@@ -5,1479 +5,854 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>VWL Übungspool: BIP | EWR GYM2</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=DM+Mono:wght@400;500&display=swap');
-
-  :root {
-    --c-bg: #f0f2f5;
-    --c-surface: #ffffff;
-    --c-primary: #1a365d;
-    --c-primary-light: #2a5298;
-    --c-accent: #e8a838;
-    --c-accent-light: #fef3c7;
-    --c-success: #16a34a;
-    --c-success-bg: #f0fdf4;
-    --c-error: #dc2626;
-    --c-error-bg: #fef2f2;
-    --c-info: #2563eb;
-    --c-info-bg: #eff6ff;
-    --c-text: #1e293b;
-    --c-text-soft: #64748b;
-    --c-border: #e2e8f0;
-    --c-hover: #f8fafc;
-    --radius: 10px;
-    --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
-    --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    font-family: 'DM Sans', system-ui, sans-serif;
-    background: var(--c-bg);
-    color: var(--c-text);
-    line-height: 1.6;
-    min-height: 100vh;
-  }
-
-  /* ── Header ── */
-  .app-header {
-    background: linear-gradient(135deg, var(--c-primary) 0%, var(--c-primary-light) 100%);
-    color: white;
-    padding: 20px 24px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.15);
-  }
-  .app-header h1 { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.02em; }
-  .app-header .meta { font-size: 0.8rem; opacity: 0.75; margin-top: 2px; }
-
-  .container { max-width: 720px; margin: 0 auto; padding: 20px 16px 100px; }
-
-  /* ── Start Screen ── */
-  .screen { display: none; }
-  .screen.active { display: block; }
-
-  .start-card {
-    background: var(--c-surface);
-    border-radius: var(--radius);
-    padding: 28px;
-    margin-bottom: 16px;
-    box-shadow: var(--shadow-sm);
-    border: 1px solid var(--c-border);
-  }
-  .start-card h2 {
-    font-size: 1.05rem;
-    font-weight: 700;
-    margin-bottom: 14px;
-    color: var(--c-primary);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .start-card h2 .icon { font-size: 1.2rem; }
-
-  /* Mode selector */
-  .mode-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 8px; }
-  .mode-card {
-    padding: 18px 16px;
-    border: 2px solid var(--c-border);
-    border-radius: var(--radius);
-    cursor: pointer;
-    transition: all 0.2s;
-    text-align: center;
-  }
-  .mode-card:hover { border-color: var(--c-primary-light); background: var(--c-hover); }
-  .mode-card.selected { border-color: var(--c-primary); background: #eef2ff; }
-  .mode-card .mode-icon { font-size: 1.8rem; margin-bottom: 6px; }
-  .mode-card .mode-title { font-weight: 700; font-size: 0.92rem; margin-bottom: 4px; }
-  .mode-card .mode-desc { font-size: 0.78rem; color: var(--c-text-soft); line-height: 1.4; }
-
-  /* Filter chips */
-  .filter-group { margin-bottom: 16px; }
-  .filter-label {
-    font-size: 0.8rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--c-text-soft);
-    margin-bottom: 8px;
-  }
-  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
-  .chip {
-    padding: 6px 14px;
-    border: 1.5px solid var(--c-border);
-    border-radius: 20px;
-    font-size: 0.82rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.15s;
-    user-select: none;
-    white-space: nowrap;
-  }
-  .chip:hover { border-color: var(--c-primary-light); }
-  .chip.selected { background: var(--c-primary); color: white; border-color: var(--c-primary); }
-  .chip .chip-count {
-    display: inline-block;
-    background: rgba(0,0,0,0.08);
-    border-radius: 10px;
-    padding: 0 6px;
-    font-size: 0.72rem;
-    margin-left: 4px;
-  }
-  .chip.selected .chip-count { background: rgba(255,255,255,0.25); }
-
-  /* Start button */
-  .start-btn {
-    width: 100%;
-    padding: 14px;
-    background: var(--c-primary);
-    color: white;
-    border: none;
-    border-radius: var(--radius);
-    font-family: inherit;
-    font-size: 1rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background 0.2s;
-    letter-spacing: -0.01em;
-  }
-  .start-btn:hover { background: var(--c-primary-light); }
-  .start-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-  .question-count-info {
-    text-align: center;
-    font-size: 0.85rem;
-    color: var(--c-text-soft);
-    margin-bottom: 14px;
-    min-height: 1.4em;
-  }
-
-  /* ── Quiz Screen ── */
-  .quiz-topbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
-    font-size: 0.82rem;
-    color: var(--c-text-soft);
-  }
-  .quiz-progress-track {
-    height: 5px;
-    background: var(--c-border);
-    border-radius: 3px;
-    margin-bottom: 20px;
-    overflow: hidden;
-  }
-  .quiz-progress-fill {
-    height: 100%;
-    background: var(--c-accent);
-    border-radius: 3px;
-    transition: width 0.4s ease;
-  }
-
-  .q-card {
-    background: var(--c-surface);
-    border-radius: var(--radius);
-    padding: 28px;
-    box-shadow: var(--shadow-sm);
-    border: 1px solid var(--c-border);
-    margin-bottom: 16px;
-    animation: fadeIn 0.3s ease;
-  }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-
-  .q-badges { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
-  .q-badge {
-    font-size: 0.68rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    padding: 3px 10px;
-    border-radius: 4px;
-  }
-  .badge-topic { background: #dbeafe; color: #1e40af; }
-  .badge-diff-1 { background: #dcfce7; color: #166534; }
-  .badge-diff-2 { background: #fef9c3; color: #854d0e; }
-  .badge-diff-3 { background: #fee2e2; color: #991b1b; }
-  .badge-type { background: #f3e8ff; color: #7c3aed; }
-  .badge-tax { background: #e0e7ff; color: #3730a3; }
-
-  .q-text {
-    font-size: 1rem;
-    font-weight: 600;
-    margin-bottom: 18px;
-    line-height: 1.55;
-    color: var(--c-text);
-  }
-
-  /* MC / TF Options */
-  .q-options { display: flex; flex-direction: column; gap: 8px; }
-  .q-opt {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    padding: 13px 16px;
-    border: 2px solid var(--c-border);
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.15s;
-    font-size: 0.92rem;
-    line-height: 1.5;
-  }
-  .q-opt:hover { border-color: #94a3b8; background: var(--c-hover); }
-  .q-opt.selected { border-color: var(--c-info); background: var(--c-info-bg); }
-  .q-opt.correct { border-color: var(--c-success); background: var(--c-success-bg); }
-  .q-opt.wrong { border-color: var(--c-error); background: var(--c-error-bg); }
-  .q-opt.was-correct { border-color: var(--c-success); background: var(--c-success-bg); }
-  .q-opt.locked { cursor: default; pointer-events: none; }
-  .q-opt-marker {
-    width: 26px; height: 26px; min-width: 26px;
-    border: 2px solid #cbd5e1;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 0.75rem; font-weight: 700; color: #94a3b8;
-    transition: all 0.15s;
-  }
-  .q-opt.selected .q-opt-marker { border-color: var(--c-info); color: var(--c-info); }
-  .q-opt.correct .q-opt-marker { border-color: var(--c-success); color: white; background: var(--c-success); }
-  .q-opt.wrong .q-opt-marker { border-color: var(--c-error); color: white; background: var(--c-error); }
-  .q-opt.was-correct .q-opt-marker { border-color: var(--c-success); color: white; background: var(--c-success); }
-
-  /* Fill blanks in quiz */
-  .q-fill-input {
-    display: inline-block;
-    border: none;
-    border-bottom: 2px solid var(--c-info);
-    background: #f8fafc;
-    padding: 3px 6px;
-    font-family: inherit;
-    font-size: 0.92rem;
-    width: 180px;
-    text-align: center;
-    outline: none;
-    transition: all 0.2s;
-  }
-  .q-fill-input:focus { border-color: var(--c-primary); background: var(--c-info-bg); }
-  .q-fill-input.correct { border-color: var(--c-success); background: var(--c-success-bg); color: #166534; }
-  .q-fill-input.wrong { border-color: var(--c-error); background: var(--c-error-bg); color: #991b1b; }
-
-  /* Calc inputs */
-  .q-calc-input {
-    width: 90px;
-    padding: 7px 10px;
-    border: 2px solid var(--c-border);
-    border-radius: 6px;
-    font-family: 'DM Mono', monospace;
-    font-size: 0.9rem;
-    text-align: right;
-    outline: none;
-  }
-  .q-calc-input:focus { border-color: var(--c-info); }
-  .q-calc-input.correct { border-color: var(--c-success); background: var(--c-success-bg); }
-  .q-calc-input.wrong { border-color: var(--c-error); background: var(--c-error-bg); }
-
-  /* Case text */
-  .q-case {
-    background: #f8fafc;
-    border-left: 4px solid var(--c-info);
-    padding: 14px 18px;
-    font-size: 0.9rem;
-    color: var(--c-text-soft);
-    margin-bottom: 16px;
-    border-radius: 0 8px 8px 0;
-    font-style: italic;
-    line-height: 1.6;
-  }
-
-  /* Feedback */
-  .q-feedback {
-    margin-top: 16px;
-    padding: 14px 18px;
-    border-radius: 8px;
-    font-size: 0.88rem;
-    line-height: 1.55;
-    display: none;
-  }
-  .q-feedback.visible { display: block; animation: fadeIn 0.25s ease; }
-  .q-feedback.success { background: var(--c-success-bg); border: 1px solid #bbf7d0; color: #166534; }
-  .q-feedback.error { background: var(--c-error-bg); border: 1px solid #fecaca; color: #991b1b; }
-  .q-feedback.info { background: var(--c-info-bg); border: 1px solid #bfdbfe; color: #1e40af; }
-
-  /* Buttons */
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 8px;
-    font-family: inherit;
-    font-size: 0.88rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-  .btn-check { background: var(--c-primary); color: white; }
-  .btn-check:hover { background: var(--c-primary-light); }
-  .btn-next { background: var(--c-accent); color: var(--c-primary); }
-  .btn-next:hover { background: #d4952e; }
-  .btn-ghost { background: var(--c-border); color: var(--c-text-soft); }
-  .btn-ghost:hover { background: #cbd5e1; }
-  .btn-stop { background: #fee2e2; color: var(--c-error); }
-  .btn-stop:hover { background: #fecaca; }
-  .btn-row { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
-
-  /* ── Results Screen ── */
-  .results-card {
-    background: var(--c-surface);
-    border-radius: var(--radius);
-    padding: 28px;
-    box-shadow: var(--shadow-sm);
-    border: 1px solid var(--c-border);
-    margin-bottom: 16px;
-    text-align: center;
-  }
-  .results-score {
-    font-size: 3rem;
-    font-weight: 700;
-    color: var(--c-primary);
-    line-height: 1;
-    margin: 12px 0;
-    font-family: 'DM Mono', monospace;
-  }
-  .results-label { font-size: 0.85rem; color: var(--c-text-soft); }
-  .results-bar {
-    height: 8px;
-    background: var(--c-border);
-    border-radius: 4px;
-    margin: 16px 0;
-    overflow: hidden;
-  }
-  .results-bar-fill {
-    height: 100%;
-    border-radius: 4px;
-    transition: width 0.6s ease;
-  }
-
-  .topic-breakdown {
-    text-align: left;
-    margin-top: 16px;
-  }
-  .topic-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 0;
-    border-bottom: 1px solid var(--c-border);
-    font-size: 0.88rem;
-  }
-  .topic-row:last-child { border-bottom: none; }
-  .topic-row .topic-name { font-weight: 500; }
-  .topic-row .topic-score { font-family: 'DM Mono', monospace; font-weight: 600; }
-  .topic-score.good { color: var(--c-success); }
-  .topic-score.ok { color: #d97706; }
-  .topic-score.bad { color: var(--c-error); }
-
-  .wrong-list { text-align: left; margin-top: 16px; }
-  .wrong-item {
-    padding: 14px 16px;
-    background: var(--c-error-bg);
-    border-radius: 8px;
-    margin-bottom: 8px;
-    font-size: 0.88rem;
-    border: 1px solid #fecaca;
-  }
-  .wrong-item .wi-q { font-weight: 600; margin-bottom: 6px; color: #991b1b; }
-  .wrong-item .wi-a { color: #166534; }
-
-  /* Print styles */
-  @media print {
-    .app-header { position: static !important; box-shadow: none !important; }
-    .btn, .quiz-topbar, .q-badges .badge-type, .q-badges .badge-tax { display: none !important; }
-    .q-card { break-inside: avoid; box-shadow: none !important; }
-    .q-feedback.visible { display: block !important; }
-    .screen.active { display: block !important; }
-  }
-
-  @media (max-width: 600px) {
-    .container { padding: 14px 10px 80px; }
-    .start-card, .q-card, .results-card { padding: 20px 16px; }
-    .mode-cards { grid-template-columns: 1fr; }
-  }
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=DM+Mono:wght@400;500&display=swap');
+:root{
+--c-bg:#f0f2f5;--c-surface:#fff;--c-primary:#1a365d;--c-primary-light:#2a5298;
+--c-accent:#e8a838;--c-accent-light:#fef3c7;--c-success:#16a34a;--c-success-bg:#f0fdf4;
+--c-error:#dc2626;--c-error-bg:#fef2f2;--c-info:#2563eb;--c-info-bg:#eff6ff;
+--c-text:#1e293b;--c-text-soft:#64748b;--c-border:#e2e8f0;--radius:10px;
+--shadow-sm:0 1px 3px rgba(0,0,0,.06);--shadow-md:0 4px 12px rgba(0,0,0,.08);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--c-bg);color:var(--c-text);line-height:1.6;min-height:100vh}
+.app-header{background:linear-gradient(135deg,var(--c-primary),var(--c-primary-light));color:#fff;padding:20px 24px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.15)}
+.app-header h1{font-size:1.25rem;font-weight:700;letter-spacing:-.02em}
+.app-header .meta{font-size:.8rem;opacity:.75;margin-top:2px}
+.container{max-width:720px;margin:0 auto;padding:20px 16px 100px}
+.screen{display:none}.screen.active{display:block}
+.card{background:var(--c-surface);border-radius:var(--radius);padding:24px;margin-bottom:16px;box-shadow:var(--shadow-sm);border:1px solid var(--c-border)}
+.card h2{font-size:1.05rem;font-weight:700;margin-bottom:14px;color:var(--c-primary)}
+.mode-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:8px}
+.mode-card{border:2px solid var(--c-border);border-radius:var(--radius);padding:16px;cursor:pointer;text-align:center;transition:.2s}
+.mode-card:hover{border-color:var(--c-primary-light);background:#f8fafc}
+.mode-card.active{border-color:var(--c-primary);background:var(--c-info-bg)}
+.mode-card .mode-icon{font-size:1.8rem;margin-bottom:6px}
+.mode-card .mode-title{font-weight:700;font-size:.95rem}
+.mode-card .mode-desc{font-size:.78rem;color:var(--c-text-soft);margin-top:4px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.chip{display:inline-flex;align-items:center;padding:6px 14px;border-radius:20px;font-size:.82rem;font-weight:500;cursor:pointer;border:2px solid var(--c-border);background:#fff;transition:.15s;user-select:none}
+.chip:hover{border-color:var(--c-primary-light)}
+.chip.active{background:var(--c-primary);color:#fff;border-color:var(--c-primary)}
+.filter-count{font-family:'DM Mono',monospace;font-size:.95rem;font-weight:600;color:var(--c-primary);margin-top:8px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 24px;border-radius:var(--radius);font-family:inherit;font-size:.95rem;font-weight:600;cursor:pointer;border:none;transition:.2s}
+.btn-primary{background:var(--c-primary);color:#fff}.btn-primary:hover{background:var(--c-primary-light)}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed}
+.btn-accent{background:var(--c-accent);color:var(--c-primary)}.btn-accent:hover{filter:brightness(1.05)}
+.btn-outline{background:transparent;border:2px solid var(--c-border);color:var(--c-text)}.btn-outline:hover{border-color:var(--c-primary);color:var(--c-primary)}
+.btn-block{width:100%;justify-content:center}
+.progress-bar-wrap{background:var(--c-border);border-radius:20px;height:8px;margin:12px 0;overflow:hidden}
+.progress-bar-fill{height:100%;background:var(--c-accent);border-radius:20px;transition:width .4s ease}
+.quiz-meta{display:flex;justify-content:space-between;align-items:center;font-size:.85rem;color:var(--c-text-soft);margin-bottom:4px}
+.quiz-meta .score{font-family:'DM Mono',monospace;font-weight:600;color:var(--c-primary)}
+.q-badges{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.badge{font-size:.7rem;font-weight:600;padding:3px 10px;border-radius:12px;text-transform:uppercase;letter-spacing:.03em}
+.badge-topic{background:var(--c-info-bg);color:var(--c-info)}
+.badge-diff1{background:#f0fdf4;color:#16a34a}.badge-diff2{background:#fef3c7;color:#b45309}.badge-diff3{background:#fef2f2;color:#dc2626}
+.badge-tax{background:#f3e8ff;color:#7c3aed}
+.badge-type{background:#f1f5f9;color:#475569}
+.q-text{font-size:1rem;font-weight:500;margin-bottom:18px;line-height:1.65}
+.mc-options{display:flex;flex-direction:column;gap:10px}
+.mc-opt{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border:2px solid var(--c-border);border-radius:var(--radius);cursor:pointer;transition:.15s;background:#fff}
+.mc-opt:hover{border-color:var(--c-primary-light);background:#f8fafc}
+.mc-opt.selected{border-color:var(--c-info);background:var(--c-info-bg)}
+.mc-opt.correct{border-color:var(--c-success);background:var(--c-success-bg)}
+.mc-opt.wrong{border-color:var(--c-error);background:var(--c-error-bg)}
+.mc-opt .opt-letter{font-family:'DM Mono',monospace;font-weight:700;font-size:.85rem;min-width:24px;height:24px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:var(--c-border);color:var(--c-text-soft);flex-shrink:0}
+.mc-opt.selected .opt-letter{background:var(--c-info);color:#fff}
+.mc-opt.correct .opt-letter{background:var(--c-success);color:#fff}
+.mc-opt.wrong .opt-letter{background:var(--c-error);color:#fff}
+.mc-opt .opt-text{font-size:.92rem;line-height:1.5}
+.tf-btns{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tf-btn{padding:16px;border:2px solid var(--c-border);border-radius:var(--radius);text-align:center;font-weight:600;font-size:1rem;cursor:pointer;transition:.15s;background:#fff}
+.tf-btn:hover{border-color:var(--c-primary-light)}.tf-btn.selected{border-color:var(--c-info);background:var(--c-info-bg)}
+.tf-btn.correct{border-color:var(--c-success);background:var(--c-success-bg)}
+.tf-btn.wrong{border-color:var(--c-error);background:var(--c-error-bg)}
+.fill-input{border:none;border-bottom:2px solid var(--c-primary);background:var(--c-info-bg);padding:4px 8px;font-family:inherit;font-size:.92rem;font-weight:500;min-width:120px;outline:none;border-radius:4px 4px 0 0;transition:.2s}
+.fill-input:focus{border-color:var(--c-accent);background:var(--c-accent-light)}
+.fill-input.correct{border-color:var(--c-success);background:var(--c-success-bg)}
+.fill-input.wrong{border-color:var(--c-error);background:var(--c-error-bg)}
+.calc-rows{display:flex;flex-direction:column;gap:10px}
+.calc-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.calc-row label{font-size:.9rem;flex:1;min-width:150px}
+.calc-row input{width:100px;padding:8px 10px;border:2px solid var(--c-border);border-radius:6px;font-family:'DM Mono',monospace;font-size:.92rem;text-align:right;outline:none}
+.calc-row input:focus{border-color:var(--c-primary)}
+.calc-row .unit{font-size:.85rem;color:var(--c-text-soft);min-width:30px}
+.calc-row input.correct{border-color:var(--c-success);background:var(--c-success-bg)}
+.calc-row input.wrong{border-color:var(--c-error);background:var(--c-error-bg)}
+.sort-pool{display:flex;flex-wrap:wrap;gap:8px;min-height:48px;padding:12px;background:var(--c-bg);border-radius:var(--radius);margin-bottom:12px}
+.sort-item{padding:8px 14px;border-radius:8px;font-size:.85rem;font-weight:500;cursor:pointer;transition:.2s;border:2px solid var(--c-border);background:#fff;user-select:none}
+.sort-item:hover{border-color:var(--c-primary-light)}.sort-item.picked{border-color:var(--c-info);background:var(--c-info-bg);box-shadow:0 0 0 2px rgba(37,99,235,.2)}
+.sort-cats{display:grid;gap:12px;margin-top:8px}
+.sort-cat{border:2px dashed var(--c-border);border-radius:var(--radius);padding:12px;min-height:60px;transition:.2s}
+.sort-cat:hover{border-color:var(--c-primary-light)}
+.sort-cat.active{border-color:var(--c-info);background:var(--c-info-bg)}
+.sort-cat-title{font-weight:700;font-size:.85rem;color:var(--c-primary);margin-bottom:8px}
+.sort-cat-items{display:flex;flex-wrap:wrap;gap:6px}
+.sort-cat-item{padding:6px 12px;border-radius:6px;font-size:.82rem;font-weight:500;cursor:pointer;background:var(--c-primary);color:#fff;transition:.15s}
+.sort-cat-item:hover{opacity:.85}
+.sort-cat-item.correct-item{background:var(--c-success)}.sort-cat-item.wrong-item{background:var(--c-error)}
+.feedback{margin-top:16px;padding:16px;border-radius:var(--radius);font-size:.9rem;line-height:1.6;display:none}
+.feedback.show{display:block}
+.feedback.correct{background:var(--c-success-bg);border-left:4px solid var(--c-success)}
+.feedback.wrong{background:var(--c-error-bg);border-left:4px solid var(--c-error)}
+.feedback-title{font-weight:700;margin-bottom:4px}
+.quiz-actions{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+.result-score{text-align:center;padding:24px;font-family:'DM Mono',monospace}
+.result-score .big{font-size:2.8rem;font-weight:700;color:var(--c-primary)}
+.result-score .pct{font-size:1.4rem;color:var(--c-text-soft)}
+.topic-results{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.topic-row{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;background:var(--c-bg)}
+.topic-row .topic-name{flex:1;font-size:.88rem;font-weight:500}
+.topic-row .topic-score{font-family:'DM Mono',monospace;font-weight:600;font-size:.85rem}
+.topic-row .topic-bar{width:60px;height:6px;background:var(--c-border);border-radius:3px;overflow:hidden}
+.topic-row .topic-bar-fill{height:100%;border-radius:3px}
+.tg{background:var(--c-success)}.ty{background:var(--c-accent)}.tr{background:var(--c-error)}
+.wrong-list{margin-top:12px}
+.wrong-item{padding:14px;border-radius:var(--radius);margin-bottom:10px;background:var(--c-bg);border-left:3px solid var(--c-error)}
+.wrong-item .wq{font-weight:600;font-size:.9rem;margin-bottom:4px}
+.wrong-item .wa{font-size:.85rem;color:var(--c-text-soft);line-height:1.5}
+@media print{.app-header,.quiz-actions,.btn,#startScreen{display:none!important}.screen{display:block!important}.card{break-inside:avoid;box-shadow:none;border:1px solid #ccc}}
+@media(max-width:500px){.mode-cards{grid-template-columns:1fr}.container{padding:12px 10px 80px}.card{padding:18px}.tf-btns{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-
-<div class="app-header">
-  <h1>Übungspool: Bruttoinlandprodukt (BIP)</h1>
-  <div class="meta">EWR GYM2 · Gymnasium Hofwil · Individuell üben</div>
-</div>
-
+<header class="app-header">
+<h1>Übungspool: Bruttoinlandprodukt (BIP)</h1>
+<div class="meta">EWR GYM2 · Gymnasium Hofwil · Individuell üben</div>
+</header>
 <div class="container">
 
-  <!-- ══════ START SCREEN ══════ -->
-  <div class="screen active" id="startScreen">
+<div id="startScreen" class="screen active">
+<div class="card">
+<h2>📋 Modus wählen</h2>
+<div class="mode-cards">
+<div class="mode-card" data-mode="focus" onclick="setMode('focus')">
+<div class="mode-icon">🎯</div>
+<div class="mode-title">Fokus</div>
+<div class="mode-desc">Gezielt ein Thema üben, nach Schwierigkeit sortiert</div>
+</div>
+<div class="mode-card" data-mode="mix" onclick="setMode('mix')">
+<div class="mode-icon">🔀</div>
+<div class="mode-title">Mix</div>
+<div class="mode-desc">Zufällige Auswahl quer durch alle Themen</div>
+</div>
+</div>
+</div>
 
-    <div class="start-card">
-      <h2><span class="icon">🎯</span> Modus wählen</h2>
-      <div class="mode-cards">
-        <div class="mode-card selected" data-mode="fokus" onclick="selectMode(this)">
-          <div class="mode-icon">🔍</div>
-          <div class="mode-title">Fokus</div>
-          <div class="mode-desc">Üben Sie gezielt ein Unterthema — von einfach nach schwierig.</div>
-        </div>
-        <div class="mode-card" data-mode="mix" onclick="selectMode(this)">
-          <div class="mode-icon">🔀</div>
-          <div class="mode-title">Mix</div>
-          <div class="mode-desc">Zufällige Mischung aller Themen — ideal zur Repetition.</div>
-        </div>
-      </div>
-    </div>
+<div class="card">
+<h2>📚 Unterthema</h2>
+<div class="chips" id="topicChips"></div>
+</div>
+<div class="card">
+<h2>📊 Schwierigkeit</h2>
+<div class="chips" id="diffChips"></div>
+</div>
+<div class="card">
+<h2>✏️ Fragetyp</h2>
+<div class="chips" id="typeChips"></div>
+</div>
+<div class="card" style="text-align:center">
+<div class="filter-count" id="filterCount">0 Aufgaben verfügbar</div>
+<button class="btn btn-primary btn-block" id="startBtn" style="margin-top:14px" onclick="startQuiz()" disabled>Übung starten</button>
+</div>
+</div>
 
-    <div class="start-card" id="filterCard">
-      <h2><span class="icon">⚙️</span> Übungen anpassen</h2>
+<div id="quizScreen" class="screen">
+<div class="card">
+<div class="quiz-meta">
+<span id="qProgress">1 / 10</span>
+<span class="score" id="qScore">0 Punkte</span>
+</div>
+<div class="progress-bar-wrap"><div class="progress-bar-fill" id="progressBar" style="width:0%"></div></div>
+</div>
+<div class="card" id="questionCard"></div>
+<div class="quiz-actions" id="quizActions">
+<button class="btn btn-accent" id="nextBtn" onclick="nextQuestion()" style="display:none">Nächste Aufgabe →</button>
+<button class="btn btn-outline" onclick="endQuiz()">Übung beenden</button>
+</div>
+</div>
 
-      <div class="filter-group">
-        <div class="filter-label">Unterthema</div>
-        <div class="chips" id="topicChips"></div>
-      </div>
-
-      <div class="filter-group">
-        <div class="filter-label">Schwierigkeit</div>
-        <div class="chips" id="diffChips">
-          <div class="chip" data-diff="1" onclick="toggleChip(this, 'diff')">⭐ Einfach</div>
-          <div class="chip" data-diff="2" onclick="toggleChip(this, 'diff')">⭐⭐ Mittel</div>
-          <div class="chip" data-diff="3" onclick="toggleChip(this, 'diff')">⭐⭐⭐ Schwer</div>
-        </div>
-      </div>
-
-      <div class="filter-group">
-        <div class="filter-label">Fragetyp</div>
-        <div class="chips" id="typeChips">
-          <div class="chip selected" data-type="mc" onclick="toggleChip(this, 'type')">Multiple Choice</div>
-          <div class="chip selected" data-type="tf" onclick="toggleChip(this, 'type')">Richtig/Falsch</div>
-          <div class="chip selected" data-type="fill" onclick="toggleChip(this, 'type')">Lückentext</div>
-          <div class="chip selected" data-type="calc" onclick="toggleChip(this, 'type')">Berechnung</div>
-          <div class="chip selected" data-type="sort" onclick="toggleChip(this, 'type')">Zuordnung</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="start-card">
-      <div class="question-count-info" id="questionCountInfo">Laden…</div>
-      <button class="start-btn" id="startBtn" onclick="startQuiz()">Übung starten</button>
-    </div>
-  </div>
-
-  <!-- ══════ QUIZ SCREEN ══════ -->
-  <div class="screen" id="quizScreen">
-    <div class="quiz-topbar">
-      <span id="quizCounter">Aufgabe 1 / 10</span>
-      <span id="quizScore">0 Punkte</span>
-    </div>
-    <div class="quiz-progress-track">
-      <div class="quiz-progress-fill" id="quizProgressFill"></div>
-    </div>
-    <div id="quizContent"></div>
-    <div class="btn-row" style="justify-content:center; margin-top:12px;">
-      <button class="btn btn-stop" onclick="endQuiz()">Übung beenden</button>
-    </div>
-  </div>
-
-  <!-- ══════ RESULTS SCREEN ══════ -->
-  <div class="screen" id="resultsScreen">
-    <div class="results-card">
-      <h2 style="justify-content:center;">Zusammenfassung</h2>
-      <div class="results-score" id="resultsScore">0/0</div>
-      <div class="results-label" id="resultsLabel">Punkte erreicht</div>
-      <div class="results-bar"><div class="results-bar-fill" id="resultsBarFill"></div></div>
-      <div class="topic-breakdown" id="topicBreakdown"></div>
-    </div>
-    <div class="results-card" id="wrongCard" style="display:none;">
-      <h2 style="justify-content:center; color:var(--c-error);">Zum Repetieren</h2>
-      <div class="wrong-list" id="wrongList"></div>
-    </div>
-    <div class="results-card">
-      <button class="start-btn" onclick="exportResults()">📄 Als PDF speichern</button>
-      <div style="height:10px;"></div>
-      <button class="start-btn" style="background:var(--c-accent); color:var(--c-primary);" onclick="resetApp()">Neue Übung starten</button>
-    </div>
-  </div>
-
+<div id="resultScreen" class="screen">
+<div class="card">
+<div class="result-score">
+<div class="big" id="resPts">0/0</div>
+<div class="pct" id="resPct">0%</div>
+</div>
+</div>
+<div class="card"><h2>📊 Nach Unterthema</h2><div id="topicResults" class="topic-results"></div></div>
+<div class="card" id="wrongCard"><h2>❌ Zum Repetieren</h2><div id="wrongList" class="wrong-list"></div></div>
+<div class="card" style="text-align:center">
+<button class="btn btn-primary" onclick="exportResults()" style="margin-right:10px">📄 Als PDF speichern</button>
+<button class="btn btn-outline" onclick="resetApp()">Neue Übung starten</button>
+</div>
+</div>
 </div>
 
 <script>
 // ══════════════════════════════════════════
-// AUFGABENPOOL
+// TOPICS
 // ══════════════════════════════════════════
-const QUESTIONS = [
-  // ── 1. DEFINITION & GRUNDBEGRIFFE ──
-  {id:"d01", topic:"definition", type:"mc", diff:1, tax:"K1", 
-   q:"Welche der folgenden Definitionen beschreibt das Bruttoinlandprodukt (BIP) am besten?",
-   options:[
-     {v:"A", t:"Die Summe aller Einkommen der Bevölkerung eines Landes."},
-     {v:"B", t:"Der Marktwert aller in einem Land innerhalb eines Jahres hergestellten Güter und Dienstleistungen, abzüglich der Vorleistungen."},
-     {v:"C", t:"Der Wert aller von Schweizer Unternehmen weltweit produzierten Güter."},
-     {v:"D", t:"Die Summe aller Konsumausgaben in einem Land."}
-   ],
-   correct:"B",
-   explain:"Das BIP misst den Marktwert aller im Inland produzierten Güter und Dienstleistungen. Vorleistungen werden abgezogen, um Doppelzählungen zu vermeiden. Antwort A beschreibt eher die Verteilungsseite, C das Bruttonationaleinkommen (BNE) und D nur die Verwendungsseite."
-  },
-  {id:"d02", topic:"definition", type:"tf", diff:1, tax:"K1",
-   q:"Das BIP misst den Wert aller Güter, die von Schweizer Staatsbürgern produziert werden, unabhängig davon, wo sie leben.",
-   correct: false,
-   explain:"Falsch. Das BIP folgt dem Inlandprinzip: Es misst, was innerhalb der Landesgrenzen produziert wird — unabhängig von der Nationalität. Was Schweizer im Ausland produzieren, zählt zum Bruttonationaleinkommen (BNE), nicht zum BIP."
-  },
-  {id:"d03", topic:"definition", type:"mc", diff:2, tax:"K2",
-   q:"Weshalb werden Vorleistungen bei der BIP-Berechnung abgezogen?",
-   options:[
-     {v:"A", t:"Weil Vorleistungen nicht auf dem Markt gehandelt werden."},
-     {v:"B", t:"Weil sonst die gleiche Wertschöpfung mehrfach gezählt würde."},
-     {v:"C", t:"Weil Vorleistungen von ausländischen Unternehmen stammen."},
-     {v:"D", t:"Weil Vorleistungen keinen Marktwert haben."}
-   ],
-   correct:"B",
-   explain:"Vorleistungen sind Güter, die in den Produktionsprozess eingehen (z.B. Mehl für den Bäcker). Würde man den Wert des Mehls und des fertigen Brotes zählen, wäre das Mehl doppelt erfasst. Deshalb wird nur die Wertschöpfung (Brot minus Mehl) gezählt."
-  },
-  {id:"d04", topic:"definition", type:"fill", diff:1, tax:"K1",
-   q:"Vervollständigen Sie: Das BIP ist definiert als der {0} aller in einem Land innerhalb eines {1} hergestellten Güter und Dienstleistungen, abzüglich der {2}.",
-   blanks:[
-     {answer:"Marktwert", alts:["marktwert"]},
-     {answer:"Jahres", alts:["jahres", "Jahr", "jahr"]},
-     {answer:"Vorleistungen", alts:["vorleistungen"]}
-   ],
-   explain:"Das BIP = Marktwert aller im Inland in einem Jahr produzierten Güter und Dienstleistungen minus Vorleistungen."
-  },
-  {id:"d05", topic:"definition", type:"mc", diff:2, tax:"K2",
-   q:"Ein Bäcker kauft Mehl für CHF 2.– und verkauft ein Brot für CHF 5.–. Wie hoch ist seine Wertschöpfung (Beitrag zum BIP)?",
-   options:[
-     {v:"A", t:"CHF 5.–"},
-     {v:"B", t:"CHF 7.–"},
-     {v:"C", t:"CHF 3.–"},
-     {v:"D", t:"CHF 2.–"}
-   ],
-   correct:"C",
-   explain:"Wertschöpfung = Output (CHF 5.–) minus Vorleistungen (CHF 2.–) = CHF 3.–. Nur diese Differenz ist der Beitrag des Bäckers zum BIP."
-  },
-  {id:"d06", topic:"definition", type:"tf", diff:1, tax:"K1",
-   q:"Das BIP wird mit Marktpreisen bewertet.",
-   correct: true,
-   explain:"Richtig. Die Güter und Dienstleistungen werden zum Marktpreis bewertet, also zum Preis, zu dem sie auf dem Markt gehandelt werden."
-  },
-  {id:"d07", topic:"definition", type:"mc", diff:1, tax:"K1",
-   q:"Welche der folgenden Aktivitäten zählt NICHT zu den Produktionsfaktoren?",
-   options:[
-     {v:"A", t:"Arbeit"},
-     {v:"B", t:"Kapital"},
-     {v:"C", t:"Konsum"},
-     {v:"D", t:"Boden / natürliche Ressourcen"}
-   ],
-   correct:"C",
-   explain:"Konsum ist die Verwendung von Gütern, kein Produktionsfaktor. Die klassischen Produktionsfaktoren sind Arbeit, Kapital und Boden (natürliche Ressourcen). Manchmal wird auch Wissen/Humankapital als vierter Faktor genannt."
-  },
-  {id:"d08", topic:"definition", type:"tf", diff:2, tax:"K2",
-   q:"Wertschöpfung entsteht, wenn die Outputs eines Unternehmens wertvoller sind als die eingesetzten Inputs.",
-   correct: true,
-   explain:"Richtig. Genau das ist das Prinzip der Wertschöpfung: Unternehmen verwandeln Produktionsfaktoren (Inputs) in Güter und Dienstleistungen (Outputs), die einen höheren Marktwert haben."
-  },
+const TOPICS={
+  definition:{label:"Definition & Grundbegriffe",short:"Definition"},
+  messprobleme:{label:"Was das BIP (nicht) misst",short:"Messprobleme"},
+  dreiseiten:{label:"Drei Seiten des BIP",short:"3 Seiten"},
+  nomreal:{label:"Nominales & Reales BIP",short:"Nom./Real"},
+  kreislauf:{label:"Wirtschaftskreislauf",short:"Kreislauf"},
+  verteilung:{label:"Verteilung & Ungleichheit",short:"Verteilung"},
+  wachstum:{label:"Wachstum & Nachhaltigkeit",short:"Wachstum"}
+};
+const DIFF_LABELS={1:"Einfach",2:"Mittel",3:"Schwer"};
+const TYPE_LABELS={mc:"Multiple Choice",tf:"Richtig/Falsch",fill:"Lückentext",calc:"Berechnung",sort:"Zuordnung"};
 
-  // ── 2. WAS DAS BIP (NICHT) MISST ──
-  {id:"m01", topic:"messprobleme", type:"tf", diff:1, tax:"K2",
-   q:"Wenn eine Familie ihre Kinder neu in eine Krippe schickt statt sie zu Hause zu betreuen, sinkt das BIP.",
-   correct: false,
-   explain:"Falsch. Das BIP steigt, weil die Krippenbetreuung als bezahlte Dienstleistung erfasst wird, während die unbezahlte Betreuung zu Hause nicht im BIP erscheint."
-  },
-  {id:"m02", topic:"messprobleme", type:"tf", diff:1, tax:"K1",
-   q:"Schwarzarbeit wird im offiziellen BIP nicht erfasst.",
-   correct: true,
-   explain:"Richtig. Schwarzarbeit wird nicht offiziell gemeldet und erscheint daher nicht in den amtlichen BIP-Statistiken."
-  },
-  {id:"m03", topic:"messprobleme", type:"tf", diff:2, tax:"K2",
-   q:"Wenn ein Unwetter Brücken zerstört und diese wieder aufgebaut werden, hat dies keinen Einfluss auf das BIP.",
-   correct: false,
-   explain:"Falsch. Der Wiederaufbau erzeugt neue Wertschöpfung (Bautätigkeit, Materialien) und erhöht das BIP. Paradoxerweise kann eine Naturkatastrophe das BIP kurzfristig steigern."
-  },
-  {id:"m04", topic:"messprobleme", type:"mc", diff:2, tax:"K3",
-   q:"Seit 2014 sind Drogenhandel und Prostitution Bestandteil der volkswirtschaftlichen Gesamtrechnung der Schweiz. Eine Hanfanlage in Lenggenwil wird von der Polizei zerstört. Wie wirkt sich das auf das BIP aus?",
-   options:[
-     {v:"A", t:"Das BIP steigt, weil die Polizeiaktion Wertschöpfung ist."},
-     {v:"B", t:"Das BIP sinkt, weil die Produktion der Anlage wegfällt."},
-     {v:"C", t:"Es gibt keinen Effekt, weil illegale Aktivitäten nicht im BIP erfasst werden."},
-     {v:"D", t:"Das BIP sinkt kurzfristig (Produktionsausfall), profitiert aber vom Polizeieinsatz."}
-   ],
-   correct:"D",
-   explain:"Die Drogenproduktion wurde im BIP erfasst und fällt nun weg (BIP sinkt). Gleichzeitig ist die Polizeiaktion eine staatliche Dienstleistung (BIP steigt). Per Saldo dürfte das BIP sinken, da der Produktionswert der Anlage grösser war als der Polizeieinsatz."
-  },
-  {id:"m05", topic:"messprobleme", type:"mc", diff:2, tax:"K2",
-   q:"Wikipedia hat kostenpflichtige Enzyklopädien weitgehend ersetzt. Welche Auswirkung hat das auf das BIP?",
-   options:[
-     {v:"A", t:"Das BIP steigt, weil mehr Menschen Zugang zu Wissen haben."},
-     {v:"B", t:"Das BIP sinkt, weil eine bisher kostenpflichtige Leistung nun gratis ist."},
-     {v:"C", t:"Kein Effekt, weil digitale Güter nicht im BIP erfasst werden."},
-     {v:"D", t:"Das BIP steigt durch die Werbeeinnahmen von Wikipedia."}
-   ],
-   correct:"B",
-   explain:"Wikipedia ist gratis und hat kostenpflichtige Enzyklopädien verdrängt. Da das BIP nur Güter zu Marktpreisen misst, geht diese Wertschöpfung verloren. Das BIP unterschätzt daher den Wohlstand, den kostenlose digitale Dienste schaffen. (Wikipedia finanziert sich durch Spenden, nicht Werbung.)"
-  },
-  {id:"m06", topic:"messprobleme", type:"mc", diff:3, tax:"K4",
-   q:"Im «Fall Fehr» meldete ein Nationalrat seine Putzfrau nicht bei der Sozialversicherung an. Nachdem der Fall publik wurde, stieg die Zahl der Anmeldungen von Haushaltshilfen. Welche Auswirkung hatte das auf das BIP?",
-   options:[
-     {v:"A", t:"Das BIP sank, weil mehr Sozialversicherungsabgaben bezahlt werden mussten."},
-     {v:"B", t:"Das BIP stieg, weil bisher nicht erfasste Arbeit nun offiziell gemeldet wurde."},
-     {v:"C", t:"Kein Effekt, weil die Arbeit vorher und nachher gleich geleistet wurde."},
-     {v:"D", t:"Das BIP stieg, weil neue Arbeitsplätze geschaffen wurden."}
-   ],
-   correct:"B",
-   explain:"Die Putzarbeit wurde schon vorher geleistet — aber als Schwarzarbeit. Durch die Anmeldung wird sie nun offiziell erfasst und erscheint im BIP. Das BIP steigt also statistisch, obwohl real dieselbe Arbeit verrichtet wird."
-  },
-  {id:"m07", topic:"messprobleme", type:"sort", diff:2, tax:"K2",
-   q:"Ordnen Sie zu: Welche der folgenden Aktivitäten werden im BIP erfasst und welche nicht?",
-   categories:["Im BIP erfasst", "Nicht im BIP erfasst"],
-   items:[
-     {t:"Kinderbetreuung in einer Krippe", cat:0},
-     {t:"Kinderbetreuung durch die Eltern zu Hause", cat:1},
-     {t:"Reparatur eines Autos in der Werkstatt", cat:0},
-     {t:"Selbst durchgeführte Autoreparatur", cat:1},
-     {t:"Kauf eines Brotes in der Bäckerei", cat:0},
-     {t:"Ehrenamtliche Arbeit im Verein", cat:1}
-   ],
-   explain:"Das BIP erfasst nur Güter und Dienstleistungen, die über den Markt gehandelt werden (also einen Preis haben). Unbezahlte Arbeit — Hausarbeit, Eigenleistungen, Ehrenamt — erscheint nicht im BIP."
-  },
-  {id:"m08", topic:"messprobleme", type:"mc", diff:3, tax:"K5",
-   q:"«Das BIP eines Landes steigt. Also geht es den Menschen in diesem Land besser.» — Beurteilen Sie diese Aussage.",
-   options:[
-     {v:"A", t:"Die Aussage ist korrekt — ein steigendes BIP bedeutet immer mehr Wohlstand."},
-     {v:"B", t:"Die Aussage ist teilweise richtig — das BIP misst nur den materiellen Wohlstand und vernachlässigt z.B. Verteilung, Umwelt und unbezahlte Arbeit."},
-     {v:"C", t:"Die Aussage ist falsch — das BIP hat nichts mit Wohlstand zu tun."},
-     {v:"D", t:"Die Aussage ist nur richtig, wenn das BIP pro Kopf steigt."}
-   ],
-   correct:"B",
-   explain:"Das BIP ist ein nützlicher, aber begrenzter Wohlstandsindikator. Es misst die wirtschaftliche Gesamtleistung, vernachlässigt aber Verteilungsaspekte, Umweltschäden, unbezahlte Arbeit, Freizeit und Lebensqualität."
-  },
+// ══════════════════════════════════════════
+// QUESTIONS – abgestimmt auf Brunetti, Eisenhut, Präsentationen & Arbeitsblätter
+// ══════════════════════════════════════════
+const QUESTIONS=[
+// ── Definition & Grundbegriffe (d01–d10) ──
+{id:"d01",topic:"definition",type:"mc",diff:1,tax:"K1",
+ q:"Was misst das Bruttoinlandprodukt (BIP)?",
+ options:[{v:"A",t:"Den Marktwert aller in einem Land während eines Jahres hergestellten Endprodukte (Waren und Dienstleistungen)"},{v:"B",t:"Den Gesamtwert aller produzierten Güter, einschliesslich aller Vorleistungen"},{v:"C",t:"Das gesamte Vermögen aller Haushalte in einem Land"},{v:"D",t:"Die Summe aller Exporte minus Importe eines Landes"}],
+ correct:"A",explain:"Das BIP entspricht dem Marktwert aller in einem Land während eines Jahres hergestellten Güter (Waren und Dienstleistungen) bewertet zu Marktpreisen, abzüglich der Vorleistungen. Es misst also die Wertschöpfung einer Volkswirtschaft."},
 
-  // ── 3. DREI SEITEN DES BIP ──
-  {id:"s01", topic:"dreiseiten", type:"fill", diff:1, tax:"K1",
-   q:"Das BIP kann auf drei Arten berechnet werden: Die {0} addiert die Wertschöpfung aller Unternehmen. Die {1} berechnet das BIP als Summe von Konsum, Staatsausgaben, Investitionen und Nettoexporten. Die {2} addiert alle Löhne und Gewinne.",
-   blanks:[
-     {answer:"Produktionsseite", alts:["Entstehungsseite", "produktionsseite", "entstehungsseite"]},
-     {answer:"Verwendungsseite", alts:["verwendungsseite"]},
-     {answer:"Verteilungsseite", alts:["Einkommensseite", "verteilungsseite", "einkommensseite"]}
-   ],
-   explain:"Die drei Seiten des BIP: Produktionsseite (Wertschöpfung), Verwendungsseite (Konsum + Staat + Investitionen + Nettoexporte), Verteilungsseite (Löhne + Gewinne). Alle drei ergeben per Definition denselben Wert."
-  },
-  {id:"s02", topic:"dreiseiten", type:"mc", diff:1, tax:"K1",
-   q:"Auf welcher Seite des BIP erscheinen die Konsumausgaben der Haushalte?",
-   options:[
-     {v:"A", t:"Produktionsseite"},
-     {v:"B", t:"Verwendungsseite"},
-     {v:"C", t:"Verteilungsseite"},
-     {v:"D", t:"Auf allen drei Seiten"}
-   ],
-   correct:"B",
-   explain:"Die Konsumausgaben sind Teil der Verwendungsseite: BIP = Konsum (C) + Staatsausgaben (G) + Investitionen (I) + Nettoexporte (NX)."
-  },
-  {id:"s03", topic:"dreiseiten", type:"tf", diff:1, tax:"K2",
-   q:"Die drei Seiten des BIP ergeben immer denselben Wert.",
-   correct: true,
-   explain:"Richtig. Per Definition müssen alle drei Seiten gleich gross sein: Was produziert wird (Produktionsseite), wird von jemandem verwendet (Verwendungsseite) und gehört als Einkommen jemandem (Verteilungsseite)."
-  },
-  {id:"s04", topic:"dreiseiten", type:"mc", diff:2, tax:"K2",
-   q:"Frau Studer arbeitet als Verkäuferin im Globus (Lohn CHF 2800/Mt.) und kauft sich dort eine Bluse für CHF 70. Wo erscheint der Kauf der Bluse in den drei Seiten des BIP?",
-   options:[
-     {v:"A", t:"Nur auf der Produktionsseite (der Globus hat die Bluse 'produziert')."},
-     {v:"B", t:"Nur auf der Verwendungsseite (Frau Studer konsumiert die Bluse)."},
-     {v:"C", t:"Auf allen drei Seiten: Produktion (Handel), Verwendung (Konsum), Verteilung (Gewinn des Globus)."},
-     {v:"D", t:"Nur auf der Verteilungsseite (der Globus macht Gewinn)."}
-   ],
-   correct:"C",
-   explain:"Jede wirtschaftliche Transaktion erscheint auf allen drei Seiten: Der Globus erbringt eine Handelsleistung (Produktionsseite), Frau Studer konsumiert (Verwendungsseite), und der Erlös wird als Lohn und Gewinn verteilt (Verteilungsseite)."
-  },
-  {id:"s05", topic:"dreiseiten", type:"sort", diff:2, tax:"K2",
-   q:"Ordnen Sie die folgenden Komponenten der richtigen BIP-Seite zu.",
-   categories:["Produktionsseite", "Verwendungsseite", "Verteilungsseite"],
-   items:[
-     {t:"Wertschöpfung der Banken", cat:0},
-     {t:"Konsumausgaben der Haushalte", cat:1},
-     {t:"Löhne der Arbeitnehmenden", cat:2},
-     {t:"Investitionen der Unternehmen", cat:1},
-     {t:"Gewinne der Unternehmen", cat:2},
-     {t:"Wertschöpfung der Industrie", cat:0}
-   ],
-   explain:"Produktionsseite: Wertschöpfung nach Branchen. Verwendungsseite: Konsum, Investitionen, Staatsausgaben, Nettoexporte. Verteilungsseite: Löhne und Gewinne."
-  },
-  {id:"s06", topic:"dreiseiten", type:"mc", diff:2, tax:"K2",
-   q:"Welche Formel beschreibt die Verwendungsseite des BIP korrekt?",
-   options:[
-     {v:"A", t:"BIP = Löhne + Gewinne + Abschreibungen"},
-     {v:"B", t:"BIP = C + G + I + (Exporte − Importe)"},
-     {v:"C", t:"BIP = Gesamtproduktion − Vorleistungen"},
-     {v:"D", t:"BIP = Konsum + Steuern + Sparen"}
-   ],
-   correct:"B",
-   explain:"Verwendungsseite: BIP = C (privater Konsum) + G (Staatsausgaben) + I (Investitionen) + NX (Nettoexporte = Exporte − Importe). Antwort A ist die Verteilungsseite, C die Produktionsseite."
-  },
+{id:"d02",topic:"definition",type:"tf",diff:1,tax:"K1",
+ q:"Das BIP misst die Wertschöpfung, die in einem Land zu aktuellen Marktpreisen erbracht worden ist.",
+ correct:true,explain:"Korrekt. Das BIP misst die effektive Wertschöpfung, die im betrachteten Land zu aktuellen Marktpreisen erbracht worden ist. Man spricht dabei vom nominalen BIP."},
 
-  // ── 4. NOMINAL vs. REAL ──
-  {id:"n01", topic:"nomreal", type:"tf", diff:1, tax:"K1",
-   q:"Das reale BIP ist um die Preisentwicklung (Inflation) bereinigt.",
-   correct: true,
-   explain:"Richtig. Das reale BIP wird zu Preisen eines Basisjahres berechnet und zeigt, ob tatsächlich mehr produziert wurde — unabhängig von Preisänderungen."
-  },
-  {id:"n02", topic:"nomreal", type:"mc", diff:1, tax:"K2",
-   q:"Das nominale BIP eines Landes steigt um 5%, die Inflation beträgt 3%. Wie hoch ist ungefähr das reale Wirtschaftswachstum?",
-   options:[
-     {v:"A", t:"8%"},
-     {v:"B", t:"5%"},
-     {v:"C", t:"2%"},
-     {v:"D", t:"3%"}
-   ],
-   correct:"C",
-   explain:"Reales Wachstum ≈ nominales Wachstum − Inflation = 5% − 3% = 2%. Die Wirtschaft ist real nur um 2% gewachsen, die restlichen 3% Anstieg sind bloss höhere Preise."
-  },
-  {id:"n03", topic:"nomreal", type:"calc", diff:2, tax:"K3",
-   q:"Berechnen Sie das ungefähre reale Wirtschaftswachstum für die folgenden Jahre. Formel: Reales Wachstum ≈ Nominales Wachstum − Inflation.",
-   rows:[
-     {label:"2023: Nom. 4.5%, Infl. 2.0%", answer:2.5, tolerance:0.2, unit:"%"},
-     {label:"2024: Nom. 3.0%, Infl. 3.5%", answer:-0.5, tolerance:0.2, unit:"%"},
-     {label:"2025: Nom. 1.2%, Infl. −0.3%", answer:1.5, tolerance:0.2, unit:"%"}
-   ],
-   explain:"2023: 4.5% − 2.0% = 2.5% | 2024: 3.0% − 3.5% = −0.5% (reale Schrumpfung!) | 2025: 1.2% − (−0.3%) = 1.5% (bei Deflation wird das reale Wachstum grösser als das nominale)."
-  },
-  {id:"n04", topic:"nomreal", type:"tf", diff:2, tax:"K2",
-   q:"Bei Deflation (negative Inflation) ist das reale BIP-Wachstum kleiner als das nominale BIP-Wachstum.",
-   correct: false,
-   explain:"Falsch. Bei Deflation ist es umgekehrt: Das reale Wachstum ist grösser als das nominale. Beispiel: Nom. Wachstum 1%, Inflation −2% → reales Wachstum ≈ 1% − (−2%) = 3%."
-  },
-  {id:"n05", topic:"nomreal", type:"mc", diff:3, tax:"K4",
-   q:"Land A meldet ein nominales BIP-Wachstum von 8% und eine Inflation von 7%. Land B meldet ein nominales Wachstum von 2% bei 0% Inflation. Welches Land hat real stärker gewachsen?",
-   options:[
-     {v:"A", t:"Land A (8% nominales Wachstum ist beeindruckend)."},
-     {v:"B", t:"Land B (2% reales Wachstum > 1% reales Wachstum in Land A)."},
-     {v:"C", t:"Beide gleich (8% − 7% = 1% und 2% − 0% = 2%)."},
-     {v:"D", t:"Das lässt sich nicht vergleichen."}
-   ],
-   correct:"B",
-   explain:"Land A: reales Wachstum ≈ 8% − 7% = 1%. Land B: reales Wachstum ≈ 2% − 0% = 2%. Land B ist real stärker gewachsen, obwohl das nominale Wachstum viel tiefer war."
-  },
+{id:"d03",topic:"definition",type:"tf",diff:1,tax:"K2",
+ q:"Um Doppelzählungen zu vermeiden, werden beim BIP nur die Endprodukte berücksichtigt, nicht die Vorleistungen.",
+ correct:true,explain:"Richtig. Bei der Ermittlung des BIP wird der Marktwert aller Güter gemessen, wobei allerdings nur Endprodukte berücksichtigt werden, um Doppelzählungen zu vermeiden. Man misst also die effektive Wertschöpfung."},
 
-  // ── 5. INTERNATIONALER VERGLEICH / PPP ──
-  {id:"p01", topic:"ppp", type:"mc", diff:2, tax:"K2",
-   q:"Was messen Kaufkraftparitäten (PPP)?",
-   options:[
-     {v:"A", t:"Den Wechselkurs zwischen zwei Währungen."},
-     {v:"B", t:"Wie viel man sich mit dem gleichen Geldbetrag in verschiedenen Ländern leisten kann."},
-     {v:"C", t:"Die Differenz zwischen nominalem und realem BIP."},
-     {v:"D", t:"Die Handelsbilanz zwischen zwei Ländern."}
-   ],
-   correct:"B",
-   explain:"PPP korrigiert dafür, dass dieselben Güter in verschiedenen Ländern unterschiedlich viel kosten. Die Idee: Wie viel Geld bräuchte man in den USA, um sich dieselben Güter leisten zu können?"
-  },
-  {id:"p02", topic:"ppp", type:"tf", diff:2, tax:"K2",
-   q:"Das BIP pro Kopf der Schweiz sinkt, wenn es für Kaufkraftparitäten (PPP) korrigiert wird.",
-   correct: true,
-   explain:"Richtig. Die Lebenshaltungskosten in der Schweiz sind deutlich höher als in den USA (Referenzland). Ein Haarschnitt, ein Mittagessen oder eine Wohnung kosten mehr. Die Kaufkraft des Schweizer BIP ist daher geringer als der nominale Wert vermuten lässt."
-  },
-  {id:"p03", topic:"ppp", type:"mc", diff:2, tax:"K3",
-   q:"Indien hat ein tiefes BIP pro Kopf, aber ein relativ höheres BIP pro Kopf in PPP. Was bedeutet das?",
-   options:[
-     {v:"A", t:"Indien exportiert viel mehr als es importiert."},
-     {v:"B", t:"Die Lebenshaltungskosten in Indien sind tiefer als in den USA — man kann sich mit weniger Geld mehr leisten."},
-     {v:"C", t:"Die indische Rupie ist überbewertet."},
-     {v:"D", t:"Indiens Wirtschaft wächst schneller als die der USA."}
-   ],
-   correct:"B",
-   explain:"In Indien sind viele Güter und Dienstleistungen viel günstiger als in den USA. Ein Haarschnitt kostet z.B. nur einen Bruchteil. Deshalb steigt das BIP pro Kopf in PPP: Die Menschen können sich mit ihrem Einkommen relativ mehr leisten."
-  },
-  {id:"p04", topic:"ppp", type:"tf", diff:3, tax:"K4",
-   q:"Ein Vergleich des BIP pro Kopf verschiedener Länder in derselben Währung (z.B. US-Dollar) reicht aus, um den Wohlstand der Bevölkerung zu vergleichen.",
-   correct: false,
-   explain:"Falsch. Der blosse Währungsumtausch berücksichtigt nicht die unterschiedlichen Preisniveaus. In einem Land mit tiefen Lebenshaltungskosten reicht ein kleineres BIP weiter. Für einen aussagekräftigen Vergleich braucht man PPP-Korrekturen — und selbst dann erfasst man nicht alles (Verteilung, Umwelt, Lebensqualität)."
-  },
+{id:"d04",topic:"definition",type:"fill",diff:1,tax:"K1",
+ q:"Die {0} ist die Wertsteigerung bei der Produktion, indem bestehende Güter in ein neues Gut umgewandelt werden. Sie entspricht dem Wert der produzierten Güter abzüglich der {1}.",
+ blanks:[{answer:"Wertschöpfung",alts:["Wertschoepfung"]},{answer:"Vorleistungen",alts:["Vorleistung"]}],
+ explain:"Wertschöpfung = Produktionswert minus Vorleistungen. Die Vorleistungen sind die von anderen Unternehmen bezogenen Güter, die in die Produktion eingehen."},
 
-  // ── 6. WIRTSCHAFTSKREISLAUF ──
-  {id:"k01", topic:"kreislauf", type:"mc", diff:1, tax:"K1",
-   q:"Im einfachen Wirtschaftskreislauf gibt es zwei Akteure. Welche?",
-   options:[
-     {v:"A", t:"Staat und Banken"},
-     {v:"B", t:"Haushalte und Unternehmen"},
-     {v:"C", t:"Unternehmen und Ausland"},
-     {v:"D", t:"Haushalte und Staat"}
-   ],
-   correct:"B",
-   explain:"Der einfache Wirtschaftskreislauf besteht aus Haushalten und Unternehmen. Haushalte bieten Produktionsfaktoren an (Arbeit) und konsumieren Güter. Unternehmen produzieren Güter und bezahlen Löhne."
-  },
-  {id:"k02", topic:"kreislauf", type:"sort", diff:2, tax:"K2",
-   q:"Ordnen Sie die folgenden Ströme dem Güterkreislauf oder dem Geldkreislauf zu.",
-   categories:["Güterkreislauf", "Geldkreislauf"],
-   items:[
-     {t:"Arbeitskraft der Haushalte", cat:0},
-     {t:"Löhne der Unternehmen", cat:1},
-     {t:"Waren im Laden", cat:0},
-     {t:"Konsumausgaben der Haushalte", cat:1},
-     {t:"Dienstleistung eines Handwerkers", cat:0},
-     {t:"Mietzahlung", cat:1}
-   ],
-   explain:"Im Wirtschaftskreislauf fliessen Güter/Dienstleistungen/Arbeit in eine Richtung (Güterkreislauf) und Geld in die entgegengesetzte Richtung (Geldkreislauf). Jeder Güterstrom hat einen entsprechenden Geldstrom."
-  },
-  {id:"k03", topic:"kreislauf", type:"mc", diff:2, tax:"K2",
-   q:"Welche zusätzlichen Akteure kommen im erweiterten Wirtschaftskreislauf hinzu?",
-   options:[
-     {v:"A", t:"Nur der Staat"},
-     {v:"B", t:"Staat, Banken und Ausland"},
-     {v:"C", t:"Banken und Versicherungen"},
-     {v:"D", t:"Staat und Ausland"}
-   ],
-   correct:"B",
-   explain:"Der erweiterte Wirtschaftskreislauf ergänzt den einfachen um drei Akteure: den Staat (Steuern, Staatsausgaben), die Banken (Sparen, Kredite) und das Ausland (Importe, Exporte)."
-  },
-  {id:"k04", topic:"kreislauf", type:"tf", diff:2, tax:"K2",
-   q:"Im Wirtschaftskreislauf fliesst Geld immer in dieselbe Richtung wie Güter.",
-   correct: false,
-   explain:"Falsch. Güter und Geld fliessen in entgegengesetzte Richtungen. Wenn ein Haushalt ein Brot kauft, fliesst das Brot zum Haushalt und das Geld zum Unternehmen."
-  },
-  {id:"k05", topic:"kreislauf", type:"mc", diff:3, tax:"K4",
-   q:"Zwischen 1962 und 1988 nahm in den USA die Zahl der Erwerbspersonen um 71% zu (Babyboom, Frauenerwerbstätigkeit). Die Zahl der Arbeitsplätze stieg fast gleich stark. Wie erklärt der Wirtschaftskreislauf das?",
-   options:[
-     {v:"A", t:"Reiner Zufall — der Arbeitsmarkt ist unabhängig von der Bevölkerung."},
-     {v:"B", t:"Mehr Beschäftigte → mehr Einkommen → mehr Konsum → Unternehmen brauchen mehr Arbeitskräfte."},
-     {v:"C", t:"Der Staat hat genügend Stellen geschaffen."},
-     {v:"D", t:"Die USA haben mehr importiert und so Arbeitsplätze geschaffen."}
-   ],
-   correct:"B",
-   explain:"Der Wirtschaftskreislauf zeigt: Mehr Arbeit auf den Faktormärkten → höheres Einkommen der Haushalte → mehr Ausgaben auf den Gütermärkten → Unternehmen müssen mehr produzieren → sie stellen mehr Arbeitskräfte ein. Die Zahl der Arbeitsplätze ist keine feste Grösse."
-  },
+{id:"d05",topic:"definition",type:"mc",diff:2,tax:"K2",
+ q:"Im Brot-Beispiel (Brunetti): Der Bauer verkauft Mehl für CHF 30, der Bäcker verkauft Brot für CHF 100, der Lebensmittelhändler verkauft das Brot für CHF 120. Wie hoch ist die Wertschöpfung des Bäckers?",
+ options:[{v:"A",t:"CHF 100"},{v:"B",t:"CHF 70"},{v:"C",t:"CHF 30"},{v:"D",t:"CHF 120"}],
+ correct:"B",explain:"Der Bäcker kauft Mehl für CHF 30 (Vorleistung) und verkauft Brot für CHF 100. Seine Wertschöpfung beträgt 100 − 30 = CHF 70. Diese fliesst in seine Löhne und Gewinne."},
 
-  // ── 7. VERTEILUNG & UMVERTEILUNG ──
-  {id:"v01", topic:"verteilung", type:"mc", diff:1, tax:"K1",
-   q:"Was ist der Unterschied zwischen Primäreinkommen und verfügbarem Einkommen?",
-   options:[
-     {v:"A", t:"Es gibt keinen Unterschied — beide Begriffe meinen dasselbe."},
-     {v:"B", t:"Das Primäreinkommen ist das Bruttoeinkommen; das verfügbare Einkommen ist das, was nach staatlicher Umverteilung (Steuern, Transfers) übrig bleibt."},
-     {v:"C", t:"Das Primäreinkommen ist nur Lohn, das verfügbare Einkommen schliesst auch Kapitalerträge ein."},
-     {v:"D", t:"Das verfügbare Einkommen ist immer höher als das Primäreinkommen."}
-   ],
-   correct:"B",
-   explain:"Das Primäreinkommen (Markteinkommen) ist das Einkommen vor staatlicher Umverteilung. Das verfügbare Einkommen ist das, was nach Steuern und Transfers (Sozialhilfe, AHV etc.) übrig bleibt."
-  },
-  {id:"v02", topic:"verteilung", type:"tf", diff:1, tax:"K1",
-   q:"Der Gini-Koeffizient misst die Ungleichheit der Einkommens- oder Vermögensverteilung.",
-   correct: true,
-   explain:"Richtig. Der Gini-Koeffizient reicht von 0 (perfekte Gleichheit) bis 1 (maximale Ungleichheit). Er wird aus der Lorenzkurve abgeleitet."
-  },
-  {id:"v03", topic:"verteilung", type:"mc", diff:2, tax:"K2",
-   q:"Was zeigt die Lorenzkurve?",
-   options:[
-     {v:"A", t:"Die Entwicklung des BIP über die Zeit."},
-     {v:"B", t:"Den Zusammenhang zwischen kumuliertem Bevölkerungsanteil und kumuliertem Einkommensanteil."},
-     {v:"C", t:"Die Inflation im Verhältnis zur Arbeitslosigkeit."},
-     {v:"D", t:"Die Aufteilung des BIP auf die drei Seiten."}
-   ],
-   correct:"B",
-   explain:"Die Lorenzkurve zeigt, welcher Anteil des Gesamteinkommens auf welchen Anteil der Bevölkerung entfällt. Bei perfekter Gleichheit wäre sie eine 45°-Linie. Je stärker sie davon abweicht, desto ungleicher die Verteilung."
-  },
-  {id:"v04", topic:"verteilung", type:"tf", diff:2, tax:"K2",
-   q:"Die Vermögensverteilung in der Schweiz ist deutlich ungleicher als die Einkommensverteilung.",
-   correct: true,
-   explain:"Richtig. In der Schweiz (und weltweit) ist die Verteilung der Vermögen viel ungleicher als die der Einkommen. Der Staat greift bei der Einkommensverteilung stärker umverteilend ein (progressive Steuern, Transfers), während die Vermögensverteilung kaum angetastet wird."
-  },
-  {id:"v05", topic:"verteilung", type:"mc", diff:3, tax:"K5",
-   q:"«Umverteilung durch den Staat schadet der Wirtschaft, weil sie die Leistungsanreize verringert.» Welche Aussage differenziert diese Position am besten?",
-   options:[
-     {v:"A", t:"Die Aussage ist immer richtig — Steuern zerstören jeden Anreiz."},
-     {v:"B", t:"Die Laffer-Kurve zeigt, dass es ein Optimum gibt: Zu hohe und zu niedrige Steuern können beide ineffizient sein."},
-     {v:"C", t:"Umverteilung hat keinerlei Auswirkung auf Anreize."},
-     {v:"D", t:"Nur Vermögenssteuern reduzieren Anreize, Einkommenssteuern nicht."}
-   ],
-   correct:"B",
-   explain:"Die Laffer-Kurve verdeutlicht, dass es einen optimalen Steuersatz gibt: Bei 0% hat der Staat keine Einnahmen, bei 100% hat niemand einen Anreiz zu arbeiten (also auch keine Einnahmen). Dazwischen gibt es ein Optimum. Die Frage ist, wo eine Gesellschaft auf dieser Kurve steht."
-  },
-  {id:"v06", topic:"verteilung", type:"sort", diff:2, tax:"K2",
-   q:"Ordnen Sie die Argumente: Welche sprechen FÜR Umverteilung und welche DAGEGEN?",
-   categories:["Für Umverteilung", "Gegen Umverteilung"],
-   items:[
-     {t:"Fairness und sozialer Zusammenhalt", cat:0},
-     {t:"Reduktion von Leistungsanreizen", cat:1},
-     {t:"Bekämpfung von Armut", cat:0},
-     {t:"Bürokratiekosten der Umverteilung", cat:1},
-     {t:"Chancengleichheit durch Bildung", cat:0},
-     {t:"Gefahr des Rent-Seeking / Lobbying", cat:1}
-   ],
-   explain:"Für Umverteilung sprechen Fairness, Armutsbekämpfung und Chancengleichheit. Dagegen sprechen reduzierte Leistungsanreize (Laffer-Kurve), Bürokratiekosten und die Gefahr, dass Umverteilung zu politischem Rent-Seeking führt."
-  },
+{id:"d06",topic:"definition",type:"calc",diff:2,tax:"K3",
+ q:"Im Brot-Beispiel: Bauer (Mehl CHF 30), Bäcker (Brot CHF 100), Lebensmittelhändler (Brot CHF 120). Berechne die Wertschöpfung jedes Produzenten und das BIP.",
+ rows:[{label:"Wertschöpfung Bauer",answer:30,tolerance:0,unit:"CHF"},{label:"Wertschöpfung Bäcker",answer:70,tolerance:0,unit:"CHF"},{label:"Wertschöpfung Händler",answer:20,tolerance:0,unit:"CHF"},{label:"BIP (Summe Wertschöpfung)",answer:120,tolerance:0,unit:"CHF"}],
+ explain:"Bauer: 30 (keine Vorleistungen). Bäcker: 100 − 30 = 70. Händler: 120 − 100 = 20. BIP = 30 + 70 + 20 = 120 CHF. Alternativ: BIP = Wert des Endprodukts = 120 CHF."},
 
-  // ── Zusätzliche Fragen über alle Themen ──
-  {id:"x01", topic:"definition", type:"mc", diff:3, tax:"K4",
-   q:"Ein Land hat ein hohes BIP, aber die Mehrheit der Bevölkerung lebt in Armut. Welche Erklärung ist am plausibelsten?",
-   options:[
-     {v:"A", t:"Das BIP wird falsch berechnet."},
-     {v:"B", t:"Das Einkommen ist sehr ungleich verteilt — wenige Reiche treiben das BIP hoch."},
-     {v:"C", t:"Das BIP pro Kopf muss tief sein."},
-     {v:"D", t:"Die Inflation ist sehr hoch."}
-   ],
-   correct:"B",
-   explain:"Ein hohes Gesamt-BIP sagt nichts über die Verteilung aus. Wenn wenige Personen oder Unternehmen den Grossteil der Wertschöpfung kontrollieren, kann die breite Bevölkerung trotzdem arm sein. Deshalb ist das BIP pro Kopf aussagekräftiger — und selbst dieses verschleiert die Verteilung."
-  },
-  {id:"x02", topic:"nomreal", type:"tf", diff:1, tax:"K1",
-   q:"Wenn das nominale BIP steigt, muss auch die reale Wirtschaftsleistung gestiegen sein.",
-   correct: false,
-   explain:"Falsch. Das nominale BIP kann allein durch steigende Preise (Inflation) zunehmen, ohne dass real mehr produziert wird. Deshalb ist das reale BIP der bessere Indikator für tatsächliches Wirtschaftswachstum."
-  },
-  {id:"x03", topic:"messprobleme", type:"tf", diff:2, tax:"K3",
-   q:"Die Nutzung von YouTube (gratis) steigert das BIP.",
-   correct: false,
-   explain:"Falsch. YouTube ist für die Nutzenden kostenlos. Da das BIP Güter zu Marktpreisen misst, erscheint die Nutzung nicht im BIP (obwohl sie einen Nutzen stiftet). Nur die Werbeeinnahmen von YouTube zählen zum BIP."
-  },
-  {id:"x04", topic:"kreislauf", type:"tf", diff:1, tax:"K1",
-   q:"Im einfachen Wirtschaftskreislauf gibt es einen Güter- und einen Geldkreislauf.",
-   correct: true,
-   explain:"Richtig. Güter (Waren, Dienstleistungen, Arbeit) und Geld (Löhne, Konsumausgaben) fliessen in entgegengesetzten Richtungen zwischen Haushalten und Unternehmen."
-  },
-  {id:"x05", topic:"dreiseiten", type:"tf", diff:2, tax:"K2",
-   q:"Exporte erhöhen das BIP auf der Verwendungsseite, Importe senken es.",
-   correct: true,
-   explain:"Richtig. Auf der Verwendungsseite gilt: BIP = C + G + I + (Exporte − Importe). Exporte sind Güter, die im Inland produziert aber im Ausland verwendet werden (zählen zum BIP). Importe sind im Ausland produziert und müssen abgezogen werden."
-  },
-  {id:"x06", topic:"ppp", type:"mc", diff:1, tax:"K1",
-   q:"Was bedeutet die Abkürzung PPP im Zusammenhang mit dem BIP?",
-   options:[
-     {v:"A", t:"Public-Private Partnership"},
-     {v:"B", t:"Purchasing Power Parity (Kaufkraftparität)"},
-     {v:"C", t:"Price Per Product"},
-     {v:"D", t:"Profit Per Person"}
-   ],
-   correct:"B",
-   explain:"PPP steht für Purchasing Power Parity (Kaufkraftparität) und dient dazu, das BIP verschiedener Länder unter Berücksichtigung der unterschiedlichen Preisniveaus vergleichbar zu machen."
-  },
-  {id:"x07", topic:"verteilung", type:"mc", diff:2, tax:"K2",
-   q:"Ein Gini-Koeffizient von 0.25 bedeutet:",
-   options:[
-     {v:"A", t:"Maximale Ungleichheit — eine Person besitzt alles."},
-     {v:"B", t:"Relativ gleichmässige Verteilung."},
-     {v:"C", t:"Genau 25% der Bevölkerung besitzen 75% des Einkommens."},
-     {v:"D", t:"Die Hälfte der Bevölkerung lebt unter der Armutsgrenze."}
-   ],
-   correct:"B",
-   explain:"Der Gini-Koeffizient reicht von 0 (perfekte Gleichheit) bis 1 (maximale Ungleichheit). Ein Wert von 0.25 zeigt eine relativ gleichmässige Verteilung an. Die Schweiz hat einen Gini-Koeffizient von ca. 0.33 (nach Umverteilung)."
-  }
+{id:"d07",topic:"definition",type:"sort",diff:1,tax:"K2",
+ q:"Ordne die folgenden Begriffe den vier Produktionsfaktoren zu.",
+ categories:["Arbeit","Natürliche Ressourcen","Realkapital","Wissen"],
+ items:[{t:"Körperliche Kraft",cat:0},{t:"Rohstoffe",cat:1},{t:"Maschinen",cat:2},{t:"Patente",cat:3},{t:"Fachwissen/Ausbildung",cat:0},{t:"Boden/Standort",cat:1},{t:"Anlagen/Gebäude",cat:2},{t:"Lizenzen",cat:3}],
+ explain:"Arbeit = körperliche und geistige Tätigkeit (inkl. Fachwissen als Mitarbeiter). Natürliche Ressourcen = Boden, Rohstoffe, Energie. Realkapital = Maschinen, Anlagen, Werkzeuge. Wissen = Patente, Lizenzen, betriebliches Know-how."},
+
+{id:"d08",topic:"definition",type:"mc",diff:1,tax:"K1",
+ q:"Welcher der folgenden Begriffe bezeichnet die von anderen Unternehmen bezogenen Güter, die in die Produktion eingehen?",
+ options:[{v:"A",t:"Endprodukte"},{v:"B",t:"Vorleistungen"},{v:"C",t:"Wertschöpfung"},{v:"D",t:"Produktionsfaktoren"}],
+ correct:"B",explain:"Vorleistungen sind die von anderen Unternehmen bezogenen Güter, die in die Produktion eingehen. Sie werden beim BIP abgezogen, um Doppelzählungen zu vermeiden."},
+
+{id:"d09",topic:"definition",type:"tf",diff:2,tax:"K2",
+ q:"Das BIP misst den Wohlstand eines Landes vollständig und zuverlässig.",
+ correct:false,explain:"Falsch. Das BIP ist ein Mass für den materiellen Wohlstand (Güterversorgung), aber kein geeignetes Mass für die Lebensqualität oder Wohlfahrt. Es erfasst z.B. weder Umweltqualität, Gesundheit noch Freizeit."},
+
+{id:"d10",topic:"definition",type:"fill",diff:1,tax:"K1",
+ q:"Das BIP pro Kopf berechnet man, indem man das BIP durch die {0} dividiert.",
+ blanks:[{answer:"Bevölkerungszahl",alts:["Einwohnerzahl","Bevölkerung","Bevölkerungsanzahl"]}],
+ explain:"Um Länder unterschiedlicher Grösse zu vergleichen, wird das BIP pro Kopf verwendet: BIP ÷ Bevölkerungszahl. So erhält man ein vergleichbares Wohlstandsmass."},
+
+// ── Messprobleme (m01–m10) ──
+{id:"m01",topic:"messprobleme",type:"mc",diff:2,tax:"K3",
+ q:"Im Jahr 2005 ereignete sich in der Schweiz ein Jahrhunderthochwasser mit ca. 3 Mrd. CHF Schaden. Welche Auswirkung hatte dies auf das BIP?",
+ options:[{v:"A",t:"Das BIP sank, weil Werte zerstört wurden."},{v:"B",t:"Das BIP stieg, weil die Aufräum- und Reparaturarbeiten als Wertschöpfung erfasst werden."},{v:"C",t:"Das BIP blieb unverändert, da Naturkatastrophen nicht erfasst werden."},{v:"D",t:"Das BIP sank um genau 3 Mrd. CHF."}],
+ correct:"B",explain:"Das BIP erfasst die Wertschöpfung, nicht den Nutzen. Die Zerstörung durch das Hochwasser senkt zwar die Lebensqualität, aber die anschliessenden Reparatur- und Aufräumarbeiten werden als positive Wertschöpfung im BIP erfasst. Ein Paradoxon des BIP!"},
+
+{id:"m02",topic:"messprobleme",type:"mc",diff:2,tax:"K3",
+ q:"Eine Familie schickt ihre Kinder neu in die Kinderkrippe statt sie zu Hause zu betreuen. Welche Auswirkung hat dies auf das BIP?",
+ options:[{v:"A",t:"Das BIP sinkt, weil die Familie weniger konsumiert."},{v:"B",t:"Das BIP bleibt gleich, da es sich um dieselbe Betreuungsleistung handelt."},{v:"C",t:"Das BIP steigt, weil die Krippenleistung im Gegensatz zur Eigenbetreuung als Marktleistung erfasst wird."},{v:"D",t:"Das BIP steigt nur, wenn die Mutter nun arbeiten geht."}],
+ correct:"C",explain:"Die VGR erfasst nur monetäre Flüsse. Eigenleistungen wie Kinderbetreuung zu Hause werden nicht im BIP erfasst, die bezahlte Betreuung in einer Krippe hingegen schon. Das BIP steigt, unabhängig davon ob die Eltern neu erwerbstätig werden."},
+
+{id:"m03",topic:"messprobleme",type:"tf",diff:2,tax:"K2",
+ q:"Seit 2012 sind Drogenhandel und Prostitution in der Schweiz Bestandteil des BIP.",
+ correct:true,explain:"Richtig. Seit September 2014 werden in der VGR gemäss einer europäischen Richtlinie auch illegale Aktivitäten erfasst bzw. geschätzt. In der Schweiz sind Schätzungen über Prostitution und Drogenhandel seit 2012 Bestandteile der VGR."},
+
+{id:"m04",topic:"messprobleme",type:"mc",diff:2,tax:"K3",
+ q:"Ein Nationalrat stellte eine Putzfrau an, ohne sie bei der Sozialversicherung anzumelden. Nachdem der Fall publik wurde, stiegen die Anmeldungen von Haushaltshilfen stark an. Was passiert mit dem BIP?",
+ options:[{v:"A",t:"Das BIP sinkt, weil Schwarzarbeit aufgedeckt wurde."},{v:"B",t:"Das BIP steigt, weil vormals schwarz erbrachte Leistungen nun offiziell erfasst werden."},{v:"C",t:"Das BIP bleibt gleich, weil die gleiche Arbeit geleistet wird."},{v:"D",t:"Das BIP sinkt, weil die Putzfrauen nun Sozialabgaben zahlen müssen."}],
+ correct:"B",explain:"Schwarzarbeit wird in der VGR nur geschätzt (ca. 7% des BIP). Wenn Putzfrauen offiziell angemeldet werden, wird ihre Leistung vollständig als Wertschöpfung erfasst. Das offizielle BIP steigt."},
+
+{id:"m05",topic:"messprobleme",type:"sort",diff:2,tax:"K3",
+ q:"Ordne die folgenden Sachverhalte zu: Welche werden im BIP erfasst und welche nicht?",
+ categories:["Im BIP erfasst","Nicht im BIP erfasst"],
+ items:[{t:"Kauf eines Brots im Laden",cat:0},{t:"Eigenarbeit im Garten",cat:1},{t:"Bezahlte Taxifahrt",cat:0},{t:"Ehrenamtliche Arbeit",cat:1},{t:"Arztbesuch",cat:0},{t:"Kochen zu Hause für die Familie",cat:1},{t:"Kauf eines neuen Autos",cat:0},{t:"Nachbarschaftshilfe gratis",cat:1}],
+ explain:"Die VGR erfasst nur monetäre Flüsse, also über den Markt gehandelte Leistungen. Eigenleistungen, Hausarbeit, Freiwilligenarbeit und Do-it-yourself-Arbeiten werden nicht erfasst."},
+
+{id:"m06",topic:"messprobleme",type:"tf",diff:2,tax:"K2",
+ q:"Eine Erhöhung der Beamtenlöhne erhöht automatisch das BIP, auch wenn die tatsächliche Leistung gleich bleibt.",
+ correct:true,explain:"Richtig. Staatliche Leistungen werden im BIP mit ihren Kosten bewertet. Eine Lohnerhöhung bedeutet somit unmittelbar und im selben Umfang eine Steigerung des BIP, was die Zweifelhaftigkeit dieser Bewertung zeigt."},
+
+{id:"m07",topic:"messprobleme",type:"mc",diff:3,tax:"K4",
+ q:"Welches der folgenden Beispiele zeigt am deutlichsten, dass das BIP kein geeigneter Indikator für die Lebensqualität ist?",
+ options:[{v:"A",t:"Die Schweiz hat ein höheres BIP pro Kopf als Deutschland."},{v:"B",t:"Eine Zunahme von Autounfällen erhöht das BIP (Polizei, Sanitäter, Reparaturen), senkt aber die Lebensqualität."},{v:"C",t:"Das reale BIP ist tiefer als das nominale BIP."},{v:"D",t:"Die Schweiz exportiert viele Dienstleistungen."}],
+ correct:"B",explain:"Autounfälle generieren wirtschaftliche Aktivität (Einsatz von Polizei, Sanitätern, Ärzten, Reparaturen), die das BIP steigern. Gleichzeitig sinkt die Lebensqualität. Dieses Paradoxon zeigt, dass das BIP kein Messinstrument für Wohlfahrt und Lebensqualität ist."},
+
+{id:"m08",topic:"messprobleme",type:"tf",diff:1,tax:"K1",
+ q:"Die Digitalisierung stellt die BIP-Statistik vor keine besonderen Herausforderungen.",
+ correct:false,explain:"Falsch. Die Digitalisierung, also die Vernetzung von Mensch und Maschine und die Verlagerung von physischen Produkten in virtuelle Räume, stellt eine besondere Herausforderung für die BIP-Statistik dar. Neue Werte der Digitalisierung bemessen sich nicht mehr in örtlich zurechenbaren Stückzahlen."},
+
+{id:"m09",topic:"messprobleme",type:"sort",diff:3,tax:"K4",
+ q:"Ordne die folgenden Aspekte zu: Handelt es sich um ein Problem der «nicht erfassten Schäden», der «nicht erfassten Leistungen» oder um eine «problematische Bewertung»?",
+ categories:["Nicht erfasste Schäden","Nicht erfasste Leistungen","Problematische Bewertung"],
+ items:[{t:"Umweltverschmutzung durch Industrie",cat:0},{t:"Ehrenamtliche Freiwilligenarbeit",cat:1},{t:"Beamtenlöhne als Mass für Staatsleistung",cat:2},{t:"Lärm durch Strassenverkehr",cat:0},{t:"Kochen zu Hause",cat:1},{t:"Steigende Gesundheitskosten = mehr BIP",cat:2}],
+ explain:"Nicht erfasste Schäden: Umwelt- und Gesundheitsschäden senken die Lebensqualität, werden aber nicht vom BIP abgezogen. Nicht erfasste Leistungen: Haus- und Freiwilligenarbeit haben einen Wert, fliessen aber nicht ins BIP ein. Problematische Bewertung: Staatliche Leistungen werden zu Kosten bewertet, was verzerren kann."},
+
+{id:"m10",topic:"messprobleme",type:"fill",diff:2,tax:"K2",
+ q:"Die Schwarzarbeit wird in der Schweiz auf knapp {0} des BIP geschätzt. Trotzdem bleibt die Erfassung der Schattenwirtschaft unzureichend.",
+ blanks:[{answer:"7%",alts:["7 %","7 Prozent","sieben Prozent"]}],
+ explain:"Gemäss Bundesamt für Statistik wird die Schwarzarbeit in der Schweiz auf knapp 7% des BIP geschätzt. Die Erfassung bleibt trotz der Statistik-Revision weitgehend im Schatten."},
+
+// ── Drei Seiten des BIP (s01–s07) ──
+{id:"s01",topic:"dreiseiten",type:"mc",diff:1,tax:"K1",
+ q:"Welche der folgenden Ansätze gehören zu den drei Seiten des BIP?",
+ options:[{v:"A",t:"Produktionsansatz, Einkommensansatz, Verwendungsansatz"},{v:"B",t:"Angebotsansatz, Nachfrageansatz, Handelsansatz"},{v:"C",t:"Import, Export, Konsum"},{v:"D",t:"Primär, Sekundär, Tertiär"}],
+ correct:"A",explain:"Das BIP lässt sich auf drei Arten berechnen, die alle zum gleichen Ergebnis führen: Produktionsansatz (Summe der Wertschöpfung), Einkommensansatz (Summe der Faktoreinkommen) und Verwendungsansatz (Summe der Ausgaben)."},
+
+{id:"s02",topic:"dreiseiten",type:"fill",diff:2,tax:"K1",
+ q:"Beim Verwendungsansatz setzt sich das BIP zusammen aus dem privaten {0}, den staatlichen Ausgaben, den {1} und den Exporten minus Importen.",
+ blanks:[{answer:"Konsum",alts:["Privatkonsum","privaten Konsum"]},{answer:"Investitionen",alts:["Bruttoinvestitionen"]}],
+ explain:"BIP (Verwendungsansatz) = Privater Konsum + Staatsausgaben + Investitionen + (Exporte − Importe). Der Verwendungsansatz zeigt, wofür die produzierten Güter verwendet werden."},
+
+{id:"s03",topic:"dreiseiten",type:"mc",diff:2,tax:"K2",
+ q:"Beim Produktionsansatz berechnet man das BIP, indem man…",
+ options:[{v:"A",t:"…die Wertschöpfung aller Unternehmen zusammenzählt."},{v:"B",t:"…alle Löhne und Gewinne addiert."},{v:"C",t:"…den gesamten Konsum aller Haushalte misst."},{v:"D",t:"…die Produktionsmenge in Stück zählt."}],
+ correct:"A",explain:"Beim Produktionsansatz wird die Wertschöpfung aller Unternehmen summiert. Wertschöpfung = Produktionswert minus Vorleistungen. Es werden also die Gütersubventionen addiert und die Gütersteuern abgezogen."},
+
+{id:"s04",topic:"dreiseiten",type:"sort",diff:2,tax:"K2",
+ q:"Ordne die folgenden Grössen dem korrekten BIP-Berechnungsansatz zu.",
+ categories:["Produktionsansatz","Einkommensansatz","Verwendungsansatz"],
+ items:[{t:"Summe der Wertschöpfung",cat:0},{t:"Löhne und Gehälter",cat:1},{t:"Privater Konsum",cat:2},{t:"Exporte minus Importe",cat:2},{t:"Gewinne",cat:1},{t:"Investitionen",cat:2},{t:"Vorleistungen abziehen",cat:0}],
+ explain:"Produktionsansatz: Summe der Wertschöpfung (Umsatz − Vorleistungen). Einkommensansatz: Löhne + Gewinne + Zinsen + Mieten. Verwendungsansatz: Konsum + Investitionen + Staatsausgaben + Nettoexporte."},
+
+{id:"s05",topic:"dreiseiten",type:"tf",diff:2,tax:"K2",
+ q:"Die drei Ansätze zur BIP-Berechnung führen zu unterschiedlichen Ergebnissen.",
+ correct:false,explain:"Falsch. Die drei Ansätze (Produktions-, Einkommens- und Verwendungsansatz) führen theoretisch zum gleichen Ergebnis. Sie betrachten dieselbe Wirtschaftsleistung aus drei verschiedenen Perspektiven."},
+
+{id:"s06",topic:"dreiseiten",type:"mc",diff:2,tax:"K2",
+ q:"Im erweiterten Wirtschaftskreislauf: Welche Ströme fliessen vom Staat an die Haushalte?",
+ options:[{v:"A",t:"Steuern"},{v:"B",t:"Löhne, Zinsen und Transfers"},{v:"C",t:"Exporte"},{v:"D",t:"Vorleistungen"}],
+ correct:"B",explain:"Der Staat zahlt den Haushalten Löhne (für Staatsangestellte), Zinsen (für Staatsanleihen) und Transfers (z.B. Renten, Sozialhilfe). Die Steuern fliessen umgekehrt von den Haushalten zum Staat."},
+
+{id:"s07",topic:"dreiseiten",type:"fill",diff:1,tax:"K1",
+ q:"Staatliche Leistungen ohne direkte Gegenleistung, wie z.B. Renten, nennt man {0}.",
+ blanks:[{answer:"Transfers",alts:["Transfer","Transferzahlungen","Transferleistungen"]}],
+ explain:"Transfers sind meist staatliche Leistungen, die man ohne direkte Gegenleistung erhält, z.B. AHV-Renten, Sozialhilfe oder Kinderzulagen."},
+
+// ── Nominales & Reales BIP (n01–n06) ──
+{id:"n01",topic:"nomreal",type:"mc",diff:1,tax:"K1",
+ q:"Was ist der Unterschied zwischen dem nominalen und dem realen BIP?",
+ options:[{v:"A",t:"Das nominale BIP ist zu laufenden Preisen, das reale BIP ist inflationsbereinigt (zu konstanten Preisen)."},{v:"B",t:"Das nominale BIP gilt für ein einzelnes Land, das reale BIP für die ganze Welt."},{v:"C",t:"Das nominale BIP wird pro Kopf gemessen, das reale BIP absolut."},{v:"D",t:"Es gibt keinen Unterschied, es sind Synonyme."}],
+ correct:"A",explain:"Das nominale BIP misst die gesamte Produktion zu laufenden (aktuellen) Marktpreisen. Das reale BIP berücksichtigt die Inflation: Indem man die Inflation herausrechnet, erhält man aus dem nominalen BIP das reale BIP. Dieser Wert lässt sich dann über die Zeit vergleichen."},
+
+{id:"n02",topic:"nomreal",type:"tf",diff:1,tax:"K2",
+ q:"Um das BIP verschiedener Jahre miteinander zu vergleichen, verwendet man am besten das nominale BIP.",
+ correct:false,explain:"Falsch. Für Zeitvergleiche nutzt man das reale BIP, da es die Inflation berücksichtigt. Ein Franken heute hat wegen der Teuerung weniger Wert als ein Franken vor zehn Jahren. Nur das reale BIP zeigt echte Produktionsveränderungen."},
+
+{id:"n03",topic:"nomreal",type:"calc",diff:2,tax:"K3",
+ q:"Das nominale BIP der Schweiz betrug 2022 rund CHF 800 Mrd. Die Inflation seit dem Basisjahr betrug 5%. Berechne das reale BIP (gerundet auf ganze Mrd.).",
+ rows:[{label:"Reales BIP (Mrd. CHF)",answer:762,tolerance:5,unit:"Mrd."}],
+ explain:"Reales BIP = Nominales BIP ÷ (1 + Inflationsrate) = 800 ÷ 1.05 ≈ 762 Mrd. CHF. Das reale BIP ist tiefer als das nominale, weil die Preissteigerung herausgerechnet wird."},
+
+{id:"n04",topic:"nomreal",type:"mc",diff:2,tax:"K2",
+ q:"Warum ist das nominale BIP in der Regel höher als das reale BIP?",
+ options:[{v:"A",t:"Weil das nominale BIP Exporte einschliesst."},{v:"B",t:"Weil das nominale BIP die Preissteigerung seit dem Basisjahr enthält."},{v:"C",t:"Weil das reale BIP nur die Hälfte der Wirtschaftssektoren erfasst."},{v:"D",t:"Weil das nominale BIP die Bevölkerungszahl berücksichtigt."}],
+ correct:"B",explain:"Da die Preise in der Regel über die Zeit steigen (Inflation), ist das zu laufenden Preisen bewertete nominale BIP höher als das reale BIP, bei dem die Inflation herausgerechnet wird."},
+
+{id:"n05",topic:"nomreal",type:"fill",diff:2,tax:"K2",
+ q:"Will man das BIP verschiedener Länder vergleichen, so rechnet man das reale BIP pro Kopf in eine einheitliche Währung um – meist in {0}.",
+ blanks:[{answer:"US-Dollar",alts:["USD","Dollar","US Dollar","US-Dollars"]}],
+ explain:"Für internationale Vergleiche wird das reale BIP pro Kopf meist in US-Dollar umgerechnet. Dabei gibt es zwei Methoden: zum Wechselkurs oder zur Kaufkraftparität (PPP)."},
+
+{id:"n06",topic:"nomreal",type:"mc",diff:3,tax:"K3",
+ q:"Die Schweiz hat 2022 ein BIP pro Kopf von ca. USD 96'390 (zum Wechselkurs), aber nur ca. USD 84'658 (in Kaufkraftparität/PPP). Warum?",
+ options:[{v:"A",t:"Weil die Schweiz weniger produziert als die Statistik zeigt."},{v:"B",t:"Weil das Preisniveau in der Schweiz hoch ist – man kann mit einem Franken weniger kaufen als in vielen anderen Ländern."},{v:"C",t:"Weil die Bevölkerung zu gross ist."},{v:"D",t:"Weil die Schweiz viel importiert."}],
+ correct:"B",explain:"Die Kaufkraftparität (PPP) berücksichtigt, dass man in der Schweiz für denselben Betrag weniger kaufen kann als in vielen anderen Ländern. Der Wechselkurs überschätzt den tatsächlichen Wohlstand, weil das hohe Preisniveau nicht berücksichtigt wird."},
+
+// ── Wirtschaftskreislauf (k01–k08) ──
+{id:"k01",topic:"kreislauf",type:"mc",diff:1,tax:"K1",
+ q:"Welche zwei Akteure stehen im Zentrum des einfachen Wirtschaftskreislaufs?",
+ options:[{v:"A",t:"Haushalte und Unternehmen"},{v:"B",t:"Staat und Ausland"},{v:"C",t:"Banken und Versicherungen"},{v:"D",t:"Arbeitnehmer und Arbeitgeber"}],
+ correct:"A",explain:"Im einfachen Wirtschaftskreislauf stehen Haushalte und Unternehmen im Zentrum. Die Haushalte bieten den Unternehmen Arbeit und Kapital an und fragen Güter nach. Die Unternehmen produzieren Güter und fragen Produktionsfaktoren nach."},
+
+{id:"k02",topic:"kreislauf",type:"tf",diff:1,tax:"K2",
+ q:"Im einfachen Wirtschaftskreislauf fliessen Güterströme und Geldströme in dieselbe Richtung.",
+ correct:false,explain:"Falsch. Güterströme und Geldströme fliessen in entgegengesetzte Richtungen. Wenn Güter von Unternehmen zu Haushalten fliessen, fliesst Geld (Zahlung) von Haushalten zu Unternehmen. Es gibt immer einen Strom und einen Gegenstrom."},
+
+{id:"k03",topic:"kreislauf",type:"fill",diff:1,tax:"K1",
+ q:"Im erweiterten Wirtschaftskreislauf kommen neben Haushalten und Unternehmen zwei weitere Akteure hinzu: der {0} und das {1}.",
+ blanks:[{answer:"Staat",alts:[]},{answer:"Ausland",alts:[]}],
+ explain:"Der erweiterte Wirtschaftskreislauf bezieht den Staat (mit Steuern, Staatsausgaben und Transfers) und das Ausland (mit Exporten und Importen) ein."},
+
+{id:"k04",topic:"kreislauf",type:"mc",diff:2,tax:"K3",
+ q:"Frau Studer arbeitet als Verkäuferin im Globus für CHF 2'800/Monat und kauft dort eine Bluse für CHF 70. Welcher Geldstrom fliesst von Globus an Frau Studer?",
+ options:[{v:"A",t:"CHF 70 (Bezahlung für die Bluse)"},{v:"B",t:"CHF 2'800 (Lohn für ihre Arbeit)"},{v:"C",t:"CHF 2'730 (Lohn minus Bluse)"},{v:"D",t:"Kein Geldstrom, nur Güterströme"}],
+ correct:"B",explain:"Von Globus (Unternehmen) an Frau Studer (Haushalt) fliesst der Lohn von CHF 2'800 als Entgelt für den Produktionsfaktor Arbeit. Die CHF 70 für die Bluse fliessen in die andere Richtung (von Frau Studer an Globus)."},
+
+{id:"k05",topic:"kreislauf",type:"sort",diff:2,tax:"K2",
+ q:"Ordne die Ströme im erweiterten Wirtschaftskreislauf korrekt zu: Von wem fliesst Geld zu wem?",
+ categories:["Unternehmen → Haushalte","Haushalte → Staat","Staat → Haushalte","Ausland → Unternehmen"],
+ items:[{t:"Löhne und Zinsen",cat:0},{t:"Steuern",cat:1},{t:"Renten (Transfers)",cat:2},{t:"Zahlung für Exporte",cat:3}],
+ explain:"Unternehmen zahlen Löhne/Zinsen an Haushalte. Haushalte zahlen Steuern an den Staat. Der Staat zahlt Transfers (z.B. Renten) an Haushalte. Das Ausland zahlt für Exporte an Unternehmen."},
+
+{id:"k06",topic:"kreislauf",type:"mc",diff:3,tax:"K3",
+ q:"Frau Camenisch (Grischuna AG) verdient CHF 3'400/Monat, kauft Bündnerfleisch für CHF 16, zahlt CHF 3'250 Steuern und bringt CHF 10'000 zur CS (Zins CHF 95). Welcher Strom gehört NICHT zum direkten Kreislauf zwischen Unternehmen und Haushalt?",
+ options:[{v:"A",t:"Lohn CHF 3'400"},{v:"B",t:"Bezahlung Bündnerfleisch CHF 16"},{v:"C",t:"Steuerzahlung CHF 3'250"},{v:"D",t:"Arbeit von Frau Camenisch"}],
+ correct:"C",explain:"Die Steuerzahlung ist ein Geldstrom vom Haushalt zum Staat, nicht zum Unternehmen. Lohn (B→H), Bezahlung für Güter (H→U) und Arbeitsleistung (H→U) sind alle Teil des direkten Kreislaufs Unternehmen–Haushalt."},
+
+{id:"k07",topic:"kreislauf",type:"tf",diff:2,tax:"K2",
+ q:"Auf dem Gütermarkt sind die Unternehmen die Anbieter und die Haushalte die Nachfrager.",
+ correct:true,explain:"Richtig. Auf dem Gütermarkt bieten Unternehmen Waren und Dienstleistungen an, die von den Haushalten nachgefragt werden. Auf dem Faktormarkt ist es umgekehrt: Haushalte bieten Produktionsfaktoren (Arbeit, Kapital) an, Unternehmen fragen diese nach."},
+
+{id:"k08",topic:"kreislauf",type:"sort",diff:2,tax:"K2",
+ q:"Ordne die folgenden Entgelte den richtigen Produktionsfaktoren zu.",
+ categories:["Arbeit","Boden","Kapital","Wissen"],
+ items:[{t:"Lohn / Gehalt",cat:0},{t:"Miete / Pacht",cat:1},{t:"Zinsen",cat:2},{t:"Lizenzgebühren",cat:3}],
+ explain:"Jeder Produktionsfaktor hat sein spezifisches Entgelt: Arbeit → Lohn/Gehalt, Boden → Miete/Pacht, Kapital → Zinsen, Wissen → Lizenz- und Patentgebühren."},
+
+// ── Verteilung & Ungleichheit (v01–v10) ──
+{id:"v01",topic:"verteilung",type:"mc",diff:1,tax:"K1",
+ q:"Was misst die Lorenzkurve?",
+ options:[{v:"A",t:"Die Verteilung von Einkommen oder Vermögen in einer Gesellschaft."},{v:"B",t:"Das BIP-Wachstum über die Zeit."},{v:"C",t:"Die Produktivität verschiedener Wirtschaftssektoren."},{v:"D",t:"Die Handelsbeziehungen zwischen Ländern."}],
+ correct:"A",explain:"Die Lorenzkurve zeigt grafisch, wie gleichmässig oder ungleichmässig Einkommen oder Vermögen in einer Gesellschaft verteilt sind. Die 45°-Diagonale repräsentiert die perfekte Gleichverteilung."},
+
+{id:"v02",topic:"verteilung",type:"tf",diff:1,tax:"K1",
+ q:"Ein Gini-Koeffizient von 0 bedeutet perfekte Gleichverteilung.",
+ correct:true,explain:"Richtig. Der Gini-Koeffizient nimmt Werte zwischen 0 (perfekte Gleichverteilung, alle haben gleich viel) und 1 (maximale Ungleichverteilung, eine Person hat alles) an."},
+
+{id:"v03",topic:"verteilung",type:"mc",diff:2,tax:"K2",
+ q:"Der Gini-Koeffizient für das verfügbare Einkommen ist in der Schweiz ca. 0,29 und in den USA ca. 0,37. Was bedeutet das?",
+ options:[{v:"A",t:"Die USA produzieren mehr als die Schweiz."},{v:"B",t:"Die Einkommensverteilung in der Schweiz ist gleichmässiger als in den USA."},{v:"C",t:"Die Schweiz hat mehr Einwohner als die USA."},{v:"D",t:"Die USA haben ein tieferes BIP pro Kopf."}],
+ correct:"B",explain:"Ein tieferer Gini-Koeffizient bedeutet eine gleichmässigere Verteilung. Mit 0,29 hat die Schweiz eine deutlich gleichmässigere Einkommensverteilung als die USA mit 0,37."},
+
+{id:"v04",topic:"verteilung",type:"tf",diff:2,tax:"K2",
+ q:"In der Schweiz besitzen 209'063 Bernerinnen und Berner kein Vermögen.",
+ correct:true,explain:"Richtig. Gemäss den Vermögensdaten des Kantons Bern besitzen 209'063 Steuerpflichtige kein Vermögen, während nur 770 Personen bereits 20% des gesamten Vermögens besitzen. Die Vermögensverteilung ist deutlich ungleicher als die Einkommensverteilung."},
+
+{id:"v05",topic:"verteilung",type:"mc",diff:2,tax:"K2",
+ q:"Was unterscheidet «gute» von «schlechter» Ungleichheit gemäss der ökonomischen Diskussion?",
+ options:[{v:"A",t:"Gute Ungleichheit gibt den Menschen Anreize, sich auszubilden und zu arbeiten. Schlechte Ungleichheit hilft vor allem, erlangte Positionen zu erhalten."},{v:"B",t:"Gute Ungleichheit betrifft nur Vermögen, schlechte nur Einkommen."},{v:"C",t:"Gute Ungleichheit gibt es nur in reichen Ländern."},{v:"D",t:"Es gibt keinen Unterschied – Ungleichheit ist immer schlecht."}],
+ correct:"A",explain:"Branko Milanovic unterscheidet: Gute Ungleichheit schafft Anreize für Leistung, Bildung und Risikobereitschaft. Schlechte Ungleichheit entsteht, wenn Reiche ihre Macht nutzen, um Vorteile zu sichern (rent-seeking) oder wenn mangelnde Chancengleichheit den Bildungszugang einschränkt."},
+
+{id:"v06",topic:"verteilung",type:"mc",diff:3,tax:"K4",
+ q:"Warum kann zu grosse Ungleichheit dem Wirtschaftswachstum schaden?",
+ options:[{v:"A",t:"Weil reiche Länder keine Exporte brauchen."},{v:"B",t:"Weil ein grosser Teil der Bevölkerung von guter Bildung ausgeschlossen wird, was Humankapital und Innovation bremst."},{v:"C",t:"Weil Ungleichheit automatisch zu höherer Inflation führt."},{v:"D",t:"Weil der Gini-Koeffizient dann über 1 steigt."}],
+ correct:"B",explain:"In ungleichen Gesellschaften haben Kinder aus armen Familien oft keinen Zugang zu guter Bildung. Da das zukünftige Einkommen stark vom Ausbildungsstand abhängt, bleibt ein grosses volkswirtschaftliches Potenzial (Humankapital) brach. Zudem können soziale Unruhen und politische Instabilität das Wachstum hemmen."},
+
+{id:"v07",topic:"verteilung",type:"tf",diff:2,tax:"K2",
+ q:"Die direkte Bundessteuer in der Schweiz ist progressiv: Das oberste 1% der Steuerpflichtigen zahlt ca. 41% der Steuererträge.",
+ correct:true,explain:"Richtig. In der Schweiz zahlt das einkommensstärkste 1% der Steuerpflichtigen rund 41% der direkten Bundessteuer, obwohl es nur etwa 12% des gesamten steuerbaren Einkommens erzielt. Dies zeigt die stark progressive Wirkung der Bundessteuer."},
+
+{id:"v08",topic:"verteilung",type:"mc",diff:2,tax:"K2",
+ q:"Was zeigt die Laffer-Kurve?",
+ options:[{v:"A",t:"Dass zu hohe Steuersätze die Steuereinnahmen senken können, weil die Leistungsanreize sinken."},{v:"B",t:"Dass die Lorenzkurve immer gleich bleibt."},{v:"C",t:"Dass das BIP bei Nullwachstum am höchsten ist."},{v:"D",t:"Dass Exporte und Importe sich immer ausgleichen."}],
+ correct:"A",explain:"Die Laffer-Kurve zeigt: Ab einem bestimmten Steuersatz führen höhere Steuern zu sinkenden Steuereinnahmen. Die Menschen haben weniger Anreize, sich anzustrengen, und weichen in die Schattenwirtschaft aus. Es gibt also einen optimalen Steuersatz."},
+
+{id:"v09",topic:"verteilung",type:"fill",diff:2,tax:"K2",
+ q:"Gemäss Ökonomen wie James Heckman ist das effizienteste Mittel gegen Ungleichheit nicht die Umverteilung durch Steuern, sondern die {0} von Kindern aus bildungsfernen Familien.",
+ blanks:[{answer:"Frühförderung",alts:["frühkindliche Förderung","Frühbildung"]}],
+ explain:"James Heckman, Wirtschaftsnobelpreisträger, argumentiert, dass ca. 50% der Einkommensunterschiede durch Faktoren vor dem 18. Lebensjahr bestimmt werden. Frühförderung von Kindern aus bildungsfernen Familien ist das wirksamste und effizienteste Instrument gegen Ungleichheit."},
+
+{id:"v10",topic:"verteilung",type:"mc",diff:3,tax:"K5",
+ q:"In der Schweiz braucht es gemäss OECD ca. 5 Generationen, bis eine Familie aus dem untersten Einkommensdezil das Durchschnittseinkommen erreicht. In Dänemark nur 2. Was lässt sich daraus folgern?",
+ options:[{v:"A",t:"Die Schweiz ist ärmer als Dänemark."},{v:"B",t:"Die soziale Mobilität ist in Dänemark höher als in der Schweiz."},{v:"C",t:"Dänemark hat ein höheres BIP."},{v:"D",t:"Die Schweiz hat mehr Ungleichheit als die USA."}],
+ correct:"B",explain:"Die Zahl der Generationen bis zum Durchschnittseinkommen misst die soziale Mobilität. In Dänemark ist der soziale Aufstieg schneller möglich (2 Generationen) als in der Schweiz (5). Das zeigt, dass das Bildungs- und Sozialsystem in Dänemark mehr Chancengleichheit fördert."},
+
+// ── Wachstum & Nachhaltigkeit (w01–w09) ──
+{id:"w01",topic:"wachstum",type:"mc",diff:1,tax:"K1",
+ q:"Auf welche zwei grundlegenden Arten kann eine Volkswirtschaft wachsen?",
+ options:[{v:"A",t:"Durch Erhöhung der Arbeitsstunden oder durch Steigerung der Produktivität (Produktion pro Arbeitsstunde)."},{v:"B",t:"Durch mehr Exporte oder durch weniger Importe."},{v:"C",t:"Durch höhere Preise oder durch höhere Steuern."},{v:"D",t:"Durch mehr Geld drucken oder durch Schulden."}],
+ correct:"A",explain:"Das BIP pro Kopf kann nur auf zwei Wegen steigen: Entweder es werden mehr Arbeitsstunden geleistet, oder die Produktion pro Arbeitsstunde (Produktivität) wird erhöht. Für den Wohlstand ist das BIP pro Kopf entscheidend, nicht das Gesamt-BIP."},
+
+{id:"w02",topic:"wachstum",type:"sort",diff:2,tax:"K2",
+ q:"Ordne die wirtschaftspolitischen Massnahmen dem richtigen Ansatz zur Wachstumsförderung zu.",
+ categories:["Mehr Arbeitsstunden","Höhere Produktivität"],
+ items:[{t:"Zuwanderung von Arbeitskräften",cat:0},{t:"Investitionen in Sachkapital",cat:1},{t:"Höhere Erwerbsquote",cat:0},{t:"Bessere Ausbildung (Humankapital)",cat:1},{t:"Technologischer Fortschritt",cat:1},{t:"Erhöhung des Pensionierungsalters",cat:0}],
+ explain:"Mehr Arbeitsstunden: durch mehr Erwerbstätige (Zuwanderung, höhere Erwerbsquote, höheres Pensionsalter). Höhere Produktivität: durch mehr Sachkapital, mehr Humankapital (Bildung) und bessere Technik."},
+
+{id:"w03",topic:"wachstum",type:"fill",diff:1,tax:"K1",
+ q:"Die fünf wirtschaftspolitischen Bereiche für Wachstum sind: Wettbewerbspolitik, {0}, Bildungspolitik, Innovationspolitik und Finanzpolitik.",
+ blanks:[{answer:"Aussenwirtschaftspolitik",alts:["Aussenwirtschaft","Aussenhandelspolitik"]}],
+ explain:"Die fünf Bereiche sind: 1. Wettbewerbspolitik (Effizienz), 2. Aussenwirtschaftspolitik (offene Märkte), 3. Bildungspolitik (Humankapital), 4. Innovationspolitik (Technologie), 5. Finanzpolitik (Staatsfinanzen)."},
+
+{id:"w04",topic:"wachstum",type:"mc",diff:1,tax:"K1",
+ q:"Was versteht man unter nachhaltiger Entwicklung (Brundtland-Definition)?",
+ options:[{v:"A",t:"Eine Entwicklung, die die Bedürfnisse der Gegenwart befriedigt, ohne zu riskieren, dass künftige Generationen ihre Bedürfnisse nicht befriedigen können."},{v:"B",t:"Ein möglichst hohes BIP-Wachstum über viele Jahre."},{v:"C",t:"Eine Wirtschaft ohne jegliche Umweltbelastung."},{v:"D",t:"Ein System, bei dem alle das gleiche Einkommen erhalten."}],
+ correct:"A",explain:"Die Brundtland-Definition (1987): Nachhaltige Entwicklung ist die Entwicklung, die die Bedürfnisse der Gegenwart befriedigt, ohne zu riskieren, dass künftige Generationen ihre eigenen Bedürfnisse nicht befriedigen können."},
+
+{id:"w05",topic:"wachstum",type:"mc",diff:2,tax:"K2",
+ q:"Was versteht man unter «externen Effekten» im Zusammenhang mit nachhaltiger Entwicklung?",
+ options:[{v:"A",t:"Kosten, die bei der Produktion oder beim Konsum anfallen, aber nicht vom Verursacher, sondern von der Gesellschaft getragen werden."},{v:"B",t:"Exporte in andere Länder."},{v:"C",t:"Kosten für die Anschaffung neuer Maschinen."},{v:"D",t:"Löhne, die an ausländische Arbeitnehmer gezahlt werden."}],
+ correct:"A",explain:"Externe Effekte (Externalitäten) sind Kosten (oder Nutzen), die nicht vom Verursacher getragen werden, sondern von der Gesellschaft. Typisches Beispiel: Umweltverschmutzung – das Unternehmen verschmutzt, die Gesellschaft trägt die Kosten. Der Markt versagt hier."},
+
+{id:"w06",topic:"wachstum",type:"sort",diff:2,tax:"K2",
+ q:"Ordne die Instrumente der Umweltpolitik korrekt zu.",
+ categories:["Gebote und Verbote","Lenkungsabgaben","Umweltzertifikate"],
+ items:[{t:"Grenzwerte für Schadstoffausstoss",cat:0},{t:"CO₂-Abgabe auf fossile Brennstoffe",cat:1},{t:"Handel mit Emissionsrechten",cat:2},{t:"Verbot von FCKW",cat:0},{t:"Klimarappen auf Benzin",cat:1}],
+ explain:"Gebote/Verbote: direkte staatliche Vorgaben (Grenzwerte, Verbote). Lenkungsabgaben: Steuern auf umweltbelastende Aktivitäten, die Anreize zur Vermeidung schaffen. Umweltzertifikate: der Staat verteilt Verschmutzungsrechte, die gehandelt werden können."},
+
+{id:"w07",topic:"wachstum",type:"tf",diff:2,tax:"K2",
+ q:"Lenkungsabgaben sollen dem Staat höhere Einnahmen verschaffen.",
+ correct:false,explain:"Falsch. Lenkungsabgaben sollen primär Verhaltensänderungen bewirken, nicht dem Staat Einnahmen verschaffen. Die Einnahmen werden vollumfänglich an die Bevölkerung zurückverteilt. Das unterscheidet sie von gewöhnlichen Steuern."},
+
+{id:"w08",topic:"wachstum",type:"mc",diff:3,tax:"K4",
+ q:"Warum sind Umweltzertifikate aus ökonomischer Sicht oft effizienter als Gebote und Verbote?",
+ options:[{v:"A",t:"Weil sie billiger herzustellen sind."},{v:"B",t:"Weil Unternehmen, die günstig Emissionen reduzieren können, dies tun und ihre Zertifikate verkaufen – so werden Emissionen dort eingespart, wo es am billigsten ist."},{v:"C",t:"Weil sie keine Kontrolle erfordern."},{v:"D",t:"Weil sie nur für grosse Unternehmen gelten."}],
+ correct:"B",explain:"Beim Zertifikatehandel erreichen die kostengünstigsten Massnahmen zuerst Wirkung. Unternehmen, die billig reduzieren können, sparen ein und verkaufen überschüssige Zertifikate. Unternehmen, für die Reduktion teuer wäre, kaufen Zertifikate. So wird das Gesamtziel kosteneffizient erreicht."},
+
+{id:"w09",topic:"wachstum",type:"fill",diff:2,tax:"K1",
+ q:"Die Schweiz hat 2008 eine CO₂-{0} eingeführt, deren Einnahmen vollständig an die Bevölkerung zurückverteilt werden.",
+ blanks:[{answer:"Abgabe",alts:["Steuer","Lenkungsabgabe"]}],
+ explain:"Die CO₂-Abgabe ist eine Lenkungsabgabe auf fossile Brennstoffe. Ihre Einnahmen werden vollständig an die Bevölkerung zurückverteilt, um Verhaltensänderungen zu bewirken, ohne den Staat zu bereichern."},
+
+// ── Zusätzliche gemischte Aufgaben (x01–x06) ──
+{id:"x01",topic:"definition",type:"mc",diff:3,tax:"K4",
+ q:"Im Brot-Beispiel beträgt das BIP 120 CHF. Warum wäre es falsch, die Umsätze aller Produzenten (30 + 100 + 120 = 250) als BIP zu nehmen?",
+ options:[{v:"A",t:"Weil das Mehl und das Brot als Vorleistungen doppelt gezählt würden."},{v:"B",t:"Weil die Löhne fehlen."},{v:"C",t:"Weil das Ausland nicht berücksichtigt ist."},{v:"D",t:"Weil der Bauer keine Vorleistungen hat."}],
+ correct:"A",explain:"Würde man alle Umsätze addieren, wäre das Mehl (CHF 30) dreimal enthalten: einmal als Produkt des Bauern, einmal in den Kosten des Bäckers und einmal in den Kosten des Händlers. Die Wertschöpfungsmethode vermeidet diese Doppelzählungen."},
+
+{id:"x02",topic:"verteilung",type:"tf",diff:3,tax:"K5",
+ q:"Sind reiche Menschen grundsätzlich glücklicher? Die Forschung zeigt, dass ab einem gewissen Einkommensniveau zusätzliches Einkommen kaum noch mehr Zufriedenheit bringt.",
+ correct:true,explain:"Richtig. Der Zusammenhang zwischen Einkommen und Glück ist bei tiefen Einkommen stark positiv, schwächt sich aber ab einem bestimmten Niveau deutlich ab. Menschen gewöhnen sich schnell an ein höheres Einkommensniveau (hedonische Anpassung). Zudem macht Einkommen vor allem dann glücklicher, wenn man im Vergleich zu seinem Umfeld mehr verdient."},
+
+{id:"x03",topic:"kreislauf",type:"tf",diff:2,tax:"K2",
+ q:"Im erweiterten Wirtschaftskreislauf importieren nur die Haushalte Güter aus dem Ausland, nicht die Unternehmen.",
+ correct:false,explain:"Falsch. Im vereinfachten Schema fliessen die Importzahlungen von den Haushalten ans Ausland. In der Realität importieren aber auch Unternehmen und der Staat Güter. Das Modell ist eine starke Vereinfachung der Realität."},
+
+{id:"x04",topic:"wachstum",type:"mc",diff:2,tax:"K2",
+ q:"Was versteht man unter dem Coase-Theorem?",
+ options:[{v:"A",t:"Bei klar definierten Eigentumsrechten und geringen Transaktionskosten können externe Effekte durch freiwillige Verhandlungen gelöst werden."},{v:"B",t:"Höhere Steuern führen immer zu höheren Staatseinnahmen."},{v:"C",t:"Das BIP entspricht immer dem Volkseinkommen."},{v:"D",t:"Nachhaltigkeit und Wachstum schliessen sich gegenseitig aus."}],
+ correct:"A",explain:"Das Coase-Theorem besagt: Wenn Eigentums-, Nutzungs- und Klagerechte klar definiert sind und die Transaktionskosten gering, können die Betroffenen das Problem externer Effekte durch freiwillige Verhandlungen lösen – ohne direkte Staatseingriffe."},
+
+{id:"x05",topic:"messprobleme",type:"mc",diff:2,tax:"K2",
+ q:"Welcher der folgenden Aspekte wird oft als Schwäche internationaler BIP-Vergleiche genannt?",
+ options:[{v:"A",t:"Wechselkursschwankungen können die Rangliste stark verändern, und mit der gleichen Summe kann man in verschiedenen Ländern unterschiedlich viel kaufen."},{v:"B",t:"Alle Länder verwenden genau dieselbe Berechnungsmethode."},{v:"C",t:"Das BIP berücksichtigt die Kaufkraft automatisch."},{v:"D",t:"Die Bevölkerungszahl spielt bei Vergleichen keine Rolle."}],
+ correct:"A",explain:"Bei internationalen Vergleichen muss man eine einheitliche Währung verwenden, wobei Wechselkursschwankungen die Ergebnisse verzerren können. Zudem kann man in verschiedenen Ländern für denselben Betrag unterschiedlich viel kaufen. Deshalb werden BIP-Vergleiche oft kaufkraftbereinigt (PPP) durchgeführt."},
+
+{id:"x06",topic:"definition",type:"sort",diff:2,tax:"K2",
+ q:"Ordne die Begriffe der korrekten Kategorie zu: Handelt es sich um Wohlstand oder Wohlfahrt?",
+ categories:["Wohlstand","Wohlfahrt"],
+ items:[{t:"BIP pro Kopf",cat:0},{t:"Umweltqualität",cat:1},{t:"Materielle Güterversorgung",cat:0},{t:"Gesundheit",cat:1},{t:"Wirtschaftswachstum",cat:0},{t:"Freizeit",cat:1},{t:"Bildungsniveau",cat:1},{t:"Soziale Sicherheit",cat:1}],
+ explain:"Wohlstand = materieller Lebensstandard, gemessen am BIP. Wohlfahrt = umfassenderes Konzept des Wohlergehens, das auch Gesundheit, Bildung, Umwelt, Freizeit und weitere Sozialindikatoren umfasst. Das BIP misst Wohlstand, aber nicht Wohlfahrt."}
 ];
 
-// ── Topic metadata ──
-const TOPICS = {
-  definition: {label:"Definition & Grundbegriffe", short:"Definition"},
-  messprobleme: {label:"Was das BIP (nicht) misst", short:"Messprobleme"},
-  dreiseiten: {label:"Drei Seiten des BIP", short:"3 Seiten"},
-  nomreal: {label:"Nominales vs. reales BIP", short:"Nominal/Real"},
-  ppp: {label:"Internationaler Vergleich / PPP", short:"PPP"},
-  kreislauf: {label:"Wirtschaftskreislauf", short:"Kreislauf"},
-  verteilung: {label:"Verteilung & Umverteilung", short:"Verteilung"}
-};
-
 // ══════════════════════════════════════════
-// APP STATE
+// STATE
 // ══════════════════════════════════════════
-let state = {
-  mode: 'fokus',
-  filters: { topics: [], diffs: [1,2,3], types: ['mc','tf','fill','calc','sort'] },
-  queue: [],
-  current: 0,
-  score: 0,
-  maxScore: 0,
-  answered: [],
-  wrong: []
-};
+let state={mode:null,filters:{topics:new Set(),diffs:new Set(),types:new Set()},queue:[],current:0,score:0,maxScore:0,answered:[],wrong:[]};
+let pickedSortItem=null;
 
 // ══════════════════════════════════════════
 // INIT
 // ══════════════════════════════════════════
-function init() {
-  // Build topic chips
-  const topicChips = document.getElementById('topicChips');
-  for (const [key, val] of Object.entries(TOPICS)) {
-    const count = QUESTIONS.filter(q => q.topic === key).length;
-    const chip = document.createElement('div');
-    chip.className = 'chip';
-    chip.dataset.topic = key;
-    chip.innerHTML = val.short + ' <span class="chip-count">' + count + '</span>';
-    chip.onclick = function() { toggleChip(this, 'topic'); };
-    topicChips.appendChild(chip);
-  }
-  updateQuestionCount();
+function init(){
+  buildChips('topicChips',TOPICS,'topics',t=>TOPICS[t].short);
+  buildChips('diffChips',DIFF_LABELS,'diffs',d=>DIFF_LABELS[d]);
+  buildChips('typeChips',TYPE_LABELS,'types',t=>TYPE_LABELS[t]);
+  updateFilterCount();
 }
 
-function selectMode(el) {
-  document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('selected'));
-  el.classList.add('selected');
-  state.mode = el.dataset.mode;
-  applyModeDefaults();
-  updateQuestionCount();
+function buildChips(containerId,obj,filterKey,labelFn){
+  const c=document.getElementById(containerId);
+  c.innerHTML='';
+  Object.keys(obj).forEach(k=>{
+    const ch=document.createElement('span');
+    ch.className='chip';
+    ch.textContent=labelFn(k);
+    ch.dataset.key=k;
+    ch.onclick=()=>toggleChip(ch,filterKey,k);
+    c.appendChild(ch);
+  });
 }
 
-function applyModeDefaults() {
-  if (state.mode === 'fokus') {
-    // Fokus: Thema und Schwierigkeit müssen gewählt werden, Fragetypen bleiben alle an
-    document.querySelectorAll('#topicChips .chip').forEach(c => c.classList.remove('selected'));
-    document.querySelectorAll('#diffChips .chip').forEach(c => c.classList.remove('selected'));
-    document.querySelectorAll('#typeChips .chip').forEach(c => c.classList.add('selected'));
+function setMode(m){
+  state.mode=m;
+  document.querySelectorAll('.mode-card').forEach(c=>c.classList.toggle('active',c.dataset.mode===m));
+  if(m==='mix'){
+    // Mix: alles vorausgewählt
+    ['topicChips','diffChips','typeChips'].forEach(id=>{
+      document.querySelectorAll('#'+id+' .chip').forEach(ch=>{
+        ch.classList.add('active');
+        state.filters[id==='topicChips'?'topics':id==='diffChips'?'diffs':'types'].add(ch.dataset.key);
+      });
+    });
   } else {
-    // Mix: alles angewählt
-    document.querySelectorAll('#topicChips .chip').forEach(c => c.classList.add('selected'));
-    document.querySelectorAll('#diffChips .chip').forEach(c => c.classList.add('selected'));
-    document.querySelectorAll('#typeChips .chip').forEach(c => c.classList.add('selected'));
+    // Fokus: nichts vorausgewählt bei Unterthema und Schwierigkeit, alle Fragetypen aktiv
+    ['topicChips','diffChips'].forEach(id=>{
+      document.querySelectorAll('#'+id+' .chip').forEach(ch=>ch.classList.remove('active'));
+      state.filters[id==='topicChips'?'topics':'diffs'].clear();
+    });
+    document.querySelectorAll('#typeChips .chip').forEach(ch=>{
+      ch.classList.add('active');
+      state.filters.types.add(ch.dataset.key);
+    });
   }
+  updateFilterCount();
 }
 
-function toggleChip(el, group) {
-  el.classList.toggle('selected');
-  updateQuestionCount();
+function toggleChip(el,filterKey,key){
+  el.classList.toggle('active');
+  if(el.classList.contains('active'))state.filters[filterKey].add(key);
+  else state.filters[filterKey].delete(key);
+  updateFilterCount();
 }
 
-function getSelectedFilters() {
-  const topics = [...document.querySelectorAll('#topicChips .chip.selected')].map(c => c.dataset.topic);
-  const diffs = [...document.querySelectorAll('#diffChips .chip.selected')].map(c => parseInt(c.dataset.diff));
-  const types = [...document.querySelectorAll('#typeChips .chip.selected')].map(c => c.dataset.type);
-  return {topics, diffs, types};
-}
-
-function getFilteredQuestions() {
-  const f = getSelectedFilters();
-  return QUESTIONS.filter(q =>
-    f.topics.includes(q.topic) &&
-    f.diffs.includes(q.diff) &&
-    f.types.includes(q.type)
+function getFiltered(){
+  return QUESTIONS.filter(q=>
+    (state.filters.topics.size===0||state.filters.topics.has(q.topic))&&
+    (state.filters.diffs.size===0||state.filters.diffs.has(String(q.diff)))&&
+    (state.filters.types.size===0||state.filters.types.has(q.type))
   );
 }
 
-function updateQuestionCount() {
-  const filtered = getFilteredQuestions();
-  const info = document.getElementById('questionCountInfo');
-  const btn = document.getElementById('startBtn');
-  if (filtered.length === 0) {
-    info.textContent = 'Keine Aufgaben mit diesen Filtern verfügbar.';
-    btn.disabled = true;
-  } else {
-    info.textContent = filtered.length + ' Aufgaben verfügbar — Sie können jederzeit aufhören.';
-    btn.disabled = false;
-  }
+function updateFilterCount(){
+  const n=getFiltered().length;
+  document.getElementById('filterCount').textContent=n+' Aufgabe'+(n!==1?'n':'')+' verfügbar';
+  document.getElementById('startBtn').disabled=n===0||!state.mode;
 }
 
 // ══════════════════════════════════════════
-// QUIZ LOGIC
+// QUIZ
 // ══════════════════════════════════════════
-function startQuiz() {
-  let pool = getFilteredQuestions();
-  if (pool.length === 0) return;
-
-  if (state.mode === 'fokus') {
-    // Sort by difficulty, then by topic
-    pool.sort((a, b) => a.diff - b.diff || a.id.localeCompare(b.id));
-  } else {
-    // Shuffle for mix mode
-    pool = shuffle([...pool]);
-  }
-
-  state.queue = pool;
-  state.current = 0;
-  state.score = 0;
-  state.maxScore = 0;
-  state.answered = [];
-  state.wrong = [];
-
+function startQuiz(){
+  let q=getFiltered();
+  if(state.mode==='focus')q.sort((a,b)=>a.diff-b.diff);
+  else shuffle(q);
+  state.queue=q;state.current=0;state.score=0;state.maxScore=0;state.answered=[];state.wrong=[];
   showScreen('quizScreen');
   renderQuestion();
 }
 
-function renderQuestion() {
-  const q = state.queue[state.current];
-  const total = state.queue.length;
-  document.getElementById('quizCounter').textContent = 'Aufgabe ' + (state.current + 1) + ' / ' + total;
-  document.getElementById('quizScore').textContent = state.score + ' Punkt' + (state.score !== 1 ? 'e' : '');
-  document.getElementById('quizProgressFill').style.width = ((state.current / total) * 100) + '%';
+function renderQuestion(){
+  const q=state.queue[state.current];
+  const total=state.queue.length;
+  document.getElementById('qProgress')=(state.current+1)+' / '+total;
+  document.getElementById('qScore').textContent=state.score+' Punkte';
+  document.getElementById('progressBar').style.width=((state.current)/total*100)+'%';
+  document.getElementById('nextBtn').style.display='none';
 
-  const diffLabels = {1:'Einfach', 2:'Mittel', 3:'Schwer'};
-  const typeLabels = {mc:'Multiple Choice', tf:'Richtig/Falsch', fill:'Lückentext', calc:'Berechnung', sort:'Zuordnung'};
+  let html='<div class="q-badges">';
+  html+='<span class="badge badge-topic">'+TOPICS[q.topic].short+'</span>';
+  html+='<span class="badge badge-diff'+q.diff+'">'+DIFF_LABELS[q.diff]+'</span>';
+  html+='<span class="badge badge-tax">'+q.tax+'</span>';
+  html+='<span class="badge badge-type">'+TYPE_LABELS[q.type]+'</span>';
+  html+='</div>';
+  html+='<div class="q-text">'+q.q+'</div>';
 
-  let html = '<div class="q-card" id="currentQ">';
-  html += '<div class="q-badges">';
-  html += '<span class="q-badge badge-topic">' + TOPICS[q.topic].short + '</span>';
-  html += '<span class="q-badge badge-diff-' + q.diff + '">' + diffLabels[q.diff] + '</span>';
-  html += '<span class="q-badge badge-type">' + typeLabels[q.type] + '</span>';
-  html += '<span class="q-badge badge-tax">' + q.tax + '</span>';
-  html += '</div>';
-
-  if (q.type === 'mc') {
-    html += '<div class="q-text">' + q.q + '</div>';
-    html += '<div class="q-options" id="qOpts">';
-    q.options.forEach(o => {
-      html += '<div class="q-opt" data-value="' + o.v + '" onclick="selectOpt(this)">';
-      html += '<div class="q-opt-marker">' + o.v + '</div>';
-      html += '<div>' + o.t + '</div></div>';
+  if(q.type==='mc'){
+    html+='<div class="mc-options">';
+    q.options.forEach(o=>{
+      html+='<div class="mc-opt" data-val="'+o.v+'" onclick="answerMC(this,\''+q.id+'\',\''+o.v+'\')">';
+      html+='<span class="opt-letter">'+o.v+'</span><span class="opt-text">'+o.t+'</span></div>';
     });
-    html += '</div>';
-    html += '<div class="btn-row"><button class="btn btn-check" onclick="checkMCQ()">Überprüfen</button></div>';
-  }
-  else if (q.type === 'tf') {
-    html += '<div class="q-text">' + q.q + '</div>';
-    html += '<div class="q-options" id="qOpts">';
-    html += '<div class="q-opt" data-value="true" onclick="selectOpt(this)"><div class="q-opt-marker">R</div><div>Richtig</div></div>';
-    html += '<div class="q-opt" data-value="false" onclick="selectOpt(this)"><div class="q-opt-marker">F</div><div>Falsch</div></div>';
-    html += '</div>';
-    html += '<div class="btn-row"><button class="btn btn-check" onclick="checkTFQ()">Überprüfen</button></div>';
-  }
-  else if (q.type === 'fill') {
-    let text = q.q;
-    q.blanks.forEach((b, i) => {
-      text = text.replace('{' + i + '}', '<input class="q-fill-input" data-idx="' + i + '" placeholder="…">');
-    });
-    html += '<div class="q-text" style="font-weight:400; line-height:2.2;">' + text + '</div>';
-    html += '<div class="btn-row"><button class="btn btn-check" onclick="checkFillQ()">Überprüfen</button></div>';
-  }
-  else if (q.type === 'calc') {
-    html += '<div class="q-text">' + q.q + '</div>';
-    html += '<div style="display:flex; flex-direction:column; gap:10px;">';
-    q.rows.forEach((r, i) => {
-      html += '<div style="display:flex; align-items:center; gap:10px; font-size:0.92rem; flex-wrap:wrap;">';
-      html += '<span style="min-width:200px;">' + r.label + '</span>';
-      html += '<input class="q-calc-input" data-idx="' + i + '" placeholder="?"> <span>' + (r.unit || '') + '</span>';
-      html += '</div>';
-    });
-    html += '</div>';
-    html += '<div class="btn-row"><button class="btn btn-check" onclick="checkCalcQ()">Überprüfen</button></div>';
-  }
-  else if (q.type === 'sort') {
-    html += '<div class="q-text">' + q.q + '</div>';
-    html += '<p style="font-size:0.82rem; color:var(--c-text-soft); margin-bottom:14px;">Wählen Sie einen Begriff aus, dann klicken Sie auf die Kategorie, in die er gehört.</p>';
-    html += '<div id="sortArea">';
-    // Pool first
-    html += '<div class="filter-label">Begriffe</div>';
-    html += '<div id="sortPool" style="display:flex; flex-wrap:wrap; gap:6px; padding:10px; border:2px solid var(--c-border); border-radius:8px; min-height:44px; margin-bottom:14px; background:#f8fafc;">';
-    const shuffled = shuffle([...q.items]);
-    shuffled.forEach((item, i) => {
-      html += '<div class="chip" data-sort-idx="' + q.items.indexOf(item) + '" onclick="selectSortItem(this)" style="cursor:pointer;">' + item.t + '</div>';
-    });
-    html += '</div>';
-    // Render categories
-    q.categories.forEach((cat, ci) => {
-      html += '<div style="margin-bottom:10px;">';
-      html += '<div class="filter-label">' + cat + '</div>';
-      html += '<div class="sort-drop" data-cat="' + ci + '" onclick="placeSortItem(this)" style="min-height:44px; padding:10px; border:2px dashed var(--c-border); border-radius:8px; display:flex; flex-wrap:wrap; gap:6px; cursor:pointer; transition: border-color 0.15s; background:white;"></div>';
-      html += '</div>';
-    });
-    html += '</div>';
-    html += '<div class="btn-row"><button class="btn btn-check" onclick="checkSortQ()">Überprüfen</button></div>';
-  }
-
-  html += '<div class="q-feedback" id="qFeedback"></div>';
-  html += '<div class="btn-row" id="nextRow" style="display:none;">';
-  if (state.current < state.queue.length - 1) {
-    html += '<button class="btn btn-next" onclick="nextQuestion()">Nächste Aufgabe →</button>';
-  } else {
-    html += '<button class="btn btn-next" onclick="endQuiz()">Auswertung anzeigen →</button>';
-  }
-  html += '</div>';
-  html += '</div>';
-
-  document.getElementById('quizContent').innerHTML = html;
-}
-
-// ── Option selection ──
-function selectOpt(el) {
-  if (el.closest('.q-options').dataset.locked) return;
-  el.closest('.q-options').querySelectorAll('.q-opt').forEach(o => o.classList.remove('selected'));
-  el.classList.add('selected');
-}
-
-// ── Sort interaction: Select then Place ──
-let selectedSortChip = null;
-
-function selectSortItem(el) {
-  // If clicking already-selected chip, deselect it
-  if (el === selectedSortChip) {
-    el.classList.remove('selected');
-    selectedSortChip = null;
-    clearDropHighlights();
-    return;
-  }
-  // Deselect previous
-  if (selectedSortChip) selectedSortChip.classList.remove('selected');
-  // Select this one
-  selectedSortChip = el;
-  el.classList.add('selected');
-  // Highlight drop targets
-  document.querySelectorAll('.sort-drop').forEach(d => {
-    d.style.borderColor = 'var(--c-accent)';
-    d.style.borderStyle = 'solid';
-  });
-}
-
-function placeSortItem(dropEl) {
-  if (!selectedSortChip) return;
-  // Move chip to this category
-  dropEl.appendChild(selectedSortChip);
-  selectedSortChip.classList.remove('selected');
-  // Allow clicking chip in category to send it back to pool
-  selectedSortChip.onclick = function() { returnSortItem(this); };
-  selectedSortChip = null;
-  clearDropHighlights();
-}
-
-function returnSortItem(el) {
-  // Send chip back to pool
-  document.getElementById('sortPool').appendChild(el);
-  el.onclick = function() { selectSortItem(this); };
-  el.classList.remove('selected');
-}
-
-function clearDropHighlights() {
-  document.querySelectorAll('.sort-drop').forEach(d => {
-    d.style.borderColor = 'var(--c-border)';
-    d.style.borderStyle = 'dashed';
-  });
-}
-
-// ── Check functions ──
-function checkMCQ() {
-  const q = state.queue[state.current];
-  const opts = document.getElementById('qOpts');
-  if (opts.dataset.locked) return;
-  const selected = opts.querySelector('.q-opt.selected');
-  if (!selected) return;
-
-  opts.dataset.locked = 'true';
-  opts.querySelectorAll('.q-opt').forEach(o => {
-    o.classList.add('locked');
-    if (o.dataset.value === q.correct) o.classList.add('was-correct');
-  });
-
-  const isCorrect = selected.dataset.value === q.correct;
-  if (isCorrect) {
-    selected.classList.add('correct');
-    state.score++;
-  } else {
-    selected.classList.add('wrong');
-    state.wrong.push({q: q.q, explain: q.explain, topic: q.topic});
-  }
-  state.maxScore++;
-  state.answered.push({id: q.id, topic: q.topic, correct: isCorrect});
-  showFeedback(isCorrect, q.explain);
-}
-
-function checkTFQ() {
-  const q = state.queue[state.current];
-  const opts = document.getElementById('qOpts');
-  if (opts.dataset.locked) return;
-  const selected = opts.querySelector('.q-opt.selected');
-  if (!selected) return;
-
-  opts.dataset.locked = 'true';
-  const userVal = selected.dataset.value === 'true';
-  const isCorrect = userVal === q.correct;
-
-  opts.querySelectorAll('.q-opt').forEach(o => {
-    o.classList.add('locked');
-    if ((o.dataset.value === 'true') === q.correct) o.classList.add('was-correct');
-  });
-
-  if (isCorrect) {
-    selected.classList.add('correct');
-    state.score++;
-  } else {
-    selected.classList.add('wrong');
-    state.wrong.push({q: q.q, explain: q.explain, topic: q.topic});
-  }
-  state.maxScore++;
-  state.answered.push({id: q.id, topic: q.topic, correct: isCorrect});
-  showFeedback(isCorrect, q.explain);
-}
-
-function checkFillQ() {
-  const q = state.queue[state.current];
-  const inputs = document.querySelectorAll('.q-fill-input');
-  let correct = 0;
-
-  inputs.forEach((inp, i) => {
-    const b = q.blanks[i];
-    const user = inp.value.trim();
-    const allAnswers = [b.answer, ...(b.alts || [])];
-    if (allAnswers.some(a => a.toLowerCase() === user.toLowerCase())) {
-      inp.classList.add('correct');
-      correct++;
-    } else if (user) {
-      inp.classList.add('wrong');
-      inp.title = 'Lösung: ' + b.answer;
+    html+='</div>';
+  } else if(q.type==='tf'){
+    html+='<div class="tf-btns"><div class="tf-btn" onclick="answerTF(this,\''+q.id+'\',true)">✅ Richtig</div>';
+    html+='<div class="tf-btn" onclick="answerTF(this,\''+q.id+'\',false)">❌ Falsch</div></div>';
+  } else if(q.type==='fill'){
+    let parts=q.q.split(/\{(\d+)\}/g);
+    html+='<div class="q-text" style="margin-bottom:0">';
+    let bIdx=0;
+    for(let i=0;i<parts.length;i++){
+      if(i%2===0)html+=parts[i];
+      else html+='<input class="fill-input" data-bidx="'+bIdx+'" placeholder="…" autocomplete="off" autocapitalize="off">';
+      if(i%2===1)bIdx++;
     }
-    inp.readOnly = true;
-  });
-
-  const total = q.blanks.length;
-  const isCorrect = correct === total;
-  if (isCorrect) state.score += total; 
-  else state.wrong.push({q: q.q.replace(/\{(\d+)\}/g, '___'), explain: q.explain, topic: q.topic});
-  state.maxScore += total;
-  state.answered.push({id: q.id, topic: q.topic, correct: isCorrect});
-  showFeedback(isCorrect, q.explain + (isCorrect ? '' : '<br><strong>Lösungen:</strong> ' + q.blanks.map(b => b.answer).join(', ')));
-}
-
-function checkCalcQ() {
-  const q = state.queue[state.current];
-  const inputs = document.querySelectorAll('.q-calc-input');
-  let correct = 0;
-
-  inputs.forEach((inp, i) => {
-    const r = q.rows[i];
-    const user = parseFloat(inp.value.replace(',', '.'));
-    if (!isNaN(user) && Math.abs(user - r.answer) <= r.tolerance) {
-      inp.classList.add('correct');
-      correct++;
-    } else {
-      inp.classList.add('wrong');
-      inp.title = 'Lösung: ' + r.answer;
-    }
-    inp.readOnly = true;
-  });
-
-  const total = q.rows.length;
-  const isCorrect = correct === total;
-  if (isCorrect) state.score += total;
-  else state.wrong.push({q: q.q, explain: q.explain, topic: q.topic});
-  state.maxScore += total;
-  state.answered.push({id: q.id, topic: q.topic, correct: isCorrect});
-  showFeedback(isCorrect, q.explain + (isCorrect ? '' : '<br><strong>Lösungen:</strong> ' + q.rows.map(r => r.answer + (r.unit||'')).join(', ')));
-}
-
-function checkSortQ() {
-  const q = state.queue[state.current];
-  const drops = document.querySelectorAll('.sort-drop');
-  let correct = 0;
-  let total = q.items.length;
-
-  // Check items in each category
-  drops.forEach((drop, ci) => {
-    drop.querySelectorAll('.chip').forEach(chip => {
-      const idx = parseInt(chip.dataset.sortIdx);
-      if (q.items[idx].cat === ci) {
-        chip.style.background = 'var(--c-success-bg)';
-        chip.style.borderColor = 'var(--c-success)';
-        chip.style.color = '#166534';
-        correct++;
-      } else {
-        chip.style.background = 'var(--c-error-bg)';
-        chip.style.borderColor = 'var(--c-error)';
-        chip.style.color = '#991b1b';
-      }
+    html+='</div><button class="btn btn-primary" style="margin-top:14px" onclick="answerFill(\''+q.id+'\')">Überprüfen</button>';
+  } else if(q.type==='calc'){
+    html+='<div class="calc-rows">';
+    q.rows.forEach((r,i)=>{
+      html+='<div class="calc-row"><label>'+r.label+'</label><input type="number" step="any" data-ridx="'+i+'" placeholder="?"><span class="unit">'+r.unit+'</span></div>';
     });
-  });
-
-  // Check items still in pool
-  document.querySelectorAll('#sortPool .chip').forEach(chip => {
-    chip.style.background = 'var(--c-error-bg)';
-    chip.style.borderColor = 'var(--c-error)';
-    chip.style.color = '#991b1b';
-  });
-
-  const isCorrect = correct === total;
-  if (isCorrect) state.score += total;
-  else state.wrong.push({q: q.q, explain: q.explain, topic: q.topic});
-  state.maxScore += total;
-  state.answered.push({id: q.id, topic: q.topic, correct: isCorrect});
-  showFeedback(isCorrect, q.explain);
-}
-
-function showFeedback(isCorrect, explain) {
-  const fb = document.getElementById('qFeedback');
-  fb.className = 'q-feedback visible ' + (isCorrect ? 'success' : 'error');
-  fb.innerHTML = (isCorrect ? '✓ Korrekt! ' : '✗ ') + explain;
-  document.getElementById('nextRow').style.display = 'flex';
-  document.getElementById('quizScore').textContent = state.score + ' Punkt' + (state.score !== 1 ? 'e' : '');
-  // Scroll feedback into view
-  fb.scrollIntoView({behavior: 'smooth', block: 'nearest'});
-}
-
-function nextQuestion() {
-  state.current++;
-  renderQuestion();
-  window.scrollTo({top: 0, behavior: 'smooth'});
-}
-
-// ══════════════════════════════════════════
-// RESULTS
-// ══════════════════════════════════════════
-function endQuiz() {
-  showScreen('resultsScreen');
-  const pct = state.maxScore > 0 ? Math.round((state.score / state.maxScore) * 100) : 0;
-
-  document.getElementById('resultsScore').textContent = state.score + ' / ' + state.maxScore;
-  document.getElementById('resultsLabel').textContent = pct + '% richtig';
-
-  const bar = document.getElementById('resultsBarFill');
-  bar.style.width = pct + '%';
-  bar.style.background = pct >= 70 ? 'var(--c-success)' : pct >= 40 ? 'var(--c-accent)' : 'var(--c-error)';
-
-  // Topic breakdown
-  const breakdown = {};
-  state.answered.forEach(a => {
-    if (!breakdown[a.topic]) breakdown[a.topic] = {correct: 0, total: 0};
-    breakdown[a.topic].total++;
-    if (a.correct) breakdown[a.topic].correct++;
-  });
-
-  let tbHtml = '';
-  for (const [topic, data] of Object.entries(breakdown)) {
-    const tpct = Math.round((data.correct / data.total) * 100);
-    const cls = tpct >= 70 ? 'good' : tpct >= 40 ? 'ok' : 'bad';
-    tbHtml += '<div class="topic-row">';
-    tbHtml += '<span class="topic-name">' + TOPICS[topic].label + '</span>';
-    tbHtml += '<span class="topic-score ' + cls + '">' + data.correct + '/' + data.total + ' (' + tpct + '%)</span>';
-    tbHtml += '</div>';
-  }
-  document.getElementById('topicBreakdown').innerHTML = tbHtml;
-
-  // Wrong answers
-  if (state.wrong.length > 0) {
-    document.getElementById('wrongCard').style.display = 'block';
-    let wHtml = '';
-    state.wrong.forEach(w => {
-      wHtml += '<div class="wrong-item">';
-      wHtml += '<div class="wi-q">' + TOPICS[w.topic].short + ': ' + w.q.substring(0, 120) + (w.q.length > 120 ? '…' : '') + '</div>';
-      wHtml += '<div class="wi-a">' + w.explain + '</div>';
-      wHtml += '</div>';
+    html+='</div><button class="btn btn-primary" style="margin-top:14px" onclick="answerCalc(\''+q.id+'\')">Überprüfen</button>';
+  } else if(q.type==='sort'){
+    html+='<div class="sort-pool" id="sortPool">';
+    let items=[...q.items];shuffle(items);
+    items.forEach((it,i)=>{
+      html+='<span class="sort-item" data-oidx="'+q.items.indexOf(it)+'" onclick="pickSortItem(this)">'+it.t+'</span>';
     });
-    document.getElementById('wrongList').innerHTML = wHtml;
-  } else {
-    document.getElementById('wrongCard').style.display = 'none';
+    html+='</div><div class="sort-cats" id="sortCats" style="grid-template-columns:repeat('+q.categories.length+',1fr)">';
+    q.categories.forEach((cat,ci)=>{
+      html+='<div class="sort-cat" data-cidx="'+ci+'" onclick="placeSortItem(this,'+ci+')"><div class="sort-cat-title">'+cat+'</div><div class="sort-cat-items" id="sortCat'+ci+'"></div></div>';
+    });
+    html+='</div><button class="btn btn-primary" style="margin-top:14px" onclick="answerSort(\''+q.id+'\')">Überprüfen</button>';
   }
+  html+='<div class="feedback" id="feedback"></div>';
+  document.getElementById('questionCard').innerHTML=html;
+  pickedSortItem=null;
 }
 
-function exportResults() {
-  window.print();
+// ── Answer handlers ──
+function answerMC(el,qid,val){
+  if(document.querySelector('.mc-opt.correct,.mc-opt.wrong'))return;
+  const q=QUESTIONS.find(x=>x.id===qid);
+  document.querySelectorAll('.mc-opt').forEach(o=>{
+    o.style.pointerEvents='none';
+    if(o.dataset.val===q.correct)o.classList.add('correct');
+    else if(o.dataset.val===val)o.classList.add('wrong');
+  });
+  finishAnswer(q,val===q.correct,q.explain);
 }
 
-function resetApp() {
-  showScreen('startScreen');
-  state = {
-    mode: state.mode,
-    filters: state.filters,
-    queue: [], current: 0, score: 0, maxScore: 0, answered: [], wrong: []
+function answerTF(el,qid,val){
+  if(document.querySelector('.tf-btn.correct,.tf-btn.wrong'))return;
+  const q=QUESTIONS.find(x=>x.id===qid);
+  const correct=val===q.correct;
+  document.querySelectorAll('.tf-btn').forEach(b=>b.style.pointerEvents='none');
+  el.classList.add(correct?'correct':'wrong');
+  if(!correct)document.querySelectorAll('.tf-btn').forEach(b=>{if(b!==el)b.classList.add('correct')});
+  finishAnswer(q,correct,q.explain);
+}
+
+function answerFill(qid){
+  const q=QUESTIONS.find(x=>x.id===qid);
+  const inputs=document.querySelectorAll('.fill-input');
+  let allCorrect=true;
+  inputs.forEach(inp=>{
+    const bi=parseInt(inp.dataset.bidx);
+    const blank=q.blanks[bi];
+    const userVal=inp.value.trim().toLowerCase();
+    const ok=userVal===blank.answer.toLowerCase()||blank.alts.some(a=>userVal===a.toLowerCase());
+    inp.classList.add(ok?'correct':'wrong');
+    inp.disabled=true;
+    if(!ok){allCorrect=false;inp.value=inp.value+' → '+blank.answer}
+  });
+  finishAnswer(q,allCorrect,q.explain);
+}
+
+function answerCalc(qid){
+  const q=QUESTIONS.find(x=>x.id===qid);
+  const inputs=document.querySelectorAll('.calc-row input');
+  let allCorrect=true;
+  inputs.forEach(inp=>{
+    const ri=parseInt(inp.dataset.ridx);
+    const row=q.rows[ri];
+    const val=parseFloat(inp.value);
+    const ok=!isNaN(val)&&Math.abs(val-row.answer)<=row.tolerance;
+    inp.classList.add(ok?'correct':'wrong');
+    inp.disabled=true;
+    if(!ok){allCorrect=false;inp.value=inp.value+' → '+row.answer}
+  });
+  finishAnswer(q,allCorrect,q.explain);
+}
+
+function pickSortItem(el){
+  if(el.classList.contains('placed'))return;
+  document.querySelectorAll('.sort-item').forEach(s=>s.classList.remove('picked'));
+  el.classList.add('picked');
+  pickedSortItem=el;
+}
+
+function placeSortItem(catEl,cidx){
+  if(!pickedSortItem)return;
+  const container=catEl.querySelector('.sort-cat-items');
+  const clone=document.createElement('span');
+  clone.className='sort-cat-item';
+  clone.textContent=pickedSortItem.textContent;
+  clone.dataset.oidx=pickedSortItem.dataset.oidx;
+  clone.onclick=function(){this.remove();
+    const orig=document.querySelector('.sort-item[data-oidx="'+this.dataset.oidx+'"]');
+    if(orig){orig.style.display='';orig.classList.remove('placed')}
   };
+  container.appendChild(clone);
+  pickedSortItem.style.display='none';
+  pickedSortItem.classList.add('placed');
+  pickedSortItem.classList.remove('picked');
+  pickedSortItem=null;
 }
 
-// ══════════════════════════════════════════
-// HELPERS
-// ══════════════════════════════════════════
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+function answerSort(qid){
+  const q=QUESTIONS.find(x=>x.id===qid);
+  let allCorrect=true;
+  document.querySelectorAll('.sort-cat').forEach(catEl=>{
+    const cidx=parseInt(catEl.dataset.cidx);
+    catEl.querySelectorAll('.sort-cat-item').forEach(item=>{
+      const oidx=parseInt(item.dataset.oidx);
+      const ok=q.items[oidx].cat===cidx;
+      item.classList.add(ok?'correct-item':'wrong-item');
+      if(!ok)allCorrect=false;
+    });
+  });
+  document.querySelectorAll('.sort-item').forEach(s=>s.style.pointerEvents='none');
+  document.querySelectorAll('.sort-cat').forEach(c=>c.style.pointerEvents='none');
+  document.querySelector('.btn-primary')&&(document.querySelectorAll('#questionCard .btn-primary').forEach(b=>b.style.display='none'));
+  finishAnswer(q,allCorrect,q.explain);
+}
+
+function finishAnswer(q,correct,explain){
+  state.maxScore++;
+  if(correct)state.score++;
+  else state.wrong.push({q:q.q,explain:q.explain,topic:q.topic});
+  state.answered.push({id:q.id,correct});
+  document.getElementById('qScore').textContent=state.score+' Punkte';
+  const fb=document.getElementById('feedback');
+  fb.className='feedback show '+(correct?'correct':'wrong');
+  fb.innerHTML='<div class="feedback-title">'+(correct?'✅ Richtig!':'❌ Leider falsch')+'</div><div>'+explain+'</div>';
+  document.getElementById('nextBtn').style.display='inline-flex';
+}
+
+function nextQuestion(){
+  state.current++;
+  if(state.current>=state.queue.length)return endQuiz();
+  renderQuestion();
+}
+
+function endQuiz(){
+  document.getElementById('progressBar').style.width='100%';
+  showScreen('resultScreen');
+  const pct=state.maxScore?Math.round(state.score/state.maxScore*100):0;
+  document.getElementById('resPts').textContent=state.score+' / '+state.maxScore;
+  document.getElementById('resPct').textContent=pct+'%';
+  // Topic breakdown
+  let topicData={};
+  state.queue.forEach((q,i)=>{
+    if(i>=state.answered.length)return;
+    if(!topicData[q.topic])topicData[q.topic]={correct:0,total:0};
+    topicData[q.topic].total++;
+    if(state.answered[i].correct)topicData[q.topic].correct++;
+  });
+  let tHtml='';
+  Object.keys(topicData).forEach(t=>{
+    const d=topicData[t];const p=Math.round(d.correct/d.total*100);
+    const cls=p>=70?'tg':p>=40?'ty':'tr';
+    tHtml+='<div class="topic-row"><span class="topic-name">'+TOPICS[t].label+'</span>';
+    tHtml+='<span class="topic-score">'+d.correct+'/'+d.total+'</span>';
+    tHtml+='<div class="topic-bar"><div class="topic-bar-fill '+cls+'" style="width:'+p+'%"></div></div></div>';
+  });
+  document.getElementById('topicResults').innerHTML=tHtml;
+  // Wrong list
+  if(state.wrong.length){
+    document.getElementById('wrongCard').style.display='';
+    let wHtml='';
+    state.wrong.forEach(w=>{
+      wHtml+='<div class="wrong-item"><div class="wq">'+w.q+'</div><div class="wa">'+w.explain+'</div></div>';
+    });
+    document.getElementById('wrongList').innerHTML=wHtml;
+  }else{document.getElementById('wrongCard').style.display='none'}
+}
+
+function exportResults(){window.print()}
+
+function resetApp(){
+  state={mode:null,filters:{topics:new Set(),diffs:new Set(),types:new Set()},queue:[],current:0,score:0,maxScore:0,answered:[],wrong:[]};
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+  document.querySelectorAll('.mode-card').forEach(c=>c.classList.remove('active'));
+  updateFilterCount();
+  showScreen('startScreen');
+}
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  window.scrollTo({top: 0});
+  window.scrollTo({top:0});
 }
 
-function shuffle(arr) {
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
-}
+function shuffle(arr){for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]]}return arr}
 
-// ── Initialize ──
 init();
 </script>
 </body>
