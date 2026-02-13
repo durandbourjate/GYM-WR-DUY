@@ -454,11 +454,11 @@
       <div class="filter-group">
         <div class="filter-label">Fragetyp</div>
         <div class="chips" id="typeChips">
-          <div class="chip" data-type="mc" onclick="toggleChip(this, 'type')">Multiple Choice</div>
-          <div class="chip" data-type="tf" onclick="toggleChip(this, 'type')">Richtig/Falsch</div>
-          <div class="chip" data-type="fill" onclick="toggleChip(this, 'type')">Lückentext</div>
-          <div class="chip" data-type="calc" onclick="toggleChip(this, 'type')">Berechnung</div>
-          <div class="chip" data-type="sort" onclick="toggleChip(this, 'type')">Zuordnung</div>
+          <div class="chip selected" data-type="mc" onclick="toggleChip(this, 'type')">Multiple Choice</div>
+          <div class="chip selected" data-type="tf" onclick="toggleChip(this, 'type')">Richtig/Falsch</div>
+          <div class="chip selected" data-type="fill" onclick="toggleChip(this, 'type')">Lückentext</div>
+          <div class="chip selected" data-type="calc" onclick="toggleChip(this, 'type')">Berechnung</div>
+          <div class="chip selected" data-type="sort" onclick="toggleChip(this, 'type')">Zuordnung</div>
         </div>
       </div>
     </div>
@@ -1014,10 +1014,10 @@ function selectMode(el) {
 
 function applyModeDefaults() {
   if (state.mode === 'fokus') {
-    // Fokus: nichts angewählt — SuS wählen gezielt
+    // Fokus: Thema und Schwierigkeit müssen gewählt werden, Fragetypen bleiben alle an
     document.querySelectorAll('#topicChips .chip').forEach(c => c.classList.remove('selected'));
     document.querySelectorAll('#diffChips .chip').forEach(c => c.classList.remove('selected'));
-    document.querySelectorAll('#typeChips .chip').forEach(c => c.classList.remove('selected'));
+    document.querySelectorAll('#typeChips .chip').forEach(c => c.classList.add('selected'));
   } else {
     // Mix: alles angewählt
     document.querySelectorAll('#topicChips .chip').forEach(c => c.classList.add('selected'));
