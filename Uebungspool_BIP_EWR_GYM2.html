@@ -445,20 +445,20 @@
       <div class="filter-group">
         <div class="filter-label">Schwierigkeit</div>
         <div class="chips" id="diffChips">
-          <div class="chip selected" data-diff="1" onclick="toggleChip(this, 'diff')">⭐ Einfach</div>
-          <div class="chip selected" data-diff="2" onclick="toggleChip(this, 'diff')">⭐⭐ Mittel</div>
-          <div class="chip selected" data-diff="3" onclick="toggleChip(this, 'diff')">⭐⭐⭐ Schwer</div>
+          <div class="chip" data-diff="1" onclick="toggleChip(this, 'diff')">⭐ Einfach</div>
+          <div class="chip" data-diff="2" onclick="toggleChip(this, 'diff')">⭐⭐ Mittel</div>
+          <div class="chip" data-diff="3" onclick="toggleChip(this, 'diff')">⭐⭐⭐ Schwer</div>
         </div>
       </div>
 
       <div class="filter-group">
         <div class="filter-label">Fragetyp</div>
         <div class="chips" id="typeChips">
-          <div class="chip selected" data-type="mc" onclick="toggleChip(this, 'type')">Multiple Choice</div>
-          <div class="chip selected" data-type="tf" onclick="toggleChip(this, 'type')">Richtig/Falsch</div>
-          <div class="chip selected" data-type="fill" onclick="toggleChip(this, 'type')">Lückentext</div>
-          <div class="chip selected" data-type="calc" onclick="toggleChip(this, 'type')">Berechnung</div>
-          <div class="chip selected" data-type="sort" onclick="toggleChip(this, 'type')">Zuordnung</div>
+          <div class="chip" data-type="mc" onclick="toggleChip(this, 'type')">Multiple Choice</div>
+          <div class="chip" data-type="tf" onclick="toggleChip(this, 'type')">Richtig/Falsch</div>
+          <div class="chip" data-type="fill" onclick="toggleChip(this, 'type')">Lückentext</div>
+          <div class="chip" data-type="calc" onclick="toggleChip(this, 'type')">Berechnung</div>
+          <div class="chip" data-type="sort" onclick="toggleChip(this, 'type')">Zuordnung</div>
         </div>
       </div>
     </div>
@@ -995,7 +995,7 @@ function init() {
   for (const [key, val] of Object.entries(TOPICS)) {
     const count = QUESTIONS.filter(q => q.topic === key).length;
     const chip = document.createElement('div');
-    chip.className = 'chip selected';
+    chip.className = 'chip';
     chip.dataset.topic = key;
     chip.innerHTML = val.short + ' <span class="chip-count">' + count + '</span>';
     chip.onclick = function() { toggleChip(this, 'topic'); };
@@ -1008,7 +1008,22 @@ function selectMode(el) {
   document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
   state.mode = el.dataset.mode;
+  applyModeDefaults();
   updateQuestionCount();
+}
+
+function applyModeDefaults() {
+  if (state.mode === 'fokus') {
+    // Fokus: nichts angewählt — SuS wählen gezielt
+    document.querySelectorAll('#topicChips .chip').forEach(c => c.classList.remove('selected'));
+    document.querySelectorAll('#diffChips .chip').forEach(c => c.classList.remove('selected'));
+    document.querySelectorAll('#typeChips .chip').forEach(c => c.classList.remove('selected'));
+  } else {
+    // Mix: alles angewählt
+    document.querySelectorAll('#topicChips .chip').forEach(c => c.classList.add('selected'));
+    document.querySelectorAll('#diffChips .chip').forEach(c => c.classList.add('selected'));
+    document.querySelectorAll('#typeChips .chip').forEach(c => c.classList.add('selected'));
+  }
 }
 
 function toggleChip(el, group) {
