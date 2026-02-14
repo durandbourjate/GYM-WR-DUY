@@ -15,7 +15,9 @@
 }
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'DM Sans',system-ui,sans-serif;background:var(--c-bg);color:var(--c-text);line-height:1.6;min-height:100vh}
-.app-header{background:linear-gradient(135deg,var(--c-primary),var(--c-primary-light));color:#fff;padding:20px 24px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.15)}
+.app-header{background:linear-gradient(135deg,var(--c-primary),var(--c-primary-light));color:#fff;padding:20px 24px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.15);display:flex;align-items:center;gap:16px}
+.home-btn{display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;background:rgba(255,255,255,.2);color:#fff;text-decoration:none;font-size:1.1rem;flex-shrink:0;transition:.15s}
+.home-btn:hover{background:rgba(255,255,255,.35)}
 .app-header h1{font-size:1.25rem;font-weight:700;letter-spacing:-.02em}
 .app-header .meta{font-size:.8rem;opacity:.75;margin-top:2px}
 .container{max-width:720px;margin:0 auto;padding:20px 16px 100px}
@@ -154,8 +156,11 @@ body{font-family:'DM Sans',system-ui,sans-serif;background:var(--c-bg);color:var
 <body>
 
 <header class="app-header">
+<a href="index.html" class="home-btn" title="Zur Übersicht">🏠</a>
+<div>
 <h1 id="poolTitle">Übungspool laden…</h1>
 <div class="meta" id="poolMeta">Gymnasium Hofwil · Individuell üben</div>
+</div>
 </header>
 <div class="container">
 
