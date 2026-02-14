@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Übungspools | Wirtschaft und Recht | Gymnasium Hofwil</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+:root{
+  --c-bg:#f0f2f5;--c-surface:#fff;--c-text:#1e293b;--c-text-soft:#64748b;
+  --c-border:#e2e8f0;--radius:10px;
+  --c-vwl:#f89907;--c-vwl-light:#ffb74d;--c-vwl-bg:#fff8eb;
+  --c-bwl:#01a9f4;--c-bwl-light:#4fc3f7;--c-bwl-bg:#e8f7fe;
+  --c-recht:#73ab2c;--c-recht-light:#8bc34a;--c-recht-bg:#f1f8e8;
+  --shadow-sm:0 1px 3px rgba(0,0,0,.06);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--c-bg);color:var(--c-text);line-height:1.6;min-height:100vh}
+.header{background:linear-gradient(135deg,#1e293b,#334155);color:#fff;padding:28px 24px;text-align:center}
+.header h1{font-size:1.5rem;font-weight:700;letter-spacing:-.02em}
+.header .sub{font-size:.85rem;opacity:.7;margin-top:4px}
+.container{max-width:800px;margin:0 auto;padding:24px 16px 80px}
+.fach-section{margin-bottom:32px}
+.fach-header{display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:8px;border-bottom:3px solid var(--c-border)}
+.fach-header .fach-dot{width:14px;height:14px;border-radius:50%;flex-shrink:0}
+.fach-header h2{font-size:1.15rem;font-weight:700}
+.fach-header .fach-count{font-size:.8rem;color:var(--c-text-soft);font-weight:500;margin-left:auto}
+.pool-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.pool-card{background:var(--c-surface);border:1px solid var(--c-border);border-radius:var(--radius);padding:18px;text-decoration:none;color:var(--c-text);transition:.2s;display:flex;flex-direction:column;box-shadow:var(--shadow-sm)}
+.pool-card:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.1)}
+.pool-card .pool-title{font-weight:700;font-size:.95rem;margin-bottom:6px}
+.pool-card .pool-meta{font-size:.78rem;color:var(--c-text-soft);margin-bottom:10px}
+.pool-card .pool-stats{display:flex;gap:8px;flex-wrap:wrap}
+.pool-card .stat{font-size:.7rem;font-weight:600;padding:3px 8px;border-radius:10px;background:var(--c-bg)}
+.pool-card.vwl{border-left:4px solid var(--c-vwl)}
+.pool-card.vwl:hover{border-color:var(--c-vwl);background:var(--c-vwl-bg)}
+.pool-card.bwl{border-left:4px solid var(--c-bwl)}
+.pool-card.bwl:hover{border-color:var(--c-bwl);background:var(--c-bwl-bg)}
+.pool-card.recht{border-left:4px solid var(--c-recht)}
+.pool-card.recht:hover{border-color:var(--c-recht);background:var(--c-recht-bg)}
+.empty-msg{font-size:.9rem;color:var(--c-text-soft);font-style:italic;padding:12px 0}
+.footer{text-align:center;padding:20px;font-size:.75rem;color:var(--c-text-soft)}
+@media(prefers-color-scheme:dark){
+  :root{--c-bg:#0f1117;--c-surface:#1a1d27;--c-text:#e2e8f0;--c-text-soft:#94a3b8;--c-border:#2d3348;
+    --c-vwl-bg:#2a1f0a;--c-bwl-bg:#0a1f2a;--c-recht-bg:#1a2a0a}
+  .header{background:linear-gradient(135deg,#0f1117,#1a1d27)}
+  .pool-card .stat{background:var(--c-border)}
+}
+@media(max-width:500px){.pool-grid{grid-template-columns:1fr}.container{padding:16px 12px 60px}}
+</style>
+</head>
+<body>
+
+<div class="header">
+<h1>📚 Übungspools</h1>
+<div class="sub">Wirtschaft und Recht · Gymnasium Hofwil</div>
+</div>
+
+<div class="container" id="content">
+<div style="text-align:center;padding:40px;color:var(--c-text-soft)">Wird geladen…</div>
+</div>
+
+<div class="footer">Gymnasium Hofwil · Wirtschaft und Recht</div>
+
+<script>
+// ══════════════════════════════════════════
+// POOL REGISTRY
+// ══════════════════════════════════════════
+// Add new pools here. The index page reads this to display all available pools.
+const POOLS = [
+  {
+    id: "vwl_beduerfnisse",
+    fach: "VWL",
+    title: "Bedürfnisse, Knappheit & Produktionsfaktoren",
+    meta: "SF GYM1",
+    questions: 50,
+    topics: 7
+  },
+  {
+    id: "vwl_menschenbild",
+    fach: "VWL",
+    title: "Ökonomisches Menschenbild",
+    meta: "SF GYM1",
+    questions: 49,
+    topics: 7
+  },
+  {
+    id: "vwl_bip",
+    fach: "VWL",
+    title: "Bruttoinlandprodukt (BIP)",
+    meta: "EWR GYM2",
+    questions: 60,
+    topics: 7
+  },
+  // ── BWL (noch leer) ──
+  // {
+  //   id: "bwl_beispiel",
+  //   fach: "BWL",
+  //   title: "Beispielpool",
+  //   meta: "SF GYM1",
+  //   questions: 0,
+  //   topics: 0
+  // },
+  // ── Recht (noch leer) ──
+  // {
+  //   id: "recht_beispiel",
+  //   fach: "Recht",
+  //   title: "Beispielpool",
+  //   meta: "SF GYM2",
+  //   questions: 0,
+  //   topics: 0
+  // },
+];
+
+// ══════════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════════
+const FACH_ORDER = ["VWL", "BWL", "Recht"];
+const FACH_COLORS = { VWL: "vwl", BWL: "bwl", Recht: "recht" };
+const FACH_DOT_COLORS = { VWL: "#f89907", BWL: "#01a9f4", Recht: "#73ab2c" };
+
+function render() {
+  const container = document.getElementById('content');
+  let html = '';
+
+  FACH_ORDER.forEach(fach => {
+    const pools = POOLS.filter(p => p.fach === fach);
+    const colorClass = FACH_COLORS[fach];
+    const dotColor = FACH_DOT_COLORS[fach];
+
+    html += '<div class="fach-section">';
+    html += '<div class="fach-header">';
+    html += '<div class="fach-dot" style="background:' + dotColor + '"></div>';
+    html += '<h2>' + fach + '</h2>';
+    html += '<span class="fach-count">' + pools.length + ' Pool' + (pools.length !== 1 ? 's' : '') + '</span>';
+    html += '</div>';
+
+    if (pools.length === 0) {
+      html += '<div class="empty-msg">Noch keine Übungspools vorhanden.</div>';
+    } else {
+      html += '<div class="pool-grid">';
+      pools.forEach(p => {
+        html += '<a class="pool-card ' + colorClass + '" href="pool.html?pool=' + p.id + '">';
+        html += '<div class="pool-title">' + p.title + '</div>';
+        html += '<div class="pool-meta">' + p.meta + '</div>';
+        html += '<div class="pool-stats">';
+        html += '<span class="stat">' + p.questions + ' Fragen</span>';
+        html += '<span class="stat">' + p.topics + ' Themen</span>';
+        html += '</div>';
+        html += '</a>';
+      });
+      html += '</div>';
+    }
+    html += '</div>';
+  });
+
+  container.innerHTML = html;
+}
+
+render();
+</script>
+</body>
+</html>
