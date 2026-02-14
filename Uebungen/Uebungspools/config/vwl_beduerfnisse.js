@@ -2,7 +2,7 @@
 // Fachbereich: VWL
 // Anzahl Fragen: 50
 
-const POOL_META = {
+window.POOL_META = {
   id: "vwl_beduerfnisse",
   fach: "VWL",
   title: "Übungspool: Bedürfnisse, Knappheit & Produktionsfaktoren",
@@ -10,7 +10,7 @@ const POOL_META = {
   color: "vwl"
 };
 
-const TOPICS = {
+window.TOPICS = {
   knappheit:{label:"Knappheit & Grundfragen der VWL",short:"Knappheit"},
   beduerfnisse:{label:"Bedürfnisse & Bedürfnispyramide",short:"Bedürfnisse"},
   gueter:{label:"Güterarten",short:"Güter"},
@@ -20,7 +20,7 @@ const TOPICS = {
   sektoren:{label:"Wirtschaftssektoren & Strukturwandel",short:"Sektoren"}
 };
 
-const QUESTIONS = [
+window.QUESTIONS = [
 // ──── KNAPPHEIT (k01–k07) ────
 {id:"k01",topic:"knappheit",type:"mc",diff:1,tax:"K1",
  q:"Was ist das zentrale Problem, mit dem sich die Volkswirtschaftslehre beschäftigt?",

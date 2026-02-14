@@ -2,7 +2,7 @@
 // Fachbereich: VWL
 // Anzahl Fragen: 49
 
-const POOL_META = {
+window.POOL_META = {
   id: "vwl_menschenbild",
   fach: "VWL",
   title: "Übungspool: Ökonomisches Menschenbild",
@@ -10,7 +10,7 @@ const POOL_META = {
   color: "vwl"
 };
 
-const TOPICS = {
+window.TOPICS = {
   homo:{label:"Homo Oeconomicus",short:"Homo Oec."},
   kritik:{label:"Kritik & Verhaltensökonomie",short:"Kritik"},
   opportunitaet:{label:"Opportunitätskosten & Trade-offs",short:"Opp.kosten"},
@@ -20,7 +20,7 @@ const TOPICS = {
   ziele:{label:"Ziele der Wirtschaftspolitik",short:"Ziele WiPol"}
 };
 
-const QUESTIONS = [
+window.QUESTIONS = [
 // ──── HOMO OECONOMICUS (h01–h08) ────
 {id:"h01",topic:"homo",type:"mc",diff:1,tax:"K1",
  q:"Was versteht man unter dem «Homo oeconomicus»?",

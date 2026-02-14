@@ -2,7 +2,7 @@
 // Fachbereich: VWL
 // Anzahl Fragen: 60
 
-const POOL_META = {
+window.POOL_META = {
   id: "vwl_bip",
   fach: "VWL",
   title: "Übungspool: Bruttoinlandprodukt (BIP)",
@@ -10,7 +10,7 @@ const POOL_META = {
   color: "vwl"
 };
 
-const TOPICS = {
+window.TOPICS = {
   definition:{label:"Definition & Grundbegriffe",short:"Definition"},
   messprobleme:{label:"Was das BIP (nicht) misst",short:"Messprobleme"},
   dreiseiten:{label:"Drei Seiten des BIP",short:"3 Seiten"},
@@ -20,7 +20,7 @@ const TOPICS = {
   wachstum:{label:"Wachstum & Nachhaltigkeit",short:"Wachstum"}
 };
 
-const QUESTIONS = [
+window.QUESTIONS = [
 // ──── DEFINITION & GRUNDBEGRIFFE (d01–d10) ────
 {id:"d01",topic:"definition",type:"mc",diff:1,tax:"K1",
  q:"Was misst das Bruttoinlandprodukt (BIP)?",
