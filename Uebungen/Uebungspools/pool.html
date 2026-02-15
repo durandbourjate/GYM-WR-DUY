@@ -364,6 +364,69 @@ function init(){
   buildChips('diffChips',DIFF_LABELS,'diffs',d=>DIFF_LABELS[d]);
   buildChips('typeChips',TYPE_LABELS,'types',t=>TYPE_LABELS[t]);
   updateFilterCount();
+  applyDeepLink();
+}
+
+// ══════════════════════════════════════════
+// DEEP LINK — Direktzugriff auf Unterthemen via URL-Parameter
+// ══════════════════════════════════════════
+// Nutzung:
+//   ?pool=vwl_bip&topic=2            → Thema 2 vorausgewählt (Fokus-Modus)
+//   ?pool=vwl_bip&topic=2&start=1    → Startet direkt ins Quiz
+//   ?pool=vwl_bip&topic=2&diff=1     → Nur einfache Fragen
+//   ?pool=vwl_bip&topic=2&diff=1,2   → Einfach + Mittel
+//   ?pool=vwl_bip&topic=2&type=mc,tf → Nur MC und R/F
+function applyDeepLink(){
+  const params=new URLSearchParams(window.location.search);
+  const topicParam=params.get('topic');
+  if(!topicParam)return;
+
+  // Validate topic exists
+  const topicKeys=topicParam.split(',').filter(k=>TOPICS[k]);
+  if(topicKeys.length===0)return;
+
+  // Set focus mode (most logical for deep links)
+  setMode('focus');
+
+  // Clear auto-selected topics from setMode, then select only the linked ones
+  state.filters.topics.clear();
+  document.querySelectorAll('#topicChips .chip').forEach(ch=>ch.classList.remove('active'));
+  topicKeys.forEach(k=>{
+    state.filters.topics.add(k);
+    const chip=document.querySelector('#topicChips .chip[data-key="'+k+'"]');
+    if(chip)chip.classList.add('active');
+  });
+
+  // Optional: Filter by difficulty
+  const diffParam=params.get('diff');
+  if(diffParam){
+    state.filters.diffs.clear();
+    document.querySelectorAll('#diffChips .chip').forEach(ch=>ch.classList.remove('active'));
+    diffParam.split(',').filter(d=>DIFF_LABELS[d]).forEach(d=>{
+      state.filters.diffs.add(d);
+      const chip=document.querySelector('#diffChips .chip[data-key="'+d+'"]');
+      if(chip)chip.classList.add('active');
+    });
+  }
+
+  // Optional: Filter by question type
+  const typeParam=params.get('type');
+  if(typeParam){
+    state.filters.types.clear();
+    document.querySelectorAll('#typeChips .chip').forEach(ch=>ch.classList.remove('active'));
+    typeParam.split(',').filter(t=>TYPE_LABELS[t]).forEach(t=>{
+      state.filters.types.add(t);
+      const chip=document.querySelector('#typeChips .chip[data-key="'+t+'"]');
+      if(chip)chip.classList.add('active');
+    });
+  }
+
+  updateFilterCount();
+
+  // Auto-start if requested
+  if(params.get('start')==='1'&&getFiltered().length>0){
+    startQuiz();
+  }
 }
 
 function buildChips(containerId,obj,filterKey,labelFn){
