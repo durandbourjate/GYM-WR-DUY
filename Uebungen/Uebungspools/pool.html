@@ -161,6 +161,7 @@ body{font-family:'DM Sans',system-ui,sans-serif;background:var(--c-bg);color:var
 .mc-opt .opt-letter{background:var(--c-border);color:var(--c-text-soft)}
 .chip{background:var(--c-surface)}
 .badge-diff1{background:#0a2618;color:#22c55e}.badge-diff2{background:#3d2e10;color:#e8a838}.badge-diff3{background:#2a0f0f;color:#ef4444}
+.badge-progress{background:#3d2e10;color:#e8a838}.badge-score{background:#0a2618;color:#22c55e}
 .badge-tax{background:#1a0f2e;color:#a78bfa}
 .badge-type{background:#1a1d27;color:#94a3b8}
 .topic-row{background:var(--c-surface)}
@@ -200,6 +201,12 @@ body{min-height:auto!important;background:#fff!important}
 .info-copy-btn{position:absolute;right:4px;top:50%;transform:translateY(-50%);background:none;border:none;font-size:1rem;cursor:pointer;padding:4px 6px;border-radius:4px;opacity:.6;transition:.15s}
 .info-copy-btn:hover{opacity:1;background:var(--c-border)}
 .info-copy-btn.copied{opacity:1}
+.q-card{position:relative;overflow:hidden;padding-top:28px}
+.q-progress-bar{position:absolute;top:0;left:0;height:4px;background:var(--c-accent);transition:width .4s ease;border-radius:0 2px 2px 0;z-index:1}
+.q-progress-bg{position:absolute;top:0;left:0;right:0;height:4px;background:var(--c-border)}
+.badge-progress{background:var(--c-accent-light);color:var(--c-accent);margin-left:auto}
+.badge-score{background:var(--c-success-bg);color:var(--c-success)}
+.q-action-row{display:flex;gap:10px;margin-top:14px;align-items:center;flex-wrap:wrap}
 .btn-skip{background:transparent;border:2px solid var(--c-border);color:var(--c-text-soft);font-size:.85rem;padding:10px 18px}
 .btn-skip:hover{border-color:var(--c-primary);color:var(--c-primary)}
 .report-row{margin-top:14px;text-align:right}
@@ -303,17 +310,9 @@ body{min-height:auto!important;background:#fff!important}
 
 <!-- ═══ Quiz-Bildschirm ═══ -->
 <div id="quizScreen" class="screen">
-<div class="card">
-<div class="quiz-meta">
-<span id="qProgress">1 / 10</span>
-<span class="score" id="qScore">0 Punkte</span>
-</div>
-<div class="progress-bar-wrap"><div class="progress-bar-fill" id="progressBar" style="width:0%"></div></div>
-</div>
-<div class="card" id="questionCard"></div>
+<div class="card q-card" id="questionCard"></div>
 <div class="quiz-actions" id="quizActions">
 <button class="btn btn-accent" id="nextBtn" onclick="nextQuestion()" style="display:none">Nächste Aufgabe →</button>
-<button class="btn btn-skip" id="skipBtn" onclick="skipQuestion()">⏭️ Überspringen</button>
 <button class="btn btn-outline" onclick="endQuiz()">Übung beenden</button>
 </div>
 </div>
@@ -349,6 +348,7 @@ body{min-height:auto!important;background:#fff!important}
 <span class="report-cat" onclick="toggleReportCat(this)" data-cat="Anderes">⚪ Anderes</span>
 </div>
 <textarea class="report-comment" id="reportComment" placeholder="Optionaler Kommentar…"></textarea>
+<div style="font-size:.78rem;color:var(--c-text-soft);margin-bottom:14px;line-height:1.5">💬 Nach dem Kopieren die Nachricht in LearningView im <strong>Chat des Bausteins</strong> einfügen und absenden.</div>
 <div class="report-actions">
 <button class="btn btn-primary" id="reportCopyBtn" onclick="copyReport()" disabled>📋 Kopieren</button>
 <button class="btn btn-outline" onclick="closeReport()">Abbrechen</button>
@@ -425,13 +425,14 @@ let pickedSortItem=null;
 // ══════════════════════════════════════════
 function sendScoreToLV(){
   if(window.parent===window)return;
-  if(state.maxScore===0)return;
-  var scaled=state.score/state.maxScore;
+  if(state.queue.length===0)return;
+  var total=state.queue.length;
+  var scaled=state.score/total;
   var xAPIscore={
     result:{
       score:{
         scaled: Math.round(scaled*1000)/1000,
-        max:    state.maxScore,
+        max:    total,
         raw:    state.score
       }
     }
@@ -512,6 +513,7 @@ function init(){
   buildChips('topicChips',TOPICS,'topics',t=>TOPICS[t].short);
   buildChips('diffChips',DIFF_LABELS,'diffs',d=>DIFF_LABELS[d]);
   buildChips('typeChips',TYPE_LABELS,'types',t=>TYPE_LABELS[t]);
+  setMode('mix');
   updateFilterCount();
   applyDeepLink();
 }
@@ -651,16 +653,16 @@ function startQuiz(){
 
 function renderQuestion(){
   const q=state.queue[state.current]; const total=state.queue.length;
-  document.getElementById('qProgress').textContent=(state.current+1)+' / '+total;
-  document.getElementById('qScore').textContent=state.score+' Punkte';
-  document.getElementById('progressBar').style.width=((state.current)/total*100)+'%';
+  const pctProgress=Math.round(state.current/total*100);
   document.getElementById('nextBtn').style.display='none';
-  document.getElementById('skipBtn').style.display='inline-flex';
-  let html='<div class="q-badges">';
+  let html='<div class="q-progress-bg"></div><div class="q-progress-bar" style="width:'+pctProgress+'%"></div>';
+  html+='<div class="q-badges">';
   html+='<span class="badge badge-topic">'+TOPICS[q.topic].short+'</span>';
   html+='<span class="badge badge-diff'+q.diff+'">'+DIFF_LABELS[q.diff]+'</span>';
   html+='<span class="badge badge-tax">'+q.tax+'</span>';
   html+='<span class="badge badge-type">'+TYPE_LABELS[q.type]+'</span>';
+  html+='<span class="badge badge-progress">'+(state.current+1)+' / '+total+'</span>';
+  html+='<span class="badge badge-score">'+state.score+' Pkt.</span>';
   html+='</div>';
   html+='<div class="q-text">'+q.q+'</div>';
   html+=renderImg(q);
@@ -718,6 +720,7 @@ function renderQuestion(){
     html+='<button class="btn btn-outline" onclick="answerOpen(\''+q.id+'\',false)">❌ Nicht gewusst</button>';
     html+='</div>';
   }
+  html+='<div class="q-action-row" id="skipRow"><button class="btn btn-skip" onclick="skipQuestion()">⏭️ Überspringen</button></div>';
   html+='<div class="report-row"><button class="btn-report" onclick="showReport(\''+q.id+'\')">⚠️ Problem melden</button></div>';
   html+='<div class="feedback" id="feedback"></div>';
   document.getElementById('questionCard').innerHTML=html;
@@ -835,12 +838,11 @@ function finishAnswer(q,correct,explain){
   if(correct)state.score++; else state.wrong.push({q:q.q,explain:q.explain,topic:q.topic});
   state.answered.push({id:q.id,correct});
   sendScoreToLV();
-  document.getElementById('qScore').textContent=state.score+' Punkte';
   const fb=document.getElementById('feedback');
   fb.className='feedback show '+(correct?'correct':'wrong');
   fb.innerHTML='<div class="feedback-title">'+(correct?'✅ Richtig!':'❌ Leider falsch')+'</div><div>'+explain+'</div>';
   document.getElementById('nextBtn').style.display='inline-flex';
-  document.getElementById('skipBtn').style.display='none';
+  var skipRow=document.getElementById('skipRow');if(skipRow)skipRow.style.display='none';
 }
 
 function nextQuestion(){
@@ -850,7 +852,6 @@ function nextQuestion(){
 }
 
 function endQuiz(){
-  document.getElementById('progressBar').style.width='100%';
   showScreen('resultScreen');
   const pct=state.maxScore?Math.round(state.score/state.maxScore*100):0;
   sendScoreToLV();
