@@ -863,6 +863,7 @@ function exportResults(){
   document.getElementById('printTitle').textContent=POOL_META.title;
   const now=new Date();
   document.getElementById('printMeta').textContent=POOL_META.meta+' · '+now.toLocaleDateString('de-CH',{day:'2-digit',month:'2-digit',year:'numeric'})+', '+now.toLocaleTimeString('de-CH',{hour:'2-digit',minute:'2-digit'});
+  window.addEventListener('afterprint',function onAP(){window.removeEventListener('afterprint',onAP);resetApp();},{once:true});
   window.print();
 }
 
