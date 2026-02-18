@@ -1,38 +1,38 @@
-# VWL Übungspools — Deep-Link-Übersicht
+# VWL Ãœbungspools â€” Deep-Link-Ãœbersicht
 
 > **Basis-URL anpassen:** Die Links unten verwenden relative Pfade.  
 > Stelle deiner GitHub-Pages-URL voran, z.B.:  
 > `https://DEINUSER.github.io/wr-vwl/pool.html?pool=...`
 >
-> **Tipp:** Hänge `&start=1` an einen Link an, damit das Quiz direkt startet.
+> **Tipp:** HÃ¤nge `&start=1` an einen Link an, damit das Quiz direkt startet.
 
 ---
 
-## 1. Bedürfnisse, Knappheit & Produktionsfaktoren
+## 1. BedÃ¼rfnisse, Knappheit & Produktionsfaktoren
 
-**Pool:** `vwl_beduerfnisse` · SF GYM1 · 50 Fragen
+**Pool:** `vwl_beduerfnisse` Â· SF GYM1 Â· 50 Fragen
 
 | Unterthema | Key | Fragen | Deep-Link |
 |---|---|:---:|---|
 | Knappheit & Grundfragen der VWL | `knappheit` | 7 | `pool.html?pool=vwl_beduerfnisse&topic=knappheit` |
-| Bedürfnisse & Bedürfnispyramide | `beduerfnisse` | 8 | `pool.html?pool=vwl_beduerfnisse&topic=beduerfnisse` |
-| Güterarten | `gueter` | 8 | `pool.html?pool=vwl_beduerfnisse&topic=gueter` |
+| BedÃ¼rfnisse & BedÃ¼rfnispyramide | `beduerfnisse` | 8 | `pool.html?pool=vwl_beduerfnisse&topic=beduerfnisse` |
+| GÃ¼terarten | `gueter` | 8 | `pool.html?pool=vwl_beduerfnisse&topic=gueter` |
 | Produktionsfaktoren | `produktionsfaktoren` | 8 | `pool.html?pool=vwl_beduerfnisse&topic=produktionsfaktoren` |
-| Ökonomisches Prinzip | `oekprinzip` | 6 | `pool.html?pool=vwl_beduerfnisse&topic=oekprinzip` |
+| Ã–konomisches Prinzip | `oekprinzip` | 6 | `pool.html?pool=vwl_beduerfnisse&topic=oekprinzip` |
 | Arbeitsteilung, Tausch & Geld | `arbeitsteilung` | 7 | `pool.html?pool=vwl_beduerfnisse&topic=arbeitsteilung` |
 | Wirtschaftssektoren & Strukturwandel | `sektoren` | 6 | `pool.html?pool=vwl_beduerfnisse&topic=sektoren` |
 
 ---
 
-## 2. Ökonomisches Menschenbild
+## 2. Ã–konomisches Menschenbild
 
-**Pool:** `vwl_menschenbild` · SF GYM1 · 49 Fragen
+**Pool:** `vwl_menschenbild` Â· SF GYM1 Â· 49 Fragen
 
 | Unterthema | Key | Fragen | Deep-Link |
 |---|---|:---:|---|
 | Homo Oeconomicus | `homo` | 8 | `pool.html?pool=vwl_menschenbild&topic=homo` |
-| Kritik & Verhaltensökonomie | `kritik` | 8 | `pool.html?pool=vwl_menschenbild&topic=kritik` |
-| Opportunitätskosten & Trade-offs | `opportunitaet` | 7 | `pool.html?pool=vwl_menschenbild&topic=opportunitaet` |
+| Kritik & VerhaltensÃ¶konomie | `kritik` | 8 | `pool.html?pool=vwl_menschenbild&topic=kritik` |
+| OpportunitÃ¤tskosten & Trade-offs | `opportunitaet` | 7 | `pool.html?pool=vwl_menschenbild&topic=opportunitaet` |
 | Anreize und ihre Wirkung | `anreize` | 7 | `pool.html?pool=vwl_menschenbild&topic=anreize` |
 | Gefangenendilemma & Spieltheorie | `spieltheorie` | 8 | `pool.html?pool=vwl_menschenbild&topic=spieltheorie` |
 | Aufgaben der VWL | `aufgaben` | 5 | `pool.html?pool=vwl_menschenbild&topic=aufgaben` |
@@ -42,7 +42,7 @@
 
 ## 3. Bruttoinlandprodukt (BIP)
 
-**Pool:** `vwl_bip` · EWR GYM2 · 60 Fragen
+**Pool:** `vwl_bip` Â· EWR GYM2 Â· 60 Fragen
 
 | Unterthema | Key | Fragen | Deep-Link |
 |---|---|:---:|---|
@@ -56,9 +56,9 @@
 
 ---
 
-## 4. Wirtschaftswachstum — Triebkräfte und Effekte
+## 4. Wirtschaftswachstum â€” TriebkrÃ¤fte und Effekte
 
-**Pool:** `vwl_wachstum` · SF GYM1–GYM4 · 55 Fragen
+**Pool:** `vwl_wachstum` Â· SF GYM1â€“GYM4 Â· 55 Fragen
 
 | Unterthema | Key | Fragen | Deep-Link |
 |---|---|:---:|---|
@@ -73,23 +73,23 @@
 
 ## 5. Arbeitslosigkeit & Armut
 
-**Pool:** `vwl_arbeitslosigkeit` · SF GYM3 · 50 Fragen
+**Pool:** `vwl_arbeitslosigkeit` Â· SF GYM3 Â· 50 Fragen
 
 | Unterthema | Key | Fragen | Deep-Link |
 |---|---|:---:|---|
 | Der Arbeitsmarkt | `arbeitsmarkt` | 8 | `pool.html?pool=vwl_arbeitslosigkeit&topic=arbeitsmarkt` |
-| Löhne & Lohnrigiditäten | `loehne` | 8 | `pool.html?pool=vwl_arbeitslosigkeit&topic=loehne` |
+| LÃ¶hne & LohnrigiditÃ¤ten | `loehne` | 8 | `pool.html?pool=vwl_arbeitslosigkeit&topic=loehne` |
 | Typen von Arbeitslosigkeit | `typen` | 8 | `pool.html?pool=vwl_arbeitslosigkeit&topic=typen` |
 | Beveridge-Kurve & Sockelarbeitslosigkeit | `beveridge` | 7 | `pool.html?pool=vwl_arbeitslosigkeit&topic=beveridge` |
-| Bekämpfung der Arbeitslosigkeit | `bekaempfung` | 8 | `pool.html?pool=vwl_arbeitslosigkeit&topic=bekaempfung` |
+| BekÃ¤mpfung der Arbeitslosigkeit | `bekaempfung` | 8 | `pool.html?pool=vwl_arbeitslosigkeit&topic=bekaempfung` |
 | Messung & Statistik | `statistik` | 7 | `pool.html?pool=vwl_arbeitslosigkeit&topic=statistik` |
-| Armut & Armutsbekämpfung | `armut` | 4 | `pool.html?pool=vwl_arbeitslosigkeit&topic=armut` |
+| Armut & ArmutsbekÃ¤mpfung | `armut` | 4 | `pool.html?pool=vwl_arbeitslosigkeit&topic=armut` |
 
 ---
 
 ## 6. Sozialpolitik und Sozialversicherungen
 
-**Pool:** `vwl_sozialpolitik` · SF GYM3 · 50 Fragen
+**Pool:** `vwl_sozialpolitik` Â· SF GYM3 Â· 50 Fragen
 
 | Unterthema | Key | Fragen | Deep-Link |
 |---|---|:---:|---|
@@ -105,7 +105,7 @@
 
 ## 7. Steuern und Staatseinnahmen
 
-**Pool:** `vwl_steuern` · SF GYM3 · 60 Fragen
+**Pool:** `vwl_steuern` Â· SF GYM3 Â· 60 Fragen
 
 | Unterthema | Key | Fragen | Deep-Link |
 |---|---|:---:|---|
@@ -114,13 +114,13 @@
 | Steuerarten in der Schweiz | `steuerarten` | 10 | `pool.html?pool=vwl_steuern&topic=steuerarten` |
 | Fiskal-/Staatsquote & Laffer-Kurve | `quoten` | 9 | `pool.html?pool=vwl_steuern&topic=quoten` |
 | Steuerwettbewerb & Finanzausgleich | `wettbewerb` | 10 | `pool.html?pool=vwl_steuern&topic=wettbewerb` |
-| Steuern und Elastizitäten | `elastizitaeten` | 11 | `pool.html?pool=vwl_steuern&topic=elastizitaeten` |
+| Steuern und ElastizitÃ¤ten | `elastizitaeten` | 11 | `pool.html?pool=vwl_steuern&topic=elastizitaeten` |
 
 ---
 
 ## 8. Staatsverschuldung
 
-**Pool:** `vwl_staatsverschuldung` · SF GYM3 · 65 Fragen
+**Pool:** `vwl_staatsverschuldung` Â· SF GYM3 Â· 65 Fragen
 
 | Unterthema | Key | Fragen | Deep-Link |
 |---|---|:---:|---|
@@ -134,20 +134,20 @@
 
 ---
 
-## Schnellreferenz: Zusätzliche Parameter
+## Schnellreferenz: ZusÃ¤tzliche Parameter
 
 | Parameter | Beispiel | Wirkung |
 |---|---|---|
 | `&start=1` | `...&topic=nomreal&start=1` | Quiz startet direkt |
 | `&diff=1` | `...&topic=nomreal&diff=1` | Nur einfache Fragen |
 | `&diff=1,2` | `...&topic=nomreal&diff=1,2` | Einfach + Mittel |
-| `&type=mc` | `...&topic=nomreal&type=mc` | Nur Multiple Choice |
-| `&type=mc,tf` | `...&topic=nomreal&type=mc,tf` | MC + Richtig/Falsch |
-| `&keys=1` | `...pool=vwl_bip&keys=1` | Info-Übersicht im Browser |
+| `&type=mc` | `...&topic=nomreal&type=mc` | Nur Einzelauswahl |
+| `&type=mc,tf` | `...&topic=nomreal&type=mc,tf` | Einzelauswahl + Richtig/Falsch |
+| `&keys=1` | `...pool=vwl_bip&keys=1` | Info-Ãœbersicht im Browser |
 
-**Schwierigkeitsstufen:** `1` = ⭐ Einfach, `2` = ⭐⭐ Mittel, `3` = ⭐⭐⭐ Schwer  
-**Fragetypen:** `mc` = Multiple Choice, `tf` = Richtig/Falsch, `fill` = Lückentext, `calc` = Berechnung, `sort` = Zuordnung, `open` = Offene Frage
+**Schwierigkeitsstufen:** `1` = â­ Einfach, `2` = â­â­ Mittel, `3` = â­â­â­ Schwer  
+**Fragetypen:** `mc` = Einzelauswahl, `multi` = Mehrfachauswahl, `tf` = Richtig/Falsch, `fill` = LÃ¼ckentext, `calc` = Berechnung, `sort` = Zuordnung, `open` = Offene Frage
 
 ---
 
-*Erstellt am 15.02.2026 · Gymnasium Hofwil · Fachbereich VWL*
+*Erstellt am 15.02.2026 Â· Gymnasium Hofwil Â· Fachbereich VWL*
