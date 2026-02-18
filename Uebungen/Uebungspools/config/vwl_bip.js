@@ -1,6 +1,6 @@
 // Übungspool: Bruttoinlandprodukt (BIP)
 // Fachbereich: VWL
-// Anzahl Fragen: 60
+// Anzahl Fragen: 78
 
 window.POOL_META = {
   id: "vwl_bip",
@@ -21,7 +21,7 @@ window.TOPICS = {
 };
 
 window.QUESTIONS = [
-// ──── DEFINITION & GRUNDBEGRIFFE (d01–d10) ────
+// ──── DEFINITION & GRUNDBEGRIFFE (d01–d12) ────
 {id:"d01",topic:"definition",type:"mc",diff:1,tax:"K1",
  q:"Was misst das Bruttoinlandprodukt (BIP)?",
  options:[{v:"A",t:"Den Marktwert aller in einem Land während eines Jahres hergestellten Endprodukte."},{v:"B",t:"Die Summe aller in einem Land produzierten Güter inklusive Vorleistungen."},{v:"C",t:"Den Wert aller Exporte eines Landes."},{v:"D",t:"Das Gesamtvermögen aller Einwohner eines Landes."}],
@@ -82,7 +82,24 @@ window.QUESTIONS = [
  q:"Das BIP pro Kopf ist ein geeignetes Mass für die Lebensqualität einer Bevölkerung.",
  correct:false,explain:"Falsch. Das BIP pro Kopf misst den materiellen Wohlstand, nicht die Lebensqualität. Es ignoriert Umweltschäden, Einkommensverteilung, Gesundheit, Bildung und Freizeit. Mehr Autounfälle erhöhen z.B. das BIP, senken aber die Lebensqualität."},
 
-// ──── MESSPROBLEME (m01–m10) ────
+
+{id:"d11",topic:"definition",type:"multi",diff:2,tax:"K2",
+ q:"Welche der folgenden Güter sind Endprodukte (und gehen ins BIP ein)?",
+ options:[
+   {v:"A",t:"Ein von einer Familie gekauftes Auto"},
+   {v:"B",t:"Stahl, den ein Autohersteller zur Produktion einkauft"},
+   {v:"C",t:"Ein Computer, den eine Firma für das Büro kauft (Investition)"},
+   {v:"D",t:"Mehl, das eine Bäckerei für die Brotproduktion kauft"}
+ ],
+ correct:["A","C"],
+ explain:"Endprodukte = Güter, die nicht weiterverarbeitet werden. Das Familienauto (Konsum) und der Bürocomputer (Investition) sind Endprodukte. Stahl und Mehl sind Vorleistungen, weil sie weiterverarbeitet werden."},
+
+{id:"d12",topic:"definition",type:"mc",diff:3,tax:"K4",
+ q:"Ein Möbelhersteller kauft Holz für CHF 500 und Schrauben für CHF 20. Er produziert einen Tisch, den er für CHF 1\u2019200 an einen Händler verkauft. Der Händler verkauft den Tisch für CHF 1\u2019500 an einen Konsumenten. Welche Aussage ist korrekt?",
+ options:[{v:"A",t:"Der BIP-Beitrag dieser Wertschöpfungskette beträgt CHF 1\u2019500."},{v:"B",t:"Der BIP-Beitrag beträgt CHF 3\u2019220 (Summe aller Transaktionen)."},{v:"C",t:"Die Wertschöpfung des Händlers beträgt CHF 1\u2019500."},{v:"D",t:"Die Wertschöpfung des Möbelherstellers beträgt CHF 1\u2019200."}],
+ correct:"A",explain:"BIP = Endproduktpreis = CHF 1\u2019500. Wertschöpfung: Zulieferer = 520, Möbelhersteller = 1\u2019200 – 520 = 680, Händler = 1\u2019500 – 1\u2019200 = 300. Summe: 520 + 680 + 300 = 1\u2019500. Antwort D ist falsch, weil 1\u2019200 der Produktionswert, nicht die Wertschöpfung ist."},
+
+// ──── MESSPROBLEME (m01–m12) ────
 {id:"m01",topic:"messprobleme",type:"mc",diff:1,tax:"K1",
  q:"Welche Leistung wird im BIP NICHT erfasst?",
  options:[{v:"A",t:"Hausarbeit und Eigenleistungen (z.B. selber kochen)"},{v:"B",t:"Die Produktion eines Automobilherstellers"},{v:"C",t:"Dienstleistungen eines Coiffeurs"},{v:"D",t:"Staatliche Leistungen wie Polizei und Schulen"}],
@@ -140,7 +157,24 @@ window.QUESTIONS = [
  ],
  explain:"Drei Hauptkritikpunkte: (1) Nicht erfasste Leistungen (Eigenarbeit, Schwarzarbeit), (2) Nicht erfasste Schäden (Umwelt), (3) Problematische Bewertung (Staatsleistungen zu Kosten)."},
 
-// ──── DREI SEITEN DES BIP (s01–s07) ────
+
+{id:"m11",topic:"messprobleme",type:"multi",diff:2,tax:"K2",
+ q:"Welche der folgenden Faktoren werden vom BIP NICHT oder nur unzureichend erfasst?",
+ options:[
+   {v:"A",t:"Ehrenamtliche Arbeit (z.B. Freiwilligenarbeit im Sportverein)"},
+   {v:"B",t:"Die Produktion von Medikamenten durch Novartis"},
+   {v:"C",t:"Umweltzerstörung durch eine Chemiefabrik"},
+   {v:"D",t:"Der Nutzen kostenloser Apps wie Wikipedia oder Google Maps"}
+ ],
+ correct:["A","C","D"],
+ explain:"Ehrenamtliche Arbeit hat keinen Marktpreis (fehlt). Umweltschäden werden nicht als Kosten erfasst (Schwäche). Kostenlose digitale Dienste generieren Nutzen ohne Marktpreis (fehlt). Nur die Medikamentenproduktion (B) wird über den Marktpreis korrekt erfasst."},
+
+{id:"m12",topic:"messprobleme",type:"mc",diff:1,tax:"K1",
+ q:"Der Human Development Index (HDI) ergänzt das BIP um welche Dimensionen?",
+ options:[{v:"A",t:"Gesundheit (Lebenserwartung) und Bildung (Schuljahre)"},{v:"B",t:"Umweltqualität und CO\u2082-Emissionen"},{v:"C",t:"Militärausgaben und Sicherheit"},{v:"D",t:"Exportquote und Handelsbilanz"}],
+ correct:"A",explain:"Der HDI (UNDP) kombiniert drei Dimensionen: (1) Gesundheit (Lebenserwartung), (2) Bildung (erwartete und durchschnittliche Schuljahre), (3) Lebensstandard (BNE pro Kopf in PPP). Er ist ein häufig verwendetes Mass, das über das reine BIP hinausgeht."},
+
+// ──── DREI SEITEN DES BIP (s01–s10) ────
 {id:"s01",topic:"dreiseiten",type:"mc",diff:1,tax:"K1",
  q:"Das BIP kann auf drei Arten berechnet werden. Welche?",
  options:[{v:"A",t:"Produktionsansatz, Einkommensansatz und Verwendungsansatz"},{v:"B",t:"Konsumansatz, Sparansatz und Investitionsansatz"},{v:"C",t:"Exportansatz, Importansatz und Binnenmarktansatz"},{v:"D",t:"Brutto-, Netto- und Realansatz"}],
@@ -186,7 +220,28 @@ window.QUESTIONS = [
  q:"Erklären Sie, warum die drei Berechnungsarten des BIP zum selben Ergebnis führen müssen.",
  sample:"Jedes produzierte Gut wird konsumiert, investiert, vom Staat gekauft oder exportiert (Verwendung). Die Einnahmen fliessen als Löhne, Gewinne, Zinsen, Mieten an die Produktionsfaktoren (Einkommen). Die Wertschöpfung bei der Herstellung entspricht dem Endproduktwert (Produktion). Es ist derselbe Geldfluss aus drei Blickwinkeln.",
  explain:"Der Kreislaufgedanke: Was produziert wird = was als Einkommen verteilt wird = was verwendet wird. Drei Perspektiven auf denselben ökonomischen Vorgang."},
-// ──── NOMINALES & REALES BIP (n01–n07) ────
+
+{id:"s08",topic:"dreiseiten",type:"multi",diff:2,tax:"K2",
+ q:"Welche der folgenden Posten gehören zur BIP-Berechnung nach dem Verwendungsansatz (C + I + G + NX)?",
+ options:[
+   {v:"A",t:"Kauf eines neuen Autos durch eine Familie (Konsum)"},
+   {v:"B",t:"Wertschöpfung einer Schreinerei"},
+   {v:"C",t:"Bau einer neuen Fabrikhalle (Investition)"},
+   {v:"D",t:"Lohnzahlung an einen Bankangestellten"}
+ ],
+ correct:["A","C"],
+ explain:"Verwendungsansatz = C + I + G + NX. Autokauf (C = Konsum) und Fabrikbau (I = Investition) gehören dazu. Die Wertschöpfung (B) gehört zum Produktionsansatz, die Lohnzahlung (D) zum Einkommensansatz."},
+
+{id:"s09",topic:"dreiseiten",type:"mc",diff:3,tax:"K4",
+ q:"In einer kleinen Volkswirtschaft produziert ein Unternehmen Güter im Wert von CHF 500. Die Löhne betragen CHF 300, Gewinne CHF 200. Die Haushalte konsumieren CHF 400 und importieren CHF 100 aus dem Ausland. Der Staat gibt CHF 100 aus, Investitionen betragen CHF 100. Es gibt keine Exporte. Was stimmt?",
+ options:[{v:"A",t:"Alle drei Ansätze ergeben CHF 500 – die Rechnung geht auf."},{v:"B",t:"Das BIP nach Verwendungsansatz ist höher als nach Produktionsansatz."},{v:"C",t:"Der Einkommensansatz ergibt CHF 600."},{v:"D",t:"Die Importe erhöhen das BIP."}],
+ correct:"A",explain:"Produktion: Wertschöpfung = 500. Einkommen: 300 + 200 = 500. Verwendung: C(400) + I(100) + G(100) + NX(0–100) = 500. Importe werden abgezogen, weil sie zwar konsumiert, aber nicht im Inland produziert wurden."},
+
+{id:"s10",topic:"dreiseiten",type:"tf",diff:3,tax:"K4",
+ q:"Wenn die Schweiz mehr importiert als exportiert, ist der Beitrag der Nettoexporte zum BIP negativ – das BIP sinkt dadurch zwingend.",
+ correct:false,explain:"Falsch. Negative Nettoexporte (NX < 0) bedeuten nur, dass dieser Teilposten negativ ist. Das BIP kann trotzdem steigen, wenn Konsum, Investitionen oder Staatsausgaben stärker wachsen. NX ist nur eine von vier Komponenten."},
+
+// ──── NOMINALES & REALES BIP (n01–n09) ────
 {id:"n01",topic:"nomreal",type:"mc",diff:1,tax:"K1",
  q:"Was unterscheidet das nominale vom realen BIP?",
  options:[{v:"A",t:"Nominal = aktuelle Preise, real = konstante Preise eines Basisjahres (inflationsbereinigt)."},{v:"B",t:"Das nominale BIP berücksichtigt die Inflation, das reale nicht."},{v:"C",t:"Das reale BIP wird nur für die Schweiz berechnet."},{v:"D",t:"Es gibt keinen Unterschied."}],
@@ -230,7 +285,23 @@ window.QUESTIONS = [
  ],
  explain:"Land A: 60'000 × 0.85 = 51'000 USD (sinkt wegen hohem Preisniveau). Land B: 25'000 × 1.6 = 40'000 USD (steigt wegen tiefem Preisniveau). Unterschied schrumpft von 35'000 auf 11'000."},
 
-// ──── WIRTSCHAFTSKREISLAUF (k01–k08) ────
+
+{id:"n08",topic:"nomreal",type:"multi",diff:2,tax:"K2",
+ q:"Welche der folgenden Aussagen zum nominalen und realen BIP sind korrekt?",
+ options:[
+   {v:"A",t:"Das reale BIP ist besser geeignet, um echtes Wirtschaftswachstum zu messen."},
+   {v:"B",t:"Bei Deflation ist das nominale BIP höher als das reale BIP."},
+   {v:"C",t:"Nominales und reales BIP sind im Basisjahr identisch."},
+   {v:"D",t:"Das reale BIP kann nie höher sein als das nominale BIP."}
+ ],
+ correct:["A","C"],
+ explain:"A ist korrekt: Nur das reale BIP zeigt die Mengenentwicklung. C ist korrekt: Im Basisjahr ist der Preisindex = 100, daher sind nominal und real gleich. B ist falsch: Bei Deflation (Preise sinken) ist das reale BIP höher als das nominale. D ist falsch: Bei Deflation (Preisindex < 100) ist das reale BIP grösser."},
+
+{id:"n09",topic:"nomreal",type:"tf",diff:2,tax:"K2",
+ q:"Kaufkraftparitäten (PPP) korrigieren für Wechselkursschwankungen, nicht für Preisunterschiede zwischen Ländern.",
+ correct:false,explain:"Falsch. PPP korrigieren gerade für Preisunterschiede zwischen Ländern. In einem Hochpreisland (z.B. Schweiz) kann man für denselben USD-Betrag weniger kaufen als in einem Niedrigpreisland (z.B. Indien). PPP rechnen auf gleiche Kaufkraft um."},
+
+// ──── WIRTSCHAFTSKREISLAUF (k01–k11) ────
 {id:"k01",topic:"kreislauf",type:"mc",diff:1,tax:"K1",
  q:"Welche zwei Akteure stehen im Zentrum des einfachen Wirtschaftskreislaufs?",
  options:[{v:"A",t:"Haushalte und Unternehmen"},{v:"B",t:"Staat und Ausland"},{v:"C",t:"Banken und Versicherungen"},{v:"D",t:"Arbeitnehmer und Arbeitgeber"}],
@@ -277,7 +348,29 @@ window.QUESTIONS = [
 {id:"k08",topic:"kreislauf",type:"tf",diff:2,tax:"K2",
  q:"Im erweiterten Kreislauf fliessen Zahlungen für Importe von den Haushalten ans Ausland.",
  correct:true,explain:"Richtig. Schweizer Haushalte kaufen ausländische Güter (Importe) \u2192 Geld fliesst ans Ausland. Umgekehrt fliessen Exporteinnahmen vom Ausland an inländische Unternehmen."},
-// ──── VERTEILUNG & UNGLEICHHEIT (v01–v09) ────
+
+{id:"k09",topic:"kreislauf",type:"multi",diff:2,tax:"K2",
+ q:"Welche der folgenden Ströme fliessen im erweiterten Wirtschaftskreislauf vom Staat an die Haushalte?",
+ options:[
+   {v:"A",t:"Transferzahlungen (z.B. AHV-Renten, Sozialhilfe)"},
+   {v:"B",t:"Löhne an Staatsangestellte"},
+   {v:"C",t:"Subventionen an Unternehmen"},
+   {v:"D",t:"Steuereinnahmen"}
+ ],
+ correct:["A","B"],
+ explain:"Vom Staat an Haushalte fliessen: Transfers (AHV, Sozialhilfe – ohne Gegenleistung) und Löhne (an Staatsangestellte – als Entgelt für Arbeit). Subventionen (C) fliessen an Unternehmen, Steuern (D) fliessen in die umgekehrte Richtung (Haushalte \u2192 Staat)."},
+
+{id:"k10",topic:"kreislauf",type:"mc",diff:3,tax:"K4",
+ q:"Was passiert im Wirtschaftskreislauf, wenn die Haushalte plötzlich deutlich mehr sparen und weniger konsumieren?",
+ options:[{v:"A",t:"Die Unternehmen erhalten weniger Einnahmen, produzieren weniger und zahlen tiefere Löhne – ein Abschwung droht."},{v:"B",t:"Das BIP steigt, weil Sparen eine Investition ist."},{v:"C",t:"Der Staat gleicht die Lücke automatisch aus."},{v:"D",t:"Es hat keinen Effekt, da das Geld bei den Banken landet und sofort weitergeleitet wird."}],
+ correct:"A",explain:"Höheres Sparen = weniger Konsum = weniger Nachfrage auf dem Gütermarkt. Die Unternehmen verkaufen weniger, reduzieren Produktion und Beschäftigung. Das Einkommen sinkt (Kreislauf-Effekt). Dieses Phänomen heisst \u00abSparparadoxon\u00bb: Was für den Einzelnen vernünftig ist (sparen), kann gesamtwirtschaftlich schaden."},
+
+{id:"k11",topic:"kreislauf",type:"open",diff:3,tax:"K4",
+ q:"Im Wirtschaftskreislauf spricht man von Sickerströmen (Abflüssen) und Zuflüssen. Erklären Sie, warum Sparen, Steuern und Importe als Sickerströme gelten, und nennen Sie die zugehörigen Zuflüsse.",
+ sample:"Sickerströme = Geld, das den Güterkreislauf zwischen Haushalten und Unternehmen verlässt: Sparen (Geld fliesst an Banken statt in Konsum), Steuern (Geld fliesst an den Staat statt in Konsum/Investition), Importe (Geld fliesst ans Ausland statt an inländische Unternehmen). Zuflüsse: Investitionen (Banken \u2192 Unternehmen), Staatsausgaben (Staat \u2192 Unternehmen/Haushalte), Exporte (Ausland \u2192 Unternehmen). Damit der Kreislauf stabil bleibt, müssen Sickerströme \u2248 Zuflüsse sein.",
+ explain:"Sickerströme (S + T + M) und Zuflüsse (I + G + X). Im Gleichgewicht gilt: S + T + M = I + G + X. Diese Gleichung ist eine Umformung der Verwendungsgleichung Y = C + I + G + (X\u2013M)."},
+
+// ──── VERTEILUNG & UNGLEICHHEIT (v01–v12) ────
 {id:"v01",topic:"verteilung",type:"mc",diff:1,tax:"K1",
  q:"Was zeigt die Lorenzkurve?",
  options:[{v:"A",t:"Die Verteilung von Einkommen oder Vermögen – je weiter von der 45\u00b0-Linie, desto ungleicher."},{v:"B",t:"Das Wirtschaftswachstum über die Zeit."},{v:"C",t:"Den Zusammenhang zwischen Inflation und Arbeitslosigkeit."},{v:"D",t:"Die Entwicklung des BIP pro Kopf."}],
@@ -330,7 +423,32 @@ window.QUESTIONS = [
  options:[{v:"A",t:"Extreme Ungleichheit provoziert soziale Unruhen, verringert Vertrauen und hemmt Investitionen."},{v:"B",t:"Hohe Ungleichheit hat keinen Einfluss auf den sozialen Frieden."},{v:"C",t:"In ungleichen Gesellschaften investieren die Reichen mehr."},{v:"D",t:"Soziale Unruhen führen zu mehr Konsum."}],
  correct:"A",explain:"Bei sehr hoher Ungleichheit (Gini > ca. 0.4) steigt das Risiko sozialer Instabilität. Menschen werden kriminell statt produktiv. Die Unsicherheit hemmt Investitionen. Zudem entstehen Forderungen nach starker Umverteilung."},
 
-// ──── WACHSTUM & NACHHALTIGKEIT (w01–w09) ────
+
+{id:"v10",topic:"verteilung",type:"mc",diff:2,tax:"K3",
+ q:"Betrachten Sie das Diagramm mit den Lorenzkurven zweier Länder. Welche Aussage trifft zu?",
+ img:{
+   src:"img/vwl/bip/lorenzkurve_vergleich.svg",
+   alt:"Lorenzkurven von Land A und Land B im Vergleich"
+ },
+ options:[{v:"A",t:"Land B hat eine ungleichere Einkommensverteilung als Land A, weil seine Kurve weiter von der 45\u00b0-Linie entfernt ist."},{v:"B",t:"Land A ist ungleicher, weil seine Kurve näher an der 45\u00b0-Linie liegt."},{v:"C",t:"Beide Länder haben denselben Gini-Koeffizienten."},{v:"D",t:"Die Kurven zeigen das BIP-Wachstum, nicht die Verteilung."}],
+ correct:"A",explain:"Je weiter eine Lorenzkurve von der 45\u00b0-Linie (= perfekte Gleichverteilung) entfernt ist, desto ungleicher ist die Verteilung. Land B weicht stärker ab \u2192 höherer Gini \u2192 grössere Ungleichheit."},
+
+{id:"v11",topic:"verteilung",type:"multi",diff:2,tax:"K2",
+ q:"Welche der folgenden Massnahmen verringern typischerweise die Einkommensungleichheit?",
+ options:[
+   {v:"A",t:"Progressive Einkommenssteuer (höherer Steuersatz bei höherem Einkommen)"},
+   {v:"B",t:"Senkung der Sozialleistungen"},
+   {v:"C",t:"Investitionen in öffentliche Bildung"},
+   {v:"D",t:"Abschaffung der Erbschaftssteuer"}
+ ],
+ correct:["A","C"],
+ explain:"Progressive Steuern belasten hohe Einkommen stärker und finanzieren Umverteilung. Bildungsinvestitionen schaffen Chancengleichheit und erhöhen das Humankapital der Ärmeren. Senkung der Sozialleistungen (B) und Abschaffung der Erbschaftssteuer (D) würden die Ungleichheit eher vergrössern."},
+
+{id:"v12",topic:"verteilung",type:"tf",diff:1,tax:"K1",
+ q:"Ein Gini-Koeffizient von 0 bedeutet, dass alle Personen exakt das gleiche Einkommen haben.",
+ correct:true,explain:"Richtig. Gini = 0 entspricht der 45\u00b0-Linie (perfekte Gleichverteilung). Jeder Prozentanteil der Bevölkerung erhält denselben Prozentanteil des Gesamteinkommens."},
+
+// ──── WACHSTUM & NACHHALTIGKEIT (w01–w12) ────
 {id:"w01",topic:"wachstum",type:"mc",diff:1,tax:"K1",
  q:"Auf welche zwei Arten kann eine Volkswirtschaft wachsen?",
  options:[{v:"A",t:"Durch mehr Arbeitsstunden oder durch höhere Produktivität."},{v:"B",t:"Durch mehr Exporte oder weniger Importe."},{v:"C",t:"Durch mehr Konsum oder mehr Sparen."},{v:"D",t:"Durch höhere Preise oder mehr Steuern."}],
@@ -386,5 +504,26 @@ window.QUESTIONS = [
    {t:"Fluglärm belästigt Anwohner",cat:0},{t:"Impfung schützt auch Ungeimpfte",cat:1},
    {t:"Abgase im Stadtverkehr",cat:0},{t:"Forschung nützt der ganzen Gesellschaft",cat:1}
  ],
- explain:"Negative Externalitäten: Kosten für Dritte (Verschmutzung, Lärm, Abgase) \u2192 zu viel Produktion. Positive Externalitäten: Nutzen für Dritte (Bestäubung, Impfschutz, Forschung) \u2192 zu wenig Produktion. Beides = Marktversagen."}
+ explain:"Negative Externalitäten: Kosten für Dritte (Verschmutzung, Lärm, Abgase) \u2192 zu viel Produktion. Positive Externalitäten: Nutzen für Dritte (Bestäubung, Impfschutz, Forschung) \u2192 zu wenig Produktion. Beides = Marktversagen."},
+
+{id:"w10",topic:"wachstum",type:"multi",diff:2,tax:"K2",
+ q:"Welche der folgenden Situationen sind Beispiele für negative externe Effekte?",
+ options:[
+   {v:"A",t:"Ein Nachbar renoviert sein Haus und der Baulärm stört die Anwohner."},
+   {v:"B",t:"Eine Universität bildet Fachkräfte aus, die in der ganzen Region Arbeitsplätze schaffen."},
+   {v:"C",t:"Eine Fabrik leitet Abwasser in einen See, in dem Fischer ihre Existenz haben."},
+   {v:"D",t:"Ein Flughafen verursacht Lärm und tiefere Immobilienpreise in der Umgebung."}
+ ],
+ correct:["A","C","D"],
+ explain:"A, C und D sind negative externe Effekte: Dritte tragen Kosten (Lärm, Verschmutzung, Wertminderung), ohne entschädigt zu werden. B ist ein positiver externer Effekt: Die Ausbildungsleistung der Universität nützt auch Dritten (Unternehmen, Region)."},
+
+{id:"w11",topic:"wachstum",type:"tf",diff:1,tax:"K1",
+ q:"Die drei Dimensionen der Nachhaltigkeit sind Ökologie, Ökonomie und Gesellschaft (Soziales).",
+ correct:true,explain:"Richtig. Das Drei-Säulen-Modell der Nachhaltigkeit: (1) Ökologische Nachhaltigkeit (Umwelt schützen), (2) Ökonomische Nachhaltigkeit (wirtschaftliche Leistungsfähigkeit erhalten), (3) Soziale Nachhaltigkeit (Gerechtigkeit, Teilhabe). Alle drei Dimensionen müssen gleichgewichtig berücksichtigt werden."},
+
+{id:"w12",topic:"wachstum",type:"mc",diff:3,tax:"K4",
+ q:"Was beschreibt die \u00abTragik der Allmende\u00bb (Tragedy of the Commons)?",
+ options:[{v:"A",t:"Wenn eine Ressource allen gehört, wird sie übernutzt, weil jeder seinen eigenen Nutzen maximiert, die Kosten aber die Allgemeinheit trägt."},{v:"B",t:"Der Staat muss alle Ressourcen privatisieren."},{v:"C",t:"Gemeinsames Eigentum ist immer effizienter als privates."},{v:"D",t:"Die Allmende bezeichnet das BIP eines Landes."}],
+ correct:"A",explain:"Beispiel: Eine gemeinsame Weide wird übernutzt, weil jeder Hirte ein zusätzliches Tier hinstellt – der Nutzen ist privat, die Kosten (Überweidung) tragen alle. Lösungen: Privatisierung, Regulierung, oder Selbstorganisation (Ostrom). Das Konzept ist zentral für Umweltprobleme wie Überfischung und Klimawandel."},
+
 ];
