@@ -48,10 +48,15 @@ https://durandbourjate.github.io/GYM-WR-DUY/Uebungen/Uebungspools/pool.html?pool
 
 Der Parameter `pool` bestimmt, welche Config-Datei geladen wird (`config/vwl_bip.js`).
 
-**Aktuelle Pool-URLs:**
-- `pool.html?pool=vwl_beduerfnisse` → Bedürfnisse, Knappheit & Produktionsfaktoren (SF GYM1)
-- `pool.html?pool=vwl_menschenbild` → Ökonomisches Menschenbild (SF GYM1)
-- `pool.html?pool=vwl_bip` → Bruttoinlandprodukt (EWR GYM2)
+**Aktuelle Pool-URLs (Stand Februar 2026):**
+- `pool.html?pool=vwl_beduerfnisse` → Bedürfnisse, Knappheit & Produktionsfaktoren (SF GYM1, 50 Fragen)
+- `pool.html?pool=vwl_menschenbild` → Ökonomisches Menschenbild (SF GYM1, 49 Fragen)
+- `pool.html?pool=vwl_bip` → Bruttoinlandprodukt (EWR GYM2, 60 Fragen)
+- `pool.html?pool=vwl_wachstum` → Wirtschaftswachstum — Triebkräfte und Effekte (SF GYM1–GYM4, 55 Fragen)
+- `pool.html?pool=vwl_steuern` → Steuern und Staatseinnahmen (SF GYM3, 60 Fragen)
+- `pool.html?pool=vwl_arbeitslosigkeit` → Arbeitslosigkeit & Armut (SF GYM3, 50 Fragen)
+- `pool.html?pool=vwl_staatsverschuldung` → Staatsverschuldung (SF GYM3, 65 Fragen)
+- `pool.html?pool=vwl_sozialpolitik` → Sozialpolitik und Sozialversicherungen (SF GYM3, 50 Fragen)
 - Übersicht: `index.html`
 
 ### Farbsystem
@@ -108,7 +113,7 @@ Array von Frage-Objekten. Jede Frage hat folgende Pflichtfelder:
 |---|---|---|
 | `id` | String | Eindeutige ID im Pool (z.B. `"d01"`) |
 | `topic` | String | Schlüssel aus TOPICS (z.B. `"definition"`) |
-| `type` | String | Fragetyp: `mc`, `tf`, `fill`, `calc`, `sort`, `open` |
+| `type` | String | Fragetyp: `mc`, `multi`, `tf`, `fill`, `calc`, `sort`, `open` |
 | `diff` | Number | Schwierigkeit: `1` (einfach), `2` (mittel), `3` (schwer) |
 | `tax` | String | Taxonomiestufe: `"K1"` bis `"K6"` |
 | `q` | String | Fragetext |
@@ -132,6 +137,30 @@ Array von Frage-Objekten. Jede Frage hat folgende Pflichtfelder:
  correct:"A",
  explain:"Das BIP entspricht dem Marktwert aller Endprodukte."
 }
+```
+
+### Mehrfachauswahl (`multi`)
+
+```javascript
+{id:"g16", topic:"gleichgewicht", type:"multi", diff:2, tax:"K4",
+ q:"Der Staat führt einen Höchstpreis P_H ein. Welche Flächen bilden die neue Konsumentenrente?",
+ options:[
+   {v:"A", t:"Fläche A"},
+   {v:"B", t:"Fläche B"},
+   {v:"C", t:"Fläche C"},
+   {v:"D", t:"Fläche D"}
+ ],
+ correct:["A","B"],
+ explain:"Die KR besteht aus Fläche A (erhalten) und Fläche B (von PR umverteilt)."
+}
+```
+
+- Wie MC, aber `correct` ist ein **Array** statt ein einzelner String.
+- Im UI werden Checkboxen (☑️) statt Radio-Buttons angezeigt.
+- Hinweis „Mehrere Antworten können richtig sein." erscheint automatisch über den Optionen.
+- SuS müssen „Überprüfen" klicken (kein sofortiges Auslösen bei Klick).
+- Bewertung: Volle Punktzahl nur bei **exakter Übereinstimmung** (alle richtigen gewählt, keine falschen).
+- Ideal für Diagramm-Fragen mit beschrifteten Flächen (A–F) oder Aussagensammlungen.
 ```
 
 ### Richtig/Falsch (`tf`)
@@ -228,9 +257,9 @@ Verteilung: ca. 40% einfach, 40% mittel, 20% schwer.
 | Stufe | Bezeichnung | Typische Fragetypen |
 |---|---|---|
 | K1 | Wissen | MC, TF, Fill |
-| K2 | Verstehen | MC, TF, Fill, Sort, Open |
-| K3 | Anwenden | MC, Calc, Sort |
-| K4 | Analysieren | MC, Open |
+| K2 | Verstehen | MC, Multi, TF, Fill, Sort, Open |
+| K3 | Anwenden | MC, Multi, Calc, Sort |
+| K4 | Analysieren | MC, Multi, Open |
 | K5 | Beurteilen | Open |
 | K6 | Gestalten | Open |
 
@@ -275,7 +304,7 @@ Folgende Angaben sind nötig:
 #### Umfang
 - Mindestens 30 Aufgaben pro Pool, besser 40–60.
 - Jedes Unterthema mindestens 4–6 Aufgaben.
-- Alle 6 Fragetypen verwenden, Schwerpunkt auf MC und TF.
+- Alle 7 Fragetypen verwenden, Schwerpunkt auf MC und TF.
 - Offene Fragen gezielt für höhere Taxonomiestufen (K2–K5).
 
 #### Erklärungen
@@ -386,7 +415,7 @@ Keine Config-Dateien müssen angefasst werden.
 - **Modus-Wahl**: Fokus oder Mix
   - **Fokus**: Unterthema und Schwierigkeit müssen gewählt werden. Aufgaben nach Schwierigkeit sortiert.
   - **Mix**: Alles vorausgewählt. Aufgaben zufällig gemischt.
-- **Filter-Chips**: Unterthema, Schwierigkeit und Fragetyp. Live-Anzeige der Aufgabenanzahl.
+- **Filter-Chips**: Unterthema, Schwierigkeit und Fragetyp. Live-Anzeige der Aufgabenanzahl. Neben jeder Rubrik ein **„Alle ⇄"-Button** zum schnellen An-/Abwählen aller Chips einer Kategorie.
 - **Start-Button**: Erst aktiv, wenn mindestens 1 Aufgabe den Filtern entspricht.
 
 ### Quiz-Ablauf
@@ -400,7 +429,7 @@ Keine Config-Dateien müssen angefasst werden.
 - Gesamtpunktzahl und Prozent.
 - Aufschlüsselung nach Unterthema (grün ≥70%, gelb ≥40%, rot <40%).
 - Liste der falsch beantworteten Fragen mit Erklärungen.
-- PDF-Export via `window.print()`.
+- PDF-Export via `window.print()`. Nach dem Drucken/Speichern wird automatisch zum Startbildschirm zurückgekehrt.
 - "Neue Übung starten"-Button.
 
 ---
@@ -450,8 +479,9 @@ Vor der Fertigstellung prüfen:
 - Status prüfen: Repository → Tab "Actions" → grüner Haken = live
 
 ### LearningView
-- URL als Weblink-Anhang bei einer Aufgabe einfügen
-- Öffnet sich in neuem Tab (kein iFrame nötig)
+- **Als Weblink:** URL als Weblink-Anhang bei einer Aufgabe einfügen. Öffnet sich in neuem Tab.
+- **Als Iframe (Aufgabentyp «Interaktiv extern»):** Pool wird direkt in LearningView eingebettet. Der Fortschritt wird automatisch via `postMessage` an LearningView gemeldet (xAPI-Score-Objekt). Die Funktion `sendScoreToLV()` sendet nach jeder Antwort und beim Quiz-Ende den aktuellen Score. Im Standalone-Betrieb (kein Iframe) hat dies keinen Effekt.
+- Details zur Integration: Siehe `learningview_integration.md`.
 
 ### Technische Anforderungen
 - Einzige externe Abhängigkeit: Google Fonts (Fallback auf system-ui)
