@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 380" font-family="DM Sans, system-ui, sans-serif">
-  <rect width="480" height="380" fill="#fff" rx="8"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 360" font-family="DM Sans, system-ui, sans-serif">
+  <rect width="480" height="360" fill="#fff" rx="8"/>
   <text x="240" y="28" text-anchor="middle" font-size="14" font-weight="700" fill="#1e293b">Adverse Selektion – Todesspirale</text>
 
   <!-- Step 1 -->
@@ -34,9 +34,8 @@
 
   <!-- Step 5 (result) -->
   <path d="M240,285 L240,305" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrowGray)"/>
-  <rect x="100" y="310" width="280" height="45" rx="8" fill="#1e293b"/>
-  <text x="240" y="332" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">☠ Markt bricht zusammen</text>
-  <text x="240" y="348" text-anchor="middle" font-size="9" fill="#94a3b8">→ Lösung: Obligatorium (Versicherungspflicht)</text>
+  <rect x="100" y="310" width="280" height="35" rx="8" fill="#1e293b"/>
+  <text x="240" y="333" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">☠ Markt bricht zusammen</text>
 
   <!-- Arrow markers -->
   <defs>
