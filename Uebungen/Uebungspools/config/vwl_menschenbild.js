@@ -7,17 +7,23 @@ window.POOL_META = {
   fach: "VWL",
   title: "Übungspool: Ökonomisches Menschenbild",
   meta: "SF GYM1 · Gymnasium Hofwil · Individuell üben",
-  color: "vwl"
+  color: "vwl",
+  lernziele: [
+    "Ich kann das Modell des Homo Oeconomicus erklären und kritisch hinterfragen. (K5)",
+    "Ich kann Opportunitätskosten berechnen und bei Entscheidungssituationen anwenden. (K3)",
+    "Ich kann grundlegende Konzepte der Spieltheorie (z.B. Gefangenendilemma) auf ökonomische Situationen anwenden. (K3)",
+    "Ich kann die Ziele der schweizerischen Wirtschaftspolitik (magisches Sechseck) nennen und Zielkonflikte erkennen. (K4)"
+  ]
 };
 
 window.TOPICS = {
-  homo:{label:"Homo Oeconomicus",short:"Homo Oec."},
-  kritik:{label:"Kritik & Verhaltensökonomie",short:"Kritik"},
-  opportunitaet:{label:"Opportunitätskosten & Trade-offs",short:"Opp.kosten"},
-  anreize:{label:"Anreize und ihre Wirkung",short:"Anreize"},
-  spieltheorie:{label:"Gefangenendilemma & Spieltheorie",short:"Spieltheorie"},
-  aufgaben:{label:"Aufgaben der VWL",short:"Aufgaben VWL"},
-  ziele:{label:"Ziele der Wirtschaftspolitik",short:"Ziele WiPol"}
+  homo:{label:"Homo Oeconomicus",short:"Homo Oec.",lernziele:["Ich kann die Annahmen des Homo Oeconomicus-Modells aufzählen (Rationalität, Eigennutz, vollständige Information). (K1)","Ich kann erklären, warum der Homo Oeconomicus ein vereinfachtes Modell und kein Abbild der Realität ist. (K2)"]},
+  kritik:{label:"Kritik & Verhaltensökonomie",short:"Kritik",lernziele:["Ich kann Erkenntnisse der Verhaltensökonomie (Nudging, Verlustaversion, Heuristiken) nennen, die das Homo-Oeconomicus-Modell in Frage stellen. (K2)","Ich kann beurteilen, wann das Modell des Homo Oeconomicus nützlich ist und wo seine Grenzen liegen. (K5)"]},
+  opportunitaet:{label:"Opportunitätskosten & Trade-offs",short:"Opp.kosten",lernziele:["Ich kann den Begriff Opportunitätskosten definieren. (K1)","Ich kann in konkreten Entscheidungssituationen die Opportunitätskosten identifizieren und berechnen. (K3)"]},
+  anreize:{label:"Anreize und ihre Wirkung",short:"Anreize",lernziele:["Ich kann erklären, wie Anreize (positive und negative) das Verhalten von Menschen beeinflussen. (K2)","Ich kann unbeabsichtigte Nebenwirkungen von Anreizsystemen an Beispielen aufzeigen. (K4)"]},
+  spieltheorie:{label:"Gefangenendilemma & Spieltheorie",short:"Spieltheorie",lernziele:["Ich kann das Gefangenendilemma erklären und die Auszahlungsmatrix interpretieren. (K2)","Ich kann das Konzept des Nash-Gleichgewichts in einfachen Spielen anwenden. (K3)","Ich kann ökonomische Alltagssituationen (z.B. Preiskampf, Wettrüsten) als spieltheoretische Probleme erkennen. (K4)"]},
+  aufgaben:{label:"Aufgaben der VWL",short:"Aufgaben VWL",lernziele:["Ich kann die Aufgaben der Volkswirtschaftslehre (Beschreiben, Erklären, Vorhersagen, Gestalten) nennen. (K1)","Ich kann zwischen positiver und normativer Ökonomie unterscheiden. (K2)"]},
+  ziele:{label:"Ziele der Wirtschaftspolitik",short:"Ziele WiPol",lernziele:["Ich kann die Ziele der schweizerischen Wirtschaftspolitik (magisches Sechseck) aufzählen. (K1)","Ich kann Zielkonflikte und Zielharmonien zwischen wirtschaftspolitischen Zielen erkennen und an Beispielen erläutern. (K4)"]}
 };
 
 window.QUESTIONS = [

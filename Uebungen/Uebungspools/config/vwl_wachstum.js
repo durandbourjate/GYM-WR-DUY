@@ -7,16 +7,22 @@ window.POOL_META = {
   fach: "VWL",
   title: "Übungspool: Wirtschaftswachstum – Triebkräfte und Effekte",
   meta: "SF GYM1–GYM4 · Gymnasium Hofwil · Individuell üben",
-  color: "vwl"
+  color: "vwl",
+  lernziele: [
+    "Ich kann Wirtschaftswachstum definieren und seine Messung erklären. (K1)",
+    "Ich kann die Bestimmungsfaktoren des Wachstums auf drei Ebenen unterscheiden und erklären. (K2)",
+    "Ich kann Chancen und Gefahren von Wirtschaftswachstum gegeneinander abwägen. (K5)",
+    "Ich kann den Zusammenhang zwischen Wachstum, Verteilung und Nachhaltigkeit analysieren. (K4)"
+  ]
 };
 
 window.TOPICS = {
-  definition: {label:"Definition & Grundbegriffe", short:"Definition"},
-  ebene1: {label:"Unmittelbare Ebene: Einkommen & Produktion", short:"Einkommen"},
-  ebene2: {label:"Zwischenebene: Investitionen & Innovation", short:"Investitionen"},
-  ebene3: {label:"Tief liegende Ebene: Institutionen & Rahmenbedingungen", short:"Institutionen"},
-  verteilung: {label:"Wachstum & Verteilung", short:"Verteilung"},
-  nachhaltigkeit: {label:"Wachstum & Nachhaltigkeit", short:"Nachhaltigkeit"}
+  definition: {label:"Definition & Grundbegriffe", short:"Definition", lernziele:["Ich kann Wirtschaftswachstum als Veränderung des realen BIP definieren. (K1)","Ich kann extensives und intensives Wachstum unterscheiden. (K2)"]},
+  ebene1: {label:"Unmittelbare Ebene: Einkommen & Produktion", short:"Einkommen", lernziele:["Ich kann die unmittelbaren Wachstumsfaktoren (Arbeit, Kapital, technischer Fortschritt) erklären. (K2)","Ich kann die Produktionsfunktion als Zusammenhang zwischen Inputs und Output interpretieren. (K2)"]},
+  ebene2: {label:"Zwischenebene: Investitionen & Innovation", short:"Investitionen", lernziele:["Ich kann die Rolle von Investitionen, Bildung und Innovation für das Wachstum erklären. (K2)","Ich kann an Beispielen zeigen, wie Humankapital und technologischer Fortschritt das Wachstum fördern. (K3)"]},
+  ebene3: {label:"Tief liegende Ebene: Institutionen & Rahmenbedingungen", short:"Institutionen", lernziele:["Ich kann erklären, warum Institutionen (Rechtsstaatlichkeit, Eigentumsrechte, politische Stabilität) für Wachstum entscheidend sind. (K2)","Ich kann Gründe nennen, warum manche Länder arm und andere reich sind (Wachstumsunterschiede). (K4)"]},
+  verteilung: {label:"Wachstum & Verteilung", short:"Verteilung", lernziele:["Ich kann den Zusammenhang zwischen Wirtschaftswachstum und Einkommensverteilung beschreiben. (K2)","Ich kann beurteilen, ob Wirtschaftswachstum automatisch allen zugutekommt (Trickle-down-Debatte). (K5)"]},
+  nachhaltigkeit: {label:"Wachstum & Nachhaltigkeit", short:"Nachhaltigkeit", lernziele:["Ich kann ökologische Grenzen des Wachstums erläutern (Ressourcenverbrauch, Klimawandel). (K2)","Ich kann das Konzept der nachhaltigen Entwicklung erklären und verschiedene Wachstumskritiken einordnen. (K4)"]}
 };
 
 window.QUESTIONS = [

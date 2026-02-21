@@ -63,6 +63,38 @@ body{font-family:'DM Sans',system-ui,sans-serif;background:var(--c-bg);color:var
 .pool-card.recht{border-left:4px solid var(--c-recht)}
 .pool-card.recht:hover{border-color:var(--c-recht);background:var(--c-recht-bg)}
 .empty-msg{font-size:.88rem;color:var(--c-text-soft);font-style:italic;padding:4px 0}
+.pool-card{position:relative}
+.card-lz-btn{position:absolute;top:10px;right:10px;width:30px;height:30px;border-radius:50%;background:rgba(0,0,0,.06);border:none;font-size:.8rem;cursor:pointer;transition:.15s;display:none;align-items:center;justify-content:center}
+.card-lz-btn:hover{background:rgba(0,0,0,.12);transform:scale(1.1)}
+.card-lz-btn.visible{display:flex}
+/* ═══ LERNZIELE — Modal für index.html ═══ */
+.lz-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.lz-overlay.active{display:flex}
+.lz-modal{background:var(--c-surface);border-radius:16px;max-width:600px;width:100%;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.2);animation:lzSlideUp .25s ease}
+@keyframes lzSlideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+.lz-modal-header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px 16px;border-bottom:1px solid var(--c-border)}
+.lz-modal-header h2{font-size:1.1rem;font-weight:700;display:flex;align-items:center;gap:8px}
+.lz-modal-close{background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--c-text-soft);padding:4px 8px;border-radius:6px;transition:.15s;line-height:1}
+.lz-modal-close:hover{background:var(--c-border);color:var(--c-text)}
+.lz-modal-body{overflow-y:auto;padding:20px 24px 24px;flex:1}
+.lz-pool-section{margin-bottom:20px}
+.lz-pool-section h3,.lz-topic-section h3{font-size:.85rem;font-weight:600;color:var(--c-text-soft);text-transform:uppercase;letter-spacing:.04em;margin-bottom:10px}
+.lz-topic-section{margin-top:16px}
+.lz-topic{background:var(--c-bg);border-radius:var(--radius);margin-bottom:8px;overflow:hidden;border:1px solid var(--c-border)}
+.lz-topic-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;cursor:pointer;transition:background .15s;gap:8px}
+.lz-topic-header:hover{background:var(--c-border)}
+.lz-topic-label{font-size:.9rem;font-weight:600;flex:1}
+.lz-topic-badge{font-family:'DM Mono',monospace;font-size:.72rem;padding:2px 8px;border-radius:99px;white-space:nowrap;background:var(--c-bg);border:1px solid var(--c-border)}
+.lz-topic-chevron{font-size:.75rem;color:var(--c-text-soft);transition:transform .2s}
+.lz-topic.open .lz-topic-chevron{transform:rotate(90deg)}
+.lz-topic-body{max-height:0;overflow:hidden;transition:max-height .25s ease}
+.lz-topic.open .lz-topic-body{max-height:500px}
+.lz-topic-body .lz-list{padding:0 16px 12px}
+.lz-list{list-style:none;padding:0}
+.lz-list li{position:relative;padding:7px 0 7px 22px;font-size:.88rem;line-height:1.5;border-bottom:1px solid var(--c-border)}
+.lz-list li:last-child{border-bottom:none}
+.lz-list li::before{content:'🎯';position:absolute;left:0;top:7px;font-size:.72rem}
+.lz-tax{font-family:'DM Mono',monospace;font-size:.68rem;background:var(--c-border);color:var(--c-text-soft);padding:1px 6px;border-radius:4px;margin-left:4px;white-space:nowrap}
 .footer{text-align:center;padding:20px;font-size:.75rem;color:var(--c-text-soft)}
 
 /* ── Dark Mode ── */
@@ -107,6 +139,17 @@ html.dark .fach-header:hover{background:color-mix(in srgb,var(--c-border) 40%,tr
 </div>
 
 <div class="footer">Gymnasium Hofwil · Wirtschaft und Recht</div>
+
+<!-- LERNZIELE — Modal -->
+<div class="lz-overlay" id="lzOverlay" onclick="if(event.target===this)closeLzModal()">
+  <div class="lz-modal">
+    <div class="lz-modal-header">
+      <h2 id="lzModalTitle">🎯 Lernziele</h2>
+      <button class="lz-modal-close" onclick="closeLzModal()">&times;</button>
+    </div>
+    <div class="lz-modal-body" id="lzModalBody"></div>
+  </div>
+</div>
 
 <script>
 // ══════════════════════════════════════════
@@ -329,6 +372,7 @@ function render() {
       html += '<div class="pool-grid">';
       pools.forEach(p => {
         html += '<a class="pool-card ' + colorClass + '" href="pool.html?pool=' + p.id + '">';
+        html += '<button class="card-lz-btn" data-pool="' + p.id + '" onclick="event.preventDefault();event.stopPropagation();loadPoolLernziele(\'' + p.id + '\',\'' + p.title + '\')" title="Lernziele">🎯</button>';
         html += '<div class="pool-title">' + p.title + '</div>';
         html += '<div class="pool-meta">' + p.meta + '</div>';
         html += '<div class="pool-stats">';
@@ -379,6 +423,108 @@ function toggleSection(headerEl) {
 }
 
 render();
+
+// ══════════════════════════════════════════
+// LERNZIELE — Dynamisches Laden und Anzeige
+// ══════════════════════════════════════════
+// Cache für geladene Configs (vermeidet doppeltes Laden)
+var lzCache = {};
+
+// Nach dem Rendern: 🎯-Buttons nur anzeigen, wenn Lernziele vorhanden
+function checkLzButtons() {
+  document.querySelectorAll('.card-lz-btn').forEach(function(btn) {
+    var poolName = btn.dataset.pool;
+    if (lzCache[poolName]) {
+      if (lzCache[poolName].hasLZ) btn.classList.add('visible');
+    } else {
+      // Config asynchron laden und prüfen
+      fetch('config/' + poolName + '.js').then(function(r) { return r.text(); }).then(function(code) {
+        try {
+          var w = {};
+          var fn = new Function('window', code + '; return {POOL_META: window.POOL_META, TOPICS: window.TOPICS, QUESTIONS: window.QUESTIONS};');
+          var data = fn(w);
+          var hasLZ = (data.POOL_META.lernziele && data.POOL_META.lernziele.length > 0) ||
+                      Object.values(data.TOPICS).some(function(t) { return t.lernziele && t.lernziele.length > 0; });
+          lzCache[poolName] = { data: data, hasLZ: hasLZ };
+          if (hasLZ) btn.classList.add('visible');
+        } catch(e) { console.warn('Lernziele-Check fehlgeschlagen für ' + poolName, e); }
+      }).catch(function() {});
+    }
+  });
+}
+
+async function loadPoolLernziele(poolName, poolTitle) {
+  try {
+    var cached = lzCache[poolName];
+    if (!cached) {
+      var resp = await fetch('config/' + poolName + '.js');
+      var code = await resp.text();
+      var w = {};
+      var fn = new Function('window', code + '; return {POOL_META: window.POOL_META, TOPICS: window.TOPICS, QUESTIONS: window.QUESTIONS};');
+      cached = { data: fn(w), hasLZ: true };
+      lzCache[poolName] = cached;
+    }
+    var data = cached.data;
+    if (!data.POOL_META.lernziele && !Object.values(data.TOPICS).some(function(t) { return t.lernziele && t.lernziele.length; })) {
+      return; // Kein Modal öffnen wenn keine Lernziele
+    }
+    showPoolLernziele(data.POOL_META, data.TOPICS, data.QUESTIONS);
+  } catch (e) {
+    console.error('Lernziele laden fehlgeschlagen:', e);
+  }
+}
+
+function showPoolLernziele(meta, topics, questions) {
+  var title = meta.title || 'Lernziele';
+  document.getElementById('lzModalTitle').innerHTML = '🎯 ' + title.replace(/^Übungspool:\s*/i, '');
+  var body = document.getElementById('lzModalBody');
+  var html = '';
+  if (meta.lernziele && meta.lernziele.length) {
+    html += '<div class="lz-pool-section"><h3>Übergeordnete Lernziele</h3><ul class="lz-list">';
+    meta.lernziele.forEach(function(lz) { html += '<li>' + formatLZ(lz) + '</li>'; });
+    html += '</ul></div>';
+  }
+  var keys = Object.keys(topics);
+  var anyLZ = keys.some(function(k) { return topics[k].lernziele && topics[k].lernziele.length; });
+  if (anyLZ) {
+    html += '<div class="lz-topic-section"><h3>Lernziele pro Thema</h3>';
+    keys.forEach(function(key) {
+      var t = topics[key];
+      if (!t.lernziele || !t.lernziele.length) return;
+      var count = questions ? questions.filter(function(q) { return q.topic === key; }).length : 0;
+      html += '<div class="lz-topic">';
+      html += '<div class="lz-topic-header" onclick="this.parentElement.classList.toggle(\'open\')">';
+      html += '<span class="lz-topic-label">' + t.label + '</span>';
+      if (count > 0) html += '<span class="lz-topic-badge">' + count + ' Fragen</span>';
+      html += '<span class="lz-topic-chevron">▶</span>';
+      html += '</div><div class="lz-topic-body"><ul class="lz-list">';
+      t.lernziele.forEach(function(lz) { html += '<li>' + formatLZ(lz) + '</li>'; });
+      html += '</ul></div></div>';
+    });
+    html += '</div>';
+  }
+  body.innerHTML = html;
+  document.getElementById('lzOverlay').classList.add('active');
+}
+
+function closeLzModal() {
+  document.getElementById('lzOverlay').classList.remove('active');
+}
+
+function formatLZ(text) {
+  var match = text.match(/\((K[1-6])\)\s*$/);
+  if (match) {
+    return text.replace(/\s*\(K[1-6]\)\s*$/, '') + ' <span class="lz-tax">' + match[1] + '</span>';
+  }
+  return text;
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeLzModal();
+});
+
+// 🎯-Buttons nach dem Rendern prüfen
+checkLzButtons();
 </script>
 </body>
 </html>

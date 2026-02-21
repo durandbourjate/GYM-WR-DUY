@@ -7,17 +7,23 @@ window.POOL_META = {
   fach: "VWL",
   title: "Übungspool: Bruttoinlandprodukt (BIP)",
   meta: "EWR GYM2 · Gymnasium Hofwil · Individuell üben",
-  color: "vwl"
+  color: "vwl",
+  lernziele: [
+    "Ich kann das BIP definieren und von verwandten Grössen (BNE, Volkseinkommen) abgrenzen. (K2)",
+    "Ich kann den Wirtschaftskreislauf erklären und die drei Berechnungsansätze des BIP unterscheiden. (K2)",
+    "Ich kann nominales und reales BIP unterscheiden und den BIP-Deflator erklären. (K2)",
+    "Ich kann die Aussagekraft des BIP als Wohlstandsindikator kritisch beurteilen und alternative Indikatoren nennen. (K5)"
+  ]
 };
 
 window.TOPICS = {
-  definition:{label:"Definition & Grundbegriffe",short:"Definition"},
-  messprobleme:{label:"Was das BIP (nicht) misst",short:"Messprobleme"},
-  dreiseiten:{label:"Drei Seiten des BIP",short:"3 Seiten"},
-  nomreal:{label:"Nominales & Reales BIP",short:"Nom./Real"},
-  kreislauf:{label:"Wirtschaftskreislauf",short:"Kreislauf"},
-  verteilung:{label:"Verteilung & Ungleichheit",short:"Verteilung"},
-  wachstum:{label:"Wachstum & Nachhaltigkeit",short:"Wachstum"}
+  definition:{label:"Definition & Grundbegriffe",short:"Definition",lernziele:["Ich kann das BIP definieren (Marktwert aller Endprodukte, in einem Land, in einer Periode). (K1)","Ich kann die Begriffe BIP, BNE und Volkseinkommen voneinander abgrenzen. (K2)"]},
+  messprobleme:{label:"Was das BIP (nicht) misst",short:"Messprobleme",lernziele:["Ich kann erklären, welche wirtschaftlichen Aktivitäten im BIP nicht erfasst werden (Hausarbeit, Schwarzarbeit, Umweltschäden). (K2)","Ich kann die Grenzen des BIP als Wohlstandsindikator erläutern und alternative Masse (HDI, BLI, GPI) beschreiben. (K5)"]},
+  dreiseiten:{label:"Drei Seiten des BIP",short:"3 Seiten",lernziele:["Ich kann die drei Berechnungsansätze des BIP (Entstehungs-, Verteilungs-, Verwendungsrechnung) erklären. (K2)","Ich kann eine einfache BIP-Berechnung nach dem Verwendungsansatz (C + I + G + NX) durchführen. (K3)"]},
+  nomreal:{label:"Nominales & Reales BIP",short:"Nom./Real",lernziele:["Ich kann den Unterschied zwischen nominalem und realem BIP erklären. (K2)","Ich kann das reale BIP mit Hilfe des BIP-Deflators berechnen. (K3)"]},
+  kreislauf:{label:"Wirtschaftskreislauf",short:"Kreislauf",lernziele:["Ich kann den einfachen und den erweiterten Wirtschaftskreislauf zeichnen und die Geld- und Güterströme zuordnen. (K3)","Ich kann die Sektoren (Haushalte, Unternehmen, Staat, Ausland, Banken) und ihre Beziehungen beschreiben. (K2)"]},
+  verteilung:{label:"Verteilung & Ungleichheit",short:"Verteilung",lernziele:["Ich kann die Einkommensverteilung mit dem Gini-Koeffizienten und der Lorenzkurve beschreiben. (K2)","Ich kann das BIP pro Kopf berechnen und für internationale Vergleiche nutzen (inkl. Kaufkraftparität). (K3)"]},
+  wachstum:{label:"Wachstum & Nachhaltigkeit",short:"Wachstum",lernziele:["Ich kann die Wachstumsrate des BIP berechnen und interpretieren. (K3)","Ich kann beurteilen, ob BIP-Wachstum automatisch zu mehr Wohlstand führt. (K5)"]}
 };
 
 window.QUESTIONS = [

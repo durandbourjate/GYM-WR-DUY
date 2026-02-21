@@ -7,17 +7,23 @@ window.POOL_META = {
   fach: "VWL",
   title: "Übungspool: Bedürfnisse, Knappheit & Produktionsfaktoren",
   meta: "SF GYM1 · Gymnasium Hofwil · Individuell üben",
-  color: "vwl"
+  color: "vwl",
+  lernziele: [
+    "Ich kann die Grundfragen der Volkswirtschaftslehre (Was? Wie? Für wen?) erklären. (K2)",
+    "Ich kann den Zusammenhang zwischen Bedürfnissen, Gütern und Knappheit erläutern. (K2)",
+    "Ich kann die volkswirtschaftlichen Produktionsfaktoren nennen und mit Beispielen veranschaulichen. (K2)",
+    "Ich kann das ökonomische Prinzip (Minimal- und Maximalprinzip) auf Alltagssituationen anwenden. (K3)"
+  ]
 };
 
 window.TOPICS = {
-  knappheit:{label:"Knappheit & Grundfragen der VWL",short:"Knappheit"},
-  beduerfnisse:{label:"Bedürfnisse & Bedürfnispyramide",short:"Bedürfnisse"},
-  gueter:{label:"Güterarten",short:"Güter"},
-  produktionsfaktoren:{label:"Produktionsfaktoren",short:"Prod.faktoren"},
-  oekprinzip:{label:"Ökonomisches Prinzip",short:"Ök. Prinzip"},
-  arbeitsteilung:{label:"Arbeitsteilung, Tausch & Geld",short:"Arbeitsteilung"},
-  sektoren:{label:"Wirtschaftssektoren & Strukturwandel",short:"Sektoren"}
+  knappheit:{label:"Knappheit & Grundfragen der VWL",short:"Knappheit",lernziele:["Ich kann erklären, warum Knappheit das Grundproblem der Volkswirtschaftslehre ist. (K2)","Ich kann die drei volkswirtschaftlichen Grundfragen (Was? Wie? Für wen?) formulieren und mit Beispielen illustrieren. (K2)"]},
+  beduerfnisse:{label:"Bedürfnisse & Bedürfnispyramide",short:"Bedürfnisse",lernziele:["Ich kann Bedürfnisse definieren und verschiedene Bedürfnisarten unterscheiden (Individual-/Kollektivbedürfnisse, Existenz-/Wahlbedürfnisse). (K1)","Ich kann die Bedürfnispyramide nach Maslow erklären und kritisch hinterfragen. (K5)"]},
+  gueter:{label:"Güterarten",short:"Güter",lernziele:["Ich kann Güterarten unterscheiden (freie/knappe, Konsum-/Investitionsgüter, Gebrauchs-/Verbrauchsgüter, materielle/immaterielle). (K1)","Ich kann konkrete Güter den richtigen Kategorien zuordnen. (K3)"]},
+  produktionsfaktoren:{label:"Produktionsfaktoren",short:"Prod.faktoren",lernziele:["Ich kann die drei volkswirtschaftlichen Produktionsfaktoren (Arbeit, Boden/Natur, Kapital) definieren. (K1)","Ich kann den Faktor Wissen/Humankapital als erweiterten Produktionsfaktor erklären. (K2)","Ich kann anhand eines Unternehmensbeispiels die eingesetzten Produktionsfaktoren identifizieren. (K3)"]},
+  oekprinzip:{label:"Ökonomisches Prinzip",short:"Ök. Prinzip",lernziele:["Ich kann das Minimal- und das Maximalprinzip formulieren und voneinander abgrenzen. (K2)","Ich kann Alltagssituationen dem Minimal- bzw. Maximalprinzip zuordnen. (K3)"]},
+  arbeitsteilung:{label:"Arbeitsteilung, Tausch & Geld",short:"Arbeitsteilung",lernziele:["Ich kann die Vorteile und Gefahren der Arbeitsteilung erklären. (K2)","Ich kann die Funktionen des Geldes (Tausch-, Wertaufbewahrungs-, Wertmassfunktion) nennen. (K1)","Ich kann den Zusammenhang zwischen Arbeitsteilung, Tausch und Geld herstellen. (K2)"]},
+  sektoren:{label:"Wirtschaftssektoren & Strukturwandel",short:"Sektoren",lernziele:["Ich kann die drei Wirtschaftssektoren (primär, sekundär, tertiär) definieren und Beispiele zuordnen. (K1)","Ich kann den Strukturwandel in der Schweiz beschreiben und mögliche Ursachen benennen. (K2)"]}
 };
 
 window.QUESTIONS = [

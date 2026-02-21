@@ -8,17 +8,23 @@ window.POOL_META = {
   fach: "VWL",
   title: "Übungspool: Sozialpolitik und Sozialversicherungen",
   meta: "SF GYM3 · Gymnasium Hofwil · Individuell üben",
-  color: "vwl"
+  color: "vwl",
+  lernziele: [
+    "Ich kann die Einkommensverteilung in der Schweiz beschreiben und verschiedene Gerechtigkeitsbegriffe unterscheiden. (K2)",
+    "Ich kann das schweizerische Sozialversicherungssystem (Drei-Säulen-System) im Überblick erklären. (K2)",
+    "Ich kann die Finanzierungsprobleme und Herausforderungen der Sozialversicherungen analysieren. (K4)",
+    "Ich kann Staatseingriffe zur Umverteilung beurteilen und deren Nebenwirkungen einschätzen. (K5)"
+  ]
 };
 
 window.TOPICS = {
-  verteilung: {label:"Einkommensverteilung & Umverteilung", short:"Verteilung"},
-  gerechtigkeit: {label:"Gerechtigkeitstheorien", short:"Gerechtigkeit"},
-  sozialversicherungen: {label:"Sozialversicherungssystem Schweiz", short:"Sozialvers."},
-  finanzierung: {label:"Finanzierung der Sozialversicherungen", short:"Finanzierung"},
-  versicherung: {label:"Versicherungsprinzipien & -theorie", short:"Versicherung"},
-  staatseingriffe: {label:"Staatseingriffe & Staatsversagen", short:"Staatseingriffe"},
-  herausforderungen: {label:"Herausforderungen & Reformen", short:"Reformen"}
+  verteilung: {label:"Einkommensverteilung & Umverteilung", short:"Verteilung", lernziele:["Ich kann die Lorenzkurve zeichnen und den Gini-Koeffizienten interpretieren. (K3)","Ich kann die Einkommensverteilung in der Schweiz im internationalen Vergleich einordnen. (K2)"]},
+  gerechtigkeit: {label:"Gerechtigkeitstheorien", short:"Gerechtigkeit", lernziele:["Ich kann verschiedene Gerechtigkeitsbegriffe (Leistungs-, Chancen-, Bedarfsgerechtigkeit) unterscheiden. (K2)","Ich kann den Zielkonflikt zwischen Effizienz und Gerechtigkeit erklären. (K4)"]},
+  sozialversicherungen: {label:"Sozialversicherungssystem Schweiz", short:"Sozialvers.", lernziele:["Ich kann die drei Säulen der Altersvorsorge (AHV, BVG, 3. Säule) erklären und ihre Finanzierungsprinzipien unterscheiden. (K2)","Ich kann die wichtigsten Sozialversicherungen (AHV, IV, ALV, EO, KV, UV) nennen und ihren Zweck beschreiben. (K1)"]},
+  finanzierung: {label:"Finanzierung der Sozialversicherungen", short:"Finanzierung", lernziele:["Ich kann das Umlageverfahren und das Kapitaldeckungsverfahren erklären und vergleichen. (K2)","Ich kann erklären, wie die demografische Entwicklung die Finanzierung der AHV beeinflusst. (K4)"]},
+  versicherung: {label:"Versicherungsprinzipien & -theorie", short:"Versicherung", lernziele:["Ich kann die Begriffe Moral Hazard und Adverse Selektion erklären und auf Versicherungssituationen anwenden. (K3)","Ich kann das Solidaritäts- und das Äquivalenzprinzip unterscheiden. (K2)"]},
+  staatseingriffe: {label:"Staatseingriffe & Staatsversagen", short:"Staatseingriffe", lernziele:["Ich kann Gründe für staatliche Umverteilung (Marktversagen, soziale Absicherung) nennen. (K2)","Ich kann negative Anreizwirkungen von Sozialleistungen (z.B. Armutsfalle) erklären. (K4)"]},
+  herausforderungen: {label:"Herausforderungen & Reformen", short:"Reformen", lernziele:["Ich kann aktuelle Herausforderungen des Schweizer Sozialstaats (Demografie, Gesundheitskosten, Digitalisierung) benennen. (K2)","Ich kann Reformvorschläge (z.B. Rentenaltererhöhung, Prämienentlastung) diskutieren und beurteilen. (K5)"]}
 };
 
 window.QUESTIONS = [

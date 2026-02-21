@@ -9,17 +9,23 @@ window.POOL_META = {
   fach: "VWL",
   title: "Übungspool: Arbeitslosigkeit & Armut",
   meta: "SF GYM3 · Gymnasium Hofwil · Individuell üben",
-  color: "vwl"
+  color: "vwl",
+  lernziele: [
+    "Ich kann die Funktionsweise des Arbeitsmarktes und die Rolle der Löhne erklären. (K2)",
+    "Ich kann die verschiedenen Typen von Arbeitslosigkeit unterscheiden und deren Ursachen nennen. (K2)",
+    "Ich kann Massnahmen zur Bekämpfung der Arbeitslosigkeit beurteilen. (K5)",
+    "Ich kann die Arbeitslosenquote berechnen und Statistiken kritisch interpretieren. (K3)"
+  ]
 };
 
 window.TOPICS = {
-  arbeitsmarkt: {label:"Der Arbeitsmarkt", short:"Arbeitsmarkt"},
-  loehne: {label:"Löhne & Lohnrigiditäten", short:"Löhne"},
-  typen: {label:"Typen von Arbeitslosigkeit", short:"AL-Typen"},
-  beveridge: {label:"Beveridge-Kurve & Sockelarbeitslosigkeit", short:"Beveridge"},
-  bekaempfung: {label:"Bekämpfung der Arbeitslosigkeit", short:"Bekämpfung"},
-  statistik: {label:"Messung & Statistik", short:"Statistik"},
-  armut: {label:"Armut & Armutsbekämpfung", short:"Armut"}
+  arbeitsmarkt: {label:"Der Arbeitsmarkt", short:"Arbeitsmarkt", lernziele:["Ich kann den Arbeitsmarkt als Zusammenspiel von Arbeitsangebot und -nachfrage beschreiben. (K2)","Ich kann erklären, warum der Arbeitsmarkt kein «normaler» Markt ist (Besonderheiten). (K2)"]},
+  loehne: {label:"Löhne & Lohnrigiditäten", short:"Löhne", lernziele:["Ich kann erklären, wie Löhne auf dem Arbeitsmarkt zustande kommen (Marktlohn, Mindestlohn). (K2)","Ich kann Gründe für Lohnrigiditäten (Mindestlöhne, GAV, Effizienzlöhne) nennen und deren Auswirkungen analysieren. (K4)"]},
+  typen: {label:"Typen von Arbeitslosigkeit", short:"AL-Typen", lernziele:["Ich kann friktionelle, strukturelle und konjunkturelle Arbeitslosigkeit definieren und unterscheiden. (K2)","Ich kann reale Beispiele den verschiedenen Typen zuordnen. (K3)"]},
+  beveridge: {label:"Beveridge-Kurve & Sockelarbeitslosigkeit", short:"Beveridge", lernziele:["Ich kann die Beveridge-Kurve erklären und Verschiebungen interpretieren. (K2)","Ich kann das Konzept der natürlichen Arbeitslosigkeit (NAIRU/Sockelarbeitslosigkeit) erklären. (K2)"]},
+  bekaempfung: {label:"Bekämpfung der Arbeitslosigkeit", short:"Bekämpfung", lernziele:["Ich kann angebots- und nachfrageseitige Massnahmen gegen Arbeitslosigkeit unterscheiden. (K2)","Ich kann die Wirksamkeit verschiedener Massnahmen je nach Typ der Arbeitslosigkeit beurteilen. (K5)"]},
+  statistik: {label:"Messung & Statistik", short:"Statistik", lernziele:["Ich kann die Arbeitslosenquote berechnen (registrierte Arbeitslose / Erwerbspersonen). (K3)","Ich kann Unterschiede zwischen der ILO-Definition und der SECO-Definition erklären und Statistiken kritisch hinterfragen. (K4)"]},
+  armut: {label:"Armut & Armutsbekämpfung", short:"Armut", lernziele:["Ich kann absolute und relative Armut definieren und Armutsgrenzen für die Schweiz nennen. (K1)","Ich kann den Zusammenhang zwischen Arbeitslosigkeit und Armut erklären. (K2)"]}
 };
 
 window.QUESTIONS = [

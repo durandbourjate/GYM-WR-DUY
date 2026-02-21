@@ -9,17 +9,22 @@ window.POOL_META = {
   fach: "VWL",
   title: "Übungspool: Staatsverschuldung",
   meta: "SF GYM3 · Gymnasium Hofwil · Individuell üben",
-  color: "vwl"
+  color: "vwl",
+  lernziele: [
+    "Ich kann die Struktur des schweizerischen Staatshaushalts (Einnahmen und Ausgaben) beschreiben. (K2)",
+    "Ich kann die Verschuldungssituation der Schweiz im internationalen Vergleich einordnen. (K3)",
+    "Ich kann Gefahren einer hohen Staatsverschuldung erklären und die Schuldenbremse beurteilen. (K5)"
+  ]
 };
 
 window.TOPICS = {
-  staatsanteil: {label:"Staatsanteil, Staatsquote & Fiskalquote", short:"Staatsanteil"},
-  ausgaben:     {label:"Ausgaben des Bundes", short:"Ausgaben"},
-  einnahmen:    {label:"Einnahmen des Bundes", short:"Einnahmen"},
-  defizite:     {label:"Konjunkturelle & strukturelle Defizite", short:"Defizite"},
-  international:{label:"Internationale Staatsverschuldung", short:"International"},
-  gefahren:     {label:"Gefahren & Risiken der Verschuldung", short:"Gefahren"},
-  richtlinien:  {label:"Richtlinien & Schuldenbremse", short:"Richtlinien"}
+  staatsanteil: {label:"Staatsanteil, Staatsquote & Fiskalquote", short:"Staatsanteil", lernziele:["Ich kann den Umfang des Staatssektors mit der Staatsquote messen. (K2)","Ich kann Gründe für das Wachstum des Staatssektors (Wagner'sches Gesetz) nennen. (K2)"]},
+  ausgaben:     {label:"Ausgaben des Bundes", short:"Ausgaben", lernziele:["Ich kann die Struktur der Bundesausgaben (Soziale Wohlfahrt, Verkehr, Bildung etc.) beschreiben. (K1)","Ich kann erklären, warum bestimmte Aufgaben staatlich und nicht privat erbracht werden (öffentliche Güter, Externalitäten). (K2)"]},
+  einnahmen:    {label:"Einnahmen des Bundes", short:"Einnahmen", lernziele:["Ich kann die Einnahmenstruktur des Bundes (direkte Bundessteuer, MWST, Verrechnungssteuer etc.) beschreiben. (K1)","Ich kann die Laffer-Kurve erklären und deren Aussage zur optimalen Steuerhöhe diskutieren. (K4)"]},
+  defizite:     {label:"Konjunkturelle & strukturelle Defizite", short:"Defizite", lernziele:["Ich kann den Unterschied zwischen Defizit (Flussgrösse) und Schuldenstand (Bestandesgrösse) erklären. (K2)","Ich kann die Schuldenquote berechnen und interpretieren. (K3)"]},
+  international:{label:"Internationale Staatsverschuldung", short:"International", lernziele:["Ich kann die Verschuldungssituation der Schweiz mit jener anderer Länder (EU, USA, Japan) vergleichen. (K3)","Ich kann erklären, warum unterschiedliche Verschuldungsniveaus existieren. (K4)"]},
+  gefahren:     {label:"Gefahren & Risiken der Verschuldung", short:"Gefahren", lernziele:["Ich kann Gefahren einer hohen Staatsverschuldung (Zinsbelastung, Crowding-out, Generationengerechtigkeit) erklären. (K2)","Ich kann die Argumente für und gegen Staatsverschuldung (keynesianisch vs. neoklassisch) gegenüberstellen. (K5)"]},
+  richtlinien:  {label:"Richtlinien & Schuldenbremse", short:"Richtlinien", lernziele:["Ich kann die Funktionsweise der Schweizer Schuldenbremse erklären. (K2)","Ich kann Vor- und Nachteile von Fiskalregeln beurteilen. (K5)"]}
 };
 
 window.QUESTIONS = [

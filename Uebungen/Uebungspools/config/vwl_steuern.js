@@ -9,33 +9,44 @@ window.POOL_META = {
   "fach": "VWL",
   "title": "Übungspool: Steuern und Staatseinnahmen",
   "meta": "SF GYM3 · Gymnasium Hofwil · Individuell üben",
-  "color": "vwl"
+  "color": "vwl",
+  lernziele: [
+    "Ich kann den Zweck von Steuern und die wichtigsten Steuerarten in der Schweiz erklären. (K2)",
+    "Ich kann die Steuerbelastung mit verschiedenen Kennzahlen (Steuer-, Fiskal-, Staatsquote) messen und international vergleichen. (K3)",
+    "Ich kann die Wirkung von Steuern auf das Verhalten der Wirtschaftssubjekte und die Effizienz analysieren. (K4)"
+  ]
 };
 
 window.TOPICS = {
   "zweck": {
     "label": "Steuerzweck",
-    "short": "Zweck"
+    "short": "Zweck",
+    "lernziele": ["Ich kann die Funktionen von Steuern (Fiskal-, Lenkungs-, Umverteilungsfunktion) erklären. (K2)","Ich kann das Äquivalenz- und das Leistungsfähigkeitsprinzip unterscheiden. (K2)"]
   },
   "formen": {
     "label": "Formen von Staatseinnahmen",
-    "short": "Formen"
+    "short": "Formen",
+    "lernziele": ["Ich kann direkte und indirekte Steuern unterscheiden und Beispiele nennen. (K1)","Ich kann progressive, proportionale und degressive Steuertarife erklären und grafisch darstellen. (K2)"]
   },
   "steuerarten": {
     "label": "Steuerarten in der Schweiz",
-    "short": "Steuerarten"
+    "short": "Steuerarten",
+    "lernziele": ["Ich kann die wichtigsten Steuerarten der Schweiz (Einkommenssteuer, Vermögenssteuer, MWST, Verrechnungssteuer) beschreiben. (K1)","Ich kann die föderale Steuerstruktur der Schweiz (Bund, Kanton, Gemeinde) erklären. (K2)"]
   },
   "quoten": {
     "label": "Fiskal-/Staatsquote & Laffer-Kurve",
-    "short": "Quoten"
+    "short": "Quoten",
+    "lernziele": ["Ich kann die Steuerquote, Fiskalquote und Staatsquote berechnen und voneinander abgrenzen. (K3)","Ich kann die Schweizer Quoten im internationalen Vergleich einordnen. (K4)"]
   },
   "wettbewerb": {
     "label": "Steuerwettbewerb & Finanzausgleich",
-    "short": "Wettbewerb"
+    "short": "Wettbewerb",
+    "lernziele": ["Ich kann den interkantonalen und internationalen Steuerwettbewerb erklären. (K2)","Ich kann Vor- und Nachteile des Steuerwettbewerbs abwägen. (K5)"]
   },
   "elastizitaeten": {
     "label": "Steuern und Elastizitäten",
-    "short": "Elastizitäten"
+    "short": "Elastizitäten",
+    "lernziele": ["Ich kann erklären, wie Steuern auf einem Markt die Preis- und Mengengleichgewichte verändern. (K2)","Ich kann anhand von Elastizitäten bestimmen, wer die ökonomische Steuerlast trägt (Steuerinzidenz). (K4)"]
   }
 };
 
