@@ -9,15 +9,20 @@ window.POOL_META = {
   title: "Personenrecht – ZGB 11 bis 28",
   fach: "Recht",
   color: "#73ab2c",
-  level: "SF GYM2"
+  level: "SF GYM2",
+  lernziele: [
+    "Ich kann die Begriffe Rechtsfähigkeit, Urteilsfähigkeit und Handlungsfähigkeit unterscheiden und erklären. (K2)",
+    "Ich kann prüfen, ob eine Person handlungsfähig ist und welche Rechtsgeschäfte sie abschliessen kann. (K3)",
+    "Ich kann den Persönlichkeitsschutz (Art. 28 ZGB) erklären und auf Fälle anwenden. (K3)"
+  ]
 };
 
 window.TOPICS = {
-  "rechtssubjekte":      {label: "Rechtssubjekte und Rechtsobjekte",        short: "Rechtssubjekte"},
-  "rechtsfaehigkeit":    {label: "Rechtsfähigkeit (ZGB 11, 31, 53, 54)",    short: "Rechtsfähigkeit"},
-  "handlungsfaehigkeit": {label: "Handlungsfähigkeit (ZGB 12–18)",          short: "Handlungsfähigkeit"},
-  "beschraenkte_hu":     {label: "Beschränkte Handlungsunfähigkeit (ZGB 19 ff.)", short: "Beschr. HU"},
-  "persoenlichkeit":     {label: "Persönlichkeitsverletzungen (ZGB 28)",    short: "Persönlichkeit"}
+  "rechtssubjekte":      {label: "Rechtssubjekte und Rechtsobjekte",        short: "Rechtssubjekte", lernziele: ["Ich kann Rechtssubjekte und Rechtsobjekte unterscheiden. (K2)", "Ich kann natürliche und juristische Personen als Rechtssubjekte identifizieren. (K1)"]},
+  "rechtsfaehigkeit":    {label: "Rechtsfähigkeit (ZGB 11, 31, 53, 54)",    short: "Rechtsfähigkeit", lernziele: ["Ich kann den Begriff Rechtsfähigkeit definieren (Art. 11 ZGB). (K1)", "Ich kann erklären, wann die Rechtsfähigkeit beginnt und endet. (K2)"]},
+  "handlungsfaehigkeit": {label: "Handlungsfähigkeit (ZGB 12–18)",          short: "Handlungsfähigkeit", lernziele: ["Ich kann die Voraussetzungen der Handlungsfähigkeit (Volljährigkeit + Urteilsfähigkeit) nennen (Art. 12–13 ZGB). (K1)", "Ich kann die Handlungsfähigkeit einer Person anhand eines Sachverhalts beurteilen. (K3)"]},
+  "beschraenkte_hu":     {label: "Beschränkte Handlungsunfähigkeit (ZGB 19 ff.)", short: "Beschr. HU", lernziele: ["Ich kann die Rechtsfolgen der beschränkten Handlungsunfähigkeit erklären (Art. 19 ff. ZGB). (K2)", "Ich kann bestimmen, welche Geschäfte eine beschränkt handlungsunfähige Person selbst abschliessen kann. (K3)"]},
+  "persoenlichkeit":     {label: "Persönlichkeitsverletzungen (ZGB 28)",    short: "Persönlichkeit", lernziele: ["Ich kann die Voraussetzungen einer Persönlichkeitsverletzung nach Art. 28 ZGB nennen. (K1)", "Ich kann in einem konkreten Fall prüfen, ob eine Persönlichkeitsverletzung vorliegt und welche Rechtsbehelfe bestehen. (K3)"]}
 };
 
 window.QUESTIONS = [

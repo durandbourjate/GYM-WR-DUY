@@ -11,15 +11,20 @@ window.POOL_META = {
   title: "Einführung Recht – Grundsätze der Rechtsordnung",
   fach: "Recht",
   color: "#73ab2c",
-  level: "SF GYM1 / EWR GYM2"
+  level: "SF GYM1 / EWR GYM2",
+  lernziele: [
+    "Ich kann die Grundsätze der schweizerischen Rechtsordnung (Rechtsstaatlichkeit, Gewaltenteilung, Grundrechte) erklären. (K2)",
+    "Ich kann zwischen öffentlichem Recht und Privatrecht unterscheiden und Beispiele zuordnen. (K2)",
+    "Ich kann die Technik der Rechtsanwendung (Tatbestand, Subsumtion, Rechtsfolge) auf einfache Fälle anwenden. (K3)"
+  ]
 };
 
 window.TOPICS = {
-  "moral_sitte_recht":  {label: "Moral, Sitte und Recht",                    short: "Moral/Sitte/Recht"},
-  "rechtsordnung":      {label: "Rechtsordnung, Gewaltmonopol & Rechtskraft", short: "Rechtsordnung"},
-  "rechtsstaat":        {label: "Rechtsstaat – Legalität, Gewaltenteilung, Grundrechte", short: "Rechtsstaat"},
-  "oeffentlich_privat": {label: "Öffentliches Recht vs. Privatrecht",         short: "ÖR / PR"},
-  "rechtsanwendung":    {label: "Rechtsanwendung – Tatbestand, Subsumtion, Rechtsfolge", short: "Rechtsanwendung"}
+  "moral_sitte_recht":  {label: "Moral, Sitte und Recht",                    short: "Moral/Sitte/Recht", lernziele: ["Ich kann Moral, Sitte und Recht voneinander abgrenzen. (K2)", "Ich kann erklären, warum eine Gesellschaft Rechtsregeln braucht. (K2)"]},
+  "rechtsordnung":      {label: "Rechtsordnung, Gewaltmonopol & Rechtskraft", short: "Rechtsordnung", lernziele: ["Ich kann das staatliche Gewaltmonopol und die Bedeutung der Rechtskraft erklären. (K2)", "Ich kann den Aufbau der schweizerischen Rechtsordnung beschreiben (Verfassung, Gesetz, Verordnung). (K1)"]},
+  "rechtsstaat":        {label: "Rechtsstaat – Legalität, Gewaltenteilung, Grundrechte", short: "Rechtsstaat", lernziele: ["Ich kann die Merkmale eines Rechtsstaats (Legalitätsprinzip, Gewaltenteilung, Grundrechte) nennen. (K1)", "Ich kann erklären, wie Grundrechte eingeschränkt werden können (Art. 36 BV). (K2)"]},
+  "oeffentlich_privat": {label: "Öffentliches Recht vs. Privatrecht",         short: "ÖR / PR", lernziele: ["Ich kann öffentliches Recht und Privatrecht unterscheiden. (K2)", "Ich kann konkrete Rechtsfälle dem öffentlichen oder privaten Recht zuordnen. (K3)"]},
+  "rechtsanwendung":    {label: "Rechtsanwendung – Tatbestand, Subsumtion, Rechtsfolge", short: "Rechtsanwendung", lernziele: ["Ich kann die Schritte der Rechtsanwendung (Sachverhalt, Tatbestand, Subsumtion, Rechtsfolge) erklären. (K2)", "Ich kann die Technik der Subsumtion auf einfache Fälle anwenden. (K3)"]}
 };
 
 window.QUESTIONS = [

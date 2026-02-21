@@ -9,16 +9,21 @@ window.POOL_META = {
   title: "Markt- und Leistungsanalyse",
   fach: "BWL",
   color: "#01a9f4",
-  level: "SF GYM3"
+  level: "SF GYM3",
+  lernziele: [
+    "Ich kann ein Marketingkonzept in seinen Grundzügen erklären. (K2)",
+    "Ich kann die Marktgrösse (Potenzial, Volumen, Anteil) berechnen und interpretieren. (K3)",
+    "Ich kann strategische Analyseinstrumente (BCG-Portfolio, Produktlebenszyklus) anwenden. (K3)"
+  ]
 };
 
 window.TOPICS = {
-  "marketing":      {label: "Marketing & Marketingkonzept", short: "Marketing"},
-  "marktgroesse":   {label: "Marktgrösse: Potenzial, Volumen, Sättigung", short: "Marktgrösse"},
-  "marktstellung":  {label: "Marktstellung & Marktanteil", short: "Marktstellung"},
-  "segmentierung":  {label: "Marktsegmentierung & Konkurrenz", short: "Segmentierung"},
-  "bcg":            {label: "BCG-Portfolio", short: "BCG"},
-  "plz":            {label: "Produktlebenszyklus", short: "PLZ"}
+  "marketing":      {label: "Marketing & Marketingkonzept", short: "Marketing", lernziele: ["Ich kann den Begriff Marketing definieren und die Elemente eines Marketingkonzepts nennen. (K1)", "Ich kann den Marketing-Mix (4P: Product, Price, Place, Promotion) erklären und auf ein Unternehmen anwenden. (K3)"]},
+  "marktgroesse":   {label: "Marktgrösse: Potenzial, Volumen, Sättigung", short: "Marktgrösse", lernziele: ["Ich kann Marktpotenzial, Marktvolumen und Marktsättigungsgrad berechnen. (K3)", "Ich kann die Begriffe voneinander abgrenzen und ihre Bedeutung für die Unternehmensplanung erklären. (K2)"]},
+  "marktstellung":  {label: "Marktstellung & Marktanteil", short: "Marktstellung", lernziele: ["Ich kann den absoluten und relativen Marktanteil berechnen. (K3)", "Ich kann Marktführer, Marktherausforderer und Mitläufer unterscheiden. (K2)"]},
+  "segmentierung":  {label: "Marktsegmentierung & Konkurrenz", short: "Segmentierung", lernziele: ["Ich kann Kriterien der Marktsegmentierung (demografisch, geografisch, psychografisch, verhaltensbasiert) nennen. (K1)", "Ich kann für ein konkretes Produkt eine sinnvolle Marktsegmentierung vorschlagen. (K3)"]},
+  "bcg":            {label: "BCG-Portfolio", short: "BCG", lernziele: ["Ich kann die BCG-Matrix (Stars, Cash Cows, Question Marks, Poor Dogs) erklären und Produkte einordnen. (K3)", "Ich kann Normstrategien für die vier Felder der BCG-Matrix ableiten. (K4)"]},
+  "plz":            {label: "Produktlebenszyklus", short: "PLZ", lernziele: ["Ich kann die Phasen des Produktlebenszyklus (Einführung, Wachstum, Reife, Sättigung, Degeneration) beschreiben. (K2)", "Ich kann für ein Produkt die aktuelle PLZ-Phase bestimmen und Marketing-Massnahmen ableiten. (K4)"]}
 };
 
 window.QUESTIONS = [

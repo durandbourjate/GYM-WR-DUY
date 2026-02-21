@@ -9,17 +9,22 @@ window.POOL_META = {
   title: "Sachenrecht – Eigentum, Besitz und dingliche Rechte",
   fach: "Recht",
   color: "#73ab2c",
-  level: "SF GYM2"
+  level: "SF GYM2",
+  lernziele: [
+    "Ich kann die Grundbegriffe des Sachenrechts (Eigentum, Besitz, dingliche Rechte) erklären und unterscheiden. (K2)",
+    "Ich kann die verschiedenen Formen des Eigentumserwerbs und -verlusts beschreiben. (K2)",
+    "Ich kann sachenrechtliche Probleme (z.B. gutgläubiger Erwerb, Dienstbarkeiten) auf einfache Fälle anwenden. (K3)"
+  ]
 };
 
 window.TOPICS = {
-  "einfuehrung":       {label: "Einführung Sachenrecht",                       short: "Einführung"},
-  "eigentum_besitz":   {label: "Eigentum und Besitz",                          short: "Eigentum/Besitz"},
-  "formen":            {label: "Formen des Eigentums",                         short: "Eigentumsformen"},
-  "erwerb_verlust":    {label: "Erwerb und Verlust des Eigentums",             short: "Erwerb/Verlust"},
-  "gutglaeubig":       {label: "Schutz des gutgläubigen Besitzers",            short: "Gutgläubiger Erwerb"},
-  "dienstbarkeiten":   {label: "Dienstbarkeiten",                              short: "Dienstbarkeiten"},
-  "pfandrechte":       {label: "Pfandrechte, Grundlasten und Grundbuch",       short: "Pfandrechte"}
+  "einfuehrung":       {label: "Einführung Sachenrecht",                       short: "Einführung", lernziele: ["Ich kann den Gegenstand und die Bedeutung des Sachenrechts im ZGB erklären. (K2)", "Ich kann den Grundsatz der Eigentumsgarantie (Art. 26 BV, Art. 641 ZGB) beschreiben. (K1)"]},
+  "eigentum_besitz":   {label: "Eigentum und Besitz",                          short: "Eigentum/Besitz", lernziele: ["Ich kann Eigentum und Besitz unterscheiden (Art. 641, 919 ZGB). (K2)", "Ich kann an Beispielen erklären, wann jemand Eigentümer, aber nicht Besitzer ist (und umgekehrt). (K3)"]},
+  "formen":            {label: "Formen des Eigentums",                         short: "Eigentumsformen", lernziele: ["Ich kann Alleineigentum, Miteigentum und Gesamteigentum unterscheiden. (K2)", "Ich kann erklären, bei welchen Rechtsformen welche Eigentumsart vorliegt. (K2)"]},
+  "erwerb_verlust":    {label: "Erwerb und Verlust des Eigentums",             short: "Erwerb/Verlust", lernziele: ["Ich kann die Formen des Eigentumserwerbs (originär und derivativ) nennen. (K1)", "Ich kann unterscheiden, wie bewegliche Sachen und Grundstücke übertragen werden. (K2)"]},
+  "gutglaeubig":       {label: "Schutz des gutgläubigen Besitzers",            short: "Gutgläubiger Erwerb", lernziele: ["Ich kann den gutgläubigen Erwerb beweglicher Sachen erklären (Art. 714, 933 ff. ZGB). (K2)", "Ich kann in einem Fall prüfen, ob jemand gutgläubig Eigentum erworben hat. (K3)"]},
+  "dienstbarkeiten":   {label: "Dienstbarkeiten",                              short: "Dienstbarkeiten", lernziele: ["Ich kann den Begriff Dienstbarkeit definieren und Grunddienstbarkeiten von Personaldienstbarkeiten unterscheiden. (K2)", "Ich kann Beispiele für Dienstbarkeiten (Wegrecht, Wohnrecht, Nutzniessung) nennen. (K1)"]},
+  "pfandrechte":       {label: "Pfandrechte, Grundlasten und Grundbuch",       short: "Pfandrechte", lernziele: ["Ich kann den Zweck von Pfandrechten (Sicherung von Forderungen) erklären. (K2)", "Ich kann Faustpfand und Grundpfand unterscheiden und die Rolle des Grundbuchs beschreiben. (K2)"]}
 };
 
 window.QUESTIONS = [

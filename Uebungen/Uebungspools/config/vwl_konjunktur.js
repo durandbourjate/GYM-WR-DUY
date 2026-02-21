@@ -11,17 +11,22 @@ window.POOL_META = {
   title: "Konjunktur und Konjunkturpolitik",
   fach: "VWL",
   color: "#f89907",
-  level: "SF GYM3–GYM4"
+  level: "SF GYM3–GYM4",
+  lernziele: [
+    "Ich kann den Konjunkturzyklus beschreiben und Konjunkturindikatoren interpretieren. (K2)",
+    "Ich kann die Ursachen von Konjunkturschwankungen erklären. (K2)",
+    "Ich kann die vier wirtschaftspolitischen Konzeptionen (Klassik, Keynesianismus, Monetarismus, Angebotsorientierung) vergleichen und beurteilen. (K5)"
+  ]
 };
 
 window.TOPICS = {
-  "zyklus":       "Konjunkturzyklus & Phasen",
-  "indikatoren":  "Konjunkturindikatoren",
-  "ursachen":     "Ursachen für Konjunkturschwankungen",
-  "klassiker":    "Klassische Konzeption",
-  "keynes":       "Keynesianische Konzeption",
-  "monetaristen": "Monetaristische Konzeption",
-  "angebot":      "Angebotsorientierte Konzeption & Synthese"
+  zyklus: {label: "Konjunkturzyklus & Phasen", short: "Zyklus", lernziele: ["Ich kann die vier Konjunkturphasen (Aufschwung, Hochkonjunktur, Abschwung, Rezession) beschreiben. (K2)", "Ich kann einen Konjunkturzyklus grafisch darstellen und die Phasen zuordnen. (K3)"]},
+  indikatoren: {label: "Konjunkturindikatoren", short: "Indikatoren", lernziele: ["Ich kann Früh-, Präsenz- und Spätindikatoren unterscheiden und Beispiele nennen. (K2)", "Ich kann anhand von Indikatoren die aktuelle Konjunkturlage einschätzen. (K4)"]},
+  ursachen: {label: "Ursachen für Konjunkturschwankungen", short: "Ursachen", lernziele: ["Ich kann endogene und exogene Ursachen von Konjunkturschwankungen unterscheiden. (K2)", "Ich kann erklären, warum es zu Konjunkturschwankungen kommt (z.B. Schocks, Erwartungen). (K2)"]},
+  klassiker: {label: "Klassische Konzeption", short: "Klassik", lernziele: ["Ich kann die Grundannahmen der klassischen Wirtschaftstheorie erklären (Say'sches Theorem, flexible Preise). (K2)", "Ich kann die klassische Empfehlung der Nichtintervention begründen. (K2)"]},
+  keynes: {label: "Keynesianische Konzeption", short: "Keynes", lernziele: ["Ich kann die keynesianische Erklärung von Konjunkturschwankungen (Nachfragemangel) erklären. (K2)", "Ich kann die keynesianische Fiskalpolitik (antizyklisch, deficit spending) erklären und kritisch beurteilen. (K5)"]},
+  monetaristen: {label: "Monetaristische Konzeption", short: "Monetaristen", lernziele: ["Ich kann die monetaristische Position (Geldmenge als zentrale Grösse) erklären. (K2)", "Ich kann erklären, warum Monetaristen eine regelgebundene Geldpolitik bevorzugen. (K2)"]},
+  angebot: {label: "Angebotsorientierte Konzeption & Synthese", short: "Angebot/Synthese", lernziele: ["Ich kann die angebotsorientierte Wirtschaftspolitik (Deregulierung, Steuersenkungen) erklären. (K2)", "Ich kann die vier Konzeptionen vergleichen und ihre unterschiedlichen Politikempfehlungen gegenüberstellen. (K4)"]}
 };
 
 window.QUESTIONS = [

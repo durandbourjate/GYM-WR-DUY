@@ -10,17 +10,22 @@ window.POOL_META = {
   title: "Unternehmensmodell – Umweltsphären & Anspruchsgruppen",
   fach: "BWL",
   color: "#01a9f4",
-  level: "SF GYM1"
+  level: "SF GYM1",
+  lernziele: [
+    "Ich kann die Elemente des Unternehmensmodells (Umweltsphären und Anspruchsgruppen) erklären. (K2)",
+    "Ich kann Wechselwirkungen zwischen Unternehmen und Umwelt analysieren. (K4)",
+    "Ich kann das Unternehmensmodell auf konkrete Fallbeispiele anwenden. (K3)"
+  ]
 };
 
 window.TOPICS = {
-  "modelle":           {label: "Modelle in der BWL",                       short: "Modelle"},
-  "anspruchsgruppen":  {label: "Anspruchsgruppen & ihre Ansprüche",        short: "Anspruchsgruppen"},
-  "zielbeziehungen":   {label: "Zielbeziehungen & Wertansätze",            short: "Zielbeziehungen"},
-  "umweltsphaeren":    {label: "Die fünf Umweltsphären",                   short: "Umweltsphären"},
-  "wechselwirkungen":  {label: "Wechselwirkungen Unternehmen & Umwelt",    short: "Wechselwirkungen"},
-  "verhaltensweisen":  {label: "Verhaltensweisen von Unternehmen",         short: "Verhaltensweisen"},
-  "anwendung":         {label: "Anwendung & Fallbeispiele",                short: "Anwendung"}
+  "modelle":           {label: "Modelle in der BWL",                       short: "Modelle", lernziele: ["Ich kann erklären, warum in der BWL Modelle verwendet werden (Vereinfachung, Verständnis). (K2)", "Ich kann das Unternehmensmodell als zentrales BWL-Modell beschreiben. (K2)"]},
+  "anspruchsgruppen":  {label: "Anspruchsgruppen & ihre Ansprüche",        short: "Anspruchsgruppen", lernziele: ["Ich kann die wichtigsten Anspruchsgruppen (Stakeholder) eines Unternehmens nennen. (K1)", "Ich kann die Ansprüche und Beiträge verschiedener Anspruchsgruppen beschreiben. (K2)"]},
+  "zielbeziehungen":   {label: "Zielbeziehungen & Wertansätze",            short: "Zielbeziehungen", lernziele: ["Ich kann Zielkonflikte zwischen verschiedenen Anspruchsgruppen erkennen. (K4)", "Ich kann den Shareholder- und den Stakeholder-Ansatz vergleichen. (K4)"]},
+  "umweltsphaeren":    {label: "Die fünf Umweltsphären",                   short: "Umweltsphären", lernziele: ["Ich kann die fünf Umweltsphären (ökologisch, technologisch, ökonomisch, sozial, rechtlich) beschreiben. (K1)", "Ich kann erklären, wie die Umweltsphären auf ein Unternehmen einwirken. (K2)"]},
+  "wechselwirkungen":  {label: "Wechselwirkungen Unternehmen & Umwelt",    short: "Wechselwirkungen", lernziele: ["Ich kann die Wechselwirkungen zwischen Unternehmen und ihren Umweltsphären analysieren. (K4)", "Ich kann anhand von Beispielen zeigen, wie Veränderungen in der Umwelt Chancen und Risiken für Unternehmen schaffen. (K3)"]},
+  "verhaltensweisen":  {label: "Verhaltensweisen von Unternehmen",         short: "Verhaltensweisen", lernziele: ["Ich kann verschiedene Verhaltensweisen von Unternehmen (reaktiv, aktiv, proaktiv, interaktiv) unterscheiden. (K2)", "Ich kann beurteilen, welche Verhaltensstrategie in einer bestimmten Situation angemessen ist. (K5)"]},
+  "anwendung":         {label: "Anwendung & Fallbeispiele",                short: "Anwendung", lernziele: ["Ich kann das Unternehmensmodell auf ein konkretes Unternehmen anwenden. (K3)", "Ich kann eine Anspruchsgruppenanalyse für ein reales Fallbeispiel durchführen. (K3)"]}
 };
 
 window.QUESTIONS = [

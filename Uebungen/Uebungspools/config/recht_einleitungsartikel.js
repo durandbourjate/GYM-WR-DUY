@@ -8,16 +8,21 @@ window.POOL_META = {
   title: "Rechtsquellen und Rechtsgrundsätze – ZGB Einleitungsartikel",
   fach: "Recht",
   color: "#73ab2c",
-  level: "SF GYM1–GYM2"
+  level: "SF GYM1–GYM2",
+  lernziele: [
+    "Ich kann die Rechtsquellen des schweizerischen Rechts gemäss Art. 1 ZGB nennen und erklären. (K2)",
+    "Ich kann die Grundsätze Treu und Glauben, Rechtsmissbrauchsverbot und guter Glaube unterscheiden und anwenden. (K3)",
+    "Ich kann Beweislastregeln (Art. 8 ZGB) auf konkrete Fälle anwenden. (K3)"
+  ]
 };
 
 window.TOPICS = {
-  "rechtsquellen":    {label: "Rechtsquellen (Art. 1 ZGB)", short: "Rechtsquellen"},
-  "treu_glauben":     {label: "Handeln nach Treu und Glauben (Art. 2 Abs. 1 ZGB)", short: "Treu & Glauben"},
-  "rechtsmissbrauch": {label: "Rechtsmissbrauchsverbot (Art. 2 Abs. 2 ZGB)", short: "Rechtsmissbrauch"},
-  "guter_glaube":     {label: "Der gute Glaube (Art. 3 ZGB)", short: "Guter Glaube"},
-  "beweislast":       {label: "Die Beweislast (Art. 8 ZGB)", short: "Beweislast"},
-  "weitere":          {label: "Weitere Rechtsgrundsätze", short: "Weitere"}
+  "rechtsquellen":    {label: "Rechtsquellen (Art. 1 ZGB)", short: "Rechtsquellen", lernziele: ["Ich kann die Rechtsquellen nach Art. 1 ZGB (Gesetz, Gewohnheitsrecht, Richterrecht) nennen und erklären. (K2)", "Ich kann den Stufenbau der Rechtsordnung (Verfassung → Gesetz → Verordnung) beschreiben. (K1)"]},
+  "treu_glauben":     {label: "Handeln nach Treu und Glauben (Art. 2 Abs. 1 ZGB)", short: "Treu & Glauben", lernziele: ["Ich kann den Grundsatz von Treu und Glauben (Art. 2 Abs. 1 ZGB) erklären. (K2)", "Ich kann in konkreten Fällen prüfen, ob eine Partei gegen Treu und Glauben verstösst. (K3)"]},
+  "rechtsmissbrauch": {label: "Rechtsmissbrauchsverbot (Art. 2 Abs. 2 ZGB)", short: "Rechtsmissbrauch", lernziele: ["Ich kann den Begriff Rechtsmissbrauch (Art. 2 Abs. 2 ZGB) definieren und Beispiele nennen. (K2)", "Ich kann beurteilen, ob ein Verhalten als Rechtsmissbrauch zu qualifizieren ist. (K5)"]},
+  "guter_glaube":     {label: "Der gute Glaube (Art. 3 ZGB)", short: "Guter Glaube", lernziele: ["Ich kann den guten Glauben (Art. 3 ZGB) vom Grundsatz von Treu und Glauben abgrenzen. (K2)", "Ich kann erklären, welche Rechtsvorteile gutgläubige Personen geniessen. (K2)"]},
+  "beweislast":       {label: "Die Beweislast (Art. 8 ZGB)", short: "Beweislast", lernziele: ["Ich kann die Grundregel der Beweislast (Art. 8 ZGB) erklären. (K2)", "Ich kann in einem konkreten Fall bestimmen, wer die Beweislast trägt. (K3)"]},
+  "weitere":          {label: "Weitere Rechtsgrundsätze", short: "Weitere", lernziele: ["Ich kann weitere Rechtsgrundsätze (z.B. Recht und Billigkeit, richterliches Ermessen) erklären. (K2)", "Ich kann erklären, wann ein Richter nach Billigkeit urteilen darf. (K2)"]}
 };
 
 window.QUESTIONS = [

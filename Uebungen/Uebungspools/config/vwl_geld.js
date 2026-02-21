@@ -11,23 +11,29 @@ window.POOL_META = {
   fach: "VWL",
   title: "Übungspool: Geld, Geldpolitik und Finanzmärkte",
   meta: "SF GYM3–GYM4 · Gymnasium Hofwil · Individuell üben",
-  color: "vwl"
+  color: "vwl",
+  lernziele: [
+    "Ich kann die Funktionen und Eigenschaften von Geld erklären und verschiedene Geldarten unterscheiden. (K2)",
+    "Ich kann die Geldmengenaggregate (M0–M3) und den Prozess der Geldschöpfung beschreiben. (K2)",
+    "Ich kann die geldpolitischen Instrumente der Schweizerischen Nationalbank erklären und ihre Wirkung analysieren. (K4)",
+    "Ich kann den Zusammenhang zwischen Geldmenge, Preisniveau und Kaufkraft erklären. (K2)"
+  ]
 };
 
 window.TOPICS = {
-  "tauschwirtschaft": {label:"Tauschwirtschaft vs. Geldwirtschaft", short:"Tauschwirtschaft"},
-  "geldfunktionen":   {label:"Geldfunktionen", short:"Geldfunktionen"},
-  "eigenschaften":    {label:"Eigenschaften von Geld", short:"Eigenschaften"},
-  "geldarten":        {label:"Warengeld, Papiergeld & Buchgeld", short:"Geldarten"},
-  "vertrauen":        {label:"Vertrauen & Rolle der Nationalbank", short:"Vertrauen"},
-  "preise":           {label:"Absolute & relative Preise", short:"Preise"},
-  "grundlagen":       {label:"Grundlagen: Geld und Geldfunktionen", short:"Grundlagen"},
-  "kaufkraft":        {label:"Geldmenge, Kaufkraft und Preisniveau", short:"Kaufkraft"},
-  "geldnachfrage":    {label:"Geldnachfrage", short:"Geldnachfrage"},
-  "geldangebot":      {label:"Geldangebot und Geldschöpfung", short:"Geldangebot"},
-  "geldmengen":       {label:"Geldmengen und Geldaggregate (M0–M3)", short:"Geldmengen"},
-  "zinssteuerung":    {label:"Konventionelle Geldpolitik und Transmissionskanäle", short:"Zinssteuerung"},
-  "unkonventionell":  {label:"Unkonventionelle Geldpolitik seit der Finanzkrise", short:"Unkonventionell"}
+  "tauschwirtschaft": {label:"Tauschwirtschaft vs. Geldwirtschaft", short:"Tauschwirtschaft", lernziele: ["Ich kann die Nachteile der Tauschwirtschaft erklären und begründen, warum Geld erfunden wurde. (K2)", "Ich kann die Vorteile der Geldwirtschaft gegenüber der Tauschwirtschaft aufzeigen. (K2)"]},
+  "geldfunktionen":   {label:"Geldfunktionen", short:"Geldfunktionen", lernziele: ["Ich kann die drei Geldfunktionen (Tausch-, Wertaufbewahrungs-, Wertmassfunktion) nennen und erklären. (K1)", "Ich kann für konkrete Beispiele die jeweilige Geldfunktion identifizieren. (K3)"]},
+  "eigenschaften":    {label:"Eigenschaften von Geld", short:"Eigenschaften", lernziele: ["Ich kann die Eigenschaften von gutem Geld (Teilbarkeit, Haltbarkeit, Knappheit, Akzeptanz) nennen. (K1)", "Ich kann beurteilen, ob ein Gut als Geld geeignet ist. (K5)"]},
+  "geldarten":        {label:"Warengeld, Papiergeld & Buchgeld", short:"Geldarten", lernziele: ["Ich kann die Entwicklung von Warengeld zu Buchgeld beschreiben. (K2)", "Ich kann Warengeld, Papiergeld und Buchgeld unterscheiden und Beispiele zuordnen. (K1)"]},
+  "vertrauen":        {label:"Vertrauen & Rolle der Nationalbank", short:"Vertrauen", lernziele: ["Ich kann erklären, warum Vertrauen die Grundlage des Geldsystems ist. (K2)", "Ich kann die Rolle der Nationalbank bei der Sicherung des Geldwertes erklären. (K2)"]},
+  "preise":           {label:"Absolute & relative Preise", short:"Preise", lernziele: ["Ich kann zwischen absoluten und relativen Preisen unterscheiden. (K2)", "Ich kann relative Preise berechnen und ihre ökonomische Bedeutung erklären. (K3)"]},
+  "grundlagen":       {label:"Grundlagen: Geld und Geldfunktionen", short:"Grundlagen", lernziele: ["Ich kann die Grundlagen des Geldes zusammenfassend erklären (Funktionen, Arten, Vertrauen). (K2)", "Ich kann die Bedeutung von Geld für eine moderne Volkswirtschaft erläutern. (K2)"]},
+  "kaufkraft":        {label:"Geldmenge, Kaufkraft und Preisniveau", short:"Kaufkraft", lernziele: ["Ich kann den Zusammenhang zwischen Geldmenge und Preisniveau erklären (Quantitätstheorie). (K2)", "Ich kann die Kaufkraft des Geldes berechnen und Inflation/Deflation erklären. (K3)"]},
+  "geldnachfrage":    {label:"Geldnachfrage", short:"Geldnachfrage", lernziele: ["Ich kann die Motive der Geldhaltung (Transaktions-, Vorsichts-, Spekulationsmotiv) erklären. (K2)", "Ich kann die Geldnachfragekurve interpretieren und Einflussfaktoren nennen. (K2)"]},
+  "geldangebot":      {label:"Geldangebot und Geldschöpfung", short:"Geldangebot", lernziele: ["Ich kann den Prozess der Geldschöpfung durch Geschäftsbanken erklären. (K2)", "Ich kann die Rolle der Zentralbank bei der Steuerung des Geldangebots beschreiben. (K2)"]},
+  "geldmengen":       {label:"Geldmengen und Geldaggregate (M0–M3)", short:"Geldmengen", lernziele: ["Ich kann die Geldmengenaggregate M0, M1, M2 und M3 definieren und voneinander abgrenzen. (K1)", "Ich kann erklären, warum verschiedene Geldmengenaggregate existieren und wofür sie verwendet werden. (K2)"]},
+  "zinssteuerung":    {label:"Konventionelle Geldpolitik und Transmissionskanäle", short:"Zinssteuerung", lernziele: ["Ich kann das geldpolitische Konzept der SNB (Leitzins, SARON) erklären. (K2)", "Ich kann die Transmissionskanäle der Geldpolitik (Zinskanal, Wechselkurskanal) beschreiben. (K2)"]},
+  "unkonventionell":  {label:"Unkonventionelle Geldpolitik seit der Finanzkrise", short:"Unkonventionell", lernziele: ["Ich kann unkonventionelle geldpolitische Instrumente (Negativzins, Mindestkurs, quantitative Lockerung) erklären. (K2)", "Ich kann beurteilen, warum die SNB zu unkonventionellen Massnahmen greifen musste und welche Risiken damit verbunden sind. (K5)"]}
 };
 
 window.QUESTIONS = [

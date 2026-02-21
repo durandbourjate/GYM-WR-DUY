@@ -8,23 +8,29 @@ window.POOL_META = {
   fach: "VWL",
   title: "Übungspool: Markteffizienz",
   meta: "SF GYM2/GYM3 · Gymnasium Hofwil · Individuell üben",
-  color: "vwl"
+  color: "vwl",
+  lernziele: [
+    "Ich kann das Zusammenspiel von Angebot und Nachfrage erklären und das Marktgleichgewicht bestimmen. (K3)",
+    "Ich kann verschiedene Formen von Marktversagen (öffentliche Güter, Externalitäten, Informationsasymmetrien) erkennen und erklären. (K2)",
+    "Ich kann staatliche Eingriffe zur Korrektur von Marktversagen beurteilen und deren Wirkung analysieren. (K5)",
+    "Ich kann Wohlfahrtseffekte von Marktgleichgewicht, Steuern und Regulierung grafisch und verbal analysieren. (K4)"
+  ]
 };
 
 window.TOPICS = {
-  angebot_nachfrage: {label:"Angebot & Nachfrage", short:"A & N"},
-  gleichgewicht: {label:"Marktgleichgewicht & Preisbildung", short:"Gleichgewicht"},
-  verschiebungen: {label:"Kurvenverschiebungen & Elastizität", short:"Verschiebungen"},
-  wohlfahrt: {label:"Wohlfahrt & Effizienz", short:"Wohlfahrt"},
-  gueterarten: {label:"Güterarten & Klassifikation", short:"Güterarten"},
-  wettbewerb: {label:"Wettbewerbsbeschränkungen", short:"Wettbewerb"},
-  oeffentlich: {label:"Öffentliche Güter & Trittbrettfahrer", short:"Öff. Güter"},
-  allmende: {label:"Allmendegüter & Tragödie der Allmende", short:"Allmende"},
-  externeffekte: {label:"Externe Effekte & Internalisierung", short:"Ext. Effekte"},
-  asyminfo: {label:"Asymmetrische Information", short:"Asym. Info"},
-  steuern: {label:"Steuern & Wohlfahrtsverlust", short:"Steuern/WFV"},
-  staatsversagen: {label:"Staatsversagen & Politikversagen", short:"Staatsversagen"},
-  nachhaltigkeit: {label:"Wachstum & Nachhaltigkeit", short:"Nachhaltigkeit"}
+  angebot_nachfrage: {label:"Angebot & Nachfrage", short:"A & N", lernziele: ["Ich kann die Angebots- und Nachfragekurve erklären und deren Einflussfaktoren nennen. (K2)", "Ich kann anhand von Beispielen bestimmen, ob sich Angebot oder Nachfrage verändert. (K3)"]},
+  gleichgewicht: {label:"Marktgleichgewicht & Preisbildung", short:"Gleichgewicht", lernziele: ["Ich kann das Marktgleichgewicht grafisch und rechnerisch bestimmen. (K3)", "Ich kann erklären, warum der Markt zum Gleichgewicht tendiert. (K2)"]},
+  verschiebungen: {label:"Kurvenverschiebungen & Elastizität", short:"Verschiebungen", lernziele: ["Ich kann zwischen Bewegungen auf einer Kurve und Kurvenverschiebungen unterscheiden. (K2)", "Ich kann die Preiselastizität der Nachfrage berechnen und interpretieren. (K3)"]},
+  wohlfahrt: {label:"Wohlfahrt & Effizienz", short:"Wohlfahrt", lernziele: ["Ich kann Konsumenten- und Produzentenrente grafisch bestimmen. (K3)", "Ich kann erklären, warum das Marktgleichgewicht wohlfahrtsoptimal ist (1. Hauptsatz der Wohlfahrtsökonomik). (K2)"]},
+  gueterarten: {label:"Güterarten & Klassifikation", short:"Güterarten", lernziele: ["Ich kann Güter anhand von Rivalität und Ausschliessbarkeit klassifizieren. (K2)", "Ich kann für konkrete Güter bestimmen, ob es sich um private, öffentliche, Klub- oder Allmendegüter handelt. (K3)"]},
+  wettbewerb: {label:"Wettbewerbsbeschränkungen", short:"Wettbewerb", lernziele: ["Ich kann Formen von Wettbewerbsbeschränkungen (Monopol, Oligopol, Kartell) unterscheiden. (K2)", "Ich kann erklären, warum Wettbewerbspolitik (WEKO) nötig ist und wie sie funktioniert. (K2)"]},
+  oeffentlich: {label:"Öffentliche Güter & Trittbrettfahrer", short:"Öff. Güter", lernziele: ["Ich kann die Eigenschaften öffentlicher Güter (Nicht-Rivalität, Nicht-Ausschliessbarkeit) erklären. (K2)", "Ich kann das Trittbrettfahrer-Problem beschreiben und Lösungsansätze nennen. (K2)"]},
+  allmende: {label:"Allmendegüter & Tragödie der Allmende", short:"Allmende", lernziele: ["Ich kann die Tragödie der Allmende erklären und Beispiele nennen. (K2)", "Ich kann Lösungsansätze für Allmende-Probleme (Privatisierung, Regulierung, Selbstorganisation) vergleichen. (K4)"]},
+  externeffekte: {label:"Externe Effekte & Internalisierung", short:"Ext. Effekte", lernziele: ["Ich kann positive und negative externe Effekte definieren und Beispiele nennen. (K2)", "Ich kann Internalisierungsinstrumente (Pigou-Steuer, Subvention, Zertifikate, Coase-Theorem) erklären und beurteilen. (K5)"]},
+  asyminfo: {label:"Asymmetrische Information", short:"Asym. Info", lernziele: ["Ich kann Adverse Selektion und Moral Hazard an Beispielen erklären. (K2)", "Ich kann Lösungsansätze für Informationsasymmetrien (Signaling, Screening, Versicherungspflicht) beschreiben. (K2)"]},
+  steuern: {label:"Steuern & Wohlfahrtsverlust", short:"Steuern/WFV", lernziele: ["Ich kann den Wohlfahrtsverlust einer Steuer grafisch darstellen und erklären. (K3)", "Ich kann die Steuerinzidenz in Abhängigkeit der Elastizitäten analysieren. (K4)"]},
+  staatsversagen: {label:"Staatsversagen & Politikversagen", short:"Staatsversagen", lernziele: ["Ich kann Gründe für Staatsversagen (Bürokratie, Lobbying, Informationsprobleme) nennen. (K2)", "Ich kann abwägen, wann staatliches Eingreifen sinnvoll ist und wann nicht. (K5)"]},
+  nachhaltigkeit: {label:"Wachstum & Nachhaltigkeit", short:"Nachhaltigkeit", lernziele: ["Ich kann den Zusammenhang zwischen Marktversagen und ökologischer Nachhaltigkeit erklären. (K2)", "Ich kann wirtschaftspolitische Instrumente zur Förderung nachhaltiger Entwicklung beurteilen. (K5)"]}
 };
 
 window.QUESTIONS = [

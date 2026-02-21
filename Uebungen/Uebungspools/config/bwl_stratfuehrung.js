@@ -8,17 +8,22 @@ window.POOL_META = {
   title: "Strategische Unternehmensführung",
   fach: "BWL",
   color: "#01a9f4",
-  level: "SF GYM1"
+  level: "SF GYM1",
+  lernziele: [
+    "Ich kann den Prozess der strategischen Planung erklären und die zentralen Instrumente anwenden. (K3)",
+    "Ich kann interne und externe Analysen (Fähigkeitsanalyse, 5-Kräfte-Modell, SWOT) durchführen. (K3)",
+    "Ich kann Unternehmensstrategien formulieren und ein Unternehmenskonzept beurteilen. (K5)"
+  ]
 };
 
 window.TOPICS = {
-  "einfuehrung":    {label: "Einführung & strategische Planung",       short: "Einführung"},
-  "grundsaetze":    {label: "Vision, Werte, Leitbild & CSR",           short: "Grundsätze"},
-  "analyse_intern": {label: "Unternehmensanalyse & Fähigkeitsanalyse", short: "Intern"},
-  "analyse_extern": {label: "Umweltanalyse & 5-Kräfte-Modell",        short: "Extern"},
-  "swot":           {label: "SWOT-Analyse",                            short: "SWOT"},
-  "strategie":      {label: "Strategien & Unternehmensziele",          short: "Strategien"},
-  "konzept":        {label: "Unternehmenskonzept & Evaluation",        short: "Konzept"}
+  "einfuehrung":    {label: "Einführung & strategische Planung",       short: "Einführung", lernziele: ["Ich kann erklären, warum strategische Planung für Unternehmen wichtig ist. (K2)", "Ich kann die Schritte des strategischen Planungsprozesses nennen. (K1)"]},
+  "grundsaetze":    {label: "Vision, Werte, Leitbild & CSR",           short: "Grundsätze", lernziele: ["Ich kann Vision, Mission und Leitbild eines Unternehmens unterscheiden. (K2)", "Ich kann den Begriff Corporate Social Responsibility (CSR) erklären und Beispiele nennen. (K2)"]},
+  "analyse_intern": {label: "Unternehmensanalyse & Fähigkeitsanalyse", short: "Intern", lernziele: ["Ich kann eine Fähigkeitsanalyse (Stärken-Schwächen-Profil) für ein Unternehmen erstellen. (K3)", "Ich kann Kernkompetenzen eines Unternehmens identifizieren. (K4)"]},
+  "analyse_extern": {label: "Umweltanalyse & 5-Kräfte-Modell",        short: "Extern", lernziele: ["Ich kann das 5-Kräfte-Modell nach Porter erklären und auf eine Branche anwenden. (K3)", "Ich kann Chancen und Gefahren aus der Unternehmensumwelt ableiten. (K4)"]},
+  "swot":           {label: "SWOT-Analyse",                            short: "SWOT", lernziele: ["Ich kann eine SWOT-Analyse durchführen und Strategieoptionen ableiten. (K3)", "Ich kann die vier SWOT-Strategien (SO, WO, ST, WT) erklären und anwenden. (K3)"]},
+  "strategie":      {label: "Strategien & Unternehmensziele",          short: "Strategien", lernziele: ["Ich kann Unternehmensstrategien (Wachstum, Stabilisierung, Schrumpfung) unterscheiden. (K2)", "Ich kann Wettbewerbsstrategien nach Porter (Kostenführerschaft, Differenzierung, Nische) erklären. (K2)"]},
+  "konzept":        {label: "Unternehmenskonzept & Evaluation",        short: "Konzept", lernziele: ["Ich kann die Bestandteile eines Unternehmenskonzepts nennen. (K1)", "Ich kann ein Unternehmenskonzept kritisch beurteilen und Verbesserungsvorschläge formulieren. (K5)"]}
 };
 
 window.QUESTIONS = [

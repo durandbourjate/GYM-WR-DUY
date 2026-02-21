@@ -8,17 +8,23 @@ window.POOL_META = {
   title: "Einführung BWL – Grundlagen der Betriebswirtschaftslehre",
   fach: "BWL",
   color: "#01a9f4",
-  level: "SF GYM1"
+  level: "SF GYM1",
+  lernziele: [
+    "Ich kann grundlegende wirtschaftliche Konzepte (Bedürfnisse, Güter, ökonomisches Prinzip) erklären. (K2)",
+    "Ich kann Unternehmen nach verschiedenen Kriterien unterscheiden und einordnen. (K2)",
+    "Ich kann betriebswirtschaftliche Kennzahlen berechnen und interpretieren. (K3)",
+    "Ich kann Standortfaktoren analysieren und eine Nutzwertanalyse durchführen. (K3)"
+  ]
 };
 
 window.TOPICS = {
-  "wirtschaft":  {label:"Wirtschaft, Bedürfnisse & Knappheit", short:"Wirtschaft"},
-  "gueter":      {label:"Güterarten & ökonomisches Prinzip", short:"Güterarten"},
-  "struktur":    {label:"Struktur der Schweizer Wirtschaft", short:"Struktur CH"},
-  "unternehmen": {label:"Kriterien zur Unterscheidung von Unternehmen", short:"Unternehmen"},
-  "ziele":       {label:"Unternehmensziele & Zielbeziehungen", short:"Ziele"},
-  "kennzahlen":  {label:"Kennzahlen", short:"Kennzahlen"},
-  "standort":    {label:"Standortfaktoren & Nutzwertanalyse", short:"Standort"}
+  "wirtschaft":  {label:"Wirtschaft, Bedürfnisse & Knappheit", short:"Wirtschaft", lernziele: ["Ich kann den Zusammenhang zwischen Bedürfnissen, Gütern und Knappheit aus betriebswirtschaftlicher Sicht erklären. (K2)", "Ich kann erklären, warum Unternehmen wirtschaften müssen. (K2)"]},
+  "gueter":      {label:"Güterarten & ökonomisches Prinzip", short:"Güterarten", lernziele: ["Ich kann verschiedene Güterarten (Konsum-/Investitionsgüter, materielle/immaterielle) unterscheiden. (K1)", "Ich kann das Minimal- und Maximalprinzip auf betriebliche Entscheidungen anwenden. (K3)"]},
+  "struktur":    {label:"Struktur der Schweizer Wirtschaft", short:"Struktur CH", lernziele: ["Ich kann die Wirtschaftssektoren und die Struktur der Schweizer Wirtschaft beschreiben. (K2)", "Ich kann den Strukturwandel und seine Auswirkungen auf Unternehmen erklären. (K2)"]},
+  "unternehmen": {label:"Kriterien zur Unterscheidung von Unternehmen", short:"Unternehmen", lernziele: ["Ich kann Unternehmen nach Grösse, Branche, Rechtsform und Gewinnorientierung unterscheiden. (K2)", "Ich kann die Merkmale von KMU und Grossunternehmen vergleichen. (K4)"]},
+  "ziele":       {label:"Unternehmensziele & Zielbeziehungen", short:"Ziele", lernziele: ["Ich kann Sach- und Formalziele von Unternehmen unterscheiden. (K2)", "Ich kann Zielbeziehungen (komplementär, konkurrierend, indifferent) erkennen und an Beispielen erklären. (K3)"]},
+  "kennzahlen":  {label:"Kennzahlen", short:"Kennzahlen", lernziele: ["Ich kann Produktivität, Wirtschaftlichkeit und Rentabilität berechnen. (K3)", "Ich kann betriebswirtschaftliche Kennzahlen interpretieren und vergleichen. (K4)"]},
+  "standort":    {label:"Standortfaktoren & Nutzwertanalyse", short:"Standort", lernziele: ["Ich kann harte und weiche Standortfaktoren unterscheiden und Beispiele nennen. (K2)", "Ich kann eine Nutzwertanalyse (NWA) durchführen und das Ergebnis interpretieren. (K3)"]}
 };
 
 window.QUESTIONS = [
