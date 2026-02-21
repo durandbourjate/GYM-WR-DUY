@@ -64,8 +64,9 @@ body{font-family:'DM Sans',system-ui,sans-serif;background:var(--c-bg);color:var
 .pool-card.recht:hover{border-color:var(--c-recht);background:var(--c-recht-bg)}
 .empty-msg{font-size:.88rem;color:var(--c-text-soft);font-style:italic;padding:4px 0}
 .pool-card{position:relative}
-.card-lz-btn{position:absolute;top:10px;right:10px;width:30px;height:30px;border-radius:50%;background:rgba(0,0,0,.06);border:none;font-size:.8rem;cursor:pointer;transition:.15s;display:none;align-items:center;justify-content:center}
-.card-lz-btn:hover{background:rgba(0,0,0,.12);transform:scale(1.1)}
+.pool-card .pool-title{padding-right:28px}
+.card-lz-btn{position:absolute;top:14px;right:12px;width:24px;height:24px;border-radius:50%;background:none;border:none;font-size:.75rem;cursor:pointer;transition:.15s;display:none;align-items:center;justify-content:center;padding:0;line-height:1}
+.card-lz-btn:hover{transform:scale(1.2)}
 .card-lz-btn.visible{display:flex}
 /* ═══ LERNZIELE — Modal für index.html ═══ */
 .lz-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
@@ -437,18 +438,25 @@ function checkLzButtons() {
     if (lzCache[poolName]) {
       if (lzCache[poolName].hasLZ) btn.classList.add('visible');
     } else {
-      // Config asynchron laden und prüfen
-      fetch('config/' + poolName + '.js').then(function(r) { return r.text(); }).then(function(code) {
+      // Config asynchron laden und prüfen (cache-bust verhindert veraltete Versionen)
+      fetch('config/' + poolName + '.js', {cache: 'no-cache'}).then(function(r) { return r.text(); }).then(function(code) {
         try {
           var w = {};
           var fn = new Function('window', code + '; return {POOL_META: window.POOL_META, TOPICS: window.TOPICS, QUESTIONS: window.QUESTIONS};');
           var data = fn(w);
-          var hasLZ = (data.POOL_META.lernziele && data.POOL_META.lernziele.length > 0) ||
-                      Object.values(data.TOPICS).some(function(t) { return t.lernziele && t.lernziele.length > 0; });
+          var hasLZ = false;
+          if (data.POOL_META && data.POOL_META.lernziele && data.POOL_META.lernziele.length > 0) hasLZ = true;
+          if (!hasLZ && data.TOPICS) {
+            var keys = Object.keys(data.TOPICS);
+            for (var i = 0; i < keys.length; i++) {
+              var t = data.TOPICS[keys[i]];
+              if (t && t.lernziele && t.lernziele.length > 0) { hasLZ = true; break; }
+            }
+          }
           lzCache[poolName] = { data: data, hasLZ: hasLZ };
           if (hasLZ) btn.classList.add('visible');
         } catch(e) { console.warn('Lernziele-Check fehlgeschlagen für ' + poolName, e); }
-      }).catch(function() {});
+      }).catch(function(e) { console.warn('Config laden fehlgeschlagen für ' + poolName, e); });
     }
   });
 }
@@ -457,7 +465,7 @@ async function loadPoolLernziele(poolName, poolTitle) {
   try {
     var cached = lzCache[poolName];
     if (!cached) {
-      var resp = await fetch('config/' + poolName + '.js');
+      var resp = await fetch('config/' + poolName + '.js', {cache: 'no-cache'});
       var code = await resp.text();
       var w = {};
       var fn = new Function('window', code + '; return {POOL_META: window.POOL_META, TOPICS: window.TOPICS, QUESTIONS: window.QUESTIONS};');

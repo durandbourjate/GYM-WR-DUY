@@ -263,10 +263,8 @@ html.dark .mode-card.active{background:var(--c-info-bg)}
 @media(max-width:500px){.mode-cards{grid-template-columns:1fr}.container{padding:12px 10px 80px}.card{padding:18px}.tf-btns{grid-template-columns:1fr}.kbd-hint{display:none}}
 
 /* ═══ LERNZIELE — 🎯 im Chip ═══ */
-.chip-lz{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:rgba(0,0,0,.06);font-size:.6rem;cursor:pointer;transition:.15s;flex-shrink:0;margin-left:2px;margin-right:-6px}
-.chip-lz:hover{background:rgba(0,0,0,.12);transform:scale(1.15)}
-.chip.active .chip-lz{background:color-mix(in srgb,var(--c-pool) 25%,transparent)}
-.chip.active .chip-lz:hover{background:color-mix(in srgb,var(--c-pool) 40%,transparent)}
+.chip-lz{display:inline-flex;align-items:center;justify-content:center;width:auto;height:auto;background:none;border:none;font-size:.6rem;cursor:pointer;transition:.15s;flex-shrink:0;margin-left:3px;margin-right:-4px;padding:0}
+.chip-lz:hover{transform:scale(1.2)}
 /* ═══ LERNZIELE — Mini-Modal (Topic-Lernziele, zentriert) ═══ */
 .lz-mini-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:400;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
 .lz-mini-overlay.active{display:flex}
