@@ -774,17 +774,18 @@ window.QUESTIONS = [
 
   // --- SVG 1: Systematik-Übersicht ---
   {
-    id: "s01", topic: "grundlagen", type: "multi", diff: 2, tax: "K2",
+    id: "s01", topic: "grundlagen", type: "mc", diff: 2, tax: "K3",
     img: {src: "img/recht/mietrecht/mietrecht_systematik_01.svg", alt: "Übersicht Mietrecht OR 253–274"},
-    q: "Betrachte die Übersicht zum Mietrecht. Welche der folgenden Bereiche gehören zu den mietrechtlichen Regelungen? (Mehrere Antworten möglich.)",
+    context: "Die Vermieterin verweigert seit Wochen die Reparatur einer defekten Heizung in Leonas Wohnung.",
+    q: "In welchem der vier Hauptbereiche der Übersicht findest du die relevanten Bestimmungen für Leonas Problem?",
     options: [
-      {v: "A", t: "Vertragsabschluss und Formvorschriften"},
-      {v: "B", t: "Mängelrecht und Reparaturen"},
-      {v: "C", t: "Kündigung und Kündigungsschutz"},
-      {v: "D", t: "Erbfolge und Pflichtteil"}
+      {v: "A", t: "Vertragsabschluss — es handelt sich um eine Formvorschrift beim Vertragsschluss."},
+      {v: "B", t: "Während der Miete — die Mängelbeseitigung fällt unter die laufenden Pflichten (OR 259 ff.)."},
+      {v: "C", t: "Kündigung — Leona muss zuerst kündigen, bevor sie handeln kann."},
+      {v: "D", t: "Mieterschutz — es handelt sich um einen missbräuchlichen Mietzins."}
     ],
-    correct: ["A", "B", "C"],
-    explain: "Das Mietrecht (OR 253–274) umfasst den Vertragsabschluss, die Regelungen während der Miete (Mängel, Untermiete), die Kündigung sowie den Mieterschutz. Erbfolge und Pflichtteil gehören zum Erbrecht (ZGB 457 ff.) und nicht zum Mietrecht."
+    correct: "B",
+    explain: "Die defekte Heizung ist ein Mangel an der Mietsache. Gemäss der Übersicht fällt die Mängelbeseitigung unter den Bereich 'Während der Miete' (OR 259 ff.). Der Vermieter ist verpflichtet, grössere Mängel zu beheben. Leona muss nicht kündigen, sondern kann die Mängelbeseitigung verlangen, den Mietzins reduzieren oder hinterlegen."
   },
 
   // --- SVG 2: Kündigungsfristen ---
@@ -819,17 +820,18 @@ window.QUESTIONS = [
 
   // --- SVG 3: Mängelrecht ---
   {
-    id: "s04", topic: "maengel", type: "mc", diff: 2, tax: "K2",
+    id: "s04", topic: "maengel", type: "mc", diff: 2, tax: "K3",
     img: {src: "img/recht/mietrecht/mietrecht_maengelrecht_03.svg", alt: "Flussdiagramm Vorgehen bei Mängeln"},
-    q: "Betrachte das Flussdiagramm. Was ist der erste Prüfschritt, wenn ein Mangel entdeckt wird?",
+    context: "Der Abfluss in Sarahs Badewanne ist verstopft. Es handelt sich um eine einfache Verstopfung, die mit einem Saugnapf behoben werden kann.",
+    q: "Folge dem Flussdiagramm: Welchen Weg durchläuft Sarahs Fall und was ist das Ergebnis?",
     options: [
-      {v: "A", t: "Sofort die Schlichtungsbehörde anrufen."},
-      {v: "B", t: "Prüfen, ob es sich um gewöhnlichen Unterhalt handelt (Art. 259 OR)."},
-      {v: "C", t: "Den Mietzins sofort hinterlegen."},
-      {v: "D", t: "Fristlos kündigen."}
+      {v: "A", t: "Mangel → Gewöhnlicher Unterhalt? Ja → Sarah muss den Abfluss selbst reparieren (Art. 259 OR)."},
+      {v: "B", t: "Mangel → Vermieter melden → Vermieter behebt → Erledigt."},
+      {v: "C", t: "Mangel → Gewöhnlicher Unterhalt? Nein → Sarah kann sofort den Mietzins hinterlegen."},
+      {v: "D", t: "Mangel → Vermieter melden → Nicht behoben → Fristlose Kündigung."}
     ],
-    correct: "B",
-    explain: "Gemäss dem Flussdiagramm ist der erste Schritt die Prüfung, ob es sich um gewöhnlichen Unterhalt handelt (Art. 259 OR). Kleinen Unterhalt (z.B. Glühbirne) muss der Mieter selbst beheben. Nur bei grösseren Mängeln (Art. 259a ff. OR) muss der Vermieter eingreifen."
+    correct: "A",
+    explain: "Ein verstopfter Abfluss, der mit einem Saugnapf behoben werden kann, ist gewöhnlicher (kleiner) Unterhalt gemäss Art. 259 OR. Im Flussdiagramm folgt man: Mangel entdeckt → Gewöhnlicher Unterhalt? → Ja → Mieter behebt selbst. Erst bei grösseren Mängeln (defekte Heizung, undichtes Dach) muss der Vermieter eingeschaltet werden."
   },
   {
     id: "s05", topic: "maengel", type: "mc", diff: 3, tax: "K4",
@@ -859,32 +861,34 @@ window.QUESTIONS = [
     explain: "Lösungsweg: Die Lebensdauer des Teppichbodens beträgt 10 Jahre. Der Mieter hat 4 Jahre gewohnt, die Restlebensdauer beträgt 6 Jahre. Der Kostenanteil: 6/10 × CHF 5'000 = CHF 3'000. Der Mieter muss also CHF 3'000 bezahlen."
   },
   {
-    id: "s07", topic: "uebergabe", type: "mc", diff: 2, tax: "K2",
+    id: "s07", topic: "uebergabe", type: "mc", diff: 2, tax: "K3",
     img: {src: "img/recht/mietrecht/mietrecht_zeitwert_04.svg", alt: "Zeitwertberechnung bei Wohnungsabgabe"},
-    q: "Betrachte die Lebensdauertabelle im Bild. Welcher Einrichtungsgegenstand hat die längste Lebensdauer?",
+    context: "Familie Becker zieht nach 12 Jahren aus ihrer Wohnung aus. Bei der Wohnungsabgabe werden Schäden am Teppichboden und am Kühlschrank festgestellt (jeweils durch unsachgemässen Gebrauch).",
+    q: "Für welchen Gegenstand muss Familie Becker gemäss der Lebensdauertabelle noch einen Kostenanteil bezahlen?",
     options: [
-      {v: "A", t: "Wandanstrich (Dispersion)"},
-      {v: "B", t: "Teppichboden"},
-      {v: "C", t: "Parkettboden (massiv)"},
-      {v: "D", t: "Kühlschrank"}
+      {v: "A", t: "Nur für den Teppichboden — seine Lebensdauer ist kürzer als die Mietdauer."},
+      {v: "B", t: "Nur für den Kühlschrank — seine Lebensdauer (15 Jahre) ist noch nicht erreicht, der Teppichboden (10 Jahre) ist bereits abgeschrieben."},
+      {v: "C", t: "Für beide Gegenstände, da die Lebensdauer bei beiden noch nicht abgelaufen ist."},
+      {v: "D", t: "Für keinen der Gegenstände — nach 12 Jahren ist alles abgeschrieben."}
     ],
-    correct: "C",
-    explain: "Gemäss der paritätischen Lebensdauertabelle hat ein massiver Parkettboden mit 40 Jahren die längste Lebensdauer. Zum Vergleich: Wandanstrich 8 Jahre, Teppichboden 10 Jahre, Kühlschrank 15 Jahre, Kochherd 20 Jahre."
+    correct: "B",
+    explain: "Gemäss der Lebensdauertabelle: Teppichboden = 10 Jahre, Kühlschrank = 15 Jahre. Nach 12 Jahren Mietdauer ist der Teppichboden vollständig abgeschrieben (Restlebensdauer = 0) — der Mieter schuldet nichts. Der Kühlschrank hat noch 3 Jahre Restlebensdauer — der Mieter muss einen Zeitwert-Anteil (3/15 × Kosten) bezahlen."
   },
 
   // --- SVG 5: Pflichten ---
   {
-    id: "s08", topic: "grundlagen", type: "mc", diff: 2, tax: "K2",
+    id: "s08", topic: "grundlagen", type: "mc", diff: 2, tax: "K3",
     img: {src: "img/recht/mietrecht/mietrecht_pflichten_05.svg", alt: "Pflichten Vermieter und Mieter"},
-    q: "Betrachte die Übersicht der Pflichten. Welche Pflicht betrifft BEIDE Vertragsparteien gleichermassen?",
+    context: "Herr Weber zahlt seit zwei Monaten keinen Mietzins, wohnt aber weiterhin in der Wohnung und nutzt alle Einrichtungen.",
+    q: "Welche Konsequenz ergibt sich aus der Vertragsstruktur (siehe Übersicht) für den Vermieter?",
     options: [
-      {v: "A", t: "Die Mietzinszahlung."},
-      {v: "B", t: "Der Vertrag ist synallagmatisch: Beide erbringen eine Gegenleistung."},
-      {v: "C", t: "Die Mängelbeseitigung."},
-      {v: "D", t: "Das Erstellen der Nebenkostenabrechnung."}
+      {v: "A", t: "Keine — der Vermieter hat keinen Anspruch auf Mietzins, solange Herr Weber wohnt."},
+      {v: "B", t: "Der Vermieter muss weiterhin alle seine Pflichten erfüllen (Unterhalt, Mängelbeseitigung), unabhängig davon, ob Herr Weber zahlt."},
+      {v: "C", t: "Da der Mietvertrag auf Leistung gegen Gegenleistung aufgebaut ist, kann der Vermieter bei Zahlungsverzug nach schriftlicher Mahnung und Fristansetzung ausserordentlich kündigen (Art. 257d OR)."},
+      {v: "D", t: "Der Vermieter darf die Wohnung sofort räumen lassen, ohne Mahnung."}
     ],
-    correct: "B",
-    explain: "Der Mietvertrag ist ein synallagmatischer (zweiseitig verpflichtender) Vertrag: Der Vermieter überlässt den Gebrauch der Sache, der Mieter zahlt dafür den Mietzins. Beide erbringen Leistung gegen Gegenleistung. Die Mietzinszahlung ist Pflicht des Mieters, die Mängelbeseitigung Pflicht des Vermieters."
+    correct: "C",
+    explain: "Der Mietvertrag ist ein synallagmatischer Vertrag: Gebrauchsüberlassung gegen Mietzins. Wenn der Mieter seine Hauptpflicht (Mietzinszahlung, Art. 257 OR) verletzt, kann der Vermieter gemäss Art. 257d OR eine Zahlungsfrist von mindestens 30 Tagen setzen und bei Nichtzahlung mit einer Frist von mindestens 30 Tagen auf Monatsende ausserordentlich kündigen. Eine sofortige Räumung ohne Mahnung ist nicht zulässig."
   },
 
   // --- Zusätzliche diff-3-Fragen zur Verstärkung ---

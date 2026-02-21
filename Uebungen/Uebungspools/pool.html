@@ -261,6 +261,14 @@ html.dark .mode-card.active{background:var(--c-info-bg)}
 .kbd-hint{font-size:.72rem;color:var(--c-text-soft);text-align:center;margin-top:8px;opacity:.6}
 .kbd-hint kbd{background:var(--c-bg);border:1px solid var(--c-border);border-radius:4px;padding:1px 6px;font-family:'DM Mono',monospace;font-size:.7rem}
 @media(max-width:500px){.mode-cards{grid-template-columns:1fr}.container{padding:12px 10px 80px}.card{padding:18px}.tf-btns{grid-template-columns:1fr}.kbd-hint{display:none}}
+/* ═══ KOMPAKTER HEADER beim Scrollen (Mobile) ═══ */
+.app-header{transition:padding .25s ease}
+.app-header .meta{transition:font-size .25s ease,margin-top .25s ease,opacity .25s ease,max-height .25s ease;overflow:hidden;max-height:2em}
+.app-header h1{transition:font-size .25s ease}
+.app-header.compact{padding:8px 16px}
+.app-header.compact h1{font-size:.95rem}
+.app-header.compact .meta{max-height:0;opacity:0;margin-top:0;font-size:0}
+.app-header.compact .home-btn,.app-header.compact .theme-toggle,.app-header.compact .header-lz-btn{width:30px;height:30px;font-size:.95rem}
 
 /* ═══ LERNZIELE — 🏁 im Chip ═══ */
 .chip-lz{display:inline-flex;align-items:center;justify-content:center;width:auto;height:auto;background:none;border:none;font-size:.6rem;cursor:pointer;transition:.15s;flex-shrink:0;margin-left:3px;margin-right:-4px;padding:0}
@@ -464,6 +472,21 @@ window.matchMedia('(prefers-color-scheme:dark)').addEventListener('change',funct
   document.documentElement.classList.toggle('dark',e.matches);
   updateThemeIcon();
 });
+
+// ══════════════════════════════════════════
+// KOMPAKTER HEADER — Minimierung beim Scrollen
+// ══════════════════════════════════════════
+(function(){
+  var header=document.querySelector('.app-header');
+  if(!header)return;
+  var threshold=40;
+  var compact=false;
+  window.addEventListener('scroll',function(){
+    var y=window.scrollY||window.pageYOffset;
+    if(y>threshold&&!compact){compact=true;header.classList.add('compact')}
+    else if(y<=threshold&&compact){compact=false;header.classList.remove('compact')}
+  },{passive:true});
+})();
 
 // ══════════════════════════════════════════
 // POOL LOADER — loads data from external JS file
