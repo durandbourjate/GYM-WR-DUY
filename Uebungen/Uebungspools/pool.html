@@ -251,7 +251,7 @@ html.dark .report-cat{background:var(--c-surface)}
 html.dark .report-comment{background:var(--c-surface);border-color:var(--c-border)}
 html.dark .mode-card{background:var(--c-surface)}
 html.dark .mode-card.active{background:var(--c-info-bg)}
-.theme-toggle{display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;background:rgba(255,255,255,.2);border:none;color:#fff;font-size:1.15rem;cursor:pointer;flex-shrink:0;transition:.15s;margin-left:auto;padding:0;line-height:1}
+.theme-toggle{display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;background:rgba(255,255,255,.2);border:none;color:#fff;font-size:1.15rem;cursor:pointer;flex-shrink:0;transition:.15s;padding:0;line-height:1}
 .theme-toggle:hover{background:rgba(255,255,255,.35)}
 .fill-hints{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0;padding:12px;background:var(--c-info-bg);border-radius:var(--radius);border:1px dashed var(--c-border);align-items:center}
 .fill-hint-label{font-size:.78rem;color:var(--c-info);font-weight:600;width:100%;margin-bottom:4px}
@@ -306,7 +306,7 @@ html.dark .mode-card.active{background:var(--c-info-bg)}
 .lz-topic.open .lz-topic-body{max-height:500px}
 .lz-topic-body .lz-list{padding:0 16px 12px}
 /* ═══ LERNZIELE — Header-Button ═══ */
-.header-lz-btn{display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;background:rgba(255,255,255,.2);border:none;color:#fff;font-size:1.05rem;cursor:pointer;flex-shrink:0;transition:.15s;padding:0;line-height:1;margin-left:auto}
+.header-lz-btn{display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;background:rgba(255,255,255,.2);border:none;color:#fff;font-size:1.05rem;cursor:pointer;flex-shrink:0;transition:.15s;padding:0;line-height:1}
 .header-lz-btn:hover{background:rgba(255,255,255,.35)}
 @media(max-width:500px){.lz-mini-modal{max-width:calc(100vw - 32px)}}
 </style>
@@ -322,12 +322,14 @@ html.dark .mode-card.active{background:var(--c-info-bg)}
 <body>
 <header class="app-header">
 <a href="index.html" class="home-btn" title="Zur Übersicht">🏠</a>
-<div>
+<div style="flex:1;min-width:0">
 <h1 id="poolTitle">Übungspool laden…</h1>
 <div class="meta" id="poolMeta">Gymnasium Hofwil · Individuell üben</div>
 </div>
+<div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
 <button class="header-lz-btn" onclick="toggleFullModal()" title="Alle Lernziele" id="headerLzBtn" style="display:none">🏁</button>
 <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Light/Dark Mode wechseln" aria-label="Farbmodus wechseln">🌙</button>
+</div>
 </header>
 <div class="container">
 
