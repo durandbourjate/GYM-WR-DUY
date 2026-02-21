@@ -290,10 +290,10 @@ html.dark .mode-card.active{background:var(--c-info-bg)}
   .sort-item{padding:7px 12px;font-size:.82rem}
   .sort-cat-item{padding:5px 10px;font-size:.8rem}
 
-  /* ── Aktions-Buttons: sauber umbrechen ── */
+  /* ── Aktions-Buttons: Flexbox mit Wrap ── */
   .q-action-row{
-    display:grid;
-    grid-template-columns:1fr 1fr;
+    display:flex;
+    flex-wrap:wrap;
     gap:8px;
     margin-top:14px;
   }
@@ -302,35 +302,18 @@ html.dark .mode-card.active{background:var(--c-info-bg)}
     padding:10px 12px;
     min-height:44px;
     white-space:nowrap;
-  }
-  .q-action-row .btn-back{
-    grid-column:1;
     justify-content:center;
   }
-  .q-action-row .btn-primary{
-    grid-column:1/-1;
-    width:100%;
-    justify-content:center;
-    order:-1;
-  }
-  .q-action-row .btn-skip{
-    grid-column:1/-1;
-    width:100%;
-    justify-content:center;
-    margin-left:0;
-  }
-  .q-action-row .btn-accent{
-    grid-column:1/-1;
-    width:100%;
-    justify-content:center;
-    margin-left:0;
-  }
-  /* Wenn Zurück + Tipps nebeneinander */
-  .q-action-row .btn-outline{
-    justify-content:center;
-  }
-  /* Zurück-Button: nur Icon auf sehr schmalen Screens */
-  .q-action-row .btn-back{font-size:.8rem;padding:10px 14px}
+  /* Tipps (Lückentext): links, Reihe 1 */
+  .q-action-row .btn-outline{order:1;flex:1 1 calc(50% - 4px)}
+  /* Überprüfen: volle Breite, ABER neben Tipps wenn vorhanden */
+  .q-action-row .btn-primary{order:2;flex:1 1 100%}
+  .q-action-row .btn-outline ~ .btn-primary{flex:1 1 calc(50% - 4px)}
+  /* Zurück + Überspringen: nebeneinander, Reihe 2 */
+  .q-action-row .btn-back{order:10;flex:1 1 calc(50% - 4px)}
+  .q-action-row .btn-skip{order:11;flex:1 1 calc(50% - 4px);margin-left:0}
+  /* Nächste Aufgabe: gleicher Platz wie Überspringen */
+  .q-action-row .btn-accent{order:11;flex:1 1 calc(50% - 4px);margin-left:0}
 
   /* ── Bottom Row: grössere Touch-Targets ── */
   .q-bottom-row{
@@ -1180,8 +1163,8 @@ function renderQuestion(){
   html+='<div class="q-action-row" id="skipRow">';
   if(state.current>0)html+='<button class="btn btn-back" onclick="prevQuestion()">← Zurück</button>';
   if(q.type==='fill'){
-    html+='<button class="btn btn-primary" onclick="answerFill(\''+q.id+'\')">🔍 Überprüfen</button>';
     html+='<button class="btn btn-outline" id="fillHintsBtn" onclick="showFillHints(\''+q.id+'\')">💡 Tipps</button>';
+    html+='<button class="btn btn-primary" onclick="answerFill(\''+q.id+'\')">🔍 Überprüfen</button>';
   }
   else if(q.type==='multi') html+='<button class="btn btn-primary" onclick="answerMulti(\''+q.id+'\')">🔍 Überprüfen</button>';
   else if(q.type==='calc') html+='<button class="btn btn-primary" onclick="answerCalc(\''+q.id+'\')">🔍 Überprüfen</button>';
