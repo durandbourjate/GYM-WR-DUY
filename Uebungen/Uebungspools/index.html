@@ -329,6 +329,14 @@ function render() {
         html += '</a>';
       });
       html += '</div>';
+      // "Ganzer Fachbereich" link
+      if (pools.length > 1) {
+        var allIds = pools.map(p => p.id).join(',');
+        html += '<div style="text-align:center;margin-top:12px">';
+        html += '<a href="pool.html?pools=' + allIds + '" style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:20px;font-size:.85rem;font-weight:600;text-decoration:none;color:' + dotColor + ';border:2px solid ' + dotColor + ';transition:.2s" onmouseover="this.style.background=\'' + dotColor + '\';this.style.color=\'#fff\'" onmouseout="this.style.background=\'transparent\';this.style.color=\'' + dotColor + '\'">';
+        html += '🎯 Ganzer Fachbereich ' + fach + ' (' + totalQ + ' Fragen)';
+        html += '</a></div>';
+      }
     }
     html += '</div></div>';
     html += '</div>';
