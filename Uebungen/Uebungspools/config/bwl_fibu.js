@@ -400,7 +400,7 @@ window.QUESTIONS = [
 
   {
     id: "k01", topic: "kontentypen", type: "mc", diff: 1, tax: "K1",
-    img: {src: "img/bwl/fibu/fibu_kontentypen_01.svg", alt: "Übersicht der vier Kontentypen mit T-Konto-Darstellung"},
+    img: {src: "img/bwl/fibu/fibu_kontentypen_01.svg", alt: "Übersicht der Kontentypen mit T-Konto-Darstellung"},
     q: "Welche vier Kontentypen gibt es in der doppelten Buchhaltung?",
     options: [
       {v: "A", t: "Aktivkonten, Passivkonten, Aufwandkonten, Ertragskonten"},
@@ -796,7 +796,7 @@ window.QUESTIONS = [
   },
   {
     id: "k37", topic: "kontentypen", type: "mc", diff: 2, tax: "K3",
-    img: {src: "img/bwl/fibu/fibu_konten_zuordnung_01.svg", alt: "12 Konten zum Zuordnen auf vier Kontentypen"},
+    img: {src: "img/bwl/fibu/fibu_konten_zuordnung_01.svg", alt: "12 Konten zum Zuordnen auf verschiedene Kontentypen"},
     q: "Betrachte die Zuordnungsübersicht. Welche Konten gehören zum Typ «Passivkonto» (cyan)?",
     options: [
       {v: "A", t: "Hypothek, Kreditoren, Eigenkapital, Darlehen"},
@@ -809,7 +809,7 @@ window.QUESTIONS = [
   },
   {
     id: "k38", topic: "kontentypen", type: "multi", diff: 2, tax: "K3",
-    img: {src: "img/bwl/fibu/fibu_konten_zuordnung_01.svg", alt: "12 Konten zum Zuordnen auf vier Kontentypen"},
+    img: {src: "img/bwl/fibu/fibu_konten_zuordnung_01.svg", alt: "12 Konten zum Zuordnen auf verschiedene Kontentypen"},
     q: "Welche Konten aus der Abbildung gehören zum Typ «Aufwandskonto» (magenta)? (Mehrere Antworten möglich.)",
     options: [
       {v: "A", t: "Lohnaufwand"},
@@ -888,7 +888,7 @@ window.QUESTIONS = [
   },
   {
     id: "s02", topic: "buchungssatz", type: "fill", diff: 1, tax: "K2",
-    img: {src: "img/bwl/fibu/fibu_buchungsregeln_01.svg", alt: "Übersicht der vier Kontentypen mit Soll- und Habenseite"},
+    img: {src: "img/bwl/fibu/fibu_buchungsregeln_01.svg", alt: "Übersicht der Kontentypen mit Buchungsseiten"},
     q: "Bei einem Aktivkonto stehen Zunahmen auf der {0}-Seite und Abnahmen auf der {1}-Seite.",
     blanks: [
       {answer: "Soll", alts: ["linken", "Sollseite"]},

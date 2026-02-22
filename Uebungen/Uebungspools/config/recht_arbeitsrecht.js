@@ -40,7 +40,7 @@ window.QUESTIONS = [
     type: "mc",
     diff: 1,
     tax: "K1",
-    img: {src: "img/recht/arbeitsrecht/arbeitsrecht_bereiche_01.svg", alt: "Diagramm: Drei Bereiche des Arbeitsrechts mit Fragezeichen"},
+    img: {src: "img/recht/arbeitsrecht/arbeitsrecht_bereiche_01.svg", alt: "Diagramm: Bereiche des Arbeitsrechts mit Fragezeichen"},
     q: "In wie viele Bereiche wird das Arbeitsrecht typischerweise eingeteilt?",
     options: [
       {v: "zwei", t: "Privaterecht und Öffentliches Recht"},

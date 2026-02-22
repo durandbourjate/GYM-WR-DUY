@@ -10,7 +10,7 @@
   <rect x="55" y="80" width="140" height="240" rx="6" fill="#dc2626" opacity="0.12" stroke="#dc2626" stroke-width="2"/>
   <rect x="55" y="80" width="140" height="40" rx="6" fill="#dc2626"/>
   <text x="125" y="105" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">1. Säule</text>
-  <text x="125" y="140" text-anchor="middle" font-size="12" font-weight="600" fill="#dc2626">AHV / IV</text>
+  <text x="125" y="140" text-anchor="middle" font-size="12" font-weight="600" fill="#dc2626">?</text>
   <text x="125" y="160" text-anchor="middle" font-size="10" fill="#64748b">+ Ergänzungsleistungen</text>
   <text x="125" y="190" text-anchor="middle" font-size="10" fill="#334155" font-weight="500">Existenzbedarf</text>
   <line x1="90" y1="200" x2="160" y2="200" stroke="#e2e8f0" stroke-width="1"/>
@@ -25,7 +25,7 @@
   <rect x="210" y="80" width="140" height="240" rx="6" fill="#2563eb" opacity="0.12" stroke="#2563eb" stroke-width="2"/>
   <rect x="210" y="80" width="140" height="40" rx="6" fill="#2563eb"/>
   <text x="280" y="105" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">2. Säule</text>
-  <text x="280" y="140" text-anchor="middle" font-size="12" font-weight="600" fill="#2563eb">Berufliche Vorsorge</text>
+  <text x="280" y="140" text-anchor="middle" font-size="12" font-weight="600" fill="#2563eb">?</text>
   <text x="280" y="160" text-anchor="middle" font-size="10" fill="#64748b">(Pensionskasse)</text>
   <text x="280" y="190" text-anchor="middle" font-size="10" fill="#334155" font-weight="500">Gewohnte Lebenshaltung</text>
   <line x1="245" y1="200" x2="315" y2="200" stroke="#e2e8f0" stroke-width="1"/>
@@ -40,7 +40,7 @@
   <rect x="365" y="80" width="140" height="240" rx="6" fill="#16a34a" opacity="0.12" stroke="#16a34a" stroke-width="2"/>
   <rect x="365" y="80" width="140" height="40" rx="6" fill="#16a34a"/>
   <text x="435" y="105" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">3. Säule</text>
-  <text x="435" y="140" text-anchor="middle" font-size="12" font-weight="600" fill="#16a34a">Private Vorsorge</text>
+  <text x="435" y="140" text-anchor="middle" font-size="12" font-weight="600" fill="#16a34a">?</text>
   <text x="435" y="160" text-anchor="middle" font-size="10" fill="#64748b">(Säule 3a / 3b)</text>
   <text x="435" y="190" text-anchor="middle" font-size="10" fill="#334155" font-weight="500">Komfortbedarf</text>
   <line x1="400" y1="200" x2="470" y2="200" stroke="#e2e8f0" stroke-width="1"/>

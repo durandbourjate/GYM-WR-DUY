@@ -13,12 +13,12 @@
   <text x="250" y="26" class="title">Verhaltenssteuerung: Zwei Ansätze im Vergleich</text>
   <!-- Linke Spalte: Traditionelle Regulierung -->
   <rect x="20" y="44" width="210" height="36" rx="8" fill="#64748b"/>
-  <text x="125" y="67" class="col-head">Traditionelle Regulierung</text>
+  <text x="125" y="67" class="col-head">Ansatz A</text>
   <rect x="20" y="84" width="210" height="200" rx="8" fill="#f8fafc" stroke="#e2e8f0"/>
-  <text x="36" y="110" class="item"><tspan class="icon">🚫</tspan> Verbote und Gebote</text>
-  <text x="36" y="134" class="item"><tspan class="icon">💰</tspan> Steuern und Gebühren</text>
-  <text x="36" y="158" class="item"><tspan class="icon">⚖️</tspan> Strafen bei Verstoss</text>
-  <text x="36" y="182" class="item"><tspan class="icon">📋</tspan> Vorschriften und Normen</text>
+  <text x="36" y="110" class="item"><tspan class="icon">🚫</tspan> ?</text>
+  <text x="36" y="134" class="item"><tspan class="icon">💰</tspan> ?</text>
+  <text x="36" y="158" class="item"><tspan class="icon">⚖️</tspan> ?</text>
+  <text x="36" y="182" class="item"><tspan class="icon">📋</tspan> ?</text>
   <line x1="36" y1="198" x2="214" y2="198" class="divider"/>
   <text x="36" y="218" class="item" font-style="italic" fill="#64748b">Beispiel: Rauchverbot in</text>
   <text x="36" y="236" class="item" font-style="italic" fill="#64748b">Restaurants, Bussen bis</text>
@@ -28,12 +28,12 @@
   <text x="250" y="170" class="vs">VS</text>
   <!-- Rechte Spalte: Nudging -->
   <rect x="270" y="44" width="210" height="36" rx="8" fill="#f89907"/>
-  <text x="375" y="67" class="col-head">Nudging</text>
+  <text x="375" y="67" class="col-head">Ansatz B</text>
   <rect x="270" y="84" width="210" height="200" rx="8" fill="#fff8eb" stroke="#e2e8f0"/>
-  <text x="286" y="110" class="item"><tspan class="icon">👣</tspan> Subtile Hinweise</text>
-  <text x="286" y="134" class="item"><tspan class="icon">📐</tspan> Architektur der Wahl</text>
-  <text x="286" y="158" class="item"><tspan class="icon">✅</tspan> Opt-out statt Opt-in</text>
-  <text x="286" y="182" class="item"><tspan class="icon">🍎</tspan> Gesundes in Augenhöhe</text>
+  <text x="286" y="110" class="item"><tspan class="icon">👣</tspan> ?</text>
+  <text x="286" y="134" class="item"><tspan class="icon">📐</tspan> ?</text>
+  <text x="286" y="158" class="item"><tspan class="icon">✅</tspan> ?</text>
+  <text x="286" y="182" class="item"><tspan class="icon">🍎</tspan> ?</text>
   <line x1="286" y1="198" x2="464" y2="198" class="divider"/>
   <text x="286" y="218" class="item" font-style="italic" fill="#64748b">Beispiel: Grüne Fussabdrücke</text>
   <text x="286" y="236" class="item" font-style="italic" fill="#64748b">zum Mülleimer → Abfall</text>

@@ -17,40 +17,40 @@
   <text x="608" y="70" text-anchor="middle" font-size="12" font-weight="700" fill="#1e293b">Ertragskonto</text>
 
   <!-- Konten zum Zuordnen -->
-  <rect x="40" y="110" width="130" height="32" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1" rx="6"/>
+  <rect x="40" y="110" width="130" height="32" fill="#e2e8f0" stroke="#cbd5e1" stroke-width="1" rx="6"/>
   <text x="105" y="131" text-anchor="middle" font-size="12" fill="#334155">Kasse</text>
-  
-  <rect x="190" y="110" width="130" height="32" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1" rx="6"/>
+
+  <rect x="190" y="110" width="130" height="32" fill="#e2e8f0" stroke="#cbd5e1" stroke-width="1" rx="6"/>
   <text x="255" y="131" text-anchor="middle" font-size="12" fill="#334155">Hypothek</text>
-  
-  <rect x="340" y="110" width="130" height="32" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1" rx="6"/>
+
+  <rect x="340" y="110" width="130" height="32" fill="#e2e8f0" stroke="#cbd5e1" stroke-width="1" rx="6"/>
   <text x="405" y="131" text-anchor="middle" font-size="12" fill="#334155">Lohnaufwand</text>
-  
-  <rect x="490" y="110" width="130" height="32" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1" rx="6"/>
+
+  <rect x="490" y="110" width="130" height="32" fill="#e2e8f0" stroke="#cbd5e1" stroke-width="1" rx="6"/>
   <text x="555" y="131" text-anchor="middle" font-size="12" fill="#334155">Warenverkauf</text>
 
-  <rect x="40" y="158" width="130" height="32" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1" rx="6"/>
+  <rect x="40" y="158" width="130" height="32" fill="#e2e8f0" stroke="#cbd5e1" stroke-width="1" rx="6"/>
   <text x="105" y="179" text-anchor="middle" font-size="12" fill="#334155">Kreditoren</text>
-  
-  <rect x="190" y="158" width="130" height="32" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1" rx="6"/>
+
+  <rect x="190" y="158" width="130" height="32" fill="#e2e8f0" stroke="#cbd5e1" stroke-width="1" rx="6"/>
   <text x="255" y="179" text-anchor="middle" font-size="12" fill="#334155">Debitoren</text>
-  
-  <rect x="340" y="158" width="130" height="32" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1" rx="6"/>
+
+  <rect x="340" y="158" width="130" height="32" fill="#e2e8f0" stroke="#cbd5e1" stroke-width="1" rx="6"/>
   <text x="405" y="179" text-anchor="middle" font-size="12" fill="#334155">Mietaufwand</text>
-  
-  <rect x="490" y="158" width="130" height="32" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1" rx="6"/>
+
+  <rect x="490" y="158" width="130" height="32" fill="#e2e8f0" stroke="#cbd5e1" stroke-width="1" rx="6"/>
   <text x="555" y="179" text-anchor="middle" font-size="12" fill="#334155">Eigenkapital</text>
 
-  <rect x="40" y="206" width="130" height="32" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1" rx="6"/>
+  <rect x="40" y="206" width="130" height="32" fill="#e2e8f0" stroke="#cbd5e1" stroke-width="1" rx="6"/>
   <text x="105" y="227" text-anchor="middle" font-size="12" fill="#334155">Fahrzeuge</text>
-  
-  <rect x="190" y="206" width="130" height="32" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1" rx="6"/>
+
+  <rect x="190" y="206" width="130" height="32" fill="#e2e8f0" stroke="#cbd5e1" stroke-width="1" rx="6"/>
   <text x="255" y="227" text-anchor="middle" font-size="12" fill="#334155">Finanzertrag</text>
-  
-  <rect x="340" y="206" width="130" height="32" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1" rx="6"/>
+
+  <rect x="340" y="206" width="130" height="32" fill="#e2e8f0" stroke="#cbd5e1" stroke-width="1" rx="6"/>
   <text x="405" y="227" text-anchor="middle" font-size="12" fill="#334155">Wareneinkauf</text>
-  
-  <rect x="490" y="206" width="130" height="32" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1" rx="6"/>
+
+  <rect x="490" y="206" width="130" height="32" fill="#e2e8f0" stroke="#cbd5e1" stroke-width="1" rx="6"/>
   <text x="555" y="227" text-anchor="middle" font-size="12" fill="#334155">Darlehen</text>
 
   <!-- Fragezeichen-Pfeile -->

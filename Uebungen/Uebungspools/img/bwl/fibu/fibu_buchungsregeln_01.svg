@@ -14,9 +14,9 @@
   <text x="115" y="78" text-anchor="middle" font-size="11" font-weight="600" fill="#1e293b">Soll</text>
   <text x="245" y="78" text-anchor="middle" font-size="11" font-weight="600" fill="#1e293b">Haben</text>
 
-  <text x="60" y="102" font-size="10" fill="#16a34a" font-weight="600">+ Anfangsbestand</text>
-  <text x="60" y="120" font-size="10" fill="#16a34a" font-weight="600">+ Zunahmen</text>
-  <text x="190" y="102" font-size="10" fill="#dc2626" font-weight="600">– Abnahmen</text>
+  <text x="60" y="102" font-size="10" fill="#16a34a" font-weight="600">?</text>
+  <text x="60" y="120" font-size="10" fill="#16a34a" font-weight="600">?</text>
+  <text x="190" y="102" font-size="10" fill="#dc2626" font-weight="600">?</text>
   <text x="190" y="140" font-size="10" fill="#7c3aed" font-weight="600">= Saldo</text>
   <text x="190" y="156" font-size="9" fill="#64748b">(Endbestand)</text>
 
@@ -33,11 +33,11 @@
   <text x="455" y="78" text-anchor="middle" font-size="11" font-weight="600" fill="#1e293b">Soll</text>
   <text x="585" y="78" text-anchor="middle" font-size="11" font-weight="600" fill="#1e293b">Haben</text>
 
-  <text x="400" y="102" font-size="10" fill="#dc2626" font-weight="600">– Abnahmen</text>
+  <text x="400" y="102" font-size="10" fill="#dc2626" font-weight="600">?</text>
   <text x="400" y="140" font-size="10" fill="#7c3aed" font-weight="600">= Saldo</text>
   <text x="400" y="156" font-size="9" fill="#64748b">(Endbestand)</text>
-  <text x="530" y="102" font-size="10" fill="#16a34a" font-weight="600">+ Anfangsbestand</text>
-  <text x="530" y="120" font-size="10" fill="#16a34a" font-weight="600">+ Zunahmen</text>
+  <text x="530" y="102" font-size="10" fill="#16a34a" font-weight="600">?</text>
+  <text x="530" y="120" font-size="10" fill="#16a34a" font-weight="600">?</text>
 
   <text x="520" y="185" text-anchor="middle" font-size="9" fill="#64748b">z.B. Kreditoren, Hypothek, EK</text>
 
@@ -50,8 +50,8 @@
   <text x="115" y="243" text-anchor="middle" font-size="11" font-weight="600" fill="#1e293b">Soll</text>
   <text x="245" y="243" text-anchor="middle" font-size="11" font-weight="600" fill="#1e293b">Haben</text>
 
-  <text x="60" y="268" font-size="10" fill="#16a34a" font-weight="600">+ Aufwandzunahme</text>
-  <text x="190" y="268" font-size="10" fill="#dc2626" font-weight="600">– Aufwandminderung</text>
+  <text x="60" y="268" font-size="10" fill="#16a34a" font-weight="600">?</text>
+  <text x="190" y="268" font-size="10" fill="#dc2626" font-weight="600">?</text>
   <text x="190" y="305" font-size="10" fill="#7c3aed" font-weight="600">= Saldo</text>
   <text x="60" y="289" font-size="9" fill="#64748b">(kein Anfangsbestand!)</text>
 
@@ -66,9 +66,9 @@
   <text x="455" y="243" text-anchor="middle" font-size="11" font-weight="600" fill="#1e293b">Soll</text>
   <text x="585" y="243" text-anchor="middle" font-size="11" font-weight="600" fill="#1e293b">Haben</text>
 
-  <text x="400" y="268" font-size="10" fill="#dc2626" font-weight="600">– Ertragsminderung</text>
+  <text x="400" y="268" font-size="10" fill="#dc2626" font-weight="600">?</text>
   <text x="400" y="305" font-size="10" fill="#7c3aed" font-weight="600">= Saldo</text>
-  <text x="530" y="268" font-size="10" fill="#16a34a" font-weight="600">+ Ertragszunahme</text>
+  <text x="530" y="268" font-size="10" fill="#16a34a" font-weight="600">?</text>
   <text x="530" y="289" font-size="9" fill="#64748b">(kein Anfangsbestand!)</text>
 
   <text x="520" y="350" text-anchor="middle" font-size="9" fill="#64748b">z.B. Warenverkauf, Honorarertrag</text>

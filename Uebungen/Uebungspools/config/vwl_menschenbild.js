@@ -108,7 +108,7 @@ window.QUESTIONS = [
 
 {id:"r04",topic:"kritik",type:"mc",diff:2,tax:"K2",
  q:"Was versteht man unter einem «Nudge» in der Verhaltensökonomie?",
- img:{src:"img/vwl/menschenbild/menschenbild_nudging_01.svg",alt:"Vergleich: Traditionelle Regulierung vs. Nudging"},
+ img:{src:"img/vwl/menschenbild/menschenbild_nudging_01.svg",alt:"Vergleich zweier Ansätze zur Verhaltenssteuerung"},
  options:[{v:"A",t:"Einen sanften Stoss – man versucht, das Verhalten von Menschen über psychologisch subtile Methoden zu steuern, ohne Verbote oder Gebote."},{v:"B",t:"Ein striktes Verbot unerwünschten Verhaltens."},{v:"C",t:"Eine finanzielle Belohnung für richtiges Verhalten."},{v:"D",t:"Eine wissenschaftliche Theorie von Adam Smith."}],
  correct:"A",explain:"Nudging = «Stupsen»: Subtile Beeinflussung ohne Zwang. Beispiele: Grüne Fussabdrücke auf dem Boden, die zum Mülleimer führen (Abfall –40%), Widerspruchslösung bei der Organspende (Opt-out statt Opt-in). Weltweit setzen Regierungen «Nudge Units» ein."},
 
@@ -234,7 +234,7 @@ window.QUESTIONS = [
 
 {id:"a07",topic:"anreize",type:"mc",diff:2,tax:"K2",
  q:"Was unterscheidet Nudging von traditioneller Regulierung?",
- img:{src:"img/vwl/menschenbild/menschenbild_nudging_01.svg",alt:"Vergleich: Traditionelle Regulierung vs. Nudging"},
+ img:{src:"img/vwl/menschenbild/menschenbild_nudging_01.svg",alt:"Vergleich zweier Ansätze zur Verhaltenssteuerung"},
  options:[{v:"A",t:"Nudging beeinflusst Verhalten über psychologisch subtile Methoden, ohne Verbote oder Gebote zu erlassen."},{v:"B",t:"Nudging ist teurer als Regulierung."},{v:"C",t:"Nudging funktioniert nur bei irrationalen Menschen."},{v:"D",t:"Es gibt keinen Unterschied."}],
  correct:"A",explain:"Traditionelle Regulierung: Verbote, Gebote, Strafen (z.B. Rauchverbot). Nudging: Sanfte Stupser, die das Verhalten lenken, ohne die Wahlfreiheit einzuschränken (z.B. Fussabdrücke zum Mülleimer, gesundes Essen in Augenhöhe in der Kantine)."},
 
@@ -372,7 +372,7 @@ window.QUESTIONS = [
 // ──── ZIELE DER WIRTSCHAFTSPOLITIK (z01–z08) ────
 {id:"z01",topic:"ziele",type:"mc",diff:1,tax:"K1",
  q:"Welche sechs Ziele umfasst das «magische Sechseck» der Wirtschaftspolitik?",
- img:{src:"img/vwl/menschenbild/menschenbild_sechseck_01.svg",alt:"Magisches Sechseck der Wirtschaftspolitik"},
+ img:{src:"img/vwl/menschenbild/menschenbild_sechseck_01.svg",alt:"Sechseck mit sechs wirtschaftspolitischen Zielen"},
  options:[{v:"A",t:"Vollbeschäftigung, Preisstabilität, Wirtschaftswachstum, aussenwirtschaftliches Gleichgewicht, sozialer Ausgleich, Umweltqualität."},{v:"B",t:"Hohe Exporte, tiefe Steuern, hohe Gewinne, viel Konsum, wenig Staat, tiefe Inflation."},{v:"C",t:"BIP, Gini-Koeffizient, Lorenzkurve, Handelsbilanz, Zinssatz, Wechselkurs."},{v:"D",t:"Freiheit, Gleichheit, Brüderlichkeit, Demokratie, Wohlstand, Sicherheit."}],
  correct:"A",explain:"Das magische Sechseck: (1) Vollbeschäftigung, (2) Preisstabilität, (3) Wirtschaftswachstum, (4) Aussenwirtschaftliches Gleichgewicht, (5) Sozialer Ausgleich (Verteilung), (6) Umweltqualität. Ursprünglich nur ein Dreieck (1-3), im Laufe der Zeit erweitert."},
 
@@ -412,7 +412,7 @@ window.QUESTIONS = [
 
 {id:"z07",topic:"ziele",type:"multi",diff:1,tax:"K2",
  q:"Welche der folgenden Ziele gehören zum «magischen Sechseck» der Wirtschaftspolitik? (Mehrere Antworten möglich.)",
- img:{src:"img/vwl/menschenbild/menschenbild_sechseck_01.svg",alt:"Magisches Sechseck der Wirtschaftspolitik"},
+ img:{src:"img/vwl/menschenbild/menschenbild_sechseck_01.svg",alt:"Sechseck mit sechs wirtschaftspolitischen Zielen"},
  options:[{v:"A",t:"Preisstabilität"},{v:"B",t:"Maximierung der Unternehmensgewinne"},{v:"C",t:"Umweltqualität"},{v:"D",t:"Vollbeschäftigung"}],
  correct:["A","C","D"],explain:"A (Preisstabilität), C (Umweltqualität) und D (Vollbeschäftigung) gehören zum magischen Sechseck. B (Maximierung der Unternehmensgewinne) ist kein wirtschaftspolitisches Ziel des Sechsecks – Unternehmensgewinne sind ein betriebswirtschaftliches Ziel, nicht ein gesamtwirtschaftliches."},
 

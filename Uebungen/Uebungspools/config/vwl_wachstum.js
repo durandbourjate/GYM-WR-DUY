@@ -55,7 +55,7 @@ window.QUESTIONS = [
  explain:"Konjunktur beschäftigt sich mit dem Auf und Ab des BIP in kurzer Frist (Quartale, 1–2 Jahre). Wachstum hingegen betrachtet die langfristige Entwicklung des realen BIP pro Kopf über Jahre und Jahrzehnte."},
 
 {id:"d04", topic:"definition", type:"calc", diff:2, tax:"K3",
- img:{src:"img/wachstumsvergleich.svg", alt:"Exponentielles Wachstum bei unterschiedlichen Wachstumsraten"},
+ img:{src:"img/vwl/wachstum/wachstumsvergleich.svg", alt:"Exponentielles Wachstum bei unterschiedlichen Wachstumsraten"},
  q:"Ein Land hat eine jährliche Wachstumsrate des BIP pro Kopf von 2 %. Berechnen Sie mit der 70er-Regel:",
  rows:[
    {label:"Anzahl Jahre bis zur Verdopplung des BIP pro Kopf", answer:35, tolerance:0.5, unit:"Jahre"}
@@ -191,7 +191,7 @@ window.QUESTIONS = [
  explain:"BIP pro Einwohner = Arbeitseinsatz × Produktivität. Also: (1 + 0,25) × (1 − 0,07) = 1,25 × 0,93 = 1,1625 → ca. +16 %. Der gesamte Wohlstandszuwachs stammt aus der Produktivitätssteigerung."},
 
 {id:"e06", topic:"ebene1", type:"open", diff:2, tax:"K2",
- img:{src:"img/bip_formel.svg", alt:"Zerlegung des BIP pro Einwohner"},
+ img:{src:"img/vwl/wachstum/bip_formel.svg", alt:"Zerlegung des BIP pro Einwohner"},
  q:"Erklären Sie anhand der Formel «BIP pro Einwohner = Arbeitseinsatz pro Einwohner × Arbeitsproduktivität», weshalb die Produktivität für den Wohlstand in der Schweiz entscheidend ist.",
  sample:"Da der Arbeitseinsatz pro Einwohner in der Schweiz seit Jahren sinkt (weniger Wochenstunden, alternde Bevölkerung), kann das BIP pro Kopf nur steigen, wenn die Produktivität überproportional wächst. Tatsächlich ist der gesamte Wohlstandszuwachs der Schweiz der letzten Jahrzehnte auf Produktivitätssteigerungen zurückzuführen.",
  explain:"Mehr Arbeitsstunden sind begrenzt (max. 24h/Tag, Erwerbsquote bereits hoch in der Schweiz). Daher ist Produktivitätswachstum der einzig nachhaltige Weg zu mehr Wohlstand."},
@@ -232,7 +232,7 @@ window.QUESTIONS = [
  explain:"Die fundamentale Wachstumsgleichung: BIP/Einwohner = Arbeitseinsatz/Einwohner × Arbeitsproduktivität. Sie zeigt die zwei grundsätzlichen Hebel für mehr Wohlstand."},
 
 {id:"e11", topic:"ebene1", type:"mc", diff:3, tax:"K4",
- img:{src:"img/bip_formel.svg", alt:"Zerlegung des BIP pro Einwohner"},
+ img:{src:"img/vwl/wachstum/bip_formel.svg", alt:"Zerlegung des BIP pro Einwohner"},
  q:"Die Schweiz hat eine der höchsten Erwerbsquoten Europas. Die durchschnittliche Wochenarbeitszeit sinkt aber seit Jahrzehnten. Welche Schlussfolgerung ist am überzeugendsten?",
  options:[
    {v:"A", t:"Die Schweiz muss ihre Produktivität stetig steigern, da kaum noch Potenzial bei der Arbeitsmenge besteht."},
@@ -359,7 +359,7 @@ window.QUESTIONS = [
  explain:"Land A: 500 × 0,15 = 75 Mrd. CHF. Land B: 200 × 0,40 = 80 Mrd. CHF. Obwohl Land B ein viel kleineres BIP hat, investiert es absolut mehr. Die hohe Investitionsquote erklärt, weshalb solche Länder (z. B. China) schnell wachsen."},
 
 {id:"i13", topic:"ebene2", type:"mc", diff:3, tax:"K4",
- img:{src:"img/strukturwandel_ch.svg", alt:"Strukturwandel der Schweiz: Beschäftigungsanteile nach Sektoren"},
+ img:{src:"img/vwl/wachstum/strukturwandel_ch.svg", alt:"Strukturwandel der Schweiz: Beschäftigungsanteile nach Sektoren"},
  q:"Die Grafik zeigt den Strukturwandel der Schweiz. Was ist die wahrscheinlichste Erklärung dafür, dass der 3. Sektor heute dominiert?",
  options:[
    {v:"A", t:"Produktivitätssteigerungen in Landwirtschaft und Industrie haben Arbeitskräfte freigesetzt, die in den Dienstleistungssektor gewechselt sind."},
@@ -393,7 +393,7 @@ window.QUESTIONS = [
  explain:"Der Staat soll Spielregeln setzen, Voraussetzungen schaffen und Marktversagen verhindern – aber nicht die Preise aller Güter staatlich festlegen. Preise sollen sich grundsätzlich über den Markt bilden."},
 
 {id:"r03", topic:"ebene3", type:"sort", diff:2, tax:"K2",
- img:{src:"img/gueterarten_matrix.svg", alt:"Güterarten nach Rivalität und Ausschliessbarkeit"},
+ img:{src:"img/vwl/wachstum/gueterarten_matrix.svg", alt:"Güterarten nach Rivalität und Ausschliessbarkeit"},
  q:"Ordnen Sie die folgenden Güter der korrekten Güterart zu.",
  categories:["Privates Gut", "Klubgut", "Allmendegut", "Öffentliches Gut"],
  items:[
@@ -463,7 +463,7 @@ window.QUESTIONS = [
  explain:"Gestaltbar sind Faktoren, die durch politische Entscheide beeinflusst werden können: Bildung (A), Rechtssicherheit (C), Handelspolitik (D). Die geografische Lage (B) ist ein nicht gestaltbarer Faktor – ein Land kann seinen Standort nicht wählen."},
 
 {id:"r11", topic:"ebene3", type:"mc", diff:3, tax:"K4",
- img:{src:"img/drei_ebenen_modell.svg", alt:"Drei-Ebenen-Modell des Wirtschaftswachstums"},
+ img:{src:"img/vwl/wachstum/drei_ebenen_modell.svg", alt:"Drei-Ebenen-Modell des Wirtschaftswachstums"},
  q:"Im Drei-Ebenen-Modell beeinflusst die tief liegende Ebene (Institutionen) die beiden oberen Ebenen. Welches Beispiel illustriert diesen Zusammenhang am besten?",
  options:[
    {v:"A", t:"Ein Land mit schwacher Rechtsstaatlichkeit hat wenig ausländische Investitionen, was die Produktivität bremst und das BIP pro Kopf niedrig hält."},
@@ -582,7 +582,7 @@ window.QUESTIONS = [
  explain:"Bei proportionalem Anstieg: 25'000 × 2 = USD 50'000. Tatsächlicher Lohn: USD 27'000. Lohnlücke: 50'000 − 27'000 = USD 23'000. Diese Differenz floss in Kapitalerträge, Managergehälter und Unternehmensgewinne – die Produktivitäts-Lohn-Schere."},
 
 {id:"v13", topic:"verteilung", type:"mc", diff:2, tax:"K2",
- img:{src:"img/elefantengrafik.svg", alt:"Globale Einkommensentwicklung 1988–2008 (vereinfacht)"},
+ img:{src:"img/vwl/wachstum/elefantengrafik.svg", alt:"Globale Einkommensentwicklung 1988–2008 (vereinfacht)"},
  q:"Betrachten Sie die Grafik. Der Bereich B zeigt einen deutlichen Knick nach unten. Welche Bevölkerungsgruppe ist hier betroffen und warum?",
  options:[
    {v:"A", t:"Die westliche untere Mittelschicht – ihre Einkommen stagnierten, weil einfache Arbeit durch Globalisierung und Automatisierung unter Druck geriet."},
@@ -614,7 +614,7 @@ window.QUESTIONS = [
  explain:"Der ökologische Fussabdruck misst den Flächenbedarf für Produktion und Abfallentsorgung. Die Schweiz hat einen Fussabdruck von ca. 5 Hektaren pro Person – lebten alle so, bräuchte es ca. 2,8 Planeten."},
 
 {id:"n03", topic:"nachhaltigkeit", type:"calc", diff:2, tax:"K3",
- img:{src:"img/oekologischer_fussabdruck.svg", alt:"Ökologischer Fussabdruck im Ländervergleich"},
+ img:{src:"img/vwl/wachstum/oekologischer_fussabdruck.svg", alt:"Ökologischer Fussabdruck im Ländervergleich"},
  q:"Der ökologische Fussabdruck der Schweiz beträgt ca. 5 Hektaren pro Einwohner, das Ideal für einen Planeten wäre ca. 1,8 Hektaren. Wie viele Planeten bräuchte es, wenn alle so lebten wie die Schweizer?",
  rows:[
    {label:"Anzahl Planeten (gerundet auf 1 Dezimalstelle)", answer:2.8, tolerance:0.2, unit:"Planeten"}
@@ -699,7 +699,7 @@ window.QUESTIONS = [
  explain:"Richtig. Länder wie die Schweiz, Schweden und Grossbritannien haben in den letzten Jahrzehnten ihr reales BIP gesteigert und gleichzeitig ihre CO₂-Emissionen pro Kopf gesenkt. Allerdings muss man beachten, dass ein Teil der Emissionen ins Ausland «exportiert» wurde (importierte Güter), weshalb die Bilanz bei konsumbasierten Emissionen weniger eindeutig ist."},
 
 {id:"n13", topic:"nachhaltigkeit", type:"mc", diff:1, tax:"K2",
- img:{src:"img/oekologischer_fussabdruck.svg", alt:"Ökologischer Fussabdruck im Ländervergleich"},
+ img:{src:"img/vwl/wachstum/oekologischer_fussabdruck.svg", alt:"Ökologischer Fussabdruck im Ländervergleich"},
  q:"Die Grafik zeigt den ökologischen Fussabdruck verschiedener Länder. Was bedeutet es, wenn der Fussabdruck eines Landes über der gestrichelten Linie (1,8 Hektaren) liegt?",
  options:[
    {v:"A", t:"Das Land verbraucht mehr Ressourcen, als die Erde pro Person dauerhaft bereitstellen kann."},

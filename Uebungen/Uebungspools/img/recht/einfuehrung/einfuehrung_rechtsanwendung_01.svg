@@ -8,7 +8,7 @@
   <!-- Step 1: Sachverhalt -->
   <rect x="50" y="65" width="310" height="90" rx="10" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
   <text x="70" y="92" font-size="13" font-weight="700" fill="#92400e">1.</text>
-  <text x="90" y="92" font-size="15" font-weight="700" fill="#92400e">Sachverhalt feststellen</text>
+  <text x="90" y="92" font-size="15" font-weight="700" fill="#92400e">Schritt 1</text>
   <text x="70" y="115" font-size="12" fill="#78350f">• Was ist passiert?</text>
   <text x="70" y="133" font-size="12" fill="#78350f">• Wer sind die Parteien?</text>
   <text x="70" y="151" font-size="12" fill="#78350f">• Welche Ansprüche?</text>
@@ -16,7 +16,7 @@
   <!-- Step 2: Rechtsregel -->
   <rect x="440" y="65" width="310" height="90" rx="10" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
   <text x="460" y="92" font-size="13" font-weight="700" fill="#1e40af">2.</text>
-  <text x="480" y="92" font-size="15" font-weight="700" fill="#1e40af">Rechtsregel finden</text>
+  <text x="480" y="92" font-size="15" font-weight="700" fill="#1e40af">Schritt 2</text>
   <text x="460" y="115" font-size="12" fill="#1e3a5f">• Welches Gesetz?</text>
   <text x="460" y="133" font-size="12" fill="#1e3a5f">• Welcher Artikel?</text>
   <text x="460" y="151" font-size="12" fill="#1e3a5f">• TBM und RF identifizieren</text>
@@ -36,7 +36,7 @@
   <!-- Step 3: Subsumtion (central, larger) -->
   <rect x="150" y="250" width="500" height="110" rx="12" fill="#fae8ff" stroke="#a855f7" stroke-width="2.5"/>
   <text x="175" y="280" font-size="13" font-weight="700" fill="#7e22ce">3.</text>
-  <text x="195" y="280" font-size="17" font-weight="700" fill="#7e22ce">Subsumtion</text>
+  <text x="195" y="280" font-size="17" font-weight="700" fill="#7e22ce">Schritt 3</text>
   <text x="175" y="308" font-size="13" fill="#581c87">Stimmt der Sachverhalt mit den Tatbestandsmerkmalen überein?</text>
   <text x="175" y="332" font-size="13" fill="#581c87">Jedes TBM einzeln am konkreten Sachverhalt prüfen.</text>
   
@@ -54,7 +54,7 @@
   <!-- Step 4a: Rechtsfolge (if yes) -->
   <rect x="170" y="420" width="260" height="60" rx="10" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
   <text x="190" y="447" font-size="13" font-weight="700" fill="#166534">4.</text>
-  <text x="210" y="447" font-size="15" font-weight="700" fill="#166534">Rechtsfolge tritt ein</text>
+  <text x="210" y="447" font-size="15" font-weight="700" fill="#166534">Schritt 4</text>
   <text x="190" y="470" font-size="12" fill="#14532d">→ Rechtliche Konsequenz bestimmen</text>
 
   <!-- Step 4b: No consequence (if no) -->

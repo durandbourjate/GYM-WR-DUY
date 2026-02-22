@@ -30,21 +30,21 @@
   <line x1="85" y1="295" x2="85" y2="165" class="line"/>
   <!-- Knoten -->
   <rect x="180" y="50" width="140" height="44" rx="10" class="node"/>
-  <text x="250" y="68" class="label">Vollbeschäftigung</text>
+  <text x="250" y="68" class="label">?</text>
   <text x="250" y="83" class="sub">tiefe Arbeitslosigkeit</text>
   <rect x="345" y="143" width="140" height="44" rx="10" class="node"/>
-  <text x="415" y="161" class="label">Preisstabilität</text>
+  <text x="415" y="161" class="label">?</text>
   <text x="415" y="176" class="sub">tiefe Inflation</text>
   <rect x="345" y="273" width="140" height="44" rx="10" class="node"/>
-  <text x="415" y="291" class="label">Wachstum</text>
+  <text x="415" y="291" class="label">?</text>
   <text x="415" y="306" class="sub">steigendes BIP</text>
   <rect x="180" y="368" width="140" height="44" rx="10" class="node"/>
-  <text x="250" y="386" class="label">Umweltqualität</text>
+  <text x="250" y="386" class="label">?</text>
   <text x="250" y="401" class="sub">Nachhaltigkeit</text>
   <rect x="15" y="273" width="140" height="44" rx="10" class="node"/>
-  <text x="85" y="291" class="label">Sozialer Ausgleich</text>
+  <text x="85" y="291" class="label">?</text>
   <text x="85" y="306" class="sub">gerechte Verteilung</text>
   <rect x="15" y="143" width="140" height="44" rx="10" class="node"/>
-  <text x="85" y="161" class="label">Aussenw. Gleichgew.</text>
+  <text x="85" y="161" class="label">?</text>
   <text x="85" y="176" class="sub">ausgeglichene Bilanz</text>
 </svg>

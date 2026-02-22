@@ -6,8 +6,8 @@
   <!-- Flow: left to right -->
   <!-- Step 1 -->
   <rect x="30" y="70" width="150" height="65" rx="8" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
-  <text x="105" y="93" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="12" font-weight="600" fill="#2563eb">Staat verschuldet</text>
-  <text x="105" y="108" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="12" font-weight="600" fill="#2563eb">sich am Kapitalmarkt</text>
+  <text x="105" y="93" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="12" font-weight="600" fill="#2563eb">?</text>
+  <text x="105" y="108" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="12" font-weight="600" fill="#2563eb"></text>
   <text x="105" y="125" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="10" fill="#64748b">(deficit spending)</text>
   
   <!-- Arrow -->
@@ -16,8 +16,8 @@
   
   <!-- Step 2 -->
   <rect x="230" y="70" width="150" height="65" rx="8" fill="#ffedd5" stroke="#ea580c" stroke-width="1.5"/>
-  <text x="305" y="93" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="12" font-weight="600" fill="#ea580c">Nachfrage nach</text>
-  <text x="305" y="108" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="12" font-weight="600" fill="#ea580c">Kapital steigt</text>
+  <text x="305" y="93" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="12" font-weight="600" fill="#ea580c">?</text>
+  <text x="305" y="108" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="12" font-weight="600" fill="#ea580c"></text>
   <text x="305" y="125" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="10" fill="#64748b">Kreditnachfrage ↑</text>
   
   <!-- Arrow -->
@@ -35,8 +35,8 @@
   
   <!-- Step 4 -->
   <rect x="630" y="55" width="150" height="80" rx="8" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
-  <text x="705" y="78" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="12" font-weight="700" fill="#dc2626">Private Investitionen</text>
-  <text x="705" y="95" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="12" font-weight="700" fill="#dc2626">werden verdrängt</text>
+  <text x="705" y="78" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="12" font-weight="700" fill="#dc2626">?</text>
+  <text x="705" y="95" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="12" font-weight="700" fill="#dc2626"></text>
   <text x="705" y="118" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="11" fill="#64748b">I privat ↓</text>
   
   <!-- Result box -->

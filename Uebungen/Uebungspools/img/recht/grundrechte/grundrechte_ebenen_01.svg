@@ -8,7 +8,7 @@
   <rect x="30" y="55" width="640" height="80" rx="10" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
   <text x="55" y="78" font-size="13" font-weight="700" fill="#1e40af">🌍 International: AEMR (1948)</text>
   <text x="55" y="96" font-size="11" fill="#475569">Allgemeine Erklärung der Menschenrechte – 30 Artikel</text>
-  <text x="55" y="112" font-size="11" fill="#475569">Deklaration (nicht direkt rechtsverbindlich) – gemeinsames Ideal aller Völker</text>
+  <text x="55" y="112" font-size="11" fill="#475569">Charakter: ?</text>
   <text x="55" y="128" font-size="10" fill="#94a3b8" font-style="italic">UNO-Generalversammlung, Resolution 217 A (III)</text>
   
   <!-- Arrow -->
@@ -19,8 +19,8 @@
   <!-- Level 2: EMRK (European) -->
   <rect x="70" y="161" width="560" height="80" rx="10" fill="#ecfdf5" stroke="#10b981" stroke-width="1.5"/>
   <text x="95" y="184" font-size="13" font-weight="700" fill="#065f46">🇪🇺 Europäisch: EMRK (1950)</text>
-  <text x="95" y="202" font-size="11" fill="#475569">Europäische Menschenrechtskonvention – rechtsverbindlicher Vertrag</text>
-  <text x="95" y="218" font-size="11" fill="#475569">Durchsetzung: Europäischer Gerichtshof für Menschenrechte (EGMR, Strassburg)</text>
+  <text x="95" y="202" font-size="11" fill="#475569">Charakter: ?</text>
+  <text x="95" y="218" font-size="11" fill="#475569">Durchsetzung: ?</text>
   <text x="95" y="234" font-size="10" fill="#94a3b8" font-style="italic">Europarat – Individualbeschwerde möglich</text>
   
   <!-- Arrow -->
@@ -41,7 +41,7 @@
   <text x="40" y="412" font-size="10" fill="#475569">• Stehen allen Menschen zu</text>
   <text x="40" y="428" font-size="10" fill="#475569">• Angeboren und unveräusserlich</text>
   <text x="40" y="444" font-size="10" fill="#475569">• Universell (weltweit)</text>
-  <text x="40" y="460" font-size="10" fill="#475569">• Moral. & polit. Verpflichtung</text>
+  <text x="40" y="460" font-size="10" fill="#475569">• Moral. &amp; polit. Verpflichtung</text>
   <text x="40" y="476" font-size="10" fill="#475569">• Bsp: AEMR, UNO-Pakte</text>
   
   <rect x="250" y="370" width="200" height="120" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
@@ -57,6 +57,6 @@
   <text x="480" y="412" font-size="10" fill="#475569">• Nur für Staatsangehörige</text>
   <text x="480" y="428" font-size="10" fill="#475569">• An Staatsbürgerschaft</text>
   <text x="480" y="444" font-size="10" fill="#475569">  geknüpft</text>
-  <text x="480" y="460" font-size="10" fill="#475569">• Bsp: Stimm- & Wahlrecht</text>
+  <text x="480" y="460" font-size="10" fill="#475569">• Bsp: Stimm- &amp; Wahlrecht</text>
   <text x="480" y="476" font-size="10" fill="#475569">  (Art. 34 BV)</text>
 </svg>

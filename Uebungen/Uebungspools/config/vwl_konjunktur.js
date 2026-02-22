@@ -635,7 +635,7 @@ window.QUESTIONS = [
   },
   {
     id: "m04", topic: "monetaristen", type: "mc",
-    img: {src: "img/vwl/konjunktur/konjunktur_crowding_out_01.svg", alt: "Der Crowding-Out-Effekt"}, diff: 2, tax: "K2",
+    img: {src: "img/vwl/konjunktur/konjunktur_crowding_out_01.svg", alt: "Wirkungskette einer staatlichen Kreditaufnahme"}, diff: 2, tax: "K2",
     q: "Was versteht man unter dem «Crowding-Out-Effekt», auf den Monetaristen häufig verweisen?",
     options: [
       {v: "A", t: "Staatliche Kreditaufnahme verdrängt private Investitionen, weil sie die Zinsen in die Höhe treibt."},

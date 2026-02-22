@@ -14,9 +14,9 @@
   <!-- Zwei Spalten -->
   <!-- Objektiv: x=60, Subjektiv: x=390 -->
   <rect x="60" y="142" width="290" height="38" rx="5" fill="#bbdefb"/>
-  <text x="205" y="166" font-family="DM Sans, system-ui, sans-serif" font-size="13" fill="#1a1a1a" text-anchor="middle">Objektiv: Täter, Handlung, Erfolg, Kausalität</text>
+  <text x="205" y="166" font-family="DM Sans, system-ui, sans-serif" font-size="13" fill="#1a1a1a" text-anchor="middle">Objektiv: ?</text>
   <rect x="370" y="142" width="290" height="38" rx="5" fill="#bbdefb"/>
-  <text x="515" y="166" font-family="DM Sans, system-ui, sans-serif" font-size="13" fill="#1a1a1a" text-anchor="middle">Subjektiv: Vorsatz oder Fahrlässigkeit</text>
+  <text x="515" y="166" font-family="DM Sans, system-ui, sans-serif" font-size="13" fill="#1a1a1a" text-anchor="middle">Subjektiv: ?</text>
 
   <!-- Pfeil 1→2 -->
   <line x1="360" y1="190" x2="360" y2="230" stroke="#888" stroke-width="2" marker-end="url(#arrowDown)"/>

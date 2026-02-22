@@ -25,7 +25,7 @@
   <!-- Segment 2: Indirekte Steuern 25% = 90° -->
   <path d="M 190,175 L 94.72,230.28 A 110,110 0 0,1 112.18,86.55 Z" fill="#01a9f4" opacity="0.85"/>
   
-  <!-- Segment 3: Gebühren & übrige 15% = 54° -->
+  <!-- Segment 3: Gebuehren und uebrige 15% = 54° -->
   <path d="M 190,175 L 112.18,86.55 A 110,110 0 0,1 190,65 Z" fill="#73ab2c" opacity="0.85"/>
   
   <!-- Percentage labels on pie -->
@@ -48,6 +48,6 @@
     <text x="20" y="82" font-size="9" fill="#94a3b8">Stempelsteuer)</text>
     
     <rect x="0" y="96" width="14" height="14" rx="3" fill="#73ab2c" opacity="0.85"/>
-    <text x="20" y="108" font-size="11" font-weight="500">Gebühren & übrige</text>
+    <text x="20" y="108" font-size="11" font-weight="500">Gebühren &amp; übrige</text>
   </g>
 </svg>

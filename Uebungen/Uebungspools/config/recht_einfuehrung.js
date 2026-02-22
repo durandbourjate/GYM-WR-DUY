@@ -275,7 +275,7 @@ window.QUESTIONS = [
 // --- diff 1 ---
 {
   id: "s01", topic: "rechtsstaat", type: "mc", diff: 1, tax: "K1",
-  img: {src: "img/recht/einfuehrung/einfuehrung_rechtsstaat_01.svg", alt: "Diagramm: Vom Gewaltmonopol zum Rechtsstaat – drei Säulen"},
+  img: {src: "img/recht/einfuehrung/einfuehrung_rechtsstaat_01.svg", alt: "Diagramm: Vom Gewaltmonopol zum Rechtsstaat"},
   q: "Welchen drei Grundsätzen verpflichtet sich ein Rechtsstaat?",
   options: [
     {v: "A", t: "Legalitätsprinzip, Gewaltenteilung und Schutz der Grundrechte."},

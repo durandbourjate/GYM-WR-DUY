@@ -5,7 +5,7 @@
   <rect x="80" y="50" width="490" height="50" rx="4" fill="#e2e8f0"/>
   <!-- Soziale Wohlfahrt 30% = 147px -->
   <rect x="80" y="50" width="147" height="50" rx="4" fill="#ef4444"/>
-  <!-- Finanzen & Steuern 14% = 69px -->
+  <!-- Finanzen und Steuern 14% = 69px -->
   <rect x="227" y="50" width="69" height="50" fill="#f97316"/>
   <!-- Verkehr 14% = 69px -->
   <rect x="296" y="50" width="69" height="50" fill="#eab308"/>

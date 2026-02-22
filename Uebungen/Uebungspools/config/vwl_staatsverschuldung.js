@@ -411,7 +411,7 @@ window.QUESTIONS = [
 
 {id:"g05", topic:"gefahren", type:"mc", diff:2, tax:"K2",
  q:"Was versteht man unter dem 'Schneeballeffekt' der Staatsverschuldung?",
- img:{src:"img/vwl/staatsverschuldung/schneeballeffekt.svg", alt:"Der Schneeballeffekt der Staatsverschuldung"},
+ img:{src:"img/vwl/staatsverschuldung/schneeballeffekt.svg", alt:"Kreislaufdiagramm: Selbstverstärkende Dynamik der Staatsverschuldung"},
  options:[
    {v:"A", t:"Steigende Schulden führen zu höherer Zinslast, die nur durch neue Schulden finanzierbar ist."},
    {v:"B", t:"Die Schulden schmelzen im Aufschwung wie Schnee in der Sonne."},
@@ -480,7 +480,7 @@ window.QUESTIONS = [
 
 {id:"r02", topic:"richtlinien", type:"fill", diff:1, tax:"K1",
  q:"Die Schweizer {0} ist in der Verfassung verankert. Sie besagt, dass über einen gesamten {1} die Staatseinnahmen und Staatsausgaben ausgeglichen sein müssen.",
- img:{src:"img/vwl/staatsverschuldung/schuldenbremse_mechanismus.svg", alt:"Funktionsweise der Schweizer Schuldenbremse"},
+ img:{src:"img/vwl/staatsverschuldung/schuldenbremse_mechanismus.svg", alt:"Mechanismus einer fiskalischen Regel über den Konjunkturverlauf"},
  blanks:[
    {answer:"Schuldenbremse", alts:[]},
    {answer:"Konjunkturzyklus", alts:["Konjunkturzyklus hinweg"]}

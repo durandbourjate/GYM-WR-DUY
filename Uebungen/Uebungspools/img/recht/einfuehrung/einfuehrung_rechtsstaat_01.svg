@@ -25,7 +25,7 @@
 
   <!-- Pillar 1: Legalitätsprinzip -->
   <rect x="30" y="240" width="230" height="140" rx="10" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
-  <text x="145" y="270" text-anchor="middle" font-size="16" font-weight="700" fill="#2563eb">Legalitätsprinzip</text>
+  <text x="145" y="270" text-anchor="middle" font-size="16" font-weight="700" fill="#2563eb">?</text>
   <text x="145" y="292" text-anchor="middle" font-size="12" fill="#1e40af">Art. 5 Abs. 1 BV</text>
   <line x1="60" y1="305" x2="230" y2="305" stroke="#dbeafe" stroke-width="1"/>
   <text x="145" y="325" text-anchor="middle" font-size="12" fill="#374151">Staat muss sich an</text>
@@ -34,7 +34,7 @@
 
   <!-- Pillar 2: Gewaltenteilung -->
   <rect x="285" y="240" width="230" height="140" rx="10" fill="#fefce8" stroke="#ca8a04" stroke-width="2"/>
-  <text x="400" y="270" text-anchor="middle" font-size="16" font-weight="700" fill="#ca8a04">Gewaltenteilung</text>
+  <text x="400" y="270" text-anchor="middle" font-size="16" font-weight="700" fill="#ca8a04">?</text>
   <text x="400" y="292" text-anchor="middle" font-size="12" fill="#854d0e">Drei Gewalten</text>
   <line x1="315" y1="305" x2="485" y2="305" stroke="#fef9c3" stroke-width="1"/>
   <text x="400" y="325" text-anchor="middle" font-size="12" fill="#374151">Macht aufteilen auf</text>
@@ -43,7 +43,7 @@
 
   <!-- Pillar 3: Grundrechte -->
   <rect x="540" y="240" width="230" height="140" rx="10" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/>
-  <text x="655" y="270" text-anchor="middle" font-size="16" font-weight="700" fill="#16a34a">Grundrechte</text>
+  <text x="655" y="270" text-anchor="middle" font-size="16" font-weight="700" fill="#16a34a">?</text>
   <text x="655" y="292" text-anchor="middle" font-size="12" fill="#166534">Art. 7–36 BV</text>
   <line x1="570" y1="305" x2="740" y2="305" stroke="#dcfce7" stroke-width="1"/>
   <text x="655" y="325" text-anchor="middle" font-size="12" fill="#374151">Schützen den Einzelnen</text>
