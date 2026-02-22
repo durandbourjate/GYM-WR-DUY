@@ -232,8 +232,38 @@ body{min-height:auto!important;background:#fff!important}
 .q-bottom-row{display:flex;justify-content:space-between;align-items:center;margin-top:16px;padding-top:14px;border-top:1px solid var(--c-border)}
 .btn-end{background:none;border:none;color:var(--c-text-soft);font-size:.78rem;cursor:pointer;padding:4px 8px;border-radius:6px;transition:.15s;font-family:inherit}
 .btn-end:hover{background:var(--c-bg);color:var(--c-text)}
-.btn-report{background:none;border:none;color:var(--c-text-soft);font-size:.78rem;cursor:pointer;padding:4px 8px;border-radius:6px;transition:.15s;font-family:inherit}
+.btn-{background:none;border:none;color:var(--c-text-soft);font-size:.78rem;cursor:pointer;padding:4px 8px;border-radius:6px;transition:.15s;font-family:inherit}
 .btn-report:hover{background:var(--c-bg);color:var(--c-text)}
+/* ═══ REPORT MODAL ═══ */
+.report-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:300;display:none;align-items:center;justify-content:center;padding:16px}
+.report-overlay.active{display:flex}
+.report-modal{background:var(--c-surface);border-radius:var(--radius);max-width:440px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,.2);overflow:hidden;animation:reportSlide .2s ease}
+@keyframes reportSlide{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.report-modal-header{padding:16px 20px;border-bottom:1px solid var(--c-border);display:flex;align-items:center;justify-content:space-between}
+.report-modal-header h3{font-size:1rem;font-weight:700}
+.report-modal-close{background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--c-text-soft);padding:4px 8px;border-radius:6px;line-height:1}
+.report-modal-close:hover{background:var(--c-bg);color:var(--c-text)}
+.report-modal-body{padding:20px}
+.report-meta{font-size:.78rem;color:var(--c-text-soft);margin-bottom:16px;padding:10px 12px;background:var(--c-bg);border-radius:8px;line-height:1.6}
+.report-meta strong{color:var(--c-text);font-weight:600}
+.report-label{font-size:.85rem;font-weight:600;margin-bottom:8px;color:var(--c-text)}
+.report-cats{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.report-cat{padding:8px 14px;border-radius:20px;font-size:.82rem;font-weight:500;cursor:pointer;border:2px solid var(--c-border);background:var(--c-surface);transition:.15s;user-select:none}
+.report-cat:hover{border-color:var(--c-primary-light)}
+.report-cat.active{background:var(--c-primary);color:#fff;border-color:var(--c-primary)}
+.report-textarea{width:100%;min-height:70px;padding:10px 12px;border:2px solid var(--c-border);border-radius:8px;font-family:inherit;font-size:.88rem;line-height:1.5;resize:vertical;outline:none;background:var(--c-surface);color:var(--c-text)}
+.report-textarea:focus{border-color:var(--c-primary)}
+.report-textarea::placeholder{color:var(--c-text-soft)}
+.report-actions{display:flex;gap:10px;margin-top:16px}
+.report-actions .btn{flex:1}
+.report-success{text-align:center;padding:24px 20px}
+.report-success .success-icon{font-size:2rem;margin-bottom:8px}
+.report-success p{font-size:.9rem;color:var(--c-text-soft)}
+.report-error{font-size:.82rem;color:var(--c-error);margin-top:8px;display:none}
+html.dark .report-modal{background:var(--c-surface)}
+html.dark .report-meta{background:var(--c-bg)}
+html.dark .report-cat{background:var(--c-surface)}
+html.dark .report-textarea{background:var(--c-bg);border-color:var(--c-border);color:var(--c-text)}
 html.dark .mode-card{background:var(--c-surface)}
 html.dark .mode-card.active{background:var(--c-info-bg)}
 .theme-toggle{display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;background:rgba(255,255,255,.2);border:none;color:#fff;font-size:1.15rem;cursor:pointer;flex-shrink:0;transition:.15s;padding:0;line-height:1}
@@ -813,30 +843,92 @@ document.addEventListener('keydown',function(e){
 });
 
 // ══════════════════════════════════════════
-// REPORT PROBLEM — Google Form
-// Opens pre-filled Google Form in new tab.
+// REPORT PROBLEM — In-App Modal + Google Apps Script
+// Shows a modal inside the pool, sends data to Apps Script → Google Sheet.
 // ══════════════════════════════════════════
 const REPORT_CONFIG={
-  url:'https://docs.google.com/forms/d/e/1FAIpQLSdmNapzDvTsJeRNqxbM7_TjzG2YE_DJUWXgifPOG2Oc4mzjDQ/viewform',
-  e:{
-    pool:'entry.122865322',
-    qid:'entry.2142422105',
-    topic:'entry.1356876520',
-    text:'entry.1353239356',
-  }
+  // ══ DEINE APPS-SCRIPT-URL HIER EINTRAGEN: ══
+  endpoint:'https://script.google.com/macros/s/https://script.google.com/macros/s/AKfycbyRxuwl3KJ91wZofPBw7TsezSlLF_YcbfqrlpB8CDljYu64RrMl5H8zlnmqKE-s6ULnMQ/exec/exec',
+  categories:['Fachlicher Fehler','Technisches Problem','Unklar formuliert','Anderes']
 };
+var _reportQid=null;
+
 function showReport(qid){
   const q=QUESTIONS.find(x=>x.id===qid);
   if(!q)return;
-  const poolId=new URLSearchParams(window.location.search).get('pool')||'';
-  const p=new URLSearchParams({
-    usp:'pp_url',
-    [REPORT_CONFIG.e.pool]:POOL_META.title+' ('+poolId+')',
-    [REPORT_CONFIG.e.qid]:q.id,
-    [REPORT_CONFIG.e.topic]:TOPICS[q.topic]?TOPICS[q.topic].short:q.topic,
-    [REPORT_CONFIG.e.text]:q.q.replace(/<[^>]*>/g,'').substring(0,150),
+  _reportQid=qid;
+  var poolId=new URLSearchParams(window.location.search).get('pool')||'';
+  var topicLabel=TOPICS[q.topic]?(TOPICS[q.topic].short||TOPICS[q.topic].label):q.topic;
+  var qText=q.q.replace(/<[^>]*>/g,'').substring(0,120);
+  // Build meta info
+  document.getElementById('reportMeta').innerHTML=
+    '<strong>Pool:</strong> '+POOL_META.title+' ('+poolId+')<br>'+
+    '<strong>Frage:</strong> '+q.id+' — '+topicLabel+'<br>'+
+    '<strong>Text:</strong> '+qText+(q.q.replace(/<[^>]*>/g,'').length>120?'…':'');
+  // Reset state
+  document.querySelectorAll('.report-cat').forEach(function(c){c.classList.remove('active')});
+  document.getElementById('reportComment').value='';
+  document.getElementById('reportError').style.display='none';
+  document.getElementById('reportForm').style.display='block';
+  document.getElementById('reportDone').style.display='none';
+  document.getElementById('reportSendBtn').disabled=false;
+  document.getElementById('reportSendBtn').textContent='📨 Senden';
+  // Show overlay
+  document.getElementById('reportOverlay').classList.add('active');
+}
+
+function closeReport(){
+  document.getElementById('reportOverlay').classList.remove('active');
+  _reportQid=null;
+}
+
+function selectReportCat(el){
+  document.querySelectorAll('.report-cat').forEach(function(c){c.classList.remove('active')});
+  el.classList.add('active');
+}
+
+function sendReport(){
+  var cat=document.querySelector('.report-cat.active');
+  if(!cat){
+    document.getElementById('reportError').textContent='Bitte wähle eine Kategorie.';
+    document.getElementById('reportError').style.display='block';
+    return;
+  }
+  var q=QUESTIONS.find(function(x){return x.id===_reportQid});
+  if(!q){closeReport();return}
+  var poolId=new URLSearchParams(window.location.search).get('pool')||'';
+  var topicLabel=TOPICS[q.topic]?(TOPICS[q.topic].short||TOPICS[q.topic].label):q.topic;
+
+  var payload={
+    pool:POOL_META.title+' ('+poolId+')',
+    qid:q.id,
+    topic:topicLabel,
+    text:q.q.replace(/<[^>]*>/g,'').substring(0,200),
+    category:cat.textContent.trim(),
+    comment:document.getElementById('reportComment').value.trim()
+  };
+
+  var btn=document.getElementById('reportSendBtn');
+  btn.disabled=true;
+  btn.textContent='Wird gesendet…';
+  document.getElementById('reportError').style.display='none';
+
+  fetch(REPORT_CONFIG.endpoint,{
+    method:'POST',
+    mode:'no-cors',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(payload)
+  }).then(function(){
+    // no-cors → response is opaque, but data was sent
+    document.getElementById('reportForm').style.display='none';
+    document.getElementById('reportDone').style.display='block';
+    setTimeout(closeReport,1800);
+  }).catch(function(err){
+    document.getElementById('reportError').textContent='Senden fehlgeschlagen. Bitte versuche es nochmals.';
+    document.getElementById('reportError').style.display='block';
+    btn.disabled=false;
+    btn.textContent='📨 Senden';
   });
-  window.open(REPORT_CONFIG.url+'?'+p.toString(),'_blank');
 }
 
 // ══════════════════════════════════════════
@@ -1456,9 +1548,42 @@ function formatLernziel(text) {
   return text;
 }
 document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') { closeMini(); closeFullModal(); }
+  if (e.key === 'Escape') { closeMini(); closeFullModal(); closeReport(); }
 });
 </script>
+
+<!-- REPORT — In-App Modal -->
+<div class="report-overlay" id="reportOverlay" onclick="if(event.target===this)closeReport()">
+  <div class="report-modal">
+    <div class="report-modal-header">
+      <h3>⚠️ Problem melden</h3>
+      <button class="report-modal-close" onclick="closeReport()">&times;</button>
+    </div>
+    <div class="report-modal-body">
+      <div id="reportForm">
+        <div class="report-meta" id="reportMeta"></div>
+        <div class="report-label">Kategorie *</div>
+        <div class="report-cats">
+          <span class="report-cat" onclick="selectReportCat(this)">Fachlicher Fehler</span>
+          <span class="report-cat" onclick="selectReportCat(this)">Technisches Problem</span>
+          <span class="report-cat" onclick="selectReportCat(this)">Unklar formuliert</span>
+          <span class="report-cat" onclick="selectReportCat(this)">Anderes</span>
+        </div>
+        <div class="report-label">Beschreibung (optional)</div>
+        <textarea class="report-textarea" id="reportComment" placeholder="Was genau ist das Problem?" maxlength="500"></textarea>
+        <div class="report-error" id="reportError"></div>
+        <div class="report-actions">
+          <button class="btn btn-outline" onclick="closeReport()">Abbrechen</button>
+          <button class="btn btn-primary" id="reportSendBtn" onclick="sendReport()">📨 Senden</button>
+        </div>
+      </div>
+      <div class="report-success" id="reportDone" style="display:none">
+        <div class="success-icon">✅</div>
+        <p><strong>Vielen Dank!</strong><br>Deine Meldung wurde gesendet.</p>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- LERNZIELE — Mini-Modal (Topic-Lernziele) -->
 <div class="lz-mini-overlay" id="lzMiniOverlay" onclick="if(event.target===this)closeMini()">
