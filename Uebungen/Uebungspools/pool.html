@@ -848,7 +848,7 @@ document.addEventListener('keydown',function(e){
 // ══════════════════════════════════════════
 const REPORT_CONFIG={
   // ══ DEINE APPS-SCRIPT-URL HIER EINTRAGEN: ══
-  endpoint:'https://docs.google.com/spreadsheets/d/1WvV1Oz0q9J-UkmBHuawLY7fJ_ddtzf8nhavsD6wruAE/edit?usp=sharing',
+  endpoint:'https://script.google.com/macros/s/AKfycbw46sH_lj9uH9f1C6olplv2PMhTUHU9i1LELin2GDO4a2N8S5adX4CzUyATO0jQW4Yuvw/exec',
   categories:['Fachlicher Fehler','Technisches Problem','Unklar formuliert','Anderes']
 };
 var _reportQid=null;
@@ -913,10 +913,9 @@ function sendReport(){
   btn.textContent='Wird gesendet…';
   document.getElementById('reportError').style.display='none';
 
-  // GET-Request via Image-Ping — einfachste Cross-Origin Methode
+  // GET-Request via Image-Ping — zuverlässigste Cross-Origin Methode
   var img=new Image();
   img.onload=img.onerror=function(){
-    // Apps Script antwortet mit HTML, daher feuert onerror — aber Daten sind trotzdem angekommen
     document.getElementById('reportForm').style.display='none';
     document.getElementById('reportDone').style.display='block';
     setTimeout(closeReport,1800);
