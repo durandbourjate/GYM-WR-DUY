@@ -13,6 +13,7 @@ window.POOL_META = {
     "Ich kann die Aufgaben und Grundsätze der Finanzbuchhaltung erklären. (K2)",
     "Ich kann eine korrekt gegliederte Bilanz erstellen und die Bilanzgleichung anwenden. (K3)",
     "Ich kann Geschäftsfälle in Buchungssätze übersetzen und auf T-Konten verbuchen. (K3)",
+    "Ich kann die vier Kontentypen (Aktiv, Passiv, Aufwand, Ertrag) unterscheiden und ihre Buchungsregeln anwenden. (K3)",
     "Ich kann die Erfolgsrechnung (ein- und zweistufig) erstellen und den Jahreserfolg ermitteln. (K3)",
     "Ich kann die Konten des Eigentümers (Eigenkapital, Privat) korrekt führen. (K3)",
     "Ich kann Warenkonten inkl. Bestandesänderung führen und die dreistufige Erfolgsrechnung erstellen. (K3)",
@@ -33,6 +34,12 @@ window.TOPICS = {
     "Ich kann eine Bilanz aus gegebenen Konten korrekt erstellen. (K3)",
     "Ich kann das Inventar als Grundlage der Bilanz erklären. (K2)",
     "Ich kann das Niederstwertprinzip bei der Bewertung von Aktiven anwenden. (K3)"
+  ]},
+  "kontentypen":       {label: "Die vier Kontentypen – Zu- und Abnahmen", short: "Kontentypen", lernziele: [
+    "Ich kann die vier Kontentypen (Aktivkonto, Passivkonto, Aufwandkonto, Ertragskonto) unterscheiden. (K2)",
+    "Ich kann für jeden Kontentyp angeben, auf welcher Seite (Soll/Haben) Zunahmen und Abnahmen stehen. (K3)",
+    "Ich kann konkrete Konten dem richtigen Kontentyp zuordnen. (K2)",
+    "Ich kann bei einem Geschäftsfall bestimmen, welches Konto im Soll und welches im Haben steht. (K3)"
   ]},
   "buchungssatz":      {label: "Buchungssätze & Bilanzkonten", short: "Buchungssätze", lernziele: [
     "Ich kann Geschäftsfälle in korrekte Buchungssätze (Soll an Haben) übersetzen. (K3)",
@@ -349,6 +356,372 @@ window.QUESTIONS = [
   },
 
   // ============================================================
+  // TOPIC: kontentypen – Die vier Kontentypen
+  // ============================================================
+
+  {
+    id: "k01", topic: "kontentypen", type: "mc", diff: 1, tax: "K1",
+    img: {src: "img/bwl/fibu/fibu_kontentypen_01.svg", alt: "Übersicht der vier Kontentypen mit T-Konto-Darstellung"},
+    q: "Welche vier Kontentypen gibt es in der doppelten Buchhaltung?",
+    options: [
+      {v: "A", t: "Aktivkonten, Passivkonten, Aufwandkonten, Ertragskonten"},
+      {v: "B", t: "Soll-Konten, Haben-Konten, Journal-Konten, Bilanzkonten"},
+      {v: "C", t: "Bargeldkonten, Kreditkonten, Gewinnkonten, Verlustkonten"},
+      {v: "D", t: "Eröffnungskonten, Schlusskonten, Erfolgskonten, Bilanzkonten"}
+    ],
+    correct: "A",
+    explain: "Die vier Kontentypen sind: Aktivkonten (Vermögen), Passivkonten (Fremd- und Eigenkapital), Aufwandkonten (Werteverzehr) und Ertragskonten (Wertezuwachs). Aktiv- und Passivkonten sind Bilanzkonten, Aufwand- und Ertragskonten sind Erfolgskonten."
+  },
+  {
+    id: "k02", topic: "kontentypen", type: "mc", diff: 1, tax: "K2",
+    q: "Auf welcher Seite stehen Zunahmen bei einem Aktivkonto?",
+    options: [
+      {v: "A", t: "Im Haben (rechts)"},
+      {v: "B", t: "Im Soll (links)"},
+      {v: "C", t: "Im Soll oder im Haben – je nach Geschäftsfall"},
+      {v: "D", t: "Aktivkonten haben keine festen Seiten"}
+    ],
+    correct: "B",
+    explain: "Bei Aktivkonten stehen Zunahmen im Soll (links) und Abnahmen im Haben (rechts). Der Anfangsbestand steht ebenfalls im Soll."
+  },
+  {
+    id: "k03", topic: "kontentypen", type: "mc", diff: 1, tax: "K2",
+    q: "Auf welcher Seite stehen Zunahmen bei einem Passivkonto?",
+    options: [
+      {v: "A", t: "Im Soll (links)"},
+      {v: "B", t: "Im Haben (rechts)"},
+      {v: "C", t: "Im Soll und im Haben gleichzeitig"},
+      {v: "D", t: "Passivkonten haben nur eine Sollseite"}
+    ],
+    correct: "B",
+    explain: "Bei Passivkonten stehen Zunahmen im Haben (rechts) und Abnahmen im Soll (links). Der Anfangsbestand steht ebenfalls im Haben. Passivkonten verhalten sich spiegelbildlich zu Aktivkonten."
+  },
+  {
+    id: "k04", topic: "kontentypen", type: "fill", diff: 1, tax: "K2",
+    q: "Aufwandkonten nehmen auf der {0}-Seite zu, Ertragskonten nehmen auf der {1}-Seite zu.",
+    blanks: [
+      {answer: "Soll", alts: ["linken"]},
+      {answer: "Haben", alts: ["rechten"]}
+    ],
+    explain: "Aufwandkonten verhalten sich wie Aktivkonten: Zunahmen im Soll (links). Ertragskonten verhalten sich wie Passivkonten: Zunahmen im Haben (rechts)."
+  },
+  {
+    id: "k05", topic: "kontentypen", type: "tf", diff: 1, tax: "K2",
+    q: "Aufwandkonten verhalten sich bezüglich Soll und Haben gleich wie Aktivkonten.",
+    correct: true,
+    explain: "Richtig. Sowohl Aktiv- als auch Aufwandkonten nehmen auf der Sollseite (links) zu und auf der Habenseite (rechts) ab. Merksatz: Aktiv- und Aufwandkonten sind «Soll-Konten»."
+  },
+  {
+    id: "k06", topic: "kontentypen", type: "tf", diff: 1, tax: "K2",
+    q: "Ertragskonten verhalten sich bezüglich Soll und Haben gleich wie Passivkonten.",
+    correct: true,
+    explain: "Richtig. Sowohl Passiv- als auch Ertragskonten nehmen auf der Habenseite (rechts) zu und auf der Sollseite (links) ab. Merksatz: Passiv- und Ertragskonten sind «Haben-Konten»."
+  },
+  {
+    id: "k07", topic: "kontentypen", type: "mc", diff: 1, tax: "K2",
+    q: "Zu welchem Kontentyp gehört das Konto «Bank»?",
+    options: [
+      {v: "A", t: "Passivkonto"},
+      {v: "B", t: "Aktivkonto"},
+      {v: "C", t: "Aufwandkonto"},
+      {v: "D", t: "Ertragskonto"}
+    ],
+    correct: "B",
+    explain: "Das Bankkonto zeigt das Guthaben des Unternehmens bei der Bank. Es gehört zum Vermögen → Aktivkonto."
+  },
+  {
+    id: "k08", topic: "kontentypen", type: "mc", diff: 1, tax: "K2",
+    q: "Zu welchem Kontentyp gehört das Konto «Kreditoren»?",
+    options: [
+      {v: "A", t: "Aktivkonto"},
+      {v: "B", t: "Aufwandkonto"},
+      {v: "C", t: "Passivkonto"},
+      {v: "D", t: "Ertragskonto"}
+    ],
+    correct: "C",
+    explain: "Kreditoren sind Verbindlichkeiten gegenüber Lieferanten. Sie stehen auf der rechten Bilanzseite → Passivkonto."
+  },
+  {
+    id: "k09", topic: "kontentypen", type: "mc", diff: 1, tax: "K2",
+    q: "Zu welchem Kontentyp gehört das Konto «Lohnaufwand»?",
+    options: [
+      {v: "A", t: "Aktivkonto"},
+      {v: "B", t: "Passivkonto"},
+      {v: "C", t: "Ertragskonto"},
+      {v: "D", t: "Aufwandkonto"}
+    ],
+    correct: "D",
+    explain: "Lohnaufwand erfasst die Kosten für Mitarbeiterlöhne. Löhne sind Werteverzehr → Aufwandkonto."
+  },
+  {
+    id: "k10", topic: "kontentypen", type: "mc", diff: 1, tax: "K2",
+    q: "Zu welchem Kontentyp gehört das Konto «Warenverkauf»?",
+    options: [
+      {v: "A", t: "Aktivkonto"},
+      {v: "B", t: "Ertragskonto"},
+      {v: "C", t: "Aufwandkonto"},
+      {v: "D", t: "Passivkonto"}
+    ],
+    correct: "B",
+    explain: "Warenverkauf erfasst die Erlöse aus dem Verkauf von Waren. Erlöse sind Wertezuwachs → Ertragskonto."
+  },
+  {
+    id: "k11", topic: "kontentypen", type: "multi", diff: 1, tax: "K2",
+    q: "Welche der folgenden Konten sind Aktivkonten? (Mehrere Antworten möglich.)",
+    options: [
+      {v: "A", t: "Kasse"},
+      {v: "B", t: "Hypothek"},
+      {v: "C", t: "Debitoren"},
+      {v: "D", t: "Fahrzeuge"}
+    ],
+    correct: ["A", "C", "D"],
+    explain: "Kasse, Debitoren und Fahrzeuge gehören zum Vermögen des Unternehmens → Aktivkonten. Die Hypothek ist eine langfristige Schuld → Passivkonto."
+  },
+  {
+    id: "k12", topic: "kontentypen", type: "multi", diff: 1, tax: "K2",
+    q: "Welche der folgenden Konten sind Passivkonten? (Mehrere Antworten möglich.)",
+    options: [
+      {v: "A", t: "Kreditoren"},
+      {v: "B", t: "Eigenkapital"},
+      {v: "C", t: "Warenvorrat"},
+      {v: "D", t: "Darlehen"}
+    ],
+    correct: ["A", "B", "D"],
+    explain: "Kreditoren (kurzfristiges FK), Eigenkapital und Darlehen (langfristiges FK) stehen auf der Passivseite der Bilanz → Passivkonten. Der Warenvorrat gehört zum Vermögen → Aktivkonto."
+  },
+  {
+    id: "k13", topic: "kontentypen", type: "mc", diff: 2, tax: "K3",
+    q: "Das Konto «Debitoren» nimmt ab. Auf welcher Seite wird diese Abnahme gebucht?",
+    options: [
+      {v: "A", t: "Im Soll, weil Abnahmen bei allen Konten im Soll stehen"},
+      {v: "B", t: "Im Haben, weil Debitoren ein Aktivkonto ist und Abnahmen bei Aktivkonten im Haben stehen"},
+      {v: "C", t: "Im Soll, weil Debitoren ein Passivkonto ist"},
+      {v: "D", t: "Im Haben, weil eine Abnahme immer eine Gutschrift ist"}
+    ],
+    correct: "B",
+    explain: "Debitoren ist ein Aktivkonto. Bei Aktivkonten stehen Abnahmen im Haben (rechts). Beispiel: Ein Kunde bezahlt seine Rechnung → Bank (Soll) an Debitoren (Haben)."
+  },
+  {
+    id: "k14", topic: "kontentypen", type: "mc", diff: 2, tax: "K3",
+    q: "Das Konto «Hypothek» nimmt ab (Teilrückzahlung). Auf welcher Seite wird diese Abnahme gebucht?",
+    options: [
+      {v: "A", t: "Im Haben, weil Hypothek ein Passivkonto ist"},
+      {v: "B", t: "Im Soll, weil Hypothek ein Passivkonto ist und Abnahmen bei Passivkonten im Soll stehen"},
+      {v: "C", t: "Im Haben, weil Rückzahlungen immer im Haben gebucht werden"},
+      {v: "D", t: "Im Soll, weil alle Abnahmen im Soll stehen"}
+    ],
+    correct: "B",
+    explain: "Hypothek ist ein Passivkonto. Bei Passivkonten stehen Abnahmen im Soll (links). Buchungssatz: Hypothek (Soll) an Bank (Haben)."
+  },
+  {
+    id: "k15", topic: "kontentypen", type: "mc", diff: 2, tax: "K3",
+    q: "Das Konto «Mietaufwand» nimmt zu (Miete wird bezahlt). Auf welcher Seite wird die Zunahme gebucht?",
+    options: [
+      {v: "A", t: "Im Haben, weil Ausgaben immer im Haben stehen"},
+      {v: "B", t: "Im Soll, weil Aufwandkonten im Soll zunehmen"},
+      {v: "C", t: "Im Haben, weil Mietaufwand ein Passivkonto ist"},
+      {v: "D", t: "Im Soll, weil alle Konten im Soll zunehmen"}
+    ],
+    correct: "B",
+    explain: "Mietaufwand ist ein Aufwandkonto. Aufwandkonten nehmen im Soll (links) zu – genau wie Aktivkonten."
+  },
+  {
+    id: "k16", topic: "kontentypen", type: "mc", diff: 2, tax: "K3",
+    q: "Das Konto «Honorarertrag» nimmt zu (Rechnung an Kunden). Auf welcher Seite wird die Zunahme gebucht?",
+    options: [
+      {v: "A", t: "Im Soll, weil Einnahmen immer im Soll stehen"},
+      {v: "B", t: "Im Haben, weil Ertragskonten im Haben zunehmen"},
+      {v: "C", t: "Im Soll, weil alle Zunahmen im Soll stehen"},
+      {v: "D", t: "Im Haben, weil Honorarertrag ein Aktivkonto ist"}
+    ],
+    correct: "B",
+    explain: "Honorarertrag ist ein Ertragskonto. Ertragskonten nehmen im Haben (rechts) zu – genau wie Passivkonten."
+  },
+  {
+    id: "k17", topic: "kontentypen", type: "fill", diff: 2, tax: "K3",
+    q: "Das Konto «Kreditoren» nimmt zu (neue Lieferantenrechnung). Die Zunahme wird im {0} gebucht, weil Kreditoren ein {1} ist.",
+    blanks: [
+      {answer: "Haben", alts: ["rechts"]},
+      {answer: "Passivkonto", alts: ["passives Konto"]}
+    ],
+    explain: "Kreditoren ist ein Passivkonto. Bei Passivkonten stehen Zunahmen im Haben (rechts)."
+  },
+  {
+    id: "k18", topic: "kontentypen", type: "fill", diff: 2, tax: "K3",
+    q: "Das Konto «Fahrzeuge» nimmt zu (Kauf eines Lieferwagens). Die Zunahme wird im {0} gebucht, weil Fahrzeuge ein {1} ist.",
+    blanks: [
+      {answer: "Soll", alts: ["links"]},
+      {answer: "Aktivkonto", alts: ["aktives Konto"]}
+    ],
+    explain: "Fahrzeuge ist ein Aktivkonto. Bei Aktivkonten stehen Zunahmen im Soll (links)."
+  },
+  {
+    id: "k19", topic: "kontentypen", type: "multi", diff: 2, tax: "K2",
+    q: "Bei welchen Kontentypen stehen Zunahmen im Soll (links)? (Mehrere Antworten möglich.)",
+    options: [
+      {v: "A", t: "Aktivkonten"},
+      {v: "B", t: "Passivkonten"},
+      {v: "C", t: "Aufwandkonten"},
+      {v: "D", t: "Ertragskonten"}
+    ],
+    correct: ["A", "C"],
+    explain: "Aktivkonten und Aufwandkonten nehmen im Soll (links) zu. Passivkonten und Ertragskonten nehmen im Haben (rechts) zu. Merksatz: Aktiv/Aufwand = Soll-Zunahme, Passiv/Ertrag = Haben-Zunahme."
+  },
+  {
+    id: "k20", topic: "kontentypen", type: "multi", diff: 2, tax: "K2",
+    q: "Bei welchen Kontentypen stehen Zunahmen im Haben (rechts)? (Mehrere Antworten möglich.)",
+    options: [
+      {v: "A", t: "Aktivkonten"},
+      {v: "B", t: "Passivkonten"},
+      {v: "C", t: "Aufwandkonten"},
+      {v: "D", t: "Ertragskonten"}
+    ],
+    correct: ["B", "D"],
+    explain: "Passivkonten und Ertragskonten nehmen im Haben (rechts) zu. Aktivkonten und Aufwandkonten nehmen im Soll (links) zu."
+  },
+  {
+    id: "k21", topic: "kontentypen", type: "mc", diff: 2, tax: "K2",
+    q: "Welche zwei Kontentypen gehören zu den Bilanzkonten (Bestandeskonten)?",
+    options: [
+      {v: "A", t: "Aufwandkonten und Ertragskonten"},
+      {v: "B", t: "Aktivkonten und Passivkonten"},
+      {v: "C", t: "Aktivkonten und Aufwandkonten"},
+      {v: "D", t: "Passivkonten und Ertragskonten"}
+    ],
+    correct: "B",
+    explain: "Bilanzkonten (Bestandeskonten) sind Aktivkonten und Passivkonten. Sie haben einen Anfangsbestand und werden von Jahr zu Jahr übertragen. Aufwand- und Ertragskonten sind Erfolgskonten und starten jedes Jahr bei null."
+  },
+  {
+    id: "k22", topic: "kontentypen", type: "multi", diff: 2, tax: "K2",
+    q: "Welche der folgenden Konten sind Aufwandkonten? (Mehrere Antworten möglich.)",
+    options: [
+      {v: "A", t: "Lohnaufwand"},
+      {v: "B", t: "Warenverkauf"},
+      {v: "C", t: "Mietaufwand"},
+      {v: "D", t: "Abschreibungen"}
+    ],
+    correct: ["A", "C", "D"],
+    explain: "Lohnaufwand, Mietaufwand und Abschreibungen sind Aufwandkonten (Werteverzehr). Warenverkauf ist ein Ertragskonto."
+  },
+  {
+    id: "k23", topic: "kontentypen", type: "multi", diff: 2, tax: "K2",
+    q: "Welche der folgenden Konten sind Ertragskonten? (Mehrere Antworten möglich.)",
+    options: [
+      {v: "A", t: "Warenverkauf"},
+      {v: "B", t: "Finanzertrag"},
+      {v: "C", t: "Wareneinkauf"},
+      {v: "D", t: "Honorarertrag"}
+    ],
+    correct: ["A", "B", "D"],
+    explain: "Warenverkauf, Finanzertrag und Honorarertrag sind Ertragskonten. Wareneinkauf ist ein Aufwandkonto."
+  },
+  {
+    id: "k24", topic: "kontentypen", type: "mc", diff: 2, tax: "K3",
+    q: "Das Konto «Eigenkapital» nimmt zu. Auf welcher Seite wird gebucht?",
+    options: [
+      {v: "A", t: "Im Soll, weil es Kapital des Eigentümers ist"},
+      {v: "B", t: "Im Haben, weil Eigenkapital ein Passivkonto ist"},
+      {v: "C", t: "Im Soll, weil alle Zunahmen im Soll stehen"},
+      {v: "D", t: "Im Haben, weil es ein Ertragskonto ist"}
+    ],
+    correct: "B",
+    explain: "Das Eigenkapital ist ein Passivkonto (rechte Bilanzseite). Zunahmen bei Passivkonten stehen im Haben (rechts)."
+  },
+  {
+    id: "k25", topic: "kontentypen", type: "tf", diff: 2, tax: "K2",
+    q: "Das Konto «Wareneinkauf» ist ein Aktivkonto, weil Waren zum Vermögen gehören.",
+    correct: false,
+    explain: "Falsch. Wareneinkauf ist ein Aufwandkonto (Werteverzehr). Es erfasst die eingekauften Waren als Aufwand. Der Warenvorrat (Lagerbestand) hingegen ist ein Aktivkonto."
+  },
+  {
+    id: "k26", topic: "kontentypen", type: "tf", diff: 2, tax: "K2",
+    q: "Das Konto «Darlehen» (Bankdarlehen, das das Unternehmen aufgenommen hat) ist ein Passivkonto.",
+    correct: true,
+    explain: "Richtig. Ein aufgenommenes Darlehen ist eine Schuld des Unternehmens gegenüber der Bank und steht auf der Passivseite der Bilanz → Passivkonto."
+  },
+  {
+    id: "k27", topic: "kontentypen", type: "mc", diff: 2, tax: "K3",
+    q: "Beim Geschäftsfall «Wareneinkauf auf Rechnung» nehmen zwei Konten zu. Welche Kontentypen sind betroffen?",
+    options: [
+      {v: "A", t: "Aufwandkonto (Soll-Zunahme) und Passivkonto (Haben-Zunahme)"},
+      {v: "B", t: "Aktivkonto (Soll-Zunahme) und Passivkonto (Haben-Zunahme)"},
+      {v: "C", t: "Aufwandkonto (Soll-Zunahme) und Aktivkonto (Haben-Abnahme)"},
+      {v: "D", t: "Ertragskonto (Haben-Zunahme) und Passivkonto (Soll-Abnahme)"}
+    ],
+    correct: "A",
+    explain: "Wareneinkauf (Aufwandkonto) nimmt zu → Soll. Kreditoren (Passivkonto) nehmen zu → Haben."
+  },
+  {
+    id: "k28", topic: "kontentypen", type: "fill", diff: 2, tax: "K3",
+    q: "Ein Aufwandkonto nimmt ab (z.B. Gutschrift). Diese Abnahme wird im {0} gebucht – also auf der gleichen Seite wie Zunahmen bei {1}.",
+    blanks: [
+      {answer: "Haben", alts: ["rechts"]},
+      {answer: "Ertragskonten", alts: ["Passivkonten", "Ertragskonto"]}
+    ],
+    explain: "Aufwandkonten nehmen im Haben ab. Das ist dieselbe Seite, auf der Ertragskonten und Passivkonten zunehmen."
+  },
+  {
+    id: "k29", topic: "kontentypen", type: "mc", diff: 3, tax: "K4",
+    q: "Welcher Geschäftsfall bewirkt eine Zunahme im Soll und eine Zunahme im Haben, ohne dass ein Erfolgskonto betroffen ist?",
+    options: [
+      {v: "A", t: "Mietaufwand per Bank bezahlt"},
+      {v: "B", t: "Kauf von Mobilien auf Rechnung (Bilanzverlängerung)"},
+      {v: "C", t: "Verkauf von Waren auf Rechnung"},
+      {v: "D", t: "Lohnzahlung per Bank"}
+    ],
+    correct: "B",
+    explain: "Kauf von Mobilien auf Rechnung: Mobilien (Aktivkonto) nimmt zu im Soll, Kreditoren (Passivkonto) nimmt zu im Haben. Beide sind Bilanzkonten – kein Erfolgskonto betroffen."
+  },
+  {
+    id: "k30", topic: "kontentypen", type: "mc", diff: 3, tax: "K4",
+    q: "Ein Geschäftsfall bewirkt eine Zunahme eines Aufwandkontos und eine Abnahme eines Aktivkontos. Was kann man daraus schliessen?",
+    options: [
+      {v: "A", t: "Der Geschäftsfall ist erfolgsunwirksam"},
+      {v: "B", t: "Der Geschäftsfall ist erfolgswirksam – der Gewinn sinkt"},
+      {v: "C", t: "Der Geschäftsfall ist erfolgswirksam – der Gewinn steigt"},
+      {v: "D", t: "Die Bilanzsumme steigt auf beiden Seiten"}
+    ],
+    correct: "B",
+    explain: "Wenn ein Aufwandkonto zunimmt, ist der Geschäftsfall erfolgswirksam. Aufwand reduziert den Gewinn."
+  },
+  {
+    id: "k31", topic: "kontentypen", type: "mc", diff: 3, tax: "K4",
+    q: "Welche Kombination von Kontentypen bewirkt eine Zunahme des Gewinns?",
+    options: [
+      {v: "A", t: "Aktivkonto nimmt zu (Soll), Ertragskonto nimmt zu (Haben)"},
+      {v: "B", t: "Aufwandkonto nimmt zu (Soll), Aktivkonto nimmt ab (Haben)"},
+      {v: "C", t: "Aktivkonto nimmt zu (Soll), Passivkonto nimmt zu (Haben)"},
+      {v: "D", t: "Passivkonto nimmt ab (Soll), Aktivkonto nimmt ab (Haben)"}
+    ],
+    correct: "A",
+    explain: "Wenn ein Ertragskonto zunimmt (Haben), steigt der Gewinn. Beispiel: Debitoren (Aktivkonto, Soll) an Warenverkauf (Ertragskonto, Haben)."
+  },
+  {
+    id: "k32", topic: "kontentypen", type: "mc", diff: 3, tax: "K4",
+    q: "Zu welchem Kontentyp gehört «Wertberichtigung Fahrzeuge» (bei indirekter Abschreibung)?",
+    options: [
+      {v: "A", t: "Aktivkonto"},
+      {v: "B", t: "Minus-Aktivkonto (Korrekturkonto zur Aktivseite)"},
+      {v: "C", t: "Passivkonto"},
+      {v: "D", t: "Aufwandkonto"}
+    ],
+    correct: "B",
+    explain: "Wertberichtigungskonten sind Minus-Aktivkonten (Korrekturkonten). Sie stehen auf der Aktivseite der Bilanz, verhalten sich aber wie Passivkonten: Zunahmen im Haben, Abnahmen im Soll."
+  },
+  {
+    id: "k33", topic: "kontentypen", type: "multi", diff: 3, tax: "K4",
+    q: "Welche der folgenden Aussagen sind korrekt? (Mehrere Antworten möglich.)",
+    options: [
+      {v: "A", t: "Erfolgskonten haben keinen Anfangsbestand – sie starten jedes Jahr bei null"},
+      {v: "B", t: "Bilanzkonten werden über den Jahreswechsel vorgetragen (Anfangsbestand)"},
+      {v: "C", t: "Aufwandkonten werden am Jahresende über die Bilanz abgeschlossen"},
+      {v: "D", t: "Ertragskonten werden am Jahresende über die Erfolgsrechnung abgeschlossen"}
+    ],
+    correct: ["A", "B", "D"],
+    explain: "Erfolgskonten starten bei null (A) und werden über die Erfolgsrechnung abgeschlossen (D). Bilanzkonten werden vorgetragen (B). Aufwandkonten werden über die Erfolgsrechnung abgeschlossen, nicht über die Bilanz (C ist falsch)."
+  },
+
+  // ============================================================
   // TOPIC: buchungssatz – Buchungssätze & Bilanzkonten
   // ============================================================
 
@@ -557,6 +930,265 @@ window.QUESTIONS = [
       {label: "Saldo Konto Kreditoren", answer: 25000, tolerance: 0, unit: "CHF"}
     ],
     explain: "Kreditoren ist ein Passivkonto. Soll: 45'000. Haben: 18'000 + 52'000 = 70'000. Saldo (Haben-Überschuss): 70'000 – 45'000 = 25'000 CHF."
+  },
+
+  // --- Neue Buchungssatz-Fragen ---
+  {
+    id: "s20", topic: "buchungssatz", type: "mc", diff: 1, tax: "K3",
+    q: "Das Unternehmen hebt CHF 2'000 bar von der Bank ab. Wie lautet der Buchungssatz?",
+    options: [
+      {v: "A", t: "Bank an Kasse 2'000"},
+      {v: "B", t: "Kasse an Bank 2'000"},
+      {v: "C", t: "Kasse an Eigenkapital 2'000"},
+      {v: "D", t: "Aufwand an Bank 2'000"}
+    ],
+    correct: "B",
+    explain: "Die Kasse (Aktivkonto) nimmt zu → Soll. Die Bank (Aktivkonto) nimmt ab → Haben. Buchungssatz: Kasse an Bank 2'000. Aktivtausch."
+  },
+  {
+    id: "s21", topic: "buchungssatz", type: "mc", diff: 1, tax: "K3",
+    q: "Das Unternehmen zahlt CHF 1'500 aus der Kasse auf das Bankkonto ein. Wie lautet der Buchungssatz?",
+    options: [
+      {v: "A", t: "Kasse an Bank 1'500"},
+      {v: "B", t: "Bank an Kasse 1'500"},
+      {v: "C", t: "Bank an Eigenkapital 1'500"},
+      {v: "D", t: "Kreditoren an Bank 1'500"}
+    ],
+    correct: "B",
+    explain: "Die Bank (Aktivkonto) nimmt zu → Soll. Die Kasse (Aktivkonto) nimmt ab → Haben. Buchungssatz: Bank an Kasse 1'500. Aktivtausch."
+  },
+  {
+    id: "s22", topic: "buchungssatz", type: "mc", diff: 2, tax: "K3",
+    q: "Das Unternehmen bezahlt die Stromrechnung von CHF 800 per Bank. Wie lautet der Buchungssatz?",
+    options: [
+      {v: "A", t: "Bank an Energieaufwand 800"},
+      {v: "B", t: "Energieaufwand an Bank 800"},
+      {v: "C", t: "Energieaufwand an Kreditoren 800"},
+      {v: "D", t: "Kreditoren an Bank 800"}
+    ],
+    correct: "B",
+    explain: "Der Energieaufwand (Aufwandkonto) nimmt zu → Soll. Die Bank (Aktivkonto) nimmt ab → Haben. Erfolgswirksam: Gewinn sinkt."
+  },
+  {
+    id: "s23", topic: "buchungssatz", type: "mc", diff: 2, tax: "K3",
+    q: "Das Unternehmen erhält eine Zinsgutschrift von CHF 500 auf das Bankkonto. Wie lautet der Buchungssatz?",
+    options: [
+      {v: "A", t: "Finanzertrag an Bank 500"},
+      {v: "B", t: "Bank an Finanzertrag 500"},
+      {v: "C", t: "Bank an Finanzaufwand 500"},
+      {v: "D", t: "Finanzaufwand an Bank 500"}
+    ],
+    correct: "B",
+    explain: "Die Bank (Aktivkonto) nimmt zu → Soll. Der Finanzertrag (Ertragskonto) nimmt zu → Haben. Erfolgswirksam: Gewinn steigt."
+  },
+  {
+    id: "s24", topic: "buchungssatz", type: "mc", diff: 2, tax: "K3",
+    q: "Das Unternehmen bezahlt die Büromiete von CHF 4'500 per Bank. Wie lautet der Buchungssatz?",
+    options: [
+      {v: "A", t: "Bank an Mietaufwand 4'500"},
+      {v: "B", t: "Mietaufwand an Kreditoren 4'500"},
+      {v: "C", t: "Mietaufwand an Bank 4'500"},
+      {v: "D", t: "Raumaufwand an Eigenkapital 4'500"}
+    ],
+    correct: "C",
+    explain: "Der Mietaufwand (Aufwandkonto) nimmt zu → Soll. Die Bank (Aktivkonto) nimmt ab → Haben."
+  },
+  {
+    id: "s25", topic: "buchungssatz", type: "fill", diff: 2, tax: "K3",
+    q: "Das Unternehmen erhält eine Lieferantenrechnung für Werbematerial über CHF 3'200. Buchungssatz: {0} an {1} 3'200.",
+    blanks: [
+      {answer: "Werbeaufwand", alts: ["Marketingaufwand", "Übriger Aufwand"]},
+      {answer: "Kreditoren", alts: ["Verbindlichkeiten"]}
+    ],
+    explain: "Der Werbeaufwand (Aufwandkonto) nimmt zu → Soll. Die Kreditoren (Passivkonto) nehmen zu → Haben. Die Rechnung ist noch nicht bezahlt."
+  },
+  {
+    id: "s26", topic: "buchungssatz", type: "mc", diff: 2, tax: "K3",
+    q: "Das Unternehmen überweist die Sozialversicherungsbeiträge von CHF 5'600 per Bank. Wie lautet der Buchungssatz?",
+    options: [
+      {v: "A", t: "Sozialversicherungsaufwand an Bank 5'600"},
+      {v: "B", t: "Bank an Sozialversicherungsaufwand 5'600"},
+      {v: "C", t: "Lohnaufwand an Bank 5'600"},
+      {v: "D", t: "Sozialversicherungsaufwand an Kreditoren 5'600"}
+    ],
+    correct: "A",
+    explain: "Der Sozialversicherungsaufwand (Aufwandkonto) nimmt zu → Soll. Die Bank (Aktivkonto) nimmt ab → Haben."
+  },
+  {
+    id: "s27", topic: "buchungssatz", type: "mc", diff: 2, tax: "K3",
+    q: "Ein Kunde bezahlt eine offene Rechnung von CHF 7'000 bar. Wie lautet der Buchungssatz?",
+    options: [
+      {v: "A", t: "Bank an Debitoren 7'000"},
+      {v: "B", t: "Kasse an Debitoren 7'000"},
+      {v: "C", t: "Debitoren an Kasse 7'000"},
+      {v: "D", t: "Kasse an Warenverkauf 7'000"}
+    ],
+    correct: "B",
+    explain: "Die Kasse (Aktivkonto) nimmt zu → Soll. Die Debitoren (Aktivkonto) nehmen ab → Haben. Aktivtausch, erfolgsunwirksam."
+  },
+  {
+    id: "s28", topic: "buchungssatz", type: "fill", diff: 2, tax: "K3",
+    q: "Das Unternehmen bezahlt die Telefonrechnung von CHF 350 bar. Buchungssatz: {0} an {1} 350.",
+    blanks: [
+      {answer: "Verwaltungsaufwand", alts: ["Telefonaufwand", "Übriger Aufwand"]},
+      {answer: "Kasse", alts: ["Kassa"]}
+    ],
+    explain: "Der Verwaltungsaufwand (Aufwandkonto) nimmt zu → Soll. Die Kasse (Aktivkonto) nimmt ab → Haben."
+  },
+  {
+    id: "s29", topic: "buchungssatz", type: "mc", diff: 2, tax: "K3",
+    q: "Das Unternehmen erhält Mieteinnahmen von CHF 2'400 auf das Bankkonto. Wie lautet der Buchungssatz?",
+    options: [
+      {v: "A", t: "Mietaufwand an Bank 2'400"},
+      {v: "B", t: "Bank an Mietaufwand 2'400"},
+      {v: "C", t: "Bank an Mietertrag 2'400"},
+      {v: "D", t: "Mietertrag an Bank 2'400"}
+    ],
+    correct: "C",
+    explain: "Die Bank (Aktivkonto) nimmt zu → Soll. Der Mietertrag (Ertragskonto) nimmt zu → Haben."
+  },
+  {
+    id: "s30", topic: "buchungssatz", type: "mc", diff: 2, tax: "K3",
+    q: "Das Unternehmen bezahlt Bankzinsen von CHF 1'200. Wie lautet der Buchungssatz?",
+    options: [
+      {v: "A", t: "Bank an Finanzaufwand 1'200"},
+      {v: "B", t: "Finanzaufwand an Bank 1'200"},
+      {v: "C", t: "Finanzertrag an Bank 1'200"},
+      {v: "D", t: "Finanzaufwand an Kreditoren 1'200"}
+    ],
+    correct: "B",
+    explain: "Der Finanzaufwand (Aufwandkonto) nimmt zu → Soll. Die Bank (Aktivkonto) nimmt ab → Haben."
+  },
+  {
+    id: "s31", topic: "buchungssatz", type: "fill", diff: 2, tax: "K3",
+    q: "Das Unternehmen kauft einen Computer für CHF 2'500 per Bank. Buchungssatz: {0} an {1} 2'500.",
+    blanks: [
+      {answer: "Mobilien", alts: ["Informatik", "EDV"]},
+      {answer: "Bank", alts: ["Bankkonto"]}
+    ],
+    explain: "Die Mobilien (Aktivkonto) nehmen zu → Soll. Die Bank (Aktivkonto) nimmt ab → Haben. Aktivtausch."
+  },
+  {
+    id: "s32", topic: "buchungssatz", type: "mc", diff: 2, tax: "K3",
+    q: "Das Unternehmen nimmt einen Bankkredit von CHF 50'000 auf. Der Betrag wird dem Bankkonto gutgeschrieben. Wie lautet der Buchungssatz?",
+    options: [
+      {v: "A", t: "Bankkredit an Bank 50'000"},
+      {v: "B", t: "Bank an Bankkredit 50'000"},
+      {v: "C", t: "Eigenkapital an Bank 50'000"},
+      {v: "D", t: "Bank an Eigenkapital 50'000"}
+    ],
+    correct: "B",
+    explain: "Die Bank (Aktivkonto) nimmt zu → Soll. Der Bankkredit (Passivkonto) nimmt zu → Haben. Bilanzverlängerung."
+  },
+  {
+    id: "s33", topic: "buchungssatz", type: "mc", diff: 2, tax: "K3",
+    q: "Das Unternehmen stellt einem Kunden für Beratungsleistungen CHF 6'000 in Rechnung. Wie lautet der Buchungssatz?",
+    options: [
+      {v: "A", t: "Honorarertrag an Debitoren 6'000"},
+      {v: "B", t: "Bank an Honorarertrag 6'000"},
+      {v: "C", t: "Debitoren an Honorarertrag 6'000"},
+      {v: "D", t: "Debitoren an Bank 6'000"}
+    ],
+    correct: "C",
+    explain: "Debitoren (Aktivkonto) nehmen zu → Soll. Honorarertrag (Ertragskonto) nimmt zu → Haben."
+  },
+  {
+    id: "s34", topic: "buchungssatz", type: "mc", diff: 2, tax: "K3",
+    q: "Das Unternehmen zahlt die Versicherungsprämie von CHF 6'000 per Bank. Wie lautet der Buchungssatz?",
+    options: [
+      {v: "A", t: "Bank an Versicherungsaufwand 6'000"},
+      {v: "B", t: "Versicherungsaufwand an Kreditoren 6'000"},
+      {v: "C", t: "Versicherungsaufwand an Bank 6'000"},
+      {v: "D", t: "Kreditoren an Bank 6'000"}
+    ],
+    correct: "C",
+    explain: "Der Versicherungsaufwand (Aufwandkonto) nimmt zu → Soll. Die Bank (Aktivkonto) nimmt ab → Haben."
+  },
+  {
+    id: "s35", topic: "buchungssatz", type: "fill", diff: 2, tax: "K3",
+    q: "Das Unternehmen verkauft Dienstleistungen für CHF 9'500. Der Kunde bezahlt sofort per Bank. Buchungssatz: {0} an {1} 9'500.",
+    blanks: [
+      {answer: "Bank", alts: ["Bankkonto"]},
+      {answer: "Dienstleistungsertrag", alts: ["Honorarertrag", "Ertrag"]}
+    ],
+    explain: "Bank (Aktivkonto) nimmt zu → Soll. Dienstleistungsertrag (Ertragskonto) nimmt zu → Haben."
+  },
+  {
+    id: "s36", topic: "buchungssatz", type: "mc", diff: 2, tax: "K3",
+    q: "Das Unternehmen wandelt eine kurzfristige Bankschuld von CHF 30'000 in ein langfristiges Darlehen um. Wie lautet der Buchungssatz?",
+    options: [
+      {v: "A", t: "Bankkredit an Darlehen 30'000"},
+      {v: "B", t: "Darlehen an Bankkredit 30'000"},
+      {v: "C", t: "Bank an Darlehen 30'000"},
+      {v: "D", t: "Bankkredit an Bank 30'000"}
+    ],
+    correct: "A",
+    explain: "Der kurzfristige Bankkredit (Passivkonto) nimmt ab → Soll. Das langfristige Darlehen (Passivkonto) nimmt zu → Haben. Passivtausch."
+  },
+  {
+    id: "s37", topic: "buchungssatz", type: "multi", diff: 2, tax: "K2",
+    q: "Welche der folgenden Geschäftsfälle bewirken eine Bilanzverkürzung? (Mehrere Antworten möglich.)",
+    options: [
+      {v: "A", t: "Rückzahlung eines Darlehens per Bank"},
+      {v: "B", t: "Bezahlung der Kreditoren per Bank"},
+      {v: "C", t: "Kauf von Mobilien auf Rechnung"},
+      {v: "D", t: "Barbezug vom Bankkonto"}
+    ],
+    correct: ["A", "B"],
+    explain: "Bilanzverkürzung: Aktiven und Passiven nehmen gleichzeitig ab. A) Bank ↓ (Aktiv), Darlehen ↓ (Passiv). B) Bank ↓ (Aktiv), Kreditoren ↓ (Passiv). C) Bilanzverlängerung. D) Aktivtausch."
+  },
+  {
+    id: "s38", topic: "buchungssatz", type: "fill", diff: 1, tax: "K3",
+    q: "Das Unternehmen kauft Briefmarken (Büromaterial) für CHF 150 bar. Buchungssatz: {0} an {1} 150.",
+    blanks: [
+      {answer: "Verwaltungsaufwand", alts: ["Büromaterialaufwand", "Übriger Aufwand"]},
+      {answer: "Kasse", alts: ["Kassa"]}
+    ],
+    explain: "Der Verwaltungsaufwand (Aufwandkonto) nimmt zu → Soll. Die Kasse (Aktivkonto) nimmt ab → Haben."
+  },
+  {
+    id: "s39", topic: "buchungssatz", type: "mc", diff: 3, tax: "K3",
+    q: "Das Unternehmen erhält eine Steuerrechnung über CHF 12'000. Die Zahlung erfolgt erst später. Wie lautet der Buchungssatz beim Rechnungseingang?",
+    options: [
+      {v: "A", t: "Steueraufwand an Bank 12'000"},
+      {v: "B", t: "Steueraufwand an Kreditoren 12'000"},
+      {v: "C", t: "Kreditoren an Steueraufwand 12'000"},
+      {v: "D", t: "Bank an Steueraufwand 12'000"}
+    ],
+    correct: "B",
+    explain: "Der Steueraufwand (Aufwandkonto) nimmt zu → Soll. Die Kreditoren (Passivkonto) nehmen zu → Haben (offene Rechnung). Bei späterer Bezahlung: Kreditoren an Bank."
+  },
+  {
+    id: "s40", topic: "buchungssatz", type: "calc", diff: 3, tax: "K3",
+    q: "Bestimme den Endbestand (Saldo) des Kontos Debitoren: Anfangsbestand CHF 42'000, neue Rechnungen an Kunden CHF 180'000, Zahlungseingänge CHF 165'000, Debitorenverlust CHF 3'000.",
+    rows: [
+      {label: "Saldo Konto Debitoren", answer: 54000, tolerance: 0, unit: "CHF"}
+    ],
+    explain: "Debitoren ist ein Aktivkonto. Soll: 42'000 (AB) + 180'000 (neue Rechnungen) = 222'000. Haben: 165'000 (Zahlungen) + 3'000 (Verlust) = 168'000. Saldo: 222'000 – 168'000 = 54'000 CHF."
+  },
+  {
+    id: "s41", topic: "buchungssatz", type: "multi", diff: 3, tax: "K4",
+    q: "Welche der folgenden Geschäftsfälle sind erfolgswirksam? (Mehrere Antworten möglich.)",
+    options: [
+      {v: "A", t: "Wareneinkauf auf Rechnung"},
+      {v: "B", t: "Bareinzahlung auf das Bankkonto"},
+      {v: "C", t: "Zinsgutschrift der Bank"},
+      {v: "D", t: "Kauf von Mobilien per Bank"}
+    ],
+    correct: ["A", "C"],
+    explain: "A) Wareneinkauf (Aufwandkonto) → erfolgswirksam. C) Finanzertrag (Ertragskonto) → erfolgswirksam. B) Aktivtausch → erfolgsunwirksam. D) Aktivtausch → erfolgsunwirksam."
+  },
+  {
+    id: "s42", topic: "buchungssatz", type: "mc", diff: 3, tax: "K4",
+    q: "Welchen Bilanzeffekt hat der Geschäftsfall «Lohnzahlung per Bank»?",
+    options: [
+      {v: "A", t: "Aktivtausch"},
+      {v: "B", t: "Bilanzverkürzung (Aktiven und Passiven sinken)"},
+      {v: "C", t: "Bilanzverlängerung"},
+      {v: "D", t: "Keiner der vier klassischen Bilanzeffekte – es ist eine erfolgswirksame Buchung, die nur die Aktivseite reduziert"}
+    ],
+    correct: "D",
+    explain: "Lohnaufwand (Aufwandkonto, Soll) an Bank (Aktivkonto, Haben). Die Bank sinkt, aber kein Passivkonto ist direkt betroffen. Stattdessen sinkt der Gewinn (und damit letztlich das Eigenkapital). Daher kein klassischer Bilanzeffekt der vier Grundtypen."
   },
 
   // ============================================================
