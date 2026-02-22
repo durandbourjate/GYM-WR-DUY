@@ -354,6 +354,45 @@ window.QUESTIONS = [
     correct: ["A", "B", "D"],
     explain: "Das Inventar ist detaillierter als die Bilanz (mit Mengen, Einzelwerten), wird mindestens jährlich erstellt und dient als Grundlage für die Bilanz. Die Bilanz fasst die Inventarinformationen zusammen."
   },
+  {
+    id: "b13", topic: "bilanz", type: "mc", diff: 1, tax: "K2",
+    img: {src: "img/bwl/fibu/fibu_bilanzstruktur_02.svg", alt: "Bilanzstruktur mit Flüssigkeits- und Fälligkeitsprinzip"},
+    q: "Betrachte die Bilanzstruktur in der Abbildung. Welches Prinzip bestimmt die Reihenfolge auf der Aktivseite?",
+    options: [
+      {v: "A", t: "Das Fälligkeitsprinzip – von kurzfristig nach langfristig"},
+      {v: "B", t: "Das Flüssigkeitsprinzip – vom flüssigsten zum am wenigsten flüssigen Vermögenswert"},
+      {v: "C", t: "Das Alphabetprinzip – nach Kontobezeichnung"},
+      {v: "D", t: "Das Wertprinzip – vom grössten zum kleinsten Betrag"}
+    ],
+    correct: "B",
+    explain: "Die Aktivseite wird nach dem Flüssigkeitsprinzip geordnet: Oben steht das Umlaufvermögen (flüssig, < 1 Jahr), unten das Anlagevermögen (weniger flüssig, > 1 Jahr)."
+  },
+  {
+    id: "b14", topic: "bilanz", type: "mc", diff: 1, tax: "K2",
+    img: {src: "img/bwl/fibu/fibu_bilanzstruktur_02.svg", alt: "Bilanzstruktur mit Flüssigkeits- und Fälligkeitsprinzip"},
+    q: "Betrachte die Bilanzstruktur. Welches Prinzip bestimmt die Reihenfolge auf der Passivseite?",
+    options: [
+      {v: "A", t: "Das Flüssigkeitsprinzip"},
+      {v: "B", t: "Das Fälligkeitsprinzip – von kurzfristig nach langfristig fällig"},
+      {v: "C", t: "Das Grössenprinzip – vom grössten zum kleinsten Betrag"},
+      {v: "D", t: "Das Alphabetprinzip"}
+    ],
+    correct: "B",
+    explain: "Die Passivseite wird nach dem Fälligkeitsprinzip geordnet: Oben steht das kurzfristige Fremdkapital (< 1 Jahr), dann das langfristige Fremdkapital (> 1 Jahr), zuunterst das Eigenkapital (unbefristet)."
+  },
+  {
+    id: "b15", topic: "bilanz", type: "multi", diff: 2, tax: "K2",
+    img: {src: "img/bwl/fibu/fibu_bilanzstruktur_02.svg", alt: "Bilanzstruktur mit Flüssigkeits- und Fälligkeitsprinzip"},
+    q: "Welche Konten gehören gemäss der Bilanzstruktur zum Umlaufvermögen? (Mehrere Antworten möglich.)",
+    options: [
+      {v: "A", t: "Kasse und Bank"},
+      {v: "B", t: "Debitoren und Warenvorrat"},
+      {v: "C", t: "Fahrzeuge und Immobilien"},
+      {v: "D", t: "Mobilien und Maschinen"}
+    ],
+    correct: ["A", "B"],
+    explain: "Umlaufvermögen (< 1 Jahr): Kasse, Bank, Debitoren, Warenvorrat. Fahrzeuge, Immobilien, Mobilien und Maschinen sind Anlagevermögen (> 1 Jahr)."
+  },
 
   // ============================================================
   // TOPIC: kontentypen – Die vier Kontentypen
@@ -719,6 +758,116 @@ window.QUESTIONS = [
     ],
     correct: ["A", "B", "D"],
     explain: "Erfolgskonten starten bei null (A) und werden über die Erfolgsrechnung abgeschlossen (D). Bilanzkonten werden vorgetragen (B). Aufwandkonten werden über die Erfolgsrechnung abgeschlossen, nicht über die Bilanz (C ist falsch)."
+  },
+
+  // --- Bildgestützte Fragen: Kontentypen visuell ---
+  {
+    id: "k34", topic: "kontentypen", type: "mc", diff: 1, tax: "K2",
+    img: {src: "img/bwl/fibu/fibu_kontentypen_02.svg", alt: "Vier leere T-Konten mit Fragezeichen statt Plus/Minus"},
+    q: "Betrachte die vier T-Konten in der Abbildung. Bei welchem Kontentyp steht das (+) auf der Soll-Seite (links)?",
+    options: [
+      {v: "A", t: "Nur beim Aktivkonto"},
+      {v: "B", t: "Beim Aktivkonto und beim Aufwandskonto"},
+      {v: "C", t: "Beim Passivkonto und beim Ertragskonto"},
+      {v: "D", t: "Bei allen vier Kontentypen"}
+    ],
+    correct: "B",
+    explain: "Aktivkonten und Aufwandskonten nehmen im Soll (links) zu (+). Passivkonten und Ertragskonten nehmen im Haben (rechts) zu (+)."
+  },
+  {
+    id: "k35", topic: "kontentypen", type: "mc", diff: 1, tax: "K2",
+    img: {src: "img/bwl/fibu/fibu_kontentypen_02.svg", alt: "Vier leere T-Konten mit Fragezeichen statt Plus/Minus"},
+    q: "Schau dir die vier T-Konten an. Wo steht der Anfangsbestand (AB) beim Aktivkonto?",
+    options: [
+      {v: "A", t: "Im Haben (rechts)"},
+      {v: "B", t: "Im Soll (links)"},
+      {v: "C", t: "Es gibt keinen Anfangsbestand"},
+      {v: "D", t: "In der Mitte"}
+    ],
+    correct: "B",
+    explain: "Der Anfangsbestand steht bei Aktivkonten im Soll (links) – also auf derselben Seite wie die Zunahmen. Bei Passivkonten steht der AB im Haben (rechts)."
+  },
+  {
+    id: "k36", topic: "kontentypen", type: "tf", diff: 1, tax: "K2",
+    img: {src: "img/bwl/fibu/fibu_kontentypen_02.svg", alt: "Vier leere T-Konten mit Fragezeichen statt Plus/Minus"},
+    q: "Aufwandskonten und Ertragskonten haben keinen Anfangsbestand – sie starten jedes Jahr bei null.",
+    correct: true,
+    explain: "Richtig. Erfolgskonten (Aufwand und Ertrag) werden am Jahresende über die Erfolgsrechnung abgeschlossen und starten im neuen Jahr bei null. Nur Bilanzkonten (Aktiv und Passiv) haben einen Anfangsbestand."
+  },
+  {
+    id: "k37", topic: "kontentypen", type: "mc", diff: 2, tax: "K3",
+    img: {src: "img/bwl/fibu/fibu_konten_zuordnung_01.svg", alt: "12 Konten zum Zuordnen auf vier Kontentypen"},
+    q: "Betrachte die Zuordnungsübersicht. Welche Konten gehören zum Typ «Passivkonto» (cyan)?",
+    options: [
+      {v: "A", t: "Hypothek, Kreditoren, Eigenkapital, Darlehen"},
+      {v: "B", t: "Hypothek, Debitoren, Eigenkapital, Darlehen"},
+      {v: "C", t: "Kreditoren, Eigenkapital, Wareneinkauf, Darlehen"},
+      {v: "D", t: "Kasse, Debitoren, Fahrzeuge, Eigenkapital"}
+    ],
+    correct: "A",
+    explain: "Passivkonten zeigen Schulden und Eigenkapital: Hypothek (langfristiges FK), Kreditoren (kurzfristiges FK), Eigenkapital und Darlehen (langfristiges FK). Debitoren sind ein Aktivkonto."
+  },
+  {
+    id: "k38", topic: "kontentypen", type: "multi", diff: 2, tax: "K3",
+    img: {src: "img/bwl/fibu/fibu_konten_zuordnung_01.svg", alt: "12 Konten zum Zuordnen auf vier Kontentypen"},
+    q: "Welche Konten aus der Abbildung gehören zum Typ «Aufwandskonto» (magenta)? (Mehrere Antworten möglich.)",
+    options: [
+      {v: "A", t: "Lohnaufwand"},
+      {v: "B", t: "Mietaufwand"},
+      {v: "C", t: "Wareneinkauf"},
+      {v: "D", t: "Finanzertrag"}
+    ],
+    correct: ["A", "B", "C"],
+    explain: "Lohnaufwand, Mietaufwand und Wareneinkauf sind Aufwandskonten (Werteverzehr). Finanzertrag ist ein Ertragskonto."
+  },
+  {
+    id: "k39", topic: "kontentypen", type: "mc", diff: 2, tax: "K3",
+    img: {src: "img/bwl/fibu/fibu_tkonto_geschaeftsfall_02.svg", alt: "T-Konten Mietaufwand und Bank mit Fragezeichen"},
+    q: "Die Abbildung zeigt den Geschäftsfall «Miete CHF 4'500 per Bank bezahlt». Auf welcher Seite wird der Betrag beim Konto Mietaufwand eingetragen?",
+    options: [
+      {v: "A", t: "Im Haben (rechts), weil Geld abfliesst"},
+      {v: "B", t: "Im Soll (links), weil Aufwandskonten im Soll zunehmen"},
+      {v: "C", t: "Im Haben (rechts), weil es ein Passivkonto ist"},
+      {v: "D", t: "Im Soll (links), weil es ein Aktivkonto ist"}
+    ],
+    correct: "B",
+    explain: "Mietaufwand ist ein Aufwandskonto (magenta). Aufwandskonten nehmen im Soll (links) zu. Bank ist ein Aktivkonto (gelb) und nimmt im Haben (rechts) ab."
+  },
+  {
+    id: "k40", topic: "kontentypen", type: "mc", diff: 2, tax: "K3",
+    img: {src: "img/bwl/fibu/fibu_tkonto_geschaeftsfall_03.svg", alt: "T-Konten Debitoren und Warenverkauf mit Fragezeichen"},
+    q: "Die Abbildung zeigt den Geschäftsfall «Warenverkauf auf Rechnung CHF 8'000». Auf welcher Seite steht der Betrag beim Konto Warenverkauf?",
+    options: [
+      {v: "A", t: "Im Soll (links), weil der Betrag zunimmt"},
+      {v: "B", t: "Im Haben (rechts), weil Ertragskonten im Haben zunehmen"},
+      {v: "C", t: "Im Soll (links), weil es ein Aktivkonto ist"},
+      {v: "D", t: "Im Haben (rechts), weil Geld eingeht"}
+    ],
+    correct: "B",
+    explain: "Warenverkauf ist ein Ertragskonto (grün). Ertragskonten nehmen im Haben (rechts) zu. Debitoren (gelb, Aktivkonto) nehmen im Soll (links) zu."
+  },
+  {
+    id: "k41", topic: "kontentypen", type: "mc", diff: 2, tax: "K3",
+    img: {src: "img/bwl/fibu/fibu_tkonto_geschaeftsfall_04.svg", alt: "T-Konten Darlehen und Bank mit Fragezeichen"},
+    q: "Die Abbildung zeigt den Geschäftsfall «Rückzahlung Darlehen CHF 20'000 per Bank». Welche Aussage stimmt?",
+    options: [
+      {v: "A", t: "Darlehen: 20'000 im Soll (Abnahme Passivkonto). Bank: 20'000 im Haben (Abnahme Aktivkonto)."},
+      {v: "B", t: "Darlehen: 20'000 im Haben (Zunahme Passivkonto). Bank: 20'000 im Soll (Zunahme Aktivkonto)."},
+      {v: "C", t: "Darlehen: 20'000 im Haben (Abnahme). Bank: 20'000 im Soll (Abnahme)."},
+      {v: "D", t: "Darlehen: 20'000 im Soll (Zunahme). Bank: 20'000 im Haben (Zunahme)."}
+    ],
+    correct: "A",
+    explain: "Darlehen ist ein Passivkonto (cyan, AB rechts). Abnahmen bei Passivkonten stehen im Soll (links). Bank ist ein Aktivkonto (gelb, AB links). Abnahmen bei Aktivkonten stehen im Haben (rechts). Bilanzverkürzung."
+  },
+  {
+    id: "k42", topic: "kontentypen", type: "fill", diff: 2, tax: "K3",
+    img: {src: "img/bwl/fibu/fibu_tkonto_geschaeftsfall_04.svg", alt: "T-Konten Darlehen und Bank mit Fragezeichen"},
+    q: "Betrachte die T-Konten in der Abbildung. Nach der Rückzahlung von CHF 20'000 beträgt der Saldo des Kontos Darlehen CHF {0} und der Saldo des Kontos Bank CHF {1}.",
+    blanks: [
+      {answer: "80000", alts: ["80'000", "80 000"]},
+      {answer: "55000", alts: ["55'000", "55 000"]}
+    ],
+    explain: "Darlehen: AB 100'000 (Haben) – 20'000 (Soll) = Saldo 80'000. Bank: AB 75'000 (Soll) – 20'000 (Haben) = Saldo 55'000."
   },
 
   // ============================================================
@@ -1189,6 +1338,39 @@ window.QUESTIONS = [
     ],
     correct: "D",
     explain: "Lohnaufwand (Aufwandkonto, Soll) an Bank (Aktivkonto, Haben). Die Bank sinkt, aber kein Passivkonto ist direkt betroffen. Stattdessen sinkt der Gewinn (und damit letztlich das Eigenkapital). Daher kein klassischer Bilanzeffekt der vier Grundtypen."
+  },
+  {
+    id: "s43", topic: "buchungssatz", type: "mc", diff: 1, tax: "K3",
+    img: {src: "img/bwl/fibu/fibu_tkonto_geschaeftsfall_01.svg", alt: "T-Konten Fahrzeuge und Bank – Kauf Fahrzeug per Bank"},
+    q: "Schau dir die T-Konten in der Abbildung an. Ein Fahrzeug wird für CHF 30'000 per Bank gekauft. Wo wird der Betrag eingetragen?",
+    options: [
+      {v: "A", t: "Fahrzeuge: 30'000 im Soll (Zunahme). Bank: 30'000 im Haben (Abnahme)."},
+      {v: "B", t: "Fahrzeuge: 30'000 im Haben (Zunahme). Bank: 30'000 im Soll (Abnahme)."},
+      {v: "C", t: "Fahrzeuge: 30'000 im Soll (Abnahme). Bank: 30'000 im Haben (Zunahme)."},
+      {v: "D", t: "Fahrzeuge: 30'000 im Haben (Abnahme). Bank: 30'000 im Soll (Zunahme)."}
+    ],
+    correct: "A",
+    explain: "Beide Konten sind Aktivkonten (gelbe Überschrift). Fahrzeuge nimmt zu → Soll (links). Bank nimmt ab → Haben (rechts). Aktivtausch."
+  },
+  {
+    id: "s44", topic: "buchungssatz", type: "calc", diff: 2, tax: "K3",
+    img: {src: "img/bwl/fibu/fibu_tkonto_geschaeftsfall_01.svg", alt: "T-Konten Fahrzeuge und Bank – Kauf Fahrzeug per Bank"},
+    q: "Berechne die neuen Salden der beiden Konten nach dem Kauf des Fahrzeugs für CHF 30'000.",
+    rows: [
+      {label: "Saldo Fahrzeuge", answer: 80000, tolerance: 0, unit: "CHF"},
+      {label: "Saldo Bank", answer: 50000, tolerance: 0, unit: "CHF"}
+    ],
+    explain: "Fahrzeuge: AB 50'000 + 30'000 = 80'000 CHF. Bank: AB 80'000 – 30'000 = 50'000 CHF."
+  },
+  {
+    id: "s45", topic: "buchungssatz", type: "calc", diff: 2, tax: "K3",
+    img: {src: "img/bwl/fibu/fibu_saldo_berechnen_01.svg", alt: "T-Konten Bank und Kreditoren mit mehreren Buchungen – Saldo berechnen"},
+    q: "Berechne die Schlussbestände (Saldi) der beiden Konten in der Abbildung.",
+    rows: [
+      {label: "Saldo Bank", answer: 43000, tolerance: 0, unit: "CHF"},
+      {label: "Saldo Kreditoren", answer: 30000, tolerance: 0, unit: "CHF"}
+    ],
+    explain: "Bank (Aktivkonto): Soll = 45'000 + 15'000 + 8'000 + 22'000 = 90'000. Haben = 30'000 + 12'000 + 5'000 = 47'000. Saldo = 90'000 – 47'000 = 43'000. Kreditoren (Passivkonto): Haben = 32'000 + 14'000 + 9'000 = 55'000. Soll = 18'000 + 7'000 = 25'000. Saldo = 55'000 – 25'000 = 30'000."
   },
 
   // ============================================================
