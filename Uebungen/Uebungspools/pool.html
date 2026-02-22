@@ -899,66 +899,37 @@ function sendReport(){
   var poolId=new URLSearchParams(window.location.search).get('pool')||'';
   var topicLabel=TOPICS[q.topic]?(TOPICS[q.topic].short||TOPICS[q.topic].label):q.topic;
 
-  var payload={
+  var params=new URLSearchParams({
     pool:POOL_META.title+' ('+poolId+')',
     qid:q.id,
     topic:topicLabel,
     text:q.q.replace(/<[^>]*>/g,'').substring(0,200),
     category:cat.textContent.trim(),
     comment:document.getElementById('reportComment').value.trim()
-  };
+  });
 
   var btn=document.getElementById('reportSendBtn');
   btn.disabled=true;
   btn.textContent='Wird gesendet…';
   document.getElementById('reportError').style.display='none';
 
-  // Unsichtbarer iframe + Form-POST — umgeht CORS komplett
-  var iframeName='_reportFrame'+Date.now();
-  var iframe=document.createElement('iframe');
-  iframe.name=iframeName;
-  iframe.style.display='none';
-  document.body.appendChild(iframe);
-
-  var form=document.createElement('form');
-  form.method='POST';
-  form.action=REPORT_CONFIG.endpoint;
-  form.target=iframeName;
-  form.style.display='none';
-
-  // Alle Felder als hidden inputs
-  Object.keys(payload).forEach(function(key){
-    var input=document.createElement('input');
-    input.type='hidden';
-    input.name=key;
-    input.value=payload[key];
-    form.appendChild(input);
-  });
-
-  document.body.appendChild(form);
-  form.submit();
-
-  // Erfolg anzeigen (iframe-load = Antwort kam)
-  iframe.onload=function(){
+  // GET-Request via Image-Ping — einfachste Cross-Origin Methode
+  var img=new Image();
+  img.onload=img.onerror=function(){
+    // Apps Script antwortet mit HTML, daher feuert onerror — aber Daten sind trotzdem angekommen
     document.getElementById('reportForm').style.display='none';
     document.getElementById('reportDone').style.display='block';
-    setTimeout(function(){
-      closeReport();
-      // Aufräumen
-      document.body.removeChild(iframe);
-      document.body.removeChild(form);
-    },1800);
+    setTimeout(closeReport,1800);
   };
+  img.src=REPORT_CONFIG.endpoint+'?'+params.toString();
 
-  // Fallback-Timeout falls onload nicht feuert
+  // Fallback falls weder onload noch onerror feuert
   setTimeout(function(){
     if(document.getElementById('reportDone').style.display==='none'){
       document.getElementById('reportForm').style.display='none';
       document.getElementById('reportDone').style.display='block';
       setTimeout(closeReport,1800);
     }
-    try{document.body.removeChild(iframe)}catch(e){}
-    try{document.body.removeChild(form)}catch(e){}
   },5000);
 }
 
