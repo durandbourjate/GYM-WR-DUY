@@ -69,15 +69,16 @@ body{font-family:'DM Sans',system-ui,sans-serif;background:var(--c-bg);color:var
 .card-lz-btn:hover{transform:scale(1.2)}
 .card-lz-btn.visible{display:flex}
 /* ═══ LERNZIELE — Modal für index.html ═══ */
-.lz-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.lz-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);overflow:hidden}
 .lz-overlay.active{display:flex}
-.lz-modal{background:var(--c-surface);border-radius:16px;max-width:600px;width:100%;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.2);animation:lzSlideUp .25s ease}
+.lz-modal{background:var(--c-surface);border-radius:16px;max-width:600px;width:100%;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.2);animation:lzSlideUp .25s ease;overflow:hidden}
 @keyframes lzSlideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
 .lz-modal-header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px 16px;border-bottom:1px solid var(--c-border)}
 .lz-modal-header h2{font-size:1.1rem;font-weight:700;display:flex;align-items:center;gap:8px}
 .lz-modal-close{background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--c-text-soft);padding:4px 8px;border-radius:6px;transition:.15s;line-height:1}
 .lz-modal-close:hover{background:var(--c-border);color:var(--c-text)}
-.lz-modal-body{overflow-y:auto;padding:20px 24px 24px;flex:1}
+.lz-modal-body{overflow-y:auto;padding:20px 24px 24px;flex:1;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+body.lz-modal-open{overflow:hidden}
 .lz-pool-section{margin-bottom:20px}
 .lz-pool-section h3,.lz-topic-section h3{font-size:.85rem;font-weight:600;color:var(--c-text-soft);text-transform:uppercase;letter-spacing:.04em;margin-bottom:10px}
 .lz-topic-section{margin-top:16px}
@@ -90,7 +91,7 @@ body{font-family:'DM Sans',system-ui,sans-serif;background:var(--c-bg);color:var
 .lz-topic-chevron{font-size:.75rem;color:var(--c-text-soft);transition:transform .2s}
 .lz-topic.open .lz-topic-chevron{transform:rotate(90deg)}
 .lz-topic-body{max-height:0;overflow:hidden;transition:max-height .25s ease}
-.lz-topic.open .lz-topic-body{max-height:500px}
+.lz-topic.open .lz-topic-body{max-height:none}
 .lz-topic-body .lz-list{padding:0 16px 12px}
 .lz-list{list-style:none;padding:0}
 .lz-list li{position:relative;padding:7px 0 7px 22px;font-size:.88rem;line-height:1.5;border-bottom:1px solid var(--c-border)}
@@ -603,10 +604,7 @@ function showPoolLernziele(meta, topics, questions, poolId) {
   }
   body.innerHTML = html;
   document.getElementById('lzOverlay').classList.add('active');
-}
-
-function closeLzModal() {
-  document.getElementById('lzOverlay').classList.remove('active');
+  document.body.classList.add('lz-modal-open');
 }
 
 function formatLZ(text) {
@@ -620,6 +618,11 @@ function formatLZ(text) {
 document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') closeLzModal();
 });
+
+function closeLzModal() {
+  document.getElementById('lzOverlay').classList.remove('active');
+  document.body.classList.remove('lz-modal-open');
+}
 
 // 🏁 Alle Lernziele im Header-Button
 async function openAllLernziele() {
@@ -648,40 +651,46 @@ async function openAllLernziele() {
   document.getElementById('lzModalTitle').innerHTML = '🏁 Alle Lernziele';
   var body = document.getElementById('lzModalBody');
   var html = '';
+  var FACH_BORDER = { VWL: 'var(--c-vwl)', BWL: 'var(--c-bwl)', Recht: 'var(--c-recht)' };
   FACH_ORDER.forEach(function(fach) {
     var fachPools = allData.filter(function(d) { return d.fach === fach; });
     if (fachPools.length === 0) return;
-    // Klappbarer Fachbereich (eingeklappt)
-    html += '<div class="lz-topic" style="margin-bottom:14px">';
+    var bc = FACH_BORDER[fach] || 'var(--c-border)';
+    // Klappbarer Fachbereich (eingeklappt), farbcodiert
+    html += '<div class="lz-topic" style="margin-bottom:14px;border-left:3px solid ' + bc + '">';
     html += '<div class="lz-topic-header" onclick="this.parentElement.classList.toggle(\'open\')" style="background:var(--c-bg)">';
-    html += '<span class="lz-topic-label" style="font-size:1rem;text-transform:uppercase;letter-spacing:.04em;color:var(--c-text-soft)">' + fach + '</span>';
+    html += '<span class="lz-topic-label" style="font-size:1rem;font-weight:700;color:' + bc + '">' + fach + '</span>';
     html += '<span style="font-size:.78rem;color:var(--c-text-soft)">' + fachPools.length + ' Pools</span>';
     html += '<span class="lz-topic-chevron">▶</span>';
-    html += '</div><div class="lz-topic-body"><div style="padding:8px 16px 12px">';
+    html += '</div><div class="lz-topic-body"><div style="padding:8px 12px 12px">';
     fachPools.forEach(function(pool) {
       // Klappbarer Pool (eingeklappt)
       html += '<div class="lz-topic" style="margin-bottom:8px">';
       html += '<div class="lz-topic-header" onclick="this.parentElement.classList.toggle(\'open\')">';
-      html += '<span class="lz-topic-label">' + pool.title + '</span>';
+      html += '<span class="lz-topic-label" style="font-size:.9rem">' + pool.title + '</span>';
       html += '<span class="lz-topic-chevron">▶</span>';
-      html += '</div><div class="lz-topic-body"><div style="padding:4px 16px 12px">';
+      html += '</div><div class="lz-topic-body"><div style="padding:4px 12px 12px">';
       // Pool-Lernziele
       if (pool.data.POOL_META.lernziele && pool.data.POOL_META.lernziele.length) {
         html += '<ul class="lz-list" style="margin-bottom:10px">';
         pool.data.POOL_META.lernziele.forEach(function(lz) { html += '<li>' + formatLZ(lz) + '</li>'; });
         html += '</ul>';
       }
-      // Topic-Lernziele mit klickbaren Badges
+      // Klappbare Topics mit Lernzielen
       var keys = Object.keys(pool.data.TOPICS);
       keys.forEach(function(key) {
         var t = pool.data.TOPICS[key];
         if (!t.lernziele || !t.lernziele.length) return;
         var count = pool.data.QUESTIONS ? pool.data.QUESTIONS.filter(function(q) { return q.topic === key; }).length : 0;
         var link = 'pool.html?pool=' + pool.id + '&lz=' + encodeURIComponent(key);
-        html += '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--c-border)">';
-        html += '<span style="flex:1;font-size:.85rem;font-weight:500">' + t.label + '</span>';
-        if (count > 0) html += '<a class="lz-topic-badge" href="' + link + '" title="Quiz starten">' + count + ' Fragen ▶</a>';
-        html += '</div>';
+        html += '<div class="lz-topic" style="margin-bottom:4px">';
+        html += '<div class="lz-topic-header" onclick="this.parentElement.classList.toggle(\'open\')">';
+        html += '<span class="lz-topic-label" style="font-size:.85rem">' + t.label + '</span>';
+        if (count > 0) html += '<a class="lz-topic-badge" href="' + link + '" onclick="event.stopPropagation()" title="Quiz starten">' + count + ' Fragen ▶</a>';
+        html += '<span class="lz-topic-chevron">▶</span>';
+        html += '</div><div class="lz-topic-body"><ul class="lz-list">';
+        t.lernziele.forEach(function(lz) { html += '<li>' + formatLZ(lz) + '</li>'; });
+        html += '</ul></div></div>';
       });
       html += '</div></div></div>';
     });
