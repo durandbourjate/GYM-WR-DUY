@@ -430,7 +430,7 @@ function render() {
     const dotColor = FACH_DOT_COLORS[fach];
     const totalQ = pools.reduce((s, p) => s + p.questions, 0);
     // Fachbereiche mit Pools: offen. Leere: eingeklappt.
-    const isOpen = pools.length > 0;
+    const isOpen = false;
 
     html += '<div class="fach-section fach-' + colorClass + (isOpen ? ' open' : '') + '">';
 
