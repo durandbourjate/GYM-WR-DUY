@@ -38,12 +38,12 @@ window.QUESTIONS = [
     id: "m01", topic: "modelle", type: "mc", diff: 1, tax: "K1",
     q: "Was ist ein Modell in der Betriebswirtschaftslehre?",
     options: [
-      {v: "A", t: "Eine vereinfachte Darstellung der Wirklichkeit"},
+      {v: "A", t: "Eine Anweisung der Geschäftsleitung"},
       {v: "B", t: "Eine exakte Kopie der Realität"},
       {v: "C", t: "Ein Gesetz, das immer gilt"},
-      {v: "D", t: "Eine Anweisung der Geschäftsleitung"}
+      {v: "D", t: "Eine vereinfachte Darstellung der Wirklichkeit"}
     ],
-    correct: "A",
+    correct: "D",
     explain: "Modelle sind Abbildungen einer bestimmten Wirklichkeit, die einen Ausschnitt daraus vereinfacht darstellen. Sie helfen, komplexe Zusammenhänge zu ordnen und zu verstehen."
   },
   {
@@ -65,11 +65,11 @@ window.QUESTIONS = [
     q: "Welches Modell wird aufgestellt, um optimale Handlungsmöglichkeiten für die Zukunft zu bestimmen?",
     options: [
       {v: "A", t: "Beschreibungsmodell"},
-      {v: "B", t: "Erklärungsmodell"},
-      {v: "C", t: "Entscheidungsmodell"},
+      {v: "B", t: "Entscheidungsmodell"},
+      {v: "C", t: "Erklärungsmodell"},
       {v: "D", t: "Prognosemodell"}
     ],
-    correct: "C",
+    correct: "B",
     explain: "Entscheidungsmodelle werden aufgestellt, um die Bestimmung optimaler Handlungsmöglichkeiten zu erleichtern. Sie enthalten Aussagen, die auf die Zukunft gerichtet sind."
   },
   {
@@ -89,11 +89,11 @@ window.QUESTIONS = [
     q: "Ein Unternehmen nutzt historische Verkaufsdaten, um den Umsatz der nächsten Quartale vorherzusagen. Welche Modellarten kommen dabei zum Einsatz?",
     options: [
       {v: "A", t: "Nur ein Beschreibungsmodell"},
-      {v: "B", t: "Erst ein Beschreibungsmodell, dann ein Erklärungsmodell"},
-      {v: "C", t: "Beschreibungsmodell → Erklärungsmodell → Entscheidungsmodell"},
+      {v: "B", t: "Beschreibungsmodell → Erklärungsmodell → Entscheidungsmodell"},
+      {v: "C", t: "Erst ein Beschreibungsmodell, dann ein Erklärungsmodell"},
       {v: "D", t: "Nur ein Entscheidungsmodell"}
     ],
-    correct: "C",
+    correct: "B",
     explain: "Zuerst werden die historischen Daten beschrieben (Beschreibungsmodell), dann werden Muster und Ursachen identifiziert (Erklärungsmodell, z.B. saisonale Schwankungen), und schliesslich wird daraus eine Prognose für Entscheidungen abgeleitet (Entscheidungsmodell)."
   },
   {
@@ -106,12 +106,12 @@ window.QUESTIONS = [
     id: "m08", topic: "modelle", type: "mc", diff: 3, tax: "K5",
     q: "Warum ist es problematisch, unternehmerische Entscheidungen ausschliesslich auf ein einziges Modell zu stützen?",
     options: [
-      {v: "A", t: "Modelle sind immer falsch und daher nutzlos."},
-      {v: "B", t: "Jedes Modell vereinfacht die Realität und blendet bestimmte Aspekte aus."},
+      {v: "A", t: "Jedes Modell vereinfacht die Realität und blendet bestimmte Aspekte aus."},
+      {v: "B", t: "Modelle können nur die Vergangenheit abbilden."},
       {v: "C", t: "Modelle sind nur für grosse Unternehmen geeignet."},
-      {v: "D", t: "Modelle können nur die Vergangenheit abbilden."}
+      {v: "D", t: "Modelle sind immer falsch und daher nutzlos."}
     ],
-    correct: "B",
+    correct: "A",
     explain: "Modelle sind bewusste Vereinfachungen. Sie zeigen nur einen Ausschnitt der Realität. Wer sich auf ein einziges Modell verlässt, riskiert, wichtige Faktoren zu übersehen. Deshalb ist es sinnvoll, verschiedene Modelle und Perspektiven zu kombinieren."
   },
   {
@@ -129,12 +129,12 @@ window.QUESTIONS = [
     id: "a01", topic: "anspruchsgruppen", type: "mc", diff: 1, tax: "K1",
     q: "Was sind Anspruchsgruppen (Stakeholder)?",
     options: [
-      {v: "A", t: "Nur die Aktionäre eines Unternehmens"},
-      {v: "B", t: "Organisierte oder nicht organisierte Gruppen, die Ansprüche an ein Unternehmen stellen"},
-      {v: "C", t: "Staatliche Behörden, die Unternehmen kontrollieren"},
-      {v: "D", t: "Die Geschäftsleitung eines Unternehmens"}
+      {v: "A", t: "Organisierte oder nicht organisierte Gruppen, die Ansprüche an ein Unternehmen stellen"},
+      {v: "B", t: "Die Geschäftsleitung eines Unternehmens"},
+      {v: "C", t: "Nur die Aktionäre eines Unternehmens"},
+      {v: "D", t: "Staatliche Behörden, die Unternehmen kontrollieren"}
     ],
-    correct: "B",
+    correct: "A",
     explain: "Anspruchsgruppen (Stakeholder) sind organisierte oder nicht organisierte Gruppen von Unternehmen, Menschen oder Institutionen, die Ansprüche an ein Unternehmen stellen. Dazu gehören z.B. Kunden, Mitarbeitende, Lieferanten, Staat, Kapitalgeber, Konkurrenz und die Öffentlichkeit."
   },
   {
@@ -161,12 +161,12 @@ window.QUESTIONS = [
     id: "a04", topic: "anspruchsgruppen", type: "mc", diff: 2, tax: "K2",
     q: "Welchen Anspruch haben Fremdkapitalgeber (z.B. Banken) typischerweise an ein Unternehmen?",
     options: [
-      {v: "A", t: "Fairer Lohn und Arbeitsplatzsicherheit"},
-      {v: "B", t: "Möglichst hoher Zins, pünktliche Rückzahlung und Sicherheiten"},
-      {v: "C", t: "Tiefe Preise und guter Service"},
-      {v: "D", t: "Hohe Steuereinnahmen und Arbeitsplätze"}
+      {v: "A", t: "Möglichst hoher Zins, pünktliche Rückzahlung und Sicherheiten"},
+      {v: "B", t: "Tiefe Preise und guter Service"},
+      {v: "C", t: "Hohe Steuereinnahmen und Arbeitsplätze"},
+      {v: "D", t: "Fairer Lohn und Arbeitsplatzsicherheit"}
     ],
-    correct: "B",
+    correct: "A",
     explain: "Fremdkapitalgeber wie Banken erwarten einen möglichst hohen Zins für ihr ausgeliehenes Kapital, pünktliche Rückzahlung sowie Sicherheiten, damit ihr Risiko begrenzt bleibt."
   },
   {
@@ -174,11 +174,11 @@ window.QUESTIONS = [
     q: "Was erwarten Mitarbeitende typischerweise von einem Unternehmen?",
     options: [
       {v: "A", t: "Wertsteigerung der Anteile und hohe Dividende"},
-      {v: "B", t: "Fairen Lohn, gute Arbeitsbedingungen und Weiterbildungsmöglichkeiten"},
+      {v: "B", t: "Finanzielle Unterstützung bei Projekten (Sponsoring)"},
       {v: "C", t: "Langfristige Lieferbeziehungen und hohe Preise"},
-      {v: "D", t: "Finanzielle Unterstützung bei Projekten (Sponsoring)"}
+      {v: "D", t: "Fairen Lohn, gute Arbeitsbedingungen und Weiterbildungsmöglichkeiten"}
     ],
-    correct: "B",
+    correct: "D",
     explain: "Mitarbeitende erwarten einen fairen Lohn, Weiterbildungs- und Mitwirkungsmöglichkeiten, Arbeitsplatzsicherheit sowie gute Arbeitsbedingungen."
   },
   {
@@ -203,12 +203,12 @@ window.QUESTIONS = [
     id: "a08", topic: "anspruchsgruppen", type: "mc", diff: 3, tax: "K4",
     q: "Ein Technologieunternehmen plant, die Produktion ins Ausland zu verlagern. Welche Anspruchsgruppen sind davon am stärksten betroffen?",
     options: [
-      {v: "A", t: "Nur die Aktionäre, da der Aktienkurs schwanken könnte"},
-      {v: "B", t: "Mitarbeitende (Arbeitsplatzverlust), Staat (Steuereinnahmen), Lieferanten (Auftragsverlust)"},
+      {v: "A", t: "Nur die Konkurrenz, da sie einen Vorteil erhält"},
+      {v: "B", t: "Nur die Aktionäre, da der Aktienkurs schwanken könnte"},
       {v: "C", t: "Nur die Kunden, da die Qualität sinken könnte"},
-      {v: "D", t: "Nur die Konkurrenz, da sie einen Vorteil erhält"}
+      {v: "D", t: "Mitarbeitende (Arbeitsplatzverlust), Staat (Steuereinnahmen), Lieferanten (Auftragsverlust)"}
     ],
-    correct: "B",
+    correct: "D",
     explain: "Eine Produktionsverlagerung betrifft vor allem Mitarbeitende (drohendem Arbeitsplatzverlust), den Staat (Rückgang von Steuereinnahmen und Arbeitsplätzen) und Lieferanten (Verlust von Aufträgen). Natürlich können auch andere Gruppen betroffen sein, aber diese drei spüren die Auswirkungen am direktesten."
   },
   {
@@ -221,10 +221,10 @@ window.QUESTIONS = [
     id: "a10", topic: "anspruchsgruppen", type: "mc", diff: 3, tax: "K5",
     q: "Warum agiert ein Unternehmen laut dem Unternehmensmodell nicht isoliert?",
     options: [
-      {v: "A", t: "Weil es vom Staat dazu gezwungen wird"},
+      {v: "A", t: "Weil Unternehmen keinen Selbstzweck haben"},
       {v: "B", t: "Weil es in dauernder Wechselbeziehung mit seinem Umfeld, anderen Unternehmen und verschiedenen Personengruppen steht"},
-      {v: "C", t: "Weil es nur so Gewinne erzielen kann"},
-      {v: "D", t: "Weil Unternehmen keinen Selbstzweck haben"}
+      {v: "C", t: "Weil es vom Staat dazu gezwungen wird"},
+      {v: "D", t: "Weil es nur so Gewinne erzielen kann"}
     ],
     correct: "B",
     explain: "Das Unternehmensmodell zeigt, dass Unternehmen in dauernder Wechselbeziehung mit ihrem Umfeld stehen – mit Anspruchsgruppen und den Umweltsphären. Diese Beziehungen sind vielfältig und komplex und beeinflussen die Ziele und Entscheide des Unternehmens massgeblich."
@@ -260,12 +260,12 @@ window.QUESTIONS = [
     id: "z01", topic: "zielbeziehungen", type: "mc", diff: 1, tax: "K1",
     q: "Was bedeutet «Zielharmonie» zwischen zwei Anspruchsgruppen?",
     options: [
-      {v: "A", t: "Die Erfüllung des einen Ziels führt zu einer Minderung des anderen Ziels."},
+      {v: "A", t: "Beide Ziele können nie gleichzeitig erreicht werden."},
       {v: "B", t: "Die beiden Ziele beeinflussen sich gegenseitig nicht."},
-      {v: "C", t: "Durch das Erreichen des einen Ziels wird die Erfüllung des anderen Ziels gesteigert."},
-      {v: "D", t: "Beide Ziele können nie gleichzeitig erreicht werden."}
+      {v: "C", t: "Die Erfüllung des einen Ziels führt zu einer Minderung des anderen Ziels."},
+      {v: "D", t: "Durch das Erreichen des einen Ziels wird die Erfüllung des anderen Ziels gesteigert."}
     ],
-    correct: "C",
+    correct: "D",
     explain: "Bei einer Zielharmonie (komplementäre Ziele) fördert das Erreichen des einen Ziels gleichzeitig das andere Ziel. Beide Seiten profitieren."
   },
   {
@@ -281,12 +281,12 @@ window.QUESTIONS = [
     id: "z03", topic: "zielbeziehungen", type: "mc", diff: 2, tax: "K3",
     q: "Die Mitarbeitenden fordern höhere Löhne, gleichzeitig möchte das Unternehmen die Kosten senken. Welche Zielbeziehung liegt vor?",
     options: [
-      {v: "A", t: "Zielharmonie"},
-      {v: "B", t: "Zielneutralität"},
-      {v: "C", t: "Zielkonflikt (Konkurrenz)"},
-      {v: "D", t: "Zielidentität"}
+      {v: "A", t: "Zielkonflikt (Konkurrenz)"},
+      {v: "B", t: "Zielidentität"},
+      {v: "C", t: "Zielneutralität"},
+      {v: "D", t: "Zielharmonie"}
     ],
-    correct: "C",
+    correct: "A",
     explain: "Höhere Löhne bedeuten höhere Kosten für das Unternehmen. Das Ziel der Mitarbeitenden (höherer Lohn) und das Unternehmensziel (Kostensenkung) stehen in Konkurrenz zueinander – ein klassischer Zielkonflikt."
   },
   {
@@ -295,11 +295,11 @@ window.QUESTIONS = [
     q: "Betrachten Sie das Diagramm. Welche Begriffe gehören zu Ansatz A und Ansatz B?",
     options: [
       {v: "A", t: "A = Stakeholder-Value, B = Shareholder-Value"},
-      {v: "B", t: "A = Shareholder-Value, B = Stakeholder-Value"},
-      {v: "C", t: "A = Kostenführerschaft, B = Differenzierungsstrategie"},
-      {v: "D", t: "A = Unternehmensmodell, B = Umweltmodell"}
+      {v: "B", t: "A = Unternehmensmodell, B = Umweltmodell"},
+      {v: "C", t: "A = Shareholder-Value, B = Stakeholder-Value"},
+      {v: "D", t: "A = Kostenführerschaft, B = Differenzierungsstrategie"}
     ],
-    correct: "B",
+    correct: "C",
     explain: "Ansatz A zeigt den Shareholder-Value-Ansatz: Fokus auf nur eine Gruppe (Eigentümer/Aktionäre) mit dem Ziel der Gewinnmaximierung und kurzfristiger Perspektive. Ansatz B zeigt den Stakeholder-Value-Ansatz: Alle Anspruchsgruppen werden berücksichtigt, mit dem Ziel der Ausgewogenheit und langfristiger Perspektive."
   },
   {
@@ -325,9 +325,9 @@ window.QUESTIONS = [
     q: "Ein Unternehmen investiert in bessere Arbeitsbedingungen. Die Mitarbeitenden sind zufriedener und produktiver, was zu höheren Gewinnen führt. Welche Zielbeziehung besteht hier zwischen den Ansprüchen der Mitarbeitenden und der Eigenkapitalgeber?",
     options: [
       {v: "A", t: "Zielkonflikt, weil die Investition kurzfristig Kosten verursacht"},
-      {v: "B", t: "Zielneutralität, weil die Bereiche nichts miteinander zu tun haben"},
+      {v: "B", t: "Die Beziehung lässt sich nicht bestimmen"},
       {v: "C", t: "Zielharmonie, weil beide Seiten langfristig profitieren"},
-      {v: "D", t: "Die Beziehung lässt sich nicht bestimmen"}
+      {v: "D", t: "Zielneutralität, weil die Bereiche nichts miteinander zu tun haben"}
     ],
     correct: "C",
     explain: "Obwohl kurzfristig Kosten entstehen, profitieren langfristig sowohl Mitarbeitende (bessere Bedingungen) als auch Eigenkapitalgeber (höhere Gewinne durch Produktivitätssteigerung). Das ist ein Beispiel für Zielharmonie im Sinne des Stakeholder-Value-Ansatzes."
@@ -342,12 +342,12 @@ window.QUESTIONS = [
     id: "z09", topic: "zielbeziehungen", type: "mc", diff: 3, tax: "K5",
     q: "Zwischen den Forderungen der Eigenkapitalgeber und den Forderungen der Fremdkapitalgeber besteht meistens:",
     options: [
-      {v: "A", t: "Ein starker Zielkonflikt"},
-      {v: "B", t: "Weitgehende Zielharmonie"},
-      {v: "C", t: "Zielneutralität"},
-      {v: "D", t: "Keine Beziehung"}
+      {v: "A", t: "Keine Beziehung"},
+      {v: "B", t: "Zielneutralität"},
+      {v: "C", t: "Ein starker Zielkonflikt"},
+      {v: "D", t: "Weitgehende Zielharmonie"}
     ],
-    correct: "B",
+    correct: "D",
     explain: "Eigen- und Fremdkapitalgeber stehen in weitgehender Zielharmonie zueinander: Beide möchten eine hohe Rendite erzielen bzw. ihre Kapitaleinlage gesichert wissen. Die Förderung des einen Anspruchs (z.B. Wertsteigerung) fördert auch das Vertrauen der anderen Gruppe."
   },
   {
@@ -367,12 +367,12 @@ window.QUESTIONS = [
     img: {src: "img/bwl/unternehmensmodell/zielbeziehungen_schema_01.svg", alt: "Drei Typen von Zielbeziehungen: Typ A mit zwei steigenden Zielen, Typ B mit unabhängigen Zielen, Typ C mit gegenläufigen Zielen"},
     q: "Betrachten Sie das Diagramm. Welche Bezeichnungen passen zu den drei Typen A, B und C?",
     options: [
-      {v: "A", t: "A = Zielharmonie, B = Zielneutralität, C = Zielkonkurrenz"},
-      {v: "B", t: "A = Zielkonkurrenz, B = Zielharmonie, C = Zielneutralität"},
-      {v: "C", t: "A = Zielneutralität, B = Zielkonkurrenz, C = Zielharmonie"},
-      {v: "D", t: "A = Zielharmonie, B = Zielkonkurrenz, C = Zielneutralität"}
+      {v: "A", t: "A = Zielneutralität, B = Zielkonkurrenz, C = Zielharmonie"},
+      {v: "B", t: "A = Zielharmonie, B = Zielkonkurrenz, C = Zielneutralität"},
+      {v: "C", t: "A = Zielkonkurrenz, B = Zielharmonie, C = Zielneutralität"},
+      {v: "D", t: "A = Zielharmonie, B = Zielneutralität, C = Zielkonkurrenz"}
     ],
-    correct: "A",
+    correct: "D",
     explain: "Typ A zeigt Zielharmonie: Beide Ziele steigen gemeinsam — die Erreichung des einen Ziels fördert das andere. Typ B zeigt Zielneutralität: Die Ziele beeinflussen sich gegenseitig nicht. Typ C zeigt Zielkonkurrenz (Zielkonflikt): Ein Ziel steigt, das andere sinkt — die Erreichung des einen Ziels beeinträchtigt das andere."
   },
 
@@ -384,10 +384,10 @@ window.QUESTIONS = [
     id: "u01", topic: "umweltsphaeren", type: "mc", diff: 1, tax: "K1",
     q: "In wie viele Umweltsphären wird die Unternehmensumwelt im St. Galler Unternehmensmodell unterteilt?",
     options: [
-      {v: "A", t: "Drei"},
+      {v: "A", t: "Sechs"},
       {v: "B", t: "Vier"},
       {v: "C", t: "Fünf"},
-      {v: "D", t: "Sechs"}
+      {v: "D", t: "Drei"}
     ],
     correct: "C",
     explain: "Die Unternehmensumwelt wird in fünf Umweltsphären unterteilt: die ökonomische, technologische, ökologische, soziale und rechtliche Umweltsphäre."
@@ -405,24 +405,24 @@ window.QUESTIONS = [
     id: "u03", topic: "umweltsphaeren", type: "mc", diff: 1, tax: "K1",
     q: "Konjunktur, Inflationsrate und Wechselkurse sind Grössen welcher Umweltsphäre?",
     options: [
-      {v: "A", t: "Technologische Umweltsphäre"},
-      {v: "B", t: "Ökonomische Umweltsphäre"},
+      {v: "A", t: "Ökonomische Umweltsphäre"},
+      {v: "B", t: "Rechtliche Umweltsphäre"},
       {v: "C", t: "Soziale Umweltsphäre"},
-      {v: "D", t: "Rechtliche Umweltsphäre"}
+      {v: "D", t: "Technologische Umweltsphäre"}
     ],
-    correct: "B",
+    correct: "A",
     explain: "Konjunktur, Inflationsrate und Wechselkurse sind gesamtwirtschaftliche Rahmenbedingungen und gehören zur ökonomischen Umweltsphäre."
   },
   {
     id: "u04", topic: "umweltsphaeren", type: "mc", diff: 2, tax: "K2",
     q: "Bodenknappheit, Rohstoffvorkommen und Klimaerwärmung sind Einflüsse welcher Umweltsphäre?",
     options: [
-      {v: "A", t: "Soziale Umweltsphäre"},
-      {v: "B", t: "Ökonomische Umweltsphäre"},
-      {v: "C", t: "Ökologische Umweltsphäre"},
-      {v: "D", t: "Technologische Umweltsphäre"}
+      {v: "A", t: "Ökologische Umweltsphäre"},
+      {v: "B", t: "Soziale Umweltsphäre"},
+      {v: "C", t: "Technologische Umweltsphäre"},
+      {v: "D", t: "Ökonomische Umweltsphäre"}
     ],
-    correct: "C",
+    correct: "A",
     explain: "Natürliche Gegebenheiten wie Bodenknappheit, Rohstoffvorkommen und Klimaerwärmung gehören zur ökologischen Umweltsphäre. Diese Umweltsphäre umfasst alle Einflüsse aus der natürlichen Umgebung."
   },
   {
@@ -441,12 +441,12 @@ window.QUESTIONS = [
     id: "u06", topic: "umweltsphaeren", type: "mc", diff: 2, tax: "K2",
     q: "Einstellungen und Werthaltungen der Menschen in einer Gesellschaft, z.B. zu Themen wie Sonntagsverkauf oder fremde Kulturen, gehören zu welcher Umweltsphäre?",
     options: [
-      {v: "A", t: "Ökonomische Umweltsphäre"},
-      {v: "B", t: "Rechtliche Umweltsphäre"},
-      {v: "C", t: "Ökologische Umweltsphäre"},
-      {v: "D", t: "Soziale Umweltsphäre"}
+      {v: "A", t: "Soziale Umweltsphäre"},
+      {v: "B", t: "Ökonomische Umweltsphäre"},
+      {v: "C", t: "Rechtliche Umweltsphäre"},
+      {v: "D", t: "Ökologische Umweltsphäre"}
     ],
-    correct: "D",
+    correct: "A",
     explain: "In der sozialen Umweltsphäre betrachten wir Einflüsse aus dem Zusammenleben und den Werthaltungen der Menschen: z.B. Themen wie Sonntagsverkauf, Gleichstellung, Kindertagesstätten oder Offenheit gegenüber anderen Ländern."
   },
   {
@@ -459,12 +459,12 @@ window.QUESTIONS = [
     id: "u08", topic: "umweltsphaeren", type: "mc", diff: 2, tax: "K3",
     q: "Ein Winterferienort unter 1200 m ü.M. hat wegen des Klimawandels kaum noch Schnee und muss in Beschneiungsanlagen investieren. Welche Umweltsphäre wirkt hier primär auf das Unternehmen?",
     options: [
-      {v: "A", t: "Soziale Umweltsphäre"},
-      {v: "B", t: "Rechtliche Umweltsphäre"},
-      {v: "C", t: "Ökologische Umweltsphäre"},
+      {v: "A", t: "Rechtliche Umweltsphäre"},
+      {v: "B", t: "Ökologische Umweltsphäre"},
+      {v: "C", t: "Soziale Umweltsphäre"},
       {v: "D", t: "Ökonomische Umweltsphäre"}
     ],
-    correct: "C",
+    correct: "B",
     explain: "Der Klimawandel ist ein Phänomen der ökologischen Umweltsphäre. Er führt zu weniger Schnee in tieferen Lagen, was die Tourismusunternehmen direkt betrifft und zu Investitionen in Beschneiungsanlagen oder alternative Angebote zwingt."
   },
   {
@@ -490,12 +490,12 @@ window.QUESTIONS = [
     id: "u11", topic: "umweltsphaeren", type: "mc", diff: 3, tax: "K4",
     q: "Ein neues Gesetz zur CO₂-Bepreisung betrifft ein Industrieunternehmen. Welche Umweltsphären sind hier verknüpft?",
     options: [
-      {v: "A", t: "Nur die rechtliche Umweltsphäre"},
-      {v: "B", t: "Die rechtliche und die ökologische Umweltsphäre"},
-      {v: "C", t: "Die rechtliche, ökologische und ökonomische Umweltsphäre"},
-      {v: "D", t: "Alle fünf Umweltsphären gleichermassen"}
+      {v: "A", t: "Die rechtliche, ökologische und ökonomische Umweltsphäre"},
+      {v: "B", t: "Nur die rechtliche Umweltsphäre"},
+      {v: "C", t: "Alle fünf Umweltsphären gleichermassen"},
+      {v: "D", t: "Die rechtliche und die ökologische Umweltsphäre"}
     ],
-    correct: "C",
+    correct: "A",
     explain: "Ein CO₂-Gesetz ist ein rechtlicher Rahmen (rechtlich), der auf ein ökologisches Problem reagiert (ökologisch) und finanzielle Auswirkungen auf das Unternehmen hat (ökonomisch). Die Umweltsphären sind nicht immer eindeutig voneinander abzugrenzen — ein CO₂-Gesetz kann gleichzeitig der rechtlichen und der ökologischen Sphäre zugeordnet werden."
   },
 
@@ -514,10 +514,10 @@ window.QUESTIONS = [
     img: {src: "img/bwl/unternehmensmodell/umweltsphaeren_wechselwirkung_01.svg", alt: "Diagramm mit Unternehmen und Umweltsphären, drei nummerierte Pfeile zeigen verschiedene Wechselwirkungen"},
     q: "Das Diagramm zeigt drei Arten von Wechselwirkungen. Welche Aussage beschreibt alle drei korrekt?",
     options: [
-      {v: "A", t: "Nur: Umweltsphäre → Unternehmen"},
+      {v: "A", t: "Nur: Unternehmen → Anspruchsgruppen"},
       {v: "B", t: "Sphäre ↔ Sphäre, Sphäre ↔ Unternehmen, Unternehmen ↔ Sphäre"},
-      {v: "C", t: "Nur: Unternehmen → Anspruchsgruppen"},
-      {v: "D", t: "Nur zwischen Anspruchsgruppen untereinander"}
+      {v: "C", t: "Nur zwischen Anspruchsgruppen untereinander"},
+      {v: "D", t: "Nur: Umweltsphäre → Unternehmen"}
     ],
     correct: "B",
     explain: "Im Unternehmensmodell gibt es drei Arten von Wechselwirkungen: zwischen Sphären untereinander, von Sphären auf das Unternehmen und vom Unternehmen auf die Sphären. Alle Richtungen sind möglich."
@@ -528,8 +528,8 @@ window.QUESTIONS = [
     options: [
       {v: "A", t: "Umweltsphäre → Unternehmen (ökonomisch)"},
       {v: "B", t: "Unternehmen → Umweltsphäre (ökonomisch und sozial)"},
-      {v: "C", t: "Sphäre → Sphäre (sozial → ökonomisch)"},
-      {v: "D", t: "Anspruchsgruppe → Unternehmen (Staat fordert Arbeitsplätze)"}
+      {v: "C", t: "Anspruchsgruppe → Unternehmen (Staat fordert Arbeitsplätze)"},
+      {v: "D", t: "Sphäre → Sphäre (sozial → ökonomisch)"}
     ],
     correct: "B",
     explain: "Das Unternehmen beeinflusst aktiv seine Umwelt: Es schafft Arbeitsplätze (soziale Wirkung) und stärkt die regionale Wirtschaft (ökonomische Wirkung). Das ist eine Wechselwirkung vom Unternehmen auf die Umweltsphären."
@@ -550,12 +550,12 @@ window.QUESTIONS = [
     id: "w05", topic: "wechselwirkungen", type: "mc", diff: 3, tax: "K4",
     q: "Warum ist die Analyse der Umwelt und die Prognose kommender Entwicklungen eine vordringliche Aufgabe der Unternehmensführung?",
     options: [
-      {v: "A", t: "Weil es gesetzlich vorgeschrieben ist"},
-      {v: "B", t: "Weil ein optimales Miteinander von Unternehmen und Umwelt ein wesentlicher Wettbewerbsvorteil ist"},
-      {v: "C", t: "Weil die Konkurrenz es auch macht"},
-      {v: "D", t: "Weil die Anspruchsgruppen es verlangen"}
+      {v: "A", t: "Weil die Konkurrenz es auch macht"},
+      {v: "B", t: "Weil die Anspruchsgruppen es verlangen"},
+      {v: "C", t: "Weil es gesetzlich vorgeschrieben ist"},
+      {v: "D", t: "Weil ein optimales Miteinander von Unternehmen und Umwelt ein wesentlicher Wettbewerbsvorteil ist"}
     ],
-    correct: "B",
+    correct: "D",
     explain: "Die Umweltvoraussetzungen sind für Unternehmen einer Branche in derselben Region oft ähnlich. Wenn es einem Unternehmen gelingt, ein optimales Miteinander mit seiner Umwelt zu schaffen, ist das ein wesentlicher Wettbewerbsvorteil."
   },
   {
@@ -568,12 +568,12 @@ window.QUESTIONS = [
     id: "w07", topic: "wechselwirkungen", type: "mc", diff: 3, tax: "K5",
     q: "Ein Unternehmen stösst grosse Mengen CO₂ aus. Die Regierung erlässt daraufhin strengere Emissionsgesetze. Welche Wechselwirkungskette liegt vor?",
     options: [
-      {v: "A", t: "Unternehmen → ökologische Sphäre → rechtliche Sphäre → Unternehmen"},
-      {v: "B", t: "Rechtliche Sphäre → Unternehmen → soziale Sphäre"},
-      {v: "C", t: "Ökonomische Sphäre → Unternehmen → technologische Sphäre"},
-      {v: "D", t: "Soziale Sphäre → Unternehmen → ökonomische Sphäre"}
+      {v: "A", t: "Rechtliche Sphäre → Unternehmen → soziale Sphäre"},
+      {v: "B", t: "Soziale Sphäre → Unternehmen → ökonomische Sphäre"},
+      {v: "C", t: "Unternehmen → ökologische Sphäre → rechtliche Sphäre → Unternehmen"},
+      {v: "D", t: "Ökonomische Sphäre → Unternehmen → technologische Sphäre"}
     ],
-    correct: "A",
+    correct: "C",
     explain: "Das Unternehmen belastet die Umwelt (Unternehmen → ökologische Sphäre), was zu gesellschaftlichem und politischem Druck führt und in neue Gesetze mündet (ökologische → rechtliche Sphäre). Diese Gesetze wirken wiederum auf das Unternehmen zurück (rechtliche Sphäre → Unternehmen). Ein Beispiel für eine Wechselwirkungskette über mehrere Sphären.",
     img: {src: "img/bwl/unternehmensmodell/unternehmensmodell_wechselwirkungen_01.svg", alt: "Diagramm: Wechselwirkungskette zwischen Unternehmen und Umweltsphären"}
   },
@@ -600,12 +600,12 @@ window.QUESTIONS = [
     id: "v01", topic: "verhaltensweisen", type: "mc", diff: 1, tax: "K1",
     q: "Welche drei grundsätzlichen Verhaltensweisen kann ein Unternehmen gegenüber seiner Umwelt einnehmen?",
     options: [
-      {v: "A", t: "Beharren, Reaktion und Aktion"},
-      {v: "B", t: "Analyse, Planung und Kontrolle"},
-      {v: "C", t: "Innovation, Imitation und Fusion"},
-      {v: "D", t: "Wachstum, Stagnation und Schrumpfung"}
+      {v: "A", t: "Innovation, Imitation und Fusion"},
+      {v: "B", t: "Wachstum, Stagnation und Schrumpfung"},
+      {v: "C", t: "Beharren, Reaktion und Aktion"},
+      {v: "D", t: "Analyse, Planung und Kontrolle"}
     ],
-    correct: "A",
+    correct: "C",
     explain: "Die drei grundsätzlichen Verhaltensweisen sind: Beharren (am Bestehenden festhalten), Reaktion (auf Veränderungen reagieren) und Aktion (proaktiv Veränderungen vorantreiben)."
   },
   {
@@ -620,12 +620,12 @@ window.QUESTIONS = [
     id: "v03", topic: "verhaltensweisen", type: "mc", diff: 2, tax: "K3",
     q: "Ein Detailhändler führt erst einen Online-Shop ein, nachdem die meisten Konkurrenten dies bereits getan haben und die Umsätze im stationären Handel stark gesunken sind. Welche Verhaltensweise zeigt das Unternehmen?",
     options: [
-      {v: "A", t: "Aktion"},
-      {v: "B", t: "Reaktion"},
-      {v: "C", t: "Beharren"},
-      {v: "D", t: "Innovation"}
+      {v: "A", t: "Reaktion"},
+      {v: "B", t: "Aktion"},
+      {v: "C", t: "Innovation"},
+      {v: "D", t: "Beharren"}
     ],
-    correct: "B",
+    correct: "A",
     explain: "Das Unternehmen reagiert erst auf den Druck der Umwelt (sinkende Umsätze, Konkurrenz online). Es handelt nicht vorausschauend (das wäre Aktion), aber auch nicht untätig (das wäre Beharren). Es reagiert – allerdings spät."
   },
   {
@@ -652,22 +652,22 @@ window.QUESTIONS = [
     options: [
       {v: "A", t: "Aktion – weil sie teuer ist"},
       {v: "B", t: "Reaktion – weil sie immer zu spät kommt"},
-      {v: "C", t: "Beharren – weil das Unternehmen technologische Entwicklungen verpasst"},
-      {v: "D", t: "Alle drei sind gleich riskant"}
+      {v: "C", t: "Alle drei sind gleich riskant"},
+      {v: "D", t: "Beharren – weil das Unternehmen technologische Entwicklungen verpasst"}
     ],
-    correct: "C",
+    correct: "D",
     explain: "In einem sich schnell wandelnden technologischen Umfeld ist Beharren am riskantesten, weil das Unternehmen wichtige Entwicklungen verpasst und den Anschluss an den Markt verlieren kann. Beispiele dafür gibt es viele (z.B. Kodak und die Digitalfotografie)."
   },
   {
     id: "v07", topic: "verhaltensweisen", type: "mc", diff: 3, tax: "K4",
     q: "Ein traditioneller Buchladen beobachtet den Aufstieg von E-Books und Online-Händlern. Er entscheidet sich, neben dem Buchverkauf auch Lesungen, Autorentreffen und ein Café anzubieten. Welche Verhaltensweise zeigt er?",
     options: [
-      {v: "A", t: "Beharren, weil er weiterhin Bücher verkauft"},
+      {v: "A", t: "Sowohl Reaktion als auch Aktion"},
       {v: "B", t: "Reaktion, weil er erst auf den Druck des Marktes reagiert"},
       {v: "C", t: "Aktion, weil er kreativ neue Wege geht"},
-      {v: "D", t: "Sowohl Reaktion als auch Aktion"}
+      {v: "D", t: "Beharren, weil er weiterhin Bücher verkauft"}
     ],
-    correct: "D",
+    correct: "A",
     explain: "Der Buchladen reagiert auf den Druck durch Online-Händler (Reaktion), geht aber gleichzeitig kreativ neue Wege, indem er sein Geschäftsmodell um Erlebnisangebote erweitert (Aktion). In der Praxis sind die Verhaltensweisen oft nicht trennscharf – hier zeigt das Unternehmen Elemente von Reaktion und Aktion."
   },
   {
@@ -686,11 +686,11 @@ window.QUESTIONS = [
     q: "Was war die Brent Spar?",
     options: [
       {v: "A", t: "Ein Öltanker der Shell AG"},
-      {v: "B", t: "Ein schwimmender Speichertank (Ölplattform) von Shell in der Nordsee"},
-      {v: "C", t: "Eine Raffinerie an der britischen Küste"},
-      {v: "D", t: "Ein Umweltschutzprojekt von Greenpeace"}
+      {v: "B", t: "Ein Umweltschutzprojekt von Greenpeace"},
+      {v: "C", t: "Ein schwimmender Speichertank (Ölplattform) von Shell in der Nordsee"},
+      {v: "D", t: "Eine Raffinerie an der britischen Küste"}
     ],
-    correct: "B",
+    correct: "C",
     explain: "Die Brent Spar war ein schwimmender Speichertank (Öl-Lagerplattform), der 1975/76 in Norwegen montiert wurde, um Rohöl anderer Bohrinseln zwischenzulagern. Sie war 137 Meter hoch und 14'500 Tonnen schwer."
   },
   {
@@ -698,11 +698,11 @@ window.QUESTIONS = [
     q: "Welche zwei Entsorgungsvarianten standen bei der Brent Spar zur Diskussion?",
     options: [
       {v: "A", t: "Stehen lassen oder verschrotten"},
-      {v: "B", t: "Versenken in tiefer See oder vollständiger Abbau an Land"},
+      {v: "B", t: "Sprengung vor Ort oder Transport nach Afrika"},
       {v: "C", t: "Verkauf an eine andere Firma oder Umbau zu einem Hotel"},
-      {v: "D", t: "Sprengung vor Ort oder Transport nach Afrika"}
+      {v: "D", t: "Versenken in tiefer See oder vollständiger Abbau an Land"}
     ],
-    correct: "B",
+    correct: "D",
     explain: "Die zwei Hauptvarianten waren: Variante 1 – Versenken in einem tiefen atlantischen Graben (ca. 2'375 m Tiefe), und Variante 2 – Vollständiger Abbau an Land (Plattform an Land schleppen und auseinandernehmen)."
   },
   {
@@ -721,24 +721,24 @@ window.QUESTIONS = [
     id: "f04", topic: "anwendung", type: "mc", diff: 2, tax: "K3",
     q: "Im Fall Brent Spar argumentierte die Ökonomin Elke Reeding, dass die Versenkungskosten bei ca. 24 Mio. Franken liegen, der Landabbau aber bei ca. 94 Mio. Franken. Welche Umweltsphäre steht bei ihrem Bericht im Vordergrund?",
     options: [
-      {v: "A", t: "Ökologische Umweltsphäre"},
-      {v: "B", t: "Technologische Umweltsphäre"},
-      {v: "C", t: "Ökonomische Umweltsphäre"},
-      {v: "D", t: "Soziale Umweltsphäre"}
+      {v: "A", t: "Technologische Umweltsphäre"},
+      {v: "B", t: "Ökonomische Umweltsphäre"},
+      {v: "C", t: "Soziale Umweltsphäre"},
+      {v: "D", t: "Ökologische Umweltsphäre"}
     ],
-    correct: "C",
+    correct: "B",
     explain: "Die Ökonomin analysiert primär die Kosten und finanziellen Konsequenzen der Entsorgungsvarianten. Ihr Bericht fokussiert auf die ökonomische Umweltsphäre: Kosten, Gewinnwirkung, Steuereffekte, Wettbewerbsvorteile."
   },
   {
     id: "f05", topic: "anwendung", type: "mc", diff: 3, tax: "K4",
     q: "Der Kommunikationsspezialist Aldo Müller empfahl im Fall Brent Spar den Landabbau, obwohl dieser viermal teurer war. Was war sein Hauptargument?",
     options: [
-      {v: "A", t: "Die technischen Risiken der Versenkung seien zu hoch."},
-      {v: "B", t: "Ein Imagegewinn als umweltbewusstes Unternehmen sei langfristig wertvoller als die Kostenersparnis."},
-      {v: "C", t: "Die britische Regierung hätte die Versenkung ohnehin verboten."},
-      {v: "D", t: "Die Mitarbeitenden hätten sich geweigert, die Versenkung durchzuführen."}
+      {v: "A", t: "Die Mitarbeitenden hätten sich geweigert, die Versenkung durchzuführen."},
+      {v: "B", t: "Die technischen Risiken der Versenkung seien zu hoch."},
+      {v: "C", t: "Ein Imagegewinn als umweltbewusstes Unternehmen sei langfristig wertvoller als die Kostenersparnis."},
+      {v: "D", t: "Die britische Regierung hätte die Versenkung ohnehin verboten."}
     ],
-    correct: "B",
+    correct: "C",
     explain: "Aldo Müller argumentierte aus der sozialen Perspektive: Ein möglicher Boykott und der damit verbundene Imageverlust wären katastrophal teuer. Umgekehrt könnte Shell sich durch den Landabbau als Vorreiterin im Umweltschutz positionieren und langfristig Marktanteile gewinnen."
   },
   {
@@ -752,11 +752,11 @@ window.QUESTIONS = [
     q: "Was war die langfristig bedeutendste Folge des Brent-Spar-Falls?",
     options: [
       {v: "A", t: "Shell ging bankrott."},
-      {v: "B", t: "Die 15 Nordsee-Anrainerstaaten beschlossen 1998 ein Versenkungsverbot für Ölplattformen."},
-      {v: "C", t: "Greenpeace wurde verboten."},
-      {v: "D", t: "Alle Ölplattformen in der Nordsee wurden sofort abgebaut."}
+      {v: "B", t: "Alle Ölplattformen in der Nordsee wurden sofort abgebaut."},
+      {v: "C", t: "Die 15 Nordsee-Anrainerstaaten beschlossen 1998 ein Versenkungsverbot für Ölplattformen."},
+      {v: "D", t: "Greenpeace wurde verboten."}
     ],
-    correct: "B",
+    correct: "C",
     explain: "Die bedeutendste Folge war das 1998 von den 15 Anrainerstaaten einstimmig beschlossene Plattform-Versenkungsverbot im Nordostatlantik. Der Fall gilt als einer der ersten grossen Erfolge von Konsumenten gegen einen Grosskonzern."
   },
   {
@@ -775,12 +775,12 @@ window.QUESTIONS = [
     id: "f09", topic: "anwendung", type: "mc", diff: 1, tax: "K2",
     q: "Welches Modell wird durch den Fall Brent Spar besonders gut illustriert?",
     options: [
-      {v: "A", t: "Das Modell der doppelten Buchhaltung"},
-      {v: "B", t: "Das Unternehmensmodell mit Anspruchsgruppen und Umweltsphären"},
+      {v: "A", t: "Das Unternehmensmodell mit Anspruchsgruppen und Umweltsphären"},
+      {v: "B", t: "Das Modell der doppelten Buchhaltung"},
       {v: "C", t: "Das Modell der Preisbildung auf dem Markt"},
       {v: "D", t: "Das Konjunkturmodell"}
     ],
-    correct: "B",
+    correct: "A",
     explain: "Der Fall Brent Spar illustriert perfekt das Unternehmensmodell: Er zeigt die verschiedenen Anspruchsgruppen (Kunden, Staat, Öffentlichkeit, Mitarbeitende, Aktionäre), die Umweltsphären (ökonomisch, ökologisch, technologisch, sozial, rechtlich) und die komplexen Wechselwirkungen und Zielkonflikte zwischen ihnen."
   },
   {
@@ -793,12 +793,12 @@ window.QUESTIONS = [
     id: "f11", topic: "anwendung", type: "mc", diff: 2, tax: "K3",
     q: "Die Alti Moschti Mühlethurnen ist eine Kulturgenossenschaft in einer Berner Gemeinde. Welche Anspruchsgruppe ist für sie am wichtigsten?",
     options: [
-      {v: "A", t: "Die Eigenkapitalgeber, da sie hohe Rendite erwarten"},
-      {v: "B", t: "Die Kundschaft, die qualitativ hochstehende Veranstaltungen in angenehmer Atmosphäre erwartet"},
-      {v: "C", t: "Die Konkurrenz, da sie den gleichen Markt bedient"},
-      {v: "D", t: "Der Staat, der hohe Steuereinnahmen erwartet"}
+      {v: "A", t: "Der Staat, der hohe Steuereinnahmen erwartet"},
+      {v: "B", t: "Die Eigenkapitalgeber, da sie hohe Rendite erwarten"},
+      {v: "C", t: "Die Kundschaft, die qualitativ hochstehende Veranstaltungen in angenehmer Atmosphäre erwartet"},
+      {v: "D", t: "Die Konkurrenz, da sie den gleichen Markt bedient"}
     ],
-    correct: "B",
+    correct: "C",
     explain: "Gemäss dem Lehrbuch-Beispiel ist die wichtigste Anspruchsgruppe der Alti Moschti die Kundschaft, die qualitativ hochstehende Konzerte und Veranstaltungen in einer angenehmen und speziellen Atmosphäre geniessen möchte."
   }
 ];

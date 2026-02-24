@@ -30,8 +30,8 @@ window.QUESTIONS = [
 // ──── DEFINITION & GRUNDBEGRIFFE (d01–d12) ────
 {id:"d01",topic:"definition",type:"mc",diff:1,tax:"K1",
  q:"Was misst das Bruttoinlandprodukt (BIP)?",
- options:[{v:"A",t:"Den Marktwert aller in einem Land während eines Jahres hergestellten Endprodukte."},{v:"B",t:"Die Summe aller in einem Land produzierten Güter inklusive Vorleistungen."},{v:"C",t:"Den Wert aller Exporte eines Landes."},{v:"D",t:"Das Gesamtvermögen aller Einwohner eines Landes."}],
- correct:"A",explain:"Das BIP entspricht dem Marktwert aller Endprodukte (Waren und Dienstleistungen), die in einem Land innerhalb eines Jahres hergestellt werden. Vorleistungen werden abgezogen, um Doppelzählungen zu vermeiden."},
+ options:[{v: "A",t:"Den Wert aller Exporte eines Landes."},{v: "B",t:"Den Marktwert aller in einem Land während eines Jahres hergestellten Endprodukte."},{v: "C",t:"Die Summe aller in einem Land produzierten Güter inklusive Vorleistungen."},{v: "D",t:"Das Gesamtvermögen aller Einwohner eines Landes."}],
+ correct:"B",explain:"Das BIP entspricht dem Marktwert aller Endprodukte (Waren und Dienstleistungen), die in einem Land innerhalb eines Jahres hergestellt werden. Vorleistungen werden abgezogen, um Doppelzählungen zu vermeiden."},
 
 {id:"d02",topic:"definition",type:"tf",diff:1,tax:"K1",
  q:"Vorleistungen werden beim BIP abgezogen, um Doppelzählungen zu vermeiden.",
@@ -48,7 +48,7 @@ window.QUESTIONS = [
 
 {id:"d04",topic:"definition",type:"mc",diff:1,tax:"K1",
  q:"Welche vier Produktionsfaktoren unterscheidet man in der VWL?",
- options:[{v:"A",t:"Arbeit, Boden (natürliche Ressourcen), Kapital und Wissen"},{v:"B",t:"Geld, Maschinen, Rohstoffe und Energie"},{v:"C",t:"Konsum, Investitionen, Staat und Exporte"},{v:"D",t:"Löhne, Zinsen, Mieten und Gewinne"}],
+ options:[{v: "A",t:"Arbeit, Boden (natürliche Ressourcen), Kapital und Wissen"},{v: "B",t:"Löhne, Zinsen, Mieten und Gewinne"},{v: "C",t:"Geld, Maschinen, Rohstoffe und Energie"},{v: "D",t:"Konsum, Investitionen, Staat und Exporte"}],
  correct:"A",explain:"Die vier Produktionsfaktoren: Arbeit (körperliche/geistige Tätigkeit), Boden (Rohstoffe, Standort, Energie), Kapital (Sach-/Geldkapital, Maschinen), Wissen (Humankapital, Know-how, Patente)."},
 
 {id:"d05",topic:"definition",type:"open",diff:2,tax:"K2",
@@ -81,7 +81,7 @@ window.QUESTIONS = [
 
 {id:"d09",topic:"definition",type:"mc",diff:2,tax:"K2",
  q:"Was ist der Unterschied zwischen Wohlstand und Wohlfahrt?",
- options:[{v:"A",t:"Wohlstand = materielle Güterversorgung (BIP pro Kopf), Wohlfahrt = zusätzlich Gesundheit, Bildung, Umwelt etc."},{v:"B",t:"Wohlstand und Wohlfahrt sind Synonyme für das BIP."},{v:"C",t:"Wohlfahrt misst nur die staatlichen Sozialleistungen."},{v:"D",t:"Wohlstand berücksichtigt die Umwelt, Wohlfahrt nicht."}],
+ options:[{v: "A",t:"Wohlstand = materielle Güterversorgung (BIP pro Kopf), Wohlfahrt = zusätzlich Gesundheit, Bildung, Umwelt etc."},{v: "B",t:"Wohlstand berücksichtigt die Umwelt, Wohlfahrt nicht."},{v: "C",t:"Wohlfahrt misst nur die staatlichen Sozialleistungen."},{v: "D",t:"Wohlstand und Wohlfahrt sind Synonyme für das BIP."}],
  correct:"A",explain:"Wohlstand = materieller Lebensstandard (BIP pro Kopf). Wohlfahrt = umfassenderes Wohlergehen inkl. Gesundheit, Bildung, Freizeit, Umwelt, soziale Sicherheit. Das BIP misst Wohlstand, aber nicht Wohlfahrt."},
 
 {id:"d10",topic:"definition",type:"tf",diff:2,tax:"K2",
@@ -108,8 +108,8 @@ window.QUESTIONS = [
 // ──── MESSPROBLEME (m01–m12) ────
 {id:"m01",topic:"messprobleme",type:"mc",diff:1,tax:"K1",
  q:"Welche Leistung wird im BIP NICHT erfasst?",
- options:[{v:"A",t:"Hausarbeit und Eigenleistungen (z.B. selber kochen)"},{v:"B",t:"Die Produktion eines Automobilherstellers"},{v:"C",t:"Dienstleistungen eines Coiffeurs"},{v:"D",t:"Staatliche Leistungen wie Polizei und Schulen"}],
- correct:"A",explain:"Hausarbeit, Eigenleistungen und DIY werden nicht erfasst, da kein Marktpreis existiert. Wenn eine Familie die Kinderbetreuung in eine Krippe auslagert, steigt das BIP – obwohl die Leistung gleich bleibt."},
+ options:[{v: "A",t:"Dienstleistungen eines Coiffeurs"},{v: "B",t:"Die Produktion eines Automobilherstellers"},{v: "C",t:"Hausarbeit und Eigenleistungen (z.B. selber kochen)"},{v: "D",t:"Staatliche Leistungen wie Polizei und Schulen"}],
+ correct:"C",explain:"Hausarbeit, Eigenleistungen und DIY werden nicht erfasst, da kein Marktpreis existiert. Wenn eine Familie die Kinderbetreuung in eine Krippe auslagert, steigt das BIP – obwohl die Leistung gleich bleibt."},
 
 {id:"m02",topic:"messprobleme",type:"tf",diff:1,tax:"K2",
  q:"Wenn ein Jahrhunderthochwasser Milliardenschäden verursacht, sinkt das BIP.",
@@ -117,7 +117,7 @@ window.QUESTIONS = [
 
 {id:"m03",topic:"messprobleme",type:"mc",diff:2,tax:"K2",
  q:"Warum ist die Bewertung staatlicher Leistungen im BIP problematisch?",
- options:[{v:"A",t:"Staatliche Leistungen werden zu ihren Kosten bewertet – eine Lohnerhöhung für Beamte erhöht das BIP, ohne dass die Leistung besser wird."},{v:"B",t:"Staatliche Leistungen werden gar nicht erfasst."},{v:"C",t:"Der Staat produziert keine Güter."},{v:"D",t:"Staatliche Leistungen werden doppelt gezählt."}],
+ options:[{v: "A",t:"Staatliche Leistungen werden zu ihren Kosten bewertet – eine Lohnerhöhung für Beamte erhöht das BIP, ohne dass die Leistung besser wird."},{v: "B",t:"Staatliche Leistungen werden doppelt gezählt."},{v: "C",t:"Staatliche Leistungen werden gar nicht erfasst."},{v: "D",t:"Der Staat produziert keine Güter."}],
  correct:"A",explain:"Da Staatsleistungen nicht am Markt verkauft werden, fehlt ein Marktpreis. Sie werden zu ihren Kosten (v.a. Löhne) bewertet. Eine Lohnerhöhung erhöht das BIP, ohne Leistungsverbesserung."},
 
 {id:"m04",topic:"messprobleme",type:"tf",diff:2,tax:"K2",
@@ -142,8 +142,8 @@ window.QUESTIONS = [
 
 {id:"m07",topic:"messprobleme",type:"mc",diff:2,tax:"K2",
  q:"Welche Herausforderung stellt die Digitalisierung für die BIP-Messung dar?",
- options:[{v:"A",t:"Digitale Werte wie Daten und kostenlose Online-Dienste haben keinen klassischen Marktpreis."},{v:"B",t:"Digitale Güter sind zu günstig."},{v:"C",t:"Die Digitalisierung hat keinen Einfluss auf das BIP."},{v:"D",t:"Digitale Produkte werden doppelt gezählt."}],
- correct:"A",explain:"Kostenlose Online-Dienste (soziale Medien, Wikipedia) generieren Nutzen, erscheinen aber nicht im BIP. Zudem lässt sich die Wertschöpfung oft nicht klar einem Land zuordnen."},
+ options:[{v: "A",t:"Digitale Güter sind zu günstig."},{v: "B",t:"Die Digitalisierung hat keinen Einfluss auf das BIP."},{v: "C",t:"Digitale Werte wie Daten und kostenlose Online-Dienste haben keinen klassischen Marktpreis."},{v: "D",t:"Digitale Produkte werden doppelt gezählt."}],
+ correct:"C",explain:"Kostenlose Online-Dienste (soziale Medien, Wikipedia) generieren Nutzen, erscheinen aber nicht im BIP. Zudem lässt sich die Wertschöpfung oft nicht klar einem Land zuordnen."},
 
 {id:"m08",topic:"messprobleme",type:"tf",diff:1,tax:"K1",
  q:"Umweltschäden durch die Produktion werden im BIP als negative Position verbucht.",
@@ -183,8 +183,8 @@ window.QUESTIONS = [
 // ──── DREI SEITEN DES BIP (s01–s10) ────
 {id:"s01",topic:"dreiseiten",type:"mc",diff:1,tax:"K1",
  q:"Das BIP kann auf drei Arten berechnet werden. Welche?",
- options:[{v:"A",t:"Produktionsansatz, Einkommensansatz und Verwendungsansatz"},{v:"B",t:"Konsumansatz, Sparansatz und Investitionsansatz"},{v:"C",t:"Exportansatz, Importansatz und Binnenmarktansatz"},{v:"D",t:"Brutto-, Netto- und Realansatz"}],
- correct:"A",explain:"(1) Produktionsansatz = Summe aller Wertschöpfungen, (2) Einkommensansatz = Summe aller Einkommen, (3) Verwendungsansatz = C + I + G + NX. Alle drei ergeben denselben Wert."},
+ options:[{v: "A",t:"Konsumansatz, Sparansatz und Investitionsansatz"},{v: "B",t:"Brutto-, Netto- und Realansatz"},{v: "C",t:"Exportansatz, Importansatz und Binnenmarktansatz"},{v: "D",t:"Produktionsansatz, Einkommensansatz und Verwendungsansatz"}],
+ correct:"D",explain:"(1) Produktionsansatz = Summe aller Wertschöpfungen, (2) Einkommensansatz = Summe aller Einkommen, (3) Verwendungsansatz = C + I + G + NX. Alle drei ergeben denselben Wert."},
 
 {id:"s02",topic:"dreiseiten",type:"fill",diff:1,tax:"K1",
  q:"Beim {0} wird das BIP als Summe aller Wertschöpfungen berechnet. Beim {1} zählt man alle Einkommen zusammen. Beim {2} betrachtet man, wofür die Güter verwendet werden.",
@@ -197,7 +197,7 @@ window.QUESTIONS = [
 
 {id:"s03",topic:"dreiseiten",type:"mc",diff:2,tax:"K2",
  q:"BIP = C + I + G + (X – M). Was bedeuten die Variablen?",
- options:[{v:"A",t:"C = privater Konsum, I = Investitionen, G = Staatsausgaben, X = Exporte, M = Importe"},{v:"B",t:"C = Kapital, I = Importe, G = Gewinne, X = Exporte, M = Mieten"},{v:"C",t:"C = Konsum, I = Zinsen, G = Geld, X = Exporte, M = Maschinen"},{v:"D",t:"C = Kosten, I = Investitionen, G = Grundstücke, X = Extra, M = Mehrwert"}],
+ options:[{v: "A",t:"C = privater Konsum, I = Investitionen, G = Staatsausgaben, X = Exporte, M = Importe"},{v: "B",t:"C = Kosten, I = Investitionen, G = Grundstücke, X = Extra, M = Mehrwert"},{v: "C",t:"C = Konsum, I = Zinsen, G = Geld, X = Exporte, M = Maschinen"},{v: "D",t:"C = Kapital, I = Importe, G = Gewinne, X = Exporte, M = Mieten"}],
  correct:"A",explain:"BIP nach Verwendungsansatz: C = privater Konsum (Haushalte), I = Bruttoinvestitionen, G = Staatskonsum (Government), X–M = Nettoexporte. In der Schweiz macht der private Konsum den grössten Anteil aus."},
 
 {id:"s04",topic:"dreiseiten",type:"sort",diff:2,tax:"K2",
@@ -240,8 +240,8 @@ window.QUESTIONS = [
 
 {id:"s09",topic:"dreiseiten",type:"mc",diff:3,tax:"K4",
  q:"In einer kleinen Volkswirtschaft produziert ein Unternehmen Güter im Wert von CHF 500. Die Löhne betragen CHF 300, Gewinne CHF 200. Die Haushalte konsumieren CHF 400 und importieren CHF 100 aus dem Ausland. Der Staat gibt CHF 100 aus, Investitionen betragen CHF 100. Es gibt keine Exporte. Was stimmt?",
- options:[{v:"A",t:"Alle drei Ansätze ergeben CHF 500 – die Rechnung geht auf."},{v:"B",t:"Das BIP nach Verwendungsansatz ist höher als nach Produktionsansatz."},{v:"C",t:"Der Einkommensansatz ergibt CHF 600."},{v:"D",t:"Die Importe erhöhen das BIP."}],
- correct:"A",explain:"Produktion: Wertschöpfung = 500. Einkommen: 300 + 200 = 500. Verwendung: C(400) + I(100) + G(100) + NX(0–100) = 500. Importe werden abgezogen, weil sie zwar konsumiert, aber nicht im Inland produziert wurden."},
+ options:[{v: "A",t:"Der Einkommensansatz ergibt CHF 600."},{v: "B",t:"Die Importe erhöhen das BIP."},{v: "C",t:"Das BIP nach Verwendungsansatz ist höher als nach Produktionsansatz."},{v: "D",t:"Alle drei Ansätze ergeben CHF 500 – die Rechnung geht auf."}],
+ correct:"D",explain:"Produktion: Wertschöpfung = 500. Einkommen: 300 + 200 = 500. Verwendung: C(400) + I(100) + G(100) + NX(0–100) = 500. Importe werden abgezogen, weil sie zwar konsumiert, aber nicht im Inland produziert wurden."},
 
 {id:"s10",topic:"dreiseiten",type:"tf",diff:3,tax:"K4",
  q:"Wenn die Schweiz mehr importiert als exportiert, ist der Beitrag der Nettoexporte zum BIP negativ – das BIP sinkt dadurch zwingend.",
@@ -250,8 +250,8 @@ window.QUESTIONS = [
 // ──── NOMINALES & REALES BIP (n01–n09) ────
 {id:"n01",topic:"nomreal",type:"mc",diff:1,tax:"K1",
  q:"Was unterscheidet das nominale vom realen BIP?",
- options:[{v:"A",t:"Nominal = aktuelle Preise, real = konstante Preise eines Basisjahres (inflationsbereinigt)."},{v:"B",t:"Das nominale BIP berücksichtigt die Inflation, das reale nicht."},{v:"C",t:"Das reale BIP wird nur für die Schweiz berechnet."},{v:"D",t:"Es gibt keinen Unterschied."}],
- correct:"A",explain:"Nominales BIP = Produktion zu aktuellen Marktpreisen (enthält Preisveränderungen). Reales BIP = Produktion zu konstanten Preisen eines Basisjahres. Nur das reale BIP zeigt die tatsächliche Mengenveränderung."},
+ options:[{v: "A",t:"Das nominale BIP berücksichtigt die Inflation, das reale nicht."},{v: "B",t:"Es gibt keinen Unterschied."},{v: "C",t:"Nominal = aktuelle Preise, real = konstante Preise eines Basisjahres (inflationsbereinigt)."},{v: "D",t:"Das reale BIP wird nur für die Schweiz berechnet."}],
+ correct:"C",explain:"Nominales BIP = Produktion zu aktuellen Marktpreisen (enthält Preisveränderungen). Reales BIP = Produktion zu konstanten Preisen eines Basisjahres. Nur das reale BIP zeigt die tatsächliche Mengenveränderung."},
 
 {id:"n02",topic:"nomreal",type:"tf",diff:1,tax:"K2",
  q:"Wenn das nominale BIP steigt, bedeutet das immer, dass die Wirtschaft gewachsen ist.",
@@ -267,8 +267,8 @@ window.QUESTIONS = [
 
 {id:"n04",topic:"nomreal",type:"mc",diff:2,tax:"K2",
  q:"Warum verwendet man bei internationalen BIP-Vergleichen Kaufkraftparitäten (PPP)?",
- options:[{v:"A",t:"Weil Wechselkurse schwanken und man in verschiedenen Ländern für denselben Betrag unterschiedlich viel kaufen kann."},{v:"B",t:"Weil PPP einfacher zu berechnen sind."},{v:"C",t:"Weil das BIP in PPP immer höher ist."},{v:"D",t:"Weil die UNO PPP vorschreibt."}],
- correct:"A",explain:"Wechselkurse spiegeln nicht die tatsächliche Kaufkraft wider. Mit CHF 10 kauft man in der Schweiz weniger als mit dem Gegenwert in Thailand. PPP berücksichtigt die Preisniveauunterschiede."},
+ options:[{v: "A",t:"Weil die UNO PPP vorschreibt."},{v: "B",t:"Weil PPP einfacher zu berechnen sind."},{v: "C",t:"Weil das BIP in PPP immer höher ist."},{v: "D",t:"Weil Wechselkurse schwanken und man in verschiedenen Ländern für denselben Betrag unterschiedlich viel kaufen kann."}],
+ correct:"D",explain:"Wechselkurse spiegeln nicht die tatsächliche Kaufkraft wider. Mit CHF 10 kauft man in der Schweiz weniger als mit dem Gegenwert in Thailand. PPP berücksichtigt die Preisniveauunterschiede."},
 
 {id:"n05",topic:"nomreal",type:"fill",diff:1,tax:"K1",
  q:"Für zeitliche Vergleiche verwendet man das {0} BIP, das die {1} herausrechnet. Für internationale Vergleiche rechnet man in {2} um.",
@@ -310,8 +310,8 @@ window.QUESTIONS = [
 // ──── WIRTSCHAFTSKREISLAUF (k01–k11) ────
 {id:"k01",topic:"kreislauf",type:"mc",diff:1,tax:"K1",
  q:"Welche zwei Akteure stehen im Zentrum des einfachen Wirtschaftskreislaufs?",
- options:[{v:"A",t:"Haushalte und Unternehmen"},{v:"B",t:"Staat und Ausland"},{v:"C",t:"Banken und Versicherungen"},{v:"D",t:"Arbeitnehmer und Arbeitgeber"}],
- correct:"A",explain:"Der einfache Wirtschaftskreislauf: Haushalte bieten Produktionsfaktoren an und fragen Güter nach. Unternehmen produzieren Güter und fragen Produktionsfaktoren nach."},
+ options:[{v: "A",t:"Staat und Ausland"},{v: "B",t:"Arbeitnehmer und Arbeitgeber"},{v: "C",t:"Banken und Versicherungen"},{v: "D",t:"Haushalte und Unternehmen"}],
+ correct:"D",explain:"Der einfache Wirtschaftskreislauf: Haushalte bieten Produktionsfaktoren an und fragen Güter nach. Unternehmen produzieren Güter und fragen Produktionsfaktoren nach."},
 
 {id:"k02",topic:"kreislauf",type:"sort",diff:1,tax:"K2",
  q:"Ordnen Sie die Ströme im einfachen Wirtschaftskreislauf zu.",
@@ -325,8 +325,8 @@ window.QUESTIONS = [
 
 {id:"k03",topic:"kreislauf",type:"mc",diff:2,tax:"K1",
  q:"Welche zusätzlichen Akteure kommen im erweiterten Wirtschaftskreislauf hinzu?",
- options:[{v:"A",t:"Staat, Ausland und Banken"},{v:"B",t:"Nur der Staat"},{v:"C",t:"Gewerkschaften und Verbände"},{v:"D",t:"Börse und Nationalbank"}],
- correct:"A",explain:"Erweiterter Kreislauf: + Staat (Steuern, Güter, Transfers), + Ausland (Exporte/Importe), + Banken (Ersparnisse, Kredite)."},
+ options:[{v: "A",t:"Nur der Staat"},{v: "B",t:"Börse und Nationalbank"},{v: "C",t:"Gewerkschaften und Verbände"},{v: "D",t:"Staat, Ausland und Banken"}],
+ correct:"D",explain:"Erweiterter Kreislauf: + Staat (Steuern, Güter, Transfers), + Ausland (Exporte/Importe), + Banken (Ersparnisse, Kredite)."},
 
 {id:"k04",topic:"kreislauf",type:"tf",diff:1,tax:"K1",
  q:"Im Wirtschaftskreislauf steht jedem Geldstrom ein Güterstrom (oder Faktorstrom) gegenüber.",
@@ -348,8 +348,8 @@ window.QUESTIONS = [
 
 {id:"k07",topic:"kreislauf",type:"mc",diff:2,tax:"K2",
  q:"Was versteht man unter einem Transfer im Wirtschaftskreislauf?",
- options:[{v:"A",t:"Eine staatliche Leistung ohne direkte Gegenleistung, z.B. AHV-Renten oder Sozialhilfe."},{v:"B",t:"Die Überweisung von Geld ins Ausland."},{v:"C",t:"Den Export von Gütern."},{v:"D",t:"Eine Steuerzahlung an den Staat."}],
- correct:"A",explain:"Transfers = Zahlungen des Staates an Haushalte ohne Gegenleistung (anders als Löhne). Beispiele: AHV, IV, Sozialhilfe, Kinderzulagen, Stipendien."},
+ options:[{v: "A",t:"Den Export von Gütern."},{v: "B",t:"Eine staatliche Leistung ohne direkte Gegenleistung, z.B. AHV-Renten oder Sozialhilfe."},{v: "C",t:"Die Überweisung von Geld ins Ausland."},{v: "D",t:"Eine Steuerzahlung an den Staat."}],
+ correct:"B",explain:"Transfers = Zahlungen des Staates an Haushalte ohne Gegenleistung (anders als Löhne). Beispiele: AHV, IV, Sozialhilfe, Kinderzulagen, Stipendien."},
 
 {id:"k08",topic:"kreislauf",type:"tf",diff:2,tax:"K2",
  q:"Im erweiterten Kreislauf fliessen Zahlungen für Importe von den Haushalten ans Ausland.",
@@ -368,8 +368,8 @@ window.QUESTIONS = [
 
 {id:"k10",topic:"kreislauf",type:"mc",diff:3,tax:"K4",
  q:"Was passiert im Wirtschaftskreislauf, wenn die Haushalte plötzlich deutlich mehr sparen und weniger konsumieren?",
- options:[{v:"A",t:"Die Unternehmen erhalten weniger Einnahmen, produzieren weniger und zahlen tiefere Löhne – ein Abschwung droht."},{v:"B",t:"Das BIP steigt, weil Sparen eine Investition ist."},{v:"C",t:"Der Staat gleicht die Lücke automatisch aus."},{v:"D",t:"Es hat keinen Effekt, da das Geld bei den Banken landet und sofort weitergeleitet wird."}],
- correct:"A",explain:"Höheres Sparen = weniger Konsum = weniger Nachfrage auf dem Gütermarkt. Die Unternehmen verkaufen weniger, reduzieren Produktion und Beschäftigung. Das Einkommen sinkt (Kreislauf-Effekt). Dieses Phänomen heisst \u00abSparparadoxon\u00bb: Was für den Einzelnen vernünftig ist (sparen), kann gesamtwirtschaftlich schaden."},
+ options:[{v: "A",t:"Das BIP steigt, weil Sparen eine Investition ist."},{v: "B",t:"Es hat keinen Effekt, da das Geld bei den Banken landet und sofort weitergeleitet wird."},{v: "C",t:"Der Staat gleicht die Lücke automatisch aus."},{v: "D",t:"Die Unternehmen erhalten weniger Einnahmen, produzieren weniger und zahlen tiefere Löhne – ein Abschwung droht."}],
+ correct:"D",explain:"Höheres Sparen = weniger Konsum = weniger Nachfrage auf dem Gütermarkt. Die Unternehmen verkaufen weniger, reduzieren Produktion und Beschäftigung. Das Einkommen sinkt (Kreislauf-Effekt). Dieses Phänomen heisst \u00abSparparadoxon\u00bb: Was für den Einzelnen vernünftig ist (sparen), kann gesamtwirtschaftlich schaden."},
 
 {id:"k11",topic:"kreislauf",type:"open",diff:3,tax:"K4",
  q:"Im Wirtschaftskreislauf spricht man von Sickerströmen (Abflüssen) und Zuflüssen. Erklären Sie, warum Sparen, Steuern und Importe als Sickerströme gelten, und nennen Sie die zugehörigen Zuflüsse.",
@@ -393,13 +393,13 @@ window.QUESTIONS = [
 
 {id:"v03",topic:"verteilung",type:"mc",diff:2,tax:"K2",
  q:"Der Gini-Koeffizient beträgt in der Schweiz ca. 0.29 und in den USA ca. 0.37. Was bedeutet das?",
- options:[{v:"A",t:"Die Einkommensungleichheit ist in den USA deutlich grösser als in der Schweiz."},{v:"B",t:"Die Schweiz ist reicher als die USA."},{v:"C",t:"Die USA haben ein höheres BIP pro Kopf."},{v:"D",t:"In der Schweiz gibt es mehr Milliardäre."}],
- correct:"A",explain:"Höherer Gini = grössere Ungleichheit. Schweiz 0.29 (relativ gleichmässig), USA 0.37 (deutlich ungleicher). Durch Umverteilung sinkt der Gini in der Schweiz von ca. 0.34 (Primäreinkommen) auf 0.29 (verfügbares Einkommen)."},
+ options:[{v: "A",t:"In der Schweiz gibt es mehr Milliardäre."},{v: "B",t:"Die Schweiz ist reicher als die USA."},{v: "C",t:"Die USA haben ein höheres BIP pro Kopf."},{v: "D",t:"Die Einkommensungleichheit ist in den USA deutlich grösser als in der Schweiz."}],
+ correct:"D",explain:"Höherer Gini = grössere Ungleichheit. Schweiz 0.29 (relativ gleichmässig), USA 0.37 (deutlich ungleicher). Durch Umverteilung sinkt der Gini in der Schweiz von ca. 0.34 (Primäreinkommen) auf 0.29 (verfügbares Einkommen)."},
 
 {id:"v04",topic:"verteilung",type:"mc",diff:2,tax:"K2",
  q:"Was versteht Branko Milanovic unter \u00abguter\u00bb und \u00abschlechter\u00bb Ungleichheit?",
- options:[{v:"A",t:"Gute Ungleichheit schafft Leistungsanreize. Schlechte Ungleichheit zementiert Privilegien und verhindert Chancengleichheit."},{v:"B",t:"Gute Ungleichheit betrifft nur Vermögen, schlechte nur Einkommen."},{v:"C",t:"Gute Ungleichheit gibt es nur in reichen Ländern."},{v:"D",t:"Jede Form von Ungleichheit ist schlecht."}],
- correct:"A",explain:"Nach Milanovic: \u00abGute\u00bb Ungleichheit ist leistungsbezogen (Anreize, Wachstum). \u00abSchlechte\u00bb entsteht durch Rent-Seeking (politischen Einfluss zum Machterhalt) oder fehlenden Bildungszugang für Arme."},
+ options:[{v: "A",t:"Gute Ungleichheit betrifft nur Vermögen, schlechte nur Einkommen."},{v: "B",t:"Gute Ungleichheit gibt es nur in reichen Ländern."},{v: "C",t:"Jede Form von Ungleichheit ist schlecht."},{v: "D",t:"Gute Ungleichheit schafft Leistungsanreize. Schlechte Ungleichheit zementiert Privilegien und verhindert Chancengleichheit."}],
+ correct:"D",explain:"Nach Milanovic: \u00abGute\u00bb Ungleichheit ist leistungsbezogen (Anreize, Wachstum). \u00abSchlechte\u00bb entsteht durch Rent-Seeking (politischen Einfluss zum Machterhalt) oder fehlenden Bildungszugang für Arme."},
 
 {id:"v05",topic:"verteilung",type:"tf",diff:2,tax:"K2",
  q:"Gemäss aktueller Forschung ist Frühförderung das effizienteste Mittel gegen Ungleichheit.",
@@ -426,7 +426,7 @@ window.QUESTIONS = [
 
 {id:"v09",topic:"verteilung",type:"mc",diff:3,tax:"K4",
  q:"Warum kann sehr hohe Ungleichheit das Wirtschaftswachstum gefährden?",
- options:[{v:"A",t:"Extreme Ungleichheit provoziert soziale Unruhen, verringert Vertrauen und hemmt Investitionen."},{v:"B",t:"Hohe Ungleichheit hat keinen Einfluss auf den sozialen Frieden."},{v:"C",t:"In ungleichen Gesellschaften investieren die Reichen mehr."},{v:"D",t:"Soziale Unruhen führen zu mehr Konsum."}],
+ options:[{v: "A",t:"Extreme Ungleichheit provoziert soziale Unruhen, verringert Vertrauen und hemmt Investitionen."},{v: "B",t:"In ungleichen Gesellschaften investieren die Reichen mehr."},{v: "C",t:"Hohe Ungleichheit hat keinen Einfluss auf den sozialen Frieden."},{v: "D",t:"Soziale Unruhen führen zu mehr Konsum."}],
  correct:"A",explain:"Bei sehr hoher Ungleichheit (Gini > ca. 0.4) steigt das Risiko sozialer Instabilität. Menschen werden kriminell statt produktiv. Die Unsicherheit hemmt Investitionen. Zudem entstehen Forderungen nach starker Umverteilung."},
 
 
@@ -457,8 +457,8 @@ window.QUESTIONS = [
 // ──── WACHSTUM & NACHHALTIGKEIT (w01–w12) ────
 {id:"w01",topic:"wachstum",type:"mc",diff:1,tax:"K1",
  q:"Auf welche zwei Arten kann eine Volkswirtschaft wachsen?",
- options:[{v:"A",t:"Durch mehr Arbeitsstunden oder durch höhere Produktivität."},{v:"B",t:"Durch mehr Exporte oder weniger Importe."},{v:"C",t:"Durch mehr Konsum oder mehr Sparen."},{v:"D",t:"Durch höhere Preise oder mehr Steuern."}],
- correct:"A",explain:"BIP-Wachstum durch: (1) Mehr Arbeitsstunden (mehr Erwerbstätige, Zuwanderung) oder (2) Höhere Arbeitsproduktivität (mehr Kapital, bessere Technologie, Humankapital). Für den Wohlstand pro Kopf ist v.a. die Produktivität entscheidend."},
+ options:[{v: "A",t:"Durch höhere Preise oder mehr Steuern."},{v: "B",t:"Durch mehr Exporte oder weniger Importe."},{v: "C",t:"Durch mehr Konsum oder mehr Sparen."},{v: "D",t:"Durch mehr Arbeitsstunden oder durch höhere Produktivität."}],
+ correct:"D",explain:"BIP-Wachstum durch: (1) Mehr Arbeitsstunden (mehr Erwerbstätige, Zuwanderung) oder (2) Höhere Arbeitsproduktivität (mehr Kapital, bessere Technologie, Humankapital). Für den Wohlstand pro Kopf ist v.a. die Produktivität entscheidend."},
 
 {id:"w02",topic:"wachstum",type:"fill",diff:1,tax:"K1",
  q:"Nachhaltige Entwicklung befriedigt die Bedürfnisse der {0}, ohne zu riskieren, dass {1} Generationen ihre Bedürfnisse nicht befriedigen können. Diese Definition stammt aus dem {2}-Bericht von 1987.",
@@ -471,8 +471,8 @@ window.QUESTIONS = [
 
 {id:"w03",topic:"wachstum",type:"mc",diff:2,tax:"K2",
  q:"Was sind externe Effekte (Externalitäten)?",
- options:[{v:"A",t:"Kosten oder Nutzen, die bei Produktion/Konsum entstehen, aber nicht vom Verursacher getragen werden."},{v:"B",t:"Auswirkungen von Exporten auf das BIP."},{v:"C",t:"Kosten, die im Ausland anfallen."},{v:"D",t:"Gewinne für ausländische Investoren."}],
- correct:"A",explain:"Externe Effekte = Kosten/Nutzen für Dritte, die nicht im Preis berücksichtigt werden. Negativ: Fabrik verschmutzt Fluss (Allgemeinheit trägt Kosten). Positiv: Impfung schützt andere. Bei negativen Externalitäten wird \u00abzu viel\u00bb produziert \u2192 Marktversagen."},
+ options:[{v: "A",t:"Gewinne für ausländische Investoren."},{v: "B",t:"Kosten, die im Ausland anfallen."},{v: "C",t:"Auswirkungen von Exporten auf das BIP."},{v: "D",t:"Kosten oder Nutzen, die bei Produktion/Konsum entstehen, aber nicht vom Verursacher getragen werden."}],
+ correct:"D",explain:"Externe Effekte = Kosten/Nutzen für Dritte, die nicht im Preis berücksichtigt werden. Negativ: Fabrik verschmutzt Fluss (Allgemeinheit trägt Kosten). Positiv: Impfung schützt andere. Bei negativen Externalitäten wird \u00abzu viel\u00bb produziert \u2192 Marktversagen."},
 
 {id:"w04",topic:"wachstum",type:"sort",diff:2,tax:"K2",
  q:"Ordnen Sie die Instrumente der Umweltpolitik den Kategorien zu.",
@@ -490,8 +490,8 @@ window.QUESTIONS = [
 
 {id:"w06",topic:"wachstum",type:"mc",diff:3,tax:"K3",
  q:"Was besagt das Coase-Theorem?",
- options:[{v:"A",t:"Bei klar definierten Eigentumsrechten und geringen Transaktionskosten können Betroffene externe Effekte durch Verhandlungen lösen."},{v:"B",t:"Der Staat muss immer eingreifen bei externen Effekten."},{v:"C",t:"Umweltverschmutzung kann nicht durch den Markt gelöst werden."},{v:"D",t:"Externe Effekte existieren nur bei Monopolen."}],
- correct:"A",explain:"Das Coase-Theorem: Wenn Eigentums- und Klagerechte klar definiert sind und die Transaktionskosten gering, können die Betroffenen das Problem durch freiwillige Verhandlungen lösen \u2013 ohne Staatseingriff."},
+ options:[{v: "A",t:"Externe Effekte existieren nur bei Monopolen."},{v: "B",t:"Der Staat muss immer eingreifen bei externen Effekten."},{v: "C",t:"Umweltverschmutzung kann nicht durch den Markt gelöst werden."},{v: "D",t:"Bei klar definierten Eigentumsrechten und geringen Transaktionskosten können Betroffene externe Effekte durch Verhandlungen lösen."}],
+ correct:"D",explain:"Das Coase-Theorem: Wenn Eigentums- und Klagerechte klar definiert sind und die Transaktionskosten gering, können die Betroffenen das Problem durch freiwillige Verhandlungen lösen \u2013 ohne Staatseingriff."},
 
 {id:"w07",topic:"wachstum",type:"tf",diff:1,tax:"K1",
  q:"Wirtschaftswachstum und Nachhaltigkeit schliessen sich gegenseitig aus.",
@@ -529,7 +529,7 @@ window.QUESTIONS = [
 
 {id:"w12",topic:"wachstum",type:"mc",diff:3,tax:"K4",
  q:"Was beschreibt die \u00abTragik der Allmende\u00bb (Tragedy of the Commons)?",
- options:[{v:"A",t:"Wenn eine Ressource allen gehört, wird sie übernutzt, weil jeder seinen eigenen Nutzen maximiert, die Kosten aber die Allgemeinheit trägt."},{v:"B",t:"Der Staat muss alle Ressourcen privatisieren."},{v:"C",t:"Gemeinsames Eigentum ist immer effizienter als privates."},{v:"D",t:"Die Allmende bezeichnet das BIP eines Landes."}],
- correct:"A",explain:"Beispiel: Eine gemeinsame Weide wird übernutzt, weil jeder Hirte ein zusätzliches Tier hinstellt – der Nutzen ist privat, die Kosten (Überweidung) tragen alle. Lösungen: Privatisierung, Regulierung, oder Selbstorganisation (Ostrom). Das Konzept ist zentral für Umweltprobleme wie Überfischung und Klimawandel."},
+ options:[{v: "A",t:"Der Staat muss alle Ressourcen privatisieren."},{v: "B",t:"Gemeinsames Eigentum ist immer effizienter als privates."},{v: "C",t:"Wenn eine Ressource allen gehört, wird sie übernutzt, weil jeder seinen eigenen Nutzen maximiert, die Kosten aber die Allgemeinheit trägt."},{v: "D",t:"Die Allmende bezeichnet das BIP eines Landes."}],
+ correct:"C",explain:"Beispiel: Eine gemeinsame Weide wird übernutzt, weil jeder Hirte ein zusätzliches Tier hinstellt – der Nutzen ist privat, die Kosten (Überweidung) tragen alle. Lösungen: Privatisierung, Regulierung, oder Selbstorganisation (Ostrom). Das Konzept ist zentral für Umweltprobleme wie Überfischung und Klimawandel."},
 
 ];

@@ -42,12 +42,12 @@ window.QUESTIONS = [
   img: {src: "img/recht/prozessrecht/prozessrecht_vergleich_zivil_straf_01.svg", alt: "Vergleichstabelle: Zivilprozess und Strafverfahren – Parteien, Ziel, Grundsatz, Rechtsgebiet"},
   q: "Was regelt das Prozessrecht?",
   options: [
-    {v: "A", t: "Es regelt, wie Rechte vor Gericht durchgesetzt werden (Verfahrensrecht)."},
-    {v: "B", t: "Es regelt die inhaltlichen Rechte und Pflichten der Bürgerinnen und Bürger (materielles Recht)."},
-    {v: "C", t: "Es regelt ausschliesslich die Strafen bei Gesetzesverstössen."},
-    {v: "D", t: "Es regelt die Organisation der Verwaltung."}
+    {v: "A", t: "Es regelt ausschliesslich die Strafen bei Gesetzesverstössen."},
+    {v: "B", t: "Es regelt die Organisation der Verwaltung."},
+    {v: "C", t: "Es regelt, wie Rechte vor Gericht durchgesetzt werden (Verfahrensrecht)."},
+    {v: "D", t: "Es regelt die inhaltlichen Rechte und Pflichten der Bürgerinnen und Bürger (materielles Recht)."}
   ],
-  correct: "A",
+  correct: "C",
   explain: "Das Prozessrecht (Verfahrensrecht) regelt, wie Rechte vor Gericht durchgesetzt werden — also den Ablauf von Gerichtsverfahren. Es ist vom materiellen Recht zu unterscheiden, welches die inhaltlichen Rechte und Pflichten regelt (z.B. OR, ZGB)."
 },
 {
@@ -69,12 +69,12 @@ window.QUESTIONS = [
   id: "g04", topic: "grundlagen", type: "mc", diff: 1, tax: "K2",
   q: "Wer verfolgt im Strafverfahren die Straftaten?",
   options: [
-    {v: "A", t: "Die Staatsanwaltschaft — sie handelt im öffentlichen Interesse."},
-    {v: "B", t: "Der Kläger — er muss die Klage einreichen."},
-    {v: "C", t: "Das Opfer — es muss die Straftat selbst anzeigen und verfolgen."},
-    {v: "D", t: "Die Schlichtungsbehörde — sie leitet das Verfahren ein."}
+    {v: "A", t: "Der Kläger — er muss die Klage einreichen."},
+    {v: "B", t: "Die Schlichtungsbehörde — sie leitet das Verfahren ein."},
+    {v: "C", t: "Die Staatsanwaltschaft — sie handelt im öffentlichen Interesse."},
+    {v: "D", t: "Das Opfer — es muss die Straftat selbst anzeigen und verfolgen."}
   ],
-  correct: "A",
+  correct: "C",
   explain: "Im Strafverfahren ist die Staatsanwaltschaft für die Strafverfolgung zuständig. Sie handelt im öffentlichen Interesse (Offizialprinzip). Der «Kläger» ist ein Begriff aus dem Zivilprozess (B). Das Opfer kann zwar eine Strafanzeige erstatten, verfolgt aber nicht selbst (C)."
 },
 
@@ -83,12 +83,12 @@ window.QUESTIONS = [
   id: "g05", topic: "grundlagen", type: "mc", diff: 2, tax: "K2",
   q: "Was bedeutet die Dispositionsmaxime im Zivilprozess?",
   options: [
-    {v: "A", t: "Die Parteien bestimmen selbst, ob und worüber ein Verfahren geführt wird."},
-    {v: "B", t: "Das Gericht bestimmt von sich aus, welche Fälle verhandelt werden."},
-    {v: "C", t: "Die Staatsanwaltschaft entscheidet, ob Anklage erhoben wird."},
-    {v: "D", t: "Das Gericht muss alle Beweise von sich aus beschaffen."}
+    {v: "A", t: "Das Gericht bestimmt von sich aus, welche Fälle verhandelt werden."},
+    {v: "B", t: "Das Gericht muss alle Beweise von sich aus beschaffen."},
+    {v: "C", t: "Die Parteien bestimmen selbst, ob und worüber ein Verfahren geführt wird."},
+    {v: "D", t: "Die Staatsanwaltschaft entscheidet, ob Anklage erhoben wird."}
   ],
-  correct: "A",
+  correct: "C",
   explain: "Die Dispositionsmaxime bedeutet, dass die Parteien im Zivilprozess selbst entscheiden, ob sie ein Verfahren einleiten, was sie verlangen und ob sie das Verfahren beenden wollen. Im Gegensatz dazu gilt im Strafprozess die Offizialmaxime: Der Staat (Staatsanwaltschaft) verfolgt Straftaten von Amtes wegen."
 },
 {
@@ -108,12 +108,12 @@ window.QUESTIONS = [
   context: "Lukas hat Marco CHF 5'000 geliehen. Marco weigert sich, das Geld zurückzuzahlen. Lukas möchte sein Geld auf dem Rechtsweg zurückbekommen.",
   q: "Welches Verfahren ist hier einschlägig?",
   options: [
-    {v: "A", t: "Ein Zivilprozess — es handelt sich um eine privatrechtliche Streitigkeit."},
-    {v: "B", t: "Ein Strafverfahren — Marco hat sich strafbar gemacht."},
-    {v: "C", t: "Ein Verwaltungsverfahren — der Staat muss eingreifen."},
-    {v: "D", t: "Keines — man kann Schulden nicht einklagen."}
+    {v: "A", t: "Ein Strafverfahren — Marco hat sich strafbar gemacht."},
+    {v: "B", t: "Keines — man kann Schulden nicht einklagen."},
+    {v: "C", t: "Ein Zivilprozess — es handelt sich um eine privatrechtliche Streitigkeit."},
+    {v: "D", t: "Ein Verwaltungsverfahren — der Staat muss eingreifen."}
   ],
-  correct: "A",
+  correct: "C",
   explain: "Es handelt sich um eine privatrechtliche Streitigkeit (Darlehensvertrag nach Art. 312 OR). Lukas muss als Kläger einen Zivilprozess gegen Marco als Beklagten anstrengen. Das blosse Nichtzurückzahlen einer Schuld ist keine Straftat (B). Selbstverständlich können Schulden eingeklagt werden (D)."
 },
 {
@@ -129,24 +129,24 @@ window.QUESTIONS = [
   context: "Petra wird auf dem Fussgängerstreifen von einem Auto angefahren und verletzt. Der Fahrer, Thomas, war alkoholisiert. Petra möchte Schadenersatz für ihre Arztkosten und Thomas soll bestraft werden.",
   q: "Welche Verfahren kommen hier in Frage?",
   options: [
-    {v: "A", t: "Sowohl ein Strafverfahren (wegen fahrlässiger Körperverletzung) als auch ein Zivilprozess (Schadenersatzklage) sind möglich."},
-    {v: "B", t: "Nur ein Strafverfahren, weil Thomas gegen das Gesetz verstossen hat."},
-    {v: "C", t: "Nur ein Zivilprozess, weil Petra Geld verlangt."},
-    {v: "D", t: "Ein Verwaltungsverfahren, weil es sich um einen Verkehrsunfall handelt."}
+    {v: "A", t: "Nur ein Zivilprozess, weil Petra Geld verlangt."},
+    {v: "B", t: "Ein Verwaltungsverfahren, weil es sich um einen Verkehrsunfall handelt."},
+    {v: "C", t: "Sowohl ein Strafverfahren (wegen fahrlässiger Körperverletzung) als auch ein Zivilprozess (Schadenersatzklage) sind möglich."},
+    {v: "D", t: "Nur ein Strafverfahren, weil Thomas gegen das Gesetz verstossen hat."}
   ],
-  correct: "A",
+  correct: "C",
   explain: "Ein Sachverhalt kann sowohl straf- als auch zivilrechtliche Folgen haben. Strafrechtlich liegt eine mögliche fahrlässige Körperverletzung (Art. 125 StGB) und Fahren in angetrunkenem Zustand (Art. 91 SVG) vor — das verfolgt die Staatsanwaltschaft. Zivilrechtlich kann Petra Schadenersatz für ihre Arztkosten verlangen (Art. 41 OR). Beide Verfahren laufen unabhängig voneinander."
 },
 {
   id: "g10", topic: "grundlagen", type: "mc", diff: 3, tax: "K4",
   q: "Warum gilt im Strafprozess die Offizialmaxime und nicht die Dispositionsmaxime?",
   options: [
-    {v: "A", t: "Weil Straftaten das öffentliche Interesse berühren und der Staat die Pflicht hat, für Ordnung und Sicherheit zu sorgen."},
+    {v: "A", t: "Weil die Gerichte im Strafprozess mehr Erfahrung haben."},
     {v: "B", t: "Weil im Strafprozess immer zwei Private gegeneinander klagen."},
-    {v: "C", t: "Weil die Gerichte im Strafprozess mehr Erfahrung haben."},
+    {v: "C", t: "Weil Straftaten das öffentliche Interesse berühren und der Staat die Pflicht hat, für Ordnung und Sicherheit zu sorgen."},
     {v: "D", t: "Weil der Beschuldigte keine eigenen Rechte geltend machen kann."}
   ],
-  correct: "A",
+  correct: "C",
   explain: "Die Offizialmaxime gilt im Strafprozess, weil Straftaten nicht nur den Einzelnen, sondern die gesamte Gesellschaft betreffen. Der Staat hat die Pflicht, die öffentliche Ordnung und Sicherheit zu gewährleisten. Deshalb verfolgt die Staatsanwaltschaft Straftaten von Amtes wegen — unabhängig davon, ob das Opfer dies möchte oder nicht (bei Offizialdelikten)."
 },
 
@@ -159,12 +159,12 @@ window.QUESTIONS = [
   id: "z01", topic: "zustaendigkeit", type: "mc", diff: 1, tax: "K1",
   q: "Was bestimmt die sachliche Zuständigkeit im Zivilprozess?",
   options: [
-    {v: "A", t: "Welche Art von Gericht (Einzelrichter oder Kollegialgericht) den Fall beurteilt."},
-    {v: "B", t: "An welchem Ort das Verfahren durchgeführt wird."},
-    {v: "C", t: "Ob der Fall zivil- oder strafrechtlich ist."},
-    {v: "D", t: "Welcher Anwalt den Fall übernimmt."}
+    {v: "A", t: "An welchem Ort das Verfahren durchgeführt wird."},
+    {v: "B", t: "Ob der Fall zivil- oder strafrechtlich ist."},
+    {v: "C", t: "Welcher Anwalt den Fall übernimmt."},
+    {v: "D", t: "Welche Art von Gericht (Einzelrichter oder Kollegialgericht) den Fall beurteilt."}
   ],
-  correct: "A",
+  correct: "D",
   explain: "Die sachliche Zuständigkeit bestimmt, welche Art von Gericht für einen Fall zuständig ist — insbesondere ob ein Einzelrichter (vereinfachtes Verfahren) oder ein Kollegialgericht (ordentliches Verfahren) urteilt. Die örtliche Zuständigkeit (B) bestimmt den Ort des Verfahrens."
 },
 {
@@ -187,12 +187,12 @@ window.QUESTIONS = [
   id: "z04", topic: "zustaendigkeit", type: "mc", diff: 2, tax: "K2",
   q: "Was ist der Unterschied zwischen dem vereinfachten und dem ordentlichen Verfahren?",
   options: [
-    {v: "A", t: "Das vereinfachte Verfahren gilt bei tieferem Streitwert (bis CHF 30'000), ist formloser und wird oft von einem Einzelrichter geführt."},
-    {v: "B", t: "Das vereinfachte Verfahren ist nur für strafrechtliche Fälle vorgesehen."},
-    {v: "C", t: "Im ordentlichen Verfahren gibt es keine Beweisaufnahme."},
-    {v: "D", t: "Das vereinfachte Verfahren kann nur am Bundesgericht durchgeführt werden."}
+    {v: "A", t: "Das vereinfachte Verfahren kann nur am Bundesgericht durchgeführt werden."},
+    {v: "B", t: "Im ordentlichen Verfahren gibt es keine Beweisaufnahme."},
+    {v: "C", t: "Das vereinfachte Verfahren gilt bei tieferem Streitwert (bis CHF 30'000), ist formloser und wird oft von einem Einzelrichter geführt."},
+    {v: "D", t: "Das vereinfachte Verfahren ist nur für strafrechtliche Fälle vorgesehen."}
   ],
-  correct: "A",
+  correct: "C",
   explain: "Das vereinfachte Verfahren (Art. 243 ff. ZPO) gilt bei einem Streitwert bis CHF 30'000. Es ist weniger formal, schneller und wird typischerweise von einem Einzelrichter beurteilt. Das ordentliche Verfahren gilt bei höherem Streitwert und wird von einem Kollegialgericht (mehrere Richter) geführt."
 },
 {
@@ -201,8 +201,8 @@ window.QUESTIONS = [
   q: "Welches Verfahren ist anwendbar und wo muss Elena klagen?",
   options: [
     {v: "A", t: "Vereinfachtes Verfahren, am Gericht in Zürich (Wohnsitz der Beklagten)."},
-    {v: "B", t: "Ordentliches Verfahren, am Gericht in Bern (Wohnsitz der Klägerin)."},
-    {v: "C", t: "Vereinfachtes Verfahren, am Gericht in Bern (Wohnsitz der Klägerin)."},
+    {v: "B", t: "Vereinfachtes Verfahren, am Gericht in Bern (Wohnsitz der Klägerin)."},
+    {v: "C", t: "Ordentliches Verfahren, am Gericht in Bern (Wohnsitz der Klägerin)."},
     {v: "D", t: "Ordentliches Verfahren, am Gericht in Zürich (Wohnsitz der Beklagten)."}
   ],
   correct: "A",
@@ -233,24 +233,24 @@ window.QUESTIONS = [
   context: "Markus (wohnhaft in Bern) und seine Schwester Claudia (wohnhaft in Basel) streiten über ein geerbtes Ferienhaus in Interlaken im Wert von CHF 400'000.",
   q: "Welches Gericht ist zuständig?",
   options: [
-    {v: "A", t: "Das Gericht in Interlaken (am Ort des Grundstücks), ordentliches Verfahren."},
-    {v: "B", t: "Das Gericht in Basel (Wohnsitz der Beklagten), ordentliches Verfahren."},
+    {v: "A", t: "Das Gericht in Basel (Wohnsitz der Beklagten), ordentliches Verfahren."},
+    {v: "B", t: "Das Bundesgericht, weil der Streitwert hoch ist."},
     {v: "C", t: "Das Gericht in Bern (Wohnsitz des Klägers), vereinfachtes Verfahren."},
-    {v: "D", t: "Das Bundesgericht, weil der Streitwert hoch ist."}
+    {v: "D", t: "Das Gericht in Interlaken (am Ort des Grundstücks), ordentliches Verfahren."}
   ],
-  correct: "A",
+  correct: "D",
   explain: "Bei Streitigkeiten über Grundstücke (Immobilien) ist das Gericht am Ort des Grundstücks zuständig — also Interlaken. Der Streitwert von CHF 400'000 liegt weit über CHF 30'000, daher gilt das ordentliche Verfahren mit einem Kollegialgericht. Das Bundesgericht (D) ist keine erste Instanz."
 },
 {
   id: "z09", topic: "zustaendigkeit", type: "mc", diff: 3, tax: "K4",
   q: "Warum ist die Frage der Zuständigkeit für ein Gerichtsverfahren so wichtig?",
   options: [
-    {v: "A", t: "Weil ein Urteil eines unzuständigen Gerichts angefochten werden kann und das Verfahren vor dem richtigen Gericht neu begonnen werden muss."},
-    {v: "B", t: "Weil nur sachlich zuständige Gerichte Beweismittel zulassen dürfen."},
-    {v: "C", t: "Weil die Zuständigkeit ausschliesslich vom Kläger bestimmt wird."},
-    {v: "D", t: "Weil die Zuständigkeit keinen Einfluss auf das Urteil hat."}
+    {v: "A", t: "Weil die Zuständigkeit ausschliesslich vom Kläger bestimmt wird."},
+    {v: "B", t: "Weil ein Urteil eines unzuständigen Gerichts angefochten werden kann und das Verfahren vor dem richtigen Gericht neu begonnen werden muss."},
+    {v: "C", t: "Weil die Zuständigkeit keinen Einfluss auf das Urteil hat."},
+    {v: "D", t: "Weil nur sachlich zuständige Gerichte Beweismittel zulassen dürfen."}
   ],
-  correct: "A",
+  correct: "B",
   explain: "Die Zuständigkeit ist eine Prozessvoraussetzung. Wird eine Klage beim unzuständigen Gericht eingereicht, tritt das Gericht auf die Klage nicht ein oder das Urteil kann angefochten werden. Das führt zu Zeitverlust und zusätzlichen Kosten. Deshalb muss die Zuständigkeit zu Beginn des Verfahrens geklärt werden."
 },
 
@@ -264,12 +264,12 @@ window.QUESTIONS = [
   img: {src: "img/recht/prozessrecht/prozessrecht_instanzenzug_01.svg", alt: "Diagramm: Instanzenzug im Zivilprozess – Schlichtungsbehörde, Regionalgericht, Obergericht, Bundesgericht"},
   q: "Wie viele Gerichtsinstanzen gibt es im Schweizer Zivilprozess?",
   options: [
-    {v: "A", t: "Drei: erste Instanz, zweite Instanz (Berufung) und Bundesgericht."},
-    {v: "B", t: "Zwei: erste Instanz und Bundesgericht."},
-    {v: "C", t: "Vier: Friedensrichter, Regionalgericht, Obergericht, Bundesgericht."},
-    {v: "D", t: "Eine: das Regionalgericht entscheidet endgültig."}
+    {v: "A", t: "Zwei: erste Instanz und Bundesgericht."},
+    {v: "B", t: "Drei: erste Instanz, zweite Instanz (Berufung) und Bundesgericht."},
+    {v: "C", t: "Eine: das Regionalgericht entscheidet endgültig."},
+    {v: "D", t: "Vier: Friedensrichter, Regionalgericht, Obergericht, Bundesgericht."}
   ],
-  correct: "A",
+  correct: "B",
   explain: "Im Schweizer Zivilprozess gibt es drei Instanzen: Die erste Instanz (z.B. Regionalgericht), die zweite Instanz (Obergericht, Berufung) und als letzte Instanz das Bundesgericht. Die Schlichtungsbehörde ist keine Gerichtsinstanz im engeren Sinn."
 },
 {
@@ -292,12 +292,12 @@ window.QUESTIONS = [
   id: "i04", topic: "instanzenzug", type: "mc", diff: 2, tax: "K2",
   q: "Was ist eine Berufung im Zivilprozess?",
   options: [
-    {v: "A", t: "Ein Rechtsmittel, mit dem ein Urteil der ersten Instanz bei der zweiten Instanz (Obergericht) angefochten wird."},
-    {v: "B", t: "Ein Antrag an das Bundesgericht, einen Fall neu zu beurteilen."},
-    {v: "C", t: "Eine schriftliche Stellungnahme des Beklagten zur Klage."},
-    {v: "D", t: "Die Überweisung eines Falls an die Schlichtungsbehörde."}
+    {v: "A", t: "Ein Antrag an das Bundesgericht, einen Fall neu zu beurteilen."},
+    {v: "B", t: "Eine schriftliche Stellungnahme des Beklagten zur Klage."},
+    {v: "C", t: "Die Überweisung eines Falls an die Schlichtungsbehörde."},
+    {v: "D", t: "Ein Rechtsmittel, mit dem ein Urteil der ersten Instanz bei der zweiten Instanz (Obergericht) angefochten wird."}
   ],
-  correct: "A",
+  correct: "D",
   explain: "Die Berufung ist das ordentliche Rechtsmittel gegen Urteile der ersten Instanz. Die unterlegene Partei kann damit das Urteil beim Obergericht (zweite Instanz) anfechten. Das Obergericht überprüft den Fall in tatsächlicher und rechtlicher Hinsicht."
 },
 {
@@ -325,24 +325,24 @@ window.QUESTIONS = [
   context: "Sandro verliert einen Mietrechtsstreit um CHF 8'000 vor dem Regionalgericht Bern. Er ist mit dem Urteil nicht einverstanden.",
   q: "Welchen Schritt muss Sandro als nächstes unternehmen?",
   options: [
-    {v: "A", t: "Er muss Berufung beim Obergericht des Kantons Bern einlegen."},
-    {v: "B", t: "Er muss direkt Beschwerde beim Bundesgericht erheben."},
-    {v: "C", t: "Er muss den Fall nochmals der Schlichtungsbehörde vorlegen."},
-    {v: "D", t: "Er kann nichts mehr tun — Urteile des Regionalgerichts sind endgültig."}
+    {v: "A", t: "Er muss direkt Beschwerde beim Bundesgericht erheben."},
+    {v: "B", t: "Er muss den Fall nochmals der Schlichtungsbehörde vorlegen."},
+    {v: "C", t: "Er kann nichts mehr tun — Urteile des Regionalgerichts sind endgültig."},
+    {v: "D", t: "Er muss Berufung beim Obergericht des Kantons Bern einlegen."}
   ],
-  correct: "A",
+  correct: "D",
   explain: "Sandro muss als nächstes Berufung beim Obergericht des Kantons Bern einlegen. Der Instanzenzug sieht vor, dass zuerst die zweite Instanz angerufen wird. Ein direkter Gang ans Bundesgericht (B) ist nicht möglich. Urteile des Regionalgerichts sind nicht endgültig (D) — die Berufung ist das vorgesehene Rechtsmittel."
 },
 {
   id: "i08", topic: "instanzenzug", type: "mc", diff: 3, tax: "K4",
   q: "Warum prüft das Bundesgericht in der Regel nur Rechtsfragen und nicht den Sachverhalt?",
   options: [
-    {v: "A", t: "Weil die Feststellung des Sachverhalts Aufgabe der Vorinstanzen ist und das Bundesgericht die einheitliche Rechtsanwendung in der Schweiz sicherstellen soll."},
-    {v: "B", t: "Weil das Bundesgericht keine Beweismittel zulassen darf."},
-    {v: "C", t: "Weil der Sachverhalt nach der ersten Instanz nicht mehr geändert werden kann."},
-    {v: "D", t: "Weil das Bundesgericht nur für Strafsachen zuständig ist."}
+    {v: "A", t: "Weil das Bundesgericht keine Beweismittel zulassen darf."},
+    {v: "B", t: "Weil das Bundesgericht nur für Strafsachen zuständig ist."},
+    {v: "C", t: "Weil die Feststellung des Sachverhalts Aufgabe der Vorinstanzen ist und das Bundesgericht die einheitliche Rechtsanwendung in der Schweiz sicherstellen soll."},
+    {v: "D", t: "Weil der Sachverhalt nach der ersten Instanz nicht mehr geändert werden kann."}
   ],
-  correct: "A",
+  correct: "C",
   explain: "Das Bundesgericht hat die Aufgabe, die einheitliche Rechtsanwendung in der ganzen Schweiz sicherzustellen. Die Sachverhaltsfeststellung — also die Ermittlung der Fakten und die Beweiswürdigung — ist primär Aufgabe der kantonalen Gerichte (erste und zweite Instanz). Das Bundesgericht greift nur ein, wenn der Sachverhalt offensichtlich unrichtig festgestellt wurde."
 },
 {
@@ -365,12 +365,12 @@ window.QUESTIONS = [
   id: "b01", topic: "beweis", type: "mc", diff: 1, tax: "K1",
   q: "Was besagt die Beweislastregel nach Art. 8 ZGB?",
   options: [
-    {v: "A", t: "Wer aus einer Tatsache Rechte ableitet, muss deren Vorhandensein beweisen."},
-    {v: "B", t: "Das Gericht muss alle Beweise selbst beschaffen."},
-    {v: "C", t: "Der Beklagte muss immer beweisen, dass er unschuldig ist."},
-    {v: "D", t: "Beweise müssen immer schriftlich vorgelegt werden."}
+    {v: "A", t: "Das Gericht muss alle Beweise selbst beschaffen."},
+    {v: "B", t: "Der Beklagte muss immer beweisen, dass er unschuldig ist."},
+    {v: "C", t: "Beweise müssen immer schriftlich vorgelegt werden."},
+    {v: "D", t: "Wer aus einer Tatsache Rechte ableitet, muss deren Vorhandensein beweisen."}
   ],
-  correct: "A",
+  correct: "D",
   explain: "Art. 8 ZGB enthält die grundlegende Beweislastregel: Wer aus einer behaupteten Tatsache Rechte ableiten will, muss diese Tatsache beweisen. Das bedeutet in der Regel: Der Kläger muss beweisen, was er behauptet, um seine Ansprüche durchzusetzen."
 },
 {
@@ -407,12 +407,12 @@ window.QUESTIONS = [
   context: "Sabrina behauptet, sie habe Marc CHF 3'000 geliehen. Marc bestreitet dies. Es gibt keinen schriftlichen Vertrag.",
   q: "Wer trägt die Beweislast?",
   options: [
-    {v: "A", t: "Sabrina — sie leitet aus dem behaupteten Darlehen einen Rückzahlungsanspruch ab."},
+    {v: "A", t: "Das Gericht — es muss den Sachverhalt von Amtes wegen abklären."},
     {v: "B", t: "Marc — er muss beweisen, dass er das Geld nicht erhalten hat."},
-    {v: "C", t: "Das Gericht — es muss den Sachverhalt von Amtes wegen abklären."},
+    {v: "C", t: "Sabrina — sie leitet aus dem behaupteten Darlehen einen Rückzahlungsanspruch ab."},
     {v: "D", t: "Niemand — ohne schriftlichen Vertrag kann kein Anspruch geltend gemacht werden."}
   ],
-  correct: "A",
+  correct: "C",
   explain: "Obersatz: Es ist zu prüfen, wer die Beweislast für das Darlehen trägt. Voraussetzung: Nach Art. 8 ZGB muss beweisen, wer aus einer Tatsache Rechte ableitet. Subsumtion: Sabrina will einen Rückzahlungsanspruch geltend machen — sie leitet also Rechte aus dem behaupteten Darlehen ab. Schluss: Sabrina trägt die Beweislast. Dass kein schriftlicher Vertrag existiert, schliesst den Anspruch nicht aus (D) — ein Darlehen kann auch mündlich vereinbart werden —, erschwert aber den Beweis."
 },
 {
@@ -420,12 +420,12 @@ window.QUESTIONS = [
   context: "In einem Bauprozess behauptet die Bauherrin, der Bauunternehmer habe mangelhafte Materialien verwendet. Der Bauunternehmer bestreitet dies.",
   q: "Welches Beweismittel wäre hier besonders geeignet?",
   options: [
-    {v: "A", t: "Ein Gutachten (Sachverständiger untersucht die verbauten Materialien)."},
+    {v: "A", t: "Ein Augenschein ist bei Baufragen nie sinnvoll."},
     {v: "B", t: "Nur die Parteiaussage der Bauherrin genügt."},
-    {v: "C", t: "Ein Augenschein ist bei Baufragen nie sinnvoll."},
-    {v: "D", t: "Im Bauprozess sind keine Beweismittel nötig."}
+    {v: "C", t: "Im Bauprozess sind keine Beweismittel nötig."},
+    {v: "D", t: "Ein Gutachten (Sachverständiger untersucht die verbauten Materialien)."}
   ],
-  correct: "A",
+  correct: "D",
   explain: "Bei technischen Fragen wie der Qualität von Baumaterialien ist ein Gutachten (Expertise) das geeignetste Beweismittel. Ein Sachverständiger (z.B. ein Bauingenieur) kann die Materialien fachkundig untersuchen und beurteilen. Zusätzlich kann auch ein Augenschein sinnvoll sein — das Gericht besichtigt dann die Baustelle."
 },
 {
@@ -441,12 +441,12 @@ window.QUESTIONS = [
   context: "Jan hat bei einer Online-Auktion ein Gemälde gekauft. Der Verkäufer behauptet, es sei ein Original im Wert von CHF 15'000. Jan bezweifelt die Echtheit und verlangt den Kaufpreis zurück.",
   q: "Wer muss was beweisen?",
   options: [
-    {v: "A", t: "Jan muss beweisen, dass das Gemälde eine Fälschung ist, da er aus diesem Mangel Rechte ableiten will (Rückforderung des Kaufpreises)."},
-    {v: "B", t: "Der Verkäufer muss beweisen, dass das Gemälde echt ist, weil er den Kaufpreis behalten will."},
-    {v: "C", t: "Niemand muss etwas beweisen — das Gericht entscheidet nach freiem Ermessen."},
-    {v: "D", t: "Der Verkäufer muss beweisen, dass er das Geld bereits ausgegeben hat."}
+    {v: "A", t: "Der Verkäufer muss beweisen, dass er das Geld bereits ausgegeben hat."},
+    {v: "B", t: "Jan muss beweisen, dass das Gemälde eine Fälschung ist, da er aus diesem Mangel Rechte ableiten will (Rückforderung des Kaufpreises)."},
+    {v: "C", t: "Der Verkäufer muss beweisen, dass das Gemälde echt ist, weil er den Kaufpreis behalten will."},
+    {v: "D", t: "Niemand muss etwas beweisen — das Gericht entscheidet nach freiem Ermessen."}
   ],
-  correct: "A",
+  correct: "B",
   explain: "Nach Art. 8 ZGB muss beweisen, wer Rechte ableitet. Jan will den Kaufpreis zurückfordern — er stützt sich dabei auf einen Sachmangel (Fälschung statt Original). Also muss Jan beweisen, dass das Gemälde nicht echt ist. Ein Gutachten eines Kunstexperten wäre hier das geeignete Beweismittel. Diese Beweislastverteilung kann für den Käufer eine Herausforderung darstellen."
 },
 {
@@ -455,8 +455,8 @@ window.QUESTIONS = [
   options: [
     {v: "A", t: "Das Gericht betrachtet den Streitgegenstand vor Ort — besonders geeignet bei Nachbarschaftsstreitigkeiten, Baumängeln oder Grenzstreitigkeiten."},
     {v: "B", t: "Ein Zeuge beschreibt dem Gericht, was er gesehen hat."},
-    {v: "C", t: "Das Gericht betrachtet nur Fotografien des Streitgegenstands."},
-    {v: "D", t: "Ein Gutachter nimmt den Streitgegenstand in Augenschein und erstellt einen Bericht."}
+    {v: "C", t: "Ein Gutachter nimmt den Streitgegenstand in Augenschein und erstellt einen Bericht."},
+    {v: "D", t: "Das Gericht betrachtet nur Fotografien des Streitgegenstands."}
   ],
   correct: "A",
   explain: "Beim Augenschein verschafft sich das Gericht einen persönlichen, unmittelbaren Eindruck vom Streitgegenstand — z.B. indem es eine Baustelle besichtigt, einen Zaun inspiziert oder eine Liegenschaft begeht. Dies ist besonders geeignet, wenn der Zustand eines Gegenstands oder einer Örtlichkeit strittig ist. Es ist vom Gutachten (D) zu unterscheiden, bei dem ein externer Sachverständiger eine fachliche Beurteilung abgibt."
@@ -477,12 +477,12 @@ window.QUESTIONS = [
   id: "s01", topic: "streitbeilegung", type: "mc", diff: 1, tax: "K1",
   q: "Was ist ein Schlichtungsverfahren?",
   options: [
-    {v: "A", t: "Ein obligatorisches Verfahren vor der Schlichtungsbehörde, bei dem versucht wird, eine Einigung zwischen den Parteien zu erzielen."},
-    {v: "B", t: "Ein freiwilliges Verfahren, bei dem ein privater Richter ein verbindliches Urteil fällt."},
+    {v: "A", t: "Ein Verfahren, das nur in Strafsachen zur Anwendung kommt."},
+    {v: "B", t: "Ein obligatorisches Verfahren vor der Schlichtungsbehörde, bei dem versucht wird, eine Einigung zwischen den Parteien zu erzielen."},
     {v: "C", t: "Die erste Verhandlung vor dem Regionalgericht."},
-    {v: "D", t: "Ein Verfahren, das nur in Strafsachen zur Anwendung kommt."}
+    {v: "D", t: "Ein freiwilliges Verfahren, bei dem ein privater Richter ein verbindliches Urteil fällt."}
   ],
-  correct: "A",
+  correct: "B",
   explain: "Das Schlichtungsverfahren ist in der Schweiz grundsätzlich obligatorisch vor der Einreichung einer Zivilklage (Art. 197 ZPO). Die Schlichtungsbehörde versucht, zwischen den Parteien eine Einigung zu vermitteln. Erst wenn die Schlichtung scheitert, erhält der Kläger eine Klagebewilligung für das Gericht."
 },
 {
@@ -505,24 +505,24 @@ window.QUESTIONS = [
   id: "s04", topic: "streitbeilegung", type: "mc", diff: 2, tax: "K2",
   q: "Was unterscheidet die Mediation von der Schlichtung?",
   options: [
-    {v: "A", t: "Mediation ist freiwillig und der Mediator hat keine Entscheidungsgewalt; Schlichtung ist obligatorisch und die Schlichtungsbehörde kann einen Urteilsvorschlag machen."},
+    {v: "A", t: "Bei der Mediation entscheidet der Mediator verbindlich über den Fall."},
     {v: "B", t: "Schlichtung ist freiwillig, Mediation ist obligatorisch."},
-    {v: "C", t: "Bei der Mediation entscheidet der Mediator verbindlich über den Fall."},
+    {v: "C", t: "Mediation ist freiwillig und der Mediator hat keine Entscheidungsgewalt; Schlichtung ist obligatorisch und die Schlichtungsbehörde kann einen Urteilsvorschlag machen."},
     {v: "D", t: "Schlichtung und Mediation sind dasselbe Verfahren."}
   ],
-  correct: "A",
+  correct: "C",
   explain: "Die Schlichtung ist in der Schweiz obligatorisch vor der Klage (Art. 197 ZPO). Die Schlichtungsbehörde kann bei einem Streitwert bis CHF 2'000 sogar einen Entscheid fällen und bei höherem Streitwert einen Urteilsvorschlag unterbreiten. Die Mediation ist freiwillig (Art. 213 ff. ZPO), und der Mediator hat keine Entscheidungsgewalt — er hilft den Parteien lediglich, selbst eine Lösung zu finden."
 },
 {
   id: "s05", topic: "streitbeilegung", type: "mc", diff: 2, tax: "K2",
   q: "Was ist ein Schiedsgericht?",
   options: [
-    {v: "A", t: "Ein privates Gericht, bei dem die Parteien die Richter selbst wählen und dessen Urteil bindend ist."},
+    {v: "A", t: "Ein Verfahren, das nur bei Streitigkeiten unter CHF 5'000 zulässig ist."},
     {v: "B", t: "Ein staatliches Gericht, das besonders schnell urteilt."},
-    {v: "C", t: "Ein Verfahren, das nur bei Streitigkeiten unter CHF 5'000 zulässig ist."},
+    {v: "C", t: "Ein privates Gericht, bei dem die Parteien die Richter selbst wählen und dessen Urteil bindend ist."},
     {v: "D", t: "Eine kostenlose Alternative zum Zivilprozess."}
   ],
-  correct: "A",
+  correct: "C",
   explain: "Ein Schiedsgericht ist eine private Gerichtsbarkeit: Die Parteien vereinbaren, ihren Streit nicht vor einem staatlichen Gericht, sondern vor einem oder mehreren privaten Schiedsrichtern auszutragen. Das Schiedsurteil (Schiedsspruch) ist bindend und vollstreckbar. Schiedsgerichte werden oft in internationalen Handelsverträgen vereinbart."
 },
 {
@@ -551,9 +551,9 @@ window.QUESTIONS = [
   q: "Welche Form der Streitbeilegung empfehlen Sie?",
   options: [
     {v: "A", t: "Mediation — sie wahrt die Geschäftsbeziehung und ermöglicht eine einvernehmliche Lösung. Falls keine Einigung erzielt wird, kann immer noch geklagt werden."},
-    {v: "B", t: "Sofort ein ordentliches Gerichtsverfahren — nur so ist ein verbindliches Urteil möglich."},
-    {v: "C", t: "Ein Schiedsverfahren — es ist verbindlich, aber diskreter als ein öffentliches Gerichtsverfahren."},
-    {v: "D", t: "Keine Streitbeilegung — die Parteien sollten den Streit einfach vergessen."}
+    {v: "B", t: "Ein Schiedsverfahren — es ist verbindlich, aber diskreter als ein öffentliches Gerichtsverfahren."},
+    {v: "C", t: "Keine Streitbeilegung — die Parteien sollten den Streit einfach vergessen."},
+    {v: "D", t: "Sofort ein ordentliches Gerichtsverfahren — nur so ist ein verbindliches Urteil möglich."}
   ],
   correct: "A",
   explain: "Bei einer langjährigen Geschäftsbeziehung, die erhalten bleiben soll, ist die Mediation besonders geeignet. Sie ermöglicht eine einvernehmliche Lösung, bei der beide Parteien ihre Interessen einbringen können. Die Geschäftsbeziehung wird weniger belastet als bei einem Gerichtsverfahren. Ein Schiedsverfahren (C) wäre auch denkbar und hätte den Vorteil der Vertraulichkeit und Verbindlichkeit, ist aber in der Regel teurer und kontradiktorischer."
@@ -562,24 +562,24 @@ window.QUESTIONS = [
   id: "s09", topic: "streitbeilegung", type: "mc", diff: 3, tax: "K4",
   q: "Warum hat die Schweiz das obligatorische Schlichtungsverfahren eingeführt?",
   options: [
-    {v: "A", t: "Um Gerichte zu entlasten und den Parteien die Möglichkeit zu geben, ihren Streit schnell und kostengünstig beizulegen, bevor sie den aufwändigen Gerichtsweg beschreiten."},
-    {v: "B", t: "Weil die Schlichtungsbehörde bessere Urteile fällt als ein Gericht."},
-    {v: "C", t: "Weil in der Schweiz nicht genügend Richterinnen und Richter zur Verfügung stehen."},
-    {v: "D", t: "Weil das Gesetz es verbietet, direkt vor Gericht zu klagen."}
+    {v: "A", t: "Weil das Gesetz es verbietet, direkt vor Gericht zu klagen."},
+    {v: "B", t: "Um Gerichte zu entlasten und den Parteien die Möglichkeit zu geben, ihren Streit schnell und kostengünstig beizulegen, bevor sie den aufwändigen Gerichtsweg beschreiten."},
+    {v: "C", t: "Weil die Schlichtungsbehörde bessere Urteile fällt als ein Gericht."},
+    {v: "D", t: "Weil in der Schweiz nicht genügend Richterinnen und Richter zur Verfügung stehen."}
   ],
-  correct: "A",
+  correct: "B",
   explain: "Das obligatorische Schlichtungsverfahren dient der Entlastung der Gerichte und gibt den Parteien eine niederschwellige Möglichkeit, ihren Streit einvernehmlich beizulegen. Viele Fälle werden bereits im Schlichtungsverfahren gelöst, was Zeit und Kosten spart — sowohl für die Parteien als auch für das Justizsystem. Es geht nicht darum, dass Schlichtungsbehörden besser urteilen (B), sondern darum, eine Einigung zu fördern."
 },
 {
   id: "s10", topic: "streitbeilegung", type: "mc", diff: 3, tax: "K5",
   q: "Welcher Nachteil kann bei einem Schiedsgericht im Vergleich zum staatlichen Gericht bestehen?",
   options: [
-    {v: "A", t: "Die Kosten können hoch sein, da die Schiedsrichter privat bezahlt werden müssen, und die Möglichkeiten der Anfechtung sind eingeschränkt."},
-    {v: "B", t: "Ein Schiedsspruch ist nie verbindlich."},
-    {v: "C", t: "Ein Schiedsverfahren dauert immer länger als ein Gerichtsverfahren."},
-    {v: "D", t: "Bei einem Schiedsgericht sind keine Anwälte zugelassen."}
+    {v: "A", t: "Ein Schiedsspruch ist nie verbindlich."},
+    {v: "B", t: "Bei einem Schiedsgericht sind keine Anwälte zugelassen."},
+    {v: "C", t: "Die Kosten können hoch sein, da die Schiedsrichter privat bezahlt werden müssen, und die Möglichkeiten der Anfechtung sind eingeschränkt."},
+    {v: "D", t: "Ein Schiedsverfahren dauert immer länger als ein Gerichtsverfahren."}
   ],
-  correct: "A",
+  correct: "C",
   explain: "Schiedsverfahren haben den Nachteil, dass die Parteien die Schiedsrichter selbst bezahlen müssen, was insbesondere bei komplexen Fällen teuer werden kann. Zudem sind die Möglichkeiten, einen Schiedsspruch anzufechten, stark eingeschränkt. Dafür bieten Schiedsverfahren Vorteile wie Vertraulichkeit, Schnelligkeit und die Möglichkeit, spezialisierte Schiedsrichter zu wählen."
 },
 
@@ -593,12 +593,12 @@ window.QUESTIONS = [
   img: {src: "img/recht/prozessrecht/prozessrecht_strafverfahren_ablauf_01.svg", alt: "Ablaufdiagramm: Phasen eines Strafverfahrens – Einleitung, Vorverfahren, Anklage, Hauptverhandlung, Urteil"},
   q: "Wie wird ein Strafverfahren in der Regel eingeleitet?",
   options: [
-    {v: "A", t: "Durch eine Strafanzeige oder einen Strafantrag, oder die Staatsanwaltschaft wird von sich aus tätig."},
-    {v: "B", t: "Durch eine Zivilklage beim Regionalgericht."},
+    {v: "A", t: "Durch eine Zivilklage beim Regionalgericht."},
+    {v: "B", t: "Durch eine Schlichtung bei der Schlichtungsbehörde."},
     {v: "C", t: "Durch den Beschuldigten selbst, der sich stellt."},
-    {v: "D", t: "Durch eine Schlichtung bei der Schlichtungsbehörde."}
+    {v: "D", t: "Durch eine Strafanzeige oder einen Strafantrag, oder die Staatsanwaltschaft wird von sich aus tätig."}
   ],
-  correct: "A",
+  correct: "D",
   explain: "Ein Strafverfahren wird eingeleitet durch: eine Strafanzeige (jede Person kann eine Straftat melden), einen Strafantrag (bei Antragsdelikten muss das Opfer dies innerhalb von 3 Monaten tun) oder durch die Staatsanwaltschaft von Amtes wegen (bei Offizialdelikten). Eine Zivilklage (B) gehört zum Zivilprozess."
 },
 {
@@ -620,12 +620,12 @@ window.QUESTIONS = [
   id: "v04", topic: "strafverfahren", type: "mc", diff: 1, tax: "K2",
   q: "Was bedeutet die Unschuldsvermutung?",
   options: [
-    {v: "A", t: "Jede beschuldigte Person gilt als unschuldig, bis ihre Schuld in einem rechtskräftigen Urteil bewiesen ist."},
-    {v: "B", t: "Das Gericht geht davon aus, dass der Beschuldigte schuldig ist, bis er das Gegenteil beweist."},
+    {v: "A", t: "Das Gericht geht davon aus, dass der Beschuldigte schuldig ist, bis er das Gegenteil beweist."},
+    {v: "B", t: "Der Beschuldigte muss seine Unschuld beweisen."},
     {v: "C", t: "Die Polizei darf niemanden verhaften, solange kein Urteil vorliegt."},
-    {v: "D", t: "Der Beschuldigte muss seine Unschuld beweisen."}
+    {v: "D", t: "Jede beschuldigte Person gilt als unschuldig, bis ihre Schuld in einem rechtskräftigen Urteil bewiesen ist."}
   ],
-  correct: "A",
+  correct: "D",
   explain: "Die Unschuldsvermutung (Art. 6 Abs. 2 EMRK, Art. 32 Abs. 1 BV) ist ein fundamentales Grundrecht: Jede beschuldigte Person gilt als unschuldig, bis ein rechtskräftiges Urteil vorliegt. Die Beweislast liegt bei der Staatsanwaltschaft — sie muss die Schuld beweisen, nicht der Beschuldigte seine Unschuld (D)."
 },
 
@@ -635,9 +635,9 @@ window.QUESTIONS = [
   q: "In welcher Reihenfolge läuft ein Strafverfahren typischerweise ab?",
   options: [
     {v: "A", t: "Strafanzeige → Vorverfahren (Ermittlung und Untersuchung) → Anklageerhebung → Hauptverhandlung → Urteil"},
-    {v: "B", t: "Hauptverhandlung → Anklageerhebung → Ermittlung → Urteil"},
-    {v: "C", t: "Schlichtung → Klage → Verhandlung → Urteil"},
-    {v: "D", t: "Strafanzeige → Urteil → Hauptverhandlung → Berufung"}
+    {v: "B", t: "Schlichtung → Klage → Verhandlung → Urteil"},
+    {v: "C", t: "Strafanzeige → Urteil → Hauptverhandlung → Berufung"},
+    {v: "D", t: "Hauptverhandlung → Anklageerhebung → Ermittlung → Urteil"}
   ],
   correct: "A",
   explain: "Der Ablauf eines Strafverfahrens: (1) Eine Strafanzeige oder ein Strafantrag leitet das Verfahren ein. (2) Im Vorverfahren ermittelt die Polizei und die Staatsanwaltschaft untersucht. (3) Die Staatsanwaltschaft erhebt Anklage. (4) In der Hauptverhandlung verhandelt das Gericht den Fall. (5) Das Gericht fällt ein Urteil. Option C beschreibt den Zivilprozess."
@@ -658,12 +658,12 @@ window.QUESTIONS = [
   id: "v07", topic: "strafverfahren", type: "mc", diff: 2, tax: "K2",
   q: "Was ist der Unterschied zwischen einer Strafanzeige und einem Strafantrag?",
   options: [
-    {v: "A", t: "Eine Strafanzeige kann jede Person erstatten; ein Strafantrag muss vom Opfer selbst gestellt werden (bei Antragsdelikten)."},
-    {v: "B", t: "Eine Strafanzeige ist verbindlicher als ein Strafantrag."},
-    {v: "C", t: "Ein Strafantrag kann nur die Polizei stellen."},
+    {v: "A", t: "Ein Strafantrag kann nur die Polizei stellen."},
+    {v: "B", t: "Eine Strafanzeige kann jede Person erstatten; ein Strafantrag muss vom Opfer selbst gestellt werden (bei Antragsdelikten)."},
+    {v: "C", t: "Eine Strafanzeige ist verbindlicher als ein Strafantrag."},
     {v: "D", t: "Es gibt keinen Unterschied — die Begriffe sind synonym."}
   ],
-  correct: "A",
+  correct: "B",
   explain: "Eine Strafanzeige ist eine Mitteilung an die Behörden, dass eine Straftat begangen wurde — jede Person kann sie erstatten. Ein Strafantrag ist bei sogenannten Antragsdelikten nötig (z.B. einfacher Diebstahl nach Art. 139 Ziff. 1 StGB). Hier muss das Opfer innerhalb von 3 Monaten ausdrücklich verlangen, dass der Täter bestraft wird."
 },
 {
@@ -679,36 +679,36 @@ window.QUESTIONS = [
   context: "Kevin (16 Jahre) wird verdächtigt, zusammen mit einem Freund (19 Jahre) einen Ladendiebstahl begangen zu haben. Der gestohlene Gegenstand hat einen Wert von CHF 50.",
   q: "Was gilt für Kevin im Strafverfahren?",
   options: [
-    {v: "A", t: "Kevin untersteht dem Jugendstrafrecht (JStG). Im Vordergrund stehen Schutzmassnahmen und Erziehung, nicht Bestrafung."},
+    {v: "A", t: "Kevin wird nur verwarnt, da der Wert unter CHF 100 liegt."},
     {v: "B", t: "Kevin wird gleich behandelt wie sein 19-jähriger Freund — das Alter spielt keine Rolle."},
-    {v: "C", t: "Kevin kann nicht bestraft werden, weil er noch minderjährig ist."},
-    {v: "D", t: "Kevin wird nur verwarnt, da der Wert unter CHF 100 liegt."}
+    {v: "C", t: "Kevin untersteht dem Jugendstrafrecht (JStG). Im Vordergrund stehen Schutzmassnahmen und Erziehung, nicht Bestrafung."},
+    {v: "D", t: "Kevin kann nicht bestraft werden, weil er noch minderjährig ist."}
   ],
-  correct: "A",
+  correct: "C",
   explain: "Kevin ist 16 und fällt damit unter das Jugendstrafgesetz (JStG). Im Jugendstrafrecht steht der Schutz und die Erziehung des Jugendlichen im Vordergrund — nicht die Vergeltung. Der Jugendliche kann trotzdem bestraft werden (C ist falsch), aber die Massnahmen sind auf Erziehung ausgerichtet. Sein 19-jähriger Freund wird nach dem ordentlichen Strafrecht (StGB) beurteilt."
 },
 {
   id: "v10", topic: "strafverfahren", type: "mc", diff: 3, tax: "K4",
   q: "Was wird im Strafregister (VOSTRA) eingetragen?",
   options: [
-    {v: "A", t: "Strafurteile (Verurteilungen zu Freiheitsstrafen, Geldstrafen und bestimmte Massnahmen) — nach einer gewissen Zeit werden Einträge gelöscht."},
+    {v: "A", t: "Nur Freiheitsstrafen ab einem Jahr Dauer."},
     {v: "B", t: "Jede Strafanzeige, unabhängig davon, ob es zu einer Verurteilung kommt."},
-    {v: "C", t: "Nur Freiheitsstrafen ab einem Jahr Dauer."},
+    {v: "C", t: "Strafurteile (Verurteilungen zu Freiheitsstrafen, Geldstrafen und bestimmte Massnahmen) — nach einer gewissen Zeit werden Einträge gelöscht."},
     {v: "D", t: "Strafregistereinträge werden nie gelöscht."}
   ],
-  correct: "A",
+  correct: "C",
   explain: "Im Strafregister (VOSTRA, Art. 365 ff. StGB) werden rechtskräftige Verurteilungen eingetragen — also Freiheitsstrafen, Geldstrafen und bestimmte Massnahmen. Blosse Strafanzeigen (B) werden nicht eingetragen. Die Einträge werden nach einer gesetzlich festgelegten Frist gelöscht (D ist falsch) — bei Geldstrafen z.B. nach 10 Jahren. Nicht alle Verurteilungen werden eingetragen; Bussen z.B. erscheinen in der Regel nicht im Strafregister."
 },
 {
   id: "v11", topic: "strafverfahren", type: "mc", diff: 3, tax: "K5",
   q: "Warum ist die Unschuldsvermutung für einen fairen Strafprozess so wichtig?",
   options: [
-    {v: "A", t: "Sie schützt den Einzelnen vor staatlicher Willkür und stellt sicher, dass die Beweislast bei der Anklagebehörde liegt — nicht beim Beschuldigten."},
-    {v: "B", t: "Sie ermöglicht es dem Beschuldigten, ohne Verteidiger vor Gericht aufzutreten."},
-    {v: "C", t: "Sie sorgt dafür, dass alle Beschuldigten freigesprochen werden."},
-    {v: "D", t: "Sie verhindert, dass die Polizei Ermittlungen aufnehmen kann."}
+    {v: "A", t: "Sie verhindert, dass die Polizei Ermittlungen aufnehmen kann."},
+    {v: "B", t: "Sie sorgt dafür, dass alle Beschuldigten freigesprochen werden."},
+    {v: "C", t: "Sie schützt den Einzelnen vor staatlicher Willkür und stellt sicher, dass die Beweislast bei der Anklagebehörde liegt — nicht beim Beschuldigten."},
+    {v: "D", t: "Sie ermöglicht es dem Beschuldigten, ohne Verteidiger vor Gericht aufzutreten."}
   ],
-  correct: "A",
+  correct: "C",
   explain: "Die Unschuldsvermutung ist ein fundamentaler Grundsatz des Rechtsstaats. Sie schützt den Einzelnen vor willkürlicher Bestrafung durch den Staat, indem sie verlangt, dass die Schuld zweifelsfrei bewiesen wird — und zwar durch die Staatsanwaltschaft (Beweislast). Der Beschuldigte muss seine Unschuld nicht beweisen. Ohne Unschuldsvermutung könnte der Staat beliebig Personen verurteilen."
 },
 

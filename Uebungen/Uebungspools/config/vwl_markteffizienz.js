@@ -50,10 +50,10 @@ window.QUESTIONS = [
 {id:"a02", topic:"angebot_nachfrage", type:"mc", diff:1, tax:"K1",
  q:"Warum verläuft die Nachfragekurve typischerweise fallend (von links oben nach rechts unten)?",
  options:[
-   {v:"A", t:"Weil die Produktionskosten mit steigender Menge sinken."},
-   {v:"B", t:"Weil der Grenznutzen eines Gutes mit zunehmendem Konsum abnimmt."},
-   {v:"C", t:"Weil der Staat höhere Preise mit Steuern belegt."},
-   {v:"D", t:"Weil Unternehmen bei höheren Preisen mehr produzieren."}
+   {v: "A", t:"Weil Unternehmen bei höheren Preisen mehr produzieren."},
+   {v: "B", t:"Weil der Grenznutzen eines Gutes mit zunehmendem Konsum abnimmt."},
+   {v: "C", t:"Weil der Staat höhere Preise mit Steuern belegt."},
+   {v: "D", t:"Weil die Produktionskosten mit steigender Menge sinken."}
  ],
  correct:"B",
  explain:"Der abnehmende Grenznutzen erklärt den fallenden Verlauf: Jede zusätzlich konsumierte Einheit stiftet weniger Nutzen als die vorherige. Konsumenten sind daher nur bei sinkendem Preis bereit, mehr zu kaufen. Zusätzlich wirken der Substitutionseffekt (Umstieg auf günstigere Alternativen) und der Einkommenseffekt (bei höherem Preis sinkt die reale Kaufkraft)."},
@@ -79,10 +79,10 @@ window.QUESTIONS = [
 {id:"a06", topic:"angebot_nachfrage", type:"mc", diff:1, tax:"K1",
  q:"Was versteht man unter «Ceteris Paribus»?",
  options:[
-   {v:"A", t:"Alle anderen Einflussgrössen bleiben gleich."},
-   {v:"B", t:"Angebot und Nachfrage sind im Gleichgewicht."},
-   {v:"C", t:"Der Preis wird vom Staat festgelegt."},
-   {v:"D", t:"Die Nachfrage ist vollkommen elastisch."}
+   {v: "A", t:"Alle anderen Einflussgrössen bleiben gleich."},
+   {v: "B", t:"Die Nachfrage ist vollkommen elastisch."},
+   {v: "C", t:"Angebot und Nachfrage sind im Gleichgewicht."},
+   {v: "D", t:"Der Preis wird vom Staat festgelegt."}
  ],
  correct:"A",
  explain:"Ceteris Paribus bedeutet «unter sonst gleichen Bedingungen». In der Ökonomie isoliert man damit einzelne Einflussfaktoren: Man verändert z.B. den Preis und hält alle anderen Faktoren (Einkommen, Präferenzen, Preise anderer Güter) konstant."},
@@ -90,12 +90,12 @@ window.QUESTIONS = [
 {id:"a07", topic:"angebot_nachfrage", type:"mc", diff:2, tax:"K2",
  q:"Warum verläuft die Angebotskurve steigend? Welche Erklärung ist am zutreffendsten?",
  options:[
-   {v:"A", t:"Weil die Grenzkosten bei steigender Produktion zunehmen (Ertragsgesetz)."},
-   {v:"B", t:"Weil die Fixkosten bei steigender Menge sinken."},
-   {v:"C", t:"Weil Konsumenten bei höheren Preisen weniger kaufen."},
-   {v:"D", t:"Weil der Staat die Produktion bei hohen Preisen subventioniert."}
+   {v: "A", t:"Weil Konsumenten bei höheren Preisen weniger kaufen."},
+   {v: "B", t:"Weil die Grenzkosten bei steigender Produktion zunehmen (Ertragsgesetz)."},
+   {v: "C", t:"Weil die Fixkosten bei steigender Menge sinken."},
+   {v: "D", t:"Weil der Staat die Produktion bei hohen Preisen subventioniert."}
  ],
- correct:"A",
+ correct:"B",
  explain:"Gemäss dem Ertragsgesetz nimmt der Grenzertrag bei zunehmender Produktion ab (bei konstantem Einsatz der übrigen Faktoren). Das bedeutet steigende Grenzkosten für jede zusätzliche Einheit — Produzenten bieten daher nur bei höheren Preisen mehr an."},
 
 {id:"a08", topic:"angebot_nachfrage", type:"sort", diff:1, tax:"K2",
@@ -122,12 +122,12 @@ window.QUESTIONS = [
 {id:"a10", topic:"angebot_nachfrage", type:"mc", diff:2, tax:"K2",
  q:"Wenn der Preis von Butter steigt, was passiert ceteris paribus mit der Nachfrage nach Margarine?",
  options:[
-   {v:"A", t:"Sie steigt, weil Margarine ein Substitut für Butter ist."},
-   {v:"B", t:"Sie sinkt, weil Margarine ein Komplement zu Butter ist."},
-   {v:"C", t:"Sie bleibt gleich, weil die Güter unabhängig sind."},
-   {v:"D", t:"Sie steigt, weil Margarine ein Komplement zu Butter ist."}
+   {v: "A", t:"Sie sinkt, weil Margarine ein Komplement zu Butter ist."},
+   {v: "B", t:"Sie bleibt gleich, weil die Güter unabhängig sind."},
+   {v: "C", t:"Sie steigt, weil Margarine ein Substitut für Butter ist."},
+   {v: "D", t:"Sie steigt, weil Margarine ein Komplement zu Butter ist."}
  ],
- correct:"A",
+ correct:"C",
  explain:"Butter und Margarine sind Substitutionsgüter — sie erfüllen einen ähnlichen Zweck. Wird Butter teurer, weichen Konsumenten auf Margarine aus: Die Nachfrage nach Margarine steigt (Nachfragekurve verschiebt sich nach rechts)."},
 
 {id:"a11", topic:"angebot_nachfrage", type:"tf", diff:2, tax:"K2",
@@ -143,12 +143,12 @@ window.QUESTIONS = [
 {id:"a13", topic:"angebot_nachfrage", type:"mc", diff:2, tax:"K2",
  q:"Was sind «Opportunitätskosten»?",
  options:[
-   {v:"A", t:"Der entgangene Nutzen der besten nicht gewählten Alternative."},
-   {v:"B", t:"Die tatsächlichen Produktionskosten eines Gutes."},
-   {v:"C", t:"Die Kosten, die durch staatliche Regulierung entstehen."},
-   {v:"D", t:"Die Differenz zwischen Einkaufs- und Verkaufspreis."}
+   {v: "A", t:"Die tatsächlichen Produktionskosten eines Gutes."},
+   {v: "B", t:"Der entgangene Nutzen der besten nicht gewählten Alternative."},
+   {v: "C", t:"Die Kosten, die durch staatliche Regulierung entstehen."},
+   {v: "D", t:"Die Differenz zwischen Einkaufs- und Verkaufspreis."}
  ],
- correct:"A",
+ correct:"B",
  explain:"Opportunitätskosten messen den Wert der besten Alternative, auf die man verzichtet. Beispiel: Wenn Sie sich für ein Konzertticket zu CHF 80 entscheiden statt für ein Essen zu CHF 80, sind die Opportunitätskosten des Konzerts der entgangene Genuss des Essens."},
 
 {id:"a14", topic:"angebot_nachfrage", type:"fill", diff:1, tax:"K1",
@@ -168,22 +168,22 @@ window.QUESTIONS = [
  img:{src:"img/vwl/markteffizienz/angebot_nachfrage_grunddiagramm.svg", alt:"Preis-Mengen-Diagramm mit Angebots- und Nachfragekurve"},
  q:"Betrachten Sie das Diagramm. Die rot eingezeichnete Kurve (N) und die blau eingezeichnete Kurve (A) schneiden sich im Punkt E. Was stellt der Punkt E dar?",
  options:[
-   {v:"A", t:"Das Marktgleichgewicht — bei Preis P* wird genau die Menge Q* angeboten und nachgefragt."},
-   {v:"B", t:"Den Höchstpreis — der Staat legt fest, dass der Preis nicht über P* steigen darf."},
-   {v:"C", t:"Den Mindestlohn — der Preis darf nicht unter P* fallen."},
-   {v:"D", t:"Den Break-Even-Punkt des Unternehmens."}
- ], correct:"A",
+   {v: "A", t:"Den Höchstpreis — der Staat legt fest, dass der Preis nicht über P* steigen darf."},
+   {v: "B", t:"Das Marktgleichgewicht — bei Preis P* wird genau die Menge Q* angeboten und nachgefragt."},
+   {v: "C", t:"Den Mindestlohn — der Preis darf nicht unter P* fallen."},
+   {v: "D", t:"Den Break-Even-Punkt des Unternehmens."}
+ ], correct:"B",
  explain:"Der Schnittpunkt von Angebots- und Nachfragekurve ist das Marktgleichgewicht. Beim Gleichgewichtspreis P* stimmen angebotene und nachgefragte Menge überein (Q*). Es gibt weder Überschuss noch Mangel. Bei vollkommener Konkurrenz pendelt sich der Marktpreis von selbst auf dieses Niveau ein."},
 // ── MARKTGLEICHGEWICHT & PREISBILDUNG (g01–g14) ──
 {id:"g01", topic:"gleichgewicht", type:"mc", diff:1, tax:"K1",
  q:"Wann herrscht Marktgleichgewicht?",
  options:[
-   {v:"A", t:"Wenn die nachgefragte Menge der angebotenen Menge entspricht."},
-   {v:"B", t:"Wenn der Staat den Preis festlegt."},
-   {v:"C", t:"Wenn kein Unternehmen Gewinn macht."},
-   {v:"D", t:"Wenn die Nachfragekurve steigend verläuft."}
+   {v: "A", t:"Wenn der Staat den Preis festlegt."},
+   {v: "B", t:"Wenn kein Unternehmen Gewinn macht."},
+   {v: "C", t:"Wenn die nachgefragte Menge der angebotenen Menge entspricht."},
+   {v: "D", t:"Wenn die Nachfragekurve steigend verläuft."}
  ],
- correct:"A",
+ correct:"C",
  explain:"Im Marktgleichgewicht stimmen angebotene und nachgefragte Menge überein. Der zugehörige Preis ist der Gleichgewichtspreis (P*), die zugehörige Menge die Gleichgewichtsmenge (Q*). Es gibt weder einen Überschuss noch einen Mangel."},
 
 {id:"g02", topic:"gleichgewicht", type:"tf", diff:1, tax:"K1",
@@ -195,10 +195,10 @@ window.QUESTIONS = [
  img:{src:"img/vwl/markteffizienz/ueberschuss_preis_ueber_gleichgewicht.svg", alt:"Preis-Mengen-Diagramm bei P₁ über dem Gleichgewichtspreis"},
  q:"Was passiert, wenn der Marktpreis über dem Gleichgewichtspreis liegt?",
  options:[
-   {v:"A", t:"Es entsteht ein Angebotsüberschuss — Produzenten bieten mehr an, als nachgefragt wird."},
-   {v:"B", t:"Es entsteht ein Nachfrageüberschuss — Konsumenten wollen mehr kaufen, als angeboten wird."},
-   {v:"C", t:"Der Markt ist im Gleichgewicht."},
-   {v:"D", t:"Die Angebotskurve verschiebt sich nach links."}
+   {v: "A", t:"Es entsteht ein Angebotsüberschuss — Produzenten bieten mehr an, als nachgefragt wird."},
+   {v: "B", t:"Der Markt ist im Gleichgewicht."},
+   {v: "C", t:"Es entsteht ein Nachfrageüberschuss — Konsumenten wollen mehr kaufen, als angeboten wird."},
+   {v: "D", t:"Die Angebotskurve verschiebt sich nach links."}
  ],
  correct:"A",
  explain:"Bei einem Preis über dem Gleichgewicht ist die angebotene Menge grösser als die nachgefragte → Angebotsüberschuss. Die Folge: Lagerbestände wachsen, Produzenten senken den Preis, bis das Gleichgewicht erreicht wird."},
@@ -207,10 +207,10 @@ window.QUESTIONS = [
  img:{src:"img/vwl/markteffizienz/hoechstpreis_diagramm.svg", alt:"Preis-Mengen-Diagramm bei einem Höchstpreis P_H"},
  q:"Was passiert, wenn der Marktpreis unter dem Gleichgewichtspreis liegt?",
  options:[
-   {v:"A", t:"Es entsteht ein Nachfrageüberschuss (Mangel)."},
-   {v:"B", t:"Es entsteht ein Angebotsüberschuss (Überproduktion)."},
-   {v:"C", t:"Die Nachfragekurve verschiebt sich nach links."},
-   {v:"D", t:"Die Produzenten erhöhen die Produktionskosten."}
+   {v: "A", t:"Es entsteht ein Nachfrageüberschuss (Mangel)."},
+   {v: "B", t:"Die Nachfragekurve verschiebt sich nach links."},
+   {v: "C", t:"Es entsteht ein Angebotsüberschuss (Überproduktion)."},
+   {v: "D", t:"Die Produzenten erhöhen die Produktionskosten."}
  ],
  correct:"A",
  explain:"Bei einem Preis unter dem Gleichgewicht übersteigt die nachgefragte Menge das Angebot → Nachfrageüberschuss (Knappheit). Die Folge: Konsumenten konkurrieren um das knappe Gut, der Preis steigt."},
@@ -269,12 +269,12 @@ window.QUESTIONS = [
 {id:"g11", topic:"gleichgewicht", type:"mc", diff:2, tax:"K2",
  q:"Was unterscheidet ein Monopol von vollkommener Konkurrenz hinsichtlich Preis und Menge?",
  options:[
-   {v:"A", t:"Ein Monopolist setzt einen höheren Preis und bietet eine geringere Menge an."},
-   {v:"B", t:"Ein Monopolist setzt einen niedrigeren Preis und bietet eine grössere Menge an."},
-   {v:"C", t:"Preis und Menge sind in beiden Marktformen identisch."},
-   {v:"D", t:"Ein Monopolist maximiert die Wohlfahrt statt den Gewinn."}
+   {v: "A", t:"Ein Monopolist setzt einen niedrigeren Preis und bietet eine grössere Menge an."},
+   {v: "B", t:"Ein Monopolist maximiert die Wohlfahrt statt den Gewinn."},
+   {v: "C", t:"Preis und Menge sind in beiden Marktformen identisch."},
+   {v: "D", t:"Ein Monopolist setzt einen höheren Preis und bietet eine geringere Menge an."}
  ],
- correct:"A",
+ correct:"D",
  explain:"Ein Monopolist beschränkt die Menge, um den Preis zu erhöhen und seinen Gewinn zu maximieren. Die Menge liegt unter der effizienten Gleichgewichtsmenge, der Preis darüber. Dadurch entsteht ein Wohlfahrtsverlust (Deadweight Loss)."},
 
 {id:"g12", topic:"gleichgewicht", type:"open", diff:3, tax:"K4",
@@ -299,33 +299,33 @@ window.QUESTIONS = [
  img:{src:"img/vwl/markteffizienz/ueberschuss_preis_ueber_gleichgewicht.svg", alt:"Preis-Mengen-Diagramm bei P₁ über dem Gleichgewichtspreis"},
  q:"Das Diagramm zeigt einen Preis P₁ oberhalb des Gleichgewichtspreises. Was passiert bei diesem Preis auf dem Markt?",
  options:[
-   {v:"A", t:"Es entsteht ein Angebotsüberschuss, weil die angebotene Menge (Q_A) grösser ist als die nachgefragte Menge (Q_N)."},
-   {v:"B", t:"Es entsteht ein Nachfrageüberschuss, weil die nachgefragte Menge grösser ist als die angebotene Menge."},
-   {v:"C", t:"Der Markt bleibt im Gleichgewicht, weil P₁ nur leicht über P* liegt."},
-   {v:"D", t:"Die Angebotskurve verschiebt sich nach rechts, bis der Überschuss abgebaut ist."}
+   {v: "A", t:"Der Markt bleibt im Gleichgewicht, weil P₁ nur leicht über P* liegt."},
+   {v: "B", t:"Es entsteht ein Angebotsüberschuss, weil die angebotene Menge (Q_A) grösser ist als die nachgefragte Menge (Q_N)."},
+   {v: "C", t:"Die Angebotskurve verschiebt sich nach rechts, bis der Überschuss abgebaut ist."},
+   {v: "D", t:"Es entsteht ein Nachfrageüberschuss, weil die nachgefragte Menge grösser ist als die angebotene Menge."}
  ],
- correct:"A",
+ correct:"B",
  explain:"Bei einem Preis P₁ über dem Gleichgewichtspreis bieten die Produzenten mehr an (Q_A), als die Konsumenten nachfragen (Q_N). Die Differenz Q_A − Q_N ist der Angebotsüberschuss (gelbe Strecke im Diagramm). In einem freien Markt würde dieser Überschuss den Preis nach unten drücken, bis das Gleichgewicht erreicht ist."},
 
 {id:"g16", topic:"gleichgewicht", type:"mc", diff:2, tax:"K4",
  img:{src:"img/vwl/markteffizienz/hoechstpreis_flaechen_abcd.svg", alt:"Höchstpreisdiagramm mit beschrifteten Flächen A–D"},
  q:"Der Staat führt einen Höchstpreis P_H unterhalb des Gleichgewichtspreises ein. Es wird nur Q_A gehandelt (Angebotsseite bestimmt die Menge). Welche Fläche wurde von den Produzenten zu den Konsumenten umverteilt?",
  options:[
-   {v:"A", t:"Fläche A"},
-   {v:"B", t:"Fläche B"},
-   {v:"C", t:"Fläche C"},
-   {v:"D", t:"Fläche D"}
+   {v: "A", t:"Fläche A"},
+   {v: "B", t:"Fläche D"},
+   {v: "C", t:"Fläche B"},
+   {v: "D", t:"Fläche C"}
  ],
- correct:"B",
+ correct:"C",
  explain:"Fläche B war vor dem Höchstpreis Teil der Produzentenrente (sie lag zwischen P* und dem tieferen Bereich). Durch den Höchstpreis P_H sinkt der Preis, und Fläche B wird von den Produzenten zu den Konsumenten transferiert. Die Konsumentenrente besteht nun aus A + B. Allerdings geht gleichzeitig Fläche C als Wohlfahrtsverlust verloren, weil weniger gehandelt wird."},
 {id:"g17", topic:"gleichgewicht", type:"mc", diff:3, tax:"K4",
  img:{src:"img/vwl/markteffizienz/hoechstpreis_flaechen_abcd.svg", alt:"Höchstpreisdiagramm mit beschrifteten Flächen A–D"},
  q:"Was passiert mit der Gesamtwohlfahrt durch den Höchstpreis P_H?",
  options:[
-   {v:"A", t:"Sie bleibt gleich, weil B lediglich umverteilt wird."},
-   {v:"B", t:"Sie sinkt um die Fläche C (Wohlfahrtsverlust)."},
-   {v:"C", t:"Sie sinkt um die Flächen B + C."},
-   {v:"D", t:"Sie steigt, weil die Konsumenten profitieren."}
+   {v: "A", t:"Sie sinkt um die Flächen B + C."},
+   {v: "B", t:"Sie sinkt um die Fläche C (Wohlfahrtsverlust)."},
+   {v: "C", t:"Sie steigt, weil die Konsumenten profitieren."},
+   {v: "D", t:"Sie bleibt gleich, weil B lediglich umverteilt wird."}
  ],
  correct:"B",
  explain:"Vorher: Gesamtwohlfahrt = KR + PR = A + B + C + D. Nachher: KR = A + B, PR = D, Wohlfahrtsverlust = C. Die Fläche B wird lediglich umverteilt (von PR zu KR), aber C geht unwiederbringlich verloren, weil Einheiten zwischen Q_A und Q* nicht mehr gehandelt werden. Die Gesamtwohlfahrt sinkt also um C."},
@@ -345,12 +345,12 @@ window.QUESTIONS = [
 {id:"v01", topic:"verschiebungen", type:"mc", diff:2, tax:"K2",
  q:"Was ist der Unterschied zwischen einer Bewegung auf der Nachfragekurve und einer Verschiebung der Nachfragekurve?",
  options:[
-   {v:"A", t:"Eine Bewegung wird durch eine Preisänderung des Gutes selbst verursacht; eine Verschiebung durch Änderung anderer Einflussfaktoren."},
-   {v:"B", t:"Eine Verschiebung wird durch eine Preisänderung des Gutes verursacht; eine Bewegung durch Einkommensänderungen."},
-   {v:"C", t:"Es gibt keinen Unterschied, beide Begriffe bedeuten dasselbe."},
-   {v:"D", t:"Eine Bewegung betrifft nur das Angebot, eine Verschiebung nur die Nachfrage."}
+   {v: "A", t:"Eine Bewegung betrifft nur das Angebot, eine Verschiebung nur die Nachfrage."},
+   {v: "B", t:"Eine Verschiebung wird durch eine Preisänderung des Gutes verursacht; eine Bewegung durch Einkommensänderungen."},
+   {v: "C", t:"Es gibt keinen Unterschied, beide Begriffe bedeuten dasselbe."},
+   {v: "D", t:"Eine Bewegung wird durch eine Preisänderung des Gutes selbst verursacht; eine Verschiebung durch Änderung anderer Einflussfaktoren."}
  ],
- correct:"A",
+ correct:"D",
  explain:"Zentrale Unterscheidung: Ändert sich der Preis des Gutes selbst → Bewegung entlang der bestehenden Kurve. Ändert sich ein anderer Faktor (Einkommen, Präferenzen, Preise anderer Güter) → die gesamte Kurve verschiebt sich."},
 
 {id:"v02", topic:"verschiebungen", type:"sort", diff:2, tax:"K2",
@@ -382,12 +382,12 @@ window.QUESTIONS = [
  img:{src:"img/vwl/markteffizienz/angebot_nachfrage_grunddiagramm.svg", alt:"Preis-Mengen-Diagramm mit Angebots- und Nachfragekurve"},
  q:"Mountainbikes werden immer beliebter (steigende Wertschätzung). Was passiert ceteris paribus im Markt für Mountainbikes?",
  options:[
-   {v:"A", t:"Die Nachfragekurve verschiebt sich nach rechts → Gleichgewichtspreis und -menge steigen."},
-   {v:"B", t:"Die Angebotskurve verschiebt sich nach rechts → Gleichgewichtspreis sinkt."},
-   {v:"C", t:"Die Nachfragekurve verschiebt sich nach links → Gleichgewichtspreis sinkt."},
-   {v:"D", t:"Es findet nur eine Bewegung auf der Nachfragekurve statt."}
+   {v: "A", t:"Die Angebotskurve verschiebt sich nach rechts → Gleichgewichtspreis sinkt."},
+   {v: "B", t:"Die Nachfragekurve verschiebt sich nach links → Gleichgewichtspreis sinkt."},
+   {v: "C", t:"Es findet nur eine Bewegung auf der Nachfragekurve statt."},
+   {v: "D", t:"Die Nachfragekurve verschiebt sich nach rechts → Gleichgewichtspreis und -menge steigen."}
  ],
- correct:"A",
+ correct:"D",
  explain:"Steigende Wertschätzung ist eine Änderung der Präferenzen — ein nicht-preislicher Faktor. Die gesamte Nachfragekurve verschiebt sich nach rechts. Im neuen Gleichgewicht sind sowohl Preis als auch Menge höher als zuvor."},
 
 {id:"v05", topic:"verschiebungen", type:"open", diff:3, tax:"K4",
@@ -398,12 +398,12 @@ window.QUESTIONS = [
 {id:"v06", topic:"verschiebungen", type:"mc", diff:1, tax:"K1",
  q:"Was misst die Preiselastizität der Nachfrage?",
  options:[
-   {v:"A", t:"Wie stark die nachgefragte Menge auf eine Preisänderung reagiert."},
-   {v:"B", t:"Wie stark der Preis auf eine Einkommensänderung reagiert."},
-   {v:"C", t:"Wie stark das Angebot auf eine Kostenänderung reagiert."},
-   {v:"D", t:"Wie schnell der Markt das Gleichgewicht erreicht."}
+   {v: "A", t:"Wie stark der Preis auf eine Einkommensänderung reagiert."},
+   {v: "B", t:"Wie stark die nachgefragte Menge auf eine Preisänderung reagiert."},
+   {v: "C", t:"Wie schnell der Markt das Gleichgewicht erreicht."},
+   {v: "D", t:"Wie stark das Angebot auf eine Kostenänderung reagiert."}
  ],
- correct:"A",
+ correct:"B",
  explain:"Die Preiselastizität der Nachfrage = prozentuale Mengenänderung / prozentuale Preisänderung. Sie misst die Sensitivität der Nachfrage auf Preisänderungen. Eine elastische Nachfrage (>1) reagiert stark, eine unelastische (<1) reagiert schwach."},
 
 {id:"v07", topic:"verschiebungen", type:"fill", diff:1, tax:"K1",
@@ -430,24 +430,24 @@ window.QUESTIONS = [
 {id:"v10", topic:"verschiebungen", type:"mc", diff:2, tax:"K2",
  q:"Die Einkommenselastizität der Nachfrage nach Luxushandtaschen beträgt 2.5. Was bedeutet das?",
  options:[
-   {v:"A", t:"Steigt das Einkommen um 1%, steigt die Nachfrage um 2.5% — es handelt sich um ein Luxusgut."},
-   {v:"B", t:"Steigt das Einkommen um 1%, sinkt die Nachfrage um 2.5% — es handelt sich um ein inferiores Gut."},
-   {v:"C", t:"Der Preis steigt um 2.5%, wenn das Einkommen um 1% steigt."},
-   {v:"D", t:"Die Nachfrage ist unelastisch."}
+   {v: "A", t:"Die Nachfrage ist unelastisch."},
+   {v: "B", t:"Steigt das Einkommen um 1%, sinkt die Nachfrage um 2.5% — es handelt sich um ein inferiores Gut."},
+   {v: "C", t:"Steigt das Einkommen um 1%, steigt die Nachfrage um 2.5% — es handelt sich um ein Luxusgut."},
+   {v: "D", t:"Der Preis steigt um 2.5%, wenn das Einkommen um 1% steigt."}
  ],
- correct:"A",
+ correct:"C",
  explain:"Eine Einkommenselastizität > 1 kennzeichnet ein Luxusgut: Die Nachfrage steigt überproportional zum Einkommen. Bei normalen Gütern liegt sie zwischen 0 und 1, bei inferioren Gütern unter 0 (steigende Einkommen → sinkende Nachfrage)."},
 
 {id:"v11", topic:"verschiebungen", type:"mc", diff:2, tax:"K3",
  img:{src:"img/vwl/markteffizienz/angebot_nachfrage_grunddiagramm.svg", alt:"Preis-Mengen-Diagramm mit Angebots- und Nachfragekurve"},
  q:"Die Nachfragekurve für Insulin verläuft sehr steil (nahezu senkrecht). Welche ökonomische Aussage trifft zu?",
  options:[
-   {v:"A", t:"Die Nachfrage ist sehr unelastisch — Diabetiker brauchen Insulin unabhängig vom Preis."},
-   {v:"B", t:"Die Nachfrage ist sehr elastisch — kleine Preisänderungen führen zu grossen Mengenänderungen."},
-   {v:"C", t:"Das Angebot ist sehr unelastisch."},
-   {v:"D", t:"Es handelt sich um ein Luxusgut."}
+   {v: "A", t:"Es handelt sich um ein Luxusgut."},
+   {v: "B", t:"Die Nachfrage ist sehr elastisch — kleine Preisänderungen führen zu grossen Mengenänderungen."},
+   {v: "C", t:"Das Angebot ist sehr unelastisch."},
+   {v: "D", t:"Die Nachfrage ist sehr unelastisch — Diabetiker brauchen Insulin unabhängig vom Preis."}
  ],
- correct:"A",
+ correct:"D",
  explain:"Insulin ist lebensnotwendig und hat keine echten Substitute. Eine steile Nachfragekurve bedeutet: Selbst bei starken Preiserhöhungen ändert sich die nachgefragte Menge kaum. Die Preiselastizität liegt nahe bei null."},
 
 {id:"v12", topic:"verschiebungen", type:"tf", diff:2, tax:"K2",
@@ -477,10 +477,10 @@ window.QUESTIONS = [
  img:{src:"img/vwl/markteffizienz/konsumenten_produzentenrente.svg", alt:"Konsumentenrente (KR) und Produzentenrente (PR) im Gleichgewicht"},
  q:"Was ist die Konsumentenrente?",
  options:[
-   {v:"A", t:"Die Differenz zwischen der Zahlungsbereitschaft und dem tatsächlich bezahlten Marktpreis."},
-   {v:"B", t:"Der Gewinn der Produzenten nach Abzug aller Kosten."},
-   {v:"C", t:"Die Steuereinnahmen des Staates aus dem Gütermarkt."},
-   {v:"D", t:"Die Differenz zwischen Angebots- und Nachfragekurve."}
+   {v: "A", t:"Die Differenz zwischen der Zahlungsbereitschaft und dem tatsächlich bezahlten Marktpreis."},
+   {v: "B", t:"Der Gewinn der Produzenten nach Abzug aller Kosten."},
+   {v: "C", t:"Die Differenz zwischen Angebots- und Nachfragekurve."},
+   {v: "D", t:"Die Steuereinnahmen des Staates aus dem Gütermarkt."}
  ],
  correct:"A",
  explain:"Die Konsumentenrente (KR) misst den Vorteil der Käufer: Sie hätten mehr bezahlt, als sie tatsächlich müssen. Grafisch: Fläche zwischen Nachfragekurve und Gleichgewichtspreis (Dreieck oberhalb der Preislinie)."},
@@ -488,12 +488,12 @@ window.QUESTIONS = [
 {id:"w02", topic:"wohlfahrt", type:"mc", diff:1, tax:"K1",
  q:"Was ist die Produzentenrente?",
  options:[
-   {v:"A", t:"Die Differenz zwischen dem erhaltenen Marktpreis und den minimalen Kosten, zu denen Produzenten gerade noch verkaufen würden."},
-   {v:"B", t:"Der Umsatz der Produzenten."},
-   {v:"C", t:"Die Differenz zwischen dem höchsten und niedrigsten Preis im Markt."},
-   {v:"D", t:"Die Kosten der Produktion."}
+   {v: "A", t:"Die Differenz zwischen dem höchsten und niedrigsten Preis im Markt."},
+   {v: "B", t:"Der Umsatz der Produzenten."},
+   {v: "C", t:"Die Kosten der Produktion."},
+   {v: "D", t:"Die Differenz zwischen dem erhaltenen Marktpreis und den minimalen Kosten, zu denen Produzenten gerade noch verkaufen würden."}
  ],
- correct:"A",
+ correct:"D",
  explain:"Die Produzentenrente (PR) misst den Vorteil der Verkäufer: Sie erhalten mehr, als sie mindestens benötigen. Grafisch: Fläche zwischen Gleichgewichtspreis und Angebotskurve (Dreieck unterhalb der Preislinie)."},
 
 {id:"w03", topic:"wohlfahrt", type:"fill", diff:1, tax:"K1",
@@ -513,23 +513,23 @@ window.QUESTIONS = [
  img:{src:"img/vwl/markteffizienz/steuerkeil_diagramm.svg", alt:"Preis-Mengen-Diagramm mit Steuerkeil"},
  q:"Was versteht man unter einem Wohlfahrtsverlust (Deadweight Loss)?",
  options:[
-   {v:"A", t:"Der Teil der Gesamtrente, der durch Marktverzerrungen verloren geht — er kommt niemandem zugute."},
-   {v:"B", t:"Die Steuereinnahmen des Staates."},
-   {v:"C", t:"Die Umverteilung von Konsumenten- zu Produzentenrente."},
-   {v:"D", t:"Der Gesamtverlust des BIP durch Rezession."}
+   {v: "A", t:"Der Gesamtverlust des BIP durch Rezession."},
+   {v: "B", t:"Der Teil der Gesamtrente, der durch Marktverzerrungen verloren geht — er kommt niemandem zugute."},
+   {v: "C", t:"Die Umverteilung von Konsumenten- zu Produzentenrente."},
+   {v: "D", t:"Die Steuereinnahmen des Staates."}
  ],
- correct:"A",
+ correct:"B",
  explain:"Ein Wohlfahrtsverlust entsteht, wenn die gehandelte Menge vom Gleichgewicht abweicht. Transaktionen, die für beide Seiten vorteilhaft wären, finden nicht statt. Dieser Verlust geht an niemanden — er ist schlicht verschwendete Wohlfahrt."},
 
 {id:"w06", topic:"wohlfahrt", type:"mc", diff:2, tax:"K2",
  q:"Was versteht man unter Pareto-Effizienz?",
  options:[
-   {v:"A", t:"Eine Situation, in der niemand bessergestellt werden kann, ohne jemand anderen schlechter zu stellen."},
-   {v:"B", t:"Eine Situation, in der alle gleich viel haben."},
-   {v:"C", t:"Eine Situation, in der der Staat die Wohlfahrt maximiert."},
-   {v:"D", t:"Eine Situation, in der 80% des Reichtums 20% der Bevölkerung gehören."}
+   {v: "A", t:"Eine Situation, in der 80% des Reichtums 20% der Bevölkerung gehören."},
+   {v: "B", t:"Eine Situation, in der der Staat die Wohlfahrt maximiert."},
+   {v: "C", t:"Eine Situation, in der alle gleich viel haben."},
+   {v: "D", t:"Eine Situation, in der niemand bessergestellt werden kann, ohne jemand anderen schlechter zu stellen."}
  ],
- correct:"A",
+ correct:"D",
  explain:"Pareto-Effizienz (benannt nach Vilfredo Pareto) bedeutet: Keine Umverteilung kann jemanden besserstellen, ohne gleichzeitig jemand anderen schlechter zu stellen. Das Marktgleichgewicht bei vollkommener Konkurrenz ist pareto-effizient — aber nicht unbedingt «gerecht»."},
 
 {id:"w07", topic:"wohlfahrt", type:"tf", diff:2, tax:"K2",
@@ -550,12 +550,12 @@ window.QUESTIONS = [
 {id:"w10", topic:"wohlfahrt", type:"mc", diff:3, tax:"K4",
  q:"Ein Höchstpreis unter dem Gleichgewicht führt zu einem Wohlfahrtsverlust. Welche Aussage ist korrekt?",
  options:[
-   {v:"A", t:"Der Wohlfahrtsverlust entsteht, weil weniger Transaktionen stattfinden als im Gleichgewicht."},
-   {v:"B", t:"Der Wohlfahrtsverlust entsteht, weil der Preis zu hoch ist."},
-   {v:"C", t:"Es gibt keinen Wohlfahrtsverlust, weil die Konsumenten vom niedrigen Preis profitieren."},
-   {v:"D", t:"Der Wohlfahrtsverlust entsteht nur, wenn der Staat Verluste macht."}
+   {v: "A", t:"Es gibt keinen Wohlfahrtsverlust, weil die Konsumenten vom niedrigen Preis profitieren."},
+   {v: "B", t:"Der Wohlfahrtsverlust entsteht, weil weniger Transaktionen stattfinden als im Gleichgewicht."},
+   {v: "C", t:"Der Wohlfahrtsverlust entsteht nur, wenn der Staat Verluste macht."},
+   {v: "D", t:"Der Wohlfahrtsverlust entsteht, weil der Preis zu hoch ist."}
  ],
- correct:"A",
+ correct:"B",
  explain:"Der Höchstpreis reduziert das Angebot unter die Gleichgewichtsmenge. Dadurch finden Transaktionen nicht statt, die für beide Seiten vorteilhaft wären (Zahlungsbereitschaft > Grenzkosten). Die Fläche des entgangenen Handels ist der Wohlfahrtsverlust."},
 
 {id:"w11", topic:"wohlfahrt", type:"open", diff:3, tax:"K5",
@@ -575,12 +575,12 @@ window.QUESTIONS = [
  img:{src:"img/vwl/markteffizienz/konsumenten_produzentenrente.svg", alt:"Konsumentenrente (KR) und Produzentenrente (PR) im Preis-Mengen-Diagramm"},
  q:"Das Diagramm zeigt die Konsumentenrente (KR) und die Produzentenrente (PR) im Marktgleichgewicht. Welche Aussage zur Gesamtwohlfahrt ist korrekt?",
  options:[
-   {v:"A", t:"Die Gesamtwohlfahrt entspricht der Summe aus Konsumentenrente und Produzentenrente (KR + PR)."},
-   {v:"B", t:"Die Gesamtwohlfahrt entspricht nur der Konsumentenrente, da die Konsumenten den Nutzen haben."},
-   {v:"C", t:"Die Gesamtwohlfahrt ist im Gleichgewicht immer null, weil sich KR und PR aufheben."},
-   {v:"D", t:"Die Gesamtwohlfahrt kann nicht grafisch dargestellt werden."}
+   {v: "A", t:"Die Gesamtwohlfahrt kann nicht grafisch dargestellt werden."},
+   {v: "B", t:"Die Gesamtwohlfahrt entspricht nur der Konsumentenrente, da die Konsumenten den Nutzen haben."},
+   {v: "C", t:"Die Gesamtwohlfahrt ist im Gleichgewicht immer null, weil sich KR und PR aufheben."},
+   {v: "D", t:"Die Gesamtwohlfahrt entspricht der Summe aus Konsumentenrente und Produzentenrente (KR + PR)."}
  ],
- correct:"A",
+ correct:"D",
  explain:"Im Marktgleichgewicht ist die Gesamtwohlfahrt maximal und entspricht der Summe von Konsumentenrente (KR = Dreieck über dem Gleichgewichtspreis zwischen Nachfragekurve und P*) und Produzentenrente (PR = Dreieck unter P* zwischen P* und Angebotskurve). Ein Eingriff in den Markt (z.B. Höchstpreis, Steuer) reduziert die Gesamtwohlfahrt."},
 
 {id:"w14", topic:"wohlfahrt", type:"multi", diff:2, tax:"K3",
@@ -613,12 +613,12 @@ window.QUESTIONS = [
  img:{src:"img/vwl/markteffizienz/steuer_flaechen_abcdef.svg", alt:"Steuerdiagramm mit beschrifteten Flächen A–F"},
  q:"Vor der Steuer betrug die Konsumentenrente A + B + C und die Produzentenrente D + E + F. Wie verteilt sich die Wohlfahrt nach der Steuereinführung?",
  options:[
-   {v:"A", t:"KR = A, PR = F, Steuer = B + D, WV = C + E"},
-   {v:"B", t:"KR = A + B, PR = E + F, Steuer = C + D, WV = 0"},
-   {v:"C", t:"KR = A + C, PR = E + F, Steuer = B + D, WV = 0"},
-   {v:"D", t:"KR = A, PR = F, Steuer = B + C + D + E, WV = 0"}
+   {v: "A", t:"KR = A, PR = F, Steuer = B + C + D + E, WV = 0"},
+   {v: "B", t:"KR = A, PR = F, Steuer = B + D, WV = C + E"},
+   {v: "C", t:"KR = A + C, PR = E + F, Steuer = B + D, WV = 0"},
+   {v: "D", t:"KR = A + B, PR = E + F, Steuer = C + D, WV = 0"}
  ],
- correct:"A",
+ correct:"B",
  explain:"Nach der Steuer: Konsumentenrente = A (Dreieck oberhalb P_K, unterhalb Nachfragekurve). Produzentenrente = F (Dreieck unterhalb P_P, oberhalb Angebotskurve). Steuereinnahmen = B + D (Rechteck zwischen P_K und P_P bis Q_t). Wohlfahrtsverlust = C + E (die zwei Dreiecke rechts von Q_t, die weder Konsumenten, Produzenten noch dem Staat zufallen). Die Gesamtwohlfahrt ist also kleiner als vor der Steuer."},
 
 {id:"w17", topic:"wohlfahrt", type:"multi", diff:2, tax:"K2",
@@ -639,12 +639,12 @@ window.QUESTIONS = [
 {id:"t01", topic:"gueterarten", type:"mc", diff:1, tax:"K1",
  q:"Anhand welcher zwei Kriterien werden Güter in der Ökonomie klassifiziert?",
  options:[
-   {v:"A", t:"Rivalität im Konsum und Ausschliessbarkeit."},
-   {v:"B", t:"Preis und Qualität."},
-   {v:"C", t:"Angebot und Nachfrage."},
-   {v:"D", t:"Knappheit und Nutzen."}
+   {v: "A", t:"Knappheit und Nutzen."},
+   {v: "B", t:"Rivalität im Konsum und Ausschliessbarkeit."},
+   {v: "C", t:"Angebot und Nachfrage."},
+   {v: "D", t:"Preis und Qualität."}
  ],
- correct:"A",
+ correct:"B",
  explain:"Die Güterklassifikation basiert auf zwei Eigenschaften: (1) Rivalität: Verringert der Konsum durch eine Person die Verfügbarkeit für andere? (2) Ausschliessbarkeit: Können Nicht-Zahlende vom Konsum ausgeschlossen werden?"},
 
 {id:"t02", topic:"gueterarten", type:"sort", diff:2, tax:"K2",
@@ -670,12 +670,12 @@ window.QUESTIONS = [
 {id:"t04", topic:"gueterarten", type:"mc", diff:2, tax:"K2",
  q:"Warum stellt der Markt öffentliche Güter typischerweise nicht in ausreichender Menge bereit?",
  options:[
-   {v:"A", t:"Weil das Trittbrettfahrerproblem dazu führt, dass niemand freiwillig bezahlt."},
-   {v:"B", t:"Weil öffentliche Güter zu teuer in der Herstellung sind."},
-   {v:"C", t:"Weil der Staat die Produktion verbietet."},
-   {v:"D", t:"Weil die Nachfrage nach öffentlichen Gütern zu gering ist."}
+   {v: "A", t:"Weil die Nachfrage nach öffentlichen Gütern zu gering ist."},
+   {v: "B", t:"Weil das Trittbrettfahrerproblem dazu führt, dass niemand freiwillig bezahlt."},
+   {v: "C", t:"Weil öffentliche Güter zu teuer in der Herstellung sind."},
+   {v: "D", t:"Weil der Staat die Produktion verbietet."}
  ],
- correct:"A",
+ correct:"B",
  explain:"Da niemand vom Konsum ausgeschlossen werden kann, nutzen viele das Gut, ohne dafür zu bezahlen (Trittbrettfahrer/Free Rider). Kein privater Anbieter kann daher die Kosten decken → das Gut wird gar nicht oder zu wenig bereitgestellt → Marktversagen."},
 
 {id:"t05", topic:"gueterarten", type:"fill", diff:1, tax:"K1",
@@ -689,12 +689,12 @@ window.QUESTIONS = [
 {id:"t06", topic:"gueterarten", type:"mc", diff:2, tax:"K2",
  q:"Welches Marktversagen tritt typischerweise bei Allmendegütern auf?",
  options:[
-   {v:"A", t:"Übernutzung, weil jeder den vollen Nutzen der Ressource erhält, aber nur einen Teil der Kosten trägt."},
-   {v:"B", t:"Unterproduktion, weil niemand bereit ist, das Gut herzustellen."},
-   {v:"C", t:"Monopolbildung, weil nur ein Anbieter das Gut kontrolliert."},
-   {v:"D", t:"Asymmetrische Information, weil Konsumenten die Qualität nicht kennen."}
+   {v: "A", t:"Asymmetrische Information, weil Konsumenten die Qualität nicht kennen."},
+   {v: "B", t:"Unterproduktion, weil niemand bereit ist, das Gut herzustellen."},
+   {v: "C", t:"Monopolbildung, weil nur ein Anbieter das Gut kontrolliert."},
+   {v: "D", t:"Übernutzung, weil jeder den vollen Nutzen der Ressource erhält, aber nur einen Teil der Kosten trägt."}
  ],
- correct:"A",
+ correct:"D",
  explain:"Bei Allmendegütern gilt: Individueller Nutzen der Nutzung > individueller Kostenanteil. Jeder hat einen Anreiz, möglichst viel zu nutzen, obwohl die Ressource begrenzt ist. Das Ergebnis: Die Ressource wird übernutzt (Tragödie der Allmende)."},
 
 {id:"t07", topic:"gueterarten", type:"tf", diff:2, tax:"K2",
@@ -710,12 +710,12 @@ window.QUESTIONS = [
 {id:"t09", topic:"gueterarten", type:"mc", diff:2, tax:"K3",
  q:"Welches der folgenden Beispiele illustriert das Trittbrettfahrerproblem am besten?",
  options:[
-   {v:"A", t:"Ein Anwohner geniesst den Deichschutz, zahlt aber nichts für dessen Unterhalt."},
-   {v:"B", t:"Ein Kunde kauft ein Produkt und ist unzufrieden."},
-   {v:"C", t:"Ein Unternehmen investiert in Forschung und patentiert die Ergebnisse."},
-   {v:"D", t:"Ein Bauer verkauft seine Ernte auf dem Wochenmarkt."}
+   {v: "A", t:"Ein Bauer verkauft seine Ernte auf dem Wochenmarkt."},
+   {v: "B", t:"Ein Anwohner geniesst den Deichschutz, zahlt aber nichts für dessen Unterhalt."},
+   {v: "C", t:"Ein Unternehmen investiert in Forschung und patentiert die Ergebnisse."},
+   {v: "D", t:"Ein Kunde kauft ein Produkt und ist unzufrieden."}
  ],
- correct:"A",
+ correct:"B",
  explain:"Der Deichschutz ist ein öffentliches Gut — niemand kann vom Schutz ausgeschlossen werden. Der Anwohner profitiert, ohne zu bezahlen (Trittbrettfahrer). Wenn alle so handeln, wird der Deich nicht finanziert. Deshalb organisiert der Staat solche Güter und finanziert sie über Steuern."},
 
 {id:"t10", topic:"gueterarten", type:"sort", diff:2, tax:"K2",
@@ -735,12 +735,12 @@ window.QUESTIONS = [
 {id:"b01", topic:"wettbewerb", type:"mc", diff:1, tax:"K1",
  q:"Was versteht man unter Wettbewerbsbeschränkungen?",
  options:[
-   {v:"A", t:"Massnahmen oder Strukturen, die den freien Wettbewerb auf einem Markt behindern."},
-   {v:"B", t:"Massnahmen des Staates zur Förderung des Wettbewerbs."},
-   {v:"C", t:"Der natürliche Rückgang der Nachfrage in einer Rezession."},
-   {v:"D", t:"Die Begrenzung der Produktionskapazität durch Ressourcenknappheit."}
+   {v: "A", t:"Massnahmen des Staates zur Förderung des Wettbewerbs."},
+   {v: "B", t:"Der natürliche Rückgang der Nachfrage in einer Rezession."},
+   {v: "C", t:"Die Begrenzung der Produktionskapazität durch Ressourcenknappheit."},
+   {v: "D", t:"Massnahmen oder Strukturen, die den freien Wettbewerb auf einem Markt behindern."}
  ],
- correct:"A",
+ correct:"D",
  explain:"Wettbewerbsbeschränkungen verhindern, dass der Preismechanismus effizient funktioniert. Sie entstehen durch Marktmacht (Monopole, Kartelle), staatliche Eingriffe (Zölle, Normen) oder andere Barrieren für den Marktzutritt."},
 
 {id:"b02", topic:"wettbewerb", type:"tf", diff:2, tax:"K2",
@@ -751,10 +751,10 @@ window.QUESTIONS = [
 {id:"b03", topic:"wettbewerb", type:"mc", diff:2, tax:"K2",
  q:"Welche Folge haben Wettbewerbsbeschränkungen für die Innovationsfähigkeit?",
  options:[
-   {v:"A", t:"Weniger Innovationsanreize, weil geschützte Unternehmen keinen Wettbewerbsdruck haben."},
-   {v:"B", t:"Mehr Innovation, weil Monopole ihre Gewinne in Forschung investieren."},
-   {v:"C", t:"Keine Auswirkung, weil Innovation nur von der Technologie abhängt."},
-   {v:"D", t:"Mehr Innovation, weil Zölle die inländische Forschung schützen."}
+   {v: "A", t:"Weniger Innovationsanreize, weil geschützte Unternehmen keinen Wettbewerbsdruck haben."},
+   {v: "B", t:"Mehr Innovation, weil Zölle die inländische Forschung schützen."},
+   {v: "C", t:"Mehr Innovation, weil Monopole ihre Gewinne in Forschung investieren."},
+   {v: "D", t:"Keine Auswirkung, weil Innovation nur von der Technologie abhängt."}
  ],
  correct:"A",
  explain:"Ohne Wettbewerbsdruck haben Marktführer weniger Anreize, ihre Produkte oder Prozesse zu verbessern. Langfristig leidet die gesamtwirtschaftliche Effizienz und Innovation. (Anmerkung: Es gibt auch das Gegenargument, dass gewisse Monopolgewinne Forschung ermöglichen — die empirische Evidenz spricht aber mehrheitlich für den Wettbewerb als Innovationstreiber.)"},
@@ -794,12 +794,12 @@ window.QUESTIONS = [
 {id:"b08", topic:"wettbewerb", type:"mc", diff:1, tax:"K1",
  q:"Welche Rolle spielt die Wettbewerbskommission (WEKO) in der Schweiz?",
  options:[
-   {v:"A", t:"Sie überwacht den Wettbewerb und bekämpft Kartelle und missbräuchliche Marktmacht."},
-   {v:"B", t:"Sie legt die Preise für alle Güter fest."},
-   {v:"C", t:"Sie verteilt staatliche Subventionen an Unternehmen."},
-   {v:"D", t:"Sie reguliert den Aussenhandel und legt Zölle fest."}
+   {v: "A", t:"Sie verteilt staatliche Subventionen an Unternehmen."},
+   {v: "B", t:"Sie reguliert den Aussenhandel und legt Zölle fest."},
+   {v: "C", t:"Sie legt die Preise für alle Güter fest."},
+   {v: "D", t:"Sie überwacht den Wettbewerb und bekämpft Kartelle und missbräuchliche Marktmacht."}
  ],
- correct:"A",
+ correct:"D",
  explain:"Die WEKO (Wettbewerbskommission) ist die Schweizer Kartellbehörde. Sie prüft Zusammenschlüsse, verfolgt Kartellabsprachen und bekämpft den Missbrauch marktbeherrschender Stellungen — alles mit dem Ziel, den funktionierenden Wettbewerb zu sichern."},
 
 {id:"b09", topic:"wettbewerb", type:"tf", diff:2, tax:"K2",
@@ -819,12 +819,12 @@ window.QUESTIONS = [
 {id:"o01", topic:"oeffentlich", type:"mc", diff:1, tax:"K1",
  q:"Welches der folgenden Güter ist ein öffentliches Gut?",
  options:[
-   {v:"A", t:"Die Landesverteidigung."},
-   {v:"B", t:"Ein Smartphone."},
-   {v:"C", t:"Ein Kinobesuch."},
-   {v:"D", t:"Ein Liter Milch."}
+   {v: "A", t:"Ein Smartphone."},
+   {v: "B", t:"Ein Liter Milch."},
+   {v: "C", t:"Ein Kinobesuch."},
+   {v: "D", t:"Die Landesverteidigung."}
  ],
- correct:"A",
+ correct:"D",
  explain:"Die Landesverteidigung erfüllt beide Kriterien: Nicht-Rivalität (der Schutz des einen schmälert nicht den Schutz des anderen) und Nicht-Ausschliessbarkeit (niemand kann vom Schutz ausgeschlossen werden, auch nicht Steuerhinterzieher)."},
 
 {id:"o02", topic:"oeffentlich", type:"tf", diff:2, tax:"K2",
@@ -835,10 +835,10 @@ window.QUESTIONS = [
 {id:"o03", topic:"oeffentlich", type:"mc", diff:2, tax:"K2",
  q:"Warum führt das Trittbrettfahrerproblem bei öffentlichen Gütern zu einem Marktversagen?",
  options:[
-   {v:"A", t:"Weil rationale Individuen keinen Anreiz haben zu zahlen, da sie das Gut auch ohne Bezahlung nutzen können — das Gut wird deshalb nicht oder zu wenig bereitgestellt."},
-   {v:"B", t:"Weil der Staat die Produktion öffentlicher Güter verbietet."},
-   {v:"C", t:"Weil die Nachfrage nach öffentlichen Gütern immer zu hoch ist."},
-   {v:"D", t:"Weil öffentliche Güter immer von schlechter Qualität sind."}
+   {v: "A", t:"Weil rationale Individuen keinen Anreiz haben zu zahlen, da sie das Gut auch ohne Bezahlung nutzen können — das Gut wird deshalb nicht oder zu wenig bereitgestellt."},
+   {v: "B", t:"Weil der Staat die Produktion öffentlicher Güter verbietet."},
+   {v: "C", t:"Weil öffentliche Güter immer von schlechter Qualität sind."},
+   {v: "D", t:"Weil die Nachfrage nach öffentlichen Gütern immer zu hoch ist."}
  ],
  correct:"A",
  explain:"Das Trittbrettfahrerproblem: Wenn niemand ausgeschlossen werden kann, hat jeder den Anreiz, andere bezahlen zu lassen. Da alle so denken, finanziert niemand das Gut freiwillig → Unterbereitstellung. Lösung: Der Staat finanziert öffentliche Güter über Steuern."},
@@ -863,12 +863,12 @@ window.QUESTIONS = [
 {id:"o06", topic:"oeffentlich", type:"mc", diff:2, tax:"K3",
  q:"Im Fischteich-Spiel starten alle Fischer anonym. Warum führt die Anonymität typischerweise zu einem schlechteren Gesamtergebnis?",
  options:[
-   {v:"A", t:"Weil ohne Kommunikation und Überwachung kein Vertrauen entsteht und jeder seinen eigenen Nutzen maximiert."},
-   {v:"B", t:"Weil anonyme Fischer schlechter fischen können."},
-   {v:"C", t:"Weil der Fischteich zu klein ist."},
-   {v:"D", t:"Weil die Spielleitung die Regeln zu streng setzt."}
+   {v: "A", t:"Weil anonyme Fischer schlechter fischen können."},
+   {v: "B", t:"Weil ohne Kommunikation und Überwachung kein Vertrauen entsteht und jeder seinen eigenen Nutzen maximiert."},
+   {v: "C", t:"Weil der Fischteich zu klein ist."},
+   {v: "D", t:"Weil die Spielleitung die Regeln zu streng setzt."}
  ],
- correct:"A",
+ correct:"B",
  explain:"Anonymität verhindert Kooperation: Man kann weder Absprachen treffen noch Trittbrettfahrer identifizieren. Jeder Fischer maximiert seinen eigenen Fang (rationales Verhalten), was kollektiv zur Übernutzung und möglicherweise zur Zerstörung der Ressource führt."},
 
 {id:"o07", topic:"oeffentlich", type:"tf", diff:2, tax:"K2",
@@ -879,12 +879,12 @@ window.QUESTIONS = [
 {id:"o08", topic:"oeffentlich", type:"mc", diff:2, tax:"K3",
  q:"Im erweiterten Fischteich-Spiel gibt es eine Strafmöglichkeit: Fischer können andere bestrafen, allerdings zu eigenen Kosten. Welcher Effekt wird damit typischerweise erreicht?",
  options:[
-   {v:"A", t:"Die Strafmöglichkeit erhöht die Kooperation, weil Übernutzer mit Konsequenzen rechnen müssen."},
-   {v:"B", t:"Die Strafmöglichkeit hat keinen Effekt, weil das Strafen zu teuer ist."},
-   {v:"C", t:"Alle Fischer strafen sich gegenseitig, und das Ergebnis wird schlechter."},
-   {v:"D", t:"Nur der grösste Fischer wird bestraft."}
+   {v: "A", t:"Nur der grösste Fischer wird bestraft."},
+   {v: "B", t:"Die Strafmöglichkeit erhöht die Kooperation, weil Übernutzer mit Konsequenzen rechnen müssen."},
+   {v: "C", t:"Die Strafmöglichkeit hat keinen Effekt, weil das Strafen zu teuer ist."},
+   {v: "D", t:"Alle Fischer strafen sich gegenseitig, und das Ergebnis wird schlechter."}
  ],
- correct:"A",
+ correct:"B",
  explain:"Die Möglichkeit, Trittbrettfahrer zu bestrafen, wirkt als sozialer Kontrollmechanismus. Obwohl Strafen den Strafenden selbst kosten, reicht oft schon die Drohung, um kooperativeres Verhalten zu fördern. Analogie: Steuern und Bussen im echten Leben."},
 
 {id:"o09", topic:"oeffentlich", type:"fill", diff:1, tax:"K1",
@@ -903,12 +903,12 @@ window.QUESTIONS = [
 {id:"l01", topic:"allmende", type:"mc", diff:1, tax:"K1",
  q:"Was versteht man unter der «Tragödie der Allmende»?",
  options:[
-   {v:"A", t:"Die Übernutzung einer gemeinsamen Ressource, weil jeder Nutzer seinen individuellen Vorteil maximiert."},
-   {v:"B", t:"Die Unternutzung einer Ressource durch staatliche Regulierung."},
-   {v:"C", t:"Den Zusammenbruch eines Monopols."},
-   {v:"D", t:"Die Verarmung einer Gesellschaft durch zu hohe Steuern."}
+   {v: "A", t:"Den Zusammenbruch eines Monopols."},
+   {v: "B", t:"Die Übernutzung einer gemeinsamen Ressource, weil jeder Nutzer seinen individuellen Vorteil maximiert."},
+   {v: "C", t:"Die Unternutzung einer Ressource durch staatliche Regulierung."},
+   {v: "D", t:"Die Verarmung einer Gesellschaft durch zu hohe Steuern."}
  ],
- correct:"A",
+ correct:"B",
  explain:"Die Tragödie der Allmende (Garrett Hardin, 1968): Bei frei zugänglichen Ressourcen (z.B. Weideland, Fischbestände) hat jeder Nutzer den Anreiz, möglichst viel zu entnehmen. Der individuelle Gewinn ist hoch, die Kosten der Übernutzung werden von allen getragen → die Ressource wird zerstört."},
 
 {id:"l02", topic:"allmende", type:"tf", diff:1, tax:"K2",
@@ -952,12 +952,12 @@ window.QUESTIONS = [
 {id:"l07", topic:"allmende", type:"mc", diff:2, tax:"K3",
  q:"Welches der folgenden aktuellen Probleme ist ein typisches Beispiel für die Tragödie der Allmende?",
  options:[
-   {v:"A", t:"Überfischung der Weltmeere."},
-   {v:"B", t:"Steigende Immobilienpreise in Zürich."},
-   {v:"C", t:"Die Einführung einer neuen Smartphone-Generation."},
-   {v:"D", t:"Der Anstieg der Gesundheitskosten."}
+   {v: "A", t:"Steigende Immobilienpreise in Zürich."},
+   {v: "B", t:"Der Anstieg der Gesundheitskosten."},
+   {v: "C", t:"Die Einführung einer neuen Smartphone-Generation."},
+   {v: "D", t:"Überfischung der Weltmeere."}
  ],
- correct:"A",
+ correct:"D",
  explain:"Fischbestände in internationalen Gewässern sind ein klassisches Allmendegut: rival (gefangene Fische fehlen anderen), nicht ausschliessbar (keine Eigentumsrechte auf hoher See). Jedes Land hat den Anreiz, möglichst viel zu fischen → Übernutzung."},
 
 {id:"l08", topic:"allmende", type:"fill", diff:1, tax:"K1",
@@ -970,12 +970,12 @@ window.QUESTIONS = [
 {id:"l09", topic:"allmende", type:"mc", diff:2, tax:"K2",
  q:"Was unterscheidet ein Allmendegut von einem öffentlichen Gut?",
  options:[
-   {v:"A", t:"Allmendegüter sind rival im Konsum (die Nutzung durch eine Person mindert die Verfügbarkeit), öffentliche Güter nicht."},
-   {v:"B", t:"Öffentliche Güter sind rival, Allmendegüter nicht."},
-   {v:"C", t:"Beide sind identisch — die Begriffe werden synonym verwendet."},
-   {v:"D", t:"Allmendegüter sind ausschliessbar, öffentliche Güter nicht."}
+   {v: "A", t:"Öffentliche Güter sind rival, Allmendegüter nicht."},
+   {v: "B", t:"Allmendegüter sind ausschliessbar, öffentliche Güter nicht."},
+   {v: "C", t:"Allmendegüter sind rival im Konsum (die Nutzung durch eine Person mindert die Verfügbarkeit), öffentliche Güter nicht."},
+   {v: "D", t:"Beide sind identisch — die Begriffe werden synonym verwendet."}
  ],
- correct:"A",
+ correct:"C",
  explain:"Der entscheidende Unterschied ist die Rivalität: Bei Allmendegütern (z.B. Fisch) verringert die Nutzung durch eine Person die Verfügbarkeit für andere. Bei öffentlichen Gütern (z.B. Landesverteidigung) ist der Konsum nicht-rival. Beide sind nicht-ausschliessbar."},
 
 {id:"l10", topic:"allmende", type:"open", diff:3, tax:"K5",
@@ -987,10 +987,10 @@ window.QUESTIONS = [
 {id:"e01", topic:"externeffekte", type:"mc", diff:1, tax:"K1",
  q:"Was versteht man unter einem externen Effekt?",
  options:[
-   {v:"A", t:"Kosten oder Nutzen, die bei Dritten anfallen und nicht im Marktpreis berücksichtigt werden."},
-   {v:"B", t:"Die Wirkung von Importen auf den inländischen Markt."},
-   {v:"C", t:"Die Auswirkungen von Steuern auf die Wirtschaft."},
-   {v:"D", t:"Die Reaktion des Marktes auf eine Preisänderung."}
+   {v: "A", t:"Kosten oder Nutzen, die bei Dritten anfallen und nicht im Marktpreis berücksichtigt werden."},
+   {v: "B", t:"Die Reaktion des Marktes auf eine Preisänderung."},
+   {v: "C", t:"Die Auswirkungen von Steuern auf die Wirtschaft."},
+   {v: "D", t:"Die Wirkung von Importen auf den inländischen Markt."}
  ],
  correct:"A",
  explain:"Externe Effekte (Externalitäten) sind Auswirkungen wirtschaftlicher Aktivitäten auf unbeteiligte Dritte, die weder im Preis noch in der Entscheidung der Marktteilnehmer berücksichtigt werden. Sie können negativ (Kosten für Dritte) oder positiv (Nutzen für Dritte) sein."},
@@ -1012,12 +1012,12 @@ window.QUESTIONS = [
  img:{src:"img/vwl/markteffizienz/externe_effekte_negativ_pk_gk.svg", alt:"Negative externe Effekte: Private Kosten (PK) vs. Gesellschaftliche Kosten (GK)"},
  q:"Warum führen negative externe Effekte zu einer ineffizienten Überproduktion?",
  options:[
-   {v:"A", t:"Weil die privaten Kosten niedriger sind als die sozialen Kosten — der Marktpreis ist zu niedrig."},
-   {v:"B", t:"Weil die Nachfrage nach dem Gut zu gering ist."},
-   {v:"C", t:"Weil der Staat die Produktion subventioniert."},
-   {v:"D", t:"Weil die Angebotskurve senkrecht verläuft."}
+   {v: "A", t:"Weil die Nachfrage nach dem Gut zu gering ist."},
+   {v: "B", t:"Weil der Staat die Produktion subventioniert."},
+   {v: "C", t:"Weil die Angebotskurve senkrecht verläuft."},
+   {v: "D", t:"Weil die privaten Kosten niedriger sind als die sozialen Kosten — der Marktpreis ist zu niedrig."}
  ],
- correct:"A",
+ correct:"D",
  explain:"Bei negativen externen Effekten (z.B. Umweltverschmutzung) sind die sozialen Kosten (private Kosten + externe Kosten) höher als die privaten Kosten. Da Unternehmen nur ihre privaten Kosten berücksichtigen, ist die Produktion zu hoch und der Preis zu niedrig — aus gesellschaftlicher Sicht."},
 
 {id:"e04", topic:"externeffekte", type:"fill", diff:2, tax:"K2",
@@ -1031,12 +1031,12 @@ window.QUESTIONS = [
 {id:"e05", topic:"externeffekte", type:"mc", diff:2, tax:"K2",
  q:"Welches Instrument nutzt der Marktmechanismus, um CO₂-Emissionen zu reduzieren?",
  options:[
-   {v:"A", t:"Emissionshandel (Cap-and-Trade): Es wird ein Gesamtlimit festgelegt und Emissionsrechte werden gehandelt."},
-   {v:"B", t:"Subventionen für fossile Brennstoffe."},
-   {v:"C", t:"Abschaffung aller Umweltregulierungen."},
-   {v:"D", t:"Verstaatlichung aller Energieunternehmen."}
+   {v: "A", t:"Verstaatlichung aller Energieunternehmen."},
+   {v: "B", t:"Emissionshandel (Cap-and-Trade): Es wird ein Gesamtlimit festgelegt und Emissionsrechte werden gehandelt."},
+   {v: "C", t:"Abschaffung aller Umweltregulierungen."},
+   {v: "D", t:"Subventionen für fossile Brennstoffe."}
  ],
- correct:"A",
+ correct:"B",
  explain:"Beim Emissionshandel (Cap-and-Trade) legt der Staat ein Gesamtlimit (Cap) für Emissionen fest und verteilt/verkauft Emissionsrechte. Unternehmen können Rechte kaufen oder verkaufen (Trade). Der Vorteil: Die Reduktion geschieht dort, wo sie am günstigsten ist — das ist effizient."},
 
 {id:"e06", topic:"externeffekte", type:"tf", diff:2, tax:"K2",
@@ -1047,12 +1047,12 @@ window.QUESTIONS = [
 {id:"e07", topic:"externeffekte", type:"mc", diff:2, tax:"K3",
  q:"Die Schweiz erhebt eine CO₂-Abgabe auf fossile Brennstoffe. Welcher ökonomische Zweck steht im Vordergrund?",
  options:[
-   {v:"A", t:"Internalisierung negativer externer Effekte: Die Umweltkosten sollen im Preis abgebildet werden."},
-   {v:"B", t:"Einnahmenmaximierung für den Bundeshaushalt."},
-   {v:"C", t:"Subventionierung erneuerbarer Energien."},
-   {v:"D", t:"Verbot fossiler Brennstoffe."}
+   {v: "A", t:"Subventionierung erneuerbarer Energien."},
+   {v: "B", t:"Internalisierung negativer externer Effekte: Die Umweltkosten sollen im Preis abgebildet werden."},
+   {v: "C", t:"Einnahmenmaximierung für den Bundeshaushalt."},
+   {v: "D", t:"Verbot fossiler Brennstoffe."}
  ],
- correct:"A",
+ correct:"B",
  explain:"Die CO₂-Abgabe ist eine Lenkungsabgabe (Pigou-Steuer): Sie verteuert fossile Brennstoffe um die geschätzten externen Kosten der CO₂-Emissionen. Dadurch werden Anreize geschaffen, weniger CO₂ auszustossen und auf Alternativen umzusteigen. Ein Grossteil der Einnahmen wird an die Bevölkerung rückverteilt."},
 
 {id:"e08", topic:"externeffekte", type:"open", diff:3, tax:"K4",
@@ -1068,12 +1068,12 @@ window.QUESTIONS = [
 {id:"e10", topic:"externeffekte", type:"mc", diff:2, tax:"K3",
  q:"Welche Massnahme eignet sich, um positive externe Effekte von Bildung zu korrigieren?",
  options:[
-   {v:"A", t:"Subventionen für Bildung oder Schulpflicht, damit mehr Bildung konsumiert wird."},
-   {v:"B", t:"Steuern auf Bildung, um die Überproduktion zu reduzieren."},
-   {v:"C", t:"Privatisierung aller Schulen."},
-   {v:"D", t:"Verbot von privaten Bildungsangeboten."}
+   {v: "A", t:"Privatisierung aller Schulen."},
+   {v: "B", t:"Verbot von privaten Bildungsangeboten."},
+   {v: "C", t:"Subventionen für Bildung oder Schulpflicht, damit mehr Bildung konsumiert wird."},
+   {v: "D", t:"Steuern auf Bildung, um die Überproduktion zu reduzieren."}
  ],
- correct:"A",
+ correct:"C",
  explain:"Bei positiven externen Effekten (Bildung hat gesellschaftlichen Nutzen über den privaten Nutzen hinaus) wird zu wenig Bildung nachgefragt. Subventionen (z.B. kostenlose Schulen, Stipendien) oder Pflicht (Schulpflicht) korrigieren die Unterbereitstellung."},
 
 {id:"e11", topic:"externeffekte", type:"calc", diff:2, tax:"K3",
@@ -1096,22 +1096,22 @@ window.QUESTIONS = [
  img:{src:"img/vwl/markteffizienz/externe_effekte_negativ_pk_gk.svg", alt:"Negative externe Effekte: Gesellschaftliche Kosten (GK) über privaten Kosten (PK)"},
  q:"Das Diagramm zeigt negative externe Effekte. Die gesellschaftlichen Grenzkosten (GK) liegen über den privaten Grenzkosten (PK). Welche Aussage zur Marktmenge ist korrekt?",
  options:[
-   {v:"A", t:"Im Marktgleichgewicht (Schnittpunkt N und PK) wird zu viel produziert, weil die externen Kosten nicht eingepreist sind."},
-   {v:"B", t:"Im Marktgleichgewicht wird zu wenig produziert, weil die GK über den PK liegen."},
-   {v:"C", t:"Das Marktgleichgewicht ist effizient, da die externen Kosten durch den Marktpreis abgedeckt werden."},
-   {v:"D", t:"Die GK-Kurve hat keinen Einfluss auf die optimale Produktionsmenge."}
+   {v: "A", t:"Das Marktgleichgewicht ist effizient, da die externen Kosten durch den Marktpreis abgedeckt werden."},
+   {v: "B", t:"Im Marktgleichgewicht (Schnittpunkt N und PK) wird zu viel produziert, weil die externen Kosten nicht eingepreist sind."},
+   {v: "C", t:"Im Marktgleichgewicht wird zu wenig produziert, weil die GK über den PK liegen."},
+   {v: "D", t:"Die GK-Kurve hat keinen Einfluss auf die optimale Produktionsmenge."}
  ],
- correct:"A",
+ correct:"B",
  explain:"Bei negativen externen Effekten liegen die gesellschaftlichen Grenzkosten (GK) über den privaten Grenzkosten (PK). Der Markt orientiert sich an PK und produziert die Menge Q_M (Schnittpunkt N und PK). Das soziale Optimum liegt aber bei Q* (Schnittpunkt N und GK), wo weniger produziert wird. Die Differenz Q_M − Q* ist die Überproduktion, die einen Wohlfahrtsverlust verursacht."},
 
 {id:"e14", topic:"externeffekte", type:"mc", diff:2, tax:"K4",
  img:{src:"img/vwl/markteffizienz/externe_effekte_negativ_gk_ueber_pk.svg", alt:"Diagramm negative externe Effekte mit GK über PK"},
  q:"Das Diagramm zeigt negative externe Effekte. Die Gesellschaftlichen Kosten (GK) liegen über den Privaten Kosten (PK = A). Das Marktgleichgewicht liegt bei Q_M. Warum entsteht ein Wohlfahrtsverlust (WV)?",
  options:[
-   {v:"A", t:"Weil die Produzenten zu wenig produzieren."},
-   {v:"B", t:"Weil für jede Einheit zwischen Q* und Q_M die gesellschaftlichen Kosten den gesellschaftlichen Nutzen übersteigen."},
-   {v:"C", t:"Weil der Staat eine Steuer erhebt, die den Preis verzerrt."},
-   {v:"D", t:"Weil die Konsumenten die externen Kosten nicht kennen."}
+   {v: "A", t:"Weil die Konsumenten die externen Kosten nicht kennen."},
+   {v: "B", t:"Weil für jede Einheit zwischen Q* und Q_M die gesellschaftlichen Kosten den gesellschaftlichen Nutzen übersteigen."},
+   {v: "C", t:"Weil der Staat eine Steuer erhebt, die den Preis verzerrt."},
+   {v: "D", t:"Weil die Produzenten zu wenig produzieren."}
  ],
  correct:"B",
  explain:"Zwischen Q* (soziales Optimum) und Q_M (Marktgleichgewicht) übersteigen die gesellschaftlichen Grenzkosten (GK) den gesellschaftlichen Grenznutzen (N = GN). Jede zusätzliche Einheit in diesem Bereich verursacht mehr Kosten als Nutzen — es wird zu viel produziert. Der Wohlfahrtsverlust (WV-Dreieck) entspricht dem Überschuss der Kosten über den Nutzen für diese Einheiten."},
@@ -1119,22 +1119,22 @@ window.QUESTIONS = [
  img:{src:"img/vwl/markteffizienz/externe_effekte_negativ_gk_ueber_pk.svg", alt:"Diagramm negative externe Effekte mit GK über PK"},
  q:"Wie kann der Staat das Marktgleichgewicht zum sozialen Optimum Q* korrigieren?",
  options:[
-   {v:"A", t:"Durch eine Pigou-Steuer in Höhe der externen Kosten pro Einheit (bei Q*), die PK auf GK anhebt."},
-   {v:"B", t:"Durch eine Subvention an die Produzenten, damit sie weniger produzieren."},
-   {v:"C", t:"Durch einen Höchstpreis unterhalb des Marktpreises."},
-   {v:"D", t:"Durch eine Erhöhung der Nachfrage."}
+   {v: "A", t:"Durch eine Erhöhung der Nachfrage."},
+   {v: "B", t:"Durch eine Subvention an die Produzenten, damit sie weniger produzieren."},
+   {v: "C", t:"Durch einen Höchstpreis unterhalb des Marktpreises."},
+   {v: "D", t:"Durch eine Pigou-Steuer in Höhe der externen Kosten pro Einheit (bei Q*), die PK auf GK anhebt."}
  ],
- correct:"A",
+ correct:"D",
  explain:"Eine Pigou-Steuer internalisiert die externen Kosten: Sie entspricht genau der Differenz zwischen GK und PK bei Q*. Dadurch verschiebt sich die private Angebotskurve nach oben auf GK, und das neue Marktgleichgewicht fällt mit dem sozialen Optimum zusammen. Der Wohlfahrtsverlust wird eliminiert. Die schattierte Fläche ‹Ext. Kosten› im Diagramm zeigt die Gesamtheit der externen Kosten, die vor der Korrektur von Dritten (z.B. Anwohner, Umwelt) getragen werden."},
 
 // ── ASYMMETRISCHE INFORMATION (i01–i10) ──
 {id:"i01", topic:"asyminfo", type:"mc", diff:1, tax:"K1",
  q:"Was versteht man unter asymmetrischer Information?",
  options:[
-   {v:"A", t:"Eine Situation, in der Marktteilnehmer unterschiedlich gut informiert sind."},
-   {v:"B", t:"Eine Situation, in der alle Marktteilnehmer gleich gut informiert sind."},
-   {v:"C", t:"Eine Situation, in der der Staat mehr Information hat als der Markt."},
-   {v:"D", t:"Eine Situation, in der die Preise alle Informationen widerspiegeln."}
+   {v: "A", t:"Eine Situation, in der Marktteilnehmer unterschiedlich gut informiert sind."},
+   {v: "B", t:"Eine Situation, in der der Staat mehr Information hat als der Markt."},
+   {v: "C", t:"Eine Situation, in der alle Marktteilnehmer gleich gut informiert sind."},
+   {v: "D", t:"Eine Situation, in der die Preise alle Informationen widerspiegeln."}
  ],
  correct:"A",
  explain:"Asymmetrische Information bedeutet: Eine Seite eines Geschäfts weiss mehr als die andere. Beispiel: Der Verkäufer eines Gebrauchtwagens kennt die Qualität besser als der Käufer. Dies kann zu Marktversagen führen."},
@@ -1142,23 +1142,23 @@ window.QUESTIONS = [
 {id:"i02", topic:"asyminfo", type:"mc", diff:2, tax:"K2",
  q:"Was beschreibt das Konzept «Moral Hazard»?",
  options:[
-   {v:"A", t:"Risikoreicheres Verhalten, weil die Kosten eines Schadens von einer anderen Partei getragen werden."},
-   {v:"B", t:"Die Tendenz, nur qualitativ schlechte Produkte auf dem Markt anzubieten."},
-   {v:"C", t:"Die absichtliche Täuschung von Geschäftspartnern."},
-   {v:"D", t:"Die Überbewertung von Risiken durch Konsumenten."}
+   {v: "A", t:"Die Tendenz, nur qualitativ schlechte Produkte auf dem Markt anzubieten."},
+   {v: "B", t:"Risikoreicheres Verhalten, weil die Kosten eines Schadens von einer anderen Partei getragen werden."},
+   {v: "C", t:"Die absichtliche Täuschung von Geschäftspartnern."},
+   {v: "D", t:"Die Überbewertung von Risiken durch Konsumenten."}
  ],
- correct:"A",
+ correct:"B",
  explain:"Moral Hazard (moralisches Risiko): Eine versicherte Person verhält sich riskanter, weil sie die Konsequenzen nicht voll tragen muss. Beispiel: Wer eine Vollkaskoversicherung hat, fährt möglicherweise unvorsichtiger, weil die Versicherung den Schaden deckt."},
 
 {id:"i03", topic:"asyminfo", type:"mc", diff:2, tax:"K2",
  q:"Was beschreibt «Adverse Selektion»?",
  options:[
-   {v:"A", t:"Die Negativauslese: Auf einem Markt bleiben vor allem «schlechte» Angebote übrig, weil Käufer die Qualität nicht beurteilen können."},
-   {v:"B", t:"Die gezielte Auswahl der besten Mitarbeiter durch Unternehmen."},
-   {v:"C", t:"Die staatliche Regulierung von Märkten."},
-   {v:"D", t:"Die bewusste Verknappung von Gütern durch Produzenten."}
+   {v: "A", t:"Die gezielte Auswahl der besten Mitarbeiter durch Unternehmen."},
+   {v: "B", t:"Die staatliche Regulierung von Märkten."},
+   {v: "C", t:"Die bewusste Verknappung von Gütern durch Produzenten."},
+   {v: "D", t:"Die Negativauslese: Auf einem Markt bleiben vor allem «schlechte» Angebote übrig, weil Käufer die Qualität nicht beurteilen können."}
  ],
- correct:"A",
+ correct:"D",
  explain:"Adverse Selektion (George Akerlof, «Market for Lemons»): Wenn Käufer die Qualität nicht beurteilen können, bieten sie nur niedrige Preise. Verkäufer guter Qualität ziehen sich zurück → nur minderwertige Produkte bleiben übrig. Im Extremfall bricht der Markt zusammen."},
 
 {id:"i04", topic:"asyminfo", type:"tf", diff:2, tax:"K2",
@@ -1181,12 +1181,12 @@ window.QUESTIONS = [
 {id:"i06", topic:"asyminfo", type:"mc", diff:2, tax:"K3",
  q:"Welche Massnahme hilft gegen Moral Hazard in der Versicherungsbranche?",
  options:[
-   {v:"A", t:"Selbstbehalt: Der Versicherte trägt einen Teil des Schadens selbst und hat daher einen Anreiz zur Vorsicht."},
-   {v:"B", t:"Abschaffung aller Versicherungen."},
-   {v:"C", t:"Erhöhung der Prämien für alle Versicherten."},
-   {v:"D", t:"Verbot von Risikoprüfungen."}
+   {v: "A", t:"Verbot von Risikoprüfungen."},
+   {v: "B", t:"Abschaffung aller Versicherungen."},
+   {v: "C", t:"Selbstbehalt: Der Versicherte trägt einen Teil des Schadens selbst und hat daher einen Anreiz zur Vorsicht."},
+   {v: "D", t:"Erhöhung der Prämien für alle Versicherten."}
  ],
- correct:"A",
+ correct:"C",
  explain:"Der Selbstbehalt (z.B. CHF 500 pro Schadensfall) sorgt dafür, dass der Versicherte ein eigenes Interesse an Schadensvermeidung behält. Weitere Massnahmen: Bonus-Malus-Systeme (gute Fahrt = niedrigere Prämie), Überwachung, vertragliche Auflagen."},
 
 {id:"i07", topic:"asyminfo", type:"fill", diff:1, tax:"K1",
@@ -1210,12 +1210,12 @@ window.QUESTIONS = [
 {id:"i10", topic:"asyminfo", type:"mc", diff:2, tax:"K2",
  q:"Welche Massnahme hilft gegen Adverse Selektion auf dem Arbeitsmarkt?",
  options:[
-   {v:"A", t:"Zeugnisse, Zertifikate und Probezeiten, die den Arbeitgebern Informationen über die Fähigkeiten der Bewerber liefern."},
-   {v:"B", t:"Abschaffung aller Qualifikationsanforderungen."},
-   {v:"C", t:"Erhöhung des Mindestlohns."},
-   {v:"D", t:"Verbot von Bewerbungsgesprächen."}
+   {v: "A", t:"Abschaffung aller Qualifikationsanforderungen."},
+   {v: "B", t:"Erhöhung des Mindestlohns."},
+   {v: "C", t:"Verbot von Bewerbungsgesprächen."},
+   {v: "D", t:"Zeugnisse, Zertifikate und Probezeiten, die den Arbeitgebern Informationen über die Fähigkeiten der Bewerber liefern."}
  ],
- correct:"A",
+ correct:"D",
  explain:"Auf dem Arbeitsmarkt wissen Bewerber mehr über ihre Fähigkeiten als Arbeitgeber. Zeugnisse und Zertifikate «signalisieren» Qualifikation (Signalling nach Spence). Probezeiten ermöglichen dem Arbeitgeber, die tatsächliche Leistung zu beobachten (Screening)."},
 
 // ── STEUERN & WOHLFAHRTSVERLUST (s01–s10) ──
@@ -1223,23 +1223,23 @@ window.QUESTIONS = [
  img:{src:"img/vwl/markteffizienz/steuerkeil_diagramm.svg", alt:"Steuerdiagramm: Konsumentenpreis P_K, Produzentenpreis P_P und Steuerkeil t"},
  q:"Eine Steuer auf ein Gut verschiebt im Preis-Mengen-Diagramm die Angebotskurve nach oben/links. Warum?",
  options:[
-   {v:"A", t:"Weil die Steuer die Produktionskosten erhöht — Anbieter verlangen bei jeder Menge einen höheren Preis."},
-   {v:"B", t:"Weil die Steuer die Nachfrage reduziert."},
-   {v:"C", t:"Weil die Steuer die Gewinne der Produzenten erhöht."},
-   {v:"D", t:"Weil die Steuer die Produktionsmenge vorschreibt."}
+   {v: "A", t:"Weil die Steuer die Produktionsmenge vorschreibt."},
+   {v: "B", t:"Weil die Steuer die Produktionskosten erhöht — Anbieter verlangen bei jeder Menge einen höheren Preis."},
+   {v: "C", t:"Weil die Steuer die Gewinne der Produzenten erhöht."},
+   {v: "D", t:"Weil die Steuer die Nachfrage reduziert."}
  ],
- correct:"A",
+ correct:"B",
  explain:"Eine Steuer wirkt wie eine Erhöhung der Kosten. Die Angebotskurve verschiebt sich um den Steuerbetrag nach oben (= nach links). Im neuen Gleichgewicht: Der Preis für Konsumenten steigt, der Erlös für Produzenten (nach Steuer) sinkt, die Menge geht zurück."},
 
 {id:"s02", topic:"steuern", type:"mc", diff:2, tax:"K2",
  q:"Was bestimmt, wer die Steuerlast hauptsächlich trägt — Konsumenten oder Produzenten?",
  options:[
-   {v:"A", t:"Die Preiselastizität von Angebot und Nachfrage: Die unelastischere Seite trägt den grösseren Teil."},
-   {v:"B", t:"Immer die Konsumenten, weil sie den höheren Preis zahlen."},
-   {v:"C", t:"Immer die Produzenten, weil sie die Steuer abführen müssen."},
-   {v:"D", t:"Der Staat entscheidet, wer die Steuer bezahlt."}
+   {v: "A", t:"Immer die Produzenten, weil sie die Steuer abführen müssen."},
+   {v: "B", t:"Der Staat entscheidet, wer die Steuer bezahlt."},
+   {v: "C", t:"Immer die Konsumenten, weil sie den höheren Preis zahlen."},
+   {v: "D", t:"Die Preiselastizität von Angebot und Nachfrage: Die unelastischere Seite trägt den grösseren Teil."}
  ],
- correct:"A",
+ correct:"D",
  explain:"Die Steuerinzidenz hängt von den Elastizitäten ab: Die Marktseite, die weniger ausweichen kann (unelastischere Seite), trägt den grösseren Teil der Steuerlast. Bei unelastischer Nachfrage (z.B. Benzin) wird die Steuer grösstenteils auf die Konsumenten überwälzt."},
 
 {id:"s03", topic:"steuern", type:"tf", diff:2, tax:"K2",
@@ -1255,12 +1255,12 @@ window.QUESTIONS = [
 {id:"s05", topic:"steuern", type:"mc", diff:2, tax:"K2",
  q:"Was ist die Steuerinzidenz?",
  options:[
-   {v:"A", t:"Die tatsächliche Verteilung der Steuerlast zwischen Konsumenten und Produzenten."},
-   {v:"B", t:"Der Steuersatz in Prozent des Preises."},
-   {v:"C", t:"Die Höhe der Steuereinnahmen des Staates."},
-   {v:"D", t:"Die Anzahl der steuerpflichtigen Güter."}
+   {v: "A", t:"Die Anzahl der steuerpflichtigen Güter."},
+   {v: "B", t:"Der Steuersatz in Prozent des Preises."},
+   {v: "C", t:"Die Höhe der Steuereinnahmen des Staates."},
+   {v: "D", t:"Die tatsächliche Verteilung der Steuerlast zwischen Konsumenten und Produzenten."}
  ],
- correct:"A",
+ correct:"D",
  explain:"Die Steuerinzidenz beschreibt, wer die Steuerlast wirtschaftlich tatsächlich trägt — unabhängig davon, wer die Steuer formal abführen muss. Entscheidend sind die Elastizitäten: Die unelastischere Seite trägt mehr."},
 
 {id:"s06", topic:"steuern", type:"open", diff:3, tax:"K4",
@@ -1271,12 +1271,12 @@ window.QUESTIONS = [
 {id:"s07", topic:"steuern", type:"mc", diff:2, tax:"K2",
  q:"Warum entsteht durch eine Steuer ein Wohlfahrtsverlust (Deadweight Loss)?",
  options:[
-   {v:"A", t:"Weil die Steuer Transaktionen verhindert, die ohne Steuer für beide Seiten vorteilhaft wären."},
-   {v:"B", t:"Weil der Staat die Steuereinnahmen verschwendet."},
-   {v:"C", t:"Weil die Produzenten ihre Gewinne vollständig verlieren."},
-   {v:"D", t:"Weil die Konsumentenrente auf null sinkt."}
+   {v: "A", t:"Weil der Staat die Steuereinnahmen verschwendet."},
+   {v: "B", t:"Weil die Steuer Transaktionen verhindert, die ohne Steuer für beide Seiten vorteilhaft wären."},
+   {v: "C", t:"Weil die Produzenten ihre Gewinne vollständig verlieren."},
+   {v: "D", t:"Weil die Konsumentenrente auf null sinkt."}
  ],
- correct:"A",
+ correct:"B",
  explain:"Die Steuer erhöht den Preis für Konsumenten und senkt den Erlös für Produzenten → die Gleichgewichtsmenge sinkt. Transaktionen, bei denen Zahlungsbereitschaft > Grenzkosten (aber < Grenzkosten + Steuer), finden nicht mehr statt. Dieser verlorene Handelsgewinn ist der Wohlfahrtsverlust — er geht an niemanden."},
 
 {id:"s08", topic:"steuern", type:"calc", diff:2, tax:"K3",
@@ -1320,23 +1320,23 @@ window.QUESTIONS = [
  img:{src:"img/vwl/markteffizienz/steuerinzidenz_elastische_nachfrage.svg", alt:"Steuerdiagramm bei elastischer Nachfrage und unelastischem Angebot"},
  q:"Das Diagramm zeigt eine Steuer bei elastischer Nachfrage und unelastischem Angebot. Welche Aussage zur Steuerlastverteilung ist korrekt?",
  options:[
-   {v:"A", t:"Die Konsumenten tragen den grösseren Teil der Steuerlast (B > D)."},
-   {v:"B", t:"Die Produzenten tragen den grösseren Teil der Steuerlast (D > B)."},
-   {v:"C", t:"Konsumenten und Produzenten tragen die Steuerlast zu gleichen Teilen."},
-   {v:"D", t:"Die Steuerlast wird vollständig auf die Konsumenten überwälzt."}
+   {v: "A", t:"Konsumenten und Produzenten tragen die Steuerlast zu gleichen Teilen."},
+   {v: "B", t:"Die Konsumenten tragen den grösseren Teil der Steuerlast (B > D)."},
+   {v: "C", t:"Die Steuerlast wird vollständig auf die Konsumenten überwälzt."},
+   {v: "D", t:"Die Produzenten tragen den grösseren Teil der Steuerlast (D > B)."}
  ],
- correct:"B",
+ correct:"D",
  explain:"Bei elastischer Nachfrage und unelastischem Angebot tragen die Produzenten den grösseren Anteil. Im Diagramm ist Fläche D (Steuerlast Produzenten) deutlich grösser als Fläche B (Steuerlast Konsumenten). Die elastische Seite kann leichter ausweichen (Konsumenten substituieren), während die unelastische Seite (Produzenten) die Last tragen muss."},
 {id:"s13", topic:"steuern", type:"mc", diff:2, tax:"K4",
  img:{src:"img/vwl/markteffizienz/steuerinzidenz_unelastische_nachfrage.svg", alt:"Steuerdiagramm bei unelastischer Nachfrage und elastischem Angebot"},
  q:"Das Diagramm zeigt eine Steuer bei unelastischer Nachfrage und elastischem Angebot. Welche Aussage ist korrekt?",
  options:[
-   {v:"A", t:"Die Konsumenten tragen den grösseren Teil der Steuerlast (B > D)."},
-   {v:"B", t:"Die Produzenten tragen den grösseren Teil der Steuerlast (D > B)."},
-   {v:"C", t:"Die Steuerlast verteilt sich symmetrisch auf beide Seiten."},
-   {v:"D", t:"Der Wohlfahrtsverlust ist grösser als die Steuereinnahmen."}
+   {v: "A", t:"Die Produzenten tragen den grösseren Teil der Steuerlast (D > B)."},
+   {v: "B", t:"Die Steuerlast verteilt sich symmetrisch auf beide Seiten."},
+   {v: "C", t:"Die Konsumenten tragen den grösseren Teil der Steuerlast (B > D)."},
+   {v: "D", t:"Der Wohlfahrtsverlust ist grösser als die Steuereinnahmen."}
  ],
- correct:"A",
+ correct:"C",
  explain:"Bei unelastischer Nachfrage und elastischem Angebot tragen die Konsumenten den grösseren Anteil. Im Diagramm ist Fläche B (Steuerlast Konsumenten) deutlich grösser als Fläche D (Steuerlast Produzenten). Unelastische Nachfrage bedeutet: Konsumenten können kaum ausweichen und akzeptieren höhere Preise. Die Steuer wird überwälzt auf die Marktseite, die weniger flexibel reagiert."},
 {id:"s14", topic:"steuern", type:"tf", diff:2, tax:"K4",
  q:"Eine Steuer auf Benzin (unelastische Nachfrage) wird grösstenteils von den Produzenten getragen, weil diese die Steuer formell abführen müssen.",
@@ -1358,12 +1358,12 @@ window.QUESTIONS = [
 {id:"p01", topic:"staatsversagen", type:"mc", diff:1, tax:"K1",
  q:"Was versteht man unter Staatsversagen?",
  options:[
-   {v:"A", t:"Wenn staatliche Eingriffe zu schlechteren Ergebnissen führen als der Markt — z.B. durch Ineffizienz, Fehlplanung oder politisch motivierte Entscheidungen."},
-   {v:"B", t:"Wenn der Staat bankrott geht."},
-   {v:"C", t:"Wenn der Staat keine Steuern erhebt."},
-   {v:"D", t:"Wenn der Staat den Markt nicht reguliert."}
+   {v: "A", t:"Wenn der Staat den Markt nicht reguliert."},
+   {v: "B", t:"Wenn der Staat bankrott geht."},
+   {v: "C", t:"Wenn staatliche Eingriffe zu schlechteren Ergebnissen führen als der Markt — z.B. durch Ineffizienz, Fehlplanung oder politisch motivierte Entscheidungen."},
+   {v: "D", t:"Wenn der Staat keine Steuern erhebt."}
  ],
- correct:"A",
+ correct:"C",
  explain:"Staatsversagen (Government Failure) liegt vor, wenn der Staat versucht, ein Marktversagen zu korrigieren, aber dabei selbst ineffiziente oder kontraproduktive Ergebnisse erzeugt. Es ist das Pendant zum Marktversagen."},
 
 {id:"p02", topic:"staatsversagen", type:"sort", diff:2, tax:"K2",
@@ -1403,12 +1403,12 @@ window.QUESTIONS = [
 {id:"p06", topic:"staatsversagen", type:"mc", diff:2, tax:"K2",
  q:"Welches der folgenden Beispiele illustriert Staatsversagen am besten?",
  options:[
-   {v:"A", t:"Subventionen für Kohlekraftwerke verlangsamen den Übergang zu erneuerbaren Energien."},
-   {v:"B", t:"Ein Monopol erhöht die Preise."},
-   {v:"C", t:"Umweltverschmutzung durch eine Chemiefabrik."},
-   {v:"D", t:"Ein Konsument kauft ein defektes Produkt."}
+   {v: "A", t:"Ein Monopol erhöht die Preise."},
+   {v: "B", t:"Subventionen für Kohlekraftwerke verlangsamen den Übergang zu erneuerbaren Energien."},
+   {v: "C", t:"Umweltverschmutzung durch eine Chemiefabrik."},
+   {v: "D", t:"Ein Konsument kauft ein defektes Produkt."}
  ],
- correct:"A",
+ correct:"B",
  explain:"Subventionen für fossile Energien sind ein klassisches Beispiel für Staatsversagen: Der Staat subventioniert eine Industrie, die negative Externalitäten verursacht, statt sie zu internalisieren. Politische Interessen (Arbeitsplätze, Lobbying) verhindern die ökonomisch sinnvolle Politik."},
 
 {id:"p07", topic:"staatsversagen", type:"fill", diff:1, tax:"K1",
@@ -1428,12 +1428,12 @@ window.QUESTIONS = [
 {id:"n01", topic:"nachhaltigkeit", type:"mc", diff:1, tax:"K1",
  q:"Was beschreibt das «Wachstumstrilemma»?",
  options:[
-   {v:"A", t:"Den Zielkonflikt zwischen Wirtschaftswachstum, Umweltschutz und sozialer Gerechtigkeit."},
-   {v:"B", t:"Die Unmöglichkeit, BIP, Inflation und Arbeitslosigkeit gleichzeitig zu steuern."},
-   {v:"C", t:"Den Konflikt zwischen Importen, Exporten und Binnennachfrage."},
-   {v:"D", t:"Die Schwierigkeit, Steuern, Ausgaben und Schulden gleichzeitig zu senken."}
+   {v: "A", t:"Die Schwierigkeit, Steuern, Ausgaben und Schulden gleichzeitig zu senken."},
+   {v: "B", t:"Die Unmöglichkeit, BIP, Inflation und Arbeitslosigkeit gleichzeitig zu steuern."},
+   {v: "C", t:"Den Zielkonflikt zwischen Wirtschaftswachstum, Umweltschutz und sozialer Gerechtigkeit."},
+   {v: "D", t:"Den Konflikt zwischen Importen, Exporten und Binnennachfrage."}
  ],
- correct:"A",
+ correct:"C",
  explain:"Das Wachstumstrilemma besagt, dass die drei Ziele — wirtschaftliches Wachstum, ökologische Nachhaltigkeit und soziale Gerechtigkeit — in Spannung zueinander stehen. Fortschritte bei einem Ziel können Rückschritte bei einem anderen bedeuten."},
 
 {id:"n02", topic:"nachhaltigkeit", type:"sort", diff:2, tax:"K2",
@@ -1460,12 +1460,12 @@ window.QUESTIONS = [
 {id:"n04", topic:"nachhaltigkeit", type:"mc", diff:2, tax:"K2",
  q:"Was beschreibt das Jevons-Paradoxon (Rebound-Effekt)?",
  options:[
-   {v:"A", t:"Effizienzsteigerungen führen nicht zu Ressourceneinsparungen, weil der günstigere Verbrauch zu mehr Nutzung führt."},
-   {v:"B", t:"Technologischer Fortschritt führt immer zu weniger Ressourcenverbrauch."},
-   {v:"C", t:"Steigende Preise führen zu sinkendem Konsum."},
-   {v:"D", t:"Der Staat kann durch Regulierung den Ressourcenverbrauch steuern."}
+   {v: "A", t:"Technologischer Fortschritt führt immer zu weniger Ressourcenverbrauch."},
+   {v: "B", t:"Steigende Preise führen zu sinkendem Konsum."},
+   {v: "C", t:"Der Staat kann durch Regulierung den Ressourcenverbrauch steuern."},
+   {v: "D", t:"Effizienzsteigerungen führen nicht zu Ressourceneinsparungen, weil der günstigere Verbrauch zu mehr Nutzung führt."}
  ],
- correct:"A",
+ correct:"D",
  explain:"Jevons-Paradoxon (1865): Effizientere Dampfmaschinen führten zu MEHR Kohleverbrauch, weil die günstigere Energie mehr Nutzung anregte. Modernes Beispiel: LED-Lampen verbrauchen weniger Strom → Menschen lassen mehr Lichter brennen. Effizienz allein reicht nicht zur Ressourcenschonung."},
 
 {id:"n05", topic:"nachhaltigkeit", type:"tf", diff:2, tax:"K2",
@@ -1486,11 +1486,11 @@ window.QUESTIONS = [
 {id:"n08", topic:"nachhaltigkeit", type:"mc", diff:3, tax:"K4",
  q:"Welches der drei Wachstumsmodelle (Green Growth, Beyond Growth, Degrowth) setzt am stärksten auf staatliche Eingriffe?",
  options:[
-   {v:"A", t:"Beyond Growth — der Staat soll durch aktive Industrie-, Arbeitsmarkt- und Finanzpolitik die Wirtschaft neu ausrichten."},
-   {v:"B", t:"Green Growth — der Staat soll massiv in erneuerbare Energien investieren."},
-   {v:"C", t:"Degrowth — der Staat soll die Wirtschaft aktiv schrumpfen lassen."},
-   {v:"D", t:"Alle drei setzen gleich stark auf den Staat."}
+   {v: "A", t:"Green Growth — der Staat soll massiv in erneuerbare Energien investieren."},
+   {v: "B", t:"Beyond Growth — der Staat soll durch aktive Industrie-, Arbeitsmarkt- und Finanzpolitik die Wirtschaft neu ausrichten."},
+   {v: "C", t:"Degrowth — der Staat soll die Wirtschaft aktiv schrumpfen lassen."},
+   {v: "D", t:"Alle drei setzen gleich stark auf den Staat."}
  ],
- correct:"A",
+ correct:"B",
  explain:"Beyond Growth fordert explizit eine stärkere Rolle des Staates: aktive Industriepolitik, stärkere Finanzregulierung, prädistributive Massnahmen (Chancengleichheit vor der Umverteilung). Green Growth setzt mehr auf Marktmechanismen (Preissignale). Degrowth setzt teilweise auf gesellschaftliche Veränderung von unten."}
 ];

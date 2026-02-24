@@ -36,12 +36,12 @@ window.QUESTIONS = [
     id: "r01", topic: "rechtsquellen", type: "mc", diff: 1, tax: "K1",
     q: "Welcher Artikel des ZGB nennt die Rechtsquellen, auf die sich ein Gericht stützt?",
     options: [
-      {v: "A", t: "Art. 1 ZGB"},
-      {v: "B", t: "Art. 2 ZGB"},
+      {v: "A", t: "Art. 3 ZGB"},
+      {v: "B", t: "Art. 1 ZGB"},
       {v: "C", t: "Art. 8 ZGB"},
-      {v: "D", t: "Art. 3 ZGB"}
+      {v: "D", t: "Art. 2 ZGB"}
     ],
-    correct: "A",
+    correct: "B",
     explain: "Art. 1 ZGB ist der zentrale Einleitungsartikel, der die Rechtsquellen aufzählt: geschriebenes Recht, Gewohnheitsrecht und – bei Lücken – die richterliche Rechtsfindung."
   },
   {
@@ -65,12 +65,12 @@ window.QUESTIONS = [
     id: "r04", topic: "rechtsquellen", type: "mc", diff: 1, tax: "K1",
     q: "Wer muss einer Änderung der Bundesverfassung zustimmen?",
     options: [
-      {v: "A", t: "Der Bundesrat allein"},
-      {v: "B", t: "Das Parlament allein"},
-      {v: "C", t: "Volk und Stände (Kantone)"},
-      {v: "D", t: "Das Bundesgericht"}
+      {v: "A", t: "Das Bundesgericht"},
+      {v: "B", t: "Volk und Stände (Kantone)"},
+      {v: "C", t: "Das Parlament allein"},
+      {v: "D", t: "Der Bundesrat allein"}
     ],
-    correct: "C",
+    correct: "B",
     explain: "Verfassungsänderungen unterliegen dem obligatorischen Referendum und benötigen die Zustimmung der Mehrheit des Volkes und der Stände (Kantone)."
   },
 
@@ -79,12 +79,12 @@ window.QUESTIONS = [
     id: "r05", topic: "rechtsquellen", type: "mc", diff: 2, tax: "K2",
     q: "Was versteht man unter Gewohnheitsrecht?",
     options: [
-      {v: "A", t: "Gesetze, die schon sehr alt sind"},
-      {v: "B", t: "Althergebrachte, lang geübte Bräuche, die als allgemein verbindlich anerkannt werden"},
-      {v: "C", t: "Regeln, die vom Bundesrat gewohnheitsmässig erlassen werden"},
-      {v: "D", t: "Gerichtsentscheide, die zur Gewohnheit geworden sind"}
+      {v: "A", t: "Althergebrachte, lang geübte Bräuche, die als allgemein verbindlich anerkannt werden"},
+      {v: "B", t: "Gerichtsentscheide, die zur Gewohnheit geworden sind"},
+      {v: "C", t: "Gesetze, die schon sehr alt sind"},
+      {v: "D", t: "Regeln, die vom Bundesrat gewohnheitsmässig erlassen werden"}
     ],
-    correct: "B",
+    correct: "A",
     explain: "Gewohnheitsrecht beruht auf althergebrachten, lang geübten Bräuchen, die als allgemein verpflichtend anerkannt werden. Beispiele sind Orts- und Handelsbräuche (Handelsusanzen), wie die Berechnung eines Monats mit 30 Tagen bei Banken."
   },
   {
@@ -110,11 +110,11 @@ window.QUESTIONS = [
     q: "Warum benötigen Verordnungen eine ausdrückliche Grundlage in einem Gesetz?",
     options: [
       {v: "A", t: "Weil der Bundesrat sonst nicht weiss, worüber er eine Verordnung erlassen soll"},
-      {v: "B", t: "Weil die Verordnung die detaillierten Ausführungsbestimmungen zu einem Gesetz enthält und sich darauf stützen muss"},
-      {v: "C", t: "Weil es die Verfassung ausdrücklich so vorschreibt"},
+      {v: "B", t: "Weil es die Verfassung ausdrücklich so vorschreibt"},
+      {v: "C", t: "Weil die Verordnung die detaillierten Ausführungsbestimmungen zu einem Gesetz enthält und sich darauf stützen muss"},
       {v: "D", t: "Weil das Parlament jede Verordnung genehmigen muss"}
     ],
-    correct: "B",
+    correct: "C",
     explain: "Verordnungen enthalten detaillierte Bestimmungen darüber, wie ein Gesetz konkret angewendet werden soll. Sie benötigen deshalb eine ausdrückliche gesetzliche Grundlage – ohne Gesetz kann keine Verordnung erlassen werden."
   },
 
@@ -124,11 +124,11 @@ window.QUESTIONS = [
     q: "Ein Autohändler verkauft einem Kunden ein Fahrzeug. Im Vertrag steht: «Gerichtsstand ist Zürich.» Welche Rechtsquelle liegt dieser Klausel zugrunde?",
     options: [
       {v: "A", t: "Gewohnheitsrecht, weil es handelsüblich ist"},
-      {v: "B", t: "Geschriebenes Recht: Der Grundsatz des Gerichtsstands am Wohnsitz kann vertraglich abgeändert werden (Art. 30 Abs. 2 BV)"},
+      {v: "B", t: "Die Bundesverfassung, weil sie alle Verträge regelt"},
       {v: "C", t: "Richterliche Rechtsfindung, weil kein Gesetz den Gerichtsstand regelt"},
-      {v: "D", t: "Die Bundesverfassung, weil sie alle Verträge regelt"}
+      {v: "D", t: "Geschriebenes Recht: Der Grundsatz des Gerichtsstands am Wohnsitz kann vertraglich abgeändert werden (Art. 30 Abs. 2 BV)"}
     ],
-    correct: "B",
+    correct: "D",
     explain: "Art. 30 Abs. 2 BV gibt jeder Person Anspruch darauf, dass die Sache vom Gericht an ihrem Wohnsitz beurteilt wird. Auf diese Garantie kann aber vertraglich verzichtet werden, sofern dies in einer ausdrücklichen Erklärung geschieht. Die Gerichtsstandsklausel stützt sich somit auf geschriebenes Recht."
   },
   {
@@ -148,11 +148,11 @@ window.QUESTIONS = [
     q: "Warum gibt es in der Schweiz keine Verfassungsgerichtsbarkeit für Bundesgesetze?",
     options: [
       {v: "A", t: "Weil die Schweiz kein Verfassungsgericht hat"},
-      {v: "B", t: "Weil das Bundesgericht Bundesgesetze nicht auf ihre Verfassungsmässigkeit überprüfen darf, der Grundsatz «übergeordnetes Recht geht vor» auf Bundesebene also nur eingeschränkt gilt"},
-      {v: "C", t: "Weil alle Gesetze automatisch verfassungskonform sind"},
+      {v: "B", t: "Weil alle Gesetze automatisch verfassungskonform sind"},
+      {v: "C", t: "Weil das Bundesgericht Bundesgesetze nicht auf ihre Verfassungsmässigkeit überprüfen darf, der Grundsatz «übergeordnetes Recht geht vor» auf Bundesebene also nur eingeschränkt gilt"},
       {v: "D", t: "Weil kantonale Gerichte diese Aufgabe übernehmen"}
     ],
-    correct: "B",
+    correct: "C",
     explain: "In der Schweiz darf das Bundesgericht Bundesgesetze nicht auf ihre Verfassungsmässigkeit überprüfen. Praktisch gehen Gesetze der Verfassung deshalb nicht vor, aber sie können auch nicht für ungültig erklärt werden. Bei Verordnungen hingegen prüft das Bundesgericht indirekt die Verfassungsmässigkeit."
   },
 
@@ -174,12 +174,12 @@ window.QUESTIONS = [
     id: "t02", topic: "treu_glauben", type: "mc", diff: 1, tax: "K1",
     q: "An wen richtet sich das Gebot des Handelns nach Treu und Glauben gemäss Art. 2 Abs. 1 ZGB?",
     options: [
-      {v: "A", t: "Nur an Richterinnen und Richter"},
-      {v: "B", t: "Nur an Vertragsparteien"},
-      {v: "C", t: "An alle Rechtssubjekte"},
-      {v: "D", t: "Nur an juristische Personen"}
+      {v: "A", t: "Nur an Vertragsparteien"},
+      {v: "B", t: "Nur an juristische Personen"},
+      {v: "C", t: "Nur an Richterinnen und Richter"},
+      {v: "D", t: "An alle Rechtssubjekte"}
     ],
-    correct: "C",
+    correct: "D",
     explain: "Art. 2 Abs. 1 ZGB richtet sich an alle Rechtssubjekte – also an alle natürlichen und juristischen Personen. Es verlangt, dass jeder in der Rechtsausübung als anständiger und korrekter Mensch handelt."
   },
   {
@@ -194,10 +194,10 @@ window.QUESTIONS = [
     id: "t04", topic: "treu_glauben", type: "mc", diff: 2, tax: "K3",
     q: "Herr Wagner verspricht einem Interessenten seinen BMW für Fr. 10'000.–. Die briefliche Annahmeerklärung soll bis Freitag, 18. Juli, eintreffen. Am 18. Juli erhält Wagner einen Brief, dessen Umschlag aber leer ist. Wagner verkauft den Wagen daraufhin an eine andere Person. Ist das Verhalten von Herrn Wagner korrekt?",
     options: [
-      {v: "A", t: "Ja, weil keine Annahmeerklärung vorlag"},
+      {v: "A", t: "Nein, weil der Kaufvertrag bereits zustande gekommen war"},
       {v: "B", t: "Nein, weil er gemäss Art. 2 Abs. 1 ZGB nach Treu und Glauben den Absender hätte benachrichtigen müssen, dass der Briefumschlag leer war"},
-      {v: "C", t: "Ja, weil der Interessent selbst schuld ist"},
-      {v: "D", t: "Nein, weil der Kaufvertrag bereits zustande gekommen war"}
+      {v: "C", t: "Ja, weil keine Annahmeerklärung vorlag"},
+      {v: "D", t: "Ja, weil der Interessent selbst schuld ist"}
     ],
     correct: "B",
     explain: "Da zwischen Wagner und dem Interessenten ein Rechtsverhältnis bestand (Vertragsverhandlung), gebieten es Treu und Glauben (Art. 2 Abs. 1 ZGB), dass Wagner den Absender sofort benachrichtigt, wenn der Briefumschlag leer war. Berechtigtes Vertrauen soll nicht enttäuscht werden."
@@ -227,11 +227,11 @@ window.QUESTIONS = [
     q: "Während eines Lockdowns muss ein Mieter sein Restaurant mehrere Monate geschlossen halten und erzielt keine Einnahmen. Er klagt auf Mietzinsreduktion. Welcher Rechtsgrundsatz wird hier angerufen?",
     options: [
       {v: "A", t: "Rechtsmissbrauchsverbot (Art. 2 Abs. 2 ZGB)"},
-      {v: "B", t: "Der gute Glaube (Art. 3 ZGB)"},
-      {v: "C", t: "Handeln nach Treu und Glauben (Art. 2 Abs. 1 ZGB) – clausula rebus sic stantibus"},
-      {v: "D", t: "Beweislast (Art. 8 ZGB)"}
+      {v: "B", t: "Beweislast (Art. 8 ZGB)"},
+      {v: "C", t: "Der gute Glaube (Art. 3 ZGB)"},
+      {v: "D", t: "Handeln nach Treu und Glauben (Art. 2 Abs. 1 ZGB) – clausula rebus sic stantibus"}
     ],
-    correct: "C",
+    correct: "D",
     explain: "Es handelt sich um die clausula rebus sic stantibus: Obwohl Verträge grundsätzlich einzuhalten sind, kann es infolge grundlegend und unvorhersehbar veränderter Umstände (hier: Lockdown) nach dem Grundsatz von Treu und Glauben (Art. 2 Abs. 1 ZGB) dazu kommen, dass der Vertragspartner auf die Gegenleistung ganz oder teilweise verzichten muss."
   },
   {
@@ -239,11 +239,11 @@ window.QUESTIONS = [
     q: "A erhält von einem Gericht einen Entscheid mit der Rechtsmittelbelehrung, dass innerhalb von 30 Tagen Beschwerde geführt werden könne. A reicht nach 26 Tagen eine Beschwerde ein. Die obere Instanz erklärt, die Frist betrage gemäss ZPO nur 10 Tage. Wie entscheidet die obere Instanz?",
     options: [
       {v: "A", t: "Die Beschwerde wird abgewiesen, da die Frist abgelaufen ist."},
-      {v: "B", t: "Die Beschwerde wird zugelassen, weil A auf die Rechtsmittelbelehrung des unteren Gerichts vertrauen durfte (Art. 2 Abs. 1 ZGB)."},
-      {v: "C", t: "Die Beschwerde wird zugelassen, weil A gutgläubig war (Art. 3 ZGB)."},
-      {v: "D", t: "Die Beschwerde wird abgewiesen, weil Rechtsunkenntnis schadet."}
+      {v: "B", t: "Die Beschwerde wird zugelassen, weil A gutgläubig war (Art. 3 ZGB)."},
+      {v: "C", t: "Die Beschwerde wird abgewiesen, weil Rechtsunkenntnis schadet."},
+      {v: "D", t: "Die Beschwerde wird zugelassen, weil A auf die Rechtsmittelbelehrung des unteren Gerichts vertrauen durfte (Art. 2 Abs. 1 ZGB)."}
     ],
-    correct: "B",
+    correct: "D",
     explain: "A durfte auf die Richtigkeit der Rechtsmittelbelehrung des unteren Gerichts vertrauen. Dieses berechtigte Vertrauen wird durch den Grundsatz von Treu und Glauben (Art. 2 Abs. 1 ZGB) geschützt. Die obere Instanz muss deshalb trotz verspäteter Eingabe auf die Beschwerde eintreten."
   },
   {
@@ -270,12 +270,12 @@ window.QUESTIONS = [
     id: "m02", topic: "rechtsmissbrauch", type: "mc", diff: 1, tax: "K1",
     q: "Wann liegt gemäss Art. 2 Abs. 2 ZGB ein Rechtsmissbrauch vor?",
     options: [
-      {v: "A", t: "Immer wenn die Ausübung eines Rechts den anderen hart trifft"},
-      {v: "B", t: "Erst wenn ein krass stossendes Verhalten vorliegt"},
-      {v: "C", t: "Wenn ein Recht formell korrekt, aber für einen fragwürdigen Zweck ausgeübt wird"},
+      {v: "A", t: "Wenn ein Recht formell korrekt, aber für einen fragwürdigen Zweck ausgeübt wird"},
+      {v: "B", t: "Immer wenn die Ausübung eines Rechts den anderen hart trifft"},
+      {v: "C", t: "Erst wenn ein krass stossendes Verhalten vorliegt"},
       {v: "D", t: "Wenn jemand sein Recht nicht sofort ausübt"}
     ],
-    correct: "B",
+    correct: "C",
     explain: "Es liegt nicht schon dann Rechtsmissbrauch vor, wenn die Ausübung eines Rechts den anderen hart trifft. Erst ein krass stossendes Verhalten ist rechtsmissbräuchlich im Sinne von Art. 2 Abs. 2 ZGB."
   },
   {
@@ -290,9 +290,9 @@ window.QUESTIONS = [
     id: "m04", topic: "rechtsmissbrauch", type: "mc", diff: 2, tax: "K3",
     q: "Eine geschiedene Person zieht mit ihrem neuen Lebenspartner zusammen, heiratet aber nicht, um den Rentenanspruch gegenüber dem Ex-Ehepartner nicht zu verlieren. Wie ist dieses Verhalten rechtlich einzuordnen?",
     options: [
-      {v: "A", t: "Zulässig, weil das Gesetz das Zusammenleben ohne Heirat erlaubt"},
+      {v: "A", t: "Verstoss gegen Treu und Glauben, aber kein Rechtsmissbrauch"},
       {v: "B", t: "Rechtsmissbräuchlich, weil das formelle Beharren auf dem Recht missbräuchlich erscheint"},
-      {v: "C", t: "Verstoss gegen Treu und Glauben, aber kein Rechtsmissbrauch"},
+      {v: "C", t: "Zulässig, weil das Gesetz das Zusammenleben ohne Heirat erlaubt"},
       {v: "D", t: "Irrelevant, da der Rentenanspruch automatisch entfällt"}
     ],
     correct: "B",
@@ -322,12 +322,12 @@ window.QUESTIONS = [
     id: "m07", topic: "rechtsmissbrauch", type: "mc", diff: 3, tax: "K4",
     q: "F10: Im BGE 116 II 431ff. spielte Art. 2 ZGB eine entscheidende Rolle. Ein Autohändler verkaufte 1981 einen Fiat 131 CL Panorama als «fabrikneu». Der Wagen wurde aber bereits 1978 in die Schweiz eingeführt. Es handelte sich um ein dreijähriges Modell, das nicht mehr hergestellt wurde. Welcher Rechtsgrundsatz spielte die entscheidende Rolle?",
     options: [
-      {v: "A", t: "Das Rechtsmissbrauchsverbot (Art. 2 Abs. 2 ZGB)"},
-      {v: "B", t: "Das Gebot des Handelns nach Treu und Glauben (Art. 2 Abs. 1 ZGB)"},
+      {v: "A", t: "Das Gebot des Handelns nach Treu und Glauben (Art. 2 Abs. 1 ZGB)"},
+      {v: "B", t: "Das Rechtsmissbrauchsverbot (Art. 2 Abs. 2 ZGB)"},
       {v: "C", t: "Der gute Glaube (Art. 3 ZGB)"},
       {v: "D", t: "Die Beweislast (Art. 8 ZGB)"}
     ],
-    correct: "B",
+    correct: "A",
     explain: "Es handelt sich um einen Verstoss gegen das Gebot des Handelns nach Treu und Glauben (Art. 2 Abs. 1 ZGB). Der Autohändler hat den Käufer durch Verschweigen eines wesentlichen Umstandes (Alter des Fahrzeugs) getäuscht. Anständige und korrekte Menschen verschweigen solche Tatsachen nicht."
   },
   {
@@ -335,11 +335,11 @@ window.QUESTIONS = [
     q: "Für die Verpflichtungen einer AG haftet grundsätzlich nur deren Vermögen, nicht das Privatvermögen der Aktionäre. In welchem Fall können die Gerichte trotzdem auf den Aktionär durchgreifen?",
     options: [
       {v: "A", t: "Wenn die AG Verluste macht"},
-      {v: "B", t: "Wenn die AG von Anfang an so konzipiert war, dass sie nicht lebensfähig sein kann oder infolge Vermögensentzug durch die kleinste Schwierigkeit zu Fall kommt (Rechtsmissbrauch)"},
-      {v: "C", t: "Wenn der Aktionär Geschäftsführer ist"},
-      {v: "D", t: "Wenn die AG weniger als 3 Aktionäre hat"}
+      {v: "B", t: "Wenn der Aktionär Geschäftsführer ist"},
+      {v: "C", t: "Wenn die AG weniger als 3 Aktionäre hat"},
+      {v: "D", t: "Wenn die AG von Anfang an so konzipiert war, dass sie nicht lebensfähig sein kann oder infolge Vermögensentzug durch die kleinste Schwierigkeit zu Fall kommt (Rechtsmissbrauch)"}
     ],
-    correct: "B",
+    correct: "D",
     explain: "Wenn die AG-Struktur rechtsmissbräuchlich eingesetzt wird (Art. 2 Abs. 2 ZGB), können die Gerichte «den Schleier der juristischen Person» durchdringen und direkt auf den Aktionär greifen (Durchgriffshaftung / Piercing the corporate veil)."
   },
   {
@@ -359,9 +359,9 @@ window.QUESTIONS = [
     q: "Was regelt Art. 3 ZGB?",
     options: [
       {v: "A", t: "Das Gebot des Handelns nach Treu und Glauben"},
-      {v: "B", t: "Das Rechtsmissbrauchsverbot"},
+      {v: "B", t: "Die Beweislast"},
       {v: "C", t: "Den guten Glauben und seine Vermutung"},
-      {v: "D", t: "Die Beweislast"}
+      {v: "D", t: "Das Rechtsmissbrauchsverbot"}
     ],
     correct: "C",
     explain: "Art. 3 ZGB regelt den guten Glauben: Wo das Gesetz eine Rechtswirkung an den guten Glauben einer Person knüpft, ist dessen Dasein zu vermuten (Abs. 1). Wer bösgläubig sein musste, kann sich nicht auf den guten Glauben berufen (Abs. 2)."
@@ -387,12 +387,12 @@ window.QUESTIONS = [
     id: "g04", topic: "guter_glaube", type: "mc", diff: 2, tax: "K2",
     q: "Warum führt Art. 3 ZGB zu einer Umkehr der Beweislast?",
     options: [
-      {v: "A", t: "Weil der gute Glaube vermutet wird und somit nicht bewiesen werden muss – die Gegenpartei muss die Bösgläubigkeit beweisen"},
+      {v: "A", t: "Weil der gute Glaube nie bewiesen werden kann"},
       {v: "B", t: "Weil der Richter immer zugunsten des Gutgläubigen entscheidet"},
       {v: "C", t: "Weil Art. 8 ZGB bei Art. 3 ZGB nicht gilt"},
-      {v: "D", t: "Weil der gute Glaube nie bewiesen werden kann"}
+      {v: "D", t: "Weil der gute Glaube vermutet wird und somit nicht bewiesen werden muss – die Gegenpartei muss die Bösgläubigkeit beweisen"}
     ],
-    correct: "A",
+    correct: "D",
     explain: "Gemäss Art. 8 ZGB muss normalerweise derjenige eine Tatsache beweisen, der aus ihr Rechte ableitet. Bei Art. 3 ZGB wird der gute Glaube aber vermutet. Wer behauptet, der andere sei gutgläubig gewesen, muss dies nicht beweisen. Umgekehrt muss die Gegenpartei die Bösgläubigkeit beweisen – daher die Beweislastumkehr."
   },
   {
@@ -419,34 +419,34 @@ window.QUESTIONS = [
     id: "g07", topic: "guter_glaube", type: "mc", diff: 3, tax: "K3",
     q: "F12: Der Prokurist Franz Renggli wird fristlos entlassen und verpflichtet noch vor der Publikation des Prokuraentzugs im SHAB eine Rockgruppe. Der Agent der Rockgruppe behauptet, vom Entzug der Prokura nichts gewusst zu haben. Muss er seine Gutgläubigkeit beweisen?",
     options: [
-      {v: "A", t: "Ja, weil er als Kläger die Beweislast trägt"},
-      {v: "B", t: "Nein, weil der gute Glaube gemäss Art. 3 Abs. 1 ZGB vermutet wird"},
-      {v: "C", t: "Ja, weil bei Handelsregistereintragungen besondere Regeln gelten"},
-      {v: "D", t: "Nein, weil der Prokuraentzug noch nicht im SHAB publiziert war"}
+      {v: "A", t: "Nein, weil der Prokuraentzug noch nicht im SHAB publiziert war"},
+      {v: "B", t: "Ja, weil bei Handelsregistereintragungen besondere Regeln gelten"},
+      {v: "C", t: "Ja, weil er als Kläger die Beweislast trägt"},
+      {v: "D", t: "Nein, weil der gute Glaube gemäss Art. 3 Abs. 1 ZGB vermutet wird"}
     ],
-    correct: "B",
+    correct: "D",
     explain: "Gemäss Art. 3 Abs. 1 ZGB wird der gute Glaube vermutet. Der Agent muss seine Gutgläubigkeit nicht beweisen. Die Arbeitgeberin müsste beweisen, dass der Agent bösgläubig war, d.h. vom Prokuraentzug Kenntnis hatte."
   },
   {
     id: "g08", topic: "guter_glaube", type: "mc", diff: 3, tax: "K4",
     q: "Gemäss BGE 107 II 41 wurde einem Garagisten die Berufung auf den guten Glauben verwehrt, weil er einen Wagen im Wert von Fr. 19'250.– für Fr. 13'000.– kaufte, ohne das Eigentumsvorbehaltsregister zu prüfen. Welcher Absatz von Art. 3 ZGB kommt hier zum Tragen?",
     options: [
-      {v: "A", t: "Art. 3 Abs. 1 ZGB – die Vermutung des guten Glaubens"},
-      {v: "B", t: "Art. 3 Abs. 2 ZGB – wer bei der gebotenen Aufmerksamkeit nicht gutgläubig sein konnte, ist nicht berechtigt, sich auf den guten Glauben zu berufen"},
-      {v: "C", t: "Art. 3 Abs. 1 und 2 ZGB gleichermassen"},
-      {v: "D", t: "Keiner, es handelt sich um Gewohnheitsrecht"}
+      {v: "A", t: "Keiner, es handelt sich um Gewohnheitsrecht"},
+      {v: "B", t: "Art. 3 Abs. 1 und 2 ZGB gleichermassen"},
+      {v: "C", t: "Art. 3 Abs. 1 ZGB – die Vermutung des guten Glaubens"},
+      {v: "D", t: "Art. 3 Abs. 2 ZGB – wer bei der gebotenen Aufmerksamkeit nicht gutgläubig sein konnte, ist nicht berechtigt, sich auf den guten Glauben zu berufen"}
     ],
-    correct: "B",
+    correct: "D",
     explain: "Art. 3 Abs. 2 ZGB: Wer bei der Aufmerksamkeit, wie sie nach den Umständen von ihm verlangt werden darf, nicht gutgläubig sein konnte, ist nicht berechtigt, sich auf den guten Glauben zu berufen. Der Garagist hätte bei einem so verdächtig tiefen Preis das Eigentumsvorbehaltsregister prüfen müssen."
   },
   {
     id: "g09", topic: "guter_glaube", type: "mc", diff: 3, tax: "K3",
     q: "Peter kauft von einem fliegenden Händler an einer Autobahnraststätte 2 Stangen Marlboro-Zigaretten für je Fr. 36.–. Welcher Einleitungsartikel des ZGB ist hier relevant?",
     options: [
-      {v: "A", t: "Art. 1 ZGB (Rechtsquellen)"},
-      {v: "B", t: "Art. 2 Abs. 1 ZGB (Treu und Glauben)"},
+      {v: "A", t: "Art. 2 Abs. 1 ZGB (Treu und Glauben)"},
+      {v: "B", t: "Art. 8 ZGB (Beweislast)"},
       {v: "C", t: "Art. 3 ZGB (Der gute Glaube)"},
-      {v: "D", t: "Art. 8 ZGB (Beweislast)"}
+      {v: "D", t: "Art. 1 ZGB (Rechtsquellen)"}
     ],
     correct: "C",
     explain: "Art. 3 ZGB (guter Glaube): Peter kauft zu einem auffällig tiefen Preis von einem fliegenden Händler an der Raststätte. Aufgrund dieser Umstände musste er annehmen, dass die Zigaretten nicht regulär beschafft wurden. Er kann sich nicht auf den guten Glauben berufen (Art. 3 Abs. 2 ZGB)."
@@ -469,10 +469,10 @@ window.QUESTIONS = [
     id: "b02", topic: "beweislast", type: "mc", diff: 1, tax: "K1",
     q: "Was gilt im Strafprozessrecht hinsichtlich der Sachverhaltsabklärung?",
     options: [
-      {v: "A", t: "Die Verhandlungsmaxime"},
+      {v: "A", t: "Der Richter entscheidet nach Gutdünken"},
       {v: "B", t: "Die Untersuchungsmaxime – der Sachverhalt wird von Amtes wegen abgeklärt"},
       {v: "C", t: "Die Behauptungslast"},
-      {v: "D", t: "Der Richter entscheidet nach Gutdünken"}
+      {v: "D", t: "Die Verhandlungsmaxime"}
     ],
     correct: "B",
     explain: "Im Strafprozessrecht gilt die Untersuchungsmaxime: Der Sachverhalt muss von Amtes wegen abgeklärt werden. Es ist Aufgabe der Strafverfolgungsbehörden, die Wahrheit zu ermitteln."
@@ -489,10 +489,10 @@ window.QUESTIONS = [
     id: "b04", topic: "beweislast", type: "mc", diff: 2, tax: "K3",
     q: "Aus der Geschäftskasse sind während der letzten Wochen einige Hundert Franken gestohlen worden. Der Arbeitgeber verdächtigt die Putzfrau und entlässt sie fristlos. Die Putzfrau bestreitet den Diebstahl. Wer trägt die Beweislast?",
     options: [
-      {v: "A", t: "Die Putzfrau muss beweisen, dass sie unschuldig ist"},
+      {v: "A", t: "Beide Parteien tragen die Beweislast zu gleichen Teilen"},
       {v: "B", t: "Der Arbeitgeber muss beweisen, dass die Putzfrau die Täterin war, weil er aus dieser Tatsache das Recht zur fristlosen Entlassung ableitet"},
-      {v: "C", t: "Niemand, der Richter klärt von Amtes wegen ab"},
-      {v: "D", t: "Beide Parteien tragen die Beweislast zu gleichen Teilen"}
+      {v: "C", t: "Die Putzfrau muss beweisen, dass sie unschuldig ist"},
+      {v: "D", t: "Niemand, der Richter klärt von Amtes wegen ab"}
     ],
     correct: "B",
     explain: "Gemäss Art. 8 ZGB muss derjenige das Vorhandensein einer Tatsache beweisen, der aus ihr Rechte ableitet. Der Arbeitgeber leitet aus dem behaupteten Diebstahl das Recht ab, die Putzfrau fristlos entlassen zu dürfen. Daher muss er beweisen, dass sie die Täterin war."
@@ -521,24 +521,24 @@ window.QUESTIONS = [
     id: "b07", topic: "beweislast", type: "mc", diff: 3, tax: "K4",
     q: "Art. 97 OR regelt die Haftung bei Nichterfüllung eines Vertrags. Der Schuldner wird ersatzpflichtig, sofern er nicht beweist, dass ihn kein Verschulden trifft. Wie verhält sich dies zur Grundregel von Art. 8 ZGB?",
     options: [
-      {v: "A", t: "Es handelt sich um eine Ausnahme: Die Beweislast wird umgekehrt – nicht der Gläubiger muss das Verschulden beweisen, sondern der Schuldner muss beweisen, dass ihn keines trifft"},
-      {v: "B", t: "Es ist die gleiche Regel wie Art. 8 ZGB"},
-      {v: "C", t: "Art. 97 OR hebt Art. 8 ZGB für alle Vertragsverhältnisse auf"},
+      {v: "A", t: "Art. 97 OR hebt Art. 8 ZGB für alle Vertragsverhältnisse auf"},
+      {v: "B", t: "Es handelt sich um eine Ausnahme: Die Beweislast wird umgekehrt – nicht der Gläubiger muss das Verschulden beweisen, sondern der Schuldner muss beweisen, dass ihn keines trifft"},
+      {v: "C", t: "Es ist die gleiche Regel wie Art. 8 ZGB"},
       {v: "D", t: "Art. 97 OR gilt nur im Strafrecht"}
     ],
-    correct: "A",
+    correct: "B",
     explain: "Art. 97 OR kehrt die Beweislast um: Es wird vermutet, dass der Schuldner schuldhaft gehandelt hat. Der Gläubiger muss das Verschulden nicht beweisen. Stattdessen muss der Schuldner beweisen, dass ihn kein Verschulden trifft. Dies ist eine gesetzliche Ausnahme zu Art. 8 ZGB."
   },
   {
     id: "b08", topic: "beweislast", type: "mc", diff: 3, tax: "K4",
     q: "Der Richter klärt im Zivilprozess den Sachverhalt nicht von Amtes wegen ab. Was geschieht, wenn sich die Prozessparteien über wesentliche Tatsachen einig sind?",
     options: [
-      {v: "A", t: "Der Richter muss trotzdem Beweise erheben"},
-      {v: "B", t: "Die Parteien können dem Richter wesentliche Tatsachen vorenthalten, und der Richter darf einzig notorische Tatsachen von sich aus berücksichtigen"},
-      {v: "C", t: "Der Prozess wird eingestellt"},
+      {v: "A", t: "Die Parteien können dem Richter wesentliche Tatsachen vorenthalten, und der Richter darf einzig notorische Tatsachen von sich aus berücksichtigen"},
+      {v: "B", t: "Der Prozess wird eingestellt"},
+      {v: "C", t: "Der Richter muss trotzdem Beweise erheben"},
       {v: "D", t: "Der Richter muss einen Sachverständigen beiziehen"}
     ],
-    correct: "B",
+    correct: "A",
     explain: "Da im Zivilprozess die Verhandlungsmaxime gilt, befasst sich der Richter nur mit den von den Parteien behaupteten und bewiesenen Tatsachen. Sind sich die Parteien einig, können sie dem Richter Tatsachen vorenthalten. Der Richter darf von sich aus einzig notorische Tatsachen (jedermann bekannte Tatsachen) berücksichtigen."
   },
   {
@@ -557,12 +557,12 @@ window.QUESTIONS = [
     id: "w01", topic: "weitere", type: "mc", diff: 1, tax: "K1",
     q: "Was bedeutet der lateinische Grundsatz «Lex posterior derogat legi priori»?",
     options: [
-      {v: "A", t: "Das spezielle Recht geht dem allgemeinen Recht vor"},
-      {v: "B", t: "Das jüngere Recht geht dem älteren Recht vor"},
-      {v: "C", t: "Das übergeordnete Recht geht dem untergeordneten Recht vor"},
-      {v: "D", t: "Bundesrecht bricht kantonales Recht"}
+      {v: "A", t: "Das übergeordnete Recht geht dem untergeordneten Recht vor"},
+      {v: "B", t: "Bundesrecht bricht kantonales Recht"},
+      {v: "C", t: "Das jüngere Recht geht dem älteren Recht vor"},
+      {v: "D", t: "Das spezielle Recht geht dem allgemeinen Recht vor"}
     ],
-    correct: "B",
+    correct: "C",
     explain: "«Lex posterior derogat legi priori» bedeutet: Das jüngere (neuere) Recht geht dem älteren Recht vor. Beim Erlass eines neuen Gesetzes ist der Gesetzgeber bemüht, widersprechende ältere Erlasse formell aufzuheben."
   },
   {
@@ -597,9 +597,9 @@ window.QUESTIONS = [
     id: "w05", topic: "weitere", type: "mc", diff: 2, tax: "K3",
     q: "Ein Käufer weiss nicht, dass er mangelhafte Ware gemäss Art. 201 Abs. 2 OR sofort rügen muss. Die Ware gilt als genehmigt. Welcher Rechtsgrundsatz wird hier angewendet?",
     options: [
-      {v: "A", t: "Unwissenheit schützt vor Strafe nicht (Error iuris nocet)"},
+      {v: "A", t: "Wo kein Kläger, da kein Richter"},
       {v: "B", t: "Rechtsunkenntnis schadet (Ignorantia iuris nocet)"},
-      {v: "C", t: "Wo kein Kläger, da kein Richter"},
+      {v: "C", t: "Unwissenheit schützt vor Strafe nicht (Error iuris nocet)"},
       {v: "D", t: "Das jüngere Recht geht dem älteren Recht vor"}
     ],
     correct: "B",
@@ -617,24 +617,24 @@ window.QUESTIONS = [
     id: "w07", topic: "weitere", type: "mc", diff: 3, tax: "K4",
     q: "Das Versicherungsvertragsgesetz (VVG) regelt, dass ein Versicherer, der beim Vertragsabschluss über eine erhebliche Gefahrstatsache getäuscht wurde, innerhalb von 4 Wochen vom Vertrag zurücktreten kann. Das OR (allgemeines Recht) sieht bei Täuschung eine Anfechtungsfrist von 1 Jahr vor. Welche Frist gilt?",
     options: [
-      {v: "A", t: "1 Jahr gemäss OR, weil das OR das ältere Gesetz ist"},
-      {v: "B", t: "4 Wochen gemäss VVG, weil das spezielle Recht dem allgemeinen Recht vorgeht (lex specialis derogat legi generali)"},
-      {v: "C", t: "Beide Fristen gleichzeitig"},
-      {v: "D", t: "Die kürzere Frist, weil im Zweifel die kürzere Frist gilt"}
+      {v: "A", t: "4 Wochen gemäss VVG, weil das spezielle Recht dem allgemeinen Recht vorgeht (lex specialis derogat legi generali)"},
+      {v: "B", t: "1 Jahr gemäss OR, weil das OR das ältere Gesetz ist"},
+      {v: "C", t: "Die kürzere Frist, weil im Zweifel die kürzere Frist gilt"},
+      {v: "D", t: "Beide Fristen gleichzeitig"}
     ],
-    correct: "B",
+    correct: "A",
     explain: "Es gilt der Grundsatz «Lex specialis derogat legi generali»: Das Versicherungsvertragsgesetz als Spezialgesetz geht dem OR als allgemeinem Recht vor. Die Frist von 4 Wochen gemäss VVG gilt daher anstelle der 1-Jahres-Frist des OR."
   },
   {
     id: "w08", topic: "weitere", type: "mc", diff: 3, tax: "K4",
     q: "Ein Kanton erlaubt es dem Vermieter, Liegenschaftensteuern und Gebäudeversicherungsprämien als Nebenkosten auf den Mieter zu überwälzen. Art. 257a OR bestimmt jedoch, dass nur solche Kosten als Nebenkosten gelten, die mit dem Gebrauch der Sache im Zusammenhang stehen. Was gilt?",
     options: [
-      {v: "A", t: "Das kantonale Recht, weil es für den Kanton spezifisch ist"},
-      {v: "B", t: "Das Bundesrecht (OR), weil Bundesrecht kantonales Recht bricht (Art. 49 BV)"},
-      {v: "C", t: "Es kommt auf die Vereinbarung im Mietvertrag an"},
-      {v: "D", t: "Beide Regelungen gelten gleichzeitig"}
+      {v: "A", t: "Es kommt auf die Vereinbarung im Mietvertrag an"},
+      {v: "B", t: "Beide Regelungen gelten gleichzeitig"},
+      {v: "C", t: "Das Bundesrecht (OR), weil Bundesrecht kantonales Recht bricht (Art. 49 BV)"},
+      {v: "D", t: "Das kantonale Recht, weil es für den Kanton spezifisch ist"}
     ],
-    correct: "B",
+    correct: "C",
     explain: "Gemäss Art. 49 BV bricht Bundesrecht kantonales Recht. Wenn der Bund in einem Rechtsgebiet allein zuständig ist, dürfen die Kantone keine widersprechenden Gesetze erlassen. Die kantonale Bestimmung ist wegen der derogatorischen Kraft des Bundesrechts nichtig."
   },
   {

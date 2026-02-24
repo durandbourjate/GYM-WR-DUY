@@ -48,8 +48,8 @@ window.QUESTIONS = [
 
 {id:"k04",topic:"knappheit",type:"mc",diff:2,tax:"K2",
  q:"Was ist der Unterschied zwischen Volkswirtschaftslehre (VWL) und Betriebswirtschaftslehre (BWL)?",
- options:[{v:"A",t:"Die VWL betrachtet die gesamtwirtschaftlichen Zusammenhänge (alle Haushalte, Unternehmen, Staat), die BWL betrachtet einzelne Betriebe und deren Innenleben."},{v:"B",t:"Die VWL beschäftigt sich mit Geld, die BWL mit Gütern."},{v:"C",t:"Die VWL untersucht nur den Staat, die BWL nur die Privaten."},{v:"D",t:"Es gibt keinen wesentlichen Unterschied."}],
- correct:"A",explain:"BWL = Mikro-Perspektive (einzelnes Unternehmen, z.B. Marketing, Buchführung, Organisation). VWL = Makro-Perspektive (gesamte Volkswirtschaft, z.B. Arbeitslosigkeit, Inflation, Wirtschaftswachstum). Beide gehören zu den Wirtschaftswissenschaften, die wiederum Teil der Sozialwissenschaften sind."},
+ options:[{v: "A",t:"Die VWL untersucht nur den Staat, die BWL nur die Privaten."},{v: "B",t:"Die VWL betrachtet die gesamtwirtschaftlichen Zusammenhänge (alle Haushalte, Unternehmen, Staat), die BWL betrachtet einzelne Betriebe und deren Innenleben."},{v: "C",t:"Die VWL beschäftigt sich mit Geld, die BWL mit Gütern."},{v: "D",t:"Es gibt keinen wesentlichen Unterschied."}],
+ correct:"B",explain:"BWL = Mikro-Perspektive (einzelnes Unternehmen, z.B. Marketing, Buchführung, Organisation). VWL = Makro-Perspektive (gesamte Volkswirtschaft, z.B. Arbeitslosigkeit, Inflation, Wirtschaftswachstum). Beide gehören zu den Wirtschaftswissenschaften, die wiederum Teil der Sozialwissenschaften sind."},
 
 {id:"k05",topic:"knappheit",type:"open",diff:2,tax:"K2",
  q:"Erklären Sie, warum «Wirtschaften» notwendig ist. Verwenden Sie die Begriffe «Knappheit» und «Bedürfnisse».",
@@ -62,8 +62,8 @@ window.QUESTIONS = [
 
 {id:"k07",topic:"knappheit",type:"mc",diff:2,tax:"K2",
  q:"Welche drei Aufgaben hat die Volkswirtschaftslehre?",
- options:[{v:"A",t:"Beschreiben und erklären von Phänomenen, Prognostizieren von Entwicklungen, Möglichkeiten der Beeinflussung aufzeigen."},{v:"B",t:"Gewinne maximieren, Kosten senken, Märkte erobern."},{v:"C",t:"Gesetze erlassen, Steuern erheben, Währungen drucken."},{v:"D",t:"Preise festlegen, Löhne bestimmen, Handel regeln."}],
- correct:"A",explain:"Die VWL hat drei Aufgaben: (1) Theoretisch-wissenschaftlich: Phänomene beschreiben und erklären (z.B. warum gibt es Arbeitslosigkeit?). (2) Prognosen: Entwicklungen vorhersagen. (3) Wirtschaftspolitisch: Möglichkeiten der Beeinflussung aufzeigen."},
+ options:[{v: "A",t:"Preise festlegen, Löhne bestimmen, Handel regeln."},{v: "B",t:"Gesetze erlassen, Steuern erheben, Währungen drucken."},{v: "C",t:"Gewinne maximieren, Kosten senken, Märkte erobern."},{v: "D",t:"Beschreiben und erklären von Phänomenen, Prognostizieren von Entwicklungen, Möglichkeiten der Beeinflussung aufzeigen."}],
+ correct:"D",explain:"Die VWL hat drei Aufgaben: (1) Theoretisch-wissenschaftlich: Phänomene beschreiben und erklären (z.B. warum gibt es Arbeitslosigkeit?). (2) Prognosen: Entwicklungen vorhersagen. (3) Wirtschaftspolitisch: Möglichkeiten der Beeinflussung aufzeigen."},
 
 // ── NEU: k08–k10 ──
 {id:"k08",topic:"knappheit",type:"multi",diff:2,tax:"K2",
@@ -73,7 +73,7 @@ window.QUESTIONS = [
 
 {id:"k09",topic:"knappheit",type:"mc",diff:3,tax:"K4",
  q:"In einem Gedankenexperiment gäbe es plötzlich unbegrenzte Energie und alle Güter wären durch Roboter gratis herstellbar. Wäre Knappheit damit abgeschafft?",
- options:[{v:"A",t:"Nein, denn knappe Güter wie Zeit, persönliche Aufmerksamkeit und bestimmte Standorte lassen sich nicht beliebig vermehren."},{v:"B",t:"Ja, weil alle Bedürfnisse kostenlos befriedigt werden könnten."},{v:"C",t:"Ja, weil Knappheit nur ein Problem der Produktion ist."},{v:"D",t:"Nein, weil die Roboter selbst knapp wären."}],
+ options:[{v: "A",t:"Nein, denn knappe Güter wie Zeit, persönliche Aufmerksamkeit und bestimmte Standorte lassen sich nicht beliebig vermehren."},{v: "B",t:"Nein, weil die Roboter selbst knapp wären."},{v: "C",t:"Ja, weil Knappheit nur ein Problem der Produktion ist."},{v: "D",t:"Ja, weil alle Bedürfnisse kostenlos befriedigt werden könnten."}],
  correct:"A",explain:"Selbst bei unbegrenzter Güterproduktion blieben bestimmte Dinge knapp: Zeit (jeder Mensch hat nur 24 Stunden), Aufmerksamkeit anderer Menschen, einzigartige Standorte (Seegrundstück), natürliche Schönheit, Status und Ansehen. Knappheit ist letztlich ein Grundproblem, das sich nicht vollständig aufheben lässt."},
 
 {id:"k10",topic:"knappheit",type:"tf",diff:3,tax:"K4",
@@ -83,7 +83,7 @@ window.QUESTIONS = [
 // ──── BEDÜRFNISSE (b01–b11) ────
 {id:"b01",topic:"beduerfnisse",type:"mc",diff:1,tax:"K1",
  q:"Was versteht man unter einem Bedürfnis?",
- options:[{v:"A",t:"Den Wunsch, einen empfundenen Mangel zu beseitigen oder zu mildern."},{v:"B",t:"Die Menge an Gütern, die ein Haushalt kauft."},{v:"C",t:"Das Einkommen einer Person."},{v:"D",t:"Die Produktionsmenge eines Unternehmens."}],
+ options:[{v: "A",t:"Den Wunsch, einen empfundenen Mangel zu beseitigen oder zu mildern."},{v: "B",t:"Das Einkommen einer Person."},{v: "C",t:"Die Menge an Gütern, die ein Haushalt kauft."},{v: "D",t:"Die Produktionsmenge eines Unternehmens."}],
  correct:"A",explain:"Ein Bedürfnis ist der Wunsch, einen empfundenen Mangel zu beseitigen oder zu mildern. Der Begriff wird in der VWL sehr weit gefasst: Er umfasst nicht nur materielle Wünsche, sondern auch z.B. Macht, Ansehen, Sicherheit, Schönheit, Abwechslung und Selbstverwirklichung."},
 
 {id:"b02",topic:"beduerfnisse",type:"tf",diff:1,tax:"K1",
@@ -113,8 +113,8 @@ window.QUESTIONS = [
 
 {id:"b05",topic:"beduerfnisse",type:"mc",diff:2,tax:"K2",
  q:"Jemand kauft einen teuren Geländewagen, obwohl er nur in der Stadt fährt. Welche Bedürfnisstufe wird hier primär befriedigt?",
- options:[{v:"A",t:"Wertschätzungsbedürfnisse (Status, Ansehen) – der Geländewagen dient als Statussymbol."},{v:"B",t:"Körperliche Bedürfnisse – der Wagen bietet Mobilität."},{v:"C",t:"Sicherheitsbedürfnisse – der grosse Wagen schützt bei Unfällen."},{v:"D",t:"Soziale Bedürfnisse – man gehört zu einer Gemeinschaft."}],
- correct:"A",explain:"Dieses Beispiel stammt direkt aus dem Lehrbuch (Eisenhut). Wenn jemand einen Geländewagen für den Stadtverkehr kauft, wird damit ein anderes Bedürfnis (Status, Ansehen) befriedigt als dem Gut eigentlich zugedacht ist (Geländefahrten). Das Gut wird zum Statussymbol."},
+ options:[{v: "A",t:"Soziale Bedürfnisse – man gehört zu einer Gemeinschaft."},{v: "B",t:"Körperliche Bedürfnisse – der Wagen bietet Mobilität."},{v: "C",t:"Wertschätzungsbedürfnisse (Status, Ansehen) – der Geländewagen dient als Statussymbol."},{v: "D",t:"Sicherheitsbedürfnisse – der grosse Wagen schützt bei Unfällen."}],
+ correct:"C",explain:"Dieses Beispiel stammt direkt aus dem Lehrbuch (Eisenhut). Wenn jemand einen Geländewagen für den Stadtverkehr kauft, wird damit ein anderes Bedürfnis (Status, Ansehen) befriedigt als dem Gut eigentlich zugedacht ist (Geländefahrten). Das Gut wird zum Statussymbol."},
 
 {id:"b06",topic:"beduerfnisse",type:"open",diff:2,tax:"K3",
  q:"Nennen Sie ein eigenes Beispiel für ein Gut, das als Statussymbol verwendet wird, und erklären Sie, welches Bedürfnis damit eigentlich befriedigt wird.",
@@ -127,8 +127,8 @@ window.QUESTIONS = [
 
 {id:"b08",topic:"beduerfnisse",type:"mc",diff:2,tax:"K3",
  q:"Ein Schüler lernt 4 Stunden für eine Prüfung und erzielt die Note 5. Am nächsten Tag merkt er, dass sein Mitschüler mit nur 2 Stunden Lernzeit dieselbe Note erreicht hat. Welches ökonomische Konzept erklärt diesen Unterschied?",
- options:[{v:"A",t:"Der Mitschüler hat das Minimumprinzip (Sparsamkeitsprinzip) besser umgesetzt."},{v:"B",t:"Der Mitschüler hat das Maximumprinzip besser umgesetzt."},{v:"C",t:"Es handelt sich um Knappheit von Lernzeit."},{v:"D",t:"Der Mitschüler hat mehr Produktionsfaktoren eingesetzt."}],
- correct:"A",explain:"Minimumprinzip: Ein bestimmtes Ergebnis (Note 5) mit minimalem Aufwand (2 statt 4 Stunden) erreichen. Das ist wirtschaftlich effizienter. Das Maximumprinzip wäre umgekehrt: Mit gegebenem Aufwand das bestmögliche Ergebnis erzielen."},
+ options:[{v: "A",t:"Es handelt sich um Knappheit von Lernzeit."},{v: "B",t:"Der Mitschüler hat das Maximumprinzip besser umgesetzt."},{v: "C",t:"Der Mitschüler hat das Minimumprinzip (Sparsamkeitsprinzip) besser umgesetzt."},{v: "D",t:"Der Mitschüler hat mehr Produktionsfaktoren eingesetzt."}],
+ correct:"C",explain:"Minimumprinzip: Ein bestimmtes Ergebnis (Note 5) mit minimalem Aufwand (2 statt 4 Stunden) erreichen. Das ist wirtschaftlich effizienter. Das Maximumprinzip wäre umgekehrt: Mit gegebenem Aufwand das bestmögliche Ergebnis erzielen."},
 
 // ── NEU: b09–b11 ──
 {id:"b09",topic:"beduerfnisse",type:"multi",diff:2,tax:"K2",
@@ -138,8 +138,8 @@ window.QUESTIONS = [
 
 {id:"b10",topic:"beduerfnisse",type:"mc",diff:3,tax:"K4",
  q:"Maslow wird häufig kritisiert. Welcher Kritikpunkt ist aus volkswirtschaftlicher Sicht am gewichtigsten?",
- options:[{v:"A",t:"Die strikte Hierarchie stimmt empirisch nicht – Menschen gewichten Bedürfnisse je nach Kultur, Alter und Lebenssituation sehr unterschiedlich."},{v:"B",t:"Die Pyramide berücksichtigt nur materielle Bedürfnisse."},{v:"C",t:"Maslow hat seine Theorie nie wissenschaftlich überprüft."},{v:"D",t:"Die Pyramide gilt nur für westliche Gesellschaften, nicht für Entwicklungsländer."}],
- correct:"A",explain:"Die stärkste Kritik betrifft die starre Hierarchie: Empirisch lässt sich nicht belegen, dass Bedürfnisse strikt stufenweise befriedigt werden. In manchen Kulturen stehen soziale Bedürfnisse (Gemeinschaft) über individuellen Sicherheitsbedürfnissen. Eisenhut selbst relativiert: Menschen versuchen, Wünsche aus verschiedenen Ebenen gleichzeitig zu erfüllen. B ist falsch (die Pyramide umfasst auch immaterielle Bedürfnisse wie Zugehörigkeit und Selbstverwirklichung)."},
+ options:[{v: "A",t:"Die Pyramide berücksichtigt nur materielle Bedürfnisse."},{v: "B",t:"Maslow hat seine Theorie nie wissenschaftlich überprüft."},{v: "C",t:"Die Pyramide gilt nur für westliche Gesellschaften, nicht für Entwicklungsländer."},{v: "D",t:"Die strikte Hierarchie stimmt empirisch nicht – Menschen gewichten Bedürfnisse je nach Kultur, Alter und Lebenssituation sehr unterschiedlich."}],
+ correct:"D",explain:"Die stärkste Kritik betrifft die starre Hierarchie: Empirisch lässt sich nicht belegen, dass Bedürfnisse strikt stufenweise befriedigt werden. In manchen Kulturen stehen soziale Bedürfnisse (Gemeinschaft) über individuellen Sicherheitsbedürfnissen. Eisenhut selbst relativiert: Menschen versuchen, Wünsche aus verschiedenen Ebenen gleichzeitig zu erfüllen. B ist falsch (die Pyramide umfasst auch immaterielle Bedürfnisse wie Zugehörigkeit und Selbstverwirklichung)."},
 
 {id:"b11",topic:"beduerfnisse",type:"sort",diff:3,tax:"K4",
  q:"Betrachten Sie die Bedürfnispyramide. Ordnen Sie die folgenden konkreten Situationen der jeweils dominierenden Bedürfnisstufe zu.",
@@ -158,8 +158,8 @@ window.QUESTIONS = [
 // ──── GÜTER (g01–g11) ────
 {id:"g01",topic:"gueter",type:"mc",diff:1,tax:"K1",
  q:"Was unterscheidet freie Güter von wirtschaftlichen (knappen) Gütern?",
- options:[{v:"A",t:"Freie Güter sind von der Natur in ausreichender Menge vorhanden und gratis. Wirtschaftliche Güter sind knapp und haben einen Preis."},{v:"B",t:"Freie Güter werden vom Staat bereitgestellt, wirtschaftliche von Unternehmen."},{v:"C",t:"Freie Güter sind immer Dienstleistungen."},{v:"D",t:"Es gibt keinen Unterschied."}],
- correct:"A",explain:"Freie Güter: Von der Natur ausreichend vorhanden, z.B. Luft (in den meisten Situationen), Sonnenlicht. Wirtschaftliche Güter: Knapp und begehrt, deshalb nachgefragt und mit einem Preis versehen."},
+ options:[{v: "A",t:"Es gibt keinen Unterschied."},{v: "B",t:"Freie Güter sind immer Dienstleistungen."},{v: "C",t:"Freie Güter sind von der Natur in ausreichender Menge vorhanden und gratis. Wirtschaftliche Güter sind knapp und haben einen Preis."},{v: "D",t:"Freie Güter werden vom Staat bereitgestellt, wirtschaftliche von Unternehmen."}],
+ correct:"C",explain:"Freie Güter: Von der Natur ausreichend vorhanden, z.B. Luft (in den meisten Situationen), Sonnenlicht. Wirtschaftliche Güter: Knapp und begehrt, deshalb nachgefragt und mit einem Preis versehen."},
 
 {id:"g02",topic:"gueter",type:"sort",diff:1,tax:"K2",
  q:"Ordnen Sie die folgenden Beispiele der korrekten Güterkategorie zu.",
@@ -187,8 +187,8 @@ window.QUESTIONS = [
 
 {id:"g05",topic:"gueter",type:"mc",diff:2,tax:"K2",
  q:"Was unterscheidet Verbrauchsgüter von Gebrauchsgütern?",
- options:[{v:"A",t:"Verbrauchsgüter werden bei der Nutzung aufgebraucht (z.B. Lebensmittel), Gebrauchsgüter können längere Zeit benutzt werden (z.B. Smartphone)."},{v:"B",t:"Verbrauchsgüter sind teurer als Gebrauchsgüter."},{v:"C",t:"Verbrauchsgüter sind immer Lebensmittel."},{v:"D",t:"Gebrauchsgüter sind immer Investitionsgüter."}],
- correct:"A",explain:"Konsumgüter werden unterteilt in: Verbrauchsgüter (einmalige Nutzung, z.B. Essen, Getränke, Benzin) und Gebrauchsgüter (mehrmalige/längere Nutzung, z.B. Velo, Handy, Kleider, Spielkonsole)."},
+ options:[{v: "A",t:"Verbrauchsgüter sind teurer als Gebrauchsgüter."},{v: "B",t:"Verbrauchsgüter sind immer Lebensmittel."},{v: "C",t:"Gebrauchsgüter sind immer Investitionsgüter."},{v: "D",t:"Verbrauchsgüter werden bei der Nutzung aufgebraucht (z.B. Lebensmittel), Gebrauchsgüter können längere Zeit benutzt werden (z.B. Smartphone)."}],
+ correct:"D",explain:"Konsumgüter werden unterteilt in: Verbrauchsgüter (einmalige Nutzung, z.B. Essen, Getränke, Benzin) und Gebrauchsgüter (mehrmalige/längere Nutzung, z.B. Velo, Handy, Kleider, Spielkonsole)."},
 
 {id:"g06",topic:"gueter",type:"sort",diff:2,tax:"K2",
  q:"Ordnen Sie die Konsumgüter: Verbrauchsgüter oder Gebrauchsgüter?",
@@ -218,8 +218,8 @@ window.QUESTIONS = [
 {id:"g10",topic:"gueter",type:"mc",diff:3,tax:"K4",
  q:"Die Grafik zeigt eine Klassifikation der Güterarten. Wasser aus dem Hahn kostet in der Schweiz einen kleinen Betrag, in einem Wüstengebiet kann es ein Vielfaches kosten. Was zeigt dieses Beispiel über die Güterklassifikation?",
  img:{src:"img/vwl/beduerfnisse/gueterklassifikation_01.svg",alt:"Klassifikation der Güterarten: freie vs. wirtschaftliche Güter, Sachgüter und Dienstleistungen"},
- options:[{v:"A",t:"Die Grenze zwischen freien und wirtschaftlichen Gütern ist nicht fix, sondern hängt von der Knappheitssituation ab."},{v:"B",t:"Wasser ist immer ein wirtschaftliches Gut."},{v:"C",t:"Wasser ist immer ein freies Gut, nur die Aufbereitung kostet etwas."},{v:"D",t:"Die Güterklassifikation gilt nicht für natürliche Ressourcen."}],
- correct:"A",explain:"Die Einordnung als freies oder wirtschaftliches Gut ist nicht absolut, sondern abhängig von der Knappheitssituation. Wasser in der Schweiz ist relativ günstig (geringe Knappheit), in der Wüste extrem teuer (hohe Knappheit). Ebenso kann saubere Luft in einer stark verschmutzten Stadt zum wirtschaftlichen Gut werden. Die Güterklassifikation ist also kontextabhängig."},
+ options:[{v: "A",t:"Die Güterklassifikation gilt nicht für natürliche Ressourcen."},{v: "B",t:"Die Grenze zwischen freien und wirtschaftlichen Gütern ist nicht fix, sondern hängt von der Knappheitssituation ab."},{v: "C",t:"Wasser ist immer ein wirtschaftliches Gut."},{v: "D",t:"Wasser ist immer ein freies Gut, nur die Aufbereitung kostet etwas."}],
+ correct:"B",explain:"Die Einordnung als freies oder wirtschaftliches Gut ist nicht absolut, sondern abhängig von der Knappheitssituation. Wasser in der Schweiz ist relativ günstig (geringe Knappheit), in der Wüste extrem teuer (hohe Knappheit). Ebenso kann saubere Luft in einer stark verschmutzten Stadt zum wirtschaftlichen Gut werden. Die Güterklassifikation ist also kontextabhängig."},
 
 {id:"g11",topic:"gueter",type:"open",diff:3,tax:"K5",
  q:"Diskutieren Sie: Sollte sauberes Trinkwasser als freies Gut behandelt werden (gratis für alle), oder sollte es einen Preis haben? Argumentieren Sie mit dem Knappheitsprinzip.",
@@ -229,7 +229,7 @@ window.QUESTIONS = [
 // ──── PRODUKTIONSFAKTOREN (p01–p11) ────
 {id:"p01",topic:"produktionsfaktoren",type:"mc",diff:1,tax:"K1",
  q:"Welche vier Produktionsfaktoren unterscheidet man in der VWL?",
- options:[{v:"A",t:"Arbeit, natürliche Ressourcen (Boden), Realkapital und Wissen."},{v:"B",t:"Geld, Maschinen, Rohstoffe und Energie."},{v:"C",t:"Konsum, Investitionen, Staat und Exporte."},{v:"D",t:"Löhne, Zinsen, Mieten und Gewinne."}],
+ options:[{v: "A",t:"Arbeit, natürliche Ressourcen (Boden), Realkapital und Wissen."},{v: "B",t:"Löhne, Zinsen, Mieten und Gewinne."},{v: "C",t:"Geld, Maschinen, Rohstoffe und Energie."},{v: "D",t:"Konsum, Investitionen, Staat und Exporte."}],
  correct:"A",explain:"Die vier Produktionsfaktoren: (1) Arbeit = jede produktive Tätigkeit des Menschen. (2) Natürliche Ressourcen = Boden, Rohmaterial. (3) Realkapital = Maschinen, Anlagen, Gebäude. (4) Wissen = Humankapital (Können, Fähigkeiten) und technischer Fortschritt."},
 
 {id:"p02",topic:"produktionsfaktoren",type:"sort",diff:1,tax:"K2",
@@ -263,8 +263,8 @@ window.QUESTIONS = [
 
 {id:"p06",topic:"produktionsfaktoren",type:"mc",diff:2,tax:"K2",
  q:"Warum wird Wissen als der wichtigste Produktionsfaktor für moderne Volkswirtschaften angesehen?",
- options:[{v:"A",t:"Weil technischer Fortschritt und Humankapital die Produktivität aller anderen Faktoren steigern."},{v:"B",t:"Weil Wissen gratis ist und unbegrenzt zur Verfügung steht."},{v:"C",t:"Weil man ohne Wissen gar keine Güter produzieren kann."},{v:"D",t:"Weil Wissen den Produktionsfaktor Arbeit ersetzt."}],
- correct:"A",explain:"Wissen erhöht die Produktivität der anderen Faktoren: Besseres Know-how → effizientere Arbeit, bessere Nutzung von Ressourcen und produktivere Maschinen. Deshalb investieren moderne Volkswirtschaften stark in Bildung und Forschung."},
+ options:[{v: "A",t:"Weil man ohne Wissen gar keine Güter produzieren kann."},{v: "B",t:"Weil Wissen gratis ist und unbegrenzt zur Verfügung steht."},{v: "C",t:"Weil Wissen den Produktionsfaktor Arbeit ersetzt."},{v: "D",t:"Weil technischer Fortschritt und Humankapital die Produktivität aller anderen Faktoren steigern."}],
+ correct:"D",explain:"Wissen erhöht die Produktivität der anderen Faktoren: Besseres Know-how → effizientere Arbeit, bessere Nutzung von Ressourcen und produktivere Maschinen. Deshalb investieren moderne Volkswirtschaften stark in Bildung und Forschung."},
 
 {id:"p07",topic:"produktionsfaktoren",type:"tf",diff:2,tax:"K2",
  q:"Ein Bäckermeister, der seine langjährige Erfahrung im Brotbacken einsetzt, nutzt dabei nur den Produktionsfaktor Arbeit.",
@@ -272,8 +272,8 @@ window.QUESTIONS = [
 
 {id:"p08",topic:"produktionsfaktoren",type:"mc",diff:1,tax:"K1",
  q:"Welcher Produktionsfaktor wird mit dem Begriff «Realkapital» bezeichnet?",
- options:[{v:"A",t:"Maschinen, Anlagen und Gebäude – also produzierte Produktionsmittel."},{v:"B",t:"Das Geld auf dem Bankkonto eines Unternehmens."},{v:"C",t:"Die Arbeitskraft der Mitarbeitenden."},{v:"D",t:"Patente und geistiges Eigentum."}],
- correct:"A",explain:"Realkapital (auch Sachkapital) = produzierte Produktionsmittel wie Maschinen, Anlagen, Werkzeuge, Gebäude. Nicht zu verwechseln mit Geldkapital (Finanzmittel). Patente und Know-how gehören zum Produktionsfaktor Wissen."},
+ options:[{v: "A",t:"Patente und geistiges Eigentum."},{v: "B",t:"Maschinen, Anlagen und Gebäude – also produzierte Produktionsmittel."},{v: "C",t:"Die Arbeitskraft der Mitarbeitenden."},{v: "D",t:"Das Geld auf dem Bankkonto eines Unternehmens."}],
+ correct:"B",explain:"Realkapital (auch Sachkapital) = produzierte Produktionsmittel wie Maschinen, Anlagen, Werkzeuge, Gebäude. Nicht zu verwechseln mit Geldkapital (Finanzmittel). Patente und Know-how gehören zum Produktionsfaktor Wissen."},
 
 // ── NEU: p09–p11 ──
 {id:"p09",topic:"produktionsfaktoren",type:"multi",diff:2,tax:"K2",
@@ -283,8 +283,8 @@ window.QUESTIONS = [
 
 {id:"p10",topic:"produktionsfaktoren",type:"mc",diff:3,tax:"K4",
  q:"Die Schweiz hat wenig natürliche Ressourcen (kaum Rohstoffe, wenig Agrarfläche), ist aber eines der reichsten Länder der Welt. Welcher Produktionsfaktor erklärt diesen Widerspruch am besten?",
- options:[{v:"A",t:"Wissen – die Schweiz investiert stark in Bildung, Forschung und Innovation, was die Produktivität aller anderen Faktoren steigert."},{v:"B",t:"Realkapital – die Schweiz hat besonders viele Maschinen und Fabriken."},{v:"C",t:"Arbeit – die Schweizer arbeiten mehr Stunden als andere Völker."},{v:"D",t:"Natürliche Ressourcen – die Schweiz nutzt ihre Wasserkraft besonders gut."}],
- correct:"A",explain:"Die Schweiz ist ein Paradebeispiel dafür, dass Wissen (Humankapital + Innovation) der entscheidende Produktionsfaktor ist. Hochqualifizierte Arbeitskräfte, exzellente Forschung (ETH, Pharma), starke Berufsbildung und technologischer Fortschritt kompensieren den Mangel an Rohstoffen. Eisenhut betont: Wissen ist «für die wirtschaftliche Entwicklung eines Landes besonders bedeutungsvoll»."},
+ options:[{v: "A",t:"Arbeit – die Schweizer arbeiten mehr Stunden als andere Völker."},{v: "B",t:"Natürliche Ressourcen – die Schweiz nutzt ihre Wasserkraft besonders gut."},{v: "C",t:"Realkapital – die Schweiz hat besonders viele Maschinen und Fabriken."},{v: "D",t:"Wissen – die Schweiz investiert stark in Bildung, Forschung und Innovation, was die Produktivität aller anderen Faktoren steigert."}],
+ correct:"D",explain:"Die Schweiz ist ein Paradebeispiel dafür, dass Wissen (Humankapital + Innovation) der entscheidende Produktionsfaktor ist. Hochqualifizierte Arbeitskräfte, exzellente Forschung (ETH, Pharma), starke Berufsbildung und technologischer Fortschritt kompensieren den Mangel an Rohstoffen. Eisenhut betont: Wissen ist «für die wirtschaftliche Entwicklung eines Landes besonders bedeutungsvoll»."},
 
 {id:"p11",topic:"produktionsfaktoren",type:"tf",diff:3,tax:"K4",
  q:"Geldkapital (z.B. Bankguthaben eines Unternehmens) ist ein Produktionsfaktor.",
@@ -293,13 +293,13 @@ window.QUESTIONS = [
 // ──── ÖKONOMISCHES PRINZIP (o01–o09) ────
 {id:"o01",topic:"oekprinzip",type:"mc",diff:1,tax:"K1",
  q:"Was besagt das Maximumprinzip (Ergiebigkeitsprinzip)?",
- options:[{v:"A",t:"Mit gegebenem Aufwand (Input) das grösstmögliche Ergebnis (Output) erzielen."},{v:"B",t:"Ein bestimmtes Ergebnis mit minimalem Aufwand erreichen."},{v:"C",t:"Immer den maximalen Preis für ein Gut verlangen."},{v:"D",t:"Möglichst viel produzieren, unabhängig von den Kosten."}],
- correct:"A",explain:"Maximumprinzip: Gegebener Input → maximaler Output. Beispiel: 4 Stunden lernen (gegebener Aufwand) → bestmögliche Note erzielen. Das Gegenstück ist das Minimumprinzip: Bestimmtes Ergebnis → minimaler Aufwand."},
+ options:[{v: "A",t:"Immer den maximalen Preis für ein Gut verlangen."},{v: "B",t:"Möglichst viel produzieren, unabhängig von den Kosten."},{v: "C",t:"Ein bestimmtes Ergebnis mit minimalem Aufwand erreichen."},{v: "D",t:"Mit gegebenem Aufwand (Input) das grösstmögliche Ergebnis (Output) erzielen."}],
+ correct:"D",explain:"Maximumprinzip: Gegebener Input → maximaler Output. Beispiel: 4 Stunden lernen (gegebener Aufwand) → bestmögliche Note erzielen. Das Gegenstück ist das Minimumprinzip: Bestimmtes Ergebnis → minimaler Aufwand."},
 
 {id:"o02",topic:"oekprinzip",type:"mc",diff:1,tax:"K1",
  q:"Was besagt das Minimumprinzip (Sparsamkeitsprinzip)?",
- options:[{v:"A",t:"Ein bestimmtes Ergebnis (Output) mit möglichst geringem Aufwand (Input) erreichen."},{v:"B",t:"Immer das billigste Produkt kaufen."},{v:"C",t:"So wenig wie möglich arbeiten."},{v:"D",t:"Die Produktion auf ein Minimum reduzieren."}],
- correct:"A",explain:"Minimumprinzip: Bestimmter Output → minimaler Input. Beispiel: Note 5 erreichen (bestimmtes Ergebnis) → möglichst wenig Lernzeit aufwenden. Das Optimumprinzip vereint beide: Input und Output optimal aufeinander abstimmen."},
+ options:[{v: "A",t:"So wenig wie möglich arbeiten."},{v: "B",t:"Ein bestimmtes Ergebnis (Output) mit möglichst geringem Aufwand (Input) erreichen."},{v: "C",t:"Die Produktion auf ein Minimum reduzieren."},{v: "D",t:"Immer das billigste Produkt kaufen."}],
+ correct:"B",explain:"Minimumprinzip: Bestimmter Output → minimaler Input. Beispiel: Note 5 erreichen (bestimmtes Ergebnis) → möglichst wenig Lernzeit aufwenden. Das Optimumprinzip vereint beide: Input und Output optimal aufeinander abstimmen."},
 
 {id:"o03",topic:"oekprinzip",type:"sort",diff:2,tax:"K3",
  q:"Ordnen Sie die Beispiele dem Maximum- oder Minimumprinzip zu.",
@@ -340,8 +340,8 @@ window.QUESTIONS = [
 
 {id:"o08",topic:"oekprinzip",type:"mc",diff:3,tax:"K4",
  q:"Eine Schülerin lernt für zwei Prüfungen gleichzeitig. Für Mathe hat sie 3 Stunden eingeplant, für Deutsch 2 Stunden. Nach welchem ökonomischen Prinzip handelt sie?",
- options:[{v:"A",t:"Nach dem Optimumprinzip – sie teilt ihre begrenzte Lernzeit so auf, dass das Gesamtergebnis möglichst gut wird."},{v:"B",t:"Nach dem Maximumprinzip für jedes einzelne Fach."},{v:"C",t:"Nach dem Minimumprinzip, weil sie die Lernzeit minimiert."},{v:"D",t:"Nach keinem ökonomischen Prinzip, da es sich um Lernen und nicht um Wirtschaft handelt."}],
- correct:"A",explain:"Hier handelt die Schülerin nach dem Optimumprinzip: Sie hat begrenzte Ressourcen (Gesamtlernzeit) und muss diese so auf verschiedene Verwendungen aufteilen, dass das Gesamtergebnis möglichst gut ist. Das ist die Kernidee des Wirtschaftens: knappe Mittel optimal einsetzen. Ökonomische Prinzipien gelten nicht nur in der Wirtschaft, sondern in allen Bereichen des Lebens."},
+ options:[{v: "A",t:"Nach keinem ökonomischen Prinzip, da es sich um Lernen und nicht um Wirtschaft handelt."},{v: "B",t:"Nach dem Optimumprinzip – sie teilt ihre begrenzte Lernzeit so auf, dass das Gesamtergebnis möglichst gut wird."},{v: "C",t:"Nach dem Maximumprinzip für jedes einzelne Fach."},{v: "D",t:"Nach dem Minimumprinzip, weil sie die Lernzeit minimiert."}],
+ correct:"B",explain:"Hier handelt die Schülerin nach dem Optimumprinzip: Sie hat begrenzte Ressourcen (Gesamtlernzeit) und muss diese so auf verschiedene Verwendungen aufteilen, dass das Gesamtergebnis möglichst gut ist. Das ist die Kernidee des Wirtschaftens: knappe Mittel optimal einsetzen. Ökonomische Prinzipien gelten nicht nur in der Wirtschaft, sondern in allen Bereichen des Lebens."},
 
 {id:"o09",topic:"oekprinzip",type:"tf",diff:3,tax:"K4",
  q:"Das ökonomische Prinzip gilt nur für Unternehmen und den Staat, nicht für private Entscheidungen im Alltag.",
@@ -350,7 +350,7 @@ window.QUESTIONS = [
 // ──── ARBEITSTEILUNG, TAUSCH UND GELD (a01–a09) ────
 {id:"a01",topic:"arbeitsteilung",type:"mc",diff:1,tax:"K1",
  q:"Was ist der Hauptvorteil von Arbeitsteilung und Spezialisierung?",
- options:[{v:"A",t:"Die Produktivität (Leistung pro Stunde/Arbeitskraft) steigt, weil sich jeder auf seine Stärken spezialisiert."},{v:"B",t:"Alle verdienen gleich viel."},{v:"C",t:"Es gibt weniger Arbeitslose."},{v:"D",t:"Die Preise sinken automatisch."}],
+ options:[{v: "A",t:"Die Produktivität (Leistung pro Stunde/Arbeitskraft) steigt, weil sich jeder auf seine Stärken spezialisiert."},{v: "B",t:"Die Preise sinken automatisch."},{v: "C",t:"Es gibt weniger Arbeitslose."},{v: "D",t:"Alle verdienen gleich viel."}],
  correct:"A",explain:"Arbeitsteilung und Spezialisierung erhöhen die Produktivität: Jeder konzentriert sich auf das, was er am besten kann. Besonders Kräftige werden Bauarbeiter, kreativ Begabte Künstler, besonders Unentwegte Volkswirtschafter (Eisenhut). Das entschärft das Knappheitsproblem."},
 
 {id:"a02",topic:"arbeitsteilung",type:"tf",diff:1,tax:"K1",
@@ -359,8 +359,8 @@ window.QUESTIONS = [
 
 {id:"a03",topic:"arbeitsteilung",type:"mc",diff:2,tax:"K2",
  q:"Welche drei Funktionen erfüllt Geld?",
- options:[{v:"A",t:"Zahlungsmittel, Rechnungseinheit und Wertaufbewahrungsmittel."},{v:"B",t:"Sparmittel, Investitionsmittel und Kreditmittel."},{v:"C",t:"Tausch, Produktion und Konsum."},{v:"D",t:"Bargeld, Buchgeld und Kryptowährung."}],
- correct:"A",explain:"Die drei Funktionen des Geldes: (1) Zahlungsmittel – ermöglicht einfachen Tausch ohne Gütertausch (spart Zeit und Kosten). (2) Rechnungseinheit – ermöglicht transparente, vergleichbare Preise. (3) Wertaufbewahrungsmittel – ermöglicht Sparen, Konsum zeitlich verschieben."},
+ options:[{v: "A",t:"Sparmittel, Investitionsmittel und Kreditmittel."},{v: "B",t:"Zahlungsmittel, Rechnungseinheit und Wertaufbewahrungsmittel."},{v: "C",t:"Bargeld, Buchgeld und Kryptowährung."},{v: "D",t:"Tausch, Produktion und Konsum."}],
+ correct:"B",explain:"Die drei Funktionen des Geldes: (1) Zahlungsmittel – ermöglicht einfachen Tausch ohne Gütertausch (spart Zeit und Kosten). (2) Rechnungseinheit – ermöglicht transparente, vergleichbare Preise. (3) Wertaufbewahrungsmittel – ermöglicht Sparen, Konsum zeitlich verschieben."},
 
 {id:"a04",topic:"arbeitsteilung",type:"sort",diff:2,tax:"K2",
  q:"Ordnen Sie die Beispiele der korrekten Geldfunktion zu.",
@@ -401,8 +401,8 @@ window.QUESTIONS = [
 
 {id:"a09",topic:"arbeitsteilung",type:"mc",diff:3,tax:"K4",
  q:"In der Coronapandemie wurden internationale Lieferketten unterbrochen, und es gab Engpässe bei Computerchips und Medikamenten. Was zeigt dies über Arbeitsteilung?",
- options:[{v:"A",t:"Arbeitsteilung erhöht zwar die Effizienz, macht aber auch verletzlich: Hohe Spezialisierung und internationale Verflechtung schaffen Abhängigkeiten."},{v:"B",t:"Arbeitsteilung funktioniert nur in guten Zeiten und sollte abgeschafft werden."},{v:"C",t:"Die Engpässe zeigen, dass Arbeitsteilung die Produktivität nicht wirklich steigert."},{v:"D",t:"Nur nationale Arbeitsteilung ist sinnvoll, internationale nicht."}],
- correct:"A",explain:"Die Pandemie hat die Kehrseite der Arbeitsteilung sichtbar gemacht: Hohe Spezialisierung und globale Lieferketten schaffen gegenseitige Abhängigkeiten. Wenn ein Glied der Kette ausfällt, kann das ganze System gestört werden. Das heisst aber nicht, dass Arbeitsteilung schlecht ist – die Vorteile (höhere Produktivität, niedrigere Kosten) überwiegen deutlich. Es zeigt jedoch die Notwendigkeit von Risikomanagement und Diversifikation."},
+ options:[{v: "A",t:"Nur nationale Arbeitsteilung ist sinnvoll, internationale nicht."},{v: "B",t:"Arbeitsteilung funktioniert nur in guten Zeiten und sollte abgeschafft werden."},{v: "C",t:"Die Engpässe zeigen, dass Arbeitsteilung die Produktivität nicht wirklich steigert."},{v: "D",t:"Arbeitsteilung erhöht zwar die Effizienz, macht aber auch verletzlich: Hohe Spezialisierung und internationale Verflechtung schaffen Abhängigkeiten."}],
+ correct:"D",explain:"Die Pandemie hat die Kehrseite der Arbeitsteilung sichtbar gemacht: Hohe Spezialisierung und globale Lieferketten schaffen gegenseitige Abhängigkeiten. Wenn ein Glied der Kette ausfällt, kann das ganze System gestört werden. Das heisst aber nicht, dass Arbeitsteilung schlecht ist – die Vorteile (höhere Produktivität, niedrigere Kosten) überwiegen deutlich. Es zeigt jedoch die Notwendigkeit von Risikomanagement und Diversifikation."},
 
 // ──── WIRTSCHAFTSSEKTOREN (s01–s09) ────
 {id:"s01",topic:"sektoren",type:"mc",diff:1,tax:"K1",
@@ -423,8 +423,8 @@ window.QUESTIONS = [
 
 {id:"s03",topic:"sektoren",type:"mc",diff:2,tax:"K2",
  q:"Wie hat sich die Beschäftigungsstruktur in der Schweiz seit 1800 verändert (Strukturwandel)?",
- options:[{v:"A",t:"Von einem Agrarland (primärer Sektor dominiert) über ein Industrieland (sekundärer Sektor dominiert) zur Dienstleistungsgesellschaft (tertiärer Sektor dominiert)."},{v:"B",t:"Der primäre Sektor ist stetig gewachsen."},{v:"C",t:"Alle drei Sektoren sind gleich gross geblieben."},{v:"D",t:"Die Industrie dominiert heute stärker als je zuvor."}],
- correct:"A",explain:"Strukturwandel der Schweiz: Um 1800 arbeiteten über 50% im primären Sektor (Agrarland). Um 1900 dominierte der sekundäre Sektor (Industrieland). Heute arbeiten über 70% im tertiären Sektor (Dienstleistungsgesellschaft). Der primäre Sektor beschäftigt nur noch ca. 3%."},
+ options:[{v: "A",t:"Die Industrie dominiert heute stärker als je zuvor."},{v: "B",t:"Der primäre Sektor ist stetig gewachsen."},{v: "C",t:"Von einem Agrarland (primärer Sektor dominiert) über ein Industrieland (sekundärer Sektor dominiert) zur Dienstleistungsgesellschaft (tertiärer Sektor dominiert)."},{v: "D",t:"Alle drei Sektoren sind gleich gross geblieben."}],
+ correct:"C",explain:"Strukturwandel der Schweiz: Um 1800 arbeiteten über 50% im primären Sektor (Agrarland). Um 1900 dominierte der sekundäre Sektor (Industrieland). Heute arbeiten über 70% im tertiären Sektor (Dienstleistungsgesellschaft). Der primäre Sektor beschäftigt nur noch ca. 3%."},
 
 {id:"s04",topic:"sektoren",type:"tf",diff:1,tax:"K1",
  q:"Die Schweiz ist heute eine Dienstleistungsgesellschaft – der tertiäre Sektor ist der grösste.",
@@ -453,8 +453,8 @@ window.QUESTIONS = [
 {id:"s08",topic:"sektoren",type:"mc",diff:3,tax:"K4",
  q:"Die Grafik zeigt den Strukturwandel der Schweiz. Sektor A, B und C sind nicht beschriftet. Welche Zuordnung ist korrekt?",
  img:{src:"img/vwl/beduerfnisse/strukturwandel_01.svg",alt:"Drei Linien zeigen die Beschäftigungsentwicklung dreier Sektoren in der Schweiz von 1800 bis 2020"},
- options:[{v:"A",t:"A = primärer Sektor (sinkend), B = sekundärer Sektor (erst steigend, dann sinkend), C = tertiärer Sektor (steigend)"},{v:"B",t:"A = tertiärer Sektor, B = primärer Sektor, C = sekundärer Sektor"},{v:"C",t:"A = sekundärer Sektor, B = primärer Sektor, C = tertiärer Sektor"},{v:"D",t:"A = primärer Sektor, B = tertiärer Sektor, C = sekundärer Sektor"}],
- correct:"A",explain:"Der primäre Sektor (A, grün) sinkt kontinuierlich von über 50% um 1800 auf ca. 3% heute. Der sekundäre Sektor (B, blau) steigt mit der Industrialisierung an, erreicht um 1960 seinen Höhepunkt und sinkt dann. Der tertiäre Sektor (C, orange) steigt kontinuierlich und dominiert heute mit über 70%. Dieses Muster ist typisch für den Strukturwandel aller entwickelten Volkswirtschaften."},
+ options:[{v: "A",t:"A = primärer Sektor, B = tertiärer Sektor, C = sekundärer Sektor"},{v: "B",t:"A = primärer Sektor (sinkend), B = sekundärer Sektor (erst steigend, dann sinkend), C = tertiärer Sektor (steigend)"},{v: "C",t:"A = tertiärer Sektor, B = primärer Sektor, C = sekundärer Sektor"},{v: "D",t:"A = sekundärer Sektor, B = primärer Sektor, C = tertiärer Sektor"}],
+ correct:"B",explain:"Der primäre Sektor (A, grün) sinkt kontinuierlich von über 50% um 1800 auf ca. 3% heute. Der sekundäre Sektor (B, blau) steigt mit der Industrialisierung an, erreicht um 1960 seinen Höhepunkt und sinkt dann. Der tertiäre Sektor (C, orange) steigt kontinuierlich und dominiert heute mit über 70%. Dieses Muster ist typisch für den Strukturwandel aller entwickelten Volkswirtschaften."},
 
 {id:"s09",topic:"sektoren",type:"tf",diff:2,tax:"K2",
  q:"Der Rückgang des primären Sektors in der Schweiz bedeutet, dass die Landwirtschaft weniger produziert als früher.",

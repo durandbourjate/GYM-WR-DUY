@@ -39,12 +39,12 @@ window.QUESTIONS = [
   img: {src: "img/recht/einfuehrung/einfuehrung_moral_sitte_recht_01.svg", alt: "Diagramm: Drei Normsysteme – Moral, Sitte, Recht – und ihr Einfluss auf menschliches Verhalten"},
   q: "Was ist Moral?",
   options: [
-    {v: "A", t: "Die innere, nicht erzwingbare Einstellung und Werthaltung eines Menschen."},
-    {v: "B", t: "Ein äusseres, nicht erzwingbares, aber im Allgemeinen erwartetes Verhalten."},
+    {v: "A", t: "Ein äusseres, nicht erzwingbares, aber im Allgemeinen erwartetes Verhalten."},
+    {v: "B", t: "Die innere, nicht erzwingbare Einstellung und Werthaltung eines Menschen."},
     {v: "C", t: "Ordnungsregeln, die das äussere Verhalten bestimmen und staatlich erzwingbar sind."},
     {v: "D", t: "Ein Gerichtsentscheid, der Rechtskraft erlangt hat."}
   ],
-  correct: "A",
+  correct: "B",
   explain: "Moral (angewandte Ethik) ist die innere, nicht erzwingbare Einstellung und Werthaltung eines Menschen. Man handelt auch danach, wenn man nicht beobachtet wird. Im Gegensatz dazu betrifft Sitte das äussere Verhalten (B) und Recht ist staatlich erzwingbar (C)."
 },
 {
@@ -66,9 +66,9 @@ window.QUESTIONS = [
   q: "Was ist der Hauptunterschied zwischen Moral und Sitte?",
   options: [
     {v: "A", t: "Moral betrifft die innere Haltung, Sitte die äussere Haltung."},
-    {v: "B", t: "Moral ist erzwingbar, Sitte nicht."},
+    {v: "B", t: "Moral wird vom Staat durchgesetzt, Sitte von der Gesellschaft."},
     {v: "C", t: "Sitte betrifft die innere Haltung, Moral die äussere Haltung."},
-    {v: "D", t: "Moral wird vom Staat durchgesetzt, Sitte von der Gesellschaft."}
+    {v: "D", t: "Moral ist erzwingbar, Sitte nicht."}
   ],
   correct: "A",
   explain: "Moral bezieht sich auf die innere Haltung (Werte und Überzeugungen), Sitte auf die äussere Haltung (erwartetes Verhalten). Beide sind nicht erzwingbar – im Gegensatz zum Recht."
@@ -80,12 +80,12 @@ window.QUESTIONS = [
   context: "In einem Gymnasium weist eine Gruppe von Schülerinnen und Schülern einen störenden Mitschüler während der Unterrichtsstunde zurecht.",
   q: "Welche Regel beeinflusst das Verhalten der Schülergruppe am stärksten?",
   options: [
-    {v: "A", t: "Recht – es gibt eine gesetzliche Pflicht, störende Mitschüler zurechtzuweisen."},
-    {v: "B", t: "Moral – die Schüler handeln aus innerer Überzeugung."},
-    {v: "C", t: "Sitte – es ist ein gesellschaftlich erwartetes Verhalten, dass man störendes Verhalten nicht toleriert."},
-    {v: "D", t: "Recht – der Lehrer hat die Klasse dazu verpflichtet."}
+    {v: "A", t: "Sitte – es ist ein gesellschaftlich erwartetes Verhalten, dass man störendes Verhalten nicht toleriert."},
+    {v: "B", t: "Recht – der Lehrer hat die Klasse dazu verpflichtet."},
+    {v: "C", t: "Recht – es gibt eine gesetzliche Pflicht, störende Mitschüler zurechtzuweisen."},
+    {v: "D", t: "Moral – die Schüler handeln aus innerer Überzeugung."}
   ],
-  correct: "C",
+  correct: "A",
   explain: "Es gibt keine gesetzliche Pflicht, störende Mitschüler zurechtzuweisen. Das Verhalten entspricht einer gesellschaftlichen Erwartung (Sitte): Man erwartet, dass sich Mitschüler an gewisse Anstandsregeln halten und gegenseitig darauf hinweisen."
 },
 {
@@ -93,10 +93,10 @@ window.QUESTIONS = [
   context: "Ein Lehrer lehnt den Bestechungsversuch einer Schülerin ab, die ihm Geld anbietet, damit er ihre Note ändert.",
   q: "Welche Regel beeinflusst das Verhalten des Lehrers am stärksten?",
   options: [
-    {v: "A", t: "Sitte – Bestechung gilt als unanständig."},
+    {v: "A", t: "Moral und Recht gleichermassen."},
     {v: "B", t: "Moral – der Lehrer handelt aus innerer Überzeugung gegen Korruption."},
-    {v: "C", t: "Recht – Bestechung ist gesetzlich verboten und strafbar."},
-    {v: "D", t: "Moral und Recht gleichermassen."}
+    {v: "C", t: "Sitte – Bestechung gilt als unanständig."},
+    {v: "D", t: "Recht – Bestechung ist gesetzlich verboten und strafbar."}
   ],
   correct: "B",
   explain: "Der Lehrer handelt hier primär aus innerer Überzeugung (Moral). Zwar ist Bestechung auch rechtlich verboten (Art. 322ter ff. StGB), aber die Frage zielt auf die Regel, die das Verhalten zuerst und am stärksten beeinflusst. Die innere Haltung gegen Korruption ist der stärkste Antrieb."
@@ -127,23 +127,23 @@ window.QUESTIONS = [
   q: "Wie ist die Situation rechtlich einzuordnen?",
   options: [
     {v: "A", t: "Da der Schiedsrichter die Situation bereits mit einer gelben Karte geahndet hat, ist sie rechtlich erledigt."},
-    {v: "B", t: "Der Spielregelverstoss kann ausschliesslich sportlich sanktioniert werden – eine strafrechtliche Überprüfung ist ausgeschlossen."},
-    {v: "C", t: "Sportliche Sanktionen und rechtliche Konsequenzen sind unabhängig voneinander – bei groben Fouls mit Verletzungsfolge kann auch eine strafrechtliche Überprüfung erfolgen."},
+    {v: "B", t: "Sportliche Sanktionen und rechtliche Konsequenzen sind unabhängig voneinander – bei groben Fouls mit Verletzungsfolge kann auch eine strafrechtliche Überprüfung erfolgen."},
+    {v: "C", t: "Der Spielregelverstoss kann ausschliesslich sportlich sanktioniert werden – eine strafrechtliche Überprüfung ist ausgeschlossen."},
     {v: "D", t: "Nur wenn der Spieler absichtlich gefoult hat, kann er strafrechtlich belangt werden."}
   ],
-  correct: "C",
+  correct: "B",
   explain: "Spielleiter und Strafrichter haben unterschiedliche Aufgaben: Der Schiedsrichter sorgt für den geordneten Spielablauf, der Strafrichter schützt die öffentliche Ordnung. Wer Spielregeln massiv missachtet und gefährlich handelt, kann strafrechtlich zur Rechenschaft gezogen werden – unabhängig von sportlichen Sanktionen (vgl. Zwick, Kap. 1: Abgrenzung Recht und Spielregeln, BGE 109 IV 102ff.)."
 },
 {
   id: "m10", topic: "moral_sitte_recht", type: "mc", diff: 3, tax: "K5",
   q: "Warum reichen Moral und Sitte allein nicht aus, um das Zusammenleben in einer Gesellschaft zu regeln?",
   options: [
-    {v: "A", t: "Weil Moral und Sitte von Person zu Person unterschiedlich sein können und nicht durchsetzbar sind – ohne verbindliche, erzwingbare Regeln gäbe es keine Rechtssicherheit."},
-    {v: "B", t: "Weil Moral und Sitte veraltet sind und in modernen Gesellschaften keine Rolle mehr spielen."},
+    {v: "A", t: "Weil Moral und Sitte veraltet sind und in modernen Gesellschaften keine Rolle mehr spielen."},
+    {v: "B", t: "Weil Moral und Sitte von Person zu Person unterschiedlich sein können und nicht durchsetzbar sind – ohne verbindliche, erzwingbare Regeln gäbe es keine Rechtssicherheit."},
     {v: "C", t: "Weil der Staat kein Interesse an moralischem Verhalten hat."},
     {v: "D", t: "Weil Moral und Sitte nur für religiöse Menschen gelten."}
   ],
-  correct: "A",
+  correct: "B",
   explain: "Moral ist subjektiv (jeder hat eigene Werte) und Sitte ist gesellschaftlich variabel. Ohne verbindliche, staatlich erzwingbare Regeln (Recht) könnten Konflikte nicht verlässlich gelöst werden. Das Recht schafft Berechenbarkeit und Rechtssicherheit für alle Mitglieder der Gesellschaft."
 },
 {
@@ -170,12 +170,12 @@ window.QUESTIONS = [
   id: "o02", topic: "rechtsordnung", type: "mc", diff: 1, tax: "K1",
   q: "Was bedeutet «Gewaltmonopol» des Staates?",
   options: [
-    {v: "A", t: "Nur der Staat darf Gewalt anwenden – Bürgerinnen und Bürger verzichten auf Selbstjustiz."},
-    {v: "B", t: "Der Staat hat ein Monopol auf den Verkauf von Waffen."},
-    {v: "C", t: "Nur die Polizei darf Verbrecher verhaften."},
-    {v: "D", t: "Der Staat allein entscheidet, wer ins Gefängnis kommt."}
+    {v: "A", t: "Nur die Polizei darf Verbrecher verhaften."},
+    {v: "B", t: "Nur der Staat darf Gewalt anwenden – Bürgerinnen und Bürger verzichten auf Selbstjustiz."},
+    {v: "C", t: "Der Staat allein entscheidet, wer ins Gefängnis kommt."},
+    {v: "D", t: "Der Staat hat ein Monopol auf den Verkauf von Waffen."}
   ],
-  correct: "A",
+  correct: "B",
   explain: "Das Gewaltmonopol bedeutet, dass die Durchsetzung des Rechts mit Zwangsmitteln dem Staat vorbehalten ist. Die Bürgerinnen und Bürger verzichten auf Selbstjustiz und wenden sich stattdessen an staatliche Organe (Polizei, Gerichte), um ihre Rechte durchzusetzen."
 },
 {
@@ -188,12 +188,12 @@ window.QUESTIONS = [
   id: "o04", topic: "rechtsordnung", type: "mc", diff: 1, tax: "K2",
   q: "Welche Gerichtsinstanzen gibt es in der Schweiz (in aufsteigender Reihenfolge)?",
   options: [
-    {v: "A", t: "Bundesgericht → Obergericht → Bezirksgericht"},
-    {v: "B", t: "Bezirksgericht → Obergericht → Bundesgericht"},
+    {v: "A", t: "Bezirksgericht → Obergericht → Bundesgericht"},
+    {v: "B", t: "Obergericht → Bezirksgericht → Bundesgericht"},
     {v: "C", t: "Friedensrichter → Bundesgericht → Obergericht"},
-    {v: "D", t: "Obergericht → Bezirksgericht → Bundesgericht"}
+    {v: "D", t: "Bundesgericht → Obergericht → Bezirksgericht"}
   ],
-  correct: "B",
+  correct: "A",
   explain: "Die Instanzen in aufsteigender Reihenfolge sind: Bezirksgericht (erste Instanz) → Obergericht (kantonale Berufungsinstanz) → Bundesgericht (höchste Instanz). Je nach Kanton und Streitwert gibt es zudem noch ein Schlichtungsverfahren (z.B. Friedensrichter) vor dem Bezirksgericht."
 },
 
@@ -202,24 +202,24 @@ window.QUESTIONS = [
   id: "o05", topic: "rechtsordnung", type: "mc", diff: 2, tax: "K2",
   q: "Auf welche zwei Arten kann Rechtskraft eintreten?",
   options: [
-    {v: "A", t: "Wenn die Rechtsmittelfrist ungenutzt abläuft oder wenn die letzte Instanz entschieden hat."},
-    {v: "B", t: "Wenn beide Parteien dem Urteil zustimmen oder wenn der Richter es für rechtskräftig erklärt."},
-    {v: "C", t: "Wenn das Urteil veröffentlicht wird oder wenn 30 Tage vergangen sind."},
-    {v: "D", t: "Wenn das Bezirksgericht entschieden hat oder wenn das Bundesgericht den Fall ablehnt."}
+    {v: "A", t: "Wenn das Urteil veröffentlicht wird oder wenn 30 Tage vergangen sind."},
+    {v: "B", t: "Wenn die Rechtsmittelfrist ungenutzt abläuft oder wenn die letzte Instanz entschieden hat."},
+    {v: "C", t: "Wenn das Bezirksgericht entschieden hat oder wenn das Bundesgericht den Fall ablehnt."},
+    {v: "D", t: "Wenn beide Parteien dem Urteil zustimmen oder wenn der Richter es für rechtskräftig erklärt."}
   ],
-  correct: "A",
+  correct: "B",
   explain: "Rechtskraft tritt auf zwei Wegen ein: (1) Die Rechtsmittelfrist läuft ab, ohne dass ein Rechtsmittel eingelegt wird. (2) Die letzte Instanz hat entschieden – es gibt keine weitere Anfechtungsmöglichkeit mehr."
 },
 {
   id: "o06", topic: "rechtsordnung", type: "mc", diff: 2, tax: "K2",
   q: "Was passiert im Zivilrecht, wenn eine Partei ihre Verpflichtung nicht freiwillig erfüllt?",
   options: [
-    {v: "A", t: "Der Staat erzwingt die Erfüllung in natura (Realerfüllung) oder in Form von Schadenersatz."},
-    {v: "B", t: "Die Partei wird strafrechtlich verfolgt."},
-    {v: "C", t: "Der Vertrag wird automatisch aufgelöst."},
-    {v: "D", t: "Die andere Partei darf Selbstjustiz üben."}
+    {v: "A", t: "Die andere Partei darf Selbstjustiz üben."},
+    {v: "B", t: "Der Vertrag wird automatisch aufgelöst."},
+    {v: "C", t: "Der Staat erzwingt die Erfüllung in natura (Realerfüllung) oder in Form von Schadenersatz."},
+    {v: "D", t: "Die Partei wird strafrechtlich verfolgt."}
   ],
-  correct: "A",
+  correct: "C",
   explain: "Im Zivilrecht wird die Erfüllung in natura (Realerfüllung) erzwungen, sofern dies möglich ist (z.B. ein Mieter, der die Wohnung nicht verlässt, wird nötigenfalls mit Hilfe der Polizei ausgewiesen). Ist Realerfüllung nicht möglich, tritt an ihre Stelle die Pflicht, Schadenersatz zu zahlen."
 },
 {
@@ -241,12 +241,12 @@ window.QUESTIONS = [
   context: "Ein Steuerpflichtiger hat in der Steuererklärung Hard- und Software im Wert von Fr. 5'000.– als Berufsauslagen geltend gemacht. Der Steuerkommissär akzeptiert die Abzüge nicht und erhöht das steuerbare Einkommen um diesen Betrag.",
   q: "Was muss der Steuerpflichtige tun, wenn er mit dem Entscheid nicht einverstanden ist?",
   options: [
-    {v: "A", t: "Er muss innerhalb der Frist schriftliche Einsprache beim kantonalen Steueramt erheben."},
-    {v: "B", t: "Er kann direkt beim Bundesgericht klagen."},
-    {v: "C", t: "Er muss nichts tun – der Entscheid wird automatisch von einer höheren Instanz überprüft."},
-    {v: "D", t: "Er kann den Steuerkommissär persönlich um eine Änderung bitten."}
+    {v: "A", t: "Er muss nichts tun – der Entscheid wird automatisch von einer höheren Instanz überprüft."},
+    {v: "B", t: "Er kann den Steuerkommissär persönlich um eine Änderung bitten."},
+    {v: "C", t: "Er muss innerhalb der Frist schriftliche Einsprache beim kantonalen Steueramt erheben."},
+    {v: "D", t: "Er kann direkt beim Bundesgericht klagen."}
   ],
-  correct: "A",
+  correct: "C",
   explain: "Um den Entscheid anzufechten, muss der Steuerpflichtige fristgerecht ein ordentliches Rechtsmittel (Einsprache) einlegen. Unterlässt er dies, erwächst der Einschätzungsentscheid in Rechtskraft. Der Instanzenzug verlangt, dass zuerst die tieferen Instanzen durchlaufen werden – ein direkter Gang ans Bundesgericht ist nicht möglich."
 },
 {
@@ -260,11 +260,11 @@ window.QUESTIONS = [
   q: "Warum ist das Gewaltmonopol des Staates eine zentrale Voraussetzung für den Rechtsfrieden?",
   options: [
     {v: "A", t: "Weil der Staat dadurch willkürlich handeln kann."},
-    {v: "B", t: "Weil es verhindert, dass Bürger selbst Recht sprechen, und sicherstellt, dass Konflikte nach einheitlichen Regeln durch unabhängige Gerichte gelöst werden."},
-    {v: "C", t: "Weil ohne Gewaltmonopol keine Gesetze existieren würden."},
-    {v: "D", t: "Weil es den Bürgern verbietet, sich gegen den Staat zu wehren."}
+    {v: "B", t: "Weil es den Bürgern verbietet, sich gegen den Staat zu wehren."},
+    {v: "C", t: "Weil es verhindert, dass Bürger selbst Recht sprechen, und sicherstellt, dass Konflikte nach einheitlichen Regeln durch unabhängige Gerichte gelöst werden."},
+    {v: "D", t: "Weil ohne Gewaltmonopol keine Gesetze existieren würden."}
   ],
-  correct: "B",
+  correct: "C",
   explain: "Das Gewaltmonopol ist zentral für den Rechtsfrieden, weil es die Eliminierung der Selbsthilfe bedeutet. Rechtsstreitigkeiten werden durch einen Gerichts- oder Verwaltungsentscheid ein für allemal entschieden (Rechtskraft). Dies schafft Rechtssicherheit und verhindert Eskalation durch Selbstjustiz."
 },
 
@@ -278,12 +278,12 @@ window.QUESTIONS = [
   img: {src: "img/recht/einfuehrung/einfuehrung_rechtsstaat_01.svg", alt: "Diagramm: Vom Gewaltmonopol zum Rechtsstaat"},
   q: "Welchen drei Grundsätzen verpflichtet sich ein Rechtsstaat?",
   options: [
-    {v: "A", t: "Legalitätsprinzip, Gewaltenteilung und Schutz der Grundrechte."},
-    {v: "B", t: "Demokratie, Föderalismus und Neutralität."},
-    {v: "C", t: "Gewaltmonopol, Rechtskraft und Subsidiarität."},
-    {v: "D", t: "Verhältnismässigkeit, Rechtsgleichheit und Legalitätsprinzip."}
+    {v: "A", t: "Verhältnismässigkeit, Rechtsgleichheit und Legalitätsprinzip."},
+    {v: "B", t: "Gewaltmonopol, Rechtskraft und Subsidiarität."},
+    {v: "C", t: "Legalitätsprinzip, Gewaltenteilung und Schutz der Grundrechte."},
+    {v: "D", t: "Demokratie, Föderalismus und Neutralität."}
   ],
-  correct: "A",
+  correct: "C",
   explain: "Ein Rechtsstaat (z.B. die Schweiz) verpflichtet sich zur Achtung von drei zentralen Grundsätzen: (1) Legalitätsprinzip (Art. 5 Abs. 1 BV), (2) Gewaltenteilung (Legislative, Exekutive, Judikative) und (3) Schutz der Grundrechte (Art. 7–36 BV)."
 },
 {
@@ -298,12 +298,12 @@ window.QUESTIONS = [
   id: "s03", topic: "rechtsstaat", type: "mc", diff: 1, tax: "K1",
   q: "Welche drei Gewalten unterscheidet die Gewaltenteilung?",
   options: [
-    {v: "A", t: "Legislative (gesetzgebend), Exekutive (ausführend), Judikative (richterlich)."},
-    {v: "B", t: "Bundesrat, Parlament, Volk."},
-    {v: "C", t: "Gemeinde, Kanton, Bund."},
-    {v: "D", t: "Polizei, Gericht, Gefängnis."}
+    {v: "A", t: "Polizei, Gericht, Gefängnis."},
+    {v: "B", t: "Legislative (gesetzgebend), Exekutive (ausführend), Judikative (richterlich)."},
+    {v: "C", t: "Bundesrat, Parlament, Volk."},
+    {v: "D", t: "Gemeinde, Kanton, Bund."}
   ],
-  correct: "A",
+  correct: "B",
   explain: "Die Gewaltenteilung teilt die Macht des Staates in drei Gewalten: Legislative (gesetzgebend – auf Bundesebene das Parlament), Exekutive (ausführend – auf Bundesebene der Bundesrat) und Judikative (richterlich – höchstes Gericht ist das Bundesgericht)."
 },
 {
@@ -330,24 +330,24 @@ window.QUESTIONS = [
   id: "s06", topic: "rechtsstaat", type: "mc", diff: 2, tax: "K2",
   q: "Warum ist die Gewaltenteilung ein zentrales Merkmal des Rechtsstaats?",
   options: [
-    {v: "A", t: "Sie verhindert die Konzentration der Macht in einer Hand und ermöglicht gegenseitige Kontrolle."},
-    {v: "B", t: "Sie macht den Staat effizienter, weil jede Behörde nur eine Aufgabe hat."},
+    {v: "A", t: "Sie macht den Staat effizienter, weil jede Behörde nur eine Aufgabe hat."},
+    {v: "B", t: "Sie ermöglicht es den Bürgern, direkt Gesetze zu erlassen."},
     {v: "C", t: "Sie garantiert, dass alle Gesetze fair sind."},
-    {v: "D", t: "Sie ermöglicht es den Bürgern, direkt Gesetze zu erlassen."}
+    {v: "D", t: "Sie verhindert die Konzentration der Macht in einer Hand und ermöglicht gegenseitige Kontrolle."}
   ],
-  correct: "A",
+  correct: "D",
   explain: "Die Gewaltenteilung verteilt die Staatsmacht auf drei voneinander unabhängige Gewalten. Dadurch wird verhindert, dass eine einzelne Behörde oder Person zu viel Macht hat. Die Gewalten kontrollieren sich gegenseitig (checks and balances)."
 },
 {
   id: "s07", topic: "rechtsstaat", type: "mc", diff: 2, tax: "K4",
   q: "Was unterscheidet einen Rechtsstaat von einem autoritären Staat?",
   options: [
-    {v: "A", t: "Im Rechtsstaat gibt es Gesetze, im autoritären Staat nicht."},
-    {v: "B", t: "Im Rechtsstaat bindet das Legalitätsprinzip den Staat an die Gesetze, die Gewaltenteilung verhindert Machtkonzentration und die Grundrechte schützen die Bürger – in autoritären Staaten fehlen diese Garantien."},
-    {v: "C", t: "Im Rechtsstaat gibt es Wahlen, im autoritären Staat nicht."},
-    {v: "D", t: "Autoritäre Staaten haben keine Gerichte."}
+    {v: "A", t: "Im Rechtsstaat gibt es Wahlen, im autoritären Staat nicht."},
+    {v: "B", t: "Autoritäre Staaten haben keine Gerichte."},
+    {v: "C", t: "Im Rechtsstaat bindet das Legalitätsprinzip den Staat an die Gesetze, die Gewaltenteilung verhindert Machtkonzentration und die Grundrechte schützen die Bürger – in autoritären Staaten fehlen diese Garantien."},
+    {v: "D", t: "Im Rechtsstaat gibt es Gesetze, im autoritären Staat nicht."}
   ],
-  correct: "B",
+  correct: "C",
   explain: "Auch autoritäre Staaten (z.B. China, Russland) haben Gesetze, Wahlen und Gerichte. Der Unterschied liegt darin, dass in autoritären Staaten die Ordnungsregeln oft willkürlich gestaltet werden, die Macht zentralisiert ist und die Grundrechte nicht geschützt sind. Ein Rechtsstaat verpflichtet sich hingegen auf Legalitätsprinzip, Gewaltenteilung und Grundrechteschutz."
 },
 {
@@ -363,24 +363,24 @@ window.QUESTIONS = [
   context: "Während einer Pandemie erlässt der Bundesrat per Notverordnung Massnahmen, die die Versammlungsfreiheit (Art. 22 BV) einschränken.",
   q: "Wie beurteilen Sie diese Situation aus rechtsstaatlicher Perspektive?",
   options: [
-    {v: "A", t: "Die Einschränkung ist grundsätzlich zulässig, wenn sie auf einer gesetzlichen Grundlage beruht, einem öffentlichen Interesse dient und verhältnismässig ist."},
-    {v: "B", t: "Grundrechte dürfen unter keinen Umständen eingeschränkt werden – die Massnahme ist verfassungswidrig."},
-    {v: "C", t: "In einer Notlage darf der Bundesrat ohne gesetzliche Grundlage handeln."},
-    {v: "D", t: "Nur das Parlament darf Grundrechte einschränken."}
+    {v: "A", t: "Nur das Parlament darf Grundrechte einschränken."},
+    {v: "B", t: "In einer Notlage darf der Bundesrat ohne gesetzliche Grundlage handeln."},
+    {v: "C", t: "Die Einschränkung ist grundsätzlich zulässig, wenn sie auf einer gesetzlichen Grundlage beruht, einem öffentlichen Interesse dient und verhältnismässig ist."},
+    {v: "D", t: "Grundrechte dürfen unter keinen Umständen eingeschränkt werden – die Massnahme ist verfassungswidrig."}
   ],
-  correct: "A",
+  correct: "C",
   explain: "Art. 36 BV erlaubt Grundrechtseinschränkungen unter drei kumulativen Voraussetzungen: (1) gesetzliche Grundlage, (2) öffentliches Interesse (hier: Schutz der öffentlichen Gesundheit), (3) Verhältnismässigkeit. Auch Notverordnungen des Bundesrates bedürfen einer gesetzlichen Grundlage (z.B. Epidemiengesetz). Die Massnahme ist rechtsstaatlich vertretbar, sofern alle Voraussetzungen erfüllt sind."
 },
 {
   id: "s10", topic: "rechtsstaat", type: "mc", diff: 3, tax: "K4",
   q: "In welchem Zusammenhang stehen das Legalitätsprinzip (Art. 5 Abs. 1 BV) und die Grundrechte?",
   options: [
-    {v: "A", t: "Sie stehen in keinem Zusammenhang – das Legalitätsprinzip betrifft nur den Staat, Grundrechte nur die Bürger."},
-    {v: "B", t: "Beide begrenzen die Staatsmacht: Das Legalitätsprinzip verlangt eine gesetzliche Grundlage für staatliches Handeln, die Grundrechte setzen dem staatlichen Handeln inhaltliche Grenzen."},
-    {v: "C", t: "Das Legalitätsprinzip ist ein Grundrecht."},
-    {v: "D", t: "Grundrechte gelten nur, wenn das Legalitätsprinzip nicht verletzt wird."}
+    {v: "A", t: "Grundrechte gelten nur, wenn das Legalitätsprinzip nicht verletzt wird."},
+    {v: "B", t: "Sie stehen in keinem Zusammenhang – das Legalitätsprinzip betrifft nur den Staat, Grundrechte nur die Bürger."},
+    {v: "C", t: "Beide begrenzen die Staatsmacht: Das Legalitätsprinzip verlangt eine gesetzliche Grundlage für staatliches Handeln, die Grundrechte setzen dem staatlichen Handeln inhaltliche Grenzen."},
+    {v: "D", t: "Das Legalitätsprinzip ist ein Grundrecht."}
   ],
-  correct: "B",
+  correct: "C",
   explain: "Das Legalitätsprinzip und die Grundrechte sind zwei sich ergänzende Begrenzungen der Staatsmacht. Das Legalitätsprinzip verlangt eine formelle Grundlage (Gesetze) für jedes staatliche Handeln. Die Grundrechte setzen darüber hinaus inhaltliche Grenzen – auch wenn ein Gesetz existiert, darf es die Grundrechte nur unter den Voraussetzungen von Art. 36 BV einschränken."
 },
 {
@@ -404,9 +404,9 @@ window.QUESTIONS = [
   q: "Was regelt das Privatrecht?",
   options: [
     {v: "A", t: "Koordinative Rechtsbeziehungen zwischen gleichberechtigten Rechtssubjekten."},
-    {v: "B", t: "Subordinative Rechtsbeziehungen zwischen Staat und Bürger."},
-    {v: "C", t: "Ausschliesslich Beziehungen zwischen natürlichen Personen."},
-    {v: "D", t: "Nur Beziehungen zwischen juristischen Personen."}
+    {v: "B", t: "Ausschliesslich Beziehungen zwischen natürlichen Personen."},
+    {v: "C", t: "Nur Beziehungen zwischen juristischen Personen."},
+    {v: "D", t: "Subordinative Rechtsbeziehungen zwischen Staat und Bürger."}
   ],
   correct: "A",
   explain: "Das Privatrecht regelt koordinative Rechtsbeziehungen zwischen gleichberechtigten Rechtssubjekten (natürliche und juristische Personen). Die Parteien begegnen sich auf Augenhöhe. Im Gegensatz dazu regelt das öffentliche Recht subordinative Beziehungen (Über-/Unterordnung) zwischen Staat und Bürger."
@@ -423,12 +423,12 @@ window.QUESTIONS = [
   id: "p03", topic: "oeffentlich_privat", type: "mc", diff: 1, tax: "K2",
   q: "Welches der folgenden Rechtsgebiete gehört zum Privatrecht?",
   options: [
-    {v: "A", t: "Strafrecht"},
-    {v: "B", t: "Verwaltungsrecht"},
-    {v: "C", t: "Obligationenrecht"},
-    {v: "D", t: "Prozessrecht"}
+    {v: "A", t: "Obligationenrecht"},
+    {v: "B", t: "Prozessrecht"},
+    {v: "C", t: "Strafrecht"},
+    {v: "D", t: "Verwaltungsrecht"}
   ],
-  correct: "C",
+  correct: "A",
   explain: "Das Obligationenrecht (OR) gehört zum Privatrecht. Es regelt Beziehungen zwischen gleichberechtigten Rechtssubjekten (z.B. Kauf-, Miet- oder Arbeitsverträge). Strafrecht, Verwaltungsrecht und Prozessrecht gehören zum öffentlichen Recht."
 },
 {
@@ -449,24 +449,24 @@ window.QUESTIONS = [
   id: "p05", topic: "oeffentlich_privat", type: "mc", diff: 2, tax: "K2",
   q: "Was bedeutet «dispositives Recht»?",
   options: [
-    {v: "A", t: "Ergänzendes Recht, das nur gilt, wenn die Parteien keine andere Abmachung getroffen haben."},
+    {v: "A", t: "Recht, das vom Staat jederzeit geändert werden kann."},
     {v: "B", t: "Recht, das von den Parteien zwingend eingehalten werden muss."},
     {v: "C", t: "Recht, das nur für bestimmte Berufsgruppen gilt."},
-    {v: "D", t: "Recht, das vom Staat jederzeit geändert werden kann."}
+    {v: "D", t: "Ergänzendes Recht, das nur gilt, wenn die Parteien keine andere Abmachung getroffen haben."}
   ],
-  correct: "A",
+  correct: "D",
   explain: "Dispositives Recht (ergänzendes Recht) gilt nur dann, wenn die Parteien keine abweichende Vereinbarung getroffen haben. Viele Normen im Privatrecht sind dispositiver Natur – die Parteien können sie bei gegenseitigem Einverständnis vertraglich abändern."
 },
 {
   id: "p06", topic: "oeffentlich_privat", type: "mc", diff: 2, tax: "K2",
   q: "Was bedeutet «relativ zwingendes Recht»?",
   options: [
-    {v: "A", t: "Bestimmungen, die nur zugunsten einer (meist schwächeren) Partei abgeändert werden dürfen."},
+    {v: "A", t: "Bestimmungen, die nur für Verwandte gelten."},
     {v: "B", t: "Bestimmungen, die relativ selten angewandt werden."},
-    {v: "C", t: "Bestimmungen, die nur für Verwandte gelten."},
-    {v: "D", t: "Bestimmungen, die teilweise zwingend und teilweise dispositiv sind."}
+    {v: "C", t: "Bestimmungen, die teilweise zwingend und teilweise dispositiv sind."},
+    {v: "D", t: "Bestimmungen, die nur zugunsten einer (meist schwächeren) Partei abgeändert werden dürfen."}
   ],
-  correct: "A",
+  correct: "D",
   explain: "Relativ zwingendes Recht sind Bestimmungen, die nur zugunsten einer (meist schwächeren) Partei abgeändert werden dürfen. Beispiel: Im Arbeitsrecht darf vertraglich ein höherer Mindestlohn, aber kein niedrigerer vereinbart werden."
 },
 {
@@ -474,12 +474,12 @@ window.QUESTIONS = [
   context: "«Zum Abschluss eines Vertrages ist die übereinstimmende gegenseitige Willensäusserung der Parteien erforderlich.» (Art. 1 Abs. 1 OR)",
   q: "Handelt es sich bei diesem Artikel um öffentliches Recht oder Privatrecht?",
   options: [
-    {v: "A", t: "Öffentliches Recht – weil es eine staatliche Vorschrift ist."},
-    {v: "B", t: "Privatrecht – weil er die Beziehung zwischen gleichberechtigten Vertragsparteien regelt."},
+    {v: "A", t: "Beides – weil der Artikel sowohl im öffentlichen als auch im privaten Recht gilt."},
+    {v: "B", t: "Öffentliches Recht – weil es eine staatliche Vorschrift ist."},
     {v: "C", t: "Öffentliches Recht – weil Verträge beim Staat registriert werden müssen."},
-    {v: "D", t: "Beides – weil der Artikel sowohl im öffentlichen als auch im privaten Recht gilt."}
+    {v: "D", t: "Privatrecht – weil er die Beziehung zwischen gleichberechtigten Vertragsparteien regelt."}
   ],
-  correct: "B",
+  correct: "D",
   explain: "Art. 1 Abs. 1 OR regelt den Vertragsabschluss zwischen gleichberechtigten Parteien. Es handelt sich um Privatrecht (Obligationenrecht als Teil des ZGB). Das Kriterium ist nicht, ob eine staatliche Vorschrift vorliegt (das trifft auf alles Recht zu), sondern ob die Beziehung koordinativ (Privatrecht) oder subordinativ (öffentliches Recht) ist."
 },
 {
@@ -496,8 +496,8 @@ window.QUESTIONS = [
   q: "Warum gehört dieser Artikel zum öffentlichen Recht?",
   options: [
     {v: "A", t: "Weil er eine subordinative Rechtsbeziehung regelt: Der Staat (Staatsanwaltschaft) tritt dem Täter nicht auf Augenhöhe gegenüber, und die Norm ist zwingend."},
-    {v: "B", t: "Weil er eine Strafe vorsieht."},
-    {v: "C", t: "Weil er im Strafgesetzbuch steht."},
+    {v: "B", t: "Weil er im Strafgesetzbuch steht."},
+    {v: "C", t: "Weil er eine Strafe vorsieht."},
     {v: "D", t: "Weil er für alle Menschen gilt."}
   ],
   correct: "A",
@@ -520,10 +520,10 @@ window.QUESTIONS = [
   context: "Ein Arbeitgeber bietet einer Arbeitnehmerin im Vertrag eine Kündigungsfrist von einem Monat an. Das Gesetz sieht im ersten Dienstjahr ebenfalls eine Kündigungsfrist von einem Monat vor (Art. 335c Abs. 1 OR).",
   q: "Dürfte der Arbeitgeber vertraglich eine kürzere Kündigungsfrist (z.B. 2 Wochen) vereinbaren?",
   options: [
-    {v: "A", t: "Ja, weil das Arbeitsrecht dispositiv ist."},
+    {v: "A", t: "Nein, weil die Kündigungsfrist absolut zwingend ist."},
     {v: "B", t: "Nein, weil die gesetzliche Kündigungsfrist relativ zwingend ist – sie darf nur zugunsten der Arbeitnehmerin (also durch eine längere Frist) abgeändert werden."},
     {v: "C", t: "Ja, wenn beide Parteien einverstanden sind."},
-    {v: "D", t: "Nein, weil die Kündigungsfrist absolut zwingend ist."}
+    {v: "D", t: "Ja, weil das Arbeitsrecht dispositiv ist."}
   ],
   correct: "B",
   explain: "Die gesetzlichen Kündigungsfristen im Arbeitsrecht sind relativ zwingend zugunsten des Arbeitnehmers. Das bedeutet: Eine längere Frist darf vereinbart werden (zum Vorteil des Arbeitnehmers), eine kürzere jedoch nicht. Dies ist ein typisches Beispiel für relativ zwingendes Recht – es schützt die schwächere Partei (Arbeitnehmer)."
@@ -553,12 +553,12 @@ window.QUESTIONS = [
   id: "r02", topic: "rechtsanwendung", type: "mc", diff: 1, tax: "K1",
   q: "Was versteht man unter Subsumtion?",
   options: [
-    {v: "A", t: "Das Anwenden von abstrakten Gesetzesnormen auf konkrete Sachverhalte."},
-    {v: "B", t: "Das Erstellen eines neuen Gesetzes durch das Parlament."},
-    {v: "C", t: "Das Zusammenfassen eines Gerichtsentscheids."},
-    {v: "D", t: "Das Anfechten eines Urteils bei einer höheren Instanz."}
+    {v: "A", t: "Das Anfechten eines Urteils bei einer höheren Instanz."},
+    {v: "B", t: "Das Zusammenfassen eines Gerichtsentscheids."},
+    {v: "C", t: "Das Erstellen eines neuen Gesetzes durch das Parlament."},
+    {v: "D", t: "Das Anwenden von abstrakten Gesetzesnormen auf konkrete Sachverhalte."}
   ],
-  correct: "A",
+  correct: "D",
   explain: "Subsumtion bedeutet, abstrakte Gesetzesnormen auf einen konkreten Sachverhalt anzuwenden. Dabei wird geprüft, ob die Tatbestandsmerkmale der Gesetzesnorm im konkreten Fall erfüllt sind. Falls ja, tritt die Rechtsfolge ein."
 },
 {
@@ -566,12 +566,12 @@ window.QUESTIONS = [
   img: {src: "img/recht/einfuehrung/einfuehrung_rechtsanwendung_01.svg", alt: "Flussdiagramm: Vier Schritte der Rechtsanwendung"},
   q: "In welcher Reihenfolge wird bei der Rechtsanwendung vorgegangen?",
   options: [
-    {v: "A", t: "Sachverhalt feststellen → Rechtsregel finden → Subsumtion → Rechtsfolge."},
-    {v: "B", t: "Rechtsfolge bestimmen → Gesetz suchen → Sachverhalt anpassen."},
-    {v: "C", t: "Gesetz lesen → Urteil fällen → Sachverhalt prüfen."},
-    {v: "D", t: "Subsumtion → Sachverhalt feststellen → Rechtsfolge → Gesetz suchen."}
+    {v: "A", t: "Gesetz lesen → Urteil fällen → Sachverhalt prüfen."},
+    {v: "B", t: "Sachverhalt feststellen → Rechtsregel finden → Subsumtion → Rechtsfolge."},
+    {v: "C", t: "Subsumtion → Sachverhalt feststellen → Rechtsfolge → Gesetz suchen."},
+    {v: "D", t: "Rechtsfolge bestimmen → Gesetz suchen → Sachverhalt anpassen."}
   ],
-  correct: "A",
+  correct: "B",
   explain: "Die Rechtsanwendung folgt vier Schritten: (1) Sachverhalt feststellen: Was ist passiert? Wer ist beteiligt? (2) Rechtsregel finden: Welche gesetzliche Bestimmung ist einschlägig? (3) Subsumtion: Stimmt der Sachverhalt mit den Tatbestandsmerkmalen überein? (4) Falls ja: Rechtsfolge bestimmen."
 },
 {
@@ -588,9 +588,9 @@ window.QUESTIONS = [
   q: "Bestimmen Sie die Tatbestandsmerkmale und die Rechtsfolge dieses Artikels.",
   options: [
     {v: "A", t: "TBM: Handlungsfähigkeit. RF: Fähigkeit, durch Handlungen Rechte und Pflichten zu begründen."},
-    {v: "B", t: "TBM: Rechte und Pflichten haben. RF: Handlungsfähig sein."},
+    {v: "B", t: "TBM: 18 Jahre alt sein. RF: Verträge abschliessen können."},
     {v: "C", t: "TBM: Schweizer Bürger sein. RF: Handlungsfähigkeit erlangen."},
-    {v: "D", t: "TBM: 18 Jahre alt sein. RF: Verträge abschliessen können."}
+    {v: "D", t: "TBM: Rechte und Pflichten haben. RF: Handlungsfähig sein."}
   ],
   correct: "A",
   explain: "Art. 12 ZGB: «Wenn» jemand handlungsfähig ist (= TBM), «dann» hat diese Person die Fähigkeit, durch ihre Handlungen Rechte und Pflichten zu begründen (= RF). D ist unvollständig – Handlungsfähigkeit setzt nicht nur Volljährigkeit, sondern auch Urteilsfähigkeit voraus (Art. 13 ZGB)."
@@ -600,12 +600,12 @@ window.QUESTIONS = [
   context: "Art. 13 ZGB: «Handlungsfähig ist, wer volljährig und urteilsfähig ist.»",
   q: "Welches sind die Tatbestandsmerkmale (TBM) dieses Artikels?",
   options: [
-    {v: "A", t: "TBM 1: volljährig. TBM 2: urteilsfähig."},
-    {v: "B", t: "TBM: handlungsfähig."},
+    {v: "A", t: "TBM: handlungsfähig."},
+    {v: "B", t: "TBM 1: volljährig. TBM 2: urteilsfähig."},
     {v: "C", t: "TBM: Schweizer Bürger."},
     {v: "D", t: "TBM 1: 18 Jahre alt. TBM 2: psychisch gesund."}
   ],
-  correct: "A",
+  correct: "B",
   explain: "Art. 13 ZGB: «Wenn» eine Person volljährig (TBM 1) UND urteilsfähig (TBM 2) ist, «dann» ist sie handlungsfähig (RF). Beide Tatbestandsmerkmale müssen kumulativ erfüllt sein. B ist falsch – Handlungsfähigkeit ist die Rechtsfolge, nicht das TBM."
 },
 {
@@ -641,9 +641,9 @@ window.QUESTIONS = [
   q: "Welche Aussage zur rechtlichen Einordnung ist korrekt?",
   options: [
     {v: "A", t: "In Variante 1 liegt ein natürlicher Todesfall vor – dies ist rechtlich nicht relevant. In Variante 2 käme Art. 112 StGB (Mord) als qualifizierte Tötung in Betracht."},
-    {v: "B", t: "Beide Varianten sind strafrechtlich relevant, da ein Mensch gestorben ist."},
-    {v: "C", t: "In beiden Varianten ist Art. 111 StGB (vorsätzliche Tötung) anwendbar."},
-    {v: "D", t: "Eine strafrechtliche Einordnung ist erst nach dem Gerichtsurteil möglich."}
+    {v: "B", t: "Eine strafrechtliche Einordnung ist erst nach dem Gerichtsurteil möglich."},
+    {v: "C", t: "Beide Varianten sind strafrechtlich relevant, da ein Mensch gestorben ist."},
+    {v: "D", t: "In beiden Varianten ist Art. 111 StGB (vorsätzliche Tötung) anwendbar."}
   ],
   correct: "A",
   explain: "Obersatz: Es ist zu prüfen, ob ein strafbarer Tatbestand vorliegt. Variante 1 (Herzinfarkt): Es liegt ein natürlicher Tod ohne Fremdeinfluss vor – kein Tatbestand erfüllt. Variante 2 (Vergiftung): TBM von Art. 112 StGB (Mord): (1) ein Toter, (2) Tod wurde vorsätzlich herbeigeführt (Vergiftung), (3) besonders verwerflicher Zweck (Eliminationsmord). Subsumtion: Alle TBM sind erfüllt. RF: Lebenslängliche Freiheitsstrafe oder Freiheitsstrafe nicht unter zehn Jahren."
@@ -653,12 +653,12 @@ window.QUESTIONS = [
   context: "Art. 54 ZGB: «Die juristischen Personen sind handlungsfähig, sobald die nach Gesetz und Statuten hiefür unentbehrlichen Organe bestellt sind.»",
   q: "Bestimmen Sie die Tatbestandsmerkmale und die Rechtsfolge.",
   options: [
-    {v: "A", t: "TBM 1: juristische Person. TBM 2: unentbehrliche Organe nach Gesetz und Statuten bestellt. RF: Handlungsfähigkeit."},
-    {v: "B", t: "TBM: Handlungsfähigkeit. RF: Organe bestellen."},
+    {v: "A", t: "TBM: Handlungsfähigkeit. RF: Organe bestellen."},
+    {v: "B", t: "TBM 1: juristische Person. TBM 2: unentbehrliche Organe nach Gesetz und Statuten bestellt. RF: Handlungsfähigkeit."},
     {v: "C", t: "TBM: juristische Person sein. RF: Organe bestellen müssen."},
     {v: "D", t: "TBM: Statuten haben. RF: juristische Person werden."}
   ],
-  correct: "A",
+  correct: "B",
   explain: "Art. 54 ZGB: «Wenn» es sich um eine juristische Person handelt (TBM 1) UND die nach Gesetz und Statuten unentbehrlichen Organe bestellt sind (TBM 2), «dann» ist die juristische Person handlungsfähig (RF). Beide TBM müssen kumulativ erfüllt sein."
 },
 {
@@ -666,12 +666,12 @@ window.QUESTIONS = [
   context: "Art. 8 ZGB: «Wo das Gesetz es nicht anders bestimmt, hat derjenige das Vorhandensein einer behaupteten Tatsache zu beweisen, der aus ihr Rechte ableitet.»",
   q: "Was regelt dieser Artikel und warum ist er für die Rechtsanwendung wichtig?",
   options: [
-    {v: "A", t: "Er regelt die Beweislastverteilung: Wer Rechte geltend macht, muss die zugrunde liegenden Tatsachen beweisen. Dies ist zentral, weil bei unklarem Sachverhalt entschieden werden muss, wer die Folgen der Beweislosigkeit trägt."},
-    {v: "B", t: "Er regelt, dass das Gericht immer alle Beweise selbst beschaffen muss."},
-    {v: "C", t: "Er regelt, dass der Beklagte immer beweisen muss, dass er unschuldig ist."},
-    {v: "D", t: "Er regelt, dass nur schriftliche Beweise vor Gericht zulässig sind."}
+    {v: "A", t: "Er regelt, dass der Beklagte immer beweisen muss, dass er unschuldig ist."},
+    {v: "B", t: "Er regelt die Beweislastverteilung: Wer Rechte geltend macht, muss die zugrunde liegenden Tatsachen beweisen. Dies ist zentral, weil bei unklarem Sachverhalt entschieden werden muss, wer die Folgen der Beweislosigkeit trägt."},
+    {v: "C", t: "Er regelt, dass nur schriftliche Beweise vor Gericht zulässig sind."},
+    {v: "D", t: "Er regelt, dass das Gericht immer alle Beweise selbst beschaffen muss."}
   ],
-  correct: "A",
+  correct: "B",
   explain: "Art. 8 ZGB enthält die grundlegende Beweislastregel des Privatrechts: TBM: Jemand leitet aus einer behaupteten Tatsache Rechte ab, und das Gesetz bestimmt nichts anderes. RF: Diese Person muss die Tatsache beweisen. Dies ist für die Rechtsanwendung zentral, weil der Sachverhalt oft strittig ist und klar sein muss, wer die Beweislast trägt."
 },
 {

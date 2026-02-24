@@ -89,12 +89,12 @@ window.QUESTIONS = [
     id: "g01", topic: "grundlagen", type: "mc", diff: 1, tax: "K1",
     q: "Welche der folgenden Aufgaben gehört NICHT zu den Hauptaufgaben der Finanzbuchhaltung?",
     options: [
-      {v: "A", t: "Ausweis von Gewinn und Verlust"},
-      {v: "B", t: "Übersicht über Forderungen und Schulden"},
-      {v: "C", t: "Planung von Marketingkampagnen"},
-      {v: "D", t: "Grundlage zur Berechnung der Steuern"}
+      {v: "A", t: "Planung von Marketingkampagnen"},
+      {v: "B", t: "Grundlage zur Berechnung der Steuern"},
+      {v: "C", t: "Ausweis von Gewinn und Verlust"},
+      {v: "D", t: "Übersicht über Forderungen und Schulden"}
     ],
-    correct: "C",
+    correct: "A",
     explain: "Die Hauptaufgaben der Finanzbuchhaltung sind: Ausweis von Gewinn und Verlust, Übersicht über Forderungen und Schulden, Beweismittel bei Streitigkeiten, Kalkulationsgrundlage für die Preisgestaltung sowie Grundlage zur Steuerberechnung. Marketing gehört nicht dazu."
   },
   {
@@ -114,11 +114,11 @@ window.QUESTIONS = [
     q: "Ab welchem Jahresumsatz besteht in der Schweiz eine umfassende Buchführungspflicht für Einzelunternehmen und Personengesellschaften?",
     options: [
       {v: "A", t: "CHF 100'000"},
-      {v: "B", t: "CHF 250'000"},
-      {v: "C", t: "CHF 500'000"},
+      {v: "B", t: "CHF 500'000"},
+      {v: "C", t: "CHF 250'000"},
       {v: "D", t: "CHF 1'000'000"}
     ],
-    correct: "C",
+    correct: "B",
     explain: "Gemäss Art. 957 Abs. 1 OR sind Einzelunternehmen und Personengesellschaften ab einem Jahresumsatz von CHF 500'000 zur ordnungsgemässen Buchführung verpflichtet. Juristische Personen sind unabhängig vom Umsatz buchführungspflichtig."
   },
   {
@@ -139,12 +139,12 @@ window.QUESTIONS = [
     id: "g06", topic: "grundlagen", type: "mc", diff: 2, tax: "K2",
     q: "Welcher Grundsatz der Buchführung besagt, dass Aktiven im Zweifelsfall eher zu tief und Passiven eher zu hoch bewertet werden sollen?",
     options: [
-      {v: "A", t: "Grundsatz der Klarheit"},
-      {v: "B", t: "Grundsatz der Stetigkeit"},
-      {v: "C", t: "Vorsichtsprinzip"},
-      {v: "D", t: "Grundsatz der Periodenabgrenzung"}
+      {v: "A", t: "Grundsatz der Periodenabgrenzung"},
+      {v: "B", t: "Vorsichtsprinzip"},
+      {v: "C", t: "Grundsatz der Stetigkeit"},
+      {v: "D", t: "Grundsatz der Klarheit"}
     ],
-    correct: "C",
+    correct: "B",
     explain: "Das Vorsichtsprinzip (Imparitätsprinzip) verlangt eine vorsichtige Bewertung: Verluste werden erfasst, sobald sie wahrscheinlich sind, Gewinne erst, wenn sie realisiert sind. Aktiven werden im Zweifelsfall tiefer, Passiven höher bewertet."
   },
   {
@@ -152,11 +152,11 @@ window.QUESTIONS = [
     q: "Was verbietet das Bruttoprinzip (Verrechnungsverbot)?",
     options: [
       {v: "A", t: "Die Verwendung von Fremdwährungen in der Buchhaltung"},
-      {v: "B", t: "Die Verrechnung von Aufwand- und Ertragspositionen miteinander"},
-      {v: "C", t: "Die Bildung von Rückstellungen"},
+      {v: "B", t: "Die Bildung von Rückstellungen"},
+      {v: "C", t: "Die Verrechnung von Aufwand- und Ertragspositionen miteinander"},
       {v: "D", t: "Die Verwendung von Abkürzungen im Journal"}
     ],
-    correct: "B",
+    correct: "C",
     explain: "Das Bruttoprinzip (Verrechnungsverbot) besagt, dass Aktiven und Passiven sowie Aufwände und Erträge nicht miteinander verrechnet werden dürfen, sondern separat ausgewiesen werden müssen."
   },
   {
@@ -172,22 +172,22 @@ window.QUESTIONS = [
     id: "g09", topic: "grundlagen", type: "mc", diff: 2, tax: "K2",
     q: "Was ist der Unterschied zwischen dem Journal und dem Hauptbuch?",
     options: [
-      {v: "A", t: "Das Journal ordnet nach Konten, das Hauptbuch nach Datum"},
-      {v: "B", t: "Das Journal ordnet chronologisch, das Hauptbuch nach Konten"},
-      {v: "C", t: "Das Journal enthält nur Bilanzkonten, das Hauptbuch auch Erfolgskonten"},
-      {v: "D", t: "Es gibt keinen Unterschied – beides sind Synonyme"}
+      {v: "A", t: "Das Journal ordnet chronologisch, das Hauptbuch nach Konten"},
+      {v: "B", t: "Das Journal enthält nur Bilanzkonten, das Hauptbuch auch Erfolgskonten"},
+      {v: "C", t: "Es gibt keinen Unterschied – beides sind Synonyme"},
+      {v: "D", t: "Das Journal ordnet nach Konten, das Hauptbuch nach Datum"}
     ],
-    correct: "B",
+    correct: "A",
     explain: "Das Journal (Grundbuch) erfasst alle Geschäftsfälle in chronologischer Reihenfolge. Das Hauptbuch ordnet dieselben Buchungen nach Konten (alle Buchungen eines Kontos zusammen). Der Ablauf ist: Belege → Journal → Hauptbuch."
   },
   {
     id: "g10", topic: "grundlagen", type: "mc", diff: 3, tax: "K4",
     q: "Ein Einzelunternehmer mit CHF 400'000 Jahresumsatz führt lediglich ein Kassenbuch und eine Aufstellung der Vermögenslage. Ist dies gesetzeskonform?",
     options: [
-      {v: "A", t: "Nein, jeder Unternehmer muss eine vollständige doppelte Buchhaltung führen"},
+      {v: "A", t: "Nein, Einzelunternehmen sind grundsätzlich von der Buchführungspflicht befreit"},
       {v: "B", t: "Ja, da er unter CHF 500'000 liegt, genügt eine vereinfachte Buchführung (Einnahmen-/Ausgabenrechnung und Vermögensaufstellung)"},
-      {v: "C", t: "Nein, Einzelunternehmen sind grundsätzlich von der Buchführungspflicht befreit"},
-      {v: "D", t: "Ja, aber nur wenn das Unternehmen weniger als 5 Mitarbeitende hat"}
+      {v: "C", t: "Ja, aber nur wenn das Unternehmen weniger als 5 Mitarbeitende hat"},
+      {v: "D", t: "Nein, jeder Unternehmer muss eine vollständige doppelte Buchhaltung führen"}
     ],
     correct: "B",
     explain: "Gemäss Art. 957 Abs. 2 OR genügt für Einzelunternehmen mit weniger als CHF 500'000 Jahresumsatz eine vereinfachte Buchführung: eine Einnahmen-/Ausgabenrechnung sowie eine Vermögensaufstellung (Inventar)."
@@ -208,12 +208,12 @@ window.QUESTIONS = [
     id: "g12", topic: "grundlagen", type: "mc", diff: 3, tax: "K4",
     q: "Ein Unternehmen wechselt jedes Jahr die Bewertungsmethode für seine Vorräte, um den Gewinn möglichst günstig darzustellen. Welcher Grundsatz wird dadurch verletzt?",
     options: [
-      {v: "A", t: "Belegprinzip"},
-      {v: "B", t: "Grundsatz der Klarheit"},
-      {v: "C", t: "Grundsatz der Stetigkeit (Kontinuität)"},
-      {v: "D", t: "Grundsatz der Wesentlichkeit"}
+      {v: "A", t: "Grundsatz der Stetigkeit (Kontinuität)"},
+      {v: "B", t: "Belegprinzip"},
+      {v: "C", t: "Grundsatz der Wesentlichkeit"},
+      {v: "D", t: "Grundsatz der Klarheit"}
     ],
-    correct: "C",
+    correct: "A",
     explain: "Der Grundsatz der Stetigkeit verlangt, dass einmal gewählte Bewertungs- und Darstellungsmethoden über mehrere Jahre beibehalten werden. Ein jährlicher Methodenwechsel zur Gewinnoptimierung verstösst klar gegen dieses Prinzip."
   },
   {
@@ -231,12 +231,12 @@ window.QUESTIONS = [
     id: "b01", topic: "bilanz", type: "mc", diff: 1, tax: "K1",
     q: "Was zeigt die Bilanz?",
     options: [
-      {v: "A", t: "Den Gewinn oder Verlust einer Periode"},
-      {v: "B", t: "Die Vermögenswerte und die Finanzierung eines Unternehmens an einem bestimmten Stichtag"},
-      {v: "C", t: "Die Umsatzentwicklung über ein Jahr"},
-      {v: "D", t: "Die Zahlungsströme eines Unternehmens"}
+      {v: "A", t: "Die Zahlungsströme eines Unternehmens"},
+      {v: "B", t: "Die Umsatzentwicklung über ein Jahr"},
+      {v: "C", t: "Die Vermögenswerte und die Finanzierung eines Unternehmens an einem bestimmten Stichtag"},
+      {v: "D", t: "Den Gewinn oder Verlust einer Periode"}
     ],
-    correct: "B",
+    correct: "C",
     explain: "Die Bilanz ist eine Gegenüberstellung von Aktiven (Vermögen) und Passiven (Finanzierung durch Fremd- und Eigenkapital) an einem bestimmten Stichtag (Bilanzstichtag)."
   },
   {
@@ -253,12 +253,12 @@ window.QUESTIONS = [
     img: {src: "img/bwl/fibu/fibu_bilanzstruktur_01.svg", alt: "Diagramm: Aufbau der Bilanz mit Aktiven und Passiven"},
     q: "Nach welchem Prinzip werden die Aktiven in der Bilanz geordnet?",
     options: [
-      {v: "A", t: "Alphabetisch nach Kontoname"},
-      {v: "B", t: "Nach dem Fälligkeitsprinzip (kurzfristig vor langfristig)"},
-      {v: "C", t: "Nach dem Liquiditätsprinzip (flüssig vor weniger flüssig)"},
-      {v: "D", t: "Nach Anschaffungswert (teuerste zuerst)"}
+      {v: "A", t: "Nach dem Fälligkeitsprinzip (kurzfristig vor langfristig)"},
+      {v: "B", t: "Nach dem Liquiditätsprinzip (flüssig vor weniger flüssig)"},
+      {v: "C", t: "Nach Anschaffungswert (teuerste zuerst)"},
+      {v: "D", t: "Alphabetisch nach Kontoname"}
     ],
-    correct: "C",
+    correct: "B",
     explain: "Die Aktiven werden nach dem Liquiditätsprinzip (Flüssigkeitsprinzip) geordnet: Zuerst die am schnellsten in Geld umwandelbaren Positionen (Kasse, Bank), dann die weniger liquiden (Immobilien)."
   },
   {
@@ -277,12 +277,12 @@ window.QUESTIONS = [
     id: "b05", topic: "bilanz", type: "mc", diff: 2, tax: "K2",
     q: "Was ist das Eigenkapital in der Bilanz?",
     options: [
-      {v: "A", t: "Die Summe aller Schulden des Unternehmens"},
-      {v: "B", t: "Die Differenz zwischen Aktiven und Fremdkapital – also die rechnerische Schuld gegenüber dem Eigentümer"},
-      {v: "C", t: "Das Bargeld, das der Eigentümer ins Unternehmen eingelegt hat"},
-      {v: "D", t: "Der Jahresgewinn des Unternehmens"}
+      {v: "A", t: "Der Jahresgewinn des Unternehmens"},
+      {v: "B", t: "Das Bargeld, das der Eigentümer ins Unternehmen eingelegt hat"},
+      {v: "C", t: "Die Summe aller Schulden des Unternehmens"},
+      {v: "D", t: "Die Differenz zwischen Aktiven und Fremdkapital – also die rechnerische Schuld gegenüber dem Eigentümer"}
     ],
-    correct: "B",
+    correct: "D",
     explain: "Das Eigenkapital ist die Differenz zwischen den Aktiven (Vermögen) und dem Fremdkapital (Schulden an Dritte). Es stellt die rechnerische Schuld des Unternehmens gegenüber dem Geschäftseigentümer dar."
   },
   {
@@ -304,24 +304,24 @@ window.QUESTIONS = [
     id: "b08", topic: "bilanz", type: "mc", diff: 2, tax: "K2",
     q: "Nach welchem Prinzip werden die Passiven in der Bilanz geordnet?",
     options: [
-      {v: "A", t: "Liquiditätsprinzip"},
-      {v: "B", t: "Fälligkeitsprinzip (kurzfristige vor langfristigen Schulden)"},
-      {v: "C", t: "Alphabetisch"},
-      {v: "D", t: "Nach Höhe des Betrags (grösster zuerst)"}
+      {v: "A", t: "Alphabetisch"},
+      {v: "B", t: "Nach Höhe des Betrags (grösster zuerst)"},
+      {v: "C", t: "Liquiditätsprinzip"},
+      {v: "D", t: "Fälligkeitsprinzip (kurzfristige vor langfristigen Schulden)"}
     ],
-    correct: "B",
+    correct: "D",
     explain: "Die Passiven werden nach dem Fälligkeitsprinzip geordnet: Zuerst die kurzfristigen Schulden (z.B. Kreditoren), dann die langfristigen (z.B. Hypotheken), zuletzt das Eigenkapital."
   },
   {
     id: "b09", topic: "bilanz", type: "mc", diff: 2, tax: "K3",
     q: "Ein Unternehmen hat Maschinen für CHF 80'000 gekauft. Der aktuelle Marktwert beträgt CHF 65'000. Zu welchem Wert erscheinen die Maschinen in der Bilanz?",
     options: [
-      {v: "A", t: "CHF 80'000 (Anschaffungswert)"},
-      {v: "B", t: "CHF 65'000 (Marktwert, da tiefer)"},
-      {v: "C", t: "CHF 72'500 (Durchschnitt)"},
-      {v: "D", t: "CHF 80'000 plus Teuerungszuschlag"}
+      {v: "A", t: "CHF 80'000 plus Teuerungszuschlag"},
+      {v: "B", t: "CHF 72'500 (Durchschnitt)"},
+      {v: "C", t: "CHF 80'000 (Anschaffungswert)"},
+      {v: "D", t: "CHF 65'000 (Marktwert, da tiefer)"}
     ],
-    correct: "B",
+    correct: "D",
     explain: "Gemäss dem Niederstwertprinzip wird der tiefere der beiden Werte (Anschaffungswert oder Marktwert) angesetzt. Da der Marktwert von CHF 65'000 tiefer ist als der Anschaffungswert von CHF 80'000, werden die Maschinen mit CHF 65'000 bilanziert."
   },
   {
@@ -334,12 +334,12 @@ window.QUESTIONS = [
     id: "b11", topic: "bilanz", type: "mc", diff: 3, tax: "K4",
     q: "Welche Aussage zur Bilanz ist korrekt?",
     options: [
-      {v: "A", t: "Die Bilanz zeigt die Situation über eine ganze Periode (Stromgrösse)"},
-      {v: "B", t: "Die Bilanz zeigt die Situation an einem bestimmten Stichtag (Bestandesgrösse)"},
-      {v: "C", t: "Die Bilanz zeigt nur die Schulden eines Unternehmens"},
-      {v: "D", t: "Die Bilanz wird monatlich erstellt und zeigt den Umsatz"}
+      {v: "A", t: "Die Bilanz zeigt nur die Schulden eines Unternehmens"},
+      {v: "B", t: "Die Bilanz wird monatlich erstellt und zeigt den Umsatz"},
+      {v: "C", t: "Die Bilanz zeigt die Situation über eine ganze Periode (Stromgrösse)"},
+      {v: "D", t: "Die Bilanz zeigt die Situation an einem bestimmten Stichtag (Bestandesgrösse)"}
     ],
-    correct: "B",
+    correct: "D",
     explain: "Die Bilanz ist eine Momentaufnahme (Bestandesgrösse) an einem bestimmten Stichtag. Die Erfolgsrechnung hingegen zeigt die Entwicklung über eine Periode (Stromgrössen: Aufwände und Erträge)."
   },
   {
@@ -359,12 +359,12 @@ window.QUESTIONS = [
     img: {src: "img/bwl/fibu/fibu_bilanzstruktur_02.svg", alt: "Bilanzstruktur mit Flüssigkeits- und Fälligkeitsprinzip"},
     q: "Betrachte die Bilanzstruktur in der Abbildung. Welches Prinzip bestimmt die Reihenfolge auf der Aktivseite?",
     options: [
-      {v: "A", t: "Das Fälligkeitsprinzip – von kurzfristig nach langfristig"},
-      {v: "B", t: "Das Flüssigkeitsprinzip – vom flüssigsten zum am wenigsten flüssigen Vermögenswert"},
-      {v: "C", t: "Das Alphabetprinzip – nach Kontobezeichnung"},
-      {v: "D", t: "Das Wertprinzip – vom grössten zum kleinsten Betrag"}
+      {v: "A", t: "Das Alphabetprinzip – nach Kontobezeichnung"},
+      {v: "B", t: "Das Fälligkeitsprinzip – von kurzfristig nach langfristig"},
+      {v: "C", t: "Das Wertprinzip – vom grössten zum kleinsten Betrag"},
+      {v: "D", t: "Das Flüssigkeitsprinzip – vom flüssigsten zum am wenigsten flüssigen Vermögenswert"}
     ],
-    correct: "B",
+    correct: "D",
     explain: "Die Aktivseite wird nach dem Flüssigkeitsprinzip geordnet: Oben steht das Umlaufvermögen (flüssig, < 1 Jahr), unten das Anlagevermögen (weniger flüssig, > 1 Jahr)."
   },
   {
@@ -372,10 +372,10 @@ window.QUESTIONS = [
     img: {src: "img/bwl/fibu/fibu_bilanzstruktur_02.svg", alt: "Bilanzstruktur mit Flüssigkeits- und Fälligkeitsprinzip"},
     q: "Betrachte die Bilanzstruktur. Welches Prinzip bestimmt die Reihenfolge auf der Passivseite?",
     options: [
-      {v: "A", t: "Das Flüssigkeitsprinzip"},
+      {v: "A", t: "Das Alphabetprinzip"},
       {v: "B", t: "Das Fälligkeitsprinzip – von kurzfristig nach langfristig fällig"},
       {v: "C", t: "Das Grössenprinzip – vom grössten zum kleinsten Betrag"},
-      {v: "D", t: "Das Alphabetprinzip"}
+      {v: "D", t: "Das Flüssigkeitsprinzip"}
     ],
     correct: "B",
     explain: "Die Passivseite wird nach dem Fälligkeitsprinzip geordnet: Oben steht das kurzfristige Fremdkapital (< 1 Jahr), dann das langfristige Fremdkapital (> 1 Jahr), zuunterst das Eigenkapital (unbefristet)."
@@ -404,8 +404,8 @@ window.QUESTIONS = [
     q: "Welche vier Kontentypen gibt es in der doppelten Buchhaltung?",
     options: [
       {v: "A", t: "Aktivkonten, Passivkonten, Aufwandkonten, Ertragskonten"},
-      {v: "B", t: "Soll-Konten, Haben-Konten, Journal-Konten, Bilanzkonten"},
-      {v: "C", t: "Bargeldkonten, Kreditkonten, Gewinnkonten, Verlustkonten"},
+      {v: "B", t: "Bargeldkonten, Kreditkonten, Gewinnkonten, Verlustkonten"},
+      {v: "C", t: "Soll-Konten, Haben-Konten, Journal-Konten, Bilanzkonten"},
       {v: "D", t: "Eröffnungskonten, Schlusskonten, Erfolgskonten, Bilanzkonten"}
     ],
     correct: "A",
@@ -415,12 +415,12 @@ window.QUESTIONS = [
     id: "k02", topic: "kontentypen", type: "mc", diff: 1, tax: "K2",
     q: "Auf welcher Seite stehen Zunahmen bei einem Aktivkonto?",
     options: [
-      {v: "A", t: "Im Haben (rechts)"},
-      {v: "B", t: "Im Soll (links)"},
-      {v: "C", t: "Im Soll oder im Haben – je nach Geschäftsfall"},
-      {v: "D", t: "Aktivkonten haben keine festen Seiten"}
+      {v: "A", t: "Aktivkonten haben keine festen Seiten"},
+      {v: "B", t: "Im Soll oder im Haben – je nach Geschäftsfall"},
+      {v: "C", t: "Im Haben (rechts)"},
+      {v: "D", t: "Im Soll (links)"}
     ],
-    correct: "B",
+    correct: "D",
     explain: "Bei Aktivkonten stehen Zunahmen im Soll (links) und Abnahmen im Haben (rechts). Der Anfangsbestand steht ebenfalls im Soll."
   },
   {
@@ -428,11 +428,11 @@ window.QUESTIONS = [
     q: "Auf welcher Seite stehen Zunahmen bei einem Passivkonto?",
     options: [
       {v: "A", t: "Im Soll (links)"},
-      {v: "B", t: "Im Haben (rechts)"},
+      {v: "B", t: "Passivkonten haben nur eine Sollseite"},
       {v: "C", t: "Im Soll und im Haben gleichzeitig"},
-      {v: "D", t: "Passivkonten haben nur eine Sollseite"}
+      {v: "D", t: "Im Haben (rechts)"}
     ],
-    correct: "B",
+    correct: "D",
     explain: "Bei Passivkonten stehen Zunahmen im Haben (rechts) und Abnahmen im Soll (links). Der Anfangsbestand steht ebenfalls im Haben. Passivkonten verhalten sich spiegelbildlich zu Aktivkonten."
   },
   {
@@ -460,12 +460,12 @@ window.QUESTIONS = [
     id: "k07", topic: "kontentypen", type: "mc", diff: 1, tax: "K2",
     q: "Zu welchem Kontentyp gehört das Konto «Bank»?",
     options: [
-      {v: "A", t: "Passivkonto"},
-      {v: "B", t: "Aktivkonto"},
+      {v: "A", t: "Aktivkonto"},
+      {v: "B", t: "Ertragskonto"},
       {v: "C", t: "Aufwandkonto"},
-      {v: "D", t: "Ertragskonto"}
+      {v: "D", t: "Passivkonto"}
     ],
-    correct: "B",
+    correct: "A",
     explain: "Das Bankkonto zeigt das Guthaben des Unternehmens bei der Bank. Es gehört zum Vermögen → Aktivkonto."
   },
   {
@@ -473,9 +473,9 @@ window.QUESTIONS = [
     q: "Zu welchem Kontentyp gehört das Konto «Kreditoren»?",
     options: [
       {v: "A", t: "Aktivkonto"},
-      {v: "B", t: "Aufwandkonto"},
+      {v: "B", t: "Ertragskonto"},
       {v: "C", t: "Passivkonto"},
-      {v: "D", t: "Ertragskonto"}
+      {v: "D", t: "Aufwandkonto"}
     ],
     correct: "C",
     explain: "Kreditoren sind Verbindlichkeiten gegenüber Lieferanten. Sie stehen auf der rechten Bilanzseite → Passivkonto."
@@ -484,24 +484,24 @@ window.QUESTIONS = [
     id: "k09", topic: "kontentypen", type: "mc", diff: 1, tax: "K2",
     q: "Zu welchem Kontentyp gehört das Konto «Lohnaufwand»?",
     options: [
-      {v: "A", t: "Aktivkonto"},
-      {v: "B", t: "Passivkonto"},
-      {v: "C", t: "Ertragskonto"},
-      {v: "D", t: "Aufwandkonto"}
+      {v: "A", t: "Ertragskonto"},
+      {v: "B", t: "Aufwandkonto"},
+      {v: "C", t: "Passivkonto"},
+      {v: "D", t: "Aktivkonto"}
     ],
-    correct: "D",
+    correct: "B",
     explain: "Lohnaufwand erfasst die Kosten für Mitarbeiterlöhne. Löhne sind Werteverzehr → Aufwandkonto."
   },
   {
     id: "k10", topic: "kontentypen", type: "mc", diff: 1, tax: "K2",
     q: "Zu welchem Kontentyp gehört das Konto «Warenverkauf»?",
     options: [
-      {v: "A", t: "Aktivkonto"},
-      {v: "B", t: "Ertragskonto"},
-      {v: "C", t: "Aufwandkonto"},
-      {v: "D", t: "Passivkonto"}
+      {v: "A", t: "Aufwandkonto"},
+      {v: "B", t: "Aktivkonto"},
+      {v: "C", t: "Passivkonto"},
+      {v: "D", t: "Ertragskonto"}
     ],
-    correct: "B",
+    correct: "D",
     explain: "Warenverkauf erfasst die Erlöse aus dem Verkauf von Waren. Erlöse sind Wertezuwachs → Ertragskonto."
   },
   {
@@ -532,48 +532,48 @@ window.QUESTIONS = [
     id: "k13", topic: "kontentypen", type: "mc", diff: 2, tax: "K3",
     q: "Das Konto «Debitoren» nimmt ab. Auf welcher Seite wird diese Abnahme gebucht?",
     options: [
-      {v: "A", t: "Im Soll, weil Abnahmen bei allen Konten im Soll stehen"},
-      {v: "B", t: "Im Haben, weil Debitoren ein Aktivkonto ist und Abnahmen bei Aktivkonten im Haben stehen"},
-      {v: "C", t: "Im Soll, weil Debitoren ein Passivkonto ist"},
-      {v: "D", t: "Im Haben, weil eine Abnahme immer eine Gutschrift ist"}
+      {v: "A", t: "Im Haben, weil Debitoren ein Aktivkonto ist und Abnahmen bei Aktivkonten im Haben stehen"},
+      {v: "B", t: "Im Soll, weil Abnahmen bei allen Konten im Soll stehen"},
+      {v: "C", t: "Im Haben, weil eine Abnahme immer eine Gutschrift ist"},
+      {v: "D", t: "Im Soll, weil Debitoren ein Passivkonto ist"}
     ],
-    correct: "B",
+    correct: "A",
     explain: "Debitoren ist ein Aktivkonto. Bei Aktivkonten stehen Abnahmen im Haben (rechts). Beispiel: Ein Kunde bezahlt seine Rechnung → Bank (Soll) an Debitoren (Haben)."
   },
   {
     id: "k14", topic: "kontentypen", type: "mc", diff: 2, tax: "K3",
     q: "Das Konto «Hypothek» nimmt ab (Teilrückzahlung). Auf welcher Seite wird diese Abnahme gebucht?",
     options: [
-      {v: "A", t: "Im Haben, weil Hypothek ein Passivkonto ist"},
-      {v: "B", t: "Im Soll, weil Hypothek ein Passivkonto ist und Abnahmen bei Passivkonten im Soll stehen"},
+      {v: "A", t: "Im Soll, weil alle Abnahmen im Soll stehen"},
+      {v: "B", t: "Im Haben, weil Hypothek ein Passivkonto ist"},
       {v: "C", t: "Im Haben, weil Rückzahlungen immer im Haben gebucht werden"},
-      {v: "D", t: "Im Soll, weil alle Abnahmen im Soll stehen"}
+      {v: "D", t: "Im Soll, weil Hypothek ein Passivkonto ist und Abnahmen bei Passivkonten im Soll stehen"}
     ],
-    correct: "B",
+    correct: "D",
     explain: "Hypothek ist ein Passivkonto. Bei Passivkonten stehen Abnahmen im Soll (links). Buchungssatz: Hypothek (Soll) an Bank (Haben)."
   },
   {
     id: "k15", topic: "kontentypen", type: "mc", diff: 2, tax: "K3",
     q: "Das Konto «Mietaufwand» nimmt zu (Miete wird bezahlt). Auf welcher Seite wird die Zunahme gebucht?",
     options: [
-      {v: "A", t: "Im Haben, weil Ausgaben immer im Haben stehen"},
-      {v: "B", t: "Im Soll, weil Aufwandkonten im Soll zunehmen"},
-      {v: "C", t: "Im Haben, weil Mietaufwand ein Passivkonto ist"},
-      {v: "D", t: "Im Soll, weil alle Konten im Soll zunehmen"}
+      {v: "A", t: "Im Soll, weil alle Konten im Soll zunehmen"},
+      {v: "B", t: "Im Haben, weil Mietaufwand ein Passivkonto ist"},
+      {v: "C", t: "Im Haben, weil Ausgaben immer im Haben stehen"},
+      {v: "D", t: "Im Soll, weil Aufwandkonten im Soll zunehmen"}
     ],
-    correct: "B",
+    correct: "D",
     explain: "Mietaufwand ist ein Aufwandkonto. Aufwandkonten nehmen im Soll (links) zu – genau wie Aktivkonten."
   },
   {
     id: "k16", topic: "kontentypen", type: "mc", diff: 2, tax: "K3",
     q: "Das Konto «Honorarertrag» nimmt zu (Rechnung an Kunden). Auf welcher Seite wird die Zunahme gebucht?",
     options: [
-      {v: "A", t: "Im Soll, weil Einnahmen immer im Soll stehen"},
-      {v: "B", t: "Im Haben, weil Ertragskonten im Haben zunehmen"},
-      {v: "C", t: "Im Soll, weil alle Zunahmen im Soll stehen"},
-      {v: "D", t: "Im Haben, weil Honorarertrag ein Aktivkonto ist"}
+      {v: "A", t: "Im Soll, weil alle Zunahmen im Soll stehen"},
+      {v: "B", t: "Im Haben, weil Honorarertrag ein Aktivkonto ist"},
+      {v: "C", t: "Im Soll, weil Einnahmen immer im Soll stehen"},
+      {v: "D", t: "Im Haben, weil Ertragskonten im Haben zunehmen"}
     ],
-    correct: "B",
+    correct: "D",
     explain: "Honorarertrag ist ein Ertragskonto. Ertragskonten nehmen im Haben (rechts) zu – genau wie Passivkonten."
   },
   {
@@ -622,12 +622,12 @@ window.QUESTIONS = [
     id: "k21", topic: "kontentypen", type: "mc", diff: 2, tax: "K2",
     q: "Welche zwei Kontentypen gehören zu den Bilanzkonten (Bestandeskonten)?",
     options: [
-      {v: "A", t: "Aufwandkonten und Ertragskonten"},
-      {v: "B", t: "Aktivkonten und Passivkonten"},
-      {v: "C", t: "Aktivkonten und Aufwandkonten"},
-      {v: "D", t: "Passivkonten und Ertragskonten"}
+      {v: "A", t: "Passivkonten und Ertragskonten"},
+      {v: "B", t: "Aktivkonten und Aufwandkonten"},
+      {v: "C", t: "Aufwandkonten und Ertragskonten"},
+      {v: "D", t: "Aktivkonten und Passivkonten"}
     ],
-    correct: "B",
+    correct: "D",
     explain: "Bilanzkonten (Bestandeskonten) sind Aktivkonten und Passivkonten. Sie haben einen Anfangsbestand und werden von Jahr zu Jahr übertragen. Aufwand- und Ertragskonten sind Erfolgskonten und starten jedes Jahr bei null."
   },
   {
@@ -658,12 +658,12 @@ window.QUESTIONS = [
     id: "k24", topic: "kontentypen", type: "mc", diff: 2, tax: "K3",
     q: "Das Konto «Eigenkapital» nimmt zu. Auf welcher Seite wird gebucht?",
     options: [
-      {v: "A", t: "Im Soll, weil es Kapital des Eigentümers ist"},
-      {v: "B", t: "Im Haben, weil Eigenkapital ein Passivkonto ist"},
-      {v: "C", t: "Im Soll, weil alle Zunahmen im Soll stehen"},
-      {v: "D", t: "Im Haben, weil es ein Ertragskonto ist"}
+      {v: "A", t: "Im Haben, weil es ein Ertragskonto ist"},
+      {v: "B", t: "Im Soll, weil es Kapital des Eigentümers ist"},
+      {v: "C", t: "Im Haben, weil Eigenkapital ein Passivkonto ist"},
+      {v: "D", t: "Im Soll, weil alle Zunahmen im Soll stehen"}
     ],
-    correct: "B",
+    correct: "C",
     explain: "Das Eigenkapital ist ein Passivkonto (rechte Bilanzseite). Zunahmen bei Passivkonten stehen im Haben (rechts)."
   },
   {
@@ -682,12 +682,12 @@ window.QUESTIONS = [
     id: "k27", topic: "kontentypen", type: "mc", diff: 2, tax: "K3",
     q: "Beim Geschäftsfall «Wareneinkauf auf Rechnung» nehmen zwei Konten zu. Welche Kontentypen sind betroffen?",
     options: [
-      {v: "A", t: "Aufwandkonto (Soll-Zunahme) und Passivkonto (Haben-Zunahme)"},
-      {v: "B", t: "Aktivkonto (Soll-Zunahme) und Passivkonto (Haben-Zunahme)"},
+      {v: "A", t: "Aktivkonto (Soll-Zunahme) und Passivkonto (Haben-Zunahme)"},
+      {v: "B", t: "Aufwandkonto (Soll-Zunahme) und Passivkonto (Haben-Zunahme)"},
       {v: "C", t: "Aufwandkonto (Soll-Zunahme) und Aktivkonto (Haben-Abnahme)"},
       {v: "D", t: "Ertragskonto (Haben-Zunahme) und Passivkonto (Soll-Abnahme)"}
     ],
-    correct: "A",
+    correct: "B",
     explain: "Wareneinkauf (Aufwandkonto) nimmt zu → Soll. Kreditoren (Passivkonto) nehmen zu → Haben."
   },
   {
@@ -703,12 +703,12 @@ window.QUESTIONS = [
     id: "k29", topic: "kontentypen", type: "mc", diff: 3, tax: "K4",
     q: "Welcher Geschäftsfall bewirkt eine Zunahme im Soll und eine Zunahme im Haben, ohne dass ein Erfolgskonto betroffen ist?",
     options: [
-      {v: "A", t: "Mietaufwand per Bank bezahlt"},
-      {v: "B", t: "Kauf von Mobilien auf Rechnung (Bilanzverlängerung)"},
-      {v: "C", t: "Verkauf von Waren auf Rechnung"},
-      {v: "D", t: "Lohnzahlung per Bank"}
+      {v: "A", t: "Kauf von Mobilien auf Rechnung (Bilanzverlängerung)"},
+      {v: "B", t: "Mietaufwand per Bank bezahlt"},
+      {v: "C", t: "Lohnzahlung per Bank"},
+      {v: "D", t: "Verkauf von Waren auf Rechnung"}
     ],
-    correct: "B",
+    correct: "A",
     explain: "Kauf von Mobilien auf Rechnung: Mobilien (Aktivkonto) nimmt zu im Soll, Kreditoren (Passivkonto) nimmt zu im Haben. Beide sind Bilanzkonten – kein Erfolgskonto betroffen."
   },
   {
@@ -716,11 +716,11 @@ window.QUESTIONS = [
     q: "Ein Geschäftsfall bewirkt eine Zunahme eines Aufwandkontos und eine Abnahme eines Aktivkontos. Was kann man daraus schliessen?",
     options: [
       {v: "A", t: "Der Geschäftsfall ist erfolgsunwirksam"},
-      {v: "B", t: "Der Geschäftsfall ist erfolgswirksam – der Gewinn sinkt"},
-      {v: "C", t: "Der Geschäftsfall ist erfolgswirksam – der Gewinn steigt"},
+      {v: "B", t: "Der Geschäftsfall ist erfolgswirksam – der Gewinn steigt"},
+      {v: "C", t: "Der Geschäftsfall ist erfolgswirksam – der Gewinn sinkt"},
       {v: "D", t: "Die Bilanzsumme steigt auf beiden Seiten"}
     ],
-    correct: "B",
+    correct: "C",
     explain: "Wenn ein Aufwandkonto zunimmt, ist der Geschäftsfall erfolgswirksam. Aufwand reduziert den Gewinn."
   },
   {
@@ -728,9 +728,9 @@ window.QUESTIONS = [
     q: "Welche Kombination von Kontentypen bewirkt eine Zunahme des Gewinns?",
     options: [
       {v: "A", t: "Aktivkonto nimmt zu (Soll), Ertragskonto nimmt zu (Haben)"},
-      {v: "B", t: "Aufwandkonto nimmt zu (Soll), Aktivkonto nimmt ab (Haben)"},
+      {v: "B", t: "Passivkonto nimmt ab (Soll), Aktivkonto nimmt ab (Haben)"},
       {v: "C", t: "Aktivkonto nimmt zu (Soll), Passivkonto nimmt zu (Haben)"},
-      {v: "D", t: "Passivkonto nimmt ab (Soll), Aktivkonto nimmt ab (Haben)"}
+      {v: "D", t: "Aufwandkonto nimmt zu (Soll), Aktivkonto nimmt ab (Haben)"}
     ],
     correct: "A",
     explain: "Wenn ein Ertragskonto zunimmt (Haben), steigt der Gewinn. Beispiel: Debitoren (Aktivkonto, Soll) an Warenverkauf (Ertragskonto, Haben)."
@@ -740,11 +740,11 @@ window.QUESTIONS = [
     q: "Zu welchem Kontentyp gehört «Wertberichtigung Fahrzeuge» (bei indirekter Abschreibung)?",
     options: [
       {v: "A", t: "Aktivkonto"},
-      {v: "B", t: "Minus-Aktivkonto (Korrekturkonto zur Aktivseite)"},
+      {v: "B", t: "Aufwandkonto"},
       {v: "C", t: "Passivkonto"},
-      {v: "D", t: "Aufwandkonto"}
+      {v: "D", t: "Minus-Aktivkonto (Korrekturkonto zur Aktivseite)"}
     ],
-    correct: "B",
+    correct: "D",
     explain: "Wertberichtigungskonten sind Minus-Aktivkonten (Korrekturkonten). Sie stehen auf der Aktivseite der Bilanz, verhalten sich aber wie Passivkonten: Zunahmen im Haben, Abnahmen im Soll."
   },
   {
@@ -766,12 +766,12 @@ window.QUESTIONS = [
     img: {src: "img/bwl/fibu/fibu_kontentypen_02.svg", alt: "Vier leere T-Konten mit Fragezeichen statt Plus/Minus"},
     q: "Betrachte die vier T-Konten in der Abbildung. Bei welchem Kontentyp steht das (+) auf der Soll-Seite (links)?",
     options: [
-      {v: "A", t: "Nur beim Aktivkonto"},
-      {v: "B", t: "Beim Aktivkonto und beim Aufwandskonto"},
-      {v: "C", t: "Beim Passivkonto und beim Ertragskonto"},
-      {v: "D", t: "Bei allen vier Kontentypen"}
+      {v: "A", t: "Bei allen vier Kontentypen"},
+      {v: "B", t: "Nur beim Aktivkonto"},
+      {v: "C", t: "Beim Aktivkonto und beim Aufwandskonto"},
+      {v: "D", t: "Beim Passivkonto und beim Ertragskonto"}
     ],
-    correct: "B",
+    correct: "C",
     explain: "Aktivkonten und Aufwandskonten nehmen im Soll (links) zu (+). Passivkonten und Ertragskonten nehmen im Haben (rechts) zu (+)."
   },
   {
@@ -780,11 +780,11 @@ window.QUESTIONS = [
     q: "Schau dir die vier T-Konten an. Wo steht der Anfangsbestand (AB) beim Aktivkonto?",
     options: [
       {v: "A", t: "Im Haben (rechts)"},
-      {v: "B", t: "Im Soll (links)"},
-      {v: "C", t: "Es gibt keinen Anfangsbestand"},
-      {v: "D", t: "In der Mitte"}
+      {v: "B", t: "In der Mitte"},
+      {v: "C", t: "Im Soll (links)"},
+      {v: "D", t: "Es gibt keinen Anfangsbestand"}
     ],
-    correct: "B",
+    correct: "C",
     explain: "Der Anfangsbestand steht bei Aktivkonten im Soll (links) – also auf derselben Seite wie die Zunahmen. Bei Passivkonten steht der AB im Haben (rechts)."
   },
   {
@@ -799,12 +799,12 @@ window.QUESTIONS = [
     img: {src: "img/bwl/fibu/fibu_konten_zuordnung_01.svg", alt: "12 Konten zum Zuordnen auf verschiedene Kontentypen"},
     q: "Betrachte die Zuordnungsübersicht. Welche Konten gehören zum Typ «Passivkonto» (cyan)?",
     options: [
-      {v: "A", t: "Hypothek, Kreditoren, Eigenkapital, Darlehen"},
+      {v: "A", t: "Kreditoren, Eigenkapital, Wareneinkauf, Darlehen"},
       {v: "B", t: "Hypothek, Debitoren, Eigenkapital, Darlehen"},
-      {v: "C", t: "Kreditoren, Eigenkapital, Wareneinkauf, Darlehen"},
-      {v: "D", t: "Kasse, Debitoren, Fahrzeuge, Eigenkapital"}
+      {v: "C", t: "Kasse, Debitoren, Fahrzeuge, Eigenkapital"},
+      {v: "D", t: "Hypothek, Kreditoren, Eigenkapital, Darlehen"}
     ],
-    correct: "A",
+    correct: "D",
     explain: "Passivkonten zeigen Schulden und Eigenkapital: Hypothek (langfristiges FK), Kreditoren (kurzfristiges FK), Eigenkapital und Darlehen (langfristiges FK). Debitoren sind ein Aktivkonto."
   },
   {
@@ -825,12 +825,12 @@ window.QUESTIONS = [
     img: {src: "img/bwl/fibu/fibu_tkonto_geschaeftsfall_02.svg", alt: "T-Konten Mietaufwand und Bank mit Fragezeichen"},
     q: "Die Abbildung zeigt den Geschäftsfall «Miete CHF 4'500 per Bank bezahlt». Auf welcher Seite wird der Betrag beim Konto Mietaufwand eingetragen?",
     options: [
-      {v: "A", t: "Im Haben (rechts), weil Geld abfliesst"},
-      {v: "B", t: "Im Soll (links), weil Aufwandskonten im Soll zunehmen"},
-      {v: "C", t: "Im Haben (rechts), weil es ein Passivkonto ist"},
+      {v: "A", t: "Im Haben (rechts), weil es ein Passivkonto ist"},
+      {v: "B", t: "Im Haben (rechts), weil Geld abfliesst"},
+      {v: "C", t: "Im Soll (links), weil Aufwandskonten im Soll zunehmen"},
       {v: "D", t: "Im Soll (links), weil es ein Aktivkonto ist"}
     ],
-    correct: "B",
+    correct: "C",
     explain: "Mietaufwand ist ein Aufwandskonto (magenta). Aufwandskonten nehmen im Soll (links) zu. Bank ist ein Aktivkonto (gelb) und nimmt im Haben (rechts) ab."
   },
   {
@@ -840,8 +840,8 @@ window.QUESTIONS = [
     options: [
       {v: "A", t: "Im Soll (links), weil der Betrag zunimmt"},
       {v: "B", t: "Im Haben (rechts), weil Ertragskonten im Haben zunehmen"},
-      {v: "C", t: "Im Soll (links), weil es ein Aktivkonto ist"},
-      {v: "D", t: "Im Haben (rechts), weil Geld eingeht"}
+      {v: "C", t: "Im Haben (rechts), weil Geld eingeht"},
+      {v: "D", t: "Im Soll (links), weil es ein Aktivkonto ist"}
     ],
     correct: "B",
     explain: "Warenverkauf ist ein Ertragskonto (grün). Ertragskonten nehmen im Haben (rechts) zu. Debitoren (gelb, Aktivkonto) nehmen im Soll (links) zu."
@@ -851,12 +851,12 @@ window.QUESTIONS = [
     img: {src: "img/bwl/fibu/fibu_tkonto_geschaeftsfall_04.svg", alt: "T-Konten Darlehen und Bank mit Fragezeichen"},
     q: "Die Abbildung zeigt den Geschäftsfall «Rückzahlung Darlehen CHF 20'000 per Bank». Welche Aussage stimmt?",
     options: [
-      {v: "A", t: "Darlehen: 20'000 im Soll (Abnahme Passivkonto). Bank: 20'000 im Haben (Abnahme Aktivkonto)."},
-      {v: "B", t: "Darlehen: 20'000 im Haben (Zunahme Passivkonto). Bank: 20'000 im Soll (Zunahme Aktivkonto)."},
-      {v: "C", t: "Darlehen: 20'000 im Haben (Abnahme). Bank: 20'000 im Soll (Abnahme)."},
-      {v: "D", t: "Darlehen: 20'000 im Soll (Zunahme). Bank: 20'000 im Haben (Zunahme)."}
+      {v: "A", t: "Darlehen: 20'000 im Haben (Zunahme Passivkonto). Bank: 20'000 im Soll (Zunahme Aktivkonto)."},
+      {v: "B", t: "Darlehen: 20'000 im Soll (Zunahme). Bank: 20'000 im Haben (Zunahme)."},
+      {v: "C", t: "Darlehen: 20'000 im Soll (Abnahme Passivkonto). Bank: 20'000 im Haben (Abnahme Aktivkonto)."},
+      {v: "D", t: "Darlehen: 20'000 im Haben (Abnahme). Bank: 20'000 im Soll (Abnahme)."}
     ],
-    correct: "A",
+    correct: "C",
     explain: "Darlehen ist ein Passivkonto (cyan, AB rechts). Abnahmen bei Passivkonten stehen im Soll (links). Bank ist ein Aktivkonto (gelb, AB links). Abnahmen bei Aktivkonten stehen im Haben (rechts). Bilanzverkürzung."
   },
   {
@@ -878,12 +878,12 @@ window.QUESTIONS = [
     id: "s01", topic: "buchungssatz", type: "mc", diff: 1, tax: "K1",
     q: "Wie lautet die Grundstruktur eines Buchungssatzes?",
     options: [
-      {v: "A", t: "Haben an Soll"},
-      {v: "B", t: "Soll an Haben"},
-      {v: "C", t: "Aufwand an Ertrag"},
-      {v: "D", t: "Aktiven an Passiven"}
+      {v: "A", t: "Aufwand an Ertrag"},
+      {v: "B", t: "Haben an Soll"},
+      {v: "C", t: "Aktiven an Passiven"},
+      {v: "D", t: "Soll an Haben"}
     ],
-    correct: "B",
+    correct: "D",
     explain: "Ein Buchungssatz gibt an, welches Konto im Soll (links) und welches im Haben (rechts) belastet wird. Die Struktur ist immer: Soll an Haben (z.B. Kasse an Eigenkapital)."
   },
   {
@@ -922,9 +922,9 @@ window.QUESTIONS = [
     q: "Das Unternehmen nimmt ein langfristiges Darlehen bei der Bank auf. CHF 100'000 werden dem Bankkonto gutgeschrieben. Wie lautet der Buchungssatz?",
     options: [
       {v: "A", t: "Bank an Darlehen 100'000"},
-      {v: "B", t: "Darlehen an Bank 100'000"},
+      {v: "B", t: "Bank an Eigenkapital 100'000"},
       {v: "C", t: "Eigenkapital an Bank 100'000"},
-      {v: "D", t: "Bank an Eigenkapital 100'000"}
+      {v: "D", t: "Darlehen an Bank 100'000"}
     ],
     correct: "A",
     explain: "Die Bank (Aktivkonto) nimmt zu → Soll. Das Darlehen (Passivkonto/langfristiges Fremdkapital) nimmt ebenfalls zu → Haben. Buchungssatz: Bank an Darlehen 100'000."
@@ -933,24 +933,24 @@ window.QUESTIONS = [
     id: "s06", topic: "buchungssatz", type: "mc", diff: 2, tax: "K3",
     q: "Das Unternehmen kauft neue Büromöbel für CHF 8'000. Die Rechnung wird noch nicht bezahlt. Wie lautet der Buchungssatz?",
     options: [
-      {v: "A", t: "Mobilien an Kasse 8'000"},
-      {v: "B", t: "Kreditoren an Mobilien 8'000"},
-      {v: "C", t: "Mobilien an Kreditoren 8'000"},
-      {v: "D", t: "Mobilien an Bank 8'000"}
+      {v: "A", t: "Mobilien an Bank 8'000"},
+      {v: "B", t: "Mobilien an Kreditoren 8'000"},
+      {v: "C", t: "Mobilien an Kasse 8'000"},
+      {v: "D", t: "Kreditoren an Mobilien 8'000"}
     ],
-    correct: "C",
+    correct: "B",
     explain: "Die Mobilien (Aktivkonto) nehmen zu → Soll. Die Kreditoren (Passivkonto, Verbindlichkeit gegenüber Lieferant) nehmen zu → Haben. Buchungssatz: Mobilien an Kreditoren 8'000."
   },
   {
     id: "s07", topic: "buchungssatz", type: "mc", diff: 2, tax: "K3",
     q: "Das Unternehmen bezahlt eine Lieferantenrechnung von CHF 3'000 per Bank. Wie lautet der Buchungssatz?",
     options: [
-      {v: "A", t: "Bank an Kreditoren 3'000"},
+      {v: "A", t: "Aufwand an Bank 3'000"},
       {v: "B", t: "Kreditoren an Kasse 3'000"},
-      {v: "C", t: "Kreditoren an Bank 3'000"},
-      {v: "D", t: "Aufwand an Bank 3'000"}
+      {v: "C", t: "Bank an Kreditoren 3'000"},
+      {v: "D", t: "Kreditoren an Bank 3'000"}
     ],
-    correct: "C",
+    correct: "D",
     explain: "Die Kreditoren (Passivkonto) nehmen ab → Soll. Die Bank (Aktivkonto) nimmt ab → Haben. Buchungssatz: Kreditoren an Bank 3'000."
   },
   {
@@ -966,12 +966,12 @@ window.QUESTIONS = [
     id: "s09", topic: "buchungssatz", type: "mc", diff: 2, tax: "K3",
     q: "Das Unternehmen zahlt CHF 50'000 der Hypothekarschuld per Bank zurück. Wie lautet der Buchungssatz?",
     options: [
-      {v: "A", t: "Bank an Hypothek 50'000"},
-      {v: "B", t: "Hypothek an Bank 50'000"},
+      {v: "A", t: "Eigenkapital an Bank 50'000"},
+      {v: "B", t: "Bank an Hypothek 50'000"},
       {v: "C", t: "Hypothek an Eigenkapital 50'000"},
-      {v: "D", t: "Eigenkapital an Bank 50'000"}
+      {v: "D", t: "Hypothek an Bank 50'000"}
     ],
-    correct: "B",
+    correct: "D",
     explain: "Die Hypothek (Passivkonto) nimmt ab → Soll. Die Bank (Aktivkonto) nimmt ab → Haben. Buchungssatz: Hypothek an Bank 50'000. Aktiven und Passiven nehmen gleichermassen ab (Bilanzverkürzung)."
   },
   {
@@ -990,10 +990,10 @@ window.QUESTIONS = [
     id: "s11", topic: "buchungssatz", type: "mc", diff: 1, tax: "K3",
     q: "Wie lautet der Abschlussbuchungssatz für ein Aktivkonto (z.B. Kasse)?",
     options: [
-      {v: "A", t: "Kasse an Schlussbilanz"},
+      {v: "A", t: "Erfolgsrechnung an Kasse"},
       {v: "B", t: "Schlussbilanz an Kasse"},
-      {v: "C", t: "Kasse an Eröffnungsbilanz"},
-      {v: "D", t: "Erfolgsrechnung an Kasse"}
+      {v: "C", t: "Kasse an Schlussbilanz"},
+      {v: "D", t: "Kasse an Eröffnungsbilanz"}
     ],
     correct: "B",
     explain: "Aktivkonten werden abgeschlossen mit: Schlussbilanz an Aktivkonto. Der Saldo des Aktivkontos wird auf die Habenseite geschrieben und in die Schlussbilanz übertragen."
@@ -1003,8 +1003,8 @@ window.QUESTIONS = [
     q: "Wie lautet der Eröffnungsbuchungssatz für ein Aktivkonto (z.B. Bank)?",
     options: [
       {v: "A", t: "Bank an Eröffnungsbilanz"},
-      {v: "B", t: "Eröffnungsbilanz an Bank"},
-      {v: "C", t: "Bank an Schlussbilanz"},
+      {v: "B", t: "Bank an Schlussbilanz"},
+      {v: "C", t: "Eröffnungsbilanz an Bank"},
       {v: "D", t: "Erfolgsrechnung an Bank"}
     ],
     correct: "A",
@@ -1031,22 +1031,22 @@ window.QUESTIONS = [
     id: "s15", topic: "buchungssatz", type: "mc", diff: 3, tax: "K3",
     q: "Der Lieferant gewährt ein Darlehen von CHF 5'000, das mit der offenen Lieferantenrechnung verrechnet wird (Schuldenumwandlung). Wie lautet der Buchungssatz?",
     options: [
-      {v: "A", t: "Kreditoren an Darlehen 5'000"},
+      {v: "A", t: "Bank an Darlehen 5'000"},
       {v: "B", t: "Darlehen an Kreditoren 5'000"},
-      {v: "C", t: "Bank an Darlehen 5'000"},
-      {v: "D", t: "Kreditoren an Bank 5'000"}
+      {v: "C", t: "Kreditoren an Bank 5'000"},
+      {v: "D", t: "Kreditoren an Darlehen 5'000"}
     ],
-    correct: "A",
+    correct: "D",
     explain: "Die kurzfristige Schuld (Kreditoren) nimmt ab → Soll. Dafür entsteht eine langfristige Schuld (Darlehen) → Haben. Es handelt sich um einen Passivtausch: Kreditoren an Darlehen 5'000. Die Bilanzsumme bleibt gleich."
   },
   {
     id: "s16", topic: "buchungssatz", type: "mc", diff: 3, tax: "K4",
     q: "Ein Geschäftsfall bewirkt gleichzeitig eine Zunahme der Aktiven und eine Zunahme der Passiven. Welcher Bilanzeffekt liegt vor?",
     options: [
-      {v: "A", t: "Aktivtausch"},
+      {v: "A", t: "Bilanzverkürzung"},
       {v: "B", t: "Passivtausch"},
       {v: "C", t: "Bilanzverlängerung"},
-      {v: "D", t: "Bilanzverkürzung"}
+      {v: "D", t: "Aktivtausch"}
     ],
     correct: "C",
     explain: "Wenn sowohl Aktiven als auch Passiven zunehmen, spricht man von einer Bilanzverlängerung: Die Bilanzsumme steigt. Beispiel: Kauf von Mobilien auf Rechnung (Mobilien ↑, Kreditoren ↑)."
@@ -1064,12 +1064,12 @@ window.QUESTIONS = [
     id: "s18", topic: "buchungssatz", type: "mc", diff: 3, tax: "K3",
     q: "Die abgekürzte Eröffnungsbuchung für alle Konten lautet:",
     options: [
-      {v: "A", t: "Passiven an Aktiven"},
-      {v: "B", t: "Aktiven an Passiven"},
-      {v: "C", t: "Schlussbilanz an Eröffnungsbilanz"},
-      {v: "D", t: "Eröffnungsbilanz an Schlussbilanz"}
+      {v: "A", t: "Aktiven an Passiven"},
+      {v: "B", t: "Passiven an Aktiven"},
+      {v: "C", t: "Eröffnungsbilanz an Schlussbilanz"},
+      {v: "D", t: "Schlussbilanz an Eröffnungsbilanz"}
     ],
-    correct: "B",
+    correct: "A",
     explain: "Die abgekürzte Eröffnungsbuchung fasst alle Eröffnungsbuchungen zusammen: Aktiven an Passiven. Alle Aktivkonten werden im Soll eröffnet, alle Passivkonten im Haben. Die abgekürzte Abschlussbuchung lautet umgekehrt: Passiven an Aktiven."
   },
   {
@@ -1087,59 +1087,59 @@ window.QUESTIONS = [
     q: "Das Unternehmen hebt CHF 2'000 bar von der Bank ab. Wie lautet der Buchungssatz?",
     options: [
       {v: "A", t: "Bank an Kasse 2'000"},
-      {v: "B", t: "Kasse an Bank 2'000"},
-      {v: "C", t: "Kasse an Eigenkapital 2'000"},
-      {v: "D", t: "Aufwand an Bank 2'000"}
+      {v: "B", t: "Aufwand an Bank 2'000"},
+      {v: "C", t: "Kasse an Bank 2'000"},
+      {v: "D", t: "Kasse an Eigenkapital 2'000"}
     ],
-    correct: "B",
+    correct: "C",
     explain: "Die Kasse (Aktivkonto) nimmt zu → Soll. Die Bank (Aktivkonto) nimmt ab → Haben. Buchungssatz: Kasse an Bank 2'000. Aktivtausch."
   },
   {
     id: "s21", topic: "buchungssatz", type: "mc", diff: 1, tax: "K3",
     q: "Das Unternehmen zahlt CHF 1'500 aus der Kasse auf das Bankkonto ein. Wie lautet der Buchungssatz?",
     options: [
-      {v: "A", t: "Kasse an Bank 1'500"},
-      {v: "B", t: "Bank an Kasse 1'500"},
-      {v: "C", t: "Bank an Eigenkapital 1'500"},
+      {v: "A", t: "Bank an Eigenkapital 1'500"},
+      {v: "B", t: "Kasse an Bank 1'500"},
+      {v: "C", t: "Bank an Kasse 1'500"},
       {v: "D", t: "Kreditoren an Bank 1'500"}
     ],
-    correct: "B",
+    correct: "C",
     explain: "Die Bank (Aktivkonto) nimmt zu → Soll. Die Kasse (Aktivkonto) nimmt ab → Haben. Buchungssatz: Bank an Kasse 1'500. Aktivtausch."
   },
   {
     id: "s22", topic: "buchungssatz", type: "mc", diff: 2, tax: "K3",
     q: "Das Unternehmen bezahlt die Stromrechnung von CHF 800 per Bank. Wie lautet der Buchungssatz?",
     options: [
-      {v: "A", t: "Bank an Energieaufwand 800"},
-      {v: "B", t: "Energieaufwand an Bank 800"},
-      {v: "C", t: "Energieaufwand an Kreditoren 800"},
+      {v: "A", t: "Energieaufwand an Bank 800"},
+      {v: "B", t: "Energieaufwand an Kreditoren 800"},
+      {v: "C", t: "Bank an Energieaufwand 800"},
       {v: "D", t: "Kreditoren an Bank 800"}
     ],
-    correct: "B",
+    correct: "A",
     explain: "Der Energieaufwand (Aufwandkonto) nimmt zu → Soll. Die Bank (Aktivkonto) nimmt ab → Haben. Erfolgswirksam: Gewinn sinkt."
   },
   {
     id: "s23", topic: "buchungssatz", type: "mc", diff: 2, tax: "K3",
     q: "Das Unternehmen erhält eine Zinsgutschrift von CHF 500 auf das Bankkonto. Wie lautet der Buchungssatz?",
     options: [
-      {v: "A", t: "Finanzertrag an Bank 500"},
-      {v: "B", t: "Bank an Finanzertrag 500"},
-      {v: "C", t: "Bank an Finanzaufwand 500"},
-      {v: "D", t: "Finanzaufwand an Bank 500"}
+      {v: "A", t: "Bank an Finanzertrag 500"},
+      {v: "B", t: "Finanzertrag an Bank 500"},
+      {v: "C", t: "Finanzaufwand an Bank 500"},
+      {v: "D", t: "Bank an Finanzaufwand 500"}
     ],
-    correct: "B",
+    correct: "A",
     explain: "Die Bank (Aktivkonto) nimmt zu → Soll. Der Finanzertrag (Ertragskonto) nimmt zu → Haben. Erfolgswirksam: Gewinn steigt."
   },
   {
     id: "s24", topic: "buchungssatz", type: "mc", diff: 2, tax: "K3",
     q: "Das Unternehmen bezahlt die Büromiete von CHF 4'500 per Bank. Wie lautet der Buchungssatz?",
     options: [
-      {v: "A", t: "Bank an Mietaufwand 4'500"},
+      {v: "A", t: "Mietaufwand an Bank 4'500"},
       {v: "B", t: "Mietaufwand an Kreditoren 4'500"},
-      {v: "C", t: "Mietaufwand an Bank 4'500"},
+      {v: "C", t: "Bank an Mietaufwand 4'500"},
       {v: "D", t: "Raumaufwand an Eigenkapital 4'500"}
     ],
-    correct: "C",
+    correct: "A",
     explain: "Der Mietaufwand (Aufwandkonto) nimmt zu → Soll. Die Bank (Aktivkonto) nimmt ab → Haben."
   },
   {
@@ -1155,24 +1155,24 @@ window.QUESTIONS = [
     id: "s26", topic: "buchungssatz", type: "mc", diff: 2, tax: "K3",
     q: "Das Unternehmen überweist die Sozialversicherungsbeiträge von CHF 5'600 per Bank. Wie lautet der Buchungssatz?",
     options: [
-      {v: "A", t: "Sozialversicherungsaufwand an Bank 5'600"},
-      {v: "B", t: "Bank an Sozialversicherungsaufwand 5'600"},
-      {v: "C", t: "Lohnaufwand an Bank 5'600"},
-      {v: "D", t: "Sozialversicherungsaufwand an Kreditoren 5'600"}
+      {v: "A", t: "Bank an Sozialversicherungsaufwand 5'600"},
+      {v: "B", t: "Sozialversicherungsaufwand an Bank 5'600"},
+      {v: "C", t: "Sozialversicherungsaufwand an Kreditoren 5'600"},
+      {v: "D", t: "Lohnaufwand an Bank 5'600"}
     ],
-    correct: "A",
+    correct: "B",
     explain: "Der Sozialversicherungsaufwand (Aufwandkonto) nimmt zu → Soll. Die Bank (Aktivkonto) nimmt ab → Haben."
   },
   {
     id: "s27", topic: "buchungssatz", type: "mc", diff: 2, tax: "K3",
     q: "Ein Kunde bezahlt eine offene Rechnung von CHF 7'000 bar. Wie lautet der Buchungssatz?",
     options: [
-      {v: "A", t: "Bank an Debitoren 7'000"},
-      {v: "B", t: "Kasse an Debitoren 7'000"},
+      {v: "A", t: "Kasse an Warenverkauf 7'000"},
+      {v: "B", t: "Bank an Debitoren 7'000"},
       {v: "C", t: "Debitoren an Kasse 7'000"},
-      {v: "D", t: "Kasse an Warenverkauf 7'000"}
+      {v: "D", t: "Kasse an Debitoren 7'000"}
     ],
-    correct: "B",
+    correct: "D",
     explain: "Die Kasse (Aktivkonto) nimmt zu → Soll. Die Debitoren (Aktivkonto) nehmen ab → Haben. Aktivtausch, erfolgsunwirksam."
   },
   {
@@ -1188,10 +1188,10 @@ window.QUESTIONS = [
     id: "s29", topic: "buchungssatz", type: "mc", diff: 2, tax: "K3",
     q: "Das Unternehmen erhält Mieteinnahmen von CHF 2'400 auf das Bankkonto. Wie lautet der Buchungssatz?",
     options: [
-      {v: "A", t: "Mietaufwand an Bank 2'400"},
-      {v: "B", t: "Bank an Mietaufwand 2'400"},
+      {v: "A", t: "Bank an Mietaufwand 2'400"},
+      {v: "B", t: "Mietertrag an Bank 2'400"},
       {v: "C", t: "Bank an Mietertrag 2'400"},
-      {v: "D", t: "Mietertrag an Bank 2'400"}
+      {v: "D", t: "Mietaufwand an Bank 2'400"}
     ],
     correct: "C",
     explain: "Die Bank (Aktivkonto) nimmt zu → Soll. Der Mietertrag (Ertragskonto) nimmt zu → Haben."
@@ -1200,9 +1200,9 @@ window.QUESTIONS = [
     id: "s30", topic: "buchungssatz", type: "mc", diff: 2, tax: "K3",
     q: "Das Unternehmen bezahlt Bankzinsen von CHF 1'200. Wie lautet der Buchungssatz?",
     options: [
-      {v: "A", t: "Bank an Finanzaufwand 1'200"},
+      {v: "A", t: "Finanzertrag an Bank 1'200"},
       {v: "B", t: "Finanzaufwand an Bank 1'200"},
-      {v: "C", t: "Finanzertrag an Bank 1'200"},
+      {v: "C", t: "Bank an Finanzaufwand 1'200"},
       {v: "D", t: "Finanzaufwand an Kreditoren 1'200"}
     ],
     correct: "B",
@@ -1222,21 +1222,21 @@ window.QUESTIONS = [
     q: "Das Unternehmen nimmt einen Bankkredit von CHF 50'000 auf. Der Betrag wird dem Bankkonto gutgeschrieben. Wie lautet der Buchungssatz?",
     options: [
       {v: "A", t: "Bankkredit an Bank 50'000"},
-      {v: "B", t: "Bank an Bankkredit 50'000"},
-      {v: "C", t: "Eigenkapital an Bank 50'000"},
+      {v: "B", t: "Eigenkapital an Bank 50'000"},
+      {v: "C", t: "Bank an Bankkredit 50'000"},
       {v: "D", t: "Bank an Eigenkapital 50'000"}
     ],
-    correct: "B",
+    correct: "C",
     explain: "Die Bank (Aktivkonto) nimmt zu → Soll. Der Bankkredit (Passivkonto) nimmt zu → Haben. Bilanzverlängerung."
   },
   {
     id: "s33", topic: "buchungssatz", type: "mc", diff: 2, tax: "K3",
     q: "Das Unternehmen stellt einem Kunden für Beratungsleistungen CHF 6'000 in Rechnung. Wie lautet der Buchungssatz?",
     options: [
-      {v: "A", t: "Honorarertrag an Debitoren 6'000"},
+      {v: "A", t: "Debitoren an Bank 6'000"},
       {v: "B", t: "Bank an Honorarertrag 6'000"},
       {v: "C", t: "Debitoren an Honorarertrag 6'000"},
-      {v: "D", t: "Debitoren an Bank 6'000"}
+      {v: "D", t: "Honorarertrag an Debitoren 6'000"}
     ],
     correct: "C",
     explain: "Debitoren (Aktivkonto) nehmen zu → Soll. Honorarertrag (Ertragskonto) nimmt zu → Haben."
@@ -1245,12 +1245,12 @@ window.QUESTIONS = [
     id: "s34", topic: "buchungssatz", type: "mc", diff: 2, tax: "K3",
     q: "Das Unternehmen zahlt die Versicherungsprämie von CHF 6'000 per Bank. Wie lautet der Buchungssatz?",
     options: [
-      {v: "A", t: "Bank an Versicherungsaufwand 6'000"},
-      {v: "B", t: "Versicherungsaufwand an Kreditoren 6'000"},
-      {v: "C", t: "Versicherungsaufwand an Bank 6'000"},
-      {v: "D", t: "Kreditoren an Bank 6'000"}
+      {v: "A", t: "Kreditoren an Bank 6'000"},
+      {v: "B", t: "Bank an Versicherungsaufwand 6'000"},
+      {v: "C", t: "Versicherungsaufwand an Kreditoren 6'000"},
+      {v: "D", t: "Versicherungsaufwand an Bank 6'000"}
     ],
-    correct: "C",
+    correct: "D",
     explain: "Der Versicherungsaufwand (Aufwandkonto) nimmt zu → Soll. Die Bank (Aktivkonto) nimmt ab → Haben."
   },
   {
@@ -1267,9 +1267,9 @@ window.QUESTIONS = [
     q: "Das Unternehmen wandelt eine kurzfristige Bankschuld von CHF 30'000 in ein langfristiges Darlehen um. Wie lautet der Buchungssatz?",
     options: [
       {v: "A", t: "Bankkredit an Darlehen 30'000"},
-      {v: "B", t: "Darlehen an Bankkredit 30'000"},
-      {v: "C", t: "Bank an Darlehen 30'000"},
-      {v: "D", t: "Bankkredit an Bank 30'000"}
+      {v: "B", t: "Bank an Darlehen 30'000"},
+      {v: "C", t: "Bankkredit an Bank 30'000"},
+      {v: "D", t: "Darlehen an Bankkredit 30'000"}
     ],
     correct: "A",
     explain: "Der kurzfristige Bankkredit (Passivkonto) nimmt ab → Soll. Das langfristige Darlehen (Passivkonto) nimmt zu → Haben. Passivtausch."
@@ -1300,11 +1300,11 @@ window.QUESTIONS = [
     q: "Das Unternehmen erhält eine Steuerrechnung über CHF 12'000. Die Zahlung erfolgt erst später. Wie lautet der Buchungssatz beim Rechnungseingang?",
     options: [
       {v: "A", t: "Steueraufwand an Bank 12'000"},
-      {v: "B", t: "Steueraufwand an Kreditoren 12'000"},
-      {v: "C", t: "Kreditoren an Steueraufwand 12'000"},
+      {v: "B", t: "Kreditoren an Steueraufwand 12'000"},
+      {v: "C", t: "Steueraufwand an Kreditoren 12'000"},
       {v: "D", t: "Bank an Steueraufwand 12'000"}
     ],
-    correct: "B",
+    correct: "C",
     explain: "Der Steueraufwand (Aufwandkonto) nimmt zu → Soll. Die Kreditoren (Passivkonto) nehmen zu → Haben (offene Rechnung). Bei späterer Bezahlung: Kreditoren an Bank."
   },
   {
@@ -1333,10 +1333,10 @@ window.QUESTIONS = [
     options: [
       {v: "A", t: "Aktivtausch"},
       {v: "B", t: "Bilanzverkürzung (Aktiven und Passiven sinken)"},
-      {v: "C", t: "Bilanzverlängerung"},
-      {v: "D", t: "Keiner der vier klassischen Bilanzeffekte – es ist eine erfolgswirksame Buchung, die nur die Aktivseite reduziert"}
+      {v: "C", t: "Keiner der vier klassischen Bilanzeffekte – es ist eine erfolgswirksame Buchung, die nur die Aktivseite reduziert"},
+      {v: "D", t: "Bilanzverlängerung"}
     ],
-    correct: "D",
+    correct: "C",
     explain: "Lohnaufwand (Aufwandkonto, Soll) an Bank (Aktivkonto, Haben). Die Bank sinkt, aber kein Passivkonto ist direkt betroffen. Stattdessen sinkt der Gewinn (und damit letztlich das Eigenkapital). Daher kein klassischer Bilanzeffekt der vier Grundtypen."
   },
   {
@@ -1345,9 +1345,9 @@ window.QUESTIONS = [
     q: "Schau dir die T-Konten in der Abbildung an. Ein Fahrzeug wird für CHF 30'000 per Bank gekauft. Wo wird der Betrag eingetragen?",
     options: [
       {v: "A", t: "Fahrzeuge: 30'000 im Soll (Zunahme). Bank: 30'000 im Haben (Abnahme)."},
-      {v: "B", t: "Fahrzeuge: 30'000 im Haben (Zunahme). Bank: 30'000 im Soll (Abnahme)."},
-      {v: "C", t: "Fahrzeuge: 30'000 im Soll (Abnahme). Bank: 30'000 im Haben (Zunahme)."},
-      {v: "D", t: "Fahrzeuge: 30'000 im Haben (Abnahme). Bank: 30'000 im Soll (Zunahme)."}
+      {v: "B", t: "Fahrzeuge: 30'000 im Haben (Abnahme). Bank: 30'000 im Soll (Zunahme)."},
+      {v: "C", t: "Fahrzeuge: 30'000 im Haben (Zunahme). Bank: 30'000 im Soll (Abnahme)."},
+      {v: "D", t: "Fahrzeuge: 30'000 im Soll (Abnahme). Bank: 30'000 im Haben (Zunahme)."}
     ],
     correct: "A",
     explain: "Beide Konten sind Aktivkonten (gelbe Überschrift). Fahrzeuge nimmt zu → Soll (links). Bank nimmt ab → Haben (rechts). Aktivtausch."
@@ -1381,12 +1381,12 @@ window.QUESTIONS = [
     id: "e01", topic: "erfolgsrechnung", type: "mc", diff: 1, tax: "K1",
     q: "Was ist Aufwand?",
     options: [
-      {v: "A", t: "Die Wertvermehrung durch den Produktionsprozess"},
-      {v: "B", t: "Der Werteverzehr (Kosten der Inputs) im Produktionsprozess"},
+      {v: "A", t: "Der Werteverzehr (Kosten der Inputs) im Produktionsprozess"},
+      {v: "B", t: "Die Wertvermehrung durch den Produktionsprozess"},
       {v: "C", t: "Die Einnahmen aus Verkäufen"},
       {v: "D", t: "Der Bestand an flüssigen Mitteln"}
     ],
-    correct: "B",
+    correct: "A",
     explain: "Aufwand (Aufwände) bezeichnet den Werteverzehr im Produktionsprozess, also die Kosten der eingesetzten Produktionsfaktoren (z.B. Löhne, Material, Miete)."
   },
   {
@@ -1402,12 +1402,12 @@ window.QUESTIONS = [
     id: "e03", topic: "erfolgsrechnung", type: "mc", diff: 1, tax: "K2",
     q: "In welcher Hinsicht unterscheiden sich Erfolgskonten von Bilanzkonten?",
     options: [
-      {v: "A", t: "Erfolgskonten haben immer einen Anfangsbestand aus dem Vorjahr"},
-      {v: "B", t: "Erfolgskonten haben keinen Anfangsbestand – sie beginnen jedes Jahr bei null"},
-      {v: "C", t: "Erfolgskonten werden nie abgeschlossen"},
-      {v: "D", t: "Erfolgskonten gehören nicht zum System der doppelten Buchhaltung"}
+      {v: "A", t: "Erfolgskonten haben keinen Anfangsbestand – sie beginnen jedes Jahr bei null"},
+      {v: "B", t: "Erfolgskonten haben immer einen Anfangsbestand aus dem Vorjahr"},
+      {v: "C", t: "Erfolgskonten gehören nicht zum System der doppelten Buchhaltung"},
+      {v: "D", t: "Erfolgskonten werden nie abgeschlossen"}
     ],
-    correct: "B",
+    correct: "A",
     explain: "Bilanzkonten sind Bestandeskonten mit Anfangsbestand (Übertrag aus Vorjahr). Erfolgskonten (Aufwand/Ertrag) sind Stromgrössen und starten jedes Geschäftsjahr bei null."
   },
   {
@@ -1423,36 +1423,36 @@ window.QUESTIONS = [
     id: "e05", topic: "erfolgsrechnung", type: "mc", diff: 2, tax: "K3",
     q: "Das Unternehmen zahlt Löhne von CHF 12'000 per Bank. Wie lautet der Buchungssatz?",
     options: [
-      {v: "A", t: "Bank an Lohnaufwand 12'000"},
-      {v: "B", t: "Lohnaufwand an Bank 12'000"},
-      {v: "C", t: "Lohnaufwand an Kasse 12'000"},
-      {v: "D", t: "Personalaufwand an Kreditoren 12'000"}
+      {v: "A", t: "Personalaufwand an Kreditoren 12'000"},
+      {v: "B", t: "Lohnaufwand an Kasse 12'000"},
+      {v: "C", t: "Lohnaufwand an Bank 12'000"},
+      {v: "D", t: "Bank an Lohnaufwand 12'000"}
     ],
-    correct: "B",
+    correct: "C",
     explain: "Der Lohnaufwand (Aufwandkonto) nimmt zu → Soll. Die Bank (Aktivkonto) nimmt ab → Haben. Buchungssatz: Lohnaufwand an Bank 12'000. Dieser Geschäftsfall ist erfolgswirksam (der Gewinn sinkt)."
   },
   {
     id: "e06", topic: "erfolgsrechnung", type: "mc", diff: 2, tax: "K3",
     q: "Das Unternehmen stellt einem Kunden eine Rechnung über CHF 8'000 für erbrachte Dienstleistungen. Wie lautet der Buchungssatz?",
     options: [
-      {v: "A", t: "Honorarertrag an Debitoren 8'000"},
-      {v: "B", t: "Debitoren an Honorarertrag 8'000"},
-      {v: "C", t: "Bank an Honorarertrag 8'000"},
-      {v: "D", t: "Debitoren an Kreditoren 8'000"}
+      {v: "A", t: "Bank an Honorarertrag 8'000"},
+      {v: "B", t: "Debitoren an Kreditoren 8'000"},
+      {v: "C", t: "Debitoren an Honorarertrag 8'000"},
+      {v: "D", t: "Honorarertrag an Debitoren 8'000"}
     ],
-    correct: "B",
+    correct: "C",
     explain: "Die Forderung (Debitoren, Aktivkonto) nimmt zu → Soll. Der Ertrag (Honorarertrag, Ertragskonto) nimmt zu → Haben. Buchungssatz: Debitoren an Honorarertrag 8'000. Dieser Geschäftsfall ist erfolgswirksam (der Gewinn steigt)."
   },
   {
     id: "e07", topic: "erfolgsrechnung", type: "mc", diff: 2, tax: "K2",
     q: "Welcher der folgenden Geschäftsfälle ist erfolgsunwirksam (beeinflusst den Jahresgewinn NICHT)?",
     options: [
-      {v: "A", t: "Zahlung von Miete per Bank"},
-      {v: "B", t: "Kunde bezahlt offene Rechnung per Bank"},
-      {v: "C", t: "Zinsgutschrift auf dem Bankkonto"},
-      {v: "D", t: "Lohnzahlung per Bank"}
+      {v: "A", t: "Kunde bezahlt offene Rechnung per Bank"},
+      {v: "B", t: "Zinsgutschrift auf dem Bankkonto"},
+      {v: "C", t: "Lohnzahlung per Bank"},
+      {v: "D", t: "Zahlung von Miete per Bank"}
     ],
-    correct: "B",
+    correct: "A",
     explain: "Wenn ein Kunde per Bank bezahlt, werden nur Bilanzkonten berührt (Bank nimmt zu, Debitoren nehmen ab). Kein Erfolgskonto ist betroffen, daher ist der Vorgang erfolgsunwirksam. Die anderen Vorgänge betreffen je ein Erfolgskonto."
   },
   {
@@ -1489,12 +1489,12 @@ window.QUESTIONS = [
     id: "e11", topic: "erfolgsrechnung", type: "mc", diff: 2, tax: "K3",
     q: "Das Unternehmen schliesst das Jahr mit einem Gewinn von CHF 35'000 ab. Wie wird der Gewinn ins Eigenkapital verbucht?",
     options: [
-      {v: "A", t: "Eigenkapital an Erfolgsrechnung 35'000"},
-      {v: "B", t: "Erfolgsrechnung an Eigenkapital 35'000"},
+      {v: "A", t: "Erfolgsrechnung an Eigenkapital 35'000"},
+      {v: "B", t: "Eigenkapital an Gewinn 35'000"},
       {v: "C", t: "Gewinn an Eigenkapital 35'000"},
-      {v: "D", t: "Eigenkapital an Gewinn 35'000"}
+      {v: "D", t: "Eigenkapital an Erfolgsrechnung 35'000"}
     ],
-    correct: "B",
+    correct: "A",
     explain: "Der Jahresgewinn wird verbucht mit: Erfolgsrechnung an Eigenkapital. Die Erfolgsrechnung wird im Soll belastet (=abgeschlossen), das Eigenkapital nimmt im Haben zu."
   },
   {
@@ -1511,10 +1511,10 @@ window.QUESTIONS = [
     id: "e13", topic: "erfolgsrechnung", type: "mc", diff: 3, tax: "K2",
     q: "Was versteht man unter «neutralem Erfolg» in der zweistufigen Erfolgsrechnung?",
     options: [
-      {v: "A", t: "Der Erfolg, der weder Gewinn noch Verlust darstellt"},
+      {v: "A", t: "Der Erfolg aus dem Kerngeschäft"},
       {v: "B", t: "Erträge und Aufwände, die betriebsfremd, ausserordentlich oder periodenfremd sind"},
-      {v: "C", t: "Der Erfolg aus dem Kerngeschäft"},
-      {v: "D", t: "Der Steueraufwand des Unternehmens"}
+      {v: "C", t: "Der Steueraufwand des Unternehmens"},
+      {v: "D", t: "Der Erfolg, der weder Gewinn noch Verlust darstellt"}
     ],
     correct: "B",
     explain: "Neutraler Erfolg umfasst Aufwände und Erträge, die nicht zum eigentlichen Geschäftszweck gehören (betriebsfremd), einmalig/ausserordentlich oder periodenfremd sind. Beispiele: Gewinn aus Liegenschaftsverkauf, Steueraufwand."
@@ -1538,24 +1538,24 @@ window.QUESTIONS = [
     id: "e16", topic: "erfolgsrechnung", type: "mc", diff: 2, tax: "K3",
     q: "Die Miete von CHF 3'000 wird per Bank bezahlt. Gleichzeitig wird eine Gutschrift für überzahlte Miete von CHF 500 auf das Mietaufwandkonto gebucht. Welcher Netto-Aufwand wird in der Erfolgsrechnung ausgewiesen?",
     options: [
-      {v: "A", t: "CHF 3'500"},
-      {v: "B", t: "CHF 3'000"},
-      {v: "C", t: "CHF 2'500"},
+      {v: "A", t: "CHF 3'000"},
+      {v: "B", t: "CHF 2'500"},
+      {v: "C", t: "CHF 3'500"},
       {v: "D", t: "CHF 500"}
     ],
-    correct: "C",
+    correct: "B",
     explain: "Mietaufwand (Soll): CHF 3'000, Gutschrift (Haben): CHF 500. Saldo des Aufwandkontos: 3'000 – 500 = 2'500 CHF. Dieser Netto-Aufwand erscheint in der Erfolgsrechnung."
   },
   {
     id: "e17", topic: "erfolgsrechnung", type: "mc", diff: 3, tax: "K3",
     q: "Ein Jahresverlust von CHF 10'000 wird ins Eigenkapital verbucht. Wie lautet der Buchungssatz?",
     options: [
-      {v: "A", t: "Erfolgsrechnung an Eigenkapital 10'000"},
-      {v: "B", t: "Eigenkapital an Erfolgsrechnung 10'000"},
-      {v: "C", t: "Verlust an Eigenkapital 10'000"},
-      {v: "D", t: "Eigenkapital an Bank 10'000"}
+      {v: "A", t: "Eigenkapital an Bank 10'000"},
+      {v: "B", t: "Verlust an Eigenkapital 10'000"},
+      {v: "C", t: "Eigenkapital an Erfolgsrechnung 10'000"},
+      {v: "D", t: "Erfolgsrechnung an Eigenkapital 10'000"}
     ],
-    correct: "B",
+    correct: "C",
     explain: "Bei einem Verlust nimmt das Eigenkapital ab. Buchungssatz: Eigenkapital an Erfolgsrechnung 10'000. Das Eigenkapital wird im Soll belastet (nimmt ab), die Erfolgsrechnung im Haben gutgeschrieben (abgeschlossen)."
   },
 
@@ -1567,24 +1567,24 @@ window.QUESTIONS = [
     id: "p01", topic: "eigentuemer", type: "mc", diff: 1, tax: "K2",
     q: "Was zeigt das Eigenkapitalkonto?",
     options: [
-      {v: "A", t: "Die kurzfristigen Schulden des Unternehmens"},
-      {v: "B", t: "Die Schuld des Unternehmens gegenüber dem Geschäftseigentümer"},
+      {v: "A", t: "Den Jahresgewinn des Unternehmens"},
+      {v: "B", t: "Die kurzfristigen Schulden des Unternehmens"},
       {v: "C", t: "Den Kassenbestand des Unternehmens"},
-      {v: "D", t: "Den Jahresgewinn des Unternehmens"}
+      {v: "D", t: "Die Schuld des Unternehmens gegenüber dem Geschäftseigentümer"}
     ],
-    correct: "B",
+    correct: "D",
     explain: "Das Eigenkapital ist die rechnerische Schuld des Unternehmens gegenüber dem Geschäftseigentümer. Es zeigt, wie viel Kapital der Eigentümer dem Unternehmen zur Verfügung gestellt hat (inklusive einbehaltener Gewinne)."
   },
   {
     id: "p02", topic: "eigentuemer", type: "mc", diff: 1, tax: "K2",
     q: "Was ist das Privatkonto?",
     options: [
-      {v: "A", t: "Ein Sparkonto des Unternehmens"},
-      {v: "B", t: "Ein Unterkonto des Eigenkapitalkontos für private Bezüge und Einlagen des Eigentümers"},
-      {v: "C", t: "Das Bankkonto des Eigentümers"},
-      {v: "D", t: "Ein Aufwandkonto für Geschäftsspesen"}
+      {v: "A", t: "Ein Aufwandkonto für Geschäftsspesen"},
+      {v: "B", t: "Das Bankkonto des Eigentümers"},
+      {v: "C", t: "Ein Sparkonto des Unternehmens"},
+      {v: "D", t: "Ein Unterkonto des Eigenkapitalkontos für private Bezüge und Einlagen des Eigentümers"}
     ],
-    correct: "B",
+    correct: "D",
     explain: "Das Privatkonto ist ein Unterkonto des Eigenkapitalkontos. Es erfasst laufende Privatbezüge (Entnahmen) und Privateinlagen des Eigentümers während des Geschäftsjahres."
   },
   {
@@ -1593,8 +1593,8 @@ window.QUESTIONS = [
     options: [
       {v: "A", t: "Kasse an Privat 4'000"},
       {v: "B", t: "Privat an Kasse 4'000"},
-      {v: "C", t: "Eigenkapital an Kasse 4'000"},
-      {v: "D", t: "Lohnaufwand an Kasse 4'000"}
+      {v: "C", t: "Lohnaufwand an Kasse 4'000"},
+      {v: "D", t: "Eigenkapital an Kasse 4'000"}
     ],
     correct: "B",
     explain: "Der Privatbezug belastet das Privatkonto im Soll (wie ein Aktivkonto). Die Kasse nimmt ab → Haben. Buchungssatz: Privat an Kasse 4'000."
@@ -1603,24 +1603,24 @@ window.QUESTIONS = [
     id: "p04", topic: "eigentuemer", type: "mc", diff: 2, tax: "K3",
     q: "Dem Eigentümer wird ein monatlicher Eigenlohn von CHF 6'000 gutgeschrieben. Wie lautet der Buchungssatz?",
     options: [
-      {v: "A", t: "Privat an Bank 6'000"},
-      {v: "B", t: "Lohnaufwand an Privat 6'000"},
-      {v: "C", t: "Bank an Eigenkapital 6'000"},
-      {v: "D", t: "Eigenkapital an Privat 6'000"}
+      {v: "A", t: "Bank an Eigenkapital 6'000"},
+      {v: "B", t: "Eigenkapital an Privat 6'000"},
+      {v: "C", t: "Privat an Bank 6'000"},
+      {v: "D", t: "Lohnaufwand an Privat 6'000"}
     ],
-    correct: "B",
+    correct: "D",
     explain: "Der Eigenlohn ist ein Aufwand des Unternehmens. Buchungssatz: Lohnaufwand an Privat 6'000. Der Aufwand steigt (Soll), das Privatkonto wird im Haben gutgeschrieben (der Eigentümer hat etwas zugute)."
   },
   {
     id: "p05", topic: "eigentuemer", type: "mc", diff: 2, tax: "K3",
     q: "Am Jahresende zeigt das Privatkonto: Sollseite CHF 52'000 (Privatbezüge), Habenseite CHF 72'000 (Eigenlohn). Der Habensaldo beträgt CHF 20'000. Wie wird das Privatkonto abgeschlossen?",
     options: [
-      {v: "A", t: "Privat an Eigenkapital 20'000 (Überschuss wird dem EK gutgeschrieben)"},
-      {v: "B", t: "Eigenkapital an Privat 20'000 (Überschuss wird vom EK abgezogen)"},
-      {v: "C", t: "Privat an Erfolgsrechnung 20'000"},
-      {v: "D", t: "Erfolgsrechnung an Privat 20'000"}
+      {v: "A", t: "Erfolgsrechnung an Privat 20'000"},
+      {v: "B", t: "Privat an Eigenkapital 20'000 (Überschuss wird dem EK gutgeschrieben)"},
+      {v: "C", t: "Eigenkapital an Privat 20'000 (Überschuss wird vom EK abgezogen)"},
+      {v: "D", t: "Privat an Erfolgsrechnung 20'000"}
     ],
-    correct: "A",
+    correct: "B",
     explain: "Der Habensaldo von CHF 20'000 bedeutet, dass der Eigentümer weniger bezogen hat als sein Eigenlohn. Der Überschuss kommt dem Eigenkapital zugute: Privat an Eigenkapital 20'000."
   },
   {
@@ -1663,12 +1663,12 @@ window.QUESTIONS = [
     id: "p10", topic: "eigentuemer", type: "mc", diff: 3, tax: "K4",
     q: "Am Jahresende zeigt das Privatkonto einen Sollsaldo von CHF 8'000. Was bedeutet das?",
     options: [
-      {v: "A", t: "Der Eigentümer hat mehr bezogen als ihm gutgeschrieben wurde – das Eigenkapital wird um 8'000 reduziert"},
-      {v: "B", t: "Der Eigentümer hat weniger bezogen als sein Eigenlohn – das Eigenkapital wird um 8'000 erhöht"},
-      {v: "C", t: "Das Unternehmen hat 8'000 Verlust gemacht"},
+      {v: "A", t: "Das Unternehmen hat 8'000 Verlust gemacht"},
+      {v: "B", t: "Der Eigentümer hat mehr bezogen als ihm gutgeschrieben wurde – das Eigenkapital wird um 8'000 reduziert"},
+      {v: "C", t: "Der Eigentümer hat weniger bezogen als sein Eigenlohn – das Eigenkapital wird um 8'000 erhöht"},
       {v: "D", t: "Der Eigentümer schuldet dem Unternehmen 8'000"}
     ],
-    correct: "A",
+    correct: "B",
     explain: "Ein Sollsaldo auf dem Privatkonto bedeutet: Die Privatbezüge übersteigen die Gutschriften (Eigenlohn). Abschlussbuchung: Eigenkapital an Privat 8'000 – das Eigenkapital wird reduziert."
   },
 
@@ -1680,12 +1680,12 @@ window.QUESTIONS = [
     id: "w01", topic: "warenkonten", type: "mc", diff: 1, tax: "K1",
     q: "Was zeigt das Konto Wareneinkauf?",
     options: [
-      {v: "A", t: "Den Verkaufserlös aus Warenverkäufen"},
-      {v: "B", t: "Den Einstandswert der eingekauften Waren"},
-      {v: "C", t: "Den Gewinn aus dem Warenhandel"},
+      {v: "A", t: "Den Einstandswert der eingekauften Waren"},
+      {v: "B", t: "Den Gewinn aus dem Warenhandel"},
+      {v: "C", t: "Den Verkaufserlös aus Warenverkäufen"},
       {v: "D", t: "Den Bestand an Waren im Lager"}
     ],
-    correct: "B",
+    correct: "A",
     explain: "Das Konto Wareneinkauf ist ein Aufwandkonto und zeigt den Einstandswert der eingekauften Waren (Einkaufspreis nach Abzug von Rabatten/Skonti und Zurechnung von Bezugsspesen)."
   },
   {
@@ -1693,9 +1693,9 @@ window.QUESTIONS = [
     q: "Das Unternehmen kauft Waren für CHF 15'000 auf Rechnung. Wie lautet der Buchungssatz?",
     options: [
       {v: "A", t: "Wareneinkauf an Kreditoren 15'000"},
-      {v: "B", t: "Kreditoren an Wareneinkauf 15'000"},
-      {v: "C", t: "Warenvorrat an Kreditoren 15'000"},
-      {v: "D", t: "Wareneinkauf an Bank 15'000"}
+      {v: "B", t: "Wareneinkauf an Bank 15'000"},
+      {v: "C", t: "Kreditoren an Wareneinkauf 15'000"},
+      {v: "D", t: "Warenvorrat an Kreditoren 15'000"}
     ],
     correct: "A",
     explain: "Der Wareneinkauf (Aufwandkonto) nimmt zu → Soll. Die Verbindlichkeit gegenüber dem Lieferanten (Kreditoren, Passivkonto) nimmt zu → Haben. Buchungssatz: Wareneinkauf an Kreditoren 15'000."
@@ -1704,60 +1704,60 @@ window.QUESTIONS = [
     id: "w03", topic: "warenkonten", type: "mc", diff: 2, tax: "K3",
     q: "Der Lieferant gewährt einen Rabatt von CHF 1'500 auf die Warenlieferung. Wie wird der Rabatt verbucht?",
     options: [
-      {v: "A", t: "Wareneinkauf an Kreditoren 1'500"},
-      {v: "B", t: "Kreditoren an Wareneinkauf 1'500"},
-      {v: "C", t: "Rabatt an Wareneinkauf 1'500"},
-      {v: "D", t: "Kasse an Wareneinkauf 1'500"}
+      {v: "A", t: "Rabatt an Wareneinkauf 1'500"},
+      {v: "B", t: "Wareneinkauf an Kreditoren 1'500"},
+      {v: "C", t: "Kasse an Wareneinkauf 1'500"},
+      {v: "D", t: "Kreditoren an Wareneinkauf 1'500"}
     ],
-    correct: "B",
+    correct: "D",
     explain: "Der Rabatt reduziert sowohl die Schuld (Kreditoren) als auch den Aufwand (Wareneinkauf). Kreditoren nimmt ab → Soll, Wareneinkauf nimmt ab → Haben. Buchungssatz: Kreditoren an Wareneinkauf 1'500."
   },
   {
     id: "w04", topic: "warenkonten", type: "mc", diff: 2, tax: "K3",
     q: "Bezugsspesen (Fracht) von CHF 600 für eine Warenlieferung werden bar bezahlt. Wie lautet der Buchungssatz?",
     options: [
-      {v: "A", t: "Kasse an Wareneinkauf 600"},
-      {v: "B", t: "Bezugsspesen an Kasse 600"},
-      {v: "C", t: "Wareneinkauf an Kasse 600"},
-      {v: "D", t: "Wareneinkauf an Kreditoren 600"}
+      {v: "A", t: "Bezugsspesen an Kasse 600"},
+      {v: "B", t: "Wareneinkauf an Kasse 600"},
+      {v: "C", t: "Wareneinkauf an Kreditoren 600"},
+      {v: "D", t: "Kasse an Wareneinkauf 600"}
     ],
-    correct: "C",
+    correct: "B",
     explain: "Bezugsspesen erhöhen den Einstandswert der Waren und werden direkt auf dem Konto Wareneinkauf verbucht: Wareneinkauf an Kasse 600."
   },
   {
     id: "w05", topic: "warenkonten", type: "mc", diff: 1, tax: "K3",
     q: "Das Unternehmen verkauft Waren für CHF 25'000 auf Rechnung. Wie lautet der Buchungssatz?",
     options: [
-      {v: "A", t: "Warenverkauf an Debitoren 25'000"},
-      {v: "B", t: "Debitoren an Warenverkauf 25'000"},
+      {v: "A", t: "Debitoren an Warenverkauf 25'000"},
+      {v: "B", t: "Warenverkauf an Debitoren 25'000"},
       {v: "C", t: "Bank an Warenverkauf 25'000"},
       {v: "D", t: "Warenverkauf an Kreditoren 25'000"}
     ],
-    correct: "B",
+    correct: "A",
     explain: "Die Forderung (Debitoren, Aktivkonto) nimmt zu → Soll. Der Warenverkauf (Ertragskonto) nimmt zu → Haben. Buchungssatz: Debitoren an Warenverkauf 25'000."
   },
   {
     id: "w06", topic: "warenkonten", type: "mc", diff: 2, tax: "K3",
     q: "Am Jahresende ergibt die Inventur einen Warenvorrat von CHF 42'000. Der Anfangsbestand betrug CHF 35'000. Wie wird die Bestandeszunahme verbucht?",
     options: [
-      {v: "A", t: "Wareneinkauf an Warenvorrat 7'000"},
-      {v: "B", t: "Warenvorrat an Wareneinkauf 7'000"},
+      {v: "A", t: "Warenvorrat an Erfolgsrechnung 7'000"},
+      {v: "B", t: "Wareneinkauf an Warenvorrat 7'000"},
       {v: "C", t: "Warenvorrat an Warenverkauf 7'000"},
-      {v: "D", t: "Warenvorrat an Erfolgsrechnung 7'000"}
+      {v: "D", t: "Warenvorrat an Wareneinkauf 7'000"}
     ],
-    correct: "B",
+    correct: "D",
     explain: "Bestandeszunahme: Endbestand (42'000) – Anfangsbestand (35'000) = 7'000 Zunahme. Warenvorrat (Aktivkonto) nimmt zu → Soll. Wareneinkauf (Aufwandkonto) nimmt ab → Haben. Buchungssatz: Warenvorrat an Wareneinkauf 7'000."
   },
   {
     id: "w07", topic: "warenkonten", type: "mc", diff: 2, tax: "K3",
     q: "Am Jahresende ergibt die Inventur einen Warenvorrat von CHF 28'000. Der Anfangsbestand betrug CHF 35'000. Wie wird die Bestandesabnahme verbucht?",
     options: [
-      {v: "A", t: "Warenvorrat an Wareneinkauf 7'000"},
-      {v: "B", t: "Wareneinkauf an Warenvorrat 7'000"},
+      {v: "A", t: "Wareneinkauf an Warenvorrat 7'000"},
+      {v: "B", t: "Warenvorrat an Erfolgsrechnung 7'000"},
       {v: "C", t: "Warenverkauf an Warenvorrat 7'000"},
-      {v: "D", t: "Warenvorrat an Erfolgsrechnung 7'000"}
+      {v: "D", t: "Warenvorrat an Wareneinkauf 7'000"}
     ],
-    correct: "B",
+    correct: "A",
     explain: "Bestandesabnahme: Endbestand (28'000) – Anfangsbestand (35'000) = –7'000 (Abnahme). Wareneinkauf nimmt zu → Soll. Warenvorrat nimmt ab → Haben. Buchungssatz: Wareneinkauf an Warenvorrat 7'000."
   },
   {
@@ -1857,24 +1857,24 @@ window.QUESTIONS = [
     id: "v01", topic: "wertberichtigungen", type: "mc", diff: 1, tax: "K1",
     q: "Warum müssen Anlagevermögenswerte abgeschrieben werden?",
     options: [
-      {v: "A", t: "Um den Gewinn künstlich zu erhöhen"},
-      {v: "B", t: "Weil sie durch Alterung und Nutzung an Wert verlieren"},
-      {v: "C", t: "Weil das Gesetz keine Bilanzierung von Anlagevermögen erlaubt"},
-      {v: "D", t: "Um die Bilanzsumme möglichst hoch zu halten"}
+      {v: "A", t: "Um die Bilanzsumme möglichst hoch zu halten"},
+      {v: "B", t: "Weil das Gesetz keine Bilanzierung von Anlagevermögen erlaubt"},
+      {v: "C", t: "Weil sie durch Alterung und Nutzung an Wert verlieren"},
+      {v: "D", t: "Um den Gewinn künstlich zu erhöhen"}
     ],
-    correct: "B",
+    correct: "C",
     explain: "Anlagevermögen (Fahrzeuge, Maschinen, Gebäude) verliert durch Alterung, Abnutzung und technische Überholung an Wert. Abschreibungen erfassen diesen Wertverlust buchmässig."
   },
   {
     id: "v02", topic: "wertberichtigungen", type: "mc", diff: 1, tax: "K2",
     q: "Was ist der Unterschied zwischen direkter und indirekter Abschreibung?",
     options: [
-      {v: "A", t: "Direkt: Abschreibung wird direkt vom Aktivkonto abgezogen. Indirekt: Abschreibung wird auf einem separaten Wertberichtigungskonto erfasst."},
+      {v: "A", t: "Direkt: Abschreibung nur für Maschinen. Indirekt: Abschreibung nur für Immobilien."},
       {v: "B", t: "Direkt: Abschreibung erfolgt jährlich. Indirekt: Abschreibung erfolgt monatlich."},
-      {v: "C", t: "Direkt: Abschreibung nur für Maschinen. Indirekt: Abschreibung nur für Immobilien."},
-      {v: "D", t: "Es gibt keinen Unterschied."}
+      {v: "C", t: "Es gibt keinen Unterschied."},
+      {v: "D", t: "Direkt: Abschreibung wird direkt vom Aktivkonto abgezogen. Indirekt: Abschreibung wird auf einem separaten Wertberichtigungskonto erfasst."}
     ],
-    correct: "A",
+    correct: "D",
     explain: "Bei der direkten Abschreibung wird der Buchwert direkt auf dem Aktivkonto reduziert (Abschreibungen an Aktivkonto). Bei der indirekten Abschreibung bleibt der Anschaffungswert auf dem Aktivkonto stehen, und die kummulierten Abschreibungen werden auf einem separaten Wertberichtigungskonto gesammelt."
   },
   {
@@ -1920,12 +1920,12 @@ window.QUESTIONS = [
     id: "v07", topic: "wertberichtigungen", type: "mc", diff: 2, tax: "K3",
     q: "Ein Fahrzeug mit einem Buchwert von CHF 12'000 wird für CHF 15'000 verkauft. Wie wird der Verkaufsgewinn verbucht?",
     options: [
-      {v: "A", t: "Bank an Fahrzeuge 12'000 und Bank an a.o. Ertrag 3'000"},
-      {v: "B", t: "Bank an Fahrzeuge 15'000"},
-      {v: "C", t: "Fahrzeuge an Bank 15'000"},
-      {v: "D", t: "Abschreibungen an Fahrzeuge 3'000"}
+      {v: "A", t: "Bank an Fahrzeuge 15'000"},
+      {v: "B", t: "Abschreibungen an Fahrzeuge 3'000"},
+      {v: "C", t: "Bank an Fahrzeuge 12'000 und Bank an a.o. Ertrag 3'000"},
+      {v: "D", t: "Fahrzeuge an Bank 15'000"}
     ],
-    correct: "A",
+    correct: "C",
     explain: "Der Verkaufspreis (CHF 15'000) übersteigt den Buchwert (CHF 12'000) um CHF 3'000. Bank erhält 15'000 (Soll), Fahrzeuge wird um 12'000 ausgebucht (Haben), der Gewinn von 3'000 wird als a.o. Ertrag erfasst (Haben)."
   },
   {
@@ -1933,11 +1933,11 @@ window.QUESTIONS = [
     q: "Was ist das Delkredere?",
     options: [
       {v: "A", t: "Ein Aufwandkonto für Warenrücksendungen"},
-      {v: "B", t: "Ein Minus-Aktivkonto (Wertberichtigung) für mutmassliche Debitorenverluste"},
-      {v: "C", t: "Ein Ertragskonto für Zinseinkünfte"},
-      {v: "D", t: "Ein Passivkonto für langfristige Schulden"}
+      {v: "B", t: "Ein Passivkonto für langfristige Schulden"},
+      {v: "C", t: "Ein Minus-Aktivkonto (Wertberichtigung) für mutmassliche Debitorenverluste"},
+      {v: "D", t: "Ein Ertragskonto für Zinseinkünfte"}
     ],
-    correct: "B",
+    correct: "C",
     explain: "Das Delkredere ist ein Minus-Aktivkonto (Korrekturkonto zu den Debitoren). Es erfasst die geschätzten, wahrscheinlichen Verluste aus offenen Forderungen. Debitoren minus Delkredere = Nettowert der Forderungen."
   },
   {
@@ -1962,12 +1962,12 @@ window.QUESTIONS = [
     id: "v11", topic: "wertberichtigungen", type: "mc", diff: 2, tax: "K3",
     q: "Ein Debitor kann seine Schuld von CHF 3'000 definitiv nicht bezahlen (Verlustschein). Wie wird der tatsächliche Verlust verbucht?",
     options: [
-      {v: "A", t: "Debitorenverluste an Debitoren 3'000"},
-      {v: "B", t: "Debitoren an Debitorenverluste 3'000"},
+      {v: "A", t: "Bank an Debitorenverluste 3'000"},
+      {v: "B", t: "Debitorenverluste an Debitoren 3'000"},
       {v: "C", t: "Delkredere an Debitoren 3'000"},
-      {v: "D", t: "Bank an Debitorenverluste 3'000"}
+      {v: "D", t: "Debitoren an Debitorenverluste 3'000"}
     ],
-    correct: "A",
+    correct: "B",
     explain: "Der tatsächliche Verlust wird verbucht mit: Debitorenverluste (Aufwandkonto) an Debitoren (Aktivkonto) 3'000. Die Forderung wird ausgebucht, der Verlust als Aufwand erfasst."
   },
   {
@@ -1997,12 +1997,12 @@ window.QUESTIONS = [
     id: "a01", topic: "abgrenzungen", type: "mc", diff: 1, tax: "K2",
     q: "Warum sind Rechnungsabgrenzungen am Jahresende nötig?",
     options: [
-      {v: "A", t: "Um die Bilanzsumme möglichst hoch auszuweisen"},
-      {v: "B", t: "Um Aufwände und Erträge der richtigen Geschäftsperiode zuzuordnen (Periodengerechtigkeit)"},
+      {v: "A", t: "Um das Eigenkapital zu erhöhen"},
+      {v: "B", t: "Um die Bilanzsumme möglichst hoch auszuweisen"},
       {v: "C", t: "Um Steuern zu sparen"},
-      {v: "D", t: "Um das Eigenkapital zu erhöhen"}
+      {v: "D", t: "Um Aufwände und Erträge der richtigen Geschäftsperiode zuzuordnen (Periodengerechtigkeit)"}
     ],
-    correct: "B",
+    correct: "D",
     explain: "Rechnungsabgrenzungen stellen sicher, dass Aufwände und Erträge in der Periode erfasst werden, in der sie wirtschaftlich angefallen sind (Grundsatz der Periodengerechtigkeit)."
   },
   {
@@ -2010,36 +2010,36 @@ window.QUESTIONS = [
     img: {src: "img/bwl/fibu/fibu_abgrenzungen_01.svg", alt: "Übersicht: Transitorische Aktiven, Transitorische Passiven und Rückstellungen"},
     q: "Was sind Transitorische Aktiven (TA)?",
     options: [
-      {v: "A", t: "Vorausbezahlte Aufwände oder noch nicht erhaltene Erträge, die ins neue Jahr gehören"},
-      {v: "B", t: "Vorauserhaltene Erträge oder noch nicht bezahlte Aufwände"},
-      {v: "C", t: "Langfristige Vermögenswerte"},
-      {v: "D", t: "Rückstellungen für zukünftige Ausgaben"}
+      {v: "A", t: "Vorauserhaltene Erträge oder noch nicht bezahlte Aufwände"},
+      {v: "B", t: "Vorausbezahlte Aufwände oder noch nicht erhaltene Erträge, die ins neue Jahr gehören"},
+      {v: "C", t: "Rückstellungen für zukünftige Ausgaben"},
+      {v: "D", t: "Langfristige Vermögenswerte"}
     ],
-    correct: "A",
+    correct: "B",
     explain: "Transitorische Aktiven entstehen, wenn ein Aufwand im alten Jahr bezahlt wurde, aber (teilweise) das neue Jahr betrifft (vorausbezahlter Aufwand), oder wenn ein Ertrag im alten Jahr entstanden ist, aber noch nicht eingegangen ist (noch nicht erhaltener Ertrag)."
   },
   {
     id: "a03", topic: "abgrenzungen", type: "mc", diff: 1, tax: "K2",
     q: "Was sind Transitorische Passiven (TP)?",
     options: [
-      {v: "A", t: "Vorausbezahlte Aufwände"},
-      {v: "B", t: "Noch nicht bezahlte Aufwände des alten Jahres oder vorauserhaltene Erträge"},
-      {v: "C", t: "Kurzfristige Schulden"},
+      {v: "A", t: "Kurzfristige Schulden"},
+      {v: "B", t: "Vorausbezahlte Aufwände"},
+      {v: "C", t: "Noch nicht bezahlte Aufwände des alten Jahres oder vorauserhaltene Erträge"},
       {v: "D", t: "Abschreibungen auf Anlagevermögen"}
     ],
-    correct: "B",
+    correct: "C",
     explain: "Transitorische Passiven entstehen, wenn ein Aufwand des alten Jahres noch nicht bezahlt wurde (noch nicht bezahlter Aufwand), oder wenn ein Ertrag im alten Jahr erhalten wurde, aber das neue Jahr betrifft (vorauserhaltener Ertrag)."
   },
   {
     id: "a04", topic: "abgrenzungen", type: "mc", diff: 2, tax: "K3",
     q: "Am 1. Oktober bezahlt das Unternehmen die Versicherungsprämie von CHF 12'000 für ein ganzes Jahr (Okt.–Sept.) per Bank. Am 31.12. muss abgegrenzt werden. Wie lautet die Abgrenzungsbuchung?",
     options: [
-      {v: "A", t: "Transitorische Aktiven an Versicherungsaufwand 9'000"},
-      {v: "B", t: "Versicherungsaufwand an Transitorische Aktiven 9'000"},
+      {v: "A", t: "Transitorische Aktiven an Versicherungsaufwand 3'000"},
+      {v: "B", t: "Transitorische Aktiven an Versicherungsaufwand 9'000"},
       {v: "C", t: "Transitorische Passiven an Versicherungsaufwand 9'000"},
-      {v: "D", t: "Transitorische Aktiven an Versicherungsaufwand 3'000"}
+      {v: "D", t: "Versicherungsaufwand an Transitorische Aktiven 9'000"}
     ],
-    correct: "A",
+    correct: "B",
     explain: "Von den CHF 12'000 betreffen nur 3 Monate (Okt.–Dez.) das alte Jahr = CHF 3'000. Die restlichen 9 Monate (Jan.–Sept.) = CHF 9'000 gehören ins neue Jahr. Abgrenzung: TA an Versicherungsaufwand 9'000. Der Aufwand im alten Jahr wird auf 3'000 korrigiert."
   },
   {
@@ -2047,11 +2047,11 @@ window.QUESTIONS = [
     q: "Am 31.12. ist der Dezemberlohn von CHF 15'000 noch nicht bezahlt. Wie lautet die Abgrenzungsbuchung?",
     options: [
       {v: "A", t: "Transitorische Aktiven an Lohnaufwand 15'000"},
-      {v: "B", t: "Lohnaufwand an Transitorische Passiven 15'000"},
-      {v: "C", t: "Lohnaufwand an Bank 15'000"},
+      {v: "B", t: "Lohnaufwand an Bank 15'000"},
+      {v: "C", t: "Lohnaufwand an Transitorische Passiven 15'000"},
       {v: "D", t: "Transitorische Passiven an Lohnaufwand 15'000"}
     ],
-    correct: "B",
+    correct: "C",
     explain: "Der Lohnaufwand gehört ins alte Jahr (Dezember), ist aber noch nicht bezahlt. Der Aufwand muss erfasst werden: Lohnaufwand an TP 15'000. Die TP zeigt die noch offene Verpflichtung."
   },
   {
@@ -2067,10 +2067,10 @@ window.QUESTIONS = [
     id: "a07", topic: "abgrenzungen", type: "mc", diff: 2, tax: "K2",
     q: "Was ist der Hauptunterschied zwischen Transitorischen Passiven und Rückstellungen?",
     options: [
-      {v: "A", t: "TP sind kurzfristig, Rückstellungen immer langfristig"},
+      {v: "A", t: "TP betreffen nur Aufwände, Rückstellungen nur Erträge"},
       {v: "B", t: "Bei TP sind Betrag und Fälligkeit bekannt, bei Rückstellungen sind Betrag oder Fälligkeit unsicher"},
-      {v: "C", t: "TP betreffen nur Aufwände, Rückstellungen nur Erträge"},
-      {v: "D", t: "Es gibt keinen Unterschied"}
+      {v: "C", t: "Es gibt keinen Unterschied"},
+      {v: "D", t: "TP sind kurzfristig, Rückstellungen immer langfristig"}
     ],
     correct: "B",
     explain: "Bei Transitorischen Passiven sind Betrag und Fälligkeit bekannt (z.B. offener Dezemberlohn). Bei Rückstellungen ist der Betrag und/oder die Fälligkeit der Zahlung unsicher (z.B. hängiger Rechtsstreit, Garantieansprüche)."
@@ -2081,8 +2081,8 @@ window.QUESTIONS = [
     options: [
       {v: "A", t: "Prozessaufwand an Rückstellungen 20'000"},
       {v: "B", t: "Rückstellungen an Bank 20'000"},
-      {v: "C", t: "Rückstellungen an Prozessaufwand 20'000"},
-      {v: "D", t: "Bank an Rückstellungen 20'000"}
+      {v: "C", t: "Bank an Rückstellungen 20'000"},
+      {v: "D", t: "Rückstellungen an Prozessaufwand 20'000"}
     ],
     correct: "A",
     explain: "Die Bildung einer Rückstellung: Aufwandkonto (Soll) an Rückstellungen (Passivkonto, Haben). Es entsteht ein Aufwand im alten Jahr und eine Verbindlichkeit mit unsicherem Betrag/Zeitpunkt."
@@ -2091,12 +2091,12 @@ window.QUESTIONS = [
     id: "a09", topic: "abgrenzungen", type: "mc", diff: 3, tax: "K3",
     q: "Der Rechtsstreit wird im Folgejahr beigelegt. Das Unternehmen zahlt CHF 15'000 (weniger als die Rückstellung von CHF 20'000). Wie wird die Auflösung der Rückstellung verbucht?",
     options: [
-      {v: "A", t: "Rückstellungen an Bank 15'000 und Rückstellungen an a.o. Ertrag 5'000"},
-      {v: "B", t: "Prozessaufwand an Bank 15'000"},
-      {v: "C", t: "Rückstellungen an Bank 20'000"},
-      {v: "D", t: "Bank an Rückstellungen 15'000"}
+      {v: "A", t: "Prozessaufwand an Bank 15'000"},
+      {v: "B", t: "Rückstellungen an Bank 15'000 und Rückstellungen an a.o. Ertrag 5'000"},
+      {v: "C", t: "Bank an Rückstellungen 15'000"},
+      {v: "D", t: "Rückstellungen an Bank 20'000"}
     ],
-    correct: "A",
+    correct: "B",
     explain: "Die Rückstellung von CHF 20'000 wird aufgelöst: CHF 15'000 werden bezahlt (Rückstellungen an Bank 15'000). Die Differenz von CHF 5'000 (nicht benötigter Teil) wird als ausserordentlicher Ertrag erfasst: Rückstellungen an a.o. Ertrag 5'000."
   },
   {

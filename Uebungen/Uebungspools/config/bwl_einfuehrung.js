@@ -37,24 +37,24 @@ window.QUESTIONS = [
     id: "w01", topic: "wirtschaft", type: "mc", diff: 1, tax: "K1",
     q: "Was ist ein Bedürfnis?",
     options: [
-      {v: "A", t: "Der Wunsch, einen empfundenen Mangel zu beseitigen oder zu mildern"},
+      {v: "A", t: "Eine Dienstleistung, die von Unternehmen angeboten wird"},
       {v: "B", t: "Ein Gut, das man im Laden kaufen kann"},
       {v: "C", t: "Die Menge an Geld, die man zur Verfügung hat"},
-      {v: "D", t: "Eine Dienstleistung, die von Unternehmen angeboten wird"}
+      {v: "D", t: "Der Wunsch, einen empfundenen Mangel zu beseitigen oder zu mildern"}
     ],
-    correct: "A",
+    correct: "D",
     explain: "Ein Bedürfnis ist gemäss Definition der Wunsch, einen empfundenen Mangel zu beseitigen oder zu mildern. Bedürfnisse sind der Ausgangspunkt wirtschaftlicher Aktivitäten."
   },
   {
     id: "w02", topic: "wirtschaft", type: "mc", diff: 1, tax: "K1",
     q: "Welche Stufe der Maslow'schen Bedürfnispyramide bildet die Basis?",
     options: [
-      {v: "A", t: "Sicherheitsbedürfnisse"},
+      {v: "A", t: "Physiologische Bedürfnisse"},
       {v: "B", t: "Soziale Bedürfnisse"},
-      {v: "C", t: "Physiologische Bedürfnisse"},
+      {v: "C", t: "Sicherheitsbedürfnisse"},
       {v: "D", t: "Selbstverwirklichung"}
     ],
-    correct: "C",
+    correct: "A",
     img: {src: "img/bwl/einfuehrung/einfuehrung_beduerfnispyramide_01.svg", alt: "Pyramide mit vier Stufen, Beschriftungen durch Fragezeichen ersetzt"},
     explain: "Die physiologischen Bedürfnisse (z.B. Nahrung, Schlaf, Wärme) bilden die unterste Stufe der Pyramide. Sie müssen zuerst befriedigt werden, bevor höhere Bedürfnisse relevant werden."
   },
@@ -77,10 +77,10 @@ window.QUESTIONS = [
     id: "w05", topic: "wirtschaft", type: "mc", diff: 2, tax: "K2",
     q: "Welche der folgenden Aussagen beschreibt den Zusammenhang zwischen Bedürfnissen und Knappheit korrekt?",
     options: [
-      {v: "A", t: "Knappheit entsteht, weil Bedürfnisse begrenzt, aber Ressourcen unbegrenzt sind"},
+      {v: "A", t: "Knappheit entsteht durch staatliche Regulierung"},
       {v: "B", t: "Knappheit entsteht, weil die Bedürfnisse unbegrenzt, die Mittel zur Befriedigung aber begrenzt sind"},
       {v: "C", t: "Knappheit existiert nur in Entwicklungsländern"},
-      {v: "D", t: "Knappheit entsteht durch staatliche Regulierung"}
+      {v: "D", t: "Knappheit entsteht, weil Bedürfnisse begrenzt, aber Ressourcen unbegrenzt sind"}
     ],
     correct: "B",
     explain: "Das Grundproblem der Wirtschaft ist, dass die menschlichen Bedürfnisse praktisch unbegrenzt sind, während die Ressourcen (Geld, Rohstoffe, Zeit) zur Befriedigung begrenzt sind. Dieses Spannungsfeld zwischen Bedarf und Deckungsmöglichkeit ist die Ursache der Knappheit."
@@ -101,22 +101,22 @@ window.QUESTIONS = [
     id: "w07", topic: "wirtschaft", type: "mc", diff: 2, tax: "K2",
     q: "Frau Wepfer schliesst eine Privathaftpflichtversicherung ab. Welcher Kategorie der Maslow'schen Bedürfnispyramide entspricht dieses Bedürfnis?",
     options: [
-      {v: "A", t: "Physiologisches Bedürfnis"},
-      {v: "B", t: "Sicherheitsbedürfnis"},
-      {v: "C", t: "Soziales Bedürfnis"},
+      {v: "A", t: "Soziales Bedürfnis"},
+      {v: "B", t: "Physiologisches Bedürfnis"},
+      {v: "C", t: "Sicherheitsbedürfnis"},
       {v: "D", t: "Bedürfnis nach Selbstverwirklichung"}
     ],
-    correct: "B",
+    correct: "C",
     explain: "Eine Privathaftpflichtversicherung dient der Absicherung gegen finanzielle Risiken. Dies entspricht einem Sicherheitsbedürfnis (Schutz vor Gefahren, festes Einkommen, Absicherung, Unterkunft)."
   },
   {
     id: "w08", topic: "wirtschaft", type: "mc", diff: 3, tax: "K4",
     q: "Herr Sommer kauft sich einen Porsche. Welche Bedürfniskategorie(n) könnten hier zutreffen?",
     options: [
-      {v: "A", t: "Nur physiologisches Bedürfnis, da ein Auto der Fortbewegung dient"},
+      {v: "A", t: "Nur soziales Bedürfnis, da man mit dem Auto Freunde besuchen kann"},
       {v: "B", t: "Nur Sicherheitsbedürfnis, da ein Auto Schutz bietet"},
       {v: "C", t: "Primär Bedürfnis nach Anerkennung (Prestige), eventuell auch Selbstverwirklichung"},
-      {v: "D", t: "Nur soziales Bedürfnis, da man mit dem Auto Freunde besuchen kann"}
+      {v: "D", t: "Nur physiologisches Bedürfnis, da ein Auto der Fortbewegung dient"}
     ],
     correct: "C",
     explain: "Ein Porsche geht weit über das Grundbedürfnis nach Mobilität hinaus. Der Kauf eines Luxusautos befriedigt primär das Bedürfnis nach Anerkennung und Prestige (Achtung). Je nach Motivation kann auch Selbstverwirklichung eine Rolle spielen."
@@ -144,24 +144,24 @@ window.QUESTIONS = [
     id: "g01", topic: "gueter", type: "mc", diff: 1, tax: "K1",
     q: "Wie werden Güter genannt, die durch die Wirtschaft bereitgestellt werden und der Bedürfnisbefriedigung dienen?",
     options: [
-      {v: "A", t: "Freie Güter"},
-      {v: "B", t: "Wirtschaftsgüter"},
-      {v: "C", t: "Luxusgüter"},
-      {v: "D", t: "Naturgüter"}
+      {v: "A", t: "Wirtschaftsgüter"},
+      {v: "B", t: "Freie Güter"},
+      {v: "C", t: "Naturgüter"},
+      {v: "D", t: "Luxusgüter"}
     ],
-    correct: "B",
+    correct: "A",
     explain: "Wirtschaftsgüter sind Güter, die knapp sind und bewirtschaftet werden müssen. Im Gegensatz dazu sind freie Güter (wie Luft) in ausreichender Menge vorhanden und werden von der BWL nicht näher betrachtet."
   },
   {
     id: "g02", topic: "gueter", type: "mc", diff: 1, tax: "K2",
     q: "Welches der folgenden Beispiele ist ein Verbrauchsgut?",
     options: [
-      {v: "A", t: "Ein Fernseher"},
-      {v: "B", t: "Ein Lebensmittel"},
-      {v: "C", t: "Ein Buch"},
-      {v: "D", t: "Ein Kletterseil"}
+      {v: "A", t: "Ein Lebensmittel"},
+      {v: "B", t: "Ein Kletterseil"},
+      {v: "C", t: "Ein Fernseher"},
+      {v: "D", t: "Ein Buch"}
     ],
-    correct: "B",
+    correct: "A",
     img: {src: "img/bwl/einfuehrung/einfuehrung_gueterarten_01.svg", alt: "Übersicht der Güterarten als Baumdiagramm mit leeren Feldern"},
     explain: "Lebensmittel sind Verbrauchsgüter, weil sie mit dem Konsum verbraucht werden. Fernseher, Bücher und Kletterseile können wiederholt benutzt werden und sind somit Gebrauchsgüter."
   },
@@ -184,12 +184,12 @@ window.QUESTIONS = [
     id: "g05", topic: "gueter", type: "mc", diff: 2, tax: "K2",
     q: "Was unterscheidet Investitionsgüter von Konsumgütern?",
     options: [
-      {v: "A", t: "Investitionsgüter sind immer teurer als Konsumgüter"},
-      {v: "B", t: "Investitionsgüter dienen der Erstellung von Konsumgütern und tragen indirekt zur Bedürfnisbefriedigung bei"},
-      {v: "C", t: "Konsumgüter können nur einmal verwendet werden"},
-      {v: "D", t: "Investitionsgüter werden ausschliesslich vom Staat gekauft"}
+      {v: "A", t: "Konsumgüter können nur einmal verwendet werden"},
+      {v: "B", t: "Investitionsgüter werden ausschliesslich vom Staat gekauft"},
+      {v: "C", t: "Investitionsgüter dienen der Erstellung von Konsumgütern und tragen indirekt zur Bedürfnisbefriedigung bei"},
+      {v: "D", t: "Investitionsgüter sind immer teurer als Konsumgüter"}
     ],
-    correct: "B",
+    correct: "C",
     explain: "Investitionsgüter (z.B. Maschinen, Fahrzeuge) werden für die Erstellung von Konsumgütern verwendet. Sie tragen somit indirekt zur Bedürfnisbefriedigung bei, während Konsumgüter direkt dem privaten Verbrauch dienen."
   },
   {
@@ -208,12 +208,12 @@ window.QUESTIONS = [
     id: "g07", topic: "gueter", type: "mc", diff: 2, tax: "K3",
     q: "Ein Unternehmen will aus 125 Holzlatten möglichst viele Tischplatten herstellen. Welches ökonomische Prinzip wird hier angewendet?",
     options: [
-      {v: "A", t: "Minimumprinzip"},
-      {v: "B", t: "Maximumprinzip"},
+      {v: "A", t: "Maximumprinzip"},
+      {v: "B", t: "Minimumprinzip"},
       {v: "C", t: "Optimumprinzip"},
       {v: "D", t: "Sparsamkeitsprinzip"}
     ],
-    correct: "B",
+    correct: "A",
     explain: "Hier ist der Input (125 Holzlatten) gegeben und der Output (Anzahl Tischplatten) soll maximiert werden. Das entspricht dem Maximumprinzip (auch Ergiebigkeitsprinzip genannt)."
   },
   {
@@ -221,23 +221,23 @@ window.QUESTIONS = [
     q: "Sechs Tischplatten sollen aus möglichst wenigen Holzlatten fabriziert werden. Welches ökonomische Prinzip wird angewendet?",
     options: [
       {v: "A", t: "Maximumprinzip"},
-      {v: "B", t: "Minimumprinzip"},
+      {v: "B", t: "Ergiebigkeitsprinzip"},
       {v: "C", t: "Optimumprinzip"},
-      {v: "D", t: "Ergiebigkeitsprinzip"}
+      {v: "D", t: "Minimumprinzip"}
     ],
-    correct: "B",
+    correct: "D",
     explain: "Hier ist der Output (sechs Tischplatten) vorgegeben und der Input (Holzlatten) soll minimiert werden. Das entspricht dem Minimumprinzip (auch Sparsamkeitsprinzip genannt)."
   },
   {
     id: "g09", topic: "gueter", type: "mc", diff: 3, tax: "K3",
     q: "Ein Flughafen soll mit vertretbaren Kosten so ausgebaut werden, dass damit mehr Passagiere befördert werden können. Welches ökonomische Prinzip wird hier angewendet?",
     options: [
-      {v: "A", t: "Maximumprinzip, weil mehr Passagiere befördert werden sollen"},
+      {v: "A", t: "Keines der ökonomischen Prinzipien"},
       {v: "B", t: "Minimumprinzip, weil die Kosten «vertretbar» sein sollen"},
-      {v: "C", t: "Optimumprinzip, weil weder Input noch Output genau vorgegeben sind"},
-      {v: "D", t: "Keines der ökonomischen Prinzipien"}
+      {v: "C", t: "Maximumprinzip, weil mehr Passagiere befördert werden sollen"},
+      {v: "D", t: "Optimumprinzip, weil weder Input noch Output genau vorgegeben sind"}
     ],
-    correct: "C",
+    correct: "D",
     explain: "Weder der zu erreichende Output (Passagierzahl) noch der verfügbare Input (Budget) sind genau vorgegeben. Es wird nach dem Optimumprinzip vorgegangen: eine Abwägung zwischen Kosten und Nutzen, um eine optimale Relation zu finden."
   },
   {
@@ -267,12 +267,12 @@ window.QUESTIONS = [
     id: "s01", topic: "struktur", type: "mc", diff: 1, tax: "K1",
     q: "Welcher Sektor umfasst die Land- und Forstwirtschaft, den Gartenbau und die Fischerei?",
     options: [
-      {v: "A", t: "1. Sektor"},
-      {v: "B", t: "2. Sektor"},
-      {v: "C", t: "3. Sektor"},
-      {v: "D", t: "4. Sektor"}
+      {v: "A", t: "2. Sektor"},
+      {v: "B", t: "1. Sektor"},
+      {v: "C", t: "4. Sektor"},
+      {v: "D", t: "3. Sektor"}
     ],
-    correct: "A",
+    correct: "B",
     explain: "Der 1. Sektor (Primärsektor) umfasst die Land- und Forstwirtschaft, den Gartenbau und die Fischerei."
   },
   {
@@ -295,22 +295,22 @@ window.QUESTIONS = [
     id: "s04", topic: "struktur", type: "mc", diff: 2, tax: "K2",
     q: "Wie hat sich die Verteilung der Erwerbstätigen auf die drei Sektoren in der Schweiz seit 1850 verändert?",
     options: [
-      {v: "A", t: "Der 1. Sektor ist gewachsen, der 3. Sektor geschrumpft"},
-      {v: "B", t: "Der 1. Sektor ist stark geschrumpft, der 3. Sektor stark gewachsen"},
-      {v: "C", t: "Alle drei Sektoren sind etwa gleich geblieben"},
-      {v: "D", t: "Nur der 2. Sektor hat sich verändert"}
+      {v: "A", t: "Nur der 2. Sektor hat sich verändert"},
+      {v: "B", t: "Der 1. Sektor ist gewachsen, der 3. Sektor geschrumpft"},
+      {v: "C", t: "Der 1. Sektor ist stark geschrumpft, der 3. Sektor stark gewachsen"},
+      {v: "D", t: "Alle drei Sektoren sind etwa gleich geblieben"}
     ],
-    correct: "B",
+    correct: "C",
     explain: "Seit 1850 hat ein massiver Strukturwandel stattgefunden: Der 1. Sektor (Landwirtschaft) ist von über 50% auf ca. 2,6% geschrumpft. Der 3. Sektor (Dienstleistungen) ist auf ca. 76,7% gewachsen. Der 2. Sektor (Industrie) lag zwischenzeitlich hoch und liegt heute bei ca. 20,7%."
   },
   {
     id: "s05", topic: "struktur", type: "mc", diff: 2, tax: "K2",
     q: "Welche Branche hat in der Schweiz den höchsten monatlichen Medianlohn (Bruttolohn)?",
     options: [
-      {v: "A", t: "IT und Kommunikation"},
+      {v: "A", t: "Gesundheits- und Sozialwesen"},
       {v: "B", t: "Finanz- und Versicherungsgewerbe"},
-      {v: "C", t: "Erziehung und Unterricht"},
-      {v: "D", t: "Gesundheits- und Sozialwesen"}
+      {v: "C", t: "IT und Kommunikation"},
+      {v: "D", t: "Erziehung und Unterricht"}
     ],
     correct: "B",
     explain: "Gemäss der Schweizerischen Lohnstrukturerhebung hat das Finanz- und Versicherungsgewerbe mit CHF 9'630 den höchsten Medianlohn, gefolgt von IT und Kommunikation (CHF 8'724) sowie Erziehung und Unterricht (CHF 8'494)."
@@ -331,9 +331,9 @@ window.QUESTIONS = [
     id: "s07", topic: "struktur", type: "mc", diff: 3, tax: "K4",
     q: "Die Mammut Sports Group AG produziert Outdoor-Bekleidung und Sportgeräte. Welchem Sektor gehört das Unternehmen an?",
     options: [
-      {v: "A", t: "1. Sektor, weil Rohstoffe verwendet werden"},
+      {v: "A", t: "3. Sektor, weil die Produkte an Konsumenten verkauft werden"},
       {v: "B", t: "2. Sektor, weil Produkte hergestellt werden (Verarbeitung und Fabrikation)"},
-      {v: "C", t: "3. Sektor, weil die Produkte an Konsumenten verkauft werden"},
+      {v: "C", t: "1. Sektor, weil Rohstoffe verwendet werden"},
       {v: "D", t: "Allen drei Sektoren gleichzeitig"}
     ],
     correct: "B",
@@ -344,11 +344,11 @@ window.QUESTIONS = [
     q: "In welcher Grossregion der Schweiz gibt es am meisten Unternehmen?",
     options: [
       {v: "A", t: "Zürich"},
-      {v: "B", t: "Genferseeregion"},
-      {v: "C", t: "Espace Mittelland"},
-      {v: "D", t: "Nordwestschweiz"}
+      {v: "B", t: "Espace Mittelland"},
+      {v: "C", t: "Nordwestschweiz"},
+      {v: "D", t: "Genferseeregion"}
     ],
-    correct: "C",
+    correct: "B",
     explain: "Der Espace Mittelland hat mit 120'971 Unternehmen die meisten Unternehmen, knapp vor der Genferseeregion (115'242) und Zürich (105'835). Dies ist auch durch die grosse Fläche und Bevölkerung dieser Region bedingt."
   },
   {
@@ -367,9 +367,9 @@ window.QUESTIONS = [
     q: "Ab wie vielen Vollzeitstellen gilt ein Unternehmen in der Schweiz als Grossunternehmen?",
     options: [
       {v: "A", t: "Ab 50 Vollzeitstellen"},
-      {v: "B", t: "Ab 100 Vollzeitstellen"},
+      {v: "B", t: "Ab 500 Vollzeitstellen"},
       {v: "C", t: "Ab 250 Vollzeitstellen"},
-      {v: "D", t: "Ab 500 Vollzeitstellen"}
+      {v: "D", t: "Ab 100 Vollzeitstellen"}
     ],
     correct: "C",
     explain: "Die Grössenklassen: Mikrounternehmen (0–9), Kleinunternehmen (10–49), Mittelunternehmen (50–249), Grossunternehmen (250 und mehr Vollzeitstellen)."
@@ -388,11 +388,11 @@ window.QUESTIONS = [
     q: "Welche Rechtsform ist in der Schweiz am häufigsten?",
     options: [
       {v: "A", t: "Aktiengesellschaft (AG)"},
-      {v: "B", t: "GmbH"},
-      {v: "C", t: "Einzelunternehmung"},
-      {v: "D", t: "Kollektivgesellschaft"}
+      {v: "B", t: "Kollektivgesellschaft"},
+      {v: "C", t: "GmbH"},
+      {v: "D", t: "Einzelunternehmung"}
     ],
-    correct: "C",
+    correct: "D",
     explain: "Die Einzelunternehmung ist mit 166'658 Firmen die in der Schweiz am häufigsten vorkommende Rechtsform, noch vor der GmbH (231'250) und der AG (229'736) (Stand 2022). Hinweis: Die Zahlen zeigen, dass es sich knapp um die Einzelunternehmung handelt."
   },
   {
@@ -413,8 +413,8 @@ window.QUESTIONS = [
     options: [
       {v: "A", t: "Sie macht grundsätzlich keinen Umsatz"},
       {v: "B", t: "Die Gewinnerzielung steht nicht im Vordergrund, sondern spezielle Bedürfnisbefriedigung"},
-      {v: "C", t: "Sie darf kein Personal anstellen"},
-      {v: "D", t: "Sie gehört immer dem Staat"}
+      {v: "C", t: "Sie gehört immer dem Staat"},
+      {v: "D", t: "Sie darf kein Personal anstellen"}
     ],
     correct: "B",
     explain: "Bei NPOs steht nicht die Gewinnerzielung im Vordergrund, sondern gemeinnützige, soziale, kulturelle oder wissenschaftliche Ziele. Beispiele sind die Schweizerische Rettungsflugwacht Rega oder die Krebsliga Schweiz. NPOs können durchaus Umsatz und Überschüsse erzielen."
@@ -429,24 +429,24 @@ window.QUESTIONS = [
     id: "u07", topic: "unternehmen", type: "mc", diff: 2, tax: "K2",
     q: "Ein Unternehmen, das in mehreren Ländern produziert und seine Produkte weltweit vertreibt, hat welche Reichweite?",
     options: [
-      {v: "A", t: "Lokale Tätigkeit"},
+      {v: "A", t: "Nationale Tätigkeit"},
       {v: "B", t: "Regionale Tätigkeit"},
-      {v: "C", t: "Nationale Tätigkeit"},
-      {v: "D", t: "Internationale Tätigkeit"}
+      {v: "C", t: "Internationale Tätigkeit"},
+      {v: "D", t: "Lokale Tätigkeit"}
     ],
-    correct: "D",
+    correct: "C",
     explain: "Ein Unternehmen mit Produktion und Vertrieb in mehreren Ländern hat eine internationale Tätigkeit. Beispiele sind Nestlé oder die Mammut Sports Group AG."
   },
   {
     id: "u08", topic: "unternehmen", type: "mc", diff: 3, tax: "K4",
     q: "Drei Freundinnen haben einen Impfstoff entwickelt und wollen ein Unternehmen gründen. Sie wünschen sich beschränkte Haftung, geringes Mindestkapital und aktive Mitarbeit aller Gesellschafterinnen. Welche Rechtsform passt am besten?",
     options: [
-      {v: "A", t: "Einzelunternehmung"},
+      {v: "A", t: "Aktiengesellschaft (AG)"},
       {v: "B", t: "Kollektivgesellschaft"},
-      {v: "C", t: "Aktiengesellschaft (AG)"},
-      {v: "D", t: "Gesellschaft mit beschränkter Haftung (GmbH)"}
+      {v: "C", t: "Gesellschaft mit beschränkter Haftung (GmbH)"},
+      {v: "D", t: "Einzelunternehmung"}
     ],
-    correct: "D",
+    correct: "C",
     explain: "Die GmbH bietet beschränkte Haftung (nur Gesellschaftsvermögen haftet), erfordert geringes Mindestkapital (CHF 20'000) und ist besonders geeignet für kleinere, personenbezogene Unternehmen mit aktiver Mitarbeit der Gesellschafterinnen. Eine Einzelunternehmung scheidet aus (3 Personen), eine KollG hat unbeschränkte Haftung, und eine AG erfordert höheres Kapital (CHF 100'000)."
   },
   {
@@ -476,12 +476,12 @@ window.QUESTIONS = [
     id: "z01", topic: "ziele", type: "mc", diff: 1, tax: "K1",
     q: "Was ist das Kernziel, das ein Unternehmen langfristig verfolgen muss, um am Markt zu bestehen?",
     options: [
-      {v: "A", t: "Möglichst viele Mitarbeitende anstellen"},
-      {v: "B", t: "Eine nachhaltige und marktgerechte Rentabilität erwirtschaften"},
-      {v: "C", t: "Möglichst viele Produkte herstellen"},
-      {v: "D", t: "Den Umsatz jedes Jahr verdoppeln"}
+      {v: "A", t: "Eine nachhaltige und marktgerechte Rentabilität erwirtschaften"},
+      {v: "B", t: "Den Umsatz jedes Jahr verdoppeln"},
+      {v: "C", t: "Möglichst viele Mitarbeitende anstellen"},
+      {v: "D", t: "Möglichst viele Produkte herstellen"}
     ],
-    correct: "B",
+    correct: "A",
     explain: "Das Kernziel eines Unternehmens ist die Erwirtschaftung einer nachhaltigen und marktgerechten Rentabilität. Nur wenn der Ertrag langfristig grösser ist als der Aufwand, kann ein Unternehmen bestehen."
   },
   {
@@ -498,22 +498,22 @@ window.QUESTIONS = [
     id: "z03", topic: "ziele", type: "mc", diff: 1, tax: "K2",
     q: "Was bedeutet das «M» in der SMART-Systematik?",
     options: [
-      {v: "A", t: "Ziele müssen motivierend sein"},
-      {v: "B", t: "Ziele müssen messbar sein"},
-      {v: "C", t: "Ziele müssen minimal sein"},
-      {v: "D", t: "Ziele müssen mehrheitsfähig sein"}
+      {v: "A", t: "Ziele müssen messbar sein"},
+      {v: "B", t: "Ziele müssen mehrheitsfähig sein"},
+      {v: "C", t: "Ziele müssen motivierend sein"},
+      {v: "D", t: "Ziele müssen minimal sein"}
     ],
-    correct: "B",
+    correct: "A",
     explain: "Das «M» steht für Measurable (messbar). Ziele müssen so formuliert sein, dass ihre Erreichung überprüft werden kann – z.B. durch Kennzahlen, Mengen oder Zeitangaben."
   },
   {
     id: "z04", topic: "ziele", type: "mc", diff: 2, tax: "K2",
     q: "Ein Unternehmen will seinen Ausschuss senken und gleichzeitig die Kosten reduzieren. Durch die Reduktion des Ausschusses werden automatisch auch Kosten gesenkt. Welche Zielbeziehung liegt vor?",
     options: [
-      {v: "A", t: "Zielkonkurrenz"},
+      {v: "A", t: "Zielindifferenz"},
       {v: "B", t: "Zielharmonie"},
-      {v: "C", t: "Zielneutralität"},
-      {v: "D", t: "Zielindifferenz"}
+      {v: "C", t: "Zielkonkurrenz"},
+      {v: "D", t: "Zielneutralität"}
     ],
     correct: "B",
     explain: "Es liegt Zielharmonie vor: Das Erreichen des einen Ziels (Ausschuss senken) fördert automatisch das andere Ziel (Kosten senken), da weniger fehlerhafte Produkte auch weniger Kosten verursachen."
@@ -523,11 +523,11 @@ window.QUESTIONS = [
     q: "Ein Unternehmen will eine hohe Lieferbereitschaft garantieren, aber gleichzeitig die Lagerhaltungskosten senken. Welche Zielbeziehung besteht?",
     options: [
       {v: "A", t: "Zielharmonie"},
-      {v: "B", t: "Zielneutralität"},
-      {v: "C", t: "Zielkonkurrenz"},
-      {v: "D", t: "Zielidentität"}
+      {v: "B", t: "Zielidentität"},
+      {v: "C", t: "Zielneutralität"},
+      {v: "D", t: "Zielkonkurrenz"}
     ],
-    correct: "C",
+    correct: "D",
     explain: "Es liegt Zielkonkurrenz vor: Um schnell liefern zu können, muss das Unternehmen grosse Lagerbestände halten. Grosse Lagerbestände bedeuten aber hohe Lagerhaltungskosten. Die beiden Ziele stehen in einem Spannungsverhältnis."
   },
   {
@@ -552,10 +552,10 @@ window.QUESTIONS = [
     id: "z08", topic: "ziele", type: "mc", diff: 3, tax: "K4",
     q: "Ein Unternehmen erneuert seine alte Lastwagenflotte aus Umweltschutzgründen und will gleichzeitig eine hohe Produktqualität sicherstellen. Die Erneuerung der Flotte hat keinen Einfluss auf die Produktqualität. Welche Zielbeziehung liegt vor?",
     options: [
-      {v: "A", t: "Zielharmonie"},
-      {v: "B", t: "Zielkonkurrenz"},
+      {v: "A", t: "Zielkonkurrenz"},
+      {v: "B", t: "Zielkomplementarität"},
       {v: "C", t: "Zielneutralität"},
-      {v: "D", t: "Zielkomplementarität"}
+      {v: "D", t: "Zielharmonie"}
     ],
     correct: "C",
     explain: "Es liegt Zielneutralität vor: Das Erreichen des einen Ziels (Erneuerung der Lastwagenflotte) hat keinen Einfluss auf das andere Ziel (Produktqualität). Die beiden Ziele berühren sich nicht."
@@ -578,24 +578,24 @@ window.QUESTIONS = [
     id: "k02", topic: "kennzahlen", type: "mc", diff: 1, tax: "K1",
     q: "Welche Kennzahl setzt den Gewinn ins Verhältnis zum eingesetzten Kapital?",
     options: [
-      {v: "A", t: "Produktivität"},
+      {v: "A", t: "Liquidität"},
       {v: "B", t: "Wirtschaftlichkeit"},
-      {v: "C", t: "Rentabilität"},
-      {v: "D", t: "Liquidität"}
+      {v: "C", t: "Produktivität"},
+      {v: "D", t: "Rentabilität"}
     ],
-    correct: "C",
+    correct: "D",
     explain: "Die Rentabilität setzt den Gewinn ins Verhältnis zum eingesetzten Kapital (Rentabilität = Gewinn / Kapital × 100). Sie zeigt, wie effizient das Kapital eingesetzt wurde."
   },
   {
     id: "k03", topic: "kennzahlen", type: "mc", diff: 2, tax: "K2",
     q: "Wie ergibt sich die Wirtschaftlichkeit aus der Produktivität?",
     options: [
-      {v: "A", t: "Outputmenge × Verkaufspreis / Inputmenge × Einkaufspreis"},
+      {v: "A", t: "Gewinn / Gesamtkapital × 100"},
       {v: "B", t: "Outputmenge / Inputmenge × Steuersatz"},
-      {v: "C", t: "Gewinn / Gesamtkapital × 100"},
-      {v: "D", t: "Umsatz / Anzahl Mitarbeitende"}
+      {v: "C", t: "Umsatz / Anzahl Mitarbeitende"},
+      {v: "D", t: "Outputmenge × Verkaufspreis / Inputmenge × Einkaufspreis"}
     ],
-    correct: "A",
+    correct: "D",
     explain: "Die Wirtschaftlichkeit ergibt sich, indem die Outputmenge mit dem Verkaufspreis und die Inputmenge mit dem Einkaufspreis multipliziert wird: (Output × Verkaufspreis) / (Input × Einkaufspreis) = Ertrag / Aufwand. So werden verschiedene Produktivitäten monetär vergleichbar."
   },
   {
@@ -626,12 +626,12 @@ window.QUESTIONS = [
     id: "k07", topic: "kennzahlen", type: "mc", diff: 2, tax: "K2",
     q: "Ein Unternehmen hat eine Wirtschaftlichkeit von 0,85. Was bedeutet das?",
     options: [
-      {v: "A", t: "Das Unternehmen arbeitet mit Gewinn"},
-      {v: "B", t: "Das Unternehmen arbeitet mit Verlust, da der Aufwand grösser ist als der Ertrag"},
-      {v: "C", t: "Das Unternehmen ist sehr produktiv"},
-      {v: "D", t: "Das Unternehmen hat eine hohe Rentabilität"}
+      {v: "A", t: "Das Unternehmen arbeitet mit Verlust, da der Aufwand grösser ist als der Ertrag"},
+      {v: "B", t: "Das Unternehmen ist sehr produktiv"},
+      {v: "C", t: "Das Unternehmen hat eine hohe Rentabilität"},
+      {v: "D", t: "Das Unternehmen arbeitet mit Gewinn"}
     ],
-    correct: "B",
+    correct: "A",
     explain: "Eine Wirtschaftlichkeit unter 1 (hier 0,85) bedeutet, dass der Aufwand grösser ist als der Ertrag – das Unternehmen arbeitet also mit Verlust. Wirtschaftlichkeit = Ertrag / Aufwand."
   },
   {
@@ -669,12 +669,12 @@ window.QUESTIONS = [
     id: "t01", topic: "standort", type: "mc", diff: 1, tax: "K1",
     q: "Was versteht man unter einem Standortfaktor?",
     options: [
-      {v: "A", t: "Den Gewinn eines Unternehmens am Standort"},
-      {v: "B", t: "Ein Kriterium, das die Standortwahl eines Unternehmens beeinflusst"},
-      {v: "C", t: "Die Anzahl Mitarbeitende an einem Standort"},
-      {v: "D", t: "Die Rechtsform des Unternehmens"}
+      {v: "A", t: "Ein Kriterium, das die Standortwahl eines Unternehmens beeinflusst"},
+      {v: "B", t: "Die Rechtsform des Unternehmens"},
+      {v: "C", t: "Den Gewinn eines Unternehmens am Standort"},
+      {v: "D", t: "Die Anzahl Mitarbeitende an einem Standort"}
     ],
-    correct: "B",
+    correct: "A",
     explain: "Ein Standortfaktor ist ein Kriterium, das bei der Wahl des Unternehmensstandorts eine Rolle spielt. Je nach Unternehmensart können unterschiedliche Standortfaktoren ausschlaggebend sein."
   },
   {
@@ -694,21 +694,21 @@ window.QUESTIONS = [
     q: "Für welchen Unternehmenstyp sind absatzorientierte Standortfaktoren (Nähe zur Kundschaft) besonders wichtig?",
     options: [
       {v: "A", t: "Bergbauunternehmen"},
-      {v: "B", t: "Softwareentwickler mit Home-Office"},
-      {v: "C", t: "Detailhandelsgeschäft oder Restaurant"},
-      {v: "D", t: "Fabrik für Grossmaschinen"}
+      {v: "B", t: "Fabrik für Grossmaschinen"},
+      {v: "C", t: "Softwareentwickler mit Home-Office"},
+      {v: "D", t: "Detailhandelsgeschäft oder Restaurant"}
     ],
-    correct: "C",
+    correct: "D",
     explain: "Für Detailhandelsgeschäfte, Restaurants, Hotels und ähnliche Betriebe ist die Nähe zur Kundschaft entscheidend. Banken, Hotels und Handwerkerbetriebe sind weitere Beispiele, bei denen absatzorientierte Standortfaktoren im Vordergrund stehen."
   },
   {
     id: "t04", topic: "standort", type: "mc", diff: 2, tax: "K2",
     q: "Was versteht man unter einer Nutzwertanalyse (NWA)?",
     options: [
-      {v: "A", t: "Eine Methode, um den Gewinn verschiedener Standorte zu berechnen"},
+      {v: "A", t: "Eine Analyse der Kundennachfrage am Standort"},
       {v: "B", t: "Ein Instrument, bei dem Standorte anhand gewichteter Kriterien bewertet und verglichen werden"},
-      {v: "C", t: "Eine Analyse der Kundennachfrage am Standort"},
-      {v: "D", t: "Ein Verfahren zur Berechnung der Mietkosten"}
+      {v: "C", t: "Ein Verfahren zur Berechnung der Mietkosten"},
+      {v: "D", t: "Eine Methode, um den Gewinn verschiedener Standorte zu berechnen"}
     ],
     correct: "B",
     img: {src: "img/bwl/einfuehrung/einfuehrung_nwa_01.svg", alt: "Schematische Darstellung einer Nutzwertanalyse mit Kriterien, Gewichtung und Bewertung"},
@@ -726,8 +726,8 @@ window.QUESTIONS = [
     options: [
       {v: "A", t: "Weil die Schweiz keine Arbeitskräfte hat"},
       {v: "B", t: "Weil bei wenig Know-how-Anforderung die Kosten der Arbeitskräfte ein ausschlaggebender Faktor sind und günstigere Standorte im Ausland attraktiv werden"},
-      {v: "C", t: "Weil Maschinen immer günstiger sind als Menschen"},
-      {v: "D", t: "Weil der Staat die Löhne festlegt"}
+      {v: "C", t: "Weil der Staat die Löhne festlegt"},
+      {v: "D", t: "Weil Maschinen immer günstiger sind als Menschen"}
     ],
     correct: "B",
     explain: "Bei arbeitsintensiver Produktion mit wenig Know-how-Anforderung (z.B. Bekleidungsindustrie) sind die Arbeitskosten der ausschlaggebende Standortfaktor. Da die Schweiz hohe Lohn- und Lohnnebenkosten hat, werden Produktionsstätten häufig ins Ausland verlagert."
@@ -756,12 +756,12 @@ window.QUESTIONS = [
     id: "t09", topic: "standort", type: "mc", diff: 3, tax: "K4",
     q: "Welche Standortfaktoren stehen bei einem Chemieunternehmen im Vordergrund?",
     options: [
-      {v: "A", t: "Absatzorientierte Faktoren und Standortimage"},
-      {v: "B", t: "Umweltorientierte und material-/rohstofforientierte Faktoren"},
-      {v: "C", t: "Nur grundstückorientierte Faktoren"},
-      {v: "D", t: "Ausschliesslich interkantonale Steuerfaktoren"}
+      {v: "A", t: "Ausschliesslich interkantonale Steuerfaktoren"},
+      {v: "B", t: "Nur grundstückorientierte Faktoren"},
+      {v: "C", t: "Absatzorientierte Faktoren und Standortimage"},
+      {v: "D", t: "Umweltorientierte und material-/rohstofforientierte Faktoren"}
     ],
-    correct: "B",
+    correct: "D",
     explain: "Für ein Chemieunternehmen sind umweltorientierte Faktoren (strenge Umweltauflagen für Abgaswerte, Abwasser) und material-/rohstofforientierte Faktoren (Zugang zu Rohstoffen, Transportkosten) besonders relevant. Auch verkehrsorientierte und infrastrukturorientierte Faktoren spielen eine Rolle."
   },
   {

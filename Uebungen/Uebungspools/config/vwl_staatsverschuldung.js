@@ -32,23 +32,23 @@ window.QUESTIONS = [
 {id:"s01", topic:"staatsanteil", type:"mc", diff:1, tax:"K1",
  q:"Was misst die Staatsquote?",
  options:[
-   {v:"A", t:"Den Anteil der Staatsausgaben am BIP."},
-   {v:"B", t:"Den Anteil der Steuereinnahmen am BIP."},
-   {v:"C", t:"Den Anteil der Staatsschulden am BIP."},
-   {v:"D", t:"Den Anteil der Sozialversicherungsbeiträge am BIP."}
+   {v: "A", t:"Den Anteil der Steuereinnahmen am BIP."},
+   {v: "B", t:"Den Anteil der Staatsausgaben am BIP."},
+   {v: "C", t:"Den Anteil der Sozialversicherungsbeiträge am BIP."},
+   {v: "D", t:"Den Anteil der Staatsschulden am BIP."}
  ],
- correct:"A",
+ correct:"B",
  explain:"Die Staatsquote gibt an, wie viel der gesamten volkswirtschaftlichen Leistung (BIP) durch die Hand des Staates fliesst. Sie umfasst die Ausgaben von Bund, Kantonen, Gemeinden und öffentlichen Sozialversicherungen."},
 
 {id:"s02", topic:"staatsanteil", type:"mc", diff:1, tax:"K1",
  q:"Was misst die Fiskalquote?",
  options:[
-   {v:"A", t:"Die Fiskaleinnahmen aller Staatsebenen inkl. Sozialversicherungsbeiträge in % des BIP."},
-   {v:"B", t:"Die Gesamtausgaben des Staates in % des BIP."},
-   {v:"C", t:"Den Anteil der Mehrwertsteuer an den gesamten Steuern."},
-   {v:"D", t:"Die Verschuldung des Staates in % des BIP."}
+   {v: "A", t:"Die Gesamtausgaben des Staates in % des BIP."},
+   {v: "B", t:"Die Fiskaleinnahmen aller Staatsebenen inkl. Sozialversicherungsbeiträge in % des BIP."},
+   {v: "C", t:"Den Anteil der Mehrwertsteuer an den gesamten Steuern."},
+   {v: "D", t:"Die Verschuldung des Staates in % des BIP."}
  ],
- correct:"A",
+ correct:"B",
  explain:"Die Fiskalquote entspricht den Fiskaleinnahmen aller Staatsebenen einschliesslich der obligatorischen Sozialversicherungsbeiträge in Prozent des BIP. Sie misst somit die gesamte Steuerbelastung."},
 
 {id:"s03", topic:"staatsanteil", type:"tf", diff:1, tax:"K1",
@@ -85,12 +85,12 @@ window.QUESTIONS = [
 {id:"s07", topic:"staatsanteil", type:"mc", diff:2, tax:"K2",
  q:"Warum sind die Möglichkeiten zur Produktivitätssteigerung im öffentlichen Sektor geringer als in der Privatwirtschaft?",
  options:[
-   {v:"A", t:"Öffentliche Dienstleistungen sind arbeitsintensiv und schwer automatisierbar."},
-   {v:"B", t:"Der Staat darf keine modernen Technologien einsetzen."},
-   {v:"C", t:"Staatsangestellte arbeiten grundsätzlich weniger produktiv."},
-   {v:"D", t:"Der Staat hat keinen Zugang zum Kapitalmarkt."}
+   {v: "A", t:"Der Staat hat keinen Zugang zum Kapitalmarkt."},
+   {v: "B", t:"Staatsangestellte arbeiten grundsätzlich weniger produktiv."},
+   {v: "C", t:"Der Staat darf keine modernen Technologien einsetzen."},
+   {v: "D", t:"Öffentliche Dienstleistungen sind arbeitsintensiv und schwer automatisierbar."}
  ],
- correct:"A",
+ correct:"D",
  explain:"Öffentliche Leistungen wie Bildung, Gesundheit und Verwaltung sind personalintensiv. Anders als in der industriellen Produktion lässt sich die Arbeitsproduktivität hier nur beschränkt steigern, was zu einer überdurchschnittlichen Kostenentwicklung führt."},
 
 {id:"s08", topic:"staatsanteil", type:"open", diff:3, tax:"K4",
@@ -107,12 +107,12 @@ window.QUESTIONS = [
 {id:"a01", topic:"ausgaben", type:"mc", diff:1, tax:"K1",
  q:"Welcher Ausgabenposten des Bundes ist der grösste?",
  options:[
-   {v:"A", t:"Soziale Wohlfahrt"},
-   {v:"B", t:"Landesverteidigung"},
-   {v:"C", t:"Bildung"},
-   {v:"D", t:"Verkehr"}
+   {v: "A", t:"Verkehr"},
+   {v: "B", t:"Soziale Wohlfahrt"},
+   {v: "C", t:"Bildung"},
+   {v: "D", t:"Landesverteidigung"}
  ],
- correct:"A",
+ correct:"B",
  explain:"Die soziale Wohlfahrt ist mit rund 22 Mrd. Fr. (Rechnung 2018) der mit Abstand grösste Ausgabenposten des Bundes. Am stärksten angestiegen sind allerdings die Ausgaben für Bildung (+67% seit 2008)."},
 
 {id:"a02", topic:"ausgaben", type:"tf", diff:1, tax:"K1",
@@ -144,10 +144,10 @@ window.QUESTIONS = [
 {id:"a05", topic:"ausgaben", type:"mc", diff:2, tax:"K2",
  q:"Im Ausgabenposten 'Finanzen und Steuern' des Bundes sind vor allem enthalten:",
  options:[
-   {v:"A", t:"Schuldzinsen und Kantonsanteile an den Bundessteuern."},
-   {v:"B", t:"Die Gehälter der Steuerbeamten."},
-   {v:"C", t:"Die Ausgaben für die Eidgenössische Steuerverwaltung."},
-   {v:"D", t:"Die Kosten für die Steuerhinterziehungsbekämpfung."}
+   {v: "A", t:"Schuldzinsen und Kantonsanteile an den Bundessteuern."},
+   {v: "B", t:"Die Kosten für die Steuerhinterziehungsbekämpfung."},
+   {v: "C", t:"Die Gehälter der Steuerbeamten."},
+   {v: "D", t:"Die Ausgaben für die Eidgenössische Steuerverwaltung."}
  ],
  correct:"A",
  explain:"Der Posten 'Finanzen und Steuern' enthält insbesondere die Schuldzinsen auf der Bundesschuld sowie die Kantonsanteile an den Bundessteuern (z.B. direkte Bundessteuer)."},
@@ -177,10 +177,10 @@ window.QUESTIONS = [
 {id:"e01", topic:"einnahmen", type:"mc", diff:1, tax:"K1",
  q:"Welche Steuer ist die wichtigste Einnahmequelle des Bundes?",
  options:[
-   {v:"A", t:"Die Mehrwertsteuer"},
-   {v:"B", t:"Die Einkommenssteuer"},
-   {v:"C", t:"Die Verrechnungssteuer"},
-   {v:"D", t:"Die Mineralölsteuer"}
+   {v: "A", t:"Die Mehrwertsteuer"},
+   {v: "B", t:"Die Mineralölsteuer"},
+   {v: "C", t:"Die Einkommenssteuer"},
+   {v: "D", t:"Die Verrechnungssteuer"}
  ],
  correct:"A",
  explain:"Die Mehrwertsteuer und die direkte Bundessteuer sind die beiden dominierenden Einnahmequellen des Bundes. Die Mehrwertsteuer ist eine indirekte Steuer auf den Verbrauch."},
@@ -215,10 +215,10 @@ window.QUESTIONS = [
 {id:"e05", topic:"einnahmen", type:"mc", diff:2, tax:"K2",
  q:"Neben Steuern erzielt der Bund auch Einnahmen aus anderen Quellen. Welche der folgenden gehört NICHT dazu?",
  options:[
-   {v:"A", t:"Zölle auf Importe aus der EU"},
-   {v:"B", t:"Gebühren für Amtshandlungen"},
-   {v:"C", t:"Gewinnablieferung der SNB"},
-   {v:"D", t:"Erträge aus privatrechtlicher Tätigkeit (z.B. Museen)"}
+   {v: "A", t:"Zölle auf Importe aus der EU"},
+   {v: "B", t:"Erträge aus privatrechtlicher Tätigkeit (z.B. Museen)"},
+   {v: "C", t:"Gewinnablieferung der SNB"},
+   {v: "D", t:"Gebühren für Amtshandlungen"}
  ],
  correct:"A",
  explain:"Die Schweiz erhebt als Nicht-EU-Mitglied zwar Zölle, diese machen aber keinen wesentlichen Einnahmeposten aus. Zu den übrigen Einnahmen gehören Gebühren, Monopolerträge (z.B. SNB-Gewinnablieferung) und Erträge aus privatrechtlicher Tätigkeit."},
@@ -231,12 +231,12 @@ window.QUESTIONS = [
 {id:"e07", topic:"einnahmen", type:"mc", diff:2, tax:"K2",
  q:"Die gesamten Einnahmen des Bundes sind von 2008 bis 2019 um wie viel Prozent gestiegen?",
  options:[
-   {v:"A", t:"Etwa 15,6%"},
-   {v:"B", t:"Etwa 8%"},
-   {v:"C", t:"Etwa 25%"},
-   {v:"D", t:"Etwa 5%"}
+   {v: "A", t:"Etwa 25%"},
+   {v: "B", t:"Etwa 5%"},
+   {v: "C", t:"Etwa 15,6%"},
+   {v: "D", t:"Etwa 8%"}
  ],
- correct:"A",
+ correct:"C",
  explain:"Die Einnahmen des Bundes stiegen von 2008 bis 2019 um 15,6%. Im gleichen Zeitraum stiegen die Ausgaben nur um 8% – was auf eine Verbesserung der Haushaltslage hindeutet."},
 
 {id:"e08", topic:"einnahmen", type:"open", diff:3, tax:"K4",
@@ -248,10 +248,10 @@ window.QUESTIONS = [
 {id:"d01", topic:"defizite", type:"mc", diff:1, tax:"K1",
  q:"Was versteht man unter einem konjunkturellen Defizit?",
  options:[
-   {v:"A", t:"Ein vorübergehendes Defizit aufgrund rezessionsbedingt tieferer Einnahmen und höherer Ausgaben."},
-   {v:"B", t:"Ein dauerhaftes Defizit, das auch bei guter Konjunktur bestehen bleibt."},
-   {v:"C", t:"Ein Defizit, das durch Fehlinvestitionen des Staates entsteht."},
-   {v:"D", t:"Ein Defizit, das durch zu hohe Zinszahlungen verursacht wird."}
+   {v: "A", t:"Ein vorübergehendes Defizit aufgrund rezessionsbedingt tieferer Einnahmen und höherer Ausgaben."},
+   {v: "B", t:"Ein Defizit, das durch zu hohe Zinszahlungen verursacht wird."},
+   {v: "C", t:"Ein dauerhaftes Defizit, das auch bei guter Konjunktur bestehen bleibt."},
+   {v: "D", t:"Ein Defizit, das durch Fehlinvestitionen des Staates entsteht."}
  ],
  correct:"A",
  explain:"Konjunkturelle Defizite entstehen in Rezessionsphasen durch sinkende Steuereinnahmen und steigende Sozialausgaben. Sie verschwinden im Aufschwung von selbst und wirken als automatische Stabilisatoren."},
@@ -259,12 +259,12 @@ window.QUESTIONS = [
 {id:"d02", topic:"defizite", type:"mc", diff:1, tax:"K1",
  q:"Was kennzeichnet ein strukturelles Defizit?",
  options:[
-   {v:"A", t:"Die Einnahmen decken die Ausgaben auch bei konjunktureller Normallage nicht."},
-   {v:"B", t:"Es entsteht nur in Phasen einer Rezession."},
-   {v:"C", t:"Es verschwindet automatisch im nächsten Aufschwung."},
-   {v:"D", t:"Es wird durch sinkende Zinsen verursacht."}
+   {v: "A", t:"Es entsteht nur in Phasen einer Rezession."},
+   {v: "B", t:"Es verschwindet automatisch im nächsten Aufschwung."},
+   {v: "C", t:"Die Einnahmen decken die Ausgaben auch bei konjunktureller Normallage nicht."},
+   {v: "D", t:"Es wird durch sinkende Zinsen verursacht."}
  ],
- correct:"A",
+ correct:"C",
  explain:"Strukturelle Defizite bestehen unabhängig von der Konjunkturlage. Sie können nur durch Ausgabenkürzungen oder Steuererhöhungen beseitigt werden – im Gegensatz zu konjunkturellen Defiziten, die sich im Aufschwung von selbst korrigieren."},
 
 {id:"d03", topic:"defizite", type:"sort", diff:2, tax:"K2",
@@ -297,10 +297,10 @@ window.QUESTIONS = [
 {id:"d06", topic:"defizite", type:"mc", diff:2, tax:"K3",
  q:"In einer Rezession sinken die Einnahmen aus der Mehrwertsteuer besonders stark. Warum?",
  options:[
-   {v:"A", t:"Weil die Konsumausgaben der Haushalte und Unternehmen zurückgehen."},
-   {v:"B", t:"Weil der Staat den Mehrwertsteuersatz in Rezessionen automatisch senkt."},
-   {v:"C", t:"Weil die Bevölkerung in Rezessionen keine Steuern mehr zahlen muss."},
-   {v:"D", t:"Weil die Mehrwertsteuer nur auf Exporte erhoben wird."}
+   {v: "A", t:"Weil die Konsumausgaben der Haushalte und Unternehmen zurückgehen."},
+   {v: "B", t:"Weil die Mehrwertsteuer nur auf Exporte erhoben wird."},
+   {v: "C", t:"Weil die Bevölkerung in Rezessionen keine Steuern mehr zahlen muss."},
+   {v: "D", t:"Weil der Staat den Mehrwertsteuersatz in Rezessionen automatisch senkt."}
  ],
  correct:"A",
  explain:"Die Mehrwertsteuer wird auf den Konsum erhoben. In einer Rezession geben Haushalte und Unternehmen weniger aus, wodurch die Steuereinnahmen sinken. Auch die Verrechnungssteuer und Stempelabgaben reagieren konjunktursensibel."},
@@ -319,12 +319,12 @@ window.QUESTIONS = [
 {id:"i01", topic:"international", type:"mc", diff:1, tax:"K1",
  q:"Welches Land weist weltweit die höchste Schuldenquote (Schulden in % des BIP) auf?",
  options:[
-   {v:"A", t:"Japan"},
-   {v:"B", t:"USA"},
-   {v:"C", t:"Griechenland"},
-   {v:"D", t:"Italien"}
+   {v: "A", t:"Griechenland"},
+   {v: "B", t:"Japan"},
+   {v: "C", t:"USA"},
+   {v: "D", t:"Italien"}
  ],
- correct:"A",
+ correct:"B",
  explain:"Japan hat mit über 230% des BIP die höchste Schuldenquote weltweit. Es folgen Griechenland, Italien und Portugal. Die Schweiz belegt mit unter 30% einen der besten Plätze."},
 
 {id:"i02", topic:"international", type:"tf", diff:1, tax:"K1",
@@ -335,12 +335,12 @@ window.QUESTIONS = [
 {id:"i03", topic:"international", type:"mc", diff:2, tax:"K2",
  q:"Warum wird die Staatsverschuldung typischerweise als Schuldenquote (in % des BIP) und nicht in absoluten Zahlen verglichen?",
  options:[
-   {v:"A", t:"Weil erst das Verhältnis zur Wirtschaftsleistung die Tragbarkeit der Schulden zeigt."},
-   {v:"B", t:"Weil absolute Zahlen schwieriger zu berechnen sind."},
-   {v:"C", t:"Weil die UNO nur prozentuale Angaben akzeptiert."},
-   {v:"D", t:"Weil absolute Zahlen geheim gehalten werden."}
+   {v: "A", t:"Weil absolute Zahlen schwieriger zu berechnen sind."},
+   {v: "B", t:"Weil absolute Zahlen geheim gehalten werden."},
+   {v: "C", t:"Weil erst das Verhältnis zur Wirtschaftsleistung die Tragbarkeit der Schulden zeigt."},
+   {v: "D", t:"Weil die UNO nur prozentuale Angaben akzeptiert."}
  ],
- correct:"A",
+ correct:"C",
  explain:"Absolute Schulden allein sagen wenig aus. Erst der Bezug zum BIP zeigt, ob ein Staat seine Schulden tragen kann. Ein Land mit hohem BIP kann höhere absolute Schulden bewältigen als ein kleines Land."},
 
 {id:"i04", topic:"international", type:"fill", diff:2, tax:"K1",
@@ -355,12 +355,12 @@ window.QUESTIONS = [
 {id:"i05", topic:"international", type:"mc", diff:2, tax:"K2",
  q:"Was ist der Unterschied zwischen Bruttoverschuldung und Nettoverschuldung eines Staates?",
  options:[
-   {v:"A", t:"Die Nettoverschuldung berücksichtigt auch die Vermögenswerte des Staates."},
-   {v:"B", t:"Die Bruttoverschuldung umfasst nur die Inlandsschulden."},
-   {v:"C", t:"Die Nettoverschuldung berücksichtigt nur die Auslandsschulden."},
-   {v:"D", t:"Es gibt keinen Unterschied – beide Begriffe sind synonym."}
+   {v: "A", t:"Die Nettoverschuldung berücksichtigt nur die Auslandsschulden."},
+   {v: "B", t:"Die Bruttoverschuldung umfasst nur die Inlandsschulden."},
+   {v: "C", t:"Die Nettoverschuldung berücksichtigt auch die Vermögenswerte des Staates."},
+   {v: "D", t:"Es gibt keinen Unterschied – beide Begriffe sind synonym."}
  ],
- correct:"A",
+ correct:"C",
  explain:"Die Nettoverschuldung = Bruttoschulden minus Vermögenswerte (z.B. Infrastruktur, Staatsbeteiligungen). Sie wäre aussagekräftiger, doch es fehlen internationale Standards zur Bewertung staatlicher Vermögen."},
 
 {id:"i06", topic:"international", type:"tf", diff:2, tax:"K2",
@@ -377,10 +377,10 @@ window.QUESTIONS = [
 {id:"g01", topic:"gefahren", type:"mc", diff:1, tax:"K1",
  q:"Was versteht man unter dem Verdrängungseffekt ('Crowding-out')?",
  options:[
-   {v:"A", t:"Der Staat verdrängt als Kreditnehmer private Investoren vom Kapitalmarkt."},
-   {v:"B", t:"Private Unternehmen verdrängen den Staat vom Arbeitsmarkt."},
-   {v:"C", t:"Ausländische Investoren verdrängen inländische Anleger."},
-   {v:"D", t:"Hohe Steuern verdrängen Unternehmen ins Ausland."}
+   {v: "A", t:"Der Staat verdrängt als Kreditnehmer private Investoren vom Kapitalmarkt."},
+   {v: "B", t:"Hohe Steuern verdrängen Unternehmen ins Ausland."},
+   {v: "C", t:"Ausländische Investoren verdrängen inländische Anleger."},
+   {v: "D", t:"Private Unternehmen verdrängen den Staat vom Arbeitsmarkt."}
  ],
  correct:"A",
  explain:"Beim Crowding-out konkurriert der Staat auf den Geld- und Kapitalmärkten mit privaten Investoren. Investoren ziehen den sicheren Schuldner Staat den privaten Nachfragern vor – private Investitionen werden dadurch verdrängt."},
@@ -401,24 +401,24 @@ window.QUESTIONS = [
 {id:"g04", topic:"gefahren", type:"mc", diff:2, tax:"K2",
  q:"Was passiert tendenziell mit den Zinsen, wenn der Staat am Kapitalmarkt grosse Mengen an Staatsanleihen ausgibt?",
  options:[
-   {v:"A", t:"Die Zinsen steigen, weil die Geldnachfrage zunimmt."},
-   {v:"B", t:"Die Zinsen sinken, weil mehr Geld im Umlauf ist."},
-   {v:"C", t:"Die Zinsen bleiben unverändert, weil der Staat kein normaler Marktteilnehmer ist."},
-   {v:"D", t:"Die Zinsen sinken, weil Staatsanleihen als sichere Anlagen gelten."}
+   {v: "A", t:"Die Zinsen bleiben unverändert, weil der Staat kein normaler Marktteilnehmer ist."},
+   {v: "B", t:"Die Zinsen steigen, weil die Geldnachfrage zunimmt."},
+   {v: "C", t:"Die Zinsen sinken, weil Staatsanleihen als sichere Anlagen gelten."},
+   {v: "D", t:"Die Zinsen sinken, weil mehr Geld im Umlauf ist."}
  ],
- correct:"A",
+ correct:"B",
  explain:"Beschafft sich der Staat Mittel am Kapitalmarkt, erhöht sich die Geldnachfrage. Dies übt Druck auf die Zinsen nach oben aus. Bei freiem Kapitalverkehr können steigende Zinsen eines grossen Landes auch andere Länder betreffen."},
 
 {id:"g05", topic:"gefahren", type:"mc", diff:2, tax:"K2",
  q:"Was versteht man unter dem 'Schneeballeffekt' der Staatsverschuldung?",
  img:{src:"img/vwl/staatsverschuldung/schneeballeffekt.svg", alt:"Kreislaufdiagramm: Selbstverstärkende Dynamik der Staatsverschuldung"},
  options:[
-   {v:"A", t:"Steigende Schulden führen zu höherer Zinslast, die nur durch neue Schulden finanzierbar ist."},
-   {v:"B", t:"Die Schulden schmelzen im Aufschwung wie Schnee in der Sonne."},
-   {v:"C", t:"Kleine Steuererhöhungen lösen eine Lawine an Steuervermeidung aus."},
-   {v:"D", t:"Schulden werden von Kanton zu Kanton weitergereicht."}
+   {v: "A", t:"Schulden werden von Kanton zu Kanton weitergereicht."},
+   {v: "B", t:"Die Schulden schmelzen im Aufschwung wie Schnee in der Sonne."},
+   {v: "C", t:"Kleine Steuererhöhungen lösen eine Lawine an Steuervermeidung aus."},
+   {v: "D", t:"Steigende Schulden führen zu höherer Zinslast, die nur durch neue Schulden finanzierbar ist."}
  ],
- correct:"A",
+ correct:"D",
  explain:"Der Schneeballeffekt entsteht, wenn die Zinslast auf den Schulden selbst wieder mit neuen Schulden finanziert werden muss. Die Verschuldung beginnt ein Eigenleben zu führen und wird zum Teufelskreis. Besonders gefährlich ist dies, wenn die Schulden zusätzlich zu höheren Zinsen (Risikoprämien) führen."},
 
 {id:"g06", topic:"gefahren", type:"sort", diff:2, tax:"K2",
@@ -442,10 +442,10 @@ window.QUESTIONS = [
 {id:"g08", topic:"gefahren", type:"mc", diff:3, tax:"K3",
  q:"Eine Studie der Ökonomen Rogoff und Reinhart ergab 2013 einen kritischen Schwellenwert für die Schuldenquote. Bei welchem Wert beginnen gemäss dieser Studie die negativen Wachstumseffekte zu dominieren?",
  options:[
-   {v:"A", t:"90% des BIP"},
-   {v:"B", t:"60% des BIP"},
-   {v:"C", t:"120% des BIP"},
-   {v:"D", t:"50% des BIP"}
+   {v: "A", t:"90% des BIP"},
+   {v: "B", t:"60% des BIP"},
+   {v: "C", t:"50% des BIP"},
+   {v: "D", t:"120% des BIP"}
  ],
  correct:"A",
  explain:"Die Studie 'Growth in Time of Debt' ergab einen Schwellenwert von 90% des BIP. Die Frage, ab welcher Schuldenquote die negativen Auswirkungen überwiegen, bleibt aber umstritten."},
@@ -458,24 +458,24 @@ window.QUESTIONS = [
 {id:"g10", topic:"gefahren", type:"mc", diff:3, tax:"K3",
  q:"Was passiert, wenn ein Staat faktisch zahlungsunfähig wird?",
  options:[
-   {v:"A", t:"Er verhandelt mit Gläubigern über Schuldenumstrukturierung oder -erlass, die Währung wird oft ruiniert."},
-   {v:"B", t:"Die UNO übernimmt automatisch die Schulden."},
-   {v:"C", t:"Der Staat wird aufgelöst und in Nachbarländer eingegliedert."},
-   {v:"D", t:"Alle Bürger müssen ihre privaten Ersparnisse abgeben."}
+   {v: "A", t:"Alle Bürger müssen ihre privaten Ersparnisse abgeben."},
+   {v: "B", t:"Er verhandelt mit Gläubigern über Schuldenumstrukturierung oder -erlass, die Währung wird oft ruiniert."},
+   {v: "C", t:"Der Staat wird aufgelöst und in Nachbarländer eingegliedert."},
+   {v: "D", t:"Die UNO übernimmt automatisch die Schulden."}
  ],
- correct:"A",
+ correct:"B",
  explain:"Bei einem Staatsbankrott werden Verhandlungen mit Gläubigern geführt, die zu Zahlungsaufschub oder einem Schuldenerlass ('Haircut') führen können. Die Währung verliert oft dramatisch an Wert und muss saniert werden. Der IWF begleitet häufig den Neuanfang mit strengen Auflagen."},
 
 // ── RICHTLINIEN (r01–r10) ──
 {id:"r01", topic:"richtlinien", type:"mc", diff:1, tax:"K1",
  q:"Was besagt die 'Goldene Finanzierungsregel'?",
  options:[
-   {v:"A", t:"Budgetdefizite sollten die Höhe der Staatsinvestitionen nicht übersteigen."},
-   {v:"B", t:"Die Staatsschulden sollten jedes Jahr um 1% sinken."},
-   {v:"C", t:"Der Goldbestand der Nationalbank muss die Staatsschulden decken."},
-   {v:"D", t:"Kantone und Bund müssen ihre Budgets genau hälftig teilen."}
+   {v: "A", t:"Kantone und Bund müssen ihre Budgets genau hälftig teilen."},
+   {v: "B", t:"Budgetdefizite sollten die Höhe der Staatsinvestitionen nicht übersteigen."},
+   {v: "C", t:"Die Staatsschulden sollten jedes Jahr um 1% sinken."},
+   {v: "D", t:"Der Goldbestand der Nationalbank muss die Staatsschulden decken."}
  ],
- correct:"A",
+ correct:"B",
  explain:"Die Goldene Finanzierungsregel besagt, dass Kredite nur für investive Zwecke (z.B. Infrastruktur) aufgenommen werden sollten, weil diese zu Wachstum und höheren Steuereinnahmen führen. Konsumausgaben (z.B. Sozial-, Personalausgaben) sollten nicht auf Pump finanziert werden."},
 
 {id:"r02", topic:"richtlinien", type:"fill", diff:1, tax:"K1",
@@ -495,10 +495,10 @@ window.QUESTIONS = [
 {id:"r04", topic:"richtlinien", type:"mc", diff:2, tax:"K2",
  q:"Was ist ein 'ausgeglichener Primärhaushalt'?",
  options:[
-   {v:"A", t:"Ein Haushalt, bei dem Einnahmen und Ausgaben ohne Berücksichtigung der Zinszahlungen ausgeglichen sind."},
-   {v:"B", t:"Ein Haushalt, bei dem alle Schulden getilgt sind."},
-   {v:"C", t:"Ein Haushalt, bei dem die Einnahmen die Ausgaben inklusive Zinsen übersteigen."},
-   {v:"D", t:"Ein Haushalt, bei dem nur die primären Steuern erhoben werden."}
+   {v: "A", t:"Ein Haushalt, bei dem Einnahmen und Ausgaben ohne Berücksichtigung der Zinszahlungen ausgeglichen sind."},
+   {v: "B", t:"Ein Haushalt, bei dem nur die primären Steuern erhoben werden."},
+   {v: "C", t:"Ein Haushalt, bei dem alle Schulden getilgt sind."},
+   {v: "D", t:"Ein Haushalt, bei dem die Einnahmen die Ausgaben inklusive Zinsen übersteigen."}
  ],
  correct:"A",
  explain:"Der Primärhaushalt = Haushaltssaldo ohne Zinszahlungen. Ein ausgeglichener Primärhaushalt bedeutet, dass die laufenden Einnahmen die laufenden Ausgaben (ohne Zinsen) decken. Bei einem stabilen Zinssatz und positivem Wirtschaftswachstum bleibt die Schuldenquote dann stabil."},
@@ -524,10 +524,10 @@ window.QUESTIONS = [
 {id:"r07", topic:"richtlinien", type:"mc", diff:2, tax:"K2",
  q:"Seit der Einführung der Schuldenbremse im Jahr 2003 hat die Schweiz Schulden in welcher Höhe abgebaut?",
  options:[
-   {v:"A", t:"Fast 27 Mrd. Fr."},
-   {v:"B", t:"Fast 10 Mrd. Fr."},
-   {v:"C", t:"Fast 50 Mrd. Fr."},
-   {v:"D", t:"Es wurden keine Schulden abgebaut."}
+   {v: "A", t:"Fast 27 Mrd. Fr."},
+   {v: "B", t:"Fast 50 Mrd. Fr."},
+   {v: "C", t:"Es wurden keine Schulden abgebaut."},
+   {v: "D", t:"Fast 10 Mrd. Fr."}
  ],
  correct:"A",
  explain:"Gemäss Christoph Schaltegger wurden seit 2003 fast 27 Mrd. Fr. an Schulden abgebaut. Diese Resilienz ermöglichte es der Schweiz, in der Coronakrise schnell und umfangreich Fiskalimpulse zu setzen."},
@@ -540,12 +540,12 @@ window.QUESTIONS = [
 {id:"r09", topic:"richtlinien", type:"mc", diff:3, tax:"K3",
  q:"Welche drei Optionen stehen einem Staat grundsätzlich zur Verfügung, um eine hohe Staatsverschuldung abzubauen?",
  options:[
-   {v:"A", t:"Haushaltsdisziplin (Ausgabenkürzungen/Steuererhöhungen), Inflation und Wirtschaftswachstum."},
-   {v:"B", t:"Schulden ignorieren, neue Schulden aufnehmen und Währung abwerten."},
-   {v:"C", t:"Goldreserven verkaufen, Steuern abschaffen und Subventionen streichen."},
-   {v:"D", t:"IWF-Beitritt, EU-Hilfe und Schuldenerlass."}
+   {v: "A", t:"IWF-Beitritt, EU-Hilfe und Schuldenerlass."},
+   {v: "B", t:"Schulden ignorieren, neue Schulden aufnehmen und Währung abwerten."},
+   {v: "C", t:"Haushaltsdisziplin (Ausgabenkürzungen/Steuererhöhungen), Inflation und Wirtschaftswachstum."},
+   {v: "D", t:"Goldreserven verkaufen, Steuern abschaffen und Subventionen streichen."}
  ],
- correct:"A",
+ correct:"C",
  explain:"Die drei Hauptoptionen sind: 1) Haushaltsdisziplin (weniger ausgeben oder mehr einnehmen), 2) Inflation (realer Wert der Schulden sinkt), 3) Wirtschaftswachstum (BIP wächst, Schuldenquote sinkt). Alle drei Optionen haben Vor- und Nachteile."},
 
 {id:"r10", topic:"richtlinien", type:"open", diff:3, tax:"K5",
@@ -577,21 +577,21 @@ window.QUESTIONS = [
 {id:"q04", topic:"gefahren", type:"mc", diff:3, tax:"K3",
  q:"Warum haben die Notenbanken nach der Finanzkrise 2008 und der Coronakrise 2020 massiv Staatsanleihen aufgekauft?",
  options:[
-   {v:"A", t:"Um die Zinsen der hochverschuldeten Staaten zu senken und die Wirtschaft zu stützen."},
-   {v:"B", t:"Um die Staatsschulden endgültig zu tilgen."},
-   {v:"C", t:"Um die Inflation absichtlich zu erhöhen."},
-   {v:"D", t:"Um die Geldmenge dauerhaft zu reduzieren."}
+   {v: "A", t:"Um die Inflation absichtlich zu erhöhen."},
+   {v: "B", t:"Um die Zinsen der hochverschuldeten Staaten zu senken und die Wirtschaft zu stützen."},
+   {v: "C", t:"Um die Staatsschulden endgültig zu tilgen."},
+   {v: "D", t:"Um die Geldmenge dauerhaft zu reduzieren."}
  ],
- correct:"A",
+ correct:"B",
  explain:"Die Zentralbanken (EZB, FED) kauften Staatsanleihen, um die Zinsen zu senken und die Finanzierungskosten der Staaten tragbar zu halten. Man erhoffte sich, dass die Staaten die Entlastung für den Schuldenabbau nutzen – was aber grösstenteils nicht geschah."},
 
 {id:"q05", topic:"einnahmen", type:"mc", diff:2, tax:"K2",
  q:"Was versteht man unter dem Finanzausgleich?",
  options:[
-   {v:"A", t:"Ein System, das finanzielle Unterschiede zwischen finanzstarken und finanzschwachen Kantonen ausgleicht."},
-   {v:"B", t:"Den jährlichen Ausgleich zwischen Einnahmen und Ausgaben des Bundes."},
-   {v:"C", t:"Die Angleichung der Steuersätze aller Kantone."},
-   {v:"D", t:"Die Verteilung der SNB-Gewinne an die Kantone."}
+   {v: "A", t:"Ein System, das finanzielle Unterschiede zwischen finanzstarken und finanzschwachen Kantonen ausgleicht."},
+   {v: "B", t:"Den jährlichen Ausgleich zwischen Einnahmen und Ausgaben des Bundes."},
+   {v: "C", t:"Die Verteilung der SNB-Gewinne an die Kantone."},
+   {v: "D", t:"Die Angleichung der Steuersätze aller Kantone."}
  ],
  correct:"A",
  explain:"Der Finanzausgleich sorgt dafür, dass auch finanzschwache Kantone ihre Aufgaben erfüllen können. Finanzstarke Kantone zahlen in den Ausgleich ein, finanzschwache erhalten Beiträge."},
@@ -611,10 +611,10 @@ window.QUESTIONS = [
 {id:"s11", topic:"staatsanteil", type:"mc", diff:3, tax:"K4",
  q:"Avenir Suisse schätzt die erweiterte Fiskalquote der Schweiz auf ca. 45%, während die offizielle Fiskalquote bei rund 28,6% liegt. Was erklärt diese Differenz?",
  options:[
-   {v:"A", t:"Die erweiterte Quote schliesst obligatorische Zwangsabgaben ein, die statistisch nicht als Steuern gelten (z.B. Krankenkassenprämien)."},
-   {v:"B", t:"Die offizielle Quote berücksichtigt die Inflation nicht."},
-   {v:"C", t:"Die Differenz ergibt sich aus der unterschiedlichen Berechnung des BIP."},
-   {v:"D", t:"Die erweiterte Quote zählt auch freiwillige Spenden an den Staat dazu."}
+   {v: "A", t:"Die erweiterte Quote schliesst obligatorische Zwangsabgaben ein, die statistisch nicht als Steuern gelten (z.B. Krankenkassenprämien)."},
+   {v: "B", t:"Die Differenz ergibt sich aus der unterschiedlichen Berechnung des BIP."},
+   {v: "C", t:"Die offizielle Quote berücksichtigt die Inflation nicht."},
+   {v: "D", t:"Die erweiterte Quote zählt auch freiwillige Spenden an den Staat dazu."}
  ],
  correct:"A",
  explain:"Die offizielle Fiskalquote erfasst nur Steuern und obligatorische Sozialversicherungsbeiträge. Die erweiterte Fiskalquote berücksichtigt zusätzlich weitere Zwangsabgaben wie obligatorische Krankenkassenprämien, Gebühren und regulatorische Kosten, die in der offiziellen Statistik nicht enthalten sind."},
@@ -633,10 +633,10 @@ window.QUESTIONS = [
 {id:"a10", topic:"ausgaben", type:"mc", diff:3, tax:"K4",
  q:"Der Bund wird als 'Transferhaushalt' bezeichnet. Welche Problematik ergibt sich daraus für die Haushaltssteuerung?",
  options:[
-   {v:"A", t:"Ein Grossteil der Ausgaben ist gebunden und kann kurzfristig nicht gekürzt werden."},
-   {v:"B", t:"Der Bund hat zu wenige Einnahmen, um die Transfers zu finanzieren."},
-   {v:"C", t:"Die Kantone können die Transfers beliebig zurückweisen."},
-   {v:"D", t:"Der Bund muss alle Transfers jährlich neu vom Parlament genehmigen lassen."}
+   {v: "A", t:"Ein Grossteil der Ausgaben ist gebunden und kann kurzfristig nicht gekürzt werden."},
+   {v: "B", t:"Der Bund muss alle Transfers jährlich neu vom Parlament genehmigen lassen."},
+   {v: "C", t:"Die Kantone können die Transfers beliebig zurückweisen."},
+   {v: "D", t:"Der Bund hat zu wenige Einnahmen, um die Transfers zu finanzieren."}
  ],
  correct:"A",
  explain:"Da rund zwei Drittel der Bundesausgaben als Übertragungen gebunden sind (Sozialversicherungen, Subventionen, Kantonsanteile), hat der Bund nur geringen Spielraum für kurzfristige Anpassungen. Sparanstrengungen können daher fast nur beim verbleibenden Drittel der Eigenausgaben ansetzen."},
@@ -664,12 +664,12 @@ window.QUESTIONS = [
 {id:"e10", topic:"einnahmen", type:"mc", diff:3, tax:"K4",
  q:"Die Schweiz hat im Vergleich zu anderen europäischen Ländern einen besonders hohen Anteil an direkten Steuern. Welchen Vorteil hat dieses System?",
  options:[
-   {v:"A", t:"Direkte Steuern können progressiv gestaltet werden und die Steuerbelastung an die wirtschaftliche Leistungsfähigkeit anpassen."},
-   {v:"B", t:"Direkte Steuern sind einfacher zu erheben als indirekte Steuern."},
-   {v:"C", t:"Direkte Steuern verursachen keine Verzerrungen auf den Märkten."},
-   {v:"D", t:"Direkte Steuern lassen sich besser vor den Bürgern verbergen."}
+   {v: "A", t:"Direkte Steuern verursachen keine Verzerrungen auf den Märkten."},
+   {v: "B", t:"Direkte Steuern lassen sich besser vor den Bürgern verbergen."},
+   {v: "C", t:"Direkte Steuern können progressiv gestaltet werden und die Steuerbelastung an die wirtschaftliche Leistungsfähigkeit anpassen."},
+   {v: "D", t:"Direkte Steuern sind einfacher zu erheben als indirekte Steuern."}
  ],
- correct:"A",
+ correct:"C",
  explain:"Direkte Steuern ermöglichen eine progressive Besteuerung nach Leistungsfähigkeit. Wer mehr verdient, zahlt proportional mehr. Dies erlaubt eine gerechtere Steuerbelastung als indirekte Steuern (z.B. Mehrwertsteuer), die alle gleich belasten und damit regressiv wirken."},
 
 {id:"e11", topic:"einnahmen", type:"tf", diff:1, tax:"K1",
@@ -681,12 +681,12 @@ window.QUESTIONS = [
 {id:"d09", topic:"defizite", type:"mc", diff:1, tax:"K1",
  q:"Was sind 'automatische Stabilisatoren'?",
  options:[
-   {v:"A", t:"Staatliche Einnahmen und Ausgaben, die ohne politische Entscheide konjunkturglättend wirken."},
-   {v:"B", t:"Geldpolitische Instrumente der Nationalbank."},
-   {v:"C", t:"Konjunkturprogramme, die vom Parlament beschlossen werden."},
-   {v:"D", t:"Internationale Abkommen zur Wirtschaftsstabilisierung."}
+   {v: "A", t:"Geldpolitische Instrumente der Nationalbank."},
+   {v: "B", t:"Staatliche Einnahmen und Ausgaben, die ohne politische Entscheide konjunkturglättend wirken."},
+   {v: "C", t:"Internationale Abkommen zur Wirtschaftsstabilisierung."},
+   {v: "D", t:"Konjunkturprogramme, die vom Parlament beschlossen werden."}
  ],
- correct:"A",
+ correct:"B",
  explain:"Automatische Stabilisatoren wirken ohne aktive politische Entscheide: In Rezessionen sinken Steuereinnahmen und steigen Sozialausgaben (z.B. Arbeitslosenentschädigung) automatisch, was die Nachfrage stützt. Im Aufschwung kehrt sich der Effekt um."},
 
 {id:"d10", topic:"defizite", type:"fill", diff:1, tax:"K1",
@@ -723,12 +723,12 @@ window.QUESTIONS = [
 {id:"i10", topic:"international", type:"mc", diff:3, tax:"K4",
  q:"Japan hat trotz einer Schuldenquote von über 230% bisher keinen Staatsbankrott erlitten. Was ist eine wichtige Erklärung dafür?",
  options:[
-   {v:"A", t:"Der Grossteil der japanischen Staatsschulden wird von inländischen Sparern und Institutionen gehalten."},
-   {v:"B", t:"Japan hat seine Schulden im Geheimen bereits getilgt."},
-   {v:"C", t:"Der IWF garantiert die Schulden Japans."},
-   {v:"D", t:"Japan hat eine höhere Bevölkerungszahl als andere verschuldete Länder."}
+   {v: "A", t:"Der IWF garantiert die Schulden Japans."},
+   {v: "B", t:"Japan hat seine Schulden im Geheimen bereits getilgt."},
+   {v: "C", t:"Der Grossteil der japanischen Staatsschulden wird von inländischen Sparern und Institutionen gehalten."},
+   {v: "D", t:"Japan hat eine höhere Bevölkerungszahl als andere verschuldete Länder."}
  ],
- correct:"A",
+ correct:"C",
  explain:"Etwa 90% der japanischen Staatsschulden werden von inländischen Gläubigern (Banken, Versicherungen, Zentralbank, Privatpersonen) gehalten. Dies reduziert das Risiko eines Kapitalabzugs durch ausländische Investoren und ermöglicht sehr tiefe Zinsen. Allerdings ist diese Situation nicht risikolos – besonders angesichts der alternden Bevölkerung."},
 
 // ── NEUE FRAGEN: GEFAHREN (g11–g13) ──
@@ -751,12 +751,12 @@ window.QUESTIONS = [
 {id:"g13", topic:"gefahren", type:"mc", diff:1, tax:"K1",
  q:"Was droht einem Staat, der seine Schulden nicht mehr bedienen kann?",
  options:[
-   {v:"A", t:"Ein Staatsbankrott mit möglichem Schuldenerlass ('Haircut') für die Gläubiger."},
-   {v:"B", t:"Der Staat wird automatisch von der UNO übernommen."},
-   {v:"C", t:"Alle Bürger müssen persönlich für die Staatsschulden haften."},
-   {v:"D", t:"Die Schulden verfallen nach 10 Jahren automatisch."}
+   {v: "A", t:"Der Staat wird automatisch von der UNO übernommen."},
+   {v: "B", t:"Alle Bürger müssen persönlich für die Staatsschulden haften."},
+   {v: "C", t:"Ein Staatsbankrott mit möglichem Schuldenerlass ('Haircut') für die Gläubiger."},
+   {v: "D", t:"Die Schulden verfallen nach 10 Jahren automatisch."}
  ],
- correct:"A",
+ correct:"C",
  explain:"Bei Zahlungsunfähigkeit verhandelt der Staat mit seinen Gläubigern über eine Umschuldung. Oft wird ein 'Haircut' vereinbart, bei dem die Gläubiger auf einen Teil ihrer Forderungen verzichten. Der IWF unterstützt häufig den Neuanfang, stellt aber strenge Auflagen."},
 
 // ── NEUE FRAGEN: RICHTLINIEN (r11–r14) ──
@@ -768,10 +768,10 @@ window.QUESTIONS = [
 {id:"r12", topic:"richtlinien", type:"mc", diff:2, tax:"K3",
  q:"In der Coronakrise hat der Bund über 30 Mrd. Fr. an ausserordentlichen Ausgaben getätigt. Wie lässt sich das mit der Schuldenbremse vereinbaren?",
  options:[
-   {v:"A", t:"Die Schuldenbremse sieht einen ausserordentlichen Haushalt für Krisenausgaben vor, der separat geführt und innerhalb von sechs Jahren abgebaut werden muss."},
-   {v:"B", t:"Die Schuldenbremse wurde für die Dauer der Krise ausser Kraft gesetzt."},
-   {v:"C", t:"Die Coronaausgaben wurden nicht als Staatsausgaben verbucht."},
-   {v:"D", t:"Die Schuldenbremse erlaubt unbegrenzte Ausgaben in Notfällen."}
+   {v: "A", t:"Die Schuldenbremse sieht einen ausserordentlichen Haushalt für Krisenausgaben vor, der separat geführt und innerhalb von sechs Jahren abgebaut werden muss."},
+   {v: "B", t:"Die Coronaausgaben wurden nicht als Staatsausgaben verbucht."},
+   {v: "C", t:"Die Schuldenbremse wurde für die Dauer der Krise ausser Kraft gesetzt."},
+   {v: "D", t:"Die Schuldenbremse erlaubt unbegrenzte Ausgaben in Notfällen."}
  ],
  correct:"A",
  explain:"Die Schuldenbremse unterscheidet zwischen ordentlichem und ausserordentlichem Haushalt. Ausserordentliche Ausgaben (wie in der Coronakrise) werden separat verbucht und müssen innerhalb von sechs Jahren wieder abgebaut werden. So bleibt die langfristige Haushaltsdisziplin gewahrt."},
@@ -779,12 +779,12 @@ window.QUESTIONS = [
 {id:"r13", topic:"richtlinien", type:"mc", diff:3, tax:"K5",
  q:"Seit 2003 hat die Schweiz dank der Schuldenbremse fast 27 Mrd. Fr. Schulden abgebaut. Ein Kritikpunkt lautet, der Bund spare 'zu viel'. Was könnte damit gemeint sein?",
  options:[
-   {v:"A", t:"Der systematische Schuldenabbau reduziert den Handlungsspielraum für Investitionen und öffentliche Leistungen."},
-   {v:"B", t:"Die Schuldenbremse führt dazu, dass der Staat überhaupt keine Schulden mehr haben darf."},
-   {v:"C", t:"Der Schuldenabbau verursacht Inflation."},
-   {v:"D", t:"Die Kantone werden durch die Schuldenbremse zu höheren Ausgaben gezwungen."}
+   {v: "A", t:"Der Schuldenabbau verursacht Inflation."},
+   {v: "B", t:"Die Kantone werden durch die Schuldenbremse zu höheren Ausgaben gezwungen."},
+   {v: "C", t:"Der systematische Schuldenabbau reduziert den Handlungsspielraum für Investitionen und öffentliche Leistungen."},
+   {v: "D", t:"Die Schuldenbremse führt dazu, dass der Staat überhaupt keine Schulden mehr haben darf."}
  ],
- correct:"A",
+ correct:"C",
  explain:"Kritiker argumentieren, dass der kontinuierliche Schuldenabbau dazu führt, dass nötige Investitionen (z.B. in Infrastruktur, Bildung, Digitalisierung) unterbleiben. Die Schuldenbremse erzeuge einen strukturellen Überschuss, der den Handlungsspielraum des Bundes unnötig einschränke. Befürworter halten dagegen, dass die Resilienz der Schweiz (z.B. in der Coronakrise) gerade auf diesen Puffern beruht."},
 
 {id:"r14", topic:"richtlinien", type:"sort", diff:2, tax:"K2",

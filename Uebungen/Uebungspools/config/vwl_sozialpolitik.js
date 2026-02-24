@@ -35,12 +35,12 @@ window.QUESTIONS = [
  q:"Was zeigt die Lorenzkurve?",
  img: {src:"img/vwl/sozialpolitik/lorenzkurve_ch.svg", alt:"Lorenzkurve Schweiz – primäre und sekundäre Einkommensverteilung"},
  options:[
-   {v:"A", t:"Die personelle Einkommensverteilung zu einem bestimmten Zeitpunkt."},
-   {v:"B", t:"Die Entwicklung des BIP über die Zeit."},
-   {v:"C", t:"Die Verteilung der Staatsausgaben auf verschiedene Bereiche."},
-   {v:"D", t:"Den Zusammenhang zwischen Inflation und Arbeitslosigkeit."}
+   {v: "A", t:"Den Zusammenhang zwischen Inflation und Arbeitslosigkeit."},
+   {v: "B", t:"Die personelle Einkommensverteilung zu einem bestimmten Zeitpunkt."},
+   {v: "C", t:"Die Verteilung der Staatsausgaben auf verschiedene Bereiche."},
+   {v: "D", t:"Die Entwicklung des BIP über die Zeit."}
  ],
- correct:"A",
+ correct:"B",
  explain:"Die Lorenzkurve stellt die personelle Einkommensverteilung grafisch dar. Je «bauchiger» die Kurve, desto ungleicher ist das Einkommen verteilt."},
 
 {id:"v02", topic:"verteilung", type:"tf", diff:1, tax:"K1",
@@ -51,12 +51,12 @@ window.QUESTIONS = [
 {id:"v03", topic:"verteilung", type:"mc", diff:2, tax:"K2",
  q:"Worin liegt der Hauptgrund für die Lohnunterschiede zwischen verschiedenen Branchen?",
  options:[
-   {v:"A", t:"Unterschiedliche gesetzliche Mindestlöhne pro Branche."},
-   {v:"B", t:"Die grossen Differenzen bei der Arbeitsproduktivität zwischen den Branchen."},
-   {v:"C", t:"Unterschiedliche Arbeitszeiten in den verschiedenen Branchen."},
-   {v:"D", t:"Die Anzahl der Beschäftigten pro Branche."}
+   {v: "A", t:"Unterschiedliche gesetzliche Mindestlöhne pro Branche."},
+   {v: "B", t:"Die Anzahl der Beschäftigten pro Branche."},
+   {v: "C", t:"Die grossen Differenzen bei der Arbeitsproduktivität zwischen den Branchen."},
+   {v: "D", t:"Unterschiedliche Arbeitszeiten in den verschiedenen Branchen."}
  ],
- correct:"B",
+ correct:"C",
  explain:"Der Hauptgrund für Lohnunterschiede zwischen Branchen sind die grossen Differenzen bei der Produktivität (Wertschöpfung pro Vollzeitstelle). Je grösser die Wertschöpfung pro Arbeitsplatz, desto höhere Löhne können bezahlt werden."},
 
 {id:"v04", topic:"verteilung", type:"fill", diff:1, tax:"K1",
@@ -70,10 +70,10 @@ window.QUESTIONS = [
 {id:"v05", topic:"verteilung", type:"mc", diff:2, tax:"K2",
  q:"Die Schweiz hat vor Steuern und Sozialabgaben einen Gini-Koeffizienten von 0.38, nach Steuern und Sozialabgaben von 0.29. Was lässt sich daraus schliessen?",
  options:[
-   {v:"A", t:"Die staatliche Umverteilung vergrössert die Einkommensunterschiede."},
-   {v:"B", t:"Die staatliche Umverteilung reduziert die Einkommensunterschiede deutlich."},
-   {v:"C", t:"Die Schweiz hat die höchste Ungleichheit in Europa."},
-   {v:"D", t:"Die primäre Verteilung ist bereits vollständig gleich."}
+   {v: "A", t:"Die staatliche Umverteilung vergrössert die Einkommensunterschiede."},
+   {v: "B", t:"Die staatliche Umverteilung reduziert die Einkommensunterschiede deutlich."},
+   {v: "C", t:"Die primäre Verteilung ist bereits vollständig gleich."},
+   {v: "D", t:"Die Schweiz hat die höchste Ungleichheit in Europa."}
  ],
  correct:"B",
  explain:"Ein Rückgang des Gini-Koeffizienten von 0.38 auf 0.29 zeigt, dass Steuern und Sozialversicherungen die Einkommensunterschiede deutlich reduzieren. Die sekundäre Verteilung ist gleichmässiger als die primäre."},
@@ -124,12 +124,12 @@ window.QUESTIONS = [
 {id:"v10", topic:"verteilung", type:"mc", diff:1, tax:"K1",
  q:"Was versteht man unter funktionaler Einkommensverteilung?",
  options:[
-   {v:"A", t:"Die Verteilung des Einkommens auf verschiedene Produktionsfaktoren (Arbeit, Kapital, Boden)."},
-   {v:"B", t:"Die Verteilung des Einkommens auf einzelne Personen oder Haushalte."},
-   {v:"C", t:"Die Verteilung des Einkommens nach Regionen."},
-   {v:"D", t:"Die Verteilung des Einkommens über verschiedene Zeitperioden."}
+   {v: "A", t:"Die Verteilung des Einkommens auf einzelne Personen oder Haushalte."},
+   {v: "B", t:"Die Verteilung des Einkommens auf verschiedene Produktionsfaktoren (Arbeit, Kapital, Boden)."},
+   {v: "C", t:"Die Verteilung des Einkommens über verschiedene Zeitperioden."},
+   {v: "D", t:"Die Verteilung des Einkommens nach Regionen."}
  ],
- correct:"A",
+ correct:"B",
  explain:"Die funktionale Einkommensverteilung zeigt, wie das Volkseinkommen auf die Produktionsfaktoren verteilt wird: Löhne/Gehälter (Arbeit), Zinsen und Dividenden (Kapital), Mieten/Pachten (Boden). Die personelle Verteilung hingegen betrachtet Individuen oder Haushalte."},
 
 {id:"v11", topic:"verteilung", type:"tf", diff:2, tax:"K2",
@@ -166,10 +166,10 @@ window.QUESTIONS = [
 {id:"v15", topic:"verteilung", type:"mc", diff:3, tax:"K4",
  q:"Land A hat einen Gini-Koeffizienten von 0.25, Land B von 0.45. Beide Länder haben ein ähnliches BIP pro Kopf. Welche Schlussfolgerung ist korrekt?",
  options:[
-   {v:"A", t:"Die Menschen in Land A sind reicher als in Land B."},
-   {v:"B", t:"In Land A ist die Einkommensverteilung gleichmässiger, aber das sagt nichts über das absolute Wohlstandsniveau aus."},
-   {v:"C", t:"Land B hat eine bessere Sozialpolitik."},
-   {v:"D", t:"In Land B sind alle Einwohner arm."}
+   {v: "A", t:"Land B hat eine bessere Sozialpolitik."},
+   {v: "B", t:"In Land A ist die Einkommensverteilung gleichmässiger, aber das sagt nichts über das absolute Wohlstandsniveau aus."},
+   {v: "C", t:"Die Menschen in Land A sind reicher als in Land B."},
+   {v: "D", t:"In Land B sind alle Einwohner arm."}
  ],
  correct:"B",
  explain:"Der Gini-Koeffizient misst nur die Gleichmässigkeit der Verteilung, nicht das absolute Einkommensniveau. Ein Land kann einen tiefen Gini-Koeffizienten haben (gleichmässig verteilt), aber trotzdem arm sein. Bei gleichem BIP pro Kopf bedeutet ein tieferer Gini, dass die Einkommen gleichmässiger verteilt sind – es gibt weniger Extreme."},
@@ -180,12 +180,12 @@ window.QUESTIONS = [
 {id:"g01", topic:"gerechtigkeit", type:"mc", diff:1, tax:"K1",
  q:"Welche Wirtschaftsordnung vertreten die Libertarians (Neo-Liberale)?",
  options:[
-   {v:"A", t:"Soziale Marktwirtschaft"},
-   {v:"B", t:"Reine Marktwirtschaft"},
-   {v:"C", t:"Sozialismus"},
-   {v:"D", t:"Planwirtschaft"}
+   {v: "A", t:"Planwirtschaft"},
+   {v: "B", t:"Soziale Marktwirtschaft"},
+   {v: "C", t:"Sozialismus"},
+   {v: "D", t:"Reine Marktwirtschaft"}
  ],
- correct:"B",
+ correct:"D",
  explain:"Libertarians (Neo-Liberale) wie Nozick, Hayek und Friedman befürworten eine reine Marktwirtschaft. Sie lehnen Umverteilung ab, da sie die ökonomische Freiheit einschränkt. Der Markt und sein Ergebnis können ihrer Meinung nach nicht gerecht oder ungerecht sein."},
 
 {id:"g02", topic:"gerechtigkeit", type:"tf", diff:1, tax:"K1",
@@ -210,12 +210,12 @@ window.QUESTIONS = [
 {id:"g04", topic:"gerechtigkeit", type:"mc", diff:2, tax:"K2",
  q:"Was besagt das Differenzprinzip von John Rawls?",
  options:[
-   {v:"A", t:"Alle Menschen sollen exakt gleich viel verdienen."},
-   {v:"B", t:"Ungleichheiten sind nur dann gerechtfertigt, wenn sie dem am schlechtesten Gestellten nützen."},
-   {v:"C", t:"Der Staat soll sich aus der Wirtschaft vollständig heraushalten."},
-   {v:"D", t:"Die Produktionsmittel sollen verstaatlicht werden."}
+   {v: "A", t:"Der Staat soll sich aus der Wirtschaft vollständig heraushalten."},
+   {v: "B", t:"Die Produktionsmittel sollen verstaatlicht werden."},
+   {v: "C", t:"Ungleichheiten sind nur dann gerechtfertigt, wenn sie dem am schlechtesten Gestellten nützen."},
+   {v: "D", t:"Alle Menschen sollen exakt gleich viel verdienen."}
  ],
- correct:"B",
+ correct:"C",
  explain:"Rawls' Differenzprinzip (Maxmin-Regel) besagt, dass der Nutzen des am schlechtesten gestellten Individuums maximiert werden soll. Ungleichheiten sind akzeptabel, wenn sie auch den Schwächsten besser stellen als eine Gleichverteilung."},
 
 {id:"g05", topic:"gerechtigkeit", type:"fill", diff:2, tax:"K2",
@@ -239,12 +239,12 @@ window.QUESTIONS = [
 {id:"g08", topic:"gerechtigkeit", type:"mc", diff:3, tax:"K4",
  q:"Welche Aussage beschreibt am besten die Haltung der Marxisten gegenüber Sozialpolitik?",
  options:[
-   {v:"A", t:"Sozialpolitik ist immer positiv, da sie die Arbeiterschaft unterstützt."},
-   {v:"B", t:"Sozialpolitik ist überflüssig, weil der Markt alles regelt."},
-   {v:"C", t:"Marxisten sind ambivalent: Sozialpolitik kann als Sieg der Arbeiterschaft oder als Schutz des Kapitalismus interpretiert werden."},
-   {v:"D", t:"Marxisten lehnen jede Form von Sozialpolitik kategorisch ab."}
+   {v: "A", t:"Sozialpolitik ist immer positiv, da sie die Arbeiterschaft unterstützt."},
+   {v: "B", t:"Marxisten sind ambivalent: Sozialpolitik kann als Sieg der Arbeiterschaft oder als Schutz des Kapitalismus interpretiert werden."},
+   {v: "C", t:"Sozialpolitik ist überflüssig, weil der Markt alles regelt."},
+   {v: "D", t:"Marxisten lehnen jede Form von Sozialpolitik kategorisch ab."}
  ],
- correct:"C",
+ correct:"B",
  explain:"Marxisten sind tatsächlich ambivalent gegenüber Sozialpolitik. Einerseits kann sie als Errungenschaft der Arbeiterschaft gesehen werden. Andererseits könnte Sozialpolitik den Kapitalismus stabilisieren und damit die Revolution verhindern – sie wirkt dann systemerhaltend."},
 
 // ── Neue Fragen Gerechtigkeit (g09–g15) ──
@@ -262,12 +262,12 @@ window.QUESTIONS = [
 {id:"g10", topic:"gerechtigkeit", type:"mc", diff:1, tax:"K1",
  q:"Welcher Denker wird am stärksten mit dem Konzept der «unsichtbaren Hand» assoziiert?",
  options:[
-   {v:"A", t:"Karl Marx"},
-   {v:"B", t:"John Rawls"},
-   {v:"C", t:"Adam Smith"},
-   {v:"D", t:"John Maynard Keynes"}
+   {v: "A", t:"John Maynard Keynes"},
+   {v: "B", t:"Adam Smith"},
+   {v: "C", t:"John Rawls"},
+   {v: "D", t:"Karl Marx"}
  ],
- correct:"C",
+ correct:"B",
  explain:"Adam Smith (1723–1790) beschrieb die «unsichtbare Hand» des Marktes: Wenn jedes Individuum seinen eigenen Vorteil verfolgt, wird durch den Preismechanismus die gesamtgesellschaftliche Wohlfahrt maximiert. Diese Idee bildet die Grundlage für die liberale Wirtschaftstheorie."},
 
 {id:"g11", topic:"gerechtigkeit", type:"tf", diff:2, tax:"K2",
@@ -318,10 +318,10 @@ window.QUESTIONS = [
 {id:"s01", topic:"sozialversicherungen", type:"mc", diff:1, tax:"K1",
  q:"Wie viele Hauptzweige umfasst das Schweizer Sozialversicherungssystem?",
  options:[
-   {v:"A", t:"5 Zweige"},
-   {v:"B", t:"6 Zweige"},
-   {v:"C", t:"8 Zweige"},
-   {v:"D", t:"10 Zweige"}
+   {v: "A", t:"10 Zweige"},
+   {v: "B", t:"5 Zweige"},
+   {v: "C", t:"8 Zweige"},
+   {v: "D", t:"6 Zweige"}
  ],
  correct:"C",
  explain:"Das Schweizer Sozialversicherungssystem umfasst 8 Hauptzweige: AHV (inkl. EL), IV, Berufliche Vorsorge (BV), EO/Mutterschaft, Unfallversicherung, Krankenversicherung, Arbeitslosenversicherung und Familienzulagen."},
@@ -356,10 +356,10 @@ window.QUESTIONS = [
 {id:"s05", topic:"sozialversicherungen", type:"mc", diff:2, tax:"K2",
  q:"Worin unterscheiden sich Sozialversicherungen von privaten Versicherungen?",
  options:[
-   {v:"A", t:"Sozialversicherungen sind freiwillig, private Versicherungen obligatorisch."},
-   {v:"B", t:"Bei Sozialversicherungen zahlen Ärmere kleinere Beiträge, und sie sind obligatorisch."},
-   {v:"C", t:"Private Versicherungen bieten bessere Leistungen als Sozialversicherungen."},
-   {v:"D", t:"Sozialversicherungen decken nur Risiken ab, private Versicherungen auch Sparen."}
+   {v: "A", t:"Private Versicherungen bieten bessere Leistungen als Sozialversicherungen."},
+   {v: "B", t:"Bei Sozialversicherungen zahlen Ärmere kleinere Beiträge, und sie sind obligatorisch."},
+   {v: "C", t:"Sozialversicherungen sind freiwillig, private Versicherungen obligatorisch."},
+   {v: "D", t:"Sozialversicherungen decken nur Risiken ab, private Versicherungen auch Sparen."}
  ],
  correct:"B",
  explain:"Im Unterschied zu privaten Versicherungen sind Sozialversicherungen erstens obligatorisch und zweitens zahlen Ärmere kleinere Beiträge als Reichere (Solidaritätsprinzip). Auch Personen, die sich keine Prämien leisten können, sind versichert."},
@@ -401,10 +401,10 @@ window.QUESTIONS = [
 {id:"s10", topic:"sozialversicherungen", type:"mc", diff:2, tax:"K2",
  q:"Was ist der Hauptunterschied zwischen Ergänzungsleistungen (EL) und Sozialhilfe?",
  options:[
-   {v:"A", t:"EL sind ein Rechtsanspruch für AHV/IV-Bezüger; Sozialhilfe ist das letzte soziale Netz für alle Bedürftigen."},
-   {v:"B", t:"Sozialhilfe wird vom Bund finanziert, EL von den Kantonen."},
-   {v:"C", t:"EL sind höher als Sozialhilfe."},
-   {v:"D", t:"Es gibt keinen Unterschied, beide Begriffe bezeichnen dasselbe."}
+   {v: "A", t:"EL sind ein Rechtsanspruch für AHV/IV-Bezüger; Sozialhilfe ist das letzte soziale Netz für alle Bedürftigen."},
+   {v: "B", t:"Es gibt keinen Unterschied, beide Begriffe bezeichnen dasselbe."},
+   {v: "C", t:"EL sind höher als Sozialhilfe."},
+   {v: "D", t:"Sozialhilfe wird vom Bund finanziert, EL von den Kantonen."}
  ],
  correct:"A",
  explain:"Ergänzungsleistungen (EL) sind ein Rechtsanspruch, der AHV- und IV-Bezügern zusteht, wenn Renten und Einkommen die minimalen Lebenskosten nicht decken. Die Sozialhilfe hingegen ist das «letzte Netz» für alle Personen, die weder durch Sozialversicherungen noch durch eigene Mittel ihren Lebensunterhalt bestreiten können. Sie wird von den Gemeinden/Kantonen ausgerichtet."},
@@ -468,12 +468,12 @@ window.QUESTIONS = [
 {id:"f01", topic:"finanzierung", type:"mc", diff:1, tax:"K1",
  q:"Wie wird die AHV (1. Säule) finanziert?",
  options:[
-   {v:"A", t:"Im Kapitaldeckungsverfahren: Individuelle Beiträge werden angespart und verzinst."},
-   {v:"B", t:"Im Umlageverfahren: Laufende Einnahmen werden für laufende Ausgaben verwendet."},
-   {v:"C", t:"Ausschliesslich über die Mehrwertsteuer."},
-   {v:"D", t:"Durch freiwillige Spenden der Bevölkerung."}
+   {v: "A", t:"Im Umlageverfahren: Laufende Einnahmen werden für laufende Ausgaben verwendet."},
+   {v: "B", t:"Durch freiwillige Spenden der Bevölkerung."},
+   {v: "C", t:"Im Kapitaldeckungsverfahren: Individuelle Beiträge werden angespart und verzinst."},
+   {v: "D", t:"Ausschliesslich über die Mehrwertsteuer."}
  ],
- correct:"B",
+ correct:"A",
  explain:"Die AHV wird im Umlageverfahren finanziert: Die aktuellen Beiträge der Erwerbstätigen (Lohnprozente, je hälftig Arbeitgeber/Arbeitnehmer) werden direkt für die laufenden Renten verwendet. Die heutigen Erwerbstätigen finanzieren die heutigen Rentner (Generationenvertrag)."},
 
 {id:"f02", topic:"finanzierung", type:"tf", diff:1, tax:"K1",
@@ -513,12 +513,12 @@ window.QUESTIONS = [
 {id:"f06", topic:"finanzierung", type:"mc", diff:2, tax:"K2",
  q:"Die Sozialausgaben des Bundes sind von 326 Mio. CHF (1960) auf über 22 Mrd. CHF (2019) gestiegen. Welcher Anteil der gesamten Bundesausgaben entfiel 2019 auf die Sozialausgaben?",
  options:[
-   {v:"A", t:"Rund 12%"},
-   {v:"B", t:"Rund 21%"},
-   {v:"C", t:"Rund 31%"},
-   {v:"D", t:"Rund 45%"}
+   {v: "A", t:"Rund 31%"},
+   {v: "B", t:"Rund 21%"},
+   {v: "C", t:"Rund 12%"},
+   {v: "D", t:"Rund 45%"}
  ],
- correct:"C",
+ correct:"A",
  explain:"2019 machten die Sozialausgaben rund 31.3% der gesamten Bundesausgaben aus. Dieser Anteil ist seit 1960 (12.5%) kontinuierlich gestiegen und zeigt die wachsende Bedeutung der sozialen Sicherheit in den Staatsausgaben."},
 
 {id:"f07", topic:"finanzierung", type:"open", diff:3, tax:"K5",
@@ -546,12 +546,12 @@ window.QUESTIONS = [
 {id:"f10", topic:"finanzierung", type:"mc", diff:1, tax:"K1",
  q:"Was bedeutet der Begriff «paritätisch» bei der Finanzierung der AHV?",
  options:[
-   {v:"A", t:"Der Bund und die Kantone teilen sich die Kosten."},
-   {v:"B", t:"Arbeitgeber und Arbeitnehmer zahlen je die Hälfte der Beiträge."},
-   {v:"C", t:"Alle Versicherten zahlen den gleichen Betrag."},
-   {v:"D", t:"Die Beiträge werden jährlich angepasst."}
+   {v: "A", t:"Arbeitgeber und Arbeitnehmer zahlen je die Hälfte der Beiträge."},
+   {v: "B", t:"Der Bund und die Kantone teilen sich die Kosten."},
+   {v: "C", t:"Die Beiträge werden jährlich angepasst."},
+   {v: "D", t:"Alle Versicherten zahlen den gleichen Betrag."}
  ],
- correct:"B",
+ correct:"A",
  explain:"Paritätisch bedeutet «zu gleichen Teilen»: Arbeitgeber und Arbeitnehmer zahlen je 4.35% des Bruttolohns in die AHV ein – zusammen 8.7%. Dieses Prinzip gilt auch für die 2. Säule."},
 
 {id:"f11", topic:"finanzierung", type:"calc", diff:2, tax:"K3",
@@ -602,12 +602,12 @@ window.QUESTIONS = [
 {id:"i01", topic:"versicherung", type:"mc", diff:1, tax:"K1",
  q:"Was ist das Grundprinzip einer Versicherung?",
  options:[
-   {v:"A", t:"Der Staat übernimmt alle individuellen Risiken."},
-   {v:"B", t:"Risiken werden zusammengelegt und gemeinsam getragen (kollektive Risikoübernahme)."},
-   {v:"C", t:"Jede Person spart individuell für den Schadensfall."},
-   {v:"D", t:"Versicherungen verhindern das Eintreten von Schäden."}
+   {v: "A", t:"Risiken werden zusammengelegt und gemeinsam getragen (kollektive Risikoübernahme)."},
+   {v: "B", t:"Versicherungen verhindern das Eintreten von Schäden."},
+   {v: "C", t:"Jede Person spart individuell für den Schadensfall."},
+   {v: "D", t:"Der Staat übernimmt alle individuellen Risiken."}
  ],
- correct:"B",
+ correct:"A",
  explain:"Das Grundprinzip einer Versicherung ist die kollektive Risikoübernahme (Solidaritätsprinzip): Risiken werden zusammengelegt und gemeinsam getragen. Nur bei einem kleinen Teil der Versicherten tritt tatsächlich ein Schaden ein, sodass sich die Kosten auf viele Prämienzahlende verteilen."},
 
 {id:"i02", topic:"versicherung", type:"fill", diff:1, tax:"K1",
@@ -621,23 +621,23 @@ window.QUESTIONS = [
  q:"Was versteht man unter «Adverse Selektion» (Negativauslese) bei Versicherungen?",
  img: {src:"img/vwl/sozialpolitik/adverse_selektion.svg", alt:"Versicherungsmarkt mit Einheitsprämien ohne Obligatorium"},
  options:[
-   {v:"A", t:"Versicherungen wählen absichtlich die schlechtesten Kunden aus."},
-   {v:"B", t:"Gute Risiken scheiden nach und nach aus dem Markt aus, weil die Durchschnittsprämie für sie zu hoch ist."},
-   {v:"C", t:"Versicherte verhalten sich nach Abschluss einer Versicherung riskanter."},
-   {v:"D", t:"Der Staat wählt aus, welche Risiken versichert werden dürfen."}
+   {v: "A", t:"Gute Risiken scheiden nach und nach aus dem Markt aus, weil die Durchschnittsprämie für sie zu hoch ist."},
+   {v: "B", t:"Der Staat wählt aus, welche Risiken versichert werden dürfen."},
+   {v: "C", t:"Versicherte verhalten sich nach Abschluss einer Versicherung riskanter."},
+   {v: "D", t:"Versicherungen wählen absichtlich die schlechtesten Kunden aus."}
  ],
- correct:"B",
+ correct:"A",
  explain:"Bei adverser Selektion ist die Durchschnittsprämie für «gute» Risiken (z.B. vorsichtige Autofahrer) unattraktiv, da sie mehr zahlen als ihrem Risiko entspricht. Sie verzichten auf die Versicherung, wodurch der Anteil «schlechter» Risiken steigt, die Prämien weiter steigen und im Extremfall der Markt zusammenbrechen kann."},
 
 {id:"i04", topic:"versicherung", type:"mc", diff:2, tax:"K2",
  q:"Was ist «Moral Hazard» im Versicherungskontext?",
  options:[
-   {v:"A", t:"Eine betrügerische Absicht beim Abschluss einer Versicherung."},
-   {v:"B", t:"Die Verhaltensänderung von Versicherten, die nach Abschluss einer Versicherung grössere Risiken eingehen."},
-   {v:"C", t:"Die Gefahr, dass die Versicherungsgesellschaft insolvent wird."},
-   {v:"D", t:"Ein moralisches Dilemma bei der Festlegung von Prämien."}
+   {v: "A", t:"Ein moralisches Dilemma bei der Festlegung von Prämien."},
+   {v: "B", t:"Eine betrügerische Absicht beim Abschluss einer Versicherung."},
+   {v: "C", t:"Die Gefahr, dass die Versicherungsgesellschaft insolvent wird."},
+   {v: "D", t:"Die Verhaltensänderung von Versicherten, die nach Abschluss einer Versicherung grössere Risiken eingehen."}
  ],
- correct:"B",
+ correct:"D",
  explain:"Moral Hazard (moralisches Risiko) beschreibt die Verhaltensänderung nach Abschluss einer Versicherung: Versicherte geben sich weniger Mühe, Schäden zu verhindern, weil der Schaden ja gedeckt wäre. Beispiel: Ein Autofahrer mit Vollkaskoversicherung fährt unvorsichtiger."},
 
 {id:"i05", topic:"versicherung", type:"sort", diff:2, tax:"K2",
@@ -676,10 +676,10 @@ window.QUESTIONS = [
 {id:"i09", topic:"versicherung", type:"mc", diff:1, tax:"K1",
  q:"Warum ist eine Versicherung gegen hohe Schäden mit niedriger Eintrittswahrscheinlichkeit (z.B. Hausbrand) sinnvoller als eine Versicherung gegen kleine, häufige Schäden (z.B. Glasbruch)?",
  options:[
-   {v:"A", t:"Weil die Prämien bei seltenen Schäden günstiger sind als die Prämien bei häufigen Schäden."},
-   {v:"B", t:"Weil hohe Schäden mit tiefer Wahrscheinlichkeit die individuelle finanzielle Existenz bedrohen können und Ersparnisse nicht ausreichen."},
-   {v:"C", t:"Weil Versicherungen nur seltene Schäden versichern dürfen."},
-   {v:"D", t:"Weil der Staat Versicherungen gegen kleine Schäden verbietet."}
+   {v: "A", t:"Weil der Staat Versicherungen gegen kleine Schäden verbietet."},
+   {v: "B", t:"Weil hohe Schäden mit tiefer Wahrscheinlichkeit die individuelle finanzielle Existenz bedrohen können und Ersparnisse nicht ausreichen."},
+   {v: "C", t:"Weil die Prämien bei seltenen Schäden günstiger sind als die Prämien bei häufigen Schäden."},
+   {v: "D", t:"Weil Versicherungen nur seltene Schäden versichern dürfen."}
  ],
  correct:"B",
  explain:"Das zentrale Argument für Versicherungen ist der Schutz gegen existenzbedrohende Risiken. Bei kleinen, häufigen Schäden ist die Prämie im Verhältnis zum Schaden hoch (die Versicherung muss Verwaltungskosten und Gewinn decken). Ersparnisse sind hier oft günstiger. Bei seltenen, aber sehr hohen Schäden (Brand, schwere Krankheit) übersteigt der potenzielle Schaden jedoch jede individuelle Sparfähigkeit."},
@@ -711,12 +711,12 @@ window.QUESTIONS = [
 {id:"i13", topic:"versicherung", type:"mc", diff:2, tax:"K3",
  q:"Eine Versicherung berechnet die Prämie für eine Hausratversicherung. Die erwartete Schadenssumme beträgt CHF 200 pro Jahr pro Versichertem. Welcher der folgenden Prämienansätze ist am realistischsten?",
  options:[
-   {v:"A", t:"CHF 150 pro Jahr (unter dem erwarteten Schaden)"},
-   {v:"B", t:"CHF 200 pro Jahr (exakt der erwartete Schaden)"},
-   {v:"C", t:"CHF 260 pro Jahr (erwarteter Schaden plus Verwaltungskosten und Gewinn)"},
-   {v:"D", t:"CHF 500 pro Jahr (möglichst hohe Sicherheitsmarge)"}
+   {v: "A", t:"CHF 500 pro Jahr (möglichst hohe Sicherheitsmarge)"},
+   {v: "B", t:"CHF 150 pro Jahr (unter dem erwarteten Schaden)"},
+   {v: "C", t:"CHF 200 pro Jahr (exakt der erwartete Schaden)"},
+   {v: "D", t:"CHF 260 pro Jahr (erwarteter Schaden plus Verwaltungskosten und Gewinn)"}
  ],
- correct:"C",
+ correct:"D",
  explain:"Eine realistische Prämie muss den erwarteten Schaden (CHF 200) plus Verwaltungskosten, Rückstellungen und Gewinnmarge decken. Eine Prämie unter dem erwarteten Schaden (A) wäre nicht kostendeckend, die exakte Schadenshöhe (B) deckt keine Kosten, und eine zu hohe Prämie (D) wäre am Markt nicht konkurrenzfähig."},
 
 {id:"i14", topic:"versicherung", type:"sort", diff:2, tax:"K2",
@@ -743,12 +743,12 @@ window.QUESTIONS = [
 {id:"e01", topic:"staatseingriffe", type:"mc", diff:1, tax:"K1",
  q:"Welches ist KEIN Grund für Staatseingriffe in die Wirtschaft?",
  options:[
-   {v:"A", t:"Marktversagen (z.B. öffentliche Güter, externe Effekte)"},
-   {v:"B", t:"Sicherung des Wettbewerbs und Bekämpfung von Monopolen"},
-   {v:"C", t:"Maximierung des Gewinns einzelner Unternehmen"},
-   {v:"D", t:"Bereitstellung öffentlicher Güter"}
+   {v: "A", t:"Maximierung des Gewinns einzelner Unternehmen"},
+   {v: "B", t:"Bereitstellung öffentlicher Güter"},
+   {v: "C", t:"Marktversagen (z.B. öffentliche Güter, externe Effekte)"},
+   {v: "D", t:"Sicherung des Wettbewerbs und Bekämpfung von Monopolen"}
  ],
- correct:"C",
+ correct:"A",
  explain:"Die Maximierung von Unternehmensgewinnen ist kein legitimer Grund für Staatseingriffe. Staatliche Eingriffe sind gerechtfertigt bei Marktversagen, zur Sicherung des Wettbewerbs, zur Bereitstellung öffentlicher Güter und zum Schutz bei externen Effekten oder asymmetrischer Information."},
 
 {id:"e02", topic:"staatseingriffe", type:"sort", diff:1, tax:"K1",
@@ -775,12 +775,12 @@ window.QUESTIONS = [
 {id:"e04", topic:"staatseingriffe", type:"mc", diff:2, tax:"K2",
  q:"Was ist mit «Staatsversagen» gemeint?",
  options:[
-   {v:"A", t:"Der Staat geht in Konkurs."},
-   {v:"B", t:"Staatliche Massnahmen verfehlen ihre Ziele oder verursachen unbeabsichtigte Nebenwirkungen."},
-   {v:"C", t:"Die Bürger verweigern die Steuerzahlung."},
-   {v:"D", t:"Der Staat stellt keine öffentlichen Güter mehr bereit."}
+   {v: "A", t:"Der Staat geht in Konkurs."},
+   {v: "B", t:"Der Staat stellt keine öffentlichen Güter mehr bereit."},
+   {v: "C", t:"Staatliche Massnahmen verfehlen ihre Ziele oder verursachen unbeabsichtigte Nebenwirkungen."},
+   {v: "D", t:"Die Bürger verweigern die Steuerzahlung."}
  ],
- correct:"B",
+ correct:"C",
  explain:"Staatsversagen bedeutet, dass staatliche Eingriffe ihre Ziele nicht erreichen oder sogar unbeabsichtigte negative Nebenwirkungen haben. Gründe sind u.a.: Eigendynamik/Überangebot, Ineffizienz, veränderte Leistungsanreize und unbeabsichtigte Nebenwirkungen (z.B. Arbeitnehmerschutz führt zu mehr Arbeitslosigkeit)."},
 
 {id:"e05", topic:"staatseingriffe", type:"tf", diff:2, tax:"K2",
@@ -791,12 +791,12 @@ window.QUESTIONS = [
 {id:"e06", topic:"staatseingriffe", type:"mc", diff:3, tax:"K4",
  q:"Die Sozialhilfe bietet ein Einkommen ohne Gegenleistung. Welches ökonomische Problem entsteht dadurch?",
  options:[
-   {v:"A", t:"Inflation steigt, weil mehr Geld im Umlauf ist."},
-   {v:"B", t:"Ein Moral-Hazard-Problem: Der Anreiz, erwerbstätig zu sein, sinkt durch das «Gratiseinkommen»."},
-   {v:"C", t:"Die Arbeitsproduktivität der Gesamtwirtschaft steigt."},
-   {v:"D", t:"Der Staat spart langfristig Geld."}
+   {v: "A", t:"Ein Moral-Hazard-Problem: Der Anreiz, erwerbstätig zu sein, sinkt durch das «Gratiseinkommen»."},
+   {v: "B", t:"Der Staat spart langfristig Geld."},
+   {v: "C", t:"Inflation steigt, weil mehr Geld im Umlauf ist."},
+   {v: "D", t:"Die Arbeitsproduktivität der Gesamtwirtschaft steigt."}
  ],
- correct:"B",
+ correct:"A",
  explain:"Je grosszügiger staatliche Sozialtransfers sind, desto grösser ist der Anreiz, die eigene Leistungsbereitschaft zu reduzieren (Moral-Hazard-Problem). Dies kann zu einem Teufelskreis führen: Geringere Leistungsbereitschaft reduziert die Wirtschaftsleistung, was die Finanzierung der Sozialwerke erschwert."},
 
 {id:"e07", topic:"staatseingriffe", type:"open", diff:3, tax:"K5",
@@ -824,12 +824,12 @@ window.QUESTIONS = [
 {id:"e10", topic:"staatseingriffe", type:"mc", diff:2, tax:"K2",
  q:"Welches Konzept beschreibt Güter, die der Markt in zu geringer Menge bereitstellt, weil die Individuen deren Nutzen unterschätzen?",
  options:[
-   {v:"A", t:"Öffentliche Güter"},
-   {v:"B", t:"Meritorische Güter"},
-   {v:"C", t:"Demeritorische Güter"},
-   {v:"D", t:"Clubgüter"}
+   {v: "A", t:"Demeritorische Güter"},
+   {v: "B", t:"Öffentliche Güter"},
+   {v: "C", t:"Meritorische Güter"},
+   {v: "D", t:"Clubgüter"}
  ],
- correct:"B",
+ correct:"C",
  explain:"Meritorische Güter sind Güter, deren Nutzen die Individuen unterschätzen (z.B. Bildung, Gesundheitsvorsorge, Altersvorsorge). Der Staat fördert ihren Konsum – etwa durch Obligatorien (Schulpflicht, Versicherungspflicht) oder Subventionen. Demeritorische Güter sind das Gegenteil: Güter, die übermässig konsumiert werden (z.B. Tabak, Alkohol) und die der Staat einschränkt."},
 
 {id:"e11", topic:"staatseingriffe", type:"sort", diff:2, tax:"K3",
@@ -876,12 +876,12 @@ window.QUESTIONS = [
  q:"Wie hat sich der Alterslastquotient (Verhältnis der über 64-Jährigen zu den 20–64-Jährigen) in der Schweiz entwickelt?",
  img: {src:"img/vwl/sozialpolitik/alterslastquotient.svg", alt:"Alterslastquotient Schweiz 1948–2050"},
  options:[
-   {v:"A", t:"Er ist von 2:1 (1948) auf 9.5:1 (heute) gestiegen."},
-   {v:"B", t:"Er ist von 9.5:1 (1948) auf ca. 2.9:1 (heute) gesunken und wird weiter auf 2:1 sinken."},
-   {v:"C", t:"Er ist stabil bei 5:1 geblieben."},
-   {v:"D", t:"Er hat sich seit 1948 nicht verändert."}
+   {v: "A", t:"Er ist stabil bei 5:1 geblieben."},
+   {v: "B", t:"Er hat sich seit 1948 nicht verändert."},
+   {v: "C", t:"Er ist von 2:1 (1948) auf 9.5:1 (heute) gestiegen."},
+   {v: "D", t:"Er ist von 9.5:1 (1948) auf ca. 2.9:1 (heute) gesunken und wird weiter auf 2:1 sinken."}
  ],
- correct:"B",
+ correct:"D",
  explain:"Der Alterslastquotient ist von 9.5:1 (1948) auf heute 2.9:1 gesunken. Bis 2050 wird er voraussichtlich auf 2:1 absinken. Das bedeutet: 1948 finanzierten 9.5 Erwerbstätige einen Rentner, heute nur noch 2.9. Dies ist eine der grössten Herausforderungen für das Umlageverfahren der AHV."},
 
 {id:"h02", topic:"herausforderungen", type:"tf", diff:1, tax:"K1",
@@ -892,12 +892,12 @@ window.QUESTIONS = [
 {id:"h03", topic:"herausforderungen", type:"mc", diff:2, tax:"K2",
  q:"Was ist die «negative Einkommenssteuer»?",
  options:[
-   {v:"A", t:"Eine Steuer, die nur auf negative Einkommen (Verluste) erhoben wird."},
-   {v:"B", t:"Ein System, bei dem Haushalte mit tiefem Einkommen Transferzahlungen erhalten statt Steuern zu zahlen."},
-   {v:"C", t:"Eine Steuer, die bei sinkendem BIP automatisch gesenkt wird."},
-   {v:"D", t:"Die Abschaffung aller Einkommenssteuern."}
+   {v: "A", t:"Eine Steuer, die nur auf negative Einkommen (Verluste) erhoben wird."},
+   {v: "B", t:"Eine Steuer, die bei sinkendem BIP automatisch gesenkt wird."},
+   {v: "C", t:"Ein System, bei dem Haushalte mit tiefem Einkommen Transferzahlungen erhalten statt Steuern zu zahlen."},
+   {v: "D", t:"Die Abschaffung aller Einkommenssteuern."}
  ],
- correct:"B",
+ correct:"C",
  explain:"Die negative Einkommenssteuer verbindet Sozial- und Steuersystem: Tiefe Einkommen erhalten Transferzahlungen (negative Steuer), die mit steigendem Einkommen abnehmen. Ab einem Schwellenwert werden reguläre Steuern fällig. Da die Transfers nicht vollständig gekürzt werden, besteht immer ein Anreiz zur Erwerbstätigkeit – die «Armutsfalle» wird vermieden."},
 
 {id:"h04", topic:"herausforderungen", type:"sort", diff:2, tax:"K2",
@@ -933,12 +933,12 @@ window.QUESTIONS = [
 {id:"h07", topic:"herausforderungen", type:"mc", diff:2, tax:"K2",
  q:"Was versteht man unter der «Armutsfalle» (poverty trap)?",
  options:[
-   {v:"A", t:"Die Tatsache, dass arme Länder nie reich werden können."},
-   {v:"B", t:"Die Situation, in der sich Erwerbsarbeit kaum lohnt, weil das Einkommen durch den Wegfall von Sozialleistungen nicht oder kaum steigt."},
-   {v:"C", t:"Die Vererbung von Armut über Generationen."},
-   {v:"D", t:"Die Verschuldung von armen Haushalten durch Konsumkredite."}
+   {v: "A", t:"Die Situation, in der sich Erwerbsarbeit kaum lohnt, weil das Einkommen durch den Wegfall von Sozialleistungen nicht oder kaum steigt."},
+   {v: "B", t:"Die Verschuldung von armen Haushalten durch Konsumkredite."},
+   {v: "C", t:"Die Tatsache, dass arme Länder nie reich werden können."},
+   {v: "D", t:"Die Vererbung von Armut über Generationen."}
  ],
- correct:"B",
+ correct:"A",
  explain:"Die Armutsfalle entsteht, wenn bei steigendem Erwerbseinkommen Sozialhilfe, Prämienverbilligungen und andere Transfers gekürzt werden. Unter Umständen steigt das verfügbare Einkommen bei Aufnahme einer Arbeit kaum. Dies reduziert den Anreiz zur Erwerbstätigkeit und ist ein zentrales Problem der Sozialpolitik."},
 
 {id:"h08", topic:"herausforderungen", type:"tf", diff:2, tax:"K2",
@@ -1003,10 +1003,10 @@ window.QUESTIONS = [
 {id:"h14", topic:"herausforderungen", type:"mc", diff:3, tax:"K4",
  q:"Warum wird die Gesundheitsversorgung im Vergleich zum Rest der Wirtschaft immer teurer (sog. «Baumol'sche Kostenkrankheit»)?",
  options:[
-   {v:"A", t:"Weil Ärzte zu viel verdienen."},
-   {v:"B", t:"Weil personalintensive Dienstleistungen wie Pflege und Medizin kaum durch technischen Fortschritt rationalisierbar sind, die Löhne aber mit der Gesamtwirtschaft steigen."},
-   {v:"C", t:"Weil die Pharmabranche zu hohe Gewinne macht."},
-   {v:"D", t:"Weil Patienten immer häufiger krank werden."}
+   {v: "A", t:"Weil die Pharmabranche zu hohe Gewinne macht."},
+   {v: "B", t:"Weil personalintensive Dienstleistungen wie Pflege und Medizin kaum durch technischen Fortschritt rationalisierbar sind, die Löhne aber mit der Gesamtwirtschaft steigen."},
+   {v: "C", t:"Weil Patienten immer häufiger krank werden."},
+   {v: "D", t:"Weil Ärzte zu viel verdienen."}
  ],
  correct:"B",
  explain:"Die Baumol'sche Kostenkrankheit beschreibt das Phänomen, dass personalintensive Dienstleistungen (Pflege, Bildung, Kunst) kaum produktiver werden: Eine Pflegefachperson kann nicht doppelt so viele Patienten betreuen wie vor 50 Jahren. Da die Löhne aber mit der Gesamtwirtschaft mitsteigen (sonst würde niemand mehr in der Pflege arbeiten), steigen die Kosten relativ zum BIP."},

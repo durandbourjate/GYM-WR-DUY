@@ -35,10 +35,10 @@ window.QUESTIONS = [
 {id:"a01", topic:"arbeitsmarkt", type:"mc", diff:1, tax:"K1",
  q:"Wer bildet auf dem Arbeitsmarkt die Arbeitsnachfrage?",
  options:[
-   {v:"A", t:"Die Arbeitnehmerinnen und Arbeitnehmer"},
-   {v:"B", t:"Unternehmen und der Staat"},
-   {v:"C", t:"Die Gewerkschaften"},
-   {v:"D", t:"Die Arbeitslosenversicherung"}
+   {v: "A", t:"Die Arbeitslosenversicherung"},
+   {v: "B", t:"Unternehmen und der Staat"},
+   {v: "C", t:"Die Arbeitnehmerinnen und Arbeitnehmer"},
+   {v: "D", t:"Die Gewerkschaften"}
  ],
  correct:"B",
  explain:"Unternehmen und der Staat fragen Arbeitskräfte nach (Arbeitsnachfrage). Arbeitnehmerinnen und Arbeitnehmer bieten ihre Arbeitskraft an (Arbeitsangebot)."},
@@ -51,10 +51,10 @@ window.QUESTIONS = [
 {id:"a03", topic:"arbeitsmarkt", type:"mc", diff:2, tax:"K2",
  q:"Weshalb ist der Arbeitsmarkt kein Markt wie jeder andere?",
  options:[
-   {v:"A", t:"Weil es auf dem Arbeitsmarkt keine Preise gibt"},
-   {v:"B", t:"Weil das Angebot homogen ist – alle Arbeitskräfte sind austauschbar"},
-   {v:"C", t:"Weil die Teilnahme für die meisten Arbeitnehmer überlebenswichtig ist und das Angebot extrem heterogen ist"},
-   {v:"D", t:"Weil der Staat den Arbeitsmarkt vollständig kontrolliert"}
+   {v: "A", t:"Weil das Angebot homogen ist – alle Arbeitskräfte sind austauschbar"},
+   {v: "B", t:"Weil es auf dem Arbeitsmarkt keine Preise gibt"},
+   {v: "C", t:"Weil die Teilnahme für die meisten Arbeitnehmer überlebenswichtig ist und das Angebot extrem heterogen ist"},
+   {v: "D", t:"Weil der Staat den Arbeitsmarkt vollständig kontrolliert"}
  ],
  correct:"C",
  explain:"Der Arbeitsmarkt zeichnet sich durch mehrere Besonderheiten aus: Das Angebot ist extrem heterogen (jede Arbeitskraft ist ein Individuum), die Teilnahme ist für die meisten überlebenswichtig, und der Markt ist stark reguliert."},
@@ -75,12 +75,12 @@ window.QUESTIONS = [
 {id:"a05", topic:"arbeitsmarkt", type:"mc", diff:2, tax:"K2",
  q:"Im klassischen Arbeitsmarktmodell: Was passiert, wenn die Löhne bei einem Nachfragerückgang unflexibel bleiben?",
  options:[
-   {v:"A", t:"Es entsteht freiwillige Arbeitslosigkeit"},
-   {v:"B", t:"Es entsteht unfreiwillige Arbeitslosigkeit"},
-   {v:"C", t:"Die Arbeitslosigkeit sinkt"},
-   {v:"D", t:"Die Löhne steigen automatisch"}
+   {v: "A", t:"Die Löhne steigen automatisch"},
+   {v: "B", t:"Die Arbeitslosigkeit sinkt"},
+   {v: "C", t:"Es entsteht unfreiwillige Arbeitslosigkeit"},
+   {v: "D", t:"Es entsteht freiwillige Arbeitslosigkeit"}
  ],
- correct:"B",
+ correct:"C",
  explain:"Wenn die Löhne trotz sinkender Nachfrage nicht sinken, fragen Unternehmen weniger Arbeitskräfte nach als angeboten werden. Es entsteht unfreiwillige Arbeitslosigkeit – Menschen wollen zum herrschenden Lohn arbeiten, finden aber keine Stelle."},
 
 {id:"a06", topic:"arbeitsmarkt", type:"tf", diff:2, tax:"K2",
@@ -96,12 +96,12 @@ window.QUESTIONS = [
 {id:"a08", topic:"arbeitsmarkt", type:"mc", diff:2, tax:"K2",
  q:"Gemäss der keynesianischen Theorie: Warum können Lohnkürzungen Arbeitslosigkeit sogar verschärfen?",
  options:[
-   {v:"A", t:"Weil tiefere Löhne die Produktivität senken"},
-   {v:"B", t:"Weil tiefere Löhne die Kaufkraft und damit die Konsumnachfrage reduzieren"},
-   {v:"C", t:"Weil Unternehmen dann noch mehr Arbeitskräfte einstellen"},
-   {v:"D", t:"Weil die Gewerkschaften dagegen streiken"}
+   {v: "A", t:"Weil tiefere Löhne die Produktivität senken"},
+   {v: "B", t:"Weil die Gewerkschaften dagegen streiken"},
+   {v: "C", t:"Weil Unternehmen dann noch mehr Arbeitskräfte einstellen"},
+   {v: "D", t:"Weil tiefere Löhne die Kaufkraft und damit die Konsumnachfrage reduzieren"}
  ],
- correct:"B",
+ correct:"D",
  explain:"Löhne sind nicht nur Kosten, sondern auch Einkommen. Sinken die Löhne aller Arbeitnehmer, sinkt die Konsumnachfrage. Wird dieser Rückgang nicht kompensiert (z.B. durch Exporte oder Staatsnachfrage), kann eine Rezession folgen."},
 
 {id:"a09", topic:"arbeitsmarkt", type:"multi", diff:2, tax:"K2",
@@ -119,12 +119,12 @@ window.QUESTIONS = [
  q:"Das Diagramm zeigt den Arbeitsmarkt mit einem starren Lohn w̄ oberhalb des Gleichgewichtslohns w*. Die Punkte Q und P markieren die nachgefragte bzw. angebotene Arbeitsmenge bei w̄. Welche Aussage ist korrekt?",
  img:{src:"img/vwl/arbeitslosigkeit/arbeitsmarkt_lohnrigid.svg", alt:"Arbeitsmarktdiagramm mit Angebots- und Nachfragekurve"},
  options:[
-   {v:"A", t:"Im Punkt Q wird mehr Arbeit nachgefragt als in P angeboten"},
-   {v:"B", t:"Die Strecke von Q nach P zeigt ein Überangebot an Arbeit – es gibt unfreiwillige Arbeitslosigkeit"},
-   {v:"C", t:"Im Gleichgewichtspunkt würden weniger Menschen arbeiten als bei w̄"},
-   {v:"D", t:"Der starre Lohn w̄ führt dazu, dass alle Arbeitswilligen eine Stelle finden"}
+   {v: "A", t:"Im Punkt Q wird mehr Arbeit nachgefragt als in P angeboten"},
+   {v: "B", t:"Der starre Lohn w̄ führt dazu, dass alle Arbeitswilligen eine Stelle finden"},
+   {v: "C", t:"Die Strecke von Q nach P zeigt ein Überangebot an Arbeit – es gibt unfreiwillige Arbeitslosigkeit"},
+   {v: "D", t:"Im Gleichgewichtspunkt würden weniger Menschen arbeiten als bei w̄"}
  ],
- correct:"B",
+ correct:"C",
  explain:"Bei w̄ > w* liegt die angebotene Arbeitsmenge (P auf Lₛ) über der nachgefragten (Q auf Lᴅ). Die Differenz ist das Überangebot an Arbeit = unfreiwillige Arbeitslosigkeit. Im Gleichgewicht (w*) wären Angebot und Nachfrage ausgeglichen."},
 
 // ── LÖHNE & LOHNRIGIDITÄTEN (l01–l10) ──
@@ -132,10 +132,10 @@ window.QUESTIONS = [
 {id:"l01", topic:"loehne", type:"mc", diff:1, tax:"K1",
  q:"Was besagt die Effizienzlohntheorie?",
  options:[
-   {v:"A", t:"Löhne sollten staatlich festgelegt werden"},
-   {v:"B", t:"Hohe Löhne steigern die Produktivität und Motivation der Beschäftigten"},
-   {v:"C", t:"Nur der niedrigste Lohn ist effizient"},
-   {v:"D", t:"Löhne spielen für die Arbeitsproduktivität keine Rolle"}
+   {v: "A", t:"Löhne spielen für die Arbeitsproduktivität keine Rolle"},
+   {v: "B", t:"Hohe Löhne steigern die Produktivität und Motivation der Beschäftigten"},
+   {v: "C", t:"Löhne sollten staatlich festgelegt werden"},
+   {v: "D", t:"Nur der niedrigste Lohn ist effizient"}
  ],
  correct:"B",
  explain:"Die Effizienzlohntheorie besagt, dass die Produktivität positiv vom Lohn abhängt. Höhere Löhne steigern Zufriedenheit, Identifikation mit der Firma und Leistungsbereitschaft. Zudem erhält das Unternehmen mehr Bewerbungen und kann die Besten auswählen."},
@@ -170,10 +170,10 @@ window.QUESTIONS = [
 {id:"l05", topic:"loehne", type:"mc", diff:2, tax:"K2",
  q:"Was ist ein Gesamtarbeitsvertrag (GAV)?",
  options:[
-   {v:"A", t:"Ein individueller Arbeitsvertrag zwischen Arbeitgeber und Arbeitnehmer"},
-   {v:"B", t:"Ein kollektiver Vertrag zwischen Sozialpartnern mit Bestimmungen zu Löhnen, Arbeitszeit und Kündigungsfristen"},
-   {v:"C", t:"Ein staatliches Gesetz zur Regulierung aller Löhne"},
-   {v:"D", t:"Ein Vertrag zwischen verschiedenen Gewerkschaften"}
+   {v: "A", t:"Ein Vertrag zwischen verschiedenen Gewerkschaften"},
+   {v: "B", t:"Ein kollektiver Vertrag zwischen Sozialpartnern mit Bestimmungen zu Löhnen, Arbeitszeit und Kündigungsfristen"},
+   {v: "C", t:"Ein staatliches Gesetz zur Regulierung aller Löhne"},
+   {v: "D", t:"Ein individueller Arbeitsvertrag zwischen Arbeitgeber und Arbeitnehmer"}
  ],
  correct:"B",
  explain:"Ein GAV wird kollektiv zwischen den Sozialpartnern (Gewerkschaften und Arbeitgeberverbände) ausgehandelt. Er enthält Bestimmungen zu Mindestlöhnen, Arbeitszeit, Ferien, Kündigungsfristen u.a. Während der Laufzeit gilt eine Friedenspflicht."},
@@ -191,12 +191,12 @@ window.QUESTIONS = [
 {id:"l08", topic:"loehne", type:"mc", diff:2, tax:"K2",
  q:"Was passiert, wenn ein GAV allgemeinverbindlich erklärt wird?",
  options:[
-   {v:"A", t:"Er gilt nur für die Mitglieder der beteiligten Gewerkschaft"},
-   {v:"B", t:"Er wird auf die ganze Branche ausgeweitet, auch auf Nichtmitglieder"},
-   {v:"C", t:"Er wird ungültig und durch ein Gesetz ersetzt"},
-   {v:"D", t:"Er gilt nur noch für die grössten Unternehmen"}
+   {v: "A", t:"Er gilt nur für die Mitglieder der beteiligten Gewerkschaft"},
+   {v: "B", t:"Er gilt nur noch für die grössten Unternehmen"},
+   {v: "C", t:"Er wird ungültig und durch ein Gesetz ersetzt"},
+   {v: "D", t:"Er wird auf die ganze Branche ausgeweitet, auch auf Nichtmitglieder"}
  ],
- correct:"B",
+ correct:"D",
  explain:"Bei einer Allgemeinverbindlichkeitserklärung wird der GAV auf die ganze Branche ausgeweitet. Dies schützt die sozialvertraglichen Vereinbarungen vor Niedriglohnkonkurrenz und verhindert, dass Aussenseiter benachteiligt werden."},
 
 {id:"l09", topic:"loehne", type:"multi", diff:2, tax:"K2",
@@ -213,12 +213,12 @@ window.QUESTIONS = [
 {id:"l10", topic:"loehne", type:"mc", diff:1, tax:"K1",
  q:"Was ist der Unterschied zwischen Nominal- und Reallohn?",
  options:[
-   {v:"A", t:"Der Nominallohn ist der tatsächlich ausbezahlte Geldbetrag, der Reallohn berücksichtigt die Kaufkraft (inflationsbereinigt)"},
-   {v:"B", t:"Der Reallohn ist immer höher als der Nominallohn"},
-   {v:"C", t:"Der Nominallohn berücksichtigt die Teuerung, der Reallohn nicht"},
-   {v:"D", t:"Es gibt keinen inhaltlichen Unterschied"}
+   {v: "A", t:"Der Reallohn ist immer höher als der Nominallohn"},
+   {v: "B", t:"Der Nominallohn berücksichtigt die Teuerung, der Reallohn nicht"},
+   {v: "C", t:"Der Nominallohn ist der tatsächlich ausbezahlte Geldbetrag, der Reallohn berücksichtigt die Kaufkraft (inflationsbereinigt)"},
+   {v: "D", t:"Es gibt keinen inhaltlichen Unterschied"}
  ],
- correct:"A",
+ correct:"C",
  explain:"Der Nominallohn ist der Betrag auf dem Lohnausweis. Der Reallohn gibt an, was man sich davon kaufen kann – er ist um die Teuerung bereinigt. Bei Inflation steigt der Nominallohn oft, während der Reallohn stagnieren oder sogar sinken kann."},
 
 // ── TYPEN VON ARBEITSLOSIGKEIT (t01–t10) ──
@@ -226,12 +226,12 @@ window.QUESTIONS = [
 {id:"t01", topic:"typen", type:"mc", diff:1, tax:"K1",
  q:"Welcher Typ von Arbeitslosigkeit entsteht durch jahreszeitliche Schwankungen oder Stellenwechsel?",
  options:[
-   {v:"A", t:"Konjunkturelle Arbeitslosigkeit"},
-   {v:"B", t:"Strukturelle Arbeitslosigkeit"},
-   {v:"C", t:"Friktionelle Arbeitslosigkeit"},
-   {v:"D", t:"Sockelarbeitslosigkeit"}
+   {v: "A", t:"Friktionelle Arbeitslosigkeit"},
+   {v: "B", t:"Konjunkturelle Arbeitslosigkeit"},
+   {v: "C", t:"Sockelarbeitslosigkeit"},
+   {v: "D", t:"Strukturelle Arbeitslosigkeit"}
  ],
- correct:"C",
+ correct:"A",
  explain:"Die friktionelle Arbeitslosigkeit hat ihre Ursache in jahreszeitlichen Nachfrageschwankungen (z.B. Tourismus, Landwirtschaft) oder in Stellenwechseln und damit verbundenen Suchprozessen. Sie ist für die Wirtschaftspolitik unproblematisch."},
 
 {id:"t02", topic:"typen", type:"sort", diff:1, tax:"K2",
@@ -264,12 +264,12 @@ window.QUESTIONS = [
 {id:"t05", topic:"typen", type:"mc", diff:2, tax:"K2",
  q:"Warum ist die konjunkturelle Arbeitslosigkeit problematischer als die friktionelle?",
  options:[
-   {v:"A", t:"Weil sie ein grösseres zeitliches Ausmass annimmt"},
-   {v:"B", t:"Weil sie nur Geringqualifizierte betrifft"},
-   {v:"C", t:"Weil sie nicht messbar ist"},
-   {v:"D", t:"Weil sie durch den Staat verursacht wird"}
+   {v: "A", t:"Weil sie durch den Staat verursacht wird"},
+   {v: "B", t:"Weil sie nicht messbar ist"},
+   {v: "C", t:"Weil sie nur Geringqualifizierte betrifft"},
+   {v: "D", t:"Weil sie ein grösseres zeitliches Ausmass annimmt"}
  ],
- correct:"A",
+ correct:"D",
  explain:"Die friktionelle Arbeitslosigkeit ist kurzfristiger Natur (Suchprozesse, saisonale Schwankungen). Die konjunkturelle Arbeitslosigkeit dauert länger an und betrifft oft viele Arbeitnehmer gleichzeitig, weshalb man ihr «nicht tatenlos zusehen will»."},
 
 {id:"t06", topic:"typen", type:"open", diff:3, tax:"K4",
@@ -280,10 +280,10 @@ window.QUESTIONS = [
 {id:"t07", topic:"typen", type:"mc", diff:2, tax:"K2",
  q:"Welche Aussage zur strukturellen Arbeitslosigkeit ist korrekt?",
  options:[
-   {v:"A", t:"Sie ist kurzfristiger Natur und verschwindet schnell"},
-   {v:"B", t:"Sie zeigt sich in regional-, branchen- und qualifikationsspezifischen Unterschieden"},
-   {v:"C", t:"Sie betrifft ausschliesslich den Industriesektor"},
-   {v:"D", t:"Sie wird durch saisonale Schwankungen verursacht"}
+   {v: "A", t:"Sie wird durch saisonale Schwankungen verursacht"},
+   {v: "B", t:"Sie zeigt sich in regional-, branchen- und qualifikationsspezifischen Unterschieden"},
+   {v: "C", t:"Sie betrifft ausschliesslich den Industriesektor"},
+   {v: "D", t:"Sie ist kurzfristiger Natur und verschwindet schnell"}
  ],
  correct:"B",
  explain:"Die strukturelle Arbeitslosigkeit hat einen längerfristigen Charakter und zeigt sich in regionalen, branchenmässigen, qualifikationsspezifischen, geschlechts- oder altersspezifischen Unterschieden."},
@@ -307,12 +307,12 @@ window.QUESTIONS = [
 {id:"t10", topic:"typen", type:"mc", diff:3, tax:"K4",
  q:"In der Schweiz steigt nach der COVID-19-Pandemie die Arbeitslosigkeit im Gastgewerbe stark an, erholt sich aber nach 18 Monaten weitgehend. Gleichzeitig bleiben in der IT-Branche dauerhaft viele Stellen unbesetzt. Welche Aussage trifft am besten zu?",
  options:[
-   {v:"A", t:"Beide Phänomene sind Beispiele für strukturelle Arbeitslosigkeit"},
-   {v:"B", t:"Die Arbeitslosigkeit im Gastgewerbe ist konjunktureller, der Fachkräftemangel in der IT struktureller Natur"},
-   {v:"C", t:"Es handelt sich in beiden Fällen um friktionelle Arbeitslosigkeit"},
-   {v:"D", t:"Beide Phänomene sind ausschliesslich konjunktureller Natur"}
+   {v: "A", t:"Die Arbeitslosigkeit im Gastgewerbe ist konjunktureller, der Fachkräftemangel in der IT struktureller Natur"},
+   {v: "B", t:"Beide Phänomene sind ausschliesslich konjunktureller Natur"},
+   {v: "C", t:"Beide Phänomene sind Beispiele für strukturelle Arbeitslosigkeit"},
+   {v: "D", t:"Es handelt sich in beiden Fällen um friktionelle Arbeitslosigkeit"}
  ],
- correct:"B",
+ correct:"A",
  explain:"Der vorübergehende Anstieg im Gastgewerbe ist konjunkturell (exogener Schock, der nach der Erholung verschwindet). Der dauerhafte Fachkräftemangel in der IT hingegen ist strukturell: Es fehlen Personen mit den passenden Qualifikationen (Mismatch)."},
 
 // ── BEVERIDGE-KURVE & SOCKELARBEITSLOSIGKEIT (b01–b10) ──
@@ -331,10 +331,10 @@ window.QUESTIONS = [
 {id:"b02", topic:"beveridge", type:"mc", diff:2, tax:"K2",
  q:"Was bedeutet eine Verschiebung der Beveridge-Kurve nach aussen (vom Ursprung weg)?",
  options:[
-   {v:"A", t:"Die konjunkturelle Arbeitslosigkeit sinkt"},
-   {v:"B", t:"Die Sockelarbeitslosigkeit hat zugenommen"},
-   {v:"C", t:"Es herrscht Vollbeschäftigung"},
-   {v:"D", t:"Die Arbeitslosen finden schneller eine Stelle"}
+   {v: "A", t:"Die konjunkturelle Arbeitslosigkeit sinkt"},
+   {v: "B", t:"Die Sockelarbeitslosigkeit hat zugenommen"},
+   {v: "C", t:"Die Arbeitslosen finden schneller eine Stelle"},
+   {v: "D", t:"Es herrscht Vollbeschäftigung"}
  ],
  correct:"B",
  explain:"Eine Verschiebung nach aussen bedeutet, dass bei gleicher Konjunkturlage mehr Arbeitslose und gleichzeitig mehr offene Stellen existieren. Das ist ein Zeichen dafür, dass die strukturelle bzw. die Sockelarbeitslosigkeit zugenommen hat (Mismatch)."},
@@ -360,10 +360,10 @@ window.QUESTIONS = [
 {id:"b05", topic:"beveridge", type:"mc", diff:2, tax:"K2",
  q:"Welcher Faktor kann zu einer Zunahme der Sockelarbeitslosigkeit führen?",
  options:[
-   {v:"A", t:"Eine kurzfristige Konjunkturschwankung"},
-   {v:"B", t:"Ein rasanter Strukturwandel, der Arbeitsplätze für Unqualifizierte vernichtet"},
-   {v:"C", t:"Eine Senkung der Arbeitslosenunterstützung"},
-   {v:"D", t:"Eine Lockerung des Kündigungsschutzes"}
+   {v: "A", t:"Eine Lockerung des Kündigungsschutzes"},
+   {v: "B", t:"Ein rasanter Strukturwandel, der Arbeitsplätze für Unqualifizierte vernichtet"},
+   {v: "C", t:"Eine kurzfristige Konjunkturschwankung"},
+   {v: "D", t:"Eine Senkung der Arbeitslosenunterstützung"}
  ],
  correct:"B",
  explain:"Ein rascher Strukturwandel (z.B. Digitalisierung) führt dazu, dass Arbeitsplätze für Unqualifizierte wegfallen und diese keine neue Beschäftigung finden. Das erhöht die Sockelarbeitslosigkeit."},
@@ -382,12 +382,12 @@ window.QUESTIONS = [
  q:"Die Abbildung zeigt eine Beveridge-Kurve mit drei Punkten A, B und C. In welchem Punkt befindet sich die Wirtschaft in einer Rezession?",
  img:{src:"img/vwl/arbeitslosigkeit/beveridge_kurve.svg", alt:"Beveridge-Kurve mit drei markierten Konjunkturpunkten"},
  options:[
-   {v:"A", t:"Punkt A (links oben)"},
-   {v:"B", t:"Punkt B (rechts unten)"},
-   {v:"C", t:"Punkt C (auf der Winkelhalbierenden)"},
-   {v:"D", t:"Die Konjunkturlage lässt sich aus der Beveridge-Kurve nicht ablesen"}
+   {v: "A", t:"Punkt C (auf der Winkelhalbierenden)"},
+   {v: "B", t:"Punkt A (links oben)"},
+   {v: "C", t:"Punkt B (rechts unten)"},
+   {v: "D", t:"Die Konjunkturlage lässt sich aus der Beveridge-Kurve nicht ablesen"}
  ],
- correct:"B",
+ correct:"C",
  explain:"In einer Rezession gibt es viele Arbeitslose und wenige offene Stellen → der Punkt liegt rechts unten auf der Beveridge-Kurve (Punkt B). Punkt A (links oben) zeigt eine Hochkonjunktur, Punkt C liegt auf der Winkelhalbierenden (Sockelarbeitslosigkeit)."},
 
 {id:"b09", topic:"beveridge", type:"multi", diff:2, tax:"K2",
@@ -429,10 +429,10 @@ window.QUESTIONS = [
 {id:"k02", topic:"bekaempfung", type:"mc", diff:1, tax:"K1",
  q:"Was ist Kurzarbeit?",
  options:[
-   {v:"A", t:"Eine Verlängerung der Arbeitszeit bei gleicher Bezahlung"},
-   {v:"B", t:"Die vorübergehende Reduzierung oder Einstellung der Arbeit, wobei die ALV den Verdienstausfall teilweise deckt"},
-   {v:"C", t:"Ein dauerhafter Abbau von Arbeitsplätzen"},
-   {v:"D", t:"Eine Form der Selbständigkeit"}
+   {v: "A", t:"Ein dauerhafter Abbau von Arbeitsplätzen"},
+   {v: "B", t:"Die vorübergehende Reduzierung oder Einstellung der Arbeit, wobei die ALV den Verdienstausfall teilweise deckt"},
+   {v: "C", t:"Eine Verlängerung der Arbeitszeit bei gleicher Bezahlung"},
+   {v: "D", t:"Eine Form der Selbständigkeit"}
  ],
  correct:"B",
  explain:"Bei Kurzarbeit wird die Arbeitszeit vorübergehend reduziert oder eingestellt. Die ALV deckt 80% des Verdienstausfalls während max. 12 Monaten. Ziel: Kündigungen vermeiden bei kurzfristigen Arbeitsausfällen."},
@@ -445,12 +445,12 @@ window.QUESTIONS = [
 {id:"k04", topic:"bekaempfung", type:"mc", diff:2, tax:"K2",
  q:"Warum wird «lebenslanges Lernen» als immer wichtiger für die Bekämpfung von Arbeitslosigkeit angesehen?",
  options:[
-   {v:"A", t:"Weil im Zuge der Globalisierung und des technologischen Wandels Arbeitsplätze für Unqualifizierte wegfallen"},
-   {v:"B", t:"Weil es gesetzlich vorgeschrieben ist"},
-   {v:"C", t:"Weil Arbeitnehmer sonst keine Sozialleistungen erhalten"},
-   {v:"D", t:"Weil Arbeitgeber nur noch Akademiker einstellen"}
+   {v: "A", t:"Weil Arbeitgeber nur noch Akademiker einstellen"},
+   {v: "B", t:"Weil im Zuge der Globalisierung und des technologischen Wandels Arbeitsplätze für Unqualifizierte wegfallen"},
+   {v: "C", t:"Weil Arbeitnehmer sonst keine Sozialleistungen erhalten"},
+   {v: "D", t:"Weil es gesetzlich vorgeschrieben ist"}
  ],
- correct:"A",
+ correct:"B",
  explain:"Durch Globalisierung und Digitalisierung fallen Arbeitsplätze für Unqualifizierte kontinuierlich weg. Um den zukünftigen Anforderungen gewachsen zu sein, braucht es permanente Weiterbildung."},
 
 {id:"k05", topic:"bekaempfung", type:"open", diff:3, tax:"K5",
@@ -461,10 +461,10 @@ window.QUESTIONS = [
 {id:"k06", topic:"bekaempfung", type:"mc", diff:2, tax:"K2",
  q:"Welche Kritik wird an staatlichen Beschäftigungsprogrammen (keynesianischer Ansatz) geübt?",
  options:[
-   {v:"A", t:"Sie kosten nichts und sind daher wirkungslos"},
-   {v:"B", t:"Sie können prozyklisch wirken und bestehende Strukturen konservieren statt anpassen"},
-   {v:"C", t:"Sie führen immer zu Vollbeschäftigung"},
-   {v:"D", t:"Sie senken automatisch die Staatsschulden"}
+   {v: "A", t:"Sie kosten nichts und sind daher wirkungslos"},
+   {v: "B", t:"Sie können prozyklisch wirken und bestehende Strukturen konservieren statt anpassen"},
+   {v: "C", t:"Sie senken automatisch die Staatsschulden"},
+   {v: "D", t:"Sie führen immer zu Vollbeschäftigung"}
  ],
  correct:"B",
  explain:"Kritiker bemängeln, dass Beschäftigungsprogramme prozyklisch wirken können (zu spät, zu viel) und Strukturen konservieren statt den nötigen Strukturwandel zu ermöglichen."},
@@ -504,23 +504,23 @@ window.QUESTIONS = [
 {id:"s01", topic:"statistik", type:"mc", diff:1, tax:"K1",
  q:"Was misst die Arbeitslosenquote?",
  options:[
-   {v:"A", t:"Die Arbeitslosen in % der Gesamtbevölkerung"},
-   {v:"B", t:"Die beim Arbeitsamt registrierten Arbeitslosen in % der Erwerbspersonen"},
-   {v:"C", t:"Die Erwerbslosen in % der Erwerbstätigen"},
-   {v:"D", t:"Die Stellensuchenden in % der Bevölkerung"}
+   {v: "A", t:"Die Arbeitslosen in % der Gesamtbevölkerung"},
+   {v: "B", t:"Die Erwerbslosen in % der Erwerbstätigen"},
+   {v: "C", t:"Die beim Arbeitsamt registrierten Arbeitslosen in % der Erwerbspersonen"},
+   {v: "D", t:"Die Stellensuchenden in % der Bevölkerung"}
  ],
- correct:"B",
+ correct:"C",
  explain:"Arbeitslosenquote = Registrierte Arbeitslose in % der Erwerbspersonen. Sie wird vom SECO monatlich anhand der gemeldeten Arbeitslosen erfasst."},
 
 {id:"s02", topic:"statistik", type:"mc", diff:2, tax:"K2",
  q:"Warum ist die Arbeitslosenquote für internationale Vergleiche ungeeignet?",
  options:[
-   {v:"A", t:"Weil sie zu kompliziert zu berechnen ist"},
-   {v:"B", t:"Weil die Kriterien für die Bezugsberechtigung von Arbeitslosengeld in verschiedenen Ländern unterschiedlich sind"},
-   {v:"C", t:"Weil nur die Schweiz eine Arbeitslosenquote berechnet"},
-   {v:"D", t:"Weil sie die Inflation nicht berücksichtigt"}
+   {v: "A", t:"Weil nur die Schweiz eine Arbeitslosenquote berechnet"},
+   {v: "B", t:"Weil sie zu kompliziert zu berechnen ist"},
+   {v: "C", t:"Weil die Kriterien für die Bezugsberechtigung von Arbeitslosengeld in verschiedenen Ländern unterschiedlich sind"},
+   {v: "D", t:"Weil sie die Inflation nicht berücksichtigt"}
  ],
- correct:"B",
+ correct:"C",
  explain:"Die Arbeitslosenquote basiert auf den beim Arbeitsamt registrierten Arbeitslosen. Da die Registrierungskriterien und Bezugsberechtigungen international variieren, ist sie für Vergleiche ungeeignet. Dafür nutzt man die Erwerbslosenquote (ILO-Standard)."},
 
 {id:"s03", topic:"statistik", type:"sort", diff:2, tax:"K2",
@@ -553,12 +553,12 @@ window.QUESTIONS = [
 {id:"s06", topic:"statistik", type:"mc", diff:2, tax:"K2",
  q:"Was ist der Hauptunterschied zwischen der Erwerbstätigenstatistik und der Beschäftigungsstatistik?",
  options:[
-   {v:"A", t:"Die Erwerbstätigenstatistik zählt Personen, die Beschäftigungsstatistik zählt Stellen"},
-   {v:"B", t:"Sie erfassen unterschiedliche Altersgruppen"},
-   {v:"C", t:"Die Beschäftigungsstatistik erfasst nur den Industriesektor"},
-   {v:"D", t:"Es gibt keinen Unterschied"}
+   {v: "A", t:"Die Beschäftigungsstatistik erfasst nur den Industriesektor"},
+   {v: "B", t:"Es gibt keinen Unterschied"},
+   {v: "C", t:"Die Erwerbstätigenstatistik zählt Personen, die Beschäftigungsstatistik zählt Stellen"},
+   {v: "D", t:"Sie erfassen unterschiedliche Altersgruppen"}
  ],
- correct:"A",
+ correct:"C",
  explain:"Die Erwerbstätigenstatistik ist personenorientiert (jede Person wird einmal gezählt). Die Beschäftigungsstatistik ist stellenorientiert (Personen mit mehreren Stellen werden mehrfach gezählt). Der Unterschied liegt in der Mehrfachbeschäftigung."},
 
 {id:"s07", topic:"statistik", type:"open", diff:3, tax:"K4",
@@ -580,10 +580,10 @@ window.QUESTIONS = [
 {id:"s09", topic:"statistik", type:"mc", diff:1, tax:"K1",
  q:"Was sind Erwerbspersonen?",
  options:[
-   {v:"A", t:"Alle Einwohnerinnen und Einwohner eines Landes"},
-   {v:"B", t:"Alle Personen, die entweder erwerbstätig sind oder eine Stelle suchen"},
-   {v:"C", t:"Nur die vollzeitbeschäftigten Personen"},
-   {v:"D", t:"Alle Personen im Rentenalter"}
+   {v: "A", t:"Alle Personen im Rentenalter"},
+   {v: "B", t:"Alle Personen, die entweder erwerbstätig sind oder eine Stelle suchen"},
+   {v: "C", t:"Alle Einwohnerinnen und Einwohner eines Landes"},
+   {v: "D", t:"Nur die vollzeitbeschäftigten Personen"}
  ],
  correct:"B",
  explain:"Erwerbspersonen = Erwerbstätige + Erwerbslose. Es sind alle Personen, die dem Arbeitsmarkt zur Verfügung stehen – egal ob sie gerade arbeiten oder eine Stelle suchen."},
@@ -598,12 +598,12 @@ window.QUESTIONS = [
 {id:"r01", topic:"armut", type:"mc", diff:1, tax:"K1",
  q:"Welches ist der grösste Ausgabenposten des schweizerischen Staates?",
  options:[
-   {v:"A", t:"Verteidigung"},
-   {v:"B", t:"Bildung"},
-   {v:"C", t:"Soziale Wohlfahrt"},
-   {v:"D", t:"Verkehr und Infrastruktur"}
+   {v: "A", t:"Verteidigung"},
+   {v: "B", t:"Bildung"},
+   {v: "C", t:"Verkehr und Infrastruktur"},
+   {v: "D", t:"Soziale Wohlfahrt"}
  ],
- correct:"C",
+ correct:"D",
  explain:"Die soziale Wohlfahrt macht mit ca. einem Drittel der Staatsausgaben den grössten Ausgabenposten des schweizerischen Staates aus."},
 
 {id:"r02", topic:"armut", type:"tf", diff:2, tax:"K2",
@@ -614,12 +614,12 @@ window.QUESTIONS = [
 {id:"r03", topic:"armut", type:"mc", diff:2, tax:"K2",
  q:"Was ist der Unterschied zwischen vertikaler und horizontaler Gerechtigkeit?",
  options:[
-   {v:"A", t:"Vertikale Gerechtigkeit: Umverteilung von Reich zu Arm. Horizontale Gerechtigkeit: Gleiche Behandlung bei gleichen Verhältnissen."},
-   {v:"B", t:"Vertikale Gerechtigkeit betrifft nur Steuern, horizontale nur Sozialversicherungen"},
-   {v:"C", t:"Es gibt keinen inhaltlichen Unterschied"},
-   {v:"D", t:"Vertikale Gerechtigkeit: Gleichbehandlung aller. Horizontale Gerechtigkeit: Umverteilung."}
+   {v: "A", t:"Vertikale Gerechtigkeit betrifft nur Steuern, horizontale nur Sozialversicherungen"},
+   {v: "B", t:"Es gibt keinen inhaltlichen Unterschied"},
+   {v: "C", t:"Vertikale Gerechtigkeit: Umverteilung von Reich zu Arm. Horizontale Gerechtigkeit: Gleiche Behandlung bei gleichen Verhältnissen."},
+   {v: "D", t:"Vertikale Gerechtigkeit: Gleichbehandlung aller. Horizontale Gerechtigkeit: Umverteilung."}
  ],
- correct:"A",
+ correct:"C",
  explain:"Vertikale Gerechtigkeit fordert eine Umverteilung zwischen verschiedenen Einkommensgruppen (von oben nach unten). Horizontale Gerechtigkeit fordert, dass Menschen in gleicher Lage gleich behandelt werden."},
 
 {id:"r04", topic:"armut", type:"open", diff:3, tax:"K5",
@@ -630,12 +630,12 @@ window.QUESTIONS = [
 {id:"r05", topic:"armut", type:"mc", diff:1, tax:"K1",
  q:"Was ist der Unterschied zwischen absoluter und relativer Armut?",
  options:[
-   {v:"A", t:"Absolute Armut: Physisches Existenzminimum nicht gesichert. Relative Armut: Einkommen deutlich unter dem gesellschaftlichen Durchschnitt."},
-   {v:"B", t:"Absolute Armut betrifft nur Entwicklungsländer, relative Armut nur Industrieländer"},
-   {v:"C", t:"Absolute Armut wird in Prozent gemessen, relative Armut in Franken"},
-   {v:"D", t:"Es gibt keinen Unterschied – beide Begriffe meinen dasselbe"}
+   {v: "A", t:"Es gibt keinen Unterschied – beide Begriffe meinen dasselbe"},
+   {v: "B", t:"Absolute Armut: Physisches Existenzminimum nicht gesichert. Relative Armut: Einkommen deutlich unter dem gesellschaftlichen Durchschnitt."},
+   {v: "C", t:"Absolute Armut betrifft nur Entwicklungsländer, relative Armut nur Industrieländer"},
+   {v: "D", t:"Absolute Armut wird in Prozent gemessen, relative Armut in Franken"}
  ],
- correct:"A",
+ correct:"B",
  explain:"Absolute Armut bedeutet, dass das physische Existenzminimum (Nahrung, Kleidung, Obdach) nicht gesichert ist. Relative Armut wird im Verhältnis zum Wohlstand der Gesellschaft gemessen – z.B. weniger als 60% des Medianeinkommens. In der Schweiz ist primär die relative Armut relevant."},
 
 {id:"r06", topic:"armut", type:"tf", diff:1, tax:"K1",
@@ -646,12 +646,12 @@ window.QUESTIONS = [
 {id:"r07", topic:"armut", type:"mc", diff:2, tax:"K2",
  q:"Was versteht man unter «Working Poor»?",
  options:[
-   {v:"A", t:"Personen, die trotz Erwerbstätigkeit unter der Armutsgrenze leben"},
-   {v:"B", t:"Personen, die freiwillig auf einen hohen Lohn verzichten"},
-   {v:"C", t:"Arbeitslose, die einen Zwischenverdienst haben"},
-   {v:"D", t:"Personen, die ausschliesslich Teilzeit arbeiten"}
+   {v: "A", t:"Personen, die ausschliesslich Teilzeit arbeiten"},
+   {v: "B", t:"Arbeitslose, die einen Zwischenverdienst haben"},
+   {v: "C", t:"Personen, die freiwillig auf einen hohen Lohn verzichten"},
+   {v: "D", t:"Personen, die trotz Erwerbstätigkeit unter der Armutsgrenze leben"}
  ],
- correct:"A",
+ correct:"D",
  explain:"Working Poor sind Erwerbstätige, deren Einkommen trotz Arbeit nicht ausreicht, um über der Armutsgrenze zu leben. Besonders betroffen sind Alleinerziehende, Personen ohne Berufsabschluss und Erwerbstätige in Tieflohnbranchen."},
 
 {id:"r08", topic:"armut", type:"fill", diff:2, tax:"K2",
@@ -700,12 +700,12 @@ window.QUESTIONS = [
 {id:"r13", topic:"armut", type:"mc", diff:2, tax:"K2",
  q:"Was versteht man unter dem sozialen Existenzminimum?",
  options:[
-   {v:"A", t:"Das Einkommen, das nötig ist, um gerade nicht zu verhungern"},
-   {v:"B", t:"Das Einkommen, das neben dem physischen Überleben auch die Teilhabe am gesellschaftlichen Leben ermöglicht"},
-   {v:"C", t:"Den durchschnittlichen Lohn in der Schweiz"},
-   {v:"D", t:"Die Mindesthöhe der AHV-Rente"}
+   {v: "A", t:"Die Mindesthöhe der AHV-Rente"},
+   {v: "B", t:"Den durchschnittlichen Lohn in der Schweiz"},
+   {v: "C", t:"Das Einkommen, das neben dem physischen Überleben auch die Teilhabe am gesellschaftlichen Leben ermöglicht"},
+   {v: "D", t:"Das Einkommen, das nötig ist, um gerade nicht zu verhungern"}
  ],
- correct:"B",
+ correct:"C",
  explain:"Das soziale Existenzminimum geht über das physische Überleben hinaus: Es soll eine minimale Teilhabe am gesellschaftlichen Leben ermöglichen (z.B. Mobilität, Kommunikation, Bildung). In der Schweiz wird es von der SKOS (Schweizerische Konferenz für Sozialhilfe) definiert."},
 
 {id:"r14", topic:"armut", type:"multi", diff:3, tax:"K4",

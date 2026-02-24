@@ -39,10 +39,10 @@ window.QUESTIONS = [
     id: "g01", topic: "grundlagen", type: "mc", diff: 1, tax: "K1",
     q: "In welchen Artikeln des Obligationenrechts ist das Mietrecht geregelt?",
     options: [
-      {v: "A", t: "OR 1–10"},
+      {v: "A", t: "OR 184–215"},
       {v: "B", t: "OR 253–274"},
-      {v: "C", t: "OR 319–362"},
-      {v: "D", t: "OR 184–215"}
+      {v: "C", t: "OR 1–10"},
+      {v: "D", t: "OR 319–362"}
     ],
     correct: "B",
     explain: "Das Mietrecht ist in den Art. 253–274 OR geregelt. Art. 319–362 OR betreffen den Arbeitsvertrag, Art. 184–215 OR den Kaufvertrag."
@@ -65,9 +65,9 @@ window.QUESTIONS = [
     id: "g04", topic: "grundlagen", type: "mc", diff: 1, tax: "K2",
     q: "Was unterscheidet die Miete von der Pacht?",
     options: [
-      {v: "A", t: "Bei der Pacht wird die Sache zum Eigentum übertragen."},
+      {v: "A", t: "Die Pacht ist immer befristet, die Miete immer unbefristet."},
       {v: "B", t: "Bei der Pacht darf der Pächter die Sache nutzen und die Erträge daraus ziehen (z.B. Früchte eines Ackers)."},
-      {v: "C", t: "Die Pacht ist immer befristet, die Miete immer unbefristet."},
+      {v: "C", t: "Bei der Pacht wird die Sache zum Eigentum übertragen."},
       {v: "D", t: "Es gibt keinen Unterschied; die Begriffe sind austauschbar."}
     ],
     correct: "B",
@@ -91,12 +91,12 @@ window.QUESTIONS = [
     id: "g06", topic: "grundlagen", type: "mc", diff: 2, tax: "K2",
     q: "Was ist die Hauptpflicht des Vermieters gemäss OR 253?",
     options: [
-      {v: "A", t: "Die Mietsache dem Mieter zum Gebrauch überlassen und in einem tauglichen Zustand erhalten."},
+      {v: "A", t: "Die Nebenkosten für den Mieter bezahlen."},
       {v: "B", t: "Dem Mieter das Eigentum an der Mietsache übertragen."},
-      {v: "C", t: "Die Nebenkosten für den Mieter bezahlen."},
+      {v: "C", t: "Die Mietsache dem Mieter zum Gebrauch überlassen und in einem tauglichen Zustand erhalten."},
       {v: "D", t: "Die Wohnung jährlich renovieren."}
     ],
-    correct: "A",
+    correct: "C",
     explain: "Nach Art. 253 und Art. 256 OR ist der Vermieter verpflichtet, die Mietsache dem Mieter in einem zum vorausgesetzten Gebrauch tauglichen Zustand zu übergeben und in diesem Zustand zu erhalten."
   },
   {
@@ -118,10 +118,10 @@ window.QUESTIONS = [
     context: "Lisa unterschreibt einen Mietvertrag für eine 3-Zimmer-Wohnung. Der Vertrag enthält eine Klausel, die besagt: «Der Mieter verzichtet auf das Recht, bei der Schlichtungsbehörde eine Mietzinssenkung zu beantragen.»",
     q: "Ist diese Vertragsklausel gültig?",
     options: [
-      {v: "A", t: "Ja, Vertragsfreiheit erlaubt solche Klauseln."},
+      {v: "A", t: "Nein, weil Mietverträge generell keine Zusatzklauseln enthalten dürfen."},
       {v: "B", t: "Nein, da das Recht auf Mietzinssenkung eine zwingende Bestimmung ist und nicht zum Nachteil des Mieters wegbedungen werden kann."},
       {v: "C", t: "Ja, aber nur wenn Lisa die Klausel eigenhändig unterschrieben hat."},
-      {v: "D", t: "Nein, weil Mietverträge generell keine Zusatzklauseln enthalten dürfen."}
+      {v: "D", t: "Ja, Vertragsfreiheit erlaubt solche Klauseln."}
     ],
     correct: "B",
     explain: "Obersatz: Es ist zu prüfen, ob die Vertragsklausel gültig ist. Voraussetzungen: Das Mietrecht enthält zahlreiche zwingende Vorschriften zum Schutz des Mieters. Art. 270a OR (Mietzinsherabsetzung) ist eine solche zwingende Bestimmung. Subsumtion: Von zwingenden Bestimmungen darf nur zu Gunsten der schwächeren Partei (Mieter) abgewichen werden, nicht zu ihren Ungunsten. Ein Verzicht auf das Recht zur Mietzinssenkung benachteiligt den Mieter. Schlussfolgerung: Die Klausel ist nichtig."
@@ -155,12 +155,12 @@ window.QUESTIONS = [
     id: "m01", topic: "mietzins", type: "mc", diff: 1, tax: "K1",
     q: "Wie hoch darf das Mietzinsdepot (Kaution) maximal sein?",
     options: [
-      {v: "A", t: "1 Monatsmiete"},
-      {v: "B", t: "2 Monatsmieten"},
-      {v: "C", t: "3 Monatsmieten"},
+      {v: "A", t: "3 Monatsmieten"},
+      {v: "B", t: "1 Monatsmiete"},
+      {v: "C", t: "2 Monatsmieten"},
       {v: "D", t: "6 Monatsmieten"}
     ],
-    correct: "C",
+    correct: "A",
     explain: "Gemäss Art. 257e OR darf der Vermieter ein Depot von maximal drei Bruttomieten verlangen. Das Depot wird auf einem Sperrkonto im Namen des Mieters hinterlegt und muss spätestens ein Jahr nach dem Auszug zurückerstattet werden."
   },
   {
@@ -184,11 +184,11 @@ window.QUESTIONS = [
     q: "Welcher Gesetzesartikel regelt das Herabsetzungsbegehren des Mieters bei gesunkenem Referenzzinssatz?",
     options: [
       {v: "A", t: "Art. 253 OR"},
-      {v: "B", t: "Art. 270a OR"},
-      {v: "C", t: "Art. 266c OR"},
-      {v: "D", t: "Art. 259 OR"}
+      {v: "B", t: "Art. 266c OR"},
+      {v: "C", t: "Art. 259 OR"},
+      {v: "D", t: "Art. 270a OR"}
     ],
-    correct: "B",
+    correct: "D",
     explain: "Art. 270a OR regelt das Recht des Mieters, eine Herabsetzung des Mietzinses zu verlangen, wenn sich die Berechnungsgrundlage wesentlich verändert hat (z.B. Senkung des Referenzzinssatzes)."
   },
   {
@@ -198,8 +198,8 @@ window.QUESTIONS = [
     options: [
       {v: "A", t: "Sofort die Schlichtungsbehörde einschalten."},
       {v: "B", t: "Dem Vermieter ein schriftliches Herabsetzungsbegehren zusenden."},
-      {v: "C", t: "Den Mietzins eigenmächtig kürzen."},
-      {v: "D", t: "Die Wohnung kündigen."}
+      {v: "C", t: "Die Wohnung kündigen."},
+      {v: "D", t: "Den Mietzins eigenmächtig kürzen."}
     ],
     correct: "B",
     explain: "Der erste Schritt ist ein schriftliches Herabsetzungsbegehren an den Vermieter. Dann muss man 30 Tage auf seine Stellungnahme warten. Reagiert der Vermieter nicht oder lehnt ab, kann der Mieter innert 30 Tagen die Schlichtungsbehörde anrufen (Art. 270a OR). Eine eigenmächtige Mietzinskürzung ist nicht zulässig."
@@ -223,12 +223,12 @@ window.QUESTIONS = [
     context: "Der Vermieter schreibt seiner Mieterin per normalem Brief: «Wir teilen Ihnen mit, dass wir den Mietzins auf Anfang April um CHF 100 auf CHF 2'500 anheben müssen.»",
     q: "Ist diese Mietzinserhöhung rechtsgültig?",
     options: [
-      {v: "A", t: "Ja, ein Brief reicht als Mitteilung aus."},
-      {v: "B", t: "Nein, eine Mietzinserhöhung muss auf dem offiziellen kantonalen Formular mitgeteilt und begründet werden."},
-      {v: "C", t: "Ja, aber nur wenn die Mieterin nicht widerspricht."},
-      {v: "D", t: "Nein, Mietzinserhöhungen sind generell verboten."}
+      {v: "A", t: "Ja, aber nur wenn die Mieterin nicht widerspricht."},
+      {v: "B", t: "Nein, Mietzinserhöhungen sind generell verboten."},
+      {v: "C", t: "Nein, eine Mietzinserhöhung muss auf dem offiziellen kantonalen Formular mitgeteilt und begründet werden."},
+      {v: "D", t: "Ja, ein Brief reicht als Mitteilung aus."}
     ],
-    correct: "B",
+    correct: "C",
     explain: "Obersatz: Es ist zu prüfen, ob die Mietzinserhöhung formgültig ist. Voraussetzungen: Gemäss Art. 269d OR muss eine Mietzinserhöhung auf dem vom Kanton genehmigten Formular mitgeteilt und begründet werden. Subsumtion: Der Vermieter hat lediglich einen normalen Brief geschickt, nicht das offizielle Formular verwendet. Schlussfolgerung: Die Mietzinserhöhung ist formungültig und damit nichtig."
   },
   {
@@ -236,10 +236,10 @@ window.QUESTIONS = [
     context: "Die Familie Lachmann hat erfolgreich beim Vermieter ein Herabsetzungsbegehren eingereicht, doch der Vermieter lehnt ab. Die 30-tägige Frist läuft.",
     q: "Wie lautet die korrekte Reihenfolge der weiteren Schritte?",
     options: [
-      {v: "A", t: "Regionalgericht → Schlichtungsbehörde → Bundesgericht"},
+      {v: "A", t: "Anwalt beauftragen → Polizei einschalten"},
       {v: "B", t: "Schlichtungsbehörde → falls keine Einigung: Regionalgericht"},
-      {v: "C", t: "Mietzins eigenständig kürzen → Schlichtungsbehörde"},
-      {v: "D", t: "Anwalt beauftragen → Polizei einschalten"}
+      {v: "C", t: "Regionalgericht → Schlichtungsbehörde → Bundesgericht"},
+      {v: "D", t: "Mietzins eigenständig kürzen → Schlichtungsbehörde"}
     ],
     correct: "B",
     explain: "Nach der Ablehnung des Herabsetzungsbegehrens kann der Mieter innert 30 Tagen die Schlichtungsbehörde anrufen. Wird dort keine Einigung erzielt, kann er innert 30 Tagen sein Begehren dem Regionalgericht vorbringen. Eine eigenmächtige Mietzinskürzung ist nicht zulässig."
@@ -268,12 +268,12 @@ window.QUESTIONS = [
     id: "k02", topic: "kuendigung", type: "mc", diff: 1, tax: "K1",
     q: "In welcher Form muss eine Kündigung des Mietverhältnisses erfolgen?",
     options: [
-      {v: "A", t: "Mündlich genügt."},
-      {v: "B", t: "Schriftlich (Art. 266l OR)."},
-      {v: "C", t: "Per E-Mail."},
-      {v: "D", t: "Öffentlich beurkundet."}
+      {v: "A", t: "Per E-Mail."},
+      {v: "B", t: "Mündlich genügt."},
+      {v: "C", t: "Öffentlich beurkundet."},
+      {v: "D", t: "Schriftlich (Art. 266l OR)."}
     ],
-    correct: "B",
+    correct: "D",
     explain: "Gemäss Art. 266l Abs. 1 OR muss die Kündigung schriftlich erfolgen. Bei Wohnungen muss der Vermieter zudem das offizielle Formular verwenden (Art. 266l Abs. 2 OR). Die Kündigung ist eine empfangsbedürftige Willenserklärung."
   },
   {
@@ -281,11 +281,11 @@ window.QUESTIONS = [
     q: "Wie lange beträgt die gesetzliche Kündigungsfrist für Geschäftsräume (Art. 266d OR)?",
     options: [
       {v: "A", t: "1 Monat"},
-      {v: "B", t: "3 Monate"},
-      {v: "C", t: "6 Monate"},
+      {v: "B", t: "6 Monate"},
+      {v: "C", t: "3 Monate"},
       {v: "D", t: "12 Monate"}
     ],
-    correct: "C",
+    correct: "B",
     explain: "Gemäss Art. 266d OR beträgt die Kündigungsfrist für Geschäftsräume sechs Monate. Für Wohnungen sind es drei Monate (Art. 266c OR), für möblierte Zimmer und Parkplätze zwei Wochen (Art. 266e OR)."
   },
 
@@ -295,12 +295,12 @@ window.QUESTIONS = [
     context: "Gabriel wohnt in Höfen bei Thun. Heute, am 15. Februar, beschliesst er, seine Wohnung zu kündigen. Es sind keine besonderen Termine oder Fristen vereinbart. Die Kündigungstermine gemäss Ortsgebrauch (Region Bern-Thun) sind der 30. April und der 31. Oktober.",
     q: "Auf welchen Termin kann Gabriel frühestens kündigen?",
     options: [
-      {v: "A", t: "30. April (Kündigung bis Ende Januar nötig — Termin bereits verpasst). Nächstmöglich: 31. Oktober."},
-      {v: "B", t: "31. Mai"},
-      {v: "C", t: "30. April"},
-      {v: "D", t: "28. Februar"}
+      {v: "A", t: "31. Mai"},
+      {v: "B", t: "30. April (Kündigung bis Ende Januar nötig — Termin bereits verpasst). Nächstmöglich: 31. Oktober."},
+      {v: "C", t: "28. Februar"},
+      {v: "D", t: "30. April"}
     ],
-    correct: "A",
+    correct: "B",
     explain: "In der Region Bern-Thun gelten die Kündigungstermine 30. April und 31. Oktober (Ortsgebrauch). Die Kündigungsfrist beträgt 3 Monate. Für den 30. April hätte die Kündigung bis spätestens 31. Januar beim Vermieter eingehen müssen. Da Gabriel erst am 15. Februar kündigt, ist dieser Termin verpasst. Der nächste Termin ist der 31. Oktober (Kündigung muss bis 31. Juli eingehen)."
   },
   {
@@ -340,12 +340,12 @@ window.QUESTIONS = [
     context: "Sandra unterzeichnet am 15. Oktober einen Mietvertrag für eine 2-Zimmer-Wohnung in Bern. Der Vertrag beginnt am 1. November und ist kündbar mit einer Frist von 3 Monaten, jeweils auf Ende eines Monats. Wenige Tage nach Vertragsunterzeichnung erhält sie ein Jobangebot in Zürich und will den Vertrag sofort wieder kündigen.",
     q: "Bis wann muss Sandra mindestens die Miete bezahlen?",
     options: [
-      {v: "A", t: "Bis Ende November (1 Monat)"},
-      {v: "B", t: "Bis Ende Januar (3 volle Monate ab Mietbeginn)"},
+      {v: "A", t: "Sie kann den Vertrag vor Mietbeginn kostenfrei stornieren."},
+      {v: "B", t: "Bis Ende November (1 Monat)"},
       {v: "C", t: "Bis Ende Februar"},
-      {v: "D", t: "Sie kann den Vertrag vor Mietbeginn kostenfrei stornieren."}
+      {v: "D", t: "Bis Ende Januar (3 volle Monate ab Mietbeginn)"}
     ],
-    correct: "B",
+    correct: "D",
     explain: "Obersatz: Es ist zu prüfen, ab wann Sandra den Vertrag beenden kann. Voraussetzungen: Der Vertrag ist gültig abgeschlossen. Die Kündigungsfrist beträgt 3 Monate auf Ende eines Monats. Subsumtion: Selbst wenn Sandra sofort kündigt, läuft die 3-monatige Frist ab November. Die Kündigung wirkt frühestens auf Ende Januar. Schlussfolgerung: Sandra muss die Miete bis Ende Januar bezahlen. Alternativ könnte sie einen zumutbaren Nachmieter stellen (Art. 264 OR)."
   },
   {
@@ -353,24 +353,24 @@ window.QUESTIONS = [
     context: "Ein Mieter stirbt unerwartet. Seine Erben sind unsicher, was mit dem Mietvertrag geschieht.",
     q: "Was gilt gemäss Art. 266i OR beim Tod des Mieters?",
     options: [
-      {v: "A", t: "Der Mietvertrag endet automatisch mit dem Tod."},
-      {v: "B", t: "Die Erben treten in das Mietverhältnis ein und können mit der gesetzlichen Frist kündigen, auch wenn vertraglich eine längere Frist gilt."},
-      {v: "C", t: "Der Vermieter muss den Vertrag sofort auflösen."},
-      {v: "D", t: "Der Vertrag wird für ein Jahr eingefroren."}
+      {v: "A", t: "Der Vertrag wird für ein Jahr eingefroren."},
+      {v: "B", t: "Der Vermieter muss den Vertrag sofort auflösen."},
+      {v: "C", t: "Die Erben treten in das Mietverhältnis ein und können mit der gesetzlichen Frist kündigen, auch wenn vertraglich eine längere Frist gilt."},
+      {v: "D", t: "Der Mietvertrag endet automatisch mit dem Tod."}
     ],
-    correct: "B",
+    correct: "C",
     explain: "Gemäss Art. 266i OR geht das Mietverhältnis auf die Erben über. Die Erben können den Vertrag mit der gesetzlichen Kündigungsfrist (3 Monate bei Wohnungen) auf den nächsten gesetzlichen Termin kündigen — auch wenn vertraglich eine längere Frist vereinbart wurde. Tun die Erben nichts, läuft der Vertrag weiter und sie müssen die Miete bezahlen."
   },
   {
     id: "k10", topic: "kuendigung", type: "mc", diff: 2, tax: "K2",
     q: "Bei welchem Mietobjekt beträgt die Kündigungsfrist nur zwei Wochen (Art. 266e OR)?",
     options: [
-      {v: "A", t: "Wohnungen"},
-      {v: "B", t: "Geschäftsräume"},
-      {v: "C", t: "Möblierte Zimmer und Parkplätze"},
-      {v: "D", t: "Einfamilienhäuser"}
+      {v: "A", t: "Geschäftsräume"},
+      {v: "B", t: "Wohnungen"},
+      {v: "C", t: "Einfamilienhäuser"},
+      {v: "D", t: "Möblierte Zimmer und Parkplätze"}
     ],
-    correct: "C",
+    correct: "D",
     explain: "Gemäss Art. 266e OR beträgt die Kündigungsfrist für möblierte Zimmer und gesondert vermietete Einstellplätze oder ähnliches zwei Wochen auf Ende eines Monats nach Beginn der Miete."
   },
   {
@@ -389,12 +389,12 @@ window.QUESTIONS = [
     id: "r01", topic: "maengel", type: "mc", diff: 1, tax: "K1",
     q: "In welchen Artikeln des OR ist das Vorgehen bei Mängeln an der Mietsache geregelt?",
     options: [
-      {v: "A", t: "Art. 253–255 OR"},
-      {v: "B", t: "Art. 259–259i OR"},
-      {v: "C", t: "Art. 266–266o OR"},
+      {v: "A", t: "Art. 266–266o OR"},
+      {v: "B", t: "Art. 253–255 OR"},
+      {v: "C", t: "Art. 259–259i OR"},
       {v: "D", t: "Art. 270–270e OR"}
     ],
-    correct: "B",
+    correct: "C",
     explain: "Die Art. 259 bis 259i OR regeln die Mängelrechte des Mieters: vom kleinen Unterhalt (Art. 259 OR) über die Pflichten bei grösseren Mängeln (Art. 259a ff. OR) bis zur Hinterlegung des Mietzinses (Art. 259g–h OR)."
   },
   {
@@ -430,9 +430,9 @@ window.QUESTIONS = [
     context: "In der Wohnung der Familie Kunz tropft seit Tagen Wasser von der Decke. Die Verwaltung reagiert nicht auf Meldungen. Die Familie hat den Schaden gemeldet und eine Frist zur Behebung gesetzt, aber es passiert nichts.",
     q: "Welche letzte Druckmöglichkeit hat Frau Kunz nach Art. 259g und 259h OR?",
     options: [
-      {v: "A", t: "Die Miete eigenmächtig kürzen"},
+      {v: "A", t: "Die Wohnung auf eigene Kosten renovieren"},
       {v: "B", t: "Den Mietzins bei einer von der Schlichtungsbehörde bezeichneten Stelle hinterlegen"},
-      {v: "C", t: "Die Wohnung auf eigene Kosten renovieren"},
+      {v: "C", t: "Die Miete eigenmächtig kürzen"},
       {v: "D", t: "Den Mietvertrag mündlich kündigen"}
     ],
     correct: "B",
@@ -446,11 +446,11 @@ window.QUESTIONS = [
     q: "Prüfen Sie die Tatbestandsmerkmale: Handelt es sich um einen Mangel nach Art. 259 OR (gewöhnlicher Unterhalt) oder nach Art. 259a OR (Mängelbeseitigung durch Vermieter)?",
     options: [
       {v: "A", t: "Art. 259 OR: Es handelt sich um gewöhnlichen Unterhalt, den der Mieter selbst beheben muss."},
-      {v: "B", t: "Art. 259a OR: Der Mangel ist nicht vom Mieter verschuldet, kann nicht durch gewöhnlichen Unterhalt behoben werden, und stört den Gebrauch der Wohnung."},
-      {v: "C", t: "Weder noch: Wasserschäden sind nicht durch das Mietrecht geregelt."},
-      {v: "D", t: "Art. 259 OR und 259a OR gleichzeitig."}
+      {v: "B", t: "Weder noch: Wasserschäden sind nicht durch das Mietrecht geregelt."},
+      {v: "C", t: "Art. 259 OR und 259a OR gleichzeitig."},
+      {v: "D", t: "Art. 259a OR: Der Mangel ist nicht vom Mieter verschuldet, kann nicht durch gewöhnlichen Unterhalt behoben werden, und stört den Gebrauch der Wohnung."}
     ],
-    correct: "B",
+    correct: "D",
     explain: "Obersatz: Es ist zu prüfen, ob Art. 259 oder Art. 259a OR anwendbar ist. Voraussetzungen Art. 259: Gewöhnlicher Unterhalt = einfache Arbeiten, die jeder selbst erledigen kann. Voraussetzungen Art. 259a: (1) Mangel nicht vom Mieter verschuldet, (2) nicht durch gewöhnlichen Unterhalt behebbar, (3) Mieter wird im Gebrauch gestört. Subsumtion: Ein tropfendes Dach oder eine defekte Wasserleitung erfordert einen Fachmann und ist kein gewöhnlicher Unterhalt. Die Familie hat den Schaden nicht verursacht und wird im Gebrauch der Wohnung erheblich gestört. Schlussfolgerung: Art. 259a OR ist anwendbar. Die Familie kann die Mängelbeseitigung, Mietzinsreduktion und Schadenersatz verlangen."
   },
   {
@@ -464,12 +464,12 @@ window.QUESTIONS = [
     context: "In Linas Mietwohnung fällt die Heizung im Januar aus. Sie meldet dies sofort dem Vermieter und setzt eine Frist von einer Woche. Der Vermieter reagiert nicht.",
     q: "Welche der folgenden Vorgehensweisen wäre für Lina am sinnvollsten?",
     options: [
-      {v: "A", t: "Abwarten und hoffen, dass der Vermieter von selbst handelt."},
-      {v: "B", t: "Die Heizung selbst reparieren lassen (Ersatzvornahme nach Art. 259b OR), Mietzinsreduktion verlangen (Art. 259d OR) und Schadenersatz geltend machen (Art. 259e OR)."},
-      {v: "C", t: "Sofort ausziehen, ohne den Mietvertrag zu kündigen."},
+      {v: "A", t: "Sofort ausziehen, ohne den Mietvertrag zu kündigen."},
+      {v: "B", t: "Abwarten und hoffen, dass der Vermieter von selbst handelt."},
+      {v: "C", t: "Die Heizung selbst reparieren lassen (Ersatzvornahme nach Art. 259b OR), Mietzinsreduktion verlangen (Art. 259d OR) und Schadenersatz geltend machen (Art. 259e OR)."},
       {v: "D", t: "Den Mietzins ohne Ankündigung auf ein Privatkonto einzahlen."}
     ],
-    correct: "B",
+    correct: "C",
     explain: "Bei einem schwerwiegenden Mangel wie einem Heizungsausfall im Winter kann Lina: (1) den Mangel nach Fristablauf selbst beheben lassen und die Kosten dem Vermieter in Rechnung stellen (Art. 259b OR), (2) eine Mietzinsreduktion für die Zeit der Beeinträchtigung verlangen (Art. 259d OR), und (3) Schadenersatz fordern, z.B. für ein Heizgerät (Art. 259e OR). Eine Hinterlegung wäre auf ein amtliches Konto nötig, nicht auf ein Privatkonto."
   },
 
@@ -483,9 +483,9 @@ window.QUESTIONS = [
     q: "In welchem Artikel des OR ist die Untermiete geregelt?",
     options: [
       {v: "A", t: "Art. 254 OR"},
-      {v: "B", t: "Art. 259 OR"},
+      {v: "B", t: "Art. 272 OR"},
       {v: "C", t: "Art. 262 OR"},
-      {v: "D", t: "Art. 272 OR"}
+      {v: "D", t: "Art. 259 OR"}
     ],
     correct: "C",
     explain: "Die Untermiete ist in Art. 262 OR geregelt. Der Mieter darf die Mietsache mit Zustimmung des Vermieters ganz oder teilweise untervermieten."
@@ -521,24 +521,24 @@ window.QUESTIONS = [
     context: "Linus hat eine Wohnung für CHF 1'350 pro Monat gemietet. Er vermietet zwei Zimmer an seine Studienkollegen für je CHF 700 — also insgesamt CHF 1'400.",
     q: "Darf der Vermieter diese Untermiete verbieten?",
     options: [
-      {v: "A", t: "Nein, Untermiete ist immer erlaubt."},
-      {v: "B", t: "Ja, weil die Bedingungen missbräuchlich sind: Linus verdient an der Untermiete, da der Gesamtbetrag der Untermieten den Hauptmietzins übersteigt."},
-      {v: "C", t: "Nein, die Untermietpreise sind Sache des Hauptmieters."},
-      {v: "D", t: "Ja, weil Studierende keine zuverlässigen Mieter sind."}
+      {v: "A", t: "Ja, weil Studierende keine zuverlässigen Mieter sind."},
+      {v: "B", t: "Nein, die Untermietpreise sind Sache des Hauptmieters."},
+      {v: "C", t: "Nein, Untermiete ist immer erlaubt."},
+      {v: "D", t: "Ja, weil die Bedingungen missbräuchlich sind: Linus verdient an der Untermiete, da der Gesamtbetrag der Untermieten den Hauptmietzins übersteigt."}
     ],
-    correct: "B",
+    correct: "D",
     explain: "Gemäss Art. 262 Abs. 2 lit. b OR kann der Vermieter die Zustimmung verweigern, wenn die Bedingungen der Untermiete missbräuchlich sind. Hier verlangen die Untermieter zusammen CHF 1'400, während Linus nur CHF 1'350 Hauptmiete zahlt. Linus verdient somit an der Untermiete, was als missbräuchlich gilt."
   },
   {
     id: "u06", topic: "untermiete", type: "mc", diff: 2, tax: "K1",
     q: "Wie lange kann eine Erstreckung des Mietverhältnisses bei Wohnungen maximal dauern (Art. 272b OR)?",
     options: [
-      {v: "A", t: "Maximal 1 Jahr"},
-      {v: "B", t: "Maximal 2 Jahre"},
-      {v: "C", t: "Maximal 4 Jahre"},
-      {v: "D", t: "Unbeschränkt"}
+      {v: "A", t: "Unbeschränkt"},
+      {v: "B", t: "Maximal 1 Jahr"},
+      {v: "C", t: "Maximal 2 Jahre"},
+      {v: "D", t: "Maximal 4 Jahre"}
     ],
-    correct: "C",
+    correct: "D",
     explain: "Gemäss Art. 272b Abs. 1 OR kann eine Wohnungsmiete um höchstens vier Jahre erstreckt werden, eine Geschäftsmiete um höchstens sechs Jahre. Die Erstreckung muss bei der Schlichtungsbehörde beantragt werden und setzt einen Härtefall voraus (Art. 272 OR)."
   },
 
@@ -549,11 +549,11 @@ window.QUESTIONS = [
     q: "Ist die Angst von Lukas und Simon berechtigt?",
     options: [
       {v: "A", t: "Ja, der Vermieter kann sich direkt an die Untermieter wenden."},
-      {v: "B", t: "Nein, die Untermieter stehen in keiner Rechtsbeziehung zum Vermieter. Nur Linus schuldet dem Vermieter den Mietzins."},
-      {v: "C", t: "Ja, aber nur wenn Linus pleitegeht."},
-      {v: "D", t: "Nein, weil Untermieter generell keine Miete zahlen müssen."}
+      {v: "B", t: "Nein, weil Untermieter generell keine Miete zahlen müssen."},
+      {v: "C", t: "Nein, die Untermieter stehen in keiner Rechtsbeziehung zum Vermieter. Nur Linus schuldet dem Vermieter den Mietzins."},
+      {v: "D", t: "Ja, aber nur wenn Linus pleitegeht."}
     ],
-    correct: "B",
+    correct: "C",
     explain: "Obersatz: Es ist zu prüfen, ob der Vermieter die Mietzinse von den Untermietern verlangen kann. Voraussetzungen: Zwischen dem Vermieter und dem Untermieter besteht keine direkte Rechtsbeziehung (Art. 262 OR). Der Mietvertrag besteht nur zwischen Vermieter und Hauptmieter. Subsumtion: Lukas und Simon haben ihren Untermietvertrag mit Linus abgeschlossen, nicht mit dem Vermieter. Der Vermieter kann nur von Linus den Mietzins verlangen. Schlussfolgerung: Die Angst ist unberechtigt — allerdings riskieren die Untermieter bei einer Kündigung des Hauptmietvertrags den Verlust ihrer Wohnung."
   },
   {
@@ -592,12 +592,12 @@ window.QUESTIONS = [
     id: "a03", topic: "uebergabe", type: "mc", diff: 1, tax: "K1",
     q: "Was ist eine paritätische Lebensdauertabelle?",
     options: [
-      {v: "A", t: "Eine Tabelle, die festlegt, nach wie vielen Jahren sich Einrichtungsgegenstände in einer Mietwohnung abnutzen."},
-      {v: "B", t: "Eine Tabelle über die Lebenserwartung der Schweizer Bevölkerung."},
+      {v: "A", t: "Eine Tabelle über die Lebenserwartung der Schweizer Bevölkerung."},
+      {v: "B", t: "Eine Liste der Pflichten des Vermieters."},
       {v: "C", t: "Eine Übersicht über die durchschnittlichen Mietpreise in der Schweiz."},
-      {v: "D", t: "Eine Liste der Pflichten des Vermieters."}
+      {v: "D", t: "Eine Tabelle, die festlegt, nach wie vielen Jahren sich Einrichtungsgegenstände in einer Mietwohnung abnutzen."}
     ],
-    correct: "A",
+    correct: "D",
     explain: "Die paritätische Lebensdauertabelle wird vom Hauseigentümerverband (HEV) und dem Schweizerischen Mieterinnen- und Mieterverband (SMV) gemeinsam herausgegeben. Sie legt fest, wie lange verschiedene Einrichtungsgegenstände (z.B. Wandanstrich, Parkettboden, Kühlschrank) üblicherweise halten. Sie dient der Berechnung des Zeitwerts bei Schadenersatzforderungen."
   },
 
@@ -628,12 +628,12 @@ window.QUESTIONS = [
     id: "a06", topic: "uebergabe", type: "mc", diff: 2, tax: "K2",
     q: "Was bedeutet der «Zeitwert» im Zusammenhang mit der Wohnungsabgabe?",
     options: [
-      {v: "A", t: "Der aktuelle Marktwert der Mietsache."},
-      {v: "B", t: "Der Wert eines Einrichtungsgegenstands unter Berücksichtigung seines Alters und der normalen Abnutzung."},
+      {v: "A", t: "Der Wert eines Einrichtungsgegenstands unter Berücksichtigung seines Alters und der normalen Abnutzung."},
+      {v: "B", t: "Der aktuelle Marktwert der Mietsache."},
       {v: "C", t: "Der Neuwert eines Gegenstands zum Zeitpunkt des Kaufs."},
       {v: "D", t: "Der Versicherungswert der Wohnung."}
     ],
-    correct: "B",
+    correct: "A",
     explain: "Der Zeitwert berücksichtigt das Alter und die normale Abnutzung eines Gegenstands. Bei einem Schaden muss der Mieter nur den Zeitwert ersetzen — nicht den Neuwert. Die paritätische Lebensdauertabelle dient zur Berechnung: Hat z.B. ein Wandanstrich eine Lebensdauer von 8 Jahren und ist bereits 5 Jahre alt, muss der Mieter nur noch 3/8 der Neustreichkosten übernehmen."
   },
 
@@ -664,12 +664,12 @@ window.QUESTIONS = [
     id: "z01", topic: "zusammenleben", type: "mc", diff: 1, tax: "K1",
     q: "Welcher Gesetzesartikel regelt das Verhalten des Mieters und die Rücksichtnahme auf Hausbewohner und Nachbarn?",
     options: [
-      {v: "A", t: "Art. 253 OR"},
-      {v: "B", t: "Art. 257f OR"},
+      {v: "A", t: "Art. 257f OR"},
+      {v: "B", t: "Art. 253 OR"},
       {v: "C", t: "Art. 262 OR"},
       {v: "D", t: "Art. 270 OR"}
     ],
-    correct: "B",
+    correct: "A",
     explain: "Art. 257f OR regelt die Sorgfaltspflicht des Mieters und die Pflicht zur Rücksichtnahme auf die Hausbewohner und Nachbarn. Bei schwerwiegenden Verstössen kann der Vermieter nach Abmahnung die Kündigung aussprechen."
   },
   {
@@ -694,12 +694,12 @@ window.QUESTIONS = [
     context: "Carla hält seit langem eine Hauskatze in ihrer Mietwohnung. Die Vermieterin Frau Neckermann wusste davon, hat es stillschweigend akzeptiert und streichelt die Katze sogar gelegentlich im Garten. Nun fordert Frau Neckermann plötzlich die Beseitigung aller Tiere.",
     q: "Darf die Vermieterin die Beseitigung der Hauskatze verlangen?",
     options: [
-      {v: "A", t: "Ja, sie ist die Vermieterin und kann jederzeit Tierhaltung verbieten."},
-      {v: "B", t: "Nein, da sie die Katze über längere Zeit stillschweigend geduldet hat, gilt die Einwilligung als stillschweigend erteilt."},
-      {v: "C", t: "Ja, aber nur mit einer Frist von 6 Monaten."},
-      {v: "D", t: "Nein, weil Katzen generell nie verboten werden dürfen."}
+      {v: "A", t: "Ja, aber nur mit einer Frist von 6 Monaten."},
+      {v: "B", t: "Nein, weil Katzen generell nie verboten werden dürfen."},
+      {v: "C", t: "Ja, sie ist die Vermieterin und kann jederzeit Tierhaltung verbieten."},
+      {v: "D", t: "Nein, da sie die Katze über längere Zeit stillschweigend geduldet hat, gilt die Einwilligung als stillschweigend erteilt."}
     ],
-    correct: "B",
+    correct: "D",
     explain: "Eine einmal erteilte Einwilligung zur Tierhaltung — auch eine stillschweigende — darf nicht ohne triftigen Grund widerrufen werden. Da Frau Neckermann die Katze über längere Zeit geduldet und sogar gestreichelt hat, gilt die Einwilligung als stillschweigend erteilt. Sie kann die Beseitigung der Katze daher nicht mehr verlangen."
   },
   {
@@ -718,12 +718,12 @@ window.QUESTIONS = [
     id: "z06", topic: "zusammenleben", type: "mc", diff: 2, tax: "K2",
     q: "Was sollte ein Mieter als Erstes tun, wenn ein Nachbar wiederholt gegen die Ruhezeiten verstösst?",
     options: [
-      {v: "A", t: "Sofort die Polizei rufen."},
-      {v: "B", t: "Das Gespräch mit dem Nachbarn suchen und an die Rücksichtnahme appellieren."},
+      {v: "A", t: "Das Gespräch mit dem Nachbarn suchen und an die Rücksichtnahme appellieren."},
+      {v: "B", t: "Die Wohnung kündigen."},
       {v: "C", t: "Den Vermieter verklagen."},
-      {v: "D", t: "Die Wohnung kündigen."}
+      {v: "D", t: "Sofort die Polizei rufen."}
     ],
-    correct: "B",
+    correct: "A",
     explain: "Der erste Schritt bei Nachbarschaftskonflikten sollte immer das direkte Gespräch sein. Führt dies nicht zum Ziel, kann man die Verwaltung oder den Vermieter informieren, der den störenden Mieter schriftlich abmahnen kann. Als weitere Schritte kommen eine Anzeige bei der Polizei oder eine Zivilklage in Frage."
   },
 
@@ -734,11 +734,11 @@ window.QUESTIONS = [
     q: "Wie ist die Rechtslage bezüglich des Hundes zu beurteilen?",
     options: [
       {v: "A", t: "Der Hund darf bleiben, weil Haustiere generell erlaubt sind."},
-      {v: "B", t: "Die Vermieterin kann die Beseitigung des Hundes verlangen, da er durch das laute Bellen die Nachbarschaft stört. Eine sofortige Kündigung ist jedoch nur nach vorgängiger schriftlicher Mahnung und bei fortgesetzter Störung möglich."},
-      {v: "C", t: "Die Vermieterin kann sofort fristlos kündigen."},
-      {v: "D", t: "Der Hund darf bleiben, solange Carla ihn draussen hält."}
+      {v: "B", t: "Der Hund darf bleiben, solange Carla ihn draussen hält."},
+      {v: "C", t: "Die Vermieterin kann die Beseitigung des Hundes verlangen, da er durch das laute Bellen die Nachbarschaft stört. Eine sofortige Kündigung ist jedoch nur nach vorgängiger schriftlicher Mahnung und bei fortgesetzter Störung möglich."},
+      {v: "D", t: "Die Vermieterin kann sofort fristlos kündigen."}
     ],
-    correct: "B",
+    correct: "C",
     explain: "Obersatz: Es ist zu prüfen, ob die Vermieterin die Beseitigung des Hundes verlangen und fristlos kündigen kann. Voraussetzungen: Hunde benötigen grundsätzlich die Einwilligung des Vermieters. Ein störender Hund, der die Nachbarschaft belästigt, kann ein Grund für eine Beseitigungsforderung sein. Für eine fristlose Kündigung braucht es vorher eine schriftliche Mahnung (Art. 257f Abs. 3 OR). Subsumtion: Konny bellt laut und stört die Nachbarschaft. Die Vermieterin hat keine Einwilligung erteilt. Schlussfolgerung: Die Vermieterin darf die Beseitigung des Hundes verlangen. Eine sofortige Kündigung ist aber erst nach erfolgloser schriftlicher Mahnung und unter Einhaltung einer Frist von 30 Tagen auf Monatsende möglich."
   },
   {
@@ -765,11 +765,11 @@ window.QUESTIONS = [
     q: "Darf Peter Schlagzeug spielen, und was riskiert er?",
     options: [
       {v: "A", t: "Ja, Musizieren ist ein Grundrecht und kann nicht eingeschränkt werden."},
-      {v: "B", t: "Schlagzeug oder laute Blasinstrumente können zu jeder Tageszeit als unzumutbare Störung gelten. Bei wiederholter Störung trotz Abmahnung riskiert Peter die Kündigung."},
-      {v: "C", t: "Nein, Musizieren ist in Mietwohnungen generell verboten."},
+      {v: "B", t: "Nein, Musizieren ist in Mietwohnungen generell verboten."},
+      {v: "C", t: "Schlagzeug oder laute Blasinstrumente können zu jeder Tageszeit als unzumutbare Störung gelten. Bei wiederholter Störung trotz Abmahnung riskiert Peter die Kündigung."},
       {v: "D", t: "Ja, solange er nur während der Nachtruhe spielt."}
     ],
-    correct: "B",
+    correct: "C",
     explain: "Schlagzeug und laute Blasinstrumente gelten gemäss gängigen Polizei- und Gemeindeverordnungen als potenziell störend — unabhängig von der Tageszeit. Das Spielen kann die Sorgfaltspflicht nach Art. 257f OR verletzen. Bei wiederholter Störung kann der Vermieter nach schriftlicher Abmahnung eine Kündigung mit 30-tägiger Frist auf Monatsende aussprechen (Art. 257f Abs. 3 OR)."
   }
 ,
@@ -785,12 +785,12 @@ window.QUESTIONS = [
     context: "Die Vermieterin verweigert seit Wochen die Reparatur einer defekten Heizung in Leonas Wohnung.",
     q: "In welchem der vier Hauptbereiche der Übersicht findest du die relevanten Bestimmungen für Leonas Problem?",
     options: [
-      {v: "A", t: "Vertragsabschluss — es handelt sich um eine Formvorschrift beim Vertragsschluss."},
-      {v: "B", t: "Während der Miete — die Mängelbeseitigung fällt unter die laufenden Pflichten (OR 259 ff.)."},
+      {v: "A", t: "Während der Miete — die Mängelbeseitigung fällt unter die laufenden Pflichten (OR 259 ff.)."},
+      {v: "B", t: "Mieterschutz — es handelt sich um einen missbräuchlichen Mietzins."},
       {v: "C", t: "Kündigung — Leona muss zuerst kündigen, bevor sie handeln kann."},
-      {v: "D", t: "Mieterschutz — es handelt sich um einen missbräuchlichen Mietzins."}
+      {v: "D", t: "Vertragsabschluss — es handelt sich um eine Formvorschrift beim Vertragsschluss."}
     ],
-    correct: "B",
+    correct: "A",
     explain: "Die defekte Heizung ist ein Mangel an der Mietsache. Gemäss der Übersicht fällt die Mängelbeseitigung unter den Bereich 'Während der Miete' (OR 259 ff.). Der Vermieter ist verpflichtet, grössere Mängel zu beheben. Leona muss nicht kündigen, sondern kann die Mängelbeseitigung verlangen, den Mietzins reduzieren oder hinterlegen."
   },
 
@@ -801,12 +801,12 @@ window.QUESTIONS = [
     context: "Betrachte die Zeitleiste auf dem Bild. Matteo möchte sein möbliertes Zimmer in Bern kündigen. Heute ist der 10. Oktober.",
     q: "Bis wann muss Matteo frühestens das Zimmer verlassen, wenn er heute kündigt?",
     options: [
-      {v: "A", t: "24. Oktober (zwei Wochen ab heute)"},
-      {v: "B", t: "31. Oktober (zwei Wochen auf Monatsende)"},
-      {v: "C", t: "31. Januar (drei Monate)"},
-      {v: "D", t: "10. November (ein Monat)"}
+      {v: "A", t: "10. November (ein Monat)"},
+      {v: "B", t: "31. Januar (drei Monate)"},
+      {v: "C", t: "31. Oktober (zwei Wochen auf Monatsende)"},
+      {v: "D", t: "24. Oktober (zwei Wochen ab heute)"}
     ],
-    correct: "B",
+    correct: "C",
     explain: "Für möblierte Zimmer gilt eine Kündigungsfrist von zwei Wochen auf ein Monatsende (Art. 266e OR). Kündigt Matteo am 10. Oktober, endet das Mietverhältnis am 31. Oktober."
   },
   {
@@ -815,12 +815,12 @@ window.QUESTIONS = [
     context: "Ein Geschäftsinhaber in Bern will seinen Laden kündigen. Heute ist der 20. März. Die Kündigungstermine gemäss Ortsgebrauch sind der 30. April und der 31. Oktober.",
     q: "Auf welchen Termin kann der Geschäftsinhaber frühestens kündigen?",
     options: [
-      {v: "A", t: "30. April dieses Jahres — Kündigung muss 6 Monate vorher (bis 31. Okt. des Vorjahres) eingehen, also bereits verpasst."},
-      {v: "B", t: "31. Oktober dieses Jahres — 6 Monate vorher ist der 30. April; da heute erst der 20. März ist, kann die Kündigung rechtzeitig eingereicht werden."},
-      {v: "C", t: "30. April nächstes Jahr — erst dann wäre ein neuer Termin fällig."},
-      {v: "D", t: "20. September — genau 6 Monate ab heute."}
+      {v: "A", t: "31. Oktober dieses Jahres — 6 Monate vorher ist der 30. April; da heute erst der 20. März ist, kann die Kündigung rechtzeitig eingereicht werden."},
+      {v: "B", t: "20. September — genau 6 Monate ab heute."},
+      {v: "C", t: "30. April dieses Jahres — Kündigung muss 6 Monate vorher (bis 31. Okt. des Vorjahres) eingehen, also bereits verpasst."},
+      {v: "D", t: "30. April nächstes Jahr — erst dann wäre ein neuer Termin fällig."}
     ],
-    correct: "B",
+    correct: "A",
     explain: "Obersatz: Es ist zu prüfen, auf welchen Termin frühestens gekündigt werden kann. Voraussetzungen: Geschäftsräume haben eine 6-monatige Kündigungsfrist (Art. 266d OR). Die Kündigung muss spätestens 6 Monate vor dem Kündigungstermin beim Vermieter eingehen. Subsumtion: Für den 30. April müsste die Kündigung bis 31. Oktober des Vorjahres eingegangen sein — verpasst. Für den 31. Oktober: 6 Monate vorher = 30. April. Heute ist der 20. März, also liegt die Kündigung rechtzeitig vor dem 30. April. Schlussfolgerung: Der Geschäftsinhaber kann auf den 31. Oktober kündigen, sofern die Kündigung bis spätestens 30. April beim Vermieter eingeht."
   },
 
@@ -831,12 +831,12 @@ window.QUESTIONS = [
     context: "Der Abfluss in Sarahs Badewanne ist verstopft. Es handelt sich um eine einfache Verstopfung, die mit einem Saugnapf behoben werden kann.",
     q: "Folge dem Flussdiagramm: Welchen Weg durchläuft Sarahs Fall und was ist das Ergebnis?",
     options: [
-      {v: "A", t: "Mangel → Gewöhnlicher Unterhalt? Ja → Sarah muss den Abfluss selbst reparieren (Art. 259 OR)."},
-      {v: "B", t: "Mangel → Vermieter melden → Vermieter behebt → Erledigt."},
-      {v: "C", t: "Mangel → Gewöhnlicher Unterhalt? Nein → Sarah kann sofort den Mietzins hinterlegen."},
+      {v: "A", t: "Mangel → Gewöhnlicher Unterhalt? Nein → Sarah kann sofort den Mietzins hinterlegen."},
+      {v: "B", t: "Mangel → Gewöhnlicher Unterhalt? Ja → Sarah muss den Abfluss selbst reparieren (Art. 259 OR)."},
+      {v: "C", t: "Mangel → Vermieter melden → Vermieter behebt → Erledigt."},
       {v: "D", t: "Mangel → Vermieter melden → Nicht behoben → Fristlose Kündigung."}
     ],
-    correct: "A",
+    correct: "B",
     explain: "Ein verstopfter Abfluss, der mit einem Saugnapf behoben werden kann, ist gewöhnlicher (kleiner) Unterhalt gemäss Art. 259 OR. Im Flussdiagramm folgt man: Mangel entdeckt → Gewöhnlicher Unterhalt? → Ja → Mieter behebt selbst. Erst bei grösseren Mängeln (defekte Heizung, undichtes Dach) muss der Vermieter eingeschaltet werden."
   },
   {
@@ -845,12 +845,12 @@ window.QUESTIONS = [
     context: "In Jonas' Wohnung ist die Geschirrspülmaschine seit zwei Wochen defekt. Er hat den Vermieter schriftlich informiert und eine Frist von 10 Tagen gesetzt. Die Frist ist abgelaufen, der Vermieter hat nicht reagiert.",
     q: "In welcher Phase des Flussdiagramms befindet sich Jonas, und welche Optionen hat er jetzt?",
     options: [
-      {v: "A", t: "Er ist bei 'Vermieter behebt den Mangel? → Nein' und hat nun vier Optionen: Mängelbeseitigung, Mietzinsreduktion, Schadenersatz oder Mietzinshinterlegung."},
-      {v: "B", t: "Er ist noch bei 'Mangel entdeckt' und muss zuerst prüfen, ob es gewöhnlicher Unterhalt ist."},
-      {v: "C", t: "Er muss nochmals eine Frist setzen, bevor er handeln darf."},
-      {v: "D", t: "Er kann nur den Mietzins hinterlegen, alle anderen Optionen sind ausgeschlossen."}
+      {v: "A", t: "Er kann nur den Mietzins hinterlegen, alle anderen Optionen sind ausgeschlossen."},
+      {v: "B", t: "Er muss nochmals eine Frist setzen, bevor er handeln darf."},
+      {v: "C", t: "Er ist noch bei 'Mangel entdeckt' und muss zuerst prüfen, ob es gewöhnlicher Unterhalt ist."},
+      {v: "D", t: "Er ist bei 'Vermieter behebt den Mangel? → Nein' und hat nun vier Optionen: Mängelbeseitigung, Mietzinsreduktion, Schadenersatz oder Mietzinshinterlegung."}
     ],
-    correct: "A",
+    correct: "D",
     explain: "Obersatz: Es ist zu prüfen, welche Rechte Jonas hat. Voraussetzungen: Jonas hat den Mangel gemeldet, eine Frist gesetzt und der Vermieter hat nicht gehandelt. Subsumtion: Eine defekte Geschirrspülmaschine ist kein gewöhnlicher Unterhalt (Fachmann nötig). Jonas hat korrekt gemeldet und eine Frist gesetzt. Da der Vermieter nicht reagiert hat, stehen Jonas alle vier Rechte aus Art. 259a–259i OR zur Verfügung. Schlussfolgerung: Jonas kann die Reparatur selbst veranlassen (Ersatzvornahme), Mietzinsreduktion fordern, Schadenersatz verlangen oder den Mietzins hinterlegen."
   },
 
@@ -872,12 +872,12 @@ window.QUESTIONS = [
     context: "Familie Becker zieht nach 12 Jahren aus ihrer Wohnung aus. Bei der Wohnungsabgabe werden Schäden am Teppichboden und am Kühlschrank festgestellt (jeweils durch unsachgemässen Gebrauch).",
     q: "Für welchen Gegenstand muss Familie Becker gemäss der Lebensdauertabelle noch einen Kostenanteil bezahlen?",
     options: [
-      {v: "A", t: "Nur für den Teppichboden — seine Lebensdauer ist kürzer als die Mietdauer."},
-      {v: "B", t: "Nur für den Kühlschrank — seine Lebensdauer (15 Jahre) ist noch nicht erreicht, der Teppichboden (10 Jahre) ist bereits abgeschrieben."},
-      {v: "C", t: "Für beide Gegenstände, da die Lebensdauer bei beiden noch nicht abgelaufen ist."},
+      {v: "A", t: "Nur für den Kühlschrank — seine Lebensdauer (15 Jahre) ist noch nicht erreicht, der Teppichboden (10 Jahre) ist bereits abgeschrieben."},
+      {v: "B", t: "Für beide Gegenstände, da die Lebensdauer bei beiden noch nicht abgelaufen ist."},
+      {v: "C", t: "Nur für den Teppichboden — seine Lebensdauer ist kürzer als die Mietdauer."},
       {v: "D", t: "Für keinen der Gegenstände — nach 12 Jahren ist alles abgeschrieben."}
     ],
-    correct: "B",
+    correct: "A",
     explain: "Gemäss der Lebensdauertabelle: Teppichboden = 10 Jahre, Kühlschrank = 15 Jahre. Nach 12 Jahren Mietdauer ist der Teppichboden vollständig abgeschrieben (Restlebensdauer = 0) — der Mieter schuldet nichts. Der Kühlschrank hat noch 3 Jahre Restlebensdauer — der Mieter muss einen Zeitwert-Anteil (3/15 × Kosten) bezahlen."
   },
 
@@ -888,12 +888,12 @@ window.QUESTIONS = [
     context: "Herr Weber zahlt seit zwei Monaten keinen Mietzins, wohnt aber weiterhin in der Wohnung und nutzt alle Einrichtungen.",
     q: "Welche Konsequenz ergibt sich aus der Vertragsstruktur (siehe Übersicht) für den Vermieter?",
     options: [
-      {v: "A", t: "Keine — der Vermieter hat keinen Anspruch auf Mietzins, solange Herr Weber wohnt."},
-      {v: "B", t: "Der Vermieter muss weiterhin alle seine Pflichten erfüllen (Unterhalt, Mängelbeseitigung), unabhängig davon, ob Herr Weber zahlt."},
-      {v: "C", t: "Da der Mietvertrag auf Leistung gegen Gegenleistung aufgebaut ist, kann der Vermieter bei Zahlungsverzug nach schriftlicher Mahnung und Fristansetzung ausserordentlich kündigen (Art. 257d OR)."},
-      {v: "D", t: "Der Vermieter darf die Wohnung sofort räumen lassen, ohne Mahnung."}
+      {v: "A", t: "Der Vermieter darf die Wohnung sofort räumen lassen, ohne Mahnung."},
+      {v: "B", t: "Keine — der Vermieter hat keinen Anspruch auf Mietzins, solange Herr Weber wohnt."},
+      {v: "C", t: "Der Vermieter muss weiterhin alle seine Pflichten erfüllen (Unterhalt, Mängelbeseitigung), unabhängig davon, ob Herr Weber zahlt."},
+      {v: "D", t: "Da der Mietvertrag auf Leistung gegen Gegenleistung aufgebaut ist, kann der Vermieter bei Zahlungsverzug nach schriftlicher Mahnung und Fristansetzung ausserordentlich kündigen (Art. 257d OR)."}
     ],
-    correct: "C",
+    correct: "D",
     explain: "Der Mietvertrag ist ein synallagmatischer Vertrag: Gebrauchsüberlassung gegen Mietzins. Wenn der Mieter seine Hauptpflicht (Mietzinszahlung, Art. 257 OR) verletzt, kann der Vermieter gemäss Art. 257d OR eine Zahlungsfrist von mindestens 30 Tagen setzen und bei Nichtzahlung mit einer Frist von mindestens 30 Tagen auf Monatsende ausserordentlich kündigen. Eine sofortige Räumung ohne Mahnung ist nicht zulässig."
   },
 
@@ -904,11 +904,11 @@ window.QUESTIONS = [
     q: "Welches Recht hat Frau Meier gemäss Art. 270 OR?",
     options: [
       {v: "A", t: "Kein Recht, da der Mietzins bei Vertragsabschluss akzeptiert wurde."},
-      {v: "B", t: "Sie kann innert 30 Tagen nach Übernahme der Sache den Anfangsmietzins bei der Schlichtungsbehörde als missbräuchlich anfechten."},
-      {v: "C", t: "Sie kann den Mietzins einseitig auf den Vormieter-Niveau senken."},
+      {v: "B", t: "Sie kann den Mietzins einseitig auf den Vormieter-Niveau senken."},
+      {v: "C", t: "Sie kann innert 30 Tagen nach Übernahme der Sache den Anfangsmietzins bei der Schlichtungsbehörde als missbräuchlich anfechten."},
       {v: "D", t: "Sie muss den Mietzins 12 Monate zahlen, bevor sie anfechten kann."}
     ],
-    correct: "B",
+    correct: "C",
     explain: "Obersatz: Es ist zu prüfen, ob Frau Meier den Anfangsmietzins anfechten kann. Voraussetzungen: Gemäss Art. 270 OR kann ein neuer Mieter den Anfangsmietzins als missbräuchlich anfechten, wenn er sich in einer persönlichen oder familiären Notlage zum Vertragsabschluss gezwungen sah, oder wenn der Mietzins deutlich über dem Vormieter-Niveau liegt und keine wertvermehrenden Investitionen vorgenommen wurden. Die Frist beträgt 30 Tage nach Übernahme. Subsumtion: Der Mietzins liegt 20% über dem Vormieter-Niveau ohne Investitionen. Schlussfolgerung: Frau Meier kann den Anfangsmietzins innert 30 Tagen bei der Schlichtungsbehörde anfechten."
   },
   {
@@ -916,10 +916,10 @@ window.QUESTIONS = [
     context: "Herr Brunner entdeckt, dass sein Vermieter eine Überwachungskamera im Eingangsbereich installiert hat, die auch den Zugang zu seiner Wohnung filmt. Der Vermieter begründet dies mit 'Sicherheitsgründen'.",
     q: "Wie ist die Rechtslage einzuschätzen?",
     options: [
-      {v: "A", t: "Der Vermieter darf Kameras jederzeit und überall installieren."},
+      {v: "A", t: "Nur die Polizei darf Kameras in Wohnhäusern installieren."},
       {v: "B", t: "Die Videoüberwachung ist problematisch: Der Vermieter muss die Verhältnismässigkeit wahren, die Mieter vorgängig informieren und darf keine Privatbereiche filmen."},
-      {v: "C", t: "Videoüberwachung ist in Mietobjekten generell verboten."},
-      {v: "D", t: "Nur die Polizei darf Kameras in Wohnhäusern installieren."}
+      {v: "C", t: "Der Vermieter darf Kameras jederzeit und überall installieren."},
+      {v: "D", t: "Videoüberwachung ist in Mietobjekten generell verboten."}
     ],
     correct: "B",
     explain: "Obersatz: Es ist zu prüfen, ob die Videoüberwachung zulässig ist. Voraussetzungen: Gemäss dem Datenschutzgesetz (DSG) und der Rechtsprechung muss eine Videoüberwachung verhältnismässig sein, die Betroffenen müssen informiert werden, und Privatbereiche (Wohnungszugänge, Balkone) dürfen nicht überwacht werden. Subsumtion: Die Kamera filmt den Zugang zu Herrn Brunners Wohnung. Es fehlt die vorgängige Information. Schlussfolgerung: Die Videoüberwachung in dieser Form ist datenschutzrechtlich problematisch und der Mieter kann die Entfernung oder Neuausrichtung der Kamera verlangen."
@@ -929,12 +929,12 @@ window.QUESTIONS = [
     context: "Anna vermietet während ihres Auslandsemesters (6 Monate) ihre gesamte 3-Zimmer-Wohnung über eine Online-Plattform an Touristen, jeweils für wenige Tage.",
     q: "Ist diese Nutzung als Untermiete zulässig?",
     options: [
-      {v: "A", t: "Ja, Untermiete ist immer erlaubt."},
-      {v: "B", t: "Die kurzfristige Vermietung an Touristen geht über die gewöhnliche Untermiete hinaus. Der Vermieter kann die Zustimmung verweigern, da die häufig wechselnden Gäste wesentliche Nachteile verursachen können."},
-      {v: "C", t: "Nein, eine ganze Wohnung darf nie untervermietet werden."},
-      {v: "D", t: "Ja, solange Anna den Mietzins weiterhin bezahlt."}
+      {v: "A", t: "Ja, solange Anna den Mietzins weiterhin bezahlt."},
+      {v: "B", t: "Nein, eine ganze Wohnung darf nie untervermietet werden."},
+      {v: "C", t: "Ja, Untermiete ist immer erlaubt."},
+      {v: "D", t: "Die kurzfristige Vermietung an Touristen geht über die gewöhnliche Untermiete hinaus. Der Vermieter kann die Zustimmung verweigern, da die häufig wechselnden Gäste wesentliche Nachteile verursachen können."}
     ],
-    correct: "B",
+    correct: "D",
     explain: "Gemäss Art. 262 Abs. 2 lit. c OR kann der Vermieter die Zustimmung verweigern, wenn ihm wesentliche Nachteile entstehen. Kurzfristige Touristenvermietungen (z.B. über Airbnb) verursachen typischerweise höheren Verschleiss, häufigen Personenwechsel und können die Nachbarn stören. Zudem kann der Mietzins im Vergleich zur Hauptmiete missbräuchlich hoch sein (Art. 262 Abs. 2 lit. b OR)."
   },
   {
@@ -943,11 +943,11 @@ window.QUESTIONS = [
     q: "Wie ist diese Kündigung rechtlich zu beurteilen?",
     options: [
       {v: "A", t: "Die Kündigung ist gültig, der Vermieter kann jederzeit kündigen."},
-      {v: "B", t: "Es handelt sich wahrscheinlich um eine Rachekündigung (missbräuchliche Kündigung nach Art. 271a OR), die angefochten werden kann."},
-      {v: "C", t: "Die Kündigung ist nur ungültig, wenn sie mündlich ausgesprochen wurde."},
-      {v: "D", t: "Frau Müller muss die Kündigung akzeptieren, da sie den Rechtsweg beschritten hat."}
+      {v: "B", t: "Die Kündigung ist nur ungültig, wenn sie mündlich ausgesprochen wurde."},
+      {v: "C", t: "Frau Müller muss die Kündigung akzeptieren, da sie den Rechtsweg beschritten hat."},
+      {v: "D", t: "Es handelt sich wahrscheinlich um eine Rachekündigung (missbräuchliche Kündigung nach Art. 271a OR), die angefochten werden kann."}
     ],
-    correct: "B",
+    correct: "D",
     explain: "Obersatz: Es ist zu prüfen, ob die Kündigung missbräuchlich ist. Voraussetzungen: Gemäss Art. 271a Abs. 1 lit. a OR ist eine Kündigung anfechtbar, wenn sie ausgesprochen wird, weil der Mieter Ansprüche aus dem Mietverhältnis geltend macht. Subsumtion: Frau Müller hat eine Mietzinserhöhung bei der Schlichtungsbehörde angefochten — ein gesetzlich vorgesehenes Recht. Die Kündigung erfolgte als Reaktion darauf. Schlussfolgerung: Die Kündigung ist mit hoher Wahrscheinlichkeit missbräuchlich (Rachekündigung) und kann bei der Schlichtungsbehörde angefochten werden."
   },
   {
@@ -961,12 +961,12 @@ window.QUESTIONS = [
     context: "Familie Weber hat sich bei der Vermieterin über den lauten Nachbarn beschwert. Die Vermieterin hat den Nachbarn bereits zweimal schriftlich abgemahnt, doch dieser feiert weiterhin laut bis in die Nacht.",
     q: "Welchen nächsten Schritt kann die Vermieterin nun einleiten?",
     options: [
-      {v: "A", t: "Sie kann dem Nachbarn ausserordentlich kündigen mit einer Frist von 30 Tagen auf Monatsende (Art. 257f Abs. 3 OR)."},
+      {v: "A", t: "Sie muss noch mindestens fünf Abmahnungen schicken."},
       {v: "B", t: "Sie kann nichts tun, der Nachbar hat Hausrecht."},
-      {v: "C", t: "Sie muss noch mindestens fünf Abmahnungen schicken."},
-      {v: "D", t: "Sie kann nur die Polizei rufen, aber nicht kündigen."}
+      {v: "C", t: "Sie kann nur die Polizei rufen, aber nicht kündigen."},
+      {v: "D", t: "Sie kann dem Nachbarn ausserordentlich kündigen mit einer Frist von 30 Tagen auf Monatsende (Art. 257f Abs. 3 OR)."}
     ],
-    correct: "A",
+    correct: "D",
     explain: "Nach Art. 257f Abs. 3 OR kann der Vermieter bei schwerer Verletzung der Sorgfaltspflicht (fortgesetzte Ruhestörung trotz Abmahnung) ausserordentlich kündigen. Die Frist beträgt mindestens 30 Tage auf Monatsende bei Wohnungen. Die schriftliche Mahnung ist Voraussetzung — hier wurde sie bereits zweimal erteilt."
   },
   {

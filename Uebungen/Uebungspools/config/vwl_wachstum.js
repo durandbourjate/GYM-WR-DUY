@@ -30,12 +30,12 @@ window.QUESTIONS = [
 {id:"d01", topic:"definition", type:"mc", diff:1, tax:"K1",
  q:"Was versteht man unter wirtschaftlichem Wachstum?",
  options:[
-   {v:"A", t:"Die langfristige Entwicklung des realen BIP pro Kopf."},
-   {v:"B", t:"Die kurzfristige Schwankung des nominalen BIP."},
-   {v:"C", t:"Den Anstieg der Konsumentenpreise über mehrere Jahre."},
-   {v:"D", t:"Die Zunahme der Bevölkerung eines Landes."}
+   {v: "A", t:"Die Zunahme der Bevölkerung eines Landes."},
+   {v: "B", t:"Die kurzfristige Schwankung des nominalen BIP."},
+   {v: "C", t:"Die langfristige Entwicklung des realen BIP pro Kopf."},
+   {v: "D", t:"Den Anstieg der Konsumentenpreise über mehrere Jahre."}
  ],
- correct:"A",
+ correct:"C",
  explain:"Wirtschaftliches Wachstum bezeichnet die langfristige Entwicklung des realen BIP pro Kopf. Es geht um den Trend über Jahre und Jahrzehnte, nicht um kurzfristige Konjunkturschwankungen."},
 
 {id:"d02", topic:"definition", type:"tf", diff:1, tax:"K1",
@@ -46,12 +46,12 @@ window.QUESTIONS = [
 {id:"d03", topic:"definition", type:"mc", diff:1, tax:"K2",
  q:"Worin unterscheiden sich «Konjunktur» und «Wachstum» als volkswirtschaftliche Konzepte?",
  options:[
-   {v:"A", t:"Konjunktur betrachtet kurzfristige BIP-Schwankungen, Wachstum den langfristigen Trend des BIP pro Kopf."},
-   {v:"B", t:"Konjunktur betrifft nur die Industrie, Wachstum die gesamte Volkswirtschaft."},
-   {v:"C", t:"Konjunktur misst nominale Grössen, Wachstum reale Grössen."},
-   {v:"D", t:"Es gibt keinen wesentlichen Unterschied."}
+   {v: "A", t:"Es gibt keinen wesentlichen Unterschied."},
+   {v: "B", t:"Konjunktur betrifft nur die Industrie, Wachstum die gesamte Volkswirtschaft."},
+   {v: "C", t:"Konjunktur misst nominale Grössen, Wachstum reale Grössen."},
+   {v: "D", t:"Konjunktur betrachtet kurzfristige BIP-Schwankungen, Wachstum den langfristigen Trend des BIP pro Kopf."}
  ],
- correct:"A",
+ correct:"D",
  explain:"Konjunktur beschäftigt sich mit dem Auf und Ab des BIP in kurzer Frist (Quartale, 1–2 Jahre). Wachstum hingegen betrachtet die langfristige Entwicklung des realen BIP pro Kopf über Jahre und Jahrzehnte."},
 
 {id:"d04", topic:"definition", type:"calc", diff:2, tax:"K3",
@@ -103,12 +103,12 @@ window.QUESTIONS = [
 {id:"d10", topic:"definition", type:"mc", diff:2, tax:"K2",
  q:"Weshalb ist Nullwachstum gemäss Eisenhut eine «wirtschaftspolitische Illusion»?",
  options:[
-   {v:"A", t:"Weil Umverteilung ohne Wachstum ein Nullsummenspiel wäre und die Sozialwerke auf Wachstum angewiesen sind."},
-   {v:"B", t:"Weil die Bevölkerung immer schrumpft."},
-   {v:"C", t:"Weil Nullwachstum automatisch zu Inflation führt."},
-   {v:"D", t:"Weil technischer Fortschritt verboten werden müsste."}
+   {v: "A", t:"Weil technischer Fortschritt verboten werden müsste."},
+   {v: "B", t:"Weil Umverteilung ohne Wachstum ein Nullsummenspiel wäre und die Sozialwerke auf Wachstum angewiesen sind."},
+   {v: "C", t:"Weil Nullwachstum automatisch zu Inflation führt."},
+   {v: "D", t:"Weil die Bevölkerung immer schrumpft."}
  ],
- correct:"A",
+ correct:"B",
  explain:"Bei Nullwachstum könnte niemand materiell reicher werden, ohne dass jemand anderes ärmer wird. Zudem sind die Sozialwerke so konzipiert, dass ihre Finanzierung ohne Wachstum stark gefährdet wäre."},
 
 {id:"d11", topic:"definition", type:"multi", diff:2, tax:"K2",
@@ -125,12 +125,12 @@ window.QUESTIONS = [
 {id:"d12", topic:"definition", type:"mc", diff:3, tax:"K4",
  q:"Land A und Land B hatten im Jahr 2000 beide ein BIP pro Kopf von CHF 40'000. Land A wächst seither mit 1 %, Land B mit 3 %. Welche Aussage ist nach 25 Jahren am zutreffendsten?",
  options:[
-   {v:"A", t:"Land B hat sein BIP pro Kopf ungefähr verdoppelt, Land A liegt noch deutlich darunter."},
-   {v:"B", t:"Beide Länder haben ihr BIP pro Kopf ungefähr verdoppelt."},
-   {v:"C", t:"Der Unterschied zwischen den Ländern beträgt weniger als CHF 10'000."},
-   {v:"D", t:"Land A hat Land B inzwischen überholt."}
+   {v: "A", t:"Beide Länder haben ihr BIP pro Kopf ungefähr verdoppelt."},
+   {v: "B", t:"Land B hat sein BIP pro Kopf ungefähr verdoppelt, Land A liegt noch deutlich darunter."},
+   {v: "C", t:"Der Unterschied zwischen den Ländern beträgt weniger als CHF 10'000."},
+   {v: "D", t:"Land A hat Land B inzwischen überholt."}
  ],
- correct:"A",
+ correct:"B",
  explain:"Nach 25 Jahren: Land A ≈ 40'000 × 1,01²⁵ ≈ 51'300. Land B ≈ 40'000 × 1,03²⁵ ≈ 83'800. Land B hat sein BIP also mehr als verdoppelt, Land A liegt weit zurück. Der Unterschied beträgt über CHF 32'000 – die Kraft des Zinseszinses."},
 
 {id:"d13", topic:"definition", type:"calc", diff:3, tax:"K3",
@@ -146,12 +146,12 @@ window.QUESTIONS = [
 {id:"e01", topic:"ebene1", type:"mc", diff:1, tax:"K1",
  q:"Auf welche zwei grundsätzlichen Arten kann eine Volkswirtschaft wachsen?",
  options:[
-   {v:"A", t:"Mehr Arbeitsstunden leisten oder die Arbeitsproduktivität erhöhen."},
-   {v:"B", t:"Mehr Geld drucken oder die Steuern senken."},
-   {v:"C", t:"Mehr exportieren oder weniger importieren."},
-   {v:"D", t:"Mehr Rohstoffe abbauen oder mehr Arbeitskräfte einstellen."}
+   {v: "A", t:"Mehr exportieren oder weniger importieren."},
+   {v: "B", t:"Mehr Arbeitsstunden leisten oder die Arbeitsproduktivität erhöhen."},
+   {v: "C", t:"Mehr Geld drucken oder die Steuern senken."},
+   {v: "D", t:"Mehr Rohstoffe abbauen oder mehr Arbeitskräfte einstellen."}
  ],
- correct:"A",
+ correct:"B",
  explain:"Grundsätzlich kann das BIP pro Kopf nur steigen, wenn entweder mehr Arbeitsstunden geleistet werden oder die Produktivität (Output pro Arbeitsstunde) zunimmt."},
 
 {id:"e02", topic:"ebene1", type:"tf", diff:2, tax:"K2",
@@ -162,12 +162,12 @@ window.QUESTIONS = [
 {id:"e03", topic:"ebene1", type:"mc", diff:2, tax:"K2",
  q:"Was versteht man unter der Erwerbsquote?",
  options:[
-   {v:"A", t:"Das Verhältnis der Erwerbspersonen zur Bevölkerung im Alter von 15–64 Jahren."},
-   {v:"B", t:"Den Anteil der Arbeitslosen an der Gesamtbevölkerung."},
-   {v:"C", t:"Die durchschnittliche Anzahl Arbeitsstunden pro Woche."},
-   {v:"D", t:"Das Verhältnis von Teilzeit- zu Vollzeitbeschäftigten."}
+   {v: "A", t:"Den Anteil der Arbeitslosen an der Gesamtbevölkerung."},
+   {v: "B", t:"Die durchschnittliche Anzahl Arbeitsstunden pro Woche."},
+   {v: "C", t:"Das Verhältnis der Erwerbspersonen zur Bevölkerung im Alter von 15–64 Jahren."},
+   {v: "D", t:"Das Verhältnis von Teilzeit- zu Vollzeitbeschäftigten."}
  ],
- correct:"A",
+ correct:"C",
  explain:"Die Erwerbsquote gibt an, wie gross der Anteil der Bevölkerung im erwerbsfähigen Alter ist, der tatsächlich am Arbeitsmarkt teilnimmt (erwerbstätig oder arbeitssuchend)."},
 
 {id:"e04", topic:"ebene1", type:"sort", diff:2, tax:"K2",
@@ -204,10 +204,10 @@ window.QUESTIONS = [
 {id:"e08", topic:"ebene1", type:"mc", diff:2, tax:"K2",
  q:"Weshalb kann «mehr Arbeiten» allein kein stetiges Wirtschaftswachstum ermöglichen?",
  options:[
-   {v:"A", t:"Weil der Arbeitseinsatz durch die maximale Tageszeit (24h) und die Erwerbsquote begrenzt ist (Niveaueffekt)."},
-   {v:"B", t:"Weil Arbeiten gesundheitsschädlich ist."},
-   {v:"C", t:"Weil es nicht genügend Arbeitsplätze gibt."},
-   {v:"D", t:"Weil die Bevölkerung immer kleiner wird."}
+   {v: "A", t:"Weil der Arbeitseinsatz durch die maximale Tageszeit (24h) und die Erwerbsquote begrenzt ist (Niveaueffekt)."},
+   {v: "B", t:"Weil es nicht genügend Arbeitsplätze gibt."},
+   {v: "C", t:"Weil die Bevölkerung immer kleiner wird."},
+   {v: "D", t:"Weil Arbeiten gesundheitsschädlich ist."}
  ],
  correct:"A",
  explain:"Die Arbeitsmenge hat eine natürliche Obergrenze (Niveaueffekt): Niemand kann mehr als 24 Stunden pro Tag arbeiten, und die Erwerbsquote kann nicht über 100 % steigen. Zudem zeigen Studien, dass übermässig viel Arbeit die Produktivität pro Stunde senkt."},
@@ -310,23 +310,23 @@ window.QUESTIONS = [
 {id:"i07", topic:"ebene2", type:"mc", diff:2, tax:"K2",
  q:"Welche der folgenden Aussagen beschreibt das Patent-Paradox korrekt?",
  options:[
-   {v:"A", t:"Patente schaffen Anreize für Innovation, führen aber nachher zu Ineffizienz durch Monopolmacht des Patenthalters."},
-   {v:"B", t:"Patente sind immer schlecht für die Innovation."},
-   {v:"C", t:"Patente verhindern, dass Erfindungen gemacht werden."},
-   {v:"D", t:"Patente funktionieren nur in der Landwirtschaft."}
+   {v: "A", t:"Patente sind immer schlecht für die Innovation."},
+   {v: "B", t:"Patente verhindern, dass Erfindungen gemacht werden."},
+   {v: "C", t:"Patente schaffen Anreize für Innovation, führen aber nachher zu Ineffizienz durch Monopolmacht des Patenthalters."},
+   {v: "D", t:"Patente funktionieren nur in der Landwirtschaft."}
  ],
- correct:"A",
+ correct:"C",
  explain:"Das Patent-Paradox beschreibt den Zielkonflikt: Vorher bietet das Patent einen Anreiz zur Innovation (Belohnung für Forschungsaufwand). Nachher entsteht Ineffizienz, weil der Patenthalter Monopolmacht hat (höhere Preise, weniger Zugang, potenziell weniger Folgeinnovationen)."},
 
 {id:"i08", topic:"ebene2", type:"mc", diff:1, tax:"K1",
  q:"Welcher Strukturwandel hat in der Schweiz seit 1800 stattgefunden?",
  options:[
-   {v:"A", t:"Vom Agrarland über das Industrieland zur Dienstleistungsgesellschaft."},
-   {v:"B", t:"Von der Dienstleistungsgesellschaft zum Industrieland."},
-   {v:"C", t:"Vom Industrieland zum Agrarland."},
-   {v:"D", t:"Es hat kein wesentlicher Strukturwandel stattgefunden."}
+   {v: "A", t:"Vom Industrieland zum Agrarland."},
+   {v: "B", t:"Von der Dienstleistungsgesellschaft zum Industrieland."},
+   {v: "C", t:"Vom Agrarland über das Industrieland zur Dienstleistungsgesellschaft."},
+   {v: "D", t:"Es hat kein wesentlicher Strukturwandel stattgefunden."}
  ],
- correct:"A",
+ correct:"C",
  explain:"Die Schweiz entwickelte sich von einem Agrarland (1800, 1. Sektor dominant) über ein Industrieland (1900, 2. Sektor dominant) zur heutigen Dienstleistungsgesellschaft (3. Sektor mit über 70 % der Beschäftigten)."},
 
 {id:"i09", topic:"ebene2", type:"tf", diff:2, tax:"K2",
@@ -362,10 +362,10 @@ window.QUESTIONS = [
  img:{src:"img/vwl/wachstum/strukturwandel_ch.svg", alt:"Strukturwandel der Schweiz: Beschäftigungsanteile nach Sektoren"},
  q:"Die Grafik zeigt den Strukturwandel der Schweiz. Was ist die wahrscheinlichste Erklärung dafür, dass der 3. Sektor heute dominiert?",
  options:[
-   {v:"A", t:"Produktivitätssteigerungen in Landwirtschaft und Industrie haben Arbeitskräfte freigesetzt, die in den Dienstleistungssektor gewechselt sind."},
-   {v:"B", t:"Die Schweiz hat Landwirtschaft und Industrie verboten."},
-   {v:"C", t:"Die Nachfrage nach Agrarprodukten ist auf null gesunken."},
-   {v:"D", t:"Der 3. Sektor wächst automatisch mit der Bevölkerung."}
+   {v: "A", t:"Produktivitätssteigerungen in Landwirtschaft und Industrie haben Arbeitskräfte freigesetzt, die in den Dienstleistungssektor gewechselt sind."},
+   {v: "B", t:"Die Nachfrage nach Agrarprodukten ist auf null gesunken."},
+   {v: "C", t:"Die Schweiz hat Landwirtschaft und Industrie verboten."},
+   {v: "D", t:"Der 3. Sektor wächst automatisch mit der Bevölkerung."}
  ],
  correct:"A",
  explain:"Der Strukturwandel wird primär durch Produktivitätssteigerungen getrieben: Dank Mechanisierung braucht die Landwirtschaft weniger Arbeitskräfte für denselben Output. Dank Automatisierung gilt Ähnliches für die Industrie. Die freigesetzten Arbeitskräfte wandern in den Dienstleistungssektor, wo die Nachfrage mit steigendem Einkommen überproportional wächst."},
@@ -384,12 +384,12 @@ window.QUESTIONS = [
 {id:"r02", topic:"ebene3", type:"mc", diff:2, tax:"K2",
  q:"Welche Aufgabe hat der Staat NICHT im Kontext der Wachstumsförderung?",
  options:[
-   {v:"A", t:"Die Preise aller Güter staatlich festlegen."},
-   {v:"B", t:"Voraussetzungen für die Marktwirtschaft schaffen (Privateigentum, Vertragsfreiheit)."},
-   {v:"C", t:"Öffentliche Güter bereitstellen."},
-   {v:"D", t:"Bei externen Effekten eingreifen."}
+   {v: "A", t:"Öffentliche Güter bereitstellen."},
+   {v: "B", t:"Die Preise aller Güter staatlich festlegen."},
+   {v: "C", t:"Bei externen Effekten eingreifen."},
+   {v: "D", t:"Voraussetzungen für die Marktwirtschaft schaffen (Privateigentum, Vertragsfreiheit)."}
  ],
- correct:"A",
+ correct:"B",
  explain:"Der Staat soll Spielregeln setzen, Voraussetzungen schaffen und Marktversagen verhindern – aber nicht die Preise aller Güter staatlich festlegen. Preise sollen sich grundsätzlich über den Markt bilden."},
 
 {id:"r03", topic:"ebene3", type:"sort", diff:2, tax:"K2",
@@ -417,12 +417,12 @@ window.QUESTIONS = [
 {id:"r05", topic:"ebene3", type:"mc", diff:2, tax:"K2",
  q:"Welche fünf wirtschaftspolitischen Bereiche beeinflussen gemäss Eisenhut das Wachstumspotenzial wesentlich?",
  options:[
-   {v:"A", t:"Wettbewerbs-, Aussenwirtschafts-, Bildungs-, Innovations- und Finanzpolitik."},
-   {v:"B", t:"Geld-, Fiskal-, Handels-, Umwelt- und Sozialpolitik."},
-   {v:"C", t:"Agrar-, Industrie-, Dienstleistungs-, Digital- und Verteidigungspolitik."},
-   {v:"D", t:"Steuer-, Zoll-, Subventions-, Preis- und Lohnpolitik."}
+   {v: "A", t:"Steuer-, Zoll-, Subventions-, Preis- und Lohnpolitik."},
+   {v: "B", t:"Geld-, Fiskal-, Handels-, Umwelt- und Sozialpolitik."},
+   {v: "C", t:"Wettbewerbs-, Aussenwirtschafts-, Bildungs-, Innovations- und Finanzpolitik."},
+   {v: "D", t:"Agrar-, Industrie-, Dienstleistungs-, Digital- und Verteidigungspolitik."}
  ],
- correct:"A",
+ correct:"C",
  explain:"Die fünf Bereiche sind: 1) Wettbewerbspolitik (Effizienz, Innovationsanreize), 2) Aussenwirtschaftspolitik (offene Märkte), 3) Bildungspolitik (Humankapital), 4) Innovationspolitik (Forschung & Technologietransfer), 5) Finanzpolitik (Staatsfinanzen)."},
 
 {id:"r06", topic:"ebene3", type:"open", diff:3, tax:"K5",
@@ -438,12 +438,12 @@ window.QUESTIONS = [
 {id:"r08", topic:"ebene3", type:"mc", diff:2, tax:"K2",
  q:"Welches sind gestaltbare Rahmenbedingungen für Wirtschaftswachstum?",
  options:[
-   {v:"A", t:"Politische Stabilität, Rechtssicherheit, Bildungspolitik, Infrastruktur."},
-   {v:"B", t:"Geografische Lage, Klima, Rohstoffvorkommen."},
-   {v:"C", t:"Bevölkerungsgrösse und Landfläche."},
-   {v:"D", t:"Nähe zu starken Volkswirtschaften und Meeresanbindung."}
+   {v: "A", t:"Bevölkerungsgrösse und Landfläche."},
+   {v: "B", t:"Geografische Lage, Klima, Rohstoffvorkommen."},
+   {v: "C", t:"Nähe zu starken Volkswirtschaften und Meeresanbindung."},
+   {v: "D", t:"Politische Stabilität, Rechtssicherheit, Bildungspolitik, Infrastruktur."}
  ],
- correct:"A",
+ correct:"D",
  explain:"Gestaltbare Determinanten sind solche, die durch Politik beeinflusst werden können: Rechtssicherheit, politische Stabilität, Bildungs- und Forschungspolitik, Infrastruktur, Arbeitsmarktpolitik. Nicht gestaltbar sind z.B. Geografie, Klima, Rohstoffvorkommen."},
 
 {id:"r09", topic:"ebene3", type:"tf", diff:1, tax:"K1",
@@ -466,10 +466,10 @@ window.QUESTIONS = [
  img:{src:"img/vwl/wachstum/drei_ebenen_modell.svg", alt:"Drei-Ebenen-Modell des Wirtschaftswachstums"},
  q:"Im Drei-Ebenen-Modell beeinflusst die tief liegende Ebene (Institutionen) die beiden oberen Ebenen. Welches Beispiel illustriert diesen Zusammenhang am besten?",
  options:[
-   {v:"A", t:"Ein Land mit schwacher Rechtsstaatlichkeit hat wenig ausländische Investitionen, was die Produktivität bremst und das BIP pro Kopf niedrig hält."},
-   {v:"B", t:"Ein Land mit vielen natürlichen Ressourcen hat automatisch hohe Produktivität."},
-   {v:"C", t:"Ein Land mit hohem BIP pro Kopf hat automatisch gute Institutionen."},
-   {v:"D", t:"Institutionen haben keinen Einfluss auf die unmittelbare Ebene."}
+   {v: "A", t:"Ein Land mit schwacher Rechtsstaatlichkeit hat wenig ausländische Investitionen, was die Produktivität bremst und das BIP pro Kopf niedrig hält."},
+   {v: "B", t:"Institutionen haben keinen Einfluss auf die unmittelbare Ebene."},
+   {v: "C", t:"Ein Land mit vielen natürlichen Ressourcen hat automatisch hohe Produktivität."},
+   {v: "D", t:"Ein Land mit hohem BIP pro Kopf hat automatisch gute Institutionen."}
  ],
  correct:"A",
  explain:"Das Drei-Ebenen-Modell zeigt: Schlechte Institutionen (tief liegende Ebene) → weniger Investitionen in Sach- und Humankapital (Zwischenebene) → geringere Produktivität und weniger Arbeitsstunden (unmittelbare Ebene) → tieferes BIP pro Kopf. Die Kausalität verläuft von unten nach oben."},
@@ -483,10 +483,10 @@ window.QUESTIONS = [
 {id:"v01", topic:"verteilung", type:"mc", diff:1, tax:"K1",
  q:"Was zeigt die Elefantengrafik von Branko Milanovic?",
  options:[
-   {v:"A", t:"Die prozentuale Veränderung der Realeinkommen verschiedener Einkommensgruppen weltweit zwischen 1988 und 2008."},
-   {v:"B", t:"Die absolute Höhe der Einkommen in verschiedenen Ländern."},
-   {v:"C", t:"Die Entwicklung der Börsenkurse seit 1988."},
-   {v:"D", t:"Den Anteil verschiedener Branchen am Welt-BIP."}
+   {v: "A", t:"Die prozentuale Veränderung der Realeinkommen verschiedener Einkommensgruppen weltweit zwischen 1988 und 2008."},
+   {v: "B", t:"Die Entwicklung der Börsenkurse seit 1988."},
+   {v: "C", t:"Den Anteil verschiedener Branchen am Welt-BIP."},
+   {v: "D", t:"Die absolute Höhe der Einkommen in verschiedenen Ländern."}
  ],
  correct:"A",
  explain:"Die Elefantengrafik zeigt auf der x-Achse die Perzentile der globalen Einkommensverteilung und auf der y-Achse die prozentuale Veränderung der Realeinkommen von 1988 bis 2008. Ihre Form ähnelt einem Elefanten."},
@@ -494,12 +494,12 @@ window.QUESTIONS = [
 {id:"v02", topic:"verteilung", type:"mc", diff:2, tax:"K2",
  q:"Wer befindet sich gemäss der Elefantengrafik im «Knick des Rüssels» (ca. 75.–85. Perzentil)?",
  options:[
-   {v:"A", t:"Die untere Mittelschicht der westlichen Industrieländer, deren Realeinkommen stagniert hat."},
-   {v:"B", t:"Die ärmsten Menschen der Welt."},
-   {v:"C", t:"Die aufstrebende Mittelschicht in Schwellenländern."},
-   {v:"D", t:"Die reichsten 1 % der Weltbevölkerung."}
+   {v: "A", t:"Die aufstrebende Mittelschicht in Schwellenländern."},
+   {v: "B", t:"Die reichsten 1 % der Weltbevölkerung."},
+   {v: "C", t:"Die untere Mittelschicht der westlichen Industrieländer, deren Realeinkommen stagniert hat."},
+   {v: "D", t:"Die ärmsten Menschen der Welt."}
  ],
- correct:"A",
+ correct:"C",
  explain:"Im Knick des Rüssels (ca. 75.–85. Perzentil) befinden sich Menschen der westlichen Mittelschicht, deren Realeinkommen in den 20 Jahren kaum gestiegen oder sogar leicht gesunken ist. Sie haben nicht von Globalisierung und technischem Fortschritt profitiert."},
 
 {id:"v03", topic:"verteilung", type:"sort", diff:2, tax:"K2",
@@ -546,12 +546,12 @@ window.QUESTIONS = [
 {id:"v09", topic:"verteilung", type:"mc", diff:3, tax:"K5",
  q:"Die Elefantengrafik wird manchmal herangezogen, um politische Phänomene wie Brexit oder den Aufstieg populistischer Bewegungen zu erklären. Welche Argumentation steckt dahinter?",
  options:[
-   {v:"A", t:"Die stagnierende westliche Mittelschicht fühlt sich von der Elite im Stich gelassen und drückt ihren Wunsch nach Wandel in Wahlen aus."},
-   {v:"B", t:"Die ärmsten Länder der Welt haben sich gegen die Globalisierung gewehrt."},
-   {v:"C", t:"Die reichsten 1 % haben die Wahlen direkt manipuliert."},
-   {v:"D", t:"Es gibt keinen Zusammenhang zwischen Einkommensverteilung und politischen Bewegungen."}
+   {v: "A", t:"Es gibt keinen Zusammenhang zwischen Einkommensverteilung und politischen Bewegungen."},
+   {v: "B", t:"Die stagnierende westliche Mittelschicht fühlt sich von der Elite im Stich gelassen und drückt ihren Wunsch nach Wandel in Wahlen aus."},
+   {v: "C", t:"Die ärmsten Länder der Welt haben sich gegen die Globalisierung gewehrt."},
+   {v: "D", t:"Die reichsten 1 % haben die Wahlen direkt manipuliert."}
  ],
- correct:"A",
+ correct:"B",
  explain:"Die westliche Mittelschicht – im Knick des Rüssels – sieht, wie andere (Schwellenländer, Superreiche) reicher werden, während ihr eigenes Einkommen stagniert. Diese gefühlte Ungerechtigkeit schafft Nährboden für populistische Bewegungen, die Wandel versprechen."},
 
 {id:"v10", topic:"verteilung", type:"fill", diff:1, tax:"K1",
@@ -585,12 +585,12 @@ window.QUESTIONS = [
  img:{src:"img/vwl/wachstum/elefantengrafik.svg", alt:"Globale Einkommensentwicklung 1988–2008 (vereinfacht)"},
  q:"Betrachten Sie die Grafik. Der Bereich B zeigt einen deutlichen Knick nach unten. Welche Bevölkerungsgruppe ist hier betroffen und warum?",
  options:[
-   {v:"A", t:"Die westliche untere Mittelschicht – ihre Einkommen stagnierten, weil einfache Arbeit durch Globalisierung und Automatisierung unter Druck geriet."},
-   {v:"B", t:"Die ärmsten Menschen Afrikas – sie haben keinen Zugang zu Bildung."},
-   {v:"C", t:"Die Mittelschicht in China – sie wurde durch die Kulturrevolution gebremst."},
-   {v:"D", t:"Die Superreichen – ihre Vermögen sind durch die Finanzkrise geschrumpft."}
+   {v: "A", t:"Die Superreichen – ihre Vermögen sind durch die Finanzkrise geschrumpft."},
+   {v: "B", t:"Die ärmsten Menschen Afrikas – sie haben keinen Zugang zu Bildung."},
+   {v: "C", t:"Die Mittelschicht in China – sie wurde durch die Kulturrevolution gebremst."},
+   {v: "D", t:"Die westliche untere Mittelschicht – ihre Einkommen stagnierten, weil einfache Arbeit durch Globalisierung und Automatisierung unter Druck geriet."}
  ],
- correct:"A",
+ correct:"D",
  explain:"Bereich B (ca. 75.–85. Perzentil) zeigt die westliche untere Mittelschicht, deren Realeinkommen kaum stiegen. Durch Globalisierung (Verlagerung ins Ausland) und Automatisierung (Maschinen ersetzen Routinearbeit) gerieten ihre Arbeitsplätze und Löhne unter Druck."},
 
 // ── WACHSTUM & NACHHALTIGKEIT (n01–n09) ──
@@ -605,12 +605,12 @@ window.QUESTIONS = [
 {id:"n02", topic:"nachhaltigkeit", type:"mc", diff:1, tax:"K1",
  q:"Was misst der ökologische Fussabdruck?",
  options:[
-   {v:"A", t:"Wie viel produktives Gebiet nötig ist, um das zu produzieren, was eine Bevölkerung konsumiert und deren Abfall zu entsorgen."},
-   {v:"B", t:"Die CO₂-Emissionen pro Kopf."},
-   {v:"C", t:"Die Biodiversität eines Landes."},
-   {v:"D", t:"Den Wasserverbrauch pro Einwohner."}
+   {v: "A", t:"Die CO₂-Emissionen pro Kopf."},
+   {v: "B", t:"Die Biodiversität eines Landes."},
+   {v: "C", t:"Den Wasserverbrauch pro Einwohner."},
+   {v: "D", t:"Wie viel produktives Gebiet nötig ist, um das zu produzieren, was eine Bevölkerung konsumiert und deren Abfall zu entsorgen."}
  ],
- correct:"A",
+ correct:"D",
  explain:"Der ökologische Fussabdruck misst den Flächenbedarf für Produktion und Abfallentsorgung. Die Schweiz hat einen Fussabdruck von ca. 5 Hektaren pro Person – lebten alle so, bräuchte es ca. 2,8 Planeten."},
 
 {id:"n03", topic:"nachhaltigkeit", type:"calc", diff:2, tax:"K3",
@@ -637,12 +637,12 @@ window.QUESTIONS = [
 {id:"n05", topic:"nachhaltigkeit", type:"mc", diff:2, tax:"K2",
  q:"Was ist das Prinzip der Internalisierung externer Kosten?",
  options:[
-   {v:"A", t:"Die Verursacher von Umweltschäden müssen für die von ihnen verursachten Kosten aufkommen."},
-   {v:"B", t:"Umweltschäden werden aus dem BIP herausgerechnet."},
-   {v:"C", t:"Unternehmen müssen ihre Produktion ins Inland verlagern."},
-   {v:"D", t:"Der Staat übernimmt alle Umweltkosten."}
+   {v: "A", t:"Umweltschäden werden aus dem BIP herausgerechnet."},
+   {v: "B", t:"Unternehmen müssen ihre Produktion ins Inland verlagern."},
+   {v: "C", t:"Der Staat übernimmt alle Umweltkosten."},
+   {v: "D", t:"Die Verursacher von Umweltschäden müssen für die von ihnen verursachten Kosten aufkommen."}
  ],
- correct:"A",
+ correct:"D",
  explain:"Bei der Internalisierung externer Kosten werden die Umweltkosten, die bisher von der Allgemeinheit getragen wurden, dem Verursacher zugerechnet. So entsteht ein Anreiz, die Umweltbelastung zu reduzieren."},
 
 {id:"n06", topic:"nachhaltigkeit", type:"open", diff:3, tax:"K4",
@@ -653,12 +653,12 @@ window.QUESTIONS = [
 {id:"n07", topic:"nachhaltigkeit", type:"mc", diff:2, tax:"K2",
  q:"Wie funktionieren Emissionszertifikate als Instrument der Umweltpolitik?",
  options:[
-   {v:"A", t:"Der Staat legt eine Gesamtmenge an zulässigen Emissionen fest und verteilt handelbare Verschmutzungsrechte."},
-   {v:"B", t:"Unternehmen erhalten Geld für jede Tonne CO₂, die sie ausstossen."},
-   {v:"C", t:"Umweltverschmutzung wird komplett verboten."},
-   {v:"D", t:"Unternehmen müssen eine Umweltversicherung abschliessen."}
+   {v: "A", t:"Unternehmen müssen eine Umweltversicherung abschliessen."},
+   {v: "B", t:"Unternehmen erhalten Geld für jede Tonne CO₂, die sie ausstossen."},
+   {v: "C", t:"Der Staat legt eine Gesamtmenge an zulässigen Emissionen fest und verteilt handelbare Verschmutzungsrechte."},
+   {v: "D", t:"Umweltverschmutzung wird komplett verboten."}
  ],
- correct:"A",
+ correct:"C",
  explain:"Bei Emissionszertifikaten schafft der Staat Nutzungsrechte an der Natur. Wer die Umwelt belasten will, muss Zertifikate kaufen. Wer Umweltschutzmassnahmen ergreift, kann überschüssige Zertifikate verkaufen. So wird die Gesamtemission begrenzt und die Reduktion dort vorgenommen, wo sie am günstigsten ist."},
 
 {id:"n08", topic:"nachhaltigkeit", type:"tf", diff:2, tax:"K2",
@@ -685,10 +685,10 @@ window.QUESTIONS = [
 {id:"n11", topic:"nachhaltigkeit", type:"mc", diff:3, tax:"K5",
  q:"Ein Kritiker argumentiert: «Emissionszertifikate sind ungerecht, weil reiche Unternehmen sich das Recht erkaufen können, die Umwelt zu verschmutzen.» Wie lässt sich diese Kritik am besten einordnen?",
  options:[
-   {v:"A", t:"Der Einwand verkennt, dass die Gesamtemissionen durch die fixe Obergrenze (Cap) begrenzt sind – wer mehr kauft, bedeutet, dass ein anderer weniger emittiert."},
-   {v:"B", t:"Die Kritik ist vollständig berechtigt – Emissionszertifikate sollten abgeschafft werden."},
-   {v:"C", t:"Emissionszertifikate funktionieren nur, wenn alle Unternehmen gleich reich sind."},
-   {v:"D", t:"Die Kritik betrifft nur Lenkungsabgaben, nicht Zertifikate."}
+   {v: "A", t:"Der Einwand verkennt, dass die Gesamtemissionen durch die fixe Obergrenze (Cap) begrenzt sind – wer mehr kauft, bedeutet, dass ein anderer weniger emittiert."},
+   {v: "B", t:"Emissionszertifikate funktionieren nur, wenn alle Unternehmen gleich reich sind."},
+   {v: "C", t:"Die Kritik betrifft nur Lenkungsabgaben, nicht Zertifikate."},
+   {v: "D", t:"Die Kritik ist vollständig berechtigt – Emissionszertifikate sollten abgeschafft werden."}
  ],
  correct:"A",
  explain:"Das Cap-and-Trade-System setzt eine Obergrenze (Cap) für die Gesamtemissionen. Innerhalb dieser Grenze werden die Reduktionen dort vorgenommen, wo sie am günstigsten sind (Effizienz). Ein reiches Unternehmen, das Zertifikate kauft, finanziert damit indirekt die Emissionsreduktion bei einem anderen Unternehmen. Die Gesamtmenge bleibt gleich."},
@@ -702,11 +702,11 @@ window.QUESTIONS = [
  img:{src:"img/vwl/wachstum/oekologischer_fussabdruck.svg", alt:"Ökologischer Fussabdruck im Ländervergleich"},
  q:"Die Grafik zeigt den ökologischen Fussabdruck verschiedener Länder. Was bedeutet es, wenn der Fussabdruck eines Landes über der gestrichelten Linie (1,8 Hektaren) liegt?",
  options:[
-   {v:"A", t:"Das Land verbraucht mehr Ressourcen, als die Erde pro Person dauerhaft bereitstellen kann."},
-   {v:"B", t:"Das Land hat ein höheres BIP pro Kopf als der Durchschnitt."},
-   {v:"C", t:"Das Land importiert mehr als es exportiert."},
-   {v:"D", t:"Das Land hat mehr Einwohner als Hektaren Fläche."}
+   {v: "A", t:"Das Land importiert mehr als es exportiert."},
+   {v: "B", t:"Das Land verbraucht mehr Ressourcen, als die Erde pro Person dauerhaft bereitstellen kann."},
+   {v: "C", t:"Das Land hat ein höheres BIP pro Kopf als der Durchschnitt."},
+   {v: "D", t:"Das Land hat mehr Einwohner als Hektaren Fläche."}
  ],
- correct:"A",
+ correct:"B",
  explain:"Die 1,8-Hektaren-Linie zeigt die global verfügbare Biokapazität pro Person. Liegt ein Land darüber, verbraucht es mehr, als die Erde langfristig regenerieren kann. Würden alle so leben, bräuchte es mehrere Planeten."}
 ];

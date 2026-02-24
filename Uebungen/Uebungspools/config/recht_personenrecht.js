@@ -36,12 +36,12 @@ window.QUESTIONS = [
     id: "r01", topic: "rechtssubjekte", type: "mc", diff: 1, tax: "K1",
     q: "Was versteht man unter einem Rechtssubjekt?",
     options: [
-      {v: "A", t: "Ein Gegenstand, über den gestritten wird."},
-      {v: "B", t: "Ein Träger von Rechten und Pflichten."},
-      {v: "C", t: "Ein Vertrag zwischen zwei Parteien."},
-      {v: "D", t: "Eine staatliche Behörde."}
+      {v: "A", t: "Ein Träger von Rechten und Pflichten."},
+      {v: "B", t: "Eine staatliche Behörde."},
+      {v: "C", t: "Ein Gegenstand, über den gestritten wird."},
+      {v: "D", t: "Ein Vertrag zwischen zwei Parteien."}
     ],
-    correct: "B",
+    correct: "A",
     explain: "Ein Rechtssubjekt ist ein Träger von Rechten und Pflichten. Es kann sich dabei um natürliche Personen (Menschen) oder juristische Personen (z.B. AG, GmbH, Verein) handeln. Rechtssubjekte können Verträge abschliessen, klagen und verklagt werden."
   },
   {
@@ -71,12 +71,12 @@ window.QUESTIONS = [
     id: "r05", topic: "rechtssubjekte", type: "mc", diff: 2, tax: "K2",
     q: "Welche der folgenden Beispiele sind Rechtssubjekte?",
     options: [
-      {v: "A", t: "Ein Grundstück und ein Auto."},
-      {v: "B", t: "Ein Mensch und eine Aktiengesellschaft."},
-      {v: "C", t: "Ein Bankkonto und ein Patent."},
-      {v: "D", t: "Ein Bargeldbestand und ein Goldbarren."}
+      {v: "A", t: "Ein Mensch und eine Aktiengesellschaft."},
+      {v: "B", t: "Ein Bargeldbestand und ein Goldbarren."},
+      {v: "C", t: "Ein Grundstück und ein Auto."},
+      {v: "D", t: "Ein Bankkonto und ein Patent."}
     ],
-    correct: "B",
+    correct: "A",
     explain: "Rechtssubjekte sind Träger von Rechten und Pflichten. Nur ein Mensch (natürliche Person) und eine Aktiengesellschaft (juristische Person) sind Rechtssubjekte. Grundstücke, Autos, Bankkonten, Patente, Bargeld und Goldbarren sind hingegen Rechtsobjekte — Gegenstände, über die Rechtssubjekte verfügen."
   },
   {
@@ -98,9 +98,9 @@ window.QUESTIONS = [
     context: "Die Tischlerei Müller GmbH bestellt bei einem Holzhändler Eichenbretter. Der Lehrling der GmbH, Tim (16), holt die Bretter persönlich ab.",
     q: "Wer ist in diesem Sachverhalt das Rechtssubjekt, das den Kaufvertrag abschliesst?",
     options: [
-      {v: "A", t: "Tim, weil er die Bretter abholt."},
+      {v: "A", t: "Der Holzhändler, weil er die Ware liefert."},
       {v: "B", t: "Die Tischlerei Müller GmbH, weil sie als juristische Person den Vertrag abschliesst."},
-      {v: "C", t: "Der Holzhändler, weil er die Ware liefert."},
+      {v: "C", t: "Tim, weil er die Bretter abholt."},
       {v: "D", t: "Beide: Die GmbH als Käuferin und der Holzhändler als Verkäufer."}
     ],
     correct: "D",
@@ -110,12 +110,12 @@ window.QUESTIONS = [
     id: "r08", topic: "rechtssubjekte", type: "mc", diff: 3, tax: "K4",
     q: "Warum ist die Unterscheidung zwischen Rechtssubjekten und Rechtsobjekten rechtlich bedeutsam?",
     options: [
-      {v: "A", t: "Weil nur Rechtsobjekte vor Gericht klagen können."},
-      {v: "B", t: "Weil nur Rechtssubjekte Träger von Rechten und Pflichten sein können und nur sie Verträge abschliessen, klagen und verklagt werden können."},
-      {v: "C", t: "Weil Rechtsobjekte einen höheren rechtlichen Schutz geniessen als Rechtssubjekte."},
+      {v: "A", t: "Weil nur Rechtssubjekte Träger von Rechten und Pflichten sein können und nur sie Verträge abschliessen, klagen und verklagt werden können."},
+      {v: "B", t: "Weil Rechtsobjekte einen höheren rechtlichen Schutz geniessen als Rechtssubjekte."},
+      {v: "C", t: "Weil nur Rechtsobjekte vor Gericht klagen können."},
       {v: "D", t: "Weil die Unterscheidung nur im Strafrecht relevant ist."}
     ],
-    correct: "B",
+    correct: "A",
     explain: "Die Unterscheidung ist fundamental: Nur Rechtssubjekte (natürliche und juristische Personen) können Träger von Rechten und Pflichten sein. Sie können Verträge abschliessen, klagen und verklagt werden. Rechtsobjekte hingegen sind Gegenstände des Rechtsverkehrs — über sie wird verfügt und gestritten, aber sie haben selbst keine Rechte."
   },
 
@@ -128,12 +128,12 @@ window.QUESTIONS = [
     id: "f01", topic: "rechtsfaehigkeit", type: "mc", diff: 1, tax: "K1",
     q: "Was bedeutet Rechtsfähigkeit?",
     options: [
-      {v: "A", t: "Die Fähigkeit, Verträge abzuschliessen."},
-      {v: "B", t: "Die Fähigkeit, Rechte und Pflichten zu haben."},
-      {v: "C", t: "Die Fähigkeit, vor Gericht aufzutreten."},
-      {v: "D", t: "Die Fähigkeit, vernünftig zu handeln."}
+      {v: "A", t: "Die Fähigkeit, vor Gericht aufzutreten."},
+      {v: "B", t: "Die Fähigkeit, vernünftig zu handeln."},
+      {v: "C", t: "Die Fähigkeit, Verträge abzuschliessen."},
+      {v: "D", t: "Die Fähigkeit, Rechte und Pflichten zu haben."}
     ],
-    correct: "B",
+    correct: "D",
     explain: "Die Rechtsfähigkeit ist die Fähigkeit, Rechte und Pflichten zu haben (Art. 11 ZGB). Sie ist zu unterscheiden von der Handlungsfähigkeit, welche die Fähigkeit betrifft, Rechte und Pflichten zu begründen (Art. 12 ZGB). Rechtsfähig sein heisst «haben», handlungsfähig sein heisst «begründen»."
   },
   {
@@ -162,24 +162,24 @@ window.QUESTIONS = [
     id: "f05", topic: "rechtsfaehigkeit", type: "mc", diff: 2, tax: "K2",
     q: "Wann beginnt die Rechtsfähigkeit einer juristischen Person?",
     options: [
-      {v: "A", t: "Mit der Gründungsversammlung."},
-      {v: "B", t: "Mit dem Eintrag ins Handelsregister."},
-      {v: "C", t: "Mit der Aufnahme der Geschäftstätigkeit."},
-      {v: "D", t: "Mit der Wahl des Verwaltungsrats."}
+      {v: "A", t: "Mit der Wahl des Verwaltungsrats."},
+      {v: "B", t: "Mit der Aufnahme der Geschäftstätigkeit."},
+      {v: "C", t: "Mit der Gründungsversammlung."},
+      {v: "D", t: "Mit dem Eintrag ins Handelsregister."}
     ],
-    correct: "B",
+    correct: "D",
     explain: "Die Rechtsfähigkeit (Rechtspersönlichkeit) einer juristischen Person beginnt mit dem Eintrag ins Handelsregister. Ab diesem Zeitpunkt kann die juristische Person Rechte und Pflichten haben. Die Rechtsfähigkeit endet mit der Löschung aus dem Handelsregister."
   },
   {
     id: "f06", topic: "rechtsfaehigkeit", type: "mc", diff: 2, tax: "K2",
     q: "Welche Rechte kann eine juristische Person gemäss Art. 53 ZGB NICHT haben?",
     options: [
-      {v: "A", t: "Das Recht auf Eigentum."},
-      {v: "B", t: "Rechte, die das Menschsein voraussetzen (z.B. das Recht auf Leben)."},
-      {v: "C", t: "Das Recht, Verträge abzuschliessen."},
-      {v: "D", t: "Das Recht, Mitarbeitende anzustellen."}
+      {v: "A", t: "Rechte, die das Menschsein voraussetzen (z.B. das Recht auf Leben)."},
+      {v: "B", t: "Das Recht, Verträge abzuschliessen."},
+      {v: "C", t: "Das Recht, Mitarbeitende anzustellen."},
+      {v: "D", t: "Das Recht auf Eigentum."}
     ],
-    correct: "B",
+    correct: "A",
     explain: "Gemäss Art. 53 ZGB können juristische Personen alle Rechte und Pflichten haben, die nicht das Menschsein zur notwendigen Voraussetzung haben. Rechte wie das Recht auf Leben, körperliche Unversehrtheit oder Ehe setzen das Menschsein voraus und stehen nur natürlichen Personen zu."
   },
   {
@@ -201,12 +201,12 @@ window.QUESTIONS = [
     context: "Die schwangere Maria erleidet im 8. Monat einen Autounfall. Ihr ungeborenes Kind erbt am selben Tag von seinem Grossvater eine Liegenschaft. Das Kind wird zwei Wochen später gesund geboren.",
     q: "Kann das Kind die Liegenschaft erben?",
     options: [
-      {v: "A", t: "Nein, da das Kind zum Zeitpunkt des Erbfalls noch nicht geboren war und somit nicht rechtsfähig war."},
-      {v: "B", t: "Ja, da das Kind lebend geboren wurde und die Rechtsfähigkeit gemäss Art. 31 Abs. 2 ZGB auf den Zeitpunkt der Empfängnis zurückwirkt."},
-      {v: "C", t: "Ja, aber erst ab dem Zeitpunkt der Geburt."},
-      {v: "D", t: "Nein, ein Kind muss mindestens 1 Jahr alt sein, um erben zu können."}
+      {v: "A", t: "Nein, ein Kind muss mindestens 1 Jahr alt sein, um erben zu können."},
+      {v: "B", t: "Ja, aber erst ab dem Zeitpunkt der Geburt."},
+      {v: "C", t: "Ja, da das Kind lebend geboren wurde und die Rechtsfähigkeit gemäss Art. 31 Abs. 2 ZGB auf den Zeitpunkt der Empfängnis zurückwirkt."},
+      {v: "D", t: "Nein, da das Kind zum Zeitpunkt des Erbfalls noch nicht geboren war und somit nicht rechtsfähig war."}
     ],
-    correct: "B",
+    correct: "C",
     explain: "Obersatz: Es ist zu prüfen, ob das ungeborene Kind zum Zeitpunkt des Erbfalls rechtsfähig war.\n\nVoraussetzungen: Gemäss Art. 31 Abs. 1 ZGB beginnt die Rechtspersönlichkeit mit der vollendeten Geburt. Art. 31 Abs. 2 ZGB bestimmt jedoch, dass das Kind vor der Geburt unter dem Vorbehalt rechtsfähig ist, dass es lebend geboren wird.\n\nSubsumtion: Das Kind war zum Zeitpunkt des Erbfalls noch ungeboren, wurde aber zwei Wochen später gesund (lebend) geboren. Damit wirkt die Rechtsfähigkeit auf den Zeitpunkt der Empfängnis zurück.\n\nSchlussfolgerung: Das Kind kann die Liegenschaft erben, da seine Rechtsfähigkeit auf den Zeitpunkt vor dem Erbfall zurückwirkt."
   },
   {
@@ -226,11 +226,11 @@ window.QUESTIONS = [
     q: "Was bedeutet Handlungsfähigkeit gemäss Art. 12 ZGB?",
     options: [
       {v: "A", t: "Die Fähigkeit, Rechte und Pflichten zu haben."},
-      {v: "B", t: "Die Fähigkeit, durch eigenes Handeln Rechte und Pflichten zu begründen."},
-      {v: "C", t: "Die Fähigkeit, vor Gericht aufzutreten."},
+      {v: "B", t: "Die Fähigkeit, vor Gericht aufzutreten."},
+      {v: "C", t: "Die Fähigkeit, durch eigenes Handeln Rechte und Pflichten zu begründen."},
       {v: "D", t: "Die Fähigkeit, einen Beruf auszuüben."}
     ],
-    correct: "B",
+    correct: "C",
     explain: "Die Handlungsfähigkeit gemäss Art. 12 ZGB ist die Fähigkeit, durch eigenes Handeln Rechte und Pflichten zu begründen. Das bedeutet z.B., dass man selbstständig Verträge abschliessen kann, die rechtlich bindend sind. Merkhilfe: Rechtsfähigkeit = «haben», Handlungsfähigkeit = «begründen»."
   },
   {
@@ -246,9 +246,9 @@ window.QUESTIONS = [
     id: "h03", topic: "handlungsfaehigkeit", type: "mc", diff: 1, tax: "K1",
     q: "Ab welchem Alter wird man in der Schweiz mündig?",
     options: [
-      {v: "A", t: "Ab 16 Jahren."},
+      {v: "A", t: "Ab 20 Jahren."},
       {v: "B", t: "Ab 18 Jahren."},
-      {v: "C", t: "Ab 20 Jahren."},
+      {v: "C", t: "Ab 16 Jahren."},
       {v: "D", t: "Ab 14 Jahren."}
     ],
     correct: "B",
@@ -267,12 +267,12 @@ window.QUESTIONS = [
     img: {src: "img/recht/personenrecht/personenrecht_handlungsfaehigkeit_01.svg", alt: "Prüfungsschema Handlungsfähigkeit mit Entscheidungspunkten"},
     q: "Welche der folgenden Personen sind handlungsfähig?",
     options: [
-      {v: "A", t: "Eine 17-jährige urteilsfähige Gymnasiastin."},
-      {v: "B", t: "Ein 25-jähriger urteilsfähiger Student."},
+      {v: "A", t: "Ein 25-jähriger urteilsfähiger Student."},
+      {v: "B", t: "Eine 17-jährige urteilsfähige Gymnasiastin."},
       {v: "C", t: "Ein 5-jähriges Kind."},
       {v: "D", t: "Eine 45-jährige bewusstlose Patientin."}
     ],
-    correct: "B",
+    correct: "A",
     explain: "Handlungsfähig ist nur, wer beide Voraussetzungen von Art. 13 ZGB erfüllt: Mündigkeit (Art. 14 ZGB: 18 Jahre) UND Urteilsfähigkeit (Art. 16 ZGB: vernunftgemässes Handeln). Nur der 25-jährige urteilsfähige Student erfüllt beides. Die 17-Jährige ist noch nicht mündig, das 5-jährige Kind ist weder mündig noch urteilsfähig, und die bewusstlose Patientin ist vorübergehend urteilsunfähig."
   },
   {
@@ -291,12 +291,12 @@ window.QUESTIONS = [
     id: "h07", topic: "handlungsfaehigkeit", type: "mc", diff: 2, tax: "K2",
     q: "Was ist die Rechtsfolge, wenn eine urteilsunfähige Person einen Vertrag abschliesst?",
     options: [
-      {v: "A", t: "Der Vertrag ist gültig, aber anfechtbar."},
-      {v: "B", t: "Der Vertrag ist von Anfang an nichtig (ungültig) gemäss Art. 18 ZGB."},
-      {v: "C", t: "Der Vertrag ist gültig, wenn die andere Partei gutgläubig war."},
-      {v: "D", t: "Der Vertrag wird erst ungültig, wenn die Person ihre Urteilsunfähigkeit beweist."}
+      {v: "A", t: "Der Vertrag ist gültig, wenn die andere Partei gutgläubig war."},
+      {v: "B", t: "Der Vertrag wird erst ungültig, wenn die Person ihre Urteilsunfähigkeit beweist."},
+      {v: "C", t: "Der Vertrag ist von Anfang an nichtig (ungültig) gemäss Art. 18 ZGB."},
+      {v: "D", t: "Der Vertrag ist gültig, aber anfechtbar."}
     ],
-    correct: "B",
+    correct: "C",
     explain: "Wer urteilsunfähig ist, ist handlungsunfähig gemäss Art. 17 und 18 ZGB. Handlungsunfähige Personen können durch ihre Handlungen keine rechtliche Wirkung erzeugen. Ein von einer urteilsunfähigen Person abgeschlossener Vertrag ist daher nichtig — er ist von Anfang an ungültig und muss nicht angefochten werden."
   },
   {
@@ -312,12 +312,12 @@ window.QUESTIONS = [
     context: "Hans (30, gesund) kauft sich zu seinem Geburtstag eine Harley-Davidson.",
     q: "Kann Hans das Motorrad alleine kaufen?",
     options: [
-      {v: "A", t: "Nein, für so teure Anschaffungen braucht man eine Bewilligung."},
-      {v: "B", t: "Ja, Hans ist handlungsfähig und kann eigenständig Verträge abschliessen."},
-      {v: "C", t: "Nur mit Zustimmung seiner Ehefrau."},
-      {v: "D", t: "Ja, aber nur schriftlich."}
+      {v: "A", t: "Ja, aber nur schriftlich."},
+      {v: "B", t: "Nur mit Zustimmung seiner Ehefrau."},
+      {v: "C", t: "Ja, Hans ist handlungsfähig und kann eigenständig Verträge abschliessen."},
+      {v: "D", t: "Nein, für so teure Anschaffungen braucht man eine Bewilligung."}
     ],
-    correct: "B",
+    correct: "C",
     explain: "Obersatz: Es ist zu prüfen, ob Hans handlungsfähig ist.\n\nVoraussetzungen: Handlungsfähigkeit setzt Mündigkeit (Art. 14 ZGB) und Urteilsfähigkeit (Art. 16 ZGB) voraus (Art. 13 ZGB).\n\nSubsumtion: Hans ist 30 Jahre alt und damit mündig (Art. 14 ZGB). Er ist gesund und somit urteilsfähig (Art. 16 ZGB).\n\nSchlussfolgerung: Hans ist handlungsfähig (Art. 12 ZGB) und kann das Motorrad eigenständig kaufen."
   },
   {
@@ -325,12 +325,12 @@ window.QUESTIONS = [
     context: "Hans (30) geht nach der Arbeit mit Kollegen in die Wirtschaft. Nach mehreren Bieren kauft er betrunken einem Kollegen dessen Auto ab. Beide halten den Kauf schriftlich fest. Am nächsten Tag will Hans nichts mehr davon wissen.",
     q: "Muss Hans das Auto bezahlen?",
     options: [
-      {v: "A", t: "Ja, ein schriftlicher Vertrag ist immer bindend."},
-      {v: "B", t: "Nein, wenn Hans aufgrund des Alkohols tatsächlich urteilsunfähig war, ist der Vertrag nichtig (Art. 18 ZGB)."},
-      {v: "C", t: "Ja, denn Alkoholkonsum ist kein Grund für Urteilsunfähigkeit."},
+      {v: "A", t: "Nein, wenn Hans aufgrund des Alkohols tatsächlich urteilsunfähig war, ist der Vertrag nichtig (Art. 18 ZGB)."},
+      {v: "B", t: "Ja, denn Alkoholkonsum ist kein Grund für Urteilsunfähigkeit."},
+      {v: "C", t: "Ja, ein schriftlicher Vertrag ist immer bindend."},
       {v: "D", t: "Nein, denn Verträge in einer Wirtschaft sind nie gültig."}
     ],
-    correct: "B",
+    correct: "A",
     explain: "Obersatz: Es ist zu prüfen, ob Hans zum Zeitpunkt des Vertragsabschlusses handlungsfähig war.\n\nVoraussetzungen: Handlungsfähigkeit setzt Urteilsfähigkeit voraus (Art. 13 ZGB). Urteilsunfähig ist, wer aufgrund von Rausch nicht vernunftgemäss handeln kann (Art. 16 ZGB). Handlungsunfähige können keine wirksamen Rechtsgeschäfte abschliessen (Art. 18 ZGB).\n\nSubsumtion: Hans hat «einen über den Durst getrunken». Wenn er aufgrund des Alkoholkonsums tatsächlich urteilsunfähig war, war er handlungsunfähig. Die Schriftform ändert daran nichts.\n\nSchlussfolgerung: War Hans urteilsunfähig, ist der Vertrag nichtig (Art. 18 ZGB). Hans muss das Auto dann nicht bezahlen. Er müsste allerdings seine Urteilsunfähigkeit beweisen."
   },
   {
@@ -338,22 +338,22 @@ window.QUESTIONS = [
     context: "Hans (30) stürzt auf dem betrunkenen Heimweg in den Garten der Nachbarin Erika und zerdrückt ihre seltenen Blumen.",
     q: "Muss Hans für den Schaden aufkommen, obwohl er urteilsunfähig war?",
     options: [
-      {v: "A", t: "Nein, urteilsunfähige Personen haften nie."},
-      {v: "B", t: "Ja, gemäss Art. 54 OR haftet, wer vorübergehend die Urteilsfähigkeit verliert und Schaden anrichtet — es sei denn, der Zustand trat ohne eigenes Verschulden ein."},
-      {v: "C", t: "Nein, es handelt sich um einen Unfall."},
-      {v: "D", t: "Ja, aber nur wenn Erika den Schaden beweisen kann."}
+      {v: "A", t: "Ja, aber nur wenn Erika den Schaden beweisen kann."},
+      {v: "B", t: "Nein, es handelt sich um einen Unfall."},
+      {v: "C", t: "Ja, gemäss Art. 54 OR haftet, wer vorübergehend die Urteilsfähigkeit verliert und Schaden anrichtet — es sei denn, der Zustand trat ohne eigenes Verschulden ein."},
+      {v: "D", t: "Nein, urteilsunfähige Personen haften nie."}
     ],
-    correct: "B",
+    correct: "C",
     explain: "Obersatz: Es ist zu prüfen, ob Hans trotz vorübergehender Urteilsunfähigkeit schadenersatzpflichtig ist.\n\nVoraussetzungen: Art. 54 OR regelt die Haftung bei vorübergehender Urteilsunfähigkeit. Wer in einem solchen Zustand Schaden anrichtet, ist ersatzpflichtig, sofern er nicht nachweist, dass der Zustand ohne sein Verschulden eingetreten ist.\n\nSubsumtion: Hans hat sich freiwillig betrunken. Der Zustand der Urteilsunfähigkeit ist somit durch sein eigenes Verschulden eingetreten.\n\nSchlussfolgerung: Hans muss den Schaden ersetzen (Art. 54 OR), weil er den Rauschzustand selbst verschuldet hat."
   },
   {
     id: "h12", topic: "handlungsfaehigkeit", type: "mc", diff: 2, tax: "K2",
     q: "Wann erlangt eine juristische Person die Handlungsfähigkeit?",
     options: [
-      {v: "A", t: "Sobald sie gegründet wird."},
+      {v: "A", t: "Wenn sie ins Handelsregister eingetragen wird."},
       {v: "B", t: "Wenn die notwendigen Organe bestellt sind (Art. 54 ZGB)."},
       {v: "C", t: "Wenn sie ihren ersten Vertrag abschliesst."},
-      {v: "D", t: "Wenn sie ins Handelsregister eingetragen wird."}
+      {v: "D", t: "Sobald sie gegründet wird."}
     ],
     correct: "B",
     explain: "Gemäss Art. 54 ZGB erlangt eine juristische Person die Handlungsfähigkeit, wenn die nach Gesetz und Statuten hierfür notwendigen Organe bestellt sind. Die Organe (z.B. Verwaltungsrat bei einer AG) handeln für die juristische Person. Fehlen die notwendigen Organe, ist die juristische Person handlungsunfähig."
@@ -368,12 +368,12 @@ window.QUESTIONS = [
     id: "b01", topic: "beschraenkte_hu", type: "mc", diff: 1, tax: "K1",
     q: "Wer gilt als beschränkt handlungsunfähig?",
     options: [
-      {v: "A", t: "Alle Personen unter 18 Jahren."},
-      {v: "B", t: "Urteilsfähige, aber unmündige Personen (Art. 19 ZGB)."},
-      {v: "C", t: "Alle Personen über 65 Jahre."},
+      {v: "A", t: "Alle Personen über 65 Jahre."},
+      {v: "B", t: "Alle Personen unter 18 Jahren."},
+      {v: "C", t: "Urteilsfähige, aber unmündige Personen (Art. 19 ZGB)."},
       {v: "D", t: "Urteilsunfähige mündige Personen."}
     ],
-    correct: "B",
+    correct: "C",
     explain: "Beschränkt handlungsunfähig sind Personen, die zwar urteilsfähig (Art. 16 ZGB), aber noch nicht mündig (unter 18 Jahren, Art. 14 ZGB) sind. Sie befinden sich zwischen Handlungsfähigkeit und Handlungsunfähigkeit. Typisches Beispiel: ein 16-jähriger Jugendlicher."
   },
   {
@@ -410,10 +410,10 @@ window.QUESTIONS = [
     context: "Die 15-jährige Vreni bekommt von ihrer Gotte Marianne ein Pferd geschenkt.",
     q: "Darf Vreni das Pferd ohne Zustimmung ihres Vaters annehmen?",
     options: [
-      {v: "A", t: "Nein, ein Pferd ist zu teuer für eine Minderjährige."},
-      {v: "B", t: "Ja, denn es handelt sich um einen unentgeltlichen Vorteil (Art. 19 Abs. 2 ZGB), der keine laufenden Kosten verursacht."},
+      {v: "A", t: "Ja, denn es handelt sich um einen unentgeltlichen Vorteil (Art. 19 Abs. 2 ZGB), der keine laufenden Kosten verursacht."},
+      {v: "B", t: "Ja, Geschenke können immer ohne Zustimmung angenommen werden."},
       {v: "C", t: "Nein, denn das Pferd verursacht Unterhaltskosten und ist daher kein rein unentgeltlicher Vorteil. Die Zustimmung des Vaters ist nötig."},
-      {v: "D", t: "Ja, Geschenke können immer ohne Zustimmung angenommen werden."}
+      {v: "D", t: "Nein, ein Pferd ist zu teuer für eine Minderjährige."}
     ],
     correct: "C",
     explain: "Obersatz: Es ist zu prüfen, ob Vreni das Pferd ohne Zustimmung ihres gesetzlichen Vertreters annehmen kann.\n\nVoraussetzungen: Vreni ist 15 und damit unmündig (Art. 14 ZGB). Als urteilsfähige Unmündige ist sie beschränkt handlungsunfähig (Art. 19 ZGB). Sie braucht grundsätzlich die Zustimmung ihres gesetzlichen Vertreters (Art. 19 Abs. 1 ZGB). Ausnahme: rein unentgeltliche Vorteile (Art. 19 Abs. 2 ZGB), also Vorteile, die keine Kosten verursachen.\n\nSubsumtion: Ein Pferd verursacht erhebliche laufende Kosten (Futter, Tierarzt, Stallmiete). Es handelt sich daher nicht um einen rein unentgeltlichen Vorteil.\n\nSchlussfolgerung: Vreni braucht die Zustimmung ihres Vaters, um das Pferd anzunehmen."
@@ -423,10 +423,10 @@ window.QUESTIONS = [
     context: "Hansli (16, urteilsfähig) möchte mit seinem Taschengeld die neue CD von Justin Bieber für CHF 20 kaufen.",
     q: "Darf Hansli die CD alleine kaufen?",
     options: [
-      {v: "A", t: "Nein, er braucht für jeden Kauf die Zustimmung seiner Eltern."},
+      {v: "A", t: "Nein, Minderjährige dürfen kein Geld ausgeben."},
       {v: "B", t: "Ja, denn der Kauf einer CD für CHF 20 ist eine geringfügige Angelegenheit des täglichen Lebens (Art. 19 Abs. 2 ZGB)."},
       {v: "C", t: "Ja, aber nur wenn er das Geld selbst verdient hat."},
-      {v: "D", t: "Nein, Minderjährige dürfen kein Geld ausgeben."}
+      {v: "D", t: "Nein, er braucht für jeden Kauf die Zustimmung seiner Eltern."}
     ],
     correct: "B",
     explain: "Obersatz: Es ist zu prüfen, ob Hansli den Kauf ohne elterliche Zustimmung tätigen kann.\n\nVoraussetzungen: Hansli ist 16 und urteilsfähig, aber unmündig — er ist beschränkt handlungsunfähig (Art. 19 ZGB). Grundsätzlich braucht er die Zustimmung seiner Eltern (Art. 19 Abs. 1 ZGB). Ausnahme: geringfügige Angelegenheiten des täglichen Lebens (Art. 19 Abs. 2 ZGB).\n\nSubsumtion: Der Kauf einer CD für CHF 20 mit Taschengeld ist eine geringfügige Angelegenheit des täglichen Lebens.\n\nSchlussfolgerung: Hansli darf die CD alleine kaufen."
@@ -435,12 +435,12 @@ window.QUESTIONS = [
     id: "b07", topic: "beschraenkte_hu", type: "mc", diff: 2, tax: "K2",
     q: "Was bedeutet es, wenn die Zustimmung «stillschweigend» erteilt wird?",
     options: [
-      {v: "A", t: "Der gesetzliche Vertreter muss schriftlich unterschreiben."},
-      {v: "B", t: "Der gesetzliche Vertreter sagt nichts, obwohl er von der Handlung weiss — sein Schweigen gilt als Zustimmung."},
-      {v: "C", t: "Die Zustimmung wird automatisch nach 30 Tagen erteilt."},
-      {v: "D", t: "Die Zustimmung muss vor einem Notar erfolgen."}
+      {v: "A", t: "Die Zustimmung muss vor einem Notar erfolgen."},
+      {v: "B", t: "Die Zustimmung wird automatisch nach 30 Tagen erteilt."},
+      {v: "C", t: "Der gesetzliche Vertreter muss schriftlich unterschreiben."},
+      {v: "D", t: "Der gesetzliche Vertreter sagt nichts, obwohl er von der Handlung weiss — sein Schweigen gilt als Zustimmung."}
     ],
-    correct: "B",
+    correct: "D",
     explain: "Die Zustimmung des gesetzlichen Vertreters kann ausdrücklich (z.B. «Ja, du darfst das kaufen») oder stillschweigend erfolgen. Stillschweigende Zustimmung liegt vor, wenn der gesetzliche Vertreter von der Handlung weiss und nicht widerspricht. Beispiel: Die Mutter sieht, wie ihr 16-jähriger Sohn ein Töffli kauft, und sagt nichts dagegen."
   },
 
@@ -450,12 +450,12 @@ window.QUESTIONS = [
     context: "Hansli (16) erhält von seinem Vater Hans ein Couvert mit Bargeld zum Geburtstag, zweckgebunden für den Kauf eines Töfflis. Am nächsten Morgen kauft Hansli das Töffli.",
     q: "Kann Hansli das Töffli alleine kaufen?",
     options: [
-      {v: "A", t: "Nein, ein Töffli ist zu teuer für eine geringfügige Angelegenheit."},
-      {v: "B", t: "Ja, denn Hans hat mit dem zweckgebundenen Geld stillschweigend seine Zustimmung zum Kauf erteilt (Art. 19 Abs. 1 ZGB)."},
+      {v: "A", t: "Nein, Hansli müsste mindestens 18 Jahre alt sein."},
+      {v: "B", t: "Nein, ein Töffli ist zu teuer für eine geringfügige Angelegenheit."},
       {v: "C", t: "Ja, denn Hansli kann frei über geschenktes Geld verfügen."},
-      {v: "D", t: "Nein, Hansli müsste mindestens 18 Jahre alt sein."}
+      {v: "D", t: "Ja, denn Hans hat mit dem zweckgebundenen Geld stillschweigend seine Zustimmung zum Kauf erteilt (Art. 19 Abs. 1 ZGB)."}
     ],
-    correct: "B",
+    correct: "D",
     explain: "Obersatz: Es ist zu prüfen, ob Hansli den Kauf alleine tätigen kann.\n\nVoraussetzungen: Hansli ist 16, urteilsfähig und unmündig, also beschränkt handlungsunfähig (Art. 19 ZGB). Er braucht grundsätzlich die Zustimmung seines gesetzlichen Vertreters (Art. 19 Abs. 1 ZGB).\n\nSubsumtion: Sein Vater Hans hat ihm das Geld zweckgebunden für den Kauf eines Töfflis geschenkt. Indem Hans das Geld speziell für diesen Kauf übergibt, erteilt er im Voraus seine Zustimmung zum Kauf des Töfflis.\n\nSchlussfolgerung: Hansli kann das Töffli alleine kaufen, weil die elterliche Zustimmung durch das zweckgebundene Geldgeschenk im Voraus erteilt wurde."
   },
   {
@@ -463,10 +463,10 @@ window.QUESTIONS = [
     context: "Hansli (16) hat das Töffli mit dem Geld seines Vaters gekauft (der Vater stimmte zu). Nun will Hansli das Töffli aber nicht mehr und möchte es gegen eine Sammlung Konsolenspiele seines Freundes Fritzli tauschen. Sein Vater ist damit nicht einverstanden.",
     q: "Darf Hansli das Töffli gegen die Spielesammlung tauschen?",
     options: [
-      {v: "A", t: "Ja, denn das Töffli gehört Hansli, und er kann frei darüber verfügen."},
+      {v: "A", t: "Nein, weil Hansli das Töffli nicht tauschen, sondern nur verkaufen darf."},
       {v: "B", t: "Nein, denn die Zustimmung des Vaters galt nur für den Kauf des Töfflis. Für den Tausch bräuchte Hansli eine neue Zustimmung (Art. 19 Abs. 1 ZGB)."},
       {v: "C", t: "Ja, denn ein Tausch ist eine geringfügige Angelegenheit."},
-      {v: "D", t: "Nein, weil Hansli das Töffli nicht tauschen, sondern nur verkaufen darf."}
+      {v: "D", t: "Ja, denn das Töffli gehört Hansli, und er kann frei darüber verfügen."}
     ],
     correct: "B",
     explain: "Obersatz: Es ist zu prüfen, ob Hansli ohne erneute Zustimmung des Vaters das Töffli tauschen kann.\n\nVoraussetzungen: Hansli ist beschränkt handlungsunfähig (Art. 19 ZGB). Jedes Rechtsgeschäft, das nicht unter eine Ausnahme fällt, braucht die Zustimmung des gesetzlichen Vertreters.\n\nSubsumtion: Die Zustimmung des Vaters bezog sich auf den Kauf eines Töfflis mit dem zweckgebundenen Geld. Der Tausch des Töfflis gegen Konsolenspiele ist ein neues Rechtsgeschäft. Es ist weder geringfügig noch ein unentgeltlicher Vorteil. Der Vater ist ausdrücklich nicht einverstanden.\n\nSchlussfolgerung: Hansli darf den Tausch nicht vornehmen. Ohne die Zustimmung seines Vaters wäre das Tauschgeschäft schwebend unwirksam."
@@ -476,9 +476,9 @@ window.QUESTIONS = [
     context: "Hansli (16) fährt mit seinem Töffli zu nah am Mercedes des Nachbarn vorbei und verursacht eine grosse Schramme.",
     q: "Muss Hansli den Schaden ersetzen?",
     options: [
-      {v: "A", t: "Nein, Minderjährige haften nie für Schäden."},
+      {v: "A", t: "Nur seine Eltern müssen haften, nicht Hansli selbst."},
       {v: "B", t: "Ja, denn beschränkt Handlungsunfähige werden durch unerlaubte Handlungen schadenersatzpflichtig (Art. 19 Abs. 3 ZGB)."},
-      {v: "C", t: "Nur seine Eltern müssen haften, nicht Hansli selbst."},
+      {v: "C", t: "Nein, Minderjährige haften nie für Schäden."},
       {v: "D", t: "Nur wenn der Nachbar Anzeige erstattet."}
     ],
     correct: "B",
@@ -488,12 +488,12 @@ window.QUESTIONS = [
     id: "b11", topic: "beschraenkte_hu", type: "mc", diff: 2, tax: "K2",
     q: "Was bedeutet «Lohn eigene Arbeit / Vermögen» als Ausnahme gemäss Art. 323 Abs. 1 ZGB?",
     options: [
-      {v: "A", t: "Unmündige dürfen selbstständig über den Lohn verfügen, den sie durch eigene Arbeit verdient haben."},
-      {v: "B", t: "Unmündige dürfen unbegrenzt Geld ausgeben."},
-      {v: "C", t: "Unmündige dürfen nur sparen, nicht ausgeben."},
-      {v: "D", t: "Nur volljährige Personen dürfen über ihren Lohn verfügen."}
+      {v: "A", t: "Unmündige dürfen nur sparen, nicht ausgeben."},
+      {v: "B", t: "Unmündige dürfen selbstständig über den Lohn verfügen, den sie durch eigene Arbeit verdient haben."},
+      {v: "C", t: "Nur volljährige Personen dürfen über ihren Lohn verfügen."},
+      {v: "D", t: "Unmündige dürfen unbegrenzt Geld ausgeben."}
     ],
-    correct: "A",
+    correct: "B",
     explain: "Gemäss Art. 323 Abs. 1 ZGB darf ein Unmündiger über den Ertrag seiner Arbeit (z.B. Lohn aus einem Ferienjob) frei verfügen. Dies ist eine Ausnahme zur Zustimmungspflicht nach Art. 19 Abs. 1 ZGB. Der Unmündige kann mit seinem selbst verdienten Geld eigenständig Käufe tätigen."
   },
   {
@@ -512,12 +512,12 @@ window.QUESTIONS = [
     id: "p01", topic: "persoenlichkeit", type: "mc", diff: 1, tax: "K1",
     q: "Welcher Gesetzesartikel schützt die Persönlichkeit?",
     options: [
-      {v: "A", t: "Art. 11 ZGB"},
-      {v: "B", t: "Art. 28 ZGB"},
-      {v: "C", t: "Art. 14 ZGB"},
-      {v: "D", t: "Art. 19 ZGB"}
+      {v: "A", t: "Art. 28 ZGB"},
+      {v: "B", t: "Art. 19 ZGB"},
+      {v: "C", t: "Art. 11 ZGB"},
+      {v: "D", t: "Art. 14 ZGB"}
     ],
-    correct: "B",
+    correct: "A",
     explain: "Art. 28 ZGB regelt den Schutz der Persönlichkeit. Er bestimmt den Grundsatz, dass jede Verletzung der Persönlichkeit widerrechtlich ist, sofern kein Rechtfertigungsgrund vorliegt. Art. 11 ZGB regelt die Rechtsfähigkeit, Art. 14 ZGB die Mündigkeit und Art. 19 ZGB die beschränkte Handlungsunfähigkeit."
   },
   {
@@ -557,8 +557,8 @@ window.QUESTIONS = [
     options: [
       {v: "A", t: "Jemand geht auf der Strasse spazieren."},
       {v: "B", t: "Eine Familie isst gemeinsam zu Hause zu Abend."},
-      {v: "C", t: "Jemand duscht im Badezimmer."},
-      {v: "D", t: "Jemand hält eine öffentliche Rede."}
+      {v: "C", t: "Jemand hält eine öffentliche Rede."},
+      {v: "D", t: "Jemand duscht im Badezimmer."}
     ],
     correct: "B",
     explain: "Die drei Sphären: Gemeinsphäre betrifft das öffentliche Auftreten (Strasse, öffentliche Rede). Privatsphäre umfasst den engeren persönlichen Bereich (Familie zu Hause, Freundeskreis). Intimsphäre betrifft den innersten Bereich (Duschen, Sexualität). Das Familien-Abendessen zu Hause gehört zur Privatsphäre."
@@ -588,10 +588,10 @@ window.QUESTIONS = [
     context: "Lisa postet auf Instagram ein Foto von ihrer Mitschülerin Sarah im Bikini, das sie heimlich am Strand aufgenommen hat. Sarah hat dem Foto nicht zugestimmt.",
     q: "Liegt eine widerrechtliche Persönlichkeitsverletzung vor?",
     options: [
-      {v: "A", t: "Nein, Sarah war am öffentlichen Strand — das fällt in die Gemeinsphäre."},
+      {v: "A", t: "Ja, aber nur wenn Sarah unter 18 ist."},
       {v: "B", t: "Ja, das heimliche Fotografieren und Veröffentlichen eines Bikinifotos verletzt die Privat- oder Intimsphäre von Sarah, und es liegt kein Rechtfertigungsgrund vor."},
       {v: "C", t: "Nein, auf Instagram gelten keine Persönlichkeitsrechte."},
-      {v: "D", t: "Ja, aber nur wenn Sarah unter 18 ist."}
+      {v: "D", t: "Nein, Sarah war am öffentlichen Strand — das fällt in die Gemeinsphäre."}
     ],
     correct: "B",
     explain: "Obersatz: Es ist zu prüfen, ob eine widerrechtliche Persönlichkeitsverletzung gemäss Art. 28 ZGB vorliegt.\n\nVoraussetzungen: Jede Verletzung der Persönlichkeit ist widerrechtlich (Art. 28 ZGB), es sei denn, ein Rechtfertigungsgrund liegt vor (Einwilligung, überwiegendes Interesse, Gesetz).\n\nSubsumtion: Das heimliche Fotografieren einer Person im Bikini berührt die Privat- bis Intimsphäre. Die Veröffentlichung auf Instagram ohne Zustimmung verstärkt die Verletzung. Sarah hat nicht eingewilligt, es besteht kein überwiegendes öffentliches Interesse, und kein Gesetz erlaubt dies.\n\nSchlussfolgerung: Es liegt eine widerrechtliche Persönlichkeitsverletzung vor. Sarah könnte Beseitigung (Löschung des Fotos), Schadenersatz und Genugtuung verlangen."
@@ -619,12 +619,12 @@ window.QUESTIONS = [
     id: "p11", topic: "persoenlichkeit", type: "mc", diff: 1, tax: "K2",
     q: "Welche Sphäre geniesst den stärksten Schutz?",
     options: [
-      {v: "A", t: "Die Gemeinsphäre"},
-      {v: "B", t: "Die Privatsphäre"},
-      {v: "C", t: "Die Intimsphäre"},
-      {v: "D", t: "Alle Sphären sind gleich geschützt."}
+      {v: "A", t: "Die Privatsphäre"},
+      {v: "B", t: "Die Intimsphäre"},
+      {v: "C", t: "Alle Sphären sind gleich geschützt."},
+      {v: "D", t: "Die Gemeinsphäre"}
     ],
-    correct: "C",
+    correct: "B",
     explain: "Die drei Sphären bilden ein Zwiebelmodell: Die Gemeinsphäre (aussen) betrifft das öffentliche Auftreten und ist am wenigsten geschützt. Die Privatsphäre (Mitte) umfasst den persönlichen Lebensbereich. Die Intimsphäre (innen) betrifft den innersten Bereich und geniesst den stärksten Schutz. Je tiefer die Verletzung in den Kern eindringt, desto schwerer wiegt sie."
   }
 ];

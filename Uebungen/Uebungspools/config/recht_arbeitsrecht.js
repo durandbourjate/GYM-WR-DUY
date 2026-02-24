@@ -44,9 +44,9 @@ window.QUESTIONS = [
     q: "In wie viele Bereiche wird das Arbeitsrecht typischerweise eingeteilt?",
     options: [
       {v: "zwei", t: "Privaterecht und Öffentliches Recht"},
-      {v: "drei", t: "Öffentliches, Kollektives und Individualarbeitsrecht"},
       {v: "vier", t: "Arbeitsvertrag, Lohn, Kündigung und Schutzvorschriften"},
-      {v: "fünf", t: "Bundesebene, Kantonal- und Gemeindebene plus Privatrecht"}
+      {v: "fünf", t: "Bundesebene, Kantonal- und Gemeindebene plus Privatrecht"},
+      {v: "drei", t: "Öffentliches, Kollektives und Individualarbeitsrecht"}
     ],
     correct: "drei",
     explain: "Das Arbeitsrecht wird klassischerweise in drei Bereiche eingeteilt: (1) Öffentliches Arbeitsrecht (Staat schützt und kontrolliert), (2) Kollektives Arbeitsrecht (Gewerkschaften und Arbeitgeberverbände), (3) Individualarbeitsrecht (direktes Verhältnis zwischen AN und AG)."
@@ -71,12 +71,12 @@ window.QUESTIONS = [
     tax: "K2",
     q: "Welche Aussage zur Abänderung zwingender Arbeitsrechtsvorschriften ist korrekt?",
     options: [
-      {v: "A", t: "Abänderungen sind unabhängig von der Richtung nicht erlaubt"},
-      {v: "B", t: "Abänderungen sind zu Gunsten des Arbeitnehmers zulässig"},
+      {v: "A", t: "Abänderungen sind zu Gunsten des Arbeitnehmers zulässig"},
+      {v: "B", t: "Abänderungen sind nur schriftlich gültig"},
       {v: "C", t: "Abänderungen sind nur mit Zustimmung der Arbeitgeberverbände erlaubt"},
-      {v: "D", t: "Abänderungen sind nur schriftlich gültig"}
+      {v: "D", t: "Abänderungen sind unabhängig von der Richtung nicht erlaubt"}
     ],
-    correct: "B",
+    correct: "A",
     explain: "Nach dem Prinzip der relativen Zwingendheit können zwingende Arbeitsrechtsvorschriften nur zu Gunsten des Arbeitnehmers abgeändert werden. Eine Verschlechterung der AN-Position durch Vertrag ist nicht zulässig."
   },
   {
@@ -87,12 +87,12 @@ window.QUESTIONS = [
     tax: "K2",
     q: "Ein Arbeitgeber und sein neuer Arbeitnehmer besprechen die Arbeitsbedingungen mündlich über Kaffee und einigen sich auf alle wesentlichen Punkte. Hat sich ein Arbeitsvertrag gebildet?",
     options: [
-      {v: "A", t: "Nein, weil Arbeitsverträge immer schriftlich sein müssen"},
-      {v: "B", t: "Ja, auch mündliche Vereinbarungen können Arbeitsverträge bilden"},
-      {v: "C", t: "Nur wenn schriftliche Bestätigung innerhalb von 7 Tagen erfolgt"},
-      {v: "D", t: "Nein, weil die Informationspflicht gemäss OR 330b nicht erfüllt ist"}
+      {v: "A", t: "Ja, auch mündliche Vereinbarungen können Arbeitsverträge bilden"},
+      {v: "B", t: "Nur wenn schriftliche Bestätigung innerhalb von 7 Tagen erfolgt"},
+      {v: "C", t: "Nein, weil die Informationspflicht gemäss OR 330b nicht erfüllt ist"},
+      {v: "D", t: "Nein, weil Arbeitsverträge immer schriftlich sein müssen"}
     ],
-    correct: "B",
+    correct: "A",
     explain: "Arbeitsverträge entstehen durch übereinstimmende Willenserklärung (OR 1 Abs. 1) und können auch konkludent gebildet werden (OR 320 Abs. 2). Formfreiheit ist die Regel. Allerdings muss der AG die Bedingungen nach OR 330b schriftlich mitteilen."
   },
   {
@@ -126,12 +126,12 @@ window.QUESTIONS = [
     tax: "K3",
     q: "Welche Aussage zur Funktion des kollektiven Arbeitsrechts ist richtig?",
     options: [
-      {v: "A", t: "Es regelt das Verhältnis zwischen einzelnem Arbeitnehmer und Arbeitgeber"},
-      {v: "B", t: "Es koordiniert zwischen Arbeitnehmerverbaenden/Gewerkschaften und Arbeitgebern/Verband"},
-      {v: "C", t: "Es wird ausschliesslich von Kantonen erlassen"},
-      {v: "D", t: "Es ist bindend für alle Branchen in der Schweiz"}
+      {v: "A", t: "Es ist bindend für alle Branchen in der Schweiz"},
+      {v: "B", t: "Es wird ausschliesslich von Kantonen erlassen"},
+      {v: "C", t: "Es regelt das Verhältnis zwischen einzelnem Arbeitnehmer und Arbeitgeber"},
+      {v: "D", t: "Es koordiniert zwischen Arbeitnehmerverbaenden/Gewerkschaften und Arbeitgebern/Verband"}
     ],
-    correct: "B",
+    correct: "D",
     explain: "Das kollektive Arbeitsrecht regelt das Verhältnis zwischen Gruppen (Gewerkschaften/AN-Verbände und AG-Verbände) und schafft kollektive Vereinbarungen wie GAV und NAV. Es ist nicht individualrechtlich."
   },
   {
@@ -159,11 +159,11 @@ window.QUESTIONS = [
     q: "Ein Arbeitnehmer möchte wissen, ob eine Vereinbarung, die seinen Urlaubsanspruch unter das gesetzliche Minimum senkt, gültig ist. Auf welches Prinzip des Arbeitsrechts ist hinzuweisen?",
     options: [
       {v: "A", t: "Absolute Zwingendheit – die Vereinbarung ist ungültig"},
-      {v: "B", t: "Relative Zwingendheit – die Vereinbarung ist nur zu Gunsten des AN gültig"},
+      {v: "B", t: "Öffentliche Ordnung – die Vereinbarung bedarf behördlicher Genehmigung"},
       {v: "C", t: "Vertragsfreiheit – die Vereinbarung ist gültig, wenn beide zustimmen"},
-      {v: "D", t: "Öffentliche Ordnung – die Vereinbarung bedarf behördlicher Genehmigung"}
+      {v: "D", t: "Relative Zwingendheit – die Vereinbarung ist nur zu Gunsten des AN gültig"}
     ],
-    correct: "B",
+    correct: "D",
     explain: "Das Arbeitsrecht folgt dem Prinzip der relativen Zwingendheit: Abweichungen von gesetzlichen Minimalstandards sind ungültig, wenn sie zu Lasten des Arbeitnehmers gehen. Eine Reduktion des Urlaubs unter das Mindestmass ist daher nichtig und der gesetzliche Standard bleibt gültig."
   },
   {
@@ -184,10 +184,10 @@ window.QUESTIONS = [
     tax: "K5",
     q: "Beurteilen Sie diese Aussage: 'Das Arbeitsrecht bietet umfassenden Schutz für Arbeitnehmer, weshalb zusätzliche kollektive Vereinbarungen (GAV) überflüssig sind.' Ist dies zutreffend?",
     options: [
-      {v: "A", t: "Ja, das Arbeitsrecht bietet vollständigen Schutz"},
+      {v: "A", t: "Ja, GAV sind rechtlich überflüssig und nur symbolisch"},
       {v: "B", t: "Nein, GAV können höhere Standards setzen und sind wichtig für Branchen"},
-      {v: "C", t: "Nein, aber GAV sind nur in Grossbetrieben nötig"},
-      {v: "D", t: "Ja, GAV sind rechtlich überflüssig und nur symbolisch"}
+      {v: "C", t: "Ja, das Arbeitsrecht bietet vollständigen Schutz"},
+      {v: "D", t: "Nein, aber GAV sind nur in Grossbetrieben nötig"}
     ],
     correct: "B",
     explain: "Das Arbeitsrecht setzt Mindeststandards, aber GAV und NAV können weitergehende Schutzbestimmungen vorsehen (z.B. höhere Mindestlöhne, bessere Kündigungsfristen). Sie sind für Branchen mit besonderem Schutzbedarf oder um Mindestlöhne zu sichern, wichtig."
@@ -213,12 +213,12 @@ window.QUESTIONS = [
     img: {src: "img/recht/arbeitsrecht/arbeitsrecht_vertragsarten_01.svg", alt: "Übersicht: Drei Vertragstypen auf Arbeitsleistung mit Fragezeichen"},
     q: "Was ist das Kernmerkmal eines Arbeitsvertrags nach OR 319?",
     options: [
-      {v: "A", t: "Arbeitnehmer arbeitet völlig selbstständig"},
-      {v: "B", t: "Arbeitnehmer unterordnet sich den Weisungen des Arbeitgebers"},
-      {v: "C", t: "Arbeitnehmer trägt allein das Unternehmensrisiko"},
-      {v: "D", t: "Arbeitnehmer bestimmt seine Arbeitszeiten selbst"}
+      {v: "A", t: "Arbeitnehmer bestimmt seine Arbeitszeiten selbst"},
+      {v: "B", t: "Arbeitnehmer trägt allein das Unternehmensrisiko"},
+      {v: "C", t: "Arbeitnehmer unterordnet sich den Weisungen des Arbeitgebers"},
+      {v: "D", t: "Arbeitnehmer arbeitet völlig selbstständig"}
     ],
-    correct: "B",
+    correct: "C",
     explain: "Das Kernmerkmal eines Arbeitsvertrags ist die Unterordnung unter die Weisung und Kontrolle des Arbeitgebers (OR 319 Abs. 1). Der Arbeitnehmer erbringt unselbstständige, entgeltliche Arbeit."
   },
   {
@@ -242,9 +242,9 @@ window.QUESTIONS = [
     tax: "K1",
     q: "Was ist der Unterschied zwischen einem Arbeitsvertrag und einem Werkvertrag?",
     options: [
-      {v: "A", t: "Beide sind gleich, nur mit unterschiedlichen Namen"},
+      {v: "A", t: "Der Werkvertrag ist immer mündlich, der Arbeitsvertrag schriftlich"},
       {v: "B", t: "Beim Werkvertrag schuldet der Unternehmer das Arbeitsresultat, beim Arbeitsvertrag nur die sorgfältige Arbeit"},
-      {v: "C", t: "Der Werkvertrag ist immer mündlich, der Arbeitsvertrag schriftlich"},
+      {v: "C", t: "Beide sind gleich, nur mit unterschiedlichen Namen"},
       {v: "D", t: "Der Werkvertrag gilt nur für Baugewerbe"}
     ],
     correct: "B",
@@ -268,10 +268,10 @@ window.QUESTIONS = [
     tax: "K2",
     q: "Ein Lehrvertrag ist eine besondere Form des Arbeitsvertrags. Welche zusätzliche Besonderheit schreibt OR 344 ff. vor?",
     options: [
-      {v: "A", t: "Schriftlichkeit ist nicht erforderlich"},
+      {v: "A", t: "Eine Genehmigung durch das Arbeitsamt ist erforderlich"},
       {v: "B", t: "Die Schriftlichkeit ist zwingend vorgeschrieben"},
       {v: "C", t: "Nur der Arbeitgeber muss unterschreiben"},
-      {v: "D", t: "Eine Genehmigung durch das Arbeitsamt ist erforderlich"}
+      {v: "D", t: "Schriftlichkeit ist nicht erforderlich"}
     ],
     correct: "B",
     explain: "Lehrverträge (OR 344-355) müssen schriftlich abgeschlossen werden – eine Ausnahme von der Formfreiheit des Arbeitsrechts. Dies schützt den Lehrling und sichert Klarheit über Ausbildungsinhalte und -dauer."
@@ -296,12 +296,12 @@ window.QUESTIONS = [
     tax: "K3",
     q: "Ein Einzelunternehmer wird beauftragt, eine komplexe Steuerberatung durchzuführen, ohne dass er dabei Weisungen des Auftraggebers unterliegt und völlig eigenverantwortlich arbeitet. Welcher Vertragstyp liegt vor?",
     options: [
-      {v: "A", t: "Arbeitsvertrag gemäss OR 319"},
+      {v: "A", t: "Dienstverhältnis gemäss BV"},
       {v: "B", t: "Werkvertrag gemäss OR 363"},
-      {v: "C", t: "Auftrag gemäss OR 394-418v"},
-      {v: "D", t: "Dienstverhältnis gemäss BV"}
+      {v: "C", t: "Arbeitsvertrag gemäss OR 319"},
+      {v: "D", t: "Auftrag gemäss OR 394-418v"}
     ],
-    correct: "C",
+    correct: "D",
     explain: "Beim Auftrag (OR 394-418v) schuldet der Beauftragte nur sorgfältige Ausführung einer Tätigkeit. Es gibt keine Unterordnung und Weisungsgebundenheit wie beim Arbeitsvertrag. Der Beauftragte ist selbstständig tätig."
   },
   {
@@ -338,9 +338,9 @@ window.QUESTIONS = [
     tax: "K5",
     q: "Eine Arbeitgeberin und ein Arbeitnehmer vereinbaren zunächst mündlich einen Arbeitsvertrag. Welche Rechtsfolgen hat das Fehlen schriftlicher Dokumentation nach OR 330b?",
     options: [
-      {v: "A", t: "Der Vertrag ist nichtig und existiert nicht"},
+      {v: "A", t: "Der Vertrag ist ungültig, bis schriftliche Genehmigung erfolgt"},
       {v: "B", t: "Der Vertrag existiert, aber der AG hat die Bedingungen nachträglich schriftlich mitzuteilen"},
-      {v: "C", t: "Der Vertrag ist ungültig, bis schriftliche Genehmigung erfolgt"},
+      {v: "C", t: "Der Vertrag ist nichtig und existiert nicht"},
       {v: "D", t: "Der Arbeitnehmer kann beliebig kündigen, bis schriftlich dokumentiert ist"}
     ],
     correct: "B",
@@ -366,12 +366,12 @@ window.QUESTIONS = [
     tax: "K1",
     q: "Welche Pflicht ist nach OR 321a für einen Arbeitnehmer zentral?",
     options: [
-      {v: "A", t: "Tägliche Arbeit ohne Pausen leisten"},
-      {v: "B", t: "Sorgfalt und Treue bei der Arbeit"},
-      {v: "C", t: "Maximale Produktivität erzielen"},
-      {v: "D", t: "Kostenloses Überstundenarbeiten"}
+      {v: "A", t: "Kostenloses Überstundenarbeiten"},
+      {v: "B", t: "Tägliche Arbeit ohne Pausen leisten"},
+      {v: "C", t: "Sorgfalt und Treue bei der Arbeit"},
+      {v: "D", t: "Maximale Produktivität erzielen"}
     ],
-    correct: "B",
+    correct: "C",
     explain: "Nach OR 321a muss der Arbeitnehmer mit der Sorgfalt eines gewissenhaften Arbeiters arbeiten und sich treu verhalten. Diese Sorgfaltspflicht ist zentral und kann zu Haftung führen."
   },
   {
@@ -394,8 +394,8 @@ window.QUESTIONS = [
     tax: "K2",
     q: "Ein Arbeitnehmer wird aufgefordert, Überstundenarbeit zu leisten. Muss er dies akzeptieren?",
     options: [
-      {v: "A", t: "Nein, Überstunden sind immer freiwillig"},
-      {v: "B", t: "Ja, er muss immer Überstunden leisten"},
+      {v: "A", t: "Ja, er muss immer Überstunden leisten"},
+      {v: "B", t: "Nein, Überstunden sind immer freiwillig"},
       {v: "C", t: "Ja, wenn es notwendig und zumutbar ist (OR 321c)"},
       {v: "D", t: "Nur, wenn er schriftlich zustimmt"}
     ],
@@ -421,11 +421,11 @@ window.QUESTIONS = [
     q: "Ein Arbeitnehmer wird von seinem Arbeitgeber angewiesen, bei einer Kundenbeschwerde unwahrheitsgemäss vorzugehen. Darf der Arbeitnehmer diese Weisung ablehnen?",
     options: [
       {v: "A", t: "Nein, er muss alle Weisungen des AG befolgen"},
-      {v: "B", t: "Ja, wenn die Weisung sittenwidrig oder gesetzwidrig ist"},
-      {v: "C", t: "Nein, Weisungen sind absolut bindend"},
-      {v: "D", t: "Nur, wenn er schriftlich protestiert"}
+      {v: "B", t: "Nein, Weisungen sind absolut bindend"},
+      {v: "C", t: "Nur, wenn er schriftlich protestiert"},
+      {v: "D", t: "Ja, wenn die Weisung sittenwidrig oder gesetzwidrig ist"}
     ],
-    correct: "B",
+    correct: "D",
     explain: "Nach OR 321d muss der Arbeitnehmer die Weisungen des Arbeitgebers befolgen. Dies gilt aber nicht für sittenwidrige oder gesetzwidrige Weisungen. Der Schutz der Persönlichkeit und der öffentlichen Ordnung geht vor."
   },
   {
@@ -451,10 +451,10 @@ window.QUESTIONS = [
     options: [
       {v: "A", t: "Persönliche Arbeitspflicht (OR 321)"},
       {v: "B", t: "Sorgfaltspflicht (OR 321a)"},
-      {v: "C", t: "Schutz von Geschäftsgeheimnissen (OR 321a Abs. 4)"},
-      {v: "D", t: "Befolgung von Anordnungen (OR 321d)"}
+      {v: "C", t: "Befolgung von Anordnungen (OR 321d)"},
+      {v: "D", t: "Schutz von Geschäftsgeheimnissen (OR 321a Abs. 4)"}
     ],
-    correct: "C",
+    correct: "D",
     explain: "Der Arbeitnehmer verletzt hier die Pflicht nach OR 321a Abs. 4, Geschäftsgeheimnisse zu schützen. Die Weitergabe von vertraulichen Geschäftsinformationen an Konkurrenten ist eine schwerwiegende Verletzung und kann zur Kündigung oder Schadensersatzpflicht führen."
   },
   {
@@ -483,11 +483,11 @@ window.QUESTIONS = [
     q: "Kann sich der Arbeitnehmer rechtlich auf seine Verweigerung berufen?",
     options: [
       {v: "A", t: "Nein, er muss alle Weisungen des Arbeitgebers befolgen"},
-      {v: "B", t: "Ja, weil die Weisung gesetzwidrig ist und gegen Heilmittelvorschriften verstösst"},
-      {v: "C", t: "Ja, aber nur wenn er schriftlich widerspricht"},
+      {v: "B", t: "Ja, aber nur wenn er schriftlich widerspricht"},
+      {v: "C", t: "Ja, weil die Weisung gesetzwidrig ist und gegen Heilmittelvorschriften verstösst"},
       {v: "D", t: "Nein, der Arbeitgeber trägt die volle Verantwortung"}
     ],
-    correct: "B",
+    correct: "C",
     explain: "Obwohl OR 321d die Befolgung von Weisungen vorsieht, gilt dies nicht für sittenwidrige oder gesetzwidrige Weisungen. Der Verkauf ohne Verordnung verstösst gegen Heilmittelgesetze und Sicherheitsvorschriften. Der Arbeitnehmer kann und sollte diese Weisung ablehnen. Obersatz: Muss der AN die Weisung befolgen? → Voraussetzungen: Ist die Weisung legal und sittengerecht? → Subsumtion: Nein, sie ist gesetzwidrig. → Schluss: Der AN darf die Weisung ablehnen."
   },
   {
@@ -520,12 +520,12 @@ window.QUESTIONS = [
     tax: "K1",
     q: "Aus welchen Bestandteilen setzt sich ein Bruttolohn typischerweise zusammen?",
     options: [
-      {v: "A", t: "Nur der vereinbarte Grundlohn"},
-      {v: "B", t: "Vereinbarter Lohn + Zuschläge + 13. Monatslohn + Gratifikation"},
-      {v: "C", t: "Nettolohn minus Steuern"},
-      {v: "D", t: "Nur die ausbezahlte Summe auf dem Bankkonto"}
+      {v: "A", t: "Vereinbarter Lohn + Zuschläge + 13. Monatslohn + Gratifikation"},
+      {v: "B", t: "Nur die ausbezahlte Summe auf dem Bankkonto"},
+      {v: "C", t: "Nur der vereinbarte Grundlohn"},
+      {v: "D", t: "Nettolohn minus Steuern"}
     ],
-    correct: "B",
+    correct: "A",
     explain: "Der Bruttolohn setzt sich aus dem vereinbarten Lohn, Zuschlägen (z.B. Überstunden, Nacht), dem 13. Monatslohn und Gratifikationen zusammen. Von diesem werden dann Sozialabzüge, Steuern und Versicherungen abgezogen, um zum Nettolohn zu gelangen."
   },
   {
@@ -548,10 +548,10 @@ window.QUESTIONS = [
     tax: "K1",
     q: "Muss der Arbeitgeber dem Arbeitnehmer Arbeitsgeräte und Material zur Verfügung stellen?",
     options: [
-      {v: "A", t: "Nein, der Arbeitnehmer muss sich selbst ausstatten"},
+      {v: "A", t: "Nur wenn der Arbeitnehmer dies fordert"},
       {v: "B", t: "Ja, nach OR 327 muss der AG die notwendigen Werkzeuge bereitstellen"},
-      {v: "C", t: "Nur für Büroarbeit"},
-      {v: "D", t: "Nur wenn der Arbeitnehmer dies fordert"}
+      {v: "C", t: "Nein, der Arbeitnehmer muss sich selbst ausstatten"},
+      {v: "D", t: "Nur für Büroarbeit"}
     ],
     correct: "B",
     explain: "Nach OR 327 ist der Arbeitgeber verpflichtet, dem Arbeitnehmer die notwendigen Werkzeuge und Materialien zur Verfügung zu stellen, damit dieser seine Arbeit ausführen kann."
@@ -574,12 +574,12 @@ window.QUESTIONS = [
     tax: "K2",
     q: "Ein Arbeitnehmer mit 3 Jahren Dienstzeit wird krank und kann nicht arbeiten. Wie lange muss der Arbeitgeber nach der Berner Skala (OR 324a) den Lohn weiterzahlen?",
     options: [
-      {v: "A", t: "3 Wochen"},
-      {v: "B", t: "4 Wochen"},
-      {v: "C", t: "9 Wochen"},
-      {v: "D", t: "13 Wochen"}
+      {v: "A", t: "13 Wochen"},
+      {v: "B", t: "9 Wochen"},
+      {v: "C", t: "4 Wochen"},
+      {v: "D", t: "3 Wochen"}
     ],
-    correct: "C",
+    correct: "B",
     explain: "Nach der Berner Skala (OR 324a) sind die Lohnfortzahlungsfristen gestaffelt: 1 Dienstjahr = 3 Wochen, 2 Dienstjahre = 4 Wochen, 3-4 Dienstjahre = 9 Wochen. Drei Jahre Dienstzeit = 9 Wochen Lohnfortzahlung."
   },
   {
@@ -603,12 +603,12 @@ window.QUESTIONS = [
     tax: "K3",
     q: "Ein Arbeiter möchte von seinem Arbeitgeber ein Arbeitszeugnis erhalten. Was muss dieses nach OR 330a enthalten?",
     options: [
-      {v: "A", t: "Nur die Tätigkeiten und Arbeitsdaten"},
+      {v: "A", t: "Wahr, klar, vollständig und in wohlwollender Form"},
       {v: "B", t: "Nur Positives über den Arbeitnehmer"},
-      {v: "C", t: "Wahr, klar, vollständig und in wohlwollender Form"},
+      {v: "C", t: "Nur die Tätigkeiten und Arbeitsdaten"},
       {v: "D", t: "Alle Fehlverhalten und Konflikte"}
     ],
-    correct: "C",
+    correct: "A",
     explain: "Nach OR 330a muss ein Arbeitszeugnis wahr, klar und vollständig sein. Es muss in wohlwollender (schonender) Form formuliert sein, darf also nicht böswillig schlecht sein, aber auch nicht falsch positiv."
   },
   {
@@ -636,12 +636,12 @@ window.QUESTIONS = [
     context: "Ein Arbeitgeber verbietet einem Arbeitnehmer, während der Arbeit ein religiöses Symbol zu tragen. Der Arbeitnehmer sieht darin eine Verletzung seiner Persönlichkeit.",
     q: "Kann der Arbeitnehmer sich auf eine Verletzung seiner Persönlichkeitsrechte nach OR 328 berufen?",
     options: [
-      {v: "A", t: "Nein, der Arbeitgeber darf jede Kleiderordnung festlegen"},
-      {v: "B", t: "Ja, automatisch, jedes Symbol ist geschützt"},
-      {v: "C", t: "Ja, wenn die Regelung unverhältnismässig eingreift, ohne legitimen Grund"},
-      {v: "D", t: "Nein, Persönlichkeitsschutz gilt nur ausserhalb der Arbeit"}
+      {v: "A", t: "Ja, wenn die Regelung unverhältnismässig eingreift, ohne legitimen Grund"},
+      {v: "B", t: "Nein, der Arbeitgeber darf jede Kleiderordnung festlegen"},
+      {v: "C", t: "Nein, Persönlichkeitsschutz gilt nur ausserhalb der Arbeit"},
+      {v: "D", t: "Ja, automatisch, jedes Symbol ist geschützt"}
     ],
-    correct: "C",
+    correct: "A",
     explain: "Nach OR 328 muss der AG die Persönlichkeit schützen. Ein generales Verbot von religiösen Symbolen könnte eine unverhältnismässige Einschränkung darstellen. Ein Verbot ist nur zulässig, wenn ein legitimer Grund besteht (z.B. Sicherheit, Kundenschutz). Dies erfordert eine Verhältnismässigkeitsprüfung."
   },
   {
@@ -662,12 +662,12 @@ window.QUESTIONS = [
     tax: "K5",
     q: "Ein Arbeitgeber zahlt seinem Angestellten immer Bargeld ohne schriftliche Lohnabrechnung aus. Welche Konsequenzen hat dies rechtlich?",
     options: [
-      {v: "A", t: "Das ist zulässig, wenn der Arbeitnehmer zustimmt"},
-      {v: "B", t: "Verstoss gegen OR 322, die schriftliche Abrechnung ist Pflicht"},
-      {v: "C", t: "Der Arbeitnehmer kann keinen Lohn fordern"},
+      {v: "A", t: "Der Arbeitnehmer kann keinen Lohn fordern"},
+      {v: "B", t: "Das ist zulässig, wenn der Arbeitnehmer zustimmt"},
+      {v: "C", t: "Verstoss gegen OR 322, die schriftliche Abrechnung ist Pflicht"},
       {v: "D", t: "Das ist nur bei Teilzeitarbeit zulässig"}
     ],
-    correct: "B",
+    correct: "C",
     explain: "Nach OR 322 ist die schriftliche Lohnabrechnung eine zwingende Pflicht des Arbeitgebers. Dies schützt den Arbeitnehmer, dokumentiert Sozialversicherungsbeiträge und Steuern. Der Verstoss kann zu Bussen und Schadensersatz führen. Ein Verzicht durch AN-Zustimmung ist nicht möglich (zwingende Vorschrift)."
   },
 
@@ -692,11 +692,11 @@ window.QUESTIONS = [
     q: "Wie lange beträgt die Kündigungsfrist während der Probezeit nach OR 335b?",
     options: [
       {v: "A", t: "1 Tag"},
-      {v: "B", t: "7 Tage"},
-      {v: "C", t: "1 Monat"},
+      {v: "B", t: "1 Monat"},
+      {v: "C", t: "7 Tage"},
       {v: "D", t: "3 Monate"}
     ],
-    correct: "B",
+    correct: "C",
     explain: "Nach OR 335b beträgt die Kündigungsfrist während der Probezeit (maximal 3 Monate) 7 Tage für beide Parteien. Dies ermöglicht eine schnelle Beendigung, wenn sich die Zusammenarbeit nicht bewährt."
   },
   {
@@ -720,10 +720,10 @@ window.QUESTIONS = [
     tax: "K1",
     q: "Was ist der wesentliche Unterschied zwischen ordentlicher und ausserordentlicher Kündigung?",
     options: [
-      {v: "A", t: "Ordentlich ist schriftlich, ausserordentlich mündlich"},
+      {v: "A", t: "Es gibt keinen Unterschied"},
       {v: "B", t: "Ordentlich hat Kündigungsfristen, ausserordentlich ist sofort"},
       {v: "C", t: "Ordentlich bedarf eines wichtigen Grundes, ausserordentlich nicht"},
-      {v: "D", t: "Es gibt keinen Unterschied"}
+      {v: "D", t: "Ordentlich ist schriftlich, ausserordentlich mündlich"}
     ],
     correct: "B",
     explain: "Ordentliche Kündigung (OR 335 ff.) erfordert Fristen (7 Tage in Probezeit, 1 Monat im 1. Jahr, 2 Monate ab 2. Jahr, 3 Monate ab 10. Jahr). Ausserordentliche/fristlose Kündigung (OR 337) ist sofort möglich, erfordert aber einen wichtigen Grund."
@@ -747,11 +747,11 @@ window.QUESTIONS = [
     q: "Ein Arbeitnehmer mit 8 Jahren Dienstzeit kündigt am 10. März. Welches ist das früheste Kündigungsdatum?",
     options: [
       {v: "A", t: "10. April"},
-      {v: "B", t: "30. April"},
-      {v: "C", t: "31. Mai"},
-      {v: "D", t: "30. Juni"}
+      {v: "B", t: "30. Juni"},
+      {v: "C", t: "30. April"},
+      {v: "D", t: "31. Mai"}
     ],
-    correct: "C",
+    correct: "D",
     explain: "Nach 8 Dienstjahren (2.-9. Jahr) beträgt die Kündigungsfrist 2 Monate auf Ende eines Monats (OR 335c). Kündigung am 10. März läuft: Frist beginnt am 10. März, endet 2 Monate später am 10. Mai → nächster Monatswechsel = 31. Mai."
   },
   {
@@ -792,12 +792,12 @@ window.QUESTIONS = [
     context: "Ein Arbeitgeber kündigt einem treuen Mitarbeiter ausserordentlich/fristlos. Als Grund gibt er an, dass der Mitarbeiter mit dem falschen Lohn-System nicht umgehen kann. Der Mitarbeiter behauptet, dass dies kein wichtiger Grund ist.",
     q: "Hat der Arbeitnehmer Recht?",
     options: [
-      {v: "A", t: "Ja, mangelnde Kompetenz ist kein wichtiger Grund"},
-      {v: "B", t: "Nein, der Arbeitgeber kann jederzeit kündigen"},
-      {v: "C", t: "Es kommt auf die Schwere der Sachkunde an"},
-      {v: "D", t: "Ja, wichtige Gründe sind nur persönliches Fehlverhalten"}
+      {v: "A", t: "Nein, der Arbeitgeber kann jederzeit kündigen"},
+      {v: "B", t: "Ja, wichtige Gründe sind nur persönliches Fehlverhalten"},
+      {v: "C", t: "Ja, mangelnde Kompetenz ist kein wichtiger Grund"},
+      {v: "D", t: "Es kommt auf die Schwere der Sachkunde an"}
     ],
-    correct: "A",
+    correct: "C",
     explain: "Mangelnde Kompetenz oder sachliche Fehler sind normalerweise kein wichtiger Grund für ausserordentliche Kündigung (OR 337). Für Leistungsmängel ist eine ordentliche Kündigung mit Frist angemessen. Nur schwerwiegende Verstösse oder Treuebruch rechtfertigen fristlose Entlassung. Obersatz: Liegt ein wichtiger Grund vor? → Voraussetzungen: Muss erheblich und unzumutbar sein. → Subsumtion: Mangelnde Sachkunde ist nicht erheblich genug. → Schluss: Kein wichtiger Grund."
   },
   {
@@ -818,12 +818,12 @@ window.QUESTIONS = [
     tax: "K5",
     q: "Ein Arbeitgeber teilt einem langjährigen Arbeitnehmer am 01. März per Telefon mit, dass das Arbeitsverhältnis 'per sofort' endet. Welche rechtswidrigen Aspekte liegen vor?",
     options: [
-      {v: "A", t: "Nur die Formlosigkeit (nicht schriftlich)"},
-      {v: "B", t: "Nur der fehlende wichtige Grund"},
-      {v: "C", t: "Formlosigkeit UND vermutlich fehlender wichtiger Grund"},
-      {v: "D", t: "Keine Rechtsverletzung, die Kündigung ist gültig"}
+      {v: "A", t: "Keine Rechtsverletzung, die Kündigung ist gültig"},
+      {v: "B", t: "Formlosigkeit UND vermutlich fehlender wichtiger Grund"},
+      {v: "C", t: "Nur der fehlende wichtige Grund"},
+      {v: "D", t: "Nur die Formlosigkeit (nicht schriftlich)"}
     ],
-    correct: "C",
+    correct: "B",
     explain: "Es liegen zwei Mängel vor: (1) Formverletzung – Kündigung muss schriftlich erfolgen (OR 335), und (2) fehlender wichtiger Grund – eine Telefonkündigung per sofort ist nur zulässig mit erheblichem Grund (OR 337). Ohne Grund ist eine ordentliche Kündigung mit Frist erforderlich. Beiden Mängel zusammen machen die Kündigung rechtswidrig."
   },
 
@@ -846,12 +846,12 @@ window.QUESTIONS = [
     tax: "K1",
     q: "Was ist ein Beispiel für missbräuchliche Kündigung nach OR 336?",
     options: [
-      {v: "A", t: "Kündigung wegen Mitgliedschaft in einer Gewerkschaft"},
+      {v: "A", t: "Kündigung aus Personalmangel"},
       {v: "B", t: "Kündigung wegen mangelnder Leistung"},
       {v: "C", t: "Kündigung während der Probezeit"},
-      {v: "D", t: "Kündigung aus Personalmangel"}
+      {v: "D", t: "Kündigung wegen Mitgliedschaft in einer Gewerkschaft"}
     ],
-    correct: "A",
+    correct: "D",
     explain: "Kündigung wegen Gewerkschaftsmitgliedschaft oder Beteiligung an Streik ist missbräuchlich (OR 336 Abs. 1, Buchstabe a). Dies schützt die Koalitionsfreiheit. Leistungsmängel, Probezeit und geschäftliche Gründe sind keine Missbräuche."
   },
   {
@@ -876,9 +876,9 @@ window.QUESTIONS = [
     q: "In welchem Fall darf ein Arbeitgeber eine Arbeitnehmerin nicht kündigen?",
     options: [
       {v: "A", t: "Während ihrer Schwangerschaft und 16 Wochen nach der Geburt"},
-      {v: "B", t: "Während ihrer Schwangerschaft, aber danach unbegrenzt"},
+      {v: "B", t: "Es gibt keinen Kündigungsschutz während Schwangerschaft"},
       {v: "C", t: "Nur in den ersten 3 Monaten der Schwangerschaft"},
-      {v: "D", t: "Es gibt keinen Kündigungsschutz während Schwangerschaft"}
+      {v: "D", t: "Während ihrer Schwangerschaft, aber danach unbegrenzt"}
     ],
     correct: "A",
     explain: "Nach OR 336c ist eine Kündigung während der Schwangerschaft und 16 Wochen nach der Niederkunft nicht zulässig. Dies ist absoluter Schutz der Mutter und des Kindes."
@@ -901,10 +901,10 @@ window.QUESTIONS = [
     tax: "K2",
     q: "Ein Arbeitnehmer wird krank. Die Sperrfrist beginnt mit dem ersten Tag der Krankheit. Der Arbeitgeber versucht, am Tag 1 der Krankheit zu kündigen. Welche Sperrfristdauer schützt den Arbeitnehmer?",
     options: [
-      {v: "A", t: "Keine, die Kündigung ist sofort wirksam"},
+      {v: "A", t: "30 Tage ab Krankheitsbeginn"},
       {v: "B", t: "Die Sperrfrist dauert die ganze Krankheitsdauer"},
-      {v: "C", t: "30 Tage ab Krankheitsbeginn"},
-      {v: "D", t: "So lange wie Lohnfortzahlung läuft (Berner Skala)"}
+      {v: "C", t: "So lange wie Lohnfortzahlung läuft (Berner Skala)"},
+      {v: "D", t: "Keine, die Kündigung ist sofort wirksam"}
     ],
     correct: "B",
     explain: "Nach OR 336c ist eine Kündigung während Krankheit nicht zulässig. Die Sperrfrist dauert während der ganzen Arbeitsunfähigkeit, mindestens aber so lange, wie die Lohnfortzahlung andauert."
@@ -947,12 +947,12 @@ window.QUESTIONS = [
     context: "Ein Arbeitnehmer teilt seinem Arbeitgeber am 05. März mit, dass er schwanger ist. Am 20. März erhält er eine ordentliche Kündigung mit 2 Monaten Frist (Kündigungstermin 31. Mai). Der Arbeitnehmer behauptet, die Kündigung sei wegen der Schwangerschaft erfolgt und somit nichtig.",
     q: "Hat der Arbeitnehmer Recht, dass die Kündigung nichtig ist?",
     options: [
-      {v: "A", t: "Ja, jede Kündigung während Schwangerschaft ist absolut nichtig"},
-      {v: "B", t: "Nein, die Kündigung kann auch vor Mitteilung ausgesprochen sein"},
-      {v: "C", t: "Ja, aber nur wenn der Grund der Schwangerschaft ist"},
-      {v: "D", t: "Nein, eine schriftliche Kündigung mit Frist ist immer wirksam"}
+      {v: "A", t: "Ja, aber nur wenn der Grund der Schwangerschaft ist"},
+      {v: "B", t: "Nein, eine schriftliche Kündigung mit Frist ist immer wirksam"},
+      {v: "C", t: "Ja, jede Kündigung während Schwangerschaft ist absolut nichtig"},
+      {v: "D", t: "Nein, die Kündigung kann auch vor Mitteilung ausgesprochen sein"}
     ],
-    correct: "A",
+    correct: "C",
     explain: "Nach OR 336c ist eine Kündigung während der Schwangerschaft und 16 Wochen nach der Niederkunft absolut nichtig, unabhängig vom Kündigungsgrund. Eine Kündigung, die während der Schwangerschaft erfolgt, ist formell nichtig und hat keine Wirkung. Die Sperrfrist ist absolut. Obersatz: Ist die Kündigung während einer Sperrfrist zulässig? → Voraussetzungen: Liegt eine Sperrfristsituation vor? → Subsumtion: Ja, Schwangerschaft ist eine Sperrfristsituation. → Schluss: Kündigung ist nichtig."
   },
   {
@@ -973,12 +973,12 @@ window.QUESTIONS = [
     tax: "K5",
     q: "Beurteilen Sie diese Situation: Ein Arbeitnehmer wird am 15. Juni gekündigt, sein Arbeitgeber merkt dabei, dass der Arbeitnehmer schwanger ist. Der Arbeitgeber möchte die Kündigung zurückziehen, aber es ist nun zu spät. Was folgt aus dem Arbeitsrecht?",
     options: [
-      {v: "A", t: "Die Kündigung ist gültig, da sie schriftlich erfolgte"},
-      {v: "B", t: "Die Kündigung ist nichtig, weil während Schwangerschaft gekündigt wurde"},
-      {v: "C", t: "Der Arbeitnehmer kann sich zwischen Wiedereinstellung und Entschädigung wählen"},
-      {v: "D", t: "Der Arbeitnehmer hat keinen Schutz, weil der AG nicht von der Schwangerschaft wusste"}
+      {v: "A", t: "Die Kündigung ist nichtig, weil während Schwangerschaft gekündigt wurde"},
+      {v: "B", t: "Der Arbeitnehmer kann sich zwischen Wiedereinstellung und Entschädigung wählen"},
+      {v: "C", t: "Der Arbeitnehmer hat keinen Schutz, weil der AG nicht von der Schwangerschaft wusste"},
+      {v: "D", t: "Die Kündigung ist gültig, da sie schriftlich erfolgte"}
     ],
-    correct: "B",
+    correct: "A",
     explain: "Nach OR 336c ist eine Kündigung während der Schwangerschaft absolut nichtig. Es spielt keine Rolle, ob der Arbeitgeber von der Schwangerschaft wusste oder nicht – die formale Sperrfrist ist absolut. Der Rückzugsversuch ändert nichts an der Nichtigkeit. Der Arbeitnehmer besteht auf Wiedereinstellung, es sei denn, die Verhältnisse sind unzumutbar geworden."
   },
 
@@ -1001,12 +1001,12 @@ window.QUESTIONS = [
     tax: "K1",
     q: "Welche maximale Höchstarbeitszeit schreibt das Arbeitsgesetz (ArG 9) für industrielle Betriebe vor?",
     options: [
-      {v: "A", t: "40 Stunden pro Woche"},
+      {v: "A", t: "45 Stunden pro Woche"},
       {v: "B", t: "44 Stunden pro Woche"},
-      {v: "C", t: "45 Stunden pro Woche"},
+      {v: "C", t: "40 Stunden pro Woche"},
       {v: "D", t: "50 Stunden pro Woche"}
     ],
-    correct: "C",
+    correct: "A",
     explain: "Nach ArG 9 beträgt die maximale Wochenarbeitszeit für industrielle, Büro- und Verkaufsbetriebe 45 Stunden pro Woche. Für andere Betriebe sind es 50 Stunden."
   },
   {
@@ -1029,12 +1029,12 @@ window.QUESTIONS = [
     tax: "K1",
     q: "Darf ein Arbeitgeber ein Nachtschicht-Arbeiter (23:00–06:00 Uhr) ohne zusätzliche Vergütung einsetzen?",
     options: [
-      {v: "A", t: "Ja, die normale Arbeitszeit gilt auch nachts"},
-      {v: "B", t: "Nein, Nachtarbeit erfordert einen Lohnzuschlag von 25% oder 50%"},
-      {v: "C", t: "Nein, Nachtarbeit ist generell verboten"},
-      {v: "D", t: "Ja, aber nur mit schriftlicher Zustimmung"}
+      {v: "A", t: "Ja, aber nur mit schriftlicher Zustimmung"},
+      {v: "B", t: "Nein, Nachtarbeit ist generell verboten"},
+      {v: "C", t: "Nein, Nachtarbeit erfordert einen Lohnzuschlag von 25% oder 50%"},
+      {v: "D", t: "Ja, die normale Arbeitszeit gilt auch nachts"}
     ],
-    correct: "B",
+    correct: "C",
     explain: "Nach ArG 16-20 erfordert Nachtarbeit (23:00-06:00 Uhr) einen Lohnzuschlag von mindestens 25%, bei Sonntagen 50%. Dies ist Schutz vor Überbelastung und Gesundheitsrisiken."
   },
   {
@@ -1056,11 +1056,11 @@ window.QUESTIONS = [
     q: "Ein Arbeitgeber lässt einen Arbeitnehmer an einem Tag 10 Stunden arbeiten, obwohl seine normale Arbeitszeit 8 Stunden pro Tag beträgt. Ist dies zulässig?",
     options: [
       {v: "A", t: "Nein, nie mehr als 8 Stunden pro Tag"},
-      {v: "B", t: "Ja, wenn die Wochenarbeitszeit nicht überschritten wird"},
-      {v: "C", t: "Ja, unbegrenzt, wenn notwendig"},
+      {v: "B", t: "Ja, unbegrenzt, wenn notwendig"},
+      {v: "C", t: "Ja, wenn die Wochenarbeitszeit nicht überschritten wird"},
       {v: "D", t: "Nein, höchstens 9 Stunden pro Tag erlaubt"}
     ],
-    correct: "B",
+    correct: "C",
     explain: "Das ArG limitiert nicht die tägliche Arbeitszeit auf 8 Stunden, sondern die Wochenarbeitszeit (45 oder 50 Stunden). Solange die Wochenarbeitszeit nicht überschritten wird und Pausen eingehalten werden, ist ein längerer Tag zulässig."
   },
   {
@@ -1101,11 +1101,11 @@ window.QUESTIONS = [
     q: "Kann der Arbeitgeber diese Regelung durchsetzen?",
     options: [
       {v: "A", t: "Ja, kleine Betriebe sind vom ArG befreit"},
-      {v: "B", t: "Nein, Nachtarbeit erfordert Zuschlag nach ArG 16-20"},
-      {v: "C", t: "Ja, wenn alle Arbeitnehmer zustimmen"},
-      {v: "D", t: "Nein, Nachtarbeit ist ganz verboten"}
+      {v: "B", t: "Nein, Nachtarbeit ist ganz verboten"},
+      {v: "C", t: "Nein, Nachtarbeit erfordert Zuschlag nach ArG 16-20"},
+      {v: "D", t: "Ja, wenn alle Arbeitnehmer zustimmen"}
     ],
-    correct: "B",
+    correct: "C",
     explain: "Das ArG gilt für Betriebe aller Grössen und auch kleine Betriebe unterliegen den Schutzbestimmungen. Nachtarbeit (23:00-06:00) erfordert nach ArG 16-20 einen Lohnzuschlag von mindestens 25%. Eine Zustimmung der Arbeitnehmer macht diese zwingende Vorschrift nicht hinfällig."
   },
   {
@@ -1126,12 +1126,12 @@ window.QUESTIONS = [
     tax: "K5",
     q: "Eine schwangere Arbeitnehmerin soll während der Nacht (23:00–06:00) arbeiten. Welche Schutzbestimmungen des ArG sind relevant?",
     options: [
-      {v: "A", t: "Nur der Lohnzuschlag für Nachtarbeit (ArG 16)"},
-      {v: "B", t: "Nur die allgemeinen Arbeitszeit-Limits (ArG 9)"},
-      {v: "C", t: "ArG 35-36: Spezielle Schutzregelungen für schwangere und stillende Frauen"},
-      {v: "D", t: "Keine besonderen Schutzbestimmungen"}
+      {v: "A", t: "Nur die allgemeinen Arbeitszeit-Limits (ArG 9)"},
+      {v: "B", t: "Keine besonderen Schutzbestimmungen"},
+      {v: "C", t: "Nur der Lohnzuschlag für Nachtarbeit (ArG 16)"},
+      {v: "D", t: "ArG 35-36: Spezielle Schutzregelungen für schwangere und stillende Frauen"}
     ],
-    correct: "C",
+    correct: "D",
     explain: "Nach ArG 35-36 sind schwangere und stillende Frauen geschützt durch besondere Regelungen: Nachtarbeit ist verboten (ausser unter strengen Bedingungen), und Ruhezeiten sind geschützt. Dies geht über normale Nachtarbeitsbedingungen hinaus und schützt Mutter und Kind."
   },
   {
@@ -1164,12 +1164,12 @@ window.QUESTIONS = [
     tax: "K1",
     q: "Was regelt ein Gesamtarbeitsvertrag (GAV) typischerweise?",
     options: [
-      {v: "A", t: "Nur die Pausenzeiten"},
-      {v: "B", t: "Mindestlöhne, Ferien, Krankheit, Kündigungsfristen, weitere Bedingungen"},
-      {v: "C", t: "Nur Arbeitgeberrechte"},
-      {v: "D", t: "Nichts, GAVs sind unverbindlich"}
+      {v: "A", t: "Nur Arbeitgeberrechte"},
+      {v: "B", t: "Nur die Pausenzeiten"},
+      {v: "C", t: "Nichts, GAVs sind unverbindlich"},
+      {v: "D", t: "Mindestlöhne, Ferien, Krankheit, Kündigungsfristen, weitere Bedingungen"}
     ],
-    correct: "B",
+    correct: "D",
     explain: "Ein GAV (OR 356-358) regelt umfassend: Mindestlöhne, Urlaub, Krankheit, Kündigungsfristen, Zuschläge, Arbeitssicherheit und weitere Schutzbestimmungen. Dies schafft Branchenstandards."
   },
   {
@@ -1193,12 +1193,12 @@ window.QUESTIONS = [
     tax: "K1",
     q: "Wer kann die Allgemeinverbindlichkeit eines GAV erklären?",
     options: [
-      {v: "A", t: "Der Kantonrat"},
-      {v: "B", t: "Der Bundesrat"},
+      {v: "A", t: "Der Bundesrat"},
+      {v: "B", t: "Das Arbeitsgericht"},
       {v: "C", t: "Die beteiligten Verbände einstimmig"},
-      {v: "D", t: "Das Arbeitsgericht"}
+      {v: "D", t: "Der Kantonrat"}
     ],
-    correct: "B",
+    correct: "A",
     explain: "Der Bundesrat kann die Allgemeinverbindlichkeit eines GAV erklären. Dies macht die GAV-Bestimmungen auch auf nicht-organisierte Arbeitnehmer und Arbeitgeber derselben Branche bindend (OR 356 Abs. 3)."
   },
   {
@@ -1220,11 +1220,11 @@ window.QUESTIONS = [
     q: "Ein GAV sieht einen Mindestlohn von CHF 4'500.– vor, aber ein Arbeitgeber zahlt nur CHF 4'000.–. Was folgt?",
     options: [
       {v: "A", t: "Das ist zulässig, da Arbeitsrecht Formfreiheit kennt"},
-      {v: "B", t: "Der Arbeitnehmer kann die Differenz einklagen"},
-      {v: "C", t: "Das GAV wird ungültig"},
-      {v: "D", t: "Der Arbeitnehmer hat keinen Anspruch"}
+      {v: "B", t: "Das GAV wird ungültig"},
+      {v: "C", t: "Der Arbeitnehmer hat keinen Anspruch"},
+      {v: "D", t: "Der Arbeitnehmer kann die Differenz einklagen"}
     ],
-    correct: "B",
+    correct: "D",
     explain: "Ein GAV ist bindend (oder allgemeinverbindlich erklärt). Unterschreitungen der GAV-Standards sind nicht zulässig. Der Arbeitnehmer kann die ausstehende Lohndifferenz klagen und ggf. Schadensersatz erhalten."
   },
   {
@@ -1265,12 +1265,12 @@ window.QUESTIONS = [
     context: "Ein Verband von Bäckerei-Arbeitnehmern und ein Verband von Bäckerei-Arbeitgebern schliessen einen GAV. Sie vereinbaren u.a. Mindestlöhne und dass während 2 Jahren keine Streiks durchgeführt werden. Die Bäckerei-Arbeitnehmer erfahren von besseren Bedingungen bei konkurrierenden Bäckereien.",
     q: "Können die Arbeitnehmer trotz GAV streiken?",
     options: [
-      {v: "A", t: "Ja, Streikrecht ist nicht aufgebbar"},
-      {v: "B", t: "Nein, die Friedenspflicht (OR 357a) verbietet Streiks während GAV-Laufzeit"},
-      {v: "C", t: "Nur mit Zustimmung der AG"},
-      {v: "D", t: "Nur wenn die Bedingungen sich verschlechtern"}
+      {v: "A", t: "Nur wenn die Bedingungen sich verschlechtern"},
+      {v: "B", t: "Nur mit Zustimmung der AG"},
+      {v: "C", t: "Ja, Streikrecht ist nicht aufgebbar"},
+      {v: "D", t: "Nein, die Friedenspflicht (OR 357a) verbietet Streiks während GAV-Laufzeit"}
     ],
-    correct: "B",
+    correct: "D",
     explain: "Nach OR 357a ist eine Friedenspflicht im GAV vereinbart: Während der Laufzeit sind Kampfmassnahmen (Streiks, Boykotte) nicht zulässig. Dies ist ein zentraler Bestandteil des Arbeitsfriedens. Die Arbeitnehmerverbände sind verpflichtet, Streiks zu unterbinden. Obersatz: Darf während GAV-Laufzeit gestreikt werden? → Voraussetzungen: Besteht eine Friedenspflicht? → Subsumtion: Ja, OR 357a verpflichtet die Parteien. → Schluss: Streiks sind verboten."
   },
   {
@@ -1291,10 +1291,10 @@ window.QUESTIONS = [
     tax: "K5",
     q: "Ein GAV wird für allgemeinverbindlich erklärt. Danach wird eine kleine, nicht verbandseigene Bäckerei eröffnet, die GAV-Standard unterschreitet. Kann die Bäckerei berechtigt gegen das GAV argumentieren?",
     options: [
-      {v: "A", t: "Ja, kleine Betriebe sind vom GAV befreit"},
-      {v: "B", t: "Ja, die Allgemeinverbindlichkeit ist verfassungswidrig"},
+      {v: "A", t: "Nur wenn die Betriebszahl gross ist"},
+      {v: "B", t: "Ja, kleine Betriebe sind vom GAV befreit"},
       {v: "C", t: "Nein, die Allgemeinverbindlichkeit bindet alle Betriebe der Branche"},
-      {v: "D", t: "Nur wenn die Betriebszahl gross ist"}
+      {v: "D", t: "Ja, die Allgemeinverbindlichkeit ist verfassungswidrig"}
     ],
     correct: "C",
     explain: "Die Allgemeinverbindlichkeit eines GAV (erklär durch Bundesrat nach OR 356) bindet alle Betriebe und Arbeitnehmer der betreffenden Branche/Region, unabhängig von Verbandsmitgliedschaft oder Betriebsgrösse. Dies schützt faire Wettbewerbsbedingungen und verhindert ‹Lohndumping› durch Neu-/Kleinbetriebe. Die Bäckerei muss die GAV-Bestimmungen einhalten."

@@ -30,7 +30,7 @@ window.QUESTIONS = [
 // ──── HOMO OECONOMICUS (h01–h10) ────
 {id:"h01",topic:"homo",type:"mc",diff:1,tax:"K1",
  q:"Was versteht man unter dem «Homo oeconomicus»?",
- options:[{v:"A",t:"Ein Modell des rational handelnden Menschen, der unter Abwägung von Kosten und Nutzen seinen persönlichen Nutzen maximiert."},{v:"B",t:"Einen Menschen, der nur an Geld interessiert ist."},{v:"C",t:"Einen perfekten Konsumenten ohne Emotionen."},{v:"D",t:"Ein historisches Menschenbild aus der Antike."}],
+ options:[{v: "A",t:"Ein Modell des rational handelnden Menschen, der unter Abwägung von Kosten und Nutzen seinen persönlichen Nutzen maximiert."},{v: "B",t:"Einen perfekten Konsumenten ohne Emotionen."},{v: "C",t:"Ein historisches Menschenbild aus der Antike."},{v: "D",t:"Einen Menschen, der nur an Geld interessiert ist."}],
  correct:"A",explain:"Der Homo oeconomicus ist ein vereinfachtes Modell: Er bewertet vernünftig alle Fakten und trifft Entscheidungen, die seinen persönlichen Nutzen maximieren. Es ist ein Durchschnittsmodell, keine Beschreibung einzelner Menschen."},
 
 {id:"h02",topic:"homo",type:"tf",diff:1,tax:"K2",
@@ -73,8 +73,8 @@ window.QUESTIONS = [
 
 {id:"h08",topic:"homo",type:"mc",diff:1,tax:"K1",
  q:"Wer hat die Idee des eigennützigen, rationalen Wirtschaftsmenschen als Erster formuliert?",
- options:[{v:"A",t:"Adam Smith in «Der Wohlstand der Nationen» (1776)."},{v:"B",t:"Gary Becker in seiner Nobelpreisrede (1992)."},{v:"C",t:"Herbert Simon mit der «begrenzten Rationalität» (1957)."},{v:"D",t:"John Stuart Mill im 19. Jahrhundert."}],
- correct:"A",explain:"Adam Smith gilt als Begründer. John Stuart Mill entwickelte die Idee im 19. Jh. weiter. Herbert Simon (1957) kritisierte die Annahme vollständiger Rationalität. Gary Becker (Nobelpreis 1992) wandte das Modell auf Bereiche wie Kriminalität und Familie an."},
+ options:[{v: "A",t:"John Stuart Mill im 19. Jahrhundert."},{v: "B",t:"Adam Smith in «Der Wohlstand der Nationen» (1776)."},{v: "C",t:"Gary Becker in seiner Nobelpreisrede (1992)."},{v: "D",t:"Herbert Simon mit der «begrenzten Rationalität» (1957)."}],
+ correct:"B",explain:"Adam Smith gilt als Begründer. John Stuart Mill entwickelte die Idee im 19. Jh. weiter. Herbert Simon (1957) kritisierte die Annahme vollständiger Rationalität. Gary Becker (Nobelpreis 1992) wandte das Modell auf Bereiche wie Kriminalität und Familie an."},
 
 {id:"h09",topic:"homo",type:"multi",diff:2,tax:"K2",
  q:"Welche der folgenden Aussagen beschreiben den Homo oeconomicus korrekt? (Mehrere Antworten möglich.)",
@@ -89,7 +89,7 @@ window.QUESTIONS = [
 // ──── KRITIK AM HOMO OECONOMICUS (r01–r10) ────
 {id:"r01",topic:"kritik",type:"mc",diff:2,tax:"K2",
  q:"Was ist der Hauptkritikpunkt am Modell des Homo oeconomicus?",
- options:[{v:"A",t:"Menschen handeln oft nicht rational, sondern emotional, impulsiv, kurzsichtig oder nach sozialen Normen."},{v:"B",t:"Das Modell ist zu alt und daher veraltet."},{v:"C",t:"Menschen wollen nie ihren Nutzen maximieren."},{v:"D",t:"Das Modell berücksichtigt nur Geld als Nutzen."}],
+ options:[{v: "A",t:"Menschen handeln oft nicht rational, sondern emotional, impulsiv, kurzsichtig oder nach sozialen Normen."},{v: "B",t:"Das Modell ist zu alt und daher veraltet."},{v: "C",t:"Das Modell berücksichtigt nur Geld als Nutzen."},{v: "D",t:"Menschen wollen nie ihren Nutzen maximieren."}],
  correct:"A",explain:"Die Verhaltensökonomie zeigt: Menschen handeln oft voreilig, unlogisch, impulsiv, emotional oder kurzsichtig. Die Finanzkrise 2008 verstärkte die Kritik – kaum ein Ökonom hatte sie vorhergesagt, was die Grenzen des rationalen Modells aufzeigte."},
 
 {id:"r02",topic:"kritik",type:"tf",diff:2,tax:"K2",
@@ -109,8 +109,8 @@ window.QUESTIONS = [
 {id:"r04",topic:"kritik",type:"mc",diff:2,tax:"K2",
  q:"Was versteht man unter einem «Nudge» in der Verhaltensökonomie?",
  img:{src:"img/vwl/menschenbild/menschenbild_nudging_01.svg",alt:"Vergleich zweier Ansätze zur Verhaltenssteuerung"},
- options:[{v:"A",t:"Einen sanften Stoss – man versucht, das Verhalten von Menschen über psychologisch subtile Methoden zu steuern, ohne Verbote oder Gebote."},{v:"B",t:"Ein striktes Verbot unerwünschten Verhaltens."},{v:"C",t:"Eine finanzielle Belohnung für richtiges Verhalten."},{v:"D",t:"Eine wissenschaftliche Theorie von Adam Smith."}],
- correct:"A",explain:"Nudging = «Stupsen»: Subtile Beeinflussung ohne Zwang. Beispiele: Grüne Fussabdrücke auf dem Boden, die zum Mülleimer führen (Abfall –40%), Widerspruchslösung bei der Organspende (Opt-out statt Opt-in). Weltweit setzen Regierungen «Nudge Units» ein."},
+ options:[{v: "A",t:"Eine finanzielle Belohnung für richtiges Verhalten."},{v: "B",t:"Einen sanften Stoss – man versucht, das Verhalten von Menschen über psychologisch subtile Methoden zu steuern, ohne Verbote oder Gebote."},{v: "C",t:"Ein striktes Verbot unerwünschten Verhaltens."},{v: "D",t:"Eine wissenschaftliche Theorie von Adam Smith."}],
+ correct:"B",explain:"Nudging = «Stupsen»: Subtile Beeinflussung ohne Zwang. Beispiele: Grüne Fussabdrücke auf dem Boden, die zum Mülleimer führen (Abfall –40%), Widerspruchslösung bei der Organspende (Opt-out statt Opt-in). Weltweit setzen Regierungen «Nudge Units» ein."},
 
 {id:"r05",topic:"kritik",type:"open",diff:3,tax:"K5",
  q:"«Der Homo oeconomicus ist unrealistisch und daher nutzlos.» Nehmen Sie kritisch Stellung zu dieser Aussage.",
@@ -132,8 +132,8 @@ window.QUESTIONS = [
 
 {id:"r08",topic:"kritik",type:"mc",diff:2,tax:"K2",
  q:"Gary Becker (Nobelpreis 1992) wandte das ökonomische Kosten-Nutzen-Prinzip auf ungewöhnliche Bereiche an. Welchen?",
- options:[{v:"A",t:"Diskriminierung, Kriminalität, Humankapital und Familienökonomie."},{v:"B",t:"Nur auf den Aktienmarkt und die Banken."},{v:"C",t:"Ausschliesslich auf internationale Handelsabkommen."},{v:"D",t:"Auf Naturwissenschaften und Physik."}],
- correct:"A",explain:"Becker zeigte, dass ökonomische Prinzipien auch ausserhalb der traditionellen Wirtschaft gelten: Ein Räuber wägt Nutzen (Beute) gegen Kosten (Gefahr, Strafe) ab. Eltern investieren in Kinder als «Humankapital». Heirat ist ein «Markt» mit Kosten-Nutzen-Überlegungen."},
+ options:[{v: "A",t:"Nur auf den Aktienmarkt und die Banken."},{v: "B",t:"Ausschliesslich auf internationale Handelsabkommen."},{v: "C",t:"Auf Naturwissenschaften und Physik."},{v: "D",t:"Diskriminierung, Kriminalität, Humankapital und Familienökonomie."}],
+ correct:"D",explain:"Becker zeigte, dass ökonomische Prinzipien auch ausserhalb der traditionellen Wirtschaft gelten: Ein Räuber wägt Nutzen (Beute) gegen Kosten (Gefahr, Strafe) ab. Eltern investieren in Kinder als «Humankapital». Heirat ist ein «Markt» mit Kosten-Nutzen-Überlegungen."},
 
 {id:"r09",topic:"kritik",type:"tf",diff:1,tax:"K1",
  q:"Die Verhaltensökonomie (Behavioral Economics) ist ein Teilgebiet der VWL, das psychologische Erkenntnisse in die ökonomische Analyse einbezieht.",
@@ -141,13 +141,13 @@ window.QUESTIONS = [
 
 {id:"r10",topic:"kritik",type:"mc",diff:1,tax:"K1",
  q:"Was versteht man unter «begrenzter Rationalität» (bounded rationality)?",
- options:[{v:"A",t:"Menschen können nicht alle Informationen verarbeiten und nutzen deshalb vereinfachte Faustregeln für ihre Entscheidungen."},{v:"B",t:"Menschen handeln immer irrational."},{v:"C",t:"Rationalität funktioniert nur in begrenzten Situationen wie beim Einkaufen."},{v:"D",t:"Nur intelligente Menschen sind rational."}],
- correct:"A",explain:"Herbert Simon (1957) prägte diesen Begriff: Die Welt ist zu komplex, als dass wir alle Informationen sammeln und verarbeiten könnten. Deshalb nutzen wir Heuristiken (Faustregeln), die meistens gut funktionieren, aber manchmal zu systematischen Fehlern führen."},
+ options:[{v: "A",t:"Rationalität funktioniert nur in begrenzten Situationen wie beim Einkaufen."},{v: "B",t:"Menschen handeln immer irrational."},{v: "C",t:"Menschen können nicht alle Informationen verarbeiten und nutzen deshalb vereinfachte Faustregeln für ihre Entscheidungen."},{v: "D",t:"Nur intelligente Menschen sind rational."}],
+ correct:"C",explain:"Herbert Simon (1957) prägte diesen Begriff: Die Welt ist zu komplex, als dass wir alle Informationen sammeln und verarbeiten könnten. Deshalb nutzen wir Heuristiken (Faustregeln), die meistens gut funktionieren, aber manchmal zu systematischen Fehlern führen."},
 
 // ──── OPPORTUNITÄTSKOSTEN (o01–o09) ────
 {id:"o01",topic:"opportunitaet",type:"mc",diff:1,tax:"K1",
  q:"Was sind Opportunitätskosten?",
- options:[{v:"A",t:"Der entgangene Nutzen der besten nicht gewählten Alternative."},{v:"B",t:"Die Kosten, die beim Einkaufen anfallen."},{v:"C",t:"Die Gebühren für eine verpasste Gelegenheit."},{v:"D",t:"Die Kosten für eine zweite Meinung."}],
+ options:[{v: "A",t:"Der entgangene Nutzen der besten nicht gewählten Alternative."},{v: "B",t:"Die Kosten, die beim Einkaufen anfallen."},{v: "C",t:"Die Kosten für eine zweite Meinung."},{v: "D",t:"Die Gebühren für eine verpasste Gelegenheit."}],
  correct:"A",explain:"Jede Entscheidung ist gleichzeitig ein Verzicht auf andere Möglichkeiten. Die Opportunitätskosten sind der Nutzen der besten nicht gewählten Alternative. Eisenhut: «Die wichtigste Erkenntnis aus dem Opportunitätskostenprinzip ist, dass nichts gratis ist.»"},
 
 {id:"o02",topic:"opportunitaet",type:"open",diff:2,tax:"K3",
@@ -161,8 +161,8 @@ window.QUESTIONS = [
 
 {id:"o04",topic:"opportunitaet",type:"mc",diff:2,tax:"K3",
  q:"Sie überlegen sich, am Samstagabend ins Kino zu gehen (Freude: Note 8/10). Alternativ könnten Sie lernen (Freude: 3/10), Freunde treffen (Freude: 9/10) oder ein Buch lesen (Freude: 6/10). Wie hoch sind die Opportunitätskosten des Kinobesuchs?",
- options:[{v:"A",t:"9/10 – das ist der Nutzen der besten nicht gewählten Alternative (Freunde treffen)."},{v:"B",t:"18/10 – die Summe aller nicht gewählten Alternativen."},{v:"C",t:"3/10 – die schlechteste Alternative."},{v:"D",t:"8/10 – der Nutzen des Kinobesuchs selbst."}],
- correct:"A",explain:"Opportunitätskosten = Nutzen der BESTEN nicht gewählten Alternative. Nicht die Summe aller Alternativen! Hier: Freunde treffen (9/10) > Buch (6/10) > Lernen (3/10). Also Opportunitätskosten = 9/10. Ökonomisch betrachtet lohnt sich das Kino nicht, weil 8 < 9."},
+ options:[{v: "A",t:"3/10 – die schlechteste Alternative."},{v: "B",t:"9/10 – das ist der Nutzen der besten nicht gewählten Alternative (Freunde treffen)."},{v: "C",t:"8/10 – der Nutzen des Kinobesuchs selbst."},{v: "D",t:"18/10 – die Summe aller nicht gewählten Alternativen."}],
+ correct:"B",explain:"Opportunitätskosten = Nutzen der BESTEN nicht gewählten Alternative. Nicht die Summe aller Alternativen! Hier: Freunde treffen (9/10) > Buch (6/10) > Lernen (3/10). Also Opportunitätskosten = 9/10. Ökonomisch betrachtet lohnt sich das Kino nicht, weil 8 < 9."},
 
 {id:"o05",topic:"opportunitaet",type:"fill",diff:1,tax:"K1",
  q:"Jede Entscheidung beinhaltet einen Verzicht. Diesen Verzicht nennt man {0}. Austauschbeziehungen zwischen verschiedenen Zielen nennt man in der Fachsprache {1}.",
@@ -188,19 +188,19 @@ window.QUESTIONS = [
 
 {id:"o09",topic:"opportunitaet",type:"mc",diff:3,tax:"K4",
  q:"Die Schweiz hat einen hohen Lebensstandard und gleichzeitig eine hohe Teilzeitquote – besonders bei gut qualifizierten Frauen. Wie lässt sich dieses Phänomen mit dem Konzept der Opportunitätskosten erklären?",
- options:[{v:"A",t:"Ein hoher Stundenlohn erhöht die Opportunitätskosten der Freizeit – gleichzeitig ermöglicht er aber, mit weniger Arbeitsstunden den gewünschten Lebensstandard zu finanzieren."},{v:"B",t:"Schweizerinnen sind weniger motiviert als Frauen in anderen Ländern."},{v:"C",t:"Der Staat zwingt die Menschen zur Teilzeitarbeit."},{v:"D",t:"Opportunitätskosten spielen bei der Arbeitszeitwahl keine Rolle."}],
- correct:"A",explain:"Zwei gegenläufige Effekte: (1) Substitutionseffekt: Hohe Löhne machen Freizeit «teuer» → Anreiz, mehr zu arbeiten. (2) Einkommenseffekt: Wer gut verdient, kann sich Freizeit leisten → Anreiz, weniger zu arbeiten. In der Schweiz überwiegt offenbar der Einkommenseffekt – besonders bei Familien, die Kinderbetreuung und Einkommen abwägen müssen."},
+ options:[{v: "A",t:"Schweizerinnen sind weniger motiviert als Frauen in anderen Ländern."},{v: "B",t:"Opportunitätskosten spielen bei der Arbeitszeitwahl keine Rolle."},{v: "C",t:"Ein hoher Stundenlohn erhöht die Opportunitätskosten der Freizeit – gleichzeitig ermöglicht er aber, mit weniger Arbeitsstunden den gewünschten Lebensstandard zu finanzieren."},{v: "D",t:"Der Staat zwingt die Menschen zur Teilzeitarbeit."}],
+ correct:"C",explain:"Zwei gegenläufige Effekte: (1) Substitutionseffekt: Hohe Löhne machen Freizeit «teuer» → Anreiz, mehr zu arbeiten. (2) Einkommenseffekt: Wer gut verdient, kann sich Freizeit leisten → Anreiz, weniger zu arbeiten. In der Schweiz überwiegt offenbar der Einkommenseffekt – besonders bei Familien, die Kinderbetreuung und Einkommen abwägen müssen."},
 
 // ──── ANREIZE UND IHRE WIRKUNG (a01–a10) ────
 {id:"a01",topic:"anreize",type:"mc",diff:1,tax:"K1",
  q:"Warum sind Anreize in der Ökonomie so wichtig?",
- options:[{v:"A",t:"Weil der Homo oeconomicus auf Anreize reagiert – Verhaltensänderungen werden durch Veränderungen der Rahmenbedingungen ausgelöst."},{v:"B",t:"Weil alle Menschen genau gleich auf Anreize reagieren."},{v:"C",t:"Weil Anreize nur in der Wirtschaft eine Rolle spielen."},{v:"D",t:"Weil Anreize immer zum gewünschten Ergebnis führen."}],
- correct:"A",explain:"Anreize sind zentral: Der Homo oeconomicus stellt seinen Entscheid jederzeit zur Disposition. Veränderungen (höhere Gebühren, mehr Steuern, bessere Löhne) können eine Revision des Entscheids bewirken, wenn die Veränderung genügend gross ist."},
+ options:[{v: "A",t:"Weil Anreize nur in der Wirtschaft eine Rolle spielen."},{v: "B",t:"Weil der Homo oeconomicus auf Anreize reagiert – Verhaltensänderungen werden durch Veränderungen der Rahmenbedingungen ausgelöst."},{v: "C",t:"Weil Anreize immer zum gewünschten Ergebnis führen."},{v: "D",t:"Weil alle Menschen genau gleich auf Anreize reagieren."}],
+ correct:"B",explain:"Anreize sind zentral: Der Homo oeconomicus stellt seinen Entscheid jederzeit zur Disposition. Veränderungen (höhere Gebühren, mehr Steuern, bessere Löhne) können eine Revision des Entscheids bewirken, wenn die Veränderung genügend gross ist."},
 
 {id:"a02",topic:"anreize",type:"mc",diff:2,tax:"K2",
  q:"Was beschreibt der «Kobra-Effekt»?",
- options:[{v:"A",t:"Wenn ein Anreizsystem so wirkt, dass genau das Gegenteil des gewünschten Ergebnisses eintritt."},{v:"B",t:"Wenn Anreize besonders effektiv sind."},{v:"C",t:"Wenn Menschen irrational auf Anreize reagieren."},{v:"D",t:"Wenn der Staat zu viele Anreize setzt."}],
- correct:"A",explain:"Der Kobra-Effekt: In Indien setzte die Kolonialregierung eine Prämie pro Kobra-Kopf aus, um die Plage zu bekämpfen. Ergebnis: Die Inder züchteten Kobras, um die Prämie zu kassieren. Die Plage wurde schlimmer. Das zeigt: Menschen reagieren auf Anreize, aber nicht immer wie erwartet."},
+ options:[{v: "A",t:"Wenn Anreize besonders effektiv sind."},{v: "B",t:"Wenn der Staat zu viele Anreize setzt."},{v: "C",t:"Wenn ein Anreizsystem so wirkt, dass genau das Gegenteil des gewünschten Ergebnisses eintritt."},{v: "D",t:"Wenn Menschen irrational auf Anreize reagieren."}],
+ correct:"C",explain:"Der Kobra-Effekt: In Indien setzte die Kolonialregierung eine Prämie pro Kobra-Kopf aus, um die Plage zu bekämpfen. Ergebnis: Die Inder züchteten Kobras, um die Prämie zu kassieren. Die Plage wurde schlimmer. Das zeigt: Menschen reagieren auf Anreize, aber nicht immer wie erwartet."},
 
 {id:"a03",topic:"anreize",type:"sort",diff:2,tax:"K3",
  q:"Ordnen Sie zu: Welche Reaktion ist ein erwünschter und welche ein unerwünschter Nebeneffekt des Anreizsystems?",
@@ -235,7 +235,7 @@ window.QUESTIONS = [
 {id:"a07",topic:"anreize",type:"mc",diff:2,tax:"K2",
  q:"Was unterscheidet Nudging von traditioneller Regulierung?",
  img:{src:"img/vwl/menschenbild/menschenbild_nudging_01.svg",alt:"Vergleich zweier Ansätze zur Verhaltenssteuerung"},
- options:[{v:"A",t:"Nudging beeinflusst Verhalten über psychologisch subtile Methoden, ohne Verbote oder Gebote zu erlassen."},{v:"B",t:"Nudging ist teurer als Regulierung."},{v:"C",t:"Nudging funktioniert nur bei irrationalen Menschen."},{v:"D",t:"Es gibt keinen Unterschied."}],
+ options:[{v: "A",t:"Nudging beeinflusst Verhalten über psychologisch subtile Methoden, ohne Verbote oder Gebote zu erlassen."},{v: "B",t:"Nudging ist teurer als Regulierung."},{v: "C",t:"Es gibt keinen Unterschied."},{v: "D",t:"Nudging funktioniert nur bei irrationalen Menschen."}],
  correct:"A",explain:"Traditionelle Regulierung: Verbote, Gebote, Strafen (z.B. Rauchverbot). Nudging: Sanfte Stupser, die das Verhalten lenken, ohne die Wahlfreiheit einzuschränken (z.B. Fussabdrücke zum Mülleimer, gesundes Essen in Augenhöhe in der Kantine)."},
 
 {id:"a08",topic:"anreize",type:"multi",diff:1,tax:"K2",
@@ -245,8 +245,8 @@ window.QUESTIONS = [
 
 {id:"a09",topic:"anreize",type:"mc",diff:3,tax:"K4",
  q:"In der Schweiz wird die Invalidenversicherung (IV) immer wieder reformiert, um Fehlanreize zu reduzieren. Welcher der folgenden Mechanismen beschreibt einen typischen Fehlanreiz bei Sozialversicherungen?",
- options:[{v:"A",t:"Wenn die IV-Rente nahe am bisherigen Lohn liegt, sinkt der Anreiz, eine neue Arbeitsstelle zu suchen – individuelle Rationalität führt zu gesellschaftlich unerwünschtem Verhalten."},{v:"B",t:"Die IV-Rente ist zu tief, deshalb arbeiten alle IV-Bezüger sofort wieder."},{v:"C",t:"Arbeitgeber stellen bevorzugt IV-Bezüger ein, weil sie billiger sind."},{v:"D",t:"Die IV verursacht keine Fehlanreize, weil sie streng kontrolliert wird."}],
- correct:"A",explain:"Klassisches Anreizproblem: Wenn Sozialleistungen den Lohn annähernd ersetzen, reduziert sich der finanzielle Anreiz zur Arbeitsaufnahme (sog. «Armutsfalle»). Das ist aus Sicht des Homo oeconomicus rational, aber gesellschaftlich unerwünscht. Deshalb arbeiten viele Reformvorschläge mit gestuften Anreizen (z.B. Eingliederung vor Rente)."},
+ options:[{v: "A",t:"Die IV-Rente ist zu tief, deshalb arbeiten alle IV-Bezüger sofort wieder."},{v: "B",t:"Arbeitgeber stellen bevorzugt IV-Bezüger ein, weil sie billiger sind."},{v: "C",t:"Wenn die IV-Rente nahe am bisherigen Lohn liegt, sinkt der Anreiz, eine neue Arbeitsstelle zu suchen – individuelle Rationalität führt zu gesellschaftlich unerwünschtem Verhalten."},{v: "D",t:"Die IV verursacht keine Fehlanreize, weil sie streng kontrolliert wird."}],
+ correct:"C",explain:"Klassisches Anreizproblem: Wenn Sozialleistungen den Lohn annähernd ersetzen, reduziert sich der finanzielle Anreiz zur Arbeitsaufnahme (sog. «Armutsfalle»). Das ist aus Sicht des Homo oeconomicus rational, aber gesellschaftlich unerwünscht. Deshalb arbeiten viele Reformvorschläge mit gestuften Anreizen (z.B. Eingliederung vor Rente)."},
 
 {id:"a10",topic:"anreize",type:"tf",diff:3,tax:"K4",
  q:"Nudging ist ethisch unproblematisch, weil die Wahlfreiheit erhalten bleibt.",
@@ -255,8 +255,8 @@ window.QUESTIONS = [
 // ──── SPIELTHEORIE / GEFANGENENDILEMMA (g01–g11) ────
 {id:"g01",topic:"spieltheorie",type:"mc",diff:1,tax:"K1",
  q:"Womit beschäftigt sich die Spieltheorie?",
- options:[{v:"A",t:"Mit der Analyse menschlichen Verhaltens in strategischen Situationen – also wenn das eigene Ergebnis auch vom Verhalten anderer abhängt."},{v:"B",t:"Mit der Analyse von Computerspielen."},{v:"C",t:"Mit der Entwicklung optimaler Brettspielstrategien."},{v:"D",t:"Mit der Psychologie von Spielsüchtigen."}],
- correct:"A",explain:"Eine Situation ist «strategisch», wenn jeder bei seiner Entscheidung berücksichtigen muss, wie andere darauf reagieren. Die Spieltheorie analysiert solche Situationen systematisch. Das berühmteste Beispiel ist das Gefangenendilemma."},
+ options:[{v: "A",t:"Mit der Entwicklung optimaler Brettspielstrategien."},{v: "B",t:"Mit der Psychologie von Spielsüchtigen."},{v: "C",t:"Mit der Analyse menschlichen Verhaltens in strategischen Situationen – also wenn das eigene Ergebnis auch vom Verhalten anderer abhängt."},{v: "D",t:"Mit der Analyse von Computerspielen."}],
+ correct:"C",explain:"Eine Situation ist «strategisch», wenn jeder bei seiner Entscheidung berücksichtigen muss, wie andere darauf reagieren. Die Spieltheorie analysiert solche Situationen systematisch. Das berühmteste Beispiel ist das Gefangenendilemma."},
 
 {id:"g02",topic:"spieltheorie",type:"fill",diff:1,tax:"K1",
  q:"Beim Gefangenendilemma hat jeder Beteiligte einen individuellen Anreiz, nicht zu {0}. Dies führt zu einem schlechteren Ergebnis für alle, obwohl {1} für die Gruppe besser wäre. Die Strategie, die individuell immer besser abschneidet, nennt man {2} Strategie.",
@@ -270,8 +270,8 @@ window.QUESTIONS = [
 {id:"g03",topic:"spieltheorie",type:"mc",diff:2,tax:"K3",
  q:"Bonnie und Clyde werden getrennt verhört. Beide schweigen → je 1 Jahr Haft. Beide verraten → je 10 Jahre. Einer verrät, einer schweigt → Verräter frei, Schweiger lebenslänglich. Was ist die dominante Strategie?",
  img:{src:"img/vwl/menschenbild/menschenbild_payoff_matrix_01.svg",alt:"Auszahlungsmatrix des Gefangenendilemmas"},
- options:[{v:"A",t:"Verraten – unabhängig davon, was der andere tut, ist man durch Verraten immer besser gestellt."},{v:"B",t:"Schweigen – man riskiert weniger."},{v:"C",t:"Es gibt keine dominante Strategie."},{v:"D",t:"Abwechselnd verraten und schweigen."}],
- correct:"A",explain:"Wenn der andere schweigt: Verraten → frei (besser als 1 Jahr). Wenn der andere verrät: Verraten → 10 Jahre (besser als lebenslänglich). Verraten ist IMMER besser, egal was der andere tut = dominante Strategie. Aber: Wenn beide verraten, bekommen beide 10 Jahre statt nur 1 Jahr bei Kooperation."},
+ options:[{v: "A",t:"Schweigen – man riskiert weniger."},{v: "B",t:"Abwechselnd verraten und schweigen."},{v: "C",t:"Verraten – unabhängig davon, was der andere tut, ist man durch Verraten immer besser gestellt."},{v: "D",t:"Es gibt keine dominante Strategie."}],
+ correct:"C",explain:"Wenn der andere schweigt: Verraten → frei (besser als 1 Jahr). Wenn der andere verrät: Verraten → 10 Jahre (besser als lebenslänglich). Verraten ist IMMER besser, egal was der andere tut = dominante Strategie. Aber: Wenn beide verraten, bekommen beide 10 Jahre statt nur 1 Jahr bei Kooperation."},
 
 {id:"g04",topic:"spieltheorie",type:"sort",diff:2,tax:"K3",
  q:"Ordnen Sie zu: Welche Alltagssituationen sind Beispiele für ein Gefangenendilemma?",
@@ -293,8 +293,8 @@ window.QUESTIONS = [
 
 {id:"g06",topic:"spieltheorie",type:"mc",diff:2,tax:"K2",
  q:"Welche drei Wege können helfen, das Gefangenendilemma zu überwinden?",
- options:[{v:"A",t:"Kommunikation (Absprachen), Sanktionen (Strafen bei Abweichung) und wiederholte Interaktion (langfristige Beziehungen)."},{v:"B",t:"Mehr Geld, weniger Regeln und schnellere Entscheidungen."},{v:"C",t:"Nur strenge Gesetze können das Problem lösen."},{v:"D",t:"Das Dilemma kann grundsätzlich nicht überwunden werden."}],
- correct:"A",explain:"Drei Lösungsansätze: (1) Kommunikation – Absprachen ermöglichen. (2) Sanktionen – Vertragsbruch bestrafen (z.B. Omertà bei der Mafia). (3) Wiederholung – bei langfristigen Beziehungen ist Kooperation attraktiver, weil Vergeltung droht. Im Veritasium-Video werden 4 Eigenschaften erfolgreicher Strategien genannt: nett, vergeltend, verzeihend, klar."},
+ options:[{v: "A",t:"Das Dilemma kann grundsätzlich nicht überwunden werden."},{v: "B",t:"Nur strenge Gesetze können das Problem lösen."},{v: "C",t:"Mehr Geld, weniger Regeln und schnellere Entscheidungen."},{v: "D",t:"Kommunikation (Absprachen), Sanktionen (Strafen bei Abweichung) und wiederholte Interaktion (langfristige Beziehungen)."}],
+ correct:"D",explain:"Drei Lösungsansätze: (1) Kommunikation – Absprachen ermöglichen. (2) Sanktionen – Vertragsbruch bestrafen (z.B. Omertà bei der Mafia). (3) Wiederholung – bei langfristigen Beziehungen ist Kooperation attraktiver, weil Vergeltung droht. Im Veritasium-Video werden 4 Eigenschaften erfolgreicher Strategien genannt: nett, vergeltend, verzeihend, klar."},
 
 {id:"g07",topic:"spieltheorie",type:"tf",diff:2,tax:"K2",
  q:"Im Gefangenendilemma kommt es zu einem schlechten Ergebnis, weil sich die Beteiligten irrational verhalten.",
@@ -311,8 +311,8 @@ window.QUESTIONS = [
 
 {id:"g10",topic:"spieltheorie",type:"mc",diff:2,tax:"K3",
  q:"Betrachten Sie die Auszahlungsmatrix: Spieler A und B können je «kooperieren» oder «nicht kooperieren». Bei gegenseitiger Kooperation erhalten beide je 3 Punkte. Bei gegenseitiger Nicht-Kooperation je 1 Punkt. Kooperiert nur einer, erhält der Nicht-Kooperierende 5 Punkte, der Kooperierende 0. Welches Ergebnis stellt sich ein?",
- options:[{v:"A",t:"Beide kooperieren nicht und erhalten je 1 Punkt – obwohl bei gegenseitiger Kooperation je 3 Punkte möglich wären."},{v:"B",t:"Beide kooperieren und erhalten je 3 Punkte."},{v:"C",t:"Einer kooperiert, der andere nicht."},{v:"D",t:"Es gibt kein vorhersagbares Ergebnis."}],
- correct:"A",explain:"Nicht-Kooperation ist die dominante Strategie: Egal was der andere tut, Nicht-Kooperation bringt individuell immer mehr (5 > 3 oder 1 > 0). Ergebnis: Beide wählen rational Nicht-Kooperation → je 1 Punkt, obwohl gegenseitige Kooperation je 3 Punkte gebracht hätte. Das ist das Nash-Gleichgewicht."},
+ options:[{v: "A",t:"Beide kooperieren und erhalten je 3 Punkte."},{v: "B",t:"Beide kooperieren nicht und erhalten je 1 Punkt – obwohl bei gegenseitiger Kooperation je 3 Punkte möglich wären."},{v: "C",t:"Es gibt kein vorhersagbares Ergebnis."},{v: "D",t:"Einer kooperiert, der andere nicht."}],
+ correct:"B",explain:"Nicht-Kooperation ist die dominante Strategie: Egal was der andere tut, Nicht-Kooperation bringt individuell immer mehr (5 > 3 oder 1 > 0). Ergebnis: Beide wählen rational Nicht-Kooperation → je 1 Punkt, obwohl gegenseitige Kooperation je 3 Punkte gebracht hätte. Das ist das Nash-Gleichgewicht."},
 
 {id:"g11",topic:"spieltheorie",type:"open",diff:3,tax:"K5",
  q:"Internationale Klimaverhandlungen werden oft als Gefangenendilemma beschrieben. Erklären Sie, warum, und beurteilen Sie, welche Lösungsmechanismen aus der Spieltheorie hier helfen könnten.",
@@ -322,8 +322,8 @@ window.QUESTIONS = [
 // ──── AUFGABEN DER VWL (v01–v08) ────
 {id:"v01",topic:"aufgaben",type:"mc",diff:1,tax:"K1",
  q:"Was sind die Aufgaben der Volkswirtschaftslehre?",
- options:[{v:"A",t:"Wirtschaftliche Vorgänge beschreiben und erklären, Entwicklungen prognostizieren, wirtschaftspolitische Beeinflussung aufzeigen."},{v:"B",t:"Gesetze erlassen und Steuern festlegen."},{v:"C",t:"Unternehmen beraten und Gewinne maximieren."},{v:"D",t:"Nur Statistiken erstellen."}],
- correct:"A",explain:"Die VWL hat vier Aufgaben: (1) Beschreiben (Was passiert?), (2) Erklären (Warum passiert es?), (3) Prognostizieren (Was wird passieren?), (4) Beeinflussen (Was soll getan werden?). Beispiel: (1) Die Arbeitslosigkeit steigt. (2) Weil die Nachfrage sinkt. (3) Sie wird weiter steigen. (4) Der Staat sollte Beschäftigungsprogramme lancieren."},
+ options:[{v: "A",t:"Nur Statistiken erstellen."},{v: "B",t:"Gesetze erlassen und Steuern festlegen."},{v: "C",t:"Unternehmen beraten und Gewinne maximieren."},{v: "D",t:"Wirtschaftliche Vorgänge beschreiben und erklären, Entwicklungen prognostizieren, wirtschaftspolitische Beeinflussung aufzeigen."}],
+ correct:"D",explain:"Die VWL hat vier Aufgaben: (1) Beschreiben (Was passiert?), (2) Erklären (Warum passiert es?), (3) Prognostizieren (Was wird passieren?), (4) Beeinflussen (Was soll getan werden?). Beispiel: (1) Die Arbeitslosigkeit steigt. (2) Weil die Nachfrage sinkt. (3) Sie wird weiter steigen. (4) Der Staat sollte Beschäftigungsprogramme lancieren."},
 
 {id:"v02",topic:"aufgaben",type:"sort",diff:2,tax:"K2",
  q:"Ordnen Sie die Beispiele der korrekten Aufgabe der VWL zu.",
@@ -356,7 +356,7 @@ window.QUESTIONS = [
 
 {id:"v06",topic:"aufgaben",type:"mc",diff:3,tax:"K4",
  q:"Ein Ökonom sagt: «Die Inflation wird nächstes Jahr bei 2.5% liegen, deshalb sollte die SNB die Leitzinsen erhöhen.» Welche Aufgaben der VWL vereint er in dieser Aussage – und warum ist das problematisch?",
- options:[{v:"A",t:"Er vermischt Prognostizieren (2.5% Inflation) und Beeinflussen (Leitzins erhöhen). Problematisch, weil die Prognose unsicher ist und die Handlungsempfehlung von Wertvorstellungen abhängt."},{v:"B",t:"Er beschreibt und erklärt gleichzeitig, was unzulässig ist."},{v:"C",t:"Er prognostiziert korrekt und seine Empfehlung folgt logisch daraus."},{v:"D",t:"Er verwechselt Mikro- und Makroökonomie."}],
+ options:[{v: "A",t:"Er vermischt Prognostizieren (2.5% Inflation) und Beeinflussen (Leitzins erhöhen). Problematisch, weil die Prognose unsicher ist und die Handlungsempfehlung von Wertvorstellungen abhängt."},{v: "B",t:"Er verwechselt Mikro- und Makroökonomie."},{v: "C",t:"Er prognostiziert korrekt und seine Empfehlung folgt logisch daraus."},{v: "D",t:"Er beschreibt und erklärt gleichzeitig, was unzulässig ist."}],
  correct:"A",explain:"Die Trennung von positiver Analyse (beschreiben, erklären, prognostizieren – Was ist?) und normativer Analyse (beeinflussen – Was soll sein?) ist zentral. Prognosen enthalten Unsicherheit. Handlungsempfehlungen enthalten zusätzlich Werturteile (z.B. «Preisstabilität ist wichtiger als Beschäftigung»). Beides zu vermischen suggeriert falsche Objektivität."},
 
 {id:"v07",topic:"aufgaben",type:"multi",diff:1,tax:"K1",
@@ -373,8 +373,8 @@ window.QUESTIONS = [
 {id:"z01",topic:"ziele",type:"mc",diff:1,tax:"K1",
  q:"Welche sechs Ziele umfasst das «magische Sechseck» der Wirtschaftspolitik?",
  img:{src:"img/vwl/menschenbild/menschenbild_sechseck_01.svg",alt:"Sechseck mit sechs wirtschaftspolitischen Zielen"},
- options:[{v:"A",t:"Vollbeschäftigung, Preisstabilität, Wirtschaftswachstum, aussenwirtschaftliches Gleichgewicht, sozialer Ausgleich, Umweltqualität."},{v:"B",t:"Hohe Exporte, tiefe Steuern, hohe Gewinne, viel Konsum, wenig Staat, tiefe Inflation."},{v:"C",t:"BIP, Gini-Koeffizient, Lorenzkurve, Handelsbilanz, Zinssatz, Wechselkurs."},{v:"D",t:"Freiheit, Gleichheit, Brüderlichkeit, Demokratie, Wohlstand, Sicherheit."}],
- correct:"A",explain:"Das magische Sechseck: (1) Vollbeschäftigung, (2) Preisstabilität, (3) Wirtschaftswachstum, (4) Aussenwirtschaftliches Gleichgewicht, (5) Sozialer Ausgleich (Verteilung), (6) Umweltqualität. Ursprünglich nur ein Dreieck (1-3), im Laufe der Zeit erweitert."},
+ options:[{v: "A",t:"Hohe Exporte, tiefe Steuern, hohe Gewinne, viel Konsum, wenig Staat, tiefe Inflation."},{v: "B",t:"BIP, Gini-Koeffizient, Lorenzkurve, Handelsbilanz, Zinssatz, Wechselkurs."},{v: "C",t:"Vollbeschäftigung, Preisstabilität, Wirtschaftswachstum, aussenwirtschaftliches Gleichgewicht, sozialer Ausgleich, Umweltqualität."},{v: "D",t:"Freiheit, Gleichheit, Brüderlichkeit, Demokratie, Wohlstand, Sicherheit."}],
+ correct:"C",explain:"Das magische Sechseck: (1) Vollbeschäftigung, (2) Preisstabilität, (3) Wirtschaftswachstum, (4) Aussenwirtschaftliches Gleichgewicht, (5) Sozialer Ausgleich (Verteilung), (6) Umweltqualität. Ursprünglich nur ein Dreieck (1-3), im Laufe der Zeit erweitert."},
 
 {id:"z02",topic:"ziele",type:"tf",diff:1,tax:"K2",
  q:"Das Sechseck heisst «magisch», weil es schwierig ist, alle sechs Ziele gleichzeitig zu erreichen.",
@@ -402,8 +402,8 @@ window.QUESTIONS = [
 
 {id:"z05",topic:"ziele",type:"mc",diff:2,tax:"K2",
  q:"Warum ist der klassische Trade-off «Butter und Kanonen» ein gutes Beispiel für wirtschaftspolitische Zielkonflikte?",
- options:[{v:"A",t:"Weil mehr Ausgaben für die Armee (Kanonen) weniger Mittel für zivile Güter (Butter) bedeuten – die Ressourcen sind knapp."},{v:"B",t:"Weil Butter und Kanonen aus denselben Rohstoffen hergestellt werden."},{v:"C",t:"Weil die Armee kein Geld benötigt."},{v:"D",t:"Weil es in der Wirtschaft immer nur um Waffen geht."}],
- correct:"A",explain:"Das «Butter-und-Kanonen»-Beispiel illustriert den grundlegenden Trade-off: Knappe Ressourcen (Geld, Arbeit, Material) können entweder für Rüstung oder für zivile Güter eingesetzt werden – nicht für beides gleichzeitig. Dies zeigt die Opportunitätskosten jeder Entscheidung auf gesamtwirtschaftlicher Ebene."},
+ options:[{v: "A",t:"Weil die Armee kein Geld benötigt."},{v: "B",t:"Weil es in der Wirtschaft immer nur um Waffen geht."},{v: "C",t:"Weil Butter und Kanonen aus denselben Rohstoffen hergestellt werden."},{v: "D",t:"Weil mehr Ausgaben für die Armee (Kanonen) weniger Mittel für zivile Güter (Butter) bedeuten – die Ressourcen sind knapp."}],
+ correct:"D",explain:"Das «Butter-und-Kanonen»-Beispiel illustriert den grundlegenden Trade-off: Knappe Ressourcen (Geld, Arbeit, Material) können entweder für Rüstung oder für zivile Güter eingesetzt werden – nicht für beides gleichzeitig. Dies zeigt die Opportunitätskosten jeder Entscheidung auf gesamtwirtschaftlicher Ebene."},
 
 {id:"z06",topic:"ziele",type:"open",diff:3,tax:"K5",
  q:"Stehen die Ziele «Wirtschaftswachstum» und «Umweltqualität» in Harmonie oder in Konkurrenz? Begründen Sie Ihre Einschätzung.",
@@ -418,6 +418,6 @@ window.QUESTIONS = [
 
 {id:"z08",topic:"ziele",type:"mc",diff:3,tax:"K4",
  q:"Die Schweiz hat eine tiefe Arbeitslosenquote (≈2%), aber hohe Mieten und Lebenshaltungskosten. Welche Zielbeziehung im magischen Sechseck wird hier sichtbar?",
- options:[{v:"A",t:"Zielkonkurrenz: Hohe Beschäftigung und Zuwanderung treiben die Nachfrage nach Wohnraum, was den sozialen Ausgleich (bezahlbares Wohnen) erschwert."},{v:"B",t:"Zielharmonie: Tiefe Arbeitslosigkeit und hohe Mieten ergänzen sich optimal."},{v:"C",t:"Zielneutralität: Die Arbeitslosenquote hat keinen Einfluss auf die Mietpreise."},{v:"D",t:"Es handelt sich um kein wirtschaftspolitisches Thema."}],
- correct:"A",explain:"Konkret: Vollbeschäftigung und wirtschaftliche Dynamik ziehen Arbeitskräfte an (Zuwanderung), was die Nachfrage nach Wohnraum erhöht und die Mieten steigen lässt. Das Ziel «sozialer Ausgleich» (bezahlbares Wohnen für alle) wird dadurch erschwert. Ein typisches Beispiel für die Zielkonflikte, die das Sechseck «magisch» machen."}
+ options:[{v: "A",t:"Zielharmonie: Tiefe Arbeitslosigkeit und hohe Mieten ergänzen sich optimal."},{v: "B",t:"Es handelt sich um kein wirtschaftspolitisches Thema."},{v: "C",t:"Zielneutralität: Die Arbeitslosenquote hat keinen Einfluss auf die Mietpreise."},{v: "D",t:"Zielkonkurrenz: Hohe Beschäftigung und Zuwanderung treiben die Nachfrage nach Wohnraum, was den sozialen Ausgleich (bezahlbares Wohnen) erschwert."}],
+ correct:"D",explain:"Konkret: Vollbeschäftigung und wirtschaftliche Dynamik ziehen Arbeitskräfte an (Zuwanderung), was die Nachfrage nach Wohnraum erhöht und die Mieten steigen lässt. Das Ziel «sozialer Ausgleich» (bezahlbares Wohnen für alle) wird dadurch erschwert. Ein typisches Beispiel für die Zielkonflikte, die das Sechseck «magisch» machen."}
 ];
