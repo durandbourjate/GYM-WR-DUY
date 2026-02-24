@@ -842,7 +842,7 @@ function restoreAnswerState(q,answer){
   document.getElementById('nextBtn').style.display='inline-flex';
   var skip=document.querySelector('.btn-skip');if(skip)skip.style.display='none';
   var hints=document.getElementById('fillHintsBtn');if(hints)hints.style.display='none';
-  document.querySelectorAll('#skipRow .btn-primary').forEach(b=>b.style.display='none');
+  document.querySelectorAll('#skipRow .btn-primary:not(#nextBtn)').forEach(b=>b.style.display='none');
 }
 
 // ══════════════════════════════════════════
