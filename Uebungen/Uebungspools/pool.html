@@ -428,6 +428,31 @@ html.dark .mode-card.active{background:var(--c-info-bg)}
 .header-lz-btn{display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;background:rgba(255,255,255,.2);border:none;color:#fff;font-size:1.05rem;cursor:pointer;flex-shrink:0;transition:.15s;padding:0;line-height:1}
 .header-lz-btn:hover{background:rgba(255,255,255,.35)}
 @media(max-width:500px){.lz-mini-modal{max-width:calc(100vw - 32px)}}
+/* ═══ LERNZIELE — Klickbare Items (Quiz starten) ═══ */
+.lz-topic-start{display:flex;align-items:center;gap:8px;margin:0 16px 12px;padding:8px 14px;border-radius:8px;background:var(--c-primary);color:#fff;border:none;font-family:inherit;font-size:.82rem;font-weight:600;cursor:pointer;transition:.15s;width:calc(100% - 32px)}
+.lz-topic-start:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.lz-topic-start .lz-start-icon{font-size:.9rem}
+html.dark .lz-topic-start{background:var(--c-primary)}
+/* ═══ SUCHFELD — Startscreen ═══ */
+.search-card{position:relative}
+.search-input{width:100%;padding:10px 14px 10px 38px;border:2px solid var(--c-border);border-radius:var(--radius);font-family:inherit;font-size:.9rem;outline:none;background:var(--c-surface);color:var(--c-text);transition:.2s}
+.search-input:focus{border-color:var(--c-primary);box-shadow:0 0 0 3px color-mix(in srgb,var(--c-primary) 15%,transparent)}
+.search-input::placeholder{color:var(--c-text-soft)}
+.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:1rem;color:var(--c-text-soft);pointer-events:none}
+.search-clear{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;font-size:1.1rem;cursor:pointer;color:var(--c-text-soft);padding:2px 6px;border-radius:4px;display:none}
+.search-clear:hover{background:var(--c-border);color:var(--c-text)}
+.search-results{font-size:.82rem;color:var(--c-text-soft);margin-top:8px;display:none}
+.search-results.active{display:block}
+.search-tag-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.search-tag{font-size:.72rem;font-weight:600;padding:3px 10px;border-radius:12px;cursor:pointer;border:1.5px solid var(--c-border);background:var(--c-surface);color:var(--c-text-soft);transition:.15s}
+.search-tag:hover{border-color:var(--c-primary);color:var(--c-primary)}
+.search-tag.active{background:var(--c-primary);color:#fff;border-color:var(--c-primary)}
+.search-tag.tag-bne{border-color:#16a34a;color:#16a34a}.search-tag.tag-bne.active{background:#16a34a;color:#fff}
+.search-tag.tag-idz{border-color:#7c3aed;color:#7c3aed}.search-tag.tag-idz.active{background:#7c3aed;color:#fff}
+.search-tag.tag-dig{border-color:#2563eb;color:#2563eb}.search-tag.tag-dig.active{background:#2563eb;color:#fff}
+.search-tag.tag-pol{border-color:#dc2626;color:#dc2626}.search-tag.tag-pol.active{background:#dc2626;color:#fff}
+html.dark .search-input{background:var(--c-surface);border-color:var(--c-border)}
+html.dark .search-tag{background:var(--c-surface)}
 </style>
 <script>
 // Theme sofort anwenden (vor Render, verhindert Flackern)
@@ -509,6 +534,16 @@ html.dark .mode-card.active{background:var(--c-info-bg)}
 <div class="card">
 <div class="filter-header"><h2>✏️ Fragetyp</h2><button class="toggle-all" onclick="toggleAll('typeChips','types')">Alle ⇄</button></div>
 <div class="chips" id="typeChips"></div>
+</div>
+<div class="card search-card" id="searchCard" style="display:none">
+<div class="filter-header"><h2>🔍 Stichwortsuche</h2></div>
+<div style="position:relative">
+<span class="search-icon">🔍</span>
+<input class="search-input" id="searchInput" type="text" placeholder="Stichwort eingeben…" oninput="onSearchInput(this.value)" autocomplete="off">
+<button class="search-clear" id="searchClear" onclick="clearSearch()">&times;</button>
+</div>
+<div class="search-results" id="searchResults"></div>
+<div class="search-tag-chips" id="transversalChips"></div>
 </div>
 <div class="card" style="text-align:center">
 <div class="filter-count" id="filterCount">0 Aufgaben verfügbar</div>
@@ -940,6 +975,8 @@ function init(){
   buildChips('diffChips',DIFF_LABELS,'diffs',d=>DIFF_LABELS[d]);
   buildChips('typeChips',TYPE_LABELS,'types',t=>TYPE_LABELS[t]);
   setMode('mix');
+  patchGetFiltered();
+  initSearch();
   updateFilterCount();
   applyDeepLink();
 }
@@ -950,6 +987,12 @@ function init(){
 function applyDeepLink(){
   const params=new URLSearchParams(window.location.search);
   if(params.get('keys')==='1'){ showInfoScreen(); return; }
+  // lz= Parameter: Topic über Lernziel-Kontext starten
+  const lzParam=params.get('lz');
+  if(lzParam && TOPICS[lzParam]){
+    startFromLZ(lzParam);
+    return;
+  }
   const topicParam=params.get('topic');
   if(!topicParam)return;
   const topicKeys=topicParam.split(',').filter(k=>TOPICS[k]);
@@ -1457,8 +1500,13 @@ function exportResults(){
 
 function resetApp(){
   state={mode:null,filters:{topics:new Set(),diffs:new Set(),types:new Set()},queue:[],current:0,score:0,maxScore:0,answered:[],wrong:[]};
+  searchState.query=''; searchState.activeTags.clear();
   document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
   document.querySelectorAll('.mode-card').forEach(c=>c.classList.remove('active'));
+  document.querySelectorAll('.search-tag').forEach(c=>c.classList.remove('active'));
+  var si=document.getElementById('searchInput'); if(si){si.value='';}
+  document.getElementById('searchClear').style.display='none';
+  document.getElementById('searchResults').classList.remove('active');
   updateFilterCount();
   showScreen('startScreen');
 }
@@ -1535,7 +1583,10 @@ function buildFullModalContent() {
       html += '<span class="lz-topic-chevron">▶</span>';
       html += '</div><div class="lz-topic-body"><ul class="lz-list">';
       t.lernziele.forEach(function(lz) { html += '<li>' + formatLernziel(lz) + '</li>'; });
-      html += '</ul></div></div>';
+      html += '</ul>';
+      html += '<button class="lz-topic-start" onclick="startFromLZ(\'' + key + '\')">';
+      html += '<span class="lz-start-icon">▶</span> ' + count + ' Fragen zu «' + t.short + '» üben</button>';
+      html += '</div></div>';
     });
     html += '</div>';
   }
@@ -1547,6 +1598,136 @@ function formatLernziel(text) {
     return text.replace(/\s*\(K[1-6]\)\s*$/, '') + ' <span class="lz-tax">' + match[1] + '</span>';
   }
   return text;
+}
+
+// ══════════════════════════════════════════
+// LERNZIEL-NAVIGATION — Quiz aus Lernziel-Modal starten
+// ══════════════════════════════════════════
+function startFromLZ(topicKey) {
+  closeFullModal();
+  closeMini();
+  setMode('focus');
+  state.filters.topics.clear();
+  document.querySelectorAll('#topicChips .chip').forEach(function(ch) { ch.classList.remove('active'); });
+  state.filters.topics.add(topicKey);
+  var chip = document.querySelector('#topicChips .chip[data-key="' + topicKey + '"]');
+  if (chip) chip.classList.add('active');
+  updateFilterCount();
+  if (getFiltered().length > 0) startQuiz();
+}
+
+// ══════════════════════════════════════════
+// STICHWORTSUCHE — Filter auf tags, q, explain, topic
+// ══════════════════════════════════════════
+var searchState = { query: '', activeTags: new Set() };
+
+function initSearch() {
+  // Prüfen ob Fragen Tags haben
+  var hasTags = QUESTIONS.some(function(q) { return q.tags && q.tags.length; });
+  var transChips = document.getElementById('transversalChips');
+  // Transversale Bereiche prüfen und Chips rendern
+  var prefixes = [
+    { prefix: 'bne:', label: '🌍 BNE', cls: 'tag-bne' },
+    { prefix: 'idz:', label: '🔗 Interdisziplinarität', cls: 'tag-idz' },
+    { prefix: 'dig:', label: '💻 Digitalität', cls: 'tag-dig' },
+    { prefix: 'pol:', label: '🏛️ Politische Bildung', cls: 'tag-pol' }
+  ];
+  var hasAnyTransversal = false;
+  transChips.innerHTML = '';
+  prefixes.forEach(function(p) {
+    var count = QUESTIONS.filter(function(q) { return q.tags && q.tags.some(function(t) { return t.startsWith(p.prefix); }); }).length;
+    if (count > 0) {
+      hasAnyTransversal = true;
+      var chip = document.createElement('span');
+      chip.className = 'search-tag ' + p.cls;
+      chip.dataset.prefix = p.prefix;
+      chip.textContent = p.label + ' (' + count + ')';
+      chip.onclick = function() { toggleTransversalTag(chip, p.prefix); };
+      transChips.appendChild(chip);
+    }
+  });
+  // Suchcard nur anzeigen, wenn Tags vorhanden oder Pool gross genug
+  if (hasTags || hasAnyTransversal || QUESTIONS.length >= 20) {
+    document.getElementById('searchCard').style.display = '';
+  }
+}
+
+function onSearchInput(val) {
+  searchState.query = val.trim().toLowerCase();
+  document.getElementById('searchClear').style.display = val.length > 0 ? '' : 'none';
+  applySearchFilter();
+}
+
+function clearSearch() {
+  document.getElementById('searchInput').value = '';
+  searchState.query = '';
+  document.getElementById('searchClear').style.display = 'none';
+  applySearchFilter();
+}
+
+function toggleTransversalTag(chip, prefix) {
+  chip.classList.toggle('active');
+  if (chip.classList.contains('active')) {
+    searchState.activeTags.add(prefix);
+  } else {
+    searchState.activeTags.delete(prefix);
+  }
+  applySearchFilter();
+}
+
+function matchesSearch(q) {
+  var queryMatch = true;
+  var tagMatch = true;
+  // Text-Suche
+  if (searchState.query.length >= 2) {
+    var s = searchState.query;
+    var inQ = (q.q || '').toLowerCase().indexOf(s) !== -1;
+    var inExplain = (q.explain || '').toLowerCase().indexOf(s) !== -1;
+    var inTopic = (TOPICS[q.topic] ? TOPICS[q.topic].label.toLowerCase().indexOf(s) !== -1 : false);
+    var inTags = q.tags ? q.tags.some(function(t) { return t.toLowerCase().indexOf(s) !== -1; }) : false;
+    var inContext = (q.context || '').toLowerCase().indexOf(s) !== -1;
+    queryMatch = inQ || inExplain || inTopic || inTags || inContext;
+  }
+  // Transversale Tags
+  if (searchState.activeTags.size > 0) {
+    if (!q.tags || !q.tags.length) { tagMatch = false; }
+    else {
+      tagMatch = false;
+      searchState.activeTags.forEach(function(prefix) {
+        if (q.tags.some(function(t) { return t.startsWith(prefix); })) tagMatch = true;
+      });
+    }
+  }
+  return queryMatch && tagMatch;
+}
+
+function applySearchFilter() {
+  var hasSearch = searchState.query.length >= 2 || searchState.activeTags.size > 0;
+  var resultsEl = document.getElementById('searchResults');
+  if (!hasSearch) {
+    resultsEl.classList.remove('active');
+    resultsEl.textContent = '';
+    updateFilterCount();
+    return;
+  }
+  var matched = getFiltered().filter(matchesSearch);
+  resultsEl.classList.add('active');
+  resultsEl.textContent = '🔍 ' + matched.length + ' Treffer' + (searchState.query ? ' für «' + searchState.query + '»' : '');
+  updateFilterCount();
+}
+
+// Override getFiltered to include search
+var _origGetFiltered = null;
+
+function patchGetFiltered() {
+  _origGetFiltered = getFiltered;
+  getFiltered = function() {
+    var base = _origGetFiltered();
+    if (searchState.query.length >= 2 || searchState.activeTags.size > 0) {
+      return base.filter(matchesSearch);
+    }
+    return base;
+  };
 }
 document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') { closeMini(); closeFullModal(); closeReport(); }
