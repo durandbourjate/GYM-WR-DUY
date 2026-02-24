@@ -97,6 +97,27 @@ body{font-family:'DM Sans',system-ui,sans-serif;background:var(--c-bg);color:var
 .lz-list li::before{content:'🏁';position:absolute;left:0;top:7px;font-size:.72rem}
 .lz-tax{font-family:'DM Mono',monospace;font-size:.68rem;background:var(--c-border);color:var(--c-text-soft);padding:1px 6px;border-radius:4px;margin-left:4px;white-space:nowrap}
 .footer{text-align:center;padding:20px;font-size:.75rem;color:var(--c-text-soft)}
+/* ═══ SUCHFELD — Übersichtsseite ═══ */
+.global-search{margin-bottom:20px;background:var(--c-surface);border-radius:var(--radius);padding:16px 20px;box-shadow:0 1px 3px rgba(0,0,0,.06);border:1px solid var(--c-border);position:relative}
+.global-search-input{width:100%;padding:10px 14px 10px 38px;border:2px solid var(--c-border);border-radius:var(--radius);font-family:inherit;font-size:.9rem;outline:none;background:var(--c-surface);color:var(--c-text);transition:.2s}
+.global-search-input:focus{border-color:#1e293b;box-shadow:0 0 0 3px rgba(30,41,59,.1)}
+.global-search-input::placeholder{color:var(--c-text-soft)}
+.global-search-icon{position:absolute;left:32px;top:50%;transform:translateY(-50%);font-size:1rem;color:var(--c-text-soft);pointer-events:none}
+.global-search-clear{position:absolute;right:28px;top:50%;transform:translateY(-50%);background:none;border:none;font-size:1.1rem;cursor:pointer;color:var(--c-text-soft);padding:2px 6px;border-radius:4px;display:none}
+.global-search-clear:hover{background:var(--c-border);color:var(--c-text)}
+.global-search-results{margin-top:12px;display:none}
+.global-search-results.active{display:block}
+.global-search-results .gsr-info{font-size:.82rem;color:var(--c-text-soft);margin-bottom:10px}
+.global-search-results .gsr-pool{margin-bottom:8px;padding:10px 14px;border-radius:8px;background:var(--c-bg);display:flex;align-items:center;gap:10px}
+.gsr-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.gsr-pool-title{font-weight:600;font-size:.88rem;flex:1}
+.gsr-pool-count{font-family:'DM Mono',monospace;font-size:.75rem;color:var(--c-text-soft)}
+.gsr-pool-btn{padding:5px 12px;border-radius:16px;font-size:.75rem;font-weight:600;text-decoration:none;color:#fff;transition:.15s}
+.gsr-pool-btn:hover{filter:brightness(1.1)}
+html.dark .global-search{background:var(--c-surface);border-color:var(--c-border)}
+html.dark .global-search-input{background:var(--c-bg);border-color:var(--c-border);color:var(--c-text)}
+html.dark .global-search-input:focus{border-color:var(--c-text-soft);box-shadow:0 0 0 3px rgba(148,163,184,.15)}
+html.dark .gsr-pool{background:var(--c-border)}
 
 /* ── Dark Mode ── */
 html.dark{--c-bg:#0f1117;--c-surface:#1a1d27;--c-text:#e2e8f0;--c-text-soft:#94a3b8;--c-border:#2d3348;
@@ -137,6 +158,13 @@ html.dark .fach-header:hover{background:color-mix(in srgb,var(--c-border) 40%,tr
 </div>
 
 <div class="container" id="content">
+<div class="global-search" id="globalSearch">
+<span class="global-search-icon">🔍</span>
+<input class="global-search-input" id="globalSearchInput" type="text" placeholder="In allen Pools suchen…" oninput="onGlobalSearch(this.value)" autocomplete="off">
+<button class="global-search-clear" id="globalSearchClear" onclick="clearGlobalSearch()">&times;</button>
+<div class="global-search-results" id="globalSearchResults"></div>
+</div>
+<div id="poolContent">
 <div style="text-align:center;padding:40px;color:var(--c-text-soft)">Wird geladen…</div>
 </div>
 
@@ -392,7 +420,7 @@ const FACH_DOT_COLORS = { VWL: "#f89907", BWL: "#01a9f4", Recht: "#73ab2c" };
 const CHEVRON_SVG = '<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
 function render() {
-  const container = document.getElementById('content');
+  const container = document.getElementById('poolContent');
   let html = '';
 
   FACH_ORDER.forEach(fach => {
@@ -664,6 +692,89 @@ async function openAllLernziele() {
 
 // 🏁-Buttons nach dem Rendern prüfen
 checkLzButtons();
+
+// ══════════════════════════════════════════
+// GLOBALE SUCHE — Über alle Pools hinweg
+// ══════════════════════════════════════════
+var globalSearchCache = {}; // poolId -> {POOL_META, TOPICS, QUESTIONS}
+
+async function loadPoolConfig(poolId) {
+  if (globalSearchCache[poolId]) return globalSearchCache[poolId];
+  try {
+    var resp = await fetch('config/' + poolId + '.js', {cache: 'no-cache'});
+    var code = await resp.text();
+    var w = {};
+    var fn = new Function('window', code + '; return {POOL_META: window.POOL_META, TOPICS: window.TOPICS, QUESTIONS: window.QUESTIONS};');
+    var data = fn(w);
+    globalSearchCache[poolId] = data;
+    return data;
+  } catch(e) { return null; }
+}
+
+var globalSearchTimeout = null;
+function onGlobalSearch(val) {
+  val = val.trim();
+  document.getElementById('globalSearchClear').style.display = val.length > 0 ? '' : 'none';
+  if (val.length < 2) {
+    document.getElementById('globalSearchResults').classList.remove('active');
+    document.getElementById('globalSearchResults').innerHTML = '';
+    return;
+  }
+  clearTimeout(globalSearchTimeout);
+  globalSearchTimeout = setTimeout(function() { runGlobalSearch(val.toLowerCase()); }, 300);
+}
+
+function clearGlobalSearch() {
+  document.getElementById('globalSearchInput').value = '';
+  document.getElementById('globalSearchClear').style.display = 'none';
+  document.getElementById('globalSearchResults').classList.remove('active');
+  document.getElementById('globalSearchResults').innerHTML = '';
+}
+
+async function runGlobalSearch(query) {
+  var resultsEl = document.getElementById('globalSearchResults');
+  resultsEl.innerHTML = '<div class="gsr-info">Suche läuft…</div>';
+  resultsEl.classList.add('active');
+
+  var results = [];
+  for (var i = 0; i < POOLS.length; i++) {
+    var p = POOLS[i];
+    var data = await loadPoolConfig(p.id);
+    if (!data || !data.QUESTIONS) continue;
+    var matches = data.QUESTIONS.filter(function(q) {
+      var inQ = (q.q || '').toLowerCase().indexOf(query) !== -1;
+      var inExplain = (q.explain || '').toLowerCase().indexOf(query) !== -1;
+      var inTags = q.tags ? q.tags.some(function(t) { return t.toLowerCase().indexOf(query) !== -1; }) : false;
+      var inContext = (q.context || '').toLowerCase().indexOf(query) !== -1;
+      var inTopic = false;
+      if (data.TOPICS[q.topic]) inTopic = data.TOPICS[q.topic].label.toLowerCase().indexOf(query) !== -1;
+      return inQ || inExplain || inTags || inContext || inTopic;
+    });
+    if (matches.length > 0) {
+      results.push({ pool: p, count: matches.length });
+    }
+  }
+
+  var html = '';
+  var total = results.reduce(function(s, r) { return s + r.count; }, 0);
+  if (total === 0) {
+    html = '<div class="gsr-info">Keine Treffer für «' + query + '»</div>';
+  } else {
+    html = '<div class="gsr-info">🔍 ' + total + ' Treffer in ' + results.length + ' Pool' + (results.length !== 1 ? 's' : '') + '</div>';
+    results.forEach(function(r) {
+      var colorClass = FACH_COLORS[r.pool.fach] || 'vwl';
+      var dotColor = FACH_DOT_COLORS[r.pool.fach] || '#999';
+      var bgColor = dotColor;
+      html += '<div class="gsr-pool">';
+      html += '<span class="gsr-dot" style="background:' + dotColor + '"></span>';
+      html += '<span class="gsr-pool-title">' + r.pool.title + '</span>';
+      html += '<span class="gsr-pool-count">' + r.count + ' Treffer</span>';
+      html += '<a class="gsr-pool-btn" style="background:' + bgColor + '" href="pool.html?pool=' + r.pool.id + '">Öffnen</a>';
+      html += '</div>';
+    });
+  }
+  resultsEl.innerHTML = html;
+}
 </script>
 </body>
 </html>

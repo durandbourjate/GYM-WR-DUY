@@ -418,7 +418,8 @@ html.dark .mode-card.active{background:var(--c-info-bg)}
 .lz-topic-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;cursor:pointer;transition:background .15s;gap:8px}
 .lz-topic-header:hover{background:var(--c-border)}
 .lz-topic-label{font-size:.9rem;font-weight:600;flex:1}
-.lz-topic-badge{font-family:'DM Mono',monospace;font-size:.72rem;background:color-mix(in srgb,var(--c-pool) 15%,transparent);color:color-mix(in srgb,var(--c-pool),#000 20%);padding:2px 8px;border-radius:99px;white-space:nowrap}
+.lz-topic-badge{font-family:'DM Mono',monospace;font-size:.72rem;background:var(--c-primary);color:#fff;padding:4px 10px;border-radius:99px;white-space:nowrap;cursor:pointer;transition:.15s;border:none;font-weight:600}
+.lz-topic-badge:hover{filter:brightness(1.15);transform:scale(1.05)}
 .lz-topic-chevron{font-size:.75rem;color:var(--c-text-soft);transition:transform .2s}
 .lz-topic.open .lz-topic-chevron{transform:rotate(90deg)}
 .lz-topic-body{max-height:0;overflow:hidden;transition:max-height .25s ease}
@@ -508,33 +509,6 @@ html.dark .search-tag{background:var(--c-surface)}
 
 <!-- ═══ Startbildschirm ═══ -->
 <div id="startScreen" class="screen">
-<div class="card">
-<h2>📋 Modus wählen</h2>
-<div class="mode-cards">
-<div class="mode-card" data-mode="focus" onclick="setMode('focus')">
-<div class="mode-icon">🔍</div>
-<div class="mode-title">Fokus</div>
-<div class="mode-desc">Gezielt ein Thema üben, nach Schwierigkeit sortiert</div>
-</div>
-<div class="mode-card" data-mode="mix" onclick="setMode('mix')">
-<div class="mode-icon">🔀</div>
-<div class="mode-title">Mix</div>
-<div class="mode-desc">Zufällige Auswahl quer durch alle Themen</div>
-</div>
-</div>
-</div>
-<div class="card">
-<div class="filter-header"><h2>📚 Unterthema</h2><button class="toggle-all" onclick="toggleAll('topicChips','topics')">Alle ⇄</button></div>
-<div class="chips" id="topicChips"></div>
-</div>
-<div class="card">
-<div class="filter-header"><h2>📊 Schwierigkeit</h2><button class="toggle-all" onclick="toggleAll('diffChips','diffs')">Alle ⇄</button></div>
-<div class="chips" id="diffChips"></div>
-</div>
-<div class="card">
-<div class="filter-header"><h2>✏️ Fragetyp</h2><button class="toggle-all" onclick="toggleAll('typeChips','types')">Alle ⇄</button></div>
-<div class="chips" id="typeChips"></div>
-</div>
 <div class="card search-card" id="searchCard" style="display:none">
 <div class="filter-header"><h2>🔍 Stichwortsuche</h2></div>
 <div style="position:relative">
@@ -548,6 +522,18 @@ html.dark .search-tag{background:var(--c-surface)}
 <div class="card" style="text-align:center">
 <div class="filter-count" id="filterCount">0 Aufgaben verfügbar</div>
 <button class="btn btn-primary btn-block" id="startBtn" style="margin-top:14px" onclick="startQuiz()" disabled>Übung starten</button>
+</div>
+<div class="card">
+<div class="filter-header"><h2>📚 Unterthema</h2><button class="toggle-all" onclick="toggleAll('topicChips','topics')">Alle ⇄</button></div>
+<div class="chips" id="topicChips"></div>
+</div>
+<div class="card">
+<div class="filter-header"><h2>📊 Schwierigkeit</h2><button class="toggle-all" onclick="toggleAll('diffChips','diffs')">Alle ⇄</button></div>
+<div class="chips" id="diffChips"></div>
+</div>
+<div class="card">
+<div class="filter-header"><h2>✏️ Fragetyp</h2><button class="toggle-all" onclick="toggleAll('typeChips','types')">Alle ⇄</button></div>
+<div class="chips" id="typeChips"></div>
 </div>
 </div>
 
@@ -997,7 +983,7 @@ function applyDeepLink(){
   if(!topicParam)return;
   const topicKeys=topicParam.split(',').filter(k=>TOPICS[k]);
   if(topicKeys.length===0)return;
-  setMode('focus');
+  // Deep-Link: nur relevante Topics aktiv, alle Diffs/Types aktiv
   state.filters.topics.clear();
   document.querySelectorAll('#topicChips .chip').forEach(ch=>ch.classList.remove('active'));
   topicKeys.forEach(k=>{
@@ -1078,7 +1064,6 @@ function buildChips(containerId,obj,filterKey,labelFn){
 
 function setMode(m){
   state.mode=m;
-  document.querySelectorAll('.mode-card').forEach(c=>c.classList.toggle('active',c.dataset.mode===m));
   if(m==='mix'){
     ['topicChips','diffChips','typeChips'].forEach(id=>{
       document.querySelectorAll('#'+id+' .chip').forEach(ch=>{
@@ -1139,7 +1124,7 @@ function updateFilterCount(){
 // ══════════════════════════════════════════
 function startQuiz(){
   let q=getFiltered();
-  if(state.mode==='focus')q.sort((a,b)=>a.diff-b.diff); else shuffle(q);
+  shuffle(q);
   state.queue=q;state.current=0;state.score=0;state.maxScore=0;state.answered=[];state.wrong=[];
   showScreen('quizScreen'); renderQuestion();
 }
@@ -1499,15 +1484,13 @@ function exportResults(){
 }
 
 function resetApp(){
-  state={mode:null,filters:{topics:new Set(),diffs:new Set(),types:new Set()},queue:[],current:0,score:0,maxScore:0,answered:[],wrong:[]};
+  state={mode:'mix',filters:{topics:new Set(),diffs:new Set(),types:new Set()},queue:[],current:0,score:0,maxScore:0,answered:[],wrong:[]};
   searchState.query=''; searchState.activeTags.clear();
-  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
-  document.querySelectorAll('.mode-card').forEach(c=>c.classList.remove('active'));
   document.querySelectorAll('.search-tag').forEach(c=>c.classList.remove('active'));
   var si=document.getElementById('searchInput'); if(si){si.value='';}
   document.getElementById('searchClear').style.display='none';
   document.getElementById('searchResults').classList.remove('active');
-  updateFilterCount();
+  setMode('mix');
   showScreen('startScreen');
 }
 
@@ -1579,7 +1562,7 @@ function buildFullModalContent() {
       html += '<div class="lz-topic">';
       html += '<div class="lz-topic-header" onclick="this.parentElement.classList.toggle(\'open\')">';
       html += '<span class="lz-topic-label">' + t.label + '</span>';
-      html += '<span class="lz-topic-badge">' + count + ' Fragen</span>';
+      html += '<span class="lz-topic-badge" onclick="event.stopPropagation();startFromLZ(\'' + key + '\')" title="Quiz starten" style="cursor:pointer">' + count + ' Fragen ▶</span>';
       html += '<span class="lz-topic-chevron">▶</span>';
       html += '</div><div class="lz-topic-body"><ul class="lz-list">';
       t.lernziele.forEach(function(lz) { html += '<li>' + formatLernziel(lz) + '</li>'; });
