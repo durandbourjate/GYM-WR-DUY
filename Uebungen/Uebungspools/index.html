@@ -85,7 +85,8 @@ body{font-family:'DM Sans',system-ui,sans-serif;background:var(--c-bg);color:var
 .lz-topic-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;cursor:pointer;transition:background .15s;gap:8px}
 .lz-topic-header:hover{background:var(--c-border)}
 .lz-topic-label{font-size:.9rem;font-weight:600;flex:1}
-.lz-topic-badge{font-family:'DM Mono',monospace;font-size:.72rem;padding:2px 8px;border-radius:99px;white-space:nowrap;background:var(--c-bg);border:1px solid var(--c-border)}
+.lz-topic-badge{font-family:'DM Mono',monospace;font-size:.72rem;padding:4px 10px;border-radius:99px;white-space:nowrap;background:var(--c-bg);border:1px solid var(--c-border);color:var(--c-text);text-decoration:none;cursor:pointer;font-weight:600;transition:.15s}
+.lz-topic-badge:hover{background:var(--c-text);color:var(--c-surface);transform:scale(1.05)}
 .lz-topic-chevron{font-size:.75rem;color:var(--c-text-soft);transition:transform .2s}
 .lz-topic.open .lz-topic-chevron{transform:rotate(90deg)}
 .lz-topic-body{max-height:0;overflow:hidden;transition:max-height .25s ease}
@@ -564,13 +565,13 @@ async function loadPoolLernziele(poolName, poolTitle) {
     if (!data.POOL_META.lernziele && !Object.values(data.TOPICS).some(function(t) { return t.lernziele && t.lernziele.length; })) {
       return; // Kein Modal öffnen wenn keine Lernziele
     }
-    showPoolLernziele(data.POOL_META, data.TOPICS, data.QUESTIONS);
+    showPoolLernziele(data.POOL_META, data.TOPICS, data.QUESTIONS, poolName);
   } catch (e) {
     console.error('Lernziele laden fehlgeschlagen:', e);
   }
 }
 
-function showPoolLernziele(meta, topics, questions) {
+function showPoolLernziele(meta, topics, questions, poolId) {
   var title = meta.title || 'Lernziele';
   document.getElementById('lzModalTitle').innerHTML = '🏁 ' + title.replace(/^Übungspool:\s*/i, '');
   var body = document.getElementById('lzModalBody');
@@ -588,10 +589,11 @@ function showPoolLernziele(meta, topics, questions) {
       var t = topics[key];
       if (!t.lernziele || !t.lernziele.length) return;
       var count = questions ? questions.filter(function(q) { return q.topic === key; }).length : 0;
+      var link = poolId ? 'pool.html?pool=' + poolId + '&lz=' + encodeURIComponent(key) : '#';
       html += '<div class="lz-topic">';
       html += '<div class="lz-topic-header" onclick="this.parentElement.classList.toggle(\'open\')">';
       html += '<span class="lz-topic-label">' + t.label + '</span>';
-      if (count > 0) html += '<span class="lz-topic-badge">' + count + ' Fragen</span>';
+      if (count > 0) html += '<a class="lz-topic-badge" href="' + link + '" onclick="event.stopPropagation()" title="Quiz starten">' + count + ' Fragen ▶</a>';
       html += '<span class="lz-topic-chevron">▶</span>';
       html += '</div><div class="lz-topic-body"><ul class="lz-list">';
       t.lernziele.forEach(function(lz) { html += '<li>' + formatLZ(lz) + '</li>'; });
@@ -621,7 +623,6 @@ document.addEventListener('keydown', function(e) {
 
 // 🏁 Alle Lernziele im Header-Button
 async function openAllLernziele() {
-  // Alle Pool-Configs laden (aus Cache oder frisch)
   var allData = [];
   for (var i = 0; i < POOLS.length; i++) {
     var p = POOLS[i];
@@ -632,59 +633,59 @@ async function openAllLernziele() {
         var w = {};
         var fn = new Function('window', code + '; return {POOL_META: window.POOL_META, TOPICS: window.TOPICS, QUESTIONS: window.QUESTIONS};');
         var data = fn(w);
-        var hasLZ = false;
-        if (data.POOL_META && data.POOL_META.lernziele && data.POOL_META.lernziele.length > 0) hasLZ = true;
+        var hasLZ = (data.POOL_META && data.POOL_META.lernziele && data.POOL_META.lernziele.length > 0);
         if (!hasLZ && data.TOPICS) {
-          var keys = Object.keys(data.TOPICS);
-          for (var k = 0; k < keys.length; k++) {
-            var t = data.TOPICS[keys[k]];
-            if (t && t.lernziele && t.lernziele.length > 0) { hasLZ = true; break; }
-          }
+          for (var k of Object.keys(data.TOPICS)) { if (data.TOPICS[k].lernziele && data.TOPICS[k].lernziele.length) { hasLZ = true; break; } }
         }
         lzCache[p.id] = { data: data, hasLZ: hasLZ };
       } catch(e) { continue; }
     }
     if (lzCache[p.id] && lzCache[p.id].hasLZ) {
-      allData.push({ title: p.title, fach: p.fach, data: lzCache[p.id].data });
+      allData.push({ id: p.id, title: p.title, fach: p.fach, data: lzCache[p.id].data });
     }
   }
   if (allData.length === 0) return;
-  // Modal mit allen Lernzielen aufbauen
   document.getElementById('lzModalTitle').innerHTML = '🏁 Alle Lernziele';
   var body = document.getElementById('lzModalBody');
   var html = '';
   FACH_ORDER.forEach(function(fach) {
     var fachPools = allData.filter(function(d) { return d.fach === fach; });
     if (fachPools.length === 0) return;
-    html += '<div class="lz-pool-section"><h3>' + fach + '</h3>';
+    // Klappbarer Fachbereich (eingeklappt)
+    html += '<div class="lz-topic" style="margin-bottom:14px">';
+    html += '<div class="lz-topic-header" onclick="this.parentElement.classList.toggle(\'open\')" style="background:var(--c-bg)">';
+    html += '<span class="lz-topic-label" style="font-size:1rem;text-transform:uppercase;letter-spacing:.04em;color:var(--c-text-soft)">' + fach + '</span>';
+    html += '<span style="font-size:.78rem;color:var(--c-text-soft)">' + fachPools.length + ' Pools</span>';
+    html += '<span class="lz-topic-chevron">▶</span>';
+    html += '</div><div class="lz-topic-body"><div style="padding:8px 16px 12px">';
     fachPools.forEach(function(pool) {
-      html += '<div style="margin-bottom:16px">';
-      html += '<div style="font-weight:700;font-size:.92rem;margin-bottom:8px">' + pool.title + '</div>';
+      // Klappbarer Pool (eingeklappt)
+      html += '<div class="lz-topic" style="margin-bottom:8px">';
+      html += '<div class="lz-topic-header" onclick="this.parentElement.classList.toggle(\'open\')">';
+      html += '<span class="lz-topic-label">' + pool.title + '</span>';
+      html += '<span class="lz-topic-chevron">▶</span>';
+      html += '</div><div class="lz-topic-body"><div style="padding:4px 16px 12px">';
+      // Pool-Lernziele
       if (pool.data.POOL_META.lernziele && pool.data.POOL_META.lernziele.length) {
-        html += '<ul class="lz-list" style="margin-bottom:8px">';
+        html += '<ul class="lz-list" style="margin-bottom:10px">';
         pool.data.POOL_META.lernziele.forEach(function(lz) { html += '<li>' + formatLZ(lz) + '</li>'; });
         html += '</ul>';
       }
+      // Topic-Lernziele mit klickbaren Badges
       var keys = Object.keys(pool.data.TOPICS);
-      var anyTopicLZ = keys.some(function(k) { return pool.data.TOPICS[k].lernziele && pool.data.TOPICS[k].lernziele.length; });
-      if (anyTopicLZ) {
-        keys.forEach(function(key) {
-          var t = pool.data.TOPICS[key];
-          if (!t.lernziele || !t.lernziele.length) return;
-          var count = pool.data.QUESTIONS ? pool.data.QUESTIONS.filter(function(q) { return q.topic === key; }).length : 0;
-          html += '<div class="lz-topic">';
-          html += '<div class="lz-topic-header" onclick="this.parentElement.classList.toggle(\'open\')">';
-          html += '<span class="lz-topic-label">' + t.label + '</span>';
-          if (count > 0) html += '<span class="lz-topic-badge">' + count + ' Fragen</span>';
-          html += '<span class="lz-topic-chevron">▶</span>';
-          html += '</div><div class="lz-topic-body"><ul class="lz-list">';
-          t.lernziele.forEach(function(lz) { html += '<li>' + formatLZ(lz) + '</li>'; });
-          html += '</ul></div></div>';
-        });
-      }
-      html += '</div>';
+      keys.forEach(function(key) {
+        var t = pool.data.TOPICS[key];
+        if (!t.lernziele || !t.lernziele.length) return;
+        var count = pool.data.QUESTIONS ? pool.data.QUESTIONS.filter(function(q) { return q.topic === key; }).length : 0;
+        var link = 'pool.html?pool=' + pool.id + '&lz=' + encodeURIComponent(key);
+        html += '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--c-border)">';
+        html += '<span style="flex:1;font-size:.85rem;font-weight:500">' + t.label + '</span>';
+        if (count > 0) html += '<a class="lz-topic-badge" href="' + link + '" title="Quiz starten">' + count + ' Fragen ▶</a>';
+        html += '</div>';
+      });
+      html += '</div></div></div>';
     });
-    html += '</div>';
+    html += '</div></div></div>';
   });
   body.innerHTML = html;
   document.getElementById('lzOverlay').classList.add('active');

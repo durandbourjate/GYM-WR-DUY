@@ -434,6 +434,18 @@ html.dark .mode-card.active{background:var(--c-info-bg)}
 .lz-topic-start:hover{filter:brightness(1.1);transform:translateY(-1px)}
 .lz-topic-start .lz-start-icon{font-size:.9rem}
 html.dark .lz-topic-start{background:var(--c-primary)}
+/* ═══ SUCHFELD + START — Nebeneinander ═══ */
+.start-top-row{display:flex;gap:14px;align-items:flex-start}
+.start-search-col{flex:1;min-width:0}
+.start-btn-col{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:140px}
+.start-btn-col .filter-count{font-family:'DM Mono',monospace;font-size:.88rem;font-weight:600;color:var(--c-text);white-space:nowrap}
+.start-btn-col .btn{width:100%}
+@media(max-width:500px){
+  .start-top-row{flex-direction:column}
+  .start-btn-col{width:100%;min-width:0;flex-direction:row;align-items:center;gap:12px}
+  .start-btn-col .filter-count{flex-shrink:0}
+  .start-btn-col .btn{flex:1}
+}
 /* ═══ SUCHFELD — Startscreen ═══ */
 .search-card{position:relative}
 .search-input{width:100%;padding:10px 14px 10px 38px;border:2px solid var(--c-border);border-radius:var(--radius);font-family:inherit;font-size:.9rem;outline:none;background:var(--c-surface);color:var(--c-text);transition:.2s}
@@ -509,19 +521,22 @@ html.dark .search-tag{background:var(--c-surface)}
 
 <!-- ═══ Startbildschirm ═══ -->
 <div id="startScreen" class="screen">
-<div class="card search-card" id="searchCard" style="display:none">
-<div class="filter-header"><h2>🔍 Stichwortsuche</h2></div>
-<div style="position:relative">
+<div class="card">
+<div class="start-top-row">
+<div class="start-search-col">
+<div style="position:relative" id="searchCard">
 <span class="search-icon">🔍</span>
-<input class="search-input" id="searchInput" type="text" placeholder="Stichwort eingeben…" oninput="onSearchInput(this.value)" autocomplete="off">
+<input class="search-input" id="searchInput" type="text" placeholder="Stichwort suchen…" oninput="onSearchInput(this.value)" autocomplete="off">
 <button class="search-clear" id="searchClear" onclick="clearSearch()">&times;</button>
 </div>
 <div class="search-results" id="searchResults"></div>
 <div class="search-tag-chips" id="transversalChips"></div>
 </div>
-<div class="card" style="text-align:center">
-<div class="filter-count" id="filterCount">0 Aufgaben verfügbar</div>
-<button class="btn btn-primary btn-block" id="startBtn" style="margin-top:14px" onclick="startQuiz()" disabled>Übung starten</button>
+<div class="start-btn-col">
+<div class="filter-count" id="filterCount">0 Aufgaben</div>
+<button class="btn btn-primary btn-block" id="startBtn" onclick="startQuiz()" disabled>Übung starten</button>
+</div>
+</div>
 </div>
 <div class="card">
 <div class="filter-header"><h2>📚 Unterthema</h2><button class="toggle-all" onclick="toggleAll('topicChips','topics')">Alle ⇄</button></div>
@@ -1629,10 +1644,7 @@ function initSearch() {
       transChips.appendChild(chip);
     }
   });
-  // Suchcard nur anzeigen, wenn Tags vorhanden oder Pool gross genug
-  if (hasTags || hasAnyTransversal || QUESTIONS.length >= 20) {
-    document.getElementById('searchCard').style.display = '';
-  }
+  // Suchcard immer sichtbar (Suchfeld + transversale Chips)
 }
 
 function onSearchInput(val) {
