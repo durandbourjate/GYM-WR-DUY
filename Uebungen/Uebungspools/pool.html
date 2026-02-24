@@ -444,6 +444,23 @@ html.dark .lz-topic-start{background:var(--c-primary)}
   .start-top-row{flex-direction:column}
   .start-btn-top{width:100%}
 }
+/* ═══ HILFE-MODAL ═══ */
+.help-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:600;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.help-overlay.active{display:flex}
+.help-modal{background:var(--c-surface);border-radius:16px;max-width:560px;width:100%;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.2);overflow:hidden;animation:lzSlideUp .25s ease}
+.help-modal-header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px 16px;border-bottom:1px solid var(--c-border)}
+.help-modal-header h2{font-size:1.1rem;font-weight:700}
+.help-modal-close{background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--c-text-soft);padding:4px 8px;border-radius:6px;transition:.15s;line-height:1}
+.help-modal-close:hover{background:var(--c-border);color:var(--c-text)}
+.help-modal-body{overflow-y:auto;padding:20px 24px 24px;flex:1;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.help-section{margin-bottom:16px}
+.help-section h4{font-size:.92rem;font-weight:700;margin-bottom:6px;color:var(--c-primary,var(--c-pool,#f89907))}
+.help-section p{font-size:.88rem;line-height:1.6;margin-bottom:6px}
+.help-section ul{list-style:none;padding:0;margin:0}
+.help-section li{font-size:.86rem;line-height:1.6;padding:3px 0 3px 18px;position:relative}
+.help-section li::before{content:'·';position:absolute;left:4px;font-weight:700;color:var(--c-text-soft)}
+.help-section kbd{display:inline-block;padding:1px 6px;border-radius:4px;font-family:'DM Mono',monospace;font-size:.78rem;background:var(--c-bg);border:1px solid var(--c-border)}
+
 /* ═══ SUCHFELD — Startscreen ═══ */
 .search-card{position:relative}
 .search-input{width:100%;padding:10px 14px 10px 38px;border:2px solid var(--c-border);border-radius:var(--radius);font-family:inherit;font-size:.9rem;outline:none;background:var(--c-surface);color:var(--c-text);transition:.2s}
@@ -483,6 +500,7 @@ html.dark .search-tag{background:var(--c-surface)}
 <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
 <a href="index.html" class="home-btn" title="Zur Übersicht">🏠</a>
 <button class="header-lz-btn" onclick="toggleFullModal()" title="Alle Lernziele" id="headerLzBtn" style="display:none">🏁</button>
+<button class="theme-toggle" onclick="openHelp()" title="Anleitung" aria-label="Anleitung anzeigen">?</button>
 <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Light/Dark Mode wechseln" aria-label="Farbmodus wechseln">🌙</button>
 </div>
 </header>
@@ -1721,8 +1739,30 @@ function patchGetFiltered() {
   };
 }
 document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') { closeMini(); closeFullModal(); closeReport(); }
+  if (e.key === 'Escape') { closeMini(); closeFullModal(); closeReport(); closeHelp(); }
 });
+
+// ══════════════════════════════════════════
+// HILFE-MODAL
+// ══════════════════════════════════════════
+var helpLoaded = false;
+function openHelp() {
+  var overlay = document.getElementById('helpOverlay');
+  overlay.classList.add('active');
+  document.body.style.overflow = 'hidden';
+  if (!helpLoaded) {
+    fetch('help-content.html', {cache: 'no-cache'}).then(function(r) { return r.text(); }).then(function(html) {
+      document.getElementById('helpModalBody').innerHTML = html;
+      helpLoaded = true;
+    }).catch(function() {
+      document.getElementById('helpModalBody').innerHTML = '<p>Anleitung konnte nicht geladen werden.</p>';
+    });
+  }
+}
+function closeHelp() {
+  document.getElementById('helpOverlay').classList.remove('active');
+  document.body.style.overflow = '';
+}
 </script>
 
 <!-- REPORT — In-App Modal -->
@@ -1778,6 +1818,17 @@ document.addEventListener('keydown', function(e) {
       <button class="lz-modal-close" onclick="closeFullModal()">&times;</button>
     </div>
     <div class="lz-modal-body" id="lzModalBody"></div>
+  </div>
+</div>
+
+<!-- HILFE-MODAL -->
+<div class="help-overlay" id="helpOverlay" onclick="if(event.target===this)closeHelp()">
+  <div class="help-modal">
+    <div class="help-modal-header">
+      <h2>❓ Anleitung</h2>
+      <button class="help-modal-close" onclick="closeHelp()">&times;</button>
+    </div>
+    <div class="help-modal-body" id="helpModalBody">Wird geladen…</div>
   </div>
 </div>
 
