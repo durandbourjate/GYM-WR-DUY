@@ -700,9 +700,10 @@ const TYPE_LABELS = {mc:"📝 Einzelauswahl",multi:"☑️ Mehrfachauswahl",tf:"
       }
     }
     // Apply metadata
-    document.getElementById('poolTitle').textContent = POOL_META.title;
+    var cleanTitle = POOL_META.title.replace(/^Übungspool[:\s–—-]+\s*/i, '');
+    document.getElementById('poolTitle').textContent = cleanTitle;
     document.getElementById('poolMeta').textContent = POOL_META.meta || POOL_META.level || '';
-    document.title = POOL_META.title + ' | Gymnasium Hofwil';
+    document.title = cleanTitle + ' | Gymnasium Hofwil';
     // Apply color scheme
     const colors = COLOR_SCHEMES[POOL_META.color] || COLOR_SCHEMES[(POOL_META.fach||'').toLowerCase()] || COLOR_SCHEMES.vwl;
     document.documentElement.style.setProperty('--c-primary', colors.primary);
