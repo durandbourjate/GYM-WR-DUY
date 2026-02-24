@@ -1194,7 +1194,7 @@ function renderQuestion(){
   else if(q.type==='sort') html+='<button class="btn btn-primary" onclick="answerSort(\''+q.id+'\')">🔍 Überprüfen</button>';
   else if(q.type==='open') html+='<button class="btn btn-primary" onclick="showOpenSample(\''+q.id+'\')">💡 Lösung anzeigen</button>';
   html+='<button class="btn btn-skip" onclick="skipQuestion()">⏭️ Überspringen</button>';
-  html+='<button class="btn btn-accent" id="nextBtn" onclick="nextQuestion()" style="display:none;margin-left:auto">Nächste Aufgabe →</button>';
+  html+='<button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()" style="display:none;margin-left:auto">Nächste Aufgabe →</button>';
   html+='</div>';
   html+='<div class="q-bottom-row" id="qBottomRow"><button class="btn-end" onclick="endQuiz()">🏁 Übung beenden</button><button class="btn-report" onclick="showReport(\''+q.id+'\')">⚠️ Problem melden</button></div>';
   html+='<div class="kbd-hint">Tastatur: <kbd>←</kbd> Zurück · <kbd>→</kbd> Weiter/Überspringen · <kbd>1</kbd>–<kbd>4</kbd> Antwort · <kbd>Enter</kbd> Prüfen</div>';

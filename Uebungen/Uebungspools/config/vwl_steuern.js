@@ -13,7 +13,8 @@ window.POOL_META = {
   lernziele: [
     "Ich kann den Zweck von Steuern und die wichtigsten Steuerarten in der Schweiz erklären. (K2)",
     "Ich kann die Steuerbelastung mit verschiedenen Kennzahlen (Steuer-, Fiskal-, Staatsquote) messen und international vergleichen. (K3)",
-    "Ich kann die Wirkung von Steuern auf das Verhalten der Wirtschaftssubjekte und die Effizienz analysieren. (K4)"
+    "Ich kann die Wirkung von Steuern auf das Verhalten der Wirtschaftssubjekte und die Effizienz analysieren. (K4)",
+    "Ich kann die Problematik von Steuerparadiesen und internationale Gegenmassnahmen beurteilen. (K5)"
   ]
 };
 
@@ -39,9 +40,9 @@ window.TOPICS = {
     "lernziele": ["Ich kann die Steuerquote, Fiskalquote und Staatsquote berechnen und voneinander abgrenzen. (K3)","Ich kann die Schweizer Quoten im internationalen Vergleich einordnen. (K4)"]
   },
   "wettbewerb": {
-    "label": "Steuerwettbewerb & Finanzausgleich",
+    "label": "Steuerwettbewerb, Finanzausgleich & Steuerparadiese",
     "short": "Wettbewerb",
-    "lernziele": ["Ich kann den interkantonalen und internationalen Steuerwettbewerb erklären. (K2)","Ich kann Vor- und Nachteile des Steuerwettbewerbs abwägen. (K5)"]
+    "lernziele": ["Ich kann den interkantonalen und internationalen Steuerwettbewerb erklären. (K2)","Ich kann Merkmale von Steuerparadiesen nennen und erläutern. (K2)","Ich kann Methoden der internationalen Gewinnverschiebung beschreiben. (K2)","Ich kann Massnahmen gegen Steuerparadiese (AIA, BEPS, Mindeststeuer) erklären. (K2)","Ich kann Vor- und Nachteile des Steuerwettbewerbs und von Steuerparadiesen beurteilen. (K5)"]
   },
   "elastizitaeten": {
     "label": "Steuern und Elastizitäten",
