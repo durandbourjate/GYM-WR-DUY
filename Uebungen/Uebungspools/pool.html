@@ -435,16 +435,14 @@ html.dark .mode-card.active{background:var(--c-info-bg)}
 .lz-topic-start .lz-start-icon{font-size:.9rem}
 html.dark .lz-topic-start{background:var(--c-primary)}
 /* ═══ SUCHFELD + START — Nebeneinander ═══ */
-.start-top-row{display:flex;gap:14px;align-items:flex-start}
-.start-search-col{flex:1;min-width:0}
-.start-btn-col{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:140px}
-.start-btn-col .filter-count{font-family:'DM Mono',monospace;font-size:.88rem;font-weight:600;color:var(--c-text);white-space:nowrap}
-.start-btn-col .btn{width:100%}
+.start-top-row{display:flex;gap:12px;align-items:stretch}
+.start-search-col{flex:1;min-width:0;display:flex;flex-direction:column}
+.start-search-col > div:first-child{flex-shrink:0}
+.start-btn-top{flex-shrink:0;min-width:140px;white-space:nowrap;height:auto}
+.card > .filter-count{font-family:'DM Mono',monospace;font-size:.82rem;font-weight:600;color:var(--c-text-soft);text-align:center;margin-top:8px}
 @media(max-width:500px){
   .start-top-row{flex-direction:column}
-  .start-btn-col{width:100%;min-width:0;flex-direction:row;align-items:center;gap:12px}
-  .start-btn-col .filter-count{flex-shrink:0}
-  .start-btn-col .btn{flex:1}
+  .start-btn-top{width:100%}
 }
 /* ═══ SUCHFELD — Startscreen ═══ */
 .search-card{position:relative}
@@ -532,11 +530,9 @@ html.dark .search-tag{background:var(--c-surface)}
 <div class="search-results" id="searchResults"></div>
 <div class="search-tag-chips" id="transversalChips"></div>
 </div>
-<div class="start-btn-col">
-<div class="filter-count" id="filterCount">0 Aufgaben</div>
-<button class="btn btn-primary btn-block" id="startBtn" onclick="startQuiz()" disabled>Übung starten</button>
+<button class="btn btn-primary start-btn-top" id="startBtn" onclick="startQuiz()" disabled>Übung starten</button>
 </div>
-</div>
+<div class="filter-count" id="filterCount">0 Aufgaben verfügbar</div>
 </div>
 <div class="card">
 <div class="filter-header"><h2>📚 Unterthema</h2><button class="toggle-all" onclick="toggleAll('topicChips','topics')">Alle ⇄</button></div>
@@ -1707,7 +1703,7 @@ function applySearchFilter() {
   }
   var matched = getFiltered().filter(matchesSearch);
   resultsEl.classList.add('active');
-  resultsEl.textContent = '🔍 ' + matched.length + ' Treffer' + (searchState.query ? ' für «' + searchState.query + '»' : '');
+  resultsEl.textContent = '🔍 ' + matched.length + ' Aufgaben' + (searchState.query ? ' für «' + searchState.query + '»' : '');
   updateFilterCount();
 }
 

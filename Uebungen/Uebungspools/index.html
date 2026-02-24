@@ -442,7 +442,7 @@ function render() {
     html += '<div class="fach-info">';
     html += '<span class="fach-count">' + pools.length + ' Pool' + (pools.length !== 1 ? 's' : '') + '</span>';
     if (totalQ > 0) {
-      html += '<span class="fach-questions">' + totalQ + ' Fragen</span>';
+      html += '<span class="fach-questions">' + totalQ + ' Aufgaben</span>';
     }
     if (pools.length > 1) {
       var allIds = pools.map(p => p.id).join(',');
@@ -464,7 +464,7 @@ function render() {
         html += '<div class="pool-title">' + p.title + '</div>';
         html += '<div class="pool-meta">' + p.meta + '</div>';
         html += '<div class="pool-stats">';
-        html += '<span class="stat">' + p.questions + ' Fragen</span>';
+        html += '<span class="stat">' + p.questions + ' Aufgaben</span>';
         html += '<span class="stat">' + p.topics + ' Themen</span>';
         html += '</div>';
         html += '</a>';
@@ -768,9 +768,9 @@ async function runGlobalSearch(query) {
   var html = '';
   var total = results.reduce(function(s, r) { return s + r.count; }, 0);
   if (total === 0) {
-    html = '<div class="gsr-info">Keine Treffer für «' + query + '»</div>';
+    html = '<div class="gsr-info">Keine Aufgaben für «' + query + '»</div>';
   } else {
-    html = '<div class="gsr-info">🔍 ' + total + ' Treffer in ' + results.length + ' Pool' + (results.length !== 1 ? 's' : '') + '</div>';
+    html = '<div class="gsr-info">🔍 ' + total + ' Aufgaben in ' + results.length + ' Pool' + (results.length !== 1 ? 's' : '') + '</div>';
     results.forEach(function(r) {
       var colorClass = FACH_COLORS[r.pool.fach] || 'vwl';
       var dotColor = FACH_DOT_COLORS[r.pool.fach] || '#999';
@@ -778,7 +778,7 @@ async function runGlobalSearch(query) {
       html += '<div class="gsr-pool">';
       html += '<span class="gsr-dot" style="background:' + dotColor + '"></span>';
       html += '<span class="gsr-pool-title">' + r.pool.title + '</span>';
-      html += '<span class="gsr-pool-count">' + r.count + ' Treffer</span>';
+      html += '<span class="gsr-pool-count">' + r.count + ' Aufgaben</span>';
       html += '<a class="gsr-pool-btn" style="background:' + bgColor + '" href="pool.html?pool=' + r.pool.id + '">Öffnen</a>';
       html += '</div>';
     });
