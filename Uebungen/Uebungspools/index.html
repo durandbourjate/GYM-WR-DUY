@@ -90,8 +90,8 @@ body.lz-modal-open{overflow:hidden}
 .lz-topic-badge:hover{background:var(--c-text);color:var(--c-surface);transform:scale(1.05)}
 .lz-topic-chevron{font-size:.75rem;color:var(--c-text-soft);transition:transform .2s}
 .lz-topic.open .lz-topic-chevron{transform:rotate(90deg)}
-.lz-topic-body{max-height:0;overflow:hidden;transition:max-height .25s ease}
-.lz-topic.open .lz-topic-body{max-height:none}
+.lz-topic-body{display:none;overflow:hidden}
+.lz-topic.open > .lz-topic-body{display:block}
 .lz-topic-body .lz-list{padding:0 16px 12px}
 .lz-list{list-style:none;padding:0}
 .lz-list li{position:relative;padding:7px 0 7px 22px;font-size:.88rem;line-height:1.5;border-bottom:1px solid var(--c-border)}

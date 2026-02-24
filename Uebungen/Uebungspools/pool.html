@@ -1284,7 +1284,7 @@ function answerMulti(qid){
     else o.classList.add('multi-neutral');
     o.querySelector('.opt-check').textContent=isCorrect?'✓':'';
   });
-  document.querySelectorAll('#skipRow .btn-primary').forEach(b=>b.style.display='none');
+  document.querySelectorAll('#skipRow .btn-primary:not(#nextBtn)').forEach(b=>b.style.display='none');
   finishAnswer(q,allCorrect,q.explain);
 }
 
@@ -1367,7 +1367,7 @@ function answerSort(qid){
   });
   document.querySelectorAll('.sort-item').forEach(s=>s.style.pointerEvents='none');
   document.querySelectorAll('.sort-cat').forEach(c=>c.style.pointerEvents='none');
-  document.querySelectorAll('#questionCard .btn-primary').forEach(b=>b.style.display='none');
+  document.querySelectorAll('#questionCard .btn-primary:not(#nextBtn)').forEach(b=>b.style.display='none');
   finishAnswer(q,allCorrect,q.explain);
 }
 
@@ -1376,7 +1376,7 @@ function showOpenSample(qid){
   document.getElementById('openSampleText').textContent=q.sample;
   document.getElementById('openSample').classList.add('show');
   document.getElementById('openSelf').classList.add('show');
-  document.querySelectorAll('#questionCard .btn-primary').forEach(b=>{if(b.textContent.includes('Lösung'))b.style.display='none'});
+  document.querySelectorAll('#questionCard .btn-primary:not(#nextBtn)').forEach(b=>{if(b.textContent.includes('Lösung'))b.style.display='none'});
   document.querySelector('.btn-skip').style.display='none';
 }
 
@@ -1400,7 +1400,7 @@ function finishAnswer(q,correct,explain){
   document.getElementById('nextBtn').style.display='inline-flex';
   document.getElementById('nextBtn').style.marginLeft='auto';
   var skip=document.querySelector('.btn-skip');if(skip)skip.style.display='none';
-  var actionBtns=document.querySelectorAll('#skipRow .btn-primary');actionBtns.forEach(function(b){b.style.display='none'});
+  var actionBtns=document.querySelectorAll('#skipRow .btn-primary:not(#nextBtn)');actionBtns.forEach(function(b){b.style.display='none'});
 }
 
 function nextQuestion(){
