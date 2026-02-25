@@ -504,31 +504,83 @@
             display: none;
             margin-top: 1.5rem;
             padding: 1rem;
-            background: #f0fdf4;
-            border-left: 4px solid #10b981;
             border-radius: 0.5rem;
-        }
-
-        @media (prefers-color-scheme: dark) {
-            .explanation {
-                background: #0f3f2f;
-                border-left-color: #34d399;
-            }
         }
 
         .explanation.show {
             display: block;
         }
 
-        .explanation-title {
-            font-weight: 600;
-            color: #047857;
-            margin-bottom: 0.5rem;
+        /* Richtig: grün */
+        .explanation.correct {
+            background: #f0fdf4;
+            border-left: 4px solid #10b981;
         }
 
         @media (prefers-color-scheme: dark) {
-            .explanation-title {
+            .explanation.correct {
+                background: #0f3f2f;
+                border-left-color: #34d399;
+            }
+        }
+
+        /* Falsch: rot */
+        .explanation.incorrect {
+            background: #fef2f2;
+            border-left: 4px solid #ef4444;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .explanation.incorrect {
+                background: #3f1d1d;
+                border-left-color: #f87171;
+            }
+        }
+
+        .explanation-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .explanation.correct .explanation-title {
+            color: #047857;
+        }
+
+        .explanation.incorrect .explanation-title {
+            color: #dc2626;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .explanation.correct .explanation-title {
                 color: #6ee7b7;
+            }
+            .explanation.incorrect .explanation-title {
+                color: #fca5a5;
+            }
+        }
+
+        .correct-answer {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem;
+            background: #ecfdf5;
+            display: inline-block;
+        }
+
+        .explanation.incorrect .correct-answer {
+            background: #f0fdf4;
+            color: #047857;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .correct-answer {
+                background: #064e3b;
+                color: #d1fae5;
+            }
+            .explanation.incorrect .correct-answer {
+                background: #064e3b;
+                color: #d1fae5;
             }
         }
 
@@ -778,7 +830,7 @@
                 <div class="answers" id="answersContainer"></div>
 
                 <div class="explanation" id="explanation">
-                    <div class="explanation-title">Erklärung:</div>
+                    <div class="explanation-title" id="explanationTitle">Erklärung:</div>
                     <div class="explanation-text" id="explanationText"></div>
                 </div>
 
@@ -2051,7 +2103,8 @@
             }
 
             // Explanation
-            document.getElementById('explanation').classList.remove('show');
+            const explEl = document.getElementById('explanation');
+            explEl.classList.remove('show', 'correct', 'incorrect');
             if (scores[q.id] !== undefined) {
                 showExplanation();
             }
@@ -2189,8 +2242,42 @@
 
         function showExplanation() {
             const q = currentQuestions[currentQuestionIndex];
-            document.getElementById('explanationText').innerHTML = q.explain.replace(/`([^`]+)`/g, '<code>$1</code>');
-            document.getElementById('explanation').classList.add('show');
+            const isCorrect = scores[q.id] === 1;
+            const explEl = document.getElementById('explanation');
+
+            // Richtig/Falsch-Klasse setzen
+            explEl.classList.remove('correct', 'incorrect');
+            explEl.classList.add(isCorrect ? 'correct' : 'incorrect');
+
+            // Titel anpassen
+            const titleEl = document.getElementById('explanationTitle');
+            titleEl.textContent = isCorrect ? '✓ Richtig!' : '✗ Leider falsch';
+
+            // Korrekte Lösung ermitteln
+            let correctAnswerHTML = '';
+            if (!isCorrect) {
+                let answerText = '';
+                if (q.type === 'mc') {
+                    answerText = String.fromCharCode(65 + q.correct) + ') ' + q.options[q.correct];
+                } else if (q.type === 'tf') {
+                    answerText = q.correct ? 'Richtig' : 'Falsch';
+                } else if (q.type === 'fill') {
+                    answerText = q.answerOptions[0];
+                } else if (q.type === 'calc') {
+                    answerText = String(q.correct);
+                } else if (q.type === 'multi') {
+                    answerText = q.correct.map(idx => String.fromCharCode(65 + idx) + ') ' + q.options[idx]).join(', ');
+                }
+                correctAnswerHTML = '<div class="correct-answer">Korrekte Antwort: ' + answerText + '</div>';
+            }
+
+            // Erklärungstext mit Code-Formatierung
+            const explainHTML = q.explain
+                .replace(/```python\n([\s\S]*?)\n```/g, '<pre><code>$1</code></pre>')
+                .replace(/`([^`]+)`/g, '<code>$1</code>');
+
+            document.getElementById('explanationText').innerHTML = correctAnswerHTML + explainHTML;
+            explEl.classList.add('show');
         }
 
         function showResults() {
