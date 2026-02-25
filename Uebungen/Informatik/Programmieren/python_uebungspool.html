@@ -1830,31 +1830,37 @@
             Object.entries(TOPICS).forEach(([key, value]) => {
                 const chip = document.createElement('button');
                 chip.className = 'chip';
+                chip.dataset.key = key;
                 chip.textContent = value.label;
                 chip.onclick = () => toggleTopic(key, chip);
                 topicChips.appendChild(chip);
             });
 
-            // Difficulty chips
+            // Difficulty chips — alle vorausgewählt
             const diffChips = document.getElementById('difficultyChips');
             [1, 2, 3].forEach(diff => {
                 const label = diff === 1 ? 'Einfach' : diff === 2 ? 'Mittel' : 'Schwer';
                 const chip = document.createElement('button');
-                chip.className = 'chip';
+                chip.className = 'chip active';
+                chip.dataset.diff = diff;
                 chip.textContent = label;
                 chip.onclick = () => toggleDifficulty(diff, chip);
                 diffChips.appendChild(chip);
+                selectedDifficulties.add(diff);
             });
 
-            // Type chips
+            // Type chips — alle vorausgewählt
             const typeChips = document.getElementById('typeChips');
-            ['mc', 'tf', 'fill', 'calc', 'multi'].forEach(type => {
+            const allTypes = ['mc', 'tf', 'fill', 'calc', 'multi'];
+            allTypes.forEach(type => {
                 const labels = { mc: 'Multiple Choice', tf: 'Wahr/Falsch', fill: 'Lückentext', calc: 'Berechnung', multi: 'Mehrfach' };
                 const chip = document.createElement('button');
-                chip.className = 'chip';
+                chip.className = 'chip active';
+                chip.dataset.type = type;
                 chip.textContent = labels[type];
                 chip.onclick = () => toggleType(type, chip);
                 typeChips.appendChild(chip);
+                selectedTypes.add(type);
             });
         }
 
@@ -1894,27 +1900,39 @@
             const diffs = params.get('diffs');
             const types = params.get('types');
 
+            // Topics aus URL übernehmen
             if (topics) {
-                topics.split(',').forEach(t => selectedTopics.add(t));
+                topics.split(',').forEach(t => selectedTopics.add(t.trim()));
                 document.querySelectorAll('#topicChips .chip').forEach(chip => {
-                    const topicKey = Array.from(TOPICS.keys())[Array.from(document.querySelectorAll('#topicChips .chip')).indexOf(chip)];
-                    if (selectedTopics.has(topicKey)) chip.classList.add('active');
+                    if (selectedTopics.has(chip.dataset.key)) chip.classList.add('active');
                 });
             }
 
+            // Schwierigkeiten aus URL übernehmen (überschreibt Vorauswahl)
             if (diffs) {
-                diffs.split(',').map(Number).forEach(d => selectedDifficulties.add(d));
-                document.querySelectorAll('#difficultyChips .chip').forEach((chip, idx) => {
-                    if (selectedDifficulties.has(idx + 1)) chip.classList.add('active');
+                selectedDifficulties.clear();
+                document.querySelectorAll('#difficultyChips .chip').forEach(chip => chip.classList.remove('active'));
+                diffs.split(',').map(Number).forEach(d => {
+                    selectedDifficulties.add(d);
+                    const chip = document.querySelector('#difficultyChips .chip[data-diff="' + d + '"]');
+                    if (chip) chip.classList.add('active');
                 });
             }
 
+            // Fragetypen aus URL übernehmen (überschreibt Vorauswahl)
             if (types) {
-                types.split(',').forEach(t => selectedTypes.add(t));
-                document.querySelectorAll('#typeChips .chip').forEach(chip => {
-                    const typeIdx = ['mc', 'tf', 'fill', 'calc', 'multi'].indexOf(types.split(',')[Array.from(document.querySelectorAll('#typeChips .chip')).indexOf(chip)]);
-                    if (typeIdx >= 0) chip.classList.add('active');
+                selectedTypes.clear();
+                document.querySelectorAll('#typeChips .chip').forEach(chip => chip.classList.remove('active'));
+                types.split(',').forEach(t => {
+                    selectedTypes.add(t.trim());
+                    const chip = document.querySelector('#typeChips .chip[data-type="' + t.trim() + '"]');
+                    if (chip) chip.classList.add('active');
                 });
+            }
+
+            // Auto-Start wenn URL-Parameter vorhanden
+            if (params.get('start') === '1') {
+                startQuiz();
             }
         }
 
@@ -2177,18 +2195,37 @@
             const keysSection = document.getElementById('keysSection');
             keysSection.style.display = keysSection.style.display === 'none' ? 'block' : 'none';
 
+            const baseUrl = window.location.origin + window.location.pathname;
+            const allDiffs = '1,2,3';
+            const allTypes = 'mc,tf,fill,calc,multi';
+
+            // Aktueller Filter-Link
             const topicString = Array.from(selectedTopics).join(',');
             const diffString = Array.from(selectedDifficulties).join(',');
             const typeString = Array.from(selectedTypes).join(',');
+            let currentParams = [];
+            if (topicString) currentParams.push('topics=' + topicString);
+            if (diffString) currentParams.push('diffs=' + diffString);
+            if (typeString) currentParams.push('types=' + typeString);
+            const currentUrl = baseUrl + (currentParams.length > 0 ? '?' + currentParams.join('&') : '');
 
-            let url = window.location.origin + window.location.pathname;
-            const params = [];
-            if (topicString) params.push('topics=' + topicString);
-            if (diffString) params.push('diffs=' + diffString);
-            if (typeString) params.push('types=' + typeString);
-            if (params.length > 0) url += '?' + params.join('&');
+            // Deep-Links pro Topic generieren
+            let html = '<div style="margin-bottom:1.5rem"><strong>Aktueller Filter:</strong><br>';
+            html += '<input type="text" value="' + currentUrl + '" readonly onclick="this.select()" style="width:100%;padding:0.5rem;font-family:\'DM Mono\',monospace;font-size:0.8rem;border:1px solid #475569;border-radius:0.5rem;background:#1e293b;color:#e5e7eb;margin-top:0.5rem"></div>';
 
-            document.getElementById('keysContent').textContent = url;
+            html += '<div style="margin-bottom:0.5rem"><strong>Deep-Links pro Thema:</strong></div>';
+            html += '<div style="display:flex;flex-direction:column;gap:0.75rem">';
+            Object.entries(TOPICS).forEach(([key, value]) => {
+                const count = QUESTIONS.filter(q => q.topic === key).length;
+                const url = baseUrl + '?topics=' + key + '&diffs=' + allDiffs + '&types=' + allTypes;
+                html += '<div style="background:#1e293b;padding:0.75rem 1rem;border-radius:0.5rem;border-left:3px solid #3b82f6">';
+                html += '<div style="font-weight:600;margin-bottom:0.25rem">' + value.label + ' <span style="opacity:0.5;font-weight:400">(' + count + ' Fragen)</span></div>';
+                html += '<input type="text" value="' + url + '" readonly onclick="this.select()" style="width:100%;padding:0.4rem;font-family:\'DM Mono\',monospace;font-size:0.75rem;border:1px solid #334155;border-radius:0.375rem;background:#0f172a;color:#94a3b8">';
+                html += '</div>';
+            });
+            html += '</div>';
+
+            document.getElementById('keysContent').innerHTML = html;
         }
 
         // Update progress bar during quiz
