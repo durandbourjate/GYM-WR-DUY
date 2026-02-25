@@ -1,0 +1,2215 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python-Grundlagen – Übungspool</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', system-ui, sans-serif;
+            background-color: #ffffff;
+            color: #1f2937;
+            line-height: 1.6;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #0f172a;
+                color: #e5e7eb;
+            }
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: #3b82f6;
+        }
+
+        .header p {
+            opacity: 0.7;
+            margin-bottom: 0.25rem;
+        }
+
+        .header .meta {
+            font-size: 0.85rem;
+            opacity: 0.6;
+        }
+
+        /* Screens */
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Start Screen */
+        .start-content {
+            margin-bottom: 2rem;
+        }
+
+        .description {
+            background: #f3f4f6;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            margin-bottom: 2rem;
+            border-left: 4px solid #3b82f6;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .description {
+                background: #1e293b;
+                border-left-color: #60a5fa;
+            }
+        }
+
+        .description h2 {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            color: #3b82f6;
+        }
+
+        .description p {
+            margin-bottom: 0.75rem;
+        }
+
+        .description ul {
+            list-style: none;
+            padding-left: 1rem;
+        }
+
+        .description li {
+            margin-bottom: 0.5rem;
+        }
+
+        .description li::before {
+            content: "▸ ";
+            color: #3b82f6;
+            font-weight: 600;
+            margin-right: 0.5rem;
+        }
+
+        /* Filter Chips */
+        .filter-section {
+            margin-bottom: 2rem;
+        }
+
+        .filter-label {
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            opacity: 0.7;
+        }
+
+        .chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .chip {
+            padding: 0.5rem 1rem;
+            border: 2px solid #d1d5db;
+            border-radius: 9999px;
+            background: transparent;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .chip {
+                border-color: #475569;
+            }
+        }
+
+        .chip:hover {
+            border-color: #3b82f6;
+            color: #3b82f6;
+        }
+
+        .chip.active {
+            background: #3b82f6;
+            border-color: #3b82f6;
+            color: #ffffff;
+        }
+
+        /* Buttons */
+        .button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-family: inherit;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .button-primary {
+            background: #3b82f6;
+            color: #ffffff;
+            width: 100%;
+            padding: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .button-primary:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .button-secondary {
+            background: #f3f4f6;
+            color: #1f2937;
+            margin-right: 0.75rem;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .button-secondary {
+                background: #1e293b;
+                color: #e5e7eb;
+            }
+        }
+
+        .button-secondary:hover {
+            background: #e5e7eb;
+        }
+
+        /* Quiz Screen */
+        .progress-bar {
+            background: #e5e7eb;
+            height: 8px;
+            border-radius: 9999px;
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .progress-bar {
+                background: #334155;
+            }
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #3b82f6;
+            transition: width 0.3s;
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: 0.5rem;
+            font-size: 0.85rem;
+            opacity: 0.6;
+        }
+
+        .question-container {
+            background: #f9fafb;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            margin-bottom: 2rem;
+            border-left: 4px solid #3b82f6;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .question-container {
+                background: #1e293b;
+                border-left-color: #60a5fa;
+            }
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .question-number {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            opacity: 0.6;
+        }
+
+        .question-badges {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border-radius: 0.25rem;
+            background: #dbeafe;
+            color: #0c4a6e;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .badge {
+                background: #0c4a6e;
+                color: #93c5fd;
+            }
+        }
+
+        .badge.topic {
+            background: #dbeafe;
+            color: #0c4a6e;
+        }
+
+        .badge.difficulty {
+            background: #fce7f3;
+            color: #831843;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .badge.difficulty {
+                background: #831843;
+                color: #fbcfe8;
+            }
+        }
+
+        .badge.type {
+            background: #d1fae5;
+            color: #064e3b;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .badge.type {
+                background: #064e3b;
+                color: #a7f3d0;
+            }
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+        }
+
+        /* Code blocks */
+        code {
+            font-family: 'DM Mono', monospace;
+            background: #f3f4f6;
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.25rem;
+            font-size: 0.9em;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            code {
+                background: #334155;
+                color: #e2e8f0;
+            }
+        }
+
+        pre {
+            background: #f3f4f6;
+            border-left: 4px solid #3b82f6;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            pre {
+                background: #1e293b;
+                border-left-color: #60a5fa;
+            }
+        }
+
+        pre code {
+            background: transparent;
+            padding: 0;
+            display: block;
+            color: #1f2937;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            pre code {
+                color: #e5e7eb;
+            }
+        }
+
+        /* Answer area */
+        .answers {
+            margin-bottom: 1.5rem;
+        }
+
+        .answer-option {
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            border: 2px solid #d1d5db;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: transparent;
+            text-align: left;
+            font-family: inherit;
+            font-size: 1rem;
+            width: 100%;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .answer-option {
+                border-color: #475569;
+            }
+        }
+
+        .answer-option:hover {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .answer-option:hover {
+                background: #0c2a48;
+            }
+        }
+
+        .answer-option.selected {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .answer-option.selected {
+                background: #0c2a48;
+            }
+        }
+
+        .answer-option.correct {
+            border-color: #10b981;
+            background: #ecfdf5;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .answer-option.correct {
+                background: #064e3b;
+                border-color: #34d399;
+            }
+        }
+
+        .answer-option.incorrect {
+            border-color: #ef4444;
+            background: #fef2f2;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .answer-option.incorrect {
+                background: #7f1d1d;
+                border-color: #f87171;
+            }
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        input[type="checkbox"], input[type="radio"] {
+            width: 1.25rem;
+            height: 1.25rem;
+            cursor: pointer;
+            accent-color: #3b82f6;
+        }
+
+        input[type="text"], input[type="number"] {
+            font-family: inherit;
+            padding: 0.75rem;
+            border: 2px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            width: 100%;
+            background: #ffffff;
+            color: #1f2937;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            input[type="text"], input[type="number"] {
+                background: #1e293b;
+                color: #e5e7eb;
+                border-color: #475569;
+            }
+        }
+
+        input[type="text"]:focus, input[type="number"]:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .fill-answer {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .fill-answer input {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        /* Explanation */
+        .explanation {
+            display: none;
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: #f0fdf4;
+            border-left: 4px solid #10b981;
+            border-radius: 0.5rem;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .explanation {
+                background: #0f3f2f;
+                border-left-color: #34d399;
+            }
+        }
+
+        .explanation.show {
+            display: block;
+        }
+
+        .explanation-title {
+            font-weight: 600;
+            color: #047857;
+            margin-bottom: 0.5rem;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .explanation-title {
+                color: #6ee7b7;
+            }
+        }
+
+        .explanation-text {
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        .buttons-row {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+        }
+
+        .buttons-row button {
+            flex: 1;
+        }
+
+        /* Results Screen */
+        .results-content {
+            text-align: center;
+        }
+
+        .results-score {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #3b82f6;
+            margin: 2rem 0;
+        }
+
+        .results-message {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.8;
+        }
+
+        .results-stats {
+            background: #f3f4f6;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            margin-bottom: 2rem;
+            text-align: left;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .results-stats {
+                background: #1e293b;
+            }
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .stat-row {
+                border-bottom-color: #334155;
+            }
+        }
+
+        .stat-row:last-child {
+            border-bottom: none;
+        }
+
+        .stat-label {
+            opacity: 0.7;
+        }
+
+        .stat-value {
+            font-weight: 600;
+            color: #3b82f6;
+        }
+
+        .topic-breakdown {
+            margin-top: 2rem;
+        }
+
+        .topic-item {
+            background: #f9fafb;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            border-radius: 0.5rem;
+            border-left: 4px solid #3b82f6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .topic-item {
+                background: #0f172a;
+                border-left-color: #60a5fa;
+            }
+        }
+
+        .topic-name {
+            font-weight: 500;
+        }
+
+        .topic-score {
+            font-weight: 600;
+            color: #3b82f6;
+        }
+
+        .retry-buttons {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 2rem;
+        }
+
+        .retry-buttons button {
+            flex: 1;
+        }
+
+        /* Keys View */
+        .keys-section {
+            background: #f9fafb;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .keys-section {
+                background: #1e293b;
+            }
+        }
+
+        .keys-section pre {
+            margin: 0;
+            font-size: 0.8rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .question-container {
+                padding: 1.5rem;
+            }
+
+            .results-score {
+                font-size: 2rem;
+            }
+
+            .buttons-row {
+                flex-direction: column;
+            }
+
+            .retry-buttons {
+                flex-direction: column;
+            }
+
+            .question-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🐍 Python-Grundlagen</h1>
+            <p>Vom Spielbuch zum Programm</p>
+            <p class="meta">GYM1 · Gymnasium Hofwil · Programmieren lernen</p>
+        </div>
+
+        <!-- START SCREEN -->
+        <div class="screen active" id="startScreen">
+            <div class="start-content">
+                <div class="description">
+                    <h2>Willkommen!</h2>
+                    <p>Du hast das Abenteuer «Raus hier!» erforscht, hast Karten gezeichnet und Flussdiagramme erstellt. Jetzt programmierst du das Spiel selbst mit Python!</p>
+                    <p style="margin-top: 1rem;">In diesem Übungspool lernst du die Grundlagen von Python:</p>
+                    <ul>
+                        <li>Ausgabe mit <code>print()</code></li>
+                        <li>Variablen und Datentypen</li>
+                        <li>Eingabe mit <code>input()</code></li>
+                        <li>String-Verarbeitung und Formatierung</li>
+                        <li>Operatoren und Berechnungen</li>
+                        <li>Verzweigungen mit <code>if/elif/else</code></li>
+                        <li>Schleifen mit <code>while</code> und <code>for</code></li>
+                    </ul>
+                </div>
+
+                <div class="filter-section">
+                    <div class="filter-label">Themen</div>
+                    <div class="chips" id="topicChips"></div>
+                </div>
+
+                <div class="filter-section">
+                    <div class="filter-label">Schwierigkeit</div>
+                    <div class="chips" id="difficultyChips"></div>
+                </div>
+
+                <div class="filter-section">
+                    <div class="filter-label">Fragentyp</div>
+                    <div class="chips" id="typeChips"></div>
+                </div>
+
+                <button class="button button-primary" onclick="startQuiz()">Quiz starten</button>
+
+                <div class="filter-section" style="margin-top: 2rem;">
+                    <div class="filter-label">Deep-Links</div>
+                    <button class="button button-secondary" onclick="showKeys()" style="width: 100%; margin-right: 0;">Deep-Link-Parameter anzeigen</button>
+                    <div class="keys-section" id="keysSection" style="display: none;">
+                        <pre id="keysContent"></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- QUIZ SCREEN -->
+        <div class="screen" id="quizScreen">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text">
+                <span id="progressText">0 / 0</span>
+            </div>
+
+            <div class="question-container">
+                <div class="question-header">
+                    <div class="question-number" id="questionNumber"></div>
+                    <div class="question-badges">
+                        <span class="badge topic" id="topicBadge"></span>
+                        <span class="badge difficulty" id="diffBadge"></span>
+                        <span class="badge type" id="typeBadge"></span>
+                    </div>
+                </div>
+
+                <div class="question-text" id="questionText"></div>
+
+                <div class="answers" id="answersContainer"></div>
+
+                <div class="explanation" id="explanation">
+                    <div class="explanation-title">Erklärung:</div>
+                    <div class="explanation-text" id="explanationText"></div>
+                </div>
+
+                <div class="buttons-row">
+                    <button class="button button-secondary" onclick="previousQuestion()" id="prevBtn">← Zurück</button>
+                    <button class="button button-primary" onclick="nextQuestion()" id="nextBtn">Weiter →</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RESULTS SCREEN -->
+        <div class="screen" id="resultsScreen">
+            <div class="results-content">
+                <h2>Ergebnisse</h2>
+                <div class="results-score" id="finalScore"></div>
+                <div class="results-message" id="resultMessage"></div>
+
+                <div class="results-stats">
+                    <div class="stat-row">
+                        <span class="stat-label">Richtige Antworten:</span>
+                        <span class="stat-value" id="correctCount"></span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Gesamt Fragen:</span>
+                        <span class="stat-value" id="totalCount"></span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Erfolgsquote:</span>
+                        <span class="stat-value" id="percentage"></span>
+                    </div>
+
+                    <div class="topic-breakdown" id="topicBreakdown"></div>
+                </div>
+
+                <div class="retry-buttons">
+                    <button class="button button-secondary" onclick="showStartScreen()">← Zur Übersicht</button>
+                    <button class="button button-primary" onclick="retryQuiz()">Nochmal versuchen</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============ POOL META ============
+        const POOL_META = {
+            title: "Python-Grundlagen – Vom Spielbuch zum Programm",
+            fach: "Informatik",
+            color: "#3b82f6",
+            meta: "GYM1 · Gymnasium Hofwil · Programmieren lernen",
+            lernziele: [
+                "Ich kann einfache Python-Programme mit Ein- und Ausgabe schreiben. (K3)",
+                "Ich kann Variablen, Datentypen und Operatoren korrekt einsetzen. (K2)",
+                "Ich kann Kontrollstrukturen (Verzweigungen, Schleifen) für Programmablauf-Steuerung nutzen. (K3)",
+                "Ich kann den Zusammenhang zwischen Flussdiagramm und Programmcode erklären. (K2)"
+            ]
+        };
+
+        // ============ TOPICS ============
+        const TOPICS = {
+            ausgabe: {
+                label: "Ausgabe mit print()",
+                lernziele: [
+                    "Ich kann mit print() Text und Variablen ausgeben. (K1)",
+                    "Ich kann Strings und Zahlen in print() korrekt verwenden. (K2)"
+                ]
+            },
+            variablen: {
+                label: "Variablen & Datentypen",
+                lernziele: [
+                    "Ich kann Variablen erstellen und ihnen Werte zuweisen. (K1)",
+                    "Ich kann die Datentypen int, float, str und bool unterscheiden. (K2)",
+                    "Ich kann Datentypen mit int(), float(), str() umwandeln. (K3)"
+                ]
+            },
+            eingabe: {
+                label: "Eingabe mit input()",
+                lernziele: [
+                    "Ich kann mit input() Benutzereingaben entgegennehmen. (K1)",
+                    "Ich kann input() mit Variablen und Typumwandlung kombinieren. (K3)"
+                ]
+            },
+            strings: {
+                label: "Strings & Formatierung",
+                lernziele: [
+                    "Ich kann Strings zusammensetzen und f-Strings verwenden. (K2)",
+                    "Ich kann String-Methoden wie .upper(), .lower(), len() anwenden. (K3)"
+                ]
+            },
+            operatoren: {
+                label: "Operatoren & Berechnungen",
+                lernziele: [
+                    "Ich kann arithmetische Operatoren (+, -, *, /, //, %, **) anwenden. (K1)",
+                    "Ich kann Vergleichsoperatoren (==, !=, <, >, <=, >=) verwenden. (K2)",
+                    "Ich kann logische Operatoren (and, or, not) einsetzen. (K2)"
+                ]
+            },
+            verzweigungen: {
+                label: "Verzweigungen (if/elif/else)",
+                lernziele: [
+                    "Ich kann einfache und verschachtelte if-Verzweigungen schreiben. (K3)",
+                    "Ich kann if-elif-else-Ketten für mehrere Bedingungen einsetzen. (K3)",
+                    "Ich kann den Zusammenhang zwischen Flussdiagramm und if-Verzweigung erklären. (K2)"
+                ]
+            },
+            schleifen: {
+                label: "Schleifen (while & for)",
+                lernziele: [
+                    "Ich kann while-Schleifen für wiederholte Aktionen einsetzen. (K3)",
+                    "Ich kann for-Schleifen über Listen und range() verwenden. (K3)",
+                    "Ich kann Endlosschleifen erkennen und vermeiden. (K4)"
+                ]
+            }
+        };
+
+        // ============ QUESTIONS DATABASE ============
+        const QUESTIONS = [
+            // === AUSGABE (10 Fragen) ===
+            {
+                id: "aus001",
+                topic: "ausgabe",
+                type: "mc",
+                difficulty: 1,
+                question: "Was gibt dieses Programm aus?\n\n```python\nprint(\"Willkommen im Keller!\")\n```",
+                options: [
+                    "Willkommen im Keller!",
+                    "\"Willkommen im Keller!\"",
+                    "print(Willkommen im Keller!)",
+                    "Fehler"
+                ],
+                correct: 0,
+                explain: "Die Funktion print() gibt den Text ohne die Anführungszeichen aus. Anführungszeichen markieren nur, dass es sich um einen String handelt."
+            },
+            {
+                id: "aus002",
+                topic: "ausgabe",
+                type: "tf",
+                difficulty: 1,
+                question: "print('Hallo') gibt den Text 'Hallo' mit Anführungszeichen aus.",
+                correct: false,
+                explain: "Falsch. Die Anführungszeichen sind Teil der Python-Syntax. print() gibt nur den eigentlichen Text ohne Anführungszeichen aus."
+            },
+            {
+                id: "aus003",
+                topic: "ausgabe",
+                type: "fill",
+                difficulty: 1,
+                question: "Ergänze den Code so, dass \"Du bist im Raum 1\" ausgegeben wird:\n\n```python\nprint(____________________)\n```",
+                answerOptions: ["\"Du bist im Raum 1\"", "'Du bist im Raum 1'"],
+                explain: "Strings müssen von Anführungszeichen (einfach oder doppelt) umgeben sein. Both Varianten sind korrekt."
+            },
+            {
+                id: "aus004",
+                topic: "ausgabe",
+                type: "mc",
+                difficulty: 2,
+                question: "Was gibt dieses Programm aus?\n\n```python\nprint(\"Du hast\", 3, \"Codes gefunden\")\n```",
+                options: [
+                    "Du hast 3 Codes gefunden",
+                    "Du hast,3,Codes gefunden",
+                    "\"Du hast\", 3, \"Codes gefunden\"",
+                    "Du hast3Codes gefunden"
+                ],
+                correct: 0,
+                explain: "print() mit mehreren Argumenten (getrennt durch Kommas) gibt die Werte mit Leerzeichen dazwischen aus."
+            },
+            {
+                id: "aus005",
+                topic: "ausgabe",
+                type: "mc",
+                difficulty: 2,
+                question: "Du willst ausgeben: Raum: 2\n\nWelcher Code ist korrekt?",
+                options: [
+                    "print(\"Raum:\", 2)",
+                    "print(\"Raum: 2\")",
+                    "Beide sind korrekt",
+                    "Keiner ist korrekt"
+                ],
+                correct: 2,
+                explain: "Beide Varianten geben dieselbe Ausgabe. In Variante 1 werden String und Zahl durch ein Komma getrennt, in Variante 2 alles in einem String geschrieben."
+            },
+            {
+                id: "aus006",
+                topic: "ausgabe",
+                type: "tf",
+                difficulty: 2,
+                question: "print() gibt immer Text aus.",
+                correct: false,
+                explain: "Falsch. print() kann Zahlen, Booleans, Listen und andere Datentypen ausgeben. Es konvertiert sie nur in Text-Form."
+            },
+            {
+                id: "aus007",
+                topic: "ausgabe",
+                type: "fill",
+                difficulty: 2,
+                question: "Was muss man schreiben, um einen Zeilenumbruch in der Ausgabe zu machen? (Hinweis: \\n verwenden)\n\n```python\nprint(\"Zeile 1____Zeile 2\")\n```",
+                answerOptions: ["\\n"],
+                explain: "Der Escape-Sequenz \\n (Backslash n) erzeugt einen Zeilenumbruch. Beispiel: print(\"Zeile 1\\nZeile 2\")"
+            },
+            {
+                id: "aus008",
+                topic: "ausgabe",
+                type: "mc",
+                difficulty: 3,
+                question: "Was ist das Ergebnis?\n\n```python\nprint(\"Code:\", \"\\\"423\\\"\")\n```",
+                options: [
+                    "Code: \"423\"",
+                    "Code: 423",
+                    "Fehler",
+                    "Code: \\\"423\\\""
+                ],
+                correct: 0,
+                explain: "\\\" ist ein escaped Double-Quote. Es wird als Anführungszeichen ausgegeben, nicht als Syntax-Element."
+            },
+            {
+                id: "aus009",
+                topic: "ausgabe",
+                type: "mc",
+                difficulty: 3,
+                question: "Du willst folgende Ausgabe:\nRaum 1 -> Osten\nRaum 2 -> Norden\n\nWelcher Code funktioniert?",
+                options: [
+                    "print(\"Raum 1 -> Osten\\nRaum 2 -> Norden\")",
+                    "print(\"Raum 1 -> Osten\", \"Raum 2 -> Norden\")",
+                    "print(\"Raum 1 -> Osten\" + \"Raum 2 -> Norden\")",
+                    "Keiner der obigen Codes"
+                ],
+                correct: 0,
+                explain: "Nur die erste Variante mit \\n erzeugt einen Zeilenumbruch in der Ausgabe."
+            },
+            {
+                id: "aus010",
+                topic: "ausgabe",
+                type: "tf",
+                difficulty: 1,
+                question: "Ich kann mehrere print()-Befehle hintereinander schreiben, um mehrere Zeilen auszugeben.",
+                correct: true,
+                explain: "Richtig! Jeder print()-Befehl erzeugt eine neue Zeile."
+            },
+
+            // === VARIABLEN (10 Fragen) ===
+            {
+                id: "var001",
+                topic: "variablen",
+                type: "mc",
+                difficulty: 1,
+                question: "Was macht dieser Code?\n\n```python\nraum_nummer = 1\n```",
+                options: [
+                    "Erstellt eine Variable mit dem Namen 'raum_nummer' und weist ihr den Wert 1 zu",
+                    "Prüft, ob raum_nummer gleich 1 ist",
+                    "Gibt raum_nummer aus",
+                    "Löscht die Variable raum_nummer"
+                ],
+                correct: 0,
+                explain: "Das Gleichheitszeichen = ist der Zuweisungsoperator. Er speichert einen Wert in einer Variable."
+            },
+            {
+                id: "var002",
+                topic: "variablen",
+                type: "tf",
+                difficulty: 1,
+                question: "In Python muss ich Variablen vor der Verwendung deklarieren (z.B. int raum = 1).",
+                correct: false,
+                explain: "Falsch. Python ist dynamisch typisiert. Ich kann einfach schreiben: raum = 1"
+            },
+            {
+                id: "var003",
+                topic: "variablen",
+                type: "mc",
+                difficulty: 1,
+                question: "Welcher Variablenname ist korrekt?",
+                options: [
+                    "hat_schluessel",
+                    "hat-schluessel",
+                    "hat schluessel",
+                    "hat.schluessel"
+                ],
+                correct: 0,
+                explain: "Variablennamen können Unterstrich enthalten. Bindestrich, Leerzeichen und Punkte sind nicht erlaubt."
+            },
+            {
+                id: "var004",
+                topic: "variablen",
+                type: "fill",
+                difficulty: 1,
+                question: "Erstelle eine Variable 'spieler_name' mit dem Wert \"Alice\":\n\n```python\n____________________ = \"Alice\"\n```",
+                answerOptions: ["spieler_name"],
+                explain: "Der Variablenname steht links vom Gleichheitszeichen, der Wert rechts davon."
+            },
+            {
+                id: "var005",
+                topic: "variablen",
+                type: "mc",
+                difficulty: 2,
+                question: "Welcher Datentyp hat diese Variable?\n\n```python\nhat_schluessel = True\n```",
+                options: [
+                    "bool (Boolean/Wahrheitswert)",
+                    "str (String)",
+                    "int (Ganzzahl)",
+                    "float (Dezimalzahl)"
+                ],
+                correct: 0,
+                explain: "True und False (Grossbuchstaben!) sind Boolean-Werte. Sie repräsentieren wahr oder falsch."
+            },
+            {
+                id: "var006",
+                topic: "variablen",
+                type: "mc",
+                difficulty: 2,
+                question: "Was ist das Ergebnis von type(3.14)?",
+                options: [
+                    "<class 'float'>",
+                    "<class 'int'>",
+                    "<class 'str'>",
+                    "3.14"
+                ],
+                correct: 0,
+                explain: "type() gibt den Datentyp zurück. 3.14 ist eine Dezimalzahl, also float."
+            },
+            {
+                id: "var007",
+                topic: "variablen",
+                type: "mc",
+                difficulty: 2,
+                question: "Der Spieler gibt \"42\" ein. Um es als Zahl zu verwenden, muss ich:\n\n```python\ncode = input(\"Code: \")\ncode_zahl = _____(code)\n```",
+                options: [
+                    "int(code)",
+                    "float(code)",
+                    "str(code)",
+                    "bool(code)"
+                ],
+                correct: 0,
+                explain: "input() gibt immer einen String zurück. Mit int() konvertiere ich ihn zu einer Ganzzahl."
+            },
+            {
+                id: "var008",
+                topic: "variablen",
+                type: "tf",
+                difficulty: 2,
+                question: "Ich kann eine Variable gleichzeitig mehrfach zuweisen: x = y = z = 5",
+                correct: true,
+                explain: "Richtig! Das funktioniert und ist sometimes praktisch."
+            },
+            {
+                id: "var009",
+                topic: "variablen",
+                type: "mc",
+                difficulty: 3,
+                question: "Was gibt dieser Code aus?\n\n```python\nx = \"3\"\ny = 4\nprint(x + y)\n```",
+                options: [
+                    "Fehler: Typ-Inkompatibilität",
+                    "7",
+                    "34",
+                    "None"
+                ],
+                correct: 0,
+                explain: "Man kann String und int nicht addieren. Erst muss man den String konvertieren: int(x) + y"
+            },
+            {
+                id: "var010",
+                topic: "variablen",
+                type: "fill",
+                difficulty: 2,
+                question: "Konvertiere die Variable 'prozent' (int) zu einem String:\n\n```python\nprozent = 75\nprozent_text = ____(prozent)\n```",
+                answerOptions: ["str"],
+                explain: "str() konvertiert den int-Wert zu einem String."
+            },
+
+            // === EINGABE (8 Fragen) ===
+            {
+                id: "ein001",
+                topic: "eingabe",
+                type: "mc",
+                difficulty: 1,
+                question: "Was macht dieser Code?\n\n```python\nname = input(\"Dein Name: \")\n```",
+                options: [
+                    "Fordert den Benutzer auf, seinen Namen einzugeben und speichert ihn in 'name'",
+                    "Gibt den Namen des Benutzers aus",
+                    "Prüft, ob der Name korrekt ist",
+                    "Erstellt eine Liste von Namen"
+                ],
+                correct: 0,
+                explain: "input() liest die Eingabe des Benutzers und speichert sie in der Variablen."
+            },
+            {
+                id: "ein002",
+                topic: "eingabe",
+                type: "tf",
+                difficulty: 1,
+                question: "input() gibt immer einen String zurück, auch wenn der Benutzer eine Zahl eingibt.",
+                correct: true,
+                explain: "Richtig! input() interpretiert die Eingabe immer als Text (String). Zum Konvertieren nutze ich int(), float() etc."
+            },
+            {
+                id: "ein003",
+                topic: "eingabe",
+                type: "mc",
+                difficulty: 1,
+                question: "Der Spieler soll die Zimmernummer eingeben. Welcher Code ist am Besten?",
+                options: [
+                    "raum = int(input(\"Raumnummer: \"))",
+                    "raum = input(\"Raumnummer: \")",
+                    "input(raum)",
+                    "raum == input(\"Raumnummer: \")"
+                ],
+                correct: 0,
+                explain: "Mit int() wird die Eingabe direkt zu einer Zahl konvertiert, so dass ich damit rechnen kann."
+            },
+            {
+                id: "ein004",
+                topic: "eingabe",
+                type: "fill",
+                difficulty: 2,
+                question: "Der Spieler soll den gefundenen Code eingeben. Ergänze:\n\n```python\ncode = input(\"Code: \")\ncode_nummer = _____(code)\n```",
+                answerOptions: ["int"],
+                explain: "int() konvertiert den eingegebenen String zu einer Ganzzahl."
+            },
+            {
+                id: "ein005",
+                topic: "eingabe",
+                type: "mc",
+                difficulty: 2,
+                question: "Was passiert bei diesem Code, wenn der Benutzer \"abc\" eingibt?\n\n```python\nzahl = int(input(\"Zahl: \"))\n```",
+                options: [
+                    "ValueError (Fehler, weil \"abc\" keine Zahl ist)",
+                    "zahl wird \"abc\"",
+                    "zahl wird 0",
+                    "Das Programm endet"
+                ],
+                correct: 0,
+                explain: "int() kann \"abc\" nicht zu einer Zahl konvertieren. Das führt zu einem ValueError."
+            },
+            {
+                id: "ein006",
+                topic: "eingabe",
+                type: "tf",
+                difficulty: 2,
+                question: "Ich kann mehrere Eingaben nacheinander machen:\n\nname = input(\"Name: \")\nalter = int(input(\"Alter: \"))",
+                correct: true,
+                explain: "Richtig! Mehrere input()-Befehle hintereinander sind völlig ok."
+            },
+            {
+                id: "ein007",
+                topic: "eingabe",
+                type: "mc",
+                difficulty: 3,
+                question: "Was ist ein Problem mit diesem Code?\n\n```python\ncode1 = input(\"Code 1: \")\ncode2 = input(\"Code 2: \")\nsumme = code1 + code2\nprint(summe)\n```",
+                options: [
+                    "code1 und code2 sind Strings, + verkettet sie statt zu addieren",
+                    "Es gibt kein Problem",
+                    "input() kann nur eine Eingabe nehmen",
+                    "Variablennamen können nicht mit 'code' anfangen"
+                ],
+                correct: 0,
+                explain: "Beide sind Strings, also: \"42\" + \"58\" ergibt \"4258\" statt 100. Lösung: int(code1) + int(code2)"
+            },
+            {
+                id: "ein008",
+                topic: "eingabe",
+                type: "fill",
+                difficulty: 2,
+                question: "Schreibe einen Code, der den Spieler nach seinem Namen fragt und ihn begrüsst:\n\n```python\nname = input(\"____\")\nprint(\"Hallo,\", name)\n```",
+                answerOptions: ["\"Dein Name: \"", "'Dein Name: '"],
+                explain: "input() erwartet einen String mit der Eingabeaufforderung."
+            },
+
+            // === STRINGS (9 Fragen) ===
+            {
+                id: "str001",
+                topic: "strings",
+                type: "mc",
+                difficulty: 1,
+                question: "Was gibt dieser Code aus?\n\n```python\ntext = \"Keller\"\nprint(text.upper())\n```",
+                options: [
+                    "KELLER",
+                    "Keller",
+                    "keller",
+                    "ERROR"
+                ],
+                correct: 0,
+                explain: ".upper() konvertiert alle Buchstaben in Grossbuchstaben."
+            },
+            {
+                id: "str002",
+                topic: "strings",
+                type: "tf",
+                difficulty: 1,
+                question: "Mit .lower() mache ich einen String in Kleinbuchstaben.",
+                correct: true,
+                explain: "Richtig! .lower() konvertiert alle Grossbuchstaben zu Kleinbuchstaben."
+            },
+            {
+                id: "str003",
+                topic: "strings",
+                type: "mc",
+                difficulty: 1,
+                question: "Was ist das Ergebnis von len(\"Spielbuch\")?",
+                options: [
+                    "9",
+                    "8",
+                    "10",
+                    "Fehler"
+                ],
+                correct: 0,
+                explain: "len() gibt die Laenge eines Strings zurück. \"Spielbuch\" hat 9 Zeichen."
+            },
+            {
+                id: "str004",
+                topic: "strings",
+                type: "fill",
+                difficulty: 1,
+                question: "Verbinde die Strings \"Du\" und \"bist im Keller\" mit +:\n\n```python\nprint(\"Du\" + ____ + \"bist im Keller\")\n```",
+                answerOptions: ["\" \"", "' '"],
+                explain: "Das + verbindet die Strings. Um ein Leerzeichen dazwischen zu haben, braucht es ein extra String \" \"."
+            },
+            {
+                id: "str005",
+                topic: "strings",
+                type: "mc",
+                difficulty: 2,
+                question: "Was macht dieser Code?\n\n```python\ntext = \"Raum\"\nprint(f\"Du bist in {text}\")\n```",
+                options: [
+                    "Gibt aus: Du bist in Raum",
+                    "Gibt aus: Du bist in {text}",
+                    "Fehler",
+                    "Gibt aus: f\"Du bist in Raum\""
+                ],
+                correct: 0,
+                explain: "f-Strings (formatted string literals) ersetzen {variable} durch den Wert. Das f vor dem String ist wichtig!"
+            },
+            {
+                id: "str006",
+                topic: "strings",
+                type: "mc",
+                difficulty: 2,
+                question: "Welcher Code gibt \"Raum 42\" aus?",
+                options: [
+                    "f\"Raum {42}\"",
+                    "f\"Raum 42\"",
+                    "\"Raum\" + 42",
+                    "\"Raum {42}\""
+                ],
+                correct: 0,
+                explain: "Mit f-String und {42} wird die Zahl in den String eingefügt. \"Raum\" + 42 würde einen Fehler verursachen."
+            },
+            {
+                id: "str007",
+                topic: "strings",
+                type: "mc",
+                difficulty: 2,
+                question: "Was ist das Ergebnis?\n\n```python\ntext = \"KELLER\"\nprint(text.lower())\n```",
+                options: [
+                    "keller",
+                    "KELLER",
+                    "Keller",
+                    "ERROR"
+                ],
+                correct: 0,
+                explain: ".lower() konvertiert alle Grossbuchstaben zu Kleinbuchstaben."
+            },
+            {
+                id: "str008",
+                topic: "strings",
+                type: "mc",
+                difficulty: 3,
+                question: "Was ist das Ergebnis?\n\n```python\ntext = \"Python\"\nprint(text[0:3])\n```",
+                options: [
+                    "Pyt",
+                    "yth",
+                    "Python",
+                    "tho"
+                ],
+                correct: 0,
+                explain: "text[0:3] ist ein Slice. Es gibt Zeichen ab Index 0 bis (nicht inklusive) Index 3 zurück: \"Pyt\"."
+            },
+            {
+                id: "str009",
+                topic: "strings",
+                type: "fill",
+                difficulty: 2,
+                question: "Ein Spieler hat seinen Namen eingegeben. Gib ihn mit .upper() in Grossbuchstaben aus:\n\n```python\nname = input(\"Name: \")\nprint(____)\n```",
+                answerOptions: ["name.upper()", "name.upper"],
+                explain: "name.upper() ist die Methode zum Konvertieren zu Grossbuchstaben. Die Klammern () sind wichtig!"
+            },
+
+            // === OPERATOREN (10 Fragen) ===
+            {
+                id: "op001",
+                topic: "operatoren",
+                type: "calc",
+                difficulty: 1,
+                question: "Berechne: 3 + 5 * 2",
+                correct: 13,
+                explain: "Punkt vor Strich (Operator-Priorität). Erst 5 * 2 = 10, dann 3 + 10 = 13."
+            },
+            {
+                id: "op002",
+                topic: "operatoren",
+                type: "mc",
+                difficulty: 1,
+                question: "Was ist das Ergebnis von 10 // 3 (Integer Division)?",
+                options: [
+                    "3",
+                    "3.333...",
+                    "4",
+                    "Fehler"
+                ],
+                correct: 0,
+                explain: "// teilt und gibt nur den ganzzahligen Teil zurück, ohne Dezimalstellen."
+            },
+            {
+                id: "op003",
+                topic: "operatoren",
+                type: "mc",
+                difficulty: 1,
+                question: "Was ist 10 % 3 (Modulo)?",
+                options: [
+                    "1",
+                    "3",
+                    "4",
+                    "0"
+                ],
+                correct: 0,
+                explain: "% gibt den Rest einer Division zurück. 10 = 3*3 + 1, Rest ist 1."
+            },
+            {
+                id: "op004",
+                topic: "operatoren",
+                type: "mc",
+                difficulty: 2,
+                question: "Was ist das Ergebnis von 2 ** 3?",
+                options: [
+                    "8",
+                    "6",
+                    "5",
+                    "1"
+                ],
+                correct: 0,
+                explain: "** ist der Exponent-Operator. 2 ** 3 = 2³ = 8."
+            },
+            {
+                id: "op005",
+                topic: "operatoren",
+                type: "mc",
+                difficulty: 2,
+                question: "Welcher Code prüft, ob 'code' nicht gleich 423 ist?",
+                options: [
+                    "code != 423",
+                    "code != 423",
+                    "code =! 423",
+                    "code <> 423"
+                ],
+                correct: 0,
+                explain: "!= ist der 'nicht gleich' Operator."
+            },
+            {
+                id: "op006",
+                topic: "operatoren",
+                type: "tf",
+                difficulty: 2,
+                question: "Wenn x = 5, dann ist 5 > x True.",
+                correct: false,
+                explain: "Falsch. 5 > 5 ist False, nicht True. 5 ist nicht grösser als 5."
+            },
+            {
+                id: "op007",
+                topic: "operatoren",
+                type: "mc",
+                difficulty: 2,
+                question: "Was ist True and False?",
+                options: [
+                    "False",
+                    "True",
+                    "None",
+                    "Fehler"
+                ],
+                correct: 0,
+                explain: "and gibt nur True zurück, wenn BEIDE Seiten True sind. True and False = False."
+            },
+            {
+                id: "op008",
+                topic: "operatoren",
+                type: "mc",
+                difficulty: 2,
+                question: "Was ist True or False?",
+                options: [
+                    "True",
+                    "False",
+                    "None",
+                    "Fehler"
+                ],
+                correct: 0,
+                explain: "or gibt True zurück, wenn MINDESTENS eine Seite True ist. True or False = True."
+            },
+            {
+                id: "op009",
+                topic: "operatoren",
+                type: "mc",
+                difficulty: 3,
+                question: "Was ist not True?",
+                options: [
+                    "False",
+                    "True",
+                    "0",
+                    "None"
+                ],
+                correct: 0,
+                explain: "not negiert den Boolean-Wert. not True = False."
+            },
+            {
+                id: "op010",
+                topic: "operatoren",
+                type: "mc",
+                difficulty: 3,
+                question: "Wie prüft man, ob code >= 400 AND <= 500?",
+                options: [
+                    "400 <= code <= 500",
+                    "400 <= code and code <= 500",
+                    "Beide sind korrekt",
+                    "Keines ist korrekt"
+                ],
+                correct: 2,
+                explain: "Beide Schreibweisen sind korrekt. Die erste ist eleganter, die zweite deutlicher."
+            },
+
+            // === VERZWEIGUNGEN (12 Fragen) ===
+            {
+                id: "verz001",
+                topic: "verzweigungen",
+                type: "mc",
+                difficulty: 1,
+                question: "Was macht dieser Code?\n\n```python\nif raum == 1:\n    print(\"Du bist im Keller\")\n```",
+                options: [
+                    "Wenn raum gleich 1 ist, wird \"Du bist im Keller\" ausgegeben",
+                    "Setzt raum auf 1",
+                    "Prüft immer, ob raum gleich 1 ist",
+                    "Gibt immer \"Du bist im Keller\" aus"
+                ],
+                correct: 0,
+                explain: "if prüft die Bedingung. Nur wenn sie wahr ist, wird der Code im Block ausgeführt."
+            },
+            {
+                id: "verz002",
+                topic: "verzweigungen",
+                type: "tf",
+                difficulty: 1,
+                question: "Einrückung (Indentation) ist in Python wichtig für if-Blöcke.",
+                correct: true,
+                explain: "Richtig! Python nutzt Einrückung zur Block-Struktur. Code, der zu if gehört, muss eingerückt sein."
+            },
+            {
+                id: "verz003",
+                topic: "verzweigungen",
+                type: "mc",
+                difficulty: 1,
+                question: "Was ist die Bedeutung von else?",
+                options: [
+                    "Der Code wird ausgeführt, wenn die if-Bedingung False ist",
+                    "Der Code wird immer ausgeführt",
+                    "Der Code wird nicht ausgeführt",
+                    "Es ist das Gegenteil von if"
+                ],
+                correct: 0,
+                explain: "else ist der Gegenpol zu if. Wenn if falsch ist, wird else ausgeführt."
+            },
+            {
+                id: "verz004",
+                topic: "verzweigungen",
+                type: "fill",
+                difficulty: 1,
+                question: "Ergänze einen else-Block:\n\n```python\nif code == 423:\n    print(\"Richtig!\")\n____:\n    print(\"Falsch!\")\n```",
+                answerOptions: ["else"],
+                explain: "else leitet den Block ein, der ausgeführt wird, wenn die if-Bedingung falsch ist."
+            },
+            {
+                id: "verz005",
+                topic: "verzweigungen",
+                type: "mc",
+                difficulty: 2,
+                question: "Wofür braucht man elif?",
+                options: [
+                    "Um mehrere Bedingungen nacheinander zu prüfen",
+                    "Um eine Bedingung zu negieren",
+                    "Um eine Schleife zu starten",
+                    "Um print() zu ersetzen"
+                ],
+                correct: 0,
+                explain: "elif = 'else if'. Man prüft weitere Bedingungen, falls die erste falsch war."
+            },
+            {
+                id: "verz006",
+                topic: "verzweigungen",
+                type: "mc",
+                difficulty: 2,
+                question: "Was gibt dieser Code aus, wenn raum = 2?\n\n```python\nif raum == 1:\n    print(\"Norden\")\nelif raum == 2:\n    print(\"Osten\")\nelse:\n    print(\"Süden\")\n```",
+                options: [
+                    "Osten",
+                    "Norden",
+                    "Süden",
+                    "Osten und Süden"
+                ],
+                correct: 0,
+                explain: "Die elif-Bedingung ist wahr, daher wird \"Osten\" ausgegeben. Die else wird übersprungen."
+            },
+            {
+                id: "verz007",
+                topic: "verzweigungen",
+                type: "mc",
+                difficulty: 2,
+                question: "Du willst prüfen: wenn hat_schluessel True ist UND raum == 3, dann Ausgang freigeben. Welcher Code?",
+                options: [
+                    "if hat_schluessel and raum == 3:",
+                    "if hat_schluessel and raum == 3:",
+                    "if (hat_schluessel) or (raum == 3):",
+                    "if hat_schluessel == raum == 3:"
+                ],
+                correct: 0,
+                explain: "and verknüpft beide Bedingungen. Beide müssen wahr sein."
+            },
+            {
+                id: "verz008",
+                topic: "verzweigungen",
+                type: "tf",
+                difficulty: 2,
+                question: "Ich kann if-Blöcke verschachteln (if innerhalb von if).",
+                correct: true,
+                explain: "Richtig! Nested if ist völlig ok, solange die Einrückung stimmt."
+            },
+            {
+                id: "verz009",
+                topic: "verzweigungen",
+                type: "mc",
+                difficulty: 2,
+                question: "Welcher Code ist korrekt?",
+                options: [
+                    "if x > 5:\n    print(\"Gross\")",
+                    "if x > 5\n    print(\"Gross\")",
+                    "if x > 5:\nprint(\"Gross\")",
+                    "if x > 5: print(\"Gross\")"
+                ],
+                correct: 0,
+                explain: "Variante 1 hat den Doppelpunkt : und korrekte Einrückung. Variante 3 hat einen Einrückungsfehler."
+            },
+            {
+                id: "verz010",
+                topic: "verzweigungen",
+                type: "mc",
+                difficulty: 3,
+                question: "Was gibt dieser Code aus, wenn x = 10?\n\n```python\nif x > 5:\n    if x > 15:\n        print(\"Sehr gross\")\n    else:\n        print(\"Mittel\")\nelse:\n    print(\"Klein\")\n```",
+                options: [
+                    "Mittel",
+                    "Sehr gross",
+                    "Klein",
+                    "Mittel und Klein"
+                ],
+                correct: 0,
+                explain: "x > 5 ist wahr, daher gehen wir in den äusseren if-Block. x > 15 ist falsch, daher: \"Mittel\"."
+            },
+            {
+                id: "verz011",
+                topic: "verzweigungen",
+                type: "fill",
+                difficulty: 2,
+                question: "Der Spieler gibt eine Zimmernummer ein. Wenn es 1 oder 2 ist, gib \"Du bist oben\" aus:\n\n```python\nif raum == 1 ____ raum == 2:\n    print(\"Du bist oben\")\n```",
+                answerOptions: ["or"],
+                explain: "or verbindet die Bedingungen mit 'oder': Wenn raum 1 ODER 2 ist."
+            },
+            {
+                id: "verz012",
+                topic: "verzweigungen",
+                type: "mc",
+                difficulty: 3,
+                question: "Welcher Code prüft, ob code NICHT gleich 423 ist?",
+                options: [
+                    "if code != 423:",
+                    "if not code == 423:",
+                    "if code ! 423:",
+                    "Beide a und b sind korrekt"
+                ],
+                correct: 3,
+                explain: "Sowohl code != 423 als auch not code == 423 sind korrekt."
+            },
+
+            // === SCHLEIFEN (12 Fragen) ===
+            {
+                id: "schle001",
+                topic: "schleifen",
+                type: "mc",
+                difficulty: 1,
+                question: "Was macht dieser Code?\n\n```python\ni = 0\nwhile i < 3:\n    print(i)\n    i = i + 1\n```",
+                options: [
+                    "Gibt 0, 1, 2 aus",
+                    "Gibt 0, 1, 2, 3 aus",
+                    "Endlosschleife",
+                    "Gibt nichts aus"
+                ],
+                correct: 0,
+                explain: "Die while-Schleife läuft, solange i < 3. i wird erhöht, bis die Bedingung falsch ist."
+            },
+            {
+                id: "schle002",
+                topic: "schleifen",
+                type: "tf",
+                difficulty: 1,
+                question: "Eine for-Schleife mit range(3) läuft 3-mal: 0, 1, 2.",
+                correct: true,
+                explain: "Richtig! range(3) gibt 0, 1, 2 zurück."
+            },
+            {
+                id: "schle003",
+                topic: "schleifen",
+                type: "mc",
+                difficulty: 1,
+                question: "Was ist das Ergebnis von list(range(5))?",
+                options: [
+                    "[0, 1, 2, 3, 4]",
+                    "[1, 2, 3, 4, 5]",
+                    "[5, 6, 7, 8, 9]",
+                    "[0, 1, 2, 3, 4, 5]"
+                ],
+                correct: 0,
+                explain: "range(5) gibt Zahlen von 0 bis 4 zurück (nicht inklusive 5)."
+            },
+            {
+                id: "schle004",
+                topic: "schleifen",
+                type: "fill",
+                difficulty: 1,
+                question: "Schreibe eine for-Schleife, die 5-mal \"Hallo\" ausgibt:\n\n```python\nfor i in ______:\n    print(\"Hallo\")\n```",
+                answerOptions: ["range(5)"],
+                explain: "range(5) erzeugt die Zahlen 0, 1, 2, 3, 4 – also 5 Iterationen."
+            },
+            {
+                id: "schle005",
+                topic: "schleifen",
+                type: "mc",
+                difficulty: 2,
+                question: "Was macht break in einer Schleife?",
+                options: [
+                    "Beendet die Schleife sofort",
+                    "Überspringt eine Iteration",
+                    "Startet die Schleife neu",
+                    "Gibt einen Fehler zurück"
+                ],
+                correct: 0,
+                explain: "break verlässt die Schleife sofort, ohne die Bedingung zu prüfen."
+            },
+            {
+                id: "schle006",
+                topic: "schleifen",
+                type: "mc",
+                difficulty: 2,
+                question: "Was macht continue in einer Schleife?",
+                options: [
+                    "Überspringt die aktuelle Iteration und geht zum nächsten Durchlauf",
+                    "Beendet die Schleife",
+                    "Startet die Schleife neu",
+                    "Printet \"continue\""
+                ],
+                correct: 0,
+                explain: "continue springt zum nächsten Durchlauf ohne den Rest des aktuellen Durchlaufs auszuführen."
+            },
+            {
+                id: "schle007",
+                topic: "schleifen",
+                type: "mc",
+                difficulty: 2,
+                question: "Der Spieler muss den richtigen Code eingeben. Welcher Code fragt, bis die richtige Antwort kommt?\n\n```python\nwhile True:\n    code = input(\"Code: \")\n    if code == \"423\":\n        ____\n```",
+                options: [
+                    "break",
+                    "continue",
+                    "exit()",
+                    "return"
+                ],
+                correct: 0,
+                explain: "break verlässt die while True-Schleife, wenn der richtige Code eingegeben wurde."
+            },
+            {
+                id: "schle008",
+                topic: "schleifen",
+                type: "mc",
+                difficulty: 2,
+                question: "Wie summiere ich die Zahlen 1 bis 5 mit einer Schleife?",
+                options: [
+                    "summe = 0\nfor i in range(1, 6):\n    summe = summe + i",
+                    "summe = range(1, 6)",
+                    "summe = 1 + 2 + 3 + 4 + 5",
+                    "for i in 5:\n    summe += i"
+                ],
+                correct: 0,
+                explain: "range(1, 6) gibt 1, 2, 3, 4, 5. Schleife addiert sie nacheinander."
+            },
+            {
+                id: "schle009",
+                topic: "schleifen",
+                type: "tf",
+                difficulty: 2,
+                question: "Diese Schleife ist eine Endlosschleife:\nwhile True:\n    print(\"Hallo\")",
+                correct: true,
+                explain: "Richtig! while True läuft für immer, es sei denn man nutzt break."
+            },
+            {
+                id: "schle010",
+                topic: "schleifen",
+                type: "mc",
+                difficulty: 3,
+                question: "Was gibt dieser Code aus?\n\n```python\nfor i in range(3):\n    print(i)\n    if i == 1:\n        break\n```",
+                options: [
+                    "0\\n1",
+                    "0\\n1\\n2",
+                    "1",
+                    "0"
+                ],
+                correct: 0,
+                explain: "Die Schleife printet 0, dann 1. Bei i == 1 wird break ausgeführt und die Schleife endet."
+            },
+            {
+                id: "schle011",
+                topic: "schleifen",
+                type: "mc",
+                difficulty: 3,
+                question: "Was ist der Unterschied zwischen while und for?",
+                options: [
+                    "while = unbekannte Anzahl, for = bekannte Anzahl",
+                    "while = schneller",
+                    "for = mehr Fehler",
+                    "Kein Unterschied"
+                ],
+                correct: 0,
+                explain: "for nutzt man für eine bekannte Anzahl (z.B. range(5)), while wenn man nicht weiss, wann die Bedingung falsch wird."
+            },
+            {
+                id: "schle012",
+                topic: "schleifen",
+                type: "fill",
+                difficulty: 2,
+                question: "Schreibe eine Schleife, die 1 bis 10 durchzählt:\n\n```python\nfor i in ________:\n    print(i)\n```",
+                answerOptions: ["range(1, 11)", "range(1,11)"],
+                explain: "range(1, 11) gibt 1, 2, ..., 10 zurück. range(1, 11) ist die richtige Syntax (obere Grenze ist exclusiv)."
+            }
+        ];
+
+        // ============ STATE ============
+        let selectedTopics = new Set();
+        let selectedDifficulties = new Set();
+        let selectedTypes = new Set();
+        let currentQuestionIndex = 0;
+        let currentQuestions = [];
+        let scores = {};
+        let userAnswers = {};
+
+        // ============ INITIALIZATION ============
+        document.addEventListener('DOMContentLoaded', function() {
+            initFilters();
+            parseUrlParams();
+        });
+
+        function initFilters() {
+            // Topic chips
+            const topicChips = document.getElementById('topicChips');
+            Object.entries(TOPICS).forEach(([key, value]) => {
+                const chip = document.createElement('button');
+                chip.className = 'chip';
+                chip.textContent = value.label;
+                chip.onclick = () => toggleTopic(key, chip);
+                topicChips.appendChild(chip);
+            });
+
+            // Difficulty chips
+            const diffChips = document.getElementById('difficultyChips');
+            [1, 2, 3].forEach(diff => {
+                const label = diff === 1 ? 'Einfach' : diff === 2 ? 'Mittel' : 'Schwer';
+                const chip = document.createElement('button');
+                chip.className = 'chip';
+                chip.textContent = label;
+                chip.onclick = () => toggleDifficulty(diff, chip);
+                diffChips.appendChild(chip);
+            });
+
+            // Type chips
+            const typeChips = document.getElementById('typeChips');
+            ['mc', 'tf', 'fill', 'calc', 'multi'].forEach(type => {
+                const labels = { mc: 'Multiple Choice', tf: 'Wahr/Falsch', fill: 'Lückentext', calc: 'Berechnung', multi: 'Mehrfach' };
+                const chip = document.createElement('button');
+                chip.className = 'chip';
+                chip.textContent = labels[type];
+                chip.onclick = () => toggleType(type, chip);
+                typeChips.appendChild(chip);
+            });
+        }
+
+        function toggleTopic(key, chip) {
+            if (selectedTopics.has(key)) {
+                selectedTopics.delete(key);
+                chip.classList.remove('active');
+            } else {
+                selectedTopics.add(key);
+                chip.classList.add('active');
+            }
+        }
+
+        function toggleDifficulty(diff, chip) {
+            if (selectedDifficulties.has(diff)) {
+                selectedDifficulties.delete(diff);
+                chip.classList.remove('active');
+            } else {
+                selectedDifficulties.add(diff);
+                chip.classList.add('active');
+            }
+        }
+
+        function toggleType(type, chip) {
+            if (selectedTypes.has(type)) {
+                selectedTypes.delete(type);
+                chip.classList.remove('active');
+            } else {
+                selectedTypes.add(type);
+                chip.classList.add('active');
+            }
+        }
+
+        function parseUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            const topics = params.get('topics');
+            const diffs = params.get('diffs');
+            const types = params.get('types');
+
+            if (topics) {
+                topics.split(',').forEach(t => selectedTopics.add(t));
+                document.querySelectorAll('#topicChips .chip').forEach(chip => {
+                    const topicKey = Array.from(TOPICS.keys())[Array.from(document.querySelectorAll('#topicChips .chip')).indexOf(chip)];
+                    if (selectedTopics.has(topicKey)) chip.classList.add('active');
+                });
+            }
+
+            if (diffs) {
+                diffs.split(',').map(Number).forEach(d => selectedDifficulties.add(d));
+                document.querySelectorAll('#difficultyChips .chip').forEach((chip, idx) => {
+                    if (selectedDifficulties.has(idx + 1)) chip.classList.add('active');
+                });
+            }
+
+            if (types) {
+                types.split(',').forEach(t => selectedTypes.add(t));
+                document.querySelectorAll('#typeChips .chip').forEach(chip => {
+                    const typeIdx = ['mc', 'tf', 'fill', 'calc', 'multi'].indexOf(types.split(',')[Array.from(document.querySelectorAll('#typeChips .chip')).indexOf(chip)]);
+                    if (typeIdx >= 0) chip.classList.add('active');
+                });
+            }
+        }
+
+        function startQuiz() {
+            // Filter questions
+            let filtered = QUESTIONS;
+
+            if (selectedTopics.size > 0) {
+                filtered = filtered.filter(q => selectedTopics.has(q.topic));
+            }
+
+            if (selectedDifficulties.size > 0) {
+                filtered = filtered.filter(q => selectedDifficulties.has(q.difficulty));
+            }
+
+            if (selectedTypes.size > 0) {
+                filtered = filtered.filter(q => selectedTypes.has(q.type));
+            }
+
+            currentQuestions = filtered.sort(() => Math.random() - 0.5);
+
+            if (currentQuestions.length === 0) {
+                alert('Keine Fragen gefunden. Bitte Filter anpassen.');
+                return;
+            }
+
+            currentQuestionIndex = 0;
+            scores = {};
+            userAnswers = {};
+
+            showScreen('quizScreen');
+            displayQuestion();
+        }
+
+        function displayQuestion() {
+            const q = currentQuestions[currentQuestionIndex];
+
+            // Update badges
+            document.getElementById('questionNumber').textContent = `Frage ${currentQuestionIndex + 1} / ${currentQuestions.length}`;
+            document.getElementById('topicBadge').textContent = TOPICS[q.topic].label;
+            document.getElementById('diffBadge').textContent = ['Einfach', 'Mittel', 'Schwer'][q.difficulty - 1];
+            const typeLabels = { mc: 'Multiple Choice', tf: 'Wahr/Falsch', fill: 'Lückentext', calc: 'Berechnung', multi: 'Mehrfach' };
+            document.getElementById('typeBadge').textContent = typeLabels[q.type];
+
+            // Question text (render code blocks)
+            let questionHTML = q.question.replace(/```python\n([\s\S]*?)\n```/g, '<pre><code>$1</code></pre>');
+            questionHTML = questionHTML.replace(/`([^`]+)`/g, '<code>$1</code>');
+            document.getElementById('questionText').innerHTML = questionHTML;
+
+            // Answers
+            const container = document.getElementById('answersContainer');
+            container.innerHTML = '';
+
+            if (q.type === 'mc') {
+                q.options.forEach((opt, idx) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'answer-option';
+                    btn.textContent = String.fromCharCode(65 + idx) + ') ' + opt;
+                    btn.onclick = () => selectMC(idx);
+                    if (userAnswers[q.id] === idx) btn.classList.add('selected');
+                    container.appendChild(btn);
+                });
+            } else if (q.type === 'tf') {
+                ['Richtig', 'Falsch'].forEach((label, idx) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'answer-option';
+                    btn.innerHTML = `<div class="checkbox-wrapper"><input type="radio" name="tf" value="${idx}"> ${label}</div>`;
+                    btn.onclick = () => selectTF(idx);
+                    if (userAnswers[q.id] === idx) btn.classList.add('selected');
+                    container.appendChild(btn);
+                });
+            } else if (q.type === 'fill') {
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.placeholder = 'Deine Antwort...';
+                input.value = userAnswers[q.id] || '';
+                input.onchange = (e) => userAnswers[q.id] = e.target.value;
+                container.appendChild(input);
+            } else if (q.type === 'calc') {
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.placeholder = 'Ergebnis...';
+                input.value = userAnswers[q.id] || '';
+                input.onchange = (e) => userAnswers[q.id] = e.target.value;
+                container.appendChild(input);
+            } else if (q.type === 'multi') {
+                q.options.forEach((opt, idx) => {
+                    const div = document.createElement('div');
+                    div.className = 'answer-option';
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.value = idx;
+                    checkbox.checked = (userAnswers[q.id] || []).includes(idx);
+                    checkbox.onchange = (e) => {
+                        if (!userAnswers[q.id]) userAnswers[q.id] = [];
+                        if (e.target.checked) {
+                            userAnswers[q.id].push(idx);
+                        } else {
+                            userAnswers[q.id] = userAnswers[q.id].filter(i => i !== idx);
+                        }
+                    };
+                    div.innerHTML = `<div class="checkbox-wrapper"><input type="checkbox" value="${idx}" ${checkbox.checked ? 'checked' : ''}> ${opt}</div>`;
+                    div.querySelector('input').onchange = checkbox.onchange;
+                    container.appendChild(div);
+                });
+            }
+
+            // Explanation
+            document.getElementById('explanation').classList.remove('show');
+            if (scores[q.id] !== undefined) {
+                showExplanation();
+            }
+
+            // Button states
+            document.getElementById('prevBtn').disabled = currentQuestionIndex === 0;
+            document.getElementById('nextBtn').textContent = currentQuestionIndex === currentQuestions.length - 1 ? 'Ergebnisse ansehen →' : 'Weiter →';
+        }
+
+        function selectMC(idx) {
+            const q = currentQuestions[currentQuestionIndex];
+            userAnswers[q.id] = idx;
+            document.querySelectorAll('.answer-option').forEach((btn, i) => {
+                btn.classList.remove('selected');
+                if (i === idx) btn.classList.add('selected');
+            });
+        }
+
+        function selectTF(idx) {
+            const q = currentQuestions[currentQuestionIndex];
+            userAnswers[q.id] = idx;
+            document.querySelectorAll('.answer-option').forEach(btn => btn.classList.remove('selected'));
+            event.target.closest('.answer-option').classList.add('selected');
+        }
+
+        function nextQuestion() {
+            const q = currentQuestions[currentQuestionIndex];
+
+            // Score the answer
+            if (scores[q.id] === undefined) {
+                scoreQuestion();
+            }
+
+            if (currentQuestionIndex < currentQuestions.length - 1) {
+                currentQuestionIndex++;
+                displayQuestion();
+                window.scrollTo(0, 0);
+            } else {
+                showResults();
+            }
+        }
+
+        function previousQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                displayQuestion();
+                window.scrollTo(0, 0);
+            }
+        }
+
+        function scoreQuestion() {
+            const q = currentQuestions[currentQuestionIndex];
+            let correct = false;
+
+            if (q.type === 'mc' || q.type === 'tf') {
+                correct = userAnswers[q.id] === q.correct;
+            } else if (q.type === 'fill') {
+                const ans = (userAnswers[q.id] || '').trim().toLowerCase();
+                correct = q.answerOptions.some(opt => opt.toLowerCase().includes(ans) || ans.includes(opt.toLowerCase()));
+            } else if (q.type === 'calc') {
+                correct = parseInt(userAnswers[q.id]) === q.correct;
+            } else if (q.type === 'multi') {
+                const selected = (userAnswers[q.id] || []).sort((a, b) => a - b);
+                correct = JSON.stringify(selected) === JSON.stringify(q.correct.sort((a, b) => a - b));
+            }
+
+            scores[q.id] = correct ? 1 : 0;
+
+            // Update UI
+            if (q.type === 'mc' || q.type === 'tf') {
+                document.querySelectorAll('.answer-option').forEach((btn, idx) => {
+                    if (q.type === 'mc' && idx === q.correct) {
+                        btn.classList.add('correct');
+                    } else if (q.type === 'tf' && (idx === q.correct)) {
+                        btn.classList.add('correct');
+                    }
+                    if ((q.type === 'mc' && idx === userAnswers[q.id]) || (q.type === 'tf' && idx === userAnswers[q.id])) {
+                        if (correct) {
+                            btn.classList.add('correct');
+                        } else {
+                            btn.classList.add('incorrect');
+                        }
+                    }
+                });
+            }
+
+            showExplanation();
+        }
+
+        function showExplanation() {
+            const q = currentQuestions[currentQuestionIndex];
+            document.getElementById('explanationText').innerHTML = q.explain.replace(/`([^`]+)`/g, '<code>$1</code>');
+            document.getElementById('explanation').classList.add('show');
+        }
+
+        function showResults() {
+            showScreen('resultsScreen');
+
+            const correct = Object.values(scores).filter(s => s === 1).length;
+            const total = currentQuestions.length;
+            const percentage = Math.round((correct / total) * 100);
+
+            document.getElementById('finalScore').textContent = percentage + '%';
+            document.getElementById('correctCount').textContent = correct + ' / ' + total;
+            document.getElementById('totalCount').textContent = total;
+            document.getElementById('percentage').textContent = percentage + '%';
+
+            if (percentage >= 80) {
+                document.getElementById('resultMessage').textContent = '🎉 Excellent!';
+            } else if (percentage >= 60) {
+                document.getElementById('resultMessage').textContent = '👍 Gut gemacht!';
+            } else {
+                document.getElementById('resultMessage').textContent = '💪 Noch üben!';
+            }
+
+            // Topic breakdown
+            const topicScores = {};
+            currentQuestions.forEach(q => {
+                if (!topicScores[q.topic]) {
+                    topicScores[q.topic] = { correct: 0, total: 0 };
+                }
+                topicScores[q.topic].total++;
+                topicScores[q.topic].correct += scores[q.id];
+            });
+
+            let breakdown = '';
+            Object.entries(topicScores).forEach(([topic, data]) => {
+                const pct = Math.round((data.correct / data.total) * 100);
+                breakdown += `<div class="topic-item"><div class="topic-name">${TOPICS[topic].label}</div><div class="topic-score">${data.correct} / ${data.total} (${pct}%)</div></div>`;
+            });
+            document.getElementById('topicBreakdown').innerHTML = breakdown;
+
+            window.scrollTo(0, 0);
+        }
+
+        function retryQuiz() {
+            showStartScreen();
+        }
+
+        function showStartScreen() {
+            showScreen('startScreen');
+            window.scrollTo(0, 0);
+        }
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function showKeys() {
+            const keysSection = document.getElementById('keysSection');
+            keysSection.style.display = keysSection.style.display === 'none' ? 'block' : 'none';
+
+            const topicString = Array.from(selectedTopics).join(',');
+            const diffString = Array.from(selectedDifficulties).join(',');
+            const typeString = Array.from(selectedTypes).join(',');
+
+            let url = window.location.origin + window.location.pathname;
+            const params = [];
+            if (topicString) params.push('topics=' + topicString);
+            if (diffString) params.push('diffs=' + diffString);
+            if (typeString) params.push('types=' + typeString);
+            if (params.length > 0) url += '?' + params.join('&');
+
+            document.getElementById('keysContent').textContent = url;
+        }
+
+        // Update progress bar during quiz
+        function updateProgress() {
+            const total = currentQuestions.length;
+            const percent = ((currentQuestionIndex + 1) / total) * 100;
+            document.getElementById('progressFill').style.width = percent + '%';
+            document.getElementById('progressText').textContent = `${currentQuestionIndex + 1} / ${total}`;
+        }
+
+        // Intercept nextQuestion to update progress
+        const originalNextQuestion = nextQuestion;
+        nextQuestion = function() {
+            originalNextQuestion.call(this);
+            updateProgress();
+        };
+
+        const originalDisplayQuestion = displayQuestion;
+        displayQuestion = function() {
+            originalDisplayQuestion.call(this);
+            updateProgress();
+        };
+    </script>
+</body>
+</html>
