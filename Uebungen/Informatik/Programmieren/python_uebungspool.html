@@ -2058,33 +2058,53 @@
 
             // Button states
             document.getElementById('prevBtn').disabled = currentQuestionIndex === 0;
-            document.getElementById('nextBtn').textContent = currentQuestionIndex === currentQuestions.length - 1 ? 'Ergebnisse ansehen →' : 'Weiter →';
+            const isScored = scores[q.id] !== undefined;
+            const isLastQuestion = currentQuestionIndex === currentQuestions.length - 1;
+            if (isScored) {
+                document.getElementById('nextBtn').textContent = isLastQuestion ? 'Ergebnisse ansehen →' : 'Weiter →';
+            } else if (q.type === 'mc' || q.type === 'tf') {
+                // MC/TF werden beim Klick automatisch bewertet
+                document.getElementById('nextBtn').textContent = isLastQuestion ? 'Ergebnisse ansehen →' : 'Weiter →';
+            } else {
+                // fill/calc/multi: "Prüfen"-Button bis zur Bewertung
+                document.getElementById('nextBtn').textContent = 'Prüfen ✓';
+            }
         }
 
         function selectMC(idx) {
             const q = currentQuestions[currentQuestionIndex];
+            // Wenn bereits bewertet, keine erneute Auswahl zulassen
+            if (scores[q.id] !== undefined) return;
             userAnswers[q.id] = idx;
             document.querySelectorAll('.answer-option').forEach((btn, i) => {
                 btn.classList.remove('selected');
                 if (i === idx) btn.classList.add('selected');
             });
+            // Sofort bewerten und Erklärung anzeigen
+            scoreQuestion();
         }
 
         function selectTF(idx) {
             const q = currentQuestions[currentQuestionIndex];
+            // Wenn bereits bewertet, keine erneute Auswahl zulassen
+            if (scores[q.id] !== undefined) return;
             userAnswers[q.id] = idx;
             document.querySelectorAll('.answer-option').forEach(btn => btn.classList.remove('selected'));
             event.target.closest('.answer-option').classList.add('selected');
+            // Sofort bewerten und Erklärung anzeigen
+            scoreQuestion();
         }
 
         function nextQuestion() {
             const q = currentQuestions[currentQuestionIndex];
 
-            // Score the answer
+            // Wenn noch nicht bewertet: zuerst bewerten und Erklärung anzeigen (nicht weiter)
             if (scores[q.id] === undefined) {
                 scoreQuestion();
+                return; // Auf aktueller Frage bleiben, Feedback anzeigen
             }
 
+            // Bereits bewertet → zur nächsten Frage wechseln
             if (currentQuestionIndex < currentQuestions.length - 1) {
                 currentQuestionIndex++;
                 displayQuestion();
@@ -2106,8 +2126,11 @@
             const q = currentQuestions[currentQuestionIndex];
             let correct = false;
 
-            if (q.type === 'mc' || q.type === 'tf') {
+            if (q.type === 'mc') {
                 correct = userAnswers[q.id] === q.correct;
+            } else if (q.type === 'tf') {
+                // idx 0 = "Richtig" gewählt, idx 1 = "Falsch" gewählt
+                correct = (userAnswers[q.id] === 0) === q.correct;
             } else if (q.type === 'fill') {
                 const ans = (userAnswers[q.id] || '').trim().toLowerCase();
                 correct = q.answerOptions.some(opt => opt.toLowerCase().includes(ans) || ans.includes(opt.toLowerCase()));
@@ -2120,25 +2143,48 @@
 
             scores[q.id] = correct ? 1 : 0;
 
-            // Update UI
-            if (q.type === 'mc' || q.type === 'tf') {
+            // UI aktualisieren: richtige/falsche Antworten markieren
+            if (q.type === 'mc') {
                 document.querySelectorAll('.answer-option').forEach((btn, idx) => {
-                    if (q.type === 'mc' && idx === q.correct) {
-                        btn.classList.add('correct');
-                    } else if (q.type === 'tf' && (idx === q.correct)) {
+                    btn.style.pointerEvents = 'none'; // Klick deaktivieren
+                    if (idx === q.correct) {
                         btn.classList.add('correct');
                     }
-                    if ((q.type === 'mc' && idx === userAnswers[q.id]) || (q.type === 'tf' && idx === userAnswers[q.id])) {
-                        if (correct) {
-                            btn.classList.add('correct');
-                        } else {
-                            btn.classList.add('incorrect');
-                        }
+                    if (idx === userAnswers[q.id] && !correct) {
+                        btn.classList.add('incorrect');
                     }
                 });
+            } else if (q.type === 'tf') {
+                // Korrekte Position: "Richtig" (idx 0) wenn q.correct=true, "Falsch" (idx 1) wenn q.correct=false
+                const correctIdx = q.correct ? 0 : 1;
+                document.querySelectorAll('.answer-option').forEach((btn, idx) => {
+                    btn.style.pointerEvents = 'none'; // Klick deaktivieren
+                    if (idx === correctIdx) {
+                        btn.classList.add('correct');
+                    }
+                    if (idx === userAnswers[q.id] && !correct) {
+                        btn.classList.add('incorrect');
+                    }
+                });
+            } else if (q.type === 'fill' || q.type === 'calc') {
+                // Eingabefeld deaktivieren
+                const inputs = document.querySelectorAll('#answersContainer input');
+                inputs.forEach(input => input.disabled = true);
+            } else if (q.type === 'multi') {
+                // Checkboxen deaktivieren
+                document.querySelectorAll('#answersContainer input[type="checkbox"]').forEach(cb => cb.disabled = true);
+                document.querySelectorAll('.answer-option').forEach(btn => btn.style.pointerEvents = 'none');
             }
 
+            // Weiter-Button Text aktualisieren
+            document.getElementById('nextBtn').textContent = currentQuestionIndex === currentQuestions.length - 1 ? 'Ergebnisse ansehen →' : 'Weiter →';
+
             showExplanation();
+
+            // Zur Erklärung scrollen damit sie sichtbar ist
+            setTimeout(() => {
+                document.getElementById('explanation').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
         }
 
         function showExplanation() {
