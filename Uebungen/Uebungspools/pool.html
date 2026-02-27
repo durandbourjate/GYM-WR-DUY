@@ -795,7 +795,9 @@ function showHints(qid){
   if(!hintsDiv)return;
   if(hintsDiv.style.display!=='none'){hintsDiv.style.display='none';return;}
   const q=QUESTIONS.find(x=>x.id===qid);
-  if(!q||!q.hints)return;
+  if(!q)return;
+  // Fill-Fragen können Hints auto-generieren, andere brauchen explizite hints
+  if(q.type!=='fill'&&(!q.hints||!q.hints.length))return;
 
   let html='';
 
