@@ -2,7 +2,7 @@
  * Google Apps Script — Übungspool: Problemmeldungen + Analytics
  *
  * Dieses Script verarbeitet ZWEI Arten von Requests über denselben Endpoint:
- * 1. Problemmeldungen (bestehend) → Blatt «Formularantworten»
+ * 1. Problemmeldungen (bestehend) → Blatt «Problemmeldungen»
  * 2. Analytics-Events (neu)       → Blätter «Events» und «Sessions»
  *
  * SETUP FÜR ANALYTICS:
@@ -16,11 +16,11 @@
 // ── KONFIGURATION ──
 const SHEET_EVENTS = 'Events';
 const SHEET_SESSIONS = 'Sessions';
-const SHEET_REPORTS = 'Formularantworten';  // Bestehendes Blatt für Problemmeldungen
+const SHEET_REPORTS = 'Problemmeldungen';  // Bestehendes Blatt (im Sheet umbenennen!)
 
 /**
  * Einmalig ausführen: Erstellt die Analytics-Blätter im bestehenden Sheet.
- * Das bestehende Blatt «Formularantworten» wird nicht verändert.
+ * Das bestehende Blatt «Problemmeldungen» wird nicht verändert.
  */
 function setupAnalyticsSheets() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();

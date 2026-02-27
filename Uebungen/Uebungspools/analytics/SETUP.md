@@ -5,7 +5,7 @@
 Das Analytics-Tracking nutzt das **bestehende Google Sheet** (bisher für Problemmeldungen), ergänzt um zwei neue Tabellenblätter. Das Apps Script verarbeitet über denselben Endpoint sowohl Problemmeldungen als auch Analytics-Events.
 
 - **Google Sheet:** `uebungspool_analyse` (ehemals «Problemmeldungen Übungspools»)
-- **Bestehendes Blatt:** «Formularantworten» (Problemmeldungen, bleibt unverändert)
+- **Bestehendes Blatt:** «Problemmeldungen» (Problemmeldungen, bleibt unverändert)
 - **Neue Blätter:** «Events» und «Sessions» (Analytics)
 
 ## Schritt 1: Apps Script aktualisieren
@@ -15,7 +15,7 @@ Das Analytics-Tracking nutzt das **bestehende Google Sheet** (bisher für Proble
 3. Den bestehenden Code **komplett ersetzen** mit dem Inhalt von `apps_script_code.js`
 4. **Einmal `setupAnalyticsSheets`** ausführen (Menü: Ausführen → Funktion auswählen → `setupAnalyticsSheets` → ▶️)
    → Erstellt die Tabellenblätter «Events» und «Sessions» mit Spaltenüberschriften
-   → Das bestehende Blatt «Formularantworten» wird **nicht** verändert
+   → Das bestehende Blatt «Problemmeldungen» wird **nicht** verändert
 5. **Deploy → Bereitstellungen verwalten → Bearbeiten (Stift-Icon) → Neue Version**
    → Die bestehende URL bleibt gleich, es braucht keine neue Bereitstellung
 
