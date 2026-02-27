@@ -107,7 +107,8 @@ function doGet(e) {
       }
     }
     // ── PROBLEMMELDUNGEN (bestehend) ──
-    else if (params.pool && params.qid && params.cat) {
+    // pool.html sendet: pool, qid, topic, text, category, comment
+    else if (params.pool && params.qid && (params.cat || params.category)) {
       const sheet = ss.getSheetByName(SHEET_REPORTS);
       if (sheet) {
         sheet.appendRow([
@@ -115,9 +116,9 @@ function doGet(e) {
           params.pool || '',
           params.qid || '',
           params.topic || '',
-          params.qtext || '',
-          params.cat || '',
-          params.desc || ''
+          params.qtext || params.text || '',
+          params.cat || params.category || '',
+          params.desc || params.comment || ''
         ]);
       }
     }
