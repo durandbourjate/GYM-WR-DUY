@@ -56,8 +56,9 @@ function setupAnalyticsSheets() {
  * Web App Endpoint — verarbeitet GET-Requests von pool.html
  *
  * Dispatch-Logik:
- * - param «event» vorhanden → Analytics (answer/skip/session_end)
+ * - param «evt» vorhanden → Analytics (answer/skip/session_end)
  * - param «pool» + «qid» + «cat» vorhanden → Problemmeldung (bestehend)
+ * HINWEIS: «evt» statt «event» weil Google «event» als reservierten Parameter blockiert!
  */
 function doGet(e) {
   try {
@@ -67,15 +68,15 @@ function doGet(e) {
     const ss = SpreadsheetApp.getActiveSpreadsheet();
 
     // ── ANALYTICS-EVENTS ──
-    if (params.event) {
-      const event = params.event;
+    if (params.evt) {
+      const evt = params.evt;
 
-      if (event === 'answer' || event === 'skip') {
+      if (evt === 'answer' || evt === 'skip') {
         const sheet = ss.getSheetByName(SHEET_EVENTS);
         if (sheet) {
           sheet.appendRow([
             ts,
-            event,
+            evt,
             params.sid || '',
             params.pool || '',
             params.qid || '',
@@ -83,13 +84,13 @@ function doGet(e) {
             params.qtype || '',
             params.diff || '',
             params.correct || '',
-            event === 'skip' ? 'true' : 'false',
+            evt === 'skip' ? 'true' : 'false',
             params.answer || '',
             params.zeit || ''
           ]);
         }
       }
-      else if (event === 'session_end') {
+      else if (evt === 'session_end') {
         const sheet = ss.getSheetByName(SHEET_SESSIONS);
         if (sheet) {
           const pct = params.max > 0 ? Math.round((params.score / params.max) * 100) : 0;

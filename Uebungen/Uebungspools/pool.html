@@ -936,7 +936,7 @@ function trackEvent(evt,data){
   if(!TRACKING_CONFIG.endpoint)return;
   var poolId=new URLSearchParams(window.location.search).get('pool')||'';
   var params=new URLSearchParams();
-  params.set('event',evt);
+  params.set('evt',evt);
   params.set('sid',_trackSid);
   params.set('pool',poolId);
   if(data){Object.keys(data).forEach(function(k){params.set(k,data[k])})}
