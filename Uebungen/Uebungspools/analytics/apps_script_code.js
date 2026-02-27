@@ -1,5 +1,5 @@
 /**
- * Google Apps Script — Übungspool Analytics
+ * Google Apps Script — Übungspool Analytics (anonym)
  *
  * DEPLOYMENT:
  * 1. Neues Google Apps Script erstellen (script.google.com)
@@ -24,26 +24,26 @@ function setupSheet() {
   if (!evSheet) {
     evSheet = ss.insertSheet(SHEET_NAME_EVENTS);
   }
-  evSheet.getRange(1, 1, 1, 14).setValues([[
-    'timestamp', 'event', 'session_id', 'pool', 'klasse',
+  evSheet.getRange(1, 1, 1, 12).setValues([[
+    'timestamp', 'event', 'session_id', 'pool',
     'frage_id', 'topic', 'type', 'diff', 'correct',
-    'skipped', 'antwort', 'zeit_ms', 'extra'
+    'skipped', 'antwort', 'zeit_ms'
   ]]);
   evSheet.setFrozenRows(1);
-  evSheet.getRange(1, 1, 1, 14).setFontWeight('bold');
+  evSheet.getRange(1, 1, 1, 12).setFontWeight('bold');
 
   // Sessions-Blatt
   let sessSheet = ss.getSheetByName(SHEET_NAME_SESSIONS);
   if (!sessSheet) {
     sessSheet = ss.insertSheet(SHEET_NAME_SESSIONS);
   }
-  sessSheet.getRange(1, 1, 1, 10).setValues([[
-    'timestamp', 'session_id', 'pool', 'klasse',
+  sessSheet.getRange(1, 1, 1, 8).setValues([[
+    'timestamp', 'session_id', 'pool',
     'score', 'max_score', 'prozent', 'dauer_s',
-    'anzahl_fragen', 'topics'
+    'anzahl_fragen'
   ]]);
   sessSheet.setFrozenRows(1);
-  sessSheet.getRange(1, 1, 1, 10).setFontWeight('bold');
+  sessSheet.getRange(1, 1, 1, 8).setFontWeight('bold');
 
   // Sheet1 entfernen falls leer
   const sheet1 = ss.getSheetByName('Sheet1') || ss.getSheetByName('Tabelle1');
@@ -65,14 +65,12 @@ function doGet(e) {
     const ss = SpreadsheetApp.getActiveSpreadsheet();
 
     if (event === 'answer' || event === 'skip') {
-      // Einzelne Antwort tracken
       const evSheet = ss.getSheetByName(SHEET_NAME_EVENTS);
       evSheet.appendRow([
         ts,
         event,
         params.sid || '',
         params.pool || '',
-        params.klasse || 'anonym',
         params.qid || '',
         params.topic || '',
         params.qtype || '',
@@ -80,29 +78,24 @@ function doGet(e) {
         params.correct || '',
         event === 'skip' ? 'true' : 'false',
         params.answer || '',
-        params.zeit || '',
-        params.extra || ''
+        params.zeit || ''
       ]);
     }
     else if (event === 'session_end') {
-      // Session-Zusammenfassung
       const sessSheet = ss.getSheetByName(SHEET_NAME_SESSIONS);
       const pct = params.max > 0 ? Math.round((params.score / params.max) * 100) : 0;
       sessSheet.appendRow([
         ts,
         params.sid || '',
         params.pool || '',
-        params.klasse || 'anonym',
         params.score || 0,
         params.max || 0,
         pct,
         params.dauer || '',
-        params.count || '',
-        params.topics || ''
+        params.count || ''
       ]);
     }
 
-    // 1x1 Pixel als Antwort (Image-Ping)
     return ContentService
       .createTextOutput('OK')
       .setMimeType(ContentService.MimeType.TEXT);

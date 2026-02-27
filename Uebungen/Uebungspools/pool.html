@@ -919,51 +919,28 @@ document.addEventListener('keydown',function(e){
 // ══════════════════════════════════════════
 // ANALYTICS TRACKING — Anonymes Nutzungstracking via Google Apps Script
 // Sendet Events (answer, skip, session_end) an ein Google Sheet.
-// Tracking ist nur aktiv wenn eine Klasse ausgewählt wurde.
+// Komplett anonym — keine Identifikation der SuS.
 // ══════════════════════════════════════════
 const TRACKING_CONFIG={
   // ══ DEINE APPS-SCRIPT-URL HIER EINTRAGEN: ══
-  endpoint:'',
-  klassen:['27a','27abcd8f','28a','28abcdf','29c','andere']
+  endpoint:''
 };
 var _trackSid='';
-var _trackKlasse='';
 var _trackStart=0;
 var _trackQStart=0;
 
 function trackInit(){
-  // Session-ID generieren
   _trackSid='s_'+Date.now()+'_'+Math.random().toString(36).substr(2,4);
-  // Klasse aus URL oder Dropdown
-  const p=new URLSearchParams(window.location.search);
-  if(p.get('klasse'))_trackKlasse=p.get('klasse');
-  // Klassen-Dropdown im Startscreen einfügen
-  const fc=document.getElementById('filterCount');
-  if(fc&&!document.getElementById('klasseSelect')){
-    var html='<div class="klasse-row" style="margin-top:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">';
-    html+='<label for="klasseSelect" style="font-size:.82rem;font-weight:600;color:var(--c-muted)">👥 Klasse (optional):</label>';
-    html+='<select id="klasseSelect" style="padding:4px 10px;border-radius:8px;border:1px solid var(--c-border);background:var(--c-surface);color:var(--c-text);font-size:.82rem;font-family:inherit">';
-    html+='<option value="">– keine Angabe –</option>';
-    TRACKING_CONFIG.klassen.forEach(function(k){html+='<option value="'+k+'"'+(k===_trackKlasse?' selected':'')+'>'+k+'</option>'});
-    html+='</select></div>';
-    fc.insertAdjacentHTML('afterend',html);
-  }
 }
 
 function trackEvent(evt,data){
   if(!TRACKING_CONFIG.endpoint)return;
-  // Klasse aus Dropdown lesen falls nicht via URL gesetzt
-  var sel=document.getElementById('klasseSelect');
-  if(sel)_trackKlasse=sel.value;
-  if(!_trackKlasse)return; // Kein Tracking ohne Klasse
   var poolId=new URLSearchParams(window.location.search).get('pool')||'';
   var params=new URLSearchParams();
   params.set('event',evt);
   params.set('sid',_trackSid);
   params.set('pool',poolId);
-  params.set('klasse',_trackKlasse);
   if(data){Object.keys(data).forEach(function(k){params.set(k,data[k])})}
-  // Image-Ping (gleich wie Problemmeldung — zuverlässigste Cross-Origin Methode)
   var img=new Image();
   img.src=TRACKING_CONFIG.endpoint+'?'+params.toString();
 }

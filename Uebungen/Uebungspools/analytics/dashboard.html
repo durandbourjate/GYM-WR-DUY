@@ -73,8 +73,6 @@ tr:hover td{background:#f1f5f9}
   <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center">
     <div><label style="font-size:.78rem;color:var(--muted);font-weight:600">Pool:</label>
       <select id="filterPool" onchange="applyFilters()"><option value="">Alle</option></select></div>
-    <div><label style="font-size:.78rem;color:var(--muted);font-weight:600">Klasse:</label>
-      <select id="filterKlasse" onchange="applyFilters()"><option value="">Alle</option></select></div>
     <div><label style="font-size:.78rem;color:var(--muted);font-weight:600">Zeitraum:</label>
       <select id="filterZeit" onchange="applyFilters()">
         <option value="">Gesamt</option><option value="7">Letzte 7 Tage</option><option value="30">Letzte 30 Tage</option>
@@ -87,7 +85,7 @@ tr:hover td{background:#f1f5f9}
   <div class="card"><h2>📚 Beliebteste Pools</h2><div class="chart-wrap"><canvas id="chartPools"></canvas></div></div>
   <div class="card"><h2>📊 Nutzung nach Schwierigkeit</h2><div class="chart-wrap"><canvas id="chartDiff"></canvas></div></div>
   <div class="card"><h2>📅 Nutzung über Zeit</h2><div class="chart-wrap"><canvas id="chartTime"></canvas></div></div>
-  <div class="card"><h2>👥 Aktivität nach Klasse</h2><div class="chart-wrap"><canvas id="chartKlasse"></canvas></div></div>
+  <div class="card"><h2>⏱️ Antwortzeit nach Schwierigkeit</h2><div class="chart-wrap"><canvas id="chartZeit"></canvas></div></div>
 </div>
 
 <!-- Tabellen -->
@@ -186,28 +184,22 @@ async function loadData(){
 // ── FILTERS ──
 function populateFilters(){
   const pools=[...new Set(rawEvents.map(e=>e.pool).filter(Boolean))].sort();
-  const klassen=[...new Set(rawEvents.map(e=>e.klasse).filter(Boolean))].sort();
   const poolSel=document.getElementById('filterPool');
   poolSel.innerHTML='<option value="">Alle</option>'+pools.map(p=>'<option value="'+p+'">'+p+'</option>').join('');
-  const klasseSel=document.getElementById('filterKlasse');
-  klasseSel.innerHTML='<option value="">Alle</option>'+klassen.map(k=>'<option value="'+k+'">'+k+'</option>').join('');
 }
 
 function applyFilters(){
   const pool=document.getElementById('filterPool').value;
-  const klasse=document.getElementById('filterKlasse').value;
   const tage=parseInt(document.getElementById('filterZeit').value)||0;
   const cutoff=tage?new Date(Date.now()-tage*86400000):null;
 
   filteredEvents=rawEvents.filter(e=>{
     if(pool&&e.pool!==pool)return false;
-    if(klasse&&e.klasse!==klasse)return false;
     if(cutoff&&new Date(e.timestamp)<cutoff)return false;
     return true;
   });
   filteredSessions=rawSessions.filter(s=>{
     if(pool&&s.pool!==pool)return false;
-    if(klasse&&s.klasse!==klasse)return false;
     if(cutoff&&new Date(s.timestamp)<cutoff)return false;
     return true;
   });
@@ -287,13 +279,14 @@ function renderCharts(){
     data:{labels:days.map(d=>d.substring(5)),datasets:[{data:days.map(d=>dayMap[d]),borderColor:'#2563eb',backgroundColor:'rgba(37,99,235,0.1)',fill:true,tension:.3}]}
   });
 
-  // 4. Klassen
-  const klasseCounts={};
-  answers.forEach(e=>{const k=e.klasse||'anonym';klasseCounts[k]=(klasseCounts[k]||0)+1});
-  const kLabels=Object.keys(klasseCounts).sort();
-  charts.klasse=new Chart(document.getElementById('chartKlasse'),{
-    type:'doughnut',options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right'}}},
-    data:{labels:kLabels,datasets:[{data:kLabels.map(k=>klasseCounts[k]),backgroundColor:['#2563eb','#16a34a','#f59e0b','#dc2626','#7c3aed','#ec4899','#64748b']}]}
+  // 4. Antwortzeit nach Schwierigkeit
+  const zeitData={1:[],2:[],3:[]};
+  answers.forEach(e=>{const d=e.diff;const z=parseInt(e.zeit_ms||e.zeit)||0;if(d&&z>0&&z<300000)zeitData[d].push(z)});
+  const avg=arr=>arr.length?Math.round(arr.reduce((a,b)=>a+b,0)/arr.length/1000):0;
+  charts.zeit=new Chart(document.getElementById('chartZeit'),{
+    type:'bar',options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,title:{display:true,text:'Sekunden'}}}},
+    data:{labels:['Leicht (1)','Mittel (2)','Schwer (3)'],
+      datasets:[{data:[1,2,3].map(d=>avg(zeitData[d])),backgroundColor:['#16a34a','#f59e0b','#dc2626']}]}
   });
 }
 

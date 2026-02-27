@@ -23,14 +23,7 @@ const TRACKING_CONFIG={
 ```
 
 Die kopierte URL als `endpoint` eintragen. Ohne URL ist das Tracking inaktiv.
-
-### Klassen anpassen
-
-Die Klassenbezeichnungen in `TRACKING_CONFIG.klassen` anpassen:
-
-```javascript
-klassen:['27a','27abcd8f','28a','28abcdf','29c','andere']
-```
+Das Tracking ist komplett anonym — es werden keine persönlichen Daten erfasst.
 
 ## Schritt 3: Dashboard konfigurieren
 
@@ -54,18 +47,9 @@ klassen:['27a','27abcd8f','28a','28abcdf','29c','andere']
 
 ### Datenschutz
 
-- **Kein Tracking ohne Klassenauswahl** — wenn SuS keine Klasse wählen, werden keine Daten gesendet
-- **Keine persönlichen Daten** — nur Klassenbezeichnung, keine Namen oder E-Mails
+- **Komplett anonym** — keine Identifikation der SuS, keine Klassen, keine Namen
 - **Session-IDs sind zufällig** und nicht rückverfolgbar
-- **Kein Tracking im Standalone-Modus** ohne konfigurierte URL
-
-### Deep-Links mit Klasse
-
-```
-pool.html?pool=vwl_sozialpolitik&klasse=29c
-```
-
-Per URL-Parameter `klasse` wird die Klasse vorausgewählt (nützlich für LearningView-Links).
+- **Kein Tracking ohne konfigurierte URL** — Endpoint muss explizit eingetragen werden
 
 ## Dashboard-Auswertungen
 
@@ -73,6 +57,6 @@ Per URL-Parameter `klasse` wird die Klasse vorausgewählt (nützlich für Learni
 2. **Übersprungene Fragen** — Welche Fragen werden gemieden?
 3. **Topics nach Nutzung** — Welche Themen werden am meisten geübt?
 4. **Nutzung nach Schwierigkeit** — Richtig/Falsch-Verteilung pro Schwierigkeitsgrad
-5. **Klassenvergleich** — Aktivität pro Klasse
+5. **Antwortzeit nach Schwierigkeit** — Durchschnittliche Antwortzeit pro Stufe
 6. **Zeitverlauf** — Nutzung über Tage (z.B. Spitzen vor Prüfungen)
 7. **Distraktorenanalyse** — Welche MC-Optionen werden am häufigsten falsch gewählt?
