@@ -1,29 +1,35 @@
 # Analytics Setup – Übungspools
 
-## Schritt 1: Google Sheet + Apps Script erstellen
+## Ausgangslage
 
-1. **Neues Google Sheet** erstellen (z.B. «Übungspool Analytics»)
+Das Analytics-Tracking nutzt das **bestehende Google Sheet** (bisher für Problemmeldungen), ergänzt um zwei neue Tabellenblätter. Das Apps Script verarbeitet über denselben Endpoint sowohl Problemmeldungen als auch Analytics-Events.
+
+- **Google Sheet:** `uebungspool_analyse` (ehemals «Problemmeldungen Übungspools»)
+- **Bestehendes Blatt:** «Formularantworten» (Problemmeldungen, bleibt unverändert)
+- **Neue Blätter:** «Events» und «Sessions» (Analytics)
+
+## Schritt 1: Apps Script aktualisieren
+
+1. Das bestehende Google Sheet öffnen
 2. **Extensions → Apps Script** öffnen
-3. Den Inhalt von `apps_script_code.js` einfügen
-4. **Einmal `setupSheet`** ausführen (Menü: Ausführen → Funktion auswählen → setupSheet → ▶️)
+3. Den bestehenden Code **komplett ersetzen** mit dem Inhalt von `apps_script_code.js`
+4. **Einmal `setupAnalyticsSheets`** ausführen (Menü: Ausführen → Funktion auswählen → `setupAnalyticsSheets` → ▶️)
    → Erstellt die Tabellenblätter «Events» und «Sessions» mit Spaltenüberschriften
-5. **Deploy → Neue Bereitstellung**:
-   - Typ: Web-App
-   - Ausführen als: Ich
-   - Zugriff: **Jeder, auch anonym**
-   - → URL kopieren (sieht aus wie `https://script.google.com/macros/s/AKfy.../exec`)
+   → Das bestehende Blatt «Formularantworten» wird **nicht** verändert
+5. **Deploy → Bereitstellungen verwalten → Bearbeiten (Stift-Icon) → Neue Version**
+   → Die bestehende URL bleibt gleich, es braucht keine neue Bereitstellung
 
-## Schritt 2: URL in pool.html eintragen
+## Schritt 2: Endpoint-URL prüfen
 
-In `pool.html` die Zeile finden:
+In `pool.html` ist die Tracking-URL bereits eingetragen (gleiche URL wie für Problemmeldungen):
 
 ```javascript
 const TRACKING_CONFIG={
-  endpoint:'',   // ← HIER die Apps-Script-URL eintragen
+  endpoint:'https://script.google.com/macros/s/AKfycbw46sH_lj9uH9f1C6olplv2PMhTUHU9i1LELin2GDO4a2N8S5adX4CzUyATO0jQW4Yuvw/exec'
+};
 ```
 
-Die kopierte URL als `endpoint` eintragen. Ohne URL ist das Tracking inaktiv.
-Das Tracking ist komplett anonym — es werden keine persönlichen Daten erfasst.
+Falls die URL sich nach dem Redeployment ändert, hier anpassen. Ohne URL ist das Tracking inaktiv.
 
 ## Schritt 3: Dashboard konfigurieren
 
@@ -43,7 +49,13 @@ Das Tracking ist komplett anonym — es werden keine persönlichen Daten erfasst
 |-------|------|-------|
 | `answer` | Nach jeder Antwort | Frage-ID, Topic, Typ, Diff, richtig/falsch, gewählte Antwort, Antwortzeit |
 | `skip` | Frage übersprungen | Frage-ID, Topic, Typ, Diff |
-| `session_end` | Quiz beendet | Score, Dauer, Anzahl Fragen, Topics |
+| `session_end` | Quiz beendet | Score, Dauer, Anzahl Fragen |
+
+### Dispatch-Logik im Apps Script
+
+Das Script unterscheidet die Request-Typen anhand der URL-Parameter:
+- Parameter `event` vorhanden → Analytics (answer/skip/session_end)
+- Parameter `pool` + `qid` + `cat` vorhanden → Problemmeldung (bestehendes Verhalten)
 
 ### Datenschutz
 
