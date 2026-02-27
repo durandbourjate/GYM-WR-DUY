@@ -268,9 +268,14 @@ html.dark .mode-card{background:var(--c-surface)}
 html.dark .mode-card.active{background:var(--c-info-bg)}
 .theme-toggle{display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;background:rgba(255,255,255,.2);border:none;color:#fff;font-size:1.15rem;cursor:pointer;flex-shrink:0;transition:.15s;padding:0;line-height:1}
 .theme-toggle:hover{background:rgba(255,255,255,.35)}
-.fill-hints{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0;padding:12px;background:var(--c-info-bg);border-radius:var(--radius);border:1px dashed var(--c-border);align-items:center}
+.hints-container{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0;padding:12px;background:var(--c-info-bg);border-radius:var(--radius);border:1px dashed var(--c-border);align-items:flex-start}
+.fill-hints{flex-wrap:wrap;align-items:center}
 .fill-hint-label{font-size:.78rem;color:var(--c-info);font-weight:600;width:100%;margin-bottom:4px}
 .fill-hint-word{padding:5px 12px;border-radius:16px;font-size:.85rem;font-weight:500;background:var(--c-surface);border:1px solid var(--c-border);color:var(--c-text)}
+.text-hints{flex-direction:column;align-items:stretch}
+.text-hints-label{font-size:.78rem;color:var(--c-info);font-weight:600;width:100%;margin-bottom:8px}
+.text-hint-item{font-size:.9rem;color:var(--c-text);line-height:1.5;margin-bottom:4px}
+.text-hint-item:last-child{margin-bottom:0}
 .btn-back{background:transparent;border:2px solid var(--c-border);color:var(--c-text-soft);font-size:.85rem;padding:10px 18px;border-radius:var(--radius);font-family:inherit;font-weight:600;cursor:pointer;transition:.2s;display:inline-flex;align-items:center;gap:6px;min-height:44px;box-sizing:border-box}
 .btn-back:hover{border-color:var(--c-primary);color:var(--c-primary);background:color-mix(in srgb,var(--c-primary) 8%,transparent)}
 .kbd-hint{font-size:.72rem;color:var(--c-text-soft);text-align:center;margin-top:8px;opacity:.6}
@@ -368,9 +373,11 @@ html.dark .mode-card.active{background:var(--c-info-bg)}
   /* ── Filter-Header ── */
   .filter-header h2{font-size:.95rem}
 
-  /* ── Fill Hints ── */
-  .fill-hints{padding:10px;gap:6px}
+  /* ── Hints Container ── */
+  .hints-container{padding:10px;gap:6px}
+  .fill-hints{gap:6px}
   .fill-hint-word{padding:4px 10px;font-size:.82rem}
+  .text-hint-item{font-size:.85rem}
 }
 /* ═══ KOMPAKTER HEADER beim Scrollen (Mobile) ═══ */
 .app-header{transition:padding .25s ease}
@@ -781,35 +788,49 @@ function prevQuestion(){
 // ══════════════════════════════════════════
 // FILL HINTS — show word bank for fill questions
 // ══════════════════════════════════════════
-function showFillHints(qid){
-  const hintsDiv=document.getElementById('fillHints');
+function showHints(qid){
+  const hintsDiv=document.getElementById('hintsContainer');
   if(!hintsDiv)return;
   if(hintsDiv.style.display!=='none'){hintsDiv.style.display='none';return;}
   const q=QUESTIONS.find(x=>x.id===qid);
-  if(!q||q.type!=='fill')return;
-  // Collect correct answers
-  const correctWords=q.blanks.map(b=>b.answer);
-  // If question has explicit hints array, use those as distractors
-  let distractors=[];
-  if(q.hints&&q.hints.length){
-    distractors=q.hints.filter(h=>!correctWords.some(c=>c.toLowerCase()===h.toLowerCase()));
+  if(!q||!q.hints)return;
+
+  let html='';
+
+  if(q.type==='fill'){
+    // Collect correct answers
+    const correctWords=q.blanks.map(b=>b.answer);
+    // q.hints are distractors for fill type
+    let distractors=[];
+    if(q.hints&&q.hints.length){
+      distractors=q.hints.filter(h=>!correctWords.some(c=>c.toLowerCase()===h.toLowerCase()));
+    } else {
+      // Auto-generate distractors from other fill questions in this pool
+      let pool=[];
+      QUESTIONS.forEach(oq=>{
+        if(oq.type==='fill'&&oq.id!==qid){
+          oq.blanks.forEach(b=>{
+            if(!correctWords.some(c=>c.toLowerCase()===b.answer.toLowerCase()))pool.push(b.answer);
+            if(b.alts)b.alts.forEach(a=>{if(!correctWords.some(c=>c.toLowerCase()===a.toLowerCase()))pool.push(a)});
+          });
+        }
+      });
+      pool=[...new Set(pool)];shuffle(pool);
+      distractors=pool.slice(0,Math.min(Math.max(correctWords.length+1,3),pool.length,5));
+    }
+    const allWords=[...correctWords,...distractors];shuffle(allWords);
+    html='<div class="fill-hint-label">Mögliche Begriffe (nicht alle sind korrekt):</div>';
+    allWords.forEach(w=>{html+='<span class="fill-hint-word">'+w+'</span>'});
+    hintsDiv.className='hints-container fill-hints';
   } else {
-    // Auto-generate distractors from other fill questions in this pool
-    let pool=[];
-    QUESTIONS.forEach(oq=>{
-      if(oq.type==='fill'&&oq.id!==qid){
-        oq.blanks.forEach(b=>{
-          if(!correctWords.some(c=>c.toLowerCase()===b.answer.toLowerCase()))pool.push(b.answer);
-          if(b.alts)b.alts.forEach(a=>{if(!correctWords.some(c=>c.toLowerCase()===a.toLowerCase()))pool.push(a)});
-        });
-      }
+    // For mc, multi, open, calc: display text hints as a list
+    html='<div class="text-hints-label">💡 Tipps:</div>';
+    q.hints.forEach(hint=>{
+      html+='<div class="text-hint-item">• '+hint+'</div>';
     });
-    pool=[...new Set(pool)];shuffle(pool);
-    distractors=pool.slice(0,Math.min(Math.max(correctWords.length+1,3),pool.length,5));
+    hintsDiv.className='hints-container text-hints';
   }
-  const allWords=[...correctWords,...distractors];shuffle(allWords);
-  let html='<div class="fill-hint-label">Mögliche Begriffe (nicht alle sind korrekt):</div>';
-  allWords.forEach(w=>{html+='<span class="fill-hint-word">'+w+'</span>'});
+
   hintsDiv.innerHTML=html;hintsDiv.style.display='flex';
 }
 
@@ -856,7 +877,7 @@ function restoreAnswerState(q,answer){
   fb.innerHTML='<div class="feedback-title">'+(answer.correct?'✅ Richtig!':'❌ Leider falsch')+'</div><div>'+q.explain+'</div>';
   document.getElementById('nextBtn').style.display='inline-flex';
   var skip=document.querySelector('.btn-skip');if(skip)skip.style.display='none';
-  var hints=document.getElementById('fillHintsBtn');if(hints)hints.style.display='none';
+  var hints=document.getElementById('hintsBtn');if(hints)hints.style.display='none';
   document.querySelectorAll('#skipRow .btn-primary:not(#nextBtn)').forEach(b=>b.style.display='none');
 }
 
@@ -1240,17 +1261,32 @@ function renderQuestion(){
   }
   // Unified action row: type-specific button + skip (same line)
   html+='<div class="feedback" id="feedback"></div>';
-  if(q.type==='fill')html+='<div class="fill-hints" id="fillHints" style="display:none"></div>';
+  // Hints container for all types that support hints
+  if((q.type==='fill')||(q.type==='mc'&&q.hints&&q.hints.length)||(q.type==='multi'&&q.hints&&q.hints.length)||(q.type==='open'&&q.hints&&q.hints.length)||(q.type==='calc'&&q.hints&&q.hints.length)){
+    html+='<div class="hints-container" id="hintsContainer" style="display:none"></div>';
+  }
   html+='<div class="q-action-row" id="skipRow">';
   if(state.current>0)html+='<button class="btn btn-back" onclick="prevQuestion()">← Zurück</button>';
   if(q.type==='fill'){
-    html+='<button class="btn btn-outline" id="fillHintsBtn" onclick="showFillHints(\''+q.id+'\')">💡 Tipps</button>';
+    html+='<button class="btn btn-outline" id="hintsBtn" onclick="showHints(\''+q.id+'\')">💡 Tipps</button>';
     html+='<button class="btn btn-primary" onclick="answerFill(\''+q.id+'\')">🔍 Überprüfen</button>';
   }
-  else if(q.type==='multi') html+='<button class="btn btn-primary" onclick="answerMulti(\''+q.id+'\')">🔍 Überprüfen</button>';
-  else if(q.type==='calc') html+='<button class="btn btn-primary" onclick="answerCalc(\''+q.id+'\')">🔍 Überprüfen</button>';
+  else if(q.type==='mc'){
+    if(q.hints&&q.hints.length)html+='<button class="btn btn-outline" id="hintsBtn" onclick="showHints(\''+q.id+'\')">💡 Tipps</button>';
+  }
+  else if(q.type==='multi'){
+    if(q.hints&&q.hints.length)html+='<button class="btn btn-outline" id="hintsBtn" onclick="showHints(\''+q.id+'\')">💡 Tipps</button>';
+    html+='<button class="btn btn-primary" onclick="answerMulti(\''+q.id+'\')">🔍 Überprüfen</button>';
+  }
+  else if(q.type==='calc'){
+    if(q.hints&&q.hints.length)html+='<button class="btn btn-outline" id="hintsBtn" onclick="showHints(\''+q.id+'\')">💡 Tipps</button>';
+    html+='<button class="btn btn-primary" onclick="answerCalc(\''+q.id+'\')">🔍 Überprüfen</button>';
+  }
   else if(q.type==='sort') html+='<button class="btn btn-primary" onclick="answerSort(\''+q.id+'\')">🔍 Überprüfen</button>';
-  else if(q.type==='open') html+='<button class="btn btn-primary" onclick="showOpenSample(\''+q.id+'\')">💡 Lösung anzeigen</button>';
+  else if(q.type==='open'){
+    if(q.hints&&q.hints.length)html+='<button class="btn btn-outline" id="hintsBtn" onclick="showHints(\''+q.id+'\')">💡 Tipps</button>';
+    html+='<button class="btn btn-primary" onclick="showOpenSample(\''+q.id+'\')">💡 Lösung anzeigen</button>';
+  }
   html+='<button class="btn btn-skip" onclick="skipQuestion()">⏭️ Überspringen</button>';
   html+='<button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()" style="display:none;margin-left:auto">Nächste Aufgabe →</button>';
   html+='</div>';

@@ -309,6 +309,7 @@ window.QUESTIONS = [
 
 {id:"g15", topic:"gerechtigkeit", type:"open", diff:3, tax:"K5",
  q:"Die Schweiz kennt weder eine reine Marktwirtschaft noch eine Planwirtschaft, sondern eine «soziale Marktwirtschaft». Beurteilen Sie, welcher Gerechtigkeitstheorie dieses Modell am nächsten kommt und begründen Sie Ihre Einschätzung.",
+ hints:["Libertarians, Liberals, Collectivists – welche Position passt?", "Denke an das Rawls'sche Differenzprinzip.", "Was zeichnet die Schweiz aus: Eigentumsschutz oder Umverteilung – oder beides?"],
  sample:"Die soziale Marktwirtschaft der Schweiz kommt dem Modell der Liberals (Sozial-Liberale) am nächsten. Wie Rawls es fordert, gibt es ein marktwirtschaftliches Grundsystem mit individuellem Eigentum und Wettbewerb. Gleichzeitig greift der Staat gezielt ein: Sozialversicherungen, progressive Steuern und Prämienverbilligungen stellen sicher, dass auch die Schwächsten abgesichert sind. Das System verfolgt einen Mittelweg zwischen Effizienz (Marktwirtschaft) und Gerechtigkeit (Sozialstaat) – genau wie es die sozial-liberale Theorie vorsieht.",
  explain:"Die Schweiz verkörpert den Kompromiss zwischen Markt und Staat: Sie schützt Eigentumsrechte (liberales Element), umverteilt aber auch gezielt (soziales Element). Dies entspricht der Position der Liberals, die Ungleichheiten akzeptieren, solange der Schwächste davon profitiert."},
 
@@ -619,7 +620,7 @@ window.QUESTIONS = [
 
 {id:"i03", topic:"versicherung", type:"mc", diff:2, tax:"K2",
  q:"Was versteht man unter «Adverse Selektion» (Negativauslese) bei Versicherungen?",
- img: {src:"img/vwl/sozialpolitik/adverse_selektion.svg", alt:"Versicherungsmarkt mit Einheitsprämien ohne Obligatorium"},
+ img: {src:"img/vwl/sozialpolitik/adverse_selektion.svg", alt:"Flussdiagramm: Dynamik auf einem Versicherungsmarkt ohne Obligatorium"},
  options:[
    {v: "A", t:"Gute Risiken scheiden nach und nach aus dem Markt aus, weil die Durchschnittsprämie für sie zu hoch ist."},
    {v: "B", t:"Der Staat wählt aus, welche Risiken versichert werden dürfen."},
@@ -963,6 +964,7 @@ window.QUESTIONS = [
    {answer:"64", alts:[]},
    {answer:"65", alts:[]}
  ],
+ hints:["60", "62", "63", "64", "65", "66", "67", "70"],
  explain:"Die AHV-Reform «AHV 21» (in Kraft seit 2024) hat das Referenzalter der Frauen von 64 auf 65 Jahre erhöht und damit an dasjenige der Männer angeglichen. Zudem wurde ein MWST-Prozent für die AHV erhöht und ein flexibler Rentenbezug (63–70) eingeführt."},
 
 {id:"h11", topic:"herausforderungen", type:"mc", diff:2, tax:"K3",
