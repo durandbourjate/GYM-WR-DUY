@@ -935,13 +935,14 @@ function trackInit(){
 function trackEvent(evt,data){
   if(!TRACKING_CONFIG.endpoint)return;
   var poolId=new URLSearchParams(window.location.search).get('pool')||'';
-  var params=new URLSearchParams();
-  params.set('evt',evt);
-  params.set('sid',_trackSid);
-  params.set('pool',poolId);
-  if(data){Object.keys(data).forEach(function(k){params.set(k,data[k])})}
-  var img=new Image();
-  img.src=TRACKING_CONFIG.endpoint+'?'+params.toString();
+  var payload={evt:evt,sid:_trackSid,pool:poolId};
+  if(data){Object.keys(data).forEach(function(k){payload[k]=data[k]})}
+  fetch(TRACKING_CONFIG.endpoint,{
+    method:'POST',
+    mode:'no-cors',
+    headers:{'Content-Type':'text/plain'},
+    body:JSON.stringify(payload)
+  }).catch(function(){});
 }
 
 function trackAnswer(q,correct,userAnswer){
