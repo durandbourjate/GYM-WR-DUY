@@ -388,12 +388,14 @@ function sortTable(tbodyId,col,type){
 }
 
 // ── INIT ──
+const DEFAULT_EV_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vQbJkrw8qKpPt_frJTJdR3tXju3qmrvhuOlH0W2tC_-5cFMvfVdZ9rugz2BMIrQ6r_EWoFufzRGcSMB/pub?gid=924663293&single=true&output=csv';
+const DEFAULT_SESS_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vQbJkrw8qKpPt_frJTJdR3tXju3qmrvhuOlH0W2tC_-5cFMvfVdZ9rugz2BMIrQ6r_EWoFufzRGcSMB/pub?gid=1676702147&single=true&output=csv';
 window.addEventListener('DOMContentLoaded',function(){
-  const savedEv=localStorage.getItem('analytics-ev-url');
-  const savedSess=localStorage.getItem('analytics-sess-url');
-  if(savedEv)document.getElementById('sheetUrl').value=savedEv;
-  if(savedSess)document.getElementById('sessUrl').value=savedSess;
-  if(savedEv)loadData();
+  const savedEv=localStorage.getItem('analytics-ev-url')||DEFAULT_EV_URL;
+  const savedSess=localStorage.getItem('analytics-sess-url')||DEFAULT_SESS_URL;
+  document.getElementById('sheetUrl').value=savedEv;
+  document.getElementById('sessUrl').value=savedSess;
+  loadData();
 });
 </script>
 </body>
