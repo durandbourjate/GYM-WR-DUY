@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Übungspool Analytics – Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#f8fafc;--surface:#fff;--border:#e2e8f0;--text:#1e293b;--muted:#64748b;--primary:#2563eb;--success:#16a34a;--warning:#f59e0b;--danger:#dc2626;--radius:12px}
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);padding:20px;max-width:1200px;margin:0 auto}
+h1{font-size:1.5rem;margin-bottom:4px}
+.subtitle{color:var(--muted);font-size:.85rem;margin-bottom:24px}
+.config-bar{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:20px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.config-bar label{font-size:.82rem;font-weight:600;color:var(--muted)}
+.config-bar input,.config-bar select{padding:6px 12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:.85rem}
+.config-bar input[type=text]{flex:1;min-width:300px}
+.config-bar button{padding:8px 20px;background:var(--primary);color:#fff;border:none;border-radius:8px;cursor:pointer;font-family:inherit;font-weight:600;font-size:.85rem}
+.config-bar button:hover{opacity:.9}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:24px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
+.stat-card h3{font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.stat-card .big{font-size:2rem;font-weight:700}
+.stat-card .sub{font-size:.82rem;color:var(--muted);margin-top:4px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:20px}
+.card h2{font-size:1.1rem;margin-bottom:16px}
+.chart-wrap{position:relative;height:300px}
+table{width:100%;border-collapse:collapse;font-size:.85rem}
+th{text-align:left;padding:10px 12px;border-bottom:2px solid var(--border);color:var(--muted);font-size:.78rem;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;user-select:none}
+th:hover{color:var(--primary)}
+td{padding:8px 12px;border-bottom:1px solid var(--border)}
+tr:hover td{background:#f1f5f9}
+.bar{height:8px;border-radius:4px;background:var(--border)}
+.bar-fill{height:100%;border-radius:4px;transition:width .3s}
+.bar-green .bar-fill{background:var(--success)}
+.bar-red .bar-fill{background:var(--danger)}
+.bar-blue .bar-fill{background:var(--primary)}
+.badge{display:inline-block;padding:2px 8px;border-radius:6px;font-size:.75rem;font-weight:600}
+.badge-danger{background:#fee2e2;color:var(--danger)}
+.badge-warning{background:#fef3c7;color:#b45309}
+.badge-success{background:#dcfce7;color:var(--success)}
+.filter-row{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.filter-chip{padding:4px 12px;border-radius:16px;border:1px solid var(--border);font-size:.8rem;cursor:pointer;background:var(--surface)}
+.filter-chip.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.empty{text-align:center;padding:60px 20px;color:var(--muted)}
+.empty h2{margin-bottom:8px}
+#status{font-size:.82rem;color:var(--muted);margin-left:12px}
+</style>
+</head>
+<body>
+<h1>📊 Übungspool Analytics</h1>
+<p class="subtitle">Nutzungsanalyse der interaktiven Übungspools · Gymnasium Hofwil</p>
+
+<div class="config-bar">
+  <label>Google Sheet CSV-URL:</label>
+  <input type="text" id="sheetUrl" placeholder="https://docs.google.com/spreadsheets/d/SHEET_ID/gviz/tq?tqx=out:csv&sheet=Events">
+  <label>Sessions-URL:</label>
+  <input type="text" id="sessUrl" placeholder="...&sheet=Sessions">
+  <button onclick="loadData()">Laden</button>
+  <span id="status"></span>
+</div>
+
+<!-- Übersichtskarten -->
+<div class="grid" id="statsGrid" style="display:none">
+  <div class="stat-card"><h3>Sessions total</h3><div class="big" id="statSessions">–</div><div class="sub" id="statSessionsSub"></div></div>
+  <div class="stat-card"><h3>Antworten total</h3><div class="big" id="statAnswers">–</div><div class="sub" id="statAnswersSub"></div></div>
+  <div class="stat-card"><h3>Fehlerquote</h3><div class="big" id="statErrorRate">–</div><div class="sub" id="statErrorRateSub"></div></div>
+  <div class="stat-card"><h3>Übersprungen</h3><div class="big" id="statSkipped">–</div><div class="sub" id="statSkippedSub"></div></div>
+</div>
+
+<!-- Filter -->
+<div class="card" id="filterCard" style="display:none">
+  <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center">
+    <div><label style="font-size:.78rem;color:var(--muted);font-weight:600">Pool:</label>
+      <select id="filterPool" onchange="applyFilters()"><option value="">Alle</option></select></div>
+    <div><label style="font-size:.78rem;color:var(--muted);font-weight:600">Klasse:</label>
+      <select id="filterKlasse" onchange="applyFilters()"><option value="">Alle</option></select></div>
+    <div><label style="font-size:.78rem;color:var(--muted);font-weight:600">Zeitraum:</label>
+      <select id="filterZeit" onchange="applyFilters()">
+        <option value="">Gesamt</option><option value="7">Letzte 7 Tage</option><option value="30">Letzte 30 Tage</option>
+      </select></div>
+  </div>
+</div>
+
+<!-- Charts -->
+<div class="grid" id="chartsGrid" style="display:none">
+  <div class="card"><h2>📚 Beliebteste Pools</h2><div class="chart-wrap"><canvas id="chartPools"></canvas></div></div>
+  <div class="card"><h2>📊 Nutzung nach Schwierigkeit</h2><div class="chart-wrap"><canvas id="chartDiff"></canvas></div></div>
+  <div class="card"><h2>📅 Nutzung über Zeit</h2><div class="chart-wrap"><canvas id="chartTime"></canvas></div></div>
+  <div class="card"><h2>👥 Aktivität nach Klasse</h2><div class="chart-wrap"><canvas id="chartKlasse"></canvas></div></div>
+</div>
+
+<!-- Tabellen -->
+<div class="card" id="errorTable" style="display:none">
+  <h2>❌ Häufigste Fehler (Fragen mit höchster Fehlerquote)</h2>
+  <table>
+    <thead><tr><th onclick="sortTable('errorTbody',0)">Pool</th><th onclick="sortTable('errorTbody',1)">Frage-ID</th><th onclick="sortTable('errorTbody',2)">Topic</th><th onclick="sortTable('errorTbody',3)">Typ</th><th onclick="sortTable('errorTbody',4)">Diff</th><th onclick="sortTable('errorTbody',5)">Versuche</th><th onclick="sortTable('errorTbody',6,'num')">Fehlerquote</th><th>Häufigste Falschantwort</th></tr></thead>
+    <tbody id="errorTbody"></tbody>
+  </table>
+</div>
+
+<div class="card" id="skipTable" style="display:none">
+  <h2>⏭️ Häufig übersprungene Fragen</h2>
+  <table>
+    <thead><tr><th>Pool</th><th>Frage-ID</th><th>Topic</th><th>Typ</th><th>Diff</th><th>Übersprungen</th><th>Quote</th></tr></thead>
+    <tbody id="skipTbody"></tbody>
+  </table>
+</div>
+
+<div class="card" id="topicTable" style="display:none">
+  <h2>📚 Topics nach Nutzung und Fehlerquote</h2>
+  <table>
+    <thead><tr><th>Pool</th><th>Topic</th><th>Antworten</th><th>Fehlerquote</th><th></th></tr></thead>
+    <tbody id="topicTbody"></tbody>
+  </table>
+</div>
+
+<div class="card" id="distraktorTable" style="display:none">
+  <h2>🎯 Distraktorenanalyse (MC-Fragen)</h2>
+  <p style="font-size:.82rem;color:var(--muted);margin-bottom:12px">Zeigt, welche falschen Optionen bei MC-Fragen am häufigsten gewählt werden.</p>
+  <table>
+    <thead><tr><th>Pool</th><th>Frage-ID</th><th>Korrekt</th><th>A</th><th>B</th><th>C</th><th>D</th><th>Versuche</th></tr></thead>
+    <tbody id="distraktorTbody"></tbody>
+  </table>
+</div>
+
+<div class="empty" id="emptyState">
+  <h2>Noch keine Daten</h2>
+  <p>Trage oben die CSV-URLs deines Google Sheets ein und klicke «Laden».</p>
+  <p style="margin-top:12px;font-size:.82rem">Die URLs findest du unter: <br><code>Datei → Im Web veröffentlichen → CSV → Tabellenblatt wählen</code></p>
+</div>
+
+<script>
+// ── GLOBALS ──
+let rawEvents=[], rawSessions=[], filteredEvents=[], filteredSessions=[];
+let charts={};
+
+// ── CSV PARSING ──
+function parseCSV(text){
+  const lines=text.trim().split('\n');
+  if(lines.length<2)return[];
+  const headers=parseCsvLine(lines[0]);
+  return lines.slice(1).map(line=>{
+    const vals=parseCsvLine(line);
+    const obj={};
+    headers.forEach((h,i)=>obj[h.trim()]=vals[i]?vals[i].trim():'');
+    return obj;
+  });
+}
+function parseCsvLine(line){
+  const result=[];let cur='';let inQuote=false;
+  for(let i=0;i<line.length;i++){
+    const c=line[i];
+    if(c==='"'){if(inQuote&&line[i+1]==='"'){cur+='"';i++}else{inQuote=!inQuote}}
+    else if(c===','&&!inQuote){result.push(cur);cur=''}
+    else{cur+=c}
+  }
+  result.push(cur);
+  return result;
+}
+
+// ── DATA LOADING ──
+async function loadData(){
+  const evUrl=document.getElementById('sheetUrl').value.trim();
+  const sessUrl=document.getElementById('sessUrl').value.trim();
+  if(!evUrl){document.getElementById('status').textContent='Bitte Events-URL eintragen';return}
+  document.getElementById('status').textContent='Lade…';
+  try{
+    const evResp=await fetch(evUrl);
+    rawEvents=parseCSV(await evResp.text());
+    if(sessUrl){
+      const sessResp=await fetch(sessUrl);
+      rawSessions=parseCSV(await sessResp.text());
+    }
+    // Save URLs to localStorage
+    localStorage.setItem('analytics-ev-url',evUrl);
+    localStorage.setItem('analytics-sess-url',sessUrl);
+    document.getElementById('status').textContent=rawEvents.length+' Events, '+rawSessions.length+' Sessions geladen';
+    populateFilters();
+    applyFilters();
+  }catch(e){
+    document.getElementById('status').textContent='Fehler: '+e.message;
+  }
+}
+
+// ── FILTERS ──
+function populateFilters(){
+  const pools=[...new Set(rawEvents.map(e=>e.pool).filter(Boolean))].sort();
+  const klassen=[...new Set(rawEvents.map(e=>e.klasse).filter(Boolean))].sort();
+  const poolSel=document.getElementById('filterPool');
+  poolSel.innerHTML='<option value="">Alle</option>'+pools.map(p=>'<option value="'+p+'">'+p+'</option>').join('');
+  const klasseSel=document.getElementById('filterKlasse');
+  klasseSel.innerHTML='<option value="">Alle</option>'+klassen.map(k=>'<option value="'+k+'">'+k+'</option>').join('');
+}
+
+function applyFilters(){
+  const pool=document.getElementById('filterPool').value;
+  const klasse=document.getElementById('filterKlasse').value;
+  const tage=parseInt(document.getElementById('filterZeit').value)||0;
+  const cutoff=tage?new Date(Date.now()-tage*86400000):null;
+
+  filteredEvents=rawEvents.filter(e=>{
+    if(pool&&e.pool!==pool)return false;
+    if(klasse&&e.klasse!==klasse)return false;
+    if(cutoff&&new Date(e.timestamp)<cutoff)return false;
+    return true;
+  });
+  filteredSessions=rawSessions.filter(s=>{
+    if(pool&&s.pool!==pool)return false;
+    if(klasse&&s.klasse!==klasse)return false;
+    if(cutoff&&new Date(s.timestamp)<cutoff)return false;
+    return true;
+  });
+  render();
+}
+
+// ── RENDER ──
+function render(){
+  if(rawEvents.length===0){document.getElementById('emptyState').style.display='';return}
+  document.getElementById('emptyState').style.display='none';
+  ['statsGrid','filterCard','chartsGrid','errorTable','skipTable','topicTable','distraktorTable'].forEach(id=>document.getElementById(id).style.display='');
+
+  renderStats();
+  renderCharts();
+  renderErrorTable();
+  renderSkipTable();
+  renderTopicTable();
+  renderDistraktoren();
+}
+
+function renderStats(){
+  const answers=filteredEvents.filter(e=>e.event==='answer');
+  const skips=filteredEvents.filter(e=>e.event==='skip');
+  const wrong=answers.filter(e=>e.correct==='0');
+
+  document.getElementById('statSessions').textContent=filteredSessions.length;
+  document.getElementById('statSessionsSub').textContent=rawSessions.length+' total';
+  document.getElementById('statAnswers').textContent=answers.length;
+  document.getElementById('statAnswersSub').textContent=skips.length+' übersprungen';
+  const errorRate=answers.length?Math.round(wrong.length/answers.length*100):0;
+  document.getElementById('statErrorRate').textContent=errorRate+'%';
+  document.getElementById('statErrorRate').style.color=errorRate>50?'var(--danger)':errorRate>30?'var(--warning)':'var(--success)';
+  document.getElementById('statErrorRateSub').textContent=wrong.length+' von '+answers.length+' falsch';
+  document.getElementById('statSkipped').textContent=skips.length;
+  const skipRate=answers.length+skips.length?Math.round(skips.length/(answers.length+skips.length)*100):0;
+  document.getElementById('statSkippedSub').textContent=skipRate+'% aller Aufgaben';
+}
+
+function renderCharts(){
+  // Destroy existing charts
+  Object.values(charts).forEach(c=>c.destroy());charts={};
+
+  const answers=filteredEvents.filter(e=>e.event==='answer');
+
+  // 1. Pools
+  const poolCounts={};
+  answers.forEach(e=>{poolCounts[e.pool]=(poolCounts[e.pool]||0)+1});
+  const poolLabels=Object.keys(poolCounts).sort((a,b)=>poolCounts[b]-poolCounts[a]).slice(0,10);
+  charts.pools=new Chart(document.getElementById('chartPools'),{
+    type:'bar',options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}},
+    data:{labels:poolLabels.map(p=>p.replace('vwl_','VWL ').replace('bwl_','BWL ').replace('recht_','Recht ')),
+      datasets:[{data:poolLabels.map(p=>poolCounts[p]),backgroundColor:'#2563eb'}]}
+  });
+
+  // 2. Schwierigkeit
+  const diffCounts={1:0,2:0,3:0},diffWrong={1:0,2:0,3:0};
+  answers.forEach(e=>{const d=e.diff;if(d){diffCounts[d]=(diffCounts[d]||0)+1;if(e.correct==='0')diffWrong[d]=(diffWrong[d]||0)+1}});
+  charts.diff=new Chart(document.getElementById('chartDiff'),{
+    type:'bar',options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'}},scales:{y:{beginAtZero:true}}},
+    data:{labels:['Leicht (1)','Mittel (2)','Schwer (3)'],
+      datasets:[
+        {label:'Richtig',data:[1,2,3].map(d=>(diffCounts[d]||0)-(diffWrong[d]||0)),backgroundColor:'#16a34a'},
+        {label:'Falsch',data:[1,2,3].map(d=>diffWrong[d]||0),backgroundColor:'#dc2626'}
+      ]}
+  });
+
+  // 3. Zeit
+  const dayMap={};
+  filteredEvents.forEach(e=>{
+    if(!e.timestamp)return;
+    const day=e.timestamp.substring(0,10);
+    dayMap[day]=(dayMap[day]||0)+1;
+  });
+  const days=Object.keys(dayMap).sort();
+  charts.time=new Chart(document.getElementById('chartTime'),{
+    type:'line',options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}},
+    data:{labels:days.map(d=>d.substring(5)),datasets:[{data:days.map(d=>dayMap[d]),borderColor:'#2563eb',backgroundColor:'rgba(37,99,235,0.1)',fill:true,tension:.3}]}
+  });
+
+  // 4. Klassen
+  const klasseCounts={};
+  answers.forEach(e=>{const k=e.klasse||'anonym';klasseCounts[k]=(klasseCounts[k]||0)+1});
+  const kLabels=Object.keys(klasseCounts).sort();
+  charts.klasse=new Chart(document.getElementById('chartKlasse'),{
+    type:'doughnut',options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right'}}},
+    data:{labels:kLabels,datasets:[{data:kLabels.map(k=>klasseCounts[k]),backgroundColor:['#2563eb','#16a34a','#f59e0b','#dc2626','#7c3aed','#ec4899','#64748b']}]}
+  });
+}
+
+function renderErrorTable(){
+  const answers=filteredEvents.filter(e=>e.event==='answer');
+  const skips=filteredEvents.filter(e=>e.event==='skip');
+  // Group by qid
+  const qMap={};
+  answers.forEach(e=>{
+    const key=e.pool+'|'+e.qid;
+    if(!qMap[key])qMap[key]={pool:e.pool,qid:e.qid,topic:e.topic,qtype:e.qtype,diff:e.diff,total:0,wrong:0,wrongAnswers:{}};
+    qMap[key].total++;
+    if(e.correct==='0'){qMap[key].wrong++;if(e.answer){qMap[key].wrongAnswers[e.answer]=(qMap[key].wrongAnswers[e.answer]||0)+1}}
+  });
+  // Add skip data
+  skips.forEach(e=>{
+    const key=e.pool+'|'+e.qid;
+    if(!qMap[key])qMap[key]={pool:e.pool,qid:e.qid,topic:e.topic,qtype:e.qtype,diff:e.diff,total:0,wrong:0,wrongAnswers:{},skips:0};
+    if(!qMap[key].skips)qMap[key].skips=0;
+    qMap[key].skips++;
+  });
+
+  const sorted=Object.values(qMap).filter(q=>q.total>=2).sort((a,b)=>(b.wrong/b.total)-(a.wrong/a.total)).slice(0,30);
+  const tbody=document.getElementById('errorTbody');
+  tbody.innerHTML=sorted.map(q=>{
+    const rate=Math.round(q.wrong/q.total*100);
+    const topWrong=Object.entries(q.wrongAnswers).sort((a,b)=>b[1]-a[1])[0];
+    const badge=rate>=60?'badge-danger':rate>=40?'badge-warning':'badge-success';
+    return '<tr><td>'+q.pool+'</td><td><strong>'+q.qid+'</strong></td><td>'+q.topic+'</td><td>'+q.qtype+'</td><td>'+q.diff+'</td><td>'+q.total+'</td><td><span class="badge '+badge+'">'+rate+'%</span></td><td>'+(topWrong?topWrong[0]+' ('+topWrong[1]+'×)':'–')+'</td></tr>';
+  }).join('');
+}
+
+function renderSkipTable(){
+  const allEvents=filteredEvents;
+  const qMap={};
+  allEvents.forEach(e=>{
+    const key=e.pool+'|'+e.qid;
+    if(!qMap[key])qMap[key]={pool:e.pool,qid:e.qid,topic:e.topic,qtype:e.qtype,diff:e.diff,total:0,skips:0};
+    qMap[key].total++;
+    if(e.event==='skip')qMap[key].skips++;
+  });
+  const sorted=Object.values(qMap).filter(q=>q.skips>=2).sort((a,b)=>(b.skips/b.total)-(a.skips/a.total)).slice(0,20);
+  const tbody=document.getElementById('skipTbody');
+  tbody.innerHTML=sorted.map(q=>{
+    const rate=Math.round(q.skips/q.total*100);
+    return '<tr><td>'+q.pool+'</td><td><strong>'+q.qid+'</strong></td><td>'+q.topic+'</td><td>'+q.qtype+'</td><td>'+q.diff+'</td><td>'+q.skips+'</td><td>'+rate+'%</td></tr>';
+  }).join('');
+}
+
+function renderTopicTable(){
+  const answers=filteredEvents.filter(e=>e.event==='answer');
+  const tMap={};
+  answers.forEach(e=>{
+    const key=e.pool+'|'+e.topic;
+    if(!tMap[key])tMap[key]={pool:e.pool,topic:e.topic,total:0,wrong:0};
+    tMap[key].total++;
+    if(e.correct==='0')tMap[key].wrong++;
+  });
+  const sorted=Object.values(tMap).sort((a,b)=>b.total-a.total);
+  const tbody=document.getElementById('topicTbody');
+  tbody.innerHTML=sorted.map(t=>{
+    const rate=Math.round(t.wrong/t.total*100);
+    const barColor=rate>=50?'bar-red':rate>=30?'bar-red':'bar-green';
+    return '<tr><td>'+t.pool+'</td><td>'+t.topic+'</td><td>'+t.total+'</td><td>'+rate+'%</td><td style="min-width:120px"><div class="bar '+barColor+'"><div class="bar-fill" style="width:'+rate+'%"></div></div></td></tr>';
+  }).join('');
+}
+
+function renderDistraktoren(){
+  const mcAnswers=filteredEvents.filter(e=>e.event==='answer'&&(e.qtype==='mc')&&e.answer);
+  const qMap={};
+  mcAnswers.forEach(e=>{
+    const key=e.pool+'|'+e.qid;
+    if(!qMap[key])qMap[key]={pool:e.pool,qid:e.qid,total:0,dist:{A:0,B:0,C:0,D:0},correct:''};
+    qMap[key].total++;
+    if(e.answer&&qMap[key].dist[e.answer]!==undefined)qMap[key].dist[e.answer]++;
+    if(e.correct==='1')qMap[key].correct=e.answer;
+  });
+  const sorted=Object.values(qMap).filter(q=>q.total>=3).sort((a,b)=>b.total-a.total).slice(0,30);
+  const tbody=document.getElementById('distraktorTbody');
+  tbody.innerHTML=sorted.map(q=>{
+    const cells=['A','B','C','D'].map(v=>{
+      const pct=Math.round(q.dist[v]/q.total*100);
+      const isCorrect=v===q.correct;
+      return '<td style="'+(isCorrect?'font-weight:700;color:var(--success)':'')+'">'+pct+'%'+(isCorrect?' ✓':'')+'</td>';
+    }).join('');
+    return '<tr><td>'+q.pool+'</td><td><strong>'+q.qid+'</strong></td><td>'+q.correct+'</td>'+cells+'<td>'+q.total+'</td></tr>';
+  }).join('');
+}
+
+function sortTable(tbodyId,col,type){
+  const tbody=document.getElementById(tbodyId);
+  const rows=Array.from(tbody.rows);
+  rows.sort((a,b)=>{
+    let av=a.cells[col].textContent,bv=b.cells[col].textContent;
+    if(type==='num'){av=parseFloat(av)||0;bv=parseFloat(bv)||0;return bv-av}
+    return av.localeCompare(bv);
+  });
+  rows.forEach(r=>tbody.appendChild(r));
+}
+
+// ── INIT ──
+window.addEventListener('DOMContentLoaded',function(){
+  const savedEv=localStorage.getItem('analytics-ev-url');
+  const savedSess=localStorage.getItem('analytics-sess-url');
+  if(savedEv)document.getElementById('sheetUrl').value=savedEv;
+  if(savedSess)document.getElementById('sessUrl').value=savedSess;
+  if(savedEv)loadData();
+});
+</script>
+</body>
+</html>

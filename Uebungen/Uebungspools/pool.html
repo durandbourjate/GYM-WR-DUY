@@ -726,6 +726,7 @@ const TYPE_LABELS = {mc:"📝 Einzelauswahl",multi:"☑️ Mehrfachauswahl",tf:"
     document.getElementById('loadingScreen').classList.remove('active');
     document.getElementById('startScreen').classList.add('active');
     init();
+    trackInit();
   } catch (err) { showError(err.message); }
 })();
 
@@ -771,6 +772,7 @@ function sendScoreToLV(){
 function skipQuestion(){
   const q=state.queue[state.current];
   state.answered[state.current]={id:q.id,skipped:true};
+  trackSkip(q);
   state.current++;
   if(state.current>=state.queue.length)return endQuiz();
   renderQuestion();
@@ -913,6 +915,79 @@ document.addEventListener('keydown',function(e){
     if(mopts[idx2])mopts[idx2].click();
   }
 });
+
+// ══════════════════════════════════════════
+// ANALYTICS TRACKING — Anonymes Nutzungstracking via Google Apps Script
+// Sendet Events (answer, skip, session_end) an ein Google Sheet.
+// Tracking ist nur aktiv wenn eine Klasse ausgewählt wurde.
+// ══════════════════════════════════════════
+const TRACKING_CONFIG={
+  // ══ DEINE APPS-SCRIPT-URL HIER EINTRAGEN: ══
+  endpoint:'',
+  klassen:['27a','27abcd8f','28a','28abcdf','29c','andere']
+};
+var _trackSid='';
+var _trackKlasse='';
+var _trackStart=0;
+var _trackQStart=0;
+
+function trackInit(){
+  // Session-ID generieren
+  _trackSid='s_'+Date.now()+'_'+Math.random().toString(36).substr(2,4);
+  // Klasse aus URL oder Dropdown
+  const p=new URLSearchParams(window.location.search);
+  if(p.get('klasse'))_trackKlasse=p.get('klasse');
+  // Klassen-Dropdown im Startscreen einfügen
+  const fc=document.getElementById('filterCount');
+  if(fc&&!document.getElementById('klasseSelect')){
+    var html='<div class="klasse-row" style="margin-top:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">';
+    html+='<label for="klasseSelect" style="font-size:.82rem;font-weight:600;color:var(--c-muted)">👥 Klasse (optional):</label>';
+    html+='<select id="klasseSelect" style="padding:4px 10px;border-radius:8px;border:1px solid var(--c-border);background:var(--c-surface);color:var(--c-text);font-size:.82rem;font-family:inherit">';
+    html+='<option value="">– keine Angabe –</option>';
+    TRACKING_CONFIG.klassen.forEach(function(k){html+='<option value="'+k+'"'+(k===_trackKlasse?' selected':'')+'>'+k+'</option>'});
+    html+='</select></div>';
+    fc.insertAdjacentHTML('afterend',html);
+  }
+}
+
+function trackEvent(evt,data){
+  if(!TRACKING_CONFIG.endpoint)return;
+  // Klasse aus Dropdown lesen falls nicht via URL gesetzt
+  var sel=document.getElementById('klasseSelect');
+  if(sel)_trackKlasse=sel.value;
+  if(!_trackKlasse)return; // Kein Tracking ohne Klasse
+  var poolId=new URLSearchParams(window.location.search).get('pool')||'';
+  var params=new URLSearchParams();
+  params.set('event',evt);
+  params.set('sid',_trackSid);
+  params.set('pool',poolId);
+  params.set('klasse',_trackKlasse);
+  if(data){Object.keys(data).forEach(function(k){params.set(k,data[k])})}
+  // Image-Ping (gleich wie Problemmeldung — zuverlässigste Cross-Origin Methode)
+  var img=new Image();
+  img.src=TRACKING_CONFIG.endpoint+'?'+params.toString();
+}
+
+function trackAnswer(q,correct,userAnswer){
+  var zeit=_trackQStart?Date.now()-_trackQStart:0;
+  trackEvent('answer',{
+    qid:q.id, topic:q.topic, qtype:q.type, diff:q.diff,
+    correct:correct?'1':'0', answer:userAnswer||'', zeit:zeit
+  });
+}
+
+function trackSkip(q){
+  trackEvent('skip',{qid:q.id, topic:q.topic, qtype:q.type, diff:q.diff});
+}
+
+function trackSessionEnd(){
+  var dauer=_trackStart?Math.round((Date.now()-_trackStart)/1000):0;
+  var topicsUsed=[...new Set(state.queue.map(function(q){return q.topic}))].join(',');
+  trackEvent('session_end',{
+    score:state.score, max:state.maxScore,
+    dauer:dauer, count:state.queue.length, topics:topicsUsed
+  });
+}
 
 // ══════════════════════════════════════════
 // REPORT PROBLEM — In-App Modal + Google Apps Script
@@ -1177,10 +1252,12 @@ function startQuiz(){
   let q=getFiltered();
   shuffle(q);
   state.queue=q;state.current=0;state.score=0;state.maxScore=0;state.answered=[];state.wrong=[];
+  _trackStart=Date.now();
   showScreen('quizScreen'); renderQuestion();
 }
 
 function renderQuestion(){
+  _trackQStart=Date.now();
   const q=state.queue[state.current]; const total=state.queue.length;
   const pctProgress=Math.round(state.current/total*100);
   let html='<div class="q-progress-bg"></div><div class="q-progress-bar" style="width:'+pctProgress+'%"></div>';
@@ -1309,7 +1386,7 @@ function answerMC(el,qid,val){
     if(o.dataset.val===q.correct)o.classList.add('correct');
     else if(o.dataset.val===val)o.classList.add('wrong');
   });
-  finishAnswer(q,val===q.correct,q.explain);
+  finishAnswer(q,val===q.correct,q.explain,val);
 }
 
 function toggleMulti(el){
@@ -1336,7 +1413,7 @@ function answerMulti(qid){
     o.querySelector('.opt-check').textContent=isCorrect?'✓':'';
   });
   document.querySelectorAll('#skipRow .btn-primary:not(#nextBtn)').forEach(b=>b.style.display='none');
-  finishAnswer(q,allCorrect,q.explain);
+  finishAnswer(q,allCorrect,q.explain,[...selected].join(','));
 }
 
 function answerTF(el,qid,val){
@@ -1346,7 +1423,7 @@ function answerTF(el,qid,val){
   document.querySelectorAll('.tf-btn').forEach(b=>b.style.pointerEvents='none');
   el.classList.add(correct?'correct':'wrong');
   if(!correct)document.querySelectorAll('.tf-btn').forEach(b=>{if(b!==el)b.classList.add('correct')});
-  finishAnswer(q,correct,q.explain);
+  finishAnswer(q,correct,q.explain,String(val));
 }
 
 function answerFill(qid){
@@ -1438,12 +1515,13 @@ function answerOpen(qid,correct){
   finishAnswer(q,correct,q.explain);
 }
 
-function finishAnswer(q,correct,explain){
+function finishAnswer(q,correct,explain,userAnswer){
   // Check if re-answering a previously skipped question
   const wasSkipped=state.answered[state.current]&&state.answered[state.current].skipped;
   state.maxScore++;
   if(correct)state.score++; else state.wrong.push({q:q.q,explain:q.explain,topic:q.topic});
   state.answered[state.current]={id:q.id,correct};
+  trackAnswer(q,correct,userAnswer||'');
   sendScoreToLV();
   const fb=document.getElementById('feedback');
   fb.className='feedback show '+(correct?'correct':'wrong');
@@ -1464,6 +1542,7 @@ function endQuiz(){
   showScreen('resultScreen');
   const pct=state.maxScore?Math.round(state.score/state.maxScore*100):0;
   sendScoreToLV();
+  trackSessionEnd();
   document.getElementById('resPts').textContent=state.score+' / '+state.maxScore;
   document.getElementById('resPct').textContent=pct+'%';
 
