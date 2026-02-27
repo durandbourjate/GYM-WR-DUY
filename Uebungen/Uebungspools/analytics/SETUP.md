@@ -51,11 +51,13 @@ Falls die URL sich nach dem Redeployment ändert, hier anpassen. Ohne URL ist da
 | `skip` | Frage übersprungen | Frage-ID, Topic, Typ, Diff |
 | `session_end` | Quiz beendet | Score, Dauer, Anzahl Fragen |
 
-### Dispatch-Logik im Apps Script
+### Technische Umsetzung
 
-Das Script unterscheidet die Request-Typen anhand der URL-Parameter:
-- Parameter `event` vorhanden → Analytics (answer/skip/session_end)
-- Parameter `pool` + `qid` + `cat` vorhanden → Problemmeldung (bestehendes Verhalten)
+Das Script verwendet zwei verschiedene HTTP-Methoden:
+- **POST** (`doPost`) → Analytics-Events (via `fetch`, JSON-Body mit Feld `evt`)
+- **GET** (`doGet`) → Problemmeldungen (via Image-Ping, URL-Parameter `pool`+`qid`+`category`)
+
+POST ist nötig, weil Google Apps Script bestimmte GET-Parameter blockiert (Status 400).
 
 ### Datenschutz
 
