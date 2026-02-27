@@ -25,7 +25,7 @@ In `pool.html` ist die Tracking-URL bereits eingetragen (gleiche URL wie für Pr
 
 ```javascript
 const TRACKING_CONFIG={
-  endpoint:'https://script.google.com/macros/s/AKfycbw46sH_lj9uH9f1C6olplv2PMhTUHU9i1LELin2GDO4a2N8S5adX4CzUyATO0jQW4Yuvw/exec'
+  endpoint:'https://script.google.com/macros/s/AKfycby9-zm3DJXdAN8uq7nuCKNwfn4Do4ej8mo5-5niM0jozAzcwVbxYW0oN7AzmS-fqoh2qQ/exec'
 };
 ```
 
