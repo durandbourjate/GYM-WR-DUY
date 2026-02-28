@@ -37,6 +37,7 @@ Das React/Vite-Projekt ist **voll funktionsfähig** und läuft lokal. Phase 0 + 
 | Migration statischer Sequenzen → Store | ✅ fertig | plannerStore.ts |
 | Batch-Operationen (Shift/Insert für Multi-Select) | ✅ fertig | plannerStore.ts |
 | Export/Import (JSON) | ✅ fertig | plannerStore.ts |
+| **💾 Daten-Menü UI (Export/Import/Reset)** | ✅ fertig | Toolbar.tsx (DataMenu) |
 | Lehrplanziel-Picker | ✅ fertig | CurriculumGoalPicker.tsx, curriculumGoals.ts |
 | Statistik-Panel | ✅ fertig | StatsPanel.tsx |
 | Drag & Drop (Swap/Move) | ✅ fertig | WeekRows.tsx, plannerStore.ts |
@@ -46,14 +47,14 @@ Das React/Vite-Projekt ist **voll funktionsfähig** und läuft lokal. Phase 0 + 
 
 | Feature | Priorität | Phase |
 |---------|-----------|-------|
-| Supabase-Anbindung (Persistenz, Auth) | HOCH | 3 |
-| PWA-Config (Offline) | MITTEL | 3 |
+| CurriculumGoalPicker + StatsPanel in App.tsx integrieren | HOCH | 3 |
 | Sequenz Auto-Platzierung (aus Bibliothek in Kurs einfügen) | MITTEL | 3 |
 | Fachbereich Auto-Detection (LessonType → SubjectArea) | NIEDRIG | 3 |
 | LearningView-Integration (Deep-Links) | MITTEL | 4 |
-| Google Calendar Sync | NIEDRIG | 4 |
 | TaF Phasenmodell + HK-Rotation | NIEDRIG | 5 |
 | Excel-Import (SJ 22/23–24/25) | NIEDRIG | 6 |
+
+**Supabase / Cloud-Sync:** Bewusst zurückgestellt. Für Single-User reicht localStorage + manueller JSON-Export. Cloud-Anbindung wird relevant bei Multi-User oder geräteübergreifendem Zugriff.
 
 ### Hinweis: Merge-Historie
 
@@ -191,3 +192,4 @@ Das vollständige Konzept (v3) mit allen Entitäten, Phasen und Architektur-Ents
 | v5 | CurriculumGoalPicker, StatsPanel, Batch-Ops, Export/Import | Git-Repo Branch |
 | v6 | Phase 2: Sequenz-CRUD, SequencePanel, ManagedSequence-Types, Store-basierte Sequenz-Balken | Arbeitskopie |
 | v7 | Merge beider Stränge, HANDOFF v2.0 aktualisiert, Git-Push | claude.ai Chat 28.02.2026 |
+| v8 | Supabase evaluiert → zurückgestellt; Daten-Menü UI (Export/Import/Reset) gebaut | claude.ai Chat 28.02.2026 |

@@ -1,3 +1,4 @@
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { usePlannerStore } from '../store/plannerStore';
 import type { FilterType } from '../types';
 
@@ -9,6 +10,116 @@ const FILTERS: { key: FilterType; label: string }[] = [
   { key: 'KS', label: 'KS' },
 ];
 
+function DataMenu() {
+  const { exportData, importData } = usePlannerStore();
+  const [open, setOpen] = useState(false);
+  const [importStatus, setImportStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [exportStatus, setExportStatus] = useState<'idle' | 'done'>('idle');
+  const menuRef = useRef<HTMLDivElement>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  // Close menu on outside click
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [open]);
+
+  const handleExport = useCallback(() => {
+    const json = exportData();
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const date = new Date().toISOString().slice(0, 10);
+    a.href = url;
+    a.download = `unterrichtsplaner-backup-${date}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    setExportStatus('done');
+    setTimeout(() => setExportStatus('idle'), 2000);
+  }, [exportData]);
+
+  const handleImport = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const ok = importData(reader.result as string);
+      setImportStatus(ok ? 'success' : 'error');
+      setTimeout(() => setImportStatus('idle'), 2500);
+    };
+    reader.readAsText(file);
+    // Reset input so same file can be re-selected
+    e.target.value = '';
+  }, [importData]);
+
+  return (
+    <div className="relative" ref={menuRef}>
+      <button
+        onClick={() => setOpen(!open)}
+        className={`px-2 py-0.5 rounded text-[10px] border cursor-pointer transition-colors ${
+          open ? 'bg-slate-800 border-gray-600 text-gray-300' : 'border-gray-700 text-gray-500 hover:text-gray-300'
+        }`}
+        title="Daten verwalten (Export/Import)"
+      >
+        💾
+      </button>
+
+      {open && (
+        <div className="absolute right-0 top-8 bg-slate-800 border border-slate-600 rounded-lg shadow-xl z-[70] w-56 py-1">
+          <div className="px-3 py-1.5 text-[9px] text-gray-500 border-b border-slate-700">
+            Daten werden automatisch im Browser gespeichert (localStorage).
+            Für ein Backup als Datei: Export nutzen.
+          </div>
+
+          {/* Export */}
+          <button
+            onClick={handleExport}
+            className="w-full px-3 py-1.5 text-left text-[10px] hover:bg-slate-700 cursor-pointer flex items-center gap-2 text-gray-200"
+          >
+            <span>📥</span>
+            <span>{exportStatus === 'done' ? '✓ Exportiert!' : 'Backup exportieren (JSON)'}</span>
+          </button>
+
+          {/* Import */}
+          <button
+            onClick={() => fileRef.current?.click()}
+            className="w-full px-3 py-1.5 text-left text-[10px] hover:bg-slate-700 cursor-pointer flex items-center gap-2 text-gray-200"
+          >
+            <span>📤</span>
+            <span>
+              {importStatus === 'success' ? '✓ Importiert!' :
+               importStatus === 'error' ? '✗ Fehler beim Import' :
+               'Backup importieren'}
+            </span>
+          </button>
+          <input ref={fileRef} type="file" accept=".json" className="hidden" onChange={handleImport} />
+
+          {/* Reset warning */}
+          <div className="border-t border-slate-700 mt-1 pt-1">
+            <button
+              onClick={() => {
+                if (confirm('Alle Planungsdaten zurücksetzen? (Undo möglich mit ⌘Z)')) {
+                  usePlannerStore.getState().pushUndo();
+                  localStorage.removeItem('unterrichtsplaner-storage');
+                  window.location.reload();
+                }
+              }}
+              className="w-full px-3 py-1.5 text-left text-[10px] hover:bg-red-900/30 cursor-pointer flex items-center gap-2 text-red-400"
+            >
+              <span>🗑</span>
+              <span>Daten zurücksetzen</span>
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function AppHeader() {
   const { filter, setFilter, showHelp, toggleHelp, undoStack, undo, sequencePanelOpen, setSequencePanelOpen } = usePlannerStore();
 
@@ -18,8 +129,7 @@ export function AppHeader() {
         <span className="text-base font-bold text-gray-50">
           <span className="text-blue-400">⊞</span> Unterrichtsplaner
         </span>
-        <span className="text-[10px] text-gray-500">SJ 25/26 · DUY · v1.1</span>
-        <span className="text-[9px] text-green-600" title="Daten werden lokal gespeichert">💾</span>
+        <span className="text-[10px] text-gray-500">SJ 25/26 · DUY · v2.0</span>
       </div>
       <div className="flex gap-1 items-center">
         {FILTERS.map((f) => (
@@ -45,6 +155,7 @@ export function AppHeader() {
             ↩
           </button>
         )}
+        <DataMenu />
         <button
           onClick={toggleHelp}
           className={`px-2 py-0.5 rounded text-[10px] border cursor-pointer ${
@@ -75,7 +186,8 @@ export function HelpBar() {
     <div className="bg-slate-800 border-b border-gray-700 px-4 py-2 text-[10px] text-slate-400 leading-relaxed">
       <b className="text-gray-200">Bedienung:</b> Klick = Detail ·{' '}
       <b>⇧/⌘+Klick</b> = Mehrfachauswahl · <b>Doppelklick</b> = Titel bearbeiten ·{' '}
-      <b>⌘Z</b> = Rückgängig · 2L grösser als 1L · Grüne Balken = Sequenz
+      <b>⌘Z</b> = Rückgängig · 2L grösser als 1L · Grüne Balken = Sequenz ·{' '}
+      <b>💾</b> = Backup exportieren/importieren
       <br />
       <b className="text-amber-400">⚠ 1L↔2L:</b> Bei Kursen mit alternierenden Slots warnt das Tool bei
       Verschiebungskonflikten.
@@ -105,8 +217,6 @@ export function MultiSelectToolbar() {
     </div>
   );
 }
-
-// DetailPanel has moved to ./DetailPanel.tsx
 
 export function Legend() {
   return (
