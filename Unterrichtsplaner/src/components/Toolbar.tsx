@@ -343,14 +343,68 @@ export function HelpBar() {
 }
 
 export function MultiSelectToolbar() {
-  const { multiSelection, clearMultiSelect, batchShiftDown, batchInsertBefore, weekData } = usePlannerStore();
+  const { multiSelection, clearMultiSelect, batchShiftDown, batchInsertBefore, weekData,
+    addSequence, setEditingSequenceId, setSidePanelOpen, setSidePanelTab } = usePlannerStore();
   if (multiSelection.length === 0) return null;
 
   const allWeeks = weekData.map(w => w.w);
 
+  // Group selection by courseId and create sequence
+  const handleCreateSequence = () => {
+    // Parse selection keys: "2026-W09-c11" → { week, courseId }
+    const parsed = multiSelection.map(key => {
+      const parts = key.split('-');
+      const courseId = parts[parts.length - 1];
+      const week = parts.slice(0, parts.length - 1).join('-');
+      return { week, courseId };
+    });
+
+    // Group by courseId
+    const byCourse = new Map<string, string[]>();
+    for (const { week, courseId } of parsed) {
+      if (!byCourse.has(courseId)) byCourse.set(courseId, []);
+      byCourse.get(courseId)!.push(week);
+    }
+
+    // Use the first (or only) courseId
+    const [courseId, weeks] = [...byCourse.entries()][0];
+    const course = COURSES.find(c => c.id === courseId);
+    if (!course) return;
+
+    // Sort weeks chronologically
+    const sortedWeeks = [...weeks].sort();
+
+    // Create single block with all selected weeks
+    const seqId = addSequence({
+      courseId,
+      title: `Neue Sequenz ${course.cls}`,
+      blocks: [{ weeks: sortedWeeks, label: 'Neuer Block' }],
+    });
+
+    setEditingSequenceId(seqId);
+    setSidePanelOpen(true);
+    setSidePanelTab('sequences');
+    clearMultiSelect();
+  };
+
+  // Check if all selections are in the same course column
+  const courseIds = new Set(multiSelection.map(key => {
+    const parts = key.split('-');
+    return parts[parts.length - 1];
+  }));
+  const singleCourse = courseIds.size === 1;
+
   return (
     <div className="bg-indigo-950 border-b-2 border-indigo-500 px-4 py-1.5 flex items-center gap-3 text-[10px] sticky top-9 z-[55]">
       <span className="font-bold text-indigo-200">{multiSelection.length} markiert</span>
+      {singleCourse && (
+        <button
+          onClick={handleCreateSequence}
+          className="px-2 py-0.5 rounded bg-green-700 text-white border-none text-[9px] font-semibold cursor-pointer hover:bg-green-600"
+        >
+          ▧ Neue Sequenz
+        </button>
+      )}
       <button
         onClick={() => batchShiftDown(multiSelection, allWeeks, COURSES)}
         className="px-2 py-0.5 rounded bg-indigo-600 text-white border-none text-[9px] font-semibold cursor-pointer hover:bg-indigo-500"

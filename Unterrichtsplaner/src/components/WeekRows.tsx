@@ -323,14 +323,27 @@ export function WeekRows({ weeks, courses, currentRef }: Props) {
                   className="p-0 border-b border-slate-900/40 relative group-hover:bg-slate-950/40"
                   style={{
                     borderLeft: newDay ? `2px solid ${DAY_COLORS[c.day]}12` : 'none',
-                    outline: isDragOver ? '2px solid #3b82f6' : 'none',
+                    outline: isDragOver ? '2px solid #3b82f6' : isMulti && !title ? '2px solid #6366f180' : 'none',
                     outlineOffset: '-2px',
-                    background: isDragOver ? '#1e3a5f30' : undefined,
+                    background: isDragOver ? '#1e3a5f30' : isMulti && !title ? '#312e8140' : undefined,
                     width: 110,
                     minWidth: 110,
                     maxWidth: 110,
                   }}
-                  onClick={(e) => title ? handleClick(week.w, c, title, e) : handleEmptyCellClick(week.w, c)}
+                  onClick={(e) => {
+                    if (e.shiftKey || e.metaKey || e.ctrlKey) {
+                      // Multi-select works on both filled and empty cells
+                      if (e.shiftKey) {
+                        selectRange(`${week.w}-${c.id}`, allWeekKeys, courses);
+                      } else {
+                        toggleMultiSelect(`${week.w}-${c.id}`);
+                      }
+                    } else if (title) {
+                      handleClick(week.w, c, title, e);
+                    } else {
+                      handleEmptyCellClick(week.w, c);
+                    }
+                  }}
                   onDoubleClick={() => title && handleDoubleClick(week.w, c, title)}
                   onMouseEnter={() => title && handleMouseEnter(week.w, c.col)}
                   onMouseLeave={handleMouseLeave}
