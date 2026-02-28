@@ -47,3 +47,29 @@ print("Zeile 1\nZeile 2")
 # Zeile 1
 # Zeile 2
 ```
+
+## Mehrzeilige Strings (Triple Quotes)
+
+Für längere Texte über mehrere Zeilen gibt es **Triple Quotes** — drei Anführungszeichen am Anfang und Ende (`"""..."""`):
+
+```python
+print("""Du betrittst den Raum.
+Es ist dunkel und kalt.
+Vor dir steht ein Koffer.""")
+```
+
+Das ist übersichtlicher als viele `print()`-Aufrufe oder `\n` in einem langen String. Triple Quotes werden vor allem für mehrzeilige Texte oder Erklärungen im Code verwendet.
+
+## String-Wiederholung mit *
+
+Mit dem Operator `*` kann ein String mehrfach wiederholt werden:
+
+```python
+print("=" * 30)
+# Ausgabe: ==============================
+
+print("-" * 20)
+# Ausgabe: --------------------
+```
+
+Das ist nützlich, um **Trennlinien** oder **Rahmen** in der Konsolenausgabe zu zeichnen — zum Beispiel zwischen Räumen im Spielbuch.

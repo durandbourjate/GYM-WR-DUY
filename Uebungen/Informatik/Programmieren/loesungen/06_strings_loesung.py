@@ -11,34 +11,43 @@
 # Teilaufgabe 1: Raumnamen dynamisch einsetzen
 # ============================================================
 
-# Ein Dictionary (dict) ist wie ein Nachschlagewerk:
-# Zu jedem Schlüssel (key) gehört ein Wert (value).
-# Hier: Raumnummer → Raumname
-raum_namen = {
-    1: "Startraum",
-    31: "West-Ost-Korridor",
-    32: "Süd-Nord-Korridor",
-    101: "Büro Ost",
-    102: "Lüftungsschacht-Raum",
-    103: "Verbindungsraum",
-    104: "Sackgasse",
-    201: "Büro West",
-    202: "Tresorraum"
-}
-
-# Mit raum_namen[nummer] holen wir den Namen zum Schlüssel
+# Raumnamen mit if/elif zuweisen
+# Für jede Raumnummer gibt es einen passenden Namen
 aktueller_raum = 32
-print(f"Du befindest dich im {raum_namen[aktueller_raum]}.")
+raum_name = ""
+
+if aktueller_raum == 1:
+    raum_name = "Startraum"
+elif aktueller_raum == 31:
+    raum_name = "West-Ost-Korridor"
+elif aktueller_raum == 32:
+    raum_name = "Süd-Nord-Korridor"
+elif aktueller_raum == 101:
+    raum_name = "Büro Ost"
+elif aktueller_raum == 102:
+    raum_name = "Lüftungsschacht-Raum"
+elif aktueller_raum == 103:
+    raum_name = "Verbindungsraum"
+elif aktueller_raum == 104:
+    raum_name = "Sackgasse"
+elif aktueller_raum == 201:
+    raum_name = "Büro West"
+elif aktueller_raum == 202:
+    raum_name = "Tresorraum"
+
+print(f"Du befindest dich im {raum_name}.")
 # Ausgabe: Du befindest dich im Süd-Nord-Korridor.
 
 # Raum wechseln — der Text passt sich automatisch an!
 aktueller_raum = 202
-print(f"Du befindest dich im {raum_namen[aktueller_raum]}.")
+raum_name = ""
+if aktueller_raum == 1:
+    raum_name = "Startraum"
+elif aktueller_raum == 202:
+    raum_name = "Tresorraum"
+# (Alle elif-Blöcke wie oben — hier gekürzt)
+print(f"Du befindest dich im {raum_name}.")
 # Ausgabe: Du befindest dich im Tresorraum.
-
-aktueller_raum = 1
-print(f"Du befindest dich im {raum_namen[aktueller_raum]}.")
-# Ausgabe: Du befindest dich im Startraum.
 
 print()
 
@@ -110,8 +119,11 @@ hat_papier = True
 hat_taschenmesser = True
 hat_sprengschnur = False
 
-# Raumname aus dem Dictionary holen
-raum_name = raum_namen[aktueller_raum]
+# Raumname per if/elif zuweisen (wie in Teilaufgabe 1)
+raum_name = ""
+if aktueller_raum == 102:
+    raum_name = "Lüftungsschacht-Raum"
+# (In der Praxis: alle Räume mit if/elif abdecken)
 
 # Inventar als Emoji-Symbole zusammenbauen
 # Wir starten mit einem leeren String und hängen Emojis an
@@ -137,7 +149,9 @@ hat_papier = False
 hat_taschenmesser = False
 hat_sprengschnur = False
 
-raum_name = raum_namen[aktueller_raum]
+raum_name = ""
+if aktueller_raum == 1:
+    raum_name = "Startraum"
 inventar = ""
 if hat_papier:
     inventar = inventar + "📄"
@@ -191,12 +205,13 @@ else:
 # Was du gelernt hast:
 # - f-Strings: f"Text {variable} mehr Text"
 # - Variablen und Berechnungen in {} einfügen
-# - Dictionaries für Nachschlage-Tabellen (z.B. Raumnummern → Namen)
+# - if/elif-Ketten für Nachschlage-Logik (z.B. Raumnummer → Name)
 # - String-Verkettung mit + ("A" + "B" = "AB")
 # - .lower() und .strip() für robuste Eingabeverarbeitung
+# - Methoden-Chaining: .lower().strip() in einer Zeile
 #
 # Drei Bausteine erstellt:
-# 1. Dynamische Raumtexte mit raum_namen-Dictionary
+# 1. Dynamische Raumtexte mit if/elif und f-Strings
 # 2. Inventar-Anzeige mit Emojis
 # 3. Normalisierte Eingabeverarbeitung
 # ============================================================

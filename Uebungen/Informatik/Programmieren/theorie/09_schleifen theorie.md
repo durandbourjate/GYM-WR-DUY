@@ -62,6 +62,31 @@ while spiel_laeuft:
     # ... weitere Räume
 ```
 
+## while True mit break
+
+Manchmal weiss man nicht im Voraus, wann die Schleife enden soll — zum Beispiel wenn ein Spieler einen Code raten muss. Dafür gibt es das Muster `while True` mit `break`:
+
+```python
+while True:
+    eingabe = input("Tresorcode eingeben (oder 'zurueck'): ")
+
+    if eingabe == "zurueck":
+        break                  # Schleife sofort verlassen
+
+    code = int(eingabe)
+    if code == 423:
+        print("Korrekt! Der Tresor öffnet sich.")
+        break                  # Schleife sofort verlassen
+    else:
+        print("Falsch. Versuch es nochmal.")
+```
+
+`while True` läuft **endlos** — bis ein `break` die Schleife von innen beendet. Das ist nützlich, wenn die Abbruchbedingung **mitten im Schleifenkörper** geprüft wird (nicht nur am Anfang).
+
+**Wann `while True` statt `while bedingung`?**
+- `while bedingung:` → Die Abbruchbedingung ist am **Anfang** klar (z.B. `while spiel_laeuft:`)
+- `while True:` + `break` → Die Abbruchbedingung ergibt sich erst **im Verlauf** des Schleifenkörpers (z.B. nach einer Eingabe)
+
 ## for-Schleife
 
 Die `for`-Schleife durchläuft eine **Sequenz** (z.B. eine Liste oder einen Bereich):

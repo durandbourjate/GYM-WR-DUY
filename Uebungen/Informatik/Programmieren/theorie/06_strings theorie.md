@@ -49,7 +49,21 @@ print(f"Total: {preis * menge} CHF")
 | `.lower()` | Alles in Kleinbuchstaben | `"HALLO".lower()` → `"hallo"` |
 | `.strip()` | Leerzeichen am Anfang/Ende entfernen | `" hi ".strip()` → `"hi"` |
 | `.replace(a, b)` | Teiltext ersetzen | `"Hallo".replace("a","o")` → `"Hollo"` |
+| `.count(x)` | Zählt, wie oft x vorkommt | `"42423".count("4")` → `2` |
 | `len(s)` | Länge des Strings | `len("Hallo")` → `5` |
+
+### Methoden verketten (Chaining)
+
+String-Methoden können direkt hintereinander aufgerufen werden. Das Ergebnis der ersten Methode wird sofort an die nächste weitergegeben:
+
+```python
+eingabe = input("Wohin? ")
+eingabe = eingabe.lower().strip()
+# Erst .lower() → alles klein, dann .strip() → Leerzeichen weg
+# "  OSTEN  " → "  osten  " → "osten"
+```
+
+Das ist kürzer als zwei separate Zeilen und wird im Spielbuch für die Eingabeverarbeitung verwendet.
 
 ## String-Indexierung
 

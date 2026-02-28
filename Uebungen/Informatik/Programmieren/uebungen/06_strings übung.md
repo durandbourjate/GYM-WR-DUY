@@ -11,22 +11,30 @@ Im Spielbuch sind die Texte fix gedruckt. In deinem Programm können sie sich ä
 
 ### Teilaufgabe 1: Raumnamen dynamisch einsetzen
 
-Erstelle ein Dictionary (eine Art Nachschlagetabelle) für die Raumnamen und verwende f-Strings, um dynamische Texte zu erzeugen:
+Verwende eine Variable für die Raumnummer und einen f-String, um den Raumnamen dynamisch in den Text einzusetzen:
 
 ```python
-raum_namen = {
-    1: "Startraum",
-    31: "West-Ost-Korridor",
-    32: "Süd-Nord-Korridor",
-    101: "Büro Ost",
-    102: "Lüftungsschacht-Raum",
-    104: "Sackgasse",
-    201: "Büro West",
-    202: "Tresorraum"
-}
-
 aktueller_raum = 32
-print(f"Du befindest dich im {raum_namen[aktueller_raum]}.")
+raum_name = ""
+
+if aktueller_raum == 1:
+    raum_name = "Startraum"
+elif aktueller_raum == 31:
+    raum_name = "West-Ost-Korridor"
+elif aktueller_raum == 32:
+    raum_name = "Süd-Nord-Korridor"
+elif aktueller_raum == 101:
+    raum_name = "Büro Ost"
+elif aktueller_raum == 102:
+    raum_name = "Lüftungsschacht-Raum"
+elif aktueller_raum == 104:
+    raum_name = "Sackgasse"
+elif aktueller_raum == 201:
+    raum_name = "Büro West"
+elif aktueller_raum == 202:
+    raum_name = "Tresorraum"
+
+print(f"Du befindest dich im {raum_name}.")
 ```
 
 Ändere `aktueller_raum` und teste, wie sich der Text anpasst.
@@ -65,7 +73,7 @@ aktueller_raum = 102
 hat_taschenmesser = True
 hat_sprengschnur = False
 
-raum_name = raum_namen[aktueller_raum]
+raum_name = "Lüftungsschacht-Raum"  # Für dieses Beispiel fest gesetzt
 
 # Inventar als Symbole
 inventar = ""
@@ -100,4 +108,4 @@ Teste mit verschiedenen Schreibweisen: `Osten`, `  osten  `, `OSTEN`.
 
 ## Ergebnis
 
-Du hast drei wichtige Bausteine erstellt: dynamische Raumtexte mit f-Strings, eine Inventar-Anzeige und eine robuste Eingabeverarbeitung. Diese machen dein Spiel lebendiger und benutzerfreundlicher.
+Du hast drei wichtige Bausteine erstellt: dynamische Raumtexte mit f-Strings und if/elif, eine Inventar-Anzeige und eine robuste Eingabeverarbeitung mit `.lower().strip()`. Diese machen dein Spiel lebendiger und benutzerfreundlicher.
