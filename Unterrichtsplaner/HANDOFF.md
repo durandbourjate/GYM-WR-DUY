@@ -14,7 +14,9 @@
 - 4ee54db: '+ Neu' Button in Toolbar
 - f192745: Block-Details + Vererbung an Kacheln
 - a497132: Sequenzen folgen Kacheln bei Drag&Drop, Block-Vererbung im Grid
-- (v2.1): Zoom-Level 2 Block-Ansicht, Zoom-Toolbar, Keyboard-Shortcuts 1/2/3
+- 0c68ed0: Zoom-Level 2 Block-Ansicht, Zoom-Toolbar, Keyboard-Shortcuts 1/2/3
+- 0384576: Klick auf Block in Zoom 2 → Zoom 3 mit Scroll + Sequenz-Panel
+- 1fca857: Multi-Select Batch-Buttons verdrahtet (Phase 2 komplett)
 
 ### Implementierte Features (komplett)
 
@@ -27,7 +29,7 @@
 - Tooltips auf allen Buttons
 - Alle Spalten gleich breit (110px)
 
-**Phase 2 — Multi-Select & Sequenzen (grösstenteils ✅)**
+**Phase 2 — Multi-Select & Sequenzen ✅**
 - Cmd+Klick Multi-Selektion
 - Sequenz-Markierung klickbar → Panel öffnen
 - Sequenz-Hervorhebung im Grid bei Block-Selektion
@@ -35,6 +37,7 @@
 - '+ Neu' Button in Toolbar für schnelle Sequenz-Erstellung
 - Klassenname klickbar → Klassenfilter
 - Typ-Badge klickbar → Typ-Filter
+- Batch-Buttons verdrahtet: ↓ Verschieben (+1) und ⊞ Einfügen davor
 
 **Phase 3 — Ferien, Fixierung, Vererbung (grösstenteils ✅)**
 - Ferien/Events (Type 5+6): nicht draggable, Icons, grössere Kacheln
@@ -59,14 +62,10 @@
 
 ### Noch offen
 
-#### Phase 2 (verbleibend)
-- [ ] Gruppen-Drag&Drop bei Multi-Selektion
-
 #### Phase 4 — Automation
-- [ ] Theme→Lehrplanziel Mapping (curriculumGoals.ts + Grobzuteilung)
+- [ ] Theme→Lehrplanziel Auto-Suggest (beim Setzen von topicMain)
 - [ ] Theme→Taxonomiestufe Mapping
 
 #### Phase 5 — Multi-Year View (verbleibend)
 - [ ] Zoom-Level 1 = Semesterübersicht über 4 GYM-Jahre
 - [ ] Jahrgang-Modus vs. Schuljahr-Modus
-- [ ] Klick auf Block in Zoom 2 → Detail-Panel oder Zoom 3 mit Scroll-to
