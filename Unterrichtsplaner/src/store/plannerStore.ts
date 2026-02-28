@@ -35,7 +35,9 @@ interface PlannerState {
   selection: Selection | null;
   setSelection: (s: Selection | null) => void;
   multiSelection: string[];
+  lastSelectedKey: string | null;
   toggleMultiSelect: (key: string) => void;
+  selectRange: (toKey: string, allWeeks: string[], courses: Course[]) => void;
   clearMultiSelect: () => void;
   showHelp: boolean;
   toggleHelp: () => void;
@@ -54,6 +56,8 @@ interface PlannerState {
   pushLessons: (courseCol: number, beforeWeekW: string, allWeeks: string[]) => void;
   batchShiftDown: (keys: string[], allWeeks: string[], courses: Course[]) => void;
   batchInsertBefore: (keys: string[], allWeeks: string[], courses: Course[]) => void;
+  // Group drag & drop
+  moveGroup: (col: number, fromWeeks: string[], toWeek: string, allWeeks: string[]) => void;
   // Lesson Details
   lessonDetails: Record<string, LessonDetail>; // key: "weekW-col"
   updateLessonDetail: (weekW: string, col: number, detail: Partial<LessonDetail>) => void;
@@ -123,13 +127,51 @@ export const usePlannerStore = create<PlannerState>()(
   selection: null,
   setSelection: (s) => set({ selection: s }),
   multiSelection: [],
+  lastSelectedKey: null,
   toggleMultiSelect: (key) =>
     set((state) => ({
       multiSelection: state.multiSelection.includes(key)
         ? state.multiSelection.filter((k) => k !== key)
         : [...state.multiSelection, key],
+      lastSelectedKey: key,
     })),
-  clearMultiSelect: () => set({ multiSelection: [] }),
+  selectRange: (toKey, allWeeks, courses) => {
+    const state = get();
+    const fromKey = state.lastSelectedKey;
+    if (!fromKey) {
+      // No previous selection — just select this one
+      set({ multiSelection: [toKey], lastSelectedKey: toKey });
+      return;
+    }
+    // Parse keys: "weekW-courseId"
+    const [fromWeek, fromCourseId] = fromKey.split('-');
+    const [toWeek, toCourseId] = toKey.split('-');
+    // Only range-select within same column
+    if (fromCourseId !== toCourseId) {
+      set((s) => ({
+        multiSelection: s.multiSelection.includes(toKey)
+          ? s.multiSelection
+          : [...s.multiSelection, toKey],
+        lastSelectedKey: toKey,
+      }));
+      return;
+    }
+    const fromIdx = allWeeks.indexOf(fromWeek);
+    const toIdx = allWeeks.indexOf(toWeek);
+    if (fromIdx < 0 || toIdx < 0) return;
+    const startIdx = Math.min(fromIdx, toIdx);
+    const endIdx = Math.max(fromIdx, toIdx);
+    const rangeKeys: string[] = [];
+    for (let i = startIdx; i <= endIdx; i++) {
+      rangeKeys.push(`${allWeeks[i]}-${fromCourseId}`);
+    }
+    // Merge with existing selection (union)
+    set((s) => {
+      const merged = new Set([...s.multiSelection, ...rangeKeys]);
+      return { multiSelection: Array.from(merged), lastSelectedKey: toKey };
+    });
+  },
+  clearMultiSelect: () => set({ multiSelection: [], lastSelectedKey: null }),
   showHelp: false,
   toggleHelp: () => set((state) => ({ showHelp: !state.showHelp })),
   editing: null,
@@ -575,6 +617,92 @@ export const usePlannerStore = create<PlannerState>()(
   },
   batchInsertBefore: (keys, allWeeks, courses) => {
     get().batchShiftDown(keys, allWeeks, courses);
+  },
+
+  // Group drag & drop: move a group of cells in a column to a new position
+  moveGroup: (col, fromWeeks, toWeek, allWeeks) => {
+    const state = get();
+    state.pushUndo();
+    const weekMap = new Map(state.weekData.map(w => [w.w, w]));
+
+    // Sort fromWeeks by their order in allWeeks
+    const sorted = [...fromWeeks].sort((a, b) => allWeeks.indexOf(a) - allWeeks.indexOf(b));
+
+    // Collect the entries to move
+    const entries: (LessonEntry | null)[] = sorted.map(wk => weekMap.get(wk)?.lessons[col] || null);
+    const details: Record<string, LessonDetail | undefined> = {};
+    for (const wk of sorted) {
+      details[wk] = state.lessonDetails[`${wk}-${col}`];
+    }
+
+    // Remove entries from their original positions
+    let newWeekData = state.weekData.map(w => {
+      if (sorted.includes(w.w)) {
+        const newLessons = { ...w.lessons };
+        delete newLessons[col];
+        return { ...w, lessons: newLessons };
+      }
+      return { ...w, lessons: { ...w.lessons } };
+    });
+
+    // Find target position and insert, shifting existing content down
+    const toIdx = allWeeks.indexOf(toWeek);
+    if (toIdx < 0) { set({ weekData: newWeekData }); return; }
+
+    // Collect non-fixed entries from toWeek onwards (excluding the moved entries)
+    const weekMapNew = new Map(newWeekData.map(w => [w.w, w]));
+    const targetWeeks = allWeeks.slice(toIdx);
+
+    // Gather existing entries in the target range
+    const existing: { week: string; entry: LessonEntry | null }[] = [];
+    for (const wk of targetWeeks) {
+      const w = weekMapNew.get(wk);
+      const entry = w?.lessons[col] || null;
+      const isFixed = entry && (entry.type === 5 || entry.type === 6);
+      if (!isFixed) {
+        existing.push({ week: wk, entry });
+      }
+    }
+
+    // Build new order: moved entries first, then existing non-null entries
+    const movedEntries = entries.filter(e => e !== null) as LessonEntry[];
+    const existingEntries = existing.filter(e => e.entry !== null).map(e => e.entry!);
+    const allEntries = [...movedEntries, ...existingEntries];
+
+    // Place back into non-fixed slots from toIdx
+    let entryIdx = 0;
+    for (const wk of targetWeeks) {
+      const w = weekMapNew.get(wk);
+      if (!w) continue;
+      const curEntry = w.lessons[col];
+      const isFixed = curEntry && (curEntry.type === 5 || curEntry.type === 6);
+      if (isFixed) continue;
+
+      if (entryIdx < allEntries.length) {
+        w.lessons[col] = allEntries[entryIdx];
+        entryIdx++;
+      } else {
+        delete w.lessons[col];
+      }
+    }
+
+    // Update sequences: remap weeks for blocks in this column
+    const courseId = COURSES.find(c => c.col === col)?.id;
+    const updatedSeqs = state.sequences.map(seq => {
+      if (courseId && seq.courseId !== courseId) return seq;
+      // Rebuild week mapping based on new positions
+      let changed = false;
+      const newBlocks = seq.blocks.map(b => {
+        const hasMovedWeek = b.weeks.some(w => sorted.includes(w));
+        if (!hasMovedWeek) return b;
+        changed = true;
+        // For moved weeks, find their new positions
+        return b; // Sequence tracking for group moves is complex — keep blocks as-is for now
+      });
+      return changed ? { ...seq, blocks: newBlocks, updatedAt: new Date().toISOString() } : seq;
+    });
+
+    set({ weekData: newWeekData.map(w => weekMapNew.get(w.w) || w), sequences: updatedSeqs, multiSelection: [] });
   },
 
   undoStack: [],

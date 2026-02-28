@@ -120,10 +120,10 @@ function EmptyCellMenu({ week, course, onClose }: { week: string; course: Course
 export function WeekRows({ weeks, courses, currentRef }: Props) {
   const {
     selection, setSelection,
-    multiSelection, toggleMultiSelect, clearMultiSelect,
+    multiSelection, toggleMultiSelect, clearMultiSelect, selectRange,
     editing, setEditing,
     weekData, updateLesson,
-    dragSource, setDragSource, swapLessons, moveLessonToEmpty,
+    dragSource, setDragSource, swapLessons, moveLessonToEmpty, moveGroup,
     sequences, editingSequenceId,
     hkOverrides, hkStartGroups, setHKOverride,
     tafPhases,
@@ -149,7 +149,10 @@ export function WeekRows({ weeks, courses, currentRef }: Props) {
   const handleClick = useCallback(
     (weekW: string, course: Course, title: string, e: React.MouseEvent) => {
       if (!title) return;
-      if (e.shiftKey || e.metaKey || e.ctrlKey) {
+      if (e.shiftKey) {
+        // Shift+Click: range select within column
+        selectRange(`${weekW}-${course.id}`, allWeekKeys, courses);
+      } else if (e.metaKey || e.ctrlKey) {
         toggleMultiSelect(`${weekW}-${course.id}`);
       } else {
         clearMultiSelect();
@@ -158,7 +161,7 @@ export function WeekRows({ weeks, courses, currentRef }: Props) {
         // Don't open side panel on single click
       }
     },
-    [selection, setSelection, toggleMultiSelect, clearMultiSelect]
+    [selection, setSelection, toggleMultiSelect, clearMultiSelect, selectRange, allWeekKeys, courses]
   );
 
   // Double click: open side panel with details tab
@@ -338,7 +341,22 @@ export function WeekRows({ weeks, courses, currentRef }: Props) {
                     if (dragSource.week === week.w) return;
                     // Don't allow dropping onto fixed cells
                     if (isFixed) return;
-                    if (title) {
+
+                    // Check if dragging a multi-selected group
+                    const dragKey = `${dragSource.week}-${courses.find(cc => cc.col === dragSource.col)?.id}`;
+                    const isGroupDrag = multiSelection.length > 1 && multiSelection.includes(dragKey);
+
+                    if (isGroupDrag) {
+                      // Group drag: move all selected cells in this column to target position
+                      const courseForCol = courses.find(cc => cc.col === c.col);
+                      if (!courseForCol) return;
+                      const selectedWeeksInCol = multiSelection
+                        .filter(k => k.endsWith(`-${courseForCol.id}`))
+                        .map(k => k.split('-')[0]);
+                      if (selectedWeeksInCol.length > 0) {
+                        moveGroup(c.col, selectedWeeksInCol, week.w, allWeekKeys);
+                      }
+                    } else if (title) {
                       swapLessons(c.col, dragSource.week, week.w);
                     } else {
                       moveLessonToEmpty(c.col, dragSource.week, week.w);
@@ -428,7 +446,8 @@ export function WeekRows({ weeks, courses, currentRef }: Props) {
                         if (isFixed) { e.preventDefault(); return; }
                         setDragSource({ week: week.w, col: c.col });
                         e.dataTransfer.effectAllowed = 'move';
-                        e.dataTransfer.setData('text/plain', `${week.w}:${c.col}`);
+                        const isGroupDrag = multiSelection.length > 1 && multiSelection.includes(`${week.w}-${c.id}`);
+                        e.dataTransfer.setData('text/plain', isGroupDrag ? `group:${c.col}` : `${week.w}:${c.col}`);
                       }}
                       onDragEnd={() => { setDragSource(null); setDropTarget(null); }}
                       className={`mx-0.5 ml-1.5 px-1 py-0.5 rounded transition-all duration-100 flex items-center hover:shadow-md hover:z-10 relative ${isFixed ? 'cursor-default' : 'cursor-grab hover:scale-[1.02]'} ${isSearchMatch ? 'search-highlight' : ''}`}
