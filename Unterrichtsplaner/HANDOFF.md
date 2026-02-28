@@ -33,6 +33,7 @@
 - de583f6: Stundenplan erster Fix
 - f906097: **Stundenplan komplett korrigiert** — SF=Di+Do, kein Fr, IN phasenabhängig
 - 1255499: **Shift+Klick → Neue Sequenz** — MultiSelect auf leeren+vollen Zellen, grüner Button
+- 046fd9b: **Multi-Tag-Sequenzen** — courseIds Verknüpfung, Auto-Place über alle Spalten
 
 ### Implementierte Features (komplett)
 
@@ -95,7 +96,7 @@
 - [x] Print-CSS für Semesterplan-Export (v2.3)
 - [x] Shift+Klick Bereichs-Selektion (v2.5)
 - [x] Gruppen-Drag&Drop (v2.5)
-- [ ] Multi-Tag-Sequenzen: Sequenz über 2 courseIds (Di+Do), Di-Do-Di-Do alternierend ODER Di-Di-Di / Do-Do-Do getrennt
+- [x] Multi-Tag-Sequenzen: Sequenz über 2 courseIds (Di+Do), Di-Do alternierend ODER getrennt (v2.7)
 - [x] Shift+Klick Bereichsauswahl → Sequenz starten aus Mehrfachauswahl (v2.6)
 - [ ] Jahrgangs-Modus in Zoom 1: ein Jahrgang durch alle 4 GYM-Jahre (braucht Multi-SJ-Daten)
 
