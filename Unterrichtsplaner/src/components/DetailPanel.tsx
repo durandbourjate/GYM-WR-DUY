@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { usePlannerStore } from '../store/plannerStore';
 import { TYPE_BADGES, getSequenceInfoFromStore } from '../utils/colors';
 import { COURSES } from '../data/courses';
@@ -156,6 +156,11 @@ export function DetailPanel() {
   const detailKey = selection && c ? `${selection.week}-${c.col}` : '';
   const detail: LessonDetail = (detailKey && lessonDetails[detailKey]) || {};
 
+  // Auto-detect subjectArea from LessonType
+  const weekData = usePlannerStore((s) => s.weekData);
+  const currentWeek = selection ? weekData.find((w) => w.w === selection.week) : undefined;
+  const currentLesson = c ? currentWeek?.lessons[c.col] : undefined;
+
   const updateField = useCallback(
     <K extends keyof LessonDetail>(field: K, value: LessonDetail[K]) => {
       if (!selection || !c) return;
@@ -163,6 +168,15 @@ export function DetailPanel() {
     },
     [selection?.week, c?.col, updateLessonDetail]
   );
+
+  useEffect(() => {
+    if (!selection || !c || detail.subjectArea || !currentLesson) return;
+    const autoMap: Record<number, SubjectArea> = { 1: 'BWL', 2: 'RECHT', 3: 'IN' };
+    const detected = autoMap[currentLesson.type];
+    if (detected) {
+      updateLessonDetail(selection.week, c.col, { subjectArea: detected });
+    }
+  }, [selection?.week, c?.col, currentLesson?.type, detail.subjectArea]);
 
   if (!selection || !c) return null;
 
