@@ -34,6 +34,7 @@
 - f906097: **Stundenplan komplett korrigiert** — SF=Di+Do, kein Fr, IN phasenabhängig
 - 1255499: **Shift+Klick → Neue Sequenz** — MultiSelect auf leeren+vollen Zellen, grüner Button
 - 046fd9b: **Multi-Tag-Sequenzen** — courseIds Verknüpfung, Auto-Place über alle Spalten
+- d20d7c0: **Jahrgangs-Modus Zoom 1** — 🎓 Jahrgänge mit Soll/Ist pro SF-Gruppe
 
 ### Implementierte Features (komplett)
 
@@ -98,7 +99,7 @@
 - [x] Gruppen-Drag&Drop (v2.5)
 - [x] Multi-Tag-Sequenzen: Sequenz über 2 courseIds (Di+Do), Di-Do alternierend ODER getrennt (v2.7)
 - [x] Shift+Klick Bereichsauswahl → Sequenz starten aus Mehrfachauswahl (v2.6)
-- [ ] Jahrgangs-Modus in Zoom 1: ein Jahrgang durch alle 4 GYM-Jahre (braucht Multi-SJ-Daten)
+- [x] Jahrgangs-Modus in Zoom 1: SF-Gruppen mit Soll/Ist-Vergleich (v2.8)
 
 ### v2.5 Features (Commits 80c6fca, a8557e0)
 - **Shift+Klick Bereichs-Selektion**: Shift+Klick selektiert alle Kacheln von der letzten Auswahl bis zur geklickten Zelle innerhalb derselben Spalte. Funktioniert additiv mit bestehender Multi-Selektion.
