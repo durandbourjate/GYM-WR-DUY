@@ -22,10 +22,11 @@ export const TYPE_BADGES: Record<CourseType, { bg: string; fg: string }> = {
   EF: { bg: '#ec4899', fg: '#fff' },
 };
 
-// Default sequence colors palette
+// Default sequence colors palette (16 colors for large sequence counts)
 export const SEQUENCE_COLORS = [
   '#16a34a', '#0ea5e9', '#d97706', '#7c3aed', '#ec4899',
   '#14b8a6', '#f43f5e', '#8b5cf6', '#eab308', '#06b6d4',
+  '#84cc16', '#e11d48', '#2563eb', '#ea580c', '#4f46e5', '#0d9488',
 ];
 
 export function getSequenceInfoFromStore(

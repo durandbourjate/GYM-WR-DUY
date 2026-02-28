@@ -206,6 +206,7 @@ function SequenceCard({ seq }: { seq: ManagedSequence }) {
   const [showAutoPlace, setShowAutoPlace] = useState(false);
   const [autoPlaceStart, setAutoPlaceStart] = useState(WEEKS[0]?.w || '33');
   const [autoPlaceResult, setAutoPlaceResult] = useState<{ placed: number; skipped: string[] } | null>(null);
+  const [compactBlocks, setCompactBlocks] = useState(seq.blocks.length > 6);
 
   const allWeekOrder = WEEKS.map(w => w.w);
 
@@ -295,7 +296,7 @@ function SequenceCard({ seq }: { seq: ManagedSequence }) {
           </div>
 
           {/* Color picker */}
-          <div className="flex gap-1 items-center">
+          <div className="flex gap-1 items-center flex-wrap">
             <span className="text-[8px] text-gray-500">Farbe:</span>
             {SEQUENCE_COLORS.map((color) => (
               <button
@@ -314,27 +315,56 @@ function SequenceCard({ seq }: { seq: ManagedSequence }) {
           {/* Blocks */}
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
-              <span className="text-[9px] text-gray-500 font-medium">Blöcke</span>
-              <button
-                onClick={handleAddBlock}
-                className="text-[9px] text-green-400 hover:text-green-300 cursor-pointer"
-              >
-                + Block
-              </button>
+              <span className="text-[9px] text-gray-500 font-medium">Blöcke ({seq.blocks.length})</span>
+              <div className="flex gap-2 items-center">
+                {seq.blocks.length > 4 && (
+                  <button
+                    onClick={() => setCompactBlocks(!compactBlocks)}
+                    className="text-[8px] text-gray-500 hover:text-gray-300 cursor-pointer"
+                    title={compactBlocks ? 'Erweiterte Ansicht' : 'Kompakte Ansicht'}
+                  >{compactBlocks ? '⊞ Erweitern' : '⊟ Kompakt'}</button>
+                )}
+                <button
+                  onClick={handleAddBlock}
+                  className="text-[9px] text-green-400 hover:text-green-300 cursor-pointer"
+                >
+                  + Block
+                </button>
+              </div>
             </div>
-            {seq.blocks.map((block, i) => (
-              <BlockEditor
-                key={i}
-                block={block}
-                index={i}
-                seqId={seq.id}
-                totalBlocks={seq.blocks.length}
-                onUpdate={(idx, b) => updateBlockInSequence(seq.id, idx, b)}
-                onRemove={(idx) => removeBlockFromSequence(seq.id, idx)}
-                onMoveUp={(idx) => reorderBlocks(seq.id, idx, idx - 1)}
-                onMoveDown={(idx) => reorderBlocks(seq.id, idx, idx + 1)}
-              />
-            ))}
+            {compactBlocks ? (
+              <div className="space-y-0.5">
+                {seq.blocks.map((block, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center gap-1 px-1.5 py-0.5 bg-slate-800 rounded border border-slate-700 group text-[9px] cursor-pointer hover:border-slate-500"
+                    onClick={() => setCompactBlocks(false)}
+                  >
+                    <span className="text-gray-500 w-4 text-center">{i + 1}</span>
+                    <span className="text-gray-200 flex-1 truncate">{block.label}</span>
+                    <span className="text-gray-500 text-[8px]">{block.weeks.length}W</span>
+                    <span className="text-gray-600 text-[8px] font-mono truncate max-w-[80px]">
+                      {block.weeks.length > 0 ? `KW ${block.weeks[0]}–${block.weeks[block.weeks.length - 1]}` : '—'}
+                    </span>
+                    {(block.topicMain || block.curriculumGoal) && <span className="text-green-500 text-[8px]">●</span>}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              seq.blocks.map((block, i) => (
+                <BlockEditor
+                  key={i}
+                  block={block}
+                  index={i}
+                  seqId={seq.id}
+                  totalBlocks={seq.blocks.length}
+                  onUpdate={(idx, b) => updateBlockInSequence(seq.id, idx, b)}
+                  onRemove={(idx) => removeBlockFromSequence(seq.id, idx)}
+                  onMoveUp={(idx) => reorderBlocks(seq.id, idx, idx - 1)}
+                  onMoveDown={(idx) => reorderBlocks(seq.id, idx, idx + 1)}
+                />
+              ))
+            )}
           </div>
 
           {/* Actions */}
