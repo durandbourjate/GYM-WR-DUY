@@ -7,9 +7,10 @@ import { WeekRows } from './components/WeekRows';
 import { AppHeader, HelpBar, MultiSelectToolbar, Legend } from './components/Toolbar';
 import { DetailPanel } from './components/DetailPanel';
 import { InsertDialog } from './components/InsertDialog';
+import { ZoomBlockView } from './components/ZoomBlockView';
 
 function App() {
-  const { filter, classFilter, selection, weekData, setWeekData, migrateStaticSequences, sequencePanelOpen, sidePanelOpen } = usePlannerStore();
+  const { filter, classFilter, selection, weekData, setWeekData, migrateStaticSequences, sequencePanelOpen, sidePanelOpen, zoomLevel, setZoomLevel } = usePlannerStore();
   const curRef = useRef<HTMLTableRowElement>(null);
 
   // Initialize weekData in store on first render
@@ -45,6 +46,10 @@ function App() {
   // Keyboard shortcut: Ctrl+Z for undo, Escape to close panel
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
+      // Don't capture shortcuts when editing inputs
+      const tag = (e.target as HTMLElement).tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+
       if ((e.metaKey || e.ctrlKey) && e.key === 'z') {
         e.preventDefault();
         usePlannerStore.getState().undo();
@@ -57,6 +62,12 @@ function App() {
         } else if (state.selection) {
           state.setSelection(null);
         }
+      }
+      // Zoom shortcuts: 1, 2, 3 (without modifier)
+      if (!e.metaKey && !e.ctrlKey && !e.altKey) {
+        if (e.key === '1') usePlannerStore.getState().setZoomLevel(1);
+        if (e.key === '2') usePlannerStore.getState().setZoomLevel(2);
+        if (e.key === '3') usePlannerStore.getState().setZoomLevel(3);
       }
     };
     window.addEventListener('keydown', handler);
@@ -73,27 +84,51 @@ function App() {
 
       <div className="flex">
         <div className={`overflow-x-auto flex-1 ${(sidePanelOpen || sequencePanelOpen) ? 'mr-[340px]' : ''}`} style={{ paddingBottom: 20 }}>
-          {/* Semester 1 */}
-          <table className="border-collapse w-max min-w-full">
-            <SemesterHeader courses={s1Courses} semester={1} />
-            <tbody>
-              <WeekRows weeks={s1Weeks} courses={s1Courses} currentRef={curRef} />
-            </tbody>
-          </table>
+          {zoomLevel === 2 ? (
+            <>
+              {/* Block View — Semester 1 */}
+              <ZoomBlockView semester={1} />
 
-          {/* Semester divider */}
-          <div className="py-1.5 px-4 flex items-center gap-2" style={{ background: 'linear-gradient(90deg, #f59e0b20, #f59e0b40, #f59e0b20)' }}>
-            <span className="text-xs font-bold text-amber-500">━━ Semester 2 ━━</span>
-            <span className="text-[9px] text-amber-800">ab KW 07</span>
-          </div>
+              {/* Semester divider */}
+              <div className="py-1.5 px-4 flex items-center gap-2" style={{ background: 'linear-gradient(90deg, #f59e0b20, #f59e0b40, #f59e0b20)' }}>
+                <span className="text-xs font-bold text-amber-500">━━ Semester 2 ━━</span>
+                <span className="text-[9px] text-amber-800">ab KW 07</span>
+              </div>
 
-          {/* Semester 2 */}
-          <table className="border-collapse w-max min-w-full">
-            <SemesterHeader courses={s2Courses} semester={2} />
-            <tbody>
-              <WeekRows weeks={s2Weeks} courses={s2Courses} currentRef={curRef} />
-            </tbody>
-          </table>
+              {/* Block View — Semester 2 */}
+              <ZoomBlockView semester={2} />
+            </>
+          ) : zoomLevel === 1 ? (
+            <div className="p-8 text-center text-gray-500 text-sm">
+              <span className="text-2xl">◫</span>
+              <p className="mt-2">Semester-Übersicht (Multi-Year View)</p>
+              <p className="text-[10px] text-gray-600 mt-1">Wird in Phase 5 implementiert — zeigt 4 GYM-Jahre im Überblick</p>
+            </div>
+          ) : (
+            <>
+              {/* Semester 1 — Week View */}
+              <table className="border-collapse w-max min-w-full">
+                <SemesterHeader courses={s1Courses} semester={1} />
+                <tbody>
+                  <WeekRows weeks={s1Weeks} courses={s1Courses} currentRef={curRef} />
+                </tbody>
+              </table>
+
+              {/* Semester divider */}
+              <div className="py-1.5 px-4 flex items-center gap-2" style={{ background: 'linear-gradient(90deg, #f59e0b20, #f59e0b40, #f59e0b20)' }}>
+                <span className="text-xs font-bold text-amber-500">━━ Semester 2 ━━</span>
+                <span className="text-[9px] text-amber-800">ab KW 07</span>
+              </div>
+
+              {/* Semester 2 — Week View */}
+              <table className="border-collapse w-max min-w-full">
+                <SemesterHeader courses={s2Courses} semester={2} />
+                <tbody>
+                  <WeekRows weeks={s2Weeks} courses={s2Courses} currentRef={curRef} />
+                </tbody>
+              </table>
+            </>
+          )}
         </div>
       </div>
 

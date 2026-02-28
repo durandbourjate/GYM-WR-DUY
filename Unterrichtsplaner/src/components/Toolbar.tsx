@@ -125,7 +125,7 @@ function DataMenu() {
 }
 
 export function AppHeader() {
-  const { filter, setFilter, classFilter, setClassFilter, showHelp, toggleHelp, undoStack, undo, sequencePanelOpen, setSequencePanelOpen, sidePanelOpen, setSidePanelOpen, setSidePanelTab, selection } = usePlannerStore();
+  const { filter, setFilter, classFilter, setClassFilter, showHelp, toggleHelp, undoStack, undo, sequencePanelOpen, setSequencePanelOpen, sidePanelOpen, setSidePanelOpen, setSidePanelTab, selection, zoomLevel, setZoomLevel } = usePlannerStore();
   const [showStats, setShowStats] = useState(false);
   const [showTaF, setShowTaF] = useState(false);
   const [showExcel, setShowExcel] = useState(false);
@@ -174,6 +174,24 @@ export function AppHeader() {
             {classFilter} ✕
           </button>
         )}
+        <span className="w-px h-4 bg-gray-700 mx-1" />
+        {/* Zoom Level */}
+        <div className="flex items-center border border-gray-700 rounded overflow-hidden">
+          {([1, 2, 3] as const).map((z) => (
+            <button
+              key={z}
+              onClick={() => setZoomLevel(z)}
+              className={`px-1.5 py-0.5 text-[9px] font-semibold cursor-pointer transition-colors ${
+                zoomLevel === z
+                  ? 'bg-cyan-600 text-white'
+                  : 'text-gray-500 hover:text-gray-300 hover:bg-gray-800'
+              } ${z < 3 ? 'border-r border-gray-700' : ''}`}
+              title={z === 1 ? 'Semester-Übersicht (weit)' : z === 2 ? 'Block-Ansicht (mittel)' : 'Wochen-Ansicht (nah)'}
+            >
+              {z === 1 ? '◫' : z === 2 ? '▧' : '▦'}
+            </button>
+          ))}
+        </div>
         <span className="w-px h-4 bg-gray-700 mx-1" />
         {undoStack.length > 0 && (
           <button

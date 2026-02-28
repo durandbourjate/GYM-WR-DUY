@@ -28,6 +28,8 @@ interface PlannerState {
   setFilter: (f: FilterType) => void;
   classFilter: string | null;
   setClassFilter: (c: string | null) => void;
+  zoomLevel: 1 | 2 | 3;
+  setZoomLevel: (z: 1 | 2 | 3) => void;
   searchQuery: string;
   setSearchQuery: (q: string) => void;
   selection: Selection | null;
@@ -114,6 +116,8 @@ export const usePlannerStore = create<PlannerState>()(
   setFilter: (f) => set({ filter: f }),
   classFilter: null,
   setClassFilter: (c) => set({ classFilter: c }),
+  zoomLevel: 3,
+  setZoomLevel: (z) => set({ zoomLevel: z }),
   searchQuery: '',
   setSearchQuery: (q) => set({ searchQuery: q }),
   selection: null,
