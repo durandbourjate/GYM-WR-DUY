@@ -7,7 +7,11 @@
 - Deployed auf GitHub Pages
 - Pfad: `10 Github/GYM-WR-DUY/Unterrichtsplaner/`
 - **Stundenplan-Quelle**: `04 Rahmenbedingungen/Stundenplan/` — Immer aktuellste Phase verwenden!
-- **SF-Wochentage**: Do + Fr (NICHT Mi!). SF alterniert Do-Fr-Do-Fr pro Woche.
+- **SF-Wochentage**: Di + Do (NICHT Mi/Fr!). Kein Unterricht am Freitag.
+- **SF-Gruppen**: 29c (Di L2 + Do L3-4), 27a28f (Di+Do L7-8), 28bc29fs (Di L9-10 + Do L2)
+- **Klassenbezeichnungen**: 27a28f (nicht 27abcd8f), 28bc29fs (nicht 28bc9f9s)
+- **Semester-Unterschiede**: KS 27a S1=Mo, S2=Do. EWR 29fs S1=Di, S2=Do. IN phasenabhängig.
+- **getLinkedCourseIds()**: Hilfsfunktion in courses.ts findet alle Kurse derselben Klasse+Typ
 
 ### Commits v2.0–2.2 Session
 - 4eabeda: Side-Panel, Hover-Preview, Seq-Hervorhebung, feste Kacheln
@@ -26,7 +30,8 @@
 - e71b774: 12/13+ Sequences Support — 16 Farben, Kompaktansicht Blöcke
 - 80c6fca: Shift+Klick Bereichs-Selektion, Gruppen-Drag&Drop
 - a8557e0: Farbcode LearningView-konform, Sequenz-Titel-Fix
-- de583f6: Stundenplan korrigiert (SF=Do+Fr, IN=Di), Sequenz-Titel Re-Migration
+- de583f6: Stundenplan erster Fix
+- f906097: **Stundenplan komplett korrigiert** — SF=Di+Do, kein Fr, IN phasenabhängig
 
 ### Implementierte Features (komplett)
 
@@ -89,7 +94,8 @@
 - [x] Print-CSS für Semesterplan-Export (v2.3)
 - [x] Shift+Klick Bereichs-Selektion (v2.5)
 - [x] Gruppen-Drag&Drop (v2.5)
-- [ ] Shift+Klick auf leere Zellen → Sequenz zuordnen (nice-to-have)
+- [ ] Multi-Tag-Sequenzen: Sequenz über 2 courseIds (Di+Do), Di-Do-Di-Do alternierend ODER Di-Di-Di / Do-Do-Do getrennt
+- [ ] Shift+Klick Bereichsauswahl → Sequenz starten aus Mehrfachauswahl
 - [ ] Jahrgangs-Modus in Zoom 1: ein Jahrgang durch alle 4 GYM-Jahre (braucht Multi-SJ-Daten)
 
 ### v2.5 Features (Commits 80c6fca, a8557e0)
