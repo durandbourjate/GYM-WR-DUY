@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { FilterType, Week, LessonEntry, Course, LessonDetail } from '../types';
+import { COURSES } from '../data/courses';
 
 interface Selection {
   week: string;
@@ -24,6 +25,8 @@ interface InsertDialog {
 interface PlannerState {
   filter: FilterType;
   setFilter: (f: FilterType) => void;
+  searchQuery: string;
+  setSearchQuery: (q: string) => void;
   selection: Selection | null;
   setSelection: (s: Selection | null) => void;
   multiSelection: string[];
@@ -44,6 +47,8 @@ interface PlannerState {
   swapLessons: (col: number, weekA: string, weekB: string) => void;
   moveLessonToEmpty: (col: number, fromWeek: string, toWeek: string) => void;
   pushLessons: (courseCol: number, beforeWeekW: string, allWeeks: string[]) => void;
+  batchShiftDown: (keys: string[], allWeeks: string[], courses: Course[]) => void;
+  batchInsertBefore: (keys: string[], allWeeks: string[], courses: Course[]) => void;
   // Lesson Details
   lessonDetails: Record<string, LessonDetail>; // key: "weekW-col"
   updateLessonDetail: (weekW: string, col: number, detail: Partial<LessonDetail>) => void;
@@ -51,6 +56,9 @@ interface PlannerState {
   // Detail Panel state
   detailPanelExpanded: boolean;
   setDetailPanelExpanded: (v: boolean) => void;
+  // Export / Import
+  exportData: () => string;
+  importData: (json: string) => boolean;
   undoStack: Week[][];
   pushUndo: () => void;
   undo: () => void;
@@ -61,6 +69,8 @@ export const usePlannerStore = create<PlannerState>()(
     (set, get) => ({
   filter: 'ALL',
   setFilter: (f) => set({ filter: f }),
+  searchQuery: '',
+  setSearchQuery: (q) => set({ searchQuery: q }),
   selection: null,
   setSelection: (s) => set({ selection: s }),
   multiSelection: [],
@@ -104,6 +114,31 @@ export const usePlannerStore = create<PlannerState>()(
   getLessonDetail: (weekW, col) => {
     const key = `${weekW}-${col}`;
     return get().lessonDetails[key];
+  },
+  // Export / Import
+  exportData: () => {
+    const state = get();
+    return JSON.stringify({
+      version: '1.1',
+      exportedAt: new Date().toISOString(),
+      weekData: state.weekData,
+      lessonDetails: state.lessonDetails,
+    }, null, 2);
+  },
+  importData: (json: string) => {
+    try {
+      const data = JSON.parse(json);
+      if (!data.weekData || !Array.isArray(data.weekData)) throw new Error('Invalid data');
+      const state = get();
+      state.pushUndo();
+      set({
+        weekData: data.weekData,
+        lessonDetails: data.lessonDetails || {},
+      });
+      return true;
+    } catch {
+      return false;
+    }
   },
   detailPanelExpanded: false,
   setDetailPanelExpanded: (v) => set({ detailPanelExpanded: v }),
@@ -180,6 +215,53 @@ export const usePlannerStore = create<PlannerState>()(
       }
     }
     set({ weekData: newWeekData });
+  },
+
+  // Batch operations for multi-select
+  batchShiftDown: (keys, allWeeks, courses) => {
+    const state = get();
+    state.pushUndo();
+    // Parse keys: "weekW-courseId" → find col
+    const parsed = keys.map(k => {
+      const [weekW, courseId] = k.split('-');
+      const course = courses.find(c => c.id === courseId);
+      return course ? { weekW, col: course.col } : null;
+    }).filter(Boolean) as { weekW: string; col: number }[];
+    // Group by col, take earliest week per col
+    const byCols = new Map<number, string[]>();
+    for (const p of parsed) {
+      const arr = byCols.get(p.col) || [];
+      arr.push(p.weekW);
+      byCols.set(p.col, arr);
+    }
+    let newWeekData = state.weekData.map(w => ({ ...w, lessons: { ...w.lessons } }));
+    for (const [col, weeks] of byCols) {
+      // Find the earliest week in allWeeks order
+      const earliest = weeks.reduce((best, w) => {
+        const bi = allWeeks.indexOf(best);
+        const wi = allWeeks.indexOf(w);
+        return wi < bi ? w : best;
+      }, weeks[0]);
+      // Push from earliest
+      const weekMap = new Map(newWeekData.map(w => [w.w, w]));
+      const targetIdx = allWeeks.indexOf(earliest);
+      if (targetIdx < 0) continue;
+      const relevantWeeks = allWeeks.slice(targetIdx);
+      const entries: (LessonEntry | null)[] = relevantWeeks.map(wk => weekMap.get(wk)?.lessons[col] || null);
+      entries.unshift(null);
+      for (let i = 0; i < relevantWeeks.length; i++) {
+        const wk = weekMap.get(relevantWeeks[i]);
+        if (wk) {
+          if (entries[i]) wk.lessons[col] = entries[i]!;
+          else delete wk.lessons[col];
+        }
+      }
+    }
+    set({ weekData: newWeekData, multiSelection: [] });
+  },
+  batchInsertBefore: (keys, allWeeks, courses) => {
+    // Same as batchShiftDown — inserts empty slot before each selected item
+    get().batchShiftDown(keys, allWeeks, courses);
   },
 
   undoStack: [],

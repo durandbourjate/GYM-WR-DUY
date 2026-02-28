@@ -37,6 +37,7 @@ export function WeekRows({ weeks, courses, currentRef }: Props) {
     editing, setEditing,
     weekData, updateLesson,
     dragSource, setDragSource, swapLessons, moveLessonToEmpty,
+    searchQuery,
   } = usePlannerStore();
 
   const [dropTarget, setDropTarget] = useState<{ week: string; col: number } | null>(null);
@@ -114,6 +115,8 @@ export function WeekRows({ weeks, courses, currentRef }: Props) {
               const cellHeight = c.les >= 2 ? 36 : 26;
               const isDragOver = dropTarget?.week === week.w && dropTarget?.col === c.col;
               const isDragSrc = dragSource?.week === week.w && dragSource?.col === c.col;
+              const isSearchMatch = searchQuery.length >= 2 && title.toLowerCase().includes(searchQuery.toLowerCase());
+              const isSearchDim = searchQuery.length >= 2 && !isSearchMatch;
 
               return (
                 <td
@@ -186,10 +189,10 @@ export function WeekRows({ weeks, courses, currentRef }: Props) {
                       className="mx-0.5 ml-1.5 px-1 py-0.5 rounded cursor-grab transition-all duration-100 flex items-center hover:scale-[1.02] hover:shadow-md hover:z-10"
                       style={{
                         minHeight: cellHeight,
-                        opacity: isDragSrc ? 0.35 : 1,
-                        background: isMulti ? '#312e81' : isSelected ? '#1e3a5f' : colors?.bg || '#eef2f7',
-                        border: `1px solid ${isMulti ? '#6366f1' : isSelected ? '#3b82f6' : colors?.border || '#cbd5e1'}`,
-                        boxShadow: isMulti ? '0 0 0 2px #6366f150' : isSelected ? '0 0 0 2px #3b82f650' : 'none',
+                        opacity: isDragSrc ? 0.35 : isSearchDim ? 0.2 : 1,
+                        background: isSearchMatch ? '#fbbf2440' : isMulti ? '#312e81' : isSelected ? '#1e3a5f' : colors?.bg || '#eef2f7',
+                        border: `1px solid ${isSearchMatch ? '#f59e0b' : isMulti ? '#6366f1' : isSelected ? '#3b82f6' : colors?.border || '#cbd5e1'}`,
+                        boxShadow: isSearchMatch ? '0 0 0 2px #f59e0b50' : isMulti ? '0 0 0 2px #6366f150' : isSelected ? '0 0 0 2px #3b82f650' : 'none',
                       }}
                     >
                       {lessonType === 4 && <span className="mr-0.5 text-[8px]">📝</span>}
