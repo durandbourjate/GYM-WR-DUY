@@ -1,6 +1,6 @@
 # Unterrichtsplaner — HANDOFF
 
-## Aktueller Stand: v2.4 (28.02.2026)
+## Aktueller Stand: v2.5 (28.02.2026)
 
 ### Architektur
 - React + TypeScript + Vite + Zustand (persist)
@@ -22,6 +22,7 @@
 - 4fdd6d0: HANDOFF.md aktualisiert — v2.2
 - 3810916: Stats-Dashboard Prüfungskollisionen, Suche, Print-CSS
 - e71b774: 12/13+ Sequences Support — 16 Farben, Kompaktansicht Blöcke
+- 80c6fca: Shift+Klick Bereichs-Selektion, Gruppen-Drag&Drop
 
 ### Implementierte Features (komplett)
 
@@ -36,6 +37,8 @@
 
 **Phase 2 — Multi-Select & Sequenzen ✅**
 - Cmd+Klick Multi-Selektion
+- Shift+Klick Bereichs-Selektion (von-bis innerhalb einer Spalte)
+- Gruppen-Drag&Drop: multi-selektierte Kacheln als Gruppe verschieben
 - Sequenz-Markierung klickbar → Panel öffnen
 - Sequenz-Hervorhebung im Grid bei Block-Selektion
 - Auto-Farbe/Fach bei Sequenz-Erstellung
@@ -80,6 +83,16 @@
 - [x] Stats-Dashboard: Prüfungskollisionen erkennen (v2.3)
 - [x] Suche über alle Kacheln/Sequenzen (v2.3)
 - [x] Print-CSS für Semesterplan-Export (v2.3)
+- [x] Shift+Klick Bereichs-Selektion (v2.5)
+- [x] Gruppen-Drag&Drop (v2.5)
+- [ ] Shift+Klick auf leere Zellen → Sequenz zuordnen (nice-to-have)
+- [ ] Jahrgangs-Modus in Zoom 1: ein Jahrgang durch alle 4 GYM-Jahre (braucht Multi-SJ-Daten)
+- [ ] Fliessende Zoom-Übergänge / Animationen (nice-to-have)
+
+### v2.5 Features (Commit 80c6fca)
+- **Shift+Klick Bereichs-Selektion**: Shift+Klick selektiert alle Kacheln von der letzten Auswahl bis zur geklickten Zelle innerhalb derselben Spalte. Funktioniert additiv mit bestehender Multi-Selektion.
+- **Gruppen-Drag&Drop**: Multi-selektierte Kacheln können als Gruppe per Drag&Drop an eine neue Position innerhalb derselben Spalte verschoben werden. Fixierte Zellen (Ferien/Events) werden übersprungen, bestehende Kacheln rutschen nach unten.
+- **lastSelectedKey Tracking**: Store trackt die letzte selektierte Kachel für korrekte Shift-Bereichs-Berechnung.
 
 ### v2.4 Features (Commit e71b774)
 - **Erweiterte Farbpalette**: SEQUENCE_COLORS von 10 auf 16 Farben, Color-Picker mit flex-wrap
