@@ -1,0 +1,418 @@
+import type { SubjectArea } from '../types';
+
+export interface CurriculumGoal {
+  id: string;
+  area: SubjectArea;
+  cycle: 1 | 2;          // Zyklus 1 (GYM1/2) or 2 (GYM3/4)
+  topic: string;          // e.g. "Preistheorie", "OR – AT"
+  goal: string;           // The Grobziel text
+  contents: string[];     // Key content items (P/W)
+  semester?: string;      // DUY semester assignment (e.g. "S3/S4")
+}
+
+export const CURRICULUM_GOALS: CurriculumGoal[] = [
+  // ============================================================
+  // RECHT – Zyklus 1 (GYM1/GYM2, S2–S4)
+  // ============================================================
+  {
+    id: 'R-Z1-01',
+    area: 'RECHT',
+    cycle: 1,
+    topic: 'Einführung Recht',
+    goal: 'Recht als ordnendes Gebilde für gesellschaftliches Zusammenleben erfassen',
+    contents: ['Gewaltenteilung', 'Recht, Moral, Sitte', 'Gliederung des Rechts (ÖR/PR)', 'Technik der Rechtsfindung (Subsumption)'],
+    semester: 'S2',
+  },
+  {
+    id: 'R-Z1-02',
+    area: 'RECHT',
+    cycle: 1,
+    topic: 'ZGB – Personenrecht',
+    goal: 'Juristische und natürliche Personen unterscheiden; Grundzüge des Personenrechts anwenden',
+    contents: ['Rechtssubjekt, Rechtsobjekt', 'Rechtsfähigkeit, Urteilsfähigkeit, Volljährigkeit', 'Handlungsfähigkeit, Deliktsfähigkeit'],
+    semester: 'S2',
+  },
+  {
+    id: 'R-Z1-03',
+    area: 'RECHT',
+    cycle: 1,
+    topic: 'ZGB – Einleitungsartikel',
+    goal: 'Bedeutung der Einleitungsartikel des ZGB für Sachverhaltsfeststellung und Rechtsfindung erfassen',
+    contents: ['Rechtsquellen, Rechtsquellenhierarchie', 'Richterliche Freiheit', 'Recht und Billigkeit', 'Guter Glaube', 'Treu und Glauben (ZGB 2)', 'Beweisregeln'],
+    semester: 'S3',
+  },
+  {
+    id: 'R-Z1-04',
+    area: 'RECHT',
+    cycle: 1,
+    topic: 'ZGB – Personenrecht (vertieft)',
+    goal: 'Verein als Beispiel für Privatautonomie verstehen; Persönlichkeitsschutz abschätzen',
+    contents: ['Verein, Stiftung (W)', 'Persönlichkeitsschutz (P)'],
+    semester: 'S3',
+  },
+  {
+    id: 'R-Z1-05',
+    area: 'RECHT',
+    cycle: 1,
+    topic: 'OR – Gesellschaftsrecht',
+    goal: 'Verschiedene Unternehmensformen anhand einschlägiger Kriterien unterscheiden',
+    contents: ['Einfache Gesellschaft (P)', 'Kollektivgesellschaft (W)', 'Aktiengesellschaft (P)', 'GmbH (P)', 'Genossenschaft (W)'],
+    semester: 'S3/S4',
+  },
+  {
+    id: 'R-Z1-06',
+    area: 'RECHT',
+    cycle: 1,
+    topic: 'ZGB – Sachenrecht',
+    goal: 'Stellenwert des Eigentums erkennen und Beziehungen zu anderen Rechtsgebieten knüpfen',
+    contents: ['Eigentumsgarantie, Eigentumsbeschränkungen (P)', 'Eigentum und Besitz (P)', 'Gemeinschaftliches Eigentum (W)', 'Beschränkte dingliche Rechte (W)'],
+    semester: 'S4',
+  },
+  {
+    id: 'R-Z1-07',
+    area: 'RECHT',
+    cycle: 1,
+    topic: 'OR – Mietrecht',
+    goal: 'Bestimmungen des Mietrechts auf Alltagssituationen anwenden',
+    contents: ['Mietvertrag', 'Rechte und Pflichten', 'Kündigung'],
+    semester: 'S4',
+  },
+
+  // ============================================================
+  // RECHT – Zyklus 2 (GYM3/GYM4, S5–S8)
+  // ============================================================
+  {
+    id: 'R-Z2-01',
+    area: 'RECHT',
+    cycle: 2,
+    topic: 'OR – AT: Zustandekommen',
+    goal: 'Zustandekommen von Obligationen beurteilen',
+    contents: ['Entstehung von Obligationen', 'Merkmale von Vertragsabschlüssen', 'Formvorschriften', 'Verjährung', 'Vertragsinhalte', 'Mängel bei Vertragsabschlüssen'],
+    semester: 'S5',
+  },
+  {
+    id: 'R-Z2-02',
+    area: 'RECHT',
+    cycle: 2,
+    topic: 'OR – AT: Erfüllung',
+    goal: 'Erfüllung von Obligationen überprüfen',
+    contents: ['Erfüllung und Nichterfüllung und deren Folgen (P)', 'Sicherungsmittel der Vertragserfüllung (W)'],
+    semester: 'S5',
+  },
+  {
+    id: 'R-Z2-03',
+    area: 'RECHT',
+    cycle: 2,
+    topic: 'OR – BT: Vertragsverhältnisse',
+    goal: 'Bestimmungen der einzelnen Vertragsverhältnisse auf Alltagssituationen anwenden',
+    contents: ['Kaufvertrag (P)', 'Verträge auf Gebrauchsüberlassung (W)', 'Verträge auf Arbeitsleistung (W)'],
+    semester: 'S5/S7',
+  },
+  {
+    id: 'R-Z2-04',
+    area: 'RECHT',
+    cycle: 2,
+    topic: 'Haftpflichtrecht',
+    goal: 'Grundlagen des Haftpflichtrechts verstehen und anwenden',
+    contents: ['Verschuldenshaftung', 'Kausalhaftung', 'Schadenersatz'],
+    semester: 'S7',
+  },
+  {
+    id: 'R-Z2-05',
+    area: 'RECHT',
+    cycle: 2,
+    topic: 'ZGB – Erbrecht',
+    goal: 'Grundzüge des Erbrechts anwenden',
+    contents: ['Gesetzliche Erbfolge', 'Pflichtteil', 'Testament'],
+    semester: 'S7',
+  },
+  {
+    id: 'R-Z2-06',
+    area: 'RECHT',
+    cycle: 2,
+    topic: 'ZGB – Eherecht',
+    goal: 'Grundzüge des Eherechts kennen',
+    contents: ['Eheschliessung', 'Ehewirkungen', 'Güterrecht'],
+    semester: 'S7',
+  },
+  {
+    id: 'R-Z2-07',
+    area: 'RECHT',
+    cycle: 2,
+    topic: 'OR – Arbeitsrecht',
+    goal: 'Bestimmungen des Arbeitsrechts auf Sachverhalte anwenden',
+    contents: ['Arbeitsvertrag', 'Rechte und Pflichten', 'Kündigung', 'Arbeitnehmerschutz'],
+    semester: 'S7',
+  },
+  {
+    id: 'R-Z2-08',
+    area: 'RECHT',
+    cycle: 2,
+    topic: 'Öffentliches Recht / Strafrecht',
+    goal: 'Mindestens einen Bereich des öffentlichen Rechts exemplarisch behandeln',
+    contents: ['Strafrecht', 'Staatsrecht', 'Verwaltungsrecht', 'Prozessrecht', 'Urheberrecht', 'Völkerrecht'],
+    semester: 'S7',
+  },
+
+  // ============================================================
+  // BWL – Zyklus 1 (GYM1/GYM2, S1–S3)
+  // ============================================================
+  {
+    id: 'B-Z1-01',
+    area: 'BWL',
+    cycle: 1,
+    topic: 'Unternehmen und Umwelt',
+    goal: 'Unternehmen als Modell verstehen; Merkmale und Wechselwirkungen von Unternehmen und Umwelt beschreiben',
+    contents: ['Unternehmensmodell mit Umweltsphären und Anspruchsgruppen', 'Zielbeziehungen', 'Ökonomische Prinzipien'],
+    semester: 'S1',
+  },
+  {
+    id: 'B-Z1-02',
+    area: 'BWL',
+    cycle: 1,
+    topic: 'Unternehmensgründung',
+    goal: 'Probleme im Zusammenhang mit der Gründung eines Unternehmens kennen',
+    contents: ['Faktoren für Unternehmenserfolg (P)', 'Unternehmenskonzept (W)', 'Businessplan'],
+    semester: 'S1',
+  },
+  {
+    id: 'B-Z1-03',
+    area: 'BWL',
+    cycle: 1,
+    topic: 'Marketing',
+    goal: 'Marketing als Prozess zur Zielerreichung erkennen und anwenden',
+    contents: ['Produktziele', 'Marktziele', 'Marketingstrategie', 'Marketingmix'],
+    semester: 'S1',
+  },
+  {
+    id: 'B-Z1-04',
+    area: 'BWL',
+    cycle: 1,
+    topic: 'Finanzielles Rechnungswesen',
+    goal: 'Selbstständig die doppelte Buchhaltung eines Unternehmens eröffnen, führen und abschliessen',
+    contents: ['Bilanz, Erfolgsrechnung, Buchungssätze', 'Warenverkehr', 'Bestandes-/Erfolgskorrekturen', 'Jahresabschluss'],
+    semester: 'S1/S2',
+  },
+  {
+    id: 'B-Z1-05',
+    area: 'BWL',
+    cycle: 1,
+    topic: 'FIBU: Abschreibungen & Korrekturen',
+    goal: 'Abschreibungen, Debitorenverluste, Rechnungsabgrenzung und Rückstellungen verbuchen',
+    contents: ['Abschreibungen (K.12)', 'Debitorenverluste', 'Rechnungsabgrenzung, Rückstellungen (K.13)'],
+    semester: 'S2',
+  },
+  {
+    id: 'B-Z1-06',
+    area: 'BWL',
+    cycle: 1,
+    topic: 'Entscheidmethodik',
+    goal: 'Instrumente zur Entscheidfindung einsetzen',
+    contents: ['Entscheidmethodik'],
+    semester: 'S3',
+  },
+  {
+    id: 'B-Z1-07',
+    area: 'BWL',
+    cycle: 1,
+    topic: 'Organisation',
+    goal: 'Organisationsformen kennen und beurteilen',
+    contents: ['Aufbauorganisation', 'Ablauforganisation', 'Organigramme'],
+    semester: 'S3',
+  },
+
+  // ============================================================
+  // BWL – Zyklus 2 (GYM3/GYM4, S6/S8)
+  // ============================================================
+  {
+    id: 'B-Z2-01',
+    area: 'BWL',
+    cycle: 2,
+    topic: 'Strategische Führung',
+    goal: 'Wesen und Bedeutung der strategischen Führung kennen; selbstständig Unternehmensstrategien entwickeln',
+    contents: ['Strategien, Leitbilder, Unternehmenskonzepte (P)', 'Analyseinstrumente: Portfolio, SWOT, PIMS, Wettbewerbsanalyse (P)', 'Strategieentwicklung: Produkt-Markt, Wettbewerbsstrategie Porter (W)', 'Führungsfunktionen (W)'],
+    semester: 'S6',
+  },
+  {
+    id: 'B-Z2-02',
+    area: 'BWL',
+    cycle: 2,
+    topic: 'Leistungsbereich',
+    goal: 'Typische Methoden zur Zielerreichung im Leistungsbereich einsetzen',
+    contents: ['Methoden der Marktuntersuchung (P)', 'Organisation der Unternehmensprozesse (W)', 'Statische/dynamische Investitionsrechnung (W)', 'Materialwirtschaft (W)', 'Produktionswirtschaft (W)'],
+    semester: 'S6',
+  },
+  {
+    id: 'B-Z2-03',
+    area: 'BWL',
+    cycle: 2,
+    topic: 'Geldflussrechnung',
+    goal: 'Geldflussrechnung erstellen und interpretieren',
+    contents: ['Geldflussrechnung', 'Cash Flow'],
+    semester: 'S6',
+  },
+  {
+    id: 'B-Z2-04',
+    area: 'BWL',
+    cycle: 2,
+    topic: 'Finanzieller Bereich',
+    goal: 'Finanzielle Ziele setzen; Unternehmung beurteilen; Kostenüberlegungen anstellen',
+    contents: ['Finanzielle Ziele', 'Unternehmungsbeurteilung', 'Kostenüberlegungen', 'Kennzahlen'],
+    semester: 'S8',
+  },
+
+  // ============================================================
+  // VWL – Zyklus 1 (GYM2, S3/S4)
+  // ============================================================
+  {
+    id: 'V-Z1-01',
+    area: 'VWL',
+    cycle: 1,
+    topic: 'Grundfragen VWL',
+    goal: 'Grundfragen und Aufgaben der Volkswirtschaftslehre erfassen',
+    contents: ['Wirtschaftskreislauf', 'Produktionsfaktoren', 'Wertschöpfung, BIP, Volkseinkommen'],
+    semester: 'S3',
+  },
+  {
+    id: 'V-Z1-02',
+    area: 'VWL',
+    cycle: 1,
+    topic: 'Bestimmungsfaktoren Wachstum',
+    goal: 'Bestimmungsfaktoren des Wirtschaftswachstums analysieren',
+    contents: ['Bestimmungsfaktoren Wachstum', 'Chancen/Gefahren Wachstum', 'Strukturwandel'],
+    semester: 'S3',
+  },
+  {
+    id: 'V-Z1-03',
+    area: 'VWL',
+    cycle: 1,
+    topic: 'Aktuelle Abstimmungen',
+    goal: 'Abstimmungen mit wirtschaftlichem Bezug behandeln',
+    contents: ['Aktuelle Abstimmungen: wirtschaftliche Folgen, Alternativen'],
+    semester: 'S3/S4',
+  },
+
+  // ============================================================
+  // VWL – Zyklus 2 (GYM3/GYM4, S5–S8)
+  // ============================================================
+  {
+    id: 'V-Z2-01',
+    area: 'VWL',
+    cycle: 2,
+    topic: 'Einführung / Ökonomische Denkweise',
+    goal: 'Sich kritisch mit der ökonomischen Denkweise auseinandersetzen und von anderen Denkweisen abgrenzen',
+    contents: ['Methodik der VWL', 'Zielsysteme der Wirtschaftspolitik', 'Ökonomisches Menschenbild'],
+    semester: 'S5',
+  },
+  {
+    id: 'V-Z2-02',
+    area: 'VWL',
+    cycle: 2,
+    topic: 'Preistheorie',
+    goal: 'Zusammenspiel von Angebot und Nachfrage erklären; Ursachen/Folgen staatlicher Eingriffe erklären',
+    contents: ['Nutzentheorie (P)', 'Angebot, Nachfrage, Preisgesetze (P)', 'Kostenfunktionen (W)', 'Elastizitäten (P)', 'Staatliche Eingriffe in Marktmechanismen (P)', 'Marktformen (W)'],
+    semester: 'S5',
+  },
+  {
+    id: 'V-Z2-03',
+    area: 'VWL',
+    cycle: 2,
+    topic: 'Wirtschaftsordnungen',
+    goal: 'Geisteswissenschaftlichen Hintergrund verschiedener Wirtschaftsordnungen erkennen; System der sozialen Marktwirtschaft kritisch hinterfragen',
+    contents: ['Wirtschaftsordnungen (W)', 'Marktwirtschaft (W)', 'Soziale Marktwirtschaft (P)', 'Markt- und Staatsversagen (P)', 'Service public (W)'],
+    semester: 'S5',
+  },
+  {
+    id: 'V-Z2-04',
+    area: 'VWL',
+    cycle: 2,
+    topic: 'Soziale Sicherheit',
+    goal: 'Hintergründe von Problemstellungen der sozialen Sicherheit untersuchen',
+    contents: ['Soziale Sicherheit', 'Sozialversicherungen', 'Umverteilung'],
+    semester: 'S5/S6',
+  },
+  {
+    id: 'V-Z2-05',
+    area: 'VWL',
+    cycle: 2,
+    topic: 'Arbeitslosigkeit',
+    goal: 'Hintergründe und Ursachen der Arbeitslosigkeit untersuchen',
+    contents: ['Arbeitsmarkt', 'Arbeitslosenquote', 'Ursachen', 'Massnahmen'],
+    semester: 'S5/S6',
+  },
+  {
+    id: 'V-Z2-06',
+    area: 'VWL',
+    cycle: 2,
+    topic: 'Öffentliche Finanzen',
+    goal: 'Öffentliche Finanzen und Steuerpolitik analysieren',
+    contents: ['Staatsausgaben', 'Staatseinnahmen', 'Steuern', 'Schuldenbremse'],
+    semester: 'S6',
+  },
+  {
+    id: 'V-Z2-07',
+    area: 'VWL',
+    cycle: 2,
+    topic: 'Geld und Geldpolitik',
+    goal: 'Geld- und Währungspolitik verstehen und beurteilen',
+    contents: ['Geld', 'Geldmenge', 'Inflation', 'SNB', 'Geldpolitische Instrumente'],
+    semester: 'S7',
+  },
+  {
+    id: 'V-Z2-08',
+    area: 'VWL',
+    cycle: 2,
+    topic: 'Aussenwirtschaft und Handel',
+    goal: 'Aussenwirtschaftliche Beziehungen und Handelspolitik analysieren',
+    contents: ['Zahlungsbilanz', 'Freihandel vs. Protektionismus', 'Wechselkurse', 'WTO', 'Bilaterale Verträge'],
+    semester: 'S7',
+  },
+  {
+    id: 'V-Z2-09',
+    area: 'VWL',
+    cycle: 2,
+    topic: 'Wachstum und Konjunktur',
+    goal: 'Wachstums- und Konjunkturpolitik untersuchen',
+    contents: ['Wachstum', 'Konjunkturzyklus', 'Konjunkturpolitik', 'Fiskal-/Geldpolitik'],
+    semester: 'S8',
+  },
+  {
+    id: 'V-Z2-10',
+    area: 'VWL',
+    cycle: 2,
+    topic: 'Spieltheorie',
+    goal: 'Grundlagen der Spieltheorie auf ökonomische Situationen anwenden',
+    contents: ['Nash-Gleichgewicht', 'Gefangenendilemma', 'Strategische Interaktion'],
+    semester: 'S8',
+  },
+  {
+    id: 'V-Z2-11',
+    area: 'VWL',
+    cycle: 2,
+    topic: 'Tagesaktualität',
+    goal: 'Themenbereiche aus der Tagesaktualität volkswirtschaftlich einordnen',
+    contents: ['Aktuelle wirtschaftspolitische Debatten', 'Anwendung erlernter Modelle'],
+    semester: 'S5–S8',
+  },
+];
+
+// Helper: get goals filtered by area and/or cycle
+export function getGoalsByArea(area: SubjectArea, cycle?: 1 | 2): CurriculumGoal[] {
+  return CURRICULUM_GOALS.filter(
+    (g) => g.area === area && (cycle === undefined || g.cycle === cycle)
+  );
+}
+
+// Helper: search goals by text
+export function searchGoals(query: string, area?: SubjectArea): CurriculumGoal[] {
+  const q = query.toLowerCase();
+  return CURRICULUM_GOALS.filter((g) => {
+    if (area && g.area !== area) return false;
+    return (
+      g.topic.toLowerCase().includes(q) ||
+      g.goal.toLowerCase().includes(q) ||
+      g.contents.some((c) => c.toLowerCase().includes(q)) ||
+      g.id.toLowerCase().includes(q)
+    );
+  });
+}

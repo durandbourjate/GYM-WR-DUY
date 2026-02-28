@@ -3,6 +3,7 @@ import { usePlannerStore } from '../store/plannerStore';
 import { TYPE_BADGES } from '../utils/colors';
 import { COURSES } from '../data/courses';
 import { WEEKS } from '../data/weeks';
+import { CurriculumGoalPicker } from './CurriculumGoalPicker';
 import type { SubjectArea, TaxonomyLevel, BlockType, LessonDetail } from '../types';
 
 const SUBJECT_AREAS: { key: SubjectArea; label: string; color: string }[] = [
@@ -327,12 +328,10 @@ export function DetailPanel() {
               {/* Lehrplanziel */}
               <div>
                 <label className="text-[9px] text-gray-500 font-medium mb-1 block">Lehrplanziel (LP17)</label>
-                <textarea
-                  value={detail.curriculumGoal || ''}
-                  onChange={(e) => updateField('curriculumGoal', e.target.value)}
-                  placeholder="Lehrplanbezug…"
-                  rows={2}
-                  className="w-full bg-slate-700 text-slate-200 border border-slate-600 rounded px-2 py-1 text-[10px] outline-none focus:border-blue-400 resize-y"
+                <CurriculumGoalPicker
+                  value={detail.curriculumGoal}
+                  onChange={(v) => updateField('curriculumGoal', v)}
+                  subjectArea={detail.subjectArea}
                 />
               </div>
 

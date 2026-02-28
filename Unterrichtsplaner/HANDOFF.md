@@ -1,6 +1,6 @@
 # Unterrichtsplaner – Handoff
 
-## Projektstatus: v1.3
+## Projektstatus: v1.4
 
 ### Tech Stack
 - React 18 + TypeScript + Vite 7
@@ -39,12 +39,23 @@
 - Print-CSS (A3 Landscape, kompakte Darstellung)
 - Fix: React Error #310 (useCallback Typ-Parameter in DetailPanel)
 
+**🆕 v1.4 Neu:**
+- Curriculum-Goals-Library: 30+ LP17-Grobziele als durchsuchbares Dropdown
+  - Neue Datei: `src/data/curriculumGoals.ts` (strukturierte LP17-Ziele mit ID, Fachbereich, Zyklus, Semester)
+  - Neue Komponente: `src/components/CurriculumGoalPicker.tsx` (Suche, Zyklusfilter, Fachbereich-Filterung, Freitext-Fallback)
+  - DetailPanel: Lehrplanziel-Feld ersetzt Freitext-Textarea durch den Picker
+  - IDs nach Schema: R-Z1-01 (Recht, Zyklus 1, Nr 1), B-Z2-03 (BWL, Zyklus 2, Nr 3), V-Z2-07 (VWL)
+  - Filtert automatisch nach gewähltem Fachbereich (subjectArea)
+  - Semester-Zuordnung gemäss DUY-Grobzuteilung (S1–S8)
+
 ### Datenmodell
 - `Course`: id, col, cls, typ, day, from/to, les, hk, semesters
 - `Week`: w (KW), lessons: Record<col, LessonEntry>
 - `LessonEntry`: title, type (0–6)
 - `LessonDetail`: subjectArea, topicMain/Sub, curriculumGoal, taxonomyLevel, blockType, learningviewUrl, materialLinks[], notes
 - `Sequence`: weeks[], label
+
+- `CurriculumGoal`: id, area, cycle, topic, goal, contents[], semester
 
 ### Persistenz
 - localStorage via Zustand persist (weekData + lessonDetails)
@@ -57,10 +68,10 @@
 
 ### Mögliche nächste Features (Phase 2+)
 - Export als Markdown / Excel
-- Statistik-Dashboard (Prüfungsverteilung, Fachbereich-Balance)
-- Curriculum-Goals-Library (Dropdown statt Freitext)
 - Print-/PDF-Ansicht für Semesterplan
 - Keyboard Navigation (Pfeiltasten zwischen Zellen)
+- Curriculum-Goals erweitern: EWR-spezifische Ziele, EF-Ziele
+- Goal-Statistik: Abdeckung der LP17-Ziele pro Kurs/Semester
 
 ---
-*Stand: 2026-02-28 · v1.3*
+*Stand: 2026-02-28 · v1.4*

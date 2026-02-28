@@ -1,0 +1,194 @@
+import { useState, useRef, useEffect } from 'react';
+import { CURRICULUM_GOALS, searchGoals } from '../data/curriculumGoals';
+import type { CurriculumGoal } from '../data/curriculumGoals';
+import type { SubjectArea } from '../types';
+
+const AREA_COLORS: Record<string, string> = {
+  BWL: '#3b82f6',
+  VWL: '#f97316',
+  RECHT: '#22c55e',
+  IN: '#06b6d4',
+  INTERDISZ: '#a855f7',
+};
+
+interface CurriculumGoalPickerProps {
+  value: string | undefined;
+  onChange: (value: string) => void;
+  subjectArea?: SubjectArea;
+}
+
+export function CurriculumGoalPicker({ value, onChange, subjectArea }: CurriculumGoalPickerProps) {
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState('');
+  const [cycleFilter, setCycleFilter] = useState<1 | 2 | null>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Close on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    if (open) document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [open]);
+
+  // Filter goals
+  const filtered = (() => {
+    let goals: CurriculumGoal[];
+    if (search.trim()) {
+      goals = searchGoals(search, subjectArea);
+    } else if (subjectArea) {
+      goals = CURRICULUM_GOALS.filter((g) => g.area === subjectArea);
+    } else {
+      goals = [...CURRICULUM_GOALS];
+    }
+    if (cycleFilter !== null) {
+      goals = goals.filter((g) => g.cycle === cycleFilter);
+    }
+    return goals;
+  })();
+
+  // Find currently selected goal
+  const selectedGoal = CURRICULUM_GOALS.find(
+    (g) => g.id === value || `${g.id}: ${g.goal}` === value
+  );
+
+  const handleSelect = (goal: CurriculumGoal) => {
+    onChange(`${goal.id}: ${goal.goal}`);
+    setOpen(false);
+    setSearch('');
+  };
+
+  const handleClear = () => {
+    onChange('');
+    setOpen(false);
+  };
+
+  return (
+    <div ref={dropdownRef} className="relative">
+      {/* Display / trigger area */}
+      <div
+        className="w-full bg-slate-700 text-slate-200 border border-slate-600 rounded px-2 py-1 text-[10px] cursor-pointer hover:border-blue-400 transition-colors min-h-[28px] flex items-start gap-1"
+        onClick={() => { setOpen(!open); setTimeout(() => inputRef.current?.focus(), 50); }}
+      >
+        {selectedGoal ? (
+          <div className="flex-1">
+            <span className="text-[8px] font-mono mr-1 px-1 py-px rounded"
+              style={{ background: (AREA_COLORS[selectedGoal.area] || '#555') + '30', color: AREA_COLORS[selectedGoal.area] }}>
+              {selectedGoal.id}
+            </span>
+            <span className="text-gray-200">{selectedGoal.goal}</span>
+          </div>
+        ) : value ? (
+          <span className="text-gray-300 flex-1">{value}</span>
+        ) : (
+          <span className="text-gray-500 flex-1">Lehrplanziel wählen oder eingeben…</span>
+        )}
+        <span className="text-gray-500 text-[8px] shrink-0 mt-0.5">{open ? '▾' : '▸'}</span>
+      </div>
+
+      {/* Dropdown */}
+      {open && (
+        <div className="absolute bottom-full left-0 right-0 mb-1 bg-slate-800 border border-slate-600 rounded shadow-xl z-[100] max-h-[300px] flex flex-col">
+          {/* Search + filters */}
+          <div className="p-1.5 border-b border-slate-700 space-y-1">
+            <input
+              ref={inputRef}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Escape') { setOpen(false); e.stopPropagation(); }
+                if (e.key === 'Enter' && filtered.length === 1) { handleSelect(filtered[0]); }
+              }}
+              placeholder="Suchen… (Thema, Inhalt, ID)"
+              className="w-full bg-slate-700 text-slate-200 border border-slate-600 rounded px-2 py-1 text-[10px] outline-none focus:border-blue-400"
+            />
+            <div className="flex gap-1 items-center">
+              <span className="text-[8px] text-gray-500">Zyklus:</span>
+              {([null, 1, 2] as const).map((c) => (
+                <button
+                  key={String(c)}
+                  onClick={() => setCycleFilter(c)}
+                  className={`px-1.5 py-px rounded text-[8px] border cursor-pointer transition-colors ${
+                    cycleFilter === c
+                      ? 'bg-blue-600/30 border-blue-500 text-blue-300'
+                      : 'border-slate-600 text-gray-500 hover:text-gray-300'
+                  }`}
+                >
+                  {c === null ? 'Alle' : `Z${c}`}
+                </button>
+              ))}
+              {value && (
+                <button onClick={handleClear}
+                  className="ml-auto text-[8px] text-red-400 hover:text-red-300 cursor-pointer">
+                  ✕ Löschen
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Results list */}
+          <div className="overflow-y-auto flex-1 p-1">
+            {filtered.length === 0 ? (
+              <div className="text-[9px] text-gray-500 p-2 text-center">
+                Keine Treffer.
+                {search.trim() && (
+                  <button
+                    onClick={() => { onChange(search.trim()); setOpen(false); setSearch(''); }}
+                    className="block mx-auto mt-1 text-blue-400 hover:text-blue-300 cursor-pointer">
+                    «{search}» als Freitext übernehmen
+                  </button>
+                )}
+              </div>
+            ) : (
+              filtered.map((goal) => {
+                const isSelected = selectedGoal?.id === goal.id;
+                return (
+                  <div
+                    key={goal.id}
+                    onClick={() => handleSelect(goal)}
+                    className={`p-1.5 rounded cursor-pointer transition-colors mb-0.5 ${
+                      isSelected
+                        ? 'bg-blue-600/20 border border-blue-500/50'
+                        : 'hover:bg-slate-700 border border-transparent'
+                    }`}
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[8px] font-mono px-1 py-px rounded shrink-0"
+                        style={{ background: (AREA_COLORS[goal.area] || '#555') + '20', color: AREA_COLORS[goal.area] }}>
+                        {goal.id}
+                      </span>
+                      <span className="text-[8px] text-gray-500 shrink-0">Z{goal.cycle}</span>
+                      <span className="text-[9px] font-medium text-gray-200 truncate">{goal.topic}</span>
+                      {goal.semester && (
+                        <span className="text-[7px] text-gray-500 shrink-0 ml-auto">{goal.semester}</span>
+                      )}
+                    </div>
+                    <div className="text-[9px] text-gray-400 mt-0.5 leading-tight">{goal.goal}</div>
+                    <div className="text-[8px] text-gray-600 mt-0.5 truncate">
+                      {goal.contents.slice(0, 3).join(' · ')}{goal.contents.length > 3 ? ' …' : ''}
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+
+          {/* Freitext fallback */}
+          {search.trim() && filtered.length > 0 && (
+            <div className="border-t border-slate-700 p-1.5">
+              <button
+                onClick={() => { onChange(search.trim()); setOpen(false); setSearch(''); }}
+                className="text-[8px] text-gray-500 hover:text-gray-300 cursor-pointer">
+                ↳ «{search}» als Freitext übernehmen
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
