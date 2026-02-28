@@ -6,6 +6,8 @@
 - React + TypeScript + Vite + Zustand (persist)
 - Deployed auf GitHub Pages
 - Pfad: `10 Github/GYM-WR-DUY/Unterrichtsplaner/`
+- **Stundenplan-Quelle**: `04 Rahmenbedingungen/Stundenplan/` — Immer aktuellste Phase verwenden!
+- **SF-Wochentage**: Do + Fr (NICHT Mi!). SF alterniert Do-Fr-Do-Fr pro Woche.
 
 ### Commits v2.0–2.2 Session
 - 4eabeda: Side-Panel, Hover-Preview, Seq-Hervorhebung, feste Kacheln
@@ -23,6 +25,8 @@
 - 3810916: Stats-Dashboard Prüfungskollisionen, Suche, Print-CSS
 - e71b774: 12/13+ Sequences Support — 16 Farben, Kompaktansicht Blöcke
 - 80c6fca: Shift+Klick Bereichs-Selektion, Gruppen-Drag&Drop
+- a8557e0: Farbcode LearningView-konform, Sequenz-Titel-Fix
+- de583f6: Stundenplan korrigiert (SF=Do+Fr, IN=Di), Sequenz-Titel Re-Migration
 
 ### Implementierte Features (komplett)
 
@@ -93,7 +97,8 @@
 - **Gruppen-Drag&Drop**: Multi-selektierte Kacheln können als Gruppe per Drag&Drop an eine neue Position innerhalb derselben Spalte verschoben werden. Fixierte Zellen (Ferien/Events) werden übersprungen, bestehende Kacheln rutschen nach unten.
 - **lastSelectedKey Tracking**: Store trackt die letzte selektierte Kachel für korrekte Shift-Bereichs-Berechnung.
 - **Farbcode LearningView-konform**: VWL=orange, BWL=blau, Recht=grün, IN=grau. SubjectArea-Farbe hat Priorität über LessonType in Kacheln. Alle Views (Zoom 1-3, Stats) konsistent.
-- **Sequenz-Titel**: Migration generiert jetzt Titel mit Klasse+Typ+Tag statt courseId (z.B. "Sequenzen 27a28f SF Mi" statt "Sequenzen c17").
+- **Sequenz-Titel**: Migration generiert jetzt Titel mit Klasse+Typ+Tag statt courseId (z.B. "Sequenzen 27abcd8f SF Do" statt "Sequenzen c17"). Re-Migration für bestehende Sequenzen via `fixSequenceTitles()`.
+- **Stundenplan korrigiert (de583f6)**: courses.ts komplett überarbeitet basierend auf Stundenplan S2 Phase 4. SF liegt auf **Do+Fr** (war fälschlich Di+Mi), IN auf **Di** (war Mo). Klassenbezeichnungen vollständig: 27abcd8f (statt 27a28f), 28bc9f9s (statt 28bc29fs). Quelle: `04 Rahmenbedingungen/Stundenplan/Stundenplan S2 Phase 4.pdf`
 
 ### v2.4 Features (Commit e71b774)
 - **Erweiterte Farbpalette**: SEQUENCE_COLORS von 10 auf 16 Farben, Color-Picker mit flex-wrap
