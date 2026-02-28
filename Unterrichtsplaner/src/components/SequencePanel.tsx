@@ -360,10 +360,16 @@ export function SequencePanel({ embedded = false }: { embedded?: boolean }) {
 
   const handleCreateSequence = () => {
     if (!newTitle.trim() || !newCourseId) return;
+    // Auto-detect color based on course type
+    const course = COURSES.find(c => c.id === newCourseId);
+    const autoColor: Record<string, string> = {
+      SF: '#16a34a', EWR: '#d97706', IN: '#0ea5e9', KS: '#7c3aed', EF: '#ec4899',
+    };
     addSequence({
       courseId: newCourseId,
       title: newTitle.trim(),
       blocks: [],
+      color: course ? autoColor[course.typ] || '#16a34a' : '#16a34a',
     });
     setNewTitle('');
     setShowNewForm(false);
@@ -428,12 +434,19 @@ export function SequencePanel({ embedded = false }: { embedded?: boolean }) {
             />
             <select
               value={newCourseId}
-              onChange={(e) => setNewCourseId(e.target.value)}
+              onChange={(e) => {
+                setNewCourseId(e.target.value);
+                // Auto-suggest title based on course
+                const course = COURSES.find(c => c.id === e.target.value);
+                if (course && !newTitle.trim()) {
+                  setNewTitle(`${course.cls} – `);
+                }
+              }}
               className="w-full bg-slate-800 text-slate-200 border border-slate-600 rounded px-2 py-1 text-[10px] outline-none focus:border-blue-400"
             >
               {COURSES.map((c) => (
                 <option key={c.id} value={c.id}>
-                  {c.cls} ({c.typ} {c.day} {c.from})
+                  {c.cls} – {c.typ} {c.day} {c.from}–{c.to} ({c.les}L)
                 </option>
               ))}
             </select>
