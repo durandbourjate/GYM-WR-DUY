@@ -87,12 +87,13 @@
 - [x] Gruppen-Drag&Drop (v2.5)
 - [ ] Shift+Klick auf leere Zellen → Sequenz zuordnen (nice-to-have)
 - [ ] Jahrgangs-Modus in Zoom 1: ein Jahrgang durch alle 4 GYM-Jahre (braucht Multi-SJ-Daten)
-- [ ] Fliessende Zoom-Übergänge / Animationen (nice-to-have)
 
-### v2.5 Features (Commit 80c6fca)
+### v2.5 Features (Commits 80c6fca, a8557e0)
 - **Shift+Klick Bereichs-Selektion**: Shift+Klick selektiert alle Kacheln von der letzten Auswahl bis zur geklickten Zelle innerhalb derselben Spalte. Funktioniert additiv mit bestehender Multi-Selektion.
 - **Gruppen-Drag&Drop**: Multi-selektierte Kacheln können als Gruppe per Drag&Drop an eine neue Position innerhalb derselben Spalte verschoben werden. Fixierte Zellen (Ferien/Events) werden übersprungen, bestehende Kacheln rutschen nach unten.
 - **lastSelectedKey Tracking**: Store trackt die letzte selektierte Kachel für korrekte Shift-Bereichs-Berechnung.
+- **Farbcode LearningView-konform**: VWL=orange, BWL=blau, Recht=grün, IN=grau. SubjectArea-Farbe hat Priorität über LessonType in Kacheln. Alle Views (Zoom 1-3, Stats) konsistent.
+- **Sequenz-Titel**: Migration generiert jetzt Titel mit Klasse+Typ+Tag statt courseId (z.B. "Sequenzen 27a28f SF Mi" statt "Sequenzen c17").
 
 ### v2.4 Features (Commit e71b774)
 - **Erweiterte Farbpalette**: SEQUENCE_COLORS von 10 auf 16 Farben, Color-Picker mit flex-wrap
