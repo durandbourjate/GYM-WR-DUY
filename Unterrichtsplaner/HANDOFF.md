@@ -1,6 +1,6 @@
 # Unterrichtsplaner — HANDOFF
 
-## Aktueller Stand: v2.3 (28.02.2026)
+## Aktueller Stand: v2.4 (28.02.2026)
 
 ### Architektur
 - React + TypeScript + Vite + Zustand (persist)
@@ -21,6 +21,7 @@
 - 46407d5: Phase 4 Auto-Suggest + Zoom 1 Multi-Year View
 - 4fdd6d0: HANDOFF.md aktualisiert — v2.2
 - 3810916: Stats-Dashboard Prüfungskollisionen, Suche, Print-CSS
+- e71b774: 12/13+ Sequences Support — 16 Farben, Kompaktansicht Blöcke
 
 ### Implementierte Features (komplett)
 
@@ -75,10 +76,15 @@
   - Farbcodierung BWL/VWL/Recht konsistent
 
 ### Noch offen / Ideen
-- [ ] 12/13 Sequences Support (>11 Blöcke)
+- [x] 12/13 Sequences Support (v2.4: 16 Farben, Kompaktansicht >6 Blöcke)
 - [x] Stats-Dashboard: Prüfungskollisionen erkennen (v2.3)
 - [x] Suche über alle Kacheln/Sequenzen (v2.3)
 - [x] Print-CSS für Semesterplan-Export (v2.3)
+
+### v2.4 Features (Commit e71b774)
+- **Erweiterte Farbpalette**: SEQUENCE_COLORS von 10 auf 16 Farben, Color-Picker mit flex-wrap
+- **Kompaktansicht Blöcke**: Bei Sequenzen mit >6 Blöcken automatisch einzeilige Darstellung (Label + Wochen-Anzahl + KW-Bereich), Toggle zwischen kompakt/erweitert
+- **Block-Zähler**: Anzahl Blöcke im Panel-Header sichtbar
 
 ### v2.3 Features (Commit 3810916)
 - **Stats-Dashboard Prüfungskollisionen**: parseClassGroups zerlegt Klassenstrings (z.B. "28bc29fs" → ['28b','28c','29f','29s']), findExamCollisions erkennt Wochen mit überlappenden Prüfungen
