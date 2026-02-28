@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import { usePlannerStore } from '../store/plannerStore';
 import { COURSES } from '../data/courses';
 import { SEQUENCE_COLORS } from '../utils/colors';
@@ -14,7 +14,7 @@ const SUBJECT_AREAS: { key: SubjectArea; label: string; color: string }[] = [
 function BlockEditor({
   block,
   index,
-  seqId,
+  seqId: _seqId,
   onUpdate,
   onRemove,
 }: {
