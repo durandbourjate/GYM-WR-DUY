@@ -1,7 +1,7 @@
 import { usePlannerStore } from '../store/plannerStore';
 import { COURSES } from '../data/courses';
 import { WEEKS } from '../data/weeks';
-import { DAY_COLORS, TYPE_BADGES } from '../utils/colors';
+import { TYPE_BADGES } from '../utils/colors';
 
 const SUBJECT_COLORS: Record<string, { bg: string; fg: string; border: string }> = {
   BWL: { bg: '#1e3a5f', fg: '#93c5fd', border: '#3b82f6' },
@@ -27,9 +27,7 @@ export function ZoomBlockView({ semester }: Props) {
   const semWeeks = semester === 1
     ? WEEKS.filter(w => parseInt(w.w) >= 33 || parseInt(w.w) === 0).map(w => w.w)
     : WEEKS.filter(w => parseInt(w.w) >= 7 && parseInt(w.w) <= 32).map(w => w.w);
-  // Use actual ordered weeks from WEEKS array
   const allWeekOrder = WEEKS.map(w => w.w);
-  const semStart = semester === 1 ? allWeekOrder.indexOf(semWeeks[0]) : allWeekOrder.indexOf(semWeeks[0]);
   const orderedSemWeeks = allWeekOrder.filter(w => semWeeks.includes(w));
 
   const totalWeeks = orderedSemWeeks.length;

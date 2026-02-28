@@ -125,7 +125,7 @@ function DataMenu() {
 }
 
 export function AppHeader() {
-  const { filter, setFilter, classFilter, setClassFilter, showHelp, toggleHelp, undoStack, undo, sequencePanelOpen, setSequencePanelOpen, sidePanelOpen, setSidePanelOpen, setSidePanelTab, selection, zoomLevel, setZoomLevel } = usePlannerStore();
+  const { filter, setFilter, classFilter, setClassFilter, showHelp, toggleHelp, undoStack, undo, setSequencePanelOpen, sidePanelOpen, setSidePanelOpen, setSidePanelTab, zoomLevel, setZoomLevel } = usePlannerStore();
   const [showStats, setShowStats] = useState(false);
   const [showTaF, setShowTaF] = useState(false);
   const [showExcel, setShowExcel] = useState(false);

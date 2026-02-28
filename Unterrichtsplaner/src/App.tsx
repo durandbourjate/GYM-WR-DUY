@@ -8,9 +8,10 @@ import { AppHeader, HelpBar, MultiSelectToolbar, Legend } from './components/Too
 import { DetailPanel } from './components/DetailPanel';
 import { InsertDialog } from './components/InsertDialog';
 import { ZoomBlockView } from './components/ZoomBlockView';
+import { ZoomMultiYearView } from './components/ZoomMultiYearView';
 
 function App() {
-  const { filter, classFilter, selection, weekData, setWeekData, migrateStaticSequences, sequencePanelOpen, sidePanelOpen, zoomLevel, setZoomLevel } = usePlannerStore();
+  const { filter, classFilter, weekData, setWeekData, migrateStaticSequences, sequencePanelOpen, sidePanelOpen, zoomLevel } = usePlannerStore();
   const curRef = useRef<HTMLTableRowElement>(null);
 
   // Initialize weekData in store on first render
@@ -99,11 +100,7 @@ function App() {
               <ZoomBlockView semester={2} />
             </>
           ) : zoomLevel === 1 ? (
-            <div className="p-8 text-center text-gray-500 text-sm">
-              <span className="text-2xl">◫</span>
-              <p className="mt-2">Semester-Übersicht (Multi-Year View)</p>
-              <p className="text-[10px] text-gray-600 mt-1">Wird in Phase 5 implementiert — zeigt 4 GYM-Jahre im Überblick</p>
-            </div>
+            <ZoomMultiYearView />
           ) : (
             <>
               {/* Semester 1 — Week View */}

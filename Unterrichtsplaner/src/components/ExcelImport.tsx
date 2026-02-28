@@ -166,7 +166,6 @@ export function ExcelImport({ onClose }: { onClose: () => void }) {
       if (existing?.title) updated++; else added++;
       week.lessons[item.col] = { title: item.title, type: item.type } as LessonEntry;
       // Auto-set blockType based on detected lesson type
-      const detailKey = `${item.weekW}-${item.col}`;
       const blockTypeMap: Record<number, string> = { 4: 'EXAM', 5: 'EVENT', 6: 'HOLIDAY' };
       const autoBlockType = blockTypeMap[item.type] || 'LESSON';
       updateLessonDetail(item.weekW, item.col, { blockType: autoBlockType as any });

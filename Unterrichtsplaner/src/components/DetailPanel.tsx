@@ -1,10 +1,9 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { usePlannerStore } from '../store/plannerStore';
 import { TYPE_BADGES, getSequenceInfoFromStore } from '../utils/colors';
-import { COURSES } from '../data/courses';
-import { WEEKS } from '../data/weeks';
 import { CurriculumGoalPicker } from './CurriculumGoalPicker';
 import { SequencePanel } from './SequencePanel';
+import { suggestGoals, suggestTaxonomyLevel } from '../utils/autoSuggest';
 import type { SubjectArea, TaxonomyLevel, BlockType, LessonDetail } from '../types';
 
 const SUBJECT_AREAS: { key: SubjectArea; label: string; color: string }[] = [
@@ -108,7 +107,6 @@ function DetailsTab() {
     selection,
     lessonDetails, updateLessonDetail,
     weekData, sequences,
-    setSelection, setSidePanelOpen,
   } = usePlannerStore();
 
   const c = selection?.course;
@@ -157,6 +155,18 @@ function DetailsTab() {
     const detected = autoMap[currentLesson.type];
     if (detected) updateLessonDetail(selection.week, c.col, { subjectArea: detected });
   }, [selection?.week, c?.col, currentLesson?.type, detail.subjectArea]);
+
+  // Phase 4: Auto-suggest curriculum goals from topicMain
+  const goalSuggestions = useMemo(() => {
+    const topic = detail.topicMain || effectiveDetail.topicMain;
+    if (!topic || topic.length < 2) return [];
+    return suggestGoals(topic, effectiveDetail.subjectArea, 3, 0.2);
+  }, [detail.topicMain, effectiveDetail.topicMain, effectiveDetail.subjectArea]);
+
+  // Phase 4: Auto-suggest taxonomy level from blockType
+  const suggestedTaxonomy = useMemo(() => {
+    return suggestTaxonomyLevel(detail.blockType);
+  }, [detail.blockType]);
 
   if (!selection || !c) {
     return (
@@ -230,6 +240,15 @@ function DetailsTab() {
           <PillSelect options={TAXONOMY_LEVELS.map(t => t.key)} value={detail.taxonomyLevel}
             onChange={(v) => updateField('taxonomyLevel', v)}
             renderOption={(v) => { const t = TAXONOMY_LEVELS.find(x => x.key === v)!; return { label: t.label, color: '#d97706' }; }} />
+          {/* Phase 4: Auto-suggest taxonomy from blockType */}
+          {suggestedTaxonomy && !detail.taxonomyLevel && !effectiveDetail.taxonomyLevel && (
+            <button
+              onClick={() => updateField('taxonomyLevel', suggestedTaxonomy)}
+              className="mt-1 text-[8px] text-amber-500/70 hover:text-amber-400 cursor-pointer transition-colors"
+              title={`Basierend auf Block-Typ "${BLOCK_TYPES.find(b => b.key === detail.blockType)?.label}"`}>
+              💡 Vorschlag: {suggestedTaxonomy} — {TAXONOMY_LEVELS.find(t => t.key === suggestedTaxonomy)?.label.split(' – ')[1]}
+            </button>
+          )}
         </div>
         <div>
           <label className="text-[9px] text-gray-500 font-medium mb-1 block">Thema</label>
@@ -242,6 +261,24 @@ function DetailsTab() {
           <input value={detail.topicSub || ''} onChange={(e) => updateField('topicSub', e.target.value)}
             placeholder={effectiveDetail.topicSub || 'Unterthema (optional)…'}
             className="w-full bg-slate-700 text-slate-200 border border-slate-600 rounded px-2 py-1 text-[10px] outline-none focus:border-blue-400 mt-1" />
+          {/* Phase 4: Auto-suggest curriculum goals */}
+          {goalSuggestions.length > 0 && !detail.curriculumGoal && !effectiveDetail.curriculumGoal && (
+            <div className="mt-1.5 space-y-0.5">
+              <span className="text-[8px] text-amber-500/70">💡 Vorgeschlagene Lehrplanziele:</span>
+              {goalSuggestions.map(s => (
+                <button key={s.goal.id}
+                  onClick={() => updateField('curriculumGoal', `${s.goal.id}: ${s.goal.goal}`)}
+                  className="w-full text-left px-1.5 py-1 rounded bg-amber-900/20 hover:bg-amber-900/40 border border-amber-700/30 hover:border-amber-600/50 transition-colors cursor-pointer"
+                  title={`${s.matchReason}\nScore: ${(s.score * 100).toFixed(0)}%\n${s.goal.contents.join(', ')}`}>
+                  <div className="flex items-center gap-1">
+                    <span className="text-[7px] font-mono text-amber-400/80 shrink-0">{s.goal.id}</span>
+                    <span className="text-[8px] text-amber-200/80 truncate">{s.goal.topic}</span>
+                    <span className="text-[7px] text-amber-600/60 shrink-0 ml-auto">{(s.score * 100).toFixed(0)}%</span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
         <div>
           <label className="text-[9px] text-gray-500 font-medium mb-1 block">Lehrplanziel (LP17)</label>
@@ -281,7 +318,6 @@ export function DetailPanel() {
   const {
     sidePanelOpen, setSidePanelOpen,
     sidePanelTab, setSidePanelTab,
-    selection, setSelection,
     sequencePanelOpen,
   } = usePlannerStore();
   const panelRef = useRef<HTMLDivElement>(null);
