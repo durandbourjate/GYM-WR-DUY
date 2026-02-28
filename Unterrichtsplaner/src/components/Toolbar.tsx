@@ -321,16 +321,24 @@ export function HelpBar() {
 }
 
 export function MultiSelectToolbar() {
-  const { multiSelection, clearMultiSelect } = usePlannerStore();
+  const { multiSelection, clearMultiSelect, batchShiftDown, batchInsertBefore, weekData } = usePlannerStore();
   if (multiSelection.length === 0) return null;
+
+  const allWeeks = weekData.map(w => w.w);
 
   return (
     <div className="bg-indigo-950 border-b-2 border-indigo-500 px-4 py-1.5 flex items-center gap-3 text-[10px] sticky top-9 z-[55]">
       <span className="font-bold text-indigo-200">{multiSelection.length} markiert</span>
-      <button className="px-2 py-0.5 rounded bg-indigo-600 text-white border-none text-[9px] font-semibold cursor-pointer hover:bg-indigo-500">
+      <button
+        onClick={() => batchShiftDown(multiSelection, allWeeks, COURSES)}
+        className="px-2 py-0.5 rounded bg-indigo-600 text-white border-none text-[9px] font-semibold cursor-pointer hover:bg-indigo-500"
+      >
         ↓ Verschieben (+1)
       </button>
-      <button className="px-2 py-0.5 rounded bg-indigo-600 text-white border-none text-[9px] font-semibold cursor-pointer hover:bg-indigo-500">
+      <button
+        onClick={() => batchInsertBefore(multiSelection, allWeeks, COURSES)}
+        className="px-2 py-0.5 rounded bg-indigo-600 text-white border-none text-[9px] font-semibold cursor-pointer hover:bg-indigo-500"
+      >
         ⊞ Einfügen davor
       </button>
       <button
