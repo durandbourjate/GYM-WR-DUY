@@ -130,6 +130,7 @@ export function WeekRows({ weeks, courses, currentRef }: Props) {
     setSidePanelOpen, setSidePanelTab,
     lessonDetails,
     setInsertDialog, pushLessons, pushUndo,
+    searchQuery,
   } = usePlannerStore();
 
   const [dropTarget, setDropTarget] = useState<{ week: string; col: number } | null>(null);
@@ -286,6 +287,17 @@ export function WeekRows({ weeks, courses, currentRef }: Props) {
               // Fixed cells: holidays (type 6) and events (type 5) should not be draggable
               const isFixed = lessonType === 6 || lessonType === 5;
 
+              // Search match
+              const searchLower = searchQuery.toLowerCase();
+              const isSearchMatch = searchQuery.length >= 2 && (
+                displayTitle.toLowerCase().includes(searchLower) ||
+                title.toLowerCase().includes(searchLower) ||
+                (cellDetail?.notes || '').toLowerCase().includes(searchLower) ||
+                (cellDetail?.curriculumGoal || '').toLowerCase().includes(searchLower) ||
+                (seq?.label || '').toLowerCase().includes(searchLower)
+              );
+              const isSearchDimmed = searchQuery.length >= 2 && !isSearchMatch && !!title;
+
               const tafPhase = tafPhases.find(p => {
                 const allW = weeks.map(w => w.w);
                 const si = allW.indexOf(p.startWeek);
@@ -419,10 +431,10 @@ export function WeekRows({ weeks, courses, currentRef }: Props) {
                         e.dataTransfer.setData('text/plain', `${week.w}:${c.col}`);
                       }}
                       onDragEnd={() => { setDragSource(null); setDropTarget(null); }}
-                      className={`mx-0.5 ml-1.5 px-1 py-0.5 rounded transition-all duration-100 flex items-center hover:shadow-md hover:z-10 relative ${isFixed ? 'cursor-default' : 'cursor-grab hover:scale-[1.02]'}`}
+                      className={`mx-0.5 ml-1.5 px-1 py-0.5 rounded transition-all duration-100 flex items-center hover:shadow-md hover:z-10 relative ${isFixed ? 'cursor-default' : 'cursor-grab hover:scale-[1.02]'} ${isSearchMatch ? 'search-highlight' : ''}`}
                       style={{
                         minHeight: isFixed ? Math.max(cellHeight, 32) : cellHeight,
-                        opacity: isDragSrc ? 0.35 : isSeqDimmed ? 0.3 : 1,
+                        opacity: isDragSrc ? 0.35 : isSeqDimmed ? 0.3 : isSearchDimmed ? 0.2 : 1,
                         background: isInEditingSeq ? '#1e3a5f' : isMulti ? '#312e81' : isSelected ? '#1e3a5f' : colors?.bg || '#eef2f7',
                         border: `1px solid ${isInEditingSeq ? '#60a5fa' : isMulti ? '#6366f1' : isSelected ? '#3b82f6' : colors?.border || '#cbd5e1'}`,
                         boxShadow: isInEditingSeq ? '0 0 0 2px #3b82f640' : isMulti ? '0 0 0 2px #6366f150' : isSelected ? '0 0 0 2px #3b82f650' : 'none',

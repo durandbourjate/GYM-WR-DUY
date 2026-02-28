@@ -10,7 +10,7 @@ interface CourseStats {
   exams: number;
   events: number;
   holidays: number;
-  byType: Record<number, number>; // type -> count
+  byType: Record<number, number>;
   examWeeks: string[];
 }
 
@@ -75,26 +75,83 @@ function MiniBar({ byType, total }: { byType: Record<number, number>; total: num
   );
 }
 
+/**
+ * Parse class strings to extract individual class groups.
+ * e.g. "28bc29fs" → ['28b', '28c', '29f', '29s']
+ * e.g. "27a28f" → ['27a', '28f']
+ * e.g. "29c" → ['29c']
+ */
+function parseClassGroups(cls: string): string[] {
+  const groups: string[] = [];
+  const regex = /(\d{2})([a-z]+)/g;
+  let match;
+  while ((match = regex.exec(cls)) !== null) {
+    const year = match[1];
+    const letters = match[2];
+    for (const letter of letters) {
+      groups.push(`${year}${letter}`);
+    }
+  }
+  return groups;
+}
+
+interface Collision {
+  week: string;
+  classes: string[]; // affected class groups
+  courses: string[]; // course cls strings
+}
+
+function findExamCollisions(stats: CourseStats[]): Collision[] {
+  // Build a map: week → list of { course, classGroups }
+  const weekExams = new Map<string, { cls: string; groups: string[] }[]>();
+  for (const s of stats) {
+    for (const w of s.examWeeks) {
+      const arr = weekExams.get(w) || [];
+      arr.push({ cls: s.course.cls, groups: parseClassGroups(s.course.cls) });
+      weekExams.set(w, arr);
+    }
+  }
+
+  const collisions: Collision[] = [];
+  for (const [w, exams] of weekExams) {
+    if (exams.length < 2) continue;
+    // Check for overlapping class groups between different exams
+    const allGroups = new Map<string, string[]>(); // group → [cls1, cls2]
+    for (const exam of exams) {
+      for (const g of exam.groups) {
+        const arr = allGroups.get(g) || [];
+        arr.push(exam.cls);
+        allGroups.set(g, arr);
+      }
+    }
+    const overlapping = [...allGroups.entries()].filter(([, courses]) => courses.length > 1);
+    if (overlapping.length > 0) {
+      const affectedClasses = overlapping.map(([g]) => g);
+      const affectedCourses = [...new Set(overlapping.flatMap(([, c]) => c))];
+      collisions.push({ week: w, classes: affectedClasses, courses: affectedCourses });
+    }
+  }
+  return collisions.sort((a, b) => {
+    const ai = parseInt(a.week), bi = parseInt(b.week);
+    // School year order: 33+ before 01-32
+    const aN = ai >= 33 ? ai - 33 : ai + 20;
+    const bN = bi >= 33 ? bi - 33 : bi + 20;
+    return aN - bN;
+  });
+}
+
 export function StatsPanel({ onClose }: { onClose: () => void }) {
-  const { weekData } = usePlannerStore();
+  const { weekData, sequences } = usePlannerStore();
   const stats = useMemo(() => computeStats(weekData), [weekData]);
+  const collisions = useMemo(() => findExamCollisions(stats), [stats]);
 
   const totalExams = stats.reduce((s, c) => s + c.exams, 0);
   const teachingWeeks = stats.reduce(
     (s, c) => s + c.totalLessons - c.holidays - c.events,
     0
   );
-
-  // Exam collision check: weeks where multiple exams happen
-  const examsByWeek = new Map<string, string[]>();
-  for (const s of stats) {
-    for (const w of s.examWeeks) {
-      const arr = examsByWeek.get(w) || [];
-      arr.push(s.course.cls);
-      examsByWeek.set(w, arr);
-    }
-  }
-  const collisions = [...examsByWeek.entries()].filter(([, cls]) => cls.length > 1);
+  const totalSequences = sequences.length;
+  const totalBlocks = sequences.reduce((s, sq) => s + sq.blocks.length, 0);
 
   return (
     <div className="fixed inset-0 bg-black/60 z-[70] flex items-center justify-center" onClick={onClose}>
@@ -108,7 +165,7 @@ export function StatsPanel({ onClose }: { onClose: () => void }) {
         </div>
 
         {/* Summary */}
-        <div className="grid grid-cols-3 gap-3 mb-4">
+        <div className="grid grid-cols-4 gap-3 mb-4">
           <div className="bg-slate-700/50 rounded p-2.5 text-center">
             <div className="text-lg font-bold text-gray-100">{totalExams}</div>
             <div className="text-[9px] text-gray-400">Prüfungen total</div>
@@ -120,6 +177,22 @@ export function StatsPanel({ onClose }: { onClose: () => void }) {
           <div className="bg-slate-700/50 rounded p-2.5 text-center">
             <div className="text-lg font-bold text-gray-100">{teachingWeeks}</div>
             <div className="text-[9px] text-gray-400">Unterrichts-Einträge</div>
+          </div>
+          <div className={`rounded p-2.5 text-center ${collisions.length > 0 ? 'bg-red-900/40 border border-red-800' : 'bg-slate-700/50'}`}>
+            <div className={`text-lg font-bold ${collisions.length > 0 ? 'text-red-400' : 'text-gray-100'}`}>
+              {collisions.length}
+            </div>
+            <div className="text-[9px] text-gray-400">Prüfungskollisionen</div>
+          </div>
+        </div>
+
+        {/* Sequenz-Übersicht */}
+        <div className="bg-slate-700/30 rounded p-2.5 mb-4 flex gap-6">
+          <div className="text-[10px] text-gray-400">
+            <span className="font-semibold text-gray-300">{totalSequences}</span> Sequenzen
+          </div>
+          <div className="text-[10px] text-gray-400">
+            <span className="font-semibold text-gray-300">{totalBlocks}</span> Blöcke
           </div>
         </div>
 
@@ -156,15 +229,31 @@ export function StatsPanel({ onClose }: { onClose: () => void }) {
           </tbody>
         </table>
 
-        {/* Exam collisions */}
+        {/* Exam collisions – enhanced with class-group analysis */}
         {collisions.length > 0 && (
-          <div className="bg-red-950/30 border border-red-800 rounded p-3">
-            <div className="text-[10px] font-bold text-red-300 mb-1">⚠ Prüfungskollisionen</div>
-            {collisions.map(([w, classes]) => (
-              <div key={w} className="text-[9px] text-red-400">
-                KW{w}: {classes.join(', ')} ({classes.length} Prüfungen)
-              </div>
-            ))}
+          <div className="bg-red-950/30 border border-red-800 rounded p-3 mb-4">
+            <div className="text-[10px] font-bold text-red-300 mb-2">⚠ Prüfungskollisionen (gleiche SuS betroffen)</div>
+            <div className="space-y-1.5">
+              {collisions.map((c) => (
+                <div key={c.week} className="bg-red-950/40 rounded p-2">
+                  <div className="flex items-center gap-2 mb-0.5">
+                    <span className="text-[10px] font-bold text-red-300">KW {c.week}</span>
+                    <span className="text-[8px] text-red-400/70">
+                      {c.courses.join(' & ')}
+                    </span>
+                  </div>
+                  <div className="text-[9px] text-red-400">
+                    Betroffene Klassen: {c.classes.join(', ')}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {collisions.length === 0 && (
+          <div className="bg-green-950/20 border border-green-800/40 rounded p-3 mb-4">
+            <div className="text-[10px] text-green-400">✓ Keine Prüfungskollisionen erkannt</div>
           </div>
         )}
 

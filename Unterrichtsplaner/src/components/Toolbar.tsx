@@ -125,12 +125,13 @@ function DataMenu() {
 }
 
 export function AppHeader() {
-  const { filter, setFilter, classFilter, setClassFilter, showHelp, toggleHelp, undoStack, undo, setSequencePanelOpen, sidePanelOpen, setSidePanelOpen, setSidePanelTab, zoomLevel, setZoomLevel } = usePlannerStore();
+  const { filter, setFilter, classFilter, setClassFilter, showHelp, toggleHelp, undoStack, undo, setSequencePanelOpen, sidePanelOpen, setSidePanelOpen, setSidePanelTab, zoomLevel, setZoomLevel, searchQuery, setSearchQuery } = usePlannerStore();
   const [showStats, setShowStats] = useState(false);
   const [showTaF, setShowTaF] = useState(false);
   const [showExcel, setShowExcel] = useState(false);
   const [showAddMenu, setShowAddMenu] = useState(false);
   const addMenuRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   // Close add menu on outside click
   useEffect(() => {
@@ -143,7 +144,7 @@ export function AppHeader() {
   }, [showAddMenu]);
 
   return (
-    <div className="bg-gray-900 border-b border-gray-800 px-4 py-2 sticky top-0 z-[60] flex items-center justify-between flex-wrap gap-2">
+    <div className="bg-gray-900 border-b border-gray-800 px-4 py-2 sticky top-0 z-[60] flex items-center justify-between flex-wrap gap-2 no-print">
       <div className="flex items-baseline gap-2">
         <span className="text-base font-bold text-gray-50">
           <span className="text-blue-400">⊞</span> Unterrichtsplaner
@@ -174,6 +175,23 @@ export function AppHeader() {
             {classFilter} ✕
           </button>
         )}
+        {/* Search */}
+        <div className="relative">
+          <input
+            ref={searchInputRef}
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="🔍 Suche…"
+            className="w-28 focus:w-44 transition-all px-2 py-0.5 rounded text-[10px] bg-slate-800 border border-gray-700 text-gray-300 outline-none focus:border-blue-400 placeholder-gray-600"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => { setSearchQuery(''); searchInputRef.current?.focus(); }}
+              className="absolute right-1 top-1/2 -translate-y-1/2 text-[9px] text-gray-500 hover:text-gray-300 cursor-pointer"
+            >✕</button>
+          )}
+        </div>
         <span className="w-px h-4 bg-gray-700 mx-1" />
         {/* Zoom Level */}
         <div className="flex items-center border border-gray-700 rounded overflow-hidden">
@@ -306,14 +324,18 @@ export function HelpBar() {
   if (!showHelp) return null;
 
   return (
-    <div className="bg-slate-800 border-b border-gray-700 px-4 py-2 text-[10px] text-slate-400 leading-relaxed">
+    <div className="bg-slate-800 border-b border-gray-700 px-4 py-2 text-[10px] text-slate-400 leading-relaxed no-print">
       <b className="text-gray-200">Bedienung:</b>{' '}
       <b>1× Klick</b> = Auswählen (Mini-Buttons: + ↓ i) ·{' '}
       <b>2× Klick</b> = Details öffnen ·{' '}
       <b>Hover (2s)</b> = Vorschau ·{' '}
       <b>⇧/⌘+Klick</b> = Mehrfachauswahl ·{' '}
       <b>⌘Z</b> = Rückgängig ·{' '}
+      <b>⌘F</b> = Suche ·{' '}
+      <b>⌘P</b> = Drucken ·{' '}
       <b>Leere Zelle</b> = Neue Kachel/Sequenz
+      <br />
+      <b>Zoom:</b> <b>1</b> = Semester-Übersicht · <b>2</b> = Block-Ansicht · <b>3</b> = Wochen-Ansicht
       <br />
       <b className="text-amber-400">⚠ 1L↔2L:</b> Bei Kursen mit alternierenden Slots warnt das Tool bei Verschiebungskonflikten.
     </div>

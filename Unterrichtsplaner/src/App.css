@@ -2,3 +2,125 @@
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
 ::-webkit-scrollbar-track { background: #0c0f1a; }
+
+/* Search highlight */
+.search-highlight {
+  outline: 2px solid #f59e0b !important;
+  outline-offset: -1px;
+  z-index: 5;
+  position: relative;
+}
+
+/* ============================
+   Print Styles – Semesterplan
+   ============================ */
+@media print {
+  /* Reset backgrounds to white */
+  html, body, #root,
+  [data-app-root] {
+    background: #fff !important;
+    color: #000 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Hide non-essential UI elements */
+  .no-print,
+  [data-no-print],
+  button,
+  .sticky {
+    display: none !important;
+  }
+
+  /* But show sticky week number column */
+  td.sticky {
+    display: table-cell !important;
+    position: static !important;
+    background: #fff !important;
+  }
+
+  /* Keep header row visible */
+  thead th {
+    position: static !important;
+    background: #f8fafc !important;
+    color: #1e293b !important;
+    font-size: 7pt !important;
+    padding: 2px 3px !important;
+    border: 1px solid #cbd5e1 !important;
+  }
+
+  /* Table cells */
+  td {
+    border: 1px solid #e2e8f0 !important;
+    padding: 1px 2px !important;
+    font-size: 7pt !important;
+    width: auto !important;
+    min-width: auto !important;
+    max-width: none !important;
+  }
+
+  /* Lesson tiles – keep colored backgrounds for readability */
+  td div[class*="rounded"] {
+    border: 1px solid #94a3b8 !important;
+    box-shadow: none !important;
+    margin: 1px !important;
+    padding: 1px 3px !important;
+    min-height: auto !important;
+    font-size: 7pt !important;
+  }
+
+  /* Sequence bars – thin left border instead */
+  .absolute.left-0.w-\[3px\] {
+    width: 2px !important;
+    print-color-adjust: exact;
+  }
+
+  /* Page setup */
+  @page {
+    size: A3 landscape;
+    margin: 8mm;
+  }
+
+  /* Table should flow across pages */
+  table {
+    width: 100% !important;
+    min-width: 0 !important;
+    border-collapse: collapse !important;
+    page-break-inside: auto;
+  }
+
+  tr {
+    page-break-inside: avoid;
+  }
+
+  /* Semester divider */
+  div[style*="linear-gradient"] {
+    background: none !important;
+    border-top: 2px solid #000 !important;
+    padding: 4px 0 !important;
+  }
+
+  /* Day separator lines */
+  td[style*="border-left"] {
+    border-left: 2px solid #94a3b8 !important;
+  }
+
+  /* Hide side panels, detail panels, modals */
+  .fixed {
+    display: none !important;
+  }
+
+  /* Override opacity for past weeks */
+  tr[style*="opacity"] {
+    opacity: 1 !important;
+  }
+
+  /* Title for print */
+  .print-title {
+    display: block !important;
+    font-size: 14pt;
+    font-weight: bold;
+    margin-bottom: 8px;
+    text-align: center;
+  }
+}

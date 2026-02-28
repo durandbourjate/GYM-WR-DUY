@@ -16,7 +16,7 @@ interface Props {
 }
 
 export function ZoomBlockView({ semester }: Props) {
-  const { filter, classFilter, sequences, weekData, setZoomLevel, setEditingSequenceId, setSidePanelOpen, setSidePanelTab } = usePlannerStore();
+  const { filter, classFilter, sequences, weekData, setZoomLevel, setEditingSequenceId, setSidePanelOpen, setSidePanelTab, searchQuery } = usePlannerStore();
 
   // Filter courses
   let courses = COURSES.filter(c => c.semesters.includes(semester));
@@ -148,9 +148,19 @@ export function ZoomBlockView({ semester }: Props) {
                     seg.seq.subjectArea ? SUBJECT_COLORS[seg.seq.subjectArea] :
                     { bg: '#1e293b', fg: '#94a3b8', border: '#475569' };
 
+                  // Search match in block view
+                  const searchLower = searchQuery.toLowerCase();
+                  const blockSearchMatch = searchQuery.length >= 2 && (
+                    seg.block.label.toLowerCase().includes(searchLower) ||
+                    (seg.block.topicMain || '').toLowerCase().includes(searchLower) ||
+                    (seg.block.curriculumGoal || '').toLowerCase().includes(searchLower) ||
+                    seg.seq.title.toLowerCase().includes(searchLower)
+                  );
+                  const blockSearchDimmed = searchQuery.length >= 2 && !blockSearchMatch;
+
                   return (
-                    <div key={`seq-${si}`} className="absolute top-0.5 bottom-0.5 rounded-sm overflow-hidden cursor-pointer hover:brightness-125 hover:scale-[1.02] transition-all"
-                      style={{ left, width, background: colors.bg, border: `1px solid ${colors.border}` }}
+                    <div key={`seq-${si}`} className={`absolute top-0.5 bottom-0.5 rounded-sm overflow-hidden cursor-pointer hover:brightness-125 hover:scale-[1.02] transition-all ${blockSearchMatch ? 'ring-2 ring-amber-400' : ''}`}
+                      style={{ left, width, background: colors.bg, border: `1px solid ${colors.border}`, opacity: blockSearchDimmed ? 0.2 : 1 }}
                       title={`${seg.seq.title} — ${seg.block.label}\n${seg.block.topicMain || ''}\nKW ${seg.block.weeks.join(', ')}\n\n🖱 Klick → Wochen-Ansicht öffnen`}
                       onClick={() => {
                         // Open sequence in side panel

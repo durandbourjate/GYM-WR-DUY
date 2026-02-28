@@ -70,13 +70,24 @@ function App() {
         if (e.key === '2') usePlannerStore.getState().setZoomLevel(2);
         if (e.key === '3') usePlannerStore.getState().setZoomLevel(3);
       }
+      // Cmd+F: focus search
+      if ((e.metaKey || e.ctrlKey) && e.key === 'f') {
+        e.preventDefault();
+        const searchInput = document.querySelector('input[placeholder*="Suche"]') as HTMLInputElement;
+        searchInput?.focus();
+        searchInput?.select();
+      }
+      // Cmd+P: print
+      if ((e.metaKey || e.ctrlKey) && e.key === 'p') {
+        // Let browser handle print with our CSS
+      }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
   }, []);
 
   return (
-    <div className="bg-[#0c0f1a] text-slate-200 min-h-screen font-sans">
+    <div className="bg-[#0c0f1a] text-slate-200 min-h-screen font-sans" data-app-root>
       <AppHeader />
       <HelpBar />
       <Legend />
