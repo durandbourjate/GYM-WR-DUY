@@ -1,8 +1,4 @@
-import { useState } from 'react';
 import { usePlannerStore } from '../store/plannerStore';
-import { COURSES } from '../data/courses';
-import { WEEKS } from '../data/weeks';
-import { StatsPanel } from './StatsPanel';
 import type { FilterType } from '../types';
 
 const FILTERS: { key: FilterType; label: string }[] = [
@@ -14,36 +10,7 @@ const FILTERS: { key: FilterType; label: string }[] = [
 ];
 
 export function AppHeader() {
-  const { filter, setFilter, showHelp, toggleHelp, undoStack, undo, exportData, importData, searchQuery, setSearchQuery } = usePlannerStore();
-  const [showStats, setShowStats] = useState(false);
-
-  const handleExport = () => {
-    const json = exportData();
-    const blob = new Blob([json], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `unterrichtsplaner_${new Date().toISOString().slice(0, 10)}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-
-  const handleImport = () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.json';
-    input.onchange = (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = () => {
-        const ok = importData(reader.result as string);
-        if (!ok) alert('Import fehlgeschlagen: Ungültige Datei.');
-      };
-      reader.readAsText(file);
-    };
-    input.click();
-  };
+  const { filter, setFilter, showHelp, toggleHelp, undoStack, undo, sequencePanelOpen, setSequencePanelOpen } = usePlannerStore();
 
   return (
     <div className="bg-gray-900 border-b border-gray-800 px-4 py-2 sticky top-0 z-[60] flex items-center justify-between flex-wrap gap-2">
@@ -51,7 +18,7 @@ export function AppHeader() {
         <span className="text-base font-bold text-gray-50">
           <span className="text-blue-400">⊞</span> Unterrichtsplaner
         </span>
-        <span className="text-[10px] text-gray-500">SJ 25/26 · DUY · v1.3</span>
+        <span className="text-[10px] text-gray-500">SJ 25/26 · DUY · v1.1</span>
         <span className="text-[9px] text-green-600" title="Daten werden lokal gespeichert">💾</span>
       </div>
       <div className="flex gap-1 items-center">
@@ -68,22 +35,6 @@ export function AppHeader() {
             {f.label}
           </button>
         ))}
-        <span className="w-px h-4 bg-gray-700 mx-1" />
-        <div className="relative">
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="🔍 Suche…"
-            className="bg-gray-800 text-gray-200 border border-gray-700 rounded px-2 py-0.5 text-[10px] outline-none focus:border-blue-400 w-32 placeholder-gray-600"
-          />
-          {searchQuery && (
-            <button
-              onClick={() => setSearchQuery('')}
-              className="absolute right-1 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 text-[9px] cursor-pointer"
-            >✕</button>
-          )}
-        </div>
         <span className="w-px h-4 bg-gray-700 mx-1" />
         {undoStack.length > 0 && (
           <button
@@ -103,29 +54,15 @@ export function AppHeader() {
           ?
         </button>
         <button
-          onClick={() => setShowStats(true)}
-          className="px-2 py-0.5 rounded text-[10px] border border-gray-700 text-gray-400 cursor-pointer hover:text-gray-200 hover:border-gray-500"
-          title="Statistik anzeigen"
+          onClick={() => setSequencePanelOpen(!sequencePanelOpen)}
+          className={`px-2 py-0.5 rounded text-[10px] border cursor-pointer ${
+            sequencePanelOpen ? 'bg-green-900 border-green-600 text-green-300' : 'border-gray-700 text-gray-500 hover:border-green-700 hover:text-green-400'
+          }`}
+          title="Sequenzen verwalten"
         >
-          📊
-        </button>
-        <span className="w-px h-4 bg-gray-700 mx-1" />
-        <button
-          onClick={handleExport}
-          className="px-2 py-0.5 rounded text-[10px] border border-gray-700 text-gray-400 cursor-pointer hover:text-gray-200 hover:border-gray-500"
-          title="Daten als JSON exportieren"
-        >
-          ⬇ Export
-        </button>
-        <button
-          onClick={handleImport}
-          className="px-2 py-0.5 rounded text-[10px] border border-gray-700 text-gray-400 cursor-pointer hover:text-gray-200 hover:border-gray-500"
-          title="Daten aus JSON importieren"
-        >
-          ⬆ Import
+          ▧ Seq
         </button>
       </div>
-      {showStats && <StatsPanel onClose={() => setShowStats(false)} />}
     </div>
   );
 }
@@ -138,8 +75,7 @@ export function HelpBar() {
     <div className="bg-slate-800 border-b border-gray-700 px-4 py-2 text-[10px] text-slate-400 leading-relaxed">
       <b className="text-gray-200">Bedienung:</b> Klick = Detail ·{' '}
       <b>⇧/⌘+Klick</b> = Mehrfachauswahl · <b>Doppelklick</b> = Titel bearbeiten ·{' '}
-      <b>⌘Z</b> = Rückgängig · <b>⌘F</b> = Suche · <b>Esc</b> = Schliessen/Abwählen ·{' '}
-      2L grösser als 1L · Grüne Balken = Sequenz
+      <b>⌘Z</b> = Rückgängig · 2L grösser als 1L · Grüne Balken = Sequenz
       <br />
       <b className="text-amber-400">⚠ 1L↔2L:</b> Bei Kursen mit alternierenden Slots warnt das Tool bei
       Verschiebungskonflikten.
@@ -148,24 +84,16 @@ export function HelpBar() {
 }
 
 export function MultiSelectToolbar() {
-  const { multiSelection, clearMultiSelect, batchShiftDown, batchInsertBefore } = usePlannerStore();
+  const { multiSelection, clearMultiSelect } = usePlannerStore();
   if (multiSelection.length === 0) return null;
-
-  const allWeekKeys = WEEKS.map(w => w.w);
 
   return (
     <div className="bg-indigo-950 border-b-2 border-indigo-500 px-4 py-1.5 flex items-center gap-3 text-[10px] sticky top-9 z-[55]">
       <span className="font-bold text-indigo-200">{multiSelection.length} markiert</span>
-      <button
-        onClick={() => batchShiftDown(multiSelection, allWeekKeys, COURSES)}
-        className="px-2 py-0.5 rounded bg-indigo-600 text-white border-none text-[9px] font-semibold cursor-pointer hover:bg-indigo-500"
-      >
+      <button className="px-2 py-0.5 rounded bg-indigo-600 text-white border-none text-[9px] font-semibold cursor-pointer hover:bg-indigo-500">
         ↓ Verschieben (+1)
       </button>
-      <button
-        onClick={() => batchInsertBefore(multiSelection, allWeekKeys, COURSES)}
-        className="px-2 py-0.5 rounded bg-indigo-600 text-white border-none text-[9px] font-semibold cursor-pointer hover:bg-indigo-500"
-      >
+      <button className="px-2 py-0.5 rounded bg-indigo-600 text-white border-none text-[9px] font-semibold cursor-pointer hover:bg-indigo-500">
         ⊞ Einfügen davor
       </button>
       <button

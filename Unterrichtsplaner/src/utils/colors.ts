@@ -1,5 +1,4 @@
-import type { LessonType, SequenceInfo, CourseType } from '../types';
-import { SEQUENCES } from '../data/sequences';
+import type { LessonType, SequenceInfo, CourseType, ManagedSequence } from '../types';
 
 export const LESSON_COLORS: Record<LessonType, { bg: string; fg: string; border: string }> = {
   0: { bg: '#eef2f7', fg: '#475569', border: '#cbd5e1' },
@@ -23,19 +22,32 @@ export const TYPE_BADGES: Record<CourseType, { bg: string; fg: string }> = {
   EF: { bg: '#ec4899', fg: '#fff' },
 };
 
-export function getSequenceInfo(courseId: string, weekW: string): SequenceInfo | null {
-  const seqs = SEQUENCES[courseId];
-  if (!seqs) return null;
-  for (const seq of seqs) {
-    const idx = seq.weeks.indexOf(weekW);
-    if (idx >= 0) {
-      return {
-        label: seq.label,
-        index: idx,
-        total: seq.weeks.length,
-        isFirst: idx === 0,
-        isLast: idx === seq.weeks.length - 1,
-      };
+// Default sequence colors palette
+export const SEQUENCE_COLORS = [
+  '#16a34a', '#0ea5e9', '#d97706', '#7c3aed', '#ec4899',
+  '#14b8a6', '#f43f5e', '#8b5cf6', '#eab308', '#06b6d4',
+];
+
+export function getSequenceInfoFromStore(
+  courseId: string,
+  weekW: string,
+  sequences: ManagedSequence[]
+): SequenceInfo | null {
+  for (const seq of sequences) {
+    if (seq.courseId !== courseId) continue;
+    for (const block of seq.blocks) {
+      const idx = block.weeks.indexOf(weekW);
+      if (idx >= 0) {
+        return {
+          sequenceId: seq.id,
+          label: block.label,
+          index: idx,
+          total: block.weeks.length,
+          isFirst: idx === 0,
+          isLast: idx === block.weeks.length - 1,
+          color: seq.color,
+        };
+      }
     }
   }
   return null;

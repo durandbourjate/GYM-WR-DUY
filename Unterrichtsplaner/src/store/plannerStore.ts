@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { FilterType, Week, LessonEntry, Course, LessonDetail } from '../types';
-import { COURSES } from '../data/courses';
+import type { FilterType, Week, LessonEntry, Course, LessonDetail, ManagedSequence, SequenceBlock } from '../types';
+import { SEQUENCES as STATIC_SEQUENCES } from '../data/sequences';
 
 interface Selection {
   week: string;
@@ -56,6 +56,22 @@ interface PlannerState {
   // Detail Panel state
   detailPanelExpanded: boolean;
   setDetailPanelExpanded: (v: boolean) => void;
+  // Sequences CRUD
+  sequences: ManagedSequence[];
+  sequencesMigrated: boolean;
+  migrateStaticSequences: () => void;
+  addSequence: (seq: Omit<ManagedSequence, 'id' | 'createdAt' | 'updatedAt'>) => string;
+  updateSequence: (id: string, updates: Partial<Pick<ManagedSequence, 'title' | 'subjectArea' | 'blocks' | 'color' | 'courseId'>>) => void;
+  deleteSequence: (id: string) => void;
+  addBlockToSequence: (seqId: string, block: SequenceBlock) => void;
+  updateBlockInSequence: (seqId: string, blockIndex: number, block: Partial<SequenceBlock>) => void;
+  removeBlockFromSequence: (seqId: string, blockIndex: number) => void;
+  reorderBlocks: (seqId: string, fromIndex: number, toIndex: number) => void;
+  // Sequence Panel UI state
+  sequencePanelOpen: boolean;
+  setSequencePanelOpen: (v: boolean) => void;
+  editingSequenceId: string | null;
+  setEditingSequenceId: (id: string | null) => void;
   // Export / Import
   exportData: () => string;
   importData: (json: string) => boolean;
@@ -115,14 +131,97 @@ export const usePlannerStore = create<PlannerState>()(
     const key = `${weekW}-${col}`;
     return get().lessonDetails[key];
   },
+  detailPanelExpanded: false,
+  setDetailPanelExpanded: (v) => set({ detailPanelExpanded: v }),
+
+  // Sequences CRUD
+  sequences: [],
+  sequencesMigrated: false,
+  migrateStaticSequences: () => {
+    const state = get();
+    if (state.sequencesMigrated) return;
+    const now = new Date().toISOString();
+    const migrated: ManagedSequence[] = [];
+    for (const [courseId, seqBlocks] of Object.entries(STATIC_SEQUENCES)) {
+      migrated.push({
+        id: `seq-${courseId}-${Date.now()}`,
+        courseId,
+        title: `Sequenzen ${courseId}`,
+        blocks: seqBlocks.map(b => ({ weeks: [...b.weeks], label: b.label })),
+        createdAt: now,
+        updatedAt: now,
+      });
+    }
+    set({ sequences: migrated, sequencesMigrated: true });
+  },
+  addSequence: (seq) => {
+    const now = new Date().toISOString();
+    const id = `seq-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+    const newSeq: ManagedSequence = { ...seq, id, createdAt: now, updatedAt: now };
+    set((state) => ({ sequences: [...state.sequences, newSeq] }));
+    return id;
+  },
+  updateSequence: (id, updates) =>
+    set((state) => ({
+      sequences: state.sequences.map((s) =>
+        s.id === id ? { ...s, ...updates, updatedAt: new Date().toISOString() } : s
+      ),
+    })),
+  deleteSequence: (id) =>
+    set((state) => ({ sequences: state.sequences.filter((s) => s.id !== id) })),
+  addBlockToSequence: (seqId, block) =>
+    set((state) => ({
+      sequences: state.sequences.map((s) =>
+        s.id === seqId
+          ? { ...s, blocks: [...s.blocks, block], updatedAt: new Date().toISOString() }
+          : s
+      ),
+    })),
+  updateBlockInSequence: (seqId, blockIndex, block) =>
+    set((state) => ({
+      sequences: state.sequences.map((s) =>
+        s.id === seqId
+          ? {
+              ...s,
+              blocks: s.blocks.map((b, i) => (i === blockIndex ? { ...b, ...block } : b)),
+              updatedAt: new Date().toISOString(),
+            }
+          : s
+      ),
+    })),
+  removeBlockFromSequence: (seqId, blockIndex) =>
+    set((state) => ({
+      sequences: state.sequences.map((s) =>
+        s.id === seqId
+          ? { ...s, blocks: s.blocks.filter((_, i) => i !== blockIndex), updatedAt: new Date().toISOString() }
+          : s
+      ),
+    })),
+  reorderBlocks: (seqId, fromIndex, toIndex) =>
+    set((state) => ({
+      sequences: state.sequences.map((s) => {
+        if (s.id !== seqId) return s;
+        const blocks = [...s.blocks];
+        const [moved] = blocks.splice(fromIndex, 1);
+        blocks.splice(toIndex, 0, moved);
+        return { ...s, blocks, updatedAt: new Date().toISOString() };
+      }),
+    })),
+  // Sequence Panel UI state
+  sequencePanelOpen: false,
+  setSequencePanelOpen: (v) => set({ sequencePanelOpen: v }),
+  editingSequenceId: null,
+  setEditingSequenceId: (id) => set({ editingSequenceId: id }),
+
   // Export / Import
   exportData: () => {
     const state = get();
     return JSON.stringify({
-      version: '1.1',
+      version: '2.0',
       exportedAt: new Date().toISOString(),
       weekData: state.weekData,
       lessonDetails: state.lessonDetails,
+      sequences: state.sequences,
     }, null, 2);
   },
   importData: (json: string) => {
@@ -134,14 +233,13 @@ export const usePlannerStore = create<PlannerState>()(
       set({
         weekData: data.weekData,
         lessonDetails: data.lessonDetails || {},
+        sequences: data.sequences || state.sequences,
       });
       return true;
     } catch {
       return false;
     }
   },
-  detailPanelExpanded: false,
-  setDetailPanelExpanded: (v) => set({ detailPanelExpanded: v }),
 
   // Drag & Drop
   dragSource: null,
@@ -221,13 +319,11 @@ export const usePlannerStore = create<PlannerState>()(
   batchShiftDown: (keys, allWeeks, courses) => {
     const state = get();
     state.pushUndo();
-    // Parse keys: "weekW-courseId" → find col
     const parsed = keys.map(k => {
       const [weekW, courseId] = k.split('-');
       const course = courses.find(c => c.id === courseId);
       return course ? { weekW, col: course.col } : null;
     }).filter(Boolean) as { weekW: string; col: number }[];
-    // Group by col, take earliest week per col
     const byCols = new Map<number, string[]>();
     for (const p of parsed) {
       const arr = byCols.get(p.col) || [];
@@ -236,13 +332,11 @@ export const usePlannerStore = create<PlannerState>()(
     }
     let newWeekData = state.weekData.map(w => ({ ...w, lessons: { ...w.lessons } }));
     for (const [col, weeks] of byCols) {
-      // Find the earliest week in allWeeks order
       const earliest = weeks.reduce((best, w) => {
         const bi = allWeeks.indexOf(best);
         const wi = allWeeks.indexOf(w);
         return wi < bi ? w : best;
       }, weeks[0]);
-      // Push from earliest
       const weekMap = new Map(newWeekData.map(w => [w.w, w]));
       const targetIdx = allWeeks.indexOf(earliest);
       if (targetIdx < 0) continue;
@@ -260,7 +354,6 @@ export const usePlannerStore = create<PlannerState>()(
     set({ weekData: newWeekData, multiSelection: [] });
   },
   batchInsertBefore: (keys, allWeeks, courses) => {
-    // Same as batchShiftDown — inserts empty slot before each selected item
     get().batchShiftDown(keys, allWeeks, courses);
   },
 
@@ -284,11 +377,19 @@ export const usePlannerStore = create<PlannerState>()(
     }),
     {
       name: 'unterrichtsplaner-storage',
-      version: 1,
+      version: 2,
       partialize: (state) => ({
         weekData: state.weekData,
         lessonDetails: state.lessonDetails,
+        sequences: state.sequences,
+        sequencesMigrated: state.sequencesMigrated,
       }),
+      migrate: (persisted: unknown, version: number) => {
+        if (version < 2) {
+          return { ...(persisted as Record<string, unknown>), sequences: [], sequencesMigrated: false };
+        }
+        return persisted;
+      },
     }
   )
 );

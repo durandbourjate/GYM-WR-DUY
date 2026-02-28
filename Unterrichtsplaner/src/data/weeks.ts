@@ -50,25 +50,5 @@ export const WEEKS: Week[] = [
 {w:"27",lessons:{2:{title:"IW27",type:5},4:{title:"IW27",type:5},11:{title:"IW27",type:5},17:{title:"IW27",type:5},19:{title:"IW27",type:5},24:{title:"IW27",type:5},29:{title:"IW27",type:5},31:{title:"IW27",type:5},35:{title:"IW27",type:5},37:{title:"IW27",type:5}}},
 ];
 
-// Auto-detect current calendar week (ISO 8601)
-function getCurrentWeek(): string {
-  const now = new Date();
-  const jan4 = new Date(now.getFullYear(), 0, 4);
-  const start = new Date(jan4.getTime() - ((jan4.getDay() || 7) - 1) * 86400000);
-  const diff = Math.floor((now.getTime() - start.getTime()) / (7 * 86400000));
-  const weekNum = diff + 1;
-  // Clamp to valid range and format
-  const w = String(Math.max(1, Math.min(53, weekNum))).padStart(2, '0');
-  // Check if this week exists in our data; if not, find nearest
-  const allWeeks = WEEKS.map(wk => wk.w);
-  if (allWeeks.includes(w)) return w;
-  // Fallback: find nearest week in data
-  return allWeeks.reduce((best, wk) => {
-    const diff = Math.abs(parseInt(wk) - parseInt(w));
-    const bestDiff = Math.abs(parseInt(best) - parseInt(w));
-    return diff < bestDiff ? wk : best;
-  }, allWeeks[0]);
-}
-
-export const CURRENT_WEEK = getCurrentWeek();
+export const CURRENT_WEEK = '09';
 export const S2_START_INDEX = 26; // Index in WEEKS where S2 begins (w07)

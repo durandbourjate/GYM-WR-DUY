@@ -1,6 +1,6 @@
 import { useCallback, useState, useRef, useEffect } from 'react';
 import type { Course, Week } from '../types';
-import { LESSON_COLORS, DAY_COLORS, getSequenceInfo, isPastWeek } from '../utils/colors';
+import { LESSON_COLORS, DAY_COLORS, getSequenceInfoFromStore, isPastWeek } from '../utils/colors';
 import { CURRENT_WEEK } from '../data/weeks';
 import { usePlannerStore } from '../store/plannerStore';
 
@@ -37,7 +37,7 @@ export function WeekRows({ weeks, courses, currentRef }: Props) {
     editing, setEditing,
     weekData, updateLesson,
     dragSource, setDragSource, swapLessons, moveLessonToEmpty,
-    searchQuery,
+    sequences,
   } = usePlannerStore();
 
   const [dropTarget, setDropTarget] = useState<{ week: string; col: number } | null>(null);
@@ -111,12 +111,10 @@ export function WeekRows({ weeks, courses, currentRef }: Props) {
               const isSelected = selection?.week === week.w && selection?.courseId === c.id;
               const isMulti = multiSelection.includes(`${week.w}-${c.id}`);
               const isEditing = editing?.week === week.w && editing?.col === c.col;
-              const seq = getSequenceInfo(c.id, week.w);
+              const seq = getSequenceInfoFromStore(c.id, week.w, sequences);
               const cellHeight = c.les >= 2 ? 36 : 26;
               const isDragOver = dropTarget?.week === week.w && dropTarget?.col === c.col;
               const isDragSrc = dragSource?.week === week.w && dragSource?.col === c.col;
-              const isSearchMatch = searchQuery.length >= 2 && title.toLowerCase().includes(searchQuery.toLowerCase());
-              const isSearchDim = searchQuery.length >= 2 && !isSearchMatch;
 
               return (
                 <td
@@ -158,13 +156,14 @@ export function WeekRows({ weeks, courses, currentRef }: Props) {
                       style={{
                         top: seq.isFirst ? 3 : 0,
                         bottom: seq.isLast ? 3 : 0,
-                        background: '#16a34a',
+                        background: seq.color || '#16a34a',
                         borderRadius: seq.isFirst ? '2px 0 0 0' : seq.isLast ? '0 0 0 2px' : '0',
                       }}
                     />
                   )}
                   {seq?.isFirst && (
-                    <div className="absolute left-1.5 -top-0.5 text-[6px] font-bold text-green-400 z-10 bg-[#0c0f1a] px-0.5 rounded whitespace-nowrap">
+                    <div className="absolute left-1.5 -top-0.5 text-[6px] font-bold z-10 bg-[#0c0f1a] px-0.5 rounded whitespace-nowrap"
+                      style={{ color: seq.color || '#4ade80' }}>
                       {seq.label}
                     </div>
                   )}
@@ -189,10 +188,10 @@ export function WeekRows({ weeks, courses, currentRef }: Props) {
                       className="mx-0.5 ml-1.5 px-1 py-0.5 rounded cursor-grab transition-all duration-100 flex items-center hover:scale-[1.02] hover:shadow-md hover:z-10"
                       style={{
                         minHeight: cellHeight,
-                        opacity: isDragSrc ? 0.35 : isSearchDim ? 0.2 : 1,
-                        background: isSearchMatch ? '#fbbf2440' : isMulti ? '#312e81' : isSelected ? '#1e3a5f' : colors?.bg || '#eef2f7',
-                        border: `1px solid ${isSearchMatch ? '#f59e0b' : isMulti ? '#6366f1' : isSelected ? '#3b82f6' : colors?.border || '#cbd5e1'}`,
-                        boxShadow: isSearchMatch ? '0 0 0 2px #f59e0b50' : isMulti ? '0 0 0 2px #6366f150' : isSelected ? '0 0 0 2px #3b82f650' : 'none',
+                        opacity: isDragSrc ? 0.35 : 1,
+                        background: isMulti ? '#312e81' : isSelected ? '#1e3a5f' : colors?.bg || '#eef2f7',
+                        border: `1px solid ${isMulti ? '#6366f1' : isSelected ? '#3b82f6' : colors?.border || '#cbd5e1'}`,
+                        boxShadow: isMulti ? '0 0 0 2px #6366f150' : isSelected ? '0 0 0 2px #3b82f650' : 'none',
                       }}
                     >
                       {lessonType === 4 && <span className="mr-0.5 text-[8px]">📝</span>}

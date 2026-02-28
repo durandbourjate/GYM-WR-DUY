@@ -7,9 +7,10 @@ import { WeekRows } from './components/WeekRows';
 import { AppHeader, HelpBar, MultiSelectToolbar, Legend } from './components/Toolbar';
 import { DetailPanel } from './components/DetailPanel';
 import { InsertDialog } from './components/InsertDialog';
+import { SequencePanel } from './components/SequencePanel';
 
 function App() {
-  const { filter, selection, weekData, setWeekData } = usePlannerStore();
+  const { filter, selection, weekData, setWeekData, migrateStaticSequences, sequencePanelOpen } = usePlannerStore();
   const curRef = useRef<HTMLTableRowElement>(null);
 
   // Initialize weekData in store on first render
@@ -17,6 +18,11 @@ function App() {
     if (weekData.length === 0) {
       setWeekData(WEEKS.map((w) => ({ ...w, lessons: { ...w.lessons } })));
     }
+  }, []);
+
+  // Migrate static sequences to store on first render
+  useEffect(() => {
+    migrateStaticSequences();
   }, []);
 
   const filterCourses = (semester: 1 | 2) => {
@@ -36,25 +42,12 @@ function App() {
     setTimeout(() => curRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
   }, []);
 
-  // Keyboard shortcuts: Ctrl+Z for undo, Escape to deselect, Ctrl+F for search
+  // Keyboard shortcut: Ctrl+Z for undo
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'z') {
         e.preventDefault();
         usePlannerStore.getState().undo();
-      }
-      if (e.key === 'Escape') {
-        const state = usePlannerStore.getState();
-        if (state.selection) state.setSelection(null);
-        if (state.editing) state.setEditing(null);
-        if (state.multiSelection.length > 0) state.clearMultiSelect();
-        state.setDetailPanelExpanded(false);
-      }
-      if ((e.metaKey || e.ctrlKey) && e.key === 'f') {
-        e.preventDefault();
-        // Focus the search input
-        const searchInput = document.querySelector('input[placeholder*="Suche"]') as HTMLInputElement;
-        if (searchInput) searchInput.focus();
       }
     };
     window.addEventListener('keydown', handler);
@@ -69,28 +62,32 @@ function App() {
       <MultiSelectToolbar />
       <InsertDialog />
 
-      <div className="overflow-x-auto" style={{ paddingBottom: selection ? 80 : 20 }}>
-        {/* Semester 1 */}
-        <table className="border-collapse w-max min-w-full">
-          <SemesterHeader courses={s1Courses} semester={1} />
-          <tbody>
-            <WeekRows weeks={s1Weeks} courses={s1Courses} currentRef={curRef} />
-          </tbody>
-        </table>
+      <div className="flex">
+        <div className={`overflow-x-auto flex-1 ${sequencePanelOpen ? 'mr-[320px]' : ''}`} style={{ paddingBottom: selection ? 80 : 20 }}>
+          {/* Semester 1 */}
+          <table className="border-collapse w-max min-w-full">
+            <SemesterHeader courses={s1Courses} semester={1} />
+            <tbody>
+              <WeekRows weeks={s1Weeks} courses={s1Courses} currentRef={curRef} />
+            </tbody>
+          </table>
 
-        {/* Semester divider */}
-        <div className="py-1.5 px-4 flex items-center gap-2" style={{ background: 'linear-gradient(90deg, #f59e0b20, #f59e0b40, #f59e0b20)' }}>
-          <span className="text-xs font-bold text-amber-500">━━ Semester 2 ━━</span>
-          <span className="text-[9px] text-amber-800">ab KW 07</span>
+          {/* Semester divider */}
+          <div className="py-1.5 px-4 flex items-center gap-2" style={{ background: 'linear-gradient(90deg, #f59e0b20, #f59e0b40, #f59e0b20)' }}>
+            <span className="text-xs font-bold text-amber-500">━━ Semester 2 ━━</span>
+            <span className="text-[9px] text-amber-800">ab KW 07</span>
+          </div>
+
+          {/* Semester 2 */}
+          <table className="border-collapse w-max min-w-full">
+            <SemesterHeader courses={s2Courses} semester={2} />
+            <tbody>
+              <WeekRows weeks={s2Weeks} courses={s2Courses} currentRef={curRef} />
+            </tbody>
+          </table>
         </div>
 
-        {/* Semester 2 */}
-        <table className="border-collapse w-max min-w-full">
-          <SemesterHeader courses={s2Courses} semester={2} />
-          <tbody>
-            <WeekRows weeks={s2Weeks} courses={s2Courses} currentRef={curRef} />
-          </tbody>
-        </table>
+        <SequencePanel />
       </div>
 
       <DetailPanel />

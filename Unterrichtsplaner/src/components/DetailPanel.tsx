@@ -1,9 +1,8 @@
 import { useState, useCallback } from 'react';
 import { usePlannerStore } from '../store/plannerStore';
-import { TYPE_BADGES } from '../utils/colors';
+import { TYPE_BADGES, getSequenceInfoFromStore } from '../utils/colors';
 import { COURSES } from '../data/courses';
 import { WEEKS } from '../data/weeks';
-import { CurriculumGoalPicker } from './CurriculumGoalPicker';
 import type { SubjectArea, TaxonomyLevel, BlockType, LessonDetail } from '../types';
 
 const SUBJECT_AREAS: { key: SubjectArea; label: string; color: string }[] = [
@@ -149,15 +148,8 @@ export function DetailPanel() {
     setInsertDialog, pushLessons, pushUndo,
     lessonDetails, updateLessonDetail,
     detailPanelExpanded, setDetailPanelExpanded,
+    sequences, setSequencePanelOpen, setEditingSequenceId,
   } = usePlannerStore();
-
-  const updateField = useCallback(
-    (field: keyof LessonDetail, value: LessonDetail[keyof LessonDetail]) => {
-      if (!selection) return;
-      updateLessonDetail(selection.week, selection.course.col, { [field]: value });
-    },
-    [selection, updateLessonDetail]
-  );
 
   if (!selection) return null;
 
@@ -166,6 +158,15 @@ export function DetailPanel() {
   const allWeekKeys = WEEKS.map((w) => w.w);
   const detailKey = `${selection.week}-${c.col}`;
   const detail: LessonDetail = lessonDetails[detailKey] || {};
+  const seqInfo = getSequenceInfoFromStore(c.id, selection.week, sequences);
+  const parentSeq = seqInfo ? sequences.find(s => s.id === seqInfo.sequenceId) : null;
+
+  const updateField = useCallback(
+    <K extends keyof LessonDetail>(field: K, value: LessonDetail[K]) => {
+      updateLessonDetail(selection.week, c.col, { [field]: value });
+    },
+    [selection.week, c.col, updateLessonDetail]
+  );
 
   const handleInsertBefore = () => {
     const paired = findPairedCourses(c);
@@ -230,6 +231,24 @@ export function DetailPanel() {
             {detail.topicMain && (
               <span className="text-[8px] px-1 py-px rounded bg-slate-700 text-gray-300 truncate max-w-[200px]">
                 {detail.topicMain}
+              </span>
+            )}
+            {seqInfo && (
+              <span
+                className="text-[8px] px-1 py-px rounded border cursor-pointer hover:opacity-80"
+                style={{
+                  borderColor: seqInfo.color || '#16a34a',
+                  color: seqInfo.color || '#4ade80',
+                }}
+                onClick={() => {
+                  if (parentSeq) {
+                    setSequencePanelOpen(true);
+                    setEditingSequenceId(parentSeq.id);
+                  }
+                }}
+                title={`Sequenz: ${parentSeq?.title} – Klick zum Öffnen`}
+              >
+                ▧ {seqInfo.label} ({seqInfo.index + 1}/{seqInfo.total})
               </span>
             )}
           </div>
@@ -328,10 +347,12 @@ export function DetailPanel() {
               {/* Lehrplanziel */}
               <div>
                 <label className="text-[9px] text-gray-500 font-medium mb-1 block">Lehrplanziel (LP17)</label>
-                <CurriculumGoalPicker
-                  value={detail.curriculumGoal}
-                  onChange={(v) => updateField('curriculumGoal', v)}
-                  subjectArea={detail.subjectArea}
+                <textarea
+                  value={detail.curriculumGoal || ''}
+                  onChange={(e) => updateField('curriculumGoal', e.target.value)}
+                  placeholder="Lehrplanbezug…"
+                  rows={2}
+                  className="w-full bg-slate-700 text-slate-200 border border-slate-600 rounded px-2 py-1 text-[10px] outline-none focus:border-blue-400 resize-y"
                 />
               </div>
 

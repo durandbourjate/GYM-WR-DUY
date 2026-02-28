@@ -31,17 +31,37 @@ export interface Week {
   lessons: Record<number, LessonEntry>; // col -> entry
 }
 
+export interface SequenceBlock {
+  weeks: string[];
+  label: string;
+}
+
+/** Legacy static format (for migration) */
 export interface Sequence {
   weeks: string[];
   label: string;
 }
 
+/** Managed sequence with CRUD capabilities */
+export interface ManagedSequence {
+  id: string;
+  courseId: string;
+  title: string;
+  subjectArea?: SubjectArea;
+  blocks: SequenceBlock[];
+  color?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface SequenceInfo {
+  sequenceId: string;
   label: string;
   index: number;
   total: number;
   isFirst: boolean;
   isLast: boolean;
+  color?: string;
 }
 
 export type FilterType = 'ALL' | CourseType;
