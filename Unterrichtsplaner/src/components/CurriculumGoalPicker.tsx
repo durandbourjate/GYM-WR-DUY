@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useLayoutEffect } from 'react';
 import { CURRICULUM_GOALS, searchGoals } from '../data/curriculumGoals';
 import type { CurriculumGoal } from '../data/curriculumGoals';
 import type { SubjectArea } from '../types';
@@ -21,13 +21,31 @@ export function CurriculumGoalPicker({ value, onChange, subjectArea }: Curriculu
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [cycleFilter, setCycleFilter] = useState<1 | 2 | null>(null);
+  const [dropdownPos, setDropdownPos] = useState<{ top: number; left: number; width: number } | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Position dropdown above trigger using fixed positioning
+  useLayoutEffect(() => {
+    if (open && triggerRef.current) {
+      const rect = triggerRef.current.getBoundingClientRect();
+      setDropdownPos({
+        top: rect.top - 4, // 4px gap above trigger
+        left: rect.left,
+        width: rect.width,
+      });
+    }
+  }, [open]);
 
   // Close on outside click
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+      const target = e.target as Node;
+      if (
+        dropdownRef.current && !dropdownRef.current.contains(target) &&
+        triggerRef.current && !triggerRef.current.contains(target)
+      ) {
         setOpen(false);
       }
     };
@@ -68,9 +86,10 @@ export function CurriculumGoalPicker({ value, onChange, subjectArea }: Curriculu
   };
 
   return (
-    <div ref={dropdownRef} className="relative">
+    <div className="relative">
       {/* Display / trigger area */}
       <div
+        ref={triggerRef}
         className="w-full bg-slate-700 text-slate-200 border border-slate-600 rounded px-2 py-1 text-[10px] cursor-pointer hover:border-blue-400 transition-colors min-h-[28px] flex items-start gap-1"
         onClick={() => { setOpen(!open); setTimeout(() => inputRef.current?.focus(), 50); }}
       >
@@ -91,8 +110,16 @@ export function CurriculumGoalPicker({ value, onChange, subjectArea }: Curriculu
       </div>
 
       {/* Dropdown */}
-      {open && (
-        <div className="absolute bottom-full left-0 right-0 mb-1 bg-slate-800 border border-slate-600 rounded shadow-xl z-[100] max-h-[300px] flex flex-col">
+      {open && dropdownPos && (
+        <div
+          ref={dropdownRef}
+          className="fixed bg-slate-800 border border-slate-600 rounded shadow-xl z-[200] max-h-[300px] flex flex-col"
+          style={{
+            bottom: `${window.innerHeight - dropdownPos.top}px`,
+            left: `${dropdownPos.left}px`,
+            width: `${dropdownPos.width}px`,
+          }}
+        >
           {/* Search + filters */}
           <div className="p-1.5 border-b border-slate-700 space-y-1">
             <input

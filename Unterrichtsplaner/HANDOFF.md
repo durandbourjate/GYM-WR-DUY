@@ -38,6 +38,8 @@ Das React/Vite-Projekt ist **voll funktionsfähig** und läuft lokal. Phase 0 + 
 | Batch-Operationen (Shift/Insert für Multi-Select) | ✅ fertig | plannerStore.ts |
 | Export/Import (JSON) | ✅ fertig | plannerStore.ts |
 | **💾 Daten-Menü UI (Export/Import/Reset)** | ✅ fertig | Toolbar.tsx (DataMenu) |
+| **🎯 CurriculumGoalPicker (LP17-Suche)** | ✅ fertig | CurriculumGoalPicker.tsx, DetailPanel.tsx |
+| **📊 StatsPanel (Statistik-Modal)** | ✅ fertig | StatsPanel.tsx, Toolbar.tsx |
 | Lehrplanziel-Picker | ✅ fertig | CurriculumGoalPicker.tsx, curriculumGoals.ts |
 | Statistik-Panel | ✅ fertig | StatsPanel.tsx |
 | Drag & Drop (Swap/Move) | ✅ fertig | WeekRows.tsx, plannerStore.ts |
@@ -168,9 +170,9 @@ Der gemergte Stand ist in der Arbeitskopie und wird ins Git-Repo synchronisiert.
 4. **PWA** – Service Worker, Offline-Cache, Install-Prompt
 5. **Sequenz Auto-Platzierung** – Template aus Bibliothek in Kurs-Timeline einfügen
 
-Alternativ (falls Supabase noch nicht nötig):
-- **UI-Polish**: CurriculumGoalPicker und StatsPanel in die App integrieren (sie existieren als Dateien, sind aber ggf. noch nicht in App.tsx eingebunden)
+Alternativ:
 - **Sequenz-Verfeinerung**: Drag & Drop für Block-Reihenfolge im Panel, Week-Picker per Klick auf Zellen
+- **Sequenz Auto-Platzierung**: Sequenz aus Bibliothek automatisch in verfügbare Wochen einsetzen
 
 ---
 
@@ -193,3 +195,4 @@ Das vollständige Konzept (v3) mit allen Entitäten, Phasen und Architektur-Ents
 | v6 | Phase 2: Sequenz-CRUD, SequencePanel, ManagedSequence-Types, Store-basierte Sequenz-Balken | Arbeitskopie |
 | v7 | Merge beider Stränge, HANDOFF v2.0 aktualisiert, Git-Push | claude.ai Chat 28.02.2026 |
 | v8 | Supabase evaluiert → zurückgestellt; Daten-Menü UI (Export/Import/Reset) gebaut | claude.ai Chat 28.02.2026 |
+| v9 | CurriculumGoalPicker ins DetailPanel integriert (fixed positioning), StatsPanel als Modal über 📊 Button, Hook-Order-Bug gefixt | claude.ai Chat 28.02.2026 |

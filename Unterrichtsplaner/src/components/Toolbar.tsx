@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { usePlannerStore } from '../store/plannerStore';
+import { StatsPanel } from './StatsPanel';
 import type { FilterType } from '../types';
 
 const FILTERS: { key: FilterType; label: string }[] = [
@@ -122,6 +123,7 @@ function DataMenu() {
 
 export function AppHeader() {
   const { filter, setFilter, showHelp, toggleHelp, undoStack, undo, sequencePanelOpen, setSequencePanelOpen } = usePlannerStore();
+  const [showStats, setShowStats] = useState(false);
 
   return (
     <div className="bg-gray-900 border-b border-gray-800 px-4 py-2 sticky top-0 z-[60] flex items-center justify-between flex-wrap gap-2">
@@ -156,6 +158,14 @@ export function AppHeader() {
           </button>
         )}
         <DataMenu />
+        <button
+          onClick={() => setShowStats(true)}
+          className="px-2 py-0.5 rounded text-[10px] border border-gray-700 text-gray-500 cursor-pointer hover:text-gray-300 hover:border-gray-500"
+          title="Statistik"
+        >
+          📊
+        </button>
+        {showStats && <StatsPanel onClose={() => setShowStats(false)} />}
         <button
           onClick={toggleHelp}
           className={`px-2 py-0.5 rounded text-[10px] border cursor-pointer ${
