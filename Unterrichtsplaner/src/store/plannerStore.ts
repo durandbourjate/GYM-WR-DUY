@@ -227,10 +227,12 @@ export const usePlannerStore = create<PlannerState>()(
     const now = new Date().toISOString();
     const migrated: ManagedSequence[] = [];
     for (const [courseId, seqBlocks] of Object.entries(STATIC_SEQUENCES)) {
+      const course = COURSES.find(c => c.id === courseId);
+      const courseLabel = course ? `${course.cls} ${course.typ} ${course.day}` : courseId;
       migrated.push({
         id: `seq-${courseId}-${Date.now()}`,
         courseId,
-        title: `Sequenzen ${courseId}`,
+        title: `Sequenzen ${courseLabel}`,
         blocks: seqBlocks.map(b => ({ weeks: [...b.weeks], label: b.label })),
         createdAt: now,
         updatedAt: now,

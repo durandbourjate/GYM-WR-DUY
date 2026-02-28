@@ -44,9 +44,9 @@ function computeStats(weekData: Week[]): CourseStats[] {
 
 const TYPE_LABELS: Record<number, { label: string; color: string }> = {
   0: { label: 'Andere', color: '#94a3b8' },
-  1: { label: 'BWL', color: '#3b82f6' },
-  2: { label: 'Recht/VWL', color: '#22c55e' },
-  3: { label: 'IN', color: '#0ea5e9' },
+  1: { label: 'BWL', color: '#3b82f6' },      // blau (LearningView)
+  2: { label: 'VWL', color: '#f97316' },       // orange (LearningView) — legacy: was Recht/VWL
+  3: { label: 'IN', color: '#6b7280' },        // grau
   4: { label: 'Prüfung', color: '#ef4444' },
   5: { label: 'Event', color: '#eab308' },
   6: { label: 'Ferien', color: '#d4d4d8' },

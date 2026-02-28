@@ -2,12 +2,21 @@ import type { LessonType, SequenceInfo, CourseType, ManagedSequence } from '../t
 
 export const LESSON_COLORS: Record<LessonType, { bg: string; fg: string; border: string }> = {
   0: { bg: '#eef2f7', fg: '#475569', border: '#cbd5e1' },
-  1: { bg: '#dbeafe', fg: '#1e40af', border: '#93c5fd' }, // BWL
-  2: { bg: '#dcfce7', fg: '#166534', border: '#86efac' }, // Recht/VWL
-  3: { bg: '#e0f2fe', fg: '#0369a1', border: '#7dd3fc' }, // IN
+  1: { bg: '#dbeafe', fg: '#1e40af', border: '#93c5fd' }, // BWL (blau)
+  2: { bg: '#fff7ed', fg: '#9a3412', border: '#fdba74' }, // VWL (orange) — legacy: was Recht/VWL combined
+  3: { bg: '#f3f4f6', fg: '#4b5563', border: '#d1d5db' }, // IN (grau)
   4: { bg: '#fee2e2', fg: '#991b1b', border: '#fca5a5' }, // Exam
   5: { bg: '#fef9c3', fg: '#854d0e', border: '#fde68a' }, // Event
   6: { bg: '#ffffff', fg: '#a1a1aa', border: '#e4e4e7' }, // Holiday
+};
+
+// SubjectArea-based colors matching LearningView: VWL=orange, BWL=blau, Recht=grün, IN=grau
+export const SUBJECT_AREA_COLORS: Record<string, { bg: string; fg: string; border: string }> = {
+  VWL:      { bg: '#fff7ed', fg: '#9a3412', border: '#fdba74' },
+  BWL:      { bg: '#dbeafe', fg: '#1e40af', border: '#93c5fd' },
+  RECHT:    { bg: '#dcfce7', fg: '#166534', border: '#86efac' },
+  IN:       { bg: '#f3f4f6', fg: '#4b5563', border: '#d1d5db' },
+  INTERDISZ:{ bg: '#f5f3ff', fg: '#5b21b6', border: '#c4b5fd' },
 };
 
 export const DAY_COLORS: Record<string, string> = {

@@ -1,6 +1,6 @@
 import { useCallback, useState, useRef, useEffect } from 'react';
 import type { Course, Week } from '../types';
-import { LESSON_COLORS, DAY_COLORS, getSequenceInfoFromStore, isPastWeek } from '../utils/colors';
+import { LESSON_COLORS, SUBJECT_AREA_COLORS, DAY_COLORS, getSequenceInfoFromStore, isPastWeek } from '../utils/colors';
 import { CURRENT_WEEK } from '../data/weeks';
 import { usePlannerStore } from '../store/plannerStore';
 import { getHKGroup } from '../utils/hkRotation';
@@ -258,6 +258,10 @@ export function WeekRows({ weeks, courses, currentRef }: Props) {
               const title = entry?.title || '';
               const lessonType = entry?.type ?? -1;
               const colors = lessonType >= 0 ? LESSON_COLORS[lessonType as keyof typeof LESSON_COLORS] : null;
+              // Use SubjectArea color if available (more precise than LessonType)
+              const effectiveSubjectArea = cellDetail?.subjectArea || parentBlock?.subjectArea;
+              const saColors = effectiveSubjectArea ? SUBJECT_AREA_COLORS[effectiveSubjectArea] : null;
+              const cellColors = saColors || colors;
               const isSelected = selection?.week === week.w && selection?.courseId === c.id;
               const isMulti = multiSelection.includes(`${week.w}-${c.id}`);
               const isEditing = editing?.week === week.w && editing?.col === c.col;
@@ -454,8 +458,8 @@ export function WeekRows({ weeks, courses, currentRef }: Props) {
                       style={{
                         minHeight: isFixed ? Math.max(cellHeight, 32) : cellHeight,
                         opacity: isDragSrc ? 0.35 : isSeqDimmed ? 0.3 : isSearchDimmed ? 0.2 : 1,
-                        background: isInEditingSeq ? '#1e3a5f' : isMulti ? '#312e81' : isSelected ? '#1e3a5f' : colors?.bg || '#eef2f7',
-                        border: `1px solid ${isInEditingSeq ? '#60a5fa' : isMulti ? '#6366f1' : isSelected ? '#3b82f6' : colors?.border || '#cbd5e1'}`,
+                        background: isInEditingSeq ? '#1e3a5f' : isMulti ? '#312e81' : isSelected ? '#1e3a5f' : cellColors?.bg || '#eef2f7',
+                        border: `1px solid ${isInEditingSeq ? '#60a5fa' : isMulti ? '#6366f1' : isSelected ? '#3b82f6' : cellColors?.border || '#cbd5e1'}`,
                         boxShadow: isInEditingSeq ? '0 0 0 2px #3b82f640' : isMulti ? '0 0 0 2px #6366f150' : isSelected ? '0 0 0 2px #3b82f650' : 'none',
                       }}
                     >
@@ -466,7 +470,7 @@ export function WeekRows({ weeks, courses, currentRef }: Props) {
                         style={{
                           fontSize: c.les >= 2 ? 9 : 8,
                           fontWeight: lessonType === 4 || isFixed ? 700 : 500,
-                          color: isInEditingSeq ? '#93c5fd' : isMulti ? '#c7d2fe' : isSelected ? '#e2e8f0' : colors?.fg || '#475569',
+                          color: isInEditingSeq ? '#93c5fd' : isMulti ? '#c7d2fe' : isSelected ? '#e2e8f0' : cellColors?.fg || '#475569',
                           display: '-webkit-box',
                           WebkitLineClamp: c.les >= 2 ? 3 : 2,
                           WebkitBoxOrient: 'vertical',

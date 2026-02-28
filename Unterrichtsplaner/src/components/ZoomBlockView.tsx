@@ -7,7 +7,7 @@ const SUBJECT_COLORS: Record<string, { bg: string; fg: string; border: string }>
   BWL: { bg: '#1e3a5f', fg: '#93c5fd', border: '#3b82f6' },
   VWL: { bg: '#3b1f0b', fg: '#fdba74', border: '#f97316' },
   RECHT: { bg: '#052e16', fg: '#86efac', border: '#22c55e' },
-  IN: { bg: '#083344', fg: '#67e8f9', border: '#06b6d4' },
+  IN: { bg: '#1f2937', fg: '#9ca3af', border: '#6b7280' },
   INTERDISZ: { bg: '#2e1065', fg: '#c4b5fd', border: '#a855f7' },
 };
 
