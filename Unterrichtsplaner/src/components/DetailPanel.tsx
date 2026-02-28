@@ -118,7 +118,9 @@ function DetailsTab() {
   // Block inheritance: find parent block for this week and merge as defaults
   const parentBlock = selection && c ? (() => {
     for (const seq of sequences) {
-      if (seq.courseId !== c.id) continue;
+      const matchesCourse = seq.courseId === c.id ||
+        (seq.courseIds && seq.courseIds.includes(c.id));
+      if (!matchesCourse) continue;
       for (const block of seq.blocks) {
         if (block.weeks.includes(selection.week)) return block;
       }

@@ -283,6 +283,49 @@ function SequenceCard({ seq }: { seq: ManagedSequence }) {
             )}
           </div>
 
+          {/* Multi-Tag linking */}
+          {(() => {
+            const linked = getLinkedCourseIds(seq.courseId);
+            if (linked.length <= 1) return null;
+            const isMultiDay = seq.courseIds && seq.courseIds.length > 1;
+            const linkedCoursesInfo = linked.map(cid => COURSES.find(c => c.id === cid)).filter(Boolean);
+            return (
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="text-[8px] text-gray-500">Multi-Tag:</span>
+                {!isMultiDay ? (
+                  <button
+                    onClick={() => updateSequence(seq.id, { courseIds: linked, multiDayMode: 'alternating' })}
+                    className="text-[8px] px-1.5 py-0.5 rounded bg-blue-900/50 text-blue-300 border border-blue-700 cursor-pointer hover:bg-blue-800/50"
+                  >
+                    ⊞ {linkedCoursesInfo.map(c => c!.day).join('+')} verknüpfen
+                  </button>
+                ) : (
+                  <>
+                    <button
+                      onClick={() => updateSequence(seq.id, { multiDayMode: 'alternating' })}
+                      className={`text-[8px] px-1.5 py-0.5 rounded cursor-pointer ${seq.multiDayMode === 'alternating' ? 'bg-blue-600 text-white' : 'bg-slate-700 text-gray-400 hover:bg-slate-600'}`}
+                    >
+                      Di↔Do
+                    </button>
+                    <button
+                      onClick={() => updateSequence(seq.id, { multiDayMode: 'separate' })}
+                      className={`text-[8px] px-1.5 py-0.5 rounded cursor-pointer ${seq.multiDayMode === 'separate' ? 'bg-blue-600 text-white' : 'bg-slate-700 text-gray-400 hover:bg-slate-600'}`}
+                    >
+                      Di|Do
+                    </button>
+                    <button
+                      onClick={() => updateSequence(seq.id, { courseIds: [seq.courseId], multiDayMode: undefined })}
+                      className="text-[8px] px-1 py-0.5 rounded bg-slate-700 text-red-400 cursor-pointer hover:bg-red-900/30"
+                      title="Multi-Tag aufheben"
+                    >
+                      ✕
+                    </button>
+                  </>
+                )}
+              </div>
+            );
+          })()}
+
           {/* Subject area + color */}
           <div className="flex gap-1 flex-wrap">
             {SUBJECT_AREAS.map((sa) => (

@@ -52,7 +52,9 @@ export function ZoomBlockView({ semester }: Props) {
         {courses.map(course => {
           const badge = TYPE_BADGES[course.typ];
           // Find sequences for this course
-          const courseSeqs = sequences.filter(s => s.courseId === course.id);
+          const courseSeqs = sequences.filter(s =>
+            s.courseId === course.id || (s.courseIds && s.courseIds.includes(course.id))
+          );
           
           // Build block segments: sequences + unsequenced lessons
           type Segment = {

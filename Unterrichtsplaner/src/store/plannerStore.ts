@@ -314,13 +314,17 @@ export const usePlannerStore = create<PlannerState>()(
   // Auto-placement: find free weeks for a course
   getAvailableWeeks: (courseId, startWeek, allWeekOrder) => {
     const state = get();
-    const seq = state.sequences.find(s => s.courseId === courseId);
-    if (!seq) return [];
-    // We need the col - find it from COURSES imported indirectly through weekData
-    // Actually we work with courseId which maps to col via COURSES
-    // For now, we need to extract col from the courseId (e.g. "c17" -> col 17)
-    const col = parseInt(courseId.replace('c', ''));
-    if (isNaN(col)) return [];
+    // Find sequence that matches this courseId (or has it in courseIds)
+    const seq = state.sequences.find(s =>
+      s.courseId === courseId || (s.courseIds && s.courseIds.includes(courseId))
+    );
+    // Get all cols to check: if multi-day, all linked cols must be free
+    const allCourseIds = seq?.courseIds && seq.courseIds.length > 1 ? seq.courseIds : [courseId];
+    const cols = allCourseIds.map(cid => {
+      const course = COURSES.find(c => c.id === cid);
+      return course ? course.col : parseInt(cid.replace('c', ''));
+    }).filter(c => !isNaN(c));
+    if (cols.length === 0) return [];
     
     const startIdx = allWeekOrder.indexOf(startWeek);
     if (startIdx < 0) return [];
@@ -330,9 +334,9 @@ export const usePlannerStore = create<PlannerState>()(
       const weekW = allWeekOrder[i];
       const week = state.weekData.find(w => w.w === weekW);
       if (!week) { available.push(weekW); continue; }
-      const lesson = week.lessons[col];
-      // Free = no lesson, or type 0 (other) with empty-ish title
-      if (!lesson) {
+      // Week is available only if ALL linked cols are free
+      const allFree = cols.every(col => !week.lessons[col]);
+      if (allFree) {
         available.push(weekW);
       }
       // Skip: holidays (6), events (5), exams (4), and occupied lessons (1,2,3)
@@ -347,7 +351,10 @@ export const usePlannerStore = create<PlannerState>()(
     
     // Get all columns to place into (multi-course support)
     const allCourseIds = seq.courseIds && seq.courseIds.length > 0 ? seq.courseIds : [seq.courseId];
-    const cols = allCourseIds.map(cid => parseInt(cid.replace('c', ''))).filter(c => !isNaN(c));
+    const cols = allCourseIds.map(cid => {
+      const course = COURSES.find(c => c.id === cid);
+      return course ? course.col : parseInt(cid.replace('c', ''));
+    }).filter(c => !isNaN(c));
     if (cols.length === 0) return { placed: 0, skipped: [] };
     
     const primaryCol = cols[0];
@@ -490,7 +497,7 @@ export const usePlannerStore = create<PlannerState>()(
     // Update sequences: swap weekA↔weekB in blocks belonging to courses with this col
     const courseId = COURSES.find(c => c.col === col)?.id;
     const updatedSeqs = state.sequences.map(seq => {
-      if (courseId && seq.courseId !== courseId) return seq;
+      if (courseId && seq.courseId !== courseId && !(seq.courseIds && seq.courseIds.includes(courseId))) return seq;
       let changed = false;
       const newBlocks = seq.blocks.map(b => {
         const hasA = b.weeks.includes(weekA);
@@ -534,7 +541,7 @@ export const usePlannerStore = create<PlannerState>()(
     // Update sequences: replace fromWeek→toWeek in blocks
     const courseId = COURSES.find(c => c.col === col)?.id;
     const updatedSeqs = state.sequences.map(seq => {
-      if (courseId && seq.courseId !== courseId) return seq;
+      if (courseId && seq.courseId !== courseId && !(seq.courseIds && seq.courseIds.includes(courseId))) return seq;
       let changed = false;
       const newBlocks = seq.blocks.map(b => {
         if (!b.weeks.includes(fromWeek)) return b;
@@ -715,7 +722,7 @@ export const usePlannerStore = create<PlannerState>()(
     // Update sequences: remap weeks for blocks in this column
     const courseId = COURSES.find(c => c.col === col)?.id;
     const updatedSeqs = state.sequences.map(seq => {
-      if (courseId && seq.courseId !== courseId) return seq;
+      if (courseId && seq.courseId !== courseId && !(seq.courseIds && seq.courseIds.includes(courseId))) return seq;
       // Rebuild week mapping based on new positions
       let changed = false;
       const newBlocks = seq.blocks.map(b => {
