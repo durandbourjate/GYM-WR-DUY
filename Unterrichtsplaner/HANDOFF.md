@@ -1,6 +1,6 @@
 # Unterrichtsplaner — HANDOFF
 
-## Aktueller Stand: v2.2 (28.02.2026)
+## Aktueller Stand: v2.3 (28.02.2026)
 
 ### Architektur
 - React + TypeScript + Vite + Zustand (persist)
@@ -19,6 +19,8 @@
 - 1fca857: Multi-Select Batch-Buttons verdrahtet (Phase 2 komplett)
 - 5aa1df4: HANDOFF.md aktualisiert
 - 46407d5: Phase 4 Auto-Suggest + Zoom 1 Multi-Year View
+- 4fdd6d0: HANDOFF.md aktualisiert — v2.2
+- 3810916: Stats-Dashboard Prüfungskollisionen, Suche, Print-CSS
 
 ### Implementierte Features (komplett)
 
@@ -73,7 +75,12 @@
   - Farbcodierung BWL/VWL/Recht konsistent
 
 ### Noch offen / Ideen
-- [ ] Stats-Dashboard: Prüfungskollisionen erkennen
-- [ ] Suche über alle Kacheln/Sequenzen
-- [ ] Print-CSS für Semesterplan-Export
 - [ ] 12/13 Sequences Support (>11 Blöcke)
+- [x] Stats-Dashboard: Prüfungskollisionen erkennen (v2.3)
+- [x] Suche über alle Kacheln/Sequenzen (v2.3)
+- [x] Print-CSS für Semesterplan-Export (v2.3)
+
+### v2.3 Features (Commit 3810916)
+- **Stats-Dashboard Prüfungskollisionen**: parseClassGroups zerlegt Klassenstrings (z.B. "28bc29fs" → ['28b','28c','29f','29s']), findExamCollisions erkennt Wochen mit überlappenden Prüfungen
+- **Suche**: Live-Suchfeld in Toolbar, filtert Kacheln/Sequenzen in Zoom 3 und Zoom 2, Highlighting (gelber Outline) + Dimming nicht-matchender Kacheln
+- **Print-CSS**: @media print Stylesheet, no-print Klassen auf Toolbar/HelpBar, druckbare Semesterplan-Ansicht
