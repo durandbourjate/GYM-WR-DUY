@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { FilterType, Week, LessonEntry, Course, LessonDetail, ManagedSequence, SequenceBlock } from '../types';
+import type { FilterType, Week, LessonEntry, Course, LessonDetail, ManagedSequence, SequenceBlock, HKGroup, TaFPhase } from '../types';
 import { SEQUENCES as STATIC_SEQUENCES } from '../data/sequences';
 
 interface Selection {
@@ -78,6 +78,17 @@ interface PlannerState {
   // Export / Import
   exportData: () => string;
   importData: (json: string) => boolean;
+  // HK Rotation
+  hkOverrides: Record<string, HKGroup>; // key: "weekW-col" -> 'A' | 'B'
+  hkStartGroups: Record<number, HKGroup>; // col -> start group
+  setHKOverride: (weekW: string, col: number, group: HKGroup | null) => void;
+  setHKStartGroup: (col: number, group: HKGroup) => void;
+  // TaF Phasen
+  tafPhases: TaFPhase[];
+  addTaFPhase: (phase: Omit<TaFPhase, 'id'>) => string;
+  updateTaFPhase: (id: string, updates: Partial<TaFPhase>) => void;
+  deleteTaFPhase: (id: string) => void;
+  // Undo
   undoStack: Week[][];
   pushUndo: () => void;
   undo: () => void;
@@ -303,15 +314,53 @@ export const usePlannerStore = create<PlannerState>()(
   editingSequenceId: null,
   setEditingSequenceId: (id) => set({ editingSequenceId: id }),
 
+  // HK Rotation
+  hkOverrides: {},
+  hkStartGroups: {},
+  setHKOverride: (weekW, col, group) =>
+    set((state) => {
+      const key = `${weekW}-${col}`;
+      const next = { ...state.hkOverrides };
+      if (group === null) {
+        delete next[key];
+      } else {
+        next[key] = group;
+      }
+      return { hkOverrides: next };
+    }),
+  setHKStartGroup: (col, group) =>
+    set((state) => ({
+      hkStartGroups: { ...state.hkStartGroups, [col]: group },
+    })),
+
+  // TaF Phasen
+  tafPhases: [],
+  addTaFPhase: (phase) => {
+    const id = `taf-${Date.now()}-${Math.random().toString(36).slice(2, 5)}`;
+    set((state) => ({ tafPhases: [...state.tafPhases, { ...phase, id }] }));
+    return id;
+  },
+  updateTaFPhase: (id, updates) =>
+    set((state) => ({
+      tafPhases: state.tafPhases.map((p) => (p.id === id ? { ...p, ...updates } : p)),
+    })),
+  deleteTaFPhase: (id) =>
+    set((state) => ({
+      tafPhases: state.tafPhases.filter((p) => p.id !== id),
+    })),
+
   // Export / Import
   exportData: () => {
     const state = get();
     return JSON.stringify({
-      version: '2.0',
+      version: '3.0',
       exportedAt: new Date().toISOString(),
       weekData: state.weekData,
       lessonDetails: state.lessonDetails,
       sequences: state.sequences,
+      hkOverrides: state.hkOverrides,
+      hkStartGroups: state.hkStartGroups,
+      tafPhases: state.tafPhases,
     }, null, 2);
   },
   importData: (json: string) => {
@@ -324,6 +373,9 @@ export const usePlannerStore = create<PlannerState>()(
         weekData: data.weekData,
         lessonDetails: data.lessonDetails || {},
         sequences: data.sequences || state.sequences,
+        hkOverrides: data.hkOverrides || {},
+        hkStartGroups: data.hkStartGroups || {},
+        tafPhases: data.tafPhases || [],
       });
       return true;
     } catch {
@@ -473,6 +525,9 @@ export const usePlannerStore = create<PlannerState>()(
         lessonDetails: state.lessonDetails,
         sequences: state.sequences,
         sequencesMigrated: state.sequencesMigrated,
+        hkOverrides: state.hkOverrides,
+        hkStartGroups: state.hkStartGroups,
+        tafPhases: state.tafPhases,
       }),
       migrate: (persisted: unknown, version: number) => {
         if (version < 2) {

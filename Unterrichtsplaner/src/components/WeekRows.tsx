@@ -3,6 +3,7 @@ import type { Course, Week } from '../types';
 import { LESSON_COLORS, DAY_COLORS, getSequenceInfoFromStore, isPastWeek } from '../utils/colors';
 import { CURRENT_WEEK } from '../data/weeks';
 import { usePlannerStore } from '../store/plannerStore';
+import { getHKGroup } from '../utils/hkRotation';
 
 interface Props {
   weeks: Week[];
@@ -38,6 +39,8 @@ export function WeekRows({ weeks, courses, currentRef }: Props) {
     weekData, updateLesson,
     dragSource, setDragSource, swapLessons, moveLessonToEmpty,
     sequences,
+    hkOverrides, hkStartGroups, setHKOverride,
+    tafPhases,
   } = usePlannerStore();
 
   const [dropTarget, setDropTarget] = useState<{ week: string; col: number } | null>(null);
@@ -115,6 +118,15 @@ export function WeekRows({ weeks, courses, currentRef }: Props) {
               const cellHeight = c.les >= 2 ? 36 : 26;
               const isDragOver = dropTarget?.week === week.w && dropTarget?.col === c.col;
               const isDragSrc = dragSource?.week === week.w && dragSource?.col === c.col;
+              const hkGroup = c.hk ? getHKGroup(week.w, c.col, hkStartGroups[c.col] || 'A', hkOverrides) : null;
+              // TaF: check if this week is in any TaF phase
+              const tafPhase = tafPhases.find(p => {
+                const allW = weeks.map(w => w.w);
+                const si = allW.indexOf(p.startWeek);
+                const ei = allW.indexOf(p.endWeek);
+                const wi = allW.indexOf(week.w);
+                return si >= 0 && ei >= 0 && wi >= si && wi <= ei;
+              });
 
               return (
                 <td
@@ -166,6 +178,33 @@ export function WeekRows({ weeks, courses, currentRef }: Props) {
                       style={{ color: seq.color || '#4ade80' }}>
                       {seq.label}
                     </div>
+                  )}
+
+                  {/* HK Rotation Badge */}
+                  {hkGroup && title && (
+                    <div
+                      className="absolute right-0.5 top-0 text-[7px] font-bold z-10 px-1 py-px rounded-bl cursor-pointer select-none"
+                      style={{
+                        background: hkGroup === 'A' ? '#7c3aed40' : '#0ea5e940',
+                        color: hkGroup === 'A' ? '#a78bfa' : '#67e8f9',
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setHKOverride(week.w, c.col, hkGroup === 'A' ? 'B' : 'A');
+                      }}
+                      title={`HK ${hkGroup} – Klick zum Wechseln`}
+                    >
+                      {hkGroup}
+                    </div>
+                  )}
+
+                  {/* TaF Phase indicator */}
+                  {tafPhase && ci === 0 && (
+                    <div
+                      className="absolute left-0 top-0 bottom-0 w-[2px]"
+                      style={{ background: tafPhase.color }}
+                      title={tafPhase.name}
+                    />
                   )}
 
                   {isEditing ? (

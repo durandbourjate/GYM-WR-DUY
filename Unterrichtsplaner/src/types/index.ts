@@ -94,3 +94,18 @@ export interface LessonDetail {
   materialLinks?: string[];
   notes?: string;
 }
+
+// HK Rotation
+export type HKGroup = 'A' | 'B';
+
+// TaF Phasenmodell
+export interface TaFPhase {
+  id: string;
+  name: string;           // z.B. "Phase 1", "Trainingsphase"
+  startWeek: string;      // KW
+  endWeek: string;        // KW
+  color: string;          // Phasenfarbe
+  absentClasses: string[];  // Klassen die in dieser Phase abwesend sind
+  presentClasses: string[]; // Klassen die anwesend sind
+  notes?: string;
+}
