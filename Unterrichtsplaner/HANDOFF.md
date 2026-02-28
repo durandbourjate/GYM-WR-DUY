@@ -1,13 +1,13 @@
 # Unterrichtsplaner — HANDOFF
 
-## Aktueller Stand: v2.1 (28.02.2026)
+## Aktueller Stand: v2.2 (28.02.2026)
 
 ### Architektur
 - React + TypeScript + Vite + Zustand (persist)
 - Deployed auf GitHub Pages
 - Pfad: `10 Github/GYM-WR-DUY/Unterrichtsplaner/`
 
-### Commits v2.0–2.1 Session
+### Commits v2.0–2.2 Session
 - 4eabeda: Side-Panel, Hover-Preview, Seq-Hervorhebung, feste Kacheln
 - 58f4128: Auto-Farbe bei Sequenz-Erstellung, Import blockType, Kurs-Labels
 - 04030e3: Klassenfilter, Push überspringt Ferien
@@ -17,6 +17,8 @@
 - 0c68ed0: Zoom-Level 2 Block-Ansicht, Zoom-Toolbar, Keyboard-Shortcuts 1/2/3
 - 0384576: Klick auf Block in Zoom 2 → Zoom 3 mit Scroll + Sequenz-Panel
 - 1fca857: Multi-Select Batch-Buttons verdrahtet (Phase 2 komplett)
+- 5aa1df4: HANDOFF.md aktualisiert
+- 46407d5: Phase 4 Auto-Suggest + Zoom 1 Multi-Year View
 
 ### Implementierte Features (komplett)
 
@@ -39,7 +41,7 @@
 - Typ-Badge klickbar → Typ-Filter
 - Batch-Buttons verdrahtet: ↓ Verschieben (+1) und ⊞ Einfügen davor
 
-**Phase 3 — Ferien, Fixierung, Vererbung (grösstenteils ✅)**
+**Phase 3 — Ferien, Fixierung, Vererbung ✅**
 - Ferien/Events (Type 5+6): nicht draggable, Icons, grössere Kacheln
 - Push überspringt fixierte Zellen
 - Drop auf fixierte Zellen blockiert
@@ -47,25 +49,31 @@
 - Vererbung: Block-Werte als Defaults für Kacheln (Detail-Panel + Grid-Titel)
 - Sequenzmarkierung bewegt sich mit Kacheln bei Drag&Drop (swap + move)
 
-**Phase 5 — Zoom (teilweise ✅)**
+**Phase 4 — Automation ✅**
+- Auto-suggest Lehrplanziele: fuzzy-match topicMain gegen CURRICULUM_GOALS
+  mit score-basiertem Ranking, Fachbereich-Boost, klickbare Vorschläge
+- Auto-suggest Taxonomiestufe: BlockType→K-Level Mapping (INTRO→K1, LESSON→K2, etc.)
+- Suggestion-Chips im DetailPanel unter Thema/Taxonomie Feldern
+
+**Phase 5 — Zoom ✅**
 - Zoom-Level Store (zoomLevel: 1|2|3, Default=3)
 - Toolbar: 3-stufiger Zoom-Schalter (◫ ▧ ▦)
 - Keyboard-Shortcuts: 1/2/3 zum Umschalten (ohne Modifier, nicht in Inputs)
-- Zoom 3 (nah) = Wochen-Ansicht (bisherige Ansicht) ✅
-- Zoom 2 (mittel) = Block-Ansicht (ZoomBlockView) ✅
+- Zoom 3 (nah) = Wochen-Ansicht (bisherige Ansicht)
+- Zoom 2 (mittel) = Block-Ansicht (ZoomBlockView)
   - Farbige Timeline-Balken pro Kurs, geordnet nach Sequenz-Blöcken
   - Fachfarben: BWL=blau, VWL=orange, Recht=grün, IN=cyan, Interdisz=violett
   - Wochen-Skala oben, Hover-Tooltips mit Block-Details
   - Gap-Darstellung für unsequenzierte Lektionen
   - Filter (Typ/Klasse) wirken auch auf Block-Ansicht
-- Zoom 1 (weit) = Platzhalter für Multi-Year View
+  - Klick auf Block → Zoom 3 mit Scroll + Sequenz-Panel
+- Zoom 1 (weit) = Multi-Year View (Semesterübersicht S1–S8)
+  - Lehrplan-Modus: Stoffverteilung DUY mit expandierbaren Semester-Karten
+  - Ist-Zustand-Modus: aggregierte Statistiken aus Sequenz-Daten
+  - Farbcodierung BWL/VWL/Recht konsistent
 
-### Noch offen
-
-#### Phase 4 — Automation
-- [ ] Theme→Lehrplanziel Auto-Suggest (beim Setzen von topicMain)
-- [ ] Theme→Taxonomiestufe Mapping
-
-#### Phase 5 — Multi-Year View (verbleibend)
-- [ ] Zoom-Level 1 = Semesterübersicht über 4 GYM-Jahre
-- [ ] Jahrgang-Modus vs. Schuljahr-Modus
+### Noch offen / Ideen
+- [ ] Stats-Dashboard: Prüfungskollisionen erkennen
+- [ ] Suche über alle Kacheln/Sequenzen
+- [ ] Print-CSS für Semesterplan-Export
+- [ ] 12/13 Sequences Support (>11 Blöcke)
