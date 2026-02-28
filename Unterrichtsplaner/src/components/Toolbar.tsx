@@ -3,6 +3,7 @@ import { usePlannerStore } from '../store/plannerStore';
 import { StatsPanel } from './StatsPanel';
 import { TaFPanel } from './TaFPanel';
 import { ExcelImport } from './ExcelImport';
+import { COURSES } from '../data/courses';
 import type { FilterType } from '../types';
 
 const FILTERS: { key: FilterType; label: string }[] = [
@@ -124,10 +125,22 @@ function DataMenu() {
 }
 
 export function AppHeader() {
-  const { filter, setFilter, classFilter, setClassFilter, showHelp, toggleHelp, undoStack, undo, sequencePanelOpen, setSequencePanelOpen, sidePanelOpen, setSidePanelOpen, setSidePanelTab } = usePlannerStore();
+  const { filter, setFilter, classFilter, setClassFilter, showHelp, toggleHelp, undoStack, undo, sequencePanelOpen, setSequencePanelOpen, sidePanelOpen, setSidePanelOpen, setSidePanelTab, selection } = usePlannerStore();
   const [showStats, setShowStats] = useState(false);
   const [showTaF, setShowTaF] = useState(false);
   const [showExcel, setShowExcel] = useState(false);
+  const [showAddMenu, setShowAddMenu] = useState(false);
+  const addMenuRef = useRef<HTMLDivElement>(null);
+
+  // Close add menu on outside click
+  useEffect(() => {
+    if (!showAddMenu) return;
+    const handler = (e: MouseEvent) => {
+      if (addMenuRef.current && !addMenuRef.current.contains(e.target as Node)) setShowAddMenu(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [showAddMenu]);
 
   return (
     <div className="bg-gray-900 border-b border-gray-800 px-4 py-2 sticky top-0 z-[60] flex items-center justify-between flex-wrap gap-2">
@@ -225,6 +238,46 @@ export function AppHeader() {
         >
           ▧ Seq
         </button>
+        <div className="relative" ref={addMenuRef}>
+          <button
+            onClick={() => setShowAddMenu(!showAddMenu)}
+            className={`px-2 py-0.5 rounded text-[10px] border cursor-pointer ${
+              showAddMenu
+                ? 'bg-blue-900 border-blue-600 text-blue-300'
+                : 'border-gray-700 text-gray-500 hover:border-blue-700 hover:text-blue-400'
+            }`}
+            title="Neue Sequenz erstellen"
+          >
+            + Neu
+          </button>
+          {showAddMenu && (
+            <div className="absolute right-0 top-8 bg-slate-800 border border-slate-600 rounded-lg shadow-xl z-[70] w-52 py-1 max-h-80 overflow-y-auto">
+              <div className="px-3 py-1 text-[9px] text-gray-500 border-b border-slate-700 font-medium">
+                Neue Sequenz für Kurs:
+              </div>
+              {COURSES.map((c) => (
+                <button
+                  key={c.id}
+                  onClick={() => {
+                    const seqId = usePlannerStore.getState().addSequence({
+                      courseId: c.id,
+                      title: `${c.cls} – Neue Sequenz`,
+                      blocks: [{ weeks: [], label: 'Block 1' }],
+                    });
+                    usePlannerStore.getState().setEditingSequenceId(seqId);
+                    setSidePanelOpen(true);
+                    setSidePanelTab('sequences');
+                    setShowAddMenu(false);
+                  }}
+                  className="w-full px-3 py-1.5 text-left text-[10px] hover:bg-slate-700 cursor-pointer flex items-center gap-2 text-gray-200"
+                >
+                  <span className="font-semibold">{c.cls}</span>
+                  <span className="text-gray-500">{c.typ} · {c.day} {c.from}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
