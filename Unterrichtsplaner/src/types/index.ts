@@ -45,3 +45,32 @@ export interface SequenceInfo {
 }
 
 export type FilterType = 'ALL' | CourseType;
+
+// Extended lesson detail fields (Phase 1)
+export type SubjectArea = 'VWL' | 'BWL' | 'RECHT' | 'IN' | 'INTERDISZ';
+export type TaxonomyLevel = 'K1' | 'K2' | 'K3' | 'K4' | 'K5' | 'K6';
+export type BlockType =
+  | 'LESSON'
+  | 'EXAM'
+  | 'EXAM_ORAL'
+  | 'EXAM_LONG'
+  | 'PRESENTATION'
+  | 'PROJECT_DUE'
+  | 'SELF_STUDY'
+  | 'INTRO'
+  | 'DISCUSSION'
+  | 'EVENT'
+  | 'HOLIDAY';
+
+export interface LessonDetail {
+  subjectArea?: SubjectArea;
+  topicMain?: string;
+  topicSub?: string;
+  curriculumGoal?: string;
+  taxonomyLevel?: TaxonomyLevel;
+  blockType?: BlockType;
+  description?: string;
+  learningviewUrl?: string;
+  materialLinks?: string[];
+  notes?: string;
+}

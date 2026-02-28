@@ -4,7 +4,8 @@ import { WEEKS, S2_START_INDEX } from './data/weeks';
 import { usePlannerStore } from './store/plannerStore';
 import { SemesterHeader } from './components/SemesterHeader';
 import { WeekRows } from './components/WeekRows';
-import { AppHeader, HelpBar, MultiSelectToolbar, DetailPanel, Legend } from './components/Toolbar';
+import { AppHeader, HelpBar, MultiSelectToolbar, Legend } from './components/Toolbar';
+import { DetailPanel } from './components/DetailPanel';
 import { InsertDialog } from './components/InsertDialog';
 
 function App() {
