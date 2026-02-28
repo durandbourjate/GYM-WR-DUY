@@ -124,7 +124,7 @@ function DataMenu() {
 }
 
 export function AppHeader() {
-  const { filter, setFilter, showHelp, toggleHelp, undoStack, undo, sequencePanelOpen, setSequencePanelOpen, sidePanelOpen, setSidePanelOpen, setSidePanelTab } = usePlannerStore();
+  const { filter, setFilter, classFilter, setClassFilter, showHelp, toggleHelp, undoStack, undo, sequencePanelOpen, setSequencePanelOpen, sidePanelOpen, setSidePanelOpen, setSidePanelTab } = usePlannerStore();
   const [showStats, setShowStats] = useState(false);
   const [showTaF, setShowTaF] = useState(false);
   const [showExcel, setShowExcel] = useState(false);
@@ -152,6 +152,15 @@ export function AppHeader() {
             {f.label}
           </button>
         ))}
+        {classFilter && (
+          <button
+            onClick={() => setClassFilter(null)}
+            className="px-2 py-0.5 rounded text-[10px] font-semibold border cursor-pointer bg-amber-500/20 text-amber-300 border-amber-500 hover:bg-amber-500/30"
+            title="Klassenfilter aufheben"
+          >
+            {classFilter} ✕
+          </button>
+        )}
         <span className="w-px h-4 bg-gray-700 mx-1" />
         {undoStack.length > 0 && (
           <button

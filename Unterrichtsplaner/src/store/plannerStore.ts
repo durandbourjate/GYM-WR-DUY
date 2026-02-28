@@ -25,6 +25,8 @@ interface InsertDialog {
 interface PlannerState {
   filter: FilterType;
   setFilter: (f: FilterType) => void;
+  classFilter: string | null;
+  setClassFilter: (c: string | null) => void;
   searchQuery: string;
   setSearchQuery: (q: string) => void;
   selection: Selection | null;
@@ -109,6 +111,8 @@ export const usePlannerStore = create<PlannerState>()(
     (set, get) => ({
   filter: 'ALL',
   setFilter: (f) => set({ filter: f }),
+  classFilter: null,
+  setClassFilter: (c) => set({ classFilter: c }),
   searchQuery: '',
   setSearchQuery: (q) => set({ searchQuery: q }),
   selection: null,
@@ -458,20 +462,35 @@ export const usePlannerStore = create<PlannerState>()(
     const newWeekData = [...state.weekData.map((w) => ({ ...w, lessons: { ...w.lessons } }))];
     const weekMap = new Map(newWeekData.map((w) => [w.w, w]));
     const relevantWeeks = weekOrder.slice(targetIdx);
-    const entries: (LessonEntry | null)[] = relevantWeeks.map((wk) => {
+
+    // Collect entries, skipping fixed cells (type 5=Event, 6=Holiday)
+    const fixedWeeks = new Set<string>();
+    const movableEntries: (LessonEntry | null)[] = [];
+    for (const wk of relevantWeeks) {
       const week = weekMap.get(wk);
-      return week?.lessons[courseCol] || null;
-    });
-    entries.unshift(null);
-    for (let i = 0; i < relevantWeeks.length; i++) {
-      const wk = weekMap.get(relevantWeeks[i]);
-      if (wk) {
-        if (entries[i]) {
-          wk.lessons[courseCol] = entries[i]!;
+      const entry = week?.lessons[courseCol] || null;
+      if (entry && (entry.type === 5 || entry.type === 6)) {
+        fixedWeeks.add(wk);
+      } else {
+        movableEntries.push(entry);
+      }
+    }
+    // Insert null at front (push down by 1)
+    movableEntries.unshift(null);
+
+    // Place back, skipping fixed weeks
+    let mi = 0;
+    for (const wk of relevantWeeks) {
+      if (fixedWeeks.has(wk)) continue; // leave fixed in place
+      const week = weekMap.get(wk);
+      if (week) {
+        if (mi < movableEntries.length && movableEntries[mi]) {
+          week.lessons[courseCol] = movableEntries[mi]!;
         } else {
-          delete wk.lessons[courseCol];
+          delete week.lessons[courseCol];
         }
       }
+      mi++;
     }
     set({ weekData: newWeekData });
   },

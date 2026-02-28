@@ -1,5 +1,6 @@
 import type { Course } from '../types';
 import { DAY_COLORS, TYPE_BADGES } from '../utils/colors';
+import { usePlannerStore } from '../store/plannerStore';
 
 interface Props {
   courses: Course[];
@@ -7,6 +8,7 @@ interface Props {
 }
 
 export function SemesterHeader({ courses, semester }: Props) {
+  const { classFilter, setClassFilter, setFilter } = usePlannerStore();
 
   return (
     <thead className="sticky z-40" style={{ top: 36 }}>
@@ -54,11 +56,21 @@ export function SemesterHeader({ courses, semester }: Props) {
                 maxWidth: 110,
               }}
             >
-              <div className="text-[10px] font-bold text-gray-200">{c.cls}</div>
+              <div
+                className={`text-[10px] font-bold cursor-pointer transition-colors ${
+                  classFilter === c.cls ? 'text-blue-400' : 'text-gray-200 hover:text-blue-300'
+                }`}
+                onClick={() => setClassFilter(classFilter === c.cls ? null : c.cls)}
+                title={`Klick: Nur ${c.cls} anzeigen (nochmal klicken: alle)`}
+              >
+                {c.cls}
+              </div>
               <div className="flex gap-0.5 justify-center mt-0.5 flex-wrap">
                 <span
-                  className="text-[7px] px-1 rounded font-bold"
+                  className="text-[7px] px-1 rounded font-bold cursor-pointer hover:opacity-80 transition-opacity"
                   style={{ background: badge?.bg, color: badge?.fg }}
+                  onClick={() => setFilter(c.typ as any)}
+                  title={`Filter: Nur ${c.typ}`}
                 >
                   {c.typ}
                 </span>

@@ -9,7 +9,7 @@ import { DetailPanel } from './components/DetailPanel';
 import { InsertDialog } from './components/InsertDialog';
 
 function App() {
-  const { filter, selection, weekData, setWeekData, migrateStaticSequences, sequencePanelOpen, sidePanelOpen } = usePlannerStore();
+  const { filter, classFilter, selection, weekData, setWeekData, migrateStaticSequences, sequencePanelOpen, sidePanelOpen } = usePlannerStore();
   const curRef = useRef<HTMLTableRowElement>(null);
 
   // Initialize weekData in store on first render
@@ -27,11 +27,12 @@ function App() {
   const filterCourses = (semester: 1 | 2) => {
     let c = COURSES.filter((co) => co.semesters.includes(semester));
     if (filter !== 'ALL') c = c.filter((co) => co.typ === filter);
+    if (classFilter) c = c.filter((co) => co.cls === classFilter);
     return c;
   };
 
-  const s1Courses = useMemo(() => filterCourses(1), [filter]);
-  const s2Courses = useMemo(() => filterCourses(2), [filter]);
+  const s1Courses = useMemo(() => filterCourses(1), [filter, classFilter]);
+  const s2Courses = useMemo(() => filterCourses(2), [filter, classFilter]);
   const s1Weeks = useMemo(() =>
     (weekData.length > 0 ? weekData : WEEKS).slice(0, S2_START_INDEX), [weekData]);
   const s2Weeks = useMemo(() =>
