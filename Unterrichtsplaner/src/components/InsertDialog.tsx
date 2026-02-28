@@ -1,5 +1,4 @@
 import { usePlannerStore } from '../store/plannerStore';
-import { COURSES } from '../data/courses';
 import { WEEKS } from '../data/weeks';
 
 export function InsertDialog() {

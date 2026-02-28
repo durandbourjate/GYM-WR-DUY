@@ -1,4 +1,4 @@
-import type { Course, DayOfWeek } from '../types';
+import type { Course } from '../types';
 import { DAY_COLORS, TYPE_BADGES } from '../utils/colors';
 
 interface Props {
@@ -7,7 +7,6 @@ interface Props {
 }
 
 export function SemesterHeader({ courses, semester }: Props) {
-  let lastDay: DayOfWeek | null = null;
 
   return (
     <thead className="sticky z-40" style={{ top: 36 }}>

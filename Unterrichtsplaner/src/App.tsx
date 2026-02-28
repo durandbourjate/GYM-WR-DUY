@@ -1,5 +1,5 @@
 import { useRef, useEffect, useMemo } from 'react';
-import { COURSES, ALL_COURSES } from './data/courses';
+import { COURSES } from './data/courses';
 import { WEEKS, S2_START_INDEX } from './data/weeks';
 import { usePlannerStore } from './store/plannerStore';
 import { SemesterHeader } from './components/SemesterHeader';
