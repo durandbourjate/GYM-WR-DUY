@@ -49,7 +49,9 @@ export function SemesterHeader({ courses, semester }: Props) {
               className="bg-gray-900 px-0.5 pb-1 border-b-2 border-gray-700 text-center"
               style={{
                 borderLeft: newDay ? `2px solid ${DAY_COLORS[c.day]}40` : 'none',
-                minWidth: c.les >= 2 ? 105 : 80,
+                width: 110,
+                minWidth: 110,
+                maxWidth: 110,
               }}
             >
               <div className="text-[10px] font-bold text-gray-200">{c.cls}</div>

@@ -7,10 +7,9 @@ import { WeekRows } from './components/WeekRows';
 import { AppHeader, HelpBar, MultiSelectToolbar, Legend } from './components/Toolbar';
 import { DetailPanel } from './components/DetailPanel';
 import { InsertDialog } from './components/InsertDialog';
-import { SequencePanel } from './components/SequencePanel';
 
 function App() {
-  const { filter, selection, weekData, setWeekData, migrateStaticSequences, sequencePanelOpen } = usePlannerStore();
+  const { filter, selection, weekData, setWeekData, migrateStaticSequences, sequencePanelOpen, sidePanelOpen } = usePlannerStore();
   const curRef = useRef<HTMLTableRowElement>(null);
 
   // Initialize weekData in store on first render
@@ -42,12 +41,21 @@ function App() {
     setTimeout(() => curRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
   }, []);
 
-  // Keyboard shortcut: Ctrl+Z for undo
+  // Keyboard shortcut: Ctrl+Z for undo, Escape to close panel
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'z') {
         e.preventDefault();
         usePlannerStore.getState().undo();
+      }
+      if (e.key === 'Escape') {
+        const state = usePlannerStore.getState();
+        if (state.sidePanelOpen) {
+          state.setSidePanelOpen(false);
+          state.setSequencePanelOpen(false);
+        } else if (state.selection) {
+          state.setSelection(null);
+        }
       }
     };
     window.addEventListener('keydown', handler);
@@ -63,7 +71,7 @@ function App() {
       <InsertDialog />
 
       <div className="flex">
-        <div className={`overflow-x-auto flex-1 ${sequencePanelOpen ? 'mr-[320px]' : ''}`} style={{ paddingBottom: selection ? 80 : 20 }}>
+        <div className={`overflow-x-auto flex-1 ${(sidePanelOpen || sequencePanelOpen) ? 'mr-[340px]' : ''}`} style={{ paddingBottom: 20 }}>
           {/* Semester 1 */}
           <table className="border-collapse w-max min-w-full">
             <SemesterHeader courses={s1Courses} semester={1} />
@@ -86,8 +94,6 @@ function App() {
             </tbody>
           </table>
         </div>
-
-        <SequencePanel />
       </div>
 
       <DetailPanel />

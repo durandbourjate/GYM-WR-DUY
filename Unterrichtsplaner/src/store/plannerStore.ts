@@ -56,6 +56,16 @@ interface PlannerState {
   // Detail Panel state
   detailPanelExpanded: boolean;
   setDetailPanelExpanded: (v: boolean) => void;
+  // Phase 1: Side panel
+  sidePanelOpen: boolean;
+  setSidePanelOpen: (v: boolean) => void;
+  sidePanelTab: 'details' | 'sequences';
+  setSidePanelTab: (t: 'details' | 'sequences') => void;
+  hoveredCell: { week: string; col: number } | null;
+  setHoveredCell: (c: { week: string; col: number } | null) => void;
+  // Empty cell action
+  emptyCellAction: { week: string; courseId: string; course: Course } | null;
+  setEmptyCellAction: (a: { week: string; courseId: string; course: Course } | null) => void;
   // Sequences CRUD
   sequences: ManagedSequence[];
   sequencesMigrated: boolean;
@@ -147,6 +157,15 @@ export const usePlannerStore = create<PlannerState>()(
   },
   detailPanelExpanded: false,
   setDetailPanelExpanded: (v) => set({ detailPanelExpanded: v }),
+  // Phase 1: Side panel
+  sidePanelOpen: false,
+  setSidePanelOpen: (v) => set({ sidePanelOpen: v }),
+  sidePanelTab: 'details',
+  setSidePanelTab: (t) => set({ sidePanelTab: t }),
+  hoveredCell: null,
+  setHoveredCell: (c) => set({ hoveredCell: c }),
+  emptyCellAction: null,
+  setEmptyCellAction: (a) => set({ emptyCellAction: a }),
 
   // Sequences CRUD
   sequences: [],

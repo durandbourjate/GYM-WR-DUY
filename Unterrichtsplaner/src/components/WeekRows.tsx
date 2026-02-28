@@ -31,6 +31,92 @@ function InlineEdit({ value, onSave, onCancel }: { value: string; onSave: (v: st
   );
 }
 
+/* Hover preview popover */
+function HoverPreview({ week, col, courses }: { week: string; col: number; courses: Course[] }) {
+  const { lessonDetails, weekData, sequences } = usePlannerStore();
+  const key = `${week}-${col}`;
+  const detail = lessonDetails[key];
+  const weekEntry = weekData.find(w => w.w === week);
+  const entry = weekEntry?.lessons[col];
+  const course = courses.find(c => c.col === col);
+  if (!entry || !course) return null;
+
+  const seq = getSequenceInfoFromStore(course.id, week, sequences);
+
+  return (
+    <div className="absolute right-0 top-0 w-56 bg-slate-800 border border-slate-600 rounded-lg shadow-xl z-[80] p-2.5 pointer-events-none"
+      style={{ transform: 'translateX(100%)' }}>
+      <div className="text-[10px] font-bold text-gray-200 mb-1">{entry.title}</div>
+      {detail?.topicMain && (
+        <div className="text-[9px] text-gray-400 mb-0.5">📌 {detail.topicMain}{detail.topicSub ? ` › ${detail.topicSub}` : ''}</div>
+      )}
+      {detail?.subjectArea && (
+        <span className="text-[8px] px-1 py-px rounded border border-gray-600 text-gray-400 mr-1">{detail.subjectArea}</span>
+      )}
+      {detail?.taxonomyLevel && (
+        <span className="text-[8px] px-1 py-px rounded border border-amber-600 text-amber-400 mr-1">{detail.taxonomyLevel}</span>
+      )}
+      {detail?.blockType && detail.blockType !== 'LESSON' && (
+        <span className="text-[8px] px-1 py-px rounded border border-gray-600 text-gray-400">{detail.blockType}</span>
+      )}
+      {seq && (
+        <div className="text-[8px] mt-1 text-gray-500">▧ {seq.label} ({seq.index + 1}/{seq.total})</div>
+      )}
+      {detail?.curriculumGoal && (
+        <div className="text-[8px] mt-1 text-gray-500 truncate">🎯 {detail.curriculumGoal}</div>
+      )}
+      {detail?.notes && (
+        <div className="text-[8px] mt-1 text-gray-500 line-clamp-2">📝 {detail.notes}</div>
+      )}
+    </div>
+  );
+}
+
+/* Empty cell context menu */
+function EmptyCellMenu({ week, course, onClose }: { week: string; course: Course; onClose: () => void }) {
+  const { updateLesson, pushUndo, addSequence, setSidePanelOpen, setSidePanelTab, setSelection, setEditingSequenceId } = usePlannerStore();
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) onClose();
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [onClose]);
+
+  const handleNewLesson = () => {
+    pushUndo();
+    updateLesson(week, course.col, { title: 'Neue Lektion', type: 1 });
+    setSelection({ week, courseId: course.id, title: 'Neue Lektion', course });
+    setSidePanelOpen(true);
+    setSidePanelTab('details');
+    onClose();
+  };
+
+  const handleNewSequence = () => {
+    const seqId = addSequence({ courseId: course.id, title: `Neue Sequenz ${course.cls}`, blocks: [{ weeks: [week], label: 'Neuer Block' }] });
+    setEditingSequenceId(seqId);
+    setSidePanelOpen(true);
+    setSidePanelTab('sequences');
+    onClose();
+  };
+
+  return (
+    <div ref={menuRef} className="absolute z-[80] bg-slate-800 border border-slate-600 rounded-lg shadow-xl py-1 w-36"
+      style={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
+      <button onClick={handleNewLesson}
+        className="w-full px-3 py-1.5 text-left text-[10px] text-gray-200 hover:bg-slate-700 cursor-pointer flex items-center gap-2">
+        <span>📖</span> Neue Kachel
+      </button>
+      <button onClick={handleNewSequence}
+        className="w-full px-3 py-1.5 text-left text-[10px] text-gray-200 hover:bg-slate-700 cursor-pointer flex items-center gap-2">
+        <span>▧</span> Neue Sequenz
+      </button>
+    </div>
+  );
+}
+
 export function WeekRows({ weeks, courses, currentRef }: Props) {
   const {
     selection, setSelection,
@@ -38,17 +124,27 @@ export function WeekRows({ weeks, courses, currentRef }: Props) {
     editing, setEditing,
     weekData, updateLesson,
     dragSource, setDragSource, swapLessons, moveLessonToEmpty,
-    sequences,
+    sequences, editingSequenceId,
     hkOverrides, hkStartGroups, setHKOverride,
     tafPhases,
+    setSidePanelOpen, setSidePanelTab,
+    lessonDetails,
+    setInsertDialog, pushLessons, pushUndo,
   } = usePlannerStore();
 
   const [dropTarget, setDropTarget] = useState<{ week: string; col: number } | null>(null);
+  const [hoverCell, setHoverCell] = useState<{ week: string; col: number } | null>(null);
+  const [showHoverPreview, setShowHoverPreview] = useState(false);
+  const hoverTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [emptyCellMenu, setEmptyCellMenu] = useState<{ week: string; course: Course } | null>(null);
 
   const displayWeeks = weekData.length > 0
     ? weeks.map((w) => weekData.find((wd) => wd.w === w.w) || w)
     : weeks;
 
+  const allWeekKeys = weeks.map(w => w.w);
+
+  // Single click: select + show mini-buttons (no detail panel)
   const handleClick = useCallback(
     (weekW: string, course: Course, title: string, e: React.MouseEvent) => {
       if (!title) return;
@@ -56,19 +152,31 @@ export function WeekRows({ weeks, courses, currentRef }: Props) {
         toggleMultiSelect(`${weekW}-${course.id}`);
       } else {
         clearMultiSelect();
-        setSelection(
-          selection?.week === weekW && selection?.courseId === course.id
-            ? null
-            : { week: weekW, courseId: course.id, title, course }
-        );
+        const isSame = selection?.week === weekW && selection?.courseId === course.id;
+        setSelection(isSame ? null : { week: weekW, courseId: course.id, title, course });
+        // Don't open side panel on single click
       }
     },
     [selection, setSelection, toggleMultiSelect, clearMultiSelect]
   );
 
+  // Double click: open side panel with details tab
   const handleDoubleClick = useCallback(
-    (weekW: string, col: number) => { setEditing({ week: weekW, col }); },
-    [setEditing]
+    (weekW: string, course: Course, title: string) => {
+      if (!title) return;
+      setSelection({ week: weekW, courseId: course.id, title, course });
+      setSidePanelOpen(true);
+      setSidePanelTab('details');
+    },
+    [setSelection, setSidePanelOpen, setSidePanelTab]
+  );
+
+  // Empty cell click
+  const handleEmptyCellClick = useCallback(
+    (weekW: string, course: Course) => {
+      setEmptyCellMenu({ week: weekW, course });
+    },
+    []
   );
 
   const handleSaveEdit = useCallback(
@@ -80,6 +188,40 @@ export function WeekRows({ weeks, courses, currentRef }: Props) {
     },
     [displayWeeks, updateLesson, setEditing]
   );
+
+  // Hover preview logic
+  const handleMouseEnter = useCallback((weekW: string, col: number) => {
+    setHoverCell({ week: weekW, col });
+    setShowHoverPreview(false);
+    if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
+    hoverTimerRef.current = setTimeout(() => setShowHoverPreview(true), 2000);
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    setHoverCell(null);
+    setShowHoverPreview(false);
+    if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
+  }, []);
+
+  // Mini action buttons for selected cell
+  const handleMiniInsert = useCallback((e: React.MouseEvent, course: Course, weekW: string) => {
+    e.stopPropagation();
+    const paired = COURSES_CACHE.filter(c => c.id !== course.id && c.cls === course.cls && c.typ === course.typ && c.les !== course.les);
+    setInsertDialog({ week: weekW, course, hasMismatch: paired.length > 0, pairedCourses: paired });
+  }, [setInsertDialog]);
+
+  const handleMiniPush = useCallback((e: React.MouseEvent, course: Course, weekW: string) => {
+    e.stopPropagation();
+    pushUndo();
+    pushLessons(course.col, weekW, allWeekKeys);
+  }, [pushUndo, pushLessons, allWeekKeys]);
+
+  const handleMiniDetails = useCallback((e: React.MouseEvent, course: Course, weekW: string, title: string) => {
+    e.stopPropagation();
+    setSelection({ week: weekW, courseId: course.id, title, course });
+    setSidePanelOpen(true);
+    setSidePanelTab('details');
+  }, [setSelection, setSidePanelOpen, setSidePanelTab]);
 
   return (
     <>
@@ -119,7 +261,24 @@ export function WeekRows({ weeks, courses, currentRef }: Props) {
               const isDragOver = dropTarget?.week === week.w && dropTarget?.col === c.col;
               const isDragSrc = dragSource?.week === week.w && dragSource?.col === c.col;
               const hkGroup = c.hk ? getHKGroup(week.w, c.col, hkStartGroups[c.col] || 'A', hkOverrides) : null;
-              // TaF: check if this week is in any TaF phase
+              const isHovered = hoverCell?.week === week.w && hoverCell?.col === c.col;
+              const showPreview = isHovered && showHoverPreview && title && !isSelected;
+              const showEmptyMenu = emptyCellMenu?.week === week.w && emptyCellMenu?.course.id === c.id;
+
+              // Sequence highlight: is this cell part of the currently edited sequence?
+              const editingSeq = editingSequenceId ? sequences.find(s => s.id === editingSequenceId) : null;
+              const isInEditingSeq = editingSeq?.courseId === c.id && editingSeq?.blocks.some(b => b.weeks.includes(week.w));
+              const isSeqDimmed = editingSeq && editingSeq.courseId === c.id && !isInEditingSeq && !!title;
+
+              // Lesson detail for display
+              const cellDetail = lessonDetails[`${week.w}-${c.col}`];
+              const displayTitle = cellDetail?.topicMain
+                ? (cellDetail.topicSub ? `${cellDetail.topicMain} › ${cellDetail.topicSub}` : cellDetail.topicMain)
+                : title;
+
+              // Fixed cells: holidays (type 6) and events (type 5) should not be draggable
+              const isFixed = lessonType === 6 || lessonType === 5;
+
               const tafPhase = tafPhases.find(p => {
                 const allW = weeks.map(w => w.w);
                 const si = allW.indexOf(p.startWeek);
@@ -137,9 +296,14 @@ export function WeekRows({ weeks, courses, currentRef }: Props) {
                     outline: isDragOver ? '2px solid #3b82f6' : 'none',
                     outlineOffset: '-2px',
                     background: isDragOver ? '#1e3a5f30' : undefined,
+                    width: 110,
+                    minWidth: 110,
+                    maxWidth: 110,
                   }}
-                  onClick={(e) => handleClick(week.w, c, title, e)}
-                  onDoubleClick={() => title && handleDoubleClick(week.w, c.col)}
+                  onClick={(e) => title ? handleClick(week.w, c, title, e) : handleEmptyCellClick(week.w, c)}
+                  onDoubleClick={() => title && handleDoubleClick(week.w, c, title)}
+                  onMouseEnter={() => title && handleMouseEnter(week.w, c.col)}
+                  onMouseLeave={handleMouseLeave}
                   onDragOver={(e) => {
                     if (dragSource && dragSource.col === c.col) {
                       e.preventDefault();
@@ -153,6 +317,8 @@ export function WeekRows({ weeks, courses, currentRef }: Props) {
                     setDropTarget(null);
                     if (!dragSource || dragSource.col !== c.col) return;
                     if (dragSource.week === week.w) return;
+                    // Don't allow dropping onto fixed cells
+                    if (isFixed) return;
                     if (title) {
                       swapLessons(c.col, dragSource.week, week.w);
                     } else {
@@ -164,18 +330,39 @@ export function WeekRows({ weeks, courses, currentRef }: Props) {
                   {/* Sequence bar */}
                   {seq && (
                     <div
-                      className="absolute left-0 w-[3px] opacity-70"
+                      className="absolute left-0 w-[3px] opacity-70 cursor-pointer"
                       style={{
                         top: seq.isFirst ? 3 : 0,
                         bottom: seq.isLast ? 3 : 0,
                         background: seq.color || '#16a34a',
                         borderRadius: seq.isFirst ? '2px 0 0 0' : seq.isLast ? '0 0 0 2px' : '0',
                       }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const parentSeq = sequences.find(s => s.id === seq.sequenceId);
+                        if (parentSeq) {
+                          usePlannerStore.getState().setEditingSequenceId(parentSeq.id);
+                          setSidePanelOpen(true);
+                          setSidePanelTab('sequences');
+                        }
+                      }}
+                      title={`Sequenz öffnen: ${seq.label}`}
                     />
                   )}
                   {seq?.isFirst && (
-                    <div className="absolute left-1.5 -top-0.5 text-[6px] font-bold z-10 bg-[#0c0f1a] px-0.5 rounded whitespace-nowrap"
-                      style={{ color: seq.color || '#4ade80' }}>
+                    <div className="absolute left-1.5 -top-0.5 text-[6px] font-bold z-10 bg-[#0c0f1a] px-0.5 rounded whitespace-nowrap cursor-pointer"
+                      style={{ color: seq.color || '#4ade80' }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const parentSeq = sequences.find(s => s.id === seq.sequenceId);
+                        if (parentSeq) {
+                          usePlannerStore.getState().setEditingSequenceId(parentSeq.id);
+                          setSidePanelOpen(true);
+                          setSidePanelTab('sequences');
+                        }
+                      }}
+                      title={`Sequenz öffnen: ${seq.label}`}
+                    >
                       {seq.label}
                     </div>
                   )}
@@ -217,39 +404,78 @@ export function WeekRows({ weeks, courses, currentRef }: Props) {
                     </div>
                   ) : title ? (
                     <div
-                      draggable
+                      draggable={!isFixed}
                       onDragStart={(e) => {
+                        if (isFixed) { e.preventDefault(); return; }
                         setDragSource({ week: week.w, col: c.col });
                         e.dataTransfer.effectAllowed = 'move';
                         e.dataTransfer.setData('text/plain', `${week.w}:${c.col}`);
                       }}
                       onDragEnd={() => { setDragSource(null); setDropTarget(null); }}
-                      className="mx-0.5 ml-1.5 px-1 py-0.5 rounded cursor-grab transition-all duration-100 flex items-center hover:scale-[1.02] hover:shadow-md hover:z-10"
+                      className={`mx-0.5 ml-1.5 px-1 py-0.5 rounded transition-all duration-100 flex items-center hover:shadow-md hover:z-10 relative ${isFixed ? 'cursor-default' : 'cursor-grab hover:scale-[1.02]'}`}
                       style={{
-                        minHeight: cellHeight,
-                        opacity: isDragSrc ? 0.35 : 1,
-                        background: isMulti ? '#312e81' : isSelected ? '#1e3a5f' : colors?.bg || '#eef2f7',
-                        border: `1px solid ${isMulti ? '#6366f1' : isSelected ? '#3b82f6' : colors?.border || '#cbd5e1'}`,
-                        boxShadow: isMulti ? '0 0 0 2px #6366f150' : isSelected ? '0 0 0 2px #3b82f650' : 'none',
+                        minHeight: isFixed ? Math.max(cellHeight, 32) : cellHeight,
+                        opacity: isDragSrc ? 0.35 : isSeqDimmed ? 0.3 : 1,
+                        background: isInEditingSeq ? '#1e3a5f' : isMulti ? '#312e81' : isSelected ? '#1e3a5f' : colors?.bg || '#eef2f7',
+                        border: `1px solid ${isInEditingSeq ? '#60a5fa' : isMulti ? '#6366f1' : isSelected ? '#3b82f6' : colors?.border || '#cbd5e1'}`,
+                        boxShadow: isInEditingSeq ? '0 0 0 2px #3b82f640' : isMulti ? '0 0 0 2px #6366f150' : isSelected ? '0 0 0 2px #3b82f650' : 'none',
                       }}
                     >
                       {lessonType === 4 && <span className="mr-0.5 text-[8px]">📝</span>}
+                      {isFixed && <span className="mr-0.5 text-[8px]">{lessonType === 6 ? '🏖' : '📅'}</span>}
                       <div
-                        className="leading-tight overflow-hidden"
+                        className="leading-tight overflow-hidden flex-1"
                         style={{
                           fontSize: c.les >= 2 ? 9 : 8,
-                          fontWeight: lessonType === 4 ? 700 : 500,
-                          color: isMulti ? '#c7d2fe' : isSelected ? '#e2e8f0' : colors?.fg || '#475569',
+                          fontWeight: lessonType === 4 || isFixed ? 700 : 500,
+                          color: isInEditingSeq ? '#93c5fd' : isMulti ? '#c7d2fe' : isSelected ? '#e2e8f0' : colors?.fg || '#475569',
                           display: '-webkit-box',
                           WebkitLineClamp: c.les >= 2 ? 3 : 2,
                           WebkitBoxOrient: 'vertical',
                         }}
                       >
-                        {title}
+                        {displayTitle}
                       </div>
+
+                      {/* Mini action buttons on selection */}
+                      {isSelected && (
+                        <div className="absolute right-0.5 bottom-0.5 flex gap-px z-20">
+                          <button
+                            onClick={(e) => handleMiniInsert(e, c, week.w)}
+                            className="w-4 h-4 rounded bg-slate-700/90 text-gray-300 text-[8px] flex items-center justify-center cursor-pointer hover:bg-blue-600 hover:text-white border border-slate-600"
+                            title="Einfügen (leere Zeile davor)"
+                          >+</button>
+                          <button
+                            onClick={(e) => handleMiniPush(e, c, week.w)}
+                            className="w-4 h-4 rounded bg-slate-700/90 text-gray-300 text-[8px] flex items-center justify-center cursor-pointer hover:bg-blue-600 hover:text-white border border-slate-600"
+                            title="Push (nach unten verschieben)"
+                          >↓</button>
+                          <button
+                            onClick={(e) => handleMiniDetails(e, c, week.w, title)}
+                            className="w-4 h-4 rounded bg-slate-700/90 text-gray-300 text-[8px] flex items-center justify-center cursor-pointer hover:bg-blue-600 hover:text-white border border-slate-600"
+                            title="Details öffnen"
+                          >i</button>
+                        </div>
+                      )}
                     </div>
                   ) : (
-                    <div style={{ minHeight: cellHeight }} />
+                    <div
+                      className="cursor-pointer hover:bg-slate-800/40 rounded mx-0.5"
+                      style={{ minHeight: cellHeight }}
+                      title="Klick: Neue Kachel oder Sequenz"
+                    />
+                  )}
+
+                  {/* Hover preview popover */}
+                  {showPreview && <HoverPreview week={week.w} col={c.col} courses={courses} />}
+
+                  {/* Empty cell context menu */}
+                  {showEmptyMenu && (
+                    <EmptyCellMenu
+                      week={week.w}
+                      course={c}
+                      onClose={() => setEmptyCellMenu(null)}
+                    />
                   )}
                 </td>
               );
@@ -260,3 +486,6 @@ export function WeekRows({ weeks, courses, currentRef }: Props) {
     </>
   );
 }
+
+// We need courses for paired detection in mini-buttons
+import { COURSES as COURSES_CACHE } from '../data/courses';
