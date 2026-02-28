@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { FilterType, Week, LessonEntry, Course, LessonDetail, ManagedSequence, SequenceBlock, HKGroup, TaFPhase } from '../types';
 import { SEQUENCES as STATIC_SEQUENCES } from '../data/sequences';
-import { COURSES } from '../data/courses';
+import { COURSES, getLinkedCourseIds } from '../data/courses';
 
 interface Selection {
   week: string;
@@ -78,7 +78,9 @@ interface PlannerState {
   // Sequences CRUD
   sequences: ManagedSequence[];
   sequencesMigrated: boolean;
+  sequenceTitlesFixed: boolean;
   migrateStaticSequences: () => void;
+  fixSequenceTitles: () => void;
   addSequence: (seq: Omit<ManagedSequence, 'id' | 'createdAt' | 'updatedAt'>) => string;
   updateSequence: (id: string, updates: Partial<Pick<ManagedSequence, 'title' | 'subjectArea' | 'blocks' | 'color' | 'courseId'>>) => void;
   deleteSequence: (id: string) => void;
@@ -221,6 +223,7 @@ export const usePlannerStore = create<PlannerState>()(
   // Sequences CRUD
   sequences: [],
   sequencesMigrated: false,
+  sequenceTitlesFixed: false,
   migrateStaticSequences: () => {
     const state = get();
     if (state.sequencesMigrated) return;
@@ -239,6 +242,21 @@ export const usePlannerStore = create<PlannerState>()(
       });
     }
     set({ sequences: migrated, sequencesMigrated: true });
+  },
+  fixSequenceTitles: () => {
+    const state = get();
+    if (state.sequenceTitlesFixed) return;
+    // Fix old "Sequenzen cXX" titles to use class+type+day
+    const updated = state.sequences.map(seq => {
+      if (/^Sequenzen c\d+$/.test(seq.title)) {
+        const course = COURSES.find(c => c.id === seq.courseId);
+        if (course) {
+          return { ...seq, title: `Sequenzen ${course.cls} ${course.typ} ${course.day}`, updatedAt: new Date().toISOString() };
+        }
+      }
+      return seq;
+    });
+    set({ sequences: updated, sequenceTitlesFixed: true });
   },
   addSequence: (seq) => {
     const now = new Date().toISOString();
@@ -327,10 +345,14 @@ export const usePlannerStore = create<PlannerState>()(
     const seq = state.sequences.find(s => s.id === seqId);
     if (!seq) return { placed: 0, skipped: [] };
     
-    const col = parseInt(seq.courseId.replace('c', ''));
-    if (isNaN(col)) return { placed: 0, skipped: [] };
+    // Get all columns to place into (multi-course support)
+    const allCourseIds = seq.courseIds && seq.courseIds.length > 0 ? seq.courseIds : [seq.courseId];
+    const cols = allCourseIds.map(cid => parseInt(cid.replace('c', ''))).filter(c => !isNaN(c));
+    if (cols.length === 0) return { placed: 0, skipped: [] };
     
-    // Get available weeks
+    const primaryCol = cols[0];
+    
+    // Get available weeks based on primary column
     const available = state.getAvailableWeeks(seq.courseId, startWeek, allWeekOrder);
     
     // Determine LessonType from subjectArea
@@ -355,12 +377,14 @@ export const usePlannerStore = create<PlannerState>()(
           weekIdx++;
           const week = weekMap.get(candidateWeek);
           if (week) {
-            week.lessons[col] = { title: block.label, type: lessonType };
+            // Place in ALL columns (primary + linked)
+            for (const col of cols) {
+              week.lessons[col] = { title: block.label, type: lessonType };
+            }
             blockWeeks.push(candidateWeek);
             placed++;
             break;
           } else {
-            // Week exists in order but not in weekData – skip
             skipped.push(candidateWeek);
           }
         }
@@ -733,13 +757,14 @@ export const usePlannerStore = create<PlannerState>()(
         lessonDetails: state.lessonDetails,
         sequences: state.sequences,
         sequencesMigrated: state.sequencesMigrated,
+        sequenceTitlesFixed: state.sequenceTitlesFixed,
         hkOverrides: state.hkOverrides,
         hkStartGroups: state.hkStartGroups,
         tafPhases: state.tafPhases,
       }),
       migrate: (persisted: unknown, version: number) => {
         if (version < 2) {
-          return { ...(persisted as Record<string, unknown>), sequences: [], sequencesMigrated: false };
+          return { ...(persisted as Record<string, unknown>), sequences: [], sequencesMigrated: false, sequenceTitlesFixed: false };
         }
         return persisted;
       },

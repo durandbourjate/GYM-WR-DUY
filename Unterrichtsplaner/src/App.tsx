@@ -11,7 +11,7 @@ import { ZoomBlockView } from './components/ZoomBlockView';
 import { ZoomMultiYearView } from './components/ZoomMultiYearView';
 
 function App() {
-  const { filter, classFilter, weekData, setWeekData, migrateStaticSequences, sequencePanelOpen, sidePanelOpen, zoomLevel } = usePlannerStore();
+  const { filter, classFilter, weekData, setWeekData, migrateStaticSequences, fixSequenceTitles, sequencePanelOpen, sidePanelOpen, zoomLevel } = usePlannerStore();
   const curRef = useRef<HTMLTableRowElement>(null);
 
   // Initialize weekData in store on first render
@@ -24,6 +24,7 @@ function App() {
   // Migrate static sequences to store on first render
   useEffect(() => {
     migrateStaticSequences();
+    fixSequenceTitles();
   }, []);
 
   const filterCourses = (semester: 1 | 2) => {

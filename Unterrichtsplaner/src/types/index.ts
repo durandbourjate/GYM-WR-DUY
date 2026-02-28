@@ -53,7 +53,8 @@ export interface Sequence {
 /** Managed sequence with CRUD capabilities */
 export interface ManagedSequence {
   id: string;
-  courseId: string;
+  courseId: string;         // Primary course (backward compat)
+  courseIds?: string[];      // All linked courses (multi-day: e.g. ["c11","c31"] for 29c SF Di+Fr)
   title: string;
   subjectArea?: SubjectArea;
   blocks: SequenceBlock[];

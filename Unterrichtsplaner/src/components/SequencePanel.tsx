@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { usePlannerStore } from '../store/plannerStore';
-import { COURSES } from '../data/courses';
+import { COURSES, getLinkedCourseIds } from '../data/courses';
 import { WEEKS } from '../data/weeks';
 import { SEQUENCE_COLORS } from '../utils/colors';
 import type { SubjectArea, ManagedSequence, SequenceBlock } from '../types';
@@ -199,6 +199,9 @@ function SequenceCard({ seq }: { seq: ManagedSequence }) {
 
   const isExpanded = editingSequenceId === seq.id;
   const course = COURSES.find((c) => c.id === seq.courseId);
+  const linkedCourses = seq.courseIds
+    ? seq.courseIds.map(cid => COURSES.find(c => c.id === cid)).filter(Boolean)
+    : course ? [course] : [];
   const totalWeeks = seq.blocks.reduce((sum, b) => sum + b.weeks.length, 0);
 
   const [editTitle, setEditTitle] = useState(false);
@@ -248,6 +251,9 @@ function SequenceCard({ seq }: { seq: ManagedSequence }) {
           <div className="text-[8px] text-gray-500">
             {seq.blocks.length} Blöcke · {totalWeeks} Wochen
             {seq.subjectArea && ` · ${seq.subjectArea}`}
+            {linkedCourses.length > 1 && (
+              <span className="text-blue-400"> · {linkedCourses.map(c => c!.day).join('+')}</span>
+            )}
           </div>
         </div>
         <span className="text-[9px] text-gray-500">{isExpanded ? '▾' : '▸'}</span>
@@ -454,7 +460,7 @@ export function SequencePanel({ embedded = false }: { embedded?: boolean }) {
   // Group sequences by course
   const filteredSequences = filterCourse === 'ALL'
     ? sequences
-    : sequences.filter((s) => s.courseId === filterCourse);
+    : sequences.filter((s) => s.courseId === filterCourse || (s.courseIds && s.courseIds.includes(filterCourse)));
 
   // Courses that have sequences
   const coursesWithSeq = [...new Set(sequences.map((s) => s.courseId))];
@@ -466,8 +472,11 @@ export function SequencePanel({ embedded = false }: { embedded?: boolean }) {
     const autoColor: Record<string, string> = {
       SF: '#16a34a', EWR: '#d97706', IN: '#0ea5e9', KS: '#7c3aed', EF: '#ec4899',
     };
+    // Auto-detect linked courses (same class + type, different days)
+    const linkedIds = getLinkedCourseIds(newCourseId);
     addSequence({
       courseId: newCourseId,
+      courseIds: linkedIds.length > 1 ? linkedIds : undefined,
       title: newTitle.trim(),
       blocks: [],
       color: course ? autoColor[course.typ] || '#16a34a' : '#16a34a',

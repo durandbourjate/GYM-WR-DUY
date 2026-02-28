@@ -44,7 +44,10 @@ export function getSequenceInfoFromStore(
   sequences: ManagedSequence[]
 ): SequenceInfo | null {
   for (const seq of sequences) {
-    if (seq.courseId !== courseId) continue;
+    // Match primary courseId OR any in courseIds array
+    const matchesCourse = seq.courseId === courseId ||
+      (seq.courseIds && seq.courseIds.includes(courseId));
+    if (!matchesCourse) continue;
     for (const block of seq.blocks) {
       const idx = block.weeks.indexOf(weekW);
       if (idx >= 0) {

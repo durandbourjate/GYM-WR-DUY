@@ -276,8 +276,12 @@ export function WeekRows({ weeks, courses, currentRef }: Props) {
 
               // Sequence highlight: is this cell part of the currently edited sequence?
               const editingSeq = editingSequenceId ? sequences.find(s => s.id === editingSequenceId) : null;
-              const isInEditingSeq = editingSeq?.courseId === c.id && editingSeq?.blocks.some(b => b.weeks.includes(week.w));
-              const isSeqDimmed = editingSeq && editingSeq.courseId === c.id && !isInEditingSeq && !!title;
+              const editingSeqMatchesCourse = editingSeq && (
+                editingSeq.courseId === c.id ||
+                (editingSeq.courseIds && editingSeq.courseIds.includes(c.id))
+              );
+              const isInEditingSeq = editingSeqMatchesCourse && editingSeq?.blocks.some(b => b.weeks.includes(week.w));
+              const isSeqDimmed = editingSeqMatchesCourse && !isInEditingSeq && !!title;
 
               // Lesson detail for display (with block inheritance)
               const cellDetail = lessonDetails[`${week.w}-${c.col}`];
