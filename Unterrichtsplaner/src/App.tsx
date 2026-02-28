@@ -36,12 +36,25 @@ function App() {
     setTimeout(() => curRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
   }, []);
 
-  // Keyboard shortcut: Ctrl+Z for undo
+  // Keyboard shortcuts: Ctrl+Z for undo, Escape to deselect, Ctrl+F for search
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'z') {
         e.preventDefault();
         usePlannerStore.getState().undo();
+      }
+      if (e.key === 'Escape') {
+        const state = usePlannerStore.getState();
+        if (state.selection) state.setSelection(null);
+        if (state.editing) state.setEditing(null);
+        if (state.multiSelection.length > 0) state.clearMultiSelect();
+        state.setDetailPanelExpanded(false);
+      }
+      if ((e.metaKey || e.ctrlKey) && e.key === 'f') {
+        e.preventDefault();
+        // Focus the search input
+        const searchInput = document.querySelector('input[placeholder*="Suche"]') as HTMLInputElement;
+        if (searchInput) searchInput.focus();
       }
     };
     window.addEventListener('keydown', handler);

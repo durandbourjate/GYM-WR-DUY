@@ -150,6 +150,14 @@ export function DetailPanel() {
     detailPanelExpanded, setDetailPanelExpanded,
   } = usePlannerStore();
 
+  const updateField = useCallback(
+    (field: keyof LessonDetail, value: LessonDetail[keyof LessonDetail]) => {
+      if (!selection) return;
+      updateLessonDetail(selection.week, selection.course.col, { [field]: value });
+    },
+    [selection, updateLessonDetail]
+  );
+
   if (!selection) return null;
 
   const c = selection.course;
@@ -157,13 +165,6 @@ export function DetailPanel() {
   const allWeekKeys = WEEKS.map((w) => w.w);
   const detailKey = `${selection.week}-${c.col}`;
   const detail: LessonDetail = lessonDetails[detailKey] || {};
-
-  const updateField = useCallback(
-    <K extends keyof LessonDetail>(field: K, value: LessonDetail[K]) => {
-      updateLessonDetail(selection.week, c.col, { [field]: value });
-    },
-    [selection.week, c.col, updateLessonDetail]
-  );
 
   const handleInsertBefore = () => {
     const paired = findPairedCourses(c);

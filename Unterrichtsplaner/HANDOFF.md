@@ -1,6 +1,6 @@
 # Unterrichtsplaner – Handoff
 
-## Projektstatus: v1.2
+## Projektstatus: v1.3
 
 ### Tech Stack
 - React 18 + TypeScript + Vite 7
@@ -33,6 +33,12 @@
 - Suchfeld in Toolbar (filtert alle Lektionsinhalte, Treffer gelb, Rest gedimmt)
 - Sequences für 12/13 Kurse vervollständigt (vorher 5/13)
 
+**🆕 v1.3 Neu:**
+- Statistik-Dashboard (📊 Button): Prüfungsverteilung, Fachbereich-Balance, Prüfungskollisionen
+- Keyboard Shortcuts: ⌘F → Suche, Escape → Schliessen/Abwählen
+- Print-CSS (A3 Landscape, kompakte Darstellung)
+- Fix: React Error #310 (useCallback Typ-Parameter in DetailPanel)
+
 ### Datenmodell
 - `Course`: id, col, cls, typ, day, from/to, les, hk, semesters
 - `Week`: w (KW), lessons: Record<col, LessonEntry>
@@ -57,4 +63,4 @@
 - Keyboard Navigation (Pfeiltasten zwischen Zellen)
 
 ---
-*Stand: 2026-02-28 · v1.2*
+*Stand: 2026-02-28 · v1.3*
