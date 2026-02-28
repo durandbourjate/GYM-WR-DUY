@@ -254,6 +254,17 @@ export function DetailPanel() {
                 ▧ {seqInfo.label} ({seqInfo.index + 1}/{seqInfo.total})
               </span>
             )}
+            {detail.learningviewUrl && (
+              <a
+                href={detail.learningviewUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[8px] px-1 py-px rounded border border-emerald-600 text-emerald-400 hover:text-emerald-300 no-underline"
+                title="In LearningView öffnen"
+              >
+                ↗ LV
+              </a>
+            )}
           </div>
           {/* Action buttons */}
           <div className="mt-1.5 flex gap-1">
@@ -360,12 +371,25 @@ export function DetailPanel() {
               {/* LearningView URL */}
               <div>
                 <label className="text-[9px] text-gray-500 font-medium mb-1 block">LearningView</label>
-                <input
-                  value={detail.learningviewUrl || ''}
-                  onChange={(e) => updateField('learningviewUrl', e.target.value)}
-                  placeholder="https://learningview.org/…"
-                  className="w-full bg-slate-700 text-slate-200 border border-slate-600 rounded px-2 py-1 text-[10px] outline-none focus:border-blue-400"
-                />
+                <div className="flex gap-1">
+                  <input
+                    value={detail.learningviewUrl || ''}
+                    onChange={(e) => updateField('learningviewUrl', e.target.value)}
+                    placeholder="https://learningview.org/…"
+                    className="flex-1 bg-slate-700 text-slate-200 border border-slate-600 rounded px-2 py-1 text-[10px] outline-none focus:border-blue-400"
+                  />
+                  {detail.learningviewUrl && (
+                    <a
+                      href={detail.learningviewUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-2 py-1 rounded bg-emerald-700 hover:bg-emerald-600 text-white text-[9px] shrink-0 no-underline"
+                      title="In LearningView öffnen"
+                    >
+                      ↗ Öffnen
+                    </a>
+                  )}
+                </div>
               </div>
 
               {/* Material-Links */}

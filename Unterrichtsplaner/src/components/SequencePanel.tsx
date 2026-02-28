@@ -16,14 +16,20 @@ function BlockEditor({
   block,
   index,
   seqId: _seqId,
+  totalBlocks,
   onUpdate,
   onRemove,
+  onMoveUp,
+  onMoveDown,
 }: {
   block: SequenceBlock;
   index: number;
   seqId: string;
+  totalBlocks: number;
   onUpdate: (idx: number, b: Partial<SequenceBlock>) => void;
   onRemove: (idx: number) => void;
+  onMoveUp: (idx: number) => void;
+  onMoveDown: (idx: number) => void;
 }) {
   const [editingLabel, setEditingLabel] = useState(false);
   const [editingWeeks, setEditingWeeks] = useState(false);
@@ -66,6 +72,20 @@ function BlockEditor({
           </span>
         )}
         <span className="text-[8px] text-gray-500">{block.weeks.length}W</span>
+        <div className="flex gap-0.5 opacity-0 group-hover:opacity-100">
+          <button
+            onClick={() => onMoveUp(index)}
+            disabled={index === 0}
+            className="text-[9px] text-gray-400 hover:text-gray-200 disabled:text-gray-600 cursor-pointer disabled:cursor-default px-0.5"
+            title="Nach oben"
+          >↑</button>
+          <button
+            onClick={() => onMoveDown(index)}
+            disabled={index === totalBlocks - 1}
+            className="text-[9px] text-gray-400 hover:text-gray-200 disabled:text-gray-600 cursor-pointer disabled:cursor-default px-0.5"
+            title="Nach unten"
+          >↓</button>
+        </div>
         <button
           onClick={() => onRemove(index)}
           className="text-[9px] text-red-400 opacity-0 group-hover:opacity-100 cursor-pointer px-1"
@@ -101,7 +121,7 @@ function BlockEditor({
 function SequenceCard({ seq }: { seq: ManagedSequence }) {
   const {
     updateSequence, deleteSequence,
-    updateBlockInSequence, removeBlockFromSequence, addBlockToSequence,
+    updateBlockInSequence, removeBlockFromSequence, addBlockToSequence, reorderBlocks,
     editingSequenceId, setEditingSequenceId,
     autoPlaceSequence, getAvailableWeeks,
   } = usePlannerStore();
@@ -237,8 +257,11 @@ function SequenceCard({ seq }: { seq: ManagedSequence }) {
                 block={block}
                 index={i}
                 seqId={seq.id}
+                totalBlocks={seq.blocks.length}
                 onUpdate={(idx, b) => updateBlockInSequence(seq.id, idx, b)}
                 onRemove={(idx) => removeBlockFromSequence(seq.id, idx)}
+                onMoveUp={(idx) => reorderBlocks(seq.id, idx, idx - 1)}
+                onMoveDown={(idx) => reorderBlocks(seq.id, idx, idx + 1)}
               />
             ))}
           </div>
