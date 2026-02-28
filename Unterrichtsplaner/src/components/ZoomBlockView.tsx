@@ -16,7 +16,7 @@ interface Props {
 }
 
 export function ZoomBlockView({ semester }: Props) {
-  const { filter, classFilter, sequences, weekData } = usePlannerStore();
+  const { filter, classFilter, sequences, weekData, setZoomLevel, setEditingSequenceId, setSidePanelOpen, setSidePanelTab } = usePlannerStore();
 
   // Filter courses
   let courses = COURSES.filter(c => c.semesters.includes(semester));
@@ -151,9 +151,25 @@ export function ZoomBlockView({ semester }: Props) {
                     { bg: '#1e293b', fg: '#94a3b8', border: '#475569' };
 
                   return (
-                    <div key={`seq-${si}`} className="absolute top-0.5 bottom-0.5 rounded-sm overflow-hidden cursor-pointer hover:brightness-110 transition-all"
+                    <div key={`seq-${si}`} className="absolute top-0.5 bottom-0.5 rounded-sm overflow-hidden cursor-pointer hover:brightness-125 hover:scale-[1.02] transition-all"
                       style={{ left, width, background: colors.bg, border: `1px solid ${colors.border}` }}
-                      title={`${seg.seq.title} — ${seg.block.label}\n${seg.block.topicMain || ''}\nKW ${seg.block.weeks.join(', ')}`}
+                      title={`${seg.seq.title} — ${seg.block.label}\n${seg.block.topicMain || ''}\nKW ${seg.block.weeks.join(', ')}\n\n🖱 Klick → Wochen-Ansicht öffnen`}
+                      onClick={() => {
+                        // Open sequence in side panel
+                        setEditingSequenceId(seg.seq.id);
+                        setSidePanelOpen(true);
+                        setSidePanelTab('sequences');
+                        // Switch to week view
+                        setZoomLevel(3);
+                        // Scroll to first week of block after render
+                        const firstWeek = seg.block.weeks[0];
+                        if (firstWeek) {
+                          setTimeout(() => {
+                            const weekRow = document.querySelector(`[data-week="${firstWeek}"]`);
+                            weekRow?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                          }, 100);
+                        }
+                      }}
                     >
                       <div className="px-1 py-0.5 h-full flex flex-col justify-center overflow-hidden">
                         <div className="text-[8px] font-semibold truncate" style={{ color: colors.fg }}>

@@ -232,6 +232,7 @@ export function WeekRows({ weeks, courses, currentRef }: Props) {
           <tr
             key={week.w}
             ref={isCurrent ? currentRef : undefined}
+            data-week={week.w}
             className="group"
             style={{ opacity: past && !isCurrent ? 0.4 : 1 }}
           >
