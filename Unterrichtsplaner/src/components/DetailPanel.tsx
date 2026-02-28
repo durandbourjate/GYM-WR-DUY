@@ -117,6 +117,31 @@ function DetailsTab() {
   const currentWeek = selection ? weekData.find((w) => w.w === selection.week) : undefined;
   const currentLesson = c ? currentWeek?.lessons[c.col] : undefined;
 
+  // Block inheritance: find parent block for this week and merge as defaults
+  const parentBlock = selection && c ? (() => {
+    for (const seq of sequences) {
+      if (seq.courseId !== c.id) continue;
+      for (const block of seq.blocks) {
+        if (block.weeks.includes(selection.week)) return block;
+      }
+    }
+    return null;
+  })() : null;
+
+  // Effective detail = own detail with block defaults for empty fields
+  const effectiveDetail: LessonDetail = {
+    topicMain: detail.topicMain || parentBlock?.topicMain,
+    topicSub: detail.topicSub || parentBlock?.topicSub,
+    subjectArea: detail.subjectArea || parentBlock?.subjectArea,
+    curriculumGoal: detail.curriculumGoal || parentBlock?.curriculumGoal,
+    taxonomyLevel: detail.taxonomyLevel || parentBlock?.taxonomyLevel,
+    blockType: detail.blockType,
+    description: detail.description || parentBlock?.description,
+    materialLinks: detail.materialLinks?.length ? detail.materialLinks : parentBlock?.materialLinks,
+    learningviewUrl: detail.learningviewUrl,
+    notes: detail.notes,
+  };
+
   const updateField = useCallback(
     <K extends keyof LessonDetail>(field: K, value: LessonDetail[K]) => {
       if (!selection || !c) return;
@@ -157,13 +182,14 @@ function DetailsTab() {
         <div className="text-sm text-gray-200">{selection.title}</div>
         {/* Tags */}
         <div className="flex gap-1 mt-1.5 flex-wrap">
-          {detail.subjectArea && (
-            <span className="text-[8px] px-1 py-px rounded border"
-              style={{ borderColor: SUBJECT_AREAS.find(s => s.key === detail.subjectArea)?.color, color: SUBJECT_AREAS.find(s => s.key === detail.subjectArea)?.color }}>
-              {detail.subjectArea}
+          {effectiveDetail.subjectArea && (
+            <span className={`text-[8px] px-1 py-px rounded border ${!detail.subjectArea && parentBlock?.subjectArea ? 'opacity-60' : ''}`}
+              style={{ borderColor: SUBJECT_AREAS.find(s => s.key === effectiveDetail.subjectArea)?.color, color: SUBJECT_AREAS.find(s => s.key === effectiveDetail.subjectArea)?.color }}
+              title={!detail.subjectArea && parentBlock?.subjectArea ? 'Vom Block geerbt' : undefined}>
+              {effectiveDetail.subjectArea}
             </span>
           )}
-          {detail.taxonomyLevel && <span className="text-[8px] px-1 py-px rounded border border-amber-600 text-amber-400">{detail.taxonomyLevel}</span>}
+          {effectiveDetail.taxonomyLevel && <span className={`text-[8px] px-1 py-px rounded border border-amber-600 text-amber-400 ${!detail.taxonomyLevel && parentBlock?.taxonomyLevel ? 'opacity-60' : ''}`}>{effectiveDetail.taxonomyLevel}</span>}
           {detail.blockType && detail.blockType !== 'LESSON' && (
             <span className="text-[8px] px-1 py-px rounded border border-gray-600 text-gray-400">
               {BLOCK_TYPES.find(b => b.key === detail.blockType)?.icon} {BLOCK_TYPES.find(b => b.key === detail.blockType)?.label}
@@ -207,16 +233,22 @@ function DetailsTab() {
         </div>
         <div>
           <label className="text-[9px] text-gray-500 font-medium mb-1 block">Thema</label>
+          {parentBlock?.topicMain && !detail.topicMain && (
+            <div className="text-[8px] text-blue-400/60 mb-0.5">↳ Block: {parentBlock.topicMain}</div>
+          )}
           <input value={detail.topicMain || ''} onChange={(e) => updateField('topicMain', e.target.value)}
-            placeholder="Hauptthema…"
+            placeholder={effectiveDetail.topicMain || 'Hauptthema…'}
             className="w-full bg-slate-700 text-slate-200 border border-slate-600 rounded px-2 py-1 text-[10px] outline-none focus:border-blue-400" />
           <input value={detail.topicSub || ''} onChange={(e) => updateField('topicSub', e.target.value)}
-            placeholder="Unterthema (optional)…"
+            placeholder={effectiveDetail.topicSub || 'Unterthema (optional)…'}
             className="w-full bg-slate-700 text-slate-200 border border-slate-600 rounded px-2 py-1 text-[10px] outline-none focus:border-blue-400 mt-1" />
         </div>
         <div>
           <label className="text-[9px] text-gray-500 font-medium mb-1 block">Lehrplanziel (LP17)</label>
-          <CurriculumGoalPicker value={detail.curriculumGoal} onChange={(v) => updateField('curriculumGoal', v)} subjectArea={detail.subjectArea} />
+          {parentBlock?.curriculumGoal && !detail.curriculumGoal && (
+            <div className="text-[8px] text-blue-400/60 mb-0.5">↳ Block: {parentBlock.curriculumGoal}</div>
+          )}
+          <CurriculumGoalPicker value={detail.curriculumGoal || effectiveDetail.curriculumGoal} onChange={(v) => updateField('curriculumGoal', v)} subjectArea={effectiveDetail.subjectArea} />
         </div>
         <div>
           <label className="text-[9px] text-gray-500 font-medium mb-1 block">LearningView</label>

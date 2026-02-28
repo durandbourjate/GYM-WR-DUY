@@ -34,6 +34,14 @@ export interface Week {
 export interface SequenceBlock {
   weeks: string[];
   label: string;
+  // Block-level details (inherited as defaults by contained tiles)
+  topicMain?: string;
+  topicSub?: string;
+  subjectArea?: SubjectArea;
+  curriculumGoal?: string;
+  taxonomyLevel?: TaxonomyLevel;
+  description?: string;
+  materialLinks?: string[];
 }
 
 /** Legacy static format (for migration) */

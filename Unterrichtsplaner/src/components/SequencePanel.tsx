@@ -33,6 +33,7 @@ function BlockEditor({
 }) {
   const [editingLabel, setEditingLabel] = useState(false);
   const [editingWeeks, setEditingWeeks] = useState(false);
+  const [showDetails, setShowDetails] = useState(false);
   const [labelText, setLabelText] = useState(block.label);
   const [weeksText, setWeeksText] = useState(block.weeks.join(', '));
 
@@ -113,6 +114,76 @@ function BlockEditor({
           title="Doppelklick zum Bearbeiten"
         >
           KW {block.weeks.join(', ')}
+        </div>
+      )}
+
+      {/* Block details toggle */}
+      <button
+        onClick={() => setShowDetails(!showDetails)}
+        className="text-[8px] text-gray-500 hover:text-gray-300 cursor-pointer mt-1 flex items-center gap-0.5"
+      >
+        {showDetails ? '▾' : '▸'} Details
+        {(block.topicMain || block.curriculumGoal) && <span className="text-green-500">●</span>}
+      </button>
+
+      {showDetails && (
+        <div className="mt-1.5 space-y-1.5 border-t border-slate-700 pt-1.5">
+          <div>
+            <label className="text-[8px] text-gray-500 block">Oberthema</label>
+            <input
+              value={block.topicMain || ''}
+              onChange={(e) => onUpdate(index, { topicMain: e.target.value || undefined })}
+              placeholder="z.B. Vertragsentstehung"
+              className="w-full bg-slate-700 text-slate-200 border border-slate-600 rounded px-1.5 py-0.5 text-[9px] outline-none focus:border-blue-400"
+            />
+          </div>
+          <div>
+            <label className="text-[8px] text-gray-500 block">Unterthema</label>
+            <input
+              value={block.topicSub || ''}
+              onChange={(e) => onUpdate(index, { topicSub: e.target.value || undefined })}
+              placeholder="optional"
+              className="w-full bg-slate-700 text-slate-200 border border-slate-600 rounded px-1.5 py-0.5 text-[9px] outline-none focus:border-blue-400"
+            />
+          </div>
+          <div>
+            <label className="text-[8px] text-gray-500 block">Fachbereich</label>
+            <div className="flex gap-0.5 flex-wrap">
+              {SUBJECT_AREAS.map((sa) => (
+                <button
+                  key={sa.key}
+                  onClick={() => onUpdate(index, { subjectArea: block.subjectArea === sa.key ? undefined : sa.key })}
+                  className="px-1 py-px rounded text-[7px] font-medium border cursor-pointer"
+                  style={{
+                    background: block.subjectArea === sa.key ? sa.color + '30' : 'transparent',
+                    borderColor: block.subjectArea === sa.key ? sa.color : '#374151',
+                    color: block.subjectArea === sa.key ? '#e5e7eb' : '#6b7280',
+                  }}
+                >
+                  {sa.label}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <label className="text-[8px] text-gray-500 block">Lehrplanziel (LP17)</label>
+            <input
+              value={block.curriculumGoal || ''}
+              onChange={(e) => onUpdate(index, { curriculumGoal: e.target.value || undefined })}
+              placeholder="z.B. 5.1 OR Grundlagen"
+              className="w-full bg-slate-700 text-slate-200 border border-slate-600 rounded px-1.5 py-0.5 text-[9px] outline-none focus:border-blue-400"
+            />
+          </div>
+          <div>
+            <label className="text-[8px] text-gray-500 block">Beschreibung</label>
+            <textarea
+              value={block.description || ''}
+              onChange={(e) => onUpdate(index, { description: e.target.value || undefined })}
+              placeholder="Notizen zum Block…"
+              rows={2}
+              className="w-full bg-slate-700 text-slate-200 border border-slate-600 rounded px-1.5 py-0.5 text-[9px] outline-none focus:border-blue-400 resize-y"
+            />
+          </div>
         </div>
       )}
     </div>
