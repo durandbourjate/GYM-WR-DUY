@@ -1,7 +1,8 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { FilterType, Week, LessonEntry, Course, LessonDetail, ManagedSequence, SequenceBlock, HKGroup, TaFPhase } from '../types';
+import type { FilterType, Week, LessonEntry, Course, LessonDetail, ManagedSequence, SequenceBlock, HKGroup, TaFPhase, SubjectArea } from '../types';
 import { SEQUENCES as STATIC_SEQUENCES } from '../data/sequences';
+import { COURSES } from '../data/courses';
 
 interface Selection {
   week: string;
@@ -413,6 +414,25 @@ export const usePlannerStore = create<PlannerState>()(
     if (weekA === weekB) return;
     const state = get();
     state.pushUndo();
+
+    // Update sequences: swap weekA↔weekB in blocks belonging to courses with this col
+    const courseId = COURSES.find(c => c.col === col)?.id;
+    const updatedSeqs = state.sequences.map(seq => {
+      if (courseId && seq.courseId !== courseId) return seq;
+      let changed = false;
+      const newBlocks = seq.blocks.map(b => {
+        const hasA = b.weeks.includes(weekA);
+        const hasB = b.weeks.includes(weekB);
+        if (!hasA && !hasB) return b;
+        changed = true;
+        return {
+          ...b,
+          weeks: b.weeks.map(w => w === weekA ? weekB : w === weekB ? weekA : w),
+        };
+      });
+      return changed ? { ...seq, blocks: newBlocks, updatedAt: new Date().toISOString() } : seq;
+    });
+
     set({
       weekData: state.weekData.map((w) => {
         if (w.w === weekA) {
@@ -431,12 +451,27 @@ export const usePlannerStore = create<PlannerState>()(
         }
         return w;
       }),
+      sequences: updatedSeqs,
     });
   },
   moveLessonToEmpty: (col, fromWeek, toWeek) => {
     if (fromWeek === toWeek) return;
     const state = get();
     state.pushUndo();
+
+    // Update sequences: replace fromWeek→toWeek in blocks
+    const courseId = COURSES.find(c => c.col === col)?.id;
+    const updatedSeqs = state.sequences.map(seq => {
+      if (courseId && seq.courseId !== courseId) return seq;
+      let changed = false;
+      const newBlocks = seq.blocks.map(b => {
+        if (!b.weeks.includes(fromWeek)) return b;
+        changed = true;
+        return { ...b, weeks: b.weeks.map(w => w === fromWeek ? toWeek : w) };
+      });
+      return changed ? { ...seq, blocks: newBlocks, updatedAt: new Date().toISOString() } : seq;
+    });
+
     set({
       weekData: state.weekData.map((w) => {
         if (w.w === fromWeek) {
@@ -451,6 +486,7 @@ export const usePlannerStore = create<PlannerState>()(
         }
         return w;
       }),
+      sequences: updatedSeqs,
     });
   },
   pushLessons: (courseCol, beforeWeekW, allWeeks) => {

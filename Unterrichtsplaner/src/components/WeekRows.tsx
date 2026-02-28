@@ -270,10 +270,16 @@ export function WeekRows({ weeks, courses, currentRef }: Props) {
               const isInEditingSeq = editingSeq?.courseId === c.id && editingSeq?.blocks.some(b => b.weeks.includes(week.w));
               const isSeqDimmed = editingSeq && editingSeq.courseId === c.id && !isInEditingSeq && !!title;
 
-              // Lesson detail for display
+              // Lesson detail for display (with block inheritance)
               const cellDetail = lessonDetails[`${week.w}-${c.col}`];
-              const displayTitle = cellDetail?.topicMain
-                ? (cellDetail.topicSub ? `${cellDetail.topicMain} › ${cellDetail.topicSub}` : cellDetail.topicMain)
+              const parentBlock = seq ? (() => {
+                const parentSeq = sequences.find(s => s.id === seq.sequenceId);
+                return parentSeq?.blocks.find(b => b.weeks.includes(week.w));
+              })() : null;
+              const effectiveTopicMain = cellDetail?.topicMain || parentBlock?.topicMain;
+              const effectiveTopicSub = cellDetail?.topicSub || parentBlock?.topicSub;
+              const displayTitle = effectiveTopicMain
+                ? (effectiveTopicSub ? `${effectiveTopicMain} › ${effectiveTopicSub}` : effectiveTopicMain)
                 : title;
 
               // Fixed cells: holidays (type 6) and events (type 5) should not be draggable
