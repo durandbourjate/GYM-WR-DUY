@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { usePlannerStore } from '../store/plannerStore';
 import { COURSES } from '../data/courses';
+import { WEEKS } from '../data/weeks';
 import { SEQUENCE_COLORS } from '../utils/colors';
 import type { SubjectArea, ManagedSequence, SequenceBlock } from '../types';
 
@@ -102,6 +103,7 @@ function SequenceCard({ seq }: { seq: ManagedSequence }) {
     updateSequence, deleteSequence,
     updateBlockInSequence, removeBlockFromSequence, addBlockToSequence,
     editingSequenceId, setEditingSequenceId,
+    autoPlaceSequence, getAvailableWeeks,
   } = usePlannerStore();
 
   const isExpanded = editingSequenceId === seq.id;
@@ -110,6 +112,11 @@ function SequenceCard({ seq }: { seq: ManagedSequence }) {
 
   const [editTitle, setEditTitle] = useState(false);
   const [titleText, setTitleText] = useState(seq.title);
+  const [showAutoPlace, setShowAutoPlace] = useState(false);
+  const [autoPlaceStart, setAutoPlaceStart] = useState(WEEKS[0]?.w || '33');
+  const [autoPlaceResult, setAutoPlaceResult] = useState<{ placed: number; skipped: string[] } | null>(null);
+
+  const allWeekOrder = WEEKS.map(w => w.w);
 
   const handleSaveTitle = () => {
     updateSequence(seq.id, { title: titleText });
@@ -237,7 +244,13 @@ function SequenceCard({ seq }: { seq: ManagedSequence }) {
           </div>
 
           {/* Actions */}
-          <div className="flex justify-end pt-1 border-t border-slate-700">
+          <div className="flex justify-between pt-1 border-t border-slate-700">
+            <button
+              onClick={() => setShowAutoPlace(!showAutoPlace)}
+              className="text-[9px] text-blue-400 hover:text-blue-300 cursor-pointer px-2 py-0.5"
+            >
+              ▶ Platzieren
+            </button>
             <button
               onClick={handleDelete}
               className="text-[9px] text-red-400 hover:text-red-300 cursor-pointer px-2 py-0.5"
@@ -245,6 +258,55 @@ function SequenceCard({ seq }: { seq: ManagedSequence }) {
               🗑 Löschen
             </button>
           </div>
+
+          {/* Auto-Place Dialog */}
+          {showAutoPlace && (
+            <div className="bg-slate-800 rounded p-2 space-y-2 border border-blue-500/30">
+              <div className="text-[9px] font-medium text-blue-300">Auto-Platzierung</div>
+              <div className="flex items-center gap-2">
+                <label className="text-[8px] text-gray-400">Ab KW:</label>
+                <select
+                  value={autoPlaceStart}
+                  onChange={(e) => { setAutoPlaceStart(e.target.value); setAutoPlaceResult(null); }}
+                  className="text-[9px] bg-slate-700 border border-slate-600 rounded px-1 py-0.5 text-gray-200"
+                >
+                  {allWeekOrder.map(w => (
+                    <option key={w} value={w}>KW {w}</option>
+                  ))}
+                </select>
+                <span className="text-[8px] text-gray-500">
+                  {getAvailableWeeks(seq.courseId, autoPlaceStart, allWeekOrder).length} frei
+                </span>
+              </div>
+              <div className="text-[8px] text-gray-500">
+                Benötigt: {totalWeeks} Wochen · Verfügbar: {getAvailableWeeks(seq.courseId, autoPlaceStart, allWeekOrder).length}
+              </div>
+              {autoPlaceResult && (
+                <div className={`text-[8px] p-1 rounded ${autoPlaceResult.placed > 0 ? 'bg-green-900/30 text-green-300' : 'bg-red-900/30 text-red-300'}`}>
+                  ✅ {autoPlaceResult.placed} Lektionen platziert
+                  {autoPlaceResult.skipped.length > 0 && ` · ${autoPlaceResult.skipped.length} übersprungen`}
+                </div>
+              )}
+              <div className="flex gap-2">
+                <button
+                  onClick={() => {
+                    const result = autoPlaceSequence(seq.id, autoPlaceStart, allWeekOrder);
+                    setAutoPlaceResult(result);
+                  }}
+                  disabled={getAvailableWeeks(seq.courseId, autoPlaceStart, allWeekOrder).length < totalWeeks}
+                  className="text-[9px] bg-blue-600 hover:bg-blue-500 disabled:bg-slate-600 disabled:text-gray-500 text-white px-2 py-0.5 rounded cursor-pointer disabled:cursor-not-allowed"
+                >
+                  Jetzt platzieren
+                </button>
+                <button
+                  onClick={() => { setShowAutoPlace(false); setAutoPlaceResult(null); }}
+                  className="text-[9px] text-gray-400 hover:text-gray-300 cursor-pointer px-2 py-0.5"
+                >
+                  Abbrechen
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

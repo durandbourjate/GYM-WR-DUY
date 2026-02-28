@@ -67,6 +67,9 @@ interface PlannerState {
   updateBlockInSequence: (seqId: string, blockIndex: number, block: Partial<SequenceBlock>) => void;
   removeBlockFromSequence: (seqId: string, blockIndex: number) => void;
   reorderBlocks: (seqId: string, fromIndex: number, toIndex: number) => void;
+  // Auto-placement
+  autoPlaceSequence: (seqId: string, startWeek: string, allWeekOrder: string[]) => { placed: number; skipped: string[] };
+  getAvailableWeeks: (courseId: string, startWeek: string, allWeekOrder: string[]) => string[];
   // Sequence Panel UI state
   sequencePanelOpen: boolean;
   setSequencePanelOpen: (v: boolean) => void;
@@ -207,6 +210,93 @@ export const usePlannerStore = create<PlannerState>()(
         return { ...s, blocks, updatedAt: new Date().toISOString() };
       }),
     })),
+  // Auto-placement: find free weeks for a course
+  getAvailableWeeks: (courseId, startWeek, allWeekOrder) => {
+    const state = get();
+    const seq = state.sequences.find(s => s.courseId === courseId);
+    if (!seq) return [];
+    // We need the col - find it from COURSES imported indirectly through weekData
+    // Actually we work with courseId which maps to col via COURSES
+    // For now, we need to extract col from the courseId (e.g. "c17" -> col 17)
+    const col = parseInt(courseId.replace('c', ''));
+    if (isNaN(col)) return [];
+    
+    const startIdx = allWeekOrder.indexOf(startWeek);
+    if (startIdx < 0) return [];
+    
+    const available: string[] = [];
+    for (let i = startIdx; i < allWeekOrder.length; i++) {
+      const weekW = allWeekOrder[i];
+      const week = state.weekData.find(w => w.w === weekW);
+      if (!week) { available.push(weekW); continue; }
+      const lesson = week.lessons[col];
+      // Free = no lesson, or type 0 (other) with empty-ish title
+      if (!lesson) {
+        available.push(weekW);
+      }
+      // Skip: holidays (6), events (5), exams (4), and occupied lessons (1,2,3)
+    }
+    return available;
+  },
+  // Auto-place a sequence: distribute blocks across free weeks starting from startWeek
+  autoPlaceSequence: (seqId, startWeek, allWeekOrder) => {
+    const state = get();
+    const seq = state.sequences.find(s => s.id === seqId);
+    if (!seq) return { placed: 0, skipped: [] };
+    
+    const col = parseInt(seq.courseId.replace('c', ''));
+    if (isNaN(col)) return { placed: 0, skipped: [] };
+    
+    // Get available weeks
+    const available = state.getAvailableWeeks(seq.courseId, startWeek, allWeekOrder);
+    
+    // Determine LessonType from subjectArea
+    const typeMap: Record<string, number> = { BWL: 1, VWL: 2, RECHT: 2, IN: 3, INTERDISZ: 0 };
+    const lessonType = (seq.subjectArea ? typeMap[seq.subjectArea] : 0) as import('../types').LessonType;
+    
+    state.pushUndo();
+    
+    let weekIdx = 0;
+    let placed = 0;
+    const skipped: string[] = [];
+    const newWeekData = state.weekData.map(w => ({ ...w, lessons: { ...w.lessons } }));
+    const weekMap = new Map(newWeekData.map(w => [w.w, w]));
+    const newBlocks: import('../types').SequenceBlock[] = [];
+    
+    for (const block of seq.blocks) {
+      const blockWeeks: string[] = [];
+      for (let i = 0; i < block.weeks.length; i++) {
+        // Find next available week
+        while (weekIdx < available.length) {
+          const candidateWeek = available[weekIdx];
+          weekIdx++;
+          const week = weekMap.get(candidateWeek);
+          if (week) {
+            week.lessons[col] = { title: block.label, type: lessonType };
+            blockWeeks.push(candidateWeek);
+            placed++;
+            break;
+          } else {
+            // Week exists in order but not in weekData – skip
+            skipped.push(candidateWeek);
+          }
+        }
+      }
+      newBlocks.push({ label: block.label, weeks: blockWeeks });
+    }
+    
+    // Update weekData and sequence blocks
+    set({
+      weekData: newWeekData,
+      sequences: state.sequences.map(s =>
+        s.id === seqId
+          ? { ...s, blocks: newBlocks, updatedAt: new Date().toISOString() }
+          : s
+      ),
+    });
+    
+    return { placed, skipped };
+  },
   // Sequence Panel UI state
   sequencePanelOpen: false,
   setSequencePanelOpen: (v) => set({ sequencePanelOpen: v }),
