@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import type { FilterType, Week, LessonEntry, Course, LessonDetail } from '../types';
 
 interface Selection {
@@ -55,7 +56,9 @@ interface PlannerState {
   undo: () => void;
 }
 
-export const usePlannerStore = create<PlannerState>((set, get) => ({
+export const usePlannerStore = create<PlannerState>()(
+  persist(
+    (set, get) => ({
   filter: 'ALL',
   setFilter: (f) => set({ filter: f }),
   selection: null,
@@ -196,4 +199,14 @@ export const usePlannerStore = create<PlannerState>((set, get) => ({
         undoStack: state.undoStack.slice(0, -1),
       };
     }),
-}));
+    }),
+    {
+      name: 'unterrichtsplaner-storage',
+      version: 1,
+      partialize: (state) => ({
+        weekData: state.weekData,
+        lessonDetails: state.lessonDetails,
+      }),
+    }
+  )
+);
