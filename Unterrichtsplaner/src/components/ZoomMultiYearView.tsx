@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react';
 import { usePlannerStore } from '../store/plannerStore';
+import { COURSES } from '../data/courses';
 import { CURRICULUM_GOALS, type CurriculumGoal } from '../data/curriculumGoals';
-import type { SubjectArea } from '../types';
+import type { SubjectArea, ManagedSequence } from '../types';
 
 /**
  * Zoom Level 1: Multi-Year View
@@ -44,7 +45,14 @@ function getGoalsBySemester(semester: string): CurriculumGoal[] {
   });
 }
 
-type ViewMode = 'curriculum' | 'actual';
+type ViewMode = 'curriculum' | 'actual' | 'class';
+
+// SF groups with their GYM year in current SJ 25/26
+const SF_GROUPS = [
+  { cls: '29c', gymYear: 1, semesters: ['S1', 'S2'], label: '29c · GYM1' },
+  { cls: '28bc29fs', gymYear: 2, semesters: ['S3', 'S4'], label: '28bc29fs · GYM2' },
+  { cls: '27a28f', gymYear: 3, semesters: ['S5', 'S6'], label: '27a28f · GYM3' },
+];
 
 function SubjectBar({ area, weight, total }: { area: SubjectArea; weight: number; total: number }) {
   if (weight === 0) return null;
@@ -207,7 +215,134 @@ function ActualDataCard({ semester, gymYear }: { semester: string; gymYear: stri
   );
 }
 
+function ClassViewCard({ group, sequences }: { group: typeof SF_GROUPS[0]; sequences: ManagedSequence[] }) {
+  // Find sequences for this class group
+  const classSequences = useMemo(() => {
+    const courseIds = COURSES.filter(c => c.cls === group.cls && c.typ === 'SF').map(c => c.id);
+    return sequences.filter(s =>
+      courseIds.includes(s.courseId) || (s.courseIds && s.courseIds.some(cid => courseIds.includes(cid)))
+    );
+  }, [group.cls, sequences]);
+
+  // Count weeks by subject area
+  const stats = useMemo(() => {
+    const counts: Record<SubjectArea, number> = { BWL: 0, VWL: 0, RECHT: 0, IN: 0, INTERDISZ: 0 };
+    const blocks: { area: SubjectArea; label: string; weeks: number; topicMain?: string }[] = [];
+    for (const seq of classSequences) {
+      for (const block of seq.blocks) {
+        const area = block.subjectArea || seq.subjectArea;
+        if (!area) continue;
+        counts[area] += block.weeks.length;
+        blocks.push({ area, label: block.label, weeks: block.weeks.length, topicMain: block.topicMain });
+      }
+    }
+    return { counts, blocks };
+  }, [classSequences]);
+
+  const total = Object.values(stats.counts).reduce((a, b) => a + b, 0);
+
+  // Curriculum goals for this class's semesters
+  const semesterGoals = useMemo(() => {
+    const goals: Record<string, CurriculumGoal[]> = {};
+    for (const sem of group.semesters) {
+      goals[sem] = getGoalsBySemester(sem);
+    }
+    return goals;
+  }, [group.semesters]);
+
+  const sv1 = STOFF_VERTEILUNG.find(s => s.semester === group.semesters[0]);
+  const sv2 = STOFF_VERTEILUNG.find(s => s.semester === group.semesters[1]);
+
+  return (
+    <div className="rounded-lg border border-slate-600 bg-slate-900/80 overflow-hidden">
+      {/* Header */}
+      <div className="px-3 py-2 bg-slate-800/50 border-b border-slate-700">
+        <div className="flex items-center gap-2">
+          <span className="text-[12px] font-bold text-amber-400">GYM{group.gymYear}</span>
+          <span className="text-[10px] font-semibold text-gray-200">{group.cls}</span>
+          <span className="text-[8px] text-gray-500 ml-auto">{group.semesters.join(' + ')} · {total} Wochen geplant</span>
+        </div>
+      </div>
+
+      <div className="p-3 space-y-3">
+        {/* Soll vs Ist comparison per semester */}
+        {group.semesters.map((sem, idx) => {
+          const sv = idx === 0 ? sv1 : sv2;
+          if (!sv) return null;
+          const goals = semesterGoals[sem] || [];
+          return (
+            <div key={sem} className="space-y-1.5">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-bold text-gray-300">{sem}</span>
+                <div className="flex-1 h-px bg-slate-700" />
+              </div>
+              {/* Soll bar */}
+              <div className="flex items-center gap-1.5">
+                <span className="text-[7px] text-gray-500 w-8 shrink-0">Soll</span>
+                <div className="flex-1 flex gap-px">
+                  <SubjectBar area="BWL" weight={sv.bwl} total={Math.max(sv.bwl + sv.vwl + sv.recht, 1)} />
+                  <SubjectBar area="VWL" weight={sv.vwl} total={Math.max(sv.bwl + sv.vwl + sv.recht, 1)} />
+                  <SubjectBar area="RECHT" weight={sv.recht} total={Math.max(sv.bwl + sv.vwl + sv.recht, 1)} />
+                </div>
+              </div>
+              {/* Ist bars */}
+              {total > 0 && (
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[7px] text-gray-500 w-8 shrink-0">Ist</span>
+                  <div className="flex-1 flex gap-px">
+                    {(['BWL', 'VWL', 'RECHT'] as SubjectArea[]).map(area => {
+                      if (stats.counts[area] === 0) return null;
+                      const c = SUBJECT_COLORS[area];
+                      const pct = Math.min((stats.counts[area] / Math.max(total, 1)) * 100, 100);
+                      return (
+                        <div key={area} className="flex items-center" style={{ width: `${pct}%`, minWidth: 20 }}>
+                          <div className="h-5 rounded-sm w-full flex items-center justify-center"
+                            style={{ background: c.bg, border: `1px solid ${c.border}`, opacity: 0.8 }}>
+                            <span className="text-[8px] font-bold" style={{ color: c.text }}>{stats.counts[area]}</span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+              {/* Goals */}
+              <div className="pl-9 space-y-px">
+                {goals.slice(0, 6).map(g => <GoalChip key={g.id} goal={g} />)}
+                {goals.length > 6 && <span className="text-[7px] text-gray-600">+{goals.length - 6} weitere</span>}
+              </div>
+            </div>
+          );
+        })}
+
+        {/* Planned blocks detail */}
+        {stats.blocks.length > 0 && (
+          <div className="border-t border-slate-700/50 pt-2">
+            <span className="text-[8px] text-gray-500 font-semibold">Geplante Blöcke:</span>
+            <div className="mt-1 space-y-0.5">
+              {stats.blocks.map((b, i) => {
+                const c = SUBJECT_COLORS[b.area];
+                return (
+                  <div key={i} className="flex items-center gap-1.5">
+                    <span className="text-[7px] px-1 py-px rounded shrink-0"
+                      style={{ background: c.bg, color: c.text, border: `1px solid ${c.border}` }}>
+                      {b.area}
+                    </span>
+                    <span className="text-[8px] text-gray-300 truncate flex-1">{b.topicMain || b.label}</span>
+                    <span className="text-[7px] text-gray-500 shrink-0">{b.weeks}W</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export function ZoomMultiYearView() {
+  const { sequences } = usePlannerStore();
   const [mode, setMode] = useState<ViewMode>('curriculum');
   const [expandedSemesters, setExpandedSemesters] = useState<Set<string>>(new Set());
   
@@ -257,10 +392,16 @@ export function ZoomMultiYearView() {
             }`}>
             📊 Ist-Zustand
           </button>
+          <button onClick={() => setMode('class')}
+            className={`px-2.5 py-1 rounded text-[9px] font-semibold border cursor-pointer transition-colors ${
+              mode === 'class' ? 'bg-amber-500/20 border-amber-500 text-amber-300' : 'border-gray-700 text-gray-500 hover:text-gray-300'
+            }`}>
+            🎓 Jahrgänge
+          </button>
         </div>
       </div>
 
-      {mode === 'curriculum' ? (
+      {mode === 'curriculum' && (
         <>
           {/* Summary bar */}
           <div className="flex items-center gap-3 mb-3 px-2 py-1.5 bg-slate-800/50 rounded-md border border-slate-700">
@@ -295,7 +436,9 @@ export function ZoomMultiYearView() {
             ))}
           </div>
         </>
-      ) : (
+      )}
+
+      {mode === 'actual' && (
         <>
           {/* Actual data view */}
           <div className="text-[9px] text-gray-500 mb-3 px-2 py-1.5 bg-slate-800/50 rounded-md border border-slate-700">
@@ -313,6 +456,19 @@ export function ZoomMultiYearView() {
                   <ActualDataCard semester={s2} gymYear={gym} />
                 </div>
               </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      {mode === 'class' && (
+        <>
+          <div className="text-[9px] text-gray-500 mb-3 px-2 py-1.5 bg-slate-800/50 rounded-md border border-slate-700">
+            Zeigt Soll- und Ist-Zustand pro SF-Gruppe im aktuellen Schuljahr (SJ 25/26).
+          </div>
+          <div className="space-y-3">
+            {SF_GROUPS.map(group => (
+              <ClassViewCard key={group.cls} group={group} sequences={sequences} />
             ))}
           </div>
         </>
