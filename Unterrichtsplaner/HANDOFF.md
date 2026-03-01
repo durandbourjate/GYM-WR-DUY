@@ -1,7 +1,7 @@
 # Unterrichtsplaner – Handoff v3.24
 
-## Status: ✅ Deployed (v3.27)
-- **Commit:** a0435b8
+## Status: ✅ Deployed (v3.28)
+- **Commit:** 4ae0c09
 - **Datum:** 2026-03-01
 - **Deploy:** https://durandbourjate.github.io/GYM-WR-DUY/Unterrichtsplaner/
 
@@ -34,8 +34,10 @@
 - v3.26: HoverPreview zeigt nach oben bei Zellen im unteren Bildschirmdrittel. Notizen-Spalte: breiterer Default (200px), grösserer Toggle-Button mit 📝-Icon, Zeilenumbrüche (whitespace-pre-line), grössere Schrift.
 - v3.27: Zoom 2 — farbige Blöcke mit Dark-Mode-Palette (VWL=orange-braun, BWL=dunkelblau, Recht=dunkelgrün), grössere Schrift (10px Labels, 8px Details), breitere Spalten (110px). Notizen-Spalte resizable (Drag-Handle im Header, 80-400px Range, noteColWidth im Store). ZoomYearView Placeholder-Datei.
 
+- v3.28: Zoom 2 komplett umgebaut → Jahresansicht (ZoomYearView). Ganzes Schuljahr in einer Tabelle statt S1/S2 separat. Kurse nach cls+typ gruppiert. 2-Tage-Kurse: breiter Balken bei geteilter Sequenz (courseIds), 2 schmale Sub-Spalten bei separaten Sequenzen. Semester-Trennlinie (goldener Border). ZoomBlockView (alte Semesteransicht) bleibt als Komponente erhalten, wird aber nicht mehr in App.tsx verwendet.
+
 ### Offene Feature-Requests
-- **Zoom 2 Jahresmodus**: Kurse durchgehend über beide Semester anzeigen (ohne Wochentag-Trennung). 2-Tage-Kurse: Breiter Balken wenn gleiche Sequenz, 2 schmale Balken wenn unterschiedliche Sequenzen an Di/Do.
+- **Zoom 2 Jahresmodus**: ✅ Implementiert (v3.28)
 - **SOL-Total bei Sequenzen**: SOL als Total aller zugehörigen Unterrichtseinheiten verlinken
 - **Google Calendar Integration**: Kalender im Tool anzeigen Klick zum Editieren, Enter/Blur zum Speichern, Escape zum Abbrechen.
 
