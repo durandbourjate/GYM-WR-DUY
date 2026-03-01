@@ -1,9 +1,10 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { usePlannerStore } from '../store/plannerStore';
 import { StatsPanel } from './StatsPanel';
 import { TaFPanel } from './TaFPanel';
 import { COURSES } from '../data/courses';
-import { CURRENT_WEEK } from '../data/weeks';
+import { CURRENT_WEEK, S2_START_INDEX } from '../data/weeks';
+import { checkGradeRequirements } from '../utils/gradeRequirements';
 import type { FilterType } from '../types';
 
 const FILTERS: { key: FilterType; label: string }[] = [
@@ -128,6 +129,14 @@ export function AppHeader() {
   const { filter, setFilter, classFilter, setClassFilter, showHelp, toggleHelp, undoStack, undo, setSequencePanelOpen, sidePanelOpen, setSidePanelOpen, setSidePanelTab, zoomLevel, setZoomLevel, searchQuery, setSearchQuery } = usePlannerStore();
   const [showStats, setShowStats] = useState(false);
   const [showTaF, setShowTaF] = useState(false);
+
+  // Grade warnings badge
+  const { weekData, lessonDetails } = usePlannerStore();
+  const gradeIssueCount = useMemo(() => {
+    if (!weekData.length) return 0;
+    return checkGradeRequirements(weekData, lessonDetails, COURSES, S2_START_INDEX)
+      .filter(w => w.status !== 'ok').length;
+  }, [weekData, lessonDetails]);
   const [showAddMenu, setShowAddMenu] = useState(false);
   const addMenuRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -232,10 +241,15 @@ export function AppHeader() {
         <DataMenu />
         <button
           onClick={() => setShowStats(true)}
-          className="px-2 py-0.5 rounded text-[10px] border border-gray-700 text-gray-500 cursor-pointer hover:text-gray-300 hover:border-gray-500"
+          className="px-2 py-0.5 rounded text-[10px] border border-gray-700 text-gray-500 cursor-pointer hover:text-gray-300 hover:border-gray-500 relative"
           title="Statistik"
         >
           📊
+          {gradeIssueCount > 0 && (
+            <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-red-500 rounded-full text-[7px] font-bold text-white flex items-center justify-center">
+              {gradeIssueCount}
+            </span>
+          )}
         </button>
         {showStats && <StatsPanel onClose={() => setShowStats(false)} />}
         <button

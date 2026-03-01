@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
 import { usePlannerStore } from '../store/plannerStore';
 import { COURSES } from '../data/courses';
-import { WEEKS } from '../data/weeks';
+import { WEEKS, S2_START_INDEX } from '../data/weeks';
+import { checkGradeRequirements } from '../utils/gradeRequirements';
 import type { Course, Week } from '../types';
 
 interface CourseStats {
@@ -141,10 +142,15 @@ function findExamCollisions(stats: CourseStats[]): Collision[] {
 }
 
 export function StatsPanel({ onClose }: { onClose: () => void }) {
-  const { weekData, sequences } = usePlannerStore();
+  const { weekData, sequences, lessonDetails } = usePlannerStore();
   const stats = useMemo(() => computeStats(weekData), [weekData]);
   const collisions = useMemo(() => findExamCollisions(stats), [stats]);
+  const gradeWarnings = useMemo(
+    () => checkGradeRequirements(weekData, lessonDetails, COURSES, S2_START_INDEX),
+    [weekData, lessonDetails]
+  );
 
+  const gradeIssues = gradeWarnings.filter(w => w.status !== 'ok');
   const totalExams = stats.reduce((s, c) => s + c.exams, 0);
   const teachingWeeks = stats.reduce(
     (s, c) => s + c.totalLessons - c.holidays - c.events,
@@ -256,6 +262,34 @@ export function StatsPanel({ onClose }: { onClose: () => void }) {
             <div className="text-[10px] text-green-400">✓ Keine Prüfungskollisionen erkannt</div>
           </div>
         )}
+
+        {/* Grade requirements (MiSDV) */}
+        <div className={`rounded p-3 mb-4 border ${gradeIssues.length > 0 ? 'bg-amber-950/30 border-amber-800' : 'bg-green-950/20 border-green-800/40'}`}>
+          <div className={`text-[10px] font-bold mb-2 ${gradeIssues.length > 0 ? 'text-amber-300' : 'text-green-400'}`}>
+            📋 Beurteilungsvorgaben (MiSDV Art. 4)
+          </div>
+          {gradeIssues.length === 0 ? (
+            <div className="text-[10px] text-green-400">✓ Alle Mindestanforderungen erfüllt</div>
+          ) : (
+            <div className="space-y-1">
+              {gradeIssues.map((w, i) => (
+                <div key={i} className={`rounded p-2 text-[9px] ${w.status === 'critical' ? 'bg-red-950/40 text-red-300' : 'bg-amber-950/40 text-amber-300'}`}>
+                  <span className="font-bold">{w.courseGroup}</span>
+                  <span className="text-gray-400 ml-1">({w.gymStufe}, {w.weeklyLessons}L/Wo)</span>
+                  <span className="ml-1">{w.status === 'critical' ? '🔴' : '🟡'} {w.message}</span>
+                </div>
+              ))}
+            </div>
+          )}
+          {/* Compact overview of all groups */}
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {gradeWarnings.filter(w => w.status === 'ok').length > 0 && (
+              <div className="text-[8px] text-gray-500">
+                ✓ OK: {gradeWarnings.filter(w => w.status === 'ok').map(w => `${w.courseGroup} (${w.requirement.label}: ${w.currentCount}/${w.requirement.minGrades})`).join(' · ')}
+              </div>
+            )}
+          </div>
+        </div>
 
         {/* Legend */}
         <div className="mt-3 flex gap-3 flex-wrap">
