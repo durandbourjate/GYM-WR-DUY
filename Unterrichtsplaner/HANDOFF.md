@@ -1,7 +1,7 @@
-# Unterrichtsplaner – Handoff v3.27
+# Unterrichtsplaner – Handoff v3.28
 
-## Status: ✅ Deployed (v3.37)
-- **Commit:** 0814ebd
+## Status: ✅ Deployed (v3.38)
+- **Commit:** bf80b5e
 - **Datum:** 2026-03-01
 - **Deploy:** https://durandbourjate.github.io/GYM-WR-DUY/Unterrichtsplaner/
 
@@ -70,9 +70,11 @@
 9. ✅ Material vereinfacht (LV+Material → 1 Feld)
 10. ✅ Zoom 2 loose lessons Bug fix
 
-#### 🔵 Nächste Runde (v3.37+)
-11. **Ferien als durchgehende Blöcke** — Zoom 2+3: Ferien-Wochen als leere, beschriftete Blöcke (z.B. "Herbstferien"), normalgross
-12. **Studienreisen/Sonderwochen visuell** — IW/Events als durchgehende graue Blöcke, ausser für anwesende UE (z.B. TaF in Schneesportwoche)
+- v3.38: Ferien/Events Zoom 2 Overhaul — (1) Aufeinanderfolgende Ferien-Wochen (type 6) werden als zusammengefasste rowSpan-Blöcke gerendert mit KW-Range-Label (z.B. "KW42–KW43"), 🏖-Icon, Name und Wochenzähler. (2) Ganztags-Events (type 5, alle Kurse betroffen) ebenso als colspan-Block mit 📅-Icon und amber-Farbe. (3) Partielle Events (nur einzelne Kurse betroffen): pro Kurs-Zelle als kleiner grauer Block mit Icon statt leere Zelle. (4) Multi-day Sub-Columns: Events/Holidays werden dort ebenfalls als Mini-Blöcke gerendert.
+
+#### 🔵 Nächste Runde (v3.37+) — ✅ Erledigt
+11. ✅ Ferien als durchgehende Blöcke (rowSpan, zusammengefasst, normalgross)
+12. ✅ Studienreisen/Sonderwochen visuell (colspan für Ganz-Events, pro-Kurs-Blöcke für partielle)
 13. **Google Calendar Integration** — Konzept steht, Umsetzung bei Gelegenheit
 
 ### Feature-Spec: Google Calendar Integration (geplant)
