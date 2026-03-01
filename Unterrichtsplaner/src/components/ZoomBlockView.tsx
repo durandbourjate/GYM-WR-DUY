@@ -1,8 +1,7 @@
-import { useMemo } from 'react';
+import { useMemo, useCallback } from 'react';
 import { usePlannerStore } from '../store/plannerStore';
-import { COURSES } from '../data/courses';
-import { WEEKS, S2_START_INDEX } from '../data/weeks';
-import { TYPE_BADGES, DAY_COLORS, SUBJECT_AREA_COLORS } from '../utils/colors';
+import { usePlannerData } from '../hooks/usePlannerData';
+import { TYPE_BADGES, DAY_COLORS, SUBJECT_AREA_COLORS, isPastWeek } from '../utils/colors';
 import type { Course, ManagedSequence } from '../types';
 
 const DAY_ORDER: Record<string, number> = { Mo: 0, Di: 1, Mi: 2, Do: 3, Fr: 4 };
@@ -11,17 +10,44 @@ interface Props {
   semester: 1 | 2;
 }
 
+/** Info about which sequence block occupies a cell */
+interface CellBlock {
+  seq: ManagedSequence;
+  blockIdx: number;
+  label: string;
+  topicMain?: string;
+  subjectArea?: string;
+  weekIndexInBlock: number;  // 0-based position within block.weeks
+  totalWeeksInBlock: number;
+  isFirst: boolean;
+  isLast: boolean;
+  curriculumGoal?: string;
+}
+
+/** Detect holiday/event weeks from weekData */
+function getWeekType(weekW: string, weekData: any[], col: number): 'holiday' | 'event' | 'normal' {
+  const week = weekData.find((w: any) => w.w === weekW);
+  if (!week) return 'normal';
+  const entry = week.lessons[col];
+  if (!entry) return 'normal';
+  if (entry.type === 6) return 'holiday';
+  if (entry.type === 5) return 'event';
+  return 'normal';
+}
+
 export function ZoomBlockView({ semester }: Props) {
   const {
-    filter, classFilter, sequences,
+    filter, classFilter, sequences, weekData,
     setZoomLevel, setEditingSequenceId,
     setSidePanelOpen, setSidePanelTab, setSelection,
-    searchQuery,
+    searchQuery, setClassFilter, setFilter,
   } = usePlannerStore();
 
-  // Filter and sort courses (same logic as App.tsx)
+  const { courses: allCourses, weeks: staticWeeks, s2StartIndex, currentWeek } = usePlannerData();
+
+  // Filter and sort courses
   const courses = useMemo(() => {
-    let c = COURSES.filter(co => co.semesters.includes(semester));
+    let c = allCourses.filter(co => co.semesters.includes(semester));
     if (filter !== 'ALL') c = c.filter(co => co.typ === filter);
     if (classFilter) c = c.filter(co => co.cls === classFilter);
     return [...c].sort((a, b) => {
@@ -29,86 +55,77 @@ export function ZoomBlockView({ semester }: Props) {
       if (dayDiff !== 0) return dayDiff;
       return a.from.localeCompare(b.from);
     });
-  }, [filter, classFilter, semester]);
+  }, [filter, classFilter, semester, allCourses]);
 
-  // Semester weeks
+  // Semester weeks from dynamic data
+  const effectiveWeeks = useMemo(() =>
+    weekData.length > 0 ? weekData : staticWeeks,
+    [weekData, staticWeeks]);
+
   const semWeeks = useMemo(() => {
-    const allWeeks = WEEKS.map(w => w.w);
-    if (semester === 1) return allWeeks.slice(0, S2_START_INDEX);
-    return allWeeks.slice(S2_START_INDEX);
-  }, [semester]);
+    const all = effectiveWeeks.map(w => w.w);
+    if (semester === 1) return all.slice(0, s2StartIndex);
+    return all.slice(s2StartIndex);
+  }, [effectiveWeeks, semester, s2StartIndex]);
 
-  // For each course, collect sequence blocks in week order
-  type BlockInfo = {
-    seq: ManagedSequence;
-    blockIdx: number;
-    label: string;
-    topicMain?: string;
-    subjectArea?: string;
-    weeks: string[];
-    curriculumGoal?: string;
-  };
-
-  const courseBlockMap = useMemo(() => {
-    const map = new Map<string, BlockInfo[]>();
+  // Build cell map: for each (weekW, courseId) → CellBlock | null
+  const cellMap = useMemo(() => {
+    const map = new Map<string, CellBlock>();
     for (const course of courses) {
       const courseSeqs = sequences.filter(s =>
         s.courseId === course.id || (s.courseIds?.includes(course.id))
       );
-      const blocks: BlockInfo[] = [];
       for (const seq of courseSeqs) {
         for (let bi = 0; bi < seq.blocks.length; bi++) {
           const block = seq.blocks[bi];
-          const relevantWeeks = block.weeks.filter(w => semWeeks.includes(w));
-          if (relevantWeeks.length === 0) continue;
-          blocks.push({
-            seq,
-            blockIdx: bi,
-            label: block.label,
-            topicMain: block.topicMain,
-            subjectArea: block.subjectArea || seq.subjectArea,
-            weeks: relevantWeeks,
-            curriculumGoal: block.curriculumGoal,
-          });
+          const blockWeeksInSem = block.weeks.filter(w => semWeeks.includes(w));
+          for (const w of blockWeeksInSem) {
+            const globalIdx = block.weeks.indexOf(w);
+            const key = `${w}:${course.id}`;
+            map.set(key, {
+              seq,
+              blockIdx: bi,
+              label: block.label,
+              topicMain: block.topicMain,
+              subjectArea: block.subjectArea || seq.subjectArea,
+              weekIndexInBlock: globalIdx,
+              totalWeeksInBlock: block.weeks.length,
+              isFirst: globalIdx === 0,
+              isLast: globalIdx === block.weeks.length - 1,
+              curriculumGoal: block.curriculumGoal,
+            });
+          }
         }
       }
-      // Sort by first week
-      blocks.sort((a, b) => semWeeks.indexOf(a.weeks[0]) - semWeeks.indexOf(b.weeks[0]));
-      map.set(course.id, blocks);
     }
     return map;
   }, [courses, sequences, semWeeks]);
 
-  // Max blocks across all courses (for row count)
-  const maxBlocks = Math.max(...Array.from(courseBlockMap.values()).map(b => b.length), 1);
-
-  const handleBlockClick = (block: BlockInfo) => {
-    setEditingSequenceId(block.seq.id);
-    setSidePanelOpen(true);
-    setSidePanelTab('sequences');
-  };
-
-  const handleBlockNavClick = (block: BlockInfo, course: Course) => {
-    setZoomLevel(3);
-    const firstWeek = block.weeks[0];
-    if (firstWeek) {
-      setSelection({ week: firstWeek, courseId: course.id, title: block.label, course });
-      setTimeout(() => {
-        const row = document.querySelector(`[data-week="${firstWeek}"]`);
-        row?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }, 100);
-    }
-  };
-
   const searchLower = searchQuery.toLowerCase();
 
+  // Click handlers
+  const handleBlockClick = useCallback((cell: CellBlock) => {
+    setEditingSequenceId(cell.seq.id);
+    setSidePanelOpen(true);
+    setSidePanelTab('sequences');
+  }, [setEditingSequenceId, setSidePanelOpen, setSidePanelTab]);
+
+  const handleBlockDblClick = useCallback((weekW: string, course: Course, cell: CellBlock) => {
+    setZoomLevel(3);
+    setSelection({ week: weekW, courseId: course.id, title: cell.label, course });
+    setTimeout(() => {
+      const row = document.querySelector(`tr[data-week="${weekW}"]`);
+      row?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 100);
+  }, [setZoomLevel, setSelection]);
+
   return (
-    <div className="px-2 py-2">
+    <div className="px-1 py-1">
       <table className="border-collapse w-max min-w-full">
         <thead className="sticky z-40" style={{ top: 0 }}>
           {/* Day row */}
           <tr>
-            <th className="w-8 bg-gray-900 sticky left-0 z-50 py-0.5 border-b border-gray-800">
+            <th className="w-10 bg-gray-900 sticky left-0 z-50 py-0.5 border-b border-gray-800">
               <span className={`text-[8px] font-bold ${semester === 1 ? 'text-blue-400' : 'text-amber-400'}`}>
                 {semester === 1 ? 'S1' : 'S2'}
               </span>
@@ -125,18 +142,25 @@ export function ZoomBlockView({ semester }: Props) {
           </tr>
           {/* Course info row */}
           <tr>
-            <th className="w-8 bg-gray-900 sticky left-0 z-50 px-0.5 pb-0.5 border-b-2 border-gray-700">
-              <span className="text-[6px] text-gray-500">#</span>
+            <th className="w-10 bg-gray-900 sticky left-0 z-50 px-0.5 pb-0.5 border-b-2 border-gray-700">
+              <span className="text-[7px] text-gray-500 font-semibold">KW</span>
             </th>
             {courses.map((c, i) => {
               const newDay = i === 0 || c.day !== courses[i - 1]?.day;
               const badge = TYPE_BADGES[c.typ];
               return (
                 <th key={`${c.id}-info`} className="bg-gray-900 px-0.5 pb-0.5 border-b-2 border-gray-700 text-center"
-                  style={{ borderLeft: newDay ? `2px solid ${DAY_COLORS[c.day]}40` : 'none', width: 110, minWidth: 110, maxWidth: 110 }}>
-                  <div className="text-[9px] font-bold text-gray-200">{c.cls}</div>
+                  style={{ borderLeft: newDay ? `2px solid ${DAY_COLORS[c.day]}40` : 'none', width: 80, minWidth: 80, maxWidth: 80 }}>
+                  <div className={`text-[9px] font-bold cursor-pointer transition-colors ${classFilter === c.cls ? 'text-blue-400' : 'text-gray-200 hover:text-blue-300'}`}
+                    onClick={() => setClassFilter(classFilter === c.cls ? null : c.cls)}>
+                    {c.cls}
+                  </div>
                   <div className="flex gap-0.5 justify-center mt-0.5">
-                    <span className="text-[7px] px-1 rounded" style={{ background: badge?.bg, color: badge?.fg }}>{c.typ}</span>
+                    <span className="text-[7px] px-1 rounded font-bold cursor-pointer hover:opacity-80"
+                      style={{ background: badge?.bg, color: badge?.fg }}
+                      onClick={() => setFilter(c.typ as any)}>
+                      {c.typ}
+                    </span>
                     <span className="text-[7px] px-0.5 rounded bg-slate-800 text-slate-400">{c.les}L</span>
                   </div>
                 </th>
@@ -145,67 +169,154 @@ export function ZoomBlockView({ semester }: Props) {
           </tr>
         </thead>
         <tbody>
-          {Array.from({ length: maxBlocks }, (_, rowIdx) => (
-            <tr key={rowIdx}>
-              <td className="bg-gray-900 sticky left-0 z-10 text-center border-b border-slate-800 py-0.5">
-                <span className="text-[7px] text-gray-600">{rowIdx + 1}</span>
-              </td>
-              {courses.map((c, ci) => {
-                const blocks = courseBlockMap.get(c.id) || [];
-                const block = blocks[rowIdx];
-                const newDay = ci === 0 || c.day !== courses[ci - 1]?.day;
+          {semWeeks.map(weekW => {
+            const past = isPastWeek(weekW, currentWeek);
+            const isCurrent = weekW === currentWeek;
 
-                if (!block) {
-                  return (
-                    <td key={c.id} className="border-b border-slate-900/30 p-0.5"
-                      style={{ borderLeft: newDay ? `2px solid ${DAY_COLORS[c.day]}12` : 'none', width: 110, minWidth: 110, maxWidth: 110, height: 40 }}>
-                    </td>
-                  );
-                }
+            // Check if entire week is holiday
+            const isHolidayWeek = effectiveWeeks.find(w => w.w === weekW &&
+              Object.values(w.lessons).length > 0 &&
+              Object.values(w.lessons).every(e => (e as any).type === 6));
+            const holidayLabel = isHolidayWeek ? Object.values(isHolidayWeek.lessons)[0]?.title : null;
 
-                const colors = block.subjectArea && SUBJECT_AREA_COLORS[block.subjectArea as keyof typeof SUBJECT_AREA_COLORS]
-                  ? SUBJECT_AREA_COLORS[block.subjectArea as keyof typeof SUBJECT_AREA_COLORS]
-                  : { bg: '#475569', fg: '#94a3b8' };
+            // Check if entire week is event (IW etc.)
+            const isEventWeek = !isHolidayWeek && effectiveWeeks.find(w => w.w === weekW &&
+              Object.values(w.lessons).length > 0 &&
+              Object.values(w.lessons).every(e => (e as any).type === 5));
+            const eventLabel = isEventWeek ? Object.values(isEventWeek.lessons)[0]?.title : null;
 
-                const blockSearchMatch = searchLower.length >= 2 && (
-                  block.label.toLowerCase().includes(searchLower) ||
-                  (block.topicMain || '').toLowerCase().includes(searchLower) ||
-                  (block.curriculumGoal || '').toLowerCase().includes(searchLower) ||
-                  block.seq.title.toLowerCase().includes(searchLower)
-                );
-                const blockSearchDimmed = searchLower.length >= 2 && !blockSearchMatch;
+            return (
+              <tr key={weekW}
+                style={{ opacity: past && !isCurrent ? 0.5 : 1, height: isHolidayWeek ? 16 : 24 }}>
+                {/* KW label */}
+                <td className={`bg-gray-900 sticky left-0 z-10 text-center border-b py-0 px-0.5 ${
+                  isCurrent ? 'border-amber-500 bg-amber-950/30' : 'border-slate-800/50'
+                }`}>
+                  <span className={`text-[8px] font-mono font-bold ${isCurrent ? 'text-amber-400' : 'text-gray-500'}`}>
+                    {weekW}
+                  </span>
+                </td>
 
-                return (
-                  <td key={c.id} className="border-b border-slate-900/30 p-0.5"
-                    style={{ borderLeft: newDay ? `2px solid ${DAY_COLORS[c.day]}12` : 'none', width: 110, minWidth: 110, maxWidth: 110, opacity: blockSearchDimmed ? 0.2 : 1 }}>
-                    <div className={`rounded px-1.5 py-1 h-full transition-all ${blockSearchMatch ? 'ring-2 ring-amber-400' : ''}`}
-                      style={{ background: colors.bg + '40', borderLeft: `3px solid ${colors.bg}` }}>
-                      <div className="text-[9px] font-semibold truncate cursor-pointer hover:brightness-150 hover:underline"
-                        style={{ color: colors.fg }}
-                        title={`${block.label} — Klick: Sequenz "${block.seq.title}" öffnen`}
-                        onClick={() => handleBlockClick(block)}>
-                        {block.topicMain || block.label}
-                      </div>
-                      <div className="text-[7px] flex items-center gap-0.5 flex-wrap" style={{ color: colors.fg, opacity: 0.7 }}>
-                        {block.label !== (block.topicMain || block.label) && <span>{block.label} · </span>}
-                        <span>{block.weeks.length}W · </span>
-                        <span className="cursor-pointer hover:text-blue-300 hover:underline"
-                          title={`KW ${block.weeks[0]}–${block.weeks[block.weeks.length - 1]} — Klick: Zur Wochenansicht springen`}
-                          onClick={() => handleBlockNavClick(block, c)}>
-                          KW {block.weeks[0]}–{block.weeks[block.weeks.length - 1]}
-                        </span>
-                      </div>
-                      {block.curriculumGoal && (
-                        <div className="text-[6px] truncate mt-0.5" style={{ color: colors.fg, opacity: 0.5 }}>
-                          {block.curriculumGoal}
-                        </div>
-                      )}
-                    </div>
+                {/* Holiday row — collapsed */}
+                {isHolidayWeek ? (
+                  <td colSpan={courses.length}
+                    className="border-b border-slate-800/30 text-center py-0"
+                    style={{ background: '#ffffff06' }}>
+                    <span className="text-[7px] text-gray-600 italic">{holidayLabel || 'Ferien'}</span>
                   </td>
-                );
-              })}
-            </tr>
-          ))}
+                ) : isEventWeek ? (
+                  <td colSpan={courses.length}
+                    className="border-b border-slate-800/30 text-center py-0"
+                    style={{ background: '#4b556312' }}>
+                    <span className="text-[8px] text-gray-400 font-semibold">{eventLabel || 'Sonderwoche'}</span>
+                  </td>
+                ) : (
+                  /* Normal week — per course cells */
+                  courses.map((c, ci) => {
+                    const newDay = ci === 0 || c.day !== courses[ci - 1]?.day;
+                    const key = `${weekW}:${c.id}`;
+                    const cell = cellMap.get(key);
+
+                    // Check individual cell holiday/event
+                    const wType = getWeekType(weekW, effectiveWeeks, c.col);
+
+                    if (wType === 'holiday') {
+                      return (
+                        <td key={c.id} className="border-b border-slate-800/20 p-0"
+                          style={{ borderLeft: newDay ? `2px solid ${DAY_COLORS[c.day]}12` : 'none', width: 80, minWidth: 80, maxWidth: 80 }}>
+                          <div className="h-full flex items-center justify-center">
+                            <span className="text-[6px] text-gray-600 italic">—</span>
+                          </div>
+                        </td>
+                      );
+                    }
+
+                    if (wType === 'event' && !cell) {
+                      const weekEntry = effectiveWeeks.find(w => w.w === weekW);
+                      const evTitle = weekEntry?.lessons[c.col]?.title || '';
+                      return (
+                        <td key={c.id} className="border-b border-slate-800/20 p-0"
+                          style={{ borderLeft: newDay ? `2px solid ${DAY_COLORS[c.day]}12` : 'none', width: 80, minWidth: 80, maxWidth: 80 }}>
+                          <div className="h-full flex items-center px-1" style={{ background: '#4b556312' }}>
+                            <span className="text-[7px] text-gray-500 truncate">{evTitle}</span>
+                          </div>
+                        </td>
+                      );
+                    }
+
+                    // Empty cell — no sequence assigned
+                    if (!cell) {
+                      return (
+                        <td key={c.id} className="border-b border-slate-800/20 p-0 cursor-pointer hover:bg-slate-800/30"
+                          style={{ borderLeft: newDay ? `2px solid ${DAY_COLORS[c.day]}12` : 'none', width: 80, minWidth: 80, maxWidth: 80 }}
+                          onClick={() => {
+                            setZoomLevel(3);
+                            setSelection({ week: weekW, courseId: c.id, title: '', course: c });
+                            setTimeout(() => {
+                              document.querySelector(`tr[data-week="${weekW}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            }, 100);
+                          }}>
+                        </td>
+                      );
+                    }
+
+                    // Sequence cell — render as colored bar segment
+                    const colors = cell.subjectArea && SUBJECT_AREA_COLORS[cell.subjectArea as keyof typeof SUBJECT_AREA_COLORS]
+                      ? SUBJECT_AREA_COLORS[cell.subjectArea as keyof typeof SUBJECT_AREA_COLORS]
+                      : { bg: '#475569', fg: '#94a3b8', border: '#64748b' };
+
+                    // Search match
+                    const blockSearchMatch = searchLower.length >= 2 && (
+                      cell.label.toLowerCase().includes(searchLower) ||
+                      (cell.topicMain || '').toLowerCase().includes(searchLower) ||
+                      (cell.curriculumGoal || '').toLowerCase().includes(searchLower) ||
+                      cell.seq.title.toLowerCase().includes(searchLower)
+                    );
+                    const blockSearchDimmed = searchLower.length >= 2 && !blockSearchMatch;
+
+                    // Visual: rounded corners only at block start/end
+                    const borderRadius = `${cell.isFirst ? '4px' : '0'} ${cell.isFirst ? '4px' : '0'} ${cell.isLast ? '4px' : '0'} ${cell.isLast ? '4px' : '0'}`;
+
+                    return (
+                      <td key={c.id} className="border-b border-transparent p-0"
+                        style={{
+                          borderLeft: newDay ? `2px solid ${DAY_COLORS[c.day]}12` : 'none',
+                          width: 80, minWidth: 80, maxWidth: 80,
+                          opacity: blockSearchDimmed ? 0.15 : 1,
+                        }}>
+                        <div
+                          className={`h-full px-1 flex items-center cursor-pointer transition-all hover:brightness-125 ${blockSearchMatch ? 'ring-1 ring-amber-400' : ''}`}
+                          style={{
+                            background: colors.bg + '50',
+                            borderLeft: `3px solid ${colors.bg}`,
+                            borderRadius,
+                            borderTop: cell.isFirst ? `1px solid ${colors.bg}40` : 'none',
+                            borderBottom: cell.isLast ? `1px solid ${colors.bg}40` : 'none',
+                            minHeight: 22,
+                          }}
+                          title={`${cell.seq.title} → ${cell.label}${cell.topicMain ? ' (' + cell.topicMain + ')' : ''}\nKW ${cell.seq.blocks[cell.blockIdx].weeks[0]}–${cell.seq.blocks[cell.blockIdx].weeks.at(-1)} (${cell.totalWeeksInBlock}W)\nKlick: Sequenz öffnen · Doppelklick: Zur Wochenansicht`}
+                          onClick={() => handleBlockClick(cell)}
+                          onDoubleClick={() => handleBlockDblClick(weekW, c, cell)}
+                        >
+                          {/* Show label only on first week of block */}
+                          {cell.isFirst ? (
+                            <span className="text-[8px] font-semibold truncate leading-tight" style={{ color: colors.fg }}>
+                              {cell.topicMain || cell.label}
+                            </span>
+                          ) : (
+                            /* Middle/last rows: show subtle continuation indicator */
+                            <span className="text-[6px] text-gray-600">
+                              {cell.isLast ? `⌊ ${cell.totalWeeksInBlock}W` : ''}
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                    );
+                  })
+                )}
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>
