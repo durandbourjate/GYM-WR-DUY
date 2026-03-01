@@ -1,7 +1,7 @@
 # Unterrichtsplaner – Handoff v3.24
 
-## Status: ✅ Deployed (v3.33)
-- **Commit:** f8e5c9e
+## Status: ✅ Deployed (v3.34)
+- **Commit:** 7c7235e
 - **Datum:** 2026-03-01
 - **Deploy:** https://durandbourjate.github.io/GYM-WR-DUY/Unterrichtsplaner/
 
@@ -45,6 +45,8 @@
 - v3.32: UX-Verbesserungen — (1) Leere Zellen klickbar mit blauer Markierung statt nur Deselect. (2) SidePanel schliesst zuverlässig bei Abwahl + Klick leere Zelle. (3) Zoom 2 grössere Schrift: ROW_H 26px, Labels 12/10/9px, Spalten 140/70px. (4) Sequenz-Klick in Zoom 2 scrollt die SequenceCard im Panel automatisch in View (scrollIntoView). (5) Shift-Klick bei Mehrtages-Kursen wählt nur den angeklickten Tag; Shift+Alt wählt beide Tage. (6) SequencePanel cardRef-Duplikat bereinigt.
 
 - v3.33: Batch-Edit Active-State — Fachbereich/Kategorie/Dauer/SOL-Buttons im Batch-Tab zeigen den aktuellen Wert der selektierten Zellen mit farblicher Hervorhebung (ring + stärkerer Hintergrund). "(gemischt)"-Hinweis bei unterschiedlichen Werten. ZoomYearView sticky header Positionsfix.
+
+- v3.34: UX-Verbesserungen #2 — (1) Klick+Drag leere Zellen bleiben nach mouseup markiert (lila Outline bleibt). (2) Zoom 3: Toggle vergangene Wochen dim/hell (◐-Button in Toolbar, `dimPastWeeks` in Store). (3) Shift-Klick Mehrtages-Kurse: Popup fragt "Auch [anderer Tag] auswählen?" statt Shift+Alt. (4) Zoom 2: Einzellektionen ohne Sequenz werden angezeigt (gestrichelter Border, halbtransparent, Klick→Details, DblClick→Zoom3). (5) SequencePanel: aktive Sequenz als Pin-Card oben angepinnt (unter Klassenbuttons); Felder+Lektionen standardmässig ausgeklappt wenn aktiv.
 
 ### Offene Feature-Requests
 - **Zoom 2 Jahresmodus**: ✅ Implementiert (v3.28)
