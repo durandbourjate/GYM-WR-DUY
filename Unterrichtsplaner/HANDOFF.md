@@ -1,7 +1,7 @@
 # Unterrichtsplaner – Handoff v3.24
 
-## Status: ✅ Deployed (v3.32)
-- **Commit:** 5561c97
+## Status: ✅ Deployed (v3.33)
+- **Commit:** f8e5c9e
 - **Datum:** 2026-03-01
 - **Deploy:** https://durandbourjate.github.io/GYM-WR-DUY/Unterrichtsplaner/
 
@@ -43,6 +43,8 @@
 - v3.31: Noten-Vorgaben-Tracking (MiSDV Art. 4) — Neue utils/gradeRequirements.ts mit Mindestanzahl-Beurteilungsprüfung pro Kursgruppe/Semester/GYM-Stufe. Rotes Badge (Zahl) am 📊-Button bei offenen Warnungen. StatsPanel zeigt Section "📋 Beurteilungsvorgaben" mit Warnungen (🔴 critical, 🟡 warning) und OK-Status. GYM-Stufe wird aus Klassenname abgeleitet (Maturjahrgang → GYM1-5).
 
 - v3.32: UX-Verbesserungen — (1) Leere Zellen klickbar mit blauer Markierung statt nur Deselect. (2) SidePanel schliesst zuverlässig bei Abwahl + Klick leere Zelle. (3) Zoom 2 grössere Schrift: ROW_H 26px, Labels 12/10/9px, Spalten 140/70px. (4) Sequenz-Klick in Zoom 2 scrollt die SequenceCard im Panel automatisch in View (scrollIntoView). (5) Shift-Klick bei Mehrtages-Kursen wählt nur den angeklickten Tag; Shift+Alt wählt beide Tage. (6) SequencePanel cardRef-Duplikat bereinigt.
+
+- v3.33: Batch-Edit Active-State — Fachbereich/Kategorie/Dauer/SOL-Buttons im Batch-Tab zeigen den aktuellen Wert der selektierten Zellen mit farblicher Hervorhebung (ring + stärkerer Hintergrund). "(gemischt)"-Hinweis bei unterschiedlichen Werten. ZoomYearView sticky header Positionsfix.
 
 ### Offene Feature-Requests
 - **Zoom 2 Jahresmodus**: ✅ Implementiert (v3.28)
