@@ -90,8 +90,13 @@
 
 ### 🟡 Geplant (mittlere Priorität)
 1. **Google Calendar Integration** — Konzept dokumentiert (siehe Feature-Spec oben). Planer→Kalender Sync, Kalender→Planer Import, Kollisionswarnungen.
-2. **Zoom 1 (Multi-Year):** Weitere Verbesserungen der Jahrgänge-Ansicht.
+2. **Detail-Fenster schliesst bei Abwahl** — Panel bleibt teilweise offen wenn nichts mehr angewählt ist.
 3. **Dauer-Warnung bei Verschieben (1L↔2L):** Relevant wenn cross-column oder Sequenz-Auto-Place erweitert wird.
+
+### 🔵 Ideen (niedrige Priorität)
+4. **Mindestanzahl Noten / Vorgaben-Tracking:** Warnung wenn zu wenige Beurteilungen pro Zeitraum geplant.
+5. **Automatischer Lehrplanbezug:** Lehrplanziele automatisch aus Thema/Fachbereich vorschlagen.
+6. **Zoom 1 (Multi-Year):** Weitere Verbesserungen der Jahrgänge-Ansicht.
 
 ### 🟢 Erledigt (v3.11–v3.29)
 - ✅ Helligkeit vergangene Wochen (0.4→0.6)
