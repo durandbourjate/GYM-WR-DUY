@@ -2,7 +2,6 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { usePlannerStore } from '../store/plannerStore';
 import { StatsPanel } from './StatsPanel';
 import { TaFPanel } from './TaFPanel';
-import { ExcelImport } from './ExcelImport';
 import { COURSES } from '../data/courses';
 import { CURRENT_WEEK } from '../data/weeks';
 import type { FilterType } from '../types';
@@ -129,7 +128,6 @@ export function AppHeader() {
   const { filter, setFilter, classFilter, setClassFilter, showHelp, toggleHelp, undoStack, undo, setSequencePanelOpen, sidePanelOpen, setSidePanelOpen, setSidePanelTab, zoomLevel, setZoomLevel, searchQuery, setSearchQuery } = usePlannerStore();
   const [showStats, setShowStats] = useState(false);
   const [showTaF, setShowTaF] = useState(false);
-  const [showExcel, setShowExcel] = useState(false);
   const [showAddMenu, setShowAddMenu] = useState(false);
   const addMenuRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -249,20 +247,15 @@ export function AppHeader() {
         </button>
         {showTaF && <TaFPanel onClose={() => setShowTaF(false)} />}
         <button
-          onClick={() => usePlannerStore.getState().setSettingsOpen(true)}
+          onClick={() => {
+            setSidePanelOpen(true);
+            setSidePanelTab('settings');
+          }}
           className="px-2 py-0.5 rounded text-[10px] border border-gray-700 text-gray-500 cursor-pointer hover:text-blue-300 hover:border-blue-700"
           title="Einstellungen"
         >
           ⚙️
         </button>
-        <button
-          onClick={() => setShowExcel(true)}
-          className="px-2 py-0.5 rounded text-[10px] border border-gray-700 text-gray-500 cursor-pointer hover:text-green-300 hover:border-green-700"
-          title="Excel-Import"
-        >
-          📥 Excel
-        </button>
-        {showExcel && <ExcelImport onClose={() => setShowExcel(false)} />}
         <button
           onClick={toggleHelp}
           className={`px-2 py-0.5 rounded text-[10px] border cursor-pointer ${

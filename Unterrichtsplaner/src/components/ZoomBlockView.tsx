@@ -6,7 +6,7 @@ import type { Course, ManagedSequence, LessonType, SubjectArea } from '../types'
 
 const DAY_ORDER: Record<string, number> = { Mo: 0, Di: 1, Mi: 2, Do: 3, Fr: 4 };
 const ROW_H = 22; // px per week row
-const HOLIDAY_ROW_H = 14;
+const HOLIDAY_ROW_H = 18;
 
 interface Props {
   semester: 1 | 2;
@@ -160,7 +160,7 @@ export function ZoomBlockView({ semester }: Props) {
 
   // Click handlers
   const handleBlockClick = useCallback((span: BlockSpan) => {
-    setEditingSequenceId(span.seq.id);
+    setEditingSequenceId(`${span.seq.id}-${span.blockIdx}`);
     setSidePanelOpen(true);
     setSidePanelTab('sequences');
   }, [setEditingSequenceId, setSidePanelOpen, setSidePanelTab]);

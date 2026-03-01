@@ -155,7 +155,7 @@ function PillSelect<T extends string>({
             style={{
               background: active ? (color || '#3b82f6') + '30' : 'transparent',
               borderColor: active ? (color || '#3b82f6') : '#374151',
-              color: active ? '#e5e7eb' : '#6b7280',
+              color: active ? '#e5e7eb' : '#9ca3af',
             }}>
             {icon && <span className="mr-0.5">{icon}</span>}{label}
           </button>
@@ -208,7 +208,7 @@ function CategorySubtypeSelector({
     <div className="space-y-2">
       {/* Category row */}
       <div>
-        <label className="text-[9px] text-gray-500 font-medium mb-1 block">Kategorie</label>
+        <label className="text-[9px] text-gray-400 font-medium mb-1 block">Kategorie</label>
         <div className="flex flex-wrap gap-1">
           {CATEGORIES.map((cat) => {
             const active = effectiveCategory === cat.key;
@@ -222,7 +222,7 @@ function CategorySubtypeSelector({
                 style={{
                   background: active ? cat.color + '30' : 'transparent',
                   borderColor: active ? cat.color : '#374151',
-                  color: active ? '#e5e7eb' : '#6b7280',
+                  color: active ? '#e5e7eb' : '#9ca3af',
                 }}>
                 <span className="mr-0.5">{cat.icon}</span>{cat.label}
               </button>
@@ -233,7 +233,7 @@ function CategorySubtypeSelector({
       {/* Subtype row (only if category has subtypes) */}
       {subtypes.length > 0 && (
         <div>
-          <label className="text-[9px] text-gray-500 font-medium mb-1 block">Typ</label>
+          <label className="text-[9px] text-gray-400 font-medium mb-1 block">Typ</label>
           <div className="flex flex-wrap gap-1">
             {subtypes.map((st) => {
               const active = subtype === st.key;
@@ -268,11 +268,11 @@ function CategorySubtypeSelector({
                   placeholder="Neues Label…"
                   className="bg-slate-700 text-slate-200 border border-blue-400 rounded px-1.5 py-0.5 text-[9px] outline-none w-24" />
                 <button onClick={handleAddCustom} className="text-[9px] text-green-400 cursor-pointer">✓</button>
-                <button onClick={() => setAddingCustom(false)} className="text-[9px] text-gray-500 cursor-pointer">✕</button>
+                <button onClick={() => setAddingCustom(false)} className="text-[9px] text-gray-400 cursor-pointer">✕</button>
               </div>
             ) : (
               <button onClick={() => setAddingCustom(true)}
-                className="px-1.5 py-0.5 rounded text-[9px] border border-dashed border-gray-600 text-gray-500 hover:text-gray-300 hover:border-gray-400 cursor-pointer transition-all">
+                className="px-1.5 py-0.5 rounded text-[9px] border border-dashed border-gray-600 text-gray-400 hover:text-gray-300 hover:border-gray-400 cursor-pointer transition-all">
                 + Eigenes
               </button>
             )}
@@ -297,7 +297,7 @@ function DurationSelector({ value, onChange }: { value?: string; onChange: (v: s
           className={`px-1.5 py-0.5 rounded text-[9px] font-medium border cursor-pointer transition-all ${
             value === preset.key
               ? 'bg-slate-600/40 border-slate-500 text-gray-200'
-              : 'border-gray-700 text-gray-500 hover:text-gray-300'
+              : 'border-gray-700 text-gray-400 hover:text-gray-300'
           }`}>
           {preset.label}
         </button>
@@ -319,12 +319,12 @@ function DurationSelector({ value, onChange }: { value?: string; onChange: (v: s
             placeholder="z.B. 60 min"
             className="bg-slate-700 text-slate-200 border border-slate-600 rounded px-1.5 py-0.5 text-[9px] outline-none focus:border-blue-400 w-20" />
           {isCustom && (
-            <button onClick={() => onChange(undefined)} className="text-[9px] text-gray-500 cursor-pointer hover:text-red-400">✕</button>
+            <button onClick={() => onChange(undefined)} className="text-[9px] text-gray-400 cursor-pointer hover:text-red-400">✕</button>
           )}
         </div>
       ) : (
         <button onClick={() => setCustomMode(true)}
-          className="px-1.5 py-0.5 rounded text-[9px] border border-dashed border-gray-600 text-gray-500 hover:text-gray-300 cursor-pointer">
+          className="px-1.5 py-0.5 rounded text-[9px] border border-dashed border-gray-600 text-gray-400 hover:text-gray-300 cursor-pointer">
           Andere…
         </button>
       )}
@@ -342,33 +342,33 @@ function SolSection({ sol, onChange }: { sol?: SolDetails; onChange: (s: SolDeta
         <button
           onClick={() => onChange({ ...sol, enabled: !enabled, topic: sol?.topic, description: sol?.description, materialLinks: sol?.materialLinks, duration: sol?.duration })}
           className={`px-2 py-0.5 rounded text-[9px] font-medium border cursor-pointer transition-all ${
-            enabled ? 'bg-purple-500/20 border-purple-500 text-purple-300' : 'border-gray-600 text-gray-500 hover:text-gray-300'
+            enabled ? 'bg-purple-500/20 border-purple-500 text-purple-300' : 'border-gray-600 text-gray-400 hover:text-gray-300'
           }`}
         >
           📚 {enabled ? 'SOL aktiv' : 'SOL hinzufügen'}
         </button>
-        {enabled && sol?.duration && <span className="text-[8px] text-gray-500">{sol.duration}</span>}
+        {enabled && sol?.duration && <span className="text-[8px] text-gray-400">{sol.duration}</span>}
       </div>
       {enabled && (
         <div className="pl-2 border-l-2 border-purple-500/30 space-y-1.5">
           <div>
-            <label className="text-[8px] text-gray-500 mb-0.5 block">SOL-Thema</label>
+            <label className="text-[8px] text-gray-400 mb-0.5 block">SOL-Thema</label>
             <input value={sol?.topic || ''} onChange={(e) => update({ topic: e.target.value })}
               placeholder="SOL-Thema…"
               className="w-full bg-slate-700 text-slate-200 border border-slate-600 rounded px-2 py-0.5 text-[9px] outline-none focus:border-purple-400" />
           </div>
           <div>
-            <label className="text-[8px] text-gray-500 mb-0.5 block">SOL-Dauer</label>
+            <label className="text-[8px] text-gray-400 mb-0.5 block">SOL-Dauer</label>
             <DurationSelector value={sol?.duration} onChange={(v) => update({ duration: v })} />
           </div>
           <div>
-            <label className="text-[8px] text-gray-500 mb-0.5 block">SOL-Beschreibung</label>
+            <label className="text-[8px] text-gray-400 mb-0.5 block">SOL-Beschreibung</label>
             <textarea value={sol?.description || ''} onChange={(e) => update({ description: e.target.value })}
               placeholder="Beschreibung, Auftrag…" rows={2}
               className="w-full bg-slate-700 text-slate-200 border border-slate-600 rounded px-2 py-0.5 text-[9px] outline-none focus:border-purple-400 resize-y" />
           </div>
           <div>
-            <label className="text-[8px] text-gray-500 mb-0.5 block">SOL-Material</label>
+            <label className="text-[8px] text-gray-400 mb-0.5 block">SOL-Material</label>
             <MaterialLinks links={sol?.materialLinks || []} onChange={(links) => update({ materialLinks: links })} />
           </div>
         </div>
@@ -402,10 +402,10 @@ function MaterialLinks({ links, onChange }: { links: string[]; onChange: (links:
             placeholder="URL eingeben…"
             className="flex-1 bg-slate-700 text-slate-200 border border-slate-600 rounded px-1.5 py-0.5 text-[9px] outline-none focus:border-blue-400" />
           <button onClick={handleAdd} className="text-[9px] text-green-400 cursor-pointer">✓</button>
-          <button onClick={() => setAdding(false)} className="text-[9px] text-gray-500 cursor-pointer">✕</button>
+          <button onClick={() => setAdding(false)} className="text-[9px] text-gray-400 cursor-pointer">✕</button>
         </div>
       ) : (
-        <button onClick={() => setAdding(true)} className="text-[9px] text-gray-500 hover:text-gray-300 cursor-pointer">
+        <button onClick={() => setAdding(true)} className="text-[9px] text-gray-400 hover:text-gray-300 cursor-pointer">
           + Link hinzufügen
         </button>
       )}
@@ -454,7 +454,7 @@ function AddToSequenceButton({ week, course }: { week: string; course: Course })
     <span className="relative inline-block">
       <button
         onClick={() => setOpen(!open)}
-        className="text-[8px] px-1 py-px rounded border border-dashed border-gray-600 text-gray-500 hover:text-gray-300 hover:border-gray-400 cursor-pointer"
+        className="text-[8px] px-1 py-px rounded border border-dashed border-gray-600 text-gray-400 hover:text-gray-300 hover:border-gray-400 cursor-pointer"
         title="Zu Sequenz hinzufügen"
       >+ Sequenz</button>
       {open && (
@@ -472,7 +472,7 @@ function AddToSequenceButton({ week, course }: { week: string; course: Course })
                 disabled={block.weeks.includes(week)}>
                 <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: seq.color || '#16a34a' }} />
                 <span className="truncate">{block.label}</span>
-                {block.weeks.includes(week) && <span className="text-[8px] text-gray-600 ml-auto">bereits</span>}
+                {block.weeks.includes(week) && <span className="text-[8px] text-gray-500 ml-auto">bereits</span>}
               </button>
             ))
           ))}
@@ -596,7 +596,7 @@ function DetailsTab() {
 
   if (!selection || !c) {
     return (
-      <div className="flex-1 flex items-center justify-center text-[10px] text-gray-500 p-4">
+      <div className="flex-1 flex items-center justify-center text-[10px] text-gray-400 p-4">
         Wähle eine Lektion aus, um Details zu bearbeiten.
       </div>
     );
@@ -616,7 +616,7 @@ function DetailsTab() {
         <div className="flex gap-2 items-center mb-1">
           <span className="text-xs font-bold text-gray-100">{c.cls}</span>
           <span className="text-[9px] px-1.5 py-px rounded text-white" style={{ background: badge?.bg }}>{c.typ}</span>
-          <span className="text-[9px] text-gray-500">{c.day} {c.from}–{c.to} · KW {selection.week}</span>
+          <span className="text-[9px] text-gray-400">{c.day} {c.from}–{c.to} · KW {selection.week}</span>
         </div>
         <div className="text-sm text-gray-200">{selection.title}</div>
         {/* Tags */}
@@ -673,10 +673,10 @@ function DetailsTab() {
       {/* Form fields */}
       <div className="space-y-2.5">
         <div>
-          <label className="text-[9px] text-gray-500 font-medium mb-1 block">
+          <label className="text-[9px] text-gray-400 font-medium mb-1 block">
             Fachbereich
             {!detail.subjectArea && effectiveDetail.subjectArea && (
-              <span className="text-[8px] text-gray-600 font-normal ml-1">(geerbt von Sequenz)</span>
+              <span className="text-[8px] text-gray-500 font-normal ml-1">(geerbt von Sequenz)</span>
             )}
           </label>
           <PillSelect options={SUBJECT_AREAS.map(s => s.key)} value={detail.subjectArea}
@@ -703,15 +703,15 @@ function DetailsTab() {
           onChangeSubtype={handleSubtypeChange}
         />
         <div>
-          <label className="text-[9px] text-gray-500 font-medium mb-1 block">Dauer</label>
+          <label className="text-[9px] text-gray-400 font-medium mb-1 block">Dauer</label>
           <DurationSelector value={detail.duration} onChange={(v) => updateField('duration', v)} />
         </div>
         <div>
-          <label className="text-[9px] text-gray-500 font-medium mb-1 block">SOL (Selbstorganisiertes Lernen)</label>
+          <label className="text-[9px] text-gray-400 font-medium mb-1 block">SOL (Selbstorganisiertes Lernen)</label>
           <SolSection sol={detail.sol} onChange={(s) => updateField('sol', s)} />
         </div>
         <div>
-          <label className="text-[9px] text-gray-500 font-medium mb-1 block">Thema</label>
+          <label className="text-[9px] text-gray-400 font-medium mb-1 block">Thema</label>
           {parentBlock?.topicMain && !detail.topicMain && (
             <div className="text-[8px] text-blue-400/60 mb-0.5">↳ Block: {parentBlock.topicMain}</div>
           )}
@@ -740,14 +740,14 @@ function DetailsTab() {
           )}
         </div>
         <div>
-          <label className="text-[9px] text-gray-500 font-medium mb-1 block">Lehrplanziel (LP17)</label>
+          <label className="text-[9px] text-gray-400 font-medium mb-1 block">Lehrplanziel (LP17)</label>
           {parentBlock?.curriculumGoal && !detail.curriculumGoal && (
             <div className="text-[8px] text-blue-400/60 mb-0.5">↳ Block: {parentBlock.curriculumGoal}</div>
           )}
           <CurriculumGoalPicker value={detail.curriculumGoal || effectiveDetail.curriculumGoal} onChange={(v) => updateField('curriculumGoal', v)} subjectArea={effectiveDetail.subjectArea} />
         </div>
         <div>
-          <label className="text-[9px] text-gray-500 font-medium mb-1 block">LearningView</label>
+          <label className="text-[9px] text-gray-400 font-medium mb-1 block">LearningView</label>
           <div className="flex gap-1">
             <input value={detail.learningviewUrl || ''} onChange={(e) => updateField('learningviewUrl', e.target.value)}
               placeholder="https://learningview.org/…"
@@ -759,11 +759,11 @@ function DetailsTab() {
           </div>
         </div>
         <div>
-          <label className="text-[9px] text-gray-500 font-medium mb-1 block">Material</label>
+          <label className="text-[9px] text-gray-400 font-medium mb-1 block">Material</label>
           <MaterialLinks links={detail.materialLinks || []} onChange={(links) => updateField('materialLinks', links)} />
         </div>
         <div>
-          <label className="text-[9px] text-gray-500 font-medium mb-1 block">Notizen</label>
+          <label className="text-[9px] text-gray-400 font-medium mb-1 block">Notizen</label>
           <textarea value={detail.notes || ''} onChange={(e) => updateField('notes', e.target.value)}
             placeholder="Notizen, Hinweise…" rows={3}
             className="w-full bg-slate-700 text-slate-200 border border-slate-600 rounded px-2 py-1 text-[10px] outline-none focus:border-blue-400 resize-y" />
@@ -823,7 +823,7 @@ function BatchEditTab() {
             </button>
           ))}
           <button onClick={() => applyToAll('subjectArea', undefined)}
-            className="px-2 py-0.5 rounded text-[9px] border border-gray-600 text-gray-500 cursor-pointer hover:text-gray-300">✕</button>
+            className="px-2 py-0.5 rounded text-[9px] border border-gray-600 text-gray-400 cursor-pointer hover:text-gray-300">✕</button>
         </div>
       </div>
 
@@ -864,7 +864,7 @@ function BatchEditTab() {
         </div>
       </div>
 
-      <div className="text-[8px] text-gray-600 pt-2 border-t border-slate-700">
+      <div className="text-[8px] text-gray-500 pt-2 border-t border-slate-700">
         Tipp: Wähle mehrere Zellen mit Shift+Klick oder Cmd+Klick, dann setze Eigenschaften hier.
       </div>
     </div>

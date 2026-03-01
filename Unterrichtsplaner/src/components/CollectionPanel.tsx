@@ -62,7 +62,7 @@ function ImportDialog({ item, onClose }: { item: CollectionItem; onClose: () => 
               Notizen & Reflexionen übernehmen
             </label>
           </div>
-          <div className="text-[8px] text-gray-500 bg-slate-900/50 rounded p-1.5">
+          <div className="text-[8px] text-gray-400 bg-slate-900/50 rounded p-1.5">
             ℹ Wochen werden nicht importiert — du weist sie nach dem Import manuell oder per AutoPlace zu.
             {item.units.length > 1 && ` ${item.units.length} Blöcke werden als neue Sequenz erstellt.`}
           </div>
@@ -198,7 +198,7 @@ function CollectionCard({ item, onImport }: { item: CollectionItem; onImport: (i
         {saColor && <div className="w-1 h-4 rounded-full shrink-0" style={{ background: saColor.bg }} />}
         <div className="flex-1 min-w-0">
           <div className="text-[10px] font-semibold text-gray-200 truncate">{item.title}</div>
-          <div className="text-[8px] text-gray-500 flex items-center gap-1.5">
+          <div className="text-[8px] text-gray-400 flex items-center gap-1.5">
             <span>{typeInfo.label}</span>
             <span>· {item.units.length} UE</span>
             {item.courseType && <span>· {item.courseType}</span>}
@@ -206,7 +206,7 @@ function CollectionCard({ item, onImport }: { item: CollectionItem; onImport: (i
             <span className="ml-auto">{dateStr}</span>
           </div>
         </div>
-        <span className="text-[9px] text-gray-500">{expanded ? '▾' : '▸'}</span>
+        <span className="text-[9px] text-gray-400">{expanded ? '▾' : '▸'}</span>
       </div>
 
       {expanded && (
@@ -309,7 +309,7 @@ export function CollectionPanel() {
         {/* Subject area filter */}
         <div className="flex gap-0.5">
           <button onClick={() => setFilterSA('ALL')}
-            className={`px-1.5 py-0.5 rounded text-[8px] border cursor-pointer ${filterSA === 'ALL' ? 'bg-slate-600 border-slate-500 text-gray-200' : 'border-gray-700 text-gray-500'}`}>
+            className={`px-1.5 py-0.5 rounded text-[8px] border cursor-pointer ${filterSA === 'ALL' ? 'bg-slate-600 border-slate-500 text-gray-200' : 'border-gray-700 text-gray-400'}`}>
             Alle FB
           </button>
           {SUBJECT_AREAS.map((sa) => (

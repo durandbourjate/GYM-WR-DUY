@@ -756,7 +756,6 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                         }}
                       >
                         {displayTitle}
-                        <span className="text-[7px] opacity-40 ml-0.5">ⓘ</span>
                       </div>
 
                       {/* Mini action buttons on selection */}

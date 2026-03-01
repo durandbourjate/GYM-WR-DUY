@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { usePlannerStore } from '../store/plannerStore';
 import { usePlannerData } from '../hooks/usePlannerData';
 import { SUBJECT_AREA_COLORS } from '../utils/colors';
@@ -50,27 +50,27 @@ function LessonsList({ block, fb, courses }: { block: SequenceBlock; fb: FlatBlo
                 store.setSidePanelOpen(true);
                 store.setSidePanelTab('details');
               }}>
-              <span className="text-[8px] text-gray-600">{isExpanded ? '▾' : '▸'}</span>
-              <span className="text-gray-500 font-mono w-8">KW{weekW}</span>
-              <span className={`truncate ${entry?.title ? 'text-gray-300' : 'text-gray-600 italic'}`}>{entry?.title || '—'}</span>
-              {detail?.topicMain && <span className="text-[7px] text-gray-500 ml-auto truncate max-w-20">📌{detail.topicMain}</span>}
+              <span className="text-[8px] text-gray-500">{isExpanded ? '▾' : '▸'}</span>
+              <span className="text-gray-400 font-mono w-8">KW{weekW}</span>
+              <span className={`truncate ${entry?.title ? 'text-gray-300' : 'text-gray-500 italic'}`}>{entry?.title || '—'}</span>
+              {detail?.topicMain && <span className="text-[7px] text-gray-400 ml-auto truncate max-w-20">📌{detail.topicMain}</span>}
             </div>
             {isExpanded && course && (
               <div className="ml-5 mr-1 my-1 p-1.5 bg-slate-900/50 rounded space-y-1 border-l-2 border-blue-500/30">
                 <div>
-                  <label className="text-[7px] text-gray-600">Thema</label>
+                  <label className="text-[7px] text-gray-500">Thema</label>
                   <input value={detail?.topicMain || ''} onChange={(e) => updateLessonDetail(weekW, course.col, { topicMain: e.target.value || undefined })}
                     placeholder={block.topicMain || 'Thema…'}
                     className="w-full bg-slate-700/50 text-slate-200 border border-slate-600 rounded px-1.5 py-0.5 text-[8px] outline-none focus:border-blue-400" />
                 </div>
                 <div>
-                  <label className="text-[7px] text-gray-600">Notizen</label>
+                  <label className="text-[7px] text-gray-500">Notizen</label>
                   <textarea value={detail?.notes || ''} onChange={(e) => updateLessonDetail(weekW, course.col, { notes: e.target.value || undefined })}
                     placeholder="Notizen…" rows={2}
                     className="w-full bg-slate-700/50 text-slate-200 border border-slate-600 rounded px-1.5 py-0.5 text-[8px] outline-none focus:border-blue-400 resize-y" />
                 </div>
                 {!detail?.subjectArea && inheritSA && (
-                  <div className="text-[7px] text-gray-600">Fachbereich: <span className="text-gray-400">{inheritSA}</span> <span className="text-gray-700">(geerbt)</span></div>
+                  <div className="text-[7px] text-gray-500">Fachbereich: <span className="text-gray-400">{inheritSA}</span> <span className="text-gray-700">(geerbt)</span></div>
                 )}
                 <div className="flex justify-end">
                   <button onClick={() => {
@@ -87,7 +87,7 @@ function LessonsList({ block, fb, courses }: { block: SequenceBlock; fb: FlatBlo
           </div>
         );
       })}
-      {block.weeks.length === 0 && <div className="text-[8px] text-gray-600 italic">Keine Wochen zugewiesen</div>}
+      {block.weeks.length === 0 && <div className="text-[8px] text-gray-500 italic">Keine Wochen zugewiesen</div>}
     </div>
   );
 }
@@ -149,9 +149,17 @@ function FlatBlockCard({ fb }: { fb: FlatBlockInfo }) {
 
   // Get parent sequence for series-level editing
   const parentSeq = sequences.find(s => s.id === fb.seqId);
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll into view when this block becomes the active editing target
+  useEffect(() => {
+    if (isActive && cardRef.current) {
+      cardRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }, [isActive]);
 
   return (
-    <div className="border rounded-lg overflow-hidden transition-colors"
+    <div ref={cardRef} data-seq-block={blockKey} className="border rounded-lg overflow-hidden transition-colors"
       style={{
         borderColor: isActive ? (blockColor || '#475569') : '#334155',
         background: isActive ? (blockColor ? blockColor + '08' : '#1a2035') : 'transparent',
@@ -166,14 +174,14 @@ function FlatBlockCard({ fb }: { fb: FlatBlockInfo }) {
         <div className="w-1 h-5 rounded-full shrink-0" style={{ background: blockColor || fb.seqColor || '#16a34a' }} />
         <div className="flex-1 min-w-0">
           <div className="text-[10px] font-semibold text-gray-200 truncate">{block.label}</div>
-          <div className="text-[8px] text-gray-500 flex items-center gap-1.5">
+          <div className="text-[8px] text-gray-400 flex items-center gap-1.5">
             <span className="font-mono">{kwRange}</span>
             <span>· {block.weeks.length}W</span>
             {sa && <span style={{ color: SUBJECT_AREA_COLORS[sa]?.fg }}>{sa}</span>}
-            <span className="text-gray-600">· {fb.seqTitle}</span>
+            <span className="text-gray-500">· {fb.seqTitle}</span>
           </div>
         </div>
-        <span className="text-[9px] text-gray-500">{isActive ? '▾' : '▸'}</span>
+        <span className="text-[9px] text-gray-400">{isActive ? '▾' : '▸'}</span>
       </div>
 
       {/* Expanded content */}
@@ -184,11 +192,11 @@ function FlatBlockCard({ fb }: { fb: FlatBlockInfo }) {
             <button onClick={navigateToBlock} className="text-[8px] text-blue-400 hover:text-blue-300 cursor-pointer px-1.5 py-0.5">↗ Im Planer</button>
             <span className="text-slate-700 mx-0.5">│</span>
             <button onClick={() => setShowFields(!showFields)}
-              className={`text-[8px] cursor-pointer px-1.5 py-0.5 rounded-t border-b-2 transition-colors ${showFields ? 'text-gray-200 bg-slate-800/50 border-blue-400 font-medium' : 'text-gray-500 hover:text-gray-300 border-transparent'}`}>
+              className={`text-[8px] cursor-pointer px-1.5 py-0.5 rounded-t border-b-2 transition-colors ${showFields ? 'text-gray-200 bg-slate-800/50 border-blue-400 font-medium' : 'text-gray-400 hover:text-gray-300 border-transparent'}`}>
               Felder
             </button>
             <button onClick={() => setShowLessons(!showLessons)}
-              className={`text-[8px] cursor-pointer px-1.5 py-0.5 rounded-t border-b-2 transition-colors ${showLessons ? 'text-gray-200 bg-slate-800/50 border-blue-400 font-medium' : 'text-gray-500 hover:text-gray-300 border-transparent'}`}>
+              className={`text-[8px] cursor-pointer px-1.5 py-0.5 rounded-t border-b-2 transition-colors ${showLessons ? 'text-gray-200 bg-slate-800/50 border-blue-400 font-medium' : 'text-gray-400 hover:text-gray-300 border-transparent'}`}>
               Lektionen ({block.weeks.length})
             </button>
             <button onClick={() => setShowSeriesFields(!showSeriesFields)}
@@ -201,7 +209,7 @@ function FlatBlockCard({ fb }: { fb: FlatBlockInfo }) {
           {showFields && (
             <div className="space-y-1.5 p-1.5 bg-slate-800/30 rounded">
               <div className="flex gap-1 flex-wrap">
-                <span className="text-[8px] text-gray-500 w-full">Fachbereich:</span>
+                <span className="text-[8px] text-gray-400 w-full">Fachbereich:</span>
                 {SUBJECT_AREAS.map((s) => (
                   <button key={s.key} onClick={() => updateBlockInSequence(fb.seqId, fb.blockIndex, {
                     subjectArea: block.subjectArea === s.key ? undefined : s.key as SubjectArea
@@ -217,27 +225,27 @@ function FlatBlockCard({ fb }: { fb: FlatBlockInfo }) {
                 ))}
               </div>
               <div>
-                <label className="text-[8px] text-gray-500">Oberthema</label>
+                <label className="text-[8px] text-gray-400">Oberthema</label>
                 <input value={block.topicMain || ''} onChange={(e) => updateBlockInSequence(fb.seqId, fb.blockIndex, { topicMain: e.target.value || undefined })}
                   className="w-full bg-slate-700/50 text-slate-200 border border-slate-600 rounded px-1.5 py-0.5 text-[9px] outline-none focus:border-blue-400" />
               </div>
               <div>
-                <label className="text-[8px] text-gray-500">Unterthema</label>
+                <label className="text-[8px] text-gray-400">Unterthema</label>
                 <input value={block.topicSub || ''} onChange={(e) => updateBlockInSequence(fb.seqId, fb.blockIndex, { topicSub: e.target.value || undefined })}
                   className="w-full bg-slate-700/50 text-slate-200 border border-slate-600 rounded px-1.5 py-0.5 text-[9px] outline-none focus:border-blue-400" />
               </div>
               <div>
-                <label className="text-[8px] text-gray-500">Lehrplanziel</label>
+                <label className="text-[8px] text-gray-400">Lehrplanziel</label>
                 <input value={block.curriculumGoal || ''} onChange={(e) => updateBlockInSequence(fb.seqId, fb.blockIndex, { curriculumGoal: e.target.value || undefined })}
                   className="w-full bg-slate-700/50 text-slate-200 border border-slate-600 rounded px-1.5 py-0.5 text-[9px] outline-none focus:border-blue-400" />
               </div>
               <div>
-                <label className="text-[8px] text-gray-500">Beschreibung</label>
+                <label className="text-[8px] text-gray-400">Beschreibung</label>
                 <textarea value={block.description || ''} onChange={(e) => updateBlockInSequence(fb.seqId, fb.blockIndex, { description: e.target.value || undefined })}
                   rows={2} className="w-full bg-slate-700/50 text-slate-200 border border-slate-600 rounded px-1.5 py-0.5 text-[9px] outline-none focus:border-blue-400 resize-y" />
               </div>
               <div>
-                <label className="text-[8px] text-gray-500">Materiallinks</label>
+                <label className="text-[8px] text-gray-400">Materiallinks</label>
                 {(block.materialLinks || []).map((link, li) => (
                   <div key={li} className="flex gap-1 items-center mt-0.5">
                     <input value={link} onChange={(e) => {
@@ -266,19 +274,19 @@ function FlatBlockCard({ fb }: { fb: FlatBlockInfo }) {
             <div className="space-y-1.5 p-1.5 bg-amber-900/10 border border-amber-700/30 rounded">
               <div className="text-[8px] text-amber-400 font-medium mb-1">
                 📂 Reihe: {parentSeq.title}
-                <span className="text-gray-500 font-normal ml-1">({parentSeq.blocks.length} Sequenz{parentSeq.blocks.length !== 1 ? 'en' : ''})</span>
+                <span className="text-gray-400 font-normal ml-1">({parentSeq.blocks.length} Sequenz{parentSeq.blocks.length !== 1 ? 'en' : ''})</span>
               </div>
-              <div className="text-[7px] text-gray-600 mb-1.5">
+              <div className="text-[7px] text-gray-500 mb-1.5">
                 Mehrere Sequenzen mit dem gleichen Oberthema bilden eine Reihe.
                 Reihen-Einstellungen gelten für alle Sequenzen darin.
               </div>
               <div>
-                <label className="text-[8px] text-gray-500">Reihen-Titel</label>
+                <label className="text-[8px] text-gray-400">Reihen-Titel</label>
                 <input value={parentSeq.title} onChange={(e) => updateSequence(fb.seqId, { title: e.target.value })}
                   className="w-full bg-slate-700/50 text-slate-200 border border-slate-600 rounded px-1.5 py-0.5 text-[9px] outline-none focus:border-amber-400" />
               </div>
               <div className="flex gap-1 flex-wrap">
-                <span className="text-[8px] text-gray-500 w-full">Fachbereich (Reihe):</span>
+                <span className="text-[8px] text-gray-400 w-full">Fachbereich (Reihe):</span>
                 {SUBJECT_AREAS.map((s) => (
                   <button key={s.key} onClick={() => updateSequence(fb.seqId, {
                     subjectArea: parentSeq.subjectArea === s.key ? undefined : s.key as SubjectArea
@@ -294,7 +302,7 @@ function FlatBlockCard({ fb }: { fb: FlatBlockInfo }) {
                 ))}
               </div>
               <div>
-                <label className="text-[8px] text-gray-500">Notizen (Reihe)</label>
+                <label className="text-[8px] text-gray-400">Notizen (Reihe)</label>
                 <textarea value={parentSeq.notes || ''} onChange={(e) => updateSequence(fb.seqId, { notes: e.target.value || undefined })}
                   rows={2} className="w-full bg-slate-700/50 text-slate-200 border border-slate-600 rounded px-1.5 py-0.5 text-[9px] outline-none focus:border-blue-400 resize-y" />
               </div>
@@ -455,7 +463,7 @@ export function SequencePanel({ embedded = false }: { embedded?: boolean }) {
         return (
           <div key={cls} className="space-y-1">
             <div className="text-[10px] font-bold text-gray-300 px-1">{cls}</div>
-            <div className="text-[9px] text-gray-600 ml-2 italic">Keine Sequenzen</div>
+            <div className="text-[9px] text-gray-500 ml-2 italic">Keine Sequenzen</div>
           </div>
         );
       }
@@ -466,7 +474,7 @@ export function SequencePanel({ embedded = false }: { embedded?: boolean }) {
             {getCourseTypesForClass(cls, COURSES).map(ct => {
               const course = COURSES.find(c => c.id === ct.courseIds[0]);
               return (
-                <span key={ct.typ} className="text-[8px] px-1 py-px rounded bg-slate-800/80 text-gray-500 font-normal">
+                <span key={ct.typ} className="text-[8px] px-1 py-px rounded bg-slate-800/80 text-gray-400 font-normal">
                   {ct.typ} {course?.day}{ct.courseIds.length > 1 ? `+${COURSES.find(c => c.id === ct.courseIds[1])?.day}` : ''}
                 </span>
               );
@@ -561,10 +569,10 @@ export function SequencePanel({ embedded = false }: { embedded?: boolean }) {
       <div className="px-3 py-2 border-b border-slate-600 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-2">
           <span className="text-[11px] font-bold text-gray-200">▧ Sequenzen</span>
-          <span className="text-[9px] text-gray-500">{sequences.length}</span>
+          <span className="text-[9px] text-gray-400">{sequences.length}</span>
         </div>
         <button onClick={() => setSequencePanelOpen(false)}
-          className="text-gray-500 hover:text-gray-300 cursor-pointer text-xs px-1">✕</button>
+          className="text-gray-400 hover:text-gray-300 cursor-pointer text-xs px-1">✕</button>
       </div>
       {content}
     </div>

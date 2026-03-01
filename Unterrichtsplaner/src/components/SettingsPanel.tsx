@@ -22,7 +22,7 @@ function Section({ title, children, defaultOpen = false }: { title: string; chil
       <button onClick={() => setOpen(!open)}
         className="w-full px-3 py-2 text-left text-[11px] font-semibold text-gray-200 bg-slate-800 hover:bg-slate-750 cursor-pointer flex items-center justify-between">
         {title}
-        <span className="text-gray-500">{open ? '▾' : '▸'}</span>
+        <span className="text-gray-400">{open ? '▾' : '▸'}</span>
       </button>
       {open && <div className="p-3 space-y-2 bg-slate-900/50">{children}</div>}
     </div>
@@ -98,7 +98,7 @@ function CourseEditor({ courses, onChange }: { courses: CourseConfig[]; onChange
                   </div>
                   <div className="flex gap-1 items-center">
                     <SmallInput value={c.from} onChange={(v) => updateCourse(c.id, { from: v })} placeholder="08:05" className="w-14" type="time" />
-                    <span className="text-[8px] text-gray-500">–</span>
+                    <span className="text-[8px] text-gray-400">–</span>
                     <SmallInput value={c.to} onChange={(v) => updateCourse(c.id, { to: v })} placeholder="08:50" className="w-14" type="time" />
                     <SmallSelect value={String(c.les) as any} onChange={(v) => updateCourse(c.id, { les: Number(v) })}
                       options={[{ key: '1', label: '1L' }, { key: '2', label: '2L' }, { key: '3', label: '3L' }]} />
@@ -132,10 +132,10 @@ function CourseEditor({ courses, onChange }: { courses: CourseConfig[]; onChange
               ) : (
                 <div className="flex items-center gap-2 text-[9px] text-gray-400 hover:text-gray-200 cursor-pointer group"
                   onClick={() => setEditingId(c.id)}>
-                  <span className="text-gray-500 font-mono">{c.day}</span>
+                  <span className="text-gray-400 font-mono">{c.day}</span>
                   <span>{c.from}–{c.to}</span>
-                  <span className="text-gray-600">{c.les}L{c.hk ? ' HK' : ''}</span>
-                  <span className="text-gray-600">{c.semesters.map(s => `S${s}`).join('+')}</span>
+                  <span className="text-gray-500">{c.les}L{c.hk ? ' HK' : ''}</span>
+                  <span className="text-gray-500">{c.semesters.map(s => `S${s}`).join('+')}</span>
                   {c.note && <span className="text-amber-600 text-[8px]">{c.note}</span>}
                 </div>
               )}
@@ -144,7 +144,7 @@ function CourseEditor({ courses, onChange }: { courses: CourseConfig[]; onChange
         </div>
       ))}
       <button onClick={addCourse}
-        className="w-full py-1.5 rounded border border-dashed border-gray-600 text-gray-500 hover:text-gray-300 hover:border-gray-400 text-[9px] cursor-pointer transition-all">
+        className="w-full py-1.5 rounded border border-dashed border-gray-600 text-gray-400 hover:text-gray-300 hover:border-gray-400 text-[9px] cursor-pointer transition-all">
         + Kurs hinzufügen
       </button>
     </div>
@@ -169,7 +169,7 @@ function SpecialWeeksEditor({ weeks, courses, onChange }: {
 
   return (
     <div className="space-y-1.5">
-      <p className="text-[8px] text-gray-500">Sonderwochen gelten standardmässig für alle Kurse. Einzelne Kurse können ausgenommen werden.</p>
+      <p className="text-[8px] text-gray-400">Sonderwochen gelten standardmässig für alle Kurse. Einzelne Kurse können ausgenommen werden.</p>
       {weeks.map(w => (
         <div key={w.id} className="bg-slate-800 rounded p-2 space-y-1">
           <div className="flex gap-1 items-center">
@@ -181,7 +181,7 @@ function SpecialWeeksEditor({ weeks, courses, onChange }: {
           </div>
           {courses.length > 0 && (
             <div className="flex flex-wrap gap-1 mt-1">
-              <span className="text-[7px] text-gray-500">Ausgenommen:</span>
+              <span className="text-[7px] text-gray-400">Ausgenommen:</span>
               {courses.map(c => {
                 const excluded = w.excludedCourseIds?.includes(c.id);
                 return (
@@ -191,7 +191,7 @@ function SpecialWeeksEditor({ weeks, courses, onChange }: {
                       excludedCourseIds: excluded ? current.filter(x => x !== c.id) : [...current, c.id]
                     });
                   }}
-                    className={`text-[7px] px-1 py-px rounded cursor-pointer ${excluded ? 'bg-red-900/40 text-red-300 border border-red-500/50' : 'bg-slate-700 text-gray-500 border border-transparent'}`}>
+                    className={`text-[7px] px-1 py-px rounded cursor-pointer ${excluded ? 'bg-red-900/40 text-red-300 border border-red-500/50' : 'bg-slate-700 text-gray-400 border border-transparent'}`}>
                     {c.cls} {c.day}
                   </button>
                 );
@@ -201,7 +201,7 @@ function SpecialWeeksEditor({ weeks, courses, onChange }: {
         </div>
       ))}
       <button onClick={addWeek}
-        className="w-full py-1 rounded border border-dashed border-gray-600 text-gray-500 hover:text-gray-300 text-[9px] cursor-pointer">
+        className="w-full py-1 rounded border border-dashed border-gray-600 text-gray-400 hover:text-gray-300 text-[9px] cursor-pointer">
         + Sonderwoche hinzufügen
       </button>
     </div>
@@ -227,15 +227,15 @@ function HolidaysEditor({ holidays, onChange }: { holidays: HolidayConfig[]; onC
       {holidays.map(h => (
         <div key={h.id} className="flex gap-1 items-center">
           <SmallInput value={h.label} onChange={(v) => update(h.id, { label: v })} placeholder="Name (z.B. Herbstferien)" className="flex-1" />
-          <span className="text-[8px] text-gray-500">KW</span>
+          <span className="text-[8px] text-gray-400">KW</span>
           <SmallInput value={h.startWeek} onChange={(v) => update(h.id, { startWeek: v })} placeholder="von" className="w-10" />
-          <span className="text-[8px] text-gray-500">–</span>
+          <span className="text-[8px] text-gray-400">–</span>
           <SmallInput value={h.endWeek} onChange={(v) => update(h.id, { endWeek: v })} placeholder="bis" className="w-10" />
           <button onClick={() => remove(h.id)} className="text-[8px] text-red-400 cursor-pointer">✕</button>
         </div>
       ))}
       <button onClick={addHoliday}
-        className="w-full py-1 rounded border border-dashed border-gray-600 text-gray-500 hover:text-gray-300 text-[9px] cursor-pointer">
+        className="w-full py-1 rounded border border-dashed border-gray-600 text-gray-400 hover:text-gray-300 text-[9px] cursor-pointer">
         + Ferienperiode hinzufügen
       </button>
     </div>
@@ -259,7 +259,7 @@ function ApplySettingsButton({ settings }: { settings: PlannerSettings }) {
 
   return (
     <div className="space-y-1.5">
-      <div className="text-[8px] text-gray-500">
+      <div className="text-[8px] text-gray-400">
         {settings.holidays.length} Ferienperioden · {settings.specialWeeks.length} Sonderwochen konfiguriert
       </div>
       <p className="text-[8px] text-green-400/70">
@@ -271,7 +271,7 @@ function ApplySettingsButton({ settings }: { settings: PlannerSettings }) {
           applyToWeeks();
         }
       }}
-        className="w-full py-1.5 rounded text-[9px] font-medium bg-amber-700 hover:bg-amber-600 text-white cursor-pointer transition-all disabled:bg-slate-700 disabled:text-gray-500 disabled:cursor-not-allowed"
+        className="w-full py-1.5 rounded text-[9px] font-medium bg-amber-700 hover:bg-amber-600 text-white cursor-pointer transition-all disabled:bg-slate-700 disabled:text-gray-400 disabled:cursor-not-allowed"
         disabled={totalEntries === 0}>
         🔄 Ferien & Sonderwochen erneut eintragen
       </button>
@@ -332,7 +332,7 @@ export function SettingsPanel() {
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-[11px] font-bold text-gray-200">Einstellungen</h3>
-          <p className="text-[8px] text-gray-500 mt-0.5">
+          <p className="text-[8px] text-gray-400 mt-0.5">
             {hasCustomSettings ? 'Eigene Konfiguration aktiv' : 'Standard-Konfiguration (DUY SJ 25/26)'}
           </p>
         </div>
@@ -367,11 +367,11 @@ export function SettingsPanel() {
       <Section title="🏫 Schule & Grundeinstellungen" defaultOpen>
         <div className="space-y-1.5">
           <div>
-            <label className="text-[8px] text-gray-500 mb-0.5 block">Schulname (optional)</label>
+            <label className="text-[8px] text-gray-400 mb-0.5 block">Schulname (optional)</label>
             <SmallInput value={settings.school?.name || ''} onChange={(v) => updateSettings({ school: { ...settings.school!, name: v } })} placeholder="z.B. Gymnasium Hofwil" className="w-full" />
           </div>
           <div>
-            <label className="text-[8px] text-gray-500 mb-0.5 block">Standard-Lektionsdauer (Minuten)</label>
+            <label className="text-[8px] text-gray-400 mb-0.5 block">Standard-Lektionsdauer (Minuten)</label>
             <SmallInput value={String(settings.school?.lessonDurationMin || 45)} onChange={(v) => {
               const n = parseInt(v) || 45;
               updateSettings({ school: { ...settings.school!, lessonDurationMin: n } });
@@ -398,7 +398,7 @@ export function SettingsPanel() {
       {/* Apply settings to planner */}
       <Section title="⚡ Einstellungen anwenden">
         <div className="space-y-2">
-          <p className="text-[8px] text-gray-500">
+          <p className="text-[8px] text-gray-400">
             Ferien und Sonderwochen aus den Einstellungen in die Planerdaten übernehmen. Bestehende Einträge in betroffenen Wochen werden überschrieben.
           </p>
           <ApplySettingsButton settings={settings} />
@@ -409,7 +409,7 @@ export function SettingsPanel() {
       <Section title="💾 Daten exportieren / importieren">
         <div className="space-y-3">
           <div>
-            <p className="text-[8px] text-gray-500 font-semibold mb-1">Einstellungen (Kurse, Ferien, Sonderwochen)</p>
+            <p className="text-[8px] text-gray-400 font-semibold mb-1">Einstellungen (Kurse, Ferien, Sonderwochen)</p>
             <div className="flex gap-1">
               <button onClick={() => {
                 const blob = new Blob([JSON.stringify(settings, null, 2)], { type: 'application/json' });
@@ -445,7 +445,7 @@ export function SettingsPanel() {
           </div>
 
           <div className="border-t border-slate-700 pt-2">
-            <p className="text-[8px] text-gray-500 font-semibold mb-1">Planerdaten (Lektionen, Sequenzen, Details)</p>
+            <p className="text-[8px] text-gray-400 font-semibold mb-1">Planerdaten (Lektionen, Sequenzen, Details)</p>
             <div className="flex gap-1">
               <button onClick={() => {
                 const json = usePlannerStore.getState().exportData();
