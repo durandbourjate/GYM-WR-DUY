@@ -7,9 +7,9 @@
 
 ## Architektur
 - **Stack:** React + TypeScript + Vite + Zustand + PWA
-- **Store:** `plannerStore.ts` (~1095 Z.), `settingsStore.ts` (181 Z.)
+- **Store:** `plannerStore.ts` (~1125 Z.), `settingsStore.ts` (181 Z.)
 - **Hook:** `usePlannerData.ts` — dynamische Courses/Weeks basierend auf Settings
-- **Hauptkomponenten:** WeekRows (~680 Z.), SequencePanel (~585 Z.), DetailPanel (~990 Z.), Toolbar (~463 Z.), SettingsPanel (~444 Z.), CollectionPanel (~295 Z.), ZoomBlockView (~324 Z.)
+- **Hauptkomponenten:** WeekRows (~1021 Z.), SequencePanel (~660 Z.), DetailPanel (~1027 Z.), ZoomYearView (~569 Z.), Toolbar (~463 Z.), SettingsPanel (~444 Z.), CollectionPanel (~295 Z.)
 
 ## Changelog v3.0–v3.14
 - v3.0–v3.7: Grundfunktionen (siehe frühere Handoffs)
@@ -47,6 +47,14 @@
 - v3.33: Batch-Edit Active-State — Fachbereich/Kategorie/Dauer/SOL-Buttons im Batch-Tab zeigen den aktuellen Wert der selektierten Zellen mit farblicher Hervorhebung (ring + stärkerer Hintergrund). "(gemischt)"-Hinweis bei unterschiedlichen Werten. ZoomYearView sticky header Positionsfix.
 
 - v3.34: UX-Verbesserungen #2 — (1) Klick+Drag leere Zellen bleiben nach mouseup markiert (lila Outline bleibt). (2) Zoom 3: Toggle vergangene Wochen dim/hell (◐-Button in Toolbar, `dimPastWeeks` in Store). (3) Shift-Klick Mehrtages-Kurse: Popup fragt "Auch [anderer Tag] auswählen?" statt Shift+Alt. (4) Zoom 2: Einzellektionen ohne Sequenz werden angezeigt (gestrichelter Border, halbtransparent, Klick→Details, DblClick→Zoom3). (5) SequencePanel: aktive Sequenz als Pin-Card oben angepinnt (unter Klassenbuttons); Felder+Lektionen standardmässig ausgeklappt wenn aktiv.
+
+- v3.35: UX-Fixes #3 — (1) Sequenz-Bar + Label Farbcode = Fachbereich statt Kurstyp (VWL=orange, BWL=blau, Recht=grün, IN=grau, INTERDISZ=violett). (2) Ferien-Wochen (type 6) in Sequenz-Lektionsliste als graue nicht-editierbare Zeile. (3) Felder/Lektionen in FlatBlockCard default ausgeklappt. (4) Aktive Sequenz Pin-Card: excluded aus normaler Sequenzliste (Doppel-Anzeige-Bug). (5) Sammlung-Buttons umbenannt: "📥 In Sammlung" / "📥 Reihe → Sammlung".
+
+- v3.36: UX-Fixes #4 — (1) Shift-Klick Mehrtages-Bug fix: "Ja, beide Tage" expandiert gesamte multiSelection um andere Tage. Kein Popup wenn anderer Tag bereits selektiert. Popup schliesst bei Click-Outside/Esc. (2) Sequenz-Detail Feldordnung: Oberthema→Unterthema→Beschreibung→Lehrplanziel (kleiner). (3) Material vereinfacht: LearningView+Materiallinks → ein "Material"-Feld. (4) Zoom 2 loose lessons fix: entry.title-Prüfung, type 0 korrekt, Holidays/Events gefiltert.
+
+- v3.37: Zoom 2 + Ferien Fixes — (1) Ferien/Events zeigen keinen Sequenz-Balken/Label in Zoom 3. (2) Zoom 2 loose lessons bei multi-day Kursen (looseKey-Fallback). (3) Header top:0 + padding → Klassen-Beschriftungen voll lesbar. (4) Block-Farben aufgehellt, Default-Block heller, Ferien/KW-Labels heller. (5) dimPastWeeks-Toggle wirkt in Zoom 2.
+
+- v3.38: Ferien/Events Zoom 2 Overhaul — (1) Aufeinanderfolgende Ferien-Wochen als zusammengefasste rowSpan-Blöcke (KW-Range, 🏖, Name, Wochenzähler). (2) Ganztags-Events als colspan-Block mit 📅 + amber-Farbe. (3) Partielle Events pro Kurs-Zelle als Mini-Blöcke. (4) Multi-day Sub-Columns Events/Holidays ebenso.
 
 - v3.35: UX-Fixes #3 — (1) Sequenz-Bar + Label Farbcode = Fachbereich statt Kurstyp (VWL=orange, BWL=blau, Recht=grün, IN=grau, INTERDISZ=violett). (2) Ferien-Wochen (type 6) in Sequenz-Lektionsliste als graue nicht-editierbare Zeile statt klickbar. (3) Felder/Lektionen in FlatBlockCard default ausgeklappt (useState(true)). (4) Aktive Sequenz Pin-Card: wird aus der normalen Sequenzliste excluded um Doppel-Anzeige zu vermeiden. (5) Sammlung-Buttons umbenannt: "💾 UE speichern" → "📥 In Sammlung", "💾 Reihe" → "📥 Reihe → Sammlung".
 

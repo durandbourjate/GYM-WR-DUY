@@ -1,4 +1,4 @@
-# Feature-Abgleich: Kommentare vs. Implementierungsstand (v3.31)
+# Feature-Abgleich: Kommentare vs. Implementierungsstand (v3.38)
 
 Stand: 2026-03-01
 
