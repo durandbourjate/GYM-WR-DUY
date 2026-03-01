@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { usePlannerStore } from '../store/plannerStore';
+import { usePlannerData } from '../hooks/usePlannerData';
 import { TYPE_BADGES, getSequenceInfoFromStore } from '../utils/colors';
 import { CurriculumGoalPicker } from './CurriculumGoalPicker';
 import { SequencePanel } from './SequencePanel';
@@ -652,6 +653,104 @@ function DetailsTab() {
   );
 }
 
+// Switcher: show batch edit when multiple cells selected, else normal details
+function BatchOrDetailsTab() {
+  const { multiSelection } = usePlannerStore();
+  if (multiSelection.length > 1) return <BatchEditTab />;
+  return <DetailsTab />;
+}
+
+// Batch editing for multiple selected cells
+function BatchEditTab() {
+  const { multiSelection, updateLessonDetail, pushUndo } = usePlannerStore();
+  const { courses: COURSES } = usePlannerData();
+  const [applied, setApplied] = useState<string | null>(null);
+
+  // Parse multi-selection keys to week-col pairs
+  const cells = multiSelection.map(key => {
+    const [week, courseId] = key.split('-');
+    const course = COURSES.find(c => c.id === courseId);
+    return course ? { week, col: course.col, courseId } : null;
+  }).filter(Boolean) as { week: string; col: number; courseId: string }[];
+
+  const applyToAll = (field: keyof LessonDetail, value: unknown) => {
+    pushUndo();
+    for (const cell of cells) {
+      updateLessonDetail(cell.week, cell.col, { [field]: value });
+    }
+    setApplied(`${field}: Auf ${cells.length} Zellen angewandt`);
+    setTimeout(() => setApplied(null), 2000);
+  };
+
+  return (
+    <div className="p-3 space-y-3 overflow-y-auto flex-1">
+      <div className="text-[11px] font-bold text-amber-300">
+        ✏ Batch-Bearbeitung ({cells.length} Zellen)
+      </div>
+      {applied && (
+        <div className="text-[9px] text-green-400 bg-green-900/20 rounded px-2 py-1">✅ {applied}</div>
+      )}
+
+      {/* Subject Area */}
+      <div className="space-y-1">
+        <label className="text-[9px] text-gray-400 font-medium">Fachbereich setzen</label>
+        <div className="flex gap-1 flex-wrap">
+          {SUBJECT_AREAS.map(sa => (
+            <button key={sa.key} onClick={() => applyToAll('subjectArea', sa.key)}
+              className="px-2 py-0.5 rounded text-[9px] font-medium border cursor-pointer hover:opacity-80"
+              style={{ background: sa.color + '20', borderColor: sa.color + '60', color: sa.color }}>
+              {sa.label}
+            </button>
+          ))}
+          <button onClick={() => applyToAll('subjectArea', undefined)}
+            className="px-2 py-0.5 rounded text-[9px] border border-gray-600 text-gray-500 cursor-pointer hover:text-gray-300">✕</button>
+        </div>
+      </div>
+
+      {/* Category */}
+      <div className="space-y-1">
+        <label className="text-[9px] text-gray-400 font-medium">Kategorie setzen</label>
+        <div className="flex gap-1 flex-wrap">
+          {CATEGORIES.map(cat => (
+            <button key={cat.key} onClick={() => applyToAll('blockCategory', cat.key)}
+              className="px-2 py-0.5 rounded text-[9px] border cursor-pointer border-gray-600 text-gray-300 hover:bg-slate-700">
+              {cat.icon} {cat.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Duration */}
+      <div className="space-y-1">
+        <label className="text-[9px] text-gray-400 font-medium">Dauer setzen</label>
+        <div className="flex gap-1 flex-wrap">
+          {[1, 2, 3].map(d => (
+            <button key={d} onClick={() => applyToAll('duration', d)}
+              className="px-2 py-0.5 rounded text-[9px] border cursor-pointer border-gray-600 text-gray-300 hover:bg-slate-700">
+              {d}L
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* SOL toggle */}
+      <div className="space-y-1">
+        <label className="text-[9px] text-gray-400 font-medium">SOL (Selbstorganisiertes Lernen)</label>
+        <div className="flex gap-1">
+          <button onClick={() => applyToAll('sol', { enabled: true })}
+            className="px-2 py-0.5 rounded text-[9px] border cursor-pointer border-green-600 text-green-400 hover:bg-green-900/30">SOL ✓</button>
+          <button onClick={() => applyToAll('sol', { enabled: false })}
+            className="px-2 py-0.5 rounded text-[9px] border cursor-pointer border-gray-600 text-gray-400 hover:bg-slate-700">SOL ✕</button>
+        </div>
+      </div>
+
+      <div className="text-[8px] text-gray-600 pt-2 border-t border-slate-700">
+        Tipp: Wähle mehrere Zellen mit Shift+Klick oder Cmd+Klick, dann setze Eigenschaften hier.
+      </div>
+    </div>
+  );
+}
+
 export function DetailPanel() {
   const {
     sidePanelOpen, setSidePanelOpen,
@@ -751,7 +850,7 @@ export function DetailPanel() {
           ✕
         </button>
       </div>
-      {sidePanelTab === 'details' ? <DetailsTab /> : sidePanelTab === 'sequences' ? <SequencePanel embedded /> : <SettingsPanel />}
+      {sidePanelTab === 'details' ? <BatchOrDetailsTab /> : sidePanelTab === 'sequences' ? <SequencePanel embedded /> : <SettingsPanel />}
     </div>
   );
 }

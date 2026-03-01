@@ -116,7 +116,7 @@ function EmptyCellMenu({ week, course, onClose, selectedWeeks }: { week: string;
   const handleNewSequence = () => {
     const weeks = selectedWeeks && selectedWeeks.length > 0 ? selectedWeeks : [week];
     const seqId = addSequence({ courseId: course.id, title: `Neue Sequenz ${course.cls}`, blocks: [{ weeks, label: 'Neuer Block' }] });
-    setEditingSequenceId(seqId);
+    setEditingSequenceId(`${seqId}-0`); // flat format: seqId-blockIndex
     setSidePanelOpen(true);
     setSidePanelTab('sequences');
     onClose();
@@ -178,8 +178,12 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
       if (e.shiftKey) {
         // Shift+Click: range select within column
         selectRange(`${weekW}-${course.id}`, allWeekKeys, courses);
+        setSidePanelOpen(true);
+        setSidePanelTab('details');
       } else if (e.metaKey || e.ctrlKey) {
         toggleMultiSelect(`${weekW}-${course.id}`);
+        setSidePanelOpen(true);
+        setSidePanelTab('details');
       } else {
         clearMultiSelect();
         const isSame = selection?.week === weekW && selection?.courseId === course.id;
@@ -345,13 +349,19 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
               const saColors = effectiveSubjectArea ? SUBJECT_AREA_COLORS[effectiveSubjectArea] : null;
               const cellColors = saColors || colors;
 
-              // Sequence highlight: is this cell part of the currently edited sequence?
-              const editingSeq = editingSequenceId ? sequences.find(s => s.id === editingSequenceId) : null;
+              // Sequence highlight: is this cell part of the currently edited sequence/block?
+              const editingParts = editingSequenceId?.match(/^(.+)-(\d+)$/);
+              const editingSeqId = editingParts ? editingParts[1] : editingSequenceId;
+              const editingBlockIdx = editingParts ? parseInt(editingParts[2]) : null;
+              const editingSeq = editingSeqId ? sequences.find(s => s.id === editingSeqId) : null;
               const editingSeqMatchesCourse = editingSeq && (
                 editingSeq.courseId === c.id ||
                 (editingSeq.courseIds && editingSeq.courseIds.includes(c.id))
               );
-              const isInEditingSeq = editingSeqMatchesCourse && editingSeq?.blocks.some(b => b.weeks.includes(week.w));
+              const editingBlock = editingSeq && editingBlockIdx !== null ? editingSeq.blocks[editingBlockIdx] : null;
+              const isInEditingSeq = editingSeqMatchesCourse && (
+                editingBlock ? editingBlock.weeks.includes(week.w) : editingSeq?.blocks.some(b => b.weeks.includes(week.w))
+              );
               const isSeqDimmed = editingSeqMatchesCourse && !isInEditingSeq && !!title;
               const effectiveTopicMain = cellDetail?.topicMain || parentBlock?.topicMain;
               const effectiveTopicSub = cellDetail?.topicSub || parentBlock?.topicSub;
