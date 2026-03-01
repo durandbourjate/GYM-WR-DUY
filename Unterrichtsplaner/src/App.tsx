@@ -101,6 +101,7 @@ function App() {
 
   return (
     <div className="bg-[#0c0f1a] text-slate-200 min-h-screen font-sans" data-app-root>
+      <div className="print-title hidden">Unterrichtsplanung SJ 25/26 – {classFilter || 'Alle Klassen'}{filter !== 'ALL' ? ` (${filter})` : ''}</div>
       <AppHeader />
       <HelpBar />
       <Legend />

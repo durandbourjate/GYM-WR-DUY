@@ -26,27 +26,38 @@
 
   /* Hide non-essential UI elements */
   .no-print,
-  [data-no-print],
-  button,
-  .sticky {
+  [data-no-print] {
     display: none !important;
   }
 
-  /* But show sticky week number column */
-  td.sticky {
+  /* Hide all buttons except inside the table */
+  body > div button,
+  div[class*="fixed"] button,
+  div[class*="sticky"][class*="top-0"] button {
+    display: none !important;
+  }
+
+  /* Sticky elements: remove sticky positioning for print */
+  .sticky, [class*="sticky"] {
+    position: static !important;
+  }
+
+  /* But ensure week column cells stay visible */
+  td.sticky, td[class*="sticky"] {
     display: table-cell !important;
     position: static !important;
     background: #fff !important;
   }
 
-  /* Keep header row visible */
-  thead th {
+  /* Keep header row visible and static */
+  thead th, thead th.sticky, thead th[class*="sticky"] {
     position: static !important;
-    background: #f8fafc !important;
+    background: #f1f5f9 !important;
     color: #1e293b !important;
     font-size: 7pt !important;
-    padding: 2px 3px !important;
+    padding: 2px 4px !important;
     border: 1px solid #cbd5e1 !important;
+    white-space: nowrap;
   }
 
   /* Table cells */
@@ -57,9 +68,10 @@
     width: auto !important;
     min-width: auto !important;
     max-width: none !important;
+    background: #fff !important;
   }
 
-  /* Lesson tiles – keep colored backgrounds for readability */
+  /* Lesson tiles – keep colored backgrounds */
   td div[class*="rounded"] {
     border: 1px solid #94a3b8 !important;
     box-shadow: none !important;
@@ -67,11 +79,14 @@
     padding: 1px 3px !important;
     min-height: auto !important;
     font-size: 7pt !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
 
-  /* Sequence bars – thin left border instead */
+  /* Sequence bars */
   .absolute.left-0.w-\[3px\] {
     width: 2px !important;
+    -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
 
@@ -106,7 +121,7 @@
   }
 
   /* Hide side panels, detail panels, modals */
-  .fixed {
+  .fixed, div[class*="fixed"] {
     display: none !important;
   }
 
@@ -122,5 +137,16 @@
     font-weight: bold;
     margin-bottom: 8px;
     text-align: center;
+  }
+
+  /* Hide zoom/interaction overlays */
+  [class*="cursor-pointer"]::after,
+  [class*="hover:"] {
+    display: none !important;
+  }
+
+  /* Ensure text is dark and readable */
+  span, div {
+    color-adjust: exact;
   }
 }
