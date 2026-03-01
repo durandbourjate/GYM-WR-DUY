@@ -335,11 +335,13 @@ export function HelpBar() {
       <b className="text-gray-200">Bedienung:</b>{' '}
       <b>1× Klick</b> = Auswählen (Mini-Buttons: + ↓ i) ·{' '}
       <b>2× Klick</b> = Details öffnen ·{' '}
-      <b>Hover (2s)</b> = Vorschau ·{' '}
+      <b>Hover</b> = Vorschau ·{' '}
       <b>⇧/⌘+Klick</b> = Mehrfachauswahl ·{' '}
+      <b>Delete</b> = Zelle leeren ·{' '}
       <b>⌘Z</b> = Rückgängig ·{' '}
       <b>⌘F</b> = Suche ·{' '}
       <b>⌘P</b> = Drucken ·{' '}
+      <b>↑↓</b> = Nächste Woche ·{' '}
       <b>Leere Zelle</b> = Neue Kachel/Sequenz
       <br />
       <b>Zoom:</b> <b>1</b> = Semester-Übersicht · <b>2</b> = Block-Ansicht · <b>3</b> = Wochen-Ansicht

@@ -88,6 +88,39 @@ function App() {
         if (e.key === '2') usePlannerStore.getState().setZoomLevel(2);
         if (e.key === '3') usePlannerStore.getState().setZoomLevel(3);
       }
+      // Arrow keys: navigate between weeks when a cell is selected
+      if ((e.key === 'ArrowUp' || e.key === 'ArrowDown') && !e.metaKey && !e.ctrlKey) {
+        const state = usePlannerStore.getState();
+        if (!state.selection) return;
+        e.preventDefault();
+        const allW = (state.weekData.length > 0 ? state.weekData : staticWeeks).map(w => w.w);
+        const curIdx = allW.indexOf(state.selection.week);
+        if (curIdx < 0) return;
+        const nextIdx = e.key === 'ArrowUp' ? curIdx - 1 : curIdx + 1;
+        if (nextIdx < 0 || nextIdx >= allW.length) return;
+        const nextWeek = allW[nextIdx];
+        const c = state.selection.course;
+        if (!c) return;
+        const weekEntry = state.weekData.find(w => w.w === nextWeek);
+        const entry = weekEntry?.lessons[c.col];
+        state.setSelection({ week: nextWeek, courseId: c.id, title: entry?.title || '', course: c });
+        // Scroll into view
+        const row = document.querySelector(`tr[data-week="${nextWeek}"]`);
+        if (row) row.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+      // Delete/Backspace: clear selected cell content
+      if (e.key === 'Delete' || e.key === 'Backspace') {
+        const state = usePlannerStore.getState();
+        if (state.selection) {
+          e.preventDefault();
+          const { week, course: c } = state.selection;
+          if (c) {
+            state.pushUndo();
+            state.updateLesson(week, c.col, { title: '', type: 0 });
+            state.setSelection({ ...state.selection, title: '' });
+          }
+        }
+      }
       // Cmd+F: focus search
       if ((e.metaKey || e.ctrlKey) && e.key === 'f') {
         e.preventDefault();
@@ -135,7 +168,7 @@ function App() {
             <>
               {/* Semester 1 — Week View */}
               <table className="border-collapse w-max min-w-full">
-                <SemesterHeader courses={s1Courses} semester={1} />
+                <SemesterHeader courses={s1Courses} semester={1} weeks={s1Weeks} />
                 <tbody>
                   <WeekRows weeks={s1Weeks} courses={s1Courses} allWeeks={allWeekKeys} currentRef={curRef} />
                 </tbody>
@@ -149,7 +182,7 @@ function App() {
 
               {/* Semester 2 — Week View */}
               <table className="border-collapse w-max min-w-full">
-                <SemesterHeader courses={s2Courses} semester={2} />
+                <SemesterHeader courses={s2Courses} semester={2} weeks={s2Weeks} />
                 <tbody>
                   <WeekRows weeks={s2Weeks} courses={s2Courses} allWeeks={allWeekKeys} currentRef={curRef} />
                 </tbody>

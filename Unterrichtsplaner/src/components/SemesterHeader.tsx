@@ -1,13 +1,14 @@
-import type { Course } from '../types';
+import type { Course, Week } from '../types';
 import { DAY_COLORS, TYPE_BADGES } from '../utils/colors';
 import { usePlannerStore } from '../store/plannerStore';
 
 interface Props {
   courses: Course[];
   semester: 1 | 2;
+  weeks?: Week[];
 }
 
-export function SemesterHeader({ courses, semester }: Props) {
+export function SemesterHeader({ courses, semester, weeks }: Props) {
   const { classFilter, setClassFilter, setFilter } = usePlannerStore();
 
   return (
@@ -84,6 +85,19 @@ export function SemesterHeader({ courses, semester }: Props) {
                 <span className="text-[7px] px-0.5 rounded bg-slate-800 text-slate-400">
                   {c.les}L
                 </span>
+                {weeks && (() => {
+                  const total = weeks.filter(w => w.lessons[c.col]).length;
+                  const planned = weeks.filter(w => {
+                    const e = w.lessons[c.col];
+                    return e && e.type !== 6; // exclude holidays
+                  }).length;
+                  const free = weeks.filter(w => !w.lessons[c.col]).length;
+                  return free > 0 ? (
+                    <span className="text-[6px] px-0.5 rounded bg-slate-800/60 text-gray-500" title={`${planned} geplant, ${free} frei, ${total - planned} blockiert`}>
+                      {free}✎
+                    </span>
+                  ) : null;
+                })()}
               </div>
               <div className="text-[7px] text-gray-500 font-mono mt-0.5">
                 {c.from}–{c.to}
