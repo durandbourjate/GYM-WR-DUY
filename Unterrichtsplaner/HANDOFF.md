@@ -1,7 +1,7 @@
 # Unterrichtsplaner – Handoff v3.24
 
-## Status: ✅ Deployed (v3.31)
-- **Commit:** 7997664
+## Status: ✅ Deployed (v3.32)
+- **Commit:** 5561c97
 - **Datum:** 2026-03-01
 - **Deploy:** https://durandbourjate.github.io/GYM-WR-DUY/Unterrichtsplaner/
 
@@ -41,6 +41,8 @@
 - v3.30: SidePanel schliesst bei Abwahl — Klick leere Zelle und Klick gleiche Zelle (toggle) schliessen Panel + clearing editingSequenceId.
 
 - v3.31: Noten-Vorgaben-Tracking (MiSDV Art. 4) — Neue utils/gradeRequirements.ts mit Mindestanzahl-Beurteilungsprüfung pro Kursgruppe/Semester/GYM-Stufe. Rotes Badge (Zahl) am 📊-Button bei offenen Warnungen. StatsPanel zeigt Section "📋 Beurteilungsvorgaben" mit Warnungen (🔴 critical, 🟡 warning) und OK-Status. GYM-Stufe wird aus Klassenname abgeleitet (Maturjahrgang → GYM1-5).
+
+- v3.32: UX-Verbesserungen — (1) Leere Zellen klickbar mit blauer Markierung statt nur Deselect. (2) SidePanel schliesst zuverlässig bei Abwahl + Klick leere Zelle. (3) Zoom 2 grössere Schrift: ROW_H 26px, Labels 12/10/9px, Spalten 140/70px. (4) Sequenz-Klick in Zoom 2 scrollt die SequenceCard im Panel automatisch in View (scrollIntoView). (5) Shift-Klick bei Mehrtages-Kursen wählt nur den angeklickten Tag; Shift+Alt wählt beide Tage. (6) SequencePanel cardRef-Duplikat bereinigt.
 
 ### Offene Feature-Requests
 - **Zoom 2 Jahresmodus**: ✅ Implementiert (v3.28)
@@ -94,12 +96,11 @@
 
 ### 🟡 Geplant (mittlere Priorität)
 1. **Google Calendar Integration** — Konzept dokumentiert (siehe Feature-Spec oben). Planer→Kalender Sync, Kalender→Planer Import, Kollisionswarnungen.
-2. **Detail-Fenster schliesst bei Abwahl** — Panel bleibt teilweise offen wenn nichts mehr angewählt ist.
-3. **Dauer-Warnung bei Verschieben (1L↔2L):** Relevant wenn cross-column oder Sequenz-Auto-Place erweitert wird.
+2. **Dauer-Warnung bei Verschieben (1L↔2L):** Relevant wenn cross-column oder Sequenz-Auto-Place erweitert wird.
 
 ### 🔵 Ideen (niedrige Priorität)
-4. **Automatischer Lehrplanbezug:** Lehrplanziele automatisch aus Thema/Fachbereich vorschlagen.
-5. **Zoom 1 (Multi-Year):** Weitere Verbesserungen der Jahrgänge-Ansicht.
+3. **Automatischer Lehrplanbezug:** Lehrplanziele automatisch aus Thema/Fachbereich vorschlagen.
+4. **Zoom 1 (Multi-Year):** Weitere Verbesserungen der Jahrgänge-Ansicht.
 
 ### 🟢 Erledigt (v3.11–v3.29)
 - ✅ Helligkeit vergangene Wochen (0.4→0.6)
