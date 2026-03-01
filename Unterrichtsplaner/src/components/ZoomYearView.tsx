@@ -231,6 +231,61 @@ export function ZoomYearView() {
   // Semester break line index
   const s2Idx = s2StartIndex;
 
+  // Pre-compute holiday/event blocks: merge consecutive holiday weeks into spans
+  // and detect event weeks (type 5) that cover all courses in a group
+  const holidaySpans = useMemo(() => {
+    const spans: { startIdx: number; len: number; label: string; type: 'holiday' | 'event' }[] = [];
+    let i = 0;
+    while (i < allWeekKeys.length) {
+      const weekEntry = effectiveWeeks.find(w => w.w === allWeekKeys[i]);
+      const entries = weekEntry ? Object.values(weekEntry.lessons) : [];
+      const isHoliday = entries.length > 0 && entries.every(e => (e as any).type === 6);
+      const isEvent = entries.length > 0 && entries.every(e => (e as any).type === 5);
+
+      if (isHoliday) {
+        const label = (entries[0] as any)?.title || 'Ferien';
+        const startIdx = i;
+        // Merge consecutive holiday weeks with same label
+        while (i < allWeekKeys.length) {
+          const nextWeek = effectiveWeeks.find(w => w.w === allWeekKeys[i]);
+          const nextEntries = nextWeek ? Object.values(nextWeek.lessons) : [];
+          const nextIsHoliday = nextEntries.length > 0 && nextEntries.every(e => (e as any).type === 6);
+          if (!nextIsHoliday) break;
+          i++;
+        }
+        spans.push({ startIdx, len: i - startIdx, label, type: 'holiday' });
+      } else if (isEvent) {
+        const label = (entries[0] as any)?.title || 'Sonderwoche';
+        spans.push({ startIdx: i, len: 1, label, type: 'event' });
+        i++;
+      } else {
+        i++;
+      }
+    }
+    return spans;
+  }, [allWeekKeys, effectiveWeeks]);
+
+  // Build skip set for holiday/event merged rows
+  const holidaySkipSet = useMemo(() => {
+    const skip = new Set<number>();
+    for (const span of holidaySpans) {
+      // Skip all rows after the first in a span (they're covered by rowSpan)
+      for (let j = 1; j < span.len; j++) {
+        skip.add(span.startIdx + j);
+      }
+    }
+    return skip;
+  }, [holidaySpans]);
+
+  // Lookup: weekIdx → span (for the first row of each span)
+  const holidaySpanStart = useMemo(() => {
+    const map = new Map<number, typeof holidaySpans[0]>();
+    for (const span of holidaySpans) {
+      map.set(span.startIdx, span);
+    }
+    return map;
+  }, [holidaySpans]);
+
   return (
     <div className="px-1 pt-0 pb-1">
       <table className="border-collapse w-max min-w-full">
@@ -273,15 +328,58 @@ export function ZoomYearView() {
         </thead>
         <tbody>
           {allWeekKeys.map((weekW, weekIdx) => {
+            // Skip rows covered by holiday/event rowSpan
+            if (holidaySkipSet.has(weekIdx)) return null;
+
             const past = isPastWeek(weekW, currentWeek);
             const isCurrent = weekW === currentWeek;
             const isSemBreak = weekIdx === s2Idx;
 
-            // Full-week holiday check
+            // Check if this is the start of a holiday/event span
+            const hSpan = holidaySpanStart.get(weekIdx);
+            const totalCols = groups.reduce((sum, g) => sum + (g.isMultiDay ? g.courses.length : 1), 0);
+
+            if (hSpan) {
+              const spanH = hSpan.len * ROW_H;
+              const isHoliday = hSpan.type === 'holiday';
+              return (
+                <tr key={weekW} data-week={weekW}
+                  style={{
+                    opacity: dimPastWeeks && past && !isCurrent ? 0.4 : 1,
+                    borderTop: isSemBreak ? '3px solid #f59e0b50' : undefined,
+                  }}>
+                  <td className={`bg-gray-900 sticky left-0 z-10 text-center py-0 px-0.5 border-b border-slate-800/50`}
+                    rowSpan={hSpan.len}
+                    style={{ height: spanH }}>
+                    <div className="flex flex-col items-center">
+                      <span className="text-[9px] font-mono text-gray-400">{weekW}</span>
+                      {hSpan.len > 1 && (
+                        <span className="text-[8px] font-mono text-gray-500">–{allWeekKeys[weekIdx + hSpan.len - 1]}</span>
+                      )}
+                    </div>
+                  </td>
+                  <td colSpan={totalCols} rowSpan={hSpan.len}
+                    className="border-b border-slate-800/30 text-center align-middle"
+                    style={{
+                      background: isHoliday ? '#1e293b50' : '#37415130',
+                      height: spanH,
+                    }}>
+                    <div className="flex items-center justify-center gap-1.5">
+                      <span className="text-[10px]">{isHoliday ? '🏖' : '📅'}</span>
+                      <span className={`text-[11px] font-medium ${isHoliday ? 'text-gray-300' : 'text-amber-300/80'}`}>
+                        {hSpan.label}
+                      </span>
+                      {hSpan.len > 1 && (
+                        <span className="text-[9px] text-gray-500">({hSpan.len}W)</span>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              );
+            }
+
+            // Check per-course events (type 5) that don't cover ALL courses
             const weekEntry = effectiveWeeks.find(w => w.w === weekW);
-            const allEntries = weekEntry ? Object.values(weekEntry.lessons) : [];
-            const isHolidayWeek = allEntries.length > 0 && allEntries.every(e => (e as any).type === 6);
-            const holidayLabel = isHolidayWeek ? (allEntries[0] as any)?.title : null;
 
             return (
               <tr key={weekW} data-week={weekW}
@@ -298,13 +396,7 @@ export function ZoomYearView() {
                   </span>
                 </td>
 
-                {isHolidayWeek ? (
-                  <td colSpan={groups.reduce((sum, g) => sum + (g.isMultiDay ? g.courses.length : 1), 0)}
-                    className="border-b border-slate-800/30 text-center py-0" style={{ background: '#1e293b40' }}>
-                    <span className="text-[10px] text-gray-300 font-medium">🏖 {holidayLabel || 'Ferien'}</span>
-                  </td>
-                ) : (
-                  groups.map((group) => {
+                {groups.map((group) => {
                     if (group.isMultiDay) {
                       // Render sub-columns per day
                       // Check for shared span first
@@ -352,6 +444,22 @@ export function ZoomYearView() {
 
                         const daySpan = spanMap.get(daySpanKey) || spanMap.get(`${weekIdx}:${course.id}:loose`);
                         if (!daySpan) {
+                          // Check if this cell is an event/holiday
+                          const cellEntry = weekEntry?.lessons[course.col];
+                          const cellType = (cellEntry as any)?.type;
+                          if (cellType === 5 || cellType === 6) {
+                            return (
+                              <td key={course.id} className="border-b border-slate-800/20 p-0"
+                                style={{ width: SUBDAY_W, minWidth: SUBDAY_W, maxWidth: SUBDAY_W }}>
+                                <div className="h-full flex items-center justify-center"
+                                  style={{ background: cellType === 6 ? '#1e293b40' : '#37415130', minHeight: ROW_H - 2 }}>
+                                  <span className={`text-[8px] ${cellType === 6 ? 'text-gray-400' : 'text-amber-400/70'}`}>
+                                    {cellType === 6 ? '🏖' : '📅'}
+                                  </span>
+                                </div>
+                              </td>
+                            );
+                          }
                           return (
                             <td key={course.id} className="border-b border-slate-800/20 p-0 cursor-pointer hover:bg-slate-800/30"
                               style={{ width: SUBDAY_W, minWidth: SUBDAY_W, maxWidth: SUBDAY_W }}
@@ -393,6 +501,23 @@ export function ZoomYearView() {
 
                       const span = spanMap.get(spanKey) || spanMap.get(looseKey);
                       if (!span) {
+                        // Check if this cell is an event/holiday
+                        const cellEntry = weekEntry?.lessons[course.col];
+                        const cellType = (cellEntry as any)?.type;
+                        if (cellType === 5 || cellType === 6) {
+                          const cellLabel = (cellEntry as any)?.title || (cellType === 6 ? 'Ferien' : 'Sonderwoche');
+                          return (
+                            <td key={group.key} className="border-b border-slate-800/20 p-0"
+                              style={{ width: GROUP_W, minWidth: GROUP_W, maxWidth: GROUP_W }}>
+                              <div className="h-full flex items-center justify-center px-1"
+                                style={{ background: cellType === 6 ? '#1e293b40' : '#37415130', minHeight: ROW_H - 2 }}>
+                                <span className={`text-[9px] ${cellType === 6 ? 'text-gray-400' : 'text-amber-400/70'}`}>
+                                  {cellType === 6 ? '🏖' : '📅'} {cellLabel}
+                                </span>
+                              </div>
+                            </td>
+                          );
+                        }
                         return (
                           <td key={group.key} className="border-b border-slate-800/20 p-0 cursor-pointer hover:bg-slate-800/30"
                             style={{ width: GROUP_W, minWidth: GROUP_W, maxWidth: GROUP_W }}
@@ -433,7 +558,7 @@ export function ZoomYearView() {
                       );
                     }
                   })
-                )}
+                }
               </tr>
             );
           })}
