@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { usePlannerStore } from '../store/plannerStore';
 import { usePlannerData } from '../hooks/usePlannerData';
 import { SUBJECT_AREA_COLORS } from '../utils/colors';
+import { computeSeqSolTotal } from '../utils/solTotal';
 import type { Course, SubjectArea, SequenceBlock } from '../types';
 
 const SUBJECT_AREAS: { key: SubjectArea; label: string; color: string }[] = [
@@ -111,7 +112,7 @@ function FlatBlockCard({ fb }: { fb: FlatBlockInfo }) {
   const {
     editingSequenceId, setEditingSequenceId,
     updateBlockInSequence, removeBlockFromSequence,
-    sequences, updateSequence,
+    sequences, updateSequence, lessonDetails,
   } = usePlannerStore();
   const { courses: COURSES } = usePlannerData();
   const [showFields, setShowFields] = useState(false);
@@ -121,6 +122,13 @@ function FlatBlockCard({ fb }: { fb: FlatBlockInfo }) {
   // When card becomes active (after re-mount from group change), auto-open fields
   const blockKey = `${fb.seqId}-${fb.blockIndex}`;
   const isActive = editingSequenceId === blockKey;
+
+  // SOL-Total: Sum all lesson-level SOL durations across all blocks of the parent sequence
+  const parentSeqForSol = sequences.find(s => s.id === fb.seqId);
+  const solTotal = useMemo(() => {
+    if (!parentSeqForSol) return { count: 0, totalMinutes: 0, formatted: '' };
+    return computeSeqSolTotal(parentSeqForSol, lessonDetails, COURSES);
+  }, [parentSeqForSol, lessonDetails, COURSES]);
 
   // Re-open fields section when component re-mounts while still active
   // (happens when subjectArea change causes group re-assignment)
@@ -318,6 +326,12 @@ function FlatBlockCard({ fb }: { fb: FlatBlockInfo }) {
                       className="accent-emerald-500 w-3 h-3" />
                     <span className="text-[9px] text-gray-300 font-medium">📚 SOL (Reihe)</span>
                   </label>
+                  {solTotal.count > 0 && (
+                    <span className="text-[8px] px-1.5 py-0.5 rounded bg-emerald-900/40 text-emerald-300 border border-emerald-700/50"
+                      title={`SOL-Total: ${solTotal.count} Einträge aus ${parentSeqForSol?.blocks.reduce((n, b) => n + b.weeks.length, 0) || 0} Lektionen`}>
+                      Σ {solTotal.formatted || `${solTotal.count}×`}
+                    </span>
+                  )}
                 </div>
                 {parentSeq.sol?.enabled && (
                   <div className="space-y-1 pl-0.5">
