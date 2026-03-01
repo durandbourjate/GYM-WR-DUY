@@ -11,7 +11,7 @@ export function SemesterHeader({ courses, semester }: Props) {
   const { classFilter, setClassFilter, setFilter } = usePlannerStore();
 
   return (
-    <thead className="sticky z-40" style={{ top: 36 }}>
+    <thead className="sticky z-40" style={{ top: 0 }}>
       {/* Day row */}
       <tr>
         <th className="w-12 bg-gray-900 sticky left-0 z-50 py-1 border-b border-gray-800">

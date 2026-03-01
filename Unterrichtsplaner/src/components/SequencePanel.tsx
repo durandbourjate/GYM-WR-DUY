@@ -3,7 +3,7 @@ import { usePlannerStore } from '../store/plannerStore';
 import { COURSES, getLinkedCourseIds } from '../data/courses';
 import { WEEKS } from '../data/weeks';
 import { SEQUENCE_COLORS, SUBJECT_AREA_COLORS } from '../utils/colors';
-import type { SubjectArea, ManagedSequence, SequenceBlock } from '../types';
+import type { SubjectArea, ManagedSequence, SequenceBlock, LessonDetail } from '../types';
 
 const SUBJECT_AREAS: { key: SubjectArea; label: string; color: string }[] = [
   { key: 'BWL', label: 'BWL', color: '#3b82f6' },
@@ -88,14 +88,72 @@ function BlockEditor({
             className="w-full bg-slate-700 text-slate-200 border border-blue-400 rounded px-1.5 py-0.5 text-[9px] outline-none font-mono" />
         </div>
       ) : (
-        <div className="text-[8px] text-gray-500 mt-0.5 cursor-pointer hover:text-gray-300 font-mono"
-          onDoubleClick={() => { setWeeksText(block.weeks.join(', ')); setEditingWeeks(true); }} title="Doppelklick zum Bearbeiten">
-          KW {block.weeks.join(', ')}
+        <div className="text-[8px] text-gray-500 mt-0.5 font-mono flex flex-wrap gap-0.5 items-center">
+          <span className="cursor-pointer hover:text-gray-300" onDoubleClick={() => { setWeeksText(block.weeks.join(', ')); setEditingWeeks(true); }} title="Doppelklick: KW bearbeiten">KW</span>
+          {block.weeks.map((w, wi) => (
+            <span key={wi}>
+              <span className="cursor-pointer hover:text-blue-300 transition-colors" title={`Zur KW ${w} springen`}
+                onClick={() => {
+                  const seq = sequences.find(s => s.id === seqId);
+                  const course = seq ? COURSES.find(c => c.id === seq.courseId) : null;
+                  if (course) {
+                    const row = document.querySelector(`tr[data-week="${w}"]`);
+                    if (row) row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    setSelection({ week: w, courseId: course.id, title: block.label, course });
+                    setSidePanelOpen(true);
+                    setSidePanelTab('details');
+                  }
+                }}>{w}</span>
+              {wi < block.weeks.length - 1 && <span className="text-gray-600">,</span>}
+            </span>
+          ))}
         </div>
       )}
+      {/* Lektionen in diesem Block */}
+      {block.weeks.length > 0 && (() => {
+        const seq = sequences.find(s => s.id === seqId);
+        if (!seq) return null;
+        const courseIds = seq.courseIds || [seq.courseId];
+        const { lessonDetails, weekData } = usePlannerStore.getState();
+        const lessons: { week: string; courseId: string; col: number; title: string; detail?: LessonDetail }[] = [];
+        for (const w of block.weeks) {
+          for (const cid of courseIds) {
+            const course = COURSES.find(c => c.id === cid);
+            if (!course) continue;
+            const weekEntry = weekData.find(wd => wd.w === w);
+            const entry = weekEntry?.lessons[course.col];
+            if (!entry) continue;
+            const key = `${w}-${course.col}`;
+            lessons.push({ week: w, courseId: cid, col: course.col, title: entry.title, detail: lessonDetails[key] });
+          }
+        }
+        if (lessons.length === 0) return null;
+        return (
+          <div className="mt-1 space-y-0.5">
+            {lessons.map((l, li) => (
+              <div key={li} className="flex items-center gap-1 text-[8px] cursor-pointer hover:bg-slate-700/50 rounded px-1 py-px transition-colors"
+                onClick={() => {
+                  const course = COURSES.find(c => c.id === l.courseId);
+                  if (!course) return;
+                  const row = document.querySelector(`tr[data-week="${l.week}"]`);
+                  if (row) row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  setSelection({ week: l.week, courseId: course.id, title: l.title, course });
+                  setSidePanelOpen(true);
+                  setSidePanelTab('details');
+                }}>
+                <span className="text-gray-600 font-mono w-5">{l.week}</span>
+                {courseIds.length > 1 && <span className="text-gray-600 w-4">{COURSES.find(c => c.id === l.courseId)?.day}</span>}
+                <span className="text-gray-300 flex-1 truncate">{l.title}</span>
+                {l.detail?.topicSub && <span className="text-gray-500 truncate max-w-[60px]">{l.detail.topicSub}</span>}
+                {l.detail?.sol?.enabled && <span title="SOL">📚</span>}
+              </div>
+            ))}
+          </div>
+        );
+      })()}
       <button onClick={() => setShowDetails(!showDetails)}
         className="text-[8px] text-gray-500 hover:text-gray-300 cursor-pointer mt-1 flex items-center gap-0.5">
-        {showDetails ? '▾' : '▸'} Details
+        {showDetails ? '▾' : '▸'} Felder
         {(block.topicMain || block.curriculumGoal) && <span className="text-green-500">●</span>}
       </button>
       {showDetails && (

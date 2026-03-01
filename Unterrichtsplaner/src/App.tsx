@@ -107,8 +107,8 @@ function App() {
       <MultiSelectToolbar />
       <InsertDialog />
 
-      <div className="flex">
-        <div className={`overflow-x-auto flex-1 ${(sidePanelOpen || sequencePanelOpen) ? 'mr-[340px]' : ''}`} style={{ paddingBottom: 20 }}>
+      <div className="flex" style={{ height: 'calc(100vh - 36px)' }}>
+        <div className={`overflow-auto flex-1 ${(sidePanelOpen || sequencePanelOpen) ? 'mr-[340px]' : ''}`} style={{ paddingBottom: 20 }}>
           {zoomLevel === 2 ? (
             <>
               {/* Block View — Semester 1 */}

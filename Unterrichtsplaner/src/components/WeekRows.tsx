@@ -82,7 +82,7 @@ function HoverPreview({ week, col, courses }: { week: string; col: number; cours
 }
 
 /* Empty cell context menu */
-function EmptyCellMenu({ week, course, onClose }: { week: string; course: Course; onClose: () => void }) {
+function EmptyCellMenu({ week, course, onClose, selectedWeeks }: { week: string; course: Course; onClose: () => void; selectedWeeks?: string[] }) {
   const { updateLesson, pushUndo, addSequence, setSidePanelOpen, setSidePanelTab, setSelection, setEditingSequenceId } = usePlannerStore();
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -113,7 +113,8 @@ function EmptyCellMenu({ week, course, onClose }: { week: string; course: Course
   };
 
   const handleNewSequence = () => {
-    const seqId = addSequence({ courseId: course.id, title: `Neue Sequenz ${course.cls}`, blocks: [{ weeks: [week], label: 'Neuer Block' }] });
+    const weeks = selectedWeeks && selectedWeeks.length > 0 ? selectedWeeks : [week];
+    const seqId = addSequence({ courseId: course.id, title: `Neue Sequenz ${course.cls}`, blocks: [{ weeks, label: 'Neuer Block' }] });
     setEditingSequenceId(seqId);
     setSidePanelOpen(true);
     setSidePanelTab('sequences');
@@ -129,7 +130,7 @@ function EmptyCellMenu({ week, course, onClose }: { week: string; course: Course
       </button>
       <button onClick={handleNewSequence}
         className="w-full px-3 py-1.5 text-left text-[10px] text-gray-200 hover:bg-slate-700 cursor-pointer flex items-center gap-2">
-        <span>▧</span> Neue Sequenz
+        <span>▧</span> {selectedWeeks && selectedWeeks.length > 1 ? `Neue Sequenz (${selectedWeeks.length} KW)` : 'Neue Sequenz'}
       </button>
     </div>
   );
@@ -156,6 +157,12 @@ export function WeekRows({ weeks, courses, currentRef }: Props) {
   const [showHoverPreview, setShowHoverPreview] = useState(false);
   const hoverTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [emptyCellMenu, setEmptyCellMenu] = useState<{ week: string; course: Course } | null>(null);
+
+  // Drag-selection for empty cells
+  const [isDragSelecting, setIsDragSelecting] = useState(false);
+  const [dragSelectCol, setDragSelectCol] = useState<number | null>(null);
+  const [dragSelectedWeeks, setDragSelectedWeeks] = useState<string[]>([]);
+  const [dragSelectCourse, setDragSelectCourse] = useState<Course | null>(null);
 
   const displayWeeks = weekData.length > 0
     ? weeks.map((w) => weekData.find((wd) => wd.w === w.w) || w)
@@ -244,6 +251,43 @@ export function WeekRows({ weeks, courses, currentRef }: Props) {
     setSidePanelOpen(true);
     setSidePanelTab('details');
   }, [setSelection, setSidePanelOpen, setSidePanelTab]);
+
+  // Drag-selection handlers for empty cells
+  const handleDragSelectStart = useCallback((weekW: string, course: Course) => {
+    const entry = displayWeeks.find(w => w.w === weekW);
+    const title = entry?.lessons[course.col]?.title;
+    if (title) return; // Only on empty cells
+    setIsDragSelecting(true);
+    setDragSelectCol(course.col);
+    setDragSelectCourse(course);
+    setDragSelectedWeeks([weekW]);
+    setEmptyCellMenu(null);
+  }, [displayWeeks]);
+
+  const handleDragSelectMove = useCallback((weekW: string, col: number) => {
+    if (!isDragSelecting || col !== dragSelectCol) return;
+    const entry = displayWeeks.find(w => w.w === weekW);
+    const title = entry?.lessons[col]?.title;
+    if (title) return; // Skip filled cells
+    setDragSelectedWeeks(prev => prev.includes(weekW) ? prev : [...prev, weekW]);
+  }, [isDragSelecting, dragSelectCol, displayWeeks]);
+
+  const handleDragSelectEnd = useCallback(() => {
+    if (!isDragSelecting) return;
+    setIsDragSelecting(false);
+    if (dragSelectedWeeks.length > 0 && dragSelectCourse) {
+      // Show context menu at the last selected cell
+      setEmptyCellMenu({ week: dragSelectedWeeks[dragSelectedWeeks.length - 1], course: dragSelectCourse });
+    }
+  }, [isDragSelecting, dragSelectedWeeks, dragSelectCourse]);
+
+  // Global mouseup listener for drag-selection
+  useEffect(() => {
+    if (!isDragSelecting) return;
+    const handler = () => handleDragSelectEnd();
+    window.addEventListener('mouseup', handler);
+    return () => window.removeEventListener('mouseup', handler);
+  }, [isDragSelecting, handleDragSelectEnd]);
 
   return (
     <>
@@ -342,13 +386,27 @@ export function WeekRows({ weeks, courses, currentRef }: Props) {
                   className="p-0 border-b border-slate-900/40 relative group-hover:bg-slate-950/40"
                   style={{
                     borderLeft: newDay ? `2px solid ${DAY_COLORS[c.day]}12` : 'none',
-                    outline: isDragOver ? '2px solid #3b82f6' : isMulti && !title ? '2px solid #6366f180' : 'none',
+                    outline: isDragOver ? '2px solid #3b82f6'
+                      : (isDragSelecting && dragSelectCol === c.col && dragSelectedWeeks.includes(week.w)) ? '2px solid #a855f7'
+                      : isMulti && !title ? '2px solid #6366f180' : 'none',
                     outlineOffset: '-2px',
-                    background: isDragOver ? '#1e3a5f30' : isMulti && !title ? '#312e8140' : undefined,
+                    background: isDragOver ? '#1e3a5f30'
+                      : (isDragSelecting && dragSelectCol === c.col && dragSelectedWeeks.includes(week.w)) ? '#7c3aed20'
+                      : isMulti && !title ? '#312e8140' : undefined,
                     width: 110,
                     minWidth: 110,
                     maxWidth: 110,
                   }}
+                  onMouseDown={(e) => {
+                    if (!title && !e.shiftKey && !e.metaKey && !e.ctrlKey && e.button === 0) {
+                      handleDragSelectStart(week.w, c);
+                    }
+                  }}
+                  onMouseEnter={() => {
+                    if (isDragSelecting) handleDragSelectMove(week.w, c.col);
+                    if (title) handleMouseEnter(week.w, c.col);
+                  }}
+                  onMouseLeave={handleMouseLeave}
                   onClick={(e) => {
                     if (e.shiftKey || e.metaKey || e.ctrlKey) {
                       if (e.shiftKey) {
@@ -373,8 +431,6 @@ export function WeekRows({ weeks, courses, currentRef }: Props) {
                       handleEmptyCellClick(week.w, c);
                     }
                   }}
-                  onMouseEnter={() => title && handleMouseEnter(week.w, c.col)}
-                  onMouseLeave={handleMouseLeave}
                   onDragOver={(e) => {
                     if (dragSource) {
                       const dragCourse = courses.find(cc => cc.col === dragSource.col);
@@ -598,7 +654,8 @@ export function WeekRows({ weeks, courses, currentRef }: Props) {
                     <EmptyCellMenu
                       week={week.w}
                       course={c}
-                      onClose={() => setEmptyCellMenu(null)}
+                      onClose={() => { setEmptyCellMenu(null); setDragSelectedWeeks([]); setDragSelectCol(null); setDragSelectCourse(null); }}
+                      selectedWeeks={dragSelectedWeeks.length > 1 ? dragSelectedWeeks : undefined}
                     />
                   )}
                 </td>

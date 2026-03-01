@@ -679,7 +679,9 @@ export function DetailPanel() {
   return (
     <div
       ref={panelRef}
-      className="fixed right-0 top-0 bottom-0 w-[340px] bg-slate-900 border-l border-slate-700 z-[65] flex flex-col shadow-[-4px_0_16px_rgba(0,0,0,0.4)]"
+      className="fixed right-0 top-0 bottom-0 w-[340px] bg-slate-900 border-l border-slate-700 z-[65] flex flex-col shadow-[-4px_0_16px_rgba(0,0,0,0.4)] overflow-y-auto"
+      style={{ overscrollBehavior: 'contain' }}
+      onWheel={(e) => e.stopPropagation()}
     >
       <div className="px-3 py-2 border-b border-slate-700 flex items-center justify-between shrink-0">
         <div className="flex gap-1">
@@ -692,7 +694,7 @@ export function DetailPanel() {
             }`}
             title="Lektionsdetails anzeigen"
           >
-            📖 Details
+            📖 Unterrichtseinheit
           </button>
           <button
             onClick={() => setSidePanelTab('sequences')}
@@ -701,9 +703,9 @@ export function DetailPanel() {
                 ? 'bg-green-500/20 border-green-500 text-green-300'
                 : 'border-gray-700 text-gray-500 hover:text-gray-300'
             }`}
-            title="Sequenzen verwalten"
+            title="Sequenz verwalten"
           >
-            ▧ Sequenzen
+            ▧ Sequenz
           </button>
           <button
             onClick={() => setSidePanelTab('settings')}

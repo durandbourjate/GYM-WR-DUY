@@ -72,9 +72,16 @@ interface PlannerState {
   setSidePanelTab: (t: 'details' | 'sequences' | 'settings') => void;
   hoveredCell: { week: string; col: number } | null;
   setHoveredCell: (c: { week: string; col: number } | null) => void;
-  // Empty cell action
-  emptyCellAction: { week: string; courseId: string; course: Course } | null;
-  setEmptyCellAction: (a: { week: string; courseId: string; course: Course } | null) => void;
+  // Empty cell action (double-click or drag-select context menu)
+  emptyCellAction: { week: string; courseId: string; course: Course; selectedWeeks?: string[] } | null;
+  setEmptyCellAction: (a: { week: string; courseId: string; course: Course; selectedWeeks?: string[] } | null) => void;
+  // Drag selection on empty cells
+  dragSelectAnchor: { week: string; col: number; courseId: string } | null;
+  dragSelectCurrent: { week: string; col: number } | null;
+  dragSelectedKeys: string[]; // "week-col" keys
+  setDragSelectAnchor: (a: { week: string; col: number; courseId: string } | null) => void;
+  setDragSelectCurrent: (c: { week: string; col: number } | null) => void;
+  setDragSelectedKeys: (keys: string[]) => void;
   // Sequences CRUD
   sequences: ManagedSequence[];
   sequencesMigrated: boolean;
@@ -285,6 +292,12 @@ export const usePlannerStore = create<PlannerState>()(
   setHoveredCell: (c) => set({ hoveredCell: c }),
   emptyCellAction: null,
   setEmptyCellAction: (a) => set({ emptyCellAction: a }),
+  dragSelectAnchor: null,
+  dragSelectCurrent: null,
+  dragSelectedKeys: [],
+  setDragSelectAnchor: (a) => set({ dragSelectAnchor: a }),
+  setDragSelectCurrent: (c) => set({ dragSelectCurrent: c }),
+  setDragSelectedKeys: (keys) => set({ dragSelectedKeys: keys }),
 
   // Sequences CRUD
   sequences: [],
