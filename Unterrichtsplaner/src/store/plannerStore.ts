@@ -157,6 +157,19 @@ export const usePlannerStore = create<PlannerState>()(
     const [fromWeek, fromCourseId] = fromKey.split('-');
     const [toWeek, toCourseId] = toKey.split('-');
 
+    // Helper: check if a week+course has a non-fixed lesson (skip holidays/events type 5,6)
+    const weekMap = new Map(state.weekData.map(w => [w.w, w]));
+    const isSelectableLesson = (wk: string, courseId: string): boolean => {
+      const course = courses.find(c => c.id === courseId);
+      if (!course) return false;
+      const week = weekMap.get(wk);
+      if (!week) return false;
+      const entry = week.lessons[course.col];
+      if (!entry) return false; // Shift: skip empty cells
+      if (entry.type === 5 || entry.type === 6) return false; // skip events/holidays
+      return true;
+    };
+
     // Check if both courses belong to the same class+type (linked courses, e.g. Di+Do)
     const fromCourse = courses.find(c => c.id === fromCourseId);
     const toCourse = courses.find(c => c.id === toCourseId);
@@ -173,8 +186,8 @@ export const usePlannerStore = create<PlannerState>()(
       const endIdx = Math.max(fromIdx, toIdx);
       const rangeKeys: string[] = [];
       for (let i = startIdx; i <= endIdx; i++) {
-        rangeKeys.push(`${allWeeks[i]}-${fromCourseId}`);
-        rangeKeys.push(`${allWeeks[i]}-${toCourseId}`);
+        if (isSelectableLesson(allWeeks[i], fromCourseId)) rangeKeys.push(`${allWeeks[i]}-${fromCourseId}`);
+        if (isSelectableLesson(allWeeks[i], toCourseId)) rangeKeys.push(`${allWeeks[i]}-${toCourseId}`);
       }
       set((s) => ({
         multiSelection: Array.from(new Set([...s.multiSelection, ...rangeKeys])),
@@ -202,7 +215,7 @@ export const usePlannerStore = create<PlannerState>()(
     const endIdx = Math.max(fromIdx, toIdx);
     const rangeKeys: string[] = [];
     for (let i = startIdx; i <= endIdx; i++) {
-      rangeKeys.push(`${allWeeks[i]}-${fromCourseId}`);
+      if (isSelectableLesson(allWeeks[i], fromCourseId)) rangeKeys.push(`${allWeeks[i]}-${fromCourseId}`);
     }
 
     // Check if same-column range should prompt for linked day
@@ -213,7 +226,7 @@ export const usePlannerStore = create<PlannerState>()(
         const otherCourse = courses.find(c => c.id === otherCourseId);
         if (otherCourse && confirm(`Auch ${otherCourse.day} einschliessen?`)) {
           for (let i = startIdx; i <= endIdx; i++) {
-            rangeKeys.push(`${allWeeks[i]}-${otherCourseId}`);
+            if (isSelectableLesson(allWeeks[i], otherCourseId)) rangeKeys.push(`${allWeeks[i]}-${otherCourseId}`);
           }
         }
       }
@@ -710,16 +723,23 @@ export const usePlannerStore = create<PlannerState>()(
     // Sort fromWeeks by their order in allWeeks
     const sorted = [...fromWeeks].sort((a, b) => allWeeks.indexOf(a) - allWeeks.indexOf(b));
 
+    // Filter out fixed entries (holidays/events type 5,6) — don't move them
+    const movable = sorted.filter(wk => {
+      const entry = weekMap.get(wk)?.lessons[col];
+      return entry && entry.type !== 5 && entry.type !== 6;
+    });
+    if (movable.length === 0) return;
+
     // Collect the entries to move
-    const entries: (LessonEntry | null)[] = sorted.map(wk => weekMap.get(wk)?.lessons[col] || null);
+    const entries: (LessonEntry | null)[] = movable.map(wk => weekMap.get(wk)?.lessons[col] || null);
     const details: Record<string, LessonDetail | undefined> = {};
-    for (const wk of sorted) {
+    for (const wk of movable) {
       details[wk] = state.lessonDetails[`${wk}-${col}`];
     }
 
     // Remove entries from their original positions
     let newWeekData = state.weekData.map(w => {
-      if (sorted.includes(w.w)) {
+      if (movable.includes(w.w)) {
         const newLessons = { ...w.lessons };
         delete newLessons[col];
         return { ...w, lessons: newLessons };

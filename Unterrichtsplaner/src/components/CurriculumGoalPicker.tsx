@@ -7,7 +7,7 @@ const AREA_COLORS: Record<string, string> = {
   BWL: '#3b82f6',
   VWL: '#f97316',
   RECHT: '#22c55e',
-  IN: '#06b6d4',
+  IN: '#6b7280',
   INTERDISZ: '#a855f7',
 };
 

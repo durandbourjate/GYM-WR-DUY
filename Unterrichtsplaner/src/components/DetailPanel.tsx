@@ -10,7 +10,7 @@ const SUBJECT_AREAS: { key: SubjectArea; label: string; color: string }[] = [
   { key: 'BWL', label: 'BWL', color: '#3b82f6' },
   { key: 'VWL', label: 'VWL', color: '#f97316' },
   { key: 'RECHT', label: 'Recht', color: '#22c55e' },
-  { key: 'IN', label: 'Informatik', color: '#06b6d4' },
+  { key: 'IN', label: 'Informatik', color: '#6b7280' },
   { key: 'INTERDISZ', label: 'Interdisziplinär', color: '#a855f7' },
 ];
 
@@ -123,7 +123,13 @@ function getSubtypeLabel(category: BlockCategory, subtype: string, long = true):
 export { CATEGORIES, getSubtypesForCategory, getEffectiveCategorySubtype, getCategoryLabel, getSubtypeLabel };
 
 // === Duration presets ===
-const DURATION_PRESETS = ['1L', '2L', '3L'];
+const DURATION_PRESETS = [
+  { key: '45 min', label: '45 min' },
+  { key: '90 min', label: '90 min' },
+  { key: '135 min', label: '135 min' },
+  { key: 'Halbtag', label: 'Halbtag' },
+  { key: 'Ganztag', label: 'Ganztag' },
+];
 
 // === Components ===
 
@@ -224,7 +230,7 @@ function CategorySubtypeSelector({
       {/* Subtype row (only if category has subtypes) */}
       {subtypes.length > 0 && (
         <div>
-          <label className="text-[9px] text-gray-500 font-medium mb-1 block">Untertyp</label>
+          <label className="text-[9px] text-gray-500 font-medium mb-1 block">Typ</label>
           <div className="flex flex-wrap gap-1">
             {subtypes.map((st) => {
               const active = subtype === st.key;
@@ -277,20 +283,20 @@ function CategorySubtypeSelector({
 function DurationSelector({ value, onChange }: { value?: string; onChange: (v: string | undefined) => void }) {
   const [customMode, setCustomMode] = useState(false);
   const [customValue, setCustomValue] = useState('');
-  const isPreset = value && DURATION_PRESETS.includes(value);
+  const isPreset = value && DURATION_PRESETS.some(p => p.key === value);
   const isCustom = value && !isPreset;
 
   return (
     <div className="flex flex-wrap gap-1 items-center">
       {DURATION_PRESETS.map((preset) => (
-        <button key={preset}
-          onClick={() => onChange(value === preset ? undefined : preset)}
+        <button key={preset.key}
+          onClick={() => onChange(value === preset.key ? undefined : preset.key)}
           className={`px-1.5 py-0.5 rounded text-[9px] font-medium border cursor-pointer transition-all ${
-            value === preset
+            value === preset.key
               ? 'bg-slate-600/40 border-slate-500 text-gray-200'
               : 'border-gray-700 text-gray-500 hover:text-gray-300'
           }`}>
-          {preset}
+          {preset.label}
         </button>
       ))}
       {customMode || isCustom ? (
@@ -307,8 +313,8 @@ function DurationSelector({ value, onChange }: { value?: string; onChange: (v: s
               if (e.key === 'Escape') { setCustomMode(false); setCustomValue(''); }
             }}
             onBlur={() => { if (customValue) { onChange(customValue); } setCustomMode(false); }}
-            placeholder="z.B. 45min"
-            className="bg-slate-700 text-slate-200 border border-slate-600 rounded px-1.5 py-0.5 text-[9px] outline-none focus:border-blue-400 w-16" />
+            placeholder="z.B. 60 min"
+            className="bg-slate-700 text-slate-200 border border-slate-600 rounded px-1.5 py-0.5 text-[9px] outline-none focus:border-blue-400 w-20" />
           {isCustom && (
             <button onClick={() => onChange(undefined)} className="text-[9px] text-gray-500 cursor-pointer hover:text-red-400">✕</button>
           )}

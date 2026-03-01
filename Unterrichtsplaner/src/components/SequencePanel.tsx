@@ -9,7 +9,7 @@ const SUBJECT_AREAS: { key: SubjectArea; label: string; color: string }[] = [
   { key: 'BWL', label: 'BWL', color: '#3b82f6' },
   { key: 'VWL', label: 'VWL', color: '#f97316' },
   { key: 'RECHT', label: 'Recht', color: '#22c55e' },
-  { key: 'IN', label: 'Informatik', color: '#06b6d4' },
+  { key: 'IN', label: 'Informatik', color: '#6b7280' },
   { key: 'INTERDISZ', label: 'Interdisziplinär', color: '#a855f7' },
 ];
 

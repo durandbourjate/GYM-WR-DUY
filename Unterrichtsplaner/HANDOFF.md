@@ -1,39 +1,9 @@
 # Unterrichtsplaner – Handoff v3.1
 
 ## Status: ✅ Deployed (v3.1)
-- **Commit:** 1d8853c
+- **Commit:** c82c0d2
 - **Datum:** 2026-03-01
 - **Deploy:** https://durandbourjate.github.io/GYM-WR-DUY/Unterrichtsplaner/
-
-## Was wurde in v3.1 geändert
-
-### Redesign A: Block-Kategorie / Untertyp (zweistufig)
-- **Neues Datenmodell:** `blockCategory` (LESSON|ASSESSMENT|EVENT|HOLIDAY) + `blockSubtype` (string)
-- **CategorySubtypeSelector:** Visuelle Pill-Auswahl für Kategorie, Untertypen erscheinen darunter
-- **Vordefinierte Untertypen:**
-  - Lektion → Einführung, Theorie, Übung, SOL, Diskussion
-  - Beurteilung → Prüfung schriftlich, Prüfung mündlich, Präsentation, Projektabgabe
-  - Event → Exkursion, Tag der offenen Tür, Ausfall, Auftrag
-  - Ferien → (keine Untertypen)
-- **Custom Labels:** "+" Button pro Kategorie, persistiert in localStorage
-- **Migration:** Altes `blockType` wird automatisch gemappt via `getEffectiveCategorySubtype()`
-- **Exports:** CATEGORIES, getSubtypesForCategory, getEffectiveCategorySubtype, getCategoryLabel, getSubtypeLabel
-
-### Redesign B: Dauer der Einheit
-- Neues `duration` Feld in LessonDetail
-- Presets: 1L, 2L, 3L + freie Eingabe ("45min", "90min" etc.)
-- Duration-Tag in der Detail-Header-Ansicht
-
-### Redesign C: Beschreibungen ausschreiben
-- DetailPanel zeigt volle Labels (Einführung, nicht Einf.)
-- `labelShort` verfügbar für Kachel-Anzeige in WeekRows
-
-## v3.0 Bug-Fixes (aus gleichem Deployment)
-- Shift+Klick: lastSelectedKey wird bei normalem Klick gesetzt
-- Cmd+Klick: Erste Cmd-Selection schliesst aktuelle Einzelauswahl ein
-- Leere Zelle: Einfachklick = Deselect, Doppelklick = Menü
-- EmptyCellMenu schliesst bei Escape
-- Block-Kategorie "Lektion" als Standard bei neuen Kacheln
 
 ## Architektur
 - **Stack:** React + TypeScript + Vite + Zustand + PWA
@@ -42,13 +12,34 @@
 - **Daten:** courses.ts, weeks.ts, curriculumGoals.ts
 - **Custom Subtypes:** localStorage key `unterrichtsplaner-custom-subtypes`
 
-## Nächste geplante Schritte (Redesigns aus User-Feedback)
+## Offene Aufgaben (priorisiert nach Umsetzbarkeit)
 
-### D. Sequenzansicht komplett überarbeiten
-- Klick auf Block in Sequenzansicht → markiert im Planer
-- Klick auf KW → wählt diese Kachel im Planer
-- Details ein/ausklappen via Klick auf Block-Titel (kein separater Details-Button)
-- Blöcke in Sequenzansicht mit Farbhintergrund
-- Bei Klick auf Klasse direkt Blöcke auflisten (keine Vorauswahl Di/Do)
-- Di-Di / Di-Do / Do-Do Anzeige in Übersichtskachel
-- Externe Links im Block-Detail der Sequenzansicht
+### Schnelle Fixes (aktuell umsetzbar)
+1. **Shift+Klick: Sonderwochen/Ferien überspringen** — Bei Shift-Selektion keine Ferien/Events (type 5, 6) anwählen. Bei Drag&Drop diese nicht verschieben.
+2. **Shift+Klick: Nur gefüllte Zellen des Kurses** — Shift wählt nur Lektionen. Cmd+Klick erlaubt auch leere Zellen.
+3. **Informatik-Farbe grau** — IN in SUBJECT_AREA_COLORS auf grau ändern (aktuell cyan).
+4. **Bezeichnung "Untertyp" → "Typ"** — Im CategorySubtypeSelector Label von "Untertyp" auf "Typ" ändern.
+5. **Dauer vereinfachen** — Statt 1L/2L/3L: "45 min", "90 min", "135 min", "Halbtag", "Ganztag" + freie Minuten-Eingabe.
+
+### Mittlere Features
+6. **Tagesbasierte Spaltenordnung (Mo→Fr)** — Spalten nach Tag sortieren statt nach Course-ID. Mehrfachauswahl bei Di+Do intelligent über nicht-nebeneinanderliegende Spalten.
+7. **SOL-Anbindung an Kurs** — In Detailansicht: SOL-Modus aktivierbar mit eigenen Details (Thema, Material, Beschreibung, Dauer). SOL-Tag auf Kachel anzeigen.
+8. **Mehrtägige Mehrfachauswahl (Di+Do)** — Shift+Klick erkennt verknüpfte Kurse und wählt auch in der Partner-Spalte an, auch wenn diese nicht nebeneinanderliegt.
+
+### Grössere Redesigns
+9. **Einstellungsmenü (Settings)** — Grundlegende Konfiguration:
+   - Stundenplan → Kurse hinzufügen/bearbeiten
+   - Sonderwochen definieren (inkl. welche Kurse betroffen, Standard alle)
+   - Ferien definieren
+   - Default-Lektionsdauer
+   - Fächer die unterrichtet werden
+   → Ermöglicht leeren Start ohne Import
+
+10. **Sequenzansicht komplett überarbeiten**
+    - Klick auf Block → markiert im Planer
+    - Klick auf KW → wählt Kachel
+    - Details ein/ausklappen via Titel-Klick (kein Details-Button)
+    - Blöcke mit Farbhintergrund
+    - Bei Klick auf Klasse direkt Blöcke auflisten
+    - Di-Di / Di-Do / Do-Do Anzeige
+    - Externe Links im Block-Detail
