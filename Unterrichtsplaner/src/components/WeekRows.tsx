@@ -751,7 +751,8 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                   }}
                 >
                   {/* Sequence bar — color from subject area (VWL=orange, BWL=blue, Recht=green) */}
-                  {seq && title && (
+                  {/* Don't show sequence bar for holidays (type 6) and events (type 5) */}
+                  {seq && title && !isFixed && (
                     <div
                       className="absolute left-0 w-[5px] opacity-80 cursor-pointer hover:opacity-100 hover:w-[7px] transition-all"
                       style={{
@@ -793,7 +794,7 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                       title={`Klick: Sequenz hervorheben · Doppelklick: Sequenz bearbeiten`}
                     />
                   )}
-                  {seq?.isFirst && title && (
+                  {seq?.isFirst && title && !isFixed && (
                     <div className="absolute left-1.5 -top-0.5 text-[6px] font-bold z-10 bg-[#0c0f1a] px-0.5 rounded whitespace-nowrap cursor-pointer"
                       style={{ color: (() => {
                         const seqLabelSA = effectiveSubjectArea || (() => {

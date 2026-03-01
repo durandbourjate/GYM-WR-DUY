@@ -5,19 +5,18 @@ import { TYPE_BADGES, DAY_COLORS, isPastWeek } from '../utils/colors';
 import type { Course, ManagedSequence, LessonType, SubjectArea } from '../types';
 
 const ROW_H = 26;
-const HOLIDAY_ROW_H = 16;
 const GROUP_W = 140; // width for single-day course group
 const SUBDAY_W = 70; // width for each sub-day in 2-day course group
 
 /** Dark-mode block colors */
 const BLOCK_COLORS: Record<string, { bg: string; fg: string; border: string }> = {
-  VWL:      { bg: '#7c2d12', fg: '#fed7aa', border: '#ea580c' },
-  BWL:      { bg: '#1e3a5f', fg: '#bfdbfe', border: '#3b82f6' },
-  RECHT:    { bg: '#14532d', fg: '#bbf7d0', border: '#22c55e' },
-  IN:       { bg: '#374151', fg: '#d1d5db', border: '#6b7280' },
-  INTERDISZ: { bg: '#4c1d95', fg: '#ddd6fe', border: '#8b5cf6' },
+  VWL:      { bg: '#7c2d12', fg: '#fde6cc', border: '#ea580c' },
+  BWL:      { bg: '#1e3a5f', fg: '#dbeafe', border: '#3b82f6' },
+  RECHT:    { bg: '#14532d', fg: '#d1fae5', border: '#22c55e' },
+  IN:       { bg: '#374151', fg: '#e5e7eb', border: '#6b7280' },
+  INTERDISZ: { bg: '#4c1d95', fg: '#ede9fe', border: '#8b5cf6' },
 };
-const DEFAULT_BLOCK = { bg: '#334155', fg: '#94a3b8', border: '#64748b' };
+const DEFAULT_BLOCK = { bg: '#334155', fg: '#cbd5e1', border: '#64748b' };
 function getBlockColors(sa?: string) { return (sa && BLOCK_COLORS[sa]) || DEFAULT_BLOCK; }
 
 function inferSubjectArea(lt?: LessonType): SubjectArea | undefined {
@@ -55,6 +54,7 @@ export function ZoomYearView() {
     setZoomLevel, setEditingSequenceId,
     setSidePanelOpen, setSidePanelTab, setSelection,
     searchQuery, setClassFilter, setFilter,
+    dimPastWeeks,
   } = usePlannerStore();
 
   const { courses: allCourses, weeks: staticWeeks, s2StartIndex, currentWeek } = usePlannerData();
@@ -234,10 +234,10 @@ export function ZoomYearView() {
   return (
     <div className="px-1 pt-0 pb-1">
       <table className="border-collapse w-max min-w-full">
-        <thead className="sticky z-40" style={{ top: -1 }}>
+        <thead className="sticky z-40" style={{ top: 0 }}>
           {/* Group header row */}
           <tr>
-            <th className="w-12 bg-gray-900 sticky left-0 z-50 py-0.5 border-b border-gray-800">
+            <th className="w-12 bg-gray-900 sticky left-0 z-50 py-1 border-b border-gray-800">
               <span className="text-[9px] font-bold text-gray-400">Jahr</span>
             </th>
             {groups.map((g) => {
@@ -245,7 +245,7 @@ export function ZoomYearView() {
               const totalW = g.isMultiDay ? g.courses.length * SUBDAY_W : GROUP_W;
               return (
                 <th key={g.key} colSpan={g.isMultiDay ? g.courses.length : 1}
-                  className="bg-gray-900 px-0.5 pb-0.5 border-b-2 border-gray-700 text-center"
+                  className="bg-gray-900 px-0.5 py-1 border-b-2 border-gray-700 text-center"
                   style={{ width: totalW, minWidth: totalW }}>
                   <div className={`text-[11px] font-bold cursor-pointer transition-colors ${
                     classFilter === g.cls ? 'text-blue-400' : 'text-gray-200 hover:text-blue-300'
@@ -286,22 +286,22 @@ export function ZoomYearView() {
             return (
               <tr key={weekW} data-week={weekW}
                 style={{
-                  opacity: past && !isCurrent ? 0.5 : 1,
-                  height: isHolidayWeek ? HOLIDAY_ROW_H : ROW_H,
+                  opacity: dimPastWeeks && past && !isCurrent ? 0.4 : 1,
+                  height: ROW_H,
                   borderTop: isSemBreak ? '3px solid #f59e0b50' : undefined,
                 }}>
                 <td className={`bg-gray-900 sticky left-0 z-10 text-center border-b py-0 px-0.5 ${
                   isCurrent ? 'border-amber-500 bg-amber-950/30' : 'border-slate-800/50'
                 }`}>
-                  <span className={`text-[9px] font-mono font-bold ${isCurrent ? 'text-amber-400' : 'text-gray-500'}`}>
+                  <span className={`text-[9px] font-mono font-bold ${isCurrent ? 'text-amber-400' : 'text-gray-400'}`}>
                     {weekW}
                   </span>
                 </td>
 
                 {isHolidayWeek ? (
                   <td colSpan={groups.reduce((sum, g) => sum + (g.isMultiDay ? g.courses.length : 1), 0)}
-                    className="border-b border-slate-800/30 text-center py-0" style={{ background: '#ffffff06' }}>
-                    <span className="text-[9px] text-gray-600 italic">{holidayLabel || 'Ferien'}</span>
+                    className="border-b border-slate-800/30 text-center py-0" style={{ background: '#1e293b40' }}>
+                    <span className="text-[10px] text-gray-300 font-medium">🏖 {holidayLabel || 'Ferien'}</span>
                   </td>
                 ) : (
                   groups.map((group) => {
@@ -350,7 +350,7 @@ export function ZoomYearView() {
                         const daySkip = skipSet.has(daySpanKey);
                         if (daySkip) return null;
 
-                        const daySpan = spanMap.get(daySpanKey);
+                        const daySpan = spanMap.get(daySpanKey) || spanMap.get(`${weekIdx}:${course.id}:loose`);
                         if (!daySpan) {
                           return (
                             <td key={course.id} className="border-b border-slate-800/20 p-0 cursor-pointer hover:bg-slate-800/30"
