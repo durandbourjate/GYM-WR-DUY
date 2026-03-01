@@ -1,7 +1,7 @@
 # Unterrichtsplaner – Handoff v3.28
 
-## Status: ✅ Deployed (v3.38)
-- **Commit:** bf80b5e
+## Status: ✅ Deployed (v3.39)
+- **Commit:** c1af172
 - **Datum:** 2026-03-01
 - **Deploy:** https://durandbourjate.github.io/GYM-WR-DUY/Unterrichtsplaner/
 
@@ -79,6 +79,8 @@
 10. ✅ Zoom 2 loose lessons Bug fix
 
 - v3.38: Ferien/Events Zoom 2 Overhaul — (1) Aufeinanderfolgende Ferien-Wochen (type 6) werden als zusammengefasste rowSpan-Blöcke gerendert mit KW-Range-Label (z.B. "KW42–KW43"), 🏖-Icon, Name und Wochenzähler. (2) Ganztags-Events (type 5, alle Kurse betroffen) ebenso als colspan-Block mit 📅-Icon und amber-Farbe. (3) Partielle Events (nur einzelne Kurse betroffen): pro Kurs-Zelle als kleiner grauer Block mit Icon statt leere Zelle. (4) Multi-day Sub-Columns: Events/Holidays werden dort ebenfalls als Mini-Blöcke gerendert.
+
+- v3.39: Zoom 3 Ferien/Events Overhaul — (1) Aufeinanderfolgende Ferien-Wochen (type 6) werden als zusammengefasste rowSpan+colspan-Blöcke gerendert (analog Zoom 2). KW-Range-Label, 🏖-Icon, Name und Wochenzähler (z.B. "2W"). (2) Ganztags-Events (type 5, alle Kurse betroffen) ebenso als colspan-Block mit 📅-Icon. (3) Partielle Events (nur einzelne Kurse) bleiben als individuelle Zellen. (4) holidaySpans/holidaySkipSet/holidaySpanStart useMemo in WeekRows.tsx.
 
 #### 🔵 Nächste Runde (v3.37+) — ✅ Erledigt
 11. ✅ Ferien als durchgehende Blöcke (rowSpan, zusammengefasst, normalgross)
