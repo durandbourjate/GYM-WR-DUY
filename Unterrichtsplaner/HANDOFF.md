@@ -1,68 +1,68 @@
-# Unterrichtsplaner – Handoff v2.9
+# Unterrichtsplaner – Handoff v3.0
 
-## Status: ✅ Deployed (v2.9)
-- **Commit:** f608659
+## Status: ✅ Deployed (v3.0)
+- **Commit:** 47009dc
 - **Datum:** 2026-03-01
 - **Deploy:** https://durandbourjate.github.io/GYM-WR-DUY/Unterrichtsplaner/
 
-## Was wurde in v2.9 geändert
+## Was wurde in v3.0 geändert
 
-### 1. Taxonomiestufen K1–K6 komplett entfernt
-- `TaxonomyLevel` Type aus `types/index.ts` entfernt
-- Felder `taxonomyLevel` aus `SequenceBlock` und `LessonDetail` entfernt
-- `suggestTaxonomyLevel()` und `BLOCK_TYPE_TAXONOMY_MAP` aus `autoSuggest.ts` entfernt
-- Taxonomy-Tags aus `HoverPreview` (WeekRows) entfernt
-- Taxonomy-Felder aus `DetailPanel` Form + Tags entfernt
+### 1. Shift+Klick Bereichs-Selektion (Bug-Fix)
+- `setSelection()` setzt jetzt automatisch `lastSelectedKey` → Shift+Click hat immer einen Ankerpunkt
+- Vorher: normaler Klick setzte `lastSelectedKey` nicht, Shift+Click funktionierte nicht
 
-### 2. Shift+Klick Bereichs-Selektion (Di+Do-aware)
-- `selectRange()` im Store komplett neu implementiert
-- Erkennt linked courses (gleiche Klasse+Typ, verschiedene Tage)
-- Di → Do oder Do → Di: Beide Tage automatisch eingeschlossen
-- Di → Di oder Do → Do: Rückfrage "Auch [anderer Tag] einschliessen?"
-- Fallback: Same-column range selection
+### 2. Cmd+Klick Mehrfachauswahl (Bug-Fix)
+- Erster Cmd+Klick schliesst die aktuelle Einzelselektion automatisch in die multiSelection ein
+- Titel-div `onClick` stoppt Propagation NICHT mehr bei Modifier-Keys (Cmd/Shift/Ctrl)
+- Vorher: Cmd+Klick auf Titel öffnete Details statt zur multiSelection hinzuzufügen
 
-### 3. Gruppen-Drag&Drop repariert (Multi-Column)
-- Drop-Handler in WeekRows.tsx überarbeitet
-- Gruppiert Selektion nach Column, berechnet Wochen-Offset
-- Verschiebt alle Columns um denselben Offset
-- DragOver akzeptiert auch Cross-Column-Drops bei Gruppen-Drag
+### 3. Leere Zelle: Einfachklick = Deselect, Doppelklick = Menü
+- Einfachklick auf leere Zelle: löscht multiSelection + selection + schliesst EmptyCellMenu
+- Doppelklick auf leere Zelle: öffnet "Neue Kachel / Neue Sequenz"-Menü
+- Vorher: Einfachklick öffnete sofort das Menü
 
-### 4. Block-Typ Beurteilungen gruppiert
-- BLOCK_TYPES aufgeteilt in BLOCK_TYPES_REGULAR + BLOCK_TYPES_ASSESSMENT
-- Neues `AssessmentDropdown` Component: "📝 Beurteilung…" Button mit Dropdown
-- Enthält: Prüfung, Mündliche Prüfung, Langprüfung, Projektabgabe, Präsentation
+### 4. Escape-Handler erweitert
+- EmptyCellMenu schliesst bei Escape (eigener keydown-Listener)
+- App.tsx Escape-Priorität: insertDialog → multiSelection → sidePanel → selection
+- Vorher: EmptyCellMenu hatte keinen Escape-Handler, insertDialog wurde nicht geschlossen
 
-### 5. Sequenz-Panel komplett überarbeitet
-- Filter-Buttons: "Alle" + je ein Button pro Klasse (29c, 27a28f, 28bc29fs)
-- Gruppierung: Klasse → Kurstyp (SF Di+Do, EWR, IN) → Fachbereich → Sequenzen
-- Fachbereich-Farben aus SUBJECT_AREA_COLORS
-- Alte Kurs-basierte Filterung durch Klassen-basierte ersetzt
-- Helfer: `getUniqueClasses()`, `getCourseTypesForClass()`
-
-### 6. Klick auf Titel → Details öffnen
-- Titel-div in WeekRows hat eigenen onClick: öffnet DetailPanel
-- Kleines ⓘ-Icon nach jedem Titel
-- `cursor-pointer` auf Titel-Element
-
-### 7. Escape-Handler erweitert
-- Priorität: multiSelection → sidePanelOpen → selection
-- Esc löscht zuerst Mehrfachauswahl, dann Panel, dann Einzelauswahl
-
-### 8. Klick ins Leere → Deselektieren
-- Empty-Cell-Click ruft `clearMultiSelect()` + `setSelection(null)` vor dem Menü
-
-### 9. Bug-Fix: Variable-Order in WeekRows
-- `cellDetail` und `parentBlock` werden jetzt VOR `effectiveSubjectArea` definiert
-- Behebt "used before declaration" Fehler
+### 5. Block-Typ "Lektion" als Standard
+- Neue Kacheln via EmptyCellMenu erhalten automatisch `blockType: 'LESSON'`
+- DetailPanel zeigt LESSON als Default-Markierung wenn kein blockType gesetzt ist
+- Vorher: kein blockType gesetzt, keine Standard-Markierung
 
 ## Architektur (unverändert)
 - **Stack:** React + TypeScript + Vite + Zustand + PWA
-- **Store:** `plannerStore.ts` (~820 Zeilen)
-- **Hauptkomponenten:** WeekRows (~585 Z.), SequencePanel (~494 Z.), DetailPanel (~398 Z.), Toolbar (~456 Z.)
+- **Store:** `plannerStore.ts` (~830 Zeilen)
+- **Hauptkomponenten:** WeekRows (~600 Z.), SequencePanel (~494 Z.), DetailPanel (~409 Z.), Toolbar (~456 Z.)
 - **Daten:** courses.ts (Stundenplan), weeks.ts (Schulwochen), curriculumGoals.ts
 
-## Nächste mögliche Schritte
-- User-Testing aller v2.9 Features
-- Mehrfachauswahl → neue Sequenz erstellen (Button in MultiSelectToolbar vorhanden, Funktion testen)
-- Material-Links-Feld testen (bereits in DetailPanel implementiert)
-- Performance-Optimierung (Bundle >500kB Warning)
+## Nächste geplante Schritte (Redesigns aus User-Feedback)
+Die folgenden Redesigns wurden als User-Feedback gesammelt und sollen in der nächsten Session umgesetzt werden:
+
+### A. Block-Typ / Block-Untertyp (zweistufig)
+- **Typ:** Lektion, Beurteilung, Event, Ferien
+- **Untertyp je Typ:**
+  - Lektion → Einführung, Übung, Theorie, SOL, Diskussion
+  - Beurteilung → Prüfung schriftlich, Prüfung mündlich, Präsentation, Projektabgabe
+  - Event → Exkursion, Tag der offenen Tür, Ausfall, Auftrag
+- Eigene Labels hinzufügbar (persistiert in localStorage)
+- Aktuelles flaches `BlockType` muss in zweistufiges System migriert werden
+
+### B. Dauer der Einheit
+- Feld mit Vorwahl 1L, 2L + freie Zeiteingabe
+- Ermöglicht Mehrlektionen-Prüfungen, halbe Lektionen etc.
+- Neues Feld `duration` in LessonDetail (oder SequenceBlock)
+
+### C. Beschreibungen ausschreiben
+- In Detailansicht lange Labels (Einführung BWL, nicht Einf. BWL)
+- In Kacheln weiterhin kurz
+
+### D. Sequenzansicht komplett überarbeiten
+- Klick auf Block in Sequenzansicht → markiert im Planer
+- Klick auf KW → wählt diese Kachel im Planer
+- Details ein/ausklappen via Klick auf Block-Titel (kein separater Details-Button)
+- Blöcke in Sequenzansicht mit Farbhintergrund
+- Bei Klick auf Klasse direkt Blöcke auflisten (keine Vorauswahl Di/Do oder Di+Do)
+- Di-Di / Di-Do / Do-Do Anzeige in Übersichtskachel
+- Externe Links (LearningView, Übungspools) im Block-Detail der Sequenzansicht
