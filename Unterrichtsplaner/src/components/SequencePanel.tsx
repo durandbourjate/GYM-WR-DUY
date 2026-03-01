@@ -248,14 +248,15 @@ function FlatBlockCard({ fb }: { fb: FlatBlockInfo }) {
                   className="w-full bg-slate-700/50 text-slate-200 border border-slate-600 rounded px-1.5 py-0.5 text-[9px] outline-none focus:border-blue-400" />
               </div>
               <div>
-                <label className="text-[8px] text-gray-400">Lehrplanziel</label>
-                <input value={block.curriculumGoal || ''} onChange={(e) => updateBlockInSequence(fb.seqId, fb.blockIndex, { curriculumGoal: e.target.value || undefined })}
-                  className="w-full bg-slate-700/50 text-slate-200 border border-slate-600 rounded px-1.5 py-0.5 text-[9px] outline-none focus:border-blue-400" />
-              </div>
-              <div>
                 <label className="text-[8px] text-gray-400">Beschreibung</label>
                 <textarea value={block.description || ''} onChange={(e) => updateBlockInSequence(fb.seqId, fb.blockIndex, { description: e.target.value || undefined })}
                   rows={2} className="w-full bg-slate-700/50 text-slate-200 border border-slate-600 rounded px-1.5 py-0.5 text-[9px] outline-none focus:border-blue-400 resize-y" />
+              </div>
+              <div>
+                <label className="text-[7px] text-gray-500">Lehrplanziel</label>
+                <input value={block.curriculumGoal || ''} onChange={(e) => updateBlockInSequence(fb.seqId, fb.blockIndex, { curriculumGoal: e.target.value || undefined })}
+                  placeholder="LP17-Ziel…"
+                  className="w-full bg-slate-700/50 text-slate-200 border border-slate-600 rounded px-1.5 py-0.5 text-[8px] outline-none focus:border-blue-400 text-gray-400" />
               </div>
               <div>
                 <label className="text-[8px] text-gray-400">Materiallinks</label>

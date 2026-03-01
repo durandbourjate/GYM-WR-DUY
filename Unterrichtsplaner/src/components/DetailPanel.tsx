@@ -747,20 +747,21 @@ function DetailsTab() {
           <CurriculumGoalPicker value={detail.curriculumGoal || effectiveDetail.curriculumGoal} onChange={(v) => updateField('curriculumGoal', v)} subjectArea={effectiveDetail.subjectArea} />
         </div>
         <div>
-          <label className="text-[9px] text-gray-400 font-medium mb-1 block">LearningView</label>
-          <div className="flex gap-1">
-            <input value={detail.learningviewUrl || ''} onChange={(e) => updateField('learningviewUrl', e.target.value)}
-              placeholder="https://learningview.org/…"
-              className="flex-1 bg-slate-700 text-slate-200 border border-slate-600 rounded px-2 py-1 text-[10px] outline-none focus:border-blue-400" />
-            {detail.learningviewUrl && (
-              <a href={detail.learningviewUrl} target="_blank" rel="noopener noreferrer"
-                className="px-2 py-1 rounded bg-emerald-700 hover:bg-emerald-600 text-white text-[9px] shrink-0 no-underline" title="In LearningView öffnen">↗</a>
-            )}
-          </div>
-        </div>
-        <div>
           <label className="text-[9px] text-gray-400 font-medium mb-1 block">Material</label>
-          <MaterialLinks links={detail.materialLinks || []} onChange={(links) => updateField('materialLinks', links)} />
+          <MaterialLinks links={[
+            ...(detail.learningviewUrl ? [detail.learningviewUrl] : []),
+            ...(detail.materialLinks || []),
+          ]} onChange={(links) => {
+            // First link that's a learningview URL goes to learningviewUrl, rest to materialLinks
+            const lvIdx = links.findIndex(l => l.includes('learningview'));
+            if (lvIdx >= 0) {
+              updateField('learningviewUrl', links[lvIdx]);
+              updateField('materialLinks', links.filter((_, i) => i !== lvIdx));
+            } else {
+              updateField('learningviewUrl', undefined);
+              updateField('materialLinks', links.length > 0 ? links : undefined);
+            }
+          }} />
         </div>
         <div>
           <label className="text-[9px] text-gray-400 font-medium mb-1 block">Notizen</label>

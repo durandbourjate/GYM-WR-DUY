@@ -174,17 +174,18 @@ export function ZoomYearView() {
           const weekW = allWeekKeys[wi];
           const wd = effectiveWeeks.find(w => w.w === weekW);
           const entry = wd?.lessons[course.col];
-          if (!entry) continue;
+          if (!entry || !entry.title) continue;
+          // Skip holidays and events — they're not loose lessons
+          if (entry.type === 5 || entry.type === 6) continue;
           // This week has a lesson but no sequence → loose lesson
           const detail = lessonDetails[`${weekW}-${course.col}`];
-          const entryType = String(entry.type || '');
-          const area = detail?.subjectArea || inferSubjectArea(entryType as unknown as LessonType);
+          const area = detail?.subjectArea || inferSubjectArea(entry.type as LessonType);
           const looseKey = `${wi}:${course.id}:loose`;
           if (spanMap.has(looseKey)) continue;
           // Create a dummy seq for type compatibility
           const dummySeq = { id: '__loose__', title: '', courseId: course.id, blocks: [], createdAt: '', updatedAt: '' } as ManagedSequence;
           spanMap.set(looseKey, {
-            seq: dummySeq, blockIdx: 0, label: entryType, topicMain: detail?.topicMain || entryType,
+            seq: dummySeq, blockIdx: 0, label: entry.title, topicMain: detail?.topicMain || entry.title,
             subjectArea: area, startIdx: wi, spanLen: 1, weeks: [weekW],
             courseId: course.id, isShared: false, isLoose: true,
           });

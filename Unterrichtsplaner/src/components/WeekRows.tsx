@@ -356,6 +356,26 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
   // Multi-day shift-click popup
   const [multiDayPrompt, setMultiDayPrompt] = useState<{ weekW: string; courseId: string; position: { x: number; y: number } } | null>(null);
 
+  // Close multi-day prompt on click outside or Escape
+  useEffect(() => {
+    if (!multiDayPrompt) return;
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMultiDayPrompt(null);
+    };
+    const handleClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest('[data-multiday-prompt]')) setMultiDayPrompt(null);
+    };
+    document.addEventListener('keydown', handleKey);
+    // Delay click listener to avoid catching the triggering click
+    const timer = setTimeout(() => document.addEventListener('mousedown', handleClick), 50);
+    return () => {
+      document.removeEventListener('keydown', handleKey);
+      document.removeEventListener('mousedown', handleClick);
+      clearTimeout(timer);
+    };
+  }, [multiDayPrompt]);
+
   const displayWeeks = weekData.length > 0
     ? weeks.map((w) => weekData.find((wd) => wd.w === w.w) || w)
     : weeks;
@@ -619,11 +639,19 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                         if (e.shiftKey) {
                           // Always select just this day first
                           selectRange(`${week.w}-${c.id}`, allWeekKeys, courses, false);
-                          // Check if multi-day course → show prompt
+                          // Check if multi-day course → show prompt (unless other day already selected)
                           const linked = getLinkedCourseIds(c.id);
                           if (linked.length > 1) {
-                            const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-                            setMultiDayPrompt({ weekW: week.w, courseId: c.id, position: { x: rect.left + rect.width / 2, y: rect.top } });
+                            const otherIds = linked.filter(id => id !== c.id);
+                            // Check if any other day is already in multiSelection (user manually selected both)
+                            const currentMulti = usePlannerStore.getState().multiSelection;
+                            const otherDayAlreadySelected = otherIds.some(oid =>
+                              currentMulti.some(k => k.endsWith(`-${oid}`))
+                            );
+                            if (!otherDayAlreadySelected) {
+                              const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                              setMultiDayPrompt({ weekW: week.w, courseId: c.id, position: { x: rect.left + rect.width / 2, y: rect.top } });
+                            }
                           }
                         } else {
                           toggleMultiSelect(`${week.w}-${c.id}`);
@@ -944,12 +972,36 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
         return (
           <tr>
             <td colSpan={courses.length + 1} className="p-0 relative">
-              <div className="fixed z-[90] bg-slate-800 border border-purple-500 rounded-lg shadow-2xl py-1 px-2 w-auto"
+              <div data-multiday-prompt className="fixed z-[90] bg-slate-800 border border-purple-500 rounded-lg shadow-2xl py-1 px-2 w-auto"
+                onClick={(e) => e.stopPropagation()}
+                onMouseDown={(e) => e.stopPropagation()}
                 style={{ top: multiDayPrompt.position.y - 40, left: multiDayPrompt.position.x - 60 }}>
                 <div className="text-[9px] text-gray-300 mb-1">Auch <span className="font-bold text-purple-300">{otherDays}</span> auswählen?</div>
                 <div className="flex gap-1">
                   <button onClick={() => {
-                    selectRange(`${multiDayPrompt.weekW}-${multiDayPrompt.courseId}`, allWeekKeys, courses, true);
+                    // Expand entire current multiSelection to include other days
+                    const currentMulti = usePlannerStore.getState().multiSelection;
+                    const newKeys: string[] = [];
+                    for (const key of currentMulti) {
+                      const parts = key.split('-');
+                      const cid = parts[parts.length - 1];
+                      const wk = parts.slice(0, parts.length - 1).join('-');
+                      // If this key belongs to a linked course, also add the other day(s)
+                      const keyLinked = getLinkedCourseIds(cid);
+                      if (keyLinked.length > 1) {
+                        for (const otherId of keyLinked) {
+                          if (otherId !== cid) {
+                            const otherKey = `${wk}-${otherId}`;
+                            if (!currentMulti.includes(otherKey)) newKeys.push(otherKey);
+                          }
+                        }
+                      }
+                    }
+                    if (newKeys.length > 0) {
+                      usePlannerStore.setState((s) => ({
+                        multiSelection: Array.from(new Set([...s.multiSelection, ...newKeys])),
+                      }));
+                    }
                     setMultiDayPrompt(null);
                   }} className="px-2 py-0.5 rounded text-[9px] bg-purple-600 text-white cursor-pointer hover:bg-purple-500">Ja, beide Tage</button>
                   <button onClick={() => setMultiDayPrompt(null)}
