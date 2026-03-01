@@ -1,15 +1,15 @@
-# Unterrichtsplaner – Handoff v3.18
+# Unterrichtsplaner – Handoff v3.19
 
-## Status: ✅ Deployed (v3.18)
-- **Commit:** d782a81
+## Status: ✅ Deployed (v3.19)
+- **Commit:** 27e7e62
 - **Datum:** 2026-03-01
 - **Deploy:** https://durandbourjate.github.io/GYM-WR-DUY/Unterrichtsplaner/
 
 ## Architektur
 - **Stack:** React + TypeScript + Vite + Zustand + PWA
-- **Store:** `plannerStore.ts` (~875 Z.), `settingsStore.ts` (181 Z.)
+- **Store:** `plannerStore.ts` (~1095 Z.), `settingsStore.ts` (181 Z.)
 - **Hook:** `usePlannerData.ts` — dynamische Courses/Weeks basierend auf Settings
-- **Hauptkomponenten:** WeekRows (~680 Z.), SequencePanel (~470 Z.), DetailPanel (~855 Z.), Toolbar (~463 Z.), SettingsPanel (~444 Z.), ZoomBlockView (~215 Z.)
+- **Hauptkomponenten:** WeekRows (~680 Z.), SequencePanel (~585 Z.), DetailPanel (~990 Z.), Toolbar (~463 Z.), SettingsPanel (~444 Z.), CollectionPanel (~295 Z.), ZoomBlockView (~215 Z.)
 
 ## Changelog v3.0–v3.14
 - v3.0–v3.7: Grundfunktionen (siehe frühere Handoffs)
@@ -24,22 +24,24 @@
 - v3.16: Fachbereich-Mismatch-Warnung mit Korrigieren-Button, Reihe-UX (Erklärtext, editierbarer Titel, Sequenz-Zähler)
 - v3.17: Hover-Preview 800ms (statt 2s), Feiertag-Erkennung bei Import (partielle Feiertage wie Auffahrt/Pfingsten)
 - v3.18: Delete-Taste löscht Zelleninhalt, Scroll-to-Current-Button (◉), geerbter Fachbereich-Hinweis, Keyboard-Hilfe aktualisiert
+- v3.19: Materialsammlung (CollectionPanel) — neuer Tab "📚 Sammlung" im Seitenpanel. Archivieren von UE, Sequenzen, Schuljahren, Bildungsgängen. Import mit Optionen (Notizen/Materiallinks). Persistierung in localStorage.
 
-## Architekturentscheidungen v3.11–v3.13
+## Architekturentscheidungen v3.11–v3.19
 - **editingSequenceId Format:** Jetzt `seqId-blockIndex` (z.B. `abc123-0`) statt nur `seqId`. WeekRows parsed dieses Format mit Regex und highlightet nur den spezifischen Block.
 - **panelWidth:** Im plannerStore persistiert, über Resize-Handle (320–700px) einstellbar.
 - **allWeeks Prop:** WeekRows erhält optionale `allWeeks`-Prop mit allen Kalenderwochen beider Semester für Cross-Semester Shift-Select.
 - **BatchOrDetailsTab:** Switcher-Komponente — zeigt BatchEditTab bei multiSelection.length > 1, sonst normaler DetailsTab.
 - **FlatBlockCard:** Ersetzt alte SequenceCard. Zeigt Blöcke direkt flach, mit Parent-Sequenz-Kontext. Aufklappbare Sections: Felder, Lektionen, Reihen-Einstellungen.
+- **CollectionPanel (v3.19):** Eigenständige Komponente als 4. Tab. Datenmodell: `CollectionItem` mit `CollectionUnit[]`. Jede Unit enthält einen Block (ohne Wochen), Lesson-Detail-Snapshots und Original-Lektionstitles. Archiv-Hierarchie: UE < Sequenz < Schuljahr < Bildungsgang. Import erstellt neue Sequenz ohne Wochen-Zuweisung; Optionen für Notizen/Materiallinks. `collection[]` im plannerStore persistiert via `partialize`.
+- **sidePanelTab:** Erweitert auf `'details' | 'sequences' | 'collection' | 'settings'`.
 
 ## Offenes Feedback (noch nicht umgesetzt)
 
 ### 🔴 Konzeptionell / Architektur
-1. **Materialsammlung (Sammlung-Tab):** Dritter Tab rechts neben "Sequenzen". Sequenzen und UE speichern für Wiederverwendung in späteren Jahren. Szenarien: (a) Lektionen+Sequenzen vom Vorjahr übernehmen, (b) Punktuell aus Sammlung importieren.
-2. **Detailspalte / Notiz-Ansicht (Unterrichtsdurchführung):** Niederschwelliger Zugang zu Notizen, Kommentaren, Reflexion ("wie hat es mit der Klasse funktioniert"). Idee: aufklappbare Detailspalte pro Kurs (wie Excel-Gruppierung). Bei Einzelkurs-Ansicht umsetzbar. Auch Mouse-Over als Option.
-3. **Feiertage tracken:** Basis vorhanden (SpecialWeek type:'holiday'). Feiertage werden bei Import erkannt und in Settings gespeichert. Noch fehlend: Automatisches Blockieren bei Weeks-Generierung (aktuell nur via "Apply" in Settings).
-4. **Zoom 2 (Mittlere Ansicht):** Alle KW-Zeilen, kompaktere Darstellung mit Sequenz-Labels statt volle Titel. Aktuell buggy (ZoomBlockView.tsx).
-5. **Zoom 1 (Multi-Year):** "Lehrplan"-Label korrigieren, "Ist-Zustand" Ansicht überarbeiten.
+1. **Detailspalte / Notiz-Ansicht (Unterrichtsdurchführung):** Niederschwelliger Zugang zu Notizen, Kommentaren, Reflexion ("wie hat es mit der Klasse funktioniert"). Idee: aufklappbare Detailspalte pro Kurs (wie Excel-Gruppierung). Bei Einzelkurs-Ansicht umsetzbar. Auch Mouse-Over als Option.
+2. **Feiertage tracken:** Basis vorhanden (SpecialWeek type:'holiday'). Feiertage werden bei Import erkannt und in Settings gespeichert. Noch fehlend: Automatisches Blockieren bei Weeks-Generierung (aktuell nur via "Apply" in Settings).
+3. **Zoom 2 (Mittlere Ansicht):** Alle KW-Zeilen, kompaktere Darstellung mit Sequenz-Labels statt volle Titel. Aktuell buggy (ZoomBlockView.tsx).
+4. **Zoom 1 (Multi-Year):** "Lehrplan"-Label korrigieren, "Ist-Zustand" Ansicht überarbeiten.
 
 ### 🟡 UX (nächste Runde)
 6. **Dauer-Warnung bei Verschieben (1L↔2L):** Aktuell kein reales Problem (Verschieben nur innerhalb gleicher Spalte). Relevant wenn cross-column oder Sequenz-Auto-Place erweitert wird.
@@ -72,3 +74,4 @@
 - ✅ Scroll-to-Current-Button (◉) in Toolbar
 - ✅ Geerbter Fachbereich: Label-Hinweis "(geerbt von Sequenz)"
 - ✅ Keyboard-Hilfe: Delete, Pfeiltasten dokumentiert
+- ✅ Materialsammlung (Sammlung-Tab): 4. Tab "📚 Sammlung" mit Archivieren (UE, Sequenz, Schuljahr, Bildungsgang) und Import (Notizen/Materiallinks optional). 💾-Buttons in FlatBlockCard.
