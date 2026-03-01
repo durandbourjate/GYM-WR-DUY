@@ -1,7 +1,7 @@
 # Unterrichtsplaner – Handoff v3.24
 
-## Status: ✅ Deployed (v3.28)
-- **Commit:** 4ae0c09
+## Status: ✅ Deployed (v3.29)
+- **Commit:** 3d96db4
 - **Datum:** 2026-03-01
 - **Deploy:** https://durandbourjate.github.io/GYM-WR-DUY/Unterrichtsplaner/
 
@@ -36,9 +36,11 @@
 
 - v3.28: Zoom 2 komplett umgebaut → Jahresansicht (ZoomYearView). Ganzes Schuljahr in einer Tabelle statt S1/S2 separat. Kurse nach cls+typ gruppiert. 2-Tage-Kurse: breiter Balken bei geteilter Sequenz (courseIds), 2 schmale Sub-Spalten bei separaten Sequenzen. Semester-Trennlinie (goldener Border). ZoomBlockView (alte Semesteransicht) bleibt als Komponente erhalten, wird aber nicht mehr in App.tsx verwendet.
 
+- v3.29: SOL-Total — Σ-Badge neben "📚 SOL (Reihe)" zeigt Summe aller Lektion-SOL-Einträge (count + formatierte Dauer). Neue utils/solTotal.ts mit parseDurationToMinutes (erkennt min/h/Lektionen/Halbtag/Ganztag), formatMinutes, computeSeqSolTotal. Duplikat-Funktionen aus SequencePanel entfernt.
+
 ### Offene Feature-Requests
 - **Zoom 2 Jahresmodus**: ✅ Implementiert (v3.28)
-- **SOL-Total bei Sequenzen**: SOL als Total aller zugehörigen Unterrichtseinheiten verlinken
+- **SOL-Total bei Sequenzen**: ✅ Implementiert (v3.29)
 - **Google Calendar Integration**: Kalender im Tool anzeigen Klick zum Editieren, Enter/Blur zum Speichern, Escape zum Abbrechen.
 
 ## Architekturentscheidungen v3.11–v3.19
