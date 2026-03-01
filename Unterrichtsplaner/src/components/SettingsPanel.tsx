@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import type { CourseType, DayOfWeek, Semester } from '../types';
+import { usePlannerStore } from '../store/plannerStore';
 import {
   loadSettings, saveSettings, getDefaultSettings, generateId,
   importCurrentCourses, importCurrentHolidays, importCurrentSpecialWeeks,
@@ -240,6 +241,107 @@ function HolidaysEditor({ holidays, onChange }: { holidays: HolidayConfig[]; onC
   );
 }
 
+// === Apply Settings to Weeks ===
+function ApplySettingsButton({ settings }: { settings: PlannerSettings }) {
+  const [result, setResult] = useState<{ holidays: number; specials: number } | null>(null);
+
+  const applyToWeeks = () => {
+    const store = usePlannerStore.getState();
+    const weekData = [...store.weekData.map(w => ({ ...w, lessons: { ...w.lessons } }))];
+    const allCols = new Set<number>();
+
+    // Collect all cols used in weekData
+    for (const w of weekData) {
+      for (const col of Object.keys(w.lessons).map(Number)) {
+        allCols.add(col);
+      }
+    }
+    if (allCols.size === 0) return;
+
+    let holidayCount = 0;
+    let specialCount = 0;
+
+    // Helper: expand KW range (handles year boundary, e.g. 51→03)
+    const expandWeekRange = (start: string, end: string): string[] => {
+      const allWeeks = weekData.map(w => w.w);
+      const startIdx = allWeeks.indexOf(start);
+      const endIdx = allWeeks.indexOf(end);
+      if (startIdx === -1 || endIdx === -1) return [];
+      const result: string[] = [];
+      for (let i = startIdx; i <= endIdx; i++) {
+        result.push(allWeeks[i]);
+      }
+      return result;
+    };
+
+    // Apply holidays
+    for (const holiday of settings.holidays) {
+      const weeks = expandWeekRange(holiday.startWeek, holiday.endWeek);
+      for (const weekW of weeks) {
+        const weekEntry = weekData.find(w => w.w === weekW);
+        if (!weekEntry) continue;
+        for (const col of allCols) {
+          weekEntry.lessons[col] = { title: holiday.label, type: 6 };
+        }
+        holidayCount++;
+      }
+    }
+
+    // Apply special weeks
+    for (const special of settings.specialWeeks) {
+      const weekEntry = weekData.find(w => w.w === special.week);
+      if (!weekEntry) continue;
+      const excluded = new Set(special.excludedCourseIds || []);
+      // Map courseIds to cols (use settings courses if available)
+      for (const col of allCols) {
+        // Check if this col belongs to an excluded course
+        const isExcluded = settings.courses.some(c => {
+          // Match by col position — this is approximate since settings courses use dynamic cols
+          // For now, skip exclusion check if we can't match precisely
+          return excluded.has(c.id);
+        });
+        if (!isExcluded) {
+          weekEntry.lessons[col] = {
+            title: special.label,
+            type: special.type === 'holiday' ? 6 : 5,
+          };
+        }
+      }
+      specialCount++;
+    }
+
+    store.pushUndo();
+    store.setWeekData(weekData);
+    setResult({ holidays: holidayCount, specials: specialCount });
+    setTimeout(() => setResult(null), 4000);
+  };
+
+  const totalEntries = settings.holidays.length + settings.specialWeeks.length;
+
+  return (
+    <div className="space-y-1.5">
+      <div className="text-[8px] text-gray-500">
+        {settings.holidays.length} Ferienperioden · {settings.specialWeeks.length} Sonderwochen konfiguriert
+      </div>
+      <button onClick={() => {
+        if (totalEntries === 0) { alert('Keine Ferien oder Sonderwochen konfiguriert.'); return; }
+        if (confirm(`${totalEntries} Einträge (Ferien + Sonderwochen) in die Planerdaten übernehmen? Bestehende Einträge werden überschrieben. (Undo möglich)`)) {
+          applyToWeeks();
+        }
+      }}
+        className="w-full py-1.5 rounded text-[9px] font-medium bg-amber-700 hover:bg-amber-600 text-white cursor-pointer transition-all disabled:bg-slate-700 disabled:text-gray-500 disabled:cursor-not-allowed"
+        disabled={totalEntries === 0}>
+        ⚡ Ferien & Sonderwochen eintragen
+      </button>
+      {result && (
+        <div className="text-[8px] p-1.5 rounded bg-green-900/30 text-green-300">
+          ✅ {result.holidays} Ferienwochen und {result.specials} Sonderwochen eingetragen. Undo verfügbar.
+        </div>
+      )}
+    </div>
+  );
+}
+
 // === Main Settings Panel ===
 export function SettingsPanel() {
   const [settings, setSettings] = useState<PlannerSettings>(() => {
@@ -344,39 +446,90 @@ export function SettingsPanel() {
         <HolidaysEditor holidays={settings.holidays} onChange={(h) => updateSettings({ holidays: h })} />
       </Section>
 
+      {/* Apply settings to planner */}
+      <Section title="⚡ Einstellungen anwenden">
+        <div className="space-y-2">
+          <p className="text-[8px] text-gray-500">
+            Ferien und Sonderwochen aus den Einstellungen in die Planerdaten übernehmen. Bestehende Einträge in betroffenen Wochen werden überschrieben.
+          </p>
+          <ApplySettingsButton settings={settings} />
+        </div>
+      </Section>
+
       {/* Export / Import JSON */}
       <Section title="💾 Daten exportieren / importieren">
-        <div className="space-y-2">
-          <button onClick={() => {
-            const blob = new Blob([JSON.stringify(settings, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url; a.download = 'unterrichtsplaner-settings.json'; a.click();
-            URL.revokeObjectURL(url);
-          }}
-            className="w-full py-1.5 rounded text-[9px] font-medium bg-slate-700 hover:bg-slate-600 text-gray-200 cursor-pointer transition-all">
-            ⬇ Einstellungen als JSON exportieren
-          </button>
-          <label className="block w-full py-1.5 rounded text-[9px] font-medium bg-slate-700 hover:bg-slate-600 text-gray-200 text-center cursor-pointer transition-all">
-            ⬆ JSON importieren
-            <input type="file" accept=".json" className="hidden" onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (!file) return;
-              const reader = new FileReader();
-              reader.onload = () => {
-                try {
-                  const imported = JSON.parse(reader.result as string) as PlannerSettings;
-                  if (imported.version && imported.courses) {
-                    setSettings(imported);
-                    setDirty(true);
-                  } else {
-                    alert('Ungültige Datei: Keine gültigen Einstellungen gefunden.');
-                  }
-                } catch { alert('Fehler beim Lesen der Datei.'); }
-              };
-              reader.readAsText(file);
-            }} />
-          </label>
+        <div className="space-y-3">
+          <div>
+            <p className="text-[8px] text-gray-500 font-semibold mb-1">Einstellungen (Kurse, Ferien, Sonderwochen)</p>
+            <div className="flex gap-1">
+              <button onClick={() => {
+                const blob = new Blob([JSON.stringify(settings, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url; a.download = 'unterrichtsplaner-settings.json'; a.click();
+                URL.revokeObjectURL(url);
+              }}
+                className="flex-1 py-1.5 rounded text-[9px] font-medium bg-slate-700 hover:bg-slate-600 text-gray-200 cursor-pointer transition-all">
+                ⬇ Export
+              </button>
+              <label className="flex-1 py-1.5 rounded text-[9px] font-medium bg-slate-700 hover:bg-slate-600 text-gray-200 text-center cursor-pointer transition-all">
+                ⬆ Import
+                <input type="file" accept=".json" className="hidden" onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  const reader = new FileReader();
+                  reader.onload = () => {
+                    try {
+                      const imported = JSON.parse(reader.result as string) as PlannerSettings;
+                      if (imported.version && imported.courses) {
+                        setSettings(imported);
+                        setDirty(true);
+                      } else {
+                        alert('Ungültige Datei: Keine gültigen Einstellungen gefunden.');
+                      }
+                    } catch { alert('Fehler beim Lesen der Datei.'); }
+                  };
+                  reader.readAsText(file);
+                }} />
+              </label>
+            </div>
+          </div>
+
+          <div className="border-t border-slate-700 pt-2">
+            <p className="text-[8px] text-gray-500 font-semibold mb-1">Planerdaten (Lektionen, Sequenzen, Details)</p>
+            <div className="flex gap-1">
+              <button onClick={() => {
+                const json = usePlannerStore.getState().exportData();
+                const blob = new Blob([json], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url; a.download = `unterrichtsplaner-daten-${new Date().toISOString().slice(0, 10)}.json`; a.click();
+                URL.revokeObjectURL(url);
+              }}
+                className="flex-1 py-1.5 rounded text-[9px] font-medium bg-slate-700 hover:bg-slate-600 text-gray-200 cursor-pointer transition-all">
+                ⬇ Export
+              </button>
+              <label className="flex-1 py-1.5 rounded text-[9px] font-medium bg-slate-700 hover:bg-slate-600 text-gray-200 text-center cursor-pointer transition-all">
+                ⬆ Import
+                <input type="file" accept=".json" className="hidden" onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  const reader = new FileReader();
+                  reader.onload = () => {
+                    try {
+                      const success = usePlannerStore.getState().importData(reader.result as string);
+                      if (success) {
+                        alert('Planerdaten erfolgreich importiert.');
+                      } else {
+                        alert('Ungültige Datei: Keine gültigen Planerdaten gefunden.');
+                      }
+                    } catch { alert('Fehler beim Lesen der Datei.'); }
+                  };
+                  reader.readAsText(file);
+                }} />
+              </label>
+            </div>
+          </div>
         </div>
       </Section>
 
