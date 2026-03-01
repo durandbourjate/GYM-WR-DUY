@@ -1,7 +1,7 @@
 # Unterrichtsplaner – Handoff v3.22
 
 ## Status: ✅ Deployed (v3.22)
-- **Commit:** 2cce134
+- **Commit:** 44b3572
 - **Datum:** 2026-03-01
 - **Deploy:** https://durandbourjate.github.io/GYM-WR-DUY/Unterrichtsplaner/
 
@@ -27,7 +27,7 @@
 - v3.19: Materialsammlung (CollectionPanel) — neuer Tab "📚 Sammlung" im Seitenpanel. Archivieren von UE, Sequenzen, Schuljahren, Bildungsgängen. Import mit Optionen (Notizen/Materiallinks). Persistierung in localStorage.
 - v3.20: Zoom 2 komplett neu — KW-Zeilen-Layout statt Block-Matrix. Migration auf usePlannerData(). Sequenzen als farbige Balken (Label auf 1. Zeile, gerundete Ecken). Ferien/IW kollabiiert. Past-Wochen abgedunkelt. Klick→Sequenz, Doppelklick→Zoom3.
 - v3.21: Zoom 2 — Sequenzen als rowSpan-Einheiten (verschmolzene Zellen statt Zeile-pro-KW). Farbcode-Inferenz aus weekData-Lektionstyp wenn Sequenz keinen Fachbereich hat. BlockSpan-Datenstruktur mit skipSet.
-- v3.22: Zoom 1 — Ist-Zustand: ActualDataCard nutzt s2StartIndex für korrekte Semester-Zuordnung, filtert nach SF-Kurs-IDs. Labels auf Deutsch ("Mehrjahresübersicht", "Stoffverteilung").
+- v3.22: Zoom 1 — Ist-Zustand: ActualDataCard nutzt s2StartIndex für korrekte Semester-Zuordnung, filtert nach SF-Kurs-IDs. Labels auf Deutsch ("Mehrjahresübersicht", "Stoffverteilung"). getAvailableWeeks blockiert Feiertage (type 6) und Events (type 5) explizit — auch wenn der Kurs selbst keinen Eintrag in dieser Woche hat (globale Feiertag-Erkennung).
 
 ## Architekturentscheidungen v3.11–v3.19
 - **editingSequenceId Format:** Jetzt `seqId-blockIndex` (z.B. `abc123-0`) statt nur `seqId`. WeekRows parsed dieses Format mit Regex und highlightet nur den spezifischen Block.
@@ -43,8 +43,7 @@
 
 ### 🔴 Konzeptionell / Architektur
 1. **Detailspalte / Notiz-Ansicht (Unterrichtsdurchführung):** Niederschwelliger Zugang zu Notizen, Kommentaren, Reflexion ("wie hat es mit der Klasse funktioniert"). Idee: aufklappbare Detailspalte pro Kurs (wie Excel-Gruppierung). Bei Einzelkurs-Ansicht umsetzbar. Auch Mouse-Over als Option.
-2. **Feiertage tracken:** Basis vorhanden (SpecialWeek type:'holiday'). Feiertage werden bei Import erkannt und in Settings gespeichert. Noch fehlend: Automatisches Blockieren bei Weeks-Generierung (aktuell nur via "Apply" in Settings).
-3. **Zoom 1 (Multi-Year):** "Lehrplan"-Label korrigieren, "Ist-Zustand" Ansicht überarbeiten.
+2. **Zoom 1 (Multi-Year):** Weitere Verbesserungen der Jahrgänge-Ansicht.
 
 ### 🟡 UX (nächste Runde)
 5. **Dauer-Warnung bei Verschieben (1L↔2L):** Aktuell kein reales Problem (Verschieben nur innerhalb gleicher Spalte). Relevant wenn cross-column oder Sequenz-Auto-Place erweitert wird.
@@ -79,3 +78,6 @@
 - ✅ Keyboard-Hilfe: Delete, Pfeiltasten dokumentiert
 - ✅ Materialsammlung (Sammlung-Tab): 4. Tab "📚 Sammlung" mit Archivieren (UE, Sequenz, Schuljahr, Bildungsgang) und Import (Notizen/Materiallinks optional). 💾-Buttons in FlatBlockCard.
 - ✅ Zoom 2 (Mittlere Ansicht): Komplett neu als KW-Zeilen-Layout mit Sequenz-Balken, Ferien-Kollabierung, usePlannerData()-Migration, Klick→Sequenz/Doppelklick→Zoom3.
+- ✅ Zoom 1 Ist-Zustand: ActualDataCard mit Semester-Zuordnung via s2StartIndex + Kurs-Filterung. Labels Deutsch.
+- ✅ Zoom 1 Labels: "Multi-Year Overview"→"Mehrjahresübersicht", "Lehrplan"→"Stoffverteilung".
+- ✅ Feiertage blockieren: getAvailableWeeks überspringt Wochen mit type 5/6 explizit (auch globale Feiertage). Settings auto-apply bei Speichern und App-Init.
