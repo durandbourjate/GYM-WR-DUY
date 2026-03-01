@@ -3,8 +3,8 @@ import { usePlannerStore } from '../store/plannerStore';
 import { TYPE_BADGES, getSequenceInfoFromStore } from '../utils/colors';
 import { CurriculumGoalPicker } from './CurriculumGoalPicker';
 import { SequencePanel } from './SequencePanel';
-import { suggestGoals, suggestTaxonomyLevel } from '../utils/autoSuggest';
-import type { SubjectArea, TaxonomyLevel, BlockType, LessonDetail } from '../types';
+import { suggestGoals } from '../utils/autoSuggest';
+import type { SubjectArea, BlockType, LessonDetail } from '../types';
 
 const SUBJECT_AREAS: { key: SubjectArea; label: string; color: string }[] = [
   { key: 'BWL', label: 'BWL', color: '#3b82f6' },
@@ -14,28 +14,24 @@ const SUBJECT_AREAS: { key: SubjectArea; label: string; color: string }[] = [
   { key: 'INTERDISZ', label: 'Interdisziplinär', color: '#a855f7' },
 ];
 
-const TAXONOMY_LEVELS: { key: TaxonomyLevel; label: string }[] = [
-  { key: 'K1', label: 'K1 – Wissen' },
-  { key: 'K2', label: 'K2 – Verstehen' },
-  { key: 'K3', label: 'K3 – Anwenden' },
-  { key: 'K4', label: 'K4 – Analysieren' },
-  { key: 'K5', label: 'K5 – Synthese' },
-  { key: 'K6', label: 'K6 – Beurteilen' },
-];
-
-const BLOCK_TYPES: { key: BlockType; label: string; icon: string }[] = [
+const BLOCK_TYPES_REGULAR: { key: BlockType; label: string; icon: string }[] = [
   { key: 'LESSON', label: 'Lektion', icon: '📖' },
-  { key: 'EXAM', label: 'Prüfung', icon: '📝' },
-  { key: 'EXAM_ORAL', label: 'Mündl. Prüfung', icon: '🎤' },
-  { key: 'EXAM_LONG', label: 'Langprüfung', icon: '📋' },
-  { key: 'PRESENTATION', label: 'Präsentation', icon: '🎯' },
-  { key: 'PROJECT_DUE', label: 'Projektabgabe', icon: '📦' },
   { key: 'SELF_STUDY', label: 'SOL', icon: '📚' },
   { key: 'INTRO', label: 'Einführung', icon: '🚀' },
   { key: 'DISCUSSION', label: 'Diskussion', icon: '💬' },
   { key: 'EVENT', label: 'Event/Anlass', icon: '📅' },
   { key: 'HOLIDAY', label: 'Ferien/Frei', icon: '🏖' },
 ];
+
+const BLOCK_TYPES_ASSESSMENT: { key: BlockType; label: string; icon: string }[] = [
+  { key: 'EXAM', label: 'Prüfung', icon: '📝' },
+  { key: 'EXAM_ORAL', label: 'Mündl. Prüfung', icon: '🎤' },
+  { key: 'EXAM_LONG', label: 'Langprüfung', icon: '📋' },
+  { key: 'PRESENTATION', label: 'Präsentation', icon: '🎯' },
+  { key: 'PROJECT_DUE', label: 'Projektabgabe', icon: '📦' },
+];
+
+const ALL_BLOCK_TYPES = [...BLOCK_TYPES_REGULAR, ...BLOCK_TYPES_ASSESSMENT];
 
 function PillSelect<T extends string>({
   options, value, onChange, renderOption,
@@ -62,6 +58,42 @@ function PillSelect<T extends string>({
           </button>
         );
       })}
+    </div>
+  );
+}
+
+function AssessmentDropdown({ value, onChange }: { value: BlockType | undefined; onChange: (v: BlockType | undefined) => void }) {
+  const [open, setOpen] = useState(false);
+  const isAssessment = value && BLOCK_TYPES_ASSESSMENT.some(b => b.key === value);
+  const current = isAssessment ? BLOCK_TYPES_ASSESSMENT.find(b => b.key === value) : null;
+
+  return (
+    <div className="relative inline-block mt-1">
+      <button
+        onClick={() => setOpen(!open)}
+        className={`px-1.5 py-0.5 rounded text-[9px] font-medium border cursor-pointer transition-all ${
+          isAssessment
+            ? 'bg-red-500/20 border-red-500 text-red-300'
+            : 'border-gray-600 text-gray-500 hover:text-gray-300'
+        }`}
+      >
+        {current ? `${current.icon} ${current.label}` : '📝 Beurteilung…'} {open ? '▴' : '▾'}
+      </button>
+      {open && (
+        <div className="absolute left-0 top-7 bg-slate-800 border border-slate-600 rounded-lg shadow-xl z-[80] py-1 w-40">
+          {BLOCK_TYPES_ASSESSMENT.map((bt) => (
+            <button
+              key={bt.key}
+              onClick={() => { onChange(isAssessment && value === bt.key ? undefined : bt.key); setOpen(false); }}
+              className={`w-full px-2 py-1 text-left text-[9px] cursor-pointer flex items-center gap-1.5 ${
+                value === bt.key ? 'bg-red-900/40 text-red-300' : 'text-gray-300 hover:bg-slate-700'
+              }`}
+            >
+              <span>{bt.icon}</span> {bt.label}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -134,7 +166,6 @@ function DetailsTab() {
     topicSub: detail.topicSub || parentBlock?.topicSub,
     subjectArea: detail.subjectArea || parentBlock?.subjectArea,
     curriculumGoal: detail.curriculumGoal || parentBlock?.curriculumGoal,
-    taxonomyLevel: detail.taxonomyLevel || parentBlock?.taxonomyLevel,
     blockType: detail.blockType,
     description: detail.description || parentBlock?.description,
     materialLinks: detail.materialLinks?.length ? detail.materialLinks : parentBlock?.materialLinks,
@@ -164,11 +195,6 @@ function DetailsTab() {
     if (!topic || topic.length < 2) return [];
     return suggestGoals(topic, effectiveDetail.subjectArea, 3, 0.2);
   }, [detail.topicMain, effectiveDetail.topicMain, effectiveDetail.subjectArea]);
-
-  // Phase 4: Auto-suggest taxonomy level from blockType
-  const suggestedTaxonomy = useMemo(() => {
-    return suggestTaxonomyLevel(detail.blockType);
-  }, [detail.blockType]);
 
   if (!selection || !c) {
     return (
@@ -201,10 +227,9 @@ function DetailsTab() {
               {effectiveDetail.subjectArea}
             </span>
           )}
-          {effectiveDetail.taxonomyLevel && <span className={`text-[8px] px-1 py-px rounded border border-amber-600 text-amber-400 ${!detail.taxonomyLevel && parentBlock?.taxonomyLevel ? 'opacity-60' : ''}`}>{effectiveDetail.taxonomyLevel}</span>}
           {detail.blockType && detail.blockType !== 'LESSON' && (
             <span className="text-[8px] px-1 py-px rounded border border-gray-600 text-gray-400">
-              {BLOCK_TYPES.find(b => b.key === detail.blockType)?.icon} {BLOCK_TYPES.find(b => b.key === detail.blockType)?.label}
+              {ALL_BLOCK_TYPES.find(b => b.key === detail.blockType)?.icon} {ALL_BLOCK_TYPES.find(b => b.key === detail.blockType)?.label}
             </span>
           )}
           {seqInfo && (
@@ -233,24 +258,10 @@ function DetailsTab() {
         </div>
         <div>
           <label className="text-[9px] text-gray-500 font-medium mb-1 block">Block-Typ</label>
-          <PillSelect options={BLOCK_TYPES.map(b => b.key)} value={detail.blockType}
+          <PillSelect options={BLOCK_TYPES_REGULAR.map(b => b.key)} value={detail.blockType}
             onChange={(v) => updateField('blockType', v)}
-            renderOption={(v) => { const b = BLOCK_TYPES.find(x => x.key === v)!; return { label: b.label, icon: b.icon }; }} />
-        </div>
-        <div>
-          <label className="text-[9px] text-gray-500 font-medium mb-1 block">Taxonomiestufe</label>
-          <PillSelect options={TAXONOMY_LEVELS.map(t => t.key)} value={detail.taxonomyLevel}
-            onChange={(v) => updateField('taxonomyLevel', v)}
-            renderOption={(v) => { const t = TAXONOMY_LEVELS.find(x => x.key === v)!; return { label: t.label, color: '#d97706' }; }} />
-          {/* Phase 4: Auto-suggest taxonomy from blockType */}
-          {suggestedTaxonomy && !detail.taxonomyLevel && !effectiveDetail.taxonomyLevel && (
-            <button
-              onClick={() => updateField('taxonomyLevel', suggestedTaxonomy)}
-              className="mt-1 text-[8px] text-amber-500/70 hover:text-amber-400 cursor-pointer transition-colors"
-              title={`Basierend auf Block-Typ "${BLOCK_TYPES.find(b => b.key === detail.blockType)?.label}"`}>
-              💡 Vorschlag: {suggestedTaxonomy} — {TAXONOMY_LEVELS.find(t => t.key === suggestedTaxonomy)?.label.split(' – ')[1]}
-            </button>
-          )}
+            renderOption={(v) => { const b = BLOCK_TYPES_REGULAR.find(x => x.key === v)!; return { label: b.label, icon: b.icon }; }} />
+          <AssessmentDropdown value={detail.blockType} onChange={(v) => updateField('blockType', v)} />
         </div>
         <div>
           <label className="text-[9px] text-gray-500 font-medium mb-1 block">Thema</label>

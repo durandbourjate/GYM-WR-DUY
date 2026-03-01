@@ -82,7 +82,7 @@ interface PlannerState {
   migrateStaticSequences: () => void;
   fixSequenceTitles: () => void;
   addSequence: (seq: Omit<ManagedSequence, 'id' | 'createdAt' | 'updatedAt'>) => string;
-  updateSequence: (id: string, updates: Partial<Pick<ManagedSequence, 'title' | 'subjectArea' | 'blocks' | 'color' | 'courseId'>>) => void;
+  updateSequence: (id: string, updates: Partial<Pick<ManagedSequence, 'title' | 'subjectArea' | 'blocks' | 'color' | 'courseId' | 'courseIds' | 'multiDayMode'>>) => void;
   deleteSequence: (id: string) => void;
   addBlockToSequence: (seqId: string, block: SequenceBlock) => void;
   updateBlockInSequence: (seqId: string, blockIndex: number, block: Partial<SequenceBlock>) => void;
@@ -141,15 +141,40 @@ export const usePlannerStore = create<PlannerState>()(
     const state = get();
     const fromKey = state.lastSelectedKey;
     if (!fromKey) {
-      // No previous selection — just select this one
       set({ multiSelection: [toKey], lastSelectedKey: toKey });
       return;
     }
-    // Parse keys: "weekW-courseId"
     const [fromWeek, fromCourseId] = fromKey.split('-');
     const [toWeek, toCourseId] = toKey.split('-');
-    // Only range-select within same column
+
+    // Check if both courses belong to the same class+type (linked courses, e.g. Di+Do)
+    const fromCourse = courses.find(c => c.id === fromCourseId);
+    const toCourse = courses.find(c => c.id === toCourseId);
+    const areLinked = fromCourse && toCourse &&
+      fromCourse.cls === toCourse.cls && fromCourse.typ === toCourse.typ &&
+      fromCourseId !== toCourseId;
+
+    if (areLinked) {
+      // Cross-day selection: select all weeks in range for BOTH course columns
+      const fromIdx = allWeeks.indexOf(fromWeek);
+      const toIdx = allWeeks.indexOf(toWeek);
+      if (fromIdx < 0 || toIdx < 0) return;
+      const startIdx = Math.min(fromIdx, toIdx);
+      const endIdx = Math.max(fromIdx, toIdx);
+      const rangeKeys: string[] = [];
+      for (let i = startIdx; i <= endIdx; i++) {
+        rangeKeys.push(`${allWeeks[i]}-${fromCourseId}`);
+        rangeKeys.push(`${allWeeks[i]}-${toCourseId}`);
+      }
+      set((s) => ({
+        multiSelection: Array.from(new Set([...s.multiSelection, ...rangeKeys])),
+        lastSelectedKey: toKey,
+      }));
+      return;
+    }
+
     if (fromCourseId !== toCourseId) {
+      // Different, unlinked courses — just add this one
       set((s) => ({
         multiSelection: s.multiSelection.includes(toKey)
           ? s.multiSelection
@@ -158,6 +183,8 @@ export const usePlannerStore = create<PlannerState>()(
       }));
       return;
     }
+
+    // Same column range selection
     const fromIdx = allWeeks.indexOf(fromWeek);
     const toIdx = allWeeks.indexOf(toWeek);
     if (fromIdx < 0 || toIdx < 0) return;
@@ -167,11 +194,25 @@ export const usePlannerStore = create<PlannerState>()(
     for (let i = startIdx; i <= endIdx; i++) {
       rangeKeys.push(`${allWeeks[i]}-${fromCourseId}`);
     }
-    // Merge with existing selection (union)
-    set((s) => {
-      const merged = new Set([...s.multiSelection, ...rangeKeys]);
-      return { multiSelection: Array.from(merged), lastSelectedKey: toKey };
-    });
+
+    // Check if same-column range should prompt for linked day
+    const linkedCourseIds = getLinkedCourseIds(fromCourseId);
+    if (linkedCourseIds.length > 1) {
+      const otherCourseId = linkedCourseIds.find(id => id !== fromCourseId);
+      if (otherCourseId) {
+        const otherCourse = courses.find(c => c.id === otherCourseId);
+        if (otherCourse && confirm(`Auch ${otherCourse.day} einschliessen?`)) {
+          for (let i = startIdx; i <= endIdx; i++) {
+            rangeKeys.push(`${allWeeks[i]}-${otherCourseId}`);
+          }
+        }
+      }
+    }
+
+    set((s) => ({
+      multiSelection: Array.from(new Set([...s.multiSelection, ...rangeKeys])),
+      lastSelectedKey: toKey,
+    }));
   },
   clearMultiSelect: () => set({ multiSelection: [], lastSelectedKey: null }),
   showHelp: false,
@@ -356,9 +397,7 @@ export const usePlannerStore = create<PlannerState>()(
       return course ? course.col : parseInt(cid.replace('c', ''));
     }).filter(c => !isNaN(c));
     if (cols.length === 0) return { placed: 0, skipped: [] };
-    
-    const primaryCol = cols[0];
-    
+
     // Get available weeks based on primary column
     const available = state.getAvailableWeeks(seq.courseId, startWeek, allWeekOrder);
     

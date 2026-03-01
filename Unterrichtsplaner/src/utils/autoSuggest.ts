@@ -1,5 +1,5 @@
 import { CURRICULUM_GOALS, type CurriculumGoal } from '../data/curriculumGoals';
-import type { SubjectArea, TaxonomyLevel, BlockType } from '../types';
+import type { SubjectArea } from '../types';
 
 /**
  * Phase 4: Auto-Suggest Lehrplanziele
@@ -107,27 +107,4 @@ export function suggestGoals(
     .slice(0, maxResults);
 
   return scored;
-}
-
-/**
- * Phase 4: Auto-Suggest Taxonomiestufe
- * 
- * Maps BlockType to a suggested taxonomy level based on
- * Bloom's taxonomy alignment with activity types.
- */
-export const BLOCK_TYPE_TAXONOMY_MAP: Partial<Record<BlockType, TaxonomyLevel>> = {
-  INTRO: 'K1',        // Einführung → Wissen
-  LESSON: 'K2',       // Lektion → Verstehen
-  SELF_STUDY: 'K3',   // SOL → Anwenden
-  DISCUSSION: 'K4',   // Diskussion → Analysieren
-  PRESENTATION: 'K5', // Präsentation → Synthese
-  EXAM: 'K3',         // Prüfung → Anwenden
-  EXAM_ORAL: 'K4',    // Mündl. Prüfung → Analysieren
-  EXAM_LONG: 'K5',    // Langprüfung → Synthese
-  PROJECT_DUE: 'K5',  // Projektabgabe → Synthese
-};
-
-export function suggestTaxonomyLevel(blockType?: BlockType): TaxonomyLevel | undefined {
-  if (!blockType) return undefined;
-  return BLOCK_TYPE_TAXONOMY_MAP[blockType];
 }

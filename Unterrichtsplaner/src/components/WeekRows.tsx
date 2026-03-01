@@ -53,9 +53,6 @@ function HoverPreview({ week, col, courses }: { week: string; col: number; cours
       {detail?.subjectArea && (
         <span className="text-[8px] px-1 py-px rounded border border-gray-600 text-gray-400 mr-1">{detail.subjectArea}</span>
       )}
-      {detail?.taxonomyLevel && (
-        <span className="text-[8px] px-1 py-px rounded border border-amber-600 text-amber-400 mr-1">{detail.taxonomyLevel}</span>
-      )}
       {detail?.blockType && detail.blockType !== 'LESSON' && (
         <span className="text-[8px] px-1 py-px rounded border border-gray-600 text-gray-400">{detail.blockType}</span>
       )}
@@ -258,10 +255,6 @@ export function WeekRows({ weeks, courses, currentRef }: Props) {
               const title = entry?.title || '';
               const lessonType = entry?.type ?? -1;
               const colors = lessonType >= 0 ? LESSON_COLORS[lessonType as keyof typeof LESSON_COLORS] : null;
-              // Use SubjectArea color if available (more precise than LessonType)
-              const effectiveSubjectArea = cellDetail?.subjectArea || parentBlock?.subjectArea;
-              const saColors = effectiveSubjectArea ? SUBJECT_AREA_COLORS[effectiveSubjectArea] : null;
-              const cellColors = saColors || colors;
               const isSelected = selection?.week === week.w && selection?.courseId === c.id;
               const isMulti = multiSelection.includes(`${week.w}-${c.id}`);
               const isEditing = editing?.week === week.w && editing?.col === c.col;
@@ -274,6 +267,18 @@ export function WeekRows({ weeks, courses, currentRef }: Props) {
               const showPreview = isHovered && showHoverPreview && title && !isSelected;
               const showEmptyMenu = emptyCellMenu?.week === week.w && emptyCellMenu?.course.id === c.id;
 
+              // Lesson detail for display (with block inheritance)
+              const cellDetail = lessonDetails[`${week.w}-${c.col}`];
+              const parentBlock = seq ? (() => {
+                const parentSeq = sequences.find(s => s.id === seq.sequenceId);
+                return parentSeq?.blocks.find(b => b.weeks.includes(week.w));
+              })() : null;
+
+              // Use SubjectArea color if available (more precise than LessonType)
+              const effectiveSubjectArea = cellDetail?.subjectArea || parentBlock?.subjectArea;
+              const saColors = effectiveSubjectArea ? SUBJECT_AREA_COLORS[effectiveSubjectArea] : null;
+              const cellColors = saColors || colors;
+
               // Sequence highlight: is this cell part of the currently edited sequence?
               const editingSeq = editingSequenceId ? sequences.find(s => s.id === editingSequenceId) : null;
               const editingSeqMatchesCourse = editingSeq && (
@@ -282,13 +287,6 @@ export function WeekRows({ weeks, courses, currentRef }: Props) {
               );
               const isInEditingSeq = editingSeqMatchesCourse && editingSeq?.blocks.some(b => b.weeks.includes(week.w));
               const isSeqDimmed = editingSeqMatchesCourse && !isInEditingSeq && !!title;
-
-              // Lesson detail for display (with block inheritance)
-              const cellDetail = lessonDetails[`${week.w}-${c.col}`];
-              const parentBlock = seq ? (() => {
-                const parentSeq = sequences.find(s => s.id === seq.sequenceId);
-                return parentSeq?.blocks.find(b => b.weeks.includes(week.w));
-              })() : null;
               const effectiveTopicMain = cellDetail?.topicMain || parentBlock?.topicMain;
               const effectiveTopicSub = cellDetail?.topicSub || parentBlock?.topicSub;
               const displayTitle = effectiveTopicMain
@@ -332,7 +330,6 @@ export function WeekRows({ weeks, courses, currentRef }: Props) {
                   }}
                   onClick={(e) => {
                     if (e.shiftKey || e.metaKey || e.ctrlKey) {
-                      // Multi-select works on both filled and empty cells
                       if (e.shiftKey) {
                         selectRange(`${week.w}-${c.id}`, allWeekKeys, courses);
                       } else {
@@ -341,6 +338,9 @@ export function WeekRows({ weeks, courses, currentRef }: Props) {
                     } else if (title) {
                       handleClick(week.w, c, title, e);
                     } else {
+                      // Click on empty cell: clear selections first, then show menu
+                      clearMultiSelect();
+                      setSelection(null);
                       handleEmptyCellClick(week.w, c);
                     }
                   }}
@@ -348,39 +348,65 @@ export function WeekRows({ weeks, courses, currentRef }: Props) {
                   onMouseEnter={() => title && handleMouseEnter(week.w, c.col)}
                   onMouseLeave={handleMouseLeave}
                   onDragOver={(e) => {
-                    if (dragSource && dragSource.col === c.col) {
-                      e.preventDefault();
-                      e.dataTransfer.dropEffect = 'move';
-                      setDropTarget({ week: week.w, col: c.col });
+                    if (dragSource) {
+                      const dragCourse = courses.find(cc => cc.col === dragSource.col);
+                      const dragKey = dragCourse ? `${dragSource.week}-${dragCourse.id}` : '';
+                      const isGroupDrag = multiSelection.length > 1 && multiSelection.includes(dragKey);
+                      if (isGroupDrag || dragSource.col === c.col) {
+                        e.preventDefault();
+                        e.dataTransfer.dropEffect = 'move';
+                        setDropTarget({ week: week.w, col: c.col });
+                      }
                     }
                   }}
                   onDragLeave={() => setDropTarget(null)}
                   onDrop={(e) => {
                     e.preventDefault();
                     setDropTarget(null);
-                    if (!dragSource || dragSource.col !== c.col) return;
-                    if (dragSource.week === week.w) return;
+                    if (!dragSource) return;
+                    if (dragSource.week === week.w && dragSource.col === c.col) return;
                     // Don't allow dropping onto fixed cells
                     if (isFixed) return;
 
                     // Check if dragging a multi-selected group
-                    const dragKey = `${dragSource.week}-${courses.find(cc => cc.col === dragSource.col)?.id}`;
+                    const dragCourse = courses.find(cc => cc.col === dragSource.col);
+                    const dragKey = dragCourse ? `${dragSource.week}-${dragCourse.id}` : '';
                     const isGroupDrag = multiSelection.length > 1 && multiSelection.includes(dragKey);
 
                     if (isGroupDrag) {
-                      // Group drag: move all selected cells in this column to target position
-                      const courseForCol = courses.find(cc => cc.col === c.col);
-                      if (!courseForCol) return;
-                      const selectedWeeksInCol = multiSelection
-                        .filter(k => k.endsWith(`-${courseForCol.id}`))
-                        .map(k => k.split('-')[0]);
-                      if (selectedWeeksInCol.length > 0) {
-                        moveGroup(c.col, selectedWeeksInCol, week.w, allWeekKeys);
+                      // Group drag: move all selected cells by column to target position
+                      // Group selections by column (col)
+                      const byCol = new Map<number, string[]>();
+                      for (const key of multiSelection) {
+                        const parts = key.split('-');
+                        const cid = parts[parts.length - 1];
+                        const wk = parts.slice(0, parts.length - 1).join('-');
+                        const course = courses.find(cc => cc.id === cid);
+                        if (course) {
+                          if (!byCol.has(course.col)) byCol.set(course.col, []);
+                          byCol.get(course.col)!.push(wk);
+                        }
                       }
-                    } else if (title) {
-                      swapLessons(c.col, dragSource.week, week.w);
-                    } else {
-                      moveLessonToEmpty(c.col, dragSource.week, week.w);
+                      // Calculate week offset from dragSource to drop target
+                      const fromIdx = allWeekKeys.indexOf(dragSource.week);
+                      const toIdx = allWeekKeys.indexOf(week.w);
+                      if (fromIdx >= 0 && toIdx >= 0) {
+                        const offset = toIdx - fromIdx;
+                        // Move each column's group by the same offset
+                        for (const [col, weeks] of byCol) {
+                          const sorted = [...weeks].sort((a, b) => allWeekKeys.indexOf(a) - allWeekKeys.indexOf(b));
+                          const targetWeek = allWeekKeys[allWeekKeys.indexOf(sorted[0]) + offset];
+                          if (targetWeek) {
+                            moveGroup(col, sorted, targetWeek, allWeekKeys);
+                          }
+                        }
+                      }
+                    } else if (dragSource.col === c.col) {
+                      if (title) {
+                        swapLessons(c.col, dragSource.week, week.w);
+                      } else {
+                        moveLessonToEmpty(c.col, dragSource.week, week.w);
+                      }
                     }
                     setDragSource(null);
                   }}
@@ -483,7 +509,14 @@ export function WeekRows({ weeks, courses, currentRef }: Props) {
                       {lessonType === 4 && <span className="mr-0.5 text-[8px]">📝</span>}
                       {isFixed && <span className="mr-0.5 text-[8px]">{lessonType === 6 ? '🏖' : '📅'}</span>}
                       <div
-                        className="leading-tight overflow-hidden flex-1"
+                        className="leading-tight overflow-hidden flex-1 cursor-pointer"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelection({ week: week.w, courseId: c.id, title, course: c });
+                          setSidePanelOpen(true);
+                          setSidePanelTab('details');
+                        }}
+                        title="Klick: Details öffnen"
                         style={{
                           fontSize: c.les >= 2 ? 9 : 8,
                           fontWeight: lessonType === 4 || isFixed ? 700 : 500,
@@ -494,6 +527,7 @@ export function WeekRows({ weeks, courses, currentRef }: Props) {
                         }}
                       >
                         {displayTitle}
+                        <span className="text-[7px] opacity-40 ml-0.5">ⓘ</span>
                       </div>
 
                       {/* Mini action buttons on selection */}

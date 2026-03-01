@@ -58,7 +58,9 @@ function App() {
       }
       if (e.key === 'Escape') {
         const state = usePlannerStore.getState();
-        if (state.sidePanelOpen) {
+        if (state.multiSelection.length > 0) {
+          state.clearMultiSelect();
+        } else if (state.sidePanelOpen) {
           state.setSidePanelOpen(false);
           state.setSequencePanelOpen(false);
         } else if (state.selection) {
