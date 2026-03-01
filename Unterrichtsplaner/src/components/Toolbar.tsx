@@ -238,6 +238,13 @@ export function AppHeader() {
         </button>
         {showTaF && <TaFPanel onClose={() => setShowTaF(false)} />}
         <button
+          onClick={() => usePlannerStore.getState().setSettingsOpen(true)}
+          className="px-2 py-0.5 rounded text-[10px] border border-gray-700 text-gray-500 cursor-pointer hover:text-blue-300 hover:border-blue-700"
+          title="Einstellungen"
+        >
+          ⚙️
+        </button>
+        <button
           onClick={() => setShowExcel(true)}
           className="px-2 py-0.5 rounded text-[10px] border border-gray-700 text-gray-500 cursor-pointer hover:text-green-300 hover:border-green-700"
           title="Excel-Import"

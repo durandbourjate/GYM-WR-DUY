@@ -7,6 +7,7 @@ import { WeekRows } from './components/WeekRows';
 import { AppHeader, HelpBar, MultiSelectToolbar, Legend } from './components/Toolbar';
 import { DetailPanel } from './components/DetailPanel';
 import { InsertDialog } from './components/InsertDialog';
+import { SettingsPanel } from './components/SettingsPanel';
 import { ZoomBlockView } from './components/ZoomBlockView';
 import { ZoomMultiYearView } from './components/ZoomMultiYearView';
 
@@ -64,7 +65,9 @@ function App() {
       }
       if (e.key === 'Escape') {
         const state = usePlannerStore.getState();
-        if (state.insertDialog) {
+        if (state.settingsOpen) {
+          state.setSettingsOpen(false);
+        } else if (state.insertDialog) {
           state.setInsertDialog(null);
         } else if (state.multiSelection.length > 0) {
           state.clearMultiSelect();
@@ -152,6 +155,7 @@ function App() {
       </div>
 
       <DetailPanel />
+      <SettingsPanel />
     </div>
   );
 }

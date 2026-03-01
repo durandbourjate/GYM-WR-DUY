@@ -68,8 +68,8 @@ interface PlannerState {
   // Phase 1: Side panel
   sidePanelOpen: boolean;
   setSidePanelOpen: (v: boolean) => void;
-  sidePanelTab: 'details' | 'sequences';
-  setSidePanelTab: (t: 'details' | 'sequences') => void;
+  sidePanelTab: 'details' | 'sequences' | 'settings';
+  setSidePanelTab: (t: 'details' | 'sequences' | 'settings') => void;
   hoveredCell: { week: string; col: number } | null;
   setHoveredCell: (c: { week: string; col: number } | null) => void;
   // Empty cell action
@@ -113,6 +113,9 @@ interface PlannerState {
   undoStack: Week[][];
   pushUndo: () => void;
   undo: () => void;
+  // Settings
+  settingsOpen: boolean;
+  setSettingsOpen: (v: boolean) => void;
 }
 
 export const usePlannerStore = create<PlannerState>()(
@@ -823,6 +826,8 @@ export const usePlannerStore = create<PlannerState>()(
         undoStack: state.undoStack.slice(0, -1),
       };
     }),
+  settingsOpen: false,
+  setSettingsOpen: (v) => set({ settingsOpen: v }),
     }),
     {
       name: 'unterrichtsplaner-storage',
