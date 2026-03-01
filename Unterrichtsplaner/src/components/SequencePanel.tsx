@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { usePlannerStore } from '../store/plannerStore';
 import { usePlannerData } from '../hooks/usePlannerData';
 import { SUBJECT_AREA_COLORS } from '../utils/colors';
@@ -39,8 +39,16 @@ function FlatBlockCard({ fb }: { fb: FlatBlockInfo }) {
   const [showLessons, setShowLessons] = useState(false);
   const [showSeriesFields, setShowSeriesFields] = useState(false);
 
+  // When card becomes active (after re-mount from group change), auto-open fields
   const blockKey = `${fb.seqId}-${fb.blockIndex}`;
   const isActive = editingSequenceId === blockKey;
+
+  // Re-open fields section when component re-mounts while still active
+  // (happens when subjectArea change causes group re-assignment)
+  useEffect(() => {
+    if (isActive && !showFields) setShowFields(true);
+  }, []); // only on mount
+
   const block = fb.block;
   const sa = block.subjectArea || fb.seqSubjectArea;
   const blockColor = sa ? SUBJECT_AREA_COLORS[sa]?.bg : fb.seqColor;
@@ -71,7 +79,11 @@ function FlatBlockCard({ fb }: { fb: FlatBlockInfo }) {
       }}>
       {/* Compact header — always visible */}
       <div className="px-2 py-1.5 flex items-center gap-1.5 cursor-pointer hover:bg-slate-800/30"
-        onClick={() => setEditingSequenceId(isActive ? null : blockKey)}>
+        onClick={() => {
+          const willActivate = !isActive;
+          setEditingSequenceId(willActivate ? blockKey : null);
+          if (willActivate) navigateToBlock();
+        }}>
         <div className="w-1 h-5 rounded-full shrink-0" style={{ background: blockColor || fb.seqColor || '#16a34a' }} />
         <div className="flex-1 min-w-0">
           <div className="text-[10px] font-semibold text-gray-200 truncate">{block.label}</div>
@@ -88,20 +100,21 @@ function FlatBlockCard({ fb }: { fb: FlatBlockInfo }) {
       {/* Expanded content */}
       {isActive && (
         <div className="px-2 pb-2 pt-0.5 border-t border-slate-700/50 space-y-1.5">
-          {/* Quick actions row */}
-          <div className="flex gap-1 items-center">
-            <button onClick={navigateToBlock} className="text-[8px] text-blue-400 hover:text-blue-300 cursor-pointer px-1">↗ Im Planer</button>
+          {/* Quick actions + tab-style toggles */}
+          <div className="flex gap-0.5 items-center">
+            <button onClick={navigateToBlock} className="text-[8px] text-blue-400 hover:text-blue-300 cursor-pointer px-1.5 py-0.5">↗ Im Planer</button>
+            <span className="text-slate-700 mx-0.5">│</span>
             <button onClick={() => setShowFields(!showFields)}
-              className="text-[8px] text-gray-400 hover:text-gray-200 cursor-pointer px-1">
-              {showFields ? '▾' : '▸'} Felder
+              className={`text-[8px] cursor-pointer px-1.5 py-0.5 rounded-t border-b-2 transition-colors ${showFields ? 'text-gray-200 bg-slate-800/50 border-blue-400 font-medium' : 'text-gray-500 hover:text-gray-300 border-transparent'}`}>
+              Felder
             </button>
             <button onClick={() => setShowLessons(!showLessons)}
-              className="text-[8px] text-gray-400 hover:text-gray-200 cursor-pointer px-1">
-              {showLessons ? '▾' : '▸'} Lektionen ({block.weeks.length})
+              className={`text-[8px] cursor-pointer px-1.5 py-0.5 rounded-t border-b-2 transition-colors ${showLessons ? 'text-gray-200 bg-slate-800/50 border-blue-400 font-medium' : 'text-gray-500 hover:text-gray-300 border-transparent'}`}>
+              Lektionen ({block.weeks.length})
             </button>
             <button onClick={() => setShowSeriesFields(!showSeriesFields)}
-              className="text-[8px] text-amber-500 hover:text-amber-400 cursor-pointer px-1 ml-auto">
-              {showSeriesFields ? '▾' : '▸'} Reihe
+              className={`text-[8px] cursor-pointer px-1.5 py-0.5 rounded-t border-b-2 transition-colors ml-auto ${showSeriesFields ? 'text-amber-300 bg-amber-900/20 border-amber-400 font-medium' : 'text-amber-600 hover:text-amber-400 border-transparent'}`}>
+              Reihe
             </button>
           </div>
 

@@ -6,7 +6,7 @@ export const LESSON_COLORS: Record<LessonType, { bg: string; fg: string; border:
   2: { bg: '#fff7ed', fg: '#9a3412', border: '#fdba74' }, // VWL (orange) — legacy: was Recht/VWL combined
   3: { bg: '#f3f4f6', fg: '#4b5563', border: '#d1d5db' }, // IN (grau)
   4: { bg: '#fee2e2', fg: '#991b1b', border: '#fca5a5' }, // Exam
-  5: { bg: '#fef9c3', fg: '#854d0e', border: '#fde68a' }, // Event
+  5: { bg: '#e5e7eb', fg: '#4b5563', border: '#d1d5db' }, // Event (grau)
   6: { bg: '#ffffff', fg: '#a1a1aa', border: '#e4e4e7' }, // Holiday
 };
 

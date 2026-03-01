@@ -108,3 +108,28 @@ export function suggestGoals(
 
   return scored;
 }
+
+/**
+ * Infer subject area from a topic string by finding the best-matching
+ * curriculum goal and returning its area. Returns undefined if no
+ * confident match is found (score < 0.35).
+ */
+export function suggestSubjectArea(topicMain: string): SubjectArea | undefined {
+  const queryTokens = tokenize(topicMain);
+  if (queryTokens.length === 0) return undefined;
+
+  let bestScore = 0;
+  let bestArea: SubjectArea | undefined;
+
+  for (const goal of CURRICULUM_GOALS) {
+    // Score without subject area bonus to get unbiased match
+    const { score } = scoreGoal(queryTokens, goal);
+    if (score > bestScore) {
+      bestScore = score;
+      bestArea = goal.area;
+    }
+  }
+
+  // Only return if we have a confident match
+  return bestScore >= 0.35 ? bestArea : undefined;
+}

@@ -83,7 +83,7 @@ function HoverPreview({ week, col, courses }: { week: string; col: number; cours
 }
 
 /* Empty cell context menu */
-function EmptyCellMenu({ week, course, onClose, selectedWeeks }: { week: string; course: Course; onClose: () => void; selectedWeeks?: string[] }) {
+function EmptyCellMenu({ week, course, onClose, selectedWeeks, position }: { week: string; course: Course; onClose: () => void; selectedWeeks?: string[]; position?: { x: number; y: number } }) {
   const { updateLesson, pushUndo, addSequence, setSidePanelOpen, setSidePanelTab, setSelection, setEditingSequenceId } = usePlannerStore();
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -124,7 +124,10 @@ function EmptyCellMenu({ week, course, onClose, selectedWeeks }: { week: string;
 
   return (
     <div ref={menuRef} className="absolute z-[80] bg-slate-800 border border-slate-600 rounded-lg shadow-xl py-1 w-36"
-      style={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
+      style={position
+        ? { top: position.y, left: position.x, transform: 'translate(-25%, -25%)' }
+        : { top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }
+      }>
       <button onClick={handleNewLesson}
         className="w-full px-3 py-1.5 text-left text-[10px] text-gray-200 hover:bg-slate-700 cursor-pointer flex items-center gap-2">
         <span>📖</span> Neue Kachel
@@ -158,6 +161,7 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
   const [showHoverPreview, setShowHoverPreview] = useState(false);
   const hoverTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [emptyCellMenu, setEmptyCellMenu] = useState<{ week: string; course: Course } | null>(null);
+  const [menuPosition, setMenuPosition] = useState<{ x: number; y: number } | undefined>(undefined);
 
   // Drag-selection for empty cells
   const [isDragSelecting, setIsDragSelecting] = useState(false);
@@ -420,10 +424,17 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                   onMouseLeave={handleMouseLeave}
                   onClick={(e) => {
                     if (e.shiftKey || e.metaKey || e.ctrlKey) {
-                      if (e.shiftKey) {
-                        selectRange(`${week.w}-${c.id}`, allWeekKeys, courses);
+                      if (title) {
+                        if (e.shiftKey) {
+                          selectRange(`${week.w}-${c.id}`, allWeekKeys, courses);
+                        } else {
+                          toggleMultiSelect(`${week.w}-${c.id}`);
+                        }
                       } else {
-                        toggleMultiSelect(`${week.w}-${c.id}`);
+                        // Cmd/Ctrl+Click on empty cell: show context menu at cursor position
+                        const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                        setMenuPosition({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+                        setEmptyCellMenu({ week: week.w, course: c });
                       }
                     } else if (title) {
                       handleClick(week.w, c, title, e);
@@ -508,9 +519,9 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                   }}
                 >
                   {/* Sequence bar */}
-                  {seq && (
+                  {seq && title && (
                     <div
-                      className="absolute left-0 w-[3px] opacity-70 cursor-pointer"
+                      className="absolute left-0 w-[5px] opacity-80 cursor-pointer hover:opacity-100 hover:w-[7px] transition-all"
                       style={{
                         top: seq.isFirst ? 3 : 0,
                         bottom: seq.isLast ? 3 : 0,
@@ -529,7 +540,7 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                       title={`Sequenz öffnen: ${seq.label}`}
                     />
                   )}
-                  {seq?.isFirst && (
+                  {seq?.isFirst && title && (
                     <div className="absolute left-1.5 -top-0.5 text-[6px] font-bold z-10 bg-[#0c0f1a] px-0.5 rounded whitespace-nowrap cursor-pointer"
                       style={{ color: seq.color || '#4ade80' }}
                       onClick={(e) => {
@@ -666,8 +677,9 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                     <EmptyCellMenu
                       week={week.w}
                       course={c}
-                      onClose={() => { setEmptyCellMenu(null); setDragSelectedWeeks([]); setDragSelectCol(null); setDragSelectCourse(null); }}
+                      onClose={() => { setEmptyCellMenu(null); setMenuPosition(undefined); setDragSelectedWeeks([]); setDragSelectCol(null); setDragSelectCourse(null); }}
                       selectedWeeks={dragSelectedWeeks.length > 1 ? dragSelectedWeeks : undefined}
+                      position={menuPosition}
                     />
                   )}
                 </td>

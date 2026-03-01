@@ -5,7 +5,7 @@ import { TYPE_BADGES, getSequenceInfoFromStore } from '../utils/colors';
 import { CurriculumGoalPicker } from './CurriculumGoalPicker';
 import { SequencePanel } from './SequencePanel';
 import { SettingsPanel } from './SettingsPanel';
-import { suggestGoals } from '../utils/autoSuggest';
+import { suggestGoals, suggestSubjectArea } from '../utils/autoSuggest';
 import type { SubjectArea, BlockCategory, LessonDetail, SolDetails } from '../types';
 
 const SUBJECT_AREAS: { key: SubjectArea; label: string; color: string }[] = [
@@ -483,13 +483,27 @@ function DetailsTab() {
     });
   }, [selection?.week, c?.col, updateLessonDetail, effectiveCategory]);
 
-  // Auto-detect subjectArea from LessonType
+  // Auto-detect subjectArea from LessonType (unambiguous types only)
   useEffect(() => {
     if (!selection || !c || detail.subjectArea || !currentLesson) return;
-    const autoMap: Record<number, SubjectArea> = { 1: 'BWL', 2: 'RECHT', 3: 'IN' };
+    // Only auto-set for unambiguous types: 1=BWL, 3=IN
+    // Type 2 (Recht/VWL) is ambiguous → handled by topic-based detection below
+    const autoMap: Record<number, SubjectArea> = { 1: 'BWL', 3: 'IN' };
     const detected = autoMap[currentLesson.type];
     if (detected) updateLessonDetail(selection.week, c.col, { subjectArea: detected });
   }, [selection?.week, c?.col, currentLesson?.type, detail.subjectArea]);
+
+  // Auto-detect subjectArea from topicMain (for ambiguous lesson types: 0, 2)
+  useEffect(() => {
+    if (!selection || !c || detail.subjectArea) return;
+    // Only run when lesson type is ambiguous (0=other, 2=Recht/VWL) or undefined
+    const lessonType = currentLesson?.type;
+    if (lessonType !== undefined && lessonType !== 0 && lessonType !== 2) return;
+    const topic = detail.topicMain || effectiveDetail.topicMain;
+    if (!topic || topic.length < 3) return;
+    const suggested = suggestSubjectArea(topic);
+    if (suggested) updateLessonDetail(selection.week, c.col, { subjectArea: suggested });
+  }, [selection?.week, c?.col, detail.topicMain, effectiveDetail.topicMain, detail.subjectArea, currentLesson?.type]);
 
   // Auto-suggest curriculum goals
   const goalSuggestions = useMemo(() => {

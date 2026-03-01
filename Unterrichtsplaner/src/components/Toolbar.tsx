@@ -439,11 +439,12 @@ export function Legend() {
     <div className="px-4 py-1 flex gap-2.5 flex-wrap text-[8px] text-gray-400 border-b border-slate-900/60">
       {[
         ['BWL', '#dbeafe'],
-        ['Recht/VWL', '#dcfce7'],
-        ['IN', '#e0f2fe'],
+        ['VWL', '#fff7ed'],
+        ['Recht', '#dcfce7'],
+        ['IN', '#f3f4f6'],
         ['Prüfung', '#fee2e2'],
-        ['Event', '#fef9c3'],
-        ['Ferien', '#fff'],
+        ['Event', '#e5e7eb'],
+        ['Ferien', '#ffffff'],
       ].map(([label, bg]) => (
         <span key={label} className="flex items-center gap-0.5">
           <span
