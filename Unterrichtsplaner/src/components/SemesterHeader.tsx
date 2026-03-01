@@ -8,7 +8,7 @@ interface Props {
   weeks?: Week[];
 }
 
-const NOTE_COL_W = 100; // px width of note column
+const NOTE_COL_W = 200; // px width of note column (default)
 
 export function SemesterHeader({ courses, semester, weeks }: Props) {
   const { classFilter, setClassFilter, setFilter, expandedNoteCols, toggleNoteCol } = usePlannerStore();
@@ -76,12 +76,12 @@ export function SemesterHeader({ courses, semester, weeks }: Props) {
                   </div>
                   <button
                     onClick={(e) => { e.stopPropagation(); toggleNoteCol(c.id); }}
-                    className={`text-[8px] px-0.5 rounded cursor-pointer transition-all ${
-                      expanded ? 'text-blue-400 bg-blue-900/30' : 'text-gray-600 hover:text-gray-400'
+                    className={`text-[9px] px-1 py-0.5 rounded cursor-pointer transition-all ${
+                      expanded ? 'text-blue-400 bg-blue-900/40 border border-blue-700/50' : 'text-gray-500 hover:text-gray-300 bg-slate-800/60 hover:bg-slate-700/60'
                     }`}
                     title={expanded ? 'Notizen-Spalte ausblenden' : 'Notizen-Spalte einblenden'}
                   >
-                    {expanded ? '◂' : '▸'}
+                    {expanded ? '📝◂' : '📝▸'}
                   </button>
                 </div>
                 <div className="flex gap-0.5 justify-center mt-0.5 flex-wrap">

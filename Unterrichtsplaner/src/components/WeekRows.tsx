@@ -40,6 +40,8 @@ const SUBJECT_AREA_COLORS_PREVIEW: Record<string, string> = {
 
 function HoverPreview({ week, col, courses, courseIndex, totalCourses }: { week: string; col: number; courses: Course[]; courseIndex: number; totalCourses: number }) {
   const { lessonDetails, weekData, sequences } = usePlannerStore();
+  const previewRef = useRef<HTMLDivElement>(null);
+  const [showAbove, setShowAbove] = useState(false);
   const key = `${week}-${col}`;
   const detail = lessonDetails[key];
   const weekEntry = weekData.find(w => w.w === week);
@@ -62,6 +64,14 @@ function HoverPreview({ week, col, courses, courseIndex, totalCourses }: { week:
   // Smart positioning: show left if course is in the right third of columns
   const showLeft = courseIndex > totalCourses * 0.6;
 
+  // Vertical positioning: check on mount if parent cell is near viewport bottom
+  useEffect(() => {
+    if (previewRef.current?.parentElement) {
+      const rect = previewRef.current.parentElement.getBoundingClientRect();
+      setShowAbove(rect.bottom > window.innerHeight * 0.65);
+    }
+  }, []);
+
   // Check if there's meaningful content beyond title/topic
   const hasNotes = !!(detail?.notes);
   const hasDescription = !!(detail?.description);
@@ -72,9 +82,13 @@ function HoverPreview({ week, col, courses, courseIndex, totalCourses }: { week:
 
   return (
     <div
-      className="absolute top-0 bg-slate-800 border border-slate-600 rounded-lg shadow-2xl z-[80] pointer-events-none"
+      ref={previewRef}
+      className="absolute bg-slate-800 border border-slate-600 rounded-lg shadow-2xl z-[80] pointer-events-none"
       style={{
         width: hasExtras ? 280 : 224,
+        ...(showAbove
+          ? { bottom: '100%', top: 'auto', marginBottom: 4 }
+          : { top: 0 }),
         ...(showLeft
           ? { right: '100%', left: 'auto', marginRight: 4 }
           : { left: '100%', right: 'auto', marginLeft: 4 }),
@@ -241,7 +255,7 @@ function EmptyCellMenu({ week, course, onClose, selectedWeeks, position }: { wee
 }
 
 /* Inline editable note cell for expanded note column */
-const NOTE_COL_W = 100;
+const NOTE_COL_W = 200;
 
 function NoteCell({ weekW, col, cellHeight }: { weekW: string; col: number; cellHeight: number }) {
   const { lessonDetails, updateLessonDetail, weekData } = usePlannerStore();
@@ -294,11 +308,11 @@ function NoteCell({ weekW, col, cellHeight }: { weekW: string; col: number; cell
       title={displayNotes || 'Klick für Notiz'}
     >
       {displayNotes ? (
-        <div className="text-[7px] text-gray-400 leading-tight p-0.5 overflow-hidden" style={{ maxHeight: cellHeight, display: '-webkit-box', WebkitLineClamp: cellHeight > 30 ? 3 : 2, WebkitBoxOrient: 'vertical' }}>
+        <div className="text-[8px] text-gray-300 leading-tight p-1 overflow-hidden whitespace-pre-line" style={{ maxHeight: cellHeight }}>
           {displayNotes}
         </div>
       ) : (
-        <div className="text-[7px] text-gray-700 p-0.5 italic">…</div>
+        <div className="text-[7px] text-gray-700 p-1 italic">…</div>
       )}
     </td>
   );
