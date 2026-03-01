@@ -1,7 +1,7 @@
 # Unterrichtsplaner – Handoff v3.24
 
-## Status: ✅ Deployed (v3.26)
-- **Commit:** abe4092
+## Status: ✅ Deployed (v3.27)
+- **Commit:** a0435b8
 - **Datum:** 2026-03-01
 - **Deploy:** https://durandbourjate.github.io/GYM-WR-DUY/Unterrichtsplaner/
 
@@ -31,7 +31,13 @@
 - v3.23: Enhanced HoverPreview — farbiger Header mit Fachbereich-Akzent, Notizen prominent (6 Zeilen statt 2), Beschreibung (3 Zeilen), SOL-Details, Materiallinks (max 4), Lernziel (2 Zeilen). Smarte Positionierung (links bei Spalten >60%). Dynamische Breite (280px wenn Extras vorhanden, sonst 224px). Block-Vererbung für SubjectArea/Topic.
 - v3.24: UX-Kontrast verbessert (gray-500→gray-400 für Labels/Text in DetailPanel, SequencePanel, SettingsPanel, CollectionPanel). Zoom 2 Block-Index fix (Klick→Sequenz öffnet korrekten Block). Toolbar: Excel-Import-Button entfernt (Settings via SidePanel), ⓘ-Icon auf Kacheln entfernt. Bundle-Grösse halbiert (743→398KB). Deploy-Workflow repariert (kombinierte Site: Uebungen + Unterrichtsplaner). SW-Scope auf /Unterrichtsplaner/ beschränkt.
 - v3.25: Aufklappbare Notizen-Spalte pro Kurs. Toggle-Button (▸/◂) im Spaltenheader. Inline-editierbare NoteCell (100px) zeigt/bearbeitet Notizen aus lessonDetails.
-- v3.26: HoverPreview zeigt nach oben bei Zellen im unteren Bildschirmdrittel. Notizen-Spalte: breiterer Default (200px), grösserer Toggle-Button mit 📝-Icon, Zeilenumbrüche (whitespace-pre-line), grössere Schrift. Klick zum Editieren, Enter/Blur zum Speichern, Escape zum Abbrechen.
+- v3.26: HoverPreview zeigt nach oben bei Zellen im unteren Bildschirmdrittel. Notizen-Spalte: breiterer Default (200px), grösserer Toggle-Button mit 📝-Icon, Zeilenumbrüche (whitespace-pre-line), grössere Schrift.
+- v3.27: Zoom 2 — farbige Blöcke mit Dark-Mode-Palette (VWL=orange-braun, BWL=dunkelblau, Recht=dunkelgrün), grössere Schrift (10px Labels, 8px Details), breitere Spalten (110px). Notizen-Spalte resizable (Drag-Handle im Header, 80-400px Range, noteColWidth im Store). ZoomYearView Placeholder-Datei.
+
+### Offene Feature-Requests
+- **Zoom 2 Jahresmodus**: Kurse durchgehend über beide Semester anzeigen (ohne Wochentag-Trennung). 2-Tage-Kurse: Breiter Balken wenn gleiche Sequenz, 2 schmale Balken wenn unterschiedliche Sequenzen an Di/Do.
+- **SOL-Total bei Sequenzen**: SOL als Total aller zugehörigen Unterrichtseinheiten verlinken
+- **Google Calendar Integration**: Kalender im Tool anzeigen Klick zum Editieren, Enter/Blur zum Speichern, Escape zum Abbrechen.
 
 ## Architekturentscheidungen v3.11–v3.19
 - **editingSequenceId Format:** Jetzt `seqId-blockIndex` (z.B. `abc123-0`) statt nur `seqId`. WeekRows parsed dieses Format mit Regex und highlightet nur den spezifischen Block.
