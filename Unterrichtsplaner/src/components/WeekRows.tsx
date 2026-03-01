@@ -33,8 +33,12 @@ function InlineEdit({ value, onSave, onCancel }: { value: string; onSave: (v: st
   );
 }
 
-/* Hover preview popover */
-function HoverPreview({ week, col, courses }: { week: string; col: number; courses: Course[] }) {
+/* Hover preview popover — enhanced v3.23 */
+const SUBJECT_AREA_COLORS_PREVIEW: Record<string, string> = {
+  BWL: '#3b82f6', VWL: '#f97316', RECHT: '#22c55e', IN: '#6b7280', INTERDISZ: '#a855f7',
+};
+
+function HoverPreview({ week, col, courses, courseIndex, totalCourses }: { week: string; col: number; courses: Course[]; courseIndex: number; totalCourses: number }) {
   const { lessonDetails, weekData, sequences } = usePlannerStore();
   const key = `${week}-${col}`;
   const detail = lessonDetails[key];
@@ -44,40 +48,133 @@ function HoverPreview({ week, col, courses }: { week: string; col: number; cours
   if (!entry || !course) return null;
 
   const seq = getSequenceInfoFromStore(course.id, week, sequences);
+  const parentBlock = seq ? (() => {
+    const parentSeq = sequences.find(s => s.id === seq.sequenceId);
+    return parentSeq?.blocks.find(b => b.weeks.includes(week));
+  })() : null;
+
+  // Inherited values
+  const effectiveSubjectArea = detail?.subjectArea || parentBlock?.subjectArea;
+  const effectiveTopicMain = detail?.topicMain || parentBlock?.topicMain;
+  const effectiveTopicSub = detail?.topicSub || parentBlock?.topicSub;
+  const accentColor = effectiveSubjectArea ? SUBJECT_AREA_COLORS_PREVIEW[effectiveSubjectArea] || '#64748b' : '#64748b';
+
+  // Smart positioning: show left if course is in the right third of columns
+  const showLeft = courseIndex > totalCourses * 0.6;
+
+  // Check if there's meaningful content beyond title/topic
+  const hasNotes = !!(detail?.notes);
+  const hasDescription = !!(detail?.description);
+  const hasMaterialLinks = !!(detail?.materialLinks && detail.materialLinks.length > 0);
+  const hasSol = !!(detail?.sol?.enabled);
+  const hasCurriculumGoal = !!(detail?.curriculumGoal);
+  const hasExtras = hasNotes || hasDescription || hasMaterialLinks || hasSol || hasCurriculumGoal;
 
   return (
-    <div className="absolute right-0 top-0 w-56 bg-slate-800 border border-slate-600 rounded-lg shadow-xl z-[80] p-2.5 pointer-events-none"
-      style={{ transform: 'translateX(100%)' }}>
-      <div className="text-[10px] font-bold text-gray-200 mb-1">{entry.title}</div>
-      {detail?.topicMain && (
-        <div className="text-[9px] text-gray-400 mb-0.5">📌 {detail.topicMain}{detail.topicSub ? ` › ${detail.topicSub}` : ''}</div>
-      )}
-      {detail?.subjectArea && (
-        <span className="text-[8px] px-1 py-px rounded border border-gray-600 text-gray-400 mr-1">{detail.subjectArea}</span>
-      )}
-      {(() => {
-        const { category, subtype } = getEffectiveCategorySubtype(detail || {});
-        const catDef = category ? CATEGORIES.find(c => c.key === category) : null;
-        return (category && category !== 'LESSON') || subtype ? (
-          <>
-            {catDef && catDef.key !== 'LESSON' && (
-              <span className="text-[8px] px-1 py-px rounded border border-gray-600 text-gray-400 mr-1">{catDef.icon} {getCategoryLabel(catDef.key, false)}</span>
+    <div
+      className="absolute top-0 bg-slate-800 border border-slate-600 rounded-lg shadow-2xl z-[80] pointer-events-none"
+      style={{
+        width: hasExtras ? 280 : 224,
+        ...(showLeft
+          ? { right: '100%', left: 'auto', marginRight: 4 }
+          : { left: '100%', right: 'auto', marginLeft: 4 }),
+      }}
+    >
+      {/* Colored header bar */}
+      <div className="rounded-t-lg px-2.5 py-1.5" style={{ background: accentColor + '20', borderBottom: `2px solid ${accentColor}40` }}>
+        <div className="text-[10px] font-bold text-gray-200 leading-tight">{entry.title}</div>
+        {effectiveTopicMain && (
+          <div className="text-[9px] text-gray-400 mt-0.5">
+            📌 {effectiveTopicMain}{effectiveTopicSub ? ` › ${effectiveTopicSub}` : ''}
+          </div>
+        )}
+      </div>
+
+      <div className="px-2.5 py-1.5">
+        {/* Badges row */}
+        <div className="flex flex-wrap gap-1 mb-1">
+          {effectiveSubjectArea && (
+            <span className="text-[8px] px-1 py-px rounded border text-gray-300 font-medium"
+              style={{ borderColor: accentColor + '60', background: accentColor + '15' }}>
+              {effectiveSubjectArea}
+            </span>
+          )}
+          {(() => {
+            const { category, subtype } = getEffectiveCategorySubtype(detail || {});
+            const catDef = category ? CATEGORIES.find(c => c.key === category) : null;
+            return <>
+              {catDef && catDef.key !== 'LESSON' && (
+                <span className="text-[8px] px-1 py-px rounded border border-gray-600 text-gray-400">{catDef.icon} {getCategoryLabel(catDef.key, false)}</span>
+              )}
+              {subtype && category && (
+                <span className="text-[8px] px-1 py-px rounded border border-gray-600 text-gray-400">{getSubtypeLabel(category, subtype, false)}</span>
+              )}
+            </>;
+          })()}
+          {detail?.duration && (
+            <span className="text-[8px] px-1 py-px rounded border border-gray-600 text-gray-400">⏱ {detail.duration}</span>
+          )}
+        </div>
+
+        {/* Sequence info */}
+        {seq && (
+          <div className="text-[8px] text-gray-500 mb-1">▧ {seq.label} ({seq.index + 1}/{seq.total})</div>
+        )}
+
+        {/* Curriculum goal */}
+        {hasCurriculumGoal && (
+          <div className="text-[8px] text-gray-500 mb-1 leading-relaxed" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+            🎯 {detail!.curriculumGoal}
+          </div>
+        )}
+
+        {/* Description */}
+        {hasDescription && (
+          <div className="text-[8px] text-gray-400 mb-1 leading-relaxed" style={{ display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+            {detail!.description}
+          </div>
+        )}
+
+        {/* Notes — the main value-add, shown prominently */}
+        {hasNotes && (
+          <div className="mt-1 pt-1 border-t border-slate-700">
+            <div className="text-[7px] font-semibold text-gray-500 uppercase tracking-wide mb-0.5">Notizen</div>
+            <div className="text-[9px] text-gray-300 leading-relaxed whitespace-pre-line" style={{ display: '-webkit-box', WebkitLineClamp: 6, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+              {detail!.notes}
+            </div>
+          </div>
+        )}
+
+        {/* SOL details */}
+        {hasSol && (
+          <div className="text-[8px] text-gray-500 mt-1">
+            📚 SOL{detail!.sol!.topic ? `: ${detail!.sol!.topic}` : ''}{detail!.sol!.duration ? ` (${detail!.sol!.duration})` : ''}
+          </div>
+        )}
+
+        {/* Material links */}
+        {hasMaterialLinks && (
+          <div className="mt-1 pt-1 border-t border-slate-700 flex flex-wrap gap-1">
+            {detail!.materialLinks!.slice(0, 4).map((link, i) => {
+              const isLV = link.includes('learningview');
+              const label = isLV ? 'LV' : link.replace(/^https?:\/\//, '').split('/')[0].slice(0, 20);
+              return (
+                <span key={i} className="text-[7px] px-1 py-px rounded bg-slate-700 text-gray-400">
+                  📎 {label}
+                </span>
+              );
+            })}
+            {detail!.materialLinks!.length > 4 && (
+              <span className="text-[7px] px-1 py-px text-gray-500">+{detail!.materialLinks!.length - 4}</span>
             )}
-            {subtype && category && (
-              <span className="text-[8px] px-1 py-px rounded border border-gray-600 text-gray-400">{getSubtypeLabel(category, subtype, false)}</span>
-            )}
-          </>
-        ) : null;
-      })()}
-      {seq && (
-        <div className="text-[8px] mt-1 text-gray-500">▧ {seq.label} ({seq.index + 1}/{seq.total})</div>
-      )}
-      {detail?.curriculumGoal && (
-        <div className="text-[8px] mt-1 text-gray-500 truncate">🎯 {detail.curriculumGoal}</div>
-      )}
-      {detail?.notes && (
-        <div className="text-[8px] mt-1 text-gray-500 line-clamp-2">📝 {detail.notes}</div>
-      )}
+          </div>
+        )}
+
+        {/* Hint if no extras */}
+        {!hasExtras && !seq && (
+          <div className="text-[8px] text-gray-600 italic">Doppelklick für Details</div>
+        )}
+      </div>
     </div>
   );
 }
@@ -692,7 +789,7 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                   )}
 
                   {/* Hover preview popover */}
-                  {showPreview && <HoverPreview week={week.w} col={c.col} courses={courses} />}
+                  {showPreview && <HoverPreview week={week.w} col={c.col} courses={courses} courseIndex={ci} totalCourses={courses.length} />}
 
                   {/* Empty cell context menu */}
                   {showEmptyMenu && (
