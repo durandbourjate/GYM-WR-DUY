@@ -4,6 +4,7 @@ import { LESSON_COLORS, SUBJECT_AREA_COLORS, DAY_COLORS, getSequenceInfoFromStor
 import { CURRENT_WEEK } from '../data/weeks';
 import { usePlannerStore } from '../store/plannerStore';
 import { getHKGroup } from '../utils/hkRotation';
+import { getEffectiveCategorySubtype, getCategoryLabel, getSubtypeLabel, CATEGORIES } from './DetailPanel';
 
 interface Props {
   weeks: Week[];
@@ -53,9 +54,20 @@ function HoverPreview({ week, col, courses }: { week: string; col: number; cours
       {detail?.subjectArea && (
         <span className="text-[8px] px-1 py-px rounded border border-gray-600 text-gray-400 mr-1">{detail.subjectArea}</span>
       )}
-      {detail?.blockType && detail.blockType !== 'LESSON' && (
-        <span className="text-[8px] px-1 py-px rounded border border-gray-600 text-gray-400">{detail.blockType}</span>
-      )}
+      {(() => {
+        const { category, subtype } = getEffectiveCategorySubtype(detail || {});
+        const catDef = category ? CATEGORIES.find(c => c.key === category) : null;
+        return (category && category !== 'LESSON') || subtype ? (
+          <>
+            {catDef && catDef.key !== 'LESSON' && (
+              <span className="text-[8px] px-1 py-px rounded border border-gray-600 text-gray-400 mr-1">{catDef.icon} {getCategoryLabel(catDef.key, false)}</span>
+            )}
+            {subtype && category && (
+              <span className="text-[8px] px-1 py-px rounded border border-gray-600 text-gray-400">{getSubtypeLabel(category, subtype, false)}</span>
+            )}
+          </>
+        ) : null;
+      })()}
       {seq && (
         <div className="text-[8px] mt-1 text-gray-500">▧ {seq.label} ({seq.index + 1}/{seq.total})</div>
       )}
@@ -92,8 +104,8 @@ function EmptyCellMenu({ week, course, onClose }: { week: string; course: Course
   const handleNewLesson = () => {
     pushUndo();
     updateLesson(week, course.col, { title: 'Neue Lektion', type: 1 });
-    // Set default blockType to LESSON
-    usePlannerStore.getState().updateLessonDetail(week, course.col, { blockType: 'LESSON' });
+    // Set default blockCategory to LESSON
+    usePlannerStore.getState().updateLessonDetail(week, course.col, { blockCategory: 'LESSON' });
     setSelection({ week, courseId: course.id, title: 'Neue Lektion', course });
     setSidePanelOpen(true);
     setSidePanelTab('details');

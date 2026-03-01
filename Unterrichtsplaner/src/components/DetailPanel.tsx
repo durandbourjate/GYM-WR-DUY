@@ -4,7 +4,7 @@ import { TYPE_BADGES, getSequenceInfoFromStore } from '../utils/colors';
 import { CurriculumGoalPicker } from './CurriculumGoalPicker';
 import { SequencePanel } from './SequencePanel';
 import { suggestGoals } from '../utils/autoSuggest';
-import type { SubjectArea, BlockType, LessonDetail } from '../types';
+import type { SubjectArea, BlockCategory, LessonDetail } from '../types';
 
 const SUBJECT_AREAS: { key: SubjectArea; label: string; color: string }[] = [
   { key: 'BWL', label: 'BWL', color: '#3b82f6' },
@@ -14,24 +14,118 @@ const SUBJECT_AREAS: { key: SubjectArea; label: string; color: string }[] = [
   { key: 'INTERDISZ', label: 'Interdisziplinär', color: '#a855f7' },
 ];
 
-const BLOCK_TYPES_REGULAR: { key: BlockType; label: string; icon: string }[] = [
-  { key: 'LESSON', label: 'Lektion', icon: '📖' },
-  { key: 'SELF_STUDY', label: 'SOL', icon: '📚' },
-  { key: 'INTRO', label: 'Einführung', icon: '🚀' },
-  { key: 'DISCUSSION', label: 'Diskussion', icon: '💬' },
-  { key: 'EVENT', label: 'Event/Anlass', icon: '📅' },
-  { key: 'HOLIDAY', label: 'Ferien/Frei', icon: '🏖' },
+// === Block-Kategorie / Untertyp-System ===
+interface CategoryDef {
+  key: BlockCategory;
+  label: string;
+  labelShort: string;
+  icon: string;
+  color: string;
+}
+
+interface SubtypeDef {
+  key: string;
+  label: string;
+  labelShort: string;
+  icon: string;
+  custom?: boolean;
+}
+
+const CATEGORIES: CategoryDef[] = [
+  { key: 'LESSON', label: 'Lektion', labelShort: 'Lekt.', icon: '📖', color: '#3b82f6' },
+  { key: 'ASSESSMENT', label: 'Beurteilung', labelShort: 'Beurt.', icon: '📝', color: '#ef4444' },
+  { key: 'EVENT', label: 'Event', labelShort: 'Event', icon: '📅', color: '#f59e0b' },
+  { key: 'HOLIDAY', label: 'Ferien/Frei', labelShort: 'Frei', icon: '🏖', color: '#6b7280' },
 ];
 
-const BLOCK_TYPES_ASSESSMENT: { key: BlockType; label: string; icon: string }[] = [
-  { key: 'EXAM', label: 'Prüfung', icon: '📝' },
-  { key: 'EXAM_ORAL', label: 'Mündl. Prüfung', icon: '🎤' },
-  { key: 'EXAM_LONG', label: 'Langprüfung', icon: '📋' },
-  { key: 'PRESENTATION', label: 'Präsentation', icon: '🎯' },
-  { key: 'PROJECT_DUE', label: 'Projektabgabe', icon: '📦' },
-];
+const DEFAULT_SUBTYPES: Record<BlockCategory, SubtypeDef[]> = {
+  LESSON: [
+    { key: 'einfuehrung', label: 'Einführung', labelShort: 'Einf.', icon: '🚀' },
+    { key: 'theorie', label: 'Theorie', labelShort: 'Theo.', icon: '📘' },
+    { key: 'uebung', label: 'Übung', labelShort: 'Übg.', icon: '✏️' },
+    { key: 'sol', label: 'Selbstorganisiertes Lernen', labelShort: 'SOL', icon: '📚' },
+    { key: 'diskussion', label: 'Diskussion', labelShort: 'Disk.', icon: '💬' },
+  ],
+  ASSESSMENT: [
+    { key: 'pruefung', label: 'Prüfung schriftlich', labelShort: 'Prüf.', icon: '📝' },
+    { key: 'pruefung_muendlich', label: 'Prüfung mündlich', labelShort: 'Mdl.', icon: '🎤' },
+    { key: 'praesentation', label: 'Präsentation', labelShort: 'Präs.', icon: '🎯' },
+    { key: 'projektabgabe', label: 'Projektabgabe', labelShort: 'Proj.', icon: '📦' },
+  ],
+  EVENT: [
+    { key: 'exkursion', label: 'Exkursion', labelShort: 'Exk.', icon: '🚌' },
+    { key: 'tag_offen', label: 'Tag der offenen Tür', labelShort: 'TdoT', icon: '🏫' },
+    { key: 'ausfall', label: 'Ausfall', labelShort: 'Ausf.', icon: '❌' },
+    { key: 'auftrag', label: 'Auftrag', labelShort: 'Auftr.', icon: '📋' },
+  ],
+  HOLIDAY: [],
+};
 
-const ALL_BLOCK_TYPES = [...BLOCK_TYPES_REGULAR, ...BLOCK_TYPES_ASSESSMENT];
+// Custom subtypes persistence
+const CUSTOM_SUBTYPES_KEY = 'unterrichtsplaner-custom-subtypes';
+
+function loadCustomSubtypes(): Record<string, SubtypeDef[]> {
+  try {
+    const data = localStorage.getItem(CUSTOM_SUBTYPES_KEY);
+    return data ? JSON.parse(data) : {};
+  } catch { return {}; }
+}
+
+function saveCustomSubtypes(custom: Record<string, SubtypeDef[]>) {
+  localStorage.setItem(CUSTOM_SUBTYPES_KEY, JSON.stringify(custom));
+}
+
+function getSubtypesForCategory(category: BlockCategory): SubtypeDef[] {
+  const defaults = DEFAULT_SUBTYPES[category] || [];
+  const custom = loadCustomSubtypes();
+  const customForCat = (custom[category] || []).map(s => ({ ...s, custom: true }));
+  return [...defaults, ...customForCat];
+}
+
+// Migration helper: old BlockType → new category + subtype
+function migrateBlockType(blockType?: string): { category?: BlockCategory; subtype?: string } {
+  if (!blockType) return {};
+  const map: Record<string, { category: BlockCategory; subtype?: string }> = {
+    'LESSON': { category: 'LESSON' },
+    'INTRO': { category: 'LESSON', subtype: 'einfuehrung' },
+    'SELF_STUDY': { category: 'LESSON', subtype: 'sol' },
+    'DISCUSSION': { category: 'LESSON', subtype: 'diskussion' },
+    'EXAM': { category: 'ASSESSMENT', subtype: 'pruefung' },
+    'EXAM_ORAL': { category: 'ASSESSMENT', subtype: 'pruefung_muendlich' },
+    'EXAM_LONG': { category: 'ASSESSMENT', subtype: 'pruefung' },
+    'PRESENTATION': { category: 'ASSESSMENT', subtype: 'praesentation' },
+    'PROJECT_DUE': { category: 'ASSESSMENT', subtype: 'projektabgabe' },
+    'EVENT': { category: 'EVENT' },
+    'HOLIDAY': { category: 'HOLIDAY' },
+  };
+  return map[blockType] || {};
+}
+
+// Get effective category/subtype from detail (with migration)
+function getEffectiveCategorySubtype(detail: LessonDetail): { category?: BlockCategory; subtype?: string } {
+  if (detail.blockCategory) return { category: detail.blockCategory, subtype: detail.blockSubtype };
+  return migrateBlockType(detail.blockType);
+}
+
+// Format display labels
+function getCategoryLabel(category: BlockCategory, long = true): string {
+  const cat = CATEGORIES.find(c => c.key === category);
+  return cat ? (long ? cat.label : cat.labelShort) : category;
+}
+
+function getSubtypeLabel(category: BlockCategory, subtype: string, long = true): string {
+  const subtypes = getSubtypesForCategory(category);
+  const st = subtypes.find(s => s.key === subtype);
+  return st ? (long ? st.label : st.labelShort) : subtype;
+}
+
+// Export for use in WeekRows etc.
+export { CATEGORIES, getSubtypesForCategory, getEffectiveCategorySubtype, getCategoryLabel, getSubtypeLabel };
+
+// === Duration presets ===
+const DURATION_PRESETS = ['1L', '2L', '3L'];
+
+// === Components ===
 
 function PillSelect<T extends string>({
   options, value, onChange, renderOption,
@@ -62,37 +156,168 @@ function PillSelect<T extends string>({
   );
 }
 
-function AssessmentDropdown({ value, onChange }: { value: BlockType | undefined; onChange: (v: BlockType | undefined) => void }) {
-  const [open, setOpen] = useState(false);
-  const isAssessment = value && BLOCK_TYPES_ASSESSMENT.some(b => b.key === value);
-  const current = isAssessment ? BLOCK_TYPES_ASSESSMENT.find(b => b.key === value) : null;
+function CategorySubtypeSelector({
+  category, subtype, onChangeCategory, onChangeSubtype,
+}: {
+  category?: BlockCategory;
+  subtype?: string;
+  onChangeCategory: (v: BlockCategory | undefined) => void;
+  onChangeSubtype: (v: string | undefined) => void;
+}) {
+  const [addingCustom, setAddingCustom] = useState(false);
+  const [customLabel, setCustomLabel] = useState('');
+  const effectiveCategory = category || 'LESSON';
+  const subtypes = getSubtypesForCategory(effectiveCategory);
+
+  const handleAddCustom = () => {
+    if (!customLabel.trim()) return;
+    const key = customLabel.trim().toLowerCase().replace(/[^a-z0-9äöü]/g, '_');
+    const custom = loadCustomSubtypes();
+    if (!custom[effectiveCategory]) custom[effectiveCategory] = [];
+    custom[effectiveCategory].push({
+      key,
+      label: customLabel.trim(),
+      labelShort: customLabel.trim().slice(0, 5) + '.',
+      icon: '🏷️',
+    });
+    saveCustomSubtypes(custom);
+    onChangeSubtype(key);
+    setCustomLabel('');
+    setAddingCustom(false);
+  };
+
+  const handleRemoveCustom = (key: string) => {
+    const custom = loadCustomSubtypes();
+    if (custom[effectiveCategory]) {
+      custom[effectiveCategory] = custom[effectiveCategory].filter(s => s.key !== key);
+      saveCustomSubtypes(custom);
+      if (subtype === key) onChangeSubtype(undefined);
+    }
+  };
 
   return (
-    <div className="relative inline-block mt-1">
-      <button
-        onClick={() => setOpen(!open)}
-        className={`px-1.5 py-0.5 rounded text-[9px] font-medium border cursor-pointer transition-all ${
-          isAssessment
-            ? 'bg-red-500/20 border-red-500 text-red-300'
-            : 'border-gray-600 text-gray-500 hover:text-gray-300'
-        }`}
-      >
-        {current ? `${current.icon} ${current.label}` : '📝 Beurteilung…'} {open ? '▴' : '▾'}
-      </button>
-      {open && (
-        <div className="absolute left-0 top-7 bg-slate-800 border border-slate-600 rounded-lg shadow-xl z-[80] py-1 w-40">
-          {BLOCK_TYPES_ASSESSMENT.map((bt) => (
-            <button
-              key={bt.key}
-              onClick={() => { onChange(isAssessment && value === bt.key ? undefined : bt.key); setOpen(false); }}
-              className={`w-full px-2 py-1 text-left text-[9px] cursor-pointer flex items-center gap-1.5 ${
-                value === bt.key ? 'bg-red-900/40 text-red-300' : 'text-gray-300 hover:bg-slate-700'
-              }`}
-            >
-              <span>{bt.icon}</span> {bt.label}
-            </button>
-          ))}
+    <div className="space-y-2">
+      {/* Category row */}
+      <div>
+        <label className="text-[9px] text-gray-500 font-medium mb-1 block">Kategorie</label>
+        <div className="flex flex-wrap gap-1">
+          {CATEGORIES.map((cat) => {
+            const active = effectiveCategory === cat.key;
+            return (
+              <button key={cat.key}
+                onClick={() => {
+                  onChangeCategory(cat.key === 'LESSON' ? undefined : cat.key);
+                  onChangeSubtype(undefined);
+                }}
+                className="px-1.5 py-0.5 rounded text-[9px] font-medium border cursor-pointer transition-all"
+                style={{
+                  background: active ? cat.color + '30' : 'transparent',
+                  borderColor: active ? cat.color : '#374151',
+                  color: active ? '#e5e7eb' : '#6b7280',
+                }}>
+                <span className="mr-0.5">{cat.icon}</span>{cat.label}
+              </button>
+            );
+          })}
         </div>
+      </div>
+      {/* Subtype row (only if category has subtypes) */}
+      {subtypes.length > 0 && (
+        <div>
+          <label className="text-[9px] text-gray-500 font-medium mb-1 block">Untertyp</label>
+          <div className="flex flex-wrap gap-1">
+            {subtypes.map((st) => {
+              const active = subtype === st.key;
+              const catDef = CATEGORIES.find(c => c.key === effectiveCategory);
+              return (
+                <div key={st.key} className="relative group inline-flex">
+                  <button
+                    onClick={() => onChangeSubtype(active ? undefined : st.key)}
+                    className="px-1.5 py-0.5 rounded text-[9px] font-medium border cursor-pointer transition-all"
+                    style={{
+                      background: active ? (catDef?.color || '#3b82f6') + '20' : 'transparent',
+                      borderColor: active ? (catDef?.color || '#3b82f6') + '80' : '#374151',
+                      color: active ? '#d1d5db' : '#6b7280',
+                    }}>
+                    <span className="mr-0.5">{st.icon}</span>{st.label}
+                  </button>
+                  {st.custom && (
+                    <button
+                      onClick={(e) => { e.stopPropagation(); handleRemoveCustom(st.key); }}
+                      className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-red-600 text-white text-[7px] flex items-center justify-center opacity-0 group-hover:opacity-100 cursor-pointer"
+                      title="Eigenes Label entfernen"
+                    >✕</button>
+                  )}
+                </div>
+              );
+            })}
+            {/* Add custom button */}
+            {addingCustom ? (
+              <div className="flex gap-0.5 items-center">
+                <input autoFocus value={customLabel} onChange={(e) => setCustomLabel(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') handleAddCustom(); if (e.key === 'Escape') setAddingCustom(false); }}
+                  placeholder="Neues Label…"
+                  className="bg-slate-700 text-slate-200 border border-blue-400 rounded px-1.5 py-0.5 text-[9px] outline-none w-24" />
+                <button onClick={handleAddCustom} className="text-[9px] text-green-400 cursor-pointer">✓</button>
+                <button onClick={() => setAddingCustom(false)} className="text-[9px] text-gray-500 cursor-pointer">✕</button>
+              </div>
+            ) : (
+              <button onClick={() => setAddingCustom(true)}
+                className="px-1.5 py-0.5 rounded text-[9px] border border-dashed border-gray-600 text-gray-500 hover:text-gray-300 hover:border-gray-400 cursor-pointer transition-all">
+                + Eigenes
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function DurationSelector({ value, onChange }: { value?: string; onChange: (v: string | undefined) => void }) {
+  const [customMode, setCustomMode] = useState(false);
+  const [customValue, setCustomValue] = useState('');
+  const isPreset = value && DURATION_PRESETS.includes(value);
+  const isCustom = value && !isPreset;
+
+  return (
+    <div className="flex flex-wrap gap-1 items-center">
+      {DURATION_PRESETS.map((preset) => (
+        <button key={preset}
+          onClick={() => onChange(value === preset ? undefined : preset)}
+          className={`px-1.5 py-0.5 rounded text-[9px] font-medium border cursor-pointer transition-all ${
+            value === preset
+              ? 'bg-slate-600/40 border-slate-500 text-gray-200'
+              : 'border-gray-700 text-gray-500 hover:text-gray-300'
+          }`}>
+          {preset}
+        </button>
+      ))}
+      {customMode || isCustom ? (
+        <div className="flex gap-0.5 items-center">
+          <input
+            autoFocus={customMode}
+            value={isCustom ? value : customValue}
+            onChange={(e) => {
+              if (isCustom) onChange(e.target.value || undefined);
+              else setCustomValue(e.target.value);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && customValue) { onChange(customValue); setCustomMode(false); }
+              if (e.key === 'Escape') { setCustomMode(false); setCustomValue(''); }
+            }}
+            onBlur={() => { if (customValue) { onChange(customValue); } setCustomMode(false); }}
+            placeholder="z.B. 45min"
+            className="bg-slate-700 text-slate-200 border border-slate-600 rounded px-1.5 py-0.5 text-[9px] outline-none focus:border-blue-400 w-16" />
+          {isCustom && (
+            <button onClick={() => onChange(undefined)} className="text-[9px] text-gray-500 cursor-pointer hover:text-red-400">✕</button>
+          )}
+        </div>
+      ) : (
+        <button onClick={() => setCustomMode(true)}
+          className="px-1.5 py-0.5 rounded text-[9px] border border-dashed border-gray-600 text-gray-500 hover:text-gray-300 cursor-pointer">
+          Andere…
+        </button>
       )}
     </div>
   );
@@ -166,12 +391,18 @@ function DetailsTab() {
     topicSub: detail.topicSub || parentBlock?.topicSub,
     subjectArea: detail.subjectArea || parentBlock?.subjectArea,
     curriculumGoal: detail.curriculumGoal || parentBlock?.curriculumGoal,
+    blockCategory: detail.blockCategory,
+    blockSubtype: detail.blockSubtype,
     blockType: detail.blockType,
     description: detail.description || parentBlock?.description,
     materialLinks: detail.materialLinks?.length ? detail.materialLinks : parentBlock?.materialLinks,
     learningviewUrl: detail.learningviewUrl,
+    duration: detail.duration,
     notes: detail.notes,
   };
+
+  // Get effective category/subtype (with legacy migration)
+  const { category: effectiveCategory, subtype: effectiveSubtype } = getEffectiveCategorySubtype(effectiveDetail);
 
   const updateField = useCallback(
     <K extends keyof LessonDetail>(field: K, value: LessonDetail[K]) => {
@@ -181,6 +412,24 @@ function DetailsTab() {
     [selection?.week, c?.col, updateLessonDetail]
   );
 
+  const handleCategoryChange = useCallback((cat: BlockCategory | undefined) => {
+    if (!selection || !c) return;
+    updateLessonDetail(selection.week, c.col, {
+      blockCategory: cat || 'LESSON',
+      blockSubtype: undefined,
+      blockType: undefined, // clear legacy
+    });
+  }, [selection?.week, c?.col, updateLessonDetail]);
+
+  const handleSubtypeChange = useCallback((st: string | undefined) => {
+    if (!selection || !c) return;
+    updateLessonDetail(selection.week, c.col, {
+      blockSubtype: st,
+      blockCategory: effectiveCategory || 'LESSON',
+      blockType: undefined, // clear legacy
+    });
+  }, [selection?.week, c?.col, updateLessonDetail, effectiveCategory]);
+
   // Auto-detect subjectArea from LessonType
   useEffect(() => {
     if (!selection || !c || detail.subjectArea || !currentLesson) return;
@@ -189,7 +438,7 @@ function DetailsTab() {
     if (detected) updateLessonDetail(selection.week, c.col, { subjectArea: detected });
   }, [selection?.week, c?.col, currentLesson?.type, detail.subjectArea]);
 
-  // Phase 4: Auto-suggest curriculum goals from topicMain
+  // Auto-suggest curriculum goals
   const goalSuggestions = useMemo(() => {
     const topic = detail.topicMain || effectiveDetail.topicMain;
     if (!topic || topic.length < 2) return [];
@@ -207,6 +456,9 @@ function DetailsTab() {
   const badge = TYPE_BADGES[c.typ];
   const seqInfo = getSequenceInfoFromStore(c.id, selection.week, sequences);
   const parentSeq = seqInfo ? sequences.find(s => s.id === seqInfo.sequenceId) : null;
+  const catDef = CATEGORIES.find(ct => ct.key === (effectiveCategory || 'LESSON'));
+  const subtypes = effectiveCategory ? getSubtypesForCategory(effectiveCategory) : [];
+  const subtypeDef = effectiveSubtype ? subtypes.find(s => s.key === effectiveSubtype) : null;
 
   return (
     <div className="flex-1 overflow-y-auto p-3 space-y-3">
@@ -227,9 +479,19 @@ function DetailsTab() {
               {effectiveDetail.subjectArea}
             </span>
           )}
-          {detail.blockType && detail.blockType !== 'LESSON' && (
+          {catDef && catDef.key !== 'LESSON' && (
+            <span className="text-[8px] px-1 py-px rounded border" style={{ borderColor: catDef.color + '80', color: catDef.color }}>
+              {catDef.icon} {catDef.label}
+            </span>
+          )}
+          {subtypeDef && (
             <span className="text-[8px] px-1 py-px rounded border border-gray-600 text-gray-400">
-              {ALL_BLOCK_TYPES.find(b => b.key === detail.blockType)?.icon} {ALL_BLOCK_TYPES.find(b => b.key === detail.blockType)?.label}
+              {subtypeDef.icon} {subtypeDef.label}
+            </span>
+          )}
+          {effectiveDetail.duration && (
+            <span className="text-[8px] px-1 py-px rounded border border-gray-600 text-gray-400">
+              ⏱ {effectiveDetail.duration}
             </span>
           )}
           {seqInfo && (
@@ -256,12 +518,15 @@ function DetailsTab() {
             onChange={(v) => updateField('subjectArea', v)}
             renderOption={(v) => { const s = SUBJECT_AREAS.find(x => x.key === v)!; return { label: s.label, color: s.color }; }} />
         </div>
+        <CategorySubtypeSelector
+          category={effectiveCategory}
+          subtype={effectiveSubtype}
+          onChangeCategory={handleCategoryChange}
+          onChangeSubtype={handleSubtypeChange}
+        />
         <div>
-          <label className="text-[9px] text-gray-500 font-medium mb-1 block">Block-Typ</label>
-          <PillSelect options={BLOCK_TYPES_REGULAR.map(b => b.key)} value={detail.blockType || 'LESSON'}
-            onChange={(v) => updateField('blockType', v)}
-            renderOption={(v) => { const b = BLOCK_TYPES_REGULAR.find(x => x.key === v)!; return { label: b.label, icon: b.icon }; }} />
-          <AssessmentDropdown value={detail.blockType} onChange={(v) => updateField('blockType', v)} />
+          <label className="text-[9px] text-gray-500 font-medium mb-1 block">Dauer</label>
+          <DurationSelector value={detail.duration} onChange={(v) => updateField('duration', v)} />
         </div>
         <div>
           <label className="text-[9px] text-gray-500 font-medium mb-1 block">Thema</label>
@@ -274,7 +539,6 @@ function DetailsTab() {
           <input value={detail.topicSub || ''} onChange={(e) => updateField('topicSub', e.target.value)}
             placeholder={effectiveDetail.topicSub || 'Unterthema (optional)…'}
             className="w-full bg-slate-700 text-slate-200 border border-slate-600 rounded px-2 py-1 text-[10px] outline-none focus:border-blue-400 mt-1" />
-          {/* Phase 4: Auto-suggest curriculum goals */}
           {goalSuggestions.length > 0 && !detail.curriculumGoal && !effectiveDetail.curriculumGoal && (
             <div className="mt-1.5 space-y-0.5">
               <span className="text-[8px] text-amber-500/70">💡 Vorgeschlagene Lehrplanziele:</span>
@@ -335,12 +599,10 @@ export function DetailPanel() {
   } = usePlannerStore();
   const panelRef = useRef<HTMLDivElement>(null);
 
-  // Click outside to close
   useEffect(() => {
     if (!sidePanelOpen) return;
     const handler = (e: MouseEvent) => {
       if (panelRef.current && !panelRef.current.contains(e.target as Node)) {
-        // Don't close if clicking on the main grid (those clicks are handled by grid handlers)
         const target = e.target as HTMLElement;
         if (target.closest('table') || target.closest('.app-header')) return;
         setSidePanelOpen(false);
@@ -350,9 +612,7 @@ export function DetailPanel() {
     return () => document.removeEventListener('mousedown', handler);
   }, [sidePanelOpen, setSidePanelOpen]);
 
-  // Also show panel if old sequencePanelOpen is true (backwards compat)
   const isOpen = sidePanelOpen || sequencePanelOpen;
-
   if (!isOpen) return null;
 
   return (
@@ -360,7 +620,6 @@ export function DetailPanel() {
       ref={panelRef}
       className="fixed right-0 top-0 bottom-0 w-[340px] bg-slate-900 border-l border-slate-700 z-[65] flex flex-col shadow-[-4px_0_16px_rgba(0,0,0,0.4)]"
     >
-      {/* Tab header */}
       <div className="px-3 py-2 border-b border-slate-700 flex items-center justify-between shrink-0">
         <div className="flex gap-1">
           <button
@@ -397,13 +656,7 @@ export function DetailPanel() {
           ✕
         </button>
       </div>
-
-      {/* Tab content */}
-      {sidePanelTab === 'details' ? (
-        <DetailsTab />
-      ) : (
-        <SequencePanel embedded />
-      )}
+      {sidePanelTab === 'details' ? <DetailsTab /> : <SequencePanel embedded />}
     </div>
   );
 }

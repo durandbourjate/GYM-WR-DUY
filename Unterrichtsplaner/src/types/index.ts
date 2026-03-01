@@ -77,6 +77,11 @@ export type FilterType = 'ALL' | CourseType;
 
 // Extended lesson detail fields (Phase 1)
 export type SubjectArea = 'VWL' | 'BWL' | 'RECHT' | 'IN' | 'INTERDISZ';
+
+// === Block-Typ / Untertyp (zweistufig) ===
+export type BlockCategory = 'LESSON' | 'ASSESSMENT' | 'EVENT' | 'HOLIDAY';
+
+// Legacy flat BlockType (for migration)
 export type BlockType =
   | 'LESSON'
   | 'EXAM'
@@ -95,7 +100,11 @@ export interface LessonDetail {
   topicMain?: string;
   topicSub?: string;
   curriculumGoal?: string;
+  /** @deprecated Use blockCategory + blockSubtype instead */
   blockType?: BlockType;
+  blockCategory?: BlockCategory;
+  blockSubtype?: string;
+  duration?: string; // e.g. "1L", "2L", "45min", "90min"
   description?: string;
   learningviewUrl?: string;
   materialLinks?: string[];
