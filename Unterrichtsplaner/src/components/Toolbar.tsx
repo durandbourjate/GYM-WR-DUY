@@ -126,7 +126,7 @@ function DataMenu() {
 }
 
 export function AppHeader() {
-  const { filter, setFilter, classFilter, setClassFilter, showHelp, toggleHelp, undoStack, undo, setSequencePanelOpen, sidePanelOpen, setSidePanelOpen, setSidePanelTab, zoomLevel, setZoomLevel, searchQuery, setSearchQuery } = usePlannerStore();
+  const { filter, setFilter, classFilter, setClassFilter, showHelp, toggleHelp, undoStack, undo, setSequencePanelOpen, sidePanelOpen, setSidePanelOpen, setSidePanelTab, zoomLevel, setZoomLevel, searchQuery, setSearchQuery, dimPastWeeks, setDimPastWeeks } = usePlannerStore();
   const [showStats, setShowStats] = useState(false);
   const [showTaF, setShowTaF] = useState(false);
 
@@ -218,6 +218,13 @@ export function AppHeader() {
             </button>
           ))}
         </div>
+        <button
+          onClick={() => setDimPastWeeks(!dimPastWeeks)}
+          className={`px-2 py-0.5 rounded text-[9px] cursor-pointer transition-colors ${dimPastWeeks ? 'text-amber-400 bg-amber-900/30 border border-amber-700' : 'text-gray-500 border border-gray-700 hover:text-gray-300'}`}
+          title={dimPastWeeks ? 'Vergangene Wochen: abgedunkelt — Klick für volle Helligkeit' : 'Vergangene Wochen: volle Helligkeit — Klick zum Abdunkeln'}
+        >
+          {dimPastWeeks ? '◐' : '●'}
+        </button>
         <span className="w-px h-4 bg-gray-700 mx-1" />
         {undoStack.length > 0 && (
           <button

@@ -46,11 +46,12 @@ interface YearSpan {
   weeks: string[];
   courseId: string;    // specific course within group
   isShared: boolean;   // true if seq covers all courses in group (→ wide bar)
+  isLoose?: boolean;   // true for lessons not in any sequence
 }
 
 export function ZoomYearView() {
   const {
-    filter, classFilter, sequences, weekData,
+    filter, classFilter, sequences, weekData, lessonDetails,
     setZoomLevel, setEditingSequenceId,
     setSidePanelOpen, setSidePanelTab, setSelection,
     searchQuery, setClassFilter, setFilter,
@@ -152,17 +153,66 @@ export function ZoomYearView() {
         }
       }
     }
+
+    // Second pass: find loose lessons (not covered by any sequence)
+    const coveredSet = new Set<string>(); // "weekIdx:courseId"
+    for (const [, span] of spanMap) {
+      for (let i = span.startIdx; i < span.startIdx + span.spanLen; i++) {
+        if (span.isShared) {
+          const g = groups.find(g2 => g2.courses.some(c => c.id === span.courseId));
+          if (g) g.courses.forEach(c => coveredSet.add(`${i}:${c.id}`));
+        } else {
+          coveredSet.add(`${i}:${span.courseId}`);
+        }
+      }
+    }
+
+    for (const group of groups) {
+      for (const course of group.courses) {
+        for (let wi = 0; wi < allWeekKeys.length; wi++) {
+          if (coveredSet.has(`${wi}:${course.id}`)) continue;
+          const weekW = allWeekKeys[wi];
+          const wd = effectiveWeeks.find(w => w.w === weekW);
+          const entry = wd?.lessons[course.col];
+          if (!entry) continue;
+          // This week has a lesson but no sequence → loose lesson
+          const detail = lessonDetails[`${weekW}-${course.col}`];
+          const entryType = String(entry.type || '');
+          const area = detail?.subjectArea || inferSubjectArea(entryType as unknown as LessonType);
+          const looseKey = `${wi}:${course.id}:loose`;
+          if (spanMap.has(looseKey)) continue;
+          // Create a dummy seq for type compatibility
+          const dummySeq = { id: '__loose__', title: '', courseId: course.id, blocks: [], createdAt: '', updatedAt: '' } as ManagedSequence;
+          spanMap.set(looseKey, {
+            seq: dummySeq, blockIdx: 0, label: entryType, topicMain: detail?.topicMain || entryType,
+            subjectArea: area, startIdx: wi, spanLen: 1, weeks: [weekW],
+            courseId: course.id, isShared: false, isLoose: true,
+          });
+        }
+      }
+    }
+
     return { spanMap, skipSet };
-  }, [groups, sequences, allWeekKeys, effectiveWeeks]);
+  }, [groups, sequences, allWeekKeys, effectiveWeeks, lessonDetails]);
 
   const searchLower = searchQuery.toLowerCase();
 
   // Click handlers
   const handleBlockClick = useCallback((span: YearSpan) => {
+    if (span.isLoose) {
+      // Loose lesson: open DetailPanel
+      const course = allCourses.find(c => c.id === span.courseId);
+      if (course) {
+        setSelection({ week: span.weeks[0], courseId: course.id, title: span.label, course });
+        setSidePanelOpen(true);
+        setSidePanelTab('details');
+      }
+      return;
+    }
     setEditingSequenceId(`${span.seq.id}-${span.blockIdx}`);
     setSidePanelOpen(true);
     setSidePanelTab('sequences');
-  }, [setEditingSequenceId, setSidePanelOpen, setSidePanelTab]);
+  }, [setEditingSequenceId, setSidePanelOpen, setSidePanelTab, allCourses, setSelection]);
 
   const handleBlockDblClick = useCallback((weekW: string, course: Course, span: YearSpan) => {
     setZoomLevel(3);
@@ -336,10 +386,11 @@ export function ZoomYearView() {
                       const course = group.courses[0];
                       // Try to find a span starting here
                       const spanKey = `${weekIdx}:${course.id}:${course.id}`;
+                      const looseKey = `${weekIdx}:${course.id}:loose`;
                       const skip = skipSet.has(spanKey);
                       if (skip) return null;
 
-                      const span = spanMap.get(spanKey);
+                      const span = spanMap.get(spanKey) || spanMap.get(looseKey);
                       if (!span) {
                         return (
                           <td key={group.key} className="border-b border-slate-800/20 p-0 cursor-pointer hover:bg-slate-800/30"
@@ -354,14 +405,20 @@ export function ZoomYearView() {
                       const blockSearchMatch = searchLower.length >= 2 && (
                         span.label.toLowerCase().includes(searchLower) ||
                         (span.topicMain || '').toLowerCase().includes(searchLower) ||
-                        span.seq.title.toLowerCase().includes(searchLower)
+                        (span.isLoose ? false : span.seq.title.toLowerCase().includes(searchLower))
                       );
                       return (
                         <td key={group.key} rowSpan={span.spanLen} className="p-0"
                           style={{ width: GROUP_W, minWidth: GROUP_W, maxWidth: GROUP_W, height: spanHeight, opacity: searchLower.length >= 2 && !blockSearchMatch ? 0.15 : 1 }}>
                           <div className={`h-full px-2 py-1 flex flex-col justify-center cursor-pointer transition-all hover:brightness-110 rounded-sm ${blockSearchMatch ? 'ring-1 ring-amber-400' : ''}`}
-                            style={{ background: colors.bg, borderLeft: `4px solid ${colors.border}`, minHeight: spanHeight - 2 }}
-                            title={`${span.seq.title} → ${displayLabel}\n${span.spanLen}W\nKlick: Sequenz · Doppelklick: Wochenansicht`}
+                            style={{
+                              background: span.isLoose ? colors.bg + '80' : colors.bg,
+                              borderLeft: span.isLoose ? `2px dashed ${colors.border}` : `4px solid ${colors.border}`,
+                              minHeight: spanHeight - 2,
+                            }}
+                            title={span.isLoose
+                              ? `${displayLabel}\nEinzellektion · Klick: Details · Doppelklick: Wochenansicht`
+                              : `${span.seq.title} → ${displayLabel}\n${span.spanLen}W\nKlick: Sequenz · Doppelklick: Wochenansicht`}
                             onClick={() => handleBlockClick(span)}
                             onDoubleClick={() => handleBlockDblClick(span.weeks[0], course, span)}>
                             <span className="text-[10px] font-bold leading-tight" style={{ color: colors.fg, display: '-webkit-box', WebkitLineClamp: span.spanLen >= 3 ? 3 : 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>

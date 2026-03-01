@@ -115,14 +115,12 @@ function FlatBlockCard({ fb }: { fb: FlatBlockInfo }) {
     sequences, updateSequence, lessonDetails,
   } = usePlannerStore();
   const { courses: COURSES } = usePlannerData();
-  const [showFields, setShowFields] = useState(false);
-  const [showLessons, setShowLessons] = useState(false);
-  const [showSeriesFields, setShowSeriesFields] = useState(false);
-  const cardRef = useRef<HTMLDivElement>(null);
-
-  // When card becomes active (after re-mount from group change), auto-open fields
   const blockKey = `${fb.seqId}-${fb.blockIndex}`;
   const isActive = editingSequenceId === blockKey;
+  const [showFields, setShowFields] = useState(isActive);
+  const [showLessons, setShowLessons] = useState(isActive);
+  const [showSeriesFields, setShowSeriesFields] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
 
   // SOL-Total: Sum all lesson-level SOL durations across all blocks of the parent sequence
   const parentSeqForSol = sequences.find(s => s.id === fb.seqId);
@@ -131,10 +129,12 @@ function FlatBlockCard({ fb }: { fb: FlatBlockInfo }) {
     return computeSeqSolTotal(parentSeqForSol, lessonDetails, COURSES);
   }, [parentSeqForSol, lessonDetails, COURSES]);
 
-  // Re-open fields section when component re-mounts while still active
-  // (happens when subjectArea change causes group re-assignment)
+  // Re-open sections when component re-mounts while still active
   useEffect(() => {
-    if (isActive && !showFields) setShowFields(true);
+    if (isActive) {
+      if (!showFields) setShowFields(true);
+      if (!showLessons) setShowLessons(true);
+    }
   }, []); // only on mount
 
   // Scroll active card into view (e.g. when clicked from Zoom 2 Year View)
@@ -426,7 +426,7 @@ function getCourseTypesForClass(cls: string, courses: Course[]): { typ: string; 
 export function SequencePanel({ embedded = false }: { embedded?: boolean }) {
   const {
     sequences, sequencePanelOpen, setSequencePanelOpen,
-    addSequence,
+    addSequence, editingSequenceId,
   } = usePlannerStore();
   const { courses: COURSES, getLinkedCourseIds } = usePlannerData();
 
@@ -536,7 +536,18 @@ export function SequencePanel({ embedded = false }: { embedded?: boolean }) {
               );
             })}
           </div>
-          {[...saMap.entries()].map(([sa, blocks]) => (
+          {[...saMap.entries()].map(([sa, blocks]) => {
+            // Sort: active (editing) block first
+            const sorted = editingSequenceId
+              ? [...blocks].sort((a, b) => {
+                  const aKey = `${a.seqId}-${a.blockIndex}`;
+                  const bKey = `${b.seqId}-${b.blockIndex}`;
+                  if (aKey === editingSequenceId) return -1;
+                  if (bKey === editingSequenceId) return 1;
+                  return 0;
+                })
+              : blocks;
+            return (
             <div key={sa} className="ml-1">
               {sa !== 'ANDERE' && (
                 <div className="text-[8px] font-medium px-1 py-0.5 mb-1 rounded flex items-center gap-1"
@@ -546,12 +557,13 @@ export function SequencePanel({ embedded = false }: { embedded?: boolean }) {
                 </div>
               )}
               <div className="space-y-1">
-                {blocks.map((fb) => (
+                {sorted.map((fb) => (
                   <FlatBlockCard key={`${fb.seqId}-${fb.blockIndex}`} fb={fb} />
                 ))}
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       );
     });
@@ -572,6 +584,18 @@ export function SequencePanel({ embedded = false }: { embedded?: boolean }) {
           </button>
         ))}
       </div>
+
+      {/* Active sequence pinned at top */}
+      {editingSequenceId && (() => {
+        const activeFb = flatBlocks.find(fb => `${fb.seqId}-${fb.blockIndex}` === editingSequenceId);
+        if (!activeFb) return null;
+        return (
+          <div className="px-3 pt-2 pb-1 border-b border-purple-500/30 bg-slate-900/50">
+            <div className="text-[8px] text-purple-400 font-medium mb-1">▶ Aktive Sequenz</div>
+            <FlatBlockCard fb={activeFb} />
+          </div>
+        );
+      })()}
 
       {/* Flat block list */}
       <div className="flex-1 overflow-y-auto px-3 py-2 space-y-3">

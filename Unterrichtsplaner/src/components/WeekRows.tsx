@@ -338,6 +338,7 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
     setInsertDialog, pushLessons, pushUndo,
     searchQuery,
     expandedNoteCols,
+    dimPastWeeks,
   } = usePlannerStore();
 
   const [dropTarget, setDropTarget] = useState<{ week: string; col: number } | null>(null);
@@ -352,6 +353,8 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
   const [dragSelectCol, setDragSelectCol] = useState<number | null>(null);
   const [dragSelectedWeeks, setDragSelectedWeeks] = useState<string[]>([]);
   const [dragSelectCourse, setDragSelectCourse] = useState<Course | null>(null);
+  // Multi-day shift-click popup
+  const [multiDayPrompt, setMultiDayPrompt] = useState<{ weekW: string; courseId: string; position: { x: number; y: number } } | null>(null);
 
   const displayWeeks = weekData.length > 0
     ? weeks.map((w) => weekData.find((wd) => wd.w === w.w) || w)
@@ -497,7 +500,7 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
             ref={isCurrent ? currentRef : undefined}
             data-week={week.w}
             className="group"
-            style={{ opacity: past && !isCurrent ? 0.6 : 1 }}
+            style={{ opacity: dimPastWeeks && past && !isCurrent ? 0.6 : 1 }}
           >
             {/* Week number */}
             <td
@@ -590,11 +593,11 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                   style={{
                     borderLeft: newDay ? `2px solid ${DAY_COLORS[c.day]}12` : 'none',
                     outline: isDragOver ? '2px solid #3b82f6'
-                      : (isDragSelecting && dragSelectCol === c.col && dragSelectedWeeks.includes(week.w)) ? '2px solid #a855f7'
+                      : (dragSelectCol === c.col && dragSelectedWeeks.includes(week.w)) ? '2px solid #a855f7'
                       : isMulti && !title ? '2px solid #6366f180' : 'none',
                     outlineOffset: '-2px',
                     background: isDragOver ? '#1e3a5f30'
-                      : (isDragSelecting && dragSelectCol === c.col && dragSelectedWeeks.includes(week.w)) ? '#7c3aed20'
+                      : (dragSelectCol === c.col && dragSelectedWeeks.includes(week.w)) ? '#7c3aed20'
                       : isMulti && !title ? '#312e8140' : undefined,
                     width: 110,
                     minWidth: 110,
@@ -614,7 +617,14 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                     if (e.shiftKey || e.metaKey || e.ctrlKey) {
                       if (title) {
                         if (e.shiftKey) {
-                          selectRange(`${week.w}-${c.id}`, allWeekKeys, courses, e.altKey ? true : false);
+                          // Always select just this day first
+                          selectRange(`${week.w}-${c.id}`, allWeekKeys, courses, false);
+                          // Check if multi-day course → show prompt
+                          const linked = getLinkedCourseIds(c.id);
+                          if (linked.length > 1) {
+                            const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                            setMultiDayPrompt({ weekW: week.w, courseId: c.id, position: { x: rect.left + rect.width / 2, y: rect.top } });
+                          }
                         } else {
                           toggleMultiSelect(`${week.w}-${c.id}`);
                         }
@@ -626,11 +636,14 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                       }
                     } else if (title) {
                       handleClick(week.w, c, title, e);
+                      // Clear drag selection when clicking filled cell
+                      setDragSelectedWeeks([]); setDragSelectCol(null); setDragSelectCourse(null);
                     } else {
                       // Click on empty cell: select it (mark visually) and close panel
                       clearMultiSelect();
                       setSelection({ week: week.w, courseId: c.id, title: '', course: c });
                       setEmptyCellMenu(null);
+                      setDragSelectedWeeks([]); setDragSelectCol(null); setDragSelectCourse(null);
                       usePlannerStore.getState().setEditingSequenceId(null);
                       setSidePanelOpen(false);
                     }
@@ -900,9 +913,35 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
           </tr>
         );
       })}
+
+      {/* Multi-day shift-click prompt */}
+      {multiDayPrompt && (() => {
+        const linked = getLinkedCourseIds(multiDayPrompt.courseId);
+        const otherIds = linked.filter(id => id !== multiDayPrompt.courseId);
+        const otherCourses = otherIds.map(id => COURSES_CACHE.find(cc => cc.id === id)).filter(Boolean);
+        const otherDays = otherCourses.map(cc => cc!.day).join('/');
+        return (
+          <tr>
+            <td colSpan={courses.length + 1} className="p-0 relative">
+              <div className="fixed z-[90] bg-slate-800 border border-purple-500 rounded-lg shadow-2xl py-1 px-2 w-auto"
+                style={{ top: multiDayPrompt.position.y - 40, left: multiDayPrompt.position.x - 60 }}>
+                <div className="text-[9px] text-gray-300 mb-1">Auch <span className="font-bold text-purple-300">{otherDays}</span> auswählen?</div>
+                <div className="flex gap-1">
+                  <button onClick={() => {
+                    selectRange(`${multiDayPrompt.weekW}-${multiDayPrompt.courseId}`, allWeekKeys, courses, true);
+                    setMultiDayPrompt(null);
+                  }} className="px-2 py-0.5 rounded text-[9px] bg-purple-600 text-white cursor-pointer hover:bg-purple-500">Ja, beide Tage</button>
+                  <button onClick={() => setMultiDayPrompt(null)}
+                    className="px-2 py-0.5 rounded text-[9px] border border-gray-600 text-gray-400 cursor-pointer hover:text-gray-200">Nein</button>
+                </div>
+              </div>
+            </td>
+          </tr>
+        );
+      })()}
     </>
   );
 }
 
 // We need courses for paired detection in mini-buttons
-import { COURSES as COURSES_CACHE } from '../data/courses';
+import { COURSES as COURSES_CACHE, getLinkedCourseIds } from '../data/courses';
