@@ -2,29 +2,40 @@ import { useMemo, useCallback } from 'react';
 import { usePlannerStore } from '../store/plannerStore';
 import { usePlannerData } from '../hooks/usePlannerData';
 import { TYPE_BADGES, DAY_COLORS, SUBJECT_AREA_COLORS, isPastWeek } from '../utils/colors';
-import type { Course, ManagedSequence } from '../types';
+import type { Course, ManagedSequence, LessonType, SubjectArea } from '../types';
 
 const DAY_ORDER: Record<string, number> = { Mo: 0, Di: 1, Mi: 2, Do: 3, Fr: 4 };
+const ROW_H = 22; // px per week row
+const HOLIDAY_ROW_H = 14;
 
 interface Props {
   semester: 1 | 2;
 }
 
-/** Info about which sequence block occupies a cell */
-interface CellBlock {
+/** Contiguous span of weeks belonging to one block within a single semester */
+interface BlockSpan {
   seq: ManagedSequence;
   blockIdx: number;
   label: string;
   topicMain?: string;
   subjectArea?: string;
-  weekIndexInBlock: number;  // 0-based position within block.weeks
-  totalWeeksInBlock: number;
-  isFirst: boolean;
-  isLast: boolean;
   curriculumGoal?: string;
+  /** The consecutive semWeeks indices this block covers */
+  startIdx: number;
+  spanLen: number;
+  /** KW strings */
+  weeks: string[];
 }
 
-/** Detect holiday/event weeks from weekData */
+/** Infer subject area from lesson type when sequence has none set */
+function inferSubjectArea(lessonType?: LessonType): SubjectArea | undefined {
+  if (lessonType === 1) return 'BWL';
+  if (lessonType === 2) return 'VWL';
+  if (lessonType === 3) return 'IN';
+  return undefined;
+}
+
+/** Detect holiday/event from weekData for a specific course column */
 function getWeekType(weekW: string, weekData: any[], col: number): 'holiday' | 'event' | 'normal' {
   const week = weekData.find((w: any) => w.w === weekW);
   if (!week) return 'normal';
@@ -33,6 +44,14 @@ function getWeekType(weekW: string, weekData: any[], col: number): 'holiday' | '
   if (entry.type === 6) return 'holiday';
   if (entry.type === 5) return 'event';
   return 'normal';
+}
+
+/** Get dark-mode friendly colors for a subject area */
+function getBlockColors(subjectArea?: string) {
+  if (subjectArea && SUBJECT_AREA_COLORS[subjectArea as keyof typeof SUBJECT_AREA_COLORS]) {
+    return SUBJECT_AREA_COLORS[subjectArea as keyof typeof SUBJECT_AREA_COLORS];
+  }
+  return { bg: '#475569', fg: '#94a3b8', border: '#64748b' };
 }
 
 export function ZoomBlockView({ semester }: Props) {
@@ -45,7 +64,6 @@ export function ZoomBlockView({ semester }: Props) {
 
   const { courses: allCourses, weeks: staticWeeks, s2StartIndex, currentWeek } = usePlannerData();
 
-  // Filter and sort courses
   const courses = useMemo(() => {
     let c = allCourses.filter(co => co.semesters.includes(semester));
     if (filter !== 'ALL') c = c.filter(co => co.typ === filter);
@@ -57,7 +75,6 @@ export function ZoomBlockView({ semester }: Props) {
     });
   }, [filter, classFilter, semester, allCourses]);
 
-  // Semester weeks from dynamic data
   const effectiveWeeks = useMemo(() =>
     weekData.length > 0 ? weekData : staticWeeks,
     [weekData, staticWeeks]);
@@ -68,9 +85,12 @@ export function ZoomBlockView({ semester }: Props) {
     return all.slice(s2StartIndex);
   }, [effectiveWeeks, semester, s2StartIndex]);
 
-  // Build cell map: for each (weekW, courseId) → CellBlock | null
-  const cellMap = useMemo(() => {
-    const map = new Map<string, CellBlock>();
+  // Build BlockSpans per course — contiguous runs of a block within the semester
+  // Also build a skip set: cells covered by a rowSpan that shouldn't render a <td>
+  const { spanMap, skipSet } = useMemo(() => {
+    const spanMap = new Map<string, BlockSpan>(); // key: "startIdx:courseId"
+    const skipSet = new Set<string>(); // keys: "weekIdx:courseId" for rows 2..n of a span
+
     for (const course of courses) {
       const courseSeqs = sequences.filter(s =>
         s.courseId === course.id || (s.courseIds?.includes(course.id))
@@ -78,44 +98,86 @@ export function ZoomBlockView({ semester }: Props) {
       for (const seq of courseSeqs) {
         for (let bi = 0; bi < seq.blocks.length; bi++) {
           const block = seq.blocks[bi];
-          const blockWeeksInSem = block.weeks.filter(w => semWeeks.includes(w));
-          for (const w of blockWeeksInSem) {
-            const globalIdx = block.weeks.indexOf(w);
-            const key = `${w}:${course.id}`;
-            map.set(key, {
-              seq,
-              blockIdx: bi,
+          // Find contiguous run of weeks within semWeeks
+          const weekIndices: number[] = [];
+          for (const w of block.weeks) {
+            const idx = semWeeks.indexOf(w);
+            if (idx >= 0) weekIndices.push(idx);
+          }
+          if (weekIndices.length === 0) continue;
+
+          // Group into contiguous runs (handle blocks that span across holidays)
+          weekIndices.sort((a, b) => a - b);
+          let runStart = weekIndices[0];
+          let prev = weekIndices[0];
+          const runs: { start: number; end: number }[] = [];
+          for (let i = 1; i < weekIndices.length; i++) {
+            if (weekIndices[i] === prev + 1) {
+              prev = weekIndices[i];
+            } else {
+              runs.push({ start: runStart, end: prev });
+              runStart = weekIndices[i];
+              prev = weekIndices[i];
+            }
+          }
+          runs.push({ start: runStart, end: prev });
+
+          // Determine subjectArea: block → seq → infer from weekData
+          let area = block.subjectArea || seq.subjectArea;
+          if (!area) {
+            const firstWeek = semWeeks[weekIndices[0]];
+            const wd = effectiveWeeks.find(w => w.w === firstWeek);
+            const entry = wd?.lessons[course.col];
+            if (entry) area = inferSubjectArea(entry.type as LessonType);
+          }
+
+          for (const run of runs) {
+            const spanLen = run.end - run.start + 1;
+            const spanWeeks = semWeeks.slice(run.start, run.end + 1);
+            const spanKey = `${run.start}:${course.id}`;
+            spanMap.set(spanKey, {
+              seq, blockIdx: bi,
               label: block.label,
               topicMain: block.topicMain,
-              subjectArea: block.subjectArea || seq.subjectArea,
-              weekIndexInBlock: globalIdx,
-              totalWeeksInBlock: block.weeks.length,
-              isFirst: globalIdx === 0,
-              isLast: globalIdx === block.weeks.length - 1,
+              subjectArea: area,
               curriculumGoal: block.curriculumGoal,
+              startIdx: run.start,
+              spanLen,
+              weeks: spanWeeks,
             });
+            // Mark rows 2..n as skipped
+            for (let r = run.start + 1; r <= run.end; r++) {
+              skipSet.add(`${r}:${course.id}`);
+            }
           }
         }
       }
     }
-    return map;
-  }, [courses, sequences, semWeeks]);
+    return { spanMap, skipSet };
+  }, [courses, sequences, semWeeks, effectiveWeeks]);
 
   const searchLower = searchQuery.toLowerCase();
 
   // Click handlers
-  const handleBlockClick = useCallback((cell: CellBlock) => {
-    setEditingSequenceId(cell.seq.id);
+  const handleBlockClick = useCallback((span: BlockSpan) => {
+    setEditingSequenceId(span.seq.id);
     setSidePanelOpen(true);
     setSidePanelTab('sequences');
   }, [setEditingSequenceId, setSidePanelOpen, setSidePanelTab]);
 
-  const handleBlockDblClick = useCallback((weekW: string, course: Course, cell: CellBlock) => {
+  const handleBlockDblClick = useCallback((weekW: string, course: Course, span: BlockSpan) => {
     setZoomLevel(3);
-    setSelection({ week: weekW, courseId: course.id, title: cell.label, course });
+    setSelection({ week: weekW, courseId: course.id, title: span.label, course });
     setTimeout(() => {
-      const row = document.querySelector(`tr[data-week="${weekW}"]`);
-      row?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      document.querySelector(`tr[data-week="${weekW}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 100);
+  }, [setZoomLevel, setSelection]);
+
+  const handleEmptyClick = useCallback((weekW: string, course: Course) => {
+    setZoomLevel(3);
+    setSelection({ week: weekW, courseId: course.id, title: '', course });
+    setTimeout(() => {
+      document.querySelector(`tr[data-week="${weekW}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }, 100);
   }, [setZoomLevel, setSelection]);
 
@@ -123,7 +185,6 @@ export function ZoomBlockView({ semester }: Props) {
     <div className="px-1 py-1">
       <table className="border-collapse w-max min-w-full">
         <thead className="sticky z-40" style={{ top: 0 }}>
-          {/* Day row */}
           <tr>
             <th className="w-10 bg-gray-900 sticky left-0 z-50 py-0.5 border-b border-gray-800">
               <span className={`text-[8px] font-bold ${semester === 1 ? 'text-blue-400' : 'text-amber-400'}`}>
@@ -140,7 +201,6 @@ export function ZoomBlockView({ semester }: Props) {
               );
             })}
           </tr>
-          {/* Course info row */}
           <tr>
             <th className="w-10 bg-gray-900 sticky left-0 z-50 px-0.5 pb-0.5 border-b-2 border-gray-700">
               <span className="text-[7px] text-gray-500 font-semibold">KW</span>
@@ -158,9 +218,7 @@ export function ZoomBlockView({ semester }: Props) {
                   <div className="flex gap-0.5 justify-center mt-0.5">
                     <span className="text-[7px] px-1 rounded font-bold cursor-pointer hover:opacity-80"
                       style={{ background: badge?.bg, color: badge?.fg }}
-                      onClick={() => setFilter(c.typ as any)}>
-                      {c.typ}
-                    </span>
+                      onClick={() => setFilter(c.typ as any)}>{c.typ}</span>
                     <span className="text-[7px] px-0.5 rounded bg-slate-800 text-slate-400">{c.les}L</span>
                   </div>
                 </th>
@@ -169,26 +227,22 @@ export function ZoomBlockView({ semester }: Props) {
           </tr>
         </thead>
         <tbody>
-          {semWeeks.map(weekW => {
+          {semWeeks.map((weekW, weekIdx) => {
             const past = isPastWeek(weekW, currentWeek);
             const isCurrent = weekW === currentWeek;
 
-            // Check if entire week is holiday
-            const isHolidayWeek = effectiveWeeks.find(w => w.w === weekW &&
-              Object.values(w.lessons).length > 0 &&
-              Object.values(w.lessons).every(e => (e as any).type === 6));
-            const holidayLabel = isHolidayWeek ? Object.values(isHolidayWeek.lessons)[0]?.title : null;
-
-            // Check if entire week is event (IW etc.)
-            const isEventWeek = !isHolidayWeek && effectiveWeeks.find(w => w.w === weekW &&
-              Object.values(w.lessons).length > 0 &&
-              Object.values(w.lessons).every(e => (e as any).type === 5));
-            const eventLabel = isEventWeek ? Object.values(isEventWeek.lessons)[0]?.title : null;
+            // Full-week holiday check
+            const weekEntry = effectiveWeeks.find(w => w.w === weekW);
+            const allEntries = weekEntry ? Object.values(weekEntry.lessons) : [];
+            const isHolidayWeek = allEntries.length > 0 && allEntries.every(e => (e as any).type === 6);
+            const holidayLabel = isHolidayWeek ? (allEntries[0] as any)?.title : null;
+            const isEventWeek = !isHolidayWeek && allEntries.length > 0 && allEntries.every(e => (e as any).type === 5);
+            const eventLabel = isEventWeek ? (allEntries[0] as any)?.title : null;
 
             return (
-              <tr key={weekW}
-                style={{ opacity: past && !isCurrent ? 0.5 : 1, height: isHolidayWeek ? 16 : 24 }}>
-                {/* KW label */}
+              <tr key={weekW} data-week={weekW}
+                style={{ opacity: past && !isCurrent ? 0.5 : 1, height: isHolidayWeek ? HOLIDAY_ROW_H : ROW_H }}>
+                {/* KW label — always present */}
                 <td className={`bg-gray-900 sticky left-0 z-10 text-center border-b py-0 px-0.5 ${
                   isCurrent ? 'border-amber-500 bg-amber-950/30' : 'border-slate-800/50'
                 }`}>
@@ -197,16 +251,14 @@ export function ZoomBlockView({ semester }: Props) {
                   </span>
                 </td>
 
-                {/* Holiday row — collapsed */}
+                {/* Full-width holiday/event */}
                 {isHolidayWeek ? (
-                  <td colSpan={courses.length}
-                    className="border-b border-slate-800/30 text-center py-0"
+                  <td colSpan={courses.length} className="border-b border-slate-800/30 text-center py-0"
                     style={{ background: '#ffffff06' }}>
                     <span className="text-[7px] text-gray-600 italic">{holidayLabel || 'Ferien'}</span>
                   </td>
                 ) : isEventWeek ? (
-                  <td colSpan={courses.length}
-                    className="border-b border-slate-800/30 text-center py-0"
+                  <td colSpan={courses.length} className="border-b border-slate-800/30 text-center py-0"
                     style={{ background: '#4b556312' }}>
                     <span className="text-[8px] text-gray-400 font-semibold">{eventLabel || 'Sonderwoche'}</span>
                   </td>
@@ -214,16 +266,25 @@ export function ZoomBlockView({ semester }: Props) {
                   /* Normal week — per course cells */
                   courses.map((c, ci) => {
                     const newDay = ci === 0 || c.day !== courses[ci - 1]?.day;
-                    const key = `${weekW}:${c.id}`;
-                    const cell = cellMap.get(key);
+                    const cellStyle = {
+                      borderLeft: newDay ? `2px solid ${DAY_COLORS[c.day]}12` : 'none' as string,
+                      width: 80, minWidth: 80, maxWidth: 80,
+                    };
 
-                    // Check individual cell holiday/event
+                    // Skip cells covered by a rowSpan from above
+                    const skipKey = `${weekIdx}:${c.id}`;
+                    if (skipSet.has(skipKey)) return null;
+
+                    // Check if a BlockSpan starts here
+                    const spanKey = `${weekIdx}:${c.id}`;
+                    const span = spanMap.get(spanKey);
+
+                    // Per-cell holiday/event
                     const wType = getWeekType(weekW, effectiveWeeks, c.col);
 
-                    if (wType === 'holiday') {
+                    if (wType === 'holiday' && !span) {
                       return (
-                        <td key={c.id} className="border-b border-slate-800/20 p-0"
-                          style={{ borderLeft: newDay ? `2px solid ${DAY_COLORS[c.day]}12` : 'none', width: 80, minWidth: 80, maxWidth: 80 }}>
+                        <td key={c.id} className="border-b border-slate-800/20 p-0" style={cellStyle}>
                           <div className="h-full flex items-center justify-center">
                             <span className="text-[6px] text-gray-600 italic">—</span>
                           </div>
@@ -231,12 +292,10 @@ export function ZoomBlockView({ semester }: Props) {
                       );
                     }
 
-                    if (wType === 'event' && !cell) {
-                      const weekEntry = effectiveWeeks.find(w => w.w === weekW);
+                    if (wType === 'event' && !span) {
                       const evTitle = weekEntry?.lessons[c.col]?.title || '';
                       return (
-                        <td key={c.id} className="border-b border-slate-800/20 p-0"
-                          style={{ borderLeft: newDay ? `2px solid ${DAY_COLORS[c.day]}12` : 'none', width: 80, minWidth: 80, maxWidth: 80 }}>
+                        <td key={c.id} className="border-b border-slate-800/20 p-0" style={cellStyle}>
                           <div className="h-full flex items-center px-1" style={{ background: '#4b556312' }}>
                             <span className="text-[7px] text-gray-500 truncate">{evTitle}</span>
                           </div>
@@ -244,71 +303,62 @@ export function ZoomBlockView({ semester }: Props) {
                       );
                     }
 
-                    // Empty cell — no sequence assigned
-                    if (!cell) {
+                    // Empty cell
+                    if (!span) {
                       return (
                         <td key={c.id} className="border-b border-slate-800/20 p-0 cursor-pointer hover:bg-slate-800/30"
-                          style={{ borderLeft: newDay ? `2px solid ${DAY_COLORS[c.day]}12` : 'none', width: 80, minWidth: 80, maxWidth: 80 }}
-                          onClick={() => {
-                            setZoomLevel(3);
-                            setSelection({ week: weekW, courseId: c.id, title: '', course: c });
-                            setTimeout(() => {
-                              document.querySelector(`tr[data-week="${weekW}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                            }, 100);
-                          }}>
+                          style={cellStyle}
+                          onClick={() => handleEmptyClick(weekW, c)}>
                         </td>
                       );
                     }
 
-                    // Sequence cell — render as colored bar segment
-                    const colors = cell.subjectArea && SUBJECT_AREA_COLORS[cell.subjectArea as keyof typeof SUBJECT_AREA_COLORS]
-                      ? SUBJECT_AREA_COLORS[cell.subjectArea as keyof typeof SUBJECT_AREA_COLORS]
-                      : { bg: '#475569', fg: '#94a3b8', border: '#64748b' };
+                    // Merged block span — rowSpan cell
+                    const colors = getBlockColors(span.subjectArea);
+                    const spanHeight = span.spanLen * ROW_H;
 
-                    // Search match
+                    // Search
                     const blockSearchMatch = searchLower.length >= 2 && (
-                      cell.label.toLowerCase().includes(searchLower) ||
-                      (cell.topicMain || '').toLowerCase().includes(searchLower) ||
-                      (cell.curriculumGoal || '').toLowerCase().includes(searchLower) ||
-                      cell.seq.title.toLowerCase().includes(searchLower)
+                      span.label.toLowerCase().includes(searchLower) ||
+                      (span.topicMain || '').toLowerCase().includes(searchLower) ||
+                      (span.curriculumGoal || '').toLowerCase().includes(searchLower) ||
+                      span.seq.title.toLowerCase().includes(searchLower)
                     );
                     const blockSearchDimmed = searchLower.length >= 2 && !blockSearchMatch;
 
-                    // Visual: rounded corners only at block start/end
-                    const borderRadius = `${cell.isFirst ? '4px' : '0'} ${cell.isFirst ? '4px' : '0'} ${cell.isLast ? '4px' : '0'} ${cell.isLast ? '4px' : '0'}`;
+                    const displayLabel = span.topicMain || span.label;
+                    const kwRange = `KW ${span.weeks[0]}–${span.weeks[span.weeks.length - 1]}`;
 
                     return (
-                      <td key={c.id} className="border-b border-transparent p-0"
+                      <td key={c.id}
+                        rowSpan={span.spanLen}
+                        className="p-0 align-stretch"
                         style={{
-                          borderLeft: newDay ? `2px solid ${DAY_COLORS[c.day]}12` : 'none',
-                          width: 80, minWidth: 80, maxWidth: 80,
+                          ...cellStyle,
+                          height: spanHeight,
                           opacity: blockSearchDimmed ? 0.15 : 1,
+                          verticalAlign: 'stretch',
                         }}>
                         <div
-                          className={`h-full px-1 flex items-center cursor-pointer transition-all hover:brightness-125 ${blockSearchMatch ? 'ring-1 ring-amber-400' : ''}`}
+                          className={`h-full px-1.5 py-1 flex flex-col justify-center cursor-pointer transition-all hover:brightness-125 rounded ${blockSearchMatch ? 'ring-1 ring-amber-400' : ''}`}
                           style={{
-                            background: colors.bg + '50',
+                            background: colors.bg + '45',
                             borderLeft: `3px solid ${colors.bg}`,
-                            borderRadius,
-                            borderTop: cell.isFirst ? `1px solid ${colors.bg}40` : 'none',
-                            borderBottom: cell.isLast ? `1px solid ${colors.bg}40` : 'none',
-                            minHeight: 22,
+                            borderTop: `1px solid ${colors.bg}30`,
+                            borderBottom: `1px solid ${colors.bg}30`,
+                            borderRight: `1px solid ${colors.bg}15`,
+                            minHeight: spanHeight - 2,
                           }}
-                          title={`${cell.seq.title} → ${cell.label}${cell.topicMain ? ' (' + cell.topicMain + ')' : ''}\nKW ${cell.seq.blocks[cell.blockIdx].weeks[0]}–${cell.seq.blocks[cell.blockIdx].weeks.at(-1)} (${cell.totalWeeksInBlock}W)\nKlick: Sequenz öffnen · Doppelklick: Zur Wochenansicht`}
-                          onClick={() => handleBlockClick(cell)}
-                          onDoubleClick={() => handleBlockDblClick(weekW, c, cell)}
+                          title={`${span.seq.title} → ${span.label}${span.topicMain ? ' (' + span.topicMain + ')' : ''}\n${kwRange} (${span.spanLen}W)\nKlick: Sequenz öffnen · Doppelklick: Zur Wochenansicht`}
+                          onClick={() => handleBlockClick(span)}
+                          onDoubleClick={() => handleBlockDblClick(span.weeks[0], c, span)}
                         >
-                          {/* Show label only on first week of block */}
-                          {cell.isFirst ? (
-                            <span className="text-[8px] font-semibold truncate leading-tight" style={{ color: colors.fg }}>
-                              {cell.topicMain || cell.label}
-                            </span>
-                          ) : (
-                            /* Middle/last rows: show subtle continuation indicator */
-                            <span className="text-[6px] text-gray-600">
-                              {cell.isLast ? `⌊ ${cell.totalWeeksInBlock}W` : ''}
-                            </span>
-                          )}
+                          <span className="text-[8px] font-semibold truncate leading-tight" style={{ color: colors.fg }}>
+                            {displayLabel}
+                          </span>
+                          <span className="text-[6px] mt-0.5" style={{ color: colors.fg, opacity: 0.6 }}>
+                            {span.spanLen}W · {kwRange}
+                          </span>
                         </div>
                       </td>
                     );
