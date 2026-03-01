@@ -82,7 +82,7 @@ interface PlannerState {
   migrateStaticSequences: () => void;
   fixSequenceTitles: () => void;
   addSequence: (seq: Omit<ManagedSequence, 'id' | 'createdAt' | 'updatedAt'>) => string;
-  updateSequence: (id: string, updates: Partial<Pick<ManagedSequence, 'title' | 'subjectArea' | 'blocks' | 'color' | 'courseId' | 'courseIds' | 'multiDayMode'>>) => void;
+  updateSequence: (id: string, updates: Partial<Pick<ManagedSequence, 'title' | 'subjectArea' | 'blocks' | 'color' | 'courseId' | 'courseIds' | 'multiDayMode' | 'links' | 'notes'>>) => void;
   deleteSequence: (id: string) => void;
   addBlockToSequence: (seqId: string, block: SequenceBlock) => void;
   updateBlockInSequence: (seqId: string, blockIndex: number, block: Partial<SequenceBlock>) => void;

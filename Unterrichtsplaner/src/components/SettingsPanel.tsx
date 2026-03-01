@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import type { CourseType, DayOfWeek, Semester } from '../types';
 import {
   loadSettings, saveSettings, getDefaultSettings, generateId,
+  importCurrentCourses, importCurrentHolidays, importCurrentSpecialWeeks,
   type PlannerSettings, type CourseConfig, type SpecialWeekConfig, type HolidayConfig,
 } from '../store/settingsStore';
 
@@ -295,6 +296,22 @@ export function SettingsPanel() {
         </div>
       </div>
 
+      {/* Import from hardcoded data */}
+      {settings.courses.length === 0 && (
+        <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-3">
+          <p className="text-[9px] text-blue-300 mb-2">Keine Kurse konfiguriert. Du kannst den aktuellen Stundenplan importieren oder von Grund auf neu anfangen.</p>
+          <button onClick={() => {
+            const courses = importCurrentCourses();
+            const holidays = importCurrentHolidays();
+            const specialWeeks = importCurrentSpecialWeeks();
+            updateSettings({ courses, holidays, specialWeeks });
+          }}
+            className="px-3 py-1 rounded text-[9px] font-medium bg-blue-600 hover:bg-blue-500 text-white cursor-pointer transition-all">
+            📋 Aktuellen Stundenplan (DUY SJ 25/26) importieren
+          </button>
+        </div>
+      )}
+
       {/* School basics */}
       <Section title="🏫 Schule & Grundeinstellungen" defaultOpen>
         <div className="space-y-1.5">
@@ -325,6 +342,42 @@ export function SettingsPanel() {
       {/* Holidays */}
       <Section title={`🏖 Ferien (${settings.holidays.length})`}>
         <HolidaysEditor holidays={settings.holidays} onChange={(h) => updateSettings({ holidays: h })} />
+      </Section>
+
+      {/* Export / Import JSON */}
+      <Section title="💾 Daten exportieren / importieren">
+        <div className="space-y-2">
+          <button onClick={() => {
+            const blob = new Blob([JSON.stringify(settings, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = 'unterrichtsplaner-settings.json'; a.click();
+            URL.revokeObjectURL(url);
+          }}
+            className="w-full py-1.5 rounded text-[9px] font-medium bg-slate-700 hover:bg-slate-600 text-gray-200 cursor-pointer transition-all">
+            ⬇ Einstellungen als JSON exportieren
+          </button>
+          <label className="block w-full py-1.5 rounded text-[9px] font-medium bg-slate-700 hover:bg-slate-600 text-gray-200 text-center cursor-pointer transition-all">
+            ⬆ JSON importieren
+            <input type="file" accept=".json" className="hidden" onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (!file) return;
+              const reader = new FileReader();
+              reader.onload = () => {
+                try {
+                  const imported = JSON.parse(reader.result as string) as PlannerSettings;
+                  if (imported.version && imported.courses) {
+                    setSettings(imported);
+                    setDirty(true);
+                  } else {
+                    alert('Ungültige Datei: Keine gültigen Einstellungen gefunden.');
+                  }
+                } catch { alert('Fehler beim Lesen der Datei.'); }
+              };
+              reader.readAsText(file);
+            }} />
+          </label>
+        </div>
       </Section>
 
       {/* Danger zone */}

@@ -1,4 +1,6 @@
 import type { Course, CourseType, DayOfWeek, Semester } from '../types';
+import { COURSES } from '../data/courses';
+import { WEEKS, S2_START_INDEX } from '../data/weeks';
 
 // === Settings Types ===
 export interface PlannerSettings {
@@ -105,4 +107,75 @@ export function configToCourses(configs: CourseConfig[]): Course[] {
 // Generate a unique ID
 export function generateId(): string {
   return 'c' + Math.random().toString(36).slice(2, 8);
+}
+
+// Import current hardcoded courses into settings
+export function importCurrentCourses(): CourseConfig[] {
+  return COURSES.map(c => ({
+    id: c.id,
+    cls: c.cls,
+    typ: c.typ,
+    day: c.day,
+    from: c.from,
+    to: c.to,
+    les: c.les,
+    hk: c.hk,
+    semesters: [...c.semesters],
+    note: c.note,
+  }));
+}
+
+// Detect holidays from current WEEKS data (weeks where all entries are type 6)
+export function importCurrentHolidays(): HolidayConfig[] {
+  const holidays: HolidayConfig[] = [];
+  let currentHoliday: { label: string; startWeek: string; endWeek: string } | null = null;
+
+  for (const week of WEEKS) {
+    const entries = Object.values(week.lessons);
+    const allHoliday = entries.length > 0 && entries.every(e => e.type === 6);
+    if (allHoliday) {
+      const label = entries[0]?.title || 'Ferien';
+      if (currentHoliday && currentHoliday.label === label) {
+        currentHoliday.endWeek = week.w;
+      } else {
+        if (currentHoliday) holidays.push({ id: generateId(), ...currentHoliday });
+        currentHoliday = { label, startWeek: week.w, endWeek: week.w };
+      }
+    } else {
+      if (currentHoliday) holidays.push({ id: generateId(), ...currentHoliday });
+      currentHoliday = null;
+    }
+  }
+  if (currentHoliday) holidays.push({ id: generateId(), ...currentHoliday });
+  return holidays;
+}
+
+// Detect special weeks from current WEEKS data (weeks where all entries are type 5)
+export function importCurrentSpecialWeeks(): SpecialWeekConfig[] {
+  const specials: SpecialWeekConfig[] = [];
+  for (const week of WEEKS) {
+    const entries = Object.values(week.lessons);
+    const allSpecial = entries.length > 0 && entries.every(e => e.type === 5);
+    if (allSpecial) {
+      const label = entries[0]?.title || 'Sonderwoche';
+      specials.push({ id: generateId(), label, week: week.w, type: 'event' });
+    }
+  }
+  return specials;
+}
+
+// Get effective courses: settings if available, else hardcoded
+export function getEffectiveCourses(): Course[] {
+  const settings = loadSettings();
+  if (settings && settings.courses.length > 0) {
+    return configToCourses(settings.courses);
+  }
+  return COURSES;
+}
+
+// Get effective S2 start index
+export function getEffectiveS2StartIndex(): number {
+  const settings = loadSettings();
+  if (settings) return settings.semesterBreak;
+  return S2_START_INDEX;
 }

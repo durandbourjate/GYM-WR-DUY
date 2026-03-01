@@ -14,7 +14,7 @@ const SUBJECT_AREAS: { key: SubjectArea; label: string; color: string }[] = [
 ];
 
 function BlockEditor({
-  block, index, seqId: _seqId, totalBlocks,
+  block, index, seqId, totalBlocks,
   onUpdate, onRemove, onMoveUp, onMoveDown,
 }: {
   block: SequenceBlock; index: number; seqId: string; totalBlocks: number;
@@ -23,6 +23,7 @@ function BlockEditor({
   onMoveUp: (idx: number) => void;
   onMoveDown: (idx: number) => void;
 }) {
+  const { setSelection, setSidePanelOpen, setSidePanelTab, sequences } = usePlannerStore();
   const [editingLabel, setEditingLabel] = useState(false);
   const [editingWeeks, setEditingWeeks] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
@@ -35,8 +36,27 @@ function BlockEditor({
     onUpdate(index, { weeks: parsed }); setEditingWeeks(false);
   };
 
+  // Navigate to first week of this block in the planner
+  const navigateToBlock = () => {
+    if (block.weeks.length === 0) return;
+    const seq = sequences.find(s => s.id === seqId);
+    if (!seq) return;
+    const weekKey = block.weeks[0];
+    const courseId = seq.courseId;
+    const course = COURSES.find(c => c.id === courseId);
+    if (!course) return;
+    const row = document.querySelector(`tr[data-week="${weekKey}"]`);
+    if (row) row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setSelection({ week: weekKey, courseId: course.id, title: block.label, course });
+    setSidePanelOpen(true);
+    setSidePanelTab('details');
+  };
+
+  const subjectColor = block.subjectArea ? (SUBJECT_AREA_COLORS[block.subjectArea] || {}).bg || '#1e293b' : undefined;
+
   return (
-    <div className="bg-slate-800 rounded px-2 py-1.5 border border-slate-700 group">
+    <div className="bg-slate-800 rounded px-2 py-1.5 border border-slate-700 group"
+      style={subjectColor ? { borderLeftColor: subjectColor, borderLeftWidth: 3 } : undefined}>
       <div className="flex items-center justify-between gap-1">
         {editingLabel ? (
           <input autoFocus value={labelText} onChange={(e) => setLabelText(e.target.value)}
@@ -45,7 +65,9 @@ function BlockEditor({
             className="flex-1 bg-slate-700 text-slate-200 border border-blue-400 rounded px-1.5 py-0.5 text-[10px] outline-none" />
         ) : (
           <span className="text-[10px] font-medium text-gray-200 cursor-pointer hover:text-blue-300 flex-1"
-            onDoubleClick={() => setEditingLabel(true)} title="Doppelklick zum Bearbeiten">
+            onClick={navigateToBlock}
+            onDoubleClick={(e) => { e.stopPropagation(); setEditingLabel(true); }}
+            title={block.weeks.length > 0 ? `Klick: Zur KW ${block.weeks[0]} springen · Doppelklick: Bearbeiten` : 'Doppelklick zum Bearbeiten'}>
             {block.label}
           </span>
         )}
@@ -146,8 +168,11 @@ function SequenceCard({ seq }: { seq: ManagedSequence }) {
   const handleDelete = () => { if (confirm(`Sequenz "${seq.title}" wirklich löschen?`)) deleteSequence(seq.id); };
   const handleAddBlock = () => { addBlockToSequence(seq.id, { weeks: [], label: 'Neuer Block' }); };
 
+  const seqSubjectColor = seq.subjectArea ? SUBJECT_AREA_COLORS[seq.subjectArea]?.bg : undefined;
+
   return (
-    <div className="border border-slate-700 rounded-lg overflow-hidden">
+    <div className="border border-slate-700 rounded-lg overflow-hidden"
+      style={seqSubjectColor ? { borderColor: seqSubjectColor + '50', background: seqSubjectColor + '08' } : undefined}>
       <div className="px-2.5 py-1.5 flex items-center gap-2 cursor-pointer hover:bg-slate-800/50"
         onClick={() => setEditingSequenceId(isExpanded ? null : seq.id)}>
         <div className="w-1 h-6 rounded-full shrink-0" style={{ background: seq.color || '#16a34a' }} />
@@ -224,6 +249,40 @@ function SequenceCard({ seq }: { seq: ManagedSequence }) {
             ))}
           </div>
 
+          {/* Links */}
+          <div className="space-y-1">
+            <div className="flex items-center justify-between">
+              <span className="text-[8px] text-gray-500">Links</span>
+              <button onClick={() => updateSequence(seq.id, { links: [...(seq.links || []), { label: '', url: '' }] })}
+                className="text-[8px] text-blue-400 cursor-pointer hover:text-blue-300">+ Link</button>
+            </div>
+            {(seq.links || []).map((link, li) => (
+              <div key={li} className="flex gap-1 items-center">
+                <input value={link.label} onChange={(e) => {
+                  const updated = [...(seq.links || [])]; updated[li] = { ...updated[li], label: e.target.value };
+                  updateSequence(seq.id, { links: updated });
+                }} placeholder="Label" className="w-16 bg-slate-700 text-slate-200 border border-slate-600 rounded px-1 py-px text-[8px] outline-none focus:border-blue-400" />
+                <input value={link.url} onChange={(e) => {
+                  const updated = [...(seq.links || [])]; updated[li] = { ...updated[li], url: e.target.value };
+                  updateSequence(seq.id, { links: updated });
+                }} placeholder="https://…" className="flex-1 bg-slate-700 text-slate-200 border border-slate-600 rounded px-1 py-px text-[8px] outline-none focus:border-blue-400 font-mono" />
+                {link.url && <a href={link.url} target="_blank" rel="noopener noreferrer" className="text-[8px] text-blue-400 hover:text-blue-300">↗</a>}
+                <button onClick={() => {
+                  const updated = (seq.links || []).filter((_, i) => i !== li);
+                  updateSequence(seq.id, { links: updated });
+                }} className="text-[8px] text-red-400 cursor-pointer">✕</button>
+              </div>
+            ))}
+          </div>
+
+          {/* Notes */}
+          <div>
+            <label className="text-[8px] text-gray-500 block mb-0.5">Notizen</label>
+            <textarea value={seq.notes || ''} onChange={(e) => updateSequence(seq.id, { notes: e.target.value || undefined })}
+              placeholder="Notizen zur Sequenz…" rows={2}
+              className="w-full bg-slate-700 text-slate-200 border border-slate-600 rounded px-1.5 py-0.5 text-[9px] outline-none focus:border-blue-400 resize-y" />
+          </div>
+
           {/* Blocks */}
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
@@ -238,18 +297,34 @@ function SequenceCard({ seq }: { seq: ManagedSequence }) {
             </div>
             {compactBlocks ? (
               <div className="space-y-0.5">
-                {seq.blocks.map((block, i) => (
-                  <div key={i} className="flex items-center gap-1 px-1.5 py-0.5 bg-slate-800 rounded border border-slate-700 group text-[9px] cursor-pointer hover:border-slate-500"
-                    onClick={() => setCompactBlocks(false)}>
-                    <span className="text-gray-500 w-4 text-center">{i + 1}</span>
-                    <span className="text-gray-200 flex-1 truncate">{block.label}</span>
-                    <span className="text-gray-500 text-[8px]">{block.weeks.length}W</span>
-                    <span className="text-gray-600 text-[8px] font-mono truncate max-w-[80px]">
-                      {block.weeks.length > 0 ? `KW ${block.weeks[0]}–${block.weeks[block.weeks.length - 1]}` : '—'}
-                    </span>
-                    {(block.topicMain || block.curriculumGoal) && <span className="text-green-500 text-[8px]">●</span>}
-                  </div>
-                ))}
+                {seq.blocks.map((block, i) => {
+                  const blockColor = block.subjectArea ? SUBJECT_AREA_COLORS[block.subjectArea]?.bg : undefined;
+                  return (
+                    <div key={i} className="flex items-center gap-1 px-1.5 py-0.5 bg-slate-800 rounded border border-slate-700 group/block text-[9px] cursor-pointer hover:border-slate-500"
+                      style={blockColor ? { borderLeftColor: blockColor, borderLeftWidth: 2 } : undefined}
+                      onClick={() => {
+                        if (block.weeks.length > 0) {
+                          const course = COURSES.find(c => c.id === seq.courseId);
+                          if (course) {
+                            const row = document.querySelector(`tr[data-week="${block.weeks[0]}"]`);
+                            if (row) row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            usePlannerStore.getState().setSelection({ week: block.weeks[0], courseId: course.id, title: block.label, course });
+                            usePlannerStore.getState().setSidePanelOpen(true);
+                            usePlannerStore.getState().setSidePanelTab('details');
+                          }
+                        }
+                      }}>
+                      <span className="text-gray-500 w-4 text-center">{i + 1}</span>
+                      <span className="text-gray-200 flex-1 truncate">{block.label}</span>
+                      <span className="text-gray-500 text-[8px]">{block.weeks.length}W</span>
+                      <span className="text-gray-600 text-[8px] font-mono truncate max-w-[80px]">
+                        {block.weeks.length > 0 ? `KW ${block.weeks[0]}–${block.weeks[block.weeks.length - 1]}` : '—'}
+                      </span>
+                      {(block.topicMain || block.curriculumGoal) && <span className="text-green-500 text-[8px]">●</span>}
+                      <span className="text-[7px] text-gray-600 opacity-0 group-hover/block:opacity-100">↗</span>
+                    </div>
+                  );
+                })}
               </div>
             ) : (
               seq.blocks.map((block, i) => (

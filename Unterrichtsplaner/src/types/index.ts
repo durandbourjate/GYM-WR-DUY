@@ -59,6 +59,8 @@ export interface ManagedSequence {
   subjectArea?: SubjectArea;
   blocks: SequenceBlock[];
   color?: string;
+  links?: { label: string; url: string }[];
+  notes?: string;
   createdAt: string;
   updatedAt: string;
 }

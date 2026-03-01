@@ -1,18 +1,18 @@
 import { useRef, useEffect, useMemo } from 'react';
-import { COURSES } from './data/courses';
-import { WEEKS, S2_START_INDEX } from './data/weeks';
+import { WEEKS } from './data/weeks';
 import { usePlannerStore } from './store/plannerStore';
+import { usePlannerData } from './hooks/usePlannerData';
 import { SemesterHeader } from './components/SemesterHeader';
 import { WeekRows } from './components/WeekRows';
 import { AppHeader, HelpBar, MultiSelectToolbar, Legend } from './components/Toolbar';
 import { DetailPanel } from './components/DetailPanel';
 import { InsertDialog } from './components/InsertDialog';
-import { SettingsPanel } from './components/SettingsPanel';
 import { ZoomBlockView } from './components/ZoomBlockView';
 import { ZoomMultiYearView } from './components/ZoomMultiYearView';
 
 function App() {
   const { filter, classFilter, weekData, setWeekData, migrateStaticSequences, fixSequenceTitles, sequencePanelOpen, sidePanelOpen, zoomLevel } = usePlannerStore();
+  const { courses: allCourses, weeks: staticWeeks, s2StartIndex } = usePlannerData();
   const curRef = useRef<HTMLTableRowElement>(null);
 
   // Initialize weekData in store on first render
@@ -30,10 +30,9 @@ function App() {
 
   const DAY_ORDER: Record<string, number> = { Mo: 0, Di: 1, Mi: 2, Do: 3, Fr: 4 };
   const filterCourses = (semester: 1 | 2) => {
-    let c = COURSES.filter((co) => co.semesters.includes(semester));
+    let c = allCourses.filter((co) => co.semesters.includes(semester));
     if (filter !== 'ALL') c = c.filter((co) => co.typ === filter);
     if (classFilter) c = c.filter((co) => co.cls === classFilter);
-    // Sort by day (Mo→Fr), then by start time
     return [...c].sort((a, b) => {
       const dayDiff = (DAY_ORDER[a.day] ?? 9) - (DAY_ORDER[b.day] ?? 9);
       if (dayDiff !== 0) return dayDiff;
@@ -41,12 +40,12 @@ function App() {
     });
   };
 
-  const s1Courses = useMemo(() => filterCourses(1), [filter, classFilter]);
-  const s2Courses = useMemo(() => filterCourses(2), [filter, classFilter]);
+  const s1Courses = useMemo(() => filterCourses(1), [filter, classFilter, allCourses]);
+  const s2Courses = useMemo(() => filterCourses(2), [filter, classFilter, allCourses]);
   const s1Weeks = useMemo(() =>
-    (weekData.length > 0 ? weekData : WEEKS).slice(0, S2_START_INDEX), [weekData]);
+    (weekData.length > 0 ? weekData : staticWeeks).slice(0, s2StartIndex), [weekData, staticWeeks, s2StartIndex]);
   const s2Weeks = useMemo(() =>
-    (weekData.length > 0 ? weekData : WEEKS).slice(S2_START_INDEX), [weekData]);
+    (weekData.length > 0 ? weekData : staticWeeks).slice(s2StartIndex), [weekData, staticWeeks, s2StartIndex]);
 
   useEffect(() => {
     setTimeout(() => curRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
@@ -155,7 +154,6 @@ function App() {
       </div>
 
       <DetailPanel />
-      <SettingsPanel />
     </div>
   );
 }
