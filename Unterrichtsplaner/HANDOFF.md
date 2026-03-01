@@ -1,7 +1,7 @@
-# Unterrichtsplaner – Handoff v3.17
+# Unterrichtsplaner – Handoff v3.18
 
-## Status: ✅ Deployed (v3.17)
-- **Commit:** a5e20cc
+## Status: ✅ Deployed (v3.18)
+- **Commit:** d782a81
 - **Datum:** 2026-03-01
 - **Deploy:** https://durandbourjate.github.io/GYM-WR-DUY/Unterrichtsplaner/
 
@@ -23,6 +23,7 @@
 - v3.15: Kontextmenü bei Cursor, Sequenz-Klick=Highlight/Doppelklick=Edit, Tag-Vererbung Sequenz→Lektion, "Zu Sequenz hinzufügen"-Button im DetailPanel
 - v3.16: Fachbereich-Mismatch-Warnung mit Korrigieren-Button, Reihe-UX (Erklärtext, editierbarer Titel, Sequenz-Zähler)
 - v3.17: Hover-Preview 800ms (statt 2s), Feiertag-Erkennung bei Import (partielle Feiertage wie Auffahrt/Pfingsten)
+- v3.18: Delete-Taste löscht Zelleninhalt, Scroll-to-Current-Button (◉), geerbter Fachbereich-Hinweis, Keyboard-Hilfe aktualisiert
 
 ## Architekturentscheidungen v3.11–v3.13
 - **editingSequenceId Format:** Jetzt `seqId-blockIndex` (z.B. `abc123-0`) statt nur `seqId`. WeekRows parsed dieses Format mit Regex und highlightet nur den spezifischen Block.
@@ -67,3 +68,7 @@
 - ✅ Reihe-Konzept UX: Erklärtext, editierbarer Titel, Sequenz-Zähler im Header
 - ✅ Hover-Preview Timer reduziert (2s → 800ms)
 - ✅ Feiertag-Erkennung bei Settings-Import (Auffahrt, Pfingsten etc.)
+- ✅ Delete/Backspace-Taste löscht selektierte Zelle (mit Undo)
+- ✅ Scroll-to-Current-Button (◉) in Toolbar
+- ✅ Geerbter Fachbereich: Label-Hinweis "(geerbt von Sequenz)"
+- ✅ Keyboard-Hilfe: Delete, Pfeiltasten dokumentiert
