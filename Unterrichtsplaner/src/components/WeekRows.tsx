@@ -536,6 +536,7 @@ export function WeekRows({ weeks, courses, currentRef }: Props) {
                     >
                       {lessonType === 4 && <span className="mr-0.5 text-[8px]">📝</span>}
                       {isFixed && <span className="mr-0.5 text-[8px]">{lessonType === 6 ? '🏖' : '📅'}</span>}
+                      {cellDetail?.sol?.enabled && <span className="mr-0.5 text-[8px]" title="SOL">📚</span>}
                       <div
                         className="leading-tight overflow-hidden flex-1 cursor-pointer"
                         onClick={(e) => {

@@ -4,7 +4,7 @@ import { TYPE_BADGES, getSequenceInfoFromStore } from '../utils/colors';
 import { CurriculumGoalPicker } from './CurriculumGoalPicker';
 import { SequencePanel } from './SequencePanel';
 import { suggestGoals } from '../utils/autoSuggest';
-import type { SubjectArea, BlockCategory, LessonDetail } from '../types';
+import type { SubjectArea, BlockCategory, LessonDetail, SolDetails } from '../types';
 
 const SUBJECT_AREAS: { key: SubjectArea; label: string; color: string }[] = [
   { key: 'BWL', label: 'BWL', color: '#3b82f6' },
@@ -329,6 +329,51 @@ function DurationSelector({ value, onChange }: { value?: string; onChange: (v: s
   );
 }
 
+function SolSection({ sol, onChange }: { sol?: SolDetails; onChange: (s: SolDetails) => void }) {
+  const enabled = sol?.enabled ?? false;
+  const update = (patch: Partial<SolDetails>) => onChange({ ...sol, enabled: true, ...patch });
+
+  return (
+    <div className="space-y-1.5">
+      <div className="flex items-center gap-2">
+        <button
+          onClick={() => onChange({ ...sol, enabled: !enabled, topic: sol?.topic, description: sol?.description, materialLinks: sol?.materialLinks, duration: sol?.duration })}
+          className={`px-2 py-0.5 rounded text-[9px] font-medium border cursor-pointer transition-all ${
+            enabled ? 'bg-purple-500/20 border-purple-500 text-purple-300' : 'border-gray-600 text-gray-500 hover:text-gray-300'
+          }`}
+        >
+          📚 {enabled ? 'SOL aktiv' : 'SOL hinzufügen'}
+        </button>
+        {enabled && sol?.duration && <span className="text-[8px] text-gray-500">{sol.duration}</span>}
+      </div>
+      {enabled && (
+        <div className="pl-2 border-l-2 border-purple-500/30 space-y-1.5">
+          <div>
+            <label className="text-[8px] text-gray-500 mb-0.5 block">SOL-Thema</label>
+            <input value={sol?.topic || ''} onChange={(e) => update({ topic: e.target.value })}
+              placeholder="SOL-Thema…"
+              className="w-full bg-slate-700 text-slate-200 border border-slate-600 rounded px-2 py-0.5 text-[9px] outline-none focus:border-purple-400" />
+          </div>
+          <div>
+            <label className="text-[8px] text-gray-500 mb-0.5 block">SOL-Dauer</label>
+            <DurationSelector value={sol?.duration} onChange={(v) => update({ duration: v })} />
+          </div>
+          <div>
+            <label className="text-[8px] text-gray-500 mb-0.5 block">SOL-Beschreibung</label>
+            <textarea value={sol?.description || ''} onChange={(e) => update({ description: e.target.value })}
+              placeholder="Beschreibung, Auftrag…" rows={2}
+              className="w-full bg-slate-700 text-slate-200 border border-slate-600 rounded px-2 py-0.5 text-[9px] outline-none focus:border-purple-400 resize-y" />
+          </div>
+          <div>
+            <label className="text-[8px] text-gray-500 mb-0.5 block">SOL-Material</label>
+            <MaterialLinks links={sol?.materialLinks || []} onChange={(links) => update({ materialLinks: links })} />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function MaterialLinks({ links, onChange }: { links: string[]; onChange: (links: string[]) => void }) {
   const [adding, setAdding] = useState(false);
   const [newLink, setNewLink] = useState('');
@@ -500,6 +545,11 @@ function DetailsTab() {
               ⏱ {effectiveDetail.duration}
             </span>
           )}
+          {detail.sol?.enabled && (
+            <span className="text-[8px] px-1 py-px rounded border border-purple-500/50 text-purple-400">
+              📚 SOL{detail.sol.duration ? ` (${detail.sol.duration})` : ''}
+            </span>
+          )}
           {seqInfo && (
             <span className="text-[8px] px-1 py-px rounded border cursor-pointer hover:opacity-80"
               style={{ borderColor: seqInfo.color || '#16a34a', color: seqInfo.color || '#4ade80' }}
@@ -533,6 +583,10 @@ function DetailsTab() {
         <div>
           <label className="text-[9px] text-gray-500 font-medium mb-1 block">Dauer</label>
           <DurationSelector value={detail.duration} onChange={(v) => updateField('duration', v)} />
+        </div>
+        <div>
+          <label className="text-[9px] text-gray-500 font-medium mb-1 block">SOL (Selbstorganisiertes Lernen)</label>
+          <SolSection sol={detail.sol} onChange={(s) => updateField('sol', s)} />
         </div>
         <div>
           <label className="text-[9px] text-gray-500 font-medium mb-1 block">Thema</label>

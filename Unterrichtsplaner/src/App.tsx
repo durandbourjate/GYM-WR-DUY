@@ -27,11 +27,17 @@ function App() {
     fixSequenceTitles();
   }, []);
 
+  const DAY_ORDER: Record<string, number> = { Mo: 0, Di: 1, Mi: 2, Do: 3, Fr: 4 };
   const filterCourses = (semester: 1 | 2) => {
     let c = COURSES.filter((co) => co.semesters.includes(semester));
     if (filter !== 'ALL') c = c.filter((co) => co.typ === filter);
     if (classFilter) c = c.filter((co) => co.cls === classFilter);
-    return c;
+    // Sort by day (Mo→Fr), then by start time
+    return [...c].sort((a, b) => {
+      const dayDiff = (DAY_ORDER[a.day] ?? 9) - (DAY_ORDER[b.day] ?? 9);
+      if (dayDiff !== 0) return dayDiff;
+      return a.from.localeCompare(b.from);
+    });
   };
 
   const s1Courses = useMemo(() => filterCourses(1), [filter, classFilter]);

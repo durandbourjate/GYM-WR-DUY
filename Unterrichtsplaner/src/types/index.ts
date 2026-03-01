@@ -95,6 +95,14 @@ export type BlockType =
   | 'EVENT'
   | 'HOLIDAY';
 
+export interface SolDetails {
+  enabled: boolean;
+  topic?: string;
+  description?: string;
+  materialLinks?: string[];
+  duration?: string; // z.B. "45 min"
+}
+
 export interface LessonDetail {
   subjectArea?: SubjectArea;
   topicMain?: string;
@@ -104,11 +112,12 @@ export interface LessonDetail {
   blockType?: BlockType;
   blockCategory?: BlockCategory;
   blockSubtype?: string;
-  duration?: string; // e.g. "1L", "2L", "45min", "90min"
+  duration?: string; // e.g. "45 min", "90 min", "Halbtag", "Ganztag"
   description?: string;
   learningviewUrl?: string;
   materialLinks?: string[];
   notes?: string;
+  sol?: SolDetails;
 }
 
 // HK Rotation

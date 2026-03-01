@@ -218,13 +218,12 @@ export const usePlannerStore = create<PlannerState>()(
       if (isSelectableLesson(allWeeks[i], fromCourseId)) rangeKeys.push(`${allWeeks[i]}-${fromCourseId}`);
     }
 
-    // Check if same-column range should prompt for linked day
+    // Check if same-column range should also include linked day
     const linkedCourseIds = getLinkedCourseIds(fromCourseId);
     if (linkedCourseIds.length > 1) {
-      const otherCourseId = linkedCourseIds.find(id => id !== fromCourseId);
-      if (otherCourseId) {
-        const otherCourse = courses.find(c => c.id === otherCourseId);
-        if (otherCourse && confirm(`Auch ${otherCourse.day} einschliessen?`)) {
+      // Automatically include linked day columns (no confirm dialog)
+      for (const otherCourseId of linkedCourseIds) {
+        if (otherCourseId !== fromCourseId) {
           for (let i = startIdx; i <= endIdx; i++) {
             if (isSelectableLesson(allWeeks[i], otherCourseId)) rangeKeys.push(`${allWeeks[i]}-${otherCourseId}`);
           }
