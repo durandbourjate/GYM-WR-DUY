@@ -58,7 +58,9 @@ function App() {
       }
       if (e.key === 'Escape') {
         const state = usePlannerStore.getState();
-        if (state.multiSelection.length > 0) {
+        if (state.insertDialog) {
+          state.setInsertDialog(null);
+        } else if (state.multiSelection.length > 0) {
           state.clearMultiSelect();
         } else if (state.sidePanelOpen) {
           state.setSidePanelOpen(false);

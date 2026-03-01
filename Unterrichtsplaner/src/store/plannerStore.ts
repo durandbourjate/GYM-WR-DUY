@@ -127,16 +127,26 @@ export const usePlannerStore = create<PlannerState>()(
   searchQuery: '',
   setSearchQuery: (q) => set({ searchQuery: q }),
   selection: null,
-  setSelection: (s) => set({ selection: s }),
+  setSelection: (s) => set({
+    selection: s,
+    lastSelectedKey: s ? `${s.week}-${s.courseId}` : get().lastSelectedKey,
+  }),
   multiSelection: [],
   lastSelectedKey: null,
   toggleMultiSelect: (key) =>
-    set((state) => ({
-      multiSelection: state.multiSelection.includes(key)
-        ? state.multiSelection.filter((k) => k !== key)
-        : [...state.multiSelection, key],
-      lastSelectedKey: key,
-    })),
+    set((state) => {
+      // If this is the first Cmd+Click and there's a current selection, include it too
+      const currentKey = state.selection ? `${state.selection.week}-${state.selection.courseId}` : null;
+      const base = state.multiSelection.length === 0 && currentKey && currentKey !== key
+        ? [currentKey]
+        : state.multiSelection;
+      return {
+        multiSelection: base.includes(key)
+          ? base.filter((k) => k !== key)
+          : [...base, key],
+        lastSelectedKey: key,
+      };
+    }),
   selectRange: (toKey, allWeeks, courses) => {
     const state = get();
     const fromKey = state.lastSelectedKey;

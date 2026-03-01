@@ -78,13 +78,22 @@ function EmptyCellMenu({ week, course, onClose }: { week: string; course: Course
     const handler = (e: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) onClose();
     };
+    const keyHandler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
     document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
+    document.addEventListener('keydown', keyHandler);
+    return () => {
+      document.removeEventListener('mousedown', handler);
+      document.removeEventListener('keydown', keyHandler);
+    };
   }, [onClose]);
 
   const handleNewLesson = () => {
     pushUndo();
     updateLesson(week, course.col, { title: 'Neue Lektion', type: 1 });
+    // Set default blockType to LESSON
+    usePlannerStore.getState().updateLessonDetail(week, course.col, { blockType: 'LESSON' });
     setSelection({ week, courseId: course.id, title: 'Neue Lektion', course });
     setSidePanelOpen(true);
     setSidePanelTab('details');
@@ -338,13 +347,20 @@ export function WeekRows({ weeks, courses, currentRef }: Props) {
                     } else if (title) {
                       handleClick(week.w, c, title, e);
                     } else {
-                      // Click on empty cell: clear selections first, then show menu
+                      // Click on empty cell: just deselect everything
                       clearMultiSelect();
                       setSelection(null);
+                      setEmptyCellMenu(null);
+                    }
+                  }}
+                  onDoubleClick={() => {
+                    if (title) {
+                      handleDoubleClick(week.w, c, title);
+                    } else {
+                      // Double-click on empty cell: show new tile/sequence menu
                       handleEmptyCellClick(week.w, c);
                     }
                   }}
-                  onDoubleClick={() => title && handleDoubleClick(week.w, c, title)}
                   onMouseEnter={() => title && handleMouseEnter(week.w, c.col)}
                   onMouseLeave={handleMouseLeave}
                   onDragOver={(e) => {
@@ -511,6 +527,8 @@ export function WeekRows({ weeks, courses, currentRef }: Props) {
                       <div
                         className="leading-tight overflow-hidden flex-1 cursor-pointer"
                         onClick={(e) => {
+                          // Let Cmd/Shift clicks propagate to td for multi-select handling
+                          if (e.metaKey || e.ctrlKey || e.shiftKey) return;
                           e.stopPropagation();
                           setSelection({ week: week.w, courseId: c.id, title, course: c });
                           setSidePanelOpen(true);

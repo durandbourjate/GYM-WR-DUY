@@ -258,7 +258,7 @@ function DetailsTab() {
         </div>
         <div>
           <label className="text-[9px] text-gray-500 font-medium mb-1 block">Block-Typ</label>
-          <PillSelect options={BLOCK_TYPES_REGULAR.map(b => b.key)} value={detail.blockType}
+          <PillSelect options={BLOCK_TYPES_REGULAR.map(b => b.key)} value={detail.blockType || 'LESSON'}
             onChange={(v) => updateField('blockType', v)}
             renderOption={(v) => { const b = BLOCK_TYPES_REGULAR.find(x => x.key === v)!; return { label: b.label, icon: b.icon }; }} />
           <AssessmentDropdown value={detail.blockType} onChange={(v) => updateField('blockType', v)} />
