@@ -48,10 +48,26 @@
 
 - v3.34: UX-Verbesserungen #2 — (1) Klick+Drag leere Zellen bleiben nach mouseup markiert (lila Outline bleibt). (2) Zoom 3: Toggle vergangene Wochen dim/hell (◐-Button in Toolbar, `dimPastWeeks` in Store). (3) Shift-Klick Mehrtages-Kurse: Popup fragt "Auch [anderer Tag] auswählen?" statt Shift+Alt. (4) Zoom 2: Einzellektionen ohne Sequenz werden angezeigt (gestrichelter Border, halbtransparent, Klick→Details, DblClick→Zoom3). (5) SequencePanel: aktive Sequenz als Pin-Card oben angepinnt (unter Klassenbuttons); Felder+Lektionen standardmässig ausgeklappt wenn aktiv.
 
-### Offene Feature-Requests
-- **Zoom 2 Jahresmodus**: ✅ Implementiert (v3.28)
-- **SOL-Total bei Sequenzen**: ✅ Implementiert (v3.29)
-- **Google Calendar Integration**: Mittlere Priorität — Konzept steht, Umsetzung bei Gelegenheit
+### Offene Feature-Requests v3.35+
+
+#### 🔴 Sofort (v3.35)
+1. **Sequenz-Bar Farbcode = Fachbereich** — Linie neben UE in Fachbereich-Farbe (VWL orange, BWL blau, Recht grün, IN grau) statt Kurstyp-Farbe
+2. **Ferien aus Lektionsliste filtern** — Sequenz-Detail Lektionsliste zeigt keine Holiday-Wochen mehr
+3. **Felder/Lektionen default ausgeklappt** — Bei aktiver Sequenz immer offen statt lazy-open
+4. **Doppelte Sequenz-Anzeige Bug** — Aktive Sequenz Pin-Card oben + nochmal in Liste → aus Liste excluden
+5. **Sammlung-Buttons umbenennen** — "💾 UE speichern" → "📥 In Sammlung", "💾 Reihe" → "📥 Reihe → Sammlung"
+
+#### 🟡 Bald (v3.36)
+6. **Shift-Klick Mehrtages-Bug** — Popup wählt nur letzte Woche; selectRange muss vollen Range abdecken. Kein Popup wenn Intention klar (manuell beide Tage gewählt). Popup schliesst bei Klick daneben/Esc.
+7. **Popup UX Mehrtages-Kurse** — Shift-Klick zeigt immer Popup, Alt+Shift entfällt. Ausnahme: manuell beide Tage → kein Popup.
+8. **Lehrplanziel weniger prominent** — In Sequenz-Detail: Reihenfolge Oberthema→Unterthema→Beschreibung→Lehrplanziel (kleiner)
+9. **Material vereinfachen** — LearningView-Feld + Material-Feld → nur "Material" (ein Feld)
+10. **Zoom 2 loose lessons Bug** — Gestrichelte Einzellektionen nur stellenweise angezeigt, entry-Erkennung verbessern
+
+#### 🔵 Nächste Runde (v3.37+)
+11. **Ferien als durchgehende Blöcke** — Zoom 2+3: Ferien-Wochen als leere, beschriftete Blöcke (z.B. "Herbstferien"), normalgross
+12. **Studienreisen/Sonderwochen visuell** — IW/Events als durchgehende graue Blöcke, ausser für anwesende UE (z.B. TaF in Schneesportwoche)
+13. **Google Calendar Integration** — Konzept steht, Umsetzung bei Gelegenheit
 
 ### Feature-Spec: Google Calendar Integration (geplant)
 

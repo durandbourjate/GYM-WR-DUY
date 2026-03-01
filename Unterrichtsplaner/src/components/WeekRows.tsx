@@ -722,14 +722,25 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                     setDragSource(null);
                   }}
                 >
-                  {/* Sequence bar */}
+                  {/* Sequence bar — color from subject area (VWL=orange, BWL=blue, Recht=green) */}
                   {seq && title && (
                     <div
                       className="absolute left-0 w-[5px] opacity-80 cursor-pointer hover:opacity-100 hover:w-[7px] transition-all"
                       style={{
                         top: seq.isFirst ? 3 : 0,
                         bottom: seq.isLast ? 3 : 0,
-                        background: seq.color || '#16a34a',
+                        background: (() => {
+                          // Use subject area color for the bar
+                          const seqBarSA = effectiveSubjectArea || (() => {
+                            const parentSeq = sequences.find(s => s.id === seq.sequenceId);
+                            const block = parentSeq?.blocks.find(b => b.weeks.includes(week.w));
+                            return block?.subjectArea || parentSeq?.subjectArea;
+                          })();
+                          const SA_BAR_COLORS: Record<string, string> = {
+                            VWL: '#f97316', BWL: '#3b82f6', RECHT: '#22c55e', IN: '#6b7280', INTERDISZ: '#a855f7'
+                          };
+                          return (seqBarSA && SA_BAR_COLORS[seqBarSA]) || seq.color || '#16a34a';
+                        })(),
                         borderRadius: seq.isFirst ? '2px 0 0 0' : seq.isLast ? '0 0 0 2px' : '0',
                       }}
                       onClick={(e) => {
@@ -756,7 +767,17 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                   )}
                   {seq?.isFirst && title && (
                     <div className="absolute left-1.5 -top-0.5 text-[6px] font-bold z-10 bg-[#0c0f1a] px-0.5 rounded whitespace-nowrap cursor-pointer"
-                      style={{ color: seq.color || '#4ade80' }}
+                      style={{ color: (() => {
+                        const seqLabelSA = effectiveSubjectArea || (() => {
+                          const parentSeq = sequences.find(s => s.id === seq.sequenceId);
+                          const block = parentSeq?.blocks.find(b => b.weeks.includes(week.w));
+                          return block?.subjectArea || parentSeq?.subjectArea;
+                        })();
+                        const SA_LABEL_COLORS: Record<string, string> = {
+                          VWL: '#fb923c', BWL: '#60a5fa', RECHT: '#4ade80', IN: '#9ca3af', INTERDISZ: '#c084fc'
+                        };
+                        return (seqLabelSA && SA_LABEL_COLORS[seqLabelSA]) || seq.color || '#4ade80';
+                      })() }}
                       onClick={(e) => {
                         e.stopPropagation();
                         const parentSeq = sequences.find(s => s.id === seq.sequenceId);

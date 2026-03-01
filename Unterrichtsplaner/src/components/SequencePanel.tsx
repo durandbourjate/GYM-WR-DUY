@@ -25,6 +25,18 @@ function LessonsList({ block, fb, courses }: { block: SequenceBlock; fb: FlatBlo
         const course = courses.find(c => c.id === fb.courseId);
         const weekData = usePlannerStore.getState().weekData.find(w => w.w === weekW);
         const entry = course && weekData?.lessons[course.col];
+
+        // Skip holiday weeks (type 6) — they shouldn't be editable in sequence context
+        if (entry && (entry as any).type === 6) {
+          return (
+            <div key={wi} className="flex items-center gap-1 text-[9px] px-1 text-gray-600 italic">
+              <span className="text-[8px]">🏖</span>
+              <span className="font-mono w-8">KW{weekW}</span>
+              <span>{entry.title || 'Ferien'}</span>
+            </div>
+          );
+        }
+
         const isExpanded = expandedWeek === weekW;
         const key = course ? `${weekW}-${course.col}` : '';
         const detail = key ? lessonDetails[key] : undefined;
@@ -117,8 +129,8 @@ function FlatBlockCard({ fb }: { fb: FlatBlockInfo }) {
   const { courses: COURSES } = usePlannerData();
   const blockKey = `${fb.seqId}-${fb.blockIndex}`;
   const isActive = editingSequenceId === blockKey;
-  const [showFields, setShowFields] = useState(isActive);
-  const [showLessons, setShowLessons] = useState(isActive);
+  const [showFields, setShowFields] = useState(true);
+  const [showLessons, setShowLessons] = useState(true);
   const [showSeriesFields, setShowSeriesFields] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -128,14 +140,6 @@ function FlatBlockCard({ fb }: { fb: FlatBlockInfo }) {
     if (!parentSeqForSol) return { count: 0, totalMinutes: 0, formatted: '' };
     return computeSeqSolTotal(parentSeqForSol, lessonDetails, COURSES);
   }, [parentSeqForSol, lessonDetails, COURSES]);
-
-  // Re-open sections when component re-mounts while still active
-  useEffect(() => {
-    if (isActive) {
-      if (!showFields) setShowFields(true);
-      if (!showLessons) setShowLessons(true);
-    }
-  }, []); // only on mount
 
   // Scroll active card into view (e.g. when clicked from Zoom 2 Year View)
   useEffect(() => {
@@ -373,18 +377,18 @@ function FlatBlockCard({ fb }: { fb: FlatBlockInfo }) {
                 store.archiveBlock(fb.seqId, fb.blockIndex, undefined);
                 // Brief feedback
                 const btn = document.activeElement as HTMLButtonElement;
-                if (btn) { btn.textContent = '✓ Gespeichert'; setTimeout(() => { btn.textContent = '💾 UE speichern'; }, 1200); }
-              }} className="text-[8px] text-amber-400 hover:text-amber-300 cursor-pointer px-1" title="Unterrichtseinheit in Sammlung speichern">
-                💾 UE speichern
+                if (btn) { btn.textContent = '✓ Gespeichert'; setTimeout(() => { btn.textContent = '📥 In Sammlung'; }, 1200); }
+              }} className="text-[8px] text-amber-400 hover:text-amber-300 cursor-pointer px-1" title="Unterrichtseinheit in Sammlung archivieren">
+                📥 In Sammlung
               </button>
               {fb.totalBlocks > 1 && (
                 <button onClick={() => {
                   const store = usePlannerStore.getState();
                   store.archiveSequence(fb.seqId, undefined);
                   const btn = document.activeElement as HTMLButtonElement;
-                  if (btn) { btn.textContent = '✓ Gespeichert'; setTimeout(() => { btn.textContent = '💾 Reihe'; }, 1200); }
-                }} className="text-[8px] text-amber-400 hover:text-amber-300 cursor-pointer px-1" title="Ganze Reihe in Sammlung speichern">
-                  💾 Reihe
+                  if (btn) { btn.textContent = '✓ Gespeichert'; setTimeout(() => { btn.textContent = '📥 Reihe → Sammlung'; }, 1200); }
+                }} className="text-[8px] text-amber-400 hover:text-amber-300 cursor-pointer px-1" title="Ganze Reihe in Sammlung archivieren">
+                  📥 Reihe → Sammlung
                 </button>
               )}
             </div>
@@ -537,16 +541,11 @@ export function SequencePanel({ embedded = false }: { embedded?: boolean }) {
             })}
           </div>
           {[...saMap.entries()].map(([sa, blocks]) => {
-            // Sort: active (editing) block first
-            const sorted = editingSequenceId
-              ? [...blocks].sort((a, b) => {
-                  const aKey = `${a.seqId}-${a.blockIndex}`;
-                  const bKey = `${b.seqId}-${b.blockIndex}`;
-                  if (aKey === editingSequenceId) return -1;
-                  if (bKey === editingSequenceId) return 1;
-                  return 0;
-                })
+            // Sort: active (editing) block first, but exclude it from the list if it's pinned above
+            const filtered = editingSequenceId
+              ? blocks.filter(fb => `${fb.seqId}-${fb.blockIndex}` !== editingSequenceId)
               : blocks;
+            if (filtered.length === 0) return null;
             return (
             <div key={sa} className="ml-1">
               {sa !== 'ANDERE' && (
@@ -557,7 +556,7 @@ export function SequencePanel({ embedded = false }: { embedded?: boolean }) {
                 </div>
               )}
               <div className="space-y-1">
-                {sorted.map((fb) => (
+                {filtered.map((fb) => (
                   <FlatBlockCard key={`${fb.seqId}-${fb.blockIndex}`} fb={fb} />
                 ))}
               </div>
