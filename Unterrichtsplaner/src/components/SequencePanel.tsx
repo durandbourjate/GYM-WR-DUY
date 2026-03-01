@@ -13,6 +13,85 @@ const SUBJECT_AREAS: { key: SubjectArea; label: string; color: string }[] = [
 ];
 
 
+// === Inline Lessons List for Sequence Panel ===
+function LessonsList({ block, fb, courses }: { block: SequenceBlock; fb: FlatBlockInfo; courses: Course[] }) {
+  const [expandedWeek, setExpandedWeek] = useState<string | null>(null);
+  const { lessonDetails, updateLessonDetail } = usePlannerStore();
+
+  return (
+    <div className="space-y-0.5 p-1.5 bg-slate-800/30 rounded max-h-64 overflow-y-auto">
+      {block.weeks.map((weekW, wi) => {
+        const course = courses.find(c => c.id === fb.courseId);
+        const weekData = usePlannerStore.getState().weekData.find(w => w.w === weekW);
+        const entry = course && weekData?.lessons[course.col];
+        const isExpanded = expandedWeek === weekW;
+        const key = course ? `${weekW}-${course.col}` : '';
+        const detail = key ? lessonDetails[key] : undefined;
+        const inheritSA = block.subjectArea || fb.seqSubjectArea;
+
+        return (
+          <div key={wi}>
+            <div className={`flex items-center gap-1 text-[9px] cursor-pointer px-1 rounded ${isExpanded ? 'bg-slate-700/50' : 'hover:bg-slate-700/30'}`}
+              onClick={() => {
+                setExpandedWeek(isExpanded ? null : weekW);
+                // Scroll to week in planner
+                const row = document.querySelector(`tr[data-week="${weekW}"]`);
+                if (row) row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                // Select cell
+                if (course) {
+                  const store = usePlannerStore.getState();
+                  store.setSelection({ week: weekW, courseId: course.id, title: entry?.title || '', course });
+                }
+              }}
+              onDoubleClick={() => {
+                if (!course) return;
+                const store = usePlannerStore.getState();
+                store.setSelection({ week: weekW, courseId: course.id, title: entry?.title || '', course });
+                store.setSidePanelOpen(true);
+                store.setSidePanelTab('details');
+              }}>
+              <span className="text-[8px] text-gray-600">{isExpanded ? '▾' : '▸'}</span>
+              <span className="text-gray-500 font-mono w-8">KW{weekW}</span>
+              <span className={`truncate ${entry?.title ? 'text-gray-300' : 'text-gray-600 italic'}`}>{entry?.title || '—'}</span>
+              {detail?.topicMain && <span className="text-[7px] text-gray-500 ml-auto truncate max-w-20">📌{detail.topicMain}</span>}
+            </div>
+            {isExpanded && course && (
+              <div className="ml-5 mr-1 my-1 p-1.5 bg-slate-900/50 rounded space-y-1 border-l-2 border-blue-500/30">
+                <div>
+                  <label className="text-[7px] text-gray-600">Thema</label>
+                  <input value={detail?.topicMain || ''} onChange={(e) => updateLessonDetail(weekW, course.col, { topicMain: e.target.value || undefined })}
+                    placeholder={block.topicMain || 'Thema…'}
+                    className="w-full bg-slate-700/50 text-slate-200 border border-slate-600 rounded px-1.5 py-0.5 text-[8px] outline-none focus:border-blue-400" />
+                </div>
+                <div>
+                  <label className="text-[7px] text-gray-600">Notizen</label>
+                  <textarea value={detail?.notes || ''} onChange={(e) => updateLessonDetail(weekW, course.col, { notes: e.target.value || undefined })}
+                    placeholder="Notizen…" rows={2}
+                    className="w-full bg-slate-700/50 text-slate-200 border border-slate-600 rounded px-1.5 py-0.5 text-[8px] outline-none focus:border-blue-400 resize-y" />
+                </div>
+                {!detail?.subjectArea && inheritSA && (
+                  <div className="text-[7px] text-gray-600">Fachbereich: <span className="text-gray-400">{inheritSA}</span> <span className="text-gray-700">(geerbt)</span></div>
+                )}
+                <div className="flex justify-end">
+                  <button onClick={() => {
+                    const store = usePlannerStore.getState();
+                    store.setSelection({ week: weekW, courseId: course.id, title: entry?.title || '', course });
+                    store.setSidePanelOpen(true);
+                    store.setSidePanelTab('details');
+                  }} className="text-[7px] text-blue-400 cursor-pointer hover:text-blue-300">
+                    Alle Details →
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      })}
+      {block.weeks.length === 0 && <div className="text-[8px] text-gray-600 italic">Keine Wochen zugewiesen</div>}
+    </div>
+  );
+}
+
 // === Flat Block Card (new flat view) ===
 type FlatBlockInfo = {
   seqId: string;
@@ -179,36 +258,7 @@ function FlatBlockCard({ fb }: { fb: FlatBlockInfo }) {
 
           {/* Lessons list */}
           {showLessons && (
-            <div className="space-y-0.5 p-1.5 bg-slate-800/30 rounded max-h-48 overflow-y-auto">
-              {block.weeks.map((weekW, wi) => {
-                const course = COURSES.find(c => c.id === fb.courseId);
-                const weekData = usePlannerStore.getState().weekData.find(w => w.w === weekW);
-                const entry = course && weekData?.lessons[course.col];
-                return (
-                  <div key={wi} className="flex items-center gap-1 text-[9px] cursor-pointer hover:bg-slate-700/30 px-1 rounded"
-                    onClick={() => {
-                      if (!course) return;
-                      const store = usePlannerStore.getState();
-                      const row = document.querySelector(`tr[data-week="${weekW}"]`);
-                      if (row) row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                      // Inherit tags from block/sequence if lesson has none
-                      const key = `${weekW}-${course.col}`;
-                      const lessonDetail = store.lessonDetails[key] || {};
-                      const inheritSA = block.subjectArea || fb.seqSubjectArea;
-                      if (!lessonDetail.subjectArea && inheritSA) {
-                        store.updateLessonDetail(weekW, course.col, { subjectArea: inheritSA });
-                      }
-                      store.setSelection({ week: weekW, courseId: course.id, title: entry?.title || '', course });
-                      store.setSidePanelOpen(true);
-                      store.setSidePanelTab('details');
-                    }}>
-                    <span className="text-gray-500 font-mono w-8">KW{weekW}</span>
-                    <span className="text-gray-300 truncate">{entry?.title || '—'}</span>
-                  </div>
-                );
-              })}
-              {block.weeks.length === 0 && <div className="text-[8px] text-gray-600 italic">Keine Wochen zugewiesen</div>}
-            </div>
+            <LessonsList block={block} fb={fb} courses={COURSES} />
           )}
 
           {/* Series-level fields (parent ManagedSequence) */}
@@ -251,8 +301,29 @@ function FlatBlockCard({ fb }: { fb: FlatBlockInfo }) {
             </div>
           )}
 
-          {/* Delete button */}
-          <div className="flex justify-end pt-0.5">
+          {/* Save + Delete buttons */}
+          <div className="flex justify-between pt-0.5">
+            <div className="flex gap-1">
+              <button onClick={() => {
+                const store = usePlannerStore.getState();
+                store.archiveBlock(fb.seqId, fb.blockIndex, undefined);
+                // Brief feedback
+                const btn = document.activeElement as HTMLButtonElement;
+                if (btn) { btn.textContent = '✓ Gespeichert'; setTimeout(() => { btn.textContent = '💾 UE speichern'; }, 1200); }
+              }} className="text-[8px] text-amber-400 hover:text-amber-300 cursor-pointer px-1" title="Unterrichtseinheit in Sammlung speichern">
+                💾 UE speichern
+              </button>
+              {fb.totalBlocks > 1 && (
+                <button onClick={() => {
+                  const store = usePlannerStore.getState();
+                  store.archiveSequence(fb.seqId, undefined);
+                  const btn = document.activeElement as HTMLButtonElement;
+                  if (btn) { btn.textContent = '✓ Gespeichert'; setTimeout(() => { btn.textContent = '💾 Reihe'; }, 1200); }
+                }} className="text-[8px] text-amber-400 hover:text-amber-300 cursor-pointer px-1" title="Ganze Reihe in Sammlung speichern">
+                  💾 Reihe
+                </button>
+              )}
+            </div>
             <button onClick={() => {
               if (confirm(`Sequenz "${block.label}" entfernen?`)) {
                 removeBlockFromSequence(fb.seqId, fb.blockIndex);

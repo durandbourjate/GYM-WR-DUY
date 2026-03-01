@@ -5,6 +5,7 @@ import { TYPE_BADGES, getSequenceInfoFromStore } from '../utils/colors';
 import { CurriculumGoalPicker } from './CurriculumGoalPicker';
 import { SequencePanel } from './SequencePanel';
 import { SettingsPanel } from './SettingsPanel';
+import { CollectionPanel } from './CollectionPanel';
 import { suggestGoals, suggestSubjectArea } from '../utils/autoSuggest';
 import type { SubjectArea, BlockCategory, LessonDetail, SolDetails, Course } from '../types';
 
@@ -651,8 +652,11 @@ function DetailsTab() {
             <span className="text-[8px] px-1 py-px rounded border cursor-pointer hover:opacity-80"
               style={{ borderColor: seqInfo.color || '#16a34a', color: seqInfo.color || '#4ade80' }}
               onClick={() => {
-                if (parentSeq) {
-                  usePlannerStore.getState().setEditingSequenceId(parentSeq.id);
+                if (parentSeq && seqInfo) {
+                  // Set block-precise editing ID
+                  const blockIdx = parentSeq.blocks.findIndex(b => b.weeks.includes(selection!.week));
+                  const editId = blockIdx >= 0 ? `${parentSeq.id}-${blockIdx}` : parentSeq.id;
+                  usePlannerStore.getState().setEditingSequenceId(editId);
                   usePlannerStore.getState().setSidePanelTab('sequences');
                 }
               }}
@@ -944,6 +948,17 @@ export function DetailPanel() {
             ▧ Sequenzen
           </button>
           <button
+            onClick={() => setSidePanelTab('collection')}
+            className={`px-2.5 py-1 rounded text-[10px] font-semibold border cursor-pointer transition-colors ${
+              sidePanelTab === 'collection'
+                ? 'bg-amber-500/25 border-amber-400 text-amber-200'
+                : 'border-gray-600 text-gray-400 hover:text-gray-200'
+            }`}
+            title="Materialsammlung"
+          >
+            📚 Sammlung
+          </button>
+          <button
             onClick={() => setSidePanelTab('settings')}
             className={`px-2.5 py-1 rounded text-[10px] font-semibold border cursor-pointer transition-colors ${
               sidePanelTab === 'settings'
@@ -966,7 +981,7 @@ export function DetailPanel() {
           ✕
         </button>
       </div>
-      {sidePanelTab === 'details' ? <BatchOrDetailsTab /> : sidePanelTab === 'sequences' ? <SequencePanel embedded /> : <SettingsPanel />}
+      {sidePanelTab === 'details' ? <BatchOrDetailsTab /> : sidePanelTab === 'sequences' ? <SequencePanel embedded /> : sidePanelTab === 'collection' ? <CollectionPanel /> : <SettingsPanel />}
     </div>
   );
 }

@@ -124,6 +124,9 @@ function EmptyCellMenu({ week, course, onClose, selectedWeeks, position }: { wee
 
   return (
     <div ref={menuRef} className="absolute z-[80] bg-slate-800 border border-slate-600 rounded-lg shadow-xl py-1 w-36"
+      onClick={(e) => e.stopPropagation()}
+      onDoubleClick={(e) => e.stopPropagation()}
+      onMouseDown={(e) => e.stopPropagation()}
       style={position
         ? { top: position.y, left: position.x, transform: 'translate(-25%, -25%)' }
         : { top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }
@@ -532,23 +535,22 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                       }}
                       onClick={(e) => {
                         e.stopPropagation();
-                        // Single click: toggle highlight in planner only
+                        // Single click: highlight + open sequences panel
                         const parentSeq = sequences.find(s => s.id === seq.sequenceId);
                         if (parentSeq) {
                           const currentEditing = usePlannerStore.getState().editingSequenceId;
                           const isAlreadyEditing = currentEditing?.startsWith(parentSeq.id);
-                          usePlannerStore.getState().setEditingSequenceId(isAlreadyEditing ? null : parentSeq.id);
+                          if (isAlreadyEditing) {
+                            usePlannerStore.getState().setEditingSequenceId(null);
+                          } else {
+                            usePlannerStore.getState().setEditingSequenceId(parentSeq.id);
+                            setSidePanelOpen(true);
+                            setSidePanelTab('sequences');
+                          }
                         }
                       }}
                       onDoubleClick={(e) => {
                         e.stopPropagation();
-                        // Double click: open sequences tab
-                        const parentSeq = sequences.find(s => s.id === seq.sequenceId);
-                        if (parentSeq) {
-                          usePlannerStore.getState().setEditingSequenceId(parentSeq.id);
-                          setSidePanelOpen(true);
-                          setSidePanelTab('sequences');
-                        }
                       }}
                       title={`Klick: Sequenz hervorheben · Doppelklick: Sequenz bearbeiten`}
                     />
@@ -562,19 +564,17 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                         if (parentSeq) {
                           const currentEditing = usePlannerStore.getState().editingSequenceId;
                           const isAlreadyEditing = currentEditing?.startsWith(parentSeq.id);
-                          usePlannerStore.getState().setEditingSequenceId(isAlreadyEditing ? null : parentSeq.id);
+                          if (isAlreadyEditing) {
+                            usePlannerStore.getState().setEditingSequenceId(null);
+                          } else {
+                            usePlannerStore.getState().setEditingSequenceId(parentSeq.id);
+                            setSidePanelOpen(true);
+                            setSidePanelTab('sequences');
+                          }
                         }
                       }}
-                      onDoubleClick={(e) => {
-                        e.stopPropagation();
-                        const parentSeq = sequences.find(s => s.id === seq.sequenceId);
-                        if (parentSeq) {
-                          usePlannerStore.getState().setEditingSequenceId(parentSeq.id);
-                          setSidePanelOpen(true);
-                          setSidePanelTab('sequences');
-                        }
-                      }}
-                      title={`Klick: Sequenz hervorheben · Doppelklick: Sequenz bearbeiten`}
+                      onDoubleClick={(e) => e.stopPropagation()}
+                      title="Klick: Sequenz anzeigen/bearbeiten"
                     >
                       {seq.label}
                     </div>

@@ -122,6 +122,36 @@ export interface LessonDetail {
   sol?: SolDetails;
 }
 
+// === Materialsammlung (Collection) ===
+export type CollectionItemType = 'unit' | 'sequence' | 'schoolyear' | 'curriculum';
+
+/** A single archived teaching unit (1 block + lesson details) */
+export interface CollectionUnit {
+  block: SequenceBlock;           // Block data (weeks stripped on archive)
+  lessonDetails: Record<string, LessonDetail>; // Snapshots keyed by relative index "0","1","2"...
+  lessonTitles: string[];         // Original tile titles in order
+}
+
+/** A collection item — the universal container in the Sammlung */
+export interface CollectionItem {
+  id: string;
+  type: CollectionItemType;
+  title: string;
+  subjectArea?: SubjectArea;
+  courseType?: CourseType;         // SF, EWR, EF...
+  cls?: string;                   // Original class (e.g. "29c", "27a28f")
+  schoolYear?: string;            // e.g. "24/25", "25/26"
+  gymYears?: string;              // e.g. "GYM1-GYM4" for curriculum
+  tags?: string[];
+  notes?: string;
+  // Content — depends on type:
+  units: CollectionUnit[];        // type='unit': 1 entry; 'sequence': multiple; 'schoolyear'/'curriculum': all
+  // Metadata from original sequence(s)
+  sequenceTitle?: string;         // Original ManagedSequence title
+  sequenceColor?: string;
+  createdAt: string;
+}
+
 // HK Rotation
 export type HKGroup = 'A' | 'B';
 
