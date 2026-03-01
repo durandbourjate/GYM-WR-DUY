@@ -669,7 +669,12 @@ function DetailsTab() {
       {/* Form fields */}
       <div className="space-y-2.5">
         <div>
-          <label className="text-[9px] text-gray-500 font-medium mb-1 block">Fachbereich</label>
+          <label className="text-[9px] text-gray-500 font-medium mb-1 block">
+            Fachbereich
+            {!detail.subjectArea && effectiveDetail.subjectArea && (
+              <span className="text-[8px] text-gray-600 font-normal ml-1">(geerbt von Sequenz)</span>
+            )}
+          </label>
           <PillSelect options={SUBJECT_AREAS.map(s => s.key)} value={detail.subjectArea}
             onChange={(v) => updateField('subjectArea', v)}
             renderOption={(v) => { const s = SUBJECT_AREAS.find(x => x.key === v)!; return { label: s.label, color: s.color }; }} />

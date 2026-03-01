@@ -4,6 +4,7 @@ import { StatsPanel } from './StatsPanel';
 import { TaFPanel } from './TaFPanel';
 import { ExcelImport } from './ExcelImport';
 import { COURSES } from '../data/courses';
+import { CURRENT_WEEK } from '../data/weeks';
 import type { FilterType } from '../types';
 
 const FILTERS: { key: FilterType; label: string }[] = [
@@ -220,6 +221,16 @@ export function AppHeader() {
             ↩
           </button>
         )}
+        <button
+          onClick={() => {
+            const el = document.querySelector(`tr[data-week="${CURRENT_WEEK}"]`);
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }}
+          className="px-2 py-0.5 rounded text-[10px] border border-gray-700 text-gray-400 cursor-pointer hover:text-gray-200 hover:border-gray-500"
+          title={`Zur aktuellen Woche (KW ${CURRENT_WEEK}) scrollen`}
+        >
+          ◉
+        </button>
         <DataMenu />
         <button
           onClick={() => setShowStats(true)}
