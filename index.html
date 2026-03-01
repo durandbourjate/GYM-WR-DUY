@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>GYM-WR-DUY</title>
+  <script>
+    // Cleanup: deregister any service workers registered at the root scope
+    // that were accidentally deployed with scope /GYM-WR-DUY/ instead of /GYM-WR-DUY/Unterrichtsplaner/
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(registrations => {
+        registrations.forEach(reg => {
+          // Only unregister SWs that are NOT scoped to the Unterrichtsplaner
+          if (!reg.scope.includes('/Unterrichtsplaner')) {
+            reg.unregister().then(() => console.log('Cleaned up old SW:', reg.scope));
+          }
+        });
+      });
+    }
+  </script>
+  <style>
+    body { font-family: system-ui, sans-serif; background: #0f172a; color: #e2e8f0; display: flex; justify-content: center; padding: 3rem; }
+    .container { max-width: 600px; }
+    h1 { color: #3b82f6; }
+    a { color: #60a5fa; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    ul { list-style: none; padding: 0; }
+    li { padding: 0.5rem 0; border-bottom: 1px solid #1e293b; }
+    li a { display: flex; align-items: center; gap: 0.5rem; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🏫 Gymnasium Hofwil — W&R DUY</h1>
+    <ul>
+      <li><a href="/GYM-WR-DUY/Unterrichtsplaner/">📅 Unterrichtsplaner</a></li>
+      <li><a href="/GYM-WR-DUY/Uebungen/Uebungspools/index.html">📚 Übungspools</a></li>
+      <li><a href="/GYM-WR-DUY/Uebungen/Uebungspools/analytics/dashboard.html">📊 Analytics Dashboard</a></li>
+    </ul>
+  </div>
+</body>
+</html>
