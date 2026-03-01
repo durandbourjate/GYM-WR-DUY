@@ -1,4 +1,4 @@
-# Feature-Abgleich: Kommentare vs. Implementierungsstand (v3.29)
+# Feature-Abgleich: Kommentare vs. Implementierungsstand (v3.31)
 
 Stand: 2026-03-01
 
@@ -18,7 +18,7 @@ Stand: 2026-03-01
 | 10 | Lokale Materialien, Links, Kalendereinträge verlinken | ✅ Materiallinks (lokal/URL) |
 | 11 | Bausteine speicherbar für Wiederverwendung über Jahre | ✅ Sammlung-Tab (v3.19) |
 | 12 | Verschiedene Ansichten (Jahr, Kurs, Sequenz) | ✅ Zoom 1/2/3 |
-| 13 | Mindestanzahl Noten / Vorgaben-Tracking | 🔴 Nicht implementiert |
+| 13 | Mindestanzahl Noten / Vorgaben-Tracking | ✅ gradeRequirements.ts (v3.31) |
 | 14 | Interaktion mit Schuladmin-Prozessen | 🟡 Google Calendar geplant |
 
 ## V2 — UX-Verfeinerungen
@@ -234,13 +234,12 @@ Stand: 2026-03-01
 ## Zusammenfassung
 
 **Total Feature-Kommentare:** ~130 Punkte über V1–V14
-**✅ Implementiert:** ~120
+**✅ Implementiert:** ~121
 **🟡 Offen / teilweise:**
 1. Google Calendar Integration (V13.5, V1.14) — Konzept dokumentiert
 2. Dauer-Warnung 1L↔2L bei Verschieben (V10.10) — erst bei cross-column relevant
-3. Detail-Fenster schliesst bei Abwahl (V14.3) — teilweise
-4. Mindestanzahl Noten / Vorgaben-Tracking (V1.13) — nicht implementiert
-5. Lehrplanbezug automatisch (V2.6) — nicht implementiert, manuell
+3. Detail-Fenster schliesst bei Abwahl (V14.3) — teilweise (v3.30 verbessert)
+4. Lehrplanbezug automatisch (V2.6) — nicht implementiert, manuell
 
 **❌ Bewusst entschieden:**
 - Taxonomiestufe automatisch (V2.7) — vom User abgelehnt in V4

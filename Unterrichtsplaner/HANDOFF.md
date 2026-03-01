@@ -1,7 +1,7 @@
 # Unterrichtsplaner – Handoff v3.24
 
-## Status: ✅ Deployed (v3.29)
-- **Commit:** 3d96db4
+## Status: ✅ Deployed (v3.31)
+- **Commit:** 7997664
 - **Datum:** 2026-03-01
 - **Deploy:** https://durandbourjate.github.io/GYM-WR-DUY/Unterrichtsplaner/
 
@@ -37,6 +37,10 @@
 - v3.28: Zoom 2 komplett umgebaut → Jahresansicht (ZoomYearView). Ganzes Schuljahr in einer Tabelle statt S1/S2 separat. Kurse nach cls+typ gruppiert. 2-Tage-Kurse: breiter Balken bei geteilter Sequenz (courseIds), 2 schmale Sub-Spalten bei separaten Sequenzen. Semester-Trennlinie (goldener Border). ZoomBlockView (alte Semesteransicht) bleibt als Komponente erhalten, wird aber nicht mehr in App.tsx verwendet.
 
 - v3.29: SOL-Total — Σ-Badge neben "📚 SOL (Reihe)" zeigt Summe aller Lektion-SOL-Einträge (count + formatierte Dauer). Neue utils/solTotal.ts mit parseDurationToMinutes (erkennt min/h/Lektionen/Halbtag/Ganztag), formatMinutes, computeSeqSolTotal. Duplikat-Funktionen aus SequencePanel entfernt.
+
+- v3.30: SidePanel schliesst bei Abwahl — Klick leere Zelle und Klick gleiche Zelle (toggle) schliessen Panel + clearing editingSequenceId.
+
+- v3.31: Noten-Vorgaben-Tracking (MiSDV Art. 4) — Neue utils/gradeRequirements.ts mit Mindestanzahl-Beurteilungsprüfung pro Kursgruppe/Semester/GYM-Stufe. Rotes Badge (Zahl) am 📊-Button bei offenen Warnungen. StatsPanel zeigt Section "📋 Beurteilungsvorgaben" mit Warnungen (🔴 critical, 🟡 warning) und OK-Status. GYM-Stufe wird aus Klassenname abgeleitet (Maturjahrgang → GYM1-5).
 
 ### Offene Feature-Requests
 - **Zoom 2 Jahresmodus**: ✅ Implementiert (v3.28)
@@ -94,9 +98,8 @@
 3. **Dauer-Warnung bei Verschieben (1L↔2L):** Relevant wenn cross-column oder Sequenz-Auto-Place erweitert wird.
 
 ### 🔵 Ideen (niedrige Priorität)
-4. **Mindestanzahl Noten / Vorgaben-Tracking:** Warnung wenn zu wenige Beurteilungen pro Zeitraum geplant.
-5. **Automatischer Lehrplanbezug:** Lehrplanziele automatisch aus Thema/Fachbereich vorschlagen.
-6. **Zoom 1 (Multi-Year):** Weitere Verbesserungen der Jahrgänge-Ansicht.
+4. **Automatischer Lehrplanbezug:** Lehrplanziele automatisch aus Thema/Fachbereich vorschlagen.
+5. **Zoom 1 (Multi-Year):** Weitere Verbesserungen der Jahrgänge-Ansicht.
 
 ### 🟢 Erledigt (v3.11–v3.29)
 - ✅ Helligkeit vergangene Wochen (0.4→0.6)
