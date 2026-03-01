@@ -782,7 +782,7 @@ function BatchOrDetailsTab() {
 
 // Batch editing for multiple selected cells
 function BatchEditTab() {
-  const { multiSelection, updateLessonDetail, pushUndo } = usePlannerStore();
+  const { multiSelection, updateLessonDetail, pushUndo, lessonDetails } = usePlannerStore();
   const { courses: COURSES } = usePlannerData();
   const [applied, setApplied] = useState<string | null>(null);
 
@@ -792,6 +792,31 @@ function BatchEditTab() {
     const course = COURSES.find(c => c.id === courseId);
     return course ? { week, col: course.col, courseId } : null;
   }).filter(Boolean) as { week: string; col: number; courseId: string }[];
+
+  // Determine current values across selection (for highlighting active state)
+  const currentValues = useMemo(() => {
+    const areas = new Set<string>();
+    const cats = new Set<string>();
+    const durations = new Set<string>();
+    const sols = new Set<boolean>();
+    for (const cell of cells) {
+      const d = lessonDetails[`${cell.week}-${cell.col}`];
+      if (d?.subjectArea) areas.add(d.subjectArea);
+      if (d?.blockCategory) cats.add(d.blockCategory);
+      if (d?.duration) durations.add(d.duration);
+      sols.add(!!d?.sol?.enabled);
+    }
+    return {
+      subjectArea: areas.size === 1 ? [...areas][0] : null,
+      blockCategory: cats.size === 1 ? [...cats][0] : null,
+      duration: durations.size === 1 ? [...durations][0] : null,
+      sol: sols.size === 1 ? [...sols][0] : null,
+      mixedArea: areas.size > 1,
+      mixedCat: cats.size > 1,
+      mixedDur: durations.size > 1,
+      mixedSol: sols.size > 1,
+    };
+  }, [cells, lessonDetails]);
 
   const applyToAll = (field: keyof LessonDetail, value: unknown) => {
     pushUndo();
@@ -813,15 +838,18 @@ function BatchEditTab() {
 
       {/* Subject Area */}
       <div className="space-y-1">
-        <label className="text-[9px] text-gray-400 font-medium">Fachbereich setzen</label>
+        <label className="text-[9px] text-gray-400 font-medium">Fachbereich setzen {currentValues.mixedArea && <span className="text-amber-400">(gemischt)</span>}</label>
         <div className="flex gap-1 flex-wrap">
-          {SUBJECT_AREAS.map(sa => (
-            <button key={sa.key} onClick={() => applyToAll('subjectArea', sa.key)}
-              className="px-2 py-0.5 rounded text-[9px] font-medium border cursor-pointer hover:opacity-80"
-              style={{ background: sa.color + '20', borderColor: sa.color + '60', color: sa.color }}>
-              {sa.label}
-            </button>
-          ))}
+          {SUBJECT_AREAS.map(sa => {
+            const isActive = currentValues.subjectArea === sa.key;
+            return (
+              <button key={sa.key} onClick={() => applyToAll('subjectArea', sa.key)}
+                className={`px-2 py-0.5 rounded text-[9px] font-medium border cursor-pointer hover:opacity-80 ${isActive ? 'ring-1 ring-offset-1 ring-offset-slate-800' : ''}`}
+                style={{ background: isActive ? sa.color + '40' : sa.color + '20', borderColor: isActive ? sa.color : sa.color + '60', color: sa.color }}>
+                {sa.label}
+              </button>
+            );
+          })}
           <button onClick={() => applyToAll('subjectArea', undefined)}
             className="px-2 py-0.5 rounded text-[9px] border border-gray-600 text-gray-400 cursor-pointer hover:text-gray-300">✕</button>
         </div>
@@ -829,38 +857,49 @@ function BatchEditTab() {
 
       {/* Category */}
       <div className="space-y-1">
-        <label className="text-[9px] text-gray-400 font-medium">Kategorie setzen</label>
+        <label className="text-[9px] text-gray-400 font-medium">Kategorie setzen {currentValues.mixedCat && <span className="text-amber-400">(gemischt)</span>}</label>
         <div className="flex gap-1 flex-wrap">
-          {CATEGORIES.map(cat => (
-            <button key={cat.key} onClick={() => applyToAll('blockCategory', cat.key)}
-              className="px-2 py-0.5 rounded text-[9px] border cursor-pointer border-gray-600 text-gray-300 hover:bg-slate-700">
-              {cat.icon} {cat.label}
-            </button>
-          ))}
+          {CATEGORIES.map(cat => {
+            const isActive = currentValues.blockCategory === cat.key;
+            return (
+              <button key={cat.key} onClick={() => applyToAll('blockCategory', cat.key)}
+                className={`px-2 py-0.5 rounded text-[9px] border cursor-pointer ${isActive ? 'bg-blue-900/40 border-blue-500 text-blue-300 ring-1 ring-blue-500/30' : 'border-gray-600 text-gray-300 hover:bg-slate-700'}`}>
+                {cat.icon} {cat.label}
+              </button>
+            );
+          })}
         </div>
       </div>
 
       {/* Duration */}
       <div className="space-y-1">
-        <label className="text-[9px] text-gray-400 font-medium">Dauer setzen</label>
+        <label className="text-[9px] text-gray-400 font-medium">Dauer setzen {currentValues.mixedDur && <span className="text-amber-400">(gemischt)</span>}</label>
         <div className="flex gap-1 flex-wrap">
-          {[1, 2, 3].map(d => (
-            <button key={d} onClick={() => applyToAll('duration', d)}
-              className="px-2 py-0.5 rounded text-[9px] border cursor-pointer border-gray-600 text-gray-300 hover:bg-slate-700">
-              {d}L
-            </button>
-          ))}
+          {[1, 2, 3].map(d => {
+            const isActive = currentValues.duration !== null && (
+              currentValues.duration === String(d) || currentValues.duration === `${d}` ||
+              (d === 1 && currentValues.duration === '45 min') ||
+              (d === 2 && (currentValues.duration === '90 min' || currentValues.duration === '2 Lektionen')) ||
+              (d === 3 && (currentValues.duration === '135 min' || currentValues.duration === '3 Lektionen'))
+            );
+            return (
+              <button key={d} onClick={() => applyToAll('duration', d)}
+                className={`px-2 py-0.5 rounded text-[9px] border cursor-pointer ${isActive ? 'bg-blue-900/40 border-blue-500 text-blue-300 ring-1 ring-blue-500/30' : 'border-gray-600 text-gray-300 hover:bg-slate-700'}`}>
+                {d}L
+              </button>
+            );
+          })}
         </div>
       </div>
 
       {/* SOL toggle */}
       <div className="space-y-1">
-        <label className="text-[9px] text-gray-400 font-medium">SOL (Selbstorganisiertes Lernen)</label>
+        <label className="text-[9px] text-gray-400 font-medium">SOL (Selbstorganisiertes Lernen) {currentValues.mixedSol && <span className="text-amber-400">(gemischt)</span>}</label>
         <div className="flex gap-1">
           <button onClick={() => applyToAll('sol', { enabled: true })}
-            className="px-2 py-0.5 rounded text-[9px] border cursor-pointer border-green-600 text-green-400 hover:bg-green-900/30">SOL ✓</button>
+            className={`px-2 py-0.5 rounded text-[9px] border cursor-pointer ${currentValues.sol === true ? 'bg-green-900/40 border-green-500 text-green-300 ring-1 ring-green-500/30' : 'border-green-600 text-green-400 hover:bg-green-900/30'}`}>SOL ✓</button>
           <button onClick={() => applyToAll('sol', { enabled: false })}
-            className="px-2 py-0.5 rounded text-[9px] border cursor-pointer border-gray-600 text-gray-400 hover:bg-slate-700">SOL ✕</button>
+            className={`px-2 py-0.5 rounded text-[9px] border cursor-pointer ${currentValues.sol === false ? 'bg-slate-700 border-gray-500 text-gray-300' : 'border-gray-600 text-gray-400 hover:bg-slate-700'}`}>SOL ✕</button>
         </div>
       </div>
 

@@ -181,9 +181,9 @@ export function ZoomYearView() {
   const s2Idx = s2StartIndex;
 
   return (
-    <div className="px-1 py-1">
+    <div className="px-1 pt-0 pb-1">
       <table className="border-collapse w-max min-w-full">
-        <thead className="sticky z-40" style={{ top: 0 }}>
+        <thead className="sticky z-40" style={{ top: -1 }}>
           {/* Group header row */}
           <tr>
             <th className="w-12 bg-gray-900 sticky left-0 z-50 py-0.5 border-b border-gray-800">
