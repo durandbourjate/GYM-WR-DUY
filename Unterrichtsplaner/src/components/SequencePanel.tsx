@@ -188,11 +188,19 @@ function FlatBlockCard({ fb }: { fb: FlatBlockInfo }) {
                   <div key={wi} className="flex items-center gap-1 text-[9px] cursor-pointer hover:bg-slate-700/30 px-1 rounded"
                     onClick={() => {
                       if (!course) return;
+                      const store = usePlannerStore.getState();
                       const row = document.querySelector(`tr[data-week="${weekW}"]`);
                       if (row) row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                      usePlannerStore.getState().setSelection({ week: weekW, courseId: course.id, title: entry?.title || '', course });
-                      usePlannerStore.getState().setSidePanelOpen(true);
-                      usePlannerStore.getState().setSidePanelTab('details');
+                      // Inherit tags from block/sequence if lesson has none
+                      const key = `${weekW}-${course.col}`;
+                      const lessonDetail = store.lessonDetails[key] || {};
+                      const inheritSA = block.subjectArea || fb.seqSubjectArea;
+                      if (!lessonDetail.subjectArea && inheritSA) {
+                        store.updateLessonDetail(weekW, course.col, { subjectArea: inheritSA });
+                      }
+                      store.setSelection({ week: weekW, courseId: course.id, title: entry?.title || '', course });
+                      store.setSidePanelOpen(true);
+                      store.setSidePanelTab('details');
                     }}>
                     <span className="text-gray-500 font-mono w-8">KW{weekW}</span>
                     <span className="text-gray-300 truncate">{entry?.title || '—'}</span>

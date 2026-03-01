@@ -446,11 +446,13 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                       usePlannerStore.getState().setEditingSequenceId(null);
                     }
                   }}
-                  onDoubleClick={() => {
+                  onDoubleClick={(e) => {
                     if (title) {
                       handleDoubleClick(week.w, c, title);
                     } else {
-                      // Double-click on empty cell: show new tile/sequence menu
+                      // Double-click on empty cell: show new tile/sequence menu at cursor
+                      const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                      setMenuPosition({ x: e.clientX - rect.left, y: e.clientY - rect.top });
                       handleEmptyCellClick(week.w, c);
                     }
                   }}
@@ -530,6 +532,17 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                       }}
                       onClick={(e) => {
                         e.stopPropagation();
+                        // Single click: toggle highlight in planner only
+                        const parentSeq = sequences.find(s => s.id === seq.sequenceId);
+                        if (parentSeq) {
+                          const currentEditing = usePlannerStore.getState().editingSequenceId;
+                          const isAlreadyEditing = currentEditing?.startsWith(parentSeq.id);
+                          usePlannerStore.getState().setEditingSequenceId(isAlreadyEditing ? null : parentSeq.id);
+                        }
+                      }}
+                      onDoubleClick={(e) => {
+                        e.stopPropagation();
+                        // Double click: open sequences tab
                         const parentSeq = sequences.find(s => s.id === seq.sequenceId);
                         if (parentSeq) {
                           usePlannerStore.getState().setEditingSequenceId(parentSeq.id);
@@ -537,7 +550,7 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                           setSidePanelTab('sequences');
                         }
                       }}
-                      title={`Sequenz öffnen: ${seq.label}`}
+                      title={`Klick: Sequenz hervorheben · Doppelklick: Sequenz bearbeiten`}
                     />
                   )}
                   {seq?.isFirst && title && (
@@ -547,12 +560,21 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                         e.stopPropagation();
                         const parentSeq = sequences.find(s => s.id === seq.sequenceId);
                         if (parentSeq) {
+                          const currentEditing = usePlannerStore.getState().editingSequenceId;
+                          const isAlreadyEditing = currentEditing?.startsWith(parentSeq.id);
+                          usePlannerStore.getState().setEditingSequenceId(isAlreadyEditing ? null : parentSeq.id);
+                        }
+                      }}
+                      onDoubleClick={(e) => {
+                        e.stopPropagation();
+                        const parentSeq = sequences.find(s => s.id === seq.sequenceId);
+                        if (parentSeq) {
                           usePlannerStore.getState().setEditingSequenceId(parentSeq.id);
                           setSidePanelOpen(true);
                           setSidePanelTab('sequences');
                         }
                       }}
-                      title={`Sequenz öffnen: ${seq.label}`}
+                      title={`Klick: Sequenz hervorheben · Doppelklick: Sequenz bearbeiten`}
                     >
                       {seq.label}
                     </div>

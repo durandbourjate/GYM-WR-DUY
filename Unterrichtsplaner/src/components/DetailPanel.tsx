@@ -6,7 +6,7 @@ import { CurriculumGoalPicker } from './CurriculumGoalPicker';
 import { SequencePanel } from './SequencePanel';
 import { SettingsPanel } from './SettingsPanel';
 import { suggestGoals, suggestSubjectArea } from '../utils/autoSuggest';
-import type { SubjectArea, BlockCategory, LessonDetail, SolDetails } from '../types';
+import type { SubjectArea, BlockCategory, LessonDetail, SolDetails, Course } from '../types';
 
 const SUBJECT_AREAS: { key: SubjectArea; label: string; color: string }[] = [
   { key: 'BWL', label: 'BWL', color: '#3b82f6' },
@@ -412,6 +412,75 @@ function MaterialLinks({ links, onChange }: { links: string[]; onChange: (links:
   );
 }
 
+/* Add to Sequence button — shown when lesson is not part of any sequence */
+function AddToSequenceButton({ week, course }: { week: string; course: Course }) {
+  const [open, setOpen] = useState(false);
+  const { sequences, addSequence, updateBlockInSequence, setEditingSequenceId, setSidePanelTab } = usePlannerStore();
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [open]);
+
+  // Filter sequences that match this course
+  const matching = sequences.filter(s =>
+    s.courseId === course.id || (s.courseIds && s.courseIds.includes(course.id))
+  );
+
+  const handleNew = () => {
+    const seqId = addSequence({ courseId: course.id, title: `Neue Sequenz ${course.cls}`, blocks: [{ weeks: [week], label: 'Neuer Block' }] });
+    setEditingSequenceId(`${seqId}-0`);
+    setSidePanelTab('sequences');
+    setOpen(false);
+  };
+
+  const handleAddToExisting = (seqId: string, blockIdx: number) => {
+    const seq = sequences.find(s => s.id === seqId);
+    if (!seq) return;
+    const block = seq.blocks[blockIdx];
+    if (block.weeks.includes(week)) return;
+    updateBlockInSequence(seqId, blockIdx, { weeks: [...block.weeks, week] });
+    setEditingSequenceId(`${seqId}-${blockIdx}`);
+    setOpen(false);
+  };
+
+  return (
+    <span className="relative inline-block">
+      <button
+        onClick={() => setOpen(!open)}
+        className="text-[8px] px-1 py-px rounded border border-dashed border-gray-600 text-gray-500 hover:text-gray-300 hover:border-gray-400 cursor-pointer"
+        title="Zu Sequenz hinzufügen"
+      >+ Sequenz</button>
+      {open && (
+        <div ref={menuRef} className="absolute left-0 top-full mt-1 z-[90] bg-slate-800 border border-slate-600 rounded-lg shadow-xl py-1 w-52">
+          <button onClick={handleNew}
+            className="w-full px-3 py-1.5 text-left text-[10px] text-blue-300 hover:bg-slate-700 cursor-pointer">
+            ✨ Neue Sequenz erstellen
+          </button>
+          {matching.length > 0 && <hr className="border-slate-700 my-0.5" />}
+          {matching.map(seq => (
+            seq.blocks.map((block, bi) => (
+              <button key={`${seq.id}-${bi}`}
+                onClick={() => handleAddToExisting(seq.id, bi)}
+                className="w-full px-3 py-1.5 text-left text-[10px] text-gray-300 hover:bg-slate-700 cursor-pointer flex items-center gap-1.5"
+                disabled={block.weeks.includes(week)}>
+                <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: seq.color || '#16a34a' }} />
+                <span className="truncate">{block.label}</span>
+                {block.weeks.includes(week) && <span className="text-[8px] text-gray-600 ml-auto">bereits</span>}
+              </button>
+            ))
+          ))}
+        </div>
+      )}
+    </span>
+  );
+}
+
 function DetailsTab() {
   const {
     selection,
@@ -578,6 +647,9 @@ function DetailsTab() {
               title="Zur Sequenz wechseln">
               ▧ {seqInfo.label} ({seqInfo.index + 1}/{seqInfo.total})
             </span>
+          )}
+          {!seqInfo && (
+            <AddToSequenceButton week={selection.week} course={c} />
           )}
         </div>
       </div>
