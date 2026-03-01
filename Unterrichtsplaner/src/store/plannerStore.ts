@@ -135,6 +135,9 @@ interface PlannerState {
   setSettingsOpen: (v: boolean) => void;
   panelWidth: number;
   setPanelWidth: (w: number) => void;
+  // Note column expansion (per course column)
+  expandedNoteCols: Record<string, boolean>; // course IDs with expanded note columns
+  toggleNoteCol: (courseId: string) => void;
 }
 
 export const usePlannerStore = create<PlannerState>()(
@@ -1080,7 +1083,13 @@ export const usePlannerStore = create<PlannerState>()(
   setSettingsOpen: (v) => set({ settingsOpen: v }),
   panelWidth: 400,
   setPanelWidth: (w) => set({ panelWidth: w }),
-    }),
+  expandedNoteCols: {},
+  toggleNoteCol: (courseId) => set((s) => {
+    const next = { ...s.expandedNoteCols };
+    if (next[courseId]) { delete next[courseId]; } else { next[courseId] = true; }
+    return { expandedNoteCols: next };
+  }),
+  }),
     {
       name: 'unterrichtsplaner-storage',
       version: 2,

@@ -1,4 +1,4 @@
-import { useCallback, useState, useRef, useEffect } from 'react';
+import React, { useCallback, useState, useRef, useEffect } from 'react';
 import type { Course, Week } from '../types';
 import { LESSON_COLORS, SUBJECT_AREA_COLORS, DAY_COLORS, getSequenceInfoFromStore, isPastWeek } from '../utils/colors';
 import { CURRENT_WEEK } from '../data/weeks';
@@ -240,6 +240,70 @@ function EmptyCellMenu({ week, course, onClose, selectedWeeks, position }: { wee
   );
 }
 
+/* Inline editable note cell for expanded note column */
+const NOTE_COL_W = 100;
+
+function NoteCell({ weekW, col, cellHeight }: { weekW: string; col: number; cellHeight: number }) {
+  const { lessonDetails, updateLessonDetail, weekData } = usePlannerStore();
+  const detail = lessonDetails[`${weekW}-${col}`];
+  const notes = detail?.notes || '';
+  const [editing, setEditing] = useState(false);
+  const [text, setText] = useState(notes);
+  const ref = useRef<HTMLTextAreaElement>(null);
+
+  // Check if this week has an entry at all
+  const weekEntry = weekData.find(w => w.w === weekW);
+  const entry = weekEntry?.lessons[col];
+  if (!entry) return <td className="border-b border-slate-900/40 bg-slate-950/30" style={{ width: NOTE_COL_W, minWidth: NOTE_COL_W, maxWidth: NOTE_COL_W, height: cellHeight }} />;
+
+  const displayNotes = notes;
+
+  useEffect(() => { setText(notes); }, [notes]);
+  useEffect(() => { if (editing && ref.current) { ref.current.focus(); ref.current.select(); } }, [editing]);
+
+  if (editing) {
+    return (
+      <td className="border-b border-slate-900/40 bg-slate-900/60 p-0 border-l border-gray-800/50"
+        style={{ width: NOTE_COL_W, minWidth: NOTE_COL_W, maxWidth: NOTE_COL_W, height: cellHeight, verticalAlign: 'top' }}>
+        <textarea
+          ref={ref}
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          onBlur={() => {
+            setEditing(false);
+            if (text !== notes) updateLessonDetail(weekW, col, { notes: text || undefined });
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') { setEditing(false); setText(notes); }
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault(); setEditing(false);
+              if (text !== notes) updateLessonDetail(weekW, col, { notes: text || undefined });
+            }
+          }}
+          className="w-full h-full bg-transparent text-slate-300 text-[8px] leading-tight p-1 outline-none resize-none border border-blue-500/50 rounded-sm"
+        />
+      </td>
+    );
+  }
+
+  return (
+    <td
+      className="border-b border-slate-900/40 bg-slate-950/30 p-0 cursor-text border-l border-gray-800/50"
+      style={{ width: NOTE_COL_W, minWidth: NOTE_COL_W, maxWidth: NOTE_COL_W, height: cellHeight, verticalAlign: 'top' }}
+      onClick={() => setEditing(true)}
+      title={displayNotes || 'Klick für Notiz'}
+    >
+      {displayNotes ? (
+        <div className="text-[7px] text-gray-400 leading-tight p-0.5 overflow-hidden" style={{ maxHeight: cellHeight, display: '-webkit-box', WebkitLineClamp: cellHeight > 30 ? 3 : 2, WebkitBoxOrient: 'vertical' }}>
+          {displayNotes}
+        </div>
+      ) : (
+        <div className="text-[7px] text-gray-700 p-0.5 italic">…</div>
+      )}
+    </td>
+  );
+}
+
 export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }: Props) {
   const {
     selection, setSelection,
@@ -254,6 +318,7 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
     lessonDetails,
     setInsertDialog, pushLessons, pushUndo,
     searchQuery,
+    expandedNoteCols,
   } = usePlannerStore();
 
   const [dropTarget, setDropTarget] = useState<{ week: string; col: number } | null>(null);
@@ -496,8 +561,8 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
               });
 
               return (
+                <React.Fragment key={c.id}>
                 <td
-                  key={c.id}
                   className="p-0 border-b border-slate-900/40 relative group-hover:bg-slate-950/40"
                   style={{
                     borderLeft: newDay ? `2px solid ${DAY_COLORS[c.day]}12` : 'none',
@@ -801,6 +866,10 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                     />
                   )}
                 </td>
+                {expandedNoteCols[c.id] && (
+                  <NoteCell weekW={week.w} col={c.col} cellHeight={cellHeight} />
+                )}
+                </React.Fragment>
               );
             })}
           </tr>

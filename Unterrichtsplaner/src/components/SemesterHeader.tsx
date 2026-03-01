@@ -8,8 +8,10 @@ interface Props {
   weeks?: Week[];
 }
 
+const NOTE_COL_W = 100; // px width of note column
+
 export function SemesterHeader({ courses, semester, weeks }: Props) {
-  const { classFilter, setClassFilter, setFilter } = usePlannerStore();
+  const { classFilter, setClassFilter, setFilter, expandedNoteCols, toggleNoteCol } = usePlannerStore();
 
   return (
     <thead className="sticky z-40" style={{ top: 0 }}>
@@ -22,19 +24,24 @@ export function SemesterHeader({ courses, semester, weeks }: Props) {
         </th>
         {courses.map((c, i) => {
           const newDay = i === 0 || c.day !== courses[i - 1]?.day;
+          const expanded = !!expandedNoteCols[c.id];
           return (
-            <th
-              key={`${c.id}-day`}
-              className="bg-gray-900 px-0 pt-0.5 border-b border-gray-800 text-center"
-              style={{
-                borderLeft: newDay ? `2px solid ${DAY_COLORS[c.day]}40` : 'none',
-                fontSize: 10,
-                fontWeight: 700,
-                color: DAY_COLORS[c.day],
-              }}
-            >
-              {newDay ? c.day : ''}
-            </th>
+            <>
+              <th
+                key={`${c.id}-day`}
+                className="bg-gray-900 px-0 pt-0.5 border-b border-gray-800 text-center"
+                style={{
+                  borderLeft: newDay ? `2px solid ${DAY_COLORS[c.day]}40` : 'none',
+                  fontSize: 10, fontWeight: 700, color: DAY_COLORS[c.day],
+                }}
+              >
+                {newDay ? c.day : ''}
+              </th>
+              {expanded && (
+                <th key={`${c.id}-day-note`} className="bg-gray-900 border-b border-gray-800"
+                  style={{ width: NOTE_COL_W, minWidth: NOTE_COL_W, maxWidth: NOTE_COL_W }} />
+              )}
+            </>
           );
         })}
       </tr>
@@ -46,69 +53,78 @@ export function SemesterHeader({ courses, semester, weeks }: Props) {
         {courses.map((c, i) => {
           const newDay = i === 0 || c.day !== courses[i - 1]?.day;
           const badge = TYPE_BADGES[c.typ];
+          const expanded = !!expandedNoteCols[c.id];
           return (
-            <th
-              key={`${c.id}-info`}
-              className="bg-gray-900 px-0.5 pb-1 border-b-2 border-gray-700 text-center"
-              style={{
-                borderLeft: newDay ? `2px solid ${DAY_COLORS[c.day]}40` : 'none',
-                width: 110,
-                minWidth: 110,
-                maxWidth: 110,
-              }}
-            >
-              <div
-                className={`text-[10px] font-bold cursor-pointer transition-colors ${
-                  classFilter === c.cls ? 'text-blue-400' : 'text-gray-200 hover:text-blue-300'
-                }`}
-                onClick={() => setClassFilter(classFilter === c.cls ? null : c.cls)}
-                title={`Klick: Nur ${c.cls} anzeigen (nochmal klicken: alle)`}
+            <>
+              <th
+                key={`${c.id}-info`}
+                className="bg-gray-900 px-0.5 pb-1 border-b-2 border-gray-700 text-center"
+                style={{
+                  borderLeft: newDay ? `2px solid ${DAY_COLORS[c.day]}40` : 'none',
+                  width: 110, minWidth: 110, maxWidth: 110,
+                }}
               >
-                {c.cls}
-              </div>
-              <div className="flex gap-0.5 justify-center mt-0.5 flex-wrap">
-                <span
-                  className="text-[7px] px-1 rounded font-bold cursor-pointer hover:opacity-80 transition-opacity"
-                  style={{ background: badge?.bg, color: badge?.fg }}
-                  onClick={() => setFilter(c.typ as any)}
-                  title={`Filter: Nur ${c.typ}`}
-                >
-                  {c.typ}
-                </span>
-                <span
-                  className={`text-[7px] px-1 rounded font-semibold ${
+                <div className="flex items-center justify-center gap-0.5">
+                  <div
+                    className={`text-[10px] font-bold cursor-pointer transition-colors ${
+                      classFilter === c.cls ? 'text-blue-400' : 'text-gray-200 hover:text-blue-300'
+                    }`}
+                    onClick={() => setClassFilter(classFilter === c.cls ? null : c.cls)}
+                    title={`Klick: Nur ${c.cls} anzeigen`}
+                  >
+                    {c.cls}
+                  </div>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); toggleNoteCol(c.id); }}
+                    className={`text-[8px] px-0.5 rounded cursor-pointer transition-all ${
+                      expanded ? 'text-blue-400 bg-blue-900/30' : 'text-gray-600 hover:text-gray-400'
+                    }`}
+                    title={expanded ? 'Notizen-Spalte ausblenden' : 'Notizen-Spalte einblenden'}
+                  >
+                    {expanded ? '◂' : '▸'}
+                  </button>
+                </div>
+                <div className="flex gap-0.5 justify-center mt-0.5 flex-wrap">
+                  <span
+                    className="text-[7px] px-1 rounded font-bold cursor-pointer hover:opacity-80 transition-opacity"
+                    style={{ background: badge?.bg, color: badge?.fg }}
+                    onClick={() => setFilter(c.typ as any)}
+                    title={`Filter: Nur ${c.typ}`}
+                  >
+                    {c.typ}
+                  </span>
+                  <span className={`text-[7px] px-1 rounded font-semibold ${
                     c.hk ? 'bg-orange-900/60 text-orange-200' : 'bg-gray-700 text-gray-400'
-                  }`}
-                >
-                  {c.hk ? 'HK' : 'GK'}
-                </span>
-                <span className="text-[7px] px-0.5 rounded bg-slate-800 text-slate-400">
-                  {c.les}L
-                </span>
-                {weeks && (() => {
-                  const total = weeks.filter(w => w.lessons[c.col]).length;
-                  const planned = weeks.filter(w => {
-                    const e = w.lessons[c.col];
-                    return e && e.type !== 6; // exclude holidays
-                  }).length;
-                  const free = weeks.filter(w => !w.lessons[c.col]).length;
-                  return free > 0 ? (
-                    <span className="text-[6px] px-0.5 rounded bg-slate-800/60 text-gray-500" title={`${planned} geplant, ${free} frei, ${total - planned} blockiert`}>
-                      {free}✎
-                    </span>
-                  ) : null;
-                })()}
-              </div>
-              <div className="text-[7px] text-gray-500 font-mono mt-0.5">
-                {c.from}–{c.to}
-              </div>
-              {c.note && (
-                <div className="text-[6px] text-amber-600 mt-0.5">{c.note}</div>
+                  }`}>
+                    {c.hk ? 'HK' : 'GK'}
+                  </span>
+                  <span className="text-[7px] px-0.5 rounded bg-slate-800 text-slate-400">{c.les}L</span>
+                  {weeks && (() => {
+                    const planned = weeks.filter(w => { const e = w.lessons[c.col]; return e && e.type !== 6; }).length;
+                    const free = weeks.filter(w => !w.lessons[c.col]).length;
+                    return free > 0 ? (
+                      <span className="text-[6px] px-0.5 rounded bg-slate-800/60 text-gray-500" title={`${planned} geplant, ${free} frei`}>
+                        {free}✎
+                      </span>
+                    ) : null;
+                  })()}
+                </div>
+                <div className="text-[7px] text-gray-500 font-mono mt-0.5">{c.from}–{c.to}</div>
+                {c.note && <div className="text-[6px] text-amber-600 mt-0.5">{c.note}</div>}
+              </th>
+              {expanded && (
+                <th key={`${c.id}-info-note`}
+                  className="bg-gray-900/80 px-1 pb-1 border-b-2 border-gray-700 text-center border-l border-gray-800"
+                  style={{ width: NOTE_COL_W, minWidth: NOTE_COL_W, maxWidth: NOTE_COL_W }}>
+                  <div className="text-[8px] text-gray-500">📝 Notizen</div>
+                </th>
               )}
-            </th>
+            </>
           );
         })}
       </tr>
     </thead>
   );
 }
+
+export { NOTE_COL_W };
