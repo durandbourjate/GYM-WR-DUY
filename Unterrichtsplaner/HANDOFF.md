@@ -1,7 +1,7 @@
-# Unterrichtsplaner – Handoff v3.14
+# Unterrichtsplaner – Handoff v3.15
 
-## Status: ✅ Deployed (v3.14)
-- **Commit:** bbd0211
+## Status: ✅ Deployed (v3.15)
+- **Commit:** 3c551f6
 - **Datum:** 2026-03-01
 - **Deploy:** https://durandbourjate.github.io/GYM-WR-DUY/Unterrichtsplaner/
 
@@ -20,6 +20,7 @@
 - v3.12: Flache Sequenz-Darstellung (FlatBlockCard), SequenceCard+BlockEditor entfernt (-460Z)
 - v3.13: Batch-Editing bei Multi-Select, Sequenz-Highlighting mit Block-Präzision, suggestSubjectArea
 - v3.14: UX-Fixes: Legende (BWL/VWL/Recht separat + Event grau), Sequenz-Bar 5px/sticky/hover, Tab-Styling Felder/Lektionen/Reihe, Fachbereich-Klick Collapse-Fix
+- v3.15: Kontextmenü bei Cursor, Sequenz-Klick=Highlight/Doppelklick=Edit, Tag-Vererbung Sequenz→Lektion, "Zu Sequenz hinzufügen"-Button im DetailPanel
 
 ## Architekturentscheidungen v3.11–v3.13
 - **editingSequenceId Format:** Jetzt `seqId-blockIndex` (z.B. `abc123-0`) statt nur `seqId`. WeekRows parsed dieses Format mit Regex und highlightet nur den spezifischen Block.
@@ -34,17 +35,13 @@
 1. **Materialsammlung (Sammlung-Tab):** Dritter Tab rechts neben "Sequenzen". Sequenzen und UE speichern für Wiederverwendung in späteren Jahren. Szenarien: (a) Lektionen+Sequenzen vom Vorjahr übernehmen, (b) Punktuell aus Sammlung importieren.
 2. **Detailspalte / Notiz-Ansicht (Unterrichtsdurchführung):** Niederschwelliger Zugang zu Notizen, Kommentaren, Reflexion ("wie hat es mit der Klasse funktioniert"). Idee: aufklappbare Detailspalte pro Kurs (wie Excel-Gruppierung). Bei Einzelkurs-Ansicht umsetzbar. Auch Mouse-Over als Option.
 3. **Feiertage tracken:** Wie Ferien blockieren.
-4. **"Zu Sequenz hinzufügen" im DetailPanel:** Einzelne UE über Details-Menü zu neuer oder bestehender Sequenz hinzufügen.
-5. **Zoom 2 (Mittlere Ansicht):** Alle KW-Zeilen, kompaktere Darstellung mit Sequenz-Labels statt volle Titel. Aktuell buggy (ZoomBlockView.tsx).
-6. **Zoom 1 (Multi-Year):** "Lehrplan"-Label korrigieren, "Ist-Zustand" Ansicht überarbeiten.
+4. **Zoom 2 (Mittlere Ansicht):** Alle KW-Zeilen, kompaktere Darstellung mit Sequenz-Labels statt volle Titel. Aktuell buggy (ZoomBlockView.tsx).
+5. **Zoom 1 (Multi-Year):** "Lehrplan"-Label korrigieren, "Ist-Zustand" Ansicht überarbeiten.
 
 ### 🟡 UX (nächste Runde)
-7. **Dauer-Warnung bei Verschieben (1L↔2L):** Wenn 90min-Lektion auf 45min-Slot verschoben wird → Warnung + Anpassung.
-8. **Kontextmenü bei Cmd+Klick:** Soll nahe bei der Zelle erscheinen.
-9. **Fachbereich-Tags oft falsch:** z.B. Preistheorie als Recht statt VWL. AutoSuggest + Vererbungslogik prüfen.
-10. **Klick auf Sequenz-Titel → Planer-Highlighting:** Sequenz im Plan aktivieren (nicht Tab wechseln).
-11. **Lektionen in Sequenz → Tab wechseln:** Tags (Fachbereich, Kategorie) von Reihe vererben.
-12. **Unterrichtsreihe Konzept klären:** Rolle der Reihe verdeutlichen. Mehrere Sequenzen (z.B. OR AT Entstehung, OR AT Erlöschung) gehören zu einer Reihe.
+6. **Dauer-Warnung bei Verschieben (1L↔2L):** Wenn 90min-Lektion auf 45min-Slot verschoben wird → Warnung + Anpassung.
+7. **Fachbereich-Tags oft falsch:** z.B. Preistheorie als Recht statt VWL. AutoSuggest + Vererbungslogik prüfen.
+8. **Unterrichtsreihe Konzept klären:** Rolle der Reihe verdeutlichen. Mehrere Sequenzen (z.B. OR AT Entstehung, OR AT Erlöschung) gehören zu einer Reihe.
 
 ### 🟢 Erledigt (v3.11–v3.14)
 - ✅ Helligkeit vergangene Wochen (0.4→0.6)
@@ -62,3 +59,7 @@
 - ✅ Sequenz-Bar: 5px breit, hover-Effekt, sticky bei Kachel (nicht bei leeren Zellen)
 - ✅ SequencePanel Felder/Lektionen/Reihe: Tab-Styling (aktiv hervorgehoben)
 - ✅ Fachbereich-Klick in Sequenz: Modal bleibt offen (Collapse-Fix via useEffect)
+- ✅ Kontextmenü bei Cursor-Position (auch bei Doppelklick leere Zelle)
+- ✅ Sequenz-Bar/Label: Klick = nur Highlight im Planer, Doppelklick = Sequenz-Tab öffnen
+- ✅ Lektion in Sequenz klicken: Fachbereich wird von Block/Sequenz geerbt
+- ✅ "Zu Sequenz hinzufügen"-Button im DetailPanel (neue oder bestehende Sequenz)

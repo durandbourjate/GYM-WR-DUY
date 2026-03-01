@@ -214,7 +214,19 @@ function FlatBlockCard({ fb }: { fb: FlatBlockInfo }) {
           {/* Series-level fields (parent ManagedSequence) */}
           {showSeriesFields && parentSeq && (
             <div className="space-y-1.5 p-1.5 bg-amber-900/10 border border-amber-700/30 rounded">
-              <div className="text-[8px] text-amber-400 font-medium">Unterrichtsreihe: {parentSeq.title}</div>
+              <div className="text-[8px] text-amber-400 font-medium mb-1">
+                📂 Reihe: {parentSeq.title}
+                <span className="text-gray-500 font-normal ml-1">({parentSeq.blocks.length} Sequenz{parentSeq.blocks.length !== 1 ? 'en' : ''})</span>
+              </div>
+              <div className="text-[7px] text-gray-600 mb-1.5">
+                Mehrere Sequenzen mit dem gleichen Oberthema bilden eine Reihe.
+                Reihen-Einstellungen gelten für alle Sequenzen darin.
+              </div>
+              <div>
+                <label className="text-[8px] text-gray-500">Reihen-Titel</label>
+                <input value={parentSeq.title} onChange={(e) => updateSequence(fb.seqId, { title: e.target.value })}
+                  className="w-full bg-slate-700/50 text-slate-200 border border-slate-600 rounded px-1.5 py-0.5 text-[9px] outline-none focus:border-amber-400" />
+              </div>
               <div className="flex gap-1 flex-wrap">
                 <span className="text-[8px] text-gray-500 w-full">Fachbereich (Reihe):</span>
                 {SUBJECT_AREAS.map((s) => (
@@ -236,7 +248,6 @@ function FlatBlockCard({ fb }: { fb: FlatBlockInfo }) {
                 <textarea value={parentSeq.notes || ''} onChange={(e) => updateSequence(fb.seqId, { notes: e.target.value || undefined })}
                   rows={2} className="w-full bg-slate-700/50 text-slate-200 border border-slate-600 rounded px-1.5 py-0.5 text-[9px] outline-none focus:border-blue-400 resize-y" />
               </div>
-              <div className="text-[8px] text-gray-500">{parentSeq.blocks.length} Sequenzen in dieser Reihe</div>
             </div>
           )}
 

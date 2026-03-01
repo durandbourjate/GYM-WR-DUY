@@ -581,6 +581,18 @@ function DetailsTab() {
     return suggestGoals(topic, effectiveDetail.subjectArea, 3, 0.2);
   }, [detail.topicMain, effectiveDetail.topicMain, effectiveDetail.subjectArea]);
 
+  // Mismatch warning: inherited subjectArea doesn't match topic
+  const subjectAreaMismatch = useMemo(() => {
+    const effective = effectiveDetail.subjectArea;
+    if (!effective) return null;
+    const topic = detail.topicMain || effectiveDetail.topicMain;
+    if (!topic || topic.length < 3) return null;
+    const suggested = suggestSubjectArea(topic);
+    if (!suggested || suggested === effective) return null;
+    // Only warn if the mismatch is from inheritance (not own value)
+    return { current: effective, suggested, isInherited: !detail.subjectArea };
+  }, [effectiveDetail.subjectArea, detail.subjectArea, detail.topicMain, effectiveDetail.topicMain]);
+
   if (!selection || !c) {
     return (
       <div className="flex-1 flex items-center justify-center text-[10px] text-gray-500 p-4">
@@ -661,6 +673,19 @@ function DetailsTab() {
           <PillSelect options={SUBJECT_AREAS.map(s => s.key)} value={detail.subjectArea}
             onChange={(v) => updateField('subjectArea', v)}
             renderOption={(v) => { const s = SUBJECT_AREAS.find(x => x.key === v)!; return { label: s.label, color: s.color }; }} />
+          {subjectAreaMismatch && (
+            <div className="mt-1 flex items-center gap-1 text-[8px]">
+              <span className="text-amber-400">⚠</span>
+              <span className="text-amber-400/80">
+                Topic passt zu <strong>{subjectAreaMismatch.suggested}</strong>{subjectAreaMismatch.isInherited ? ' (geerbt: ' + subjectAreaMismatch.current + ')' : ''}
+              </span>
+              <button
+                onClick={() => updateField('subjectArea', subjectAreaMismatch.suggested)}
+                className="text-[8px] text-blue-400 hover:text-blue-300 cursor-pointer underline ml-1">
+                Korrigieren
+              </button>
+            </div>
+          )}
         </div>
         <CategorySubtypeSelector
           category={effectiveCategory}
