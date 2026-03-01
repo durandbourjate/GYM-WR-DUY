@@ -1,7 +1,7 @@
-# Unterrichtsplaner – Handoff v3.26
+# Unterrichtsplaner – Handoff v3.27
 
-## Status: ✅ Deployed (v3.36)
-- **Commit:** 740550f
+## Status: ✅ Deployed (v3.37)
+- **Commit:** 0814ebd
 - **Datum:** 2026-03-01
 - **Deploy:** https://durandbourjate.github.io/GYM-WR-DUY/Unterrichtsplaner/
 
@@ -49,6 +49,8 @@
 - v3.34: UX-Verbesserungen #2 — (1) Klick+Drag leere Zellen bleiben nach mouseup markiert (lila Outline bleibt). (2) Zoom 3: Toggle vergangene Wochen dim/hell (◐-Button in Toolbar, `dimPastWeeks` in Store). (3) Shift-Klick Mehrtages-Kurse: Popup fragt "Auch [anderer Tag] auswählen?" statt Shift+Alt. (4) Zoom 2: Einzellektionen ohne Sequenz werden angezeigt (gestrichelter Border, halbtransparent, Klick→Details, DblClick→Zoom3). (5) SequencePanel: aktive Sequenz als Pin-Card oben angepinnt (unter Klassenbuttons); Felder+Lektionen standardmässig ausgeklappt wenn aktiv.
 
 - v3.35: UX-Fixes #3 — (1) Sequenz-Bar + Label Farbcode = Fachbereich statt Kurstyp (VWL=orange, BWL=blau, Recht=grün, IN=grau, INTERDISZ=violett). (2) Ferien-Wochen (type 6) in Sequenz-Lektionsliste als graue nicht-editierbare Zeile statt klickbar. (3) Felder/Lektionen in FlatBlockCard default ausgeklappt (useState(true)). (4) Aktive Sequenz Pin-Card: wird aus der normalen Sequenzliste excluded um Doppel-Anzeige zu vermeiden. (5) Sammlung-Buttons umbenannt: "💾 UE speichern" → "📥 In Sammlung", "💾 Reihe" → "📥 Reihe → Sammlung".
+
+- v3.37: Zoom 2 + Ferien Fixes — (1) Ferien/Events (isFixed) zeigen keinen Sequenz-Balken und kein Sequenz-Label mehr in Zoom 3. (2) Zoom 2 loose lessons: Multi-day-Kurse zeigen jetzt auch Einzellektionen (looseKey-Fallback bei Sub-Columns fehlte). (3) Zoom 2 Header: `top: 0` statt `top: -1`, mehr Padding (`py-1`) → Klassen-Beschriftungen voll lesbar. (4) Zoom 2 Schrift heller: Block-Farben aufgehellt (VWL fg `#fde6cc`, BWL `#dbeafe`, Recht `#d1fae5`), Default-Block `#cbd5e1`, Ferien-Label `text-gray-300`, KW-Labels `text-gray-400`. (5) dimPastWeeks-Toggle wirkt jetzt in Zoom 2 (war vorher hardcoded opacity 0.5).
 
 - v3.36: UX-Fixes #4 — (1) Shift-Klick Mehrtages-Bug fix: "Ja, beide Tage" expandiert jetzt die GESAMTE aktuelle multiSelection um die anderen Tage (nicht nur letzte Woche). Kein Popup wenn anderer Tag bereits manuell selektiert. Popup schliesst bei Klick daneben oder Esc. (2) Sequenz-Detail Feldordnung: Oberthema→Unterthema→Beschreibung→Lehrplanziel (kleiner, dezenter). (3) Material vereinfacht: LearningView-Feld + Materiallinks → ein "Material"-Feld. LV-URLs werden intern erkannt und in learningviewUrl gespeichert (Rückwärtskompatibilität). (4) Zoom 2 loose lessons fix: entry.title-Prüfung statt nur entry, type 0 korrekt behandelt (nicht mehr als empty string), Holidays/Events gefiltert, Label zeigt Titel statt Type-Nummer.
 
