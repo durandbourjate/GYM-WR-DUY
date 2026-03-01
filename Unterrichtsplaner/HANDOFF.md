@@ -1,7 +1,7 @@
-# Unterrichtsplaner – Handoff v3.15
+# Unterrichtsplaner – Handoff v3.16
 
-## Status: ✅ Deployed (v3.15)
-- **Commit:** 3c551f6
+## Status: ✅ Deployed (v3.16)
+- **Commit:** 7f64421
 - **Datum:** 2026-03-01
 - **Deploy:** https://durandbourjate.github.io/GYM-WR-DUY/Unterrichtsplaner/
 
@@ -21,6 +21,7 @@
 - v3.13: Batch-Editing bei Multi-Select, Sequenz-Highlighting mit Block-Präzision, suggestSubjectArea
 - v3.14: UX-Fixes: Legende (BWL/VWL/Recht separat + Event grau), Sequenz-Bar 5px/sticky/hover, Tab-Styling Felder/Lektionen/Reihe, Fachbereich-Klick Collapse-Fix
 - v3.15: Kontextmenü bei Cursor, Sequenz-Klick=Highlight/Doppelklick=Edit, Tag-Vererbung Sequenz→Lektion, "Zu Sequenz hinzufügen"-Button im DetailPanel
+- v3.16: Fachbereich-Mismatch-Warnung mit Korrigieren-Button, Reihe-UX (Erklärtext, editierbarer Titel, Sequenz-Zähler)
 
 ## Architekturentscheidungen v3.11–v3.13
 - **editingSequenceId Format:** Jetzt `seqId-blockIndex` (z.B. `abc123-0`) statt nur `seqId`. WeekRows parsed dieses Format mit Regex und highlightet nur den spezifischen Block.
@@ -39,9 +40,7 @@
 5. **Zoom 1 (Multi-Year):** "Lehrplan"-Label korrigieren, "Ist-Zustand" Ansicht überarbeiten.
 
 ### 🟡 UX (nächste Runde)
-6. **Dauer-Warnung bei Verschieben (1L↔2L):** Wenn 90min-Lektion auf 45min-Slot verschoben wird → Warnung + Anpassung.
-7. **Fachbereich-Tags oft falsch:** z.B. Preistheorie als Recht statt VWL. AutoSuggest + Vererbungslogik prüfen.
-8. **Unterrichtsreihe Konzept klären:** Rolle der Reihe verdeutlichen. Mehrere Sequenzen (z.B. OR AT Entstehung, OR AT Erlöschung) gehören zu einer Reihe.
+6. **Dauer-Warnung bei Verschieben (1L↔2L):** Aktuell kein reales Problem (Verschieben nur innerhalb gleicher Spalte). Relevant wenn cross-column oder Sequenz-Auto-Place erweitert wird.
 
 ### 🟢 Erledigt (v3.11–v3.14)
 - ✅ Helligkeit vergangene Wochen (0.4→0.6)
@@ -63,3 +62,5 @@
 - ✅ Sequenz-Bar/Label: Klick = nur Highlight im Planer, Doppelklick = Sequenz-Tab öffnen
 - ✅ Lektion in Sequenz klicken: Fachbereich wird von Block/Sequenz geerbt
 - ✅ "Zu Sequenz hinzufügen"-Button im DetailPanel (neue oder bestehende Sequenz)
+- ✅ Fachbereich-Mismatch-Warnung: ⚠ Topic passt zu VWL (geerbt: RECHT) + Korrigieren-Button
+- ✅ Reihe-Konzept UX: Erklärtext, editierbarer Titel, Sequenz-Zähler im Header
