@@ -44,3 +44,21 @@ index.html             ← Übersichtsseite aller Pools
 ## Neuen Pool erstellen
 
 Eine neue `.js`-Datei in `config/` anlegen, die das `poolConfig`-Objekt exportiert. Struktur siehe bestehende Pools oder den Claude-Skill «uebungspool».
+
+## Features pool.html (Stand März 2026)
+
+### ✅ Implementiert
+- **Farbschema pro Fachbereich:** `COLOR_SCHEMES` setzt `--c-primary` basierend auf `POOL_META.color`/`POOL_META.fach` (VWL=orange, BWL=blau, Recht=grün)
+- **Light/Dark-Mode Toggle:** Sonne/Mond-Icon im Header (`.theme-toggle`), Modus per `localStorage` gespeichert
+- **Suchfeld:** Textfeld im Startscreen (`.search-input`), filtert Fragen über Keywords/Titel
+- **Lernziel-Anzeige:** Lernziele als Chips (`.chip-lz`), Button im Header (`headerLzBtn`), Overlay-Panel (`lz-mini-overlay`)
+- **Multi-Pool-Modus:** `index.html` als Übersicht, `pool.html?config=a,b,c` lädt mehrere Pools gleichzeitig mit Topic-Prefixing
+- **LearningView-Integration:** xAPI-Score via `postMessage`, Deep-Links mit `topic`-Parameter
+- **Kompakter Header:** Scrollt zusammen bei Scrollen (`.app-header.compact`)
+- **Fortschrittsanzeige:** Statistiken, Übungsfortschritt
+- **Hilfe-System:** `help-content.html` als eingebundene Hilfeseite
+
+### 🟡 Offene Feature-Ideen
+- **Keywords/Tags pro Frage:** Neues `keywords`-Feld in Frage-Objekten für feinere Filterung (z.B. "Steuerparadies", "BNE", "Nachhaltigkeit")
+- **Interdisziplinäre Filter:** Fragen über Fachbereichsgrenzen hinweg filtern (BNE, transversale Kompetenzen) — basiert auf Keyword-System
+- **Lernziel→Fragen-Filter:** Klick auf Lernziel zeigt nur passende Fragen (aktuell: Anzeige, aber kein direkter Filter-Klick)

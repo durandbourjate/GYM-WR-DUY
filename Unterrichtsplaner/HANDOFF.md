@@ -88,14 +88,12 @@
 
 ## Offenes Feedback (noch nicht umgesetzt)
 
-### 🔴 Konzeptionell / Architektur
-1. **Detailspalte / Notiz-Ansicht (Unterrichtsdurchführung):** Niederschwelliger Zugang zu Notizen, Kommentaren, Reflexion ("wie hat es mit der Klasse funktioniert"). Idee: aufklappbare Detailspalte pro Kurs (wie Excel-Gruppierung). Bei Einzelkurs-Ansicht umsetzbar. Auch Mouse-Over als Option.
+### 🟡 Geplant (mittlere Priorität)
+1. **Google Calendar Integration** — Konzept dokumentiert (siehe Feature-Spec oben). Planer→Kalender Sync, Kalender→Planer Import, Kollisionswarnungen.
 2. **Zoom 1 (Multi-Year):** Weitere Verbesserungen der Jahrgänge-Ansicht.
+3. **Dauer-Warnung bei Verschieben (1L↔2L):** Relevant wenn cross-column oder Sequenz-Auto-Place erweitert wird.
 
-### 🟡 UX (nächste Runde)
-5. **Dauer-Warnung bei Verschieben (1L↔2L):** Aktuell kein reales Problem (Verschieben nur innerhalb gleicher Spalte). Relevant wenn cross-column oder Sequenz-Auto-Place erweitert wird.
-
-### 🟢 Erledigt (v3.11–v3.14)
+### 🟢 Erledigt (v3.11–v3.29)
 - ✅ Helligkeit vergangene Wochen (0.4→0.6)
 - ✅ Panel-Kontrast (hellerer Hintergrund #151b2e)
 - ✅ Panel-Resize mit Handle (320–700px)
@@ -133,4 +131,8 @@
 - ✅ Zoom 2 Block-Index: Klick auf Sequenz-Block öffnet korrekten Block (nicht nur Sequenz).
 - ✅ Toolbar Cleanup: Excel-Import-Button entfernt, Settings über SidePanel. ⓘ-Icon entfernt. Bundle halbiert.
 - ✅ Deploy-Fix: Kombinierte Site (Uebungen + Unterrichtsplaner). SW-Scope korrigiert.
-- ✅ Notizen-Spalte: Aufklappbar pro Kurs via Toggle im Header. Inline-editierbare NoteCell.
+- ✅ Notizen-Spalte (v3.25–v3.26): Aufklappbar pro Kurs via 📝-Toggle im Header. Inline-editierbare NoteCell, 200px Default, resizable (80–400px), Zeilenumbrüche. Löst "Detailspalte / Notiz-Ansicht" Feature-Request.
+- ✅ HoverPreview Positionierung (v3.26): Zeigt nach oben bei Zellen im unteren Bildschirmdrittel.
+- ✅ Zoom 2 Farbpalette (v3.27): Dark-Mode-Farben (VWL=orange, BWL=blau, Recht=grün), grössere Schrift, breitere Spalten.
+- ✅ Zoom 2 Jahresansicht (v3.28): Ganzes Schuljahr in einer Tabelle. Kurse nach cls+typ gruppiert. 2-Tage-Kurse: breiter Balken bei geteilter Sequenz, 2 schmale Sub-Spalten bei separaten.
+- ✅ SOL-Total (v3.29): Σ-Badge zeigt Summe aller Lektion-SOL-Einträge pro Sequenz. utils/solTotal.ts.
