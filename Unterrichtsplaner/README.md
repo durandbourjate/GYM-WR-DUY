@@ -1,73 +1,41 @@
-# React + TypeScript + Vite
+# Unterrichtsplaner
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Webbasierter Semesterplaner für den W&R-Unterricht. Zeigt alle Kurse (SF, EWR, IN) als Grid mit Kalenderwochen und ermöglicht Drag & Drop, Sequenz-Verwaltung, Lehrplanbezüge und Druckansicht.
 
-Currently, two official plugins are available:
+**Live:** https://durandbourjate.github.io/GYM-WR-DUY/Unterrichtsplaner/
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Stack
 
-## React Compiler
+- React 19 + TypeScript + Vite
+- Zustand (State Management)
+- PWA (Offline-fähig)
+- Tailwind-Utility-Klassen (inline)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Entwicklung
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+cd Unterrichtsplaner
+npm install
+npm run dev      # Entwicklungsserver (localhost:5173)
+npm run build    # Produktions-Build → dist/
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Features (v2.9)
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- Wochenraster mit allen Kursen (Stundenplan SJ 25/26)
+- Sequenzen: Themenblöcke über mehrere Wochen, mit Fachbereich-Farben
+- Shift+Klick Bereichs-Selektion (Di+Do-aware für SF)
+- Gruppen-Drag & Drop (Multi-Column)
+- Detail-Panel: Themen, Notizen, Material-Links, Lehrplanziele
+- Suche, Statistiken, HK-Rotation, TaF-Phasen
+- Druckansicht, Auto-Save (localStorage), JSON-Export/Import
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## Daten
+
+- `src/data/courses.ts` — Stundenplan (Kurse, Tage, Zeiten)
+- `src/data/weeks.ts` — Schulwochen mit Ferien/Sonderwochen
+- `src/data/curriculumGoals.ts` — Lehrplanziele LP17
+
+## Weiterentwicklung
+
+Siehe [HANDOFF.md](./HANDOFF.md) für den aktuellen Entwicklungsstand und nächste Schritte.
