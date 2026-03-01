@@ -1,7 +1,7 @@
-# Unterrichtsplaner – Handoff v3.22
+# Unterrichtsplaner – Handoff v3.23
 
-## Status: ✅ Deployed (v3.22)
-- **Commit:** 44b3572
+## Status: ✅ Deployed (v3.23)
+- **Commit:** 3833d5e
 - **Datum:** 2026-03-01
 - **Deploy:** https://durandbourjate.github.io/GYM-WR-DUY/Unterrichtsplaner/
 
@@ -28,6 +28,7 @@
 - v3.20: Zoom 2 komplett neu — KW-Zeilen-Layout statt Block-Matrix. Migration auf usePlannerData(). Sequenzen als farbige Balken (Label auf 1. Zeile, gerundete Ecken). Ferien/IW kollabiiert. Past-Wochen abgedunkelt. Klick→Sequenz, Doppelklick→Zoom3.
 - v3.21: Zoom 2 — Sequenzen als rowSpan-Einheiten (verschmolzene Zellen statt Zeile-pro-KW). Farbcode-Inferenz aus weekData-Lektionstyp wenn Sequenz keinen Fachbereich hat. BlockSpan-Datenstruktur mit skipSet.
 - v3.22: Zoom 1 — Ist-Zustand: ActualDataCard nutzt s2StartIndex für korrekte Semester-Zuordnung, filtert nach SF-Kurs-IDs. Labels auf Deutsch ("Mehrjahresübersicht", "Stoffverteilung"). getAvailableWeeks blockiert Feiertage (type 6) und Events (type 5) explizit — auch wenn der Kurs selbst keinen Eintrag in dieser Woche hat (globale Feiertag-Erkennung).
+- v3.23: Enhanced HoverPreview — farbiger Header mit Fachbereich-Akzent, Notizen prominent (6 Zeilen statt 2), Beschreibung (3 Zeilen), SOL-Details, Materiallinks (max 4), Lernziel (2 Zeilen). Smarte Positionierung (links bei Spalten >60%). Dynamische Breite (280px wenn Extras vorhanden, sonst 224px). Block-Vererbung für SubjectArea/Topic.
 
 ## Architekturentscheidungen v3.11–v3.19
 - **editingSequenceId Format:** Jetzt `seqId-blockIndex` (z.B. `abc123-0`) statt nur `seqId`. WeekRows parsed dieses Format mit Regex und highlightet nur den spezifischen Block.
@@ -81,3 +82,4 @@
 - ✅ Zoom 1 Ist-Zustand: ActualDataCard mit Semester-Zuordnung via s2StartIndex + Kurs-Filterung. Labels Deutsch.
 - ✅ Zoom 1 Labels: "Multi-Year Overview"→"Mehrjahresübersicht", "Lehrplan"→"Stoffverteilung".
 - ✅ Feiertage blockieren: getAvailableWeeks überspringt Wochen mit type 5/6 explizit (auch globale Feiertage). Settings auto-apply bei Speichern und App-Init.
+- ✅ HoverPreview v2: Farbiger Header, Notizen prominent (6 Zeilen), Beschreibung, SOL, Materiallinks, smarte Positionierung, Block-Vererbung.
