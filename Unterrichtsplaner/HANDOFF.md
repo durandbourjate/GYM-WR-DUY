@@ -1,7 +1,7 @@
-# Unterrichtsplaner – Handoff v3.25
+# Unterrichtsplaner – Handoff v3.26
 
-## Status: ✅ Deployed (v3.35)
-- **Commit:** 898023d
+## Status: ✅ Deployed (v3.36)
+- **Commit:** 740550f
 - **Datum:** 2026-03-01
 - **Deploy:** https://durandbourjate.github.io/GYM-WR-DUY/Unterrichtsplaner/
 
@@ -50,21 +50,23 @@
 
 - v3.35: UX-Fixes #3 — (1) Sequenz-Bar + Label Farbcode = Fachbereich statt Kurstyp (VWL=orange, BWL=blau, Recht=grün, IN=grau, INTERDISZ=violett). (2) Ferien-Wochen (type 6) in Sequenz-Lektionsliste als graue nicht-editierbare Zeile statt klickbar. (3) Felder/Lektionen in FlatBlockCard default ausgeklappt (useState(true)). (4) Aktive Sequenz Pin-Card: wird aus der normalen Sequenzliste excluded um Doppel-Anzeige zu vermeiden. (5) Sammlung-Buttons umbenannt: "💾 UE speichern" → "📥 In Sammlung", "💾 Reihe" → "📥 Reihe → Sammlung".
 
+- v3.36: UX-Fixes #4 — (1) Shift-Klick Mehrtages-Bug fix: "Ja, beide Tage" expandiert jetzt die GESAMTE aktuelle multiSelection um die anderen Tage (nicht nur letzte Woche). Kein Popup wenn anderer Tag bereits manuell selektiert. Popup schliesst bei Klick daneben oder Esc. (2) Sequenz-Detail Feldordnung: Oberthema→Unterthema→Beschreibung→Lehrplanziel (kleiner, dezenter). (3) Material vereinfacht: LearningView-Feld + Materiallinks → ein "Material"-Feld. LV-URLs werden intern erkannt und in learningviewUrl gespeichert (Rückwärtskompatibilität). (4) Zoom 2 loose lessons fix: entry.title-Prüfung statt nur entry, type 0 korrekt behandelt (nicht mehr als empty string), Holidays/Events gefiltert, Label zeigt Titel statt Type-Nummer.
+
 ### Offene Feature-Requests v3.35+
 
-#### 🔴 Sofort (v3.35)
-1. **Sequenz-Bar Farbcode = Fachbereich** — Linie neben UE in Fachbereich-Farbe (VWL orange, BWL blau, Recht grün, IN grau) statt Kurstyp-Farbe
-2. **Ferien aus Lektionsliste filtern** — Sequenz-Detail Lektionsliste zeigt keine Holiday-Wochen mehr
-3. **Felder/Lektionen default ausgeklappt** — Bei aktiver Sequenz immer offen statt lazy-open
-4. **Doppelte Sequenz-Anzeige Bug** — Aktive Sequenz Pin-Card oben + nochmal in Liste → aus Liste excluden
-5. **Sammlung-Buttons umbenennen** — "💾 UE speichern" → "📥 In Sammlung", "💾 Reihe" → "📥 Reihe → Sammlung"
+#### 🔴 Sofort (v3.35) — ✅ Erledigt
+1. ✅ Sequenz-Bar Farbcode = Fachbereich
+2. ✅ Ferien aus Lektionsliste filtern
+3. ✅ Felder/Lektionen default ausgeklappt
+4. ✅ Doppelte Sequenz-Anzeige Bug fix
+5. ✅ Sammlung-Buttons umbenannt
 
-#### 🟡 Bald (v3.36)
-6. **Shift-Klick Mehrtages-Bug** — Popup wählt nur letzte Woche; selectRange muss vollen Range abdecken. Kein Popup wenn Intention klar (manuell beide Tage gewählt). Popup schliesst bei Klick daneben/Esc.
-7. **Popup UX Mehrtages-Kurse** — Shift-Klick zeigt immer Popup, Alt+Shift entfällt. Ausnahme: manuell beide Tage → kein Popup.
-8. **Lehrplanziel weniger prominent** — In Sequenz-Detail: Reihenfolge Oberthema→Unterthema→Beschreibung→Lehrplanziel (kleiner)
-9. **Material vereinfachen** — LearningView-Feld + Material-Feld → nur "Material" (ein Feld)
-10. **Zoom 2 loose lessons Bug** — Gestrichelte Einzellektionen nur stellenweise angezeigt, entry-Erkennung verbessern
+#### 🟡 Bald (v3.36) — ✅ Erledigt
+6. ✅ Shift-Klick Mehrtages-Bug fix (voller Range, kein Popup bei manueller Auswahl, Click-Outside/Esc)
+7. ✅ Popup UX Mehrtages-Kurse (integriert in #6)
+8. ✅ Lehrplanziel weniger prominent (Reihenfolge: Oberthema→Unterthema→Beschreibung→Lehrplanziel)
+9. ✅ Material vereinfacht (LV+Material → 1 Feld)
+10. ✅ Zoom 2 loose lessons Bug fix
 
 #### 🔵 Nächste Runde (v3.37+)
 11. **Ferien als durchgehende Blöcke** — Zoom 2+3: Ferien-Wochen als leere, beschriftete Blöcke (z.B. "Herbstferien"), normalgross
