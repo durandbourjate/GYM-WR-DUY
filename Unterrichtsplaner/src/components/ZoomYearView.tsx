@@ -4,10 +4,10 @@ import { usePlannerData } from '../hooks/usePlannerData';
 import { TYPE_BADGES, DAY_COLORS, isPastWeek } from '../utils/colors';
 import type { Course, ManagedSequence, LessonType, SubjectArea } from '../types';
 
-const ROW_H = 22;
-const HOLIDAY_ROW_H = 14;
-const GROUP_W = 130; // width for single-day course group
-const SUBDAY_W = 65; // width for each sub-day in 2-day course group
+const ROW_H = 26;
+const HOLIDAY_ROW_H = 16;
+const GROUP_W = 140; // width for single-day course group
+const SUBDAY_W = 70; // width for each sub-day in 2-day course group
 
 /** Dark-mode block colors */
 const BLOCK_COLORS: Record<string, { bg: string; fg: string; border: string }> = {
@@ -186,8 +186,8 @@ export function ZoomYearView() {
         <thead className="sticky z-40" style={{ top: 0 }}>
           {/* Group header row */}
           <tr>
-            <th className="w-10 bg-gray-900 sticky left-0 z-50 py-0.5 border-b border-gray-800">
-              <span className="text-[8px] font-bold text-gray-400">Jahr</span>
+            <th className="w-12 bg-gray-900 sticky left-0 z-50 py-0.5 border-b border-gray-800">
+              <span className="text-[9px] font-bold text-gray-400">Jahr</span>
             </th>
             {groups.map((g) => {
               const badge = (TYPE_BADGES as Record<string, { bg: string; fg: string }>)[g.typ];
@@ -196,20 +196,20 @@ export function ZoomYearView() {
                 <th key={g.key} colSpan={g.isMultiDay ? g.courses.length : 1}
                   className="bg-gray-900 px-0.5 pb-0.5 border-b-2 border-gray-700 text-center"
                   style={{ width: totalW, minWidth: totalW }}>
-                  <div className={`text-[9px] font-bold cursor-pointer transition-colors ${
+                  <div className={`text-[11px] font-bold cursor-pointer transition-colors ${
                     classFilter === g.cls ? 'text-blue-400' : 'text-gray-200 hover:text-blue-300'
                   }`} onClick={() => setClassFilter(classFilter === g.cls ? null : g.cls)}>
                     {g.cls}
                   </div>
                   <div className="flex gap-0.5 justify-center mt-0.5">
-                    <span className="text-[7px] px-1 rounded font-bold cursor-pointer hover:opacity-80"
+                    <span className="text-[9px] px-1 rounded font-bold cursor-pointer hover:opacity-80"
                       style={{ background: badge?.bg, color: badge?.fg }}
                       onClick={() => setFilter(g.typ as any)}>{g.typ}</span>
                   </div>
                   {g.isMultiDay && (
                     <div className="flex justify-center gap-0 mt-0.5">
                       {g.courses.map(c => (
-                        <span key={c.id} className="text-[7px] px-1 text-gray-500" style={{ color: DAY_COLORS[c.day] }}>
+                        <span key={c.id} className="text-[9px] px-1 text-gray-500" style={{ color: DAY_COLORS[c.day] }}>
                           {c.day}
                         </span>
                       ))}
@@ -242,7 +242,7 @@ export function ZoomYearView() {
                 <td className={`bg-gray-900 sticky left-0 z-10 text-center border-b py-0 px-0.5 ${
                   isCurrent ? 'border-amber-500 bg-amber-950/30' : 'border-slate-800/50'
                 }`}>
-                  <span className={`text-[8px] font-mono font-bold ${isCurrent ? 'text-amber-400' : 'text-gray-500'}`}>
+                  <span className={`text-[9px] font-mono font-bold ${isCurrent ? 'text-amber-400' : 'text-gray-500'}`}>
                     {weekW}
                   </span>
                 </td>
@@ -250,7 +250,7 @@ export function ZoomYearView() {
                 {isHolidayWeek ? (
                   <td colSpan={groups.reduce((sum, g) => sum + (g.isMultiDay ? g.courses.length : 1), 0)}
                     className="border-b border-slate-800/30 text-center py-0" style={{ background: '#ffffff06' }}>
-                    <span className="text-[7px] text-gray-600 italic">{holidayLabel || 'Ferien'}</span>
+                    <span className="text-[9px] text-gray-600 italic">{holidayLabel || 'Ferien'}</span>
                   </td>
                 ) : (
                   groups.map((group) => {
@@ -282,11 +282,11 @@ export function ZoomYearView() {
                               title={`${sharedSpan.seq.title} → ${displayLabel}\n${sharedSpan.spanLen}W\nKlick: Sequenz · Doppelklick: Wochenansicht`}
                               onClick={() => handleBlockClick(sharedSpan)}
                               onDoubleClick={() => handleBlockDblClick(sharedSpan.weeks[0], group.courses[0], sharedSpan)}>
-                              <span className="text-[10px] font-bold leading-tight" style={{ color: colors.fg, display: '-webkit-box', WebkitLineClamp: sharedSpan.spanLen >= 3 ? 3 : 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                              <span className="text-[12px] font-bold leading-tight" style={{ color: colors.fg, display: '-webkit-box', WebkitLineClamp: sharedSpan.spanLen >= 3 ? 3 : 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                                 {displayLabel}
                               </span>
                               {sharedSpan.spanLen >= 2 && (
-                                <span className="text-[8px] mt-0.5 font-medium" style={{ color: colors.fg, opacity: 0.7 }}>{sharedSpan.spanLen}W</span>
+                                <span className="text-[9px] mt-0.5 font-medium" style={{ color: colors.fg, opacity: 0.7 }}>{sharedSpan.spanLen}W</span>
                               )}
                             </div>
                           </td>
@@ -324,7 +324,7 @@ export function ZoomYearView() {
                               title={`${daySpan.seq.title} → ${displayLabel} (${course.day})\n${daySpan.spanLen}W`}
                               onClick={() => handleBlockClick(daySpan)}
                               onDoubleClick={() => handleBlockDblClick(daySpan.weeks[0], course, daySpan)}>
-                              <span className="text-[8px] font-bold leading-tight" style={{ color: colors.fg, display: '-webkit-box', WebkitLineClamp: daySpan.spanLen >= 3 ? 2 : 1, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                              <span className="text-[10px] font-bold leading-tight" style={{ color: colors.fg, display: '-webkit-box', WebkitLineClamp: daySpan.spanLen >= 3 ? 2 : 1, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                                 {displayLabel}
                               </span>
                             </div>

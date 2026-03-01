@@ -37,7 +37,7 @@ interface PlannerState {
   multiSelection: string[];
   lastSelectedKey: string | null;
   toggleMultiSelect: (key: string) => void;
-  selectRange: (toKey: string, allWeeks: string[], courses: Course[]) => void;
+  selectRange: (toKey: string, allWeeks: string[], courses: Course[], crossDay?: boolean) => void;
   clearMultiSelect: () => void;
   showHelp: boolean;
   toggleHelp: () => void;
@@ -174,7 +174,7 @@ export const usePlannerStore = create<PlannerState>()(
         lastSelectedKey: key,
       };
     }),
-  selectRange: (toKey, allWeeks, courses) => {
+  selectRange: (toKey, allWeeks, courses, crossDay) => {
     const state = get();
     const fromKey = state.lastSelectedKey;
     if (!fromKey) {
@@ -204,7 +204,7 @@ export const usePlannerStore = create<PlannerState>()(
       fromCourse.cls === toCourse.cls && fromCourse.typ === toCourse.typ &&
       fromCourseId !== toCourseId;
 
-    if (areLinked) {
+    if (areLinked && crossDay !== false) {
       // Cross-day selection: select all weeks in range for BOTH course columns
       const fromIdx = allWeeks.indexOf(fromWeek);
       const toIdx = allWeeks.indexOf(toWeek);
@@ -223,7 +223,7 @@ export const usePlannerStore = create<PlannerState>()(
       return;
     }
 
-    if (fromCourseId !== toCourseId) {
+    if (fromCourseId !== toCourseId && !(areLinked && crossDay === false)) {
       // Different, unlinked courses — just add this one
       set((s) => ({
         multiSelection: s.multiSelection.includes(toKey)
@@ -234,7 +234,7 @@ export const usePlannerStore = create<PlannerState>()(
       return;
     }
 
-    // Same column range selection
+    // Same column range selection (or linked course with crossDay=false → use fromCourseId column)
     const fromIdx = allWeeks.indexOf(fromWeek);
     const toIdx = allWeeks.indexOf(toWeek);
     if (fromIdx < 0 || toIdx < 0) return;
@@ -246,13 +246,15 @@ export const usePlannerStore = create<PlannerState>()(
     }
 
     // Check if same-column range should also include linked day
-    const linkedCourseIds = getLinkedCourseIds(fromCourseId);
-    if (linkedCourseIds.length > 1) {
-      // Automatically include linked day columns (no confirm dialog)
-      for (const otherCourseId of linkedCourseIds) {
-        if (otherCourseId !== fromCourseId) {
-          for (let i = startIdx; i <= endIdx; i++) {
-            if (isSelectableLesson(allWeeks[i], otherCourseId)) rangeKeys.push(`${allWeeks[i]}-${otherCourseId}`);
+    if (crossDay !== false) {
+      const linkedCourseIds = getLinkedCourseIds(fromCourseId);
+      if (linkedCourseIds.length > 1) {
+        // Automatically include linked day columns
+        for (const otherCourseId of linkedCourseIds) {
+          if (otherCourseId !== fromCourseId) {
+            for (let i = startIdx; i <= endIdx; i++) {
+              if (isSelectableLesson(allWeeks[i], otherCourseId)) rangeKeys.push(`${allWeeks[i]}-${otherCourseId}`);
+            }
           }
         }
       }

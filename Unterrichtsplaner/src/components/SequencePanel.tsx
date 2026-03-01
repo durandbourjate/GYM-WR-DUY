@@ -118,6 +118,7 @@ function FlatBlockCard({ fb }: { fb: FlatBlockInfo }) {
   const [showFields, setShowFields] = useState(false);
   const [showLessons, setShowLessons] = useState(false);
   const [showSeriesFields, setShowSeriesFields] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
 
   // When card becomes active (after re-mount from group change), auto-open fields
   const blockKey = `${fb.seqId}-${fb.blockIndex}`;
@@ -135,6 +136,13 @@ function FlatBlockCard({ fb }: { fb: FlatBlockInfo }) {
   useEffect(() => {
     if (isActive && !showFields) setShowFields(true);
   }, []); // only on mount
+
+  // Scroll active card into view (e.g. when clicked from Zoom 2 Year View)
+  useEffect(() => {
+    if (isActive && cardRef.current) {
+      cardRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [isActive]);
 
   const block = fb.block;
   const sa = block.subjectArea || fb.seqSubjectArea;
@@ -157,14 +165,6 @@ function FlatBlockCard({ fb }: { fb: FlatBlockInfo }) {
 
   // Get parent sequence for series-level editing
   const parentSeq = sequences.find(s => s.id === fb.seqId);
-  const cardRef = useRef<HTMLDivElement>(null);
-
-  // Auto-scroll into view when this block becomes the active editing target
-  useEffect(() => {
-    if (isActive && cardRef.current) {
-      cardRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
-  }, [isActive]);
 
   return (
     <div ref={cardRef} data-seq-block={blockKey} className="border rounded-lg overflow-hidden transition-colors"

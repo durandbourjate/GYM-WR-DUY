@@ -364,8 +364,8 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
     (weekW: string, course: Course, title: string, e: React.MouseEvent) => {
       if (!title) return;
       if (e.shiftKey) {
-        // Shift+Click: range select within column
-        selectRange(`${weekW}-${course.id}`, allWeekKeys, courses);
+        // Shift+Click: range select. Alt+Shift = both days, Shift only = single day
+        selectRange(`${weekW}-${course.id}`, allWeekKeys, courses, e.altKey ? true : false);
         setSidePanelOpen(true);
         setSidePanelTab('details');
       } else if (e.metaKey || e.ctrlKey) {
@@ -614,7 +614,7 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                     if (e.shiftKey || e.metaKey || e.ctrlKey) {
                       if (title) {
                         if (e.shiftKey) {
-                          selectRange(`${week.w}-${c.id}`, allWeekKeys, courses);
+                          selectRange(`${week.w}-${c.id}`, allWeekKeys, courses, e.altKey ? true : false);
                         } else {
                           toggleMultiSelect(`${week.w}-${c.id}`);
                         }
@@ -627,9 +627,9 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                     } else if (title) {
                       handleClick(week.w, c, title, e);
                     } else {
-                      // Click on empty cell: just deselect everything
+                      // Click on empty cell: select it (mark visually) and close panel
                       clearMultiSelect();
-                      setSelection(null);
+                      setSelection({ week: week.w, courseId: c.id, title: '', course: c });
                       setEmptyCellMenu(null);
                       usePlannerStore.getState().setEditingSequenceId(null);
                       setSidePanelOpen(false);
@@ -871,9 +871,9 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                     </div>
                   ) : (
                     <div
-                      className="cursor-pointer hover:bg-slate-800/40 rounded mx-0.5"
+                      className={`cursor-pointer rounded mx-0.5 transition-all ${isSelected ? 'bg-blue-900/30 border border-blue-500/50 shadow-[0_0_0_1px_#3b82f640]' : 'hover:bg-slate-800/40'}`}
                       style={{ minHeight: cellHeight }}
-                      title="Klick: Neue Kachel oder Sequenz"
+                      title="Doppelklick: Neue Kachel oder Sequenz"
                     />
                   )}
 
