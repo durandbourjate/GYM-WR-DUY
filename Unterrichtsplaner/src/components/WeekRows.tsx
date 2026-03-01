@@ -232,7 +232,7 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
     setHoverCell({ week: weekW, col });
     setShowHoverPreview(false);
     if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
-    hoverTimerRef.current = setTimeout(() => setShowHoverPreview(true), 2000);
+    hoverTimerRef.current = setTimeout(() => setShowHoverPreview(true), 800);
   }, []);
 
   const handleMouseLeave = useCallback(() => {

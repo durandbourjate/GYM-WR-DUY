@@ -150,15 +150,25 @@ export function importCurrentHolidays(): HolidayConfig[] {
   return holidays;
 }
 
-// Detect special weeks from current WEEKS data (weeks where all entries are type 5)
+// Detect special weeks from current WEEKS data (weeks where all entries are type 5 or type 6 partial)
 export function importCurrentSpecialWeeks(): SpecialWeekConfig[] {
   const specials: SpecialWeekConfig[] = [];
   for (const week of WEEKS) {
     const entries = Object.values(week.lessons);
-    const allSpecial = entries.length > 0 && entries.every(e => e.type === 5);
-    if (allSpecial) {
+    if (entries.length === 0) continue;
+    const allEvent = entries.every(e => e.type === 5);
+    if (allEvent) {
       const label = entries[0]?.title || 'Sonderwoche';
       specials.push({ id: generateId(), label, week: week.w, type: 'event' });
+      continue;
+    }
+    // Check for partial holidays (some entries are type 6, not all → single-day holiday in a week)
+    const holidays = entries.filter(e => e.type === 6);
+    const nonHolidays = entries.filter(e => e.type !== 6);
+    if (holidays.length > 0 && nonHolidays.length > 0) {
+      // This week has a partial holiday (e.g. Auffahrt on Thursday but other days have lessons)
+      const label = holidays[0]?.title || 'Feiertag';
+      specials.push({ id: generateId(), label, week: week.w, type: 'holiday' });
     }
   }
   return specials;
