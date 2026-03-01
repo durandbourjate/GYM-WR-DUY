@@ -8,10 +8,25 @@ interface Props {
   weeks?: Week[];
 }
 
-const NOTE_COL_W = 200; // px width of note column (default)
-
 export function SemesterHeader({ courses, semester, weeks }: Props) {
-  const { classFilter, setClassFilter, setFilter, expandedNoteCols, toggleNoteCol } = usePlannerStore();
+  const { classFilter, setClassFilter, setFilter, expandedNoteCols, toggleNoteCol, noteColWidth, setNoteColWidth } = usePlannerStore();
+  const ncw = noteColWidth;
+
+  // Drag resize for note column
+  const handleResizeStart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const startX = e.clientX;
+    const startW = ncw;
+    const onMove = (ev: MouseEvent) => {
+      setNoteColWidth(startW + ev.clientX - startX);
+    };
+    const onUp = () => {
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+    };
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+  };
 
   return (
     <thead className="sticky z-40" style={{ top: 0 }}>
@@ -39,7 +54,7 @@ export function SemesterHeader({ courses, semester, weeks }: Props) {
               </th>
               {expanded && (
                 <th key={`${c.id}-day-note`} className="bg-gray-900 border-b border-gray-800"
-                  style={{ width: NOTE_COL_W, minWidth: NOTE_COL_W, maxWidth: NOTE_COL_W }} />
+                  style={{ width: ncw, minWidth: ncw, maxWidth: ncw }} />
               )}
             </>
           );
@@ -114,9 +129,14 @@ export function SemesterHeader({ courses, semester, weeks }: Props) {
               </th>
               {expanded && (
                 <th key={`${c.id}-info-note`}
-                  className="bg-gray-900/80 px-1 pb-1 border-b-2 border-gray-700 text-center border-l border-gray-800"
-                  style={{ width: NOTE_COL_W, minWidth: NOTE_COL_W, maxWidth: NOTE_COL_W }}>
+                  className="bg-gray-900/80 px-1 pb-1 border-b-2 border-gray-700 text-center border-l border-gray-800 relative"
+                  style={{ width: ncw, minWidth: ncw, maxWidth: ncw }}>
                   <div className="text-[8px] text-gray-500">📝 Notizen</div>
+                  {/* Resize handle */}
+                  <div
+                    className="absolute right-0 top-0 bottom-0 w-1.5 cursor-col-resize hover:bg-blue-500/40 transition-colors"
+                    onMouseDown={handleResizeStart}
+                  />
                 </th>
               )}
             </>
@@ -126,5 +146,3 @@ export function SemesterHeader({ courses, semester, weeks }: Props) {
     </thead>
   );
 }
-
-export { NOTE_COL_W };

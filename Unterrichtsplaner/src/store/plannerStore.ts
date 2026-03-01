@@ -138,6 +138,8 @@ interface PlannerState {
   // Note column expansion (per course column)
   expandedNoteCols: Record<string, boolean>; // course IDs with expanded note columns
   toggleNoteCol: (courseId: string) => void;
+  noteColWidth: number; // shared width for all note columns
+  setNoteColWidth: (w: number) => void;
 }
 
 export const usePlannerStore = create<PlannerState>()(
@@ -1089,6 +1091,8 @@ export const usePlannerStore = create<PlannerState>()(
     if (next[courseId]) { delete next[courseId]; } else { next[courseId] = true; }
     return { expandedNoteCols: next };
   }),
+  noteColWidth: 200,
+  setNoteColWidth: (w) => set({ noteColWidth: Math.max(80, Math.min(400, w)) }),
   }),
     {
       name: 'unterrichtsplaner-storage',

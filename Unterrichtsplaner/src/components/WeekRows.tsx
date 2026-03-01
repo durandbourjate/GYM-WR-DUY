@@ -255,10 +255,9 @@ function EmptyCellMenu({ week, course, onClose, selectedWeeks, position }: { wee
 }
 
 /* Inline editable note cell for expanded note column */
-const NOTE_COL_W = 200;
 
 function NoteCell({ weekW, col, cellHeight }: { weekW: string; col: number; cellHeight: number }) {
-  const { lessonDetails, updateLessonDetail, weekData } = usePlannerStore();
+  const { lessonDetails, updateLessonDetail, weekData, noteColWidth: ncw } = usePlannerStore();
   const detail = lessonDetails[`${weekW}-${col}`];
   const notes = detail?.notes || '';
   const [editing, setEditing] = useState(false);
@@ -268,7 +267,7 @@ function NoteCell({ weekW, col, cellHeight }: { weekW: string; col: number; cell
   // Check if this week has an entry at all
   const weekEntry = weekData.find(w => w.w === weekW);
   const entry = weekEntry?.lessons[col];
-  if (!entry) return <td className="border-b border-slate-900/40 bg-slate-950/30" style={{ width: NOTE_COL_W, minWidth: NOTE_COL_W, maxWidth: NOTE_COL_W, height: cellHeight }} />;
+  if (!entry) return <td className="border-b border-slate-900/40 bg-slate-950/30" style={{ width: ncw, minWidth: ncw, maxWidth: ncw, height: cellHeight }} />;
 
   const displayNotes = notes;
 
@@ -278,7 +277,7 @@ function NoteCell({ weekW, col, cellHeight }: { weekW: string; col: number; cell
   if (editing) {
     return (
       <td className="border-b border-slate-900/40 bg-slate-900/60 p-0 border-l border-gray-800/50"
-        style={{ width: NOTE_COL_W, minWidth: NOTE_COL_W, maxWidth: NOTE_COL_W, height: cellHeight, verticalAlign: 'top' }}>
+        style={{ width: ncw, minWidth: ncw, maxWidth: ncw, height: cellHeight, verticalAlign: 'top' }}>
         <textarea
           ref={ref}
           value={text}
@@ -303,7 +302,7 @@ function NoteCell({ weekW, col, cellHeight }: { weekW: string; col: number; cell
   return (
     <td
       className="border-b border-slate-900/40 bg-slate-950/30 p-0 cursor-text border-l border-gray-800/50"
-      style={{ width: NOTE_COL_W, minWidth: NOTE_COL_W, maxWidth: NOTE_COL_W, height: cellHeight, verticalAlign: 'top' }}
+      style={{ width: ncw, minWidth: ncw, maxWidth: ncw, height: cellHeight, verticalAlign: 'top' }}
       onClick={() => setEditing(true)}
       title={displayNotes || 'Klick für Notiz'}
     >

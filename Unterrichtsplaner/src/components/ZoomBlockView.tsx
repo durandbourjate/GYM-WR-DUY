@@ -1,12 +1,13 @@
 import { useMemo, useCallback } from 'react';
 import { usePlannerStore } from '../store/plannerStore';
 import { usePlannerData } from '../hooks/usePlannerData';
-import { TYPE_BADGES, DAY_COLORS, SUBJECT_AREA_COLORS, isPastWeek } from '../utils/colors';
+import { TYPE_BADGES, DAY_COLORS, isPastWeek } from '../utils/colors';
 import type { Course, ManagedSequence, LessonType, SubjectArea } from '../types';
 
 const DAY_ORDER: Record<string, number> = { Mo: 0, Di: 1, Mi: 2, Do: 3, Fr: 4 };
-const ROW_H = 22; // px per week row
+const ROW_H = 24; // px per week row
 const HOLIDAY_ROW_H = 18;
+const COL_W = 110; // column width
 
 interface Props {
   semester: 1 | 2;
@@ -46,12 +47,19 @@ function getWeekType(weekW: string, weekData: any[], col: number): 'holiday' | '
   return 'normal';
 }
 
-/** Get dark-mode friendly colors for a subject area */
+/** Dark-mode block colors for Zoom 2 — saturated backgrounds with light text */
+const BLOCK_COLORS: Record<string, { bg: string; fg: string; border: string }> = {
+  VWL:      { bg: '#7c2d12', fg: '#fed7aa', border: '#ea580c' },   // Orange-braun
+  BWL:      { bg: '#1e3a5f', fg: '#bfdbfe', border: '#3b82f6' },   // Dunkelblau
+  RECHT:    { bg: '#14532d', fg: '#bbf7d0', border: '#22c55e' },   // Dunkelgrün
+  IN:       { bg: '#374151', fg: '#d1d5db', border: '#6b7280' },   // Grau
+  INTERDISZ: { bg: '#4c1d95', fg: '#ddd6fe', border: '#8b5cf6' },  // Violett
+};
+const DEFAULT_BLOCK = { bg: '#334155', fg: '#94a3b8', border: '#64748b' };
+
 function getBlockColors(subjectArea?: string) {
-  if (subjectArea && SUBJECT_AREA_COLORS[subjectArea as keyof typeof SUBJECT_AREA_COLORS]) {
-    return SUBJECT_AREA_COLORS[subjectArea as keyof typeof SUBJECT_AREA_COLORS];
-  }
-  return { bg: '#475569', fg: '#94a3b8', border: '#64748b' };
+  if (subjectArea && BLOCK_COLORS[subjectArea]) return BLOCK_COLORS[subjectArea];
+  return DEFAULT_BLOCK;
 }
 
 export function ZoomBlockView({ semester }: Props) {
@@ -210,7 +218,7 @@ export function ZoomBlockView({ semester }: Props) {
               const badge = TYPE_BADGES[c.typ];
               return (
                 <th key={`${c.id}-info`} className="bg-gray-900 px-0.5 pb-0.5 border-b-2 border-gray-700 text-center"
-                  style={{ borderLeft: newDay ? `2px solid ${DAY_COLORS[c.day]}40` : 'none', width: 80, minWidth: 80, maxWidth: 80 }}>
+                  style={{ borderLeft: newDay ? `2px solid ${DAY_COLORS[c.day]}40` : 'none', width: COL_W, minWidth: COL_W, maxWidth: COL_W }}>
                   <div className={`text-[9px] font-bold cursor-pointer transition-colors ${classFilter === c.cls ? 'text-blue-400' : 'text-gray-200 hover:text-blue-300'}`}
                     onClick={() => setClassFilter(classFilter === c.cls ? null : c.cls)}>
                     {c.cls}
@@ -268,7 +276,7 @@ export function ZoomBlockView({ semester }: Props) {
                     const newDay = ci === 0 || c.day !== courses[ci - 1]?.day;
                     const cellStyle = {
                       borderLeft: newDay ? `2px solid ${DAY_COLORS[c.day]}12` : 'none' as string,
-                      width: 80, minWidth: 80, maxWidth: 80,
+                      width: COL_W, minWidth: COL_W, maxWidth: COL_W,
                     };
 
                     // Skip cells covered by a rowSpan from above
@@ -340,25 +348,24 @@ export function ZoomBlockView({ semester }: Props) {
                           verticalAlign: 'stretch',
                         }}>
                         <div
-                          className={`h-full px-1.5 py-1 flex flex-col justify-center cursor-pointer transition-all hover:brightness-125 rounded ${blockSearchMatch ? 'ring-1 ring-amber-400' : ''}`}
+                          className={`h-full px-2 py-1.5 flex flex-col justify-center cursor-pointer transition-all hover:brightness-110 rounded-sm ${blockSearchMatch ? 'ring-1 ring-amber-400' : ''}`}
                           style={{
-                            background: colors.bg + '45',
-                            borderLeft: `3px solid ${colors.bg}`,
-                            borderTop: `1px solid ${colors.bg}30`,
-                            borderBottom: `1px solid ${colors.bg}30`,
-                            borderRight: `1px solid ${colors.bg}15`,
+                            background: colors.bg,
+                            borderLeft: `4px solid ${colors.border || colors.bg}`,
                             minHeight: spanHeight - 2,
                           }}
                           title={`${span.seq.title} → ${span.label}${span.topicMain ? ' (' + span.topicMain + ')' : ''}\n${kwRange} (${span.spanLen}W)\nKlick: Sequenz öffnen · Doppelklick: Zur Wochenansicht`}
                           onClick={() => handleBlockClick(span)}
                           onDoubleClick={() => handleBlockDblClick(span.weeks[0], c, span)}
                         >
-                          <span className="text-[8px] font-semibold truncate leading-tight" style={{ color: colors.fg }}>
+                          <span className="text-[10px] font-bold leading-tight" style={{ color: colors.fg, display: '-webkit-box', WebkitLineClamp: span.spanLen >= 3 ? 3 : 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                             {displayLabel}
                           </span>
-                          <span className="text-[6px] mt-0.5" style={{ color: colors.fg, opacity: 0.6 }}>
-                            {span.spanLen}W · {kwRange}
-                          </span>
+                          {span.spanLen >= 2 && (
+                            <span className="text-[8px] mt-0.5 font-medium" style={{ color: colors.fg, opacity: 0.7 }}>
+                              {span.spanLen}W
+                            </span>
+                          )}
                         </div>
                       </td>
                     );
