@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { usePlannerStore } from '../store/plannerStore';
-import { WEEKS } from '../data/weeks';
 import { usePlannerData } from '../hooks/usePlannerData';
-import { SEQUENCE_COLORS, SUBJECT_AREA_COLORS } from '../utils/colors';
-import type { Course, SubjectArea, ManagedSequence, SequenceBlock, LessonDetail } from '../types';
+import { SUBJECT_AREA_COLORS } from '../utils/colors';
+import type { Course, SubjectArea, SequenceBlock } from '../types';
 
 const SUBJECT_AREAS: { key: SubjectArea; label: string; color: string }[] = [
   { key: 'BWL', label: 'BWL', color: '#3b82f6' },
@@ -13,463 +12,227 @@ const SUBJECT_AREAS: { key: SubjectArea; label: string; color: string }[] = [
   { key: 'INTERDISZ', label: 'Interdisziplinär', color: '#a855f7' },
 ];
 
-function BlockEditor({
-  block, index, seqId, totalBlocks,
-  onUpdate, onRemove, onMoveUp, onMoveDown,
-}: {
-  block: SequenceBlock; index: number; seqId: string; totalBlocks: number;
-  onUpdate: (idx: number, b: Partial<SequenceBlock>) => void;
-  onRemove: (idx: number) => void;
-  onMoveUp: (idx: number) => void;
-  onMoveDown: (idx: number) => void;
-}) {
-  const { setSelection, setSidePanelOpen, setSidePanelTab, sequences } = usePlannerStore();
+
+// === Flat Block Card (new flat view) ===
+type FlatBlockInfo = {
+  seqId: string;
+  seqTitle: string;
+  seqColor?: string;
+  seqSubjectArea?: SubjectArea;
+  block: SequenceBlock;
+  blockIndex: number;
+  totalBlocks: number;
+  courseId: string;
+  courseIds?: string[];
+  cls: string;
+  typ: string;
+};
+
+function FlatBlockCard({ fb }: { fb: FlatBlockInfo }) {
+  const {
+    editingSequenceId, setEditingSequenceId,
+    updateBlockInSequence, removeBlockFromSequence,
+    sequences, updateSequence,
+  } = usePlannerStore();
   const { courses: COURSES } = usePlannerData();
-  const [editingLabel, setEditingLabel] = useState(false);
-  const [editingWeeks, setEditingWeeks] = useState(false);
-  const [showDetails, setShowDetails] = useState(false);
+  const [showFields, setShowFields] = useState(false);
   const [showLessons, setShowLessons] = useState(false);
-  const [labelText, setLabelText] = useState(block.label);
-  const [weeksText, setWeeksText] = useState(block.weeks.join(', '));
+  const [showSeriesFields, setShowSeriesFields] = useState(false);
 
-  const saveLabel = () => { onUpdate(index, { label: labelText }); setEditingLabel(false); };
-  const saveWeeks = () => {
-    const parsed = weeksText.split(/[,;\s]+/).map((w) => w.trim().replace(/^0+/, '').padStart(2, '0')).filter((w) => w && /^\d{2}$/.test(w));
-    onUpdate(index, { weeks: parsed }); setEditingWeeks(false);
-  };
+  const blockKey = `${fb.seqId}-${fb.blockIndex}`;
+  const isActive = editingSequenceId === blockKey;
+  const block = fb.block;
+  const sa = block.subjectArea || fb.seqSubjectArea;
+  const blockColor = sa ? SUBJECT_AREA_COLORS[sa]?.bg : fb.seqColor;
+  const kwRange = block.weeks.length > 0
+    ? `KW ${block.weeks[0]}–${block.weeks[block.weeks.length - 1]}`
+    : '—';
 
-  // Navigate to first week of this block in the planner
+  // Navigate to first lesson in planner
   const navigateToBlock = () => {
     if (block.weeks.length === 0) return;
-    const seq = sequences.find(s => s.id === seqId);
-    if (!seq) return;
-    const weekKey = block.weeks[0];
-    const courseId = seq.courseId;
-    const course = COURSES.find(c => c.id === courseId);
+    const course = COURSES.find(c => c.id === fb.courseId);
     if (!course) return;
-    const row = document.querySelector(`tr[data-week="${weekKey}"]`);
+    const row = document.querySelector(`tr[data-week="${block.weeks[0]}"]`);
     if (row) row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    setSelection({ week: weekKey, courseId: course.id, title: block.label, course });
-    setSidePanelOpen(true);
-    setSidePanelTab('details');
+    usePlannerStore.getState().setSelection({
+      week: block.weeks[0], courseId: course.id, title: block.label, course,
+    });
   };
 
-  const subjectColor = block.subjectArea ? (SUBJECT_AREA_COLORS[block.subjectArea] || {}).bg || '#1e293b' : undefined;
+  // Get parent sequence for series-level editing
+  const parentSeq = sequences.find(s => s.id === fb.seqId);
 
   return (
-    <div className="bg-slate-800 rounded px-2 py-1.5 border border-slate-700 group"
-      style={subjectColor ? { borderLeftColor: subjectColor, borderLeftWidth: 3 } : undefined}>
-      <div className="flex items-center justify-between gap-1">
-        {editingLabel ? (
-          <input autoFocus value={labelText} onChange={(e) => setLabelText(e.target.value)}
-            onKeyDown={(e) => { if (e.key === 'Enter') saveLabel(); if (e.key === 'Escape') setEditingLabel(false); }}
-            onBlur={saveLabel}
-            className="flex-1 bg-slate-700 text-slate-200 border border-blue-400 rounded px-1.5 py-0.5 text-[10px] outline-none" />
-        ) : (
-          <span className="text-[10px] font-medium text-gray-200 cursor-pointer hover:text-blue-300 flex-1"
-            onClick={navigateToBlock}
-            onDoubleClick={(e) => { e.stopPropagation(); setEditingLabel(true); }}
-            title={block.weeks.length > 0 ? `Klick: Zur KW ${block.weeks[0]} springen · Doppelklick: Bearbeiten` : 'Doppelklick zum Bearbeiten'}>
-            {block.label}
-          </span>
-        )}
-        <span className="text-[8px] text-gray-500">{block.weeks.length}W</span>
-        <div className="flex gap-0.5 opacity-0 group-hover:opacity-100">
-          <button onClick={() => onMoveUp(index)} disabled={index === 0}
-            className="text-[9px] text-gray-400 hover:text-gray-200 disabled:text-gray-600 cursor-pointer disabled:cursor-default px-0.5" title="Nach oben">↑</button>
-          <button onClick={() => onMoveDown(index)} disabled={index === totalBlocks - 1}
-            className="text-[9px] text-gray-400 hover:text-gray-200 disabled:text-gray-600 cursor-pointer disabled:cursor-default px-0.5" title="Nach unten">↓</button>
+    <div className="border rounded-lg overflow-hidden transition-colors"
+      style={{
+        borderColor: isActive ? (blockColor || '#475569') : '#334155',
+        background: isActive ? (blockColor ? blockColor + '08' : '#1a2035') : 'transparent',
+      }}>
+      {/* Compact header — always visible */}
+      <div className="px-2 py-1.5 flex items-center gap-1.5 cursor-pointer hover:bg-slate-800/30"
+        onClick={() => setEditingSequenceId(isActive ? null : blockKey)}>
+        <div className="w-1 h-5 rounded-full shrink-0" style={{ background: blockColor || fb.seqColor || '#16a34a' }} />
+        <div className="flex-1 min-w-0">
+          <div className="text-[10px] font-semibold text-gray-200 truncate">{block.label}</div>
+          <div className="text-[8px] text-gray-500 flex items-center gap-1.5">
+            <span className="font-mono">{kwRange}</span>
+            <span>· {block.weeks.length}W</span>
+            {sa && <span style={{ color: SUBJECT_AREA_COLORS[sa]?.fg }}>{sa}</span>}
+            <span className="text-gray-600">· {fb.seqTitle}</span>
+          </div>
         </div>
-        <button onClick={() => onRemove(index)} className="text-[9px] text-red-400 opacity-0 group-hover:opacity-100 cursor-pointer px-1" title="Block entfernen">✕</button>
+        <span className="text-[9px] text-gray-500">{isActive ? '▾' : '▸'}</span>
       </div>
-      {editingWeeks ? (
-        <div className="mt-1">
-          <input autoFocus value={weeksText} onChange={(e) => setWeeksText(e.target.value)}
-            onKeyDown={(e) => { if (e.key === 'Enter') saveWeeks(); if (e.key === 'Escape') setEditingWeeks(false); }}
-            onBlur={saveWeeks} placeholder="33, 34, 35, 36..."
-            className="w-full bg-slate-700 text-slate-200 border border-blue-400 rounded px-1.5 py-0.5 text-[9px] outline-none font-mono" />
-        </div>
-      ) : (
-        <div className="text-[8px] text-gray-500 mt-0.5 font-mono flex flex-wrap gap-0.5 items-center">
-          <span className="cursor-pointer hover:text-gray-300" onDoubleClick={() => { setWeeksText(block.weeks.join(', ')); setEditingWeeks(true); }} title="Doppelklick: KW bearbeiten">KW</span>
-          {block.weeks.map((w, wi) => (
-            <span key={wi}>
-              <span className="cursor-pointer hover:text-blue-300 transition-colors" title={`Zur KW ${w} springen`}
-                onClick={() => {
-                  const seq = sequences.find(s => s.id === seqId);
-                  const course = seq ? COURSES.find(c => c.id === seq.courseId) : null;
-                  if (course) {
-                    const row = document.querySelector(`tr[data-week="${w}"]`);
-                    if (row) row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    setSelection({ week: w, courseId: course.id, title: block.label, course });
-                    setSidePanelOpen(true);
-                    setSidePanelTab('details');
-                  }
-                }}>{w}</span>
-              {wi < block.weeks.length - 1 && <span className="text-gray-600">,</span>}
-            </span>
-          ))}
-        </div>
-      )}
-      {/* Lektionen-Toggle + Liste */}
-      {block.weeks.length > 0 && (() => {
-        const seq = sequences.find(s => s.id === seqId);
-        if (!seq) return null;
-        const courseIds = seq.courseIds || [seq.courseId];
-        const { lessonDetails, weekData } = usePlannerStore.getState();
-        const lessons: { week: string; courseId: string; col: number; title: string; detail?: LessonDetail }[] = [];
-        for (const w of block.weeks) {
-          for (const cid of courseIds) {
-            const course = COURSES.find(c => c.id === cid);
-            if (!course) continue;
-            const weekEntry = weekData.find(wd => wd.w === w);
-            const entry = weekEntry?.lessons[course.col];
-            if (!entry) continue;
-            const key = `${w}-${course.col}`;
-            lessons.push({ week: w, courseId: cid, col: course.col, title: entry.title, detail: lessonDetails[key] });
-          }
-        }
-        if (lessons.length === 0) return null;
-        return (
-          <>
-            <button onClick={() => setShowLessons(!showLessons)}
-              className="text-[8px] text-gray-500 hover:text-gray-300 cursor-pointer mt-1 flex items-center gap-0.5">
-              {showLessons ? '▾' : '▸'} Lektionen
-              <span className="text-gray-600">({lessons.length})</span>
+
+      {/* Expanded content */}
+      {isActive && (
+        <div className="px-2 pb-2 pt-0.5 border-t border-slate-700/50 space-y-1.5">
+          {/* Quick actions row */}
+          <div className="flex gap-1 items-center">
+            <button onClick={navigateToBlock} className="text-[8px] text-blue-400 hover:text-blue-300 cursor-pointer px-1">↗ Im Planer</button>
+            <button onClick={() => setShowFields(!showFields)}
+              className="text-[8px] text-gray-400 hover:text-gray-200 cursor-pointer px-1">
+              {showFields ? '▾' : '▸'} Felder
             </button>
-            {showLessons && (
-              <div className="mt-0.5 space-y-0.5">
-                {lessons.map((l, li) => (
-                  <div key={li} className="flex items-center gap-1 text-[8px] cursor-pointer hover:bg-slate-700/50 rounded px-1 py-px transition-colors"
-                    onClick={() => {
-                      const course = COURSES.find(c => c.id === l.courseId);
-                      if (!course) return;
-                      const row = document.querySelector(`tr[data-week="${l.week}"]`);
-                      if (row) row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                      setSelection({ week: l.week, courseId: course.id, title: l.title, course });
-                      setSidePanelOpen(true);
-                      setSidePanelTab('details');
+            <button onClick={() => setShowLessons(!showLessons)}
+              className="text-[8px] text-gray-400 hover:text-gray-200 cursor-pointer px-1">
+              {showLessons ? '▾' : '▸'} Lektionen ({block.weeks.length})
+            </button>
+            <button onClick={() => setShowSeriesFields(!showSeriesFields)}
+              className="text-[8px] text-amber-500 hover:text-amber-400 cursor-pointer px-1 ml-auto">
+              {showSeriesFields ? '▾' : '▸'} Reihe
+            </button>
+          </div>
+
+          {/* Block-level fields */}
+          {showFields && (
+            <div className="space-y-1.5 p-1.5 bg-slate-800/30 rounded">
+              <div className="flex gap-1 flex-wrap">
+                <span className="text-[8px] text-gray-500 w-full">Fachbereich:</span>
+                {SUBJECT_AREAS.map((s) => (
+                  <button key={s.key} onClick={() => updateBlockInSequence(fb.seqId, fb.blockIndex, {
+                    subjectArea: block.subjectArea === s.key ? undefined : s.key as SubjectArea
+                  })}
+                    className="px-1.5 py-0.5 rounded text-[8px] font-medium border cursor-pointer"
+                    style={{
+                      background: block.subjectArea === s.key ? s.color + '30' : 'transparent',
+                      borderColor: block.subjectArea === s.key ? s.color : '#374151',
+                      color: block.subjectArea === s.key ? '#e5e7eb' : '#6b7280',
                     }}>
-                    <span className="text-gray-600 font-mono w-5">{l.week}</span>
-                    {courseIds.length > 1 && <span className="text-gray-600 w-4">{COURSES.find(c => c.id === l.courseId)?.day}</span>}
-                    <span className="text-gray-300 flex-1 truncate">{l.title}</span>
-                    {l.detail?.topicSub && <span className="text-gray-500 truncate max-w-[60px]">{l.detail.topicSub}</span>}
-                    {l.detail?.sol?.enabled && <span title="SOL">📚</span>}
-                  </div>
+                    {s.label}
+                  </button>
                 ))}
               </div>
-            )}
-          </>
-        );
-      })()}
-      <button onClick={() => setShowDetails(!showDetails)}
-        className="text-[8px] text-gray-500 hover:text-gray-300 cursor-pointer mt-1 flex items-center gap-0.5">
-        {showDetails ? '▾' : '▸'} Felder
-        {(block.topicMain || block.curriculumGoal) && <span className="text-green-500">●</span>}
-      </button>
-      {showDetails && (
-        <div className="mt-1.5 space-y-1.5 border-t border-slate-700 pt-1.5">
-          <div>
-            <label className="text-[8px] text-gray-500 block">Oberthema</label>
-            <input value={block.topicMain || ''} onChange={(e) => onUpdate(index, { topicMain: e.target.value || undefined })}
-              placeholder="z.B. Vertragsentstehung"
-              className="w-full bg-slate-700 text-slate-200 border border-slate-600 rounded px-1.5 py-0.5 text-[9px] outline-none focus:border-blue-400" />
-          </div>
-          <div>
-            <label className="text-[8px] text-gray-500 block">Unterthema</label>
-            <input value={block.topicSub || ''} onChange={(e) => onUpdate(index, { topicSub: e.target.value || undefined })}
-              placeholder="optional"
-              className="w-full bg-slate-700 text-slate-200 border border-slate-600 rounded px-1.5 py-0.5 text-[9px] outline-none focus:border-blue-400" />
-          </div>
-          <div>
-            <label className="text-[8px] text-gray-500 block">Fachbereich</label>
-            <div className="flex gap-0.5 flex-wrap">
-              {SUBJECT_AREAS.map((sa) => (
-                <button key={sa.key} onClick={() => onUpdate(index, { subjectArea: block.subjectArea === sa.key ? undefined : sa.key })}
-                  className="px-1 py-px rounded text-[7px] font-medium border cursor-pointer"
-                  style={{ background: block.subjectArea === sa.key ? sa.color + '30' : 'transparent', borderColor: block.subjectArea === sa.key ? sa.color : '#374151', color: block.subjectArea === sa.key ? '#e5e7eb' : '#6b7280' }}>
-                  {sa.label}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div>
-            <label className="text-[8px] text-gray-500 block">Lehrplanziel (LP17)</label>
-            <input value={block.curriculumGoal || ''} onChange={(e) => onUpdate(index, { curriculumGoal: e.target.value || undefined })}
-              placeholder="z.B. 5.1 OR Grundlagen"
-              className="w-full bg-slate-700 text-slate-200 border border-slate-600 rounded px-1.5 py-0.5 text-[9px] outline-none focus:border-blue-400" />
-          </div>
-          <div>
-            <label className="text-[8px] text-gray-500 block">Beschreibung</label>
-            <textarea value={block.description || ''} onChange={(e) => onUpdate(index, { description: e.target.value || undefined })}
-              placeholder="Notizen zum Block…" rows={2}
-              className="w-full bg-slate-700 text-slate-200 border border-slate-600 rounded px-1.5 py-0.5 text-[9px] outline-none focus:border-blue-400 resize-y" />
-          </div>
-          <div>
-            <label className="text-[8px] text-gray-500 block mb-0.5">Material / Links</label>
-            {(block.materialLinks || []).map((link, li) => (
-              <div key={li} className="flex items-center gap-1 mb-0.5">
-                <a href={link} target="_blank" rel="noopener noreferrer"
-                  className="text-[8px] text-blue-400 hover:text-blue-300 truncate flex-1 font-mono">{link}</a>
-                <button onClick={() => {
-                  const updated = (block.materialLinks || []).filter((_, j) => j !== li);
-                  onUpdate(index, { materialLinks: updated.length > 0 ? updated : undefined });
-                }} className="text-[8px] text-red-400 cursor-pointer shrink-0">✕</button>
+              <div>
+                <label className="text-[8px] text-gray-500">Oberthema</label>
+                <input value={block.topicMain || ''} onChange={(e) => updateBlockInSequence(fb.seqId, fb.blockIndex, { topicMain: e.target.value || undefined })}
+                  className="w-full bg-slate-700/50 text-slate-200 border border-slate-600 rounded px-1.5 py-0.5 text-[9px] outline-none focus:border-blue-400" />
               </div>
-            ))}
-            <input placeholder="https://… Enter zum Hinzufügen"
-              className="w-full bg-slate-700 text-slate-200 border border-slate-600 rounded px-1.5 py-0.5 text-[8px] outline-none focus:border-blue-400 font-mono"
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  const val = (e.target as HTMLInputElement).value.trim();
-                  if (val) {
-                    onUpdate(index, { materialLinks: [...(block.materialLinks || []), val] });
-                    (e.target as HTMLInputElement).value = '';
-                  }
-                }
-              }} />
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function SequenceCard({ seq }: { seq: ManagedSequence }) {
-  const {
-    updateSequence, deleteSequence,
-    updateBlockInSequence, removeBlockFromSequence, addBlockToSequence, reorderBlocks,
-    editingSequenceId, setEditingSequenceId,
-    autoPlaceSequence, getAvailableWeeks,
-  } = usePlannerStore();
-  const { courses: COURSES, getLinkedCourseIds } = usePlannerData();
-
-  const isExpanded = editingSequenceId === seq.id;
-  const course = COURSES.find((c) => c.id === seq.courseId);
-  const linkedCourses = seq.courseIds
-    ? seq.courseIds.map(cid => COURSES.find(c => c.id === cid)).filter(Boolean)
-    : course ? [course] : [];
-  const totalWeeks = seq.blocks.reduce((sum, b) => sum + b.weeks.length, 0);
-  const [editTitle, setEditTitle] = useState(false);
-  const [titleText, setTitleText] = useState(seq.title);
-  const [showAutoPlace, setShowAutoPlace] = useState(false);
-  const [autoPlaceStart, setAutoPlaceStart] = useState(WEEKS[0]?.w || '33');
-  const [autoPlaceResult, setAutoPlaceResult] = useState<{ placed: number; skipped: string[] } | null>(null);
-  const [compactBlocks, setCompactBlocks] = useState(seq.blocks.length > 6);
-  const allWeekOrder = WEEKS.map(w => w.w);
-
-  const handleSaveTitle = () => { updateSequence(seq.id, { title: titleText }); setEditTitle(false); };
-  const handleDelete = () => { if (confirm(`Sequenz "${seq.title}" wirklich löschen?`)) deleteSequence(seq.id); };
-  const handleAddBlock = () => { addBlockToSequence(seq.id, { weeks: [], label: 'Neuer Block' }); };
-
-  const seqSubjectColor = seq.subjectArea ? SUBJECT_AREA_COLORS[seq.subjectArea]?.bg : undefined;
-
-  return (
-    <div className="border border-slate-700 rounded-lg overflow-hidden"
-      style={seqSubjectColor ? { borderColor: seqSubjectColor + '50', background: seqSubjectColor + '08' } : undefined}>
-      <div className="px-2.5 py-1.5 flex items-center gap-2 cursor-pointer hover:bg-slate-800/50"
-        onClick={() => setEditingSequenceId(isExpanded ? null : seq.id)}>
-        <div className="w-1 h-6 rounded-full shrink-0" style={{ background: seq.color || '#16a34a' }} />
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-1.5">
-            <span className="text-[10px] font-semibold text-gray-200 truncate">{seq.title}</span>
-          </div>
-          <div className="text-[8px] text-gray-500">
-            {seq.blocks.length} Blöcke · {totalWeeks} Wochen
-            {seq.subjectArea && ` · ${seq.subjectArea}`}
-            {linkedCourses.length > 1 && <span className="text-blue-400"> · {linkedCourses.map(c => c!.day).join('+')}</span>}
-          </div>
-        </div>
-        <span className="text-[9px] text-gray-500">{isExpanded ? '▾' : '▸'}</span>
-      </div>
-
-      {isExpanded && (
-        <div className="px-2.5 pb-2.5 pt-1 border-t border-slate-700 space-y-2">
-          <div className="flex gap-1 items-center">
-            {editTitle ? (
-              <input autoFocus value={titleText} onChange={(e) => setTitleText(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter') handleSaveTitle(); if (e.key === 'Escape') setEditTitle(false); }}
-                onBlur={handleSaveTitle}
-                className="flex-1 bg-slate-700 text-slate-200 border border-blue-400 rounded px-1.5 py-0.5 text-[10px] outline-none" />
-            ) : (
-              <span className="flex-1 text-[10px] text-gray-300 cursor-pointer hover:text-blue-300"
-                onDoubleClick={() => setEditTitle(true)}>{seq.title}</span>
-            )}
-          </div>
-          {/* Multi-Tag linking */}
-          {(() => {
-            const linked = getLinkedCourseIds(seq.courseId);
-            if (linked.length <= 1) return null;
-            const isMultiDay = seq.courseIds && seq.courseIds.length > 1;
-            const linkedCoursesInfo = linked.map(cid => COURSES.find(c => c.id === cid)).filter(Boolean);
-            return (
-              <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="text-[8px] text-gray-500">Multi-Tag:</span>
-                {!isMultiDay ? (
-                  <button onClick={() => updateSequence(seq.id, { courseIds: linked, multiDayMode: 'alternating' })}
-                    className="text-[8px] px-1.5 py-0.5 rounded bg-blue-900/50 text-blue-300 border border-blue-700 cursor-pointer hover:bg-blue-800/50">
-                    ⊞ {linkedCoursesInfo.map(c => c!.day).join('+')} verknüpfen
-                  </button>
-                ) : (
-                  <>
-                    <button onClick={() => updateSequence(seq.id, { multiDayMode: 'alternating' })}
-                      className={`text-[8px] px-1.5 py-0.5 rounded cursor-pointer ${seq.multiDayMode === 'alternating' ? 'bg-blue-600 text-white' : 'bg-slate-700 text-gray-400 hover:bg-slate-600'}`}>Di↔Do</button>
-                    <button onClick={() => updateSequence(seq.id, { multiDayMode: 'separate' })}
-                      className={`text-[8px] px-1.5 py-0.5 rounded cursor-pointer ${seq.multiDayMode === 'separate' ? 'bg-blue-600 text-white' : 'bg-slate-700 text-gray-400 hover:bg-slate-600'}`}>Di|Do</button>
-                    <button onClick={() => updateSequence(seq.id, { courseIds: [seq.courseId], multiDayMode: undefined })}
-                      className="text-[8px] px-1 py-0.5 rounded bg-slate-700 text-red-400 cursor-pointer hover:bg-red-900/30" title="Multi-Tag aufheben">✕</button>
-                  </>
-                )}
+              <div>
+                <label className="text-[8px] text-gray-500">Unterthema</label>
+                <input value={block.topicSub || ''} onChange={(e) => updateBlockInSequence(fb.seqId, fb.blockIndex, { topicSub: e.target.value || undefined })}
+                  className="w-full bg-slate-700/50 text-slate-200 border border-slate-600 rounded px-1.5 py-0.5 text-[9px] outline-none focus:border-blue-400" />
               </div>
-            );
-          })()}
-          {/* Subject area + color */}
-          <div className="flex gap-1 flex-wrap">
-            {SUBJECT_AREAS.map((sa) => (
-              <button key={sa.key} onClick={() => updateSequence(seq.id, { subjectArea: seq.subjectArea === sa.key ? undefined : sa.key })}
-                className="px-1.5 py-0.5 rounded text-[8px] font-medium border cursor-pointer transition-all"
-                style={{ background: seq.subjectArea === sa.key ? sa.color + '30' : 'transparent', borderColor: seq.subjectArea === sa.key ? sa.color : '#374151', color: seq.subjectArea === sa.key ? '#e5e7eb' : '#6b7280' }}>
-                {sa.label}
-              </button>
-            ))}
-          </div>
-          {/* Color picker */}
-          <div className="flex gap-1 items-center flex-wrap">
-            <span className="text-[8px] text-gray-500">Farbe:</span>
-            {SEQUENCE_COLORS.map((color) => (
-              <button key={color} onClick={() => updateSequence(seq.id, { color })}
-                className="w-3.5 h-3.5 rounded-full cursor-pointer border-2 transition-all"
-                style={{ background: color, borderColor: seq.color === color ? '#fff' : 'transparent', transform: seq.color === color ? 'scale(1.2)' : 'scale(1)' }} />
-            ))}
-          </div>
-
-          {/* Links */}
-          <div className="space-y-1">
-            <div className="flex items-center justify-between">
-              <span className="text-[8px] text-gray-500">Links</span>
-              <button onClick={() => updateSequence(seq.id, { links: [...(seq.links || []), { label: '', url: '' }] })}
-                className="text-[8px] text-blue-400 cursor-pointer hover:text-blue-300">+ Link</button>
-            </div>
-            {(seq.links || []).map((link, li) => (
-              <div key={li} className="flex gap-1 items-center">
-                <input value={link.label} onChange={(e) => {
-                  const updated = [...(seq.links || [])]; updated[li] = { ...updated[li], label: e.target.value };
-                  updateSequence(seq.id, { links: updated });
-                }} placeholder="Label" className="w-16 bg-slate-700 text-slate-200 border border-slate-600 rounded px-1 py-px text-[8px] outline-none focus:border-blue-400" />
-                <input value={link.url} onChange={(e) => {
-                  const updated = [...(seq.links || [])]; updated[li] = { ...updated[li], url: e.target.value };
-                  updateSequence(seq.id, { links: updated });
-                }} placeholder="https://…" className="flex-1 bg-slate-700 text-slate-200 border border-slate-600 rounded px-1 py-px text-[8px] outline-none focus:border-blue-400 font-mono" />
-                {link.url && <a href={link.url} target="_blank" rel="noopener noreferrer" className="text-[8px] text-blue-400 hover:text-blue-300">↗</a>}
-                <button onClick={() => {
-                  const updated = (seq.links || []).filter((_, i) => i !== li);
-                  updateSequence(seq.id, { links: updated });
-                }} className="text-[8px] text-red-400 cursor-pointer">✕</button>
+              <div>
+                <label className="text-[8px] text-gray-500">Lehrplanziel</label>
+                <input value={block.curriculumGoal || ''} onChange={(e) => updateBlockInSequence(fb.seqId, fb.blockIndex, { curriculumGoal: e.target.value || undefined })}
+                  className="w-full bg-slate-700/50 text-slate-200 border border-slate-600 rounded px-1.5 py-0.5 text-[9px] outline-none focus:border-blue-400" />
               </div>
-            ))}
-          </div>
-
-          {/* Notes */}
-          <div>
-            <label className="text-[8px] text-gray-500 block mb-0.5">Notizen</label>
-            <textarea value={seq.notes || ''} onChange={(e) => updateSequence(seq.id, { notes: e.target.value || undefined })}
-              placeholder="Notizen zur Sequenz…" rows={2}
-              className="w-full bg-slate-700 text-slate-200 border border-slate-600 rounded px-1.5 py-0.5 text-[9px] outline-none focus:border-blue-400 resize-y" />
-          </div>
-
-          {/* Blocks */}
-          <div className="space-y-1.5">
-            <div className="flex items-center justify-between">
-              <span className="text-[9px] text-gray-500 font-medium">Blöcke ({seq.blocks.length})</span>
-              <div className="flex gap-2 items-center">
-                {seq.blocks.length > 4 && (
-                  <button onClick={() => setCompactBlocks(!compactBlocks)}
-                    className="text-[8px] text-gray-500 hover:text-gray-300 cursor-pointer">{compactBlocks ? '⊞ Erweitern' : '⊟ Kompakt'}</button>
-                )}
-                <button onClick={handleAddBlock} className="text-[9px] text-green-400 hover:text-green-300 cursor-pointer">+ Block</button>
+              <div>
+                <label className="text-[8px] text-gray-500">Beschreibung</label>
+                <textarea value={block.description || ''} onChange={(e) => updateBlockInSequence(fb.seqId, fb.blockIndex, { description: e.target.value || undefined })}
+                  rows={2} className="w-full bg-slate-700/50 text-slate-200 border border-slate-600 rounded px-1.5 py-0.5 text-[9px] outline-none focus:border-blue-400 resize-y" />
               </div>
-            </div>
-            {compactBlocks ? (
-              <div className="space-y-0.5">
-                {seq.blocks.map((block, i) => {
-                  const blockColor = block.subjectArea ? SUBJECT_AREA_COLORS[block.subjectArea]?.bg : undefined;
-                  return (
-                    <div key={i} className="flex items-center gap-1 px-1.5 py-0.5 bg-slate-800 rounded border border-slate-700 group/block text-[9px] cursor-pointer hover:border-slate-500"
-                      style={blockColor ? { borderLeftColor: blockColor, borderLeftWidth: 2 } : undefined}
-                      onClick={() => {
-                        if (block.weeks.length > 0) {
-                          const course = COURSES.find(c => c.id === seq.courseId);
-                          if (course) {
-                            const row = document.querySelector(`tr[data-week="${block.weeks[0]}"]`);
-                            if (row) row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                            usePlannerStore.getState().setSelection({ week: block.weeks[0], courseId: course.id, title: block.label, course });
-                            usePlannerStore.getState().setSidePanelOpen(true);
-                            usePlannerStore.getState().setSidePanelTab('details');
-                          }
-                        }
-                      }}>
-                      <span className="text-gray-500 w-4 text-center">{i + 1}</span>
-                      <span className="text-gray-200 flex-1 truncate">{block.label}</span>
-                      <span className="text-gray-500 text-[8px]">{block.weeks.length}W</span>
-                      <span className="text-gray-600 text-[8px] font-mono truncate max-w-[80px]">
-                        {block.weeks.length > 0 ? `KW ${block.weeks[0]}–${block.weeks[block.weeks.length - 1]}` : '—'}
-                      </span>
-                      {(block.topicMain || block.curriculumGoal) && <span className="text-green-500 text-[8px]">●</span>}
-                      <span className="text-[7px] text-gray-600 opacity-0 group-hover/block:opacity-100">↗</span>
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              seq.blocks.map((block, i) => (
-                <BlockEditor key={i} block={block} index={i} seqId={seq.id} totalBlocks={seq.blocks.length}
-                  onUpdate={(idx, b) => updateBlockInSequence(seq.id, idx, b)}
-                  onRemove={(idx) => removeBlockFromSequence(seq.id, idx)}
-                  onMoveUp={(idx) => reorderBlocks(seq.id, idx, idx - 1)}
-                  onMoveDown={(idx) => reorderBlocks(seq.id, idx, idx + 1)} />
-              ))
-            )}
-          </div>
-          {/* Actions */}
-          <div className="flex justify-between pt-1 border-t border-slate-700">
-            <button onClick={() => setShowAutoPlace(!showAutoPlace)}
-              className="text-[9px] text-blue-400 hover:text-blue-300 cursor-pointer px-2 py-0.5">▶ Platzieren</button>
-            <button onClick={handleDelete}
-              className="text-[9px] text-red-400 hover:text-red-300 cursor-pointer px-2 py-0.5">🗑 Löschen</button>
-          </div>
-          {showAutoPlace && (
-            <div className="bg-slate-800 rounded p-2 space-y-2 border border-blue-500/30">
-              <div className="text-[9px] font-medium text-blue-300">Auto-Platzierung</div>
-              <div className="flex items-center gap-2">
-                <label className="text-[8px] text-gray-400">Ab KW:</label>
-                <select value={autoPlaceStart} onChange={(e) => { setAutoPlaceStart(e.target.value); setAutoPlaceResult(null); }}
-                  className="text-[9px] bg-slate-700 border border-slate-600 rounded px-1 py-0.5 text-gray-200">
-                  {allWeekOrder.map(w => <option key={w} value={w}>KW {w}</option>)}
-                </select>
-                <span className="text-[8px] text-gray-500">{getAvailableWeeks(seq.courseId, autoPlaceStart, allWeekOrder).length} frei</span>
-              </div>
-              <div className="text-[8px] text-gray-500">Benötigt: {totalWeeks} Wochen · Verfügbar: {getAvailableWeeks(seq.courseId, autoPlaceStart, allWeekOrder).length}</div>
-              {autoPlaceResult && (
-                <div className={`text-[8px] p-1 rounded ${autoPlaceResult.placed > 0 ? 'bg-green-900/30 text-green-300' : 'bg-red-900/30 text-red-300'}`}>
-                  ✅ {autoPlaceResult.placed} Lektionen platziert{autoPlaceResult.skipped.length > 0 && ` · ${autoPlaceResult.skipped.length} übersprungen`}
-                </div>
-              )}
-              <div className="flex gap-2">
-                <button onClick={() => { const result = autoPlaceSequence(seq.id, autoPlaceStart, allWeekOrder); setAutoPlaceResult(result); }}
-                  disabled={getAvailableWeeks(seq.courseId, autoPlaceStart, allWeekOrder).length < totalWeeks}
-                  className="text-[9px] bg-blue-600 hover:bg-blue-500 disabled:bg-slate-600 disabled:text-gray-500 text-white px-2 py-0.5 rounded cursor-pointer disabled:cursor-not-allowed">
-                  Jetzt platzieren
-                </button>
-                <button onClick={() => { setShowAutoPlace(false); setAutoPlaceResult(null); }}
-                  className="text-[9px] text-gray-400 hover:text-gray-300 cursor-pointer px-2 py-0.5">Abbrechen</button>
+              <div>
+                <label className="text-[8px] text-gray-500">Materiallinks</label>
+                {(block.materialLinks || []).map((link, li) => (
+                  <div key={li} className="flex gap-1 items-center mt-0.5">
+                    <input value={link} onChange={(e) => {
+                      const updated = [...(block.materialLinks || [])]; updated[li] = e.target.value;
+                      updateBlockInSequence(fb.seqId, fb.blockIndex, { materialLinks: updated });
+                    }} className="flex-1 bg-slate-700/50 text-slate-200 border border-slate-600 rounded px-1 py-px text-[8px] outline-none font-mono" />
+                    <button onClick={() => {
+                      const updated = (block.materialLinks || []).filter((_, i) => i !== li);
+                      updateBlockInSequence(fb.seqId, fb.blockIndex, { materialLinks: updated.length > 0 ? updated : undefined });
+                    }} className="text-[8px] text-red-400 cursor-pointer">✕</button>
+                  </div>
+                ))}
+                <button onClick={() => updateBlockInSequence(fb.seqId, fb.blockIndex, { materialLinks: [...(block.materialLinks || []), ''] })}
+                  className="text-[8px] text-blue-400 cursor-pointer mt-0.5">+ Link</button>
               </div>
             </div>
           )}
+
+          {/* Lessons list */}
+          {showLessons && (
+            <div className="space-y-0.5 p-1.5 bg-slate-800/30 rounded max-h-48 overflow-y-auto">
+              {block.weeks.map((weekW, wi) => {
+                const course = COURSES.find(c => c.id === fb.courseId);
+                const weekData = usePlannerStore.getState().weekData.find(w => w.w === weekW);
+                const entry = course && weekData?.lessons[course.col];
+                return (
+                  <div key={wi} className="flex items-center gap-1 text-[9px] cursor-pointer hover:bg-slate-700/30 px-1 rounded"
+                    onClick={() => {
+                      if (!course) return;
+                      const row = document.querySelector(`tr[data-week="${weekW}"]`);
+                      if (row) row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      usePlannerStore.getState().setSelection({ week: weekW, courseId: course.id, title: entry?.title || '', course });
+                      usePlannerStore.getState().setSidePanelOpen(true);
+                      usePlannerStore.getState().setSidePanelTab('details');
+                    }}>
+                    <span className="text-gray-500 font-mono w-8">KW{weekW}</span>
+                    <span className="text-gray-300 truncate">{entry?.title || '—'}</span>
+                  </div>
+                );
+              })}
+              {block.weeks.length === 0 && <div className="text-[8px] text-gray-600 italic">Keine Wochen zugewiesen</div>}
+            </div>
+          )}
+
+          {/* Series-level fields (parent ManagedSequence) */}
+          {showSeriesFields && parentSeq && (
+            <div className="space-y-1.5 p-1.5 bg-amber-900/10 border border-amber-700/30 rounded">
+              <div className="text-[8px] text-amber-400 font-medium">Unterrichtsreihe: {parentSeq.title}</div>
+              <div className="flex gap-1 flex-wrap">
+                <span className="text-[8px] text-gray-500 w-full">Fachbereich (Reihe):</span>
+                {SUBJECT_AREAS.map((s) => (
+                  <button key={s.key} onClick={() => updateSequence(fb.seqId, {
+                    subjectArea: parentSeq.subjectArea === s.key ? undefined : s.key as SubjectArea
+                  })}
+                    className="px-1.5 py-0.5 rounded text-[8px] font-medium border cursor-pointer"
+                    style={{
+                      background: parentSeq.subjectArea === s.key ? s.color + '30' : 'transparent',
+                      borderColor: parentSeq.subjectArea === s.key ? s.color : '#374151',
+                      color: parentSeq.subjectArea === s.key ? '#e5e7eb' : '#6b7280',
+                    }}>
+                    {s.label}
+                  </button>
+                ))}
+              </div>
+              <div>
+                <label className="text-[8px] text-gray-500">Notizen (Reihe)</label>
+                <textarea value={parentSeq.notes || ''} onChange={(e) => updateSequence(fb.seqId, { notes: e.target.value || undefined })}
+                  rows={2} className="w-full bg-slate-700/50 text-slate-200 border border-slate-600 rounded px-1.5 py-0.5 text-[9px] outline-none focus:border-blue-400 resize-y" />
+              </div>
+              <div className="text-[8px] text-gray-500">{parentSeq.blocks.length} Sequenzen in dieser Reihe</div>
+            </div>
+          )}
+
+          {/* Delete button */}
+          <div className="flex justify-end pt-0.5">
+            <button onClick={() => {
+              if (confirm(`Sequenz "${block.label}" entfernen?`)) {
+                removeBlockFromSequence(fb.seqId, fb.blockIndex);
+              }
+            }} className="text-[8px] text-red-400 hover:text-red-300 cursor-pointer px-1">🗑 Entfernen</button>
+          </div>
         </div>
       )}
     </div>
   );
 }
+
 
 // Get unique classes from courses, preserving order
 function getUniqueClasses(courses: Course[]): string[] {
@@ -510,8 +273,7 @@ export function SequencePanel({ embedded = false }: { embedded?: boolean }) {
   const uniqueClasses = getUniqueClasses(COURSES);
 
   // Group sequences by class → course type → subject area
-  const getSequencesForCourseIds = (courseIds: string[]) =>
-    sequences.filter(s => courseIds.includes(s.courseId) || (s.courseIds && s.courseIds.some(cid => courseIds.includes(cid))));
+
 
   // Subject area color helper
   const saColor = (sa?: SubjectArea) => sa ? (SUBJECT_AREA_COLORS[sa] || {}).bg || '#1e293b' : '#1e293b';
@@ -532,85 +294,128 @@ export function SequencePanel({ embedded = false }: { embedded?: boolean }) {
     setNewTitle(''); setShowNewForm(false);
   };
 
-  const renderClassGroup = (cls: string) => {
-    const courseTypes = getCourseTypesForClass(cls, COURSES);
-    const allCourseIds = courseTypes.flatMap(ct => ct.courseIds);
-    const classSequences = getSequencesForCourseIds(allCourseIds);
-    if (classSequences.length === 0 && filterClass !== cls) return null;
+  // === Flat block listing ===
+  // Collect all blocks from all sequences, enriched with parent sequence info
+  type FlatBlock = {
+    seqId: string;
+    seqTitle: string;
+    seqColor?: string;
+    seqSubjectArea?: SubjectArea;
+    block: SequenceBlock;
+    blockIndex: number;
+    totalBlocks: number;
+    courseId: string;
+    courseIds?: string[];
+    cls: string;
+    typ: string;
+  };
 
-    return (
-      <div key={cls} className="space-y-1.5">
-        <div className="text-[10px] font-bold text-gray-300 px-1 flex items-center gap-2">
-          <span>{cls}</span>
-          {courseTypes.map(ct => {
-            const course = COURSES.find(c => c.id === ct.courseIds[0]);
-            return (
-              <span key={ct.typ} className="text-[8px] px-1 py-px rounded bg-slate-800 text-gray-500 font-normal">
-                {ct.typ} {course?.day}{ct.courseIds.length > 1 ? `+${COURSES.find(c => c.id === ct.courseIds[1])?.day}` : ''}
-              </span>
-            );
-          })}
-        </div>
-        {/* Group by subject area */}
-        {(() => {
-          const bySubject = new Map<string, ManagedSequence[]>();
-          for (const seq of classSequences) {
-            const key = seq.subjectArea || 'ANDERE';
-            if (!bySubject.has(key)) bySubject.set(key, []);
-            bySubject.get(key)!.push(seq);
-          }
-          return [...bySubject.entries()].map(([sa, seqs]) => (
-            <div key={sa} className="ml-2">
+  const flatBlocks: FlatBlock[] = [];
+  for (const seq of sequences) {
+    const course = COURSES.find(c => c.id === seq.courseId);
+    if (!course) continue;
+    // Apply class filter
+    if (filterClass !== 'ALL' && course.cls !== filterClass) continue;
+    for (let i = 0; i < seq.blocks.length; i++) {
+      flatBlocks.push({
+        seqId: seq.id,
+        seqTitle: seq.title,
+        seqColor: seq.color,
+        seqSubjectArea: seq.subjectArea,
+        block: seq.blocks[i],
+        blockIndex: i,
+        totalBlocks: seq.blocks.length,
+        courseId: seq.courseId,
+        courseIds: seq.courseIds,
+        cls: course.cls,
+        typ: course.typ,
+      });
+    }
+  }
+
+  // Group by class → subject area
+  const groupedByClass = new Map<string, Map<string, FlatBlock[]>>();
+  for (const fb of flatBlocks) {
+    const sa = fb.block.subjectArea || fb.seqSubjectArea || 'ANDERE';
+    if (!groupedByClass.has(fb.cls)) groupedByClass.set(fb.cls, new Map());
+    const saMap = groupedByClass.get(fb.cls)!;
+    if (!saMap.has(sa)) saMap.set(sa, []);
+    saMap.get(sa)!.push(fb);
+  }
+
+  const renderFlatBlocks = () => {
+    const classes = filterClass === 'ALL' ? uniqueClasses : [filterClass];
+    return classes.map(cls => {
+      const saMap = groupedByClass.get(cls);
+      if (!saMap || saMap.size === 0) {
+        if (filterClass !== cls && filterClass !== 'ALL') return null;
+        return (
+          <div key={cls} className="space-y-1">
+            <div className="text-[10px] font-bold text-gray-300 px-1">{cls}</div>
+            <div className="text-[9px] text-gray-600 ml-2 italic">Keine Sequenzen</div>
+          </div>
+        );
+      }
+      return (
+        <div key={cls} className="space-y-2">
+          <div className="text-[10px] font-bold text-gray-300 px-1 flex items-center gap-2">
+            <span>{cls}</span>
+            {getCourseTypesForClass(cls, COURSES).map(ct => {
+              const course = COURSES.find(c => c.id === ct.courseIds[0]);
+              return (
+                <span key={ct.typ} className="text-[8px] px-1 py-px rounded bg-slate-800/80 text-gray-500 font-normal">
+                  {ct.typ} {course?.day}{ct.courseIds.length > 1 ? `+${COURSES.find(c => c.id === ct.courseIds[1])?.day}` : ''}
+                </span>
+              );
+            })}
+          </div>
+          {[...saMap.entries()].map(([sa, blocks]) => (
+            <div key={sa} className="ml-1">
               {sa !== 'ANDERE' && (
-                <div className="text-[8px] font-medium px-1 py-0.5 mb-0.5 rounded flex items-center gap-1"
+                <div className="text-[8px] font-medium px-1 py-0.5 mb-1 rounded flex items-center gap-1"
                   style={{ color: saFg(sa as SubjectArea), background: saColor(sa as SubjectArea) + '15' }}>
                   <span className="w-1.5 h-1.5 rounded-full" style={{ background: saFg(sa as SubjectArea) }} />
                   {SUBJECT_AREAS.find(s => s.key === sa)?.label || sa}
                 </div>
               )}
-              <div className="space-y-1.5">
-                {seqs.map(seq => <SequenceCard key={seq.id} seq={seq} />)}
+              <div className="space-y-1">
+                {blocks.map((fb) => (
+                  <FlatBlockCard key={`${fb.seqId}-${fb.blockIndex}`} fb={fb} />
+                ))}
               </div>
             </div>
-          ));
-        })()}
-        {classSequences.length === 0 && (
-          <div className="text-[9px] text-gray-600 ml-2 italic">Keine Sequenzen</div>
-        )}
-      </div>
-    );
+          ))}
+        </div>
+      );
+    });
   };
 
   const content = (
     <>
       {/* Class filter buttons */}
-      <div className="px-3 py-1.5 border-b border-slate-800 flex gap-1 flex-wrap shrink-0">
+      <div className="px-3 py-1.5 border-b border-slate-700/50 flex gap-1 flex-wrap shrink-0">
         <button onClick={() => setFilterClass('ALL')}
-          className={`px-1.5 py-0.5 rounded text-[8px] border cursor-pointer ${filterClass === 'ALL' ? 'bg-blue-500/20 border-blue-500 text-blue-300' : 'border-gray-700 text-gray-500'}`}>
+          className={`px-1.5 py-0.5 rounded text-[8px] border cursor-pointer ${filterClass === 'ALL' ? 'bg-blue-500/20 border-blue-500 text-blue-300' : 'border-gray-600 text-gray-400'}`}>
           Alle
         </button>
         {uniqueClasses.map((cls) => (
           <button key={cls} onClick={() => setFilterClass(cls)}
-            className={`px-1.5 py-0.5 rounded text-[8px] border cursor-pointer ${filterClass === cls ? 'bg-blue-500/20 border-blue-500 text-blue-300' : 'border-gray-700 text-gray-500'}`}>
+            className={`px-1.5 py-0.5 rounded text-[8px] border cursor-pointer ${filterClass === cls ? 'bg-blue-500/20 border-blue-500 text-blue-300' : 'border-gray-600 text-gray-400'}`}>
             {cls}
           </button>
         ))}
       </div>
 
-      {/* Sequence list grouped by class */}
+      {/* Flat block list */}
       <div className="flex-1 overflow-y-auto px-3 py-2 space-y-3">
-        {filterClass === 'ALL' ? (
-          uniqueClasses.map(cls => renderClassGroup(cls))
-        ) : (
-          renderClassGroup(filterClass)
-        )}
-        {sequences.length === 0 && (
-          <div className="text-[10px] text-gray-500 text-center py-4">Noch keine Sequenzen erstellt</div>
+        {renderFlatBlocks()}
+        {flatBlocks.length === 0 && sequences.length === 0 && (
+          <div className="text-[10px] text-gray-400 text-center py-4">Noch keine Sequenzen erstellt</div>
         )}
       </div>
 
       {/* New sequence form */}
-      <div className="px-3 py-2 border-t border-slate-700 shrink-0">
+      <div className="px-3 py-2 border-t border-slate-600 shrink-0">
         {showNewForm ? (
           <div className="space-y-1.5">
             <input autoFocus value={newTitle} onChange={(e) => setNewTitle(e.target.value)}
