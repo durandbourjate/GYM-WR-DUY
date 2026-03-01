@@ -376,6 +376,10 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
         clearMultiSelect();
         const isSame = selection?.week === weekW && selection?.courseId === course.id;
         setSelection(isSame ? null : { week: weekW, courseId: course.id, title, course });
+        if (isSame) {
+          setSidePanelOpen(false);
+          usePlannerStore.getState().setEditingSequenceId(null);
+        }
         // Don't open side panel on single click
       }
     },
@@ -628,6 +632,7 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                       setSelection(null);
                       setEmptyCellMenu(null);
                       usePlannerStore.getState().setEditingSequenceId(null);
+                      setSidePanelOpen(false);
                     }
                   }}
                   onDoubleClick={(e) => {
