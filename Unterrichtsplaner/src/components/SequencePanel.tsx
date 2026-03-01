@@ -178,6 +178,7 @@ function FlatBlockCard({ fb }: { fb: FlatBlockInfo }) {
             <span className="font-mono">{kwRange}</span>
             <span>· {block.weeks.length}W</span>
             {sa && <span style={{ color: SUBJECT_AREA_COLORS[sa]?.fg }}>{sa}</span>}
+            {parentSeq?.sol?.enabled && <span className="text-emerald-500" title={`SOL: ${parentSeq.sol.topic || 'aktiv'}${parentSeq.sol.duration ? ' (' + parentSeq.sol.duration + ')' : ''}`}>📚</span>}
             <span className="text-gray-500">· {fb.seqTitle}</span>
           </div>
         </div>
@@ -305,6 +306,47 @@ function FlatBlockCard({ fb }: { fb: FlatBlockInfo }) {
                 <label className="text-[8px] text-gray-400">Notizen (Reihe)</label>
                 <textarea value={parentSeq.notes || ''} onChange={(e) => updateSequence(fb.seqId, { notes: e.target.value || undefined })}
                   rows={2} className="w-full bg-slate-700/50 text-slate-200 border border-slate-600 rounded px-1.5 py-0.5 text-[9px] outline-none focus:border-blue-400 resize-y" />
+              </div>
+              {/* SOL auf Reihen-Ebene */}
+              <div className="border-t border-slate-700 pt-1.5 mt-1">
+                <div className="flex items-center gap-2 mb-1">
+                  <label className="flex items-center gap-1 cursor-pointer">
+                    <input type="checkbox" checked={!!parentSeq.sol?.enabled}
+                      onChange={(e) => updateSequence(fb.seqId, {
+                        sol: { ...parentSeq.sol, enabled: e.target.checked } as any
+                      })}
+                      className="accent-emerald-500 w-3 h-3" />
+                    <span className="text-[9px] text-gray-300 font-medium">📚 SOL (Reihe)</span>
+                  </label>
+                </div>
+                {parentSeq.sol?.enabled && (
+                  <div className="space-y-1 pl-0.5">
+                    <div>
+                      <label className="text-[8px] text-gray-400">SOL-Thema</label>
+                      <input value={parentSeq.sol?.topic || ''} onChange={(e) => updateSequence(fb.seqId, {
+                        sol: { ...parentSeq.sol, enabled: true, topic: e.target.value || undefined }
+                      })}
+                        placeholder="SOL-Thema…"
+                        className="w-full bg-slate-700/50 text-slate-200 border border-slate-600 rounded px-1.5 py-0.5 text-[9px] outline-none focus:border-emerald-400" />
+                    </div>
+                    <div>
+                      <label className="text-[8px] text-gray-400">Beschreibung / Auftrag</label>
+                      <textarea value={parentSeq.sol?.description || ''} onChange={(e) => updateSequence(fb.seqId, {
+                        sol: { ...parentSeq.sol, enabled: true, description: e.target.value || undefined }
+                      })}
+                        placeholder="SOL-Auftrag…" rows={2}
+                        className="w-full bg-slate-700/50 text-slate-200 border border-slate-600 rounded px-1.5 py-0.5 text-[9px] outline-none focus:border-emerald-400 resize-y" />
+                    </div>
+                    <div>
+                      <label className="text-[8px] text-gray-400">Gesamtdauer</label>
+                      <input value={parentSeq.sol?.duration || ''} onChange={(e) => updateSequence(fb.seqId, {
+                        sol: { ...parentSeq.sol, enabled: true, duration: e.target.value || undefined }
+                      })}
+                        placeholder="z.B. 4h, 2 Wochen…"
+                        className="w-full bg-slate-700/50 text-slate-200 border border-slate-600 rounded px-1.5 py-0.5 text-[9px] outline-none focus:border-emerald-400" />
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           )}

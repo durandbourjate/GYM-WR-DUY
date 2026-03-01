@@ -61,6 +61,7 @@ export interface ManagedSequence {
   color?: string;
   links?: { label: string; url: string }[];
   notes?: string;
+  sol?: SolDetails; // Sequence-level SOL (total for all contained lessons)
   createdAt: string;
   updatedAt: string;
 }

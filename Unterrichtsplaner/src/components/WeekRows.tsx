@@ -131,9 +131,15 @@ function HoverPreview({ week, col, courses, courseIndex, totalCourses }: { week:
         </div>
 
         {/* Sequence info */}
-        {seq && (
-          <div className="text-[8px] text-gray-500 mb-1">▧ {seq.label} ({seq.index + 1}/{seq.total})</div>
-        )}
+        {seq && (() => {
+          const parentSeq = sequences.find(s => s.id === seq.sequenceId);
+          return (
+            <div className="text-[8px] text-gray-500 mb-1">
+              ▧ {seq.label} ({seq.index + 1}/{seq.total})
+              {parentSeq?.sol?.enabled && <span className="text-emerald-500 ml-1" title={`SOL: ${parentSeq.sol.topic || ''} ${parentSeq.sol.duration || ''}`}>📚 SOL</span>}
+            </div>
+          );
+        })()}
 
         {/* Curriculum goal */}
         {hasCurriculumGoal && (
@@ -752,6 +758,7 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                       title="Klick: Sequenz anzeigen/bearbeiten"
                     >
                       {seq.label}
+                      {(() => { const s = sequences.find(x => x.id === seq.sequenceId); return s?.sol?.enabled ? ' 📚' : ''; })()}
                     </div>
                   )}
 
