@@ -1,202 +1,213 @@
+import { useMemo } from 'react';
 import { usePlannerStore } from '../store/plannerStore';
 import { COURSES } from '../data/courses';
-import { WEEKS } from '../data/weeks';
-import { TYPE_BADGES } from '../utils/colors';
+import { WEEKS, S2_START_INDEX } from '../data/weeks';
+import { TYPE_BADGES, DAY_COLORS, SUBJECT_AREA_COLORS } from '../utils/colors';
+import type { Course, ManagedSequence } from '../types';
 
-const SUBJECT_COLORS: Record<string, { bg: string; fg: string; border: string }> = {
-  BWL: { bg: '#1e3a5f', fg: '#93c5fd', border: '#3b82f6' },
-  VWL: { bg: '#3b1f0b', fg: '#fdba74', border: '#f97316' },
-  RECHT: { bg: '#052e16', fg: '#86efac', border: '#22c55e' },
-  IN: { bg: '#1f2937', fg: '#9ca3af', border: '#6b7280' },
-  INTERDISZ: { bg: '#2e1065', fg: '#c4b5fd', border: '#a855f7' },
-};
+const DAY_ORDER: Record<string, number> = { Mo: 0, Di: 1, Mi: 2, Do: 3, Fr: 4 };
 
 interface Props {
   semester: 1 | 2;
 }
 
 export function ZoomBlockView({ semester }: Props) {
-  const { filter, classFilter, sequences, weekData, setZoomLevel, setEditingSequenceId, setSidePanelOpen, setSidePanelTab, searchQuery } = usePlannerStore();
+  const {
+    filter, classFilter, sequences,
+    setZoomLevel, setEditingSequenceId,
+    setSidePanelOpen, setSidePanelTab, setSelection,
+    searchQuery,
+  } = usePlannerStore();
 
-  // Filter courses
-  let courses = COURSES.filter(c => c.semesters.includes(semester));
-  if (filter !== 'ALL') courses = courses.filter(c => c.typ === filter);
-  if (classFilter) courses = courses.filter(c => c.cls === classFilter);
+  // Filter and sort courses (same logic as App.tsx)
+  const courses = useMemo(() => {
+    let c = COURSES.filter(co => co.semesters.includes(semester));
+    if (filter !== 'ALL') c = c.filter(co => co.typ === filter);
+    if (classFilter) c = c.filter(co => co.cls === classFilter);
+    return [...c].sort((a, b) => {
+      const dayDiff = (DAY_ORDER[a.day] ?? 9) - (DAY_ORDER[b.day] ?? 9);
+      if (dayDiff !== 0) return dayDiff;
+      return a.from.localeCompare(b.from);
+    });
+  }, [filter, classFilter, semester]);
 
   // Semester weeks
-  const semWeeks = semester === 1
-    ? WEEKS.filter(w => parseInt(w.w) >= 33 || parseInt(w.w) === 0).map(w => w.w)
-    : WEEKS.filter(w => parseInt(w.w) >= 7 && parseInt(w.w) <= 32).map(w => w.w);
-  const allWeekOrder = WEEKS.map(w => w.w);
-  const orderedSemWeeks = allWeekOrder.filter(w => semWeeks.includes(w));
+  const semWeeks = useMemo(() => {
+    const allWeeks = WEEKS.map(w => w.w);
+    if (semester === 1) return allWeeks.slice(0, S2_START_INDEX);
+    return allWeeks.slice(S2_START_INDEX);
+  }, [semester]);
 
-  const totalWeeks = orderedSemWeeks.length;
-  if (totalWeeks === 0) return null;
+  // For each course, collect sequence blocks in week order
+  type BlockInfo = {
+    seq: ManagedSequence;
+    blockIdx: number;
+    label: string;
+    topicMain?: string;
+    subjectArea?: string;
+    weeks: string[];
+    curriculumGoal?: string;
+  };
+
+  const courseBlockMap = useMemo(() => {
+    const map = new Map<string, BlockInfo[]>();
+    for (const course of courses) {
+      const courseSeqs = sequences.filter(s =>
+        s.courseId === course.id || (s.courseIds?.includes(course.id))
+      );
+      const blocks: BlockInfo[] = [];
+      for (const seq of courseSeqs) {
+        for (let bi = 0; bi < seq.blocks.length; bi++) {
+          const block = seq.blocks[bi];
+          const relevantWeeks = block.weeks.filter(w => semWeeks.includes(w));
+          if (relevantWeeks.length === 0) continue;
+          blocks.push({
+            seq,
+            blockIdx: bi,
+            label: block.label,
+            topicMain: block.topicMain,
+            subjectArea: block.subjectArea || seq.subjectArea,
+            weeks: relevantWeeks,
+            curriculumGoal: block.curriculumGoal,
+          });
+        }
+      }
+      // Sort by first week
+      blocks.sort((a, b) => semWeeks.indexOf(a.weeks[0]) - semWeeks.indexOf(b.weeks[0]));
+      map.set(course.id, blocks);
+    }
+    return map;
+  }, [courses, sequences, semWeeks]);
+
+  // Max blocks across all courses (for row count)
+  const maxBlocks = Math.max(...Array.from(courseBlockMap.values()).map(b => b.length), 1);
+
+  const handleBlockClick = (block: BlockInfo) => {
+    setEditingSequenceId(block.seq.id);
+    setSidePanelOpen(true);
+    setSidePanelTab('sequences');
+  };
+
+  const handleBlockNavClick = (block: BlockInfo, course: Course) => {
+    setZoomLevel(3);
+    const firstWeek = block.weeks[0];
+    if (firstWeek) {
+      setSelection({ week: firstWeek, courseId: course.id, title: block.label, course });
+      setTimeout(() => {
+        const row = document.querySelector(`[data-week="${firstWeek}"]`);
+        row?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+    }
+  };
+
+  const searchLower = searchQuery.toLowerCase();
 
   return (
-    <div className="px-4 py-3">
-      <div className="text-[10px] text-gray-500 mb-2 font-semibold">
-        {semester === 1 ? 'Semester 1' : 'Semester 2'} — Block-Ansicht ({totalWeeks} Wochen)
-      </div>
-      {/* Week scale */}
-      <div className="flex mb-1" style={{ marginLeft: 120 }}>
-        {orderedSemWeeks.map(w => (
-          <div key={w} className="text-[7px] text-gray-600 text-center" style={{ width: `${100/totalWeeks}%`, minWidth: 0 }}>
-            {w}
-          </div>
-        ))}
-      </div>
+    <div className="px-2 py-2">
+      <table className="border-collapse w-max min-w-full">
+        <thead className="sticky z-40" style={{ top: 0 }}>
+          {/* Day row */}
+          <tr>
+            <th className="w-8 bg-gray-900 sticky left-0 z-50 py-0.5 border-b border-gray-800">
+              <span className={`text-[8px] font-bold ${semester === 1 ? 'text-blue-400' : 'text-amber-400'}`}>
+                {semester === 1 ? 'S1' : 'S2'}
+              </span>
+            </th>
+            {courses.map((c, i) => {
+              const newDay = i === 0 || c.day !== courses[i - 1]?.day;
+              return (
+                <th key={`${c.id}-day`} className="bg-gray-900 px-0 pt-0.5 border-b border-gray-800 text-center"
+                  style={{ borderLeft: newDay ? `2px solid ${DAY_COLORS[c.day]}40` : 'none', fontSize: 9, fontWeight: 700, color: DAY_COLORS[c.day] }}>
+                  {newDay ? c.day : ''}
+                </th>
+              );
+            })}
+          </tr>
+          {/* Course info row */}
+          <tr>
+            <th className="w-8 bg-gray-900 sticky left-0 z-50 px-0.5 pb-0.5 border-b-2 border-gray-700">
+              <span className="text-[6px] text-gray-500">#</span>
+            </th>
+            {courses.map((c, i) => {
+              const newDay = i === 0 || c.day !== courses[i - 1]?.day;
+              const badge = TYPE_BADGES[c.typ];
+              return (
+                <th key={`${c.id}-info`} className="bg-gray-900 px-0.5 pb-0.5 border-b-2 border-gray-700 text-center"
+                  style={{ borderLeft: newDay ? `2px solid ${DAY_COLORS[c.day]}40` : 'none', width: 110, minWidth: 110, maxWidth: 110 }}>
+                  <div className="text-[9px] font-bold text-gray-200">{c.cls}</div>
+                  <div className="flex gap-0.5 justify-center mt-0.5">
+                    <span className="text-[7px] px-1 rounded" style={{ background: badge?.bg, color: badge?.fg }}>{c.typ}</span>
+                    <span className="text-[7px] px-0.5 rounded bg-slate-800 text-slate-400">{c.les}L</span>
+                  </div>
+                </th>
+              );
+            })}
+          </tr>
+        </thead>
+        <tbody>
+          {Array.from({ length: maxBlocks }, (_, rowIdx) => (
+            <tr key={rowIdx}>
+              <td className="bg-gray-900 sticky left-0 z-10 text-center border-b border-slate-800 py-0.5">
+                <span className="text-[7px] text-gray-600">{rowIdx + 1}</span>
+              </td>
+              {courses.map((c, ci) => {
+                const blocks = courseBlockMap.get(c.id) || [];
+                const block = blocks[rowIdx];
+                const newDay = ci === 0 || c.day !== courses[ci - 1]?.day;
 
-      {/* Course rows */}
-      <div className="space-y-1">
-        {courses.map(course => {
-          const badge = TYPE_BADGES[course.typ];
-          // Find sequences for this course
-          const courseSeqs = sequences.filter(s =>
-            s.courseId === course.id || (s.courseIds && s.courseIds.includes(course.id))
-          );
-          
-          // Build block segments: sequences + unsequenced lessons
-          type Segment = {
-            type: 'sequence';
-            seq: typeof courseSeqs[0];
-            block: typeof courseSeqs[0]['blocks'][0];
-            blockIdx: number;
-            startIdx: number;
-            endIdx: number;
-          } | {
-            type: 'gap';
-            startIdx: number;
-            endIdx: number;
-            hasContent: boolean;
-          };
-
-          const segments: Segment[] = [];
-          const coveredWeeks = new Set<string>();
-
-          // Add sequence blocks
-          for (const seq of courseSeqs) {
-            for (let bi = 0; bi < seq.blocks.length; bi++) {
-              const block = seq.blocks[bi];
-              if (block.weeks.length === 0) continue;
-              const weekIndices = block.weeks
-                .map(w => orderedSemWeeks.indexOf(w))
-                .filter(i => i >= 0)
-                .sort((a, b) => a - b);
-              if (weekIndices.length === 0) continue;
-              segments.push({
-                type: 'sequence',
-                seq,
-                block,
-                blockIdx: bi,
-                startIdx: weekIndices[0],
-                endIdx: weekIndices[weekIndices.length - 1],
-              });
-              block.weeks.forEach(w => coveredWeeks.add(w));
-            }
-          }
-
-          // Find gaps with content (unsequenced lessons)
-          let gapStart = -1;
-          let gapHasContent = false;
-          for (let i = 0; i < totalWeeks; i++) {
-            const w = orderedSemWeeks[i];
-            if (coveredWeeks.has(w)) {
-              if (gapStart >= 0) {
-                segments.push({ type: 'gap', startIdx: gapStart, endIdx: i - 1, hasContent: gapHasContent });
-                gapStart = -1;
-                gapHasContent = false;
-              }
-            } else {
-              if (gapStart < 0) gapStart = i;
-              const wd = weekData.find(ww => ww.w === w);
-              if (wd?.lessons[course.col]) gapHasContent = true;
-            }
-          }
-          if (gapStart >= 0) {
-            segments.push({ type: 'gap', startIdx: gapStart, endIdx: totalWeeks - 1, hasContent: gapHasContent });
-          }
-
-          // Sort by startIdx
-          segments.sort((a, b) => a.startIdx - b.startIdx);
-
-          return (
-            <div key={course.id} className="flex items-stretch" style={{ minHeight: 28 }}>
-              {/* Course label */}
-              <div className="w-[120px] shrink-0 flex items-center gap-1 pr-2">
-                <span className="text-[9px] font-bold text-gray-300 truncate">{course.cls}</span>
-                <span className="text-[7px] px-1 rounded" style={{ background: badge?.bg, color: badge?.fg }}>{course.typ}</span>
-              </div>
-
-              {/* Timeline */}
-              <div className="flex-1 relative flex items-stretch">
-                {segments.map((seg, si) => {
-                  const left = `${(seg.startIdx / totalWeeks) * 100}%`;
-                  const width = `${((seg.endIdx - seg.startIdx + 1) / totalWeeks) * 100}%`;
-
-                  if (seg.type === 'gap') {
-                    if (!seg.hasContent) return null;
-                    return (
-                      <div key={`gap-${si}`} className="absolute top-0 bottom-0 flex items-center justify-center"
-                        style={{ left, width }}>
-                        <div className="w-full h-3 bg-slate-800/60 rounded border border-dashed border-slate-700 flex items-center justify-center">
-                          <span className="text-[7px] text-gray-600">…</span>
-                        </div>
-                      </div>
-                    );
-                  }
-
-                  const colors = seg.block.subjectArea ? SUBJECT_COLORS[seg.block.subjectArea] :
-                    seg.seq.subjectArea ? SUBJECT_COLORS[seg.seq.subjectArea] :
-                    { bg: '#1e293b', fg: '#94a3b8', border: '#475569' };
-
-                  // Search match in block view
-                  const searchLower = searchQuery.toLowerCase();
-                  const blockSearchMatch = searchQuery.length >= 2 && (
-                    seg.block.label.toLowerCase().includes(searchLower) ||
-                    (seg.block.topicMain || '').toLowerCase().includes(searchLower) ||
-                    (seg.block.curriculumGoal || '').toLowerCase().includes(searchLower) ||
-                    seg.seq.title.toLowerCase().includes(searchLower)
-                  );
-                  const blockSearchDimmed = searchQuery.length >= 2 && !blockSearchMatch;
-
+                if (!block) {
                   return (
-                    <div key={`seq-${si}`} className={`absolute top-0.5 bottom-0.5 rounded-sm overflow-hidden cursor-pointer hover:brightness-125 hover:scale-[1.02] transition-all ${blockSearchMatch ? 'ring-2 ring-amber-400' : ''}`}
-                      style={{ left, width, background: colors.bg, border: `1px solid ${colors.border}`, opacity: blockSearchDimmed ? 0.2 : 1 }}
-                      title={`${seg.seq.title} — ${seg.block.label}\n${seg.block.topicMain || ''}\nKW ${seg.block.weeks.join(', ')}\n\n🖱 Klick → Wochen-Ansicht öffnen`}
-                      onClick={() => {
-                        // Open sequence in side panel
-                        setEditingSequenceId(seg.seq.id);
-                        setSidePanelOpen(true);
-                        setSidePanelTab('sequences');
-                        // Switch to week view
-                        setZoomLevel(3);
-                        // Scroll to first week of block after render
-                        const firstWeek = seg.block.weeks[0];
-                        if (firstWeek) {
-                          setTimeout(() => {
-                            const weekRow = document.querySelector(`[data-week="${firstWeek}"]`);
-                            weekRow?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                          }, 100);
-                        }
-                      }}
-                    >
-                      <div className="px-1 py-0.5 h-full flex flex-col justify-center overflow-hidden">
-                        <div className="text-[8px] font-semibold truncate" style={{ color: colors.fg }}>
-                          {seg.block.topicMain || seg.block.label}
-                        </div>
-                        <div className="text-[7px] truncate" style={{ color: colors.fg, opacity: 0.7 }}>
-                          {seg.block.weeks.length}W · {seg.block.curriculumGoal || seg.seq.title}
-                        </div>
-                      </div>
-                    </div>
+                    <td key={c.id} className="border-b border-slate-900/30 p-0.5"
+                      style={{ borderLeft: newDay ? `2px solid ${DAY_COLORS[c.day]}12` : 'none', width: 110, minWidth: 110, maxWidth: 110, height: 40 }}>
+                    </td>
                   );
-                })}
-              </div>
-            </div>
-          );
-        })}
-      </div>
+                }
+
+                const colors = block.subjectArea && SUBJECT_AREA_COLORS[block.subjectArea as keyof typeof SUBJECT_AREA_COLORS]
+                  ? SUBJECT_AREA_COLORS[block.subjectArea as keyof typeof SUBJECT_AREA_COLORS]
+                  : { bg: '#475569', fg: '#94a3b8' };
+
+                const blockSearchMatch = searchLower.length >= 2 && (
+                  block.label.toLowerCase().includes(searchLower) ||
+                  (block.topicMain || '').toLowerCase().includes(searchLower) ||
+                  (block.curriculumGoal || '').toLowerCase().includes(searchLower) ||
+                  block.seq.title.toLowerCase().includes(searchLower)
+                );
+                const blockSearchDimmed = searchLower.length >= 2 && !blockSearchMatch;
+
+                return (
+                  <td key={c.id} className="border-b border-slate-900/30 p-0.5"
+                    style={{ borderLeft: newDay ? `2px solid ${DAY_COLORS[c.day]}12` : 'none', width: 110, minWidth: 110, maxWidth: 110, opacity: blockSearchDimmed ? 0.2 : 1 }}>
+                    <div className={`rounded px-1.5 py-1 h-full transition-all ${blockSearchMatch ? 'ring-2 ring-amber-400' : ''}`}
+                      style={{ background: colors.bg + '40', borderLeft: `3px solid ${colors.bg}` }}>
+                      <div className="text-[9px] font-semibold truncate cursor-pointer hover:brightness-150 hover:underline"
+                        style={{ color: colors.fg }}
+                        title={`${block.label} — Klick: Sequenz "${block.seq.title}" öffnen`}
+                        onClick={() => handleBlockClick(block)}>
+                        {block.topicMain || block.label}
+                      </div>
+                      <div className="text-[7px] flex items-center gap-0.5 flex-wrap" style={{ color: colors.fg, opacity: 0.7 }}>
+                        {block.label !== (block.topicMain || block.label) && <span>{block.label} · </span>}
+                        <span>{block.weeks.length}W · </span>
+                        <span className="cursor-pointer hover:text-blue-300 hover:underline"
+                          title={`KW ${block.weeks[0]}–${block.weeks[block.weeks.length - 1]} — Klick: Zur Wochenansicht springen`}
+                          onClick={() => handleBlockNavClick(block, c)}>
+                          KW {block.weeks[0]}–{block.weeks[block.weeks.length - 1]}
+                        </span>
+                      </div>
+                      {block.curriculumGoal && (
+                        <div className="text-[6px] truncate mt-0.5" style={{ color: colors.fg, opacity: 0.5 }}>
+                          {block.curriculumGoal}
+                        </div>
+                      )}
+                    </div>
+                  </td>
+                );
+              })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }

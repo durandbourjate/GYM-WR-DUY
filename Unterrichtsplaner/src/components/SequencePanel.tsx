@@ -194,6 +194,30 @@ function BlockEditor({
               placeholder="Notizen zum Block…" rows={2}
               className="w-full bg-slate-700 text-slate-200 border border-slate-600 rounded px-1.5 py-0.5 text-[9px] outline-none focus:border-blue-400 resize-y" />
           </div>
+          <div>
+            <label className="text-[8px] text-gray-500 block mb-0.5">Material / Links</label>
+            {(block.materialLinks || []).map((link, li) => (
+              <div key={li} className="flex items-center gap-1 mb-0.5">
+                <a href={link} target="_blank" rel="noopener noreferrer"
+                  className="text-[8px] text-blue-400 hover:text-blue-300 truncate flex-1 font-mono">{link}</a>
+                <button onClick={() => {
+                  const updated = (block.materialLinks || []).filter((_, j) => j !== li);
+                  onUpdate(index, { materialLinks: updated.length > 0 ? updated : undefined });
+                }} className="text-[8px] text-red-400 cursor-pointer shrink-0">✕</button>
+              </div>
+            ))}
+            <input placeholder="https://… Enter zum Hinzufügen"
+              className="w-full bg-slate-700 text-slate-200 border border-slate-600 rounded px-1.5 py-0.5 text-[8px] outline-none focus:border-blue-400 font-mono"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  const val = (e.target as HTMLInputElement).value.trim();
+                  if (val) {
+                    onUpdate(index, { materialLinks: [...(block.materialLinks || []), val] });
+                    (e.target as HTMLInputElement).value = '';
+                  }
+                }
+              }} />
+          </div>
         </div>
       )}
     </div>
