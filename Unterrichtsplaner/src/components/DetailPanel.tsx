@@ -674,23 +674,44 @@ export function DetailPanel() {
   }, [sidePanelOpen, setSidePanelOpen]);
 
   const isOpen = sidePanelOpen || sequencePanelOpen;
+  const { panelWidth, setPanelWidth } = usePlannerStore();
+  const resizing = useRef(false);
+
+  // Resize handle
+  useEffect(() => {
+    const onMouseMove = (e: MouseEvent) => {
+      if (!resizing.current) return;
+      const newWidth = Math.min(Math.max(window.innerWidth - e.clientX, 320), 700);
+      setPanelWidth(newWidth);
+    };
+    const onMouseUp = () => { resizing.current = false; document.body.style.cursor = ''; document.body.style.userSelect = ''; };
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+    return () => { window.removeEventListener('mousemove', onMouseMove); window.removeEventListener('mouseup', onMouseUp); };
+  }, []);
+
   if (!isOpen) return null;
 
   return (
     <div
       ref={panelRef}
-      className="fixed right-0 top-0 bottom-0 w-[340px] bg-slate-900 border-l border-slate-700 z-[65] flex flex-col shadow-[-4px_0_16px_rgba(0,0,0,0.4)] overflow-y-auto"
-      style={{ overscrollBehavior: 'contain' }}
+      className="fixed right-0 top-0 bottom-0 bg-slate-850 border-l border-slate-600 z-[65] flex flex-col shadow-[-4px_0_16px_rgba(0,0,0,0.4)] overflow-y-auto"
+      style={{ overscrollBehavior: 'contain', width: panelWidth, background: '#151b2e' }}
       onWheel={(e) => e.stopPropagation()}
     >
-      <div className="px-3 py-2 border-b border-slate-700 flex items-center justify-between shrink-0">
+      {/* Resize handle */}
+      <div
+        className="absolute left-0 top-0 bottom-0 w-1.5 cursor-col-resize hover:bg-blue-500/30 active:bg-blue-500/50 z-10 transition-colors"
+        onMouseDown={() => { resizing.current = true; document.body.style.cursor = 'col-resize'; document.body.style.userSelect = 'none'; }}
+      />
+      <div className="px-3 py-2 border-b border-slate-600 flex items-center justify-between shrink-0">
         <div className="flex gap-1">
           <button
             onClick={() => setSidePanelTab('details')}
             className={`px-2.5 py-1 rounded text-[10px] font-semibold border cursor-pointer transition-colors ${
               sidePanelTab === 'details'
-                ? 'bg-blue-500/20 border-blue-500 text-blue-300'
-                : 'border-gray-700 text-gray-500 hover:text-gray-300'
+                ? 'bg-blue-500/25 border-blue-400 text-blue-200'
+                : 'border-gray-600 text-gray-400 hover:text-gray-200'
             }`}
             title="Lektionsdetails anzeigen"
           >
@@ -700,19 +721,19 @@ export function DetailPanel() {
             onClick={() => setSidePanelTab('sequences')}
             className={`px-2.5 py-1 rounded text-[10px] font-semibold border cursor-pointer transition-colors ${
               sidePanelTab === 'sequences'
-                ? 'bg-green-500/20 border-green-500 text-green-300'
-                : 'border-gray-700 text-gray-500 hover:text-gray-300'
+                ? 'bg-green-500/25 border-green-400 text-green-200'
+                : 'border-gray-600 text-gray-400 hover:text-gray-200'
             }`}
-            title="Sequenz verwalten"
+            title="Sequenzen verwalten"
           >
-            ▧ Sequenz
+            ▧ Sequenzen
           </button>
           <button
             onClick={() => setSidePanelTab('settings')}
             className={`px-2.5 py-1 rounded text-[10px] font-semibold border cursor-pointer transition-colors ${
               sidePanelTab === 'settings'
-                ? 'bg-gray-500/20 border-gray-500 text-gray-300'
-                : 'border-gray-700 text-gray-500 hover:text-gray-300'
+                ? 'bg-gray-500/25 border-gray-400 text-gray-200'
+                : 'border-gray-600 text-gray-400 hover:text-gray-200'
             }`}
             title="Einstellungen"
           >
@@ -724,7 +745,7 @@ export function DetailPanel() {
             setSidePanelOpen(false);
             usePlannerStore.getState().setSequencePanelOpen(false);
           }}
-          className="text-gray-500 hover:text-gray-300 cursor-pointer text-xs px-1"
+          className="text-gray-400 hover:text-gray-200 cursor-pointer text-xs px-1"
           title="Panel schliessen (Esc)"
         >
           ✕

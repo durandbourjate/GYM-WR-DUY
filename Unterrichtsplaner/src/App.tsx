@@ -11,7 +11,7 @@ import { ZoomBlockView } from './components/ZoomBlockView';
 import { ZoomMultiYearView } from './components/ZoomMultiYearView';
 
 function App() {
-  const { filter, classFilter, weekData, setWeekData, migrateStaticSequences, fixSequenceTitles, sequencePanelOpen, sidePanelOpen, zoomLevel } = usePlannerStore();
+  const { filter, classFilter, weekData, setWeekData, migrateStaticSequences, fixSequenceTitles, sequencePanelOpen, sidePanelOpen, zoomLevel, panelWidth } = usePlannerStore();
   const { courses: allCourses, weeks: staticWeeks, s2StartIndex } = usePlannerData();
   const curRef = useRef<HTMLTableRowElement>(null);
 
@@ -39,6 +39,9 @@ function App() {
       return a.from.localeCompare(b.from);
     });
   };
+
+  const allWeekKeys = useMemo(() =>
+    (weekData.length > 0 ? weekData : staticWeeks).map(w => w.w), [weekData, staticWeeks]);
 
   const s1Courses = useMemo(() => filterCourses(1), [filter, classFilter, allCourses]);
   const s2Courses = useMemo(() => filterCourses(2), [filter, classFilter, allCourses]);
@@ -68,6 +71,8 @@ function App() {
           state.setSettingsOpen(false);
         } else if (state.insertDialog) {
           state.setInsertDialog(null);
+        } else if (state.editingSequenceId) {
+          state.setEditingSequenceId(null);
         } else if (state.multiSelection.length > 0) {
           state.clearMultiSelect();
         } else if (state.sidePanelOpen) {
@@ -109,7 +114,7 @@ function App() {
       <InsertDialog />
 
       <div className="flex" style={{ height: 'calc(100vh - 36px)' }}>
-        <div className={`overflow-auto flex-1 ${(sidePanelOpen || sequencePanelOpen) ? 'mr-[340px]' : ''}`} style={{ paddingBottom: 20 }}>
+        <div className="overflow-auto flex-1" style={{ paddingBottom: 20, marginRight: (sidePanelOpen || sequencePanelOpen) ? panelWidth : 0 }}>
           {zoomLevel === 2 ? (
             <>
               {/* Block View — Semester 1 */}
@@ -132,7 +137,7 @@ function App() {
               <table className="border-collapse w-max min-w-full">
                 <SemesterHeader courses={s1Courses} semester={1} />
                 <tbody>
-                  <WeekRows weeks={s1Weeks} courses={s1Courses} currentRef={curRef} />
+                  <WeekRows weeks={s1Weeks} courses={s1Courses} allWeeks={allWeekKeys} currentRef={curRef} />
                 </tbody>
               </table>
 
@@ -146,7 +151,7 @@ function App() {
               <table className="border-collapse w-max min-w-full">
                 <SemesterHeader courses={s2Courses} semester={2} />
                 <tbody>
-                  <WeekRows weeks={s2Weeks} courses={s2Courses} currentRef={curRef} />
+                  <WeekRows weeks={s2Weeks} courses={s2Courses} allWeeks={allWeekKeys} currentRef={curRef} />
                 </tbody>
               </table>
             </>

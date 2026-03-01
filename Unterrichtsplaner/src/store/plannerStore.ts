@@ -123,6 +123,8 @@ interface PlannerState {
   // Settings
   settingsOpen: boolean;
   setSettingsOpen: (v: boolean) => void;
+  panelWidth: number;
+  setPanelWidth: (w: number) => void;
 }
 
 export const usePlannerStore = create<PlannerState>()(
@@ -841,6 +843,8 @@ export const usePlannerStore = create<PlannerState>()(
     }),
   settingsOpen: false,
   setSettingsOpen: (v) => set({ settingsOpen: v }),
+  panelWidth: 400,
+  setPanelWidth: (w) => set({ panelWidth: w }),
     }),
     {
       name: 'unterrichtsplaner-storage',

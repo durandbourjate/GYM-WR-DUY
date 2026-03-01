@@ -9,6 +9,7 @@ import { getEffectiveCategorySubtype, getCategoryLabel, getSubtypeLabel, CATEGOR
 interface Props {
   weeks: Week[];
   courses: Course[];
+  allWeeks?: string[]; // All week keys across both semesters (for cross-semester shift-select)
   currentRef?: React.RefObject<HTMLTableRowElement | null>;
 }
 
@@ -136,7 +137,7 @@ function EmptyCellMenu({ week, course, onClose, selectedWeeks }: { week: string;
   );
 }
 
-export function WeekRows({ weeks, courses, currentRef }: Props) {
+export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }: Props) {
   const {
     selection, setSelection,
     multiSelection, toggleMultiSelect, clearMultiSelect, selectRange,
@@ -168,7 +169,7 @@ export function WeekRows({ weeks, courses, currentRef }: Props) {
     ? weeks.map((w) => weekData.find((wd) => wd.w === w.w) || w)
     : weeks;
 
-  const allWeekKeys = weeks.map(w => w.w);
+  const allWeekKeys = allWeeksProp || weeks.map(w => w.w);
 
   // Single click: select + show mini-buttons (no detail panel)
   const handleClick = useCallback(
@@ -300,7 +301,7 @@ export function WeekRows({ weeks, courses, currentRef }: Props) {
             ref={isCurrent ? currentRef : undefined}
             data-week={week.w}
             className="group"
-            style={{ opacity: past && !isCurrent ? 0.4 : 1 }}
+            style={{ opacity: past && !isCurrent ? 0.6 : 1 }}
           >
             {/* Week number */}
             <td
@@ -421,6 +422,7 @@ export function WeekRows({ weeks, courses, currentRef }: Props) {
                       clearMultiSelect();
                       setSelection(null);
                       setEmptyCellMenu(null);
+                      usePlannerStore.getState().setEditingSequenceId(null);
                     }
                   }}
                   onDoubleClick={() => {
