@@ -189,3 +189,68 @@ export function getEffectiveS2StartIndex(): number {
   if (settings) return settings.semesterBreak;
   return S2_START_INDEX;
 }
+
+/**
+ * Apply holidays and special weeks from settings to weekData.
+ * Returns modified weekData copy + stats. Does NOT modify store directly.
+ */
+export function applySettingsToWeekData(
+  weekData: import('../types').Week[],
+  settings: PlannerSettings
+): { weekData: import('../types').Week[]; holidayWeeks: number; specialWeeks: number } {
+  const result = weekData.map(w => ({ ...w, lessons: { ...w.lessons } }));
+  const allCols = new Set<number>();
+  for (const w of result) {
+    for (const col of Object.keys(w.lessons).map(Number)) {
+      allCols.add(col);
+    }
+  }
+  if (allCols.size === 0) return { weekData: result, holidayWeeks: 0, specialWeeks: 0 };
+
+  let holidayWeeks = 0;
+  let specialWeeks = 0;
+
+  // Helper: expand KW range within weekData order
+  const allWeekIds = result.map(w => w.w);
+  const expandWeekRange = (start: string, end: string): string[] => {
+    const startIdx = allWeekIds.indexOf(start);
+    const endIdx = allWeekIds.indexOf(end);
+    if (startIdx === -1 || endIdx === -1) return [];
+    const weeks: string[] = [];
+    for (let i = startIdx; i <= endIdx; i++) weeks.push(allWeekIds[i]);
+    return weeks;
+  };
+
+  // Apply holidays (full weeks → all cols get type 6)
+  for (const holiday of settings.holidays) {
+    const weeks = expandWeekRange(holiday.startWeek, holiday.endWeek);
+    for (const weekW of weeks) {
+      const weekEntry = result.find(w => w.w === weekW);
+      if (!weekEntry) continue;
+      for (const col of allCols) {
+        weekEntry.lessons[col] = { title: holiday.label, type: 6 };
+      }
+      holidayWeeks++;
+    }
+  }
+
+  // Apply special weeks (events/partial holidays)
+  for (const special of settings.specialWeeks) {
+    const weekEntry = result.find(w => w.w === special.week);
+    if (!weekEntry) continue;
+    const excluded = new Set(special.excludedCourseIds || []);
+    for (const col of allCols) {
+      // Skip excluded courses (mapped by settings course id → col position)
+      const isExcluded = settings.courses.some(c => excluded.has(c.id));
+      if (!isExcluded) {
+        weekEntry.lessons[col] = {
+          title: special.label,
+          type: special.type === 'holiday' ? 6 : 5,
+        };
+      }
+    }
+    specialWeeks++;
+  }
+
+  return { weekData: result, holidayWeeks, specialWeeks };
+}

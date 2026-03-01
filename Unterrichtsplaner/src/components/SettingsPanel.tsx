@@ -4,6 +4,7 @@ import { usePlannerStore } from '../store/plannerStore';
 import {
   loadSettings, saveSettings, getDefaultSettings, generateId,
   importCurrentCourses, importCurrentHolidays, importCurrentSpecialWeeks,
+  applySettingsToWeekData,
   type PlannerSettings, type CourseConfig, type SpecialWeekConfig, type HolidayConfig,
 } from '../store/settingsStore';
 
@@ -247,72 +248,10 @@ function ApplySettingsButton({ settings }: { settings: PlannerSettings }) {
 
   const applyToWeeks = () => {
     const store = usePlannerStore.getState();
-    const weekData = [...store.weekData.map(w => ({ ...w, lessons: { ...w.lessons } }))];
-    const allCols = new Set<number>();
-
-    // Collect all cols used in weekData
-    for (const w of weekData) {
-      for (const col of Object.keys(w.lessons).map(Number)) {
-        allCols.add(col);
-      }
-    }
-    if (allCols.size === 0) return;
-
-    let holidayCount = 0;
-    let specialCount = 0;
-
-    // Helper: expand KW range (handles year boundary, e.g. 51→03)
-    const expandWeekRange = (start: string, end: string): string[] => {
-      const allWeeks = weekData.map(w => w.w);
-      const startIdx = allWeeks.indexOf(start);
-      const endIdx = allWeeks.indexOf(end);
-      if (startIdx === -1 || endIdx === -1) return [];
-      const result: string[] = [];
-      for (let i = startIdx; i <= endIdx; i++) {
-        result.push(allWeeks[i]);
-      }
-      return result;
-    };
-
-    // Apply holidays
-    for (const holiday of settings.holidays) {
-      const weeks = expandWeekRange(holiday.startWeek, holiday.endWeek);
-      for (const weekW of weeks) {
-        const weekEntry = weekData.find(w => w.w === weekW);
-        if (!weekEntry) continue;
-        for (const col of allCols) {
-          weekEntry.lessons[col] = { title: holiday.label, type: 6 };
-        }
-        holidayCount++;
-      }
-    }
-
-    // Apply special weeks
-    for (const special of settings.specialWeeks) {
-      const weekEntry = weekData.find(w => w.w === special.week);
-      if (!weekEntry) continue;
-      const excluded = new Set(special.excludedCourseIds || []);
-      // Map courseIds to cols (use settings courses if available)
-      for (const col of allCols) {
-        // Check if this col belongs to an excluded course
-        const isExcluded = settings.courses.some(c => {
-          // Match by col position — this is approximate since settings courses use dynamic cols
-          // For now, skip exclusion check if we can't match precisely
-          return excluded.has(c.id);
-        });
-        if (!isExcluded) {
-          weekEntry.lessons[col] = {
-            title: special.label,
-            type: special.type === 'holiday' ? 6 : 5,
-          };
-        }
-      }
-      specialCount++;
-    }
-
+    const applied = applySettingsToWeekData(store.weekData, settings);
     store.pushUndo();
-    store.setWeekData(weekData);
-    setResult({ holidays: holidayCount, specials: specialCount });
+    store.setWeekData(applied.weekData);
+    setResult({ holidays: applied.holidayWeeks, specials: applied.specialWeeks });
     setTimeout(() => setResult(null), 4000);
   };
 
@@ -323,15 +262,18 @@ function ApplySettingsButton({ settings }: { settings: PlannerSettings }) {
       <div className="text-[8px] text-gray-500">
         {settings.holidays.length} Ferienperioden · {settings.specialWeeks.length} Sonderwochen konfiguriert
       </div>
+      <p className="text-[8px] text-green-400/70">
+        ✓ Ferien und Sonderwochen werden bei der Initialisierung automatisch angewendet.
+      </p>
       <button onClick={() => {
         if (totalEntries === 0) { alert('Keine Ferien oder Sonderwochen konfiguriert.'); return; }
-        if (confirm(`${totalEntries} Einträge (Ferien + Sonderwochen) in die Planerdaten übernehmen? Bestehende Einträge werden überschrieben. (Undo möglich)`)) {
+        if (confirm(`${totalEntries} Einträge (Ferien + Sonderwochen) erneut in die Planerdaten übernehmen? Bestehende Einträge werden überschrieben. (Undo möglich)`)) {
           applyToWeeks();
         }
       }}
         className="w-full py-1.5 rounded text-[9px] font-medium bg-amber-700 hover:bg-amber-600 text-white cursor-pointer transition-all disabled:bg-slate-700 disabled:text-gray-500 disabled:cursor-not-allowed"
         disabled={totalEntries === 0}>
-        ⚡ Ferien & Sonderwochen eintragen
+        🔄 Ferien & Sonderwochen erneut eintragen
       </button>
       {result && (
         <div className="text-[8px] p-1.5 rounded bg-green-900/30 text-green-300">
@@ -361,6 +303,13 @@ export function SettingsPanel() {
 
   const handleSave = useCallback(() => {
     saveSettings(settings);
+    // Auto-apply holidays & special weeks to weekData
+    const store = usePlannerStore.getState();
+    if (store.weekData.length > 0 && (settings.holidays.length > 0 || settings.specialWeeks.length > 0)) {
+      const applied = applySettingsToWeekData(store.weekData, settings);
+      store.pushUndo();
+      store.setWeekData(applied.weekData);
+    }
     setDirty(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);

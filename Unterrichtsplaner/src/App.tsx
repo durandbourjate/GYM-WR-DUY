@@ -2,6 +2,7 @@ import { useRef, useEffect, useMemo } from 'react';
 import { WEEKS } from './data/weeks';
 import { usePlannerStore } from './store/plannerStore';
 import { usePlannerData } from './hooks/usePlannerData';
+import { loadSettings, applySettingsToWeekData } from './store/settingsStore';
 import { SemesterHeader } from './components/SemesterHeader';
 import { WeekRows } from './components/WeekRows';
 import { AppHeader, HelpBar, MultiSelectToolbar, Legend } from './components/Toolbar';
@@ -15,10 +16,16 @@ function App() {
   const { courses: allCourses, weeks: staticWeeks, s2StartIndex } = usePlannerData();
   const curRef = useRef<HTMLTableRowElement>(null);
 
-  // Initialize weekData in store on first render
+  // Initialize weekData in store on first render (apply holidays/special weeks from settings)
   useEffect(() => {
     if (weekData.length === 0) {
-      setWeekData(WEEKS.map((w) => ({ ...w, lessons: { ...w.lessons } })));
+      let initial = WEEKS.map((w) => ({ ...w, lessons: { ...w.lessons } }));
+      const settings = loadSettings();
+      if (settings && (settings.holidays.length > 0 || settings.specialWeeks.length > 0)) {
+        const applied = applySettingsToWeekData(initial, settings);
+        initial = applied.weekData;
+      }
+      setWeekData(initial);
     }
   }, []);
 
