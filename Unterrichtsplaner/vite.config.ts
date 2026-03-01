@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
-  base: '/GYM-WR-DUY/',
+  base: '/GYM-WR-DUY/Unterrichtsplaner/',
   plugins: [
     react(),
     tailwindcss(),
@@ -18,8 +18,8 @@ export default defineConfig({
         theme_color: '#1e40af',
         background_color: '#f8fafc',
         display: 'standalone',
-        scope: '/GYM-WR-DUY/',
-        start_url: '/GYM-WR-DUY/',
+        scope: '/GYM-WR-DUY/Unterrichtsplaner/',
+        start_url: '/GYM-WR-DUY/Unterrichtsplaner/',
         icons: [
           {
             src: 'icon-192.png',
