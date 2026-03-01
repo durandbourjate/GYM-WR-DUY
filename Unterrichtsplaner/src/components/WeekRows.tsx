@@ -382,6 +382,49 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
 
   const allWeekKeys = allWeeksProp || weeks.map(w => w.w);
 
+  // Pre-compute holiday/event spans for merged rows (like ZoomYearView)
+  const { holidaySkipSet, holidaySpanStart } = React.useMemo(() => {
+    const spans: { startIdx: number; len: number; label: string; type: 'holiday' | 'event'; weekKeys: string[] }[] = [];
+    let i = 0;
+    const dwKeys = displayWeeks.map(w => w.w);
+    while (i < displayWeeks.length) {
+      const wk = displayWeeks[i];
+      const entries = Object.values(wk.lessons || {});
+      const allHoliday = entries.length > 0 && entries.every(e => (e as any).type === 6);
+      const allEvent = entries.length > 0 && entries.every(e => (e as any).type === 5);
+
+      if (allHoliday) {
+        const label = (entries[0] as any)?.title || 'Ferien';
+        const startIdx = i;
+        const weekKeys: string[] = [];
+        while (i < displayWeeks.length) {
+          const nwk = displayWeeks[i];
+          const ne = Object.values(nwk.lessons || {});
+          if (!(ne.length > 0 && ne.every(e => (e as any).type === 6))) break;
+          weekKeys.push(nwk.w);
+          i++;
+        }
+        spans.push({ startIdx, len: i - startIdx, label, type: 'holiday', weekKeys });
+      } else if (allEvent) {
+        const label = (entries[0] as any)?.title || 'Sonderwoche';
+        spans.push({ startIdx: i, len: 1, label, type: 'event', weekKeys: [wk.w] });
+        i++;
+      } else {
+        i++;
+      }
+    }
+
+    const skipSet = new Set<string>();
+    const spanStart = new Map<string, typeof spans[0]>();
+    for (const span of spans) {
+      spanStart.set(dwKeys[span.startIdx], span);
+      for (let j = 1; j < span.len; j++) {
+        skipSet.add(dwKeys[span.startIdx + j]);
+      }
+    }
+    return { holidaySkipSet: skipSet, holidaySpanStart: spanStart };
+  }, [displayWeeks]);
+
   // Single click: select + show mini-buttons (no detail panel)
   const handleClick = useCallback(
     (weekW: string, course: Course, title: string, e: React.MouseEvent) => {
@@ -514,6 +557,61 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
       {displayWeeks.map((week) => {
         const isCurrent = week.w === CURRENT_WEEK;
         const past = isPastWeek(week.w, CURRENT_WEEK);
+
+        // Skip weeks that are covered by a holiday/event rowSpan
+        if (holidaySkipSet.has(week.w)) return null;
+
+        // Check if this is the start of a holiday/event span
+        const hSpan = holidaySpanStart.get(week.w);
+        if (hSpan) {
+          const isHoliday = hSpan.type === 'holiday';
+          const ROW_H = 36; // approximate row height
+          const spanH = hSpan.len * ROW_H;
+          return (
+            <tr
+              key={week.w}
+              ref={isCurrent ? currentRef : undefined}
+              data-week={week.w}
+              className="group"
+              style={{ opacity: dimPastWeeks && past && !isCurrent ? 0.5 : 1 }}
+            >
+              {/* Week number(s) */}
+              <td
+                className="sticky left-0 z-30 px-1 text-center border-b border-slate-900/60"
+                style={{ background: '#0c0f1a' }}
+                rowSpan={hSpan.len}
+              >
+                <div className="flex flex-col items-center">
+                  <span className="text-[9px] font-mono font-medium text-gray-500">{hSpan.weekKeys[0]}</span>
+                  {hSpan.len > 1 && (
+                    <span className="text-[8px] font-mono text-gray-600">–{hSpan.weekKeys[hSpan.len - 1]}</span>
+                  )}
+                </div>
+              </td>
+              {/* Merged cell spanning all course columns */}
+              <td
+                colSpan={courses.length}
+                rowSpan={hSpan.len}
+                className="border-b border-slate-800/30 text-center align-middle"
+                style={{
+                  background: isHoliday ? '#1e293b50' : '#37415130',
+                  height: spanH,
+                }}
+              >
+                <div className="flex items-center justify-center gap-1.5">
+                  <span className="text-[11px]">{isHoliday ? '🏖' : '📅'}</span>
+                  <span className={`text-[11px] font-medium ${isHoliday ? 'text-gray-400' : 'text-amber-400/80'}`}>
+                    {hSpan.label}
+                  </span>
+                  {hSpan.len > 1 && (
+                    <span className="text-[9px] text-gray-500">({hSpan.len}W)</span>
+                  )}
+                </div>
+              </td>
+            </tr>
+          );
+        }
+
         return (
           <tr
             key={week.w}
@@ -864,6 +962,23 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                         onSave={(v) => handleSaveEdit(week.w, c.col, v)}
                         onCancel={() => setEditing(null)}
                       />
+                    </div>
+                  ) : title && isFixed ? (
+                    /* Holiday/Event cells: dezent, grau, nicht draggable */
+                    <div
+                      className="mx-0.5 ml-1.5 px-1.5 py-1 rounded flex items-center justify-center cursor-default"
+                      style={{
+                        minHeight: Math.max(cellHeight, 32),
+                        opacity: isSearchDimmed ? 0.2 : 1,
+                        background: lessonType === 6 ? '#1e293b60' : '#37415140',
+                        border: `1px solid ${lessonType === 6 ? '#334155' : '#475569'}`,
+                      }}
+                    >
+                      <span className="mr-1 text-[9px]">{lessonType === 6 ? '🏖' : '📅'}</span>
+                      <span className={`text-[9px] font-medium leading-tight ${lessonType === 6 ? 'text-gray-400' : 'text-amber-400/80'}`}
+                        style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                        {displayTitle}
+                      </span>
                     </div>
                   ) : title ? (
                     <div
