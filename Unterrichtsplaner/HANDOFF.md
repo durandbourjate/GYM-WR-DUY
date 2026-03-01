@@ -1,7 +1,7 @@
-# Unterrichtsplaner – Handoff v3.20
+# Unterrichtsplaner – Handoff v3.21
 
-## Status: ✅ Deployed (v3.20)
-- **Commit:** a65da9c
+## Status: ✅ Deployed (v3.21)
+- **Commit:** 90bf706
 - **Datum:** 2026-03-01
 - **Deploy:** https://durandbourjate.github.io/GYM-WR-DUY/Unterrichtsplaner/
 
@@ -26,6 +26,7 @@
 - v3.18: Delete-Taste löscht Zelleninhalt, Scroll-to-Current-Button (◉), geerbter Fachbereich-Hinweis, Keyboard-Hilfe aktualisiert
 - v3.19: Materialsammlung (CollectionPanel) — neuer Tab "📚 Sammlung" im Seitenpanel. Archivieren von UE, Sequenzen, Schuljahren, Bildungsgängen. Import mit Optionen (Notizen/Materiallinks). Persistierung in localStorage.
 - v3.20: Zoom 2 komplett neu — KW-Zeilen-Layout statt Block-Matrix. Migration auf usePlannerData(). Sequenzen als farbige Balken (Label auf 1. Zeile, gerundete Ecken). Ferien/IW kollabiiert. Past-Wochen abgedunkelt. Klick→Sequenz, Doppelklick→Zoom3.
+- v3.21: Zoom 2 — Sequenzen als rowSpan-Einheiten (verschmolzene Zellen statt Zeile-pro-KW). Farbcode-Inferenz aus weekData-Lektionstyp wenn Sequenz keinen Fachbereich hat. BlockSpan-Datenstruktur mit skipSet.
 
 ## Architekturentscheidungen v3.11–v3.19
 - **editingSequenceId Format:** Jetzt `seqId-blockIndex` (z.B. `abc123-0`) statt nur `seqId`. WeekRows parsed dieses Format mit Regex und highlightet nur den spezifischen Block.
@@ -34,7 +35,7 @@
 - **BatchOrDetailsTab:** Switcher-Komponente — zeigt BatchEditTab bei multiSelection.length > 1, sonst normaler DetailsTab.
 - **FlatBlockCard:** Ersetzt alte SequenceCard. Zeigt Blöcke direkt flach, mit Parent-Sequenz-Kontext. Aufklappbare Sections: Felder, Lektionen, Reihen-Einstellungen.
 - **CollectionPanel (v3.19):** Eigenständige Komponente als 4. Tab. Datenmodell: `CollectionItem` mit `CollectionUnit[]`. Jede Unit enthält einen Block (ohne Wochen), Lesson-Detail-Snapshots und Original-Lektionstitles. Archiv-Hierarchie: UE < Sequenz < Schuljahr < Bildungsgang. Import erstellt neue Sequenz ohne Wochen-Zuweisung; Optionen für Notizen/Materiallinks. `collection[]` im plannerStore persistiert via `partialize`.
-- **ZoomBlockView v3.20:** Komplett umgebaut von Block-Matrix auf KW-Zeilen-Layout. Nutzt jetzt `usePlannerData()` statt statische Imports (COURSES/WEEKS/S2_START_INDEX). CellMap-Pattern: `Map<"weekW:courseId", CellBlock>` für O(1) Lookup. Visuelle Sequenz-Balken mit `isFirst`/`isLast` für gerundete Ecken. Feiertag-Erkennung auf zwei Ebenen: ganze Woche (colSpan) und einzelne Zelle. Spaltenbreite 80px (kompakter als Zoom 3's 110px).
+- **ZoomBlockView v3.20–v3.21:** Komplett umgebaut. KW-Zeilen-Layout mit rowSpan für zusammenhängende Sequenz-Blöcke. Nutzt `usePlannerData()`. BlockSpan-Datenstruktur: für jeden Kurs werden kontiguitive Wochenläufe eines Blocks berechnet und als `Map<"startIdx:courseId", BlockSpan>` gespeichert. `skipSet` (Set<string>) trackt welche Zellen von einem rowSpan überdeckt sind. Farbcode: `subjectArea` wird aus Block → Sequenz → weekData-Lektionstyp inferiert (Fallback-Kette). Spaltenbreite 80px.
 - **sidePanelTab:** Erweitert auf `'details' | 'sequences' | 'collection' | 'settings'`.
 
 ## Offenes Feedback (noch nicht umgesetzt)
