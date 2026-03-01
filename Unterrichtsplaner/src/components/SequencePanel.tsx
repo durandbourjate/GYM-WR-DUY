@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { usePlannerStore } from '../store/plannerStore';
-import { COURSES, getLinkedCourseIds } from '../data/courses';
 import { WEEKS } from '../data/weeks';
+import { usePlannerData } from '../hooks/usePlannerData';
 import { SEQUENCE_COLORS, SUBJECT_AREA_COLORS } from '../utils/colors';
-import type { SubjectArea, ManagedSequence, SequenceBlock, LessonDetail } from '../types';
+import type { Course, SubjectArea, ManagedSequence, SequenceBlock, LessonDetail } from '../types';
 
 const SUBJECT_AREAS: { key: SubjectArea; label: string; color: string }[] = [
   { key: 'BWL', label: 'BWL', color: '#3b82f6' },
@@ -24,9 +24,11 @@ function BlockEditor({
   onMoveDown: (idx: number) => void;
 }) {
   const { setSelection, setSidePanelOpen, setSidePanelTab, sequences } = usePlannerStore();
+  const { courses: COURSES } = usePlannerData();
   const [editingLabel, setEditingLabel] = useState(false);
   const [editingWeeks, setEditingWeeks] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
+  const [showLessons, setShowLessons] = useState(false);
   const [labelText, setLabelText] = useState(block.label);
   const [weeksText, setWeeksText] = useState(block.weeks.join(', '));
 
@@ -109,7 +111,7 @@ function BlockEditor({
           ))}
         </div>
       )}
-      {/* Lektionen in diesem Block */}
+      {/* Lektionen-Toggle + Liste */}
       {block.weeks.length > 0 && (() => {
         const seq = sequences.find(s => s.id === seqId);
         if (!seq) return null;
@@ -129,26 +131,35 @@ function BlockEditor({
         }
         if (lessons.length === 0) return null;
         return (
-          <div className="mt-1 space-y-0.5">
-            {lessons.map((l, li) => (
-              <div key={li} className="flex items-center gap-1 text-[8px] cursor-pointer hover:bg-slate-700/50 rounded px-1 py-px transition-colors"
-                onClick={() => {
-                  const course = COURSES.find(c => c.id === l.courseId);
-                  if (!course) return;
-                  const row = document.querySelector(`tr[data-week="${l.week}"]`);
-                  if (row) row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                  setSelection({ week: l.week, courseId: course.id, title: l.title, course });
-                  setSidePanelOpen(true);
-                  setSidePanelTab('details');
-                }}>
-                <span className="text-gray-600 font-mono w-5">{l.week}</span>
-                {courseIds.length > 1 && <span className="text-gray-600 w-4">{COURSES.find(c => c.id === l.courseId)?.day}</span>}
-                <span className="text-gray-300 flex-1 truncate">{l.title}</span>
-                {l.detail?.topicSub && <span className="text-gray-500 truncate max-w-[60px]">{l.detail.topicSub}</span>}
-                {l.detail?.sol?.enabled && <span title="SOL">📚</span>}
+          <>
+            <button onClick={() => setShowLessons(!showLessons)}
+              className="text-[8px] text-gray-500 hover:text-gray-300 cursor-pointer mt-1 flex items-center gap-0.5">
+              {showLessons ? '▾' : '▸'} Lektionen
+              <span className="text-gray-600">({lessons.length})</span>
+            </button>
+            {showLessons && (
+              <div className="mt-0.5 space-y-0.5">
+                {lessons.map((l, li) => (
+                  <div key={li} className="flex items-center gap-1 text-[8px] cursor-pointer hover:bg-slate-700/50 rounded px-1 py-px transition-colors"
+                    onClick={() => {
+                      const course = COURSES.find(c => c.id === l.courseId);
+                      if (!course) return;
+                      const row = document.querySelector(`tr[data-week="${l.week}"]`);
+                      if (row) row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      setSelection({ week: l.week, courseId: course.id, title: l.title, course });
+                      setSidePanelOpen(true);
+                      setSidePanelTab('details');
+                    }}>
+                    <span className="text-gray-600 font-mono w-5">{l.week}</span>
+                    {courseIds.length > 1 && <span className="text-gray-600 w-4">{COURSES.find(c => c.id === l.courseId)?.day}</span>}
+                    <span className="text-gray-300 flex-1 truncate">{l.title}</span>
+                    {l.detail?.topicSub && <span className="text-gray-500 truncate max-w-[60px]">{l.detail.topicSub}</span>}
+                    {l.detail?.sol?.enabled && <span title="SOL">📚</span>}
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            )}
+          </>
         );
       })()}
       <button onClick={() => setShowDetails(!showDetails)}
@@ -231,6 +242,7 @@ function SequenceCard({ seq }: { seq: ManagedSequence }) {
     editingSequenceId, setEditingSequenceId,
     autoPlaceSequence, getAvailableWeeks,
   } = usePlannerStore();
+  const { courses: COURSES, getLinkedCourseIds } = usePlannerData();
 
   const isExpanded = editingSequenceId === seq.id;
   const course = COURSES.find((c) => c.id === seq.courseId);
@@ -460,19 +472,19 @@ function SequenceCard({ seq }: { seq: ManagedSequence }) {
 }
 
 // Get unique classes from courses, preserving order
-function getUniqueClasses(): string[] {
+function getUniqueClasses(courses: Course[]): string[] {
   const seen = new Set<string>();
   const result: string[] = [];
-  for (const c of COURSES) {
+  for (const c of courses) {
     if (!seen.has(c.cls)) { seen.add(c.cls); result.push(c.cls); }
   }
   return result;
 }
 
 // Get course types for a class
-function getCourseTypesForClass(cls: string): { typ: string; courseIds: string[] }[] {
+function getCourseTypesForClass(cls: string, courses: Course[]): { typ: string; courseIds: string[] }[] {
   const typMap = new Map<string, string[]>();
-  for (const c of COURSES) {
+  for (const c of courses) {
     if (c.cls !== cls) continue;
     const key = c.typ;
     if (!typMap.has(key)) typMap.set(key, []);
@@ -486,6 +498,7 @@ export function SequencePanel({ embedded = false }: { embedded?: boolean }) {
     sequences, sequencePanelOpen, setSequencePanelOpen,
     addSequence,
   } = usePlannerStore();
+  const { courses: COURSES, getLinkedCourseIds } = usePlannerData();
 
   const [filterClass, setFilterClass] = useState<string>('ALL');
   const [showNewForm, setShowNewForm] = useState(false);
@@ -494,7 +507,7 @@ export function SequencePanel({ embedded = false }: { embedded?: boolean }) {
 
   if (!embedded && !sequencePanelOpen) return null;
 
-  const uniqueClasses = getUniqueClasses();
+  const uniqueClasses = getUniqueClasses(COURSES);
 
   // Group sequences by class → course type → subject area
   const getSequencesForCourseIds = (courseIds: string[]) =>
@@ -520,7 +533,7 @@ export function SequencePanel({ embedded = false }: { embedded?: boolean }) {
   };
 
   const renderClassGroup = (cls: string) => {
-    const courseTypes = getCourseTypesForClass(cls);
+    const courseTypes = getCourseTypesForClass(cls, COURSES);
     const allCourseIds = courseTypes.flatMap(ct => ct.courseIds);
     const classSequences = getSequencesForCourseIds(allCourseIds);
     if (classSequences.length === 0 && filterClass !== cls) return null;
