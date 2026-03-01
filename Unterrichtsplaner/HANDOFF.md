@@ -1,7 +1,7 @@
-# Unterrichtsplaner – Handoff v3.16
+# Unterrichtsplaner – Handoff v3.17
 
-## Status: ✅ Deployed (v3.16)
-- **Commit:** 7f64421
+## Status: ✅ Deployed (v3.17)
+- **Commit:** a5e20cc
 - **Datum:** 2026-03-01
 - **Deploy:** https://durandbourjate.github.io/GYM-WR-DUY/Unterrichtsplaner/
 
@@ -22,6 +22,7 @@
 - v3.14: UX-Fixes: Legende (BWL/VWL/Recht separat + Event grau), Sequenz-Bar 5px/sticky/hover, Tab-Styling Felder/Lektionen/Reihe, Fachbereich-Klick Collapse-Fix
 - v3.15: Kontextmenü bei Cursor, Sequenz-Klick=Highlight/Doppelklick=Edit, Tag-Vererbung Sequenz→Lektion, "Zu Sequenz hinzufügen"-Button im DetailPanel
 - v3.16: Fachbereich-Mismatch-Warnung mit Korrigieren-Button, Reihe-UX (Erklärtext, editierbarer Titel, Sequenz-Zähler)
+- v3.17: Hover-Preview 800ms (statt 2s), Feiertag-Erkennung bei Import (partielle Feiertage wie Auffahrt/Pfingsten)
 
 ## Architekturentscheidungen v3.11–v3.13
 - **editingSequenceId Format:** Jetzt `seqId-blockIndex` (z.B. `abc123-0`) statt nur `seqId`. WeekRows parsed dieses Format mit Regex und highlightet nur den spezifischen Block.
@@ -35,7 +36,7 @@
 ### 🔴 Konzeptionell / Architektur
 1. **Materialsammlung (Sammlung-Tab):** Dritter Tab rechts neben "Sequenzen". Sequenzen und UE speichern für Wiederverwendung in späteren Jahren. Szenarien: (a) Lektionen+Sequenzen vom Vorjahr übernehmen, (b) Punktuell aus Sammlung importieren.
 2. **Detailspalte / Notiz-Ansicht (Unterrichtsdurchführung):** Niederschwelliger Zugang zu Notizen, Kommentaren, Reflexion ("wie hat es mit der Klasse funktioniert"). Idee: aufklappbare Detailspalte pro Kurs (wie Excel-Gruppierung). Bei Einzelkurs-Ansicht umsetzbar. Auch Mouse-Over als Option.
-3. **Feiertage tracken:** Wie Ferien blockieren.
+3. **Feiertage tracken:** Basis vorhanden (SpecialWeek type:'holiday'). Feiertage werden bei Import erkannt und in Settings gespeichert. Noch fehlend: Automatisches Blockieren bei Weeks-Generierung (aktuell nur via "Apply" in Settings).
 4. **Zoom 2 (Mittlere Ansicht):** Alle KW-Zeilen, kompaktere Darstellung mit Sequenz-Labels statt volle Titel. Aktuell buggy (ZoomBlockView.tsx).
 5. **Zoom 1 (Multi-Year):** "Lehrplan"-Label korrigieren, "Ist-Zustand" Ansicht überarbeiten.
 
@@ -64,3 +65,5 @@
 - ✅ "Zu Sequenz hinzufügen"-Button im DetailPanel (neue oder bestehende Sequenz)
 - ✅ Fachbereich-Mismatch-Warnung: ⚠ Topic passt zu VWL (geerbt: RECHT) + Korrigieren-Button
 - ✅ Reihe-Konzept UX: Erklärtext, editierbarer Titel, Sequenz-Zähler im Header
+- ✅ Hover-Preview Timer reduziert (2s → 800ms)
+- ✅ Feiertag-Erkennung bei Settings-Import (Auffahrt, Pfingsten etc.)
