@@ -425,12 +425,20 @@ export const usePlannerStore = create<PlannerState>()(
       const weekW = allWeekOrder[i];
       const week = state.weekData.find(w => w.w === weekW);
       if (!week) { available.push(weekW); continue; }
+      // Skip weeks where ANY col has a holiday (6) or event (5)
+      const hasBlockingEntry = cols.some(col => {
+        const entry = week.lessons[col];
+        return entry && (entry.type === 5 || entry.type === 6);
+      });
+      if (hasBlockingEntry) continue;
+      // Also check if ANY other col in the week has a holiday (global block)
+      const hasGlobalHoliday = Object.values(week.lessons).some(e => e.type === 6);
+      if (hasGlobalHoliday) continue;
       // Week is available only if ALL linked cols are free
       const allFree = cols.every(col => !week.lessons[col]);
       if (allFree) {
         available.push(weekW);
       }
-      // Skip: holidays (6), events (5), exams (4), and occupied lessons (1,2,3)
     }
     return available;
   },

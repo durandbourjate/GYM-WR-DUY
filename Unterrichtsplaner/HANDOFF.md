@@ -1,7 +1,7 @@
-# Unterrichtsplaner – Handoff v3.21
+# Unterrichtsplaner – Handoff v3.22
 
-## Status: ✅ Deployed (v3.21)
-- **Commit:** 90bf706
+## Status: ✅ Deployed (v3.22)
+- **Commit:** 2cce134
 - **Datum:** 2026-03-01
 - **Deploy:** https://durandbourjate.github.io/GYM-WR-DUY/Unterrichtsplaner/
 
@@ -27,6 +27,7 @@
 - v3.19: Materialsammlung (CollectionPanel) — neuer Tab "📚 Sammlung" im Seitenpanel. Archivieren von UE, Sequenzen, Schuljahren, Bildungsgängen. Import mit Optionen (Notizen/Materiallinks). Persistierung in localStorage.
 - v3.20: Zoom 2 komplett neu — KW-Zeilen-Layout statt Block-Matrix. Migration auf usePlannerData(). Sequenzen als farbige Balken (Label auf 1. Zeile, gerundete Ecken). Ferien/IW kollabiiert. Past-Wochen abgedunkelt. Klick→Sequenz, Doppelklick→Zoom3.
 - v3.21: Zoom 2 — Sequenzen als rowSpan-Einheiten (verschmolzene Zellen statt Zeile-pro-KW). Farbcode-Inferenz aus weekData-Lektionstyp wenn Sequenz keinen Fachbereich hat. BlockSpan-Datenstruktur mit skipSet.
+- v3.22: Zoom 1 — Ist-Zustand: ActualDataCard nutzt s2StartIndex für korrekte Semester-Zuordnung, filtert nach SF-Kurs-IDs. Labels auf Deutsch ("Mehrjahresübersicht", "Stoffverteilung").
 
 ## Architekturentscheidungen v3.11–v3.19
 - **editingSequenceId Format:** Jetzt `seqId-blockIndex` (z.B. `abc123-0`) statt nur `seqId`. WeekRows parsed dieses Format mit Regex und highlightet nur den spezifischen Block.
