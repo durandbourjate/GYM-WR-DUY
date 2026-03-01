@@ -41,7 +41,40 @@
 ### Offene Feature-Requests
 - **Zoom 2 Jahresmodus**: ✅ Implementiert (v3.28)
 - **SOL-Total bei Sequenzen**: ✅ Implementiert (v3.29)
-- **Google Calendar Integration**: Kalender im Tool anzeigen Klick zum Editieren, Enter/Blur zum Speichern, Escape zum Abbrechen.
+- **Google Calendar Integration**: Mittlere Priorität — Konzept steht, Umsetzung bei Gelegenheit
+
+### Feature-Spec: Google Calendar Integration (geplant)
+
+**Kernidee:** Planer wird zur Quelle für Unterrichtslektionen im Kalender. Keine Doppelpflege mehr.
+
+**3 Funktionen:**
+
+1. **Planer→Kalender Sync (automatisch bei jeder Änderung)**
+   - Lektionen/Prüfungen werden als Google-Calendar-Events erstellt
+   - Wählbar: alle Lektionen (wöchentlich) ODER nur Prüfungen/Spezialanlässe
+   - Events mit Tag `planer-managed` markiert, damit Planer sie wiedererkennt
+   - Update/Delete bei Änderungen im Planer (bidirektional nur Planer→Kalender)
+   - Event enthält: Titel, Fachbereich, Thema, Klasse, Zeitslot (aus Kursdaten)
+
+2. **Kalender→Planer Import (Sonderwochen)**
+   - Events aus Schul-Kalender mit Keywords (IW, Besuchstag, Sonderwoche) → Holiday/Event-Blöcke
+   - Per "Importieren"-Aktion oder automatisch bei erkannten Keywords
+   - Multi-Kalender-Support: Benutzer wählt in Settings welche Kalender gelesen werden
+
+3. **Kollisionswarnungen (⚠️ in Zellen)**
+   - Nur für Events aus Nicht-Planer-Kalendern (keine Warnungen für selbst gepushte Lektionen)
+   - ⚠️ wenn Schul-Kalender-Event (Sitzung, Konferenz) auf gleichen Zeitslot fällt
+   - Tooltip zeigt kollidierenden Event
+
+**Multi-Kalender-Architektur:**
+- Schreib-Kalender: 1 Kalender konfigurierbar (z.B. "Unterricht") — hier pushed der Planer hin
+- Lese-Kalender: N Kalender konfigurierbar (z.B. "Schule allgemein", "Privat") — für Import + Kollision
+- planer-managed Events werden bei Kollisionscheck ausgeschlossen
+
+**Technisch:**
+- Google Calendar API via OAuth (Settings-Flow)
+- Sync-State im plannerStore (eventId-Mapping pro Lektion)
+- Settings: Kalender-Auswahl, Sync-Modus (alle/nur Prüfungen), Auto-Sync on/off Klick zum Editieren, Enter/Blur zum Speichern, Escape zum Abbrechen.
 
 ## Architekturentscheidungen v3.11–v3.19
 - **editingSequenceId Format:** Jetzt `seqId-blockIndex` (z.B. `abc123-0`) statt nur `seqId`. WeekRows parsed dieses Format mit Regex und highlightet nur den spezifischen Block.
