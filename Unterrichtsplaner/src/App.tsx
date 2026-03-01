@@ -8,7 +8,7 @@ import { WeekRows } from './components/WeekRows';
 import { AppHeader, HelpBar, MultiSelectToolbar, Legend } from './components/Toolbar';
 import { DetailPanel } from './components/DetailPanel';
 import { InsertDialog } from './components/InsertDialog';
-import { ZoomBlockView } from './components/ZoomBlockView';
+import { ZoomYearView } from './components/ZoomYearView';
 import { ZoomMultiYearView } from './components/ZoomMultiYearView';
 
 function App() {
@@ -156,19 +156,7 @@ function App() {
       <div className="flex" style={{ height: 'calc(100vh - 36px)' }}>
         <div className="overflow-auto flex-1" style={{ paddingBottom: 20, marginRight: (sidePanelOpen || sequencePanelOpen) ? panelWidth : 0 }}>
           {zoomLevel === 2 ? (
-            <>
-              {/* Block View — Semester 1 */}
-              <ZoomBlockView semester={1} />
-
-              {/* Semester divider */}
-              <div className="py-1.5 px-4 flex items-center gap-2" style={{ background: 'linear-gradient(90deg, #f59e0b20, #f59e0b40, #f59e0b20)' }}>
-                <span className="text-xs font-bold text-amber-500">━━ Semester 2 ━━</span>
-                <span className="text-[9px] text-amber-800">ab KW 07</span>
-              </div>
-
-              {/* Block View — Semester 2 */}
-              <ZoomBlockView semester={2} />
-            </>
+            <ZoomYearView />
           ) : zoomLevel === 1 ? (
             <ZoomMultiYearView />
           ) : (

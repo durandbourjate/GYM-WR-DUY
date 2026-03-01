@@ -1,12 +1,386 @@
-// ZoomYearView — Jahresmodus (Zoom 2 Jahresansicht)
-// TODO: Implementation — Kurse durchgehend über beide Semester,
-// 2-Tage-Kurse als breite/schmale Balken je nach Sequenz-Zugehörigkeit
-// Placeholder file — wird in einer zukünftigen Version implementiert.
+import { useMemo, useCallback } from 'react';
+import { usePlannerStore } from '../store/plannerStore';
+import { usePlannerData } from '../hooks/usePlannerData';
+import { TYPE_BADGES, DAY_COLORS, isPastWeek } from '../utils/colors';
+import type { Course, ManagedSequence, LessonType, SubjectArea } from '../types';
+
+const ROW_H = 22;
+const HOLIDAY_ROW_H = 14;
+const GROUP_W = 130; // width for single-day course group
+const SUBDAY_W = 65; // width for each sub-day in 2-day course group
+
+/** Dark-mode block colors */
+const BLOCK_COLORS: Record<string, { bg: string; fg: string; border: string }> = {
+  VWL:      { bg: '#7c2d12', fg: '#fed7aa', border: '#ea580c' },
+  BWL:      { bg: '#1e3a5f', fg: '#bfdbfe', border: '#3b82f6' },
+  RECHT:    { bg: '#14532d', fg: '#bbf7d0', border: '#22c55e' },
+  IN:       { bg: '#374151', fg: '#d1d5db', border: '#6b7280' },
+  INTERDISZ: { bg: '#4c1d95', fg: '#ddd6fe', border: '#8b5cf6' },
+};
+const DEFAULT_BLOCK = { bg: '#334155', fg: '#94a3b8', border: '#64748b' };
+function getBlockColors(sa?: string) { return (sa && BLOCK_COLORS[sa]) || DEFAULT_BLOCK; }
+
+function inferSubjectArea(lt?: LessonType): SubjectArea | undefined {
+  if (lt === 1) return 'BWL'; if (lt === 2) return 'VWL'; if (lt === 3) return 'IN';
+  return undefined;
+}
+
+/** Group courses by cls+typ. Each group has 1+ courses (1 per day). */
+interface CourseGroup {
+  key: string;      // "27abcd8f-SF"
+  cls: string;
+  typ: string;
+  courses: Course[]; // sorted by day
+  isMultiDay: boolean;
+}
+
+/** Block span within the year */
+interface YearSpan {
+  seq: ManagedSequence;
+  blockIdx: number;
+  label: string;
+  topicMain?: string;
+  subjectArea?: string;
+  startIdx: number;
+  spanLen: number;
+  weeks: string[];
+  courseId: string;    // specific course within group
+  isShared: boolean;   // true if seq covers all courses in group (→ wide bar)
+}
 
 export function ZoomYearView() {
+  const {
+    filter, classFilter, sequences, weekData,
+    setZoomLevel, setEditingSequenceId,
+    setSidePanelOpen, setSidePanelTab, setSelection,
+    searchQuery, setClassFilter, setFilter,
+  } = usePlannerStore();
+
+  const { courses: allCourses, weeks: staticWeeks, s2StartIndex, currentWeek } = usePlannerData();
+
+  // All weeks for the entire year
+  const effectiveWeeks = useMemo(() =>
+    weekData.length > 0 ? weekData : staticWeeks,
+    [weekData, staticWeeks]);
+  const allWeekKeys = useMemo(() => effectiveWeeks.map(w => w.w), [effectiveWeeks]);
+
+  // Filter courses then group by cls+typ
+  const groups = useMemo(() => {
+    let c = [...allCourses];
+    if (filter !== 'ALL') c = c.filter(co => co.typ === filter);
+    if (classFilter) c = c.filter(co => co.cls === classFilter);
+
+    const map = new Map<string, CourseGroup>();
+    for (const course of c) {
+      const key = `${course.cls}-${course.typ}`;
+      if (!map.has(key)) {
+        map.set(key, { key, cls: course.cls, typ: course.typ, courses: [], isMultiDay: false });
+      }
+      map.get(key)!.courses.push(course);
+    }
+    // Sort courses within groups by day, mark multi-day
+    for (const g of map.values()) {
+      const dayOrder: Record<string, number> = { Mo: 0, Di: 1, Mi: 2, Do: 3, Fr: 4 };
+      g.courses.sort((a, b) => (dayOrder[a.day] ?? 9) - (dayOrder[b.day] ?? 9));
+      g.isMultiDay = g.courses.length > 1;
+    }
+    return [...map.values()].sort((a, b) => a.key.localeCompare(b.key));
+  }, [allCourses, filter, classFilter]);
+
+  // Build YearSpans per group
+  const { spanMap, skipSet } = useMemo(() => {
+    const spanMap = new Map<string, YearSpan>();
+    const skipSet = new Set<string>();
+
+    for (const group of groups) {
+      for (const course of group.courses) {
+        const courseSeqs = sequences.filter(s =>
+          s.courseId === course.id || (s.courseIds?.includes(course.id))
+        );
+        for (const seq of courseSeqs) {
+          // Check if this seq is shared across all courses in group
+          const isShared = group.isMultiDay && group.courses.every(gc =>
+            seq.courseId === gc.id || seq.courseIds?.includes(gc.id)
+          );
+
+          for (let bi = 0; bi < seq.blocks.length; bi++) {
+            const block = seq.blocks[bi];
+            const weekIndices: number[] = [];
+            for (const w of block.weeks) {
+              const idx = allWeekKeys.indexOf(w);
+              if (idx >= 0) weekIndices.push(idx);
+            }
+            if (weekIndices.length === 0) continue;
+            weekIndices.sort((a, b) => a - b);
+
+            // Determine subjectArea
+            let area = block.subjectArea || seq.subjectArea;
+            if (!area) {
+              const firstWeek = allWeekKeys[weekIndices[0]];
+              const wd = effectiveWeeks.find(w => w.w === firstWeek);
+              const entry = wd?.lessons[course.col];
+              if (entry) area = inferSubjectArea(entry.type as LessonType);
+            }
+
+            // Group into contiguous runs
+            let runStart = weekIndices[0];
+            let prev = weekIndices[0];
+            const runs: { start: number; end: number }[] = [];
+            for (let i = 1; i < weekIndices.length; i++) {
+              if (weekIndices[i] === prev + 1) { prev = weekIndices[i]; }
+              else { runs.push({ start: runStart, end: prev }); runStart = weekIndices[i]; prev = weekIndices[i]; }
+            }
+            runs.push({ start: runStart, end: prev });
+
+            for (const run of runs) {
+              const spanLen = run.end - run.start + 1;
+              const spanWeeks = allWeekKeys.slice(run.start, run.end + 1);
+              // For shared seqs, only create span for first course in group to avoid duplicates
+              const spanCourseId = isShared ? group.courses[0].id : course.id;
+              const spanKey = `${run.start}:${spanCourseId}:${isShared ? 'shared' : course.id}`;
+              if (spanMap.has(spanKey)) continue; // avoid duplicate shared spans
+              spanMap.set(spanKey, {
+                seq, blockIdx: bi, label: block.label, topicMain: block.topicMain,
+                subjectArea: area, startIdx: run.start, spanLen, weeks: spanWeeks,
+                courseId: spanCourseId, isShared,
+              });
+              for (let r = run.start + 1; r <= run.end; r++) {
+                skipSet.add(`${r}:${spanCourseId}:${isShared ? 'shared' : course.id}`);
+              }
+            }
+          }
+        }
+      }
+    }
+    return { spanMap, skipSet };
+  }, [groups, sequences, allWeekKeys, effectiveWeeks]);
+
+  const searchLower = searchQuery.toLowerCase();
+
+  // Click handlers
+  const handleBlockClick = useCallback((span: YearSpan) => {
+    setEditingSequenceId(`${span.seq.id}-${span.blockIdx}`);
+    setSidePanelOpen(true);
+    setSidePanelTab('sequences');
+  }, [setEditingSequenceId, setSidePanelOpen, setSidePanelTab]);
+
+  const handleBlockDblClick = useCallback((weekW: string, course: Course, span: YearSpan) => {
+    setZoomLevel(3);
+    setSelection({ week: weekW, courseId: course.id, title: span.label, course });
+    setTimeout(() => {
+      document.querySelector(`tr[data-week="${weekW}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 100);
+  }, [setZoomLevel, setSelection]);
+
+  const handleEmptyClick = useCallback((weekW: string, course: Course) => {
+    setZoomLevel(3);
+    setSelection({ week: weekW, courseId: course.id, title: '', course });
+  }, [setZoomLevel, setSelection]);
+
+  // Semester break line index
+  const s2Idx = s2StartIndex;
+
   return (
-    <div className="p-4 text-gray-500 text-sm">
-      Jahresansicht — in Entwicklung
+    <div className="px-1 py-1">
+      <table className="border-collapse w-max min-w-full">
+        <thead className="sticky z-40" style={{ top: 0 }}>
+          {/* Group header row */}
+          <tr>
+            <th className="w-10 bg-gray-900 sticky left-0 z-50 py-0.5 border-b border-gray-800">
+              <span className="text-[8px] font-bold text-gray-400">Jahr</span>
+            </th>
+            {groups.map((g) => {
+              const badge = (TYPE_BADGES as Record<string, { bg: string; fg: string }>)[g.typ];
+              const totalW = g.isMultiDay ? g.courses.length * SUBDAY_W : GROUP_W;
+              return (
+                <th key={g.key} colSpan={g.isMultiDay ? g.courses.length : 1}
+                  className="bg-gray-900 px-0.5 pb-0.5 border-b-2 border-gray-700 text-center"
+                  style={{ width: totalW, minWidth: totalW }}>
+                  <div className={`text-[9px] font-bold cursor-pointer transition-colors ${
+                    classFilter === g.cls ? 'text-blue-400' : 'text-gray-200 hover:text-blue-300'
+                  }`} onClick={() => setClassFilter(classFilter === g.cls ? null : g.cls)}>
+                    {g.cls}
+                  </div>
+                  <div className="flex gap-0.5 justify-center mt-0.5">
+                    <span className="text-[7px] px-1 rounded font-bold cursor-pointer hover:opacity-80"
+                      style={{ background: badge?.bg, color: badge?.fg }}
+                      onClick={() => setFilter(g.typ as any)}>{g.typ}</span>
+                  </div>
+                  {g.isMultiDay && (
+                    <div className="flex justify-center gap-0 mt-0.5">
+                      {g.courses.map(c => (
+                        <span key={c.id} className="text-[7px] px-1 text-gray-500" style={{ color: DAY_COLORS[c.day] }}>
+                          {c.day}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </th>
+              );
+            })}
+          </tr>
+        </thead>
+        <tbody>
+          {allWeekKeys.map((weekW, weekIdx) => {
+            const past = isPastWeek(weekW, currentWeek);
+            const isCurrent = weekW === currentWeek;
+            const isSemBreak = weekIdx === s2Idx;
+
+            // Full-week holiday check
+            const weekEntry = effectiveWeeks.find(w => w.w === weekW);
+            const allEntries = weekEntry ? Object.values(weekEntry.lessons) : [];
+            const isHolidayWeek = allEntries.length > 0 && allEntries.every(e => (e as any).type === 6);
+            const holidayLabel = isHolidayWeek ? (allEntries[0] as any)?.title : null;
+
+            return (
+              <tr key={weekW} data-week={weekW}
+                style={{
+                  opacity: past && !isCurrent ? 0.5 : 1,
+                  height: isHolidayWeek ? HOLIDAY_ROW_H : ROW_H,
+                  borderTop: isSemBreak ? '3px solid #f59e0b50' : undefined,
+                }}>
+                <td className={`bg-gray-900 sticky left-0 z-10 text-center border-b py-0 px-0.5 ${
+                  isCurrent ? 'border-amber-500 bg-amber-950/30' : 'border-slate-800/50'
+                }`}>
+                  <span className={`text-[8px] font-mono font-bold ${isCurrent ? 'text-amber-400' : 'text-gray-500'}`}>
+                    {weekW}
+                  </span>
+                </td>
+
+                {isHolidayWeek ? (
+                  <td colSpan={groups.reduce((sum, g) => sum + (g.isMultiDay ? g.courses.length : 1), 0)}
+                    className="border-b border-slate-800/30 text-center py-0" style={{ background: '#ffffff06' }}>
+                    <span className="text-[7px] text-gray-600 italic">{holidayLabel || 'Ferien'}</span>
+                  </td>
+                ) : (
+                  groups.map((group) => {
+                    if (group.isMultiDay) {
+                      // Render sub-columns per day
+                      // Check for shared span first
+                      const sharedKey = `${weekIdx}:${group.courses[0].id}:shared`;
+                      const sharedSpan = spanMap.get(sharedKey);
+                      const sharedSkip = skipSet.has(sharedKey);
+
+                      if (sharedSkip) return null; // covered by rowSpan above
+
+                      if (sharedSpan) {
+                        // Wide bar spanning all sub-columns
+                        const colors = getBlockColors(sharedSpan.subjectArea);
+                        const spanHeight = sharedSpan.spanLen * ROW_H;
+                        const displayLabel = sharedSpan.topicMain || sharedSpan.label;
+                        const blockSearchMatch = searchLower.length >= 2 && (
+                          sharedSpan.label.toLowerCase().includes(searchLower) ||
+                          (sharedSpan.topicMain || '').toLowerCase().includes(searchLower) ||
+                          sharedSpan.seq.title.toLowerCase().includes(searchLower)
+                        );
+                        return (
+                          <td key={group.key} colSpan={group.courses.length}
+                            rowSpan={sharedSpan.spanLen} className="p-0"
+                            style={{ height: spanHeight, opacity: searchLower.length >= 2 && !blockSearchMatch ? 0.15 : 1 }}>
+                            <div className={`h-full px-2 py-1 flex flex-col justify-center cursor-pointer transition-all hover:brightness-110 rounded-sm ${blockSearchMatch ? 'ring-1 ring-amber-400' : ''}`}
+                              style={{ background: colors.bg, borderLeft: `4px solid ${colors.border}`, minHeight: spanHeight - 2 }}
+                              title={`${sharedSpan.seq.title} → ${displayLabel}\n${sharedSpan.spanLen}W\nKlick: Sequenz · Doppelklick: Wochenansicht`}
+                              onClick={() => handleBlockClick(sharedSpan)}
+                              onDoubleClick={() => handleBlockDblClick(sharedSpan.weeks[0], group.courses[0], sharedSpan)}>
+                              <span className="text-[10px] font-bold leading-tight" style={{ color: colors.fg, display: '-webkit-box', WebkitLineClamp: sharedSpan.spanLen >= 3 ? 3 : 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                                {displayLabel}
+                              </span>
+                              {sharedSpan.spanLen >= 2 && (
+                                <span className="text-[8px] mt-0.5 font-medium" style={{ color: colors.fg, opacity: 0.7 }}>{sharedSpan.spanLen}W</span>
+                              )}
+                            </div>
+                          </td>
+                        );
+                      }
+
+                      // Separate sub-columns per day
+                      return group.courses.map((course) => {
+                        const daySpanKey = `${weekIdx}:${course.id}:${course.id}`;
+                        const daySkip = skipSet.has(daySpanKey);
+                        if (daySkip) return null;
+
+                        const daySpan = spanMap.get(daySpanKey);
+                        if (!daySpan) {
+                          return (
+                            <td key={course.id} className="border-b border-slate-800/20 p-0 cursor-pointer hover:bg-slate-800/30"
+                              style={{ width: SUBDAY_W, minWidth: SUBDAY_W, maxWidth: SUBDAY_W }}
+                              onClick={() => handleEmptyClick(weekW, course)} />
+                          );
+                        }
+
+                        const colors = getBlockColors(daySpan.subjectArea);
+                        const spanHeight = daySpan.spanLen * ROW_H;
+                        const displayLabel = daySpan.topicMain || daySpan.label;
+                        const blockSearchMatch = searchLower.length >= 2 && (
+                          daySpan.label.toLowerCase().includes(searchLower) ||
+                          (daySpan.topicMain || '').toLowerCase().includes(searchLower) ||
+                          daySpan.seq.title.toLowerCase().includes(searchLower)
+                        );
+                        return (
+                          <td key={course.id} rowSpan={daySpan.spanLen} className="p-0"
+                            style={{ width: SUBDAY_W, minWidth: SUBDAY_W, maxWidth: SUBDAY_W, height: spanHeight, opacity: searchLower.length >= 2 && !blockSearchMatch ? 0.15 : 1 }}>
+                            <div className={`h-full px-1 py-0.5 flex flex-col justify-center cursor-pointer transition-all hover:brightness-110 rounded-sm ${blockSearchMatch ? 'ring-1 ring-amber-400' : ''}`}
+                              style={{ background: colors.bg, borderLeft: `3px solid ${colors.border}`, minHeight: spanHeight - 2 }}
+                              title={`${daySpan.seq.title} → ${displayLabel} (${course.day})\n${daySpan.spanLen}W`}
+                              onClick={() => handleBlockClick(daySpan)}
+                              onDoubleClick={() => handleBlockDblClick(daySpan.weeks[0], course, daySpan)}>
+                              <span className="text-[8px] font-bold leading-tight" style={{ color: colors.fg, display: '-webkit-box', WebkitLineClamp: daySpan.spanLen >= 3 ? 2 : 1, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                                {displayLabel}
+                              </span>
+                            </div>
+                          </td>
+                        );
+                      });
+                    } else {
+                      // Single-day course group
+                      const course = group.courses[0];
+                      // Try to find a span starting here
+                      const spanKey = `${weekIdx}:${course.id}:${course.id}`;
+                      const skip = skipSet.has(spanKey);
+                      if (skip) return null;
+
+                      const span = spanMap.get(spanKey);
+                      if (!span) {
+                        return (
+                          <td key={group.key} className="border-b border-slate-800/20 p-0 cursor-pointer hover:bg-slate-800/30"
+                            style={{ width: GROUP_W, minWidth: GROUP_W, maxWidth: GROUP_W }}
+                            onClick={() => handleEmptyClick(weekW, course)} />
+                        );
+                      }
+
+                      const colors = getBlockColors(span.subjectArea);
+                      const spanHeight = span.spanLen * ROW_H;
+                      const displayLabel = span.topicMain || span.label;
+                      const blockSearchMatch = searchLower.length >= 2 && (
+                        span.label.toLowerCase().includes(searchLower) ||
+                        (span.topicMain || '').toLowerCase().includes(searchLower) ||
+                        span.seq.title.toLowerCase().includes(searchLower)
+                      );
+                      return (
+                        <td key={group.key} rowSpan={span.spanLen} className="p-0"
+                          style={{ width: GROUP_W, minWidth: GROUP_W, maxWidth: GROUP_W, height: spanHeight, opacity: searchLower.length >= 2 && !blockSearchMatch ? 0.15 : 1 }}>
+                          <div className={`h-full px-2 py-1 flex flex-col justify-center cursor-pointer transition-all hover:brightness-110 rounded-sm ${blockSearchMatch ? 'ring-1 ring-amber-400' : ''}`}
+                            style={{ background: colors.bg, borderLeft: `4px solid ${colors.border}`, minHeight: spanHeight - 2 }}
+                            title={`${span.seq.title} → ${displayLabel}\n${span.spanLen}W\nKlick: Sequenz · Doppelklick: Wochenansicht`}
+                            onClick={() => handleBlockClick(span)}
+                            onDoubleClick={() => handleBlockDblClick(span.weeks[0], course, span)}>
+                            <span className="text-[10px] font-bold leading-tight" style={{ color: colors.fg, display: '-webkit-box', WebkitLineClamp: span.spanLen >= 3 ? 3 : 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                              {displayLabel}
+                            </span>
+                            {span.spanLen >= 2 && (
+                              <span className="text-[8px] mt-0.5 font-medium" style={{ color: colors.fg, opacity: 0.7 }}>{span.spanLen}W</span>
+                            )}
+                          </div>
+                        </td>
+                      );
+                    }
+                  })
+                )}
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
     </div>
   );
 }
