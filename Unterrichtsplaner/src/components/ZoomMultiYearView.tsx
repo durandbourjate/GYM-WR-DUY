@@ -3,8 +3,25 @@ import { usePlannerStore } from '../store/plannerStore';
 import { usePlannerData } from '../hooks/usePlannerData';
 import { COURSES } from '../data/courses';
 import { CURRICULUM_GOALS, type CurriculumGoal } from '../data/curriculumGoals';
-import { WR_CATEGORIES } from '../data/categories';
+import { WR_CATEGORIES, type CategoryDefinition } from '../data/categories';
 import type { SubjectArea, ManagedSequence } from '../types';
+
+/** Build a zero-initialized Record from category keys */
+function emptyCountRecord(cats: CategoryDefinition[]): Record<string, number> {
+  const r: Record<string, number> = {};
+  for (const c of cats) r[c.key] = 0;
+  return r;
+}
+function emptyArrayRecord(cats: CategoryDefinition[]): Record<string, string[]> {
+  const r: Record<string, string[]> = {};
+  for (const c of cats) r[c.key] = [];
+  return r;
+}
+function emptyGoalRecord(cats: CategoryDefinition[]): Record<string, CurriculumGoal[]> {
+  const r: Record<string, CurriculumGoal[]> = {};
+  for (const c of cats) r[c.key] = [];
+  return r;
+}
 
 /**
  * Zoom Level 1: Multi-Year View
@@ -101,7 +118,7 @@ function SemesterCard({ sv, expanded, onToggle }: {
   
   // Group goals by area
   const goalsByArea = useMemo(() => {
-    const grouped: Record<SubjectArea, CurriculumGoal[]> = { BWL: [], VWL: [], RECHT: [], IN: [], INTERDISZ: [] };
+    const grouped = emptyGoalRecord(WR_CATEGORIES) as Record<SubjectArea, CurriculumGoal[]>;
     for (const g of goals) grouped[g.area].push(g);
     return grouped;
   }, [goals]);
@@ -169,8 +186,8 @@ function ActualDataCard({ semester, gymYear }: { semester: string; gymYear: stri
 
   // Count actual planned lessons by subject area from sequences (filtered by semester weeks + courses)
   const stats = useMemo(() => {
-    const counts: Record<SubjectArea, number> = { BWL: 0, VWL: 0, RECHT: 0, IN: 0, INTERDISZ: 0 };
-    const topics: Record<SubjectArea, string[]> = { BWL: [], VWL: [], RECHT: [], IN: [], INTERDISZ: [] };
+    const counts = emptyCountRecord(WR_CATEGORIES) as Record<SubjectArea, number>;
+    const topics = emptyArrayRecord(WR_CATEGORIES) as Record<SubjectArea, string[]>;
     
     for (const seq of sequences) {
       // Check if sequence belongs to this class group
@@ -254,7 +271,7 @@ function ClassViewCard({ group, sequences }: { group: typeof SF_GROUPS[0]; seque
 
   // Count weeks by subject area
   const stats = useMemo(() => {
-    const counts: Record<SubjectArea, number> = { BWL: 0, VWL: 0, RECHT: 0, IN: 0, INTERDISZ: 0 };
+    const counts = emptyCountRecord(WR_CATEGORIES) as Record<SubjectArea, number>;
     const blocks: { area: SubjectArea; label: string; weeks: number; topicMain?: string }[] = [];
     for (const seq of classSequences) {
       for (const block of seq.blocks) {

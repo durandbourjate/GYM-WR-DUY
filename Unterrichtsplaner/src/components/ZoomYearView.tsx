@@ -109,7 +109,7 @@ export function ZoomYearView() {
               const firstWeek = allWeekKeys[weekIndices[0]];
               const wd = effectiveWeeks.find(w => w.w === firstWeek);
               const entry = wd?.lessons[course.col];
-              if (entry) area = inferSubjectAreaFromLessonType(entry.type as LessonType);
+              if (entry) area = inferSubjectAreaFromLessonType(entry.type as LessonType) as SubjectArea | undefined;
             }
 
             // Group into contiguous runs
@@ -168,7 +168,7 @@ export function ZoomYearView() {
           if (entry.type === 5 || entry.type === 6) continue;
           // This week has a lesson but no sequence → loose lesson
           const detail = lessonDetails[`${weekW}-${course.col}`];
-          const area = detail?.subjectArea || inferSubjectAreaFromLessonType(entry.type as LessonType);
+          const area = (detail?.subjectArea || inferSubjectAreaFromLessonType(entry.type as LessonType)) as SubjectArea | undefined;
           const looseKey = `${wi}:${course.id}:loose`;
           if (spanMap.has(looseKey)) continue;
           // Create a dummy seq for type compatibility

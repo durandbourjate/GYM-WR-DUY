@@ -118,7 +118,7 @@ export function ZoomBlockView({ semester }: Props) {
             const firstWeek = semWeeks[weekIndices[0]];
             const wd = effectiveWeeks.find(w => w.w === firstWeek);
             const entry = wd?.lessons[course.col];
-            if (entry) area = inferSubjectAreaFromLessonType(entry.type as LessonType);
+            if (entry) area = inferSubjectAreaFromLessonType(entry.type as LessonType) as SubjectArea | undefined;
           }
 
           for (const run of runs) {

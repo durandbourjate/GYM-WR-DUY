@@ -1,5 +1,3 @@
-import type { SubjectArea } from '../types';
-
 /**
  * Category definition — the single source of truth for subject area metadata.
  * Used by all components that need category labels, colors, or keys.
@@ -58,7 +56,7 @@ export function subjectConfigsToCategories(
 /**
  * Generate bg/fg/border from a primary hex color.
  */
-function generateColorVariants(hex: string): { bg: string; fg: string; border: string } {
+export function generateColorVariants(hex: string): { bg: string; fg: string; border: string } {
   const r = parseInt(hex.slice(1, 3), 16);
   const g = parseInt(hex.slice(3, 5), 16);
   const b = parseInt(hex.slice(5, 7), 16);

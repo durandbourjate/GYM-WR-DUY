@@ -3,7 +3,6 @@ import { usePlannerStore } from '../store/plannerStore';
 import { usePlannerData } from '../hooks/usePlannerData';
 import { SUBJECT_AREA_COLORS } from '../utils/colors';
 import { computeSeqSolTotal } from '../utils/solTotal';
-import { getCategoryColors, type CategoryDefinition } from '../data/categories';
 import type { Course, SubjectArea, SequenceBlock } from '../types';
 
 

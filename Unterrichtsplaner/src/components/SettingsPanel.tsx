@@ -6,7 +6,9 @@ import {
   importCurrentCourses, importCurrentHolidays, importCurrentSpecialWeeks,
   applySettingsToWeekData,
   type PlannerSettings, type CourseConfig, type SpecialWeekConfig, type HolidayConfig,
+  type SubjectConfig,
 } from '../store/settingsStore';
+import { WR_CATEGORIES, generateColorVariants } from '../data/categories';
 
 const DAYS: DayOfWeek[] = ['Mo', 'Di', 'Mi', 'Do', 'Fr'];
 const COURSE_TYPES: { key: CourseType; label: string }[] = [
@@ -46,6 +48,86 @@ function SmallSelect<T extends string>({ value, onChange, options }: {
       className="bg-slate-700 text-slate-200 border border-slate-600 rounded px-1 py-0.5 text-[9px] outline-none focus:border-blue-400 cursor-pointer">
       {options.map(o => <option key={o.key} value={o.key}>{o.label}</option>)}
     </select>
+  );
+}
+
+// === Subjects / Categories Editor ===
+function SubjectsEditor({ subjects, onChange }: { subjects: SubjectConfig[]; onChange: (s: SubjectConfig[]) => void }) {
+  const [editingId, setEditingId] = useState<string | null>(null);
+
+  const addSubject = () => {
+    const newSubj: SubjectConfig = {
+      id: generateId(), label: '', shortLabel: '', color: '#64748b', courseType: 'SF',
+    };
+    onChange([...subjects, newSubj]);
+    setEditingId(newSubj.id);
+  };
+
+  const update = (id: string, patch: Partial<SubjectConfig>) => {
+    onChange(subjects.map(s => s.id === id ? { ...s, ...patch } : s));
+  };
+
+  const remove = (id: string) => {
+    if (confirm('Fachbereich wirklich entfernen? Bestehende Zuordnungen bleiben erhalten, werden aber nicht mehr farbig angezeigt.')) {
+      onChange(subjects.filter(s => s.id !== id));
+      if (editingId === id) setEditingId(null);
+    }
+  };
+
+  const loadWRDefaults = () => {
+    const wrSubjects: SubjectConfig[] = WR_CATEGORIES
+      .filter(c => c.key !== 'INTERDISZ')
+      .map(c => ({ id: c.key.toLowerCase(), label: c.label, shortLabel: c.shortLabel, color: c.color, courseType: 'SF' as CourseType }));
+    onChange(wrSubjects);
+  };
+
+  return (
+    <div className="space-y-2">
+      <p className="text-[8px] text-gray-400">Fachbereiche definieren die Farben und Kategorien für die Unterrichtsplanung. INTERDISZ wird automatisch ergänzt.</p>
+      {subjects.length === 0 && (
+        <button onClick={loadWRDefaults}
+          className="w-full py-1.5 rounded text-[9px] font-medium bg-blue-900/30 border border-blue-500/30 text-blue-300 hover:bg-blue-900/50 cursor-pointer transition-all">
+          📋 W&R-Standard laden (BWL, VWL, Recht, IN)
+        </button>
+      )}
+      {subjects.map(s => (
+        <div key={s.id}>
+          {editingId === s.id ? (
+            <div className="bg-slate-800 rounded p-2 space-y-1.5">
+              <div className="flex gap-1 items-center">
+                <input type="color" value={s.color} onChange={(e) => update(s.id, { color: e.target.value })}
+                  className="w-6 h-6 rounded cursor-pointer border-0 bg-transparent" />
+                <SmallInput value={s.label} onChange={(v) => update(s.id, { label: v })} placeholder="Name (z.B. Mathematik)" className="flex-1" />
+                <SmallInput value={s.shortLabel} onChange={(v) => update(s.id, { shortLabel: v })} placeholder="Kürzel" className="w-12" />
+              </div>
+              <div className="flex gap-1 items-center">
+                <span className="text-[7px] text-gray-400">Vorschau:</span>
+                {(() => { const cv = generateColorVariants(s.color); return (
+                  <span className="text-[8px] px-1.5 py-0.5 rounded font-semibold" style={{ background: cv.bg, color: cv.fg, border: `1px solid ${cv.border}` }}>
+                    {s.shortLabel || s.label || '?'}
+                  </span>
+                ); })()}
+              </div>
+              <div className="flex gap-1 mt-1">
+                <button onClick={() => setEditingId(null)} className="text-[8px] text-blue-400 cursor-pointer">✓ Fertig</button>
+                <button onClick={() => remove(s.id)} className="text-[8px] text-red-400 cursor-pointer ml-auto">Entfernen</button>
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2 text-[9px] text-gray-400 hover:text-gray-200 cursor-pointer group px-1 py-0.5"
+              onClick={() => setEditingId(s.id)}>
+              <div className="w-3 h-3 rounded-sm shrink-0" style={{ background: s.color }} />
+              <span className="font-medium text-gray-300">{s.label || '(unbenennt)'}</span>
+              <span className="text-gray-500">{s.shortLabel}</span>
+            </div>
+          )}
+        </div>
+      ))}
+      <button onClick={addSubject}
+        className="w-full py-1 rounded border border-dashed border-gray-600 text-gray-400 hover:text-gray-300 hover:border-gray-400 text-[9px] cursor-pointer transition-all">
+        + Fachbereich hinzufügen
+      </button>
+    </div>
   );
 }
 
@@ -398,6 +480,11 @@ export function SettingsPanel() {
             }} placeholder="45" className="w-16" type="number" />
           </div>
         </div>
+      </Section>
+
+      {/* Subjects / Categories */}
+      <Section title={`🎨 Fachbereiche (${settings.subjects.length})`}>
+        <SubjectsEditor subjects={settings.subjects} onChange={(s) => updateSettings({ subjects: s })} />
       </Section>
 
       {/* Courses */}

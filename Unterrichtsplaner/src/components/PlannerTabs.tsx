@@ -3,9 +3,10 @@
  */
 import { useState, useRef } from 'react';
 import { useInstanceStore, instanceStorageKey, generateWeekIds } from '../store/instanceStore';
-import { usePlannerStore, saveToInstance } from '../store/plannerStore';
+import { saveToInstance } from '../store/plannerStore';
 import { SCHOOL_YEAR_PRESETS, getPresetForYear } from '../data/holidayPresets';
 import { generateId, configToCourses, type HolidayConfig, type PlannerSettings, getDefaultSettings, applySettingsToWeekData } from '../store/settingsStore';
+import type { LessonType } from '../types';
 
 interface Props {
   onImport: (json: string) => void;
@@ -97,9 +98,9 @@ export function PlannerTabs({ onImport }: Props) {
       );
       // Build initial weekData with proper columns from courses
       const courses = initialSettings.courses.length > 0 ? configToCourses(initialSettings.courses) : [];
-      const emptyLessons: Record<number, { type: number; text: string }> = {};
+      const emptyLessons: Record<number, { type: LessonType; title: string }> = {};
       for (const c of courses) {
-        emptyLessons[c.col] = { type: 0, text: '' };
+        emptyLessons[c.col] = { type: 0 as LessonType, title: '' };
       }
       let initWeekData = weekIds.map(w => ({ w, lessons: { ...emptyLessons } }));
 

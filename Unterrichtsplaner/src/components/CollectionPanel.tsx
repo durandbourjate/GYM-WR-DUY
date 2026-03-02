@@ -309,7 +309,7 @@ export function CollectionPanel() {
             Alle FB
           </button>
           {categories.map((sa) => (
-            <button key={sa.key} onClick={() => setFilterSA(filterSA === sa.key ? 'ALL' : sa.key)}
+            <button key={sa.key} onClick={() => setFilterSA(filterSA === sa.key ? 'ALL' : sa.key as SubjectArea)}
               className={`px-1.5 py-0.5 rounded text-[8px] border cursor-pointer ${filterSA === sa.key ? 'bg-opacity-20 border-current' : 'border-gray-700'}`}
               style={{ color: filterSA === sa.key ? sa.color : '#6b7280', borderColor: filterSA === sa.key ? sa.color : undefined }}>
               {sa.label}

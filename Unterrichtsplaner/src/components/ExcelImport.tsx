@@ -3,6 +3,9 @@ import { usePlannerStore } from '../store/plannerStore';
 import { COURSES } from '../data/courses';
 import { WEEKS } from '../data/weeks';
 import * as XLSX from 'xlsx';
+
+// Legacy type labels for Excel import preview (indices match lessonType values)
+const TYPE_LABELS = ['Andere', 'BWL', 'Recht/VWL', 'IN', 'Prüfung', 'Event', 'Ferien'];
 import type { LessonType, LessonEntry } from '../types';
 
 const WEEK_ORDER = WEEKS.map(w => w.w);
@@ -320,13 +323,12 @@ export function ExcelImport({ onClose }: { onClose: () => void }) {
                   <tbody>
                     {preview.slice(0, 100).map((p, i) => {
                       const course = COURSES.find(c => c.col === p.col);
-                      const typeLabels = ['Andere', 'BWL', 'Recht/VWL', 'IN', 'Prüfung', 'Event', 'Ferien'];
                       return (
                         <tr key={i} className={`border-b border-slate-700/30 ${p.isNew ? '' : 'text-amber-400'}`}>
                           <td className="px-1 py-0.5 text-gray-400">{p.weekW}</td>
                           <td className="px-1 py-0.5 text-gray-400">{course?.cls || `col${p.col}`}</td>
                           <td className="px-1 py-0.5 text-gray-200 truncate max-w-[200px]">{p.title}</td>
-                          <td className="px-1 py-0.5 text-gray-500">{typeLabels[p.type]}</td>
+                          <td className="px-1 py-0.5 text-gray-500">{TYPE_LABELS[p.type] || `Typ ${p.type}`}</td>
                           <td className="px-1 py-0.5">{p.isNew ? '🆕' : '♻️'}</td>
                         </tr>
                       );

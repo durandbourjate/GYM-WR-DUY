@@ -7,7 +7,7 @@ import { SequencePanel } from './SequencePanel';
 import { SettingsPanel } from './SettingsPanel';
 import { CollectionPanel } from './CollectionPanel';
 import { suggestGoals, suggestSubjectArea } from '../utils/autoSuggest';
-import { type CategoryDefinition } from '../data/categories';
+import { inferSubjectAreaFromLessonType } from '../data/categories';
 import type { SubjectArea, BlockCategory, LessonDetail, SolDetails, Course } from '../types';
 
 // SUBJECT_AREAS is now provided via usePlannerData().categories — no local constant needed
@@ -612,10 +612,9 @@ function DetailsTab() {
   // Auto-detect subjectArea from LessonType (unambiguous types only)
   useEffect(() => {
     if (!selection || !c || detail.subjectArea || !currentLesson) return;
-    // Only auto-set for unambiguous types: 1=BWL, 3=IN
+    // Only auto-set for unambiguous types (from categories.ts mapping)
     // Type 2 (Recht/VWL) is ambiguous → handled by topic-based detection below
-    const autoMap: Record<number, SubjectArea> = { 1: 'BWL', 3: 'IN' };
-    const detected = autoMap[currentLesson.type];
+    const detected = inferSubjectAreaFromLessonType(currentLesson.type) as SubjectArea | undefined;
     if (detected) updateLessonDetail(selection.week, c.col, { subjectArea: detected });
   }, [selection?.week, c?.col, currentLesson?.type, detail.subjectArea]);
 
@@ -736,7 +735,7 @@ function DetailsTab() {
             )}
           </label>
           <PillSelect options={categories.map(s => s.key)} value={detail.subjectArea}
-            onChange={(v) => updateField('subjectArea', v)}
+            onChange={(v) => updateField('subjectArea', v as SubjectArea)}
             renderOption={(v) => { const s = categories.find(x => x.key === v)!; return { label: s.label, color: s.color }; }} />
           {subjectAreaMismatch && (
             <div className="mt-1 flex items-center gap-1 text-[8px]">
