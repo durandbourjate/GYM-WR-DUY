@@ -1,7 +1,7 @@
-# Unterrichtsplaner – Handoff v3.70
+# Unterrichtsplaner – Handoff v3.71
 
-## Status: ✅ Deployed (v3.70)
-- **Commit:** (pending — Versionsnummer-Fix in Toolbar)
+## Status: ✅ Deployed (v3.71)
+- **Commit:** d96365e
 - **Datum:** 2026-03-02
 - **Deploy:** https://durandbourjate.github.io/GYM-WR-DUY/Unterrichtsplaner/
 
@@ -46,6 +46,8 @@
 ## Architektur
 
 - **Stack:** React + TypeScript + Vite + Zustand + PWA
+- **Build & Deploy:** `./deploy.sh` baut die App und kopiert Build-Output (assets/, index.html, sw.js etc.) in den Repo-Root. GitHub Pages serviert direkt aus `main`. `dist/` ist in .gitignore — nur die kopierten Dateien werden committet. Für lokale Entwicklung: `npm run dev` (nutzt `src/index.dev.html` als Vite-Entry).
+- **Wiki:** `wiki.html` (Standalone-HTML, kein Build nötig). Erreichbar über 📖-Button in der Toolbar.
 - **Store:** `plannerStore.ts` (~1247 Z.), `settingsStore.ts` (~256 Z.), `instanceStore.ts` (~204 Z.)
 - **Hook:** `usePlannerData.ts` — liest Kurse/Wochen reaktiv aus `plannerStore.plannerSettings` (pro Instanz) → Fallback auf globale Settings → Fallback auf hardcoded WEEKS/COURSES. Gibt `isLegacy`-Flag zurück.
 - **Multi-Planer:** `instanceStore.ts` verwaltet Planer-Instanzen (Tabs). Jeder Planer hat eigenen localStorage-Slot (`planner-data-{id}`) inkl. `plannerSettings`. `plannerStore.ts` speichert/lädt Daten pro Instanz via `switchInstance()`.
@@ -95,3 +97,4 @@
 - v3.68: Batch→Sequenz — Fachbereich übertragen, floating Toolbar
 - v3.69: Sammlung im Detail-Tab — Speichern/Laden einzelner UE
 - v3.70: Sequenz-Felder — Erklärtexte und Feld-Hierarchie
+- v3.71: Wiki-Anleitung (wiki.html), Build-Pipeline (deploy.sh, dist/ ignoriert), 📖-Button in Toolbar
