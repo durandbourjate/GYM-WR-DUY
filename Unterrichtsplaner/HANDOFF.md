@@ -1,9 +1,19 @@
 # Unterrichtsplaner – Handoff v3.28
 
 ## Status: ✅ Deployed (v3.47)
-- **Commit:** 27c34dc
+- **Commit:** f870e07
 - **Datum:** 2026-03-02
 - **Deploy:** https://durandbourjate.github.io/GYM-WR-DUY/Unterrichtsplaner/
+
+## Nächster Schritt (in neuem Chat fortsetzen)
+
+**UX-Fix: "Neuer Block" Default-Label umbenennen.** Beim Erstellen einer neuen Sequenz erhält der erste Block das Label `'Neuer Block'` — das ist nichtssagend. Betroffene Stellen (4×):
+- `Toolbar.tsx:440` — Kontextmenü "Sequenz erstellen"
+- `WeekRows.tsx:234` — Drag-Erstellung
+- `DetailPanel.tsx:432` — "Zu Sequenz hinzufügen"-Button
+- `DetailPanel.tsx:896` — Batch-Edit Sequenz-Erstellung
+
+`block.label` wird als Titel in FlatBlockCard angezeigt (`SequencePanel.tsx:181`) und im Confirm-Dialog (`SequencePanel.tsx:390`). Vorschlag: Kurs-Kürzel als Default (z.B. `course.cls + ' ' + course.typ`) oder leerer String mit Placeholder.
 
 ## Architektur
 - **Stack:** React + TypeScript + Vite + Zustand + PWA

@@ -2,10 +2,10 @@
  * PlannerTabs — Tab bar for switching between planner instances
  */
 import { useState, useRef } from 'react';
-import { useInstanceStore, instanceStorageKey } from '../store/instanceStore';
+import { useInstanceStore, instanceStorageKey, generateWeekIds } from '../store/instanceStore';
 import { usePlannerStore, saveToInstance } from '../store/plannerStore';
 import { SCHOOL_YEAR_PRESETS, getPresetForYear } from '../data/holidayPresets';
-import { generateId, type HolidayConfig, type PlannerSettings, getDefaultSettings } from '../store/settingsStore';
+import { generateId, configToCourses, type HolidayConfig, type PlannerSettings, getDefaultSettings, applySettingsToWeekData } from '../store/settingsStore';
 
 interface Props {
   onImport: (json: string) => void;
@@ -90,8 +90,33 @@ export function PlannerTabs({ onImport }: Props) {
 
       // Pre-seed the new instance's localStorage BEFORE switchInstance runs,
       // so loadFromInstance() picks up settings immediately (no setTimeout race).
+      // Also generate initial weekData so Zoom 3 works immediately.
+      const weekIds = generateWeekIds(
+        preset?.startWeek ?? 33, startYear,
+        preset?.endWeek ?? endWeek, endYear
+      );
+      // Build initial weekData with proper columns from courses
+      const courses = initialSettings.courses.length > 0 ? configToCourses(initialSettings.courses) : [];
+      const emptyLessons: Record<number, { type: number; text: string }> = {};
+      for (const c of courses) {
+        emptyLessons[c.col] = { type: 0, text: '' };
+      }
+      let initWeekData = weekIds.map(w => ({ w, lessons: { ...emptyLessons } }));
+
+      // Auto-apply holidays & special weeks to the initial weekData
+      if (initialSettings.holidays.length > 0 || initialSettings.specialWeeks.length > 0) {
+        const applied = applySettingsToWeekData(initWeekData, initialSettings);
+        initWeekData = applied.weekData;
+      }
+
       localStorage.setItem(instanceStorageKey(newId), JSON.stringify({
-        state: { plannerSettings: initialSettings },
+        state: {
+          plannerSettings: initialSettings,
+          weekData: initWeekData,
+          sequences: [],
+          lessonDetails: {},
+          collection: [],
+        },
       }));
     }
 

@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import type { CourseType, DayOfWeek, Semester } from '../types';
 import { usePlannerStore } from '../store/plannerStore';
 import {
@@ -73,19 +73,28 @@ function CourseEditor({ courses, onChange }: { courses: CourseConfig[]; onChange
     }
   };
 
-  // Group by class+type
-  const grouped = courses.reduce<Record<string, CourseConfig[]>>((acc, c) => {
-    const key = `${c.cls}|${c.typ}`;
-    (acc[key] = acc[key] || []).push(c);
-    return acc;
-  }, {});
+  // Group by class+type — use stable ID-based group keys to prevent focus loss on edit
+  const grouped = useMemo(() => {
+    const groups: { key: string; stableKey: string; courses: CourseConfig[] }[] = [];
+    const seen = new Map<string, number>();
+    for (const c of courses) {
+      const groupLabel = `${c.cls}|${c.typ}`;
+      if (seen.has(groupLabel)) {
+        groups[seen.get(groupLabel)!].courses.push(c);
+      } else {
+        seen.set(groupLabel, groups.length);
+        groups.push({ key: groupLabel, stableKey: c.id, courses: [c] });
+      }
+    }
+    return groups;
+  }, [courses]);
 
   return (
     <div className="space-y-2">
-      {Object.entries(grouped).map(([key, group]) => (
-        <div key={key} className="border border-slate-700/50 rounded p-2 space-y-1">
+      {grouped.map(({ stableKey, courses: group }) => (
+        <div key={stableKey} className="border border-slate-700/50 rounded p-2 space-y-1">
           <div className="text-[9px] font-semibold text-gray-300">
-            {group[0].cls} <span className="text-blue-400">{group[0].typ}</span>
+            {group[0].cls || '(neu)'} <span className="text-blue-400">{group[0].typ}</span>
           </div>
           {group.map(c => (
             <div key={c.id}>
