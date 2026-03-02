@@ -1,6 +1,7 @@
-import { useRef, useEffect, useMemo } from 'react';
+import { useRef, useEffect, useMemo, useCallback } from 'react';
 import { WEEKS } from './data/weeks';
-import { usePlannerStore } from './store/plannerStore';
+import { usePlannerStore, switchInstance, saveToInstance } from './store/plannerStore';
+import { useInstanceStore } from './store/instanceStore';
 import { usePlannerData } from './hooks/usePlannerData';
 import { loadSettings, applySettingsToWeekData } from './store/settingsStore';
 import { SemesterHeader } from './components/SemesterHeader';
@@ -10,8 +11,61 @@ import { DetailPanel } from './components/DetailPanel';
 import { InsertDialog } from './components/InsertDialog';
 import { ZoomYearView } from './components/ZoomYearView';
 import { ZoomMultiYearView } from './components/ZoomMultiYearView';
+import { PlannerTabs, WelcomeScreen } from './components/PlannerTabs';
 
 function App() {
+  const { instances, activeId, setActive, importInstance } = useInstanceStore();
+  const prevActiveId = useRef<string | null>(null);
+
+  // Handle instance switching
+  useEffect(() => {
+    if (activeId && activeId !== prevActiveId.current) {
+      switchInstance(prevActiveId.current, activeId);
+      prevActiveId.current = activeId;
+    }
+  }, [activeId]);
+
+  // Auto-save on unmount / before unload
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (activeId) saveToInstance(activeId);
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      handleBeforeUnload();
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [activeId]);
+
+  const handleImport = useCallback((json: string) => {
+    importInstance(json);
+  }, [importInstance]);
+
+  // No instances yet → Welcome screen
+  if (instances.length === 0) {
+    return (
+      <div className="bg-[#0c0f1a] text-slate-200 min-h-screen font-sans">
+        <WelcomeScreen />
+      </div>
+    );
+  }
+
+  // No active instance → select first
+  if (!activeId) {
+    setActive(instances[0].id);
+    return null;
+  }
+
+  return (
+    <div className="bg-[#0c0f1a] text-slate-200 min-h-screen font-sans" data-app-root>
+      <PlannerTabs onImport={handleImport} />
+      <PlannerContent />
+    </div>
+  );
+}
+
+/** The actual planner grid — separated so it re-renders on instance switch */
+function PlannerContent() {
   const { filter, classFilter, weekData, setWeekData, migrateStaticSequences, fixSequenceTitles, sequencePanelOpen, sidePanelOpen, zoomLevel, panelWidth } = usePlannerStore();
   const { courses: allCourses, weeks: staticWeeks, s2StartIndex } = usePlannerData();
   const curRef = useRef<HTMLTableRowElement>(null);
@@ -145,8 +199,8 @@ function App() {
   }, []);
 
   return (
-    <div className="bg-[#0c0f1a] text-slate-200 min-h-screen font-sans" data-app-root>
-      <div className="print-title hidden">Unterrichtsplanung SJ 25/26 – {classFilter || 'Alle Klassen'}{filter !== 'ALL' ? ` (${filter})` : ''}</div>
+    <>
+      <div className="print-title hidden">Unterrichtsplanung – {classFilter || 'Alle Klassen'}{filter !== 'ALL' ? ` (${filter})` : ''}</div>
       <AppHeader />
       <HelpBar />
       <Legend />
@@ -188,7 +242,7 @@ function App() {
       </div>
 
       <DetailPanel />
-    </div>
+    </>
   );
 }
 

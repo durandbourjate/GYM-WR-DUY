@@ -4,6 +4,7 @@ import type { FilterType, Week, LessonEntry, Course, LessonDetail, ManagedSequen
 import { SEQUENCES as STATIC_SEQUENCES } from '../data/sequences';
 import { COURSES, getLinkedCourseIds } from '../data/courses';
 import { INITIAL_LESSON_DETAILS } from '../data/initialLessonDetails';
+import { instanceStorageKey } from './instanceStore';
 
 interface Selection {
   week: string;
@@ -1132,3 +1133,98 @@ export const usePlannerStore = create<PlannerState>()(
     }
   )
 );
+
+// === Multi-Planner Instance Switching ===
+
+/** Extract persistable state from current store */
+function extractPersistedState(): Record<string, unknown> {
+  const state = usePlannerStore.getState();
+  return {
+    weekData: state.weekData,
+    lessonDetails: state.lessonDetails,
+    sequences: state.sequences,
+    sequencesMigrated: state.sequencesMigrated,
+    sequenceTitlesFixed: state.sequenceTitlesFixed,
+    hkOverrides: state.hkOverrides,
+    hkStartGroups: state.hkStartGroups,
+    tafPhases: state.tafPhases,
+    collection: state.collection,
+  };
+}
+
+/** Save current store state to a specific instance slot */
+export function saveToInstance(instanceId: string): void {
+  const data = extractPersistedState();
+  const wrapped = { state: data, version: 3 };
+  localStorage.setItem(instanceStorageKey(instanceId), JSON.stringify(wrapped));
+}
+
+/** Load an instance's data into the store (replaces current state) */
+export function loadFromInstance(instanceId: string): void {
+  const raw = localStorage.getItem(instanceStorageKey(instanceId));
+  if (raw) {
+    try {
+      const parsed = JSON.parse(raw);
+      const data = parsed.state || parsed;
+      usePlannerStore.setState({
+        weekData: data.weekData || [],
+        lessonDetails: data.lessonDetails || {},
+        sequences: data.sequences || [],
+        sequencesMigrated: data.sequencesMigrated ?? false,
+        sequenceTitlesFixed: data.sequenceTitlesFixed ?? false,
+        hkOverrides: data.hkOverrides || {},
+        hkStartGroups: data.hkStartGroups || {},
+        tafPhases: data.tafPhases || [],
+        collection: data.collection || [],
+        // Reset UI state on switch
+        selection: null,
+        editing: null,
+        insertDialog: null,
+        dragSource: null,
+        multiSelection: [],
+      });
+    } catch (e) {
+      console.error('Failed to load instance:', e);
+      resetToEmpty();
+    }
+  } else {
+    resetToEmpty();
+  }
+}
+
+/** Reset store to empty state (new planner) */
+export function resetToEmpty(): void {
+  usePlannerStore.setState({
+    weekData: [],
+    lessonDetails: {},
+    sequences: [],
+    sequencesMigrated: true,
+    sequenceTitlesFixed: true,
+    hkOverrides: {},
+    hkStartGroups: {},
+    tafPhases: [],
+    collection: [],
+    selection: null,
+    editing: null,
+    insertDialog: null,
+    dragSource: null,
+    multiSelection: [],
+  });
+}
+
+/** Switch from one instance to another (save current, load new) */
+export function switchInstance(fromId: string | null, toId: string): void {
+  if (fromId) {
+    saveToInstance(fromId);
+  }
+  loadFromInstance(toId);
+}
+
+/** Export instance data as JSON string */
+export function exportInstanceData(instanceId: string): string | null {
+  // If this is the currently active instance, save first
+  const currentData = extractPersistedState();
+  const raw = localStorage.getItem(instanceStorageKey(instanceId));
+  const data = raw ? JSON.parse(raw)?.state || JSON.parse(raw) : currentData;
+  return JSON.stringify(data, null, 2);
+}

@@ -1,0 +1,3024 @@
+{
+  "meta": {
+    "name": "DUY SJ 25/26",
+    "exportDate": "2026-03-02T07:09:52.150Z",
+    "version": "2.9",
+    "currentWeek": "09",
+    "s2StartIndex": 26
+  },
+  "weeks": [
+    {
+      "w": "33",
+      "lessons": {
+        "2": {
+          "title": "Begrüssung Schulstart",
+          "type": 0
+        },
+        "4": {
+          "title": "Rep. Programmieren",
+          "type": 3
+        },
+        "6": {
+          "title": "HK B Rep. Progr.",
+          "type": 3
+        },
+        "11": {
+          "title": "Kennenlernen SF WR",
+          "type": 1
+        },
+        "13": {
+          "title": "HK A Rep. Progr.",
+          "type": 3
+        },
+        "15": {
+          "title": "Menschenrechte",
+          "type": 2
+        },
+        "17": {
+          "title": "Rep. OR AT",
+          "type": 2
+        },
+        "19": {
+          "title": "Rep. FIBU K.12/13",
+          "type": 2
+        },
+        "24": {
+          "title": "IL RTpP BYOD",
+          "type": 3
+        },
+        "29": {
+          "title": "Rep. FIBU K.12/13",
+          "type": 2
+        },
+        "31": {
+          "title": "Vorwissen Einf. BWL",
+          "type": 1
+        },
+        "35": {
+          "title": "OR AT Gültige Verträge",
+          "type": 2
+        },
+        "37": {
+          "title": "RTpP Gruppenbildung",
+          "type": 3
+        }
+      }
+    },
+    {
+      "w": "34",
+      "lessons": {
+        "4": {
+          "title": "Rep. Programmieren",
+          "type": 3
+        },
+        "6": {
+          "title": "HK A Rep. Progr.",
+          "type": 3
+        },
+        "11": {
+          "title": "Struktur CH-Wirtschaft",
+          "type": 1
+        },
+        "13": {
+          "title": "HK B Rep. Progr.",
+          "type": 3
+        },
+        "15": {
+          "title": "Grundrechte",
+          "type": 2
+        },
+        "17": {
+          "title": "OR AT Gültige Verträge",
+          "type": 2
+        },
+        "19": {
+          "title": "Rep. FIBU K.12/13",
+          "type": 2
+        },
+        "24": {
+          "title": "BYOD Dateimgmt.",
+          "type": 3
+        },
+        "29": {
+          "title": "Rep. FIBU K.12/13",
+          "type": 2
+        },
+        "31": {
+          "title": "Unterscheidung Untern.",
+          "type": 1
+        },
+        "35": {
+          "title": "OR AT Gültige Verträge",
+          "type": 2
+        },
+        "37": {
+          "title": "RTpP Konzept",
+          "type": 3
+        }
+      }
+    },
+    {
+      "w": "35",
+      "lessons": {
+        "2": {
+          "title": "Planung Elternabend",
+          "type": 0
+        },
+        "4": {
+          "title": "Prüfung Progr.",
+          "type": 4
+        },
+        "6": {
+          "title": "HK B Rep. Progr.",
+          "type": 3
+        },
+        "11": {
+          "title": "Unternehmensprofile",
+          "type": 1
+        },
+        "13": {
+          "title": "HK A Rastergrafik",
+          "type": 3
+        },
+        "15": {
+          "title": "Rechtsordnung ÖR/PR",
+          "type": 2
+        },
+        "17": {
+          "title": "OR AT Willensmängel",
+          "type": 2
+        },
+        "19": {
+          "title": "Prüfung FIBU",
+          "type": 4
+        },
+        "24": {
+          "title": "BYOD LearningView",
+          "type": 3
+        },
+        "29": {
+          "title": "Grundr. Versamml.frh.",
+          "type": 2
+        },
+        "31": {
+          "title": "Standortfaktoren NWA",
+          "type": 1
+        },
+        "35": {
+          "title": "OR AT Vertragserfüll.",
+          "type": 2
+        },
+        "37": {
+          "title": "RTpP Peer Review",
+          "type": 3
+        }
+      }
+    },
+    {
+      "w": "36",
+      "lessons": {
+        "2": {
+          "title": "CEM/CES Studienreise",
+          "type": 0
+        },
+        "4": {
+          "title": "Vorträge Proceedings",
+          "type": 3
+        },
+        "6": {
+          "title": "HK A Rep. Progr.",
+          "type": 3
+        },
+        "11": {
+          "title": "Standortfaktoren",
+          "type": 1
+        },
+        "13": {
+          "title": "Ausfall",
+          "type": 0
+        },
+        "15": {
+          "title": "ÖR/PR Moral Sitte",
+          "type": 2
+        },
+        "17": {
+          "title": "OR AT Sicherung",
+          "type": 2
+        },
+        "19": {
+          "title": "Grundr. Glaubensfrh.",
+          "type": 2
+        },
+        "24": {
+          "title": "Sporttag",
+          "type": 5
+        },
+        "29": {
+          "title": "Grundr. Glaubensfrh.",
+          "type": 2
+        },
+        "31": {
+          "title": "Standortanalyse",
+          "type": 1
+        },
+        "35": {
+          "title": "OR AT Sicherung Ford.",
+          "type": 2
+        },
+        "37": {
+          "title": "RTpP",
+          "type": 3
+        }
+      }
+    },
+    {
+      "w": "37",
+      "lessons": {
+        "2": {
+          "title": "Prüfung Progr. 29f",
+          "type": 4
+        },
+        "4": {
+          "title": "Proceedings Handouts",
+          "type": 3
+        },
+        "6": {
+          "title": "Prüfung Progr.",
+          "type": 4
+        },
+        "11": {
+          "title": "NWA Apple K.1",
+          "type": 1
+        },
+        "13": {
+          "title": "HK B Rastergrafik",
+          "type": 3
+        },
+        "15": {
+          "title": "Personenrecht",
+          "type": 2
+        },
+        "17": {
+          "title": "Erlöschen Obligation",
+          "type": 2
+        },
+        "19": {
+          "title": "Grundr. Glaubensfrh.",
+          "type": 2
+        },
+        "24": {
+          "title": "BYOD Fact-Sheets",
+          "type": 3
+        },
+        "29": {
+          "title": "Grundrechte Corona",
+          "type": 2
+        },
+        "31": {
+          "title": "Übungen K.1 Kennz.",
+          "type": 1
+        },
+        "35": {
+          "title": "Erlöschen Obligation",
+          "type": 2
+        },
+        "37": {
+          "title": "RTpP",
+          "type": 3
+        }
+      }
+    },
+    {
+      "w": "38",
+      "lessons": {
+        "2": {
+          "title": "Studienreise Triest",
+          "type": 5
+        },
+        "4": {
+          "title": "Studienreise",
+          "type": 5
+        },
+        "6": {
+          "title": "Studienreise",
+          "type": 5
+        },
+        "11": {
+          "title": "Studienreise",
+          "type": 5
+        },
+        "13": {
+          "title": "Studienreise",
+          "type": 5
+        },
+        "15": {
+          "title": "Studienreise",
+          "type": 5
+        },
+        "17": {
+          "title": "Studienreise",
+          "type": 5
+        },
+        "19": {
+          "title": "Studienreise",
+          "type": 5
+        },
+        "24": {
+          "title": "Studienreise",
+          "type": 5
+        },
+        "29": {
+          "title": "Studienreise",
+          "type": 5
+        },
+        "31": {
+          "title": "Studienreise",
+          "type": 5
+        },
+        "35": {
+          "title": "Studienreise",
+          "type": 5
+        },
+        "37": {
+          "title": "Studienreise",
+          "type": 5
+        }
+      }
+    },
+    {
+      "w": "39",
+      "lessons": {
+        "2": {
+          "title": "Herbstferien",
+          "type": 6
+        },
+        "4": {
+          "title": "Herbstferien",
+          "type": 6
+        },
+        "6": {
+          "title": "Herbstferien",
+          "type": 6
+        },
+        "11": {
+          "title": "Herbstferien",
+          "type": 6
+        },
+        "13": {
+          "title": "Herbstferien",
+          "type": 6
+        },
+        "15": {
+          "title": "Herbstferien",
+          "type": 6
+        },
+        "17": {
+          "title": "Herbstferien",
+          "type": 6
+        },
+        "19": {
+          "title": "Herbstferien",
+          "type": 6
+        },
+        "24": {
+          "title": "Herbstferien",
+          "type": 6
+        },
+        "29": {
+          "title": "Herbstferien",
+          "type": 6
+        },
+        "37": {
+          "title": "Herbstferien",
+          "type": 6
+        }
+      }
+    },
+    {
+      "w": "40",
+      "lessons": {
+        "2": {
+          "title": "Herbstferien",
+          "type": 6
+        },
+        "4": {
+          "title": "Herbstferien",
+          "type": 6
+        },
+        "6": {
+          "title": "Herbstferien",
+          "type": 6
+        },
+        "11": {
+          "title": "Herbstferien",
+          "type": 6
+        },
+        "13": {
+          "title": "Herbstferien",
+          "type": 6
+        },
+        "15": {
+          "title": "Herbstferien",
+          "type": 6
+        },
+        "17": {
+          "title": "Herbstferien",
+          "type": 6
+        },
+        "19": {
+          "title": "Herbstferien",
+          "type": 6
+        },
+        "24": {
+          "title": "Herbstferien",
+          "type": 6
+        },
+        "29": {
+          "title": "Herbstferien",
+          "type": 6
+        },
+        "37": {
+          "title": "Herbstferien",
+          "type": 6
+        }
+      }
+    },
+    {
+      "w": "41",
+      "lessons": {
+        "2": {
+          "title": "Herbstferien",
+          "type": 6
+        },
+        "4": {
+          "title": "Herbstferien",
+          "type": 6
+        },
+        "6": {
+          "title": "Herbstferien",
+          "type": 6
+        },
+        "11": {
+          "title": "Herbstferien",
+          "type": 6
+        },
+        "13": {
+          "title": "Herbstferien",
+          "type": 6
+        },
+        "15": {
+          "title": "Herbstferien",
+          "type": 6
+        },
+        "17": {
+          "title": "Herbstferien",
+          "type": 6
+        },
+        "19": {
+          "title": "Herbstferien",
+          "type": 6
+        },
+        "24": {
+          "title": "Herbstferien",
+          "type": 6
+        },
+        "29": {
+          "title": "Herbstferien",
+          "type": 6
+        },
+        "37": {
+          "title": "Herbstferien",
+          "type": 6
+        }
+      }
+    },
+    {
+      "w": "42",
+      "lessons": {
+        "2": {
+          "title": "Auftrag Studienreise",
+          "type": 0
+        },
+        "4": {
+          "title": "Vortragstechnik",
+          "type": 3
+        },
+        "6": {
+          "title": "HK A Rastergrafik",
+          "type": 3
+        },
+        "11": {
+          "title": "Rep. Selbstbeurteil.",
+          "type": 1
+        },
+        "13": {
+          "title": "HK A Vektorgrafik",
+          "type": 3
+        },
+        "15": {
+          "title": "Rep. Personenrecht",
+          "type": 2
+        },
+        "17": {
+          "title": "OR AT Störung VE",
+          "type": 2
+        },
+        "19": {
+          "title": "Rep. Grundr. Mietr.",
+          "type": 2
+        },
+        "24": {
+          "title": "KI",
+          "type": 3
+        },
+        "29": {
+          "title": "Mietrecht",
+          "type": 2
+        },
+        "31": {
+          "title": "Selbstbeurteilungen",
+          "type": 1
+        },
+        "35": {
+          "title": "OR AT Schlechtleist.",
+          "type": 2
+        },
+        "37": {
+          "title": "RTpP",
+          "type": 3
+        }
+      }
+    },
+    {
+      "w": "43",
+      "lessons": {
+        "2": {
+          "title": "Studienreise Destin.",
+          "type": 0
+        },
+        "4": {
+          "title": "Vortrag G1 KI",
+          "type": 3
+        },
+        "6": {
+          "title": "HK B Vektorgrafik",
+          "type": 3
+        },
+        "11": {
+          "title": "St. Galler Modell",
+          "type": 1
+        },
+        "13": {
+          "title": "HK B Vektorgrafik",
+          "type": 3
+        },
+        "15": {
+          "title": "Persönlichkeitsschutz",
+          "type": 2
+        },
+        "17": {
+          "title": "OR AT Gl./Schuldn.verz.",
+          "type": 2
+        },
+        "19": {
+          "title": "Mietrecht Werkstatt",
+          "type": 2
+        },
+        "24": {
+          "title": "RTpP Peer Review",
+          "type": 3
+        },
+        "29": {
+          "title": "Mietrecht Werkstatt",
+          "type": 2
+        },
+        "31": {
+          "title": "St. Galler Anspr.",
+          "type": 1
+        },
+        "35": {
+          "title": "Auftrag Schuldn.verz.",
+          "type": 2
+        },
+        "37": {
+          "title": "Auftrag RTpP",
+          "type": 3
+        }
+      }
+    },
+    {
+      "w": "44",
+      "lessons": {
+        "2": {
+          "title": "Studienreise Konzept",
+          "type": 0
+        },
+        "4": {
+          "title": "Vortrag G2",
+          "type": 3
+        },
+        "6": {
+          "title": "HK A Vektorgrafik",
+          "type": 3
+        },
+        "11": {
+          "title": "Besuchstag Vision",
+          "type": 5
+        },
+        "13": {
+          "title": "Tag d.off.Tür",
+          "type": 5
+        },
+        "15": {
+          "title": "Ausfall IL TED",
+          "type": 5
+        },
+        "17": {
+          "title": "Tag d.off.Tür OR AT",
+          "type": 5
+        },
+        "19": {
+          "title": "Tag d.off.Tür Mietr.",
+          "type": 5
+        },
+        "24": {
+          "title": "RTpP Endversion",
+          "type": 3
+        },
+        "29": {
+          "title": "Gesellschaftsrecht",
+          "type": 2
+        },
+        "31": {
+          "title": "St. Galler Umwelt",
+          "type": 1
+        },
+        "35": {
+          "title": "Orientierungslauf",
+          "type": 5
+        },
+        "37": {
+          "title": "Abschluss RTpP",
+          "type": 3
+        }
+      }
+    },
+    {
+      "w": "45",
+      "lessons": {
+        "2": {
+          "title": "Planung Studienreise",
+          "type": 0
+        },
+        "4": {
+          "title": "Vortrag G3",
+          "type": 3
+        },
+        "6": {
+          "title": "HK A Gesichtserken.",
+          "type": 3
+        },
+        "11": {
+          "title": "Besuchstag CSR",
+          "type": 5
+        },
+        "13": {
+          "title": "Tag d.off.Tür HK B",
+          "type": 5
+        },
+        "15": {
+          "title": "Ausfall IL TED",
+          "type": 5
+        },
+        "17": {
+          "title": "HK Rep. OR AT",
+          "type": 5
+        },
+        "19": {
+          "title": "HK Mietrecht",
+          "type": 5
+        },
+        "24": {
+          "title": "PW RTpP BYOD KI",
+          "type": 4
+        },
+        "29": {
+          "title": "Gesellschaftsrecht",
+          "type": 2
+        },
+        "31": {
+          "title": "St. Galler Modell",
+          "type": 1
+        },
+        "35": {
+          "title": "Einstieg Sozialpol.",
+          "type": 2
+        }
+      }
+    },
+    {
+      "w": "46",
+      "lessons": {
+        "2": {
+          "title": "Studienreise Bespr.",
+          "type": 0
+        },
+        "4": {
+          "title": "Vortrag G4",
+          "type": 3
+        },
+        "6": {
+          "title": "Ausfall IW46",
+          "type": 5
+        },
+        "11": {
+          "title": "Prüfung BWL Einf.",
+          "type": 4
+        },
+        "13": {
+          "title": "HK A Metadaten",
+          "type": 3
+        },
+        "15": {
+          "title": "Ausfall IW46",
+          "type": 5
+        },
+        "17": {
+          "title": "GA Sozialversich.",
+          "type": 2
+        },
+        "19": {
+          "title": "Mietrecht Abschluss",
+          "type": 2
+        },
+        "24": {
+          "title": "10L IL RTpP",
+          "type": 0
+        },
+        "29": {
+          "title": "Ges.recht AG",
+          "type": 2
+        },
+        "31": {
+          "title": "CSR Vision Werte",
+          "type": 1
+        },
+        "35": {
+          "title": "Prüfung OR",
+          "type": 4
+        }
+      }
+    },
+    {
+      "w": "47",
+      "lessons": {
+        "2": {
+          "title": "Planung Studienreise",
+          "type": 0
+        },
+        "4": {
+          "title": "Klassenkonferenz",
+          "type": 5
+        },
+        "6": {
+          "title": "HK B Gesichtserken.",
+          "type": 3
+        },
+        "11": {
+          "title": "Porter SWOT",
+          "type": 1
+        },
+        "13": {
+          "title": "HK B Metadaten",
+          "type": 3
+        },
+        "15": {
+          "title": "TED Prozessrecht",
+          "type": 2
+        },
+        "17": {
+          "title": "GA Sozialversich.",
+          "type": 2
+        },
+        "19": {
+          "title": "Prüfung Grundr.+Mietr.",
+          "type": 4
+        },
+        "29": {
+          "title": "Ges.recht AG",
+          "type": 2
+        },
+        "31": {
+          "title": "SWOT Apple",
+          "type": 1
+        },
+        "35": {
+          "title": "Gerechtigkeitstheor.",
+          "type": 2
+        }
+      }
+    },
+    {
+      "w": "48",
+      "lessons": {
+        "2": {
+          "title": "Planung Studienreise",
+          "type": 0
+        },
+        "4": {
+          "title": "Vortrag G5",
+          "type": 3
+        },
+        "6": {
+          "title": "HK A Metadaten",
+          "type": 3
+        },
+        "11": {
+          "title": "GA Untern.konzept",
+          "type": 1
+        },
+        "13": {
+          "title": "HK A Kryptographie",
+          "type": 3
+        },
+        "15": {
+          "title": "Prüfung Recht",
+          "type": 4
+        },
+        "17": {
+          "title": "GA Sozialversich.",
+          "type": 2
+        },
+        "19": {
+          "title": "Einf. VWL Ökon.M.",
+          "type": 2
+        },
+        "29": {
+          "title": "Ges.recht AG",
+          "type": 2
+        },
+        "31": {
+          "title": "Einstieg Marketing",
+          "type": 1
+        },
+        "35": {
+          "title": "Sozialpol. Eingriffe",
+          "type": 2
+        }
+      }
+    },
+    {
+      "w": "49",
+      "lessons": {
+        "2": {
+          "title": "Recherche Studienr.",
+          "type": 0
+        },
+        "4": {
+          "title": "Vortrag G6",
+          "type": 3
+        },
+        "6": {
+          "title": "HK B Metadaten",
+          "type": 3
+        },
+        "11": {
+          "title": "Fachschaftstag",
+          "type": 5
+        },
+        "13": {
+          "title": "Fachschaftstag",
+          "type": 5
+        },
+        "15": {
+          "title": "Fachschaftstag",
+          "type": 5
+        },
+        "17": {
+          "title": "Fachschaftstag",
+          "type": 5
+        },
+        "19": {
+          "title": "Fachschaftstag",
+          "type": 5
+        },
+        "29": {
+          "title": "Ges.recht Aktien",
+          "type": 2
+        },
+        "31": {
+          "title": "GA Marketing-Mix",
+          "type": 1
+        },
+        "35": {
+          "title": "iconomix Versich.",
+          "type": 2
+        }
+      }
+    },
+    {
+      "w": "50",
+      "lessons": {
+        "4": {
+          "title": "Vortrag G7 Krypto",
+          "type": 3
+        },
+        "6": {
+          "title": "HK A Kryptographie",
+          "type": 3
+        },
+        "11": {
+          "title": "GA Marketing-Mix",
+          "type": 1
+        },
+        "13": {
+          "title": "HK B Kryptographie",
+          "type": 3
+        },
+        "15": {
+          "title": "VWL Dollar Street",
+          "type": 2
+        },
+        "17": {
+          "title": "Prüf. bespr. GA Sozv.",
+          "type": 2
+        },
+        "19": {
+          "title": "Prüf. bespr. VWL",
+          "type": 2
+        },
+        "29": {
+          "title": "Ges.recht GmbH",
+          "type": 2
+        },
+        "31": {
+          "title": "1L selbstständig",
+          "type": 1
+        },
+        "35": {
+          "title": "GA Sozvers. Vortr.",
+          "type": 2
+        }
+      }
+    },
+    {
+      "w": "51",
+      "lessons": {
+        "4": {
+          "title": "Vortrag 8 Darknet",
+          "type": 3
+        },
+        "6": {
+          "title": "HK B Kryptographie",
+          "type": 3
+        },
+        "11": {
+          "title": "GA Marketing-Mix",
+          "type": 1
+        },
+        "13": {
+          "title": "HK A Krypto Sicherh.",
+          "type": 3
+        },
+        "15": {
+          "title": "Einführung BIP",
+          "type": 2
+        },
+        "17": {
+          "title": "GA Sozvers. Vortr.",
+          "type": 2
+        },
+        "19": {
+          "title": "VWL Gefangenendil.",
+          "type": 2
+        },
+        "29": {
+          "title": "Genossenschaft",
+          "type": 2
+        },
+        "31": {
+          "title": "GA Marketing-Mix",
+          "type": 1
+        },
+        "35": {
+          "title": "Sozvers. Finanzier.",
+          "type": 2
+        }
+      }
+    },
+    {
+      "w": "52",
+      "lessons": {
+        "2": {
+          "title": "Winterferien",
+          "type": 6
+        },
+        "4": {
+          "title": "Winterferien",
+          "type": 6
+        },
+        "6": {
+          "title": "Winterferien",
+          "type": 6
+        },
+        "11": {
+          "title": "Winterferien",
+          "type": 6
+        },
+        "13": {
+          "title": "Winterferien",
+          "type": 6
+        },
+        "17": {
+          "title": "Winterferien",
+          "type": 6
+        },
+        "19": {
+          "title": "Winterferien",
+          "type": 6
+        },
+        "24": {
+          "title": "Winterferien",
+          "type": 6
+        },
+        "29": {
+          "title": "Winterferien",
+          "type": 6
+        },
+        "37": {
+          "title": "Winterferien",
+          "type": 6
+        }
+      }
+    },
+    {
+      "w": "01",
+      "lessons": {
+        "2": {
+          "title": "Winterferien",
+          "type": 6
+        },
+        "4": {
+          "title": "Winterferien",
+          "type": 6
+        },
+        "6": {
+          "title": "Winterferien",
+          "type": 6
+        },
+        "11": {
+          "title": "Winterferien",
+          "type": 6
+        },
+        "13": {
+          "title": "Winterferien",
+          "type": 6
+        },
+        "17": {
+          "title": "Winterferien",
+          "type": 6
+        },
+        "19": {
+          "title": "Winterferien",
+          "type": 6
+        },
+        "24": {
+          "title": "Winterferien",
+          "type": 6
+        },
+        "29": {
+          "title": "Winterferien",
+          "type": 6
+        },
+        "37": {
+          "title": "Winterferien",
+          "type": 6
+        }
+      }
+    },
+    {
+      "w": "02",
+      "lessons": {
+        "4": {
+          "title": "Vortrag 9",
+          "type": 3
+        },
+        "6": {
+          "title": "HK A Krypto Sicherh.",
+          "type": 3
+        },
+        "11": {
+          "title": "Marketing Abschluss",
+          "type": 1
+        },
+        "13": {
+          "title": "HK B Krypto Sicherh.",
+          "type": 3
+        },
+        "15": {
+          "title": "Einf. BIP Def.",
+          "type": 2
+        },
+        "17": {
+          "title": "GA Sozvers. V.7",
+          "type": 2
+        },
+        "19": {
+          "title": "VWL Preistheorie",
+          "type": 2
+        },
+        "29": {
+          "title": "Ges.recht Zusammenf.",
+          "type": 2
+        },
+        "31": {
+          "title": "Prüfung Marketing",
+          "type": 4
+        },
+        "35": {
+          "title": "Rückmeldung Sozvers.",
+          "type": 2
+        }
+      }
+    },
+    {
+      "w": "03",
+      "lessons": {
+        "4": {
+          "title": "Vortrag 10",
+          "type": 3
+        },
+        "6": {
+          "title": "HK B Krypto Sicherh.",
+          "type": 3
+        },
+        "11": {
+          "title": "Einf. FIBU K.1",
+          "type": 1
+        },
+        "13": {
+          "title": "HK A Krypto Sicherh.",
+          "type": 3
+        },
+        "15": {
+          "title": "W nicht misst",
+          "type": 2
+        },
+        "17": {
+          "title": "GA Sozvers. V.6",
+          "type": 2
+        },
+        "19": {
+          "title": "Preisth. Nachfrage",
+          "type": 2
+        },
+        "29": {
+          "title": "Ges.recht Abschluss",
+          "type": 2
+        },
+        "31": {
+          "title": "FIBU K.1 K.2",
+          "type": 1
+        },
+        "35": {
+          "title": "MA Präsentationen",
+          "type": 5
+        },
+        "37": {
+          "title": "MA Präsentationen",
+          "type": 5
+        }
+      }
+    },
+    {
+      "w": "04",
+      "lessons": {
+        "4": {
+          "title": "Vortrag 11 KI",
+          "type": 3
+        },
+        "6": {
+          "title": "HK A Kryptographie",
+          "type": 3
+        },
+        "11": {
+          "title": "Rückmeldung FIBU K.2",
+          "type": 1
+        },
+        "13": {
+          "title": "HK B Kryptographie",
+          "type": 3
+        },
+        "15": {
+          "title": "Lorenzkurve Gini",
+          "type": 2
+        },
+        "17": {
+          "title": "Reformen Staatsversch.",
+          "type": 2
+        },
+        "19": {
+          "title": "Preisth. Angebotsk.",
+          "type": 2
+        },
+        "29": {
+          "title": "Prüfung Ges.recht",
+          "type": 4
+        },
+        "31": {
+          "title": "FIBU K.2 K.3",
+          "type": 1
+        },
+        "35": {
+          "title": "Staatsverschuldung",
+          "type": 2
+        }
+      }
+    },
+    {
+      "w": "05",
+      "lessons": {
+        "4": {
+          "title": "Prüfung RTpP",
+          "type": 4
+        },
+        "6": {
+          "title": "Auftrag HK B Krypto",
+          "type": 5
+        },
+        "11": {
+          "title": "FIBU K.3",
+          "type": 1
+        },
+        "13": {
+          "title": "Ausfall",
+          "type": 0
+        },
+        "15": {
+          "title": "Ungleichheit",
+          "type": 2
+        },
+        "17": {
+          "title": "Staatsversch. Staatsein.",
+          "type": 2
+        },
+        "19": {
+          "title": "Preisth. Elastizitäten",
+          "type": 2
+        },
+        "29": {
+          "title": "Preisth. Kurvenversch.",
+          "type": 2
+        },
+        "31": {
+          "title": "FIBU K.3",
+          "type": 1
+        },
+        "35": {
+          "title": "Staatseinnahmen",
+          "type": 2
+        }
+      }
+    },
+    {
+      "w": "06",
+      "lessons": {
+        "2": {
+          "title": "Sportferien",
+          "type": 6
+        },
+        "4": {
+          "title": "Sportferien",
+          "type": 6
+        },
+        "6": {
+          "title": "Sportferien",
+          "type": 6
+        },
+        "11": {
+          "title": "Sportferien",
+          "type": 6
+        },
+        "17": {
+          "title": "Sportferien",
+          "type": 6
+        },
+        "19": {
+          "title": "Sportferien",
+          "type": 6
+        },
+        "24": {
+          "title": "Sportferien",
+          "type": 6
+        },
+        "29": {
+          "title": "Sportferien",
+          "type": 6
+        },
+        "37": {
+          "title": "Sportferien",
+          "type": 6
+        }
+      }
+    },
+    {
+      "w": "07",
+      "lessons": {
+        "2": {
+          "title": "Krypto Freiheit",
+          "type": 3
+        },
+        "4": {
+          "title": "Krypto Prüfungsvorb.",
+          "type": 3
+        },
+        "6": {
+          "title": "VSC Excel IL",
+          "type": 3
+        },
+        "11": {
+          "title": "FIBU K.3",
+          "type": 1
+        },
+        "17": {
+          "title": "Staatseinnahmen",
+          "type": 2
+        },
+        "19": {
+          "title": "Preisth. Dynamic Pr.",
+          "type": 2
+        },
+        "24": {
+          "title": "Excel Einstieg",
+          "type": 3
+        },
+        "29": {
+          "title": "Kosten-Gewinntheorie",
+          "type": 2
+        },
+        "31": {
+          "title": "FIBU K.4",
+          "type": 1
+        },
+        "35": {
+          "title": "Klassenkonf. TaF",
+          "type": 5
+        },
+        "37": {
+          "title": "Klassenkonf. TaF",
+          "type": 5
+        }
+      }
+    },
+    {
+      "w": "08",
+      "lessons": {
+        "2": {
+          "title": "Projekte S4 Start",
+          "type": 3
+        },
+        "4": {
+          "title": "Projekte S4 Start",
+          "type": 3
+        },
+        "6": {
+          "title": "Ausfall KL-SL",
+          "type": 0
+        },
+        "11": {
+          "title": "FIBU K.4",
+          "type": 1
+        },
+        "17": {
+          "title": "Steuern Elastizitäten",
+          "type": 2
+        },
+        "19": {
+          "title": "Preisth. Mindestlöhne",
+          "type": 2
+        },
+        "24": {
+          "title": "Einstieg Progr.",
+          "type": 3
+        },
+        "29": {
+          "title": "Marktversagen",
+          "type": 2
+        },
+        "31": {
+          "title": "FIBU K.4",
+          "type": 1
+        },
+        "35": {
+          "title": "Organisation Personal",
+          "type": 2
+        }
+      }
+    },
+    {
+      "w": "09",
+      "lessons": {
+        "2": {
+          "title": "Projekte S4",
+          "type": 3
+        },
+        "4": {
+          "title": "Prüfung Krypto",
+          "type": 4
+        },
+        "6": {
+          "title": "Programmieren",
+          "type": 3
+        },
+        "11": {
+          "title": "FIBU K.4",
+          "type": 1
+        },
+        "17": {
+          "title": "Steuererklärung",
+          "type": 2
+        },
+        "19": {
+          "title": "Start Praktikum FP2",
+          "type": 2
+        },
+        "24": {
+          "title": "Programmieren",
+          "type": 3
+        },
+        "29": {
+          "title": "Wohnungsmarkt",
+          "type": 2
+        },
+        "31": {
+          "title": "FIBU K.4",
+          "type": 1
+        },
+        "35": {
+          "title": "Start Praktikum OR BT",
+          "type": 2
+        },
+        "37": {
+          "title": "MA Fragerunde",
+          "type": 5
+        }
+      }
+    },
+    {
+      "w": "10",
+      "lessons": {
+        "2": {
+          "title": "Projekte S4 Konzept",
+          "type": 3
+        },
+        "4": {
+          "title": "Projekte S4",
+          "type": 3
+        },
+        "6": {
+          "title": "Programmieren",
+          "type": 3
+        },
+        "11": {
+          "title": "Start Praktikum",
+          "type": 2
+        },
+        "17": {
+          "title": "Prüfungsvorbereitung",
+          "type": 2
+        },
+        "19": {
+          "title": "iconomix Fischteich",
+          "type": 2
+        },
+        "24": {
+          "title": "Programmieren",
+          "type": 3
+        },
+        "31": {
+          "title": "Prüfung FIBU K.1-4",
+          "type": 4
+        },
+        "35": {
+          "title": "Praktikum Org.",
+          "type": 2
+        }
+      }
+    },
+    {
+      "w": "11",
+      "lessons": {
+        "2": {
+          "title": "Projekte S4",
+          "type": 3
+        },
+        "4": {
+          "title": "Projekte S4",
+          "type": 3
+        },
+        "6": {
+          "title": "Programmieren",
+          "type": 3
+        },
+        "11": {
+          "title": "FIBU",
+          "type": 1
+        },
+        "17": {
+          "title": "Prüfung",
+          "type": 4
+        },
+        "19": {
+          "title": "Staatseingriffe",
+          "type": 2
+        },
+        "24": {
+          "title": "Programmieren",
+          "type": 3
+        },
+        "29": {
+          "title": "Aufnahmeprüfungen",
+          "type": 5
+        },
+        "31": {
+          "title": "Aufnahmeprüfungen",
+          "type": 5
+        },
+        "35": {
+          "title": "Aufnahmeprüfungen",
+          "type": 5
+        },
+        "37": {
+          "title": "Aufnahmeprüfungen",
+          "type": 5
+        }
+      }
+    },
+    {
+      "w": "12",
+      "lessons": {
+        "2": {
+          "title": "Schneesportwoche",
+          "type": 5
+        },
+        "4": {
+          "title": "Projekte S4",
+          "type": 3
+        },
+        "6": {
+          "title": "Programmieren",
+          "type": 3
+        },
+        "11": {
+          "title": "FIBU",
+          "type": 1
+        },
+        "19": {
+          "title": "Schneesportwoche",
+          "type": 5
+        },
+        "24": {
+          "title": "Programmieren",
+          "type": 3
+        },
+        "29": {
+          "title": "Schneesportwoche",
+          "type": 5
+        },
+        "35": {
+          "title": "Praktikum Org.",
+          "type": 2
+        }
+      }
+    },
+    {
+      "w": "13",
+      "lessons": {
+        "2": {
+          "title": "Projekte S4",
+          "type": 3
+        },
+        "4": {
+          "title": "Projekte S4",
+          "type": 3
+        },
+        "6": {
+          "title": "Prüfung",
+          "type": 4
+        },
+        "11": {
+          "title": "FIBU",
+          "type": 1
+        },
+        "19": {
+          "title": "Staatsversagen",
+          "type": 2
+        },
+        "24": {
+          "title": "Programmieren",
+          "type": 3
+        },
+        "35": {
+          "title": "Praktikum Org.",
+          "type": 2
+        }
+      }
+    },
+    {
+      "w": "14",
+      "lessons": {
+        "2": {
+          "title": "IW14",
+          "type": 5
+        },
+        "4": {
+          "title": "IW14",
+          "type": 5
+        },
+        "6": {
+          "title": "IW14",
+          "type": 5
+        },
+        "11": {
+          "title": "IW14",
+          "type": 5
+        },
+        "17": {
+          "title": "IW14",
+          "type": 5
+        },
+        "19": {
+          "title": "IW14",
+          "type": 5
+        },
+        "24": {
+          "title": "IW14",
+          "type": 5
+        },
+        "29": {
+          "title": "IW14",
+          "type": 5
+        },
+        "31": {
+          "title": "IW14",
+          "type": 5
+        },
+        "35": {
+          "title": "IW14",
+          "type": 5
+        },
+        "37": {
+          "title": "IW14",
+          "type": 5
+        }
+      }
+    },
+    {
+      "w": "15",
+      "lessons": {
+        "2": {
+          "title": "Frühlingsferien",
+          "type": 6
+        },
+        "4": {
+          "title": "Frühlingsferien",
+          "type": 6
+        },
+        "6": {
+          "title": "Frühlingsferien",
+          "type": 6
+        },
+        "11": {
+          "title": "Frühlingsferien",
+          "type": 6
+        },
+        "17": {
+          "title": "Frühlingsferien",
+          "type": 6
+        },
+        "19": {
+          "title": "Frühlingsferien",
+          "type": 6
+        },
+        "24": {
+          "title": "Frühlingsferien",
+          "type": 6
+        },
+        "29": {
+          "title": "Frühlingsferien",
+          "type": 6
+        },
+        "37": {
+          "title": "Frühlingsferien",
+          "type": 6
+        }
+      }
+    },
+    {
+      "w": "16",
+      "lessons": {
+        "2": {
+          "title": "Frühlingsferien",
+          "type": 6
+        },
+        "4": {
+          "title": "Frühlingsferien",
+          "type": 6
+        },
+        "6": {
+          "title": "Frühlingsferien",
+          "type": 6
+        },
+        "11": {
+          "title": "Frühlingsferien",
+          "type": 6
+        },
+        "17": {
+          "title": "Frühlingsferien",
+          "type": 6
+        },
+        "19": {
+          "title": "Frühlingsferien",
+          "type": 6
+        },
+        "24": {
+          "title": "Frühlingsferien",
+          "type": 6
+        },
+        "29": {
+          "title": "Frühlingsferien",
+          "type": 6
+        },
+        "37": {
+          "title": "Frühlingsferien",
+          "type": 6
+        }
+      }
+    },
+    {
+      "w": "17",
+      "lessons": {
+        "19": {
+          "title": "Prüfung",
+          "type": 4
+        }
+      }
+    },
+    {
+      "w": "18",
+      "lessons": {
+        "2": {
+          "title": "Projekte S4",
+          "type": 3
+        },
+        "4": {
+          "title": "Projekte S4",
+          "type": 3
+        },
+        "19": {
+          "title": "OR AT Unerl.Handl.",
+          "type": 2
+        },
+        "29": {
+          "title": "OR AT Kausalhaftung",
+          "type": 2
+        }
+      }
+    },
+    {
+      "w": "19",
+      "lessons": {
+        "2": {
+          "title": "Projekte S4 Zwisch.",
+          "type": 3
+        },
+        "4": {
+          "title": "Projekte S4 Konzept",
+          "type": 3
+        },
+        "19": {
+          "title": "OR AT Unger.Bereicher.",
+          "type": 2
+        }
+      }
+    },
+    {
+      "w": "20",
+      "lessons": {
+        "2": {
+          "title": "Projekte S4",
+          "type": 3
+        },
+        "4": {
+          "title": "Projekte S4 Abgabe",
+          "type": 3
+        },
+        "29": {
+          "title": "Auffahrt",
+          "type": 6
+        },
+        "31": {
+          "title": "Auffahrt",
+          "type": 6
+        },
+        "35": {
+          "title": "Auffahrt",
+          "type": 6
+        },
+        "37": {
+          "title": "Auffahrt",
+          "type": 6
+        }
+      }
+    },
+    {
+      "w": "21",
+      "lessons": {
+        "2": {
+          "title": "Projekte S4",
+          "type": 3
+        },
+        "4": {
+          "title": "Projekte S4",
+          "type": 3
+        }
+      }
+    },
+    {
+      "w": "22",
+      "lessons": {
+        "2": {
+          "title": "Pfingstmontag",
+          "type": 6
+        },
+        "4": {
+          "title": "Pfingstmontag",
+          "type": 6
+        }
+      }
+    },
+    {
+      "w": "23",
+      "lessons": {
+        "2": {
+          "title": "Projekte S4 Abgabe",
+          "type": 3
+        },
+        "4": {
+          "title": "Projekte S4 Abgabe",
+          "type": 3
+        }
+      }
+    },
+    {
+      "w": "24",
+      "lessons": {
+        "2": {
+          "title": "Schlussveranstaltung",
+          "type": 4
+        },
+        "4": {
+          "title": "Schlussveranstaltung",
+          "type": 4
+        }
+      }
+    },
+    {
+      "w": "25",
+      "lessons": {
+        "2": {
+          "title": "IW25",
+          "type": 5
+        },
+        "4": {
+          "title": "IW25",
+          "type": 5
+        },
+        "11": {
+          "title": "IW25",
+          "type": 5
+        },
+        "17": {
+          "title": "IW25",
+          "type": 5
+        },
+        "19": {
+          "title": "IW25",
+          "type": 5
+        },
+        "24": {
+          "title": "IW25",
+          "type": 5
+        },
+        "29": {
+          "title": "IW25",
+          "type": 5
+        },
+        "31": {
+          "title": "IW25",
+          "type": 5
+        },
+        "35": {
+          "title": "IW25",
+          "type": 5
+        },
+        "37": {
+          "title": "IW25",
+          "type": 5
+        }
+      }
+    },
+    {
+      "w": "26",
+      "lessons": {
+        "2": {
+          "title": "Abschluss",
+          "type": 3
+        },
+        "4": {
+          "title": "Abschluss",
+          "type": 3
+        }
+      }
+    },
+    {
+      "w": "27",
+      "lessons": {
+        "2": {
+          "title": "IW27",
+          "type": 5
+        },
+        "4": {
+          "title": "IW27",
+          "type": 5
+        },
+        "11": {
+          "title": "IW27",
+          "type": 5
+        },
+        "17": {
+          "title": "IW27",
+          "type": 5
+        },
+        "19": {
+          "title": "IW27",
+          "type": 5
+        },
+        "24": {
+          "title": "IW27",
+          "type": 5
+        },
+        "29": {
+          "title": "IW27",
+          "type": 5
+        },
+        "31": {
+          "title": "IW27",
+          "type": 5
+        },
+        "35": {
+          "title": "IW27",
+          "type": 5
+        },
+        "37": {
+          "title": "IW27",
+          "type": 5
+        }
+      }
+    }
+  ],
+  "courses": [
+    {
+      "id": "c11",
+      "col": 11,
+      "cls": "29c",
+      "typ": "SF",
+      "day": "Di",
+      "from": "09:00",
+      "to": "09:45",
+      "les": 1,
+      "hk": false,
+      "semesters": [
+        1,
+        2
+      ]
+    },
+    {
+      "id": "c31",
+      "col": 31,
+      "cls": "29c",
+      "typ": "SF",
+      "day": "Do",
+      "from": "10:05",
+      "to": "11:45",
+      "les": 2,
+      "hk": false,
+      "semesters": [
+        1,
+        2
+      ]
+    },
+    {
+      "id": "c17",
+      "col": 17,
+      "cls": "27a28f",
+      "typ": "SF",
+      "day": "Di",
+      "from": "13:40",
+      "to": "15:20",
+      "les": 2,
+      "hk": false,
+      "semesters": [
+        1,
+        2
+      ]
+    },
+    {
+      "id": "c35",
+      "col": 35,
+      "cls": "27a28f",
+      "typ": "SF",
+      "day": "Do",
+      "from": "13:40",
+      "to": "15:20",
+      "les": 2,
+      "hk": false,
+      "semesters": [
+        1,
+        2
+      ]
+    },
+    {
+      "id": "c19",
+      "col": 19,
+      "cls": "28bc29fs",
+      "typ": "SF",
+      "day": "Di",
+      "from": "15:35",
+      "to": "17:10",
+      "les": 2,
+      "hk": false,
+      "semesters": [
+        1,
+        2
+      ]
+    },
+    {
+      "id": "c29",
+      "col": 29,
+      "cls": "28bc29fs",
+      "typ": "SF",
+      "day": "Do",
+      "from": "09:00",
+      "to": "09:45",
+      "les": 1,
+      "hk": false,
+      "semesters": [
+        1,
+        2
+      ]
+    },
+    {
+      "id": "c2",
+      "col": 2,
+      "cls": "27a",
+      "typ": "KS",
+      "day": "Mo",
+      "from": "10:05",
+      "to": "10:50",
+      "les": 1,
+      "hk": false,
+      "semesters": [
+        1
+      ]
+    },
+    {
+      "id": "c2b",
+      "col": 2,
+      "cls": "27a",
+      "typ": "KS",
+      "day": "Do",
+      "from": "16:25",
+      "to": "17:10",
+      "les": 1,
+      "hk": false,
+      "semesters": [
+        2
+      ]
+    },
+    {
+      "id": "c4",
+      "col": 4,
+      "cls": "28c",
+      "typ": "IN",
+      "day": "Di",
+      "from": "13:40",
+      "to": "14:25",
+      "les": 1,
+      "hk": false,
+      "semesters": [
+        1
+      ]
+    },
+    {
+      "id": "c13",
+      "col": 13,
+      "cls": "28c",
+      "typ": "IN",
+      "day": "Di",
+      "from": "10:05",
+      "to": "11:45",
+      "les": 2,
+      "hk": true,
+      "semesters": [
+        1
+      ],
+      "note": "Praktikum"
+    },
+    {
+      "id": "c4s2",
+      "col": 4,
+      "cls": "28c",
+      "typ": "IN",
+      "day": "Mo",
+      "from": "10:05",
+      "to": "11:45",
+      "les": 2,
+      "hk": true,
+      "semesters": [
+        2
+      ]
+    },
+    {
+      "id": "c6",
+      "col": 6,
+      "cls": "29f",
+      "typ": "IN",
+      "day": "Di",
+      "from": "14:35",
+      "to": "16:20",
+      "les": 2,
+      "hk": true,
+      "semesters": [
+        1
+      ],
+      "note": "Praktikum"
+    },
+    {
+      "id": "c6s2",
+      "col": 6,
+      "cls": "29f",
+      "typ": "IN",
+      "day": "Di",
+      "from": "13:40",
+      "to": "14:25",
+      "les": 1,
+      "hk": false,
+      "semesters": [
+        2
+      ]
+    },
+    {
+      "id": "c24",
+      "col": 24,
+      "cls": "30s",
+      "typ": "IN",
+      "day": "Mi",
+      "from": "08:05",
+      "to": "09:45",
+      "les": 2,
+      "hk": false,
+      "semesters": [
+        1,
+        2
+      ],
+      "note": "Phasenunterricht"
+    },
+    {
+      "id": "c15",
+      "col": 15,
+      "cls": "29fs",
+      "typ": "EWR",
+      "day": "Di",
+      "from": "12:50",
+      "to": "13:35",
+      "les": 1,
+      "hk": false,
+      "semesters": [
+        1
+      ],
+      "note": "+1L Auftrag"
+    },
+    {
+      "id": "c15s2",
+      "col": 15,
+      "cls": "29fs",
+      "typ": "EWR",
+      "day": "Do",
+      "from": "12:50",
+      "to": "13:35",
+      "les": 1,
+      "hk": false,
+      "semesters": [
+        2
+      ]
+    }
+  ],
+  "sequences": {
+    "c17": [
+      {
+        "weeks": [
+          "33",
+          "34",
+          "35",
+          "36",
+          "37"
+        ],
+        "label": "OR AT"
+      },
+      {
+        "weeks": [
+          "42",
+          "43"
+        ],
+        "label": "Störung VE"
+      },
+      {
+        "weeks": [
+          "46",
+          "47",
+          "48",
+          "49",
+          "50",
+          "51",
+          "02",
+          "03"
+        ],
+        "label": "GA Sozvers."
+      },
+      {
+        "weeks": [
+          "04",
+          "05",
+          "07",
+          "08",
+          "09"
+        ],
+        "label": "Steuern/Reform"
+      }
+    ],
+    "c31": [
+      {
+        "weeks": [
+          "33",
+          "34",
+          "35",
+          "36",
+          "37"
+        ],
+        "label": "Einf. BWL"
+      },
+      {
+        "weeks": [
+          "42",
+          "43",
+          "44",
+          "45"
+        ],
+        "label": "St. Galler M."
+      },
+      {
+        "weeks": [
+          "46",
+          "47",
+          "48",
+          "49",
+          "50",
+          "51",
+          "02"
+        ],
+        "label": "Marketing"
+      },
+      {
+        "weeks": [
+          "03",
+          "04",
+          "05",
+          "07",
+          "08",
+          "09",
+          "10",
+          "11",
+          "12",
+          "13"
+        ],
+        "label": "FIBU"
+      }
+    ],
+    "c19": [
+      {
+        "weeks": [
+          "33",
+          "34"
+        ],
+        "label": "Rep. FIBU"
+      },
+      {
+        "weeks": [
+          "36",
+          "37",
+          "42"
+        ],
+        "label": "Grundrechte"
+      },
+      {
+        "weeks": [
+          "43",
+          "44",
+          "45",
+          "46"
+        ],
+        "label": "Mietrecht"
+      },
+      {
+        "weeks": [
+          "48",
+          "49",
+          "50",
+          "51",
+          "02",
+          "03",
+          "04",
+          "05"
+        ],
+        "label": "VWL Preis"
+      },
+      {
+        "weeks": [
+          "07",
+          "08",
+          "09",
+          "10",
+          "11",
+          "13"
+        ],
+        "label": "Markt/Staat"
+      },
+      {
+        "weeks": [
+          "18",
+          "19"
+        ],
+        "label": "OR AT"
+      }
+    ],
+    "c4": [
+      {
+        "weeks": [
+          "33",
+          "34"
+        ],
+        "label": "Rep. Progr."
+      },
+      {
+        "weeks": [
+          "42",
+          "43",
+          "44",
+          "45",
+          "46",
+          "47",
+          "48",
+          "49",
+          "50",
+          "51"
+        ],
+        "label": "Vorträge RTpP"
+      },
+      {
+        "weeks": [
+          "07",
+          "08",
+          "09",
+          "10",
+          "11",
+          "12",
+          "13",
+          "18",
+          "19",
+          "20",
+          "21",
+          "23"
+        ],
+        "label": "Projekte S4"
+      }
+    ],
+    "c29": [
+      {
+        "weeks": [
+          "33",
+          "34"
+        ],
+        "label": "Rep. FIBU"
+      },
+      {
+        "weeks": [
+          "36",
+          "37",
+          "42"
+        ],
+        "label": "Grundrechte"
+      },
+      {
+        "weeks": [
+          "44",
+          "45",
+          "46",
+          "47",
+          "48",
+          "49",
+          "50",
+          "51",
+          "02",
+          "03"
+        ],
+        "label": "Ges.recht"
+      },
+      {
+        "weeks": [
+          "05",
+          "07",
+          "08",
+          "09"
+        ],
+        "label": "VWL Preis"
+      }
+    ]
+  },
+  "lessonDetails": {
+    "02-6": {
+      "notes": "LearningView Kryptographie: \nEinstieg Brickfilm zu Kryptographie\nSicherheitsziele Theorie lesen und an Bsp. Anwenden.\n\nLerneinheit \"Verschlüsselung\"\nSuS lesen selbstständig die Theorie und bearbeiten die Übungsfragen. \nLösungen auf LV hochladen."
+    },
+    "02-13": {
+      "notes": "LearningView Kryptographie: \nEinstieg Brickfilm zu Kryptographie\nSicherheitsziele Theorie lesen und an Bsp. Anwenden.\n\nLerneinheit \"Verschlüsselung\"\nSuS lesen selbstständig die Theorie und bearbeiten die Übungsfragen. \nLösungen auf LV hochladen."
+    },
+    "02-15": {
+      "notes": "Einführung BIP\n- Definition BIP\n- Wertschöpfung / -skette\n- Produktionsfaktoren\n- Wachstumsraten\n- Kaufkraftparitäten"
+    },
+    "02-17": {
+      "notes": "7. ALV & EO  Nithin, Leon\nJanis war im Spital, Nithin hatte eine Augenoperation\n\nVertiefung Arbeitslosigkeit\nMarktanalyse\n- (Arbeitsangebot, Arbeitsnachfrage\n- Eigenschaften (Heterogenität etc.)\n- Unflexible Löhne\n\nQuoten & Ursachen von Arbeitslosigkeit\nBekämpfung von Arbeitslosigkeit"
+    },
+    "02-19": {
+      "notes": "Einstieg Preistheorie\n-Iconomix Rollenspiel Feuerwerksverkauf inkl. Aufgaben besprochen\nHinweis auf verwirrende Achsen (Preis als unabhängige Variable auf Y-Achse), sinkende Linie steht für steigende Menge).\n\nNachfragekurve interpretieren (Einzelperson, Gesamtmarkt)\n\nBegonnen mit Input zu Lehrbuchtext K.2.1-2.3\nK.2.1 W Kaufentscheid im Plenum besprochen\nAbnehmende Grenznutzen als Herleitung.\n\nnächstes Mal:\nVertiefung der Nachfragekurve anhand der Lehrbuchtexte (Eisenhut). \n- Gründe für Kurvenverschiebungen"
+    },
+    "02-29": {
+      "notes": "Zusammenfassung Tabelle Gesellschaftsrecht"
+    },
+    "02-35": {
+      "notes": "Rückmeldung Präsentationen Sozialversicherungen\n\nLehrbuch Text zu Arbeitslosigkeit lesen\n\nReformen Sozialversicherungen\nAuftrag:\nErarbeiten Sie, basierend auf den Vorträgen, Handouts und den Vertiefungen zu den Sozialversicherungen, mögliche Reformen für die wichtigsten Herausforderungen. \nStrukturieren Sie Ihre Analyse übersichtlich.\n\nMögliche Anhaltspunkte:\nPriorisierung der Reformen (z.B. wegen Dringlichkeit, Auswirkungen, etc.)\nReformen können spezifisch für eine Herausforderung einer Sozialversicherung oder genereller Art sein, also mehrere Sozialversicherungen betreffend.\nPolitische Herausforderungen (Akzeptanz, Interessengruppen)\nGewinner bzw. Verlierer der Reformen\nFinanzielle Auswirkungen\nUnbeabsichtigte Nebeneffekte"
+    },
+    "03-6": {
+      "notes": "LearningView Kryptographie: \nEinstieg Brickfilm zu Kryptographie\nSicherheitsziele Theorie lesen und an Bsp. Anwenden.\n\nLerneinheit \"Verschlüsselung\"\nSuS lesen selbstständig die Theorie und bearbeiten die Übungsfragen. \nLösungen auf LV hochladen.\n\n1 SuS fertig"
+    },
+    "03-11": {
+      "notes": "K.1 Begriff und Zweck der Buchhaltung\n1.1 Informationsbedürfnis des Unternehmens\n1.2 Aufgaben der Buchhaltung\n1.3 Grundsätze\n\nInput als Einstieg\n- Spiegel der Realität\n- Übersicht über gesamten FIBU-Prozess\n- Hinweise auf die Arbeitsmethodik, Lehrbuch, LearningView.\nSuS lesen die Theorie im Lehrbuch und lösen die Aufgaben dazu."
+    },
+    "03-13": {
+      "notes": "Sulashvili Sara noch keine Note: Selbstbeurteilung\n\nLearningView Kryptographie: \nLerneinheit \"Verschlüsselung\"\nSuS lesen selbstständig die Theorie und bearbeiten die Übungsfragen. \nLösungen auf LV hochladen."
+    },
+    "03-15": {
+      "notes": "W BIP nicht misst\n3 Seiten des BIP\nLorenzkurve & Gini\nAuftrag:\nWidersprüche weltweite Ungleichheit"
+    },
+    "03-17": {
+      "notes": "6. Unfallversicherung  Janis, Raphae\n\nReformen Sozialversicherungen\nAuftrag:\nErarbeiten Sie, basierend auf den Vorträgen, Handouts und den Vertiefungen zu den Sozialversicherungen, mögliche Reformen für die wichtigsten Herausforderungen. \nStrukturieren Sie Ihre Analyse übersichtlich.\n\nMögliche Anhaltspunkte:\nPriorisierung der Reformen (z.B. wegen Dringlichkeit, Auswirkungen, etc.)\nReformen können spezifisch für eine Herausforderung einer Sozialversicherung oder genereller Art sein, also mehrere Sozialversicherungen betreffend.\nPolitische Herausforderungen (Akzeptanz, Interessengruppen)\nGewinner bzw. Verlierer der Reformen\nFinanzielle Auswirkungen\nUnbeabsichtigte Nebeneffektel"
+    },
+    "03-19": {
+      "notes": "Vertiefung der Nachfragekurve anhand der Lehrbuchtexte (Eisenhut). \n- Gründe für Kurvenverschiebungen\n\nEinstieg Angebotskurve"
+    },
+    "03-29": {
+      "notes": "Ausgefüllte Tabelle besprechen, ergänzen"
+    },
+    "03-31": {
+      "notes": "FIBU K.1 aufgaben fertigstellen, besprechen\n\nFIBU K.2 starten\nKurzer Input, SuS beginnen Lehrbuchtexte zu lesen und Übungen zu lösen."
+    },
+    "04-6": {
+      "notes": "Keine SuS anwesend.\n\nLearningView Kryptographie: \nLerneinheit \"Verschlüsselung\"\nSuS lesen selbstständig die Theorie und bearbeiten die Übungsfragen. \nLösungen auf LV hochladen.\n\nEs handelt sich um zwei längere, englischsprachige, Texte. Lesen Sie die Texte aufmerksam, notieren Sie sich Ihre Gedanken zur Thematik. Es ist auch wichtig, Teile, welche Sie nicht verstehen zu notieren, dass wir alle Unklarheiten nächstes Mal aus der Welt schaffen können.\n\nTexte:\n1) Text zur Blockchain Technologie und möglichen Anwendungen dieser. Die Blockchain ist eine konkrete Anwendung welche auf Kryptographie basiert. Ein Anwendungsbeispiel im Bereich Finanzen ist Bitcoin, die wohl bekannteste Kryptowährung. Mögliche Anwendungen der Blockchain gehen aber weit über Bitcoin hinaus, wie im Text ersichtlich ist.\n\n2) Text zum Spannungsfeld Freiheit und Sicherheit. Diskutiert wird der Zielkonflikt zwischen Privatsphäre (konkret Kryptographisch verschlüsselte Kommunikation) und dem Ziel der Aufdeckung von unerwünschten Aktivitäten (Bsp. Kinderpornographie) durch Überwachung der Kommunikation.\n\nPPT Blockchain \nFreiheit vs. Sicherheit"
+    },
+    "04-11": {
+      "notes": "FIBU K.2\nSuS lesen Lehrbuchtexte und lösen Übungen."
+    },
+    "04-13": {
+      "notes": "LearningView Kryptographie: \nLerneinheit \"Verschlüsselung\"\nSuS lesen selbstständig die Theorie und bearbeiten die Übungsfragen. \nLösungen auf LV hochladen.\n\nEs handelt sich um zwei längere, englischsprachige, Texte. Lesen Sie die Texte aufmerksam, notieren Sie sich Ihre Gedanken zur Thematik. Es ist auch wichtig, Teile, welche Sie nicht verstehen zu notieren, dass wir alle Unklarheiten nächstes Mal aus der Welt schaffen können.\n\nTexte:\n1) Text zur Blockchain Technologie und möglichen Anwendungen dieser. Die Blockchain ist eine konkrete Anwendung welche auf Kryptographie basiert. Ein Anwendungsbeispiel im Bereich Finanzen ist Bitcoin, die wohl bekannteste Kryptowährung. Mögliche Anwendungen der Blockchain gehen aber weit über Bitcoin hinaus, wie im Text ersichtlich ist.\n\n2) Text zum Spannungsfeld Freiheit und Sicherheit. Diskutiert wird der Zielkonflikt zwischen Privatsphäre (konkret Kryptographisch verschlüsselte Kommunikation) und dem Ziel der Aufdeckung von unerwünschten Aktivitäten (Bsp. Kinderpornographie) durch Überwachung der Kommunikation.\n\nPPT Blockchain \nFreiheit vs. Sicherheit"
+    },
+    "04-15": {
+      "notes": "Widersprüche weltweite Ungleichheit besprechen\nLorenzkurve, Gini besprechen\n\nAuftrag: Gute vs. schlechte Ungleichheit"
+    },
+    "04-17": {
+      "notes": "Refoermen Sozialversicherungen besprechen\n\nStaatsverschuldung\nPrivat: Wieso Verschulden? Auswirkungen?\n\nPPT noch nicht gezeigt."
+    },
+    "04-19": {
+      "notes": "Angebotskurve\nHerleitung\nVerschiebung\n\nElastizitäten"
+    },
+    "04-29": {
+      "notes": "10 Anwesende\nAbwesend:\nKarl Baumann\nAurore Gaillard\nTim Gauch\nJoan Gerber\nEli\nLioba Zoubkoff"
+    },
+    "04-31": {
+      "notes": "Weiterarbeit K.2. SuS lösen Übungen.\nStart K.3"
+    },
+    "04-35": {
+      "notes": "Einstieg Staatsverschuldung\nPPT Zeigen (Ländervergleich, Schuldenwachstum)\n\nLehrbuch Text lesen\nRepetitionsfragen lösen"
+    },
+    "05-4": {
+      "notes": "SuS reichen Prüfungsfragen ein"
+    },
+    "05-6": {
+      "notes": "LearningView Kryptographie: \nLerneinheit \"Verschlüsselung\"\nSuS lesen selbstständig die Theorie und bearbeiten die Übungsfragen. \nLösungen auf LV hochladen.\n\nEs handelt sich um zwei längere, englischsprachige, Texte. Lesen Sie die Texte aufmerksam, notieren Sie sich Ihre Gedanken zur Thematik. Es ist auch wichtig, Teile, welche Sie nicht verstehen zu notieren, dass wir alle Unklarheiten nächstes Mal aus der Welt schaffen können.\n\nTexte:\n1) Text zur Blockchain Technologie und möglichen Anwendungen dieser. Die Blockchain ist eine konkrete Anwendung welche auf Kryptographie basiert. Ein Anwendungsbeispiel im Bereich Finanzen ist Bitcoin, die wohl bekannteste Kryptowährung. Mögliche Anwendungen der Blockchain gehen aber weit über Bitcoin hinaus, wie im Text ersichtlich ist.\n\n2) Text zum Spannungsfeld Freiheit und Sicherheit. Diskutiert wird der Zielkonflikt zwischen Privatsphäre (konkret Kryptographisch verschlüsselte Kommunikation) und dem Ziel der Aufdeckung von unerwünschten Aktivitäten (Bsp. Kinderpornographie) durch Überwachung der Kommunikation.\n\nPPT Blockchain \nFreiheit vs. Sicherheit"
+    },
+    "05-11": {
+      "notes": "Weiterarbeit K.3. SuS lösen Übungen."
+    },
+    "05-15": {
+      "notes": "Gute vs. schlechte Ungleichheit besprechen\nWirtschaftskreislauf einführen\nAuftrag: Übung Wirtschaftskreislauf"
+    },
+    "05-17": {
+      "notes": "Staatsverschuldung\nRepetitionsaufgaben besprechen\nSuS Länderbeispiele\n\nStaatseinnahmen\nTagebuch eines Steuerzahlers, Theorie"
+    },
+    "05-19": {
+      "notes": "VWL\nPreistheorie\nK.2.9 Die Messung der Effizienz: Konsumenten- und Produzentenrente\n2.10 Dynamic Pricing"
+    },
+    "05-29": {
+      "notes": "Ü2a (A4, A5) Kurvenverschiebungen\nÜ2b (A1 TA2, A4) Höchst- und Mindestpreise"
+    },
+    "05-31": {
+      "notes": "Weiterarbeit K.3. SuS lösen Übungen."
+    },
+    "05-35": {
+      "notes": "Staatseinnahmen\nLafferKurve\nSteuerwettbewerb Unternehmenssteuern"
+    },
+    "07-4": {
+      "notes": "PPT Blockchain \nFreiheit vs. Sicherheit\n\nInput zur Bockchain am Beispiel Bitcoin, Double Spending Problem und d von Vertrauensinstitutionen.\n\nSuS überlegen sich Beispiele für weitere Anwendungen der Blockchain. Diese diskutieren.\n\nDezentralisierte Nachrichten, Datenspeicher, Cloud-Computing\nEigentumsrechte, Besitzverhältnisse\nAutomatisierte, intelligente Verträge\nAuthentizität (Dinge, Menschen)\nReputation (Unternehmen, Bildung\nDemokratie, Wahlen\n\nEs handelt sich um zwei längere, englischsprachige, Texte. Lesen Sie die Texte aufmerksam, notieren Sie sich Ihre Gedanken zur Thematik. Es ist auch wichtig, Teile, welche Sie nicht verstehen zu notieren, dass wir alle Unklarheiten nächstes Mal aus der Welt schaffen können.\n\nTexte:\n1) Text zur Blockchain Technologie und möglichen Anwendungen dieser. Die Blockchain ist eine konkrete Anwendung welche auf Kryptographie basiert. Ein Anwendungsbeispiel im Bereich Finanzen ist Bitcoin, die wohl bekannteste Kryptowährung. Mögliche Anwendungen der Blockchain gehen aber weit über Bitcoin hinaus, wie im Text ersichtlich ist.\n\n2) Text zum Spannungsfeld Freiheit und Sicherheit. Diskutiert wird der Zielkonflikt zwischen Privatsphäre (konkret Kryptographisch verschlüsselte Kommunikation) und dem Ziel der Aufdeckung von unerwünschten Aktivitäten (Bsp. Kinderpornographie) durch Überwachung der Kommunikation."
+    },
+    "07-11": {
+      "notes": "Repetition K.3\nWeiterarbeit K.3. SuS lösen Übungen."
+    },
+    "07-17": {
+      "notes": "Steuerwettbewerb Unternehmenssteuern\nStandortfaktoren\nFinanzausgleich"
+    },
+    "07-19": {
+      "notes": "Preistheorie\n2.10 Dynamic Pricing \n\nAnwendungsbeispiele\nSteuern, Elastizitäten\nSteuern verschieben Angebotskurve (zumindest aus Konsumenten-Sicht. Neues Markt-GG, WFV, KR/PR Veränderungen.\nEinfluss der Elastizität auf die Veränderungen der KR/PR analysieren."
+    },
+    "07-24": {
+      "notes": "Info zum IL Auftrag\nExcel Zalando Schuhdaten\nDaten wurden schon gesammelt, etwäumt. Weitere Probleme suchen\nAufträge in LV erfüllen"
+    },
+    "07-29": {
+      "notes": "SuS lesen Lehrbuchtext zu Kosten- und Gewinntheorie. Begriffe wi variable bzw. fixe kosten, gewinn, erlös, grenzkosten werden eingeführt.\n\nFallbeispiel Monopol: \nAm Preis-Mengen-Diagramm die Situation des Monopolisten analysieren. SuS lesen den Text im Lehrbuch. Preis-Mengen-Diagramm im Plenum zeichnen."
+    },
+    "07-31": {
+      "notes": "Einführung K.4 Erfolgsrechnung"
+    },
+    "08-17": {
+      "notes": "Auftrag: Steuern & Elastizitäten bespreschen"
+    },
+    "08-35": {
+      "notes": "SRF Video Steuerhinterziehung\nRecherche-Fragen zu Steuerbetrug\nÜbungen lösen, repetieren"
+    },
+    "09-4": {
+      "notes": "Prüfung RTpP"
+    },
+    "10-19": {
+      "notes": "s"
+    },
+    "33-2": {
+      "notes": "Neue SuS:\n- Zita B.\n- Anna G.\n- Severin V.\n\nVorstellungsrunde alle.\n\nFreifächer\n\nNotfall-Krisensituationen\n\nElternabend Do. 28.8.25 19-21Uhr\n\nGYM3 Maturvorschläge B/C\n\nHinweis: Teams nicht zuverlässig\n\nZeugnisse zurück\n\nKlassenchef / Raumverantwortliche\n\nChatGPT study&learn"
+    },
+    "33-4": {
+      "notes": "S1: 1L GK, 2L HK\nS2: 2L GK\nW33+34 Repetition Programmieren\nW35 Prüfung\nGK: Vorträge RTpP\nHK: Bilder, Krypto\nS2: Projekte"
+    },
+    "33-6": {
+      "notes": "S1: 2L HK\nS2: 1L GK\nW33+36 Repetition Programmieren\n? W37 Prüfung\ndanach: Bilder, Krypto, Projekte\n\nJan Spilker (29f) L9 von Montag. Er wird trainingsbedingt im nächsten Semester (P1 + P2) jeweils Montags, wenn möglich, etwa um 15:45 Uhr den Zug nehmen müssen.\n\nLouis Stirnimann hat ein Problem mit dem IN Praktikum am Montag in L8/9.\n\nGruppe 1:    \nAmmeter    Sophie\nBoschung    Mia\nDenaro    Deliana\nFankhauser    Jano\nFeuz    Jan\nFeuz    Leo\nGarn    Rune\nGraffagnino    Elisa\nHäusler    Lynn\nHofer    Selma\nLuong    Leandro\n\nGruppe 2:   \nFlubacher    Elin \nHofstetter    Joy\nKaufher    Nora\nLeonhard    Aliya\nLutz    Nicl    Gioia\nRöhrl    Viraya\nSchäfer    Joy\nSpilker    Jan\nStirnimann    Louis\nVido    Remy\nvon Büren    Amelia"
+    },
+    "33-11": {
+      "notes": "Admin: Übersicht SF WR\n- Rahmenbedingungen (SF-Schiene, Lehrplan, Lektionentafel, Sonderwochen (GYM2 IW25 W&A, GYM3 SF-Woche)\n- Hinweis auf BYOD (LearningView)/Lehrbücher, ≠Smartphones\n- Wechselnde Sitzordnung\n- SF WR vs. EWR in GYM2), Sondersituation TaF\n\n- Noten: Selbstbeurteilung Unterrichtsleistung, mündliche Prüfungen, Produkte, schriftliche Prüfungen\n- Regeln / Vereinbarungen für erfolgreiches Lernen?\n\nLearningView Login/Kurs beitreten (CQD5XPT2), LearningView einführen"
+    },
+    "33-13": {
+      "notes": "Gruppe 1:\t\t\n28c\tBadertscher\tSarah\n28c\tBähler\tAylin\n28c\tBorn\tNola\n28c\tFuchs\tNina\n28c\tGauch\tTim\n28c\tHilber\tEleni\n28c\tHubacher\tJimena\n28c\tKammer\tAnne Louise\n28c\tMeier\tSeraina\n28c\tStremlow\tLorenz\n\t\t\nGruppe 2:\t\t\n28c\tBärtschi\tGabrielle\n28c\tMichel\tSimon\n28c\tMoesch\tRafael\n28c\tMüller\tZoe\n28c\tNeuenschwander\tAlva\n28c\tNoverraz\tElenie\n28c\tRoth\tHelena\n28c\tSchneider\tLynn\n28c\tWettstein\tHelena\n28c\tWolf\tNino\n\nRepetition Programmieren"
+    },
+    "33-15": {
+      "notes": "29f:\nFankhauser Jano\nLuong Leandro\n29s:\nAllemann Nicol Karl\nGaillard Aurore\nGerber Joan\nHofer Mats\nTobler Eli: \nEWR 1 Jahr vorholen, 1L Präsenz, 1L Aufträge. 3 Noten.\n\nEinstieg Recht\nMenschenrechte\n\nAuftrag IL:"
+    },
+    "33-17": {
+      "notes": "Repetition OR AT\nUnerlaubte Handlung\nVerschuldenshaftung\nKausalhaftung\n\nVoraussetzungen gültiger Verträge:\nRepetition Personenrecht"
+    },
+    "33-19": {
+      "notes": "Am Dienstag Nachmittag dispensiert: Joan Gerber\n\nAm Donnerstag L2 verpassen \n28c\tMösch\tRafael\tWR!\n29s\tBaumann\tKarl\tWR!\n28c\tGauch\tTim\tWR!\n29s\tTobler\tEli!\n29s\tGaillard\tAurore\tWR!\n\n\nden Unterricht, mit SuS d besprechen.\n\nFIBU Prüfung vereinbaren\n\nRepetition FIBU K.12/13"
+    },
+    "33-24": {
+      "notes": "IL Auftrag RTpP\nEinrichten BYOD\nSuS arbeiten an LV Aufträgen (LV, Kommunikation etc.)"
+    },
+    "33-29": {
+      "notes": "Sportler*innen mit Problem mit der SF Lektion vom Donnerstag in L2.\nUnd zwar sind d SuS:\n29s\tBaumann\tKarl\tWR!\n28c\tGauch\tTim\tWR!\n29s\tTobler\tEli!\n29s\tGaillard\tAurore\tWR!\n\nW du, können sie den verpassten Stoff selbständig aufarbeiten oder wäre eine regelmässige Nachführlektion nötig?\nMarcel\n\nRepetition FIBU K.12/13"
+    },
+    "33-31": {
+      "notes": "Vorwissen/Interesse:\n- Gründe für SF WR Wahl?\n- Berührungspunkte mit WR im eignen Leben? Meine Rolle in der Wirtschaft: Bitten Sie die Schüler*innen, darüber nachzudenken und zu schreiben, wie sie selbst Teil der Wirtschaft sind (zum Beispiel als Konsumenten, mögliche zukünftige Arbeitnehmer, etc.)\n- Vorwissen WR? Themen, an welchen ich interessiert bin und schon etw?\nInteresse an welchen Themen, ohne bisheriges Vorwissen? Wunschthemen auf Zetteln sammeln, in Planung einfliessen lassen.\n- Ziele und Erwartungen an mich und an d WR?\n\nSuS erhalten zur Info den SF WR Lehrplan.\n\n\nEinführung BWL\nBetrieb-Wirtschaft\n\nBuch: HEP - Betriebswirtschaftslehre 2023\n\nBWL\nSuS bearbeiten erste Bausteine in LV zur Grundlagen der BWL, lesen Kapitel 1.1 im Lehrbuch und lösen erste Aufgaben\n\nw Wirtschaft?\n- Wer? Komsument*innen. Arbeitnehmende, Produzierende, Sparende\nBedürfnispyramide, Maslow (Eigene Bedürfnisse sammeln).\nBetrieb\nZusammenschluss von Menschen, um ein Ziel zu verfolgen\n\nBis und mit Unternehmen als Problemlöser besprochen.\n- Ökonomisches Prinzip (Optimumsprinzip, Minimum, Maximum)"
+    },
+    "33-35": {
+      "notes": "Voraussetzungen gültiger Verträge\n- Repetition Einführung OR AT Entstehungsgründe, Vertrag als eine Möglichkeit\n- Repetition Personenrecht (EWR) als eine der Voraussetzungen\n\nGA: Voraussetzungen gültiger Verträge:\nGruppen erstellen ein Fact-Sheet, stellen dieses vor und spielen eine kurze Schauspielsequenz.\nGruppe 1: Gegenseitige, übereinstimmende Willenserklärungen (OR 1)\nGruppe 2: Gültiger Vertragsinhalt (OR 19, 20)\nGruppe 3: Korrekte Vertragsform (OR 11 ff.)"
+    },
+    "33-37": {
+      "notes": "Gian Aebersold aus der 30s - Kunstturner, verpasst in Phase 1 L9 am Donnerstag. \n\nEinführung RTpP Auftrag\nThemensuche\nGruppenbildung\nZeit für 3-Themen PPT"
+    },
+    "34-4": {
+      "notes": "Repetition Programmieren:\nSuS arbeiten selbstständig an den LV Inhalten zum Programmieren und repetieren für die Prüfung."
+    },
+    "34-6": {
+      "notes": "Repetition Programmieren:\nSuS arbeiten selbstständig an den LV Inhalten zum Programmieren und repetieren für die Prüfung."
+    },
+    "34-11": {
+      "notes": "- Repetition Bedürfnisse, Knappheit, Unternehmen als Problemlöser\n- Ökonomisches Prinzip (Optimumsprinzip, Minimum, Maximum)\n\n5`SuS wählen zwei der Statistiken zur Schweizer Wirtschaft und notieren Ihre Beobachtungen in LearningView.\n\nStruktur CH-Wirtschaft\n- Erwerbstätige (M, F, CH, Ausland)\n- Lohn nach Sektor\n- Beschäftigte nach Sektor\n- Beschäftigte nach Branchen\n- Erwerbsstatus (Selbstständig, AN, Lernende)\n- Frauenanteil nach Branchen\n- Unternehmensgründungen / Schliessungen\n- Beschäftigte nach Kantonen"
+    },
+    "34-13": {
+      "notes": "Repetition Programmieren K12 & K13"
+    },
+    "34-15": {
+      "notes": "Menschenrechte besprechen\nEinstieg Grundrechte\n\nIL: Weiterarbeit am Grundrechtsfall Versammlungsfreiheit"
+    },
+    "34-17": {
+      "notes": "OR AT\nÜbungen zu den Voraussetzungen gültiger Verträge lösen"
+    },
+    "34-19": {
+      "notes": "FIBU\nRepetition FIBU K.12/13"
+    },
+    "34-24": {
+      "notes": "Einrichten BYOD\nDateimanagement & Sicherheit\nIL (3 Themen als Auftrag bis Donnerstag fertigstellen)"
+    },
+    "34-29": {
+      "notes": "FBU\nRepetition FIBU K.12/13"
+    },
+    "34-31": {
+      "notes": "SuS wählen zwei der Statistiken zur Schweizer Wirtschaft und notieren Ihre Beobachtungen in LearningView.\n\nStruktur CH-Wirtschaft\n- Erwerbstätige (M, F, CH, Ausland)\n- Lohn nach Sektor\n- Beschäftigte nach Sektor\n- Beschäftigte nach Branchen\n- Erwerbsstatus (Selbstständig, AN, Lernende)\n- Frauenanteil nach Branchen\n- Unternehmensgründungen / Schliessungen\n- Beschäftigte nach Kantonen\n\n60' GA: \nKriterien zur Unterscheidung von Unternehmen\n- H&M, SBB, Rheinmetall, Apple, Nike, McDonalds, Coop"
+    },
+    "34-35": {
+      "notes": "Übungen zu den Voraussetzungen gültiger Verträge besprechen, Fragen klären\nEinführung Willensmängel\nÜbungen zu den Willensmängeln\nSuS brauchen noch etw"
+    },
+    "34-37": {
+      "notes": "RTpP Themenvergabe\nIL Auftrag Konzept\nEinrichten BYOD\nDateimanagement & Sicherheit"
+    },
+    "35-4": {
+      "notes": "Abwesend: Aylin Bähler (Arzttermin)"
+    },
+    "35-6": {
+      "notes": "Repetition Programmieren:\nSuS arbeiten selbstständig an den LV Inhalten zum Programmieren und repetieren für die Prüfung."
+    },
+    "35-11": {
+      "notes": "leztes Mal:\n60' GA: \nKriterien zur Unterscheidung von Unternehmen\n- H&M, SBB, Rheinmetall, Apple, Nike, McDonalds, Coop\n\nSuS finalisieren ihre Unternehmensprofile und stellen diese nächstes Mal vor."
+    },
+    "35-13": {
+      "notes": "HK A\nBilder\nRastergrafik\nSuS reproduzieren Bild gemäss Auftrag auf LV. Im Zentrum steht d der Ebenen."
+    },
+    "35-15": {
+      "notes": "Verweis auf Grundrechte im SF WR. \nEinstieg Rechtsstaat, Rechtsordnung (Fokus auf Problematik des Gewaltmonopols)\nInput zu Moral/Sitte/Recht\nInput zu ÖR/PR \nIL: SuS erarbeiten Übungen."
+    },
+    "35-17": {
+      "notes": "OR AT\nDie meisten SuS sind noch nicht einmal bei den Willensmängeln angelangt, manche jedoch schon.\n\nOR AT\nVertragserfüllung\nKurzer Input\nSuS haben mit dem Lesen des Theorietextes begonnen."
+    },
+    "35-19": {
+      "notes": "1L Prüfung FIBU K.12/13\nAbwesend: Karl Baumann 29s\n\nEinführung Grundrechte\nGrundrechtsfall Versammlungsfreiheit\nSuS sind sehr unkonzentriert, daher wurde kaum produktiv gearbeitet.\nSuS von EWR 29fs frei, Weiterarbeit am Donnerstag"
+    },
+    "35-24": {
+      "notes": "BYOD\nLetztes Einrichten\nRTpP\nKonzept erarbeiten\nIL: Konzept bis Donnerstag fertig"
+    },
+    "35-29": {
+      "notes": "Grundrechtsfall Versammlungsfreiheit besprechen.\nGrundsätzlich die Problematik durchgegangen, BV 36 erläuter und grob die Inhalte des Theorieblattes erklärt.\nNächstes Mal die Theorie auf den konkreten Fall anwenden."
+    },
+    "35-31": {
+      "notes": "GA: \nKriterien zur Unterscheidung von Unternehmen\n- Apple, Coop, H&M, McDonalds, Nike, Rheinmetall, SBB \n\nSuS stellen ihre Unternehmensprofile vor.\n\nSuS machen eine Analyse der Standortfaktoren und beginnen mit dem Erstellen einer Nutzwertanalyse zu ihrem gewählten Unternehmen. Dieses sucht einen neuen Standort gemäss LV Auftrag."
+    },
+    "35-35": {
+      "notes": "OR AT\nVertragserfüllung\nTheorietexte weiterlesen.\nÜbungen lösen."
+    },
+    "35-37": {
+      "notes": "RTpP Konzept Peer Review\nSuS reichen Konzepte ein und geben sich gegenseitig eine kurze Rückmeldung dazu (Peer Review)\nJuanita Berliner Smersu wechselt zu Gruppe 6, da Lou Krebs nicht mehr kommt (Besucht IN in anderer Regelklasse bei TEM)"
+    },
+    "36-2": {
+      "notes": "Befragung CEM/CES: Alle KL führen Befragung mit ihren Klassen durch.\n\nHinweis auf Einreichefrist der Sehr-Grob-Konzepte für die Wahl der Destination der Studienreise nächste Woche. Nur Destinationen mit Konzepten können kandidieren."
+    },
+    "36-4": {
+      "notes": "Prüfung nächste Woche zurück, Noten schon auf Evento.\nPlanung Vorträge RTpP\nSuS erstellen gemeinsames Dokument mit den Handouts: Proceedings"
+    },
+    "36-6": {
+      "notes": "Repetition Programmieren:\nSuS arbeiten selbstständig an den LV Inhalten zum Programmieren und repetieren für die Prüfung."
+    },
+    "36-11": {
+      "notes": "Weiterarbeit: SuS machen eine Analyse der Standortfaktoren und beginnen mit dem Erstellen einer Nutzwertanalyse zu ihrem gewählten Unternehmen. Dieses sucht einen neuen Standort zB. für eine Produktionsstätte."
+    },
+    "36-15": {
+      "notes": "Kurz die Übungen besprechen und Fragen klären.\nEinstieg Personenrecht\nInput\nIL: Theorie Personenrecht lesen"
+    },
+    "36-17": {
+      "notes": "1L: Planung SF Woche\nHinweis auf meine Vorstellungen bezüglich SF Woche, Rahmenbedingungen, Zielen.\n1L: Kurzer Input (Überblick) zu K.4 Sicherung von Forderungen- SuS lesen 20' Theorie."
+    },
+    "36-19": {
+      "notes": "Grundrechtsfall Versammlungsfreiheit: die Theorie auf den konkreten Fall anwenden.\nGrundrechtsfall Glaubensfreiheit lösen und besprechen.\nDa die 28c abwesend ist und einige der 29s eine spontane Dispensation haben lösen die SuS den Fall Glaubensfreiheit als Auftrag."
+    },
+    "36-29": {
+      "notes": "Grundrechtsfall Glaubensfreiheit sollte als Auftrag gelöst werden. Nur 2/16 haben eine Lösung hochgeladen. SuS brauchen nocht Zeit die Lösung zu formulieren. Nächstes Mal besprechen."
+    },
+    "36-31": {
+      "notes": "Die Standortfaktorenanalyse (Nutzwertanalyse) wird vorgestellt, die Klasse stellt kritische Fragen.\nApple noch nicht vorgestellt, Grundsätzliche Kommentare zu allen NWA."
+    },
+    "36-35": {
+      "notes": "SuS lesen weiter Theorie zu K.4 Sicherung von Forderungen und lösen Übungen."
+    },
+    "36-37": {
+      "notes": "RTpP erarbeiten\nHinweis Textverarbeitung (Layout, Automatisierung, Zusammenarbeit)"
+    },
+    "37-2": {
+      "notes": "Da die 29f nur Halbklassenunterricht hat in diesem Semester führe ich die Prüfung während der Klassenstunde der 27a durch. Als Kompensation haben die beiden Halbklassen dächste Mal nur 1L.\n\nProblem mit Prüfungsfragen:\n\"\" sollten ignoriert werden, kann aber zu verwirrung stiften"
+    },
+    "37-4": {
+      "notes": "Proceedings\nSuS sammeln Ihre Handouts in einem Dokument, dazu werden diese allenfalls etw oder als Bild eingefügt. Ziel ist ein Booklet mit allen Handouts für die Vorträge zu haben."
+    },
+    "37-6": {
+      "notes": "HK B\nBilder\nRastergrafik\nSuS reproduzieren Bild gemäss Auftrag auf LV. Im Zentrum steht d der Ebenen."
+    },
+    "37-11": {
+      "notes": "NWA Apple vorstellen. Generelle Kommentare zu den NWA:\n- wofür wird NWA gemacht?\n- NWA formal korrekt (Standorte/Fakroren, Noten, Gewichtung, Punkte, Ranking.)\n- Begründungen für Standorte, Faktoren, Noten, Gewichtung\n- Faktoren genau definieren, nicht \"Verkehrsorientiert\"\nSuS lösen Aufgaben aus dem Lehrbuch zum ersten Kapitel."
+    },
+    "37-13": {
+      "notes": "HK B\nBilder\nRastergrafik\nSuS reproduzieren Bild gemäss Auftrag auf LV. Im Zentrum steht d der Ebenen."
+    },
+    "37-15": {
+      "notes": "Theorie Personenrecht kurz repetieren\nÜbungen Personenrecht lösen.\nKein IL da Ferien."
+    },
+    "37-17": {
+      "notes": "Input Erlöschen der Obligation.\nSuS lesen Theorie und beginnen mit Übungen."
+    },
+    "37-19": {
+      "notes": "Grundrechts-Fall Glaubensfreiheit:\nSuS lesen Grundrechtsfall-Lösung eines anderen SuS und geben eine detaillierte Rückmeldung.\nDen Fall im Plenum miteinander besprechen.\nSuS ergänzen Ihre Lösung, um eine gute Musterlösung zu haben."
+    },
+    "37-24": {
+      "notes": "BYOD\nProduktwissen / Konuzeptwissen\nHinweis auf die Fact-Sheets\nInput zu Dateimanagement, Datensicherheit\nRTpP\nHinweis auf Atkinson & Meyer\nSuS arbeiten weiter am Dossier"
+    },
+    "37-29": {
+      "notes": "SuS analysieren Umgang mit Corona in der Schweiz und beurteilen die Eingriffe aus einer Grundrechtsperspektive."
+    },
+    "37-31": {
+      "notes": "SuS lösen Aufgaben aus dem Lehrbuch zum ersten Kapitel.\nSuS lesen Kapitel 1.5 Ziele & Kennzahlen"
+    },
+    "37-35": {
+      "notes": "SuS lösen Übungen zum Erlöschen der Obligation.\nAbschluss"
+    },
+    "37-37": {
+      "notes": "RTpP erarbeiten"
+    },
+    "38-4": {
+      "notes": "Studienreise\n26e mit STZ (Triest)"
+    },
+    "38-13": {
+      "notes": "Studienreise\n26e mit STZ (Triest)"
+    },
+    "38-15": {
+      "notes": "Studienreise\n26e mit STZ (Triest)"
+    },
+    "38-17": {
+      "notes": "Studienreise\n26e mit STZ (Triest)"
+    },
+    "42-2": {
+      "notes": "SuS bereiten Ihre Präsentationen der Destinationen vor."
+    },
+    "42-4": {
+      "notes": "6 Gruppen haben Handout nicht in Proceedings eingefügt.\nNur 1 SuS hat Fragen zu Handout eingetragen.\nVorgehen Vortragslektion:\n- Vortrag:\n10 min (Zweiergruppen, 15 min bei Dreiergruppen)\n\n- Diskussion: ca. 15 min. Schüler*innen reichen im Vorfeld je mindestens 2 Fragen zum Handout ein. In der Diskussionsrunde sollen, so gut möglich, Fragen zum Vorgetragenen gestellt werden. Es kann jedoch auch auf die Fragen zum Handout zurückgegriffen werden.\n\n- Rhetorik:\nca. 15 min. 4 Gruppen, jeweils als Gruppe eine Rückmeldung im Plenum.\n1) Sprache / Stimme\n2) Körpersprache / Gestik / Mimik / Blick / Auftreten / Position / Stand / Bewegung\n3) Inhalt / Struktur / Argumentation / Spannungsbogen\n4) Visualisierung / Zusammenhang Gesagtes / Gezeigtes"
+    },
+    "42-6": {
+      "notes": "HK A\nBilder\nRastergrafik\nSuS reproduzieren Bild gemäss Auftrag auf LV. Im Zentrum steht d der Ebenen."
+    },
+    "42-11": {
+      "notes": "Selbstbeurteilung Unterrichtsleistung\nRepetition"
+    },
+    "42-13": {
+      "notes": "HK A\nBilder\nVektorgrafik\nSuS reproduzieren Bild gemäss Auftrag auf LV (Nachthimmel)."
+    },
+    "42-15": {
+      "notes": "Theorie Personenrecht repetieren\nÜbungen Personenrecht lösen\nIL: Übungen zum Personenrecht lösen"
+    },
+    "42-17": {
+      "notes": "Repetition OR AT\nEinführung Störung der Vertragserfüllung\nSachgewährleistung"
+    },
+    "42-19": {
+      "notes": "Recherchieren Sie, inwiefern die Massnahmen des Bundes während der COVID-Pandemie die Grundrechte rechtmässig eingeschränkt haben.\n\nGehen Sie auch auf folgende Fragen ein:\nWelche Grundrechte wurden eingeschränkt?\nWer hat Grundrechte eingeschränkt?\nWaren die Einschränkungen kontrovers? Weshalb?\nWer hat sich gegen Einschränkungen gewehrt?\nWie wurden die Einschränkungen beurteilt?\nWelche Anpassungen wurden nach den Notmassnahmen getroffen?\n--> Verhältnismässigkeit?\n--> Unsicherheit\n--> Risikotoleranz, Einstellung gegenüber dem Staat?"
+    },
+    "42-24": {
+      "notes": "KI\nUmgang mit LLM\nPrompting"
+    },
+    "42-29": {
+      "notes": "Vorstellen Praktikant\nMietrecht\nMietrecht Werkstatt"
+    },
+    "42-31": {
+      "notes": "Vorstellen Praktikant\nFehlende Selbstbeurteilungen\nK.1.5 Ziele Peer-Feedback\nKennzahlen  besprechen\nÜbungen K.1 fertig lösen und besprechen"
+    },
+    "42-35": {
+      "notes": "OR AT\nStörung Vertragserfüllung\nSchlechterfüllung, Sachgewährleistung\nÜbungen\nEinstieg Verzug"
+    },
+    "42-37": {
+      "notes": "RTpP erarbeiten"
+    },
+    "43-2": {
+      "notes": "Wahl zwischen den vorgeschlagenen Destionationen, welche ein Konzept eingereicht haben. \n1. Gruppen können Destination kurz vorstellen (mit Konzept).\n2. Alle geben Ihre Rangliste für die Destinationen ab.\n3. Für alle Destinationen werden Prioritäten gezählt (wie oft 1. 2. 3. 4. 5.). Destination mit den wenigsten 1. fällt raus. Diese werden zu den jeweiligen 2. Destinationen gezählt. erneutes Zählen. Letzte Destination fällt wiederum raus etc.\nFalls nur eine Destination eingereicht ist, ist diese gewählt."
+    },
+    "43-6": {
+      "notes": "HK B\nBilder\nVektorgrafik\nSuS reproduzieren Bild gemäss Auftrag auf LV (Nachthimmel)."
+    },
+    "43-13": {
+      "notes": "HK B\nBilder\nVektorgrafik\nSuS reproduzieren Bild gemäss Auftrag auf LV (Nachthimmel)."
+    },
+    "43-15": {
+      "notes": "Übungen Personenrecht besprechen?\nPersönlichkeitsverletzungen besprechen\nZivilprozessrecht\nIL: TED Video zu Zeugenaussagen schauen und Fragen Theorie zu Prozessrecht lesen."
+    },
+    "43-17": {
+      "notes": "OR AT\nRepetition Einstieg Gläubigerverzug, Schuldnerverzug\nSuS lösen die Übungen zum Verzug\nschreiben die Zusammenfassung für die Prüfung (2 A4 Seiten)"
+    },
+    "43-19": {
+      "notes": "SuS arbeiten selbstständig an Mietrechts-Werkstatt während ca. 8 Lektionen"
+    },
+    "43-24": {
+      "notes": "RTpP Erstversion / Peer Review\nSuS geben eine erste Version der Dokumente ab (Handout, Präsentationsfolien und Redetext)\nSuS geben sich Peer Feedback zu Handout und Präsentation"
+    },
+    "43-29": {
+      "notes": "SuS arbeiten selbstständig an Mietrechts-Werkstatt während ca. 8 Lektionen"
+    },
+    "43-35": {
+      "notes": "OR AT\nRepetition Einstieg Gläubigerverzug, Schuldnerverzug\nSuS lösen die Übungen zum Verzug\nschreiben die Zusammenfassung für die Prüfung (2 A4 Seiten)"
+    },
+    "43-37": {
+      "notes": "Prompting\nÜbung fertigstellen, besprechen"
+    },
+    "44-2": {
+      "notes": "Klasse plant Studienreise in Gruppen.\nReise\nUnterkunft\nVerpflegung\nAktivitäten"
+    },
+    "44-6": {
+      "notes": "HK A\nBilder\nVektorgrafik\nSuS reproduzieren Bild gemäss Auftrag auf LV (Nachthimmel)."
+    },
+    "44-11": {
+      "notes": "L1: ca. 45 Besuchende, L2: ca. 45 Besuchende\n\n29c\tBieri\tLenny\n29c\tClénin\tMelissa\n29c\tFarron\tColin\n29c\tGamper\tNeo\n29c\tGotsch\tSelina\n29c\tGrossenbacher\tMelina\n29c\tHäsler\tSilvan\n29c\tHäusler\tOscar\n29c\tHert\tJérôme\n\n1L:\n- Kurzer Input zum SF WR\n- Kurzer Input zur Fallstudie Brent Spar & St. Galler Unternehmensmodell\n- Einstieg in Strategische Unternehmensführung\n- SuS lesen Lehrbuchtext zu Vision, Werten & Leitbild\n- SuS lesen Leitbild von Hofwil und vergleichen dies mit dem Erleben der Schule. Wo Zeigen sich die Elemente des Leitbildes in der Realität der Schule?\n\n1L:\n- Kurzer Input zum SF WR\n- Kurzer Input zur Fallstudie Brent Spar & St. Galler Unternehmensmodell- Kurzer Input zu CSR (Corporate Social Responsibility)\n- SuS lesen Lehrbuchtext zu CSR\n- GA: SuS analysieren Strategie von Shell in 4 Gruppen, reflektieren die Aussagen kritisch (z.B. netto 0 als Erdölkonzern)\n\nAuftrag andere HK: frei, da normalerweise nur 1L"
+    },
+    "44-13": {
+      "notes": "28c\tBadertscher\tSarah\n28c\tBähler\tAylin\n28c\tBorn\tNola\n28c\tFuchs\tNina\n28c\tGauch\tTim\n28c\tHilber\tEleni\n28c\tHubacher\tJimena\n28c\tKammer\tAnne Louise\n28c\tMeier\tSeraina\n28c\tStremlow\tLorenz"
+    },
+    "44-15": {
+      "notes": "29f\tFankhauser\tJano\n29f\tLuong\tLeandro Gia-Hy\n29s\tGerber\tJoan\n29s\tHofer\tMats\n29s\tTobler\tElias"
+    },
+    "44-17": {
+      "notes": "L1: ca. 10 Besuchende, L2: ca. 17 Besuchende\n\n27a\tArn\tMelina\n27a\tClénin\tSelina\n27a\tDzamko\tElia\n27a\tFlury\tMaya\n27a\tFranzelli\tJanis\n27a\tGalanis\tSpiros\n27a\tRousselot\tLéonore\n28f\tMoret\tBen\n28f\tPalanivelu\tNithin\n28f\tWieser\tLeon\n28f\tBernhard\tNai-Thim\n28f\tMedici\tNevio"
+    },
+    "44-19": {
+      "notes": "L1: 15 Besuchende, L2: XX Besuchende\n\nSuS arbeiten selbstständig an Mietrechts-Werkstatt während ca. 8 Lektionen\n\n(28b\tZoubkoff\tLioba)\n28c\tGauch\tTim\n(28c\tStremlow\tLorenz)\n29f\tFankhauser\tJano\n29f\tLuong\tLeandro Gia-Hy\n(29s\tGerber\tJoan)\n(29s\tHofer\tMats)\n29s\tTobler\tEli: Werkstatt Mietrecht\n- Kurzer Input zum SF WR\n- SuS zeigen Besuchern bisher bearbeitete Posten, Beispiele für Gelerntes.\n- Posten 11 (Fallen für den Vermieter)\n2 Fallen ausdenken\n1.5 S. Text mit 7 Fallen lesen, mit eigenen Beispielen abgleichen\nArtikel im Gesetz zu den Fallen suchen\n\n1L: Werkstatt Mietrecht\n- Kurzer Input zum SF WR\n- SuS zeigen Besuchern bisher bearbeitete Posten, Beispiele für Gelerntes.\n- Posten 12 (Datenschutz)\n1/2 S. Text lesen, 9 R/F Fragen beantworten. \nLösung diskutieren\n- Posten 14 (Kreuzworträtsel)\nIndividuell\n\nAndere HK arbeit an Mietrecht Werkstatt"
+    },
+    "44-24": {
+      "notes": "RTpP Endversion\nSuS geben die finale Version der RTpP Dokumente ab"
+    },
+    "44-29": {
+      "notes": "Dispensiert:\n28c Tim G.\n29s Karl B.\n29s Eli.\n29s Aurore G."
+    },
+    "44-35": {
+      "notes": "? Prüfung\nObligationenrecht\nA4 Blatt Notizen"
+    },
+    "44-37": {
+      "notes": "Abschluss RTpP\nReflexion"
+    },
+    "45-11": {
+      "notes": "29c\tHirter\tLaurel\n29c\tHochuli\tMalin\n29c\tLanz\tFabian\n29c\tLieb\tAmanda\n29c\tLuginbühl\tLouis\n29c\tMünger\tLevin\n29c\tRoth\tFabia\n29c\tRousselot\tLuc\n\n1L:\n- Kurzer Input zum SF WR\n- Kurzer Input zur Fallstudie Brent Spar & St. Galler Unternehmensmodell\n- Einstieg in Strategische Unternehmensführung\n- SuS lesen Lehrbuchtext zu Vision, Werten & Leitbild\n- SuS lesen Leitbild von Hofwil und vergleichen dies mit dem Erleben der Schule. Wo Zeigen sich die Elemente des Leitbildes in der Realität der Schule?\n\n1L:\n- Kurzer Input zum SF WR\n- Kurzer Input zur Fallstudie Brent Spar & St. Galler Unternehmensmodell- Kurzer Input zu CSR (Corporate Social Responsibility)\n- SuS lesen Lehrbuchtext zu CSR\n- GA: SuS analysieren Strategie von Shell in 4 Gruppen, reflektieren die Aussagen kritisch (z.B. netto 0 als Erdölkonzern)\n\nAuftrag andere HK: frei, da normalerweise nur 1L"
+    },
+    "45-13": {
+      "notes": "Bilder\nLV Gesichtserkennung"
+    },
+    "45-15": {
+      "notes": "29s\tAllemann\tNicol\tBaumann\tKarl\n29s\tGaillard\tAurore"
+    },
+    "45-17": {
+      "notes": "27a\tGnanambalavanan\tShaiylan\n27a\tLieb\tRaphael\n27a\tMarchal\tSelina\n27a\tRickli\tAnjo\n27a\tRousselot\tLéonore"
+    },
+    "45-19": {
+      "notes": "SuS arbeiten selbstständig an Mietrechts-Werkstatt während ca. 8 Lektionen\n\n28c\tBärtschi\tGabrielle\n28c\tMichel\tSimon\n28c\tNeuenschwander\tAlva\n28c\tSchneider\tLynn\n28c\tWettstein\tHelena\n29s\tAllemann\tNicol\tBaumann\tKarl\n29s\tGaillard\tAurore"
+    },
+    "45-29": {
+      "notes": "Dispensiert:\n28c Rafael M.\n28c Tim G.\n29s Karl B.\n29s Eli.\n29s Aurore G."
+    },
+    "45-35": {
+      "notes": "Einstieg Sozialpolitik\n\nGA Sozialversicherungen\n- Gruppen bilden, Themen zuteilen\nAHV: Alters- und Hinterlassenenversicherung\nIV, EL: Invalidenversicherung, Ergänzungsleistungen\nBV: Berufliche Vorsorge (Pensionskasse), 3.Säule: Säule 3a/b\nFZ: Familienzulagen\nKV: Krankenversicherung\nALV, EO: Arbeitslosenversicherung & Erwerbsersatzordnung\nUV: Unfallversicherung\nSozialhilfe"
+    },
+    "46-11": {
+      "notes": "Prüfung BWL\nEinführung BWL\nNutzwertanalyse\nSt.Galler Unternehmensmodell\nPapierprüfung, 45Min, keine Hilfsmittel. Alles offene Fragen.\n\nMelina Grossenbacher hat sich kurz vor der Prüfung mit Scherben an der Hand verletzt. Sie sagt Sie könne schreiben.\n\nalle 17 Anwesend, Levin kam 5 Minuten zu spät."
+    },
+    "46-13": {
+      "notes": "Bilder\nMetadaten\n\nKopieren von Dateien\n- Bild von Handy auf Computer: Wege? Vorteile, Nachteile? Plattformabhängig, Dateityp (z.B. PDF? .py?)\n\nTools an Tafel sammeln (Mail, Whatsapp, Google Drive, Google Photos, Instagram, Airdrop (Apple), Smart Switch (Android)\n\nWie .pdf oder .py von einem Gerät aufs andere?\n\nDatei öffnen mit:\n- Fotoprogramme\n- Text Edit\n- VSC?\n--> spezifische Dateien sehen in unterschiedlichen Programmen unterschiedlich aus\n\nMetadaten von Dateien\n- OS (ctrl i)\n- Bildbearbeitungsprogramm\n- Auftrag: Selfie in Oslo in 1 Woche\n\nWettbewerb: Inhalte/Metadaten manipulieren vs. Manipulation verhindern/feststellen\n\nMetadaten früher? Bsp. Analoges Foto\n\nFoto Hofwil: Heute Morgen?\nFoto Gitarre: Wer, Wie, Wann, Wo?\n\nMetadaten: Datenschutz?\nWo sind Metadaten relevant? W man daraus herauslesen?\n- Smartphone: GPS, Communikation (mit wem, wann, etc.), etc.?\n- Social Media: Bspw. Whatsapp erkennt Kinderpornographieringe trotz 2-Wege-Verschlüsselung der Inhalte.\n- Migros / Coop (wer kauft w ein etc.)\n- Nutzen für Nutzende (z.B. Konfort) vs. Anbietende (z.B. gezielte Werbung)\nWer ist an Metadaten interessiert? (Unternehmung (Nutzererlebnis, Werbung), Staat)\nAlternativen?"
+    },
+    "46-15": {
+      "notes": "TED Video zu Zeugenaussagen besprechen\nProzessrecht besprechen\nRepetition Recht"
+    },
+    "46-17": {
+      "notes": "GA Sozialversicherungen\n1. AHV: Alters- und Hinterlassenenversicherung:  Spiros, Shaiylan \n2. IV, EL: Invalidenversicherung, Ergänzungsleistungen: Selina C., Melina\n3. BV: Berufliche Vorsorge (Pensionskasse), 3.Säule: Säule 3a/b: Selina M, Léonore\n4. FZ, BZ: Familienzulagen, Betreuungszulagen: Ben, Nai-Thim\n5. KV: Krankenversicherung: Nevio, Elia\n6. UV: Unfallversicherung: Raphael, Janis\n7. ALV, EO: Arbeitslosenversicherung & Erwerbsersatzordnung: Leon, Nithin (Augen OP am 20.11)\n8. Sozialhilfe: Anjo, Maya\nNithin hat am 20.11 eine Augenop, fällt danach allenfalls bis 4 Wochen aus. Daher fällt er 2 von 7 Lektionen aus, allenfalls auch beim Vortrag."
+    },
+    "46-19": {
+      "notes": "SuS arbeiten selbstständig an Mietrechts-Werkstatt während ca. 8 Lektionen\nRepetition Prüfungsstoff (Einführung Recht, Grundrechte, Mietrecht)\nZusammenfassung schreiben für Prüfung 1 A4 Seite"
+    },
+    "46-29": {
+      "notes": "Dispensiert:\n28c Tim G.\n29s Karl B.\n29s Eli.\n29s Aurore G.\nAlle TaF-SuS abwesend (wegen IW46)"
+    },
+    "46-31": {
+      "notes": "Kurze Repetition zu Vision, Werte, Leitbild\nCSR (Bsp. Shell)\nStrategische Planung: Analysieren der Ausgangslage\n- 5-Kräfte-Modell nach Porter\n1. Rivalität durch Konkurrenz\n2. Verhandlungsmacht Kunden\n3. Verhandlungsmacht Lieferanten\n4. Potentielle Konkurrenz\n5. Gefahr durch Ersatzprodukte\n- SWOT-Analyse\nSuS wenden die beiden Modelle an einem konkreten Beispiel (z.B. Shell) an."
+    },
+    "46-35": {
+      "notes": "Prüfung\nObligationenrecht AT\n2 A4 Seiten Notizen\n\nLeon kann krankheithalber nicht schreiben. NP\n15 Anwesende"
+    },
+    "47-11": {
+      "notes": "SuS wenden Produkt-Markt-Matrix und die Wettbewerbsstrategien nach Porter am Bsp. Apple an."
+    },
+    "47-13": {
+      "notes": "Bilder\nMetadaten\n\nKopieren von Dateien\n- Bild von Handy auf Computer: Wege? Vorteile, Nachteile? Plattformabhängig, Dateityp (z.B. PDF? .py?)\n\nTools an Tafel sammeln (Mail, Whatsapp, Google Drive, Google Photos, Instagram, Airdrop (Apple), Smart Switch (Android)\n\nWie .pdf oder .py von einem Gerät aufs andere?\n\nDatei öffnen mit:\n- Fotoprogramme\n- Text Edit\n- VSC?\n--> spezifische Dateien sehen in unterschiedlichen Programmen unterschiedlich aus\n\nMetadaten von Dateien\n- OS (ctrl i)\n- Bildbearbeitungsprogramm\n- Auftrag: Selfie in Oslo in 1 Woche\n\nWettbewerb: Inhalte/Metadaten manipulieren vs. Manipulation verhindern/feststellen\n\nMetadaten früher? Bsp. Analoges Foto\n\nFoto Hofwil: Heute Morgen?\nFoto Gitarre: Wer, Wie, Wann, Wo?\n\nMetadaten: Datenschutz?\nWo sind Metadaten relevant? W man daraus herauslesen?\n- Smartphone: GPS, Communikation (mit wem, wann, etc.), etc.?\n- Social Media: Bspw. Whatsapp erkennt Kinderpornographieringe trotz 2-Wege-Verschlüsselung der Inhalte.\n- Migros / Coop (wer kauft w ein etc.)\n- Nutzen für Nutzende (z.B. Konfort) vs. Anbietende (z.B. gezielte Werbung)\nWer ist an Metadaten interessiert? (Unternehmung (Nutzererlebnis, Werbung), Staat)\nAlternativen?"
+    },
+    "47-15": {
+      "notes": "TED Video zu Zeugenaussagen besprechen\nProzessrecht besprechen\nRepetition Recht"
+    },
+    "47-17": {
+      "notes": "GA Sozialversicherungen\n1. AHV: Alters- und Hinterlassenenversicherung:  Spiros, Shaiylan \n2. IV, EL: Invalidenversicherung, Ergänzungsleistungen: Selina C., Melina\n3. BV: Berufliche Vorsorge (Pensionskasse), 3.Säule: Säule 3a/b: Selina M, Léonore\n4. FZ, BZ: Familienzulagen, Betreuungszulagen: Ben, Nai-Thim\n5. KV: Krankenversicherung: Nevio, Elia\n6. UV: Unfallversicherung: Raphael, Janis\n7. ALV, EO: Arbeitslosenversicherung & Erwerbsersatzordnung: Leon, Nithin (Augen OP am 20.11)\n8. Sozialhilfe: Anjo, Maya\nNithin hat am 20.11 eine Augenop, fällt danach allenfalls bis 4 Wochen aus. Daher fällt er 2 von 7 Lektionen aus, allenfalls auch beim Vortrag."
+    },
+    "47-19": {
+      "notes": "Prüfung\nGrundrechte\nMietrecht\n\nAbwesend:\nAlva Neuenschwander 28c\nNicol 29s\nKarl Baumann 29s\nJoan Gerber 29s (Dienstags dispensiert)\nMats Hofer 29s\nEli 29s"
+    },
+    "47-29": {
+      "notes": "Dispensiert:\n28c Tim G.\n29s Karl B.\n29s Eli.\n29s Aurore G."
+    },
+    "47-35": {
+      "notes": "Sozialpolitik\nGerechtigkeitstheorien\nEingriffe aus Gerechtigkeitsgründen"
+    },
+    "48-11": {
+      "notes": "Start GA Unternehmenskonzept\nSuS erarbeiten ein einfaches Unternehmenskonzept für ein Cupcake-Café in Bern.\nDies dient als Vorarbeit für den Marketing-Mix Auftrag, welchen die SuS in den selben Gruppen erarbeiten werden."
+    },
+    "48-13": {
+      "notes": "Einstieg Kryptologie\n\nNachricht von A nach C. (3 Gruppen)\nüber 3 S* (dabei ist B) hinweg transportiert.\nB möchte Nachricht lesen.\nA möchte C Geheimnis mitteilen. Wie B hindern mitzulesen?\n\n- A, B, C jeweils in allen drei Rollen\n- Nachricht: Auf A5 Papier, Entschlüsselte Nachricht 20 Zeichen\n- 3 Versionen: \n1) A und C können vorher nicht kommunizieren\nPhase 1: 20' Nachricht verfassen\nPhase 2: 10' Abhören\nPhase 3: 10' Entschlüsseln\n\n2) A und C können vorher kommunizieren, B ist jedoch dabei\nPhase 1: 20' Nachricht verfassen, 1' Absprache mit B,  C hört zu\nPhase 2: 10' Abhören\nPhase 3: 10' Entschlüsseln\n\n3) A und C können vorher unter Ausschluss von B kommunizieren\nPhase 1: 20' Nachricht verfassen,1' Absprache mit B,  ohne C\nPhase 2: 10' Abhören\nPhase 3: 10' Entschlüsseln\n\nStrategien:\n- Buchstaben verschieben\n- Insider-Wissen (z.B. Erlebnisse, Fremdsprachenkenntnisse, graphische Codierung (Bilder), etc.)\n- Kontextwissen: Wer sendet Wem? \n- Information erraten, darauf auf Verschlüsselung schliessen\n- Wahrscheinlichkeiten (Histogramme, Häufige Worte etc.)"
+    },
+    "48-15": {
+      "notes": "Prüfung:\nEinstieg Rechtsordnung (ÖR, PR), Moral, Sitte, Recht\nPersonenrecht\nProzessrecht"
+    },
+    "48-17": {
+      "notes": "GA Sozialversicherungen\n1. AHV: Alters- und Hinterlassenenversicherung:  Spiros, Shaiylan \n2. IV, EL: Invalidenversicherung, Ergänzungsleistungen: Selina C., Melina\n3. BV: Berufliche Vorsorge (Pensionskasse), 3.Säule: Säule 3a/b: Selina M, Léonore\n4. FZ, BZ: Familienzulagen, Betreuungszulagen: Ben, Nai-Thim\n5. KV: Krankenversicherung: Nevio, Elia\n6. UV: Unfallversicherung: Raphael, Janis\n7. ALV, EO: Arbeitslosenversicherung & Erwerbsersatzordnung: Leon, Nithin (Augen OP am 20.11)\n8. Sozialhilfe: Anjo, Maya\nNithin hat am 20.11 eine Augenop, fällt danach allenfalls bis 4 Wochen aus. Daher fällt er 2 von 7 Lektionen aus, allenfalls auch beim Vortrag."
+    },
+    "48-19": {
+      "notes": "Einführung VWL\nÖkonomisches Menschenbild\nEntscheidfindungsprozesse\nSuS sammelnt Entscheide, welche sie heute getroffen haben. \n\nHomo Oeconomicus\nEigenschaften & Kritik\n\nAnreize und Ihre Wirkung: Notensystem in Hofwil analysieren und Auswirkungen auf Verhalten der Beteiligten diskutieren.\nAndere Bsp.: Steuersystem, Strafrecht, Lohnarbeit, Sozialversicherungen..."
+    },
+    "48-29": {
+      "notes": "Dispensiert:\n28c Tim G.\n29s Karl B.\n29s Eli.\n29s Aurore G."
+    },
+    "48-31": {
+      "notes": "Unternehmenskonzept fertigstellen\nEvaluation besprechen\n\nEinstieg Marketing\nGA Marketing-Mix einführen\n\nTheorie\nMarktanalyse\nLeistungsanalyse\nProdukt-Marktziele\n\nMarketing-Mix"
+    },
+    "48-35": {
+      "notes": "Sozialpolitik\nInput Messung von Wohlfahrt, Armug, Ungleichheit\nGA Analyse der Marktversagen, Staatseingriffe je Sozialversicherung\nMonopole (Unfallversicherung SUVA) vs. Markt (Krankenkassen)\nInformationsprobleme, Moral Hazard, Adverse Selection"
+    },
+    "49-13": {
+      "notes": "28c\tBadertscher\tSarah\n28c\tBähler\tAylin\n28c\tBorn\tNola\n28c\tFuchs\tNina\n28c\tGauch\tTim\n28c\tHilber\tEleni\n28c\tHubacher\tJimena\n28c\tKammer\tAnne Louise\n28c\tMeier\tSeraina\n28c\tStremlow\tLorenz\n\nBilder\nMetadaten\n\nKopieren von Dateien\n- Bild von Handy auf Computer: Wege? Vorteile, Nachteile? Plattformabhängig, Dateityp (z.B. PDF? .py?)\n\nTools an Tafel sammeln (Mail, Whatsapp, Google Drive, Google Photos, Instagram, Airdrop (Apple), Smart Switch (Android)\n\nWie .pdf oder .py von einem Gerät aufs andere?\n\nDatei öffnen mit:\n- Fotoprogramme\n- Text Edit\n- VSC?\n--> spezifische Dateien sehen in unterschiedlichen Programmen unterschiedlich aus\n\nMetadaten von Dateien\n- OS (ctrl i)\n- Bildbearbeitungsprogramm\n- Auftrag: Selfie in Oslo in 1 Woche\n\nWettbewerb: Inhalte/Metadaten manipulieren vs. Manipulation verhindern/feststellen\n\nMetadaten früher? Bsp. Analoges Foto\n\nFoto Hofwil: Heute Morgen?\nFoto Gitarre: Wer, Wie, Wann, Wo?\n\nMetadaten: Datenschutz?\nWo sind Metadaten relevant? W man daraus herauslesen?\n- Smartphone: GPS, Communikation (mit wem, wann, etc.), etc.?\n- Social Media: Bspw. Whatsapp erkennt Kinderpornographieringe trotz 2-Wege-Verschlüsselung der Inhalte.\n- Migros / Coop (wer kauft w ein etc.)\n- Nutzen für Nutzende (z.B. Konfort) vs. Anbietende (z.B. gezielte Werbung)\nWer ist an Metadaten interessiert? (Unternehmung (Nutzererlebnis, Werbung), Staat)\nAlternativen?"
+    },
+    "49-29": {
+      "notes": "Einstieg: Video 1962 Börse Zürich\nSuS lesen Theorie zu Aktien und bearbeiten Übung dazu.\nNamenaktien, Inhaberaktien, Vorzugsaktien, Vinkulierte Aktien,"
+    },
+    "49-35": {
+      "notes": "Sozialpolitik\niconomix Wie Versicherungen funktionieren\n\nEingriffe aus Effizienzlösungen\nElastizitäten (wer trägt Last der Versicherung?)"
+    },
+    "50-13": {
+      "notes": "Einstieg Kryptologie\n\nNachricht von A nach C. (3 Gruppen)\nüber 3 S* (dabei ist B) hinweg transportiert.\nB möchte Nachricht lesen.\nA möchte C Geheimnis mitteilen. Wie B hindern mitzulesen?\n\n- A, B, C jeweils in allen drei Rollen\n- Nachricht: Auf A5 Papier, Entschlüsselte Nachricht 20 Zeichen\n- 3 Versionen: \n1) A und C können vorher nicht kommunizieren\nPhase 1: 20' Nachricht verfassen\nPhase 2: 10' Abhören\nPhase 3: 10' Entschlüsseln\n\n2) A und C können vorher kommunizieren, B ist jedoch dabei\nPhase 1: 20' Nachricht verfassen, 1' Absprache mit B,  C hört zu\nPhase 2: 10' Abhören\nPhase 3: 10' Entschlüsseln\n\n3) A und C können vorher unter Ausschluss von B kommunizieren\nPhase 1: 20' Nachricht verfassen,1' Absprache mit B,  ohne C\nPhase 2: 10' Abhören\nPhase 3: 10' Entschlüsseln\n\nStrategien:\n- Buchstaben verschieben\n- Insider-Wissen (z.B. Erlebnisse, Fremdsprachenkenntnisse, graphische Codierung (Bilder), etc.)\n- Kontextwissen: Wer sendet Wem? \n- Information erraten, darauf auf Verschlüsselung schliessen\n- Wahrscheinlichkeiten (Histogramme, Häufige Worte etc.)"
+    },
+    "50-15": {
+      "notes": "SF WR: Letzte Woche Einstieg  Homo Oeconomicus.\nEinstieg VWL \nDollar Street \nAuftrag: SuS lesen Texte, nächstes Mal besprechen. \nBedürfnisse vs. Knappheit\nGüter/DL, Produktionsfaktoren\nStrukturwandel"
+    },
+    "50-17": {
+      "notes": "? CoP PICTS (HEP)\nPrüfung besprechen\n\nGA Sozialversicherungen\n1. AHV  Spiros, Shaiylan\n2. IV, EL  Selina C., Melina\nVertiefung"
+    },
+    "50-19": {
+      "notes": "Ökonomisches Menschenbild\nRepetition Anreize und Ihre Wirkung: Auswirkungen des Noten- und Bestehungssystems auf d der Beteiligten. Fokus: Auswirkungen auf Lehrpersonen?\n\niconomix Gefangenendilemma\nSuS entscheiden, ob Sie Geld behalten oder in Couvert geben. Dieses Couvert wird zufällig jemand anderem gegeben. D im Couvert wird verdoppelt.\nKonzept des Gefangenendilemm (Es geht um Anreizsysteme, in welchen Kooperation für alle am besten wäre, die individuellen Anreize der Kooperation aber im Wege stehen.). Erweiterung auf Mafia."
+    },
+    "50-29": {
+      "notes": "Gesellschaftsrecht\nGmbH"
+    },
+    "50-35": {
+      "notes": "GA Sozialversicherungen\n3. BV, 3.Säule  Selina M., Léonore\n4. Familien und Betreuungszulagen  Ben, Nai-Thim\nVertiefung"
+    },
+    "51-13": {
+      "notes": "LearningView Kryptographie: \nEinstieg Brickfilm zu Kryptographie\nSicherheitsziele Theorie lesen und an Bsp. Anwenden.\n\nLerneinheit \"Verschlüsselung\"\nSuS lesen selbstständig die Theorie und bearbeiten die Übungsfragen. \nLösungen auf LV hochladen."
+    },
+    "51-15": {
+      "notes": "Letzter Auftrag: SuS lesen Texte, dieses Mal besprechen. \nBedürfnisse vs. Knappheit\nGüter/DL, Produktionsfaktoren\nStrukturwandel"
+    },
+    "51-17": {
+      "notes": "GA Sozialversicherungen\n5. Krankenversicherung  Elia, Nevio\n8. Sozialhilfe  Anjo, Maya\n\nVertiefung"
+    },
+    "51-19": {
+      "notes": "NP NP Karl Baumann 29s\nPrüfung besprechen\n\nRepetition Gefangenendilemma, wichtigste Punkte\n\nÖkonomisches Menschenbild - Gefangenendilemma.\nEigenschaften von erfolgreichen Strategien erarbeiten.\nVideo: What Game Theory Reveals About Life, The Universe, and Everything\nErweiterung Gefangenendilemma:\n- Wiederholte Spiele (Endlich (Endrundeneffekt, Unendlich)\n- Eigenschaften erfolgreicher Strategien (Nett, Verzeihend, Gib schnell zurück, interpretierbares Verhalten)"
+    },
+    "51-29": {
+      "notes": "Gesellschaftsrecht\nGenossenschaft"
+    },
+    "51-35": {
+      "notes": "Repetition Erweiterung Prisoners Dilemma\n\nFinanzierung Sozialpolitik: Wer zahlt?\nHäufig teilemn sich AN/AG Beiträge. Aufgrund der Elastizitäten zahlen de fakto jedoch AN.\nUmverteilungseffekt? (Beiträge, Mwst. keine grosse Umverteilung)\n\nVertiefung Demographie\nGründe für demographischen Wandel, sinkende Fertilitätsrate\n- Emanzipation der Frauen (Bildung, Arbeit)\n- Kindersterblichkeit sinkt\n- Kosten Kinder steigen\n- Normen, Rollenbilder, Religion, Familienplanung, Politik"
+    }
+  }
+}
