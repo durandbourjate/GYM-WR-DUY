@@ -228,13 +228,8 @@ export const usePlannerStore = create<PlannerState>()(
     }
 
     if (fromCourseId !== toCourseId && !(areLinked && crossDay === false)) {
-      // Different, unlinked courses — just add this one
-      set((s) => ({
-        multiSelection: s.multiSelection.includes(toKey)
-          ? s.multiSelection
-          : [...s.multiSelection, toKey],
-        lastSelectedKey: toKey,
-      }));
+      // Different, unlinked courses — block range select (error-prone cross-course selection)
+      // Only allow single-cell add via Cmd/Ctrl+Click, not Shift+Click range
       return;
     }
 

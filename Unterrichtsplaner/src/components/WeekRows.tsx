@@ -636,7 +636,11 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                 {week.w}
               </div>
               {isCurrent && <div className="w-1 h-1 rounded-full bg-blue-400 mx-auto mt-0.5 animate-pulse" />}
-              {eventInfo && <div className="text-[7px] text-amber-500/70 leading-tight mt-0.5 max-w-[40px] overflow-hidden" title={eventInfo.label}>📅</div>}
+              {eventInfo && (
+                <div className="text-[6px] text-amber-500/70 leading-tight mt-0.5 max-w-[44px] truncate" title={eventInfo.label}>
+                  📅 {eventInfo.label.length > 6 ? eventInfo.label.slice(0, 6) + '…' : eventInfo.label}
+                </div>
+              )}
             </td>
 
             {/* Lesson cells */}
@@ -690,8 +694,9 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                 ? (effectiveTopicSub ? `${effectiveTopicMain} › ${effectiveTopicSub}` : effectiveTopicMain)
                 : title;
 
-              // Fixed cells: holidays (type 6) and events (type 5) should not be draggable
-              const isFixed = lessonType === 6 || lessonType === 5;
+              // Fixed cells: holidays (type 6) always fixed, events (type 5) fixed unless they have a LESSON category (Auftrag = Unterricht)
+              const isAuftragUnterricht = lessonType === 5 && cellDetail?.blockCategory === 'LESSON';
+              const isFixed = lessonType === 6 || (lessonType === 5 && !isAuftragUnterricht);
 
               // Search match
               const searchLower = searchQuery.toLowerCase();
@@ -954,6 +959,20 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                     </div>
                   )}
 
+                  {/* Custom Badges */}
+                  {(() => {
+                    const cellBadges = lessonDetails[`${week.w}-${c.col}`]?.badges;
+                    if (!cellBadges?.length || !title) return null;
+                    const topOffset = hkGroup ? 12 : 0;
+                    return cellBadges.map((b, bi) => (
+                      <div key={bi}
+                        className="absolute right-0.5 text-[7px] font-bold z-10 px-1 py-px rounded-bl select-none pointer-events-none"
+                        style={{ top: topOffset + bi * 12, background: b.color + '40', color: b.color }}>
+                        {b.label}
+                      </div>
+                    ));
+                  })()}
+
                   {/* TaF Phase indicator */}
                   {tafPhase && ci === 0 && (
                     <div
@@ -988,7 +1007,7 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                         {displayTitle}
                       </span>
                     </div>
-                  ) : title && lessonType === 5 ? (
+                  ) : title && lessonType === 5 && !isAuftragUnterricht ? (
                     /* Event/Sonderwoche cells: amber, klickbar (Studienreisen etc. brauchen Planung) */
                     <div
                       className="mx-0.5 ml-1.5 px-1.5 py-1 rounded flex items-center justify-center cursor-pointer hover:brightness-110 transition-all"
@@ -1030,6 +1049,7 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                     >
                       {lessonType === 4 && <span className="mr-0.5 text-[8px]">📝</span>}
                       {isFixed && <span className="mr-0.5 text-[8px]">{lessonType === 6 ? '🏖' : '📅'}</span>}
+                      {isAuftragUnterricht && <span className="mr-0.5 text-[8px]" title="Auftrag (kein Präsenzunterricht)">📋</span>}
                       {cellDetail?.sol?.enabled && <span className="mr-0.5 text-[8px]" title="SOL">📚</span>}
                       <div
                         className="leading-tight overflow-hidden flex-1 cursor-pointer"

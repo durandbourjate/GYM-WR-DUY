@@ -121,6 +121,12 @@ export interface LessonDetail {
   materialLinks?: string[];
   notes?: string;
   sol?: SolDetails;
+  badges?: CellBadge[];
+}
+
+export interface CellBadge {
+  label: string;   // 1-3 Zeichen, z.B. "P", "HK", "📝"
+  color: string;   // Hex-Farbe, z.B. "#ef4444"
 }
 
 // === Materialsammlung (Collection) ===

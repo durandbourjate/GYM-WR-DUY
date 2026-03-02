@@ -482,6 +482,66 @@ function AddToSequenceButton({ week, course }: { week: string; course: Course })
   );
 }
 
+const BADGE_PRESETS: { label: string; color: string; title: string }[] = [
+  { label: 'P', color: '#ef4444', title: 'Prüfung' },
+  { label: 'HK', color: '#7c3aed', title: 'Halbklasse' },
+  { label: '!', color: '#f59e0b', title: 'Wichtig' },
+  { label: '📎', color: '#6b7280', title: 'Material' },
+];
+
+function BadgeEditor({ badges, onChange }: { badges: import('../types').CellBadge[]; onChange: (b: import('../types').CellBadge[]) => void }) {
+  const [customLabel, setCustomLabel] = useState('');
+  const [customColor, setCustomColor] = useState('#3b82f6');
+
+  const addBadge = (label: string, color: string) => {
+    if (!label || badges.some(b => b.label === label)) return;
+    onChange([...badges, { label, color }]);
+  };
+
+  const removeBadge = (idx: number) => {
+    onChange(badges.filter((_, i) => i !== idx));
+  };
+
+  return (
+    <div className="space-y-1.5">
+      {/* Current badges */}
+      {badges.length > 0 && (
+        <div className="flex gap-1 flex-wrap">
+          {badges.map((b, i) => (
+            <span key={i} className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-bold"
+              style={{ background: b.color + '30', color: b.color, border: `1px solid ${b.color}60` }}>
+              {b.label}
+              <button onClick={() => removeBadge(i)} className="text-[8px] opacity-60 hover:opacity-100 cursor-pointer ml-0.5">✕</button>
+            </span>
+          ))}
+        </div>
+      )}
+      {/* Presets */}
+      <div className="flex gap-1 flex-wrap">
+        {BADGE_PRESETS.map(p => (
+          <button key={p.label} onClick={() => addBadge(p.label, p.color)}
+            className="px-1.5 py-0.5 rounded text-[8px] border border-dashed cursor-pointer hover:opacity-80"
+            style={{ borderColor: p.color + '60', color: p.color + 'cc' }}
+            title={p.title}
+            disabled={badges.some(b => b.label === p.label)}
+          >+ {p.label}</button>
+        ))}
+      </div>
+      {/* Custom */}
+      <div className="flex gap-1 items-center">
+        <input value={customLabel} onChange={e => setCustomLabel(e.target.value.slice(0, 3))}
+          placeholder="1-3 Z." maxLength={3}
+          className="w-12 bg-slate-700 text-slate-200 border border-slate-600 rounded px-1 py-0.5 text-[9px] outline-none focus:border-blue-400" />
+        <input type="color" value={customColor} onChange={e => setCustomColor(e.target.value)}
+          className="w-5 h-5 rounded cursor-pointer border-0 bg-transparent" />
+        <button onClick={() => { if (customLabel.trim()) { addBadge(customLabel.trim(), customColor); setCustomLabel(''); } }}
+          disabled={!customLabel.trim()}
+          className="px-1.5 py-0.5 rounded text-[8px] border border-dashed border-gray-600 text-gray-400 hover:text-gray-200 cursor-pointer disabled:opacity-30">+</button>
+      </div>
+    </div>
+  );
+}
+
 function DetailsTab() {
   const {
     selection,
@@ -763,6 +823,12 @@ function DetailsTab() {
             }
           }} />
         </div>
+        {/* Badges */}
+        <div>
+          <label className="text-[9px] text-gray-400 font-medium mb-1 block">Badges</label>
+          <BadgeEditor badges={detail.badges || []} onChange={(badges) => updateField('badges', badges.length > 0 ? badges : undefined)} />
+        </div>
+
         <div>
           <label className="text-[9px] text-gray-400 font-medium mb-1 block">Notizen</label>
           <textarea value={detail.notes || ''} onChange={(e) => updateField('notes', e.target.value)}
@@ -783,9 +849,11 @@ function BatchOrDetailsTab() {
 
 // Batch editing for multiple selected cells
 function BatchEditTab() {
-  const { multiSelection, updateLessonDetail, pushUndo, lessonDetails } = usePlannerStore();
+  const { multiSelection, updateLessonDetail, pushUndo, lessonDetails, sequences, addSequence, updateBlockInSequence, setEditingSequenceId, setSidePanelTab } = usePlannerStore();
   const { courses: COURSES } = usePlannerData();
   const [applied, setApplied] = useState<string | null>(null);
+  const [showSeqMenu, setShowSeqMenu] = useState(false);
+  const seqMenuRef = useRef<HTMLDivElement>(null);
 
   // Parse multi-selection keys to week-col pairs
   const cells = multiSelection.map(key => {
@@ -793,6 +861,58 @@ function BatchEditTab() {
     const course = COURSES.find(c => c.id === courseId);
     return course ? { week, col: course.col, courseId } : null;
   }).filter(Boolean) as { week: string; col: number; courseId: string }[];
+
+  // Close seq menu on outside click
+  useEffect(() => {
+    if (!showSeqMenu) return;
+    const handler = (e: MouseEvent) => {
+      if (seqMenuRef.current && !seqMenuRef.current.contains(e.target as Node)) setShowSeqMenu(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [showSeqMenu]);
+
+  // Determine shared course for sequence creation
+  const sharedCourseId = useMemo(() => {
+    const ids = new Set(cells.map(c => c.courseId));
+    if (ids.size === 1) return [...ids][0];
+    // Check if all are linked (same cls+typ)
+    const courses = [...ids].map(id => COURSES.find(c => c.id === id)).filter(Boolean) as Course[];
+    if (courses.length > 0 && courses.every(c => c.cls === courses[0].cls && c.typ === courses[0].typ)) {
+      return courses[0].id; // Use first course as primary
+    }
+    return null;
+  }, [cells, COURSES]);
+
+  const matchingSequences = useMemo(() => {
+    if (!sharedCourseId) return [];
+    return sequences.filter(s =>
+      s.courseId === sharedCourseId || (s.courseIds?.includes(sharedCourseId))
+    );
+  }, [sharedCourseId, sequences]);
+
+  const selectedWeeks = useMemo(() => cells.map(c => c.week), [cells]);
+
+  const handleNewSequence = () => {
+    if (!sharedCourseId) return;
+    const course = COURSES.find(c => c.id === sharedCourseId);
+    pushUndo();
+    const seqId = addSequence({ courseId: sharedCourseId, title: `Neue Sequenz ${course?.cls || ''}`, blocks: [{ weeks: selectedWeeks, label: 'Neuer Block' }] });
+    setEditingSequenceId(`${seqId}-0`);
+    setSidePanelTab('sequences');
+    setShowSeqMenu(false);
+  };
+
+  const handleAddToBlock = (seqId: string, blockIdx: number) => {
+    const seq = sequences.find(s => s.id === seqId);
+    if (!seq) return;
+    const block = seq.blocks[blockIdx];
+    pushUndo();
+    const newWeeks = [...new Set([...block.weeks, ...selectedWeeks])];
+    updateBlockInSequence(seqId, blockIdx, { weeks: newWeeks });
+    setEditingSequenceId(`${seqId}-${blockIdx}`);
+    setShowSeqMenu(false);
+  };
 
   // Determine current values across selection (for highlighting active state)
   const currentValues = useMemo(() => {
@@ -903,6 +1023,51 @@ function BatchEditTab() {
             className={`px-2 py-0.5 rounded text-[9px] border cursor-pointer ${currentValues.sol === false ? 'bg-slate-700 border-gray-500 text-gray-300' : 'border-gray-600 text-gray-400 hover:bg-slate-700'}`}>SOL ✕</button>
         </div>
       </div>
+
+      {/* Sequence actions */}
+      {sharedCourseId && (
+        <div className="space-y-1 pt-2 border-t border-slate-700">
+          <label className="text-[9px] text-gray-400 font-medium">Sequenz</label>
+          <div className="relative" ref={seqMenuRef}>
+            <div className="flex gap-1 flex-wrap">
+              <button
+                onClick={handleNewSequence}
+                className="px-2 py-1 rounded text-[9px] font-medium border border-dashed border-green-600 text-green-400 hover:bg-green-900/20 cursor-pointer"
+              >✨ Neue Sequenz ({cells.length} UE)</button>
+              {matchingSequences.length > 0 && (
+                <button
+                  onClick={() => setShowSeqMenu(!showSeqMenu)}
+                  className="px-2 py-1 rounded text-[9px] font-medium border border-dashed border-blue-600 text-blue-400 hover:bg-blue-900/20 cursor-pointer"
+                >+ Zu bestehender ({matchingSequences.length})</button>
+              )}
+            </div>
+            {showSeqMenu && matchingSequences.length > 0 && (
+              <div className="absolute left-0 top-full mt-1 z-[90] bg-slate-800 border border-slate-600 rounded-lg shadow-xl py-1 w-56 max-h-48 overflow-y-auto">
+                {matchingSequences.map(seq => (
+                  seq.blocks.map((block, bi) => {
+                    const allIncluded = selectedWeeks.every(w => block.weeks.includes(w));
+                    return (
+                      <button key={`${seq.id}-${bi}`}
+                        onClick={() => handleAddToBlock(seq.id, bi)}
+                        className="w-full px-3 py-1.5 text-left text-[10px] text-gray-300 hover:bg-slate-700 cursor-pointer flex items-center gap-1.5"
+                        disabled={allIncluded}>
+                        <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: seq.color || '#16a34a' }} />
+                        <span className="truncate">{seq.title} → {block.label}</span>
+                        {allIncluded && <span className="text-[8px] text-gray-500 ml-auto shrink-0">bereits</span>}
+                      </button>
+                    );
+                  })
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+      {!sharedCourseId && cells.length > 0 && (
+        <div className="text-[8px] text-amber-400/70 pt-2 border-t border-slate-700">
+          ⚠ Sequenzen nur innerhalb desselben Kurses erstellbar. Auswahl enthält verschiedene Kurse.
+        </div>
+      )}
 
       <div className="text-[8px] text-gray-500 pt-2 border-t border-slate-700">
         Tipp: Wähle mehrere Zellen mit Shift+Klick oder Cmd+Klick, dann setze Eigenschaften hier.

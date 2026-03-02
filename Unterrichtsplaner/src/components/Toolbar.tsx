@@ -307,6 +307,29 @@ export function AppHeader() {
         >
           ▧ Seq
         </button>
+        {/* Panel tab shortcuts — shown when side panel is open */}
+        {sidePanelOpen && (
+          <>
+            <button
+              onClick={() => { setSidePanelOpen(true); setSidePanelTab('details'); }}
+              className={`px-2 py-0.5 rounded text-[10px] border cursor-pointer transition-colors ${
+                usePlannerStore.getState().sidePanelTab === 'details'
+                  ? 'bg-blue-900/50 border-blue-500 text-blue-300'
+                  : 'border-gray-700 text-gray-500 hover:border-blue-700 hover:text-blue-400'
+              }`}
+              title="Unterrichtseinheit / Batch-Edit"
+            >📖</button>
+            <button
+              onClick={() => { setSidePanelOpen(true); setSidePanelTab('collection'); }}
+              className={`px-2 py-0.5 rounded text-[10px] border cursor-pointer transition-colors ${
+                usePlannerStore.getState().sidePanelTab === 'collection'
+                  ? 'bg-amber-900/50 border-amber-500 text-amber-300'
+                  : 'border-gray-700 text-gray-500 hover:border-amber-700 hover:text-amber-400'
+              }`}
+              title="Materialsammlung"
+            >📚</button>
+          </>
+        )}
         <div className="relative" ref={addMenuRef}>
           <button
             onClick={() => setShowAddMenu(!showAddMenu)}
