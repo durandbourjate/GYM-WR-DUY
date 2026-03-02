@@ -35,6 +35,7 @@ export interface CourseConfig {
   hk: boolean;
   semesters: Semester[];
   note?: string;
+  sol?: boolean;
 }
 
 export interface SpecialWeekConfig {
@@ -43,6 +44,7 @@ export interface SpecialWeekConfig {
   week: string; // KW
   type: 'event' | 'holiday';
   excludedCourseIds?: string[]; // courses NOT affected (default: all affected)
+  days?: number[]; // 1=Mo..5=Fr, undefined = all days
 }
 
 export interface HolidayConfig {
@@ -50,6 +52,7 @@ export interface HolidayConfig {
   label: string;
   startWeek: string;
   endWeek: string;
+  days?: number[]; // 1=Mo..5=Fr, undefined = all days (for partial holidays like Auffahrt)
 }
 
 // === Persistence ===

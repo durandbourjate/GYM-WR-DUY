@@ -57,7 +57,7 @@ function LessonsList({ block, fb, courses }: { block: SequenceBlock; fb: FlatBlo
               }}>
               <span className="text-[8px] text-gray-500">{isExpanded ? '▾' : '▸'}</span>
               <span className="text-gray-400 font-mono w-8">KW{weekW}</span>
-              <span className={`truncate ${entry?.title ? 'text-gray-300' : 'text-gray-500 italic'}`}>{entry?.title || '—'}</span>
+              <span className={`truncate ${entry?.title ? 'text-gray-300' : 'text-gray-500 italic'}`}>{entry?.title || detail?.topicMain || block.topicSub || '—'}</span>
               {detail?.topicMain && <span className="text-[7px] text-gray-400 ml-auto truncate max-w-20">📌{detail.topicMain}</span>}
             </div>
             {isExpanded && course && (
@@ -231,13 +231,27 @@ function FlatBlockCard({ fb }: { fb: FlatBlockInfo }) {
               </div>
               <div>
                 <label className="text-[8px] text-gray-400">Bezeichnung</label>
-                <input value={block.label || ''} onChange={(e) => updateBlockInSequence(fb.seqId, fb.blockIndex, { label: e.target.value })}
+                <input value={block.label || ''} onChange={(e) => {
+                  const val = e.target.value;
+                  updateBlockInSequence(fb.seqId, fb.blockIndex, { label: val });
+                  // Sync: wenn Oberthema leer ist, setze es gleich mit
+                  if (val && !block.topicMain) {
+                    updateBlockInSequence(fb.seqId, fb.blockIndex, { label: val, topicMain: val });
+                  }
+                }}
                   placeholder={block.topicMain || `Block ${fb.blockIndex + 1}`}
                   className="w-full bg-slate-700/50 text-slate-200 border border-slate-600 rounded px-1.5 py-0.5 text-[9px] outline-none focus:border-blue-400 placeholder:text-gray-500 placeholder:italic" />
               </div>
               <div>
                 <label className="text-[8px] text-gray-400">Oberthema</label>
-                <input value={block.topicMain || ''} onChange={(e) => updateBlockInSequence(fb.seqId, fb.blockIndex, { topicMain: e.target.value || undefined })}
+                <input value={block.topicMain || ''} onChange={(e) => {
+                  const val = e.target.value || undefined;
+                  updateBlockInSequence(fb.seqId, fb.blockIndex, { topicMain: val });
+                  // Sync: Sequenz-/Reihen-Titel = Oberthema (wenn Titel leer oder gleich dem alten Oberthema)
+                  if (parentSeq && val && (!parentSeq.title || parentSeq.title === block.topicMain || parentSeq.title === 'Neue Reihe')) {
+                    updateSequence(fb.seqId, { title: val });
+                  }
+                }}
                   className="w-full bg-slate-700/50 text-slate-200 border border-slate-600 rounded px-1.5 py-0.5 text-[9px] outline-none focus:border-blue-400" />
               </div>
               <div>
@@ -273,6 +287,31 @@ function FlatBlockCard({ fb }: { fb: FlatBlockInfo }) {
                 <button onClick={() => updateBlockInSequence(fb.seqId, fb.blockIndex, { materialLinks: [...(block.materialLinks || []), ''] })}
                   className="text-[8px] text-blue-400 cursor-pointer mt-0.5">+ Link</button>
               </div>
+              {/* Apply block fields to all lessons */}
+              {block.weeks.length > 0 && (
+                <button onClick={() => {
+                  const course = COURSES.find(c => c.id === fb.courseId);
+                  if (!course) return;
+                  const fieldsToApply: string[] = [];
+                  if (sa) fieldsToApply.push(`Fachbereich: ${sa}`);
+                  if (block.topicMain) fieldsToApply.push(`Oberthema: ${block.topicMain}`);
+                  if (fieldsToApply.length === 0) { alert('Keine Sequenz-Felder gesetzt, die übertragen werden können.'); return; }
+                  if (!confirm(`Folgende Felder auf alle ${block.weeks.length} Lektionen übertragen?\n\n${fieldsToApply.join('\n')}\n\nBestehende Werte werden überschrieben.`)) return;
+                  const store = usePlannerStore.getState();
+                  for (const weekW of block.weeks) {
+                    const weekData = store.weekData.find(w => w.w === weekW);
+                    const entry = weekData?.lessons[course.col];
+                    if (!entry || (entry as any).type === 6) continue; // skip holidays
+                    const patch: Record<string, any> = {};
+                    if (sa) patch.subjectArea = sa;
+                    if (block.topicMain) patch.topicMain = block.topicMain;
+                    store.updateLessonDetail(weekW, course.col, patch);
+                  }
+                }}
+                  className="w-full py-1 rounded text-[8px] font-medium border border-dashed border-blue-500/40 text-blue-400 hover:bg-blue-900/20 cursor-pointer transition-all mt-1">
+                  ↓ Auf alle {block.weeks.length} Lektionen anwenden
+                </button>
+              )}
             </div>
           )}
 

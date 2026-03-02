@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import type { CourseType, DayOfWeek, Semester } from '../types';
 import { usePlannerStore } from '../store/plannerStore';
 import {
@@ -9,6 +9,23 @@ import {
   type SubjectConfig,
 } from '../store/settingsStore';
 import { WR_CATEGORIES, generateColorVariants } from '../data/categories';
+
+// === Duration helper for courses ===
+const COURSE_DURATION_PRESETS = [
+  { min: 45, label: '45 min' },
+  { min: 90, label: '90 min' },
+  { min: 135, label: '135 min' },
+];
+
+function durationToLes(min: number): 1 | 2 | 3 {
+  if (min <= 50) return 1;
+  if (min <= 100) return 2;
+  return 3;
+}
+
+function lesToDuration(les: number): number {
+  return les * 45;
+}
 
 const DAYS: DayOfWeek[] = ['Mo', 'Di', 'Mi', 'Do', 'Fr'];
 const COURSE_TYPES: { key: CourseType; label: string }[] = [
@@ -36,7 +53,7 @@ function SmallInput({ value, onChange, placeholder, className = '', type = 'text
 }) {
   return (
     <input value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} type={type}
-      className={`bg-slate-700 text-slate-200 border border-slate-600 rounded px-1.5 py-0.5 text-[9px] outline-none focus:border-blue-400 ${className}`} />
+      className={`bg-slate-700 text-slate-200 border border-slate-600 rounded px-1.5 py-0.5 text-[10px] outline-none focus:border-blue-400 ${type === 'time' ? 'min-w-[5rem]' : ''} ${className}`} />
   );
 }
 
@@ -131,6 +148,41 @@ function SubjectsEditor({ subjects, onChange }: { subjects: SubjectConfig[]; onC
   );
 }
 
+// === Course Duration Picker ===
+function CourseDurationPicker({ value, onChange }: { value: number; onChange: (min: number) => void }) {
+  const [customMode, setCustomMode] = useState(false);
+  const [customVal, setCustomVal] = useState('');
+  const isPreset = COURSE_DURATION_PRESETS.some(p => p.min === value);
+
+  return (
+    <div className="flex flex-wrap gap-1 items-center">
+      {COURSE_DURATION_PRESETS.map(p => (
+        <button key={p.min} onClick={() => { onChange(p.min); setCustomMode(false); }}
+          className={`px-1.5 py-0.5 rounded text-[9px] font-medium border cursor-pointer transition-all ${
+            value === p.min ? 'bg-blue-600/30 border-blue-500 text-gray-200' : 'border-gray-600 text-gray-400 hover:text-gray-300'
+          }`}>
+          {p.label}
+        </button>
+      ))}
+      {customMode || (!isPreset && value > 0) ? (
+        <div className="flex items-center gap-0.5">
+          <input autoFocus={customMode} type="number" value={!isPreset ? String(value) : customVal}
+            onChange={(e) => { const n = parseInt(e.target.value) || 0; setCustomVal(e.target.value); if (n > 0) onChange(n); }}
+            onKeyDown={(e) => { if (e.key === 'Escape') setCustomMode(false); }}
+            placeholder="min"
+            className="bg-slate-700 text-slate-200 border border-blue-400 rounded px-1.5 py-0.5 text-[9px] outline-none w-14" />
+          <span className="text-[8px] text-gray-400">min</span>
+        </div>
+      ) : (
+        <button onClick={() => setCustomMode(true)}
+          className="px-1.5 py-0.5 rounded text-[9px] border border-dashed border-gray-600 text-gray-400 hover:text-gray-300 cursor-pointer">
+          Andere
+        </button>
+      )}
+    </div>
+  );
+}
+
 // === Course Editor ===
 function CourseEditor({ courses, onChange }: { courses: CourseConfig[]; onChange: (c: CourseConfig[]) => void }) {
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -181,37 +233,43 @@ function CourseEditor({ courses, onChange }: { courses: CourseConfig[]; onChange
           {group.map(c => (
             <div key={c.id}>
               {editingId === c.id ? (
-                <div className="space-y-1 bg-slate-800 rounded p-2">
+                <div className="space-y-1.5 bg-slate-800 rounded p-2">
                   <div className="flex gap-1 flex-wrap">
                     <SmallInput value={c.cls} onChange={(v) => updateCourse(c.id, { cls: v })} placeholder="Klasse" className="w-20" />
                     <SmallSelect value={c.typ} onChange={(v) => updateCourse(c.id, { typ: v })} options={COURSE_TYPES} />
                     <SmallSelect value={c.day} onChange={(v) => updateCourse(c.id, { day: v })} options={DAYS.map(d => ({ key: d, label: d }))} />
                   </div>
-                  <div className="flex gap-1 items-center">
-                    <SmallInput value={c.from} onChange={(v) => updateCourse(c.id, { from: v })} placeholder="08:05" className="w-14" type="time" />
-                    <span className="text-[8px] text-gray-400">–</span>
-                    <SmallInput value={c.to} onChange={(v) => updateCourse(c.id, { to: v })} placeholder="08:50" className="w-14" type="time" />
-                    <SmallSelect value={String(c.les) as any} onChange={(v) => updateCourse(c.id, { les: Number(v) })}
-                      options={[{ key: '1', label: '1L' }, { key: '2', label: '2L' }, { key: '3', label: '3L' }]} />
+                  <div className="flex gap-1 items-center flex-wrap">
+                    <SmallInput value={c.from} onChange={(v) => updateCourse(c.id, { from: v })} placeholder="08:05" className="w-24 text-[11px]" type="time" />
+                    <span className="text-[10px] text-gray-400">–</span>
+                    <SmallInput value={c.to} onChange={(v) => updateCourse(c.id, { to: v })} placeholder="08:50" className="w-24 text-[11px]" type="time" />
                   </div>
-                  <div className="flex gap-2 items-center">
-                    <label className="flex items-center gap-1 text-[8px] text-gray-400 cursor-pointer">
+                  <div>
+                    <label className="text-[8px] text-gray-400 mb-0.5 block">Dauer</label>
+                    <CourseDurationPicker value={c.les * 45} onChange={(min) => updateCourse(c.id, { les: durationToLes(min) })} />
+                  </div>
+                  <div className="flex gap-3 items-center flex-wrap">
+                    <label className="flex items-center gap-1 text-[9px] text-gray-400 cursor-pointer">
                       <input type="checkbox" checked={c.hk} onChange={(e) => updateCourse(c.id, { hk: e.target.checked })} className="cursor-pointer" />
                       HK
                     </label>
-                    <label className="flex items-center gap-1 text-[8px] text-gray-400 cursor-pointer">
+                    <label className="flex items-center gap-1 text-[9px] text-gray-400 cursor-pointer">
                       <input type="checkbox" checked={c.semesters.includes(1)} onChange={(e) => {
                         const s = e.target.checked ? [...new Set([...c.semesters, 1 as Semester])] : c.semesters.filter(x => x !== 1);
                         updateCourse(c.id, { semesters: s });
                       }} className="cursor-pointer" />
                       S1
                     </label>
-                    <label className="flex items-center gap-1 text-[8px] text-gray-400 cursor-pointer">
+                    <label className="flex items-center gap-1 text-[9px] text-gray-400 cursor-pointer">
                       <input type="checkbox" checked={c.semesters.includes(2)} onChange={(e) => {
                         const s = e.target.checked ? [...new Set([...c.semesters, 2 as Semester])] : c.semesters.filter(x => x !== 2);
                         updateCourse(c.id, { semesters: s });
                       }} className="cursor-pointer" />
                       S2
+                    </label>
+                    <label className="flex items-center gap-1 text-[9px] text-gray-400 cursor-pointer" title="Selbstorganisiertes Lernen">
+                      <input type="checkbox" checked={!!c.sol} onChange={(e) => updateCourse(c.id, { sol: e.target.checked || undefined })} className="cursor-pointer" />
+                      SOL
                     </label>
                   </div>
                   <SmallInput value={c.note || ''} onChange={(v) => updateCourse(c.id, { note: v || undefined })} placeholder="Bemerkung (optional)" className="w-full" />
@@ -225,7 +283,7 @@ function CourseEditor({ courses, onChange }: { courses: CourseConfig[]; onChange
                   onClick={() => setEditingId(c.id)}>
                   <span className="text-gray-400 font-mono">{c.day}</span>
                   <span>{c.from}–{c.to}</span>
-                  <span className="text-gray-500">{c.les}L{c.hk ? ' HK' : ''}</span>
+                  <span className="text-gray-500">{c.les * 45}min{c.hk ? ' HK' : ''}</span>
                   <span className="text-gray-500">{c.semesters.map(s => `S${s}`).join('+')}</span>
                   {c.note && <span className="text-amber-600 text-[8px]">{c.note}</span>}
                 </div>
@@ -242,12 +300,38 @@ function CourseEditor({ courses, onChange }: { courses: CourseConfig[]; onChange
   );
 }
 
-// === Special Weeks Editor ===
+// === Special Weeks Editor (Hierarchisch: KW → GYM-Stufen) ===
 function SpecialWeeksEditor({ weeks, courses, onChange }: {
   weeks: SpecialWeekConfig[]; courses: CourseConfig[]; onChange: (w: SpecialWeekConfig[]) => void;
 }) {
-  const addWeek = () => {
-    onChange([...weeks, { id: generateId(), label: '', week: '', type: 'event' }]);
+  const [expandedWeek, setExpandedWeek] = useState<string | null>(null);
+
+  // Group by KW for hierarchical display
+  const grouped = useMemo(() => {
+    const map = new Map<string, SpecialWeekConfig[]>();
+    for (const w of weeks) {
+      const kw = w.week;
+      if (!map.has(kw)) map.set(kw, []);
+      map.get(kw)!.push(w);
+    }
+    // Sort by KW number
+    return [...map.entries()].sort((a, b) => {
+      const na = parseInt(a[0]) || 0, nb = parseInt(b[0]) || 0;
+      // School year: KW33-52 then KW01-27
+      const wa = na >= 33 ? na : na + 52;
+      const wb = nb >= 33 ? nb : nb + 52;
+      return wa - wb;
+    });
+  }, [weeks]);
+
+  const addEntry = (kw: string) => {
+    onChange([...weeks, { id: generateId(), label: '', week: kw, type: 'event' }]);
+  };
+
+  const addNewWeek = () => {
+    const newKw = '';
+    onChange([...weeks, { id: generateId(), label: '', week: newKw, type: 'event' }]);
+    setExpandedWeek('');
   };
 
   const update = (id: string, patch: Partial<SpecialWeekConfig>) => {
@@ -260,46 +344,95 @@ function SpecialWeeksEditor({ weeks, courses, onChange }: {
 
   return (
     <div className="space-y-1.5">
-      <p className="text-[8px] text-gray-400">Sonderwochen gelten standardmässig für alle Kurse. Einzelne Kurse können ausgenommen werden.</p>
-      {weeks.map(w => (
-        <div key={w.id} className="bg-slate-800 rounded p-2 space-y-1">
-          <div className="flex gap-1 items-center">
-            <SmallInput value={w.label} onChange={(v) => update(w.id, { label: v })} placeholder="Bezeichnung (z.B. IW, Studienreise)" className="flex-1" />
-            <SmallInput value={w.week} onChange={(v) => update(w.id, { week: v })} placeholder="KW" className="w-10" />
-            <SmallSelect value={w.type} onChange={(v) => update(w.id, { type: v })}
-              options={[{ key: 'event', label: '📅 Event' }, { key: 'holiday', label: '🏖 Frei' }]} />
-            <button onClick={() => remove(w.id)} className="text-[8px] text-red-400 cursor-pointer">✕</button>
-          </div>
-          {courses.length > 0 && (
-            <div className="flex flex-wrap gap-1 mt-1">
-              <span className="text-[7px] text-gray-400">Ausgenommen:</span>
-              {courses.map(c => {
-                const excluded = w.excludedCourseIds?.includes(c.id);
-                return (
-                  <button key={c.id} onClick={() => {
-                    const current = w.excludedCourseIds || [];
-                    update(w.id, {
-                      excludedCourseIds: excluded ? current.filter(x => x !== c.id) : [...current, c.id]
-                    });
-                  }}
-                    className={`text-[7px] px-1 py-px rounded cursor-pointer ${excluded ? 'bg-red-900/40 text-red-300 border border-red-500/50' : 'bg-slate-700 text-gray-400 border border-transparent'}`}>
-                    {c.cls} {c.day}
-                  </button>
-                );
-              })}
+      <p className="text-[8px] text-gray-400">Pro Kalenderwoche können verschiedene GYM-Stufen unterschiedliche Sonderwochen haben. Klicke auf eine KW um Details zu bearbeiten.</p>
+      {grouped.map(([kw, entries]) => {
+        const isExpanded = expandedWeek === kw;
+        const labels = entries.map(e => e.label).filter(Boolean).join(', ');
+        return (
+          <div key={kw || 'new'} className="border border-slate-700/50 rounded overflow-hidden">
+            <div className="flex items-center gap-2 px-2 py-1.5 bg-slate-800/50 cursor-pointer hover:bg-slate-800"
+              onClick={() => setExpandedWeek(isExpanded ? null : kw)}>
+              <span className="text-[9px] text-gray-400">{isExpanded ? '▾' : '▸'}</span>
+              <span className="text-[10px] font-semibold text-amber-400 font-mono w-10">{kw ? `KW${kw}` : 'Neu'}</span>
+              <span className="text-[9px] text-gray-300 truncate flex-1">{labels || '(unbenannt)'}</span>
+              <span className="text-[8px] text-gray-500">{entries.length} {entries.length === 1 ? 'Eintrag' : 'Einträge'}</span>
             </div>
-          )}
-        </div>
-      ))}
-      <button onClick={addWeek}
-        className="w-full py-1 rounded border border-dashed border-gray-600 text-gray-400 hover:text-gray-300 text-[9px] cursor-pointer">
+            {isExpanded && (
+              <div className="p-2 space-y-2 bg-slate-900/30">
+                {entries.map(w => (
+                  <div key={w.id} className="bg-slate-800 rounded p-2 space-y-1.5">
+                    <div className="flex gap-1 items-center">
+                      <SmallInput value={w.week} onChange={(v) => update(w.id, { week: v })} placeholder="KW" className="w-10" />
+                      <SmallInput value={w.label} onChange={(v) => update(w.id, { label: v })} placeholder="z.B. SF-Woche GYM3" className="flex-1" />
+                      <SmallSelect value={w.type} onChange={(v) => update(w.id, { type: v })}
+                        options={[{ key: 'event', label: '📅 Event' }, { key: 'holiday', label: '🏖 Frei' }]} />
+                      <button onClick={() => remove(w.id)} className="text-[8px] text-red-400 cursor-pointer">✕</button>
+                    </div>
+                    {/* Day selector */}
+                    <div className="flex items-center gap-1">
+                      <span className="text-[7px] text-gray-400">Tage:</span>
+                      {['Mo', 'Di', 'Mi', 'Do', 'Fr'].map((day, di) => {
+                        const dayNum = di + 1;
+                        const days = w.days || [1,2,3,4,5]; // default all
+                        const active = days.includes(dayNum);
+                        return (
+                          <button key={day} onClick={() => {
+                            const current = w.days || [1,2,3,4,5];
+                            const next = active ? current.filter(d => d !== dayNum) : [...current, dayNum].sort();
+                            update(w.id, { days: next.length === 5 ? undefined : next }); // undefined = all
+                          }}
+                            className={`px-1.5 py-px rounded text-[8px] cursor-pointer transition-all ${
+                              active ? 'bg-amber-700/40 text-amber-300 border border-amber-500/50' : 'bg-slate-700 text-gray-500 border border-transparent'
+                            }`}>
+                            {day}
+                          </button>
+                        );
+                      })}
+                      {(w.days && w.days.length < 5) && (
+                        <button onClick={() => update(w.id, { days: undefined })}
+                          className="text-[7px] text-gray-500 cursor-pointer hover:text-gray-300 ml-1">Ganze Woche</button>
+                      )}
+                    </div>
+                    {/* Course exclusions */}
+                    {courses.length > 0 && (
+                      <div className="flex flex-wrap gap-1">
+                        <span className="text-[7px] text-gray-400">Ausgenommen:</span>
+                        {courses.map(c => {
+                          const excluded = w.excludedCourseIds?.includes(c.id);
+                          return (
+                            <button key={c.id} onClick={() => {
+                              const current = w.excludedCourseIds || [];
+                              update(w.id, {
+                                excludedCourseIds: excluded ? current.filter(x => x !== c.id) : [...current, c.id]
+                              });
+                            }}
+                              className={`text-[7px] px-1 py-px rounded cursor-pointer ${excluded ? 'bg-red-900/40 text-red-300 border border-red-500/50' : 'bg-slate-700 text-gray-400 border border-transparent'}`}>
+                              {c.cls} {c.day}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                ))}
+                <button onClick={() => addEntry(kw)}
+                  className="w-full py-1 rounded border border-dashed border-gray-600 text-gray-400 hover:text-gray-300 text-[8px] cursor-pointer">
+                  + Weiteren Eintrag für KW{kw}
+                </button>
+              </div>
+            )}
+          </div>
+        );
+      })}
+      <button onClick={addNewWeek}
+        className="w-full py-1.5 rounded border border-dashed border-gray-600 text-gray-400 hover:text-gray-300 hover:border-gray-400 text-[9px] cursor-pointer transition-all">
         + Sonderwoche hinzufügen
       </button>
     </div>
   );
 }
 
-// === Holidays Editor ===
+// === Holidays Editor (mit Tagesauswahl für partielle Wochen) ===
 function HolidaysEditor({ holidays, onChange }: { holidays: HolidayConfig[]; onChange: (h: HolidayConfig[]) => void }) {
   const addHoliday = () => {
     onChange([...holidays, { id: generateId(), label: '', startWeek: '', endWeek: '' }]);
@@ -315,14 +448,42 @@ function HolidaysEditor({ holidays, onChange }: { holidays: HolidayConfig[]; onC
 
   return (
     <div className="space-y-1.5">
+      <p className="text-[8px] text-gray-400">Ferienperioden als KW-Bereiche. Standard = ganze Wochen. Für Einzeltage (z.B. Auffahrt) die betroffenen Tage wählen.</p>
       {holidays.map(h => (
-        <div key={h.id} className="flex gap-1 items-center">
-          <SmallInput value={h.label} onChange={(v) => update(h.id, { label: v })} placeholder="Name (z.B. Herbstferien)" className="flex-1" />
-          <span className="text-[8px] text-gray-400">KW</span>
-          <SmallInput value={h.startWeek} onChange={(v) => update(h.id, { startWeek: v })} placeholder="von" className="w-10" />
-          <span className="text-[8px] text-gray-400">–</span>
-          <SmallInput value={h.endWeek} onChange={(v) => update(h.id, { endWeek: v })} placeholder="bis" className="w-10" />
-          <button onClick={() => remove(h.id)} className="text-[8px] text-red-400 cursor-pointer">✕</button>
+        <div key={h.id} className="bg-slate-800 rounded p-2 space-y-1.5">
+          <div className="flex gap-1 items-center">
+            <SmallInput value={h.label} onChange={(v) => update(h.id, { label: v })} placeholder="Name (z.B. Herbstferien)" className="flex-1" />
+            <span className="text-[8px] text-gray-400">KW</span>
+            <SmallInput value={h.startWeek} onChange={(v) => update(h.id, { startWeek: v })} placeholder="von" className="w-10" />
+            <span className="text-[8px] text-gray-400">–</span>
+            <SmallInput value={h.endWeek} onChange={(v) => update(h.id, { endWeek: v })} placeholder="bis" className="w-10" />
+            <button onClick={() => remove(h.id)} className="text-[8px] text-red-400 cursor-pointer">✕</button>
+          </div>
+          {/* Day selector for partial holidays */}
+          <div className="flex items-center gap-1">
+            <span className="text-[7px] text-gray-400">Tage:</span>
+            {['Mo', 'Di', 'Mi', 'Do', 'Fr'].map((day, di) => {
+              const dayNum = di + 1;
+              const days = h.days || [1,2,3,4,5];
+              const active = days.includes(dayNum);
+              return (
+                <button key={day} onClick={() => {
+                  const current = h.days || [1,2,3,4,5];
+                  const next = active ? current.filter(d => d !== dayNum) : [...current, dayNum].sort();
+                  update(h.id, { days: next.length === 5 ? undefined : next });
+                }}
+                  className={`px-1.5 py-px rounded text-[8px] cursor-pointer transition-all ${
+                    active ? 'bg-gray-600/40 text-gray-200 border border-gray-500/50' : 'bg-slate-700 text-gray-500 border border-transparent'
+                  }`}>
+                  {day}
+                </button>
+              );
+            })}
+            {(h.days && h.days.length < 5) && (
+              <button onClick={() => update(h.id, { days: undefined })}
+                className="text-[7px] text-gray-500 cursor-pointer hover:text-gray-300 ml-1">Ganze Woche</button>
+            )}
+          </div>
         </div>
       ))}
       <button onClick={addHoliday}
@@ -333,8 +494,8 @@ function HolidaysEditor({ holidays, onChange }: { holidays: HolidayConfig[]; onC
   );
 }
 
-// === Apply Settings to Weeks ===
-function ApplySettingsButton({ settings }: { settings: PlannerSettings }) {
+// === Re-apply Settings to Weeks (rarely needed) ===
+function ReapplyButton({ settings }: { settings: PlannerSettings }) {
   const [result, setResult] = useState<{ holidays: number; specials: number } | null>(null);
 
   const applyToWeeks = () => {
@@ -349,28 +510,22 @@ function ApplySettingsButton({ settings }: { settings: PlannerSettings }) {
   const totalEntries = settings.holidays.length + settings.specialWeeks.length;
 
   return (
-    <div className="space-y-1.5">
-      <div className="text-[8px] text-gray-400">
-        {settings.holidays.length} Ferienperioden · {settings.specialWeeks.length} Sonderwochen konfiguriert
-      </div>
-      <p className="text-[8px] text-green-400/70">
-        ✓ Ferien und Sonderwochen werden bei der Initialisierung automatisch angewendet.
-      </p>
-      <button onClick={() => {
-        if (totalEntries === 0) { alert('Keine Ferien oder Sonderwochen konfiguriert.'); return; }
-        if (confirm(`${totalEntries} Einträge (Ferien + Sonderwochen) erneut in die Planerdaten übernehmen? Bestehende Einträge werden überschrieben. (Undo möglich)`)) {
-          applyToWeeks();
-        }
-      }}
-        className="w-full py-1.5 rounded text-[9px] font-medium bg-amber-700 hover:bg-amber-600 text-white cursor-pointer transition-all disabled:bg-slate-700 disabled:text-gray-400 disabled:cursor-not-allowed"
-        disabled={totalEntries === 0}>
-        🔄 Ferien & Sonderwochen erneut eintragen
-      </button>
+    <div className="space-y-1">
       {result && (
         <div className="text-[8px] p-1.5 rounded bg-green-900/30 text-green-300">
           ✅ {result.holidays} Ferienwochen und {result.specials} Sonderwochen eingetragen. Undo verfügbar.
         </div>
       )}
+      <button onClick={() => {
+        if (totalEntries === 0) return;
+        if (confirm(`${totalEntries} Einträge (Ferien + Sonderwochen) erneut in die Planerdaten übernehmen? (Undo möglich)`)) {
+          applyToWeeks();
+        }
+      }}
+        className="text-[8px] text-gray-500 hover:text-gray-300 cursor-pointer"
+        disabled={totalEntries === 0}>
+        🔄 Ferien & Sonderwochen erneut eintragen
+      </button>
     </div>
   );
 }
@@ -381,50 +536,53 @@ export function SettingsPanel() {
   const setPlannerSettings = usePlannerStore(s => s.setPlannerSettings);
 
   const [settings, setSettings] = useState<PlannerSettings>(() => {
-    // Priority: store settings > global settings > defaults
     if (storeSettings) return storeSettings;
     const global = loadSettings();
     if (global) return global;
     return getDefaultSettings();
   });
-  const [dirty, setDirty] = useState(false);
-  const [saved, setSaved] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isFirstRender = useRef(true);
+
+  // Auto-save with debounce (300ms)
+  const doSave = useCallback((s: PlannerSettings) => {
+    setPlannerSettings(s);
+    saveSettings(s);
+    // Auto-apply holidays & special weeks to weekData
+    const store = usePlannerStore.getState();
+    if (store.weekData.length > 0 && (s.holidays.length > 0 || s.specialWeeks.length > 0)) {
+      const applied = applySettingsToWeekData(store.weekData, s);
+      store.pushUndo();
+      store.setWeekData(applied.weekData);
+    }
+    setSaveStatus('saved');
+    setTimeout(() => setSaveStatus('idle'), 1500);
+  }, [setPlannerSettings]);
 
   const updateSettings = useCallback((patch: Partial<PlannerSettings>) => {
     setSettings(prev => {
       const next = { ...prev, ...patch };
+      // Debounced auto-save
+      if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+      setSaveStatus('saving');
+      saveTimerRef.current = setTimeout(() => doSave(next), 400);
       return next;
     });
-    setDirty(true);
-    setSaved(false);
-  }, []);
+  }, [doSave]);
 
-  const handleSave = useCallback(() => {
-    // Save to store (per-instance) — this is the primary path
-    setPlannerSettings(settings);
-    // Also save to global localStorage for backward compat
-    saveSettings(settings);
-    // Auto-apply holidays & special weeks to weekData
-    const store = usePlannerStore.getState();
-    if (store.weekData.length > 0 && (settings.holidays.length > 0 || settings.specialWeeks.length > 0)) {
-      const applied = applySettingsToWeekData(store.weekData, settings);
-      store.pushUndo();
-      store.setWeekData(applied.weekData);
-    }
-    setDirty(false);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
-  }, [settings, setPlannerSettings]);
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => { if (saveTimerRef.current) clearTimeout(saveTimerRef.current); };
+  }, []);
 
   const handleReset = useCallback(() => {
     if (confirm('Alle Einstellungen zurücksetzen? Die bestehende Planung bleibt erhalten.')) {
       const fresh = getDefaultSettings();
       setSettings(fresh);
-      setPlannerSettings(fresh);
-      saveSettings(fresh);
-      setDirty(false);
+      doSave(fresh);
     }
-  }, [setPlannerSettings]);
+  }, [doSave]);
 
   const hasCustomSettings = storeSettings !== null || loadSettings() !== null;
 
@@ -438,14 +596,9 @@ export function SettingsPanel() {
             {hasCustomSettings ? 'Eigene Konfiguration aktiv' : 'Standard-Konfiguration (DUY SJ 25/26)'}
           </p>
         </div>
-        <div className="flex gap-1">
-          {dirty && (
-            <button onClick={handleSave}
-              className="px-2 py-0.5 rounded text-[9px] font-medium bg-blue-600 hover:bg-blue-500 text-white cursor-pointer transition-all">
-              💾 Speichern
-            </button>
-          )}
-          {saved && <span className="text-[9px] text-green-400">✓ Gespeichert</span>}
+        <div className="flex gap-1 items-center">
+          {saveStatus === 'saving' && <span className="text-[9px] text-gray-500">Speichern…</span>}
+          {saveStatus === 'saved' && <span className="text-[9px] text-green-400">✓ Gespeichert</span>}
         </div>
       </div>
 
@@ -502,16 +655,6 @@ export function SettingsPanel() {
         <HolidaysEditor holidays={settings.holidays} onChange={(h) => updateSettings({ holidays: h })} />
       </Section>
 
-      {/* Apply settings to planner */}
-      <Section title="⚡ Einstellungen anwenden">
-        <div className="space-y-2">
-          <p className="text-[8px] text-gray-400">
-            Ferien und Sonderwochen aus den Einstellungen in die Planerdaten übernehmen. Bestehende Einträge in betroffenen Wochen werden überschrieben.
-          </p>
-          <ApplySettingsButton settings={settings} />
-        </div>
-      </Section>
-
       {/* Export / Import JSON */}
       <Section title="💾 Daten exportieren / importieren">
         <div className="space-y-3">
@@ -539,7 +682,7 @@ export function SettingsPanel() {
                       const imported = JSON.parse(reader.result as string) as PlannerSettings;
                       if (imported.version && imported.courses) {
                         setSettings(imported);
-                        setDirty(true);
+                        doSave(imported);
                       } else {
                         alert('Ungültige Datei: Keine gültigen Einstellungen gefunden.');
                       }

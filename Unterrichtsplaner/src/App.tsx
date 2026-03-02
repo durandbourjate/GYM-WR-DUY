@@ -163,7 +163,7 @@ function PlannerContent() {
       // Zoom shortcuts: 1, 2, 3 (without modifier)
       if (!e.metaKey && !e.ctrlKey && !e.altKey) {
         if (e.key === '1') usePlannerStore.getState().setZoomLevel(1);
-        if (e.key === '2') usePlannerStore.getState().setZoomLevel(2);
+        if (e.key === '2') usePlannerStore.getState().setZoomLevel(1); // Zoom 2 removed, redirect to 1
         if (e.key === '3') usePlannerStore.getState().setZoomLevel(3);
       }
       // Arrow keys: navigate between weeks when a cell is selected
@@ -244,9 +244,7 @@ function PlannerContent() {
                 ⚙️ Einstellungen öffnen
               </button>
             </div>
-          ) : zoomLevel === 2 ? (
-            <ZoomYearView />
-          ) : zoomLevel === 1 ? (
+          ) : zoomLevel === 1 || zoomLevel === 2 ? (
             <ZoomMultiYearView />
           ) : (
             <>

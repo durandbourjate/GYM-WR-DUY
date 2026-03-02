@@ -203,9 +203,9 @@ export function AppHeader() {
           )}
         </div>
         <span className="w-px h-4 bg-gray-700 mx-1" />
-        {/* Zoom Level */}
+        {/* Zoom Level — 2 levels: overview (1) and detail (3) */}
         <div className="flex items-center border border-gray-700 rounded overflow-hidden">
-          {([1, 2, 3] as const).map((z) => (
+          {([1, 3] as const).map((z, i) => (
             <button
               key={z}
               onClick={() => setZoomLevel(z)}
@@ -213,10 +213,10 @@ export function AppHeader() {
                 zoomLevel === z
                   ? 'bg-cyan-600 text-white'
                   : 'text-gray-500 hover:text-gray-300 hover:bg-gray-800'
-              } ${z < 3 ? 'border-r border-gray-700' : ''}`}
-              title={z === 1 ? 'Semester-Übersicht (weit)' : z === 2 ? 'Block-Ansicht (mittel)' : 'Wochen-Ansicht (nah)'}
+              } ${i === 0 ? 'border-r border-gray-700' : ''}`}
+              title={z === 1 ? 'Jahresübersicht' : 'Wochenansicht'}
             >
-              {z === 1 ? '◫' : z === 2 ? '▧' : '▦'}
+              {z === 1 ? '◫' : '▦'}
             </button>
           ))}
         </div>
