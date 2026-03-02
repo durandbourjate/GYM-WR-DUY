@@ -286,8 +286,15 @@ function ApplySettingsButton({ settings }: { settings: PlannerSettings }) {
 
 // === Main Settings Panel ===
 export function SettingsPanel() {
+  const storeSettings = usePlannerStore(s => s.plannerSettings);
+  const setPlannerSettings = usePlannerStore(s => s.setPlannerSettings);
+
   const [settings, setSettings] = useState<PlannerSettings>(() => {
-    return loadSettings() || getDefaultSettings();
+    // Priority: store settings > global settings > defaults
+    if (storeSettings) return storeSettings;
+    const global = loadSettings();
+    if (global) return global;
+    return getDefaultSettings();
   });
   const [dirty, setDirty] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -302,6 +309,9 @@ export function SettingsPanel() {
   }, []);
 
   const handleSave = useCallback(() => {
+    // Save to store (per-instance) — this is the primary path
+    setPlannerSettings(settings);
+    // Also save to global localStorage for backward compat
     saveSettings(settings);
     // Auto-apply holidays & special weeks to weekData
     const store = usePlannerStore.getState();
@@ -313,18 +323,19 @@ export function SettingsPanel() {
     setDirty(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
-  }, [settings]);
+  }, [settings, setPlannerSettings]);
 
   const handleReset = useCallback(() => {
     if (confirm('Alle Einstellungen zurücksetzen? Die bestehende Planung bleibt erhalten.')) {
       const fresh = getDefaultSettings();
       setSettings(fresh);
+      setPlannerSettings(fresh);
       saveSettings(fresh);
       setDirty(false);
     }
-  }, []);
+  }, [setPlannerSettings]);
 
-  const hasCustomSettings = loadSettings() !== null;
+  const hasCustomSettings = storeSettings !== null || loadSettings() !== null;
 
   return (
     <div className="flex-1 overflow-y-auto p-3 space-y-3">

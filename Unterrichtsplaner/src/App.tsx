@@ -92,6 +92,14 @@ function PlannerContent() {
     }
   }, [isLegacy]);
 
+  // Auto-open settings for new empty planners (no courses configured)
+  useEffect(() => {
+    if (!isLegacy && allCourses.length === 0) {
+      usePlannerStore.getState().setSidePanelOpen(true);
+      usePlannerStore.getState().setSidePanelTab('settings');
+    }
+  }, [isLegacy, allCourses.length]);
+
   const DAY_ORDER: Record<string, number> = { Mo: 0, Di: 1, Mi: 2, Do: 3, Fr: 4 };
   const filterCourses = (semester: 1 | 2) => {
     let c = allCourses.filter((co) => co.semesters.includes(semester));

@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
 import { COURSES, getLinkedCourseIds as staticGetLinkedCourseIds } from '../data/courses';
-import { WEEKS, S2_START_INDEX, CURRENT_WEEK } from '../data/weeks';
-import { loadSettings, configToCourses } from '../store/settingsStore';
+import { WEEKS, S2_START_INDEX } from '../data/weeks';
+import { configToCourses, loadSettings } from '../store/settingsStore';
+import { usePlannerStore } from '../store/plannerStore';
 import { useInstanceStore, generateWeekIds } from '../store/instanceStore';
 import type { Course, Week } from '../types';
 
@@ -18,17 +19,20 @@ function getCurrentISOWeek(): string {
 }
 
 /**
- * Hook that returns courses and weeks based on settings (if configured)
- * or falls back to hardcoded data for legacy planners.
+ * Hook that returns courses and weeks.
  * 
- * For NEW planners (created via instanceStore), weeks are generated dynamically
- * from the instance metadata and courses come from settings.
- * For LEGACY planners (no instance or imported with hardcoded data), falls back
- * to static WEEKS/COURSES.
+ * Settings source priority:
+ * 1. plannerSettings in store (per-instance, new system)
+ * 2. global localStorage settings (legacy, migration path)
+ * 3. hardcoded COURSES/WEEKS (legacy fallback)
  */
 export function usePlannerData() {
   const activeMeta = useInstanceStore(s => s.getActive());
-  const settings = useMemo(() => loadSettings(), []);
+  const storeSettings = usePlannerStore(s => s.plannerSettings);
+  
+  // Fall back to global settings for legacy planners
+  const globalSettings = useMemo(() => loadSettings(), []);
+  const settings = storeSettings ?? globalSettings;
   const hasCustomCourses = settings !== null && settings.courses.length > 0;
 
   // === Courses ===
@@ -40,21 +44,16 @@ export function usePlannerData() {
   }, [settings, hasCustomCourses]);
 
   // === Weeks ===
-  // For planners with instance metadata, generate weeks dynamically.
-  // For legacy planners (or when instance meta matches static data), use WEEKS.
   const { weeks, s2StartIndex, isLegacy } = useMemo(() => {
     if (!activeMeta) {
-      // No active instance → legacy mode
       return { weeks: WEEKS, s2StartIndex: settings?.semesterBreak ?? S2_START_INDEX, isLegacy: true };
     }
 
-    // Check if this is a legacy planner that still uses hardcoded WEEKS
-    // (i.e. the week range matches the default SJ 25/26 range AND we have hardcoded data)
+    // Legacy planner detection: default SJ 25/26 range + no custom courses + no store settings
     const isDefaultRange = activeMeta.startWeek === 33 && activeMeta.startYear === 2025
       && activeMeta.endWeek === 27 && activeMeta.endYear === 2026;
     
-    if (isDefaultRange && WEEKS.length > 0 && !hasCustomCourses) {
-      // Legacy planner with default range — use static WEEKS
+    if (isDefaultRange && WEEKS.length > 0 && !hasCustomCourses && !storeSettings) {
       return { weeks: WEEKS, s2StartIndex: settings?.semesterBreak ?? S2_START_INDEX, isLegacy: true };
     }
 
@@ -63,17 +62,15 @@ export function usePlannerData() {
       activeMeta.startWeek, activeMeta.startYear,
       activeMeta.endWeek, activeMeta.endYear
     );
-
-    // Generate empty Week objects
     const dynamicWeeks: Week[] = weekIds.map(w => ({ w, lessons: {} }));
 
-    // Calculate S2 start index from semesterBreakWeek
+    // S2 start index from semesterBreakWeek
     const breakWeek = String(activeMeta.semesterBreakWeek ?? 7).padStart(2, '0');
     const breakIdx = weekIds.indexOf(breakWeek);
     const s2Idx = breakIdx >= 0 ? breakIdx : Math.floor(weekIds.length / 2);
 
     return { weeks: dynamicWeeks, s2StartIndex: s2Idx, isLegacy: false };
-  }, [activeMeta, settings, hasCustomCourses]);
+  }, [activeMeta, settings, hasCustomCourses, storeSettings]);
 
   const currentWeek = useMemo(() => getCurrentISOWeek(), []);
 

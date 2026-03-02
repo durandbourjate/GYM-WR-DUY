@@ -1,15 +1,15 @@
 # Unterrichtsplaner – Handoff v3.28
 
-## Status: ✅ Deployed (v3.42)
-- **Commit:** 0845038
+## Status: ✅ Deployed (v3.43)
+- **Commit:** pending
 - **Datum:** 2026-03-02
 - **Deploy:** https://durandbourjate.github.io/GYM-WR-DUY/Unterrichtsplaner/
 
 ## Architektur
 - **Stack:** React + TypeScript + Vite + Zustand + PWA
-- **Store:** `plannerStore.ts` (~1230 Z.), `settingsStore.ts` (~256 Z.), `instanceStore.ts` (~204 Z.)
-- **Hook:** `usePlannerData.ts` — dynamische Courses/Weeks; generiert Wochen aus instanceStore-Meta für neue Planer, fällt auf hardcoded WEEKS zurück für Legacy-Planer. Gibt `isLegacy`-Flag zurück.
-- **Multi-Planer:** `instanceStore.ts` verwaltet Planer-Instanzen (Tabs). Jeder Planer hat eigenen localStorage-Slot (`planner-data-{id}`). `plannerStore.ts` speichert/lädt Daten pro Instanz via `switchInstance()`.
+- **Store:** `plannerStore.ts` (~1240 Z.), `settingsStore.ts` (~256 Z.), `instanceStore.ts` (~204 Z.)
+- **Hook:** `usePlannerData.ts` — liest Kurse/Wochen reaktiv aus `plannerStore.plannerSettings` (pro Instanz) → Fallback auf globale Settings → Fallback auf hardcoded WEEKS/COURSES. Gibt `isLegacy`-Flag zurück.
+- **Multi-Planer:** `instanceStore.ts` verwaltet Planer-Instanzen (Tabs). Jeder Planer hat eigenen localStorage-Slot (`planner-data-{id}`) inkl. `plannerSettings`. `plannerStore.ts` speichert/lädt Daten pro Instanz via `switchInstance()`.
 - **Hauptkomponenten:** WeekRows (~1021 Z.), SequencePanel (~660 Z.), DetailPanel (~1027 Z.), ZoomYearView (~569 Z.), Toolbar (~463 Z.), SettingsPanel (~494 Z.), CollectionPanel (~295 Z.), PlannerTabs (~263 Z.)
 
 ## Changelog v3.0–v3.14
@@ -88,6 +88,8 @@
 - v3.41: Batch-Sequenzen + UX-Verbesserungen — (1) **Batch-Sequenzen:** Bei Mehrfachauswahl (Shift/Cmd-Klick) kann aus dem BatchEditTab eine neue Sequenz erstellt oder die selektierten Wochen zu einer bestehenden Sequenz hinzugefügt werden. Warnung bei kursübergreifender Auswahl. (2) **Toolbar-Tabs:** Tab-Shortcuts (📖 UE, 📚 Sammlung) in Kopfzeile wenn SidePanel offen. (3) **Shift-Klick eingeschränkt:** Range-Select nur innerhalb desselben Kurses (cls+typ) möglich; verschiedene unverknüpfte Kurse werden blockiert. (4) **Auftrag-Unterricht:** Events (type 5) mit Category LESSON werden als normaler Unterricht mit 📋 Icon dargestellt, nicht als amber Event-Block. (5) **Event-Overlay:** Event-Name (gekürzt) im KW-Label sichtbar. (6) **IW-Plan:** Empfehlung Material-Links für IW-Events zu nutzen (bestehende Infrastruktur).
 
 - v3.42: **Multi-Planer Leerer Start (Phase 1 Abschluss)** — (1) `usePlannerData()` generiert Wochen dynamisch aus `instanceStore`-Metadaten (`generateWeekIds`) statt immer auf hardcoded `WEEKS` zurückzufallen. Neuer Rückgabewert `isLegacy` unterscheidet Legacy- und neue Planer. (2) `App.tsx`: Wochen-Init nutzt `hookWeeks` aus dem Data-Hook statt direkten `WEEKS`-Import. `migrateStaticSequences()` nur für Legacy-Planer. (3) Legacy-Erkennung: Planer mit Default-Range (KW33/2025–KW27/2026) und ohne Custom-Kurse werden als Legacy erkannt und nutzen weiterhin hardcoded `WEEKS`/`COURSES`. (4) Neue Planer starten komplett leer — leeres Wochenraster wird aus Meta-Daten generiert, keine Fallback-Daten. (5) `CURRENT_WEEK` wird live berechnet statt als Konstante.
+
+- v3.43: **Settings pro Planer-Instanz (Phase 2 Start)** — (1) `plannerSettings: PlannerSettings | null` als neues Feld im `plannerStore`. Wird pro Instanz persistiert via `partialize`, `extractPersistedState`, `loadFromInstance`, `resetToEmpty`. (2) `usePlannerData()` liest Settings reaktiv aus dem Store (statt `loadSettings()`). Priority: Store → Global localStorage → Hardcoded. Kurs-Änderungen wirken sofort (kein Page-Reload nötig). (3) `SettingsPanel` schreibt via `setPlannerSettings()` in den Store UND weiterhin in globalen localStorage (Rückwärtskompatibilität). (4) **Onboarding:** Neuer leerer Planer öffnet automatisch SidePanel mit Settings-Tab, wenn keine Kurse konfiguriert sind. (5) Legacy-Erkennung erweitert: Planer mit `storeSettings === null` + Default-Range gelten als Legacy.
 
 #### 🔵 Nächste Runde (v3.37+) — ✅ Erledigt
 11. ✅ Ferien als durchgehende Blöcke (rowSpan, zusammengefasst, normalgross)

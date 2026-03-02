@@ -5,6 +5,7 @@ import { SEQUENCES as STATIC_SEQUENCES } from '../data/sequences';
 import { COURSES, getLinkedCourseIds } from '../data/courses';
 import { INITIAL_LESSON_DETAILS } from '../data/initialLessonDetails';
 import { instanceStorageKey } from './instanceStore';
+import type { PlannerSettings } from './settingsStore';
 
 interface Selection {
   week: string;
@@ -134,7 +135,10 @@ interface PlannerState {
   undoStack: Week[][];
   pushUndo: () => void;
   undo: () => void;
-  // Settings
+  // Planner Settings (per-instance: courses, holidays, special weeks)
+  plannerSettings: PlannerSettings | null;
+  setPlannerSettings: (s: PlannerSettings) => void;
+  // Settings UI
   settingsOpen: boolean;
   setSettingsOpen: (v: boolean) => void;
   panelWidth: number;
@@ -1084,6 +1088,8 @@ export const usePlannerStore = create<PlannerState>()(
         undoStack: state.undoStack.slice(0, -1),
       };
     }),
+  plannerSettings: null,
+  setPlannerSettings: (s) => set({ plannerSettings: s }),
   settingsOpen: false,
   setSettingsOpen: (v) => set({ settingsOpen: v }),
   panelWidth: 400,
@@ -1110,6 +1116,7 @@ export const usePlannerStore = create<PlannerState>()(
         hkStartGroups: state.hkStartGroups,
         tafPhases: state.tafPhases,
         collection: state.collection,
+        plannerSettings: state.plannerSettings,
       }),
       migrate: (persisted: unknown, version: number) => {
         const state = persisted as Record<string, unknown>;
@@ -1149,6 +1156,7 @@ function extractPersistedState(): Record<string, unknown> {
     hkStartGroups: state.hkStartGroups,
     tafPhases: state.tafPhases,
     collection: state.collection,
+    plannerSettings: state.plannerSettings,
   };
 }
 
@@ -1176,6 +1184,7 @@ export function loadFromInstance(instanceId: string): void {
         hkStartGroups: data.hkStartGroups || {},
         tafPhases: data.tafPhases || [],
         collection: data.collection || [],
+        plannerSettings: data.plannerSettings || null,
         // Reset UI state on switch
         selection: null,
         editing: null,
@@ -1204,6 +1213,7 @@ export function resetToEmpty(): void {
     hkStartGroups: {},
     tafPhases: [],
     collection: [],
+    plannerSettings: null,
     selection: null,
     editing: null,
     insertDialog: null,
