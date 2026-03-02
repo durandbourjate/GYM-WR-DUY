@@ -347,11 +347,12 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
   const [emptyCellMenu, setEmptyCellMenu] = useState<{ week: string; course: Course } | null>(null);
   const [menuPosition, setMenuPosition] = useState<{ x: number; y: number } | undefined>(undefined);
 
-  // Drag-selection for empty cells
+  // Drag-selection for cells (empty and filled)
   const [isDragSelecting, setIsDragSelecting] = useState(false);
   const [dragSelectCol, setDragSelectCol] = useState<number | null>(null);
   const [dragSelectedWeeks, setDragSelectedWeeks] = useState<string[]>([]);
   const [dragSelectCourse, setDragSelectCourse] = useState<Course | null>(null);
+  const dragMoved = useRef(false);
   // Multi-day shift-click popup
   const [multiDayPrompt, setMultiDayPrompt] = useState<{ weekW: string; courseId: string; position: { x: number; y: number } } | null>(null);
 
@@ -517,34 +518,54 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
     setSidePanelTab('details');
   }, [setSelection, setSidePanelOpen, setSidePanelTab]);
 
-  // Drag-selection handlers for empty cells
-  const handleDragSelectStart = useCallback((weekW: string, course: Course) => {
+  // Drag-selection handlers (works on both empty and filled cells)
+  const handleDragSelectStart = useCallback((weekW: string, course: Course, e: React.MouseEvent) => {
+    if (e.shiftKey || e.metaKey || e.ctrlKey) return;
+    if (e.button !== 0) return;
     const entry = displayWeeks.find(w => w.w === weekW);
-    const title = entry?.lessons[course.col]?.title;
-    if (title) return; // Only on empty cells
+    const lesson = entry?.lessons[course.col];
+    if (lesson?.type === 6) return; // Holidays not draggable
     setIsDragSelecting(true);
     setDragSelectCol(course.col);
     setDragSelectCourse(course);
     setDragSelectedWeeks([weekW]);
     setEmptyCellMenu(null);
+    dragMoved.current = false;
   }, [displayWeeks]);
 
-  const handleDragSelectMove = useCallback((weekW: string, col: number) => {
-    if (!isDragSelecting || col !== dragSelectCol) return;
+  const handleDragSelectMove = useCallback((weekW: string, course: Course) => {
+    if (!isDragSelecting) return;
+    // Only within same course (cls+typ)
+    if (!dragSelectCourse || course.cls !== dragSelectCourse.cls || course.typ !== dragSelectCourse.typ) return;
     const entry = displayWeeks.find(w => w.w === weekW);
-    const title = entry?.lessons[col]?.title;
-    if (title) return; // Skip filled cells
-    setDragSelectedWeeks(prev => prev.includes(weekW) ? prev : [...prev, weekW]);
-  }, [isDragSelecting, dragSelectCol, displayWeeks]);
+    const lesson = entry?.lessons[course.col];
+    if (lesson?.type === 6) return; // Skip holidays
+    if (!dragSelectedWeeks.includes(weekW)) {
+      dragMoved.current = true;
+      setDragSelectedWeeks(prev => [...prev, weekW]);
+    }
+  }, [isDragSelecting, dragSelectCourse, displayWeeks, dragSelectedWeeks]);
 
   const handleDragSelectEnd = useCallback(() => {
     if (!isDragSelecting) return;
     setIsDragSelecting(false);
-    if (dragSelectedWeeks.length > 0 && dragSelectCourse) {
-      // Show context menu at the last selected cell
-      setEmptyCellMenu({ week: dragSelectedWeeks[dragSelectedWeeks.length - 1], course: dragSelectCourse });
+    if (dragMoved.current && dragSelectedWeeks.length > 1 && dragSelectCourse) {
+      // Multi-cell drag: set multiSelection directly and open SidePanel with batch tab
+      const keys = dragSelectedWeeks.map(w => `${w}-${dragSelectCourse.id}`);
+      usePlannerStore.getState().setMultiSelectionDirect(keys);
+      setSidePanelOpen(true);
+      setSidePanelTab('details'); // BatchOrDetailsTab auto-switches when multiSelection > 1
+    } else if (!dragMoved.current && dragSelectedWeeks.length === 1 && dragSelectCourse) {
+      // Single cell clicked (no drag): check if all cells are empty → show context menu
+      const entry = displayWeeks.find(w => w.w === dragSelectedWeeks[0]);
+      const lesson = entry?.lessons[dragSelectCourse.col];
+      if (!lesson?.title) {
+        setEmptyCellMenu({ week: dragSelectedWeeks[0], course: dragSelectCourse });
+      }
     }
-  }, [isDragSelecting, dragSelectedWeeks, dragSelectCourse]);
+    // Reset dragMoved after a short delay so onClick can still check it
+    setTimeout(() => { dragMoved.current = false; }, 50);
+  }, [isDragSelecting, dragSelectedWeeks, dragSelectCourse, displayWeeks, setSidePanelOpen, setSidePanelTab]);
 
   // Global mouseup listener for drag-selection
   useEffect(() => {
@@ -724,26 +745,28 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                     borderLeft: newDay ? `2px solid ${DAY_COLORS[c.day]}12` : 'none',
                     outline: isDragOver ? '2px solid #3b82f6'
                       : (dragSelectCol === c.col && dragSelectedWeeks.includes(week.w)) ? '2px solid #a855f7'
-                      : isMulti && !title ? '2px solid #6366f180' : 'none',
+                      : isMulti ? '2px solid #6366f180' : 'none',
                     outlineOffset: '-2px',
                     background: isDragOver ? '#1e3a5f30'
                       : (dragSelectCol === c.col && dragSelectedWeeks.includes(week.w)) ? '#7c3aed20'
-                      : isMulti && !title ? '#312e8140' : undefined,
+                      : isMulti ? '#312e8140' : undefined,
                     width: 110,
                     minWidth: 110,
                     maxWidth: 110,
                   }}
                   onMouseDown={(e) => {
-                    if (!title && !e.shiftKey && !e.metaKey && !e.ctrlKey && e.button === 0) {
-                      handleDragSelectStart(week.w, c);
+                    if (!e.shiftKey && !e.metaKey && !e.ctrlKey && e.button === 0) {
+                      handleDragSelectStart(week.w, c, e);
                     }
                   }}
                   onMouseEnter={() => {
-                    if (isDragSelecting) handleDragSelectMove(week.w, c.col);
+                    if (isDragSelecting) handleDragSelectMove(week.w, c);
                     if (title) handleMouseEnter(week.w, c.col);
                   }}
                   onMouseLeave={handleMouseLeave}
                   onClick={(e) => {
+                    // If a drag just happened, ignore this click
+                    if (dragMoved.current) return;
                     if (e.shiftKey || e.metaKey || e.ctrlKey) {
                       if (title) {
                         if (e.shiftKey) {

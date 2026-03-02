@@ -42,6 +42,7 @@ interface PlannerState {
   multiSelection: string[];
   lastSelectedKey: string | null;
   toggleMultiSelect: (key: string) => void;
+  setMultiSelectionDirect: (keys: string[]) => void;
   selectRange: (toKey: string, allWeeks: string[], courses: Course[], crossDay?: boolean) => void;
   clearMultiSelect: () => void;
   showHelp: boolean;
@@ -184,6 +185,7 @@ export const usePlannerStore = create<PlannerState>()(
         lastSelectedKey: key,
       };
     }),
+  setMultiSelectionDirect: (keys) => set({ multiSelection: keys, lastSelectedKey: keys[keys.length - 1] ?? null }),
   selectRange: (toKey, allWeeks, courses, crossDay) => {
     const state = get();
     const fromKey = state.lastSelectedKey;
