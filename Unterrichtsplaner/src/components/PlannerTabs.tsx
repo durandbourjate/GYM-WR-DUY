@@ -4,6 +4,8 @@
 import { useState, useRef } from 'react';
 import { useInstanceStore } from '../store/instanceStore';
 import { usePlannerStore, saveToInstance } from '../store/plannerStore';
+import { SCHOOL_YEAR_PRESETS, getPresetForYear } from '../data/holidayPresets';
+import { generateId, type HolidayConfig, type PlannerSettings, getDefaultSettings } from '../store/settingsStore';
 
 interface Props {
   onImport: (json: string) => void;
@@ -14,48 +16,87 @@ export function PlannerTabs({ onImport }: Props) {
   const [showNew, setShowNew] = useState(false);
   const [newName, setNewName] = useState('');
   const [templateId, setTemplateId] = useState<string | ''>('');
+  const [presetId, setPresetId] = useState<string>('');
+  const [autoHolidays, setAutoHolidays] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
   const [contextMenu, setContextMenu] = useState<{ id: string; x: number; y: number } | null>(null);
   const importRef = useRef<HTMLInputElement>(null);
 
+  // Auto-detect best preset based on current date
+  const defaultPresetId = (() => {
+    const now = new Date();
+    const year = now.getMonth() >= 6 ? now.getFullYear() : now.getFullYear() - 1;
+    const preset = getPresetForYear(year);
+    return preset?.id ?? '';
+  })();
+
   const handleCreate = () => {
     if (!newName.trim()) return;
-    const currentYear = new Date().getFullYear();
-    const currentMonth = new Date().getMonth();
-    const startYear = currentMonth >= 6 ? currentYear : currentYear - 1;
+
+    // Determine school year parameters from preset or defaults
+    const preset = SCHOOL_YEAR_PRESETS.find(p => p.id === (presetId || defaultPresetId));
+    const startWeek = preset?.startWeek ?? 33;
+    const startYear = preset?.startYear ?? new Date().getFullYear();
+    const endWeek = preset?.endWeek ?? 27;
+    const endYear = preset?.endYear ?? startYear + 1;
+    const semesterBreakWeek = preset?.semesterBreakWeek ?? 7;
 
     // Save current instance before switching
     if (activeId) saveToInstance(activeId);
 
     const newId = createInstance(newName.trim(), {
-      startWeek: 33,
-      startYear,
-      endWeek: 27,
-      endYear: startYear + 1,
-      semesterBreakWeek: 7,
+      startWeek, startYear, endWeek, endYear, semesterBreakWeek,
     });
 
-    // Copy settings (courses, holidays, special weeks) from template planner
-    if (templateId && newId) {
-      // We need to load the template's plannerSettings
-      const templateData = localStorage.getItem(`planner-data-${templateId}`);
-      if (templateData) {
-        try {
-          const parsed = JSON.parse(templateData);
-          const data = parsed.state || parsed;
-          if (data.plannerSettings) {
-            // Apply template settings to new instance after a tick (let switchInstance happen first)
-            setTimeout(() => {
-              usePlannerStore.getState().setPlannerSettings(data.plannerSettings);
-            }, 50);
+    if (newId) {
+      // Build initial settings
+      let initialSettings: PlannerSettings | null = null;
+
+      if (templateId) {
+        // Copy settings from template planner
+        const templateData = localStorage.getItem(`planner-data-${templateId}`);
+        if (templateData) {
+          try {
+            const parsed = JSON.parse(templateData);
+            const data = parsed.state || parsed;
+            if (data.plannerSettings) {
+              initialSettings = { ...data.plannerSettings };
+            }
+          } catch { /* ignore */ }
+        }
+      }
+
+      // Apply preset holidays (merge with template holidays or create new settings)
+      if (autoHolidays && preset) {
+        if (!initialSettings) {
+          initialSettings = getDefaultSettings();
+        }
+        const presetHolidays: HolidayConfig[] = preset.holidays.map(h => ({
+          id: generateId(),
+          label: h.label,
+          startWeek: h.startWeek,
+          endWeek: h.endWeek,
+        }));
+        // Only add holidays that don't already exist (from template)
+        const existingLabels = new Set(initialSettings.holidays.map(h => h.label));
+        for (const h of presetHolidays) {
+          if (!existingLabels.has(h.label)) {
+            initialSettings.holidays.push(h);
           }
-        } catch { /* ignore parse errors */ }
+        }
+      }
+
+      if (initialSettings) {
+        setTimeout(() => {
+          usePlannerStore.getState().setPlannerSettings(initialSettings!);
+        }, 50);
       }
     }
 
     setNewName('');
     setTemplateId('');
+    setPresetId('');
     setShowNew(false);
   };
 
@@ -156,43 +197,50 @@ export function PlannerTabs({ onImport }: Props) {
 
         {/* New planner button */}
         {showNew ? (
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 flex-wrap">
             <input
-              className="bg-slate-800 border border-slate-600 rounded px-2 py-1 text-white text-sm outline-none w-32"
-              placeholder="Name des Planers..."
+              className="bg-slate-800 border border-slate-600 rounded px-2 py-1 text-white text-sm outline-none w-28"
+              placeholder="Name..."
               value={newName}
               onChange={e => setNewName(e.target.value)}
               onKeyDown={e => {
                 if (e.key === 'Enter') handleCreate();
-                if (e.key === 'Escape') { setShowNew(false); setNewName(''); setTemplateId(''); }
+                if (e.key === 'Escape') { setShowNew(false); setNewName(''); setTemplateId(''); setPresetId(''); }
               }}
               autoFocus
             />
+            <select
+              className="bg-slate-800 border border-slate-600 rounded px-1 py-1 text-slate-300 text-[10px] outline-none cursor-pointer"
+              value={presetId || defaultPresetId}
+              onChange={e => setPresetId(e.target.value)}
+              title="Schuljahr"
+            >
+              {SCHOOL_YEAR_PRESETS.map(p => (
+                <option key={p.id} value={p.id}>{p.label}</option>
+              ))}
+              <option value="">Manuell</option>
+            </select>
+            {(presetId || defaultPresetId) && (
+              <label className="flex items-center gap-0.5 text-[10px] text-slate-400 cursor-pointer" title="Schulferien Kt. Bern automatisch eintragen">
+                <input type="checkbox" checked={autoHolidays} onChange={e => setAutoHolidays(e.target.checked)} className="cursor-pointer" />
+                🏖
+              </label>
+            )}
             {instances.length > 0 && (
               <select
                 className="bg-slate-800 border border-slate-600 rounded px-1 py-1 text-slate-400 text-[10px] outline-none cursor-pointer"
                 value={templateId}
                 onChange={e => setTemplateId(e.target.value)}
-                title="Kurse & Ferien übernehmen von..."
+                title="Kurse übernehmen von..."
               >
-                <option value="">Leer starten</option>
+                <option value="">Ohne Vorlage</option>
                 {instances.map(inst => (
                   <option key={inst.id} value={inst.id}>Kurse von: {inst.name}</option>
                 ))}
               </select>
             )}
-            <button
-              className="px-2 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-500"
-              onClick={handleCreate}
-            >
-              OK
-            </button>
-            <button
-              className="px-2 py-1 text-slate-400 hover:text-white text-xs"
-              onClick={() => { setShowNew(false); setNewName(''); setTemplateId(''); }}
-            >
-              ✕
-            </button>
+            <button className="px-2 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-500 cursor-pointer" onClick={handleCreate}>OK</button>
+            <button className="px-2 py-1 text-slate-400 hover:text-white text-xs cursor-pointer" onClick={() => { setShowNew(false); setNewName(''); setTemplateId(''); setPresetId(''); }}>✕</button>
           </div>
         ) : (
           <button
@@ -248,25 +296,41 @@ export function PlannerTabs({ onImport }: Props) {
   );
 }
 
-/** Welcome screen shown when no planner exists or planner has no courses */
+/** Welcome screen shown when no planner exists */
 export function WelcomeScreen() {
   const { createInstance } = useInstanceStore();
   const [name, setName] = useState('');
+  const [presetId, setPresetId] = useState('');
+  const [autoHolidays, setAutoHolidays] = useState(true);
+
+  const defaultPresetId = (() => {
+    const now = new Date();
+    const year = now.getMonth() >= 6 ? now.getFullYear() : now.getFullYear() - 1;
+    return getPresetForYear(year)?.id ?? SCHOOL_YEAR_PRESETS[0]?.id ?? '';
+  })();
 
   const handleCreate = () => {
-    const currentYear = new Date().getFullYear();
-    const currentMonth = new Date().getMonth();
-    const startYear = currentMonth >= 6 ? currentYear : currentYear - 1;
-
+    const preset = SCHOOL_YEAR_PRESETS.find(p => p.id === (presetId || defaultPresetId));
+    const startYear = preset?.startYear ?? new Date().getFullYear();
     const plannerName = name.trim() || `Planer ${startYear}/${(startYear + 1) % 100}`;
 
-    createInstance(plannerName, {
-      startWeek: 33,
+    const newId = createInstance(plannerName, {
+      startWeek: preset?.startWeek ?? 33,
       startYear,
-      endWeek: 27,
-      endYear: startYear + 1,
-      semesterBreakWeek: 7,
+      endWeek: preset?.endWeek ?? 27,
+      endYear: preset?.endYear ?? startYear + 1,
+      semesterBreakWeek: preset?.semesterBreakWeek ?? 7,
     });
+
+    if (newId && autoHolidays && preset) {
+      const initialSettings = getDefaultSettings();
+      initialSettings.holidays = preset.holidays.map(h => ({
+        id: generateId(), label: h.label, startWeek: h.startWeek, endWeek: h.endWeek,
+      }));
+      setTimeout(() => {
+        usePlannerStore.getState().setPlannerSettings(initialSettings);
+      }, 50);
+    }
   };
 
   return (
@@ -285,8 +349,23 @@ export function WelcomeScreen() {
           onChange={e => setName(e.target.value)}
           onKeyDown={e => { if (e.key === 'Enter') handleCreate(); }}
         />
+        <div className="flex gap-2 items-center justify-center">
+          <select
+            className="bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm outline-none cursor-pointer"
+            value={presetId || defaultPresetId}
+            onChange={e => setPresetId(e.target.value)}
+          >
+            {SCHOOL_YEAR_PRESETS.map(p => (
+              <option key={p.id} value={p.id}>{p.label}</option>
+            ))}
+          </select>
+          <label className="flex items-center gap-1.5 text-sm text-slate-400 cursor-pointer" title="Schulferien Kt. Bern automatisch eintragen">
+            <input type="checkbox" checked={autoHolidays} onChange={e => setAutoHolidays(e.target.checked)} className="cursor-pointer" />
+            🏖 Ferien eintragen
+          </label>
+        </div>
         <button
-          className="px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-500 transition-colors"
+          className="px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-500 transition-colors cursor-pointer"
           onClick={() => handleCreate()}
         >
           + Neuen Planer erstellen
