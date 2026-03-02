@@ -9,6 +9,7 @@ const TYPE_LABELS: Record<CollectionItemType, { label: string; icon: string }> =
   sequence: { label: 'Sequenz', icon: '📋' },
   schoolyear: { label: 'Schuljahr', icon: '📅' },
   curriculum: { label: 'Bildungsgang', icon: '🎓' },
+  settings: { label: 'Konfiguration', icon: '⚙️' },
 };
 
 
@@ -195,7 +196,11 @@ function CollectionCard({ item, onImport }: { item: CollectionItem; onImport: (i
           <div className="text-[10px] font-semibold text-gray-200 truncate">{item.title}</div>
           <div className="text-[8px] text-gray-400 flex items-center gap-1.5">
             <span>{typeInfo.label}</span>
-            <span>· {item.units.length} UE</span>
+            {item.type === 'settings' ? (
+              <span>· {(() => { try { const s = JSON.parse(item.settingsSnapshot || '{}'); return `${s.courses?.length || 0} Kurse`; } catch { return ''; } })()}</span>
+            ) : (
+              <span>· {item.units.length} UE</span>
+            )}
             {item.courseType && <span>· {item.courseType}</span>}
             {item.schoolYear && <span>· SJ {item.schoolYear}</span>}
             <span className="ml-auto">{dateStr}</span>
@@ -206,22 +211,34 @@ function CollectionCard({ item, onImport }: { item: CollectionItem; onImport: (i
 
       {expanded && (
         <div className="px-2 pb-2 pt-0.5 border-t border-slate-700/50 space-y-1.5">
-          {/* Unit list */}
-          <div className="space-y-0.5 max-h-40 overflow-y-auto">
-            {item.units.map((u, i) => (
-              <div key={i} className="flex items-center gap-1 text-[8px] px-1 py-0.5 rounded hover:bg-slate-700/30">
-                <span className="text-gray-600">{i + 1}.</span>
-                <span className="text-gray-300 truncate">{u.block.label || '(ohne Titel)'}</span>
-                {u.block.subjectArea && (
-                  <span className="ml-auto text-[7px] px-1 rounded" style={{
-                    color: SUBJECT_AREA_COLORS[u.block.subjectArea]?.fg,
-                    background: SUBJECT_AREA_COLORS[u.block.subjectArea]?.bg + '20',
-                  }}>{u.block.subjectArea}</span>
-                )}
-                <span className="text-gray-600">{u.lessonTitles.filter(Boolean).length}L</span>
-              </div>
-            ))}
-          </div>
+          {/* Content — settings summary or unit list */}
+          {item.type === 'settings' && item.settingsSnapshot ? (
+            <div className="text-[8px] text-gray-400 space-y-0.5 px-1">
+              {(() => { try { const s = JSON.parse(item.settingsSnapshot);
+                return (<>
+                  <div>📚 {s.courses?.length || 0} Kurse</div>
+                  <div>🏖 {s.holidays?.length || 0} Ferienperioden</div>
+                  <div>📅 {s.specialWeeks?.length || 0} Sonderwochen</div>
+                  <div>🎨 {s.subjects?.length || 0} Fachbereiche</div>
+                </>); } catch { return <div>Fehler beim Lesen</div>; } })()}
+            </div>
+          ) : (
+            <div className="space-y-0.5 max-h-40 overflow-y-auto">
+              {item.units.map((u, i) => (
+                <div key={i} className="flex items-center gap-1 text-[8px] px-1 py-0.5 rounded hover:bg-slate-700/30">
+                  <span className="text-gray-600">{i + 1}.</span>
+                  <span className="text-gray-300 truncate">{u.block.label || '(ohne Titel)'}</span>
+                  {u.block.subjectArea && (
+                    <span className="ml-auto text-[7px] px-1 rounded" style={{
+                      color: SUBJECT_AREA_COLORS[u.block.subjectArea]?.fg,
+                      background: SUBJECT_AREA_COLORS[u.block.subjectArea]?.bg + '20',
+                    }}>{u.block.subjectArea}</span>
+                  )}
+                  <span className="text-gray-600">{u.lessonTitles.filter(Boolean).length}L</span>
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* Tags */}
           {item.tags && item.tags.length > 0 && (
@@ -248,7 +265,12 @@ function CollectionCard({ item, onImport }: { item: CollectionItem; onImport: (i
           ) : (
             <div className="flex gap-1 justify-between items-center">
               <div className="flex gap-1">
-                <button onClick={() => onImport(item)} className="text-[8px] text-blue-400 hover:text-blue-300 cursor-pointer">↗ Importieren</button>
+                {item.type !== 'settings' && (
+                  <button onClick={() => onImport(item)} className="text-[8px] text-blue-400 hover:text-blue-300 cursor-pointer">↗ Importieren</button>
+                )}
+                {item.type === 'settings' && (
+                  <span className="text-[8px] text-gray-500">Laden via Einstellungen-Tab</span>
+                )}
                 <button onClick={() => setEditing(true)} className="text-[8px] text-gray-400 hover:text-gray-300 cursor-pointer">✏ Bearbeiten</button>
               </div>
               <button onClick={() => { if (confirm(`"${item.title}" aus Sammlung löschen?`)) deleteCollectionItem(item.id); }}
@@ -295,7 +317,7 @@ export function CollectionPanel() {
           className="w-full bg-slate-800/50 text-slate-200 border border-slate-600 rounded px-2 py-1 text-[9px] outline-none focus:border-amber-400" />
         {/* Type filter */}
         <div className="flex gap-0.5 flex-wrap">
-          {(['ALL', 'unit', 'sequence', 'schoolyear', 'curriculum'] as const).map((t) => (
+          {(['ALL', 'unit', 'sequence', 'schoolyear', 'curriculum', 'settings'] as const).map((t) => (
             <button key={t} onClick={() => setFilterType(t)}
               className={`px-1.5 py-0.5 rounded text-[8px] border cursor-pointer ${filterType === t ? 'bg-amber-500/20 border-amber-500 text-amber-300' : 'border-gray-600 text-gray-400'}`}>
               {t === 'ALL' ? 'Alle' : TYPE_LABELS[t].icon + ' ' + TYPE_LABELS[t].label}

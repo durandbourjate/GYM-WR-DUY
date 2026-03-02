@@ -130,7 +130,7 @@ export interface CellBadge {
 }
 
 // === Materialsammlung (Collection) ===
-export type CollectionItemType = 'unit' | 'sequence' | 'schoolyear' | 'curriculum';
+export type CollectionItemType = 'unit' | 'sequence' | 'schoolyear' | 'curriculum' | 'settings';
 
 /** A single archived teaching unit (1 block + lesson details) */
 export interface CollectionUnit {
@@ -153,6 +153,7 @@ export interface CollectionItem {
   notes?: string;
   // Content — depends on type:
   units: CollectionUnit[];        // type='unit': 1 entry; 'sequence': multiple; 'schoolyear'/'curriculum': all
+  settingsSnapshot?: string;      // type='settings': JSON-serialized PlannerSettings
   // Metadata from original sequence(s)
   sequenceTitle?: string;         // Original ManagedSequence title
   sequenceColor?: string;

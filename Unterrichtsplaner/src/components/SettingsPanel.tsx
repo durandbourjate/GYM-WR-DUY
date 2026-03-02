@@ -626,6 +626,47 @@ function ReapplyButton({ settings }: { settings: PlannerSettings }) {
   );
 }
 
+// === Settings Collection Picker Modal ===
+function SettingsCollectionPicker({ onLoad, onClose }: { onLoad: (snapshot: string) => void; onClose: () => void }) {
+  const { collection } = usePlannerStore();
+  const settingsItems = collection.filter(item => item.type === 'settings' && item.settingsSnapshot);
+
+  return (
+    <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center" onClick={onClose}>
+      <div className="bg-slate-800 border border-slate-600 rounded-lg p-4 w-80 max-h-[60vh] shadow-xl flex flex-col" onClick={(e) => e.stopPropagation()}>
+        <div className="text-[11px] font-bold text-gray-200 mb-3">📚 Konfiguration aus Sammlung laden</div>
+        {settingsItems.length === 0 ? (
+          <div className="text-[9px] text-gray-400 text-center py-4">
+            Keine gespeicherten Konfigurationen in der Sammlung.
+          </div>
+        ) : (
+          <div className="flex-1 overflow-y-auto space-y-1.5 mb-3">
+            {settingsItems.map(item => {
+              let summary = '';
+              try {
+                const s = JSON.parse(item.settingsSnapshot!);
+                summary = `${s.courses?.length || 0} Kurse, ${s.holidays?.length || 0} Ferien, ${s.specialWeeks?.length || 0} Sonderwochen`;
+              } catch { summary = 'Fehler'; }
+              const dateStr = new Date(item.createdAt).toLocaleDateString('de-CH', { day: '2-digit', month: '2-digit', year: '2-digit' });
+              return (
+                <button key={item.id} onClick={() => onLoad(item.settingsSnapshot!)}
+                  className="w-full text-left px-3 py-2 rounded bg-slate-700/50 hover:bg-slate-700 border border-slate-600 hover:border-blue-500 cursor-pointer transition-all">
+                  <div className="text-[10px] font-semibold text-gray-200">{item.title}</div>
+                  <div className="text-[8px] text-gray-400">{summary} · {dateStr}</div>
+                </button>
+              );
+            })}
+          </div>
+        )}
+        <button onClick={onClose}
+          className="w-full py-1.5 rounded text-[9px] text-gray-400 border border-gray-700 cursor-pointer hover:text-gray-200">
+          Abbrechen
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // === Main Settings Panel ===
 export function SettingsPanel() {
   const storeSettings = usePlannerStore(s => s.plannerSettings);
@@ -681,6 +722,39 @@ export function SettingsPanel() {
   }, [doSave]);
 
   const hasCustomSettings = storeSettings !== null || loadSettings() !== null;
+  const [showCollectionPicker, setShowCollectionPicker] = useState(false);
+
+  // Save current settings to collection
+  const saveToCollection = useCallback(() => {
+    const activeMeta = useInstanceStore.getState().getActive();
+    const planerName = activeMeta?.name || 'Planer';
+    const datum = new Date().toLocaleDateString('de-CH', { day: '2-digit', month: '2-digit', year: '2-digit' });
+    const store = usePlannerStore.getState();
+    store.addCollectionItem({
+      type: 'settings',
+      title: `Konfiguration ${planerName} ${datum}`,
+      units: [],
+      settingsSnapshot: JSON.stringify(settings),
+    });
+    alert('Konfiguration in Sammlung gespeichert.');
+  }, [settings]);
+
+  // Load settings from a collection item
+  const loadFromCollection = useCallback((snapshot: string) => {
+    try {
+      const imported = JSON.parse(snapshot);
+      if (!Array.isArray(imported.courses) || !Array.isArray(imported.holidays) || !Array.isArray(imported.specialWeeks)) {
+        alert('Ungültige Konfiguration in der Sammlung.');
+        return;
+      }
+      if (!confirm(`Bestehende Einstellungen werden überschrieben (${imported.courses.length} Kurse, ${imported.holidays.length} Ferienperioden, ${imported.specialWeeks.length} Sonderwochen). Fortfahren?`)) {
+        return;
+      }
+      setSettings(imported as PlannerSettings);
+      doSave(imported as PlannerSettings);
+      setShowCollectionPicker(false);
+    } catch { alert('Fehler beim Lesen der Konfiguration.'); }
+  }, [doSave]);
 
   return (
     <div className="flex-1 overflow-y-auto p-3 space-y-3">
@@ -848,6 +922,26 @@ export function SettingsPanel() {
           </div>
         </div>
       </Section>
+
+      {/* Collection save/load */}
+      <Section title="📚 Sammlung">
+        <div className="space-y-2">
+          <p className="text-[8px] text-gray-400">Konfigurationen (Kurse, Ferien, Sonderwochen) in der Sammlung sichern oder aus einer gespeicherten Konfiguration laden.</p>
+          <div className="flex gap-1">
+            <button onClick={saveToCollection}
+              className="flex-1 py-1.5 rounded text-[9px] font-medium bg-slate-700 hover:bg-slate-600 text-gray-200 cursor-pointer transition-all">
+              📥 In Sammlung speichern
+            </button>
+            <button onClick={() => setShowCollectionPicker(true)}
+              className="flex-1 py-1.5 rounded text-[9px] font-medium bg-slate-700 hover:bg-slate-600 text-gray-200 cursor-pointer transition-all">
+              📚 Aus Sammlung laden
+            </button>
+          </div>
+        </div>
+      </Section>
+
+      {/* Collection picker modal */}
+      {showCollectionPicker && <SettingsCollectionPicker onLoad={loadFromCollection} onClose={() => setShowCollectionPicker(false)} />}
 
       {/* Danger zone */}
       <div className="pt-2 border-t border-slate-700">
