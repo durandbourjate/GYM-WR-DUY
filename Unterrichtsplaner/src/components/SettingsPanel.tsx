@@ -32,6 +32,16 @@ function lesToDuration(les: number): number {
   return les * 45;
 }
 
+/** Add minutes to a "HH:MM" time string, return "HH:MM" */
+function addMinutesToTime(time: string, minutes: number): string {
+  const [h, m] = time.split(':').map(Number);
+  if (isNaN(h) || isNaN(m)) return time;
+  const total = h * 60 + m + minutes;
+  const rh = Math.floor(total / 60) % 24;
+  const rm = total % 60;
+  return `${String(rh).padStart(2, '0')}:${String(rm).padStart(2, '0')}`;
+}
+
 const DAYS: DayOfWeek[] = ['Mo', 'Di', 'Mi', 'Do', 'Fr'];
 const COURSE_TYPES: { key: CourseType; label: string }[] = [
   { key: 'SF', label: 'SF' }, { key: 'EWR', label: 'EWR' },
@@ -245,13 +255,25 @@ function CourseEditor({ courses, onChange }: { courses: CourseConfig[]; onChange
                     <SmallSelect value={c.day} onChange={(v) => updateCourse(c.id, { day: v })} options={DAYS.map(d => ({ key: d, label: d }))} />
                   </div>
                   <div className="flex gap-1 items-center flex-wrap">
-                    <SmallInput value={c.from} onChange={(v) => updateCourse(c.id, { from: v })} placeholder="08:05" className="w-24 text-[11px]" type="time" />
-                    <span className="text-[10px] text-gray-400">–</span>
-                    <SmallInput value={c.to} onChange={(v) => updateCourse(c.id, { to: v })} placeholder="08:50" className="w-24 text-[11px]" type="time" />
+                    <div>
+                      <label className="text-[8px] text-gray-400 mb-0.5 block">Beginn</label>
+                      <SmallInput value={c.from} onChange={(v) => {
+                        const autoEnd = addMinutesToTime(v, c.les * 45);
+                        updateCourse(c.id, { from: v, to: autoEnd });
+                      }} placeholder="08:05" className="w-28 text-[11px]" type="time" />
+                    </div>
+                    <span className="text-[10px] text-gray-400 mt-4">–</span>
+                    <div>
+                      <label className="text-[8px] text-gray-400 mb-0.5 block">Ende <span className="text-gray-500">(auto)</span></label>
+                      <SmallInput value={c.to} onChange={(v) => updateCourse(c.id, { to: v })} placeholder="08:50" className="w-28 text-[11px]" type="time" />
+                    </div>
                   </div>
                   <div>
                     <label className="text-[8px] text-gray-400 mb-0.5 block">Dauer</label>
-                    <CourseDurationPicker value={c.les * 45} onChange={(min) => updateCourse(c.id, { les: durationToLes(min) })} />
+                    <CourseDurationPicker value={c.les * 45} onChange={(min) => {
+                      const autoEnd = addMinutesToTime(c.from, min);
+                      updateCourse(c.id, { les: durationToLes(min), to: autoEnd });
+                    }} />
                   </div>
                   <div className="flex gap-3 items-center flex-wrap">
                     <label className="flex items-center gap-1 text-[9px] text-gray-400 cursor-pointer">
@@ -278,8 +300,13 @@ function CourseEditor({ courses, onChange }: { courses: CourseConfig[]; onChange
                     </label>
                   </div>
                   <SmallInput value={c.note || ''} onChange={(v) => updateCourse(c.id, { note: v || undefined })} placeholder="Bemerkung (optional)" className="w-full" />
-                  <div className="flex gap-1 mt-1">
+                  <div className="flex gap-1 mt-1 flex-wrap">
                     <button onClick={() => setEditingId(null)} className="text-[8px] text-blue-400 cursor-pointer">✓ Fertig</button>
+                    <button onClick={() => {
+                      const dup: CourseConfig = { ...c, id: generateId(), day: 'Di' as DayOfWeek };
+                      onChange([...courses, dup]);
+                      setEditingId(dup.id);
+                    }} className="text-[8px] text-green-400 cursor-pointer" title="Kurs mit anderem Tag duplizieren (z.B. für Di+Do-Kurse)">+ Tag</button>
                     <button onClick={() => removeCourse(c.id)} className="text-[8px] text-red-400 cursor-pointer ml-auto">Entfernen</button>
                   </div>
                 </div>
