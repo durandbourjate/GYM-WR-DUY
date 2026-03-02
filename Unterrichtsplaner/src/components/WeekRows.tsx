@@ -356,6 +356,21 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
   // Multi-day shift-click popup
   const [multiDayPrompt, setMultiDayPrompt] = useState<{ weekW: string; courseId: string; position: { x: number; y: number } } | null>(null);
 
+  // Rhythm warning after push (1L↔2L)
+  const [rhythmWarning, setRhythmWarning] = useState<string | null>(null);
+  const checkRhythmAfterPush = useCallback((course: Course) => {
+    const linked = getLinkedCourseIds(course.id);
+    if (linked.length <= 1) return; // Not a multi-day course
+    const linkedCourses = courses.filter(c => linked.includes(c.id));
+    const hasDifferentDurations = new Set(linkedCourses.map(c => c.les)).size > 1;
+    if (hasDifferentDurations) {
+      const courseName = `${course.cls} ${course.typ}`;
+      const durations = linkedCourses.map(c => `${c.day}=${c.les}L`).join(', ');
+      setRhythmWarning(`Achtung: Rhythmisierung ${durations} bei ${courseName} nach Verschiebung beachten.`);
+      setTimeout(() => setRhythmWarning(null), 5000);
+    }
+  }, [courses]);
+
   // Close multi-day prompt on click outside or Escape
   useEffect(() => {
     if (!multiDayPrompt) return;
@@ -509,7 +524,8 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
     e.stopPropagation();
     pushUndo();
     pushLessons(course.col, weekW, allWeekKeys);
-  }, [pushUndo, pushLessons, allWeekKeys]);
+    checkRhythmAfterPush(course);
+  }, [pushUndo, pushLessons, allWeekKeys, checkRhythmAfterPush]);
 
   const handleMiniDetails = useCallback((e: React.MouseEvent, course: Course, weekW: string, title: string) => {
     e.stopPropagation();
@@ -1198,6 +1214,19 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
           </tr>
         );
       })()}
+
+      {/* Rhythm warning toast */}
+      {rhythmWarning && (
+        <tr>
+          <td colSpan={courses.length + 1} className="p-0 relative">
+            <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[90] bg-amber-900/90 border border-amber-500/50 rounded-lg shadow-2xl px-4 py-2 flex items-center gap-2 max-w-md">
+              <span className="text-amber-300 text-sm">⚠️</span>
+              <span className="text-[10px] text-amber-200">{rhythmWarning}</span>
+              <button onClick={() => setRhythmWarning(null)} className="text-amber-400 hover:text-amber-200 text-[10px] cursor-pointer ml-2">✕</button>
+            </div>
+          </td>
+        </tr>
+      )}
     </>
   );
 }
