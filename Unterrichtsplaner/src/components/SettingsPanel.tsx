@@ -28,10 +28,6 @@ function durationToLes(min: number): 1 | 2 | 3 {
   return 3;
 }
 
-function lesToDuration(les: number): number {
-  return les * 45;
-}
-
 /** Add minutes to a "HH:MM" time string, return "HH:MM" */
 function addMinutesToTime(time: string, minutes: number): string {
   const [h, m] = time.split(':').map(Number);
@@ -453,12 +449,6 @@ function SpecialWeeksEditor({ weeks, courses, onChange }: {
       <p className="text-[8px] text-gray-400">Pro Kalenderwoche können verschiedene GYM-Stufen unterschiedliche Sonderwochen haben. Klicke auf eine KW um Details zu bearbeiten.</p>
       {grouped.map(([kw, entries]) => {
         const isExpanded = expandedWeek === kw;
-        // Build label with GYM-Stufe badges
-        const labelParts = entries.map(e => {
-          const badge = e.gymLevel ? `${e.gymLevel} ` : '';
-          return badge + (e.label || '');
-        }).filter(Boolean);
-        const labels = labelParts.join(', ');
         return (
           <div key={kw || 'new'} className="border border-slate-700/50 rounded overflow-hidden">
             <div className="flex items-center gap-2 px-2 py-1.5 bg-slate-800/50 cursor-pointer hover:bg-slate-800"
@@ -1149,7 +1139,6 @@ export function SettingsPanel() {
   });
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const isFirstRender = useRef(true);
 
   // Auto-save with debounce (300ms)
   const doSave = useCallback((s: PlannerSettings) => {

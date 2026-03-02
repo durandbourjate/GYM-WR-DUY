@@ -8,7 +8,7 @@ import { SettingsPanel } from './SettingsPanel';
 import { CollectionPanel } from './CollectionPanel';
 import { suggestGoals, suggestSubjectArea } from '../utils/autoSuggest';
 import { inferSubjectAreaFromLessonType } from '../data/categories';
-import type { SubjectArea, BlockCategory, LessonDetail, SolDetails, Course, SequenceBlock, CollectionItem } from '../types';
+import type { SubjectArea, BlockCategory, LessonDetail, SolDetails, Course, SequenceBlock } from '../types';
 
 // SUBJECT_AREAS is now provided via usePlannerData().categories — no local constant needed
 

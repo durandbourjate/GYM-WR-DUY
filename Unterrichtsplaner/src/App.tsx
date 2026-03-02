@@ -8,7 +8,6 @@ import { WeekRows } from './components/WeekRows';
 import { AppHeader, HelpBar, MultiSelectToolbar, Legend } from './components/Toolbar';
 import { DetailPanel } from './components/DetailPanel';
 import { InsertDialog } from './components/InsertDialog';
-import { ZoomYearView } from './components/ZoomYearView';
 import { ZoomMultiYearView } from './components/ZoomMultiYearView';
 import { PlannerTabs, WelcomeScreen } from './components/PlannerTabs';
 

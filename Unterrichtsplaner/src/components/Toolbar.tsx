@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { usePlannerStore } from '../store/plannerStore';
 import { usePlannerData } from '../hooks/usePlannerData';
 import { StatsPanel } from './StatsPanel';
@@ -18,7 +18,7 @@ export function AppHeader() {
   const courseTypeFilters = useMemo(() => {
     const types = new Set(plannerCourses.map(c => c.typ));
     const ordered: FilterType[] = ['SF', 'EWR', 'EF', 'IN', 'KS'];
-    return ordered.filter(t => types.has(t));
+    return ordered.filter(t => t !== 'ALL' && types.has(t as import('../types').CourseType));
   }, [plannerCourses]);
 
   // Grade warnings badge
