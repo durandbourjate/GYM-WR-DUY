@@ -9,7 +9,7 @@ interface Props {
 }
 
 export function SemesterHeader({ courses, semester, weeks }: Props) {
-  const { classFilter, setClassFilter, setFilter, expandedNoteCols, toggleNoteCol, noteColWidth, setNoteColWidth } = usePlannerStore();
+  const { classFilter, setClassFilter, courseFilter, setCourseFilter, setFilter, expandedNoteCols, toggleNoteCol, noteColWidth, setNoteColWidth } = usePlannerStore();
   const ncw = noteColWidth;
 
   // Drag resize for note column
@@ -73,11 +73,12 @@ export function SemesterHeader({ courses, semester, weeks }: Props) {
             <>
               <th
                 key={`${c.id}-info`}
-                className="bg-gray-900 px-0.5 pb-1 border-b-2 border-gray-700 text-center"
+                className={`bg-gray-900 px-0.5 pb-1 border-b-2 text-center ${courseFilter === `${c.cls}|${c.typ}` ? 'border-blue-500' : 'border-gray-700'}`}
                 style={{
                   borderLeft: newDay ? `2px solid ${DAY_COLORS[c.day]}40` : 'none',
                   width: 110, minWidth: 110, maxWidth: 110,
                 }}
+                onDoubleClick={() => setCourseFilter(courseFilter === `${c.cls}|${c.typ}` ? null : `${c.cls}|${c.typ}`)}
               >
                 <div className="flex items-center justify-center gap-0.5">
                   <div
@@ -85,7 +86,7 @@ export function SemesterHeader({ courses, semester, weeks }: Props) {
                       classFilter === c.cls ? 'text-blue-400' : 'text-gray-200 hover:text-blue-300'
                     }`}
                     onClick={() => setClassFilter(classFilter === c.cls ? null : c.cls)}
-                    title={`Klick: Nur ${c.cls} anzeigen`}
+                    title={`Klick: Nur ${c.cls} | Doppelklick: Nur ${c.cls} ${c.typ}`}
                   >
                     {c.cls}
                   </div>

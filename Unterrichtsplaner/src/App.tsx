@@ -65,7 +65,7 @@ function App() {
 
 /** The actual planner grid — separated so it re-renders on instance switch */
 function PlannerContent() {
-  const { filter, classFilter, weekData, setWeekData, migrateStaticSequences, fixSequenceTitles, sequencePanelOpen, sidePanelOpen, zoomLevel, panelWidth, plannerSettings } = usePlannerStore();
+  const { filter, classFilter, courseFilter, setCourseFilter, weekData, setWeekData, migrateStaticSequences, fixSequenceTitles, sequencePanelOpen, sidePanelOpen, zoomLevel, panelWidth, plannerSettings } = usePlannerStore();
   const { courses: allCourses, weeks: hookWeeks, s2StartIndex, isLegacy } = usePlannerData();
   const curRef = useRef<HTMLTableRowElement>(null);
 
@@ -111,6 +111,7 @@ function PlannerContent() {
     let c = allCourses.filter((co) => co.semesters.includes(semester));
     if (filter !== 'ALL') c = c.filter((co) => co.typ === filter);
     if (classFilter) c = c.filter((co) => co.cls === classFilter);
+    if (courseFilter) c = c.filter((co) => `${co.cls}|${co.typ}` === courseFilter);
     return [...c].sort((a, b) => {
       const dayDiff = (DAY_ORDER[a.day] ?? 9) - (DAY_ORDER[b.day] ?? 9);
       if (dayDiff !== 0) return dayDiff;
@@ -121,8 +122,8 @@ function PlannerContent() {
   const allWeekKeys = useMemo(() =>
     (weekData.length > 0 ? weekData : hookWeeks).map(w => w.w), [weekData, hookWeeks]);
 
-  const s1Courses = useMemo(() => filterCourses(1), [filter, classFilter, allCourses]);
-  const s2Courses = useMemo(() => filterCourses(2), [filter, classFilter, allCourses]);
+  const s1Courses = useMemo(() => filterCourses(1), [filter, classFilter, courseFilter, allCourses]);
+  const s2Courses = useMemo(() => filterCourses(2), [filter, classFilter, courseFilter, allCourses]);
   const s1Weeks = useMemo(() =>
     (weekData.length > 0 ? weekData : hookWeeks).slice(0, s2StartIndex), [weekData, hookWeeks, s2StartIndex]);
   const s2Weeks = useMemo(() =>
@@ -153,6 +154,8 @@ function PlannerContent() {
           state.setEditingSequenceId(null);
         } else if (state.multiSelection.length > 0) {
           state.clearMultiSelect();
+        } else if (state.courseFilter) {
+          state.setCourseFilter(null);
         } else if (state.sidePanelOpen) {
           state.setSidePanelOpen(false);
           state.setSequencePanelOpen(false);
@@ -223,6 +226,17 @@ function PlannerContent() {
       <Legend />
       <MultiSelectToolbar />
       <InsertDialog />
+
+      {courseFilter && (
+        <div className="flex items-center gap-2 px-4 py-1 bg-blue-900/40 border-b border-blue-800/50">
+          <span className="text-[10px] text-blue-300 font-semibold">🔍 Gefiltert: {courseFilter.replace('|', ' ')}</span>
+          <button
+            onClick={() => setCourseFilter(null)}
+            className="text-[10px] text-blue-400 hover:text-white bg-blue-800/60 hover:bg-blue-700 px-1.5 py-0.5 rounded cursor-pointer transition-colors"
+            title="Filter aufheben (Esc)"
+          >✕</button>
+        </div>
+      )}
 
       <div className="flex" style={{ height: 'calc(100vh - 36px)' }}>
         <div className="overflow-auto flex-1" style={{ paddingBottom: 20, marginRight: (sidePanelOpen || sequencePanelOpen) ? panelWidth : 0 }}>

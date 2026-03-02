@@ -1,6 +1,6 @@
-# Unterrichtsplaner – Handoff v3.58
+# Unterrichtsplaner – Handoff v3.59
 
-## Status: ✅ Deployed (v3.58)
+## Status: ✅ Deployed (v3.59)
 - **Commit:** (pending)
 - **Datum:** 2026-03-02
 - **Deploy:** https://durandbourjate.github.io/GYM-WR-DUY/Unterrichtsplaner/
@@ -112,7 +112,7 @@ Aufträge in empfohlener Reihenfolge. Jeden Auftrag einzeln umsetzen, dann commi
 
 ---
 
-### Auftrag F: v3.59 — Doppelklick Spaltentitel als Kursfilter (Klein)
+### ✅ Auftrag F: v3.59 — Doppelklick Spaltentitel als Kursfilter (Klein)
 
 **Kontext:** Im Wochenplan (Zoom 3) werden alle Kurse als Spalten angezeigt. Doppelklick auf einen Spaltentitel (Klassenname) soll alle anderen Spalten ausblenden — als schneller Kursfilter.
 

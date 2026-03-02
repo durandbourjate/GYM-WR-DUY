@@ -31,6 +31,8 @@ interface PlannerState {
   setFilter: (f: FilterType) => void;
   classFilter: string | null;
   setClassFilter: (c: string | null) => void;
+  courseFilter: string | null;
+  setCourseFilter: (c: string | null) => void;
   zoomLevel: 1 | 2 | 3;
   setZoomLevel: (z: 1 | 2 | 3) => void;
   dimPastWeeks: boolean;
@@ -158,6 +160,8 @@ export const usePlannerStore = create<PlannerState>()(
   setFilter: (f) => set({ filter: f }),
   classFilter: null,
   setClassFilter: (c) => set({ classFilter: c }),
+  courseFilter: null,
+  setCourseFilter: (c) => set({ courseFilter: c }),
   zoomLevel: 3,
   setZoomLevel: (z) => set({ zoomLevel: z }),
   dimPastWeeks: true,
