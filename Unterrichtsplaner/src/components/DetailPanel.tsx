@@ -429,7 +429,7 @@ function AddToSequenceButton({ week, course }: { week: string; course: Course })
   );
 
   const handleNew = () => {
-    const seqId = addSequence({ courseId: course.id, title: `Neue Sequenz ${course.cls}`, blocks: [{ weeks: [week], label: 'Neuer Block' }] });
+    const seqId = addSequence({ courseId: course.id, title: `Neue Sequenz ${course.cls}`, blocks: [{ weeks: [week], label: '' }] });
     setEditingSequenceId(`${seqId}-0`);
     setSidePanelTab('sequences');
     setOpen(false);
@@ -893,7 +893,7 @@ function BatchEditTab() {
     if (!sharedCourseId) return;
     const course = COURSES.find(c => c.id === sharedCourseId);
     pushUndo();
-    const seqId = addSequence({ courseId: sharedCourseId, title: `Neue Sequenz ${course?.cls || ''}`, blocks: [{ weeks: selectedWeeks, label: 'Neuer Block' }] });
+    const seqId = addSequence({ courseId: sharedCourseId, title: `Neue Sequenz ${course?.cls || ''}`, blocks: [{ weeks: selectedWeeks, label: '' }] });
     setEditingSequenceId(`${seqId}-0`);
     setSidePanelTab('sequences');
     setShowSeqMenu(false);

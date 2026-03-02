@@ -231,7 +231,7 @@ function EmptyCellMenu({ week, course, onClose, selectedWeeks, position }: { wee
 
   const handleNewSequence = () => {
     const weeks = selectedWeeks && selectedWeeks.length > 0 ? selectedWeeks : [week];
-    const seqId = addSequence({ courseId: course.id, title: `Neue Sequenz ${course.cls}`, blocks: [{ weeks, label: 'Neuer Block' }] });
+    const seqId = addSequence({ courseId: course.id, title: `Neue Sequenz ${course.cls}`, blocks: [{ weeks, label: '' }] });
     setEditingSequenceId(`${seqId}-0`); // flat format: seqId-blockIndex
     setSidePanelOpen(true);
     setSidePanelTab('sequences');

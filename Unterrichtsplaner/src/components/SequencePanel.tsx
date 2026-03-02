@@ -178,7 +178,7 @@ function FlatBlockCard({ fb }: { fb: FlatBlockInfo }) {
         }}>
         <div className="w-1 h-5 rounded-full shrink-0" style={{ background: blockColor || fb.seqColor || '#16a34a' }} />
         <div className="flex-1 min-w-0">
-          <div className="text-[10px] font-semibold text-gray-200 truncate">{block.label}</div>
+          <div className="text-[10px] font-semibold text-gray-200 truncate">{block.label || block.topicMain || <span className="text-gray-500 italic font-normal">Block {fb.blockIndex + 1}</span>}</div>
           <div className="text-[8px] text-gray-400 flex items-center gap-1.5">
             <span className="font-mono">{kwRange}</span>
             <span>· {block.weeks.length}W</span>
@@ -229,6 +229,12 @@ function FlatBlockCard({ fb }: { fb: FlatBlockInfo }) {
                     {s.label}
                   </button>
                 ))}
+              </div>
+              <div>
+                <label className="text-[8px] text-gray-400">Bezeichnung</label>
+                <input value={block.label || ''} onChange={(e) => updateBlockInSequence(fb.seqId, fb.blockIndex, { label: e.target.value })}
+                  placeholder={block.topicMain || `Block ${fb.blockIndex + 1}`}
+                  className="w-full bg-slate-700/50 text-slate-200 border border-slate-600 rounded px-1.5 py-0.5 text-[9px] outline-none focus:border-blue-400 placeholder:text-gray-500 placeholder:italic" />
               </div>
               <div>
                 <label className="text-[8px] text-gray-400">Oberthema</label>
@@ -387,7 +393,7 @@ function FlatBlockCard({ fb }: { fb: FlatBlockInfo }) {
               )}
             </div>
             <button onClick={() => {
-              if (confirm(`Sequenz "${block.label}" entfernen?`)) {
+              if (confirm(`Sequenz "${block.label || block.topicMain || `Block ${fb.blockIndex + 1}`}" entfernen?`)) {
                 removeBlockFromSequence(fb.seqId, fb.blockIndex);
               }
             }} className="text-[8px] text-red-400 hover:text-red-300 cursor-pointer px-1">🗑 Entfernen</button>

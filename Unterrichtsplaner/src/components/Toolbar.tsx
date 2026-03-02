@@ -437,7 +437,7 @@ export function MultiSelectToolbar() {
     const seqId = addSequence({
       courseId,
       title: `Neue Sequenz ${course.cls}`,
-      blocks: [{ weeks: sortedWeeks, label: 'Neuer Block' }],
+      blocks: [{ weeks: sortedWeeks, label: '' }],
     });
 
     setEditingSequenceId(seqId);
