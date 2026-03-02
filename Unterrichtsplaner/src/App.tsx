@@ -1,5 +1,4 @@
 import { useRef, useEffect, useMemo, useCallback } from 'react';
-import { WEEKS } from './data/weeks';
 import { usePlannerStore, switchInstance, saveToInstance } from './store/plannerStore';
 import { useInstanceStore } from './store/instanceStore';
 import { usePlannerData } from './hooks/usePlannerData';
@@ -67,13 +66,15 @@ function App() {
 /** The actual planner grid — separated so it re-renders on instance switch */
 function PlannerContent() {
   const { filter, classFilter, weekData, setWeekData, migrateStaticSequences, fixSequenceTitles, sequencePanelOpen, sidePanelOpen, zoomLevel, panelWidth } = usePlannerStore();
-  const { courses: allCourses, weeks: staticWeeks, s2StartIndex } = usePlannerData();
+  const { courses: allCourses, weeks: hookWeeks, s2StartIndex, isLegacy } = usePlannerData();
   const curRef = useRef<HTMLTableRowElement>(null);
 
-  // Initialize weekData in store on first render (apply holidays/special weeks from settings)
+  // Initialize weekData in store on first render
+  // For legacy planners: apply holidays/special weeks from settings to static WEEKS
+  // For new planners: start with empty dynamic weeks from instance meta
   useEffect(() => {
     if (weekData.length === 0) {
-      let initial = WEEKS.map((w) => ({ ...w, lessons: { ...w.lessons } }));
+      let initial = hookWeeks.map((w) => ({ ...w, lessons: { ...w.lessons } }));
       const settings = loadSettings();
       if (settings && (settings.holidays.length > 0 || settings.specialWeeks.length > 0)) {
         const applied = applySettingsToWeekData(initial, settings);
@@ -83,11 +84,13 @@ function PlannerContent() {
     }
   }, []);
 
-  // Migrate static sequences to store on first render
+  // Migrate static sequences to store on first render (legacy planners only)
   useEffect(() => {
-    migrateStaticSequences();
-    fixSequenceTitles();
-  }, []);
+    if (isLegacy) {
+      migrateStaticSequences();
+      fixSequenceTitles();
+    }
+  }, [isLegacy]);
 
   const DAY_ORDER: Record<string, number> = { Mo: 0, Di: 1, Mi: 2, Do: 3, Fr: 4 };
   const filterCourses = (semester: 1 | 2) => {
@@ -102,14 +105,14 @@ function PlannerContent() {
   };
 
   const allWeekKeys = useMemo(() =>
-    (weekData.length > 0 ? weekData : staticWeeks).map(w => w.w), [weekData, staticWeeks]);
+    (weekData.length > 0 ? weekData : hookWeeks).map(w => w.w), [weekData, hookWeeks]);
 
   const s1Courses = useMemo(() => filterCourses(1), [filter, classFilter, allCourses]);
   const s2Courses = useMemo(() => filterCourses(2), [filter, classFilter, allCourses]);
   const s1Weeks = useMemo(() =>
-    (weekData.length > 0 ? weekData : staticWeeks).slice(0, s2StartIndex), [weekData, staticWeeks, s2StartIndex]);
+    (weekData.length > 0 ? weekData : hookWeeks).slice(0, s2StartIndex), [weekData, hookWeeks, s2StartIndex]);
   const s2Weeks = useMemo(() =>
-    (weekData.length > 0 ? weekData : staticWeeks).slice(s2StartIndex), [weekData, staticWeeks, s2StartIndex]);
+    (weekData.length > 0 ? weekData : hookWeeks).slice(s2StartIndex), [weekData, hookWeeks, s2StartIndex]);
 
   useEffect(() => {
     setTimeout(() => curRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
@@ -154,7 +157,7 @@ function PlannerContent() {
         const state = usePlannerStore.getState();
         if (!state.selection) return;
         e.preventDefault();
-        const allW = (state.weekData.length > 0 ? state.weekData : staticWeeks).map(w => w.w);
+        const allW = (state.weekData.length > 0 ? state.weekData : hookWeeks).map(w => w.w);
         const curIdx = allW.indexOf(state.selection.week);
         if (curIdx < 0) return;
         const nextIdx = e.key === 'ArrowUp' ? curIdx - 1 : curIdx + 1;

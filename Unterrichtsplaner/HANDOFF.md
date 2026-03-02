@@ -1,13 +1,13 @@
 # Unterrichtsplaner – Handoff v3.28
 
-## Status: ✅ Deployed (v3.41)
-- **Commit:** 24264a8
+## Status: ✅ Deployed (v3.42)
+- **Commit:** pending
 - **Datum:** 2026-03-02
 - **Deploy:** https://durandbourjate.github.io/GYM-WR-DUY/Unterrichtsplaner/
 
 ## Architektur
 - **Stack:** React + TypeScript + Vite + Zustand + PWA
-- **Store:** `plannerStore.ts` (~1125 Z.), `settingsStore.ts` (181 Z.)
+- **Store:** `plannerStore.ts` (~1230 Z.), `settingsStore.ts` (~256 Z.), `instanceStore.ts` (~204 Z.)
 - **Hook:** `usePlannerData.ts` — dynamische Courses/Weeks basierend auf Settings
 - **Hauptkomponenten:** WeekRows (~1021 Z.), SequencePanel (~660 Z.), DetailPanel (~1027 Z.), ZoomYearView (~569 Z.), Toolbar (~463 Z.), SettingsPanel (~444 Z.), CollectionPanel (~295 Z.)
 
@@ -86,6 +86,8 @@
 
 - v3.41: Batch-Sequenzen + UX-Verbesserungen — (1) **Batch-Sequenzen:** Bei Mehrfachauswahl (Shift/Cmd-Klick) kann aus dem BatchEditTab eine neue Sequenz erstellt oder die selektierten Wochen zu einer bestehenden Sequenz hinzugefügt werden. Warnung bei kursübergreifender Auswahl. (2) **Toolbar-Tabs:** Tab-Shortcuts (📖 UE, 📚 Sammlung) in Kopfzeile wenn SidePanel offen. (3) **Shift-Klick eingeschränkt:** Range-Select nur innerhalb desselben Kurses (cls+typ) möglich; verschiedene unverknüpfte Kurse werden blockiert. (4) **Auftrag-Unterricht:** Events (type 5) mit Category LESSON werden als normaler Unterricht mit 📋 Icon dargestellt, nicht als amber Event-Block. (5) **Event-Overlay:** Event-Name (gekürzt) im KW-Label sichtbar. (6) **IW-Plan:** Empfehlung Material-Links für IW-Events zu nutzen (bestehende Infrastruktur).
 
+- v3.42: **Multi-Planer Leerer Start (Phase 1 Abschluss)** — (1) `usePlannerData()` generiert Wochen dynamisch aus `instanceStore`-Metadaten (`generateWeekIds`) statt immer auf hardcoded `WEEKS` zurückzufallen. Neuer Rückgabewert `isLegacy` unterscheidet Legacy- und neue Planer. (2) `App.tsx`: Wochen-Init nutzt `hookWeeks` aus dem Data-Hook statt direkten `WEEKS`-Import. `migrateStaticSequences()` nur für Legacy-Planer. (3) Legacy-Erkennung: Planer mit Default-Range (KW33/2025–KW27/2026) und ohne Custom-Kurse werden als Legacy erkannt und nutzen weiterhin hardcoded `WEEKS`/`COURSES`. (4) Neue Planer starten komplett leer — leeres Wochenraster wird aus Meta-Daten generiert, keine Fallback-Daten. (5) `CURRENT_WEEK` wird live berechnet statt als Konstante.
+
 #### 🔵 Nächste Runde (v3.37+) — ✅ Erledigt
 11. ✅ Ferien als durchgehende Blöcke (rowSpan, zusammengefasst, normalgross)
 12. ✅ Studienreisen/Sonderwochen visuell (colspan für Ganz-Events, pro-Kurs-Blöcke für partielle)
@@ -135,6 +137,11 @@
 - **sidePanelTab:** Erweitert auf `'details' | 'sequences' | 'collection' | 'settings'`.
 
 ## Offenes Feedback (noch nicht umgesetzt)
+
+### 🔴 Nächste Phase: Multi-Planer Generalisierung (Phase 2+)
+1. **Kurs-Management-UI (Phase 2):** Neuer Planer → SettingsPanel öffnet sich automatisch. Kurse manuell anlegen mit Klasse, Typ, Tag, Zeit, Lektionen. Dynamisches Wochenraster wird aus Kursen + Zeitraum generiert. Bestehender CourseEditor im SettingsPanel erweitern.
+2. **Konfigurierbare Kategorien (Phase 3):** Statt fixe BWL/VWL/Recht/IN → benutzerdefinierte Fachbereiche/Kategorien pro Planer.
+3. **Template-System (Phase 6):** Bestehenden Planer als Vorlage für neuen verwenden. Kurse/Ferien/Settings übernehmen, Inhalte optional.
 
 ### 🟡 Geplant (mittlere Priorität)
 1. **Google Calendar Integration** — Konzept dokumentiert (siehe Feature-Spec oben). Planer→Kalender Sync, Kalender→Planer Import, Kollisionswarnungen.
