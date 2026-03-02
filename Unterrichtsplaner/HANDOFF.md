@@ -5,7 +5,163 @@
 - **Datum:** 2026-03-02
 - **Deploy:** https://durandbourjate.github.io/GYM-WR-DUY/Unterrichtsplaner/
 
-## Nächster Auftrag: v3.52 — Sonderwochen: GYM-Stufen-Feld + IW-Preset
+## Nächster Auftrag: v3.53 — Klick&Drag Mehrfachauswahl auf gefüllte Zellen
+
+### Kontext
+
+Aktuell funktioniert Klick&Drag nur auf **leere Zellen** (Zeile 524 in WeekRows.tsx: `if (title) return;` bricht ab). Der Benutzer will aber auch auf **gefüllte Zellen** klicken und ziehen, um mehrere Lektionen auszuwählen und dann z.B. als Sequenz zu gruppieren oder per Batch zu bearbeiten. Bisher geht das nur mit Shift+Klick oder Cmd+Klick.
+
+### Gewünschtes Verhalten
+
+**Klick&Drag auf gefüllte Zellen:**
+1. Benutzer drückt Maus auf eine gefüllte Zelle (Lektion) und hält gedrückt
+2. Beim Ziehen über weitere Zellen im **selben Kurs** (gleiche Spalte bzw. cls+typ) werden diese zur Auswahl hinzugefügt
+3. Sowohl leere als auch gefüllte Zellen werden einbezogen
+4. Visuell: alle ausgewählten Zellen bekommen den Multi-Select-Stil (lila Outline, wie bei Shift+Klick)
+5. Bei Loslassen: die ausgewählten Zellen sind in `multiSelection` und das SidePanel öffnet mit Batch-Tab
+6. Ferien (type 6) und fixe Events werden beim Drag **übersprungen** (nicht in die Auswahl aufgenommen)
+
+**Abgrenzung zum normalen Klick:**
+- Einfacher Klick (mousedown + mouseup ohne Bewegung) = wie bisher (Selektion einer einzelnen Zelle)
+- Klick&Drag (mousedown + mousemove auf andere Zelle + mouseup) = Mehrfachauswahl
+- Shift+Klick und Cmd+Klick bleiben unverändert
+
+**Einschränkung:** Drag nur innerhalb desselben Kurses (gleiche `cls+typ`-Kombination). Wenn der Benutzer in eine andere Spalte zieht, passiert nichts (Drag wird ignoriert für diese Zelle).
+
+### Aufgabe
+
+#### 1. Drag-State erweitern (WeekRows.tsx, ab Zeile ~350)
+
+Die bestehenden Drag-State-Variablen (`isDragSelecting`, `dragSelectCol`, `dragSelectedWeeks`, `dragSelectCourse`) werden wiederverwendet und generalisiert — sie sollen nicht mehr zwischen leeren und gefüllten Zellen unterscheiden.
+
+#### 2. `handleDragSelectStart` ändern (Zeile ~521)
+
+```typescript
+const handleDragSelectStart = useCallback((weekW: string, course: Course, e: React.MouseEvent) => {
+  if (e.shiftKey || e.metaKey || e.ctrlKey) return; // Modifier-Klicks nicht abfangen
+  if (e.button !== 0) return; // Nur linke Maustaste
+  
+  const entry = displayWeeks.find(w => w.w === weekW);
+  const lesson = entry?.lessons[course.col];
+  if (lesson?.type === 6) return; // Ferien nicht draggbar
+  
+  setIsDragSelecting(true);
+  setDragSelectCol(course.col);
+  setDragSelectCourse(course);
+  setDragSelectedWeeks([weekW]);
+  setEmptyCellMenu(null);
+  // Merken: war es ein gefüllter oder leerer Start? → Neuen State `dragStartedOnFilled`
+}, [displayWeeks]);
+```
+
+#### 3. `handleDragSelectMove` ändern (Zeile ~531)
+
+```typescript
+const handleDragSelectMove = useCallback((weekW: string, course: Course) => {
+  if (!isDragSelecting) return;
+  // Gleicher Kurs (cls+typ)? Sonst ignorieren
+  if (!dragSelectCourse || course.cls !== dragSelectCourse.cls || course.typ !== dragSelectCourse.typ) return;
+  
+  const entry = displayWeeks.find(w => w.w === weekW);
+  const lesson = entry?.lessons[course.col];
+  if (lesson?.type === 6) return; // Ferien überspringen
+  
+  setDragSelectedWeeks(prev => prev.includes(weekW) ? prev : [...prev, weekW]);
+}, [isDragSelecting, dragSelectCourse, displayWeeks]);
+```
+
+#### 4. `handleDragSelectEnd` ändern (Zeile ~540)
+
+```typescript
+const handleDragSelectEnd = useCallback(() => {
+  if (!isDragSelecting) return;
+  setIsDragSelecting(false);
+  
+  if (dragSelectedWeeks.length > 1 && dragSelectCourse) {
+    // Mehr als 1 Zelle: → multiSelection setzen, SidePanel mit Batch-Tab öffnen
+    const keys = dragSelectedWeeks.map(w => `${w}-${dragSelectCourse.id}`);
+    // Auch verknüpfte Kurse berücksichtigen (Multi-day)
+    // Die Keys direkt in multiSelection setzen (im plannerStore)
+    usePlannerStore.getState().setMultiSelectionDirect(keys); // Neue Store-Action nötig!
+    setSidePanelOpen(true);
+    setSidePanelTab('details'); // BatchOrDetailsTab switcht automatisch bei multiSelection > 1
+  } else if (dragSelectedWeeks.length === 1) {
+    // Nur 1 Zelle angeklickt (kein Drag): normales Klick-Verhalten
+    // → nichts tun, der onClick-Handler übernimmt
+  }
+  
+  // Drag-State zurücksetzen (aber dragSelectedWeeks für visuelle Markierung behalten bis nächster Klick)
+}, [isDragSelecting, dragSelectedWeeks, dragSelectCourse]);
+```
+
+#### 5. Neue Store-Action: `setMultiSelectionDirect` (plannerStore.ts)
+
+Neue Action hinzufügen, die `multiSelection` direkt setzt (nicht togglet):
+```typescript
+setMultiSelectionDirect: (keys: string[]) => void;
+// Implementation:
+setMultiSelectionDirect: (keys) => set({ multiSelection: keys, lastSelectedKey: keys[keys.length - 1] ?? null }),
+```
+
+#### 6. onMouseDown auf gefüllte Zellen (Zeile ~736)
+
+Aktuell steht dort:
+```typescript
+onMouseDown={(e) => {
+  if (!title && !e.shiftKey && !e.metaKey && !e.ctrlKey && e.button === 0) {
+    handleDragSelectStart(week.w, c);
+  }
+}}
+```
+
+Ändern zu:
+```typescript
+onMouseDown={(e) => {
+  if (!e.shiftKey && !e.metaKey && !e.ctrlKey && e.button === 0) {
+    handleDragSelectStart(week.w, c, e);
+  }
+}}
+```
+
+Die `!title`-Bedingung entfällt — Drag startet jetzt auf allen Zellen.
+
+#### 7. Visuelles Feedback während Drag
+
+Die bestehende Drag-Visualisierung (lila Outline für `dragSelectedWeeks`) muss auch auf gefüllte Zellen wirken. Prüfe, ob die CSS-Klasse in der Zelle korrekt gesetzt wird — aktuell wird `dragSelectedWeeks.includes(week.w) && c.col === dragSelectCol` möglicherweise nur auf leere Zellen angewendet.
+
+#### 8. Konfliktvermeidung: Klick vs. Drag
+
+Das Problem: `onMouseDown` startet den Drag, aber `onClick` feuert auch. Lösung:
+- Einen `dragMoved`-Ref einführen (`useRef(false)`)
+- In `handleDragSelectMove`: wenn eine neue Zelle betreten wird, `dragMoved.current = true`
+- In `onClick`: wenn `dragMoved.current === true`, den Click ignorieren (Drag hat stattgefunden)
+- In `handleDragSelectEnd`: `dragMoved` zurücksetzen (nach kurzem timeout, damit onClick noch prüfen kann)
+
+### Nicht ändern
+
+- Shift+Klick / Cmd+Klick Verhalten bleibt unverändert
+- Multi-Day-Prompt bei Shift+Klick bleibt wie gehabt
+- EmptyCellMenu bei Doppelklick auf leere Zelle bleibt
+- Bestehende Sequenz-Drag&Drop (falls vorhanden) nicht berühren
+
+### Testhinweise
+
+1. **Drag auf gefüllte Zellen:** 3-4 aufeinanderfolgende Lektionen im selben Kurs auswählen → sollten alle lila markiert sein, Batch-Tab öffnet sich
+2. **Gemischt:** Drag über gefüllte und leere Zellen → beide in der Auswahl
+3. **Einfacher Klick:** Weiterhin normales Verhalten (keine Mehrfachauswahl)
+4. **Spaltenüberschreitung:** Drag in andere Spalte → wird ignoriert
+5. **Ferien:** Drag über Ferien-Zellen → werden übersprungen
+6. **Nach Drag:** Batch-Tab zeigt korrekte Optionen (Fachbereich, Kategorie, "Neue Sequenz" etc.)
+
+### Commit
+
+`v3.53: Klick&Drag Mehrfachauswahl auf gefüllte und leere Zellen`
+
+Nach Umsetzung: HANDOFF.md Changelog aktualisieren und committen/pushen.
+
+---
+
+## Vorheriger Auftrag (erledigt): v3.52 — Sonderwochen GYM-Stufen + IW-Preset ✅
 
 ### Kontext
 
