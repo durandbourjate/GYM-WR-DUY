@@ -1,7 +1,7 @@
 # Unterrichtsplaner – Handoff v3.28
 
-## Status: ✅ Deployed (v3.40)
-- **Commit:** af9439e
+## Status: ✅ Deployed (v3.41)
+- **Commit:** 24264a8
 - **Datum:** 2026-03-02
 - **Deploy:** https://durandbourjate.github.io/GYM-WR-DUY/Unterrichtsplaner/
 
@@ -84,6 +84,8 @@
 
 - v3.40: Ferien/Events/Sonderwochen differenziert — (1) Ferien (type 6) bleiben als zusammengefasste rowSpan-Blöcke (grau, nicht klickbar). (2) Events/Sonderwochen (type 5) werden separat behandelt: amber-Hintergrund, klickbar+doppelklickbar (Studienreisen, IW, Besuchstage brauchen Detailplanung). (3) Event-Wochen: amber-Akzent auf ganzer Zeile + 📅 am KW-Label. (4) Kurse mit Unterricht in Event-Wochen: Normale Kacheln über dem Event-Hintergrund. (5) ESC-Taste löscht Suchfeld-Inhalt und defokussiert.
 
+- v3.41: Batch-Sequenzen + UX-Verbesserungen — (1) **Batch-Sequenzen:** Bei Mehrfachauswahl (Shift/Cmd-Klick) kann aus dem BatchEditTab eine neue Sequenz erstellt oder die selektierten Wochen zu einer bestehenden Sequenz hinzugefügt werden. Warnung bei kursübergreifender Auswahl. (2) **Toolbar-Tabs:** Tab-Shortcuts (📖 UE, 📚 Sammlung) in Kopfzeile wenn SidePanel offen. (3) **Shift-Klick eingeschränkt:** Range-Select nur innerhalb desselben Kurses (cls+typ) möglich; verschiedene unverknüpfte Kurse werden blockiert. (4) **Auftrag-Unterricht:** Events (type 5) mit Category LESSON werden als normaler Unterricht mit 📋 Icon dargestellt, nicht als amber Event-Block. (5) **Event-Overlay:** Event-Name (gekürzt) im KW-Label sichtbar. (6) **IW-Plan:** Empfehlung Material-Links für IW-Events zu nutzen (bestehende Infrastruktur).
+
 #### 🔵 Nächste Runde (v3.37+) — ✅ Erledigt
 11. ✅ Ferien als durchgehende Blöcke (rowSpan, zusammengefasst, normalgross)
 12. ✅ Studienreisen/Sonderwochen visuell (colspan für Ganz-Events, pro-Kurs-Blöcke für partielle)
@@ -138,12 +140,9 @@
 1. **Google Calendar Integration** — Konzept dokumentiert (siehe Feature-Spec oben). Planer→Kalender Sync, Kalender→Planer Import, Kollisionswarnungen.
 2. **Dauer-Warnung bei Verschieben (1L↔2L):** Relevant wenn cross-column oder Sequenz-Auto-Place erweitert wird.
 
-### 🔴 Nächste Runde (v3.41+) — Feedback 2026-03-02
-3. **Shift-Klick nur im selben Kurs:** Range-Select soll nur innerhalb desselben Kurses möglich sein (selbe cls+typ = ok, z.B. SF WR Di+Do). Cross-Kurs-Range (z.B. GYM1→GYM2) blockieren oder mit Warnung versehen — Fehlerquelle grösser als Nutzen. Entscheidung: Vorerst auf selben cls+typ beschränken.
-4. **Zellen-Badge-System:** Erweiterung des HK-Badge-Mechanismus auf weitere Anwendungsfälle. Im DetailPanel wählbar (Toggle aktiv/nicht sichtbar). Vorläufig 2-3 Zeichen mit wählbarer Farbe. Hauptanwendung: **Prüfungen** (rotes "P"), aber allgemein nutzbar.
-5. **Auftrag-Unterricht visuell differenzieren:** Unterrichtseinheiten mit Aufträgen sollen ähnlich wie normaler Unterricht aussehen (Stoff wird bearbeitet), anders als ein Ausfall. Möglicherweise über Category/Subtype im DetailPanel steuerbar.
-6. **Event-Overlay bei partieller Sonderwoche:** Wenn in einer Event-Woche (📅) einzelne Kurse Unterricht haben, sollen die Unterrichts-Kacheln ÜBER dem Event-Hintergrund liegen. Wenn eine Kachel genau über dem Event-Namen liegt, soll der Name nach links/rechts verschoben und in beiden Teilen gezeigt werden.
-7. **IW-Plan Verknüpfung:** Bei IW-Wochen könnte der IW-Plan (Projektwissen) als Link/Materialverweis verknüpft werden.
+### 🔴 Offen (niedrige Priorität)
+3. **Event-Overlay Name-Verschiebung:** Bei partielle Sonderwochen, wenn eine Unterrichts-Kachel genau über dem Event-Namen liegt, soll der Name nach links/rechts verschoben und in beiden Teilen gezeigt werden. (Komplex, CSS-Technik nötig)
+4. **IW-Plan Auto-Verknüpfung:** Automatische Erkennung von IW-Events und Einblendung eines konfigurierbaren IW-Plan-Links im DetailPanel. Aktuell Empfehlung: Material-Links nutzen.
 
 ### 🔵 Ideen (niedrige Priorität)
 3. **Automatischer Lehrplanbezug:** Lehrplanziele automatisch aus Thema/Fachbereich vorschlagen.
