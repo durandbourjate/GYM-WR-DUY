@@ -328,7 +328,7 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
     multiSelection, toggleMultiSelect, clearMultiSelect, selectRange,
     editing, setEditing,
     weekData, updateLesson,
-    dragSource, setDragSource, swapLessons, moveLessonToEmpty, moveGroup,
+    swapLessons, moveLessonToEmpty,
     sequences, editingSequenceId,
     hkOverrides, hkStartGroups, setHKOverride,
     tafPhases,
@@ -340,7 +340,6 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
     dimPastWeeks,
   } = usePlannerStore();
 
-  const [dropTarget, setDropTarget] = useState<{ week: string; col: number } | null>(null);
   const [hoverCell, setHoverCell] = useState<{ week: string; col: number } | null>(null);
   const [showHoverPreview, setShowHoverPreview] = useState(false);
   const hoverTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -355,6 +354,11 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
   const dragMoved = useRef(false);
   // Multi-day shift-click popup
   const [multiDayPrompt, setMultiDayPrompt] = useState<{ weekW: string; courseId: string; position: { x: number; y: number } } | null>(null);
+
+  // Long-hold drag-move state (v3.58)
+  const [dragMoveSource, setDragMoveSource] = useState<{ week: string; col: number } | null>(null);
+  const [dragMoveTarget, setDragMoveTarget] = useState<{ week: string; col: number } | null>(null);
+  const holdTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Rhythm warning after push (1L↔2L)
   const [rhythmWarning, setRhythmWarning] = useState<string | null>(null);
@@ -541,16 +545,49 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
     const entry = displayWeeks.find(w => w.w === weekW);
     const lesson = entry?.lessons[course.col];
     if (lesson?.type === 6) return; // Holidays not draggable
+    // Clear any previous hold timer
+    if (holdTimerRef.current) { clearTimeout(holdTimerRef.current); holdTimerRef.current = null; }
+    // For filled, non-fixed cells: start 300ms hold timer for move-drag (v3.58)
+    if (lesson?.title) {
+      const isFixed = lesson.type === 5 && !(lessonDetails[`${weekW}-${course.col}`]?.blockCategory === 'LESSON');
+      if (!isFixed) {
+        holdTimerRef.current = setTimeout(() => {
+          holdTimerRef.current = null;
+          setIsDragSelecting(false);
+          setDragSelectedWeeks([]);
+          setDragSelectCol(null);
+          setDragSelectCourse(null);
+          setDragMoveSource({ week: weekW, col: course.col });
+          dragMoved.current = true;
+        }, 300);
+      }
+    }
     setIsDragSelecting(true);
     setDragSelectCol(course.col);
     setDragSelectCourse(course);
     setDragSelectedWeeks([weekW]);
     setEmptyCellMenu(null);
     dragMoved.current = false;
-  }, [displayWeeks]);
+  }, [displayWeeks, lessonDetails]);
 
   const handleDragSelectMove = useCallback((weekW: string, course: Course) => {
+    // Move-drag mode (v3.58): track target cell
+    if (dragMoveSource) {
+      if (course.col === dragMoveSource.col && weekW !== dragMoveSource.week) {
+        const entry = displayWeeks.find(w => w.w === weekW);
+        const lesson = entry?.lessons[course.col];
+        const isFixed = lesson?.type === 6 || (lesson?.type === 5 && !(lessonDetails[`${weekW}-${course.col}`]?.blockCategory === 'LESSON'));
+        if (!isFixed) {
+          setDragMoveTarget({ week: weekW, col: course.col });
+        }
+      } else {
+        setDragMoveTarget(null);
+      }
+      return;
+    }
     if (!isDragSelecting) return;
+    // Mouse moved to another cell → cancel hold timer (it's a drag-select)
+    if (holdTimerRef.current) { clearTimeout(holdTimerRef.current); holdTimerRef.current = null; }
     // Only within same course (cls+typ)
     if (!dragSelectCourse || course.cls !== dragSelectCourse.cls || course.typ !== dragSelectCourse.typ) return;
     const entry = displayWeeks.find(w => w.w === weekW);
@@ -560,9 +597,33 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
       dragMoved.current = true;
       setDragSelectedWeeks(prev => [...prev, weekW]);
     }
-  }, [isDragSelecting, dragSelectCourse, displayWeeks, dragSelectedWeeks]);
+  }, [isDragSelecting, dragMoveSource, dragSelectCourse, displayWeeks, dragSelectedWeeks, lessonDetails]);
 
   const handleDragSelectEnd = useCallback(() => {
+    // Clear hold timer
+    if (holdTimerRef.current) { clearTimeout(holdTimerRef.current); holdTimerRef.current = null; }
+    // Handle move-drag drop (v3.58)
+    if (dragMoveSource) {
+      if (dragMoveTarget && dragMoveSource.week !== dragMoveTarget.week) {
+        pushUndo();
+        const targetEntry = displayWeeks.find(w => w.w === dragMoveTarget.week);
+        const targetLesson = targetEntry?.lessons[dragMoveTarget.col];
+        if (targetLesson?.title) {
+          swapLessons(dragMoveSource.col, dragMoveSource.week, dragMoveTarget.week);
+        } else {
+          moveLessonToEmpty(dragMoveSource.col, dragMoveSource.week, dragMoveTarget.week);
+        }
+        const course = courses.find(cc => cc.col === dragMoveSource.col);
+        if (course) checkRhythmAfterPush(course);
+        dragMoved.current = true;
+        setTimeout(() => { dragMoved.current = false; }, 50);
+      } else {
+        dragMoved.current = false; // No target → allow click
+      }
+      setDragMoveSource(null);
+      setDragMoveTarget(null);
+      return;
+    }
     if (!isDragSelecting) return;
     setIsDragSelecting(false);
     if (dragMoved.current && dragSelectedWeeks.length > 1 && dragSelectCourse) {
@@ -581,15 +642,15 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
     }
     // Reset dragMoved after a short delay so onClick can still check it
     setTimeout(() => { dragMoved.current = false; }, 50);
-  }, [isDragSelecting, dragSelectedWeeks, dragSelectCourse, displayWeeks, setSidePanelOpen, setSidePanelTab]);
+  }, [isDragSelecting, dragMoveSource, dragMoveTarget, dragSelectedWeeks, dragSelectCourse, displayWeeks, setSidePanelOpen, setSidePanelTab, pushUndo, swapLessons, moveLessonToEmpty, courses, checkRhythmAfterPush]);
 
-  // Global mouseup listener for drag-selection
+  // Global mouseup listener for drag-selection and move-drag
   useEffect(() => {
-    if (!isDragSelecting) return;
+    if (!isDragSelecting && !dragMoveSource) return;
     const handler = () => handleDragSelectEnd();
     window.addEventListener('mouseup', handler);
     return () => window.removeEventListener('mouseup', handler);
-  }, [isDragSelecting, handleDragSelectEnd]);
+  }, [isDragSelecting, dragMoveSource, handleDragSelectEnd]);
 
   return (
     <>
@@ -691,8 +752,8 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
               const isEditing = editing?.week === week.w && editing?.col === c.col;
               const seq = getSequenceInfoFromStore(c.id, week.w, sequences);
               const cellHeight = c.les >= 2 ? 36 : 26;
-              const isDragOver = dropTarget?.week === week.w && dropTarget?.col === c.col;
-              const isDragSrc = dragSource?.week === week.w && dragSource?.col === c.col;
+              const isDragOver = dragMoveTarget?.week === week.w && dragMoveTarget?.col === c.col;
+              const isDragSrc = dragMoveSource?.week === week.w && dragMoveSource?.col === c.col;
               const hkGroup = c.hk ? getHKGroup(week.w, c.col, hkStartGroups[c.col] || 'A', hkOverrides) : null;
               const isHovered = hoverCell?.week === week.w && hoverCell?.col === c.col;
               const showPreview = isHovered && showHoverPreview && title && !isSelected;
@@ -769,6 +830,7 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                     width: 110,
                     minWidth: 110,
                     maxWidth: 110,
+                    cursor: dragMoveSource ? 'grabbing' : undefined,
                   }}
                   onMouseDown={(e) => {
                     if (!e.shiftKey && !e.metaKey && !e.ctrlKey && e.button === 0) {
@@ -776,10 +838,13 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                     }
                   }}
                   onMouseEnter={() => {
-                    if (isDragSelecting) handleDragSelectMove(week.w, c);
-                    if (title) handleMouseEnter(week.w, c.col);
+                    if (isDragSelecting || dragMoveSource) handleDragSelectMove(week.w, c);
+                    if (title && !dragMoveSource) handleMouseEnter(week.w, c.col);
                   }}
-                  onMouseLeave={handleMouseLeave}
+                  onMouseLeave={() => {
+                    if (dragMoveSource) setDragMoveTarget(null);
+                    handleMouseLeave();
+                  }}
                   onClick={(e) => {
                     // If a drag just happened, ignore this click
                     if (dragMoved.current) return;
@@ -834,69 +899,6 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                       setMenuPosition({ x: e.clientX - rect.left, y: e.clientY - rect.top });
                       handleEmptyCellClick(week.w, c);
                     }
-                  }}
-                  onDragOver={(e) => {
-                    if (dragSource) {
-                      const dragCourse = courses.find(cc => cc.col === dragSource.col);
-                      const dragKey = dragCourse ? `${dragSource.week}-${dragCourse.id}` : '';
-                      const isGroupDrag = multiSelection.length > 1 && multiSelection.includes(dragKey);
-                      if (isGroupDrag || dragSource.col === c.col) {
-                        e.preventDefault();
-                        e.dataTransfer.dropEffect = 'move';
-                        setDropTarget({ week: week.w, col: c.col });
-                      }
-                    }
-                  }}
-                  onDragLeave={() => setDropTarget(null)}
-                  onDrop={(e) => {
-                    e.preventDefault();
-                    setDropTarget(null);
-                    if (!dragSource) return;
-                    if (dragSource.week === week.w && dragSource.col === c.col) return;
-                    // Don't allow dropping onto fixed cells
-                    if (isFixed) return;
-
-                    // Check if dragging a multi-selected group
-                    const dragCourse = courses.find(cc => cc.col === dragSource.col);
-                    const dragKey = dragCourse ? `${dragSource.week}-${dragCourse.id}` : '';
-                    const isGroupDrag = multiSelection.length > 1 && multiSelection.includes(dragKey);
-
-                    if (isGroupDrag) {
-                      // Group drag: move all selected cells by column to target position
-                      // Group selections by column (col)
-                      const byCol = new Map<number, string[]>();
-                      for (const key of multiSelection) {
-                        const parts = key.split('-');
-                        const cid = parts[parts.length - 1];
-                        const wk = parts.slice(0, parts.length - 1).join('-');
-                        const course = courses.find(cc => cc.id === cid);
-                        if (course) {
-                          if (!byCol.has(course.col)) byCol.set(course.col, []);
-                          byCol.get(course.col)!.push(wk);
-                        }
-                      }
-                      // Calculate week offset from dragSource to drop target
-                      const fromIdx = allWeekKeys.indexOf(dragSource.week);
-                      const toIdx = allWeekKeys.indexOf(week.w);
-                      if (fromIdx >= 0 && toIdx >= 0) {
-                        const offset = toIdx - fromIdx;
-                        // Move each column's group by the same offset
-                        for (const [col, weeks] of byCol) {
-                          const sorted = [...weeks].sort((a, b) => allWeekKeys.indexOf(a) - allWeekKeys.indexOf(b));
-                          const targetWeek = allWeekKeys[allWeekKeys.indexOf(sorted[0]) + offset];
-                          if (targetWeek) {
-                            moveGroup(col, sorted, targetWeek, allWeekKeys);
-                          }
-                        }
-                      }
-                    } else if (dragSource.col === c.col) {
-                      if (title) {
-                        swapLessons(c.col, dragSource.week, week.w);
-                      } else {
-                        moveLessonToEmpty(c.col, dragSource.week, week.w);
-                      }
-                    }
-                    setDragSource(null);
                   }}
                 >
                   {/* Sequence bar — color from subject area (VWL=orange, BWL=blue, Recht=green) */}
@@ -1067,16 +1069,7 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                     </div>
                   ) : title ? (
                     <div
-                      draggable={!isFixed}
-                      onDragStart={(e) => {
-                        if (isFixed) { e.preventDefault(); return; }
-                        setDragSource({ week: week.w, col: c.col });
-                        e.dataTransfer.effectAllowed = 'move';
-                        const isGroupDrag = multiSelection.length > 1 && multiSelection.includes(`${week.w}-${c.id}`);
-                        e.dataTransfer.setData('text/plain', isGroupDrag ? `group:${c.col}` : `${week.w}:${c.col}`);
-                      }}
-                      onDragEnd={() => { setDragSource(null); setDropTarget(null); }}
-                      className={`mx-0.5 ml-1.5 px-1 py-0.5 rounded transition-all duration-100 flex items-center hover:shadow-md hover:z-10 relative ${isFixed ? 'cursor-default' : 'cursor-grab hover:scale-[1.02]'} ${isSearchMatch ? 'search-highlight' : ''}`}
+                      className={`mx-0.5 ml-1.5 px-1 py-0.5 rounded transition-all duration-100 flex items-center hover:shadow-md hover:z-10 relative ${isFixed ? 'cursor-default' : isDragSrc ? 'cursor-grabbing' : 'cursor-grab hover:scale-[1.02]'} ${isSearchMatch ? 'search-highlight' : ''}`}
                       style={{
                         minHeight: isFixed ? Math.max(cellHeight, 32) : cellHeight,
                         opacity: isDragSrc ? 0.35 : isSeqDimmed ? 0.3 : isSearchDimmed ? 0.2 : 1,

@@ -1,7 +1,7 @@
-# Unterrichtsplaner – Handoff v3.53
+# Unterrichtsplaner – Handoff v3.58
 
-## Status: ✅ Deployed (v3.53)
-- **Commit:** de7d5c9
+## Status: ✅ Deployed (v3.58)
+- **Commit:** (pending)
 - **Datum:** 2026-03-02
 - **Deploy:** https://durandbourjate.github.io/GYM-WR-DUY/Unterrichtsplaner/
 
@@ -89,7 +89,7 @@ Aufträge in empfohlener Reihenfolge. Jeden Auftrag einzeln umsetzen, dann commi
 
 ---
 
-### Auftrag E: v3.58 — Drag&Drop Verschieben von Lektionen (Mittel)
+### ✅ Auftrag E: v3.58 — Drag&Drop Verschieben von Lektionen (Mittel)
 
 **Kontext:** Aktuell kann man Kacheln nur per Push (→-Button) nach unten verschieben. Direktes Drag&Drop einer Lektion von einer Woche in eine andere ist nicht möglich. Der Store hat bereits `swapLessons` und `moveLessonToEmpty`.
 
@@ -161,6 +161,10 @@ Aufträge in empfohlener Reihenfolge. Jeden Auftrag einzeln umsetzen, dann commi
 
 ## Erledigte Aufträge
 
+### ✅ v3.57 — Warnung bei gestörter 1L/2L Rhythmisierung nach Push
+### ✅ v3.56 — Kachel-Badge für Prüfungen und Spezialanlässe
+### ✅ v3.55 — Aus Sammlung laden für Settings-Konfigurationen
+### ✅ v3.54 — Kurs-Konfiguration Export/Import in Settings
 ### ✅ v3.53 — Klick&Drag auf gefüllte Zellen
 ### ✅ v3.52 — Sonderwochen GYM-Stufen + IW-Preset
 
