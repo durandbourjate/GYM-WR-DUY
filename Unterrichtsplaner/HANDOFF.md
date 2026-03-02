@@ -1,13 +1,13 @@
 # Unterrichtsplaner – Handoff v3.28
 
-## Status: ✅ Deployed (v3.48)
-- **Commit:** 32dd36d
+## Status: ✅ Deployed (v3.49)
+- **Commit:** 2087f87
 - **Datum:** 2026-03-02
 - **Deploy:** https://durandbourjate.github.io/GYM-WR-DUY/Unterrichtsplaner/
 
 ## Nächster Schritt (in neuem Chat fortsetzen)
 
-**Konfigurierbare Kategorien Phase 3:** Settings-UI zum Erstellen/Bearbeiten eigener Kategorien (Fachbereiche) pro Planer-Instanz. Verbleibende hardcoded Stellen: Record-Initialisierer in ZoomMultiYearView (Statistik-Zähler), ExcelImport (typeLabels), autoMap in DetailPanel. Ziel: Andere Lehrpersonen können mit eigenen Fächern (nicht nur WR) arbeiten.
+**Google Calendar Integration** oder weitere UX-Verbesserungen. Die Kategorien-Migration (Phase 1–3) ist vollständig abgeschlossen. Einzige verbleibende WR-spezifische Stelle: `TYPE_LABELS` in ExcelImport.tsx (Legacy-Import-Preview, bewusst belassen da nur für alte Excel-Formate relevant). Andere Lehrpersonen können jetzt über Settings > Fachbereiche eigene Kategorien mit Farbwähler definieren.
 
 ## Architektur
 - **Stack:** React + TypeScript + Vite + Zustand + PWA
@@ -101,6 +101,8 @@
 
 - v3.46: **Legacy-Auto-Migration** — Kritischer Bug behoben: Bestehende Nutzer mit Daten in `unterrichtsplaner-storage` aber ohne Instanzen im `instanceStore` sahen den WelcomeScreen statt ihren Planer. Fix: `onRehydrateStorage`-Callback im instanceStore prüft nach Hydration, ob Legacy-Daten existieren und erstellt automatisch eine Instanz "SJ 25/26" mit den bestehenden Daten.
 
+- v3.49: **Flexible Kategorien Phase 3 (Abschluss)** — (1) **SubjectsEditor** im SettingsPanel: Fachbereiche erstellen/bearbeiten/entfernen mit Farbwähler und Live-Badge-Vorschau. W&R-Standard-Laden-Button. (2) ZoomMultiYearView: Record-Initialisierer dynamisch (emptyCountRecord/emptyArrayRecord/emptyGoalRecord). (3) DetailPanel: autoMap entfernt, Fachbereich-Erkennung über categories. (4) PlannerTabs: LessonEntry type-Fix (text→title, number→LessonType), unused Import entfernt. (5) categories.ts: generateColorVariants exportiert. Alle Phase-1-bis-3-Migrationen abgeschlossen.
+
 - v3.48: **Block-Label UX** — (1) Default-Label bei neuer Sequenz von `'Neuer Block'` auf leeren String geändert (4 Stellen: Toolbar, WeekRows, DetailPanel ×2). (2) FlatBlockCard-Header zeigt Fallback-Kette: `block.label || block.topicMain || "Block N"` (Placeholder in grau/kursiv). (3) Confirm-Dialog nutzt gleichen Fallback. (4) Neues editierbares "Bezeichnung"-Feld im Felder-Bereich der FlatBlockCard (vor Oberthema), mit dynamischem Placeholder (Oberthema oder "Block N").
 
 - v3.47: **Flexible Kategorien Phase 1+2 — Zentralisierung + Zoom-Views** — (1) Neue Datei `data/categories.ts`: `CategoryDefinition`-Interface, `WR_CATEGORIES` als Default, `subjectConfigsToCategories()` für benutzerdefinierte Fachbereiche, `generateColorVariants()` für automatische bg/fg/border aus Primärfarbe, `getCategoryColors()`, `categoriesToColorMap()`, `inferSubjectAreaFromLessonType()`, `getBlockColors()`, `WR_BLOCK_COLORS`. (2) `usePlannerData()` gibt `categories: CategoryDefinition[]` zurück (aus plannerSettings oder WR-Default). INTERDISZ wird automatisch ergänzt. (3) **Phase 1:** Lokale `SUBJECT_AREAS`-Konstanten entfernt aus: DetailPanel (DetailsTab + BatchEditTab), SequencePanel (FlatBlockCard + Hauptkomponente), CollectionPanel (Filter-Buttons). (4) **Phase 2:** `colors.ts` SUBJECT_AREA_COLORS generiert aus WR_CATEGORIES. Toolbar Legend dynamisch aus categories. ZoomYearView/ZoomBlockView: lokale BLOCK_COLORS/inferSubjectArea entfernt, importiert aus categories.ts. ZoomMultiYearView: SUBJECT_COLORS generiert, MAIN_AREAS-Konstante. WeekRows: SUBJECT_AREA_COLORS_PREVIEW generiert. (5) **Verbleibend (Phase 3):** Record-Initialisierer in ZoomMultiYearView, ExcelImport typeLabels, autoMap in DetailPanel — diese sind WR-spezifisch und werden erst bei UI für eigene Kategorien migriert.
@@ -157,7 +159,7 @@
 
 ### 🔴 Nächste Phase: Multi-Planer Generalisierung (Phase 2+)
 1. ~~**Kurs-Management-UI (Phase 2):**~~ ✅ Erledigt (v3.43–v3.44)
-2. **Konfigurierbare Kategorien (Phase 3):** ~~Statt fixe BWL/VWL/Recht/IN → benutzerdefinierte Fachbereiche/Kategorien pro Planer.~~ **Phase 1+2 erledigt (v3.47):** `data/categories.ts` als Single Source of Truth, alle SidePanel-Komponenten + Zoom-Views + Toolbar + WeekRows migriert. **Phase 3 offen:** Settings-UI zum Erstellen/Bearbeiten eigener Kategorien pro Planer-Instanz. Verbleibende hardcoded Stellen: Record-Initialisierer in ZoomMultiYearView (Statistik-Zähler), ExcelImport (typeLabels), autoMap in DetailPanel.rifft Farb- und Filterlogik. Ziel: Andere LP können mit eigenen Fächern arbeiten. Noch nicht dringend, aber architektonisch wichtig für Generalisierung.
+2. **Konfigurierbare Kategorien (Phase 3):** ✅ **Vollständig erledigt (v3.47–v3.49).** Phase 1: `data/categories.ts` als Single Source of Truth. Phase 2: Alle Komponenten migriert (SidePanel, Zoom-Views, Toolbar, WeekRows). Phase 3: Settings-UI (SubjectsEditor) mit Farbwähler. Einzige verbleibende WR-spezifische Stelle: `TYPE_LABELS` in ExcelImport.tsx (Legacy, bewusst belassen).
 3. **Template-System (Phase 6):** ~~Bestehenden Planer als Vorlage für neuen verwenden.~~ Basis implementiert (v3.44: Kurse/Ferien kopieren). Erweiterung: Komplette Planer-Daten als Template, Vorlagen-Bibliothek.
 
 ### 🟡 Geplant (mittlere Priorität)
