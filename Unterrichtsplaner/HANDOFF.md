@@ -1,7 +1,7 @@
-# Unterrichtsplaner – Handoff v3.63
+# Unterrichtsplaner – Handoff v3.70
 
-## Status: ✅ Deployed (v3.63)
-- **Commit:** Alle v3.54–v3.63 committed & pushed
+## Status: ✅ Deployed (v3.70)
+- **Commit:** Alle v3.54–v3.70 committed & pushed
 - **Datum:** 2026-03-02
 - **Deploy:** https://durandbourjate.github.io/GYM-WR-DUY/Unterrichtsplaner/
 
@@ -19,15 +19,29 @@
 
 **Hinweis:** Google Calendar benötigt Google Cloud Projekt mit OAuth Client ID.
 
+## Erledigte Aufträge (v3.64–v3.70, UX-Feedback Runde 2)
+
+| Version | Auftrag | Status |
+|---------|---------|--------|
+| v3.64 | A: Bugfixes & Defaults — Dauer in min, SOL/Kategorie/Dauer Defaults, Sequenz-Persistenz | ✅ |
+| v3.65 | B: Toolbar aufräumen — dynamische Kursfilter, DataMenu/+Neu entfernt, TaF bei Filtern | ✅ |
+| v3.66 | C: Kurs-Einstellungen — Endzeit auto, + Tag Button, grössere Zeitfelder | ✅ |
+| v3.67 | D: Ferien vereinfacht — Tage nur bei Einzelwochen, ReapplyButton entfernt | ✅ |
+| v3.68 | E: Batch→Sequenz — Fachbereich übertragen, floating Toolbar, editingSequenceId Fix | ✅ |
+| v3.69 | F: Sammlung im Detail-Tab — In Sammlung/Aus Sammlung für einzelne UE | ✅ |
+| v3.70 | G: Sequenz-Felder — Erklärtexte, Hierarchie-Indikator (Reihe›Sequenz›Block›Lektion) | ✅ |
+
 ---
 
 ## Auftrags-Warteschlange (UX-Feedback Runde 2)
 
-Aufträge in empfohlener Reihenfolge. Jeden Auftrag einzeln umsetzen, dann committen und pushen. HANDOFF.md nach jedem Auftrag aktualisieren.
+✅ **Alle 7 Aufträge (A–G) abgeschlossen.**
 
-**Wichtig: Nach jeder Umsetzung `git add -A && git commit -m "v3.XX: Kurzbeschreibung" && git push` ausführen.**
+~~Aufträge in empfohlener Reihenfolge. Jeden Auftrag einzeln umsetzen, dann committen und pushen. HANDOFF.md nach jedem Auftrag aktualisieren.~~
 
-**Hinweis:** Die Screenshots stammen teils von v2.9 — einige Punkte (Zoom 2 entfernt, Auto-Save, SOL-Checkbox, Ferien-Tagesauswahl, Zeit-Inputs) wurden bereits in v3.50 umgesetzt. Die folgenden Aufträge betreffen nur **noch offene** Punkte.
+~~**Wichtig: Nach jeder Umsetzung `git add -A && git commit -m "v3.XX: Kurzbeschreibung" && git push` ausführen.**~~
+
+~~**Hinweis:** Die Screenshots stammen teils von v2.9 — einige Punkte (Zoom 2 entfernt, Auto-Save, SOL-Checkbox, Ferien-Tagesauswahl, Zeit-Inputs) wurden bereits in v3.50 umgesetzt. Die folgenden Aufträge betreffen nur **noch offene** Punkte.~~
 
 ---
 
@@ -148,7 +162,7 @@ Aufträge in empfohlener Reihenfolge. Jeden Auftrag einzeln umsetzen, dann commi
 - **Store:** `plannerStore.ts` (~1240 Z.), `settingsStore.ts` (~256 Z.), `instanceStore.ts` (~204 Z.)
 - **Hook:** `usePlannerData.ts` — liest Kurse/Wochen reaktiv aus `plannerStore.plannerSettings` (pro Instanz) → Fallback auf globale Settings → Fallback auf hardcoded WEEKS/COURSES. Gibt `isLegacy`-Flag zurück.
 - **Multi-Planer:** `instanceStore.ts` verwaltet Planer-Instanzen (Tabs). Jeder Planer hat eigenen localStorage-Slot (`planner-data-{id}`) inkl. `plannerSettings`. `plannerStore.ts` speichert/lädt Daten pro Instanz via `switchInstance()`.
-- **Hauptkomponenten:** WeekRows (~1021 Z.), SequencePanel (~660 Z.), DetailPanel (~1027 Z.), ZoomYearView (~569 Z.), Toolbar (~463 Z.), SettingsPanel (~494 Z.), CollectionPanel (~295 Z.), PlannerTabs (~263 Z.)
+- **Hauptkomponenten:** WeekRows (~1021 Z.), SequencePanel (~708 Z.), DetailPanel (~1320 Z.), ZoomYearView (~569 Z.), Toolbar (~354 Z.), SettingsPanel (~1427 Z.), CollectionPanel (~295 Z.), PlannerTabs (~263 Z.)
 
 ### Architektur-Details
 
@@ -222,3 +236,10 @@ Aufträge in empfohlener Reihenfolge. Jeden Auftrag einzeln umsetzen, dann commi
 - v3.61: Google Calendar Phase 2 — Planer→Kalender Sync
 - v3.62: Google Calendar Phase 3 — Kalender→Planer Import
 - v3.63: Google Calendar Phase 4 — Kollisionswarnungen
+- v3.64: Bugfixes — Dauer in min, SOL/Kategorie/Dauer Defaults, Sequenz-Persistenz
+- v3.65: Toolbar aufräumen — dynamische Kursfilter, DataMenu/+Neu entfernt
+- v3.66: Kurs-Settings — Endzeit auto, + Tag Button, grössere Zeitfelder
+- v3.67: Ferien vereinfacht — Tage nur bei Einzelwochen, ReapplyButton entfernt
+- v3.68: Batch→Sequenz — Fachbereich übertragen, floating Toolbar
+- v3.69: Sammlung im Detail-Tab — Speichern/Laden einzelner UE
+- v3.70: Sequenz-Felder — Erklärtexte und Feld-Hierarchie
