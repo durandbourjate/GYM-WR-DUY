@@ -1,11 +1,12 @@
 /**
- * Google Calendar API service (v3.61)
+ * Google Calendar API service (v3.62)
  * Uses Google Identity Services (GIS) for OAuth 2.0 implicit grant flow.
  * Requires a Google Cloud Project with Calendar API enabled and OAuth Client ID.
  */
 import { useGCalStore } from '../store/gcalStore';
 import { weekToDate } from '../store/instanceStore';
 import type { Course, Week } from '../types';
+import { generateId, type SpecialWeekConfig } from '../store/settingsStore';
 
 const SCOPES = 'https://www.googleapis.com/auth/calendar';
 
@@ -275,4 +276,113 @@ export async function syncPlannerToCalendar(
   }
 
   return progress;
+}
+
+// ---- v3.62: Kalender→Planer Import ----
+
+/** Keywords that indicate special weeks (IW, Besuchstag, Sonderwoche, etc.) */
+const SPECIAL_KEYWORDS = [
+  { pattern: /\bIW\b|Interdisziplinäre?\s*Woche|Intensivwoche/i, label: 'IW' },
+  { pattern: /\bBesuchstag/i, label: 'Besuchstag' },
+  { pattern: /\bSonderwoche/i, label: 'Sonderwoche' },
+  { pattern: /\bProjektwoche/i, label: 'Projektwoche' },
+  { pattern: /\bStudienreise/i, label: 'Studienreise' },
+  { pattern: /\bMatura/i, label: 'Matura' },
+  { pattern: /\bSchulfrei/i, label: 'Schulfrei' },
+  { pattern: /\bWeiterbildung/i, label: 'Weiterbildung' },
+  { pattern: /\bSporttag/i, label: 'Sporttag' },
+  { pattern: /\bExkursion/i, label: 'Exkursion' },
+];
+
+/** Get ISO week number from a Date */
+function getISOWeek(date: Date): string {
+  const d = new Date(date.getTime());
+  d.setHours(0, 0, 0, 0);
+  d.setDate(d.getDate() + 3 - ((d.getDay() + 6) % 7));
+  const week1 = new Date(d.getFullYear(), 0, 4);
+  const weekNum = 1 + Math.round(((d.getTime() - week1.getTime()) / 86400000 - 3 + ((week1.getDay() + 6) % 7)) / 7);
+  return String(weekNum).padStart(2, '0');
+}
+
+export interface ImportCandidate {
+  event: { summary: string; start: string; end: string; id: string };
+  suggestedConfig: SpecialWeekConfig;
+  matchedKeyword: string;
+}
+
+/**
+ * Scan read calendars for events matching special week keywords.
+ * Returns candidate SpecialWeekConfig items for user confirmation.
+ */
+export async function scanCalendarsForSpecialWeeks(
+  calendarIds: string[],
+  timeMin: string,
+  timeMax: string,
+): Promise<ImportCandidate[]> {
+  const gcalStore = useGCalStore.getState();
+  if (!gcalStore.isAuthenticated()) throw new Error('Nicht authentifiziert');
+
+  const candidates: ImportCandidate[] = [];
+
+  for (const calId of calendarIds) {
+    let events: any[];
+    try {
+      events = await fetchEvents(calId, timeMin, timeMax);
+    } catch {
+      continue; // skip inaccessible calendars
+    }
+
+    for (const ev of events) {
+      // Skip planer-managed events
+      if (ev.extendedProperties?.private?.[PLANER_TAG]) continue;
+
+      const summary = ev.summary || '';
+      for (const kw of SPECIAL_KEYWORDS) {
+        if (kw.pattern.test(summary)) {
+          // Determine week from event start
+          const startStr = ev.start?.dateTime || ev.start?.date;
+          if (!startStr) break;
+          const startDate = new Date(startStr);
+          const weekKey = getISOWeek(startDate);
+
+          // Determine if it spans partial days
+          let days: number[] | undefined;
+          const endStr = ev.end?.dateTime || ev.end?.date;
+          if (endStr) {
+            const endDate = new Date(endStr);
+            const startDay = (startDate.getDay() + 6) % 7; // 0=Mo..6=Su
+            const endDay = (endDate.getDay() + 6) % 7;
+            // If not a full week (Mo-Fr), mark specific days
+            if (startDay > 0 || endDay < 4) {
+              days = [];
+              for (let d = startDay; d <= Math.min(endDay, 4); d++) {
+                days.push(d + 1); // 1=Mo..5=Fr
+              }
+            }
+          }
+
+          // Detect GYM level from summary
+          let gymLevel: string | undefined;
+          const gymMatch = summary.match(/GYM\s*(\d)/i);
+          if (gymMatch) gymLevel = `GYM${gymMatch[1]}`;
+
+          candidates.push({
+            event: { summary, start: startStr, end: endStr || startStr, id: ev.id },
+            suggestedConfig: {
+              id: generateId(),
+              label: summary,
+              week: weekKey,
+              type: 'event',
+              gymLevel,
+              days,
+            },
+            matchedKeyword: kw.label,
+          });
+          break; // only match first keyword per event
+        }
+      }
+    }
+  }
+
+  return candidates;
 }

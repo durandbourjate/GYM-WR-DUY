@@ -1,6 +1,6 @@
-# Unterrichtsplaner – Handoff v3.61
+# Unterrichtsplaner – Handoff v3.62
 
-## Status: ✅ Deployed (v3.61)
+## Status: ✅ Deployed (v3.62)
 - **Commit:** (pending)
 - **Datum:** 2026-03-02
 - **Deploy:** https://durandbourjate.github.io/GYM-WR-DUY/Unterrichtsplaner/
@@ -146,7 +146,7 @@ Aufträge in empfohlener Reihenfolge. Jeden Auftrag einzeln umsetzen, dann commi
 - Sync bei Änderungen (Create/Update/Delete)
 - eventId-Mapping im gcalStore
 
-**Phase 3 (v3.62): Kalender→Planer Import**
+**✅ Phase 3 (v3.62): Kalender→Planer Import**
 - Events aus Lese-Kalendern lesen
 - IW/Sonderwochen erkennen und als SpecialWeekConfig importieren
 
@@ -161,6 +161,7 @@ Aufträge in empfohlener Reihenfolge. Jeden Auftrag einzeln umsetzen, dann commi
 
 ## Erledigte Aufträge
 
+### ✅ v3.62 — Google Calendar Phase 3: Kalender→Planer Import
 ### ✅ v3.61 — Google Calendar Phase 2: Planer→Kalender Sync
 ### ✅ v3.60 — Google Calendar Phase 1: OAuth + Kalender-Auswahl
 ### ✅ v3.59 — Doppelklick auf Spaltentitel als Kursfilter

@@ -11,9 +11,9 @@ import {
 import { WR_CATEGORIES, generateColorVariants } from '../data/categories';
 import { getGymStufe } from '../utils/gradeRequirements';
 import { IW_PRESET_2526 } from '../data/iwPresets';
-import { useInstanceStore } from '../store/instanceStore';
+import { useInstanceStore, weekToDate } from '../store/instanceStore';
 import { useGCalStore } from '../store/gcalStore';
-import { loginWithGoogle, logout as gcalLogout, fetchCalendarList, syncPlannerToCalendar, buildWeekYearMap, type SyncProgress } from '../services/gcal';
+import { loginWithGoogle, logout as gcalLogout, fetchCalendarList, syncPlannerToCalendar, buildWeekYearMap, scanCalendarsForSpecialWeeks, type SyncProgress, type ImportCandidate } from '../services/gcal';
 
 // === Duration helper for courses ===
 const COURSE_DURATION_PRESETS = [
@@ -680,6 +680,9 @@ function GCalSection() {
   const [syncing, setSyncing] = useState(false);
   const [syncProgress, setSyncProgress] = useState<SyncProgress | null>(null);
   const [syncResult, setSyncResult] = useState<SyncProgress | null>(null);
+  const [importing, setImporting] = useState(false);
+  const [importCandidates, setImportCandidates] = useState<ImportCandidate[] | null>(null);
+  const [selectedImports, setSelectedImports] = useState<Set<string>>(new Set());
 
   const handleLogin = useCallback(async () => {
     if (!editClientId.trim()) { setError('Client ID erforderlich'); return; }
@@ -758,6 +761,75 @@ function GCalSection() {
     }
     setSyncing(false);
   }, [writeCalendarId]);
+
+  const handleScanImport = useCallback(async () => {
+    if (readCalendarIds.length === 0) { setError('Keine Lese-Kalender ausgewählt'); return; }
+    const activeMeta = useInstanceStore.getState().getActive();
+    if (!activeMeta) { setError('Kein aktiver Planer'); return; }
+
+    // Build time range from planner meta
+    const weekYearMap = buildWeekYearMap(activeMeta.startWeek, activeMeta.startYear, activeMeta.endWeek, activeMeta.endYear);
+    const weeks = Object.entries(weekYearMap);
+    if (weeks.length === 0) return;
+    const firstWeek = weeks[0];
+    const lastWeek = weeks[weeks.length - 1];
+    const timeMin = new Date(weekToDate(parseInt(firstWeek[0]), firstWeek[1])).toISOString();
+    const lastMon = weekToDate(parseInt(lastWeek[0]), lastWeek[1]);
+    lastMon.setDate(lastMon.getDate() + 6);
+    const timeMax = lastMon.toISOString();
+
+    setImporting(true); setError(null); setImportCandidates(null);
+    try {
+      const candidates = await scanCalendarsForSpecialWeeks(readCalendarIds, timeMin, timeMax);
+      setImportCandidates(candidates);
+      // Pre-select all
+      setSelectedImports(new Set(candidates.map(c => c.event.id)));
+    } catch (e: any) {
+      setError(e.message || 'Scan fehlgeschlagen');
+    }
+    setImporting(false);
+  }, [readCalendarIds]);
+
+  const handleConfirmImport = useCallback(() => {
+    if (!importCandidates) return;
+    const store = usePlannerStore.getState();
+    const settings = store.plannerSettings;
+    if (!settings) { setError('Keine Planer-Settings'); return; }
+
+    const toImport = importCandidates.filter(c => selectedImports.has(c.event.id));
+    if (toImport.length === 0) return;
+
+    // Merge with existing specialWeeks, avoid duplicates by week+label
+    const existing = settings.specialWeeks || [];
+    const existingKeys = new Set(existing.map(s => `${s.week}-${s.label}`));
+    const newWeeks: import('../store/settingsStore').SpecialWeekConfig[] = [];
+    for (const c of toImport) {
+      const key = `${c.suggestedConfig.week}-${c.suggestedConfig.label}`;
+      if (!existingKeys.has(key)) {
+        newWeeks.push(c.suggestedConfig);
+        existingKeys.add(key);
+      }
+    }
+
+    if (newWeeks.length === 0) {
+      setError('Alle ausgewählten Events sind bereits als Sonderwochen vorhanden.');
+      return;
+    }
+
+    store.setPlannerSettings({ ...settings, specialWeeks: [...existing, ...newWeeks] });
+    // Also save to global settings
+    saveSettings({ ...settings, specialWeeks: [...existing, ...newWeeks] });
+    // Apply to weekData
+    if (store.weekData.length > 0) {
+      const applied = applySettingsToWeekData(store.weekData, { ...settings, specialWeeks: [...existing, ...newWeeks] });
+      store.pushUndo();
+      store.setWeekData(applied.weekData);
+    }
+
+    setImportCandidates(null);
+    setSelectedImports(new Set());
+    alert(`${newWeeks.length} Sonderwoche(n) importiert.`);
+  }, [importCandidates, selectedImports]);
 
   return (
     <Section title="📅 Google Calendar">
@@ -909,6 +981,70 @@ function GCalSection() {
               className="text-[7px] text-gray-500 hover:text-gray-300 cursor-pointer">
               🗑 Event-Mapping zurücksetzen
             </button>
+          </div>
+        )}
+
+        {/* Import section (v3.62) */}
+        {isAuth && readCalendarIds.length > 0 && (
+          <div className="space-y-1.5 pt-1.5 border-t border-slate-700">
+            <div className="flex items-center justify-between">
+              <span className="text-[9px] font-semibold text-gray-300">Kalender → Planer Import</span>
+            </div>
+            <p className="text-[7px] text-gray-500">
+              Scannt Lese-Kalender nach Sonderwochen (IW, Besuchstag, Studienreise etc.) und importiert sie als Sonderwochen-Einstellungen.
+            </p>
+            <button onClick={handleScanImport} disabled={importing}
+              className="w-full py-1.5 rounded text-[9px] font-medium bg-slate-700 hover:bg-slate-600 text-gray-200 cursor-pointer transition-all disabled:opacity-50">
+              {importing ? '⏳ Scanne Kalender…' : '📥 Sonderwochen aus Kalender importieren'}
+            </button>
+
+            {/* Import candidates list */}
+            {importCandidates !== null && (
+              <div className="space-y-1">
+                {importCandidates.length === 0 ? (
+                  <p className="text-[8px] text-gray-500 italic">Keine passenden Events gefunden.</p>
+                ) : (
+                  <>
+                    <p className="text-[8px] text-gray-400">{importCandidates.length} Events gefunden:</p>
+                    <div className="max-h-48 overflow-y-auto space-y-0.5">
+                      {importCandidates.map(c => (
+                        <label key={c.event.id} className="flex items-start gap-1.5 px-1.5 py-1 rounded hover:bg-slate-700/60 cursor-pointer text-[9px]">
+                          <input
+                            type="checkbox"
+                            checked={selectedImports.has(c.event.id)}
+                            onChange={() => setSelectedImports(prev => {
+                              const next = new Set(prev);
+                              if (next.has(c.event.id)) next.delete(c.event.id);
+                              else next.add(c.event.id);
+                              return next;
+                            })}
+                            className="accent-blue-500 w-3 h-3 mt-0.5"
+                          />
+                          <div>
+                            <div className="text-gray-200">{c.event.summary}</div>
+                            <div className="text-[7px] text-gray-500">
+                              KW {c.suggestedConfig.week} · {c.matchedKeyword}
+                              {c.suggestedConfig.gymLevel && ` · ${c.suggestedConfig.gymLevel}`}
+                              {c.suggestedConfig.days && ` · Tage: ${c.suggestedConfig.days.map(d => ['Mo','Di','Mi','Do','Fr'][d-1]).join(',')}`}
+                            </div>
+                          </div>
+                        </label>
+                      ))}
+                    </div>
+                    <div className="flex gap-1">
+                      <button onClick={handleConfirmImport} disabled={selectedImports.size === 0}
+                        className="flex-1 py-1 rounded text-[9px] font-medium bg-blue-700 hover:bg-blue-600 text-white cursor-pointer transition-all disabled:opacity-50">
+                        ✅ {selectedImports.size} importieren
+                      </button>
+                      <button onClick={() => { setImportCandidates(null); setSelectedImports(new Set()); }}
+                        className="px-2 py-1 rounded text-[9px] bg-slate-700 hover:bg-slate-600 text-gray-300 cursor-pointer transition-all">
+                        Abbrechen
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
           </div>
         )}
       </div>
