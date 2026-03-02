@@ -69,21 +69,26 @@ function PlannerContent() {
   const { courses: allCourses, weeks: hookWeeks, s2StartIndex, isLegacy } = usePlannerData();
   const curRef = useRef<HTMLTableRowElement>(null);
 
-  // Initialize weekData in store on first render
-  // For legacy planners: apply holidays/special weeks from settings to static WEEKS
-  // For new planners: start with empty dynamic weeks from instance meta
+  // Initialize weekData in store, and re-apply holidays when plannerSettings change
   useEffect(() => {
     if (weekData.length === 0) {
       let initial = hookWeeks.map((w) => ({ ...w, lessons: { ...w.lessons } }));
-      // Apply holidays/special weeks from per-instance or global settings
       const settings = plannerSettings ?? loadSettings();
       if (settings && (settings.holidays.length > 0 || settings.specialWeeks.length > 0)) {
         const applied = applySettingsToWeekData(initial, settings);
         initial = applied.weekData;
       }
       setWeekData(initial);
+    } else if (plannerSettings) {
+      // Re-apply holidays/special weeks when plannerSettings are set (e.g. from template)
+      // Only if weekData is "empty" (all lessons maps are empty = no user edits)
+      const hasContent = weekData.some(w => Object.keys(w.lessons).length > 0);
+      if (!hasContent && (plannerSettings.holidays.length > 0 || plannerSettings.specialWeeks.length > 0)) {
+        const applied = applySettingsToWeekData(weekData, plannerSettings);
+        setWeekData(applied.weekData);
+      }
     }
-  }, []);
+  }, [plannerSettings]);
 
   // Migrate static sequences to store on first render (legacy planners only)
   useEffect(() => {
