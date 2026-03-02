@@ -11,11 +11,6 @@ const TYPE_LABELS: Record<CollectionItemType, { label: string; icon: string }> =
   curriculum: { label: 'Bildungsgang', icon: '🎓' },
 };
 
-const SUBJECT_AREAS: { key: SubjectArea; label: string; color: string }[] = [
-  { key: 'BWL', label: 'BWL', color: '#3b82f6' },
-  { key: 'VWL', label: 'VWL', color: '#f97316' },
-  { key: 'RECHT', label: 'Recht', color: '#22c55e' },
-];
 
 // === Import Dialog ===
 function ImportDialog({ item, onClose }: { item: CollectionItem; onClose: () => void }) {
@@ -269,6 +264,7 @@ function CollectionCard({ item, onImport }: { item: CollectionItem; onImport: (i
 // === Main Collection Panel ===
 export function CollectionPanel() {
   const { collection } = usePlannerStore();
+  const { categories } = usePlannerData();
   const [filterType, setFilterType] = useState<CollectionItemType | 'ALL'>('ALL');
   const [filterSA, setFilterSA] = useState<SubjectArea | 'ALL'>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
@@ -312,7 +308,7 @@ export function CollectionPanel() {
             className={`px-1.5 py-0.5 rounded text-[8px] border cursor-pointer ${filterSA === 'ALL' ? 'bg-slate-600 border-slate-500 text-gray-200' : 'border-gray-700 text-gray-400'}`}>
             Alle FB
           </button>
-          {SUBJECT_AREAS.map((sa) => (
+          {categories.map((sa) => (
             <button key={sa.key} onClick={() => setFilterSA(filterSA === sa.key ? 'ALL' : sa.key)}
               className={`px-1.5 py-0.5 rounded text-[8px] border cursor-pointer ${filterSA === sa.key ? 'bg-opacity-20 border-current' : 'border-gray-700'}`}
               style={{ color: filterSA === sa.key ? sa.color : '#6b7280', borderColor: filterSA === sa.key ? sa.color : undefined }}>

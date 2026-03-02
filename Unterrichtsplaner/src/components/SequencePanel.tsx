@@ -3,15 +3,8 @@ import { usePlannerStore } from '../store/plannerStore';
 import { usePlannerData } from '../hooks/usePlannerData';
 import { SUBJECT_AREA_COLORS } from '../utils/colors';
 import { computeSeqSolTotal } from '../utils/solTotal';
+import { getCategoryColors, type CategoryDefinition } from '../data/categories';
 import type { Course, SubjectArea, SequenceBlock } from '../types';
-
-const SUBJECT_AREAS: { key: SubjectArea; label: string; color: string }[] = [
-  { key: 'BWL', label: 'BWL', color: '#3b82f6' },
-  { key: 'VWL', label: 'VWL', color: '#f97316' },
-  { key: 'RECHT', label: 'Recht', color: '#22c55e' },
-  { key: 'IN', label: 'Informatik', color: '#6b7280' },
-  { key: 'INTERDISZ', label: 'Interdisziplinär', color: '#a855f7' },
-];
 
 
 // === Inline Lessons List for Sequence Panel ===
@@ -126,7 +119,7 @@ function FlatBlockCard({ fb }: { fb: FlatBlockInfo }) {
     updateBlockInSequence, removeBlockFromSequence,
     sequences, updateSequence, lessonDetails,
   } = usePlannerStore();
-  const { courses: COURSES } = usePlannerData();
+  const { courses: COURSES, categories } = usePlannerData();
   const blockKey = `${fb.seqId}-${fb.blockIndex}`;
   const isActive = editingSequenceId === blockKey;
   const [showFields, setShowFields] = useState(true);
@@ -223,7 +216,7 @@ function FlatBlockCard({ fb }: { fb: FlatBlockInfo }) {
             <div className="space-y-1.5 p-1.5 bg-slate-800/30 rounded">
               <div className="flex gap-1 flex-wrap">
                 <span className="text-[8px] text-gray-400 w-full">Fachbereich:</span>
-                {SUBJECT_AREAS.map((s) => (
+                {categories.map((s) => (
                   <button key={s.key} onClick={() => updateBlockInSequence(fb.seqId, fb.blockIndex, {
                     subjectArea: block.subjectArea === s.key ? undefined : s.key as SubjectArea
                   })}
@@ -301,7 +294,7 @@ function FlatBlockCard({ fb }: { fb: FlatBlockInfo }) {
               </div>
               <div className="flex gap-1 flex-wrap">
                 <span className="text-[8px] text-gray-400 w-full">Fachbereich (Reihe):</span>
-                {SUBJECT_AREAS.map((s) => (
+                {categories.map((s) => (
                   <button key={s.key} onClick={() => updateSequence(fb.seqId, {
                     subjectArea: parentSeq.subjectArea === s.key ? undefined : s.key as SubjectArea
                   })}
@@ -433,7 +426,7 @@ export function SequencePanel({ embedded = false }: { embedded?: boolean }) {
     sequences, sequencePanelOpen, setSequencePanelOpen,
     addSequence, editingSequenceId,
   } = usePlannerStore();
-  const { courses: COURSES, getLinkedCourseIds } = usePlannerData();
+  const { courses: COURSES, getLinkedCourseIds, categories } = usePlannerData();
 
   const [filterClass, setFilterClass] = useState<string>('ALL');
   const [showNewForm, setShowNewForm] = useState(false);
@@ -553,7 +546,7 @@ export function SequencePanel({ embedded = false }: { embedded?: boolean }) {
                 <div className="text-[8px] font-medium px-1 py-0.5 mb-1 rounded flex items-center gap-1"
                   style={{ color: saFg(sa as SubjectArea), background: saColor(sa as SubjectArea) + '15' }}>
                   <span className="w-1.5 h-1.5 rounded-full" style={{ background: saFg(sa as SubjectArea) }} />
-                  {SUBJECT_AREAS.find(s => s.key === sa)?.label || sa}
+                  {categories.find(s => s.key === sa)?.label || sa}
                 </div>
               )}
               <div className="space-y-1">

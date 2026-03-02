@@ -1,7 +1,7 @@
 # Unterrichtsplaner – Handoff v3.28
 
-## Status: ✅ Deployed (v3.46)
-- **Commit:** 32a6ddc
+## Status: ✅ Deployed (v3.47)
+- **Commit:** (pending)
 - **Datum:** 2026-03-02
 - **Deploy:** https://durandbourjate.github.io/GYM-WR-DUY/Unterrichtsplaner/
 
@@ -97,6 +97,8 @@
 
 - v3.46: **Legacy-Auto-Migration** — Kritischer Bug behoben: Bestehende Nutzer mit Daten in `unterrichtsplaner-storage` aber ohne Instanzen im `instanceStore` sahen den WelcomeScreen statt ihren Planer. Fix: `onRehydrateStorage`-Callback im instanceStore prüft nach Hydration, ob Legacy-Daten existieren und erstellt automatisch eine Instanz "SJ 25/26" mit den bestehenden Daten.
 
+- v3.47: **Flexible Kategorien Phase 1 — Zentralisierung** — (1) Neue Datei `data/categories.ts`: `CategoryDefinition`-Interface, `WR_CATEGORIES` als Default, `subjectConfigsToCategories()` für benutzerdefinierte Fachbereiche, `generateColorVariants()` für automatische bg/fg/border aus Primärfarbe, `getCategoryColors()` und `categoriesToColorMap()` als Utility-Funktionen. (2) `usePlannerData()` gibt `categories: CategoryDefinition[]` zurück (aus plannerSettings oder WR-Default). INTERDISZ wird automatisch ergänzt. (3) Lokale `SUBJECT_AREAS`-Konstanten entfernt aus: DetailPanel (DetailsTab + BatchEditTab), SequencePanel (FlatBlockCard + Hauptkomponente), CollectionPanel (Filter-Buttons). Alle lesen jetzt aus `usePlannerData().categories`.
+
 #### 🔵 Nächste Runde (v3.37+) — ✅ Erledigt
 11. ✅ Ferien als durchgehende Blöcke (rowSpan, zusammengefasst, normalgross)
 12. ✅ Studienreisen/Sonderwochen visuell (colspan für Ganz-Events, pro-Kurs-Blöcke für partielle)
@@ -149,7 +151,7 @@
 
 ### 🔴 Nächste Phase: Multi-Planer Generalisierung (Phase 2+)
 1. ~~**Kurs-Management-UI (Phase 2):**~~ ✅ Erledigt (v3.43–v3.44)
-2. **Konfigurierbare Kategorien (Phase 3):** Statt fixe BWL/VWL/Recht/IN → benutzerdefinierte Fachbereiche/Kategorien pro Planer. Betrifft Farb- und Filterlogik. Ziel: Andere LP können mit eigenen Fächern arbeiten. Noch nicht dringend, aber architektonisch wichtig für Generalisierung.
+2. **Konfigurierbare Kategorien (Phase 3):** ~~Statt fixe BWL/VWL/Recht/IN → benutzerdefinierte Fachbereiche/Kategorien pro Planer.~~ **Phase 1 erledigt (v3.47):** `data/categories.ts` als Single Source of Truth, alle SidePanel-Komponenten migriert. **Phase 2 offen:** ZoomYearView, ZoomBlockView, ZoomMultiYearView, Toolbar (Legende), WeekRows (Farbzuweisung), ExcelImport noch hardcoded. **Phase 3 offen:** Settings-UI zum Erstellen/Bearbeiten eigener Kategorien pro Planer-Instanz.rifft Farb- und Filterlogik. Ziel: Andere LP können mit eigenen Fächern arbeiten. Noch nicht dringend, aber architektonisch wichtig für Generalisierung.
 3. **Template-System (Phase 6):** ~~Bestehenden Planer als Vorlage für neuen verwenden.~~ Basis implementiert (v3.44: Kurse/Ferien kopieren). Erweiterung: Komplette Planer-Daten als Template, Vorlagen-Bibliothek.
 
 ### 🟡 Geplant (mittlere Priorität)

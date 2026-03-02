@@ -7,15 +7,10 @@ import { SequencePanel } from './SequencePanel';
 import { SettingsPanel } from './SettingsPanel';
 import { CollectionPanel } from './CollectionPanel';
 import { suggestGoals, suggestSubjectArea } from '../utils/autoSuggest';
+import { type CategoryDefinition } from '../data/categories';
 import type { SubjectArea, BlockCategory, LessonDetail, SolDetails, Course } from '../types';
 
-const SUBJECT_AREAS: { key: SubjectArea; label: string; color: string }[] = [
-  { key: 'BWL', label: 'BWL', color: '#3b82f6' },
-  { key: 'VWL', label: 'VWL', color: '#f97316' },
-  { key: 'RECHT', label: 'Recht', color: '#22c55e' },
-  { key: 'IN', label: 'Informatik', color: '#6b7280' },
-  { key: 'INTERDISZ', label: 'Interdisziplinär', color: '#a855f7' },
-];
+// SUBJECT_AREAS is now provided via usePlannerData().categories — no local constant needed
 
 // === Block-Kategorie / Untertyp-System ===
 interface CategoryDef {
@@ -548,6 +543,7 @@ function DetailsTab() {
     lessonDetails, updateLessonDetail,
     weekData, sequences,
   } = usePlannerStore();
+  const { categories } = usePlannerData();
 
   const c = selection?.course;
   const detailKey = selection && c ? `${selection.week}-${c.col}` : '';
@@ -683,7 +679,7 @@ function DetailsTab() {
         <div className="flex gap-1 mt-1.5 flex-wrap">
           {effectiveDetail.subjectArea && (
             <span className={`text-[8px] px-1 py-px rounded border ${!detail.subjectArea && parentBlock?.subjectArea ? 'opacity-60' : ''}`}
-              style={{ borderColor: SUBJECT_AREAS.find(s => s.key === effectiveDetail.subjectArea)?.color, color: SUBJECT_AREAS.find(s => s.key === effectiveDetail.subjectArea)?.color }}
+              style={{ borderColor: categories.find(s => s.key === effectiveDetail.subjectArea)?.color, color: categories.find(s => s.key === effectiveDetail.subjectArea)?.color }}
               title={!detail.subjectArea && parentBlock?.subjectArea ? 'Vom Block geerbt' : undefined}>
               {effectiveDetail.subjectArea}
             </span>
@@ -739,9 +735,9 @@ function DetailsTab() {
               <span className="text-[8px] text-gray-500 font-normal ml-1">(geerbt von Sequenz)</span>
             )}
           </label>
-          <PillSelect options={SUBJECT_AREAS.map(s => s.key)} value={detail.subjectArea}
+          <PillSelect options={categories.map(s => s.key)} value={detail.subjectArea}
             onChange={(v) => updateField('subjectArea', v)}
-            renderOption={(v) => { const s = SUBJECT_AREAS.find(x => x.key === v)!; return { label: s.label, color: s.color }; }} />
+            renderOption={(v) => { const s = categories.find(x => x.key === v)!; return { label: s.label, color: s.color }; }} />
           {subjectAreaMismatch && (
             <div className="mt-1 flex items-center gap-1 text-[8px]">
               <span className="text-amber-400">⚠</span>
@@ -850,7 +846,7 @@ function BatchOrDetailsTab() {
 // Batch editing for multiple selected cells
 function BatchEditTab() {
   const { multiSelection, updateLessonDetail, pushUndo, lessonDetails, sequences, addSequence, updateBlockInSequence, setEditingSequenceId, setSidePanelTab } = usePlannerStore();
-  const { courses: COURSES } = usePlannerData();
+  const { courses: COURSES, categories } = usePlannerData();
   const [applied, setApplied] = useState<string | null>(null);
   const [showSeqMenu, setShowSeqMenu] = useState(false);
   const seqMenuRef = useRef<HTMLDivElement>(null);
@@ -961,7 +957,7 @@ function BatchEditTab() {
       <div className="space-y-1">
         <label className="text-[9px] text-gray-400 font-medium">Fachbereich setzen {currentValues.mixedArea && <span className="text-amber-400">(gemischt)</span>}</label>
         <div className="flex gap-1 flex-wrap">
-          {SUBJECT_AREAS.map(sa => {
+          {categories.map(sa => {
             const isActive = currentValues.subjectArea === sa.key;
             return (
               <button key={sa.key} onClick={() => applyToAll('subjectArea', sa.key)}

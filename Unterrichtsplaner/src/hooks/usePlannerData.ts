@@ -4,6 +4,7 @@ import { WEEKS, S2_START_INDEX } from '../data/weeks';
 import { configToCourses, loadSettings } from '../store/settingsStore';
 import { usePlannerStore } from '../store/plannerStore';
 import { useInstanceStore, generateWeekIds } from '../store/instanceStore';
+import { WR_CATEGORIES, subjectConfigsToCategories, type CategoryDefinition } from '../data/categories';
 import type { Course, Week } from '../types';
 
 /**
@@ -80,6 +81,19 @@ export function usePlannerData() {
 
   const currentWeek = useMemo(() => getCurrentISOWeek(), []);
 
+  // === Categories (Subject Areas) ===
+  const categories: CategoryDefinition[] = useMemo(() => {
+    if (settings?.subjects && settings.subjects.length > 0) {
+      const converted = subjectConfigsToCategories(settings.subjects);
+      // Always ensure INTERDISZ is available (not stored in subjects but used as cross-cutting)
+      if (!converted.find(c => c.key === 'INTERDISZ')) {
+        converted.push(WR_CATEGORIES.find(c => c.key === 'INTERDISZ')!);
+      }
+      return converted;
+    }
+    return WR_CATEGORIES;
+  }, [settings]);
+
   // === Linked course IDs ===
   const getLinkedCourseIds = useMemo(() => {
     if (!hasCustomCourses) return staticGetLinkedCourseIds;
@@ -92,5 +106,5 @@ export function usePlannerData() {
     };
   }, [courses, hasCustomCourses]);
 
-  return { courses, weeks, s2StartIndex, currentWeek, getLinkedCourseIds, hasCustomCourses, isLegacy: isLegacyPlanner };
+  return { courses, weeks, s2StartIndex, currentWeek, getLinkedCourseIds, hasCustomCourses, isLegacy: isLegacyPlanner, categories };
 }
