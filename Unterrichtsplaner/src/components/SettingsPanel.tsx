@@ -13,7 +13,7 @@ import { getGymStufe } from '../utils/gradeRequirements';
 import { IW_PRESET_2526 } from '../data/iwPresets';
 import { useInstanceStore, weekToDate } from '../store/instanceStore';
 import { useGCalStore } from '../store/gcalStore';
-import { loginWithGoogle, logout as gcalLogout, fetchCalendarList, syncPlannerToCalendar, buildWeekYearMap, scanCalendarsForSpecialWeeks, type SyncProgress, type ImportCandidate } from '../services/gcal';
+import { loginWithGoogle, logout as gcalLogout, fetchCalendarList, syncPlannerToCalendar, buildWeekYearMap, scanCalendarsForSpecialWeeks, checkCollisions, type SyncProgress, type ImportCandidate } from '../services/gcal';
 
 // === Duration helper for courses ===
 const COURSE_DURATION_PRESETS = [
@@ -683,6 +683,8 @@ function GCalSection() {
   const [importing, setImporting] = useState(false);
   const [importCandidates, setImportCandidates] = useState<ImportCandidate[] | null>(null);
   const [selectedImports, setSelectedImports] = useState<Set<string>>(new Set());
+  const [checkingCollisions, setCheckingCollisions] = useState(false);
+  const collisionCount = Object.keys(useGCalStore(s => s.collisions)).length;
 
   const handleLogin = useCallback(async () => {
     if (!editClientId.trim()) { setError('Client ID erforderlich'); return; }
@@ -830,6 +832,41 @@ function GCalSection() {
     setSelectedImports(new Set());
     alert(`${newWeeks.length} Sonderwoche(n) importiert.`);
   }, [importCandidates, selectedImports]);
+
+  const handleCheckCollisions = useCallback(async () => {
+    if (readCalendarIds.length === 0) { setError('Keine Lese-Kalender ausgewählt'); return; }
+    const activeMeta = useInstanceStore.getState().getActive();
+    if (!activeMeta) { setError('Kein aktiver Planer'); return; }
+    const store = usePlannerStore.getState();
+    const weekData = store.weekData;
+    const settings = store.plannerSettings;
+    if (!settings || !weekData.length) { setError('Keine Planerdaten vorhanden'); return; }
+
+    const courses: import('../types').Course[] = settings.courses.map((cc, i) => ({
+      id: cc.id || `c${i}`,
+      col: i,
+      cls: cc.cls,
+      typ: cc.typ as import('../types').CourseType,
+      day: cc.day as import('../types').DayOfWeek,
+      from: cc.from,
+      to: cc.to,
+      les: cc.les as 1 | 2 | 3,
+      hk: cc.hk ?? false,
+      semesters: cc.semesters as import('../types').Semester[],
+      note: cc.note,
+    }));
+
+    const weekYearMap = buildWeekYearMap(activeMeta.startWeek, activeMeta.startYear, activeMeta.endWeek, activeMeta.endYear);
+
+    setCheckingCollisions(true); setError(null);
+    try {
+      const collisions = await checkCollisions(readCalendarIds, weekData, courses, weekYearMap);
+      useGCalStore.getState().setCollisions(collisions);
+    } catch (e: any) {
+      setError(e.message || 'Kollisionsprüfung fehlgeschlagen');
+    }
+    setCheckingCollisions(false);
+  }, [readCalendarIds]);
 
   return (
     <Section title="📅 Google Calendar">
@@ -1044,6 +1081,36 @@ function GCalSection() {
                   </>
                 )}
               </div>
+            )}
+          </div>
+        )}
+
+        {/* Collision check section (v3.63) */}
+        {isAuth && readCalendarIds.length > 0 && (
+          <div className="space-y-1.5 pt-1.5 border-t border-slate-700">
+            <div className="flex items-center justify-between">
+              <span className="text-[9px] font-semibold text-gray-300">Kollisionswarnungen</span>
+              {collisionCount > 0 && (
+                <span className="text-[8px] text-amber-400 font-bold">⚠️ {collisionCount}</span>
+              )}
+            </div>
+            <p className="text-[7px] text-gray-500">
+              Prüft ob externe Kalender-Events (Sitzungen, Konferenzen) mit Lektionszeiten kollidieren. Kollisionen werden als ⚠️ im Wochenplan angezeigt.
+            </p>
+            <button onClick={handleCheckCollisions} disabled={checkingCollisions}
+              className="w-full py-1.5 rounded text-[9px] font-medium bg-slate-700 hover:bg-slate-600 text-gray-200 cursor-pointer transition-all disabled:opacity-50">
+              {checkingCollisions ? '⏳ Prüfe Kollisionen…' : '⚠️ Kollisionen prüfen'}
+            </button>
+            {collisionCount > 0 && (
+              <div className="text-[8px] text-amber-300 bg-amber-900/20 px-2 py-1 rounded">
+                {collisionCount} Lektion(en) haben Zeitkonflikte mit externen Kalender-Events. Siehe ⚠️ im Wochenplan.
+              </div>
+            )}
+            {collisionCount > 0 && (
+              <button onClick={() => useGCalStore.getState().clearCollisions()}
+                className="text-[7px] text-gray-500 hover:text-gray-300 cursor-pointer">
+                ✕ Warnungen ausblenden
+              </button>
             )}
           </div>
         )}

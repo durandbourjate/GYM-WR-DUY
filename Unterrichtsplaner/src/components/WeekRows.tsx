@@ -3,6 +3,7 @@ import type { Course, Week } from '../types';
 import { LESSON_COLORS, SUBJECT_AREA_COLORS, DAY_COLORS, getSequenceInfoFromStore, isPastWeek } from '../utils/colors';
 import { CURRENT_WEEK } from '../data/weeks';
 import { usePlannerStore } from '../store/plannerStore';
+import { useGCalStore } from '../store/gcalStore';
 import { getHKGroup } from '../utils/hkRotation';
 import { getEffectiveCategorySubtype, getCategoryLabel, getSubtypeLabel, CATEGORIES } from './DetailPanel';
 
@@ -339,6 +340,8 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
     expandedNoteCols,
     dimPastWeeks,
   } = usePlannerStore();
+
+  const gcalCollisions = useGCalStore(s => s.collisions);
 
   const [hoverCell, setHoverCell] = useState<{ week: string; col: number } | null>(null);
   const [showHoverPreview, setShowHoverPreview] = useState(false);
@@ -1011,6 +1014,21 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                         {b.label}
                       </div>
                     ));
+                  })()}
+
+                  {/* Collision warning (v3.63) */}
+                  {(() => {
+                    const collisionKey = `${week.w}-${c.col}`;
+                    const collidingEvents = gcalCollisions[collisionKey];
+                    if (!collidingEvents?.length || !title) return null;
+                    return (
+                      <div
+                        className="absolute left-0.5 bottom-0.5 text-[8px] z-10 cursor-help select-none"
+                        title={`⚠️ Zeitkonflikt mit: ${collidingEvents.join(', ')}`}
+                      >
+                        ⚠️
+                      </div>
+                    );
                   })()}
 
                   {/* TaF Phase indicator */}

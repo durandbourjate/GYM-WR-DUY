@@ -386,3 +386,94 @@ export async function scanCalendarsForSpecialWeeks(
 
   return candidates;
 }
+
+// ---- v3.63: Kollisionswarnungen ----
+
+/**
+ * Check for collisions between planner lessons and external calendar events.
+ * Returns a map of "weekKey-col" → array of colliding event summaries.
+ */
+export async function checkCollisions(
+  readCalendarIds: string[],
+  weekData: Week[],
+  courses: Course[],
+  weekYearMap: Record<string, number>,
+): Promise<Record<string, string[]>> {
+  const gcalStore = useGCalStore.getState();
+  if (!gcalStore.isAuthenticated()) throw new Error('Nicht authentifiziert');
+
+  // Build time range
+  const weeks = Object.entries(weekYearMap);
+  if (weeks.length === 0) return {};
+  const firstWeek = weeks[0];
+  const lastWeek = weeks[weeks.length - 1];
+  const timeMin = new Date(weekToDate(parseInt(firstWeek[0]), firstWeek[1])).toISOString();
+  const lastMon = weekToDate(parseInt(lastWeek[0]), lastWeek[1]);
+  lastMon.setDate(lastMon.getDate() + 6);
+  const timeMax = lastMon.toISOString();
+
+  // Fetch all external events from read calendars
+  const externalEvents: Array<{ summary: string; startMs: number; endMs: number }> = [];
+  for (const calId of readCalendarIds) {
+    let events: any[];
+    try {
+      events = await fetchEvents(calId, timeMin, timeMax);
+    } catch {
+      continue;
+    }
+    for (const ev of events) {
+      // Skip planer-managed events
+      if (ev.extendedProperties?.private?.[PLANER_TAG]) continue;
+      const startStr = ev.start?.dateTime;
+      const endStr = ev.end?.dateTime;
+      // Only check timed events (not all-day)
+      if (!startStr || !endStr) continue;
+      externalEvents.push({
+        summary: ev.summary || '(Kein Titel)',
+        startMs: new Date(startStr).getTime(),
+        endMs: new Date(endStr).getTime(),
+      });
+    }
+  }
+
+  if (externalEvents.length === 0) return {};
+
+  // Build planner lesson time slots and check overlaps
+  const collisions: Record<string, string[]> = {};
+  const courseMap = new Map(courses.map(c => [c.col, c]));
+
+  for (const week of weekData) {
+    for (const [colStr, entry] of Object.entries(week.lessons)) {
+      const col = Number(colStr);
+      const course = courseMap.get(col);
+      if (!course) continue;
+      if (!entry.title || entry.type === 5 || entry.type === 6) continue;
+      const year = weekYearMap[week.w];
+      if (!year) continue;
+
+      const weekNum = parseInt(week.w);
+      const monday = weekToDate(weekNum, year);
+      const dayOff = DAY_OFFSET[course.day] ?? 0;
+      const d = new Date(monday);
+      d.setDate(d.getDate() + dayOff);
+
+      const [sh, sm] = course.from.split(':').map(Number);
+      const [eh, em] = course.to.split(':').map(Number);
+      const lessonStart = new Date(d); lessonStart.setHours(sh, sm, 0, 0);
+      const lessonEnd = new Date(d); lessonEnd.setHours(eh, em, 0, 0);
+      const ls = lessonStart.getTime();
+      const le = lessonEnd.getTime();
+
+      const key = `${week.w}-${col}`;
+      for (const ext of externalEvents) {
+        // Check time overlap: start1 < end2 && start2 < end1
+        if (ext.startMs < le && ls < ext.endMs) {
+          if (!collisions[key]) collisions[key] = [];
+          collisions[key].push(ext.summary);
+        }
+      }
+    }
+  }
+
+  return collisions;
+}

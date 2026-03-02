@@ -27,6 +27,10 @@ interface GCalState {
   setEventMapping: (key: string, eventId: string) => void;
   removeEventMapping: (key: string) => void;
   clearEventMap: () => void;
+  // Collision warnings: "weekKey-col" → colliding event summaries (ephemeral, not persisted)
+  collisions: Record<string, string[]>;
+  setCollisions: (c: Record<string, string[]>) => void;
+  clearCollisions: () => void;
 }
 
 export const useGCalStore = create<GCalState>()(
@@ -68,7 +72,17 @@ export const useGCalStore = create<GCalState>()(
         return { eventMap: rest };
       }),
       clearEventMap: () => set({ eventMap: {} }),
+      collisions: {},
+      setCollisions: (c) => set({ collisions: c }),
+      clearCollisions: () => set({ collisions: {} }),
     }),
-    { name: 'gcal-config' }
+    {
+      name: 'gcal-config',
+      partialize: (state) => {
+        // Don't persist collisions (ephemeral data)
+        const { collisions: _, ...rest } = state;
+        return rest;
+      },
+    }
   )
 );

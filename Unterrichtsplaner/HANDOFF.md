@@ -1,6 +1,6 @@
-# Unterrichtsplaner – Handoff v3.62
+# Unterrichtsplaner – Handoff v3.63
 
-## Status: ✅ Deployed (v3.62)
+## Status: ✅ Deployed (v3.63)
 - **Commit:** (pending)
 - **Datum:** 2026-03-02
 - **Deploy:** https://durandbourjate.github.io/GYM-WR-DUY/Unterrichtsplaner/
@@ -150,7 +150,7 @@ Aufträge in empfohlener Reihenfolge. Jeden Auftrag einzeln umsetzen, dann commi
 - Events aus Lese-Kalendern lesen
 - IW/Sonderwochen erkennen und als SpecialWeekConfig importieren
 
-**Phase 4 (v3.63): Kollisionswarnungen**
+**✅ Phase 4 (v3.63): Kollisionswarnungen**
 - ⚠️ in Zellen wenn Nicht-Planer-Events auf gleichen Zeitslot fallen
 - Tooltip mit kollidierendem Event
 
@@ -161,6 +161,7 @@ Aufträge in empfohlener Reihenfolge. Jeden Auftrag einzeln umsetzen, dann commi
 
 ## Erledigte Aufträge
 
+### ✅ v3.63 — Google Calendar Phase 4: Kollisionswarnungen
 ### ✅ v3.62 — Google Calendar Phase 3: Kalender→Planer Import
 ### ✅ v3.61 — Google Calendar Phase 2: Planer→Kalender Sync
 ### ✅ v3.60 — Google Calendar Phase 1: OAuth + Kalender-Auswahl
