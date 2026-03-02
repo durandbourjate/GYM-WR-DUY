@@ -1,278 +1,168 @@
-# Unterrichtsplaner – Handoff v3.51
+# Unterrichtsplaner – Handoff v3.53
 
-## Status: ✅ Deployed (v3.51)
-- **Commit:** c221920
+## Status: ✅ Deployed (v3.53)
+- **Commit:** de7d5c9
 - **Datum:** 2026-03-02
 - **Deploy:** https://durandbourjate.github.io/GYM-WR-DUY/Unterrichtsplaner/
 
-## Nächster Auftrag: v3.53 — Klick&Drag Mehrfachauswahl auf gefüllte Zellen
+## Auftrags-Warteschlange
 
-### Kontext
+Aufträge in empfohlener Reihenfolge. Jeden Auftrag einzeln umsetzen, dann committen und pushen. HANDOFF.md nach jedem Auftrag aktualisieren (Status auf ✅, Changelog-Eintrag hinzufügen).
 
-Aktuell funktioniert Klick&Drag nur auf **leere Zellen** (Zeile 524 in WeekRows.tsx: `if (title) return;` bricht ab). Der Benutzer will aber auch auf **gefüllte Zellen** klicken und ziehen, um mehrere Lektionen auszuwählen und dann z.B. als Sequenz zu gruppieren oder per Batch zu bearbeiten. Bisher geht das nur mit Shift+Klick oder Cmd+Klick.
-
-### Gewünschtes Verhalten
-
-**Klick&Drag auf gefüllte Zellen:**
-1. Benutzer drückt Maus auf eine gefüllte Zelle (Lektion) und hält gedrückt
-2. Beim Ziehen über weitere Zellen im **selben Kurs** (gleiche Spalte bzw. cls+typ) werden diese zur Auswahl hinzugefügt
-3. Sowohl leere als auch gefüllte Zellen werden einbezogen
-4. Visuell: alle ausgewählten Zellen bekommen den Multi-Select-Stil (lila Outline, wie bei Shift+Klick)
-5. Bei Loslassen: die ausgewählten Zellen sind in `multiSelection` und das SidePanel öffnet mit Batch-Tab
-6. Ferien (type 6) und fixe Events werden beim Drag **übersprungen** (nicht in die Auswahl aufgenommen)
-
-**Abgrenzung zum normalen Klick:**
-- Einfacher Klick (mousedown + mouseup ohne Bewegung) = wie bisher (Selektion einer einzelnen Zelle)
-- Klick&Drag (mousedown + mousemove auf andere Zelle + mouseup) = Mehrfachauswahl
-- Shift+Klick und Cmd+Klick bleiben unverändert
-
-**Einschränkung:** Drag nur innerhalb desselben Kurses (gleiche `cls+typ`-Kombination). Wenn der Benutzer in eine andere Spalte zieht, passiert nichts (Drag wird ignoriert für diese Zelle).
-
-### Aufgabe
-
-#### 1. Drag-State erweitern (WeekRows.tsx, ab Zeile ~350)
-
-Die bestehenden Drag-State-Variablen (`isDragSelecting`, `dragSelectCol`, `dragSelectedWeeks`, `dragSelectCourse`) werden wiederverwendet und generalisiert — sie sollen nicht mehr zwischen leeren und gefüllten Zellen unterscheiden.
-
-#### 2. `handleDragSelectStart` ändern (Zeile ~521)
-
-```typescript
-const handleDragSelectStart = useCallback((weekW: string, course: Course, e: React.MouseEvent) => {
-  if (e.shiftKey || e.metaKey || e.ctrlKey) return; // Modifier-Klicks nicht abfangen
-  if (e.button !== 0) return; // Nur linke Maustaste
-  
-  const entry = displayWeeks.find(w => w.w === weekW);
-  const lesson = entry?.lessons[course.col];
-  if (lesson?.type === 6) return; // Ferien nicht draggbar
-  
-  setIsDragSelecting(true);
-  setDragSelectCol(course.col);
-  setDragSelectCourse(course);
-  setDragSelectedWeeks([weekW]);
-  setEmptyCellMenu(null);
-  // Merken: war es ein gefüllter oder leerer Start? → Neuen State `dragStartedOnFilled`
-}, [displayWeeks]);
-```
-
-#### 3. `handleDragSelectMove` ändern (Zeile ~531)
-
-```typescript
-const handleDragSelectMove = useCallback((weekW: string, course: Course) => {
-  if (!isDragSelecting) return;
-  // Gleicher Kurs (cls+typ)? Sonst ignorieren
-  if (!dragSelectCourse || course.cls !== dragSelectCourse.cls || course.typ !== dragSelectCourse.typ) return;
-  
-  const entry = displayWeeks.find(w => w.w === weekW);
-  const lesson = entry?.lessons[course.col];
-  if (lesson?.type === 6) return; // Ferien überspringen
-  
-  setDragSelectedWeeks(prev => prev.includes(weekW) ? prev : [...prev, weekW]);
-}, [isDragSelecting, dragSelectCourse, displayWeeks]);
-```
-
-#### 4. `handleDragSelectEnd` ändern (Zeile ~540)
-
-```typescript
-const handleDragSelectEnd = useCallback(() => {
-  if (!isDragSelecting) return;
-  setIsDragSelecting(false);
-  
-  if (dragSelectedWeeks.length > 1 && dragSelectCourse) {
-    // Mehr als 1 Zelle: → multiSelection setzen, SidePanel mit Batch-Tab öffnen
-    const keys = dragSelectedWeeks.map(w => `${w}-${dragSelectCourse.id}`);
-    // Auch verknüpfte Kurse berücksichtigen (Multi-day)
-    // Die Keys direkt in multiSelection setzen (im plannerStore)
-    usePlannerStore.getState().setMultiSelectionDirect(keys); // Neue Store-Action nötig!
-    setSidePanelOpen(true);
-    setSidePanelTab('details'); // BatchOrDetailsTab switcht automatisch bei multiSelection > 1
-  } else if (dragSelectedWeeks.length === 1) {
-    // Nur 1 Zelle angeklickt (kein Drag): normales Klick-Verhalten
-    // → nichts tun, der onClick-Handler übernimmt
-  }
-  
-  // Drag-State zurücksetzen (aber dragSelectedWeeks für visuelle Markierung behalten bis nächster Klick)
-}, [isDragSelecting, dragSelectedWeeks, dragSelectCourse]);
-```
-
-#### 5. Neue Store-Action: `setMultiSelectionDirect` (plannerStore.ts)
-
-Neue Action hinzufügen, die `multiSelection` direkt setzt (nicht togglet):
-```typescript
-setMultiSelectionDirect: (keys: string[]) => void;
-// Implementation:
-setMultiSelectionDirect: (keys) => set({ multiSelection: keys, lastSelectedKey: keys[keys.length - 1] ?? null }),
-```
-
-#### 6. onMouseDown auf gefüllte Zellen (Zeile ~736)
-
-Aktuell steht dort:
-```typescript
-onMouseDown={(e) => {
-  if (!title && !e.shiftKey && !e.metaKey && !e.ctrlKey && e.button === 0) {
-    handleDragSelectStart(week.w, c);
-  }
-}}
-```
-
-Ändern zu:
-```typescript
-onMouseDown={(e) => {
-  if (!e.shiftKey && !e.metaKey && !e.ctrlKey && e.button === 0) {
-    handleDragSelectStart(week.w, c, e);
-  }
-}}
-```
-
-Die `!title`-Bedingung entfällt — Drag startet jetzt auf allen Zellen.
-
-#### 7. Visuelles Feedback während Drag
-
-Die bestehende Drag-Visualisierung (lila Outline für `dragSelectedWeeks`) muss auch auf gefüllte Zellen wirken. Prüfe, ob die CSS-Klasse in der Zelle korrekt gesetzt wird — aktuell wird `dragSelectedWeeks.includes(week.w) && c.col === dragSelectCol` möglicherweise nur auf leere Zellen angewendet.
-
-#### 8. Konfliktvermeidung: Klick vs. Drag
-
-Das Problem: `onMouseDown` startet den Drag, aber `onClick` feuert auch. Lösung:
-- Einen `dragMoved`-Ref einführen (`useRef(false)`)
-- In `handleDragSelectMove`: wenn eine neue Zelle betreten wird, `dragMoved.current = true`
-- In `onClick`: wenn `dragMoved.current === true`, den Click ignorieren (Drag hat stattgefunden)
-- In `handleDragSelectEnd`: `dragMoved` zurücksetzen (nach kurzem timeout, damit onClick noch prüfen kann)
-
-### Nicht ändern
-
-- Shift+Klick / Cmd+Klick Verhalten bleibt unverändert
-- Multi-Day-Prompt bei Shift+Klick bleibt wie gehabt
-- EmptyCellMenu bei Doppelklick auf leere Zelle bleibt
-- Bestehende Sequenz-Drag&Drop (falls vorhanden) nicht berühren
-
-### Testhinweise
-
-1. **Drag auf gefüllte Zellen:** 3-4 aufeinanderfolgende Lektionen im selben Kurs auswählen → sollten alle lila markiert sein, Batch-Tab öffnet sich
-2. **Gemischt:** Drag über gefüllte und leere Zellen → beide in der Auswahl
-3. **Einfacher Klick:** Weiterhin normales Verhalten (keine Mehrfachauswahl)
-4. **Spaltenüberschreitung:** Drag in andere Spalte → wird ignoriert
-5. **Ferien:** Drag über Ferien-Zellen → werden übersprungen
-6. **Nach Drag:** Batch-Tab zeigt korrekte Optionen (Fachbereich, Kategorie, "Neue Sequenz" etc.)
-
-### Commit
-
-`v3.53: Klick&Drag Mehrfachauswahl auf gefüllte und leere Zellen`
-
-Nach Umsetzung: HANDOFF.md Changelog aktualisieren und committen/pushen.
+**Wichtig: Nach jeder Umsetzung `git add -A && git commit -m "v3.XX: Kurzbeschreibung" && git push` ausführen.**
 
 ---
 
-## Vorheriger Auftrag (erledigt): v3.52 — Sonderwochen GYM-Stufen + IW-Preset ✅
+### Auftrag A: v3.54 — Kurs-Export/Import (Klein)
 
-### Kontext
+**Kontext:** Aktuell kann man ganze Planer exportieren/importieren (PlannerTabs.tsx, `handleExport`/`handleImport`). Es fehlt die Möglichkeit, nur die **Kurs-Konfiguration** (Settings: Kurse, Ferien, Sonderwochen) einzeln zu exportieren/importieren — z.B. um die Kursstruktur eines Schuljahres mit einem Kollegen zu teilen oder als Backup zu sichern.
 
-Der IW-Plan (Intensivwochen) von Gym Hofwil definiert pro Kalenderwoche **unterschiedliche Sonderwochen für verschiedene GYM-Stufen**. Beispiel IW 27:
-- GYM1: Medienwoche
-- GYM2: MINT
-- GYM3: Schwerpunktfach
-- GYM4: Studienreise
+**Aufgabe:**
 
-Aktuell kann man pro KW mehrere Einträge manuell anlegen, aber es fehlt:
-1. Ein **GYM-Stufe-Feld** pro Eintrag (welche Stufe betrifft dieser Eintrag?)
-2. Intelligentere **Kurs-Ausschluss-Logik** basierend auf der GYM-Stufe
-3. Ein **IW-Preset** zum schnellen Laden des offiziellen IW-Plans
+1. **SettingsPanel.tsx** — Zwei Buttons am Ende des Settings-Panels hinzufügen:
+   - **"📤 Konfiguration exportieren"**: Exportiert `plannerSettings` (Kurse, Ferien, Sonderwochen, Fächer, Semesterbruch) als JSON-Datei. Filename: `planer-config-{planername}-{datum}.json`.
+   - **"📥 Konfiguration importieren"**: File-Input für JSON. Beim Import: bestehende Settings mit den importierten ersetzen. Confirm-Dialog: "Bestehende Einstellungen werden überschrieben. Fortfahren?"
 
-### Aufgabe
+2. **Datenformat:** Reines `PlannerSettings`-Objekt (aus `settingsStore.ts`). Keine Planer-Daten (Wochen, Sequenzen etc.) — nur die Konfiguration.
 
-#### 1. Datenmodell erweitern (`settingsStore.ts`)
+3. **Validierung beim Import:** Prüfen ob das JSON-Objekt die erwarteten Felder hat (`courses`, `holidays`, `specialWeeks`). Bei ungültigem Format: Fehlermeldung.
 
-`SpecialWeekConfig` erweitern:
-```typescript
-export interface SpecialWeekConfig {
-  id: string;
-  label: string;
-  week: string; // KW
-  type: 'event' | 'holiday';
-  gymLevel?: string; // z.B. 'GYM1', 'GYM2', 'GYM3', 'GYM4', 'alle' oder undefined (=alle)
-  excludedCourseIds?: string[];
-  days?: number[];
-}
-```
+**Nicht ändern:** PlannerTabs Export/Import (ganzer Planer) bleibt wie gehabt.
 
-Rückwärtskompatibel: `gymLevel` ist optional, undefined = wie bisher (betrifft alle).
+**Commit:** `v3.54: Kurs-Konfiguration Export/Import in Settings`
 
-#### 2. SpecialWeeksEditor erweitern (`SettingsPanel.tsx`, ab Zeile ~302)
+---
 
-Pro Eintrag innerhalb einer KW-Gruppe ein **GYM-Stufe-Dropdown** hinzufügen:
-- Optionen: `alle`, `GYM1`, `GYM2`, `GYM3`, `GYM4`, `GYM5`, `TaF`
-- Position: nach dem Label-Feld, vor dem Typ-Dropdown
-- Wenn GYM-Stufe gewählt: die `excludedCourseIds` automatisch vorschlagen (Kurse, deren Klassenname nicht zur GYM-Stufe passt, vorselektieren). Dazu braucht es eine Hilfsfunktion die aus dem Kursnamen die GYM-Stufe ableitet (wie bei gradeRequirements.ts, Maturjahrgang → GYM-Stufe).
-- Die manuelle Kurs-Ausschluss-Liste bleibt als Override erhalten.
+### Auftrag B: v3.55 — "Aus Sammlung laden" bei Settings (Mittel)
 
-Visuell: Das GYM-Stufe-Badge soll in der KW-Zeile (collapsed) neben dem Label angezeigt werden, z.B.:
-```
-▸ KW27  GYM1 Medienwoche, GYM2 MINT, GYM3 SF-Woche, GYM4 Studienreise  4 Einträge
-```
+**Kontext:** Die Sammlung (CollectionPanel) enthält archivierte UE, Sequenzen und Schuljahre. Der Wunsch ist, beim Erstellen/Bearbeiten in den Settings auf die Sammlung zurückgreifen zu können — z.B. Sonderwochen aus dem letzten Jahr laden oder Kurs-Presets aus der Sammlung.
 
-#### 3. IW-Preset-Button
+**Aufgabe:**
 
-Einen Button **"📋 IW-Plan SJ 25/26 laden"** am Ende des SpecialWeeksEditors hinzufügen. Beim Klick:
-- Bestehende Sonderwochen bleiben (kein Überschreiben)
-- Die IW-Einträge aus `SCHULKONTEXT.md` (Abschnitt "Intensivwochen") werden als neue Einträge hinzugefügt
-- Die Preset-Daten als Konstante in einer neuen Datei `data/iwPresets.ts` definieren
+1. **Neuer CollectionItem-Typ: `settings`** — In `types.ts` einen neuen `CollectionItemType` hinzufügen: `'settings'`. Ein Settings-Collection-Item speichert ein `PlannerSettings`-Snapshot (Kurse, Ferien, Sonderwochen).
 
-Preset-Daten für SJ 25/26 (aus IW-Plan):
-```typescript
-export const IW_PRESET_2526: SpecialWeekConfig[] = [
-  // IW 38
-  { id: 'iw38-gym1', label: 'Klassenwoche', week: '38', type: 'event', gymLevel: 'GYM1' },
-  { id: 'iw38-gym2', label: 'SOL-Projekt', week: '38', type: 'event', gymLevel: 'GYM2' },
-  { id: 'iw38-gym3', label: 'Franz-Aufenthalt', week: '38', type: 'event', gymLevel: 'GYM3' },
-  { id: 'iw38-gym4', label: 'Studienreise', week: '38', type: 'event', gymLevel: 'GYM4' },
-  // IW 46 — nur TaF, Unterricht gem. Stundenplan für Regelklassen
-  { id: 'iw46-taf', label: 'IW TaF', week: '46', type: 'event', gymLevel: 'TaF' },
-  // IW 12
-  { id: 'iw12-gym2', label: 'Schneesportlager', week: '12', type: 'event', gymLevel: 'GYM2' },
-  // IW 14
-  { id: 'iw14-gym1', label: 'Nothilfekurs/Gesundheit', week: '14', type: 'event', gymLevel: 'GYM1' },
-  { id: 'iw14-gym2', label: 'Deutsch', week: '14', type: 'event', gymLevel: 'GYM2' },
-  { id: 'iw14-gym3', label: 'EF-Woche', week: '14', type: 'event', gymLevel: 'GYM3' },
-  { id: 'iw14-gym4', label: 'Franz/Englisch', week: '14', type: 'event', gymLevel: 'GYM4' },
-  // IW 25
-  { id: 'iw25-gym1', label: 'Geo + Sport', week: '25', type: 'event', gymLevel: 'GYM1' },
-  { id: 'iw25-gym2', label: 'Wirtschaftswoche', week: '25', type: 'event', gymLevel: 'GYM2' },
-  { id: 'iw25-gym3', label: 'Maturaarbeit', week: '25', type: 'event', gymLevel: 'GYM3' },
-  { id: 'iw25-gym4', label: 'Maturprüfung', week: '25', type: 'event', gymLevel: 'GYM4' },
-  // IW 27
-  { id: 'iw27-gym1', label: 'Medienwoche', week: '27', type: 'event', gymLevel: 'GYM1' },
-  { id: 'iw27-gym2', label: 'MINT', week: '27', type: 'event', gymLevel: 'GYM2' },
-  { id: 'iw27-gym3', label: 'Schwerpunktfach', week: '27', type: 'event', gymLevel: 'GYM3' },
-  { id: 'iw27-gym4', label: 'Studienreise', week: '27', type: 'event', gymLevel: 'GYM4' },
-];
-```
+2. **"📥 In Sammlung"-Button im SettingsPanel** — Am Ende der Settings: Button "Aktuelle Konfiguration in Sammlung speichern". Erstellt ein CollectionItem vom Typ `settings` mit Titel "Konfiguration {Planername} {Datum}".
 
-#### 4. Kurs-Ausschluss-Automatik
+3. **"📚 Aus Sammlung laden"-Button im SettingsPanel** — Öffnet ein Modal/Dropdown mit allen Settings-Items aus der Sammlung. Bei Auswahl: importiert Kurse, Ferien, Sonderwochen (mit Confirm-Dialog).
 
-Neue Hilfsfunktion in `utils/` oder direkt in `SettingsPanel.tsx`:
-```typescript
-function getGymLevel(className: string): string | null {
-  // Aus Maturjahrgang die GYM-Stufe ableiten
-  // Aktuelles SJ: 25/26 → AK29=GYM1, AK28=GYM2, AK27=GYM3, AK26=GYM4
-  // TaF: Klassen mit 'f' oder 's' am Ende
-  // Ähnliche Logik wie in gradeRequirements.ts
-}
-```
+4. **Sammlung-Filter:** CollectionPanel zeigt den neuen Typ `settings` mit eigenem Icon (⚙️) und Filter-Button.
 
-Wenn `gymLevel` bei einem SpecialWeek-Eintrag gesetzt wird, sollen die `excludedCourseIds` automatisch berechnet werden: Alle Kurse ausschliessen, deren Klasse **nicht** zur gewählten GYM-Stufe gehört. Der Benutzer kann danach manuell Kurse wieder einschliessen/ausschliessen.
+**Bestehende Architektur:** `CollectionItem` in `types.ts` hat `units: CollectionUnit[]`. Für Settings-Items: `units` enthält ein einzelnes Element mit den serialisierten Settings im `details`-Feld (oder ein neues `settings`-Feld im CollectionItem).
 
-### Nicht ändern
+**Commit:** `v3.55: Aus Sammlung laden für Settings-Konfigurationen`
 
-- WeekRows.tsx und die Darstellung der Sonderwochen im Planer — die bestehende Logik (type 5 Events, excludedCourseIds) funktioniert weiterhin korrekt.
-- Kein "In Planer übernehmen"-Button nötig — Sonderwochen werden automatisch angewendet (Auto-Save).
+---
 
-### Testhinweise
+### Auftrag C: v3.56 — Halbklassen-Badge auf Kacheln (Klein)
 
-- Neuen Planer erstellen → IW-Preset laden → prüfen ob alle KW korrekt gruppiert angezeigt werden
-- GYM-Stufe wählen → prüfen ob Kurs-Ausschlüsse korrekt vorgeschlagen werden
-- Legacy-Planer ohne gymLevel → muss weiterhin funktionieren (Rückwärtskompatibilität)
+**Kontext:** Prüfungen und Spezialanlässe sollen auf den Kacheln im Wochenplan ein kompaktes Badge zeigen (z.B. rotes "P" für Prüfung, blaues "E" für Exkursion) — zusätzlich zum Farbcode.
 
-### Commit
+**Aufgabe:**
 
-`v3.52: Sonderwochen GYM-Stufen-Feld, IW-Preset SJ 25/26, automatische Kurs-Ausschlüsse`
+1. **Datenmodell** — `LessonEntry` (in `types.ts`) erweitern um optionales `badge?: { text: string; color: string }`. Max 3 Zeichen.
+
+2. **DetailPanel.tsx (DetailsTab)** — Badge-Feld hinzufügen: Text-Input (max 3 Zeichen) + Farbwähler (5-6 Preset-Farben: rot, blau, grün, amber, lila, grau). Nur sichtbar wenn Lektion eine Kategorie hat (Prüfung, Event etc.) oder manuell gesetzt.
+
+3. **WeekRows.tsx** — In der Kachel-Render-Logik: wenn `badge` vorhanden, kleines farbiges Badge (absolute positioniert, top-right der Kachel) mit dem Text anzeigen. `text-[7px]`, `px-1`, `rounded-sm`, `font-bold`.
+
+4. **Automatik (optional):** Wenn die Kategorie auf "Prüfung schriftlich" gesetzt wird, Badge automatisch auf `{ text: 'P', color: '#ef4444' }` setzen. Manuell überschreibbar.
+
+**Commit:** `v3.56: Kachel-Badge für Prüfungen und Spezialanlässe`
+
+---
+
+### Auftrag D: v3.57 — Warnung bei 1L↔2L Rhythmisierung (Klein)
+
+**Kontext:** Mehrtages-Kurse haben oft eine Rhythmisierung (z.B. Di 1L Theorie, Do 2L Übung). Wenn Lektionen verschoben werden (`pushLessons`), kann diese Rhythmisierung gestört werden. Der Benutzer wünscht eine Warnung.
+
+**Aufgabe:**
+
+1. **Erkennung:** Wenn `pushLessons` oder `batchShiftDown` aufgerufen wird, prüfen ob der Kurs Teil eines Mehrtages-Kurses ist (gleiche `cls+typ`, verschiedene `day`). Falls ja: prüfen ob die Lektionsdauer (aus `lessonDetails.duration` oder Kurs-Default) pro Tag konsistent bleibt.
+
+2. **Warnung anzeigen:** Wenn nach dem Push ein Kurs mit 1L am Dienstag plötzlich eine 2L-Lektion hat (oder umgekehrt): Toast-Warnung oder gelbes ⚠️ in der Toolbar. Text: "Achtung: Rhythmisierung 1L/2L bei {Kursname} nach Verschiebung gestört."
+
+3. **Implementierung:** In `WeekRows.tsx` nach `handleMiniPush` — nach dem Push ein Check durchführen. Neuer State `rhythmWarning: string | null` mit auto-dismiss nach 5 Sekunden.
+
+**Nicht:** Kein Blocking (der Push wird trotzdem ausgeführt, nur die Warnung erscheint).
+
+**Commit:** `v3.57: Warnung bei gestörter 1L/2L Rhythmisierung nach Push`
+
+---
+
+### Auftrag E: v3.58 — Drag&Drop Verschieben von Lektionen (Mittel)
+
+**Kontext:** Aktuell kann man Kacheln nur per Push (→-Button) nach unten verschieben. Direktes Drag&Drop einer Lektion von einer Woche in eine andere ist nicht möglich. Der Store hat bereits `swapLessons` und `moveLessonToEmpty`.
+
+**Aufgabe:**
+
+1. **Drag-Start:** Langer Klick (300ms Hold) auf eine gefüllte Kachel startet den Drag-Modus (unterscheidbar vom normalen Klick/Drag-Select durch die Hold-Dauer). Visuell: Kachel wird halbtransparent, Cursor ändert sich zu `grabbing`.
+
+2. **Drag-Over:** Beim Ziehen über Zellen im selben Kurs: Zielzelle wird hervorgehoben (blauer Border). Nur Zellen im selben Kurs (gleiche Spalte) sind gültige Drop-Targets. Ferien/Events sind keine gültigen Targets.
+
+3. **Drop:**
+   - Auf **leere Zelle**: `moveLessonToEmpty(col, fromWeek, toWeek)` aufrufen
+   - Auf **gefüllte Zelle**: `swapLessons(col, fromWeek, toWeek)` aufrufen (Tausch)
+   - Undo via `pushUndo()` vor der Aktion
+
+4. **State:** Neuer `dragMove`-State in WeekRows: `{ fromWeek: string; col: number } | null`. Separiert vom bestehenden Drag-Select-State (`isDragSelecting`).
+
+5. **Abgrenzung:** Normaler Klick = Selektion, kurzer Drag (< 300ms) = Multi-Select (v3.53), langer Hold + Drag = Verschieben.
+
+**Commit:** `v3.58: Drag&Drop Verschieben von Lektionen innerhalb eines Kurses`
+
+---
+
+### Auftrag F: v3.59 — Doppelklick Spaltentitel als Kursfilter (Klein)
+
+**Kontext:** Im Wochenplan (Zoom 3) werden alle Kurse als Spalten angezeigt. Doppelklick auf einen Spaltentitel (Klassenname) soll alle anderen Spalten ausblenden — als schneller Kursfilter.
+
+**Aufgabe:**
+
+1. **State:** Neuer `visibleCourseFilter: string | null` im plannerStore (oder lokal in WeekRows). `null` = alle sichtbar, `string` = nur Kurse mit dieser `cls+typ`-Kombination.
+
+2. **WeekRows.tsx Spaltentitel:** `onDoubleClick` auf die Kopfzeile-`<th>`-Elemente: setzt `visibleCourseFilter` auf `cls+typ` des Kurses (oder auf `null` wenn bereits gefiltert auf diesen Kurs → Toggle).
+
+3. **Rendering:** Wenn Filter aktiv: `courses.filter(...)` vor dem Rendern. Visueller Hinweis: Badge "Gefiltert: 29c SF" in der Toolbar mit ✕-Button zum Aufheben.
+
+4. **Keyboard:** Escape hebt den Filter auf (zusätzlich zum bestehenden Esc-Verhalten).
+
+**Commit:** `v3.59: Doppelklick auf Spaltentitel als Kursfilter`
+
+---
+
+### Auftrag G: Google Calendar Integration (Gross — mehrere Versionen)
+
+**Kontext:** Konzept in HANDOFF.md dokumentiert (siehe "Feature-Spec: Google Calendar Integration"). Drei Funktionen: Planer→Kalender Sync, Kalender→Planer Import, Kollisionswarnungen. Benötigt Google Calendar API via OAuth.
+
+**Dieser Auftrag ist zu gross für eine einzelne Version.** Empfohlene Aufteilung:
+
+**Phase 1 (v3.60): OAuth + Kalender-Auswahl**
+- Google Calendar API OAuth-Flow in Settings (Login-Button, Kalender-Liste laden, Schreib-/Lese-Kalender wählen)
+- Neuer Abschnitt "📅 Google Calendar" im SettingsPanel
+- Token-Persistierung im localStorage
+
+**Phase 2 (v3.61): Planer→Kalender Sync**
+- Lektionen als Calendar-Events erstellen (`planer-managed` Tag)
+- Sync bei Änderungen (Create/Update/Delete)
+- eventId-Mapping im plannerStore
+
+**Phase 3 (v3.62): Kalender→Planer Import**
+- Events aus Lese-Kalendern lesen
+- IW/Sonderwochen erkennen und als SpecialWeekConfig importieren
+
+**Phase 4 (v3.63): Kollisionswarnungen**
+- ⚠️ in Zellen wenn Nicht-Planer-Events auf gleichen Zeitslot fallen
+- Tooltip mit kollidierendem Event
+
+**Hinweis:** Google Calendar API benötigt ein Google Cloud Projekt mit OAuth Client ID. Die Client ID muss als Environment-Variable oder in den Settings konfigurierbar sein.
+
+**Commit pro Phase:** `v3.6X: Google Calendar Phase X — {Beschreibung}`
+---
+
+## Erledigte Aufträge
+
+### ✅ v3.53 — Klick&Drag auf gefüllte Zellen
+### ✅ v3.52 — Sonderwochen GYM-Stufen + IW-Preset
 
 ---
 

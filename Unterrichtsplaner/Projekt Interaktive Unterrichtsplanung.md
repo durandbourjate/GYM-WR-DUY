@@ -267,19 +267,183 @@ Interaktives Tool für die Unterrichtsplanung
 - Klick&Drag für neue Sequenz: Zellen hervorheben.
 - Zoom 2 vorerst weglassen (Mehrwert unklar, kompliziert Erstellung).
 
-## Umsetzungsstatus V31/V32 (v3.50–v3.51)
+## Gesamtabgleich V1–V32 gegen Umsetzungsstand (v3.53)
 
-**Erledigt:**
-- ✅ Zoom 2 entfernt
+### ✅ Umgesetzt
+
+**V1 Grundkonzept:**
+- ✅ Matrix Kurse × KW
+- ✅ Modulare Felder, gruppierbar als Sequenz
+- ✅ Farbcode nach Fachbereich
+- ✅ Ferien/Sonderwochen/Events sichtbar
+- ✅ Oberthema/Unterthema/Fachbereich pro Lektion
+- ✅ Push-Funktion (Verlauf hinausschieben)
+- ✅ LearningView-Links, Materiallinks
+- ✅ Sammlung (Wiederverwendung über Jahre)
+- ✅ Verschiedene Ansichten (Zoom 1 Jahresübersicht, Zoom 3 Wochendetail)
+- ✅ Noten-Vorgaben (MiSDV) Tracking
+- ✅ Ferien/Sonderwochen fixiert (nicht verschiebbar)
+
+**V2 Interaktion & Navigation:**
+- ✅ Doppelklick → Detail öffnen, Klick neben → schliessen
+- ✅ Cmd+Klick (einzeln), Shift+Klick (von–bis)
+- ✅ Leere Zellen anklickbar
+- ✅ Sequenz-Markierung → zum Block scrollen
+- ✅ Farbcode automatisch aus Fachbereich
+- ✅ Auswahl hervorgehoben
+- ✅ Mini-Buttons bei Klick (+, Pfeil, Details)
+- ✅ Hover-Preview (800ms)
+- ✅ Spalten gleich breit
+
+**V3 Farbcode:** ✅ VWL orange, BWL blau, Recht grün, IN grau
+
+**V4 Auswahl & Blocktypen:**
+- ✅ Block-Typ/Untertyp System
+- ✅ Externe Verlinkung (Material)
+- ✅ Mehrere Kacheln → zu Sequenz zusammenfügen
+- ✅ Abwählen mit Esc/Klick ins Leere
+- ✅ Eigene Labels
+
+**V5 Kategorien & Dauer:**
+- ✅ Doppelklick leeres Feld → Menü
+- ✅ Einfacher Klick → abwählen
+- ✅ Block-Typ/Kategorie System
+- ✅ Dauer: 45min/90min/Andere
+
+**V6 Einstellungsmenü & SOL:**
+- ✅ Shift+Klick nur im selben Kurs
+- ✅ SOL-Verknüpfung (Kurs-Checkbox + Details)
+- ✅ Einstellungsmenü (Kurse, Sonderwochen, Ferien, Fächer)
+- ✅ Leerer Planer ohne Import möglich
+- ✅ Bei Mehrfachauswahl: Ferien überspringen
+
+**V7 Sequenzansicht & Drag:**
+- ✅ Klick+Hold+Drag → auswählen (v3.53: auch gefüllte Zellen)
+- ✅ Sequenzansicht mit Klick→Details, KW→Kachel
+- ✅ Materiallinks in Detailansicht
+- ✅ Lektionen-Auflistung in Sequenz-Detail
+
+**V8 Sequenz/Block-Konzept:**
+- ✅ Flache Block-Auflistung (FlatBlockCard)
+- ✅ Gefiltert nach Klasse/Fachbereich
+- ✅ Aufklappbare Felder/Lektionen
+- ✅ Sticky Titelzeilen
+
+**V9 Kontrast, Batch & Reihen:**
+- ✅ Kontrast verbessert, vergangene Wochen dimm-bar
+- ✅ Shift-Klick über Semesterwechsel
+- ✅ Batch-Bearbeitung (Fachbereich, Kategorie, Dauer, SOL)
+- ✅ Reihen-Konzept (mehrere Sequenzen zusammen)
+- ✅ Sequenz-Bar Farbcode nach Fach
+- ✅ Legende
+
+**V10 Sammlung & Notizen:**
+- ✅ UE zu Sequenz hinzufügen (neue/bestehende)
+- ✅ Materialsammlung (Tab "Sammlung")
+- ✅ Feiertage tracken und blockieren
+- ✅ Aufklappbare Notizen-Spalte pro Kurs
+- ✅ Tabs Felder/Lektionen visuell hervorgehoben
+- ✅ Reihen-Zusammenfassung
+
+**V11 Direktbearbeitung:**
+- ✅ Hover → Thema/Notizen (HoverPreview)
+- ✅ Doppelklick leere Zelle → Menü
+- ✅ Klick auf Sequenzbalken → Bearbeitungsmenü
+- ✅ Sequenz-Tag → zur Sequenz springen
+
+**V12 Zoom & Drag:**
+- ✅ Click+Drag leere Felder → Sequenz erstellen
+- ✅ Click+Drag auch auf gefüllte Zellen (v3.53)
+- ✅ ⓘ-Symbol entfernt
+- ✅ Einstellungen in Kopfzeile/SidePanel
+- ✅ Export/Import in Einstellungen
+
+**V13 Hover-Preview & Zoom 2:**
+- ✅ Hover-Preview auch am Bildschirmrand (smarte Positionierung)
+- ✅ SOL Total bei Sequenzen (Σ-Badge)
+- ✅ Zoom 1 als Jahresansicht mit Fachfarben
+
+**V14 Auto-Save:** ✅ Automatisch speichern, Panel schliesst bei Abwahl
+
+**V15 Zellauswahl:** ✅ Leere Zellen klickbar + Drag-Auswahl
+
+**V16 Batch:** ✅ Batch-Buttons zeigen aktiven Wert (farbliche Hervorhebung)
+
+**V17 Klick+Drag & Toggle:**
+- ✅ Auto-Save
+- ✅ Toggle vergangene Wochen (◐-Button)
+- ✅ Shift-Klick Mehrtageskurse: Popup
+- ✅ Aktive Sequenz oben, Felder/Lektionen ausgeklappt
+
+**V18 Ferien/Sonderwochen-Darstellung:**
+- ✅ Ferien als durchgehende rowSpan-Blöcke
+- ✅ Studienreisen/Sonderwochen als Events
+- ✅ Sequenz-Linie in Fachfarbe
+- ✅ Lehrplanziel weniger prominent
+- ✅ Ferien nicht in Sequenz-Lektionsliste
+- ✅ Material vereinfacht (1 Feld)
+- ✅ Felder/Lektionen default ausgeklappt
+
+**V19 Zoom 2 Fixes:** ✅ (Zoom 2 wurde in v3.50 entfernt, Themen erledigt oder obsolet)
+
+**V20 Mehrfachauswahl & Events:**
+- ✅ Esc löscht Suchfeld
+- ✅ Shift-Klick nur im selben Kurs
+- ✅ Ferien/Sonderwochen/Events differenziert
+- ✅ Events mit Unterricht: Kacheln über Event-Hintergrund
+
+**V21 Menü & Batch:**
+- ✅ Toolbar-Tabs bei geöffnetem Panel
+- ✅ Mehrfachauswahl → Batch → neue Sequenz / zu bestehender
+
+**V22 Multi-Planer:**
+- ✅ Mehrere Planer (Tabs)
+- ✅ Template bei Planer-Erstellung (Kurse von bestehendem kopieren)
+- ✅ Klick auf Sequenz-Linie → richtige Sequenz öffnen
+
+**V30 Neuer Planer:**
+- ✅ Leerer Planer Start (Empty State UI)
+- ✅ Schuljahr-Presets mit Ferien-Automatik
+- ✅ Sequenz-Name = Oberthema
+
+**V31 Einstellungen & Details:**
+- ✅ SOL-Checkbox, 45min/90min/Andere
+- ✅ Sonderwochen pro GYM-Stufe (v3.52: gymLevel + IW-Preset)
+- ✅ Ferien Tagesauswahl
 - ✅ Settings Auto-Save
-- ✅ Kurs: SOL-Checkbox, grössere Zeit-Inputs, 45min/90min/Andere
-- ✅ Ferien: Tagesauswahl für partielle Wochen
+- ✅ UE-Details auf Sequenz übertragen
 - ✅ Sequenz-Name = Oberthema (auto-sync)
-- ✅ UE-Name: Unterthema als Fallback in Lektionsliste
-- ✅ "Auf Sequenz anwenden"-Button im DetailPanel
+- ✅ UE-Name: Unterthema als Default
 
-**Offen:**
-- Sonderwochen hierarchisch pro GYM-Stufe (IW-Konzept)
-- "Aus Sammlung laden" bei Hinzufügen
-- Kurs exportieren/speichern/archivieren
-- Klick&Drag für Mehrfachauswahl/Sequenz-Erstellung
+**V32 Vereinfachung:**
+- ✅ Klick&Drag Zellen hervorheben (v3.53)
+- ✅ Zoom 2 entfernt
+
+### 🟡 Teilweise umgesetzt
+
+| Wunsch | Version | Status | Fehlend |
+|--------|---------|--------|---------|
+| Halbklassen-Badge (rotes P bei Prüfungen) | V20 | 🟡 | Badge-System existiert nicht. Kacheln zeigen nur Farbcode + Text. |
+| Spaltenbreite anpassbar (2× normal für Details) | V13 | 🟡 | Notizen-Spalte ist resizable, aber Kurs-Spalten selbst nicht. |
+| Kursfilter bei Doppelklick auf Klassenname | V2 | 🟡 | Suchfeld existiert, aber kein Doppelklick-Filter auf Spaltentitel. |
+| Drag&Drop Verschieben von Lektionen | V2 | 🟡 | Drag wählt aus, verschiebt aber nicht. Push-Funktion als Workaround. |
+
+### 🔴 Offen (noch nicht umgesetzt)
+
+| Wunsch | Version | Beschreibung |
+|--------|---------|-------------|
+| **"Aus Sammlung laden"** | V31 | Bei Hinzufügen (Kurse, Sonderwochen, Ferien) auf Sammlung zurückgreifen. Verknüpfung Settings ↔ CollectionPanel. |
+| **Kurs exportieren/speichern/archivieren** | V31 | Button zum Exportieren/Importieren einzelner Kurs-Konfigurationen. |
+| **Google Calendar Integration** | V13/V16 | Planer→Kalender Sync, Kalender→Planer Import, Kollisionswarnungen. Konzept in HANDOFF.md dokumentiert. |
+| **Warnung bei 1L↔2L Rhythmisierung** | V9 | Warnung wenn Verschiebung die 1L-2L-Abfolge stört. |
+| **Automatischer Lehrplanbezug** | V2 | Lehrplanziele aus Thema/Fachbereich vorschlagen. |
+| **Lokale Dateien verlinken** | V1 | Kalendereinträge, Mails, lokale Materialien direkt verlinken (Weblinks funktionieren, lokale Pfade nicht). |
+| **Interaktion mit Unterrichtsadministration** | V1 | Verknüpfung mit anderen Arbeitsprozessen. |
+
+### ❌ Bewusst verworfen/obsolet
+
+| Wunsch | Grund |
+|--------|-------|
+| Taxonomiestufen K1-K6 bei Lektionen (V2) | V4: "nicht nötig, in LearningView abgedeckt" |
+| Zoom 2 Semesteransicht (V8/V12) | V32: "Mehrwert unklar, kompliziert Erstellung" → entfernt in v3.50 |
+| Excel-Import (V22) | Entfernt in v3.24 (zu fehleranfällig, Settings-UI ersetzt) |
