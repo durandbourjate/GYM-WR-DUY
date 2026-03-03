@@ -1,8 +1,8 @@
 # Unterrichtsplaner – Handoff v3.71
 
-## Status: ✅ Deployed (v3.71)
-- **Commit:** d96365e
-- **Datum:** 2026-03-02
+## Status: ✅ Deployed (v3.72)
+- **Commit:** 8cad5d3
+- **Datum:** 2026-03-03
 - **Deploy:** https://durandbourjate.github.io/GYM-WR-DUY/Unterrichtsplaner/
 
 ## Erledigte Aufträge (v3.54–v3.63)
