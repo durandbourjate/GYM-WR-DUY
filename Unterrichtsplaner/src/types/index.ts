@@ -130,7 +130,8 @@ export interface CellBadge {
 }
 
 // === Materialsammlung (Collection) ===
-export type CollectionItemType = 'unit' | 'sequence' | 'schoolyear' | 'curriculum' | 'settings';
+export type CollectionItemType = 'unit' | 'sequence' | 'schoolyear' | 'curriculum' | 'settings'
+  | 'fachbereiche' | 'kurse' | 'sonderwochen' | 'ferien' | 'lehrplanziele' | 'beurteilungsregeln'; // v3.77 #9 rubric types
 
 /** A single archived teaching unit (1 block + lesson details) */
 export interface CollectionUnit {

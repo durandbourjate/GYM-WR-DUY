@@ -369,9 +369,6 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
   // Multi-day shift-click popup
   const [multiDayPrompt, setMultiDayPrompt] = useState<{ weekW: string; courseId: string; position: { x: number; y: number } } | null>(null);
 
-  // Delayed single-click to allow double-click detection (v3.76 #2)
-  const clickTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
   // Long-hold drag-move state (v3.58)
   const [dragMoveSource, setDragMoveSource] = useState<{ week: string; col: number } | null>(null);
   const [dragMoveTarget, setDragMoveTarget] = useState<{ week: string; col: number } | null>(null);
@@ -671,12 +668,7 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
       setSidePanelOpen(true);
       setSidePanelTab('details'); // BatchOrDetailsTab auto-switches when multiSelection > 1
     } else if (!dragMoved.current && dragSelectedWeeks.length === 1 && dragSelectCourse) {
-      // Single cell clicked (no drag): check if all cells are empty → show context menu
-      const entry = displayWeeks.find(w => w.w === dragSelectedWeeks[0]);
-      const lesson = entry?.lessons[dragSelectCourse.col];
-      if (!lesson?.title) {
-        setEmptyCellMenu({ week: dragSelectedWeeks[0], course: dragSelectCourse });
-      }
+      // Single cell clicked (no drag): selection handled by onClick, menu by onDoubleClick (v3.77 #1)
     }
     // Reset dragMoved after a short delay so onClick can still check it
     setTimeout(() => { dragMoved.current = false; }, 50);
@@ -772,8 +764,8 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
               </div>
               {isCurrent && <div className="w-1 h-1 rounded-full bg-blue-400 mx-auto mt-0.5 animate-pulse" />}
               {eventInfo && (
-                <div className="text-[6px] text-amber-500/70 leading-tight mt-0.5 max-w-[44px] truncate" title={eventInfo.label}>
-                  📅 {eventInfo.label.length > 6 ? eventInfo.label.slice(0, 6) + '…' : eventInfo.label}
+                <div className="text-[6px] text-amber-500/80 leading-tight mt-0.5 max-w-[48px] truncate font-medium" title={eventInfo.label}>
+                  📅 {eventInfo.label}
                 </div>
               )}
             </td>
@@ -920,33 +912,24 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                       // Clear drag selection when clicking filled cell
                       setDragSelectedWeeks([]); setDragSelectCol(null); setDragSelectCourse(null);
                     } else {
-                      // Click on empty cell: delay to allow double-click detection (v3.76 #2)
-                      if (clickTimerRef.current) { clearTimeout(clickTimerRef.current); clickTimerRef.current = null; }
-                      clickTimerRef.current = setTimeout(() => {
-                        clickTimerRef.current = null;
-                        clearMultiSelect();
-                        setSelection({ week: week.w, courseId: c.id, title: '', course: c });
-                        setEmptyCellMenu(null);
-                        setDragSelectedWeeks([]); setDragSelectCol(null); setDragSelectCourse(null);
-                        usePlannerStore.getState().setEditingSequenceId(null);
-                        setSidePanelOpen(false);
-                      }, 250);
+                      // Single click on empty cell: just select, no menu (v3.77 #1)
+                      clearMultiSelect();
+                      setSelection({ week: week.w, courseId: c.id, title: '', course: c });
+                      setEmptyCellMenu(null);
+                      setDragSelectedWeeks([]); setDragSelectCol(null); setDragSelectCourse(null);
+                      usePlannerStore.getState().setEditingSequenceId(null);
+                      setSidePanelOpen(false);
                     }
                   }}
                   onDoubleClick={(e) => {
-                    // Cancel pending single-click (v3.76 #2)
-                    if (clickTimerRef.current) { clearTimeout(clickTimerRef.current); clickTimerRef.current = null; }
                     if (title) {
                       handleDoubleClick(week.w, c, title);
                     } else {
-                      // Double-click on empty cell: directly create new UE and open detail panel
+                      // Double-click on empty cell: show Neue UE / Neue Sequenz menu (v3.77 #1)
                       e.stopPropagation();
-                      pushUndo();
-                      updateLesson(week.w, c.col, { title: 'Neue UE', type: 1 });
-                      usePlannerStore.getState().updateLessonDetail(week.w, c.col, { blockCategory: 'LESSON', duration: '90 min' });
-                      setSelection({ week: week.w, courseId: c.id, title: 'Neue UE', course: c });
-                      setSidePanelOpen(true);
-                      setSidePanelTab('details');
+                      const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                      setMenuPosition({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+                      setEmptyCellMenu({ week: week.w, course: c });
                     }
                   }}
                 >

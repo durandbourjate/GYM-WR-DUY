@@ -50,7 +50,7 @@ export interface GradeRequirement {
   label: string;
   deadline: string; // descriptive, e.g. "Ende Semester 1"
   minGrades: number;
-  semester: 1 | 2 | 'year';
+  semester: 1 | 2 | 'year' | 'custom';
 }
 
 /**
@@ -91,7 +91,7 @@ export function countAssessments(
   lessonDetails: Record<string, LessonDetail>,
   courseIds: string[],
   courses: Course[],
-  semesterFilter: 1 | 2 | 'year',
+  semesterFilter: 1 | 2 | 'year' | 'custom',
   s2StartIndex: number
 ): number {
   const courseCols = courseIds

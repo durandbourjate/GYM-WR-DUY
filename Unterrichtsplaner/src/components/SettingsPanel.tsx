@@ -9,7 +9,7 @@ import {
   type PlannerSettings, type CourseConfig, type SpecialWeekConfig, type HolidayConfig,
   type SubjectConfig, type SchoolLevel, type AssessmentRule,
 } from '../store/settingsStore';
-import { WR_CATEGORIES, generateColorVariants } from '../data/categories';
+import { generateColorVariants } from '../data/categories';
 import { CURRICULUM_GOALS, type CurriculumGoal } from '../data/curriculumGoals';
 import { getGymStufe } from '../utils/gradeRequirements';
 import { useInstanceStore, weekToDate } from '../store/instanceStore';
@@ -102,6 +102,169 @@ function SmallSelect<T extends string>({ value, onChange, options }: {
   );
 }
 
+// === Rubric Collection Save/Load (v3.77 #8/#9/#10) ===
+type RubricType = 'fachbereiche' | 'kurse' | 'sonderwochen' | 'ferien' | 'lehrplanziele' | 'beurteilungsregeln' | 'settings';
+const RUBRIC_LABELS: Record<RubricType, string> = {
+  fachbereiche: 'Fachbereiche', kurse: 'Kurse', sonderwochen: 'Sonderwochen',
+  ferien: 'Ferien', lehrplanziele: 'Lehrplanziele', beurteilungsregeln: 'Beurteilungsregeln', settings: 'Konfiguration',
+};
+
+/** Save-to-collection dialog: replace existing or create new (v3.77 #10) */
+function SaveToCollectionDialog({ rubricType, data, onClose }: { rubricType: RubricType; data: any; onClose: () => void }) {
+  const { collection, addCollectionItem } = usePlannerStore();
+  const label = RUBRIC_LABELS[rubricType];
+  const existing = collection.filter(item => item.type === rubricType && item.settingsSnapshot);
+  const [mode, setMode] = useState<'new' | 'replace'>(existing.length > 0 ? 'replace' : 'new');
+  const [selectedId, setSelectedId] = useState(existing[0]?.id || '');
+  const activeMeta = useInstanceStore.getState().getActive();
+  const datum = new Date().toLocaleDateString('de-CH', { day: '2-digit', month: '2-digit', year: '2-digit' });
+  const [newName, setNewName] = useState(`${label} ${activeMeta?.name || 'Planer'} ${datum}`);
+
+  const handleSave = () => {
+    const snapshot = JSON.stringify(data);
+    if (mode === 'replace' && selectedId) {
+      const item = existing.find(e => e.id === selectedId);
+      if (item) {
+        // Update the existing collection item's snapshot
+        // We need to reach into the store directly since updateCollectionItem only updates title/tags/notes/subjectArea
+        const store = usePlannerStore.getState();
+        const updated = store.collection.map(c => c.id === selectedId ? { ...c, settingsSnapshot: snapshot, title: c.title } : c);
+        usePlannerStore.setState({ collection: updated });
+      }
+    } else {
+      addCollectionItem({ type: rubricType as any, title: newName.trim() || `${label} ${datum}`, units: [], settingsSnapshot: snapshot });
+    }
+    onClose();
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center" onClick={onClose}>
+      <div className="bg-slate-800 border border-slate-600 rounded-lg p-4 w-80 shadow-xl" onClick={(e) => e.stopPropagation()}>
+        <div className="text-[11px] font-bold text-gray-200 mb-3">📥 {label} in Sammlung speichern</div>
+        <div className="space-y-2">
+          {existing.length > 0 && (
+            <div className="flex gap-2 text-[9px]">
+              <label className={`flex items-center gap-1 cursor-pointer ${mode === 'replace' ? 'text-blue-300' : 'text-gray-400'}`}>
+                <input type="radio" checked={mode === 'replace'} onChange={() => setMode('replace')} className="cursor-pointer" />
+                Bestehende ersetzen
+              </label>
+              <label className={`flex items-center gap-1 cursor-pointer ${mode === 'new' ? 'text-blue-300' : 'text-gray-400'}`}>
+                <input type="radio" checked={mode === 'new'} onChange={() => setMode('new')} className="cursor-pointer" />
+                Als neue speichern
+              </label>
+            </div>
+          )}
+          {mode === 'replace' && existing.length > 0 ? (
+            <select value={selectedId} onChange={e => setSelectedId(e.target.value)}
+              className="w-full bg-slate-700 text-slate-200 border border-slate-600 rounded px-2 py-1.5 text-[10px] outline-none cursor-pointer">
+              {existing.map(item => (
+                <option key={item.id} value={item.id}>{item.title}</option>
+              ))}
+            </select>
+          ) : (
+            <input value={newName} onChange={e => setNewName(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') handleSave(); }}
+              placeholder="Name…" autoFocus
+              className="w-full bg-slate-700 text-slate-200 border border-slate-600 rounded px-2 py-1.5 text-[10px] outline-none focus:border-blue-400" />
+          )}
+        </div>
+        <div className="flex gap-1 mt-3">
+          <button onClick={handleSave} className="flex-1 py-1.5 rounded text-[9px] font-medium bg-blue-600 hover:bg-blue-500 text-white cursor-pointer">Speichern</button>
+          <button onClick={onClose} className="flex-1 py-1.5 rounded text-[9px] text-gray-400 border border-gray-700 cursor-pointer hover:text-gray-200">Abbrechen</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** Load-from-collection picker for a specific rubric type (v3.77 #9) */
+function RubricCollectionPicker({ rubricType, onLoad, onClose }: { rubricType: RubricType; onLoad: (snapshot: string) => void; onClose: () => void }) {
+  const { collection } = usePlannerStore();
+  const label = RUBRIC_LABELS[rubricType];
+  // Show both rubric-specific items AND full 'settings' items (since those contain all rubrics)
+  const items = collection.filter(item => (item.type === rubricType || item.type === 'settings') && item.settingsSnapshot);
+
+  return (
+    <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center" onClick={onClose}>
+      <div className="bg-slate-800 border border-slate-600 rounded-lg p-4 w-80 max-h-[60vh] shadow-xl flex flex-col" onClick={(e) => e.stopPropagation()}>
+        <div className="text-[11px] font-bold text-gray-200 mb-3">📚 {label} aus Sammlung laden</div>
+        {items.length === 0 ? (
+          <div className="text-[9px] text-gray-400 text-center py-4">
+            Keine gespeicherten {label} in der Sammlung.
+          </div>
+        ) : (
+          <div className="flex-1 overflow-y-auto space-y-1.5 mb-3">
+            {items.map(item => {
+              const dateStr = new Date(item.createdAt).toLocaleDateString('de-CH', { day: '2-digit', month: '2-digit', year: '2-digit' });
+              const isFullConfig = item.type === 'settings';
+              return (
+                <button key={item.id} onClick={() => onLoad(item.settingsSnapshot!)}
+                  className="w-full text-left px-3 py-2 rounded bg-slate-700/50 hover:bg-slate-700 border border-slate-600 hover:border-blue-500 cursor-pointer transition-all">
+                  <div className="text-[10px] font-semibold text-gray-200">{item.title}</div>
+                  <div className="text-[8px] text-gray-400">{isFullConfig ? '(Gesamtkonfiguration)' : label} · {dateStr}</div>
+                </button>
+              );
+            })}
+          </div>
+        )}
+        <button onClick={onClose} className="w-full py-1.5 rounded text-[9px] text-gray-400 border border-gray-700 cursor-pointer hover:text-gray-200">Abbrechen</button>
+      </div>
+    </div>
+  );
+}
+
+/** Inline buttons for rubric-level collection save/load (v3.77 #9) */
+function RubricCollectionButtons({ rubricType, getData, onLoad }: {
+  rubricType: RubricType; getData: () => any; onLoad: (data: any) => void;
+}) {
+  const [showSave, setShowSave] = useState(false);
+  const [showLoad, setShowLoad] = useState(false);
+
+  const handleLoad = (snapshot: string) => {
+    try {
+      const parsed = JSON.parse(snapshot);
+      // For full 'settings' items, extract just the rubric we need
+      const rubricData = extractRubricData(rubricType, parsed);
+      if (rubricData === undefined) { alert('Keine passenden Daten in dieser Konfiguration gefunden.'); return; }
+      onLoad(rubricData);
+      setShowLoad(false);
+    } catch { alert('Fehler beim Lesen der Konfiguration.'); }
+  };
+
+  return (
+    <>
+      <div className="flex gap-1">
+        <button onClick={() => setShowSave(true)}
+          className="px-1.5 py-0.5 rounded text-[8px] bg-slate-700/50 border border-slate-600 text-gray-400 hover:text-gray-200 hover:border-slate-500 cursor-pointer transition-all"
+          title={`${RUBRIC_LABELS[rubricType]} in Sammlung speichern`}>
+          📥 Speichern
+        </button>
+        <button onClick={() => setShowLoad(true)}
+          className="px-1.5 py-0.5 rounded text-[8px] bg-slate-700/50 border border-slate-600 text-gray-400 hover:text-gray-200 hover:border-slate-500 cursor-pointer transition-all"
+          title={`${RUBRIC_LABELS[rubricType]} aus Sammlung laden`}>
+          📚 Laden
+        </button>
+      </div>
+      {showSave && <SaveToCollectionDialog rubricType={rubricType} data={getData()} onClose={() => setShowSave(false)} />}
+      {showLoad && <RubricCollectionPicker rubricType={rubricType} onLoad={handleLoad} onClose={() => setShowLoad(false)} />}
+    </>
+  );
+}
+
+/** Extract rubric-specific data from a parsed settings snapshot */
+function extractRubricData(rubricType: RubricType, parsed: any): any {
+  switch (rubricType) {
+    case 'fachbereiche': return parsed.subjects ?? parsed;
+    case 'kurse': return parsed.courses ?? parsed;
+    case 'sonderwochen': return parsed.specialWeeks ?? parsed;
+    case 'ferien': return parsed.holidays ?? parsed;
+    case 'lehrplanziele': return parsed.curriculumGoals ?? parsed;
+    case 'beurteilungsregeln': return parsed.assessmentRules ?? parsed;
+    case 'settings': return parsed;
+    default: return undefined;
+  }
+}
+
 // === Subjects / Categories Editor ===
 function SubjectsEditor({ subjects, onChange }: { subjects: SubjectConfig[]; onChange: (s: SubjectConfig[]) => void }) {
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -125,21 +288,13 @@ function SubjectsEditor({ subjects, onChange }: { subjects: SubjectConfig[]; onC
     }
   };
 
-  const loadWRDefaults = () => {
-    const wrSubjects: SubjectConfig[] = WR_CATEGORIES
-      .filter(c => c.key !== 'INTERDISZ')
-      .map(c => ({ id: c.key.toLowerCase(), label: c.label, shortLabel: c.shortLabel, color: c.color, courseType: 'SF' as CourseType }));
-    onChange(wrSubjects);
-  };
-
   return (
     <div className="space-y-2">
-      <p className="text-[8px] text-gray-400">Fachbereiche definieren die Farben und Kategorien für die Unterrichtsplanung. INTERDISZ wird automatisch ergänzt.</p>
-      <button onClick={loadWRDefaults}
-        className="w-full py-1.5 rounded text-[9px] font-medium bg-blue-900/30 border border-blue-500/30 text-blue-300 hover:bg-blue-900/50 cursor-pointer transition-all"
-        title="Lädt die Standard-Fachbereiche für Wirtschaft & Recht (BWL, VWL, Recht, Informatik). Überschreibt bestehende Fachbereiche. Vorlage ist in src/data/categories.ts definiert.">
-        📋 W&R-Vorlage laden {subjects.length > 0 && '(zurücksetzen)'}
-      </button>
+      <div className="flex items-center justify-between">
+        <p className="text-[8px] text-gray-400">Fachbereiche definieren die Farben und Kategorien für die Unterrichtsplanung. INTERDISZ wird automatisch ergänzt.</p>
+        <RubricCollectionButtons rubricType="fachbereiche" getData={() => subjects}
+          onLoad={(data) => { if (Array.isArray(data) && confirm(`${data.length} Fachbereiche laden? Bestehende werden ersetzt.`)) onChange(data); }} />
+      </div>
       {subjects.map(s => (
         <div key={s.id}>
           {editingId === s.id ? (
@@ -334,20 +489,22 @@ function CourseEditor({ courses, onChange, schoolLevel, baseDuration = 45, focus
                       })}
                     </div>
                   </div>
-                  <div className="flex gap-1 items-center flex-wrap">
-                    <div>
-                      <label className="text-[8px] text-gray-400 mb-0.5 block">Beginn</label>
-                      <SmallInput value={c.from} onChange={(v) => {
-                        const autoEnd = addMinutesToTime(v, c.les * 45);
-                        updateCourse(c.id, { from: v, to: autoEnd });
-                      }} placeholder="08:05" className="w-28 text-[11px]" type="time" />
+                  <div>
+                    <div className="flex gap-1 items-start flex-wrap">
+                      <div>
+                        <label className="text-[8px] text-gray-400 mb-0.5 block">Beginn</label>
+                        <SmallInput value={c.from} onChange={(v) => {
+                          const autoEnd = addMinutesToTime(v, c.les * 45);
+                          updateCourse(c.id, { from: v, to: autoEnd });
+                        }} placeholder="08:05" className="w-28 text-[11px]" type="time" />
+                      </div>
+                      <span className="text-[10px] text-gray-400 mt-4">–</span>
+                      <div>
+                        <label className="text-[8px] text-gray-400 mb-0.5 block">Ende <span className="text-gray-500">(auto)</span></label>
+                        <SmallInput value={c.to} onChange={(v) => updateCourse(c.id, { to: v })} placeholder="08:50" className="w-28 text-[11px]" type="time" />
+                      </div>
                     </div>
-                    <span className="text-[10px] text-gray-400 mt-4">–</span>
-                    <div>
-                      <label className="text-[8px] text-gray-400 mb-0.5 block">Ende <span className="text-gray-500">(auto)</span></label>
-                      <SmallInput value={c.to} onChange={(v) => updateCourse(c.id, { to: v })} placeholder="08:50" className="w-28 text-[11px]" type="time" />
-                      {c.les > 1 && <p className="text-[6px] text-yellow-600 mt-0.5" title="Pausen zwischen Lektionen werden nicht automatisch berücksichtigt. Endzeit ggf. manuell anpassen.">⚠ ohne Pausen</p>}
-                    </div>
+                    {c.les > 1 && <p className="text-[6px] text-yellow-600 mt-0.5" title="Pausen zwischen Lektionen werden nicht automatisch berücksichtigt. Endzeit ggf. manuell anpassen.">⚠ ohne Pausen</p>}
                   </div>
                   <div>
                     <label className="text-[8px] text-gray-400 mb-0.5 block">Dauer</label>
@@ -800,7 +957,7 @@ const DEFAULT_GYM_RULES: AssessmentRule[] = [
   { label: 'Jahreszeugnis', deadline: 'Ende Schuljahr', minGrades: 3, semester: 'year' },
 ];
 
-function AssessmentRulesEditor({ rules, onChange }: {
+function AssessmentRulesEditor({ rules, onChange, schoolLevel }: {
   rules: AssessmentRule[];
   onChange: (r: AssessmentRule[]) => void;
   schoolLevel?: SchoolLevel;
@@ -817,6 +974,41 @@ function AssessmentRulesEditor({ rules, onChange }: {
     onChange(rules.filter((_, i) => i !== idx));
   };
 
+  // Stufe options from school level (v3.77 #11)
+  const stufeOptions = useMemo(() => {
+    const opts: { key: string; label: string }[] = [{ key: '', label: 'Alle Stufen' }];
+    if (schoolLevel && STUFE_OPTIONS[schoolLevel]) {
+      opts.push(...STUFE_OPTIONS[schoolLevel]);
+    } else {
+      // Default GYM levels
+      opts.push(
+        { key: 'GYM1', label: 'GYM1' }, { key: 'GYM2', label: 'GYM2' },
+        { key: 'GYM3', label: 'GYM3' }, { key: 'GYM4', label: 'GYM4' },
+        { key: 'GYM5', label: 'GYM5' },
+      );
+    }
+    return opts;
+  }, [schoolLevel]);
+
+  // Import rules from JSON (v3.77 #11)
+  const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const data = JSON.parse(reader.result as string);
+        const imported: AssessmentRule[] = Array.isArray(data) ? data : data.assessmentRules || data.rules || [];
+        if (imported.length === 0) { alert('Keine gültigen Regeln gefunden.'); return; }
+        if (confirm(`${imported.length} Beurteilungsregeln importieren?`)) {
+          onChange([...rules, ...imported]);
+        }
+      } catch { alert('Datei konnte nicht gelesen werden.'); }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  };
+
   return (
     <div className="space-y-1.5">
       <p className="text-[8px] text-gray-400">
@@ -828,16 +1020,54 @@ function AssessmentRulesEditor({ rules, onChange }: {
         <div key={i} className="bg-slate-800 rounded p-2 space-y-1">
           <div className="flex gap-1 items-center">
             <SmallInput value={r.label} onChange={(v) => update(i, { label: v })} placeholder="Bezeichnung" className="flex-1" />
-            <SmallInput value={r.deadline} onChange={(v) => update(i, { deadline: v })}
-              placeholder={r.semester === 'year' ? 'Ende SJ' : `Ende Sem ${r.semester}`} className="w-32" />
             <button onClick={() => remove(i)} className="text-[8px] text-red-400 cursor-pointer">✕</button>
           </div>
           <div className="flex gap-1.5 items-center flex-wrap">
-            <span className="text-[7px] text-gray-400">Min. Noten:</span>
-            <SmallInput value={String(r.minGrades)} onChange={(v) => update(i, { minGrades: parseInt(v) || 1 })} className="w-12 text-center" type="number" />
-            <SmallSelect value={String(r.semester)} onChange={(v) => update(i, { semester: v === 'year' ? 'year' : parseInt(v) as 1 | 2 })}
-              options={[{ key: '1', label: 'Sem 1' }, { key: '2', label: 'Sem 2' }, { key: 'year', label: 'Ganz SJ' }]} />
-            <SmallInput value={r.stufe || ''} onChange={(v) => update(i, { stufe: v || undefined })} placeholder="Stufe (opt.)" className="w-20" />
+            <span className="text-[7px] text-gray-400">Zeitraum:</span>
+            <SmallSelect value={String(r.semester)} onChange={(v) => {
+              const sem = v === 'year' ? 'year' : v === 'custom' ? 'custom' : parseInt(v) as 1 | 2;
+              const deadlineAuto = sem === 1 ? 'Ende Semester 1' : sem === 2 ? 'Ende Semester 2' : sem === 'year' ? 'Ende Schuljahr' : r.deadline;
+              update(i, { semester: sem, deadline: sem !== 'custom' ? deadlineAuto : r.deadline });
+            }}
+              options={[
+                { key: '1', label: 'Sem 1' }, { key: '2', label: 'Sem 2' },
+                { key: 'year', label: 'Ganz SJ' }, { key: 'custom', label: 'Andere…' },
+              ]} />
+            {r.semester === 'custom' ? (
+              <input type="date" value={r.customDate || ''}
+                onChange={(e) => update(i, { customDate: e.target.value, deadline: e.target.value })}
+                className="bg-slate-700 text-slate-200 border border-slate-600 rounded px-1.5 py-0.5 text-[9px] outline-none focus:border-blue-400 cursor-pointer" />
+            ) : (
+              <SmallInput value={r.deadline} onChange={(v) => update(i, { deadline: v })}
+                placeholder={r.semester === 'year' ? 'Ende SJ' : `Ende Sem ${r.semester}`} className="w-28" />
+            )}
+          </div>
+          <div className="flex gap-1.5 items-center flex-wrap">
+            <span className="text-[7px] text-gray-400">Stufe:</span>
+            <select value={r.stufe || ''} onChange={(e) => update(i, { stufe: e.target.value || undefined })}
+              className="bg-slate-700 text-slate-200 border border-slate-600 rounded px-1 py-0.5 text-[9px] outline-none focus:border-blue-400 cursor-pointer">
+              {stufeOptions.map(o => <option key={o.key} value={o.key}>{o.label}</option>)}
+            </select>
+            <span className="text-[7px] text-gray-400 ml-1">Min. Noten:</span>
+            <SmallInput value={String(r.minGrades)} onChange={(v) => update(i, { minGrades: parseInt(v) || 1 })} className="w-10 text-center" type="number" />
+          </div>
+          {/* Lektionenzahl-abhängige Regeln (v3.77 #11) */}
+          <div className="flex gap-1.5 items-center flex-wrap">
+            <span className="text-[7px] text-gray-400">Bei &gt;</span>
+            <SmallInput value={r.weeklyLessonsThreshold != null ? String(r.weeklyLessonsThreshold) : ''} onChange={(v) => {
+              const n = parseInt(v);
+              update(i, { weeklyLessonsThreshold: isNaN(n) ? undefined : n });
+            }} placeholder="L/W" className="w-10 text-center" type="number" />
+            <span className="text-[7px] text-gray-400">L/Woche → Min. Noten:</span>
+            <SmallInput value={r.minGradesAboveThreshold != null ? String(r.minGradesAboveThreshold) : ''} onChange={(v) => {
+              const n = parseInt(v);
+              update(i, { minGradesAboveThreshold: isNaN(n) ? undefined : n });
+            }} placeholder="—" className="w-10 text-center" type="number" />
+            {r.weeklyLessonsThreshold != null && r.minGradesAboveThreshold != null && (
+              <span className="text-[7px] text-gray-500">
+                (≤{r.weeklyLessonsThreshold}L → {r.minGrades}, &gt;{r.weeklyLessonsThreshold}L → {r.minGradesAboveThreshold})
+              </span>
+            )}
           </div>
         </div>
       ))}
@@ -852,51 +1082,17 @@ function AssessmentRulesEditor({ rules, onChange }: {
             📋 GYM-Standard laden
           </button>
         )}
+        <label className="py-1 px-2 rounded border border-slate-600 text-gray-400 hover:text-gray-300 text-[9px] cursor-pointer hover:border-slate-500"
+          title="Beurteilungsregeln aus JSON importieren">
+          📥 Import
+          <input type="file" accept=".json" className="hidden" onChange={handleImport} />
+        </label>
       </div>
     </div>
   );
 }
 
-// === Settings Collection Picker Modal ===
-function SettingsCollectionPicker({ onLoad, onClose }: { onLoad: (snapshot: string) => void; onClose: () => void }) {
-  const { collection } = usePlannerStore();
-  const settingsItems = collection.filter(item => item.type === 'settings' && item.settingsSnapshot);
-
-  return (
-    <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center" onClick={onClose}>
-      <div className="bg-slate-800 border border-slate-600 rounded-lg p-4 w-80 max-h-[60vh] shadow-xl flex flex-col" onClick={(e) => e.stopPropagation()}>
-        <div className="text-[11px] font-bold text-gray-200 mb-3">📚 Konfiguration aus Sammlung laden</div>
-        {settingsItems.length === 0 ? (
-          <div className="text-[9px] text-gray-400 text-center py-4">
-            Keine gespeicherten Konfigurationen in der Sammlung.
-          </div>
-        ) : (
-          <div className="flex-1 overflow-y-auto space-y-1.5 mb-3">
-            {settingsItems.map(item => {
-              let summary = '';
-              try {
-                const s = JSON.parse(item.settingsSnapshot!);
-                summary = `${s.courses?.length || 0} Kurse, ${s.holidays?.length || 0} Ferien, ${s.specialWeeks?.length || 0} Sonderwochen`;
-              } catch { summary = 'Fehler'; }
-              const dateStr = new Date(item.createdAt).toLocaleDateString('de-CH', { day: '2-digit', month: '2-digit', year: '2-digit' });
-              return (
-                <button key={item.id} onClick={() => onLoad(item.settingsSnapshot!)}
-                  className="w-full text-left px-3 py-2 rounded bg-slate-700/50 hover:bg-slate-700 border border-slate-600 hover:border-blue-500 cursor-pointer transition-all">
-                  <div className="text-[10px] font-semibold text-gray-200">{item.title}</div>
-                  <div className="text-[8px] text-gray-400">{summary} · {dateStr}</div>
-                </button>
-              );
-            })}
-          </div>
-        )}
-        <button onClick={onClose}
-          className="w-full py-1.5 rounded text-[9px] text-gray-400 border border-gray-700 cursor-pointer hover:text-gray-200">
-          Abbrechen
-        </button>
-      </div>
-    </div>
-  );
-}
+// (SettingsCollectionPicker removed in v3.77 #9 — replaced by RubricCollectionPicker)
 
 // === Google Calendar Section (v3.60) ===
 function GCalSection() {
@@ -1403,39 +1599,6 @@ export function SettingsPanel() {
   }, [doSave]);
 
   const hasCustomSettings = storeSettings !== null || loadSettings() !== null;
-  const [showCollectionPicker, setShowCollectionPicker] = useState(false);
-
-  // Save current settings to collection
-  const saveToCollection = useCallback(() => {
-    const activeMeta = useInstanceStore.getState().getActive();
-    const planerName = activeMeta?.name || 'Planer';
-    const datum = new Date().toLocaleDateString('de-CH', { day: '2-digit', month: '2-digit', year: '2-digit' });
-    const store = usePlannerStore.getState();
-    store.addCollectionItem({
-      type: 'settings',
-      title: `Konfiguration ${planerName} ${datum}`,
-      units: [],
-      settingsSnapshot: JSON.stringify(settings),
-    });
-    alert('Konfiguration in Sammlung gespeichert.');
-  }, [settings]);
-
-  // Load settings from a collection item
-  const loadFromCollection = useCallback((snapshot: string) => {
-    try {
-      const imported = JSON.parse(snapshot);
-      if (!Array.isArray(imported.courses) || !Array.isArray(imported.holidays) || !Array.isArray(imported.specialWeeks)) {
-        alert('Ungültige Konfiguration in der Sammlung.');
-        return;
-      }
-      if (!confirm(`Bestehende Einstellungen werden überschrieben (${imported.courses.length} Kurse, ${imported.holidays.length} Ferienperioden, ${imported.specialWeeks.length} Sonderwochen). Fortfahren?`)) {
-        return;
-      }
-      setSettings(imported as PlannerSettings);
-      doSave(imported as PlannerSettings);
-      setShowCollectionPicker(false);
-    } catch { alert('Fehler beim Lesen der Konfiguration.'); }
-  }, [doSave]);
 
   return (
     <div className="flex-1 overflow-y-auto p-3 pb-12 space-y-3">
@@ -1505,22 +1668,30 @@ export function SettingsPanel() {
 
       {/* Courses */}
       <Section title={`📚 Kurse / Stundenplan (${settings.courses.length})`}>
+        <RubricCollectionButtons rubricType="kurse" getData={() => settings.courses}
+          onLoad={(data) => { if (Array.isArray(data) && confirm(`${data.length} Kurse laden? Bestehende werden ersetzt.`)) updateSettings({ courses: data }); }} />
         <CourseEditor courses={settings.courses} onChange={(c) => updateSettings({ courses: c })} schoolLevel={settings.schoolLevel} baseDuration={settings.school?.lessonDurationMin || 45} focusCourseId={settingsEditCourseId} subjects={settings.subjects || []} />
       </Section>
 
       {/* Special Weeks */}
       <Section title={`📅 Sonderwochen (${settings.specialWeeks.length})`}>
+        <RubricCollectionButtons rubricType="sonderwochen" getData={() => settings.specialWeeks}
+          onLoad={(data) => { if (Array.isArray(data) && confirm(`${data.length} Sonderwochen laden? Bestehende werden ersetzt.`)) updateSettings({ specialWeeks: data }); }} />
         <SpecialWeeksEditor weeks={settings.specialWeeks} courses={settings.courses} onChange={(w) => updateSettings({ specialWeeks: w })} />
       </Section>
 
       {/* Holidays */}
       <Section title={`🏖 Ferien (${settings.holidays.length})`}>
+        <RubricCollectionButtons rubricType="ferien" getData={() => settings.holidays}
+          onLoad={(data) => { if (Array.isArray(data) && confirm(`${data.length} Ferienperioden laden? Bestehende werden ersetzt.`)) updateSettings({ holidays: data }); }} />
         <HolidaysEditor holidays={settings.holidays} onChange={(h) => updateSettings({ holidays: h })} />
       </Section>
 
       {/* Curriculum Goals */}
       <Section title={`🎯 Lehrplanziele (${settings.curriculumGoals?.length || ((!settings.schoolLevel || settings.schoolLevel === 'Sek2') ? CURRICULUM_GOALS.length : 0)})`}>
         <div className="space-y-2">
+          <RubricCollectionButtons rubricType="lehrplanziele" getData={() => settings.curriculumGoals || CURRICULUM_GOALS}
+            onLoad={(data) => { if (Array.isArray(data) && confirm(`${data.length} Lehrplanziele laden? Bestehende werden ersetzt.`)) updateSettings({ curriculumGoals: data }); }} />
           <p className="text-[8px] text-gray-400">
             {settings.curriculumGoals?.length
               ? `${settings.curriculumGoals.length} eigene Lehrplanziele konfiguriert.`
@@ -1575,6 +1746,8 @@ export function SettingsPanel() {
 
       {/* Assessment Rules */}
       <Section title={`📝 Beurteilungsregeln (${settings.assessmentRules?.length || 0})`}>
+        <RubricCollectionButtons rubricType="beurteilungsregeln" getData={() => settings.assessmentRules || []}
+          onLoad={(data) => { if (Array.isArray(data) && confirm(`${data.length} Beurteilungsregeln laden? Bestehende werden ersetzt.`)) updateSettings({ assessmentRules: data }); }} />
         <AssessmentRulesEditor
           rules={settings.assessmentRules || []}
           onChange={(r) => updateSettings({ assessmentRules: r.length > 0 ? r : undefined as any })}
@@ -1680,25 +1853,23 @@ export function SettingsPanel() {
         </div>
       </Section>
 
-      {/* Collection save/load */}
-      <Section title="📚 Sammlung">
+      {/* Collection save/load (v3.77 #10: replace or new dialog) */}
+      <Section title="📚 Sammlung (Gesamtkonfiguration)">
         <div className="space-y-2">
-          <p className="text-[8px] text-gray-400">Konfigurationen (Kurse, Ferien, Sonderwochen) in der Sammlung sichern oder aus einer gespeicherten Konfiguration laden.</p>
-          <div className="flex gap-1">
-            <button onClick={saveToCollection}
-              className="flex-1 py-1.5 rounded text-[9px] font-medium bg-slate-700 hover:bg-slate-600 text-gray-200 cursor-pointer transition-all">
-              📥 In Sammlung speichern
-            </button>
-            <button onClick={() => setShowCollectionPicker(true)}
-              className="flex-1 py-1.5 rounded text-[9px] font-medium bg-slate-700 hover:bg-slate-600 text-gray-200 cursor-pointer transition-all">
-              📚 Aus Sammlung laden
-            </button>
-          </div>
+          <p className="text-[8px] text-gray-400">Gesamte Konfiguration (Kurse, Ferien, Sonderwochen, Fachbereiche, Regeln) in der Sammlung sichern oder laden. Einzelne Rubriken können oben separat gespeichert werden.</p>
+          <RubricCollectionButtons rubricType="settings" getData={() => settings}
+            onLoad={(data) => {
+              if (!data || typeof data !== 'object') { alert('Ungültige Konfiguration.'); return; }
+              if (!Array.isArray(data.courses) || !Array.isArray(data.holidays) || !Array.isArray(data.specialWeeks)) {
+                alert('Ungültige Konfiguration in der Sammlung.');
+                return;
+              }
+              if (!confirm(`Bestehende Einstellungen werden überschrieben (${data.courses.length} Kurse, ${data.holidays.length} Ferien, ${data.specialWeeks.length} Sonderwochen). Fortfahren?`)) return;
+              setSettings(data as PlannerSettings);
+              doSave(data as PlannerSettings);
+            }} />
         </div>
       </Section>
-
-      {/* Collection picker modal */}
-      {showCollectionPicker && <SettingsCollectionPicker onLoad={loadFromCollection} onClose={() => setShowCollectionPicker(false)} />}
 
       {/* Google Calendar */}
       <GCalSection />

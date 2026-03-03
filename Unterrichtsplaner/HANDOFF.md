@@ -1,8 +1,25 @@
-# Unterrichtsplaner – Handoff v3.76
+# Unterrichtsplaner – Handoff v3.77
 
-## Status: ✅ Built & Deployed (v3.76)
+## Status: ✅ Built (v3.77)
 - **Datum:** 2026-03-03
 - **Deploy:** https://durandbourjate.github.io/GYM-WR-DUY/Unterrichtsplaner/
+
+## Erledigte Aufträge (v3.77 — Auftrag v3.77, 13 Tasks)
+
+| # | Typ | Beschreibung | Status |
+|---|-----|-------------|--------|
+| 1 | Bug | Linksklick öffnet Modal nicht mehr kurz (nur Doppelklick zeigt EmptyCellMenu) | ✅ |
+| 2 | Bug | ESC schliesst Kontextmenü bei Mehrfachauswahl | ✅ |
+| 3 | Bug | Wiki-Button entfernt (vermied Duplikat-Tab), Hilfe über ?-Button | ✅ |
+| 4+13 | Bug+Feature | Ferien/Sonderwochen werden im Planer korrekt angezeigt (colIdx-Fix in applySettingsToWeekData) | ✅ |
+| 5 | UX | Toolbar in 5 logische Gruppen reorganisiert (Add, Filter, Suche, Navigation, Einstellungen) | ✅ |
+| 6 | UX | "Seq"-Button entfernt, +-Button mit Dropdown (Neue Sequenz / Neue UE) | ✅ |
+| 7 | UX | Import-Button aus Tab-Leiste entfernt (nur noch in Einstellungen) | ✅ |
+| 8 | UX | W&R-Vorlage-Button entfernt, ersetzt durch Sammlung-Speichern/Laden für Fachbereiche | ✅ |
+| 9 | Feature | Einzelne Rubriken separat in Sammlung speichern/laden (Fachbereiche, Kurse, Ferien, Sonderwochen, Lehrplanziele, Beurteilungsregeln) | ✅ |
+| 10 | Feature | Sammlung-Speichern: Dialog "Bestehende ersetzen" oder "Als neue speichern" | ✅ |
+| 11 | Feature | Beurteilungsregeln erweitert: Stufe-Dropdown, "Andere…"-Semester mit Datepicker, Lektionenzahl-Schwellenwerte, JSON-Import | ✅ |
+| 12 | UX | Zeit-Eingabefelder (Beginn/Ende) auf gleicher Höhe, Pause-Warnung in eigener Zeile | ✅ |
 
 ## Erledigte Aufträge (v3.54–v3.63)
 
@@ -112,7 +129,7 @@
 
 - **Stack:** React + TypeScript + Vite + Zustand + PWA
 - **Build & Deploy:** GitHub Actions (`.github/workflows/deploy.yml`) baut und deployed automatisch bei Push auf `main`. `dist/` ist in .gitignore — Build-Artefakte werden NICHT committet. Für lokale Entwicklung: `npm run dev` (nutzt `src/index.dev.html` als Vite-Entry). `deploy.sh` ist nur für lokale Tests.
-- **Wiki:** `wiki.html` (Standalone-HTML, kein Build nötig). Erreichbar über 📖-Button in der Toolbar.
+- **Wiki:** `wiki.html` (Standalone-HTML, kein Build nötig). Nicht mehr direkt verlinkt (v3.77 #3).
 - **Store:** `plannerStore.ts` (~1260 Z.), `settingsStore.ts` (~323 Z.), `instanceStore.ts` (~204 Z.)
 - **Hook:** `usePlannerData.ts` — liest Kurse/Wochen reaktiv aus `plannerStore.plannerSettings` (pro Instanz) → Fallback auf globale Settings → Fallback auf hardcoded WEEKS/COURSES. Gibt `isLegacy`-Flag zurück.
 - **Multi-Planer:** `instanceStore.ts` verwaltet Planer-Instanzen (Tabs). Jeder Planer hat eigenen localStorage-Slot (`planner-data-{id}`) inkl. `plannerSettings`. `plannerStore.ts` speichert/lädt Daten pro Instanz via `switchInstance()`.
@@ -167,3 +184,4 @@
 - v3.74: Auftrag v3.74 — 12 neue Tasks #21–#32 (Sync-Bug, Sequenz-UX, Mehrjahresübersicht generisch, Assessment-UI, Import-Hints)
 - v3.75: Auftrag v3.75 — 4 Tasks (Fachbereiche dynamisch, Sequenz-Sichtbarkeit, Drag-Interpolation, HANDOFF)
 - v3.76: Auftrag v3.76 — 10 Tasks (Bug-Fixes & UX: Doppelklick, Ferien, Sonderwoche, Sequenz, Scrolling, Kurstyp, Vorlage, Deadline, Badge)
+- v3.77: Auftrag v3.77 — 13 Tasks (Bugs: Klick/ESC/Wiki/Ferien; UX: Toolbar-Reorg, Sammlung-Rubrik, Zeit-Alignment; Features: Rubrik-Collection, Replace/New-Dialog, Assessment-Erweiterung)

@@ -33,11 +33,13 @@ export const STUFE_OPTIONS: Record<SchoolLevel, { key: string; label: string }[]
 
 export interface AssessmentRule {
   label: string;           // e.g. "Standortbestimmung (Nov)"
-  deadline: string;        // descriptive, e.g. "Ende Semester 1"
+  deadline: string;        // descriptive, e.g. "Ende Semester 1" or "2026-03-15"
   minGrades: number;       // minimum number of assessments
-  semester: 1 | 2 | 'year'; // when this rule applies
+  semester: 1 | 2 | 'year' | 'custom'; // when this rule applies
   stufe?: string;          // which GYM level, e.g. 'GYM1' — undefined = all
   weeklyLessonsThreshold?: number; // only apply if weekly lessons > threshold
+  minGradesAboveThreshold?: number; // min grades when weekly lessons > threshold (v3.77 #11)
+  customDate?: string;     // ISO date for 'custom' semester (v3.77 #11)
 }
 
 export interface PlannerSettings {
@@ -247,7 +249,13 @@ export function applySettingsToWeekData(
   settings: PlannerSettings
 ): { weekData: import('../types').Week[]; holidayWeeks: number; specialWeeks: number } {
   const result = weekData.map(w => ({ ...w, lessons: { ...w.lessons } }));
+  // Build col set from settings courses (same col numbering as configToCourses) (v3.77 #4)
   const allCols = new Set<number>();
+  let colIdx = 100;
+  for (const _c of settings.courses) {
+    allCols.add(colIdx++);
+  }
+  // Also include any existing cols from weekData (legacy planners)
   for (const w of result) {
     for (const col of Object.keys(w.lessons).map(Number)) {
       allCols.add(col);

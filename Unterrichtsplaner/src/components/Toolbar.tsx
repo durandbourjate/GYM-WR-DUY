@@ -8,9 +8,11 @@ import { checkGradeRequirements } from '../utils/gradeRequirements';
 import type { FilterType } from '../types';
 
 export function AppHeader() {
-  const { filter, setFilter, classFilter, setClassFilter, showHelp, toggleHelp, undoStack, undo, setSequencePanelOpen, sidePanelOpen, setSidePanelOpen, setSidePanelTab, zoomLevel, setZoomLevel, searchQuery, setSearchQuery, dimPastWeeks, setDimPastWeeks } = usePlannerStore();
+  const { filter, setFilter, classFilter, setClassFilter, showHelp, toggleHelp, undoStack, undo, setSequencePanelOpen, setSidePanelOpen, setSidePanelTab, zoomLevel, setZoomLevel, searchQuery, setSearchQuery, dimPastWeeks, setDimPastWeeks } = usePlannerStore();
   const [showStats, setShowStats] = useState(false);
   const [showTaF, setShowTaF] = useState(false);
+  const [showAddMenu, setShowAddMenu] = useState(false);
+  const addMenuRef = useRef<HTMLDivElement>(null);
   const { courses: plannerCourses } = usePlannerData();
 
   // Dynamic course type filters from configured courses
@@ -30,29 +32,62 @@ export function AppHeader() {
   }, [weekData, lessonDetails, plannerCourses, s2StartIndex, plannerSettings?.assessmentRules]);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
+  // Close add menu on click outside (v3.77 #6)
+  useEffect(() => {
+    if (!showAddMenu) return;
+    const handler = (e: MouseEvent) => {
+      if (addMenuRef.current && !addMenuRef.current.contains(e.target as Node)) setShowAddMenu(false);
+    };
+    const keyHandler = (e: KeyboardEvent) => { if (e.key === 'Escape') setShowAddMenu(false); };
+    document.addEventListener('mousedown', handler);
+    document.addEventListener('keydown', keyHandler);
+    return () => { document.removeEventListener('mousedown', handler); document.removeEventListener('keydown', keyHandler); };
+  }, [showAddMenu]);
+
   return (
     <div className="bg-gray-900 border-b border-gray-800 px-4 py-2 sticky top-0 z-[60] flex items-center justify-between flex-wrap gap-2 no-print">
       <div className="flex items-baseline gap-2">
         <span className="text-base font-bold text-gray-50">
           <span className="text-blue-400">⊞</span> Unterrichtsplaner
         </span>
-        <span className="text-[10px] text-gray-500">SJ 25/26 · DUY · v3.76</span>
+        <span className="text-[10px] text-gray-500">v3.77</span>
       </div>
       <div className="flex gap-1 items-center">
-        {/* Quick-add sequence button */}
-        <button
-          onClick={() => {
-            setSidePanelOpen(true);
-            setSidePanelTab('sequences');
-            setSequencePanelOpen(true);
-          }}
-          className="px-1.5 py-0.5 rounded text-[10px] font-semibold border border-dashed border-green-700 text-green-500 cursor-pointer hover:bg-green-900/20 hover:text-green-300 transition-colors"
-          title="Neue Sequenz erstellen"
-        >
-          +
-        </button>
+        {/* === Group 1: Add === */}
+        <div className="relative" ref={addMenuRef}>
+          <button
+            onClick={() => setShowAddMenu(!showAddMenu)}
+            className="px-1.5 py-0.5 rounded text-[10px] font-semibold border border-dashed border-green-700 text-green-500 cursor-pointer hover:bg-green-900/20 hover:text-green-300 transition-colors"
+            title="Neue Sequenz oder UE erstellen"
+          >
+            +
+          </button>
+          {showAddMenu && (
+            <div className="absolute top-full left-0 mt-1 bg-slate-800 border border-slate-600 rounded-lg shadow-xl py-1 w-44 z-[70]">
+              <button onClick={() => {
+                setSidePanelOpen(true);
+                setSidePanelTab('sequences');
+                setSequencePanelOpen(true);
+                setShowAddMenu(false);
+              }}
+                className="w-full px-3 py-1.5 text-left text-[10px] text-gray-200 hover:bg-slate-700 cursor-pointer flex items-center gap-2">
+                <span className="text-green-400">▧</span> Neue Sequenz
+              </button>
+              <button onClick={() => {
+                // Open details panel for creating a new UE (user selects cell first)
+                setSidePanelOpen(true);
+                setSidePanelTab('details');
+                setShowAddMenu(false);
+              }}
+                className="w-full px-3 py-1.5 text-left text-[10px] text-gray-200 hover:bg-slate-700 cursor-pointer flex items-center gap-2">
+                <span className="text-blue-400">📖</span> Neue UE
+              </button>
+            </div>
+          )}
+        </div>
         <span className="w-px h-4 bg-gray-700 mx-0.5" />
-        {/* Dynamic course type filters */}
+
+        {/* === Group 2: Filters === */}
         <button
           onClick={() => setFilter('ALL')}
           className={`px-2 py-0.5 rounded text-[10px] font-semibold border cursor-pointer transition-colors ${
@@ -78,7 +113,6 @@ export function AppHeader() {
             {typ}
           </button>
         ))}
-        {/* TaF toggle */}
         <button
           onClick={() => setShowTaF(true)}
           className="px-2 py-0.5 rounded text-[10px] font-semibold border border-gray-700 text-gray-500 cursor-pointer hover:text-purple-300 hover:border-purple-700 transition-colors"
@@ -95,7 +129,10 @@ export function AppHeader() {
             {classFilter} ✕
           </button>
         )}
-        {/* Search */}
+        {showTaF && <TaFPanel onClose={() => setShowTaF(false)} />}
+        <span className="w-px h-4 bg-gray-700 mx-0.5" />
+
+        {/* === Group 3: Search === */}
         <div className="relative">
           <input
             ref={searchInputRef}
@@ -113,8 +150,9 @@ export function AppHeader() {
             >✕</button>
           )}
         </div>
-        {showTaF && <TaFPanel onClose={() => setShowTaF(false)} />}
         <span className="w-px h-4 bg-gray-700 mx-1" />
+
+        {/* === Group 4: Navigation & View === */}
         {undoStack.length > 0 && (
           <button
             onClick={undo}
@@ -134,21 +172,6 @@ export function AppHeader() {
         >
           ◉
         </button>
-        <button
-          onClick={() => setShowStats(true)}
-          className="px-2 py-0.5 rounded text-[10px] border border-gray-700 text-gray-500 cursor-pointer hover:text-gray-300 hover:border-gray-500 relative"
-          title="Statistik"
-        >
-          📊
-          {gradeIssueCount > 0 && (
-            <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-red-500 rounded-full text-[7px] font-bold text-white flex items-center justify-center">
-              {gradeIssueCount}
-            </span>
-          )}
-        </button>
-        {showStats && <StatsPanel onClose={() => setShowStats(false)} />}
-        <span className="w-px h-4 bg-gray-700 mx-1" />
-        {/* Zoom Level */}
         <div className="flex items-center border border-gray-700 rounded overflow-hidden">
           {([1, 3] as const).map((z, i) => (
             <button
@@ -173,27 +196,21 @@ export function AppHeader() {
           {dimPastWeeks ? '◐' : '●'}
         </button>
         <span className="w-px h-4 bg-gray-700 mx-1" />
+
+        {/* === Group 5: Stats & Settings === */}
         <button
-          onClick={() => {
-            const isSeqOpen = sidePanelOpen && usePlannerStore.getState().sidePanelTab === 'sequences';
-            if (isSeqOpen) {
-              setSidePanelOpen(false);
-              setSequencePanelOpen(false);
-            } else {
-              setSidePanelOpen(true);
-              setSidePanelTab('sequences');
-              setSequencePanelOpen(true);
-            }
-          }}
-          className={`px-2 py-0.5 rounded text-[10px] border cursor-pointer ${
-            sidePanelOpen && usePlannerStore.getState().sidePanelTab === 'sequences'
-              ? 'bg-green-900 border-green-600 text-green-300'
-              : 'border-gray-700 text-gray-500 hover:border-green-700 hover:text-green-400'
-          }`}
-          title="Sequenzen verwalten"
+          onClick={() => setShowStats(true)}
+          className="px-2 py-0.5 rounded text-[10px] border border-gray-700 text-gray-500 cursor-pointer hover:text-gray-300 hover:border-gray-500 relative"
+          title="Statistik"
         >
-          ▧ Seq
+          📊
+          {gradeIssueCount > 0 && (
+            <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-red-500 rounded-full text-[7px] font-bold text-white flex items-center justify-center">
+              {gradeIssueCount}
+            </span>
+          )}
         </button>
+        {showStats && <StatsPanel onClose={() => setShowStats(false)} />}
         <button
           onClick={() => {
             setSidePanelOpen(true);
@@ -209,19 +226,10 @@ export function AppHeader() {
           className={`px-2 py-0.5 rounded text-[10px] border cursor-pointer ${
             showHelp ? 'bg-slate-800 border-gray-600 text-gray-300' : 'border-gray-700 text-gray-500'
           }`}
-          title="Kurzanleitung"
+          title="Kurzanleitung & Tastenkürzel"
         >
           ?
         </button>
-        <a
-          href="wiki.html"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="px-2 py-0.5 rounded text-[10px] border border-gray-700 text-gray-500 cursor-pointer hover:text-cyan-300 hover:border-cyan-700 no-underline"
-          title="Ausführliche Anleitung (Wiki)"
-        >
-          📖
-        </a>
       </div>
     </div>
   );
@@ -301,6 +309,16 @@ export function MultiSelectToolbar() {
   }, [multiSelection]);
 
   useLayoutEffect(() => { computePosition(); }, [computePosition]);
+
+  // ESC to close (v3.77 #2)
+  useEffect(() => {
+    if (multiSelection.length === 0) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') clearMultiSelect();
+    };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, [multiSelection, clearMultiSelect]);
 
   // Re-position on scroll
   useEffect(() => {

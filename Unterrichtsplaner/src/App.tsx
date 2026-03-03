@@ -1,4 +1,4 @@
-import { useRef, useEffect, useMemo, useCallback } from 'react';
+import { useRef, useEffect, useMemo } from 'react';
 import { usePlannerStore, switchInstance, saveToInstance } from './store/plannerStore';
 import { useInstanceStore } from './store/instanceStore';
 import { usePlannerData } from './hooks/usePlannerData';
@@ -12,7 +12,7 @@ import { ZoomMultiYearView } from './components/ZoomMultiYearView';
 import { PlannerTabs, WelcomeScreen } from './components/PlannerTabs';
 
 function App() {
-  const { instances, activeId, setActive, importInstance } = useInstanceStore();
+  const { instances, activeId, setActive } = useInstanceStore();
   const prevActiveId = useRef<string | null>(null);
 
   // Handle instance switching
@@ -35,10 +35,6 @@ function App() {
     };
   }, [activeId]);
 
-  const handleImport = useCallback((json: string) => {
-    importInstance(json);
-  }, [importInstance]);
-
   // No instances yet → Welcome screen
   if (instances.length === 0) {
     return (
@@ -56,7 +52,7 @@ function App() {
 
   return (
     <div className="bg-[#0c0f1a] text-slate-200 min-h-screen font-sans" data-app-root>
-      <PlannerTabs onImport={handleImport} />
+      <PlannerTabs />
       <PlannerContent />
     </div>
   );

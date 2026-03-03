@@ -1,18 +1,14 @@
 /**
  * PlannerTabs — Tab bar for switching between planner instances
  */
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { useInstanceStore, instanceStorageKey, generateWeekIds } from '../store/instanceStore';
 import { saveToInstance } from '../store/plannerStore';
 import { SCHOOL_YEAR_PRESETS, getPresetForYear } from '../data/holidayPresets';
 import { generateId, configToCourses, type HolidayConfig, type PlannerSettings, getDefaultSettings, applySettingsToWeekData } from '../store/settingsStore';
 import type { LessonType } from '../types';
 
-interface Props {
-  onImport: (json: string) => void;
-}
-
-export function PlannerTabs({ onImport }: Props) {
+export function PlannerTabs() {
   const { instances, activeId, setActive, createInstance, deleteInstance, renameInstance, exportInstance } = useInstanceStore();
   const [showNew, setShowNew] = useState(false);
   const [newName, setNewName] = useState('');
@@ -22,7 +18,6 @@ export function PlannerTabs({ onImport }: Props) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
   const [contextMenu, setContextMenu] = useState<{ id: string; x: number; y: number } | null>(null);
-  const importRef = useRef<HTMLInputElement>(null);
 
   // Auto-detect best preset based on current date
   const defaultPresetId = (() => {
@@ -139,23 +134,6 @@ export function PlannerTabs({ onImport }: Props) {
     a.click();
     URL.revokeObjectURL(url);
     setContextMenu(null);
-  };
-
-  const handleImportClick = () => {
-    importRef.current?.click();
-  };
-
-  const handleImportFile = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result === 'string') {
-        onImport(reader.result);
-      }
-    };
-    reader.readAsText(file);
-    e.target.value = '';
   };
 
   const handleContextMenu = (e: React.MouseEvent, id: string) => {
@@ -279,21 +257,7 @@ export function PlannerTabs({ onImport }: Props) {
           </button>
         )}
 
-        {/* Import button */}
-        <button
-          className="ml-auto px-2 py-1.5 text-slate-500 hover:text-white text-xs"
-          onClick={handleImportClick}
-          title="Planer aus JSON importieren"
-        >
-          📥 Import
-        </button>
-        <input
-          ref={importRef}
-          type="file"
-          accept=".json"
-          className="hidden"
-          onChange={handleImportFile}
-        />
+        {/* Import moved to Settings panel (v3.77 #7) */}
       </div>
 
       {/* Context menu */}

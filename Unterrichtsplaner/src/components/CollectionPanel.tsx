@@ -10,6 +10,12 @@ const TYPE_LABELS: Record<CollectionItemType, { label: string; icon: string }> =
   schoolyear: { label: 'Schuljahr', icon: '📅' },
   curriculum: { label: 'Bildungsgang', icon: '🎓' },
   settings: { label: 'Konfiguration', icon: '⚙️' },
+  fachbereiche: { label: 'Fachbereiche', icon: '🎨' },
+  kurse: { label: 'Kurse', icon: '📚' },
+  sonderwochen: { label: 'Sonderwochen', icon: '📅' },
+  ferien: { label: 'Ferien', icon: '🏖' },
+  lehrplanziele: { label: 'Lehrplanziele', icon: '🎯' },
+  beurteilungsregeln: { label: 'Beurteilungsregeln', icon: '📝' },
 };
 
 
