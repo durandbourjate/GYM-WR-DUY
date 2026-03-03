@@ -10,6 +10,13 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+
+# Build artifacts (GitHub Actions builds fresh)
+assets/
+sw.js
+registerSW.js
+manifest.webmanifest
+workbox-*.js
 *.local
 
 # Editor directories and files
