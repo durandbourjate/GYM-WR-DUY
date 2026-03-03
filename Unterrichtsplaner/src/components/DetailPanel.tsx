@@ -120,14 +120,17 @@ function getSubtypeLabel(category: BlockCategory, subtype: string, long = true):
 // Export for use in WeekRows etc.
 export { CATEGORIES, getSubtypesForCategory, getEffectiveCategorySubtype, getCategoryLabel, getSubtypeLabel };
 
-// === Duration presets ===
-const DURATION_PRESETS = [
-  { key: '45 min', label: '45 min' },
-  { key: '90 min', label: '90 min' },
-  { key: '135 min', label: '135 min' },
-  { key: 'Halbtag', label: 'Halbtag' },
-  { key: 'Ganztag', label: 'Ganztag' },
-];
+// === Duration presets (dynamic based on standard lesson duration) ===
+function getDurationPresets(baseDuration: number = 45): { key: string; label: string }[] {
+  const d = baseDuration || 45;
+  return [
+    { key: `${d} min`, label: `${d} min` },
+    { key: `${d * 2} min`, label: `${d * 2} min` },
+    { key: `${d * 3} min`, label: `${d * 3} min` },
+    { key: 'Halbtag', label: 'Halbtag' },
+    { key: 'Ganztag', label: 'Ganztag' },
+  ];
+}
 
 // === Components ===
 
@@ -278,15 +281,16 @@ function CategorySubtypeSelector({
   );
 }
 
-function DurationSelector({ value, onChange }: { value?: string; onChange: (v: string | undefined) => void }) {
+function DurationSelector({ value, onChange, baseDuration = 45 }: { value?: string; onChange: (v: string | undefined) => void; baseDuration?: number }) {
+  const presets = useMemo(() => getDurationPresets(baseDuration), [baseDuration]);
   const [customMode, setCustomMode] = useState(false);
   const [customValue, setCustomValue] = useState('');
-  const isPreset = value && DURATION_PRESETS.some(p => p.key === value);
+  const isPreset = value && presets.some(p => p.key === value);
   const isCustom = value && !isPreset;
 
   return (
     <div className="flex flex-wrap gap-1 items-center">
-      {DURATION_PRESETS.map((preset) => (
+      {presets.map((preset) => (
         <button key={preset.key}
           onClick={() => onChange(value === preset.key ? undefined : preset.key)}
           className={`px-1.5 py-0.5 rounded text-[9px] font-medium border cursor-pointer transition-all ${
@@ -537,6 +541,46 @@ function BadgeEditor({ badges, onChange }: { badges: import('../types').CellBadg
   );
 }
 
+/** Button to create a new UE in the next available empty cell */
+function NewUEButton() {
+  const { weekData, pushUndo, updateLesson, updateLessonDetail, setSelection, setSidePanelOpen, setSidePanelTab } = usePlannerStore();
+  const { courses } = usePlannerData();
+
+  const handleCreate = () => {
+    if (courses.length === 0 || weekData.length === 0) return;
+    // Find first empty cell across all courses and weeks
+    for (const week of weekData) {
+      for (const course of courses) {
+        const entry = week.lessons[course.col];
+        if (!entry || (!entry.title && entry.type === 0)) {
+          pushUndo();
+          updateLesson(week.w, course.col, { title: 'Neue UE', type: 1 });
+          updateLessonDetail(week.w, course.col, { blockCategory: 'LESSON', duration: '90 min' });
+          setSelection({ week: week.w, courseId: course.id, title: 'Neue UE', course });
+          setSidePanelOpen(true);
+          setSidePanelTab('details');
+          // Scroll the grid row into view
+          setTimeout(() => {
+            const row = document.querySelector(`tr[data-week="${week.w}"]`);
+            if (row) row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }, 100);
+          return;
+        }
+      }
+    }
+  };
+
+  return (
+    <button
+      onClick={handleCreate}
+      className="px-3 py-1.5 rounded text-[10px] text-green-400 border border-dashed border-green-700 cursor-pointer hover:bg-green-900/20 hover:text-green-300"
+      title="Neue Unterrichtseinheit in nächster freier Zelle erstellen"
+    >
+      + Neue UE
+    </button>
+  );
+}
+
 function DetailsTab() {
   const {
     selection,
@@ -544,7 +588,7 @@ function DetailsTab() {
     weekData, sequences,
     collection, addCollectionItem, pushUndo,
   } = usePlannerStore();
-  const { categories, effectiveGoals } = usePlannerData();
+  const { categories, effectiveGoals, settings } = usePlannerData();
   const [showCollectionPicker, setShowCollectionPicker] = useState(false);
   const [savedMsg, setSavedMsg] = useState<string | null>(null);
 
@@ -668,8 +712,9 @@ function DetailsTab() {
 
   if (!selection || !c) {
     return (
-      <div className="flex-1 flex items-center justify-center text-[10px] text-gray-400 p-4">
-        Wähle eine Lektion aus, um Details zu bearbeiten.
+      <div className="flex-1 flex flex-col items-center justify-center text-[10px] text-gray-400 p-4 gap-3">
+        <span>Wähle eine Unterrichtseinheit aus, um Details zu bearbeiten.</span>
+        <NewUEButton />
       </div>
     );
   }
@@ -801,7 +846,7 @@ function DetailsTab() {
         />
         <div>
           <label className="text-[9px] text-gray-400 font-medium mb-1 block">Dauer</label>
-          <DurationSelector value={detail.duration} onChange={(v) => updateField('duration', v)} />
+          <DurationSelector value={detail.duration} onChange={(v) => updateField('duration', v)} baseDuration={settings?.school?.lessonDurationMin} />
         </div>
         <div>
           <label className="text-[9px] text-gray-400 font-medium mb-1 block">SOL (Selbstorganisiertes Lernen)</label>
@@ -972,7 +1017,7 @@ function BatchOrDetailsTab() {
 // Batch editing for multiple selected cells
 function BatchEditTab() {
   const { multiSelection, updateLessonDetail, pushUndo, lessonDetails, sequences, addSequence, updateBlockInSequence, setEditingSequenceId, setSidePanelTab } = usePlannerStore();
-  const { courses: COURSES, categories } = usePlannerData();
+  const { courses: COURSES, categories, settings } = usePlannerData();
   const [applied, setApplied] = useState<string | null>(null);
   const [showSeqMenu, setShowSeqMenu] = useState(false);
   const seqMenuRef = useRef<HTMLDivElement>(null);
@@ -1125,7 +1170,7 @@ function BatchEditTab() {
       <div className="space-y-1">
         <label className="text-[9px] text-gray-400 font-medium">Dauer setzen {currentValues.mixedDur && <span className="text-amber-400">(gemischt)</span>}</label>
         <div className="flex gap-1 flex-wrap">
-          {DURATION_PRESETS.map(preset => {
+          {getDurationPresets(settings?.school?.lessonDurationMin).map(preset => {
             const isActive = currentValues.duration === preset.key;
             return (
               <button key={preset.key} onClick={() => applyToAll('duration', preset.key)}

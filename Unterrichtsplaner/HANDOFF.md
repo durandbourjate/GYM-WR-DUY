@@ -1,7 +1,6 @@
-# Unterrichtsplaner – Handoff v3.71
+# Unterrichtsplaner – Handoff v3.73
 
-## Status: ✅ Deployed (v3.72)
-- **Commit:** 8cad5d3
+## Status: ✅ Built (v3.73)
 - **Datum:** 2026-03-03
 - **Deploy:** https://durandbourjate.github.io/GYM-WR-DUY/Unterrichtsplaner/
 
@@ -16,6 +15,31 @@
 | v3.58 | Drag&Drop Verschieben | ✅ |
 | v3.59 | Doppelklick Kursfilter | ✅ |
 | v3.60–63 | Google Calendar Integration (4 Phasen) | ✅ |
+
+## Erledigte Aufträge (v3.73 — Auftrag v3.73, 20 Tasks)
+
+| # | Batch | Beschreibung | Status |
+|---|-------|-------------|--------|
+| 4 | 1-Bug | Leere Statistik crash fix (keine Kurse) | ✅ |
+| 6 | 1-Bug | Phantom-Ferien nach Settings-Änderung | ✅ |
+| 13 | 1-Bug | Cursor-Bug: pointer auf Klick-Elemente | ✅ |
+| 12 | 1-Bug | Benennung: "Batch"→"Sequenz" durchgängig | ✅ |
+| 1 | 2-Settings | Schulstufe wählbar (Grundstufe–Hochschule) | ✅ |
+| 2 | 2-Settings | Lektionendauer konfigurierbar (45/50 min) | ✅ |
+| 3 | 2-Settings | GYM-Stufe pro Kurs in Settings | ✅ |
+| 5 | 2-Settings | Fachbereiche: leerer Default, +Vorlage-Button | ✅ |
+| 11 | 3-UX | Doppelklick öffnet direkt Detail-Panel | ✅ |
+| 14 | 3-UX | Klick auf Klassenname → Settings mit Kurs | ✅ |
+| 15 | 3-UX | "Neue UE"-Button im Side-Panel | ✅ |
+| 16 | 3-UX | "+"-Button vor "Alle" für neue Sequenz | ✅ |
+| 17 | 3-UX | Legende zeigt nur aktive Kategorien | ✅ |
+| 8 | 4-Sonderw | Sonderwochen: Doppelklick=Edit, Rechtsklick=Entfernen | ✅ |
+| 9 | 4-Sonderw | "Ausgenommen"→"Nicht betroffen" mit Tooltip | ✅ |
+| 10 | 4-Sonderw | Hofwil-Preset entfernt (generisch) | ✅ |
+| 7 | 4-Import | Ferien-Import: CSV + JSON Format | ✅ |
+| 20 | 5-Feature | Beurteilungsregeln konfigurierbar (Settings) | ✅ |
+| 18 | 5-Feature | Lehrplanziele-Text nach Schulstufe | ✅ |
+| 19 | 5-Feature | GCal OAuth: besseres Error Handling (403, 404, Netzwerk) | ✅ |
 
 ## Erledigte Aufträge (v3.64–v3.70, UX-Feedback Runde 2)
 
@@ -48,10 +72,10 @@
 - **Stack:** React + TypeScript + Vite + Zustand + PWA
 - **Build & Deploy:** `./deploy.sh` baut die App und kopiert Build-Output (assets/, index.html, sw.js etc.) in den Repo-Root. GitHub Pages serviert direkt aus `main`. `dist/` ist in .gitignore — nur die kopierten Dateien werden committet. Für lokale Entwicklung: `npm run dev` (nutzt `src/index.dev.html` als Vite-Entry).
 - **Wiki:** `wiki.html` (Standalone-HTML, kein Build nötig). Erreichbar über 📖-Button in der Toolbar.
-- **Store:** `plannerStore.ts` (~1247 Z.), `settingsStore.ts` (~256 Z.), `instanceStore.ts` (~204 Z.)
+- **Store:** `plannerStore.ts` (~1260 Z.), `settingsStore.ts` (~323 Z.), `instanceStore.ts` (~204 Z.)
 - **Hook:** `usePlannerData.ts` — liest Kurse/Wochen reaktiv aus `plannerStore.plannerSettings` (pro Instanz) → Fallback auf globale Settings → Fallback auf hardcoded WEEKS/COURSES. Gibt `isLegacy`-Flag zurück.
 - **Multi-Planer:** `instanceStore.ts` verwaltet Planer-Instanzen (Tabs). Jeder Planer hat eigenen localStorage-Slot (`planner-data-{id}`) inkl. `plannerSettings`. `plannerStore.ts` speichert/lädt Daten pro Instanz via `switchInstance()`.
-- **Hauptkomponenten:** WeekRows (~1021 Z.), SequencePanel (~708 Z.), DetailPanel (~1320 Z.), ZoomYearView (~569 Z.), Toolbar (~354 Z.), SettingsPanel (~1427 Z.), CollectionPanel (~295 Z.), PlannerTabs (~263 Z.)
+- **Hauptkomponenten:** WeekRows (~1200 Z.), SequencePanel (~708 Z.), DetailPanel (~1370 Z.), ZoomYearView (~569 Z.), Toolbar (~460 Z.), SettingsPanel (~1550 Z.), CollectionPanel (~295 Z.), PlannerTabs (~263 Z.)
 
 ### Architektur-Details
 
@@ -98,3 +122,4 @@
 - v3.69: Sammlung im Detail-Tab — Speichern/Laden einzelner UE
 - v3.70: Sequenz-Felder — Erklärtexte und Feld-Hierarchie
 - v3.71: Wiki-Anleitung (wiki.html), Build-Pipeline (deploy.sh, dist/ ignoriert), 📖-Button in Toolbar
+- v3.73: Auftrag v3.73 — 20 Tasks in 5 Batches (Bugs, Settings, UX, Sonderwochen, Features)

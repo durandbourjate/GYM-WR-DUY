@@ -22,12 +22,12 @@ export function AppHeader() {
 
   // Grade warnings badge
   const { weekData, lessonDetails } = usePlannerStore();
-  const { s2StartIndex } = usePlannerData();
+  const { s2StartIndex, settings: plannerSettings } = usePlannerData();
   const gradeIssueCount = useMemo(() => {
     if (!weekData.length || !plannerCourses.length) return 0;
-    return checkGradeRequirements(weekData, lessonDetails, plannerCourses, s2StartIndex)
+    return checkGradeRequirements(weekData, lessonDetails, plannerCourses, s2StartIndex, plannerSettings?.assessmentRules)
       .filter(w => w.status !== 'ok').length;
-  }, [weekData, lessonDetails, plannerCourses, s2StartIndex]);
+  }, [weekData, lessonDetails, plannerCourses, s2StartIndex, plannerSettings?.assessmentRules]);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   return (
@@ -39,6 +39,19 @@ export function AppHeader() {
         <span className="text-[10px] text-gray-500">SJ 25/26 · DUY · v3.72</span>
       </div>
       <div className="flex gap-1 items-center">
+        {/* Quick-add sequence button */}
+        <button
+          onClick={() => {
+            setSidePanelOpen(true);
+            setSidePanelTab('sequences');
+            setSequencePanelOpen(true);
+          }}
+          className="px-1.5 py-0.5 rounded text-[10px] font-semibold border border-dashed border-green-700 text-green-500 cursor-pointer hover:bg-green-900/20 hover:text-green-300 transition-colors"
+          title="Neue Sequenz erstellen"
+        >
+          +
+        </button>
+        <span className="w-px h-4 bg-gray-700 mx-0.5" />
         {/* Dynamic course type filters */}
         <button
           onClick={() => setFilter('ALL')}
@@ -230,7 +243,7 @@ export function HelpBar() {
       <b>⌘F</b> = Suche ·{' '}
       <b>⌘P</b> = Drucken ·{' '}
       <b>↑↓</b> = Nächste Woche ·{' '}
-      <b>Leere Zelle</b> = Neue Kachel/Sequenz
+      <b>Leere Zelle</b> = Neue UE/Sequenz
       <br />
       <b>Zoom:</b> <b>1</b> = Semester-Übersicht · <b>2</b> = Block-Ansicht · <b>3</b> = Wochen-Ansicht
       <br />
@@ -409,7 +422,22 @@ export function MultiSelectToolbar() {
 }
 
 export function Legend() {
-  const { categories } = usePlannerData();
+  const { categories, courses: plannerCourses, settings } = usePlannerData();
+
+  // Filter categories to only show those linked to active course types
+  const activeCategories = useMemo(() => {
+    const activeCourseTypes = new Set(plannerCourses.map(c => c.typ));
+    if (!settings?.subjects?.length) return categories; // No subjects configured → show all
+    const subjectCourseTypes = new Map<string, string>();
+    for (const s of settings.subjects) {
+      subjectCourseTypes.set(s.id.toUpperCase(), s.courseType);
+    }
+    return categories.filter(cat => {
+      const ct = subjectCourseTypes.get(cat.key);
+      return !ct || activeCourseTypes.has(ct as any);
+    });
+  }, [categories, plannerCourses, settings]);
+
   const fixedItems: [string, string][] = [
     ['Prüfung', '#fee2e2'],
     ['Event', '#e5e7eb'],
@@ -417,7 +445,7 @@ export function Legend() {
   ];
   return (
     <div className="px-4 py-1 flex gap-2.5 flex-wrap text-[8px] text-gray-400 border-b border-slate-900/60">
-      {categories.map(cat => (
+      {activeCategories.map(cat => (
         <span key={cat.key} className="flex items-center gap-0.5">
           <span className="w-2 h-2 rounded-sm border border-black/10" style={{ background: cat.bg }} />
           {cat.label}

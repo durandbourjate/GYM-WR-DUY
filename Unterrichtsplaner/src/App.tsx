@@ -72,7 +72,9 @@ function PlannerContent() {
   useEffect(() => {
     if (weekData.length === 0) {
       let initial = hookWeeks.map((w) => ({ ...w, lessons: { ...w.lessons } }));
-      const settings = plannerSettings ?? loadSettings();
+      // Only use per-instance settings for holidays (never fall back to global
+      // settings for NEW planners — global settings may contain legacy holiday data)
+      const settings = plannerSettings ?? (isLegacy ? loadSettings() : null);
       if (settings && (settings.holidays.length > 0 || settings.specialWeeks.length > 0)) {
         const applied = applySettingsToWeekData(initial, settings);
         initial = applied.weekData;

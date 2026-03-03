@@ -7,26 +7,30 @@ import {
   applySettingsToWeekData,
   STUFE_OPTIONS,
   type PlannerSettings, type CourseConfig, type SpecialWeekConfig, type HolidayConfig,
-  type SubjectConfig, type SchoolLevel,
+  type SubjectConfig, type SchoolLevel, type AssessmentRule,
 } from '../store/settingsStore';
 import { WR_CATEGORIES, generateColorVariants } from '../data/categories';
 import { CURRICULUM_GOALS, type CurriculumGoal } from '../data/curriculumGoals';
 import { getGymStufe } from '../utils/gradeRequirements';
-import { IW_PRESET_2526 } from '../data/iwPresets';
 import { useInstanceStore, weekToDate } from '../store/instanceStore';
 import { useGCalStore } from '../store/gcalStore';
 import { loginWithGoogle, logout as gcalLogout, fetchCalendarList, syncPlannerToCalendar, buildWeekYearMap, scanCalendarsForSpecialWeeks, checkCollisions, type SyncProgress, type ImportCandidate } from '../services/gcal';
 
 // === Duration helper for courses ===
-const COURSE_DURATION_PRESETS = [
-  { min: 45, label: '45 min' },
-  { min: 90, label: '90 min' },
-  { min: 135, label: '135 min' },
-];
+/** Build duration presets as multiples of the standard lesson duration */
+function getDurationPresets(baseDuration: number): { min: number; label: string }[] {
+  const d = baseDuration || 45;
+  return [
+    { min: d, label: `${d} min` },
+    { min: d * 2, label: `${d * 2} min` },
+    { min: d * 3, label: `${d * 3} min` },
+  ];
+}
 
-function durationToLes(min: number): 1 | 2 | 3 {
-  if (min <= 50) return 1;
-  if (min <= 100) return 2;
+function durationToLes(min: number, baseDuration: number = 45): 1 | 2 | 3 {
+  const d = baseDuration || 45;
+  if (min <= d * 1.1) return 1;
+  if (min <= d * 2.1) return 2;
   return 3;
 }
 
@@ -64,8 +68,15 @@ function Section({ title, children, defaultOpen = false }: { title: string; chil
 function SmallInput({ value, onChange, placeholder, className = '', type = 'text' }: {
   value: string; onChange: (v: string) => void; placeholder?: string; className?: string; type?: string;
 }) {
+  // Use local state to prevent cursor jump on re-render (debounce pattern)
+  const [local, setLocal] = useState(value);
+  const ref = useRef<HTMLInputElement>(null);
+  useEffect(() => { if (ref.current !== document.activeElement) setLocal(value); }, [value]);
   return (
-    <input value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} type={type}
+    <input ref={ref} value={local} onChange={(e) => setLocal(e.target.value)}
+      onBlur={() => { if (local !== value) onChange(local); }}
+      onKeyDown={(e) => { if (e.key === 'Enter') { (e.target as HTMLInputElement).blur(); } }}
+      placeholder={placeholder} type={type}
       className={`bg-slate-700 text-slate-200 border border-slate-600 rounded px-1.5 py-0.5 text-[10px] outline-none focus:border-blue-400 ${type === 'time' ? 'min-w-[5rem]' : ''} ${className}`} />
   );
 }
@@ -162,14 +173,15 @@ function SubjectsEditor({ subjects, onChange }: { subjects: SubjectConfig[]; onC
 }
 
 // === Course Duration Picker ===
-function CourseDurationPicker({ value, onChange }: { value: number; onChange: (min: number) => void }) {
+function CourseDurationPicker({ value, onChange, baseDuration = 45 }: { value: number; onChange: (min: number) => void; baseDuration?: number }) {
+  const presets = useMemo(() => getDurationPresets(baseDuration), [baseDuration]);
   const [customMode, setCustomMode] = useState(false);
   const [customVal, setCustomVal] = useState('');
-  const isPreset = COURSE_DURATION_PRESETS.some(p => p.min === value);
+  const isPreset = presets.some(p => p.min === value);
 
   return (
     <div className="flex flex-wrap gap-1 items-center">
-      {COURSE_DURATION_PRESETS.map(p => (
+      {presets.map(p => (
         <button key={p.min} onClick={() => { onChange(p.min); setCustomMode(false); }}
           className={`px-1.5 py-0.5 rounded text-[9px] font-medium border cursor-pointer transition-all ${
             value === p.min ? 'bg-blue-600/30 border-blue-500 text-gray-200' : 'border-gray-600 text-gray-400 hover:text-gray-300'
@@ -197,8 +209,22 @@ function CourseDurationPicker({ value, onChange }: { value: number; onChange: (m
 }
 
 // === Course Editor ===
-function CourseEditor({ courses, onChange, schoolLevel }: { courses: CourseConfig[]; onChange: (c: CourseConfig[]) => void; schoolLevel?: SchoolLevel }) {
+function CourseEditor({ courses, onChange, schoolLevel, baseDuration = 45, focusCourseId }: { courses: CourseConfig[]; onChange: (c: CourseConfig[]) => void; schoolLevel?: SchoolLevel; baseDuration?: number; focusCourseId?: string | null }) {
   const [editingId, setEditingId] = useState<string | null>(null);
+  const focusRef = useRef<HTMLDivElement>(null);
+
+  // Auto-expand and scroll to focused course
+  useEffect(() => {
+    if (focusCourseId) {
+      const course = courses.find(c => c.id === focusCourseId);
+      if (course) {
+        setEditingId(course.id);
+        // Clear the focus request after handling
+        usePlannerStore.getState().setSettingsEditCourseId(null);
+        setTimeout(() => focusRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+      }
+    }
+  }, [focusCourseId]);
 
   const addCourse = () => {
     const newCourse: CourseConfig = {
@@ -239,7 +265,7 @@ function CourseEditor({ courses, onChange, schoolLevel }: { courses: CourseConfi
   return (
     <div className="space-y-2">
       {grouped.map(({ stableKey, courses: group }) => (
-        <div key={stableKey} className="border border-slate-700/50 rounded p-2 space-y-1">
+        <div key={stableKey} ref={group.some(c => c.id === editingId) ? focusRef : undefined} className="border border-slate-700/50 rounded p-2 space-y-1">
           <div className="text-[9px] font-semibold text-gray-300 cursor-pointer hover:text-blue-300 transition-colors"
             onClick={() => setEditingId(editingId === group[0].id ? null : group[0].id)}>
             {group[0].cls || '(neu)'} <span className="text-blue-400">{group[0].typ}</span>
@@ -312,9 +338,9 @@ function CourseEditor({ courses, onChange, schoolLevel }: { courses: CourseConfi
                   </div>
                   <div>
                     <label className="text-[8px] text-gray-400 mb-0.5 block">Dauer</label>
-                    <CourseDurationPicker value={c.les * 45} onChange={(min) => {
+                    <CourseDurationPicker value={c.les * baseDuration} baseDuration={baseDuration} onChange={(min) => {
                       const autoEnd = addMinutesToTime(c.from, min);
-                      updateCourse(c.id, { les: durationToLes(min), to: autoEnd });
+                      updateCourse(c.id, { les: durationToLes(min, baseDuration), to: autoEnd });
                     }} />
                   </div>
                   <div className="flex gap-3 items-center flex-wrap">
@@ -469,22 +495,6 @@ function SpecialWeeksEditor({ weeks, courses, onChange }: {
     onChange(weeks.filter(w => w.id !== id));
   };
 
-  const loadIWPreset = () => {
-    // Add IW preset entries (don't overwrite existing)
-    const existingIds = new Set(weeks.map(w => w.id));
-    const newEntries = IW_PRESET_2526
-      .filter(e => !existingIds.has(e.id))
-      .map(e => ({
-        ...e,
-        // Auto-compute excludedCourseIds for each preset entry
-        excludedCourseIds: computeExcludedCourses(e.gymLevel, courses) || undefined,
-      }));
-    if (newEntries.length === 0) {
-      alert('Alle IW-Einträge sind bereits vorhanden.');
-      return;
-    }
-    onChange([...weeks, ...newEntries]);
-  };
 
   return (
     <div className="space-y-1.5">
@@ -548,8 +558,8 @@ function SpecialWeeksEditor({ weeks, courses, onChange }: {
                     </div>
                     {/* Course exclusions */}
                     {courses.length > 0 && (
-                      <div className="flex flex-wrap gap-1">
-                        <span className="text-[7px] text-gray-400">Ausgenommen:</span>
+                      <div className="flex flex-wrap gap-1 items-center">
+                        <span className="text-[7px] text-gray-400" title="Kurse, die von dieser Sonderwoche NICHT betroffen sind (= normaler Unterricht)">Nicht betroffen:</span>
                         {courses.map(c => {
                           const excluded = w.excludedCourseIds?.includes(c.id);
                           return (
@@ -559,6 +569,7 @@ function SpecialWeeksEditor({ weeks, courses, onChange }: {
                                 excludedCourseIds: excluded ? current.filter(x => x !== c.id) : [...current, c.id]
                               });
                             }}
+                              title={excluded ? `${c.cls} ${c.typ} (${c.day}) hat normalen Unterricht` : `${c.cls} ${c.typ} (${c.day}) ist von Sonderwoche betroffen`}
                               className={`text-[7px] px-1 py-px rounded cursor-pointer ${excluded ? 'bg-red-900/40 text-red-300 border border-red-500/50' : 'bg-slate-700 text-gray-400 border border-transparent'}`}>
                               {c.cls} {c.day}
                             </button>
@@ -622,10 +633,6 @@ function SpecialWeeksEditor({ weeks, courses, onChange }: {
           }} />
         </label>
       </div>
-      <button onClick={loadIWPreset}
-        className="py-1 rounded text-[8px] bg-amber-900/20 border border-amber-500/20 text-amber-400/70 hover:bg-amber-900/40 cursor-pointer transition-all">
-        Hofwil 25/26 Preset
-      </button>
     </div>
   );
 }
@@ -713,32 +720,46 @@ function HolidaysEditor({ holidays, onChange }: { holidays: HolidayConfig[]; onC
           className="flex-1 py-1 rounded border border-dashed border-gray-600 text-gray-400 hover:text-gray-300 text-[9px] cursor-pointer">
           + Ferienperiode hinzufügen
         </button>
-        <label className="py-1 px-2 rounded border border-slate-600 text-gray-400 hover:text-gray-300 text-[9px] cursor-pointer hover:border-slate-500">
-          📥 CSV
-          <input type="file" accept=".csv,.txt" className="hidden" onChange={(e) => {
+        <label className="py-1 px-2 rounded border border-slate-600 text-gray-400 hover:text-gray-300 text-[9px] cursor-pointer hover:border-slate-500"
+          title="CSV: Name,KW-Start,KW-Ende (pro Zeile) · JSON: Array von {label, startWeek, endWeek}">
+          📥 Import
+          <input type="file" accept=".csv,.txt,.json" className="hidden" onChange={(e) => {
             const file = e.target.files?.[0];
             if (!file) return;
             const reader = new FileReader();
             reader.onload = () => {
               try {
-                const lines = (reader.result as string).split('\n').filter(l => l.trim());
-                const imported: HolidayConfig[] = [];
-                for (const line of lines) {
-                  const parts = line.split(/[,;\t]/).map(p => p.trim());
-                  if (parts.length >= 3) {
-                    imported.push({
-                      id: generateId(),
-                      label: parts[0],
-                      startWeek: parts[1].replace(/^KW\s*/i, '').padStart(2, '0'),
-                      endWeek: parts[2].replace(/^KW\s*/i, '').padStart(2, '0'),
-                    });
+                const text = reader.result as string;
+                let imported: HolidayConfig[] = [];
+                if (file.name.endsWith('.json')) {
+                  const data = JSON.parse(text);
+                  const arr = Array.isArray(data) ? data : data.holidays || [];
+                  imported = arr.map((h: any) => ({
+                    id: generateId(),
+                    label: h.label || h.name || '',
+                    startWeek: String(h.startWeek || h.start || '').replace(/^KW\s*/i, '').padStart(2, '0'),
+                    endWeek: String(h.endWeek || h.end || '').replace(/^KW\s*/i, '').padStart(2, '0'),
+                    ...(h.days ? { days: h.days } : {}),
+                  }));
+                } else {
+                  const lines = text.split('\n').filter(l => l.trim());
+                  for (const line of lines) {
+                    const parts = line.split(/[,;\t]/).map(p => p.trim());
+                    if (parts.length >= 3) {
+                      imported.push({
+                        id: generateId(),
+                        label: parts[0],
+                        startWeek: parts[1].replace(/^KW\s*/i, '').padStart(2, '0'),
+                        endWeek: parts[2].replace(/^KW\s*/i, '').padStart(2, '0'),
+                      });
+                    }
                   }
                 }
-                if (imported.length === 0) { alert('Keine gültigen Zeilen gefunden. Format: Name,KW-Start,KW-Ende'); return; }
+                if (imported.length === 0) { alert('Keine gültigen Einträge gefunden.\nCSV: Name,KW-Start,KW-Ende\nJSON: [{label, startWeek, endWeek}]'); return; }
                 if (confirm(`${imported.length} Ferienperioden importieren? (werden zu bestehenden hinzugefügt)`)) {
                   onChange([...holidays, ...imported]);
                 }
-              } catch { alert('CSV konnte nicht gelesen werden.'); }
+              } catch { alert('Datei konnte nicht gelesen werden.'); }
             };
             reader.readAsText(file);
             e.target.value = '';
@@ -750,6 +771,71 @@ function HolidaysEditor({ holidays, onChange }: { holidays: HolidayConfig[]; onC
 }
 
 // ReapplyButton removed — Auto-Save with 400ms debounce makes manual re-apply unnecessary
+
+// === Assessment Rules Editor ===
+const DEFAULT_GYM_RULES: AssessmentRule[] = [
+  { label: 'Standortbestimmung (Nov)', deadline: 'KW 45', minGrades: 1, semester: 1, stufe: 'GYM1' },
+  { label: 'Semesterzeugnis', deadline: 'Ende Semester 1', minGrades: 2, semester: 1, stufe: 'GYM1' },
+  { label: 'Jahreszeugnis (≤2L)', deadline: 'Ende Schuljahr', minGrades: 3, semester: 'year', stufe: 'GYM1', weeklyLessonsThreshold: undefined },
+  { label: 'Zwischenbericht', deadline: 'Ende Semester 1', minGrades: 1, semester: 1, stufe: 'GYM2' },
+  { label: 'Jahreszeugnis', deadline: 'Ende Schuljahr', minGrades: 3, semester: 'year' },
+];
+
+function AssessmentRulesEditor({ rules, onChange }: {
+  rules: AssessmentRule[];
+  onChange: (r: AssessmentRule[]) => void;
+  schoolLevel?: SchoolLevel;
+}) {
+  const addRule = () => {
+    onChange([...rules, { label: '', deadline: '', minGrades: 1, semester: 'year' }]);
+  };
+
+  const update = (idx: number, patch: Partial<AssessmentRule>) => {
+    onChange(rules.map((r, i) => i === idx ? { ...r, ...patch } : r));
+  };
+
+  const remove = (idx: number) => {
+    onChange(rules.filter((_, i) => i !== idx));
+  };
+
+  return (
+    <div className="space-y-1.5">
+      <p className="text-[8px] text-gray-400">
+        {rules.length > 0
+          ? `${rules.length} eigene Beurteilungsregeln aktiv. Prüfungen werden in der Statistik dagegen geprüft.`
+          : 'Standard-Regelwerk (GYM1–5, MiSDV Art. 4) wird verwendet. Eigene Regeln überschreiben den Standard.'}
+      </p>
+      {rules.map((r, i) => (
+        <div key={i} className="bg-slate-800 rounded p-2 space-y-1">
+          <div className="flex gap-1 items-center">
+            <SmallInput value={r.label} onChange={(v) => update(i, { label: v })} placeholder="Bezeichnung" className="flex-1" />
+            <SmallInput value={r.deadline} onChange={(v) => update(i, { deadline: v })} placeholder="Deadline" className="w-28" />
+            <button onClick={() => remove(i)} className="text-[8px] text-red-400 cursor-pointer">✕</button>
+          </div>
+          <div className="flex gap-1 items-center flex-wrap">
+            <span className="text-[7px] text-gray-400">Min. Noten:</span>
+            <SmallInput value={String(r.minGrades)} onChange={(v) => update(i, { minGrades: parseInt(v) || 1 })} className="w-8" type="number" />
+            <SmallSelect value={String(r.semester)} onChange={(v) => update(i, { semester: v === 'year' ? 'year' : parseInt(v) as 1 | 2 })}
+              options={[{ key: '1', label: 'Sem 1' }, { key: '2', label: 'Sem 2' }, { key: 'year', label: 'Ganz SJ' }]} />
+            <SmallInput value={r.stufe || ''} onChange={(v) => update(i, { stufe: v || undefined })} placeholder="Stufe (opt.)" className="w-16" />
+          </div>
+        </div>
+      ))}
+      <div className="flex gap-1">
+        <button onClick={addRule}
+          className="flex-1 py-1 rounded border border-dashed border-gray-600 text-gray-400 hover:text-gray-300 text-[9px] cursor-pointer">
+          + Regel hinzufügen
+        </button>
+        {rules.length === 0 && (
+          <button onClick={() => onChange([...DEFAULT_GYM_RULES])}
+            className="py-1 px-2 rounded border border-blue-500/30 text-blue-400 text-[9px] cursor-pointer hover:bg-blue-500/10">
+            📋 GYM-Standard laden
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
 
 // === Settings Collection Picker Modal ===
 function SettingsCollectionPicker({ onLoad, onClose }: { onLoad: (snapshot: string) => void; onClose: () => void }) {
@@ -1246,6 +1332,7 @@ function GCalSection() {
 export function SettingsPanel() {
   const storeSettings = usePlannerStore(s => s.plannerSettings);
   const setPlannerSettings = usePlannerStore(s => s.setPlannerSettings);
+  const settingsEditCourseId = usePlannerStore(s => s.settingsEditCourseId);
 
   const [settings, setSettings] = useState<PlannerSettings>(() => {
     if (storeSettings) return storeSettings;
@@ -1374,9 +1461,11 @@ export function SettingsPanel() {
             <select value={settings.schoolLevel || ''} onChange={(e) => updateSettings({ schoolLevel: (e.target.value || undefined) as SchoolLevel | undefined })}
               className="bg-slate-700 text-slate-200 border border-slate-600 rounded px-1.5 py-0.5 text-[10px] outline-none focus:border-blue-400 cursor-pointer w-full">
               <option value="">-- Nicht gesetzt --</option>
-              <option value="Grundstufe">Grundstufe (1.–6. Klasse)</option>
-              <option value="Sek1">Sekundarstufe I (7.–9. Klasse)</option>
+              <option value="Grundstufe">Grundstufe (Primarstufe)</option>
+              <option value="Sek1">Sekundarstufe I</option>
               <option value="Sek2">Sekundarstufe II (Gymnasium)</option>
+              <option value="Berufsbildung">Berufsbildung</option>
+              <option value="Hochschule">Hochschule</option>
             </select>
           </div>
           <div>
@@ -1396,7 +1485,7 @@ export function SettingsPanel() {
 
       {/* Courses */}
       <Section title={`📚 Kurse / Stundenplan (${settings.courses.length})`}>
-        <CourseEditor courses={settings.courses} onChange={(c) => updateSettings({ courses: c })} schoolLevel={settings.schoolLevel} />
+        <CourseEditor courses={settings.courses} onChange={(c) => updateSettings({ courses: c })} schoolLevel={settings.schoolLevel} baseDuration={settings.school?.lessonDurationMin || 45} focusCourseId={settingsEditCourseId} />
       </Section>
 
       {/* Special Weeks */}
@@ -1416,8 +1505,8 @@ export function SettingsPanel() {
             {settings.curriculumGoals?.length
               ? `${settings.curriculumGoals.length} eigene Lehrplanziele konfiguriert.`
               : (!settings.schoolLevel || settings.schoolLevel === 'Sek2')
-                ? `Standard: ${CURRICULUM_GOALS.length} W&R-Lehrplanziele (Sek2 DUY) aktiv.`
-                : 'Für diese Schulstufe sind keine Standard-Lehrplanziele hinterlegt.'}
+                ? `Standard: ${CURRICULUM_GOALS.length} W&R-Lehrplanziele (Sek2) aktiv. Eigene Ziele importieren, um den Standard zu ersetzen.`
+                : `Für ${settings.schoolLevel} sind keine Standard-Lehrplanziele hinterlegt. Importiere eigene Ziele als JSON oder lade die W&R Sek2-Ziele als Vorlage.`}
           </p>
           <div className="flex gap-1 flex-wrap">
             {/* Preset button */}
@@ -1462,6 +1551,15 @@ export function SettingsPanel() {
             )}
           </div>
         </div>
+      </Section>
+
+      {/* Assessment Rules */}
+      <Section title={`📝 Beurteilungsregeln (${settings.assessmentRules?.length || 0})`}>
+        <AssessmentRulesEditor
+          rules={settings.assessmentRules || []}
+          onChange={(r) => updateSettings({ assessmentRules: r.length > 0 ? r : undefined as any })}
+          schoolLevel={settings.schoolLevel}
+        />
       </Section>
 
       {/* Export / Import JSON */}

@@ -9,7 +9,7 @@ interface Props {
 }
 
 export function SemesterHeader({ courses, semester, weeks }: Props) {
-  const { classFilter, setClassFilter, courseFilter, setCourseFilter, setFilter, expandedNoteCols, toggleNoteCol, noteColWidth, setNoteColWidth } = usePlannerStore();
+  const { classFilter, setClassFilter, courseFilter, setCourseFilter, setFilter, expandedNoteCols, toggleNoteCol, noteColWidth, setNoteColWidth, setSidePanelOpen, setSidePanelTab, setSettingsEditCourseId } = usePlannerStore();
   const ncw = noteColWidth;
 
   // Drag resize for note column
@@ -85,8 +85,17 @@ export function SemesterHeader({ courses, semester, weeks }: Props) {
                     className={`text-[10px] font-bold cursor-pointer transition-colors ${
                       classFilter === c.cls ? 'text-blue-400' : 'text-gray-200 hover:text-blue-300'
                     }`}
-                    onClick={() => setClassFilter(classFilter === c.cls ? null : c.cls)}
-                    title={`Klick: Nur ${c.cls} | Doppelklick: Nur ${c.cls} ${c.typ}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSettingsEditCourseId(c.id);
+                      setSidePanelOpen(true);
+                      setSidePanelTab('settings');
+                    }}
+                    onContextMenu={(e) => {
+                      e.preventDefault();
+                      setClassFilter(classFilter === c.cls ? null : c.cls);
+                    }}
+                    title={`Klick: Kurs bearbeiten | Rechtsklick: Nur ${c.cls} filtern`}
                   >
                     {c.cls}
                   </div>

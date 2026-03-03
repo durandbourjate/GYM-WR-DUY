@@ -15,6 +15,7 @@
  */
 
 import type { Course, Week, LessonDetail } from '../types';
+import type { AssessmentRule } from '../store/settingsStore';
 
 // Current school year: Maturjahrgang → GYM-Stufe in SJ 25/26
 // 29 → GYM1, 28 → GYM2, 27 → GYM3, 26 → GYM4
@@ -167,14 +168,34 @@ export function getCourseGroups(courses: Course[]): CourseGroupInfo[] {
 }
 
 /**
+ * Convert custom AssessmentRule[] into GradeRequirement[] for a specific group.
+ */
+function customRulesToRequirements(rules: AssessmentRule[], gymStufe: GymStufe, weeklyLessons: number): GradeRequirement[] {
+  return rules
+    .filter(r => {
+      if (r.stufe && r.stufe !== gymStufe) return false;
+      if (r.weeklyLessonsThreshold !== undefined && weeklyLessons <= r.weeklyLessonsThreshold) return false;
+      return true;
+    })
+    .map(r => ({
+      label: r.label,
+      deadline: r.deadline,
+      minGrades: r.minGrades,
+      semester: r.semester,
+    }));
+}
+
+/**
  * Check all grade requirements for all course groups.
  * Returns warnings sorted by severity.
+ * Accepts optional custom assessment rules from settings.
  */
 export function checkGradeRequirements(
   weekData: Week[],
   lessonDetails: Record<string, LessonDetail>,
   courses: Course[],
-  s2StartIndex: number
+  s2StartIndex: number,
+  customRules?: AssessmentRule[]
 ): GradeWarning[] {
   const groups = getCourseGroups(courses);
   const warnings: GradeWarning[] = [];
@@ -182,7 +203,9 @@ export function checkGradeRequirements(
   groups.forEach(group => {
     if (group.gymStufe === 'UNKNOWN') return;
 
-    const requirements = getGradeRequirements(group.gymStufe, group.weeklyLessons);
+    const requirements = customRules && customRules.length > 0
+      ? customRulesToRequirements(customRules, group.gymStufe, group.weeklyLessons)
+      : getGradeRequirements(group.gymStufe, group.weeklyLessons);
 
     requirements.forEach(req => {
       const count = countAssessments(

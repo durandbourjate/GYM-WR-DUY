@@ -144,6 +144,8 @@ interface PlannerState {
   // Settings UI
   settingsOpen: boolean;
   setSettingsOpen: (v: boolean) => void;
+  settingsEditCourseId: string | null;
+  setSettingsEditCourseId: (id: string | null) => void;
   panelWidth: number;
   setPanelWidth: (w: number) => void;
   // Note column expansion (per course column)
@@ -1098,6 +1100,8 @@ export const usePlannerStore = create<PlannerState>()(
   setPlannerSettings: (s) => set({ plannerSettings: s }),
   settingsOpen: false,
   setSettingsOpen: (v) => set({ settingsOpen: v }),
+  settingsEditCourseId: null,
+  setSettingsEditCourseId: (id) => set({ settingsEditCourseId: id }),
   panelWidth: 400,
   setPanelWidth: (w) => set({ panelWidth: w }),
   expandedNoteCols: {},
@@ -1192,12 +1196,24 @@ export function loadFromInstance(instanceId: string): void {
         tafPhases: data.tafPhases || [],
         collection: data.collection || [],
         plannerSettings: data.plannerSettings || null,
-        // Reset UI state on switch
+        // Reset ALL UI & transient state on switch
         selection: null,
         editing: null,
         insertDialog: null,
         dragSource: null,
         multiSelection: [],
+        lastSelectedKey: null,
+        undoStack: [],
+        editingSequenceId: null,
+        emptyCellAction: null,
+        dragSelectAnchor: null,
+        dragSelectCurrent: null,
+        dragSelectedKeys: [],
+        hoveredCell: null,
+        searchQuery: '',
+        courseFilter: null,
+        classFilter: null,
+        settingsEditCourseId: null,
       });
     } catch (e) {
       console.error('Failed to load instance:', e);

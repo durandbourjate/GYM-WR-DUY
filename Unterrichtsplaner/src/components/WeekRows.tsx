@@ -221,10 +221,10 @@ function EmptyCellMenu({ week, course, onClose, selectedWeeks, position }: { wee
 
   const handleNewLesson = () => {
     pushUndo();
-    updateLesson(week, course.col, { title: 'Neue Lektion', type: 1 });
+    updateLesson(week, course.col, { title: 'Neue UE', type: 1 });
     // Set defaults: blockCategory=LESSON, duration=90 min
     usePlannerStore.getState().updateLessonDetail(week, course.col, { blockCategory: 'LESSON', duration: '90 min' });
-    setSelection({ week, courseId: course.id, title: 'Neue Lektion', course });
+    setSelection({ week, courseId: course.id, title: 'Neue UE', course });
     setSidePanelOpen(true);
     setSidePanelTab('details');
     onClose();
@@ -250,7 +250,7 @@ function EmptyCellMenu({ week, course, onClose, selectedWeeks, position }: { wee
       }>
       <button onClick={handleNewLesson}
         className="w-full px-3 py-1.5 text-left text-[10px] text-gray-200 hover:bg-slate-700 cursor-pointer flex items-center gap-2">
-        <span>📖</span> Neue Kachel
+        <span>📖</span> Neue Unterrichtseinheit
       </button>
       <button onClick={handleNewSequence}
         className="w-full px-3 py-1.5 text-left text-[10px] text-gray-200 hover:bg-slate-700 cursor-pointer flex items-center gap-2">
@@ -488,12 +488,14 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
     [setSelection, setSidePanelOpen, setSidePanelTab]
   );
 
-  // Empty cell click
-  const handleEmptyCellClick = useCallback(
-    (weekW: string, course: Course) => {
-      setEmptyCellMenu({ week: weekW, course });
+  // Double click on event/holiday cell: start inline edit
+  const handleEventCellAction = useCallback(
+    (weekW: string, col: number, _title: string, action: 'edit') => {
+      if (action === 'edit') {
+        setEditing({ week: weekW, col });
+      }
     },
-    []
+    [setEditing]
   );
 
   const handleSaveEdit = useCallback(
@@ -898,10 +900,14 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                     if (title) {
                       handleDoubleClick(week.w, c, title);
                     } else {
-                      // Double-click on empty cell: show new tile/sequence menu at cursor
-                      const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-                      setMenuPosition({ x: e.clientX - rect.left, y: e.clientY - rect.top });
-                      handleEmptyCellClick(week.w, c);
+                      // Double-click on empty cell: directly create new UE and open detail panel
+                      e.stopPropagation();
+                      pushUndo();
+                      updateLesson(week.w, c.col, { title: 'Neue UE', type: 1 });
+                      usePlannerStore.getState().updateLessonDetail(week.w, c.col, { blockCategory: 'LESSON', duration: '90 min' });
+                      setSelection({ week: week.w, courseId: c.id, title: 'Neue UE', course: c });
+                      setSidePanelOpen(true);
+                      setSidePanelTab('details');
                     }
                   }}
                 >
@@ -1050,15 +1056,26 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                       />
                     </div>
                   ) : title && lessonType === 6 ? (
-                    /* Holiday cells: grau, nicht klickbar/draggable */
+                    /* Holiday cells: grau, Doppelklick → Kontextmenü */
                     <div
-                      className="mx-0.5 ml-1.5 px-1.5 py-1 rounded flex items-center justify-center cursor-default"
+                      className="mx-0.5 ml-1.5 px-1.5 py-1 rounded flex items-center justify-center cursor-pointer hover:brightness-110 transition-all"
                       style={{
                         minHeight: Math.max(cellHeight, 32),
                         opacity: isSearchDimmed ? 0.2 : 1,
                         background: '#1e293b60',
                         border: '1px solid #334155',
                       }}
+                      onDoubleClick={(e) => {
+                        e.stopPropagation();
+                        handleEventCellAction(week.w, c.col, title, 'edit');
+                      }}
+                      onContextMenu={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        pushUndo();
+                        updateLesson(week.w, c.col, { title: '', type: 0 });
+                      }}
+                      title="Doppelklick: Bearbeiten · Rechtsklick: Aufheben"
                     >
                       <span className="mr-1 text-[9px]">🏖</span>
                       <span className="text-[9px] font-medium leading-tight text-gray-400"
@@ -1078,7 +1095,17 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                         boxShadow: isSelected ? '0 0 0 2px #f59e0b40' : 'none',
                       }}
                       onClick={(e) => { e.stopPropagation(); handleClick(week.w, c, title, e); }}
-                      onDoubleClick={() => handleDoubleClick(week.w, c, title)}
+                      onDoubleClick={(e) => {
+                        e.stopPropagation();
+                        handleEventCellAction(week.w, c.col, title, 'edit');
+                      }}
+                      onContextMenu={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        pushUndo();
+                        updateLesson(week.w, c.col, { title: '', type: 0 });
+                      }}
+                      title="Klick: Auswählen · Doppelklick: Bearbeiten · Rechtsklick: Aufheben"
                     >
                       <span className="mr-1 text-[9px]">📅</span>
                       <span className="text-[9px] font-medium leading-tight text-amber-400/80"
@@ -1149,7 +1176,7 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                     <div
                       className={`cursor-pointer rounded mx-0.5 transition-all ${isSelected ? 'bg-blue-900/30 border border-blue-500/50 shadow-[0_0_0_1px_#3b82f640]' : 'hover:bg-slate-800/40'}`}
                       style={{ minHeight: cellHeight }}
-                      title="Doppelklick: Neue Kachel oder Sequenz"
+                      title="Doppelklick: Neue Unterrichtseinheit oder Sequenz"
                     />
                   )}
 

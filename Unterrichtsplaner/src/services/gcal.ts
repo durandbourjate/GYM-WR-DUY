@@ -86,18 +86,38 @@ async function gcalFetch(path: string, options?: RequestInit) {
   const store = useGCalStore.getState();
   if (!store.isAuthenticated()) throw new Error('Nicht authentifiziert – bitte erneut anmelden');
 
-  const res = await fetch(`https://www.googleapis.com/calendar/v3${path}`, {
-    ...options,
-    headers: {
-      'Authorization': `Bearer ${store.accessToken}`,
-      'Content-Type': 'application/json',
-      ...options?.headers,
-    },
-  });
+  let res: Response;
+  try {
+    res = await fetch(`https://www.googleapis.com/calendar/v3${path}`, {
+      ...options,
+      headers: {
+        'Authorization': `Bearer ${store.accessToken}`,
+        'Content-Type': 'application/json',
+        ...options?.headers,
+      },
+    });
+  } catch (e: any) {
+    throw new Error(`Netzwerkfehler: ${e.message || 'Keine Verbindung zu Google'}. Prüfe deine Internetverbindung.`);
+  }
 
   if (res.status === 401) {
     store.clearToken();
     throw new Error('Token abgelaufen – bitte erneut anmelden');
+  }
+  if (res.status === 403) {
+    const err = await res.json().catch(() => ({}));
+    const reason = err.error?.errors?.[0]?.reason;
+    if (reason === 'rateLimitExceeded' || reason === 'userRateLimitExceeded') {
+      throw new Error('API-Limit erreicht. Bitte warte einen Moment und versuche es erneut.');
+    }
+    if (reason === 'insufficientPermissions') {
+      store.clearToken();
+      throw new Error('Fehlende Berechtigung. Bitte erneut anmelden und Kalender-Zugriff erlauben.');
+    }
+    throw new Error(err.error?.message || 'Zugriff verweigert (403)');
+  }
+  if (res.status === 404) {
+    throw new Error('Kalender oder Ereignis nicht gefunden. Möglicherweise wurde es gelöscht.');
   }
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));

@@ -142,12 +142,12 @@ function findExamCollisions(stats: CourseStats[]): Collision[] {
 
 export function StatsPanel({ onClose }: { onClose: () => void }) {
   const { weekData, sequences, lessonDetails } = usePlannerStore();
-  const { courses: plannerCourses, s2StartIndex } = usePlannerData();
+  const { courses: plannerCourses, s2StartIndex, settings } = usePlannerData();
   const stats = useMemo(() => computeStats(weekData, plannerCourses), [weekData, plannerCourses]);
   const collisions = useMemo(() => findExamCollisions(stats), [stats]);
   const gradeWarnings = useMemo(
-    () => plannerCourses.length > 0 ? checkGradeRequirements(weekData, lessonDetails, plannerCourses, s2StartIndex) : [],
-    [weekData, lessonDetails, plannerCourses, s2StartIndex]
+    () => plannerCourses.length > 0 ? checkGradeRequirements(weekData, lessonDetails, plannerCourses, s2StartIndex, settings?.assessmentRules) : [],
+    [weekData, lessonDetails, plannerCourses, s2StartIndex, settings?.assessmentRules]
   );
 
   const gradeIssues = gradeWarnings.filter(w => w.status !== 'ok');

@@ -3,7 +3,7 @@ import { COURSES } from '../data/courses';
 import { WEEKS, S2_START_INDEX } from '../data/weeks';
 
 // === Settings Types ===
-export type SchoolLevel = 'Grundstufe' | 'Sek1' | 'Sek2';
+export type SchoolLevel = 'Grundstufe' | 'Sek1' | 'Sek2' | 'Berufsbildung' | 'Hochschule';
 
 export const STUFE_OPTIONS: Record<SchoolLevel, { key: string; label: string }[]> = {
   Sek2: [
@@ -20,7 +20,25 @@ export const STUFE_OPTIONS: Record<SchoolLevel, { key: string; label: string }[]
     { key: '3. Klasse', label: '3. Kl.' }, { key: '4. Klasse', label: '4. Kl.' },
     { key: '5. Klasse', label: '5. Kl.' }, { key: '6. Klasse', label: '6. Kl.' },
   ],
+  Berufsbildung: [
+    { key: '1. Lehrjahr', label: '1. LJ' }, { key: '2. Lehrjahr', label: '2. LJ' },
+    { key: '3. Lehrjahr', label: '3. LJ' }, { key: '4. Lehrjahr', label: '4. LJ' },
+  ],
+  Hochschule: [
+    { key: '1. Semester', label: '1. Sem.' }, { key: '2. Semester', label: '2. Sem.' },
+    { key: '3. Semester', label: '3. Sem.' }, { key: '4. Semester', label: '4. Sem.' },
+    { key: '5. Semester', label: '5. Sem.' }, { key: '6. Semester', label: '6. Sem.' },
+  ],
 };
+
+export interface AssessmentRule {
+  label: string;           // e.g. "Standortbestimmung (Nov)"
+  deadline: string;        // descriptive, e.g. "Ende Semester 1"
+  minGrades: number;       // minimum number of assessments
+  semester: 1 | 2 | 'year'; // when this rule applies
+  stufe?: string;          // which GYM level, e.g. 'GYM1' — undefined = all
+  weeklyLessonsThreshold?: number; // only apply if weekly lessons > threshold
+}
 
 export interface PlannerSettings {
   version: number;
@@ -36,6 +54,7 @@ export interface PlannerSettings {
   semesterBreak: number; // week index where S2 starts
   stoffverteilung?: StoffverteilungEntry[];
   curriculumGoals?: import('../data/curriculumGoals').CurriculumGoal[];
+  assessmentRules?: AssessmentRule[];
 }
 
 export interface StoffverteilungEntry {
@@ -88,12 +107,8 @@ export interface HolidayConfig {
 // === Persistence ===
 const SETTINGS_KEY = 'unterrichtsplaner-settings';
 
-const DEFAULT_SUBJECTS: SubjectConfig[] = [
-  { id: 'bwl', label: 'BWL', shortLabel: 'BWL', color: '#3b82f6', courseType: 'SF' },
-  { id: 'vwl', label: 'VWL', shortLabel: 'VWL', color: '#f97316', courseType: 'SF' },
-  { id: 'recht', label: 'Recht', shortLabel: 'Recht', color: '#22c55e', courseType: 'SF' },
-  { id: 'in', label: 'Informatik', shortLabel: 'IN', color: '#6b7280', courseType: 'IN' },
-];
+// No default subjects — user configures their own (avoids school-specific hardcoding)
+const DEFAULT_SUBJECTS: SubjectConfig[] = [];
 
 export function loadSettings(): PlannerSettings | null {
   try {
