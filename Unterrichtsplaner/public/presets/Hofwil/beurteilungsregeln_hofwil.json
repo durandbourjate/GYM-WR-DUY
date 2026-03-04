@@ -1,0 +1,7 @@
+[
+  { "label": "Standortbestimmung (Nov)", "deadline": "KW 45", "minGrades": 1, "semester": 1, "stufe": "GYM1" },
+  { "label": "Semesterzeugnis", "deadline": "Ende Semester 1", "minGrades": 2, "semester": 1 },
+  { "label": "Jahreszeugnis (≤3 WL)", "deadline": "Ende Schuljahr", "minGrades": 3, "semester": "year", "weeklyLessonsThreshold": 3 },
+  { "label": "Jahreszeugnis (>3 WL)", "deadline": "Ende Schuljahr", "minGrades": 4, "semester": "year", "weeklyLessonsThreshold": 4 },
+  { "label": "Zwischenbericht GYM2+", "deadline": "Ende Semester 1", "minGrades": 1, "semester": 1, "stufe": "GYM2" }
+]

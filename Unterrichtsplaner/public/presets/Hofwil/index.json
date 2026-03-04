@@ -1,0 +1,43 @@
+{
+  "name": "GYM Hofwil – Presets",
+  "version": "2.0",
+  "date": "2026-03-04",
+  "description": "Import-Dateien für den Unterrichtsplaner. Jede Datei kann einzeln über den 📥-Import-Button der jeweiligen Rubrik in den Einstellungen importiert werden.",
+  "files": {
+    "ferien_hofwil_2526.json": {
+      "rubrik": "Ferien",
+      "beschreibung": "Schulferien Kt. Bern SJ 2025/26",
+      "format": "HolidayConfig[]"
+    },
+    "ferien_hofwil_2627.json": {
+      "rubrik": "Ferien",
+      "beschreibung": "Schulferien Kt. Bern SJ 2026/27",
+      "format": "HolidayConfig[]"
+    },
+    "sonderwochen_hofwil_2526.json": {
+      "rubrik": "Sonderwochen",
+      "beschreibung": "Intensivwochen, Prüfungswochen, Events SJ 2025/26",
+      "format": "SpecialWeekConfig[]"
+    },
+    "beurteilungsregeln_hofwil.json": {
+      "rubrik": "Beurteilungsregeln",
+      "beschreibung": "Notenminima Gymnasium Hofwil (MiSDV, Schwelle ≤3/>3 WL)",
+      "format": "AssessmentRule[]"
+    },
+    "fachbereiche_wr.json": {
+      "rubrik": "Fachbereiche",
+      "beschreibung": "VWL (orange), BWL (blau), Recht (grün) — SF W&R",
+      "format": "SubjectConfig[]"
+    },
+    "lehrplanziele_sf_wr_lp17.json": {
+      "rubrik": "Lehrplanziele",
+      "beschreibung": "40 Lehrplanziele SF W&R (LP17 Kt. Bern, Grobzuteilung DUY)",
+      "format": "CurriculumGoal[]"
+    },
+    "stoffverteilung_sf_wr_duy.json": {
+      "rubrik": "Stoffverteilung / Mehrjahresübersicht",
+      "beschreibung": "Gewichtung BWL/VWL/Recht pro Semester (S1–S8, DUY)",
+      "format": "StoffverteilungEntry[]"
+    }
+  }
+}

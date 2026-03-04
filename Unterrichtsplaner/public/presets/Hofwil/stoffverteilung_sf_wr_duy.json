@@ -1,0 +1,10 @@
+[
+  { "semester": "S1", "gym": "GYM1", "weights": { "BWL": 3, "VWL": 0, "RECHT": 0 } },
+  { "semester": "S2", "gym": "GYM1", "weights": { "BWL": 2, "VWL": 0, "RECHT": 1 } },
+  { "semester": "S3", "gym": "GYM2", "weights": { "BWL": 1, "VWL": 2, "RECHT": 2 } },
+  { "semester": "S4", "gym": "GYM2", "weights": { "BWL": 0, "VWL": 2, "RECHT": 3 } },
+  { "semester": "S5", "gym": "GYM3", "weights": { "BWL": 0, "VWL": 2, "RECHT": 2 } },
+  { "semester": "S6", "gym": "GYM3", "weights": { "BWL": 2, "VWL": 2, "RECHT": 0 } },
+  { "semester": "S7", "gym": "GYM4", "weights": { "BWL": 0, "VWL": 2, "RECHT": 2 } },
+  { "semester": "S8", "gym": "GYM4", "weights": { "BWL": 2, "VWL": 2, "RECHT": 0 } }
+]

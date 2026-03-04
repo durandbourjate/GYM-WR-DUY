@@ -1,0 +1,14 @@
+[
+  { "label": "Klassenwoche / SOL", "week": "38", "type": "event", "gymLevel": "alle" },
+  { "label": "IW TaF (G&K, MU, SP)", "week": "46", "type": "event", "gymLevel": "TaF" },
+  { "label": "Schneesportlager GYM2", "week": "12", "type": "event", "gymLevel": "GYM2" },
+  { "label": "IW 14 (Gesundheit / EF / Sprachen)", "week": "14", "type": "event", "gymLevel": "alle" },
+  { "label": "IW 25 (Wirtschaftswoche / Matur / Prüfungen)", "week": "25", "type": "event", "gymLevel": "alle" },
+  { "label": "IW 27 (Medien / MINT / SF-Woche)", "week": "27", "type": "event", "gymLevel": "alle" },
+  { "label": "Prüfungswoche 1 (Nov)", "week": "45", "type": "event", "gymLevel": "alle" },
+  { "label": "Prüfungswoche TaF (März)", "week": "13", "type": "event", "gymLevel": "TaF" },
+  { "label": "Kollegiumstagung", "week": "34", "type": "event", "gymLevel": "alle" },
+  { "label": "Tag der offenen Tür", "week": "44", "type": "event", "gymLevel": "alle" },
+  { "label": "Maturprüfungen schriftlich", "week": "19", "type": "event", "gymLevel": "GYM4" },
+  { "label": "Maturprüfungen mündlich", "week": "25", "type": "event", "gymLevel": "GYM4" }
+]
