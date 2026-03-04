@@ -9,6 +9,6 @@
   { "label": "Prüfungswoche TaF (März)", "week": "13", "type": "event", "gymLevel": "TaF" },
   { "label": "Kollegiumstagung", "week": "34", "type": "event", "gymLevel": "alle" },
   { "label": "Tag der offenen Tür", "week": "44", "type": "event", "gymLevel": "alle" },
-  { "label": "Maturprüfungen schriftlich", "week": "19", "type": "event", "gymLevel": "GYM4" },
+  { "label": "Maturprüfungen schriftlich", "week": "22", "type": "event", "gymLevel": "GYM4" },
   { "label": "Maturprüfungen mündlich", "week": "25", "type": "event", "gymLevel": "GYM4" }
 ]

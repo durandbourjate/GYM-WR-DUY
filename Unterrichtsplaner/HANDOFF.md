@@ -1,4 +1,143 @@
-# Unterrichtsplaner – Handoff v3.80
+# Unterrichtsplaner – Handoff v3.81
+
+## Status: 🔜 v3.81 — 6 Tasks offen
+
+---
+
+## Originalauftrag v3.81 (04.03.2026)
+
+| # | Typ | Beschreibung |
+|---|-----|-------------|
+| D1 | Bug | Import-Button doppelt in Rubriken — unten entfernen, Icon in Kopfzeile ändern |
+| D2 | Bug | Fachbereiche leer → Crash beheben, leerer Zustand crashfrei |
+| D3 | Bug | Ferien-Preset-Dropdown beim neuen Planer entfernen (verhindert Duplikate) |
+| D4 | Feature | Fachbereiche-Vorlagen: Dropdown mit allen Gymnasialfächern |
+| D5 | UX | «Daten exportieren» + «Sammlung» zu einer Rubrik zusammenführen |
+| D6 | Data | Sonderwochen-Preset KW-Fix ✅ (JSON bereits korrigiert, .ts prüfen) |
+
+**Empfohlene Reihenfolge:** D2 → D1 → D3 → D5 → D4 → D6
+
+---
+
+### Task D1: Bug — Import-Button doppelt
+
+**Betrifft:** Alle Rubriken in `SettingsPanel`
+
+**Problem (Screenshot `import_ist_doppelt`):** Nach C1 erscheint Import jetzt in der Kopfzeile UND noch unten als zweiter Button. Ausserdem ist das Import-Icon gleich wie das Speichern-Icon — verwirrend.
+
+**Lösung:**
+1. Unteren Import-Button aus jeder Rubrik entfernen (der gestrichelte «+ Hinzufügen»-Button unten bleibt)
+2. Import-Icon in Kopfzeile auf `⬆️` oder `📂` ändern — klar unterscheidbar von `💾 Speichern`
+3. Reihenfolge Kopfzeile konsistent: `[+]` `[💾 Speichern]` `[📂 Laden]` `[⬆️ Import]`
+4. Gilt für alle 6 Rubriken
+
+---
+
+### Task D2: Bug — Fachbereiche leer → Crash
+
+**Betrifft:** `SettingsPanel`, `WeekRows`, `ZoomYearView`, `ZoomMultiYearView`, `StatsPanel`
+
+**Problem (Screenshot `alle_fachbereiche_entfernen_leer_ist_buggy`):** Wenn alle Fachbereiche gelöscht werden, crasht die App oder zeigt Fehler.
+
+**Lösung:**
+1. Alle `subjects[0]`, `subjects.map(...)`, `SUBJECT_COLORS[area]` ohne Null-Check finden und defensiv machen
+2. Leer-Zustand in Fachbereiche-Rubrik: «Keine Fachbereiche konfiguriert. Füge einen Fachbereich hinzu oder wähle eine Vorlage.»
+3. `SUBJECT_COLORS[area]` → Fallback `#6b7280` (grau) wenn `area` nicht gefunden
+4. Löschen des letzten Fachbereichs **nicht blockieren** — leerer Zustand soll erlaubt sein, nur crashfrei
+
+---
+
+### Task D3: Bug — Ferien-Preset-Dropdown beim Planer-Erstellen entfernen
+
+**Betrifft:** Startbildschirm, `PlannerTabs.tsx` oder `App.tsx`
+
+**Problem (Screenshot `beim_start_ferien_json_importieren`):** Checkbox «✅ Ferien eintragen» + Dropdown «SJ 2025/26 (Gym Bern)» führt zu Duplikaten, wenn danach nochmals via JSON importiert wird (Screenshot zeigt 11 Ferien statt 7).
+
+**Lösung:**
+1. Checkbox «Ferien eintragen» und das SJ-Preset-Dropdown komplett aus dem Startbildschirm entfernen
+2. Neuer Planer startet mit leeren Ferien (kein automatischer Preset)
+3. Ferien-Import läuft ausschliesslich über Einstellungen → Ferien-Rubrik → Import-Button
+4. Startbildschirm vereinfacht: nur Name-Eingabe + «+ Neuen Planer erstellen» + Hinweis auf JSON-Import
+
+**Hinweis:** `ferien_hofwil_2526.json` in `public/presets/Hofwil/` bleibt bestehen — nur der automatische Eintrag beim Planer-Erstellen fällt weg.
+
+---
+
+### Task D4: Feature — Fachbereiche-Vorlagen: Dropdown mit allen Gymnasialfächern
+
+**Betrifft:** Fachbereiche-Rubrik in `SettingsPanel`, `data/subjectPresets.ts`
+
+**Problem (Screenshot `das_sind_nicht_alle_facher`):** Aktuell gibt es Kategorie-Buttons (W&R, NaWi, Sprachen, Mathe&Info). Einzelfächer wie Geschichte, Geografie, BG, Musik fehlen.
+
+**Ziel:** Ein **Fach-Dropdown** mit allen Gymnasialfächern Kt. Bern (Lehrplan 17):
+
+```
+── W&R ──            VWL / BWL / Recht
+── Naturwiss. ──     Biologie / Chemie / Physik
+── Sprachen ──       Deutsch / Englisch / Französisch / Italienisch / Latein / Spanisch
+── Geistes-/Soz. ── Geschichte / Geografie / Philosophie
+── Gestalterisch ── Bildnerisches Gestalten / Musik / Sport
+── Mathe & Info ──  Mathematik / Informatik
+── Andere ──         Leer
+```
+
+**Farben für neue Fächer:**
+- Geschichte `#b45309`, Geografie `#0891b2`, BG `#ec4899`, Musik `#8b5cf6`
+- Sport `#10b981`, Latein `#6b7280`, Philosophie `#f59e0b`, Spanisch `#ef4444`
+
+**Verhalten beim Laden:**
+- Dialog: «Bestehende Fachbereiche ersetzen» / «Ergänzen (Duplikate überspringen)»
+- Duplikat-Prüfung by `id` oder `name`
+
+**Technisch:** Vorlagen in `data/subjectPresets.ts` als exportiertes Array, Dropdown in der Fachbereiche-Rubrik unterhalb der Liste. Die bestehenden 4 Kategorie-Buttons durch das Dropdown ersetzen (kompakter).
+
+---
+
+### Task D5: UX — «Daten» + «Sammlung» zusammenführen
+
+**Betrifft:** Ende von `SettingsPanel` — die zwei letzten Rubriken
+
+**Ist-Zustand (Screenshot `diese_beiden_menus_zusammenfuhren`):**
+- Rubrik 1: «💾 Daten exportieren / importieren» (Konfiguration + Planerdaten)
+- Rubrik 2: «📚 Sammlung (Gesamtkonfiguration)» (Speichern/Laden)
+
+**Ziel:** Eine einzige Rubrik «💾 Daten & Sammlung» mit drei Unterabschnitten:
+
+```
+💾 Daten & Sammlung
+├── Konfiguration (Kurse, Ferien, Sonderwochen, Fächer)
+│   [📤 Exportieren]  [📥 Importieren]
+├── ─────────────────────────────────
+├── Planerdaten (Lektionen, Sequenzen, Details)
+│   [⬇️ Export]  [⬆️ Import]
+└── ─────────────────────────────────
+    Sammlung (gesamte Konfiguration)
+    [💾 Speichern]  [📂 Laden]
+```
+
+**Technisch:** Zwei `Section`-Komponenten durch eine ersetzen, Unterabschnitte mit `border-t border-white/10 pt-3 mt-3` trennen.
+
+---
+
+### Task D6: Data — Sonderwochen KW-Fix ✅ + .ts prüfen
+
+**JSON bereits korrigiert** (04.03.2026):
+- `sonderwochen_hofwil_2526.json`: «Maturprüfungen schriftlich» KW19 → **KW22**
+
+**Noch zu tun:** Prüfen ob der Wert auch in `iwPresets.ts` oder `initialLessonDetails.ts` hardcoded steht und ggf. dort ebenfalls auf KW22 korrigieren.
+
+---
+
+### Commit-Anweisung
+
+```bash
+npm run build 2>&1 | tail -20
+git add -A
+git commit -m "v3.81: Import-Bug (D1), Fachbereiche-Leer (D2), Ferien-Dropdown entfernt (D3), Fach-Dropdown (D4), Daten+Sammlung (D5), KW-Fix (D6)"
+git push
+```
+
+---
 
 ## Status: ✅ v3.80 — 8 Tasks erledigt
 
