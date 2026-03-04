@@ -38,6 +38,11 @@
       "rubrik": "Stoffverteilung / Mehrjahresübersicht",
       "beschreibung": "Gewichtung BWL/VWL/Recht pro Semester (S1–S8, DUY)",
       "format": "StoffverteilungEntry[]"
+    },
+    "stundenplan_duy_2526.json": {
+      "rubrik": "Kurse / Stundenplan",
+      "beschreibung": "Vollständiger Stundenplan DUY SJ 2025/26 — alle Phasen (SF, IN, EWR, KS)",
+      "format": "CourseConfig[]"
     }
   }
 }
