@@ -1,0 +1,55 @@
+{
+  "_meta": {
+    "version": "2.0",
+    "beschreibung": "Stundenplan SJ 25/26 — DUY W&R (Gymnasium Hofwil), alle Phasen",
+    "quelle": "Stundenpläne Phase 1–4 (Bilder), stundenplan_alle_phasen.md, konsolidiert 04.03.2026",
+    "import_typ": "CourseConfig[]",
+    "duplikat_key": "cls + day + from + semesters",
+    "korrekturen_gegenueber_v1": [
+      "28c IN S1: Mo L7 Praktikum (P-02) hinzugefuegt — war bisher fehlend",
+      "29f IN S1: korrekt Mo L8-9 (H-206, Praktikum) statt Di L8-9",
+      "30s IN: aufgeteilt in Do L9 (S1) und Mo L8 (S2), Mi L1 phasenabhaengig praezisiert",
+      "29fs EWR: Zimmer ergaenzt (H-108 S1, H-204 S2)",
+      "KS 27a: S2 korrekt Do L10 col 10"
+    ]
+  },
+  "kurse": [
+    {
+      "_kommentar": "SF Schwerpunktfach — ganzjaehrig Di + Do, alle Phasen",
+      "id": "c11",  "col": 11, "cls": "29c",      "typ": "SF",  "day": "Di", "from": "09:00", "to": "09:45", "les": 1, "hk": false, "room": "H-204", "semesters": [1, 2]
+    },
+    { "id": "c31",  "col": 31, "cls": "29c",      "typ": "SF",  "day": "Do", "from": "10:05", "to": "11:45", "les": 2, "hk": false, "room": "H-204", "semesters": [1, 2] },
+    { "id": "c17",  "col": 17, "cls": "27a28f",   "typ": "SF",  "day": "Di", "from": "13:40", "to": "15:20", "les": 2, "hk": false, "room": "H-204", "semesters": [1, 2] },
+    { "id": "c35",  "col": 35, "cls": "27a28f",   "typ": "SF",  "day": "Do", "from": "13:40", "to": "15:20", "les": 2, "hk": false, "room": "H-204", "semesters": [1, 2] },
+    { "id": "c19",  "col": 19, "cls": "28bc29fs", "typ": "SF",  "day": "Di", "from": "15:35", "to": "17:10", "les": 2, "hk": false, "room": "H-204", "semesters": [1, 2] },
+    { "id": "c29",  "col": 29, "cls": "28bc29fs", "typ": "SF",  "day": "Do", "from": "09:00", "to": "09:45", "les": 1, "hk": false, "room": "H-204", "semesters": [1, 2] },
+    {
+      "_kommentar": "KS Klassenstunde 27a",
+      "id": "c2",   "col": 2,  "cls": "27a", "typ": "KS", "day": "Mo", "from": "10:05", "to": "10:50", "les": 1, "hk": false, "room": "H-104", "semesters": [1]
+    },
+    { "id": "c2b",  "col": 10, "cls": "27a", "typ": "KS", "day": "Do", "from": "16:25", "to": "17:10", "les": 1, "hk": false, "room": "H-101", "semesters": [2] },
+    {
+      "_kommentar": "IN Informatik 28c — S1: Mo L7 Praktikum + Di L3-4 Praktikum; S2: Mo L3-4",
+      "id": "c28c_s1_mo", "col": 7,  "cls": "28c", "typ": "IN", "day": "Mo", "from": "13:40", "to": "14:25", "les": 1, "hk": true, "room": "P-02",  "semesters": [1], "note": "Praktikum hk"
+    },
+    { "id": "c13",        "col": 13, "cls": "28c", "typ": "IN", "day": "Di", "from": "10:05", "to": "11:45", "les": 2, "hk": true, "room": "H-106", "semesters": [1], "note": "Praktikum hk" },
+    { "id": "c4s2",       "col": 4,  "cls": "28c", "typ": "IN", "day": "Mo", "from": "10:05", "to": "11:45", "les": 2, "hk": false,"room": "H-111", "semesters": [2] },
+    {
+      "_kommentar": "IN Informatik 29f — S1: Mo L8-9 Praktikum; S2: Mo L7",
+      "id": "c6",    "col": 8,  "cls": "29f", "typ": "IN", "day": "Mo", "from": "14:35", "to": "16:20", "les": 2, "hk": true, "room": "H-206", "semesters": [1], "note": "Praktikum hk"
+    },
+    { "id": "c6s2",  "col": 7,  "cls": "29f", "typ": "IN", "day": "Mo", "from": "13:40", "to": "14:25", "les": 1, "hk": false,"room": "C-01",  "semesters": [2] },
+    {
+      "_kommentar": "IN Informatik 30s — Phasenunterricht, nicht in allen Phasen aktiv",
+      "id": "c30s_mi",  "col": 1, "cls": "30s", "typ": "IN", "day": "Mi", "from": "08:05", "to": "08:50", "les": 1, "hk": false, "room": "H-106", "semesters": [1], "note": "Phasenunterricht (nur Phase 1)"
+    },
+    { "id": "c30s_do",  "col": 9, "cls": "30s", "typ": "IN", "day": "Do", "from": "15:35", "to": "16:20", "les": 1, "hk": false, "room": "H-106", "semesters": [1], "note": "Phasenunterricht" },
+    { "id": "c30s_mi2", "col": 1, "cls": "30s", "typ": "IN", "day": "Mi", "from": "08:05", "to": "08:50", "les": 1, "hk": false, "room": "C-02",  "semesters": [2], "note": "Phasenunterricht (nur Phase 3)" },
+    { "id": "c30s_mo2", "col": 8, "cls": "30s", "typ": "IN", "day": "Mo", "from": "14:35", "to": "15:20", "les": 1, "hk": false, "room": "H-106", "semesters": [2], "note": "Phasenunterricht (nur Phase 3)" },
+    {
+      "_kommentar": "EWR Ergaenzungsfach 29fs — S1: Di L6 H-108; S2: Do L6 H-204",
+      "id": "c15",   "col": 6, "cls": "29fs", "typ": "EWR", "day": "Di", "from": "12:50", "to": "13:35", "les": 1, "hk": false, "room": "H-108", "semesters": [1]
+    },
+    { "id": "c15s2", "col": 6, "cls": "29fs", "typ": "EWR", "day": "Do", "from": "12:50", "to": "13:35", "les": 1, "hk": false, "room": "H-204", "semesters": [2] }
+  ]
+}
