@@ -1,3 +1,54 @@
+# Unterrichtsplaner – Handoff v3.92
+
+## Status: ✅ v3.92 — Abgeschlossen
+
+---
+
+## Originalauftrag v3.92
+
+| # | Typ | Beschreibung | Status |
+|---|-----|-------------|--------|
+| O1 | Bug | SequencePanel: Hardcodierte Hex-Farben brechen Light-Mode (Fachbereich-Buttons, Card-Container, Fallback-Farben) | ✅ |
+| O2 | Feature | Zoom-Funktion: Alle Texte, Icons, Badges und Zeilenhöhen proportional skalieren (bisher nur Spaltenbreite + Haupttext) | ✅ |
+
+---
+
+## Task O1: SequencePanel Light-Mode Fix
+
+**Problem:** Inline-Styles mit hardcodierten Hex-Farben (`#1a2035`, `#374151`, `#e5e7eb`, `#1e293b`, `#94a3b8`) reagieren nicht auf die Tailwind-Palette-Inversion im Light-Mode.
+
+**Lösung:** Hex-Werte durch Tailwind-Klassen (auto-invertierend) und CSS-Variablen (`var(--bg-secondary)`, `var(--text-muted)`) ersetzt.
+
+**Dateien:** `SequencePanel.tsx`
+
+---
+
+## Task O2: Zoom auf alle Texte/Icons/Badges/Höhen ausweiten
+
+**Problem:** Die 5 Zoom-Stufen (−/+) änderten bisher nur Spaltenbreite und den Haupttitel-Text. Alle KW-Nummern, Badges, Icons, Zeilenhöhen, Sequenz-Labels etc. blieben fix — kaum sichtbarer Unterschied zwischen Stufen.
+
+**Lösung:** `zs()` Helper-Funktion in `plannerStore.ts`:
+```ts
+export function zs(base: number, zoomCfg): number {
+  return Math.round(base * zoomCfg.fontSize / 11); // 11 = Default Stufe 3
+}
+```
+
+Alle `text-[Npx]` Tailwind-Klassen → `style={{ fontSize: z(N) }}` ersetzt. Zeilenhöhen (`ROW_H`, `cellHeight`) ebenfalls skaliert.
+
+**Nicht im Scope:** HoverPreview, EmptyCellMenu, Kontextmenü, Multi-Day-Dialog (Floating-Overlays).
+
+**Dateien:**
+- `plannerStore.ts` — `zs()` Export
+- `SemesterHeader.tsx` — ~11 Texte
+- `ZoomBlockView.tsx` — ~12 Texte + ROW_H
+- `ZoomYearView.tsx` — ~14 Texte + ROW_H
+- `WeekRows.tsx` — ~30 Texte + cellHeight + Badge-Stacking
+
+---
+
+## Vorherige Version
+
 # Unterrichtsplaner – Handoff v3.91
 
 ## Status: ✅ v3.91 — Abgeschlossen

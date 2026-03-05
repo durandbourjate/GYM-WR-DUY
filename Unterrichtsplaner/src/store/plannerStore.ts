@@ -17,6 +17,12 @@ export const ZOOM_LEVELS = [
   { colWidth: 340, fontSize: 14 },  // Stufe 5 (max)
 ] as const;
 
+/** Zoom-Scale Helper: skaliert einen Pixel-Basiswert proportional zur Zoom-Stufe.
+ *  Referenz = Stufe 3 (fontSize 11). Bei Stufe 1 ~18% kleiner, Stufe 5 ~27% grösser. */
+export function zs(base: number, zoomCfg: typeof ZOOM_LEVELS[number]): number {
+  return Math.round(base * zoomCfg.fontSize / 11);
+}
+
 interface Selection {
   week: string;
   courseId: string;

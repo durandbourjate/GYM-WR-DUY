@@ -1,13 +1,11 @@
 import { useMemo, useCallback } from 'react';
-import { usePlannerStore, ZOOM_LEVELS } from '../store/plannerStore';
+import { usePlannerStore, ZOOM_LEVELS, zs } from '../store/plannerStore';
 import { usePlannerData } from '../hooks/usePlannerData';
 import { TYPE_BADGES, DAY_COLORS, isPastWeek } from '../utils/colors';
 import { inferSubjectAreaFromLessonType, getBlockColors } from '../data/categories';
 import type { Course, ManagedSequence, LessonType, SubjectArea } from '../types';
 
 const DAY_ORDER: Record<string, number> = { Mo: 0, Di: 1, Mi: 2, Do: 3, Fr: 4 };
-const ROW_H = 24; // px per week row
-const HOLIDAY_ROW_H = 18;
 
 interface Props {
   semester: 1 | 2;
@@ -54,6 +52,9 @@ export function ZoomBlockView({ semester }: Props) {
 
   const zoomCfg = ZOOM_LEVELS[columnZoom] || ZOOM_LEVELS[2];
   const COL_W = zoomCfg.colWidth;
+  const z = (base: number) => zs(base, zoomCfg);
+  const ROW_H = z(24);
+  const HOLIDAY_ROW_H = z(18);
 
   const { courses: allCourses, weeks: staticWeeks, s2StartIndex, currentWeek } = usePlannerData();
 
@@ -180,7 +181,7 @@ export function ZoomBlockView({ semester }: Props) {
         <thead className="sticky z-40" style={{ top: 0 }}>
           <tr>
             <th className="w-10 bg-gray-900 sticky left-0 z-50 py-0.5 border-b border-gray-800">
-              <span className={`text-[8px] font-bold ${semester === 1 ? 'text-blue-400' : 'text-amber-400'}`}>
+              <span className={`font-bold ${semester === 1 ? 'text-blue-400' : 'text-amber-400'}`} style={{ fontSize: z(8) }}>
                 {semester === 1 ? 'S1' : 'S2'}
               </span>
             </th>
@@ -188,7 +189,7 @@ export function ZoomBlockView({ semester }: Props) {
               const newDay = i === 0 || c.day !== courses[i - 1]?.day;
               return (
                 <th key={`${c.id}-day`} className="bg-gray-900 px-0 pt-0.5 border-b border-gray-800 text-center"
-                  style={{ borderLeft: newDay ? `2px solid ${DAY_COLORS[c.day]}40` : 'none', fontSize: 9, fontWeight: 700, color: DAY_COLORS[c.day] }}>
+                  style={{ borderLeft: newDay ? `2px solid ${DAY_COLORS[c.day]}40` : 'none', fontSize: z(9), fontWeight: 700, color: DAY_COLORS[c.day] }}>
                   {newDay ? c.day : ''}
                 </th>
               );
@@ -196,7 +197,7 @@ export function ZoomBlockView({ semester }: Props) {
           </tr>
           <tr>
             <th className="w-10 bg-gray-900 sticky left-0 z-50 px-0.5 pb-0.5 border-b-2 border-gray-700">
-              <span className="text-[7px] text-gray-500 font-semibold">KW</span>
+              <span className="text-gray-500 font-semibold" style={{ fontSize: z(7) }}>KW</span>
             </th>
             {courses.map((c, i) => {
               const newDay = i === 0 || c.day !== courses[i - 1]?.day;
@@ -204,15 +205,16 @@ export function ZoomBlockView({ semester }: Props) {
               return (
                 <th key={`${c.id}-info`} className="bg-gray-900 px-0.5 pb-0.5 border-b-2 border-gray-700 text-center"
                   style={{ borderLeft: newDay ? `2px solid ${DAY_COLORS[c.day]}40` : 'none', width: COL_W, minWidth: COL_W, maxWidth: COL_W }}>
-                  <div className={`text-[9px] font-bold cursor-pointer transition-colors ${classFilter === c.cls ? 'text-blue-400' : 'text-gray-200 hover:text-blue-300'}`}
+                  <div className={`font-bold cursor-pointer transition-colors ${classFilter === c.cls ? 'text-blue-400' : 'text-gray-200 hover:text-blue-300'}`}
+                    style={{ fontSize: z(9) }}
                     onClick={() => setClassFilter(classFilter === c.cls ? null : c.cls)}>
                     {c.cls}
                   </div>
                   <div className="flex gap-0.5 justify-center mt-0.5">
-                    <span className="text-[7px] px-1 rounded font-bold cursor-pointer hover:opacity-80"
-                      style={{ background: badge?.bg, color: badge?.fg }}
+                    <span className="px-1 rounded font-bold cursor-pointer hover:opacity-80"
+                      style={{ fontSize: z(7), background: badge?.bg, color: badge?.fg }}
                       onClick={() => setFilter(c.typ as any)}>{c.typ}</span>
-                    <span className="text-[7px] px-0.5 rounded bg-slate-800 text-slate-400">{c.les}L</span>
+                    <span className="px-0.5 rounded bg-slate-800 text-slate-400" style={{ fontSize: z(7) }}>{c.les}L</span>
                   </div>
                 </th>
               );
@@ -239,7 +241,7 @@ export function ZoomBlockView({ semester }: Props) {
                 <td className={`bg-gray-900 sticky left-0 z-10 text-center border-b py-0 px-0.5 ${
                   isCurrent ? 'border-amber-500 bg-amber-950/30' : 'border-slate-800/50'
                 }`}>
-                  <span className={`text-[8px] font-mono font-bold ${isCurrent ? 'text-amber-400' : 'text-gray-500'}`}>
+                  <span className={`font-mono font-bold ${isCurrent ? 'text-amber-400' : 'text-gray-500'}`} style={{ fontSize: z(8) }}>
                     {weekW}
                   </span>
                 </td>
@@ -248,12 +250,12 @@ export function ZoomBlockView({ semester }: Props) {
                 {isHolidayWeek ? (
                   <td colSpan={courses.length} className="border-b border-slate-800/30 text-center py-0"
                     style={{ background: '#ffffff06' }}>
-                    <span className="text-[7px] text-gray-600 italic">{holidayLabel || 'Ferien'}</span>
+                    <span className="text-gray-600 italic" style={{ fontSize: z(7) }}>{holidayLabel || 'Ferien'}</span>
                   </td>
                 ) : isEventWeek ? (
                   <td colSpan={courses.length} className="border-b border-slate-800/30 text-center py-0"
                     style={{ background: '#4b556312' }}>
-                    <span className="text-[8px] text-gray-400 font-semibold">{eventLabel || 'Sonderwoche'}</span>
+                    <span className="text-gray-400 font-semibold" style={{ fontSize: z(8) }}>{eventLabel || 'Sonderwoche'}</span>
                   </td>
                 ) : (
                   /* Normal week — per course cells */
@@ -279,7 +281,7 @@ export function ZoomBlockView({ semester }: Props) {
                       return (
                         <td key={c.id} className="border-b border-slate-800/20 p-0" style={cellStyle}>
                           <div className="h-full flex items-center justify-center">
-                            <span className="text-[6px] text-gray-600 italic">—</span>
+                            <span className="text-gray-600 italic" style={{ fontSize: z(6) }}>—</span>
                           </div>
                         </td>
                       );
@@ -290,7 +292,7 @@ export function ZoomBlockView({ semester }: Props) {
                       return (
                         <td key={c.id} className="border-b border-slate-800/20 p-0" style={cellStyle}>
                           <div className="h-full flex items-center px-1" style={{ background: '#4b556312' }}>
-                            <span className="text-[7px] text-gray-500 truncate">{evTitle}</span>
+                            <span className="text-gray-500 truncate" style={{ fontSize: z(7) }}>{evTitle}</span>
                           </div>
                         </td>
                       );
@@ -343,11 +345,11 @@ export function ZoomBlockView({ semester }: Props) {
                           onClick={() => handleBlockClick(span)}
                           onDoubleClick={() => handleBlockDblClick(span.weeks[0], c, span)}
                         >
-                          <span className="text-[10px] font-bold leading-tight" style={{ color: colors.fg, display: '-webkit-box', WebkitLineClamp: span.spanLen >= 3 ? 3 : 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                          <span className="font-bold leading-tight" style={{ fontSize: z(10), color: colors.fg, display: '-webkit-box', WebkitLineClamp: span.spanLen >= 3 ? 3 : 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                             {displayLabel}
                           </span>
                           {span.spanLen >= 2 && (
-                            <span className="text-[8px] mt-0.5 font-medium" style={{ color: colors.fg, opacity: 0.7 }}>
+                            <span className="mt-0.5 font-medium" style={{ fontSize: z(8), color: colors.fg, opacity: 0.7 }}>
                               {span.spanLen}W
                             </span>
                           )}

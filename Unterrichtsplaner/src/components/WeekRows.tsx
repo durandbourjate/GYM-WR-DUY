@@ -2,7 +2,7 @@ import React, { useCallback, useState, useRef, useEffect } from 'react';
 import type { Course, Week, SubjectArea } from '../types';
 import { LESSON_COLORS, SUBJECT_AREA_COLORS, DAY_COLORS, getSequenceInfoFromStore, isPastWeek } from '../utils/colors';
 import { CURRENT_WEEK } from '../data/weeks';
-import { usePlannerStore, ZOOM_LEVELS } from '../store/plannerStore';
+import { usePlannerStore, ZOOM_LEVELS, zs } from '../store/plannerStore';
 import { useGCalStore } from '../store/gcalStore';
 import { getHKGroup } from '../utils/hkRotation';
 import { getEffectiveCategorySubtype, getCategoryLabel, getSubtypeLabel, CATEGORIES } from './DetailPanel';
@@ -17,6 +17,8 @@ interface Props {
 function InlineEdit({ value, onSave, onCancel }: { value: string; onSave: (v: string) => void; onCancel: () => void }) {
   const [text, setText] = useState(value);
   const inputRef = useRef<HTMLInputElement>(null);
+  const { columnZoom } = usePlannerStore();
+  const ieZoom = ZOOM_LEVELS[columnZoom] || ZOOM_LEVELS[2];
   useEffect(() => { inputRef.current?.focus(); inputRef.current?.select(); }, []);
   return (
     <input
@@ -28,8 +30,8 @@ function InlineEdit({ value, onSave, onCancel }: { value: string; onSave: (v: st
         if (e.key === 'Escape') onCancel();
       }}
       onBlur={() => onSave(text)}
-      className="w-full bg-slate-700 text-slate-100 border border-blue-400 rounded px-1 py-0.5 text-[9px] outline-none"
-      style={{ minHeight: 20 }}
+      className="w-full bg-slate-700 text-slate-100 border border-blue-400 rounded px-1 py-0.5 outline-none"
+      style={{ fontSize: zs(9, ieZoom), minHeight: zs(20, ieZoom) }}
     />
   );
 }
@@ -285,7 +287,9 @@ function EmptyCellMenu({ week, course, onClose, selectedWeeks, position }: { wee
 /* Inline editable note cell for expanded note column */
 
 function NoteCell({ weekW, col, cellHeight }: { weekW: string; col: number; cellHeight: number }) {
-  const { lessonDetails, updateLessonDetail, weekData, noteColWidth: ncw } = usePlannerStore();
+  const { lessonDetails, updateLessonDetail, weekData, noteColWidth: ncw, columnZoom } = usePlannerStore();
+  const nZoomCfg = ZOOM_LEVELS[columnZoom] || ZOOM_LEVELS[2];
+  const nz = (base: number) => zs(base, nZoomCfg);
   const detail = lessonDetails[`${weekW}-${col}`];
   const notes = detail?.notes || '';
   const [editing, setEditing] = useState(false);
@@ -321,7 +325,8 @@ function NoteCell({ weekW, col, cellHeight }: { weekW: string; col: number; cell
               if (text !== notes) updateLessonDetail(weekW, col, { notes: text || undefined });
             }
           }}
-          className="w-full h-full bg-transparent text-slate-300 text-[8px] leading-tight p-1 outline-none resize-none border border-blue-500/50 rounded-sm"
+          className="w-full h-full bg-transparent text-slate-300 leading-tight p-1 outline-none resize-none border border-blue-500/50 rounded-sm"
+          style={{ fontSize: nz(8) }}
         />
       </td>
     );
@@ -335,11 +340,11 @@ function NoteCell({ weekW, col, cellHeight }: { weekW: string; col: number; cell
       title={displayNotes || 'Klick für Notiz'}
     >
       {displayNotes ? (
-        <div className="text-[8px] text-gray-300 leading-tight p-1 overflow-hidden whitespace-pre-line" style={{ maxHeight: cellHeight }}>
+        <div className="text-gray-300 leading-tight p-1 overflow-hidden whitespace-pre-line" style={{ fontSize: nz(8), maxHeight: cellHeight }}>
           {displayNotes}
         </div>
       ) : (
-        <div className="text-[7px] text-gray-700 p-1 italic">…</div>
+        <div className="text-gray-700 p-1 italic" style={{ fontSize: nz(7) }}>…</div>
       )}
     </td>
   );
@@ -367,6 +372,7 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
   } = usePlannerStore();
 
   const zoomCfg = ZOOM_LEVELS[columnZoom] || ZOOM_LEVELS[2];
+  const z = (base: number) => zs(base, zoomCfg);
   const colW = zoomCfg.colWidth;
 
   const gcalCollisions = useGCalStore(s => s.collisions);
@@ -794,7 +800,7 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
         // Check if this is the start of a holiday span
         const hSpan = holidaySpanStart.get(week.w);
         if (hSpan) {
-          const ROW_H = 36;
+          const ROW_H = z(36);
           const spanH = hSpan.len * ROW_H;
           return (
             <tr
@@ -811,9 +817,9 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                 rowSpan={hSpan.len}
               >
                 <div className="flex flex-col items-center">
-                  <span className="text-[9px] font-mono font-medium text-gray-500">{hSpan.weekKeys[0]}</span>
+                  <span className="font-mono font-medium text-gray-500" style={{ fontSize: z(9) }}>{hSpan.weekKeys[0]}</span>
                   {hSpan.len > 1 && (
-                    <span className="text-[8px] font-mono text-gray-600">–{hSpan.weekKeys[hSpan.len - 1]}</span>
+                    <span className="font-mono text-gray-600" style={{ fontSize: z(8) }}>–{hSpan.weekKeys[hSpan.len - 1]}</span>
                   )}
                 </div>
               </td>
@@ -828,13 +834,13 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                 }}
               >
                 <div className="flex items-center justify-center gap-1.5">
-                  <span className="text-[11px]">🏖</span>
-                  <span className="text-[11px] font-medium text-gray-400">
+                  <span style={{ fontSize: z(11) }}>🏖</span>
+                  <span className="font-medium text-gray-400" style={{ fontSize: z(11) }}>
                     {hSpan.label}
                   </span>
                   {/* H1-fix: hSpan.len = Anzahl eindeutige Zeilen (KWs), direkt verwenden */}
                   {hSpan.len > 1 && (
-                    <span className="text-[9px] text-gray-500">({hSpan.len}W)</span>
+                    <span className="text-gray-500" style={{ fontSize: z(9) }}>({hSpan.len}W)</span>
                   )}
                 </div>
               </td>
@@ -866,12 +872,12 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
               }}
               title="Doppelklick: Ferien hinzufügen"
             >
-              <div className={`text-[9px] font-mono ${isCurrent ? 'font-extrabold text-blue-400' : 'font-medium text-gray-500'}`}>
+              <div className={`font-mono ${isCurrent ? 'font-extrabold text-blue-400' : 'font-medium text-gray-500'}`} style={{ fontSize: z(9) }}>
                 {week.w}
               </div>
               {isCurrent && <div className="w-1 h-1 rounded-full bg-blue-400 mx-auto mt-0.5 animate-pulse" />}
               {eventInfo && (
-                <div className="text-[6px] text-amber-500/80 leading-tight mt-0.5 max-w-[48px] truncate font-medium" title={eventInfo.label}>
+                <div className="text-amber-500/80 leading-tight mt-0.5 max-w-[48px] truncate font-medium" style={{ fontSize: z(6) }} title={eventInfo.label}>
                   📅 {eventInfo.label}
                 </div>
               )}
@@ -892,7 +898,7 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
               const isMulti = multiSelection.includes(`${week.w}-${c.id}`);
               const isEditing = editing?.week === week.w && editing?.col === c.col;
               const seq = getSequenceInfoFromStore(c.id, week.w, sequences);
-              const cellHeight = c.les >= 2 ? 36 : 26;
+              const cellHeight = c.les >= 2 ? z(36) : z(26);
               const isDragOver = dragMoveTarget?.week === week.w && dragMoveTarget?.col === c.col;
               const isDragSrc = dragMoveSource?.week === week.w && dragMoveSource?.col === c.col;
               const hkGroup = c.hk ? getHKGroup(week.w, c.col, hkStartGroups[c.col] || 'A', hkOverrides) : null;
@@ -1092,8 +1098,8 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                     />
                   )}
                   {seq?.isFirst && !isFixed && (
-                    <div className="absolute left-1.5 -top-0.5 text-[6px] font-bold z-10 px-0.5 rounded whitespace-nowrap cursor-pointer"
-                      style={{ background: 'var(--holiday-bg)', color: (() => {
+                    <div className="absolute left-1.5 -top-0.5 font-bold z-10 px-0.5 rounded whitespace-nowrap cursor-pointer"
+                      style={{ fontSize: z(6), background: 'var(--holiday-bg)', color: (() => {
                         const seqLabelSA = effectiveSubjectArea || (() => {
                           const parentSeq = sequences.find(s => s.id === seq.sequenceId);
                           const block = parentSeq?.blocks.find(b => b.weeks.includes(week.w));
@@ -1130,8 +1136,9 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                   {/* HK Rotation Badge */}
                   {hkGroup && title && (
                     <div
-                      className="absolute right-0.5 top-0 text-[7px] font-bold z-10 px-1 py-px rounded-bl cursor-pointer select-none"
+                      className="absolute right-0.5 top-0 font-bold z-10 px-1 py-px rounded-bl cursor-pointer select-none"
                       style={{
+                        fontSize: z(7),
                         background: hkGroup === 'A' ? '#7c3aed40' : '#0ea5e940',
                         color: hkGroup === 'A' ? '#a78bfa' : '#67e8f9',
                       }}
@@ -1149,11 +1156,11 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                   {(() => {
                     const cellBadges = lessonDetails[`${week.w}-${c.col}`]?.badges;
                     if (!cellBadges?.length || !title) return null;
-                    const topOffset = hkGroup ? 12 : 0;
+                    const topOffset = hkGroup ? z(12) : 0;
                     return cellBadges.map((b, bi) => (
                       <div key={bi}
-                        className="absolute right-0.5 text-[7px] font-bold z-10 px-1 py-px rounded-bl select-none pointer-events-none"
-                        style={{ top: topOffset + bi * 12, background: b.color + '40', color: b.color }}>
+                        className="absolute right-0.5 font-bold z-10 px-1 py-px rounded-bl select-none pointer-events-none"
+                        style={{ fontSize: z(7), top: topOffset + bi * z(12), background: b.color + '40', color: b.color }}>
                         {b.label}
                       </div>
                     ));
@@ -1166,7 +1173,8 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                     if (!collidingEvents?.length || !title) return null;
                     return (
                       <div
-                        className="absolute left-0.5 bottom-0.5 text-[8px] z-10 cursor-help select-none"
+                        className="absolute left-0.5 bottom-0.5 z-10 cursor-help select-none"
+                        style={{ fontSize: z(8) }}
                         title={`⚠️ Zeitkonflikt mit: ${collidingEvents.join(', ')}`}
                       >
                         ⚠️
@@ -1196,7 +1204,7 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                     <div
                       className="mx-0.5 ml-1.5 px-1.5 py-1 rounded flex items-center justify-center cursor-pointer hover:brightness-110 transition-all"
                       style={{
-                        minHeight: Math.max(cellHeight, 32),
+                        minHeight: Math.max(cellHeight, z(32)),
                         opacity: isSearchDimmed ? 0.2 : 1,
                         background: 'color-mix(in srgb, var(--holiday-bar) 60%, transparent)',
                         border: '1px solid var(--border)',
@@ -1213,9 +1221,9 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                       }}
                       title="Doppelklick: Bearbeiten · Rechtsklick: Aufheben"
                     >
-                      <span className="mr-1 text-[9px]">🏖</span>
-                      <span className="text-[9px] font-medium leading-tight text-gray-400"
-                        style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                      <span className="mr-1" style={{ fontSize: z(9) }}>🏖</span>
+                      <span className="font-medium leading-tight text-gray-400"
+                        style={{ fontSize: z(9), display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                         {displayTitle}
                       </span>
                     </div>
@@ -1224,7 +1232,7 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                     <div
                       className="mx-0.5 ml-1.5 px-1.5 py-1 rounded flex items-center justify-center cursor-pointer hover:brightness-110 transition-all"
                       style={{
-                        minHeight: Math.max(cellHeight, 32),
+                        minHeight: Math.max(cellHeight, z(32)),
                         opacity: isSearchDimmed ? 0.2 : isSelected ? 1 : 0.9,
                         background: isSelected ? '#78350f' : '#451a0340',
                         border: `1px solid ${isSelected ? '#f59e0b' : '#92400e60'}`,
@@ -1243,9 +1251,9 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                       }}
                       title="Klick: Auswählen · Doppelklick: Bearbeiten · Rechtsklick: Aufheben"
                     >
-                      <span className="mr-1 text-[9px]">📅</span>
-                      <span className="text-[9px] font-medium leading-tight text-amber-400/80"
-                        style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                      <span className="mr-1" style={{ fontSize: z(9) }}>📅</span>
+                      <span className="font-medium leading-tight text-amber-400/80"
+                        style={{ fontSize: z(9), display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                         {displayTitle}
                       </span>
                     </div>
@@ -1253,17 +1261,17 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                     <div
                       className={`mx-0.5 ml-1.5 px-1 py-0.5 rounded transition-all duration-100 flex items-center hover:shadow-md hover:z-10 relative ${isFixed ? 'cursor-default' : isDragSrc ? 'cursor-grabbing' : 'cursor-grab hover:scale-[1.02]'} ${isSearchMatch ? 'search-highlight' : ''}`}
                       style={{
-                        minHeight: isFixed ? Math.max(cellHeight, 32) : cellHeight,
+                        minHeight: isFixed ? Math.max(cellHeight, z(32)) : cellHeight,
                         opacity: isDragSrc ? 0.35 : isSeqDimmed ? 0.3 : isSearchDimmed ? 0.2 : 1,
                         background: isInEditingSeq ? '#1e3a5f' : isMulti ? '#312e81' : isSelected ? '#1e3a5f' : cellColors?.bg || '#eef2f7',
                         border: `1px solid ${isInEditingSeq ? '#60a5fa' : isMulti ? '#6366f1' : isSelected ? '#3b82f6' : cellColors?.border || '#cbd5e1'}`,
                         boxShadow: isInEditingSeq ? '0 0 0 2px #3b82f640' : isMulti ? '0 0 0 2px #6366f150' : isSelected ? '0 0 0 2px #3b82f650' : 'none',
                       }}
                     >
-                      {lessonType === 4 && <span className="mr-0.5 text-[8px]">📝</span>}
-                      {isFixed && <span className="mr-0.5 text-[8px]">{lessonType === 6 ? '🏖' : '📅'}</span>}
-                      {isAuftragUnterricht && <span className="mr-0.5 text-[8px]" title="Auftrag (kein Präsenzunterricht)">📋</span>}
-                      {cellDetail?.sol?.enabled && <span className="mr-0.5 text-[8px]" title="SOL">📚</span>}
+                      {lessonType === 4 && <span className="mr-0.5" style={{ fontSize: z(8) }}>📝</span>}
+                      {isFixed && <span className="mr-0.5" style={{ fontSize: z(8) }}>{lessonType === 6 ? '🏖' : '📅'}</span>}
+                      {isAuftragUnterricht && <span className="mr-0.5" style={{ fontSize: z(8) }} title="Auftrag (kein Präsenzunterricht)">📋</span>}
+                      {cellDetail?.sol?.enabled && <span className="mr-0.5" style={{ fontSize: z(8) }} title="SOL">📚</span>}
                       <div
                         className="leading-tight overflow-hidden flex-1 cursor-pointer"
                         onClick={(e) => {
@@ -1276,7 +1284,7 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                         }}
                         title="Klick: Details öffnen"
                         style={{
-                          fontSize: c.les >= 2 ? zoomCfg.fontSize : zoomCfg.fontSize - 1,
+                          fontSize: c.les >= 2 ? z(zoomCfg.fontSize) : z(zoomCfg.fontSize - 1),
                           fontWeight: lessonType === 4 || isFixed ? 700 : 500,
                           color: isInEditingSeq ? '#93c5fd' : isMulti ? '#c7d2fe' : isSelected ? '#e2e8f0' : cellColors?.fg || '#475569',
                           display: '-webkit-box',
@@ -1312,13 +1320,15 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                           <button
                             onClick={(e) => { e.stopPropagation(); if (prevFree) { pushUndo(); swapLessons(c.col, week.w, prevFree); } }}
                             disabled={!prevFree}
-                            className={`w-4 h-4 rounded bg-slate-700/90 text-[8px] flex items-center justify-center border border-slate-600 ${!prevFree ? 'text-gray-600 cursor-not-allowed' : 'text-gray-300 cursor-pointer hover:bg-blue-600 hover:text-white'}`}
+                            className={`rounded bg-slate-700/90 flex items-center justify-center border border-slate-600 ${!prevFree ? 'text-gray-600 cursor-not-allowed' : 'text-gray-300 cursor-pointer hover:bg-blue-600 hover:text-white'}`}
+                            style={{ width: z(16), height: z(16), fontSize: z(8) }}
                             title="Nach oben verschieben (überspringt Ferien)"
                           >↑</button>
                           <button
                             onClick={(e) => { e.stopPropagation(); if (nextFree) { pushUndo(); swapLessons(c.col, week.w, nextFree); } }}
                             disabled={!nextFree}
-                            className={`w-4 h-4 rounded bg-slate-700/90 text-[8px] flex items-center justify-center border border-slate-600 ${!nextFree ? 'text-gray-600 cursor-not-allowed' : 'text-gray-300 cursor-pointer hover:bg-blue-600 hover:text-white'}`}
+                            className={`rounded bg-slate-700/90 flex items-center justify-center border border-slate-600 ${!nextFree ? 'text-gray-600 cursor-not-allowed' : 'text-gray-300 cursor-pointer hover:bg-blue-600 hover:text-white'}`}
+                            style={{ width: z(16), height: z(16), fontSize: z(8) }}
                             title="Nach unten verschieben (überspringt Ferien)"
                           >↓</button>
                         </div>
@@ -1329,9 +1339,9 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                     /* K6: TaF phasenfreie Woche — grau wie Ferien */
                     <div
                       className="mx-0.5 ml-1.5 px-1.5 py-1 rounded flex items-center justify-center"
-                      style={{ minHeight: Math.max(cellHeight, 32), background: 'color-mix(in srgb, var(--holiday-bar) 60%, transparent)', border: '1px solid var(--border)' }}
+                      style={{ minHeight: Math.max(cellHeight, z(32)), background: 'color-mix(in srgb, var(--holiday-bar) 60%, transparent)', border: '1px solid var(--border)' }}
                     >
-                      <span className="text-[8px] text-gray-600 italic">— keine Phase —</span>
+                      <span className="text-gray-600 italic" style={{ fontSize: z(8) }}>— keine Phase —</span>
                     </div>
                   ) : (
                     <div

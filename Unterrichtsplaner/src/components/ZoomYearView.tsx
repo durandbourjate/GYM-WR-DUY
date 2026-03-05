@@ -1,11 +1,9 @@
 import { useMemo, useCallback } from 'react';
-import { usePlannerStore, ZOOM_LEVELS } from '../store/plannerStore';
+import { usePlannerStore, ZOOM_LEVELS, zs } from '../store/plannerStore';
 import { usePlannerData } from '../hooks/usePlannerData';
 import { TYPE_BADGES, DAY_COLORS, isPastWeek } from '../utils/colors';
 import { inferSubjectAreaFromLessonType, getBlockColors } from '../data/categories';
 import type { Course, ManagedSequence, LessonType, SubjectArea } from '../types';
-
-const ROW_H = 26;
 
 // Block colors are now in data/categories.ts (getBlockColors)
 
@@ -44,10 +42,12 @@ export function ZoomYearView() {
     dimPastWeeks, columnZoom,
   } = usePlannerStore();
 
-  // v3.91 N3: Zoom-abhängige Breiten
+  // v3.91 N3: Zoom-abhängige Breiten + Skalierung
   const zoomCfg = ZOOM_LEVELS[columnZoom] || ZOOM_LEVELS[2];
   const GROUP_W = zoomCfg.colWidth;
   const SUBDAY_W = Math.round(zoomCfg.colWidth / 2);
+  const z = (base: number) => zs(base, zoomCfg);
+  const ROW_H = z(26);
 
   const { courses: allCourses, weeks: staticWeeks, s2StartIndex, currentWeek } = usePlannerData();
 
@@ -285,7 +285,7 @@ export function ZoomYearView() {
           {/* Group header row */}
           <tr>
             <th className="w-12 bg-gray-900 sticky left-0 z-50 py-1 border-b border-gray-800">
-              <span className="text-[9px] font-bold text-gray-400">Jahr</span>
+              <span className="font-bold text-gray-400" style={{ fontSize: z(9) }}>Jahr</span>
             </th>
             {groups.map((g) => {
               const badge = (TYPE_BADGES as Record<string, { bg: string; fg: string }>)[g.typ];
@@ -294,20 +294,20 @@ export function ZoomYearView() {
                 <th key={g.key} colSpan={g.isMultiDay ? g.courses.length : 1}
                   className="bg-gray-900 px-0.5 py-1 border-b-2 border-gray-700 text-center"
                   style={{ width: totalW, minWidth: totalW }}>
-                  <div className={`text-[11px] font-bold cursor-pointer transition-colors ${
+                  <div className={`font-bold cursor-pointer transition-colors ${
                     classFilter === g.cls ? 'text-blue-400' : 'text-gray-200 hover:text-blue-300'
-                  }`} onClick={() => setClassFilter(classFilter === g.cls ? null : g.cls)}>
+                  }`} style={{ fontSize: z(11) }} onClick={() => setClassFilter(classFilter === g.cls ? null : g.cls)}>
                     {g.cls}
                   </div>
                   <div className="flex gap-0.5 justify-center mt-0.5">
-                    <span className="text-[9px] px-1 rounded font-bold cursor-pointer hover:opacity-80"
-                      style={{ background: badge?.bg, color: badge?.fg }}
+                    <span className="px-1 rounded font-bold cursor-pointer hover:opacity-80"
+                      style={{ fontSize: z(9), background: badge?.bg, color: badge?.fg }}
                       onClick={() => setFilter(g.typ as any)}>{g.typ}</span>
                   </div>
                   {g.isMultiDay && (
                     <div className="flex justify-center gap-0 mt-0.5">
                       {g.courses.map(c => (
-                        <span key={c.id} className="text-[9px] px-1 text-gray-500" style={{ color: DAY_COLORS[c.day] }}>
+                        <span key={c.id} className="px-1 text-gray-500" style={{ fontSize: z(9), color: DAY_COLORS[c.day] }}>
                           {c.day}
                         </span>
                       ))}
@@ -344,9 +344,9 @@ export function ZoomYearView() {
                     rowSpan={hSpan.len}
                     style={{ height: spanH }}>
                     <div className="flex flex-col items-center">
-                      <span className="text-[9px] font-mono text-gray-400">{weekW}</span>
+                      <span className="font-mono text-gray-400" style={{ fontSize: z(9) }}>{weekW}</span>
                       {hSpan.len > 1 && (
-                        <span className="text-[8px] font-mono text-gray-500">–{allWeekKeys[weekIdx + hSpan.len - 1]}</span>
+                        <span className="font-mono text-gray-500" style={{ fontSize: z(8) }}>–{allWeekKeys[weekIdx + hSpan.len - 1]}</span>
                       )}
                     </div>
                   </td>
@@ -357,12 +357,12 @@ export function ZoomYearView() {
                       height: spanH,
                     }}>
                     <div className="flex items-center justify-center gap-1.5">
-                      <span className="text-[10px]">{isHoliday ? '🏖' : '📅'}</span>
-                      <span className={`text-[11px] font-medium ${isHoliday ? 'text-gray-300' : 'text-amber-300/80'}`}>
+                      <span style={{ fontSize: z(10) }}>{isHoliday ? '🏖' : '📅'}</span>
+                      <span className={`font-medium ${isHoliday ? 'text-gray-300' : 'text-amber-300/80'}`} style={{ fontSize: z(11) }}>
                         {hSpan.label}
                       </span>
                       {hSpan.len > 1 && (
-                        <span className="text-[9px] text-gray-500">({hSpan.len}W)</span>
+                        <span className="text-gray-500" style={{ fontSize: z(9) }}>({hSpan.len}W)</span>
                       )}
                     </div>
                   </td>
@@ -383,7 +383,7 @@ export function ZoomYearView() {
                 <td className={`bg-gray-900 sticky left-0 z-10 text-center border-b py-0 px-0.5 ${
                   isCurrent ? 'border-amber-500 bg-amber-950/30' : 'border-slate-800/50'
                 }`}>
-                  <span className={`text-[9px] font-mono font-bold ${isCurrent ? 'text-amber-400' : 'text-gray-400'}`}>
+                  <span className={`font-mono font-bold ${isCurrent ? 'text-amber-400' : 'text-gray-400'}`} style={{ fontSize: z(9) }}>
                     {weekW}
                   </span>
                 </td>
@@ -417,11 +417,11 @@ export function ZoomYearView() {
                               title={`${sharedSpan.seq.title} → ${displayLabel}\n${sharedSpan.spanLen}W\nKlick: Sequenz · Doppelklick: Wochenansicht`}
                               onClick={() => handleBlockClick(sharedSpan)}
                               onDoubleClick={() => handleBlockDblClick(sharedSpan.weeks[0], group.courses[0], sharedSpan)}>
-                              <span className="font-bold leading-tight" style={{ color: colors.fg, fontSize: zoomCfg.fontSize + 1, display: '-webkit-box', WebkitLineClamp: sharedSpan.spanLen >= 3 ? 3 : 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                              <span className="font-bold leading-tight" style={{ color: colors.fg, fontSize: z(zoomCfg.fontSize + 1), display: '-webkit-box', WebkitLineClamp: sharedSpan.spanLen >= 3 ? 3 : 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                                 {displayLabel}
                               </span>
                               {sharedSpan.spanLen >= 2 && (
-                                <span className="text-[9px] mt-0.5 font-medium" style={{ color: colors.fg, opacity: 0.7 }}>{sharedSpan.spanLen}W</span>
+                                <span className="mt-0.5 font-medium" style={{ fontSize: z(9), color: colors.fg, opacity: 0.7 }}>{sharedSpan.spanLen}W</span>
                               )}
                             </div>
                           </td>
@@ -445,7 +445,7 @@ export function ZoomYearView() {
                                 style={{ width: SUBDAY_W, minWidth: SUBDAY_W, maxWidth: SUBDAY_W }}>
                                 <div className="h-full flex items-center justify-center"
                                   style={{ background: cellType === 6 ? '#1e293b40' : '#37415130', minHeight: ROW_H - 2 }}>
-                                  <span className={`text-[8px] ${cellType === 6 ? 'text-gray-400' : 'text-amber-400/70'}`}>
+                                  <span className={`${cellType === 6 ? 'text-gray-400' : 'text-amber-400/70'}`} style={{ fontSize: z(8) }}>
                                     {cellType === 6 ? '🏖' : '📅'}
                                   </span>
                                 </div>
@@ -503,7 +503,7 @@ export function ZoomYearView() {
                               style={{ width: GROUP_W, minWidth: GROUP_W, maxWidth: GROUP_W }}>
                               <div className="h-full flex items-center justify-center px-1"
                                 style={{ background: cellType === 6 ? '#1e293b40' : '#37415130', minHeight: ROW_H - 2 }}>
-                                <span className={`text-[9px] ${cellType === 6 ? 'text-gray-400' : 'text-amber-400/70'}`}>
+                                <span className={cellType === 6 ? 'text-gray-400' : 'text-amber-400/70'} style={{ fontSize: z(9) }}>
                                   {cellType === 6 ? '🏖' : '📅'} {cellLabel}
                                 </span>
                               </div>
@@ -539,11 +539,11 @@ export function ZoomYearView() {
                               : `${span.seq.title} → ${displayLabel}\n${span.spanLen}W\nKlick: Sequenz · Doppelklick: Wochenansicht`}
                             onClick={() => handleBlockClick(span)}
                             onDoubleClick={() => handleBlockDblClick(span.weeks[0], course, span)}>
-                            <span className="font-bold leading-tight" style={{ color: colors.fg, fontSize: zoomCfg.fontSize, display: '-webkit-box', WebkitLineClamp: span.spanLen >= 3 ? 3 : 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                            <span className="font-bold leading-tight" style={{ color: colors.fg, fontSize: z(zoomCfg.fontSize), display: '-webkit-box', WebkitLineClamp: span.spanLen >= 3 ? 3 : 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                               {displayLabel}
                             </span>
                             {span.spanLen >= 2 && (
-                              <span className="text-[8px] mt-0.5 font-medium" style={{ color: colors.fg, opacity: 0.7 }}>{span.spanLen}W</span>
+                              <span className="mt-0.5 font-medium" style={{ color: colors.fg, opacity: 0.7, fontSize: z(8) }}>{span.spanLen}W</span>
                             )}
                           </div>
                         </td>
