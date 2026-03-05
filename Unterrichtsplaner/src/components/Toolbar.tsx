@@ -1,4 +1,5 @@
 import { useState, useRef, useMemo, useEffect, useCallback, useLayoutEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { usePlannerStore } from '../store/plannerStore';
 import { usePlannerData } from '../hooks/usePlannerData';
 import { StatsPanel } from './StatsPanel';
@@ -15,6 +16,8 @@ export function AppHeader() {
   const { isLight, toggleTheme } = useTheme();
   const [showAddMenu, setShowAddMenu] = useState(false);
   const addMenuRef = useRef<HTMLDivElement>(null);
+  const addBtnRef = useRef<HTMLButtonElement>(null);
+  const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0 });
   const { courses: plannerCourses } = usePlannerData();
 
   // Dynamic course type filters from configured courses
@@ -34,11 +37,13 @@ export function AppHeader() {
   }, [weekData, lessonDetails, plannerCourses, s2StartIndex, plannerSettings?.assessmentRules]);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
-  // Close add menu on click outside (v3.77 #6)
+  // Close add menu on click outside (v3.77 #6, v3.90 M4: Portal-aware)
   useEffect(() => {
     if (!showAddMenu) return;
     const handler = (e: MouseEvent) => {
-      if (addMenuRef.current && !addMenuRef.current.contains(e.target as Node)) setShowAddMenu(false);
+      const target = e.target as Node;
+      if (addMenuRef.current?.contains(target) || addBtnRef.current?.contains(target)) return;
+      setShowAddMenu(false);
     };
     const keyHandler = (e: KeyboardEvent) => { if (e.key === 'Escape') setShowAddMenu(false); };
     document.addEventListener('mousedown', handler);
@@ -52,7 +57,7 @@ export function AppHeader() {
         <span className="text-base font-bold text-gray-50">
           <span className="text-blue-400">⊞</span> Unterrichtsplaner
         </span>
-        <span className="text-[10px] text-gray-500">v3.89</span>
+        <span className="text-[10px] text-gray-500">v3.90</span>
       </div>
       {/* J6: Toolbar-Layout — Suche links, Filter mitte, Icons rechts */}
       {/* === Area 1: Search (flex-1, nimmt verfügbaren Platz) === */}
@@ -73,37 +78,46 @@ export function AppHeader() {
           >✕</button>
         )}
       </div>
-      {/* K4: «+» Button ausserhalb von overflow-hidden, damit Dropdown sichtbar */}
-      <div className="relative flex-shrink-0" ref={addMenuRef}>
+      {/* M4: «+» Button — Dropdown als Portal gerendert (kein overflow-clip-Problem) */}
+      <div className="flex-shrink-0" ref={addMenuRef}>
         <button
-          onClick={() => setShowAddMenu(!showAddMenu)}
-          className="px-1.5 py-0.5 rounded text-[10px] font-semibold border border-dashed border-green-700 text-green-500 cursor-pointer hover:bg-green-900/20 hover:text-green-300 transition-colors z-50"
+          ref={addBtnRef}
+          onClick={() => {
+            if (!showAddMenu) {
+              const rect = addBtnRef.current?.getBoundingClientRect();
+              if (rect) setDropdownPos({ top: rect.bottom + 4, left: rect.left });
+            }
+            setShowAddMenu(!showAddMenu);
+          }}
+          className="px-1.5 py-0.5 rounded text-[10px] font-semibold border border-dashed border-green-700 text-green-500 cursor-pointer hover:bg-green-900/20 hover:text-green-300 transition-colors"
           title="Neue Sequenz oder UE erstellen"
         >
           +
         </button>
-        {showAddMenu && (
-          <div className="absolute top-full left-0 mt-1 bg-slate-800 border border-slate-600 rounded-lg shadow-xl py-1 w-44 z-[9999]">
-            <button onClick={() => {
-              setSidePanelOpen(true);
-              setSidePanelTab('sequences');
-              setSequencePanelOpen(true);
-              setShowAddMenu(false);
-            }}
-              className="w-full px-3 py-1.5 text-left text-[10px] text-gray-200 hover:bg-slate-700 cursor-pointer flex items-center gap-2">
-              <span className="text-green-400">▧</span> Neue Sequenz
-            </button>
-            <button onClick={() => {
-              setSidePanelOpen(true);
-              setSidePanelTab('details');
-              setShowAddMenu(false);
-            }}
-              className="w-full px-3 py-1.5 text-left text-[10px] text-gray-200 hover:bg-slate-700 cursor-pointer flex items-center gap-2">
-              <span className="text-blue-400">📖</span> Neue UE
-            </button>
-          </div>
-        )}
       </div>
+      {showAddMenu && createPortal(
+        <div ref={addMenuRef} className="bg-slate-800 border border-slate-600 rounded-lg shadow-xl py-1 w-44"
+          style={{ position: 'fixed', top: dropdownPos.top, left: dropdownPos.left, zIndex: 9999 }}>
+          <button onClick={() => {
+            setSidePanelOpen(true);
+            setSidePanelTab('sequences');
+            setSequencePanelOpen(true);
+            setShowAddMenu(false);
+          }}
+            className="w-full px-3 py-1.5 text-left text-[10px] text-gray-200 hover:bg-slate-700 cursor-pointer flex items-center gap-2">
+            <span className="text-green-400">▧</span> Neue Sequenz
+          </button>
+          <button onClick={() => {
+            setSidePanelOpen(true);
+            setSidePanelTab('details');
+            setShowAddMenu(false);
+          }}
+            className="w-full px-3 py-1.5 text-left text-[10px] text-gray-200 hover:bg-slate-700 cursor-pointer flex items-center gap-2">
+            <span className="text-blue-400">📖</span> Neue UE
+          </button>
+        </div>,
+        document.body
+      )}
       {/* === Area 2: Filters (flex-shrink, bei Platzmangel zusammengestaucht) === */}
       <div className="flex gap-1 items-center flex-shrink overflow-hidden">
         <button

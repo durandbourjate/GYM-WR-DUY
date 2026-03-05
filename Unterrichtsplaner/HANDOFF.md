@@ -1,4 +1,138 @@
-# Unterrichtsplaner – Handoff v3.89
+# Unterrichtsplaner – Handoff v3.90
+
+## Status: ✅ v3.90 — Abgeschlossen
+
+---
+
+## Originalauftrag v3.90
+
+| # | Typ | Beschreibung | Priorität | Status |
+|---|-----|-------------|-----------|--------|
+| M1 | Bug | Light-Mode: alle Input/Textarea/Select-Felder dunkel (hardcodierte Dark-Klassen nicht auf CSS-Variablen umgestellt) | 🔴 Kritisch | ✅ |
+| M2 | Bug | Light-Mode: Kontrast/Lesbarkeit — Tab «UE» unsichtbar, ausgewählte Kategorie «Lektion» kaum erkennbar, allgemein zu wenig Kontrast | 🔴 Kritisch | ✅ |
+| M3 | Bug | Light-Mode: Statistik-Modal, Ist-Zustand-Ansicht und weitere Modals/Overlays dunkel statt hell | 🔴 Kritisch | ✅ |
+| M4 | Bug | «+»-Button-Dropdown liegt hinter Kurs-Header-Balken (z-index, tritt immer auf — v3.89 L1-Fix hat nicht gewirkt) | 🟠 Hoch | ✅ |
+| M5 | Bug | Scroll-Bug Sequenzen-Panel: Panel kann nicht nach unten gescrollt werden (tritt auch ohne ausgeklappten KW-Eintrag auf — v3.89 L2-Fix hat nicht gewirkt) | 🟠 Hoch | ✅ |
+
+---
+
+## Task M1+M2+M3: Bug — Light-Mode unvollständig
+
+**Problem:** Die Light-Mode-Implementierung aus v3.89 (L7) hat nicht alle Komponenten korrekt auf CSS-Variablen umgestellt. Im Light-Mode erscheinen:
+- Alle Eingabefelder (Input, Textarea, Select) mit dunklem Hintergrund (`bg-slate-800` o.ä. noch hardcodiert)
+- Tabs (z.B. «UE» im Modal) mit schlechtem Kontrast — Text unsichtbar
+- Ausgewählte Kategorien/Buttons (z.B. «Lektion» aktiv) kaum erkennbar
+- Statistik-Modal komplett dunkel
+- Ist-Zustand-Ansicht komplett dunkel
+- Sammlung-Tab dunkel
+- Sequenz-Bearbeitungs-Panel dunkel
+
+**Vorgehen — systematische Durchsicht aller Komponenten:**
+
+1. **`src/index.css` prüfen:** CSS-Variablen für `--bg-input`, `--text-input`, `--border-input` ergänzen falls fehlend:
+```css
+:root {
+  --bg-input:    #1e293b;
+  --text-input:  #f1f5f9;
+  --border-input: #334155;
+}
+:root.light-mode {
+  --bg-input:    #ffffff;
+  --text-input:  #0f172a;
+  --border-input: #cbd5e1;
+}
+```
+
+2. **Alle `.tsx`-Dateien nach hardcodierten Dark-Klassen durchsuchen:**
+   - `bg-slate-800`, `bg-slate-900`, `bg-[#0f172a]`, `bg-[#1e293b]`
+   - `text-white`, `text-slate-100`, `text-slate-400`
+   - `border-slate-700`, `border-slate-600`
+   → Alle durch `style={{ background: 'var(--bg-input)' }}` etc. ersetzen
+
+3. **Betroffene Dateien (mindestens):**
+   - `DetailPanel.tsx` — UE-Formular (Inputs, Textareas, Tabs, Kategorie-Buttons)
+   - `SequencePanel.tsx` — Sequenz-Formular, Lektionsliste
+   - `SettingsPanel.tsx` — alle Formularfelder
+   - Statistik-Modal-Komponente
+   - Sammlung-/Collection-Panel
+   - `ZoomYearView.tsx` — Ist-Zustand-Ansicht
+
+4. **Aktive/ausgewählte Zustände:** Im Light-Mode erkennbarer Kontrast:
+   - Aktiver Tab: dunklerer Hintergrund + dunkler Text
+   - Ausgewählte Kategorie: Rand + leicht farbiger Hintergrund, Text immer lesbar
+   - Standard: WCAG-AA-Konformität (Kontrastverhältnis ≥ 4.5:1)
+
+---
+
+## Task M4: Bug — «+»-Button-Dropdown hinter Kurs-Header
+
+**Problem:** Das Dropdown («Neue UE» / «Neue Sequenz») erscheint hinter dem Kurs-Header-Balken. Tritt immer auf. Der v3.89-Fix (`z-[9999]`) hat nicht gewirkt — vermutlich weil das Dropdown noch in einem `overflow: hidden`-Container liegt und deshalb abgeschnitten wird.
+
+**Fix — Dropdown als React Portal rendern:**
+```tsx
+import { createPortal } from 'react-dom';
+
+const buttonRef = useRef<HTMLButtonElement>(null);
+const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0 });
+
+const handleOpen = () => {
+  const rect = buttonRef.current?.getBoundingClientRect();
+  if (rect) setDropdownPos({ top: rect.bottom + 4, left: rect.left });
+  setOpen(true);
+};
+
+{open && createPortal(
+  <div style={{ position: 'fixed', top: dropdownPos.top, left: dropdownPos.left, zIndex: 9999 }}>
+    ...Menü-Einträge...
+  </div>,
+  document.body
+)}
+```
+Portal löst das Dropdown aus dem DOM-Baum heraus → `overflow: hidden` eines Vorfahren hat keinen Effekt mehr.
+
+---
+
+## Task M5: Bug — Scroll-Bug Sequenzen-Panel (3. Anlauf)
+
+**Problem:** Sequenzen-Panel scrollt nicht. Tritt auch ohne ausgeklappten KW-Eintrag auf. Seit v3.87 gescheitert (J2, K2, L2).
+
+**Vorgehen — diesmal vollständige Vorfahren-Analyse:**
+1. `SequencePanel.tsx` komplett lesen
+2. Scrollbaren Container identifizieren
+3. Checkliste für diesen Container:
+   - `overflow-y: auto` (nicht `hidden`, nicht `visible`)
+   - Explizite Höhe: `height: calc(100vh - Xpx)` oder `flex: 1 1 0; min-height: 0`
+4. **Alle Flex-Vorfahren bis zum `<body>`:** jeder braucht `min-height: 0`
+5. Kein Vorfahre darf `overflow: hidden` haben
+6. `overscroll-behavior: contain` auf dem scrollbaren Container
+7. `onWheel stopPropagation` nur auf dem **äussersten Panel-div**
+
+**Wichtig:** Den gesamten Vorfahren-Baum bis zum Root analysieren — nicht nur den direkten Container.
+
+---
+
+## Ergebnis v3.90
+
+| # | Typ | Beschreibung | Status | Details |
+|---|-----|-------------|--------|---------|
+| M1 | Bug | Light-Mode Eingabefelder | ✅ | TW4-Palette-Inversion in `index.css`: `--color-slate-*` und `--color-gray-*` in `:root.light-mode` überschrieben → alle hardcodierten Klassen passen sich automatisch an |
+| M2 | Bug | Light-Mode Kontrast/Lesbarkeit | ✅ | Gleicher Ansatz; zusätzlich `.text-white` und `.placeholder-gray-600` explizit überschrieben |
+| M3 | Bug | Light-Mode Modals/Overlays | ✅ | Gleicher Ansatz — Palette-Inversion erfasst alle Modals/Overlays ohne Einzeländerungen |
+| M4 | Bug | «+»-Dropdown Portal | ✅ | `createPortal` nach `document.body` mit `position: fixed` + `getBoundingClientRect()` in `Toolbar.tsx` |
+| M5 | Bug | Scroll-Bug Sequenzen-Panel | ✅ | `overflow-hidden` von SidePanel-Container (`DetailPanel.tsx:1325`) und Embedded-Wrapper (`SequencePanel.tsx:710`) entfernt; aktive Sequenz auf `max-h-[40vh] overflow-y-auto shrink-0` begrenzt |
+
+---
+
+## Commit-Anweisung für v3.90
+
+```bash
+npx tsc --noEmit && npm run build 2>&1 | tail -20
+git add -A
+git commit -m "fix: v3.90 — Light-Mode Felder/Kontrast/Modals (M1-M3), Dropdown-Portal (M4), Panel-Scroll (M5)"
+git push
+```
+
+---
 
 ## Status: ✅ v3.89 — Abgeschlossen
 

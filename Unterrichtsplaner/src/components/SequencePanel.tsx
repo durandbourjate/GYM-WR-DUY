@@ -657,7 +657,7 @@ export function SequencePanel({ embedded = false }: { embedded?: boolean }) {
         const activeFb = flatBlocks.find(fb => `${fb.seqId}-${fb.blockIndex}` === editingSequenceId);
         if (!activeFb) return null;
         return (
-          <div className="px-3 pt-2 pb-1 border-b border-purple-500/30 bg-slate-900/50">
+          <div className="px-3 pt-2 pb-1 border-b border-purple-500/30 bg-slate-900/50 shrink-0 max-h-[40vh] overflow-y-auto">
             <div className="text-[8px] text-purple-400 font-medium mb-1">▶ Aktive Sequenz</div>
             <FlatBlockCard fb={activeFb} />
           </div>
@@ -707,7 +707,7 @@ export function SequencePanel({ embedded = false }: { embedded?: boolean }) {
   );
 
   if (embedded) {
-    return <div className="flex flex-col flex-1 min-h-0 overflow-hidden">{content}</div>;
+    return <div className="flex flex-col flex-1 min-h-0">{content}</div>;
   }
 
   return (
