@@ -6,6 +6,7 @@ import { COURSES, getLinkedCourseIds } from '../data/courses';
 import { INITIAL_LESSON_DETAILS } from '../data/initialLessonDetails';
 import { instanceStorageKey } from './instanceStore';
 import type { PlannerSettings } from './settingsStore';
+import { configToCourses } from './settingsStore';
 
 interface Selection {
   week: string;
@@ -82,6 +83,9 @@ interface PlannerState {
   setSidePanelOpen: (v: boolean) => void;
   sidePanelTab: 'details' | 'sequences' | 'collection' | 'settings';
   setSidePanelTab: (t: 'details' | 'sequences' | 'collection' | 'settings') => void;
+  // G6: Doppelklick auf KW → Ferien-Dialog vorausgefüllt
+  pendingHolidayKw: string | null;
+  setPendingHolidayKw: (kw: string | null) => void;
   hoveredCell: { week: string; col: number } | null;
   setHoveredCell: (c: { week: string; col: number } | null) => void;
   // Empty cell action (double-click or drag-select context menu)
@@ -292,13 +296,45 @@ export const usePlannerStore = create<PlannerState>()(
   weekData: [],
   setWeekData: (w) => set({ weekData: w }),
   updateLesson: (weekW, col, entry) =>
-    set((state) => ({
-      weekData: state.weekData.map((w) =>
+    set((state) => {
+      const newWeekData = state.weekData.map((w) =>
         w.w === weekW
           ? { ...w, lessons: { ...w.lessons, [col]: entry } }
           : w
-      ),
-    })),
+      );
+      // v3.84 G8: Auto-PW-Badge bei UE in Prüfungswochen (SF/EF + TaF-Kurs)
+      const result: Partial<typeof state> = { weekData: newWeekData };
+      if (entry.title && entry.type > 0 && state.plannerSettings) {
+        const ps = state.plannerSettings;
+        // 1. KW = Prüfungswoche?
+        const isPW = ps.specialWeeks.some(
+          sw => sw.week === weekW && /prüfung/i.test(sw.label)
+        );
+        if (isPW) {
+          // 2. Kurs finden
+          const courses = configToCourses(ps.courses);
+          const course = courses.find(c => c.col === col);
+          if (course) {
+            // 3. Durchgehendes Fach (SF/EF)?
+            const isDurchgehend = course.typ === 'SF' || course.typ === 'EF';
+            // 4. TaF-Kurs (Kursname enthält f oder s)?
+            const isTaF = /[fs]/.test(course.cls.replace(/\d/g, ''));
+            if (isDurchgehend && isTaF) {
+              const key = `${weekW}-${col}`;
+              const existing = state.lessonDetails[key] || {};
+              const badges = existing.badges || [];
+              if (!badges.some((b: { label: string }) => b.label === 'PW')) {
+                result.lessonDetails = {
+                  ...state.lessonDetails,
+                  [key]: { ...existing, badges: [...badges, { label: 'PW', color: '#ea580c' }] },
+                };
+              }
+            }
+          }
+        }
+      }
+      return result;
+    }),
   insertDialog: null,
   setInsertDialog: (d) => set({ insertDialog: d }),
 
@@ -326,6 +362,8 @@ export const usePlannerStore = create<PlannerState>()(
   setSidePanelOpen: (v) => set({ sidePanelOpen: v }),
   sidePanelTab: 'details',
   setSidePanelTab: (t) => set({ sidePanelTab: t }),
+  pendingHolidayKw: null,
+  setPendingHolidayKw: (kw) => set({ pendingHolidayKw: kw }),
   hoveredCell: null,
   setHoveredCell: (c) => set({ hoveredCell: c }),
   emptyCellAction: null,

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { usePlannerStore } from '../store/plannerStore';
 import { WEEKS } from '../data/weeks';
 import type { TaFPhase } from '../types';
@@ -15,6 +15,13 @@ const HOFWIL_PRESET: Omit<TaFPhase, 'id'>[] = [
 ];
 
 export function TaFPanel({ onClose }: { onClose: () => void }) {
+  // G4: ESC schliesst Modal
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [onClose]);
+
   const { tafPhases, addTaFPhase, updateTaFPhase, deleteTaFPhase } = usePlannerStore();
   const [showNew, setShowNew] = useState(false);
   const [newName, setNewName] = useState('');

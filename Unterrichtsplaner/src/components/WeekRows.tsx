@@ -429,6 +429,8 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
   const allWeekKeys = allWeeksProp || weeks.map(w => w.w);
 
   // Pre-compute holiday/event spans for merged rows (like ZoomYearView)
+  // G3: Nur gefilterte Kurs-Spalten berücksichtigen
+  const visibleCols = React.useMemo(() => new Set(courses.map(c => c.col)), [courses]);
   const { holidaySkipSet, holidaySpanStart, eventWeeks } = React.useMemo(() => {
     const spans: { startIdx: number; len: number; label: string; type: 'holiday'; weekKeys: string[] }[] = [];
     const events = new Map<string, { label: string; affectedCols: Set<number> }>();
@@ -436,7 +438,8 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
     const dwKeys = displayWeeks.map(w => w.w);
     while (i < displayWeeks.length) {
       const wk = displayWeeks[i];
-      const entries = Object.entries(wk.lessons || {});
+      // G3: Nur sichtbare (gefilterte) Spalten prüfen
+      const entries = Object.entries(wk.lessons || {}).filter(([col]) => visibleCols.has(parseInt(col)));
       const allHoliday = entries.length > 0 && entries.every(([, e]) => (e as any).type === 6);
 
       if (allHoliday) {
@@ -445,14 +448,14 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
         const weekKeys: string[] = [];
         while (i < displayWeeks.length) {
           const nwk = displayWeeks[i];
-          const ne = Object.entries(nwk.lessons || {});
+          const ne = Object.entries(nwk.lessons || {}).filter(([col]) => visibleCols.has(parseInt(col)));
           if (!(ne.length > 0 && ne.every(([, e]) => (e as any).type === 6))) break;
           weekKeys.push(nwk.w);
           i++;
         }
         spans.push({ startIdx, len: i - startIdx, label, type: 'holiday', weekKeys });
       } else {
-        // Check for event/sonderwoche: any course has type 5
+        // Check for event/sonderwoche: nur sichtbare Spalten (G3)
         const eventEntries = entries.filter(([, e]) => (e as any).type === 5);
         if (eventEntries.length > 0) {
           const label = (eventEntries[0][1] as any)?.title || 'Sonderwoche';
@@ -472,7 +475,7 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
       }
     }
     return { holidaySkipSet: skipSet, holidaySpanStart: spanStart, eventWeeks: events };
-  }, [displayWeeks]);
+  }, [displayWeeks, visibleCols]);
 
   // Single click: select + show mini-buttons (no detail panel)
   const handleClick = useCallback(
@@ -772,9 +775,13 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                   <span className="text-[11px] font-medium text-gray-400">
                     {hSpan.label}
                   </span>
-                  {hSpan.len > 1 && (
-                    <span className="text-[9px] text-gray-500">({hSpan.len}W)</span>
-                  )}
+                  {/* G2: Einzigartige KWs zählen (aufgeteilte Wochen = 1 KW, nicht 2) */}
+                  {(() => {
+                    const uniqueKWs = new Set(hSpan.weekKeys).size;
+                    return uniqueKWs > 1 && (
+                      <span className="text-[9px] text-gray-500">({uniqueKWs}W)</span>
+                    );
+                  })()}
                 </div>
               </td>
             </tr>
@@ -794,10 +801,16 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
               background: eventInfo ? '#78350f18' : undefined,
             }}
           >
-            {/* Week number */}
+            {/* Week number — G6: Doppelklick öffnet Ferien-Dialog */}
             <td
-              className="sticky left-0 z-30 px-1 text-center border-b border-slate-900/60"
+              className="sticky left-0 z-30 px-1 text-center border-b border-slate-900/60 cursor-pointer"
               style={{ background: isCurrent ? '#172554' : '#0c0f1a' }}
+              onDoubleClick={() => {
+                usePlannerStore.getState().setPendingHolidayKw(week.w);
+                setSidePanelOpen(true);
+                setSidePanelTab('settings');
+              }}
+              title="Doppelklick: Ferien hinzufügen"
             >
               <div className={`text-[9px] font-mono ${isCurrent ? 'font-extrabold text-blue-400' : 'font-medium text-gray-500'}`}>
                 {week.w}

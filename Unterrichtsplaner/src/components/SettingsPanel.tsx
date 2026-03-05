@@ -61,10 +61,12 @@ function getCourseTypes(subjects: SubjectConfig[]): { key: CourseType; label: st
 }
 
 // === Helper Components ===
-function Section({ title, children, defaultOpen = false, actions }: { title: string; children: React.ReactNode; defaultOpen?: boolean; actions?: React.ReactNode }) {
+function Section({ title, children, defaultOpen = false, actions, sectionId, forceOpen }: { title: string; children: React.ReactNode; defaultOpen?: boolean; actions?: React.ReactNode; sectionId?: string; forceOpen?: boolean }) {
   const [open, setOpen] = useState(defaultOpen);
+  // G6: Section von aussen öffnen
+  useEffect(() => { if (forceOpen) setOpen(true); }, [forceOpen]);
   return (
-    <div className="border border-slate-700 rounded-lg overflow-hidden">
+    <div className="border border-slate-700 rounded-lg overflow-hidden" data-section={sectionId}>
       <div className="flex items-center bg-slate-800 hover:bg-slate-750">
         <button onClick={() => setOpen(!open)}
           className="flex-1 px-3 py-2 text-left text-[11px] font-semibold text-gray-200 cursor-pointer flex items-center justify-between">
@@ -1615,6 +1617,23 @@ export function SettingsPanel() {
     return () => { if (saveTimerRef.current) clearTimeout(saveTimerRef.current); };
   }, []);
 
+  // G6: pendingHolidayKw → auto-add holiday entry with pre-filled KW
+  const pendingHolidayKw = usePlannerStore(s => s.pendingHolidayKw);
+  const [forceOpenHolidays, setForceOpenHolidays] = useState(false);
+  useEffect(() => {
+    if (!pendingHolidayKw) return;
+    const kw = pendingHolidayKw;
+    usePlannerStore.getState().setPendingHolidayKw(null);
+    setForceOpenHolidays(true);
+    updateSettings({
+      holidays: [...settings.holidays, { id: generateId(), label: '', startWeek: kw, endWeek: kw }],
+    });
+    setTimeout(() => {
+      const el = document.querySelector('[data-section="ferien"]');
+      el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 200);
+  }, [pendingHolidayKw]);
+
   const handleReset = useCallback(() => {
     if (confirm('Alle Einstellungen zurücksetzen? Die bestehende Planung bleibt erhalten.')) {
       const fresh = getDefaultSettings();
@@ -1818,7 +1837,7 @@ export function SettingsPanel() {
       </Section>
 
       {/* Holidays */}
-      <Section title={`🏖 Ferien (${settings.holidays.length})`} actions={
+      <Section title={`🏖 Ferien (${settings.holidays.length})`} sectionId="ferien" forceOpen={forceOpenHolidays} actions={
         <SectionActions rubricType="ferien" getData={() => settings.holidays}
           onLoad={(data) => { if (Array.isArray(data) && confirm(`${data.length} Ferienperioden laden? Bestehende werden ersetzt.`)) updateSettings({ holidays: data }); }}
           onAdd={addHolidayHeader} importAccept=".csv,.txt,.json" onImport={importHolidaysHeader}

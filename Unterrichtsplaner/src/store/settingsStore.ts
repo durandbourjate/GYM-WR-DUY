@@ -289,13 +289,28 @@ export function applySettingsToWeekData(
     return weeks;
   };
 
-  // Apply holidays (full weeks → all cols get type 6)
+  // G1: Tag-Mapping für Einzel-Tag-Ferien (1=Mo..5=Fr)
+  const DAY_TO_NUM: Record<string, number> = { Mo: 1, Di: 2, Mi: 3, Do: 4, Fr: 5 };
+  const colToDay = new Map<number, number>();
+  let dayColIdx = 100;
+  for (const c of settings.courses) {
+    colToDay.set(dayColIdx++, DAY_TO_NUM[c.day] || 0);
+  }
+
+  // Apply holidays (G1: Einzel-Tag-Ferien nur auf passende Tage)
   for (const holiday of settings.holidays) {
     const weeks = expandWeekRange(holiday.startWeek, holiday.endWeek);
+    const hasPartialDays = holiday.days && holiday.days.length > 0 && holiday.days.length < 5;
+    const holidayDays = hasPartialDays ? new Set(holiday.days) : null;
     for (const weekW of weeks) {
       const weekEntry = result.find(w => w.w === weekW);
       if (!weekEntry) continue;
       for (const col of allCols) {
+        // G1: Bei Einzel-Tag-Ferien nur passende Wochentage markieren
+        if (holidayDays) {
+          const courseDay = colToDay.get(col);
+          if (courseDay && !holidayDays.has(courseDay)) continue;
+        }
         weekEntry.lessons[col] = { title: holiday.label, type: 6 };
       }
       holidayWeeks++;

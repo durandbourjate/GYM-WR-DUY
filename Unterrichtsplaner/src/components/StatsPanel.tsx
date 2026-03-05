@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 import { usePlannerStore } from '../store/plannerStore';
 import { checkGradeRequirements } from '../utils/gradeRequirements';
 import { usePlannerData } from '../hooks/usePlannerData';
@@ -144,6 +144,13 @@ function findExamCollisions(stats: CourseStats[]): Collision[] {
 }
 
 export function StatsPanel({ onClose }: { onClose: () => void }) {
+  // G4: ESC schliesst Modal
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [onClose]);
+
   const { weekData, sequences, lessonDetails } = usePlannerStore();
   const { courses: plannerCourses, s2StartIndex, settings } = usePlannerData();
   const stats = useMemo(() => computeStats(weekData, plannerCourses), [weekData, plannerCourses]);

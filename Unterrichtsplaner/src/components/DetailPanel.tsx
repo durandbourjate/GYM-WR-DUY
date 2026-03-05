@@ -487,6 +487,7 @@ function AddToSequenceButton({ week, course }: { week: string; course: Course })
 
 const BADGE_PRESETS: { label: string; color: string; title: string }[] = [
   { label: 'P', color: '#ef4444', title: 'Prüfung' },
+  { label: 'PW', color: '#ea580c', title: 'Prüfungswoche' },
   { label: 'HK', color: '#7c3aed', title: 'Halbklasse' },
   { label: '!', color: '#f59e0b', title: 'Wichtig' },
   { label: '📎', color: '#6b7280', title: 'Material' },

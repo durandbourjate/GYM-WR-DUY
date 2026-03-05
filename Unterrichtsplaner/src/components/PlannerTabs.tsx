@@ -20,6 +20,12 @@ export function PlannerTabs() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
   const [contextMenu, setContextMenu] = useState<{ id: string; x: number; y: number } | null>(null);
+  // G7: Import-State für Setup-Wizard im +Tab-Dialog
+  const [importedConfig, setImportedConfig] = useState<PlannerSettings | null>(null);
+  const [importedFileName, setImportedFileName] = useState('');
+  const [partialImports, setPartialImports] = useState<PartialImports>({});
+  const [partialFileNames, setPartialFileNames] = useState<Record<string, string>>({});
+  const [showPartial, setShowPartial] = useState(false);
 
   // Auto-detect best preset based on current date
   const defaultPresetId = (() => {
@@ -28,6 +34,73 @@ export function PlannerTabs() {
     const preset = getPresetForYear(year);
     return preset?.id ?? '';
   })();
+
+  // G7: Import-Handler für Setup-Wizard
+  const handleConfigImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const parsed = JSON.parse(reader.result as string);
+        if (!parsed || typeof parsed !== 'object') { alert('Ungültige Datei.'); return; }
+        setImportedConfig(parsed as PlannerSettings);
+        setImportedFileName(file.name);
+      } catch { alert('Fehler beim Lesen der Datei.'); }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  };
+
+  const handlePartialImport = (key: keyof PartialImports, label: string) =>
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const text = reader.result as string;
+          let data: any[];
+          if (file.name.endsWith('.json')) {
+            const parsed = JSON.parse(text);
+            data = Array.isArray(parsed) ? parsed : parsed[key] || parsed.kurse || parsed.rules || [];
+          } else {
+            const lines = text.split('\n').filter(l => l.trim());
+            if (key === 'holidays') {
+              data = lines.map(line => {
+                const p = line.split(/[,;\t]/).map(s => s.trim());
+                return p.length >= 3 ? { id: crypto.randomUUID(), label: p[0], startWeek: p[1].replace(/^KW\s*/i, '').padStart(2, '0'), endWeek: p[2].replace(/^KW\s*/i, '').padStart(2, '0') } : null;
+              }).filter(Boolean);
+            } else if (key === 'specialWeeks') {
+              data = lines.map(line => {
+                const p = line.split(/[,;\t]/).map(s => s.trim());
+                return p.length >= 2 ? { id: crypto.randomUUID(), label: p[0], week: p[1].replace(/^KW\s*/i, '').padStart(2, '0'), type: (p[2] === 'holiday' ? 'holiday' : 'event'), gymLevel: p[3] || undefined } : null;
+              }).filter(Boolean);
+            } else { data = []; }
+          }
+          if (!data || data.length === 0) { alert(`Keine gültigen ${label} gefunden.`); return; }
+          setPartialImports(prev => ({ ...prev, [key]: data }));
+          setPartialFileNames(prev => ({ ...prev, [key]: file.name }));
+        } catch { alert('Datei konnte nicht gelesen werden.'); }
+      };
+      reader.readAsText(file);
+      e.target.value = '';
+    };
+
+  const partialButtons: { key: keyof PartialImports; label: string; icon: string; accept: string }[] = [
+    { key: 'holidays', label: 'Schulferien', icon: '🏖️', accept: '.json,.csv,.txt' },
+    { key: 'specialWeeks', label: 'Sonderwochen', icon: '📅', accept: '.json,.csv,.txt' },
+    { key: 'courses', label: 'Stundenplan / Kurse', icon: '📋', accept: '.json' },
+    { key: 'subjects', label: 'Fachbereiche', icon: '🎨', accept: '.json' },
+    { key: 'curriculumGoals', label: 'Lehrplanziele', icon: '🎯', accept: '.json' },
+    { key: 'assessmentRules', label: 'Beurteilungsregeln', icon: '📊', accept: '.json' },
+  ];
+
+  const resetNewDialog = () => {
+    setShowNew(false); setNewName(''); setTemplateId(''); setPresetId('');
+    setImportedConfig(null); setImportedFileName('');
+    setPartialImports({}); setPartialFileNames({}); setShowPartial(false);
+  };
 
   const handleCreate = () => {
     if (!newName.trim()) return;
@@ -65,21 +138,32 @@ export function PlannerTabs() {
         }
       }
 
-      // Always set plannerSettings for new planners (even if empty).
-      // This distinguishes new planners (storeSettings !== null) from legacy ones.
       if (!initialSettings) {
         initialSettings = getDefaultSettings();
       }
-      // v3.81 D3: Keine automatischen Ferien mehr — Import nur über Einstellungen
 
-      // Pre-seed the new instance's localStorage BEFORE switchInstance runs,
-      // so loadFromInstance() picks up settings immediately (no setTimeout race).
-      // Also generate initial weekData so Zoom 3 works immediately.
+      // G7: Gesamtkonfiguration übernehmen
+      if (importedConfig) {
+        if (Array.isArray(importedConfig.courses)) initialSettings.courses = importedConfig.courses;
+        if (Array.isArray(importedConfig.holidays)) initialSettings.holidays = importedConfig.holidays;
+        if (Array.isArray(importedConfig.specialWeeks)) initialSettings.specialWeeks = importedConfig.specialWeeks;
+        if (Array.isArray(importedConfig.subjects)) initialSettings.subjects = importedConfig.subjects;
+        if (Array.isArray((importedConfig as any).curriculumGoals)) initialSettings.curriculumGoals = (importedConfig as any).curriculumGoals;
+        if (Array.isArray((importedConfig as any).assessmentRules)) initialSettings.assessmentRules = (importedConfig as any).assessmentRules;
+        if (importedConfig.school) initialSettings.school = importedConfig.school;
+      }
+      // G7: Einzel-Imports überschreiben Gesamtkonfiguration
+      if (partialImports.courses) initialSettings.courses = partialImports.courses;
+      if (partialImports.holidays) initialSettings.holidays = partialImports.holidays;
+      if (partialImports.specialWeeks) initialSettings.specialWeeks = partialImports.specialWeeks;
+      if (partialImports.subjects) initialSettings.subjects = partialImports.subjects;
+      if (partialImports.curriculumGoals) initialSettings.curriculumGoals = partialImports.curriculumGoals;
+      if (partialImports.assessmentRules) initialSettings.assessmentRules = partialImports.assessmentRules;
+
       const weekIds = generateWeekIds(
         preset?.startWeek ?? 33, startYear,
         preset?.endWeek ?? endWeek, endYear
       );
-      // Build initial weekData with proper columns from courses
       const courses = initialSettings.courses.length > 0 ? configToCourses(initialSettings.courses) : [];
       const emptyLessons: Record<number, { type: LessonType; title: string }> = {};
       for (const c of courses) {
@@ -87,7 +171,6 @@ export function PlannerTabs() {
       }
       let initWeekData = weekIds.map(w => ({ w, lessons: { ...emptyLessons } }));
 
-      // Auto-apply holidays & special weeks to the initial weekData
       if (initialSettings.holidays.length > 0 || initialSettings.specialWeeks.length > 0) {
         const applied = applySettingsToWeekData(initWeekData, initialSettings);
         initWeekData = applied.weekData;
@@ -104,10 +187,7 @@ export function PlannerTabs() {
       }));
     }
 
-    setNewName('');
-    setTemplateId('');
-    setPresetId('');
-    setShowNew(false);
+    resetNewDialog();
   };
 
   const handleExport = (id: string) => {
@@ -188,59 +268,101 @@ export function PlannerTabs() {
           </button>
         ))}
 
-        {/* New planner button */}
-        {showNew ? (
-          <div className="flex items-center gap-1 flex-wrap">
-            <input
-              className="bg-slate-800 border border-slate-600 rounded px-2 py-1 text-white text-sm outline-none w-28"
-              placeholder="Name..."
-              value={newName}
-              onChange={e => setNewName(e.target.value)}
-              onKeyDown={e => {
-                if (e.key === 'Enter') handleCreate();
-                if (e.key === 'Escape') { setShowNew(false); setNewName(''); setTemplateId(''); setPresetId(''); }
-              }}
-              autoFocus
-            />
-            <select
-              className="bg-slate-800 border border-slate-600 rounded px-1 py-1 text-slate-300 text-[10px] outline-none cursor-pointer"
-              value={presetId || defaultPresetId}
-              onChange={e => setPresetId(e.target.value)}
-              title="Schuljahr"
-            >
-              {SCHOOL_YEAR_PRESETS.map(p => (
-                <option key={p.id} value={p.id}>{p.label}</option>
-              ))}
-              <option value="">Manuell</option>
-            </select>
-            {instances.length > 0 && (
-              <select
-                className="bg-slate-800 border border-slate-600 rounded px-1 py-1 text-slate-400 text-[10px] outline-none cursor-pointer"
-                value={templateId}
-                onChange={e => setTemplateId(e.target.value)}
-                title="Kurse übernehmen von..."
-              >
-                <option value="">Ohne Vorlage</option>
-                {instances.map(inst => (
-                  <option key={inst.id} value={inst.id}>Kurse von: {inst.name}</option>
-                ))}
-              </select>
-            )}
-            <button className="px-2 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-500 cursor-pointer" onClick={handleCreate}>OK</button>
-            <button className="px-2 py-1 text-slate-400 hover:text-white text-xs cursor-pointer" onClick={() => { setShowNew(false); setNewName(''); setTemplateId(''); setPresetId(''); }}>✕</button>
-          </div>
-        ) : (
-          <button
-            className="px-2 py-1.5 text-slate-500 hover:text-white hover:bg-slate-800/50 rounded-t-md"
-            onClick={() => setShowNew(true)}
-            title="Neuen Planer erstellen"
-          >
-            +
-          </button>
-        )}
-
-        {/* Import moved to Settings panel (v3.77 #7) */}
+        {/* New planner button — G7: vollständiger Setup-Wizard */}
+        <button
+          className="px-2 py-1.5 text-slate-500 hover:text-white hover:bg-slate-800/50 rounded-t-md"
+          onClick={() => setShowNew(!showNew)}
+          title="Neuen Planer erstellen"
+        >
+          +
+        </button>
       </div>
+
+      {/* G7: Setup-Wizard Dialog */}
+      {showNew && (
+        <div className="absolute top-full left-0 right-0 z-50 bg-slate-900 border-b border-slate-600 shadow-xl px-4 py-3">
+          <div className="max-w-lg mx-auto space-y-3">
+            <div className="text-[11px] font-bold text-gray-200 mb-1">Neuer Planer erstellen</div>
+            <div className="flex gap-2 items-center flex-wrap">
+              <input
+                className="bg-slate-800 border border-slate-600 rounded px-2 py-1.5 text-white text-sm outline-none flex-1 min-w-[120px]"
+                placeholder="Name (z.B. SJ 25/26)"
+                value={newName}
+                onChange={e => setNewName(e.target.value)}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') handleCreate();
+                  if (e.key === 'Escape') resetNewDialog();
+                }}
+                autoFocus
+              />
+              <select
+                className="bg-slate-800 border border-slate-600 rounded px-2 py-1.5 text-slate-300 text-[10px] outline-none cursor-pointer"
+                value={presetId || defaultPresetId}
+                onChange={e => setPresetId(e.target.value)}
+                title="Schuljahr"
+              >
+                {SCHOOL_YEAR_PRESETS.map(p => (
+                  <option key={p.id} value={p.id}>{p.label}</option>
+                ))}
+                <option value="">Manuell</option>
+              </select>
+              {instances.length > 0 && (
+                <select
+                  className="bg-slate-800 border border-slate-600 rounded px-2 py-1.5 text-slate-400 text-[10px] outline-none cursor-pointer"
+                  value={templateId}
+                  onChange={e => setTemplateId(e.target.value)}
+                  title="Vorlage"
+                >
+                  <option value="">Ohne Vorlage</option>
+                  {instances.map(inst => (
+                    <option key={inst.id} value={inst.id}>Kopie von: {inst.name}</option>
+                  ))}
+                </select>
+              )}
+            </div>
+            {/* Gesamtkonfiguration importieren */}
+            <label className={`block px-3 py-2 rounded-lg text-[10px] font-medium transition-colors cursor-pointer text-center ${
+              importedConfig
+                ? 'bg-green-800/50 text-green-300 border border-green-600'
+                : 'bg-slate-800 text-slate-400 border border-slate-600 hover:border-slate-500 hover:text-slate-300'
+            }`}>
+              {importedConfig ? `✅ ${importedFileName}` : '📥 Gesamtkonfiguration importieren'}
+              <input type="file" accept=".json" className="hidden" onChange={handleConfigImport} />
+            </label>
+            {/* Einzelne Rubriken importieren */}
+            <button
+              className="text-[10px] text-slate-500 hover:text-slate-300 cursor-pointer transition-colors"
+              onClick={() => setShowPartial(!showPartial)}
+            >
+              {showPartial ? '▾' : '▸'} Einzelne Rubriken importieren {Object.keys(partialImports).length > 0 && `(${Object.keys(partialImports).length})`}
+            </button>
+            {showPartial && (
+              <div className="grid grid-cols-3 gap-1.5">
+                {partialButtons.map(({ key, label, icon, accept }) => {
+                  const isLoaded = !!partialImports[key];
+                  return (
+                    <label key={key} className={`px-2 py-1.5 rounded-md text-[9px] font-medium transition-colors cursor-pointer text-center ${
+                      isLoaded
+                        ? 'bg-green-800/40 text-green-300 border border-green-700'
+                        : 'bg-slate-800/80 text-slate-400 border border-slate-700 hover:border-slate-500 hover:text-slate-300'
+                    }`} title={isLoaded ? partialFileNames[key] : `${label} importieren`}>
+                      {isLoaded ? `✅ ${label}` : `${icon} ${label}`}
+                      <input type="file" accept={accept} className="hidden"
+                        onChange={handlePartialImport(key, label)} />
+                    </label>
+                  );
+                })}
+              </div>
+            )}
+            <div className="flex gap-2 justify-end">
+              <button className="px-3 py-1.5 text-slate-400 hover:text-white text-xs cursor-pointer" onClick={resetNewDialog}>Abbrechen</button>
+              <button className="px-4 py-1.5 bg-blue-600 text-white rounded text-xs hover:bg-blue-500 cursor-pointer font-medium" onClick={handleCreate}>
+                + Erstellen
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Context menu */}
       {contextMenu && (
