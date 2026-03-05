@@ -15,7 +15,6 @@ export function PlannerTabs() {
   const { instances, activeId, setActive, createInstance, deleteInstance, renameInstance, exportInstance } = useInstanceStore();
   const [showNew, setShowNew] = useState(false);
   const [newName, setNewName] = useState('');
-  const [templateId, setTemplateId] = useState<string | ''>('');
   const [presetId, setPresetId] = useState<string>('');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
@@ -97,7 +96,7 @@ export function PlannerTabs() {
   ];
 
   const resetNewDialog = () => {
-    setShowNew(false); setNewName(''); setTemplateId(''); setPresetId('');
+    setShowNew(false); setNewName(''); setPresetId('');
     setImportedConfig(null); setImportedFileName('');
     setPartialImports({}); setPartialFileNames({}); setShowPartial(false);
   };
@@ -124,23 +123,7 @@ export function PlannerTabs() {
       // Build initial settings
       let initialSettings: PlannerSettings | null = null;
 
-      if (templateId) {
-        // Copy settings from template planner
-        const templateData = localStorage.getItem(`planner-data-${templateId}`);
-        if (templateData) {
-          try {
-            const parsed = JSON.parse(templateData);
-            const data = parsed.state || parsed;
-            if (data.plannerSettings) {
-              initialSettings = { ...data.plannerSettings };
-            }
-          } catch { /* ignore */ }
-        }
-      }
-
-      if (!initialSettings) {
-        initialSettings = getDefaultSettings();
-      }
+      initialSettings = getDefaultSettings();
 
       // G7: Gesamtkonfiguration übernehmen
       if (importedConfig) {
@@ -306,19 +289,6 @@ export function PlannerTabs() {
                 ))}
                 <option value="">Manuell</option>
               </select>
-              {instances.length > 0 && (
-                <select
-                  className="bg-slate-800 border border-slate-600 rounded px-2 py-1.5 text-slate-400 text-[10px] outline-none cursor-pointer"
-                  value={templateId}
-                  onChange={e => setTemplateId(e.target.value)}
-                  title="Vorlage"
-                >
-                  <option value="">Ohne Vorlage</option>
-                  {instances.map(inst => (
-                    <option key={inst.id} value={inst.id}>Kopie von: {inst.name}</option>
-                  ))}
-                </select>
-              )}
             </div>
             {/* Gesamtkonfiguration importieren */}
             <label className={`block px-3 py-2 rounded-lg text-[10px] font-medium transition-colors cursor-pointer text-center ${

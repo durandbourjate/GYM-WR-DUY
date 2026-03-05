@@ -361,6 +361,8 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
     searchQuery,
     expandedNoteCols,
     dimPastWeeks,
+    plannerSettings,
+    filter,
   } = usePlannerStore();
 
   const gcalCollisions = useGCalStore(s => s.collisions);
@@ -431,6 +433,53 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
   // Pre-compute holiday/event spans for merged rows (like ZoomYearView)
   // G3: Nur gefilterte Kurs-Spalten berücksichtigen
   const visibleCols = React.useMemo(() => new Set(courses.map(c => c.col)), [courses]);
+
+  // H2: Sonderwochen-Scope prüfen — bei aktivem Filter nur relevante Events anzeigen
+  const validEventCols = React.useMemo(() => {
+    if (filter === 'ALL' || !plannerSettings?.specialWeeks) return null; // null = keine Filterung
+    // Kurs-ID → col Mapping
+    const courseIdToCol = new Map<string, number>();
+    const colToCourseType = new Map<number, string>();
+    let colIdx = 100;
+    for (const c of plannerSettings.courses) {
+      courseIdToCol.set(c.id, colIdx);
+      colToCourseType.set(colIdx, c.typ);
+      colIdx++;
+    }
+    // Pro Woche: welche Cols dürfen type 5 zeigen?
+    const validMap = new Map<string, Set<number>>();
+    for (const sw of plannerSettings.specialWeeks) {
+      if (sw.type === 'holiday') continue;
+      const hasCourseFilter = sw.courseFilter && sw.courseFilter.length > 0;
+      const hasGymLevel = !!sw.gymLevel && sw.gymLevel !== 'alle';
+      // Ohne jeglichen Filter → überall anzeigen (null = nicht filtern)
+      if (!hasCourseFilter && !hasGymLevel) continue;
+      // Betroffene Cols ermitteln
+      const cols = new Set<number>();
+      if (hasCourseFilter) {
+        for (const id of sw.courseFilter!) {
+          const col = courseIdToCol.get(id);
+          if (col !== undefined) cols.add(col);
+        }
+      }
+      if (hasGymLevel) {
+        let ci = 100;
+        for (const c of plannerSettings.courses) {
+          if (sw.gymLevel === 'TaF') {
+            const isTaF = /[fs]/.test(c.cls.replace(/\d/g, ''));
+            if (isTaF) cols.add(ci);
+          } else {
+            if (c.stufe === sw.gymLevel) cols.add(ci);
+          }
+          ci++;
+        }
+      }
+      if (!validMap.has(sw.week)) validMap.set(sw.week, new Set());
+      for (const col of cols) validMap.get(sw.week)!.add(col);
+    }
+    return validMap;
+  }, [filter, plannerSettings]);
+
   const { holidaySkipSet, holidaySpanStart, eventWeeks } = React.useMemo(() => {
     const spans: { startIdx: number; len: number; label: string; type: 'holiday'; weekKeys: string[] }[] = [];
     const events = new Map<string, { label: string; affectedCols: Set<number> }>();
@@ -456,7 +505,14 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
         spans.push({ startIdx, len: i - startIdx, label, type: 'holiday', weekKeys });
       } else {
         // Check for event/sonderwoche: nur sichtbare Spalten (G3)
-        const eventEntries = entries.filter(([, e]) => (e as any).type === 5);
+        // H2: Bei aktivem Filter Sonderwochen-Scope berücksichtigen
+        const scopedCols = validEventCols?.get(wk.w);
+        const eventEntries = entries.filter(([col, e]) => {
+          if ((e as any).type !== 5) return false;
+          // Wenn scopedCols existiert für diese Woche, nur erlaubte Cols anzeigen
+          if (scopedCols && !scopedCols.has(parseInt(col))) return false;
+          return true;
+        });
         if (eventEntries.length > 0) {
           const label = (eventEntries[0][1] as any)?.title || 'Sonderwoche';
           const affectedCols = new Set(eventEntries.map(([col]) => parseInt(col)));
@@ -475,7 +531,7 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
       }
     }
     return { holidaySkipSet: skipSet, holidaySpanStart: spanStart, eventWeeks: events };
-  }, [displayWeeks, visibleCols]);
+  }, [displayWeeks, visibleCols, validEventCols]);
 
   // Single click: select + show mini-buttons (no detail panel)
   const handleClick = useCallback(
@@ -775,11 +831,19 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                   <span className="text-[11px] font-medium text-gray-400">
                     {hSpan.label}
                   </span>
-                  {/* G2: Einzigartige KWs zählen (aufgeteilte Wochen = 1 KW, nicht 2) */}
+                  {/* H1: Feriendauer korrekt berechnen (Jahreswechsel berücksichtigen) */}
                   {(() => {
-                    const uniqueKWs = new Set(hSpan.weekKeys).size;
-                    return uniqueKWs > 1 && (
-                      <span className="text-[9px] text-gray-500">({uniqueKWs}W)</span>
+                    const uniqueKWs = [...new Set(hSpan.weekKeys)];
+                    if (uniqueKWs.length <= 1) return null;
+                    const nums = uniqueKWs.map(k => parseInt(k, 10));
+                    const startKw = Math.min(...nums);
+                    const endKw = Math.max(...nums);
+                    // Jahreswechsel: endKw < startKw (z.B. KW 52 → KW 01)
+                    const weeks = endKw >= startKw
+                      ? endKw - startKw + 1
+                      : (52 - startKw + 1) + endKw;
+                    return (
+                      <span className="text-[9px] text-gray-500">({weeks}W)</span>
                     );
                   })()}
                 </div>
@@ -826,7 +890,11 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
             {/* Lesson cells */}
             {courses.map((c, ci) => {
               const newDay = ci === 0 || c.day !== courses[ci - 1]?.day;
-              const entry = week.lessons[c.col];
+              const rawEntry = week.lessons[c.col];
+              // H2: Bei aktivem Filter Sonderwoche-Scope prüfen — ausserhalb des Scopes als leer behandeln
+              const scopedCols = validEventCols?.get(week.w);
+              const isSuppressedEvent = rawEntry?.type === 5 && scopedCols && !scopedCols.has(c.col);
+              const entry = isSuppressedEvent ? undefined : rawEntry;
               const title = entry?.title || '';
               const lessonType = entry?.type ?? -1;
               const colors = lessonType >= 0 ? LESSON_COLORS[lessonType as keyof typeof LESSON_COLORS] : null;

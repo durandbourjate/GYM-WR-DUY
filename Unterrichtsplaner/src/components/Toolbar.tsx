@@ -45,14 +45,14 @@ export function AppHeader() {
   }, [showAddMenu]);
 
   return (
-    <div className="bg-gray-900 border-b border-gray-800 px-4 py-2 sticky top-0 z-[60] flex items-center justify-between gap-2 no-print">
+    <div className="bg-gray-900 border-b border-gray-800 px-4 py-2 sticky top-0 z-[60] flex items-center gap-2 no-print overflow-hidden">
       <div className="flex items-baseline gap-2 flex-shrink-0">
         <span className="text-base font-bold text-gray-50">
           <span className="text-blue-400">⊞</span> Unterrichtsplaner
         </span>
-        <span className="text-[10px] text-gray-500">v3.84</span>
+        <span className="text-[10px] text-gray-500">v3.85</span>
       </div>
-      <div className="flex gap-1 items-center min-w-0 flex-shrink overflow-x-auto">
+      <div className="flex gap-1 items-center min-w-0 flex-1 overflow-hidden">
         {/* === Group 1: Add === */}
         <div className="relative" ref={addMenuRef}>
           <button

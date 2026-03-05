@@ -317,8 +317,9 @@ export const usePlannerStore = create<PlannerState>()(
           if (course) {
             // 3. Durchgehendes Fach (SF/EF)?
             const isDurchgehend = course.typ === 'SF' || course.typ === 'EF';
-            // 4. TaF-Kurs (Kursname enthält f oder s)?
-            const isTaF = /[fs]/.test(course.cls.replace(/\d/g, ''));
+            // 4. Reiner TaF-Kurs? (alle Buchstaben sind f/s, keine Regelklassen-Buchstaben a-e)
+            const letters = course.cls.replace(/[^a-zA-Z]/g, '').toLowerCase();
+            const isTaF = letters.length > 0 && /^[fs]+$/.test(letters);
             if (isDurchgehend && isTaF) {
               const key = `${weekW}-${col}`;
               const existing = state.lessonDetails[key] || {};

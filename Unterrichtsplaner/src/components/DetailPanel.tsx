@@ -1268,6 +1268,19 @@ export function DetailPanel() {
   } = usePlannerStore();
   const panelRef = useRef<HTMLDivElement>(null);
 
+  // H6: Panel beim Öffnen/Tab-Wechsel nach oben scrollen
+  useEffect(() => {
+    if (!sidePanelOpen) return;
+    // scrollTop auf 0 setzen für das Panel und alle scrollbaren Kinder
+    requestAnimationFrame(() => {
+      if (panelRef.current) {
+        panelRef.current.scrollTop = 0;
+        const scrollable = panelRef.current.querySelector('.overflow-y-auto');
+        if (scrollable) (scrollable as HTMLElement).scrollTop = 0;
+      }
+    });
+  }, [sidePanelOpen, sidePanelTab]);
+
   useEffect(() => {
     if (!sidePanelOpen) return;
     const handler = (e: MouseEvent) => {
@@ -1304,9 +1317,8 @@ export function DetailPanel() {
   return (
     <div
       ref={panelRef}
-      className="fixed right-0 top-0 bottom-0 bg-slate-850 border-l border-slate-600 z-[65] flex flex-col shadow-[-4px_0_16px_rgba(0,0,0,0.4)] overflow-hidden"
-      style={{ width: panelWidth, background: '#151b2e', overscrollBehavior: 'contain' }}
-      onWheel={(e) => e.stopPropagation()}
+      className="fixed right-0 top-0 bottom-0 bg-slate-850 border-l border-slate-600 z-[65] flex flex-col shadow-[-4px_0_16px_rgba(0,0,0,0.4)]"
+      style={{ width: panelWidth, background: '#151b2e' }}
     >
       {/* Resize handle */}
       <div

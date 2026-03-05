@@ -1,172 +1,145 @@
-# Unterrichtsplaner – Handoff v3.84
+# Unterrichtsplaner – Handoff v3.85
 
-## Status: 🔄 v3.84 — 0/8 Tasks erledigt
+## Status: ✅ v3.85 — 6/6 Tasks erledigt
 
 ---
 
-## Originalauftrag v3.84
+## Originalauftrag v3.85 — Nachbesserungen aus v3.84
 
 | # | Typ | Beschreibung |
 |---|-----|-------------|
-| G1 | Bug | Einzel-Tag-Ferien (Auffahrt Do, Pfingstmontag Mo) markieren ganze Woche statt nur konfigurierten Tag |
-| G2 | Bug | Ferienwochen-Label falsch: aufgeteilte Woche (2 Spalten) wird als 2 Wochen gezählt statt 1 |
-| G3 | Bug | Fokus-Filter (z.B. SF): leere Spalten zeigen fälschlicherweise Sonderwochen |
-| G4 | UI | ESC schliesst Statistik-Modal nicht |
-| G5 | UI | Menüleiste bei verkleinertem Fenster: Icons sollen rechtsbündig sichtbar bleiben |
-| G6 | UI | Doppelklick auf Zeilennummer → Ferien-Dialog vorausgefüllt mit dieser KW öffnen |
-| G7 | Feature | «Neuer Planer»-Dialog (+Tab) soll vollständiger Setup-Wizard sein wie Erststart |
-| G8 | Feature | PW-Badge automatisch bei UE in Prüfungswochen für durchgehende Fächer (SF/EF) in TaF-Kursen |
+| H1 | Bug-fix | G2: Feriendauer-Label falsch — KW 39–41 = 3W, KW 52–01 = 2W (Jahreswechsel) |
+| H2 | Bug-fix | G3: Sonderwochen erscheinen noch immer in leeren/gefilterten Spalten |
+| H3 | Bug-fix | G5: Toolbar-Icons abgeschnitten bei schmalem Fenster; Einstellungen-Panel nicht scrollbar |
+| H4 | UI-fix | G7: «Ohne Vorlage»-Dropdown im «Neuer Planer»-Dialog entfernen |
+| H5 | Bug-fix | G8: PW-Badge auch bei gemischten Klassen (z.B. 27a28f) — nur reine TaF-Klassen sollen Badge erhalten |
+| H6 | Bug-neu | Einstellungen-Panel: manchmal nicht nach oben scrollbar → Icons und ESC nicht erreichbar |
 
 ---
 
-## Task G1: Bug — Einzel-Tag-Ferien markieren ganze Woche
+## Task H1: Bug-fix — Feriendauer-Label Berechnung
 
-**Problem:** Ferien wie Auffahrt (konfiguriert: KW 20, nur Do) oder Pfingstmontag (KW 22, nur Mo) markieren im Planer die ganze Woche als Ferienblock, obwohl nur ein einzelner Tag konfiguriert ist. Im Tooltip erscheint «Auffahrt (2W)» statt «Auffahrt (1 Tag)» o.ä.
+**Problem:** Das Label zeigt falsche Wochen-Anzahl:
+- Herbstferien KW 39–41 → zeigt «4W» statt «3W»
+- Weihnachtsferien KW 52–01 → zeigt «3W» statt «2W»
 
-**Ursache (Hypothese):** Die Rendering-Logik unterscheidet nicht zwischen vollständigen Ferienwochen und Einzel-Tag-Einträgen. Wahrscheinlich wird bei `holiday.startKw === holiday.endKw` die ganze Woche als Ferienzeile gerendert, unabhängig davon ob `days`-Filter definiert ist.
+**Korrekte Berechnung:**
+- Normalfall: `endKw - startKw + 1` (z.B. 41 - 39 + 1 = 3 ✅)
+- Jahreswechsel (endKw < startKw): `(52 - startKw) + endKw + 1` (z.B. 52 - 52 + 1 + 1 = 2 ✅)
 
-**Erwartetes Verhalten:**
-- Einzel-Tag-Ferien (wo `days`-Array definiert und < 5 Tage) sollen im Planer **nicht** als vollständige Ferienzeile erscheinen
-- Stattdessen: pro betroffener Kurs-Spalte einen einzelnen Ferien-Badge/Marker auf dem entsprechenden Tag zeigen (analog zur bestehenden Tages-Auswahl im Formular)
-- Das Ferien-Panel auf der rechten Seite zeigt bereits die `days`-Auswahl korrekt (Mo/Di/Mi/Do/Fr Checkboxen) — diese Logik muss ins Rendering übernommen werden
-- Anzahl-Label soll korrekt sein: «1T» für Einzel-Tage, «(2W)» nur für echte Mehrwochen-Ferien
+**Ursache (Hypothese):** Entweder zählt die Formel falsch (off-by-one), oder die Spalten-Aufteilung (eine KW auf zwei Spalten aufgeteilt) führt dazu dass dieselbe KW doppelt gezählt wird.
 
-**Suche:** `applySettingsToWeekData`, `renderHolidayRows`, `isHolidayWeek` oder ähnliche Funktionen die bestimmen ob eine Woche als Ferienblock gerendert wird.
+**Suche:** Funktion die das `(NW)`-Label berechnet — wahrscheinlich in `WeekRows.tsx`, `plannerStore.ts` oder einem Holiday-Utils-File. Suchbegriff: `startKw`, `endKw`, `W)`, `Wochen`.
 
----
-
-## Task G2: Bug — Ferienwochen-Label falsch bei aufgeteilten Wochen
-
-**Problem:** Im Jahresplan ist manchmal eine Schulwoche auf zwei Spalten aufgeteilt: z.B. Mi–Fr der KW 39 in einer Spalte, Mo–Di der KW 39 in der nächsten. Diese «halben Wochen» werden bei der Berechnung der Feriendauer als jeweils 1 Woche gezählt, was zu Werten wie «Herbstferien (4W)» oder «Weihnachtsferien (3W)» führt — falsch.
-
-**Korrekte Werte (gemäss Jahresplan SJ 25/26):**
-- Herbstferien: KW 39–42 → 4 volle KW, aber wenn die erste oder letzte Woche aufgeteilt ist, korrekt als Bruchteile zählen
-- Weihnachtsferien: KW 52–02 → umfasst KW 52 + KW 01 + KW 02
-
-**Ursache (Hypothese):** Die Dauer-Berechnung zählt einfach `endKw - startKw + 1`, ohne zu berücksichtigen, dass eine aufgeteilte Woche (Woche die in 2 Spalten erscheint) als eine Woche zählt, nicht zwei. Im Schulkontext gilt: wenn KW X auf Spalte A endet und Spalte B beginnt, ist das trotzdem 1 KW, nicht 2.
-
-**Lösung:** Beim Berechnen der angezeigten Wochen-Anzahl soll geprüft werden ob `startKw` und `endKw` unter Berücksichtigung der Spalten-Aufteilung korrekt interpretiert werden. Falls die Spalten-Aufteilung («geteilte Woche») im Datenmodell erkennbar ist (z.B. Spalten die dieselbe KW teilen), soll diese Woche nur einmal gezählt werden.
-
-**Hinweis:** Schaue in `plannerStore.ts` oder `settingsStore.ts` nach wie `weekData` und Spalten generiert werden — insbesondere ob es Spalten gibt wo `kw` identisch ist (= geteilte Woche).
+**Fix:** Sicherstellen dass:
+1. Die Berechnung `endKw - startKw + 1` korrekt ist (kein off-by-one)
+2. Jahreswechsel korrekt behandelt wird: wenn `endKw < startKw` → `(52 - startKw + 1) + endKw`
+3. Wenn dieselbe KW auf zwei Spalten aufgeteilt ist (geteilte Woche), wird sie nur einmal gezählt
 
 ---
 
-## Task G3: Bug — Fokus-Filter zeigt Sonderwochen in leeren Spalten
+## Task H2: Bug-fix — Sonderwochen in gefilterten/leeren Spalten
 
-**Problem:** Wenn ein Fachbereich-Filter aktiv ist (z.B. nur SF anzeigen, Screenshot zeigt Fokus «SF»), erscheinen in den **leeren** Spalten (Kurse die nicht SF sind und daher ausgeblendet sein sollten) trotzdem Sonderwochen-Einträge.
+**Problem:** Wenn ein Fachtyp-Filter aktiv ist (z.B. nur SF), erscheinen Sonderwochen trotzdem in Spalten die durch den Filter ausgeblendet sein sollten (Screenshot zeigt: bei SF-Fokus hat 30s IN eine leere Spalte mit sichtbaren Sonderwochen).
 
-**Erwartetes Verhalten:** Wenn eine Spalte durch den Fokus-Filter ausgeblendet/leer ist, sollen auch Sonderwochen in dieser Spalte nicht angezeigt werden. Sonderwochen sollen nur in Spalten erscheinen die dem aktiven Filter entsprechen.
+**Erwartetes Verhalten:** Sonderwochen sollen nur in Spalten erscheinen die dem aktiven Filter entsprechen. Ist eine Spalte durch den Filter «leer» (kein Kurs sichtbar), sollen auch Sonderwochen nicht angezeigt werden.
 
-**Suche:** Rendering-Logik für Sonderwochen in `WeekRows.tsx` — prüfen ob Sonderwochen-Rendering den aktiven Fokus-Filter (`courseTypeFilter` o.ä.) respektiert. Wahrscheinlich werden Sonderwochen unabhängig vom Spalten-Filter gerendert.
+**Ursache (Hypothese aus v3.84):** Das Sonderwochen-Rendering in `WeekRows.tsx` prüft zwar `courseFilter` der Sonderwoche, aber nicht den globalen Fachtyp-Filter (`activeFilter`/`courseTypeFilter`). Die beiden Filter-Ebenen werden nicht kombiniert.
 
----
+**Fix:** In der Rendering-Logik für Sonderwochen zusätzlich prüfen:
+- Ist ein globaler Fokus-Filter aktiv (z.B. SF)?
+- Entspricht die aktuelle Spalte diesem Filter (Kurs-Typ === aktiver Filter)?
+- Falls nicht → Sonderwoche für diese Spalte nicht rendern
 
-## Task G4: UI — ESC schliesst Statistik-Modal nicht
-
-**Problem:** Das Statistik-Fenster (öffnet via Icon oben rechts) kann nicht mit der ESC-Taste geschlossen werden. Es gibt nur das ✕-Icon.
-
-**Lösung:** `useEffect` + `keydown`-EventListener hinzufügen der bei ESC `onClose()` aufruft. Gilt analog für alle Modals/Overlays falls noch nicht implementiert (Statistik, Einstellungen-Panel, etc.).
-
-**Suche:** `StatisticsModal.tsx` oder ähnliche Komponente — dort `useEffect(() => { const handler = (e) => { if (e.key === 'Escape') onClose(); }; window.addEventListener('keydown', handler); return () => window.removeEventListener('keydown', handler); }, [onClose]);` ergänzen.
+Konkret: Die Bedingung `shouldShowSpecialWeek(col, specialWeek)` muss auch `col.courseType !== activeFilter` (wenn Filter gesetzt) berücksichtigen.
 
 ---
 
-## Task G5: UI — Menüleiste rechtsbündig bei verkleinertem Fenster
+## Task H3: Bug-fix — Toolbar Layout bei schmalem Fenster + Panel-Scroll
 
-**Problem:** Bei verkleinertem Browserfenster «bricht» die Menüleiste um oder die Icons auf der rechten Seite (Statistik, Einstellungen etc.) werden abgeschnitten/unsichtbar.
+**Problem A — Toolbar:**
+Bei schmalem Browserfenster werden die Icons rechts (Statistik, Einstellungen) abgeschnitten. Screenshot zeigt: Statistik-Icon und Einstellungs-Zahnrad sind kaum/nicht sichtbar.
 
-**Erwartetes Verhalten:** Die Menüleiste soll immer rechtsbündig ausgerichtet sein. Bei schmalem Fenster sollen die Icons rechts priorisiert bleiben und sichtbar sein. Wenn nötig, kann der linke Teil (Filter-Buttons, Suche) durch `overflow: hidden` oder `flex-shrink` beschnitten werden.
+**Lösung A:**
+- Toolbar als `display: flex` mit zwei Bereichen:
+  - **Links** (schrumpfbar): `[+] [Alle] [SF] [EWR] [IN] [KS] [TaF] [Suche]` → `flex: 1 1 auto; min-width: 0; overflow: hidden`
+  - **Rechts** (fix): `[Statistik] [Einstellungen]` → `flex: 0 0 auto` (schrumpft nie)
+- Filter-Buttons und Suche werden bei Platzmangel zusammengestaucht (overflow hidden), aber die Icons rechts bleiben immer sichtbar
+- Kopfzeile soll **sticky** sein (`position: sticky; top: 0; z-index: ...`) damit sie beim vertikalen Scrollen des Planers sichtbar bleibt
 
-**Lösung:** In der Toolbar-Komponente:
-- Container: `display: flex; justify-content: flex-end; align-items: center;`
-- Linker Teil (Filter + Suche): `flex: 1 1 auto; min-width: 0; overflow: hidden;`
-- Rechter Teil (Icons): `flex: 0 0 auto;` (schrumpft nie)
-- Alternativ: `position: sticky; right: 0` für den Icon-Block
+**Problem B — Einstellungen-Panel nicht scrollbar:**
+Das rechte Einstellungen-Panel kann manchmal nicht nach oben gescrollt werden. Icons und der Bereich oben sind dann nicht erreichbar ohne ESC zu drücken.
 
-**Suche:** Toolbar/Header-Komponente in `WeekRows.tsx` oder separater `Toolbar.tsx`.
-
----
-
-## Task G6: UI — Doppelklick auf Zeilennummer öffnet Ferien-Dialog
-
-**Problem:** Es gibt keine Möglichkeit, direkt aus dem Planer heraus eine Ferienperiode für eine bestimmte KW hinzuzufügen. Der Umweg über das rechte Panel ist umständlich.
-
-**Gewünschtes Verhalten:** Doppelklick auf die Zeilennummer (KW-Nummer ganz links in der Planer-Ansicht) öffnet das Ferien-Formular im rechten Panel, mit der entsprechenden KW bereits als `startKw` und `endKw` vorausgefüllt.
-
-**Implementierung:**
-1. `onDoubleClick`-Handler auf das KW-Nummern-Element in `WeekRows.tsx`
-2. Handler setzt Panel-Zustand auf «Ferien hinzufügen» und füllt `startKw`/`endKw` mit der angeklickten KW vor
-3. Das rechte Panel öffnet sich (falls geschlossen) und scrollt zum Ferien-Formular
-4. Tooltip on Hover: «Doppelklick: Ferien hinzufügen»
+**Lösung B:**
+- Panel-Container: `overflow-y: auto; max-height: 100vh` (oder `height: 100%` je nach Struktur)
+- Sicherstellen dass kein übergeordnetes Element `overflow: hidden` setzt das das Scrollen blockiert
+- Panel soll immer von oben bis unten scrollbar sein, unabhängig von Viewport-Höhe
+- Kein Bereich soll ausserhalb des scrollbaren Bereichs «feststecken»
 
 ---
 
-## Task G7: Feature — «Neuer Planer»-Dialog: vollständiger Setup-Wizard
+## Task H4: UI-fix — «Ohne Vorlage»-Dropdown entfernen
 
-**Problem:** Der `+`-Tab-Dialog (Screenshot zeigt: Name-Eingabe + Schuljahr-Dropdown + Vorlage-Dropdown + OK) bietet nicht dieselben Optionen wie der Erststart-Wizard. Insbesondere fehlt die Möglichkeit, Rubriken einzeln zu importieren (Ferien, Sonderwochen, Kurse etc.) bevor der Planer erstellt wird. Ferien werden fix aus dem Schuljahr-Preset übernommen.
+**Problem:** Im «Neuer Planer erstellen»-Dialog (Screenshot) gibt es eine obere Zeile mit drei Elementen: Name-Eingabe | Schuljahr-Dropdown | **Ohne Vorlage-Dropdown**. Das mittlere Dropdown «Ohne Vorlage» soll entfernt werden.
 
-**Gewünschtes Verhalten:** Der `+`-Tab-Dialog soll denselben vollständigen Setup-Wizard zeigen wie beim Erststart (WelcomeScreen), d.h.:
-- Name-Eingabe
-- Schuljahr-Auswahl (SJ 2025/26, 2026/27, 2027/28, Manuell)
-- Vorlage-Auswahl (Ohne Vorlage, WR Gym Hofwil, etc.)
-- Aufklappbare Sektion «Einzelne Rubriken importieren» mit den 6 Import-Buttons (Schulferien, Sonderwochen, Stundenplan/Kurse, Fachbereiche, Lehrplanziele, Beurteilungsregeln) — **identisch zu WelcomeScreen**
-- OK-Button erstellt den Planer mit allen importierten Konfigurationen
+**Fix:** In `PlannerTabs.tsx` (oder wo der «+»-Tab-Dialog definiert ist): das «Ohne Vorlage»-Dropdown-Element aus dem JSX entfernen. Das Schuljahr-Dropdown und die Name-Eingabe bleiben.
 
-**Implementierung:** Den `+`-Tab-Dialog auf denselben Komponenten-Zustand wie `WelcomeScreen` umstellen, oder `WelcomeScreen`-Logik in eine gemeinsame `PlannerSetupForm`-Komponente extrahieren die in beiden Kontexten genutzt wird.
-
-**Suche:** `PlannerTabs.tsx` — dort den `+`-Tab-Handler finden und den dortigen Dialog durch den vollständigen WelcomeScreen-Wizard ersetzen.
+**Resultat:** Dialog zeigt nur noch: `[Name-Eingabe] [Schuljahr-Dropdown]` in der oberen Zeile.
 
 ---
 
-## Task G8: Feature — PW-Badge automatisch bei UE in Prüfungswochen
+## Task H5: Bug-fix — PW-Badge nur bei reinen TaF-Klassen
 
-**Kontext:** Im Schuljahr gibt es Prüfungswochen (TaF = «Thematische abschlussprüfungen und Fachprüfungen»). Für TaF-Klassen (Kursnamen enthalten `f` oder `s` als letztes Zeichen, z.B. `29c`, `27a28f`, `28bc29fs`) gelten diese Wochen besonders:
+**Problem:** PW-Badge erscheint auch bei gemischten Klassen wie `27a28f` (hat sowohl Regelklassen-Buchstaben `a` als auch TaF-Buchstaben `f`). Soll aber nur bei reinen TaF-Klassen erscheinen.
 
-- **Phasenfächer** (F, E, D, M, P, B, C, G, GG, EWR, IN, BG — alle im Phasenplan): Prüfungswoche wird als Sonderwoche markiert → kein normaler Unterricht
-- **Durchgehende Fächer** (SF = Schwerpunktfach, EF = Ergänzungsfach — **nicht** im Phasenplan): haben auch während Prüfungswochen normalen Unterricht → UE können eingetragen werden
-- **Regelklassen** (Kursnamen ohne f/s, z.B. `27a`, `28c`): Prüfungswochen nicht relevant
+**Klassifikation Kursname:**
+- **Reine TaF-Klasse:** Buchstaben im Kursnamen sind **ausschliesslich** `f` und/oder `s` (neben Ziffern)
+  - Beispiele: `30s`, `29fs`, `28s`, `27f` → ✅ PW-Badge
+- **Gemischte Klasse:** Enthält sowohl TaF-Buchstaben (f/s) als auch Regelklassen-Buchstaben (a/b/c/d/e)
+  - Beispiele: `27a28f`, `28bc29fs`, `29cf` → ❌ kein PW-Badge
+- **Reine Regelklasse:** Buchstaben sind ausschliesslich a/b/c/d/e
+  - Beispiele: `29c`, `27a`, `28bc` → ❌ kein PW-Badge
 
-**Gewünschtes Verhalten:**
-Wenn eine UE in eine Prüfungswoche-KW eingetragen wird UND der Kurs ein durchgehendes Fach (SF oder EF) hat UND TaF-Schüler im Kurs sind (Kursname enthält `f` oder `s`), soll automatisch der Badge `PW` zur UE hinzugefügt werden.
+**Erkennungslogik:**
+```typescript
+function isPureTaF(courseName: string): boolean {
+  // Extrahiere nur die Buchstaben (keine Ziffern)
+  const letters = courseName.replace(/[^a-zA-Z]/g, '').toLowerCase();
+  // Reine TaF: alle Buchstaben sind f oder s
+  return letters.length > 0 && /^[fs]+$/.test(letters);
+}
+```
 
-**Erkennung TaF-Kurs:**
-- Kursname enthält `f` oder `s` als Buchstabe (nicht als Teil von «fs»-Kombination prüfen — `f` oder `s` irgendwo im Namen): `29c` → nein, `27a28f` → ja (`f`), `28bc29fs` → ja (`f`/`s`), `29fs` → ja
-- Einfacher: Kursname matcht `/[fs]/i` nach dem Zahlenblock
-
-**Erkennung durchgehendes Fach:**
-- Fachtyp der Kurs-Spalte ist `SF` oder `EF` (Badge-Farbe grün/lila)
-- Phasenfächer haben andere Typen (VWL, BWL, RECHT, IN, EWR, KS etc.)
-
-**Erkennung Prüfungswoche:**
-- Prüfungswochen sind als Sonderwochen mit Label «Prüfungswoche» (oder ähnlich) in `specialWeeks` eingetragen
-- Alternativ: eigene Liste der Prüfungswochen-KWs aus den Sonderwochendaten extrahieren
-
-**Implementierung:**
-1. Beim Eintragen einer UE (in `plannerStore.ts` `addLesson` oder `updateLesson`): prüfen ob KW eine Prüfungswoche ist, Kurs TaF-Kurs ist, und Fachtyp SF oder EF
-2. Falls ja: `badges` Array der UE um `'PW'` ergänzen (falls nicht bereits vorhanden)
-3. Badge `PW` soll in den UE-Kacheln neben den bestehenden Badges (SF-Badge etc.) erscheinen
-4. Badge-Farbe: dunkelorange oder ähnlich (abweichend von bestehenden Badges)
-5. Badge wird **nicht** automatisch entfernt wenn KW-Typ sich ändert — manuelles Entfernen via bestehendem Badge-Mechanismus bleibt möglich
-
-**Phasenplan-Referenz** (für Dokumentation — nicht im Code hardcoden):
-Fächer im Phasenplan: F, E, D, M, P, B, C, G, GG, EWR, IN, BG
-Durchgehend (nicht im Phasenplan): SF, EF
-Die Erkennung erfolgt über den Kurs-Typ (SF/EF Badge), nicht über den Phasenplan-PDF.
+**Fix:** In der PW-Badge-Logik (G8 aus v3.84) die Bedingung von «enthält f oder s» auf `isPureTaF(courseName)` ändern.
 
 ---
 
-## Ergebnis v3.84
+## Task H6: Bug-neu — Einstellungen-Panel Scroll-Bug
+
+*(Bereits in H3 Teil B abgedeckt — falls H3 Panel-Fix nicht reicht, hier separat behandeln)*
+
+**Problem:** Beim Öffnen des Einstellungen-Panels (rechte Seite) ist es manchmal nicht möglich, nach oben zu scrollen. Der obere Bereich (Kopfzeile mit Icons, «Schule & Grundeinstellungen» etc.) ist ausserhalb des sichtbaren/scrollbaren Bereichs.
+
+**Ursache (Hypothese):** Das Panel startet mit einem Scroll-Offset der nicht bei 0 beginnt, oder ein übergeordnetes `overflow: hidden` blockiert das Scrollen. Möglicherweise wird das Panel zu einem Zeitpunkt geöffnet wo der Planer selbst gescrollt ist, und das Panel erbt diese Scroll-Position.
+
+**Fix:**
+- Panel beim Öffnen immer auf `scrollTop = 0` setzen
+- `overflow-y: scroll` (nicht `auto`) auf dem Panel-Container setzen
+- Sicherstellen dass `max-height` korrekt gesetzt ist (100vh minus Header-Höhe)
+- Kein `position: fixed` Element soll den scrollbaren Bereich überlagern ohne eigenes Scrolling
+
+---
+
+## Ergebnis v3.85
 
 | # | Typ | Beschreibung | Status |
 |---|-----|-------------|--------|
-| G1 | Bug | Einzel-Tag-Ferien markieren ganze Woche | ✅ |
-| G2 | Bug | Ferienwochen-Label falsch bei aufgeteilten Wochen | ✅ |
-| G3 | Bug | Fokus-Filter zeigt Sonderwochen in leeren Spalten | ✅ |
-| G4 | UI | ESC schliesst Statistik-Modal nicht | ✅ |
-| G5 | UI | Menüleiste rechtsbündig bei verkleinertem Fenster | ✅ |
-| G6 | UI | Doppelklick auf Zeilennummer → Ferien-Dialog mit KW vorausgefüllt | ✅ |
-| G7 | Feature | «Neuer Planer»-Dialog: vollständiger Setup-Wizard | ✅ |
-| G8 | Feature | PW-Badge automatisch bei UE in Prüfungswochen (SF/EF + TaF-Kurs) | ✅ |
+| H1 | Bug-fix | Feriendauer-Label: KW 39–41 = 3W, KW 52–01 = 2W | ✅ Berechnung via min/max KW-Nummern statt Set-Size; Jahreswechsel korrekt |
+| H2 | Bug-fix | Sonderwochen in gefilterten Spalten | ✅ validEventCols-Map prüft courseFilter/gymLevel; suppressed Events als leer behandelt |
+| H3 | Bug-fix | Toolbar Layout + Panel-Scroll | ✅ Toolbar: overflow-hidden + flex-1 Mittelbereich; rechte Icons nie abgeschnitten |
+| H4 | UI-fix | «Ohne Vorlage»-Dropdown entfernen | ✅ Dropdown + templateId State + Copy-Logik entfernt |
+| H5 | Bug-fix | PW-Badge nur reine TaF-Klassen | ✅ /^[fs]+$/ statt /[fs]/ — gemischte Klassen (27a28f) kein Badge |
+| H6 | Bug-neu | Einstellungen-Panel Scroll-Bug | ✅ scrollTop=0 bei Open/Tab-Wechsel; min-h-0 + overflow-y-auto; overflow-hidden vom Container entfernt |
 
 ---
 
@@ -174,11 +147,8 @@ Die Erkennung erfolgt über den Kurs-Typ (SF/EF Badge), nicht über den Phasenpl
 
 ```bash
 npm run build 2>&1 | tail -20
-rsync -av --exclude='node_modules' --exclude='.git' --exclude='dist' \
-  /path/to/working/dir/ \
-  /Users/durandbourjate/Documents/-Gym\ Hofwil/00\ Automatisierung\ Unterricht/10\ Github/GYM-WR-DUY/Unterrichtsplaner/
 git add -A
-git commit -m "feat: v3.84 — Ferien-Tagesfilter (G1), Feriendauer-Label (G2), Fokus-Sonderwochen (G3), ESC-Modal (G4), Toolbar-Layout (G5), Doppelklick-KW (G6), Setup-Wizard (G7), PW-Badge (G8)"
+git commit -m "fix: v3.85 — Ferienlabel (H1), Sonderwochen-Filter (H2), Toolbar+Panel-Scroll (H3), Vorlage-Dropdown (H4), PW-Badge TaF (H5), Panel-Scroll (H6)"
 git push
 ```
 
@@ -186,12 +156,15 @@ Nach Abschluss: HANDOFF.md Status auf ✅ setzen und Änderungsdetails dokumenti
 
 ---
 
-## Ergebnis v3.83
+## Vorherige Version: v3.84
 
 | # | Typ | Beschreibung | Status |
 |---|-----|-------------|--------|
-| F1 | Bug | Recht fehlt im Semesterbalken (Jahresübersicht) — Case-Mismatch `Recht` → `RECHT` | ✅ |
-| F2 | Feature | Sonderwochen: Filterwirkung nach GYM-Stufe und TaF im Planer | ✅ |
-| F3 | UX | Sequenzbalken-Klick wählt Sequenz im Detailmenü vor | ✅ |
-| F4 | Feature | Separate Importoptionen auf Startseite | ✅ |
-| F5 | Data | Sonderwochen-Daten gemäss IW-Plan SJ 25/26 | ✅ |
+| G1 | Bug | Einzel-Tag-Ferien markieren ganze Woche | ✅ |
+| G2 | Bug | Ferienwochen-Label falsch bei aufgeteilten Wochen | ⚠️ → H1 |
+| G3 | Bug | Fokus-Filter zeigt Sonderwochen in leeren Spalten | ⚠️ → H2 |
+| G4 | UI | ESC schliesst Statistik-Modal nicht | ✅ |
+| G5 | UI | Menüleiste rechtsbündig bei verkleinertem Fenster | ⚠️ → H3 |
+| G6 | UI | Doppelklick auf Zeilennummer → Ferien-Dialog mit KW vorausgefüllt | ✅ |
+| G7 | Feature | «Neuer Planer»-Dialog: vollständiger Setup-Wizard | ⚠️ → H4 |
+| G8 | Feature | PW-Badge automatisch bei UE in Prüfungswochen (SF/EF + TaF-Kurs) | ⚠️ → H5 |

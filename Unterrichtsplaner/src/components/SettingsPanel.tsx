@@ -1757,7 +1757,7 @@ export function SettingsPanel() {
   const hasCustomSettings = storeSettings !== null || loadSettings() !== null;
 
   return (
-    <div className="flex-1 overflow-y-auto p-3 pb-12 space-y-3" style={{ overscrollBehavior: 'contain' }}>
+    <div className="flex-1 min-h-0 overflow-y-auto p-3 pb-12 space-y-3" style={{ overscrollBehavior: 'contain' }}>
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
