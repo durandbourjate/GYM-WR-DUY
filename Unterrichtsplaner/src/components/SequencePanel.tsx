@@ -167,10 +167,10 @@ function FlatBlockCard({ fb }: { fb: FlatBlockInfo }) {
   const parentSeq = sequences.find(s => s.id === fb.seqId);
 
   return (
-    <div ref={cardRef} data-seq-block={blockKey} className="border rounded-lg overflow-hidden transition-colors"
+    <div ref={cardRef} data-seq-block={blockKey} className={`border rounded-lg overflow-hidden transition-colors ${isActive ? 'border-slate-600' : 'border-slate-700'}`}
       style={{
-        borderColor: isActive ? (blockColor || '#475569') : '#334155',
-        background: isActive ? (blockColor ? blockColor + '08' : '#1a2035') : 'transparent',
+        ...(isActive && blockColor ? { borderColor: blockColor, background: blockColor + '08' } : {}),
+        ...(!isActive ? {} : !blockColor ? { background: 'var(--bg-secondary)' } : {}),
       }}>
       {/* Compact header — always visible */}
       <div className="px-2 py-1.5 flex items-center gap-1.5 cursor-pointer hover:bg-slate-800/30"
@@ -229,11 +229,10 @@ function FlatBlockCard({ fb }: { fb: FlatBlockInfo }) {
                   <button key={s.key} onClick={() => updateBlockInSequence(fb.seqId, fb.blockIndex, {
                     subjectArea: block.subjectArea === s.key ? undefined : s.key as SubjectArea
                   })}
-                    className="px-1.5 py-0.5 rounded text-[8px] font-medium border cursor-pointer"
+                    className={`px-1.5 py-0.5 rounded text-[8px] font-medium border cursor-pointer ${block.subjectArea === s.key ? 'text-gray-200' : 'text-gray-500 border-gray-700'}`}
                     style={{
                       background: block.subjectArea === s.key ? s.color + '30' : 'transparent',
-                      borderColor: block.subjectArea === s.key ? s.color : '#374151',
-                      color: block.subjectArea === s.key ? '#e5e7eb' : '#6b7280',
+                      ...(block.subjectArea === s.key ? { borderColor: s.color } : {}),
                     }}>
                     {s.label}
                   </button>
@@ -354,11 +353,10 @@ function FlatBlockCard({ fb }: { fb: FlatBlockInfo }) {
                   <button key={s.key} onClick={() => updateSequence(fb.seqId, {
                     subjectArea: parentSeq.subjectArea === s.key ? undefined : s.key as SubjectArea
                   })}
-                    className="px-1.5 py-0.5 rounded text-[8px] font-medium border cursor-pointer"
+                    className={`px-1.5 py-0.5 rounded text-[8px] font-medium border cursor-pointer ${parentSeq.subjectArea === s.key ? 'text-gray-200' : 'text-gray-500 border-gray-700'}`}
                     style={{
                       background: parentSeq.subjectArea === s.key ? s.color + '30' : 'transparent',
-                      borderColor: parentSeq.subjectArea === s.key ? s.color : '#374151',
-                      color: parentSeq.subjectArea === s.key ? '#e5e7eb' : '#6b7280',
+                      ...(parentSeq.subjectArea === s.key ? { borderColor: s.color } : {}),
                     }}>
                     {s.label}
                   </button>
@@ -497,8 +495,8 @@ export function SequencePanel({ embedded = false }: { embedded?: boolean }) {
 
 
   // Subject area color helper
-  const saColor = (sa?: SubjectArea) => sa ? (SUBJECT_AREA_COLORS[sa] || {}).bg || '#1e293b' : '#1e293b';
-  const saFg = (sa?: SubjectArea) => sa ? (SUBJECT_AREA_COLORS[sa] || {}).fg || '#94a3b8' : '#94a3b8';
+  const saColor = (sa?: SubjectArea) => sa ? (SUBJECT_AREA_COLORS[sa] || {}).bg || 'var(--bg-secondary)' : 'var(--bg-secondary)';
+  const saFg = (sa?: SubjectArea) => sa ? (SUBJECT_AREA_COLORS[sa] || {}).fg || 'var(--text-muted)' : 'var(--text-muted)';
 
   const handleCreateSequence = () => {
     if (!newTitle.trim() || !newCourseId) return;
