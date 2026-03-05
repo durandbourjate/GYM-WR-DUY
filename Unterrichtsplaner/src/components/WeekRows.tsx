@@ -835,21 +835,10 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                   <span className="text-[11px] font-medium text-gray-400">
                     {hSpan.label}
                   </span>
-                  {/* H1: Feriendauer korrekt berechnen (Jahreswechsel berücksichtigen) */}
-                  {(() => {
-                    const uniqueKWs = [...new Set(hSpan.weekKeys)];
-                    if (uniqueKWs.length <= 1) return null;
-                    const nums = uniqueKWs.map(k => parseInt(k, 10));
-                    const startKw = Math.min(...nums);
-                    const endKw = Math.max(...nums);
-                    // Jahreswechsel: endKw < startKw (z.B. KW 52 → KW 01)
-                    const weeks = endKw >= startKw
-                      ? endKw - startKw + 1
-                      : (52 - startKw + 1) + endKw;
-                    return (
-                      <span className="text-[9px] text-gray-500">({weeks}W)</span>
-                    );
-                  })()}
+                  {/* H1-fix: hSpan.len = Anzahl eindeutige Zeilen (KWs), direkt verwenden */}
+                  {hSpan.len > 1 && (
+                    <span className="text-[9px] text-gray-500">({hSpan.len}W)</span>
+                  )}
                 </div>
               </td>
             </tr>
