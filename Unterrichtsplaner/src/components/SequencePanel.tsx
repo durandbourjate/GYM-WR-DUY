@@ -182,7 +182,7 @@ function FlatBlockCard({ fb }: { fb: FlatBlockInfo }) {
         }}>
         <div className="w-1 h-6 rounded-full shrink-0" style={{ background: blockColor || fb.seqColor || '#16a34a' }} />
         <div className="flex-1 min-w-0">
-          <div className="text-[12px] font-semibold text-gray-200 truncate">{block.label || block.topicMain || <span className="text-gray-500 italic font-normal">Block {fb.blockIndex + 1}</span>}</div>
+          <div className="text-[11px] font-semibold text-gray-200 truncate">{block.label || block.topicMain || <span className="text-gray-500 italic font-normal">Block {fb.blockIndex + 1}</span>}</div>
           <div className="text-[10px] text-gray-400 flex items-center gap-1.5">
             <span className="font-mono">{kwRange}</span>
             <span>· {block.weeks.length}W</span>
@@ -251,7 +251,7 @@ function FlatBlockCard({ fb }: { fb: FlatBlockInfo }) {
                   }
                 }}
                   placeholder={block.topicMain || `Block ${fb.blockIndex + 1}`}
-                  className="w-full bg-slate-700/50 text-slate-200 border border-slate-600 rounded px-2 py-1 text-[11px] outline-none focus:border-blue-400 placeholder:text-gray-500 placeholder:italic" />
+                  className="w-full bg-slate-700/50 text-slate-200 border border-slate-600 rounded px-2 py-1 text-[10px] outline-none focus:border-blue-400 placeholder:text-gray-500 placeholder:italic" />
                 <p className="text-[8px] text-gray-500 mt-0.5">Interner Name der Sequenz (z.B. für Sammlung und Navigation). Wird aus Oberthema übernommen falls leer.</p>
               </div>
               <div>
@@ -264,17 +264,17 @@ function FlatBlockCard({ fb }: { fb: FlatBlockInfo }) {
                     updateSequence(fb.seqId, { title: val });
                   }
                 }}
-                  className="w-full bg-slate-700/50 text-slate-200 border border-slate-600 rounded px-2 py-1 text-[11px] outline-none focus:border-blue-400" />
+                  className="w-full bg-slate-700/50 text-slate-200 border border-slate-600 rounded px-2 py-1 text-[10px] outline-none focus:border-blue-400" />
               </div>
               <div>
                 <label className="text-[10px] text-gray-400">Unterthema</label>
                 <input value={block.topicSub || ''} onChange={(e) => updateBlockInSequence(fb.seqId, fb.blockIndex, { topicSub: e.target.value || undefined })}
-                  className="w-full bg-slate-700/50 text-slate-200 border border-slate-600 rounded px-2 py-1 text-[11px] outline-none focus:border-blue-400" />
+                  className="w-full bg-slate-700/50 text-slate-200 border border-slate-600 rounded px-2 py-1 text-[10px] outline-none focus:border-blue-400" />
               </div>
               <div>
                 <label className="text-[10px] text-gray-400">Beschreibung</label>
                 <textarea value={block.description || ''} onChange={(e) => updateBlockInSequence(fb.seqId, fb.blockIndex, { description: e.target.value || undefined })}
-                  rows={2} className="w-full bg-slate-700/50 text-slate-200 border border-slate-600 rounded px-2 py-1 text-[11px] outline-none focus:border-blue-400 resize-y" />
+                  rows={2} className="w-full bg-slate-700/50 text-slate-200 border border-slate-600 rounded px-2 py-1 text-[10px] outline-none focus:border-blue-400 resize-y" />
               </div>
               <div>
                 <label className="text-[9px] text-gray-500">Lehrplanziel</label>
@@ -346,7 +346,7 @@ function FlatBlockCard({ fb }: { fb: FlatBlockInfo }) {
               <div>
                 <label className="text-[10px] text-gray-400">Reihen-Titel</label>
                 <input value={parentSeq.title} onChange={(e) => updateSequence(fb.seqId, { title: e.target.value })}
-                  className="w-full bg-slate-700/50 text-slate-200 border border-slate-600 rounded px-2 py-1 text-[11px] outline-none focus:border-amber-400" />
+                  className="w-full bg-slate-700/50 text-slate-200 border border-slate-600 rounded px-2 py-1 text-[10px] outline-none focus:border-amber-400" />
               </div>
               <div className="flex gap-1.5 flex-wrap">
                 <span className="text-[10px] text-gray-400 w-full">Fachbereich (Reihe):</span>
@@ -366,7 +366,7 @@ function FlatBlockCard({ fb }: { fb: FlatBlockInfo }) {
               <div>
                 <label className="text-[10px] text-gray-400">Notizen (Reihe)</label>
                 <textarea value={parentSeq.notes || ''} onChange={(e) => updateSequence(fb.seqId, { notes: e.target.value || undefined })}
-                  rows={2} className="w-full bg-slate-700/50 text-slate-200 border border-slate-600 rounded px-2 py-1 text-[11px] outline-none focus:border-blue-400 resize-y" />
+                  rows={2} className="w-full bg-slate-700/50 text-slate-200 border border-slate-600 rounded px-2 py-1 text-[10px] outline-none focus:border-blue-400 resize-y" />
               </div>
               {/* SOL auf Reihen-Ebene */}
               <div className="border-t border-slate-700 pt-1.5 mt-1">
@@ -394,7 +394,7 @@ function FlatBlockCard({ fb }: { fb: FlatBlockInfo }) {
                         sol: { ...parentSeq.sol, enabled: true, topic: e.target.value || undefined }
                       })}
                         placeholder="SOL-Thema…"
-                        className="w-full bg-slate-700/50 text-slate-200 border border-slate-600 rounded px-2 py-1 text-[11px] outline-none focus:border-emerald-400" />
+                        className="w-full bg-slate-700/50 text-slate-200 border border-slate-600 rounded px-2 py-1 text-[10px] outline-none focus:border-emerald-400" />
                     </div>
                     <div>
                       <label className="text-[10px] text-gray-400">Beschreibung / Auftrag</label>
@@ -402,7 +402,7 @@ function FlatBlockCard({ fb }: { fb: FlatBlockInfo }) {
                         sol: { ...parentSeq.sol, enabled: true, description: e.target.value || undefined }
                       })}
                         placeholder="SOL-Auftrag…" rows={2}
-                        className="w-full bg-slate-700/50 text-slate-200 border border-slate-600 rounded px-2 py-1 text-[11px] outline-none focus:border-emerald-400 resize-y" />
+                        className="w-full bg-slate-700/50 text-slate-200 border border-slate-600 rounded px-2 py-1 text-[10px] outline-none focus:border-emerald-400 resize-y" />
                     </div>
                     <div>
                       <label className="text-[10px] text-gray-400">Gesamtdauer</label>
@@ -410,7 +410,7 @@ function FlatBlockCard({ fb }: { fb: FlatBlockInfo }) {
                         sol: { ...parentSeq.sol, enabled: true, duration: e.target.value || undefined }
                       })}
                         placeholder="z.B. 4h, 2 Wochen…"
-                        className="w-full bg-slate-700/50 text-slate-200 border border-slate-600 rounded px-2 py-1 text-[11px] outline-none focus:border-emerald-400" />
+                        className="w-full bg-slate-700/50 text-slate-200 border border-slate-600 rounded px-2 py-1 text-[10px] outline-none focus:border-emerald-400" />
                     </div>
                   </div>
                 )}
@@ -704,13 +704,13 @@ export function SequencePanel({ embedded = false }: { embedded?: boolean }) {
               <input autoFocus value={newTitle} onChange={(e) => setNewTitle(e.target.value)}
                 onKeyDown={(e) => { if (e.key === 'Enter') handleCreateSequence(); if (e.key === 'Escape') setShowNewForm(false); }}
                 placeholder="Titel der Sequenz…"
-                className="w-full bg-slate-800 text-slate-200 border border-slate-600 rounded px-2.5 py-2 text-[12px] outline-none focus:border-blue-400" />
+                className="w-full bg-slate-800 text-slate-200 border border-slate-600 rounded px-2 py-1.5 text-[10px] outline-none focus:border-blue-400" />
               <select value={newCourseId} onChange={(e) => {
                   setNewCourseId(e.target.value);
                   const course = COURSES.find(c => c.id === e.target.value);
                   if (course && !newTitle.trim()) setNewTitle(`${course.cls} – `);
                 }}
-                className="w-full bg-slate-800 text-slate-200 border border-slate-600 rounded px-2.5 py-2 text-[12px] outline-none focus:border-blue-400">
+                className="w-full bg-slate-800 text-slate-200 border border-slate-600 rounded px-2 py-1.5 text-[10px] outline-none focus:border-blue-400">
                 {COURSES.map((c) => (
                   <option key={c.id} value={c.id}>{c.cls} – {c.typ} {c.day} {c.from}–{c.to} ({c.les}L)</option>
                 ))}
@@ -755,7 +755,7 @@ export function SequencePanel({ embedded = false }: { embedded?: boolean }) {
                   <div>
                     <label className="text-[8px] text-gray-400">Kurs</label>
                     <select value={importCourseId} onChange={(e) => setImportCourseId(e.target.value)}
-                      className="w-full bg-slate-800 text-slate-200 border border-slate-600 rounded px-2.5 py-2 text-[12px] outline-none focus:border-amber-400">
+                      className="w-full bg-slate-800 text-slate-200 border border-slate-600 rounded px-2 py-1.5 text-[10px] outline-none focus:border-amber-400">
                       {COURSES.map((c) => (
                         <option key={c.id} value={c.id}>{c.cls} – {c.typ} {c.day} {c.from}–{c.to}</option>
                       ))}
@@ -764,7 +764,7 @@ export function SequencePanel({ embedded = false }: { embedded?: boolean }) {
                   <div>
                     <label className="text-[8px] text-gray-400">Ab welcher KW platzieren?</label>
                     <select value={importStartWeek} onChange={(e) => setImportStartWeek(e.target.value)}
-                      className="w-full bg-slate-800 text-slate-200 border border-slate-600 rounded px-2.5 py-2 text-[12px] outline-none focus:border-amber-400">
+                      className="w-full bg-slate-800 text-slate-200 border border-slate-600 rounded px-2 py-1.5 text-[10px] outline-none focus:border-amber-400">
                       {usePlannerStore.getState().weekData.map(w => (
                         <option key={w.w} value={w.w}>KW {w.w}</option>
                       ))}
