@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { INITIAL_LESSON_DETAILS } from '../data/initialLessonDetails';
 import { instanceStorageKey, generateWeekIds, useInstanceStore } from './instanceStore';
+import { applySettingsToWeekData, loadSettings } from './settingsStore';
 import { createUISlice, type UISlice } from './slices/uiSlice';
 import { createCollectionSlice, type CollectionSlice } from './slices/collectionSlice';
 import { createSequenceSlice, type SequenceSlice } from './slices/sequenceSlice';
@@ -122,7 +123,13 @@ export function loadFromInstance(instanceId: string): void {
           // Sortierung nach erwarteter Reihenfolge
           const order = new Map(expected.map((id, idx) => [id, idx]));
           weekData.sort((a: { w: string }, b: { w: string }) => (order.get(a.w) ?? 999) - (order.get(b.w) ?? 999));
-          console.log('[Migration V2] Fehlende Wochen ergänzt:', missing);
+          // Settings anwenden damit neue Wochen als Ferien/Events markiert werden
+          const settings = data.plannerSettings ?? loadSettings();
+          if (settings && (settings.holidays?.length > 0 || settings.specialWeeks?.length > 0)) {
+            const applied = applySettingsToWeekData(weekData, settings);
+            weekData = applied.weekData;
+          }
+          console.log('[Migration V2] Fehlende Wochen ergänzt + Settings angewendet:', missing);
         }
       }
 
