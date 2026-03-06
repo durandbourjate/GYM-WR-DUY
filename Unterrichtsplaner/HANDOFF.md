@@ -1,6 +1,6 @@
-# Unterrichtsplaner – Handoff v3.93
+# Unterrichtsplaner – Handoff v3.94
 
-## Status: ✅ v3.93 — Refactoring Phase 1 (SettingsPanel aufteilen)
+## Status: 🔄 v3.94 — Refactoring Phase 2 (WeekRows + DetailPanel)
 
 **Referenz:** Lies `REFACTORING.md` für Analyse, Regeln und Verbote.
 
@@ -13,48 +13,49 @@ Reines Strukturrefactoring: Move + Extract. Die App muss vor und nach jedem Schr
 
 ---
 
-## Refactoring P1: SettingsPanel.tsx aufteilen
+## Refactoring P3: WeekRows.tsx Sub-Komponenten extrahieren
 
-SettingsPanel.tsx hat 2137 Zeilen mit 6 eigenständigen Sub-Editoren.
-Ziel: Jeder Editor → eigene Datei. SettingsPanel.tsx wird zum dünnen Orchestrator.
+WeekRows.tsx hat 1445 Zeilen mit mehreren eigenständigen Sub-Komponenten.
+Ziel: Sub-Komponenten in eigene Dateien. WeekRows.tsx wird schlanker.
 
-### Zielstruktur
+### Zu extrahierende Komponenten
 
-```
-src/components/settings/
-├── shared.tsx              ← Section, SmallInput, SmallSelect, RubricCollectionButtons, SaveToCollectionDialog, RubricCollectionPicker, SectionActions, extractRubricData
-├── SubjectsEditor.tsx      ← SubjectsEditor (Z.320–437)
-├── CourseEditor.tsx         ← CourseEditor + CourseDurationPicker + Duration-Helpers (Z.438–674)
-├── SpecialWeeksEditor.tsx   ← SpecialWeeksEditor + GYM-Level-Helpers (Z.675–986)
-├── HolidaysEditor.tsx       ← HolidaysEditor (Z.988–1077)
-├── AssessmentRulesEditor.tsx ← AssessmentRulesEditor (Z.1087–1204)
-└── GCalSection.tsx          ← GCalSection (Z.1206–1661)
-```
+| # | Schritt | Was | Zeilen ca. | Ziel |
+|---|---------|-----|------------|------|
+| R8 | InlineEdit | Inline-Edit-Feld (Z.17–41) + getCatColor/getCatBorder Helper (Z.43–44) | ~30 | `components/InlineEdit.tsx` |
+| R9 | HoverPreview | Hover-Vorschau auf Zellen (Z.46–207) | ~160 | `components/HoverPreview.tsx` |
+| R10 | EmptyCellMenu | Kontextmenü für leere Zellen (Z.208–288) | ~80 | `components/EmptyCellMenu.tsx` |
+| R11 | NoteCell | Notizen-Zelle pro Kurs/Woche (Z.289–~360) | ~70 | `components/NoteCell.tsx` |
 
-SettingsPanel.tsx bleibt als Hauptdatei: importiert alle Editoren, rendert Tabs/Layout.
-
-### Schritte (je ein Commit)
-
-| # | Schritt | Dateien | Status |
-|---|---------|---------|--------|
-| R1 | `settings/` Ordner erstellen, `shared.tsx` extrahieren (Section, SmallInput, SmallSelect, Rubric-Helpers) | Neu: settings/shared.tsx, Edit: SettingsPanel.tsx | ✅ |
-| R2 | `SubjectsEditor.tsx` extrahieren | Neu: settings/SubjectsEditor.tsx, Edit: SettingsPanel.tsx | ✅ |
-| R3 | `CourseEditor.tsx` extrahieren (inkl. CourseDurationPicker, Duration-Helpers) | Neu: settings/CourseEditor.tsx, Edit: SettingsPanel.tsx | ✅ |
-| R4 | `SpecialWeeksEditor.tsx` extrahieren (inkl. GYM-Level-Helpers) | Neu: settings/SpecialWeeksEditor.tsx, Edit: SettingsPanel.tsx | ✅ |
-| R5 | `HolidaysEditor.tsx` extrahieren | Neu: settings/HolidaysEditor.tsx, Edit: SettingsPanel.tsx | ✅ |
-| R6 | `AssessmentRulesEditor.tsx` extrahieren | Neu: settings/AssessmentRulesEditor.tsx, Edit: SettingsPanel.tsx | ✅ |
-| R7 | `GCalSection.tsx` extrahieren | Neu: settings/GCalSection.tsx, Edit: SettingsPanel.tsx | ✅ |
-
-### Regeln pro Schritt
+### Regeln (identisch mit P1)
 
 1. **Vor** dem Schritt: `npx tsc --noEmit && npm run build` (Baseline)
 2. Code 1:1 verschieben — KEINE Logik-Änderungen
-3. Imports in der neuen Datei ergänzen, in SettingsPanel.tsx auf Import umstellen
+3. Imports in der neuen Datei ergänzen, in WeekRows.tsx auf Import umstellen
 4. **Nach** dem Schritt: `npx tsc --noEmit && npm run build` (muss fehlerfrei)
 5. Commit: `git add -A && git commit -m "refactor R[N]: [Beschreibung]"`
 6. Push: `git push`
 
-### Verbote (aus REFACTORING.md)
+---
+
+## Refactoring P4: DetailPanel.tsx Datenlogik extrahieren
+
+DetailPanel.tsx hat 1396 Zeilen. Z.15–121 ist ein reines Datenmodell (Block-Kategorie/Untertyp-System) mit Konstanten und Lookup-Funktionen — hat nichts mit der React-Komponente zu tun.
+
+### Zu extrahierende Teile
+
+| # | Schritt | Was | Zeilen ca. | Ziel |
+|---|---------|-----|------------|------|
+| R12 | Block-Kategorie-System | CATEGORIES, DEFAULT_SUBTYPES, loadCustomSubtypes, saveCustomSubtypes, getSubtypesForCategory, migrateBlockType, getEffectiveCategorySubtype, getCategoryLabel, getSubtypeLabel + Types (BlockCategory, SubtypeDef, CategoryDef) | ~110 | `data/blockCategories.ts` |
+| R13 | Shared UI-Helpers | PillSelect, DurationSelector (getDurationPresets), SolSection, MaterialLinks, SequenceAssignMenu — kleine generische Komponenten | ~250 | `components/detail/shared.tsx` |
+
+### Regeln (identisch)
+
+Gleiche Regeln wie oben. Ein Commit pro Schritt.
+
+---
+
+## Verbote (aus REFACTORING.md)
 
 - KEINE neuen Features
 - KEINE Logik-Änderungen
@@ -65,14 +66,9 @@ SettingsPanel.tsx bleibt als Hauptdatei: importiert alle Editoren, rendert Tabs/
 
 ---
 
-### Ergebnis
+## Vorherige Version: v3.93 ✅ (Refactoring P1: SettingsPanel)
 
-- **SettingsPanel.tsx**: 1883 → 495 Zeilen (dünner Orchestrator)
-- **7 neue Dateien** in `src/components/settings/`: shared.tsx, SubjectsEditor.tsx, CourseEditor.tsx, SpecialWeeksEditor.tsx, HolidaysEditor.tsx, AssessmentRulesEditor.tsx, GCalSection.tsx
-- `npx tsc --noEmit && npm run build` bestanden
-- Keine Funktionalitäts-Änderungen
-
----
+SettingsPanel.tsx: 2137 → 495 Zeilen. 7 Editoren in `components/settings/` extrahiert (R1–R7).
 
 ## Vorherige Version: v3.92 ✅
 
