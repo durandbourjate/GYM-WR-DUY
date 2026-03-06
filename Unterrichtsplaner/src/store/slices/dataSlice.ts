@@ -38,6 +38,8 @@ export interface DataSlice {
   batchShiftDown: (keys: string[], allWeeks: string[], courses: Course[]) => void;
   batchInsertBefore: (keys: string[], allWeeks: string[], courses: Course[]) => void;
   moveGroup: (col: number, fromWeeks: string[], toWeek: string, allWeeks: string[]) => void;
+  // T5: Sequence block drag — move ALL weeks of a sequence block together
+  moveSequenceBlock: (col: number, fromWeek: string, toWeek: string, allWeekOrder: string[], courseId: string) => void;
   // Undo
   undoStack: Week[][];
   pushUndo: () => void;
@@ -553,6 +555,141 @@ export const createDataSlice: StateCreator<PlannerState, [], [], DataSlice> = (s
 
     set({ weekData: newWeekData.map(w => weekMapNew.get(w.w) || w), sequences: updatedSeqs, multiSelection: [] });
   },
+
+  // T5: Move entire sequence block together
+  moveSequenceBlock: (col, fromWeek, toWeek, allWeekOrder, courseId) => {
+    if (fromWeek === toWeek) return;
+    const state = get();
+
+    // Find the sequence and block containing fromWeek for this course
+    let targetSeqId = '';
+    let targetBlockIdx = -1;
+    let blockWeeks: string[] = [];
+
+    for (const seq of state.sequences) {
+      const matchesCourse = seq.courseId === courseId ||
+        (seq.courseIds && seq.courseIds.includes(courseId));
+      if (!matchesCourse) continue;
+      for (let bi = 0; bi < seq.blocks.length; bi++) {
+        if (seq.blocks[bi].weeks.includes(fromWeek)) {
+          targetSeqId = seq.id;
+          targetBlockIdx = bi;
+          blockWeeks = [...seq.blocks[bi].weeks];
+          break;
+        }
+      }
+      if (targetSeqId) break;
+    }
+
+    // Not in a sequence or single-week block → no-op (caller falls back to single move)
+    if (!targetSeqId || blockWeeks.length <= 1) return;
+
+    // Calculate offset in allWeekOrder
+    const fromIdx = allWeekOrder.indexOf(fromWeek);
+    const toIdx = allWeekOrder.indexOf(toWeek);
+    if (fromIdx < 0 || toIdx < 0) return;
+    const offset = toIdx - fromIdx;
+    if (offset === 0) return;
+
+    // Calculate new positions for all block weeks
+    const weekDataMap = new Map(state.weekData.map(w => [w.w, w]));
+    const blockWeekSet = new Set(blockWeeks);
+    const weekMapping: { from: string; to: string }[] = [];
+
+    for (const bw of blockWeeks) {
+      const bwIdx = allWeekOrder.indexOf(bw);
+      if (bwIdx < 0) return;
+      const newIdx = bwIdx + offset;
+      if (newIdx < 0 || newIdx >= allWeekOrder.length) return; // out of bounds
+      const targetW = allWeekOrder[newIdx];
+      // Check: target is a holiday/event not in our block → abort
+      const tw = weekDataMap.get(targetW);
+      const te = tw?.lessons[col];
+      if (te && (te.type === 5 || te.type === 6) && !blockWeekSet.has(targetW)) return;
+      weekMapping.push({ from: bw, to: targetW });
+    }
+
+    state.pushUndo();
+
+    // Collect block entries + details
+    const blockEntries = new Map<string, LessonEntry>();
+    const blockDetailMap = new Map<string, LessonDetail>();
+    for (const bw of blockWeeks) {
+      const w = weekDataMap.get(bw);
+      if (w?.lessons[col]) blockEntries.set(bw, w.lessons[col]);
+      const dk = `${bw}-${col}`;
+      if (state.lessonDetails[dk]) blockDetailMap.set(bw, state.lessonDetails[dk]);
+    }
+
+    // Collect displaced entries at target positions (not part of current block)
+    const displacedEntries: { entry: LessonEntry; detail?: LessonDetail }[] = [];
+    for (const { to } of weekMapping) {
+      if (blockWeekSet.has(to)) continue;
+      const w = weekDataMap.get(to);
+      if (w?.lessons[col]?.title) {
+        displacedEntries.push({
+          entry: w.lessons[col],
+          detail: state.lessonDetails[`${to}-${col}`],
+        });
+      }
+    }
+
+    // Build new weekData
+    const newWeekData = state.weekData.map(w => ({ ...w, lessons: { ...w.lessons } }));
+    const newWeekMap = new Map(newWeekData.map(w => [w.w, w]));
+
+    // Clear all block source positions
+    for (const bw of blockWeeks) {
+      const week = newWeekMap.get(bw);
+      if (week) delete week.lessons[col];
+    }
+
+    // Place block entries at new positions
+    for (const { from, to } of weekMapping) {
+      const entry = blockEntries.get(from);
+      if (entry) {
+        const week = newWeekMap.get(to);
+        if (week) week.lessons[col] = { ...entry };
+      }
+    }
+
+    // Place displaced entries into vacated block positions
+    const targetWeekSet = new Set(weekMapping.map(m => m.to));
+    const vacated = blockWeeks.filter(bw => !targetWeekSet.has(bw));
+    for (let i = 0; i < displacedEntries.length && i < vacated.length; i++) {
+      const week = newWeekMap.get(vacated[i]);
+      if (week) week.lessons[col] = { ...displacedEntries[i].entry };
+    }
+
+    // Update lesson details
+    const newDetails = { ...state.lessonDetails };
+    for (const bw of blockWeeks) delete newDetails[`${bw}-${col}`];
+    for (const { from, to } of weekMapping) {
+      const d = blockDetailMap.get(from);
+      if (d) newDetails[`${to}-${col}`] = d;
+    }
+    // Displaced details → vacated positions
+    for (let i = 0; i < displacedEntries.length && i < vacated.length; i++) {
+      const d = displacedEntries[i].detail;
+      if (d) newDetails[`${vacated[i]}-${col}`] = d;
+    }
+
+    // Update sequences: remap block weeks
+    const newBlockWeeks = weekMapping.map(m => m.to);
+    const updatedSeqs = state.sequences.map(seq => {
+      if (seq.id !== targetSeqId) return seq;
+      return {
+        ...seq,
+        blocks: seq.blocks.map((b, idx) =>
+          idx === targetBlockIdx ? { ...b, weeks: newBlockWeeks } : b
+        ),
+        updatedAt: new Date().toISOString(),
+      };
+    });
+
+    set({ weekData: newWeekData, lessonDetails: newDetails, sequences: updatedSeqs });
+  },
+
   undoStack: [],
   pushUndo: () =>
     set((state) => ({

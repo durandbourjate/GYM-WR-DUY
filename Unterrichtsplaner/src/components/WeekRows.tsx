@@ -384,6 +384,25 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
     // Handle move-drag drop (v3.82 E4: cross-column support)
     if (dragMoveSource) {
       if (dragMoveTarget && (dragMoveSource.week !== dragMoveTarget.week || dragMoveSource.col !== dragMoveTarget.col)) {
+        // T5: Check if source is part of a sequence block → move entire block
+        if (dragMoveSource.col === dragMoveTarget.col) {
+          const srcCourse = courses.find(cc => cc.col === dragMoveSource.col);
+          if (srcCourse) {
+            const seqInfo = getSequenceInfoFromStore(srcCourse.id, dragMoveSource.week, sequences);
+            if (seqInfo && seqInfo.total > 1) {
+              const allWeeks = allWeeksProp || displayWeeks.map(w => w.w);
+              usePlannerStore.getState().moveSequenceBlock(
+                dragMoveSource.col, dragMoveSource.week, dragMoveTarget.week, allWeeks, srcCourse.id
+              );
+              checkRhythmAfterPush(srcCourse);
+              dragMoved.current = true;
+              setTimeout(() => { dragMoved.current = false; }, 50);
+              setDragMoveSource(null);
+              setDragMoveTarget(null);
+              return;
+            }
+          }
+        }
         pushUndo();
         if (dragMoveSource.col === dragMoveTarget.col) {
           // Same column: use existing swap/move logic
@@ -425,7 +444,7 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
     }
     // Reset dragMoved after a short delay so onClick can still check it
     setTimeout(() => { dragMoved.current = false; }, 50);
-  }, [isDragSelecting, dragMoveSource, dragMoveTarget, dragSelectedWeeks, dragSelectCourse, displayWeeks, setSidePanelOpen, setSidePanelTab, pushUndo, swapLessons, moveLessonToEmpty, courses, checkRhythmAfterPush]);
+  }, [isDragSelecting, dragMoveSource, dragMoveTarget, dragSelectedWeeks, dragSelectCourse, displayWeeks, setSidePanelOpen, setSidePanelTab, pushUndo, swapLessons, moveLessonToEmpty, courses, checkRhythmAfterPush, sequences, allWeeksProp]);
 
   // Global mouseup listener for drag-selection and move-drag
   useEffect(() => {
