@@ -196,7 +196,7 @@ function FlatBlockCard({ fb }: { fb: FlatBlockInfo }) {
 
       {/* Expanded content */}
       {isActive && (
-        <div className="px-3 pb-3 pt-1 border-t border-slate-700/50 space-y-2">
+        <div className="px-3 pb-3 pt-1 border-t border-slate-700/50 space-y-2" style={{ minHeight: '50vh' }}>
           {/* Quick actions + tab-style toggles */}
           <div className="flex gap-0.5 items-center">
             <button onClick={navigateToBlock} className="text-[10px] text-blue-400 hover:text-blue-300 cursor-pointer px-2 py-1">↗ Im Planer</button>
@@ -691,7 +691,7 @@ export function SequencePanel({ embedded = false }: { embedded?: boolean }) {
           const activeFb = flatBlocks.find(fb => `${fb.seqId}-${fb.blockIndex}` === editingSequenceId);
           if (!activeFb) return null;
           return (
-            <div className="pt-1 pb-2 mb-2 border-b border-purple-500/30 bg-slate-900/50 rounded max-h-[40vh] overflow-y-auto -mx-3 px-3">
+            <div className="pt-1 pb-2 mb-2 border-b border-purple-500/30 bg-slate-900/50 rounded max-h-[75vh] overflow-y-auto -mx-3 px-3">
               <div className="text-[8px] text-purple-400 font-medium mb-1">▶ Aktive Sequenz</div>
               <FlatBlockCard fb={activeFb} />
             </div>
