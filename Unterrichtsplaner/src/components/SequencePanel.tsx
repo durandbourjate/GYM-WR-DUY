@@ -441,10 +441,15 @@ function FlatBlockCard({ fb }: { fb: FlatBlockInfo }) {
               )}
             </div>
             <button onClick={() => {
-              if (confirm(`Sequenz "${block.label || block.topicMain || `Block ${fb.blockIndex + 1}`}" entfernen?`)) {
+              if (confirm(`Sequenz "${block.label || block.topicMain || `Block ${fb.blockIndex + 1}`}" auflösen? (UEs bleiben erhalten)`)) {
                 removeBlockFromSequence(fb.seqId, fb.blockIndex);
               }
-            }} className="text-[8px] text-red-400 hover:text-red-300 cursor-pointer px-1">🗑 Entfernen</button>
+            }} className="text-[8px] text-amber-400 hover:text-amber-300 cursor-pointer px-1" title="Gruppierung entfernen, UEs behalten">🔗 Auflösen</button>
+            <button onClick={() => {
+              if (confirm(`Sequenz "${block.label || block.topicMain || `Block ${fb.blockIndex + 1}`}" + alle UEs komplett löschen?`)) {
+                usePlannerStore.getState().removeBlockWithLessons(fb.seqId, fb.blockIndex);
+              }
+            }} className="text-[8px] text-red-400 hover:text-red-300 cursor-pointer px-1" title="Sequenz + alle UEs löschen">🗑 Komplett entfernen</button>
           </div>
         </div>
       )}

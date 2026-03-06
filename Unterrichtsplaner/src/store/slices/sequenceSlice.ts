@@ -19,6 +19,8 @@ export interface SequenceSlice {
   addBlockToSequence: (seqId: string, block: SequenceBlock) => void;
   updateBlockInSequence: (seqId: string, blockIndex: number, updates: Partial<SequenceBlock>) => void;
   removeBlockFromSequence: (seqId: string, blockIndex: number) => void;
+  // T6: Remove block AND delete all associated weekData entries + lessonDetails
+  removeBlockWithLessons: (seqId: string, blockIndex: number) => void;
   reorderBlocks: (seqId: string, fromIndex: number, toIndex: number) => void;
   getAvailableWeeks: (courseId: string, startWeek: string, allWeekOrder: string[]) => string[];
   autoPlaceSequence: (seqId: string, startWeek: string, allWeekOrder: string[]) => { placed: number; skipped: string[] };
@@ -174,6 +176,38 @@ export const createSequenceSlice: StateCreator<PlannerState, [], [], SequenceSli
           : s
       ),
     })),
+  // T6: Remove block AND delete weekData + lessonDetails for all block weeks
+  removeBlockWithLessons: (seqId, blockIndex) => {
+    const state = get();
+    const seq = state.sequences.find(s => s.id === seqId);
+    if (!seq || !seq.blocks[blockIndex]) return;
+    state.pushUndo();
+    const block = seq.blocks[blockIndex];
+    const weeksToDelete = new Set(block.weeks);
+    // Find all columns for this sequence's courses
+    const allCourseIds = seq.courseIds && seq.courseIds.length > 0 ? seq.courseIds : [seq.courseId];
+    const settings = state.plannerSettings || loadSettings();
+    const courses = settings ? configToCourses(settings.courses) : COURSES;
+    const cols = allCourseIds.map(cid => courses.find(c => c.id === cid)?.col).filter((c): c is number => c !== undefined);
+    // Remove weekData entries for block weeks in sequence columns
+    const newWeekData = state.weekData.map(w => {
+      if (!weeksToDelete.has(w.w)) return w;
+      const newLessons = { ...w.lessons };
+      for (const col of cols) delete newLessons[col];
+      return { ...w, lessons: newLessons };
+    });
+    // Remove lessonDetails for block weeks
+    const newDetails = { ...state.lessonDetails };
+    for (const wk of weeksToDelete) {
+      for (const col of cols) delete newDetails[`${wk}-${col}`];
+    }
+    // Remove block from sequence (or remove entire sequence if it was the only block)
+    const newBlocks = seq.blocks.filter((_, i) => i !== blockIndex);
+    const newSequences = newBlocks.length > 0
+      ? state.sequences.map(s => s.id === seqId ? { ...s, blocks: newBlocks, updatedAt: new Date().toISOString() } : s)
+      : state.sequences.filter(s => s.id !== seqId);
+    set({ weekData: newWeekData, lessonDetails: newDetails, sequences: newSequences });
+  },
   reorderBlocks: (seqId, fromIndex, toIndex) =>
     set((state) => ({
       sequences: state.sequences.map((s) => {
