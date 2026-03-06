@@ -13,6 +13,7 @@ import { SubjectsEditor } from './settings/SubjectsEditor';
 import { CourseEditor } from './settings/CourseEditor';
 import { SpecialWeeksEditor } from './settings/SpecialWeeksEditor';
 import { HolidaysEditor } from './settings/HolidaysEditor';
+import { TaFSection } from './TaFPanel';
 import { AssessmentRulesEditor } from './settings/AssessmentRulesEditor';
 import { GCalSection } from './settings/GCalSection';
 
@@ -323,6 +324,11 @@ export function SettingsPanel() {
             )}
           </div>
         </div>
+      </Section>
+
+      {/* TaF Phasenmodell (v3.98: aus Toolbar in Settings verschoben) */}
+      <Section title="🔄 TaF Phasenmodell">
+        <TaFSection />
       </Section>
 
       {/* Assessment Rules */}

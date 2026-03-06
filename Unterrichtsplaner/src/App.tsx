@@ -5,11 +5,11 @@ import { usePlannerData } from './hooks/usePlannerData';
 import { loadSettings, applySettingsToWeekData } from './store/settingsStore';
 import { SemesterHeader } from './components/SemesterHeader';
 import { WeekRows } from './components/WeekRows';
-import { AppHeader, HelpBar, MultiSelectToolbar, Legend } from './components/Toolbar';
+import { AppHeader, HelpBar, MultiSelectToolbar } from './components/Toolbar';
 import { DetailPanel } from './components/DetailPanel';
 import { InsertDialog } from './components/InsertDialog';
 import { ZoomMultiYearView } from './components/ZoomMultiYearView';
-import { PlannerTabs, WelcomeScreen } from './components/PlannerTabs';
+import { WelcomeScreen } from './components/PlannerTabs';
 
 function App() {
   const { instances, activeId, setActive } = useInstanceStore();
@@ -52,7 +52,6 @@ function App() {
 
   return (
     <div className="text-slate-200 min-h-screen font-sans" style={{ background: 'var(--bg-primary)', color: 'var(--text-primary)' }} data-app-root>
-      <PlannerTabs />
       <PlannerContent />
     </div>
   );
@@ -243,7 +242,6 @@ function PlannerContent() {
       <div className="print-title hidden">Unterrichtsplanung – {classFilter || 'Alle Klassen'}{filter !== 'ALL' ? ` (${filter})` : ''}</div>
       <AppHeader />
       <HelpBar />
-      <Legend />
       <MultiSelectToolbar />
       <InsertDialog />
 

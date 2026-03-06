@@ -999,8 +999,8 @@ export function DetailPanel() {
   return (
     <div
       ref={panelRef}
-      className="fixed right-0 top-0 bottom-0 bg-slate-850 border-l border-slate-600 z-[65] flex flex-col shadow-[-4px_0_16px_rgba(0,0,0,0.4)]"
-      style={{ width: panelWidth, background: 'var(--panel-bg)', overscrollBehavior: 'contain' }}
+      className="fixed right-0 bottom-0 bg-slate-850 border-l border-slate-600 z-[65] flex flex-col shadow-[-4px_0_16px_rgba(0,0,0,0.4)]"
+      style={{ width: panelWidth, top: 'var(--toolbar-h, 44px)', background: 'var(--panel-bg)', overscrollBehavior: 'contain' }}
       onWheel={(e) => e.stopPropagation()}
     >
       {/* Resize handle */}

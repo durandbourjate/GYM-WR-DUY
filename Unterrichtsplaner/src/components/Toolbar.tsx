@@ -3,23 +3,40 @@ import { createPortal } from 'react-dom';
 import { usePlannerStore } from '../store/plannerStore';
 import { usePlannerData } from '../hooks/usePlannerData';
 import { StatsPanel } from './StatsPanel';
-import { TaFPanel } from './TaFPanel';
 import { CURRENT_WEEK } from '../data/weeks';
 import { checkGradeRequirements } from '../utils/gradeRequirements';
 import { useTheme } from '../hooks/useTheme';
 import type { FilterType, CollectionItem } from '../types';
 import { ZOOM_LEVELS } from '../store/plannerStore';
 import { CollectionPickerList } from './CollectionPicker';
+import { PlannerTabs } from './PlannerTabs';
 
 export function AppHeader() {
   const { filter, setFilter, classFilter, setClassFilter, showHelp, toggleHelp, undoStack, undo, setSequencePanelOpen, setSidePanelOpen, setSidePanelTab, zoomLevel, setZoomLevel, autoFitZoom, setAutoFitZoom, columnZoom, setColumnZoom, searchQuery, setSearchQuery, dimPastWeeks, setDimPastWeeks } = usePlannerStore();
   const [showStats, setShowStats] = useState(false);
-  const [showTaF, setShowTaF] = useState(false);
   const { isLight, toggleTheme } = useTheme();
   const [showAddMenu, setShowAddMenu] = useState(false);
   const addMenuRef = useRef<HTMLDivElement>(null);
   const addBtnRef = useRef<HTMLButtonElement>(null);
   const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0 });
+  const [showCourseMenu, setShowCourseMenu] = useState(false);
+  const courseBtnRef = useRef<HTMLButtonElement>(null);
+  const courseMenuRef = useRef<HTMLDivElement>(null);
+  const [courseDropdownPos, setCourseDropdownPos] = useState({ top: 0, left: 0 });
+  const toolbarRef = useRef<HTMLDivElement>(null);
+
+  // v3.98: Toolbar-Höhe als CSS-Variable setzen (für Side-Panel top-Offset)
+  useLayoutEffect(() => {
+    const measure = () => {
+      if (toolbarRef.current) {
+        const h = toolbarRef.current.getBoundingClientRect().height;
+        document.documentElement.style.setProperty('--toolbar-h', `${h}px`);
+      }
+    };
+    measure();
+    window.addEventListener('resize', measure);
+    return () => window.removeEventListener('resize', measure);
+  }, []);
   const { courses: plannerCourses } = usePlannerData();
 
   // Dynamic course type filters from configured courses
@@ -53,15 +70,30 @@ export function AppHeader() {
     return () => { document.removeEventListener('mousedown', handler); document.removeEventListener('keydown', keyHandler); };
   }, [showAddMenu]);
 
+  // Close course menu on click outside / ESC
+  useEffect(() => {
+    if (!showCourseMenu) return;
+    const handler = (e: MouseEvent) => {
+      const target = e.target as Node;
+      if (courseMenuRef.current?.contains(target) || courseBtnRef.current?.contains(target)) return;
+      setShowCourseMenu(false);
+    };
+    const keyHandler = (e: KeyboardEvent) => { if (e.key === 'Escape') setShowCourseMenu(false); };
+    document.addEventListener('mousedown', handler);
+    document.addEventListener('keydown', keyHandler);
+    return () => { document.removeEventListener('mousedown', handler); document.removeEventListener('keydown', keyHandler); };
+  }, [showCourseMenu]);
+
   return (
-    <div className="border-b px-4 py-2 sticky top-0 z-[60] flex items-center gap-2 no-print overflow-hidden" style={{ background: 'var(--toolbar-bg)', borderColor: 'var(--toolbar-border)' }}>
+    <div ref={toolbarRef} className="border-b px-4 py-2 sticky top-0 z-[60] flex items-center gap-2 no-print overflow-hidden app-header" style={{ background: 'var(--toolbar-bg)', borderColor: 'var(--toolbar-border)' }}>
       <div className="flex items-baseline gap-2 flex-shrink-0">
         <span className="text-base font-bold text-gray-50">
-          <span className="text-blue-400">⊞</span> Unterrichtsplaner
+          <span className="text-blue-400">⊞</span> Planer
         </span>
-        <span className="text-[12px] text-gray-500">v3.96</span>
+        <span className="text-[12px] text-gray-500">v3.98</span>
       </div>
-      {/* J6: Toolbar-Layout — Suche links, Filter mitte, Icons rechts */}
+      {/* v3.98: PlannerTabs inline in der Toolbar */}
+      <PlannerTabs />
       {/* === Area 1: Search (flex-1, nimmt verfügbaren Platz) === */}
       <div className="relative flex-1 min-w-[120px]">
         <input
@@ -120,51 +152,57 @@ export function AppHeader() {
         </div>,
         document.body
       )}
-      {/* === Area 2: Filters (flex-shrink, bei Platzmangel zusammengestaucht) === */}
-      <div className="flex gap-1 items-center flex-shrink overflow-hidden">
+      {/* === Area 2: Kursfilter-Dropdown === */}
+      <div className="flex-shrink-0 relative">
         <button
-          onClick={() => setFilter('ALL')}
+          ref={courseBtnRef}
+          onClick={() => {
+            if (!showCourseMenu) {
+              const rect = courseBtnRef.current?.getBoundingClientRect();
+              if (rect) setCourseDropdownPos({ top: rect.bottom + 4, left: rect.left });
+            }
+            setShowCourseMenu(!showCourseMenu);
+          }}
           className={`px-2 py-0.5 rounded text-[12px] font-semibold border cursor-pointer transition-colors ${
-            filter === 'ALL'
-              ? 'bg-blue-500 text-white border-blue-500'
-              : 'bg-transparent text-gray-400 border-gray-700 hover:border-gray-500'
+            filter !== 'ALL' || classFilter
+              ? 'bg-blue-500/20 text-blue-300 border-blue-500'
+              : 'bg-transparent text-gray-400 border-gray-700 hover:border-gray-500 hover:text-gray-200'
           }`}
-          title="Alle Kurse anzeigen"
+          title="Kursfilter"
         >
-          Alle
+          {filter !== 'ALL' ? filter : classFilter ? classFilter : 'Kurse'}{classFilter && filter !== 'ALL' ? ` · ${classFilter}` : ''} ▾
         </button>
-        {courseTypeFilters.map((typ) => (
-          <button
-            key={typ}
-            onClick={() => setFilter(typ)}
-            className={`px-2 py-0.5 rounded text-[12px] font-semibold border cursor-pointer transition-colors ${
-              filter === typ
-                ? 'bg-blue-500 text-white border-blue-500'
-                : 'bg-transparent text-gray-400 border-gray-700 hover:border-gray-500'
-            }`}
-            title={`Filter: ${typ}`}
-          >
-            {typ}
-          </button>
-        ))}
-        <button
-          onClick={() => setShowTaF(true)}
-          className="px-2 py-0.5 rounded text-[12px] font-semibold border border-gray-700 text-gray-500 cursor-pointer hover:text-purple-300 hover:border-purple-700 transition-colors"
-          title="TaF Phasenmodell"
-        >
-          TaF
-        </button>
-        {classFilter && (
-          <button
-            onClick={() => setClassFilter(null)}
-            className="px-2 py-0.5 rounded text-[12px] font-semibold border cursor-pointer bg-amber-500/20 text-amber-300 border-amber-500 hover:bg-amber-500/30"
-            title="Klassenfilter aufheben"
-          >
-            {classFilter} ✕
-          </button>
-        )}
-        {showTaF && <TaFPanel onClose={() => setShowTaF(false)} />}
       </div>
+      {showCourseMenu && createPortal(
+        <div ref={courseMenuRef} className="bg-slate-800 border border-slate-600 rounded-lg shadow-xl py-1 w-48"
+          style={{ position: 'fixed', top: courseDropdownPos.top, left: courseDropdownPos.left, zIndex: 9999 }}>
+          <button onClick={() => { setFilter('ALL'); setShowCourseMenu(false); }}
+            className={`w-full px-3 py-1.5 text-left text-[12px] cursor-pointer flex items-center gap-2 ${
+              filter === 'ALL' ? 'text-blue-300 bg-blue-500/10' : 'text-gray-200 hover:bg-slate-700'
+            }`}>
+            {filter === 'ALL' ? '✓' : '\u2003'} Alle Kurse
+          </button>
+          <hr className="border-slate-700 my-0.5" />
+          {courseTypeFilters.map((typ) => (
+            <button key={typ} onClick={() => { setFilter(typ); setShowCourseMenu(false); }}
+              className={`w-full px-3 py-1.5 text-left text-[12px] cursor-pointer flex items-center gap-2 ${
+                filter === typ ? 'text-blue-300 bg-blue-500/10' : 'text-gray-200 hover:bg-slate-700'
+              }`}>
+              {filter === typ ? '✓' : '\u2003'} {typ}
+            </button>
+          ))}
+          {classFilter && (
+            <>
+              <hr className="border-slate-700 my-0.5" />
+              <button onClick={() => { setClassFilter(null); setShowCourseMenu(false); }}
+                className="w-full px-3 py-1.5 text-left text-[12px] text-amber-300 hover:bg-slate-700 cursor-pointer flex items-center gap-2">
+                ✕ Klasse: {classFilter}
+              </button>
+            </>
+          )}
+        </div>,
+        document.body
+      )}
       {/* === Area 3: Icons + Stats + Settings (flex-none, immer sichtbar) === */}
       <div className="flex gap-1 items-center flex-shrink-0">
         {undoStack.length > 0 && (
@@ -296,7 +334,29 @@ export function AppHeader() {
 
 export function HelpBar() {
   const { showHelp } = usePlannerStore();
+  const { categories, courses: plannerCourses, settings } = usePlannerData();
+
+  // Filter categories to only show those linked to active course types
+  const activeCategories = useMemo(() => {
+    const activeCourseTypes = new Set(plannerCourses.map(c => c.typ));
+    if (!settings?.subjects?.length) return categories;
+    const subjectCourseTypes = new Map<string, string>();
+    for (const s of settings.subjects) {
+      subjectCourseTypes.set(s.id.toUpperCase(), s.courseType);
+    }
+    return categories.filter(cat => {
+      const ct = subjectCourseTypes.get(cat.key);
+      return !ct || activeCourseTypes.has(ct as any);
+    });
+  }, [categories, plannerCourses, settings]);
+
   if (!showHelp) return null;
+
+  const fixedItems: [string, string][] = [
+    ['Prüfung', '#fee2e2'],
+    ['Event', '#e5e7eb'],
+    ['Ferien', '#ffffff'],
+  ];
 
   return (
     <div className="border-b px-4 py-2 text-[12px] leading-relaxed no-print" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)', color: 'var(--text-muted)' }}>
@@ -315,6 +375,25 @@ export function HelpBar() {
       <b>Zoom:</b> <b>1</b> = Semester-Übersicht · <b>2</b> = Block-Ansicht · <b>3</b> = Wochen-Ansicht
       <br />
       <b className="text-amber-400">⚠ 1L↔2L:</b> Bei Kursen mit alternierenden Slots warnt das Tool bei Verschiebungskonflikten.
+      <br />
+      <b className="text-gray-200">Legende:</b>{' '}
+      {activeCategories.map(cat => (
+        <span key={cat.key} className="inline-flex items-center gap-0.5 mr-2">
+          <span className="inline-block w-2 h-2 rounded-sm border border-black/10" style={{ background: cat.bg }} />
+          {cat.label}
+        </span>
+      ))}
+      {fixedItems.map(([label, bg]) => (
+        <span key={label} className="inline-flex items-center gap-0.5 mr-2">
+          <span className="inline-block w-2 h-2 rounded-sm border border-black/10" style={{ background: bg }} />
+          {label}
+        </span>
+      ))}
+      <span className="mr-2">│</span>
+      <span className="inline-flex items-center gap-0.5">
+        <span className="inline-block w-[3px] h-2.5 rounded-sm bg-green-600" />
+        Sequenz
+      </span>
     </div>
   );
 }
@@ -528,47 +607,4 @@ export function MultiSelectToolbar() {
   );
 }
 
-export function Legend() {
-  const { categories, courses: plannerCourses, settings } = usePlannerData();
-
-  // Filter categories to only show those linked to active course types
-  const activeCategories = useMemo(() => {
-    const activeCourseTypes = new Set(plannerCourses.map(c => c.typ));
-    if (!settings?.subjects?.length) return categories; // No subjects configured → show all
-    const subjectCourseTypes = new Map<string, string>();
-    for (const s of settings.subjects) {
-      subjectCourseTypes.set(s.id.toUpperCase(), s.courseType);
-    }
-    return categories.filter(cat => {
-      const ct = subjectCourseTypes.get(cat.key);
-      return !ct || activeCourseTypes.has(ct as any);
-    });
-  }, [categories, plannerCourses, settings]);
-
-  const fixedItems: [string, string][] = [
-    ['Prüfung', '#fee2e2'],
-    ['Event', '#e5e7eb'],
-    ['Ferien', '#ffffff'],
-  ];
-  return (
-    <div className="px-4 py-1 flex gap-2.5 flex-wrap text-[9px] border-b" style={{ background: 'var(--bg-primary)', borderColor: 'var(--border)', color: 'var(--text-muted)' }}>
-      {activeCategories.map(cat => (
-        <span key={cat.key} className="flex items-center gap-0.5">
-          <span className="w-2 h-2 rounded-sm border border-black/10" style={{ background: cat.bg }} />
-          {cat.label}
-        </span>
-      ))}
-      {fixedItems.map(([label, bg]) => (
-        <span key={label} className="flex items-center gap-0.5">
-          <span className="w-2 h-2 rounded-sm border border-black/10" style={{ background: bg }} />
-          {label}
-        </span>
-      ))}
-      <span>│</span>
-      <span className="flex items-center gap-0.5">
-        <span className="w-[3px] h-2.5 rounded-sm bg-green-600" />
-        Sequenz
-      </span>
-    </div>
-  );
-}
+// Legend-Inhalt ist jetzt in HelpBar integriert (v3.98)

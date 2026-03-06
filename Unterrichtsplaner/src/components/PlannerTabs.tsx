@@ -1,7 +1,8 @@
 /**
  * PlannerTabs — Tab bar for switching between planner instances
  */
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useInstanceStore, instanceStorageKey, generateWeekIds } from '../store/instanceStore';
 import { saveToInstance } from '../store/plannerStore';
 import { SCHOOL_YEAR_PRESETS, getPresetForYear } from '../data/holidayPresets';
@@ -216,17 +217,26 @@ export function PlannerTabs() {
     setContextMenu(null);
   };
 
+  // ESC schliesst Setup-Wizard Modal
+  useEffect(() => {
+    if (!showNew) return;
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') resetNewDialog(); };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [showNew]);
+
   return (
     <>
-      <div className="flex items-center gap-1 px-2 py-1 bg-slate-900 border-b border-slate-700 text-sm overflow-x-auto"
+      {/* Inline tabs für die Toolbar */}
+      <div className="flex items-center gap-0.5 overflow-x-auto max-w-[30vw] flex-shrink"
            onClick={() => setContextMenu(null)}>
         {instances.map(inst => (
           <button
             key={inst.id}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-t-md whitespace-nowrap transition-colors ${
+            className={`px-2 py-0.5 rounded text-[12px] whitespace-nowrap transition-colors cursor-pointer ${
               inst.id === activeId
-                ? 'bg-slate-800 text-white border-t border-x border-slate-600'
-                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
+                ? 'bg-slate-700 text-white font-semibold'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/50'
             }`}
             onClick={() => setActive(inst.id)}
             onContextMenu={(e) => handleContextMenu(e, inst.id)}
@@ -234,7 +244,7 @@ export function PlannerTabs() {
           >
             {editingId === inst.id ? (
               <input
-                className="bg-transparent border-b border-blue-400 text-white outline-none w-32"
+                className="bg-transparent border-b border-blue-400 text-white outline-none w-24 text-[12px]"
                 value={editName}
                 onChange={e => setEditName(e.target.value)}
                 onBlur={commitRename}
@@ -251,9 +261,8 @@ export function PlannerTabs() {
           </button>
         ))}
 
-        {/* New planner button — G7: vollständiger Setup-Wizard */}
         <button
-          className="px-2 py-1.5 text-slate-500 hover:text-white hover:bg-slate-800/50 rounded-t-md"
+          className="px-1.5 py-0.5 text-[12px] text-slate-500 hover:text-white hover:bg-slate-700/50 rounded cursor-pointer"
           onClick={() => setShowNew(!showNew)}
           title="Neuen Planer erstellen"
         >
@@ -261,101 +270,108 @@ export function PlannerTabs() {
         </button>
       </div>
 
-      {/* G7: Setup-Wizard Dialog */}
-      {showNew && (
-        <div className="absolute top-full left-0 right-0 z-50 bg-slate-900 border-b border-slate-600 shadow-xl px-4 py-3">
-          <div className="max-w-lg mx-auto space-y-3">
-            <div className="text-[13px] font-bold text-gray-200 mb-1">Neuer Planer erstellen</div>
-            <div className="flex gap-2 items-center flex-wrap">
-              <input
-                className="bg-slate-800 border border-slate-600 rounded px-2 py-1.5 text-white text-sm outline-none flex-1 min-w-[120px]"
-                placeholder="Name (z.B. SJ 25/26)"
-                value={newName}
-                onChange={e => setNewName(e.target.value)}
-                onKeyDown={e => {
-                  if (e.key === 'Enter') handleCreate();
-                  if (e.key === 'Escape') resetNewDialog();
-                }}
-                autoFocus
-              />
-              <select
-                className="bg-slate-800 border border-slate-600 rounded px-2 py-1.5 text-slate-300 text-[12px] outline-none cursor-pointer"
-                value={presetId || defaultPresetId}
-                onChange={e => setPresetId(e.target.value)}
-                title="Schuljahr"
-              >
-                {SCHOOL_YEAR_PRESETS.map(p => (
-                  <option key={p.id} value={p.id}>{p.label}</option>
-                ))}
-                <option value="">Manuell</option>
-              </select>
+      {/* Setup-Wizard als zentriertes Modal (v3.98) */}
+      {showNew && createPortal(
+        <div className="fixed inset-0 bg-black/60 z-[70] flex items-center justify-center"
+          onClick={resetNewDialog}>
+          <div className="bg-slate-800 rounded-xl shadow-2xl border border-slate-700 w-[480px] max-h-[80vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}>
+            <div className="px-4 py-3 border-b border-slate-700 flex justify-between items-center">
+              <h2 className="text-sm font-bold text-gray-200">Neuer Planer erstellen</h2>
+              <button onClick={resetNewDialog} className="text-gray-500 hover:text-gray-300 cursor-pointer text-lg">✕</button>
             </div>
-            {/* Gesamtkonfiguration importieren */}
-            <label className={`block px-3 py-2 rounded-lg text-[12px] font-medium transition-colors cursor-pointer text-center ${
-              importedConfig
-                ? 'bg-green-800/50 text-green-300 border border-green-600'
-                : 'bg-slate-800 text-slate-400 border border-slate-600 hover:border-slate-500 hover:text-slate-300'
-            }`}>
-              {importedConfig ? `✅ ${importedFileName}` : '📥 Gesamtkonfiguration importieren'}
-              <input type="file" accept=".json" className="hidden" onChange={handleConfigImport} />
-            </label>
-            {/* Einzelne Rubriken importieren */}
-            <button
-              className="text-[12px] text-slate-500 hover:text-slate-300 cursor-pointer transition-colors"
-              onClick={() => setShowPartial(!showPartial)}
-            >
-              {showPartial ? '▾' : '▸'} Einzelne Rubriken importieren {Object.keys(partialImports).length > 0 && `(${Object.keys(partialImports).length})`}
-            </button>
-            {showPartial && (
-              <div className="grid grid-cols-3 gap-1.5">
-                {partialButtons.map(({ key, label, icon, accept }) => {
-                  const isLoaded = !!partialImports[key];
-                  return (
-                    <label key={key} className={`px-2 py-1.5 rounded-md text-[11px] font-medium transition-colors cursor-pointer text-center ${
-                      isLoaded
-                        ? 'bg-green-800/40 text-green-300 border border-green-700'
-                        : 'bg-slate-800/80 text-slate-400 border border-slate-700 hover:border-slate-500 hover:text-slate-300'
-                    }`} title={isLoaded ? partialFileNames[key] : `${label} importieren`}>
-                      {isLoaded ? `✅ ${label}` : `${icon} ${label}`}
-                      <input type="file" accept={accept} className="hidden"
-                        onChange={handlePartialImport(key, label)} />
-                    </label>
-                  );
-                })}
+            <div className="p-4 space-y-3">
+              <div className="flex gap-2 items-center flex-wrap">
+                <input
+                  className="bg-slate-700 border border-slate-600 rounded px-2 py-1.5 text-white text-sm outline-none flex-1 min-w-[120px]"
+                  placeholder="Name (z.B. SJ 25/26)"
+                  value={newName}
+                  onChange={e => setNewName(e.target.value)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter') handleCreate();
+                    if (e.key === 'Escape') resetNewDialog();
+                  }}
+                  autoFocus
+                />
+                <select
+                  className="bg-slate-700 border border-slate-600 rounded px-2 py-1.5 text-slate-300 text-[12px] outline-none cursor-pointer"
+                  value={presetId || defaultPresetId}
+                  onChange={e => setPresetId(e.target.value)}
+                  title="Schuljahr"
+                >
+                  {SCHOOL_YEAR_PRESETS.map(p => (
+                    <option key={p.id} value={p.id}>{p.label}</option>
+                  ))}
+                  <option value="">Manuell</option>
+                </select>
               </div>
-            )}
-            <div className="flex gap-2 justify-end">
-              <button className="px-3 py-1.5 text-slate-400 hover:text-white text-xs cursor-pointer" onClick={resetNewDialog}>Abbrechen</button>
-              <button className="px-4 py-1.5 bg-blue-600 text-white rounded text-xs hover:bg-blue-500 cursor-pointer font-medium" onClick={handleCreate}>
-                + Erstellen
+              <label className={`block px-3 py-2 rounded-lg text-[12px] font-medium transition-colors cursor-pointer text-center ${
+                importedConfig
+                  ? 'bg-green-800/50 text-green-300 border border-green-600'
+                  : 'bg-slate-700 text-slate-400 border border-slate-600 hover:border-slate-500 hover:text-slate-300'
+              }`}>
+                {importedConfig ? `✅ ${importedFileName}` : '📥 Gesamtkonfiguration importieren'}
+                <input type="file" accept=".json" className="hidden" onChange={handleConfigImport} />
+              </label>
+              <button
+                className="text-[12px] text-slate-500 hover:text-slate-300 cursor-pointer transition-colors"
+                onClick={() => setShowPartial(!showPartial)}
+              >
+                {showPartial ? '▾' : '▸'} Einzelne Rubriken importieren {Object.keys(partialImports).length > 0 && `(${Object.keys(partialImports).length})`}
               </button>
+              {showPartial && (
+                <div className="grid grid-cols-3 gap-1.5">
+                  {partialButtons.map(({ key, label, icon, accept }) => {
+                    const isLoaded = !!partialImports[key];
+                    return (
+                      <label key={key} className={`px-2 py-1.5 rounded-md text-[11px] font-medium transition-colors cursor-pointer text-center ${
+                        isLoaded
+                          ? 'bg-green-800/40 text-green-300 border border-green-700'
+                          : 'bg-slate-700/80 text-slate-400 border border-slate-700 hover:border-slate-500 hover:text-slate-300'
+                      }`} title={isLoaded ? partialFileNames[key] : `${label} importieren`}>
+                        {isLoaded ? `✅ ${label}` : `${icon} ${label}`}
+                        <input type="file" accept={accept} className="hidden"
+                          onChange={handlePartialImport(key, label)} />
+                      </label>
+                    );
+                  })}
+                </div>
+              )}
+              <div className="flex gap-2 justify-end pt-2">
+                <button className="px-3 py-1.5 text-slate-400 hover:text-white text-xs cursor-pointer" onClick={resetNewDialog}>Abbrechen</button>
+                <button className="px-4 py-1.5 bg-blue-600 text-white rounded text-xs hover:bg-blue-500 cursor-pointer font-medium" onClick={handleCreate}>
+                  + Erstellen
+                </button>
+              </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Context menu */}
-      {contextMenu && (
+      {contextMenu && createPortal(
         <div
-          className="fixed z-50 bg-slate-800 border border-slate-600 rounded shadow-lg py-1 text-sm"
+          className="fixed z-[9999] bg-slate-800 border border-slate-600 rounded shadow-lg py-1 text-sm"
           style={{ left: contextMenu.x, top: contextMenu.y }}
           onClick={() => setContextMenu(null)}
         >
-          <button className="w-full px-4 py-1.5 text-left text-slate-200 hover:bg-slate-700"
+          <button className="w-full px-4 py-1.5 text-left text-slate-200 hover:bg-slate-700 cursor-pointer"
                   onClick={() => handleRename(contextMenu.id)}>
             ✏️ Umbenennen
           </button>
-          <button className="w-full px-4 py-1.5 text-left text-slate-200 hover:bg-slate-700"
+          <button className="w-full px-4 py-1.5 text-left text-slate-200 hover:bg-slate-700 cursor-pointer"
                   onClick={() => handleExport(contextMenu.id)}>
             📤 Exportieren
           </button>
           <hr className="border-slate-700 my-1" />
-          <button className="w-full px-4 py-1.5 text-left text-red-400 hover:bg-slate-700"
+          <button className="w-full px-4 py-1.5 text-left text-red-400 hover:bg-slate-700 cursor-pointer"
                   onClick={() => handleDelete(contextMenu.id)}
                   disabled={instances.length <= 1}>
             🗑️ Löschen
           </button>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );

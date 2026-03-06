@@ -14,14 +14,8 @@ const HOFWIL_PRESET: Omit<TaFPhase, 'id'>[] = [
   { name: 'Phase 4', startWeek: '17', endWeek: '25', color: '#ef4444', absentClasses: [], presentClasses: [] },
 ];
 
-export function TaFPanel({ onClose }: { onClose: () => void }) {
-  // G4: ESC schliesst Modal
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
-  }, [onClose]);
-
+/** Einbettbare TaF-Phasen-Verwaltung (für SettingsPanel) */
+export function TaFSection() {
   const { tafPhases, addTaFPhase, updateTaFPhase, deleteTaFPhase } = usePlannerStore();
   const [showNew, setShowNew] = useState(false);
   const [newName, setNewName] = useState('');
@@ -87,6 +81,96 @@ export function TaFPanel({ onClose }: { onClose: () => void }) {
   };
 
   return (
+    <div className="space-y-3">
+      {tafPhases.length === 0 && !showNew && (
+        <div className="text-[12px] text-gray-500 text-center py-4">
+          Noch keine TaF-Phasen definiert.
+        </div>
+      )}
+
+      {tafPhases.map((phase) => (
+        <PhaseRow key={phase.id} phase={phase}
+          onUpdate={(u) => updateTaFPhase(phase.id, u)}
+          onDelete={() => {
+            if (confirm(`Phase "${phase.name}" löschen?`)) deleteTaFPhase(phase.id);
+          }}
+        />
+      ))}
+
+      {/* Import & Presets (v3.80 C7) */}
+      <div className="flex gap-1.5 flex-wrap">
+        <label className="text-[11px] px-2 py-1 rounded border border-slate-600 text-gray-400 hover:text-gray-200 cursor-pointer hover:border-slate-500">
+          📥 Import (JSON)
+          <input type="file" accept=".json" className="hidden" onChange={handleImport} />
+        </label>
+        <button onClick={() => loadPreset(HOFWIL_PRESET)}
+          className="text-[11px] px-2 py-1 rounded border border-blue-500/30 text-blue-400 hover:bg-blue-500/10 cursor-pointer">
+          🏫 SJ 25/26 Hofwil
+        </button>
+      </div>
+
+      {showNew ? (
+        <div className="bg-slate-750 rounded-lg p-3 border border-slate-600 space-y-2">
+          <input value={newName} onChange={(e) => setNewName(e.target.value)}
+            placeholder="Phasenname…" autoFocus
+            className="w-full bg-slate-700 text-slate-200 border border-slate-600 rounded px-2 py-1 text-[12px] outline-none focus:border-blue-400"
+            onKeyDown={(e) => { if (e.key === 'Enter') handleAdd(); }}
+          />
+          <div className="flex gap-3">
+            <div className="flex items-center gap-1">
+              <label className="text-[11px] text-gray-400">Von:</label>
+              <select value={newStart} onChange={(e) => setNewStart(e.target.value)}
+                className="text-[11px] bg-slate-700 border border-slate-600 rounded px-1 py-0.5 text-gray-200">
+                {allWeeks.map(w => <option key={w} value={w}>KW {w}</option>)}
+              </select>
+            </div>
+            <div className="flex items-center gap-1">
+              <label className="text-[11px] text-gray-400">Bis:</label>
+              <select value={newEnd} onChange={(e) => setNewEnd(e.target.value)}
+                className="text-[11px] bg-slate-700 border border-slate-600 rounded px-1 py-0.5 text-gray-200">
+                {allWeeks.map(w => <option key={w} value={w}>KW {w}</option>)}
+              </select>
+            </div>
+          </div>
+          <div className="flex items-center gap-1">
+            <span className="text-[11px] text-gray-400">Farbe:</span>
+            {PHASE_COLORS.map(c => (
+              <button key={c} onClick={() => setNewColor(c)}
+                className="w-4 h-4 rounded-full cursor-pointer border-2"
+                style={{ background: c, borderColor: newColor === c ? '#fff' : 'transparent' }}
+              />
+            ))}
+          </div>
+          <div className="flex gap-2 pt-1">
+            <button onClick={handleAdd}
+              className="text-[11px] bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded cursor-pointer">
+              Hinzufügen
+            </button>
+            <button onClick={() => setShowNew(false)}
+              className="text-[11px] text-gray-400 hover:text-gray-300 cursor-pointer px-2 py-1">
+              Abbrechen
+            </button>
+          </div>
+        </div>
+      ) : (
+        <button onClick={() => setShowNew(true)}
+          className="text-[11px] text-blue-400 hover:text-blue-300 cursor-pointer">
+          + Phase hinzufügen
+        </button>
+      )}
+    </div>
+  );
+}
+
+/** Modal-Variante (Legacy, wird nicht mehr verwendet) */
+export function TaFPanel({ onClose }: { onClose: () => void }) {
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [onClose]);
+
+  return (
     <div className="fixed inset-0 bg-black/60 z-[70] flex items-center justify-center"
       onClick={onClose}>
       <div className="bg-slate-800 rounded-xl shadow-2xl border border-slate-700 w-[480px] max-h-[70vh] overflow-y-auto"
@@ -95,84 +179,8 @@ export function TaFPanel({ onClose }: { onClose: () => void }) {
           <h2 className="text-sm font-bold text-gray-200">TaF Phasenmodell</h2>
           <button onClick={onClose} className="text-gray-500 hover:text-gray-300 cursor-pointer text-lg">✕</button>
         </div>
-
-        <div className="p-4 space-y-3">
-          {tafPhases.length === 0 && !showNew && (
-            <div className="text-[12px] text-gray-500 text-center py-4">
-              Noch keine TaF-Phasen definiert.
-            </div>
-          )}
-
-          {tafPhases.map((phase) => (
-            <PhaseRow key={phase.id} phase={phase}
-              onUpdate={(u) => updateTaFPhase(phase.id, u)}
-              onDelete={() => {
-                if (confirm(`Phase "${phase.name}" löschen?`)) deleteTaFPhase(phase.id);
-              }}
-            />
-          ))}
-
-          {/* Import & Presets (v3.80 C7) */}
-          <div className="flex gap-1.5 flex-wrap">
-            <label className="text-[11px] px-2 py-1 rounded border border-slate-600 text-gray-400 hover:text-gray-200 cursor-pointer hover:border-slate-500">
-              📥 Import (JSON)
-              <input type="file" accept=".json" className="hidden" onChange={handleImport} />
-            </label>
-            <button onClick={() => loadPreset(HOFWIL_PRESET)}
-              className="text-[11px] px-2 py-1 rounded border border-blue-500/30 text-blue-400 hover:bg-blue-500/10 cursor-pointer">
-              🏫 SJ 25/26 Hofwil
-            </button>
-          </div>
-
-          {showNew ? (
-            <div className="bg-slate-750 rounded-lg p-3 border border-slate-600 space-y-2">
-              <input value={newName} onChange={(e) => setNewName(e.target.value)}
-                placeholder="Phasenname…" autoFocus
-                className="w-full bg-slate-700 text-slate-200 border border-slate-600 rounded px-2 py-1 text-[12px] outline-none focus:border-blue-400"
-                onKeyDown={(e) => { if (e.key === 'Enter') handleAdd(); }}
-              />
-              <div className="flex gap-3">
-                <div className="flex items-center gap-1">
-                  <label className="text-[11px] text-gray-400">Von:</label>
-                  <select value={newStart} onChange={(e) => setNewStart(e.target.value)}
-                    className="text-[11px] bg-slate-700 border border-slate-600 rounded px-1 py-0.5 text-gray-200">
-                    {allWeeks.map(w => <option key={w} value={w}>KW {w}</option>)}
-                  </select>
-                </div>
-                <div className="flex items-center gap-1">
-                  <label className="text-[11px] text-gray-400">Bis:</label>
-                  <select value={newEnd} onChange={(e) => setNewEnd(e.target.value)}
-                    className="text-[11px] bg-slate-700 border border-slate-600 rounded px-1 py-0.5 text-gray-200">
-                    {allWeeks.map(w => <option key={w} value={w}>KW {w}</option>)}
-                  </select>
-                </div>
-              </div>
-              <div className="flex items-center gap-1">
-                <span className="text-[11px] text-gray-400">Farbe:</span>
-                {PHASE_COLORS.map(c => (
-                  <button key={c} onClick={() => setNewColor(c)}
-                    className="w-4 h-4 rounded-full cursor-pointer border-2"
-                    style={{ background: c, borderColor: newColor === c ? '#fff' : 'transparent' }}
-                  />
-                ))}
-              </div>
-              <div className="flex gap-2 pt-1">
-                <button onClick={handleAdd}
-                  className="text-[11px] bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded cursor-pointer">
-                  Hinzufügen
-                </button>
-                <button onClick={() => setShowNew(false)}
-                  className="text-[11px] text-gray-400 hover:text-gray-300 cursor-pointer px-2 py-1">
-                  Abbrechen
-                </button>
-              </div>
-            </div>
-          ) : (
-            <button onClick={() => setShowNew(true)}
-              className="text-[11px] text-blue-400 hover:text-blue-300 cursor-pointer">
-              + Phase hinzufügen
-            </button>
-          )}
+        <div className="p-4">
+          <TaFSection />
         </div>
       </div>
     </div>
