@@ -700,17 +700,17 @@ export function SequencePanel({ embedded = false }: { embedded?: boolean }) {
         {/* New sequence form — inline at top */}
         <div>
           {showNewForm ? (
-            <div className="space-y-1.5 bg-slate-800/50 rounded p-2 border border-slate-600/50" style={{ minWidth: 300 }}>
+            <div className="space-y-2 bg-slate-800/50 rounded p-3 border border-slate-600/50 w-full">
               <input autoFocus value={newTitle} onChange={(e) => setNewTitle(e.target.value)}
                 onKeyDown={(e) => { if (e.key === 'Enter') handleCreateSequence(); if (e.key === 'Escape') setShowNewForm(false); }}
                 placeholder="Titel der Sequenz…"
-                className="w-full bg-slate-800 text-slate-200 border border-slate-600 rounded px-2 py-1.5 text-[11px] outline-none focus:border-blue-400" />
+                className="w-full bg-slate-800 text-slate-200 border border-slate-600 rounded px-2.5 py-2 text-[12px] outline-none focus:border-blue-400" />
               <select value={newCourseId} onChange={(e) => {
                   setNewCourseId(e.target.value);
                   const course = COURSES.find(c => c.id === e.target.value);
                   if (course && !newTitle.trim()) setNewTitle(`${course.cls} – `);
                 }}
-                className="w-full bg-slate-800 text-slate-200 border border-slate-600 rounded px-2 py-1.5 text-[11px] outline-none focus:border-blue-400">
+                className="w-full bg-slate-800 text-slate-200 border border-slate-600 rounded px-2.5 py-2 text-[12px] outline-none focus:border-blue-400">
                 {COURSES.map((c) => (
                   <option key={c.id} value={c.id}>{c.cls} – {c.typ} {c.day} {c.from}–{c.to} ({c.les}L)</option>
                 ))}
@@ -724,7 +724,7 @@ export function SequencePanel({ embedded = false }: { embedded?: boolean }) {
             </div>
           ) : showCollectionImport ? (
             /* T10: Collection import flow */
-            <div className="space-y-1.5 bg-amber-900/10 rounded p-2 border border-amber-700/30" style={{ minWidth: 300 }}>
+            <div className="space-y-2 bg-amber-900/10 rounded p-3 border border-amber-700/30 w-full">
               <div className="flex items-center justify-between">
                 <span className="text-[10px] text-amber-400 font-medium">📥 Aus Sammlung importieren</span>
                 <button onClick={() => { setShowCollectionImport(false); setPendingImportItem(null); }}
@@ -755,7 +755,7 @@ export function SequencePanel({ embedded = false }: { embedded?: boolean }) {
                   <div>
                     <label className="text-[8px] text-gray-400">Kurs</label>
                     <select value={importCourseId} onChange={(e) => setImportCourseId(e.target.value)}
-                      className="w-full bg-slate-800 text-slate-200 border border-slate-600 rounded px-2 py-1.5 text-[11px] outline-none focus:border-amber-400">
+                      className="w-full bg-slate-800 text-slate-200 border border-slate-600 rounded px-2.5 py-2 text-[12px] outline-none focus:border-amber-400">
                       {COURSES.map((c) => (
                         <option key={c.id} value={c.id}>{c.cls} – {c.typ} {c.day} {c.from}–{c.to}</option>
                       ))}
@@ -764,7 +764,7 @@ export function SequencePanel({ embedded = false }: { embedded?: boolean }) {
                   <div>
                     <label className="text-[8px] text-gray-400">Ab welcher KW platzieren?</label>
                     <select value={importStartWeek} onChange={(e) => setImportStartWeek(e.target.value)}
-                      className="w-full bg-slate-800 text-slate-200 border border-slate-600 rounded px-2 py-1.5 text-[11px] outline-none focus:border-amber-400">
+                      className="w-full bg-slate-800 text-slate-200 border border-slate-600 rounded px-2.5 py-2 text-[12px] outline-none focus:border-amber-400">
                       {usePlannerStore.getState().weekData.map(w => (
                         <option key={w.w} value={w.w}>KW {w.w}</option>
                       ))}
