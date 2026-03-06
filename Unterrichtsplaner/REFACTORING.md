@@ -88,8 +88,31 @@ Kein eigener Task — opportunistisch bei P1–P4 miterledigen.
 
 ## Regeln für das Refactoring
 
-1. **Pro Commit ein Refactoring-Schritt.** Nie mehrere gleichzeitig.
-2. **Nach jedem Schritt:** `npx tsc --noEmit && npm run build` — muss fehlerfrei sein.
-3. **Keine Funktionalitäts-Änderungen.** Reines Move+Rename. Wenn etwas nicht 1:1 extrahierbar ist → nicht anfassen.
-4. **Imports aktualisieren.** Nach jedem Extract: alle Import-Stellen prüfen.
-5. **Smoke-Test im Browser.** Nach jedem Commit: App öffnen, Settings aufmachen, Sequenz erstellen, Zoom wechseln.
+### OBERSTE REGEL: Keine Funktionalität darf verloren gehen oder sich verändern.
+
+Das Refactoring ist ein reines Strukturverbesserung. Die App muss vor und nach jedem Schritt exakt gleich funktionieren. Wenn ein Extract nicht 1:1 möglich ist ohne Verhaltensänderung → NICHT anfassen und im Commit dokumentieren warum.
+
+### Verbote
+
+- KEINE neuen Features einbauen, auch nicht «kleine Verbesserungen»
+- KEINE Logik-Änderungen (Bedingungen, Berechnungen, State-Updates)
+- KEINE API-Änderungen an exportierten Funktionen/Typen (Signatur muss identisch bleiben)
+- KEINE Umbenennung von Props, State-Keys oder localStorage-Keys (bricht Nutzerdaten)
+- KEINE Änderungen an der Reihenfolge von Hooks (React Rules of Hooks)
+- KEINE «Optimierungen» an bestehender Logik (auch wenn sie suboptimal aussieht)
+
+### Erlaubt
+
+- Dateien aufteilen (Extract Component/Hook/Utility)
+- Import-Pfade aktualisieren
+- `as any` durch korrekte Types ersetzen (nur wo der Typ eindeutig ist)
+- Tote Imports entfernen (nur offensichtlich ungenutzte)
+
+### Ablauf pro Schritt
+
+1. **Vor dem Refactoring:** `npx tsc --noEmit && npm run build` — Baseline muss fehlerfrei sein
+2. **Ein Schritt durchführen** (z.B. einen Editor extrahieren)
+3. **Nach dem Refactoring:** `npx tsc --noEmit && npm run build` — muss wieder fehlerfrei sein
+4. **Commit:** `git add -A && git commit -m "refactor: Beschreibung"` — ein Commit pro Schritt
+5. **Smoke-Test im Browser** (durch Nutzer): App öffnen, betroffene Funktion testen
+6. Erst nach Bestätigung → nächster Schritt
