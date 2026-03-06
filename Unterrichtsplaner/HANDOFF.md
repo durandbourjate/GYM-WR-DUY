@@ -1,33 +1,86 @@
-# Unterrichtsplaner – Handoff v3.96
+# Unterrichtsplaner – Handoff v3.97
 
-## Status: ✅ v3.96 — Bug-Fixes + UX-Verbesserungen (11 Tasks) — ABGESCHLOSSEN
+## Status: ⬜ v3.97 — Ferien-Rendering Vereinfachung
 
-**Vorgänger:** v3.95 (Refactoring P2 plannerStore → Slices abgeschlossen). Refactoring ist FERTIG — diese Version enthält reine Bug-Fixes und UX-Verbesserungen.
+**Vorgänger:** v3.96 (11 Bug-Fixes + UX abgeschlossen und deployed).
 
 ---
 
 ## OBERSTE REGEL
 
 **Immer `npx tsc --noEmit && npm run build` vor und nach jeder Änderung.**
-Commit nach jedem erledigten Task: `git add -A && git commit -m "fix/feat: v3.96 T[N] — [Beschreibung]" && git push`
+Commit nach jedem erledigten Task: `git add -A && git commit -m "fix: v3.97 — [Beschreibung]" && git push`
 
 ---
 
-## Originalauftrag v3.96
+## Originalauftrag v3.97
 
 | # | Typ | Beschreibung | Priorität | Status |
 |---|-----|-------------|-----------|--------|
-| T1 | Bug | Ferien-Bug Regression: KW-Zeilen fehlen komplett (KW 3–4, 17, 43–45) | 🔴 Kritisch | ✅ |
-| T2 | Bug | Sonderwochen: falscher Inhalt (alle Kurse zeigen dasselbe) + Text kaum lesbar | 🔴 Kritisch | ✅ |
-| T3 | Bug | Auto-Fit Zoom: leere Spalten neben Kursspalten in Wochendetailansicht | 🟠 Hoch | ✅ |
-| T4 | Bug | Badges (P/PW/HK): zu blass, schlechtes Alignment, vertikal statt horizontal | 🟠 Hoch | ✅ |
-| T5 | Bug | Sequenz Drag&Drop: nur erste UE wird verschoben, Rest bleibt | 🟠 Hoch | ✅ |
-| T6 | Bug | Sequenz entfernen: keine Option «Sequenz + UEs entfernen» | 🟠 Hoch | ✅ |
-| T7 | Bug | Light-Mode Überbleibsel: Mehrjahresübersicht Semester-Karten dunkel | 🟡 Mittel | ✅ |
-| T8 | Bug | Sequenz-Menü (Neue Sequenz): zu klein, Schrift im Tab unlesbar | 🟡 Mittel | ✅ |
-| T9 | Feature | «Zur aktuellen Woche»-Button: soll in jeder Ansicht funktionieren (Ansicht wechseln + scrollen) | 🟡 Mittel | ✅ |
-| T10 | Feature | Sequenz aus Sammlung importieren: bei Markierung + im Sequenz-Menü | 🟡 Mittel | ✅ |
-| T11 | Feature | Importierte Sequenz KW-Zuordnung: UX klären nach Import aus Sammlung | 🟡 Mittel | ✅ |
+| U1 | Refactor | Ferien-Rendering: rowSpan-Merging komplett entfernen, jede Ferienwoche einzeln als Balken | 🔴 Kritisch | ⬜ |
+
+---
+
+## Task U1: Ferien-Rendering vereinfachen — kein rowSpan mehr
+
+### Problem
+Die bisherige `holidaySpans`-Logik fasst aufeinanderfolgende Ferien-Wochen per `rowSpan` + `colspan` zu einem einzigen Block zusammen. Diese Logik war die Ursache für den hartnäckigen Bug, bei dem KW-Zeilen komplett verschwanden (KW 3–4, 17, 43–45 in v3.96 T1). Obwohl T1 den Bug gefixt hat, ist die rowSpan-Logik fragil und fehleranfällig.
+
+### Gewünschtes Verhalten (NEU)
+- **Jede Ferienwoche wird als eigene Zeile dargestellt** — kein rowSpan-Merging mehr
+- **Jede Ferienzeile ist ein durchgehender Balken** über alle Kurs-Spalten (colspan über alle Kurse)
+- **Kein `holidaySpans`, kein `holidaySkipSet`, kein `holidaySpanStart`** — diese drei useMemos komplett entfernen
+- **Darstellung pro Ferienwoche:** Eine `<tr>` mit KW-Nummer links + einem `<td colSpan={courses.length}>` das den Feriennamen zeigt (z.B. «🏖 Herbstferien»)
+- **Mehrtägige Ferien** (z.B. Herbstferien KW 39–41): Jede KW eine eigene Zeile, jede zeigt «🏖 Herbstferien». Optional: Wochenzähler «(1/3)», «(2/3)», «(3/3)» — aber kein Muss.
+- **Sonderwochen/Events (type 5):** Gleiche Behandlung — colspan-Balken pro Woche, KEIN rowSpan
+
+### Technische Umsetzung
+
+**In `ZoomYearView.tsx`:**
+1. Die drei `useMemo`-Blöcke entfernen: `holidaySpans`, `holidaySkipSet`, `holidaySpanStart`
+2. Im `allWeekKeys.map()`-Loop: Die `if (holidaySkipSet.has(weekIdx)) return null;` Zeile entfernen
+3. Die `if (hSpan)` Branch (die den rowSpan-Block rendert) entfernen
+4. Stattdessen: Innerhalb des regulären Wochen-Renderings prüfen ob die Woche eine Ferien-/Event-Woche ist:
+```typescript
+const weekEntry = effectiveWeeks.find(w => w.w === weekW);
+const allEntries = weekEntry ? Object.values(weekEntry.lessons) : [];
+const isAllHoliday = allEntries.length > 0 && allEntries.every(e => e.type === 6);
+const isAllEvent = allEntries.length > 0 && allEntries.every(e => e.type === 5);
+
+if (isAllHoliday || isAllEvent) {
+  // Render: KW-Zelle + EIN td mit colSpan={totalCols} als Balken
+  return (
+    <tr key={weekW} ...>
+      <td ...>{weekW}</td>
+      <td colSpan={totalCols} className="... text-center">
+        <span>{isAllHoliday ? '🏖' : '📅'} {allEntries[0]?.title}</span>
+      </td>
+    </tr>
+  );
+}
+// Sonst: normales Wochen-Rendering (wie bisher)
+```
+
+**In `WeekRows.tsx`:**
+Analog: Die `holidaySpans`/`holidaySkipSet`/`holidaySpanStart` useMemos entfernen. Falls WeekRows eine eigene Ferien-Zusammenfassungslogik hat, ebenfalls durch einfaches colspan-pro-Woche ersetzen.
+
+### Checkliste
+- [ ] `ZoomYearView.tsx`: holidaySpans/holidaySkipSet/holidaySpanStart useMemos entfernen
+- [ ] `ZoomYearView.tsx`: rowSpan-Rendering-Branch entfernen
+- [ ] `ZoomYearView.tsx`: Einfaches colspan-Rendering für Ferien/Event-Wochen
+- [ ] `WeekRows.tsx`: Analoge Änderungen (falls Ferien-Merging vorhanden)
+- [ ] Sicherstellen: Alle KW-Zeilen (33–27) werden angezeigt — keine verschwindet
+- [ ] Sicherstellen: Ferien-Balken spannen über alle Kursspalten (kein einzelner Kachel pro Kurs)
+- [ ] Light-Mode + Dark-Mode: Ferien-Balken lesbar in beiden Modi
+- [ ] `npx tsc --noEmit && npm run build` fehlerfrei
+
+### Dateien
+- `src/components/ZoomYearView.tsx` (Hauptänderung)
+- `src/components/WeekRows.tsx` (analoge Änderung)
+
+---
+
+## Vorherige Version: v3.96 ✅ (11 Bug-Fixes + UX)
 
 **Empfohlene Reihenfolge:** T1 → T2 → T3 → T5 → T6 → T4 → T7 → T8 → T9 → T10 → T11
 
