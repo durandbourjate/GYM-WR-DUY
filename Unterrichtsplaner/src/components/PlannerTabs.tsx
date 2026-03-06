@@ -109,7 +109,7 @@ export function PlannerTabs() {
     const preset = SCHOOL_YEAR_PRESETS.find(p => p.id === (presetId || defaultPresetId));
     const startWeek = preset?.startWeek ?? 33;
     const startYear = preset?.startYear ?? new Date().getFullYear();
-    const endWeek = preset?.endWeek ?? 27;
+    const endWeek = preset?.endWeek ?? 32;
     const endYear = preset?.endYear ?? startYear + 1;
     const semesterBreakWeek = preset?.semesterBreakWeek ?? 7;
 
@@ -146,7 +146,7 @@ export function PlannerTabs() {
 
       const weekIds = generateWeekIds(
         preset?.startWeek ?? 33, startYear,
-        preset?.endWeek ?? endWeek, endYear
+        endWeek, endYear
       );
       const courses = initialSettings.courses.length > 0 ? configToCourses(initialSettings.courses) : [];
       const emptyLessons: Record<number, { type: LessonType; title: string }> = {};
@@ -471,7 +471,7 @@ export function WelcomeScreen() {
     const newId = createInstance(plannerName, {
       startWeek: preset?.startWeek ?? 33,
       startYear,
-      endWeek: preset?.endWeek ?? 27,
+      endWeek: preset?.endWeek ?? 32,
       endYear: preset?.endYear ?? startYear + 1,
       semesterBreakWeek: preset?.semesterBreakWeek ?? 7,
     });
@@ -500,7 +500,7 @@ export function WelcomeScreen() {
       // Build initial weekData with courses
       const weekIds = generateWeekIds(
         preset?.startWeek ?? 33, startYear,
-        preset?.endWeek ?? 27, preset?.endYear ?? startYear + 1
+        preset?.endWeek ?? 32, preset?.endYear ?? startYear + 1
       );
       const courses = initialSettings.courses.length > 0 ? configToCourses(initialSettings.courses) : [];
       const emptyLessons: Record<number, { type: import('../types').LessonType; title: string }> = {};

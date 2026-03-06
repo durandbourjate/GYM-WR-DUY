@@ -29,7 +29,7 @@ export const SCHOOL_YEAR_PRESETS: SchoolYearPreset[] = [
     id: 'gym-bern-2025-26',
     label: 'SJ 2025/26 (Gym Bern)',
     startWeek: 33, startYear: 2025,
-    endWeek: 27, endYear: 2026,
+    endWeek: 32, endYear: 2026,
     semesterBreakWeek: 7,
     holidays: [
       { label: 'Herbstferien', startWeek: '39', endWeek: '41' },
@@ -43,7 +43,7 @@ export const SCHOOL_YEAR_PRESETS: SchoolYearPreset[] = [
     id: 'gym-bern-2026-27',
     label: 'SJ 2026/27 (Gym Bern)',
     startWeek: 34, startYear: 2026,
-    endWeek: 27, endYear: 2027,
+    endWeek: 32, endYear: 2027,
     semesterBreakWeek: 7,
     holidays: [
       // Herbstferien: Sa 19.09.2026 – So 11.10.2026 → KW39–41
@@ -61,7 +61,7 @@ export const SCHOOL_YEAR_PRESETS: SchoolYearPreset[] = [
     id: 'gym-bern-2027-28',
     label: 'SJ 2027/28 (Gym Bern)',
     startWeek: 33, startYear: 2027,
-    endWeek: 27, endYear: 2028,
+    endWeek: 32, endYear: 2028,
     semesterBreakWeek: 7,
     holidays: [
       // Herbstferien: Sa 25.09.2027 – So 17.10.2027 → KW39–41
