@@ -1,6 +1,6 @@
 # Unterrichtsplaner – Handoff v3.93
 
-## Status: 🔄 v3.93 — Refactoring Phase 1 (SettingsPanel aufteilen)
+## Status: ✅ v3.93 — Refactoring Phase 1 (SettingsPanel aufteilen)
 
 **Referenz:** Lies `REFACTORING.md` für Analyse, Regeln und Verbote.
 
@@ -35,15 +35,15 @@ SettingsPanel.tsx bleibt als Hauptdatei: importiert alle Editoren, rendert Tabs/
 
 ### Schritte (je ein Commit)
 
-| # | Schritt | Dateien |
-|---|---------|---------|
-| R1 | `settings/` Ordner erstellen, `shared.tsx` extrahieren (Section, SmallInput, SmallSelect, Rubric-Helpers) | Neu: settings/shared.tsx, Edit: SettingsPanel.tsx |
-| R2 | `SubjectsEditor.tsx` extrahieren | Neu: settings/SubjectsEditor.tsx, Edit: SettingsPanel.tsx |
-| R3 | `CourseEditor.tsx` extrahieren (inkl. CourseDurationPicker, Duration-Helpers) | Neu: settings/CourseEditor.tsx, Edit: SettingsPanel.tsx |
-| R4 | `SpecialWeeksEditor.tsx` extrahieren (inkl. GYM-Level-Helpers) | Neu: settings/SpecialWeeksEditor.tsx, Edit: SettingsPanel.tsx |
-| R5 | `HolidaysEditor.tsx` extrahieren | Neu: settings/HolidaysEditor.tsx, Edit: SettingsPanel.tsx |
-| R6 | `AssessmentRulesEditor.tsx` extrahieren | Neu: settings/AssessmentRulesEditor.tsx, Edit: SettingsPanel.tsx |
-| R7 | `GCalSection.tsx` extrahieren | Neu: settings/GCalSection.tsx, Edit: SettingsPanel.tsx |
+| # | Schritt | Dateien | Status |
+|---|---------|---------|--------|
+| R1 | `settings/` Ordner erstellen, `shared.tsx` extrahieren (Section, SmallInput, SmallSelect, Rubric-Helpers) | Neu: settings/shared.tsx, Edit: SettingsPanel.tsx | ✅ |
+| R2 | `SubjectsEditor.tsx` extrahieren | Neu: settings/SubjectsEditor.tsx, Edit: SettingsPanel.tsx | ✅ |
+| R3 | `CourseEditor.tsx` extrahieren (inkl. CourseDurationPicker, Duration-Helpers) | Neu: settings/CourseEditor.tsx, Edit: SettingsPanel.tsx | ✅ |
+| R4 | `SpecialWeeksEditor.tsx` extrahieren (inkl. GYM-Level-Helpers) | Neu: settings/SpecialWeeksEditor.tsx, Edit: SettingsPanel.tsx | ✅ |
+| R5 | `HolidaysEditor.tsx` extrahieren | Neu: settings/HolidaysEditor.tsx, Edit: SettingsPanel.tsx | ✅ |
+| R6 | `AssessmentRulesEditor.tsx` extrahieren | Neu: settings/AssessmentRulesEditor.tsx, Edit: SettingsPanel.tsx | ✅ |
+| R7 | `GCalSection.tsx` extrahieren | Neu: settings/GCalSection.tsx, Edit: SettingsPanel.tsx | ✅ |
 
 ### Regeln pro Schritt
 
@@ -62,6 +62,15 @@ SettingsPanel.tsx bleibt als Hauptdatei: importiert alle Editoren, rendert Tabs/
 - KEINE Umbenennung von State-Keys oder localStorage-Keys
 - KEINE Hook-Reihenfolge ändern
 - KEINE «Optimierungen» an bestehender Logik
+
+---
+
+### Ergebnis
+
+- **SettingsPanel.tsx**: 1883 → 495 Zeilen (dünner Orchestrator)
+- **7 neue Dateien** in `src/components/settings/`: shared.tsx, SubjectsEditor.tsx, CourseEditor.tsx, SpecialWeeksEditor.tsx, HolidaysEditor.tsx, AssessmentRulesEditor.tsx, GCalSection.tsx
+- `npx tsc --noEmit && npm run build` bestanden
+- Keine Funktionalitäts-Änderungen
 
 ---
 
