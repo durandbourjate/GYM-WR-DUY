@@ -1,6 +1,6 @@
 # Unterrichtsplaner – Handoff v3.97
 
-## Status: ⬜ v3.97 — Ferien-Rendering Vereinfachung
+## Status: ✅ v3.97 — Ferien-Rendering Vereinfachung — ABGESCHLOSSEN
 
 **Vorgänger:** v3.96 (11 Bug-Fixes + UX abgeschlossen und deployed).
 
@@ -17,8 +17,8 @@ Commit nach jedem erledigten Task: `git add -A && git commit -m "fix: v3.97 — 
 
 | # | Typ | Beschreibung | Priorität | Status |
 |---|-----|-------------|-----------|--------|
-| U1 | Refactor | Ferien-Rendering: rowSpan-Merging komplett entfernen, jede Ferienwoche einzeln als Balken | 🔴 Kritisch | ⬜ |
-| U2 | Bug | Sequenz-Menü zu klein + Tab-Schrift «Sequenzen» unlesbar (T8-Regression) | 🟠 Hoch | ⬜ |
+| U1 | Refactor | Ferien-Rendering: rowSpan-Merging komplett entfernen, jede Ferienwoche einzeln als Balken | 🔴 Kritisch | ✅ |
+| U2 | Bug | Sequenz-Menü zu klein + Tab-Schrift «Sequenzen» unlesbar (T8-Regression) | 🟠 Hoch | ✅ |
 
 ---
 
