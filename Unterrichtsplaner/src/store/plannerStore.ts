@@ -2,11 +2,12 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { FilterType, Week, LessonEntry, LessonType, Course, LessonDetail, ManagedSequence, SequenceBlock, HKGroup, TaFPhase, CollectionItem, CollectionUnit } from '../types';
 import { SEQUENCES as STATIC_SEQUENCES } from '../data/sequences';
-import { COURSES, getLinkedCourseIds } from '../data/courses';
+import { COURSES } from '../data/courses';
 import { INITIAL_LESSON_DETAILS } from '../data/initialLessonDetails';
 import { instanceStorageKey } from './instanceStore';
 import type { PlannerSettings } from './settingsStore';
 import { configToCourses, loadSettings } from './settingsStore';
+import { createUISlice, type Selection, type EditingCell, type InsertDialog } from './slices/uiSlice';
 
 // v3.91 N3: Zoom-Stufen für Spaltenbreite und Schriftgrösse
 export const ZOOM_LEVELS = [
@@ -23,26 +24,7 @@ export function zs(base: number, zoomCfg: typeof ZOOM_LEVELS[number]): number {
   return Math.round(base * zoomCfg.fontSize / 11);
 }
 
-interface Selection {
-  week: string;
-  courseId: string;
-  title: string;
-  course: Course;
-}
-
-interface EditingCell {
-  week: string;
-  col: number;
-}
-
-interface InsertDialog {
-  week: string;
-  course: Course;
-  hasMismatch: boolean;
-  pairedCourses: Course[];
-}
-
-interface PlannerState {
+export interface PlannerState {
   filter: FilterType;
   setFilter: (f: FilterType) => void;
   classFilter: string | null;
@@ -182,136 +164,10 @@ interface PlannerState {
 
 export const usePlannerStore = create<PlannerState>()(
   persist(
-    (set, get) => ({
-  filter: 'ALL',
-  setFilter: (f) => set({ filter: f }),
-  classFilter: null,
-  setClassFilter: (c) => set({ classFilter: c }),
-  courseFilter: null,
-  setCourseFilter: (c) => set({ courseFilter: c }),
-  zoomLevel: 3,
-  setZoomLevel: (z) => set({ zoomLevel: z }),
-  autoFitZoom: false,
-  setAutoFitZoom: (v) => set({ autoFitZoom: v }),
-  columnZoom: parseInt(localStorage.getItem('columnZoom') || '2', 10),
-  setColumnZoom: (z) => { const clamped = Math.max(0, Math.min(4, z)); localStorage.setItem('columnZoom', String(clamped)); set({ columnZoom: clamped }); },
-  dimPastWeeks: true,
-  setDimPastWeeks: (v) => set({ dimPastWeeks: v }),
-  searchQuery: '',
-  setSearchQuery: (q) => set({ searchQuery: q }),
-  selection: null,
-  setSelection: (s) => set({
-    selection: s,
-    lastSelectedKey: s ? `${s.week}-${s.courseId}` : get().lastSelectedKey,
-  }),
-  multiSelection: [],
-  lastSelectedKey: null,
-  toggleMultiSelect: (key) =>
-    set((state) => {
-      // If this is the first Cmd+Click and there's a current selection, include it too
-      const currentKey = state.selection ? `${state.selection.week}-${state.selection.courseId}` : null;
-      const base = state.multiSelection.length === 0 && currentKey && currentKey !== key
-        ? [currentKey]
-        : state.multiSelection;
-      return {
-        multiSelection: base.includes(key)
-          ? base.filter((k) => k !== key)
-          : [...base, key],
-        lastSelectedKey: key,
-      };
-    }),
-  setMultiSelectionDirect: (keys) => set({ multiSelection: keys, lastSelectedKey: keys[keys.length - 1] ?? null }),
-  selectRange: (toKey, allWeeks, courses, crossDay) => {
-    const state = get();
-    const fromKey = state.lastSelectedKey;
-    if (!fromKey) {
-      set({ multiSelection: [toKey], lastSelectedKey: toKey });
-      return;
-    }
-    const [fromWeek, fromCourseId] = fromKey.split('-');
-    const [toWeek, toCourseId] = toKey.split('-');
-
-    // Helper: check if a week+course is selectable (allow empty cells, skip holidays/events)
-    const weekMap = new Map(state.weekData.map(w => [w.w, w]));
-    const isSelectableLesson = (wk: string, courseId: string): boolean => {
-      const course = courses.find(c => c.id === courseId);
-      if (!course) return false;
-      const week = weekMap.get(wk);
-      if (!week) return false;
-      const entry = week.lessons[course.col];
-      if (!entry) return true; // Allow empty cells (for creating sequences on blank weeks)
-      if (entry.type === 5 || entry.type === 6) return false; // skip events/holidays
-      return true;
-    };
-
-    // Check if both courses belong to the same class+type (linked courses, e.g. Di+Do)
-    const fromCourse = courses.find(c => c.id === fromCourseId);
-    const toCourse = courses.find(c => c.id === toCourseId);
-    const areLinked = fromCourse && toCourse &&
-      fromCourse.cls === toCourse.cls && fromCourse.typ === toCourse.typ &&
-      fromCourseId !== toCourseId;
-
-    if (areLinked && crossDay !== false) {
-      // Cross-day selection: select all weeks in range for BOTH course columns
-      const fromIdx = allWeeks.indexOf(fromWeek);
-      const toIdx = allWeeks.indexOf(toWeek);
-      if (fromIdx < 0 || toIdx < 0) return;
-      const startIdx = Math.min(fromIdx, toIdx);
-      const endIdx = Math.max(fromIdx, toIdx);
-      const rangeKeys: string[] = [];
-      for (let i = startIdx; i <= endIdx; i++) {
-        if (isSelectableLesson(allWeeks[i], fromCourseId)) rangeKeys.push(`${allWeeks[i]}-${fromCourseId}`);
-        if (isSelectableLesson(allWeeks[i], toCourseId)) rangeKeys.push(`${allWeeks[i]}-${toCourseId}`);
-      }
-      set((s) => ({
-        multiSelection: Array.from(new Set([...s.multiSelection, ...rangeKeys])),
-        lastSelectedKey: toKey,
-      }));
-      return;
-    }
-
-    if (fromCourseId !== toCourseId && !(areLinked && crossDay === false)) {
-      // Different, unlinked courses — block range select (error-prone cross-course selection)
-      // Only allow single-cell add via Cmd/Ctrl+Click, not Shift+Click range
-      return;
-    }
-
-    // Same column range selection (or linked course with crossDay=false → use fromCourseId column)
-    const fromIdx = allWeeks.indexOf(fromWeek);
-    const toIdx = allWeeks.indexOf(toWeek);
-    if (fromIdx < 0 || toIdx < 0) return;
-    const startIdx = Math.min(fromIdx, toIdx);
-    const endIdx = Math.max(fromIdx, toIdx);
-    const rangeKeys: string[] = [];
-    for (let i = startIdx; i <= endIdx; i++) {
-      if (isSelectableLesson(allWeeks[i], fromCourseId)) rangeKeys.push(`${allWeeks[i]}-${fromCourseId}`);
-    }
-
-    // Check if same-column range should also include linked day
-    if (crossDay !== false) {
-      const linkedCourseIds = getLinkedCourseIds(fromCourseId);
-      if (linkedCourseIds.length > 1) {
-        // Automatically include linked day columns
-        for (const otherCourseId of linkedCourseIds) {
-          if (otherCourseId !== fromCourseId) {
-            for (let i = startIdx; i <= endIdx; i++) {
-              if (isSelectableLesson(allWeeks[i], otherCourseId)) rangeKeys.push(`${allWeeks[i]}-${otherCourseId}`);
-            }
-          }
-        }
-      }
-    }
-
-    set((s) => ({
-      multiSelection: Array.from(new Set([...s.multiSelection, ...rangeKeys])),
-      lastSelectedKey: toKey,
-    }));
-  },
-  clearMultiSelect: () => set({ multiSelection: [], lastSelectedKey: null }),
-  showHelp: false,
-  toggleHelp: () => set((state) => ({ showHelp: !state.showHelp })),
-  editing: null,
-  setEditing: (e) => set({ editing: e }),
+    (...a) => {
+  const [set, get] = a;
+  return {
+  ...createUISlice(...a),
   weekData: [],
   setWeekData: (w) => set({ weekData: w }),
   updateLesson: (weekW, col, entry) =>
@@ -355,9 +211,6 @@ export const usePlannerStore = create<PlannerState>()(
       }
       return result;
     }),
-  insertDialog: null,
-  setInsertDialog: (d) => set({ insertDialog: d }),
-
   // Lesson Details
   lessonDetails: { ...INITIAL_LESSON_DETAILS },
   updateLessonDetail: (weekW, col, detail) =>
@@ -375,25 +228,6 @@ export const usePlannerStore = create<PlannerState>()(
     const key = `${weekW}-${col}`;
     return get().lessonDetails[key];
   },
-  detailPanelExpanded: false,
-  setDetailPanelExpanded: (v) => set({ detailPanelExpanded: v }),
-  // Phase 1: Side panel
-  sidePanelOpen: false,
-  setSidePanelOpen: (v) => set({ sidePanelOpen: v }),
-  sidePanelTab: 'details',
-  setSidePanelTab: (t) => set({ sidePanelTab: t }),
-  pendingHolidayKw: null,
-  setPendingHolidayKw: (kw) => set({ pendingHolidayKw: kw }),
-  hoveredCell: null,
-  setHoveredCell: (c) => set({ hoveredCell: c }),
-  emptyCellAction: null,
-  setEmptyCellAction: (a) => set({ emptyCellAction: a }),
-  dragSelectAnchor: null,
-  dragSelectCurrent: null,
-  dragSelectedKeys: [],
-  setDragSelectAnchor: (a) => set({ dragSelectAnchor: a }),
-  setDragSelectCurrent: (c) => set({ dragSelectCurrent: c }),
-  setDragSelectedKeys: (keys) => set({ dragSelectedKeys: keys }),
 
   // Sequences CRUD
   sequences: [],
@@ -1338,21 +1172,7 @@ export const usePlannerStore = create<PlannerState>()(
     }),
   plannerSettings: null,
   setPlannerSettings: (s) => set({ plannerSettings: s }),
-  settingsOpen: false,
-  setSettingsOpen: (v) => set({ settingsOpen: v }),
-  settingsEditCourseId: null,
-  setSettingsEditCourseId: (id) => set({ settingsEditCourseId: id }),
-  panelWidth: 400,
-  setPanelWidth: (w) => set({ panelWidth: w }),
-  expandedNoteCols: {},
-  toggleNoteCol: (courseId) => set((s) => {
-    const next = { ...s.expandedNoteCols };
-    if (next[courseId]) { delete next[courseId]; } else { next[courseId] = true; }
-    return { expandedNoteCols: next };
-  }),
-  noteColWidth: 200,
-  setNoteColWidth: (w) => set({ noteColWidth: Math.max(80, Math.min(400, w)) }),
-  }),
+  }; },
     {
       name: 'unterrichtsplaner-storage',
       version: 3,
