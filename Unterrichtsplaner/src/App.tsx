@@ -1,6 +1,6 @@
 import { useRef, useEffect, useMemo } from 'react';
 import { usePlannerStore, switchInstance, saveToInstance } from './store/plannerStore';
-import { useInstanceStore } from './store/instanceStore';
+import { useInstanceStore, generateWeekIds } from './store/instanceStore';
 import { usePlannerData } from './hooks/usePlannerData';
 import { loadSettings, applySettingsToWeekData } from './store/settingsStore';
 import { SemesterHeader } from './components/SemesterHeader';
@@ -83,6 +83,29 @@ function PlannerContent() {
       setWeekData(applied.weekData);
     }
   }, [plannerSettings]);
+
+  // v3.99 V2: Fehlende Wochen ergänzen (z.B. KW 28–32 Sommerferien)
+  const activeMeta = useInstanceStore(s => s.getActive());
+  useEffect(() => {
+    if (weekData.length === 0 || !activeMeta) return;
+    const expected = generateWeekIds(activeMeta.startWeek, activeMeta.startYear, activeMeta.endWeek, activeMeta.endYear);
+    const existing = new Set(weekData.map(w => w.w));
+    const missing = expected.filter(wId => !existing.has(wId));
+    if (missing.length === 0) return;
+    // Fehlende Wochen ergänzen und sortieren
+    const extended = [...weekData, ...missing.map(w => ({ w, lessons: {} as Record<number, import('./types').LessonEntry> }))];
+    const order = new Map(expected.map((id, idx) => [id, idx]));
+    extended.sort((a, b) => (order.get(a.w) ?? 999) - (order.get(b.w) ?? 999));
+    // Settings anwenden (Ferien/Events markieren)
+    const settings = plannerSettings ?? (isLegacy ? loadSettings() : null);
+    if (settings && (settings.holidays?.length > 0 || settings.specialWeeks?.length > 0)) {
+      const applied = applySettingsToWeekData(extended, settings);
+      setWeekData(applied.weekData);
+    } else {
+      setWeekData(extended);
+    }
+    console.log('[App V2] Fehlende Wochen ergänzt:', missing);
+  }, [weekData.length, activeMeta?.endWeek]);
 
   // Migrate static sequences to store on first render (legacy planners only)
   useEffect(() => {
