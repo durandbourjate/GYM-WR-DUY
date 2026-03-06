@@ -10,7 +10,7 @@ interface Props {
 }
 
 export function SemesterHeader({ courses, semester, weeks }: Props) {
-  const { classFilter, setClassFilter, courseFilter, setCourseFilter, setFilter, expandedNoteCols, toggleNoteCol, noteColWidth, setNoteColWidth, setSidePanelOpen, setSidePanelTab, setSettingsEditCourseId, columnZoom } = usePlannerStore();
+  const { classFilter, setClassFilter, courseFilter, setCourseFilter, setFilter, expandedNoteCols, toggleNoteCol, noteColWidth, setNoteColWidth, setSidePanelOpen, setSidePanelTab, setSettingsEditCourseId, columnZoom, autoFitZoom } = usePlannerStore();
   const ncw = noteColWidth;
   const zoomCfg = ZOOM_LEVELS[columnZoom] || ZOOM_LEVELS[2];
   const colW = zoomCfg.colWidth;
@@ -78,7 +78,7 @@ export function SemesterHeader({ courses, semester, weeks }: Props) {
                 className={`bg-gray-900 px-0.5 pb-1 border-b-2 text-center ${courseFilter === `${c.cls}|${c.typ}` ? 'border-blue-500' : 'border-gray-700'}`}
                 style={{
                   borderLeft: newDay ? `2px solid ${DAY_COLORS[c.day]}40` : 'none',
-                  width: colW, minWidth: colW, maxWidth: colW,
+                  ...(autoFitZoom ? {} : { width: colW, minWidth: colW, maxWidth: colW }),
                 }}
                 onDoubleClick={() => setCourseFilter(courseFilter === `${c.cls}|${c.typ}` ? null : `${c.cls}|${c.typ}`)}
               >

@@ -37,6 +37,7 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
     plannerSettings,
     filter,
     columnZoom,
+    autoFitZoom,
   } = usePlannerStore();
 
   const zoomCfg = ZOOM_LEVELS[columnZoom] || ZOOM_LEVELS[2];
@@ -649,9 +650,7 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                     background: isDragOver ? '#1e3a5f30'
                       : (dragSelectCol === c.col && dragSelectedWeeks.includes(week.w)) ? '#7c3aed20'
                       : isMulti ? '#312e8140' : undefined,
-                    width: colW,
-                    minWidth: colW,
-                    maxWidth: colW,
+                    ...(autoFitZoom ? {} : { width: colW, minWidth: colW, maxWidth: colW }),
                     cursor: dragMoveSource ? 'grabbing' : undefined,
                   }}
                   onMouseDown={(e) => {
