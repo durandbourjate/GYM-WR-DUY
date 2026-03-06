@@ -1,6 +1,6 @@
 # Unterrichtsplaner – Handoff v3.99
 
-## Status: ⬜ v3.99 — Schuljahr vollständig (Sommerferien)
+## Status: ✅ v3.99 — Schuljahr vollständig (Sommerferien) — ABGESCHLOSSEN
 
 **Vorgänger:** v3.98 (Toolbar-Redesign abgeschlossen).
 
@@ -17,7 +17,7 @@ Commit nach jedem erledigten Task: `git add -A && git commit -m "fix: v3.99 — 
 
 | # | Typ | Beschreibung | Priorität | Status |
 |---|-----|-------------|-----------|--------|
-| V1 | Feature | Schuljahr bis KW 32 verlängern — Sommerferien sichtbar im Planer | 🟠 Hoch | ⬜ |
+| V1 | Feature | Schuljahr bis KW 32 verlängern — Sommerferien sichtbar im Planer | 🟠 Hoch | ✅ |
 
 ---
 

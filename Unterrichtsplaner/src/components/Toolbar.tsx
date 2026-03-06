@@ -90,7 +90,7 @@ export function AppHeader() {
         <span className="text-base font-bold text-gray-50">
           <span className="text-blue-400">⊞</span> Planer
         </span>
-        <span className="text-[12px] text-gray-500">v3.98</span>
+        <span className="text-[12px] text-gray-500">v3.99</span>
       </div>
       {/* v3.98: PlannerTabs inline in der Toolbar */}
       <PlannerTabs />

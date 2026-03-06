@@ -15,7 +15,7 @@ export interface PlannerMeta {
   // Time range
   startWeek: number;     // e.g. 33
   startYear: number;     // e.g. 2025
-  endWeek: number;       // e.g. 27
+  endWeek: number;       // e.g. 32
   endYear: number;       // e.g. 2026
   semesterBreakWeek?: number; // e.g. 7 (KW where S2 starts)
 }
@@ -109,7 +109,7 @@ export const useInstanceStore = create<InstanceState>()(
           updatedAt: now,
           startWeek: opts?.startWeek ?? 33,
           startYear: opts?.startYear ?? new Date().getFullYear(),
-          endWeek: opts?.endWeek ?? 27,
+          endWeek: opts?.endWeek ?? 32,
           endYear: opts?.endYear ?? new Date().getFullYear() + 1,
           semesterBreakWeek: opts?.semesterBreakWeek ?? 7,
           ...opts,
@@ -201,7 +201,10 @@ export const useInstanceStore = create<InstanceState>()(
       name: 'unterrichtsplaner-instances',
       onRehydrateStorage: () => {
         // Called after zustand has loaded persisted state from localStorage
-        return () => migrateIfLegacy();
+        return () => {
+          migrateIfLegacy();
+          migrateEndWeek();
+        };
       },
     }
   )
@@ -232,7 +235,7 @@ function migrateIfLegacy() {
       updatedAt: now,
       startWeek: 33,
       startYear: 2025,
-      endWeek: 27,
+      endWeek: 32,
       endYear: 2026,
       semesterBreakWeek: 7,
     };
@@ -249,4 +252,18 @@ function migrateIfLegacy() {
   } catch (e) {
     console.error('[Migration] Failed to migrate legacy data:', e);
   }
+}
+
+// === Auto-migration: endWeek 27 → 32 (Sommerferien sichtbar) ===
+function migrateEndWeek() {
+  const state = useInstanceStore.getState();
+  const needsMigration = state.instances.some(i => i.endWeek < 32);
+  if (!needsMigration) return;
+
+  useInstanceStore.setState({
+    instances: state.instances.map(i =>
+      i.endWeek < 32 ? { ...i, endWeek: 32 } : i
+    ),
+  });
+  console.log('[Migration] endWeek upgraded to 32 for all instances (Sommerferien)');
 }

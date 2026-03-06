@@ -48,6 +48,11 @@ export const WEEKS: Week[] = [
 {w:"25",lessons:{2:{title:"IW25",type:5},4:{title:"IW25",type:5},11:{title:"IW25",type:5},17:{title:"IW25",type:5},19:{title:"IW25",type:5},24:{title:"IW25",type:5},29:{title:"IW25",type:5},31:{title:"IW25",type:5},35:{title:"IW25",type:5},37:{title:"IW25",type:5}}},
 {w:"26",lessons:{2:{title:"Abschluss",type:3},4:{title:"Abschluss",type:3}}},
 {w:"27",lessons:{2:{title:"IW27",type:5},4:{title:"IW27",type:5},11:{title:"IW27",type:5},17:{title:"IW27",type:5},19:{title:"IW27",type:5},24:{title:"IW27",type:5},29:{title:"IW27",type:5},31:{title:"IW27",type:5},35:{title:"IW27",type:5},37:{title:"IW27",type:5}}},
+{w:"28",lessons:{}},
+{w:"29",lessons:{}},
+{w:"30",lessons:{}},
+{w:"31",lessons:{}},
+{w:"32",lessons:{}},
 ];
 
 export const CURRENT_WEEK = '09';
