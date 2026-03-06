@@ -1,6 +1,6 @@
 # Unterrichtsplaner – Handoff v3.95
 
-## Status: 🔄 v3.95 — Refactoring Phase 3 (plannerStore aufteilen)
+## Status: ✅ v3.95 — Refactoring Phase 3 (plannerStore aufteilen)
 
 **Referenz:** Lies `REFACTORING.md` für Analyse, Regeln und Verbote.
 
@@ -87,6 +87,19 @@ export const usePlannerStore = create<PlannerState>()(
   )
 );
 ```
+
+### Ergebnis
+
+| Datei | Zeilen | Inhalt |
+|-------|--------|--------|
+| `plannerStore.ts` | 186 | create + persist + instance-switching (von 1504) |
+| `slices/uiSlice.ts` | 257 | Filter, Zoom, Selection, SidePanel, DragSelect, Settings-UI, NoteCol |
+| `slices/dataSlice.ts` | 575 | WeekData, LessonDetails, D&D, Export/Import, HK, TaF, Undo, PlannerSettings |
+| `slices/sequenceSlice.ts` | 297 | Sequences CRUD, Blocks, AutoPlace, SequencePanel-UI |
+| `slices/collectionSlice.ts` | 239 | Collection CRUD, Archive-Funktionen, ImportFromCollection |
+| **Total** | **1554** | (vorher 1504 in einer Datei — Overhead durch Slice-Interfaces +50) |
+
+Alle 5 Commits (R14–R18) erfolgreich. `npx tsc --noEmit && npm run build` nach jedem Schritt bestätigt.
 
 ### Regeln (BESONDERS WICHTIG bei P2)
 
