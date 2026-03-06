@@ -1,6 +1,71 @@
-# Unterrichtsplaner – Handoff v3.92
+# Unterrichtsplaner – Handoff v3.93
 
-## Status: ✅ v3.92 — Abgeschlossen
+## Status: 🔄 v3.93 — Refactoring Phase 1 (SettingsPanel aufteilen)
+
+**Referenz:** Lies `REFACTORING.md` für Analyse, Regeln und Verbote.
+
+---
+
+## OBERSTE REGEL
+
+**Keine Funktionalität darf verloren gehen oder sich verändern.**
+Reines Strukturrefactoring: Move + Extract. Die App muss vor und nach jedem Schritt exakt gleich funktionieren. Siehe REFACTORING.md → Regeln.
+
+---
+
+## Refactoring P1: SettingsPanel.tsx aufteilen
+
+SettingsPanel.tsx hat 2137 Zeilen mit 6 eigenständigen Sub-Editoren.
+Ziel: Jeder Editor → eigene Datei. SettingsPanel.tsx wird zum dünnen Orchestrator.
+
+### Zielstruktur
+
+```
+src/components/settings/
+├── shared.tsx              ← Section, SmallInput, SmallSelect, RubricCollectionButtons, SaveToCollectionDialog, RubricCollectionPicker, SectionActions, extractRubricData
+├── SubjectsEditor.tsx      ← SubjectsEditor (Z.320–437)
+├── CourseEditor.tsx         ← CourseEditor + CourseDurationPicker + Duration-Helpers (Z.438–674)
+├── SpecialWeeksEditor.tsx   ← SpecialWeeksEditor + GYM-Level-Helpers (Z.675–986)
+├── HolidaysEditor.tsx       ← HolidaysEditor (Z.988–1077)
+├── AssessmentRulesEditor.tsx ← AssessmentRulesEditor (Z.1087–1204)
+└── GCalSection.tsx          ← GCalSection (Z.1206–1661)
+```
+
+SettingsPanel.tsx bleibt als Hauptdatei: importiert alle Editoren, rendert Tabs/Layout.
+
+### Schritte (je ein Commit)
+
+| # | Schritt | Dateien |
+|---|---------|---------|
+| R1 | `settings/` Ordner erstellen, `shared.tsx` extrahieren (Section, SmallInput, SmallSelect, Rubric-Helpers) | Neu: settings/shared.tsx, Edit: SettingsPanel.tsx |
+| R2 | `SubjectsEditor.tsx` extrahieren | Neu: settings/SubjectsEditor.tsx, Edit: SettingsPanel.tsx |
+| R3 | `CourseEditor.tsx` extrahieren (inkl. CourseDurationPicker, Duration-Helpers) | Neu: settings/CourseEditor.tsx, Edit: SettingsPanel.tsx |
+| R4 | `SpecialWeeksEditor.tsx` extrahieren (inkl. GYM-Level-Helpers) | Neu: settings/SpecialWeeksEditor.tsx, Edit: SettingsPanel.tsx |
+| R5 | `HolidaysEditor.tsx` extrahieren | Neu: settings/HolidaysEditor.tsx, Edit: SettingsPanel.tsx |
+| R6 | `AssessmentRulesEditor.tsx` extrahieren | Neu: settings/AssessmentRulesEditor.tsx, Edit: SettingsPanel.tsx |
+| R7 | `GCalSection.tsx` extrahieren | Neu: settings/GCalSection.tsx, Edit: SettingsPanel.tsx |
+
+### Regeln pro Schritt
+
+1. **Vor** dem Schritt: `npx tsc --noEmit && npm run build` (Baseline)
+2. Code 1:1 verschieben — KEINE Logik-Änderungen
+3. Imports in der neuen Datei ergänzen, in SettingsPanel.tsx auf Import umstellen
+4. **Nach** dem Schritt: `npx tsc --noEmit && npm run build` (muss fehlerfrei)
+5. Commit: `git add -A && git commit -m "refactor R[N]: [Beschreibung]"`
+6. Push: `git push`
+
+### Verbote (aus REFACTORING.md)
+
+- KEINE neuen Features
+- KEINE Logik-Änderungen
+- KEINE API-Änderungen (exportierte Funktionen/Typen/Props unverändert)
+- KEINE Umbenennung von State-Keys oder localStorage-Keys
+- KEINE Hook-Reihenfolge ändern
+- KEINE «Optimierungen» an bestehender Logik
+
+---
+
+## Vorherige Version: v3.92 ✅
 
 ---
 
