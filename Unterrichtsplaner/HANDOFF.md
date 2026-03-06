@@ -1,15 +1,36 @@
-# Unterrichtsplaner – Handoff v3.97
+# Unterrichtsplaner – Handoff v3.98
 
-## Status: ✅ v3.97 — Ferien-Rendering + Sequenz-Menü + Schriftgrössen + Sonderwochen — ABGESCHLOSSEN
+## Status: ✅ v3.98 — Toolbar-Redesign: kompaktere Kopfzeile — ABGESCHLOSSEN
 
-**Vorgänger:** v3.96 (11 Bug-Fixes + UX abgeschlossen und deployed).
+**Vorgänger:** v3.97 (Ferien-Rendering + Sequenz-Menü + Schriftgrössen + Sonderwochen).
 
 ---
 
 ## OBERSTE REGEL
 
 **Immer `npx tsc --noEmit && npm run build` vor und nach jeder Änderung.**
-Commit nach jedem erledigten Task: `git add -A && git commit -m "fix: v3.97 — [Beschreibung]" && git push`
+Commit nach jedem erledigten Task: `git add -A && git commit -m "fix: v3.98 — [Beschreibung]" && git push`
+
+---
+
+## Originalauftrag v3.98 — Toolbar-Redesign
+
+| # | Typ | Beschreibung | Priorität | Status |
+|---|-----|-------------|-----------|--------|
+| T1 | UX | Side-Panel unter Kopfzeile limitieren (verdeckt keine Toolbar-Buttons mehr) | 🟠 Hoch | ✅ |
+| T2 | UX | PlannerTabs in Kopfzeile integrieren (neben Versionsnummer) | 🟠 Hoch | ✅ |
+| T3 | UX | "Unterrichtsplaner" → "Planer" + Version v3.98 | 🟢 Niedrig | ✅ |
+| T4 | UX | Kursfilter-Buttons → Dropdown "Kurse" | 🟡 Mittel | ✅ |
+| T5 | UX | TaF-Button → neue Settings-Rubrik (über Beurteilungsregeln) | 🟡 Mittel | ✅ |
+| T6 | UX | Legend-Bar entfernen → Infos in HelpBar (Kurzanleitung) | 🟡 Mittel | ✅ |
+
+### Geänderte Dateien
+- `src/components/Toolbar.tsx` — Hauptumbau: Planer-Name, PlannerTabs inline, Kursfilter-Dropdown, TaF-Button entfernt, Legend→HelpBar, Toolbar-Höhenmessung via `--toolbar-h`
+- `src/components/PlannerTabs.tsx` — Inline-Tabs (compact), Setup-Wizard als zentriertes Modal (Portal)
+- `src/components/DetailPanel.tsx` — `top-0` → `top: var(--toolbar-h, 44px)`
+- `src/components/SettingsPanel.tsx` — Neue TaF-Section eingefügt
+- `src/components/TaFPanel.tsx` — `TaFSection` als einbettbare Komponente exportiert
+- `src/App.tsx` — PlannerTabs + Legend aus Root-Layout entfernt
 
 ---
 
