@@ -1,6 +1,6 @@
 # Unterrichtsplaner – Handoff v3.97
 
-## Status: ✅ v3.97 — Ferien-Rendering + Sequenz-Menü Fix — ABGESCHLOSSEN
+## Status: ✅ v3.97 — Ferien-Rendering + Sequenz-Menü + Schriftgrössen + Sonderwochen — ABGESCHLOSSEN
 
 **Vorgänger:** v3.96 (11 Bug-Fixes + UX abgeschlossen und deployed).
 
@@ -19,6 +19,9 @@ Commit nach jedem erledigten Task: `git add -A && git commit -m "fix: v3.97 — 
 |---|-----|-------------|-----------|--------|
 | U1 | Refactor | Ferien-Rendering: rowSpan-Merging komplett entfernen, jede Ferienwoche einzeln als Balken | 🔴 Kritisch | ✅ |
 | U2 | Bug | Sequenz-Menü zu klein + Tab-Schrift «Sequenzen» unlesbar (T8-Regression) | 🟠 Hoch | ✅ |
+| U3 | UX | FlatBlockCard Bearbeitungsbereich vergrössert (40vh→75vh) | 🟠 Hoch | ✅ |
+| U4 | UX | Globale Schriftgrössen-Erhöhung: Side-Panels + Zoom-Stufen | 🟡 Mittel | ✅ |
+| U5 | Bug | Sonderwochen stufenspezifisch anzeigen (colspan nur bei identischem Titel) | 🟠 Hoch | ✅ |
 
 ---
 
@@ -98,6 +101,87 @@ Analog: Die `holidaySpans`/`holidaySkipSet`/`holidaySpanStart` useMemos entferne
 - `src/components/DetailPanel.tsx` (Tab-Farben)
 - `src/components/SequencePanel.tsx` (FlatBlockCard-Grösse)
 - `public/presets/Hofwil/ferien_hofwil_2526.json` (Weihnachtsferien-Daten)
+
+---
+
+## Task U3: UX — FlatBlockCard Bearbeitungsbereich vergrössert
+
+### Problem
+Der FlatBlockCard-Bearbeitungsbereich in der Sequenz-Verwaltung war auf `max-h-[40vh]` limitiert — nur die Hälfte der Bildschirmhöhe. Das machte das Bearbeiten von Sequenzen mit vielen Blöcken/Reihen umständlich.
+
+### Fix (umgesetzt)
+- **Aktive Sequenz Container:** `max-h-[40vh]` → `max-h-[75vh]`
+- **FlatBlockCard expanded Content:** `minHeight: '50vh'` hinzugefügt
+- **Padding:** Header px-2 py-1.5 → px-3 py-2, Content px-2 pb-2 → px-3 pb-3
+
+### Dateien
+- `src/components/SequencePanel.tsx`
+
+---
+
+## Task U4: UX — Globale Schriftgrössen-Erhöhung
+
+### Problem
+Die Schriftgrössen in den Side-Panels (Detail, Sequenz, Sammlung, Settings, etc.) waren zu klein zum komfortablen Lesen. Ausserdem waren die Zoom-Stufen im Planungsraster zu eng beieinander (~10% Schritte).
+
+### Fix (umgesetzt)
+
+**Side-Panels (24 Dateien, ~550 Ersetzungen):**
+- Überschriften: 11px → 13px
+- Labels/Inputs: 10px → 12px
+- Buttons: 9px → 11px
+- Hilfetext: 8px → 9px
+- Tertiär: 7px → 8px
+
+**Zoom-Stufen (plannerStore.ts):**
+- Referenz-Font: 11 → 12 (Stufe 3, Default)
+- Neue fontSize-Werte: `[10, 11, 12, 14, 16]` (vorher `[9, 10, 11, 12, 14]`)
+- Schritte: ~15% statt ~10%
+- `zs()` Divisor: 11 → 12
+- Spaltenbreiten unverändert: `[120, 160, 200, 260, 340]`
+
+**Schriftgrössen-Konsistenz:** Alle Panels normalisiert — FlatBlockCard-Titel von 12px auf 11px (→13px), Inputs von 11px auf 10px (→12px), damit alle Panels einheitlich sind.
+
+### Dateien (24 Dateien)
+- `src/store/plannerStore.ts` (ZOOM_LEVELS, zs())
+- `src/components/DetailPanel.tsx`, `SequencePanel.tsx`, `CollectionPanel.tsx`
+- `src/components/Toolbar.tsx`, `StatsPanel.tsx`, `TaFPanel.tsx`
+- `src/components/SettingsPanel.tsx` + settings/*.tsx (6 Dateien)
+- `src/components/detail/shared.tsx`, `CurriculumGoalPicker.tsx`, `CollectionPicker.tsx`
+- `src/components/HoverPreview.tsx`, `EmptyCellMenu.tsx`, `InsertDialog.tsx`
+- `src/components/PlannerTabs.tsx`, `ExcelImport.tsx`
+- `src/components/ZoomMultiYearView.tsx`, `WeekRows.tsx`
+
+---
+
+## Task U5: Bug — Sonderwochen stufenspezifisch anzeigen
+
+### Problem
+Wenn verschiedene Stufen in derselben KW verschiedene Sonderwochen haben (z.B. KW 25: GYM1=Geografie, GYM2=Wirtschaftswoche, GYM3=Maturaarbeit), wurde nur EIN Titel über alle Spalten als colspan-Balken gerendert. Die Daten waren korrekt stufenspezifisch gespeichert — das Problem lag rein im Rendering.
+
+### Ursache
+In `ZoomYearView.tsx` und `WeekRows.tsx`:
+```typescript
+const isAllEvent = allEntries.every(e => e.type === 5);
+if (isAllEvent) {
+  const label = allEntries[0]?.title;  // ← NUR erster Eintrag!
+  // → colspan über ALLE Spalten mit diesem einen Titel
+}
+```
+
+### Fix (umgesetzt)
+Zusätzliche Prüfung: Nur colspan-Merging wenn alle Einträge denselben Titel haben:
+```typescript
+const isAllEvent = allEntries.length > 0
+  && allEntries.every(e => (e as any).type === 5)
+  && new Set(allEntries.map(e => (e as any).title)).size === 1;
+```
+- **Gleicher Titel** → colspan-Balken (wie bisher)
+- **Verschiedene Titel** → kein colspan, normale Zellen-Darstellung pro Kurs
+
+### Dateien
+- `src/components/ZoomYearView.tsx` (isAllEvent-Check)
+- `src/components/WeekRows.tsx` (isAllEvent-Check)
 
 ---
 

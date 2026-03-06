@@ -20,10 +20,10 @@ npm run dev      # Entwicklungsserver (localhost:5173)
 npm run build    # Produktions-Build → dist/
 ```
 
-## Features (v3.92)
+## Features (v3.97)
 
 ### 2 Zoom-Stufen
-- **Jahresübersicht:** Ganzes Schuljahr als Blockübersicht mit farbcodierten Sequenzen, zusammengefassten Ferien-Blöcken (rowSpan), Events/Sonderwochen als graue Blöcke, Ist/Soll-Vergleich pro Fachbereich und Semester
+- **Jahresübersicht:** Ganzes Schuljahr als Blockübersicht mit farbcodierten Sequenzen, Ferien-Balken pro Woche (colspan), stufenspezifische Sonderwochen, Ist/Soll-Vergleich pro Fachbereich und Semester
 - **Wochendetail:** Detailliertes Wochenraster mit allen Kursen, Drag & Drop, Inline-Editing
 
 ### Sequenzen, Blöcke & Reihen
@@ -42,7 +42,7 @@ npm run build    # Produktions-Build → dist/
 
 ### Panels & Verwaltung
 - Detail-Panel: Themen, Notizen, Material-Links (LV integriert)
-- Sequenz-Panel: Alle Sequenzen nach Fachbereich gruppiert, Pin-Card für aktive Sequenz
+- Sequenz-Panel: Alle Sequenzen nach Fachbereich gruppiert, Pin-Card für aktive Sequenz, grosser Bearbeitungsbereich (75vh)
 - Materialsammlung: Archivierung von UE und Reihen
 - Noten-Vorgaben-Tracking pro Semester (MiSDV Art. 4)
 - Notizen-Spalte (aufklappbar pro Kurs, resizable)
@@ -54,9 +54,10 @@ npm run build    # Produktions-Build → dist/
 - Preset-Dateien in `public/presets/Hofwil/`
 
 ### Zoom & Darstellung
-- Stufenlose Zoom-Funktion: Alle Texte, Icons, Badges und Zeilenhöhen skalieren proportional
+- 5-stufige Zoom-Funktion (10–16px): Alle Texte, Icons, Badges und Zeilenhöhen skalieren proportional (~15% Schritte)
+- Optimierte Schriftgrössen: Überschriften 13px, Labels/Inputs 12px, Buttons 11px
 - Hell/Dunkel-Toggle für vergangene Wochen (alle Zoom-Stufen)
-- Light/Dark-Mode
+- Light/Dark-Mode mit CSS-Variables
 - HoverPreview mit smarter Positionierung
 
 ### Weitere Features
