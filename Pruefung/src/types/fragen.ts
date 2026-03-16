@@ -1,0 +1,125 @@
+// === FRAGE (Basis) ===
+export interface FrageBase {
+  id: string;
+  version: number;
+  erstelltAm: string;
+  geaendertAm: string;
+
+  // Inhaltliche Zuordnung
+  fachbereich: Fachbereich;
+  thema: string;
+  unterthema?: string;
+  lehrplanziel?: string;
+  semester: string[];
+  gefaesse: Gefaess[];
+
+  // Taxonomie
+  bloom: BloomStufe;
+  tags: string[];
+
+  // Bewertung
+  punkte: number;
+  musterlosung: string;
+  bewertungsraster: Bewertungskriterium[];
+
+  // Metadaten aus Verwendung
+  schwierigkeit?: number;
+  streuung?: number;
+  verwendungen: Verwendung[];
+
+  // Herkunft
+  quelle?: 'pool' | 'papier' | 'manuell' | 'ki-generiert';
+  quellReferenz?: string;
+}
+
+export type Fachbereich = 'VWL' | 'BWL' | 'Recht' | 'Informatik';
+export type Gefaess = 'SF' | 'EF' | 'EWR';
+export type BloomStufe = 'K1' | 'K2' | 'K3' | 'K4' | 'K5' | 'K6';
+
+export interface Bewertungskriterium {
+  beschreibung: string;
+  punkte: number;
+  stichworte?: string[];
+}
+
+export interface Verwendung {
+  datum: string;
+  pruefungId: string;
+  klasse: string;
+  typ: 'summativ' | 'formativ';
+  durchschnitt?: number;
+  n?: number;
+}
+
+// === FRAGETYPEN ===
+
+export interface MCFrage extends FrageBase {
+  typ: 'mc';
+  fragetext: string;
+  optionen: MCOption[];
+  mehrfachauswahl: boolean;
+  zufallsreihenfolge: boolean;
+}
+
+export interface MCOption {
+  id: string;
+  text: string;
+  korrekt: boolean;
+  feedback?: string;
+}
+
+export interface FreitextFrage extends FrageBase {
+  typ: 'freitext';
+  fragetext: string;
+  laenge: 'kurz' | 'mittel' | 'lang';
+  maxZeichen?: number;
+  hilfstextPlaceholder?: string;
+}
+
+export interface ZuordnungFrage extends FrageBase {
+  typ: 'zuordnung';
+  fragetext: string;
+  paare: { links: string; rechts: string }[];
+  zufallsreihenfolge: boolean;
+}
+
+export interface LueckentextFrage extends FrageBase {
+  typ: 'lueckentext';
+  fragetext: string;
+  textMitLuecken: string;
+  luecken: {
+    id: string;
+    korrekteAntworten: string[];
+    caseSensitive: boolean;
+  }[];
+}
+
+export interface VisualisierungFrage extends FrageBase {
+  typ: 'visualisierung';
+  untertyp: 'zeichnen' | 'diagramm-manipulieren' | 'schema-erstellen';
+  fragetext: string;
+  ausgangsdiagramm?: DiagrammConfig;
+  canvasConfig?: CanvasConfig;
+}
+
+export interface DiagrammConfig {
+  typ: 'angebot-nachfrage' | 'konjunkturzyklus' | 'bilanz' | 'custom';
+  achsen?: { x: string; y: string };
+  elemente?: DiagrammElement[];
+}
+
+export interface DiagrammElement {
+  typ: string;
+  label: string;
+  daten: unknown;
+}
+
+export interface CanvasConfig {
+  breite: number;
+  hoehe: number;
+  koordinatensystem: boolean;
+  achsenBeschriftung?: { x: string; y: string };
+  werkzeuge: ('stift' | 'linie' | 'pfeil' | 'text' | 'rechteck')[];
+}
+
+export type Frage = MCFrage | FreitextFrage | ZuordnungFrage | LueckentextFrage | VisualisierungFrage;

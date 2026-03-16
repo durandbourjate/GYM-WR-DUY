@@ -1,0 +1,76 @@
+import type { Antwort } from '../types/antworten.ts'
+
+const IDB_NAME = 'pruefung-backup'
+const IDB_STORE = 'antworten'
+const IDB_VERSION = 1
+
+// === IndexedDB Helpers ===
+
+function openDB(): Promise<IDBDatabase> {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(IDB_NAME, IDB_VERSION)
+    request.onupgradeneeded = () => {
+      const db = request.result
+      if (!db.objectStoreNames.contains(IDB_STORE)) {
+        db.createObjectStore(IDB_STORE)
+      }
+    }
+    request.onsuccess = () => resolve(request.result)
+    request.onerror = () => reject(request.error)
+  })
+}
+
+export async function saveToIndexedDB(
+  pruefungId: string,
+  antworten: Record<string, Antwort>,
+  startzeit: string | null
+): Promise<void> {
+  try {
+    const db = await openDB()
+    const tx = db.transaction(IDB_STORE, 'readwrite')
+    const store = tx.objectStore(IDB_STORE)
+    store.put(
+      {
+        antworten,
+        startzeit,
+        timestamp: new Date().toISOString(),
+      },
+      pruefungId
+    )
+    await new Promise<void>((resolve, reject) => {
+      tx.oncomplete = () => resolve()
+      tx.onerror = () => reject(tx.error)
+    })
+  } catch (e) {
+    console.warn('IndexedDB Save fehlgeschlagen:', e)
+  }
+}
+
+export async function loadFromIndexedDB(
+  pruefungId: string
+): Promise<{ antworten: Record<string, Antwort>; startzeit: string | null; timestamp: string } | null> {
+  try {
+    const db = await openDB()
+    const tx = db.transaction(IDB_STORE, 'readonly')
+    const store = tx.objectStore(IDB_STORE)
+    const request = store.get(pruefungId)
+    return new Promise((resolve, reject) => {
+      request.onsuccess = () => resolve(request.result ?? null)
+      request.onerror = () => reject(request.error)
+    })
+  } catch (e) {
+    console.warn('IndexedDB Load fehlgeschlagen:', e)
+    return null
+  }
+}
+
+export async function clearIndexedDB(pruefungId: string): Promise<void> {
+  try {
+    const db = await openDB()
+    const tx = db.transaction(IDB_STORE, 'readwrite')
+    const store = tx.objectStore(IDB_STORE)
+    store.delete(pruefungId)
+  } catch (e) {
+    console.warn('IndexedDB Clear fehlgeschlagen:', e)
+  }
+}

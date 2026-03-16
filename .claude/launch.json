@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "pruefung-dev",
+      "runtimeExecutable": "/Users/durandbourjate/Documents/-Gym Hofwil/00 Automatisierung Unterricht/10 Github/GYM-WR-DUY/Pruefung/node_modules/.bin/vite",
+      "runtimeArgs": ["--root", "/Users/durandbourjate/Documents/-Gym Hofwil/00 Automatisierung Unterricht/10 Github/GYM-WR-DUY/Pruefung", "--port", "5174"],
+      "port": 5174
+    }
+  ]
+}

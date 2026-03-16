@@ -24,9 +24,11 @@ jobs:
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: Unterrichtsplaner/package-lock.json
+          cache-dependency-path: |
+            Unterrichtsplaner/package-lock.json
+            Pruefung/package-lock.json
 
-      - name: Install dependencies
+      - name: Install Unterrichtsplaner dependencies
         working-directory: Unterrichtsplaner
         run: npm ci
 
@@ -34,15 +36,25 @@ jobs:
         working-directory: Unterrichtsplaner
         run: npx tsc -b && npx vite build
 
-      # Combine: repo root (Uebungen etc.) + Unterrichtsplaner build
+      - name: Install Pruefung dependencies
+        working-directory: Pruefung
+        run: npm ci
+
+      - name: Build Pruefung
+        working-directory: Pruefung
+        run: npx tsc -b && npx vite build
+
+      # Combine: repo root (Uebungen etc.) + Unterrichtsplaner + Pruefung builds
       - name: Prepare combined site
         run: |
-          mkdir -p _site/Unterrichtsplaner
+          mkdir -p _site/Unterrichtsplaner _site/Pruefung
           # Copy static content (Uebungen + root landing page)
           cp -r Uebungen _site/Uebungen
           cp index.html _site/ 2>/dev/null || true
           # Copy Unterrichtsplaner build output
           cp -r Unterrichtsplaner/dist/* _site/Unterrichtsplaner/
+          # Copy Pruefung build output
+          cp -r Pruefung/dist/* _site/Pruefung/
           # Clean up macOS artifacts
           find _site -name '.DS_Store' -delete
 
