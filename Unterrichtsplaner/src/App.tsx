@@ -10,6 +10,7 @@ import { DetailPanel } from './components/DetailPanel';
 import { InsertDialog } from './components/InsertDialog';
 import { ZoomMultiYearView } from './components/ZoomMultiYearView';
 import { WelcomeScreen } from './components/PlannerTabs';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 function App() {
   const { instances, activeId, setActive } = useInstanceStore();
@@ -281,6 +282,7 @@ function PlannerContent() {
 
       <div className="flex" style={{ height: 'calc(100vh - 36px)' }}>
         <div className="overflow-auto flex-1" style={{ paddingBottom: 20, marginRight: (sidePanelOpen || sequencePanelOpen) ? panelWidth : 0 }}>
+          <ErrorBoundary fallbackLabel="Planungsraster">
           {allCourses.length === 0 ? (
             /* Empty state: no courses configured */
             <div className="flex flex-col items-center justify-center h-full text-center px-8">
@@ -330,10 +332,13 @@ function PlannerContent() {
               </table>
             </>
           )}
+          </ErrorBoundary>
         </div>
       </div>
 
-      <DetailPanel />
+      <ErrorBoundary fallbackLabel="Detail-Panel">
+        <DetailPanel />
+      </ErrorBoundary>
     </>
   );
 }

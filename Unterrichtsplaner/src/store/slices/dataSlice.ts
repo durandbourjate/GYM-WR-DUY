@@ -3,7 +3,6 @@ import type { PlannerState } from '../plannerStore';
 import type { Week, LessonEntry, LessonDetail, Course, HKGroup, TaFPhase } from '../../types';
 import type { PlannerSettings } from '../settingsStore';
 import { COURSES } from '../../data/courses';
-import { INITIAL_LESSON_DETAILS } from '../../data/initialLessonDetails';
 import { configToCourses, loadSettings } from '../settingsStore';
 
 // === DataSlice Interface ===
@@ -96,7 +95,7 @@ export const createDataSlice: StateCreator<PlannerState, [], [], DataSlice> = (s
       return result;
     }),
   // Lesson Details
-  lessonDetails: { ...INITIAL_LESSON_DETAILS },
+  lessonDetails: {},
   updateLessonDetail: (weekW, col, detail) =>
     set((state) => {
       const key = `${weekW}-${col}`;

@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { INITIAL_LESSON_DETAILS } from '../data/initialLessonDetails';
 import { instanceStorageKey, generateWeekIds, useInstanceStore } from './instanceStore';
 import { applySettingsToWeekData, loadSettings } from './settingsStore';
 import { createUISlice, type UISlice } from './slices/uiSlice';
@@ -59,16 +58,9 @@ export const usePlannerStore = create<PlannerState>()(
           return { ...state, sequences: [], sequencesMigrated: false, sequenceTitlesFixed: false };
         }
         if (version < 3) {
-          // Merge initial lesson details (from Excel) without overwriting user edits
-          const existing = (state.lessonDetails || {}) as Record<string, unknown>;
-          const merged = { ...INITIAL_LESSON_DETAILS };
-          // User edits take precedence
-          for (const [key, val] of Object.entries(existing)) {
-            if (val && typeof val === 'object') {
-              merged[key] = { ...(merged[key] || {}), ...val } as typeof merged[string];
-            }
-          }
-          return { ...state, lessonDetails: merged };
+          // Legacy-Migration: lessonDetails werden unverändert übernommen
+          // (INITIAL_LESSON_DETAILS-Merge entfernt — Bundle-Optimierung v3.101)
+          return { ...state, lessonDetails: state.lessonDetails || {} };
         }
         return persisted;
       },
