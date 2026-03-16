@@ -26,8 +26,8 @@ export default function AbgabeDialog({ onSchliessen }: Props) {
     return (
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
         <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-8 max-w-md w-full text-center">
-          <div className="w-16 h-16 mx-auto mb-4 bg-green-500 rounded-full flex items-center justify-center">
-            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-16 h-16 mx-auto mb-4 bg-slate-700 dark:bg-slate-300 rounded-full flex items-center justify-center">
+            <svg className="w-8 h-8 text-white dark:text-slate-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
             </svg>
           </div>
@@ -57,20 +57,23 @@ export default function AbgabeDialog({ onSchliessen }: Props) {
           <StatusZeile
             label="Beantwortet"
             wert={`${beantwortet} von ${fragen.length}`}
-            farbe="text-green-600 dark:text-green-400"
+            icon={'\u2713'}
+            farbe="text-green-700 dark:text-green-400"
           />
           {unbeantwortet > 0 && (
             <StatusZeile
               label="Nicht beantwortet"
               wert={`${unbeantwortet}`}
-              farbe="text-red-600 dark:text-red-400"
+              icon={'\u2717'}
+              farbe="text-red-700 dark:text-red-400"
             />
           )}
           {markiert > 0 && (
             <StatusZeile
               label="Als unsicher markiert"
               wert={`${markiert}`}
-              farbe="text-orange-600 dark:text-orange-400"
+              icon="?"
+              farbe="text-amber-700 dark:text-amber-400"
             />
           )}
         </div>
@@ -92,7 +95,7 @@ export default function AbgabeDialog({ onSchliessen }: Props) {
           </button>
           <button
             onClick={handleAbgabe}
-            className="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-colors cursor-pointer font-medium"
+            className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-900 dark:bg-slate-200 dark:hover:bg-slate-100 text-white dark:text-slate-800 rounded-xl transition-colors cursor-pointer font-medium"
           >
             Definitiv abgeben
           </button>
@@ -105,15 +108,20 @@ export default function AbgabeDialog({ onSchliessen }: Props) {
 function StatusZeile({
   label,
   wert,
+  icon,
   farbe,
 }: {
   label: string
   wert: string
+  icon: string
   farbe: string
 }) {
   return (
     <div className="flex justify-between text-sm">
-      <span className="text-slate-600 dark:text-slate-300">{label}</span>
+      <span className="text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
+        <span className={`font-bold ${farbe}`}>{icon}</span>
+        {label}
+      </span>
       <span className={`font-semibold ${farbe}`}>{wert}</span>
     </div>
   )

@@ -42,12 +42,12 @@ export default function LueckentextFrage({ frage }: Props) {
 
       {/* Fragetext */}
       <div
-        className="text-base leading-relaxed text-slate-800 dark:text-slate-200"
+        className="text-base leading-relaxed text-slate-800 dark:text-slate-100"
         dangerouslySetInnerHTML={{ __html: renderMarkdown(frage.fragetext) }}
       />
 
       {/* Text mit Inline-Inputs */}
-      <div className="text-base leading-loose text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700">
+      <div className="text-base leading-loose text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700">
         {teile.map((teil, i) => {
           const match = teil.match(/^\{\{(\d+)\}\}$/)
           if (match) {
@@ -61,18 +61,17 @@ export default function LueckentextFrage({ frage }: Props) {
                 onChange={(e) => handleChange(lueckenId, e.target.value)}
                 disabled={abgegeben}
                 placeholder={`Lücke ${lueckenId}`}
-                className={`inline-block mx-1 px-3 py-1 w-48 text-base border-b-2 bg-transparent outline-none transition-colors
+                className={`inline-block mx-1 px-3 py-1 w-48 text-base border-b-2 bg-transparent outline-none transition-colors text-slate-800 dark:text-slate-100
                   ${abgegeben
                     ? 'border-slate-300 dark:border-slate-600 opacity-75'
                     : wert
-                      ? 'border-blue-500 dark:border-blue-400'
-                      : 'border-slate-400 dark:border-slate-500 focus:border-blue-500 dark:focus:border-blue-400'
+                      ? 'border-slate-600 dark:border-slate-300'
+                      : 'border-slate-400 dark:border-slate-500 focus:border-slate-700 dark:focus:border-slate-300'
                   }
                 `}
               />
             )
           }
-          // Normaler Text — via dangerouslySetInnerHTML weil er Markdown enthalten kann
           return <span key={i} dangerouslySetInnerHTML={{ __html: renderMarkdown(teil) }} />
         })}
       </div>

@@ -1,6 +1,7 @@
 import type { PruefungsConfig } from '../types/pruefung.ts'
 import type { Frage } from '../types/fragen.ts'
 import { usePruefungStore } from '../store/pruefungStore.ts'
+import ThemeToggle from './ThemeToggle.tsx'
 
 interface Props {
   config: PruefungsConfig
@@ -14,7 +15,6 @@ export default function Startbildschirm({ config, fragen, wiederhergestellt }: P
 
   function handleStart() {
     if (wiederhergestellt) {
-      // Sitzung wiederherstellen — nicht neu starten
       setPhase('pruefung')
     } else {
       pruefungStarten(config, fragen)
@@ -24,12 +24,17 @@ export default function Startbildschirm({ config, fragen, wiederhergestellt }: P
   const gesamtFragen = config.abschnitte.reduce((sum, a) => sum + a.fragenIds.length, 0)
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900 p-4 relative">
+      {/* Theme-Toggle oben rechts */}
+      <div className="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
+
       <div className="max-w-lg w-full bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700 p-8">
-        {/* Logo / Titel */}
+        {/* Titel */}
         <div className="text-center mb-8">
-          <div className="w-16 h-16 mx-auto mb-4 bg-blue-600 rounded-2xl flex items-center justify-center">
-            <span className="text-white text-2xl font-bold">WR</span>
+          <div className="w-16 h-16 mx-auto mb-4 bg-slate-800 dark:bg-slate-200 rounded-2xl flex items-center justify-center">
+            <span className="text-white dark:text-slate-800 text-2xl font-bold">WR</span>
           </div>
           <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-1">
             {config.titel}
@@ -78,10 +83,10 @@ export default function Startbildschirm({ config, fragen, wiederhergestellt }: P
           <p>Antworten werden automatisch gespeichert.</p>
         </div>
 
-        {/* Start-Button */}
+        {/* Start-Button — neutral */}
         <button
           onClick={handleStart}
-          className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white text-lg font-semibold rounded-xl transition-colors cursor-pointer"
+          className="w-full py-3 bg-slate-800 hover:bg-slate-900 dark:bg-slate-200 dark:hover:bg-slate-100 text-white dark:text-slate-800 text-lg font-semibold rounded-xl transition-colors cursor-pointer"
         >
           {wiederhergestellt ? 'Sitzung fortsetzen' : 'Prüfung starten'}
         </button>

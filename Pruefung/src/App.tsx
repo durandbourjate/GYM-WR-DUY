@@ -7,6 +7,10 @@ import type { PruefungsConfig } from './types/pruefung.ts'
 import Startbildschirm from './components/Startbildschirm.tsx'
 import Layout from './components/Layout.tsx'
 import FragenUebersicht from './components/FragenUebersicht.tsx'
+import ThemeToggle from './components/ThemeToggle.tsx'
+
+// Theme-Store importieren damit er initialisiert wird
+import './store/themeStore.ts'
 
 export default function App() {
   const phase = usePruefungStore((s) => s.phase)
@@ -76,10 +80,13 @@ function resolveFragenFuerPruefung(config: PruefungsConfig, alleFragen: Frage[])
 
 function AbgabeBestaetigung() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900 p-4 relative">
+      <div className="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
       <div className="max-w-md w-full bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700 p-8 text-center">
-        <div className="w-16 h-16 mx-auto mb-4 bg-green-500 rounded-full flex items-center justify-center">
-          <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="w-16 h-16 mx-auto mb-4 bg-slate-700 dark:bg-slate-300 rounded-full flex items-center justify-center">
+          <svg className="w-8 h-8 text-white dark:text-slate-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
           </svg>
         </div>

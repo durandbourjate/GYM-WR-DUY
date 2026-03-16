@@ -45,26 +45,39 @@ export default function FragenNavigation() {
               const istBeantwortet = !!antworten[frageId]
               const istMarkiert = !!markierungen[frageId]
 
+              // Status: Icons + dezente Farbe
+              let bgClass: string
+              let statusIcon: string | null = null
+
+              if (istMarkiert) {
+                bgClass = 'bg-amber-50 text-amber-800 border border-amber-300 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-700'
+                statusIcon = '?'
+              } else if (istBeantwortet) {
+                bgClass = 'bg-slate-100 text-slate-700 border border-slate-300 dark:bg-slate-700 dark:text-slate-200 dark:border-slate-600'
+                statusIcon = '\u2713'
+              } else {
+                bgClass = 'bg-white text-slate-500 border border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-600'
+              }
+
               return (
                 <button
                   key={frageId}
                   onClick={() => navigiere(idx)}
                   title={frage ? `${frage.fachbereich}: ${frage.thema}` : frageId}
-                  className={`w-9 h-9 rounded-lg text-sm font-medium transition-all flex items-center justify-center
-                    ${istAktuell
-                      ? 'ring-2 ring-blue-500 ring-offset-1 dark:ring-offset-slate-800'
-                      : ''
-                    }
-                    ${istMarkiert
-                      ? 'bg-orange-400 text-white dark:bg-orange-600'
-                      : istBeantwortet
-                        ? 'bg-green-500 text-white dark:bg-green-600'
-                        : 'bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300'
-                    }
+                  className={`w-9 h-9 rounded-lg text-sm font-medium transition-all flex items-center justify-center relative
+                    ${istAktuell ? 'ring-2 ring-slate-500 ring-offset-1 dark:ring-slate-400 dark:ring-offset-slate-800' : ''}
+                    ${bgClass}
                     hover:scale-110 cursor-pointer
                   `}
                 >
                   {idx + 1}
+                  {statusIcon && (
+                    <span className={`absolute -top-1 -right-1 text-[10px] font-bold leading-none
+                      ${istMarkiert ? 'text-amber-600 dark:text-amber-400' : 'text-green-600 dark:text-green-400'}
+                    `}>
+                      {statusIcon}
+                    </span>
+                  )}
                 </button>
               )
             })}
@@ -75,20 +88,20 @@ export default function FragenNavigation() {
       {/* Legende */}
       <div className="flex flex-wrap gap-3 text-xs text-slate-500 dark:text-slate-400 mt-2 pt-2 border-t border-slate-200 dark:border-slate-700">
         <span className="flex items-center gap-1">
-          <span className="w-3 h-3 rounded bg-slate-200 dark:bg-slate-700 inline-block" /> Offen
+          <span className="w-3 h-3 rounded border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 inline-block" /> Offen
         </span>
         <span className="flex items-center gap-1">
-          <span className="w-3 h-3 rounded bg-green-500 inline-block" /> Beantwortet
+          <span className="text-green-600 dark:text-green-400 font-bold">{'\u2713'}</span> Beantwortet
         </span>
         <span className="flex items-center gap-1">
-          <span className="w-3 h-3 rounded bg-orange-400 inline-block" /> Unsicher
+          <span className="text-amber-600 dark:text-amber-400 font-bold">?</span> Unsicher
         </span>
       </div>
 
       {/* Übersicht-Button */}
       <button
         onClick={() => setPhase('uebersicht')}
-        className="mt-2 text-sm text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
+        className="mt-2 text-sm text-slate-600 dark:text-slate-400 hover:underline cursor-pointer"
       >
         Übersicht anzeigen
       </button>

@@ -44,7 +44,7 @@ export default function MCFrage({ frage }: Props) {
           {frage.punkte} {frage.punkte === 1 ? 'Punkt' : 'Punkte'}
         </span>
         {frage.mehrfachauswahl && (
-          <span className="text-xs px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300">
+          <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300">
             Mehrfachauswahl
           </span>
         )}
@@ -52,7 +52,7 @@ export default function MCFrage({ frage }: Props) {
 
       {/* Fragetext */}
       <div
-        className="text-base leading-relaxed text-slate-800 dark:text-slate-200"
+        className="text-base leading-relaxed text-slate-800 dark:text-slate-100"
         dangerouslySetInnerHTML={{ __html: renderMarkdown(frage.fragetext) }}
       />
 
@@ -67,8 +67,8 @@ export default function MCFrage({ frage }: Props) {
               disabled={abgegeben}
               className={`flex items-start gap-3 p-4 rounded-xl border-2 text-left transition-all cursor-pointer
                 ${istGewaehlt
-                  ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-400'
-                  : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 bg-white dark:bg-slate-800'
+                  ? 'border-slate-700 bg-slate-50 dark:bg-slate-700/50 dark:border-slate-300'
+                  : 'border-slate-200 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-500 bg-white dark:bg-slate-800'
                 }
                 ${abgegeben ? 'opacity-75 cursor-not-allowed' : ''}
               `}
@@ -76,12 +76,12 @@ export default function MCFrage({ frage }: Props) {
               {/* Radio / Checkbox Icon */}
               <span className={`mt-0.5 flex-shrink-0 w-5 h-5 rounded-${frage.mehrfachauswahl ? 'md' : 'full'} border-2 flex items-center justify-center
                 ${istGewaehlt
-                  ? 'border-blue-500 bg-blue-500 dark:border-blue-400 dark:bg-blue-400'
+                  ? 'border-slate-700 bg-slate-700 dark:border-slate-300 dark:bg-slate-300'
                   : 'border-slate-300 dark:border-slate-600'
                 }
               `}>
                 {istGewaehlt && (
-                  <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 12 12">
+                  <svg className="w-3 h-3 text-white dark:text-slate-900" fill="currentColor" viewBox="0 0 12 12">
                     <path d="M10.28 2.28L3.989 8.575 1.695 6.28A1 1 0 00.28 7.695l3 3a1 1 0 001.414 0l7-7A1 1 0 0010.28 2.28z" />
                   </svg>
                 )}
@@ -92,7 +92,7 @@ export default function MCFrage({ frage }: Props) {
                 <span className="font-semibold text-slate-500 dark:text-slate-400 mr-2">
                   {option.id.toUpperCase()})
                 </span>
-                <span className="text-slate-700 dark:text-slate-200">{option.text}</span>
+                <span className="text-slate-800 dark:text-slate-100">{option.text}</span>
               </div>
             </button>
           )

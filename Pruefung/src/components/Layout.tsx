@@ -5,6 +5,7 @@ import VerbindungsStatus from './VerbindungsStatus.tsx'
 import AutoSaveIndikator from './AutoSaveIndikator.tsx'
 import FragenNavigation from './FragenNavigation.tsx'
 import AbgabeDialog from './AbgabeDialog.tsx'
+import ThemeToggle from './ThemeToggle.tsx'
 import MCFrage from './fragetypen/MCFrage.tsx'
 import FreitextFrage from './fragetypen/FreitextFrage.tsx'
 import LueckentextFrage from './fragetypen/LueckentextFrage.tsx'
@@ -49,18 +50,90 @@ export default function Layout() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex flex-col">
-      {/* Header */}
-      <header className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-4 py-3 flex items-center justify-between gap-4 sticky top-0 z-20">
-        <div className="flex items-center gap-3 min-w-0">
-          <h1 className="text-sm font-semibold text-slate-800 dark:text-slate-100 truncate">
-            {config.titel}
-          </h1>
-          <AutoSaveIndikator />
+      {/* Header — alle Steuerungen */}
+      <header className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-3 py-2 sticky top-0 z-20">
+        <div className="flex items-center justify-between gap-2">
+          {/* Links: Zurück / Frage X/Y / Weiter */}
+          <div className="flex items-center gap-1.5">
+            <button
+              onClick={vorherigeFrage}
+              disabled={aktuelleFrageIndex === 0}
+              title="Vorherige Frage"
+              className="px-3 py-1.5 text-sm font-medium text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
+            >
+              &larr;
+            </button>
+            <span className="text-sm text-slate-600 dark:text-slate-300 tabular-nums min-w-[4rem] text-center font-medium">
+              {aktuelleFrageIndex + 1} / {fragen.length}
+            </span>
+            <button
+              onClick={naechsteFrage}
+              disabled={aktuelleFrageIndex === fragen.length - 1}
+              title="Nächste Frage"
+              className="px-3 py-1.5 text-sm font-medium text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
+            >
+              &rarr;
+            </button>
+          </div>
+
+          {/* Mitte: Timer + AutoSave */}
+          <div className="flex items-center gap-2">
+            <AutoSaveIndikator />
+            <Timer />
+          </div>
+
+          {/* Rechts: Markieren + Abgeben + Status + Theme */}
+          <div className="flex items-center gap-1.5">
+            {aktuelleFrage && (
+              <button
+                onClick={() => toggleMarkierung(aktuelleFrage.id)}
+                title={istMarkiert ? 'Markierung entfernen' : 'Als unsicher markieren'}
+                className={`px-2 py-1.5 text-xs rounded-lg border transition-colors cursor-pointer hidden sm:flex items-center gap-1
+                  ${istMarkiert
+                    ? 'bg-amber-50 border-amber-300 text-amber-700 dark:bg-amber-900/30 dark:border-amber-700 dark:text-amber-300'
+                    : 'border-slate-300 text-slate-500 dark:border-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
+                  }
+                `}
+              >
+                <span>?</span>
+                <span className="hidden md:inline">{istMarkiert ? 'Markiert' : 'Unsicher'}</span>
+              </button>
+            )}
+
+            {!abgegeben && (
+              <button
+                onClick={() => setZeigAbgabeDialog(true)}
+                className="px-3 py-1.5 text-xs font-semibold text-white bg-slate-700 dark:bg-slate-600 rounded-lg hover:bg-slate-800 dark:hover:bg-slate-500 transition-colors cursor-pointer"
+              >
+                Abgeben
+              </button>
+            )}
+
+            <VerbindungsStatus />
+            <ThemeToggle />
+          </div>
         </div>
-        <div className="flex items-center gap-4">
-          <VerbindungsStatus />
-          <Timer />
-        </div>
+
+        {/* Mobile: Markieren-Button */}
+        {aktuelleFrage && (
+          <div className="sm:hidden mt-1.5 flex items-center gap-2">
+            <button
+              onClick={() => toggleMarkierung(aktuelleFrage.id)}
+              className={`px-2 py-1 text-xs rounded-lg border transition-colors cursor-pointer flex items-center gap-1
+                ${istMarkiert
+                  ? 'bg-amber-50 border-amber-300 text-amber-700 dark:bg-amber-900/30 dark:border-amber-700 dark:text-amber-300'
+                  : 'border-slate-300 text-slate-500 dark:border-slate-600 dark:text-slate-400'
+                }
+              `}
+            >
+              <span>?</span>
+              <span>{istMarkiert ? 'Markiert' : 'Unsicher'}</span>
+            </button>
+            <span className="text-xs text-slate-400 dark:text-slate-500 truncate">
+              {config.titel}
+            </span>
+          </div>
+        )}
       </header>
 
       {/* Main */}
@@ -73,27 +146,6 @@ export default function Layout() {
         {/* Fragenbereich */}
         <main className="flex-1 p-4 md:p-8 overflow-auto">
           <div className="max-w-3xl mx-auto">
-            {/* Fragen-Nummer */}
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-sm text-slate-500 dark:text-slate-400">
-                Frage {aktuelleFrageIndex + 1} von {fragen.length}
-              </span>
-              {aktuelleFrage && (
-                <button
-                  onClick={() => toggleMarkierung(aktuelleFrage.id)}
-                  className={`text-xs px-3 py-1.5 rounded-full border transition-colors cursor-pointer
-                    ${istMarkiert
-                      ? 'bg-orange-100 border-orange-300 text-orange-700 dark:bg-orange-900/30 dark:border-orange-700 dark:text-orange-300'
-                      : 'border-slate-300 text-slate-500 dark:border-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
-                    }
-                  `}
-                >
-                  {istMarkiert ? 'Markiert als unsicher' : 'Als unsicher markieren'}
-                </button>
-              )}
-            </div>
-
-            {/* Frage rendern */}
             {aktuelleFrage && renderFrage(aktuelleFrage)}
 
             {/* Mobile Navigation (Kacheln) */}
@@ -103,34 +155,6 @@ export default function Layout() {
           </div>
         </main>
       </div>
-
-      {/* Footer */}
-      <footer className="bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 px-4 py-3 flex items-center justify-between">
-        <button
-          onClick={vorherigeFrage}
-          disabled={aktuelleFrageIndex === 0}
-          className="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
-        >
-          Zurück
-        </button>
-
-        {!abgegeben && (
-          <button
-            onClick={() => setZeigAbgabeDialog(true)}
-            className="px-5 py-2 text-sm font-semibold text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors cursor-pointer"
-          >
-            Abgeben
-          </button>
-        )}
-
-        <button
-          onClick={naechsteFrage}
-          disabled={aktuelleFrageIndex === fragen.length - 1}
-          className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
-        >
-          Weiter
-        </button>
-      </footer>
 
       {/* Abgabe-Dialog */}
       {zeigAbgabeDialog && (
