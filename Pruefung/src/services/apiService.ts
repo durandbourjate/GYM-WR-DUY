@@ -108,15 +108,25 @@ export const apiService = {
 
     try {
       const url = `${APPS_SCRIPT_URL}?action=ladeAlleConfigs&email=${encodeURIComponent(email)}`
+      console.log('[API] ladeAlleConfigs → GET', url)
       const response = await fetch(url)
+      console.log('[API] ladeAlleConfigs ← Status:', response.status, '| URL:', response.url)
       if (!response.ok) return null
 
-      const data = await response.json()
-      if (data.error) {
-        console.error('[API] Configs-Fehler:', data.error)
+      const text = await response.text()
+      console.log('[API] ladeAlleConfigs ← Body:', text.slice(0, 500))
+
+      try {
+        const data = JSON.parse(text)
+        if (data.error) {
+          console.error('[API] Configs-Fehler:', data.error)
+          return null
+        }
+        return data.configs ?? []
+      } catch {
+        console.error('[API] ladeAlleConfigs: Antwort ist kein JSON:', text.slice(0, 200))
         return null
       }
-      return data.configs ?? []
     } catch (error) {
       console.error('[API] Configs-Netzwerkfehler:', error)
       return null
@@ -129,15 +139,25 @@ export const apiService = {
 
     try {
       const url = `${APPS_SCRIPT_URL}?action=ladeFragenbank&email=${encodeURIComponent(email)}`
+      console.log('[API] ladeFragenbank → GET', url)
       const response = await fetch(url)
+      console.log('[API] ladeFragenbank ← Status:', response.status, '| URL:', response.url)
       if (!response.ok) return null
 
-      const data = await response.json()
-      if (data.error) {
-        console.error('[API] Fragenbank-Fehler:', data.error)
+      const text = await response.text()
+      console.log('[API] ladeFragenbank ← Body:', text.slice(0, 500))
+
+      try {
+        const data = JSON.parse(text)
+        if (data.error) {
+          console.error('[API] Fragenbank-Fehler:', data.error)
+          return null
+        }
+        return data.fragen ?? []
+      } catch {
+        console.error('[API] ladeFragenbank: Antwort ist kein JSON:', text.slice(0, 200))
         return null
       }
-      return data.fragen ?? []
     } catch (error) {
       console.error('[API] Fragenbank-Netzwerkfehler:', error)
       return null
@@ -146,20 +166,45 @@ export const apiService = {
 
   /** Prüfungs-Config speichern (Composer → Configs-Sheet) */
   async speichereConfig(email: string, config: PruefungsConfig): Promise<boolean> {
-    if (!APPS_SCRIPT_URL) return false
+    if (!APPS_SCRIPT_URL) {
+      console.warn('[API] speichereConfig: Kein APPS_SCRIPT_URL konfiguriert')
+      return false
+    }
 
     try {
+      const payload = JSON.stringify({ action: 'speichereConfig', email, config })
+      console.log('[API] speichereConfig → POST', APPS_SCRIPT_URL, '| Payload-Länge:', payload.length)
+
       const response = await fetch(APPS_SCRIPT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify({ action: 'speichereConfig', email, config }),
+        body: payload,
       })
-      if (!response.ok) return false
 
-      const data = await response.json()
-      return data.success === true
+      console.log('[API] speichereConfig ← Status:', response.status, response.statusText, '| URL:', response.url)
+
+      if (!response.ok) {
+        const text = await response.text()
+        console.error('[API] speichereConfig: Response nicht ok:', text.slice(0, 500))
+        return false
+      }
+
+      const text = await response.text()
+      console.log('[API] speichereConfig ← Body:', text.slice(0, 500))
+
+      try {
+        const data = JSON.parse(text)
+        if (data.error) {
+          console.error('[API] speichereConfig: Server-Fehler:', data.error)
+          return false
+        }
+        return data.success === true
+      } catch {
+        console.error('[API] speichereConfig: Antwort ist kein JSON:', text.slice(0, 200))
+        return false
+      }
     } catch (error) {
-      console.error('[API] Config-Save-Fehler:', error)
+      console.error('[API] speichereConfig: Netzwerkfehler:', error)
       return false
     }
   },
