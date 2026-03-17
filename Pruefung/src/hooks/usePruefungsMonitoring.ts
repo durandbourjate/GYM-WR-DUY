@@ -3,6 +3,7 @@ import { usePruefungStore } from '../store/pruefungStore.ts'
 import { useAuthStore } from '../store/authStore.ts'
 import { apiService } from '../services/apiService.ts'
 import { saveToIndexedDB } from '../services/autoSave.ts'
+import { enqueue, processQueue } from '../services/retryQueue.ts'
 import type { Antwort } from '../types/antworten.ts'
 
 /**
@@ -73,6 +74,14 @@ export function usePruefungsMonitoring(): void {
       } else {
         setVerbindungsstatus('offline')
         incrementNetzwerkFehler()
+        // In Retry-Queue einfügen
+        enqueue({
+          pruefungId: config.id,
+          email: user.email,
+          antworten: antwortenRef.current as Record<string, Antwort>,
+          version: remoteSaveVersionRef.current + 1,
+          istAbgabe: false,
+        })
       }
     }, intervallMs)
 
@@ -135,6 +144,10 @@ export function usePruefungsMonitoring(): void {
 
     function handleOnline(): void {
       setVerbindungsstatus('online')
+      // Retry-Queue verarbeiten wenn wieder online
+      if (backendVerfuegbar) {
+        processQueue()
+      }
     }
 
     function handleOffline(): void {

@@ -6,11 +6,11 @@
 
 ## Aktueller Stand
 
-**Phase 2c: LP-Monitoring-Dashboard + GitHub Actions** (17.03.2026)
+**Phase 2d: ZuordnungFrage + verbesserte Abgabe + Retry-Queue** (17.03.2026)
 
 ### Was funktioniert
 - Startbildschirm mit Prüfungsinfo + Sitzungswiederherstellung
-- 3 Fragetypen: MC (Einzel-/Mehrfachauswahl), Freitext (Tiptap), Lückentext
+- **4 Fragetypen:** MC (Einzel-/Mehrfachauswahl), Freitext (Tiptap), Lückentext, **Zuordnung (NEU)**
 - Fragennavigation mit Kacheln (✓ beantwortet, ? unsicher, — offen)
 - Timer mit Countdown + Warnungen (15 Min. orange, 5 Min. rot)
 - Auto-Save: LocalStorage (sofort) + IndexedDB (15s) + Remote via Apps Script (30s, konfigurierbar)
@@ -31,6 +31,11 @@
 - **NEU: LP-Monitoring-Dashboard** (Live-Übersicht aller SuS: Status, Fortschritt, Heartbeats, Unterbrechungen)
 - **NEU: Rollen-Routing** (LP → Dashboard, SuS → Prüfung, automatisch via E-Mail-Domain)
 - **NEU: GitHub Actions** Env-Variablen für Pruefung-Build (Secrets)
+- **NEU: ZuordnungFrage** (Dropdown-basierte Zuordnung, gemischte Reihenfolge, Fortschrittsanzeige)
+- **NEU: Verbesserte Abgabe** (PruefungsAbgabe-Objekt mit Meta-Daten: SEB, Browser, Heartbeats, Unterbrechungen)
+- **NEU: Abgabe-Dialog** mit Sende-Status (bereit → senden → erfolg/fehler), Retry bei Fehler, localStorage-Fallback
+- **NEU: Retry-Queue** (IndexedDB-basiert, fehlgeschlagene Remote-Saves werden bei Reconnect nachgesendet)
+- **NEU: 8 Demo-Fragen** (3 MC, 3 Freitext, 1 Lückentext, 1 Zuordnung) in 4 Abschnitten
 
 ### Auth-Flow
 1. Kein User → LoginScreen (Google-Button / Schülercode / Demo)
@@ -71,8 +76,8 @@ Pruefung/
 │   │   ├── authStore.ts                 — Auth-State: User, Demo, Login/Logout (NEU)
 │   │   └── themeStore.ts                — Light/Dark/System Mode mit Persist
 │   ├── data/
-│   │   ├── demoFragen.ts                — 7 Demo-Fragen
-│   │   ├── demoPruefung.ts              — Demo-PruefungsConfig (45 Min, 3 Abschnitte)
+│   │   ├── demoFragen.ts                — 8 Demo-Fragen (inkl. Zuordnung)
+│   │   ├── demoPruefung.ts              — Demo-PruefungsConfig (45 Min, 4 Abschnitte)
 │   │   └── demoMonitoring.ts            — Demo-Monitoring-Daten für LP-Dashboard (NEU)
 │   ├── hooks/
 │   │   └── usePruefungsMonitoring.ts    — Zentraler Monitoring-Hook (NEU)
@@ -80,6 +85,7 @@ Pruefung/
 │   │   ├── autoSave.ts                  — IndexedDB Backup
 │   │   ├── remoteSave.ts                — Mock für Remote-Save (Phase 1)
 │   │   ├── sebService.ts               — SEB User-Agent Erkennung (NEU)
+│   │   ├── retryQueue.ts              — IndexedDB Retry-Queue für fehlgeschlagene Saves (NEU)
 │   │   ├── authService.ts              — Google Identity Services Wrapper
 │   │   └── apiService.ts               — Apps Script API Client
 │   ├── components/
@@ -94,12 +100,13 @@ Pruefung/
 │   │   ├── Timer.tsx                    — Countdown mit Warnstufen
 │   │   ├── VerbindungsStatus.tsx        — Online/Offline-Indikator
 │   │   ├── AutoSaveIndikator.tsx        — "Gespeichert ✓" Fade-Animation
-│   │   ├── AbgabeDialog.tsx             — Bestätigungsdialog mit Icons
+│   │   ├── AbgabeDialog.tsx             — Abgabe mit Sende-Status, Retry, Meta-Daten
 │   │   ├── ThemeToggle.tsx              — ☀/🌙 Button
 │   │   └── fragetypen/
 │   │       ├── MCFrage.tsx              — MC mit neutraler Selektion
 │   │       ├── FreitextFrage.tsx        — Tiptap + Heading + ArrowReplace + Auto-Focus
-│   │       └── LueckentextFrage.tsx     — Inline-Inputs
+│   │       ├── LueckentextFrage.tsx     — Inline-Inputs
+│   │       └── ZuordnungFrage.tsx      — Dropdown-Zuordnung mit Fortschritt (NEU)
 │   └── utils/
 │       ├── markdown.ts                  — Einfacher Markdown→HTML Renderer
 │       └── zeit.ts                      — Timer-Hilfsfunktionen
@@ -144,3 +151,4 @@ Danach:
 | *pending* | Phase 2a: Google OAuth Login, Auth-Store, API-Service, LoginScreen, URL-Param (10 Dateien) |
 | *pending* | Phase 2b: Monitoring-Hook, SEB-Erkennung, Focus-Detection, Heartbeat, Remote-Save (4 Dateien) |
 | *pending* | Phase 2c: LP-Monitoring-Dashboard, GitHub Actions Env-Vars, Rollen-Routing (8 Dateien) |
+| *pending* | Phase 2d: ZuordnungFrage, verbesserte Abgabe mit Meta-Daten, Retry-Queue (6 Dateien) |

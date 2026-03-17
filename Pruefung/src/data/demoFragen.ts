@@ -170,6 +170,39 @@ export const demoFragen: Frage[] = [
     hilfstextPlaceholder: 'Benennen Sie die 4P und geben Sie ein konkretes Beispiel...',
   },
 
+  // === ZUORDNUNG ===
+  {
+    id: 'bwl-zu-001',
+    typ: 'zuordnung',
+    version: 1,
+    erstelltAm: jetzt,
+    geaendertAm: jetzt,
+    fachbereich: 'BWL',
+    thema: 'Rechtsformen',
+    semester: ['S1', 'S2'],
+    gefaesse: ['SF'],
+    bloom: 'K2',
+    tags: ['Rechtsformen', 'OR', 'Haftung', 'Kapital'],
+    punkte: 4,
+    musterlosung: 'Einzelunternehmen → Unbeschränkte persönliche Haftung, GmbH → CHF 20 000 Stammkapital, AG → CHF 100 000 Aktienkapital, Kollektivgesellschaft → Alle Gesellschafter haften solidarisch',
+    bewertungsraster: [
+      { beschreibung: 'Alle 4 korrekt', punkte: 4 },
+      { beschreibung: '3 korrekt', punkte: 3 },
+      { beschreibung: '2 korrekt', punkte: 2 },
+      { beschreibung: '1 korrekt', punkte: 1 },
+    ],
+    verwendungen: [],
+    quelle: 'pool',
+    fragetext: 'Ordnen Sie die folgenden **Rechtsformen** ihren charakteristischen Merkmalen zu.',
+    paare: [
+      { links: 'Einzelunternehmen', rechts: 'Unbeschränkte persönliche Haftung' },
+      { links: 'GmbH', rechts: 'CHF 20 000 Stammkapital' },
+      { links: 'AG', rechts: 'CHF 100 000 Aktienkapital' },
+      { links: 'Kollektivgesellschaft', rechts: 'Alle Gesellschafter haften solidarisch' },
+    ],
+    zufallsreihenfolge: true,
+  },
+
   // === LÜCKENTEXT ===
   {
     id: 'recht-lt-001',

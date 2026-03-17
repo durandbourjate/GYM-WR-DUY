@@ -13,7 +13,7 @@ export const demoPruefung: PruefungsConfig = {
   typ: 'summativ',
   modus: 'pruefung',
   dauerMinuten: 45,
-  gesamtpunkte: 20,
+  gesamtpunkte: 24,
 
   erlaubteKlasse: '28abcd WR',
 
@@ -34,6 +34,11 @@ export const demoPruefung: PruefungsConfig = {
       titel: 'Teil C: Lückentext',
       beschreibung: 'Ergänzen Sie die fehlenden Begriffe.',
       fragenIds: ['recht-lt-001'],
+    },
+    {
+      titel: 'Teil D: Zuordnung',
+      beschreibung: 'Ordnen Sie die Begriffe korrekt zu. Verwenden Sie die Dropdown-Menüs.',
+      fragenIds: ['bwl-zu-001'],
     },
   ],
 

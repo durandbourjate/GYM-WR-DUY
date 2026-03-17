@@ -12,7 +12,8 @@ import ThemeToggle from './ThemeToggle.tsx'
 import MCFrage from './fragetypen/MCFrage.tsx'
 import FreitextFrage from './fragetypen/FreitextFrage.tsx'
 import LueckentextFrage from './fragetypen/LueckentextFrage.tsx'
-import type { MCFrage as MCFrageType, FreitextFrage as FreitextFrageType, LueckentextFrage as LueckentextFrageType } from '../types/fragen.ts'
+import ZuordnungFrage from './fragetypen/ZuordnungFrage.tsx'
+import type { MCFrage as MCFrageType, FreitextFrage as FreitextFrageType, LueckentextFrage as LueckentextFrageType, ZuordnungFrage as ZuordnungFrageType } from '../types/fragen.ts'
 
 export default function Layout() {
   const user = useAuthStore((s) => s.user)
@@ -175,7 +176,7 @@ export default function Layout() {
   )
 }
 
-function renderFrage(frage: MCFrageType | FreitextFrageType | LueckentextFrageType | { typ: string }) {
+function renderFrage(frage: MCFrageType | FreitextFrageType | LueckentextFrageType | ZuordnungFrageType | { typ: string }) {
   switch (frage.typ) {
     case 'mc':
       return <MCFrage frage={frage as MCFrageType} />
@@ -183,6 +184,8 @@ function renderFrage(frage: MCFrageType | FreitextFrageType | LueckentextFrageTy
       return <FreitextFrage frage={frage as FreitextFrageType} />
     case 'lueckentext':
       return <LueckentextFrage frage={frage as LueckentextFrageType} />
+    case 'zuordnung':
+      return <ZuordnungFrage frage={frage as ZuordnungFrageType} />
     default:
       return (
         <div className="p-6 bg-slate-100 dark:bg-slate-800 rounded-xl text-slate-500 dark:text-slate-400 text-center">
