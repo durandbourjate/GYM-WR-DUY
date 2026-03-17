@@ -1,5 +1,5 @@
 import { usePruefungStore } from '../store/pruefungStore.ts'
-import { fachbereichFarbe } from './FragenNavigation.tsx'
+import { fachbereichFarbe } from '../utils/fachbereich.ts'
 import { berechneAbschnittFortschritt } from '../utils/abschnitte.ts'
 
 export default function FragenUebersicht() {

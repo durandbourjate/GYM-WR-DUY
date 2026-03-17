@@ -17,7 +17,7 @@ import LueckentextFrage from './fragetypen/LueckentextFrage.tsx'
 import ZuordnungFrage from './fragetypen/ZuordnungFrage.tsx'
 import RichtigFalschFrage from './fragetypen/RichtigFalschFrage.tsx'
 import BerechnungFrage from './fragetypen/BerechnungFrage.tsx'
-import type { MCFrage as MCFrageType, FreitextFrage as FreitextFrageType, LueckentextFrage as LueckentextFrageType, ZuordnungFrage as ZuordnungFrageType, RichtigFalschFrage as RichtigFalschFrageType, BerechnungFrage as BerechnungFrageType } from '../types/fragen.ts'
+import type { Frage, MCFrage as MCFrageType, FreitextFrage as FreitextFrageType, LueckentextFrage as LueckentextFrageType, ZuordnungFrage as ZuordnungFrageType, RichtigFalschFrage as RichtigFalschFrageType, BerechnungFrage as BerechnungFrageType } from '../types/fragen.ts'
 import { findeAbschnitt } from '../utils/abschnitte.ts'
 
 export default function Layout() {
@@ -32,7 +32,6 @@ export default function Layout() {
   const vorherigeFrage = usePruefungStore((s) => s.vorherigeFrage)
   const toggleMarkierung = usePruefungStore((s) => s.toggleMarkierung)
   const [zeigAbgabeDialog, setZeigAbgabeDialog] = useState(false)
-  const [sebWarnungGeschlossen, setSebWarnungGeschlossen] = useState(false)
   const [tabKonfliktGeschlossen, setTabKonfliktGeschlossen] = useState(false)
   const [zeitAbgelaufen, setZeitAbgelaufen] = useState(false)
 
@@ -82,18 +81,12 @@ export default function Layout() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex flex-col">
       {/* SEB-Warnung */}
-      {config.sebErforderlich && !istImSEB() && !sebWarnungGeschlossen && (
+      {/* SEB-Warnung — absichtlich nicht schliessbar */}
+      {config.sebErforderlich && !istImSEB() && (
         <div className="bg-amber-50 dark:bg-amber-900/30 border-b border-amber-300 dark:border-amber-700 px-4 py-2 flex items-center justify-between">
           <p className="text-sm text-amber-800 dark:text-amber-200">
             Diese Prüfung sollte im Safe Exam Browser (SEB) geschrieben werden. Du verwendest einen normalen Browser.
           </p>
-          <button
-            onClick={() => setSebWarnungGeschlossen(true)}
-            className="text-amber-600 dark:text-amber-400 hover:text-amber-800 dark:hover:text-amber-200 text-lg leading-none cursor-pointer"
-            title="Warnung schliessen"
-          >
-            &times;
-          </button>
         </div>
       )}
 
@@ -245,7 +238,7 @@ export default function Layout() {
               </div>
             )}
 
-            {aktuelleFrage && renderFrage(aktuelleFrage)}
+            {aktuelleFrage && <div key={aktuelleFrage.id}>{renderFrage(aktuelleFrage)}</div>}
 
             {/* Mobile Navigation (Kacheln) */}
             <div className="md:hidden mt-6 pt-4 border-t border-slate-200 dark:border-slate-700">
@@ -271,7 +264,7 @@ export default function Layout() {
   )
 }
 
-function renderFrage(frage: MCFrageType | FreitextFrageType | LueckentextFrageType | ZuordnungFrageType | RichtigFalschFrageType | BerechnungFrageType | { typ: string }) {
+function renderFrage(frage: Frage) {
   switch (frage.typ) {
     case 'mc':
       return <MCFrage frage={frage as MCFrageType} />

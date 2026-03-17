@@ -54,7 +54,8 @@ export default function LoginScreen() {
       clearInterval(check)
       clearTimeout(timeout)
     }
-  }, [istProduktion]) // eslint-disable-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps — Einmalige Initialisierung, anmelden/setFehler sind stabil, googleGeladen wuerde Loop verursachen
+  }, [istProduktion])
 
   // Google-Button rendern wenn bereit
   useEffect(() => {

@@ -36,6 +36,17 @@
 - Tab-Konflikterkennung, Error Boundary, Sticky Fragetext
 - Retry-Queue (IndexedDB, fehlgeschlagene Saves bei Reconnect nachsenden)
 - Zeitablauf-Auto-Abgabe, beforeunload-Warnung, Tastaturnavigation
+- **Code-Review-Cleanup (17.03.2026):**
+  - XSS-Schutz: DOMPurify für alle `dangerouslySetInnerHTML`-Stellen
+  - Stale-Closure-Fix: `useRef` für Timer/Intervall-Callbacks
+  - Zustand Persist: `partialize` (config/fragen ausgeschlossen) + Schema-Migration (Version 2)
+  - IndexedDB-Cleanup nach erfolgreicher Abgabe
+  - Custom Bestätigungsdialog statt `confirm()` im Composer
+  - SEB-Warnung nicht mehr schliessbar (State-Bereinigung)
+  - Debug-Logs entfernt aus apiService.ts
+  - remoteSave.ts gelöscht (toter Code)
+  - Shared Utils: `fachbereich.ts` (fachbereichFarbe, typLabel, bloomLabel)
+  - eslint-disable-Stellen: 2 gefixt (Zustand-Actions in Deps), 5 dokumentiert
 
 ### Auth-Flow
 1. Kein User → LoginScreen (Google-Button / Schülercode mit E-Mail / Demo)
@@ -91,7 +102,6 @@ Pruefung/
 │   │   └── useTabKonflikt.ts           — BroadcastChannel Tab-Erkennung
 │   ├── services/
 │   │   ├── autoSave.ts                  — IndexedDB Backup
-│   │   ├── remoteSave.ts                — Mock für Remote-Save (Phase 1)
 │   │   ├── sebService.ts               — SEB User-Agent Erkennung
 │   │   ├── retryQueue.ts              — IndexedDB Retry-Queue für fehlgeschlagene Saves
 │   │   ├── authService.ts              — Google Identity Services Wrapper
@@ -125,6 +135,7 @@ Pruefung/
 │   │       └── BerechnungFrage.tsx     — Numerische Eingabe + Rechenweg
 │   └── utils/
 │       ├── abschnitte.ts               — findeAbschnitt(), berechneAbschnittFortschritt()
+│       ├── fachbereich.ts              — Shared: fachbereichFarbe(), typLabel(), bloomLabel()
 │       ├── markdown.ts                  — Einfacher Markdown→HTML Renderer
 │       └── zeit.ts                      — Timer-Hilfsfunktionen
 ├── seb/
@@ -164,9 +175,14 @@ Ohne diese Variablen funktioniert die App im **Demo-Modus** (Schülercode + Demo
 2. Composer E2E testen (Prüfung erstellen → Fragen zuordnen → Speichern → mit `?id=` öffnen)
 3. Tablet-/Smartphone-Tests
 
+### Code-Review-Rückstand (separat angehen)
+4. **W4: Schülercode-Validierung** — Server-seitige Validierung nötig (Backend-Änderung)
+5. **W5: Focus-Trap für Modals** — Braucht neue Dependency (z.B. `@headlessui/react`) oder viel manueller Code
+6. **W6: FragenEditor Split** — 971 Zeilen, substanzielles Refactoring (Extract Component/Hook)
+
 ### Später
-4. KI-Korrektur (Claude API für Freitext-Bewertung)
-5. Textfeld-Höhe testen (auto-grow vs. begrenzter Bereich)
+7. KI-Korrektur (Claude API für Freitext-Bewertung)
+8. Textfeld-Höhe testen (auto-grow vs. begrenzter Bereich)
 
 ## Commits
 
@@ -186,3 +202,8 @@ Ohne diese Variablen funktioniert die App im **Demo-Modus** (Schülercode + Demo
 | `d1a3d00` | Phase 3: CORS-Fix, E-Mail bei Schülercode-Login, Session-Restore robuster (5 Dateien) |
 | `33cbc2c` | README für Prüfungsplattform erstellt |
 | *pending* | Phase 4: SEB-Konfiguration + Prüfungs-Composer + README (LP-Startseite, 3-Tab-Editor, FragenBrowser, API-Endpoints) |
+| `eb2c085` | HANDOFF: Backend getestet, Nächste Schritte aktualisiert |
+| `65e9e42` | speichereFrage-Endpoint in Apps Script Doku ergänzt |
+| `0c9f0f0` | 2 neue Fragetypen (Richtig/Falsch + Berechnung), FragenEditor, Backend-Fixes |
+| `a6aaeb1` | FragenBrowser: Redesign für Skalierbarkeit mit vielen Fragen |
+| *pending* | Code-Review-Cleanup: Shared Utils, Debug-Logs, toter Code, Custom-Dialoge, eslint-Fixes |

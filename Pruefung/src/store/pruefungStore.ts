@@ -150,9 +150,17 @@ export const usePruefungStore = create<PruefungState>()(
     }),
     {
       name: 'pruefung-state',
+      version: 2,
+      migrate: (persisted, version) => {
+        if (version < 2) {
+          // v1→v2: config und fragen nicht mehr persistieren (werden vom Backend geladen)
+          const state = persisted as Record<string, unknown>
+          delete state.config
+          delete state.fragen
+        }
+        return persisted as PruefungState
+      },
       partialize: (state) => ({
-        config: state.config,
-        fragen: state.fragen,
         aktuelleFrageIndex: state.aktuelleFrageIndex,
         phase: state.phase,
         antworten: state.antworten,

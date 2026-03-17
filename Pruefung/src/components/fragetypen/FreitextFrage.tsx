@@ -7,7 +7,7 @@ import { Extension } from '@tiptap/core'
 import { usePruefungStore } from '../../store/pruefungStore.ts'
 import type { FreitextFrage as FreitextFrageType } from '../../types/fragen.ts'
 import { renderMarkdown } from '../../utils/markdown.ts'
-import { fachbereichFarbe } from '../FragenNavigation.tsx'
+import { fachbereichFarbe } from '../../utils/fachbereich.ts'
 
 interface Props {
   frage: FreitextFrageType
@@ -94,7 +94,8 @@ export default function FreitextFrage({ frage }: Props) {
         editor.commands.clearContent()
       }
     }
-  }, [frage.id]) // eslint-disable-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps — Nur bei Fragewechsel triggern, editor/gespeicherterText wuerden Loop verursachen
+  }, [frage.id])
 
   // Auto-Focus: Cursor automatisch ins Textfeld
   useEffect(() => {

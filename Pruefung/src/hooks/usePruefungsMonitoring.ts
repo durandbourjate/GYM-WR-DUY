@@ -86,7 +86,7 @@ export function usePruefungsMonitoring(): void {
     }, intervallMs)
 
     return () => clearInterval(interval)
-  }, [config, abgegeben, backendVerfuegbar, user]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [config, abgegeben, backendVerfuegbar, user, setVerbindungsstatus, incrementRemoteSaveVersion, setLetzterSave, incrementAutoSaveCount, incrementNetzwerkFehler])
 
   // === 3. Heartbeat (alle 10s, konfigurierbar) ===
   useEffect(() => {
@@ -108,7 +108,7 @@ export function usePruefungsMonitoring(): void {
     }, intervallMs)
 
     return () => clearInterval(interval)
-  }, [config, abgegeben, backendVerfuegbar, user]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [config, abgegeben, backendVerfuegbar, user, incrementHeartbeats, addUnterbrechung])
 
   // === 4. Focus-Detection (visibilitychange) ===
   useEffect(() => {

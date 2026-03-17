@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { usePruefungStore } from '../store/pruefungStore.ts'
 import { useAuthStore } from '../store/authStore.ts'
 import { apiService } from '../services/apiService.ts'
+import { clearIndexedDB } from '../services/autoSave.ts'
 import { sebVersion, browserInfo } from '../services/sebService.ts'
 import { formatUhrzeit } from '../utils/zeit.ts'
 import type { PruefungsAbgabe } from '../types/antworten.ts'
@@ -83,12 +84,15 @@ export default function AbgabeDialog({ onSchliessen }: Props) {
 
       if (erfolg) {
         setStatus('erfolg')
+        // IndexedDB-Backup nach erfolgreicher Abgabe leeren
+        clearIndexedDB(abgabe.pruefungId)
       } else {
         setStatus('fehler')
       }
     } else {
       // Demo-Modus oder kein Backend → direkt Erfolg
       setStatus('erfolg')
+      clearIndexedDB(abgabe.pruefungId)
     }
   }
 
@@ -104,7 +108,12 @@ export default function AbgabeDialog({ onSchliessen }: Props) {
       istAbgabe: true,
     })
 
-    setStatus(erfolg ? 'erfolg' : 'fehler')
+    if (erfolg) {
+      setStatus('erfolg')
+      clearIndexedDB(config?.id ?? 'demo')
+    } else {
+      setStatus('fehler')
+    }
   }
 
   // === Erfolgs-Anzeige ===

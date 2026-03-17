@@ -26,6 +26,18 @@ export default function Timer({ onZeitAbgelaufen }: Props) {
   const [restSekunden, setRestSekunden] = useState<number | null>(null)
   const abgegebenRef = useRef(false)
 
+  // Refs fuer stale-closure Schutz im Interval
+  const antwortenRef = useRef(antworten)
+  antwortenRef.current = antworten
+  const autoSaveCountRef = useRef(autoSaveCount)
+  autoSaveCountRef.current = autoSaveCount
+  const heartbeatsRef = useRef(heartbeats)
+  heartbeatsRef.current = heartbeats
+  const netzwerkFehlerRef = useRef(netzwerkFehler)
+  netzwerkFehlerRef.current = netzwerkFehler
+  const unterbrechungenRef = useRef(unterbrechungen)
+  unterbrechungenRef.current = unterbrechungen
+
   useEffect(() => {
     if (!config || !startzeit || abgegeben) return
 
@@ -41,7 +53,7 @@ export default function Timer({ onZeitAbgelaufen }: Props) {
         // Callback für Banner-Anzeige
         onZeitAbgelaufen?.()
 
-        // Abgabe-Daten in localStorage sichern
+        // Abgabe-Daten in localStorage sichern (Refs fuer aktuellen Stand)
         try {
           const abgabeObjekt = {
             pruefungId: config.id,
@@ -49,14 +61,14 @@ export default function Timer({ onZeitAbgelaufen }: Props) {
             name: user?.name ?? 'Unbekannt',
             startzeit,
             abgabezeit: new Date().toISOString(),
-            antworten,
+            antworten: antwortenRef.current,
             meta: {
               sebVersion: sebVersion(),
               browserInfo: browserInfo(),
-              autoSaveCount,
-              netzwerkFehler,
-              heartbeats,
-              unterbrechungen,
+              autoSaveCount: autoSaveCountRef.current,
+              netzwerkFehler: netzwerkFehlerRef.current,
+              heartbeats: heartbeatsRef.current,
+              unterbrechungen: unterbrechungenRef.current,
               autoAbgabe: true,
             },
           }
@@ -65,12 +77,12 @@ export default function Timer({ onZeitAbgelaufen }: Props) {
           // ignorieren
         }
 
-        // Remote senden (fire-and-forget)
+        // Remote senden (fire-and-forget, aktueller Stand via Ref)
         if (apiService.istKonfiguriert() && !istDemoModus && user?.email) {
           apiService.speichereAntworten({
             pruefungId: config.id,
             email: user.email,
-            antworten,
+            antworten: antwortenRef.current,
             version: -1,
             istAbgabe: true,
           })
@@ -81,7 +93,7 @@ export default function Timer({ onZeitAbgelaufen }: Props) {
     update()
     const interval = setInterval(update, 1000)
     return () => clearInterval(interval)
-  }, [config, startzeit, abgegeben]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [config, startzeit, abgegeben, pruefungAbgeben, onZeitAbgelaufen, user, istDemoModus])
 
   if (!config || restSekunden === null) return null
 

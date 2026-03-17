@@ -46,6 +46,7 @@ export default function PruefungsComposer({ config, onZurueck }: Props) {
   const [speicherStatus, setSpeicherStatus] = useState<'idle' | 'speichern' | 'erfolg' | 'fehler'>('idle')
   const [zeigFragenBrowser, setZeigFragenBrowser] = useState(false)
   const [zielAbschnittIndex, setZielAbschnittIndex] = useState<number>(0)
+  const [loeschDialog, setLoeschDialog] = useState<{ index: number; titel: string } | null>(null)
 
   // Gesamtpunkte berechnen (wird in Vorschau angezeigt)
   const gesamtFragen = pruefung.abschnitte.reduce((s, a) => s + a.fragenIds.length, 0)
@@ -73,9 +74,14 @@ export default function PruefungsComposer({ config, onZurueck }: Props) {
   }
 
   function removeAbschnitt(index: number): void {
-    if (!confirm(`Abschnitt "${pruefung.abschnitte[index].titel}" wirklich löschen?`)) return
-    const abschnitte = pruefung.abschnitte.filter((_, i) => i !== index)
+    setLoeschDialog({ index, titel: pruefung.abschnitte[index].titel })
+  }
+
+  function bestaetigeLoeschen(): void {
+    if (!loeschDialog) return
+    const abschnitte = pruefung.abschnitte.filter((_, i) => i !== loeschDialog.index)
     updatePruefung({ abschnitte })
+    setLoeschDialog(null)
   }
 
   function moveAbschnitt(index: number, richtung: 'hoch' | 'runter'): void {
@@ -111,7 +117,8 @@ export default function PruefungsComposer({ config, onZurueck }: Props) {
       fragenIds: [...abschnitt.fragenIds, ...neueIds],
     })
     setZeigFragenBrowser(false)
-  }, [pruefung.abschnitte, zielAbschnittIndex]) // eslint-disable-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps — updateAbschnitt ist inline-Funktion, wuerde Callback bei jedem Render neu erstellen
+  }, [pruefung.abschnitte, zielAbschnittIndex])
 
   async function handleSpeichern(): Promise<void> {
     // ID generieren wenn neue Prüfung
@@ -241,6 +248,34 @@ export default function PruefungsComposer({ config, onZurueck }: Props) {
           onSchliessen={() => setZeigFragenBrowser(false)}
           bereitsVerwendet={pruefung.abschnitte.flatMap((a) => a.fragenIds)}
         />
+      )}
+
+      {/* Lösch-Bestätigungsdialog */}
+      {loeschDialog && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-6 max-w-sm w-full">
+            <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-2">
+              Abschnitt löschen?
+            </h3>
+            <p className="text-sm text-slate-600 dark:text-slate-300 mb-5">
+              Abschnitt &laquo;{loeschDialog.titel}&raquo; wirklich löschen? Die enthaltenen Fragen werden aus der Prüfung entfernt.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setLoeschDialog(null)}
+                className="flex-1 py-2 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer font-medium text-sm"
+              >
+                Abbrechen
+              </button>
+              <button
+                onClick={bestaetigeLoeschen}
+                className="flex-1 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors cursor-pointer font-medium text-sm"
+              >
+                Löschen
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )

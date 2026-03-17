@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { useAuthStore } from '../../store/authStore.ts'
 import { apiService } from '../../services/apiService.ts'
 import { demoFragen } from '../../data/demoFragen.ts'
+import { fachbereichFarbe, typLabel } from '../../utils/fachbereich.ts'
 import type { Frage, Fachbereich, BloomStufe } from '../../types/fragen.ts'
 import FragenEditor from './FragenEditor.tsx'
 
@@ -81,7 +82,8 @@ export default function FragenBrowser({ onHinzufuegen, onSchliessen, bereitsVerw
       const gruppen = new Set(alleFragen.map((f) => gruppenKey(f, gruppierung)))
       setAufgeklappteGruppen(gruppen)
     }
-  }, [ladeStatus, alleFragen, gruppierung]) // eslint-disable-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps — aufgeklappteGruppen absichtlich ausgeschlossen (wuerde Loop verursachen)
+  }, [ladeStatus, alleFragen, gruppierung])
 
   // Verfügbare Themen (für Filter-Dropdown)
   const verfuegbareThemen = useMemo(() => {
@@ -662,23 +664,3 @@ function gruppenLabelFarbe(key: string, gruppierung: Gruppierung): string {
   return 'text-slate-700 dark:text-slate-200'
 }
 
-function fachbereichFarbe(fb: string): string {
-  switch (fb) {
-    case 'VWL': return 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300'
-    case 'BWL': return 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
-    case 'Recht': return 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
-    default: return 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300'
-  }
-}
-
-function typLabel(typ: string): string {
-  switch (typ) {
-    case 'mc': return 'MC'
-    case 'freitext': return 'Freitext'
-    case 'lueckentext': return 'Lückentext'
-    case 'zuordnung': return 'Zuordnung'
-    case 'richtigfalsch': return 'Richtig/Falsch'
-    case 'berechnung': return 'Berechnung'
-    default: return typ
-  }
-}

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { typLabel, bloomLabel } from '../../utils/fachbereich.ts'
 import type {
   Frage, Fachbereich, BloomStufe, Gefaess,
   MCFrage, FreitextFrage, LueckentextFrage, ZuordnungFrage,
@@ -938,29 +939,6 @@ function generiereFrageId(fachbereich: string, typ: string): string {
   return `${fb}-${typKurz}-${rand}`
 }
 
-function typLabel(typ: string): string {
-  switch (typ) {
-    case 'mc': return 'Multiple Choice'
-    case 'freitext': return 'Freitext'
-    case 'lueckentext': return 'Lückentext'
-    case 'zuordnung': return 'Zuordnung'
-    case 'richtigfalsch': return 'Richtig/Falsch'
-    case 'berechnung': return 'Berechnung'
-    default: return typ
-  }
-}
-
-function bloomLabel(stufe: string): string {
-  switch (stufe) {
-    case 'K1': return 'Wissen'
-    case 'K2': return 'Verstehen'
-    case 'K3': return 'Anwenden'
-    case 'K4': return 'Analysieren'
-    case 'K5': return 'Beurteilen'
-    case 'K6': return 'Erschaffen'
-    default: return ''
-  }
-}
 
 function parseLuecken(text: string): LueckentextFrage['luecken'] {
   const matches = text.match(/\{\{(\d+)\}\}/g)

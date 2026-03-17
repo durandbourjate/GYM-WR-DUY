@@ -108,14 +108,10 @@ export const apiService = {
 
     try {
       const url = `${APPS_SCRIPT_URL}?action=ladeAlleConfigs&email=${encodeURIComponent(email)}`
-      console.log('[API] ladeAlleConfigs → GET', url)
       const response = await fetch(url)
-      console.log('[API] ladeAlleConfigs ← Status:', response.status, '| URL:', response.url)
       if (!response.ok) return null
 
       const text = await response.text()
-      console.log('[API] ladeAlleConfigs ← Body:', text.slice(0, 500))
-
       try {
         const data = JSON.parse(text)
         if (data.error) {
@@ -124,7 +120,7 @@ export const apiService = {
         }
         return data.configs ?? []
       } catch {
-        console.error('[API] ladeAlleConfigs: Antwort ist kein JSON:', text.slice(0, 200))
+        console.error('[API] ladeAlleConfigs: Antwort ist kein JSON')
         return null
       }
     } catch (error) {
@@ -139,14 +135,10 @@ export const apiService = {
 
     try {
       const url = `${APPS_SCRIPT_URL}?action=ladeFragenbank&email=${encodeURIComponent(email)}`
-      console.log('[API] ladeFragenbank → GET', url)
       const response = await fetch(url)
-      console.log('[API] ladeFragenbank ← Status:', response.status, '| URL:', response.url)
       if (!response.ok) return null
 
       const text = await response.text()
-      console.log('[API] ladeFragenbank ← Body:', text.slice(0, 500))
-
       try {
         const data = JSON.parse(text)
         if (data.error) {
@@ -155,7 +147,7 @@ export const apiService = {
         }
         return data.fragen ?? []
       } catch {
-        console.error('[API] ladeFragenbank: Antwort ist kein JSON:', text.slice(0, 200))
+        console.error('[API] ladeFragenbank: Antwort ist kein JSON')
         return null
       }
     } catch (error) {
@@ -166,14 +158,10 @@ export const apiService = {
 
   /** Prüfungs-Config speichern (Composer → Configs-Sheet) */
   async speichereConfig(email: string, config: PruefungsConfig): Promise<boolean> {
-    if (!APPS_SCRIPT_URL) {
-      console.warn('[API] speichereConfig: Kein APPS_SCRIPT_URL konfiguriert')
-      return false
-    }
+    if (!APPS_SCRIPT_URL) return false
 
     try {
       const payload = JSON.stringify({ action: 'speichereConfig', email, config })
-      console.log('[API] speichereConfig → POST', APPS_SCRIPT_URL, '| Payload-Länge:', payload.length)
 
       const response = await fetch(APPS_SCRIPT_URL, {
         method: 'POST',
@@ -181,17 +169,12 @@ export const apiService = {
         body: payload,
       })
 
-      console.log('[API] speichereConfig ← Status:', response.status, response.statusText, '| URL:', response.url)
-
       if (!response.ok) {
-        const text = await response.text()
-        console.error('[API] speichereConfig: Response nicht ok:', text.slice(0, 500))
+        console.error('[API] speichereConfig: Response nicht ok')
         return false
       }
 
       const text = await response.text()
-      console.log('[API] speichereConfig ← Body:', text.slice(0, 500))
-
       try {
         const data = JSON.parse(text)
         if (data.error) {
@@ -200,7 +183,7 @@ export const apiService = {
         }
         return data.success === true
       } catch {
-        console.error('[API] speichereConfig: Antwort ist kein JSON:', text.slice(0, 200))
+        console.error('[API] speichereConfig: Antwort ist kein JSON')
         return false
       }
     } catch (error) {
@@ -211,22 +194,16 @@ export const apiService = {
 
   /** Einzelne Frage speichern (Fragenbank) */
   async speichereFrage(email: string, frage: Frage): Promise<boolean> {
-    if (!APPS_SCRIPT_URL) {
-      console.warn('[API] speichereFrage: Kein APPS_SCRIPT_URL konfiguriert')
-      return false
-    }
+    if (!APPS_SCRIPT_URL) return false
 
     try {
       const payload = JSON.stringify({ action: 'speichereFrage', email, frage })
-      console.log('[API] speichereFrage → POST', APPS_SCRIPT_URL, '| Frage-ID:', frage.id)
 
       const response = await fetch(APPS_SCRIPT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain' },
         body: payload,
       })
-
-      console.log('[API] speichereFrage ← Status:', response.status)
 
       if (!response.ok) return false
 
@@ -239,7 +216,7 @@ export const apiService = {
         }
         return data.success === true
       } catch {
-        console.error('[API] speichereFrage: Antwort ist kein JSON:', text.slice(0, 200))
+        console.error('[API] speichereFrage: Antwort ist kein JSON')
         return false
       }
     } catch (error) {

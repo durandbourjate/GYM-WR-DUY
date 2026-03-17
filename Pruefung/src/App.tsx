@@ -70,7 +70,8 @@ export default function App() {
     }
 
     ladePruefung()
-  }, [user, istDemoModus, pruefungIdAusUrl]) // eslint-disable-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps — config/phase absichtlich ausgeschlossen: Laden nur bei User/URL-Wechsel, nicht bei State-Aenderung
+  }, [user, istDemoModus, pruefungIdAusUrl])
 
   // Auth-Gate: Kein User → Login-Screen
   if (!user) {

@@ -1,6 +1,7 @@
+import DOMPurify from 'dompurify'
 import { usePruefungStore } from '../store/pruefungStore.ts'
 import { useAuthStore } from '../store/authStore.ts'
-import { fachbereichFarbe } from './FragenNavigation.tsx'
+import { fachbereichFarbe } from '../utils/fachbereich.ts'
 import { berechneAbschnittFortschritt } from '../utils/abschnitte.ts'
 import type { Frage, MCFrage, LueckentextFrage, ZuordnungFrage } from '../types/fragen.ts'
 import type { Antwort } from '../types/antworten.ts'
@@ -203,7 +204,7 @@ function FreitextAntwortAnzeige({ text }: { text: string }) {
     return (
       <div
         className="text-sm text-slate-800 dark:text-slate-200 print:text-black bg-slate-50 dark:bg-slate-800 print:bg-slate-50 rounded-lg p-3 border border-slate-200 dark:border-slate-700 print:border-slate-300 prose-zusammenfassung"
-        dangerouslySetInnerHTML={{ __html: text }}
+        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(text) }}
       />
     )
   }

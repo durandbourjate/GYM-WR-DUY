@@ -5,7 +5,7 @@ Digitale Prüfungsplattform für den Wirtschaft-&-Recht-Unterricht am Gymnasium 
 ## Features
 
 **Für Schülerinnen und Schüler**
-- 4 Fragetypen: Multiple Choice, Freitext (Rich Text), Lückentext, Zuordnung
+- 6 Fragetypen: Multiple Choice, Freitext (Rich Text), Lückentext, Zuordnung, Richtig/Falsch, Berechnung
 - Automatisches Speichern (lokal + remote) — kein Datenverlust
 - Timer mit Countdown, Fortschrittsanzeige pro Abschnitt
 - Offline-fähig (PWA): Antworten werden bei Reconnect nachgesendet
@@ -48,7 +48,7 @@ npm run dev
 
 Öffne `http://localhost:5174/GYM-WR-DUY/Pruefung/`
 
-Ohne Backend-Konfiguration startet die App im **Demo-Modus** mit 8 Beispielfragen.
+Ohne Backend-Konfiguration startet die App im **Demo-Modus** mit 10 Beispielfragen.
 
 ### Mit Backend (Google Workspace)
 
@@ -109,7 +109,7 @@ Environment-Variablen werden über GitHub Secrets gesetzt:
 src/
 ├── components/
 │   ├── lp/                    LP-Komponenten (Composer, Monitoring)
-│   ├── fragetypen/            MC, Freitext, Lückentext, Zuordnung
+│   ├── fragetypen/            MC, Freitext, Lückentext, Zuordnung, Richtig/Falsch, Berechnung
 │   └── ...                    Login, Layout, Timer, Abgabe, etc.
 ├── services/                  API, Auth, SEB, Auto-Save, Retry-Queue
 ├── store/                     Zustand Stores (Prüfung, Auth, Theme)
