@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { usePruefungStore } from '../store/pruefungStore.ts'
 import { useAuthStore } from '../store/authStore.ts'
 import { usePruefungsMonitoring } from '../hooks/usePruefungsMonitoring.ts'
+import { usePruefungsUX } from '../hooks/usePruefungsUX.ts'
 import { istImSEB } from '../services/sebService.ts'
 import Timer from './Timer.tsx'
 import VerbindungsStatus from './VerbindungsStatus.tsx'
@@ -27,9 +28,18 @@ export default function Layout() {
   const toggleMarkierung = usePruefungStore((s) => s.toggleMarkierung)
   const [zeigAbgabeDialog, setZeigAbgabeDialog] = useState(false)
   const [sebWarnungGeschlossen, setSebWarnungGeschlossen] = useState(false)
+  const [zeitAbgelaufen, setZeitAbgelaufen] = useState(false)
 
   // Monitoring: Auto-Save (lokal + remote), Heartbeat, Focus-Detection, Online/Offline
   usePruefungsMonitoring()
+
+  // UX: beforeunload-Warnung, Tastaturnavigation, Escape
+  const handleAbgabeDialogSchliessen = useCallback(() => setZeigAbgabeDialog(false), [])
+  const handleAbgabeDialogOeffnen = useCallback(() => setZeigAbgabeDialog(true), [])
+  usePruefungsUX({
+    onAbgabeDialogOeffnen: handleAbgabeDialogOeffnen,
+    onAbgabeDialogSchliessen: handleAbgabeDialogSchliessen,
+  })
 
   if (!config || fragen.length === 0) return null
 
@@ -83,7 +93,7 @@ export default function Layout() {
           {/* Mitte: Timer + AutoSave */}
           <div className="flex items-center gap-2">
             <AutoSaveIndikator />
-            <Timer />
+            <Timer onZeitAbgelaufen={() => setZeitAbgelaufen(true)} />
           </div>
 
           {/* Rechts: Markieren + Abgeben + Status + Theme */}
@@ -167,6 +177,14 @@ export default function Layout() {
           </div>
         </main>
       </div>
+
+      {/* Zeitablauf-Banner */}
+      {zeitAbgelaufen && abgegeben && (
+        <div className="fixed bottom-0 left-0 right-0 bg-red-600 dark:bg-red-700 text-white px-4 py-3 text-center z-30">
+          <p className="font-semibold">Die Zeit ist abgelaufen — Ihre Prüfung wurde automatisch abgegeben.</p>
+          <p className="text-sm text-red-100 mt-1">Ihre Antworten wurden gespeichert. Sie können das Fenster schliessen.</p>
+        </div>
+      )}
 
       {/* Abgabe-Dialog */}
       {zeigAbgabeDialog && (

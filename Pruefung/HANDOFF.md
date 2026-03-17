@@ -6,7 +6,7 @@
 
 ## Aktueller Stand
 
-**Phase 2d: ZuordnungFrage + verbesserte Abgabe + Retry-Queue** (17.03.2026)
+**Phase 2e: Prüfungs-UX (Zeitablauf, Keyboard, Startbildschirm)** (17.03.2026)
 
 ### Was funktioniert
 - Startbildschirm mit Prüfungsinfo + Sitzungswiederherstellung
@@ -36,6 +36,10 @@
 - **NEU: Abgabe-Dialog** mit Sende-Status (bereit → senden → erfolg/fehler), Retry bei Fehler, localStorage-Fallback
 - **NEU: Retry-Queue** (IndexedDB-basiert, fehlgeschlagene Remote-Saves werden bei Reconnect nachgesendet)
 - **NEU: 8 Demo-Fragen** (3 MC, 3 Freitext, 1 Lückentext, 1 Zuordnung) in 4 Abschnitten
+- **NEU: Zeitablauf-Auto-Abgabe** (Timer sendet Daten an Backend + localStorage-Backup + Banner)
+- **NEU: beforeunload-Warnung** (verhindert versehentliches Tab-Schliessen während Prüfung)
+- **NEU: Tastaturnavigation** (← → / Ctrl+← → für Fragen, Escape für Dialog)
+- **NEU: Verbesserter Startbildschirm** (Punkte pro Abschnitt, User-Info, SEB-Blockade, Keyboard-Hinweis)
 
 ### Auth-Flow
 1. Kein User → LoginScreen (Google-Button / Schülercode / Demo)
@@ -80,7 +84,8 @@ Pruefung/
 │   │   ├── demoPruefung.ts              — Demo-PruefungsConfig (45 Min, 4 Abschnitte)
 │   │   └── demoMonitoring.ts            — Demo-Monitoring-Daten für LP-Dashboard (NEU)
 │   ├── hooks/
-│   │   └── usePruefungsMonitoring.ts    — Zentraler Monitoring-Hook (NEU)
+│   │   ├── usePruefungsMonitoring.ts    — Zentraler Monitoring-Hook (NEU)
+│   │   └── usePruefungsUX.ts           — beforeunload, Tastaturnavigation (NEU)
 │   ├── services/
 │   │   ├── autoSave.ts                  — IndexedDB Backup
 │   │   ├── remoteSave.ts                — Mock für Remote-Save (Phase 1)
@@ -151,4 +156,5 @@ Danach:
 | *pending* | Phase 2a: Google OAuth Login, Auth-Store, API-Service, LoginScreen, URL-Param (10 Dateien) |
 | *pending* | Phase 2b: Monitoring-Hook, SEB-Erkennung, Focus-Detection, Heartbeat, Remote-Save (4 Dateien) |
 | *pending* | Phase 2c: LP-Monitoring-Dashboard, GitHub Actions Env-Vars, Rollen-Routing (8 Dateien) |
-| *pending* | Phase 2d: ZuordnungFrage, verbesserte Abgabe mit Meta-Daten, Retry-Queue (6 Dateien) |
+| `c95d83d` | Phase 2d: ZuordnungFrage, verbesserte Abgabe mit Meta-Daten, Retry-Queue (6 Dateien) |
+| *pending* | Phase 2e: Zeitablauf-Remote-Abgabe, beforeunload, Tastaturnavigation, Startbildschirm (5 Dateien) |

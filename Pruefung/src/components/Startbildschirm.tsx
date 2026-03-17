@@ -1,6 +1,8 @@
 import type { PruefungsConfig } from '../types/pruefung.ts'
 import type { Frage } from '../types/fragen.ts'
 import { usePruefungStore } from '../store/pruefungStore.ts'
+import { useAuthStore } from '../store/authStore.ts'
+import { istImSEB } from '../services/sebService.ts'
 import ThemeToggle from './ThemeToggle.tsx'
 
 interface Props {
@@ -12,6 +14,7 @@ interface Props {
 export default function Startbildschirm({ config, fragen, wiederhergestellt }: Props) {
   const pruefungStarten = usePruefungStore((s) => s.pruefungStarten)
   const setPhase = usePruefungStore((s) => s.setPhase)
+  const user = useAuthStore((s) => s.user)
 
   function handleStart() {
     if (wiederhergestellt) {
@@ -22,6 +25,16 @@ export default function Startbildschirm({ config, fragen, wiederhergestellt }: P
   }
 
   const gesamtFragen = config.abschnitte.reduce((sum, a) => sum + a.fragenIds.length, 0)
+
+  // Punkte pro Abschnitt berechnen
+  function punkteFuerAbschnitt(fragenIds: string[]): number {
+    return fragenIds.reduce((sum, id) => {
+      const frage = fragen.find((f) => f.id === id)
+      return sum + (frage?.punkte ?? 0)
+    }, 0)
+  }
+
+  const sebErforderlich = config.sebErforderlich && !istImSEB()
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900 p-4 relative">
@@ -42,7 +55,19 @@ export default function Startbildschirm({ config, fragen, wiederhergestellt }: P
           <p className="text-slate-500 dark:text-slate-400">
             {config.klasse} · {config.datum}
           </p>
+          {user && (
+            <p className="text-sm text-slate-400 dark:text-slate-500 mt-1">
+              Angemeldet als {user.name}
+            </p>
+          )}
         </div>
+
+        {/* SEB-Warnung */}
+        {sebErforderlich && (
+          <div className="mb-6 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-700 dark:text-red-300">
+            Diese Prüfung erfordert den <strong>Safe Exam Browser (SEB)</strong>. Bitte starte die Prüfung über den SEB-Link.
+          </div>
+        )}
 
         {/* Wiederherstellungs-Hinweis */}
         {wiederhergestellt && (
@@ -59,19 +84,24 @@ export default function Startbildschirm({ config, fragen, wiederhergestellt }: P
           <InfoCard label="Typ" wert={config.typ === 'summativ' ? 'Summativ' : 'Formativ'} />
         </div>
 
-        {/* Abschnitte */}
+        {/* Abschnitte mit Punkten */}
         <div className="mb-6">
           <h3 className="text-sm font-semibold text-slate-600 dark:text-slate-300 mb-2">Aufbau</h3>
           <div className="space-y-1.5">
-            {config.abschnitte.map((a) => (
-              <div
-                key={a.titel}
-                className="flex justify-between text-sm text-slate-700 dark:text-slate-300 py-1.5 px-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg"
-              >
-                <span>{a.titel}</span>
-                <span className="text-slate-500 dark:text-slate-400">{a.fragenIds.length} Fragen</span>
-              </div>
-            ))}
+            {config.abschnitte.map((a) => {
+              const punkte = punkteFuerAbschnitt(a.fragenIds)
+              return (
+                <div
+                  key={a.titel}
+                  className="flex justify-between text-sm text-slate-700 dark:text-slate-300 py-1.5 px-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg"
+                >
+                  <span>{a.titel}</span>
+                  <span className="text-slate-500 dark:text-slate-400">
+                    {a.fragenIds.length} {a.fragenIds.length === 1 ? 'Frage' : 'Fragen'} · {punkte} P.
+                  </span>
+                </div>
+              )
+            })}
           </div>
         </div>
 
@@ -81,12 +111,19 @@ export default function Startbildschirm({ config, fragen, wiederhergestellt }: P
             <p>Alle Fragen können in beliebiger Reihenfolge beantwortet werden.</p>
           )}
           <p>Antworten werden automatisch gespeichert.</p>
+          <p>Navigation: Pfeiltasten oder Ctrl + Pfeiltasten</p>
         </div>
 
-        {/* Start-Button — neutral */}
+        {/* Start-Button */}
         <button
           onClick={handleStart}
-          className="w-full py-3 bg-slate-800 hover:bg-slate-900 dark:bg-slate-200 dark:hover:bg-slate-100 text-white dark:text-slate-800 text-lg font-semibold rounded-xl transition-colors cursor-pointer"
+          disabled={sebErforderlich}
+          className={`w-full py-3 text-lg font-semibold rounded-xl transition-colors
+            ${sebErforderlich
+              ? 'bg-slate-300 dark:bg-slate-600 text-slate-500 dark:text-slate-400 cursor-not-allowed'
+              : 'bg-slate-800 hover:bg-slate-900 dark:bg-slate-200 dark:hover:bg-slate-100 text-white dark:text-slate-800 cursor-pointer'
+            }
+          `}
         >
           {wiederhergestellt ? 'Sitzung fortsetzen' : 'Prüfung starten'}
         </button>
