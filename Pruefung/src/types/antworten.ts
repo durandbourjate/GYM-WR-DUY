@@ -30,4 +30,6 @@ export type Antwort =
   | { typ: 'freitext'; text: string; formatierung?: string }
   | { typ: 'zuordnung'; zuordnungen: Record<string, string> }
   | { typ: 'lueckentext'; eintraege: Record<string, string> }
-  | { typ: 'visualisierung'; daten: string; bildLink?: string };
+  | { typ: 'visualisierung'; daten: string; bildLink?: string }
+  | { typ: 'richtigfalsch'; bewertungen: Record<string, boolean> }
+  | { typ: 'berechnung'; ergebnisse: Record<string, string>; rechenweg?: string };

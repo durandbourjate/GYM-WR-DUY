@@ -11,13 +11,13 @@
 ### Was funktioniert
 - **E2E-Flow getestet:** Login → Prüfung laden → Ausfüllen → Abgabe → Antwort-Datei in Google Drive ✅
 - Startbildschirm mit Prüfungsinfo + Sitzungswiederherstellung
-- **4 Fragetypen:** MC (Einzel-/Mehrfachauswahl), Freitext (Tiptap), Lückentext, Zuordnung
+- **6 Fragetypen:** MC (Einzel-/Mehrfachauswahl), Freitext (Tiptap), Lückentext, Zuordnung, Richtig/Falsch, Berechnung
 - Fragennavigation mit Kacheln (✓ beantwortet, ? unsicher, — offen)
 - Timer mit Countdown + Warnungen (15 Min. orange, 5 Min. rot)
 - Auto-Save: LocalStorage (sofort) + IndexedDB (15s) + Remote via Apps Script (30s, konfigurierbar)
 - Light/Dark Mode: System-Erkennung + manueller Toggle
 - Abgabe-Dialog mit Bestätigung + Statusübersicht + Sende-Status + Retry
-- 8 Demo-Fragen (3 MC, 3 Freitext, 1 Lückentext, 1 Zuordnung) in 4 Abschnitten
+- 10 Demo-Fragen (3 MC, 3 Freitext, 1 Lückentext, 1 Zuordnung, 1 Richtig/Falsch, 1 Berechnung) in 4 Abschnitten
 - GitHub Actions Deploy (mit Env-Variablen für Backend)
 - Login-Screen (Google OAuth + Schülercode mit E-Mail + Demo-Modus)
 - Auth-Store (Session via sessionStorage, Rollen-Erkennung aus E-Mail-Domain)

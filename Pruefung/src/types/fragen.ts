@@ -122,4 +122,31 @@ export interface CanvasConfig {
   werkzeuge: ('stift' | 'linie' | 'pfeil' | 'text' | 'rechteck')[];
 }
 
-export type Frage = MCFrage | FreitextFrage | ZuordnungFrage | LueckentextFrage | VisualisierungFrage;
+export interface RichtigFalschFrage extends FrageBase {
+  typ: 'richtigfalsch';
+  fragetext: string;
+  aussagen: {
+    id: string;
+    text: string;
+    korrekt: boolean;
+    erklaerung?: string;
+  }[];
+}
+
+export interface BerechnungFrage extends FrageBase {
+  typ: 'berechnung';
+  fragetext: string;
+  /** Erwartete numerische Ergebnisse (mehrere Teilresultate möglich) */
+  ergebnisse: {
+    id: string;
+    label: string;
+    korrekt: number;
+    toleranz: number;
+    einheit?: string;
+  }[];
+  /** Rechenweg soll gezeigt werden? */
+  rechenwegErforderlich: boolean;
+  hilfsmittel?: string;
+}
+
+export type Frage = MCFrage | FreitextFrage | ZuordnungFrage | LueckentextFrage | VisualisierungFrage | RichtigFalschFrage | BerechnungFrage;

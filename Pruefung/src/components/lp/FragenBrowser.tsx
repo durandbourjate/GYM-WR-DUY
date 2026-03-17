@@ -3,6 +3,7 @@ import { useAuthStore } from '../../store/authStore.ts'
 import { apiService } from '../../services/apiService.ts'
 import { demoFragen } from '../../data/demoFragen.ts'
 import type { Frage, Fachbereich, BloomStufe } from '../../types/fragen.ts'
+import FragenEditor from './FragenEditor.tsx'
 
 interface Props {
   onHinzufuegen: (frageIds: string[]) => void
@@ -29,6 +30,11 @@ export default function FragenBrowser({ onHinzufuegen, onSchliessen, bereitsVerw
   const [filterFachbereich, setFilterFachbereich] = useState<Fachbereich | ''>('')
   const [filterTyp, setFilterTyp] = useState<string>('')
   const [filterBloom, setFilterBloom] = useState<BloomStufe | ''>('')
+  const [filterThema, setFilterThema] = useState('')
+
+  // Editor
+  const [zeigEditor, setZeigEditor] = useState(false)
+  const [editFrage, setEditFrage] = useState<Frage | null>(null)
 
   // Ansicht
   const [sortierung, setSortierung] = useState<Sortierung>('thema')
@@ -77,12 +83,26 @@ export default function FragenBrowser({ onHinzufuegen, onSchliessen, bereitsVerw
     }
   }, [ladeStatus, alleFragen, gruppierung]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Verfügbare Themen (für Filter-Dropdown)
+  const verfuegbareThemen = useMemo(() => {
+    const themen = new Map<string, number>()
+    for (const f of alleFragen) {
+      const key = f.thema + (f.unterthema ? ` › ${f.unterthema}` : '')
+      themen.set(key, (themen.get(key) || 0) + 1)
+    }
+    return Array.from(themen.entries()).sort((a, b) => a[0].localeCompare(b[0]))
+  }, [alleFragen])
+
   // Filtern
   const gefilterteFragen = useMemo(() => {
     return alleFragen.filter((f) => {
       if (filterFachbereich && f.fachbereich !== filterFachbereich) return false
       if (filterTyp && f.typ !== filterTyp) return false
       if (filterBloom && f.bloom !== filterBloom) return false
+      if (filterThema) {
+        const key = f.thema + (f.unterthema ? ` › ${f.unterthema}` : '')
+        if (key !== filterThema && f.thema !== filterThema) return false
+      }
       if (suchtext) {
         const text = suchtext.toLowerCase()
         const fragetext = 'fragetext' in f ? (f as { fragetext: string }).fragetext : ''
@@ -96,7 +116,7 @@ export default function FragenBrowser({ onHinzufuegen, onSchliessen, bereitsVerw
       }
       return true
     })
-  }, [alleFragen, filterFachbereich, filterTyp, filterBloom, suchtext])
+  }, [alleFragen, filterFachbereich, filterTyp, filterBloom, filterThema, suchtext])
 
   // Sortieren
   const sortierteFragen = useMemo(() => {
@@ -148,7 +168,7 @@ export default function FragenBrowser({ onHinzufuegen, onSchliessen, bereitsVerw
   }, [gefilterteFragen])
 
   // Aktive Filter zählen
-  const aktiveFilter = [filterFachbereich, filterTyp, filterBloom, suchtext].filter(Boolean).length
+  const aktiveFilter = [filterFachbereich, filterTyp, filterBloom, filterThema, suchtext].filter(Boolean).length
 
   function toggleAuswahl(id: string): void {
     setAusgewaehlt((prev) => {
@@ -187,6 +207,25 @@ export default function FragenBrowser({ onHinzufuegen, onSchliessen, bereitsVerw
     setFilterFachbereich('')
     setFilterTyp('')
     setFilterBloom('')
+    setFilterThema('')
+  }
+
+  async function handleFrageGespeichert(neueFrage: Frage): Promise<void> {
+    // Zur lokalen Liste hinzufügen
+    setAlleFragen((prev) => {
+      const ohneAlt = prev.filter((f) => f.id !== neueFrage.id)
+      return [...ohneAlt, neueFrage]
+    })
+    setZeigEditor(false)
+    setEditFrage(null)
+
+    // Ans Backend senden (im Hintergrund)
+    if (user && apiService.istKonfiguriert() && !istDemoModus) {
+      const ok = await apiService.speichereFrage(user.email, neueFrage)
+      if (!ok) {
+        console.warn('[FragenBrowser] Frage lokal hinzugefügt, aber Backend-Speichern fehlgeschlagen')
+      }
+    }
   }
 
   function handleHinzufuegen(): void {
@@ -215,6 +254,13 @@ export default function FragenBrowser({ onHinzufuegen, onSchliessen, bereitsVerw
               )}
             </div>
             <div className="flex items-center gap-2">
+              <button
+                onClick={() => { setEditFrage(null); setZeigEditor(true) }}
+                className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors cursor-pointer"
+                title="Neue Frage erstellen"
+              >
+                + Neue Frage
+              </button>
               {ausgewaehlt.size > 0 && (
                 <button
                   onClick={handleHinzufuegen}
@@ -274,6 +320,18 @@ export default function FragenBrowser({ onHinzufuegen, onSchliessen, bereitsVerw
                 <option key={k} value={k}>{k}</option>
               ))}
             </select>
+            {verfuegbareThemen.length > 1 && (
+              <select
+                value={filterThema}
+                onChange={(e) => { setFilterThema(e.target.value); setAngezeigteMenge(SEITEN_GROESSE) }}
+                className="text-xs px-2 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-300 cursor-pointer max-w-[180px]"
+              >
+                <option value="">Thema</option>
+                {verfuegbareThemen.map(([thema, anzahl]) => (
+                  <option key={thema} value={thema}>{thema} ({anzahl})</option>
+                ))}
+              </select>
+            )}
 
             {/* Separator */}
             <div className="w-px h-5 bg-slate-300 dark:bg-slate-600" />
@@ -422,6 +480,15 @@ export default function FragenBrowser({ onHinzufuegen, onSchliessen, bereitsVerw
           )}
         </div>
       </div>
+
+      {/* Fragen-Editor Overlay */}
+      {zeigEditor && (
+        <FragenEditor
+          frage={editFrage}
+          onSpeichern={handleFrageGespeichert}
+          onAbbrechen={() => { setZeigEditor(false); setEditFrage(null) }}
+        />
+      )}
     </div>
   )
 }
@@ -610,6 +677,8 @@ function typLabel(typ: string): string {
     case 'freitext': return 'Freitext'
     case 'lueckentext': return 'Lückentext'
     case 'zuordnung': return 'Zuordnung'
+    case 'richtigfalsch': return 'Richtig/Falsch'
+    case 'berechnung': return 'Berechnung'
     default: return typ
   }
 }

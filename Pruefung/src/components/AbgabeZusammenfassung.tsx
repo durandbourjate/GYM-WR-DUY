@@ -2,7 +2,7 @@ import { usePruefungStore } from '../store/pruefungStore.ts'
 import { useAuthStore } from '../store/authStore.ts'
 import { fachbereichFarbe } from './FragenNavigation.tsx'
 import { berechneAbschnittFortschritt } from '../utils/abschnitte.ts'
-import type { Frage, MCFrage, FreitextFrage, LueckentextFrage, ZuordnungFrage } from '../types/fragen.ts'
+import type { Frage, MCFrage, LueckentextFrage, ZuordnungFrage } from '../types/fragen.ts'
 import type { Antwort } from '../types/antworten.ts'
 
 interface AbgabeZusammenfassungProps {
@@ -114,7 +114,7 @@ export default function AbgabeZusammenfassung({ onZurueck }: AbgabeZusammenfassu
                             )}
                           </div>
                           <p className="text-sm font-medium text-slate-800 dark:text-slate-200 print:text-black">
-                            {frage.fragetext}
+                            {(frage as MCFrage).fragetext}
                           </p>
                         </div>
                       </div>
@@ -157,6 +157,10 @@ function AntwortAnzeige({ frage, antwort }: { frage: Frage; antwort: Antwort }) 
       return <LueckentextAntwortAnzeige frage={frage as LueckentextFrage} eintraege={antwort.eintraege} />
     case 'zuordnung':
       return <ZuordnungAntwortAnzeige frage={frage as ZuordnungFrage} zuordnungen={antwort.zuordnungen} />
+    case 'richtigfalsch':
+      return <RichtigFalschAntwortAnzeige bewertungen={antwort.bewertungen} />
+    case 'berechnung':
+      return <BerechnungAntwortAnzeige ergebnisse={antwort.ergebnisse} rechenweg={antwort.rechenweg} />
     default:
       return <p className="text-sm text-slate-400 italic">Anzeige nicht verfügbar</p>
   }
@@ -256,6 +260,59 @@ function ZuordnungAntwortAnzeige({ frage, zuordnungen }: { frage: ZuordnungFrage
           </div>
         )
       })}
+    </div>
+  )
+}
+
+function RichtigFalschAntwortAnzeige({ bewertungen }: { bewertungen: Record<string, boolean> }) {
+  const eintraege = Object.entries(bewertungen)
+  if (eintraege.length === 0) {
+    return <p className="text-sm text-slate-400 italic">Keine Bewertungen abgegeben</p>
+  }
+  return (
+    <div className="flex flex-col gap-1">
+      {eintraege.map(([id, wert]) => (
+        <div key={id} className="flex items-center gap-2 text-sm">
+          <span className="text-slate-500 dark:text-slate-400 print:text-slate-600 font-medium min-w-[2rem]">
+            {id}.
+          </span>
+          <span className={`px-2 py-0.5 rounded text-xs font-medium ${
+            wert
+              ? 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300 print:text-green-700'
+              : 'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-300 print:text-red-700'
+          }`}>
+            {wert ? 'Richtig' : 'Falsch'}
+          </span>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function BerechnungAntwortAnzeige({ ergebnisse, rechenweg }: { ergebnisse: Record<string, string>; rechenweg?: string }) {
+  const eintraege = Object.entries(ergebnisse)
+  return (
+    <div className="flex flex-col gap-2">
+      {eintraege.length > 0 && (
+        <div className="flex flex-col gap-1">
+          {eintraege.map(([id, wert]) => (
+            <div key={id} className="flex items-center gap-2 text-sm">
+              <span className="text-slate-500 dark:text-slate-400 print:text-slate-600 font-medium">
+                Ergebnis {id}:
+              </span>
+              <span className="font-mono text-slate-800 dark:text-slate-200 print:text-black">
+                {wert || '–'}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+      {rechenweg && (
+        <div className="bg-slate-50 dark:bg-slate-800 print:bg-slate-50 rounded-lg p-3 border border-slate-200 dark:border-slate-700 print:border-slate-300">
+          <p className="text-xs text-slate-500 dark:text-slate-400 print:text-slate-600 mb-1 font-medium">Rechenweg:</p>
+          <p className="text-sm text-slate-800 dark:text-slate-200 print:text-black whitespace-pre-wrap">{rechenweg}</p>
+        </div>
+      )}
     </div>
   )
 }

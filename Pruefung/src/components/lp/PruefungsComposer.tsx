@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react'
 import { useAuthStore } from '../../store/authStore.ts'
 import { apiService } from '../../services/apiService.ts'
 import type { PruefungsConfig, PruefungsAbschnitt } from '../../types/pruefung.ts'
-import type { Frage } from '../../types/fragen.ts'
+
 import ThemeToggle from '../ThemeToggle.tsx'
 import FragenBrowser from './FragenBrowser.tsx'
 

@@ -15,7 +15,9 @@ import MCFrage from './fragetypen/MCFrage.tsx'
 import FreitextFrage from './fragetypen/FreitextFrage.tsx'
 import LueckentextFrage from './fragetypen/LueckentextFrage.tsx'
 import ZuordnungFrage from './fragetypen/ZuordnungFrage.tsx'
-import type { MCFrage as MCFrageType, FreitextFrage as FreitextFrageType, LueckentextFrage as LueckentextFrageType, ZuordnungFrage as ZuordnungFrageType } from '../types/fragen.ts'
+import RichtigFalschFrage from './fragetypen/RichtigFalschFrage.tsx'
+import BerechnungFrage from './fragetypen/BerechnungFrage.tsx'
+import type { MCFrage as MCFrageType, FreitextFrage as FreitextFrageType, LueckentextFrage as LueckentextFrageType, ZuordnungFrage as ZuordnungFrageType, RichtigFalschFrage as RichtigFalschFrageType, BerechnungFrage as BerechnungFrageType } from '../types/fragen.ts'
 import { findeAbschnitt } from '../utils/abschnitte.ts'
 
 export default function Layout() {
@@ -269,7 +271,7 @@ export default function Layout() {
   )
 }
 
-function renderFrage(frage: MCFrageType | FreitextFrageType | LueckentextFrageType | ZuordnungFrageType | { typ: string }) {
+function renderFrage(frage: MCFrageType | FreitextFrageType | LueckentextFrageType | ZuordnungFrageType | RichtigFalschFrageType | BerechnungFrageType | { typ: string }) {
   switch (frage.typ) {
     case 'mc':
       return <MCFrage frage={frage as MCFrageType} />
@@ -279,6 +281,10 @@ function renderFrage(frage: MCFrageType | FreitextFrageType | LueckentextFrageTy
       return <LueckentextFrage frage={frage as LueckentextFrageType} />
     case 'zuordnung':
       return <ZuordnungFrage frage={frage as ZuordnungFrageType} />
+    case 'richtigfalsch':
+      return <RichtigFalschFrage frage={frage as RichtigFalschFrageType} />
+    case 'berechnung':
+      return <BerechnungFrage frage={frage as BerechnungFrageType} />
     default:
       return (
         <div className="p-6 bg-slate-100 dark:bg-slate-800 rounded-xl text-slate-500 dark:text-slate-400 text-center">

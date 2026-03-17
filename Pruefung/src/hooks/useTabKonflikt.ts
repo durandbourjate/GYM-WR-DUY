@@ -14,7 +14,7 @@ export function useTabKonflikt(pruefungId: string | null): boolean {
     const channelName = `pruefung-tab-${pruefungId}`
 
     // BroadcastChannel: Moderne Browser
-    if ('BroadcastChannel' in window) {
+    if (typeof BroadcastChannel !== 'undefined') {
       const channel = new BroadcastChannel(channelName)
       const tabId = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
 

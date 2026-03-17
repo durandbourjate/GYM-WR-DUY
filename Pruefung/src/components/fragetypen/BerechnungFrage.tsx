@@ -1,0 +1,114 @@
+import { usePruefungStore } from '../../store/pruefungStore.ts'
+import type { BerechnungFrage as BerechnungFrageType } from '../../types/fragen.ts'
+import { renderMarkdown } from '../../utils/markdown.ts'
+import { fachbereichFarbe } from '../FragenNavigation.tsx'
+
+interface Props {
+  frage: BerechnungFrageType
+}
+
+export default function BerechnungFrage({ frage }: Props) {
+  const antworten = usePruefungStore((s) => s.antworten)
+  const setAntwort = usePruefungStore((s) => s.setAntwort)
+  const abgegeben = usePruefungStore((s) => s.abgegeben)
+
+  const aktuelleAntwort = antworten[frage.id]
+  const ergebnisse: Record<string, string> =
+    aktuelleAntwort?.typ === 'berechnung' ? aktuelleAntwort.ergebnisse : {}
+  const rechenweg: string =
+    aktuelleAntwort?.typ === 'berechnung' ? aktuelleAntwort.rechenweg ?? '' : ''
+
+  function handleErgebnis(ergebnisId: string, wert: string) {
+    if (abgegeben) return
+    const neueErgebnisse = { ...ergebnisse, [ergebnisId]: wert }
+    setAntwort(frage.id, { typ: 'berechnung', ergebnisse: neueErgebnisse, rechenweg })
+  }
+
+  function handleRechenweg(text: string) {
+    if (abgegeben) return
+    setAntwort(frage.id, { typ: 'berechnung', ergebnisse, rechenweg: text })
+  }
+
+  return (
+    <div className="flex flex-col gap-5">
+      {/* Header: Badges */}
+      <div className="flex flex-wrap items-center gap-2">
+        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${fachbereichFarbe(frage.fachbereich)}`}>
+          {frage.fachbereich}
+        </span>
+        <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300">
+          {frage.bloom}
+        </span>
+        <span className="text-xs text-slate-500 dark:text-slate-400">
+          {frage.punkte} {frage.punkte === 1 ? 'Punkt' : 'Punkte'}
+        </span>
+        <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300">
+          Berechnung
+        </span>
+        {frage.hilfsmittel && (
+          <span className="text-xs px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">
+            Hilfsmittel: {frage.hilfsmittel}
+          </span>
+        )}
+      </div>
+
+      {/* Fragetext (sticky) */}
+      <div
+        className="text-base leading-relaxed text-slate-800 dark:text-slate-100 bg-slate-50 dark:bg-slate-800/80 p-4 rounded-lg border border-slate-200 dark:border-slate-700 sticky top-14 z-10"
+        dangerouslySetInnerHTML={{ __html: renderMarkdown(frage.fragetext) }}
+      />
+
+      {/* Ergebnis-Eingaben */}
+      <div className="flex flex-col gap-3">
+        {frage.ergebnisse.map((erg) => (
+          <div key={erg.id} className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-2">
+              {erg.label}
+            </label>
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                inputMode="decimal"
+                value={ergebnisse[erg.id] ?? ''}
+                onChange={(e) => handleErgebnis(erg.id, e.target.value)}
+                disabled={abgegeben}
+                placeholder="Ergebnis eingeben..."
+                className="flex-1 px-3 py-2 text-base bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400 dark:focus:ring-slate-500 text-slate-800 dark:text-slate-100 font-mono disabled:opacity-60"
+              />
+              {erg.einheit && (
+                <span className="text-sm font-medium text-slate-500 dark:text-slate-400 shrink-0">
+                  {erg.einheit}
+                </span>
+              )}
+            </div>
+            {erg.toleranz > 0 && (
+              <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
+                Toleranz: ±{erg.toleranz} {erg.einheit ?? ''}
+              </p>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* Rechenweg */}
+      {frage.rechenwegErforderlich && (
+        <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
+          <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-2">
+            Rechenweg / Lösungsweg
+          </label>
+          <textarea
+            value={rechenweg}
+            onChange={(e) => handleRechenweg(e.target.value)}
+            disabled={abgegeben}
+            rows={6}
+            placeholder="Zeigen Sie Ihren Rechenweg hier..."
+            className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400 dark:focus:ring-slate-500 text-slate-800 dark:text-slate-100 resize-y disabled:opacity-60"
+          />
+          <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
+            Beschreiben Sie Ihren Lösungsweg — auch Teilresultate zählen.
+          </p>
+        </div>
+      )}
+    </div>
+  )
+}

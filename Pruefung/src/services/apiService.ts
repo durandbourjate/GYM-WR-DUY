@@ -209,6 +209,45 @@ export const apiService = {
     }
   },
 
+  /** Einzelne Frage speichern (Fragenbank) */
+  async speichereFrage(email: string, frage: Frage): Promise<boolean> {
+    if (!APPS_SCRIPT_URL) {
+      console.warn('[API] speichereFrage: Kein APPS_SCRIPT_URL konfiguriert')
+      return false
+    }
+
+    try {
+      const payload = JSON.stringify({ action: 'speichereFrage', email, frage })
+      console.log('[API] speichereFrage → POST', APPS_SCRIPT_URL, '| Frage-ID:', frage.id)
+
+      const response = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: payload,
+      })
+
+      console.log('[API] speichereFrage ← Status:', response.status)
+
+      if (!response.ok) return false
+
+      const text = await response.text()
+      try {
+        const data = JSON.parse(text)
+        if (data.error) {
+          console.error('[API] speichereFrage: Server-Fehler:', data.error)
+          return false
+        }
+        return data.success === true
+      } catch {
+        console.error('[API] speichereFrage: Antwort ist kein JSON:', text.slice(0, 200))
+        return false
+      }
+    } catch (error) {
+      console.error('[API] speichereFrage: Netzwerkfehler:', error)
+      return false
+    }
+  },
+
   /** Prüft ob das Backend konfiguriert ist */
   istKonfiguriert(): boolean {
     return !!APPS_SCRIPT_URL
