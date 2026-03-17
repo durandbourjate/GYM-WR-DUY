@@ -12,7 +12,8 @@ export default function LPStartseite() {
   const istDemoModus = useAuthStore((s) => s.istDemoModus)
 
   const [configs, setConfigs] = useState<PruefungsConfig[]>([])
-  const [ladeStatus, setLadeStatus] = useState<'laden' | 'fertig' | 'fehler'>('laden')
+  const [ladeStatus, setLadeStatus] = useState<'laden' | 'fertig'>('laden')
+  const [backendFehler, setBackendFehler] = useState(false)
   const [ansicht, setAnsicht] = useState<'liste' | 'composer'>('liste')
   const [editConfig, setEditConfig] = useState<PruefungsConfig | null>(null)
 
@@ -31,10 +32,13 @@ export default function LPStartseite() {
       const result = await apiService.ladeAlleConfigs(user.email)
       if (result) {
         setConfigs(result)
-        setLadeStatus('fertig')
+        setBackendFehler(false)
       } else {
-        setLadeStatus('fehler')
+        console.warn("[LP] Configs nicht ladbar — Composer bleibt nutzbar")
+        setConfigs([])
+        setBackendFehler(true)
       }
+      setLadeStatus("fertig")
     }
     lade()
   }, [user, istDemoModus])
@@ -114,17 +118,10 @@ export default function LPStartseite() {
           </p>
         )}
 
-        {ladeStatus === 'fehler' && (
-          <div className="text-center py-12">
-            <p className="text-red-600 dark:text-red-400 mb-4">
-              Fehler beim Laden der Prüfungen.
-            </p>
-            <button
-              onClick={() => window.location.reload()}
-              className="px-4 py-2 text-sm bg-slate-200 dark:bg-slate-700 rounded-lg cursor-pointer"
-            >
-              Erneut versuchen
-            </button>
+        {ladeStatus === "fertig" && backendFehler && (
+          <div className="mb-4 px-4 py-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg text-sm text-amber-800 dark:text-amber-300">
+            Backend nicht erreichbar — bestehende Prüfungen konnten nicht geladen werden.
+            Der Composer ist trotzdem nutzbar.
           </div>
         )}
 

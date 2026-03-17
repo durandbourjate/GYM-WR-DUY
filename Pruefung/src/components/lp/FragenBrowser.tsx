@@ -16,7 +16,7 @@ export default function FragenBrowser({ onHinzufuegen, onSchliessen, bereitsVerw
   const istDemoModus = useAuthStore((s) => s.istDemoModus)
 
   const [alleFragen, setAlleFragen] = useState<Frage[]>([])
-  const [ladeStatus, setLadeStatus] = useState<'laden' | 'fertig' | 'fehler'>('laden')
+  const [ladeStatus, setLadeStatus] = useState<'laden' | 'fertig'>('laden')
   const [ausgewaehlt, setAusgewaehlt] = useState<Set<string>>(new Set())
 
   // Filter
@@ -36,12 +36,14 @@ export default function FragenBrowser({ onHinzufuegen, onSchliessen, bereitsVerw
 
       if (!user) return
       const result = await apiService.ladeFragenbank(user.email)
-      if (result) {
+      if (result && result.length > 0) {
         setAlleFragen(result)
-        setLadeStatus('fertig')
       } else {
-        setLadeStatus('fehler')
+        // Backend-Fehler → Fallback auf Demo-Fragen
+        console.warn('[FragenBrowser] Backend-Fragen nicht ladbar — zeige Demo-Fragen')
+        setAlleFragen(demoFragen)
       }
+      setLadeStatus('fertig')
     }
     lade()
   }, [user, istDemoModus])
@@ -160,11 +162,7 @@ export default function FragenBrowser({ onHinzufuegen, onSchliessen, bereitsVerw
             </p>
           )}
 
-          {ladeStatus === 'fehler' && (
-            <p className="text-sm text-red-500 dark:text-red-400 text-center py-8">
-              Fehler beim Laden der Fragenbank.
-            </p>
-          )}
+
 
           {ladeStatus === 'fertig' && gefilterteFragen.length === 0 && (
             <p className="text-sm text-slate-500 dark:text-slate-400 text-center py-8">
