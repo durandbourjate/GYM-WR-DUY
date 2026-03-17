@@ -6,7 +6,7 @@
 
 ## Aktueller Stand
 
-**Phase 2f: Navigation, Orientierung & Abgabe-Zusammenfassung** (17.03.2026)
+**Phase 2g: Robustheit & Qualität** (17.03.2026)
 
 ### Was funktioniert
 - Startbildschirm mit Prüfungsinfo + Sitzungswiederherstellung
@@ -45,6 +45,9 @@
 - **NEU: Verbesserte FragenÜbersicht** (Fortschrittsbalken pro Abschnitt, Punkte, Detail-Info je Fragetyp)
 - **NEU: Abgabe-Zusammenfassung** (Read-only Ansicht aller Fragen + Antworten, Druck-optimiert, "Meine Antworten ansehen"-Button)
 - **NEU: Druckansicht** (@media print Styles für sauberen PDF-Export der Zusammenfassung)
+- **NEU: Tab-Konflikterkennung** (BroadcastChannel API + localStorage-Fallback, Warnung bei mehreren Tabs)
+- **NEU: Error Boundary** (Fängt Rendering-Fehler ab, zeigt Recovery-UI + Daten-Export-Button)
+- **NEU: Sticky Fragetext** (Fragetext bleibt beim Scrollen sichtbar, alle 4 Fragetypen)
 
 ### Auth-Flow
 1. Kein User → LoginScreen (Google-Button / Schülercode / Demo)
@@ -90,7 +93,8 @@ Pruefung/
 │   │   └── demoMonitoring.ts            — Demo-Monitoring-Daten für LP-Dashboard (NEU)
 │   ├── hooks/
 │   │   ├── usePruefungsMonitoring.ts    — Zentraler Monitoring-Hook (NEU)
-│   │   └── usePruefungsUX.ts           — beforeunload, Tastaturnavigation (NEU)
+│   │   ├── usePruefungsUX.ts           — beforeunload, Tastaturnavigation (NEU)
+│   │   └── useTabKonflikt.ts           — BroadcastChannel Tab-Erkennung (NEU)
 │   ├── services/
 │   │   ├── autoSave.ts                  — IndexedDB Backup
 │   │   ├── remoteSave.ts                — Mock für Remote-Save (Phase 1)
@@ -102,6 +106,7 @@ Pruefung/
 │   │   ├── lp/
 │   │   │   ├── MonitoringDashboard.tsx  — LP-Dashboard: Live-Übersicht aller SuS (NEU)
 │   │   │   └── SchuelerZeile.tsx        — Einzelne SuS-Zeile mit Detail-Panel (NEU)
+│   │   ├── ErrorBoundary.tsx            — Fängt Rendering-Fehler, Recovery-UI (NEU)
 │   │   ├── LoginScreen.tsx              — Google OAuth + Schülercode + Demo
 │   │   ├── Layout.tsx                   — Header + Sidebar (mit User-Info) + Main
 │   │   ├── Startbildschirm.tsx          — Prüfungsinfo + Start-Button
@@ -165,4 +170,5 @@ Danach:
 | *pending* | Phase 2c: LP-Monitoring-Dashboard, GitHub Actions Env-Vars, Rollen-Routing (8 Dateien) |
 | `c95d83d` | Phase 2d: ZuordnungFrage, verbesserte Abgabe mit Meta-Daten, Retry-Queue (6 Dateien) |
 | `44ec263` | Phase 2e: Zeitablauf-Remote-Abgabe, beforeunload, Tastaturnavigation, Startbildschirm (5 Dateien) |
-| *pending* | Phase 2f: Abschnitt-Header, Fortschrittsbalken, FragenÜbersicht, Abgabe-Zusammenfassung (6 Dateien) |
+| `f77a1ca` | Phase 2f: Abschnitt-Header, Fortschrittsbalken, FragenÜbersicht, Abgabe-Zusammenfassung (6 Dateien) |
+| *pending* | Phase 2g: Tab-Konflikterkennung, Error Boundary, Sticky Fragetext (8 Dateien) |

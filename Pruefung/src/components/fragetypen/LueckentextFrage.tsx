@@ -40,9 +40,9 @@ export default function LueckentextFrage({ frage }: Props) {
         </span>
       </div>
 
-      {/* Fragetext */}
+      {/* Fragetext (sticky: bleibt beim Scrollen sichtbar) */}
       <div
-        className="text-base leading-relaxed text-slate-800 dark:text-slate-100"
+        className="text-base leading-relaxed text-slate-800 dark:text-slate-100 bg-slate-50 dark:bg-slate-800/80 p-4 rounded-lg border border-slate-200 dark:border-slate-700 sticky top-14 z-10"
         dangerouslySetInnerHTML={{ __html: renderMarkdown(frage.fragetext) }}
       />
 

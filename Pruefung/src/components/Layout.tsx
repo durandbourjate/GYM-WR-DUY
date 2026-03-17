@@ -3,6 +3,7 @@ import { usePruefungStore } from '../store/pruefungStore.ts'
 import { useAuthStore } from '../store/authStore.ts'
 import { usePruefungsMonitoring } from '../hooks/usePruefungsMonitoring.ts'
 import { usePruefungsUX } from '../hooks/usePruefungsUX.ts'
+import { useTabKonflikt } from '../hooks/useTabKonflikt.ts'
 import { istImSEB } from '../services/sebService.ts'
 import Timer from './Timer.tsx'
 import VerbindungsStatus from './VerbindungsStatus.tsx'
@@ -30,7 +31,11 @@ export default function Layout() {
   const toggleMarkierung = usePruefungStore((s) => s.toggleMarkierung)
   const [zeigAbgabeDialog, setZeigAbgabeDialog] = useState(false)
   const [sebWarnungGeschlossen, setSebWarnungGeschlossen] = useState(false)
+  const [tabKonfliktGeschlossen, setTabKonfliktGeschlossen] = useState(false)
   const [zeitAbgelaufen, setZeitAbgelaufen] = useState(false)
+
+  // Tab-Konflikterkennung
+  const tabKonflikt = useTabKonflikt(config?.id ?? null)
 
   // Monitoring: Auto-Save (lokal + remote), Heartbeat, Focus-Detection, Online/Offline
   usePruefungsMonitoring()
@@ -66,6 +71,22 @@ export default function Layout() {
           <button
             onClick={() => setSebWarnungGeschlossen(true)}
             className="text-amber-600 dark:text-amber-400 hover:text-amber-800 dark:hover:text-amber-200 text-lg leading-none cursor-pointer"
+            title="Warnung schliessen"
+          >
+            &times;
+          </button>
+        </div>
+      )}
+
+      {/* Tab-Konflikt-Warnung */}
+      {tabKonflikt && !tabKonfliktGeschlossen && (
+        <div className="bg-red-50 dark:bg-red-900/30 border-b border-red-300 dark:border-red-700 px-4 py-2 flex items-center justify-between">
+          <p className="text-sm text-red-800 dark:text-red-200">
+            <strong>Achtung:</strong> Diese Prüfung ist in einem anderen Tab geöffnet. Bitte nur in einem Tab arbeiten.
+          </p>
+          <button
+            onClick={() => setTabKonfliktGeschlossen(true)}
+            className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-200 text-lg leading-none cursor-pointer"
             title="Warnung schliessen"
           >
             &times;
