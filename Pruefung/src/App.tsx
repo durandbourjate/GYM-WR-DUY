@@ -46,6 +46,8 @@ export default function App() {
 
           if (config && config.id === result.config.id && phase !== 'start') {
             setWiederhergestellt(true)
+            // Immer zum Startbildschirm zurück, damit User entscheiden kann
+            usePruefungStore.getState().setPhase('start')
           }
           return
         }
@@ -61,6 +63,8 @@ export default function App() {
 
       if (config && config.id === resolvedConfig.id && phase !== 'start') {
         setWiederhergestellt(true)
+        // Immer zum Startbildschirm zurück, damit User entscheiden kann
+        usePruefungStore.getState().setPhase('start')
       }
     }
 

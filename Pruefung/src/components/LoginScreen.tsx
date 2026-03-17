@@ -14,6 +14,7 @@ export default function LoginScreen() {
   const [zeigeFallback, setZeigeFallback] = useState(false)
   const [code, setCode] = useState('')
   const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
   const [googleGeladen, setGoogleGeladen] = useState(false)
 
   const istProduktion = !!CLIENT_ID
@@ -64,11 +65,20 @@ export default function LoginScreen() {
 
   function handleCodeLogin(e: React.FormEvent): void {
     e.preventDefault()
-    if (code.length !== 4 || !name.trim()) {
-      setFehler('Bitte 4-stelligen Code und Namen eingeben.')
+    if (code.length !== 4 || !name.trim() || !email.trim()) {
+      setFehler('Bitte E-Mail, Namen und 4-stelligen Code eingeben.')
       return
     }
-    anmeldenMitCode(code, name.trim())
+    // E-Mail normalisieren: wenn nur Vorname eingegeben → @stud.gymhofwil.ch anhängen
+    let volleEmail = email.trim().toLowerCase()
+    if (!volleEmail.includes('@')) {
+      volleEmail = `${volleEmail}@stud.gymhofwil.ch`
+    }
+    if (!volleEmail.endsWith('@stud.gymhofwil.ch') && !volleEmail.endsWith('@gymhofwil.ch')) {
+      setFehler('Bitte verwenden Sie Ihre Schul-E-Mail (@stud.gymhofwil.ch).')
+      return
+    }
+    anmeldenMitCode(code, name.trim(), volleEmail)
   }
 
   return (
@@ -138,6 +148,21 @@ export default function LoginScreen() {
             )}
             <div>
               <label className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">
+                Schul-E-Mail
+              </label>
+              <input
+                type="text"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="vorname.nachname@stud.gymhofwil.ch"
+                className="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-400 dark:focus:ring-slate-500"
+              />
+              <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
+                Nur der Teil vor @ genügt (z.B. «vorname.nachname»)
+              </p>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">
                 Name
               </label>
               <input
@@ -164,7 +189,7 @@ export default function LoginScreen() {
             </div>
             <button
               type="submit"
-              disabled={code.length !== 4 || !name.trim()}
+              disabled={code.length !== 4 || !name.trim() || !email.trim()}
               className="w-full py-2.5 bg-slate-800 hover:bg-slate-900 dark:bg-slate-200 dark:hover:bg-slate-100 text-white dark:text-slate-800 text-sm font-semibold rounded-xl transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
             >
               Anmelden

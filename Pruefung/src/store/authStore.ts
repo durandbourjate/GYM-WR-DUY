@@ -23,7 +23,7 @@ interface AuthStore {
   fehler: string | null
 
   anmelden: (credential: GoogleCredential) => void
-  anmeldenMitCode: (schuelerId: string, name: string) => void
+  anmeldenMitCode: (schuelerId: string, name: string, email: string) => void
   demoStarten: () => void
   abmelden: () => void
   setFehler: (fehler: string | null) => void
@@ -49,9 +49,9 @@ export const useAuthStore = create<AuthStore>((set) => ({
     set({ user, istDemoModus: false, ladeStatus: 'fertig', fehler: null })
   },
 
-  anmeldenMitCode: (schuelerId: string, name: string) => {
+  anmeldenMitCode: (schuelerId: string, name: string, email: string) => {
     const user: AuthUser = {
-      email: '',
+      email,
       name,
       vorname: name.split(' ')[0] || name,
       nachname: name.split(' ').slice(1).join(' ') || '',

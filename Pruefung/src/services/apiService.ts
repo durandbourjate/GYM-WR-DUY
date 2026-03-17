@@ -43,9 +43,10 @@ export const apiService = {
     if (!APPS_SCRIPT_URL) return false
 
     try {
+      // text/plain vermeidet CORS-Preflight (OPTIONS), den Apps Script nicht beantwortet
       const response = await fetch(APPS_SCRIPT_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'text/plain' },
         body: JSON.stringify({ action: 'speichereAntworten', ...payload }),
       })
       if (!response.ok) return false
@@ -63,9 +64,10 @@ export const apiService = {
     if (!APPS_SCRIPT_URL) return false
 
     try {
+      // text/plain vermeidet CORS-Preflight
       const response = await fetch(APPS_SCRIPT_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'text/plain' },
         body: JSON.stringify({
           action: 'heartbeat',
           pruefungId,
