@@ -6,7 +6,7 @@
 
 ## Aktueller Stand
 
-**Phase 4: Composer & SEB** (17.03.2026)
+**Phase 4: Composer & SEB** (17.03.2026) — Backend getestet & funktioniert ✅
 
 ### Was funktioniert
 - **E2E-Flow getestet:** Login → Prüfung laden → Ausfüllen → Abgabe → Antwort-Datei in Google Drive ✅
@@ -29,6 +29,7 @@
 - **LP-Startseite:** Prüfungen verwalten, Monitoring/Bearbeiten/URL-Links
 - **Prüfungs-Composer:** 3-Tab-Editor (Einstellungen, Abschnitte & Fragen, Vorschau)
 - **Fragenbank-Browser:** Slide-over mit Filtern (Fachbereich, Typ, Bloom, Freitext-Suche)
+- **Fragenbank-Editor:** Alle 6 Fragetypen erstellen/bearbeiten + in Google Sheets speichern
 - Rollen-Routing (LP ohne `?id=` → LPStartseite/Composer, mit `?id=` → Monitoring)
 - Zuordnung, Abschnitt-Header, Fortschrittsbalken, FragenÜbersicht
 - Abgabe-Zusammenfassung (Read-only, druckbar)
@@ -100,6 +101,7 @@ Pruefung/
 │   │   │   ├── LPStartseite.tsx         — LP-Startseite: Prüfungen verwalten + erstellen
 │   │   │   ├── PruefungsComposer.tsx    — 3-Tab-Editor (Einstellungen, Abschnitte, Vorschau)
 │   │   │   ├── FragenBrowser.tsx        — Slide-over: Fragenbank durchsuchen + filtern
+│   │   │   ├── FragenEditor.tsx        — Fragen erstellen/bearbeiten (6 Typen)
 │   │   │   ├── MonitoringDashboard.tsx  — LP-Dashboard: Live-Übersicht aller SuS
 │   │   │   └── SchuelerZeile.tsx        — Einzelne SuS-Zeile mit Detail-Panel
 │   │   ├── ErrorBoundary.tsx            — Fängt Rendering-Fehler, Recovery-UI
@@ -118,7 +120,9 @@ Pruefung/
 │   │       ├── MCFrage.tsx              — MC mit neutraler Selektion
 │   │       ├── FreitextFrage.tsx        — Tiptap + Heading + ArrowReplace + Auto-Focus
 │   │       ├── LueckentextFrage.tsx     — Inline-Inputs
-│   │       └── ZuordnungFrage.tsx      — Dropdown-Zuordnung mit Fortschritt
+│   │       ├── ZuordnungFrage.tsx      — Dropdown-Zuordnung mit Fortschritt
+│   │       ├── RichtigFalschFrage.tsx  — Richtig/Falsch-Buttons pro Aussage
+│   │       └── BerechnungFrage.tsx     — Numerische Eingabe + Rechenweg
 │   └── utils/
 │       ├── abschnitte.ts               — findeAbschnitt(), berechneAbschnittFortschritt()
 │       ├── markdown.ts                  — Einfacher Markdown→HTML Renderer
@@ -151,20 +155,18 @@ Ohne diese Variablen funktioniert die App im **Demo-Modus** (Schülercode + Demo
 | 3: Apps Script | ✅ erledigt | Deployed, Berechtigungen autorisiert, URL in `.env.local` |
 | 4: GitHub Actions | ✅ erledigt | Secrets `VITE_GOOGLE_CLIENT_ID` + `VITE_APPS_SCRIPT_URL` gesetzt |
 | 5: End-to-End-Test | ✅ erledigt | Login → Laden → Ausfüllen → Abgabe → Datei in Drive |
+| 6: Fragenbank+Composer | ✅ erledigt | Login → Frage erstellen → Speichern → Prüfung zusammenstellen (17.03.2026) |
 
 ## Nächste Schritte
 
-### Sofort: Apps Script aktualisieren (manuell)
-1. **Code.gs aktualisieren:** Gesamten Code aus `Google_Workspace_Setup.md` (Abschnitt 3.2) in den Apps Script Editor kopieren — enthält 3 neue Endpoints: `ladeAlleConfigs`, `ladeFragenbank`, `speichereConfig`
-2. **Neue Version bereitstellen:** Bereitstellungen verwalten → Bearbeiten → Neue Version
-3. **Configs-Sheet:** Spalte `fachbereiche` zur Header-Zeile hinzufügen (Komma-separiert, z.B. `VWL,Recht`)
-4. **Testen:** LP-Login ohne `?id=` → LPStartseite → Neue Prüfung → Fragenbank → Speichern
+### Sofort
+1. SEB-Datei im SEB Config Tool erstellen (XML aus `seb/` importieren → URL anpassen → .seb exportieren)
+2. Composer E2E testen (Prüfung erstellen → Fragen zuordnen → Speichern → mit `?id=` öffnen)
+3. Tablet-/Smartphone-Tests
 
-### Danach
-5. SEB-Datei im SEB Config Tool erstellen (XML aus `seb/` importieren → URL anpassen → .seb exportieren)
-6. Composer E2E testen (Prüfung erstellen → Fragen zuordnen → Speichern → mit `?id=` öffnen)
-7. Tablet-/Smartphone-Tests
-8. KI-Korrektur (Claude API für Freitext-Bewertung)
+### Später
+4. KI-Korrektur (Claude API für Freitext-Bewertung)
+5. Textfeld-Höhe testen (auto-grow vs. begrenzter Bereich)
 
 ## Commits
 
