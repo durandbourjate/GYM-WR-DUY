@@ -152,14 +152,19 @@ Ohne diese Variablen funktioniert die App im **Demo-Modus** (Schülercode + Demo
 | 4: GitHub Actions | ✅ erledigt | Secrets `VITE_GOOGLE_CLIENT_ID` + `VITE_APPS_SCRIPT_URL` gesetzt |
 | 5: End-to-End-Test | ✅ erledigt | Login → Laden → Ausfüllen → Abgabe → Datei in Drive |
 
-## Nächste Schritte (Phase 5)
+## Nächste Schritte
 
-1. **Apps Script aktualisieren:** Neuen Code aus `Google_Workspace_Setup.md` in Apps Script Editor kopieren + neue Version bereitstellen
-2. **Configs-Sheet:** Spalte `fachbereiche` zur Header-Zeile hinzufügen
-3. Composer E2E testen (Prüfung erstellen → Fragen zuordnen → Speichern → mit `?id=` öffnen)
-4. SEB-Datei im SEB Config Tool erstellen (XML importieren → URL anpassen → .seb exportieren)
-5. Tablet-/Smartphone-Tests
-6. KI-Korrektur (Claude API für Freitext-Bewertung)
+### Sofort: Apps Script aktualisieren (manuell)
+1. **Code.gs aktualisieren:** Gesamten Code aus `Google_Workspace_Setup.md` (Abschnitt 3.2) in den Apps Script Editor kopieren — enthält 3 neue Endpoints: `ladeAlleConfigs`, `ladeFragenbank`, `speichereConfig`
+2. **Neue Version bereitstellen:** Bereitstellungen verwalten → Bearbeiten → Neue Version
+3. **Configs-Sheet:** Spalte `fachbereiche` zur Header-Zeile hinzufügen (Komma-separiert, z.B. `VWL,Recht`)
+4. **Testen:** LP-Login ohne `?id=` → LPStartseite → Neue Prüfung → Fragenbank → Speichern
+
+### Danach
+5. SEB-Datei im SEB Config Tool erstellen (XML aus `seb/` importieren → URL anpassen → .seb exportieren)
+6. Composer E2E testen (Prüfung erstellen → Fragen zuordnen → Speichern → mit `?id=` öffnen)
+7. Tablet-/Smartphone-Tests
+8. KI-Korrektur (Claude API für Freitext-Bewertung)
 
 ## Commits
 
@@ -177,4 +182,5 @@ Ohne diese Variablen funktioniert die App im **Demo-Modus** (Schülercode + Demo
 | `705380f` | Fix: Demo/Abmelden setzt Prüfungszustand zurück |
 | `569f81a` | HANDOFF: Google Workspace Setup (Teil 1-4) erledigt |
 | `d1a3d00` | Phase 3: CORS-Fix, E-Mail bei Schülercode-Login, Session-Restore robuster (5 Dateien) |
-| *pending* | Phase 4: SEB-Konfiguration + Prüfungs-Composer (LP-Startseite, 3-Tab-Editor, FragenBrowser) |
+| `33cbc2c` | README für Prüfungsplattform erstellt |
+| *pending* | Phase 4: SEB-Konfiguration + Prüfungs-Composer + README (LP-Startseite, 3-Tab-Editor, FragenBrowser, API-Endpoints) |
