@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import type { AuthUser, Rolle } from '../types/auth.ts'
+import { usePruefungStore } from './pruefungStore.ts'
 
 function rolleAusDomain(email: string): Rolle {
   if (email.endsWith('@stud.gymhofwil.ch')) return 'sus'
@@ -62,6 +63,8 @@ export const useAuthStore = create<AuthStore>((set) => ({
   },
 
   demoStarten: () => {
+    // Alten Prüfungszustand zurücksetzen (sonst bleibt z.B. 'abgegeben' hängen)
+    usePruefungStore.getState().zuruecksetzen()
     const user: AuthUser = {
       email: 'demo@example.com',
       name: 'Demo-Nutzer',
@@ -74,6 +77,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
 
   abmelden: () => {
     clearSession()
+    usePruefungStore.getState().zuruecksetzen()
     set({ user: null, istDemoModus: false, ladeStatus: 'idle', fehler: null })
   },
 
