@@ -1,5 +1,6 @@
 import { usePruefungStore } from '../store/pruefungStore.ts'
 import { fachbereichFarbe } from './FragenNavigation.tsx'
+import { berechneAbschnittFortschritt } from '../utils/abschnitte.ts'
 
 export default function FragenUebersicht() {
   const config = usePruefungStore((s) => s.config)
@@ -11,8 +12,10 @@ export default function FragenUebersicht() {
 
   if (!config) return null
 
-  const beantwortet = fragen.filter((f) => !!antworten[f.id]).length
   const markiert = fragen.filter((f) => !!markierungen[f.id]).length
+  const { abschnitte: fortschrittAbschnitte, gesamtBeantwortet, gesamtFragen } =
+    berechneAbschnittFortschritt(config, fragen, antworten)
+  const gesamtProzent = gesamtFragen > 0 ? (gesamtBeantwortet / gesamtFragen) * 100 : 0
 
   let globalIdx = 0
 
@@ -21,18 +24,68 @@ export default function FragenUebersicht() {
       <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-2">
         Übersicht
       </h2>
-      <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
-        {beantwortet} von {fragen.length} Fragen beantwortet
-        {markiert > 0 && ` · ${markiert} als unsicher markiert`}
-      </p>
 
-      {config.abschnitte.map((abschnitt) => {
+      {/* Gesamt-Fortschritt */}
+      <div className="mb-6">
+        <div className="flex justify-between text-sm mb-1.5">
+          <span className="text-slate-600 dark:text-slate-300">
+            {gesamtBeantwortet} von {gesamtFragen} Fragen beantwortet
+            {markiert > 0 && <span className="text-amber-600 dark:text-amber-400"> · {markiert} unsicher</span>}
+          </span>
+          <span className="font-medium text-slate-700 dark:text-slate-200">{Math.round(gesamtProzent)}%</span>
+        </div>
+        <div className="h-2.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+          <div
+            className={`h-full rounded-full transition-all duration-500 ${
+              gesamtProzent === 100
+                ? 'bg-green-500 dark:bg-green-400'
+                : 'bg-slate-500 dark:bg-slate-400'
+            }`}
+            style={{ width: `${gesamtProzent}%` }}
+          />
+        </div>
+      </div>
+
+      {/* Abschnitte */}
+      {config.abschnitte.map((abschnitt, abschnittIdx) => {
         const startIdx = globalIdx
+        const fortschritt = fortschrittAbschnitte[abschnittIdx]
+        const abschnittProzent = fortschritt.gesamt > 0 ? (fortschritt.beantwortet / fortschritt.gesamt) * 100 : 0
+
         return (
           <div key={abschnitt.titel} className="mb-6">
-            <h3 className="text-sm font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wide mb-3">
-              {abschnitt.titel}
-            </h3>
+            {/* Abschnitt-Header mit Fortschritt */}
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wide">
+                {abschnitt.titel}
+              </h3>
+              <span className="text-xs text-slate-500 dark:text-slate-400">
+                {fortschritt.beantwortet}/{fortschritt.gesamt} · {fortschritt.punkteBeantwortet}/{fortschritt.punkte} P.
+              </span>
+            </div>
+
+            {/* Mini-Fortschrittsbalken pro Abschnitt */}
+            <div className="h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden mb-3">
+              <div
+                className={`h-full rounded-full transition-all duration-300 ${
+                  abschnittProzent === 100
+                    ? 'bg-green-500 dark:bg-green-400'
+                    : abschnittProzent > 0
+                      ? 'bg-slate-400 dark:bg-slate-500'
+                      : ''
+                }`}
+                style={{ width: `${abschnittProzent}%` }}
+              />
+            </div>
+
+            {/* Beschreibung */}
+            {abschnitt.beschreibung && (
+              <p className="text-xs text-slate-400 dark:text-slate-500 mb-2 italic">
+                {abschnitt.beschreibung}
+              </p>
+            )}
+
+            {/* Fragen-Liste */}
             <div className="flex flex-col gap-2">
               {abschnitt.fragenIds.map((frageId, i) => {
                 const idx = startIdx + i
@@ -43,12 +96,20 @@ export default function FragenUebersicht() {
                 const istMarkiert = !!markierungen[frageId]
                 const antwort = antworten[frageId]
 
-                // Wortanzahl für Freitext
-                let wortInfo = ''
+                // Detail-Info je nach Fragetyp
+                let detailInfo = ''
                 if (antwort?.typ === 'freitext' && antwort.text) {
                   const plainText = antwort.text.replace(/<[^>]*>/g, '').trim()
                   const woerter = plainText ? plainText.split(/\s+/).length : 0
-                  wortInfo = `${woerter} Wörter`
+                  detailInfo = `${woerter} Wörter`
+                } else if (antwort?.typ === 'zuordnung') {
+                  const zugeordnet = Object.keys(antwort.zuordnungen).length
+                  detailInfo = `${zugeordnet} zugeordnet`
+                } else if (antwort?.typ === 'mc') {
+                  detailInfo = `${antwort.gewaehlteOptionen.length} gewählt`
+                } else if (antwort?.typ === 'lueckentext') {
+                  const ausgefuellt = Object.values(antwort.eintraege).filter((v) => v.trim()).length
+                  detailInfo = `${ausgefuellt} ausgefüllt`
                 }
 
                 // Status-Icon und -Farbe
@@ -61,7 +122,7 @@ export default function FragenUebersicht() {
                   statusIcon = '\u2713'
                   statusColor = 'text-green-700 dark:text-green-400'
                 } else {
-                  statusIcon = '\u2014' // —
+                  statusIcon = '\u2014'
                   statusColor = 'text-slate-400 dark:text-slate-500'
                 }
 
@@ -89,7 +150,7 @@ export default function FragenUebersicht() {
                     </div>
                     <div className="text-xs text-slate-500 dark:text-slate-400 text-right">
                       <div>{frage.punkte} P.</div>
-                      {wortInfo && <div className="text-slate-400">{wortInfo}</div>}
+                      {detailInfo && <div className="text-slate-400 dark:text-slate-500">{detailInfo}</div>}
                     </div>
                   </button>
                 )

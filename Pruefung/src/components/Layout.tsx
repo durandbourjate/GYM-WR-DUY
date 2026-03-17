@@ -15,12 +15,14 @@ import FreitextFrage from './fragetypen/FreitextFrage.tsx'
 import LueckentextFrage from './fragetypen/LueckentextFrage.tsx'
 import ZuordnungFrage from './fragetypen/ZuordnungFrage.tsx'
 import type { MCFrage as MCFrageType, FreitextFrage as FreitextFrageType, LueckentextFrage as LueckentextFrageType, ZuordnungFrage as ZuordnungFrageType } from '../types/fragen.ts'
+import { findeAbschnitt } from '../utils/abschnitte.ts'
 
 export default function Layout() {
   const user = useAuthStore((s) => s.user)
   const config = usePruefungStore((s) => s.config)
   const fragen = usePruefungStore((s) => s.fragen)
   const aktuelleFrageIndex = usePruefungStore((s) => s.aktuelleFrageIndex)
+  const antworten = usePruefungStore((s) => s.antworten)
   const markierungen = usePruefungStore((s) => s.markierungen)
   const abgegeben = usePruefungStore((s) => s.abgegeben)
   const naechsteFrage = usePruefungStore((s) => s.naechsteFrage)
@@ -45,6 +47,13 @@ export default function Layout() {
 
   const aktuelleFrage = fragen[aktuelleFrageIndex]
   const istMarkiert = aktuelleFrage ? !!markierungen[aktuelleFrage.id] : false
+
+  // Abschnitt-Kontext für aktuelle Frage
+  const abschnittInfo = findeAbschnitt(config, aktuelleFrageIndex, fragen)
+
+  // Fortschritt: Anzahl beantworteter Fragen
+  const beantwortetAnzahl = fragen.filter((f) => !!antworten[f.id]).length
+  const fortschrittProzent = fragen.length > 0 ? (beantwortetAnzahl / fragen.length) * 100 : 0
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex flex-col">
@@ -148,6 +157,13 @@ export default function Layout() {
             </span>
           </div>
         )}
+        {/* Fortschrittsbalken */}
+        <div className="h-1 bg-slate-100 dark:bg-slate-700">
+          <div
+            className="h-full bg-slate-500 dark:bg-slate-400 transition-all duration-500"
+            style={{ width: `${fortschrittProzent}%` }}
+          />
+        </div>
       </header>
 
       {/* Main */}
@@ -168,6 +184,27 @@ export default function Layout() {
         {/* Fragenbereich */}
         <main className="flex-1 p-4 md:p-8 overflow-auto">
           <div className="max-w-3xl mx-auto">
+            {/* Abschnitt-Header */}
+            {abschnittInfo && abschnittInfo.istErsteFrage && (
+              <div className="mb-5 pb-3 border-b border-slate-200 dark:border-slate-700">
+                <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100">
+                  {abschnittInfo.abschnitt.titel}
+                </h2>
+                {abschnittInfo.abschnitt.beschreibung && (
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                    {abschnittInfo.abschnitt.beschreibung}
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* Abschnitt-Kontext (kompakt, wenn nicht erste Frage) */}
+            {abschnittInfo && !abschnittInfo.istErsteFrage && (
+              <div className="mb-3 text-xs text-slate-400 dark:text-slate-500">
+                {abschnittInfo.abschnitt.titel} · Frage {abschnittInfo.positionImAbschnitt + 1} von {abschnittInfo.abschnitt.fragenIds.length}
+              </div>
+            )}
+
             {aktuelleFrage && renderFrage(aktuelleFrage)}
 
             {/* Mobile Navigation (Kacheln) */}

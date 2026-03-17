@@ -6,7 +6,7 @@
 
 ## Aktueller Stand
 
-**Phase 2e: Prüfungs-UX (Zeitablauf, Keyboard, Startbildschirm)** (17.03.2026)
+**Phase 2f: Navigation, Orientierung & Abgabe-Zusammenfassung** (17.03.2026)
 
 ### Was funktioniert
 - Startbildschirm mit Prüfungsinfo + Sitzungswiederherstellung
@@ -40,6 +40,11 @@
 - **NEU: beforeunload-Warnung** (verhindert versehentliches Tab-Schliessen während Prüfung)
 - **NEU: Tastaturnavigation** (← → / Ctrl+← → für Fragen, Escape für Dialog)
 - **NEU: Verbesserter Startbildschirm** (Punkte pro Abschnitt, User-Info, SEB-Blockade, Keyboard-Hinweis)
+- **NEU: Abschnitt-Header im Fragenfluss** (prominenter Titel bei erster Frage, kompakter Kontext danach)
+- **NEU: Fortschrittsbalken im Header** (1px-Balken zeigt Gesamtfortschritt)
+- **NEU: Verbesserte FragenÜbersicht** (Fortschrittsbalken pro Abschnitt, Punkte, Detail-Info je Fragetyp)
+- **NEU: Abgabe-Zusammenfassung** (Read-only Ansicht aller Fragen + Antworten, Druck-optimiert, "Meine Antworten ansehen"-Button)
+- **NEU: Druckansicht** (@media print Styles für sauberen PDF-Export der Zusammenfassung)
 
 ### Auth-Flow
 1. Kein User → LoginScreen (Google-Button / Schülercode / Demo)
@@ -101,7 +106,8 @@ Pruefung/
 │   │   ├── Layout.tsx                   — Header + Sidebar (mit User-Info) + Main
 │   │   ├── Startbildschirm.tsx          — Prüfungsinfo + Start-Button
 │   │   ├── FragenNavigation.tsx         — Kacheln mit Icons + Legende + fachbereichFarbe()
-│   │   ├── FragenUebersicht.tsx         — Alle Fragen mit Status
+│   │   ├── FragenUebersicht.tsx         — Alle Fragen mit Status + Fortschritt pro Abschnitt
+│   │   ├── AbgabeZusammenfassung.tsx   — Read-only Antworten-Review, druckbar (NEU)
 │   │   ├── Timer.tsx                    — Countdown mit Warnstufen
 │   │   ├── VerbindungsStatus.tsx        — Online/Offline-Indikator
 │   │   ├── AutoSaveIndikator.tsx        — "Gespeichert ✓" Fade-Animation
@@ -113,6 +119,7 @@ Pruefung/
 │   │       ├── LueckentextFrage.tsx     — Inline-Inputs
 │   │       └── ZuordnungFrage.tsx      — Dropdown-Zuordnung mit Fortschritt (NEU)
 │   └── utils/
+│       ├── abschnitte.ts               — findeAbschnitt(), berechneAbschnittFortschritt() (NEU)
 │       ├── markdown.ts                  — Einfacher Markdown→HTML Renderer
 │       └── zeit.ts                      — Timer-Hilfsfunktionen
 ├── .env.example                         — Template für Environment-Variablen (NEU)
@@ -157,4 +164,5 @@ Danach:
 | *pending* | Phase 2b: Monitoring-Hook, SEB-Erkennung, Focus-Detection, Heartbeat, Remote-Save (4 Dateien) |
 | *pending* | Phase 2c: LP-Monitoring-Dashboard, GitHub Actions Env-Vars, Rollen-Routing (8 Dateien) |
 | `c95d83d` | Phase 2d: ZuordnungFrage, verbesserte Abgabe mit Meta-Daten, Retry-Queue (6 Dateien) |
-| *pending* | Phase 2e: Zeitablauf-Remote-Abgabe, beforeunload, Tastaturnavigation, Startbildschirm (5 Dateien) |
+| `44ec263` | Phase 2e: Zeitablauf-Remote-Abgabe, beforeunload, Tastaturnavigation, Startbildschirm (5 Dateien) |
+| *pending* | Phase 2f: Abschnitt-Header, Fortschrittsbalken, FragenÜbersicht, Abgabe-Zusammenfassung (6 Dateien) |
