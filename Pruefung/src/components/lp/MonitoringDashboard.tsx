@@ -8,9 +8,11 @@ import type { SchuelerAbgabe } from '../../types/korrektur.ts'
 import type { Frage } from '../../types/fragen.ts'
 import ThemeToggle from '../ThemeToggle.tsx'
 import SchuelerZeile from './SchuelerZeile.tsx'
+import { typLabel } from '../../utils/fachbereich.ts'
 
 type Sortierung = 'name' | 'status' | 'fortschritt' | 'unterbrechungen'
 type Filter = 'alle' | 'aktiv' | 'inaktiv' | 'abgegeben' | 'nicht-gestartet'
+type MonitoringAnsicht = 'sus' | 'fragen'
 
 export default function MonitoringDashboard({ pruefungId }: { pruefungId: string | null }) {
   const user = useAuthStore((s) => s.user)
@@ -23,6 +25,7 @@ export default function MonitoringDashboard({ pruefungId }: { pruefungId: string
   const [filter, setFilter] = useState<Filter>('alle')
   const [aufgeklappteSchueler, setAufgeklappteSchueler] = useState<Set<string>>(new Set())
   const [autoRefresh, setAutoRefresh] = useState(true)
+  const [ansicht, setAnsicht] = useState<MonitoringAnsicht>('sus')
 
   // Abgaben + Fragen (einmalig geladen, nicht bei jedem Refresh)
   const [abgaben, setAbgaben] = useState<Record<string, SchuelerAbgabe>>({})
@@ -285,6 +288,24 @@ export default function MonitoringDashboard({ pruefungId }: { pruefungId: string
           <StatusKarte label="Unterbrechungen" wert={zusammenfassung.mitUnterbrechungen} farbe="red" />
         </div>
 
+        {/* Ansicht-Toggle: SuS / Fragen */}
+        <div className="flex gap-1 mb-4">
+          {(['sus', 'fragen'] as MonitoringAnsicht[]).map((a) => (
+            <button
+              key={a}
+              onClick={() => setAnsicht(a)}
+              className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors cursor-pointer
+                ${ansicht === a
+                  ? 'bg-slate-800 dark:bg-slate-200 text-white dark:text-slate-800'
+                  : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'
+                }`}
+            >
+              {a === 'sus' ? 'SuS' : 'Fragen'}
+            </button>
+          ))}
+        </div>
+
+        {ansicht === 'sus' && <>
         {/* Filter + Sortierung */}
         <div className="flex flex-wrap items-center gap-2 mb-4">
           <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Filter:</span>
@@ -356,6 +377,11 @@ export default function MonitoringDashboard({ pruefungId }: { pruefungId: string
             ))
           )}
         </div>
+        </>}
+
+        {ansicht === 'fragen' && (
+          <FragenFortschritt fragen={fragen} abgaben={abgaben} gesamtSus={daten.gesamtSus} />
+        )}
 
         {/* Footer mit letztem Update */}
         <p className="text-xs text-slate-400 dark:text-slate-500 mt-3 text-center">
@@ -365,6 +391,73 @@ export default function MonitoringDashboard({ pruefungId }: { pruefungId: string
           {autoRefresh && ' · Auto-Refresh alle 5s'}
         </p>
       </div>
+    </div>
+  )
+}
+
+/** Aggregierte Fragen-Fortschrittsansicht */
+function FragenFortschritt({ fragen, abgaben, gesamtSus }: {
+  fragen: Frage[]
+  abgaben: Record<string, SchuelerAbgabe>
+  gesamtSus: number
+}) {
+  // Für jede Frage zählen, wie viele SuS sie beantwortet haben
+  const abgabenListe = Object.values(abgaben)
+  const total = abgabenListe.length || gesamtSus || 1
+
+  const fragenStats = fragen.map((frage) => {
+    const beantwortet = abgabenListe.filter((a) => a.antworten?.[frage.id] != null).length
+    const prozent = Math.round((beantwortet / total) * 100)
+    return { frage, beantwortet, total, prozent }
+  })
+
+  if (fragen.length === 0) {
+    return (
+      <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-8 text-center text-sm text-slate-400 dark:text-slate-500">
+        Keine Fragen geladen.
+      </div>
+    )
+  }
+
+  return (
+    <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+      {/* Header */}
+      <div className="grid grid-cols-[2fr_1fr_1.5fr_0.5fr] gap-2 px-4 py-2.5 bg-slate-50 dark:bg-slate-750 border-b border-slate-200 dark:border-slate-700 text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+        <span>Frage</span>
+        <span>Typ</span>
+        <span>Beantwortet</span>
+        <span className="text-right">%</span>
+      </div>
+
+      {fragenStats.map(({ frage, beantwortet, total: t, prozent }) => (
+        <div
+          key={frage.id}
+          className="grid grid-cols-[2fr_1fr_1.5fr_0.5fr] gap-2 px-4 py-2.5 border-b border-slate-100 dark:border-slate-700/50 items-center text-sm"
+        >
+          <span className="font-mono text-xs text-slate-600 dark:text-slate-300 truncate" title={frage.id}>
+            {frage.id}
+          </span>
+          <span className="inline-flex">
+            <span className="px-2 py-0.5 text-xs rounded bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
+              {typLabel(frage.typ)}
+            </span>
+          </span>
+          <div className="flex items-center gap-2">
+            <div className="flex-1 h-2 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-green-500 dark:bg-green-400 rounded-full transition-all"
+                style={{ width: `${prozent}%` }}
+              />
+            </div>
+            <span className="text-xs text-slate-500 dark:text-slate-400 tabular-nums whitespace-nowrap">
+              {beantwortet} / {t}
+            </span>
+          </div>
+          <span className="text-xs text-slate-600 dark:text-slate-300 tabular-nums text-right font-medium">
+            {prozent}%
+          </span>
+        </div>
+      ))}
     </div>
   )
 }
