@@ -1,13 +1,17 @@
 import type { SchuelerStatus } from '../../types/monitoring.ts'
+import type { Antwort } from '../../types/antworten.ts'
+import type { Frage } from '../../types/fragen.ts'
 
 interface Props {
   schueler: SchuelerStatus
   aufgeklappt: boolean
   onToggle: () => void
   zeitverlaengerung?: number // Zusätzliche Minuten (Nachteilsausgleich)
+  antworten?: Record<string, Antwort> // Antworten des Schülers (frageId → Antwort)
+  fragen?: Frage[] // Fragen der Prüfung (für Metadaten)
 }
 
-export default function SchuelerZeile({ schueler, aufgeklappt, onToggle, zeitverlaengerung }: Props) {
+export default function SchuelerZeile({ schueler, aufgeklappt, onToggle, zeitverlaengerung, antworten, fragen }: Props) {
   const fortschrittProzent = schueler.gesamtFragen > 0
     ? Math.round((schueler.beantworteteFragen / schueler.gesamtFragen) * 100)
     : 0
@@ -134,10 +138,112 @@ export default function SchuelerZeile({ schueler, aufgeklappt, onToggle, zeitver
               </div>
             </div>
           )}
+
+          {/* Fragen-Fortschritt */}
+          {fragen && fragen.length > 0 && (
+            <FragenFortschritt fragen={fragen} antworten={antworten} />
+          )}
         </div>
       )}
     </div>
   )
+}
+
+/** Typ-Label für Frage-Badges */
+const FRAGE_TYP_LABELS: Record<string, string> = {
+  mc: 'MC',
+  freitext: 'Freitext',
+  zuordnung: 'Zuordnung',
+  lueckentext: 'Lückentext',
+  visualisierung: 'Visualisierung',
+  richtigfalsch: 'R/F',
+  berechnung: 'Berechnung',
+}
+
+/** Fragen-Fortschritt im aufgeklappten Detail-Panel */
+function FragenFortschritt({ fragen, antworten }: { fragen: Frage[]; antworten?: Record<string, Antwort> }) {
+  const beantwortet = antworten ? Object.keys(antworten).length : 0
+
+  return (
+    <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700">
+      <h4 className="text-xs font-medium text-slate-600 dark:text-slate-300 mb-2">
+        Fragen-Fortschritt ({beantwortet}/{fragen.length})
+      </h4>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+        {fragen.map((frage) => {
+          const antwort = antworten?.[frage.id]
+          const istBeantwortet = !!antwort
+          return (
+            <div
+              key={frage.id}
+              className={`flex items-start gap-2 px-2 py-1.5 rounded text-xs ${
+                istBeantwortet
+                  ? 'bg-green-50 dark:bg-green-900/15 border border-green-200 dark:border-green-800/40'
+                  : 'bg-slate-100 dark:bg-slate-700/40 border border-slate-200 dark:border-slate-600/40'
+              }`}
+            >
+              {/* Status-Icon */}
+              <span className={`flex-shrink-0 mt-0.5 ${istBeantwortet ? 'text-green-600 dark:text-green-400' : 'text-slate-400 dark:text-slate-500'}`}>
+                {istBeantwortet ? '✓' : '—'}
+              </span>
+
+              <div className="min-w-0 flex-1">
+                {/* Frage-ID + Typ-Badge */}
+                <div className="flex items-center gap-1.5">
+                  <span className="font-medium text-slate-700 dark:text-slate-200 truncate">
+                    {frage.id}
+                  </span>
+                  <span className="flex-shrink-0 px-1 py-0.5 rounded bg-slate-200 dark:bg-slate-600 text-slate-600 dark:text-slate-300 text-[10px] leading-none">
+                    {FRAGE_TYP_LABELS[frage.typ] || frage.typ}
+                  </span>
+                </div>
+
+                {/* Antwort-Vorschau */}
+                {antwort && (
+                  <div className="mt-0.5 text-slate-500 dark:text-slate-400 truncate">
+                    <AntwortVorschau antwort={antwort} />
+                  </div>
+                )}
+              </div>
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+/** Kompakte Vorschau einer Antwort */
+function AntwortVorschau({ antwort }: { antwort: Antwort }) {
+  switch (antwort.typ) {
+    case 'mc':
+      return <span>Gewählt: {antwort.gewaehlteOptionen.join(', ') || '—'}</span>
+    case 'freitext': {
+      const text = antwort.text || ''
+      return <span>{text.length > 50 ? text.slice(0, 50) + '…' : text || '—'}</span>
+    }
+    case 'zuordnung': {
+      const anzahl = Object.keys(antwort.zuordnungen).length
+      return <span>{anzahl} Zuordnung{anzahl !== 1 ? 'en' : ''}</span>
+    }
+    case 'lueckentext': {
+      const anzahl = Object.keys(antwort.eintraege).length
+      return <span>{anzahl} Lücke{anzahl !== 1 ? 'n' : ''} ausgefüllt</span>
+    }
+    case 'richtigfalsch': {
+      const anzahl = Object.keys(antwort.bewertungen).length
+      return <span>{anzahl} Aussage{anzahl !== 1 ? 'n' : ''} bewertet</span>
+    }
+    case 'berechnung': {
+      const anzahl = Object.keys(antwort.ergebnisse).length
+      const hatRechenweg = !!antwort.rechenweg
+      return <span>{anzahl} Ergebnis{anzahl !== 1 ? 'se' : ''}{hatRechenweg ? ' + Rechenweg' : ''}</span>
+    }
+    case 'visualisierung':
+      return <span>{antwort.bildLink ? 'Bild vorhanden' : 'Daten vorhanden'}</span>
+    default:
+      return <span>—</span>
+  }
 }
 
 /** Farbiger Status-Punkt */

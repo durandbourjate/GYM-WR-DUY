@@ -1,8 +1,11 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import { useAuthStore } from '../../store/authStore.ts'
 import { apiService } from '../../services/apiService.ts'
 import { erstelleDemoMonitoring } from '../../data/demoMonitoring.ts'
+import { demoFragen } from '../../data/demoFragen.ts'
 import type { MonitoringDaten, SchuelerStatus } from '../../types/monitoring.ts'
+import type { SchuelerAbgabe } from '../../types/korrektur.ts'
+import type { Frage } from '../../types/fragen.ts'
 import ThemeToggle from '../ThemeToggle.tsx'
 import SchuelerZeile from './SchuelerZeile.tsx'
 
@@ -20,6 +23,11 @@ export default function MonitoringDashboard({ pruefungId }: { pruefungId: string
   const [filter, setFilter] = useState<Filter>('alle')
   const [aufgeklappteSchueler, setAufgeklappteSchueler] = useState<Set<string>>(new Set())
   const [autoRefresh, setAutoRefresh] = useState(true)
+
+  // Abgaben + Fragen (einmalig geladen, nicht bei jedem Refresh)
+  const [abgaben, setAbgaben] = useState<Record<string, SchuelerAbgabe>>({})
+  const [fragen, setFragen] = useState<Frage[]>([])
+  const abgabenGeladen = useRef(false)
 
   // Daten laden (Backend oder Demo)
   const ladeDaten = useCallback(async () => {
@@ -75,6 +83,31 @@ export default function MonitoringDashboard({ pruefungId }: { pruefungId: string
     const interval = setInterval(ladeDaten, 5000)
     return () => clearInterval(interval)
   }, [autoRefresh, ladeStatus, ladeDaten])
+
+  // Abgaben + Fragen einmalig laden (für Fragen-Fortschritt)
+  useEffect(() => {
+    if (abgabenGeladen.current || !user) return
+
+    async function ladeAbgabenUndFragen() {
+      if (istDemoModus || !apiService.istKonfiguriert() || !pruefungId) {
+        // Demo-Modus: Demo-Fragen verwenden, Abgaben leer lassen
+        setFragen(demoFragen.slice(0, 7)) // Passend zu gesamtFragen=7 in Demo
+        abgabenGeladen.current = true
+        return
+      }
+
+      const [abgabenResult, pruefungResult] = await Promise.all([
+        apiService.ladeAbgaben(pruefungId, user!.email),
+        apiService.ladePruefung(pruefungId, user!.email),
+      ])
+
+      if (abgabenResult) setAbgaben(abgabenResult)
+      if (pruefungResult?.fragen) setFragen(pruefungResult.fragen)
+      abgabenGeladen.current = true
+    }
+
+    ladeAbgabenUndFragen()
+  }, [user, istDemoModus, pruefungId])
 
   // Detail-Zeile aufklappen/zuklappen
   function toggleDetail(email: string): void {
@@ -317,6 +350,8 @@ export default function MonitoringDashboard({ pruefungId }: { pruefungId: string
                 aufgeklappt={aufgeklappteSchueler.has(schueler.email)}
                 onToggle={() => toggleDetail(schueler.email)}
                 zeitverlaengerung={daten?.zeitverlaengerungen?.[schueler.email]}
+                antworten={abgaben[schueler.email]?.antworten}
+                fragen={fragen}
               />
             ))
           )}
