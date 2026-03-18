@@ -78,9 +78,9 @@ export default function MonitoringDashboard({ pruefungId }: { pruefungId: string
           return (reihenfolge[a.status] ?? 4) - (reihenfolge[b.status] ?? 4)
         }
         case 'fortschritt':
-          return (b.beantworteteFragen / (b.gesamtFragen || 1)) - (a.beantworteteFragen / (a.gesamtFragen || 1))
+          return ((b.beantworteteFragen || 0) / (b.gesamtFragen || 1)) - ((a.beantworteteFragen || 0) / (a.gesamtFragen || 1))
         case 'unterbrechungen':
-          return b.unterbrechungen.length - a.unterbrechungen.length
+          return (b.unterbrechungen || []).length - (a.unterbrechungen || []).length
         default:
           return 0
       }
@@ -130,6 +130,9 @@ export default function MonitoringDashboard({ pruefungId }: { pruefungId: string
     )
   }
 
+  // Null-Guard: daten könnte null sein wenn ladeStatus noch "laden" ist
+  if (!daten) return null
+
   const gefilterteSchueler = sortiere(filtre(daten.schueler))
 
   // Zusammenfassung berechnen
@@ -138,7 +141,7 @@ export default function MonitoringDashboard({ pruefungId }: { pruefungId: string
     inaktiv: daten.schueler.filter((s) => s.status === 'inaktiv').length,
     abgegeben: daten.schueler.filter((s) => s.status === 'abgegeben').length,
     nichtGestartet: daten.schueler.filter((s) => s.status === 'nicht-gestartet').length,
-    mitUnterbrechungen: daten.schueler.filter((s) => s.unterbrechungen.length > 0).length,
+    mitUnterbrechungen: daten.schueler.filter((s) => (s.unterbrechungen || []).length > 0).length,
   }
 
   return (
@@ -146,10 +149,17 @@ export default function MonitoringDashboard({ pruefungId }: { pruefungId: string
       {/* Header */}
       <header className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-4 py-3 sticky top-0 z-20">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <div>
-            <h1 className="text-lg font-bold text-slate-800 dark:text-slate-100">
-              Prüfungs-Monitoring
-            </h1>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => { window.history.pushState({}, '', window.location.pathname); window.location.reload() }}
+              className="px-3 py-1.5 text-sm text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors cursor-pointer"
+            >
+              ← Zurück
+            </button>
+            <div>
+              <h1 className="text-lg font-bold text-slate-800 dark:text-slate-100">
+                Prüfungs-Monitoring
+              </h1>
             <p className="text-sm text-slate-500 dark:text-slate-400">
               {daten.pruefungTitel}
               {istDemoModus && (
@@ -158,6 +168,7 @@ export default function MonitoringDashboard({ pruefungId }: { pruefungId: string
                 </span>
               )}
             </p>
+            </div>
           </div>
           <div className="flex items-center gap-3">
             {/* Auto-Refresh Toggle */}
