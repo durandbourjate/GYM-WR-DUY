@@ -14,7 +14,6 @@ export default function LoginScreen() {
   const googleButtonRef = useRef<HTMLDivElement>(null)
   const [zeigeFallback, setZeigeFallback] = useState(false)
   const [code, setCode] = useState('')
-  const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [googleGeladen, setGoogleGeladen] = useState(false)
 
@@ -67,10 +66,16 @@ export default function LoginScreen() {
 
   const [codeWirdValidiert, setCodeWirdValidiert] = useState(false)
 
+  // Name aus E-Mail ableiten: vorname.nachname → Vorname Nachname
+  function nameAusEmail(emailStr: string): string {
+    const teil = emailStr.split('@')[0] || ''
+    return teil.split('.').map(t => t.charAt(0).toUpperCase() + t.slice(1)).join(' ')
+  }
+
   async function handleCodeLogin(e: React.FormEvent): Promise<void> {
     e.preventDefault()
-    if (code.length !== 4 || !name.trim() || !email.trim()) {
-      setFehler('Bitte E-Mail, Namen und 4-stelligen Code eingeben.')
+    if (code.length !== 4 || !email.trim()) {
+      setFehler('Bitte E-Mail und 4-stellige Schüler-ID eingeben.')
       return
     }
     // E-Mail normalisieren: wenn nur Vorname eingegeben → @stud.gymhofwil.ch anhängen
@@ -93,7 +98,7 @@ export default function LoginScreen() {
       if (result === null) {
         // Netzwerkfehler → Fallback auf lokale Anmeldung
         console.warn('[Login] Backend nicht erreichbar — Fallback auf lokale Code-Anmeldung')
-        anmeldenMitCode(code, name.trim(), volleEmail)
+        anmeldenMitCode(code, nameAusEmail(volleEmail), volleEmail)
         return
       }
       if (!result.success) {
@@ -103,11 +108,11 @@ export default function LoginScreen() {
       // Backend hat validiert: Name aus Klassenliste verwenden
       const validierterName = result.vorname && result.name
         ? `${result.vorname} ${result.name}`
-        : name.trim()
+        : nameAusEmail(volleEmail)
       anmeldenMitCode(code, validierterName, volleEmail)
     } else {
       // Kein Backend → direkt anmelden
-      anmeldenMitCode(code, name.trim(), volleEmail)
+      anmeldenMitCode(code, nameAusEmail(volleEmail), volleEmail)
     }
   }
 
@@ -165,7 +170,7 @@ export default function LoginScreen() {
             onClick={() => setZeigeFallback(true)}
             className="w-full text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors cursor-pointer"
           >
-            Anmeldung mit Schülercode
+            Anmeldung mit Schüler-ID
           </button>
         )}
 
@@ -173,7 +178,7 @@ export default function LoginScreen() {
           <form onSubmit={handleCodeLogin} className="space-y-3">
             {!istProduktion && (
               <p className="text-xs text-slate-500 dark:text-slate-400 mb-2">
-                Google-Login nicht konfiguriert. Anmeldung mit Schülercode:
+                Google-Login nicht konfiguriert. Anmeldung mit Schüler-ID:
               </p>
             )}
             <div>
@@ -188,24 +193,13 @@ export default function LoginScreen() {
                 className="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-400 dark:focus:ring-slate-500"
               />
               <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
-                Nur der Teil vor @ genügt (z.B. «vorname.nachname»)
+                Nur der Teil vor @ genügt (z.B. «vorname.nachname»). Dein Name wird daraus übernommen.
               </p>
             </div>
+
             <div>
               <label className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">
-                Name
-              </label>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Vorname Nachname"
-                className="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-400 dark:focus:ring-slate-500"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">
-                Schülercode (4-stellig)
+                Schüler-ID (4-stellig)
               </label>
               <input
                 type="text"
@@ -219,7 +213,7 @@ export default function LoginScreen() {
             </div>
             <button
               type="submit"
-              disabled={code.length !== 4 || !name.trim() || !email.trim() || codeWirdValidiert}
+              disabled={code.length !== 4 || !email.trim() || codeWirdValidiert}
               className="w-full py-2.5 bg-slate-800 hover:bg-slate-900 dark:bg-slate-200 dark:hover:bg-slate-100 text-white dark:text-slate-800 text-sm font-semibold rounded-xl transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {codeWirdValidiert ? 'Code wird geprüft…' : 'Anmelden'}
