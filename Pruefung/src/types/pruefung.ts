@@ -31,6 +31,12 @@ export interface PruefungsConfig {
   ruecknavigation: boolean;
   zeitanzeigeTyp: 'countdown' | 'verstricheneZeit' | 'keine';
 
+  // Warteraum / Freischaltung
+  freigeschaltet: boolean;
+
+  // Zeitzuschläge (Nachteilsausgleich: E-Mail → zusätzliche Minuten)
+  zeitverlaengerungen?: Record<string, number>;
+
   // Auto-Save
   autoSaveIntervallSekunden: number;
   heartbeatIntervallSekunden: number;

@@ -46,6 +46,7 @@ export const demoPruefung: PruefungsConfig = {
   ruecknavigation: true,
   zeitanzeigeTyp: 'countdown',
 
+  freigeschaltet: true,
   autoSaveIntervallSekunden: 30,
   heartbeatIntervallSekunden: 10,
 

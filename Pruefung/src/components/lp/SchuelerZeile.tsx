@@ -4,9 +4,10 @@ interface Props {
   schueler: SchuelerStatus
   aufgeklappt: boolean
   onToggle: () => void
+  zeitverlaengerung?: number // Zusätzliche Minuten (Nachteilsausgleich)
 }
 
-export default function SchuelerZeile({ schueler, aufgeklappt, onToggle }: Props) {
+export default function SchuelerZeile({ schueler, aufgeklappt, onToggle, zeitverlaengerung }: Props) {
   const fortschrittProzent = schueler.gesamtFragen > 0
     ? Math.round((schueler.beantworteteFragen / schueler.gesamtFragen) * 100)
     : 0
@@ -26,6 +27,14 @@ export default function SchuelerZeile({ schueler, aufgeklappt, onToggle }: Props
           <span className="text-sm font-medium text-slate-800 dark:text-slate-100 truncate">
             {schueler.name}
           </span>
+          {zeitverlaengerung && zeitverlaengerung > 0 && (
+            <span
+              className="text-xs px-1 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded"
+              title="Nachteilsausgleich"
+            >
+              +{zeitverlaengerung} Min.
+            </span>
+          )}
           {hatProbleme && (
             <span className="text-amber-500 text-xs" title="Hat Unterbrechungen oder Netzwerkfehler">⚠</span>
           )}

@@ -51,4 +51,5 @@ export interface MonitoringDaten {
   gesamtSus: number
   aktualisiert: string // ISO-Timestamp der letzten Datenaktualisierung
   schueler: SchuelerStatus[]
+  zeitverlaengerungen?: Record<string, number> // E-Mail → zusätzliche Minuten (Nachteilsausgleich)
 }

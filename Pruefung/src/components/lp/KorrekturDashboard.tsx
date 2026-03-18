@@ -3,7 +3,9 @@ import { useAuthStore } from '../../store/authStore.ts'
 import { apiService } from '../../services/apiService.ts'
 import type { PruefungsKorrektur, SchuelerAbgabe } from '../../types/korrektur.ts'
 import type { Frage } from '../../types/fragen.ts'
-import { berechneStatistiken } from '../../utils/korrekturUtils.ts'
+import { berechneStatistiken, berechneFragenStatistiken } from '../../utils/korrekturUtils.ts'
+import type { FragenStatistik } from '../../utils/korrekturUtils.ts'
+import { exportiereAlsCSV, downloadCSV } from '../../utils/exportUtils.ts'
 import ThemeToggle from '../ThemeToggle.tsx'
 import KorrekturSchuelerZeile from './KorrekturSchuelerZeile.tsx'
 
@@ -26,6 +28,9 @@ export default function KorrekturDashboard({ pruefungId }: Props) {
   const [feedbackDialog, setFeedbackDialog] = useState(false)
   const [feedbackStatus, setFeedbackStatus] = useState<'idle' | 'senden' | 'fertig'>('idle')
   const [feedbackErgebnis, setFeedbackErgebnis] = useState<{ erfolg: string[]; fehler: string[] } | null>(null)
+  const [analyseOffen, setAnalyseOffen] = useState(false)
+  const [analyseSortierung, setAnalyseSortierung] = useState<'frageId' | 'loesungsquote' | 'durchschnitt'>('frageId')
+  const [analyseSortierungAsc, setAnalyseSortierungAsc] = useState(true)
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   // Daten laden
@@ -159,6 +164,35 @@ export default function KorrekturDashboard({ pruefungId }: Props) {
 
   const stats = korrektur ? berechneStatistiken(korrektur.schueler) : null
 
+  // Fragen-Statistiken berechnen und sortieren
+  const fragenStats: FragenStatistik[] = korrektur ? berechneFragenStatistiken(korrektur) : []
+  const sortiertFragenStats = [...fragenStats].sort((a, b) => {
+    let cmp = 0
+    switch (analyseSortierung) {
+      case 'frageId': cmp = a.frageId.localeCompare(b.frageId); break
+      case 'loesungsquote': cmp = a.loesungsquote - b.loesungsquote; break
+      case 'durchschnitt': cmp = a.durchschnittPunkte - b.durchschnittPunkte; break
+    }
+    return analyseSortierungAsc ? cmp : -cmp
+  })
+
+  function handleAnalyseSortierung(spalte: 'frageId' | 'loesungsquote' | 'durchschnitt'): void {
+    if (analyseSortierung === spalte) {
+      setAnalyseSortierungAsc((prev) => !prev)
+    } else {
+      setAnalyseSortierung(spalte)
+      setAnalyseSortierungAsc(spalte === 'frageId')
+    }
+  }
+
+  // CSV-Export
+  function handleCSVExport(): void {
+    if (!korrektur) return
+    const csv = exportiereAlsCSV(korrektur, fragen)
+    const dateiname = `${korrektur.pruefungTitel.replace(/[^a-zA-Z0-9äöüÄÖÜ\-_ ]/g, '')}_Ergebnisse.csv`
+    downloadCSV(csv, dateiname)
+  }
+
   // Zurück-Navigation
   function zurueck(): void {
     window.location.href = window.location.pathname
@@ -228,6 +262,15 @@ export default function KorrekturDashboard({ pruefungId }: Props) {
                 Fehler: {korrektur.batchFehler}
               </span>
             )}
+            {korrektur && korrektur.schueler.length > 0 && (
+              <button
+                onClick={handleCSVExport}
+                className="px-3 py-1.5 text-sm text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors cursor-pointer"
+                title="Ergebnisse als CSV exportieren"
+              >
+                CSV Export
+              </button>
+            )}
             <button
               onClick={abmelden}
               className="text-xs text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 cursor-pointer"
@@ -248,6 +291,84 @@ export default function KorrekturDashboard({ pruefungId }: Props) {
             <StatKarte label="Median" wert={`${stats.median} Pkt.`} />
             <StatKarte label="Bestanden" wert={`${stats.bestanden}/${korrektur.schueler.length}`} />
             <StatKarte label="Durchgefallen" wert={String(stats.durchgefallen)} highlight={stats.durchgefallen > 0} />
+          </div>
+        )}
+
+        {/* Fragen-Analyse (Toggle) */}
+        {korrektur && korrektur.schueler.length > 0 && fragenStats.length > 0 && (
+          <div className="mb-6">
+            <button
+              onClick={() => setAnalyseOffen((prev) => !prev)}
+              className="text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center gap-2 mb-3 cursor-pointer hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
+            >
+              <span className={`inline-block transition-transform ${analyseOffen ? 'rotate-90' : ''}`}>&#9654;</span>
+              Fragen-Analyse
+            </button>
+            {analyseOffen && (
+              <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-slate-200 dark:border-slate-700 text-left">
+                      <th
+                        className="px-4 py-2 text-slate-500 dark:text-slate-400 font-medium cursor-pointer hover:text-slate-700 dark:hover:text-slate-200 select-none"
+                        onClick={() => handleAnalyseSortierung('frageId')}
+                      >
+                        Frage-ID {analyseSortierung === 'frageId' && (analyseSortierungAsc ? '↑' : '↓')}
+                      </th>
+                      <th className="px-4 py-2 text-slate-500 dark:text-slate-400 font-medium">Typ</th>
+                      <th
+                        className="px-4 py-2 text-slate-500 dark:text-slate-400 font-medium cursor-pointer hover:text-slate-700 dark:hover:text-slate-200 select-none text-right"
+                        onClick={() => handleAnalyseSortierung('durchschnitt')}
+                      >
+                        Punkte {analyseSortierung === 'durchschnitt' && (analyseSortierungAsc ? '↑' : '↓')}
+                      </th>
+                      <th
+                        className="px-4 py-2 text-slate-500 dark:text-slate-400 font-medium cursor-pointer hover:text-slate-700 dark:hover:text-slate-200 select-none"
+                        onClick={() => handleAnalyseSortierung('loesungsquote')}
+                      >
+                        Losungsquote {analyseSortierung === 'loesungsquote' && (analyseSortierungAsc ? '↑' : '↓')}
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {sortiertFragenStats.map((stat) => {
+                      const farbe = stat.loesungsquote > 70
+                        ? 'text-green-700 dark:text-green-400'
+                        : stat.loesungsquote >= 40
+                          ? 'text-amber-700 dark:text-amber-400'
+                          : 'text-red-700 dark:text-red-400'
+                      const barFarbe = stat.loesungsquote > 70
+                        ? 'bg-green-500 dark:bg-green-400'
+                        : stat.loesungsquote >= 40
+                          ? 'bg-amber-500 dark:bg-amber-400'
+                          : 'bg-red-500 dark:bg-red-400'
+                      return (
+                        <tr key={stat.frageId} className="border-b border-slate-100 dark:border-slate-700/50 last:border-0">
+                          <td className="px-4 py-2 font-mono text-slate-800 dark:text-slate-200">{stat.frageId}</td>
+                          <td className="px-4 py-2 text-slate-500 dark:text-slate-400 capitalize">{stat.fragenTyp}</td>
+                          <td className="px-4 py-2 text-right text-slate-800 dark:text-slate-200 tabular-nums">
+                            {stat.durchschnittPunkte} / {stat.maxPunkte}
+                          </td>
+                          <td className="px-4 py-2">
+                            <div className="flex items-center gap-2">
+                              <div className="flex-1 h-2 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                                <div
+                                  className={`h-full rounded-full transition-all ${barFarbe}`}
+                                  style={{ width: `${Math.min(stat.loesungsquote, 100)}%` }}
+                                />
+                              </div>
+                              <span className={`text-xs font-medium tabular-nums w-12 text-right ${farbe}`}>
+                                {stat.loesungsquote}%
+                              </span>
+                            </div>
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         )}
 

@@ -260,6 +260,7 @@ function demoConfigs(): PruefungsConfig[] {
       heartbeatIntervallSekunden: 10,
       korrektur: { aktiviert: false, modus: 'batch' },
       feedback: { zeitpunkt: 'nach-review', format: 'in-app-und-pdf', detailgrad: 'vollstaendig' },
+      freigeschaltet: true,
     },
   ]
 }

@@ -1,4 +1,4 @@
-import type { FragenBewertung, SchuelerKorrektur } from '../types/korrektur.ts'
+import type { FragenBewertung, SchuelerKorrektur, PruefungsKorrektur } from '../types/korrektur.ts'
 
 /** Effektive Punkte: LP-Anpassung wenn vorhanden, sonst KI-Vorschlag, sonst 0 */
 export function effektivePunkte(bewertung: FragenBewertung): number {
@@ -100,4 +100,69 @@ export function quelleLabel(quelle: FragenBewertung['quelle']): string {
     case 'fehler': return 'Fehler'
     default: return quelle
   }
+}
+
+// === Fragen-Statistiken ===
+
+export interface FragenStatistik {
+  frageId: string
+  fragenTyp: string
+  maxPunkte: number
+  durchschnittPunkte: number
+  loesungsquote: number  // 0-100%
+  anzahlBewertet: number
+}
+
+/**
+ * Berechnet Statistiken pro Frage über alle SuS.
+ * Für jede eindeutige frageId: Durchschnitt, Lösungsquote, Anzahl bewerteter SuS.
+ */
+export function berechneFragenStatistiken(korrektur: PruefungsKorrektur): FragenStatistik[] {
+  // Alle Frage-IDs sammeln
+  const fragenDaten = new Map<string, {
+    typ: string
+    maxPunkte: number
+    sumPunkte: number
+    anzahl: number
+  }>()
+
+  for (const schueler of korrektur.schueler) {
+    for (const [frageId, bewertung] of Object.entries(schueler.bewertungen)) {
+      const bestehend = fragenDaten.get(frageId)
+      const punkte = effektivePunkte(bewertung)
+
+      if (bestehend) {
+        bestehend.sumPunkte += punkte
+        bestehend.anzahl += 1
+      } else {
+        fragenDaten.set(frageId, {
+          typ: bewertung.fragenTyp,
+          maxPunkte: bewertung.maxPunkte,
+          sumPunkte: punkte,
+          anzahl: 1,
+        })
+      }
+    }
+  }
+
+  const statistiken: FragenStatistik[] = []
+  for (const [frageId, daten] of fragenDaten) {
+    const durchschnitt = daten.anzahl > 0
+      ? Math.round((daten.sumPunkte / daten.anzahl) * 100) / 100
+      : 0
+    const loesungsquote = daten.maxPunkte > 0
+      ? Math.round((durchschnitt / daten.maxPunkte) * 1000) / 10
+      : 0
+
+    statistiken.push({
+      frageId,
+      fragenTyp: daten.typ,
+      maxPunkte: daten.maxPunkte,
+      durchschnittPunkte: durchschnitt,
+      loesungsquote,
+      anzahlBewertet: daten.anzahl,
+    })
+  }
+
+  return statistiken
 }

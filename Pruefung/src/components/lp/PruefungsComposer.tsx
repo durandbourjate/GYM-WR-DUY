@@ -36,6 +36,8 @@ const leerePruefung: PruefungsConfig = {
   heartbeatIntervallSekunden: 10,
   korrektur: { aktiviert: false, modus: 'batch' },
   feedback: { zeitpunkt: 'nach-review', format: 'in-app-und-pdf', detailgrad: 'vollstaendig' },
+  freigeschaltet: true,
+  zeitverlaengerungen: {},
 }
 
 export default function PruefungsComposer({ config, onZurueck }: Props) {
@@ -296,6 +298,28 @@ function ConfigTab({
   updatePruefung: (partial: Partial<PruefungsConfig>) => void
   toggleFachbereich: (fb: string) => void
 }) {
+  const [neueEmail, setNeueEmail] = useState('')
+  const [neueMinuten, setNeueMinuten] = useState(15)
+
+  const zeitverlaengerungen = pruefung.zeitverlaengerungen ?? {}
+  const eintraege = Object.entries(zeitverlaengerungen)
+
+  function addZeitverlaengerung(): void {
+    const email = neueEmail.trim().toLowerCase()
+    if (!email || !email.includes('@')) return
+    updatePruefung({
+      zeitverlaengerungen: { ...zeitverlaengerungen, [email]: neueMinuten },
+    })
+    setNeueEmail('')
+    setNeueMinuten(15)
+  }
+
+  function removeZeitverlaengerung(email: string): void {
+    const kopie = { ...zeitverlaengerungen }
+    delete kopie[email]
+    updatePruefung({ zeitverlaengerungen: kopie })
+  }
+
   return (
     <div className="space-y-6">
       {/* Grunddaten */}
@@ -456,6 +480,73 @@ function ConfigTab({
               <option value="keine">Keine Zeitanzeige</option>
             </select>
           </Field>
+        </div>
+      </Section>
+
+      {/* Zeitzuschläge (Nachteilsausgleich) */}
+      <Section titel="Zeitzuschläge (Nachteilsausgleich)">
+        <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">
+          Individuelle Zeitverlängerungen für SuS mit Nachteilsausgleich. Die zusätzlichen Minuten werden zur regulären Prüfungsdauer addiert.
+        </p>
+
+        {/* Bestehende Einträge */}
+        {eintraege.length > 0 && (
+          <div className="space-y-2 mb-4">
+            {eintraege.map(([email, minuten]) => (
+              <div
+                key={email}
+                className="flex items-center gap-3 px-3 py-2 bg-slate-50 dark:bg-slate-700/30 rounded-lg text-sm"
+              >
+                <span className="flex-1 text-slate-700 dark:text-slate-200 truncate">{email}</span>
+                <span className="text-xs px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded font-medium">
+                  +{minuten} Min.
+                </span>
+                <button
+                  onClick={() => removeZeitverlaengerung(email)}
+                  className="w-6 h-6 text-xs text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 rounded cursor-pointer transition-colors"
+                  title="Entfernen"
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Neuen Eintrag hinzufügen */}
+        <div className="flex items-end gap-2">
+          <Field label="E-Mail">
+            <input
+              type="email"
+              value={neueEmail}
+              onChange={(e) => setNeueEmail(e.target.value)}
+              placeholder="vorname.nachname@stud.gymhofwil.ch"
+              className="input-field"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault()
+                  addZeitverlaengerung()
+                }
+              }}
+            />
+          </Field>
+          <Field label="Minuten">
+            <input
+              type="number"
+              value={neueMinuten}
+              onChange={(e) => setNeueMinuten(parseInt(e.target.value) || 0)}
+              min={1}
+              max={120}
+              className="input-field w-20"
+            />
+          </Field>
+          <button
+            onClick={addZeitverlaengerung}
+            disabled={!neueEmail.trim() || !neueEmail.includes('@')}
+            className="px-3 py-2 text-sm font-medium text-white bg-slate-800 dark:bg-slate-200 dark:text-slate-800 rounded-lg hover:bg-slate-900 dark:hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer mb-px"
+          >
+            +
+          </button>
         </div>
       </Section>
     </div>

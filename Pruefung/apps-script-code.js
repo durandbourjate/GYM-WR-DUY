@@ -65,6 +65,8 @@ function doPost(e) {
       return generiereUndSendeFeedbackEndpoint(body);
     case 'validiereSchuelercode':
       return validiereSchuelercode(body);
+    case 'schalteFrei':
+      return schalteFreiEndpoint(body);
     default:
       return jsonResponse({ error: 'Unbekannte Aktion' });
   }
@@ -165,6 +167,8 @@ function ladePruefung(pruefungId, email) {
       autoSaveIntervallSekunden: Number(configRow.autoSaveIntervallSekunden) || 30,
       heartbeatIntervallSekunden: Number(configRow.heartbeatIntervallSekunden) || 10,
       zufallsreihenfolgeFragen: configRow.zufallsreihenfolgeFragen === 'true',
+      freigeschaltet: configRow.freigeschaltet === 'true',
+      zeitverlaengerungen: safeJsonParse(configRow.zeitverlaengerungen, {}),
       korrektur: { aktiviert: false, modus: 'batch' },
       feedback: { zeitpunkt: 'nach-review', format: 'pdf', detailgrad: 'vollstaendig' },
     };
@@ -462,6 +466,8 @@ function ladeAlleConfigs(email) {
       zufallsreihenfolgeFragen: row.zufallsreihenfolgeFragen === 'true',
       autoSaveIntervallSekunden: Number(row.autoSaveIntervallSekunden) || 30,
       heartbeatIntervallSekunden: Number(row.heartbeatIntervallSekunden) || 10,
+      freigeschaltet: row.freigeschaltet === 'true',
+      zeitverlaengerungen: safeJsonParse(row.zeitverlaengerungen, {}),
       korrektur: { aktiviert: false, modus: 'batch' },
       feedback: { zeitpunkt: 'nach-review', format: 'pdf', detailgrad: 'vollstaendig' },
     }));
@@ -537,6 +543,8 @@ function speichereConfig(body) {
       zufallsreihenfolgeFragen: config.zufallsreihenfolgeFragen ? 'true' : 'false',
       autoSaveIntervallSekunden: String(config.autoSaveIntervallSekunden || 30),
       heartbeatIntervallSekunden: String(config.heartbeatIntervallSekunden || 10),
+      freigeschaltet: config.freigeschaltet ? 'true' : 'false',
+      zeitverlaengerungen: JSON.stringify(config.zeitverlaengerungen || {}),
     };
 
     const existingRow = data.findIndex(row => row.id === config.id);
@@ -1114,6 +1122,38 @@ function findOrCreatePdfOrdner() {
   const iter = antworten.getFoldersByName('Feedback-PDFs');
   if (iter.hasNext()) return iter.next();
   return antworten.createFolder('Feedback-PDFs');
+}
+
+// === PRÜFUNG FREISCHALTEN ===
+
+function schalteFreiEndpoint(body) {
+  try {
+    const { pruefungId, email } = body;
+    if (!email || !email.endsWith('@' + LP_DOMAIN)) {
+      return jsonResponse({ error: 'Nur für Lehrpersonen' });
+    }
+    if (!pruefungId) {
+      return jsonResponse({ error: 'Keine Prüfungs-ID' });
+    }
+
+    const configSheet = SpreadsheetApp.openById(CONFIGS_ID).getSheetByName('Configs');
+    const data = getSheetData(configSheet);
+    const headers = configSheet.getRange(1, 1, 1, configSheet.getLastColumn()).getValues()[0];
+    const rowIndex = data.findIndex(row => row.id === pruefungId);
+
+    if (rowIndex < 0) {
+      return jsonResponse({ error: 'Prüfung nicht gefunden' });
+    }
+
+    const col = headers.indexOf('freigeschaltet');
+    if (col >= 0) {
+      configSheet.getRange(rowIndex + 2, col + 1).setValue('true');
+    }
+
+    return jsonResponse({ success: true });
+  } catch (error) {
+    return jsonResponse({ error: error.message });
+  }
 }
 
 // === SCHÜLERCODE VALIDIERUNG ===

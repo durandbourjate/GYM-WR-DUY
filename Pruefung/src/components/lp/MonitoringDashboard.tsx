@@ -288,6 +288,7 @@ export default function MonitoringDashboard({ pruefungId }: { pruefungId: string
                 schueler={schueler}
                 aufgeklappt={aufgeklappteSchueler.has(schueler.email)}
                 onToggle={() => toggleDetail(schueler.email)}
+                zeitverlaengerung={daten?.zeitverlaengerungen?.[schueler.email]}
               />
             ))
           )}

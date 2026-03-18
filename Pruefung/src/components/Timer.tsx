@@ -38,11 +38,15 @@ export default function Timer({ onZeitAbgelaufen }: Props) {
   const unterbrechungenRef = useRef(unterbrechungen)
   unterbrechungenRef.current = unterbrechungen
 
+  // Individuelle Zeitverlängerung (Nachteilsausgleich)
+  const zusatzMinuten = Number((user?.email && config?.zeitverlaengerungen?.[user.email]) ?? 0)
+  const effektiveDauer = (config?.dauerMinuten ?? 0) + zusatzMinuten
+
   useEffect(() => {
     if (!config || !startzeit || abgegeben) return
 
     const update = () => {
-      const rest = berechneRestzeit(startzeit, config.dauerMinuten)
+      const rest = berechneRestzeit(startzeit, effektiveDauer)
       setRestSekunden(rest)
       if (rest <= 0 && !abgegebenRef.current) {
         abgegebenRef.current = true
@@ -93,14 +97,14 @@ export default function Timer({ onZeitAbgelaufen }: Props) {
     update()
     const interval = setInterval(update, 1000)
     return () => clearInterval(interval)
-  }, [config, startzeit, abgegeben, pruefungAbgeben, onZeitAbgelaufen, user, istDemoModus])
+  }, [config, startzeit, abgegeben, pruefungAbgeben, onZeitAbgelaufen, user, istDemoModus, effektiveDauer])
 
   if (!config || restSekunden === null) return null
 
   const istCountdown = config.zeitanzeigeTyp === 'countdown'
   const anzeige = istCountdown
     ? formatZeit(Math.max(0, restSekunden))
-    : formatZeit(config.dauerMinuten * 60 - restSekunden)
+    : formatZeit(effektiveDauer * 60 - restSekunden)
 
   const warnungStufe =
     restSekunden <= 0 ? 'abgelaufen' : restSekunden <= 300 ? 'kritisch' : restSekunden <= 900 ? 'warnung' : 'normal'
@@ -119,6 +123,11 @@ export default function Timer({ onZeitAbgelaufen }: Props) {
       title={`${restSekunden > 0 ? 'Verbleibende Zeit' : 'Zeit abgelaufen'}`}
     >
       {istCountdown ? '' : '+'}{anzeige}
+      {zusatzMinuten > 0 && (
+        <span className="text-xs font-normal text-slate-500 dark:text-slate-400 ml-1" title="Nachteilsausgleich">
+          (+{zusatzMinuten} Min.)
+        </span>
+      )}
     </div>
   )
 }

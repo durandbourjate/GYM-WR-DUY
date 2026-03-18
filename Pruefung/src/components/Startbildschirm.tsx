@@ -1,7 +1,9 @@
+import { useState, useEffect } from 'react'
 import type { PruefungsConfig } from '../types/pruefung.ts'
 import type { Frage } from '../types/fragen.ts'
 import { usePruefungStore } from '../store/pruefungStore.ts'
 import { useAuthStore } from '../store/authStore.ts'
+import { apiService } from '../services/apiService.ts'
 import { istImSEB } from '../services/sebService.ts'
 import ThemeToggle from './ThemeToggle.tsx'
 
@@ -15,6 +17,27 @@ export default function Startbildschirm({ config, fragen, wiederhergestellt }: P
   const pruefungStarten = usePruefungStore((s) => s.pruefungStarten)
   const setPhase = usePruefungStore((s) => s.setPhase)
   const user = useAuthStore((s) => s.user)
+  const istDemoModus = useAuthStore((s) => s.istDemoModus)
+
+  // Warteraum: Polling bis freigeschaltet === true
+  const [istFreigeschaltet, setIstFreigeschaltet] = useState(
+    istDemoModus || config.freigeschaltet
+  )
+
+  useEffect(() => {
+    // Kein Polling nötig wenn bereits freigeschaltet oder Demo-Modus
+    if (istFreigeschaltet || istDemoModus) return
+
+    const interval = setInterval(async () => {
+      if (!user) return
+      const result = await apiService.ladePruefung(config.id, user.email)
+      if (result?.config.freigeschaltet) {
+        setIstFreigeschaltet(true)
+      }
+    }, 3000)
+
+    return () => clearInterval(interval)
+  }, [istFreigeschaltet, istDemoModus, config.id, user])
 
   function handleStart() {
     if (wiederhergestellt) {
@@ -35,6 +58,57 @@ export default function Startbildschirm({ config, fragen, wiederhergestellt }: P
   }
 
   const sebErforderlich = config.sebErforderlich && !istImSEB()
+
+  // Warteraum anzeigen wenn Prüfung noch nicht freigeschaltet
+  if (!istFreigeschaltet) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900 p-4 relative">
+        <div className="absolute top-4 right-4">
+          <ThemeToggle />
+        </div>
+
+        <div className="max-w-lg w-full bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700 p-8">
+          {/* Warte-Animation */}
+          <div className="text-center mb-8">
+            <div className="w-20 h-20 mx-auto mb-6 flex items-center justify-center">
+              <svg
+                className="w-16 h-16 text-slate-400 dark:text-slate-500 animate-pulse"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={1.5}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+              </svg>
+            </div>
+            <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-2">
+              {config.titel}
+            </h1>
+            <p className="text-lg text-slate-500 dark:text-slate-400 mb-1">
+              Warte auf Freigabe durch die Lehrperson...
+            </p>
+            {/* Spinning-Indikator */}
+            <div className="mt-4 flex justify-center">
+              <div className="w-6 h-6 border-2 border-slate-300 dark:border-slate-600 border-t-slate-600 dark:border-t-slate-300 rounded-full animate-spin" />
+            </div>
+          </div>
+
+          {/* Prüfungsinfos weiterhin sichtbar */}
+          <div className="grid grid-cols-3 gap-3 mb-4">
+            <InfoCard label="Klasse" wert={config.klasse} />
+            <InfoCard label="Dauer" wert={`${config.dauerMinuten} Min.`} />
+            <InfoCard label="Datum" wert={config.datum} />
+          </div>
+
+          {user && (
+            <p className="text-center text-sm text-slate-400 dark:text-slate-500">
+              Angemeldet als {user.name}
+            </p>
+          )}
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900 p-4 relative">
