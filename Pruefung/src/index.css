@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* Tailwind v4: Class-basiertes Dark Mode statt Media Query */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* Neutrales Farbschema: slate hat Blau-Stich → mit reinem Grau überschreiben */
 html {
   background-color: #ffffff;
