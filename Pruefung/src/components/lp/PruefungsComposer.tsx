@@ -7,6 +7,7 @@ import type { PruefungsConfig, PruefungsAbschnitt } from '../../types/pruefung.t
 import { formatDatum } from '../../utils/zeit.ts'
 import ThemeToggle from '../ThemeToggle.tsx'
 import FragenBrowser from './FragenBrowser.tsx'
+import SuSVorschau from './SuSVorschau.tsx'
 
 interface Props {
   config: PruefungsConfig | null // null = neue Prüfung
@@ -51,6 +52,7 @@ export default function PruefungsComposer({ config, onZurueck }: Props) {
   const [zeigFragenBrowser, setZeigFragenBrowser] = useState(false)
   const [zielAbschnittIndex, setZielAbschnittIndex] = useState<number>(0)
   const [loeschDialog, setLoeschDialog] = useState<{ index: number; titel: string } | null>(null)
+  const [zeigSuSVorschau, setZeigSuSVorschau] = useState(false)
 
   const loeschDialogRef = useRef<HTMLDivElement>(null)
   useFocusTrap(loeschDialog ? loeschDialogRef : { current: null })
@@ -248,7 +250,7 @@ export default function PruefungsComposer({ config, onZurueck }: Props) {
           />
         )}
 
-        {tab === 'vorschau' && <VorschauTab pruefung={pruefung} />}
+        {tab === 'vorschau' && <VorschauTab pruefung={pruefung} onSuSVorschau={() => setZeigSuSVorschau(true)} />}
       </main>
 
       {/* Fragen-Browser Overlay */}
@@ -257,6 +259,14 @@ export default function PruefungsComposer({ config, onZurueck }: Props) {
           onHinzufuegen={handleFragenHinzufuegen}
           onSchliessen={() => setZeigFragenBrowser(false)}
           bereitsVerwendet={pruefung.abschnitte.flatMap((a) => a.fragenIds)}
+        />
+      )}
+
+      {/* SuS-Vorschau Overlay */}
+      {zeigSuSVorschau && (
+        <SuSVorschau
+          config={pruefung}
+          onSchliessen={() => setZeigSuSVorschau(false)}
         />
       )}
 
@@ -709,7 +719,7 @@ function AbschnitteTab({
   )
 }
 
-function VorschauTab({ pruefung }: { pruefung: PruefungsConfig }) {
+function VorschauTab({ pruefung, onSuSVorschau }: { pruefung: PruefungsConfig; onSuSVorschau: () => void }) {
   const gesamtFragen = pruefung.abschnitte.reduce((s, a) => s + a.fragenIds.length, 0)
 
   return (
@@ -769,6 +779,20 @@ function VorschauTab({ pruefung }: { pruefung: PruefungsConfig }) {
           </div>
         )}
       </div>
+
+      {/* SuS-Vorschau Button */}
+      <button
+        onClick={onSuSVorschau}
+        disabled={gesamtFragen === 0}
+        className="mt-4 w-full py-3 text-sm font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-600 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+      >
+        SuS-Ansicht öffnen
+      </button>
+      {gesamtFragen === 0 && (
+        <p className="text-xs text-slate-400 dark:text-slate-500 text-center mt-2">
+          Fügen Sie zuerst Fragen hinzu, um die SuS-Ansicht zu sehen.
+        </p>
+      )}
     </div>
   )
 }
