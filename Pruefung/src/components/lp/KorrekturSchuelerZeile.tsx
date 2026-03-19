@@ -3,12 +3,14 @@ import type { SchuelerKorrektur, SchuelerAbgabe } from '../../types/korrektur.ts
 import type { Frage } from '../../types/fragen.ts'
 import type { Antwort } from '../../types/antworten.ts'
 import { effektivePunkte, berechneNote, statusLabel, statusFarbe } from '../../utils/korrekturUtils.ts'
+import type { NotenConfig } from '../../types/pruefung.ts'
 import KorrekturFrageZeile from './KorrekturFrageZeile.tsx'
 
 interface Props {
   schueler: SchuelerKorrektur
   abgabe: SchuelerAbgabe | undefined
   fragen: Frage[]
+  notenConfig?: Partial<NotenConfig>
   onBewertungUpdate: (
     schuelerEmail: string,
     frageId: string,
@@ -73,7 +75,7 @@ function antwortAlsText(antwort: Antwort | undefined, frage: Frage): string {
   }
 }
 
-export default function KorrekturSchuelerZeile({ schueler, abgabe, fragen, onBewertungUpdate, onNoteOverride }: Props) {
+export default function KorrekturSchuelerZeile({ schueler, abgabe, fragen, notenConfig, onBewertungUpdate, onNoteOverride }: Props) {
   const [offen, setOffen] = useState(false)
   const [noteEditModus, setNoteEditModus] = useState(false)
   const [noteInput, setNoteInput] = useState('')
@@ -82,7 +84,7 @@ export default function KorrekturSchuelerZeile({ schueler, abgabe, fragen, onBew
   const bewertungenListe = Object.values(schueler.bewertungen)
   const totalPunkte = bewertungenListe.reduce((s, b) => s + effektivePunkte(b), 0)
   const totalMax = bewertungenListe.reduce((s, b) => s + b.maxPunkte, 0)
-  const berechneteNote = berechneNote(totalPunkte, totalMax)
+  const berechneteNote = berechneNote(totalPunkte, totalMax, notenConfig)
   const note = schueler.noteOverride ?? berechneteNote
   const hatOverride = schueler.noteOverride != null
   const geprueftCount = bewertungenListe.filter((b) => b.geprueft).length
@@ -97,9 +99,10 @@ export default function KorrekturSchuelerZeile({ schueler, abgabe, fragen, onBew
   function handleNoteSpeichern(): void {
     const parsed = parseFloat(noteInput)
     if (!isNaN(parsed) && parsed >= 1 && parsed <= 6) {
-      // Auf 0.5 runden
-      const gerundet = Math.round(parsed * 2) / 2
-      onNoteOverride(schueler.email, gerundet)
+      const rundung = notenConfig?.rundung ?? 0.5
+      const gerundet = Math.round(parsed / rundung) * rundung
+      const begrenzt = Math.round(Math.min(6, Math.max(1, gerundet)) * 100) / 100
+      onNoteOverride(schueler.email, begrenzt)
     }
     setNoteEditModus(false)
   }
@@ -152,9 +155,9 @@ export default function KorrekturSchuelerZeile({ schueler, abgabe, fragen, onBew
                 ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
                 : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'
             } ${hatOverride ? 'ring-1 ring-amber-400 dark:ring-amber-500' : ''}`}
-            title={hatOverride ? `Berechnet: ${berechneteNote.toFixed(1)}, Überschrieben: ${note.toFixed(1)}` : `Note: ${note.toFixed(1)}`}
+            title={hatOverride ? `Berechnet: ${berechneteNote.toFixed((notenConfig?.rundung ?? 0.5) < 0.5 ? 2 : 1)}, Überschrieben: ${note.toFixed((notenConfig?.rundung ?? 0.5) < 0.5 ? 2 : 1)}` : `Note: ${note.toFixed((notenConfig?.rundung ?? 0.5) < 0.5 ? 2 : 1)}`}
           >
-            {note.toFixed(1)}
+            {note.toFixed((notenConfig?.rundung ?? 0.5) < 0.5 ? 2 : 1)}
           </span>
         </div>
 
@@ -178,7 +181,7 @@ export default function KorrekturSchuelerZeile({ schueler, abgabe, fragen, onBew
             {totalPunkte}/{totalMax}
           </span>
           <span className={`ml-1 text-xs ${note >= 4 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-            ({note.toFixed(1)})
+            ({note.toFixed((notenConfig?.rundung ?? 0.5) < 0.5 ? 2 : 1)})
           </span>
         </div>
       </button>
@@ -216,7 +219,7 @@ export default function KorrekturSchuelerZeile({ schueler, abgabe, fragen, onBew
                   onKeyDown={(e) => { if (e.key === 'Enter') handleNoteSpeichern(); if (e.key === 'Escape') setNoteEditModus(false) }}
                   min={1}
                   max={6}
-                  step={0.5}
+                  step={notenConfig?.rundung ?? 0.5}
                   className="w-16 px-2 py-1 text-sm border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-400"
                   autoFocus
                 />
@@ -248,11 +251,11 @@ export default function KorrekturSchuelerZeile({ schueler, abgabe, fragen, onBew
                     ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
                     : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'
                 }`}>
-                  {note.toFixed(1)}
+                  {note.toFixed((notenConfig?.rundung ?? 0.5) < 0.5 ? 2 : 1)}
                 </span>
                 {hatOverride && (
                   <span className="text-[10px] text-amber-600 dark:text-amber-400">
-                    (berechnet: {berechneteNote.toFixed(1)})
+                    (berechnet: {berechneteNote.toFixed((notenConfig?.rundung ?? 0.5) < 0.5 ? 2 : 1)})
                   </span>
                 )}
                 <button

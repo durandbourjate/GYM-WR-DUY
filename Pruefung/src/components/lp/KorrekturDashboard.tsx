@@ -3,8 +3,9 @@ import { useAuthStore } from '../../store/authStore.ts'
 import { apiService } from '../../services/apiService.ts'
 import type { PruefungsKorrektur, SchuelerAbgabe } from '../../types/korrektur.ts'
 import type { Frage } from '../../types/fragen.ts'
-import { berechneStatistiken, berechneFragenStatistiken } from '../../utils/korrekturUtils.ts'
+import { berechneStatistiken, berechneFragenStatistiken, berechneNote } from '../../utils/korrekturUtils.ts'
 import type { FragenStatistik } from '../../utils/korrekturUtils.ts'
+import type { NotenConfig } from '../../types/pruefung.ts'
 import { exportiereAlsCSV, downloadCSV } from '../../utils/exportUtils.ts'
 import { formatDatum } from '../../utils/zeit.ts'
 import ThemeToggle from '../ThemeToggle.tsx'
@@ -32,6 +33,8 @@ export default function KorrekturDashboard({ pruefungId }: Props) {
   const [analyseOffen, setAnalyseOffen] = useState(false)
   const [analyseSortierung, setAnalyseSortierung] = useState<'frageId' | 'loesungsquote' | 'durchschnitt'>('frageId')
   const [analyseSortierungAsc, setAnalyseSortierungAsc] = useState(true)
+  const [notenConfigOffen, setNotenConfigOffen] = useState(false)
+  const [notenConfig, setNotenConfig] = useState<NotenConfig>({ punkteFuerSechs: 0, rundung: 0.5 })
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   // Daten laden
@@ -187,7 +190,7 @@ export default function KorrekturDashboard({ pruefungId }: Props) {
     }
   })
 
-  const stats = korrektur ? berechneStatistiken(korrektur.schueler) : null
+  const stats = korrektur ? berechneStatistiken(korrektur.schueler, notenConfig) : null
 
   // Fragen-Statistiken berechnen und sortieren
   const fragenStats: FragenStatistik[] = korrektur ? berechneFragenStatistiken(korrektur) : []
@@ -320,6 +323,94 @@ export default function KorrekturDashboard({ pruefungId }: Props) {
           </div>
         )}
 
+        {/* Notenskala-Einstellungen */}
+        {korrektur && korrektur.schueler.length > 0 && (
+          <div className="mb-6">
+            <button
+              onClick={() => setNotenConfigOffen((prev) => !prev)}
+              className="text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center gap-2 mb-3 cursor-pointer hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
+            >
+              <span className={`inline-block transition-transform ${notenConfigOffen ? 'rotate-90' : ''}`}>&#9654;</span>
+              Notenskala
+            </button>
+            {notenConfigOffen && (
+              <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-4 space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">
+                      Punkte für Note 6
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="number"
+                        value={notenConfig.punkteFuerSechs || korrektur.schueler[0]?.maxPunkte || 0}
+                        onChange={(e) => setNotenConfig((prev) => ({ ...prev, punkteFuerSechs: parseFloat(e.target.value) || 0 }))}
+                        min={1}
+                        max={korrektur.schueler[0]?.maxPunkte || 100}
+                        step={0.5}
+                        className="w-20 px-2 py-1.5 text-sm border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-400"
+                        title="Benötigte Punkte für die Maximalnote 6"
+                      />
+                      <span className="text-xs text-slate-500 dark:text-slate-400">
+                        / {korrektur.schueler[0]?.maxPunkte || 0} Max.
+                        {notenConfig.punkteFuerSechs > 0 && notenConfig.punkteFuerSechs < (korrektur.schueler[0]?.maxPunkte || 0) && (
+                          <span className="ml-1">
+                            ({Math.round(notenConfig.punkteFuerSechs / (korrektur.schueler[0]?.maxPunkte || 1) * 100)}%)
+                          </span>
+                        )}
+                      </span>
+                    </div>
+                    <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1">
+                      Standard: Maximum. Heruntersetzen um eine «mildere» Skala zu verwenden.
+                    </p>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">
+                      Rundung
+                    </label>
+                    <div className="flex rounded-lg border border-slate-300 dark:border-slate-600 overflow-hidden">
+                      {([0.1, 0.25, 0.5, 1] as const).map((r) => (
+                        <button
+                          key={r}
+                          onClick={() => setNotenConfig((prev) => ({ ...prev, rundung: r }))}
+                          className={`flex-1 px-2 py-1.5 text-xs transition-colors cursor-pointer border-l first:border-l-0 border-slate-300 dark:border-slate-600
+                            ${notenConfig.rundung === r
+                              ? 'bg-slate-800 dark:bg-slate-200 text-white dark:text-slate-800 font-semibold'
+                              : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
+                            }`}
+                          title={`Auf ${r === 1 ? 'ganze' : r === 0.5 ? 'halbe' : r === 0.25 ? 'Viertel-' : 'Zehntel-'}Noten runden`}
+                        >
+                          {r === 1 ? 'Ganze' : r === 0.5 ? 'Halbe' : r === 0.25 ? 'Viertel' : 'Zehntel'}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                {/* Vorschau der Notenskala */}
+                <div>
+                  <p className="text-xs font-medium text-slate-600 dark:text-slate-300 mb-2">Vorschau</p>
+                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-600 dark:text-slate-400 font-mono">
+                    {[100, 90, 80, 70, 60, 50, 40, 30, 20, 10, 0].map((pct) => {
+                      const maxP = korrektur.schueler[0]?.maxPunkte || 1
+                      const p = maxP * pct / 100
+                      const note = berechneNote(p, maxP, notenConfig)
+                      const farbe = note >= 4 ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'
+                      return (
+                        <span key={pct}>
+                          {pct}% → <span className={farbe}>{note.toFixed(notenConfig.rundung < 0.5 ? 2 : 1)}</span>
+                        </span>
+                      )
+                    })}
+                  </div>
+                  <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1">
+                    Formel: Note = 1 + 5 × (Punkte / {notenConfig.punkteFuerSechs > 0 ? notenConfig.punkteFuerSechs : (korrektur.schueler[0]?.maxPunkte || '?')})
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Fragen-Analyse (Toggle) */}
         {korrektur && korrektur.schueler.length > 0 && fragenStats.length > 0 && (
           <div className="mb-6">
@@ -437,6 +528,7 @@ export default function KorrekturDashboard({ pruefungId }: Props) {
               schueler={schueler}
               abgabe={abgaben[schueler.email]}
               fragen={fragen}
+              notenConfig={notenConfig}
               onBewertungUpdate={handleBewertungUpdate}
               onNoteOverride={handleNoteOverride}
             />

@@ -1,4 +1,18 @@
 import type { FragenBewertung, SchuelerKorrektur, PruefungsKorrektur } from '../types/korrektur.ts'
+import type { NotenConfig } from '../types/pruefung.ts'
+
+/** Standard-Notenkonfiguration (Schweizer Gymnasium) */
+export const DEFAULT_NOTEN_CONFIG: NotenConfig = {
+  punkteFuerSechs: 0, // 0 = maxPunkte verwenden
+  rundung: 0.5,
+}
+
+/** Rundet auf die gewählte Genauigkeit */
+function rundeNote(note: number, rundung: NotenConfig['rundung']): number {
+  const gerundet = Math.round(note / rundung) * rundung
+  // Auf max. 2 Dezimalstellen begrenzen (Floating-Point-Artefakte)
+  return Math.round(gerundet * 100) / 100
+}
 
 /** Effektive Punkte: LP-Anpassung wenn vorhanden, sonst KI-Vorschlag, sonst 0 */
 export function effektivePunkte(bewertung: FragenBewertung): number {
@@ -21,17 +35,26 @@ export function berechneGesamtpunkte(bewertungen: Record<string, FragenBewertung
 
 /**
  * Schweizer Note berechnen (1-6, 4 = genügend)
- * Lineare Skala: 0% → 1, 100% → 6
- * Auf 0.5 gerundet (Standard an Schweizer Gymnasien)
+ * Formel: Note = 1 + 5 × (erreichtePunkte / punkteFuerSechs)
+ *
+ * @param punkte — erreichte Punkte
+ * @param maxPunkte — maximale Punkte der Prüfung
+ * @param config — optionale Konfiguration (punkteFuerSechs, Rundung)
  */
-export function berechneNote(punkte: number, maxPunkte: number): number {
-  if (maxPunkte === 0) return 1
-  const note = 1 + 5 * (punkte / maxPunkte)
-  return Math.round(note * 2) / 2  // Auf 0.5 runden
+export function berechneNote(punkte: number, maxPunkte: number, config?: Partial<NotenConfig>): number {
+  const punkteFuerSechs = (config?.punkteFuerSechs && config.punkteFuerSechs > 0)
+    ? config.punkteFuerSechs
+    : maxPunkte
+  const rundung = config?.rundung ?? 0.5
+
+  if (punkteFuerSechs === 0) return 1
+  const note = 1 + 5 * (punkte / punkteFuerSechs)
+  const begrenzt = Math.min(6, Math.max(1, note)) // Auf 1-6 begrenzen
+  return rundeNote(begrenzt, rundung)
 }
 
 /** Statistiken über alle SuS berechnen */
-export function berechneStatistiken(schueler: SchuelerKorrektur[]): {
+export function berechneStatistiken(schueler: SchuelerKorrektur[], notenConfig?: Partial<NotenConfig>): {
   durchschnitt: number
   median: number
   bestanden: number
@@ -45,7 +68,8 @@ export function berechneStatistiken(schueler: SchuelerKorrektur[]): {
 
   const punkte = schueler.map((s) => s.gesamtPunkte)
   const maxPunkte = schueler[0]?.maxPunkte || 1
-  const noten = punkte.map((p) => berechneNote(p, maxPunkte))
+  const rundung = notenConfig?.rundung ?? 0.5
+  const noten = punkte.map((p) => berechneNote(p, maxPunkte, notenConfig))
 
   const summe = punkte.reduce((a, b) => a + b, 0)
   const durchschnitt = Math.round((summe / punkte.length) * 10) / 10
@@ -57,10 +81,10 @@ export function berechneStatistiken(schueler: SchuelerKorrektur[]): {
     : sortiert[mitte]
 
   const summeNoten = noten.reduce((a, b) => a + b, 0)
-  const durchschnittNote = Math.round((summeNoten / noten.length) * 2) / 2
+  const durchschnittNote = rundeNote(summeNoten / noten.length, rundung)
   const notenSortiert = [...noten].sort((a, b) => a - b)
   const medianNote = notenSortiert.length % 2 === 0
-    ? Math.round(((notenSortiert[mitte - 1] + notenSortiert[mitte]) / 2) * 2) / 2
+    ? rundeNote((notenSortiert[mitte - 1] + notenSortiert[mitte]) / 2, rundung)
     : notenSortiert[mitte]
 
   const bestanden = noten.filter((n) => n >= 4).length
