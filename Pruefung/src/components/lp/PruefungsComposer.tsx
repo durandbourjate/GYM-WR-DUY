@@ -63,6 +63,12 @@ export default function PruefungsComposer({ config, onZurueck }: Props) {
   const loeschDialogRef = useRef<HTMLDivElement>(null)
   useFocusTrap(loeschDialog ? loeschDialogRef : { current: null })
 
+  // Autosave: Refs für Vergleich und Debounce
+  const vorherigePruefungRef = useRef<string>(JSON.stringify(config ?? leerePruefung))
+  const hasChangedRef = useRef(false)
+  const autoSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [autoSaveStatus, setAutoSaveStatus] = useState<'idle' | 'gespeichert'>('idle')
+
   // Fragen-Map laden
   const [fragenMap, setFragenMap] = useState<Record<string, Frage>>({})
   const [fragenGeladen, setFragenGeladen] = useState(false)
@@ -83,6 +89,35 @@ export default function PruefungsComposer({ config, onZurueck }: Props) {
     }
     ladeFragen()
   }, [istDemoModus, user])
+
+  // Autosave-Effekt: 3 Sekunden Debounce
+  useEffect(() => {
+    const aktuellerJSON = JSON.stringify(pruefung)
+    if (aktuellerJSON === vorherigePruefungRef.current) return
+
+    // Beim allerersten Unterschied merken, dass sich etwas geändert hat
+    if (!hasChangedRef.current) {
+      hasChangedRef.current = true
+      vorherigePruefungRef.current = aktuellerJSON
+      return
+    }
+
+    if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current)
+
+    autoSaveTimerRef.current = setTimeout(async () => {
+      if (!pruefung.titel.trim()) return
+
+      await handleSpeichernIntern()
+      vorherigePruefungRef.current = JSON.stringify(pruefung)
+      setAutoSaveStatus('gespeichert')
+      setTimeout(() => setAutoSaveStatus('idle'), 2000)
+    }, 3000)
+
+    return () => {
+      if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pruefung])
 
   const gesamtFragen = pruefung.abschnitte.reduce((s, a) => s + a.fragenIds.length, 0)
 
@@ -153,11 +188,23 @@ export default function PruefungsComposer({ config, onZurueck }: Props) {
     updateAbschnitt(zielAbschnittIndex, {
       fragenIds: [...abschnitt.fragenIds, ...neueIds],
     })
-    setZeigFragenBrowser(false)
+    // Browser bleibt offen nach dem Hinzufügen
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pruefung.abschnitte, zielAbschnittIndex])
 
-  async function handleSpeichern(): Promise<void> {
+  const handleFrageEntfernen = useCallback((frageId: string) => {
+    // Frage aus allen Abschnitten entfernen
+    setPruefung((prev) => ({
+      ...prev,
+      abschnitte: prev.abschnitte.map((a) => ({
+        ...a,
+        fragenIds: a.fragenIds.filter((id) => id !== frageId),
+      })),
+    }))
+  }, [])
+
+  /** Interne Speicher-Logik (wiederverwendbar für Autosave und manuelles Speichern) */
+  async function handleSpeichernIntern(): Promise<boolean> {
     const zuSpeichern = { ...pruefung }
     if (!zuSpeichern.id) {
       zuSpeichern.id = generiereId(zuSpeichern)
@@ -166,19 +213,24 @@ export default function PruefungsComposer({ config, onZurueck }: Props) {
       zuSpeichern.erlaubteKlasse = zuSpeichern.klasse
     }
 
-    setSpeicherStatus('speichern')
-
     if (istDemoModus || !apiService.istKonfiguriert()) {
-      await new Promise((r) => setTimeout(r, 500))
+      await new Promise((r) => setTimeout(r, 300))
       setPruefung(zuSpeichern)
-      setSpeicherStatus('erfolg')
-      setTimeout(() => setSpeicherStatus('idle'), 2000)
-      return
+      return true
     }
 
     const ok = await apiService.speichereConfig(user!.email, zuSpeichern)
     if (ok) {
       setPruefung(zuSpeichern)
+    }
+    return ok
+  }
+
+  async function handleSpeichern(): Promise<void> {
+    setSpeicherStatus('speichern')
+    const ok = await handleSpeichernIntern()
+    if (ok) {
+      vorherigePruefungRef.current = JSON.stringify(pruefung)
       setSpeicherStatus('erfolg')
       setTimeout(() => setSpeicherStatus('idle'), 2000)
     } else {
@@ -217,13 +269,19 @@ export default function PruefungsComposer({ config, onZurueck }: Props) {
             {speicherStatus === 'fehler' && (
               <span className="text-sm text-red-600 dark:text-red-400">Fehler beim Speichern</span>
             )}
-            <button
-              onClick={handleSpeichern}
-              disabled={speicherStatus === 'speichern' || !pruefung.titel.trim()}
-              className="px-4 py-2 text-sm font-semibold text-white bg-slate-800 dark:bg-slate-200 dark:text-slate-800 rounded-lg hover:bg-slate-900 dark:hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
-            >
-              {speicherStatus === 'speichern' ? 'Speichern...' : 'Speichern'}
-            </button>
+            {autoSaveStatus === 'gespeichert' && speicherStatus === 'idle' && (
+              <span className="text-sm text-green-600 dark:text-green-400">Automatisch gespeichert ✓</span>
+            )}
+            <div className="flex flex-col items-end gap-0.5">
+              <button
+                onClick={handleSpeichern}
+                disabled={speicherStatus === 'speichern' || !pruefung.titel.trim()}
+                className="px-4 py-2 text-sm font-semibold text-white bg-slate-800 dark:bg-slate-200 dark:text-slate-800 rounded-lg hover:bg-slate-900 dark:hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+              >
+                {speicherStatus === 'speichern' ? 'Speichern...' : 'Speichern'}
+              </button>
+              <span className="text-[10px] text-slate-400 dark:text-slate-500">Auto-Speichern aktiv</span>
+            </div>
             <ThemeToggle />
           </div>
         </div>
@@ -290,6 +348,7 @@ export default function PruefungsComposer({ config, onZurueck }: Props) {
       {zeigFragenBrowser && (
         <FragenBrowser
           onHinzufuegen={handleFragenHinzufuegen}
+          onEntfernen={handleFrageEntfernen}
           onSchliessen={() => { setZeigFragenBrowser(false); setInitialEditFrageId(undefined) }}
           bereitsVerwendet={pruefung.abschnitte.flatMap((a) => a.fragenIds)}
           initialEditFrageId={initialEditFrageId}

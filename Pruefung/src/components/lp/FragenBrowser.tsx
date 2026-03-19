@@ -10,6 +10,7 @@ import FragenImport from './FragenImport.tsx'
 
 interface Props {
   onHinzufuegen: (frageIds: string[]) => void
+  onEntfernen?: (frageId: string) => void
   onSchliessen: () => void
   bereitsVerwendet: string[]
   /** Wenn gesetzt, wird der Editor für diese Frage sofort geöffnet */
@@ -22,7 +23,7 @@ type Gruppierung = 'keine' | 'fachbereich' | 'thema' | 'typ' | 'bloom'
 const SEITEN_GROESSE = 30
 
 /** Overlay-Panel zum Durchsuchen und Auswählen von Fragen aus der Fragenbank */
-export default function FragenBrowser({ onHinzufuegen, onSchliessen, bereitsVerwendet, initialEditFrageId }: Props) {
+export default function FragenBrowser({ onHinzufuegen, onEntfernen, onSchliessen, bereitsVerwendet, initialEditFrageId }: Props) {
   const user = useAuthStore((s) => s.user)
   const istDemoModus = useAuthStore((s) => s.istDemoModus)
 
@@ -31,7 +32,9 @@ export default function FragenBrowser({ onHinzufuegen, onSchliessen, bereitsVerw
 
   const [alleFragen, setAlleFragen] = useState<Frage[]>([])
   const [ladeStatus, setLadeStatus] = useState<'laden' | 'fertig'>('laden')
-  const [ausgewaehlt, setAusgewaehlt] = useState<Set<string>>(new Set())
+
+  // Set für schnellen Lookup der bereits verwendeten Fragen
+  const bereitsVerwendetSet = useMemo(() => new Set(bereitsVerwendet), [bereitsVerwendet])
 
   // Filter
   const [suchtext, setSuchtext] = useState('')
@@ -194,27 +197,13 @@ export default function FragenBrowser({ onHinzufuegen, onSchliessen, bereitsVerw
   // Aktive Filter zählen
   const aktiveFilter = [filterFachbereich, filterTyp, filterBloom, filterThema, suchtext, filterBesitzer !== 'alle' ? filterBesitzer : ''].filter(Boolean).length
 
-  function toggleAuswahl(id: string): void {
-    setAusgewaehlt((prev) => {
-      const neu = new Set(prev)
-      if (neu.has(id)) neu.delete(id)
-      else neu.add(id)
-      return neu
-    })
-  }
-
-  function alleInGruppeToggle(fragen: Frage[]): void {
-    setAusgewaehlt((prev) => {
-      const neu = new Set(prev)
-      const verfuegbar = fragen.filter((f) => !bereitsVerwendet.includes(f.id))
-      const alleAusgewaehlt = verfuegbar.every((f) => neu.has(f.id))
-      if (alleAusgewaehlt) {
-        verfuegbar.forEach((f) => neu.delete(f.id))
-      } else {
-        verfuegbar.forEach((f) => neu.add(f.id))
-      }
-      return neu
-    })
+  /** Ein Klick: Frage hinzufügen oder entfernen */
+  function toggleFrageInPruefung(frageId: string): void {
+    if (bereitsVerwendetSet.has(frageId)) {
+      onEntfernen?.(frageId)
+    } else {
+      onHinzufuegen([frageId])
+    }
   }
 
   function toggleGruppe(key: string): void {
@@ -269,10 +258,6 @@ export default function FragenBrowser({ onHinzufuegen, onSchliessen, bereitsVerw
     }
   }
 
-  function handleHinzufuegen(): void {
-    onHinzufuegen(Array.from(ausgewaehlt))
-  }
-
   return (
     <div className="fixed inset-0 z-50 flex">
       {/* Backdrop */}
@@ -297,10 +282,7 @@ export default function FragenBrowser({ onHinzufuegen, onSchliessen, bereitsVerw
             <div className="flex items-center gap-2">
               <button
                 onClick={() => {
-                  const zuExportieren = ausgewaehlt.size > 0
-                    ? gefilterteFragen.filter((f) => ausgewaehlt.has(f.id))
-                    : gefilterteFragen
-                  const json = JSON.stringify(zuExportieren, null, 2)
+                  const json = JSON.stringify(gefilterteFragen, null, 2)
                   const blob = new Blob([json], { type: 'application/json' })
                   const url = URL.createObjectURL(blob)
                   const datum = new Date().toISOString().slice(0, 10)
@@ -311,9 +293,9 @@ export default function FragenBrowser({ onHinzufuegen, onSchliessen, bereitsVerw
                   URL.revokeObjectURL(url)
                 }}
                 className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors cursor-pointer"
-                title={ausgewaehlt.size > 0 ? `${ausgewaehlt.size} ausgewählte Fragen als JSON exportieren` : 'Alle gefilterten Fragen als JSON exportieren'}
+                title="Alle gefilterten Fragen als JSON exportieren"
               >
-                Export{ausgewaehlt.size > 0 ? ` (${ausgewaehlt.size})` : ''}
+                Export
               </button>
               <button
                 onClick={() => setZeigImport(true)}
@@ -329,14 +311,6 @@ export default function FragenBrowser({ onHinzufuegen, onSchliessen, bereitsVerw
               >
                 + Neue Frage
               </button>
-              {ausgewaehlt.size > 0 && (
-                <button
-                  onClick={handleHinzufuegen}
-                  className="px-4 py-2 text-sm font-semibold text-white bg-slate-800 dark:bg-slate-200 dark:text-slate-800 rounded-lg hover:bg-slate-900 dark:hover:bg-slate-100 transition-colors cursor-pointer"
-                >
-                  {ausgewaehlt.size} hinzufügen
-                </button>
-              )}
               <button
                 onClick={onSchliessen}
                 className="w-8 h-8 text-lg text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors cursor-pointer"
@@ -497,8 +471,7 @@ export default function FragenBrowser({ onHinzufuegen, onSchliessen, bereitsVerw
             <div>
               {gruppierteAnzeige.map((gruppe) => {
                 const istAufgeklappt = gruppierung === 'keine' || aufgeklappteGruppen.has(gruppe.key)
-                const verfuegbarInGruppe = gruppe.fragen.filter((f) => !bereitsVerwendet.includes(f.id))
-                const ausgewaehltInGruppe = verfuegbarInGruppe.filter((f) => ausgewaehlt.has(f.id))
+                const inPruefungInGruppe = gruppe.fragen.filter((f) => bereitsVerwendetSet.has(f.id)).length
 
                 return (
                   <div key={gruppe.key || '_alle'}>
@@ -516,17 +489,10 @@ export default function FragenBrowser({ onHinzufuegen, onSchliessen, bereitsVerw
                         </span>
                         <span className="text-xs text-slate-500 dark:text-slate-400">
                           {gruppe.fragen.length}
+                          {inPruefungInGruppe > 0 && (
+                            <span className="ml-1 text-blue-600 dark:text-blue-400">({inPruefungInGruppe} in Prüfung)</span>
+                          )}
                         </span>
-
-                        {/* Gruppe komplett auswählen */}
-                        {istAufgeklappt && verfuegbarInGruppe.length > 0 && (
-                          <button
-                            onClick={(e) => { e.stopPropagation(); alleInGruppeToggle(gruppe.fragen) }}
-                            className="ml-auto text-xs text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer"
-                          >
-                            {ausgewaehltInGruppe.length === verfuegbarInGruppe.length ? 'Alle abwählen' : 'Alle wählen'}
-                          </button>
-                        )}
                       </div>
                     )}
 
@@ -538,18 +504,16 @@ export default function FragenBrowser({ onHinzufuegen, onSchliessen, bereitsVerw
                             ? <KompaktZeile
                                 key={frage.id}
                                 frage={frage}
-                                istVerwendet={bereitsVerwendet.includes(frage.id)}
-                                istAusgewaehlt={ausgewaehlt.has(frage.id)}
-                                onToggle={() => toggleAuswahl(frage.id)}
+                                istInPruefung={bereitsVerwendetSet.has(frage.id)}
+                                onToggle={() => toggleFrageInPruefung(frage.id)}
                                 onEdit={() => { setEditFrage(frage); setZeigEditor(true) }}
                                 zeigeGruppierung={gruppierung}
                               />
                             : <DetailKarte
                                 key={frage.id}
                                 frage={frage}
-                                istVerwendet={bereitsVerwendet.includes(frage.id)}
-                                istAusgewaehlt={ausgewaehlt.has(frage.id)}
-                                onToggle={() => toggleAuswahl(frage.id)}
+                                istInPruefung={bereitsVerwendetSet.has(frage.id)}
+                                onToggle={() => toggleFrageInPruefung(frage.id)}
                                 onEdit={() => { setEditFrage(frage); setZeigEditor(true) }}
                               />
                         ))}
@@ -598,34 +562,22 @@ export default function FragenBrowser({ onHinzufuegen, onSchliessen, bereitsVerw
 // === SUB-KOMPONENTEN ===
 
 /** Kompakte Zeile für grosse Listen */
-function KompaktZeile({ frage, istVerwendet, istAusgewaehlt, onToggle, onEdit, zeigeGruppierung }: {
+function KompaktZeile({ frage, istInPruefung, onToggle, onEdit, zeigeGruppierung }: {
   frage: Frage
-  istVerwendet: boolean
-  istAusgewaehlt: boolean
+  istInPruefung: boolean
   onToggle: () => void
   onEdit: () => void
   zeigeGruppierung: Gruppierung
 }) {
   return (
     <div
-      onClick={() => !istVerwendet && onToggle()}
-      className={`flex items-center gap-2 px-5 py-1.5 text-sm border-b border-slate-100 dark:border-slate-700/50 transition-colors
-        ${istVerwendet
-          ? 'opacity-35 cursor-not-allowed'
-          : istAusgewaehlt
-            ? 'bg-slate-100 dark:bg-slate-700 cursor-pointer'
-            : 'hover:bg-slate-50 dark:hover:bg-slate-700/30 cursor-pointer'
+      onClick={onToggle}
+      className={`flex items-center gap-2 px-5 py-1.5 text-sm border-b transition-colors cursor-pointer
+        ${istInPruefung
+          ? 'border-l-4 border-l-blue-500 border-b-slate-100 dark:border-b-slate-700/50 bg-blue-50/50 dark:bg-blue-900/10'
+          : 'border-l-4 border-l-transparent border-b-slate-100 dark:border-b-slate-700/50 hover:bg-slate-50 dark:hover:bg-slate-700/30'
         }`}
     >
-      {/* Checkbox */}
-      <div className={`w-3.5 h-3.5 rounded border flex items-center justify-center shrink-0
-        ${istAusgewaehlt
-          ? 'bg-slate-800 dark:bg-slate-200 border-slate-800 dark:border-slate-200'
-          : 'border-slate-400 dark:border-slate-500'
-        }`}>
-        {istAusgewaehlt && <span className="text-white dark:text-slate-800 text-[10px]">✓</span>}
-      </div>
-
       {/* ID */}
       <span className="font-mono text-xs text-slate-500 dark:text-slate-400 w-28 truncate shrink-0">
         {frage.id}
@@ -653,8 +605,10 @@ function KompaktZeile({ frage, istVerwendet, istAusgewaehlt, onToggle, onEdit, z
         {frage.thema}{frage.unterthema ? ` › ${frage.unterthema}` : ''}
       </span>
 
-      {istVerwendet && (
-        <span className="text-[10px] text-slate-400 italic shrink-0">verwendet</span>
+      {istInPruefung && (
+        <span className="text-[10px] px-1.5 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded shrink-0 font-medium">
+          ✓ In Prüfung
+        </span>
       )}
 
       {/* Bearbeiten-Button */}
@@ -670,10 +624,9 @@ function KompaktZeile({ frage, istVerwendet, istAusgewaehlt, onToggle, onEdit, z
 }
 
 /** Detaillierte Karte mit Fragetext-Vorschau */
-function DetailKarte({ frage, istVerwendet, istAusgewaehlt, onToggle, onEdit }: {
+function DetailKarte({ frage, istInPruefung, onToggle, onEdit }: {
   frage: Frage
-  istVerwendet: boolean
-  istAusgewaehlt: boolean
+  istInPruefung: boolean
   onToggle: () => void
   onEdit: () => void
 }) {
@@ -681,25 +634,14 @@ function DetailKarte({ frage, istVerwendet, istAusgewaehlt, onToggle, onEdit }: 
 
   return (
     <div
-      onClick={() => !istVerwendet && onToggle()}
-      className={`p-3 rounded-lg border transition-colors
-        ${istVerwendet
-          ? 'opacity-35 cursor-not-allowed border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800'
-          : istAusgewaehlt
-            ? 'border-slate-800 dark:border-slate-200 bg-slate-100 dark:bg-slate-700 cursor-pointer'
-            : 'border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer'
+      onClick={onToggle}
+      className={`p-3 rounded-lg border transition-colors cursor-pointer
+        ${istInPruefung
+          ? 'border-l-4 border-l-blue-500 border-slate-200 dark:border-slate-700 bg-blue-50/50 dark:bg-blue-900/10'
+          : 'border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50'
         }`}
     >
       <div className="flex items-start gap-3">
-        {/* Checkbox */}
-        <div className={`mt-0.5 w-4 h-4 rounded border flex items-center justify-center shrink-0
-          ${istAusgewaehlt
-            ? 'bg-slate-800 dark:bg-slate-200 border-slate-800 dark:border-slate-200'
-            : 'border-slate-400 dark:border-slate-500'
-          }`}>
-          {istAusgewaehlt && <span className="text-white dark:text-slate-800 text-xs">✓</span>}
-        </div>
-
         <div className="flex-1 min-w-0">
           {/* ID + Badges */}
           <div className="flex items-center gap-2 mb-1 flex-wrap">
@@ -715,8 +657,10 @@ function DetailKarte({ frage, istVerwendet, istAusgewaehlt, onToggle, onEdit }: 
             <span className="text-xs text-slate-500 dark:text-slate-400">
               {frage.bloom} · {frage.punkte}P.
             </span>
-            {istVerwendet && (
-              <span className="text-xs text-slate-400 italic">bereits verwendet</span>
+            {istInPruefung && (
+              <span className="text-xs px-1.5 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded font-medium">
+                ✓ In Prüfung
+              </span>
             )}
             {/* Bearbeiten-Button */}
             <button
