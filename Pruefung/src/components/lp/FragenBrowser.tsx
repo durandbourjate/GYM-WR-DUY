@@ -12,6 +12,8 @@ interface Props {
   onHinzufuegen: (frageIds: string[]) => void
   onSchliessen: () => void
   bereitsVerwendet: string[]
+  /** Wenn gesetzt, wird der Editor für diese Frage sofort geöffnet */
+  initialEditFrageId?: string
 }
 
 type Sortierung = 'thema' | 'bloom' | 'punkte' | 'typ' | 'id'
@@ -20,7 +22,7 @@ type Gruppierung = 'keine' | 'fachbereich' | 'thema' | 'typ' | 'bloom'
 const SEITEN_GROESSE = 30
 
 /** Overlay-Panel zum Durchsuchen und Auswählen von Fragen aus der Fragenbank */
-export default function FragenBrowser({ onHinzufuegen, onSchliessen, bereitsVerwendet }: Props) {
+export default function FragenBrowser({ onHinzufuegen, onSchliessen, bereitsVerwendet, initialEditFrageId }: Props) {
   const user = useAuthStore((s) => s.user)
   const istDemoModus = useAuthStore((s) => s.istDemoModus)
 
@@ -82,6 +84,18 @@ export default function FragenBrowser({ onHinzufuegen, onSchliessen, bereitsVerw
     }
     lade()
   }, [user, istDemoModus])
+
+  // Wenn initialEditFrageId gesetzt, Editor sofort öffnen sobald Fragen geladen
+  useEffect(() => {
+    if (ladeStatus === 'fertig' && initialEditFrageId) {
+      const frage = alleFragen.find((f) => f.id === initialEditFrageId)
+      if (frage) {
+        setEditFrage(frage)
+        setZeigEditor(true)
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps — Nur beim ersten Laden ausführen
+  }, [ladeStatus])
 
   // Alle Gruppen initial aufklappen
   useEffect(() => {

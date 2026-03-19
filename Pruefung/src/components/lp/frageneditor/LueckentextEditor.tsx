@@ -7,9 +7,11 @@ interface LueckentextEditorProps {
   setTextMitLuecken: (v: string) => void
   luecken: LueckentextFrage['luecken']
   setLuecken: (v: LueckentextFrage['luecken']) => void
+  /** Optionaler Inhalt rechts im Abschnitt-Header (z.B. KI-Buttons) */
+  titelRechts?: React.ReactNode
 }
 
-export default function LueckentextEditor({ textMitLuecken, setTextMitLuecken, luecken, setLuecken }: LueckentextEditorProps) {
+export default function LueckentextEditor({ textMitLuecken, setTextMitLuecken, luecken, setLuecken, titelRechts }: LueckentextEditorProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   // Auto-parse Lücken aus Text
@@ -66,7 +68,7 @@ export default function LueckentextEditor({ textMitLuecken, setTextMitLuecken, l
   }
 
   return (
-    <Abschnitt titel="Lückentext">
+    <Abschnitt titel="Lückentext" titelRechts={titelRechts}>
       <Feld label="Text mit Lücken">
         <div className="flex gap-2 mb-1">
           <button

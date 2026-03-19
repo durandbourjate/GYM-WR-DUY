@@ -6,9 +6,11 @@ interface MCEditorProps {
   setOptionen: (o: MCOption[]) => void
   mehrfachauswahl: boolean
   setMehrfachauswahl: (v: boolean) => void
+  /** Optionaler Inhalt rechts im Abschnitt-Header (z.B. KI-Buttons) */
+  titelRechts?: React.ReactNode
 }
 
-export default function MCEditor({ optionen, setOptionen, mehrfachauswahl, setMehrfachauswahl }: MCEditorProps) {
+export default function MCEditor({ optionen, setOptionen, mehrfachauswahl, setMehrfachauswahl, titelRechts }: MCEditorProps) {
   function updateOption(index: number, partial: Partial<MCOption>): void {
     const neu = [...optionen]
     neu[index] = { ...neu[index], ...partial }
@@ -26,7 +28,7 @@ export default function MCEditor({ optionen, setOptionen, mehrfachauswahl, setMe
   }
 
   return (
-    <Abschnitt titel="Antwortoptionen">
+    <Abschnitt titel="Antwortoptionen" titelRechts={titelRechts}>
       <div className="flex items-center gap-3 mb-3">
         <label className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300 cursor-pointer">
           <input

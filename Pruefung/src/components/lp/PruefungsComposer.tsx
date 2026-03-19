@@ -56,6 +56,7 @@ export default function PruefungsComposer({ config, onZurueck }: Props) {
   const [speicherStatus, setSpeicherStatus] = useState<'idle' | 'speichern' | 'erfolg' | 'fehler'>('idle')
   const [zeigFragenBrowser, setZeigFragenBrowser] = useState(false)
   const [zielAbschnittIndex, setZielAbschnittIndex] = useState<number>(0)
+  const [initialEditFrageId, setInitialEditFrageId] = useState<string | undefined>(undefined)
   const [loeschDialog, setLoeschDialog] = useState<{ index: number; titel: string } | null>(null)
   const [zeigSuSVorschau, setZeigSuSVorschau] = useState(false)
 
@@ -273,10 +274,13 @@ export default function PruefungsComposer({ config, onZurueck }: Props) {
               setZielAbschnittIndex(abschnittIndex)
               setZeigFragenBrowser(true)
             }}
-            onEditFrage={() => setZeigFragenBrowser(true)}
+            onEditFrage={(frageId) => {
+              setInitialEditFrageId(frageId)
+              setZeigFragenBrowser(true)
+            }}
           />
         )}
-        {tab === 'vorschau' && <VorschauTab pruefung={pruefung} onSuSVorschau={() => setZeigSuSVorschau(true)} />}
+        {tab === 'vorschau' && <VorschauTab pruefung={pruefung} fragenMap={fragenMap} onSuSVorschau={() => setZeigSuSVorschau(true)} />}
         {tab === 'analyse' && (
           <AnalyseTab pruefung={pruefung} fragenMap={fragenMap} fragenGeladen={fragenGeladen} />
         )}
@@ -286,8 +290,9 @@ export default function PruefungsComposer({ config, onZurueck }: Props) {
       {zeigFragenBrowser && (
         <FragenBrowser
           onHinzufuegen={handleFragenHinzufuegen}
-          onSchliessen={() => setZeigFragenBrowser(false)}
+          onSchliessen={() => { setZeigFragenBrowser(false); setInitialEditFrageId(undefined) }}
           bereitsVerwendet={pruefung.abschnitte.flatMap((a) => a.fragenIds)}
+          initialEditFrageId={initialEditFrageId}
         />
       )}
 

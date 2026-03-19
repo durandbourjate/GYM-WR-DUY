@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
 import { useAuthStore } from '../../../store/authStore.ts'
+import { apiService } from '../../../services/apiService.ts'
 import { useFocusTrap } from '../../../hooks/useFocusTrap.ts'
 import { typLabel, bloomLabel } from '../../../utils/fachbereich.ts'
 import type {
@@ -18,9 +19,9 @@ import ZuordnungEditor from './ZuordnungEditor.tsx'
 import RichtigFalschEditor from './RichtigFalschEditor.tsx'
 import BerechnungEditor from './BerechnungEditor.tsx'
 import AnhangEditor from './AnhangEditor.tsx'
-import { useKIAssistent, KIFragetextButtons, KIMusterlosungButtons, KIMCOptionenButton } from './KIAssistentPanel.tsx'
-import { ErgebnisAnzeige } from './KIBausteine.tsx'
-import { KIZuordnungButtons, KIRichtigFalschButtons, KILueckentextButtons, KIBerechnungButtons } from './KITypButtons.tsx'
+import { useKIAssistent } from './KIAssistentPanel.tsx'
+import { InlineAktionButton, ErgebnisAnzeige } from './KIBausteine.tsx'
+import { KIZuordnungButtons } from './KITypButtons.tsx'
 import { berechneZeitbedarf } from '../../../utils/zeitbedarf.ts'
 import FormattierungsToolbar from './FormattierungsToolbar.tsx'
 
@@ -133,6 +134,7 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen }: Props)
 
   // Validierung
   const [fehler, setFehler] = useState<string[]>([])
+  const [speicherLaeuft, setSpeicherLaeuft] = useState(false)
 
   // KI-Assistent
   const ki = useKIAssistent()
@@ -209,17 +211,38 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen }: Props)
     return errs
   }
 
-  function handleSpeichern(): void {
+  async function handleSpeichern(): Promise<void> {
     const errs = validiere()
     if (errs.length > 0) {
       setFehler(errs)
       return
     }
     setFehler([])
+    setSpeicherLaeuft(true)
 
     const jetzt = new Date().toISOString()
     const tagListe = tags.split(',').map((t) => t.trim()).filter(Boolean)
     const id = frage?.id ?? generiereFrageId(fachbereich, typ)
+
+    // Neue Anhänge hochladen
+    let alleAnhaenge = [...anhaenge]
+    if (neueAnhaenge.length > 0 && user && apiService.istKonfiguriert()) {
+      for (const datei of neueAnhaenge) {
+        try {
+          const ergebnis = await apiService.uploadAnhang(user.email, id, datei)
+          if (ergebnis) {
+            alleAnhaenge.push(ergebnis)
+          } else {
+            console.warn(`[FragenEditor] Upload fehlgeschlagen für: ${datei.name}`)
+          }
+        } catch (err) {
+          console.error(`[FragenEditor] Upload-Fehler für ${datei.name}:`, err)
+        }
+      }
+      // Lokale State aktualisieren
+      setAnhaenge(alleAnhaenge)
+      setNeueAnhaenge([])
+    }
 
     const basis = {
       id,
@@ -243,7 +266,7 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen }: Props)
       ),
       verwendungen: frage?.verwendungen ?? [],
       quelle: frage?.quelle ?? 'manuell' as const,
-      anhaenge: anhaenge.length > 0 ? anhaenge : undefined,
+      anhaenge: alleAnhaenge.length > 0 ? alleAnhaenge : undefined,
       autor: frage?.autor ?? user?.email,
       geteilt,
     }
@@ -311,6 +334,7 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen }: Props)
         break
     }
 
+    setSpeicherLaeuft(false)
     onSpeichern(neueFrage)
   }
 
@@ -339,9 +363,10 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen }: Props)
             </button>
             <button
               onClick={handleSpeichern}
-              className="px-4 py-2 text-sm font-semibold text-white bg-slate-800 dark:bg-slate-200 dark:text-slate-800 rounded-lg hover:bg-slate-900 dark:hover:bg-slate-100 transition-colors cursor-pointer"
+              disabled={speicherLaeuft}
+              className="px-4 py-2 text-sm font-semibold text-white bg-slate-800 dark:bg-slate-200 dark:text-slate-800 rounded-lg hover:bg-slate-900 dark:hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
             >
-              Speichern
+              {speicherLaeuft ? 'Speichern...' : 'Speichern'}
             </button>
           </div>
         </div>
@@ -565,7 +590,29 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen }: Props)
           </Abschnitt>
 
           {/* Fragetext */}
-          <Abschnitt titel="Fragetext *">
+          <Abschnitt
+            titel="Fragetext *"
+            titelRechts={ki.verfuegbar ? (
+              <div className="flex gap-1.5">
+                <InlineAktionButton
+                  label="Generieren"
+                  tooltip="KI erstellt einen neuen Fragetext basierend auf Thema, Fachbereich und Taxonomiestufe"
+                  hinweis={!thema.trim() ? 'Thema nötig' : undefined}
+                  disabled={!thema.trim() || ki.ladeAktion !== null}
+                  ladend={ki.ladeAktion === 'generiereFragetext'}
+                  onClick={() => ki.ausfuehren('generiereFragetext', { fachbereich, thema, unterthema, typ, bloom })}
+                />
+                <InlineAktionButton
+                  label="Prüfen & Verbessern"
+                  tooltip="KI prüft den Fragetext auf Klarheit, Eindeutigkeit und Taxonomie-Passung"
+                  hinweis={!fragetext.trim() ? 'Fragetext nötig' : undefined}
+                  disabled={!fragetext.trim() || ki.ladeAktion !== null}
+                  ladend={ki.ladeAktion === 'verbessereFragetext'}
+                  onClick={() => ki.ausfuehren('verbessereFragetext', { fragetext })}
+                />
+              </div>
+            ) : undefined}
+          >
             <FormattierungsToolbar textareaRef={fragetextRef} value={fragetext} onChange={setFragetext} />
             <textarea
               ref={fragetextRef}
@@ -578,17 +625,40 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen }: Props)
             <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
               Tipp: **fett** für Hervorhebungen, \n für Absätze
             </p>
-            <KIFragetextButtons
-              ki={ki}
-              typ={typ}
-              fachbereich={fachbereich}
-              thema={thema}
-              unterthema={unterthema}
-              bloom={bloom}
-              fragetext={fragetext}
-              onSetFragetext={setFragetext}
-              onSetMusterlosung={setMusterlosung}
-            />
+            {/* KI-Ergebnisse */}
+            {ki.ergebnisse.generiereFragetext && (
+              <div className="mt-2">
+                <ErgebnisAnzeige
+                  ergebnis={ki.ergebnisse.generiereFragetext}
+                  vorschauKey="fragetext"
+                  zusatzKey="musterlosung"
+                  onUebernehmen={() => {
+                    const d = ki.ergebnisse.generiereFragetext?.daten
+                    if (d) {
+                      if (typeof d.fragetext === 'string') setFragetext(d.fragetext)
+                      if (typeof d.musterlosung === 'string') setMusterlosung(d.musterlosung)
+                    }
+                    ki.verwerfen('generiereFragetext')
+                  }}
+                  onVerwerfen={() => ki.verwerfen('generiereFragetext')}
+                />
+              </div>
+            )}
+            {ki.ergebnisse.verbessereFragetext && (
+              <div className="mt-2">
+                <ErgebnisAnzeige
+                  ergebnis={ki.ergebnisse.verbessereFragetext}
+                  vorschauKey="fragetext"
+                  zusatzKey="aenderungen"
+                  onUebernehmen={() => {
+                    const d = ki.ergebnisse.verbessereFragetext?.daten
+                    if (d && typeof d.fragetext === 'string') setFragetext(d.fragetext)
+                    ki.verwerfen('verbessereFragetext')
+                  }}
+                  onVerwerfen={() => ki.verwerfen('verbessereFragetext')}
+                />
+              </div>
+            )}
           </Abschnitt>
 
           {/* Anhänge (Bilder, PDFs) */}
@@ -608,13 +678,54 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen }: Props)
                 setOptionen={setOptionen}
                 mehrfachauswahl={mehrfachauswahl}
                 setMehrfachauswahl={setMehrfachauswahl}
+                titelRechts={ki.verfuegbar ? (
+                  <InlineAktionButton
+                    label="Optionen generieren"
+                    tooltip="KI erstellt Antwortoptionen (korrekte und falsche) passend zum Fragetext"
+                    hinweis={!fragetext.trim() ? 'Fragetext nötig' : undefined}
+                    disabled={!fragetext.trim() || ki.ladeAktion !== null}
+                    ladend={ki.ladeAktion === 'generiereOptionen'}
+                    onClick={() => ki.ausfuehren('generiereOptionen', { fragetext })}
+                  />
+                ) : undefined}
               />
-              <KIMCOptionenButton
-                ki={ki}
-                fragetext={fragetext}
-                optionen={optionen}
-                onSetOptionen={setOptionen}
-              />
+              {ki.ergebnisse.generiereOptionen && (
+                <div className="-mt-2">
+                  <ErgebnisAnzeige
+                    ergebnis={ki.ergebnisse.generiereOptionen}
+                    vorschauKey="optionen"
+                    renderVorschau={(daten) => {
+                      const opts = daten.optionen as Array<{ text: string; korrekt: boolean }> | undefined
+                      if (!Array.isArray(opts)) return null
+                      return (
+                        <ul className="space-y-1">
+                          {opts.map((o, i) => (
+                            <li key={i} className={`text-sm px-2 py-1 rounded ${o.korrekt ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300' : 'text-slate-600 dark:text-slate-300'}`}>
+                              {o.korrekt ? '\u2713 ' : '\u2717 '}{o.text}
+                            </li>
+                          ))}
+                        </ul>
+                      )
+                    }}
+                    onUebernehmen={() => {
+                      const d = ki.ergebnisse.generiereOptionen?.daten
+                      if (d && Array.isArray(d.optionen)) {
+                        const neueOptionen: MCOption[] = (d.optionen as Array<{ text: string; korrekt: boolean }>).map((o, i) => ({
+                          id: String.fromCharCode(97 + i),
+                          text: o.text,
+                          korrekt: o.korrekt,
+                        }))
+                        const merged = neueOptionen.length >= optionen.length
+                          ? neueOptionen
+                          : [...neueOptionen, ...optionen.slice(neueOptionen.length)]
+                        setOptionen(merged)
+                      }
+                      ki.verwerfen('generiereOptionen')
+                    }}
+                    onVerwerfen={() => ki.verwerfen('generiereOptionen')}
+                  />
+                </div>
+              )}
             </>
           )}
 
@@ -634,15 +745,102 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen }: Props)
                 setTextMitLuecken={setTextMitLuecken}
                 luecken={luecken}
                 setLuecken={setLuecken}
+                titelRechts={ki.verfuegbar ? (
+                  <div className="flex gap-1.5">
+                    <InlineAktionButton
+                      label="Generieren"
+                      tooltip="KI markiert sinnvolle Lückenstellen im Text"
+                      hinweis={!fragetext.trim() ? 'Fragetext nötig' : undefined}
+                      disabled={!fragetext.trim() || ki.ladeAktion !== null}
+                      ladend={ki.ladeAktion === 'generiereLuecken'}
+                      onClick={() => ki.ausfuehren('generiereLuecken', { fragetext, textMitLuecken: textMitLuecken || fragetext })}
+                    />
+                    <InlineAktionButton
+                      label="Prüfen & Verbessern"
+                      tooltip="KI prüft ob alle akzeptierten Antwort-Varianten vollständig sind"
+                      hinweis={!(textMitLuecken.includes('{{') && luecken.length > 0) ? 'Lückentext mit {{}} nötig' : undefined}
+                      disabled={!(textMitLuecken.includes('{{') && luecken.length > 0) || ki.ladeAktion !== null}
+                      ladend={ki.ladeAktion === 'pruefeLueckenAntworten'}
+                      onClick={() => ki.ausfuehren('pruefeLueckenAntworten', { textMitLuecken, luecken })}
+                    />
+                  </div>
+                ) : undefined}
               />
-              <KILueckentextButtons
-                ki={ki}
-                fragetext={fragetext}
-                textMitLuecken={textMitLuecken}
-                luecken={luecken}
-                onSetTextMitLuecken={setTextMitLuecken}
-                onSetLuecken={setLuecken}
-              />
+              {ki.ergebnisse.generiereLuecken && (
+                <div className="-mt-2">
+                  <ErgebnisAnzeige
+                    ergebnis={ki.ergebnisse.generiereLuecken}
+                    vorschauKey="textMitLuecken"
+                    renderVorschau={(daten) => {
+                      const text = daten.textMitLuecken as string | undefined
+                      const l = daten.luecken as Array<{ id: string; korrekteAntworten: string[] }> | undefined
+                      if (!text) return null
+                      return (
+                        <div className="space-y-2">
+                          <p className="text-sm text-slate-700 dark:text-slate-200 whitespace-pre-wrap">{text}</p>
+                          {Array.isArray(l) && l.length > 0 && (
+                            <div className="text-xs text-slate-500 dark:text-slate-400">
+                              {l.map((luecke, i) => (
+                                <span key={i} className="inline-block mr-3">
+                                  {`{{${luecke.id}}}`}: {luecke.korrekteAntworten.join(' / ')}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )
+                    }}
+                    onUebernehmen={() => {
+                      const d = ki.ergebnisse.generiereLuecken?.daten
+                      if (d) {
+                        if (typeof d.textMitLuecken === 'string') setTextMitLuecken(d.textMitLuecken)
+                        if (Array.isArray(d.luecken)) {
+                          setLuecken((d.luecken as Array<{ id: string; korrekteAntworten: string[] }>).map((l) => ({
+                            id: l.id, korrekteAntworten: l.korrekteAntworten, caseSensitive: false,
+                          })))
+                        }
+                      }
+                      ki.verwerfen('generiereLuecken')
+                    }}
+                    onVerwerfen={() => ki.verwerfen('generiereLuecken')}
+                  />
+                </div>
+              )}
+              {ki.ergebnisse.pruefeLueckenAntworten && (
+                <div className="-mt-2">
+                  <ErgebnisAnzeige
+                    ergebnis={ki.ergebnisse.pruefeLueckenAntworten}
+                    vorschauKey="bewertung"
+                    renderVorschau={(daten) => {
+                      const bewertung = daten.bewertung as string | undefined
+                      const ergaenzt = daten.ergaenzteAntworten as Array<{ id: string; korrekteAntworten: string[] }> | undefined
+                      return (
+                        <div className="space-y-2">
+                          {bewertung && <p className="text-sm text-slate-700 dark:text-slate-200 whitespace-pre-wrap">{bewertung}</p>}
+                          {Array.isArray(ergaenzt) && ergaenzt.length > 0 && (
+                            <div className="text-xs text-slate-500 dark:text-slate-400">
+                              <p className="font-medium mb-1">Ergänzte Antwort-Varianten:</p>
+                              {ergaenzt.map((l, i) => (
+                                <span key={i} className="inline-block mr-3">{`{{${l.id}}}`}: {l.korrekteAntworten.join(' / ')}</span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )
+                    }}
+                    onUebernehmen={() => {
+                      const d = ki.ergebnisse.pruefeLueckenAntworten?.daten
+                      if (d && Array.isArray(d.ergaenzteAntworten)) {
+                        setLuecken((d.ergaenzteAntworten as Array<{ id: string; korrekteAntworten: string[] }>).map((l) => ({
+                          id: l.id, korrekteAntworten: l.korrekteAntworten, caseSensitive: false,
+                        })))
+                      }
+                      ki.verwerfen('pruefeLueckenAntworten')
+                    }}
+                    onVerwerfen={() => ki.verwerfen('pruefeLueckenAntworten')}
+                  />
+                </div>
+              )}
             </>
           )}
 
@@ -662,15 +860,74 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen }: Props)
 
           {typ === 'richtigfalsch' && (
             <>
-              <RichtigFalschEditor aussagen={aussagen} setAussagen={setAussagen} />
-              <KIRichtigFalschButtons
-                ki={ki}
-                fragetext={fragetext}
-                fachbereich={fachbereich}
-                thema={thema}
+              <RichtigFalschEditor
                 aussagen={aussagen}
-                onSetAussagen={setAussagen}
+                setAussagen={setAussagen}
+                titelRechts={ki.verfuegbar ? (
+                  <div className="flex gap-1.5">
+                    <InlineAktionButton
+                      label="Generieren"
+                      tooltip="KI erstellt Richtig/Falsch-Aussagen passend zum Thema"
+                      hinweis={!fragetext.trim() ? 'Fragetext nötig' : undefined}
+                      disabled={!fragetext.trim() || ki.ladeAktion !== null}
+                      ladend={ki.ladeAktion === 'generiereAussagen'}
+                      onClick={() => ki.ausfuehren('generiereAussagen', { fragetext, fachbereich, thema })}
+                    />
+                    <InlineAktionButton
+                      label="Prüfen & Verbessern"
+                      tooltip="KI prüft Aussagen auf Balance, Eindeutigkeit und fachliche Korrektheit"
+                      hinweis={!(aussagen.filter((a) => a.text.trim()).length >= 2) ? 'Mind. 2 Aussagen nötig' : undefined}
+                      disabled={!(aussagen.filter((a) => a.text.trim()).length >= 2) || !fragetext.trim() || ki.ladeAktion !== null}
+                      ladend={ki.ladeAktion === 'pruefeAussagen'}
+                      onClick={() => ki.ausfuehren('pruefeAussagen', { fragetext, aussagen })}
+                    />
+                  </div>
+                ) : undefined}
               />
+              {ki.ergebnisse.generiereAussagen && (
+                <div className="-mt-2">
+                  <ErgebnisAnzeige
+                    ergebnis={ki.ergebnisse.generiereAussagen}
+                    vorschauKey="aussagen"
+                    renderVorschau={(daten) => {
+                      const a = daten.aussagen as Array<{ text: string; korrekt: boolean; erklaerung?: string }> | undefined
+                      if (!Array.isArray(a)) return null
+                      return (
+                        <ul className="space-y-1">
+                          {a.map((aus, i) => (
+                            <li key={i} className={`text-sm px-2 py-1 rounded ${aus.korrekt ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300' : 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300'}`}>
+                              {aus.korrekt ? '\u2713 ' : '\u2717 '}{aus.text}
+                              {aus.erklaerung && <span className="block text-xs text-slate-500 dark:text-slate-400 mt-0.5 italic">{aus.erklaerung}</span>}
+                            </li>
+                          ))}
+                        </ul>
+                      )
+                    }}
+                    onUebernehmen={() => {
+                      const d = ki.ergebnisse.generiereAussagen?.daten
+                      if (d && Array.isArray(d.aussagen)) {
+                        const neue = (d.aussagen as Array<{ text: string; korrekt: boolean; erklaerung?: string }>).map((a, i) => ({
+                          id: String(i + 1), text: a.text, korrekt: a.korrekt, erklaerung: a.erklaerung,
+                        }))
+                        setAussagen(neue)
+                      }
+                      ki.verwerfen('generiereAussagen')
+                    }}
+                    onVerwerfen={() => ki.verwerfen('generiereAussagen')}
+                  />
+                </div>
+              )}
+              {ki.ergebnisse.pruefeAussagen && (
+                <div className="-mt-2">
+                  <ErgebnisAnzeige
+                    ergebnis={ki.ergebnisse.pruefeAussagen}
+                    vorschauKey="bewertung"
+                    zusatzKey="verbesserungen"
+                    onUebernehmen={() => ki.verwerfen('pruefeAussagen')}
+                    onVerwerfen={() => ki.verwerfen('pruefeAussagen')}
+                  />
+                </div>
+              )}
             </>
           )}
 
@@ -683,18 +940,99 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen }: Props)
                 setRechenwegErforderlich={setRechenwegErforderlich}
                 hilfsmittel={hilfsmittel}
                 setHilfsmittel={setHilfsmittel}
+                titelRechts={ki.verfuegbar ? (
+                  <div className="flex gap-1.5">
+                    <InlineAktionButton
+                      label="Generieren"
+                      tooltip="KI berechnet die korrekten Ergebnisse aus dem Aufgabentext"
+                      hinweis={!fragetext.trim() ? 'Fragetext nötig' : undefined}
+                      disabled={!fragetext.trim() || ki.ladeAktion !== null}
+                      ladend={ki.ladeAktion === 'berechneErgebnis'}
+                      onClick={() => ki.ausfuehren('berechneErgebnis', { fragetext })}
+                    />
+                    <InlineAktionButton
+                      label="Prüfen & Verbessern"
+                      tooltip="KI prüft ob die Toleranzbereiche sinnvoll gewählt sind"
+                      hinweis={!(ergebnisse.filter((e) => e.label.trim()).length >= 1) ? 'Mind. 1 Ergebnis nötig' : undefined}
+                      disabled={!(ergebnisse.filter((e) => e.label.trim()).length >= 1) || !fragetext.trim() || ki.ladeAktion !== null}
+                      ladend={ki.ladeAktion === 'pruefeToleranz'}
+                      onClick={() => ki.ausfuehren('pruefeToleranz', { fragetext, ergebnisse })}
+                    />
+                  </div>
+                ) : undefined}
               />
-              <KIBerechnungButtons
-                ki={ki}
-                fragetext={fragetext}
-                ergebnisse={ergebnisse}
-                onSetErgebnisse={setErgebnisse}
-              />
+              {ki.ergebnisse.berechneErgebnis && (
+                <div className="-mt-2">
+                  <ErgebnisAnzeige
+                    ergebnis={ki.ergebnisse.berechneErgebnis}
+                    vorschauKey="ergebnisse"
+                    renderVorschau={(daten) => {
+                      const erg = daten.ergebnisse as Array<{ label: string; korrekt: number; toleranz: number; einheit?: string }> | undefined
+                      if (!Array.isArray(erg)) return null
+                      return (
+                        <div className="space-y-1">
+                          {erg.map((e, i) => (
+                            <div key={i} className="text-sm text-slate-700 dark:text-slate-200">
+                              <span className="font-medium">{e.label}:</span>{' '}
+                              {e.korrekt} {e.einheit ?? ''}
+                              {e.toleranz > 0 && <span className="text-slate-400"> (+/-{e.toleranz})</span>}
+                            </div>
+                          ))}
+                        </div>
+                      )
+                    }}
+                    onUebernehmen={() => {
+                      const d = ki.ergebnisse.berechneErgebnis?.daten
+                      if (d && Array.isArray(d.ergebnisse)) {
+                        const neue = (d.ergebnisse as Array<{ label: string; korrekt: number; toleranz: number; einheit?: string }>).map((e, i) => ({
+                          id: String(i + 1), label: e.label, korrekt: e.korrekt, toleranz: e.toleranz, einheit: e.einheit,
+                        }))
+                        setErgebnisse(neue)
+                      }
+                      ki.verwerfen('berechneErgebnis')
+                    }}
+                    onVerwerfen={() => ki.verwerfen('berechneErgebnis')}
+                  />
+                </div>
+              )}
+              {ki.ergebnisse.pruefeToleranz && (
+                <div className="-mt-2">
+                  <ErgebnisAnzeige
+                    ergebnis={ki.ergebnisse.pruefeToleranz}
+                    vorschauKey="bewertung"
+                    zusatzKey="empfohleneToleranz"
+                    onUebernehmen={() => ki.verwerfen('pruefeToleranz')}
+                    onVerwerfen={() => ki.verwerfen('pruefeToleranz')}
+                  />
+                </div>
+              )}
             </>
           )}
 
           {/* Musterlösung */}
-          <Abschnitt titel="Musterlösung">
+          <Abschnitt
+            titel="Musterlösung"
+            titelRechts={ki.verfuegbar ? (
+              <div className="flex gap-1.5">
+                <InlineAktionButton
+                  label="Generieren"
+                  tooltip="KI erstellt eine Musterlösung basierend auf dem Fragetext"
+                  hinweis={!fragetext.trim() ? 'Fragetext nötig' : undefined}
+                  disabled={!fragetext.trim() || ki.ladeAktion !== null}
+                  ladend={ki.ladeAktion === 'generiereMusterloesung'}
+                  onClick={() => ki.ausfuehren('generiereMusterloesung', { fragetext, typ, fachbereich, bloom })}
+                />
+                <InlineAktionButton
+                  label="Prüfen & Verbessern"
+                  tooltip="KI prüft die Musterlösung auf Korrektheit und Vollständigkeit"
+                  hinweis={!fragetext.trim() || !musterlosung.trim() ? 'Fragetext + Musterlösung nötig' : undefined}
+                  disabled={!fragetext.trim() || !musterlosung.trim() || ki.ladeAktion !== null}
+                  ladend={ki.ladeAktion === 'pruefeMusterloesung'}
+                  onClick={() => ki.ausfuehren('pruefeMusterloesung', { fragetext, musterlosung })}
+                />
+              </div>
+            ) : undefined}
+          >
             <FormattierungsToolbar textareaRef={musterloeRef} value={musterlosung} onChange={setMusterlosung} />
             <textarea
               ref={musterloeRef}
@@ -704,15 +1042,35 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen }: Props)
               placeholder="Erwartete korrekte Antwort..."
               className="input-field resize-y"
             />
-            <KIMusterlosungButtons
-              ki={ki}
-              fragetext={fragetext}
-              musterlosung={musterlosung}
-              typ={typ}
-              fachbereich={fachbereich}
-              bloom={bloom}
-              onSetMusterlosung={setMusterlosung}
-            />
+            {ki.ergebnisse.generiereMusterloesung && (
+              <div className="mt-2">
+                <ErgebnisAnzeige
+                  ergebnis={ki.ergebnisse.generiereMusterloesung}
+                  vorschauKey="musterlosung"
+                  onUebernehmen={() => {
+                    const d = ki.ergebnisse.generiereMusterloesung?.daten
+                    if (d && typeof d.musterlosung === 'string') setMusterlosung(d.musterlosung)
+                    ki.verwerfen('generiereMusterloesung')
+                  }}
+                  onVerwerfen={() => ki.verwerfen('generiereMusterloesung')}
+                />
+              </div>
+            )}
+            {ki.ergebnisse.pruefeMusterloesung && (
+              <div className="mt-2">
+                <ErgebnisAnzeige
+                  ergebnis={ki.ergebnisse.pruefeMusterloesung}
+                  vorschauKey="bewertung"
+                  zusatzKey="verbesserteLosung"
+                  onUebernehmen={() => {
+                    const d = ki.ergebnisse.pruefeMusterloesung?.daten
+                    if (d && typeof d.verbesserteLosung === 'string') setMusterlosung(d.verbesserteLosung)
+                    ki.verwerfen('pruefeMusterloesung')
+                  }}
+                  onVerwerfen={() => ki.verwerfen('pruefeMusterloesung')}
+                />
+              </div>
+            )}
           </Abschnitt>
 
           {/* Bewertungsraster */}

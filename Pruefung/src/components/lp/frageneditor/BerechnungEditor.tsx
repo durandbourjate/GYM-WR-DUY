@@ -8,9 +8,11 @@ interface BerechnungEditorProps {
   setRechenwegErforderlich: (v: boolean) => void
   hilfsmittel: string
   setHilfsmittel: (v: string) => void
+  /** Optionaler Inhalt rechts im Abschnitt-Header (z.B. KI-Buttons) */
+  titelRechts?: React.ReactNode
 }
 
-export default function BerechnungEditor({ ergebnisse, setErgebnisse, rechenwegErforderlich, setRechenwegErforderlich, hilfsmittel, setHilfsmittel }: BerechnungEditorProps) {
+export default function BerechnungEditor({ ergebnisse, setErgebnisse, rechenwegErforderlich, setRechenwegErforderlich, hilfsmittel, setHilfsmittel, titelRechts }: BerechnungEditorProps) {
   function updateErgebnis(index: number, partial: Partial<BerechnungFrage['ergebnisse'][0]>): void {
     const neu = [...ergebnisse]
     neu[index] = { ...neu[index], ...partial }
@@ -28,7 +30,7 @@ export default function BerechnungEditor({ ergebnisse, setErgebnisse, rechenwegE
   }
 
   return (
-    <Abschnitt titel="Berechnungs-Parameter">
+    <Abschnitt titel="Berechnungs-Parameter" titelRechts={titelRechts}>
       <div className="flex items-center gap-4 mb-4">
         <label className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300 cursor-pointer">
           <input

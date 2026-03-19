@@ -4,9 +4,11 @@ import { Abschnitt } from './EditorBausteine.tsx'
 interface RichtigFalschEditorProps {
   aussagen: RichtigFalschFrage['aussagen']
   setAussagen: (a: RichtigFalschFrage['aussagen']) => void
+  /** Optionaler Inhalt rechts im Abschnitt-Header (z.B. KI-Buttons) */
+  titelRechts?: React.ReactNode
 }
 
-export default function RichtigFalschEditor({ aussagen, setAussagen }: RichtigFalschEditorProps) {
+export default function RichtigFalschEditor({ aussagen, setAussagen, titelRechts }: RichtigFalschEditorProps) {
   function updateAussage(index: number, partial: Partial<RichtigFalschFrage['aussagen'][0]>): void {
     const neu = [...aussagen]
     neu[index] = { ...neu[index], ...partial }
@@ -24,7 +26,7 @@ export default function RichtigFalschEditor({ aussagen, setAussagen }: RichtigFa
   }
 
   return (
-    <Abschnitt titel="Aussagen (Richtig/Falsch)">
+    <Abschnitt titel="Aussagen (Richtig/Falsch)" titelRechts={titelRechts}>
       <p className="text-xs text-slate-400 dark:text-slate-500 mb-3">
         Geben Sie die Aussagen ein und markieren Sie, ob sie richtig oder falsch sind.
       </p>
