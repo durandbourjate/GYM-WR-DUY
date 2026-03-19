@@ -5,6 +5,7 @@ import { usePruefungStore } from '../store/pruefungStore.ts'
 import { useAuthStore } from '../store/authStore.ts'
 import { apiService } from '../services/apiService.ts'
 import { istImSEB } from '../services/sebService.ts'
+import { formatDatum } from '../utils/zeit.ts'
 import ThemeToggle from './ThemeToggle.tsx'
 
 interface Props {
@@ -97,7 +98,7 @@ export default function Startbildschirm({ config, fragen, wiederhergestellt }: P
           <div className="grid grid-cols-3 gap-3 mb-4">
             <InfoCard label="Klasse" wert={config.klasse} />
             <InfoCard label="Dauer" wert={`${config.dauerMinuten} Min.`} />
-            <InfoCard label="Datum" wert={config.datum} />
+            <InfoCard label="Datum" wert={formatDatum(config.datum)} />
           </div>
 
           {user && (
@@ -127,7 +128,7 @@ export default function Startbildschirm({ config, fragen, wiederhergestellt }: P
             {config.titel}
           </h1>
           <p className="text-slate-500 dark:text-slate-400">
-            {config.klasse} · {config.datum}
+            {config.klasse} · {formatDatum(config.datum)}
           </p>
           {user && (
             <p className="text-sm text-slate-400 dark:text-slate-500 mt-1">

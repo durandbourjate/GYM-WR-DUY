@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react'
 import { useAuthStore } from '../../store/authStore.ts'
 import { apiService } from '../../services/apiService.ts'
 import type { PruefungsConfig } from '../../types/pruefung.ts'
+import { formatDatum } from '../../utils/zeit.ts'
 import ThemeToggle from '../ThemeToggle.tsx'
 import PruefungsComposer from './PruefungsComposer.tsx'
+import FragenBrowser from './FragenBrowser.tsx'
 
 /** Startseite für Lehrpersonen: Prüfungen verwalten + erstellen */
 export default function LPStartseite() {
@@ -16,6 +18,7 @@ export default function LPStartseite() {
   const [backendFehler, setBackendFehler] = useState(false)
   const [ansicht, setAnsicht] = useState<'liste' | 'composer'>('liste')
   const [editConfig, setEditConfig] = useState<PruefungsConfig | null>(null)
+  const [zeigFragenbank, setZeigFragenbank] = useState(false)
 
   // Alle Prüfungs-Configs laden
   useEffect(() => {
@@ -94,6 +97,12 @@ export default function LPStartseite() {
           </div>
           <div className="flex items-center gap-3">
             <button
+              onClick={() => setZeigFragenbank(true)}
+              className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors cursor-pointer"
+            >
+              Fragenbank
+            </button>
+            <button
               onClick={handleNeue}
               className="px-4 py-2 text-sm font-semibold text-white bg-slate-800 dark:bg-slate-200 dark:text-slate-800 rounded-lg hover:bg-slate-900 dark:hover:bg-slate-100 transition-colors cursor-pointer"
             >
@@ -162,7 +171,7 @@ export default function LPStartseite() {
                   <div className="flex items-center gap-3 mt-1 text-sm text-slate-500 dark:text-slate-400">
                     <span>{c.klasse}</span>
                     <span>·</span>
-                    <span>{c.datum}</span>
+                    <span>{formatDatum(c.datum)}</span>
                     <span>·</span>
                     <span>{c.dauerMinuten} Min.</span>
                     <span>·</span>
@@ -226,6 +235,15 @@ export default function LPStartseite() {
           </div>
         )}
       </main>
+
+      {/* Fragenbank Overlay */}
+      {zeigFragenbank && (
+        <FragenBrowser
+          onHinzufuegen={() => setZeigFragenbank(false)}
+          onSchliessen={() => setZeigFragenbank(false)}
+          bereitsVerwendet={[]}
+        />
+      )}
     </div>
   )
 }

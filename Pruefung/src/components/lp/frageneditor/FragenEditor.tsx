@@ -444,7 +444,7 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen }: Props)
               {bewertungsraster.length > 0 && (
                 <div className="flex gap-2 items-center text-xs text-slate-500 dark:text-slate-400">
                   <span className="flex-1">Kriterium</span>
-                  <span className="w-16 text-center">Pkt.</span>
+                  <span className="w-14 text-center">Pkt.</span>
                   <span className="w-7" />
                 </div>
               )}
@@ -471,7 +471,7 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen }: Props)
                     }}
                     min={0}
                     step={0.5}
-                    className="input-field w-16 text-center"
+                    className="input-field w-14 text-center"
                     title="Punkte für dieses Kriterium"
                   />
                   <button

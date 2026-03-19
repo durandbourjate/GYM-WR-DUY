@@ -4,6 +4,7 @@ import { useAuthStore } from '../../store/authStore.ts'
 import { apiService } from '../../services/apiService.ts'
 import type { PruefungsConfig, PruefungsAbschnitt } from '../../types/pruefung.ts'
 
+import { formatDatum } from '../../utils/zeit.ts'
 import ThemeToggle from '../ThemeToggle.tsx'
 import FragenBrowser from './FragenBrowser.tsx'
 
@@ -239,6 +240,9 @@ export default function PruefungsComposer({ config, onZurueck }: Props) {
             onMoveFrage={moveFrageInAbschnitt}
             onFragenBrowser={(abschnittIndex) => {
               setZielAbschnittIndex(abschnittIndex)
+              setZeigFragenBrowser(true)
+            }}
+            onEditFrage={() => {
               setZeigFragenBrowser(true)
             }}
           />
@@ -562,6 +566,7 @@ function AbschnitteTab({
   onRemoveFrage,
   onMoveFrage,
   onFragenBrowser,
+  onEditFrage,
 }: {
   pruefung: PruefungsConfig
   onAddAbschnitt: () => void
@@ -571,6 +576,7 @@ function AbschnitteTab({
   onRemoveFrage: (abschnittIndex: number, frageId: string) => void
   onMoveFrage: (abschnittIndex: number, frageIndex: number, richtung: 'hoch' | 'runter') => void
   onFragenBrowser: (abschnittIndex: number) => void
+  onEditFrage: (frageId: string) => void
 }) {
   if (pruefung.abschnitte.length === 0) {
     return (
@@ -654,9 +660,13 @@ function AbschnitteTab({
                     <span className="text-xs text-slate-400 dark:text-slate-500 w-5 text-center tabular-nums">
                       {fIndex + 1}.
                     </span>
-                    <span className="flex-1 text-slate-700 dark:text-slate-200 font-mono text-xs truncate">
+                    <button
+                      onClick={() => onEditFrage(frageId)}
+                      className="flex-1 text-left text-slate-700 dark:text-slate-200 font-mono text-xs truncate cursor-pointer hover:text-slate-900 dark:hover:text-slate-100 underline decoration-slate-300 dark:decoration-slate-600"
+                      title="In Fragenbank öffnen"
+                    >
                       {frageId}
-                    </span>
+                    </button>
                     <div className="flex gap-0.5">
                       <button
                         onClick={() => onMoveFrage(aIndex, fIndex, 'hoch')}
@@ -713,7 +723,7 @@ function VorschauTab({ pruefung }: { pruefung: PruefungsConfig }) {
             {pruefung.titel || '(Kein Titel)'}
           </h2>
           <p className="text-slate-500 dark:text-slate-400 mt-1">
-            {pruefung.klasse || '(Keine Klasse)'} · {pruefung.datum}
+            {pruefung.klasse || '(Keine Klasse)'} · {formatDatum(pruefung.datum)}
           </p>
         </div>
 

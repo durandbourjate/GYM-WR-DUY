@@ -6,6 +6,7 @@ import type { Frage } from '../../types/fragen.ts'
 import { berechneStatistiken, berechneFragenStatistiken } from '../../utils/korrekturUtils.ts'
 import type { FragenStatistik } from '../../utils/korrekturUtils.ts'
 import { exportiereAlsCSV, downloadCSV } from '../../utils/exportUtils.ts'
+import { formatDatum } from '../../utils/zeit.ts'
 import ThemeToggle from '../ThemeToggle.tsx'
 import KorrekturSchuelerZeile from './KorrekturSchuelerZeile.tsx'
 
@@ -223,7 +224,7 @@ export default function KorrekturDashboard({ pruefungId }: Props) {
                 Korrektur: {korrektur?.pruefungTitel ?? pruefungId}
               </h1>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                {korrektur?.klasse} · {korrektur?.datum}
+                {korrektur?.klasse} · {korrektur?.datum ? formatDatum(korrektur.datum) : ''}
                 {korrektur && ` · ${korrektur.schueler.length} SuS`}
               </p>
             </div>

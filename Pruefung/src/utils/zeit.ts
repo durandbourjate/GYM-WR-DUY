@@ -1,3 +1,15 @@
+/** Formatiert ein Datum-String (z.B. "2026-04-01") als "Mi 01. April 2026" */
+export function formatDatum(datumStr: string): string {
+  const d = new Date(datumStr + 'T00:00:00')
+  if (isNaN(d.getTime())) return datumStr
+  return new Intl.DateTimeFormat('de-CH', {
+    weekday: 'short',
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+  }).format(d)
+}
+
 /** Formatiert Sekunden als MM:SS */
 export function formatZeit(sekunden: number): string {
   const min = Math.floor(Math.abs(sekunden) / 60)
