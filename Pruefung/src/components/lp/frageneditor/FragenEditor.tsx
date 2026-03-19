@@ -18,6 +18,8 @@ import RichtigFalschEditor from './RichtigFalschEditor.tsx'
 import BerechnungEditor from './BerechnungEditor.tsx'
 import AnhangEditor from './AnhangEditor.tsx'
 import { useKIAssistent, KIFragetextButtons, KIMusterlosungButton, KIMCOptionenButton } from './KIAssistentPanel.tsx'
+import { KIZuordnungButtons, KIRichtigFalschButtons, KILueckentextButtons, KIBerechnungButtons } from './KITypButtons.tsx'
+import { berechneZeitbedarf } from '../../../utils/zeitbedarf.ts'
 
 interface Props {
   /** Bestehende Frage zum Bearbeiten, oder null für neue */
@@ -107,6 +109,16 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen }: Props)
     frage?.typ === 'berechnung' ? (frage as BerechnungFrage).hilfsmittel ?? '' : ''
   )
 
+  // Zeitbedarf
+  const [zeitbedarf, setZeitbedarf] = useState<number>(
+    frage?.zeitbedarf ?? berechneZeitbedarf(
+      (frage?.typ ?? 'mc') as 'mc' | 'freitext' | 'lueckentext' | 'zuordnung' | 'richtigfalsch' | 'berechnung' | 'visualisierung',
+      frage?.bloom ?? 'K2',
+      frage?.typ === 'freitext' ? { laenge: (frage as FreitextFrage).laenge } : undefined,
+    )
+  )
+  const [zeitbedarfManuell, setZeitbedarfManuell] = useState(!!frage?.zeitbedarf)
+
   // Anhänge
   const [anhaenge, setAnhaenge] = useState<FrageAnhang[]>(frage?.anhaenge ?? [])
   const [neueAnhaenge, setNeueAnhaenge] = useState<File[]>([])
@@ -172,6 +184,11 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen }: Props)
       punkte,
       musterlosung: musterlosung.trim(),
       bewertungsraster: bewertungsraster.filter((b) => b.beschreibung.trim()),
+      zeitbedarf: zeitbedarfManuell ? zeitbedarf : berechneZeitbedarf(
+        typ as 'mc' | 'freitext' | 'lueckentext' | 'zuordnung' | 'richtigfalsch' | 'berechnung' | 'visualisierung',
+        bloom,
+        typ === 'freitext' ? { laenge } : undefined,
+      ),
       verwendungen: frage?.verwendungen ?? [],
       quelle: frage?.quelle ?? 'manuell' as const,
       anhaenge: anhaenge.length > 0 ? anhaenge : undefined,
@@ -332,6 +349,21 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen }: Props)
                 <input type="number" value={punkte} onChange={(e) => setPunkte(parseInt(e.target.value) || 0)}
                   min={1} max={20} className="input-field" />
               </Feld>
+              <Feld label="Zeitbedarf (Min.)">
+                <input
+                  type="number"
+                  value={zeitbedarf}
+                  onChange={(e) => { setZeitbedarf(parseFloat(e.target.value) || 0); setZeitbedarfManuell(true) }}
+                  min={0.5}
+                  max={60}
+                  step={0.5}
+                  className="input-field"
+                  title="Geschätzter Zeitbedarf in Minuten"
+                />
+                <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">
+                  {zeitbedarfManuell ? 'Manuell gesetzt' : 'Geschätzt (Typ + Taxonomie)'}
+                </p>
+              </Feld>
               <Feld label="Tags (Komma-getrennt)">
                 <input type="text" value={tags} onChange={(e) => setTags(e.target.value)}
                   placeholder="z.B. Angebot, Nachfrage, BIP" className="input-field" />
@@ -437,31 +469,69 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen }: Props)
           )}
 
           {typ === 'lueckentext' && (
-            <LueckentextEditor
-              textMitLuecken={textMitLuecken}
-              setTextMitLuecken={setTextMitLuecken}
-              luecken={luecken}
-              setLuecken={setLuecken}
-            />
+            <>
+              <LueckentextEditor
+                textMitLuecken={textMitLuecken}
+                setTextMitLuecken={setTextMitLuecken}
+                luecken={luecken}
+                setLuecken={setLuecken}
+              />
+              <KILueckentextButtons
+                ki={ki}
+                fragetext={fragetext}
+                textMitLuecken={textMitLuecken}
+                luecken={luecken}
+                onSetTextMitLuecken={setTextMitLuecken}
+                onSetLuecken={setLuecken}
+              />
+            </>
           )}
 
           {typ === 'zuordnung' && (
-            <ZuordnungEditor paare={paare} setPaare={setPaare} />
+            <>
+              <ZuordnungEditor paare={paare} setPaare={setPaare} />
+              <KIZuordnungButtons
+                ki={ki}
+                fragetext={fragetext}
+                fachbereich={fachbereich}
+                thema={thema}
+                paare={paare}
+                onSetPaare={setPaare}
+              />
+            </>
           )}
 
           {typ === 'richtigfalsch' && (
-            <RichtigFalschEditor aussagen={aussagen} setAussagen={setAussagen} />
+            <>
+              <RichtigFalschEditor aussagen={aussagen} setAussagen={setAussagen} />
+              <KIRichtigFalschButtons
+                ki={ki}
+                fragetext={fragetext}
+                fachbereich={fachbereich}
+                thema={thema}
+                aussagen={aussagen}
+                onSetAussagen={setAussagen}
+              />
+            </>
           )}
 
           {typ === 'berechnung' && (
-            <BerechnungEditor
-              ergebnisse={ergebnisse}
-              setErgebnisse={setErgebnisse}
-              rechenwegErforderlich={rechenwegErforderlich}
-              setRechenwegErforderlich={setRechenwegErforderlich}
-              hilfsmittel={hilfsmittel}
-              setHilfsmittel={setHilfsmittel}
-            />
+            <>
+              <BerechnungEditor
+                ergebnisse={ergebnisse}
+                setErgebnisse={setErgebnisse}
+                rechenwegErforderlich={rechenwegErforderlich}
+                setRechenwegErforderlich={setRechenwegErforderlich}
+                hilfsmittel={hilfsmittel}
+                setHilfsmittel={setHilfsmittel}
+              />
+              <KIBerechnungButtons
+                ki={ki}
+                fragetext={fragetext}
+                ergebnisse={ergebnisse}
+                onSetErgebnisse={setErgebnisse}
+              />
+            </>
           )}
 
           {/* Musterlösung */}

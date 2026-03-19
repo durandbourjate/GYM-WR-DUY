@@ -40,6 +40,10 @@ export interface FrageBase {
   // Anhänge (Bilder, PDFs)
   anhaenge?: FrageAnhang[];
 
+  // Zeitbedarf
+  /** Geschätzter Zeitbedarf in Minuten (vorausgefüllt, editierbar) */
+  zeitbedarf?: number;
+
   // Herkunft
   quelle?: 'pool' | 'papier' | 'manuell' | 'ki-generiert';
   quellReferenz?: string;
