@@ -126,6 +126,7 @@ Pruefung/
 │   │   │   ├── KorrekturDashboard.tsx   — KI-Korrektur: Review + Feedback
 │   │   │   ├── KorrekturSchuelerZeile.tsx — Aufklappbare SuS-Zeile mit Bewertungen
 │   │   │   ├── KorrekturFrageZeile.tsx   — Einzelne Frage: KI-Vorschlag + LP-Override
+│   │   │   ├── SuSVorschau.tsx          — Fullscreen SuS-Vorschau (Preview aus Schüler-Sicht)
 │   │   │   ├── MonitoringDashboard.tsx  — LP-Dashboard: Live-Übersicht aller SuS
 │   │   │   └── SchuelerZeile.tsx        — Einzelne SuS-Zeile mit Detail-Panel
 │   │   ├── ErrorBoundary.tsx            — Fängt Rendering-Fehler, Recovery-UI
@@ -207,6 +208,16 @@ Ohne diese Variablen funktioniert die App im **Demo-Modus** (Schülercode + Demo
 | 15 | Erweitertes LP-Monitoring | ✅ | Antwort-Einsicht pro SuS (Fragen-Fortschritt + Kurzvorschau) |
 | 16 | Fragen-Dashboard | ✅ | SuS/Fragen Toggle im Monitoring (aggregierter Fortschritt pro Frage) |
 | 17 | LP-zu-SuS Chat | ✅ | Nachrichten senden/empfangen während Prüfung (Einzel + Broadcast) |
+
+### UI-Verbesserungen (19.03.2026)
+| # | Feature | Status | Beschreibung |
+|---|---------|--------|-------------|
+| 18 | Datum formatiert | ✅ | `formatDatum()` in zeit.ts, "Mi 01. April 2026" statt rohes Date |
+| 19 | Bewertungsraster Layout | ✅ | Kriterium flex-1, Punkte w-14, Spalten-Header |
+| 20 | Klickbare Fragen | ✅ | Frage-IDs in AbschnitteTab klickbar → öffnet Fragenbank |
+| 21 | Fragenbank-Button | ✅ | In LP-Startseite Header neben "+ Neue Prüfung" |
+| 22 | SuS-Vorschau | ✅ | Fullscreen-Preview aus SuS-Sicht mit VORSCHAU-Banner |
+| 23 | Prüfungsorganisation | ✅ | Suchfeld, Filter-Chips (Fachbereich/Typ/Gefäss), Sortierung, "Zuletzt"-Sektion |
 
 ### Offen
 - Kollaboratives Korrigieren (mehrere LP korrigieren dieselbe Prüfung)
