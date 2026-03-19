@@ -74,11 +74,15 @@ export interface NotenConfig {
 export interface PruefungsMaterial {
   id: string;
   titel: string;
-  typ: 'pdf' | 'text' | 'link';
+  typ: 'pdf' | 'text' | 'link' | 'dateiUpload';
   /** URL für PDF oder Link */
   url?: string;
   /** Inline-Inhalt für Typ 'text' */
   inhalt?: string;
+  /** Dateiname bei Typ 'dateiUpload' */
+  dateiname?: string;
+  /** Drive File ID bei Typ 'dateiUpload' */
+  driveFileId?: string;
 }
 
 export interface PruefungsAbschnitt {

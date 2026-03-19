@@ -81,7 +81,7 @@ export default function MaterialPanel({ materialien, onSchliessen }: MaterialPan
                       <span>{typIcon(mat.typ)}</span>
                       <span className="text-sm font-medium text-slate-700 dark:text-slate-200">{mat.titel}</span>
                       <span className="text-xs text-slate-400 dark:text-slate-500 ml-auto">
-                        {mat.typ === 'pdf' ? 'PDF' : mat.typ === 'text' ? 'Text' : 'Link'}
+                        {mat.typ === 'pdf' ? 'PDF' : mat.typ === 'text' ? 'Text' : mat.typ === 'dateiUpload' ? 'Datei' : 'Link'}
                       </span>
                     </div>
                   </button>
@@ -99,7 +99,7 @@ export default function MaterialPanel({ materialien, onSchliessen }: MaterialPan
 
 /** Zeigt den Inhalt eines einzelnen Materials */
 function MaterialInhalt({ material }: { material: PruefungsMaterial }) {
-  if (material.typ === 'pdf' && material.url) {
+  if ((material.typ === 'pdf' || material.typ === 'dateiUpload') && material.url) {
     // Google Drive Preview URL erstellen falls nötig
     const embedUrl = convertToEmbedUrl(material.url)
 
@@ -186,5 +186,6 @@ function typIcon(typ: PruefungsMaterial['typ']): string {
     case 'pdf': return '\u{1F4C4}'
     case 'text': return '\u{1F4DD}'
     case 'link': return '\u{1F517}'
+    case 'dateiUpload': return '\u{1F4CE}'
   }
 }

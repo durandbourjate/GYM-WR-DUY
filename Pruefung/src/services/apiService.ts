@@ -491,6 +491,45 @@ export const apiService = {
     }
   },
 
+  /** Material-Datei (PDF/Bild) hochladen und Drive-URL zurückgeben */
+  async uploadMaterial(email: string, datei: File): Promise<{ driveFileId: string; url: string } | null> {
+    if (!APPS_SCRIPT_URL) return null
+
+    try {
+      const base64 = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader()
+        reader.onload = () => resolve((reader.result as string).split(',')[1])
+        reader.onerror = reject
+        reader.readAsDataURL(datei)
+      })
+
+      const response = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({
+          action: 'uploadMaterial',
+          email,
+          dateiname: datei.name,
+          mimeType: datei.type,
+          groesseBytes: datei.size,
+          base64Data: base64,
+        }),
+      })
+      if (!response.ok) return null
+
+      const text = await response.text()
+      try {
+        const data = JSON.parse(text)
+        if (data.error) return null
+        return { driveFileId: data.driveFileId, url: data.url }
+      } catch {
+        return null
+      }
+    } catch {
+      return null
+    }
+  },
+
   /** Anhang (Bild/PDF) zu einer Frage hochladen */
   async uploadAnhang(email: string, frageId: string, datei: File): Promise<FrageAnhang | null> {
     if (!APPS_SCRIPT_URL) return null
