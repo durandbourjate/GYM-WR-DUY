@@ -221,6 +221,7 @@ function parseFrage(row, fachbereich) {
     punkte: Number(row.punkte) || 1,
     musterlosung: row.musterlosung || '',
     bewertungsraster: safeJsonParse(row.bewertungsraster, []),
+    anhaenge: safeJsonParse(row.anhaenge, []),
     verwendungen: [],
   };
 
@@ -398,6 +399,7 @@ function speichereFrage(body) {
       bewertungsraster: JSON.stringify(frage.bewertungsraster || []),
       fragetext: frage.fragetext || '',
       quelle: frage.quelle || 'manuell',
+      anhaenge: JSON.stringify(frage.anhaenge || []),
       typDaten: JSON.stringify(getTypDaten(frage)),
     };
 

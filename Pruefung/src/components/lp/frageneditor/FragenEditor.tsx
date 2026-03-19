@@ -2,7 +2,7 @@ import { useState, useRef } from 'react'
 import { useFocusTrap } from '../../../hooks/useFocusTrap.ts'
 import { typLabel, bloomLabel } from '../../../utils/fachbereich.ts'
 import type {
-  Frage, Fachbereich, BloomStufe, Gefaess,
+  Frage, Fachbereich, BloomStufe, Gefaess, FrageAnhang,
   MCFrage, FreitextFrage, LueckentextFrage, ZuordnungFrage,
   RichtigFalschFrage, BerechnungFrage,
   MCOption, Bewertungskriterium,
@@ -16,6 +16,7 @@ import LueckentextEditor from './LueckentextEditor.tsx'
 import ZuordnungEditor from './ZuordnungEditor.tsx'
 import RichtigFalschEditor from './RichtigFalschEditor.tsx'
 import BerechnungEditor from './BerechnungEditor.tsx'
+import AnhangEditor from './AnhangEditor.tsx'
 
 interface Props {
   /** Bestehende Frage zum Bearbeiten, oder null für neue */
@@ -105,6 +106,10 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen }: Props)
     frage?.typ === 'berechnung' ? (frage as BerechnungFrage).hilfsmittel ?? '' : ''
   )
 
+  // Anhänge
+  const [anhaenge, setAnhaenge] = useState<FrageAnhang[]>(frage?.anhaenge ?? [])
+  const [neueAnhaenge, setNeueAnhaenge] = useState<File[]>([])
+
   // Validierung
   const [fehler, setFehler] = useState<string[]>([])
 
@@ -165,6 +170,7 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen }: Props)
       bewertungsraster: bewertungsraster.filter((b) => b.beschreibung.trim()),
       verwendungen: frage?.verwendungen ?? [],
       quelle: frage?.quelle ?? 'manuell' as const,
+      anhaenge: anhaenge.length > 0 ? anhaenge : undefined,
     }
 
     let neueFrage: Frage
@@ -378,6 +384,15 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen }: Props)
               Tipp: **fett** für Hervorhebungen, \n für Absätze
             </p>
           </Abschnitt>
+
+          {/* Anhänge (Bilder, PDFs) */}
+          <AnhangEditor
+            anhaenge={anhaenge}
+            neueAnhaenge={neueAnhaenge}
+            onAnhangHinzu={(file) => setNeueAnhaenge((prev) => [...prev, file])}
+            onAnhangEntfernen={(id) => setAnhaenge((prev) => prev.filter((a) => a.id !== id))}
+            onNeuenAnhangEntfernen={(idx) => setNeueAnhaenge((prev) => prev.filter((_, i) => i !== idx))}
+          />
 
           {/* Typ-spezifische Felder */}
           {typ === 'mc' && (

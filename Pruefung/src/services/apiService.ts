@@ -1,4 +1,4 @@
-import type { Frage } from '../types/fragen.ts'
+import type { Frage, FrageAnhang } from '../types/fragen.ts'
 import type { PruefungsConfig } from '../types/pruefung.ts'
 import type { Antwort } from '../types/antworten.ts'
 import type { MonitoringDaten, PruefungsNachricht } from '../types/monitoring.ts'
@@ -488,6 +488,47 @@ export const apiService = {
     } catch (error) {
       console.error('[API] ladeNachrichten: Netzwerkfehler:', error)
       return []
+    }
+  },
+
+  /** Anhang (Bild/PDF) zu einer Frage hochladen */
+  async uploadAnhang(email: string, frageId: string, datei: File): Promise<FrageAnhang | null> {
+    if (!APPS_SCRIPT_URL) return null
+
+    try {
+      // Datei als Base64 kodieren
+      const base64 = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader()
+        reader.onload = () => resolve((reader.result as string).split(',')[1])
+        reader.onerror = reject
+        reader.readAsDataURL(datei)
+      })
+
+      const response = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({
+          action: 'uploadAnhang',
+          email,
+          frageId,
+          dateiname: datei.name,
+          mimeType: datei.type,
+          groesseBytes: datei.size,
+          base64Data: base64,
+        }),
+      })
+      if (!response.ok) return null
+
+      const text = await response.text()
+      try {
+        const data = JSON.parse(text)
+        if (data.error) return null
+        return data as FrageAnhang
+      } catch {
+        return null
+      }
+    } catch {
+      return null
     }
   },
 

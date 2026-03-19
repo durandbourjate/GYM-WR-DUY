@@ -1,3 +1,13 @@
+// === ANHANG ===
+export interface FrageAnhang {
+  id: string
+  dateiname: string
+  mimeType: string
+  groesseBytes: number
+  driveFileId: string
+  beschreibung?: string
+}
+
 // === FRAGE (Basis) ===
 export interface FrageBase {
   id: string;
@@ -26,6 +36,9 @@ export interface FrageBase {
   schwierigkeit?: number;
   streuung?: number;
   verwendungen: Verwendung[];
+
+  // Anhänge (Bilder, PDFs)
+  anhaenge?: FrageAnhang[];
 
   // Herkunft
   quelle?: 'pool' | 'papier' | 'manuell' | 'ki-generiert';
