@@ -11,6 +11,8 @@ const FRAGENBANK_ID = '1ASSRv7mSpmyD22PAMUJ8iekHwuamYkHpy9E6yxWNIVs';
 const KLASSENLISTEN_ID = '1tCLVobfVPXIu52aP_xsziCLKuVfZ7cNwp77g1yKCtCM';
 const CONFIGS_ID = '1QpcC44Ly7BUTLgUkVQtdqjTUDXmgdWdVD8ajjzsd7tE';
 const ANTWORTEN_ORDNER_ID = '1PAF1SUnR7nQ175muXn4iQERdQLJ-UnQQ';
+const ANHAENGE_ORDNER_ID = '1Ql4XuKmxyNW9ZIGsn4getcaB4FhLbjtm';
+const MATERIALIEN_ORDNER_ID = '1yBqm-9iKOcp8QptnISmwKaZGbR63mF5V';
 const LP_DOMAIN = 'gymhofwil.ch';
 const SUS_DOMAIN = 'stud.gymhofwil.ch';
 
@@ -107,17 +109,8 @@ function uploadAnhang(body) {
     var decoded = Utilities.base64Decode(base64Data);
     var blob = Utilities.newBlob(decoded, mimeType, dateiname);
 
-    // Im Antworten-Ordner einen Unterordner "Anhaenge" finden/erstellen
-    var hauptOrdner = DriveApp.getFolderById(ANTWORTEN_ORDNER_ID);
-    var anhaengeOrdner;
-    var unterordner = hauptOrdner.getFoldersByName('Anhaenge');
-    if (unterordner.hasNext()) {
-      anhaengeOrdner = unterordner.next();
-    } else {
-      anhaengeOrdner = hauptOrdner.createFolder('Anhaenge');
-    }
-
-    // Datei speichern
+    // Direkt in den Anhänge-Ordner speichern
+    var anhaengeOrdner = DriveApp.getFolderById(ANHAENGE_ORDNER_ID);
     var file = anhaengeOrdner.createFile(blob);
 
     // Öffentlich lesbar machen (für SuS während Prüfung)
@@ -161,17 +154,8 @@ function uploadMaterial(body) {
     var decoded = Utilities.base64Decode(base64Data);
     var blob = Utilities.newBlob(decoded, mimeType, dateiname);
 
-    // Im Antworten-Ordner einen Unterordner "Materialien" finden/erstellen
-    var hauptOrdner = DriveApp.getFolderById(ANTWORTEN_ORDNER_ID);
-    var materialOrdner;
-    var unterordner = hauptOrdner.getFoldersByName('Materialien');
-    if (unterordner.hasNext()) {
-      materialOrdner = unterordner.next();
-    } else {
-      materialOrdner = hauptOrdner.createFolder('Materialien');
-    }
-
-    // Datei speichern
+    // Direkt in den Materialien-Ordner speichern
+    var materialOrdner = DriveApp.getFolderById(MATERIALIEN_ORDNER_ID);
     var file = materialOrdner.createFile(blob);
 
     // Öffentlich lesbar machen (für SuS während Prüfung)
