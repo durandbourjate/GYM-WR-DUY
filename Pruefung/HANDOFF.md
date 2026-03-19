@@ -219,6 +219,18 @@ Ohne diese Variablen funktioniert die App im **Demo-Modus** (Schülercode + Demo
 | 22 | SuS-Vorschau | ✅ | Fullscreen-Preview aus SuS-Sicht mit VORSCHAU-Banner |
 | 23 | Prüfungsorganisation | ✅ | Suchfeld, Filter-Chips (Fachbereich/Typ/Gefäss), Sortierung, "Zuletzt"-Sektion |
 
+### Neue Features (19.03.2026)
+| # | Feature | Status | Beschreibung |
+|---|---------|--------|-------------|
+| 24 | Dateianhänge | ✅ | FrageAnhang Type, AnhangEditor (Drag&Drop), FrageAnhaenge (Lightbox), uploadAnhang Endpoint |
+| 25 | KI-Assistent im Editor | ✅ | KIAssistentPanel: Fragetext generieren/verbessern, Musterlösung prüfen, MC-Optionen generieren |
+| 26 | Datumformatierung | ✅ | formatDatum() in zeit.ts, alle Ansichten |
+| 27 | Bewertungsraster Layout | ✅ | Kriterium flex-1, Punkte w-14 |
+| 28 | Klickbare Fragen | ✅ | Frage-IDs in AbschnitteTab öffnen Fragenbank |
+| 29 | Fragenbank-Button LP-Header | ✅ | Neben "+ Neue Prüfung" |
+| 30 | SuS-Vorschau | ✅ | Fullscreen-Preview mit VORSCHAU-Banner |
+| 31 | Prüfungsorganisation | ✅ | Suche, Filter, Sortierung, "Zuletzt"-Sektion |
+
 ### Offen
 - Kollaboratives Korrigieren (mehrere LP korrigieren dieselbe Prüfung)
 - Textfeld-Höhe testen (auto-grow vs. begrenzter Bereich)
