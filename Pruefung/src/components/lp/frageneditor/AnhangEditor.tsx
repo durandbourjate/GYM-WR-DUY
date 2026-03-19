@@ -79,7 +79,7 @@ export default function AnhangEditor({
   }, [])
 
   return (
-    <Abschnitt titel="Anhänge">
+    <Abschnitt titel="Anhänge" einklappbar standardOffen={false}>
       {/* Drag & Drop Zone + Button */}
       <div
         onDrop={handleDrop}

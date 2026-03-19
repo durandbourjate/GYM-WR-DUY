@@ -21,6 +21,8 @@ export type AktionKey =
   // Berechnung
   | 'berechneErgebnis'
   | 'pruefeToleranz'
+  // Klassifizierung
+  | 'klassifiziereFrage'
   // Prüfungs-Analyse
   | 'analysierePruefung'
   // Import

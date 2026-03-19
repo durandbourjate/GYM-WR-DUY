@@ -61,7 +61,7 @@ export default function BerechnungEditor({ ergebnisse, setErgebnisse, rechenwegE
             <span className="w-20 text-center">Ergebnis</span>
             <span className="w-20 text-center">±Toleranz</span>
             <span className="w-16 text-center">Einheit</span>
-            <span className="w-7" />
+            {ergebnisse.length > 1 && <span className="w-7" />}
           </div>
         )}
         {ergebnisse.map((erg, i) => (

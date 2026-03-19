@@ -1,10 +1,48 @@
-export function Abschnitt({ titel, children }: { titel: string; children: React.ReactNode }) {
+import { useState } from 'react'
+
+interface AbschnittProps {
+  titel: string
+  children: React.ReactNode
+  /** Optionaler Inhalt rechts neben dem Titel (z.B. Buttons) */
+  titelRechts?: React.ReactNode
+  /** Wenn true, kann der Abschnitt ein-/ausgeklappt werden */
+  einklappbar?: boolean
+  /** Initialer Zustand: offen (true) oder geschlossen (false). Standard: true */
+  standardOffen?: boolean
+}
+
+export function Abschnitt({ titel, children, titelRechts, einklappbar, standardOffen = true }: AbschnittProps) {
+  const [offen, setOffen] = useState(standardOffen)
+
   return (
     <div className="bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 p-4">
-      <h3 className="text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wide mb-3">
-        {titel}
-      </h3>
-      {children}
+      <div className="flex items-center justify-between">
+        {einklappbar ? (
+          <button
+            onClick={() => setOffen(!offen)}
+            className="flex items-center gap-1.5 cursor-pointer select-none group"
+          >
+            <span className="text-[10px] text-slate-400 dark:text-slate-500 transition-transform duration-150 group-hover:text-slate-600 dark:group-hover:text-slate-300"
+              style={{ transform: offen ? 'rotate(90deg)' : 'rotate(0deg)', display: 'inline-block' }}
+            >
+              ▶
+            </span>
+            <h3 className="text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wide group-hover:text-slate-800 dark:group-hover:text-slate-100 transition-colors">
+              {titel}
+            </h3>
+          </button>
+        ) : (
+          <h3 className="text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wide">
+            {titel}
+          </h3>
+        )}
+        {titelRechts && <div className="flex items-center gap-2">{titelRechts}</div>}
+      </div>
+      {(!einklappbar || offen) && (
+        <div className={einklappbar ? 'mt-3' : 'mt-3'}>
+          {children}
+        </div>
+      )}
     </div>
   )
 }

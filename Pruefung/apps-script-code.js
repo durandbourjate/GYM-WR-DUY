@@ -73,6 +73,8 @@ function doPost(e) {
       return sendeNachrichtEndpoint(body);
     case 'uploadAnhang':
       return uploadAnhang(body);
+    case 'uploadMaterial':
+      return uploadMaterial(body);
     case 'kiAssistent':
       return kiAssistentEndpoint(body);
     default:
@@ -130,6 +132,60 @@ function uploadAnhang(body) {
     };
 
     return jsonResponse({ success: true, ...anhang });
+  } catch (error) {
+    return jsonResponse({ error: error.message });
+  }
+}
+
+// === MATERIAL UPLOAD ===
+
+function uploadMaterial(body) {
+  try {
+    var email = body.email;
+    var dateiname = body.dateiname;
+    var mimeType = body.mimeType;
+    var groesseBytes = body.groesseBytes;
+    var base64Data = body.base64Data;
+
+    if (!email || !email.endsWith('@' + LP_DOMAIN)) {
+      return jsonResponse({ error: 'Nur für Lehrpersonen' });
+    }
+    if (!base64Data || !dateiname) {
+      return jsonResponse({ error: 'Keine Dateidaten' });
+    }
+    if (groesseBytes > 10 * 1024 * 1024) {
+      return jsonResponse({ error: 'Datei zu gross (max. 10 MB)' });
+    }
+
+    // Base64 dekodieren und als Blob erstellen
+    var decoded = Utilities.base64Decode(base64Data);
+    var blob = Utilities.newBlob(decoded, mimeType, dateiname);
+
+    // Im Antworten-Ordner einen Unterordner "Materialien" finden/erstellen
+    var hauptOrdner = DriveApp.getFolderById(ANTWORTEN_ORDNER_ID);
+    var materialOrdner;
+    var unterordner = hauptOrdner.getFoldersByName('Materialien');
+    if (unterordner.hasNext()) {
+      materialOrdner = unterordner.next();
+    } else {
+      materialOrdner = hauptOrdner.createFolder('Materialien');
+    }
+
+    // Datei speichern
+    var file = materialOrdner.createFile(blob);
+
+    // Öffentlich lesbar machen (für SuS während Prüfung)
+    file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+
+    var fileId = file.getId();
+    var previewUrl = 'https://drive.google.com/file/d/' + fileId + '/preview';
+
+    return jsonResponse({
+      success: true,
+      driveFileId: fileId,
+      url: previewUrl,
+      dateiname: dateiname,
+    });
   } catch (error) {
     return jsonResponse({ error: error.message });
   }
@@ -868,6 +924,20 @@ function kiAssistentEndpoint(body) {
           'Fragetext:\n' + daten.fragetext + '\n\n' +
           'Ergebnisse mit Toleranzen:\n' + JSON.stringify(daten.ergebnisse) + '\n\n' +
           'Antworte als JSON: { "bewertung": "...", "empfohleneToleranz": "..." }';
+        result = rufeClaudeAuf(systemPrompt, userPrompt);
+        return jsonResponse({ success: true, ergebnis: result });
+
+      case 'klassifiziereFrage':
+        if (!daten.fragetext) return jsonResponse({ error: 'Fragetext fehlt' });
+        userPrompt = 'Klassifiziere die folgende Prüfungsfrage für den W&R-Unterricht am Schweizer Gymnasium (Lehrplan 17, Kanton Bern).\n\n' +
+          'Fragetext:\n' + daten.fragetext + '\n\n' +
+          'Bestimme:\n' +
+          '1. Fachbereich: "VWL", "BWL" oder "Recht"\n' +
+          '2. Thema: Das übergeordnete Thema (z.B. "Marktgleichgewicht", "Vertragsrecht", "Unternehmensformen")\n' +
+          '3. Unterthema: Ein spezifischeres Unterthema (z.B. "Angebot & Nachfrage", "Mängelrechte")\n' +
+          '4. Bloom-Stufe: K1 (Wissen), K2 (Verstehen), K3 (Anwenden), K4 (Analysieren), K5 (Bewerten), K6 (Erschaffen)\n' +
+          '5. Tags: 3–5 relevante Schlagwörter als Array\n\n' +
+          'Antworte als JSON: { "fachbereich": "VWL"|"BWL"|"Recht", "thema": "...", "unterthema": "...", "bloom": "K1"-"K6", "tags": ["...", "..."] }';
         result = rufeClaudeAuf(systemPrompt, userPrompt);
         return jsonResponse({ success: true, ergebnis: result });
 

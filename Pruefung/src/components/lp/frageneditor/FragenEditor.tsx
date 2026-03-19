@@ -19,6 +19,7 @@ import RichtigFalschEditor from './RichtigFalschEditor.tsx'
 import BerechnungEditor from './BerechnungEditor.tsx'
 import AnhangEditor from './AnhangEditor.tsx'
 import { useKIAssistent, KIFragetextButtons, KIMusterlosungButtons, KIMCOptionenButton } from './KIAssistentPanel.tsx'
+import { ErgebnisAnzeige } from './KIBausteine.tsx'
 import { KIZuordnungButtons, KIRichtigFalschButtons, KILueckentextButtons, KIBerechnungButtons } from './KITypButtons.tsx'
 import { berechneZeitbedarf } from '../../../utils/zeitbedarf.ts'
 import FormattierungsToolbar from './FormattierungsToolbar.tsx'
@@ -358,7 +359,7 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen }: Props)
         <div className="flex-1 overflow-auto px-5 py-4 space-y-5">
 
           {/* Fragetyp wählen */}
-          <Abschnitt titel="Fragetyp">
+          <Abschnitt titel="Fragetyp" einklappbar standardOffen={!frage}>
             <div className="flex gap-2 flex-wrap">
               {(['mc', 'freitext', 'lueckentext', 'zuordnung', 'richtigfalsch', 'berechnung'] as FrageTyp[]).map((t) => (
                 <button
@@ -380,7 +381,74 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen }: Props)
           </Abschnitt>
 
           {/* Grunddaten */}
-          <Abschnitt titel="Zuordnung">
+          <Abschnitt
+            titel="Zuordnung"
+            einklappbar
+            standardOffen={!frage}
+            titelRechts={ki.verfuegbar ? (
+              <button
+                onClick={() => ki.ausfuehren('klassifiziereFrage', { fragetext })}
+                disabled={!fragetext.trim() || ki.ladeAktion !== null}
+                title="KI klassifiziert die Frage und schlägt Fachbereich, Thema, Bloom-Stufe und Tags vor"
+                className={`px-2 py-0.5 text-[11px] rounded-md border transition-colors cursor-pointer inline-flex items-center gap-1
+                  ${!fragetext.trim() || ki.ladeAktion !== null
+                    ? 'border-slate-200 dark:border-slate-600 text-slate-400 dark:text-slate-500 cursor-not-allowed'
+                    : 'border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
+                  }`}
+              >
+                {ki.ladeAktion === 'klassifiziereFrage' ? (
+                  <>
+                    <span className="inline-block w-3 h-3 border-2 border-slate-400 border-t-transparent rounded-full animate-spin" />
+                    Klassifiziere...
+                  </>
+                ) : (
+                  'KI klassifizieren'
+                )}
+              </button>
+            ) : undefined}
+          >
+            {/* KI-Klassifizierungs-Ergebnis */}
+            {ki.ergebnisse.klassifiziereFrage && (
+              <div className="mb-3">
+                <ErgebnisAnzeige
+                  ergebnis={ki.ergebnisse.klassifiziereFrage}
+                  vorschauKey="zusammenfassung"
+                  renderVorschau={(daten) => {
+                    const fb = daten.fachbereich as string | undefined
+                    const th = daten.thema as string | undefined
+                    const uth = daten.unterthema as string | undefined
+                    const bl = daten.bloom as string | undefined
+                    const tg = daten.tags as string[] | undefined
+                    return (
+                      <div className="text-sm text-slate-700 dark:text-slate-200 space-y-1">
+                        {fb && <p><span className="text-xs text-slate-500 dark:text-slate-400">Fachbereich:</span> {fb}</p>}
+                        {th && <p><span className="text-xs text-slate-500 dark:text-slate-400">Thema:</span> {th}</p>}
+                        {uth && <p><span className="text-xs text-slate-500 dark:text-slate-400">Unterthema:</span> {uth}</p>}
+                        {bl && <p><span className="text-xs text-slate-500 dark:text-slate-400">Bloom:</span> {bl}</p>}
+                        {Array.isArray(tg) && tg.length > 0 && (
+                          <p><span className="text-xs text-slate-500 dark:text-slate-400">Tags:</span> {tg.join(', ')}</p>
+                        )}
+                      </div>
+                    )
+                  }}
+                  onUebernehmen={() => {
+                    const d = ki.ergebnisse.klassifiziereFrage?.daten
+                    if (d) {
+                      if (typeof d.fachbereich === 'string' && ['VWL', 'BWL', 'Recht'].includes(d.fachbereich)) {
+                        setFachbereich(d.fachbereich as Fachbereich)
+                      }
+                      if (typeof d.thema === 'string' && d.thema.trim()) setThema(d.thema.trim())
+                      if (typeof d.unterthema === 'string' && d.unterthema.trim()) setUnterthema(d.unterthema.trim())
+                      if (typeof d.bloom === 'string' && /^K[1-6]$/.test(d.bloom)) setBloom(d.bloom as BloomStufe)
+                      if (Array.isArray(d.tags) && d.tags.length > 0) setTags(d.tags.join(', '))
+                    }
+                    ki.verwerfen('klassifiziereFrage')
+                  }}
+                  onVerwerfen={() => ki.verwerfen('klassifiziereFrage')}
+                />
+              </div>
+            )}
+
             <div className="grid grid-cols-2 gap-3">
               <Feld label="Fachbereich">
                 <select value={fachbereich} onChange={(e) => setFachbereich(e.target.value as Fachbereich)} className="input-field">
@@ -470,7 +538,7 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen }: Props)
                 <div className="flex rounded-lg border border-slate-300 dark:border-slate-600 overflow-hidden">
                   <button
                     onClick={() => setGeteilt('privat')}
-                    className={`px-3 py-1 text-xs transition-colors cursor-pointer ${
+                    className={`flex-1 px-3 py-1 text-xs transition-colors cursor-pointer ${
                       geteilt === 'privat'
                         ? 'bg-slate-800 dark:bg-slate-200 text-white dark:text-slate-800'
                         : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
@@ -480,7 +548,7 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen }: Props)
                   </button>
                   <button
                     onClick={() => setGeteilt('schule')}
-                    className={`px-3 py-1 text-xs transition-colors cursor-pointer border-l border-slate-300 dark:border-slate-600 ${
+                    className={`flex-1 px-3 py-1 text-xs transition-colors cursor-pointer border-l border-slate-300 dark:border-slate-600 ${
                       geteilt === 'schule'
                         ? 'bg-blue-600 dark:bg-blue-500 text-white'
                         : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
@@ -648,7 +716,7 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen }: Props)
           </Abschnitt>
 
           {/* Bewertungsraster */}
-          <Abschnitt titel="Bewertungsraster">
+          <Abschnitt titel="Bewertungsraster" einklappbar standardOffen={false}>
             <div className="space-y-2">
               {/* Spalten-Header */}
               {bewertungsraster.length > 0 && (
