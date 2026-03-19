@@ -1,5 +1,6 @@
 import type { Frage } from '../../../types/fragen.ts'
 import type { PruefungsConfig, PruefungsAbschnitt } from '../../../types/pruefung.ts'
+import { typLabel } from '../../../utils/fachbereich.ts'
 
 interface Props {
   pruefung: PruefungsConfig
@@ -103,46 +104,81 @@ export default function AbschnitteTab({
                 {abschnitt.fragenIds.map((frageId, fIndex) => {
                   const frage = fragenMap[frageId]
                   const fragetext = frage && 'fragetext' in frage ? (frage as { fragetext: string }).fragetext : ''
-                  const vorschau = fragetext.length > 60 ? fragetext.slice(0, 60) + '...' : fragetext
+                  const vorschau = fragetext.length > 80 ? fragetext.slice(0, 80) + '...' : fragetext
+                  const fb = frage?.fachbereich
+                  const fbFarben: Record<string, string> = {
+                    VWL: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300',
+                    BWL: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
+                    Recht: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300',
+                  }
                   return (
                   <div
                     key={frageId}
-                    className="flex items-center gap-2 px-3 py-2 bg-slate-50 dark:bg-slate-700/30 rounded-lg text-sm"
+                    className="px-3 py-2.5 bg-slate-50 dark:bg-slate-700/30 rounded-lg text-sm"
                   >
-                    <span className="text-xs text-slate-400 dark:text-slate-500 w-5 text-center tabular-nums shrink-0">
-                      {fIndex + 1}.
-                    </span>
-                    <button
-                      onClick={() => onEditFrage(frageId)}
-                      className="flex-1 text-left cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-600/50 rounded px-1 -mx-1 min-w-0"
-                      title="In Fragenbank öffnen"
-                    >
-                      <span className="block text-slate-700 dark:text-slate-200 font-mono text-xs underline decoration-slate-300 dark:decoration-slate-600">
-                        {frageId}
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-slate-400 dark:text-slate-500 w-5 text-center tabular-nums shrink-0">
+                        {fIndex + 1}.
                       </span>
-                      {vorschau && (
-                        <span className="block text-[11px] text-slate-400 dark:text-slate-500 truncate mt-0.5">
-                          {vorschau}
+                      <span className="font-mono text-xs text-slate-600 dark:text-slate-300">{frageId}</span>
+                      {fb && (
+                        <span className={`px-1.5 py-0.5 text-[10px] font-medium rounded ${fbFarben[fb] ?? 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300'}`}>
+                          {fb}
                         </span>
                       )}
-                    </button>
-                    <div className="flex gap-0.5">
+                      {frage && (
+                        <span className="px-1.5 py-0.5 text-[10px] font-medium rounded bg-slate-100 text-slate-600 dark:bg-slate-600 dark:text-slate-300">
+                          {typLabel(frage.typ)}
+                        </span>
+                      )}
+                      {frage && (
+                        <span className="text-[10px] text-slate-400 dark:text-slate-500">
+                          {frage.bloom} · {frage.punkte}P.
+                        </span>
+                      )}
+                      <span className="flex-1" />
                       <button
-                        onClick={() => onMoveFrage(aIndex, fIndex, 'hoch')}
-                        disabled={fIndex === 0}
-                        className="w-6 h-6 text-xs text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600 rounded disabled:opacity-20 cursor-pointer disabled:cursor-not-allowed"
-                      >↑</button>
-                      <button
-                        onClick={() => onMoveFrage(aIndex, fIndex, 'runter')}
-                        disabled={fIndex === abschnitt.fragenIds.length - 1}
-                        className="w-6 h-6 text-xs text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600 rounded disabled:opacity-20 cursor-pointer disabled:cursor-not-allowed"
-                      >↓</button>
-                      <button
-                        onClick={() => onRemoveFrage(aIndex, frageId)}
-                        className="w-6 h-6 text-xs text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 rounded cursor-pointer"
-                        title="Frage entfernen"
-                      >×</button>
+                        onClick={() => onEditFrage(frageId)}
+                        className="text-[10px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-pointer"
+                        title="In Fragenbank öffnen"
+                      >
+                        Bearbeiten
+                      </button>
+                      <div className="flex gap-0.5">
+                        <button
+                          onClick={() => onMoveFrage(aIndex, fIndex, 'hoch')}
+                          disabled={fIndex === 0}
+                          className="w-6 h-6 text-xs text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600 rounded disabled:opacity-20 cursor-pointer disabled:cursor-not-allowed"
+                        >↑</button>
+                        <button
+                          onClick={() => onMoveFrage(aIndex, fIndex, 'runter')}
+                          disabled={fIndex === abschnitt.fragenIds.length - 1}
+                          className="w-6 h-6 text-xs text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600 rounded disabled:opacity-20 cursor-pointer disabled:cursor-not-allowed"
+                        >↓</button>
+                        <button
+                          onClick={() => onRemoveFrage(aIndex, frageId)}
+                          className="w-6 h-6 text-xs text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 rounded cursor-pointer"
+                          title="Frage entfernen"
+                        >×</button>
+                      </div>
                     </div>
+                    {vorschau && (
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 ml-7 truncate">
+                        {vorschau}
+                      </p>
+                    )}
+                    {frage?.thema && (
+                      <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5 ml-7">
+                        {frage.thema}{frage.unterthema ? ` › ${frage.unterthema}` : ''}
+                        {frage.tags && frage.tags.length > 0 && (
+                          <>
+                            {frage.tags.slice(0, 3).map((tag) => (
+                              <span key={tag} className="ml-2 px-1.5 py-0.5 bg-slate-100 dark:bg-slate-600 rounded text-[10px]">{tag}</span>
+                            ))}
+                          </>
+                        )}
+                      </p>
+                    )}
                   </div>
                   )
                 })}
