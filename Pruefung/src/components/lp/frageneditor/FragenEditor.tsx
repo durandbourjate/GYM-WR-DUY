@@ -490,7 +490,7 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen }: Props)
                       setBewertungsraster(neu)
                     }}
                     placeholder="Kriterium..."
-                    className="input-field flex-1"
+                    className="input-field flex-1 min-w-0"
                   />
                   <input
                     type="number"
@@ -502,7 +502,7 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen }: Props)
                     }}
                     min={0}
                     step={0.5}
-                    className="input-field w-14 text-center"
+                    className="input-field w-14 text-center shrink-0"
                     title="Punkte für dieses Kriterium"
                   />
                   <button
