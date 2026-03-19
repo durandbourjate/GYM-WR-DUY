@@ -231,9 +231,24 @@ Ohne diese Variablen funktioniert die App im **Demo-Modus** (Schülercode + Demo
 | 30 | SuS-Vorschau | ✅ | Fullscreen-Preview mit VORSCHAU-Banner |
 | 31 | Prüfungsorganisation | ✅ | Suche, Filter, Sortierung, "Zuletzt"-Sektion |
 
+### Session 19.03.2026 (Abend)
+| # | Feature | Status | Beschreibung |
+|---|---------|--------|-------------|
+| 32 | KI-Buttons vereinheitlicht | ✅ | Alle Fragetypen: Generieren + Prüfen & Verbessern, Tooltips überall, Musterlösung-Generierung |
+| 33 | Backend KI-Prompts (10 neue) | ✅ | generiereMusterloesung, generierePaare/pruefePaare, generiereAussagen/pruefeAussagen, generiereLuecken/pruefeLueckenAntworten, berechneErgebnis/pruefeToleranz, analysierePruefung |
+| 34 | Analyse-Tab im Composer | ✅ | 4. Tab: Taxonomie-Verteilung, Fragetypen-Mix, Zeitschätzung, KI-Analyse per Button |
+| 35 | Zeitbedarf pro Frage | ✅ | Neues Feld in FrageBase, vorausgefüllt (Typ+Bloom+Länge), editierbar, Summe im Analyse-Tab |
+| 36 | Fragenansicht im Composer | ✅ | AbschnitteTab zeigt Fachbereich-Badge, Typ, Bloom, Punkte, Zeitbedarf, Thema/Tags wie Fragenbank |
+| 37 | Schweizer Notenskala | ✅ | Note 1-6 (halbe Noten), Farbcodierung grün/rot, LP-Override möglich, Median in Statistiken |
+| 38 | Fragen-Import via KI | ✅ | Text einfügen → KI erkennt Fragen → Vorschau mit Checkboxen → selektiv importieren |
+| 39 | Fragen-Sharing | ✅ | autor/geteilt-Felder, Privat/Schule-Toggle, Filter "Alle/Meine" in Fragenbank |
+| 40 | Hilfe/FAQ-Seite | ✅ | In-App Hilfe mit Akkordeon-Sektionen, Bloom-Taxonomie-Erklärung, Onboarding für neue LP |
+
 ### Offen
 - Kollaboratives Korrigieren (mehrere LP korrigieren dieselbe Prüfung)
 - Textfeld-Höhe testen (auto-grow vs. begrenzter Bereich)
+- Buchhaltungs-Fragetyp (Soll/Haben, Kontenrahmen, T-Konten — wie bei eLoB)
+- Audio/Video in Fragen (Multimedia-Einbettung)
 
 ### Backend-Hinweis
 `apps-script-code.js` enthält den kompletten Apps Script Code. Nach Änderungen: Code kopieren → Apps Script Editor → Bereitstellung aktualisieren (Stift → Neue Version). Die Spalten `freigeschaltet` und `zeitverlaengerungen` müssen im Configs-Sheet vorhanden sein.
