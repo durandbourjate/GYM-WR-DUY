@@ -1,0 +1,118 @@
+<h2>Design: Fragenbank — neues Layout & Klickverhalten</h2>
+<p class="subtitle">Breiteres Panel, neue Button-Reihenfolge, +/– Buttons, Ziel-Anzeige</p>
+
+<div class="split">
+  <div class="mockup" style="flex:1;">
+    <div class="mockup-header">Aktuell (672px)</div>
+    <div class="mockup-body" style="padding:0; font-size:12px;">
+      <div style="padding:10px 12px; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <span style="font-weight:700; font-size:14px;">Fragenbank</span>
+          <span style="color:#94a3b8; font-size:11px; margin-left:6px;">42 Fragen</span>
+        </div>
+        <div style="display:flex; gap:4px; align-items:center;">
+          <span style="padding:2px 6px; border:1px solid #cbd5e1; border-radius:4px; font-size:10px;">Export</span>
+          <span style="padding:2px 6px; border:1px solid #cbd5e1; border-radius:4px; font-size:10px;">Import via KI</span>
+          <span style="padding:2px 6px; border:1px solid #cbd5e1; border-radius:4px; font-size:10px;">+ Neue Frage</span>
+          <span style="font-size:12px;">🌙</span>
+          <span style="color:#94a3b8;">×</span>
+        </div>
+      </div>
+      <div style="padding:8px 12px; border-bottom:1px solid #e2e8f0;">
+        <div style="background:#f1f5f9; border-radius:4px; padding:4px 8px; color:#94a3b8; font-size:11px;">🔍 Suchen...</div>
+      </div>
+      <div style="padding:8px 12px;">
+        <div style="padding:8px; border:1px solid #e2e8f0; border-radius:6px; margin-bottom:6px;">
+          <div style="display:flex; justify-content:space-between; align-items:start;">
+            <div>
+              <span style="font-size:10px; padding:1px 4px; background:#fed7aa; border-radius:3px;">VWL</span>
+              <span style="font-size:10px; padding:1px 4px; background:#e2e8f0; border-radius:3px; margin-left:3px;">MC</span>
+              <div style="margin-top:4px; font-size:12px;">Was versteht man unter dem BIP?</div>
+            </div>
+            <span style="padding:2px 6px; border:1px solid #cbd5e1; border-radius:4px; font-size:10px; color:#475569; white-space:nowrap;">Bearbeiten</span>
+          </div>
+        </div>
+        <div style="padding:8px; border:1px solid #e2e8f0; border-radius:6px;">
+          <div style="display:flex; justify-content:space-between; align-items:start;">
+            <div>
+              <span style="font-size:10px; padding:1px 4px; background:#bbf7d0; border-radius:3px;">Recht</span>
+              <span style="font-size:10px; padding:1px 4px; background:#e2e8f0; border-radius:3px; margin-left:3px;">Freitext</span>
+              <div style="margin-top:4px; font-size:12px;">Erklären Sie die Vertragsfreiheit.</div>
+            </div>
+            <span style="padding:2px 6px; border:1px solid #cbd5e1; border-radius:4px; font-size:10px; color:#475569; white-space:nowrap;">Bearbeiten</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mockup" style="flex:1;">
+    <div class="mockup-header">Neu (~1008px, 50% breiter)</div>
+    <div class="mockup-body" style="padding:0; font-size:12px;">
+      <!-- Ziel-Anzeige -->
+      <div style="padding:5px 12px; background:#f0fdf4; border-bottom:1px solid #bbf7d0; display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-size:11px; color:#16a34a;">Ziel: <strong>VWL Konjunktur 28bc</strong> · Teil A</span>
+        <span style="font-size:10px; color:#94a3b8; text-decoration:underline; cursor:pointer;">ändern</span>
+      </div>
+      <!-- Header -->
+      <div style="padding:10px 12px; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <span style="font-weight:700; font-size:14px;">Fragenbank</span>
+          <span style="color:#94a3b8; font-size:11px; margin-left:6px;">42 Fragen</span>
+        </div>
+        <div style="display:flex; gap:4px; align-items:center;">
+          <span style="padding:2px 6px; border:1px solid #cbd5e1; border-radius:4px; font-size:10px;">+ Neue Frage</span>
+          <span style="padding:2px 6px; border:1px solid #cbd5e1; border-radius:4px; font-size:10px;">Import</span>
+          <span style="padding:2px 6px; border:1px solid #cbd5e1; border-radius:4px; font-size:10px;">Export</span>
+          <span style="color:#94a3b8;">×</span>
+        </div>
+      </div>
+      <!-- Suche -->
+      <div style="padding:8px 12px; border-bottom:1px solid #e2e8f0;">
+        <div style="background:#f1f5f9; border-radius:4px; padding:4px 8px; color:#94a3b8; font-size:11px;">🔍 Suchen...</div>
+      </div>
+      <!-- Fragen mit +/- Buttons -->
+      <div style="padding:8px 12px;">
+        <div style="padding:8px; border:1px solid #e2e8f0; border-radius:6px; margin-bottom:6px; cursor:pointer;" title="Klick = Editor öffnen">
+          <div style="display:flex; align-items:start; gap:8px;">
+            <button style="width:24px; height:24px; border-radius:50%; border:1px solid #cbd5e1; background:white; color:#475569; font-size:14px; cursor:pointer; flex-shrink:0; margin-top:2px;" title="Zur Prüfung hinzufügen">+</button>
+            <div style="flex:1; min-width:0;">
+              <span style="font-size:10px; padding:1px 4px; background:#fed7aa; border-radius:3px;">VWL</span>
+              <span style="font-size:10px; padding:1px 4px; background:#e2e8f0; border-radius:3px; margin-left:3px;">MC</span>
+              <span style="font-size:10px; padding:1px 4px; background:#e2e8f0; border-radius:3px; margin-left:3px;">K2</span>
+              <span style="font-size:10px; color:#94a3b8; margin-left:3px;">3 Pkt.</span>
+              <div style="margin-top:4px; font-size:12px;">Was versteht man unter dem BIP?</div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:8px; border:2px solid #86efac; border-radius:6px; background:#f0fdf4; cursor:pointer;" title="Klick = Editor öffnen">
+          <div style="display:flex; align-items:start; gap:8px;">
+            <button style="width:24px; height:24px; border-radius:50%; border:1px solid #ef4444; background:#fef2f2; color:#ef4444; font-size:14px; cursor:pointer; flex-shrink:0; margin-top:2px;" title="Aus Prüfung entfernen">–</button>
+            <div style="flex:1; min-width:0;">
+              <span style="font-size:10px; padding:1px 4px; background:#bbf7d0; border-radius:3px;">Recht</span>
+              <span style="font-size:10px; padding:1px 4px; background:#e2e8f0; border-radius:3px; margin-left:3px;">Freitext</span>
+              <span style="font-size:10px; padding:1px 4px; background:#e2e8f0; border-radius:3px; margin-left:3px;">K3</span>
+              <span style="font-size:10px; color:#94a3b8; margin-left:3px;">5 Pkt.</span>
+              <div style="margin-top:4px; font-size:12px;">Erklären Sie die Vertragsfreiheit.</div>
+              <div style="font-size:10px; color:#16a34a; margin-top:2px;">✓ In dieser Prüfung</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top: 1.5rem; padding: 1rem; background: rgba(0,0,0,0.03); border-radius: 8px;">
+  <p><strong>Änderungen:</strong></p>
+  <ul style="margin:8px 0; padding-left:20px; font-size:14px; line-height:1.8;">
+    <li><strong>50% breiter:</strong> 672px → ~1008px Standardbreite</li>
+    <li><strong>ThemeToggle entfernt</strong> (ist bereits im Header)</li>
+    <li><strong>Button-Reihenfolge:</strong> + Neue Frage · Import · Export (statt Export · Import · + Neue)</li>
+    <li><strong>Ziel-Leiste oben:</strong> Zeigt an, zu welcher Prüfung/Abschnitt hinzugefügt wird (grüner Balken)</li>
+    <li><strong>+/– Button links:</strong> + für Hinzufügen, – (rot) für bereits enthaltene Fragen</li>
+    <li><strong>Klick auf Frage:</strong> Öffnet Editor (statt bisheriges Fenster-Schliessen)</li>
+    <li><strong>"Bearbeiten"-Button entfällt:</strong> Klick auf die Frage selbst reicht</li>
+    <li><strong>Enthaltene Fragen:</strong> Grüner Rand + "✓ In dieser Prüfung"</li>
+  </ul>
+</div>
