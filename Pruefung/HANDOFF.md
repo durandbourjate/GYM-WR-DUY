@@ -6,9 +6,24 @@
 
 ## Aktueller Stand
 
-**Phase 5c: UX-Fixes Runde 1–4** (20.03.2026) — Editor-Fixes, GF-Gefäss, Panel-Flow, Scroll-Fix, Auto-Submit-Dialog ✅
+**Phase 5d: Pool-Brücke** (20.03.2026) — Übungspools ↔ Prüfungstool Sync-Bridge ✅
 
-### Letzte Änderungen (20.03.2026 Abend)
+### Letzte Änderungen (20.03.2026 Nacht)
+
+**Pool-Brücke** (12 Tasks):
+- Pool-Sync: 26 Übungspools von GitHub Pages → Fragenbank importieren (Batch via Apps Script)
+- Pool-Converter: 7 Pool-Typen → 6 Prüfungstypen (mc→MC, multi→MC, tf→RichtigFalsch, fill→Lückentext, calc→Berechnung, sort→Zuordnung, open→Freitext)
+- Zwei Review-Flags: `poolGeprueft` (aus Pool-Quelle) + `pruefungstauglich` (LP-Absegnung im Editor)
+- Badges im FragenBrowser: Pool/ungeprüft (rot), Pool ✓ (gelb), Prüfungstauglich (grün), Update (blau pulsierend)
+- Filter: Quelle (Alle/Eigene/Pool), Pool-Status (Ungeprüft/Pool ✓/Prüfungstauglich/Update)
+- Update-Vergleich: Aufklappbarer Side-by-side-Vergleich im Editor, Übernehmen/Ignorieren/Manuell anpassen
+- Lernziel-Datenbank: Lernziele aus Pools in separatem Sheet, KI-Generierung zu Lernzielen (🎯 Button)
+- 4 neue Backend-Endpoints: `importierePoolFragen`, `importiereLernziele`, `ladeLernziele`, `generiereFrageZuLernziel`
+- Content-Hashing (SHA-256) für Delta-Erkennung bei wiederholtem Sync
+- `reviewed` Feld zu allen 2179 Fragen in 26 Pool-Configs hinzugefügt
+- **Wichtig nach Push:** `apps-script-code.js` in Apps Script Editor kopieren + neue Bereitstellung erstellen
+
+### Frühere Änderungen (20.03.2026 Abend)
 
 **Runde 1** (Commit `4b45cd3`):
 - Prüfung löschen: Button im Composer + Bestätigungsdialog + Backend-Endpoint `loeschePruefung`
@@ -37,10 +52,8 @@
 - Auto-Submit-Bestätigung: Bottom-Banner durch prominenten Vollbild-Dialog ersetzt (wie AbgabeDialog-Erfolg, mit Checkmark-Icon)
 
 ### Offene Punkte (noch nicht umgesetzt)
-- **Lernziele-Integration:** Eingabefeld, Datenbank, KI-basierte Fragen-/Musterlösungs-Generierung, Übungspool als Quelle
-- **Übungspool-Import:** Fragen aus bestehenden JS-Pools ins Prüfungstool importieren
 - **Prüfungs-Durchführung erweitern:** Open-End-Modus, LP-kontrolliertes Beenden, Zeitverlängerung live
-- **Wichtig nach Code-Änderungen:** `apps-script-code.js` muss in Apps Script Editor kopiert + neue Bereitstellung erstellt werden (für `loeschePruefung` Endpoint)
+- **Wichtig nach Code-Änderungen:** `apps-script-code.js` muss in Apps Script Editor kopiert + neue Bereitstellung erstellt werden
 
 ### Was funktioniert
 - **E2E-Flow getestet:** Login → Prüfung laden → Ausfüllen → Abgabe → Antwort-Datei in Google Drive ✅
@@ -147,6 +160,7 @@ Pruefung/
 │   ├── main.tsx
 │   ├── types/
 │   │   ├── fragen.ts                    — FrageBase, MCFrage, FreitextFrage, LueckentextFrage, etc.
+│   │   ├── pool.ts                      — Pool-spezifische Typen (PoolConfig, Lernziel, PoolSyncErgebnis)
 │   │   ├── pruefung.ts                  — PruefungsConfig, PruefungsAbschnitt
 │   │   ├── antworten.ts                 — PruefungsAbgabe, Antwort-Union-Typ
 │   │   ├── auth.ts                      — AuthUser, Rolle
@@ -171,13 +185,15 @@ Pruefung/
 │   │   ├── sebService.ts               — SEB User-Agent Erkennung
 │   │   ├── retryQueue.ts              — IndexedDB Retry-Queue für fehlgeschlagene Saves
 │   │   ├── authService.ts              — Google Identity Services Wrapper
-│   │   └── apiService.ts               — Apps Script API Client (text/plain CORS-Fix)
+│   │   ├── apiService.ts               — Apps Script API Client (text/plain CORS-Fix)
+│   │   └── poolSync.ts                 — Pool-Fetch, Parse, Delta-Berechnung, Content-Hash
 │   ├── components/
 │   │   ├── lp/
 │   │   │   ├── LPHeader.tsx              — Shared LP-Header (ESC, Panels, Abmelden, ThemeToggle)
 │   │   │   ├── LPStartseite.tsx         — LP-Startseite: Prüfungen verwalten + erstellen + duplizieren
 │   │   │   ├── PruefungsComposer.tsx    — 4-Tab-Editor (Einstellungen, Abschnitte, Vorschau, Analyse) + Autosave
-│   │   │   ├── FragenBrowser.tsx        — Slide-over: Fragenbank + Direktes Hinzufügen/Entfernen + Resize
+│   │   │   ├── FragenBrowser.tsx        — Slide-over: Fragenbank + Direktes Hinzufügen/Entfernen + Resize + Pool-Badges/Filter
+│   │   │   ├── PoolSyncDialog.tsx       — Sync-UI: Pools laden, Delta-Vorschau, Batch-Import
 │   │   │   ├── HilfeSeite.tsx           — In-App Hilfe mit Akkordeon-Sektionen + Resize
 │   │   │   ├── composer/
 │   │   │   │   ├── AbschnitteTab.tsx    — Abschnitte mit Fragen-Details (Badges, Bloom, Punkte, Zeit)
@@ -194,7 +210,8 @@ Pruefung/
 │   │   │   │   ├── RichtigFalschEditor.tsx — Richtig/Falsch-Editor
 │   │   │   │   ├── BerechnungEditor.tsx — Berechnung-Editor
 │   │   │   │   ├── BewertungsrasterEditor.tsx — Bewertungsraster-Editor (extrahiert)
-│   │   │   │   └── useKIAssistent.ts  — KI-Assistent Hook (17 Aktionen)
+│   │   │   │   ├── PoolUpdateVergleich.tsx — Side-by-side Update-Vergleich (Pool vs. aktuell)
+│   │   │   │   └── useKIAssistent.ts  — KI-Assistent Hook (18 Aktionen inkl. generiereFrageZuLernziel)
 │   │   │   ├── KorrekturDashboard.tsx   — KI-Korrektur: Review + Feedback
 │   │   │   ├── KorrekturSchuelerZeile.tsx — Aufklappbare SuS-Zeile mit Bewertungen
 │   │   │   ├── KorrekturFrageZeile.tsx   — Einzelne Frage: KI-Vorschlag + LP-Override
@@ -227,6 +244,7 @@ Pruefung/
 │   │       ├── RichtigFalschFrage.tsx  — Richtig/Falsch-Buttons pro Aussage
 │   │       └── BerechnungFrage.tsx     — Numerische Eingabe + Rechenweg
 │   └── utils/
+│       ├── poolConverter.ts            — Typ-Konvertierung Pool→Prüfungstool (7→6 Typen)
 │       ├── abschnitte.ts               — findeAbschnitt(), berechneAbschnittFortschritt()
 │       ├── fachbereich.ts              — Shared: fachbereichFarbe(), typLabel(), bloomLabel()
 │       ├── korrekturUtils.ts          — berechneNote(), effektivePunkte(), Statistiken
