@@ -78,6 +78,8 @@ function doPost(e) {
       return uploadAnhang(body);
     case 'uploadMaterial':
       return uploadMaterial(body);
+    case 'loeschePruefung':
+      return loeschePruefung(body);
     case 'kiAssistent':
       return kiAssistentEndpoint(body);
     case 'korrekturFreigeben':
@@ -689,6 +691,35 @@ function speichereConfig(body) {
     }
 
     return jsonResponse({ success: true, id: config.id });
+  } catch (error) {
+    return jsonResponse({ error: error.message });
+  }
+}
+
+// === PRÜFUNG LÖSCHEN ===
+
+function loeschePruefung(body) {
+  try {
+    const { email, pruefungId } = body;
+    if (!email || !email.endsWith('@' + LP_DOMAIN)) {
+      return jsonResponse({ error: 'Nur für Lehrpersonen' });
+    }
+    if (!pruefungId) {
+      return jsonResponse({ error: 'Keine Prüfungs-ID angegeben' });
+    }
+
+    const configSheet = SpreadsheetApp.openById(CONFIGS_ID).getSheetByName('Configs');
+    const data = getSheetData(configSheet);
+
+    const rowIndex = data.findIndex(row => row.id === pruefungId);
+    if (rowIndex < 0) {
+      return jsonResponse({ error: 'Prüfung nicht gefunden' });
+    }
+
+    // Zeile löschen (rowIndex + 2 wegen Header-Zeile und 1-basiertem Index)
+    configSheet.deleteRow(rowIndex + 2);
+
+    return jsonResponse({ success: true });
   } catch (error) {
     return jsonResponse({ error: error.message });
   }

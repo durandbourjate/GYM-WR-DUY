@@ -87,8 +87,11 @@ export default function BewertungsrasterEditor({ bewertungsraster, setBewertungs
       titel="Bewertungsraster"
       einklappbar
       standardOffen={false}
-      titelRechts={
-        <div className="flex items-center gap-1.5">
+      titelRechts={kiButtons}
+    >
+      <div className="space-y-2">
+        {/* Vorlage-Controls */}
+        <div className="flex items-center gap-1.5 flex-wrap">
           <select
             value=""
             onChange={(e) => {
@@ -159,11 +162,8 @@ export default function BewertungsrasterEditor({ bewertungsraster, setBewertungs
           >
             Zurücksetzen
           </button>
-          {kiButtons}
         </div>
-      }
-    >
-      <div className="space-y-2">
+
         {/* Spalten-Header */}
         {bewertungsraster.length > 0 && (
           <div className="flex gap-2 items-center text-xs text-slate-500 dark:text-slate-400">

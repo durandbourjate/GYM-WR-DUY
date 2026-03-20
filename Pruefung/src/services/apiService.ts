@@ -193,6 +193,33 @@ export const apiService = {
     }
   },
 
+  /** Prüfung löschen (aus Configs-Sheet entfernen) */
+  async loeschePruefung(email: string, pruefungId: string): Promise<boolean> {
+    if (!APPS_SCRIPT_URL) return false
+
+    try {
+      const payload = JSON.stringify({ action: 'loeschePruefung', email, pruefungId })
+
+      const response = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: payload,
+      })
+
+      if (!response.ok) return false
+
+      const text = await response.text()
+      try {
+        const data = JSON.parse(text)
+        return data.success === true
+      } catch {
+        return false
+      }
+    } catch {
+      return false
+    }
+  },
+
   /** Einzelne Frage speichern (Fragenbank) */
   async speichereFrage(email: string, frage: Frage): Promise<boolean> {
     if (!APPS_SCRIPT_URL) return false

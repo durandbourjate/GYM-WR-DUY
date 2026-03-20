@@ -61,6 +61,8 @@ export default function PruefungsComposer({ config, onZurueck }: Props) {
   const [loeschDialog, setLoeschDialog] = useState<{ index: number; titel: string } | null>(null)
   const [zeigHilfe, setZeigHilfe] = useState(false)
   const [zeigSuSVorschau, setZeigSuSVorschau] = useState(false)
+  const [zeigLoeschPruefung, setZeigLoeschPruefung] = useState(false)
+  const [loescht, setLoescht] = useState(false)
 
   const loeschDialogRef = useRef<HTMLDivElement>(null)
   useFocusTrap(loeschDialog ? loeschDialogRef : { current: null })
@@ -248,6 +250,28 @@ export default function PruefungsComposer({ config, onZurueck }: Props) {
     updatePruefung({ fachbereiche })
   }
 
+  async function handleLoeschePruefung(): Promise<void> {
+    if (!pruefung.id) {
+      // Noch nicht gespeicherte Prüfung → einfach zurück
+      onZurueck()
+      return
+    }
+    setLoescht(true)
+    if (istDemoModus || !apiService.istKonfiguriert()) {
+      await new Promise((r) => setTimeout(r, 300))
+      setLoescht(false)
+      setZeigLoeschPruefung(false)
+      onZurueck()
+      return
+    }
+    const ok = await apiService.loeschePruefung(user!.email, pruefung.id)
+    setLoescht(false)
+    if (ok) {
+      setZeigLoeschPruefung(false)
+      onZurueck()
+    }
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
       <LPHeader
@@ -331,6 +355,18 @@ export default function PruefungsComposer({ config, onZurueck }: Props) {
         {tab === 'analyse' && (
           <AnalyseTab pruefung={pruefung} fragenMap={fragenMap} fragenGeladen={fragenGeladen} />
         )}
+
+        {/* Prüfung löschen — nur bei bestehender Prüfung */}
+        {config && (
+          <div className="mt-12 pt-6 border-t border-slate-200 dark:border-slate-700">
+            <button
+              onClick={() => setZeigLoeschPruefung(true)}
+              className="text-sm text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 cursor-pointer transition-colors"
+            >
+              Prüfung löschen...
+            </button>
+          </div>
+        )}
       </main>
 
       {/* Fragen-Browser Overlay */}
@@ -359,7 +395,7 @@ export default function PruefungsComposer({ config, onZurueck }: Props) {
         <HilfeSeite onSchliessen={() => setZeigHilfe(false)} />
       )}
 
-      {/* Lösch-Bestätigungsdialog */}
+      {/* Abschnitt-Lösch-Bestätigungsdialog */}
       {loeschDialog && (
         <div ref={loeschDialogRef} className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-6 max-w-sm w-full">
@@ -381,6 +417,42 @@ export default function PruefungsComposer({ config, onZurueck }: Props) {
                 className="flex-1 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors cursor-pointer font-medium text-sm"
               >
                 Löschen
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Prüfung-Lösch-Bestätigungsdialog */}
+      {zeigLoeschPruefung && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-6 max-w-sm w-full">
+            <h3 className="text-lg font-bold text-red-600 dark:text-red-400 mb-2">
+              Prüfung löschen?
+            </h3>
+            <p className="text-sm text-slate-600 dark:text-slate-300 mb-2">
+              &laquo;{pruefung.titel || 'Unbenannte Prüfung'}&raquo; unwiderruflich löschen?
+            </p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mb-5">
+              Die Prüfungskonfiguration wird aus dem System entfernt. Bereits abgegebene Antworten bleiben in Google Drive erhalten.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setZeigLoeschPruefung(false)}
+                disabled={loescht}
+                className="flex-1 py-2 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer font-medium text-sm disabled:opacity-40"
+              >
+                Abbrechen
+              </button>
+              <button
+                onClick={handleLoeschePruefung}
+                disabled={loescht}
+                className="flex-1 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors cursor-pointer font-medium text-sm disabled:opacity-60 flex items-center justify-center gap-2"
+              >
+                {loescht && (
+                  <span className="inline-block w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                )}
+                {loescht ? 'Wird gelöscht...' : 'Endgültig löschen'}
               </button>
             </div>
           </div>

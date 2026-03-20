@@ -118,7 +118,9 @@ export default function AbschnitteTab({
                   return (
                   <div
                     key={frageId}
-                    className="px-3 py-2.5 bg-slate-50 dark:bg-slate-700/30 rounded-lg text-sm"
+                    onClick={() => onEditFrage(frageId)}
+                    className="px-3 py-2.5 bg-slate-50 dark:bg-slate-700/30 rounded-lg text-sm cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-colors"
+                    title="Klicken zum Bearbeiten"
                   >
                     {/* Zeile 1: Nummer, Badges, Aktionen */}
                     <div className="flex items-center gap-2">
@@ -149,14 +151,7 @@ export default function AbschnitteTab({
                         <span className="font-mono text-xs text-red-400 dark:text-red-500 italic">{frageId} (nicht gefunden)</span>
                       )}
                       <span className="flex-1" />
-                      <button
-                        onClick={() => onEditFrage(frageId)}
-                        className="text-[10px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-pointer"
-                        title="In Fragenbank öffnen"
-                      >
-                        Bearbeiten
-                      </button>
-                      <div className="flex gap-0.5">
+                      <div className="flex gap-0.5" onClick={(e) => e.stopPropagation()}>
                         <button
                           onClick={() => onMoveFrage(aIndex, fIndex, 'hoch')}
                           disabled={fIndex === 0}

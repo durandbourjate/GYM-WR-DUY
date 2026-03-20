@@ -158,7 +158,7 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen }: Props)
   // Resizable Panel
   const MIN_BREITE = 480
   const MAX_BREITE_FAKTOR = 0.9 // 90vw
-  const [panelBreite, setPanelBreite] = useState(672) // entspricht max-w-2xl (42rem)
+  const [panelBreite, setPanelBreite] = useState(1008) // gleich wie FragenBrowser
   const ziehtRef = useRef(false)
   const startXRef = useRef(0)
   const startBreiteRef = useRef(0)
