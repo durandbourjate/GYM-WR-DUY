@@ -33,7 +33,8 @@ window.QUESTIONS = [
 
   // --- diff 1 ---
   {
-    id: "r01", topic: "rechtssubjekte", type: "mc", diff: 1, tax: "K1",
+    id: "r01", topic: "rechtssubjekte", type: "mc", diff: 1, tax: "K1"
+ reviewed:false,
     q: "Was versteht man unter einem Rechtssubjekt?",
     options: [
       {v: "A", t: "Ein Träger von Rechten und Pflichten."},
@@ -45,13 +46,15 @@ window.QUESTIONS = [
     explain: "Ein Rechtssubjekt ist ein Träger von Rechten und Pflichten. Es kann sich dabei um natürliche Personen (Menschen) oder juristische Personen (z.B. AG, GmbH, Verein) handeln. Rechtssubjekte können Verträge abschliessen, klagen und verklagt werden."
   },
   {
-    id: "r02", topic: "rechtssubjekte", type: "tf", diff: 1, tax: "K1",
+    id: "r02", topic: "rechtssubjekte", type: "tf", diff: 1, tax: "K1"
+ reviewed:false,
     q: "Ein Hund ist ein Rechtssubjekt.",
     correct: false,
     explain: "Ein Hund ist kein Rechtssubjekt, sondern ein Rechtsobjekt. Nur natürliche Personen (Menschen) und juristische Personen (z.B. AG, GmbH, Verein) sind Rechtssubjekte. Tiere gehören rechtlich zu den Rechtsobjekten (Sachen), auch wenn sie gemäss Art. 641a ZGB keine Sachen im herkömmlichen Sinn sind."
   },
   {
-    id: "r03", topic: "rechtssubjekte", type: "fill", diff: 1, tax: "K1",
+    id: "r03", topic: "rechtssubjekte", type: "fill", diff: 1, tax: "K1"
+ reviewed:false,
     q: "Rechtssubjekte werden unterteilt in {0} Personen (Menschen) und {1} Personen (z.B. AG, Verein).",
     blanks: [
       {answer: "natürliche", alts: ["Natürliche", "natuerliche"]},
@@ -60,7 +63,8 @@ window.QUESTIONS = [
     explain: "Die zwei Arten von Rechtssubjekten sind natürliche Personen (alle Menschen) und juristische Personen (z.B. Aktiengesellschaften, GmbH, Vereine, Stiftungen). Beide können Träger von Rechten und Pflichten sein."
   },
   {
-    id: "r04", topic: "rechtssubjekte", type: "tf", diff: 1, tax: "K2",
+    id: "r04", topic: "rechtssubjekte", type: "tf", diff: 1, tax: "K2"
+ reviewed:false,
     q: "Ein Auto ist ein Rechtsobjekt.",
     correct: true,
     explain: "Ein Auto ist ein Rechtsobjekt. Rechtsobjekte sind Gegenstände (Sachen), über die Rechtssubjekte verfügen können. Typischerweise streiten Rechtssubjekte um Rechtsobjekte — z.B. wem das Auto gehört."
@@ -68,7 +72,8 @@ window.QUESTIONS = [
 
   // --- diff 2 ---
   {
-    id: "r05", topic: "rechtssubjekte", type: "mc", diff: 2, tax: "K2",
+    id: "r05", topic: "rechtssubjekte", type: "mc", diff: 2, tax: "K2"
+ reviewed:false,
     q: "Welche der folgenden Beispiele sind Rechtssubjekte?",
     options: [
       {v: "A", t: "Ein Mensch und eine Aktiengesellschaft."},
@@ -80,7 +85,8 @@ window.QUESTIONS = [
     explain: "Rechtssubjekte sind Träger von Rechten und Pflichten. Nur ein Mensch (natürliche Person) und eine Aktiengesellschaft (juristische Person) sind Rechtssubjekte. Grundstücke, Autos, Bankkonten, Patente, Bargeld und Goldbarren sind hingegen Rechtsobjekte — Gegenstände, über die Rechtssubjekte verfügen."
   },
   {
-    id: "r06", topic: "rechtssubjekte", type: "multi", diff: 2, tax: "K2",
+    id: "r06", topic: "rechtssubjekte", type: "multi", diff: 2, tax: "K2"
+ reviewed:false,
     q: "Welche der folgenden sind juristische Personen? (Mehrere Antworten möglich.)",
     options: [
       {v: "A", t: "Eine Aktiengesellschaft (AG)"},
@@ -94,7 +100,8 @@ window.QUESTIONS = [
 
   // --- diff 3 ---
   {
-    id: "r07", topic: "rechtssubjekte", type: "mc", diff: 3, tax: "K4",
+    id: "r07", topic: "rechtssubjekte", type: "mc", diff: 3, tax: "K4"
+ reviewed:false,
     context: "Die Tischlerei Müller GmbH bestellt bei einem Holzhändler Eichenbretter. Der Lehrling der GmbH, Tim (16), holt die Bretter persönlich ab.",
     q: "Wer ist in diesem Sachverhalt das Rechtssubjekt, das den Kaufvertrag abschliesst?",
     options: [
@@ -107,7 +114,8 @@ window.QUESTIONS = [
     explain: "An diesem Kaufvertrag sind zwei Rechtssubjekte beteiligt: Die Tischlerei Müller GmbH als Käuferin und der Holzhändler als Verkäufer. Beide schliessen als Rechtssubjekte den Vertrag ab. Tim handelt lediglich als Hilfsperson für die GmbH — er holt die Ware ab, ist aber nicht Vertragspartei. Die Eichenbretter sind das Rechtsobjekt des Vertrags."
   },
   {
-    id: "r08", topic: "rechtssubjekte", type: "mc", diff: 3, tax: "K4",
+    id: "r08", topic: "rechtssubjekte", type: "mc", diff: 3, tax: "K4"
+ reviewed:false,
     q: "Warum ist die Unterscheidung zwischen Rechtssubjekten und Rechtsobjekten rechtlich bedeutsam?",
     options: [
       {v: "A", t: "Weil nur Rechtssubjekte Träger von Rechten und Pflichten sein können und nur sie Verträge abschliessen, klagen und verklagt werden können."},
@@ -125,7 +133,8 @@ window.QUESTIONS = [
 
   // --- diff 1 ---
   {
-    id: "f01", topic: "rechtsfaehigkeit", type: "mc", diff: 1, tax: "K1",
+    id: "f01", topic: "rechtsfaehigkeit", type: "mc", diff: 1, tax: "K1"
+ reviewed:false,
     q: "Was bedeutet Rechtsfähigkeit?",
     options: [
       {v: "A", t: "Die Fähigkeit, vor Gericht aufzutreten."},
@@ -137,7 +146,8 @@ window.QUESTIONS = [
     explain: "Die Rechtsfähigkeit ist die Fähigkeit, Rechte und Pflichten zu haben (Art. 11 ZGB). Sie ist zu unterscheiden von der Handlungsfähigkeit, welche die Fähigkeit betrifft, Rechte und Pflichten zu begründen (Art. 12 ZGB). Rechtsfähig sein heisst «haben», handlungsfähig sein heisst «begründen»."
   },
   {
-    id: "f02", topic: "rechtsfaehigkeit", type: "fill", diff: 1, tax: "K1",
+    id: "f02", topic: "rechtsfaehigkeit", type: "fill", diff: 1, tax: "K1"
+ reviewed:false,
     q: "Gemäss Art. 11 ZGB ist jeder {0} rechtsfähig.",
     blanks: [
       {answer: "Mensch", alts: ["mensch"]}
@@ -145,13 +155,15 @@ window.QUESTIONS = [
     explain: "Art. 11 Abs. 1 ZGB bestimmt: «Rechtsfähig ist jeder Mensch.» Dies bedeutet, dass jede natürliche Person — unabhängig von Alter, Geschlecht, Herkunft oder geistigem Zustand — Trägerin von Rechten und Pflichten sein kann. Dies steht im Zusammenhang mit dem Gleichheitsgebot von Art. 8 BV."
   },
   {
-    id: "f03", topic: "rechtsfaehigkeit", type: "tf", diff: 1, tax: "K1",
+    id: "f03", topic: "rechtsfaehigkeit", type: "tf", diff: 1, tax: "K1"
+ reviewed:false,
     q: "Die Rechtsfähigkeit einer natürlichen Person beginnt mit der Geburt.",
     correct: true,
     explain: "Gemäss Art. 31 Abs. 1 ZGB beginnt die Rechtspersönlichkeit (und damit die Rechtsfähigkeit) mit der vollendeten Geburt. Bereits vor der Geburt ist das Kind unter der Bedingung rechtsfähig, dass es lebend geboren wird (bedingte Rechtsfähigkeit des Nasciturus)."
   },
   {
-    id: "f04", topic: "rechtsfaehigkeit", type: "tf", diff: 1, tax: "K2",
+    id: "f04", topic: "rechtsfaehigkeit", type: "tf", diff: 1, tax: "K2"
+ reviewed:false,
     q: "Die Rechtsfähigkeit einer natürlichen Person endet mit dem Tod.",
     correct: true,
     explain: "Die Rechtsfähigkeit endet mit dem Tod der natürlichen Person. Ab dem Todeszeitpunkt kann die verstorbene Person keine Rechte und Pflichten mehr haben. Bestehende Rechte und Pflichten gehen auf die Erben über (Universalsukzession)."
@@ -159,7 +171,8 @@ window.QUESTIONS = [
 
   // --- diff 2 ---
   {
-    id: "f05", topic: "rechtsfaehigkeit", type: "mc", diff: 2, tax: "K2",
+    id: "f05", topic: "rechtsfaehigkeit", type: "mc", diff: 2, tax: "K2"
+ reviewed:false,
     q: "Wann beginnt die Rechtsfähigkeit einer juristischen Person?",
     options: [
       {v: "A", t: "Mit der Wahl des Verwaltungsrats."},
@@ -171,7 +184,8 @@ window.QUESTIONS = [
     explain: "Die Rechtsfähigkeit (Rechtspersönlichkeit) einer juristischen Person beginnt mit dem Eintrag ins Handelsregister. Ab diesem Zeitpunkt kann die juristische Person Rechte und Pflichten haben. Die Rechtsfähigkeit endet mit der Löschung aus dem Handelsregister."
   },
   {
-    id: "f06", topic: "rechtsfaehigkeit", type: "mc", diff: 2, tax: "K2",
+    id: "f06", topic: "rechtsfaehigkeit", type: "mc", diff: 2, tax: "K2"
+ reviewed:false,
     q: "Welche Rechte kann eine juristische Person gemäss Art. 53 ZGB NICHT haben?",
     options: [
       {v: "A", t: "Rechte, die das Menschsein voraussetzen (z.B. das Recht auf Leben)."},
@@ -183,7 +197,8 @@ window.QUESTIONS = [
     explain: "Gemäss Art. 53 ZGB können juristische Personen alle Rechte und Pflichten haben, die nicht das Menschsein zur notwendigen Voraussetzung haben. Rechte wie das Recht auf Leben, körperliche Unversehrtheit oder Ehe setzen das Menschsein voraus und stehen nur natürlichen Personen zu."
   },
   {
-    id: "f07", topic: "rechtsfaehigkeit", type: "multi", diff: 2, tax: "K2",
+    id: "f07", topic: "rechtsfaehigkeit", type: "multi", diff: 2, tax: "K2"
+ reviewed:false,
     q: "Welche Aussagen zur Rechtsfähigkeit sind korrekt? (Mehrere Antworten möglich.)",
     options: [
       {v: "A", t: "Alle Menschen sind rechtsfähig, unabhängig von Alter oder Urteilsfähigkeit."},
@@ -197,7 +212,8 @@ window.QUESTIONS = [
 
   // --- diff 3 ---
   {
-    id: "f08", topic: "rechtsfaehigkeit", type: "mc", diff: 3, tax: "K3",
+    id: "f08", topic: "rechtsfaehigkeit", type: "mc", diff: 3, tax: "K3"
+ reviewed:false,
     context: "Die schwangere Maria erleidet im 8. Monat einen Autounfall. Ihr ungeborenes Kind erbt am selben Tag von seinem Grossvater eine Liegenschaft. Das Kind wird zwei Wochen später gesund geboren.",
     q: "Kann das Kind die Liegenschaft erben?",
     options: [
@@ -210,7 +226,8 @@ window.QUESTIONS = [
     explain: "Obersatz: Es ist zu prüfen, ob das ungeborene Kind zum Zeitpunkt des Erbfalls rechtsfähig war.\n\nVoraussetzungen: Gemäss Art. 31 Abs. 1 ZGB beginnt die Rechtspersönlichkeit mit der vollendeten Geburt. Art. 31 Abs. 2 ZGB bestimmt jedoch, dass das Kind vor der Geburt unter dem Vorbehalt rechtsfähig ist, dass es lebend geboren wird.\n\nSubsumtion: Das Kind war zum Zeitpunkt des Erbfalls noch ungeboren, wurde aber zwei Wochen später gesund (lebend) geboren. Damit wirkt die Rechtsfähigkeit auf den Zeitpunkt der Empfängnis zurück.\n\nSchlussfolgerung: Das Kind kann die Liegenschaft erben, da seine Rechtsfähigkeit auf den Zeitpunkt vor dem Erbfall zurückwirkt."
   },
   {
-    id: "f09", topic: "rechtsfaehigkeit", type: "tf", diff: 3, tax: "K4",
+    id: "f09", topic: "rechtsfaehigkeit", type: "tf", diff: 3, tax: "K4"
+ reviewed:false,
     q: "Auch eine Person, die wegen Geistesschwäche unter umfassender Beistandschaft steht, ist rechtsfähig.",
     correct: true,
     explain: "Die Rechtsfähigkeit ist von der Handlungsfähigkeit strikt zu unterscheiden. Gemäss Art. 11 ZGB ist jeder Mensch rechtsfähig — unabhängig von Alter, Gesundheitszustand oder Urteilsfähigkeit. Eine Person unter umfassender Beistandschaft verliert zwar die Handlungsfähigkeit (sie kann nicht selbst Rechte begründen), bleibt aber Trägerin von Rechten und Pflichten. Sie kann z.B. Eigentümerin eines Hauses sein oder Erbin werden."
@@ -222,7 +239,8 @@ window.QUESTIONS = [
 
   // --- diff 1 ---
   {
-    id: "h01", topic: "handlungsfaehigkeit", type: "mc", diff: 1, tax: "K1",
+    id: "h01", topic: "handlungsfaehigkeit", type: "mc", diff: 1, tax: "K1"
+ reviewed:false,
     q: "Was bedeutet Handlungsfähigkeit gemäss Art. 12 ZGB?",
     options: [
       {v: "A", t: "Die Fähigkeit, Rechte und Pflichten zu haben."},
@@ -234,7 +252,8 @@ window.QUESTIONS = [
     explain: "Die Handlungsfähigkeit gemäss Art. 12 ZGB ist die Fähigkeit, durch eigenes Handeln Rechte und Pflichten zu begründen. Das bedeutet z.B., dass man selbstständig Verträge abschliessen kann, die rechtlich bindend sind. Merkhilfe: Rechtsfähigkeit = «haben», Handlungsfähigkeit = «begründen»."
   },
   {
-    id: "h02", topic: "handlungsfaehigkeit", type: "fill", diff: 1, tax: "K1",
+    id: "h02", topic: "handlungsfaehigkeit", type: "fill", diff: 1, tax: "K1"
+ reviewed:false,
     q: "Die Handlungsfähigkeit setzt gemäss Art. 13 ZGB zwei Voraussetzungen voraus: {0} und {1}.",
     blanks: [
       {answer: "Mündigkeit", alts: ["Volljährigkeit", "mündigkeit", "volljährigkeit", "Muendigkeit"]},
@@ -243,7 +262,8 @@ window.QUESTIONS = [
     explain: "Art. 13 ZGB: Handlungsfähig ist, wer volljährig (mündig) und urteilsfähig ist. Beide Voraussetzungen müssen kumulativ erfüllt sein. Die Mündigkeit wird mit dem 18. Lebensjahr erreicht (Art. 14 ZGB). Die Urteilsfähigkeit erfordert vernunftgemässes Handeln (Art. 16 ZGB)."
   },
   {
-    id: "h03", topic: "handlungsfaehigkeit", type: "mc", diff: 1, tax: "K1",
+    id: "h03", topic: "handlungsfaehigkeit", type: "mc", diff: 1, tax: "K1"
+ reviewed:false,
     q: "Ab welchem Alter wird man in der Schweiz mündig?",
     options: [
       {v: "A", t: "Ab 20 Jahren."},
@@ -255,7 +275,8 @@ window.QUESTIONS = [
     explain: "Gemäss Art. 14 ZGB ist mündig (volljährig), wer das 18. Lebensjahr zurückgelegt hat. Die Mündigkeit ist eine der zwei Voraussetzungen der Handlungsfähigkeit (Art. 13 ZGB)."
   },
   {
-    id: "h04", topic: "handlungsfaehigkeit", type: "tf", diff: 1, tax: "K2",
+    id: "h04", topic: "handlungsfaehigkeit", type: "tf", diff: 1, tax: "K2"
+ reviewed:false,
     q: "Urteilsfähigkeit bedeutet, dass man das 18. Lebensjahr erreicht hat.",
     correct: false,
     explain: "Die Urteilsfähigkeit (Art. 16 ZGB) ist nicht an ein bestimmtes Alter geknüpft, sondern an die Fähigkeit, vernunftgemäss zu handeln. Sie kann auch Minderjährigen zukommen — gemäss Bundesgerichtspraxis etwa ab ca. 12 Jahren für die meisten Angelegenheiten. Die Volljährigkeit mit 18 Jahren betrifft die Mündigkeit (Art. 14 ZGB), nicht die Urteilsfähigkeit."
@@ -263,7 +284,8 @@ window.QUESTIONS = [
 
   // --- diff 2 ---
   {
-    id: "h05", topic: "handlungsfaehigkeit", type: "mc", diff: 2, tax: "K2",
+    id: "h05", topic: "handlungsfaehigkeit", type: "mc", diff: 2, tax: "K2"
+ reviewed:false,
     img: {src: "img/recht/personenrecht/personenrecht_handlungsfaehigkeit_01.svg", alt: "Prüfungsschema Handlungsfähigkeit mit Entscheidungspunkten"},
     q: "Welche der folgenden Personen sind handlungsfähig?",
     options: [
@@ -276,7 +298,8 @@ window.QUESTIONS = [
     explain: "Handlungsfähig ist nur, wer beide Voraussetzungen von Art. 13 ZGB erfüllt: Mündigkeit (Art. 14 ZGB: 18 Jahre) UND Urteilsfähigkeit (Art. 16 ZGB: vernunftgemässes Handeln). Nur der 25-jährige urteilsfähige Student erfüllt beides. Die 17-Jährige ist noch nicht mündig, das 5-jährige Kind ist weder mündig noch urteilsfähig, und die bewusstlose Patientin ist vorübergehend urteilsunfähig."
   },
   {
-    id: "h06", topic: "handlungsfaehigkeit", type: "multi", diff: 2, tax: "K2",
+    id: "h06", topic: "handlungsfaehigkeit", type: "multi", diff: 2, tax: "K2"
+ reviewed:false,
     q: "Welche Gründe können zum Verlust der Urteilsfähigkeit führen? (Mehrere Antworten möglich.)",
     options: [
       {v: "A", t: "Kindesalter (z.B. ein 3-jähriges Kind)"},
@@ -288,7 +311,8 @@ window.QUESTIONS = [
     explain: "Art. 16 ZGB nennt als Gründe für fehlende Urteilsfähigkeit: Kindesalter, geistige Behinderung, psychische Störung, Rausch und ähnliche Zustände. Ein 3-jähriges Kind (A), eine geistig behinderte Person (B) und eine stark betrunkene Person (C) können urteilsunfähig sein. Die blosse Minderjährigkeit (D) führt dagegen nicht zur Urteilsunfähigkeit — ein 17-Jähriger ist in der Regel urteilsfähig, aber noch nicht mündig."
   },
   {
-    id: "h07", topic: "handlungsfaehigkeit", type: "mc", diff: 2, tax: "K2",
+    id: "h07", topic: "handlungsfaehigkeit", type: "mc", diff: 2, tax: "K2"
+ reviewed:false,
     q: "Was ist die Rechtsfolge, wenn eine urteilsunfähige Person einen Vertrag abschliesst?",
     options: [
       {v: "A", t: "Der Vertrag ist gültig, wenn die andere Partei gutgläubig war."},
@@ -300,7 +324,8 @@ window.QUESTIONS = [
     explain: "Wer urteilsunfähig ist, ist handlungsunfähig gemäss Art. 17 und 18 ZGB. Handlungsunfähige Personen können durch ihre Handlungen keine rechtliche Wirkung erzeugen. Ein von einer urteilsunfähigen Person abgeschlossener Vertrag ist daher nichtig — er ist von Anfang an ungültig und muss nicht angefochten werden."
   },
   {
-    id: "h08", topic: "handlungsfaehigkeit", type: "tf", diff: 2, tax: "K2",
+    id: "h08", topic: "handlungsfaehigkeit", type: "tf", diff: 2, tax: "K2"
+ reviewed:false,
     q: "Die Urteilsfähigkeit ist ein absoluter Zustand: Man ist entweder für alles urteilsfähig oder für nichts.",
     correct: false,
     explain: "Die Urteilsfähigkeit ist relativ — sie hängt von der konkreten Handlung ab. Eine Person kann z.B. urteilsfähig sein, um eine CD zu kaufen, aber urteilsunfähig, um ein kompliziertes Finanzgeschäft abzuschliessen. Art. 16 ZGB spricht von der Fähigkeit, vernunftgemäss zu handeln, und dies muss jeweils im Hinblick auf die konkrete Handlung beurteilt werden."
@@ -308,7 +333,8 @@ window.QUESTIONS = [
 
   // --- diff 3 ---
   {
-    id: "h09", topic: "handlungsfaehigkeit", type: "mc", diff: 3, tax: "K3",
+    id: "h09", topic: "handlungsfaehigkeit", type: "mc", diff: 3, tax: "K3"
+ reviewed:false,
     context: "Hans (30, gesund) kauft sich zu seinem Geburtstag eine Harley-Davidson.",
     q: "Kann Hans das Motorrad alleine kaufen?",
     options: [
@@ -321,7 +347,8 @@ window.QUESTIONS = [
     explain: "Obersatz: Es ist zu prüfen, ob Hans handlungsfähig ist.\n\nVoraussetzungen: Handlungsfähigkeit setzt Mündigkeit (Art. 14 ZGB) und Urteilsfähigkeit (Art. 16 ZGB) voraus (Art. 13 ZGB).\n\nSubsumtion: Hans ist 30 Jahre alt und damit mündig (Art. 14 ZGB). Er ist gesund und somit urteilsfähig (Art. 16 ZGB).\n\nSchlussfolgerung: Hans ist handlungsfähig (Art. 12 ZGB) und kann das Motorrad eigenständig kaufen."
   },
   {
-    id: "h10", topic: "handlungsfaehigkeit", type: "mc", diff: 3, tax: "K3",
+    id: "h10", topic: "handlungsfaehigkeit", type: "mc", diff: 3, tax: "K3"
+ reviewed:false,
     context: "Hans (30) geht nach der Arbeit mit Kollegen in die Wirtschaft. Nach mehreren Bieren kauft er betrunken einem Kollegen dessen Auto ab. Beide halten den Kauf schriftlich fest. Am nächsten Tag will Hans nichts mehr davon wissen.",
     q: "Muss Hans das Auto bezahlen?",
     options: [
@@ -334,7 +361,8 @@ window.QUESTIONS = [
     explain: "Obersatz: Es ist zu prüfen, ob Hans zum Zeitpunkt des Vertragsabschlusses handlungsfähig war.\n\nVoraussetzungen: Handlungsfähigkeit setzt Urteilsfähigkeit voraus (Art. 13 ZGB). Urteilsunfähig ist, wer aufgrund von Rausch nicht vernunftgemäss handeln kann (Art. 16 ZGB). Handlungsunfähige können keine wirksamen Rechtsgeschäfte abschliessen (Art. 18 ZGB).\n\nSubsumtion: Hans hat «einen über den Durst getrunken». Wenn er aufgrund des Alkoholkonsums tatsächlich urteilsunfähig war, war er handlungsunfähig. Die Schriftform ändert daran nichts.\n\nSchlussfolgerung: War Hans urteilsunfähig, ist der Vertrag nichtig (Art. 18 ZGB). Hans muss das Auto dann nicht bezahlen. Er müsste allerdings seine Urteilsunfähigkeit beweisen."
   },
   {
-    id: "h11", topic: "handlungsfaehigkeit", type: "mc", diff: 3, tax: "K3",
+    id: "h11", topic: "handlungsfaehigkeit", type: "mc", diff: 3, tax: "K3"
+ reviewed:false,
     context: "Hans (30) stürzt auf dem betrunkenen Heimweg in den Garten der Nachbarin Erika und zerdrückt ihre seltenen Blumen.",
     q: "Muss Hans für den Schaden aufkommen, obwohl er urteilsunfähig war?",
     options: [
@@ -347,7 +375,8 @@ window.QUESTIONS = [
     explain: "Obersatz: Es ist zu prüfen, ob Hans trotz vorübergehender Urteilsunfähigkeit schadenersatzpflichtig ist.\n\nVoraussetzungen: Art. 54 OR regelt die Haftung bei vorübergehender Urteilsunfähigkeit. Wer in einem solchen Zustand Schaden anrichtet, ist ersatzpflichtig, sofern er nicht nachweist, dass der Zustand ohne sein Verschulden eingetreten ist.\n\nSubsumtion: Hans hat sich freiwillig betrunken. Der Zustand der Urteilsunfähigkeit ist somit durch sein eigenes Verschulden eingetreten.\n\nSchlussfolgerung: Hans muss den Schaden ersetzen (Art. 54 OR), weil er den Rauschzustand selbst verschuldet hat."
   },
   {
-    id: "h12", topic: "handlungsfaehigkeit", type: "mc", diff: 2, tax: "K2",
+    id: "h12", topic: "handlungsfaehigkeit", type: "mc", diff: 2, tax: "K2"
+ reviewed:false,
     q: "Wann erlangt eine juristische Person die Handlungsfähigkeit?",
     options: [
       {v: "A", t: "Wenn sie ins Handelsregister eingetragen wird."},
@@ -365,7 +394,8 @@ window.QUESTIONS = [
 
   // --- diff 1 ---
   {
-    id: "b01", topic: "beschraenkte_hu", type: "mc", diff: 1, tax: "K1",
+    id: "b01", topic: "beschraenkte_hu", type: "mc", diff: 1, tax: "K1"
+ reviewed:false,
     q: "Wer gilt als beschränkt handlungsunfähig?",
     options: [
       {v: "A", t: "Alle Personen über 65 Jahre."},
@@ -377,13 +407,15 @@ window.QUESTIONS = [
     explain: "Beschränkt handlungsunfähig sind Personen, die zwar urteilsfähig (Art. 16 ZGB), aber noch nicht mündig (unter 18 Jahren, Art. 14 ZGB) sind. Sie befinden sich zwischen Handlungsfähigkeit und Handlungsunfähigkeit. Typisches Beispiel: ein 16-jähriger Jugendlicher."
   },
   {
-    id: "b02", topic: "beschraenkte_hu", type: "tf", diff: 1, tax: "K1",
+    id: "b02", topic: "beschraenkte_hu", type: "tf", diff: 1, tax: "K1"
+ reviewed:false,
     q: "Beschränkt Handlungsunfähige brauchen grundsätzlich die Zustimmung ihres gesetzlichen Vertreters, um Rechte und Pflichten zu begründen.",
     correct: true,
     explain: "Gemäss Art. 19 Abs. 1 ZGB bedürfen urteilsfähige Unmündige der Zustimmung ihres gesetzlichen Vertreters (z.B. der Eltern), um Rechte und Pflichten zu begründen. Es gibt jedoch Ausnahmen von dieser Regel (Art. 19 Abs. 2 ZGB, Art. 19c ZGB, Art. 323 Abs. 1 ZGB)."
   },
   {
-    id: "b03", topic: "beschraenkte_hu", type: "fill", diff: 1, tax: "K1",
+    id: "b03", topic: "beschraenkte_hu", type: "fill", diff: 1, tax: "K1"
+ reviewed:false,
     q: "Die Zustimmung des gesetzlichen Vertreters kann im {0} oder im {1} erfolgen.",
     blanks: [
       {answer: "Voraus", alts: ["voraus", "Vorhinein", "vorhinein"]},
@@ -394,7 +426,8 @@ window.QUESTIONS = [
 
   // --- diff 2 ---
   {
-    id: "b04", topic: "beschraenkte_hu", type: "multi", diff: 2, tax: "K2",
+    id: "b04", topic: "beschraenkte_hu", type: "multi", diff: 2, tax: "K2"
+ reviewed:false,
     q: "Welche Ausnahmen erlauben es beschränkt Handlungsunfähigen, OHNE Zustimmung des gesetzlichen Vertreters zu handeln? (Mehrere Antworten möglich.)",
     options: [
       {v: "A", t: "Unentgeltliche Vorteile erlangen (Art. 19 Abs. 2 ZGB)"},
@@ -406,7 +439,8 @@ window.QUESTIONS = [
     explain: "Die Ausnahmen zur Zustimmungspflicht sind: unentgeltliche Vorteile erlangen wie Geschenke annehmen (Art. 19 Abs. 2 ZGB), geringfügige Angelegenheiten des täglichen Lebens wie z.B. ein Busbillett kaufen (Art. 19 Abs. 2 ZGB), und höchstpersönliche Rechte ausüben (Art. 19c ZGB). Der Kauf eines Autos ist weder geringfügig noch unentgeltlich und braucht daher die Zustimmung."
   },
   {
-    id: "b05", topic: "beschraenkte_hu", type: "mc", diff: 2, tax: "K3",
+    id: "b05", topic: "beschraenkte_hu", type: "mc", diff: 2, tax: "K3"
+ reviewed:false,
     context: "Die 15-jährige Vreni bekommt von ihrer Gotte Marianne ein Pferd geschenkt.",
     q: "Darf Vreni das Pferd ohne Zustimmung ihres Vaters annehmen?",
     options: [
@@ -419,7 +453,8 @@ window.QUESTIONS = [
     explain: "Obersatz: Es ist zu prüfen, ob Vreni das Pferd ohne Zustimmung ihres gesetzlichen Vertreters annehmen kann.\n\nVoraussetzungen: Vreni ist 15 und damit unmündig (Art. 14 ZGB). Als urteilsfähige Unmündige ist sie beschränkt handlungsunfähig (Art. 19 ZGB). Sie braucht grundsätzlich die Zustimmung ihres gesetzlichen Vertreters (Art. 19 Abs. 1 ZGB). Ausnahme: rein unentgeltliche Vorteile (Art. 19 Abs. 2 ZGB), also Vorteile, die keine Kosten verursachen.\n\nSubsumtion: Ein Pferd verursacht erhebliche laufende Kosten (Futter, Tierarzt, Stallmiete). Es handelt sich daher nicht um einen rein unentgeltlichen Vorteil.\n\nSchlussfolgerung: Vreni braucht die Zustimmung ihres Vaters, um das Pferd anzunehmen."
   },
   {
-    id: "b06", topic: "beschraenkte_hu", type: "mc", diff: 2, tax: "K3",
+    id: "b06", topic: "beschraenkte_hu", type: "mc", diff: 2, tax: "K3"
+ reviewed:false,
     context: "Hansli (16, urteilsfähig) möchte mit seinem Taschengeld die neue CD von Justin Bieber für CHF 20 kaufen.",
     q: "Darf Hansli die CD alleine kaufen?",
     options: [
@@ -432,7 +467,8 @@ window.QUESTIONS = [
     explain: "Obersatz: Es ist zu prüfen, ob Hansli den Kauf ohne elterliche Zustimmung tätigen kann.\n\nVoraussetzungen: Hansli ist 16 und urteilsfähig, aber unmündig — er ist beschränkt handlungsunfähig (Art. 19 ZGB). Grundsätzlich braucht er die Zustimmung seiner Eltern (Art. 19 Abs. 1 ZGB). Ausnahme: geringfügige Angelegenheiten des täglichen Lebens (Art. 19 Abs. 2 ZGB).\n\nSubsumtion: Der Kauf einer CD für CHF 20 mit Taschengeld ist eine geringfügige Angelegenheit des täglichen Lebens.\n\nSchlussfolgerung: Hansli darf die CD alleine kaufen."
   },
   {
-    id: "b07", topic: "beschraenkte_hu", type: "mc", diff: 2, tax: "K2",
+    id: "b07", topic: "beschraenkte_hu", type: "mc", diff: 2, tax: "K2"
+ reviewed:false,
     q: "Was bedeutet es, wenn die Zustimmung «stillschweigend» erteilt wird?",
     options: [
       {v: "A", t: "Die Zustimmung muss vor einem Notar erfolgen."},
@@ -446,7 +482,8 @@ window.QUESTIONS = [
 
   // --- diff 3 ---
   {
-    id: "b08", topic: "beschraenkte_hu", type: "mc", diff: 3, tax: "K3",
+    id: "b08", topic: "beschraenkte_hu", type: "mc", diff: 3, tax: "K3"
+ reviewed:false,
     context: "Hansli (16) erhält von seinem Vater Hans ein Couvert mit Bargeld zum Geburtstag, zweckgebunden für den Kauf eines Töfflis. Am nächsten Morgen kauft Hansli das Töffli.",
     q: "Kann Hansli das Töffli alleine kaufen?",
     options: [
@@ -459,7 +496,8 @@ window.QUESTIONS = [
     explain: "Obersatz: Es ist zu prüfen, ob Hansli den Kauf alleine tätigen kann.\n\nVoraussetzungen: Hansli ist 16, urteilsfähig und unmündig, also beschränkt handlungsunfähig (Art. 19 ZGB). Er braucht grundsätzlich die Zustimmung seines gesetzlichen Vertreters (Art. 19 Abs. 1 ZGB).\n\nSubsumtion: Sein Vater Hans hat ihm das Geld zweckgebunden für den Kauf eines Töfflis geschenkt. Indem Hans das Geld speziell für diesen Kauf übergibt, erteilt er im Voraus seine Zustimmung zum Kauf des Töfflis.\n\nSchlussfolgerung: Hansli kann das Töffli alleine kaufen, weil die elterliche Zustimmung durch das zweckgebundene Geldgeschenk im Voraus erteilt wurde."
   },
   {
-    id: "b09", topic: "beschraenkte_hu", type: "mc", diff: 3, tax: "K4",
+    id: "b09", topic: "beschraenkte_hu", type: "mc", diff: 3, tax: "K4"
+ reviewed:false,
     context: "Hansli (16) hat das Töffli mit dem Geld seines Vaters gekauft (der Vater stimmte zu). Nun will Hansli das Töffli aber nicht mehr und möchte es gegen eine Sammlung Konsolenspiele seines Freundes Fritzli tauschen. Sein Vater ist damit nicht einverstanden.",
     q: "Darf Hansli das Töffli gegen die Spielesammlung tauschen?",
     options: [
@@ -472,7 +510,8 @@ window.QUESTIONS = [
     explain: "Obersatz: Es ist zu prüfen, ob Hansli ohne erneute Zustimmung des Vaters das Töffli tauschen kann.\n\nVoraussetzungen: Hansli ist beschränkt handlungsunfähig (Art. 19 ZGB). Jedes Rechtsgeschäft, das nicht unter eine Ausnahme fällt, braucht die Zustimmung des gesetzlichen Vertreters.\n\nSubsumtion: Die Zustimmung des Vaters bezog sich auf den Kauf eines Töfflis mit dem zweckgebundenen Geld. Der Tausch des Töfflis gegen Konsolenspiele ist ein neues Rechtsgeschäft. Es ist weder geringfügig noch ein unentgeltlicher Vorteil. Der Vater ist ausdrücklich nicht einverstanden.\n\nSchlussfolgerung: Hansli darf den Tausch nicht vornehmen. Ohne die Zustimmung seines Vaters wäre das Tauschgeschäft schwebend unwirksam."
   },
   {
-    id: "b10", topic: "beschraenkte_hu", type: "mc", diff: 3, tax: "K3",
+    id: "b10", topic: "beschraenkte_hu", type: "mc", diff: 3, tax: "K3"
+ reviewed:false,
     context: "Hansli (16) fährt mit seinem Töffli zu nah am Mercedes des Nachbarn vorbei und verursacht eine grosse Schramme.",
     q: "Muss Hansli den Schaden ersetzen?",
     options: [
@@ -485,7 +524,8 @@ window.QUESTIONS = [
     explain: "Obersatz: Es ist zu prüfen, ob Hansli für den Schaden am Mercedes haftet.\n\nVoraussetzungen: Art. 19 Abs. 3 ZGB bestimmt, dass urteilsfähige Unmündige für Schaden aus unerlaubten Handlungen ersatzpflichtig werden (Deliktsfähigkeit).\n\nSubsumtion: Hansli ist 16 und urteilsfähig. Er hat durch sein Fahrverhalten eine unerlaubte Handlung begangen und einen Schaden verursacht.\n\nSchlussfolgerung: Hansli muss den Schaden ersetzen (Art. 19 Abs. 3 ZGB). Die beschränkte Handlungsunfähigkeit schützt nur vor rechtsgeschäftlichen Verpflichtungen, nicht vor Haftung aus Delikt."
   },
   {
-    id: "b11", topic: "beschraenkte_hu", type: "mc", diff: 2, tax: "K2",
+    id: "b11", topic: "beschraenkte_hu", type: "mc", diff: 2, tax: "K2"
+ reviewed:false,
     q: "Was bedeutet «Lohn eigene Arbeit / Vermögen» als Ausnahme gemäss Art. 323 Abs. 1 ZGB?",
     options: [
       {v: "A", t: "Unmündige dürfen nur sparen, nicht ausgeben."},
@@ -497,7 +537,8 @@ window.QUESTIONS = [
     explain: "Gemäss Art. 323 Abs. 1 ZGB darf ein Unmündiger über den Ertrag seiner Arbeit (z.B. Lohn aus einem Ferienjob) frei verfügen. Dies ist eine Ausnahme zur Zustimmungspflicht nach Art. 19 Abs. 1 ZGB. Der Unmündige kann mit seinem selbst verdienten Geld eigenständig Käufe tätigen."
   },
   {
-    id: "b12", topic: "beschraenkte_hu", type: "tf", diff: 1, tax: "K2",
+    id: "b12", topic: "beschraenkte_hu", type: "tf", diff: 1, tax: "K2"
+ reviewed:false,
     q: "Beschränkt Handlungsunfähige können durch unerlaubte Handlungen schadenersatzpflichtig werden.",
     correct: true,
     explain: "Gemäss Art. 19 Abs. 3 ZGB werden urteilsfähige Unmündige durch ihre unerlaubten Handlungen (Delikte) schadenersatzpflichtig. Man spricht hier von der Deliktsfähigkeit. Dies bedeutet: Auch wenn ein 16-Jähriger nicht alle Verträge alleine abschliessen kann, haftet er dennoch, wenn er jemandem einen Schaden zufügt."
@@ -509,7 +550,8 @@ window.QUESTIONS = [
 
   // --- diff 1 ---
   {
-    id: "p01", topic: "persoenlichkeit", type: "mc", diff: 1, tax: "K1",
+    id: "p01", topic: "persoenlichkeit", type: "mc", diff: 1, tax: "K1"
+ reviewed:false,
     q: "Welcher Gesetzesartikel schützt die Persönlichkeit?",
     options: [
       {v: "A", t: "Art. 28 ZGB"},
@@ -521,13 +563,15 @@ window.QUESTIONS = [
     explain: "Art. 28 ZGB regelt den Schutz der Persönlichkeit. Er bestimmt den Grundsatz, dass jede Verletzung der Persönlichkeit widerrechtlich ist, sofern kein Rechtfertigungsgrund vorliegt. Art. 11 ZGB regelt die Rechtsfähigkeit, Art. 14 ZGB die Mündigkeit und Art. 19 ZGB die beschränkte Handlungsunfähigkeit."
   },
   {
-    id: "p02", topic: "persoenlichkeit", type: "tf", diff: 1, tax: "K1",
+    id: "p02", topic: "persoenlichkeit", type: "tf", diff: 1, tax: "K1"
+ reviewed:false,
     q: "Jede Verletzung der Persönlichkeit ist gemäss Art. 28 ZGB widerrechtlich.",
     correct: true,
     explain: "Art. 28 ZGB stellt den Grundsatz auf, dass jede Verletzung der Persönlichkeit widerrechtlich ist. Allerdings kann die Widerrechtlichkeit durch einen Rechtfertigungsgrund aufgehoben werden: Einwilligung des Verletzten, überwiegendes privates oder öffentliches Interesse oder gesetzliche Erlaubnis."
   },
   {
-    id: "p03", topic: "persoenlichkeit", type: "fill", diff: 1, tax: "K1",
+    id: "p03", topic: "persoenlichkeit", type: "fill", diff: 1, tax: "K1"
+ reviewed:false,
     q: "Der Persönlichkeitsschutz umfasst drei Sphären: die {0}, die {1} und die {2}.",
     blanks: [
       {answer: "Gemeinsphäre", alts: ["gemeinsphäre", "Gemeinsphaere"]},
@@ -539,7 +583,8 @@ window.QUESTIONS = [
 
   // --- diff 2 ---
   {
-    id: "p04", topic: "persoenlichkeit", type: "multi", diff: 2, tax: "K2",
+    id: "p04", topic: "persoenlichkeit", type: "multi", diff: 2, tax: "K2"
+ reviewed:false,
     q: "Welche der folgenden sind Rechtfertigungsgründe für eine Persönlichkeitsverletzung? (Mehrere Antworten möglich.)",
     options: [
       {v: "A", t: "Einwilligung des Verletzten"},
@@ -551,7 +596,8 @@ window.QUESTIONS = [
     explain: "Die drei Rechtfertigungsgründe für eine Persönlichkeitsverletzung gemäss Art. 28 ZGB sind: Einwilligung des Verletzten, überwiegendes privates oder öffentliches Interesse und gesetzliche Erlaubnis. Unwissenheit des Verletzers ist kein Rechtfertigungsgrund — wer die Persönlichkeit eines anderen verletzt, haftet unabhängig davon, ob er es wusste oder nicht."
   },
   {
-    id: "p05", topic: "persoenlichkeit", type: "mc", diff: 2, tax: "K2",
+    id: "p05", topic: "persoenlichkeit", type: "mc", diff: 2, tax: "K2"
+ reviewed:false,
     img: {src: "img/recht/personenrecht/personenrecht_sphaeren_01.svg", alt: "Sphärenmodell des Persönlichkeitsschutzes mit drei konzentrischen Kreisen"},
     q: "Welches Beispiel fällt in die Privatsphäre?",
     options: [
@@ -564,7 +610,8 @@ window.QUESTIONS = [
     explain: "Die drei Sphären: Gemeinsphäre betrifft das öffentliche Auftreten (Strasse, öffentliche Rede). Privatsphäre umfasst den engeren persönlichen Bereich (Familie zu Hause, Freundeskreis). Intimsphäre betrifft den innersten Bereich (Duschen, Sexualität). Das Familien-Abendessen zu Hause gehört zur Privatsphäre."
   },
   {
-    id: "p06", topic: "persoenlichkeit", type: "multi", diff: 2, tax: "K2",
+    id: "p06", topic: "persoenlichkeit", type: "multi", diff: 2, tax: "K2"
+ reviewed:false,
     q: "Welche Rechtsfolgen kann eine Persönlichkeitsverletzung nach sich ziehen? (Mehrere Antworten möglich.)",
     options: [
       {v: "A", t: "Schadenersatz"},
@@ -576,7 +623,8 @@ window.QUESTIONS = [
     explain: "Die zivilrechtlichen Rechtsfolgen einer Persönlichkeitsverletzung nach Art. 28 ZGB umfassen: Schadenersatz, Genugtuung (Schmerzensgeld), Beseitigung der bestehenden Verletzung und Verbot einer drohenden Verletzung. Eine Freiheitsstrafe ist eine strafrechtliche Sanktion und keine direkte Folge von Art. 28 ZGB."
   },
   {
-    id: "p07", topic: "persoenlichkeit", type: "tf", diff: 2, tax: "K2",
+    id: "p07", topic: "persoenlichkeit", type: "tf", diff: 2, tax: "K2"
+ reviewed:false,
     q: "Ein Journalist darf den Namen eines verurteilten Straftäters in der Zeitung veröffentlichen, weil ein überwiegendes öffentliches Interesse vorliegt.",
     correct: true,
     explain: "Die Veröffentlichung des Namens eines verurteilten Straftäters kann durch ein überwiegendes öffentliches Interesse gerechtfertigt sein. Dies ist ein anerkannter Rechtfertigungsgrund gemäss Art. 28 ZGB. Allerdings ist immer eine Interessenabwägung nötig — bei weniger schweren Delikten oder bei Jugendlichen kann das Persönlichkeitsrecht überwiegen."
@@ -584,7 +632,8 @@ window.QUESTIONS = [
 
   // --- diff 3 ---
   {
-    id: "p08", topic: "persoenlichkeit", type: "mc", diff: 3, tax: "K4",
+    id: "p08", topic: "persoenlichkeit", type: "mc", diff: 3, tax: "K4"
+ reviewed:false,
     context: "Lisa postet auf Instagram ein Foto von ihrer Mitschülerin Sarah im Bikini, das sie heimlich am Strand aufgenommen hat. Sarah hat dem Foto nicht zugestimmt.",
     q: "Liegt eine widerrechtliche Persönlichkeitsverletzung vor?",
     options: [
@@ -597,7 +646,8 @@ window.QUESTIONS = [
     explain: "Obersatz: Es ist zu prüfen, ob eine widerrechtliche Persönlichkeitsverletzung gemäss Art. 28 ZGB vorliegt.\n\nVoraussetzungen: Jede Verletzung der Persönlichkeit ist widerrechtlich (Art. 28 ZGB), es sei denn, ein Rechtfertigungsgrund liegt vor (Einwilligung, überwiegendes Interesse, Gesetz).\n\nSubsumtion: Das heimliche Fotografieren einer Person im Bikini berührt die Privat- bis Intimsphäre. Die Veröffentlichung auf Instagram ohne Zustimmung verstärkt die Verletzung. Sarah hat nicht eingewilligt, es besteht kein überwiegendes öffentliches Interesse, und kein Gesetz erlaubt dies.\n\nSchlussfolgerung: Es liegt eine widerrechtliche Persönlichkeitsverletzung vor. Sarah könnte Beseitigung (Löschung des Fotos), Schadenersatz und Genugtuung verlangen."
   },
   {
-    id: "p09", topic: "persoenlichkeit", type: "mc", diff: 3, tax: "K5",
+    id: "p09", topic: "persoenlichkeit", type: "mc", diff: 3, tax: "K5"
+ reviewed:false,
     context: "Ein Arbeitgeber installiert ohne Vorankündigung Videokameras in den Büros seiner Angestellten, um deren Arbeitsleistung zu überwachen.",
     q: "Liegt eine gerechtfertigte Persönlichkeitsverletzung vor?",
     options: [
@@ -610,13 +660,15 @@ window.QUESTIONS = [
     explain: "Obersatz: Es ist zu prüfen, ob die Videoüberwachung eine gerechtfertigte Persönlichkeitsverletzung darstellt.\n\nVoraussetzungen: Jede Persönlichkeitsverletzung ist widerrechtlich (Art. 28 ZGB), es sei denn, ein Rechtfertigungsgrund liegt vor.\n\nSubsumtion: Die heimliche Videoüberwachung greift in die Privatsphäre der Angestellten ein. Die Angestellten haben nicht eingewilligt. Ein überwiegendes Interesse des Arbeitgebers an einer solch invasiven Massnahme ist fraglich, zumal sie ohne Vorankündigung erfolgt. Auch das Arbeitsrecht bietet keine Grundlage für heimliche Überwachung.\n\nSchlussfolgerung: Es liegt eine widerrechtliche Persönlichkeitsverletzung vor."
   },
   {
-    id: "p10", topic: "persoenlichkeit", type: "tf", diff: 3, tax: "K4",
+    id: "p10", topic: "persoenlichkeit", type: "tf", diff: 3, tax: "K4"
+ reviewed:false,
     q: "Wenn jemand in die Veröffentlichung eines Fotos einwilligt, kann er später trotzdem eine Persönlichkeitsverletzung geltend machen.",
     correct: false,
     explain: "Die Einwilligung des Verletzten ist ein Rechtfertigungsgrund gemäss Art. 28 ZGB. Wer in die Veröffentlichung eines Fotos einwilligt, kann grundsätzlich später nicht mehr geltend machen, seine Persönlichkeit sei verletzt worden — vorausgesetzt, die Einwilligung wurde freiwillig und in Kenntnis der Sachlage erteilt und die tatsächliche Verwendung geht nicht über die Einwilligung hinaus."
   },
   {
-    id: "p11", topic: "persoenlichkeit", type: "mc", diff: 1, tax: "K2",
+    id: "p11", topic: "persoenlichkeit", type: "mc", diff: 1, tax: "K2"
+ reviewed:false,
     q: "Welche Sphäre geniesst den stärksten Schutz?",
     options: [
       {v: "A", t: "Die Privatsphäre"},
