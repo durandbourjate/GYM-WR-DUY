@@ -237,7 +237,7 @@ export async function berechneDelta(
         const lernzielIds = findeLernzielIds(config.meta.id, poolFrage.topic, poolLernziele)
         const neueFrage = konvertierePoolFrage(poolFrage, config.meta, config.topics, lernzielIds)
         // Hash nachträglich setzen (konvertierePoolFrage setzt '' als Platzhalter)
-        ;(neueFrage as Record<string, unknown>)['poolContentHash'] = hash
+        neueFrage.poolContentHash = hash
         neueFragen.push(neueFrage)
         neu++
       } else if (bestehendeFrageOpt.poolContentHash !== hash) {
