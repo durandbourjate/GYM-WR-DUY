@@ -2,6 +2,7 @@ import { useState, useRef, useCallback } from 'react'
 import type { PruefungsConfig, PruefungsMaterial } from '../../../types/pruefung.ts'
 import { Section, Field, Toggle } from './ComposerUI.tsx'
 import { apiService } from '../../../services/apiService.ts'
+import { parseVideoUrl } from '../../../utils/mediaUtils.ts'
 
 interface Props {
   pruefung: PruefungsConfig
@@ -279,7 +280,7 @@ function formatGroesse(bytes: number): string {
 }
 
 const MAX_MATERIAL_GROESSE = 10 * 1024 * 1024 // 10 MB
-const ERLAUBTE_TYPEN = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg']
+const ERLAUBTE_TYPEN = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg', 'audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/ogg', 'audio/webm', 'video/mp4', 'video/webm', 'video/ogg']
 
 /** Verwaltung von Prüfungs-Materialien (PDFs, Texte, Links, Datei-Uploads) */
 function MaterialienSection({ materialien, setMaterialien }: {
@@ -291,6 +292,7 @@ function MaterialienSection({ materialien, setMaterialien }: {
   const [neuerTitel, setNeuerTitel] = useState('')
   const [neueUrl, setNeueUrl] = useState('')
   const [neuerInhalt, setNeuerInhalt] = useState('')
+  const [embedUrlFehler, setEmbedUrlFehler] = useState('')
 
   // Datei-Upload State
   const [uploadDatei, setUploadDatei] = useState<File | null>(null)
@@ -305,6 +307,7 @@ function MaterialienSection({ materialien, setMaterialien }: {
     setNeuerInhalt('')
     setUploadDatei(null)
     setUploadFehler(null)
+    setEmbedUrlFehler('')
     setZeigHinzufuegen(false)
   }
 
@@ -313,6 +316,23 @@ function MaterialienSection({ materialien, setMaterialien }: {
     if (!titel) return
     if ((neuerTyp === 'pdf' || neuerTyp === 'link') && !neueUrl.trim()) return
     if (neuerTyp === 'text' && !neuerInhalt.trim()) return
+    if (neuerTyp === 'videoEmbed') {
+      const info = parseVideoUrl(neueUrl.trim())
+      if (!info) {
+        setEmbedUrlFehler('URL nicht erkannt. Unterstützt: YouTube, Vimeo, nanoo.tv')
+        return
+      }
+      const neu: PruefungsMaterial = {
+        id: crypto.randomUUID(),
+        titel,
+        typ: 'videoEmbed',
+        embedUrl: info.embedUrl,
+        url: neueUrl.trim(),
+      }
+      setMaterialien([...materialien, neu])
+      resetForm()
+      return
+    }
 
     const neu: PruefungsMaterial = {
       id: crypto.randomUUID(),
@@ -331,8 +351,10 @@ function MaterialienSection({ materialien, setMaterialien }: {
     setUploadFehler(null)
 
     const datei = dateien[0]
-    if (!ERLAUBTE_TYPEN.includes(datei.type)) {
-      setUploadFehler('Nur PDF- und Bild-Dateien (PNG, JPG) erlaubt.')
+    const erlaubt = ERLAUBTE_TYPEN.includes(datei.type)
+      || datei.type.startsWith('audio/') || datei.type.startsWith('video/')
+    if (!erlaubt) {
+      setUploadFehler('Nur PDF, Bild, Audio und Video erlaubt.')
       return
     }
     if (datei.size > MAX_MATERIAL_GROESSE) {
@@ -380,6 +402,7 @@ function MaterialienSection({ materialien, setMaterialien }: {
         url: ergebnis.url,
         driveFileId: ergebnis.driveFileId,
         dateiname: uploadDatei.name,
+        mimeType: uploadDatei.type,
       }
       setMaterialien([...materialien, neu])
       resetForm()
@@ -419,6 +442,7 @@ function MaterialienSection({ materialien, setMaterialien }: {
     text: 'Text',
     link: 'Link',
     dateiUpload: 'Datei',
+    videoEmbed: 'Video',
   }
 
   const typIcon: Record<PruefungsMaterial['typ'], string> = {
@@ -426,6 +450,7 @@ function MaterialienSection({ materialien, setMaterialien }: {
     text: '📝',
     link: '🔗',
     dateiUpload: '📎',
+    videoEmbed: '🎬',
   }
 
   return (
@@ -479,6 +504,11 @@ function MaterialienSection({ materialien, setMaterialien }: {
                     {mat.dateiname}
                   </p>
                 )}
+                {mat.typ === 'videoEmbed' && mat.url && (
+                  <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                    {mat.url}
+                  </p>
+                )}
               </div>
               <button
                 onClick={() => removeMaterial(mat.id)}
@@ -524,7 +554,8 @@ function MaterialienSection({ materialien, setMaterialien }: {
                 className="input-field"
               >
                 <option value="pdf">PDF-Link (eingebettet)</option>
-                <option value="dateiUpload">Datei hochladen (PDF/Bild)</option>
+                <option value="dateiUpload">Datei hochladen (PDF/Bild/Audio/Video)</option>
+                <option value="videoEmbed">Video einbetten (YouTube/Vimeo/nanoo.tv)</option>
                 <option value="text">Text (inline)</option>
                 <option value="link">Link (extern)</option>
               </select>
@@ -541,6 +572,21 @@ function MaterialienSection({ materialien, setMaterialien }: {
                 className="input-field"
               />
             </Field>
+          )}
+
+          {neuerTyp === 'videoEmbed' && (
+            <div className="space-y-1">
+              <Field label="Video-URL (YouTube, Vimeo, nanoo.tv)">
+                <input
+                  type="url"
+                  value={neueUrl}
+                  onChange={(e) => { setNeueUrl(e.target.value); setEmbedUrlFehler('') }}
+                  placeholder="https://www.youtube.com/watch?v=... oder https://vimeo.com/..."
+                  className="input-field"
+                />
+              </Field>
+              {embedUrlFehler && <p className="text-xs text-red-500">{embedUrlFehler}</p>}
+            </div>
           )}
 
           {neuerTyp === 'text' && (
@@ -572,7 +618,7 @@ function MaterialienSection({ materialien, setMaterialien }: {
                 <input
                   ref={fileInputRef}
                   type="file"
-                  accept=".pdf,.png,.jpg,.jpeg"
+                  accept=".pdf,.png,.jpg,.jpeg,audio/*,video/*"
                   onChange={(e) => handleDateiWaehlen(e.target.files)}
                   className="hidden"
                 />
@@ -585,15 +631,23 @@ function MaterialienSection({ materialien, setMaterialien }: {
                   Datei auswählen
                 </button>
                 <p className="text-xs text-slate-400 dark:text-slate-500 mt-2">
-                  PDF oder Bild hierher ziehen — max. 10 MB
+                  PDF, Bild, Audio oder Video hierher ziehen — max. 10 MB
                 </p>
               </div>
 
               {/* Gewählte Datei anzeigen */}
               {uploadDatei && (
                 <div className="flex items-center gap-3 p-2 bg-slate-50 dark:bg-slate-700/30 rounded-lg border border-slate-200 dark:border-slate-600">
-                  <span className="text-lg shrink-0" title={uploadDatei.type.startsWith('image/') ? 'Bild' : 'PDF'}>
-                    {uploadDatei.type.startsWith('image/') ? '🖼️' : '📄'}
+                  <span className="text-lg shrink-0" title={
+                    uploadDatei.type.startsWith('image/') ? 'Bild'
+                    : uploadDatei.type.startsWith('audio/') ? 'Audio'
+                    : uploadDatei.type.startsWith('video/') ? 'Video'
+                    : 'PDF'
+                  }>
+                    {uploadDatei.type.startsWith('image/') ? '🖼️'
+                      : uploadDatei.type.startsWith('audio/') ? '🎵'
+                      : uploadDatei.type.startsWith('video/') ? '🎬'
+                      : '📄'}
                   </span>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm text-slate-700 dark:text-slate-200 truncate">{uploadDatei.name}</p>
@@ -640,7 +694,7 @@ function MaterialienSection({ materialien, setMaterialien }: {
             ) : (
               <button
                 onClick={addMaterial}
-                disabled={!neuerTitel.trim() || ((neuerTyp === 'pdf' || neuerTyp === 'link') && !neueUrl.trim()) || (neuerTyp === 'text' && !neuerInhalt.trim())}
+                disabled={!neuerTitel.trim() || ((neuerTyp === 'pdf' || neuerTyp === 'link' || neuerTyp === 'videoEmbed') && !neueUrl.trim()) || (neuerTyp === 'text' && !neuerInhalt.trim())}
                 className="px-3 py-1.5 text-sm font-medium text-white bg-slate-800 dark:bg-slate-200 dark:text-slate-800 rounded-lg hover:bg-slate-900 dark:hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
               >
                 Hinzufügen

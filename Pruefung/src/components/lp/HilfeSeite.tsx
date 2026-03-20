@@ -32,7 +32,7 @@ export default function HilfeSeite({ onSchliessen }: Props) {
   }, [])
 
   // Resizable Panel
-  const [panelBreite, setPanelBreite] = useState(768) // max-w-3xl equivalent
+  const [panelBreite, setPanelBreite] = useState(1152)
 
   const handleZiehStart = useCallback((e: React.MouseEvent) => {
     e.preventDefault()

@@ -3,7 +3,7 @@ import { useAuthStore } from '../../store/authStore.ts'
 import { apiService } from '../../services/apiService.ts'
 import type { PruefungsConfig } from '../../types/pruefung.ts'
 import { formatDatum } from '../../utils/zeit.ts'
-import ThemeToggle from '../ThemeToggle.tsx'
+import LPHeader from './LPHeader.tsx'
 import PruefungsComposer from './PruefungsComposer.tsx'
 import FragenBrowser from './FragenBrowser.tsx'
 import HilfeSeite from './HilfeSeite.tsx'
@@ -11,7 +11,6 @@ import HilfeSeite from './HilfeSeite.tsx'
 /** Startseite für Lehrpersonen: Prüfungen verwalten + erstellen */
 export default function LPStartseite() {
   const user = useAuthStore((s) => s.user)
-  const abmelden = useAuthStore((s) => s.abmelden)
   const istDemoModus = useAuthStore((s) => s.istDemoModus)
 
   const [configs, setConfigs] = useState<PruefungsConfig[]>([])
@@ -110,6 +109,18 @@ export default function LPStartseite() {
     setAnsicht('composer')
   }
 
+  function handleDuplizieren(config: PruefungsConfig): void {
+    const kopie: PruefungsConfig = {
+      ...config,
+      id: '',
+      titel: `${config.titel} (Kopie)`,
+      datum: new Date().toISOString().split('T')[0],
+      freigeschaltet: false,
+    }
+    setEditConfig(kopie)
+    setAnsicht('composer')
+  }
+
   function handleZurueck(): void {
     setAnsicht('liste')
     // Configs neu laden
@@ -136,49 +147,19 @@ export default function LPStartseite() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
-      {/* Header */}
-      <header className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-6 py-2.5">
-        <div className="max-w-5xl mx-auto flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold text-slate-800 dark:text-slate-100">
-              Prüfungsplattform
-            </h1>
-            {user && (
-              <p className="text-sm text-slate-500 dark:text-slate-400">
-                {user.name} · Lehrperson
-              </p>
-            )}
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={handleNeue}
-              className="px-3 py-1.5 text-sm font-semibold text-white bg-slate-800 dark:bg-slate-200 dark:text-slate-800 rounded-lg hover:bg-slate-900 dark:hover:bg-slate-100 transition-colors cursor-pointer"
-            >
-              + Neue Prüfung
-            </button>
-            <button
-              onClick={() => setZeigFragenbank(true)}
-              className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
-            >
-              Fragenbank
-            </button>
-            <button
-              onClick={() => setZeigHilfe(true)}
-              className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
-              title="Anleitung und häufige Fragen zur Prüfungsplattform"
-            >
-              Hilfe
-            </button>
-            <ThemeToggle />
-            <button
-              onClick={abmelden}
-              className="px-2 py-1.5 text-sm text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors cursor-pointer"
-            >
-              Abmelden
-            </button>
-          </div>
-        </div>
-      </header>
+      <LPHeader
+        titel="Prüfungsplattform"
+        untertitel={user ? `${user.name} · Lehrperson` : undefined}
+        ansichtsButtons={
+          <button onClick={handleNeue} className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer">
+            + Neue Prüfung
+          </button>
+        }
+        onFragenbank={() => { setZeigHilfe(false); setZeigFragenbank(!zeigFragenbank) }}
+        onHilfe={() => { setZeigFragenbank(false); setZeigHilfe(!zeigHilfe) }}
+        fragebankOffen={zeigFragenbank}
+        hilfeOffen={zeigHilfe}
+      />
 
       {/* Content */}
       <main className="max-w-5xl mx-auto p-6">
@@ -306,7 +287,7 @@ export default function LPStartseite() {
                   Zuletzt
                 </h3>
                 {letzteFuenf.map(c => (
-                  <PruefungsKarte key={`recent-${c.id}`} config={c} onBearbeiten={handleBearbeiten} pruefungsUrl={pruefungsUrl} />
+                  <PruefungsKarte key={`recent-${c.id}`} config={c} onBearbeiten={handleBearbeiten} onDuplizieren={handleDuplizieren} pruefungsUrl={pruefungsUrl} />
                 ))}
                 <div className="border-b border-slate-200 dark:border-slate-700 pt-2 mb-1" />
                 <h3 className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide pt-1">
@@ -322,7 +303,7 @@ export default function LPStartseite() {
               </p>
             )}
             {gefilterteConfigs.map(c => (
-              <PruefungsKarte key={c.id} config={c} onBearbeiten={handleBearbeiten} pruefungsUrl={pruefungsUrl} />
+              <PruefungsKarte key={c.id} config={c} onBearbeiten={handleBearbeiten} onDuplizieren={handleDuplizieren} pruefungsUrl={pruefungsUrl} />
             ))}
           </div>
         )}
@@ -346,9 +327,10 @@ export default function LPStartseite() {
 }
 
 /** Prüfungskarte — wiederverwendbar für Zuletzt-Sektion und Hauptliste */
-function PruefungsKarte({ config: c, onBearbeiten, pruefungsUrl }: {
+function PruefungsKarte({ config: c, onBearbeiten, onDuplizieren, pruefungsUrl }: {
   config: PruefungsConfig
   onBearbeiten: (c: PruefungsConfig) => void
+  onDuplizieren: (c: PruefungsConfig) => void
   pruefungsUrl: (id: string) => string
 }) {
   return (
@@ -384,6 +366,7 @@ function PruefungsKarte({ config: c, onBearbeiten, pruefungsUrl }: {
         <a href={`${window.location.pathname}?id=${c.id}`} className="px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors" title="Live-Monitoring">Monitoring</a>
         <a href={`${window.location.pathname}?id=${c.id}&ansicht=korrektur`} className="px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors" title="KI-Korrektur & Feedback">Korrektur</a>
         <button onClick={() => onBearbeiten(c)} className="px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors cursor-pointer">Bearbeiten</button>
+        <button onClick={() => onDuplizieren(c)} className="px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors cursor-pointer" title="Prüfung duplizieren">Duplizieren</button>
         <button onClick={() => { navigator.clipboard.writeText(pruefungsUrl(c.id)); alert('Prüfungs-URL kopiert!') }} className="px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors cursor-pointer" title="Prüfungs-URL für SuS kopieren">URL</button>
       </div>
     </div>

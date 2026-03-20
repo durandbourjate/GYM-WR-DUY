@@ -6,7 +6,7 @@
 
 ## Aktueller Stand
 
-**Phase 5: Audio/Video + Korrektur-Einsicht** (20.03.2026) — Audio/Video-Anhänge, Audio-Korrektur, SuS-Korrektur-Einsicht ✅
+**Phase 5b: UI/UX-Verbesserungen** (20.03.2026) — Unified Header, Panel-UX, Materialien erweitert ✅
 
 ### Was funktioniert
 - **E2E-Flow getestet:** Login → Prüfung laden → Ausfüllen → Abgabe → Antwort-Datei in Google Drive ✅
@@ -52,6 +52,18 @@
   - Detailansicht pro Prüfung: Fragen, Punkte, Kommentare, Audio-Feedback
   - Symbole: ✓ (volle Punkte), ~ (Teilpunkte), ✗ (0 Punkte)
   - 3 neue Backend-Endpoints: korrekturFreigeben, ladeKorrekturenFuerSuS, ladeKorrekturDetail
+- **UI/UX-Verbesserungen (20.03.2026):**
+  - LPHeader: Shared Header für alle LP-Ansichten (Startseite, Composer, Monitoring, Korrektur)
+  - ESC schliesst Panels, direkte Umschaltung Fragenbank ↔ Hilfe
+  - FragenBrowser 50% breiter (672→1008px), Hilfe 50% breiter (768→1152px)
+  - Fragenbank-Klickverhalten: Klick → Editor öffnen, +/– Buttons für Hinzufügen/Entfernen
+  - Ziel-Leiste zeigt aktuelle Prüfung/Abschnitt im FragenBrowser
+  - BerechnungEditor Layout-Fix (Ergebnis/Toleranz breiter, Hilfsmittel schmaler)
+  - BewertungsrasterEditor als eigene Komponente extrahiert + KI-Buttons
+  - Prüfung duplizieren auf LP-Startseite
+  - Audio-Aufnahme im AnhangEditor (MediaRecorder → WebM → File)
+  - Materialien erweitert: Audio/Video-Upload + Video-Embed (YouTube/Vimeo/nanoo.tv)
+  - Alle Buttons in einheitlichem neutralen Style
 - **Code-Review-Cleanup (17.03.2026):**
   - XSS-Schutz: DOMPurify für alle `dangerouslySetInnerHTML`-Stellen
   - Stale-Closure-Fix: `useRef` für Timer/Intervall-Callbacks
@@ -128,7 +140,8 @@ Pruefung/
 │   │   └── apiService.ts               — Apps Script API Client (text/plain CORS-Fix)
 │   ├── components/
 │   │   ├── lp/
-│   │   │   ├── LPStartseite.tsx         — LP-Startseite: Prüfungen verwalten + erstellen
+│   │   │   ├── LPHeader.tsx              — Shared LP-Header (ESC, Panels, Abmelden, ThemeToggle)
+│   │   │   ├── LPStartseite.tsx         — LP-Startseite: Prüfungen verwalten + erstellen + duplizieren
 │   │   │   ├── PruefungsComposer.tsx    — 4-Tab-Editor (Einstellungen, Abschnitte, Vorschau, Analyse) + Autosave
 │   │   │   ├── FragenBrowser.tsx        — Slide-over: Fragenbank + Direktes Hinzufügen/Entfernen + Resize
 │   │   │   ├── HilfeSeite.tsx           — In-App Hilfe mit Akkordeon-Sektionen + Resize
@@ -145,7 +158,9 @@ Pruefung/
 │   │   │   │   ├── LueckentextEditor.tsx — Lückentext-Editor
 │   │   │   │   ├── ZuordnungEditor.tsx — Zuordnung-Editor
 │   │   │   │   ├── RichtigFalschEditor.tsx — Richtig/Falsch-Editor
-│   │   │   │   └── BerechnungEditor.tsx — Berechnung-Editor
+│   │   │   │   ├── BerechnungEditor.tsx — Berechnung-Editor
+│   │   │   │   ├── BewertungsrasterEditor.tsx — Bewertungsraster-Editor (extrahiert)
+│   │   │   │   └── useKIAssistent.ts  — KI-Assistent Hook (17 Aktionen)
 │   │   │   ├── KorrekturDashboard.tsx   — KI-Korrektur: Review + Feedback
 │   │   │   ├── KorrekturSchuelerZeile.tsx — Aufklappbare SuS-Zeile mit Bewertungen
 │   │   │   ├── KorrekturFrageZeile.tsx   — Einzelne Frage: KI-Vorschlag + LP-Override
@@ -292,9 +307,22 @@ Ohne diese Variablen funktioniert die App im **Demo-Modus** (Schülercode + Demo
 | 56 | Berechnung Layout-Fix | ✅ | Header-Spacer nur bei >1 Ergebnis |
 | 57 | initialEditFrageId | ✅ | "Bearbeiten" in AbschnitteTab öffnet FragenBrowser + Editor direkt |
 
+### Session 20.03.2026 — UI/UX-Verbesserungen
+| # | Feature | Status | Beschreibung |
+|---|---------|--------|-------------|
+| 58 | LPHeader (Shared) | ✅ | Einheitlicher Header für alle LP-Ansichten mit ESC-Handler, Panel-Toggles |
+| 59 | Panel-Breiten & ThemeToggle | ✅ | FragenBrowser 672→1008px, Hilfe 768→1152px, ThemeToggle aus Panels entfernt |
+| 60 | BerechnungEditor Layout | ✅ | Hilfsmittel w-64, Ergebnis/Toleranz flex-1 |
+| 61 | BewertungsrasterEditor | ✅ | Aus FragenEditor extrahiert (~210 Z.), KI-Buttons (generieren/verbessern) |
+| 62 | Prüfung duplizieren | ✅ | "Duplizieren"-Button auf LP-Startseite, Titel + "(Kopie)" |
+| 63 | Fragenbank Klickverhalten | ✅ | Klick → Editor, +/– Buttons, grüner Rahmen für "in Prüfung" |
+| 64 | Ziel-Leiste | ✅ | Grüne Info-Leiste im FragenBrowser zeigt Ziel-Prüfung/Abschnitt |
+| 65 | Audio-Aufnahme | ✅ | AudioRecorder im AnhangEditor (Blob → File) |
+| 66 | Materialien Audio/Video/Embed | ✅ | `videoEmbed` Typ, Audio/Video-Upload, YouTube/Vimeo/nanoo.tv Embed |
+| 67 | Bewertungsraster KI (Backend) | ✅ | 2 neue Cases in apps-script-code.js: bewertungsrasterGenerieren/Verbessern |
+
 ### Offen
 - Buchhaltungs-Fragetyp (Soll/Haben, Kontenrahmen, T-Konten — wie bei eLoB)
-- Audio/Video in Fragen (Multimedia-Einbettung, aktuell nur Bilder + PDFs)
 - Kollaboratives Korrigieren (mehrere LP korrigieren dieselbe Prüfung — Architektur-Klärung nötig)
 - Tablet/Smartphone-Optimierung (responsive by design, spezifische Tests ausstehend)
 

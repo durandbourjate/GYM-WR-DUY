@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { PruefungsMaterial } from '../types/pruefung.ts'
+import AudioPlayer from './AudioPlayer.tsx'
 
 export type MaterialModus = 'split' | 'overlay'
 
@@ -180,7 +181,7 @@ function MaterialAuswahl({ materialien, onWaehlen }: { materialien: PruefungsMat
               <span>{typIcon(mat.typ)}</span>
               <span className="text-sm font-medium text-slate-700 dark:text-slate-200">{mat.titel}</span>
               <span className="text-xs text-slate-400 dark:text-slate-500 ml-auto">
-                {mat.typ === 'pdf' ? 'PDF' : mat.typ === 'text' ? 'Text' : mat.typ === 'dateiUpload' ? 'Datei' : 'Link'}
+                {mat.typ === 'pdf' ? 'PDF' : mat.typ === 'text' ? 'Text' : mat.typ === 'dateiUpload' ? 'Datei' : mat.typ === 'videoEmbed' ? 'Video' : 'Link'}
               </span>
             </div>
           </button>
@@ -192,8 +193,60 @@ function MaterialAuswahl({ materialien, onWaehlen }: { materialien: PruefungsMat
 
 /** Zeigt den Inhalt eines einzelnen Materials */
 function MaterialInhalt({ material }: { material: PruefungsMaterial }) {
+  // Audio-Dateien
+  if (material.typ === 'dateiUpload' && material.mimeType?.startsWith('audio/') && material.url) {
+    return (
+      <div className="p-6 flex flex-col items-center gap-4">
+        <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+          {material.titel}
+        </h3>
+        <AudioPlayer src={material.url} />
+      </div>
+    )
+  }
+
+  // Video-Dateien (Upload)
+  if (material.typ === 'dateiUpload' && material.mimeType?.startsWith('video/') && material.url) {
+    return (
+      <div className="h-full flex flex-col">
+        <div className="px-4 py-2 bg-slate-50 dark:bg-slate-700/30 text-xs text-slate-500 dark:text-slate-400 shrink-0">
+          {material.titel}
+        </div>
+        <div className="flex-1 flex items-center justify-center p-4">
+          <video
+            src={material.url}
+            controls
+            className="max-w-full max-h-full rounded"
+          >
+            Video nicht unterstützt.
+          </video>
+        </div>
+      </div>
+    )
+  }
+
+  // Video-Embed (YouTube, Vimeo, nanoo.tv)
+  if (material.typ === 'videoEmbed' && material.embedUrl) {
+    return (
+      <div className="h-full flex flex-col">
+        <div className="px-4 py-2 bg-slate-50 dark:bg-slate-700/30 text-xs text-slate-500 dark:text-slate-400 shrink-0">
+          {material.titel}
+        </div>
+        <div className="flex-1 relative">
+          <iframe
+            src={material.embedUrl}
+            className="absolute inset-0 w-full h-full border-0"
+            title={material.titel}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        </div>
+      </div>
+    )
+  }
+
+  // PDF / Datei-Upload (Bilder, PDFs)
   if ((material.typ === 'pdf' || material.typ === 'dateiUpload') && material.url) {
-    // Google Drive Preview URL erstellen falls nötig
     const embedUrl = convertToEmbedUrl(material.url)
 
     return (
@@ -280,5 +333,6 @@ function typIcon(typ: PruefungsMaterial['typ']): string {
     case 'text': return '\u{1F4DD}'
     case 'link': return '\u{1F517}'
     case 'dateiUpload': return '\u{1F4CE}'
+    case 'videoEmbed': return '\u{1F3AC}'
   }
 }

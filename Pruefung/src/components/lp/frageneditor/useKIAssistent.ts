@@ -21,6 +21,9 @@ export type AktionKey =
   // Berechnung
   | 'berechneErgebnis'
   | 'pruefeToleranz'
+  // Bewertungsraster
+  | 'bewertungsrasterGenerieren'
+  | 'bewertungsrasterVerbessern'
   // Klassifizierung
   | 'klassifiziereFrage'
   // Prüfungs-Analyse

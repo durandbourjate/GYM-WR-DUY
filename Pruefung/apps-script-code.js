@@ -918,6 +918,37 @@ function kiAssistentEndpoint(body) {
         result = rufeClaudeAuf(systemPrompt, userPrompt);
         return jsonResponse({ success: true, ergebnis: result });
 
+      case 'bewertungsrasterGenerieren':
+        if (!daten.fragetext) return jsonResponse({ error: 'Fragetext fehlt' });
+        userPrompt = 'Erstelle ein Bewertungsraster für die folgende Prüfungsfrage.\n\n' +
+          'Fragetext:\n' + daten.fragetext + '\n' +
+          'Fragetyp: ' + (daten.typ || 'freitext') + '\n' +
+          'Fachbereich: ' + (daten.fachbereich || '?') + '\n' +
+          'Bloom-Stufe: ' + (daten.bloom || '?') + '\n' +
+          'Punkte: ' + (daten.punkte || '?') + '\n' +
+          (daten.musterlosung ? 'Musterlösung:\n' + daten.musterlosung + '\n' : '') + '\n' +
+          'Erstelle ein Bewertungsraster mit konkreten, messbaren Kriterien. ' +
+          'Die Summe der Kriterien-Punkte muss exakt ' + (daten.punkte || '?') + ' ergeben.\n\n' +
+          'Antworte als JSON: { "kriterien": [{ "beschreibung": "...", "punkte": 1 }, ...] }';
+        result = rufeClaudeAuf(systemPrompt, userPrompt);
+        return jsonResponse({ success: true, ergebnis: result });
+
+      case 'bewertungsrasterVerbessern':
+        if (!daten.fragetext || !daten.bewertungsraster) return jsonResponse({ error: 'Fragetext und Bewertungsraster fehlen' });
+        userPrompt = 'Prüfe und verbessere das folgende Bewertungsraster.\n\n' +
+          'Fragetext:\n' + daten.fragetext + '\n' +
+          'Fragetyp: ' + (daten.typ || 'freitext') + '\n' +
+          'Fachbereich: ' + (daten.fachbereich || '?') + '\n' +
+          'Bloom-Stufe: ' + (daten.bloom || '?') + '\n' +
+          'Punkte: ' + (daten.punkte || '?') + '\n' +
+          (daten.musterlosung ? 'Musterlösung:\n' + daten.musterlosung + '\n' : '') + '\n' +
+          'Aktuelles Bewertungsraster:\n' + JSON.stringify(daten.bewertungsraster) + '\n\n' +
+          'Prüfe: Sind die Kriterien messbar und eindeutig? Stimmt die Punkteverteilung? Fehlen wichtige Aspekte? ' +
+          'Vorschläge für Verbesserungen machen.\n\n' +
+          'Antworte als JSON: { "bewertung": "Freitext-Analyse des Rasters", "verbesserteKriterien": [{ "beschreibung": "...", "punkte": 1 }, ...] }';
+        result = rufeClaudeAuf(systemPrompt, userPrompt);
+        return jsonResponse({ success: true, ergebnis: result });
+
       case 'klassifiziereFrage':
         if (!daten.fragetext) return jsonResponse({ error: 'Fragetext fehlt' });
         userPrompt = 'Klassifiziere die folgende Prüfungsfrage für den W&R-Unterricht am Schweizer Gymnasium (Lehrplan 17, Kanton Bern).\n\n' +

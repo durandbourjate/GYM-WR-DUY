@@ -2,6 +2,7 @@ import { useRef, useState, useCallback } from 'react'
 import type { FrageAnhang } from '../../../types/fragen.ts'
 import { Abschnitt } from './EditorBausteine.tsx'
 import { maxGroesseFuerMimeType, formatGroesse, AKZEPTIERTE_MIME_TYPES, parseVideoUrl, istBild, istAudio, istVideo, istEmbed } from '../../../utils/mediaUtils.ts'
+import AudioRecorder from '../../AudioRecorder.tsx'
 
 const MAX_ANHAENGE = 5
 
@@ -36,6 +37,7 @@ export default function AnhangEditor({
   const [urlModus, setUrlModus] = useState(false)
   const [urlEingabe, setUrlEingabe] = useState('')
   const [urlFehler, setUrlFehler] = useState('')
+  const [zeigAufnahme, setZeigAufnahme] = useState(false)
 
   const gesamtAnzahl = anhaenge.length + neueAnhaenge.length
 
@@ -122,6 +124,14 @@ export default function AnhangEditor({
           >
             + URL einbetten
           </button>
+          <button
+            type="button"
+            onClick={() => setZeigAufnahme(!zeigAufnahme)}
+            disabled={gesamtAnzahl >= MAX_ANHAENGE}
+            className="px-3 py-1.5 text-sm bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            🎤 Aufnehmen
+          </button>
         </div>
         <p className="text-xs text-slate-400 dark:text-slate-500 mt-2">
           Dateien hierher ziehen oder klicken — max. {MAX_ANHAENGE} Anhänge, Bilder/PDF/Audio max. 5 MB, Video max. 25 MB
@@ -171,6 +181,22 @@ export default function AnhangEditor({
         </div>
       )}
       {urlFehler && <p className="text-xs text-red-500 mt-1">{urlFehler}</p>}
+
+      {/* Audio-Aufnahme */}
+      {zeigAufnahme && (
+        <div className="mt-2 p-3 bg-slate-50 dark:bg-slate-700/30 rounded-lg border border-slate-200 dark:border-slate-600">
+          <p className="text-xs text-slate-500 dark:text-slate-400 mb-2">Audio aufnehmen:</p>
+          <AudioRecorder
+            onSpeichern={async (blob) => {
+              const dateiname = `aufnahme_${Date.now()}.webm`
+              const file = new File([blob], dateiname, { type: blob.type || 'audio/webm' })
+              onAnhangHinzu(file)
+              setZeigAufnahme(false)
+            }}
+            kompakt
+          />
+        </div>
+      )}
 
       {/* Fehlermeldung */}
       {fehler && (

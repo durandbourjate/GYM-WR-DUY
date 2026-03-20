@@ -6,8 +6,9 @@ import { demoFragen } from '../../data/demoFragen.ts'
 import type { Frage } from '../../types/fragen.ts'
 import type { PruefungsConfig, PruefungsAbschnitt } from '../../types/pruefung.ts'
 
-import ThemeToggle from '../ThemeToggle.tsx'
+import LPHeader from './LPHeader.tsx'
 import FragenBrowser from './FragenBrowser.tsx'
+import HilfeSeite from './HilfeSeite.tsx'
 import SuSVorschau from './SuSVorschau.tsx'
 import ConfigTab from './composer/ConfigTab.tsx'
 import AbschnitteTab from './composer/AbschnitteTab.tsx'
@@ -58,6 +59,7 @@ export default function PruefungsComposer({ config, onZurueck }: Props) {
   const [zielAbschnittIndex, setZielAbschnittIndex] = useState<number>(0)
   const [initialEditFrageId, setInitialEditFrageId] = useState<string | undefined>(undefined)
   const [loeschDialog, setLoeschDialog] = useState<{ index: number; titel: string } | null>(null)
+  const [zeigHilfe, setZeigHilfe] = useState(false)
   const [zeigSuSVorschau, setZeigSuSVorschau] = useState(false)
 
   const loeschDialogRef = useRef<HTMLDivElement>(null)
@@ -248,46 +250,33 @@ export default function PruefungsComposer({ config, onZurueck }: Props) {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
-      {/* Header */}
-      <header className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-6 py-2 sticky top-0 z-20">
-        <div className="max-w-5xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={onZurueck}
-              className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
-            >
-              ← Zurück
-            </button>
-            <h1 className="text-lg font-bold text-slate-800 dark:text-slate-100">
-              {config ? 'Prüfung bearbeiten' : 'Neue Prüfung'}
-            </h1>
-          </div>
-          <div className="flex items-center gap-2">
-            {speicherStatus === 'erfolg' && (
-              <span className="text-sm text-green-600 dark:text-green-400">Gespeichert ✓</span>
-            )}
-            {speicherStatus === 'fehler' && (
-              <span className="text-sm text-red-600 dark:text-red-400">Fehler beim Speichern</span>
-            )}
-            {autoSaveStatus === 'gespeichert' && speicherStatus === 'idle' && (
-              <span className="text-sm text-green-600 dark:text-green-400">Automatisch gespeichert ✓</span>
-            )}
-            <div className="flex flex-col items-end gap-0.5">
-              <button
-                onClick={handleSpeichern}
-                disabled={speicherStatus === 'speichern' || !pruefung.titel.trim()}
-                className="px-3 py-1.5 text-sm font-semibold text-white bg-slate-800 dark:bg-slate-200 dark:text-slate-800 rounded-lg hover:bg-slate-900 dark:hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
-              >
-                {speicherStatus === 'speichern' ? 'Speichern...' : 'Speichern'}
-              </button>
-              <span className="text-[10px] text-slate-400 dark:text-slate-500">Auto-Speichern aktiv</span>
-            </div>
-            <ThemeToggle />
-          </div>
-        </div>
+      <LPHeader
+        titel={config ? 'Prüfung bearbeiten' : 'Neue Prüfung'}
+        zurueck={onZurueck}
+        statusText={
+          speicherStatus === 'erfolg' ? 'Gespeichert ✓'
+          : speicherStatus === 'fehler' ? 'Fehler beim Speichern'
+          : autoSaveStatus === 'gespeichert' && speicherStatus === 'idle' ? 'Automatisch gespeichert ✓'
+          : undefined
+        }
+        ansichtsButtons={
+          <button
+            onClick={handleSpeichern}
+            disabled={speicherStatus === 'speichern' || !pruefung.titel.trim()}
+            className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+          >
+            {speicherStatus === 'speichern' ? 'Speichern...' : 'Speichern'}
+          </button>
+        }
+        onFragenbank={() => { setZeigHilfe(false); setZeigFragenBrowser(!zeigFragenBrowser) }}
+        onHilfe={() => { setZeigFragenBrowser(false); setZeigHilfe(!zeigHilfe) }}
+        fragebankOffen={zeigFragenBrowser}
+        hilfeOffen={zeigHilfe}
+      />
 
-        {/* Tabs */}
-        <div className="max-w-5xl mx-auto mt-2 flex gap-1">
+      {/* Tabs */}
+      <div className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-6">
+        <div className="max-w-5xl mx-auto flex gap-1">
           {([
             { key: 'config' as ComposerTab, label: 'Einstellungen' },
             { key: 'abschnitte' as ComposerTab, label: `Abschnitte & Fragen (${gesamtFragen})` },
@@ -311,7 +300,7 @@ export default function PruefungsComposer({ config, onZurueck }: Props) {
             </button>
           ))}
         </div>
-      </header>
+      </div>
 
       {/* Content */}
       <main className="max-w-5xl mx-auto p-6">
@@ -352,6 +341,8 @@ export default function PruefungsComposer({ config, onZurueck }: Props) {
           onSchliessen={() => { setZeigFragenBrowser(false); setInitialEditFrageId(undefined) }}
           bereitsVerwendet={pruefung.abschnitte.flatMap((a) => a.fragenIds)}
           initialEditFrageId={initialEditFrageId}
+          zielPruefungTitel={pruefung.titel || 'Neue Prüfung'}
+          zielAbschnittTitel={pruefung.abschnitte[zielAbschnittIndex]?.titel}
         />
       )}
 
@@ -361,6 +352,11 @@ export default function PruefungsComposer({ config, onZurueck }: Props) {
           config={pruefung}
           onSchliessen={() => setZeigSuSVorschau(false)}
         />
+      )}
+
+      {/* Hilfe Overlay */}
+      {zeigHilfe && (
+        <HilfeSeite onSchliessen={() => setZeigHilfe(false)} />
       )}
 
       {/* Lösch-Bestätigungsdialog */}

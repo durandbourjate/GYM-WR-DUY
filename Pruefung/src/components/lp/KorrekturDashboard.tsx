@@ -8,7 +8,9 @@ import type { FragenStatistik } from '../../utils/korrekturUtils.ts'
 import type { NotenConfig } from '../../types/pruefung.ts'
 import { exportiereAlsCSV, downloadCSV } from '../../utils/exportUtils.ts'
 import { formatDatum } from '../../utils/zeit.ts'
-import ThemeToggle from '../ThemeToggle.tsx'
+import LPHeader from './LPHeader.tsx'
+import FragenBrowser from './FragenBrowser.tsx'
+import HilfeSeite from './HilfeSeite.tsx'
 import KorrekturSchuelerZeile from './KorrekturSchuelerZeile.tsx'
 
 interface Props {
@@ -19,7 +21,6 @@ type Sortierung = 'name' | 'punkte' | 'status'
 
 export default function KorrekturDashboard({ pruefungId }: Props) {
   const user = useAuthStore((s) => s.user)
-  const abmelden = useAuthStore((s) => s.abmelden)
 
   const [korrektur, setKorrektur] = useState<PruefungsKorrektur | null>(null)
   const [abgaben, setAbgaben] = useState<Record<string, SchuelerAbgabe>>({})
@@ -36,6 +37,8 @@ export default function KorrekturDashboard({ pruefungId }: Props) {
   const [notenConfigOffen, setNotenConfigOffen] = useState(false)
   const [notenConfig, setNotenConfig] = useState<NotenConfig>({ punkteFuerSechs: 0, rundung: 0.5 })
   const [korrekturFreigegeben, setKorrekturFreigegeben] = useState(false)
+  const [zeigFragenbank, setZeigFragenbank] = useState(false)
+  const [zeigHilfe, setZeigHilfe] = useState(false)
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   // Daten laden
@@ -265,61 +268,29 @@ export default function KorrekturDashboard({ pruefungId }: Props) {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
-      {/* Header */}
-      <header className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-6 py-3 sticky top-0 z-20">
-        <div className="max-w-5xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={zurueck}
-              className="px-3 py-1.5 text-sm text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors cursor-pointer"
-            >
-              ← Zurück
-            </button>
-            <div>
-              <h1 className="text-lg font-bold text-slate-800 dark:text-slate-100">
-                Korrektur: {korrektur?.pruefungTitel ?? pruefungId}
-              </h1>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                {korrektur?.klasse} · {korrektur?.datum ? formatDatum(korrektur.datum) : ''}
-                {korrektur && ` · ${korrektur.schueler.length} SuS`}
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            {/* Batch-Button / Fortschritt */}
+      <LPHeader
+        titel={`Korrektur: ${korrektur?.pruefungTitel ?? pruefungId}`}
+        untertitel={korrektur ? `${korrektur.klasse} · ${korrektur.datum ? formatDatum(korrektur.datum) : ''} · ${korrektur.schueler.length} SuS` : undefined}
+        zurueck={zurueck}
+        statusText={
+          (korrektur?.batchStatus === 'laeuft' || batchLaeuft)
+            ? `KI korrigiert... ${korrektur?.batchFortschritt ? `${korrektur.batchFortschritt.erledigt}/${korrektur.batchFortschritt.gesamt}` : ''}`
+          : korrektur?.batchStatus === 'fehler'
+            ? `Fehler: ${korrektur.batchFehler}`
+          : undefined
+        }
+        ansichtsButtons={
+          <>
             {korrektur?.batchStatus === 'idle' && (
-              <button
-                onClick={handleStarteKorrektur}
-                className="px-4 py-2 text-sm font-semibold text-white bg-slate-800 dark:bg-slate-200 dark:text-slate-800 rounded-lg hover:bg-slate-900 dark:hover:bg-slate-100 transition-colors cursor-pointer"
-              >
+              <button onClick={handleStarteKorrektur} className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer">
                 KI-Korrektur starten
               </button>
             )}
-            {(korrektur?.batchStatus === 'laeuft' || batchLaeuft) && (
-              <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
-                <div className="w-4 h-4 border-2 border-slate-200 dark:border-slate-600 border-t-slate-700 dark:border-t-slate-300 rounded-full animate-spin" />
-                KI korrigiert...
-                {korrektur?.batchFortschritt && (
-                  <span className="tabular-nums">
-                    {korrektur.batchFortschritt.erledigt}/{korrektur.batchFortschritt.gesamt}
-                  </span>
-                )}
-              </div>
-            )}
             {korrektur?.batchStatus === 'fertig' && (
-              <button
-                onClick={() => setFeedbackDialog(true)}
-                className="px-4 py-2 text-sm font-semibold text-white bg-slate-800 dark:bg-slate-200 dark:text-slate-800 rounded-lg hover:bg-slate-900 dark:hover:bg-slate-100 transition-colors cursor-pointer"
-              >
+              <button onClick={() => setFeedbackDialog(true)} className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer">
                 Feedback senden
               </button>
             )}
-            {korrektur?.batchStatus === 'fehler' && (
-              <span className="text-sm text-red-600 dark:text-red-400">
-                Fehler: {korrektur.batchFehler}
-              </span>
-            )}
-            {/* Korrektur freigeben / sperren */}
             {korrektur && (
               <button
                 type="button"
@@ -340,24 +311,17 @@ export default function KorrekturDashboard({ pruefungId }: Props) {
               </button>
             )}
             {korrektur && korrektur.schueler.length > 0 && (
-              <button
-                onClick={handleCSVExport}
-                className="px-3 py-1.5 text-sm text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors cursor-pointer"
-                title="Ergebnisse als CSV exportieren"
-              >
+              <button onClick={handleCSVExport} className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer" title="Ergebnisse als CSV exportieren">
                 CSV Export
               </button>
             )}
-            <button
-              onClick={abmelden}
-              className="text-xs text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 cursor-pointer"
-            >
-              Abmelden
-            </button>
-            <ThemeToggle />
-          </div>
-        </div>
-      </header>
+          </>
+        }
+        onFragenbank={() => { setZeigHilfe(false); setZeigFragenbank(!zeigFragenbank) }}
+        onHilfe={() => { setZeigFragenbank(false); setZeigHilfe(!zeigHilfe) }}
+        fragebankOffen={zeigFragenbank}
+        hilfeOffen={zeigHilfe}
+      />
 
       <main className="max-w-5xl mx-auto p-6">
         {/* Statistik-Leiste */}
@@ -642,6 +606,20 @@ export default function KorrekturDashboard({ pruefungId }: Props) {
             )}
           </div>
         </div>
+      )}
+
+      {/* Fragenbank Overlay */}
+      {zeigFragenbank && (
+        <FragenBrowser
+          onHinzufuegen={() => {}}
+          onSchliessen={() => setZeigFragenbank(false)}
+          bereitsVerwendet={[]}
+        />
+      )}
+
+      {/* Hilfe Overlay */}
+      {zeigHilfe && (
+        <HilfeSeite onSchliessen={() => setZeigHilfe(false)} />
       )}
     </div>
   )

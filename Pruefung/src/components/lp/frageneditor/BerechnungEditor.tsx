@@ -41,12 +41,12 @@ export default function BerechnungEditor({ ergebnisse, setErgebnisse, rechenwegE
           />
           Rechenweg erforderlich
         </label>
-        <div className="flex-1">
+        <div className="w-64">
           <input
             type="text"
             value={hilfsmittel}
             onChange={(e) => setHilfsmittel(e.target.value)}
-            placeholder="Erlaubte Hilfsmittel (z.B. Taschenrechner)"
+            placeholder="Erlaubte Hilfsmittel (z.B. TR)"
             className="input-field"
           />
         </div>
@@ -59,9 +59,9 @@ export default function BerechnungEditor({ ergebnisse, setErgebnisse, rechenwegE
         {/* Spalten-Header */}
         {ergebnisse.length > 0 && (
           <div className="flex gap-2 items-center text-xs text-slate-500 dark:text-slate-400">
-            <span className="flex-1 min-w-0">Bezeichnung</span>
-            <span className="w-20 text-center">Ergebnis</span>
-            <span className="w-20 text-center">±Toleranz</span>
+            <span className="w-48 shrink-0">Bezeichnung</span>
+            <span className="flex-1 min-w-0 text-center">Ergebnis</span>
+            <span className="flex-1 min-w-0 text-center">±Toleranz</span>
             <span className="w-16 text-center">Einheit</span>
             {ergebnisse.length > 1 && <span className="w-7" />}
           </div>
@@ -73,14 +73,14 @@ export default function BerechnungEditor({ ergebnisse, setErgebnisse, rechenwegE
               value={erg.label}
               onChange={(e) => updateErgebnis(i, { label: e.target.value })}
               placeholder="z.B. Gewinn"
-              className="input-field flex-1 min-w-0"
+              className="input-field w-48 shrink-0"
             />
             <input
               type="number"
               value={erg.korrekt}
               onChange={(e) => updateErgebnis(i, { korrekt: parseFloat(e.target.value) || 0 })}
               placeholder="Korrekt"
-              className="input-field w-20 text-center font-mono shrink-0"
+              className="input-field flex-1 min-w-0 text-center font-mono"
               title="Korrekte Antwort"
             />
             <input
@@ -88,7 +88,7 @@ export default function BerechnungEditor({ ergebnisse, setErgebnisse, rechenwegE
               value={erg.toleranz}
               onChange={(e) => updateErgebnis(i, { toleranz: parseFloat(e.target.value) || 0 })}
               placeholder="±Tol."
-              className="input-field w-20 text-center shrink-0"
+              className="input-field flex-1 min-w-0 text-center"
               title="Toleranz"
               min={0}
             />

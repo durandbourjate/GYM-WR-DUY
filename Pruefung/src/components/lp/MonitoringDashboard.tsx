@@ -6,7 +6,9 @@ import { demoFragen } from '../../data/demoFragen.ts'
 import type { MonitoringDaten, SchuelerStatus, PruefungsNachricht } from '../../types/monitoring.ts'
 import type { SchuelerAbgabe } from '../../types/korrektur.ts'
 import type { Frage } from '../../types/fragen.ts'
-import ThemeToggle from '../ThemeToggle.tsx'
+import LPHeader from './LPHeader.tsx'
+import FragenBrowser from './FragenBrowser.tsx'
+import HilfeSeite from './HilfeSeite.tsx'
 import SchuelerZeile from './SchuelerZeile.tsx'
 import { typLabel } from '../../utils/fachbereich.ts'
 
@@ -20,6 +22,8 @@ export default function MonitoringDashboard({ pruefungId }: { pruefungId: string
   const istDemoModus = useAuthStore((s) => s.istDemoModus)
 
   const [daten, setDaten] = useState<MonitoringDaten | null>(null)
+  const [zeigFragenbank, setZeigFragenbank] = useState(false)
+  const [zeigHilfe, setZeigHilfe] = useState(false)
   const [ladeStatus, setLadeStatus] = useState<'laden' | 'fertig' | 'fehler'>('laden')
   const [sortierung, setSortierung] = useState<Sortierung>('name')
   const [filter, setFilter] = useState<Filter>('alle')
@@ -227,32 +231,12 @@ export default function MonitoringDashboard({ pruefungId }: { pruefungId: string
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex flex-col">
-      {/* Header */}
-      <header className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-4 py-3 sticky top-0 z-20">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => { window.history.pushState({}, '', window.location.pathname); window.location.reload() }}
-              className="px-3 py-1.5 text-sm text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors cursor-pointer"
-            >
-              ← Zurück
-            </button>
-            <div>
-              <h1 className="text-lg font-bold text-slate-800 dark:text-slate-100">
-                Prüfungs-Monitoring
-              </h1>
-            <p className="text-sm text-slate-500 dark:text-slate-400">
-              {daten.pruefungTitel}
-              {istDemoModus && (
-                <span className="ml-2 px-1.5 py-0.5 text-xs bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 rounded">
-                  Demo
-                </span>
-              )}
-            </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            {/* Auto-Refresh Toggle */}
+      <LPHeader
+        titel="Prüfungs-Monitoring"
+        untertitel={`${daten.pruefungTitel}${istDemoModus ? ' (Demo)' : ''}`}
+        zurueck={() => { window.history.pushState({}, '', window.location.pathname); window.location.reload() }}
+        ansichtsButtons={
+          <>
             <button
               onClick={() => setAutoRefresh(!autoRefresh)}
               title={autoRefresh ? 'Auto-Refresh pausieren' : 'Auto-Refresh aktivieren'}
@@ -265,8 +249,6 @@ export default function MonitoringDashboard({ pruefungId }: { pruefungId: string
               <span className={`inline-block w-2 h-2 rounded-full ${autoRefresh ? 'bg-green-500 animate-pulse' : 'bg-slate-400'}`} />
               Live
             </button>
-
-            {/* Manueller Refresh */}
             <button
               onClick={ladeDaten}
               title="Jetzt aktualisieren"
@@ -274,26 +256,13 @@ export default function MonitoringDashboard({ pruefungId }: { pruefungId: string
             >
               ↻
             </button>
-
-            {/* User-Info + Abmelden */}
-            {user && (
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-slate-500 dark:text-slate-400 hidden sm:inline">
-                  {user.name}
-                </span>
-                <button
-                  onClick={abmelden}
-                  title="Abmelden"
-                  className="text-xs text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors cursor-pointer"
-                >
-                  Abmelden
-                </button>
-              </div>
-            )}
-            <ThemeToggle />
-          </div>
-        </div>
-      </header>
+          </>
+        }
+        onFragenbank={() => { setZeigHilfe(false); setZeigFragenbank(!zeigFragenbank) }}
+        onHilfe={() => { setZeigFragenbank(false); setZeigHilfe(!zeigHilfe) }}
+        fragebankOffen={zeigFragenbank}
+        hilfeOffen={zeigHilfe}
+      />
 
       {/* Zusammenfassung */}
       <div className="max-w-6xl mx-auto w-full px-4 py-4">
@@ -412,6 +381,20 @@ export default function MonitoringDashboard({ pruefungId }: { pruefungId: string
           {autoRefresh && ' · Auto-Refresh alle 5s'}
         </p>
       </div>
+
+      {/* Fragenbank Overlay */}
+      {zeigFragenbank && (
+        <FragenBrowser
+          onHinzufuegen={() => {}}
+          onSchliessen={() => setZeigFragenbank(false)}
+          bereitsVerwendet={[]}
+        />
+      )}
+
+      {/* Hilfe Overlay */}
+      {zeigHilfe && (
+        <HilfeSeite onSchliessen={() => setZeigHilfe(false)} />
+      )}
     </div>
   )
 }

@@ -5,7 +5,6 @@ import { apiService } from '../../services/apiService.ts'
 import { demoFragen } from '../../data/demoFragen.ts'
 import { fachbereichFarbe, typLabel } from '../../utils/fachbereich.ts'
 import type { Frage, Fachbereich, BloomStufe } from '../../types/fragen.ts'
-import ThemeToggle from '../ThemeToggle.tsx'
 import FragenEditor from './frageneditor/FragenEditor.tsx'
 import FragenImport from './FragenImport.tsx'
 
@@ -16,6 +15,10 @@ interface Props {
   bereitsVerwendet: string[]
   /** Wenn gesetzt, wird der Editor für diese Frage sofort geöffnet */
   initialEditFrageId?: string
+  /** Titel der Ziel-Prüfung (für die Ziel-Leiste) */
+  zielPruefungTitel?: string
+  /** Titel des Ziel-Abschnitts (für die Ziel-Leiste) */
+  zielAbschnittTitel?: string
 }
 
 type Sortierung = 'thema' | 'bloom' | 'punkte' | 'typ' | 'id'
@@ -24,7 +27,7 @@ type Gruppierung = 'keine' | 'fachbereich' | 'thema' | 'typ' | 'bloom'
 const SEITEN_GROESSE = 30
 
 /** Overlay-Panel zum Durchsuchen und Auswählen von Fragen aus der Fragenbank */
-export default function FragenBrowser({ onHinzufuegen, onEntfernen, onSchliessen, bereitsVerwendet, initialEditFrageId }: Props) {
+export default function FragenBrowser({ onHinzufuegen, onEntfernen, onSchliessen, bereitsVerwendet, initialEditFrageId, zielPruefungTitel, zielAbschnittTitel }: Props) {
   const user = useAuthStore((s) => s.user)
   const istDemoModus = useAuthStore((s) => s.istDemoModus)
 
@@ -39,7 +42,7 @@ export default function FragenBrowser({ onHinzufuegen, onEntfernen, onSchliessen
   }, [])
 
   // Resizable Panel
-  const [panelBreite, setPanelBreite] = useState(672)
+  const [panelBreite, setPanelBreite] = useState(1008)
 
   const handleZiehStart = useCallback((e: React.MouseEvent) => {
     e.preventDefault()
@@ -47,7 +50,7 @@ export default function FragenBrowser({ onHinzufuegen, onEntfernen, onSchliessen
     const startW = panelBreite
     function onMove(ev: MouseEvent) {
       const diff = startX - ev.clientX
-      setPanelBreite(Math.max(400, Math.min(startW + diff, window.innerWidth * 0.9)))
+      setPanelBreite(Math.max(600, Math.min(startW + diff, window.innerWidth * 0.9)))
     }
     function onUp() {
       document.removeEventListener('mousemove', onMove)
@@ -314,6 +317,20 @@ export default function FragenBrowser({ onHinzufuegen, onEntfernen, onSchliessen
             </div>
             <div className="flex items-center gap-2">
               <button
+                onClick={() => { setEditFrage(null); setZeigEditor(true) }}
+                className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors cursor-pointer"
+                title="Neue Frage erstellen"
+              >
+                + Neue Frage
+              </button>
+              <button
+                onClick={() => setZeigImport(true)}
+                className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors cursor-pointer"
+                title="Fragen via KI aus Text importieren"
+              >
+                Import via KI
+              </button>
+              <button
                 onClick={() => {
                   const json = JSON.stringify(gefilterteFragen, null, 2)
                   const blob = new Blob([json], { type: 'application/json' })
@@ -331,21 +348,6 @@ export default function FragenBrowser({ onHinzufuegen, onEntfernen, onSchliessen
                 Export
               </button>
               <button
-                onClick={() => setZeigImport(true)}
-                className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors cursor-pointer"
-                title="Fragen via KI aus Text importieren"
-              >
-                Import via KI
-              </button>
-              <button
-                onClick={() => { setEditFrage(null); setZeigEditor(true) }}
-                className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors cursor-pointer"
-                title="Neue Frage erstellen"
-              >
-                + Neue Frage
-              </button>
-              <ThemeToggle />
-              <button
                 onClick={onSchliessen}
                 className="w-8 h-8 text-lg text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors cursor-pointer"
               >
@@ -353,6 +355,14 @@ export default function FragenBrowser({ onHinzufuegen, onEntfernen, onSchliessen
               </button>
             </div>
           </div>
+
+          {/* Ziel-Leiste */}
+          {zielPruefungTitel && (
+            <div className="px-3 py-2 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg mb-3 text-sm text-green-700 dark:text-green-300">
+              Ziel: <strong>{zielPruefungTitel}</strong>
+              {zielAbschnittTitel && <> → {zielAbschnittTitel}</>}
+            </div>
+          )}
 
           {/* Suche */}
           <input
@@ -605,13 +615,26 @@ function KompaktZeile({ frage, istInPruefung, onToggle, onEdit, zeigeGruppierung
 }) {
   return (
     <div
-      onClick={onToggle}
+      onClick={onEdit}
       className={`flex items-center gap-2 px-5 py-1.5 text-sm border-b transition-colors cursor-pointer
         ${istInPruefung
-          ? 'border-l-4 border-l-blue-500 border-b-slate-100 dark:border-b-slate-700/50 bg-blue-50/50 dark:bg-blue-900/10'
+          ? 'border-l-4 border-l-green-500 border-b-slate-100 dark:border-b-slate-700/50 bg-green-50/50 dark:bg-green-900/10'
           : 'border-l-4 border-l-transparent border-b-slate-100 dark:border-b-slate-700/50 hover:bg-slate-50 dark:hover:bg-slate-700/30'
         }`}
     >
+      {/* +/– Button */}
+      <button
+        onClick={(e) => { e.stopPropagation(); onToggle() }}
+        className={`w-6 h-6 rounded-full text-sm font-bold flex items-center justify-center shrink-0 transition-colors cursor-pointer
+          ${istInPruefung
+            ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50'
+            : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'
+          }`}
+        title={istInPruefung ? 'Aus Prüfung entfernen' : 'Zur Prüfung hinzufügen'}
+      >
+        {istInPruefung ? '–' : '+'}
+      </button>
+
       {/* ID */}
       <span className="font-mono text-xs text-slate-500 dark:text-slate-400 w-28 truncate shrink-0">
         {frage.id}
@@ -640,19 +663,10 @@ function KompaktZeile({ frage, istInPruefung, onToggle, onEdit, zeigeGruppierung
       </span>
 
       {istInPruefung && (
-        <span className="text-[10px] px-1.5 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded shrink-0 font-medium">
+        <span className="text-[10px] px-1.5 py-0.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded shrink-0 font-medium">
           ✓ In Prüfung
         </span>
       )}
-
-      {/* Bearbeiten-Button */}
-      <button
-        onClick={(e) => { e.stopPropagation(); onEdit() }}
-        className="text-[10px] px-1.5 py-0.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-600 rounded transition-colors cursor-pointer shrink-0"
-        title="Frage bearbeiten"
-      >
-        ✎
-      </button>
     </div>
   )
 }
@@ -668,14 +682,26 @@ function DetailKarte({ frage, istInPruefung, onToggle, onEdit }: {
 
   return (
     <div
-      onClick={onToggle}
+      onClick={onEdit}
       className={`p-3 rounded-lg border transition-colors cursor-pointer
         ${istInPruefung
-          ? 'border-l-4 border-l-blue-500 border-slate-200 dark:border-slate-700 bg-blue-50/50 dark:bg-blue-900/10'
+          ? 'border-l-4 border-l-green-500 border-green-200 dark:border-green-800 bg-green-50/50 dark:bg-green-900/10'
           : 'border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50'
         }`}
     >
       <div className="flex items-start gap-3">
+        {/* +/– Button */}
+        <button
+          onClick={(e) => { e.stopPropagation(); onToggle() }}
+          className={`w-7 h-7 rounded-full text-sm font-bold flex items-center justify-center shrink-0 mt-0.5 transition-colors cursor-pointer
+            ${istInPruefung
+              ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50'
+              : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'
+            }`}
+          title={istInPruefung ? 'Aus Prüfung entfernen' : 'Zur Prüfung hinzufügen'}
+        >
+          {istInPruefung ? '–' : '+'}
+        </button>
         <div className="flex-1 min-w-0">
           {/* ID + Badges */}
           <div className="flex items-center gap-2 mb-1 flex-wrap">
@@ -692,18 +718,10 @@ function DetailKarte({ frage, istInPruefung, onToggle, onEdit }: {
               {frage.bloom} · {frage.punkte}P.
             </span>
             {istInPruefung && (
-              <span className="text-xs px-1.5 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded font-medium">
+              <span className="text-xs px-1.5 py-0.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded font-medium">
                 ✓ In Prüfung
               </span>
             )}
-            {/* Bearbeiten-Button */}
-            <button
-              onClick={(e) => { e.stopPropagation(); onEdit() }}
-              className="ml-auto text-xs px-2 py-0.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-600 rounded transition-colors cursor-pointer shrink-0"
-              title="Frage bearbeiten"
-            >
-              Bearbeiten
-            </button>
           </div>
 
           {/* Fragetext (gekürzt) */}

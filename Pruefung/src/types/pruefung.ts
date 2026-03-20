@@ -75,7 +75,7 @@ export interface NotenConfig {
 export interface PruefungsMaterial {
   id: string;
   titel: string;
-  typ: 'pdf' | 'text' | 'link' | 'dateiUpload';
+  typ: 'pdf' | 'text' | 'link' | 'dateiUpload' | 'videoEmbed';
   /** URL für PDF oder Link */
   url?: string;
   /** Inline-Inhalt für Typ 'text' */
@@ -84,6 +84,10 @@ export interface PruefungsMaterial {
   dateiname?: string;
   /** Drive File ID bei Typ 'dateiUpload' */
   driveFileId?: string;
+  /** MIME-Typ bei Datei-Upload (audio/*, video/*) */
+  mimeType?: string;
+  /** Embed-URL bei Typ 'videoEmbed' (YouTube, Vimeo, nanoo.tv) */
+  embedUrl?: string;
 }
 
 export interface PruefungsAbschnitt {
