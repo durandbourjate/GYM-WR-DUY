@@ -71,11 +71,11 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen }: Props)
     frage?.typ === 'mc' ? (frage as MCFrage).mehrfachauswahl : false
   )
 
-  // Freitext-spezifisch
-  const [laenge, setLaenge] = useState<'kurz' | 'mittel' | 'lang'>(
+  // Freitext-spezifisch (State beibehalten für Speicherung, UI-Editor entfernt)
+  const [laenge] = useState<'kurz' | 'mittel' | 'lang'>(
     frage?.typ === 'freitext' ? (frage as FreitextFrage).laenge : 'mittel'
   )
-  const [placeholder, setPlaceholder] = useState(
+  const [placeholder] = useState(
     frage?.typ === 'freitext' ? (frage as FreitextFrage).hilfstextPlaceholder ?? '' : ''
   )
 

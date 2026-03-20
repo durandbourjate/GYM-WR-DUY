@@ -6,7 +6,27 @@
 
 ## Aktueller Stand
 
-**Phase 5b: UI/UX-Verbesserungen** (20.03.2026) — Unified Header, Panel-UX, Materialien erweitert ✅
+**Phase 5c: UX-Fixes Runde 1+2** (20.03.2026) — Editor-Fixes, GF-Gefäss, Optionen-Randomisierung ✅
+
+### Letzte Änderungen (20.03.2026 Abend)
+
+**Runde 1** (Commit `4b45cd3`):
+- Prüfung löschen: Button im Composer + Bestätigungsdialog + Backend-Endpoint `loeschePruefung`
+- FragenEditor Breite auf 1008px angeglichen (wie FragenBrowser)
+- Fragen in AbschnitteTab klickbar (öffnet Editor, Bearbeiten-Button entfernt)
+- BewertungsrasterEditor: KI-Buttons auf Titel-Höhe, Vorlage-Controls als separate Zeile darunter
+
+**Runde 2** (Commit `ca0857a`):
+- ThemeToggle aus FragenEditor entfernt (duplizierte den Toggle in LPHeader)
+- Zuordnungs-Felder neu sortiert: Links Fachbereich/Thema/Unterthema/Tags, Rechts Bloom/Zeit/Punkte
+- GF (Grundlagenfach) als Gefäss hinzugefügt — in `Gefaess`-Typ, FragenEditor-Buttons, ConfigTab-Select
+- Neuer Toggle `zufallsreihenfolgeOptionen` in PruefungsConfig + ConfigTab (MC/SC/R-F Optionen mischen)
+- Freitext-Optionen (erwartete Länge) Sektion aus FragenEditor entfernt
+
+### Offene Punkte (noch nicht umgesetzt)
+- **Lernziele-Integration:** Eingabefeld, Datenbank, KI-basierte Fragen-/Musterlösungs-Generierung, Übungspool als Quelle
+- **Übungspool-Import:** Fragen aus bestehenden JS-Pools ins Prüfungstool importieren
+- **Wichtig nach Code-Änderungen:** `apps-script-code.js` muss in Apps Script Editor kopiert + neue Bereitstellung erstellt werden (für `loeschePruefung` Endpoint)
 
 ### Was funktioniert
 - **E2E-Flow getestet:** Login → Prüfung laden → Ausfüllen → Abgabe → Antwort-Datei in Google Drive ✅
