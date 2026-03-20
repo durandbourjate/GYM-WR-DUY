@@ -4,7 +4,7 @@ export interface PruefungsConfig {
 
   // Zuordnung
   klasse: string;
-  gefaess: 'SF' | 'EF' | 'EWR';
+  gefaess: 'SF' | 'EF' | 'EWR' | 'GF';
   semester: string;
   fachbereiche: string[];
   datum: string;
@@ -28,6 +28,7 @@ export interface PruefungsConfig {
 
   // Navigation & Darstellung
   zufallsreihenfolgeFragen: boolean;
+  zufallsreihenfolgeOptionen: boolean;
   ruecknavigation: boolean;
   zeitanzeigeTyp: 'countdown' | 'verstricheneZeit' | 'keine';
 

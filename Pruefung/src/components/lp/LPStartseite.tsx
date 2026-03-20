@@ -397,6 +397,7 @@ function demoConfigs(): PruefungsConfig[] {
         { titel: 'Teil D: Zuordnung', fragenIds: ['bwl-zu-001'] },
       ],
       zufallsreihenfolgeFragen: false,
+      zufallsreihenfolgeOptionen: false,
       ruecknavigation: true,
       zeitanzeigeTyp: 'countdown',
       autoSaveIntervallSekunden: 30,

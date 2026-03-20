@@ -70,12 +70,13 @@ export default function ConfigTab({ pruefung, updatePruefung, toggleFachbereich 
           <Field label="Gefäss">
             <select
               value={pruefung.gefaess}
-              onChange={(e) => updatePruefung({ gefaess: e.target.value as 'SF' | 'EF' | 'EWR' })}
+              onChange={(e) => updatePruefung({ gefaess: e.target.value as 'SF' | 'EF' | 'EWR' | 'GF' })}
               className="input-field"
             >
               <option value="SF">SF (Schwerpunktfach)</option>
               <option value="EF">EF (Ergänzungsfach)</option>
               <option value="EWR">EWR (Einführung W&R)</option>
+              <option value="GF">GF (Grundlagenfach)</option>
             </select>
           </Field>
 
@@ -178,6 +179,12 @@ export default function ConfigTab({ pruefung, updatePruefung, toggleFachbereich 
             beschreibung="Fragen innerhalb eines Abschnitts werden gemischt"
             aktiv={pruefung.zufallsreihenfolgeFragen}
             onChange={(v) => updatePruefung({ zufallsreihenfolgeFragen: v })}
+          />
+          <Toggle
+            label="Zufällige Optionen-Reihenfolge"
+            beschreibung="Antwortoptionen bei MC, Single Choice und R/F werden gemischt"
+            aktiv={pruefung.zufallsreihenfolgeOptionen}
+            onChange={(v) => updatePruefung({ zufallsreihenfolgeOptionen: v })}
           />
         </div>
 

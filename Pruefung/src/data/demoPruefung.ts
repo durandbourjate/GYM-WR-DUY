@@ -43,6 +43,7 @@ export const demoPruefung: PruefungsConfig = {
   ],
 
   zufallsreihenfolgeFragen: false,
+  zufallsreihenfolgeOptionen: false,
   ruecknavigation: true,
   zeitanzeigeTyp: 'countdown',
 

@@ -13,7 +13,6 @@ import type { FrageTyp } from './editorUtils.ts'
 import { generiereFrageId, parseLuecken } from './editorUtils.ts'
 import { Abschnitt, Feld } from './EditorBausteine.tsx'
 import MCEditor from './MCEditor.tsx'
-import FreitextEditor from './FreitextEditor.tsx'
 import LueckentextEditor from './LueckentextEditor.tsx'
 import ZuordnungEditor from './ZuordnungEditor.tsx'
 import RichtigFalschEditor from './RichtigFalschEditor.tsx'
@@ -24,7 +23,6 @@ import { useKIAssistent } from './KIAssistentPanel.tsx'
 import { InlineAktionButton, ErgebnisAnzeige } from './KIBausteine.tsx'
 import { berechneZeitbedarf } from '../../../utils/zeitbedarf.ts'
 import FormattierungsToolbar from './FormattierungsToolbar.tsx'
-import ThemeToggle from '../../ThemeToggle.tsx'
 
 
 
@@ -366,7 +364,6 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen }: Props)
             {frage ? 'Frage bearbeiten' : 'Neue Frage erstellen'}
           </h2>
           <div className="flex items-center gap-2">
-            <ThemeToggle />
             <button
               onClick={onAbbrechen}
               className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
@@ -505,14 +502,6 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen }: Props)
                 <input type="text" value={thema} onChange={(e) => setThema(e.target.value)}
                   placeholder="z.B. Marktgleichgewicht" className="input-field" />
               </Feld>
-              <Feld label="Unterthema">
-                <input type="text" value={unterthema} onChange={(e) => setUnterthema(e.target.value)}
-                  placeholder="z.B. Angebot & Nachfrage" className="input-field" />
-              </Feld>
-              <Feld label="Punkte *">
-                <input type="number" value={punkte} onChange={(e) => setPunkte(parseInt(e.target.value) || 0)}
-                  min={1} max={20} className="input-field" />
-              </Feld>
               <Feld label="Zeitbedarf (Min.)">
                 <input
                   type="number"
@@ -527,6 +516,14 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen }: Props)
                 <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">
                   {zeitbedarfManuell ? 'Manuell gesetzt' : 'Geschätzt (Typ + Taxonomie)'}
                 </p>
+              </Feld>
+              <Feld label="Unterthema">
+                <input type="text" value={unterthema} onChange={(e) => setUnterthema(e.target.value)}
+                  placeholder="z.B. Angebot & Nachfrage" className="input-field" />
+              </Feld>
+              <Feld label="Punkte *">
+                <input type="number" value={punkte} onChange={(e) => setPunkte(parseInt(e.target.value) || 0)}
+                  min={1} max={20} className="input-field" />
               </Feld>
               <Feld label="Tags (Komma-getrennt)">
                 <input type="text" value={tags} onChange={(e) => setTags(e.target.value)}
@@ -555,7 +552,7 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen }: Props)
               <div>
                 <label className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Gefäss</label>
                 <div className="flex gap-1">
-                  {(['SF', 'EF', 'EWR'] as Gefaess[]).map((g) => (
+                  {(['SF', 'EF', 'EWR', 'GF'] as Gefaess[]).map((g) => (
                     <button
                       key={g}
                       onClick={() => setGefaesse((prev) => prev.includes(g) ? prev.filter((x) => x !== g) : [...prev, g])}
@@ -742,14 +739,6 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen }: Props)
             </>
           )}
 
-          {typ === 'freitext' && (
-            <FreitextEditor
-              laenge={laenge}
-              setLaenge={setLaenge}
-              placeholder={placeholder}
-              setPlaceholder={setPlaceholder}
-            />
-          )}
 
           {typ === 'lueckentext' && (
             <>

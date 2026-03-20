@@ -38,6 +38,7 @@ const leerePruefung: PruefungsConfig = {
   sebErforderlich: false,
   abschnitte: [],
   zufallsreihenfolgeFragen: false,
+  zufallsreihenfolgeOptionen: false,
   ruecknavigation: true,
   zeitanzeigeTyp: 'countdown',
   autoSaveIntervallSekunden: 30,
