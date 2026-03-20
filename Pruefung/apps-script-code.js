@@ -16,6 +16,7 @@ const MATERIALIEN_ORDNER_ID = '1yBqm-9iKOcp8QptnISmwKaZGbR63mF5V';    // LP-Mate
 const SUS_UPLOADS_ORDNER_ID = '1pQdSujvdzTp5MAbBdJU3ipiaG3zstyu8';     // SuS-Uploads während Prüfung (im Antworten-Ordner)
 const LP_DOMAIN = 'gymhofwil.ch';
 const SUS_DOMAIN = 'stud.gymhofwil.ch';
+const LERNZIELE_TAB = 'Lernziele';
 
 // === WEB-APP ENDPOINTS ===
 
@@ -88,6 +89,12 @@ function doPost(e) {
       return ladeKorrekturenFuerSuSEndpoint(body);
     case 'ladeKorrekturDetail':
       return ladeKorrekturDetailEndpoint(body);
+    case 'importierePoolFragen':
+      return importierePoolFragen(body);
+    case 'importiereLernziele':
+      return importiereLernziele(body);
+    case 'ladeLernziele':
+      return ladeLernziele(body);
     default:
       return jsonResponse({ error: 'Unbekannte Aktion' });
   }
@@ -334,6 +341,13 @@ function parseFrage(row, fachbereich) {
     autor: row.autor || '',
     geteilt: row.geteilt || 'privat',
     geteiltVon: row.geteiltVon || '',
+    poolId: row.poolId || '',
+    poolGeprueft: row.poolGeprueft === 'true',
+    pruefungstauglich: row.pruefungstauglich === 'true',
+    poolContentHash: row.poolContentHash || '',
+    poolUpdateVerfuegbar: row.poolUpdateVerfuegbar === 'true',
+    poolVersion: safeJsonParse(row.poolVersion, undefined),
+    lernzielIds: (row.lernzielIds || '').split(',').filter(Boolean),
   };
 
   // Typ-spezifische Felder aus typDaten-Spalte laden (falls vorhanden)
@@ -782,6 +796,245 @@ function ladeMonitoring(pruefungId, email) {
 
 // === CLAUDE API ===
 
+// === POOL-IMPORT (Fragen aus Übungspools) ===
+
+function importierePoolFragen(body) {
+  try {
+    var email = body.email;
+    var fragen = body.fragen || [];
+
+    if (!email || !email.endsWith('@' + LP_DOMAIN)) {
+      return jsonResponse({ error: 'Nur für Lehrpersonen' });
+    }
+    if (!fragen.length) {
+      return jsonResponse({ error: 'Keine Fragen zum Importieren' });
+    }
+
+    var fragenbank = SpreadsheetApp.openById(FRAGENBANK_ID);
+    var importiert = 0;
+    var aktualisiert = 0;
+    var fehler = [];
+
+    // Standard-Headers für neue Tabs (gleiche Reihenfolge wie bestehende Tabs)
+    var standardHeaders = [
+      'id', 'typ', 'version', 'erstelltAm', 'geaendertAm',
+      'thema', 'unterthema', 'semester', 'gefaesse', 'bloom', 'tags',
+      'punkte', 'musterlosung', 'bewertungsraster', 'fragetext', 'quelle',
+      'anhaenge', 'typDaten', 'autor', 'geteilt', 'geteiltVon',
+      'poolId', 'poolGeprueft', 'pruefungstauglich', 'poolContentHash',
+      'poolUpdateVerfuegbar', 'poolVersion', 'lernzielIds'
+    ];
+
+    for (var i = 0; i < fragen.length; i++) {
+      var frage = fragen[i];
+      try {
+        var tabName = frage.fachbereich;
+        if (!tabName) {
+          fehler.push('Frage ' + (frage.id || i) + ': Kein Fachbereich');
+          continue;
+        }
+
+        var sheet = fragenbank.getSheetByName(tabName);
+        if (!sheet) {
+          // Neuen Tab erstellen mit Standard-Headers
+          sheet = fragenbank.insertSheet(tabName);
+          sheet.getRange(1, 1, 1, standardHeaders.length).setValues([standardHeaders]);
+          sheet.getRange(1, 1, 1, standardHeaders.length).setFontWeight('bold');
+        }
+
+        var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0].map(function(h) { return String(h).trim(); });
+        var data = getSheetData(sheet);
+
+        // Prüfe ob poolId bereits existiert
+        var existingIdx = -1;
+        for (var j = 0; j < data.length; j++) {
+          if (data[j].poolId === frage.poolId) {
+            existingIdx = j;
+            break;
+          }
+        }
+
+        if (existingIdx >= 0) {
+          // Nur Pool-Sync-Felder aktualisieren (Inhalt bleibt unverändert)
+          var rowIndex = existingIdx + 2;
+          var syncFelder = {
+            poolUpdateVerfuegbar: frage.poolUpdateVerfuegbar ? 'true' : 'false',
+            poolVersion: JSON.stringify(frage.poolVersion || {}),
+            poolGeprueft: frage.poolGeprueft ? 'true' : 'false',
+            poolContentHash: frage.poolContentHash || ''
+          };
+          for (var feld in syncFelder) {
+            var colIdx = headers.indexOf(feld);
+            if (colIdx >= 0) {
+              sheet.getRange(rowIndex, colIdx + 1).setValue(syncFelder[feld]);
+            }
+          }
+          aktualisiert++;
+        } else {
+          // Neue Frage: vollständige Zeile einfügen
+          var rowData = {
+            id: frage.id || Utilities.getUuid(),
+            typ: frage.typ || 'freitext',
+            version: String(frage.version || 1),
+            erstelltAm: frage.erstelltAm || new Date().toISOString(),
+            geaendertAm: new Date().toISOString(),
+            thema: frage.thema || '',
+            unterthema: frage.unterthema || '',
+            semester: (frage.semester || []).join(','),
+            gefaesse: (frage.gefaesse || []).join(','),
+            bloom: frage.bloom || 'K1',
+            tags: (frage.tags || []).join(','),
+            punkte: String(frage.punkte || 0),
+            musterlosung: frage.musterlosung || '',
+            bewertungsraster: JSON.stringify(frage.bewertungsraster || []),
+            fragetext: frage.fragetext || '',
+            quelle: frage.quelle || 'pool',
+            anhaenge: JSON.stringify(frage.anhaenge || []),
+            typDaten: JSON.stringify(getTypDaten(frage)),
+            autor: frage.autor || email,
+            geteilt: frage.geteilt || 'privat',
+            geteiltVon: frage.geteiltVon || '',
+            poolId: frage.poolId || '',
+            poolGeprueft: frage.poolGeprueft ? 'true' : 'false',
+            pruefungstauglich: frage.pruefungstauglich ? 'true' : 'false',
+            poolContentHash: frage.poolContentHash || '',
+            poolUpdateVerfuegbar: frage.poolUpdateVerfuegbar ? 'true' : 'false',
+            poolVersion: JSON.stringify(frage.poolVersion || {}),
+            lernzielIds: (frage.lernzielIds || []).join(',')
+          };
+
+          var newRow = headers.map(function(h) { return rowData[h] || ''; });
+          sheet.appendRow(newRow);
+          importiert++;
+        }
+      } catch (err) {
+        fehler.push('Frage ' + (frage.id || i) + ': ' + err.message);
+      }
+    }
+
+    return jsonResponse({ erfolg: true, importiert: importiert, aktualisiert: aktualisiert, fehler: fehler });
+  } catch (error) {
+    return jsonResponse({ error: error.message });
+  }
+}
+
+// === LERNZIELE (Pool-Brücke) ===
+
+function importiereLernziele(body) {
+  try {
+    var email = body.email;
+    var lernziele = body.lernziele || [];
+
+    if (!email || !email.endsWith('@' + LP_DOMAIN)) {
+      return jsonResponse({ error: 'Nur für Lehrpersonen' });
+    }
+    if (!lernziele.length) {
+      return jsonResponse({ error: 'Keine Lernziele zum Importieren' });
+    }
+
+    var fragenbank = SpreadsheetApp.openById(FRAGENBANK_ID);
+    var sheet = fragenbank.getSheetByName(LERNZIELE_TAB);
+
+    // Tab erstellen falls nicht vorhanden
+    var lernzielHeaders = ['id', 'fach', 'poolId', 'thema', 'text', 'bloom', 'aktiv'];
+    if (!sheet) {
+      sheet = fragenbank.insertSheet(LERNZIELE_TAB);
+      sheet.getRange(1, 1, 1, lernzielHeaders.length).setValues([lernzielHeaders]);
+      sheet.getRange(1, 1, 1, lernzielHeaders.length).setFontWeight('bold');
+    }
+
+    var data = getSheetData(sheet);
+    var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0].map(function(h) { return String(h).trim(); });
+    var neu = 0;
+    var aktualisiert = 0;
+
+    for (var i = 0; i < lernziele.length; i++) {
+      var lz = lernziele[i];
+      if (!lz.id) continue;
+
+      var rowData = {
+        id: lz.id,
+        fach: lz.fach || '',
+        poolId: lz.poolId || '',
+        thema: lz.thema || '',
+        text: lz.text || '',
+        bloom: lz.bloom || '',
+        aktiv: lz.aktiv !== false ? 'true' : 'false'
+      };
+
+      // Suche nach bestehender Zeile
+      var existingIdx = -1;
+      for (var j = 0; j < data.length; j++) {
+        if (data[j].id === lz.id) {
+          existingIdx = j;
+          break;
+        }
+      }
+
+      if (existingIdx >= 0) {
+        // Update bestehende Zeile
+        var rowIndex = existingIdx + 2;
+        headers.forEach(function(header, colIndex) {
+          if (rowData[header] !== undefined) {
+            sheet.getRange(rowIndex, colIndex + 1).setValue(rowData[header]);
+          }
+        });
+        aktualisiert++;
+      } else {
+        // Neue Zeile anhängen
+        var newRow = headers.map(function(h) { return rowData[h] || ''; });
+        sheet.appendRow(newRow);
+        // data-Array aktualisieren für spätere Duplikat-Erkennung im selben Batch
+        data.push(rowData);
+        neu++;
+      }
+    }
+
+    return jsonResponse({ erfolg: true, neu: neu, aktualisiert: aktualisiert });
+  } catch (error) {
+    return jsonResponse({ error: error.message });
+  }
+}
+
+function ladeLernziele(body) {
+  try {
+    var email = body.email;
+    var fachFilter = body.fach || '';
+
+    if (!email || !email.endsWith('@' + LP_DOMAIN)) {
+      return jsonResponse({ error: 'Nur für Lehrpersonen' });
+    }
+
+    var fragenbank = SpreadsheetApp.openById(FRAGENBANK_ID);
+    var sheet = fragenbank.getSheetByName(LERNZIELE_TAB);
+
+    if (!sheet) {
+      return jsonResponse({ lernziele: [] });
+    }
+
+    var data = getSheetData(sheet);
+    var lernziele = [];
+
+    for (var i = 0; i < data.length; i++) {
+      var row = data[i];
+      if (fachFilter && row.fach !== fachFilter) continue;
+      lernziele.push({
+        id: row.id,
+        fach: row.fach || '',
+        poolId: row.poolId || '',
+        thema: row.thema || '',
+        text: row.text || '',
+        bloom: row.bloom || '',
+        aktiv: row.aktiv !== 'false'
+      });
+    }
+
+    return jsonResponse({ lernziele: lernziele });
+  } catch (error) {
+    return jsonResponse({ error: error.message });
+  }
+}
+
 // === KI-ASSISTENT (Frageneditor) ===
 
 function kiAssistentEndpoint(body) {
@@ -1034,6 +1287,37 @@ function kiAssistentEndpoint(body) {
           '"zeitschaetzung": { "gesamt": 0, "proFrage": [{ "frageNr": 1, "minuten": 0 }, ...] }, ' +
           '"themenAbdeckung": "...", "schwierigkeitsBalance": "...", "verbesserungen": ["...", "..."] }';
         result = rufeClaudeAuf(systemPrompt, userPrompt, 2048);
+        return jsonResponse({ success: true, ergebnis: result });
+
+      case 'generiereFrageZuLernziel':
+        if (!daten.lernziel) return jsonResponse({ error: 'Lernziel fehlt' });
+        userPrompt = 'Generiere eine Prüfungsfrage für das Schweizer Gymnasium (Kanton Bern, Lehrplan 17).\n\n' +
+          'Lernziel:\n' + daten.lernziel + '\n\n' +
+          'Bloom-Stufe: ' + (daten.bloom || 'K2') + '\n' +
+          (daten.thema ? 'Thema: ' + daten.thema + '\n' : '') +
+          'Fragetyp: ' + (daten.fragetyp || 'freitext') + '\n\n' +
+          'Wichtig:\n' +
+          '- Verwende Schweizer Kontext (CHF, Schweizer Institutionen wie SNB, SECO, BFS)\n' +
+          '- Die Frage muss das Lernziel prüfen\n' +
+          '- Schwierigkeit passend zur Bloom-Stufe\n\n' +
+          'Antworte als JSON mit folgender Struktur:\n' +
+          '{\n' +
+          '  "fragetext": "...",\n' +
+          '  "musterlosung": "...",\n' +
+          '  "punkte": <Zahl>,\n' +
+          (daten.fragetyp === 'mc' ?
+            '  "optionen": [{ "text": "...", "korrekt": true/false }, ...]\n' :
+            daten.fragetyp === 'richtigfalsch' ?
+            '  "aussagen": [{ "text": "...", "korrekt": true/false, "erklaerung": "..." }, ...]\n' :
+            daten.fragetyp === 'zuordnung' ?
+            '  "paare": [{ "links": "...", "rechts": "..." }, ...]\n' :
+            daten.fragetyp === 'lueckentext' ?
+            '  "textMitLuecken": "Text mit {{1}}, {{2}} ...", "luecken": [{ "id": "1", "korrekteAntworten": ["..."] }, ...]\n' :
+            daten.fragetyp === 'berechnung' ?
+            '  "ergebnisse": [{ "label": "...", "korrekt": 0, "toleranz": 0, "einheit": "CHF" }], "rechenwegErforderlich": true\n' :
+            '') +
+          '}';
+        result = rufeClaudeAuf(systemPrompt, userPrompt, 1536);
         return jsonResponse({ success: true, ergebnis: result });
 
       default:
