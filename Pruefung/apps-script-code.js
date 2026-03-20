@@ -843,6 +843,19 @@ function importierePoolFragen(body) {
         }
 
         var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0].map(function(h) { return String(h).trim(); });
+
+        // Fehlende Pool-Spalten zu bestehendem Tab hinzufügen
+        var poolSpalten = ['poolId', 'poolGeprueft', 'pruefungstauglich', 'poolContentHash', 'poolUpdateVerfuegbar', 'poolVersion', 'lernzielIds'];
+        var spaltenHinzugefuegt = false;
+        for (var ps = 0; ps < poolSpalten.length; ps++) {
+          if (headers.indexOf(poolSpalten[ps]) === -1) {
+            var neueSpalte = headers.length + 1;
+            sheet.getRange(1, neueSpalte).setValue(poolSpalten[ps]).setFontWeight('bold');
+            headers.push(poolSpalten[ps]);
+            spaltenHinzugefuegt = true;
+          }
+        }
+
         var data = getSheetData(sheet);
 
         // Prüfe ob poolId bereits existiert
