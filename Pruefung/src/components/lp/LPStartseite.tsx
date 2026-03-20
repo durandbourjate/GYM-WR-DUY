@@ -2,11 +2,13 @@ import { useState, useEffect, useMemo } from 'react'
 import { useAuthStore } from '../../store/authStore.ts'
 import { apiService } from '../../services/apiService.ts'
 import type { PruefungsConfig } from '../../types/pruefung.ts'
+import type { Frage } from '../../types/fragen.ts'
 import { formatDatum } from '../../utils/zeit.ts'
 import LPHeader from './LPHeader.tsx'
 import PruefungsComposer from './PruefungsComposer.tsx'
 import FragenBrowser from './FragenBrowser.tsx'
 import HilfeSeite from './HilfeSeite.tsx'
+import PoolSyncDialog from './PoolSyncDialog.tsx'
 
 /** Startseite für Lehrpersonen: Prüfungen verwalten + erstellen */
 export default function LPStartseite() {
@@ -20,6 +22,8 @@ export default function LPStartseite() {
   const [editConfig, setEditConfig] = useState<PruefungsConfig | null>(null)
   const [zeigFragenbank, setZeigFragenbank] = useState(false)
   const [zeigHilfe, setZeigHilfe] = useState(false)
+  const [zeigSyncDialog, setZeigSyncDialog] = useState(false)
+  const [fragenbank, setFragenbank] = useState<Frage[]>([])
 
   // Such- und Filterstate
   const [suchtext, setSuchtext] = useState('')
@@ -121,6 +125,15 @@ export default function LPStartseite() {
     setAnsicht('composer')
   }
 
+  async function handleOeffneSyncDialog(): Promise<void> {
+    // Fragenbank laden damit Delta-Berechnung bestehende Pool-Fragen kennt
+    if (user && apiService.istKonfiguriert() && !istDemoModus && fragenbank.length === 0) {
+      const result = await apiService.ladeFragenbank(user.email)
+      if (result) setFragenbank(result)
+    }
+    setZeigSyncDialog(true)
+  }
+
   function handleZurueck(): void {
     setAnsicht('liste')
     // Configs neu laden
@@ -151,9 +164,18 @@ export default function LPStartseite() {
         titel="Prüfungsplattform"
         untertitel={user ? `${user.name} · Lehrperson` : undefined}
         ansichtsButtons={
-          <button onClick={handleNeue} className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer">
-            + Neue Prüfung
-          </button>
+          <>
+            <button onClick={handleNeue} className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer">
+              + Neue Prüfung
+            </button>
+            <button
+              onClick={handleOeffneSyncDialog}
+              title="Übungspools synchronisieren"
+              className="px-3 py-1.5 text-sm border border-slate-300 rounded hover:bg-slate-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+            >
+              ↻ Pools sync
+            </button>
+          </>
         }
         onFragenbank={() => { setZeigHilfe(false); setZeigFragenbank(!zeigFragenbank) }}
         onHilfe={() => { setZeigFragenbank(false); setZeigHilfe(!zeigHilfe) }}
@@ -322,6 +344,18 @@ export default function LPStartseite() {
       {zeigHilfe && (
         <HilfeSeite onSchliessen={() => setZeigHilfe(false)} />
       )}
+
+      {/* Pool-Sync Dialog */}
+      <PoolSyncDialog
+        offen={zeigSyncDialog}
+        onSchliessen={() => setZeigSyncDialog(false)}
+        bestehendeFragen={fragenbank}
+        onImportAbgeschlossen={() => {
+          setZeigSyncDialog(false)
+          // Fragenbank-Cache zurücksetzen damit nächste Sync-Sitzung aktualisierte Daten lädt
+          setFragenbank([])
+        }}
+      />
     </div>
   )
 }

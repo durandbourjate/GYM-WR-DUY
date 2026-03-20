@@ -220,6 +220,73 @@ export const apiService = {
     }
   },
 
+  /** Batch-Import von Pool-Fragen */
+  async importierePoolFragen(email: string, fragen: Frage[]): Promise<{ erfolg: boolean; importiert: number; aktualisiert: number; fehler: string[] } | null> {
+    if (!APPS_SCRIPT_URL) return null
+    try {
+      const payload = JSON.stringify({ action: 'importierePoolFragen', email, fragen })
+      const response = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: payload,
+      })
+      if (!response.ok) return null
+      const text = await response.text()
+      try {
+        const data = JSON.parse(text)
+        if (data.error) { console.error('[API] importierePoolFragen:', data.error); return null }
+        return data
+      } catch { return null }
+    } catch (error) {
+      console.error('[API] importierePoolFragen: Netzwerkfehler:', error)
+      return null
+    }
+  },
+
+  /** Batch-Import von Lernzielen */
+  async importiereLernziele(lernziele: import('../types/pool').Lernziel[]): Promise<{ erfolg: boolean; neu: number; aktualisiert: number } | null> {
+    if (!APPS_SCRIPT_URL) return null
+    try {
+      const payload = JSON.stringify({ action: 'importiereLernziele', lernziele })
+      const response = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: payload,
+      })
+      if (!response.ok) return null
+      const text = await response.text()
+      try {
+        const data = JSON.parse(text)
+        if (data.error) { console.error('[API] importiereLernziele:', data.error); return null }
+        return data
+      } catch { return null }
+    } catch (error) {
+      console.error('[API] importiereLernziele: Netzwerkfehler:', error)
+      return null
+    }
+  },
+
+  /** Lernziele laden (optional nach Fach gefiltert) */
+  async ladeLernziele(fach?: string): Promise<import('../types/pool').Lernziel[]> {
+    if (!APPS_SCRIPT_URL) return []
+    try {
+      const payload = JSON.stringify({ action: 'ladeLernziele', fach })
+      const response = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: payload,
+      })
+      if (!response.ok) return []
+      const text = await response.text()
+      try {
+        const data = JSON.parse(text)
+        return data?.lernziele || []
+      } catch { return [] }
+    } catch {
+      return []
+    }
+  },
+
   /** Einzelne Frage speichern (Fragenbank) */
   async speichereFrage(email: string, frage: Frage): Promise<boolean> {
     if (!APPS_SCRIPT_URL) return false
