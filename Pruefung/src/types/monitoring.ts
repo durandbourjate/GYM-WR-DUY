@@ -7,7 +7,7 @@ export interface SchuelerStatus {
   klasse?: string
 
   /** Aktuelle Aktivität */
-  status: 'aktiv' | 'inaktiv' | 'abgegeben' | 'nicht-gestartet'
+  status: 'aktiv' | 'inaktiv' | 'abgegeben' | 'nicht-gestartet' | 'beendet-lp'
 
   /** Zeitpunkt des letzten Heartbeats (ISO-String) */
   letzterHeartbeat: string | null
@@ -52,6 +52,13 @@ export interface MonitoringDaten {
   aktualisiert: string // ISO-Timestamp der letzten Datenaktualisierung
   schueler: SchuelerStatus[]
   zeitverlaengerungen?: Record<string, number> // E-Mail → zusätzliche Minuten (Nachteilsausgleich)
+}
+
+/** Antwort des Heartbeat-Endpoints (erweitert um Beenden-Signal) */
+export interface HeartbeatResponse {
+  success: boolean
+  beendetUm?: string        // ISO-Timestamp — LP hat Prüfung beendet
+  restzeitMinuten?: number   // Original-Restzeit (für Nachteilsausgleich)
 }
 
 /** Nachricht von LP an SuS während einer Prüfung */

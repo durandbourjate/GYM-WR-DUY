@@ -13,6 +13,7 @@ export const demoPruefung: PruefungsConfig = {
   typ: 'summativ',
   modus: 'pruefung',
   dauerMinuten: 45,
+  zeitModus: 'countdown',
   gesamtpunkte: 24,
 
   erlaubteKlasse: '28abcd WR',

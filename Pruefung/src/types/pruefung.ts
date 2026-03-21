@@ -13,6 +13,7 @@ export interface PruefungsConfig {
   typ: 'summativ' | 'formativ';
   modus: 'pruefung' | 'uebung';
   dauerMinuten: number;
+  zeitModus: 'countdown' | 'open-end';
   gesamtpunkte: number;
 
   // Authentifizierung

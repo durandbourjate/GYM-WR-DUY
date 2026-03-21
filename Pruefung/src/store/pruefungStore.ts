@@ -32,6 +32,10 @@ interface PruefungState {
   netzwerkFehler: number
   unterbrechungen: Unterbrechung[]
 
+  // LP-Beenden
+  beendetUm: string | null
+  restzeitMinuten: number | null
+
   // Actions
   setAntwort: (frageId: string, antwort: Antwort) => void
   toggleMarkierung: (frageId: string) => void
@@ -48,6 +52,7 @@ interface PruefungState {
   incrementHeartbeats: () => void
   incrementNetzwerkFehler: () => void
   addUnterbrechung: (unterbrechung: Unterbrechung) => void
+  setBeendetUm: (beendetUm: string, restzeitMinuten?: number) => void
   zuruecksetzen: () => void
 }
 
@@ -67,6 +72,8 @@ const initialState = {
   heartbeats: 0,
   netzwerkFehler: 0,
   unterbrechungen: [] as Unterbrechung[],
+  beendetUm: null,
+  restzeitMinuten: null,
 }
 
 export const usePruefungStore = create<PruefungState>()(
@@ -125,6 +132,8 @@ export const usePruefungStore = create<PruefungState>()(
           heartbeats: 0,
           netzwerkFehler: 0,
           unterbrechungen: [],
+          beendetUm: null,
+          restzeitMinuten: null,
         }),
 
       pruefungAbgeben: () =>
@@ -146,17 +155,25 @@ export const usePruefungStore = create<PruefungState>()(
       addUnterbrechung: (unterbrechung) =>
         set((state) => ({ unterbrechungen: [...state.unterbrechungen, unterbrechung] })),
 
+      setBeendetUm: (beendetUm, restzeitMinuten) =>
+        set({ beendetUm, restzeitMinuten: restzeitMinuten ?? null }),
+
       zuruecksetzen: () => set(initialState),
     }),
     {
       name: 'pruefung-state',
-      version: 2,
+      version: 3,
       migrate: (persisted, version) => {
+        const state = persisted as Record<string, unknown>
         if (version < 2) {
           // v1→v2: config und fragen nicht mehr persistieren (werden vom Backend geladen)
-          const state = persisted as Record<string, unknown>
           delete state.config
           delete state.fragen
+        }
+        if (version < 3) {
+          // v2→v3: LP-Beenden Felder
+          state.beendetUm = null
+          state.restzeitMinuten = null
         }
         return persisted as PruefungState
       },
@@ -173,6 +190,8 @@ export const usePruefungStore = create<PruefungState>()(
         heartbeats: state.heartbeats,
         netzwerkFehler: state.netzwerkFehler,
         unterbrechungen: state.unterbrechungen,
+        beendetUm: state.beendetUm,
+        restzeitMinuten: state.restzeitMinuten,
       }),
     }
   )

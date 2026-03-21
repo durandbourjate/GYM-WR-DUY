@@ -6,7 +6,45 @@
 
 ## Aktueller Stand
 
-**Phase 5g: FiBu UI-Fixes** (21.03.2026) — FiBu-Editor Design-Korrekturen ✅
+**Phase 5h: Open-End-Modus + LP-kontrolliertes Beenden** (21.03.2026) ✅
+
+### Session 21.03.2026 — Open-End & LP-Beenden
+
+#### Neues Feature: Open-End-Prüfungsmodus
+- **`zeitModus: 'countdown' | 'open-end'`** in PruefungsConfig — LP wählt im Composer
+- **Timer**: Open-End zeigt Stoppuhr aufwärts (+MM:SS), Countdown wie bisher
+- **Startbildschirm**: Zeigt "Open-End" / "Kein Zeitlimit" statt Minutenangabe
+- **ConfigTab**: Zeitmodus-Toggle, Dauer/Zeitanzeige nur bei Countdown sichtbar
+
+#### Neues Feature: LP-kontrolliertes Beenden
+- **BeendenDialog** (`src/components/lp/BeendenDialog.tsx`): Sofort oder mit Restzeit (1–60 Min.), global oder individuell
+- **MonitoringDashboard**: "Beenden"-Button im Header (nur wenn aktive/inaktive SuS vorhanden)
+- **SchuelerZeile**: "Beenden"-Button pro SuS (nur bei Status aktiv/inaktiv)
+- **Heartbeat-Erweiterung**: Response enthält `beendetUm` + `restzeitMinuten`, Client erkennt Signal
+- **Timer-Umschaltung**: Bei Restzeit-Modus wechselt Open-End-Stoppuhr zu Countdown
+- **Nachteilsausgleich**: Bei Restzeit-Modus bekommen SuS mit Zeitverlängerung zusätzliche Minuten
+- **Auto-Abgabe**: Wie bei Zeitablauf — localStorage + Remote-Speicherung
+- **Layout-Banner**: Gelbes Banner "LP hat Prüfung beendet — Restzeit läuft" + angepasster Dialog-Text
+
+#### Backend (Apps Script)
+- **`beendePruefungEndpoint`**: Setzt `beendetUm` in Configs-Sheet (global) oder Antworten-Sheet (individuell)
+- **Heartbeat**: Prüft individuelles → globales `beendetUm` und liefert es zurück
+- **Config-Mapping**: `zeitModus` Feld hinzugefügt
+- **Spalten-Migration**: `beendetUm` + `restzeitMinuten` Spalten werden automatisch angelegt
+- **Wichtig nach Push:** `apps-script-code.js` in Apps Script Editor kopieren + neue Bereitstellung
+
+#### Betroffene Dateien
+- Types: `pruefung.ts` (zeitModus), `monitoring.ts` (HeartbeatResponse, beendet-lp Status)
+- Utils: `zeit.ts` (berechneVerstricheneZeit, formatVerstricheneZeit)
+- Store: `pruefungStore.ts` (beendetUm, restzeitMinuten, Version 3 Migration)
+- Services: `apiService.ts` (heartbeat JSON-Response, beendePruefung Endpoint)
+- Hooks: `usePruefungsMonitoring.ts` (beendetUm-Erkennung)
+- Components: `Timer.tsx` (komplett überarbeitet), `Layout.tsx`, `Startbildschirm.tsx`
+- LP-Components: `BeendenDialog.tsx` (neu), `MonitoringDashboard.tsx`, `SchuelerZeile.tsx`, `ConfigTab.tsx`
+- Defaults: `PruefungsComposer.tsx`, `LPStartseite.tsx`, `demoPruefung.ts`
+- Backend: `apps-script-code.js`
+- Spec: `docs/superpowers/specs/2026-03-21-open-end-lp-beenden-design.md`
+- Plan: `docs/superpowers/plans/2026-03-21-open-end-lp-beenden.md`
 
 ### Session 21.03.2026 — FiBu UI-Fixes
 

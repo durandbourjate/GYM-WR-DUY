@@ -10,10 +10,11 @@ import LPHeader from './LPHeader.tsx'
 import FragenBrowser from './FragenBrowser.tsx'
 import HilfeSeite from './HilfeSeite.tsx'
 import SchuelerZeile from './SchuelerZeile.tsx'
+import BeendenDialog from './BeendenDialog.tsx'
 import { typLabel } from '../../utils/fachbereich.ts'
 
 type Sortierung = 'name' | 'status' | 'fortschritt' | 'unterbrechungen'
-type Filter = 'alle' | 'aktiv' | 'inaktiv' | 'abgegeben' | 'nicht-gestartet'
+type Filter = 'alle' | 'aktiv' | 'inaktiv' | 'abgegeben' | 'nicht-gestartet' | 'beendet-lp'
 type MonitoringAnsicht = 'sus' | 'fragen'
 
 export default function MonitoringDashboard({ pruefungId }: { pruefungId: string | null }) {
@@ -30,6 +31,7 @@ export default function MonitoringDashboard({ pruefungId }: { pruefungId: string
   const [aufgeklappteSchueler, setAufgeklappteSchueler] = useState<Set<string>>(new Set())
   const [autoRefresh, setAutoRefresh] = useState(true)
   const [ansicht, setAnsicht] = useState<MonitoringAnsicht>('sus')
+  const [zeigBeendenDialog, setZeigBeendenDialog] = useState(false)
 
   // Abgaben + Fragen (einmalig geladen, nicht bei jedem Refresh)
   const [abgaben, setAbgaben] = useState<Record<string, SchuelerAbgabe>>({})
@@ -153,7 +155,7 @@ export default function MonitoringDashboard({ pruefungId }: { pruefungId: string
         case 'name':
           return a.name.localeCompare(b.name, 'de')
         case 'status': {
-          const reihenfolge: Record<string, number> = { 'inaktiv': 0, 'aktiv': 1, 'nicht-gestartet': 2, 'abgegeben': 3 }
+          const reihenfolge: Record<string, number> = { 'inaktiv': 0, 'aktiv': 1, 'beendet-lp': 2, 'nicht-gestartet': 3, 'abgegeben': 4 }
           return (reihenfolge[a.status] ?? 4) - (reihenfolge[b.status] ?? 4)
         }
         case 'fortschritt':
@@ -256,6 +258,15 @@ export default function MonitoringDashboard({ pruefungId }: { pruefungId: string
             >
               ↻
             </button>
+            {zusammenfassung.aktiv + zusammenfassung.inaktiv > 0 && (
+              <button
+                onClick={() => setZeigBeendenDialog(true)}
+                title="Prüfung für alle beenden"
+                className="px-2.5 py-1.5 text-xs border border-red-300 dark:border-red-700 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors cursor-pointer"
+              >
+                Beenden
+              </button>
+            )}
           </>
         }
         onFragenbank={() => { setZeigHilfe(false); setZeigFragenbank(!zeigFragenbank) }}
@@ -381,6 +392,22 @@ export default function MonitoringDashboard({ pruefungId }: { pruefungId: string
           {autoRefresh && ' · Auto-Refresh alle 5s'}
         </p>
       </div>
+
+      {/* BeendenDialog */}
+      {zeigBeendenDialog && pruefungId && user && (
+        <BeendenDialog
+          pruefungId={pruefungId}
+          lpEmail={user.email}
+          anzahlAktiv={zusammenfassung.aktiv + zusammenfassung.inaktiv}
+          anzahlMitNachteilsausgleich={
+            daten.zeitverlaengerungen
+              ? Object.keys(daten.zeitverlaengerungen).length
+              : 0
+          }
+          onBeendet={() => { setZeigBeendenDialog(false); ladeDaten() }}
+          onAbbrechen={() => setZeigBeendenDialog(false)}
+        />
+      )}
 
       {/* Fragenbank Overlay */}
       {zeigFragenbank && (

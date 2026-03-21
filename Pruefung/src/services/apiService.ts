@@ -60,12 +60,11 @@ export const apiService = {
     }
   },
 
-  /** Heartbeat senden (Monitoring durch LP) */
-  async heartbeat(pruefungId: string, email: string): Promise<boolean> {
-    if (!APPS_SCRIPT_URL) return false
+  /** Heartbeat senden (Monitoring durch LP) — gibt Beenden-Signal zurück */
+  async heartbeat(pruefungId: string, email: string): Promise<import('../types/monitoring.ts').HeartbeatResponse> {
+    if (!APPS_SCRIPT_URL) return { success: false }
 
     try {
-      // text/plain vermeidet CORS-Preflight
       const response = await fetch(APPS_SCRIPT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain' },
@@ -76,9 +75,20 @@ export const apiService = {
           timestamp: new Date().toISOString(),
         }),
       })
-      return response.ok
+      if (!response.ok) return { success: false }
+
+      try {
+        const data = await response.json()
+        return {
+          success: data.success === true,
+          beendetUm: data.beendetUm || undefined,
+          restzeitMinuten: data.restzeitMinuten != null ? Number(data.restzeitMinuten) : undefined,
+        }
+      } catch {
+        return { success: response.ok }
+      }
     } catch {
-      return false
+      return { success: false }
     }
   },
 
@@ -571,6 +581,35 @@ export const apiService = {
       }
     } catch {
       return false
+    }
+  },
+
+  /** Prüfung beenden (LP) — sofort oder mit Restzeit, global oder einzeln */
+  async beendePruefung(payload: {
+    pruefungId: string
+    email: string
+    modus: 'sofort' | 'restzeit'
+    restzeitMinuten?: number
+    einzelneSuS?: string[]
+  }): Promise<{ success: boolean; beendetUm?: string; error?: string }> {
+    if (!APPS_SCRIPT_URL) return { success: false, error: 'nicht_konfiguriert' }
+
+    try {
+      const response = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({ action: 'beendePruefung', ...payload }),
+      })
+      if (!response.ok) return { success: false, error: 'netzwerk_fehler' }
+
+      const text = await response.text()
+      try {
+        return JSON.parse(text)
+      } catch {
+        return { success: false, error: 'json_parse_fehler' }
+      }
+    } catch {
+      return { success: false, error: 'netzwerk_fehler' }
     }
   },
 

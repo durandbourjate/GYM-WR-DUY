@@ -45,3 +45,20 @@ export function berechneRestzeit(startzeit: string, dauerMinuten: number): numbe
   const jetzt = Date.now()
   return Math.max(0, Math.floor((ende - jetzt) / 1000))
 }
+
+/** Berechnet verstrichene Sekunden seit Startzeit */
+export function berechneVerstricheneZeit(startzeit: string): number {
+  const start = new Date(startzeit).getTime()
+  return Math.max(0, Math.floor((Date.now() - start) / 1000))
+}
+
+/** Formatiert Sekunden als H:MM:SS (wenn >= 1h) oder MM:SS */
+export function formatVerstricheneZeit(sekunden: number): string {
+  const h = Math.floor(sekunden / 3600)
+  const m = Math.floor((sekunden % 3600) / 60)
+  const s = sekunden % 60
+  if (h > 0) {
+    return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
+  }
+  return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
+}

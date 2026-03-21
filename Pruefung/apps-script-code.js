@@ -97,6 +97,8 @@ function doPost(e) {
       return ladeLernziele(body);
     case 'schreibePoolAenderung':
       return schreibePoolAenderung(body);
+    case 'beendePruefung':
+      return beendePruefungEndpoint(body);
     default:
       return jsonResponse({ error: 'Unbekannte Aktion' });
   }
@@ -532,11 +534,143 @@ function heartbeat(body) {
         const current = Number(sheet.getRange(rowIndex, countCol + 1).getValue()) || 0;
         sheet.getRange(rowIndex, countCol + 1).setValue(current + 1);
       }
+
+      // Beenden-Signal prüfen (individuell → global)
+      var beendetUm = null;
+      var restzeitMinutenWert = null;
+
+      // 1. Individuell (aus Antworten-Sheet)
+      const beendetUmColIdx = headers.indexOf('beendetUm');
+      if (beendetUmColIdx >= 0) {
+        const val = sheet.getRange(rowIndex, beendetUmColIdx + 1).getValue();
+        if (val) {
+          beendetUm = val;
+          const rzmColIdx = headers.indexOf('restzeitMinuten');
+          if (rzmColIdx >= 0) {
+            restzeitMinutenWert = sheet.getRange(rowIndex, rzmColIdx + 1).getValue() || null;
+          }
+        }
+      }
+
+      // 2. Global (aus Configs-Sheet) falls kein individuelles
+      if (!beendetUm) {
+        const ss = SpreadsheetApp.getActiveSpreadsheet();
+        const configSheet = ss.getSheetByName('Configs');
+        if (configSheet) {
+          const configHeaders = configSheet.getRange(1, 1, 1, configSheet.getLastColumn()).getValues()[0];
+          const configBeendetCol = configHeaders.indexOf('beendetUm');
+          if (configBeendetCol >= 0) {
+            const configData = configSheet.getDataRange().getValues();
+            const configIdCol = configHeaders.indexOf('id');
+            for (var i = 1; i < configData.length; i++) {
+              if (configData[i][configIdCol] === pruefungId) {
+                if (configData[i][configBeendetCol]) {
+                  beendetUm = configData[i][configBeendetCol];
+                  const configRzmCol = configHeaders.indexOf('restzeitMinuten');
+                  if (configRzmCol >= 0) {
+                    restzeitMinutenWert = configData[i][configRzmCol] || null;
+                  }
+                }
+                break;
+              }
+            }
+          }
+        }
+      }
+
+      return jsonResponse({
+        success: true,
+        ...(beendetUm ? { beendetUm: beendetUm, restzeitMinuten: restzeitMinutenWert } : {})
+      });
     }
 
     return jsonResponse({ success: true });
   } catch (error) {
     return jsonResponse({ error: error.message });
+  }
+}
+
+// === PRÜFUNG BEENDEN (LP-kontrolliert) ===
+
+function beendePruefungEndpoint(body) {
+  try {
+    const { pruefungId, email, modus, restzeitMinuten, einzelneSuS } = body;
+
+    // Auth: nur LP
+    if (!email || !email.endsWith('@' + LP_DOMAIN)) {
+      return jsonResponse({ success: false, error: 'nicht_autorisiert' });
+    }
+
+    const beendetUm = modus === 'restzeit'
+      ? new Date(Date.now() + (restzeitMinuten || 5) * 60000).toISOString()
+      : new Date().toISOString();
+
+    if (einzelneSuS && einzelneSuS.length > 0) {
+      // Individuelles Beenden: in Antworten-Sheet pro SuS
+      const sheetName = 'Antworten_' + pruefungId;
+      const ss = SpreadsheetApp.getActiveSpreadsheet();
+      const sheet = ss.getSheetByName(sheetName);
+      if (!sheet) return jsonResponse({ success: false, error: 'pruefung_nicht_gefunden' });
+
+      // Spalten-Migration: beendetUm + restzeitMinuten hinzufügen falls fehlend
+      var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+      var beendetUmCol = headers.indexOf('beendetUm') + 1;
+      var restzeitCol = headers.indexOf('restzeitMinuten') + 1;
+      if (beendetUmCol === 0) {
+        beendetUmCol = headers.length + 1;
+        sheet.getRange(1, beendetUmCol).setValue('beendetUm');
+      }
+      if (restzeitCol === 0) {
+        restzeitCol = (beendetUmCol === headers.length + 1 ? headers.length + 2 : headers.length + 1);
+        sheet.getRange(1, restzeitCol).setValue('restzeitMinuten');
+      }
+
+      var emailCol = headers.indexOf('email') + 1;
+      var data = sheet.getDataRange().getValues();
+      for (var i = 1; i < data.length; i++) {
+        if (einzelneSuS.includes(data[i][emailCol - 1])) {
+          sheet.getRange(i + 1, beendetUmCol).setValue(beendetUm);
+          if (modus === 'restzeit') {
+            sheet.getRange(i + 1, restzeitCol).setValue(restzeitMinuten);
+          }
+        }
+      }
+    } else {
+      // Globales Beenden: in Configs-Sheet
+      var ss = SpreadsheetApp.getActiveSpreadsheet();
+      var configSheet = ss.getSheetByName('Configs');
+      if (!configSheet) return jsonResponse({ success: false, error: 'configs_nicht_gefunden' });
+
+      var headers = configSheet.getRange(1, 1, 1, configSheet.getLastColumn()).getValues()[0];
+      var idCol = headers.indexOf('id') + 1;
+
+      // Spalten-Migration
+      var beendetUmCol = headers.indexOf('beendetUm') + 1;
+      var restzeitCol = headers.indexOf('restzeitMinuten') + 1;
+      if (beendetUmCol === 0) {
+        beendetUmCol = headers.length + 1;
+        configSheet.getRange(1, beendetUmCol).setValue('beendetUm');
+      }
+      if (restzeitCol === 0) {
+        restzeitCol = (beendetUmCol === headers.length + 1 ? headers.length + 2 : headers.length + 1);
+        configSheet.getRange(1, restzeitCol).setValue('restzeitMinuten');
+      }
+
+      var data = configSheet.getDataRange().getValues();
+      for (var i = 1; i < data.length; i++) {
+        if (data[i][idCol - 1] === pruefungId) {
+          configSheet.getRange(i + 1, beendetUmCol).setValue(beendetUm);
+          if (modus === 'restzeit') {
+            configSheet.getRange(i + 1, restzeitCol).setValue(restzeitMinuten);
+          }
+          break;
+        }
+      }
+    }
+
+    return jsonResponse({ success: true, beendetUm: beendetUm });
+  } catch (error) {
+    return jsonResponse({ success: false, error: error.message });
   }
 }
 
@@ -666,6 +800,7 @@ function ladeAlleConfigs(email) {
       typ: row.typ,
       modus: row.modus || 'pruefung',
       dauerMinuten: Number(row.dauerMinuten),
+      zeitModus: row.zeitModus || 'countdown',
       gesamtpunkte: Number(row.gesamtpunkte),
       erlaubteKlasse: row.erlaubteKlasse,
       sebErforderlich: row.sebErforderlich === 'true',

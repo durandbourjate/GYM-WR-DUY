@@ -43,6 +43,8 @@ export default function Layout() {
   const [materialModus, setMaterialModus] = useState<'aus' | MaterialModus>('aus')
   const [tabKonfliktGeschlossen, setTabKonfliktGeschlossen] = useState(false)
   const [zeitAbgelaufen, setZeitAbgelaufen] = useState(false)
+  const beendetUm = usePruefungStore((s) => s.beendetUm)
+  const restzeitMinuten = usePruefungStore((s) => s.restzeitMinuten)
 
   // Tab-Konflikterkennung
   const tabKonflikt = useTabKonflikt(config?.id ?? null)
@@ -371,6 +373,15 @@ export default function Layout() {
         )}
       </div>
 
+      {/* Beenden-Banner (LP hat Prüfung beendet, SuS hat noch Restzeit) */}
+      {beendetUm && !abgegeben && restzeitMinuten && restzeitMinuten > 0 && (
+        <div className="bg-amber-50 dark:bg-amber-900/30 border-b border-amber-300 dark:border-amber-700 px-4 py-2 text-center">
+          <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
+            Die Lehrperson hat die Prüfung beendet. Du hast noch {restzeitMinuten} Minuten Zeit zum Abschliessen.
+          </p>
+        </div>
+      )}
+
       {/* Zeitablauf-Dialog (prominent, zentriert — wie AbgabeDialog-Erfolg) */}
       {zeitAbgelaufen && abgegeben && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -381,10 +392,12 @@ export default function Layout() {
               </svg>
             </div>
             <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-2">
-              Zeit abgelaufen
+              {beendetUm ? 'Prüfung beendet' : 'Zeit abgelaufen'}
             </h2>
             <p className="text-slate-600 dark:text-slate-300 mb-1">
-              Ihre Prüfung wurde automatisch abgegeben.
+              {beendetUm
+                ? 'Die Lehrperson hat die Prüfung beendet. Ihre Antworten wurden automatisch abgegeben.'
+                : 'Ihre Prüfung wurde automatisch abgegeben.'}
             </p>
             <p className="text-sm text-slate-400 dark:text-slate-500">
               Alle Antworten wurden gespeichert. Sie können das Fenster schliessen.

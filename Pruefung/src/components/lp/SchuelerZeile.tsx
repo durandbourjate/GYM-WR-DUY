@@ -3,6 +3,7 @@ import type { SchuelerStatus, PruefungsNachricht } from '../../types/monitoring.
 import type { Antwort } from '../../types/antworten.ts'
 import type { Frage } from '../../types/fragen.ts'
 import { apiService } from '../../services/apiService.ts'
+import BeendenDialog from './BeendenDialog.tsx'
 
 interface Props {
   schueler: SchuelerStatus
@@ -18,6 +19,8 @@ interface Props {
 }
 
 export default function SchuelerZeile({ schueler, aufgeklappt, onToggle, zeitverlaengerung, antworten, fragen, pruefungId, lpEmail, nachrichten, onNachrichtGesendet }: Props) {
+  const [zeigBeendenDialog, setZeigBeendenDialog] = useState(false)
+
   const fortschrittProzent = schueler.gesamtFragen > 0
     ? Math.round((schueler.beantworteteFragen / schueler.gesamtFragen) * 100)
     : 0
@@ -44,6 +47,15 @@ export default function SchuelerZeile({ schueler, aufgeklappt, onToggle, zeitver
             >
               +{zeitverlaengerung} Min.
             </span>
+          )}
+          {pruefungId && lpEmail && (schueler.status === 'aktiv' || schueler.status === 'inaktiv') && (
+            <button
+              onClick={(e) => { e.stopPropagation(); setZeigBeendenDialog(true) }}
+              className="text-xs px-1.5 py-0.5 border border-red-300 dark:border-red-700 text-red-600 dark:text-red-400 rounded hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors cursor-pointer"
+              title="Prüfung für diesen SuS beenden"
+            >
+              Beenden
+            </button>
           )}
           {hatProbleme && (
             <span className="text-amber-500 text-xs" title="Hat Unterbrechungen oder Netzwerkfehler">⚠</span>
@@ -161,6 +173,17 @@ export default function SchuelerZeile({ schueler, aufgeklappt, onToggle, zeitver
             />
           )}
         </div>
+      )}
+
+      {/* BeendenDialog für einzelnen SuS */}
+      {zeigBeendenDialog && pruefungId && lpEmail && (
+        <BeendenDialog
+          pruefungId={pruefungId}
+          lpEmail={lpEmail}
+          einzelnerSuS={{ email: schueler.email, name: schueler.name }}
+          onBeendet={() => { setZeigBeendenDialog(false); onNachrichtGesendet?.() }}
+          onAbbrechen={() => setZeigBeendenDialog(false)}
+        />
       )}
     </div>
   )
@@ -358,6 +381,7 @@ function StatusPunkt({ status }: { status: SchuelerStatus['status'] }) {
     'inaktiv': 'bg-amber-500',
     'abgegeben': 'bg-slate-400 dark:bg-slate-500',
     'nicht-gestartet': 'bg-gray-300 dark:bg-gray-600',
+    'beendet-lp': 'bg-red-400 dark:bg-red-500',
   }
 
   return (
@@ -386,6 +410,10 @@ function StatusBadge({ status }: { status: SchuelerStatus['status'] }) {
     'nicht-gestartet': {
       label: 'Nicht gestartet',
       klasse: 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400',
+    },
+    'beendet-lp': {
+      label: 'Beendet (LP)',
+      klasse: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300',
     },
   }
 

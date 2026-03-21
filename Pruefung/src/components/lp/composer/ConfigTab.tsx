@@ -124,7 +124,33 @@ export default function ConfigTab({ pruefung, updatePruefung, toggleFachbereich 
 
       {/* Prüfungsparameter */}
       <Section titel="Prüfungsparameter">
+        {/* Zeitmodus */}
+        <div className="mb-4">
+          <label className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1.5">Zeitmodus</label>
+          <div className="flex gap-1">
+            {(['countdown', 'open-end'] as const).map((m) => (
+              <button
+                key={m}
+                onClick={() => updatePruefung({ zeitModus: m })}
+                className={`flex-1 px-3 py-2 text-sm font-medium rounded-lg transition-colors cursor-pointer
+                  ${(pruefung.zeitModus ?? 'countdown') === m
+                    ? 'bg-slate-800 dark:bg-slate-200 text-white dark:text-slate-800'
+                    : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'
+                  }`}
+              >
+                {m === 'countdown' ? 'Countdown' : 'Open-End'}
+              </button>
+            ))}
+          </div>
+          {(pruefung.zeitModus ?? 'countdown') === 'open-end' && (
+            <p className="mt-1.5 text-xs text-slate-500 dark:text-slate-400">
+              Kein Zeitlimit. Beenden Sie die Prüfung manuell im Monitoring.
+            </p>
+          )}
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {(pruefung.zeitModus ?? 'countdown') !== 'open-end' && (
           <Field label="Dauer (Minuten)">
             <input
               type="number"
@@ -135,6 +161,7 @@ export default function ConfigTab({ pruefung, updatePruefung, toggleFachbereich 
               className="input-field"
             />
           </Field>
+          )}
 
           <Field label="Typ">
             <select
@@ -188,6 +215,7 @@ export default function ConfigTab({ pruefung, updatePruefung, toggleFachbereich 
           />
         </div>
 
+        {(pruefung.zeitModus ?? 'countdown') !== 'open-end' && (
         <div className="mt-4">
           <Field label="Zeitanzeige">
             <select
@@ -201,6 +229,7 @@ export default function ConfigTab({ pruefung, updatePruefung, toggleFachbereich 
             </select>
           </Field>
         </div>
+        )}
       </Section>
 
       {/* Zeitzuschläge (Nachteilsausgleich) */}

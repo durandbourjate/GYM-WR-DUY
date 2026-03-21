@@ -3,7 +3,7 @@ import { usePruefungStore } from '../store/pruefungStore.ts'
 import { useAuthStore } from '../store/authStore.ts'
 import { apiService } from '../services/apiService.ts'
 import { sebVersion, browserInfo } from '../services/sebService.ts'
-import { berechneRestzeit, formatZeit } from '../utils/zeit.ts'
+import { berechneRestzeit, formatZeit, berechneVerstricheneZeit, formatVerstricheneZeit } from '../utils/zeit.ts'
 
 interface Props {
   onZeitAbgelaufen?: () => void
@@ -19,14 +19,16 @@ export default function Timer({ onZeitAbgelaufen }: Props) {
   const netzwerkFehler = usePruefungStore((s) => s.netzwerkFehler)
   const unterbrechungen = usePruefungStore((s) => s.unterbrechungen)
   const pruefungAbgeben = usePruefungStore((s) => s.pruefungAbgeben)
+  const beendetUm = usePruefungStore((s) => s.beendetUm)
+  const restzeitMinuten = usePruefungStore((s) => s.restzeitMinuten)
 
   const user = useAuthStore((s) => s.user)
   const istDemoModus = useAuthStore((s) => s.istDemoModus)
 
-  const [restSekunden, setRestSekunden] = useState<number | null>(null)
+  const [anzeigeSekunden, setAnzeigeSekunden] = useState<number | null>(null)
   const abgegebenRef = useRef(false)
 
-  // Refs fuer stale-closure Schutz im Interval
+  // Refs für stale-closure Schutz im Interval
   const antwortenRef = useRef(antworten)
   antwortenRef.current = antworten
   const autoSaveCountRef = useRef(autoSaveCount)
@@ -38,76 +40,116 @@ export default function Timer({ onZeitAbgelaufen }: Props) {
   const unterbrechungenRef = useRef(unterbrechungen)
   unterbrechungenRef.current = unterbrechungen
 
-  // Individuelle Zeitverlängerung (Nachteilsausgleich)
+  const zeitModus = config?.zeitModus ?? 'countdown'
   const zusatzMinuten = Number((user?.email && config?.zeitverlaengerungen?.[user.email]) ?? 0)
-  const effektiveDauer = (config?.dauerMinuten ?? 0) + zusatzMinuten
+
+  // Effektives Beenden-Datum (mit Nachteilsausgleich bei Restzeit)
+  const effektivBeendetUm = (() => {
+    if (!beendetUm) return null
+    const ts = new Date(beendetUm).getTime()
+    // Nachteilsausgleich nur bei Restzeit-Modus (restzeitMinuten vorhanden)
+    if (restzeitMinuten != null && zusatzMinuten > 0) {
+      return new Date(ts + zusatzMinuten * 60000).toISOString()
+    }
+    return beendetUm
+  })()
+
+  // Auto-Abgabe Logik (shared zwischen Countdown und Beenden)
+  function autoAbgabe(): void {
+    if (abgegebenRef.current) return
+    abgegebenRef.current = true
+    pruefungAbgeben()
+    onZeitAbgelaufen?.()
+
+    try {
+      const abgabeObjekt = {
+        pruefungId: config!.id,
+        email: user?.email ?? '',
+        name: user?.name ?? 'Unbekannt',
+        startzeit,
+        abgabezeit: new Date().toISOString(),
+        antworten: antwortenRef.current,
+        meta: {
+          sebVersion: sebVersion(),
+          browserInfo: browserInfo(),
+          autoSaveCount: autoSaveCountRef.current,
+          netzwerkFehler: netzwerkFehlerRef.current,
+          heartbeats: heartbeatsRef.current,
+          unterbrechungen: unterbrechungenRef.current,
+          autoAbgabe: true,
+        },
+      }
+      localStorage.setItem(`pruefung-abgabe-${config!.id}`, JSON.stringify(abgabeObjekt))
+    } catch {
+      // ignorieren
+    }
+
+    if (apiService.istKonfiguriert() && !istDemoModus && user?.email) {
+      apiService.speichereAntworten({
+        pruefungId: config!.id,
+        email: user.email,
+        antworten: antwortenRef.current,
+        version: -1,
+        istAbgabe: true,
+      })
+    }
+  }
 
   useEffect(() => {
     if (!config || !startzeit || abgegeben) return
 
+    const effektiveDauer = (config.dauerMinuten ?? 0) + zusatzMinuten
+    const istOpenEnd = zeitModus === 'open-end'
+
     const update = () => {
+      // Fall 1: LP hat Beenden mit Restzeit ausgelöst → Countdown bis effektivBeendetUm
+      if (effektivBeendetUm) {
+        const beendetTs = new Date(effektivBeendetUm).getTime()
+        const restSek = Math.max(0, Math.floor((beendetTs - Date.now()) / 1000))
+        setAnzeigeSekunden(restSek)
+        if (restSek <= 0) {
+          autoAbgabe()
+        }
+        return
+      }
+
+      // Fall 2: Open-End ohne Beenden → Stoppuhr aufwärts
+      if (istOpenEnd) {
+        setAnzeigeSekunden(berechneVerstricheneZeit(startzeit))
+        return
+      }
+
+      // Fall 3: Countdown (Standard)
       const rest = berechneRestzeit(startzeit, effektiveDauer)
-      setRestSekunden(rest)
-      if (rest <= 0 && !abgegebenRef.current) {
-        abgegebenRef.current = true
-
-        // Lokal abgeben
-        pruefungAbgeben()
-
-        // Callback für Banner-Anzeige
-        onZeitAbgelaufen?.()
-
-        // Abgabe-Daten in localStorage sichern (Refs fuer aktuellen Stand)
-        try {
-          const abgabeObjekt = {
-            pruefungId: config.id,
-            email: user?.email ?? '',
-            name: user?.name ?? 'Unbekannt',
-            startzeit,
-            abgabezeit: new Date().toISOString(),
-            antworten: antwortenRef.current,
-            meta: {
-              sebVersion: sebVersion(),
-              browserInfo: browserInfo(),
-              autoSaveCount: autoSaveCountRef.current,
-              netzwerkFehler: netzwerkFehlerRef.current,
-              heartbeats: heartbeatsRef.current,
-              unterbrechungen: unterbrechungenRef.current,
-              autoAbgabe: true,
-            },
-          }
-          localStorage.setItem(`pruefung-abgabe-${config.id}`, JSON.stringify(abgabeObjekt))
-        } catch {
-          // ignorieren
-        }
-
-        // Remote senden (fire-and-forget, aktueller Stand via Ref)
-        if (apiService.istKonfiguriert() && !istDemoModus && user?.email) {
-          apiService.speichereAntworten({
-            pruefungId: config.id,
-            email: user.email,
-            antworten: antwortenRef.current,
-            version: -1,
-            istAbgabe: true,
-          })
-        }
+      setAnzeigeSekunden(rest)
+      if (rest <= 0) {
+        autoAbgabe()
       }
     }
 
     update()
     const interval = setInterval(update, 1000)
     return () => clearInterval(interval)
-  }, [config, startzeit, abgegeben, pruefungAbgeben, onZeitAbgelaufen, user, istDemoModus, effektiveDauer])
+    // eslint-disable-next-line react-hooks/exhaustive-deps — autoAbgabe nutzt Refs
+  }, [config, startzeit, abgegeben, zeitModus, zusatzMinuten, effektivBeendetUm])
 
-  if (!config || restSekunden === null) return null
+  if (!config || anzeigeSekunden === null) return null
 
-  const istCountdown = config.zeitanzeigeTyp === 'countdown'
-  const anzeige = istCountdown
-    ? formatZeit(Math.max(0, restSekunden))
-    : formatZeit(effektiveDauer * 60 - restSekunden)
+  // Modus bestimmen für Anzeige
+  const istOpenEndOhneBeenden = zeitModus === 'open-end' && !effektivBeendetUm
+  const anzeige = istOpenEndOhneBeenden
+    ? formatVerstricheneZeit(anzeigeSekunden)
+    : formatZeit(Math.max(0, anzeigeSekunden))
 
-  const warnungStufe =
-    restSekunden <= 0 ? 'abgelaufen' : restSekunden <= 300 ? 'kritisch' : restSekunden <= 900 ? 'warnung' : 'normal'
+  const warnungStufe = istOpenEndOhneBeenden
+    ? 'normal'
+    : anzeigeSekunden <= 0
+      ? 'abgelaufen'
+      : anzeigeSekunden <= 300
+        ? 'kritisch'
+        : anzeigeSekunden <= 900
+          ? 'warnung'
+          : 'normal'
 
   return (
     <div
@@ -120,9 +162,9 @@ export default function Timer({ onZeitAbgelaufen }: Props) {
               ? 'text-orange-600 dark:text-orange-400'
               : 'text-slate-700 dark:text-slate-200'
       }`}
-      title={`${restSekunden > 0 ? 'Verbleibende Zeit' : 'Zeit abgelaufen'}`}
+      title={istOpenEndOhneBeenden ? 'Verstrichene Zeit' : (anzeigeSekunden > 0 ? 'Verbleibende Zeit' : 'Zeit abgelaufen')}
     >
-      {istCountdown ? '' : '+'}{anzeige}
+      {istOpenEndOhneBeenden && '+'}{anzeige}
       {zusatzMinuten > 0 && (
         <span className="text-xs font-normal text-slate-500 dark:text-slate-400 ml-1" title="Nachteilsausgleich">
           (+{zusatzMinuten} Min.)

@@ -24,6 +24,7 @@ export function usePruefungsMonitoring(): void {
   const incrementNetzwerkFehler = usePruefungStore((s) => s.incrementNetzwerkFehler)
   const setVerbindungsstatus = usePruefungStore((s) => s.setVerbindungsstatus)
   const addUnterbrechung = usePruefungStore((s) => s.addUnterbrechung)
+  const setBeendetUm = usePruefungStore((s) => s.setBeendetUm)
 
   const user = useAuthStore((s) => s.user)
   const istDemoModus = useAuthStore((s) => s.istDemoModus)
@@ -88,16 +89,20 @@ export function usePruefungsMonitoring(): void {
     return () => clearInterval(interval)
   }, [config, abgegeben, backendVerfuegbar, user, setVerbindungsstatus, incrementRemoteSaveVersion, setLetzterSave, incrementAutoSaveCount, incrementNetzwerkFehler])
 
-  // === 3. Heartbeat (alle 10s, konfigurierbar) ===
+  // === 3. Heartbeat (alle 10s, konfigurierbar) + Beenden-Signal ===
   useEffect(() => {
     if (!config || abgegeben || !backendVerfuegbar || !user) return
 
     const intervallMs = (config.heartbeatIntervallSekunden || 10) * 1000
 
     const interval = setInterval(async () => {
-      const erfolg = await apiService.heartbeat(config.id, user.email)
-      if (erfolg) {
+      const response = await apiService.heartbeat(config.id, user.email)
+      if (response.success) {
         incrementHeartbeats()
+        // Beenden-Signal vom Backend?
+        if (response.beendetUm && !abgegeben) {
+          setBeendetUm(response.beendetUm, response.restzeitMinuten)
+        }
       } else {
         addUnterbrechung({
           zeitpunkt: new Date().toISOString(),
@@ -108,7 +113,7 @@ export function usePruefungsMonitoring(): void {
     }, intervallMs)
 
     return () => clearInterval(interval)
-  }, [config, abgegeben, backendVerfuegbar, user, incrementHeartbeats, addUnterbrechung])
+  }, [config, abgegeben, backendVerfuegbar, user, incrementHeartbeats, addUnterbrechung, setBeendetUm])
 
   // === 4. Focus-Detection (visibilitychange) ===
   useEffect(() => {

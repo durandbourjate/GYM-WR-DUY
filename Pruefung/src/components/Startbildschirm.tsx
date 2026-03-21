@@ -97,7 +97,7 @@ export default function Startbildschirm({ config, fragen, wiederhergestellt }: P
           {/* Prüfungsinfos weiterhin sichtbar */}
           <div className="grid grid-cols-3 gap-3 mb-4">
             <InfoCard label="Klasse" wert={config.klasse} />
-            <InfoCard label="Dauer" wert={`${config.dauerMinuten} Min.`} />
+            <InfoCard label="Dauer" wert={config.zeitModus === 'open-end' ? 'Open-End' : `${config.dauerMinuten} Min.`} />
             <InfoCard label="Datum" wert={formatDatum(config.datum)} />
           </div>
 
@@ -153,7 +153,7 @@ export default function Startbildschirm({ config, fragen, wiederhergestellt }: P
 
         {/* Infos */}
         <div className="grid grid-cols-2 gap-4 mb-6">
-          <InfoCard label="Dauer" wert={`${config.dauerMinuten} Minuten`} />
+          <InfoCard label="Dauer" wert={config.zeitModus === 'open-end' ? 'Kein Zeitlimit' : `${config.dauerMinuten} Minuten`} />
           <InfoCard label="Fragen" wert={`${gesamtFragen}`} />
           <InfoCard label="Punkte" wert={`${config.gesamtpunkte}`} />
           <InfoCard label="Typ" wert={config.typ === 'summativ' ? 'Summativ' : 'Formativ'} />
