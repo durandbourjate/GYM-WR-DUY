@@ -6,6 +6,36 @@
 
 ## Aktueller Stand
 
+**Phase 5j: Kurs-basierte Teilnehmer-Auswahl + Bugfixes** (22.03.2026) ✅
+
+### Session 22.03.2026 — Kurs-basierte Auswahl + Bugfixes
+
+#### Umbau: Kurs-basierte statt Klasse-basierte Auswahl
+- **Problem:** Prüfungen werden pro Kurs/Gefäss geschrieben (z.B. SF 28bc29fs), nicht pro Stammklasse. SuS können in mehreren Kursen vorkommen (z.B. 29f in EWR + SF).
+- **Neues Konzept:** Sheet-Name = Kurs. Auswahl erfolgt per Kurs-Button, nicht per Klassen-Button.
+- **`KursAuswahl.tsx`** (neu): Zeigt Kurs-Buttons mit SuS-Anzahl, aufklappbare Details nach Klasse, Alle/Keine-Buttons
+- **`VorbereitungPhase.tsx`** (umgebaut): Gruppiert nach Kurs statt Klasse. Dedup-Logik: beim Abwählen eines Kurses werden SuS nur entfernt wenn kein anderer gewählter Kurs sie abdeckt.
+- **`KlassenAuswahl.tsx`**: Nicht mehr verwendet (kann entfernt werden)
+
+#### Bugfixes
+- **"Zur Korrektur"-Button** (BeendetPhase): War `() => { /* TODO */ }`, navigiert jetzt zu `?ansicht=korrektur`
+- **"Ergebnisse exportieren"-Button** (BeendetPhase): War `() => { /* TODO */ }`, erstellt jetzt Teilnahme-CSV (Name, Status, Zeiten, Fortschritt)
+- **BeendenDialog Doppelklick**: `setLade(false)` lief vor Phasenwechsel → Button wurde re-enabled. Fix: `lade` bleibt true bei Erfolg.
+- **TeilnehmerListe**: Von flacher Liste auf collapsible Klassen-Gruppen umgebaut
+- **Klassenlisten Header-Erkennung**: Apps Script erkennt jetzt Spalten-Header automatisch (Klasse, E-Mail etc.) statt feste Positionen
+- **SuS-Deduplizierung**: `gesehen`-Set verhindert Duplikate wenn SuS in mehreren Kurs-Sheets vorkommt
+
+#### Neue/Geänderte Dateien
+- `src/components/lp/KursAuswahl.tsx` (neu) — Kurs-basierte Auswahl-Buttons
+- `src/components/lp/VorbereitungPhase.tsx` — Komplett auf Kurs-Logik umgebaut
+- `src/components/lp/TeilnehmerListe.tsx` — Collapsible Klassen-Gruppen
+- `src/components/lp/MonitoringDashboard.tsx` — onKorrektur + onExportieren implementiert
+- `src/utils/exportUtils.ts` — `exportiereTeilnahmeCSV()` + `downloadCSV()`
+- `src/components/lp/BeendenDialog.tsx` — Doppelklick-Fix
+- `apps-script-code.js` — Header-Autoerkennung + `kurs: sheetName` Feld
+
+---
+
 **Phase 5i: Prüfungs-Workflow (Teilnehmer → Lobby → Aktiv → Beendet)** (21.03.2026) ✅
 
 ### Session 21.03.2026 — Prüfungs-Workflow
