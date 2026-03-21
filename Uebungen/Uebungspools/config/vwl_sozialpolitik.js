@@ -333,12 +333,12 @@ window.QUESTIONS = [
  items:[
    {t:"Deckung des Existenzbedarfs im Alter", cat:0},
    {t:"Fortführung der gewohnten Lebenshaltung", cat:1},
-   {t:"Deckung des Komfortbedarfs im Alter", cat:2},
+   {t:"Individuelle Ergänzung der Altersvorsorge", cat:2},
    {t:"Obligatorisch seit 1948", cat:0},
    {t:"Obligatorisch seit 1985", cat:1},
    {t:"Steuerlich begünstigt, aber freiwillig", cat:2}
  ],
- explain:"Die 1. Säule (AHV) sichert das Existenzminimum, die 2. Säule (Berufliche Vorsorge) ermöglicht die Fortführung der gewohnten Lebenshaltung, und die 3. Säule (individuelle Vorsorge) dient dem Komfortbedarf. Zusammen bilden sie das Drei-Säulen-System der Schweizer Altersvorsorge."},
+ explain:"Die 1. Säule (AHV) sichert das Existenzminimum, die 2. Säule (Berufliche Vorsorge) ermöglicht die Fortführung der gewohnten Lebenshaltung, und die 3. Säule (individuelle Vorsorge) dient der individuellen Ergänzung (z.B. für zusätzlichen Komfort). Zusammen bilden sie das Drei-Säulen-System der Schweizer Altersvorsorge."},
 
 {id:"s03", topic:"sozialversicherungen", type:"tf", diff:1, tax:"K1",reviewed:false,
  q:"Die Krankenversicherung (Grundversicherung) bietet für alle Versicherten pro Kasse und Region die gleichen Prämien für Erwachsene.",

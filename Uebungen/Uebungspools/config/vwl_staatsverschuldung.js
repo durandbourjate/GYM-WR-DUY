@@ -155,10 +155,10 @@ window.QUESTIONS = [
 {id:"a06", topic:"ausgaben", type:"mc", diff:2, tax:"K2",reviewed:false,
  q:"Welcher Bundesausgabenbereich verzeichnete zwischen 2008 und 2018 das stärkste prozentuales Wachstum?",
  options:[
-   {v:"A", t:"Bildung (+67%)"},
-   {v:"B", t:"Soziale Wohlfahrt (+27%)"},
-   {v:"C", t:"Verkehr (+15%)"},
-   {v:"D", t:"Landesverteidigung (+11%)"}
+   {v:"A", t:"Bildung"},
+   {v:"B", t:"Soziale Wohlfahrt"},
+   {v:"C", t:"Verkehr"},
+   {v:"D", t:"Landesverteidigung"}
  ],
  correct:"A",
  explain:"Die Bildungsausgaben stiegen mit +67% am stärksten, gefolgt von der sozialen Wohlfahrt (+27%). Die Ausgaben für Finanzen und Steuern sanken sogar um 5%."},
@@ -201,8 +201,8 @@ window.QUESTIONS = [
 {id:"e03", topic:"einnahmen", type:"fill", diff:1, tax:"K1",reviewed:false,
  q:"Direkte Steuern werden auf {0} und {1} erhoben. Indirekte Steuern werden auf den {2} erhoben.",
  blanks:[
-   {answer:"Einkommen", alts:["das Einkommen"]},
-   {answer:"Vermögen", alts:["das Vermögen"]},
+   {answer:"Einkommen", alts:["das Einkommen", "Vermögen", "das Vermögen"]},
+   {answer:"Vermögen", alts:["das Vermögen", "Einkommen", "das Einkommen"]},
    {answer:"Verbrauch", alts:["Konsum"]}
  ],
  explain:"Direkte Steuern betreffen direkt die wirtschaftliche Leistungsfähigkeit (Einkommen, Vermögen). Indirekte Steuern belasten den Verbrauch – die wichtigste ist die Mehrwertsteuer."},
