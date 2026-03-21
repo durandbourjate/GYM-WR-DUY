@@ -338,6 +338,7 @@ function parseFrage(row, fachbereich) {
     bewertungsraster: safeJsonParse(row.bewertungsraster, []),
     anhaenge: safeJsonParse(row.anhaenge, []),
     verwendungen: [],
+    quelle: row.quelle || 'manuell',
     autor: row.autor || '',
     geteilt: row.geteilt || 'privat',
     geteiltVon: row.geteiltVon || '',
