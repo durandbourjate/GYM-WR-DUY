@@ -63,6 +63,8 @@ function doPost(e) {
       return speichereConfig(body);
     case 'speichereFrage':
       return speichereFrage(body);
+    case 'loescheFrage':
+      return loescheFrage(body);
     case 'starteKorrektur':
       return starteKorrekturEndpoint(body);
     case 'speichereKorrekturZeile':
@@ -734,6 +736,42 @@ function speichereFrage(body) {
     }
 
     return jsonResponse({ success: true, id: frage.id });
+  } catch (error) {
+    return jsonResponse({ error: error.message });
+  }
+}
+
+// === Frage aus Fragenbank löschen ===
+
+function loescheFrage(body) {
+  try {
+    var email = body.email;
+    var frageId = body.frageId;
+    var fachbereich = body.fachbereich;
+
+    if (!email || !email.endsWith('@' + LP_DOMAIN)) {
+      return jsonResponse({ error: 'Nur für Lehrpersonen' });
+    }
+    if (!frageId || !fachbereich) {
+      return jsonResponse({ error: 'frageId und fachbereich erforderlich' });
+    }
+
+    var fragenbank = SpreadsheetApp.openById(FRAGENBANK_ID);
+    var sheet = fragenbank.getSheetByName(fachbereich);
+    if (!sheet) {
+      return jsonResponse({ error: 'Fachbereich-Tab "' + fachbereich + '" nicht gefunden' });
+    }
+
+    var data = getSheetData(sheet);
+    var rowIndex = data.findIndex(function(row) { return row.id === frageId; });
+    if (rowIndex < 0) {
+      return jsonResponse({ error: 'Frage nicht gefunden: ' + frageId });
+    }
+
+    // Zeile löschen (rowIndex + 2 wegen Header-Zeile und 0-basiertem Index)
+    sheet.deleteRow(rowIndex + 2);
+
+    return jsonResponse({ success: true, id: frageId });
   } catch (error) {
     return jsonResponse({ error: error.message });
   }

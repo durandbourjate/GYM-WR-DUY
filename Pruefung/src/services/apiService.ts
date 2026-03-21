@@ -375,6 +375,29 @@ export const apiService = {
   },
 
 
+  /** Frage aus Fragenbank löschen */
+  async loescheFrage(email: string, frageId: string, fachbereich: string): Promise<boolean> {
+    if (!APPS_SCRIPT_URL) return false
+    try {
+      const payload = JSON.stringify({ action: 'loescheFrage', email, frageId, fachbereich })
+      const response = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: payload,
+      })
+      if (!response.ok) return false
+      const text = await response.text()
+      try {
+        const data = JSON.parse(text)
+        if (data.error) { console.error('[API] loescheFrage:', data.error); return false }
+        return data.success === true
+      } catch { return false }
+    } catch (error) {
+      console.error('[API] loescheFrage: Netzwerkfehler:', error)
+      return false
+    }
+  },
+
   /** Schülercode gegen Klassenliste validieren */
   async validiereSchuelercode(email: string, code: string): Promise<{
     success: boolean

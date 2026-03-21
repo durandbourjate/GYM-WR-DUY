@@ -60,6 +60,7 @@ export default function FragenBrowser({ onHinzufuegen, onEntfernen, onSchliessen
   const istDemoModus = useAuthStore((s) => s.istDemoModus)
 
   const panelRef = useRef<HTMLDivElement>(null)
+  const listeRef = useRef<HTMLDivElement>(null)
   useFocusTrap(panelRef)
 
   // Header-Höhe messen, damit Overlay unterhalb des Headers beginnt
@@ -100,8 +101,7 @@ export default function FragenBrowser({ onHinzufuegen, onEntfernen, onSchliessen
   const [filterTyp, setFilterTyp] = useState<string>('')
   const [filterBloom, setFilterBloom] = useState<BloomStufe | ''>('')
   const [filterThema, setFilterThema] = useState('')
-  const [filterBesitzer, setFilterBesitzer] = useState<'alle' | 'meine'>('alle')
-  const [filterQuelle, setFilterQuelle] = useState<'alle' | 'eigene' | 'pool'>('alle')
+  const [filterQuelle, setFilterQuelle] = useState<'alle' | 'meine' | 'pool'>('alle')
   const [filterPoolStatus, setFilterPoolStatus] = useState<'alle' | 'ungeprueft' | 'pool_geprueft' | 'pruefungstauglich' | 'update'>('alle')
 
   // Editor / Import
@@ -109,6 +109,7 @@ export default function FragenBrowser({ onHinzufuegen, onEntfernen, onSchliessen
   const [editFrage, setEditFrage] = useState<Frage | null>(null)
   const [zeigImport, setZeigImport] = useState(false)
   const [zeigBatchExport, setZeigBatchExport] = useState(false)
+  const [loeschKandidat, setLoeschKandidat] = useState<Frage | null>(null)
 
   // Ansicht
   const [sortierung, setSortierung] = useState<Sortierung>('thema')
@@ -186,13 +187,12 @@ export default function FragenBrowser({ onHinzufuegen, onEntfernen, onSchliessen
       if (filterFachbereich && f.fachbereich !== filterFachbereich) return false
       if (filterTyp && f.typ !== filterTyp) return false
       if (filterBloom && f.bloom !== filterBloom) return false
-      if (filterBesitzer === 'meine' && user && f.autor && f.autor !== user.email) return false
       if (filterThema) {
         const key = f.thema + (f.unterthema ? ` › ${f.unterthema}` : '')
         if (key !== filterThema && f.thema !== filterThema) return false
       }
-      // Quelle-Filter
-      if (filterQuelle === 'eigene' && f.quelle === 'pool') return false
+      // Quelle-Filter (zusammengelegt: Meine = mein Autor, Pool = aus Pool)
+      if (filterQuelle === 'meine' && user && f.autor && f.autor !== user.email) return false
       if (filterQuelle === 'pool' && f.quelle !== 'pool') return false
       // Pool-Status-Filter
       if (filterPoolStatus !== 'alle') {
@@ -217,7 +217,7 @@ export default function FragenBrowser({ onHinzufuegen, onEntfernen, onSchliessen
       }
       return true
     })
-  }, [alleFragen, filterFachbereich, filterTyp, filterBloom, filterThema, filterBesitzer, filterQuelle, filterPoolStatus, suchtext, user])
+  }, [alleFragen, filterFachbereich, filterTyp, filterBloom, filterThema, filterQuelle, filterPoolStatus, suchtext, user])
 
   // Sortieren
   const sortierteFragen = useMemo(() => {
@@ -269,7 +269,7 @@ export default function FragenBrowser({ onHinzufuegen, onEntfernen, onSchliessen
   }, [gefilterteFragen])
 
   // Aktive Filter zählen
-  const aktiveFilter = [filterFachbereich, filterTyp, filterBloom, filterThema, suchtext, filterBesitzer !== 'alle' ? filterBesitzer : '', filterQuelle !== 'alle' ? filterQuelle : '', filterPoolStatus !== 'alle' ? filterPoolStatus : ''].filter(Boolean).length
+  const aktiveFilter = [filterFachbereich, filterTyp, filterBloom, filterThema, suchtext, filterQuelle !== 'alle' ? filterQuelle : '', filterPoolStatus !== 'alle' ? filterPoolStatus : ''].filter(Boolean).length
 
   /** Ein Klick: Frage hinzufügen oder entfernen */
   function toggleFrageInPruefung(frageId: string): void {
@@ -295,7 +295,6 @@ export default function FragenBrowser({ onHinzufuegen, onEntfernen, onSchliessen
     setFilterTyp('')
     setFilterBloom('')
     setFilterThema('')
-    setFilterBesitzer('alle')
     setFilterQuelle('alle')
     setFilterPoolStatus('alle')
   }
@@ -334,6 +333,21 @@ export default function FragenBrowser({ onHinzufuegen, onEntfernen, onSchliessen
     }
   }
 
+  async function handleFrageLoeschen(): Promise<void> {
+    if (!loeschKandidat) return
+    // Lokal entfernen
+    setAlleFragen(prev => prev.filter(f => f.id !== loeschKandidat.id))
+    const frage = loeschKandidat
+    setLoeschKandidat(null)
+    // Backend löschen (im Hintergrund)
+    if (user && apiService.istKonfiguriert() && !istDemoModus) {
+      const ok = await apiService.loescheFrage(user.email, frage.id, frage.fachbereich)
+      if (!ok) {
+        console.warn('[FragenBrowser] Frage lokal gelöscht, aber Backend-Löschen fehlgeschlagen')
+      }
+    }
+  }
+
   return (
     <div className="fixed inset-0 z-50 flex pointer-events-none">
       {/* Backdrop */}
@@ -347,8 +361,8 @@ export default function FragenBrowser({ onHinzufuegen, onEntfernen, onSchliessen
           className="absolute left-0 top-0 bottom-0 w-1 cursor-col-resize z-10 hover:bg-slate-400/50 active:bg-slate-400/70 transition-colors"
           title="Breite anpassen"
         />
-        {/* Header */}
-        <div className="px-5 py-4 border-b border-slate-200 dark:border-slate-700">
+        {/* Header — Scroll an Fragen-Liste weiterleiten */}
+        <div className="px-5 py-4 border-b border-slate-200 dark:border-slate-700" onWheel={(e) => { listeRef.current?.scrollBy(0, e.deltaY) }}>
           <div className="flex items-center justify-between mb-3">
             <div>
               <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100">
@@ -466,41 +480,18 @@ export default function FragenBrowser({ onHinzufuegen, onEntfernen, onSchliessen
                 <option key={k} value={k}>{k}</option>
               ))}
             </select>
-            {/* Besitzer-Filter */}
-            <div className="flex rounded-lg border border-slate-300 dark:border-slate-600 overflow-hidden">
-              <button
-                onClick={() => setFilterBesitzer('alle')}
-                className={`text-xs px-2 py-1.5 transition-colors cursor-pointer ${
-                  filterBesitzer === 'alle'
-                    ? 'bg-slate-800 dark:bg-slate-200 text-white dark:text-slate-800'
-                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
-                }`}
-              >
-                Alle
-              </button>
-              <button
-                onClick={() => setFilterBesitzer('meine')}
-                className={`text-xs px-2 py-1.5 transition-colors cursor-pointer border-l border-slate-300 dark:border-slate-600 ${
-                  filterBesitzer === 'meine'
-                    ? 'bg-slate-800 dark:bg-slate-200 text-white dark:text-slate-800'
-                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
-                }`}
-              >
-                Meine
-              </button>
-            </div>
-
+            {/* Quellen-Filter (Alle / Meine / Pool) */}
             <select
               value={filterQuelle}
-              onChange={(e) => { setFilterQuelle(e.target.value as typeof filterQuelle); if (e.target.value === 'eigene') setFilterPoolStatus('alle'); setAngezeigteMenge(SEITEN_GROESSE) }}
+              onChange={(e) => { setFilterQuelle(e.target.value as typeof filterQuelle); if (e.target.value === 'meine') setFilterPoolStatus('alle'); setAngezeigteMenge(SEITEN_GROESSE) }}
               className="text-xs px-2 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-300 cursor-pointer"
             >
               <option value="alle">Alle Quellen</option>
-              <option value="eigene">Eigene</option>
+              <option value="meine">Meine</option>
               <option value="pool">Pool</option>
             </select>
 
-            {filterQuelle !== 'eigene' && (
+            {filterQuelle !== 'meine' && (
               <select
                 value={filterPoolStatus}
                 onChange={(e) => { setFilterPoolStatus(e.target.value as typeof filterPoolStatus); setAngezeigteMenge(SEITEN_GROESSE) }}
@@ -582,7 +573,7 @@ export default function FragenBrowser({ onHinzufuegen, onEntfernen, onSchliessen
         </div>
 
         {/* Fragen-Liste */}
-        <div className="flex-1 overflow-auto">
+        <div ref={listeRef} className="flex-1 overflow-auto">
           {ladeStatus === 'laden' && (
             <p className="text-sm text-slate-500 dark:text-slate-400 text-center py-8">
               Fragenbank wird geladen...
@@ -643,6 +634,7 @@ export default function FragenBrowser({ onHinzufuegen, onEntfernen, onSchliessen
                                 istInPruefung={bereitsVerwendetSet.has(frage.id)}
                                 onToggle={() => toggleFrageInPruefung(frage.id)}
                                 onEdit={() => { setEditFrage(frage); setZeigEditor(true) }}
+                                onLoeschen={() => setLoeschKandidat(frage)}
                               />
                         ))}
                       </div>
@@ -674,6 +666,40 @@ export default function FragenBrowser({ onHinzufuegen, onEntfernen, onSchliessen
           onSpeichern={handleFrageGespeichert}
           onAbbrechen={() => { setZeigEditor(false); setEditFrage(null) }}
         />
+      )}
+
+      {/* Lösch-Bestätigung */}
+      {loeschKandidat && (
+        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/40">
+          <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl p-6 max-w-md">
+            <h3 className="text-lg font-bold dark:text-white mb-2">Frage löschen?</h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+              <strong>{loeschKandidat.id}</strong> · {loeschKandidat.fachbereich} · {typLabel(loeschKandidat.typ)}
+            </p>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              {'fragetext' in loeschKandidat
+                ? (loeschKandidat as { fragetext: string }).fragetext?.replace(/\*\*/g, '').replace(/\n/g, ' ').slice(0, 120)
+                : ''}
+            </p>
+            <p className="text-xs text-red-600 dark:text-red-400 mb-4">
+              Diese Aktion kann nicht rückgängig gemacht werden.
+            </p>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setLoeschKandidat(null)}
+                className="px-4 py-2 text-sm rounded border dark:border-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
+              >
+                Abbrechen
+              </button>
+              <button
+                onClick={handleFrageLoeschen}
+                className="px-4 py-2 text-sm rounded bg-red-600 text-white hover:bg-red-700 cursor-pointer"
+              >
+                Endgültig löschen
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Import Overlay */}
@@ -773,18 +799,19 @@ function KompaktZeile({ frage, istInPruefung, onToggle, onEdit, zeigeGruppierung
 }
 
 /** Detaillierte Karte mit Fragetext-Vorschau */
-function DetailKarte({ frage, istInPruefung, onToggle, onEdit }: {
+function DetailKarte({ frage, istInPruefung, onToggle, onEdit, onLoeschen }: {
   frage: Frage
   istInPruefung: boolean
   onToggle: () => void
   onEdit: () => void
+  onLoeschen: () => void
 }) {
   const fragetext = 'fragetext' in frage ? (frage as { fragetext: string }).fragetext : ''
 
   return (
     <div
       onClick={onEdit}
-      className={`p-3 rounded-lg border transition-colors cursor-pointer
+      className={`p-3 rounded-lg border transition-colors cursor-pointer group
         ${istInPruefung
           ? 'border-l-4 border-l-green-500 border-green-200 dark:border-green-800 bg-green-50/50 dark:bg-green-900/10'
           : 'border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50'
@@ -853,6 +880,14 @@ function DetailKarte({ frage, istInPruefung, onToggle, onEdit }: {
             )}
           </div>
         </div>
+        {/* Löschen-Button */}
+        <button
+          onClick={(e) => { e.stopPropagation(); onLoeschen() }}
+          className="self-start p-1.5 text-slate-400 hover:text-red-500 dark:text-slate-500 dark:hover:text-red-400 transition-colors cursor-pointer shrink-0 opacity-0 group-hover:opacity-100"
+          title="Frage löschen"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        </button>
       </div>
     </div>
   )
