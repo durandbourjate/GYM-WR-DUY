@@ -6,6 +6,9 @@ export interface SchuelerStatus {
   name: string
   klasse?: string
 
+  /** Aktuelle Frage (0-basierter Index), null wenn unbekannt */
+  aktuelleFrage: number | null
+
   /** Aktuelle Aktivität */
   status: 'aktiv' | 'inaktiv' | 'abgegeben' | 'nicht-gestartet' | 'beendet-lp'
 
@@ -70,3 +73,6 @@ export interface PruefungsNachricht {
   zeitpunkt: string    // ISO-Timestamp
   gelesen: boolean     // Vom Empfänger gelesen
 }
+
+/** Phasen des Prüfungs-Workflows */
+export type PruefungsPhase = 'vorbereitung' | 'lobby' | 'aktiv' | 'beendet'

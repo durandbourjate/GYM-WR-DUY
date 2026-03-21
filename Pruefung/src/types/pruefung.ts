@@ -1,3 +1,12 @@
+export interface Teilnehmer {
+  email: string
+  name: string
+  vorname: string
+  klasse: string
+  quelle: 'klassenliste' | 'manuell'
+  einladungGesendet?: boolean
+}
+
 export interface PruefungsConfig {
   id: string;
   titel: string;
@@ -35,6 +44,10 @@ export interface PruefungsConfig {
 
   // Warteraum / Freischaltung
   freigeschaltet: boolean;
+
+  // Teilnehmer (Workflow)
+  teilnehmer?: Teilnehmer[];
+  beendetUm?: string; // ISO-Zeitstempel
 
   // Zeitzuschläge (Nachteilsausgleich: E-Mail → zusätzliche Minuten)
   zeitverlaengerungen?: Record<string, number>;
