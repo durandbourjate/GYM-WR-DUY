@@ -19,18 +19,18 @@ interface KontenSelectProps {
 
 const MAX_RESULTS = 15
 
-/** Kategorie-Badge-Farben (Tailwind-Klassen) */
+/** Kategorie-Badge-Farben — aktiv=gelb, passiv=blau, aufwand=rot, ertrag=grün */
 const kategorieBadge: Record<KontoEintrag['kategorie'], string> = {
-  aktiv:   'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300',
-  passiv:  'bg-gray-100 text-gray-700 dark:bg-gray-700/40 dark:text-gray-300',
+  aktiv:   'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300',
+  passiv:  'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300',
   aufwand: 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300',
   ertrag:  'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300',
 }
 
 /** Dezente Kategorie-Hintergrundfarben für Dropdown-Zeilen */
 const kategorieZeile: Record<KontoEintrag['kategorie'], string> = {
-  aktiv:   'bg-blue-50/60 dark:bg-blue-900/10',
-  passiv:  'bg-slate-50/60 dark:bg-slate-700/15',
+  aktiv:   'bg-amber-50/60 dark:bg-amber-900/10',
+  passiv:  'bg-blue-50/60 dark:bg-blue-900/10',
   aufwand: 'bg-red-50/60 dark:bg-red-900/10',
   ertrag:  'bg-green-50/60 dark:bg-green-900/10',
 }

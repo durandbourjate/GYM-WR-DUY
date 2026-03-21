@@ -220,21 +220,21 @@ function BilanzMusterloesung({ bilanz, onBilanzChange, verfuegbareKonten }: {
       <h4 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Bilanz-Musterlösung</h4>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        {/* Aktiven — dezent blau hinterlegt */}
+        {/* Aktiven — dezent gelb hinterlegt */}
         <GruppenEditor
           label="Aktiven"
           gruppen={b.aktivSeite.gruppen}
           onChange={(g) => updateSeite('aktiv', g)}
           verfuegbareKonten={verfuegbareKonten}
-          bgClass="bg-blue-50/40 dark:bg-blue-900/10"
+          bgClass="bg-amber-50/50 dark:bg-amber-900/10"
         />
-        {/* Passiven — dezent grau hinterlegt */}
+        {/* Passiven — dezent blau hinterlegt */}
         <GruppenEditor
           label="Passiven"
           gruppen={b.passivSeite.gruppen}
           onChange={(g) => updateSeite('passiv', g)}
           verfuegbareKonten={verfuegbareKonten}
-          bgClass="bg-slate-50/60 dark:bg-slate-700/15"
+          bgClass="bg-blue-50/50 dark:bg-blue-900/10"
         />
       </div>
 
