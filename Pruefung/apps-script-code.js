@@ -682,8 +682,7 @@ function heartbeat(body) {
 
       // 2. Global (aus Configs-Sheet) falls kein individuelles
       if (!beendetUm) {
-        const ss = SpreadsheetApp.getActiveSpreadsheet();
-        const configSheet = ss.getSheetByName('Configs');
+        const configSheet = SpreadsheetApp.openById(CONFIGS_ID).getSheetByName('Configs');
         if (configSheet) {
           const configHeaders = configSheet.getRange(1, 1, 1, configSheet.getLastColumn()).getValues()[0];
           const configBeendetCol = configHeaders.indexOf('beendetUm');
@@ -736,8 +735,7 @@ function beendePruefungEndpoint(body) {
     if (einzelneSuS && einzelneSuS.length > 0) {
       // Individuelles Beenden: in Antworten-Sheet pro SuS
       const sheetName = 'Antworten_' + pruefungId;
-      const ss = SpreadsheetApp.getActiveSpreadsheet();
-      const sheet = ss.getSheetByName(sheetName);
+      const sheet = findOrCreateAntwortenSheet(sheetName, pruefungId);
       if (!sheet) return jsonResponse({ success: false, error: 'pruefung_nicht_gefunden' });
 
       // Spalten-Migration: beendetUm + restzeitMinuten hinzufügen falls fehlend
@@ -765,8 +763,7 @@ function beendePruefungEndpoint(body) {
       }
     } else {
       // Globales Beenden: in Configs-Sheet
-      var ss = SpreadsheetApp.getActiveSpreadsheet();
-      var configSheet = ss.getSheetByName('Configs');
+      var configSheet = SpreadsheetApp.openById(CONFIGS_ID).getSheetByName('Configs');
       if (!configSheet) return jsonResponse({ success: false, error: 'configs_nicht_gefunden' });
 
       var headers = configSheet.getRange(1, 1, 1, configSheet.getLastColumn()).getValues()[0];
