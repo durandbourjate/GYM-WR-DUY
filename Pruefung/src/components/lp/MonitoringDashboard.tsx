@@ -12,6 +12,14 @@ import HilfeSeite from './HilfeSeite.tsx'
 import SchuelerZeile from './SchuelerZeile.tsx'
 import BeendenDialog from './BeendenDialog.tsx'
 import { typLabel } from '../../utils/fachbereich.ts'
+import type { PruefungsConfig } from '../../types/pruefung'
+import type { PruefungsPhase } from '../../types/monitoring'
+import { bestimmePhase } from '../../utils/phase'
+import PhaseHeader from './PhaseHeader'
+import VorbereitungPhase from './VorbereitungPhase'
+import LobbyPhase from './LobbyPhase'
+import AktivPhase from './AktivPhase'
+import BeendetPhase from './BeendetPhase'
 
 type Sortierung = 'name' | 'status' | 'fortschritt' | 'unterbrechungen'
 type Filter = 'alle' | 'aktiv' | 'inaktiv' | 'abgegeben' | 'nicht-gestartet' | 'beendet-lp'
@@ -40,6 +48,9 @@ export default function MonitoringDashboard({ pruefungId }: { pruefungId: string
 
   // Nachrichten (LP → SuS)
   const [nachrichten, setNachrichten] = useState<PruefungsNachricht[]>([])
+
+  // Config der Prüfung (für Phasen-Bestimmung)
+  const [config, setConfig] = useState<PruefungsConfig | null>(null)
 
   // Nachrichten laden
   const ladeNachrichten = useCallback(async () => {
@@ -88,6 +99,7 @@ export default function MonitoringDashboard({ pruefungId }: { pruefungId: string
           unterbrechungen: Array.isArray(s.unterbrechungen) ? s.unterbrechungen : [],
           sebVersion: s.sebVersion || undefined,
           browserInfo: s.browserInfo || undefined,
+          aktuelleFrage: typeof s.aktuelleFrage === 'number' ? s.aktuelleFrage : (s.aktuelleFrage != null && s.aktuelleFrage !== '' ? Number(s.aktuelleFrage) : null),
         })),
       }
       setDaten(mappedResult as MonitoringDaten)
@@ -134,6 +146,26 @@ export default function MonitoringDashboard({ pruefungId }: { pruefungId: string
 
     ladeAbgabenUndFragen()
   }, [user, istDemoModus, pruefungId])
+
+  // Config laden und periodisch aktualisieren (für Phase-Bestimmung)
+  useEffect(() => {
+    if (!user || !pruefungId || istDemoModus) return
+    const ladeConfig = async () => {
+      try {
+        const configs = await apiService.ladeAlleConfigs(user.email)
+        const found = configs?.find((c) => c.id === pruefungId)
+        if (found) setConfig(found)
+      } catch { /* ignore */ }
+    }
+    ladeConfig()
+    const interval = setInterval(ladeConfig, 15000)
+    return () => clearInterval(interval)
+  }, [user, pruefungId, istDemoModus])
+
+  // Phase ableiten
+  const phase: PruefungsPhase = config && daten
+    ? bestimmePhase(config, daten.schueler)
+    : 'vorbereitung'
 
   // Detail-Zeile aufklappen/zuklappen
   function toggleDetail(email: string): void {
@@ -275,8 +307,76 @@ export default function MonitoringDashboard({ pruefungId }: { pruefungId: string
         hilfeOffen={zeigHilfe}
       />
 
-      {/* Zusammenfassung */}
-      <div className="max-w-6xl mx-auto w-full px-4 py-4">
+      {/* === Phase-basierter Workflow === */}
+      {config && (
+        <div className="max-w-6xl mx-auto w-full px-4 py-4 space-y-4">
+          <PhaseHeader config={config} phase={phase} />
+
+          {phase === 'vorbereitung' && (
+            <VorbereitungPhase
+              config={config}
+              onTeilnehmerGesetzt={(teilnehmer) => {
+                setConfig({ ...config, teilnehmer })
+              }}
+              onPruefungStarten={async () => {
+                if (user) {
+                  await apiService.schaltePruefungFrei(config.id, user.email)
+                  setConfig({ ...config, freigeschaltet: true })
+                }
+              }}
+            />
+          )}
+
+          {phase === 'lobby' && daten && (
+            <LobbyPhase
+              config={config}
+              schuelerStatus={daten.schueler}
+              onFreischalten={async () => {
+                if (user) {
+                  await apiService.schaltePruefungFrei(config.id, user.email)
+                  setConfig({ ...config, freigeschaltet: true })
+                }
+              }}
+              onZurueck={async () => {
+                if (user) {
+                  await apiService.setzeTeilnehmer(user.email, config.id, [])
+                  setConfig({ ...config, teilnehmer: [] })
+                }
+              }}
+              onAkzeptieren={async (email, name) => {
+                const neueTeilnehmer = [
+                  ...(config.teilnehmer ?? []),
+                  { email, name, vorname: '', klasse: '—', quelle: 'manuell' as const },
+                ]
+                if (user) {
+                  await apiService.setzeTeilnehmer(user.email, config.id, neueTeilnehmer)
+                  setConfig({ ...config, teilnehmer: neueTeilnehmer })
+                }
+              }}
+            />
+          )}
+
+          {phase === 'aktiv' && daten && (
+            <AktivPhase
+              config={config}
+              schuelerStatus={daten.schueler}
+              onBeenden={() => ladeDaten()}
+            />
+          )}
+
+          {phase === 'beendet' && daten && (
+            <BeendetPhase
+              config={config}
+              schuelerStatus={daten.schueler}
+              onExportieren={() => { /* TODO: Batch-Export öffnen */ }}
+              onKorrektur={() => { /* TODO: Navigation zu Korrektur */ }}
+            />
+          )}
+        </div>
+      )}
+
+      {/* Legacy/Demo Ansicht (wenn Config nicht geladen) */}
+      {!config && <div className="max-w-6xl mx-auto w-full px-4 py-4">
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-4">
           <StatusKarte label="Aktiv" wert={zusammenfassung.aktiv} farbe="green" />
           <StatusKarte label="Inaktiv" wert={zusammenfassung.inaktiv} farbe="amber" />
@@ -391,10 +491,10 @@ export default function MonitoringDashboard({ pruefungId }: { pruefungId: string
           {daten.gesamtSus} SuS total
           {autoRefresh && ' · Auto-Refresh alle 5s'}
         </p>
-      </div>
+      </div>}
 
-      {/* BeendenDialog */}
-      {zeigBeendenDialog && pruefungId && user && (
+      {/* BeendenDialog (Legacy) */}
+      {!config && zeigBeendenDialog && pruefungId && user && (
         <BeendenDialog
           pruefungId={pruefungId}
           lpEmail={user.email}
