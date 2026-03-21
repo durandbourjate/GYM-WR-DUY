@@ -1410,6 +1410,75 @@ function kiAssistentEndpoint(body) {
         result = rufeClaudeAuf(systemPrompt, userPrompt, 1536);
         return jsonResponse({ success: true, ergebnis: result });
 
+      // === Buchhaltung / FiBu ===
+
+      case 'generiereKontenauswahl':
+        if (!daten.geschaeftsfall) return jsonResponse({ error: 'Geschäftsfall fehlt' });
+        userPrompt = 'Du bist ein Buchhaltungsexperte für den Schweizer KMU-Kontenrahmen. ' +
+          'Gegeben ist ein Geschäftsfall. Schlage 8–12 relevante Konten vor (die korrekten + plausible Distraktoren).\n\n' +
+          'Geschäftsfall:\n' + daten.geschaeftsfall + '\n\n' +
+          'Antworte als JSON: { "konten": [{ "nummer": "1000", "name": "Kasse" }, ...] }';
+        result = rufeClaudeAuf(systemPrompt, userPrompt);
+        return jsonResponse({ success: true, ergebnis: result });
+
+      case 'generiereBuchungssaetze':
+        if (!daten.geschaeftsfall) return jsonResponse({ error: 'Geschäftsfall fehlt' });
+        userPrompt = 'Du bist ein Buchhaltungsexperte. Erstelle die korrekten Buchungssätze (Soll/Haben mit Kontonummern und Beträgen) für den gegebenen Geschäftsfall. ' +
+          'Verwende den Schweizer KMU-Kontenrahmen.\n\n' +
+          'Geschäftsfall:\n' + daten.geschaeftsfall + '\n\n' +
+          'Antworte als JSON: { "buchungen": [{ "sollKonten": [{ "kontonummer": "1000", "betrag": 500 }], "habenKonten": [{ "kontonummer": "2000", "betrag": 500 }], "buchungstext": "..." }] }';
+        result = rufeClaudeAuf(systemPrompt, userPrompt);
+        return jsonResponse({ success: true, ergebnis: result });
+
+      case 'pruefeBuchungssaetze':
+        if (!daten.geschaeftsfall || !daten.buchungen) return jsonResponse({ error: 'Geschäftsfall und Buchungen nötig' });
+        userPrompt = 'Du bist ein Buchhaltungsexperte. Prüfe die folgenden Buchungssätze auf fachliche Korrektheit (Soll/Haben-Logik, Kontenrahmen, Beträge).\n\n' +
+          'Geschäftsfall:\n' + daten.geschaeftsfall + '\n\n' +
+          'Buchungen:\n' + JSON.stringify(daten.buchungen) + '\n\n' +
+          'Antworte als JSON: { "korrekt": true/false, "bewertung": "...", "korrigiert": [{ "sollKonten": [...], "habenKonten": [...], "buchungstext": "..." }] }';
+        result = rufeClaudeAuf(systemPrompt, userPrompt);
+        return jsonResponse({ success: true, ergebnis: result });
+
+      case 'generiereTKonten':
+        if (!daten.aufgabentext) return jsonResponse({ error: 'Aufgabentext fehlt' });
+        userPrompt = 'Du bist ein Buchhaltungsexperte. Erstelle T-Konten für den gegebenen Aufgabentext. ' +
+          'Verwende den Schweizer KMU-Kontenrahmen.\n\n' +
+          'Aufgabe:\n' + daten.aufgabentext + '\n\n' +
+          'Antworte als JSON: { "konten": [{ "kontonummer": "1000", "name": "Kasse", "anfangsbestand": 5000, "eintraege": [{ "seite": "soll", "gegenkonto": "2000", "betrag": 500 }], "saldo": { "betrag": 5500, "seite": "soll" } }] }';
+        result = rufeClaudeAuf(systemPrompt, userPrompt);
+        return jsonResponse({ success: true, ergebnis: result });
+
+      case 'generiereKontenaufgaben':
+        if (!daten.aufgabentext) return jsonResponse({ error: 'Aufgabentext fehlt' });
+        userPrompt = 'Du bist ein Buchhaltungsexperte. Erstelle 6–10 Geschäftsfälle zur Kontenbestimmung. ' +
+          'Für jeden Geschäftsfall: welches Konto, welche Kategorie (aktiv/passiv/aufwand/ertrag), welche Buchungsseite (Soll/Haben).\n\n' +
+          'Thema:\n' + daten.aufgabentext + '\n\n' +
+          'Antworte als JSON: { "aufgaben": [{ "text": "Barverkauf von Waren", "erwarteteAntworten": [{ "kontonummer": "1000", "kategorie": "aktiv", "seite": "soll" }, { "kontonummer": "3200", "kategorie": "ertrag", "seite": "haben" }] }] }';
+        result = rufeClaudeAuf(systemPrompt, userPrompt, 1536);
+        return jsonResponse({ success: true, ergebnis: result });
+
+      case 'generiereBilanzStruktur':
+        if (!daten.aufgabentext) return jsonResponse({ error: 'Aufgabentext fehlt' });
+        userPrompt = 'Du bist ein Buchhaltungsexperte. Erstelle eine ' +
+          (daten.modus === 'erfolgsrechnung' ? 'mehrstufige Erfolgsrechnung' : 'Bilanz') +
+          ' basierend auf dem Aufgabentext. Verwende den Schweizer KMU-Kontenrahmen.\n\n' +
+          'Aufgabe:\n' + daten.aufgabentext + '\n\n' +
+          (daten.modus === 'erfolgsrechnung' ?
+            'Antworte als JSON: { "erfolgsrechnung": { "stufen": [{ "label": "Bruttogewinn", "aufwandKonten": ["4200"], "ertragKonten": ["3200"], "zwischentotal": 50000 }] } }' :
+            'Antworte als JSON: { "bilanz": { "aktivSeite": { "label": "Aktiven", "gruppen": [{ "label": "Umlaufvermögen", "positionen": [{ "konto": "1000", "name": "Kasse", "betrag": 5000 }] }] }, "passivSeite": { "label": "Passiven", "gruppen": [{ "label": "Fremdkapital", "positionen": [{ "konto": "2000", "name": "Kreditoren", "betrag": 3000 }] }] }, "bilanzsumme": 100000 } }');
+        result = rufeClaudeAuf(systemPrompt, userPrompt, 1536);
+        return jsonResponse({ success: true, ergebnis: result });
+
+      case 'generiereFallbeispiel':
+        if (!daten.thema) return jsonResponse({ error: 'Thema fehlt' });
+        userPrompt = 'Du bist ein Buchhaltungsexperte. Erstelle ein vollständiges Fallbeispiel mit Geschäftsfällen für das Thema. ' +
+          'Verwende Schweizer KMU-Kontenrahmen und CHF.\n\n' +
+          'Thema: ' + daten.thema + '\n' +
+          (daten.schwierigkeit ? 'Schwierigkeit: ' + daten.schwierigkeit + '\n' : '') +
+          '\nAntworte als JSON: { "titel": "...", "beschreibung": "Ausgangslage des Unternehmens", "geschaeftsfaelle": [{ "nr": 1, "text": "...", "loesung": { "sollKonten": [{ "kontonummer": "1000", "betrag": 500 }], "habenKonten": [{ "kontonummer": "2000", "betrag": 500 }] } }] }';
+        result = rufeClaudeAuf(systemPrompt, userPrompt, 2048);
+        return jsonResponse({ success: true, ergebnis: result });
+
       default:
         return jsonResponse({ error: 'Unbekannte KI-Aktion: ' + aktion });
     }

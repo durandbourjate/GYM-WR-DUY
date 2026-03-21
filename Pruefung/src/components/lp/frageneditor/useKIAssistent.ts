@@ -32,6 +32,14 @@ export type AktionKey =
   | 'importiereFragen'
   // Pool-Brücke: Lernziel → Frage
   | 'generiereFrageZuLernziel'
+  // Buchhaltung / FiBu
+  | 'generiereKontenauswahl'
+  | 'generiereBuchungssaetze'
+  | 'pruefeBuchungssaetze'
+  | 'generiereTKonten'
+  | 'generiereKontenaufgaben'
+  | 'generiereBilanzStruktur'
+  | 'generiereFallbeispiel'
 
 export interface AktionErgebnis {
   daten: Record<string, unknown> | null
