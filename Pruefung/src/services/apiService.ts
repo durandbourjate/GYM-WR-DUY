@@ -7,6 +7,13 @@ import type { PruefungsKorrektur, SchuelerAbgabe, KorrekturZeileUpdate, Feedback
 /** URL des deployed Google Apps Script Web-Apps */
 const APPS_SCRIPT_URL = import.meta.env.VITE_APPS_SCRIPT_URL || ''
 
+interface KlassenlistenEintrag {
+  klasse: string
+  email: string
+  name: string
+  vorname: string
+}
+
 /** API-Service für Kommunikation mit Google Apps Script Backend */
 export const apiService = {
   /** Prüfungskonfiguration + Fragen laden */
@@ -61,7 +68,7 @@ export const apiService = {
   },
 
   /** Heartbeat senden (Monitoring durch LP) — gibt Beenden-Signal zurück */
-  async heartbeat(pruefungId: string, email: string): Promise<import('../types/monitoring.ts').HeartbeatResponse> {
+  async heartbeat(pruefungId: string, email: string, aktuelleFrage?: number): Promise<import('../types/monitoring.ts').HeartbeatResponse> {
     if (!APPS_SCRIPT_URL) return { success: false }
 
     try {
@@ -73,6 +80,7 @@ export const apiService = {
           pruefungId,
           email,
           timestamp: new Date().toISOString(),
+          ...(aktuelleFrage !== undefined ? { aktuelleFrage } : {}),
         }),
       })
       if (!response.ok) return { success: false }
@@ -897,6 +905,66 @@ export const apiService = {
         return data as KorrekturDetailDaten
       } catch { return null }
     } catch { return null }
+  },
+
+  /** Lädt Klassenlisten vom Backend (LP-only) */
+  async ladeKlassenlisten(email: string): Promise<KlassenlistenEintrag[]> {
+    if (!APPS_SCRIPT_URL) return []
+    const url = `${APPS_SCRIPT_URL}?action=ladeKlassenlisten&email=${encodeURIComponent(email)}`
+    const res = await fetch(url)
+    if (!res.ok) throw new Error(`Klassenlisten laden fehlgeschlagen (${res.status})`)
+    const data = await res.json()
+    if (data.error) throw new Error(data.error)
+    return data.klassenlisten ?? []
+  },
+
+  /** Setzt Teilnehmer für eine Prüfung (LP-only) */
+  async setzeTeilnehmer(
+    email: string,
+    pruefungId: string,
+    teilnehmer: Array<{ email: string; name: string; vorname: string; klasse: string; quelle: 'klassenliste' | 'manuell'; einladungGesendet?: boolean }>,
+  ): Promise<boolean> {
+    if (!APPS_SCRIPT_URL) return false
+    const res = await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({
+        action: 'setzeTeilnehmer',
+        email,
+        pruefungId,
+        teilnehmer,
+      }),
+    })
+    if (!res.ok) return false
+    const data = await res.json()
+    return data.success === true
+  },
+
+  /** Sendet Einladungs-E-Mails an Teilnehmer (LP-only) */
+  async sendeEinladungen(
+    email: string,
+    pruefungId: string,
+    pruefungTitel: string,
+    pruefungUrl: string,
+    empfaenger: Array<{ email: string; name: string; vorname: string }>,
+  ): Promise<Array<{ email: string; erfolg: boolean; fehler?: string }>> {
+    if (!APPS_SCRIPT_URL) return []
+    const res = await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({
+        action: 'sendeEinladungen',
+        email,
+        pruefungId,
+        pruefungTitel,
+        pruefungUrl,
+        empfaenger,
+      }),
+    })
+    if (!res.ok) throw new Error('Einladungen senden fehlgeschlagen')
+    const data = await res.json()
+    if (data.error) throw new Error(data.error)
+    return data.ergebnisse ?? []
   },
 
   /** Prüft ob das Backend konfiguriert ist */
