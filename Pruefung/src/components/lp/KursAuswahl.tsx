@@ -1,0 +1,151 @@
+import { useState } from 'react'
+
+/** Ein SuS-Eintrag aus der Klassenliste */
+export interface KlassenlistenSuS {
+  email: string
+  name: string
+  vorname: string
+  klasse: string
+  kurs?: string
+}
+
+/** Kurs = Sheet-Name (z.B. "28bc29fs", "EWR 29fs") mit allen zugehörigen SuS */
+export interface KursGruppe {
+  kurs: string
+  schueler: KlassenlistenSuS[]
+}
+
+interface Props {
+  kursGruppen: KursGruppe[]
+  ausgewaehlteKurse: Set<string>
+  onToggleKurs: (kurs: string) => void
+}
+
+export default function KursAuswahl({ kursGruppen, ausgewaehlteKurse, onToggleKurs }: Props) {
+  const [zugeklappt, setZugeklappt] = useState<Set<string>>(new Set())
+
+  const toggleDetails = (kurs: string) => {
+    setZugeklappt((prev) => {
+      const neu = new Set(prev)
+      if (neu.has(kurs)) neu.delete(kurs)
+      else neu.add(kurs)
+      return neu
+    })
+  }
+
+  if (kursGruppen.length === 0) {
+    return <p className="text-sm text-slate-500 dark:text-slate-400">Keine Kurse gefunden.</p>
+  }
+
+  return (
+    <div className="space-y-2">
+      {/* Alle / Keine */}
+      <div className="flex gap-2 mb-1">
+        <button
+          type="button"
+          onClick={() => {
+            for (const kg of kursGruppen) {
+              if (!ausgewaehlteKurse.has(kg.kurs)) onToggleKurs(kg.kurs)
+            }
+          }}
+          className="text-xs text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
+        >
+          Alle
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            for (const kg of kursGruppen) {
+              if (ausgewaehlteKurse.has(kg.kurs)) onToggleKurs(kg.kurs)
+            }
+          }}
+          className="text-xs text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
+        >
+          Keine
+        </button>
+      </div>
+
+      {/* Kurs-Buttons */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        {kursGruppen.map((kg) => {
+          const ausgewaehlt = ausgewaehlteKurse.has(kg.kurs)
+          const istOffen = !zugeklappt.has(kg.kurs)
+          // Klassen innerhalb des Kurses zählen
+          const klassen = [...new Set(kg.schueler.map((s) => s.klasse))].sort()
+
+          return (
+            <div
+              key={kg.kurs}
+              className={`rounded-lg border transition-colors overflow-hidden
+                ${ausgewaehlt
+                  ? 'bg-blue-50 border-blue-300 dark:bg-blue-900/30 dark:border-blue-600'
+                  : 'bg-white border-slate-200 dark:bg-slate-800 dark:border-slate-600'
+                }`}
+            >
+              {/* Kurs-Header mit Checkbox */}
+              <button
+                type="button"
+                onClick={() => onToggleKurs(kg.kurs)}
+                className="w-full flex items-center gap-2 px-3 py-2.5 cursor-pointer hover:bg-blue-100/50 dark:hover:bg-blue-900/20"
+              >
+                <span className={`w-4 h-4 rounded border flex items-center justify-center text-xs flex-shrink-0
+                  ${ausgewaehlt
+                    ? 'bg-blue-500 border-blue-500 text-white'
+                    : 'border-slate-300 dark:border-slate-500'
+                  }`}>
+                  {ausgewaehlt ? '✓' : ''}
+                </span>
+                <span className={`font-semibold text-sm ${ausgewaehlt ? 'text-blue-800 dark:text-blue-200' : 'text-slate-700 dark:text-slate-200'}`}>
+                  {kg.kurs}
+                </span>
+                <span className="text-xs text-slate-500 dark:text-slate-400 ml-auto">
+                  {kg.schueler.length} SuS
+                </span>
+              </button>
+
+              {/* Details-Toggle */}
+              <div className="border-t border-slate-200/50 dark:border-slate-700/50">
+                <button
+                  type="button"
+                  onClick={() => toggleDetails(kg.kurs)}
+                  className="w-full flex items-center gap-1 px-3 py-1 text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-pointer"
+                >
+                  <span
+                    className="transition-transform duration-150"
+                    style={{ transform: istOffen ? 'rotate(0deg)' : 'rotate(-90deg)' }}
+                  >
+                    ▼
+                  </span>
+                  <span>
+                    {klassen.join(', ')}
+                  </span>
+                </button>
+
+                {/* SuS-Liste (ausgeklappt) */}
+                {istOffen && (
+                  <div className="px-3 pb-2 max-h-40 overflow-y-auto">
+                    {klassen.map((kl) => {
+                      const susInKlasse = kg.schueler.filter((s) => s.klasse === kl)
+                      return (
+                        <div key={kl} className="mt-1">
+                          <div className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-0.5">
+                            {kl} ({susInKlasse.length})
+                          </div>
+                          {susInKlasse.map((s) => (
+                            <div key={s.email} className="text-xs text-slate-600 dark:text-slate-300 pl-2">
+                              {s.name} {s.vorname}
+                            </div>
+                          ))}
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}

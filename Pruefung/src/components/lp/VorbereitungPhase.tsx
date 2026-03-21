@@ -1,9 +1,9 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useAuthStore } from '../../store/authStore'
 import { apiService } from '../../services/apiService'
 import type { PruefungsConfig, Teilnehmer } from '../../types/pruefung'
-import KlassenAuswahl from './KlassenAuswahl'
-import type { KlassenGruppe } from './KlassenAuswahl'
+import KursAuswahl from './KursAuswahl'
+import type { KursGruppe, KlassenlistenSuS } from './KursAuswahl'
 import TeilnehmerListe from './TeilnehmerListe'
 
 interface Props {
@@ -13,10 +13,10 @@ interface Props {
 
 export default function VorbereitungPhase({ config, onTeilnehmerGesetzt }: Props) {
   const user = useAuthStore((s) => s.user)
-  const [gruppen, setGruppen] = useState<KlassenGruppe[]>([])
+  const [rohDaten, setRohDaten] = useState<KlassenlistenSuS[]>([])
   const [ladeStatus, setLadeStatus] = useState<'idle' | 'laden' | 'fertig' | 'fehler'>('idle')
   const [fehler, setFehler] = useState('')
-  const [ausgewaehlteKlassen, setAusgewaehlteKlassen] = useState<Set<string>>(new Set())
+  const [ausgewaehlteKurse, setAusgewaehlteKurse] = useState<Set<string>>(new Set())
   const [abgewaehlte, setAbgewaehlte] = useState<Set<string>>(new Set())
   const [teilnehmer, setTeilnehmer] = useState<Teilnehmer[]>(config.teilnehmer ?? [])
   const [einladungStatus, setEinladungStatus] = useState<'idle' | 'senden' | 'fertig' | 'fehler'>('idle')
@@ -29,23 +29,15 @@ export default function VorbereitungPhase({ config, onTeilnehmerGesetzt }: Props
     setFehler('')
     try {
       const daten = await apiService.ladeKlassenlisten(user.email)
-      // Nach Klasse gruppieren, SuS per E-Mail deduplizieren
-      // (gleicher SuS kann in mehreren Kurs-Sheets vorkommen, z.B. 29f in EWR + SF)
-      const map = new Map<string, KlassenGruppe>()
-      const gesehen = new Set<string>() // "klasse:email"
-      for (const eintrag of daten) {
-        const key = `${eintrag.klasse}:${eintrag.email}`
-        if (gesehen.has(key)) continue
-        gesehen.add(key)
-        if (!map.has(eintrag.klasse)) {
-          map.set(eintrag.klasse, { klasse: eintrag.klasse, schueler: [] })
-        }
-        map.get(eintrag.klasse)!.schueler.push({
-          ...eintrag,
-          kurs: eintrag.kurs,
-        })
-      }
-      setGruppen(Array.from(map.values()).sort((a, b) => a.klasse.localeCompare(b.klasse)))
+      // Rohdaten speichern (jeder Eintrag hat kurs = Sheet-Name)
+      const sus: KlassenlistenSuS[] = daten.map((e) => ({
+        email: e.email,
+        name: e.name,
+        vorname: e.vorname,
+        klasse: e.klasse,
+        kurs: e.kurs || '—',
+      }))
+      setRohDaten(sus)
       setLadeStatus('fertig')
     } catch (err) {
       setFehler(String(err))
@@ -55,15 +47,42 @@ export default function VorbereitungPhase({ config, onTeilnehmerGesetzt }: Props
 
   useEffect(() => { ladeKlassenlisten() }, [ladeKlassenlisten])
 
-  // Klasse togglen → Teilnehmer-Liste aktualisieren
-  const handleToggleKlasse = (klasse: string) => {
-    const neueAuswahl = new Set(ausgewaehlteKlassen)
-    if (neueAuswahl.has(klasse)) {
-      neueAuswahl.delete(klasse)
-      setTeilnehmer((prev) => prev.filter((t) => t.klasse !== klasse || t.quelle === 'manuell'))
+  // Nach Kurs gruppieren (Sheet-Name)
+  const kursGruppen = useMemo((): KursGruppe[] => {
+    const map = new Map<string, KlassenlistenSuS[]>()
+    for (const s of rohDaten) {
+      const kurs = s.kurs || '—'
+      if (!map.has(kurs)) map.set(kurs, [])
+      map.get(kurs)!.push(s)
+    }
+    return Array.from(map.entries())
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([kurs, schueler]) => ({ kurs, schueler }))
+  }, [rohDaten])
+
+  // Kurs togglen → Teilnehmer-Liste aktualisieren
+  const handleToggleKurs = (kurs: string) => {
+    const neueAuswahl = new Set(ausgewaehlteKurse)
+
+    if (neueAuswahl.has(kurs)) {
+      // Kurs abwählen: nur SuS entfernen, die nicht durch andere gewählte Kurse abgedeckt sind
+      neueAuswahl.delete(kurs)
+
+      // Emails aller SuS in den verbleibenden gewählten Kursen sammeln
+      const abgedeckteEmails = new Set<string>()
+      for (const kg of kursGruppen) {
+        if (neueAuswahl.has(kg.kurs)) {
+          for (const s of kg.schueler) abgedeckteEmails.add(s.email)
+        }
+      }
+
+      setTeilnehmer((prev) =>
+        prev.filter((t) => t.quelle === 'manuell' || abgedeckteEmails.has(t.email)),
+      )
     } else {
-      neueAuswahl.add(klasse)
-      const gruppe = gruppen.find((g) => g.klasse === klasse)
+      // Kurs auswählen: SuS hinzufügen, die noch nicht in der Teilnehmer-Liste sind
+      neueAuswahl.add(kurs)
+      const gruppe = kursGruppen.find((g) => g.kurs === kurs)
       if (gruppe) {
         const neue: Teilnehmer[] = gruppe.schueler
           .filter((s) => !teilnehmer.some((t) => t.email === s.email))
@@ -77,7 +96,7 @@ export default function VorbereitungPhase({ config, onTeilnehmerGesetzt }: Props
         setTeilnehmer((prev) => [...prev, ...neue])
       }
     }
-    setAusgewaehlteKlassen(neueAuswahl)
+    setAusgewaehlteKurse(neueAuswahl)
   }
 
   const handleToggleEinzelne = (email: string) => {
@@ -148,10 +167,10 @@ export default function VorbereitungPhase({ config, onTeilnehmerGesetzt }: Props
 
   return (
     <div className="space-y-6">
-      {/* Klassenlisten */}
+      {/* Kurs-Auswahl */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-200">Teilnehmer auswählen</h3>
+          <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-200">Kurs auswählen</h3>
           <button
             type="button"
             onClick={ladeKlassenlisten}
@@ -168,10 +187,10 @@ export default function VorbereitungPhase({ config, onTeilnehmerGesetzt }: Props
           <p className="text-sm text-red-600 dark:text-red-400">{fehler}</p>
         )}
         {ladeStatus === 'fertig' && (
-          <KlassenAuswahl
-            gruppen={gruppen}
-            ausgewaehlteKlassen={ausgewaehlteKlassen}
-            onToggleKlasse={handleToggleKlasse}
+          <KursAuswahl
+            kursGruppen={kursGruppen}
+            ausgewaehlteKurse={ausgewaehlteKurse}
+            onToggleKurs={handleToggleKurs}
           />
         )}
       </div>
@@ -186,7 +205,7 @@ export default function VorbereitungPhase({ config, onTeilnehmerGesetzt }: Props
         />
       )}
 
-      {/* Manuell hinzufügen (wenn noch keine Klasse gewählt) */}
+      {/* Manuell hinzufügen (wenn noch kein Kurs gewählt) */}
       {teilnehmer.length === 0 && ladeStatus === 'fertig' && (
         <TeilnehmerListe
           teilnehmer={[]}
