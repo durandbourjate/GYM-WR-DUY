@@ -452,6 +452,7 @@ export default function FragenBrowser({ onHinzufuegen, onEntfernen, onSchliessen
               <option value="tkonto">T-Konto ({stats.typen.get('tkonto') ?? 0})</option>
               <option value="kontenbestimmung">Kontenbestimmung ({stats.typen.get('kontenbestimmung') ?? 0})</option>
               <option value="bilanzstruktur">Bilanz/ER ({stats.typen.get('bilanzstruktur') ?? 0})</option>
+              <option value="aufgabengruppe">Aufgabengruppe ({stats.typen.get('aufgabengruppe') ?? 0})</option>
             </select>
             <select
               value={filterBloom}

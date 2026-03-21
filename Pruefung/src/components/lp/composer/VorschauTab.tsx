@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from 'react'
 import type { PruefungsConfig } from '../../../types/pruefung.ts'
-import type { Frage, FrageAnhang, MCFrage, FreitextFrage, LueckentextFrage, ZuordnungFrage, RichtigFalschFrage, BerechnungFrage, BuchungssatzFrage, TKontoFrage, KontenbestimmungFrage, BilanzERFrage } from '../../../types/fragen.ts'
+import type { Frage, FrageAnhang, MCFrage, FreitextFrage, LueckentextFrage, ZuordnungFrage, RichtigFalschFrage, BerechnungFrage, BuchungssatzFrage, TKontoFrage, KontenbestimmungFrage, BilanzERFrage, AufgabengruppeFrage } from '../../../types/fragen.ts'
 import { kontoLabel } from '../../../utils/kontenrahmen.ts'
 import { formatDatum } from '../../../utils/zeit.ts'
 import { typLabel, fachbereichFarbe } from '../../../utils/fachbereich.ts'
@@ -165,6 +165,7 @@ function schaetzeZeitbedarf(frage: Frage): number {
     case 'tkonto': return Math.max(5, frage.punkte * 2)
     case 'kontenbestimmung': return Math.max(2, frage.punkte)
     case 'bilanzstruktur': return Math.max(10, frage.punkte * 3)
+    case 'aufgabengruppe': return Math.max(5, frage.punkte * 2)
     default: return frage.punkte
   }
 }
@@ -200,7 +201,8 @@ function formatFragetext(text: string): ReactNode[] {
 /** Read-only Vorschau einer einzelnen Frage wie SuS sie sehen */
 function FrageVorschau({ frage, nummer }: { frage: Frage; nummer: number }) {
   const fragetext = 'fragetext' in frage ? (frage as { fragetext: string }).fragetext
-    : 'aufgabentext' in frage ? (frage as { aufgabentext: string }).aufgabentext : ''
+    : 'aufgabentext' in frage ? (frage as { aufgabentext: string }).aufgabentext
+    : 'kontext' in frage ? (frage as { kontext: string }).kontext : ''
   const zeitbedarf = frage.zeitbedarf ?? schaetzeZeitbedarf(frage)
 
   return (
@@ -251,6 +253,7 @@ function FrageVorschau({ frage, nummer }: { frage: Frage; nummer: number }) {
       {frage.typ === 'tkonto' && <TKontoVorschau frage={frage as TKontoFrage} />}
       {frage.typ === 'kontenbestimmung' && <KontenbestimmungVorschau frage={frage as KontenbestimmungFrage} />}
       {frage.typ === 'bilanzstruktur' && <BilanzERVorschau frage={frage as BilanzERFrage} />}
+      {frage.typ === 'aufgabengruppe' && <AufgabengruppeVorschau frage={frage as AufgabengruppeFrage} />}
     </div>
   )
 }
@@ -554,6 +557,26 @@ function BilanzERVorschau({ frage }: { frage: BilanzERFrage }) {
         {zeigeBilanz && 'SuS erstellen die Bilanzstruktur (Aktiven/Passiven mit Gruppen).'}
         {zeigeBilanz && zeigeER && ' '}
         {zeigeER && 'SuS erstellen die mehrstufige Erfolgsrechnung.'}
+      </div>
+    </div>
+  )
+}
+
+function AufgabengruppeVorschau({ frage }: { frage: AufgabengruppeFrage }) {
+  return (
+    <div className="space-y-2">
+      <div className="text-xs text-slate-500 dark:text-slate-400">
+        {frage.teilaufgabenIds.length} Teilaufgabe{frage.teilaufgabenIds.length !== 1 ? 'n' : ''} verknuepft
+      </div>
+      <div className="space-y-1">
+        {frage.teilaufgabenIds.map((id, i) => (
+          <div key={id} className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 dark:bg-slate-700/30 rounded text-sm">
+            <span className="font-medium text-slate-600 dark:text-slate-300">
+              {String.fromCharCode(97 + i)})
+            </span>
+            <code className="text-xs font-mono text-slate-500 dark:text-slate-400">{id}</code>
+          </div>
+        ))}
       </div>
     </div>
   )

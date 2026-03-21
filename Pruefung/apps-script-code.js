@@ -451,6 +451,14 @@ function parseFrage(row, fachbereich) {
           bilanzsummeOderGewinn: true, mehrstufigkeit: true,
         },
       };
+    case 'aufgabengruppe':
+      return {
+        ...base,
+        typ: 'aufgabengruppe',
+        kontext: row.fragetext || '',
+        teilaufgabenIds: typDaten.teilaufgabenIds || [],
+        kontextAnhaenge: typDaten.kontextAnhaenge || [],
+      };
     default:
       return { ...base, typ: row.typ, fragetext: row.fragetext || '' };
   }
@@ -569,7 +577,7 @@ function speichereFrage(body) {
       punkte: String(frage.punkte || 0),
       musterlosung: frage.musterlosung || '',
       bewertungsraster: JSON.stringify(frage.bewertungsraster || []),
-      fragetext: frage.fragetext || frage.geschaeftsfall || frage.aufgabentext || '',
+      fragetext: frage.fragetext || frage.geschaeftsfall || frage.aufgabentext || frage.kontext || '',
       quelle: frage.quelle || 'manuell',
       anhaenge: JSON.stringify(frage.anhaenge || []),
       typDaten: JSON.stringify(getTypDaten(frage)),
@@ -629,6 +637,8 @@ function getTypDaten(frage) {
         loesung: frage.loesung,
         bewertungsoptionen: frage.bewertungsoptionen,
       };
+    case 'aufgabengruppe':
+      return { teilaufgabenIds: frage.teilaufgabenIds, kontextAnhaenge: frage.kontextAnhaenge };
     default:
       return {};
   }
@@ -967,7 +977,7 @@ function importierePoolFragen(body) {
             punkte: String(frage.punkte || 0),
             musterlosung: frage.musterlosung || '',
             bewertungsraster: JSON.stringify(frage.bewertungsraster || []),
-            fragetext: frage.fragetext || frage.geschaeftsfall || frage.aufgabentext || '',
+            fragetext: frage.fragetext || frage.geschaeftsfall || frage.aufgabentext || frage.kontext || '',
             quelle: frage.quelle || 'pool',
             anhaenge: JSON.stringify(frage.anhaenge || []),
             typDaten: JSON.stringify(getTypDaten(frage)),
