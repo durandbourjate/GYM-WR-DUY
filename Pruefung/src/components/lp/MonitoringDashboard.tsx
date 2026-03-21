@@ -362,8 +362,14 @@ export default function MonitoringDashboard({ pruefungId }: { pruefungId: string
             <BeendetPhase
               config={config}
               schuelerStatus={daten.schueler}
-              onExportieren={() => { /* TODO: Batch-Export öffnen */ }}
-              onKorrektur={() => { /* TODO: Navigation zu Korrektur */ }}
+              onExportieren={() => {
+                // TODO: Batch-Export Dialog öffnen
+              }}
+              onKorrektur={() => {
+                const url = new URL(window.location.href)
+                url.searchParams.set('ansicht', 'korrektur')
+                window.location.href = url.toString()
+              }}
             />
           )}
         </div>
