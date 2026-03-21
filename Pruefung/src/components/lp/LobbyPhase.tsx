@@ -1,4 +1,4 @@
-import type { PruefungsConfig, Teilnehmer } from '../../types/pruefung'
+import type { PruefungsConfig } from '../../types/pruefung'
 import type { SchuelerStatus } from '../../types/monitoring'
 
 interface Props {

@@ -27,6 +27,7 @@ export function erstelleDemoMonitoring(): MonitoringDaten {
         unterbrechungen: [],
         sebVersion: '3.8.0',
         browserInfo: 'SEB/3.8.0 Win10',
+        aktuelleFrage: 5,
       },
       {
         email: 'beat.beispiel@stud.gymhofwil.ch',
@@ -44,6 +45,7 @@ export function erstelleDemoMonitoring(): MonitoringDaten {
         unterbrechungen: [],
         sebVersion: '3.8.0',
         browserInfo: 'SEB/3.8.0 macOS',
+        aktuelleFrage: 7,
       },
       {
         email: 'carla.fischer@stud.gymhofwil.ch',
@@ -61,6 +63,7 @@ export function erstelleDemoMonitoring(): MonitoringDaten {
         unterbrechungen: [],
         sebVersion: '3.8.0',
         browserInfo: 'SEB/3.8.0 Win10',
+        aktuelleFrage: null,
       },
       {
         email: 'david.keller@stud.gymhofwil.ch',
@@ -80,6 +83,7 @@ export function erstelleDemoMonitoring(): MonitoringDaten {
           { zeitpunkt: vor(2.5), dauer_sekunden: 0, typ: 'heartbeat-ausfall' },
         ],
         browserInfo: 'Chrome 130 macOS',
+        aktuelleFrage: 3,
       },
       {
         email: 'eva.schneider@stud.gymhofwil.ch',
@@ -97,6 +101,7 @@ export function erstelleDemoMonitoring(): MonitoringDaten {
         unterbrechungen: [],
         sebVersion: '3.8.0',
         browserInfo: 'SEB/3.8.0 Win11',
+        aktuelleFrage: 6,
       },
       {
         email: 'felix.weber@stud.gymhofwil.ch',
@@ -116,6 +121,7 @@ export function erstelleDemoMonitoring(): MonitoringDaten {
         ],
         sebVersion: '3.7.1',
         browserInfo: 'SEB/3.7.1 Win10',
+        aktuelleFrage: 4,
       },
       {
         email: 'gina.huber@stud.gymhofwil.ch',
@@ -131,6 +137,7 @@ export function erstelleDemoMonitoring(): MonitoringDaten {
         netzwerkFehler: 0,
         autoSaveCount: 0,
         unterbrechungen: [],
+        aktuelleFrage: null,
       },
       {
         email: 'hans.brunner@stud.gymhofwil.ch',
@@ -148,6 +155,7 @@ export function erstelleDemoMonitoring(): MonitoringDaten {
         unterbrechungen: [],
         sebVersion: '3.8.0',
         browserInfo: 'SEB/3.8.0 macOS',
+        aktuelleFrage: null,
       },
     ],
   }

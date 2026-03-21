@@ -6,6 +6,86 @@
 
 ## Aktueller Stand
 
+**Phase 5i: Prüfungs-Workflow (Teilnehmer → Lobby → Aktiv → Beendet)** (21.03.2026) ✅
+
+### Session 21.03.2026 — Prüfungs-Workflow
+
+#### Neues Feature: 4-Phasen-Workflow im MonitoringDashboard
+
+State-Machine mit 4 Phasen: `vorbereitung → lobby → aktiv → beendet`, deterministisch abgeleitet aus bestehendem State (kein neues Feld nötig).
+
+**Phase-Ableitung (Priorität):**
+1. `beendetUm` gesetzt → `beendet`
+2. `freigeschaltet` → `aktiv`
+3. `teilnehmer` vorhanden + mindestens 1 SuS eingeloggt → `lobby`
+4. Sonst → `vorbereitung`
+
+**Vorbereitung (`VorbereitungPhase.tsx`):**
+- Klassenlisten von Google Sheets laden (neuer Endpoint `ladeKlassenlisten`)
+- Klassen-Toggle (Checkboxen), individuelle De-/Selektion
+- Manuelles Hinzufügen per E-Mail
+- Einladungs-E-Mails senden (HTML-E-Mail via MailApp)
+- Link kopieren, "Prüfung starten" → speichert Teilnehmer + setzt `freigeschaltet`
+
+**Lobby (`LobbyPhase.tsx`):**
+- Fortschrittsbalken (bereit/ausstehend/unerwartet)
+- Unerwartete SuS werden der LP angezeigt (semi-offener Zugang)
+- "Freischalten" und "Zurück"-Buttons
+
+**Aktiv (`AktivPhase.tsx` + `ZusammenfassungsLeiste.tsx` + `SusDetailPanel.tsx`):**
+- Live-Monitoring-Tabelle mit QuickFilter + Sortierung
+- Inaktivitäts-Warnstufen: 🟡 1min, 🟠 3min, 🔴 5min (abgeleitet aus letzterHeartbeat/Save)
+- Zusammenfassungsleiste: aktiv/abgegeben/ausstehend
+- Slide-in Detail-Panel pro SuS mit Fragen-Grid + technische Stats
+- BeendenDialog-Integration (Sofort/Restzeit, Einzel/Global)
+
+**Beendet (`BeendetPhase.tsx`):**
+- Zusammenfassungs-Grid (Teilnehmer, Abgegeben, Durchschnitt, Dauer)
+- Status-Tabelle aller SuS
+- Export- und Korrektur-Buttons (Platzhalter)
+
+**SuS-Wartebildschirm (`Startbildschirm.tsx`):**
+- Puls-Animation (🔒 + `animate-ping`) statt SVG-Lock
+- Text: "Die Lehrperson hat die Prüfung noch nicht freigegeben."
+- 3s-Polling bis `freigeschaltet === true`
+
+**PhaseHeader (`PhaseHeader.tsx`):**
+- Status-Badge mit phasenspezifischen Farben/Icons (⚙️🟡🟢⏹)
+- Timer-Anzeige während aktiver Phase
+
+#### Neue Komponenten (8 Dateien)
+- `src/components/lp/PhaseHeader.tsx` — Status-Badge + Timer
+- `src/components/lp/KlassenAuswahl.tsx` — Klassen-Grid mit Checkboxen
+- `src/components/lp/TeilnehmerListe.tsx` — Scrollbare Teilnehmer-Liste
+- `src/components/lp/VorbereitungPhase.tsx` — Orchestrierung Teilnehmer-Auswahl
+- `src/components/lp/LobbyPhase.tsx` — Bereitschafts-Lobby
+- `src/components/lp/AktivPhase.tsx` — Live-Monitoring mit Inaktivitäts-Warnung
+- `src/components/lp/ZusammenfassungsLeiste.tsx` — Aktiv/Abgegeben/Ausstehend
+- `src/components/lp/SusDetailPanel.tsx` — Slide-in Detail-Panel
+- `src/components/lp/BeendetPhase.tsx` — Zusammenfassung nach Prüfungsende
+
+#### Geänderte Dateien
+- `src/types/pruefung.ts` — `Teilnehmer` Interface, `teilnehmer?` + `beendetUm?` in Config
+- `src/types/monitoring.ts` — `aktuelleFrage: number | null`, `PruefungsPhase` Type
+- `src/utils/phase.ts` — `bestimmePhase()`, `letzteAktivitaet()`, `inaktivitaetsStufe()`
+- `src/services/apiService.ts` — 3 neue Methoden: `ladeKlassenlisten()`, `setzeTeilnehmer()`, `sendeEinladungen()`
+- `src/hooks/usePruefungsMonitoring.ts` — Heartbeat sendet `aktuelleFrage`
+- `src/components/lp/MonitoringDashboard.tsx` — Config-Laden, Phase-Router, Phase-Komponenten
+- `src/components/Startbildschirm.tsx` — Puls-Animation im Warteraum
+- `src/data/demoMonitoring.ts` — `aktuelleFrage` zu allen Demo-SuS
+- `apps-script-code.js` — 3 neue Endpoints: `ladeKlassenlisten`, `setzeTeilnehmer`, `sendeEinladungen` + Heartbeat `aktuelleFrage` + Config `teilnehmer`/`beendetUm` + Monitoring `aktuelleFrage`/`klasse`
+
+#### Specs & Pläne
+- Spec: `docs/superpowers/specs/2026-03-21-pruefungs-workflow-design.md`
+- Plan: `docs/superpowers/plans/2026-03-21-pruefungs-workflow.md`
+
+#### Wichtig nach Push
+- `apps-script-code.js` in Apps Script Editor kopieren + neue Bereitstellung erstellen
+- Sheet "Klassenlisten" muss existieren (wird von `ladeKlassenlisten` gelesen)
+- `KLASSENLISTEN_ID` in apps-script-code.js anpassen falls nötig
+
+---
+
 **Phase 5h: Open-End-Modus + LP-kontrolliertes Beenden** (21.03.2026) ✅
 
 ### Session 21.03.2026 — Open-End & LP-Beenden
@@ -354,7 +434,16 @@ Pruefung/
 │   │   │   ├── KorrekturSchuelerZeile.tsx — Aufklappbare SuS-Zeile mit Bewertungen
 │   │   │   ├── KorrekturFrageZeile.tsx   — Einzelne Frage: KI-Vorschlag + LP-Override
 │   │   │   ├── SuSVorschau.tsx          — Fullscreen SuS-Vorschau (Preview aus Schüler-Sicht)
-│   │   │   ├── MonitoringDashboard.tsx  — LP-Dashboard: Live-Übersicht aller SuS
+│   │   │   ├── MonitoringDashboard.tsx  — LP-Dashboard: Live-Übersicht aller SuS + Phase-Router
+│   │   │   ├── PhaseHeader.tsx          — Status-Badge + Timer pro Phase
+│   │   │   ├── KlassenAuswahl.tsx       — Klassen-Grid mit Checkboxen
+│   │   │   ├── TeilnehmerListe.tsx      — Scrollbare Teilnehmer-Liste
+│   │   │   ├── VorbereitungPhase.tsx    — Teilnehmer-Auswahl + Einladungen
+│   │   │   ├── LobbyPhase.tsx           — Bereitschafts-Lobby (bereit/ausstehend)
+│   │   │   ├── AktivPhase.tsx           — Live-Monitoring mit Inaktivitäts-Warnung
+│   │   │   ├── ZusammenfassungsLeiste.tsx — Aktiv/Abgegeben/Ausstehend Zähler
+│   │   │   ├── SusDetailPanel.tsx       — Slide-in Detail-Panel pro SuS
+│   │   │   ├── BeendetPhase.tsx         — Zusammenfassung nach Prüfungsende
 │   │   │   └── SchuelerZeile.tsx        — Einzelne SuS-Zeile mit Detail-Panel
 │   │   ├── sus/
 │   │   │   ├── KorrekturListe.tsx      — SuS: Liste freigegebener Korrekturen
@@ -399,6 +488,7 @@ Pruefung/
 │       ├── exportUtils.ts              — CSV-Export (Semicolon, BOM für Excel)
 │       ├── markdown.ts                  — Einfacher Markdown→HTML Renderer
 │       ├── mediaUtils.ts               — MIME-Helpers, URL-Parsing (YouTube/Vimeo/nanoo), Drive-URLs
+│       ├── phase.ts                     — bestimmePhase(), letzteAktivitaet(), inaktivitaetsStufe()
 │       ├── zeitbedarf.ts               — Zeitbedarfs-Schätzung pro Fragetyp
 │       └── zeit.ts                      — Timer-Hilfsfunktionen
 ├── seb/
@@ -524,7 +614,7 @@ Ohne diese Variablen funktioniert die App im **Demo-Modus** (Schülercode + Demo
 ### Offen (User-Wünsche für spätere Iterationen)
 - Pool-Rück-Sync End-to-End-Test (GITHUB_TOKEN konfiguriert, Live-Test ausstehend)
 - Pool-Rück-Sync Batch-Export ✅ implementiert
-- Prüfungs-Durchführung erweitern (Open-End-Modus, LP-kontrolliertes Beenden)
+- ~~Prüfungs-Durchführung erweitern~~ ✅ (Open-End, LP-Beenden, 4-Phasen-Workflow)
 - ~~Buchhaltungs-Fragetyp~~ ✅ (4 FiBu-Typen + Aufgabengruppe implementiert)
 - Kollaboratives Korrigieren (mehrere LP korrigieren dieselbe Prüfung — Architektur-Klärung nötig)
 - Tablet/Smartphone-Optimierung (responsive by design, spezifische Tests ausstehend)
