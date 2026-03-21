@@ -407,6 +407,14 @@ function parseFrage(row, fachbereich) {
         rechenwegErforderlich: typDaten.rechenwegErforderlich || false,
         hilfsmittel: typDaten.hilfsmittel || '',
       };
+    case 'buchungssatz':
+      return {
+        ...base,
+        typ: 'buchungssatz',
+        geschaeftsfall: row.fragetext || '',
+        buchungen: typDaten.buchungen || [],
+        kontenauswahl: typDaten.kontenauswahl || { modus: 'voll' },
+      };
     default:
       return { ...base, typ: row.typ, fragetext: row.fragetext || '' };
   }
@@ -525,7 +533,7 @@ function speichereFrage(body) {
       punkte: String(frage.punkte || 0),
       musterlosung: frage.musterlosung || '',
       bewertungsraster: JSON.stringify(frage.bewertungsraster || []),
-      fragetext: frage.fragetext || '',
+      fragetext: frage.fragetext || frage.geschaeftsfall || '',
       quelle: frage.quelle || 'manuell',
       anhaenge: JSON.stringify(frage.anhaenge || []),
       typDaten: JSON.stringify(getTypDaten(frage)),
@@ -567,6 +575,8 @@ function getTypDaten(frage) {
       return { aussagen: frage.aussagen };
     case 'berechnung':
       return { ergebnisse: frage.ergebnisse, rechenwegErforderlich: frage.rechenwegErforderlich, hilfsmittel: frage.hilfsmittel };
+    case 'buchungssatz':
+      return { buchungen: frage.buchungen, kontenauswahl: frage.kontenauswahl };
     default:
       return {};
   }
@@ -905,7 +915,7 @@ function importierePoolFragen(body) {
             punkte: String(frage.punkte || 0),
             musterlosung: frage.musterlosung || '',
             bewertungsraster: JSON.stringify(frage.bewertungsraster || []),
-            fragetext: frage.fragetext || '',
+            fragetext: frage.fragetext || frage.geschaeftsfall || '',
             quelle: frage.quelle || 'pool',
             anhaenge: JSON.stringify(frage.anhaenge || []),
             typDaten: JSON.stringify(getTypDaten(frage)),

@@ -73,6 +73,15 @@ function antwortAlsText(antwort: Antwort | undefined, frage: Frage): string {
       return teile.join(', ')
     }
 
+    case 'buchungssatz': {
+      if (antwort.buchungen.length === 0) return '(keine Buchungen)'
+      return antwort.buchungen.map((b, i) => {
+        const soll = b.sollKonten.map(k => `${k.kontonummer || '?'}: ${k.betrag}`).join(', ')
+        const haben = b.habenKonten.map(k => `${k.kontonummer || '?'}: ${k.betrag}`).join(', ')
+        return `Buchung ${i + 1}: Soll [${soll}] / Haben [${haben}]`
+      }).join('; ')
+    }
+
     default:
       return '(unbekannter Typ)'
   }

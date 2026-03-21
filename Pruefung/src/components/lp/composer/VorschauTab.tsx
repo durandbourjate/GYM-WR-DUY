@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from 'react'
 import type { PruefungsConfig } from '../../../types/pruefung.ts'
-import type { Frage, FrageAnhang, MCFrage, FreitextFrage, LueckentextFrage, ZuordnungFrage, RichtigFalschFrage, BerechnungFrage } from '../../../types/fragen.ts'
+import type { Frage, FrageAnhang, MCFrage, FreitextFrage, LueckentextFrage, ZuordnungFrage, RichtigFalschFrage, BerechnungFrage, BuchungssatzFrage } from '../../../types/fragen.ts'
 import { formatDatum } from '../../../utils/zeit.ts'
 import { typLabel, fachbereichFarbe } from '../../../utils/fachbereich.ts'
 import MediaAnhang from '../../MediaAnhang.tsx'
@@ -160,6 +160,7 @@ function schaetzeZeitbedarf(frage: Frage): number {
     case 'lueckentext': return Math.max(1, frage.punkte)
     case 'zuordnung': return Math.max(1, frage.punkte)
     case 'berechnung': return Math.max(2, frage.punkte * 2)
+    case 'buchungssatz': return Math.max(3, frage.punkte * 1.5)
     default: return frage.punkte
   }
 }
@@ -241,6 +242,7 @@ function FrageVorschau({ frage, nummer }: { frage: Frage; nummer: number }) {
       {frage.typ === 'zuordnung' && <ZuordnungVorschau frage={frage as ZuordnungFrage} />}
       {frage.typ === 'richtigfalsch' && <RichtigFalschVorschau frage={frage as RichtigFalschFrage} />}
       {frage.typ === 'berechnung' && <BerechnungVorschau frage={frage as BerechnungFrage} />}
+      {frage.typ === 'buchungssatz' && <BuchungssatzVorschau frage={frage as BuchungssatzFrage} />}
     </div>
   )
 }
@@ -387,6 +389,40 @@ function BerechnungVorschau({ frage }: { frage: BerechnungFrage }) {
           />
         </div>
       )}
+    </div>
+  )
+}
+
+function BuchungssatzVorschau({ frage }: { frage: BuchungssatzFrage }) {
+  return (
+    <div className="space-y-3">
+      {/* Geschäftsfall */}
+      <div className="text-sm text-slate-700 dark:text-slate-200 mb-3 leading-relaxed whitespace-pre-wrap">
+        {frage.geschaeftsfall}
+      </div>
+      {/* Buchungstabelle (leer für SuS) */}
+      <div className="border border-slate-200 dark:border-slate-600 rounded-lg overflow-hidden">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="bg-slate-50 dark:bg-slate-700/50 text-xs text-slate-500 dark:text-slate-400">
+              <th className="px-3 py-2 text-left font-medium">Soll</th>
+              <th className="px-3 py-2 text-right font-medium">Betrag</th>
+              <th className="px-3 py-2 text-left font-medium">Haben</th>
+              <th className="px-3 py-2 text-right font-medium">Betrag</th>
+            </tr>
+          </thead>
+          <tbody>
+            {frage.buchungen.map((b) => (
+              <tr key={b.id} className="border-t border-slate-100 dark:border-slate-700">
+                <td className="px-3 py-2 text-slate-400 dark:text-slate-500">---</td>
+                <td className="px-3 py-2 text-right text-slate-400 dark:text-slate-500">---</td>
+                <td className="px-3 py-2 text-slate-400 dark:text-slate-500">---</td>
+                <td className="px-3 py-2 text-right text-slate-400 dark:text-slate-500">---</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   )
 }

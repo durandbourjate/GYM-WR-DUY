@@ -446,6 +446,9 @@ export default function FragenBrowser({ onHinzufuegen, onEntfernen, onSchliessen
               <option value="freitext">Freitext ({stats.typen.get('freitext') ?? 0})</option>
               <option value="lueckentext">Lückentext ({stats.typen.get('lueckentext') ?? 0})</option>
               <option value="zuordnung">Zuordnung ({stats.typen.get('zuordnung') ?? 0})</option>
+              <option value="richtigfalsch">Richtig/Falsch ({stats.typen.get('richtigfalsch') ?? 0})</option>
+              <option value="berechnung">Berechnung ({stats.typen.get('berechnung') ?? 0})</option>
+              <option value="buchungssatz">Buchungssatz ({stats.typen.get('buchungssatz') ?? 0})</option>
             </select>
             <select
               value={filterBloom}
