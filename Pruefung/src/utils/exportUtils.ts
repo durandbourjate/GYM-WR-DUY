@@ -1,5 +1,7 @@
 import type { PruefungsKorrektur } from '../types/korrektur.ts'
 import type { Frage } from '../types/fragen.ts'
+import type { SchuelerStatus } from '../types/monitoring.ts'
+import type { PruefungsConfig } from '../types/pruefung.ts'
 import { effektivePunkte, berechneNote } from './korrekturUtils.ts'
 
 /**
@@ -93,6 +95,67 @@ function ermittleFrageIds(korrektur: PruefungsKorrektur): string[] {
     }
   }
   return Array.from(ids)
+}
+
+/**
+ * Exportiert Teilnahme-Übersicht als CSV (für BeendetPhase, vor der Korrektur).
+ * Spalten: Name; E-Mail; Klasse; Status; Startzeit; Abgabezeit; Beantwortet; Gesamt; Unterbrechungen
+ */
+export function exportiereTeilnahmeCSV(
+  config: PruefungsConfig,
+  schuelerStatus: SchuelerStatus[],
+): string {
+  if (schuelerStatus.length === 0) return ''
+
+  const header = [
+    'Name',
+    'E-Mail',
+    'Klasse',
+    'Status',
+    'Startzeit',
+    'Abgabezeit',
+    'Beantwortet',
+    'Gesamt',
+    'Unterbrechungen',
+  ]
+
+  const statusLabel: Record<string, string> = {
+    'aktiv': 'Aktiv',
+    'inaktiv': 'Inaktiv',
+    'abgegeben': 'Abgegeben',
+    'nicht-gestartet': 'Nicht erschienen',
+    'beendet-lp': 'Erzwungen beendet',
+  }
+
+  const formatZeit = (iso: string | null): string => {
+    if (!iso) return ''
+    try {
+      return new Date(iso).toLocaleString('de-CH', {
+        day: '2-digit', month: '2-digit', year: 'numeric',
+        hour: '2-digit', minute: '2-digit',
+      })
+    } catch {
+      return iso
+    }
+  }
+
+  const zeilen = schuelerStatus
+    .sort((a, b) => (a.name || a.email).localeCompare(b.name || b.email))
+    .map((s) => [
+      escapeCSV(s.name || ''),
+      escapeCSV(s.email),
+      escapeCSV(s.klasse || ''),
+      statusLabel[s.status] || s.status,
+      formatZeit(s.startzeit),
+      formatZeit(s.abgabezeit),
+      String(s.beantworteteFragen),
+      String(s.gesamtFragen),
+      String(s.unterbrechungen?.length ?? 0),
+    ])
+
+  const titelZeile = `Prüfung: ${escapeCSV(config.titel || config.id)}`
+  const csvZeilen = [titelZeile, header.join(';'), ...zeilen.map((z) => z.join(';'))]
+  return csvZeilen.join('\n')
 }
 
 /** CSV-Feld escapen: Semikolon, Anführungszeichen, Zeilenumbrüche */

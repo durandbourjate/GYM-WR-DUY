@@ -15,6 +15,7 @@ import { typLabel } from '../../utils/fachbereich.ts'
 import type { PruefungsConfig } from '../../types/pruefung'
 import type { PruefungsPhase } from '../../types/monitoring'
 import { bestimmePhase } from '../../utils/phase'
+import { exportiereTeilnahmeCSV, downloadCSV } from '../../utils/exportUtils'
 import PhaseHeader from './PhaseHeader'
 import VorbereitungPhase from './VorbereitungPhase'
 import LobbyPhase from './LobbyPhase'
@@ -363,7 +364,11 @@ export default function MonitoringDashboard({ pruefungId }: { pruefungId: string
               config={config}
               schuelerStatus={daten.schueler}
               onExportieren={() => {
-                // TODO: Batch-Export Dialog öffnen
+                const csv = exportiereTeilnahmeCSV(config, daten.schueler)
+                if (csv) {
+                  const dateiname = `${config.titel || config.id}_Teilnahme_${new Date().toISOString().slice(0, 10)}.csv`
+                  downloadCSV(csv, dateiname)
+                }
               }}
               onKorrektur={() => {
                 const url = new URL(window.location.href)
