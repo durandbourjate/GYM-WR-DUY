@@ -6,6 +6,28 @@
 
 ## Aktueller Stand
 
+**fragenMap-Sync + Build-Fixes + DurchfuehrenDashboard** (22.03.2026) ✅
+
+### Session 22.03.2026 — fragenMap-Sync + Refactoring DurchfuehrenDashboard
+
+#### Bug-Fix: fragenMap-Sync zwischen Composer und FragenBrowser
+- **Problem:** Neue/bearbeitete Fragen im FragenBrowser wurden nicht in der `fragenMap` des PruefungsComposers aktualisiert → Anzeige "nicht gefunden" im Abschnitte-Tab
+- **Ursache:** `PruefungsComposer` und `FragenBrowser` laden die Fragenbank unabhängig. Nur FragenBrowser aktualisiert seine lokale Liste bei neuen Fragen.
+- **Fix:** Neuer `onFrageAktualisiert`-Callback: FragenBrowser meldet Änderungen an Composer, der seine `fragenMap` sofort synchronisiert
+- **Betroffene Dateien:** `FragenBrowser.tsx` (neuer Prop + Aufrufe bei Speichern/Import), `PruefungsComposer.tsx` (neuer Callback + Prop-Durchreichung)
+
+#### Refactoring: DurchfuehrenDashboard ersetzt MonitoringDashboard + PhaseHeader
+- `DurchfuehrenDashboard.tsx` (neu): Vereint Monitoring-Funktionalität mit Tab-basierter Navigation (Vorbereitung, Lobby, Live, Ergebnisse, Korrektur)
+- `MonitoringDashboard.tsx` + `PhaseHeader.tsx`: Gelöscht (Funktionalität in DurchfuehrenDashboard integriert)
+- `LPStartseite.tsx`: "Durchführen"/"Bearbeiten"-Buttons statt altem Layout
+- `KorrekturDashboard.tsx`: Aufgeräumt
+- `FragenBrowserHeader.tsx`: Filter-Verbesserungen
+
+#### Build-Fixes
+- Unbenutzte Variablen (`pruefungsUrl`, `abgaben`, `fragen`, `nachrichten`) bereinigt — Vite-Build scheiterte an `noUnusedLocals`
+
+---
+
 **Refactoring: Code-Strukturierung** (22.03.2026) ✅
 
 ### Session 22.03.2026 — Refactoring (3 Dateien, 5 Phasen)
@@ -354,10 +376,13 @@ Beim Speichern von FiBu-Fragen wird das `musterlosung`-Textfeld automatisch aus 
 - Monitoring-Hook (Auto-Save, Remote-Save, Heartbeat, Focus-Detection, Online/Offline)
 - SEB-Erkennung (User-Agent-Check + Warnbanner) + SEB-Konfigurationsvorlage (`seb/`)
 - LP-Monitoring-Dashboard (Live-Übersicht aller SuS)
-- **LP-Startseite:** Prüfungen verwalten, Monitoring/Bearbeiten/URL-Links
-- **Prüfungs-Composer:** 3-Tab-Editor (Einstellungen, Abschnitte & Fragen, Vorschau)
-- **Fragenbank-Browser:** Slide-over mit Filtern (Fachbereich, Typ, Bloom, Freitext-Suche)
-- **Fragenbank-Editor:** Alle 6 Fragetypen erstellen/bearbeiten + in Google Sheets speichern
+- **LP-Startseite:** Prüfungen verwalten, Durchführen/Bearbeiten-Buttons, Filter/Suche
+- **Prüfungs-Composer:** 4-Tab-Editor (Einstellungen, Abschnitte & Fragen, Vorschau, Analyse) + Autosave
+- **DurchfuehrenDashboard:** Tab-basiert (Vorbereitung → Lobby → Live → Ergebnisse → Korrektur)
+- **4-Phasen-Workflow:** vorbereitung → lobby → aktiv → beendet (State-Machine, deterministische Ableitung)
+- **Kurs-basierte Teilnehmer-Auswahl:** Pro Kurs/Gefäss statt Klasse, Dedup bei Mehrfach-Kursen
+- **Fragenbank-Browser:** Slide-over mit Filtern (Fachbereich, Typ, Bloom, Freitext-Suche, Pool-Status)
+- **Fragenbank-Editor:** Alle 11 Fragetypen erstellen/bearbeiten + in Google Sheets speichern
 - Rollen-Routing (LP ohne `?id=` → LPStartseite/Composer, mit `?id=` → Monitoring)
 - Zuordnung, Abschnitt-Header, Fortschrittsbalken, FragenÜbersicht
 - Abgabe-Zusammenfassung (Read-only, druckbar)
@@ -464,13 +489,19 @@ Pruefung/
 │   │   ├── useFocusTrap.ts             — Keyboard-Focus-Trap für Modals/Dialoge
 │   │   ├── usePruefungsMonitoring.ts    — Zentraler Monitoring-Hook
 │   │   ├── usePruefungsUX.ts           — beforeunload, Tastaturnavigation
-│   │   └── useTabKonflikt.ts           — BroadcastChannel Tab-Erkennung
+│   │   ├── useTabKonflikt.ts           — BroadcastChannel Tab-Erkennung
+│   │   ├── usePanelResize.ts          — Wiederverwendbarer Panel-Resize-Hook
+│   │   └── useFragenFilter.ts         — Filter-/Sort-/Gruppen-Logik für Fragenbank
 │   ├── services/
 │   │   ├── autoSave.ts                  — IndexedDB Backup
 │   │   ├── sebService.ts               — SEB User-Agent Erkennung
 │   │   ├── retryQueue.ts              — IndexedDB Retry-Queue für fehlgeschlagene Saves
 │   │   ├── authService.ts              — Google Identity Services Wrapper
-│   │   ├── apiService.ts               — Apps Script API Client (text/plain CORS-Fix)
+│   │   ├── apiService.ts               — Barrel-Re-Export (27 Import-Stellen unverändert)
+│   │   ├── apiClient.ts               — Shared HTTP-Schicht (postJson, postBool, getJson, fileToBase64)
+│   │   ├── api/                        — 8 Domain-Module
+│   │   │   ├── pruefungApi.ts, fragenbankApi.ts, korrekturApi.ts, poolApi.ts
+│   │   │   ├── klassenlistenApi.ts, uploadApi.ts, nachrichtenApi.ts, monitoringApi.ts
 │   │   └── poolSync.ts                 — Pool-Fetch, Parse, Delta-Berechnung, Content-Hash
 │   ├── components/
 │   │   ├── lp/
@@ -478,6 +509,12 @@ Pruefung/
 │   │   │   ├── LPStartseite.tsx         — LP-Startseite: Prüfungen verwalten + erstellen + duplizieren
 │   │   │   ├── PruefungsComposer.tsx    — 4-Tab-Editor (Einstellungen, Abschnitte, Vorschau, Analyse) + Autosave
 │   │   │   ├── FragenBrowser.tsx        — Slide-over: Fragenbank + Direktes Hinzufügen/Entfernen + Resize + Pool-Badges/Filter
+│   │   │   ├── fragenbrowser/
+│   │   │   │   ├── FragenBrowserHeader.tsx — Header + Filter-Controls
+│   │   │   │   ├── KompaktZeile.tsx       — Kompakte Frage-Zeile
+│   │   │   │   ├── DetailKarte.tsx        — Detail-Ansicht einer Frage
+│   │   │   │   ├── PoolBadges.tsx         — Pool-Status-Badges
+│   │   │   │   └── gruppenHelfer.ts       — Gruppen-Utilities
 │   │   │   ├── PoolSyncDialog.tsx       — Sync-UI: Pools laden, Delta-Vorschau, Batch-Import (neu + aktualisierte Fragen)
 │   │   │   ├── RueckSyncDialog.tsx     — Rück-Sync: Update bestehender Pool-Fragen / Export neuer Fragen via GitHub API
 │   │   │   ├── HilfeSeite.tsx           — In-App Hilfe mit Akkordeon-Sektionen + Resize
@@ -503,13 +540,18 @@ Pruefung/
 │   │   │   │   ├── KIFiBuButtons.tsx   — KI-Buttons für FiBu-Typen (4 exportierte Komponenten)
 │   │   │   │   ├── BewertungsrasterEditor.tsx — Bewertungsraster-Editor (extrahiert)
 │   │   │   │   ├── PoolUpdateVergleich.tsx — Side-by-side Update-Vergleich (Pool vs. aktuell)
-│   │   │   │   └── useKIAssistent.ts  — KI-Assistent Hook (25 Aktionen inkl. 7 FiBu-Aktionen)
+│   │   │   │   ├── useKIAssistent.ts  — KI-Assistent Hook (25 Aktionen inkl. 7 FiBu-Aktionen)
+│   │   │   │   ├── sections/
+│   │   │   │   │   ├── MetadataSection.tsx     — Fachbereich, Bloom, Thema, Punkte etc.
+│   │   │   │   │   ├── FragetextSection.tsx    — Fragetext + KI-Buttons
+│   │   │   │   │   ├── TypEditorDispatcher.tsx — 11 Typ-Editoren Dispatch
+│   │   │   │   │   └── MusterloesungSection.tsx — Musterlösung + KI
+│   │   │   │   └── FormattierungsToolbar.tsx  — Formatierungs-Buttons (B/I/Liste/Code)
 │   │   │   ├── KorrekturDashboard.tsx   — KI-Korrektur: Review + Feedback
 │   │   │   ├── KorrekturSchuelerZeile.tsx — Aufklappbare SuS-Zeile mit Bewertungen
 │   │   │   ├── KorrekturFrageZeile.tsx   — Einzelne Frage: KI-Vorschlag + LP-Override
 │   │   │   ├── SuSVorschau.tsx          — Fullscreen SuS-Vorschau (Preview aus Schüler-Sicht)
-│   │   │   ├── MonitoringDashboard.tsx  — LP-Dashboard: Live-Übersicht aller SuS + Phase-Router
-│   │   │   ├── PhaseHeader.tsx          — Status-Badge + Timer pro Phase
+│   │   │   ├── DurchfuehrenDashboard.tsx — LP-Dashboard: Tab-basiert (Vorbereitung/Lobby/Live/Ergebnisse/Korrektur)
 │   │   │   ├── KursAuswahl.tsx           — Kurs-basierte Teilnehmer-Auswahl (ersetzt KlassenAuswahl)
 │   │   │   ├── BatchExportDialog.tsx     — Batch-Export mehrerer Fragen in Pools
 │   │   │   ├── TeilnehmerListe.tsx      — Scrollbare Teilnehmer-Liste
@@ -565,7 +607,10 @@ Pruefung/
 │       ├── mediaUtils.ts               — MIME-Helpers, URL-Parsing (YouTube/Vimeo/nanoo), Drive-URLs
 │       ├── phase.ts                     — bestimmePhase(), letzteAktivitaet(), inaktivitaetsStufe()
 │       ├── zeitbedarf.ts               — Zeitbedarfs-Schätzung pro Fragetyp
-│       └── zeit.ts                      — Timer-Hilfsfunktionen
+│       ├── zeit.ts                      — Timer-Hilfsfunktionen
+│       ├── fragenValidierung.ts       — validiereFrage() mit explizitem Parameter-Objekt
+│       ├── fragenFactory.ts           — erstelleFrageObjekt() Frage-Objekt-Konstruktion
+│       └── musterloesungGenerierung.ts — 5 FiBu-Musterlösungs-Generatoren
 ├── seb/
 │   ├── GymHofwil_Pruefung_Konfig.xml   — SEB-Konfigurationsvorlage (Import in SEB Config Tool)
 │   └── README.md                        — SEB-Anleitung (URL anpassen, exportieren, verteilen)

@@ -159,7 +159,7 @@ function HilfeEinstieg() {
 
       <Untertitel>Überblick: Ihr Workflow</Untertitel>
       <Schritt nr={1}>
-        <strong>Fragen erstellen</strong> — In der Fragenbank Fragen mit 6 verschiedenen Typen anlegen (MC, Freitext, Lückentext, Zuordnung, Richtig/Falsch, Berechnung).
+        <strong>Fragen erstellen</strong> — In der Fragenbank Fragen mit 11 verschiedenen Typen anlegen (MC, Freitext, Lückentext, Zuordnung, Richtig/Falsch, Berechnung, Buchungssatz, T-Konto, Kontenbestimmung, Bilanz/ER, Aufgabengruppe).
       </Schritt>
       <Schritt nr={2}>
         <strong>Prüfung zusammenstellen</strong> — Im Composer eine neue Prüfung erstellen: Einstellungen festlegen, Abschnitte bilden, Fragen aus der Fragenbank zuordnen.
@@ -168,7 +168,7 @@ function HilfeEinstieg() {
         <strong>Prüfung analysieren</strong> — Im Analyse-Tab die Prüfung auf Taxonomie-Verteilung, Zeitbedarf und Fragetypen-Mix prüfen.
       </Schritt>
       <Schritt nr={4}>
-        <strong>Prüfung durchführen</strong> — URL an SuS verteilen. Im Monitoring-Dashboard den Fortschritt live verfolgen.
+        <strong>Prüfung durchführen</strong> — Klicken Sie auf &laquo;Durchführen&raquo; auf der Startseite. Der 4-Phasen-Workflow führt Sie durch: Teilnehmer auswählen (Vorbereitung) → Bereitschaft prüfen (Lobby) → Live-Monitoring → Ergebnisse.
       </Schritt>
       <Schritt nr={5}>
         <strong>Korrigieren</strong> — Im Korrektur-Dashboard die Antworten KI-gestützt bewerten lassen und Feedback versenden.
@@ -176,7 +176,7 @@ function HilfeEinstieg() {
 
       <Untertitel>Demo-Modus</Untertitel>
       <Text>
-        Ohne Backend-Konfiguration läuft die App im Demo-Modus mit Beispieldaten. Sie können alle Funktionen ausprobieren — Änderungen werden aber nicht gespeichert. Klicken Sie auf dem Login-Screen auf &laquo;Demo ausprobieren&raquo; um direkt loszulegen.
+        Ohne Backend-Konfiguration läuft die App im Demo-Modus mit Beispieldaten. Sie können alle Funktionen ausprobieren — Änderungen werden aber nicht gespeichert. Klicken Sie auf dem Login-Screen auf &laquo;Als Lehrperson&raquo; oder &laquo;Als Schüler/in&raquo; unter &laquo;Demo ohne Login starten&raquo;.
       </Text>
     </div>
   )
@@ -224,7 +224,7 @@ function HilfeFragen() {
         Die Fragenbank ist der zentrale Ort für alle Prüfungsfragen. Fragen können in mehreren Prüfungen wiederverwendet werden.
       </Text>
 
-      <Untertitel>6 Fragetypen</Untertitel>
+      <Untertitel>11 Fragetypen</Untertitel>
       <Text>
         <strong>Multiple Choice</strong> — Einfach- oder Mehrfachauswahl. Optionen werden bei der Prüfung automatisch gemischt.
       </Text>
@@ -235,13 +235,32 @@ function HilfeFragen() {
         <strong>Lückentext</strong> — Text mit Platzhaltern (z.B. {`{{1}}`}, {`{{2}}`}). Pro Lücke können mehrere akzeptierte Antworten definiert werden.
       </Text>
       <Text>
-        <strong>Zuordnung</strong> — Paare von Begriffen und Definitionen. SuS ordnen per Drag & Drop zu.
+        <strong>Zuordnung</strong> — Paare von Begriffen und Definitionen. SuS ordnen per Dropdown zu.
       </Text>
       <Text>
         <strong>Richtig/Falsch</strong> — Mehrere Aussagen, die einzeln als richtig oder falsch bewertet werden.
       </Text>
       <Text>
         <strong>Berechnung</strong> — Numerische Ergebnisse mit definierbarer Toleranz und Einheit. Rechenweg kann optional verlangt werden.
+      </Text>
+
+      <Untertitel>Finanzbuchhaltung (FiBu)</Untertitel>
+      <Text>
+        <strong>Buchungssatz</strong> — Geschäftsfälle mit Soll/Haben-Konten aus dem Schweizer KMU-Kontenrahmen. Compound Entries möglich.
+      </Text>
+      <Text>
+        <strong>T-Konto</strong> — T-Konten-Form mit Soll/Haben-Buchungen, Gegenkonten und Saldo-Berechnung.
+      </Text>
+      <Text>
+        <strong>Kontenbestimmung</strong> — Geschäftsfall → Konto/Kategorie/Seite bestimmen. 3 Modi verfügbar.
+      </Text>
+      <Text>
+        <strong>Bilanz/ER</strong> — Zweispalten-Bilanz und mehrstufige Erfolgsrechnung mit Kontenauswahl.
+      </Text>
+
+      <Untertitel>Weitere</Untertitel>
+      <Text>
+        <strong>Aufgabengruppe</strong> — Bündelt mehrere Teilaufgaben unter einem gemeinsamen Kontext/Fallbeispiel. Fächerübergreifend nutzbar.
       </Text>
 
       <Untertitel>Metadaten pro Frage</Untertitel>
@@ -341,24 +360,48 @@ function HilfeDurchfuehrung() {
   return (
     <div>
       <Titel>Prüfung durchführen</Titel>
-
-      <Untertitel>Vorbereitung</Untertitel>
-      <Schritt nr={1}>Prüfung im Composer fertigstellen und speichern.</Schritt>
-      <Schritt nr={2}>URL an SuS verteilen (über den &laquo;URL&raquo;-Button auf der Startseite kopieren).</Schritt>
-      <Schritt nr={3}>Falls SEB aktiviert: SuS müssen den Safe Exam Browser starten.</Schritt>
-
-      <Untertitel>Während der Prüfung</Untertitel>
       <Text>
-        Über &laquo;Monitoring&raquo; auf der Startseite öffnen Sie das Live-Dashboard. Dort sehen Sie pro SuS: Fortschritt, letzte Aktivität, Netzwerkstatus und SEB-Status.
+        Klicken Sie auf &laquo;Durchführen&raquo; bei der gewünschten Prüfung auf der Startseite. Der 4-Phasen-Workflow führt Sie durch den gesamten Ablauf:
+      </Text>
+
+      <Untertitel>Phase 1: Vorbereitung</Untertitel>
+      <Schritt nr={1}>Klassenlisten werden automatisch aus Google Sheets geladen.</Schritt>
+      <Schritt nr={2}>Wählen Sie die Kurse aus (pro Gefäss, z.B. SF WR). SuS können in mehreren Kursen vorkommen — Duplikate werden automatisch erkannt.</Schritt>
+      <Schritt nr={3}>Optional: Einladungs-E-Mails an die ausgewählten SuS versenden.</Schritt>
+      <Schritt nr={4}>Klicken Sie &laquo;Prüfung starten&raquo; — die Prüfung wird freigeschaltet und SuS werden weitergeleitet.</Schritt>
+
+      <Untertitel>Phase 2: Lobby</Untertitel>
+      <Text>
+        Hier sehen Sie, welche SuS bereit sind (eingeloggt und wartend). Ein Fortschrittsbalken zeigt bereit/ausstehend an. Unerwartete SuS (nicht auf der Teilnehmerliste) werden separat angezeigt.
+      </Text>
+
+      <Untertitel>Phase 3: Live-Monitoring</Untertitel>
+      <Text>
+        Im Live-Dashboard sehen Sie pro SuS: Fortschritt, aktuelle Frage, letzte Aktivität und Netzwerkstatus. Inaktivitäts-Warnstufen zeigen an, wenn SuS länger als 1/3/5 Minuten nichts tun.
       </Text>
       <Text>
-        Antworten werden alle 30 Sekunden automatisch gespeichert. Bei Verbindungsabbruch werden Antworten lokal zwischengespeichert und bei Reconnect nachgesendet.
+        Sie können die Prüfung jederzeit beenden — sofort oder mit Restzeit (z.B. noch 5 Minuten). Auch einzelne SuS können individuell beendet werden.
+      </Text>
+      <Text>
+        Antworten werden alle 30 Sekunden automatisch gespeichert. Bei Verbindungsabbruch werden sie lokal zwischengespeichert und bei Reconnect nachgesendet.
+      </Text>
+
+      <Untertitel>Phase 4: Ergebnisse</Untertitel>
+      <Text>
+        Nach Prüfungsende sehen Sie eine Zusammenfassung: Teilnehmer, Abgaben, No-Shows. Von hier gelangen Sie direkt zur Korrektur.
+      </Text>
+
+      <Untertitel>Zeitmodus</Untertitel>
+      <Text>
+        <strong>Countdown:</strong> Klassischer Modus mit fixer Dauer (z.B. 45 Min.). SuS mit Nachteilsausgleich erhalten automatisch Zusatzzeit.
+      </Text>
+      <Text>
+        <strong>Open-End:</strong> Kein Zeitlimit — die Stoppuhr zählt aufwärts. Sie beenden die Prüfung manuell, optional mit Restzeit.
       </Text>
 
       <Untertitel>URL-Schema</Untertitel>
       <div className="bg-slate-50 dark:bg-slate-700/50 rounded-lg p-4 text-sm space-y-2 mb-4">
-        <div><code className="text-xs bg-slate-200 dark:bg-slate-600 px-1.5 py-0.5 rounded">/Pruefung/?id=abc</code> — Prüfung für SuS</div>
-        <div><code className="text-xs bg-slate-200 dark:bg-slate-600 px-1.5 py-0.5 rounded">/Pruefung/?id=abc</code> — Monitoring für LP (wenn als LP angemeldet)</div>
+        <div><code className="text-xs bg-slate-200 dark:bg-slate-600 px-1.5 py-0.5 rounded">/Pruefung/?id=abc</code> — Prüfung für SuS / Durchführen für LP</div>
         <div><code className="text-xs bg-slate-200 dark:bg-slate-600 px-1.5 py-0.5 rounded">/Pruefung/?id=abc&ansicht=korrektur</code> — Korrektur-Dashboard</div>
       </div>
     </div>
