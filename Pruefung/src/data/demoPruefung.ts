@@ -2,44 +2,58 @@ import type { PruefungsConfig } from '../types/pruefung.ts'
 
 export const demoPruefung: PruefungsConfig = {
   id: 'demo',
-  titel: 'Demo-Prüfung WR — Wirtschaft & Recht',
+  titel: 'Musterprüfung W&R — Alle Fragetypen',
 
-  klasse: '28abcd WR',
+  klasse: 'Testklasse',
   gefaess: 'SF',
   semester: 'S4',
   fachbereiche: ['VWL', 'BWL', 'Recht'],
-  datum: '2026-03-16',
+  datum: '2026-03-22',
 
   typ: 'summativ',
   modus: 'pruefung',
-  dauerMinuten: 45,
+  dauerMinuten: 60,
   zeitModus: 'countdown',
-  gesamtpunkte: 24,
+  gesamtpunkte: 50,
 
-  erlaubteKlasse: '28abcd WR',
+  erlaubteKlasse: 'Testklasse',
 
   sebErforderlich: false,
 
   abschnitte: [
     {
-      titel: 'Teil A: Multiple Choice',
-      beschreibung: 'Beantworten Sie die folgenden Fragen. Bei Mehrfachauswahl-Fragen können mehrere Antworten korrekt sein.',
-      fragenIds: ['vwl-mc-001', 'bwl-mc-001', 'recht-mc-001'],
+      titel: 'Teil A: Multiple Choice & Richtig/Falsch',
+      beschreibung: 'Beantworten Sie alle Fragen. Bei Mehrfachauswahl-Fragen können mehrere Antworten korrekt sein. Bei Richtig/Falsch beurteilen Sie jede Aussage einzeln.',
+      fragenIds: ['demo-mc-konjunktur', 'demo-mc-vertrag', 'demo-rf-geldpolitik'],
     },
     {
-      titel: 'Teil B: Freitext',
-      beschreibung: 'Beantworten Sie die folgenden Fragen in eigenen Worten. Achten Sie auf eine klare Struktur.',
-      fragenIds: ['bwl-ft-001', 'vwl-ft-001', 'recht-ft-001'],
+      titel: 'Teil B: Kurzantworten',
+      beschreibung: 'Ergänzen Sie die Lücken, ordnen Sie die Begriffe zu und lösen Sie die Berechnungsaufgabe. Zeigen Sie bei Berechnungen den Rechenweg.',
+      fragenIds: ['demo-lt-normenhierarchie', 'demo-zu-rechtsformen', 'demo-be-erfolgsrechnung'],
     },
     {
-      titel: 'Teil C: Lückentext',
-      beschreibung: 'Ergänzen Sie die fehlenden Begriffe.',
-      fragenIds: ['recht-lt-001'],
+      titel: 'Teil C: Freitext',
+      beschreibung: 'Beantworten Sie die Fragen in eigenen Worten. Achten Sie auf eine klare Struktur und verwenden Sie die Fachbegriffe korrekt.',
+      fragenIds: ['demo-ft-bip', 'demo-ft-kaufvertrag'],
     },
     {
-      titel: 'Teil D: Zuordnung',
-      beschreibung: 'Ordnen Sie die Begriffe korrekt zu. Verwenden Sie die Dropdown-Menüs.',
-      fragenIds: ['bwl-zu-001'],
+      titel: 'Teil D: Finanzbuchhaltung',
+      beschreibung: 'Verwenden Sie den Kontenplan KMU. Buchen Sie sauber mit Kontonummer und Betrag. Beachten Sie die Buchungsregeln (Soll an Haben).',
+      fragenIds: ['demo-bs-geschaeftsfaelle', 'demo-tk-bank', 'demo-kb-gemischt', 'demo-bilanz-einfach'],
+    },
+    {
+      titel: 'Teil E: Fallbeispiel',
+      beschreibung: 'Lesen Sie das Fallbeispiel aufmerksam durch und beantworten Sie alle Teilaufgaben.',
+      fragenIds: ['demo-ag-gmbh'],
+    },
+  ],
+
+  materialien: [
+    {
+      id: 'mat-kontenplan',
+      titel: 'Kontenplan KMU (Auszug)',
+      typ: 'text',
+      inhalt: '1000 Kasse | 1020 Bank | 1100 Debitoren | 2000 Kreditoren | 2100 Bankdarlehen | 2800 Eigenkapital | 3200 Warenertrag | 4200 Warenaufwand | 5200 Personalaufwand | 6000 Mietaufwand',
     },
   ],
 
@@ -53,7 +67,7 @@ export const demoPruefung: PruefungsConfig = {
   heartbeatIntervallSekunden: 10,
 
   korrektur: {
-    aktiviert: false,
+    aktiviert: true,
     modus: 'batch',
   },
 
