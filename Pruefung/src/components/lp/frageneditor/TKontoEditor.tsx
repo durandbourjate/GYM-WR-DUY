@@ -221,7 +221,7 @@ export default function TKontoEditor({
           <input
             type="checkbox"
             checked={kontenauswahl.zeigeKategoriefarben !== false}
-            onChange={() => update({ kontenauswahl: { ...kontenauswahl, zeigeKategoriefarben: kontenauswahl.zeigeKategoriefarben === false ? true : false } })}
+            onChange={() => setKontenauswahl({ ...kontenauswahl, zeigeKategoriefarben: kontenauswahl.zeigeKategoriefarben === false ? true : false })}
             className="rounded"
           />
           Konten-Kategoriefarben anzeigen
