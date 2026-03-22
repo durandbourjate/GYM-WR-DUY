@@ -271,7 +271,7 @@ export default function BuchungssatzFrage({ frage }: Props) {
                 placeholder="z.B. Wareneinkauf auf Kredit"
                 className="min-h-[44px] w-full rounded-md border border-slate-300 bg-white px-3 py-2
                   text-sm text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100
-                  focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500
+                  focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500
                   disabled:cursor-not-allowed disabled:opacity-50
                   placeholder:text-slate-400 dark:placeholder:text-slate-500"
               />
@@ -326,7 +326,7 @@ function KontoSeite({
   // Neutral: keine farbliche Vorwegnahme der Kontenart
   const hatEingabe = zeilen.some(z => z.kontonummer || z.betrag)
   const labelFarbe = hatEingabe
-    ? 'text-slate-700 dark:text-slate-200 bg-blue-50/50 dark:bg-blue-900/10 border-blue-200 dark:border-blue-700'
+    ? 'text-slate-700 dark:text-slate-200 bg-indigo-50/50 dark:bg-indigo-900/10 border-indigo-200 dark:border-indigo-700'
     : 'text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700'
 
   return (
@@ -358,7 +358,7 @@ function KontoSeite({
                 step="0.01"
                 className="min-h-[44px] w-full rounded-md border border-slate-300 bg-white px-3 py-2
                   text-sm text-right text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100
-                  focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500
+                  focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500
                   disabled:cursor-not-allowed disabled:opacity-50
                   placeholder:text-slate-400 dark:placeholder:text-slate-500"
               />

@@ -145,7 +145,7 @@ export default function KontenbestimmungFrage({ frage }: Props) {
                           disabled={readOnly}
                           className="min-h-[44px] w-full rounded-md border border-slate-300 bg-white px-2 py-2
                             text-sm text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100
-                            focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500
+                            focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500
                             disabled:cursor-not-allowed disabled:opacity-50"
                         >
                           <option value="">--</option>
@@ -166,7 +166,7 @@ export default function KontenbestimmungFrage({ frage }: Props) {
                           disabled={readOnly}
                           className="min-h-[44px] w-full rounded-md border border-slate-300 bg-white px-2 py-2
                             text-sm text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100
-                            focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500
+                            focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500
                             disabled:cursor-not-allowed disabled:opacity-50"
                         >
                           <option value="">--</option>

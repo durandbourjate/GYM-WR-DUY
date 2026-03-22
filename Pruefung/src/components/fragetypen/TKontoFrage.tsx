@@ -224,12 +224,24 @@ export default function TKontoFrage({ frage }: Props) {
               {/* Kontenkategorie */}
               {opts.kontenkategorie && (
                 <div className="px-4 py-2 border-b border-slate-100 dark:border-slate-700">
-                  <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Kontenkategorie</label>
+                  <div className="flex items-center gap-2">
+                    <label className="text-xs font-medium text-slate-500 dark:text-slate-400">Kontenkategorie</label>
+                    {konto.kontenkategorie && (
+                      <span className={`text-xs font-bold px-2 py-0.5 rounded-full border ${
+                        konto.kontenkategorie === 'aktiv' ? 'bg-yellow-50 text-yellow-700 border-yellow-300 dark:bg-yellow-900/20 dark:text-yellow-300 dark:border-yellow-700' :
+                        konto.kontenkategorie === 'passiv' ? 'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/15 dark:text-red-300 dark:border-red-800' :
+                        konto.kontenkategorie === 'aufwand' ? 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/15 dark:text-blue-300 dark:border-blue-800' :
+                        'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/15 dark:text-green-300 dark:border-green-800'
+                      }`}>
+                        {konto.kontenkategorie.charAt(0).toUpperCase() + konto.kontenkategorie.slice(1)}
+                      </span>
+                    )}
+                  </div>
                   <select
                     value={konto.kontenkategorie}
                     onChange={(e) => feldAendern(kIdx, 'kontenkategorie', e.target.value)}
                     disabled={readOnly}
-                    className="min-h-[44px] rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="mt-1 min-h-[44px] rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     <option value="">-- wählen --</option>
                     <option value="aktiv">Aktiv</option>
@@ -296,7 +308,7 @@ export default function TKontoFrage({ frage }: Props) {
                             onChange={(e) => feldAendern(kIdx, 'anfangsbestandLinks', e.target.value)}
                             disabled={readOnly}
                             placeholder="0"
-                            className="min-h-[36px] flex-1 rounded border border-slate-300 bg-white px-2 py-1 text-sm text-right text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 focus:border-blue-500 focus:outline-none disabled:opacity-50 placeholder:text-slate-400"
+                            className="min-h-[36px] flex-1 rounded border border-slate-300 bg-white px-2 py-1 text-sm text-right text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 focus:border-indigo-500 focus:outline-none disabled:opacity-50 placeholder:text-slate-400"
                           />
                         </div>
                       )}
@@ -311,7 +323,7 @@ export default function TKontoFrage({ frage }: Props) {
                             onChange={(e) => feldAendern(kIdx, 'anfangsbestandRechts', e.target.value)}
                             disabled={readOnly}
                             placeholder="0"
-                            className="min-h-[36px] flex-1 rounded border border-slate-300 bg-white px-2 py-1 text-sm text-right text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 focus:border-blue-500 focus:outline-none disabled:opacity-50 placeholder:text-slate-400"
+                            className="min-h-[36px] flex-1 rounded border border-slate-300 bg-white px-2 py-1 text-sm text-right text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 focus:border-indigo-500 focus:outline-none disabled:opacity-50 placeholder:text-slate-400"
                           />
                         </div>
                       )}
@@ -342,7 +354,7 @@ export default function TKontoFrage({ frage }: Props) {
                           placeholder="CHF"
                           min="0"
                           step="0.01"
-                          className="min-h-[36px] w-24 rounded border border-slate-300 bg-white px-2 py-1 text-sm text-right text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 focus:border-blue-500 focus:outline-none disabled:opacity-50 placeholder:text-slate-400"
+                          className="min-h-[36px] w-24 rounded border border-slate-300 bg-white px-2 py-1 text-sm text-right text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 focus:border-indigo-500 focus:outline-none disabled:opacity-50 placeholder:text-slate-400"
                         />
                         {!readOnly && konto.eintraegeLinks.length > 1 && (
                           <button type="button" onClick={() => zeileEntfernen(kIdx, 'links', zIdx)}
@@ -386,7 +398,7 @@ export default function TKontoFrage({ frage }: Props) {
                           placeholder="CHF"
                           min="0"
                           step="0.01"
-                          className="min-h-[36px] w-24 rounded border border-slate-300 bg-white px-2 py-1 text-sm text-right text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 focus:border-blue-500 focus:outline-none disabled:opacity-50 placeholder:text-slate-400"
+                          className="min-h-[36px] w-24 rounded border border-slate-300 bg-white px-2 py-1 text-sm text-right text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 focus:border-indigo-500 focus:outline-none disabled:opacity-50 placeholder:text-slate-400"
                         />
                         {!readOnly && konto.eintraegeRechts.length > 1 && (
                           <button type="button" onClick={() => zeileEntfernen(kIdx, 'rechts', zIdx)}
@@ -426,13 +438,13 @@ export default function TKontoFrage({ frage }: Props) {
                     placeholder="Betrag"
                     min="0"
                     step="0.01"
-                    className="min-h-[36px] w-28 rounded border border-slate-300 bg-white px-2 py-1 text-sm text-right text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 focus:border-blue-500 focus:outline-none disabled:opacity-50 placeholder:text-slate-400"
+                    className="min-h-[36px] w-28 rounded border border-slate-300 bg-white px-2 py-1 text-sm text-right text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 focus:border-indigo-500 focus:outline-none disabled:opacity-50 placeholder:text-slate-400"
                   />
                   <select
                     value={konto.saldoSeite}
                     onChange={(e) => feldAendern(kIdx, 'saldoSeite', e.target.value)}
                     disabled={readOnly}
-                    className="min-h-[36px] rounded border border-slate-300 bg-white px-2 py-1 text-sm text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 focus:border-blue-500 focus:outline-none disabled:opacity-50"
+                    className="min-h-[36px] rounded border border-slate-300 bg-white px-2 py-1 text-sm text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 focus:border-indigo-500 focus:outline-none disabled:opacity-50"
                   >
                     <option value="links">Links (Soll)</option>
                     <option value="rechts">Rechts (Haben)</option>

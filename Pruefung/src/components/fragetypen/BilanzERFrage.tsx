@@ -25,7 +25,7 @@ const leereStufe = (): StufeEingabe => ({ id: neueId(), label: '', konten: [leer
 const leereER = (): ERFeldEingabe => ({ stufen: [leereStufe()], gewinnVerlust: '' })
 
 // CSS Klassen-Helfer
-const inputSm = 'min-h-[36px] rounded border border-slate-300 bg-white px-2 py-1 text-sm text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 focus:border-blue-500 focus:outline-none disabled:opacity-50'
+const inputSm = 'min-h-[36px] rounded border border-slate-300 bg-white px-2 py-1 text-sm text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 focus:border-indigo-500 focus:outline-none disabled:opacity-50'
 const numInput = `${inputSm} text-right placeholder:text-slate-400`
 const btnRemove = 'min-h-[36px] min-w-[28px] flex items-center justify-center text-slate-400 hover:text-red-500 transition-colors'
 const btnAdd = 'mt-1 min-h-[36px] flex items-center gap-1 text-xs font-medium text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 opacity-60 hover:opacity-100 transition-opacity'
@@ -171,9 +171,9 @@ function BilanzUI({ bilanz, onChange, readOnly, konten }: { bilanz: BilanzEingab
     <div className="rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4">
       <h3 className="text-sm font-bold text-slate-700 dark:text-slate-200 mb-3">Bilanz</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <BilanzSeiteUI seite={bilanz.linkeSeite} seiteKey="links" bilanzsumme={bilanz.bilanzsummeLinks} readOnly={readOnly} konten={konten}
+        <BilanzSeiteUI seite={bilanz.linkeSeite} bilanzsumme={bilanz.bilanzsummeLinks} readOnly={readOnly} konten={konten}
           onUpdate={fn => updateSeite('links', fn)} onBsChange={v => { const k = dc(); k.bilanzsummeLinks = v; onChange(k) }} />
-        <BilanzSeiteUI seite={bilanz.rechteSeite} seiteKey="rechts" bilanzsumme={bilanz.bilanzsummeRechts} readOnly={readOnly} konten={konten}
+        <BilanzSeiteUI seite={bilanz.rechteSeite} bilanzsumme={bilanz.bilanzsummeRechts} readOnly={readOnly} konten={konten}
           onUpdate={fn => updateSeite('rechts', fn)} onBsChange={v => { const k = dc(); k.bilanzsummeRechts = v; onChange(k) }} />
       </div>
     </div>
@@ -181,8 +181,8 @@ function BilanzUI({ bilanz, onChange, readOnly, konten }: { bilanz: BilanzEingab
 }
 
 /* ─── Bilanz-Seite ─── */
-function BilanzSeiteUI({ seite, seiteKey, bilanzsumme, readOnly, konten, onUpdate, onBsChange }: {
-  seite: SeiteEingabe; seiteKey: 'links' | 'rechts'; bilanzsumme: string; readOnly: boolean; konten: string[]
+function BilanzSeiteUI({ seite, bilanzsumme, readOnly, konten, onUpdate, onBsChange }: {
+  seite: SeiteEingabe; bilanzsumme: string; readOnly: boolean; konten: string[]
   onUpdate: (fn: (s: SeiteEingabe) => void) => void; onBsChange: (v: string) => void
 }) {
   // Farbe erst nach SuS-Auswahl: Aktiven=gelb, Passiven=rot, sonst neutral
