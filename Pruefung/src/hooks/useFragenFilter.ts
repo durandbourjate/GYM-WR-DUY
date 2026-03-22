@@ -29,6 +29,8 @@ interface FragenFilterErgebnis {
   setFilterQuelle: (v: FilterQuelle) => void
   filterPoolStatus: FilterPoolStatus
   setFilterPoolStatus: (v: FilterPoolStatus) => void
+  filterMitAnhang: boolean
+  setFilterMitAnhang: (v: boolean) => void
 
   // Ansicht-State + Setter
   sortierung: Sortierung
@@ -68,6 +70,7 @@ export function useFragenFilter(
   const [filterThema, setFilterThema] = useState('')
   const [filterQuelle, setFilterQuelle] = useState<FilterQuelle>('alle')
   const [filterPoolStatus, setFilterPoolStatus] = useState<FilterPoolStatus>('alle')
+  const [filterMitAnhang, setFilterMitAnhang] = useState(false)
 
   // Ansicht
   const [sortierung, setSortierung] = useState<Sortierung>('thema')
@@ -118,6 +121,8 @@ export function useFragenFilter(
           case 'update': if (!f.poolUpdateVerfuegbar) return false; break
         }
       }
+      // Anhang-Filter
+      if (filterMitAnhang && (!f.anhaenge || f.anhaenge.length === 0)) return false
       if (suchtext) {
         const text = suchtext.toLowerCase()
         const fragetext = 'fragetext' in f ? (f as { fragetext: string }).fragetext : ''
@@ -131,7 +136,7 @@ export function useFragenFilter(
       }
       return true
     })
-  }, [alleFragen, filterFachbereich, filterTyp, filterBloom, filterThema, filterQuelle, filterPoolStatus, suchtext, userEmail])
+  }, [alleFragen, filterFachbereich, filterTyp, filterBloom, filterThema, filterQuelle, filterPoolStatus, filterMitAnhang, suchtext, userEmail])
 
   // Sortieren
   const sortierteFragen = useMemo(() => {
@@ -183,7 +188,7 @@ export function useFragenFilter(
   }, [gefilterteFragen])
 
   // Aktive Filter zählen
-  const aktiveFilter = [filterFachbereich, filterTyp, filterBloom, filterThema, suchtext, filterQuelle !== 'alle' ? filterQuelle : '', filterPoolStatus !== 'alle' ? filterPoolStatus : ''].filter(Boolean).length
+  const aktiveFilter = [filterFachbereich, filterTyp, filterBloom, filterThema, suchtext, filterQuelle !== 'alle' ? filterQuelle : '', filterPoolStatus !== 'alle' ? filterPoolStatus : '', filterMitAnhang ? 'anhang' : ''].filter(Boolean).length
 
   function filterZuruecksetzen(): void {
     setSuchtext('')
@@ -193,6 +198,7 @@ export function useFragenFilter(
     setFilterThema('')
     setFilterQuelle('alle')
     setFilterPoolStatus('alle')
+    setFilterMitAnhang(false)
   }
 
   return {
@@ -203,6 +209,7 @@ export function useFragenFilter(
     filterThema, setFilterThema,
     filterQuelle, setFilterQuelle,
     filterPoolStatus, setFilterPoolStatus,
+    filterMitAnhang, setFilterMitAnhang,
     sortierung, setSortierung,
     gruppierung, setGruppierung,
     aufgeklappteGruppen, setAufgeklappteGruppen,

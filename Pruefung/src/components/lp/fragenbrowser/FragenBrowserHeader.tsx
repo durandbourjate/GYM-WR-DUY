@@ -27,6 +27,8 @@ interface Props {
   setFilterQuelle: (v: FilterQuelle) => void
   filterPoolStatus: FilterPoolStatus
   setFilterPoolStatus: (v: FilterPoolStatus) => void
+  filterMitAnhang: boolean
+  setFilterMitAnhang: (v: boolean) => void
   filterZuruecksetzen: () => void
 
   // Ansicht-State
@@ -63,6 +65,7 @@ export default function FragenBrowserHeader({
   filterThema, setFilterThema,
   filterQuelle, setFilterQuelle,
   filterPoolStatus, setFilterPoolStatus,
+  filterMitAnhang, setFilterMitAnhang,
   filterZuruecksetzen,
   sortierung, setSortierung,
   gruppierung, setGruppierung,
@@ -245,6 +248,19 @@ export default function FragenBrowserHeader({
             <option value="update">Update verfügbar</option>
           </select>
         )}
+
+        {/* Anhang-Filter */}
+        <button
+          onClick={() => { setFilterMitAnhang(!filterMitAnhang); setAngezeigteMenge(seitenGroesse) }}
+          className={`text-xs px-2 py-1.5 rounded-lg border transition-colors cursor-pointer
+            ${filterMitAnhang
+              ? 'bg-slate-800 dark:bg-slate-200 text-white dark:text-slate-800 border-slate-800 dark:border-slate-200'
+              : 'border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
+            }`}
+          title="Nur Fragen mit Anhängen (Bilder, Audio, Video)"
+        >
+          📎
+        </button>
 
         {verfuegbareThemen.length > 1 && (
           <select

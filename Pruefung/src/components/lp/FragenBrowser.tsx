@@ -216,6 +216,8 @@ export default function FragenBrowser({ onHinzufuegen, onEntfernen, onSchliessen
           setFilterQuelle={filter.setFilterQuelle}
           filterPoolStatus={filter.filterPoolStatus}
           setFilterPoolStatus={filter.setFilterPoolStatus}
+          filterMitAnhang={filter.filterMitAnhang}
+          setFilterMitAnhang={filter.setFilterMitAnhang}
           filterZuruecksetzen={filter.filterZuruecksetzen}
           sortierung={filter.sortierung}
           setSortierung={filter.setSortierung}

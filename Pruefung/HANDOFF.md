@@ -580,6 +580,28 @@ SuS nutzen den Planer nicht — sie arbeiten mit **LearningView**, wo Übungspoo
 - Pools werden besser durch: neue Fragen aus Prüfungstool (Rück-Sync), Statistik-basierte Schwierigkeitsanpassung, LP-Review
 - xAPI-Scores fliessen von Pools → LearningView (schon implementiert)
 
+### Variablen-Harmonisierung (TODO)
+
+Die drei Tools verwenden teilweise unterschiedliche Namen für dieselben Konzepte. Ziel: schrittweise vereinheitlichen, um Synergien zu erleichtern.
+
+| Konzept | Übungspools (pool.html) | Prüfungstool (React) | Unterrichtsplaner (React) | Zielname |
+|---------|------------------------|---------------------|--------------------------|----------|
+| Fachbereich | `fach` | `fachbereich` ✅ | `subjectArea` | `fachbereich` |
+| Bloom-Stufe | `tax` | `bloom` ✅ | — | `bloom` |
+| Thema | `topic` / `TOPICS.label` | `thema` ✅ | `topicMain` | `thema` |
+| Unterthema | — | `unterthema` ✅ | `topicSub` | `unterthema` |
+| Schwierigkeit | `diff` | `schwierigkeit` ✅ | — | `schwierigkeit` |
+| Fragetext | `q` | `fragetext` ✅ | — | `fragetext` |
+| Erklärung | `explain` | `erklaerung` (im Pool-Import) | — | `erklaerung` |
+| Korrekte Antwort | `correct` | `korrekt` / `korrekteAntworten` | — | `korrekt` |
+| Frage-ID | `id` (kurz, z.B. "d01") | `id` (z.B. "vwl-ft-abc1") | — | `id` |
+
+**Migrationsplan:**
+1. **Prüfungstool** ist Referenz — Variablen dort sind schon gut benannt (deutsch, konsistent)
+2. **Übungspools**: 26 Config-Dateien müssten angepasst werden → grösserer Aufwand. Vorerst Mapping im `poolConverter.ts` beibehalten. Bei Gelegenheit Batch-Migration (Script das alle Configs umschreibt)
+3. **Unterrichtsplaner**: `subjectArea` → `fachbereich`, `topicMain` → `thema`, `topicSub` → `unterthema` beim nächsten Refactoring. Breaking Change für Export/Import-Format → Migration nötig
+4. **Reihenfolge**: Erst Planer (weniger Dateien betroffen), dann Pools (26 Dateien, Script-basiert)
+
 ## Verzeichnisstruktur
 
 ```
