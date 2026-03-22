@@ -23,19 +23,19 @@ interface KontenSelectProps {
 
 const MAX_RESULTS = 80
 
-/** Kategorie-Badge-Farben — aktiv=gelb, passiv=blau, aufwand=rot, ertrag=grün */
+/** Kategorie-Badge-Farben — Lehrmittel-Standard: aktiv=gelb, passiv=rot, aufwand=blau, ertrag=grün */
 const kategorieBadge: Record<KontoEintrag['kategorie'], string> = {
-  aktiv:   'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300',
-  passiv:  'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300',
-  aufwand: 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300',
+  aktiv:   'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300',
+  passiv:  'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300',
+  aufwand: 'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300',
   ertrag:  'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300',
 }
 
 /** Dezente Kategorie-Hintergrundfarben für Dropdown-Zeilen */
 const kategorieZeile: Record<KontoEintrag['kategorie'], string> = {
-  aktiv:   'bg-amber-50/60 dark:bg-amber-900/10',
-  passiv:  'bg-blue-50/60 dark:bg-blue-900/10',
-  aufwand: 'bg-red-50/60 dark:bg-red-900/10',
+  aktiv:   'bg-yellow-50/60 dark:bg-yellow-900/10',
+  passiv:  'bg-red-50/60 dark:bg-red-900/10',
+  aufwand: 'bg-blue-50/60 dark:bg-blue-900/10',
   ertrag:  'bg-green-50/60 dark:bg-green-900/10',
 }
 
