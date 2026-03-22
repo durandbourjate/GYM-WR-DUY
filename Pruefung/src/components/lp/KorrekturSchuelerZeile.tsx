@@ -20,6 +20,7 @@ interface Props {
   onNoteOverride: (schuelerEmail: string, noteOverride: number | null) => void
   onAudioUpload: (schuelerEmail: string, frageId: string, blob: Blob) => Promise<string | null>
   onGesamtAudioUpdate: (email: string, audioId: string) => void
+  onPDF?: () => void
 }
 
 /** Wandelt eine Antwort in lesbaren Text um */
@@ -118,7 +119,7 @@ function antwortAlsText(antwort: Antwort | undefined, frage: Frage): string {
   }
 }
 
-export default function KorrekturSchuelerZeile({ schueler, abgabe, fragen, notenConfig, onBewertungUpdate, onNoteOverride, onAudioUpload, onGesamtAudioUpdate }: Props) {
+export default function KorrekturSchuelerZeile({ schueler, abgabe, fragen, notenConfig, onBewertungUpdate, onNoteOverride, onAudioUpload, onGesamtAudioUpdate, onPDF }: Props) {
   const [offen, setOffen] = useState(false)
   const [noteEditModus, setNoteEditModus] = useState(false)
   const [noteInput, setNoteInput] = useState('')
@@ -216,6 +217,15 @@ export default function KorrekturSchuelerZeile({ schueler, abgabe, fragen, noten
           }`}>
             {geprueftCount}/{totalCount} ✓
           </span>
+          {onPDF && (
+            <button
+              onClick={(e) => { e.stopPropagation(); onPDF() }}
+              className="text-xs px-1.5 py-0.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-600 rounded transition-colors cursor-pointer"
+              title="Korrektur-PDF anzeigen"
+            >
+              PDF
+            </button>
+          )}
         </div>
 
         {/* Punkte + Note (Mobile, rechts oben) */}

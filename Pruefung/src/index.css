@@ -148,13 +148,20 @@ html.dark {
   animation: slide-in-right 0.2s ease-out;
 }
 
-/* Druckansicht (Abgabe-Zusammenfassung) */
+/* Druckansicht (Abgabe-Zusammenfassung + Korrektur-PDF) */
 @media print {
   body {
     background: white !important;
     color: black !important;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
+  }
+  /* Korrektur-PDF: Seitenumbruch-Steuerung */
+  .korrektur-pdf-header {
+    break-after: avoid;
+  }
+  .korrektur-pdf-frage {
+    break-inside: avoid;
   }
   /* Prose-Styling für Freitext-HTML in Zusammenfassung */
   .prose-zusammenfassung h2 {

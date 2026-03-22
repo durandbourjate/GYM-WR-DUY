@@ -12,6 +12,7 @@ import LPHeader from './LPHeader.tsx'
 import FragenBrowser from './FragenBrowser.tsx'
 import HilfeSeite from './HilfeSeite.tsx'
 import KorrekturSchuelerZeile from './KorrekturSchuelerZeile.tsx'
+import KorrekturPDFAnsicht from './KorrekturPDFAnsicht.tsx'
 
 interface Props {
   pruefungId: string
@@ -40,6 +41,7 @@ export default function KorrekturDashboard({ pruefungId, eingebettet = false }: 
   const [korrekturFreigegeben, setKorrekturFreigegeben] = useState(false)
   const [zeigFragenbank, setZeigFragenbank] = useState(false)
   const [zeigHilfe, setZeigHilfe] = useState(false)
+  const [pdfSchuelerEmail, setPdfSchuelerEmail] = useState<string | null>(null)
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   // Daten laden
@@ -322,6 +324,18 @@ export default function KorrekturDashboard({ pruefungId, eingebettet = false }: 
           Excel-Export (Detailliert)
         </button>
       )}
+      {korrektur && korrektur.schueler.length > 0 && (
+        <button
+          onClick={() => {
+            const sorted = [...korrektur.schueler].sort((a, b) => a.name.localeCompare(b.name))
+            if (sorted.length > 0) setPdfSchuelerEmail(sorted[0].email)
+          }}
+          className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors cursor-pointer"
+          title="Einzelne Korrektur-PDFs nacheinander anzeigen und drucken"
+        >
+          Korrektur-PDFs
+        </button>
+      )}
     </>
   )
 
@@ -578,6 +592,7 @@ export default function KorrekturDashboard({ pruefungId, eingebettet = false }: 
               onNoteOverride={handleNoteOverride}
               onAudioUpload={handleAudioUpload}
               onGesamtAudioUpdate={handleGesamtAudioUpdate}
+              onPDF={() => setPdfSchuelerEmail(schueler.email)}
             />
           ))}
         </div>
@@ -651,6 +666,22 @@ export default function KorrekturDashboard({ pruefungId, eingebettet = false }: 
       {!eingebettet && zeigHilfe && (
         <HilfeSeite onSchliessen={() => setZeigHilfe(false)} />
       )}
+
+      {/* PDF-Ansicht Overlay */}
+      {pdfSchuelerEmail && korrektur && (() => {
+        const pdfSchueler = korrektur.schueler.find((s) => s.email === pdfSchuelerEmail)
+        if (!pdfSchueler) return null
+        return (
+          <KorrekturPDFAnsicht
+            schueler={pdfSchueler}
+            abgabe={abgaben[pdfSchuelerEmail]}
+            fragen={fragen}
+            korrektur={korrektur}
+            notenConfig={notenConfig}
+            onSchliessen={() => setPdfSchuelerEmail(null)}
+          />
+        )
+      })()}
     </div>
   )
 }
