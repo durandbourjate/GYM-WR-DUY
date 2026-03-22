@@ -7,6 +7,7 @@ import type { FrageTyp } from '../editorUtils.ts'
 import type { Lernziel } from '../../../../types/pool.ts'
 import type { useKIAssistent } from '../useKIAssistent.ts'
 import { apiService } from '../../../../services/apiService.ts'
+import { useAuthStore } from '../../../../store/authStore.ts'
 import { Abschnitt } from '../EditorBausteine.tsx'
 import { InlineAktionButton, ErgebnisAnzeige } from '../KIBausteine.tsx'
 import FormattierungsToolbar from '../FormattierungsToolbar.tsx'
@@ -41,6 +42,7 @@ export default function FragetextSection({
   zeigLernzielDialog, setZeigLernzielDialog,
   gewaehlterLernzielId, setGewaehlterLernzielId,
 }: FragetextSectionProps) {
+  const user = useAuthStore((s) => s.user)
   return (
     <Abschnitt
       titel="Fragetext *"
@@ -69,7 +71,7 @@ export default function FragetextSection({
             ladend={ki.ladeAktion === 'generiereFrageZuLernziel'}
             onClick={async () => {
               if (!lernziele.length) {
-                const lz = await apiService.ladeLernziele(fachbereich)
+                const lz = await apiService.ladeLernziele(user?.email ?? '', fachbereich)
                 setLernziele(lz)
               }
               setZeigLernzielDialog(true)

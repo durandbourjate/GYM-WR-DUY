@@ -34,10 +34,10 @@ export async function schreibePoolAenderung(
 }
 
 /** Lernziele laden (optional nach Fach gefiltert) — gibt [] statt null zurück */
-export async function ladeLernziele(fach?: string): Promise<Lernziel[]> {
+export async function ladeLernziele(email: string, fach?: string): Promise<Lernziel[]> {
   if (!APPS_SCRIPT_URL) return []
   try {
-    const payload = JSON.stringify({ action: 'ladeLernziele', fach })
+    const payload = JSON.stringify({ action: 'ladeLernziele', email, fach })
     const response = await fetch(APPS_SCRIPT_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain' },
