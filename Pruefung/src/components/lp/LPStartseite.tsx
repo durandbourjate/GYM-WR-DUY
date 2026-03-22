@@ -149,10 +149,8 @@ export default function LPStartseite() {
     }
   }
 
-  function pruefungsUrl(id: string): string {
-    const base = window.location.origin + window.location.pathname
-    return `${base}?id=${id}`
-  }
+  // pruefungsUrl(id) wird von Durchführen-Link verwendet (→ DurchfuehrenDashboard)
+  // const pruefungsUrl = (id: string) => `${window.location.origin}${window.location.pathname}?id=${id}`
 
   if (ansicht === 'composer') {
     return <PruefungsComposer config={editConfig} onZurueck={handleZurueck} onDuplizieren={handleDuplizieren} />

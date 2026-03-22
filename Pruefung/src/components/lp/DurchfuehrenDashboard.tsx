@@ -83,12 +83,12 @@ export default function DurchfuehrenDashboard({ pruefungId }: { pruefungId: stri
   const [autoRefresh, setAutoRefresh] = useState(true)
 
   // Abgaben + Fragen (einmalig geladen)
-  const [abgaben, setAbgaben] = useState<Record<string, SchuelerAbgabe>>({})
-  const [fragen, setFragen] = useState<Frage[]>([])
+  const [_abgaben, setAbgaben] = useState<Record<string, SchuelerAbgabe>>({})
+  const [_fragen, setFragen] = useState<Frage[]>([])
   const abgabenGeladen = useRef(false)
 
   // Nachrichten (LP → SuS)
-  const [nachrichten, setNachrichten] = useState<PruefungsNachricht[]>([])
+  const [_nachrichten, setNachrichten] = useState<PruefungsNachricht[]>([])
 
   // Config der Prüfung
   const [config, setConfig] = useState<PruefungsConfig | null>(null)
