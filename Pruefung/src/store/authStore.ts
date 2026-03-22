@@ -2,9 +2,16 @@ import { create } from 'zustand'
 import type { AuthUser, Rolle } from '../types/auth.ts'
 import { usePruefungStore } from './pruefungStore.ts'
 
+// Zugelassene LP-E-Mail-Adressen (vorerst nur DUY)
+const ZUGELASSENE_LP: string[] = [
+  'durand.bourjate@gymhofwil.ch',
+]
+
 function rolleAusDomain(email: string): Rolle {
   if (email.endsWith('@stud.gymhofwil.ch')) return 'sus'
-  if (email.endsWith('@gymhofwil.ch')) return 'lp'
+  if (ZUGELASSENE_LP.includes(email.toLowerCase())) return 'lp'
+  // Andere @gymhofwil.ch-Adressen → SuS-Rolle (kein Zugriff auf Composer/Fragenbank)
+  if (email.endsWith('@gymhofwil.ch')) return 'sus'
   return 'unbekannt'
 }
 
