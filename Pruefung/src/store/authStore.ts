@@ -24,7 +24,7 @@ interface AuthStore {
 
   anmelden: (credential: GoogleCredential) => void
   anmeldenMitCode: (schuelerId: string, name: string, email: string) => void
-  demoStarten: () => void
+  demoStarten: (rolle?: 'sus' | 'lp') => void
   abmelden: () => void
   setFehler: (fehler: string | null) => void
 }
@@ -62,10 +62,16 @@ export const useAuthStore = create<AuthStore>((set) => ({
     set({ user, istDemoModus: false, ladeStatus: 'fertig', fehler: null })
   },
 
-  demoStarten: () => {
+  demoStarten: (rolle: 'sus' | 'lp' = 'sus') => {
     // Alten Prüfungszustand zurücksetzen (sonst bleibt z.B. 'abgegeben' hängen)
     usePruefungStore.getState().zuruecksetzen()
-    const user: AuthUser = {
+    const user: AuthUser = rolle === 'lp' ? {
+      email: 'demo-lp@gymhofwil.ch',
+      name: 'Demo-Lehrperson',
+      vorname: 'Demo',
+      nachname: 'Lehrperson',
+      rolle: 'lp',
+    } : {
       email: 'demo@example.com',
       name: 'Demo-Nutzer',
       vorname: 'Demo',
