@@ -176,12 +176,12 @@ export default function FragenImport({ onImportiert, onSchliessen }: Props) {
   const ausgewaehltAnzahl = erkannteQuestions.filter((f) => f.ausgewaehlt).length
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-start justify-center pt-[120px]">
       <div className="absolute inset-0 bg-black/50" onClick={onSchliessen} />
 
       <div
         ref={panelRef}
-        className="relative w-full max-w-2xl max-h-[90vh] bg-white dark:bg-slate-800 rounded-2xl shadow-2xl flex flex-col"
+        className="relative w-full max-w-2xl max-h-[calc(100vh-150px)] bg-white dark:bg-slate-800 rounded-2xl shadow-2xl flex flex-col"
       >
         {/* Header */}
         <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">

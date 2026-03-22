@@ -15,11 +15,12 @@ import KorrekturSchuelerZeile from './KorrekturSchuelerZeile.tsx'
 
 interface Props {
   pruefungId: string
+  eingebettet?: boolean
 }
 
 type Sortierung = 'name' | 'punkte' | 'status'
 
-export default function KorrekturDashboard({ pruefungId }: Props) {
+export default function KorrekturDashboard({ pruefungId, eingebettet = false }: Props) {
   const user = useAuthStore((s) => s.user)
 
   const [korrektur, setKorrektur] = useState<PruefungsKorrektur | null>(null)
@@ -260,70 +261,88 @@ export default function KorrekturDashboard({ pruefungId }: Props) {
 
   if (ladeStatus === 'laden') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900">
+      <div className={eingebettet ? 'py-8 text-center' : 'min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900'}>
         <p className="text-slate-500 dark:text-slate-400">Korrektur wird geladen...</p>
       </div>
     )
   }
 
-  return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
-      <LPHeader
-        titel={`Korrektur: ${korrektur?.pruefungTitel ?? pruefungId}`}
-        untertitel={korrektur ? `${korrektur.klasse} · ${korrektur.datum ? formatDatum(korrektur.datum) : ''} · ${korrektur.schueler.length} SuS` : undefined}
-        zurueck={zurueck}
-        statusText={
-          (korrektur?.batchStatus === 'laeuft' || batchLaeuft)
-            ? `KI korrigiert... ${korrektur?.batchFortschritt ? `${korrektur.batchFortschritt.erledigt}/${korrektur.batchFortschritt.gesamt}` : ''}`
-          : korrektur?.batchStatus === 'fehler'
-            ? `Fehler: ${korrektur.batchFehler}`
-          : undefined
-        }
-        ansichtsButtons={
-          <>
-            {korrektur?.batchStatus === 'idle' && (
-              <button onClick={handleStarteKorrektur} className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer">
-                KI-Korrektur starten
-              </button>
-            )}
-            {korrektur?.batchStatus === 'fertig' && (
-              <button onClick={() => setFeedbackDialog(true)} className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer">
-                Feedback senden
-              </button>
-            )}
-            {korrektur && (
-              <button
-                type="button"
-                onClick={async () => {
-                  if (!user) return
-                  const neuerWert = !korrekturFreigegeben
-                  const ok = await apiService.korrekturFreigeben(pruefungId, neuerWert, user.email)
-                  if (ok) setKorrekturFreigegeben(neuerWert)
-                }}
-                className={`text-sm px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
-                  korrekturFreigegeben
-                    ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-900/50'
-                    : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'
-                }`}
-                title={korrekturFreigegeben ? 'Korrektur für SuS sperren' : 'Korrektur für SuS freigeben'}
-              >
-                {korrekturFreigegeben ? '✓ Freigegeben' : 'Freigeben'}
-              </button>
-            )}
-            {korrektur && korrektur.schueler.length > 0 && (
-              <button onClick={handleCSVExport} className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer" title="Ergebnisse als CSV exportieren">
-                CSV Export
-              </button>
-            )}
-          </>
-        }
-        onFragenbank={() => { setZeigHilfe(false); setZeigFragenbank(!zeigFragenbank) }}
-        onHilfe={() => { setZeigFragenbank(false); setZeigHilfe(!zeigHilfe) }}
-        fragebankOffen={zeigFragenbank}
-        hilfeOffen={zeigHilfe}
-      />
+  // Aktions-Toolbar (für eingebetteten Modus und standalone)
+  const aktionsButtons = (
+    <>
+      {(korrektur?.batchStatus === 'laeuft' || batchLaeuft) && (
+        <span className="text-sm text-amber-600 dark:text-amber-400">
+          KI korrigiert... {korrektur?.batchFortschritt ? `${korrektur.batchFortschritt.erledigt}/${korrektur.batchFortschritt.gesamt}` : ''}
+        </span>
+      )}
+      {korrektur?.batchStatus === 'idle' && (
+        <button onClick={handleStarteKorrektur} className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors cursor-pointer">
+          KI-Korrektur starten
+        </button>
+      )}
+      {korrektur?.batchStatus === 'fertig' && (
+        <button onClick={() => setFeedbackDialog(true)} className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors cursor-pointer">
+          Feedback senden
+        </button>
+      )}
+      {korrektur && (
+        <button
+          type="button"
+          onClick={async () => {
+            if (!user) return
+            const neuerWert = !korrekturFreigegeben
+            const ok = await apiService.korrekturFreigeben(pruefungId, neuerWert, user.email)
+            if (ok) setKorrekturFreigegeben(neuerWert)
+          }}
+          className={`text-sm px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
+            korrekturFreigegeben
+              ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-900/50'
+              : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'
+          }`}
+          title={korrekturFreigegeben ? 'Korrektur für SuS sperren' : 'Korrektur für SuS freigeben'}
+        >
+          {korrekturFreigegeben ? '✓ Freigegeben' : 'Freigeben'}
+        </button>
+      )}
+      {korrektur && korrektur.schueler.length > 0 && (
+        <button onClick={handleCSVExport} className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors cursor-pointer" title="Ergebnisse als CSV exportieren">
+          CSV Export
+        </button>
+      )}
+    </>
+  )
 
-      <main className="max-w-5xl mx-auto p-6">
+  return (
+    <div className={eingebettet ? '' : 'min-h-screen bg-slate-50 dark:bg-slate-900'}>
+      {/* Header nur im standalone-Modus */}
+      {!eingebettet && (
+        <LPHeader
+          titel={`Korrektur: ${korrektur?.pruefungTitel ?? pruefungId}`}
+          untertitel={korrektur ? `${korrektur.klasse} · ${korrektur.datum ? formatDatum(korrektur.datum) : ''} · ${korrektur.schueler.length} SuS` : undefined}
+          zurueck={zurueck}
+          statusText={
+            (korrektur?.batchStatus === 'laeuft' || batchLaeuft)
+              ? `KI korrigiert... ${korrektur?.batchFortschritt ? `${korrektur.batchFortschritt.erledigt}/${korrektur.batchFortschritt.gesamt}` : ''}`
+            : korrektur?.batchStatus === 'fehler'
+              ? `Fehler: ${korrektur.batchFehler}`
+            : undefined
+          }
+          ansichtsButtons={aktionsButtons}
+          onFragenbank={() => { setZeigHilfe(false); setZeigFragenbank(!zeigFragenbank) }}
+          onHilfe={() => { setZeigFragenbank(false); setZeigHilfe(!zeigHilfe) }}
+          fragebankOffen={zeigFragenbank}
+          hilfeOffen={zeigHilfe}
+        />
+      )}
+
+      {/* Toolbar im eingebetteten Modus */}
+      {eingebettet && (
+        <div className="flex flex-wrap items-center gap-2 mb-4">
+          {aktionsButtons}
+        </div>
+      )}
+
+      <main className={eingebettet ? '' : 'max-w-5xl mx-auto p-6'}>
         {/* Statistik-Leiste */}
         {stats && korrektur && korrektur.schueler.length > 0 && (
           <div className="grid grid-cols-2 md:grid-cols-6 gap-3 mb-6">
@@ -608,17 +627,15 @@ export default function KorrekturDashboard({ pruefungId }: Props) {
         </div>
       )}
 
-      {/* Fragenbank Overlay */}
-      {zeigFragenbank && (
+      {/* Fragenbank + Hilfe Overlays nur im standalone-Modus */}
+      {!eingebettet && zeigFragenbank && (
         <FragenBrowser
           onHinzufuegen={() => {}}
           onSchliessen={() => setZeigFragenbank(false)}
           bereitsVerwendet={[]}
         />
       )}
-
-      {/* Hilfe Overlay */}
-      {zeigHilfe && (
+      {!eingebettet && zeigHilfe && (
         <HilfeSeite onSchliessen={() => setZeigHilfe(false)} />
       )}
     </div>

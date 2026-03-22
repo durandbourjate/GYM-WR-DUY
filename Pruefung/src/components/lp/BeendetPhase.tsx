@@ -5,10 +5,9 @@ interface Props {
   config: PruefungsConfig
   schuelerStatus: SchuelerStatus[]
   onExportieren: () => void
-  onKorrektur: () => void
 }
 
-export default function BeendetPhase({ config, schuelerStatus, onExportieren, onKorrektur }: Props) {
+export default function BeendetPhase({ config, schuelerStatus, onExportieren }: Props) {
   const abgegeben = schuelerStatus.filter((s) => s.status === 'abgegeben')
   const erzwungen = schuelerStatus.filter((s) => s.status === 'beendet-lp')
   const nichtErschienen = schuelerStatus.filter((s) => s.status === 'nicht-gestartet')
@@ -65,13 +64,6 @@ export default function BeendetPhase({ config, schuelerStatus, onExportieren, on
           className="px-4 py-2 text-sm bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-600 cursor-pointer"
         >
           Ergebnisse exportieren
-        </button>
-        <button
-          type="button"
-          onClick={onKorrektur}
-          className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer font-medium"
-        >
-          Zur Korrektur →
         </button>
       </div>
     </div>

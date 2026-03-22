@@ -1,3 +1,4 @@
+import { useState, useRef, useEffect } from 'react'
 import type { Frage, Fachbereich, BloomStufe } from '../../../types/fragen.ts'
 import type { Sortierung, FilterQuelle, FilterPoolStatus } from '../../../hooks/useFragenFilter.ts'
 import type { Gruppierung } from './gruppenHelfer.ts'
@@ -71,6 +72,19 @@ export default function FragenBrowserHeader({
   zielPruefungTitel, zielAbschnittTitel,
   listeRef,
 }: Props) {
+  const [exportOffen, setExportOffen] = useState(false)
+  const exportRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (exportRef.current && !exportRef.current.contains(e.target as Node)) {
+        setExportOffen(false)
+      }
+    }
+    if (exportOffen) document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [exportOffen])
+
   return (
     <div className="px-5 py-4 border-b border-slate-200 dark:border-slate-700" onWheel={(e) => { listeRef.current?.scrollBy(0, e.deltaY) }}>
       <div className="flex items-center justify-between mb-3">
@@ -94,36 +108,53 @@ export default function FragenBrowserHeader({
             + Neue Frage
           </button>
           <button
-            onClick={onBatchExport}
-            className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors cursor-pointer"
-            title="Mehrere Fragen in Pools exportieren"
-          >
-            ↑ Pool-Export
-          </button>
-          <button
             onClick={onImport}
             className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors cursor-pointer"
             title="Fragen via KI aus Text importieren"
           >
             Import via KI
           </button>
-          <button
-            onClick={() => {
-              const json = JSON.stringify(gefilterteFragen, null, 2)
-              const blob = new Blob([json], { type: 'application/json' })
-              const url = URL.createObjectURL(blob)
-              const datum = new Date().toISOString().slice(0, 10)
-              const a = document.createElement('a')
-              a.href = url
-              a.download = `fragenbank_export_${datum}.json`
-              a.click()
-              URL.revokeObjectURL(url)
-            }}
-            className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors cursor-pointer"
-            title="Alle gefilterten Fragen als JSON exportieren"
-          >
-            Export
-          </button>
+          {/* Export-Dropdown */}
+          <div className="relative" ref={exportRef}>
+            <button
+              onClick={() => setExportOffen(!exportOffen)}
+              className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors cursor-pointer flex items-center gap-1"
+              title="Fragen exportieren"
+            >
+              Export
+              <span className="text-xs">{exportOffen ? '▲' : '▼'}</span>
+            </button>
+            {exportOffen && (
+              <div className="absolute right-0 top-full mt-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg shadow-lg z-50 min-w-[200px]">
+                <button
+                  onClick={() => {
+                    onBatchExport()
+                    setExportOffen(false)
+                  }}
+                  className="w-full text-left px-4 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-t-lg transition-colors cursor-pointer"
+                >
+                  ↑ In Pools exportieren
+                </button>
+                <button
+                  onClick={() => {
+                    const json = JSON.stringify(gefilterteFragen, null, 2)
+                    const blob = new Blob([json], { type: 'application/json' })
+                    const url = URL.createObjectURL(blob)
+                    const datum = new Date().toISOString().slice(0, 10)
+                    const a = document.createElement('a')
+                    a.href = url
+                    a.download = `fragenbank_export_${datum}.json`
+                    a.click()
+                    URL.revokeObjectURL(url)
+                    setExportOffen(false)
+                  }}
+                  className="w-full text-left px-4 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-b-lg transition-colors cursor-pointer"
+                >
+                  ↓ Als JSON-Datei
+                </button>
+              </div>
+            )}
+          </div>
           <button
             onClick={onSchliessen}
             className="w-8 h-8 text-lg text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors cursor-pointer"

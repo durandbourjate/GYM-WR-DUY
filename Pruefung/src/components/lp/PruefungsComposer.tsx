@@ -210,6 +210,11 @@ export default function PruefungsComposer({ config, onZurueck, onDuplizieren }: 
     }))
   }, [])
 
+  /** fragenMap aktualisieren wenn Frage im Browser erstellt/bearbeitet wird */
+  const handleFrageAktualisiert = useCallback((frage: Frage) => {
+    setFragenMap((prev) => ({ ...prev, [frage.id]: frage }))
+  }, [])
+
   /** Interne Speicher-Logik (wiederverwendbar für Autosave und manuelles Speichern) */
   async function handleSpeichernIntern(): Promise<boolean> {
     const zuSpeichern = { ...pruefung }
@@ -393,6 +398,7 @@ export default function PruefungsComposer({ config, onZurueck, onDuplizieren }: 
           initialEditFrageId={initialEditFrageId}
           zielPruefungTitel={pruefung.titel || 'Neue Prüfung'}
           zielAbschnittTitel={pruefung.abschnitte[zielAbschnittIndex]?.titel}
+          onFrageAktualisiert={handleFrageAktualisiert}
         />
       )}
 

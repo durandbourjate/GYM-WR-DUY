@@ -26,10 +26,12 @@ interface Props {
   zielPruefungTitel?: string
   /** Titel des Ziel-Abschnitts (für die Ziel-Leiste) */
   zielAbschnittTitel?: string
+  /** Callback wenn eine Frage erstellt/aktualisiert wird (für fragenMap-Sync) */
+  onFrageAktualisiert?: (frage: Frage) => void
 }
 
 /** Overlay-Panel zum Durchsuchen und Auswählen von Fragen aus der Fragenbank */
-export default function FragenBrowser({ onHinzufuegen, onEntfernen, onSchliessen, bereitsVerwendet, initialEditFrageId, zielPruefungTitel, zielAbschnittTitel }: Props) {
+export default function FragenBrowser({ onHinzufuegen, onEntfernen, onSchliessen, bereitsVerwendet, initialEditFrageId, zielPruefungTitel, zielAbschnittTitel, onFrageAktualisiert }: Props) {
   const user = useAuthStore((s) => s.user)
   const istDemoModus = useAuthStore((s) => s.istDemoModus)
 
@@ -133,6 +135,9 @@ export default function FragenBrowser({ onHinzufuegen, onEntfernen, onSchliessen
     setZeigEditor(false)
     setEditFrage(null)
 
+    // fragenMap im Composer synchronisieren
+    onFrageAktualisiert?.(neueFrage)
+
     // Ans Backend senden (im Hintergrund)
     if (user && apiService.istKonfiguriert() && !istDemoModus) {
       const ok = await apiService.speichereFrage(user.email, neueFrage)
@@ -145,6 +150,11 @@ export default function FragenBrowser({ onHinzufuegen, onEntfernen, onSchliessen
   async function handleImportFragen(importierteFragen: Frage[]): Promise<void> {
     setAlleFragen((prev) => [...prev, ...importierteFragen])
     setZeigImport(false)
+
+    // fragenMap im Composer synchronisieren
+    for (const frage of importierteFragen) {
+      onFrageAktualisiert?.(frage)
+    }
 
     // Ans Backend senden (im Hintergrund)
     if (user && apiService.istKonfiguriert() && !istDemoModus) {
