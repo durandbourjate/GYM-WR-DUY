@@ -4,7 +4,7 @@ import { usePruefungStore } from './pruefungStore.ts'
 
 // Zugelassene LP-E-Mail-Adressen (vorerst nur DUY)
 const ZUGELASSENE_LP: string[] = [
-  'durand.bourjate@gymhofwil.ch',
+  'yannick.durand@gymhofwil.ch',
 ]
 
 function rolleAusDomain(email: string): Rolle {
