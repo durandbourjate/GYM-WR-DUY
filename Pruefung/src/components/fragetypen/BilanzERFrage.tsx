@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { usePruefungStore } from '../../store/pruefungStore.ts'
 import type { BilanzERFrage as BilanzERFrageType } from '../../types/fragen.ts'
 import { renderMarkdown } from '../../utils/markdown.ts'
@@ -71,9 +72,25 @@ export default function BilanzERFrage({ frage }: Props) {
   const gespeichert = antworten[frage.id]?.typ === 'bilanzstruktur' ? antworten[frage.id] : undefined
   const zeigeBilanz = frage.modus === 'bilanz' || frage.modus === 'beides'
   const zeigeER = frage.modus === 'erfolgsrechnung' || frage.modus === 'beides'
-  const bilanz = zeigeBilanz ? vonAntwortBilanz(gespeichert) : null
-  const er = zeigeER ? vonAntwortER(gespeichert) : null
-  const speichern = (b: BilanzEingabe | null, e: ERFeldEingabe | null) => setAntwort(frage.id, zuAntwort(b, e))
+
+  // Lokaler State statt Neuberechnung bei jedem Render (verhindert Cursor-Sprung bei Inputs)
+  const [bilanz, setBilanzLokal] = useState<BilanzEingabe | null>(() => zeigeBilanz ? vonAntwortBilanz(gespeichert) : null)
+  const [er, setERLokal] = useState<ERFeldEingabe | null>(() => zeigeER ? vonAntwortER(gespeichert) : null)
+
+  // Bei Fragenwechsel: State neu initialisieren
+  useEffect(() => {
+    const a = antworten[frage.id]
+    const g = a?.typ === 'bilanzstruktur' ? a : undefined
+    setBilanzLokal(zeigeBilanz ? vonAntwortBilanz(g) : null)
+    setERLokal(zeigeER ? vonAntwortER(g) : null)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [frage.id])
+
+  const speichern = (b: BilanzEingabe | null, e: ERFeldEingabe | null) => {
+    setBilanzLokal(b)
+    setERLokal(e)
+    setAntwort(frage.id, zuAntwort(b, e))
+  }
   const readOnly = abgegeben
   const verfuegbar = frage.kontenMitSaldi.map(k => k.kontonummer)
 
@@ -168,9 +185,13 @@ function BilanzSeiteUI({ seite, seiteKey, bilanzsumme, readOnly, konten, onUpdat
   seite: SeiteEingabe; seiteKey: 'links' | 'rechts'; bilanzsumme: string; readOnly: boolean; konten: string[]
   onUpdate: (fn: (s: SeiteEingabe) => void) => void; onBsChange: (v: string) => void
 }) {
-  const farbe = seiteKey === 'links'
-    ? 'border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-900/10'
-    : 'border-orange-200 dark:border-orange-800 bg-orange-50/50 dark:bg-orange-900/10'
+  // Farbe erst nach SuS-Auswahl: Aktiven=gelb, Passiven=rot, sonst neutral
+  const labelWert = seite.label
+  const farbe = labelWert === 'Aktiven'
+    ? 'border-yellow-300 dark:border-yellow-700 bg-yellow-50/50 dark:bg-yellow-900/10'
+    : labelWert === 'Passiven'
+      ? 'border-red-200 dark:border-red-800 bg-red-50/50 dark:bg-red-900/10'
+      : 'border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/30'
 
   return (
     <div className={`rounded-lg border p-3 ${farbe}`}>

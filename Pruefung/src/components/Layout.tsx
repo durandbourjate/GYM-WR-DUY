@@ -206,7 +206,7 @@ export default function Layout() {
                 title={materialOffen ? 'Material schliessen' : 'Material anzeigen'}
                 className={`px-2 py-1.5 text-xs rounded-lg border transition-colors cursor-pointer flex items-center gap-1
                   ${materialOffen
-                    ? 'bg-blue-50 border-blue-300 text-blue-700 dark:bg-blue-900/30 dark:border-blue-700 dark:text-blue-300'
+                    ? 'bg-green-50 border-green-300 text-green-700 dark:bg-green-900/30 dark:border-green-700 dark:text-green-300'
                     : 'border-slate-300 text-slate-500 dark:border-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
                   }
                 `}
@@ -275,34 +275,34 @@ export default function Layout() {
                   <span className="text-sm text-slate-600 dark:text-slate-300 tabular-nums font-semibold">
                     Frage {aktuelleFrageIndex + 1} von {fragen.length}
                   </span>
-                  <button
-                    onClick={naechsteFrage}
-                    disabled={aktuelleFrageIndex === fragen.length - 1}
-                    title="Nächste Frage"
-                    className="px-4 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer min-h-[44px] flex items-center gap-1"
-                  >
-                    <span className="hidden sm:inline">Weiter</span>
-                    <span>&rarr;</span>
-                  </button>
-                </div>
-                {/* Unsicher-Toggle */}
-                {aktuelleFrage && (
-                  <div className="flex justify-center mt-2">
+                  <div className="flex items-center gap-2">
+                    {/* Unsicher-Toggle links neben Weiter */}
+                    {aktuelleFrage && (
+                      <button
+                        onClick={() => toggleMarkierung(aktuelleFrage.id)}
+                        title={istMarkiert ? 'Markierung entfernen' : 'Als unsicher markieren'}
+                        className={`px-3 py-2.5 text-sm rounded-lg border transition-colors cursor-pointer flex items-center gap-1.5 min-h-[44px]
+                          ${istMarkiert
+                            ? 'bg-amber-100 border-amber-400 text-amber-800 font-semibold dark:bg-amber-900/40 dark:border-amber-600 dark:text-amber-300'
+                            : 'border-slate-300 text-slate-500 dark:border-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
+                          }
+                        `}
+                      >
+                        <span>?</span>
+                        <span className="hidden sm:inline">{istMarkiert ? 'Markiert \u2713' : 'Unsicher'}</span>
+                      </button>
+                    )}
                     <button
-                      onClick={() => toggleMarkierung(aktuelleFrage.id)}
-                      title={istMarkiert ? 'Markierung entfernen' : 'Als unsicher markieren'}
-                      className={`px-4 py-2 text-sm rounded-lg border transition-colors cursor-pointer flex items-center gap-1.5 min-h-[44px]
-                        ${istMarkiert
-                          ? 'bg-amber-100 border-amber-400 text-amber-800 font-semibold dark:bg-amber-900/40 dark:border-amber-600 dark:text-amber-300'
-                          : 'border-slate-300 text-slate-500 dark:border-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
-                        }
-                      `}
+                      onClick={naechsteFrage}
+                      disabled={aktuelleFrageIndex === fragen.length - 1}
+                      title="Nächste Frage"
+                      className="px-4 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer min-h-[44px] flex items-center gap-1"
                     >
-                      <span>?</span>
-                      <span>{istMarkiert ? 'Markiert \u2713' : 'Unsicher markieren'}</span>
+                      <span className="hidden sm:inline">Weiter</span>
+                      <span>&rarr;</span>
                     </button>
                   </div>
-                )}
+                </div>
               </div>
 
               {/* Abschnitt-Header */}

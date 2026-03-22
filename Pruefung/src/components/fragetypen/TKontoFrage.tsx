@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { usePruefungStore } from '../../store/pruefungStore.ts'
 import type { TKontoFrage as TKontoFrageType } from '../../types/fragen.ts'
 import { renderMarkdown } from '../../utils/markdown.ts'
@@ -112,9 +113,21 @@ export default function TKontoFrage({ frage }: Props) {
   const gespeicherteAntwort =
     aktuelleAntwort?.typ === 'tkonto' ? aktuelleAntwort : undefined
 
-  const konten = vonAntwort(gespeicherteAntwort as ReturnType<typeof zuAntwort> | undefined, frage.konten)
+  // Lokaler State statt Neuberechnung bei jedem Render (verhindert Cursor-Sprung bei Inputs)
+  const [konten, setKontenLokal] = useState<KontoEingabe[]>(() =>
+    vonAntwort(gespeicherteAntwort as ReturnType<typeof zuAntwort> | undefined, frage.konten)
+  )
+
+  // Bei Fragenwechsel: State neu initialisieren
+  useEffect(() => {
+    const a = antworten[frage.id]
+    const gespeichert = a?.typ === 'tkonto' ? a : undefined
+    setKontenLokal(vonAntwort(gespeichert as ReturnType<typeof zuAntwort> | undefined, frage.konten))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [frage.id])
 
   function aktualisiere(neueKonten: KontoEingabe[]) {
+    setKontenLokal(neueKonten)
     setAntwort(frage.id, zuAntwort(neueKonten))
   }
 

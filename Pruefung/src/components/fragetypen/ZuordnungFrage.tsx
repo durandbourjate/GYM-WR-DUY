@@ -102,7 +102,7 @@ export default function ZuordnungFrage({ frage }: Props) {
               key={links}
               className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all
                 ${aktuelleZuordnung
-                  ? 'border-slate-700 bg-slate-50 dark:bg-slate-700/50 dark:border-slate-300'
+                  ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-400'
                   : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800'
                 }
                 ${abgegeben ? 'opacity-75' : ''}
@@ -130,7 +130,7 @@ export default function ZuordnungFrage({ frage }: Props) {
                 disabled={abgegeben}
                 className={`flex-1 max-w-[50%] px-3 py-2 rounded-lg border text-sm transition-colors
                   ${aktuelleZuordnung
-                    ? 'border-slate-500 dark:border-slate-400 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100'
+                    ? 'border-blue-400 dark:border-blue-500 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100'
                     : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400'
                   }
                   ${abgegeben ? 'cursor-not-allowed' : 'cursor-pointer'}

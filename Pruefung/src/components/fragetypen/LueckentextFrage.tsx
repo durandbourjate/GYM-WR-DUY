@@ -61,12 +61,12 @@ export default function LueckentextFrage({ frage }: Props) {
                 onChange={(e) => handleChange(lueckenId, e.target.value)}
                 disabled={abgegeben}
                 placeholder={`Lücke ${lueckenId}`}
-                className={`inline-block mx-1 px-3 py-1 w-48 text-base border-b-2 bg-transparent outline-none transition-colors text-slate-800 dark:text-slate-100
+                className={`inline-block mx-1 px-3 py-1 w-48 text-base border-b-2 outline-none transition-colors text-slate-800 dark:text-slate-100
                   ${abgegeben
-                    ? 'border-slate-300 dark:border-slate-600 opacity-75'
+                    ? 'border-slate-300 dark:border-slate-600 bg-transparent opacity-75'
                     : wert
-                      ? 'border-slate-600 dark:border-slate-300'
-                      : 'border-slate-400 dark:border-slate-500 focus:border-slate-700 dark:focus:border-slate-300'
+                      ? 'border-blue-500 dark:border-blue-400 bg-blue-50/50 dark:bg-blue-900/10'
+                      : 'border-slate-400 dark:border-slate-500 bg-transparent focus:border-blue-500 dark:focus:border-blue-400'
                   }
                 `}
               />

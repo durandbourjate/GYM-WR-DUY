@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { usePruefungStore } from '../../store/pruefungStore.ts'
 import type { BuchungssatzFrage as BuchungssatzFrageType } from '../../types/fragen.ts'
 import { renderMarkdown } from '../../utils/markdown.ts'
@@ -100,10 +101,21 @@ export default function BuchungssatzFrage({ frage }: Props) {
   const gespeicherteAntwort =
     aktuelleAntwort?.typ === 'buchungssatz' ? aktuelleAntwort : undefined
 
-  // Lokaler State für die Eingabe (Strings statt Zahlen für Beträge)
-  const buchungen = vonAntwort(gespeicherteAntwort)
+  // Lokaler State statt Neuberechnung bei jedem Render (verhindert Cursor-Sprung bei Inputs)
+  const [buchungen, setBuchungenLokal] = useState<BuchungEingabe[]>(() =>
+    vonAntwort(gespeicherteAntwort)
+  )
+
+  // Bei Fragenwechsel: State neu initialisieren
+  useEffect(() => {
+    const a = antworten[frage.id]
+    const gespeichert = a?.typ === 'buchungssatz' ? a : undefined
+    setBuchungenLokal(vonAntwort(gespeichert))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [frage.id])
 
   function aktualisiere(neueBuchungen: BuchungEingabe[]) {
+    setBuchungenLokal(neueBuchungen)
     setAntwort(frage.id, zuAntwort(neueBuchungen))
   }
 
@@ -311,10 +323,11 @@ function KontoSeite({
   onZeileHinzufuegen,
   onZeileEntfernen,
 }: KontoSeiteProps) {
-  const istSoll = label === 'Soll'
-  const labelFarbe = istSoll
-    ? 'text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800'
-    : 'text-orange-700 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-800'
+  // Neutral: keine farbliche Vorwegnahme der Kontenart
+  const hatEingabe = zeilen.some(z => z.kontonummer || z.betrag)
+  const labelFarbe = hatEingabe
+    ? 'text-slate-700 dark:text-slate-200 bg-blue-50/50 dark:bg-blue-900/10 border-blue-200 dark:border-blue-700'
+    : 'text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700'
 
   return (
     <div className={`rounded-lg border p-3 ${labelFarbe}`}>
@@ -377,7 +390,7 @@ function KontoSeite({
           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
           </svg>
-          {istSoll ? '+ Soll-Zeile' : '+ Haben-Zeile'}
+          {label === 'Soll' ? '+ Soll-Zeile' : '+ Haben-Zeile'}
         </button>
       )}
     </div>

@@ -204,7 +204,9 @@ export default function FreitextFrage({ frage }: Props) {
       <div className={`tiptap-editor w-full border-2 rounded-xl
         ${abgegeben
           ? 'border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 opacity-75'
-          : 'border-slate-300 dark:border-slate-600 focus-within:border-slate-500 dark:focus-within:border-slate-400 bg-white dark:bg-slate-900'
+          : zeichenAnzahl > 0
+            ? 'border-blue-400 dark:border-blue-500 bg-white dark:bg-slate-900 focus-within:border-blue-500 dark:focus-within:border-blue-400'
+            : 'border-slate-300 dark:border-slate-600 focus-within:border-blue-500 dark:focus-within:border-blue-400 bg-white dark:bg-slate-900'
         }`}
       >
         <EditorContent editor={editor} />
