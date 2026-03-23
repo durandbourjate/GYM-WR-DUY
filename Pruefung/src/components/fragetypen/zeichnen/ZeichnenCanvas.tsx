@@ -218,14 +218,14 @@ export function ZeichnenCanvas({
         if (!prev.sichtbar) return prev;
 
         if (!abbrechen && prev.text.trim().length > 0) {
-          const cmd: Omit<DrawCommand, 'id'> = {
+          // Cast nötig weil Omit<DrawCommand, 'id'> die Union nicht verteilt
+          engine.addCommand({
             typ: 'text',
             position: { x: prev.logischX, y: prev.logischY },
             text: prev.text.trim(),
             farbe: aktiveFarbe,
             groesse: 18,
-          };
-          engine.addCommand(cmd);
+          } as Omit<DrawCommand, 'id'>);
         }
 
         return TEXT_OVERLAY_LEER;

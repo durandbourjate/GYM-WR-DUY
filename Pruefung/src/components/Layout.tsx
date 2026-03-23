@@ -25,7 +25,8 @@ import TKontoFrageComponent from './fragetypen/TKontoFrage.tsx'
 import KontenbestimmungFrageComponent from './fragetypen/KontenbestimmungFrage.tsx'
 import BilanzERFrageComponent from './fragetypen/BilanzERFrage.tsx'
 import AufgabengruppeFrageComponent from './fragetypen/AufgabengruppeFrage.tsx'
-import type { Frage, MCFrage as MCFrageType, FreitextFrage as FreitextFrageType, LueckentextFrage as LueckentextFrageType, ZuordnungFrage as ZuordnungFrageType, RichtigFalschFrage as RichtigFalschFrageType, BerechnungFrage as BerechnungFrageType, BuchungssatzFrage as BuchungssatzFrageType, TKontoFrage as TKontoFrageType, KontenbestimmungFrage as KontenbestimmungFrageType, BilanzERFrage as BilanzERFrageType, AufgabengruppeFrage as AufgabengruppeFrageType } from '../types/fragen.ts'
+import ZeichnenFrage from './fragetypen/ZeichnenFrage.tsx'
+import type { Frage, MCFrage as MCFrageType, FreitextFrage as FreitextFrageType, LueckentextFrage as LueckentextFrageType, ZuordnungFrage as ZuordnungFrageType, RichtigFalschFrage as RichtigFalschFrageType, BerechnungFrage as BerechnungFrageType, BuchungssatzFrage as BuchungssatzFrageType, TKontoFrage as TKontoFrageType, KontenbestimmungFrage as KontenbestimmungFrageType, BilanzERFrage as BilanzERFrageType, AufgabengruppeFrage as AufgabengruppeFrageType, VisualisierungFrage as VisualisierungFrageType } from '../types/fragen.ts'
 import { findeAbschnitt } from '../utils/abschnitte.ts'
 
 export default function Layout() {
@@ -422,10 +423,19 @@ function renderFrage(frage: Frage) {
       return <BilanzERFrageComponent frage={frage as BilanzERFrageType} />
     case 'aufgabengruppe':
       return <AufgabengruppeFrageComponent frage={frage as AufgabengruppeFrageType} />
+    case 'visualisierung':
+      if ((frage as VisualisierungFrageType).untertyp === 'zeichnen') {
+        return <ZeichnenFrage frage={frage as VisualisierungFrageType} />
+      }
+      return (
+        <div className="p-6 bg-slate-100 dark:bg-slate-800 rounded-xl text-slate-500 dark:text-slate-400 text-center">
+          Visualisierungs-Untertyp «{(frage as VisualisierungFrageType).untertyp}» wird in einer späteren Phase implementiert.
+        </div>
+      )
     default:
       return (
         <div className="p-6 bg-slate-100 dark:bg-slate-800 rounded-xl text-slate-500 dark:text-slate-400 text-center">
-          Fragetyp «{frage.typ}» wird in einer späteren Phase implementiert.
+          Fragetyp «{(frage as { typ: string }).typ}» wird in einer späteren Phase implementiert.
         </div>
       )
   }
