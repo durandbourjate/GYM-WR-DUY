@@ -18,6 +18,12 @@ const LP_DOMAIN = 'gymhofwil.ch';
 const SUS_DOMAIN = 'stud.gymhofwil.ch';
 const LERNZIELE_TAB = 'Lernziele';
 
+// Zentrale Daten-Sheets (Synergien)
+const KURSE_SHEET_ID = 'PLACEHOLDER_KURSE';       // User muss ID einsetzen
+const STUNDENPLAN_SHEET_ID = 'PLACEHOLDER_STUNDENPLAN';
+const SCHULJAHR_SHEET_ID = 'PLACEHOLDER_SCHULJAHR';
+const LEHRPLAN_SHEET_ID = 'PLACEHOLDER_LEHRPLAN';
+
 // === WEB-APP ENDPOINTS ===
 
 function doGet(e) {
@@ -96,6 +102,10 @@ function doGet(e) {
         return jsonResponse({ error: 'Klassenlisten nicht ladbar: ' + String(err) });
       }
     }
+    case 'ladeKurse': return ladeKurseEndpoint({ email: e.parameter.email });
+    case 'ladeKursDetails': return ladeKursDetailsEndpoint({ email: e.parameter.email, kursId: e.parameter.kursId });
+    case 'ladeSchuljahr': return ladeSchuljahrEndpoint({ email: e.parameter.email });
+    case 'ladeLehrplan': return ladeLehrplanEndpoint({ email: e.parameter.email, fach: e.parameter.fach, gefaess: e.parameter.gefaess });
     default:
       return jsonResponse({ error: 'Unbekannte Aktion' });
   }
@@ -373,6 +383,109 @@ function safeJsonParse(str, fallback) {
     return JSON.parse(str);
   } catch {
     return fallback;
+  }
+}
+
+// === SYNERGY ENDPOINTS (Zentrale Kurs-Verwaltung) ===
+
+function ladeKurseEndpoint(body) {
+  try {
+    var email = body.email;
+    if (!email || !email.endsWith('@' + LP_DOMAIN)) {
+      return jsonResponse({ error: 'Nur für Lehrpersonen' });
+    }
+    var sheet = SpreadsheetApp.openById(KURSE_SHEET_ID).getSheetByName('Kurse');
+    if (!sheet) return jsonResponse({ kurse: [] });
+    var data = getSheetData(sheet);
+    var kurse = data.filter(function(r) { return r.lpEmail === email && r.aktiv !== 'false'; });
+    return jsonResponse({ kurse: kurse });
+  } catch (e) {
+    return jsonResponse({ error: e.message });
+  }
+}
+
+function ladeKursDetailsEndpoint(body) {
+  try {
+    var email = body.email;
+    var kursId = body.kursId;
+    if (!email || !kursId) return jsonResponse({ error: 'Parameter fehlen' });
+
+    // Kurs-Meta laden
+    var kurseSheet = SpreadsheetApp.openById(KURSE_SHEET_ID).getSheetByName('Kurse');
+    var kursMeta = getSheetData(kurseSheet).find(function(r) { return r.kursId === kursId; });
+    if (!kursMeta) return jsonResponse({ error: 'Kurs nicht gefunden' });
+
+    // SuS-Liste: Tab mit Kurslabel suchen
+    var susSheet = SpreadsheetApp.openById(KURSE_SHEET_ID).getSheetByName(kursMeta.label);
+    var sus = susSheet ? getSheetData(susSheet) : [];
+
+    // Stundenplan
+    var spSheet = SpreadsheetApp.openById(STUNDENPLAN_SHEET_ID).getSheets()[0];
+    var stundenplan = spSheet ? getSheetData(spSheet).filter(function(r) { return r.kursId === kursId; }) : [];
+
+    // Phasen (optional — nur für TaF)
+    var phasenSheet = SpreadsheetApp.openById(SCHULJAHR_SHEET_ID).getSheetByName('TaF-Phasen');
+    var phasen = phasenSheet ? getSheetData(phasenSheet).filter(function(r) { return r.kursId === kursId; }) : [];
+
+    return jsonResponse({
+      kurs: kursMeta,
+      schueler: sus,
+      stundenplan: stundenplan,
+      phasen: phasen
+    });
+  } catch (e) {
+    return jsonResponse({ error: e.message });
+  }
+}
+
+function ladeSchuljahrEndpoint(body) {
+  try {
+    var email = body.email;
+    if (!email || !email.endsWith('@' + LP_DOMAIN)) {
+      return jsonResponse({ error: 'Nur für Lehrpersonen' });
+    }
+    var ss = SpreadsheetApp.openById(SCHULJAHR_SHEET_ID);
+
+    var ferienSheet = ss.getSheetByName('Ferien');
+    var ferien = ferienSheet ? getSheetData(ferienSheet) : [];
+
+    var swSheet = ss.getSheetByName('Sonderwochen');
+    var sonderwochen = swSheet ? getSheetData(swSheet) : [];
+
+    var semSheet = ss.getSheetByName('Semester');
+    var semester = semSheet ? getSheetData(semSheet) : [];
+
+    var phasenSheet = ss.getSheetByName('TaF-Phasen');
+    var phasen = phasenSheet ? getSheetData(phasenSheet) : [];
+
+    return jsonResponse({ ferien: ferien, sonderwochen: sonderwochen, semester: semester, phasen: phasen });
+  } catch (e) {
+    return jsonResponse({ error: e.message });
+  }
+}
+
+function ladeLehrplanEndpoint(body) {
+  try {
+    var email = body.email;
+    if (!email || !email.endsWith('@' + LP_DOMAIN)) {
+      return jsonResponse({ error: 'Nur für Lehrpersonen' });
+    }
+    var fach = body.fach || null;
+    var gefaess = body.gefaess || null;
+    var ss = SpreadsheetApp.openById(LEHRPLAN_SHEET_ID);
+
+    var lzSheet = ss.getSheetByName('Lehrplanziele');
+    var lz = lzSheet ? getSheetData(lzSheet) : [];
+    if (fach) lz = lz.filter(function(r) { return r.fach === fach; });
+    if (gefaess) lz = lz.filter(function(r) { return r.gefaess === gefaess; });
+
+    var brSheet = ss.getSheetByName('Beurteilungsregeln');
+    var regeln = brSheet ? getSheetData(brSheet) : [];
+    if (gefaess) regeln = regeln.filter(function(r) { return r.gefaess === gefaess; });
+
+    return jsonResponse({ lehrplanziele: lz, beurteilungsregeln: regeln });
+  } catch (e) {
+    return jsonResponse({ error: e.message });
   }
 }
 

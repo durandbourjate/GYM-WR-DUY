@@ -11,6 +11,7 @@ import { uploadMaterial, uploadAnhang, uploadAudioKommentar, kiAssistent } from 
 import { sendeNachricht, ladeNachrichten } from './nachrichtenApi'
 import { ladeMonitoring } from './monitoringApi'
 import { ladeTrackerDaten } from './api/trackerApi'
+import { ladeKurse, ladeKursDetails, ladeSchuljahr, ladeLehrplan } from './synergyApi'
 
 export const apiService = {
   istKonfiguriert,
@@ -51,8 +52,13 @@ export const apiService = {
   sendeEinladungen,
   ladeTrackerDaten,
   sebAusnahmeErlauben,
+  ladeKurse,
+  ladeKursDetails,
+  ladeSchuljahr,
+  ladeLehrplan,
 }
 
 // Typ-Re-Exports für Abwärtskompatibilität
 export type { KorrekturListeEintrag, KorrekturDetailBewertung, KorrekturDetailDaten } from './korrekturApi'
 export type { KlassenlistenEintrag } from './klassenlistenApi'
+export type { ZentralerKurs, StundenplanEintrag, KursDetails, Schuljahr, LehrplanDaten } from './synergyApi'
