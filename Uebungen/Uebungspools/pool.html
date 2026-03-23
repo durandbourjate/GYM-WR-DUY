@@ -476,6 +476,16 @@ html.dark .badge-fibu-aktiv{background:#422006;color:#fde68a;border-color:#b4530
 html.dark .badge-fibu-passiv{background:#450a0a;color:#fca5a5;border-color:#b91c1c}
 html.dark .badge-fibu-aufwand{background:#172554;color:#93c5fd;border-color:#2563eb}
 html.dark .badge-fibu-ertrag{background:#052e16;color:#86efac;border-color:#16a34a}
+/* FiBu Inline-Highlighting im Fragetext (dezenter als Badges) */
+.konto-hl{font-weight:600;padding:0 2px;border-radius:3px}
+.konto-hl-aktiv{color:#92400e;background:#fef3c7}
+.konto-hl-passiv{color:#991b1b;background:#fee2e2}
+.konto-hl-aufwand{color:#1e3a5f;background:#dbeafe}
+.konto-hl-ertrag{color:#166534;background:#dcfce7}
+html.dark .konto-hl-aktiv{color:#fde68a;background:#422006}
+html.dark .konto-hl-passiv{color:#fca5a5;background:#450a0a}
+html.dark .konto-hl-aufwand{color:#93c5fd;background:#172554}
+html.dark .konto-hl-ertrag{color:#86efac;background:#052e16}
 /* ═══ SUCHFELD + START — Nebeneinander ═══ */
 .start-top-row{display:flex;gap:12px;align-items:stretch}
 .start-search-col{flex:1;min-width:0;display:flex;flex-direction:column}
@@ -694,6 +704,40 @@ const COLOR_SCHEMES = {
 // Labels (shared across all pools)
 const DIFF_LABELS = {1:"⭐ Einfach",2:"⭐⭐ Mittel",3:"⭐⭐⭐ Schwer"};
 const TYPE_LABELS = {mc:"📝 Einzelauswahl",multi:"☑️ Mehrfachauswahl",tf:"✓✗ Richtig/Falsch",fill:"📖 Lückentext",calc:"🔢 Berechnung",sort:"🔀 Zuordnung",open:"✏️ Offene Frage"};
+
+// ══════════════════════════════════════════
+// FiBu Konten-Highlighting (Lehrmittel-Farben)
+// ══════════════════════════════════════════
+const KONTO_KATEGORIEN = {
+  // Kontentypen (werden in Frage- und Optionstext hervorgehoben)
+  'Aktivkonto':'aktiv','Aktivkonten':'aktiv','Passivkonto':'passiv','Passivkonten':'passiv',
+  'Aufwandkonto':'aufwand','Aufwandskonto':'aufwand','Aufwandskonten':'aufwand','Aufwandkonten':'aufwand',
+  'Ertragskonto':'ertrag','Ertragskonten':'ertrag','Ertragkonto':'ertrag',
+  // Bilanzbegriffe
+  'Aktiven':'aktiv','Passiven':'passiv','Umlaufvermögen':'aktiv','Anlagevermögen':'aktiv',
+  'Fremdkapital':'passiv','Eigenkapital':'passiv',
+  // Häufige Einzelkonten
+  'Kasse':'aktiv','Bank':'aktiv','Post':'aktiv','Debitoren':'aktiv','Warenvorrat':'aktiv',
+  'Fahrzeuge':'aktiv','Maschinen':'aktiv','Mobiliar':'aktiv','Immobilien':'aktiv','Wertschriften':'aktiv',
+  'Kreditoren':'passiv','Bankdarlehen':'passiv','Hypothek':'passiv','Hypotheken':'passiv',
+  'Lohnaufwand':'aufwand','Mietaufwand':'aufwand','Zinsaufwand':'aufwand','Abschreibungen':'aufwand',
+  'Warenaufwand':'aufwand','Büromaterial':'aufwand','Energieaufwand':'aufwand','Werbeaufwand':'aufwand',
+  'Warenertrag':'ertrag','Dienstleistungsertrag':'ertrag','Zinsertrag':'ertrag',
+  'Warenverkauf':'ertrag','Mietertrag':'ertrag','Finanzertrag':'ertrag',
+};
+
+// Regex aus Schlüsseln bauen (längste zuerst, damit «Aufwandskonto» vor «Aufwand» matcht)
+const _kontoKeys = Object.keys(KONTO_KATEGORIEN).sort((a,b)=>b.length-a.length);
+const _kontoRegex = new RegExp('('+_kontoKeys.map(k=>k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|')+')','g');
+
+function highlightKonten(text) {
+  if(!text || typeof window.POOL_META==='undefined' || POOL_META.fach!=='BWL') return text;
+  return text.replace(_kontoRegex, function(match) {
+    var kat = KONTO_KATEGORIEN[match];
+    if(!kat) return match;
+    return '<span class="konto-hl konto-hl-'+kat+'">'+match+'</span>';
+  });
+}
 
 (async function loadPool() {
   const params = new URLSearchParams(window.location.search);
@@ -923,7 +967,7 @@ function restoreAnswerState(q,answer){
   }
   const fb=document.getElementById('feedback');
   fb.className='feedback show '+(answer.correct?'correct':'wrong');
-  fb.innerHTML='<div class="feedback-title">'+(answer.correct?'✅ Richtig!':'❌ Leider falsch')+'</div><div>'+q.explain+'</div>';
+  fb.innerHTML='<div class="feedback-title">'+(answer.correct?'✅ Richtig!':'❌ Leider falsch')+'</div><div>'+highlightKonten(q.explain)+'</div>';
   document.getElementById('nextBtn').style.display='inline-flex';
   var skip=document.querySelector('.btn-skip');if(skip)skip.style.display='none';
   var unsicherBtn=document.getElementById('unsicherBtn');if(unsicherBtn)unsicherBtn.style.display='none';
@@ -1373,13 +1417,13 @@ function renderQuestion(){
   html+='<span class="badge badge-score">'+state.score+' Pkt.</span>';
   html+='</div>';
   html+=renderContext(q);
-  html+='<div class="q-text">'+q.q+'</div>';
+  html+='<div class="q-text">'+highlightKonten(q.q)+'</div>';
   html+=renderImg(q);
   if(q.type==='mc'){
     html+='<div class="mc-options">';
     q.options.forEach(o=>{
       html+='<div class="mc-opt" data-val="'+o.v+'" onclick="answerMC(this,\''+q.id+'\',\''+o.v+'\')">';
-      html+='<span class="opt-letter">'+o.v+'</span><span class="opt-text">'+o.t+'</span></div>';
+      html+='<span class="opt-letter">'+o.v+'</span><span class="opt-text">'+highlightKonten(o.t)+'</span></div>';
     });
     html+='</div>';
   } else if(q.type==='multi'){
@@ -1387,7 +1431,7 @@ function renderQuestion(){
     html+='<div class="mc-options" id="multiOpts">';
     q.options.forEach(o=>{
       html+='<div class="mc-opt" data-val="'+o.v+'" onclick="toggleMulti(this)">';
-      html+='<span class="opt-check"></span><span class="opt-letter">'+o.v+'</span><span class="opt-text">'+o.t+'</span></div>';
+      html+='<span class="opt-check"></span><span class="opt-letter">'+o.v+'</span><span class="opt-text">'+highlightKonten(o.t)+'</span></div>';
     });
     html+='</div>';
   } else if(q.type==='tf'){
@@ -1409,7 +1453,7 @@ function renderQuestion(){
     html+='<div class="q-text">';
     let bIdx=0;
     for(let i=0;i<parts.length;i++){
-      if(i%2===0)html+=parts[i];
+      if(i%2===0)html+=highlightKonten(parts[i]);
       else html+='<input class="fill-input" data-bidx="'+bIdx+'" placeholder="…" autocomplete="off" autocapitalize="off">';
       if(i%2===1)bIdx++;
     }
@@ -1425,11 +1469,11 @@ function renderQuestion(){
     html+='<div class="sort-pool" id="sortPool">';
     let items=[...q.items];shuffle(items);
     items.forEach((it,i)=>{
-      html+='<span class="sort-item" data-oidx="'+q.items.indexOf(it)+'" onclick="pickSortItem(this)">'+it.t+'</span>';
+      html+='<span class="sort-item" data-oidx="'+q.items.indexOf(it)+'" onclick="pickSortItem(this)">'+highlightKonten(it.t)+'</span>';
     });
     html+='</div><div class="sort-cats" id="sortCats" style="grid-template-columns:repeat('+q.categories.length+',1fr)">';
     q.categories.forEach((cat,ci)=>{
-      html+='<div class="sort-cat" data-cidx="'+ci+'" onclick="placeSortItem(this,'+ci+')"><div class="sort-cat-title">'+cat+'</div><div class="sort-cat-items" id="sortCat'+ci+'"></div></div>';
+      html+='<div class="sort-cat" data-cidx="'+ci+'" onclick="placeSortItem(this,'+ci+')"><div class="sort-cat-title">'+highlightKonten(cat)+'</div><div class="sort-cat-items" id="sortCat'+ci+'"></div></div>';
     });
     html+='</div>';
   } else if(q.type==='open'){

@@ -61,7 +61,7 @@ export function NoteCell({ weekW, col, cellHeight }: { weekW: string; col: numbe
           {displayNotes}
         </div>
       ) : (
-        <div className="text-gray-700 p-1 italic" style={{ fontSize: nz(7) }}>…</div>
+        <div className="text-gray-500 p-1 italic" style={{ fontSize: nz(7) }}>…</div>
       )}
     </td>
   );

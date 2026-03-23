@@ -57,30 +57,32 @@
      nutzen in TW4 CSS-Variablen (--color-slate-800 etc.).
      Durch Überschreiben der Palette passen sich ALLE Komponenten an. */
 
-  /* Slate-Palette: dunkle Werte → hell, helle Werte → dunkel */
+  /* Slate-Palette: dunkle Werte → hell, helle Werte → dunkel
+     500 dunkler für WCAG AA Text-Kontrast auf weissem Hintergrund */
   --color-slate-950: #f8fafc;  /* bg: darkest → lightest */
   --color-slate-900: #f8fafc;  /* bg: main background */
   --color-slate-800: #f1f5f9;  /* bg: cards, panels, dropdowns */
   --color-slate-700: #e2e8f0;  /* bg: inputs, hover */
   --color-slate-600: #cbd5e1;  /* borders */
-  --color-slate-500: #94a3b8;  /* mid-gray */
+  --color-slate-500: #64748b;  /* mid-gray (war #94a3b8, jetzt slate-500 original → 4.6:1) */
   --color-slate-400: #475569;  /* text: muted */
   --color-slate-300: #334155;  /* text: secondary */
   --color-slate-200: #1e293b;  /* text: primary */
   --color-slate-100: #0f172a;  /* text: emphasis */
   --color-slate-50:  #020617;  /* text: strongest */
 
-  /* Gray-Palette: analog invertiert */
+  /* Gray-Palette: analog invertiert
+     500 dunkler für WCAG AA Text-Kontrast */
   --color-gray-950: #f9fafb;
   --color-gray-900: #f9fafb;
   --color-gray-800: #f3f4f6;
   --color-gray-700: #e5e7eb;
   --color-gray-600: #9ca3af;
-  --color-gray-500: #6b7280;
-  --color-gray-400: #4b5563;
-  --color-gray-300: #374151;
-  --color-gray-200: #1f2937;
-  --color-gray-100: #111827;
+  --color-gray-500: #4b5563;  /* war #6b7280, jetzt gray-600 original → 7.0:1 */
+  --color-gray-400: #374151;  /* war #4b5563, jetzt gray-700 original → 9.7:1 */
+  --color-gray-300: #1f2937;  /* war #374151 */
+  --color-gray-200: #111827;
+  --color-gray-100: #030712;
   --color-gray-50:  #030712;
 
   /* Indigo-Palette: invertiert für Light Mode (UI-Akzentfarbe)

@@ -268,7 +268,7 @@ export function AppHeader() {
           <button
             onClick={() => setColumnZoom(columnZoom - 1)}
             disabled={columnZoom <= 0}
-            className={`px-1.5 py-0.5 text-[11px] font-semibold cursor-pointer transition-colors border-r border-gray-700 ${columnZoom <= 0 ? 'text-gray-700 cursor-not-allowed' : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800'}`}
+            className={`px-1.5 py-0.5 text-[11px] font-semibold cursor-pointer transition-colors border-r border-gray-700 ${columnZoom <= 0 ? 'text-gray-500 opacity-50 cursor-not-allowed' : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800'}`}
             title={`Zoom verkleinern (Stufe ${columnZoom + 1}/${ZOOM_LEVELS.length})`}
           >
             −
@@ -276,7 +276,7 @@ export function AppHeader() {
           <button
             onClick={() => setColumnZoom(columnZoom + 1)}
             disabled={columnZoom >= ZOOM_LEVELS.length - 1}
-            className={`px-1.5 py-0.5 text-[11px] font-semibold cursor-pointer transition-colors ${columnZoom >= ZOOM_LEVELS.length - 1 ? 'text-gray-700 cursor-not-allowed' : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800'}`}
+            className={`px-1.5 py-0.5 text-[11px] font-semibold cursor-pointer transition-colors ${columnZoom >= ZOOM_LEVELS.length - 1 ? 'text-gray-500 opacity-50 cursor-not-allowed' : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800'}`}
             title={`Zoom vergrössern (Stufe ${columnZoom + 1}/${ZOOM_LEVELS.length})`}
           >
             +

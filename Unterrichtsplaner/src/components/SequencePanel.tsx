@@ -80,7 +80,7 @@ function LessonsList({ block, fb, courses }: { block: SequenceBlock; fb: FlatBlo
                     className="w-full bg-slate-700/50 text-slate-200 border border-slate-600 rounded px-1.5 py-0.5 text-[9px] outline-none focus:border-indigo-400 resize-y" />
                 </div>
                 {!detail?.subjectArea && inheritSA && (
-                  <div className="text-[8px] text-gray-500">Fachbereich: <span className="text-gray-400">{inheritSA}</span> <span className="text-gray-700">(geerbt)</span></div>
+                  <div className="text-[8px] text-gray-500">Fachbereich: <span className="text-gray-400">{inheritSA}</span> <span className="text-gray-500">(geerbt)</span></div>
                 )}
                 <div className="flex justify-end">
                   <button onClick={() => {
