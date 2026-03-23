@@ -135,6 +135,7 @@ export interface VisualisierungFrage extends FrageBase {
   fragetext: string;
   ausgangsdiagramm?: DiagrammConfig;
   canvasConfig?: CanvasConfig;
+  musterloesungBild?: string;
 }
 
 export interface DiagrammConfig {
@@ -155,6 +156,11 @@ export interface CanvasConfig {
   koordinatensystem: boolean;
   achsenBeschriftung?: { x: string; y: string };
   werkzeuge: ('stift' | 'linie' | 'pfeil' | 'text' | 'rechteck')[];
+  hintergrundbild?: string;
+  hintergrundbildId?: string;
+  groessePreset?: 'klein' | 'mittel' | 'gross' | 'auto';
+  radierer?: boolean;
+  farben?: string[];
 }
 
 export interface RichtigFalschFrage extends FrageBase {

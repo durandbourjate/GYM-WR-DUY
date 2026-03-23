@@ -1,0 +1,50 @@
+// Punkt auf dem Canvas
+export interface Point {
+  x: number;
+  y: number;
+  druck?: number; // 0.0-1.0, nur bei Stifteingabe
+}
+
+// Eindeutige ID pro Command (Timestamp-basiert)
+export type CommandId = string;
+
+// Alle Zeichenbefehle als Discriminated Union
+export type DrawCommand =
+  | { id: CommandId; typ: 'stift'; punkte: Point[]; farbe: string; breite: number }
+  | { id: CommandId; typ: 'linie'; von: Point; bis: Point; farbe: string; breite: number }
+  | { id: CommandId; typ: 'pfeil'; von: Point; bis: Point; farbe: string; breite: number }
+  | { id: CommandId; typ: 'rechteck'; von: Point; bis: Point; farbe: string; breite: number; gefuellt: boolean }
+  | { id: CommandId; typ: 'text'; position: Point; text: string; farbe: string; groesse: number }
+  | { id: CommandId; typ: 'radierer'; punkte: Point[]; breite: number };
+
+// Aktives Werkzeug
+export type Tool = 'auswahl' | 'stift' | 'linie' | 'pfeil' | 'rechteck' | 'text' | 'radierer';
+
+// Canvas-Gesamtzustand
+export interface CanvasState {
+  commands: DrawCommand[];
+  redoStack: DrawCommand[];
+  aktiverCommand: DrawCommand | null;
+  selektierterCommand: CommandId | null;
+}
+
+// Toolbar-Orientierung
+export type ToolbarLayout = 'horizontal' | 'vertikal';
+
+// Standard-Farben
+export const STANDARD_FARBEN = ['#000000', '#ef4444', '#3b82f6', '#22c55e'];
+
+// Grössen-Presets
+export const GROESSE_PRESETS: Record<string, { breite: number; hoehe: number }> = {
+  klein: { breite: 600, hoehe: 400 },
+  mittel: { breite: 800, hoehe: 600 },
+  gross: { breite: 1200, hoehe: 800 },
+};
+
+// Max Undo-Tiefe
+export const MAX_UNDO_TIEFE = 50;
+
+// Command-ID generieren
+export function generiereCommandId(): CommandId {
+  return `cmd-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+}
