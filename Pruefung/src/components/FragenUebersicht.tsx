@@ -1,6 +1,7 @@
 import { usePruefungStore } from '../store/pruefungStore.ts'
 import { fachbereichFarbe } from '../utils/fachbereich.ts'
 import { berechneAbschnittFortschritt } from '../utils/abschnitte.ts'
+import { istVollstaendigBeantwortet } from '../utils/antwortStatus.ts'
 
 export default function FragenUebersicht() {
   const config = usePruefungStore((s) => s.config)
@@ -92,7 +93,7 @@ export default function FragenUebersicht() {
                 if (i === abschnitt.fragenIds.length - 1) globalIdx = idx + 1
                 const frage = fragen[idx]
                 if (!frage) return null
-                const istBeantwortet = !!antworten[frageId]
+                const istBeantwortet = frage ? istVollstaendigBeantwortet(frage, antworten[frageId]) : !!antworten[frageId]
                 const istMarkiert = !!markierungen[frageId]
                 const antwort = antworten[frageId]
 

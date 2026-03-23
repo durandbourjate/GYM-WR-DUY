@@ -1,6 +1,7 @@
 import type { PruefungsConfig, PruefungsAbschnitt } from '../types/pruefung.ts'
 import type { Frage } from '../types/fragen.ts'
 import type { Antwort } from '../types/antworten.ts'
+import { istVollstaendigBeantwortet } from './antwortStatus.ts'
 
 /** Findet den Abschnitt und die Position der aktuellen Frage */
 export function findeAbschnitt(
@@ -57,7 +58,7 @@ export function berechneAbschnittFortschritt(
       const frage = fragenMap.get(id)
       const p = frage?.punkte ?? 0
       punkte += p
-      if (antworten[id]) {
+      if (frage && istVollstaendigBeantwortet(frage, antworten[id])) {
         beantwortet++
         punkteBeantwortet += p
       }

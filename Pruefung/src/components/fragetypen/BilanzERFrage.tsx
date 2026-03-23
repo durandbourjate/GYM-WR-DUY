@@ -3,7 +3,7 @@ import { usePruefungStore } from '../../store/pruefungStore.ts'
 import type { BilanzERFrage as BilanzERFrageType } from '../../types/fragen.ts'
 import { renderMarkdown } from '../../utils/markdown.ts'
 import { fachbereichFarbe } from '../../utils/fachbereich.ts'
-import { kontoLabel } from '../../utils/kontenrahmen.ts'
+import { kontoLabel, findKonto } from '../../utils/kontenrahmen.ts'
 
 interface Props { frage: BilanzERFrageType }
 
@@ -110,6 +110,18 @@ export default function BilanzERFrage({ frage }: Props) {
   )
 }
 
+/* ─── Kategorie-Badge-Farben (Lehrmittel) ─── */
+const kategorieBadge: Record<string, string> = {
+  aktiv:   'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300',
+  passiv:  'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300',
+  aufwand: 'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300',
+  ertrag:  'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300',
+}
+
+const kategorieLabel: Record<string, string> = {
+  aktiv: 'Aktiven', passiv: 'Passiven', aufwand: 'Aufwand', ertrag: 'Ertrag',
+}
+
 /* ─── Konten-Referenztabelle ─── */
 function KontenTabelle({ konten }: { konten: { kontonummer: string; saldo: number }[] }) {
   return (
@@ -120,17 +132,30 @@ function KontenTabelle({ konten }: { konten: { kontonummer: string; saldo: numbe
           <tr className="text-xs text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-600">
             <th className="text-left px-2 py-1 font-medium">Nr.</th>
             <th className="text-left px-2 py-1 font-medium">Konto</th>
+            <th className="text-left px-2 py-1 font-medium">Kontenklasse</th>
+            <th className="text-left px-2 py-1 font-medium">Kontenhauptgruppe</th>
             <th className="text-right px-2 py-1 font-medium">Saldo (CHF)</th>
           </tr>
         </thead>
         <tbody>
-          {konten.map(k => (
-            <tr key={k.kontonummer} className="border-b border-slate-100 dark:border-slate-700/50">
-              <td className="px-2 py-1 font-mono text-slate-700 dark:text-slate-200">{k.kontonummer}</td>
-              <td className="px-2 py-1 text-slate-700 dark:text-slate-200">{kontoLabel(k.kontonummer)}</td>
-              <td className="px-2 py-1 text-right font-mono text-slate-700 dark:text-slate-200">{k.saldo.toLocaleString('de-CH', { minimumFractionDigits: 2 })}</td>
-            </tr>
-          ))}
+          {konten.map(k => {
+            const konto = findKonto(k.kontonummer)
+            return (
+              <tr key={k.kontonummer} className="border-b border-slate-100 dark:border-slate-700/50">
+                <td className="px-2 py-1 font-mono text-slate-700 dark:text-slate-200">{k.kontonummer}</td>
+                <td className="px-2 py-1 text-slate-700 dark:text-slate-200">{konto?.name ?? k.kontonummer}</td>
+                <td className="px-2 py-1">
+                  {konto && (
+                    <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${kategorieBadge[konto.kategorie] ?? ''}`}>
+                      {kategorieLabel[konto.kategorie] ?? konto.kategorie}
+                    </span>
+                  )}
+                </td>
+                <td className="px-2 py-1 text-xs text-slate-500 dark:text-slate-400">{konto?.gruppe ?? ''}</td>
+                <td className="px-2 py-1 text-right font-mono text-slate-700 dark:text-slate-200">{k.saldo.toLocaleString('de-CH', { minimumFractionDigits: 2 })}</td>
+              </tr>
+            )
+          })}
         </tbody>
       </table>
     </div>
@@ -207,7 +232,7 @@ function BilanzSeiteUI({ seite, bilanzsumme, readOnly, konten, onUpdate, onBsCha
           <div key={gruppe.id} className="rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 p-2">
             <div className="flex items-center gap-1 mb-2">
               <input type="text" value={gruppe.label} onChange={e => onUpdate(s => { s.gruppen[gi].label = e.target.value })} disabled={readOnly}
-                placeholder="Gruppenname (z.B. Umlaufvermögen)" className={`${inputSm} flex-1 font-medium placeholder:text-slate-400`} />
+                placeholder="Kontenhauptgruppe" className={`${inputSm} flex-1 font-medium placeholder:text-slate-400`} />
               {!readOnly && (
                 <>
                   <button type="button" onClick={() => onUpdate(s => { if (gi > 0) [s.gruppen[gi], s.gruppen[gi-1]] = [s.gruppen[gi-1], s.gruppen[gi]] })} disabled={gi === 0}
@@ -257,7 +282,7 @@ function ERUI({ er, onChange, readOnly, konten }: { er: ERFeldEingabe; onChange:
           <div key={stufe.id} className="rounded-md border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700/30 p-3">
             <div className="flex items-center gap-2 mb-2">
               <input type="text" value={stufe.label} onChange={e => { const k = dc(); k.stufen[si].label = e.target.value; onChange(k) }} disabled={readOnly}
-                placeholder="Stufenbezeichnung (z.B. Bruttogewinn)" className={`${inputSm} flex-1 font-medium placeholder:text-slate-400`} />
+                placeholder="Stufe (z.B. Bruttogewinn)" className={`${inputSm} flex-1 font-medium placeholder:text-slate-400`} />
               {!readOnly && er.stufen.length > 1 && (
                 <button type="button" onClick={() => { const k = dc(); k.stufen.splice(si, 1); onChange(k) }} className={btnRemove} title="Stufe entfernen">×</button>
               )}

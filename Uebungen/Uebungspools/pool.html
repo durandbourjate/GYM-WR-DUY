@@ -467,6 +467,15 @@ html.dark .lz-topic-start{background:var(--c-primary)}
 .tag-chips-section{margin-top:4px}
 .badge-tag{background:#f3e8ff;color:#7c3aed;font-size:.65rem;font-weight:500;padding:2px 7px;border-radius:10px}
 html.dark .badge-tag{background:#1a0f2e;color:#a78bfa}
+/* FiBu-Kontenkategorie-Badges (Lehrmittel-Farben) */
+.badge-fibu-aktiv{background:#fef9c3;color:#92400e;border:1px solid #fbbf24}
+.badge-fibu-passiv{background:#fee2e2;color:#991b1b;border:1px solid #f87171}
+.badge-fibu-aufwand{background:#dbeafe;color:#1e3a5f;border:1px solid #60a5fa}
+.badge-fibu-ertrag{background:#dcfce7;color:#166534;border:1px solid #4ade80}
+html.dark .badge-fibu-aktiv{background:#422006;color:#fde68a;border-color:#b45309}
+html.dark .badge-fibu-passiv{background:#450a0a;color:#fca5a5;border-color:#b91c1c}
+html.dark .badge-fibu-aufwand{background:#172554;color:#93c5fd;border-color:#2563eb}
+html.dark .badge-fibu-ertrag{background:#052e16;color:#86efac;border-color:#16a34a}
 /* ═══ SUCHFELD + START — Nebeneinander ═══ */
 .start-top-row{display:flex;gap:12px;align-items:stretch}
 .start-search-col{flex:1;min-width:0;display:flex;flex-direction:column}
@@ -1811,17 +1820,42 @@ function showScreen(id){
 function shuffle(arr){for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]]}return arr}
 
 function renderTagBadges(q){
-  if(!q.tags||!q.tags.length)return '';
   var html='';
-  q.tags.forEach(function(t){
-    // Transversale Tags kurz darstellen
-    var label=t;
-    if(t.startsWith('bne:'))label='🌍 '+t.substring(4);
-    else if(t.startsWith('idz:'))label='🔗 '+t.substring(4);
-    else if(t.startsWith('dig:'))label='💻 '+t.substring(4);
-    else if(t.startsWith('pol:'))label='🏛️ '+t.substring(4);
-    html+='<span class="badge badge-tag">'+label+'</span>';
-  });
+  // FiBu-Auto-Badges: Kontenkategorie aus Fragetext erkennen
+  if(q.q){
+    var txt=q.q.toLowerCase();
+    var fibuAuto={aktiv:['aktivkont','aktiven','umlaufvermögen','anlagevermögen'],passiv:['passivkont','passiven','fremdkapital','eigenkapital'],aufwand:['aufwandskont','aufwandkont','aufwand'],ertrag:['ertragskont','ertragskon','ertrag']};
+    var gefunden={};
+    for(var kat in fibuAuto){
+      fibuAuto[kat].forEach(function(kw){if(txt.indexOf(kw)!==-1)gefunden[kat]=true});
+    }
+    var fibuLabels={aktiv:'Aktivkonto',passiv:'Passivkonto',aufwand:'Aufwandskonto',ertrag:'Ertragskonto'};
+    // Nur anzeigen wenn 1–2 Kategorien (nicht alle 4 → zu generisch)
+    var keys=Object.keys(gefunden);
+    if(keys.length>=1&&keys.length<=2){
+      keys.forEach(function(k){html+='<span class="badge badge-fibu-'+k+'">'+fibuLabels[k]+'</span>'});
+    }
+  }
+  // Explizite Tags
+  if(q.tags&&q.tags.length){
+    var fibuLabels2={aktiv:'Aktivkonto',passiv:'Passivkonto',aufwand:'Aufwandskonto',ertrag:'Ertragskonto'};
+    q.tags.forEach(function(t){
+      // FiBu-Kontenkategorie-Tags mit Lehrmittel-Farben
+      if(t.startsWith('fibu:')){
+        var kat=t.substring(5);
+        var label=fibuLabels2[kat]||kat;
+        html+='<span class="badge badge-fibu-'+kat+'">'+label+'</span>';
+        return;
+      }
+      // Transversale Tags kurz darstellen
+      var label=t;
+      if(t.startsWith('bne:'))label='🌍 '+t.substring(4);
+      else if(t.startsWith('idz:'))label='🔗 '+t.substring(4);
+      else if(t.startsWith('dig:'))label='💻 '+t.substring(4);
+      else if(t.startsWith('pol:'))label='🏛️ '+t.substring(4);
+      html+='<span class="badge badge-tag">'+label+'</span>';
+    });
+  }
   return html;
 }
 

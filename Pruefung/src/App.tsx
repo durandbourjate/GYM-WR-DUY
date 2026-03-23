@@ -170,6 +170,7 @@ function resolveFragenFuerPruefung(config: PruefungsConfig, alleFragen: Frage[])
 function AbgabeBestaetigung() {
   const user = useAuthStore((s) => s.user)
   const abmelden = useAuthStore((s) => s.abmelden)
+  const istDemoModus = useAuthStore((s) => s.istDemoModus)
   const [zeigeZusammenfassung, setZeigeZusammenfassung] = useState(false)
 
   if (zeigeZusammenfassung) {
@@ -207,12 +208,15 @@ function AbgabeBestaetigung() {
         <p className="text-slate-500 dark:text-slate-400 mb-6">
           Ihre Antworten wurden gespeichert. Sie können das Fenster schliessen.
         </p>
-        <button
-          onClick={() => setZeigeZusammenfassung(true)}
-          className="px-5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors cursor-pointer mb-4"
-        >
-          Meine Antworten ansehen
-        </button>
+        {/* Antworten nur im Demo-Modus sofort einsehbar — im echten Betrieb entscheidet die LP über Korrektur-Einsicht */}
+        {istDemoModus && (
+          <button
+            onClick={() => setZeigeZusammenfassung(true)}
+            className="px-5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors cursor-pointer mb-4"
+          >
+            Meine Antworten ansehen
+          </button>
+        )}
         <p className="text-xs text-slate-400 dark:text-slate-500">
           Bei Fragen wenden Sie sich an Ihre Lehrperson.
         </p>

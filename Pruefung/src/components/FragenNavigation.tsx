@@ -1,5 +1,6 @@
 import { usePruefungStore } from '../store/pruefungStore.ts'
 import { fachbereichFarbe } from '../utils/fachbereich.ts'
+import { istVollstaendigBeantwortet } from '../utils/antwortStatus.ts'
 import type { PruefungsAbschnitt } from '../types/pruefung.ts'
 
 export default function FragenNavigation() {
@@ -33,7 +34,7 @@ export default function FragenNavigation() {
               const idx = startIndex + i
               const frage = fragen[idx]
               const istAktuell = idx === aktuelleFrageIndex
-              const istBeantwortet = !!antworten[frageId]
+              const istBeantwortet = frage ? istVollstaendigBeantwortet(frage, antworten[frageId]) : !!antworten[frageId]
               const istMarkiert = !!markierungen[frageId]
 
               // Status: Icons + dezente Farbe

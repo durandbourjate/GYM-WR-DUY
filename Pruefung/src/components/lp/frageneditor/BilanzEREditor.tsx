@@ -315,7 +315,7 @@ function GruppenEditor({ label, gruppen, onChange, verfuegbareKonten, bgClass }:
                 type="text"
                 value={gruppe.label}
                 onChange={(e) => updateGruppeLabel(gi, e.target.value)}
-                placeholder="Gruppenname"
+                placeholder="Kontenhauptgruppe"
                 className="min-h-[32px] flex-1 rounded border border-slate-300 bg-white px-2 py-0.5 text-xs font-medium text-slate-800 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 focus:border-slate-400 focus:outline-none placeholder:text-slate-400"
               />
               {gruppen.length > 1 && (
@@ -420,7 +420,7 @@ function ERMusterloesung({ er, onERChange, verfuegbareKonten }: {
               type="text"
               value={stufe.label}
               onChange={(e) => updateStufe(si, { label: e.target.value })}
-              placeholder="Stufenbezeichnung (z.B. Bruttogewinn)"
+              placeholder="Stufe (z.B. Bruttogewinn)"
               className="min-h-[32px] flex-1 rounded border border-slate-300 bg-white px-2 py-0.5 text-xs font-medium text-slate-800 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 focus:border-slate-400 focus:outline-none placeholder:text-slate-400"
             />
             <input
