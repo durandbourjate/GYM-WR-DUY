@@ -1,26 +1,51 @@
-# Unterrichtsplaner – Handoff v3.103
+# Unterrichtsplaner – Handoff v3.104
 
-## Status: ✅ v3.103 — Tool-Synergien + Variablen-Harmonisierung — ABGESCHLOSSEN
+## Status: ✅ v3.104 — Tool-Synergien UI-Integration — ABGESCHLOSSEN
 
-**Vorgänger:** v3.100 (UI-Verbesserungen & Bugfixes).
+**Vorgänger:** v3.103 (Variablen-Harmonisierung), v3.100 (UI-Verbesserungen & Bugfixes).
 
 ---
 
-## Session 24.03.2026 — Tool-Synergien: Planer-Integration
+## Session 23.03.2026 (Session 2) — v3.104: Tool-Synergien UI-Integration
+
+### 4 Features implementiert
+
+#### useSynergyData Hook
+- **Datei:** `src/hooks/useSynergyData.ts` (neu)
+- Shared async data loading mit Cache für Prüfungs- und Synergy-Daten.
+- Verwendet `pruefungBridge.ts` + `synergyService.ts` unter der Haube.
+- Caching im Hook-State, re-fetch bei Bedarf.
+
+#### PruefungBadge in WeekRows
+- **Datei:** `src/components/WeekRows.tsx`
+- KW-Badges zeigen anstehende/durchgeführte Prüfungen in der Wochenzeile.
+- 1 oder mehrere Badges pro Woche möglich.
+- Daten kommen via `getPruefungFuerKW()` aus dem Hook.
+
+#### NotenStandSection in Settings
+- **Datei:** `src/components/settings/NotenStandSection.tsx` (neu)
+- Fortschrittsbalken pro Gefäss/Semester (vorhandene vs. erforderliche Noten).
+- Farbcodiert: grün (ok), amber (warning), rot (critical).
+- Integriert in SettingsPanel.
+
+#### KursImportButton
+- **Datei:** `src/components/settings/KursImportButton.tsx` (neu)
+- Button in Kurse-Section im SettingsPanel.
+- Lädt Kurse aus dem zentralen Google Sheet (via Synergy-Service).
+- Auswahl-Dialog: LP wählt welche Kurse importiert werden sollen.
+
+### Konfiguration ✅
+- `APPS_SCRIPT_URL` und `LP_EMAIL` in `synergyService.ts` und `pruefungBridge.ts` sind konfiguriert.
+- URL: Dieselbe wie im Prüfungstool.
+- E-Mail: `yannick.durand@gymhofwil.ch`
+
+---
+
+## Session 24.03.2026 — v3.103: Tool-Synergien Backend + Variablen-Harmonisierung
 
 ### Neue Dateien
 - **`src/services/synergyService.ts`** — Lädt zentrale Daten (Kurse, Schuljahr, Lehrplan) via Apps Script. localStorage-Caching mit 24h TTL, `synergy-*` Keys. Funktionen: `ladeKurse()`, `ladeSchuljahr()`, `ladeLehrplan()`, `getCacheAge()`, `istKonfiguriert()`.
 - **`src/services/pruefungBridge.ts`** — Prüfungs-Badges + Noten-Stand. Lädt Tracker-Daten vom Prüfungstool-Backend, transformiert zu `PruefungBadge` (pro KW) und `NotenStandInfo` (pro Gefäss/Semester). Funktionen: `getPruefungFuerKW()`, `getNotenStand()`, `ladePruefungsDaten()`.
-
-### Konfiguration (noch ausstehend)
-Beide Services haben `APPS_SCRIPT_URL` und `LP_EMAIL` als leere Strings. Müssen manuell gesetzt werden:
-- `APPS_SCRIPT_URL`: Dieselbe URL wie im Prüfungstool
-- `LP_EMAIL`: `yannick.durand@gymhofwil.ch`
-
-### Integration in UI (noch ausstehend)
-- WeekRows: Prüfungs-Badge an Lektion ("Prüfung ✓" / "Prüfung ✓ benotet")
-- Settings oder Overlay: Noten-Stand pro Kurs (Fortschrittsbalken)
-- CourseEditor: Kurse aus zentraler Sheet laden statt manuell
 
 ### v3.103 — Variablen-Harmonisierung (24.03.2026)
 ~510 Stellen in 45 Dateien umbenannt an Prüfungstool-Standard:
@@ -29,10 +54,6 @@ Beide Services haben `APPS_SCRIPT_URL` und `LP_EMAIL` als leere Strings. Müssen
 - `courseId` → `kursId`, `courseIds` → `kursIds` (275 Stellen, 31 Dateien)
 - Enum-Werte: `'RECHT'` → `'Recht'`, `'IN'` → `'Informatik'`, `'INTERDISZ'` → `'Interdisziplinaer'`
 - CourseType/Gefäss `'IN'` bewusst beibehalten (andere Semantik)
-
-### Nächste Schritte Planer
-- Synergy-Services in UI einbauen (Prüfungs-Badge an Lektionen, Noten-Stand, Kurse aus Sheet)
-- `pruefungBridge.ts` und `synergyService.ts` sind konfiguriert und bereit
 
 ### Verifizierte Bugs L1–L7 (v3.89)
 Alle in v3.90–v3.103 bereits behoben.

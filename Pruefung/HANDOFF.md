@@ -6,6 +6,49 @@
 
 ## Aktueller Stand
 
+**Bugfixes + Feature-Erweiterungen** (23.03.2026 Session 2) ✅
+
+### Session 23.03.2026 (Session 2) — 2 Bugfixes + 3 Features
+
+#### Bug B1: Lobby-Button funktioniert nicht
+- **Problem:** `handleSpeichern()` hatte kein try/catch — API-Fehler wurden verschluckt, Button hing ohne Feedback.
+- **Fix:** Try/catch + `lobbySpeichern` Loading-State + `lobbyFehler` Fehlermeldung.
+- **Datei:** `components/lp/VorbereitungPhase.tsx`
+
+#### Bug B2: Side-Panel von Kopfzeile abgeschnitten
+- **Problem:** `SusDetailPanel` hatte `fixed inset-y-0` (top:0) → Panel startete unter dem Header (z-[60]), oberer Teil unsichtbar.
+- **Fix:** `top-[53px] bottom-0` statt `inset-y-0`, `z-[65]` statt `z-30`.
+- **Datei:** `components/lp/SusDetailPanel.tsx`
+
+#### F2: Einzelne SuS an-/abwählbar + Suchfeld
+- **Suchfeld** in TeilnehmerListe: Filtert bestehende Teilnehmer nach Name/Vorname/E-Mail/Klasse.
+- **SuS aus allen Kursen hinzufügen:** Suche zeigt nicht-ausgewählte SuS aus `rohDaten` → klick auf "+" fügt sie hinzu.
+- **Neues Interface:** `AlleSuS` in TeilnehmerListe exportiert, `onSuSHinzufuegen` + `alleSuS` Props.
+- **Dateien:** `components/lp/TeilnehmerListe.tsx`, `components/lp/VorbereitungPhase.tsx`
+
+#### F3: Einzelne SuS vorzeitig beenden (war bereits implementiert)
+- Per-Student-Beendigung existierte bereits in `SchuelerZeile.tsx` (kleiner roter "Beenden"-Button pro SuS).
+- **Ergänzt:** Optionales Bemerkungsfeld im `BeendenDialog` — LP kann Grund angeben (z.B. "Beim Spicken erwischt").
+- Bemerkungen werden in localStorage gespeichert (`pruefung-bemerkungen-{id}`).
+- **Datei:** `components/lp/BeendenDialog.tsx`
+
+#### F4: LP-Kommentare pro SuS
+- **SusDetailPanel:** Neuer Abschnitt "Bemerkungen" am Ende des Panels.
+- Anzeige bestehender Bemerkungen mit Zeitstempel (amber-farbig).
+- Eingabefeld + Button zum Hinzufügen neuer Bemerkungen (Enter oder Klick).
+- Persistiert in localStorage, verknüpft mit SuS-E-Mail.
+- **Neue Props:** `pruefungId` an SusDetailPanel (via AktivPhase).
+- **Dateien:** `components/lp/SusDetailPanel.tsx`, `components/lp/AktivPhase.tsx`
+
+#### Geänderte Dateien
+- `components/lp/VorbereitungPhase.tsx`: Loading-State, Error-Handling, SuS-Hinzufügen
+- `components/lp/TeilnehmerListe.tsx`: Suchfeld, Suchvorschläge, AlleSuS-Interface
+- `components/lp/SusDetailPanel.tsx`: top-[53px], z-[65], Bemerkungen-UI
+- `components/lp/BeendenDialog.tsx`: Bemerkungsfeld + localStorage-Persistierung
+- `components/lp/AktivPhase.tsx`: pruefungId-Prop an SusDetailPanel
+
+---
+
 **Tool-Synergien + Variablen-Harmonisierung** (24.03.2026) ✅
 
 ### Session 24.03.2026 — Tool-Synergien (S1-S4a)
@@ -694,7 +737,7 @@ Beim Speichern von FiBu-Fragen wird das `musterlosung`-Textfeld automatisch aus 
 - **Hoher Kontrast:** Besonders wichtig bei Prüfungen (Lesbarkeit)
 - **Sortierung:** Nur durch Lehrperson (Abschnitte in PruefungsConfig), SuS nicht
 
-### Offene Aufgaben — Konsolidiert (Stand 24.03.2026 Abend)
+### Offene Aufgaben — Konsolidiert (Stand 23.03.2026, Session 2)
 
 #### 🔴 Kurzfristig (nächste Sessions)
 
@@ -741,6 +784,11 @@ Beim Speichern von FiBu-Fragen wird das `musterlosung`-Textfeld automatisch aus 
 - ~~Trennschärfe~~ ✅ Punkt-biseriale Korrelation mit Part-Whole-Correction (23.03.)
 - ~~Unterrichtsplaner-Bugs L1–L7~~ ✅ Alle bereits in v3.90–v3.102 behoben (verifiziert 23.03.)
 - ~~Trennschärfe über mehrere Durchführungen~~ ✅ Backend + Aggregation + MetadataSection (23.03.)
+- ~~Lobby-Button Bug~~ ✅ try/catch + Loading-State + Fehlermeldung (23.03.)
+- ~~Side-Panel abgeschnitten~~ ✅ top-[53px] + z-[65] (23.03.)
+- ~~Einzelne SuS an-/abwählbar + Suchfeld~~ ✅ TeilnehmerListe Suche + SuS aus allen Kursen (23.03.)
+- ~~LP-Kommentare pro SuS~~ ✅ SusDetailPanel Bemerkungen + localStorage (23.03.)
+- ~~Bemerkungsfeld im BeendenDialog~~ ✅ Optional, mit localStorage-Persistierung (23.03.)
 
 ### Roadmap: Multi-LP / Skalierung (Sammlung)
 
@@ -1171,3 +1219,16 @@ Ohne diese Variablen funktioniert die App im **Demo-Modus** (Schülercode + Demo
 | `15b5121` | Fix: RueckSyncDialog aus pointer-events-none Container + img im Content-Hash |
 | `64585bb` | Fix: Pool-Sync Updates übernehmen — Button + Backend-Anhaenge |
 | `1119985` | Fix: 4 Pool-Fragen korrigiert (SuS-Meldungen) |
+| `b156a3a` | Trennschärfe über mehrere Durchführungen (Backend + Aggregation + UI) |
+| `d4fe28f` | Light Mode Kontrast + 2-stufige Korrektur-Freigabe + Trennschärfe |
+| `12366c1` | Demo-Fallback für pruefungId='demo' + clearSession fix |
+| `575bf92` | Demo-Session persistieren + Beenden-Button im Demo fixen |
+| `839e15c` | 5 Fixes: Teilfragen-Status, Demo-Antworten, FiBu-Fachbegriffe, Light-Mode-Kontrast, Pool-Kontenfarben |
+| `025438e` | Farbkonzept komplett: 3 Features (Indigo, FiBu-Badges, seiteKey) |
+| `c5da09f` | S1: Zentrale Kurs-Verwaltung — Backend + API-Client + Sheets-Anleitung |
+| `3eaa40c` | S1+S3: Planer Synergy-Service + Pool-Statistiken im Composer |
+| `36e9f31` | S2+S4a: Noten-Stand Bridge + Lernziel-DB zentral |
+| `15684bd` | KLASSENLISTEN_ID entfernt — alle SuS aus KURSE_SHEET_ID |
+| `c0ba8a8` | v3.103: Variablen-Harmonisierung Unterrichtsplaner (45 Dateien) |
+| `f9d7084` | v3.104: Tool-Synergien UI-Integration (4 Features) |
+| `d604a55` | Prüfungstool: 2 Bugfixes + 3 Features (Lobby, Side-Panel, SuS-Suche, Bemerkungen) |
