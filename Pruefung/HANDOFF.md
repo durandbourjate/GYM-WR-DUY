@@ -6,6 +6,24 @@
 
 ## Aktueller Stand
 
+**Light Mode Kontrast + Pool Konten-Highlighting** (23.03.2026, Nachmittag) ✅
+
+### Session 23.03.2026 Nachmittag — Kontrast + Konten-Highlighting
+
+#### Unterrichtsplaner — Light Mode Kontrast
+- **CSS-Variablen-Fix:** `slate-500` dunkler (#64748b, war #94a3b8) → Kontrastverhältnis 4.6:1 statt 2.8:1
+- **Gray-Palette:** gray-500/400/300 alle dunkler für WCAG AA auf weissem Hintergrund
+- **text-gray-700 als Textfarbe:** 4 Stellen in Toolbar, NoteCell, SequencePanel auf text-gray-500 + opacity-50 geändert (war #e5e7eb = unsichtbar auf weiss)
+- **Bekannter Stand:** Weitere Kontrast-Verbesserungen möglich (border-gray-700 als Border ist dezent aber akzeptabel, HoverPreview hat hardcodierte dark-Farben)
+
+#### Übungspools — FiBu Konten-Highlighting
+- **KONTO_KATEGORIEN Map:** ~40 Kontonamen + Kontentypen → Kontenkategorie (Aktiv/Passiv/Aufwand/Ertrag)
+- **highlightKonten():** Regex-basierte Erkennung im Text, nur aktiv für BWL-Pools
+- **Integriert in:** Fragetext, MC/Multi-Optionen, Lückentext-Teile, Zuordnungs-Kategorien und -Items, Erklärungen
+- **CSS:** Dezentes Inline-Highlighting (gelb/rot/blau/grün Hintergrund) für Light + Dark Mode
+
+---
+
 **5 Fixes: Teilfragen, Demo, FiBu-Fachbegriffe, Kontrast, Pool-Farben** (23.03.2026) ✅
 
 ### Session 23.03.2026 — Bugfixes + FiBu-Verbesserungen
