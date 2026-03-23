@@ -19,10 +19,10 @@ const SUS_DOMAIN = 'stud.gymhofwil.ch';
 const LERNZIELE_TAB = 'Lernziele';
 
 // Zentrale Daten-Sheets (Synergien)
-const KURSE_SHEET_ID = 'PLACEHOLDER_KURSE';       // User muss ID einsetzen
-const STUNDENPLAN_SHEET_ID = 'PLACEHOLDER_STUNDENPLAN';
-const SCHULJAHR_SHEET_ID = 'PLACEHOLDER_SCHULJAHR';
-const LEHRPLAN_SHEET_ID = 'PLACEHOLDER_LEHRPLAN';
+const KURSE_SHEET_ID = '1inmEds_g48-lTFCqo9NUqAcxhDxF2mFSoBM5fO6uJng';       // User muss ID einsetzen
+const STUNDENPLAN_SHEET_ID = '1mesBOmPuLewvnY5iNb4iD2zNDUn8-ruK5HE0DsKwUSs';
+const SCHULJAHR_SHEET_ID = '1LG52G7uqBMxQDVBeYXLb4jSa20Mjs1OBCKkd4bU3yjM';
+const LEHRPLAN_SHEET_ID = '1x3p_-_GjP25JvmCASh2TQSg0EhE0BD3MtHIy2xpo3Xo';
 
 // === WEB-APP ENDPOINTS ===
 
@@ -369,7 +369,13 @@ function findOrCreateAntwortenSheet(sheetName, pruefungId) {
 function getSheetData(sheet) {
   const data = sheet.getDataRange().getValues();
   if (data.length <= 1) return [];
-  const headers = data[0].map(h => String(h).trim());
+  // Header normalisieren: kursID → kursId, schuelerID → schuelerId
+  const headers = data[0].map(h => {
+    var s = String(h).trim();
+    if (s === 'kursID') return 'kursId';
+    if (s === 'schuelerID') return 'schuelerId';
+    return s;
+  });
   return data.slice(1).map(row => {
     const obj = {};
     headers.forEach((header, i) => {
@@ -421,13 +427,14 @@ function ladeKursDetailsEndpoint(body) {
     var susSheet = SpreadsheetApp.openById(KURSE_SHEET_ID).getSheetByName(kursMeta.label);
     var sus = susSheet ? getSheetData(susSheet) : [];
 
-    // Stundenplan
-    var spSheet = SpreadsheetApp.openById(STUNDENPLAN_SHEET_ID).getSheets()[0];
+    // Stundenplan (Tab "Stundenplan": kursId, wochentag, lektionen, zeit, raum, halbklasse, semester, phasen, raum_s1, raum_s2, bemerkung)
+    var spSheet = SpreadsheetApp.openById(STUNDENPLAN_SHEET_ID).getSheetByName('Stundenplan');
+    if (!spSheet) spSheet = SpreadsheetApp.openById(STUNDENPLAN_SHEET_ID).getSheets()[0];
     var stundenplan = spSheet ? getSheetData(spSheet).filter(function(r) { return r.kursId === kursId; }) : [];
 
-    // Phasen (optional — nur für TaF)
+    // TaF-Phasen (global, nicht kursId-spezifisch: phase, startKW, endKW, schuljahr, bemerkung)
     var phasenSheet = SpreadsheetApp.openById(SCHULJAHR_SHEET_ID).getSheetByName('TaF-Phasen');
-    var phasen = phasenSheet ? getSheetData(phasenSheet).filter(function(r) { return r.kursId === kursId; }) : [];
+    var phasen = phasenSheet ? getSheetData(phasenSheet) : [];
 
     return jsonResponse({
       kurs: kursMeta,
@@ -481,9 +488,9 @@ function ladeLehrplanEndpoint(body) {
     if (fach) lz = lz.filter(function(r) { return r.fach === fach; });
     if (gefaess) lz = lz.filter(function(r) { return r.gefaess === gefaess; });
 
+    // Beurteilungsregeln (label, deadline, minNoten, semester, stufe, wochenlektionen, bemerkung)
     var brSheet = ss.getSheetByName('Beurteilungsregeln');
     var regeln = brSheet ? getSheetData(brSheet) : [];
-    if (gefaess) regeln = regeln.filter(function(r) { return r.gefaess === gefaess; });
 
     return jsonResponse({ lehrplanziele: lz, beurteilungsregeln: regeln });
   } catch (e) {

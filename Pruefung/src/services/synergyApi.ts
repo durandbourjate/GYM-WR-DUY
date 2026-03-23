@@ -1,6 +1,7 @@
 import { getJson } from './apiClient'
 
-// Typen
+// Typen — Spalten gemäss tatsächlichen Google Sheets
+
 export interface ZentralerKurs {
   kursId: string
   label: string
@@ -17,25 +18,57 @@ export interface StundenplanEintrag {
   lektionen: string
   zeit: string
   raum: string
+  halbklasse: string
+  semester: string
+  phasen: string
+  raum_s1: string
+  raum_s2: string
+  bemerkung: string
+}
+
+export interface Schueler {
+  name: string
+  vorname: string
+  email: string
+  klasse: string
+  schuelerId: string
+}
+
+export interface TafPhase {
+  phase: string
+  startKW: string
+  endKW: string
+  schuljahr: string
+  bemerkung: string
 }
 
 export interface KursDetails {
   kurs: ZentralerKurs
-  schueler: Array<{ name: string; email: string; klasse: string }>
+  schueler: Schueler[]
   stundenplan: StundenplanEintrag[]
-  phasen: Array<{ kursId: string; phase: string; startKW: string; endKW: string }>
+  phasen: TafPhase[]
 }
 
 export interface Schuljahr {
-  ferien: Array<{ label: string; startKW: string; endKW: string }>
-  sonderwochen: Array<{ kw: string; label: string; gymLevel: string; typ: string }>
-  semester: Array<{ kursId: string; semester: string; startKW: string; endKW: string }>
-  phasen: Array<{ kursId: string; phase: string; startKW: string; endKW: string }>
+  ferien: Array<{ label: string; startKW: string; endKW: string; schuljahr: string; tage: string }>
+  sonderwochen: Array<{ kw: string; label: string; gymLevel: string; schuljahr: string; typ: string }>
+  semester: Array<{ kursId: string; semester: string; startKW: string; endKW: string; schuljahr: string; faecher: string }>
+  phasen: TafPhase[]
+}
+
+export interface Beurteilungsregel {
+  label: string
+  deadline: string
+  minNoten: string
+  semester: string
+  stufe: string
+  wochenlektionen: string
+  bemerkung: string
 }
 
 export interface LehrplanDaten {
   lehrplanziele: Array<{ id: string; ebene: string; parentId: string; fach: string; gefaess: string; semester: string; thema: string; text: string; bloom: string }>
-  beurteilungsregeln: Array<{ gefaess: string; semester: string; minNoten: string; gewichtung: string; bemerkung: string }>
+  beurteilungsregeln: Beurteilungsregel[]
 }
 
 // API-Funktionen

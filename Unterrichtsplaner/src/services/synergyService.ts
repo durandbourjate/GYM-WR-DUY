@@ -6,6 +6,30 @@ const CACHE_TTL_MS = 24 * 60 * 60 * 1000 // 24h
 // LP-E-Mail muss konfiguriert werden bevor der Service funktioniert
 const LP_EMAIL = 'yannick.durand@gymhofwil.ch'
 
+// Typen — Spalten gemäss tatsächlichen Google Sheets
+
+export interface ZentralerKurs {
+  kursId: string
+  label: string
+  fach: string
+  gefaess: string
+  lpEmail: string
+  klassen: string
+  aktiv: string
+}
+
+export interface SchuljahrDaten {
+  ferien: Array<{ label: string; startKW: string; endKW: string; schuljahr: string; tage: string }>
+  sonderwochen: Array<{ kw: string; label: string; gymLevel: string; schuljahr: string; typ: string }>
+  semester: Array<{ kursId: string; semester: string; startKW: string; endKW: string; schuljahr: string; faecher: string }>
+  phasen: Array<{ phase: string; startKW: string; endKW: string; schuljahr: string; bemerkung: string }>
+}
+
+export interface LehrplanDaten {
+  lehrplanziele: Array<{ id: string; ebene: string; parentId: string; fach: string; gefaess: string; semester: string; thema: string; text: string; bloom: string }>
+  beurteilungsregeln: Array<{ label: string; deadline: string; minNoten: string; semester: string; stufe: string; wochenlektionen: string; bemerkung: string }>
+}
+
 interface CacheEntry<T> {
   data: T
   timestamp: number
@@ -40,27 +64,27 @@ async function fetchFromBackend<T>(action: string, params: Record<string, string
   } catch { return null }
 }
 
-export async function ladeKurse(): Promise<unknown[]> {
-  const cached = getCached<unknown[]>('kurse')
+export async function ladeKurse(): Promise<ZentralerKurs[]> {
+  const cached = getCached<ZentralerKurs[]>('kurse')
   if (cached) return cached
-  const result = await fetchFromBackend<{ kurse: unknown[] }>('ladeKurse')
+  const result = await fetchFromBackend<{ kurse: ZentralerKurs[] }>('ladeKurse')
   if (result?.kurse) { setCache('kurse', result.kurse); return result.kurse }
   return []
 }
 
-export async function ladeSchuljahr(): Promise<unknown | null> {
-  const cached = getCached<unknown>('schuljahr')
+export async function ladeSchuljahr(): Promise<SchuljahrDaten | null> {
+  const cached = getCached<SchuljahrDaten>('schuljahr')
   if (cached) return cached
-  const result = await fetchFromBackend<unknown>('ladeSchuljahr')
+  const result = await fetchFromBackend<SchuljahrDaten>('ladeSchuljahr')
   if (result) { setCache('schuljahr', result); return result }
   return null
 }
 
-export async function ladeLehrplan(fach?: string, gefaess?: string): Promise<unknown | null> {
+export async function ladeLehrplan(fach?: string, gefaess?: string): Promise<LehrplanDaten | null> {
   const key = `lehrplan-${fach ?? 'all'}-${gefaess ?? 'all'}`
-  const cached = getCached<unknown>(key)
+  const cached = getCached<LehrplanDaten>(key)
   if (cached) return cached
-  const result = await fetchFromBackend<unknown>('ladeLehrplan', { fach: fach ?? '', gefaess: gefaess ?? '' })
+  const result = await fetchFromBackend<LehrplanDaten>('ladeLehrplan', { fach: fach ?? '', gefaess: gefaess ?? '' })
   if (result) { setCache(key, result); return result }
   return null
 }

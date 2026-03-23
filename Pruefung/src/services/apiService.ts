@@ -61,4 +61,4 @@ export const apiService = {
 // Typ-Re-Exports für Abwärtskompatibilität
 export type { KorrekturListeEintrag, KorrekturDetailBewertung, KorrekturDetailDaten } from './korrekturApi'
 export type { KlassenlistenEintrag } from './klassenlistenApi'
-export type { ZentralerKurs, StundenplanEintrag, KursDetails, Schuljahr, LehrplanDaten } from './synergyApi'
+export type { ZentralerKurs, StundenplanEintrag, Schueler, TafPhase, KursDetails, Schuljahr, Beurteilungsregel, LehrplanDaten } from './synergyApi'
