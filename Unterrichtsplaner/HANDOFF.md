@@ -1,8 +1,31 @@
-# Unterrichtsplaner – Handoff v3.100
+# Unterrichtsplaner – Handoff v3.102
 
-## Status: ✅ v3.100 — 8 UI-Verbesserungen & Bugfixes — ABGESCHLOSSEN
+## Status: 🔧 v3.102 — Tool-Synergien (Shared Data Layer) — IN ARBEIT
 
-**Vorgänger:** v3.99 (Sommerferien + weekData-Migration abgeschlossen).
+**Vorgänger:** v3.100 (UI-Verbesserungen & Bugfixes).
+
+---
+
+## Session 24.03.2026 — Tool-Synergien: Planer-Integration
+
+### Neue Dateien
+- **`src/services/synergyService.ts`** — Lädt zentrale Daten (Kurse, Schuljahr, Lehrplan) via Apps Script. localStorage-Caching mit 24h TTL, `synergy-*` Keys. Funktionen: `ladeKurse()`, `ladeSchuljahr()`, `ladeLehrplan()`, `getCacheAge()`, `istKonfiguriert()`.
+- **`src/services/pruefungBridge.ts`** — Prüfungs-Badges + Noten-Stand. Lädt Tracker-Daten vom Prüfungstool-Backend, transformiert zu `PruefungBadge` (pro KW) und `NotenStandInfo` (pro Gefäss/Semester). Funktionen: `getPruefungFuerKW()`, `getNotenStand()`, `ladePruefungsDaten()`.
+
+### Konfiguration (noch ausstehend)
+Beide Services haben `APPS_SCRIPT_URL` und `LP_EMAIL` als leere Strings. Müssen manuell gesetzt werden:
+- `APPS_SCRIPT_URL`: Dieselbe URL wie im Prüfungstool
+- `LP_EMAIL`: `yannick.durand@gymhofwil.ch`
+
+### Integration in UI (noch ausstehend)
+- WeekRows: Prüfungs-Badge an Lektion ("Prüfung ✓" / "Prüfung ✓ benotet")
+- Settings oder Overlay: Noten-Stand pro Kurs (Fortschrittsbalken)
+- CourseEditor: Kurse aus zentraler Sheet laden statt manuell
+
+### Verifizierte Bugs L1–L7 (v3.89)
+Alle in v3.90–v3.102 bereits behoben (verifiziert 23.03.2026).
+
+---
 
 ---
 

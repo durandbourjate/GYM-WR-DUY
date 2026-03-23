@@ -6,6 +6,54 @@
 
 ## Aktueller Stand
 
+**Tool-Synergien: Gemeinsame Datenschicht** (24.03.2026) 🔧 In Arbeit
+
+### Session 24.03.2026 — Tool-Synergien (S1-S4a)
+
+#### Architektur
+4 zentrale Google Sheets (Kurse, Stundenplan, Schuljahr, Lehrplan) + Apps Script als Gateway. Alle 3 Tools lesen über dieselbe API. Spec: `docs/superpowers/specs/2026-03-23-tool-synergien-design.md`. Plan: `docs/superpowers/plans/2026-03-23-tool-synergien.md`.
+
+#### S1: Zentrale Kurs-Verwaltung
+- **Apps Script:** 4 neue GET-Endpoints (`ladeKurse`, `ladeKursDetails`, `ladeSchuljahr`, `ladeLehrplan`). Sheet-Konstanten mit PLACEHOLDER-Werten (User muss IDs einsetzen).
+- **Prüfungstool:** `services/synergyApi.ts` — Typen + API-Funktionen für alle 4 Endpoints.
+- **Unterrichtsplaner:** `services/synergyService.ts` — Fetch + localStorage-Caching (24h TTL, `synergy-*` Keys). `services/pruefungBridge.ts` — Prüfungs-Badges + Noten-Stand mit Caching.
+- **Sheets-Anleitung:** `docs/superpowers/sheets-setup-anleitung.md` — Copy-paste-fertig mit allen Kursen/Ferien/Sonderwochen.
+
+#### S2: Prüfung ↔ Planer Bridge
+- **Apps Script:** `ladeTrackerDaten` erweitert — liest Beurteilungsregeln aus Lehrplan-Sheet, berechnet Noten-Stand (vorhandene vs. erforderliche Noten pro Gefäss/Semester).
+- **Typen:** `NotenStandKurs` Interface mit `kursId`, `status` (ok/warning/critical), `naechsterTermin`.
+- **Planer:** `pruefungBridge.ts` — `getPruefungFuerKW()` für Badges, `getNotenStand()` für Fortschrittsanzeige.
+
+#### S3: Pool-Statistiken im Composer
+- **PruefungsComposer.tsx:** Lädt `FragenPerformance` via Tracker-Daten (Demo + Live).
+- **AbschnitteTab.tsx:** Zeigt pro Frage: ∅ Lösungsquote (farbig), Trennschärfe, Warnungen (Sehr leicht/schwer, Schlechte TS).
+
+#### S4a: Zentrale Lernziel-DB
+- **Apps Script:** `importiereLehrplanziele` Endpoint (Upsert in Lehrplan-Sheet).
+- **Apps Script:** `ladeLernziele` liest zuerst aus zentralem Lehrplan-Sheet, Fallback auf Pool-Import.
+- **Utility:** `utils/lehrplanImport.ts` — Konverter Preset-Format → zentrales Format (Grobziele ebene='grob').
+
+#### Geänderte Dateien
+- `apps-script-code.js`: 6 neue Endpoints + 4 Sheet-Konstanten + Noten-Stand-Berechnung
+- `src/services/synergyApi.ts` (neu): Typen + API-Client
+- `src/services/apiService.ts`: Synergy-Funktionen re-exportiert
+- `src/types/tracker.ts`: NotenStandKurs.kursId + TrackerDaten.notenStand
+- `src/utils/trackerUtils.ts`: kursId in berechneNotenStand
+- `src/utils/lehrplanImport.ts` (neu): Preset-Konverter
+- `src/components/lp/PruefungsComposer.tsx`: fragenStats laden + an AbschnitteTab
+- `src/components/lp/composer/AbschnitteTab.tsx`: Performance-Badges + Warnungen
+- `Unterrichtsplaner/src/services/synergyService.ts` (neu): Caching-Service
+- `Unterrichtsplaner/src/services/pruefungBridge.ts` (neu): Prüfungs-Badges
+
+#### User-Aktionen (noch ausstehend)
+1. 4 Google Sheets erstellen (Anleitung: `docs/superpowers/sheets-setup-anleitung.md`)
+2. Sheet-IDs in `apps-script-code.js` eintragen (PLACEHOLDER_* ersetzen)
+3. Apps Script URL in `Unterrichtsplaner/src/services/synergyService.ts` + `pruefungBridge.ts` eintragen
+4. Apps Script Code in Editor kopieren + neue Bereitstellung
+5. End-to-End-Test: Kurse laden, Noten-Stand prüfen, Lernziele importieren
+
+---
+
 **Light Mode Kontrast + 2-stufige Korrektur-Freigabe + Trennschärfe** (23.03.2026, Nacht) ✅
 
 ### Session 23.03.2026 Nacht — Kontrast, Korrektur-Freigabe, Trennschärfe
@@ -634,21 +682,23 @@ Beim Speichern von FiBu-Fragen wird das `musterlosung`-Textfeld automatisch aus 
 - **Hoher Kontrast:** Besonders wichtig bei Prüfungen (Lesbarkeit)
 - **Sortierung:** Nur durch Lehrperson (Abschnitte in PruefungsConfig), SuS nicht
 
-### Offene Aufgaben — Konsolidiert (Stand 23.03.2026 Nacht)
+### Offene Aufgaben — Konsolidiert (Stand 24.03.2026)
 
 #### 🔴 Kurzfristig (nächste Sessions)
 
 | # | Projekt | Aufgabe | Aufwand |
 |---|---------|---------|--------|
-| 1 | Prüfungstool | **Pool-Rück-Sync Live-Test** — GITHUB_TOKEN konfiguriert, End-to-End-Test noch offen | Klein |
+| 1 | Alle | **Synergien E2E-Test** — Sheets erstellen, IDs eintragen, Apps Script deployen, End-to-End verifizieren | Mittel |
+| 2 | Prüfungstool | **Pool-Rück-Sync Live-Test** — GITHUB_TOKEN konfiguriert, E2E-Test offen | Klein |
 
 #### 🟡 Mittelfristig (vor produktivem Einsatz)
 
 | # | Projekt | Aufgabe |
 |---|---------|---------|
-| 2 | Prüfungstool | **Tablet/Smartphone-Tests** — responsive gebaut, spezifisch noch nicht getestet |
-| 3 | Prüfungstool | **Evento REST-Zugang** beantragen → Klassenlisten-Sync (Schulinformatiker hat bestätigt, 22.03.) |
-| 4 | Prüfungstool | **Pool-Fehlerquoten explizit filtern** — Sortier-/Filteroptionen in FragenBrowser nach Performance-Daten |
+| 3 | Prüfungstool | **Tablet/Smartphone-Tests** — responsive gebaut, spezifisch noch nicht getestet |
+| 4 | Prüfungstool | **Evento REST-Zugang** beantragen → Klassenlisten-Sync (Schulinformatiker hat bestätigt, 22.03.) |
+| 5 | Prüfungstool | **Pool-Fehlerquoten explizit filtern** — Sortier-/Filteroptionen in FragenBrowser nach Performance |
+| 6 | Alle | **S4b: Lernziel-Abdeckungs-Analyse** — Cross-Tool (unterrichtet/geübt/geprüft), braucht zentrale LZ-IDs in allen 3 Tools |
 
 #### 🟢 Längerfristig (Roadmap)
 
