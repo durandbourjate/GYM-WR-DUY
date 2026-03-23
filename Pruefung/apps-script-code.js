@@ -405,8 +405,8 @@ function ladeKursDetailsEndpoint(body) {
     var kursMeta = getSheetData(kurseSheet).find(function(r) { return r.kursId === kursId; });
     if (!kursMeta) return jsonResponse({ error: 'Kurs nicht gefunden' });
 
-    // SuS-Liste: Tab mit Kurslabel suchen
-    var susSheet = SpreadsheetApp.openById(KURSE_SHEET_ID).getSheetByName(kursMeta.label);
+    // SuS-Liste: Tab mit kursId suchen (Tab-Name = kursId)
+    var susSheet = SpreadsheetApp.openById(KURSE_SHEET_ID).getSheetByName(kursId);
     var sus = susSheet ? getSheetData(susSheet) : [];
 
     // Stundenplan (Tab "Stundenplan": kursId, wochentag, lektionen, zeit, raum, halbklasse, semester, phasen, raum_s1, raum_s2, bemerkung)
@@ -513,9 +513,9 @@ function ladePruefung(pruefungId, email) {
       if (!passenderKurs) {
         return jsonResponse({ error: 'Klassenliste nicht gefunden (kein Kurs für Klasse ' + erlaubteKlasse + ')' });
       }
-      const klassenSheet = kurseSS.getSheetByName(passenderKurs.label);
+      const klassenSheet = kurseSS.getSheetByName(passenderKurs.kursId);
       if (!klassenSheet) {
-        return jsonResponse({ error: 'SuS-Tab nicht gefunden: ' + passenderKurs.label });
+        return jsonResponse({ error: 'SuS-Tab nicht gefunden: ' + passenderKurs.kursId });
       }
       const klassenData = getSheetData(klassenSheet);
       const susEintrag = klassenData.find(row => row.email === email);
