@@ -16,6 +16,8 @@ import { HolidaysEditor } from './settings/HolidaysEditor';
 import { TaFSection } from './TaFPanel';
 import { AssessmentRulesEditor } from './settings/AssessmentRulesEditor';
 import { GCalSection } from './settings/GCalSection';
+import { NotenStandSection } from './settings/NotenStandSection';
+import { KursImportButton } from './settings/KursImportButton';
 
 
 // === Main Settings Panel ===
@@ -266,11 +268,14 @@ export function SettingsPanel() {
 
       {/* Courses */}
       <Section title={`📚 Kurse / Stundenplan (${settings.courses.length})`} actions={
-        <SectionActions rubricType="kurse" getData={() => settings.courses}
-          onLoad={(data) => { if (Array.isArray(data) && confirm(`${data.length} Kurse laden? Bestehende werden ersetzt.`)) updateSettings({ courses: data }); }}
-          onAdd={addCourseHeader} onImport={importCoursesHeader}
-          itemCount={settings.courses.length}
-          onClearAll={() => { if (confirm(`Alle ${settings.courses.length} Kurse entfernen?`)) updateSettings({ courses: [] }); }} />
+        <>
+          <KursImportButton existingCourses={settings.courses} onChange={(c) => updateSettings({ courses: c })} />
+          <SectionActions rubricType="kurse" getData={() => settings.courses}
+            onLoad={(data) => { if (Array.isArray(data) && confirm(`${data.length} Kurse laden? Bestehende werden ersetzt.`)) updateSettings({ courses: data }); }}
+            onAdd={addCourseHeader} onImport={importCoursesHeader}
+            itemCount={settings.courses.length}
+            onClearAll={() => { if (confirm(`Alle ${settings.courses.length} Kurse entfernen?`)) updateSettings({ courses: [] }); }} />
+        </>
       }>
         <CourseEditor courses={settings.courses} onChange={(c) => updateSettings({ courses: c })} schoolLevel={settings.schoolLevel} baseDuration={settings.school?.lessonDurationMin || 45} focusKursId={settingsEditKursId} subjects={settings.subjects || []} />
       </Section>
@@ -345,6 +350,8 @@ export function SettingsPanel() {
           schoolLevel={settings.schoolLevel}
         />
       </Section>
+
+      <NotenStandSection />
 
       {/* v3.81 D5: «Daten» + «Sammlung» zusammengeführt */}
       <Section title="💾 Daten & Sammlung">

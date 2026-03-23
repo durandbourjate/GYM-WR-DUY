@@ -11,6 +11,8 @@ import { EmptyCellMenu } from './EmptyCellMenu';
 import { NoteCell } from './NoteCell';
 import { useDragHandlers } from '../hooks/useDragHandlers';
 import { getGymStufe } from '../utils/gradeRequirements';
+import { PruefungBadge } from './PruefungBadge';
+import { useSynergyData } from '../hooks/useSynergyData';
 
 interface Props {
   weeks: Week[];
@@ -46,6 +48,7 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
   const colW = zoomCfg.colWidth;
 
   const gcalCollisions = useGCalStore(s => s.collisions);
+  const { getBadgesFuerKW } = useSynergyData();
 
   const [hoverCell, setHoverCell] = useState<{ week: string; col: number } | null>(null);
   const [showHoverPreview, setShowHoverPreview] = useState(false);
@@ -273,6 +276,7 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                   📅 {eventInfo.label}
                 </div>
               )}
+              <PruefungBadge badges={getBadgesFuerKW(parseInt(week.w))} fontSize={z(6)} />
             </td>
 
             {/* Lesson cells */}

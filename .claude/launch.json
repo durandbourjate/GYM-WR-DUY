@@ -2,16 +2,16 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "pruefung-dev",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev", "--prefix", "Pruefung"],
-      "port": 5174
-    },
-    {
       "name": "unterrichtsplaner-dev",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev", "--prefix", "Unterrichtsplaner"],
+      "runtimeArgs": ["run", "dev", "--prefix", "/Users/durandbourjate/Documents/-Gym Hofwil/00 Automatisierung Unterricht/10 Github/GYM-WR-DUY/Unterrichtsplaner"],
       "port": 5173
+    },
+    {
+      "name": "pruefung-dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--prefix", "/Users/durandbourjate/Documents/-Gym Hofwil/00 Automatisierung Unterricht/10 Github/GYM-WR-DUY/Pruefung"],
+      "port": 5174
     }
   ]
 }
