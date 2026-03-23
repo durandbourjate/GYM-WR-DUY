@@ -6,6 +6,46 @@
 
 ## Aktueller Stand
 
+**Zeichnen/Stifteingabe — Neuer Fragetyp** (23.03.2026) ✅
+
+### Session 23.03.2026 — Zeichnen-Fragetyp (10 Tasks)
+
+Neuer Fragetyp `visualisierung` (Untertyp `zeichnen`) mit HTML5 Canvas, 7 Werkzeugen, Hintergrundbild, LP-Editor und KI-Korrektur.
+
+**Spec:** `docs/superpowers/specs/2026-03-23-stifteingabe-zeichnen-design.md`
+**Plan:** `docs/superpowers/plans/2026-03-23-stifteingabe-zeichnen.md`
+
+#### Neue Dateien
+- `src/components/fragetypen/zeichnen/ZeichnenTypes.ts` — Typen (DrawCommand, Point, CanvasState, Tool)
+- `src/components/fragetypen/zeichnen/useDrawingEngine.ts` — Command-Stack, Undo/Redo, Render, Hit-Testing, RDP
+- `src/components/fragetypen/zeichnen/usePointerEvents.ts` — Touch/Maus/Stift-Events normalisiert
+- `src/components/fragetypen/zeichnen/ZeichnenCanvas.tsx` — Canvas-Rendering, Text-Overlay, DPR
+- `src/components/fragetypen/zeichnen/ZeichnenToolbar.tsx` — Werkzeugleiste horizontal/vertikal
+- `src/components/fragetypen/ZeichnenFrage.tsx` — SuS-Ansicht mit Auto-Save
+- `src/components/lp/frageneditor/ZeichnenEditor.tsx` — LP-Editor (Config, Hintergrundbild, Musterlösung)
+- `src/components/lp/ZeichnenKorrektur.tsx` — Korrektur (Text, Audio, Annotation, KI-Vorschlag)
+
+#### Geänderte Dateien
+- `src/types/fragen.ts` — CanvasConfig erweitert, musterloesungBild auf VisualisierungFrage
+- `src/components/Layout.tsx` — `case 'visualisierung'` Routing
+- `src/components/lp/frageneditor/sections/TypEditorDispatcher.tsx` — Dispatcher-Integration
+- `src/components/lp/frageneditor/FragenEditor.tsx` — State + Typ-Button
+- `src/utils/fragenFactory.ts` — Factory-Case
+- `src/utils/exportUtils.ts` — Verbesserte Export-Texte
+- `src/utils/editorUtils.ts` — Typ-Label
+- `src/utils/fachbereich.ts` — Typ-Label
+- `src/components/lp/KorrekturDashboard.tsx` — pruefungId Prop
+- `src/components/lp/KorrekturSchuelerZeile.tsx` — ZeichnenKorrektur Routing
+- `src/components/lp/KorrekturPDFAnsicht.tsx` — PNG in PDF
+- `apps-script-code.js` — `korrigiereZeichnung` + `rufeClaudeAufMitBild()`
+
+#### Wichtig
+- **Apps Script:** Code manuell in Apps Script Editor kopieren + neue Bereitstellung!
+- **Keine neuen Dependencies** — alles native HTML5 Canvas
+- **v2 Ausblick:** PDF-Annotationstyp (Text-Highlighting) für Sprachfächer
+
+---
+
 **Bugfixes + Feature-Erweiterungen** (23.03.2026 Session 2) ✅
 
 ### Session 23.03.2026 (Session 2) — 2 Bugfixes + 3 Features
