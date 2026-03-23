@@ -229,8 +229,8 @@ body{min-height:auto!important;background:#fff!important}
 .q-action-row .btn-skip{margin-left:auto}
 .btn-skip{background:transparent;border:2px solid var(--c-primary);color:var(--c-primary);font-size:.85rem;padding:10px 18px;min-height:44px;box-sizing:border-box}
 .btn-skip:hover{background:color-mix(in srgb,var(--c-primary) 10%,transparent)}
-.btn-unsicher{background:none;border:none;color:var(--c-text-soft);font-size:.78rem;cursor:pointer;padding:4px 8px;border-radius:6px;transition:.15s;font-family:inherit;display:none;align-items:center;gap:4px}
-.btn-unsicher:hover{background:var(--c-bg);color:var(--c-text)}
+.btn-unsicher{background:none;border:1px solid var(--c-border);color:var(--c-text-soft);font-size:.78rem;cursor:pointer;padding:4px 10px;border-radius:6px;transition:.15s;font-family:inherit;display:none;align-items:center;gap:4px}
+.btn-unsicher:hover{background:var(--c-bg);color:var(--c-text);border-color:var(--c-text-soft)}
 .toast-repeat{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;padding:12px 24px;border-radius:var(--radius);font-size:.9rem;font-weight:600;box-shadow:0 4px 16px rgba(0,0,0,.2);z-index:500;opacity:0;transition:opacity .3s;pointer-events:none}
 .toast-repeat.show{opacity:1}
 html.dark .toast-repeat{background:#334155}
@@ -1678,11 +1678,11 @@ function finishAnswer(q,correct,explain,userAnswer){
   }
   document.getElementById('nextBtn').style.display='inline-flex';
   document.getElementById('nextBtn').style.marginLeft='auto';
-  // Unsicher-Button anzeigen (nur wenn Frage nicht schon in repeatQueue)
+  // Unsicher-Button anzeigen (immer nach Antwort — auch bei falsch, zur bewussten Markierung)
   var unsicherBtn=document.getElementById('unsicherBtn');
   if(unsicherBtn){
-    var inRepeat=state.repeatQueue.some(function(rq){return rq.id===q.id});
-    unsicherBtn.style.display=inRepeat?'none':'inline-flex';
+    var alreadyMarked=state.unsure.some(function(u){return u.id===q.id});
+    unsicherBtn.style.display=alreadyMarked?'none':'inline-flex';
   }
   var skip=document.querySelector('.btn-skip');if(skip)skip.style.display='none';
   var actionBtns=document.querySelectorAll('#skipRow .btn-primary:not(#nextBtn)');actionBtns.forEach(function(b){b.style.display='none'});
