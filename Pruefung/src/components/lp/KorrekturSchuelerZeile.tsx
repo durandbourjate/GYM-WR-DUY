@@ -5,9 +5,11 @@ import type { Antwort } from '../../types/antworten.ts'
 import { effektivePunkte, berechneNote, statusLabel, statusFarbe } from '../../utils/korrekturUtils.ts'
 import type { NotenConfig } from '../../types/pruefung.ts'
 import KorrekturFrageZeile from './KorrekturFrageZeile.tsx'
+import ZeichnenKorrektur from './ZeichnenKorrektur.tsx'
 import AudioRecorder from '../AudioRecorder.tsx'
 
 interface Props {
+  pruefungId: string
   schueler: SchuelerKorrektur
   abgabe: SchuelerAbgabe | undefined
   fragen: Frage[]
@@ -119,7 +121,7 @@ function antwortAlsText(antwort: Antwort | undefined, frage: Frage): string {
   }
 }
 
-export default function KorrekturSchuelerZeile({ schueler, abgabe, fragen, notenConfig, onBewertungUpdate, onNoteOverride, onAudioUpload, onGesamtAudioUpdate, onPDF }: Props) {
+export default function KorrekturSchuelerZeile({ pruefungId, schueler, abgabe, fragen, notenConfig, onBewertungUpdate, onNoteOverride, onAudioUpload, onGesamtAudioUpdate, onPDF }: Props) {
   const [offen, setOffen] = useState(false)
   const [noteEditModus, setNoteEditModus] = useState(false)
   const [noteInput, setNoteInput] = useState('')
@@ -245,9 +247,52 @@ export default function KorrekturSchuelerZeile({ schueler, abgabe, fragen, noten
           {fragen.map((frage) => {
             const bewertung = schueler.bewertungen[frage.id]
             const antwort = abgabe?.antworten[frage.id]
+
+            if (!bewertung) return null
+
+            // Visualisierung: spezielle Zeichnen-Korrektur
+            if (frage.typ === 'visualisierung' && antwort?.typ === 'visualisierung') {
+              return (
+                <div
+                  key={frage.id}
+                  className={`rounded-lg border p-4 transition-colors ${
+                    bewertung.geprueft
+                      ? 'border-green-200 bg-green-50/30 dark:border-green-800/40 dark:bg-green-900/10'
+                      : 'border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800'
+                  }`}
+                >
+                  {/* Frage-Header */}
+                  <div className="flex flex-wrap items-center gap-2 mb-2">
+                    <span className="font-mono text-xs text-slate-400 dark:text-slate-500">{frage.id}</span>
+                    <span className="inline-block px-1.5 py-0.5 text-xs rounded font-medium bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300">
+                      visualisierung
+                    </span>
+                    <span className="ml-auto text-xs text-slate-400 dark:text-slate-500 tabular-nums">
+                      max. {bewertung.maxPunkte} Pkt.
+                    </span>
+                  </div>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mb-3 truncate" title={(frage as { fragetext?: string }).fragetext}>
+                    {(frage as { fragetext?: string }).fragetext ?? frage.id}
+                  </p>
+                  <ZeichnenKorrektur
+                    pruefungId={pruefungId}
+                    frageId={frage.id}
+                    fragetext={(frage as { fragetext?: string }).fragetext ?? frage.id}
+                    maxPunkte={bewertung.maxPunkte}
+                    bildLink={antwort.bildLink}
+                    daten={antwort.daten}
+                    bewertung={bewertung}
+                    schuelerEmail={schueler.email}
+                    onUpdate={(updates) => onBewertungUpdate(schueler.email, frage.id, updates)}
+                    onAudioUpload={(frageId, blob) => onAudioUpload(schueler.email, frageId, blob)}
+                  />
+                </div>
+              )
+            }
+
             const antwortText = antwortAlsText(antwort, frage)
 
-            return bewertung ? (
+            return (
               <KorrekturFrageZeile
                 key={frage.id}
                 frageId={frage.id}
@@ -258,7 +303,7 @@ export default function KorrekturSchuelerZeile({ schueler, abgabe, fragen, noten
                 onUpdate={(updates) => onBewertungUpdate(schueler.email, frage.id, updates)}
                 onAudioUpload={(frageId, blob) => onAudioUpload(schueler.email, frageId, blob)}
               />
-            ) : null
+            )
           })}
 
           {/* Note-Anzeige und Override */}

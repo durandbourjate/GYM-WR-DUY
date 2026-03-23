@@ -296,9 +296,14 @@ export function antwortAlsText(antwort: Antwort | undefined, frage: Frage): stri
     }
 
     case 'visualisierung': {
-      // Nur Vermerk, ob Daten vorhanden
-      if (antwort.bildLink) return `(Zeichnung vorhanden)`
-      return antwort.daten ? `(Visualisierung: ${antwort.daten.slice(0, 100)}...)` : '(keine Eingabe)'
+      if (antwort.bildLink) return '(Zeichnung vorhanden — siehe Anhang)'
+      if (antwort.daten) {
+        try {
+          const commands = JSON.parse(antwort.daten)
+          return `(Zeichnung: ${Array.isArray(commands) ? commands.length : '?'} Elemente)`
+        } catch { return '(Zeichnung vorhanden)' }
+      }
+      return '(keine Eingabe)'
     }
 
     default:

@@ -632,6 +632,7 @@ export default function KorrekturDashboard({ pruefungId, eingebettet = false }: 
           {sortierteSchueler.map((schueler) => (
             <KorrekturSchuelerZeile
               key={schueler.email}
+              pruefungId={pruefungId}
               schueler={schueler}
               abgabe={abgaben[schueler.email]}
               fragen={fragen}

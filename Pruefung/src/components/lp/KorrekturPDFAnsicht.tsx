@@ -104,6 +104,10 @@ function antwortAlsText(antwort: Antwort | undefined, frage: Frage): string {
       return parts.length > 0 ? parts.join(', ') : '(leer)'
     }
 
+    case 'visualisierung':
+      if (antwort.bildLink) return '__VISUALISIERUNG_BILD__'
+      return '(Zeichnung vorhanden — siehe Tool-Korrektur)'
+
     case 'freitext':
       return antwort.text || '(leer)'
 
@@ -138,6 +142,7 @@ function PDFFrageBlock({ idx, frage, bewertung, antwort }: {
   const punkte = effektivePunkte(bewertung)
   const istFreitext = antwort?.typ === 'freitext'
   const istHTML = istFreitext && /<[^>]+>/.test(antwort.text)
+  const istVisualisierungMitBild = antwort?.typ === 'visualisierung' && !!antwort.bildLink
   const fragetext = (frage as MCFrage).fragetext ?? frage.id
 
   return (
@@ -168,7 +173,13 @@ function PDFFrageBlock({ idx, frage, bewertung, antwort }: {
       {/* Schüler-Antwort */}
       <div className="mb-2">
         <p className="text-xs font-medium text-slate-500 print:text-slate-600 mb-1">Antwort:</p>
-        {istHTML ? (
+        {istVisualisierungMitBild && antwort?.typ === 'visualisierung' ? (
+          <img
+            src={antwort.bildLink}
+            alt="Zeichnung"
+            className="max-w-full rounded border border-slate-200 print:border-slate-300 bg-white"
+          />
+        ) : istHTML ? (
           <div
             className="text-sm text-slate-800 print:text-black bg-slate-50 print:bg-white rounded p-2 border border-slate-200 print:border-slate-300 prose-zusammenfassung"
             dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(antwort.text) }}
