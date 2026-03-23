@@ -229,10 +229,8 @@ body{min-height:auto!important;background:#fff!important}
 .q-action-row .btn-skip{margin-left:auto}
 .btn-skip{background:transparent;border:2px solid var(--c-primary);color:var(--c-primary);font-size:.85rem;padding:10px 18px;min-height:44px;box-sizing:border-box}
 .btn-skip:hover{background:color-mix(in srgb,var(--c-primary) 10%,transparent)}
-.btn-unsicher{background:transparent;border:2px solid #d97706;color:#d97706;font-size:.85rem;padding:10px 18px;min-height:44px;box-sizing:border-box;border-radius:var(--radius);font-family:inherit;font-weight:600;cursor:pointer;transition:.2s;display:none;align-items:center;gap:6px}
-.btn-unsicher:hover{background:color-mix(in srgb,#d97706 10%,transparent)}
-html.dark .btn-unsicher{border-color:#f59e0b;color:#f59e0b}
-html.dark .btn-unsicher:hover{background:color-mix(in srgb,#f59e0b 10%,transparent)}
+.btn-unsicher{background:none;border:none;color:var(--c-text-soft);font-size:.78rem;cursor:pointer;padding:4px 8px;border-radius:6px;transition:.15s;font-family:inherit;display:none;align-items:center;gap:4px}
+.btn-unsicher:hover{background:var(--c-bg);color:var(--c-text)}
 .toast-repeat{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;padding:12px 24px;border-radius:var(--radius);font-size:.9rem;font-weight:600;box-shadow:0 4px 16px rgba(0,0,0,.2);z-index:500;opacity:0;transition:opacity .3s;pointer-events:none}
 .toast-repeat.show{opacity:1}
 html.dark .toast-repeat{background:#334155}
@@ -241,7 +239,7 @@ html.dark .badge-unsicher{background:#3d2e10;color:#f59e0b}
 .ri-unsicher{border-left:3px solid #d97706}
 .res-unsicher-stat{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:.9rem;color:#b45309;font-weight:600;justify-content:center}
 html.dark .res-unsicher-stat{color:#f59e0b}
-.q-bottom-row{display:flex;justify-content:space-between;align-items:center;margin-top:16px;padding-top:14px;border-top:1px solid var(--c-border)}
+.q-bottom-row{display:flex;justify-content:space-between;align-items:center;margin-top:16px;padding-top:14px;border-top:1px solid var(--c-border);gap:8px}
 .btn-end{background:none;border:none;color:var(--c-text-soft);font-size:.78rem;cursor:pointer;padding:4px 8px;border-radius:6px;transition:.15s;font-family:inherit}
 .btn-end:hover{background:var(--c-bg);color:var(--c-text)}
 .btn-report{background:none;border:none;color:var(--c-text-soft);font-size:.78rem;cursor:pointer;padding:4px 8px;border-radius:6px;transition:.15s;font-family:inherit}
@@ -342,8 +340,7 @@ html.dark .mode-card.active{background:var(--c-info-bg)}
   /* Zurück + Überspringen: nebeneinander, Reihe 2 */
   .q-action-row .btn-back{order:10;flex:1 1 calc(50% - 4px)}
   .q-action-row .btn-skip{order:11;flex:1 1 calc(50% - 4px);margin-left:0}
-  /* Unsicher-Button: eigene Zeile, volle Breite */
-  .q-action-row .btn-unsicher{order:12;flex:1 1 100%}
+  /* Unsicher-Button ist jetzt in der Bottom-Row */
   /* Nächste Aufgabe: gleicher Platz wie Überspringen */
   .q-action-row .btn-accent{order:11;flex:1 1 calc(50% - 4px);margin-left:0}
 
@@ -680,12 +677,12 @@ window.matchMedia('(prefers-color-scheme:dark)').addEventListener('change',funct
 (function(){
   var header=document.querySelector('.app-header');
   if(!header)return;
-  var threshold=40;
   var compact=false;
   window.addEventListener('scroll',function(){
     var y=window.scrollY||window.pageYOffset;
-    if(y>threshold&&!compact){compact=true;header.classList.add('compact')}
-    else if(y<=threshold&&compact){compact=false;header.classList.remove('compact')}
+    // Hysterese: compact ab 60px, zurück erst unter 20px (verhindert Zittern)
+    if(y>60&&!compact){compact=true;header.classList.add('compact')}
+    else if(y<20&&compact){compact=false;header.classList.remove('compact')}
   },{passive:true});
 })();
 
@@ -726,9 +723,9 @@ const KONTO_KATEGORIEN = {
   'Warenverkauf':'ertrag','Mietertrag':'ertrag','Finanzertrag':'ertrag',
 };
 
-// Regex aus Schlüsseln bauen (längste zuerst, damit «Aufwandskonto» vor «Aufwand» matcht)
+// Regex aus Schlüsseln bauen (längste zuerst, Wortgrenzen um False Positives zu vermeiden)
 const _kontoKeys = Object.keys(KONTO_KATEGORIEN).sort((a,b)=>b.length-a.length);
-const _kontoRegex = new RegExp('('+_kontoKeys.map(k=>k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|')+')','g');
+const _kontoRegex = new RegExp('\\b('+_kontoKeys.map(k=>k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|')+')\\b','g');
 
 function highlightKonten(text) {
   if(!text || typeof window.POOL_META==='undefined' || POOL_META.fach!=='BWL') return text;
@@ -1513,10 +1510,9 @@ function renderQuestion(){
     html+='<button class="btn btn-primary" onclick="showOpenSample(\''+q.id+'\')">💡 Lösung anzeigen</button>';
   }
   html+='<button class="btn btn-skip" onclick="skipQuestion()">⏭️ Überspringen</button>';
-  html+='<button class="btn btn-unsicher" id="unsicherBtn" onclick="markUnsicher()">🔖 Unsicher — nochmal üben</button>';
   html+='<button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()" style="display:none;margin-left:auto">Nächste Aufgabe →</button>';
   html+='</div>';
-  html+='<div class="q-bottom-row" id="qBottomRow"><button class="btn-end" onclick="endQuiz()">🏁 Übung beenden</button><button class="btn-report" onclick="showReport(\''+q.id+'\')">⚠️ Problem melden</button></div>';
+  html+='<div class="q-bottom-row" id="qBottomRow"><button class="btn-end" onclick="endQuiz()">🏁 Übung beenden</button><button class="btn-unsicher" id="unsicherBtn" onclick="markUnsicher()">🔖 Nochmal üben</button><button class="btn-report" onclick="showReport(\''+q.id+'\')">⚠️ Problem melden</button></div>';
   html+='<div class="kbd-hint">Tastatur: <kbd>←</kbd> Zurück · <kbd>→</kbd> Weiter/Überspringen · <kbd>1</kbd>–<kbd>4</kbd> Antwort · <kbd>Enter</kbd> Prüfen</div>';
   document.getElementById('questionCard').innerHTML=html;
   pickedSortItem=null;
@@ -1865,16 +1861,21 @@ function shuffle(arr){for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.ra
 
 function renderTagBadges(q){
   var html='';
-  // FiBu-Auto-Badges: Kontenkategorie aus Fragetext erkennen
-  if(q.q){
-    var txt=q.q.toLowerCase();
-    var fibuAuto={aktiv:['aktivkont','aktiven','umlaufvermögen','anlagevermögen'],passiv:['passivkont','passiven','fremdkapital','eigenkapital'],aufwand:['aufwandskont','aufwandkont','aufwand'],ertrag:['ertragskont','ertragskon','ertrag']};
+  // FiBu-Auto-Badges: nur für BWL-Pools, Wortgrenzen-Match (keine False Positives)
+  if(q.q && typeof POOL_META!=='undefined' && POOL_META.fach==='BWL'){
+    var txt=' '+q.q.toLowerCase()+' ';
+    // Regex mit Wortgrenzen: \b matcht Wortanfang/-ende
+    var fibuPatterns={
+      aktiv:/\b(aktivkont|aktivkonten|aktiven|umlaufvermögen|anlagevermögen)\b/,
+      passiv:/\b(passivkont|passivkonten|passiven|fremdkapital|eigenkapital)\b/,
+      aufwand:/\b(aufwandskont|aufwandskonten|aufwandkont|aufwandkonten)\b/,
+      ertrag:/\b(ertragskont|ertragskonten|ertragkont|ertragkonten)\b/
+    };
     var gefunden={};
-    for(var kat in fibuAuto){
-      fibuAuto[kat].forEach(function(kw){if(txt.indexOf(kw)!==-1)gefunden[kat]=true});
+    for(var kat in fibuPatterns){
+      if(fibuPatterns[kat].test(txt))gefunden[kat]=true;
     }
     var fibuLabels={aktiv:'Aktivkonto',passiv:'Passivkonto',aufwand:'Aufwandskonto',ertrag:'Ertragskonto'};
-    // Nur anzeigen wenn 1–2 Kategorien (nicht alle 4 → zu generisch)
     var keys=Object.keys(gefunden);
     if(keys.length>=1&&keys.length<=2){
       keys.forEach(function(k){html+='<span class="badge badge-fibu-'+k+'">'+fibuLabels[k]+'</span>'});
