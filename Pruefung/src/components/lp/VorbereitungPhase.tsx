@@ -4,7 +4,7 @@ import { apiService } from '../../services/apiService'
 import type { PruefungsConfig, Teilnehmer } from '../../types/pruefung'
 import KursAuswahl from './KursAuswahl'
 import type { KursGruppe, KlassenlistenSuS } from './KursAuswahl'
-import TeilnehmerListe from './TeilnehmerListe'
+import TeilnehmerListe, { type AlleSuS } from './TeilnehmerListe'
 import { downloadSebDatei } from '../../utils/sebConfigGenerator'
 
 interface Props {
@@ -22,6 +22,8 @@ export default function VorbereitungPhase({ config, onTeilnehmerGesetzt }: Props
   const [teilnehmer, setTeilnehmer] = useState<Teilnehmer[]>(config.teilnehmer ?? [])
   const [einladungStatus, setEinladungStatus] = useState<'idle' | 'senden' | 'fertig' | 'fehler'>('idle')
   const [einladungFehler, setEinladungFehler] = useState<string[]>([])
+  const [lobbySpeichern, setLobbySpeichern] = useState(false)
+  const [lobbyFehler, setLobbyFehler] = useState('')
 
   // Klassenlisten laden
   const ladeKlassenlisten = useCallback(async () => {
@@ -118,12 +120,34 @@ export default function VorbereitungPhase({ config, onTeilnehmerGesetzt }: Props
     }])
   }
 
+  const handleSuSHinzufuegen = (sus: AlleSuS) => {
+    if (teilnehmer.some((t) => t.email === sus.email)) return
+    setTeilnehmer((prev) => [...prev, {
+      email: sus.email,
+      name: sus.name,
+      vorname: sus.vorname,
+      klasse: sus.klasse,
+      quelle: 'klassenliste' as const,
+    }])
+  }
+
   const handleSpeichern = async () => {
     if (!user) return
-    const effektiveTeilnehmer = teilnehmer.filter((t) => !abgewaehlte.has(t.email))
-    const erfolg = await apiService.setzeTeilnehmer(user.email, config.id, effektiveTeilnehmer)
-    if (erfolg) {
-      onTeilnehmerGesetzt(effektiveTeilnehmer)
+    setLobbySpeichern(true)
+    setLobbyFehler('')
+    try {
+      const effektiveTeilnehmer = teilnehmer.filter((t) => !abgewaehlte.has(t.email))
+      const erfolg = await apiService.setzeTeilnehmer(user.email, config.id, effektiveTeilnehmer)
+      if (erfolg) {
+        onTeilnehmerGesetzt(effektiveTeilnehmer)
+      } else {
+        setLobbyFehler('Teilnehmer konnten nicht gespeichert werden. Bitte erneut versuchen.')
+      }
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : 'Unbekannter Fehler'
+      setLobbyFehler(`Fehler beim Speichern: ${msg}`)
+    } finally {
+      setLobbySpeichern(false)
     }
   }
 
@@ -202,7 +226,9 @@ export default function VorbereitungPhase({ config, onTeilnehmerGesetzt }: Props
           teilnehmer={teilnehmer}
           onToggle={handleToggleEinzelne}
           onManuellHinzufuegen={handleManuellHinzufuegen}
+          onSuSHinzufuegen={handleSuSHinzufuegen}
           abgewaehlte={abgewaehlte}
+          alleSuS={rohDaten}
         />
       )}
 
@@ -212,7 +238,9 @@ export default function VorbereitungPhase({ config, onTeilnehmerGesetzt }: Props
           teilnehmer={[]}
           onToggle={() => {}}
           onManuellHinzufuegen={handleManuellHinzufuegen}
+          onSuSHinzufuegen={handleSuSHinzufuegen}
           abgewaehlte={abgewaehlte}
+          alleSuS={rohDaten}
         />
       )}
 
@@ -262,12 +290,18 @@ export default function VorbereitungPhase({ config, onTeilnehmerGesetzt }: Props
         <button
           type="button"
           onClick={handleSpeichern}
-          disabled={effektiveTeilnehmer.length === 0}
+          disabled={effektiveTeilnehmer.length === 0 || lobbySpeichern}
           className="px-4 py-2 text-sm bg-slate-800 dark:bg-slate-200 text-white dark:text-slate-800 rounded-lg hover:bg-slate-900 dark:hover:bg-slate-100 disabled:opacity-50 cursor-pointer font-medium"
         >
-          Weiter zur Lobby →
+          {lobbySpeichern ? 'Speichere...' : 'Weiter zur Lobby →'}
         </button>
       </div>
+
+      {lobbyFehler && (
+        <div className="mt-3 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-700 dark:text-red-300">
+          {lobbyFehler}
+        </div>
+      )}
     </div>
   )
 }

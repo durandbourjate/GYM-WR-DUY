@@ -211,6 +211,7 @@ export default function AktivPhase({ config, schuelerStatus, onBeenden }: Props)
       {detailSchueler && (
         <SusDetailPanel
           schueler={detailSchueler}
+          pruefungId={config.id}
           onSchliessen={() => setDetailSus(null)}
         />
       )}

@@ -1,13 +1,54 @@
+import { useState, useMemo, useCallback } from 'react'
 import type { SchuelerStatus } from '../../types/monitoring'
+
+interface Bemerkung {
+  zeitpunkt: string
+  text: string
+  sus?: string
+}
 
 interface Props {
   schueler: SchuelerStatus
+  pruefungId: string
   onSchliessen: () => void
 }
 
-export default function SusDetailPanel({ schueler, onSchliessen }: Props) {
+function ladeBemerkungen(pruefungId: string): Bemerkung[] {
+  try {
+    return JSON.parse(localStorage.getItem(`pruefung-bemerkungen-${pruefungId}`) || '[]')
+  } catch { return [] }
+}
+
+function speichereBemerkung(pruefungId: string, bemerkung: Bemerkung): void {
+  try {
+    const alle = ladeBemerkungen(pruefungId)
+    alle.push(bemerkung)
+    localStorage.setItem(`pruefung-bemerkungen-${pruefungId}`, JSON.stringify(alle))
+  } catch { /* ignorieren */ }
+}
+
+export default function SusDetailPanel({ schueler, pruefungId, onSchliessen }: Props) {
+  const [kommentar, setKommentar] = useState('')
+  const [bemerkungsVersion, setBemerkungsVersion] = useState(0)
+
+  const bemerkungen = useMemo(
+    () => ladeBemerkungen(pruefungId).filter((b) => b.sus === schueler.email),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [pruefungId, schueler.email, bemerkungsVersion],
+  )
+
+  const handleKommentarSpeichern = useCallback(() => {
+    if (!kommentar.trim()) return
+    speichereBemerkung(pruefungId, {
+      zeitpunkt: new Date().toISOString(),
+      text: kommentar.trim(),
+      sus: schueler.email,
+    })
+    setKommentar('')
+    setBemerkungsVersion((v) => v + 1)
+  }, [kommentar, pruefungId, schueler.email])
   return (
-    <div className="fixed inset-y-0 right-0 w-80 bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-700 shadow-lg z-30 overflow-y-auto">
+    <div className="fixed top-[53px] bottom-0 right-0 w-80 bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-700 shadow-lg z-[65] overflow-y-auto">
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-700">
         <div>
@@ -115,6 +156,43 @@ export default function SusDetailPanel({ schueler, onSchliessen }: Props) {
               <span>Unterbrechungen: {schueler.unterbrechungen.length}</span>
             </div>
           )}
+        </div>
+
+        {/* LP-Bemerkungen */}
+        <div className="border-t border-slate-200 dark:border-slate-700 pt-3">
+          <span className="text-xs text-slate-500 dark:text-slate-400 uppercase">Bemerkungen</span>
+
+          {bemerkungen.length > 0 && (
+            <div className="mt-1 space-y-1">
+              {bemerkungen.map((b, i) => (
+                <div key={i} className="text-xs p-2 bg-amber-50 dark:bg-amber-900/20 rounded border border-amber-200 dark:border-amber-800">
+                  <span className="text-amber-600 dark:text-amber-400">
+                    {new Date(b.zeitpunkt).toLocaleTimeString('de-CH', { hour: '2-digit', minute: '2-digit' })}
+                  </span>
+                  {' '}{b.text}
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className="mt-2 flex gap-1">
+            <input
+              type="text"
+              value={kommentar}
+              onChange={(e) => setKommentar(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleKommentarSpeichern()}
+              placeholder="Bemerkung hinzufügen..."
+              className="flex-1 text-xs px-2 py-1.5 border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 placeholder-slate-400"
+            />
+            <button
+              type="button"
+              onClick={handleKommentarSpeichern}
+              disabled={!kommentar.trim()}
+              className="px-2 py-1.5 text-xs bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded hover:bg-slate-300 dark:hover:bg-slate-600 disabled:opacity-50 cursor-pointer"
+            >
+              +
+            </button>
+          </div>
         </div>
       </div>
     </div>

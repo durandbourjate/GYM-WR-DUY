@@ -1,16 +1,27 @@
 import { useState, useMemo } from 'react'
 import type { Teilnehmer } from '../../types/pruefung'
 
+/** Alle geladenen SuS (für Suche über alle Kurse) */
+export interface AlleSuS {
+  email: string
+  name: string
+  vorname: string
+  klasse: string
+}
+
 interface Props {
   teilnehmer: Teilnehmer[]
   onToggle: (email: string) => void
   onManuellHinzufuegen: (email: string) => void
+  onSuSHinzufuegen?: (sus: AlleSuS) => void
   abgewaehlte: Set<string>
+  alleSuS?: AlleSuS[]
 }
 
-export default function TeilnehmerListe({ teilnehmer, onToggle, onManuellHinzufuegen, abgewaehlte }: Props) {
+export default function TeilnehmerListe({ teilnehmer, onToggle, onManuellHinzufuegen, onSuSHinzufuegen, abgewaehlte, alleSuS = [] }: Props) {
   const [manuelleEmail, setManuelleEmail] = useState('')
   const [zugeklappt, setZugeklappt] = useState<Set<string>>(new Set())
+  const [suchText, setSuchText] = useState('')
 
   const handleHinzufuegen = () => {
     const email = manuelleEmail.trim().toLowerCase()
@@ -48,16 +59,65 @@ export default function TeilnehmerListe({ teilnehmer, onToggle, onManuellHinzufu
   const aktiveInGruppe = (schueler: Teilnehmer[]): number =>
     schueler.filter((t) => !abgewaehlte.has(t.email)).length
 
+  // Suchfilter: Teilnehmer-Liste filtern
+  const suchLower = suchText.trim().toLowerCase()
+  const gefilterteGruppen = suchLower
+    ? gruppen.map((g) => ({
+        ...g,
+        schueler: g.schueler.filter((t) =>
+          `${t.name} ${t.vorname} ${t.email} ${t.klasse}`.toLowerCase().includes(suchLower)),
+      })).filter((g) => g.schueler.length > 0)
+    : gruppen
+
+  // SuS aus anderen Kursen die noch nicht Teilnehmer sind (für Suche)
+  const teilnehmerEmails = useMemo(() => new Set(teilnehmer.map((t) => t.email)), [teilnehmer])
+  const suchVorschlaege = useMemo(() => {
+    if (!suchLower || alleSuS.length === 0) return []
+    return alleSuS
+      .filter((s) => !teilnehmerEmails.has(s.email) && `${s.name} ${s.vorname} ${s.email} ${s.klasse}`.toLowerCase().includes(suchLower))
+      .slice(0, 10)
+  }, [suchLower, alleSuS, teilnehmerEmails])
+
   return (
     <div className="space-y-3">
-      {/* Zähler */}
-      <p className="text-sm text-slate-600 dark:text-slate-400">
-        Ausgewählt: <strong>{teilnehmer.filter((t) => !abgewaehlte.has(t.email)).length}</strong> von {teilnehmer.length} SuS
-      </p>
+      {/* Zähler + Suchfeld */}
+      <div className="flex items-center gap-3">
+        <p className="text-sm text-slate-600 dark:text-slate-400">
+          Ausgewählt: <strong>{teilnehmer.filter((t) => !abgewaehlte.has(t.email)).length}</strong> von {teilnehmer.length} SuS
+        </p>
+        <input
+          type="text"
+          value={suchText}
+          onChange={(e) => setSuchText(e.target.value)}
+          placeholder="🔍 Suchen..."
+          className="flex-1 text-sm px-3 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 placeholder-slate-400"
+        />
+      </div>
+
+      {/* Suchergebnisse: SuS die noch nicht Teilnehmer sind */}
+      {suchVorschlaege.length > 0 && onSuSHinzufuegen && (
+        <div className="border border-blue-200 dark:border-blue-700 rounded-lg bg-blue-50/50 dark:bg-blue-900/20">
+          <div className="px-3 py-1.5 text-xs font-medium text-blue-700 dark:text-blue-300 border-b border-blue-200 dark:border-blue-700">
+            Weitere SuS hinzufügen:
+          </div>
+          {suchVorschlaege.map((s) => (
+            <button
+              key={s.email}
+              type="button"
+              onClick={() => { onSuSHinzufuegen(s); setSuchText('') }}
+              className="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-blue-100 dark:hover:bg-blue-900/30 cursor-pointer"
+            >
+              <span className="text-blue-500">+</span>
+              <span>{s.name}, {s.vorname}</span>
+              <span className="text-xs text-slate-400 ml-auto">{s.klasse}</span>
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Gruppierte Liste */}
       <div className="max-h-80 overflow-y-auto border border-slate-200 dark:border-slate-700 rounded-lg">
-        {gruppen.map(({ klasse, schueler }) => {
+        {gefilterteGruppen.map(({ klasse, schueler }) => {
           const istZu = zugeklappt.has(klasse)
           const aktive = aktiveInGruppe(schueler)
           return (

@@ -25,6 +25,7 @@ export default function BeendenDialog({
 }: Props) {
   const [modus, setModus] = useState<'sofort' | 'restzeit'>('sofort')
   const [restzeitMinuten, setRestzeitMinuten] = useState(5)
+  const [bemerkung, setBemerkung] = useState('')
   const [bestaetigung, setBestaetigung] = useState(false)
   const [lade, setLade] = useState(false)
   const [fehler, setFehler] = useState('')
@@ -41,7 +42,19 @@ export default function BeendenDialog({
     })
 
     if (result.success) {
-      // lade bleibt true → Button bleibt disabled bis Phase wechselt
+      // Bemerkung lokal speichern (LP-Notizen)
+      if (bemerkung.trim()) {
+        try {
+          const key = `pruefung-bemerkungen-${pruefungId}`
+          const bisherige = JSON.parse(localStorage.getItem(key) || '[]') as Array<{zeitpunkt: string; text: string; sus?: string}>
+          bisherige.push({
+            zeitpunkt: new Date().toISOString(),
+            text: bemerkung.trim(),
+            sus: einzelnerSuS?.email,
+          })
+          localStorage.setItem(key, JSON.stringify(bisherige))
+        } catch { /* ignorieren */ }
+      }
       onBeendet()
       return
     } else {
@@ -125,6 +138,20 @@ export default function BeendenDialog({
                 {anzahlMitNachteilsausgleich} SuS mit Nachteilsausgleich erhalten zusätzliche Zeit.
               </div>
             )}
+
+            {/* Bemerkung (optional) */}
+            <div className="mb-4">
+              <label className="text-xs text-slate-500 dark:text-slate-400 block mb-1">
+                Bemerkung (optional)
+              </label>
+              <textarea
+                value={bemerkung}
+                onChange={(e) => setBemerkung(e.target.value)}
+                placeholder={einzelnerSuS ? 'z.B. Beim Spicken erwischt...' : 'z.B. Internet ausgefallen...'}
+                rows={2}
+                className="w-full text-sm px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 placeholder-slate-400 resize-none"
+              />
+            </div>
 
             <div className="flex gap-2 justify-end">
               <button
