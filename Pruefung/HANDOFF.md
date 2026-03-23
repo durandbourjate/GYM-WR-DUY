@@ -6,6 +6,23 @@
 
 ## Aktueller Stand
 
+**Demo-Modus Fixes + Übungspool UX** (23.03.2026, Abend) ✅
+
+### Session 23.03.2026 Abend — Demo-Modus + Übungspool-Fixes
+
+#### Prüfungstool — Demo-Modus
+- **Session-Persistenz:** `demoStarten()` speichert jetzt User + Demo-Flag in `sessionStorage`. "Durchführen"-Link (Page-Reload) verliert Login nicht mehr.
+- **Beenden-Button:** Im Demo-Modus setzt `onBeenden` jetzt `beendetUm` lokal auf Config → Phase wechselt korrekt von "aktiv" zu "beendet".
+- **Fallback `pruefungId==='demo'`:** Alle Backend-Aufrufe im DurchfuehrenDashboard prüfen zusätzlich auf Demo-ID → funktioniert zuverlässig auch wenn Backend konfiguriert ist.
+- **clearSession()** löscht jetzt auch `pruefung-demo` Key.
+
+#### Übungspools — 3 Fixes
+- **FiBu Auto-Badge False Positives:** Regex mit `\b`-Wortgrenzen + nur für BWL-Pools. "Mietvertrag" löst nicht mehr "Ertragskonto" aus.
+- **Header-Scroll-Jitter:** Hysterese statt fixer Threshold (compact ab 60px, zurück unter 20px).
+- **Unsicher-Button UX:** In Bottom-Row verschoben (neben "Problem melden"), dezentes Design mit Border. Erscheint bei allen Antworten (richtig + falsch), nicht nur bei richtigen.
+
+---
+
 **Light Mode Kontrast + Pool Konten-Highlighting** (23.03.2026, Nachmittag) ✅
 
 ### Session 23.03.2026 Nachmittag — Kontrast + Konten-Highlighting
