@@ -6,7 +6,7 @@
 
 ## Aktueller Stand
 
-**Tool-Synergien: Gemeinsame Datenschicht** (24.03.2026) 🔧 In Arbeit
+**Tool-Synergien + Variablen-Harmonisierung** (24.03.2026) ✅
 
 ### Session 24.03.2026 — Tool-Synergien (S1-S4a)
 
@@ -45,12 +45,24 @@
 - `Unterrichtsplaner/src/services/synergyService.ts` (neu): Caching-Service
 - `Unterrichtsplaner/src/services/pruefungBridge.ts` (neu): Prüfungs-Badges
 
-#### User-Aktionen (noch ausstehend)
-1. 4 Google Sheets erstellen (Anleitung: `docs/superpowers/sheets-setup-anleitung.md`)
-2. Sheet-IDs in `apps-script-code.js` eintragen (PLACEHOLDER_* ersetzen)
-3. Apps Script URL in `Unterrichtsplaner/src/services/synergyService.ts` + `pruefungBridge.ts` eintragen
-4. Apps Script Code in Editor kopieren + neue Bereitstellung
-5. End-to-End-Test: Kurse laden, Noten-Stand prüfen, Lernziele importieren
+#### Zusätzlich in dieser Session
+- **KLASSENLISTEN_ID entfernt** — Alle SuS-Daten kommen jetzt aus KURSE_SHEET_ID (1 Quelle statt 2)
+- **kursId-Format vereinfacht** — `sf-wr-29c` statt `sf-wr-29c-2526`, `in-28c` statt `in-in-28c-2526`
+- **SuS-Tab über kursId** — Tab-Namen = kursIds (nicht mehr Labels)
+- **geschlecht-Feld** ergänzt in Schueler-Interface + Apps Script
+
+#### Variablen-Harmonisierung (v3.103 Unterrichtsplaner)
+~510 Stellen in 45 Dateien umbenannt:
+- `subjectArea` → `fachbereich`, `SubjectArea` → `Fachbereich`
+- `topicMain` → `thema`, `topicSub` → `unterthema`
+- `courseId` → `kursId`, `courseIds` → `kursIds`
+- Enum-Werte: `'RECHT'` → `'Recht'`, `'IN'` → `'Informatik'`, `'INTERDISZ'` → `'Interdisziplinaer'`
+- CourseType/Gefäss `'IN'` bleibt (andere Semantik als Fachbereich)
+
+#### E2E-Test bestanden ✅
+- 4 Google Sheets erstellt + befüllt (147 SuS, 8 Kurse, 16 Stundenplan-Einträge)
+- Alle 4 Endpoints live getestet (ladeKurse, ladeKursDetails, ladeSchuljahr, ladeLehrplan)
+- Klassenlisten-Migration verifiziert (147 SuS über alle Kurse)
 
 ---
 
@@ -682,29 +694,30 @@ Beim Speichern von FiBu-Fragen wird das `musterlosung`-Textfeld automatisch aus 
 - **Hoher Kontrast:** Besonders wichtig bei Prüfungen (Lesbarkeit)
 - **Sortierung:** Nur durch Lehrperson (Abschnitte in PruefungsConfig), SuS nicht
 
-### Offene Aufgaben — Konsolidiert (Stand 24.03.2026)
+### Offene Aufgaben — Konsolidiert (Stand 24.03.2026 Abend)
 
 #### 🔴 Kurzfristig (nächste Sessions)
 
 | # | Projekt | Aufgabe | Aufwand |
 |---|---------|---------|--------|
-| 1 | Alle | **Synergien E2E-Test** — Sheets erstellen, IDs eintragen, Apps Script deployen, End-to-End verifizieren | Mittel |
-| 2 | Prüfungstool | **Pool-Rück-Sync Live-Test** — GITHUB_TOKEN konfiguriert, E2E-Test offen | Klein |
+| 1 | Prüfungstool | **Pool-Rück-Sync Live-Test** — GITHUB_TOKEN konfiguriert, E2E-Test offen | Klein |
+| 2 | Unterrichtsplaner | **Planer-UI: Synergy-Daten einbauen** — Prüfungs-Badge an Lektionen, Noten-Stand-Panel, Kurse aus Sheet | Mittel |
+| 3 | Alle | **Lehrplanziele befüllen** — Import aus Presets oder manuell ins Sheet | Klein |
 
 #### 🟡 Mittelfristig (vor produktivem Einsatz)
 
 | # | Projekt | Aufgabe |
 |---|---------|---------|
-| 3 | Prüfungstool | **Tablet/Smartphone-Tests** — responsive gebaut, spezifisch noch nicht getestet |
-| 4 | Prüfungstool | **Evento REST-Zugang** beantragen → Klassenlisten-Sync (Schulinformatiker hat bestätigt, 22.03.) |
-| 5 | Prüfungstool | **Pool-Fehlerquoten explizit filtern** — Sortier-/Filteroptionen in FragenBrowser nach Performance |
-| 6 | Alle | **S4b: Lernziel-Abdeckungs-Analyse** — Cross-Tool (unterrichtet/geübt/geprüft), braucht zentrale LZ-IDs in allen 3 Tools |
+| 4 | Prüfungstool | **Tablet/Smartphone-Tests** — responsive gebaut, spezifisch noch nicht getestet |
+| 5 | Prüfungstool | **Evento REST-Zugang** beantragen → SuS-Import automatisieren (Schulinformatiker hat bestätigt, 22.03.) |
+| 6 | Prüfungstool | **Pool-Fehlerquoten explizit filtern** — Sortier-/Filteroptionen in FragenBrowser nach Performance |
+| 7 | Alle | **S4b: Lernziel-Abdeckungs-Analyse** — Cross-Tool (unterrichtet/geübt/geprüft), braucht zentrale LZ-IDs in allen 3 Tools |
+| 8 | Unterrichtsplaner | **Räume im Stundenplan-Sheet eintragen** — raum_s1/raum_s2 Spalten befüllen |
 
 #### 🟢 Längerfristig (Roadmap)
 
 | # | Projekt | Aufgabe |
 |---|---------|---------|
-| 8 | Alle | **Variablen-Harmonisierung** — `subjectArea`→`fachbereich`, `topicMain`→`thema` etc. (Prüfungstool ist Referenz) |
 | 9 | Prüfungstool | **Kollaboratives Korrigieren** — mehrere LP korrigieren dieselbe Prüfung (Architektur-Klärung nötig) |
 | 10 | Alle | **Skalierung/Multi-LP** — erst wenn alle Apps für DUY fertig stehen |
 | 11 | Unterrichtsplaner | **Live-Sync / Cloud-Backend** — erst wenn Planer in definitiver Version |

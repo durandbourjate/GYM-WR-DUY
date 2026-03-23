@@ -1,6 +1,6 @@
-# Unterrichtsplaner – Handoff v3.102
+# Unterrichtsplaner – Handoff v3.103
 
-## Status: 🔧 v3.102 — Tool-Synergien (Shared Data Layer) — IN ARBEIT
+## Status: ✅ v3.103 — Tool-Synergien + Variablen-Harmonisierung — ABGESCHLOSSEN
 
 **Vorgänger:** v3.100 (UI-Verbesserungen & Bugfixes).
 
@@ -22,8 +22,20 @@ Beide Services haben `APPS_SCRIPT_URL` und `LP_EMAIL` als leere Strings. Müssen
 - Settings oder Overlay: Noten-Stand pro Kurs (Fortschrittsbalken)
 - CourseEditor: Kurse aus zentraler Sheet laden statt manuell
 
+### v3.103 — Variablen-Harmonisierung (24.03.2026)
+~510 Stellen in 45 Dateien umbenannt an Prüfungstool-Standard:
+- `subjectArea` → `fachbereich`, `SubjectArea` → `Fachbereich` (114 Stellen, 22 Dateien)
+- `topicMain` → `thema`, `topicSub` → `unterthema` (71 Stellen, 9 Dateien)
+- `courseId` → `kursId`, `courseIds` → `kursIds` (275 Stellen, 31 Dateien)
+- Enum-Werte: `'RECHT'` → `'Recht'`, `'IN'` → `'Informatik'`, `'INTERDISZ'` → `'Interdisziplinaer'`
+- CourseType/Gefäss `'IN'` bewusst beibehalten (andere Semantik)
+
+### Nächste Schritte Planer
+- Synergy-Services in UI einbauen (Prüfungs-Badge an Lektionen, Noten-Stand, Kurse aus Sheet)
+- `pruefungBridge.ts` und `synergyService.ts` sind konfiguriert und bereit
+
 ### Verifizierte Bugs L1–L7 (v3.89)
-Alle in v3.90–v3.102 bereits behoben (verifiziert 23.03.2026).
+Alle in v3.90–v3.103 bereits behoben.
 
 ---
 
