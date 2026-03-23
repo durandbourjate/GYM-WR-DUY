@@ -493,10 +493,7 @@ Beim Speichern von FiBu-Fragen wird das `musterlosung`-Textfeld automatisch aus 
 - Auto-Submit-Bestätigung: Bottom-Banner durch prominenten Vollbild-Dialog ersetzt (wie AbgabeDialog-Erfolg, mit Checkmark-Icon)
 
 ### Offene Punkte (noch nicht umgesetzt)
-- ~~Pool-Rück-Sync End-to-End-Test~~ ✅ Implementiert + BatchExportDialog
-- ~~Prüfungs-Durchführung erweitern~~ ✅ Open-End-Modus + LP-Beenden (Phase 5h) + 4-Phasen-Workflow (Phase 5i) + Kurs-Auswahl (Phase 5j)
 - **Apps Script Deployment nötig:** `apps-script-code.js` muss nach jedem Push in Apps Script Editor kopiert + neue Bereitstellung erstellt werden
-- ~~Refactoring-Kandidaten~~ ✅ FragenEditor (1705→684 Z.), apiService (1008→55 Z. Barrel), FragenBrowser (923→381 Z.)
 
 ### Was funktioniert
 - **E2E-Flow getestet:** Login → Prüfung laden → Ausfüllen → Abgabe → Antwort-Datei in Google Drive ✅
@@ -595,32 +592,47 @@ Beim Speichern von FiBu-Fragen wird das `musterlosung`-Textfeld automatisch aus 
 - **Hoher Kontrast:** Besonders wichtig bei Prüfungen (Lesbarkeit)
 - **Sortierung:** Nur durch Lehrperson (Abschnitte in PruefungsConfig), SuS nicht
 
-### Offene User-Wünsche (für spätere Iterationen)
-- ~~Buchhaltungs-Fragetyp~~ ✅ (Session 21.03.2026 — 4 FiBu-Typen + Aufgabengruppe)
-- ~~Open-End-Modus + LP-Beenden~~ ✅ (Session 21.03.2026 — Phase 5h)
-- ~~Prüfungs-Workflow (4 Phasen)~~ ✅ (Session 21.03.2026 — Phase 5i)
-- ~~Kurs-basierte Teilnehmer-Auswahl~~ ✅ (Session 22.03.2026 — Phase 5j)
-- Tablet-/Smartphone-Optimierung: grundsätzlich responsive, aber noch nicht spezifisch getestet
-- Skalierung/Kollaboration: Apps für andere LP nutzbar machen (→ Roadmap unten)
+### Offene Aufgaben — Konsolidiert (Stand 23.03.2026)
 
-### Nächste Features (vor Multi-LP umsetzbar)
+#### 🔴 Kurzfristig (nächste Sessions)
 
-| Feature | Beschreibung | Status |
-|---------|-------------|--------|
-| **Ergebnis-Export (Excel)** | Tabelle wie Google Forms: Spalten pro Frage + Antwort + erreichte Punkte, eine Zeile pro SuS. Offline-Archiv der Prüfungsresultate. | 🔜 Geplant |
-| **Individuelle SuS-PDFs** | Pro SuS ein PDF mit Fragen, Antworten, Punkten, Kommentaren, Audio-Links. Für Zustellung an SuS oder Archivierung. | 🔜 Geplant |
-| **SuS-Korrektur-Einsicht (erweitert)** | SuS können korrigierte Prüfung im System anschauen (✅). PDF-Download kommt später (z.B. nach Nachprüfungen). LP steuert Freigabe-Zeitpunkt. | Teilweise ✅ |
-| **Fragen-Statistiken** | Schwierigkeit (Lösungsquote), Trennschärfe, Analyse über mehrere Durchführungen. Pool-Statistiken (Fehlerquoten) als Hinweis im Editor anzeigen. | 🔜 Geplant |
-| **Prüfungstracker** | Übersicht: Welche SuS haben gefehlt? Wer braucht Nachprüfung? Erinnerungen. Noten-Stand pro Kurs/Semester vs. Vorgaben. Shared mit Planer. | 🔜 Geplant |
-| **SEB-Installation** | Safe Exam Browser Deployment vorbereiten (Konfiguration, Anleitung für IT, Testlauf) | 🔜 Geplant |
-| **Materialien-Filter** | In Fragenbank nach Fragen mit Anhängen (Bilder, Audio, Video) filtern können | 🔜 Geplant |
+| # | Projekt | Aufgabe | Aufwand |
+|---|---------|---------|--------|
+| 1 | Übungspools | **Konten-Highlighting im Fragetext** — `highlightKonten()` in `renderQuestion()` einbauen (CSS-Klassen + Funktion sind bereit) | Klein |
+| 2 | Unterrichtsplaner | **Light Mode Kontrast (gross)** — Gray/Slate-Palette in ~20 Komponenten (text-gray-400/500, border-slate-700, Hover-States). Kontrast-Check-Report existiert. | Mittel |
+| 3 | Prüfungstool | **Pool-Rück-Sync Live-Test** — GITHUB_TOKEN konfiguriert, End-to-End-Test noch offen | Klein |
 
-### Übungspools: Geplante Verbesserungen
+#### 🟡 Mittelfristig (vor produktivem Einsatz)
 
-| Feature | Beschreibung | Status |
-|---------|-------------|--------|
-| **"Unsicher"-Markierung** | SuS können bei Fragen markieren, dass sie unsicher waren → Frage kommt erneut (wie falsch beantwortete). Ergänzt bestehende Wiederholungslogik. | 🔜 Geplant |
-| **Pool-Sync aktuell halten** | Pools wachsen dynamisch durch Rück-Sync aus Prüfungstool. Beim Sync immer aktuelle Version holen. | Laufend |
+| # | Projekt | Aufgabe |
+|---|---------|---------|
+| 4 | Prüfungstool | **Tablet/Smartphone-Tests** — responsive gebaut, spezifisch noch nicht getestet |
+| 5 | Prüfungstool | **Evento REST-Zugang** beantragen → Klassenlisten-Sync (Schulinformatiker hat bestätigt, 22.03.) |
+| 6 | Prüfungstool | **SuS-Korrektur-Einsicht erweitern** — PDF-Download (nach Nachprüfungen), LP steuert Freigabe ✅ |
+| 7 | Prüfungstool | **Fragen-Statistiken erweitern** — Trennschärfe, Analyse über mehrere Durchführungen, Pool-Fehlerquoten im Editor |
+
+#### 🟢 Längerfristig (Roadmap)
+
+| # | Projekt | Aufgabe |
+|---|---------|---------|
+| 8 | Alle | **Variablen-Harmonisierung** — `subjectArea`→`fachbereich`, `topicMain`→`thema` etc. (Prüfungstool ist Referenz) |
+| 9 | Prüfungstool | **Kollaboratives Korrigieren** — mehrere LP korrigieren dieselbe Prüfung (Architektur-Klärung nötig) |
+| 10 | Alle | **Skalierung/Multi-LP** — erst wenn alle Apps für DUY fertig stehen |
+| 11 | Unterrichtsplaner | **Live-Sync / Cloud-Backend** — erst wenn Planer in definitiver Version |
+
+#### ✅ Bereits erledigt (Referenz)
+
+- ~~Buchhaltungs-Fragetyp~~ ✅ 4 FiBu-Typen + Aufgabengruppe (21.03.)
+- ~~Pool-Rück-Sync + Batch-Export~~ ✅ (21.03.)
+- ~~Open-End + LP-Beenden~~ ✅ Phase 5h (21.03.)
+- ~~4-Phasen-Workflow~~ ✅ Phase 5i (21.03.)
+- ~~Kurs-basierte Teilnehmer-Auswahl~~ ✅ Phase 5j (22.03.)
+- ~~Prüfungstracker + SuS-PDFs + SEB + Statistiken + Excel-Export~~ ✅ (22.03.)
+- ~~FiBu-Farben + Konten-Highlighting in Pools~~ ✅ (23.03.)
+- ~~Demo-Modus Fixes (Session, Beenden, Fallback)~~ ✅ (23.03.)
+- ~~Unsicher-Button~~ ✅ implementiert + UX verbessert (23.03.)
+- ~~Materialien-Filter (📎 Toggle)~~ ✅ (22.03.)
+- ~~SEB komplett~~ ✅ Auto-Config, harte Durchsetzung, LP-Ausnahme (22.03.)
 
 ### Roadmap: Multi-LP / Skalierung (Sammlung)
 
@@ -1009,12 +1021,7 @@ Ohne diese Variablen funktioniert die App im **Demo-Modus** (Schülercode + Demo
 | 67 | Bewertungsraster KI (Backend) | ✅ | 2 neue Cases in apps-script-code.js: bewertungsrasterGenerieren/Verbessern |
 
 ### Offen (User-Wünsche für spätere Iterationen)
-- Pool-Rück-Sync End-to-End-Test (GITHUB_TOKEN konfiguriert, Live-Test ausstehend)
-- Pool-Rück-Sync Batch-Export ✅ implementiert
-- ~~Prüfungs-Durchführung erweitern~~ ✅ (Open-End, LP-Beenden, 4-Phasen-Workflow)
-- ~~Buchhaltungs-Fragetyp~~ ✅ (4 FiBu-Typen + Aufgabengruppe implementiert)
-- Kollaboratives Korrigieren (mehrere LP korrigieren dieselbe Prüfung — Architektur-Klärung nötig)
-- Tablet/Smartphone-Optimierung (responsive by design, spezifische Tests ausstehend)
+→ Siehe konsolidierte Liste oben unter **"Offene Aufgaben — Konsolidiert"**
 
 ### Backend-Hinweis
 `apps-script-code.js` enthält den kompletten Apps Script Code. Nach Änderungen: Code kopieren → Apps Script Editor → Bereitstellung aktualisieren (Stift → Neue Version). Die Spalten `freigeschaltet` und `zeitverlaengerungen` müssen im Configs-Sheet vorhanden sein.
