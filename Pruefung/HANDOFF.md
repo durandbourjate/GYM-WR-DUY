@@ -6,6 +6,27 @@
 
 ## Aktueller Stand
 
+**5 Fixes: Teilfragen, Demo, FiBu-Fachbegriffe, Kontrast, Pool-Farben** (23.03.2026) ✅
+
+### Session 23.03.2026 — Bugfixes + FiBu-Verbesserungen
+
+#### Bugfixes
+- **Teilfragen-Status:** Fragen mit Teilaufgaben (R/F, Lückentext, Berechnung, Zuordnung) werden erst grün markiert wenn ALLE Teile beantwortet sind. Neue Utility `antwortStatus.ts` mit `istVollstaendigBeantwortet()`.
+- **"Meine Antworten ansehen":** Button nur im Demo-Modus sichtbar. Im echten Prüfungsbetrieb steuert die LP die Korrektur-Einsicht.
+
+#### FiBu-Fachbegriffe
+- **Bilanz/ER SuS-Ansicht:** Placeholder `"Kontenhauptgruppe"` statt `"Gruppenname (z.B. Umlaufvermögen)"` — korrekte Fachterminologie.
+- **Konten-Referenztabelle erweitert:** Zeigt neu Kontenklasse (farbige Badges: Aktiven=gelb, Passiven=rot, Aufwand=blau, Ertrag=grün) und Kontenhauptgruppe aus dem Kontenrahmen.
+- **LP-Editor:** Gleiche Placeholder-Anpassungen.
+
+#### Übungspools
+- **FiBu-Kontenfarben:** Auto-Badges erkennen Kontenkategorien im Fragetext (Aktivkonto=gelb, Passivkonto=rot, etc.). Zusätzlich `fibu:`-Tag-System für explizite Zuordnung. CSS für Light + Dark Mode.
+
+#### Unterrichtsplaner
+- **Light Mode Kontrast:** Indigo-300/400 in der invertierten Palette dunkler gemacht für WCAG AA Kontrast (≥4.5:1 auf weissem Hintergrund).
+
+---
+
 **Farbkonzept + UX-Fixes** (22.03.2026, Abend-Session) ✅
 
 ### Session 22.03.2026 Abend — Farbkonzept, FiBu-UX, Demo-Fixes (9 Commits)
