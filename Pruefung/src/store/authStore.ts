@@ -38,7 +38,7 @@ interface AuthStore {
 
 export const useAuthStore = create<AuthStore>((set) => ({
   user: restoreSession(),
-  istDemoModus: false,
+  istDemoModus: restoreDemoFlag(),
   ladeStatus: 'idle',
   fehler: null,
 
@@ -52,7 +52,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
       bild: credential.picture,
       rolle,
     }
-    saveSession(user)
+    saveSession(user, false)
     set({ user, istDemoModus: false, ladeStatus: 'fertig', fehler: null })
   },
 
@@ -65,7 +65,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
       rolle: 'sus',
       schuelerId,
     }
-    saveSession(user)
+    saveSession(user, false)
     set({ user, istDemoModus: false, ladeStatus: 'fertig', fehler: null })
   },
 
@@ -85,6 +85,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
       nachname: 'Nutzer',
       rolle: 'sus',
     }
+    saveSession(user, true)
     set({ user, istDemoModus: true, ladeStatus: 'fertig', fehler: null })
   },
 
@@ -98,9 +99,14 @@ export const useAuthStore = create<AuthStore>((set) => ({
 }))
 
 // Session via sessionStorage (Tab-gebunden, überlebt Reload aber nicht Tab-Schliessung)
-function saveSession(user: AuthUser): void {
+function saveSession(user: AuthUser, demo = false): void {
   try {
     sessionStorage.setItem('pruefung-auth', JSON.stringify(user))
+    if (demo) {
+      sessionStorage.setItem('pruefung-demo', '1')
+    } else {
+      sessionStorage.removeItem('pruefung-demo')
+    }
   } catch {
     // sessionStorage nicht verfügbar
   }
@@ -117,6 +123,14 @@ function restoreSession(): AuthUser | null {
     return null
   } catch {
     return null
+  }
+}
+
+function restoreDemoFlag(): boolean {
+  try {
+    return sessionStorage.getItem('pruefung-demo') === '1'
+  } catch {
+    return false
   }
 }
 

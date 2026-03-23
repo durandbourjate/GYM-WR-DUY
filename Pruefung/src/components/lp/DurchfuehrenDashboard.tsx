@@ -421,7 +421,13 @@ export default function DurchfuehrenDashboard({ pruefungId }: { pruefungId: stri
             <AktivPhase
               config={config}
               schuelerStatus={daten.schueler}
-              onBeenden={() => ladeDaten()}
+              onBeenden={() => {
+                // Im Demo-Modus: Config lokal als beendet markieren (kein Backend)
+                if (istDemoModus && config) {
+                  setConfig({ ...config, beendetUm: new Date().toISOString() })
+                }
+                ladeDaten()
+              }}
             />
           )}
 
