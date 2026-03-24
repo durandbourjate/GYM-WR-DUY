@@ -50,8 +50,10 @@ function tabIndex(tab: DurchfuehrenTab): number {
 function istTabVerfuegbar(tab: DurchfuehrenTab, phase: PruefungsPhase): boolean {
   const aktuellerTabIndex = tabIndex(phaseZuTab(phase))
   const zielIndex = tabIndex(tab)
-  // Vergangene + aktuelle Phase: verfügbar. Korrektur nur wenn beendet.
-  if (tab === 'korrektur') return phase === 'beendet'
+  // Korrektur immer verfügbar (auch wenn Prüfung noch läuft — LP muss jederzeit korrigieren können)
+  if (tab === 'korrektur') return true
+  // Ergebnisse verfügbar sobald beendet ODER aktiv (LP kann während Prüfung reinschauen)
+  if (tab === 'ergebnisse') return phase === 'beendet' || phase === 'aktiv'
   return zielIndex <= aktuellerTabIndex
 }
 
