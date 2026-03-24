@@ -13,6 +13,7 @@ import type {
   MCOption, Bewertungskriterium,
   AufgabengruppeFrage,
   VisualisierungFrage, CanvasConfig,
+  PDFFrage, PDFKategorie, PDFAnnotationsWerkzeug, PDFAnnotation,
 } from '../types/fragen.ts'
 import { parseLuecken } from '../components/lp/frageneditor/editorUtils.ts'
 import {
@@ -60,6 +61,7 @@ export type TypSpezifischeDaten =
   | { typ: 'bilanzstruktur'; aufgabentext: string; modus: BilanzERFrage['modus']; kontenMitSaldi: KontoMitSaldo[]; loesung: BilanzERLoesung; bewertungsoptionen: BilanzERBewertung }
   | { typ: 'aufgabengruppe'; kontext: string; teilaufgabenIds: string[] }
   | { typ: 'visualisierung'; untertyp?: VisualisierungFrage['untertyp']; fragetext?: string; canvasConfig?: CanvasConfig; musterloesungBild?: string }
+  | { typ: 'pdf'; fragetext: string; pdfDriveFileId: string; pdfBase64?: string; pdfDateiname: string; seitenAnzahl: number; kategorien?: PDFKategorie[]; erlaubteWerkzeuge: PDFAnnotationsWerkzeug[]; musterloesungAnnotationen?: PDFAnnotation[] }
 
 /** Erstellt ein vollständiges Frage-Objekt aus Basisdaten + typ-spezifischen Daten */
 export function erstelleFrageObjekt(basis: FrageBasis, typDaten: TypSpezifischeDaten): Frage {
@@ -184,5 +186,19 @@ export function erstelleFrageObjekt(basis: FrageBasis, typDaten: TypSpezifischeD
         canvasConfig: typDaten.canvasConfig,
         musterloesungBild: typDaten.musterloesungBild,
       } as VisualisierungFrage
+
+    case 'pdf':
+      return {
+        ...basis,
+        typ: 'pdf',
+        fragetext: typDaten.fragetext.trim(),
+        pdfDriveFileId: typDaten.pdfDriveFileId,
+        pdfBase64: typDaten.pdfBase64,
+        pdfDateiname: typDaten.pdfDateiname,
+        seitenAnzahl: typDaten.seitenAnzahl,
+        kategorien: typDaten.kategorien,
+        erlaubteWerkzeuge: typDaten.erlaubteWerkzeuge,
+        musterloesungAnnotationen: typDaten.musterloesungAnnotationen,
+      } as PDFFrage
   }
 }

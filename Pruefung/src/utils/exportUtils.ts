@@ -1,5 +1,5 @@
 import type { PruefungsKorrektur, SchuelerAbgabe } from '../types/korrektur.ts'
-import type { Frage, MCFrage, ZuordnungFrage, LueckentextFrage, RichtigFalschFrage, BerechnungFrage } from '../types/fragen.ts'
+import type { Frage, MCFrage, ZuordnungFrage, LueckentextFrage, RichtigFalschFrage, BerechnungFrage, PDFAnnotation } from '../types/fragen.ts'
 import type { Antwort } from '../types/antworten.ts'
 import type { SchuelerStatus } from '../types/monitoring.ts'
 import type { PruefungsConfig } from '../types/pruefung.ts'
@@ -304,6 +304,12 @@ export function antwortAlsText(antwort: Antwort | undefined, frage: Frage): stri
         } catch { return '(Zeichnung vorhanden)' }
       }
       return '(keine Eingabe)'
+    }
+
+    case 'pdf': {
+      const pdfAntwort = antwort as { typ: 'pdf'; annotationen: PDFAnnotation[] }
+      const count = pdfAntwort.annotationen?.length ?? 0
+      return count > 0 ? `(${count} PDF-Annotationen vorhanden)` : '(keine Annotationen)'
     }
 
     default:

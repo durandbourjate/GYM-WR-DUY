@@ -25,6 +25,8 @@ export interface FrageValidierungsParams {
   biKontenMitSaldi?: KontoMitSaldo[]
   agKontext?: string
   agTeilaufgabenIds?: string[]
+  pdfDriveFileId?: string
+  pdfErlaubteWerkzeuge?: string[]
 }
 
 /** Validiert eine Frage und gibt eine Liste von Fehlermeldungen zurück (leer = valide) */
@@ -33,7 +35,7 @@ export function validiereFrage(params: FrageValidierungsParams): string[] {
   const { typ, thema, fragetext, punkte } = params
 
   if (!thema.trim()) errs.push('Thema fehlt')
-  if (!fragetext.trim() && typ !== 'tkonto' && typ !== 'kontenbestimmung' && typ !== 'bilanzstruktur' && typ !== 'aufgabengruppe') errs.push('Fragetext fehlt')
+  if (!fragetext.trim() && typ !== 'tkonto' && typ !== 'kontenbestimmung' && typ !== 'bilanzstruktur' && typ !== 'aufgabengruppe' && typ !== 'pdf') errs.push('Fragetext fehlt')
   if (punkte <= 0) errs.push('Punkte müssen > 0 sein')
 
   if (typ === 'mc' && params.optionen) {
@@ -79,6 +81,11 @@ export function validiereFrage(params: FrageValidierungsParams): string[] {
   if (typ === 'aufgabengruppe') {
     if (!params.agKontext?.trim()) errs.push('Kontext erforderlich')
     if ((params.agTeilaufgabenIds?.length ?? 0) < 1) errs.push('Mindestens 1 Teilaufgabe erforderlich')
+  }
+  if (typ === 'pdf') {
+    if (!params.pdfDriveFileId) errs.push('Bitte PDF hochladen')
+    if (!params.fragetext?.trim()) errs.push('Fragestellung eingeben')
+    if (!params.pdfErlaubteWerkzeuge?.length) errs.push('Mindestens ein Werkzeug auswählen')
   }
 
   return errs

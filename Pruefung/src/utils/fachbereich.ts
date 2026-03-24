@@ -23,6 +23,7 @@ export function typLabel(typ: string): string {
     case 'bilanzstruktur': return 'Bilanz/ER'
     case 'aufgabengruppe': return 'Aufgabengruppe'
     case 'visualisierung': return 'Zeichnen'
+    case 'pdf': return 'PDF-Annotation'
     default: return typ
   }
 }
