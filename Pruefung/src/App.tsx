@@ -73,15 +73,8 @@ export default function App() {
           }
         } catch (error) {
           console.error('[App] Backend-Fehler beim Laden:', error)
-          // Nicht crashen — Fallback auf eingebaute Prüfungen
-        }
-        // Fallback: Eingebaute Prüfungen (z.B. Einrichtungsprüfung)
-        const eingebaut = ladeEingebautePruefung(pruefungIdAusUrl)
-        if (eingebaut) {
-          const resolvedFragen = resolveFragenFuerPruefung(eingebaut.config, eingebaut.fragen)
-          setPruefungsConfig(eingebaut.config)
-          setPruefungsFragen(resolvedFragen)
-          return
+          // Nicht crashen — Fehler anzeigen, aber NICHT auf eingebaute Prüfungen zurückfallen
+          // (sonst umgeht der Schüler die Freischaltung)
         }
 
         setLadeFehler('Prüfung konnte nicht geladen werden. Bitte URL prüfen oder Lehrperson kontaktieren.')
