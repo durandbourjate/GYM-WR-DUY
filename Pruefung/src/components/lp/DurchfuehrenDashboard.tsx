@@ -93,6 +93,12 @@ export default function DurchfuehrenDashboard({ pruefungId }: { pruefungId: stri
   // Config der Prüfung
   const [config, setConfig] = useState<PruefungsConfig | null>(null)
 
+  // Loading-State für Freischalten-Button
+  const [freischaltenLaedt, setFreischaltenLaedt] = useState(false)
+
+  // AbortController für Monitoring-Polling (Overlap-Schutz)
+  const monitoringAbortRef = useRef<AbortController | null>(null)
+
   // Timer für aktive Phase
   const [startTimestamp] = useState(() => Date.now())
   const [dauer, setDauer] = useState('')
@@ -110,7 +116,7 @@ export default function DurchfuehrenDashboard({ pruefungId }: { pruefungId: stri
     return () => clearInterval(interval)
   }, [ladeNachrichten])
 
-  // Daten laden
+  // Daten laden (mit Overlap-Schutz: vorherigen Request abbrechen)
   const ladeDaten = useCallback(async () => {
     if (!user) return
     if (istDemoModus || !apiService.istKonfiguriert() || !pruefungId || pruefungId === 'demo') {
@@ -118,7 +124,11 @@ export default function DurchfuehrenDashboard({ pruefungId }: { pruefungId: stri
       setLadeStatus('fertig')
       return
     }
-    const result = await apiService.ladeMonitoring(pruefungId, user.email)
+    // Vorherigen laufenden Request abbrechen
+    monitoringAbortRef.current?.abort()
+    const controller = new AbortController()
+    monitoringAbortRef.current = controller
+    const result = await apiService.ladeMonitoring(pruefungId, user.email, { signal: controller.signal })
     if (result) {
       const mappedResult = {
         ...result,
@@ -393,12 +403,17 @@ export default function DurchfuehrenDashboard({ pruefungId }: { pruefungId: stri
             <LobbyPhase
               config={config}
               schuelerStatus={daten.schueler}
+              freischaltenLaedt={freischaltenLaedt}
               onFreischalten={async () => {
-                if (user) {
-                  const erfolg = await apiService.schaltePruefungFrei(config.id, user.email)
-                  if (erfolg) {
-                    setConfig({ ...config, freigeschaltet: true })
-                  }
+                if (!user || freischaltenLaedt) return
+                // Optimistic UI: sofort freigeschaltet anzeigen
+                setFreischaltenLaedt(true)
+                setConfig({ ...config, freigeschaltet: true })
+                const erfolg = await apiService.schaltePruefungFrei(config.id, user.email)
+                setFreischaltenLaedt(false)
+                if (!erfolg) {
+                  // Rollback bei Fehler
+                  setConfig({ ...config, freigeschaltet: false })
                 }
               }}
               onZurueck={async () => {

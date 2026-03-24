@@ -42,6 +42,7 @@ type CanvasAction =
   | { type: 'CLEAR' }
   | { type: 'SELECT'; id: CommandId | null }
   | { type: 'DELETE_SELECTED' }
+  | { type: 'DELETE_BY_ID'; id: CommandId }
   | { type: 'MOVE_SELECTED'; dx: number; dy: number }
   | { type: 'LOAD'; commands: DrawCommand[] };
 
@@ -138,6 +139,17 @@ function canvasReducer(state: CanvasState, action: CanvasAction): CanvasState {
         commands: state.commands.filter(c => c.id !== state.selektierterCommand),
         redoStack: [...state.redoStack, zuLoeschen],
         selektierterCommand: null,
+      };
+    }
+
+    case 'DELETE_BY_ID': {
+      const zuLoeschen = state.commands.find(c => c.id === action.id);
+      if (!zuLoeschen) return state;
+      return {
+        ...state,
+        commands: state.commands.filter(c => c.id !== action.id),
+        redoStack: [...state.redoStack, zuLoeschen],
+        selektierterCommand: state.selektierterCommand === action.id ? null : state.selektierterCommand,
       };
     }
 
@@ -590,6 +602,10 @@ export function useDrawingEngine(options: UseDrawingEngineOptions): UseDrawingEn
     dispatch({ type: 'DELETE_SELECTED' });
   }, []);
 
+  const loescheById = useCallback((id: CommandId) => {
+    dispatch({ type: 'DELETE_BY_ID', id });
+  }, []);
+
   const verschiebeSelektierten = useCallback((dx: number, dy: number) => {
     dispatch({ type: 'MOVE_SELECTED', dx, dy });
   }, []);
@@ -636,6 +652,7 @@ export function useDrawingEngine(options: UseDrawingEngineOptions): UseDrawingEn
     allesLoeschen,
     selektiere,
     loescheSelektierten,
+    loescheById,
     verschiebeSelektierten,
     render,
     serialisiere,

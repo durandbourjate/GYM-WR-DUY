@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { usePruefungStore } from './store/pruefungStore.ts'
 import { useAuthStore } from './store/authStore.ts'
-import { einrichtungsPruefung } from './data/einrichtungsPruefung.ts'
-import { einrichtungsFragen } from './data/einrichtungsFragen.ts'
+import { demoPruefung } from './data/demoPruefung.ts'
+import { demoFragen } from './data/demoFragen.ts'
 import { apiService } from './services/apiService.ts'
 import type { Frage } from './types/fragen.ts'
 import type { PruefungsConfig } from './types/pruefung.ts'
@@ -20,14 +20,9 @@ import KorrekturEinsicht from './components/sus/KorrekturEinsicht.tsx'
 // Theme-Store importieren damit er initialisiert wird
 import './store/themeStore.ts'
 
-/** Registry eingebauter Prüfungen (lokal im Bundle, kein Backend nötig) */
-const EINGEBAUTE_PRUEFUNGEN: Record<string, { config: PruefungsConfig; fragen: Frage[] }> = {
-  'einrichtung-sf-wr-27a28f': { config: einrichtungsPruefung, fragen: einrichtungsFragen },
-}
-
-function ladeEingebautePruefung(id: string): { config: PruefungsConfig; fragen: Frage[] } | null {
-  return EINGEBAUTE_PRUEFUNGEN[id] ?? null
-}
+// Hinweis: Eingebaute Prüfungen (EINGEBAUTE_PRUEFUNGEN) wurden entfernt.
+// Alle Prüfungen laufen jetzt über den normalen Backend-Datenfluss (Google Sheets).
+// Im Demo-Modus wird die demoPruefung aus data/demoPruefung.ts verwendet.
 
 export default function App() {
   // Notfall-Reset: ?reset=true löscht alles und leitet zum Login weiter
@@ -109,26 +104,14 @@ export default function App() {
         return
       }
 
-      // Eingebaute Prüfungen auch ohne Backend laden
-      if (pruefungIdAusUrl && !istDemoModus) {
-        const eingebaut = ladeEingebautePruefung(pruefungIdAusUrl)
-        if (eingebaut) {
-          const resolvedFragen = resolveFragenFuerPruefung(eingebaut.config, eingebaut.fragen)
-          setPruefungsConfig(eingebaut.config)
-          setPruefungsFragen(resolvedFragen)
-          return
-        }
-      }
-
-      // Fallback: Im Demo-Modus die Einrichtungsprüfung laden (statt alte demoPruefung)
-      const resolvedConfig = { ...einrichtungsPruefung, freigeschaltet: true }
-      const resolvedFragen = resolveFragenFuerPruefung(resolvedConfig, einrichtungsFragen)
+      // Fallback: Im Demo-Modus die Demo-Prüfung laden
+      const resolvedConfig = { ...demoPruefung, freigeschaltet: true }
+      const resolvedFragen = resolveFragenFuerPruefung(resolvedConfig, demoFragen)
       setPruefungsConfig(resolvedConfig)
       setPruefungsFragen(resolvedFragen)
 
       if (config && config.id === resolvedConfig.id && phase !== 'start') {
         setWiederhergestellt(true)
-        // Immer zum Startbildschirm zurück, damit User entscheiden kann
         usePruefungStore.getState().setPhase('start')
       }
     }

@@ -256,24 +256,22 @@ export function ZeichnenCanvas({
           break;
         }
 
-        case 'stift':
-        case 'radierer': {
-          const cmd: DrawCommand =
-            aktivesTool === 'stift'
-              ? {
-                  id: generiereCommandId(),
-                  typ: 'stift',
-                  punkte: [punkt],
-                  farbe: aktiveFarbe,
-                  breite: stiftBreite,
-                }
-              : {
-                  id: generiereCommandId(),
-                  typ: 'radierer',
-                  punkte: [punkt],
-                  breite: stiftBreite * 4,
-                };
+        case 'stift': {
+          const cmd: DrawCommand = {
+            id: generiereCommandId(),
+            typ: 'stift',
+            punkte: [punkt],
+            farbe: aktiveFarbe,
+            breite: stiftBreite,
+          };
           engine.updateAktiverCommand(cmd);
+          break;
+        }
+
+        case 'radierer': {
+          // Objekt-Radierer: Objekt unter Cursor finden und löschen
+          const gefunden = findeCommandBeiPunkt(engine.state.commands, punkt);
+          if (gefunden) engine.loescheById(gefunden);
           break;
         }
 
@@ -318,16 +316,9 @@ export function ZeichnenCanvas({
         }
 
         case 'text': {
-          // Text-Overlay anzeigen an geklickter Stelle
-          const canvas = canvasRef.current;
-          if (!canvas) break;
-
-          const rect = canvas.getBoundingClientRect();
-          // CSS-Position relativ zum Container
-          const skalierungX = rect.width / logischeBreite;
-          const skalierungY = rect.height / logischeHoehe;
-          const cssLeft = punkt.x * skalierungX;
-          const cssTop = (punkt.y - 18) * skalierungY; // 18px = Schriftgrösse
+          // Text-Overlay anzeigen an geklickter Stelle (prozentual positioniert)
+          const cssLeft = (punkt.x / logischeBreite) * 100;
+          const cssTop = ((punkt.y - 18) / logischeHoehe) * 100;
 
           setTextOverlay({
             sichtbar: true,
@@ -358,22 +349,20 @@ export function ZeichnenCanvas({
           break;
         }
 
-        case 'stift':
-        case 'radierer': {
+        case 'stift': {
           const aktiver = engine.state.aktiverCommand;
-          if (!aktiver) break;
+          if (!aktiver || aktiver.typ !== 'stift') break;
+          engine.updateAktiverCommand({
+            ...aktiver,
+            punkte: [...aktiver.punkte, punkt],
+          });
+          break;
+        }
 
-          if (aktiver.typ === 'stift') {
-            engine.updateAktiverCommand({
-              ...aktiver,
-              punkte: [...aktiver.punkte, punkt],
-            });
-          } else if (aktiver.typ === 'radierer') {
-            engine.updateAktiverCommand({
-              ...aktiver,
-              punkte: [...aktiver.punkte, punkt],
-            });
-          }
+        case 'radierer': {
+          // Objekt-Radierer: Objekt unter Cursor beim Bewegen löschen
+          const gefunden = findeCommandBeiPunkt(engine.state.commands, punkt);
+          if (gefunden) engine.loescheById(gefunden);
           break;
         }
 
@@ -414,21 +403,21 @@ export function ZeichnenCanvas({
           break;
         }
 
-        case 'stift':
-        case 'radierer': {
+        case 'stift': {
           const aktiver = engine.state.aktiverCommand;
-          if (!aktiver) break;
-
-          if (aktiver.typ === 'stift' || aktiver.typ === 'radierer') {
-            const mitEndpunkt = {
-              ...aktiver,
-              punkte: [...aktiver.punkte, punkt],
-            };
-            engine.addCommand(mitEndpunkt as Omit<DrawCommand, 'id'>);
-            engine.updateAktiverCommand(null);
-          }
+          if (!aktiver || aktiver.typ !== 'stift') break;
+          const mitEndpunkt = {
+            ...aktiver,
+            punkte: [...aktiver.punkte, punkt],
+          };
+          engine.addCommand(mitEndpunkt as Omit<DrawCommand, 'id'>);
+          engine.updateAktiverCommand(null);
           break;
         }
+
+        case 'radierer':
+          // Objekt-Radierer: nichts zu finalisieren
+          break;
 
         case 'linie': {
           const aktiver = engine.state.aktiverCommand;
@@ -578,11 +567,14 @@ export function ZeichnenCanvas({
               textAbschliessen(true);
             }
           }}
-          onBlur={() => textAbschliessen(false)}
+          onBlur={() => {
+            // Kleiner Delay damit der Blur nicht sofort beim Focus-Wechsel feuert
+            setTimeout(() => textAbschliessen(false), 100);
+          }}
           style={{
             position: 'absolute',
-            left: `${textOverlay.cssLeft}px`,
-            top: `${textOverlay.cssTop}px`,
+            left: `${textOverlay.cssLeft}%`,
+            top: `${textOverlay.cssTop}%`,
             fontSize: '18px',
             fontFamily: 'sans-serif',
             color: aktiveFarbe,

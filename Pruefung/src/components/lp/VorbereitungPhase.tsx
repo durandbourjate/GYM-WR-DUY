@@ -136,13 +136,13 @@ export default function VorbereitungPhase({ config, onTeilnehmerGesetzt, onWeite
     if (!user) return
     setLobbySpeichern(true)
     setLobbyFehler('')
+    const effektiveTeilnehmer = teilnehmer.filter((t) => !abgewaehlte.has(t.email))
+    // Optimistic: Sofort zur Lobby wechseln, API im Hintergrund
+    onTeilnehmerGesetzt(effektiveTeilnehmer)
+    onWeiterZurLobby?.()
     try {
-      const effektiveTeilnehmer = teilnehmer.filter((t) => !abgewaehlte.has(t.email))
       const erfolg = await apiService.setzeTeilnehmer(user.email, config.id, effektiveTeilnehmer)
-      if (erfolg) {
-        onTeilnehmerGesetzt(effektiveTeilnehmer)
-        onWeiterZurLobby?.()
-      } else {
+      if (!erfolg) {
         setLobbyFehler('Teilnehmer konnten nicht gespeichert werden. Bitte erneut versuchen.')
       }
     } catch (e: unknown) {

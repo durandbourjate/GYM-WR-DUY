@@ -8,9 +8,10 @@ interface Props {
   onZurueck: () => void
   onAkzeptieren: (email: string, name: string) => void
   onEntfernen: (email: string) => void
+  freischaltenLaedt?: boolean
 }
 
-export default function LobbyPhase({ config, schuelerStatus, onFreischalten, onZurueck, onAkzeptieren, onEntfernen }: Props) {
+export default function LobbyPhase({ config, schuelerStatus, onFreischalten, onZurueck, onAkzeptieren, onEntfernen, freischaltenLaedt }: Props) {
   const teilnehmer = config.teilnehmer ?? []
   const teilnehmerEmails = new Set(teilnehmer.map((t) => t.email))
 
@@ -124,9 +125,14 @@ export default function LobbyPhase({ config, schuelerStatus, onFreischalten, onZ
         <button
           type="button"
           onClick={onFreischalten}
-          className="px-4 py-2 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 cursor-pointer font-medium"
+          disabled={freischaltenLaedt || config.freigeschaltet}
+          className={`px-4 py-2 text-sm rounded-lg font-medium transition-colors ${
+            freischaltenLaedt || config.freigeschaltet
+              ? 'bg-slate-300 dark:bg-slate-600 text-slate-500 dark:text-slate-400 cursor-not-allowed'
+              : 'bg-green-600 text-white hover:bg-green-700 cursor-pointer'
+          }`}
         >
-          ▶ Freischalten
+          {freischaltenLaedt ? '⏳ Wird freigeschaltet...' : config.freigeschaltet ? '✓ Freigeschaltet' : '▶ Freischalten'}
         </button>
       </div>
     </div>

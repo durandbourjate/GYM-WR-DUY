@@ -44,22 +44,23 @@ export default function Startbildschirm({ config, fragen, wiederhergestellt }: P
     const interval = setInterval(async () => {
       if (!user) return
 
-      // 1. Heartbeat senden → SuS erscheint als "bereit" in der LP-Lobby
-      if (apiService.istKonfiguriert()) {
-        try {
-          const response = await apiService.heartbeat(config.id, user.email)
-          // SEB-Ausnahme prüfen
-          if (response.sebAusnahme) setHatSebAusnahme(true)
-        } catch { /* ignore */ }
+      // Heartbeat + Freischaltung parallel statt sequenziell (spart ~1-2s pro Zyklus)
+      const [heartbeatResult, pruefungResult] = await Promise.allSettled([
+        apiService.istKonfiguriert()
+          ? apiService.heartbeat(config.id, user.email)
+          : Promise.resolve(null),
+        apiService.ladePruefung(config.id, user.email),
+      ])
+
+      // SEB-Ausnahme aus Heartbeat prüfen
+      if (heartbeatResult.status === 'fulfilled' && heartbeatResult.value?.sebAusnahme) {
+        setHatSebAusnahme(true)
       }
 
-      // 2. Freischaltung prüfen
-      try {
-        const result = await apiService.ladePruefung(config.id, user.email)
-        if (result?.config.freigeschaltet) {
-          setIstFreigeschaltet(true)
-        }
-      } catch { /* ignore */ }
+      // Freischaltung prüfen
+      if (pruefungResult.status === 'fulfilled' && pruefungResult.value?.config.freigeschaltet) {
+        setIstFreigeschaltet(true)
+      }
     }, 3000)
 
     return () => clearInterval(interval)
