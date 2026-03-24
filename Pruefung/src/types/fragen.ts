@@ -342,4 +342,71 @@ export interface AufgabengruppeFrage extends FrageBase {
   teilaufgabenIds: string[]
 }
 
-export type Frage = MCFrage | FreitextFrage | ZuordnungFrage | LueckentextFrage | VisualisierungFrage | RichtigFalschFrage | BerechnungFrage | BuchungssatzFrage | TKontoFrage | KontenbestimmungFrage | BilanzERFrage | AufgabengruppeFrage;
+// === PDF-ANNOTATION ===
+
+export type PDFAnnotationsWerkzeug = 'highlighter' | 'kommentar' | 'freihand' | 'label'
+export type PDFToolbarWerkzeug = PDFAnnotationsWerkzeug | 'radierer' | 'auswahl'
+
+export interface PDFKategorie {
+  id: string
+  label: string
+  farbe: string
+  beschreibung?: string
+}
+
+export interface PDFTextRange {
+  startOffset: number
+  endOffset: number
+  text: string
+}
+
+interface PDFAnnotationBase {
+  id: string
+  seite: number
+  zeitstempel: string
+}
+
+export interface PDFHighlightAnnotation extends PDFAnnotationBase {
+  werkzeug: 'highlighter'
+  textRange: PDFTextRange
+  farbe: string
+}
+
+export interface PDFKommentarAnnotation extends PDFAnnotationBase {
+  werkzeug: 'kommentar'
+  position: { x: number; y: number }
+  kommentarText: string
+}
+
+export interface PDFFreihandAnnotation extends PDFAnnotationBase {
+  werkzeug: 'freihand'
+  zeichnungsDaten: string
+  farbe: string
+}
+
+export interface PDFLabelAnnotation extends PDFAnnotationBase {
+  werkzeug: 'label'
+  textRange: PDFTextRange
+  kategorieId: string
+  farbe: string
+}
+
+export type PDFAnnotation =
+  | PDFHighlightAnnotation
+  | PDFKommentarAnnotation
+  | PDFFreihandAnnotation
+  | PDFLabelAnnotation
+
+export interface PDFFrage extends FrageBase {
+  typ: 'pdf'
+  fragetext: string
+  pdfDriveFileId: string
+  pdfBase64?: string
+  pdfDateiname: string
+  seitenAnzahl: number
+  kategorien?: PDFKategorie[]
+  erlaubteWerkzeuge: PDFAnnotationsWerkzeug[]
+  musterloesungAnnotationen?: PDFAnnotation[]
+}
+
+export type Frage = MCFrage | FreitextFrage | ZuordnungFrage | LueckentextFrage | VisualisierungFrage | RichtigFalschFrage | BerechnungFrage | BuchungssatzFrage | TKontoFrage | KontenbestimmungFrage | BilanzERFrage | AufgabengruppeFrage | PDFFrage;

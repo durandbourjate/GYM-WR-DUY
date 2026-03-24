@@ -60,4 +60,5 @@ export type Antwort =
     erfolgsrechnung?: {
       stufen: { label: string; konten: { nr: string; betrag: number }[]; zwischentotal?: number }[];
       gewinnVerlust?: number;
-    } };
+    } }
+  | { typ: 'pdf'; annotationen: import('./fragen').PDFAnnotation[] };
