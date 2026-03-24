@@ -3,6 +3,8 @@ import { usePruefungStore } from './store/pruefungStore.ts'
 import { useAuthStore } from './store/authStore.ts'
 import { demoPruefung } from './data/demoPruefung.ts'
 import { demoFragen } from './data/demoFragen.ts'
+import { einrichtungsPruefung } from './data/einrichtungsPruefung.ts'
+import { einrichtungsFragen } from './data/einrichtungsFragen.ts'
 import { apiService } from './services/apiService.ts'
 import type { Frage } from './types/fragen.ts'
 import type { PruefungsConfig } from './types/pruefung.ts'
@@ -19,6 +21,15 @@ import KorrekturEinsicht from './components/sus/KorrekturEinsicht.tsx'
 
 // Theme-Store importieren damit er initialisiert wird
 import './store/themeStore.ts'
+
+/** Registry eingebauter Prüfungen (lokal im Bundle, kein Backend nötig) */
+const EINGEBAUTE_PRUEFUNGEN: Record<string, { config: PruefungsConfig; fragen: Frage[] }> = {
+  'einrichtung-sf-wr-27a28f': { config: einrichtungsPruefung, fragen: einrichtungsFragen },
+}
+
+function ladeEingebautePruefung(id: string): { config: PruefungsConfig; fragen: Frage[] } | null {
+  return EINGEBAUTE_PRUEFUNGEN[id] ?? null
+}
 
 export default function App() {
   const phase = usePruefungStore((s) => s.phase)
@@ -55,8 +66,28 @@ export default function App() {
           }
           return
         }
+        // Fallback: Eingebaute Prüfungen (z.B. Einrichtungsprüfung)
+        const eingebaut = ladeEingebautePruefung(pruefungIdAusUrl)
+        if (eingebaut) {
+          const resolvedFragen = resolveFragenFuerPruefung(eingebaut.config, eingebaut.fragen)
+          setPruefungsConfig(eingebaut.config)
+          setPruefungsFragen(resolvedFragen)
+          return
+        }
+
         setLadeFehler('Prüfung konnte nicht geladen werden. Bitte URL prüfen oder Lehrperson kontaktieren.')
         return
+      }
+
+      // Eingebaute Prüfungen auch ohne Backend laden
+      if (pruefungIdAusUrl && !istDemoModus) {
+        const eingebaut = ladeEingebautePruefung(pruefungIdAusUrl)
+        if (eingebaut) {
+          const resolvedFragen = resolveFragenFuerPruefung(eingebaut.config, eingebaut.fragen)
+          setPruefungsConfig(eingebaut.config)
+          setPruefungsFragen(resolvedFragen)
+          return
+        }
       }
 
       // Fallback: Demo-Prüfung
