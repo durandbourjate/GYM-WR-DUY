@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { usePruefungStore } from '../../store/pruefungStore.ts'
+import { useAuthStore } from '../../store/authStore.ts'
+import { apiService } from '../../services/apiService.ts'
 import type { PDFFrage as PDFFrageTyp } from '../../types/fragen.ts'
 import { renderMarkdown } from '../../utils/markdown.ts'
 import { fachbereichFarbe } from '../../utils/fachbereich.ts'
@@ -21,6 +23,7 @@ export default function PDFFrage({ frage }: Props) {
   const antworten = usePruefungStore((s) => s.antworten)
   const setAntwort = usePruefungStore((s) => s.setAntwort)
   const abgegeben = usePruefungStore((s) => s.abgegeben)
+  const user = useAuthStore((s) => s.user)
 
   // PDF renderer
   const renderer = usePDFRenderer()
@@ -61,9 +64,13 @@ export default function PDFFrage({ frage }: Props) {
       renderer.ladePDF({ base64: frage.pdfBase64 })
     } else if (frage.pdfUrl) {
       renderer.ladePDF({ url: frage.pdfUrl })
-    } else if (frage.pdfDriveFileId) {
-      // Google Drive direkt-Download (Datei muss "Jeder mit Link" freigegeben sein)
-      renderer.ladePDF({ url: `https://drive.google.com/uc?export=download&id=${frage.pdfDriveFileId}` })
+    } else if (frage.pdfDriveFileId && apiService.istKonfiguriert()) {
+      // PDF aus Google Drive via Apps Script Proxy laden (vermeidet CORS)
+      apiService.ladeDriveFile(frage.pdfDriveFileId, user?.email ?? '').then((result) => {
+        if (result?.base64) {
+          renderer.ladePDF({ base64: result.base64 })
+        }
+      })
     } else if (frage.pdfDateiname) {
       // Fallback: lokale Datei im materialien-Ordner
       renderer.ladePDF({ url: `./materialien/${frage.pdfDateiname}` })

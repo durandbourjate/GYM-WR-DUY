@@ -50,6 +50,19 @@ function doGet(e) {
       return ladeKorrekturFortschritt(e.parameter.id, email);
     case 'ladeNachrichten':
       return ladeNachrichtenEndpoint(e.parameter.id, email);
+    case 'ladeDriveFile': {
+      // PDF/Datei aus Google Drive als Base64 laden (für PDF.js im Browser)
+      const fileId = e.parameter.fileId;
+      if (!fileId) return jsonResponse({ error: 'fileId fehlt' });
+      try {
+        const file = DriveApp.getFileById(fileId);
+        const blob = file.getBlob();
+        const base64 = Utilities.base64Encode(blob.getBytes());
+        return jsonResponse({ base64: base64, mimeType: blob.getContentType(), name: file.getName() });
+      } catch (err) {
+        return jsonResponse({ error: 'Datei nicht gefunden oder kein Zugriff: ' + err.message });
+      }
+    }
     case 'ladeKlassenlisten': {
       // Nur LP darf Klassenlisten laden
       if (!email || !email.endsWith('@' + LP_DOMAIN)) {

@@ -1,7 +1,7 @@
 // Barrel-Re-Export für Abwärtskompatibilität
 // Alle bestehenden Imports `import { apiService } from '../services/apiService'` bleiben funktional
 
-import { istKonfiguriert } from './apiClient'
+import { istKonfiguriert, getJson } from './apiClient'
 import { ladePruefung, speichereAntworten, heartbeat, schaltePruefungFrei, beendePruefung, resetPruefung, sebAusnahmeErlauben } from './pruefungApi'
 import { ladeAlleConfigs, ladeFragenbank, speichereConfig, loeschePruefung, speichereFrage, loescheFrage } from './fragenbankApi'
 import { ladeKorrektur, ladeAbgaben, starteKorrektur, ladeKorrekturFortschritt, speichereKorrekturZeile, generiereUndSendeFeedback, korrekturFreigeben, ladeKorrekturenFuerSuS, ladeKorrekturDetail } from './korrekturApi'
@@ -53,6 +53,8 @@ export const apiService = {
   sendeEinladungen,
   ladeTrackerDaten,
   sebAusnahmeErlauben,
+  ladeDriveFile: (fileId: string, email: string) =>
+    getJson<{ base64: string; mimeType: string; name: string }>('ladeDriveFile', { fileId, email }),
   ladeKurse,
   ladeKursDetails,
   ladeSchuljahr,

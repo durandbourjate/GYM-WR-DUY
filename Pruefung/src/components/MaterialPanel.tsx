@@ -246,8 +246,9 @@ function MaterialInhalt({ material }: { material: PruefungsMaterial }) {
   }
 
   // PDF / Datei-Upload (Bilder, PDFs)
-  if ((material.typ === 'pdf' || material.typ === 'dateiUpload') && material.url) {
-    const embedUrl = convertToEmbedUrl(material.url)
+  const materialUrl = material.url || (material.driveFileId ? `https://drive.google.com/file/d/${material.driveFileId}/view` : '')
+  if ((material.typ === 'pdf' || material.typ === 'dateiUpload') && materialUrl) {
+    const embedUrl = convertToEmbedUrl(materialUrl)
 
     return (
       <div className="h-full flex flex-col">
