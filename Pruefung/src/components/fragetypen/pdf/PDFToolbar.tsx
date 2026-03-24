@@ -51,7 +51,7 @@ export function PDFToolbar({
   if (readOnly) return null
 
   const sichtbareWerkzeuge = WERKZEUG_DEFS.filter((def) =>
-    erlaubteWerkzeuge.includes(def.id),
+    (erlaubteWerkzeuge || []).includes(def.id),
   )
 
   const zeigeFarbPicker =

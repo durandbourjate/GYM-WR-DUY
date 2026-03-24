@@ -51,7 +51,7 @@ export function ZeichnenToolbar({
   const sichtbareTools = TOOL_DEFS.filter((def) => {
     if (def.id === 'auswahl') return true;
     if (def.id === 'radierer') return radiererAktiv;
-    if (def.configKey) return verfuegbareWerkzeuge.includes(def.configKey);
+    if (def.configKey) return (verfuegbareWerkzeuge || []).includes(def.configKey);
     return false;
   });
 
