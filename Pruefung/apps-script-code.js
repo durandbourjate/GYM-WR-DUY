@@ -534,10 +534,11 @@ function ladePruefung(pruefungId, email) {
       klasse: configRow.klasse,
       gefaess: configRow.gefaess,
       semester: configRow.semester,
-      fachbereiche: [],
+      fachbereiche: (configRow.fachbereiche || '').split(',').map(function(s) { return s.trim(); }).filter(Boolean),
       datum: configRow.datum,
       typ: configRow.typ,
-      modus: configRow.modus,
+      modus: configRow.modus || 'pruefung',
+      zeitModus: configRow.zeitModus || 'countdown',
       dauerMinuten: Number(configRow.dauerMinuten),
       gesamtpunkte: Number(configRow.gesamtpunkte),
       erlaubteKlasse: configRow.erlaubteKlasse,
@@ -1455,6 +1456,8 @@ function speichereConfig(body) {
       freigeschaltet: config.freigeschaltet ? 'true' : 'false',
       zeitverlaengerungen: JSON.stringify(config.zeitverlaengerungen || {}),
       sebAusnahmen: JSON.stringify(config.sebAusnahmen || []),
+      materialien: JSON.stringify(config.materialien || []),
+      zeitModus: config.zeitModus || 'countdown',
     };
 
     const existingRow = data.findIndex(row => row.id === config.id);

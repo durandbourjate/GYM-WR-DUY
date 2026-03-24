@@ -1,0 +1,44 @@
+{
+  "config": {
+    "id": "einrichtung-sf-wr-27a28f",
+    "titel": "Einrichtungsprüfung — Lerne das Prüfungstool kennen",
+    "klasse": "sf-wr-27a28f",
+    "gefaess": "SF",
+    "semester": "S5",
+    "fachbereiche": ["VWL", "BWL", "Recht"],
+    "datum": "2026-03-24",
+    "typ": "formativ",
+    "modus": "uebung",
+    "dauerMinuten": 30,
+    "zeitModus": "open-end",
+    "gesamtpunkte": 40,
+    "erlaubteKlasse": "—",
+    "sebErforderlich": false,
+    "abschnitte": [
+      {"titel": "Teil A: Ankommen & Orientierung", "beschreibung": "Erkunden Sie die Prüfungsoberfläche.", "fragenIds": ["einr-mc-orientierung", "einr-mc-uielemente", "einr-rf-toolfunktionen"]},
+      {"titel": "Teil B: Texteingabe", "beschreibung": "Testen Sie Freitext und Lückentext.", "fragenIds": ["einr-ft-formatierung", "einr-lt-hofwil", "einr-ft-morgen"]},
+      {"titel": "Teil C: Auswahl & Rechnen", "beschreibung": "Zuordnung und Berechnung.", "fragenIds": ["einr-zu-emojis", "einr-be-pizza"]},
+      {"titel": "Teil D: Zeichnen & PDF", "beschreibung": "Zeichenwerkzeuge und PDF-Annotation.", "fragenIds": ["einr-vis-smiley", "einr-pdf-witz"]},
+      {"titel": "Teil E: Buchhaltung — Eingabefelder", "beschreibung": "FiBu-Eingabefelder testen. Lösungen stehen in der Aufgabe.", "fragenIds": ["einr-bs-eis", "einr-tk-kasse", "einr-kb-einfach", "einr-bilanz-einfach"]},
+      {"titel": "Teil F: Material & Features", "beschreibung": "Materialpanel und versteckte Features.", "fragenIds": ["einr-ag-material", "einr-mc-features"]}
+    ],
+    "materialien": [
+      {
+        "id": "mat-witzsammlung",
+        "titel": "Amtliche Witzsammlung der Schweiz (Ausgabe 2026)",
+        "typ": "pdf",
+        "dateiname": "witzsammlung.pdf",
+        "driveFileId": "1Yi8WYN0HFm9iiVWYhsr-dn-1QO-5oyZy"
+      }
+    ],
+    "zufallsreihenfolgeFragen": false,
+    "zufallsreihenfolgeOptionen": false,
+    "ruecknavigation": true,
+    "zeitanzeigeTyp": "verstricheneZeit",
+    "freigeschaltet": false,
+    "autoSaveIntervallSekunden": 30,
+    "heartbeatIntervallSekunden": 10,
+    "korrektur": {"aktiviert": true, "modus": "batch", "freigegeben": false},
+    "feedback": {"zeitpunkt": "manuell", "format": "in-app-und-pdf", "detailgrad": "vollstaendig"}
+  }
+}
