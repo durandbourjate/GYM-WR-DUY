@@ -7,6 +7,7 @@ import { berechneStatistiken, berechneFragenStatistiken, berechneNote } from '..
 import type { FragenStatistik } from '../../utils/korrekturUtils.ts'
 import type { NotenConfig } from '../../types/pruefung.ts'
 import { exportiereAlsCSV, exportiereErgebnisseAlsCSV, downloadCSV } from '../../utils/exportUtils.ts'
+import { exportiereBackupXlsx } from '../../utils/backupExport.ts'
 import { formatDatum } from '../../utils/zeit.ts'
 import LPHeader from './LPHeader.tsx'
 import FragenBrowser from './FragenBrowser.tsx'
@@ -266,6 +267,25 @@ export default function KorrekturDashboard({ pruefungId, eingebettet = false }: 
     downloadCSV(csv, dateiname)
   }
 
+  // Backup-Export (Excel mit Tabs)
+  const [backupLaden, setBackupLaden] = useState(false)
+  async function handleBackupExport(): Promise<void> {
+    if (!korrektur || !fragen.length) return
+    setBackupLaden(true)
+    try {
+      await exportiereBackupXlsx({
+        config: { titel: korrektur.pruefungTitel, id: pruefungId } as import('../../types/pruefung').PruefungsConfig,
+        fragen,
+        abgaben,
+        korrektur,
+      })
+    } catch (e) {
+      console.error('[Backup] Export fehlgeschlagen:', e)
+    } finally {
+      setBackupLaden(false)
+    }
+  }
+
   // Zurück-Navigation
   function zurueck(): void {
     window.location.href = window.location.pathname
@@ -350,6 +370,11 @@ export default function KorrekturDashboard({ pruefungId, eingebettet = false }: 
       {korrektur && korrektur.schueler.length > 0 && Object.keys(abgaben).length > 0 && (
         <button onClick={handleDetailExport} className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors cursor-pointer" title="Detaillierter Export mit Antworten und Punkten pro Frage">
           Excel-Export (Detailliert)
+        </button>
+      )}
+      {korrektur && fragen.length > 0 && (
+        <button onClick={handleBackupExport} disabled={backupLaden} className="px-3 py-1.5 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-500 disabled:opacity-50 transition-colors cursor-pointer" title="Vollständiges Backup als Excel (Übersicht + Tab pro SuS)">
+          {backupLaden ? 'Exportiert…' : '📥 Backup (.xlsx)'}
         </button>
       )}
       {korrektur && korrektur.schueler.length > 0 && (
