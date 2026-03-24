@@ -129,6 +129,8 @@ export default function DurchfuehrenDashboard({ pruefungId }: { pruefungId: stri
     const controller = new AbortController()
     monitoringAbortRef.current = controller
     const result = await apiService.ladeMonitoring(pruefungId, user.email, { signal: controller.signal })
+    // Abgebrochene Requests ignorieren (nicht als Fehler werten)
+    if (controller.signal.aborted) return
     if (result) {
       const mappedResult = {
         ...result,
