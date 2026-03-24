@@ -202,10 +202,25 @@ export default function App() {
 function resolveFragenFuerPruefung(config: PruefungsConfig, alleFragen: Frage[]): Frage[] {
   const fragenMap = new Map(alleFragen.map((f) => [f.id, f]))
   const result: Frage[] = []
+  const hinzugefuegt = new Set<string>()
+
   for (const abschnitt of config.abschnitte) {
     for (const id of abschnitt.fragenIds) {
       const frage = fragenMap.get(id)
-      if (frage) result.push(frage)
+      if (frage && !hinzugefuegt.has(id)) {
+        result.push(frage)
+        hinzugefuegt.add(id)
+        // Aufgabengruppen: Teilaufgaben auch einschliessen
+        if (frage.typ === 'aufgabengruppe' && 'teilaufgabenIds' in frage) {
+          for (const tid of (frage as { teilaufgabenIds: string[] }).teilaufgabenIds) {
+            const teilfrage = fragenMap.get(tid)
+            if (teilfrage && !hinzugefuegt.has(tid)) {
+              result.push(teilfrage)
+              hinzugefuegt.add(tid)
+            }
+          }
+        }
+      }
     }
   }
   return result
