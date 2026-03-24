@@ -14,6 +14,12 @@ Keine offenen Punkte.
 
 ## Letzte Sessions
 
+### 24.03.2026 (Session 3) — Apps Script Deployment Fix
+
+Apps Script Web-App war nach GCP-Projekt-Verknüpfung nicht mehr autorisiert für SpreadsheetApp-Zugriff.
+- **Root Cause:** GCP-Projekt verknüpft + OAuth-Consent auf Extern/Produktion → Spreadsheet-Scope nicht re-autorisiert
+- **Fix:** Neue Bereitstellung + manuelle Re-Autorisierung (testAutorisierung-Funktion) + URL in GitHub Secrets aktualisiert
+
 ### 24.03.2026 (Session 2) — Backup-Export als Excel (v1.1, PT-1)
 
 Neuer "Backup exportieren"-Button in BeendetPhase + KorrekturDashboard. Generiert `.xlsx` mit:
