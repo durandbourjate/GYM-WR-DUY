@@ -239,7 +239,7 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen, performa
     frage?.typ === 'pdf' ? (frage as PDFFrage).pdfBase64 ?? '' : ''
   )
   const [pdfDriveFileId, setPdfDriveFileId] = useState(
-    frage?.typ === 'pdf' ? (frage as PDFFrage).pdfDriveFileId : ''
+    frage?.typ === 'pdf' ? (frage as PDFFrage).pdfDriveFileId || '' : ''
   )
   const [pdfDateiname, setPdfDateiname] = useState(
     frage?.typ === 'pdf' ? (frage as PDFFrage).pdfDateiname : ''

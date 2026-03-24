@@ -61,7 +61,7 @@ export type TypSpezifischeDaten =
   | { typ: 'bilanzstruktur'; aufgabentext: string; modus: BilanzERFrage['modus']; kontenMitSaldi: KontoMitSaldo[]; loesung: BilanzERLoesung; bewertungsoptionen: BilanzERBewertung }
   | { typ: 'aufgabengruppe'; kontext: string; teilaufgabenIds: string[] }
   | { typ: 'visualisierung'; untertyp?: VisualisierungFrage['untertyp']; fragetext?: string; canvasConfig?: CanvasConfig; musterloesungBild?: string }
-  | { typ: 'pdf'; fragetext: string; pdfDriveFileId: string; pdfBase64?: string; pdfDateiname: string; seitenAnzahl: number; kategorien?: PDFKategorie[]; erlaubteWerkzeuge: PDFAnnotationsWerkzeug[]; musterloesungAnnotationen?: PDFAnnotation[] }
+  | { typ: 'pdf'; fragetext: string; pdfDriveFileId?: string; pdfBase64?: string; pdfUrl?: string; pdfDateiname: string; seitenAnzahl: number; kategorien?: PDFKategorie[]; erlaubteWerkzeuge: PDFAnnotationsWerkzeug[]; musterloesungAnnotationen?: PDFAnnotation[] }
 
 /** Erstellt ein vollständiges Frage-Objekt aus Basisdaten + typ-spezifischen Daten */
 export function erstelleFrageObjekt(basis: FrageBasis, typDaten: TypSpezifischeDaten): Frage {
