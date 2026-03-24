@@ -30,6 +30,31 @@ function ladeEingebautePruefung(id: string): { config: PruefungsConfig; fragen: 
 }
 
 export default function App() {
+  // Notfall-Reset: ?reset=true löscht alles und leitet zum Login weiter
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('reset') === 'true') {
+      // Alles löschen
+      try {
+        // Alle pruefung-state Keys löschen
+        Object.keys(localStorage).forEach(key => {
+          if (key.startsWith('pruefung-') || key.startsWith('auth-')) {
+            localStorage.removeItem(key)
+          }
+        })
+        // IndexedDB löschen
+        indexedDB.deleteDatabase('pruefung-backup')
+        // Service Worker deregistrieren
+        navigator.serviceWorker?.getRegistrations().then(regs =>
+          regs.forEach(r => r.unregister())
+        )
+      } catch { /* ignore */ }
+      // Zur sauberen URL weiterleiten
+      window.location.href = window.location.pathname
+      return
+    }
+  }, [])
+
   const phase = usePruefungStore((s) => s.phase)
   const config = usePruefungStore((s) => s.config)
   const user = useAuthStore((s) => s.user)

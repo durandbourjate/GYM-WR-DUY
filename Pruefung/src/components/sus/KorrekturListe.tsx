@@ -11,6 +11,7 @@ interface Props {
 
 export default function KorrekturListe({ onWaehle }: Props) {
   const user = useAuthStore((s) => s.user)
+  const abmelden = useAuthStore((s) => s.abmelden)
   const [korrekturen, setKorrekturen] = useState<KorrekturListeEintrag[]>([])
   const [laden, setLaden] = useState(true)
   const [fehler, setFehler] = useState<string | null>(null)
@@ -34,6 +35,12 @@ export default function KorrekturListe({ onWaehle }: Props) {
         <h1 className="text-lg font-semibold text-slate-800 dark:text-slate-100">Meine Korrekturen</h1>
         <div className="flex items-center gap-2">
           <span className="text-xs text-slate-400 dark:text-slate-500">{user?.name || user?.email}</span>
+          <button
+            onClick={abmelden}
+            className="px-3 py-1.5 text-xs text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors cursor-pointer"
+          >
+            Abmelden
+          </button>
           <ThemeToggle />
         </div>
       </header>
