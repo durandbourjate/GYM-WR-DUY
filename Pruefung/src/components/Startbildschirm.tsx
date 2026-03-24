@@ -29,41 +29,49 @@ export default function Startbildschirm({ config, fragen, wiederhergestellt }: P
   // SEB-Ausnahme: LP hat für diesen SuS eine Ausnahme erteilt
   const [hatSebAusnahme, setHatSebAusnahme] = useState(false)
 
+  // Warteraum-Polling: Heartbeat senden (damit LP den SuS in der Lobby sieht)
+  // + Freischaltung prüfen + SEB-Ausnahme prüfen — alles in einem Intervall
   useEffect(() => {
-    // Kein Polling nötig wenn bereits freigeschaltet oder Demo-Modus
-    if (istFreigeschaltet || istDemoModus) return
+    if (istFreigeschaltet || istDemoModus || !user) return
+
+    // Sofort einen initialen Heartbeat senden
+    if (apiService.istKonfiguriert()) {
+      apiService.heartbeat(config.id, user.email).then((response) => {
+        if (response.sebAusnahme) setHatSebAusnahme(true)
+      }).catch(() => {})
+    }
 
     const interval = setInterval(async () => {
       if (!user) return
-      const result = await apiService.ladePruefung(config.id, user.email)
-      if (result?.config.freigeschaltet) {
-        setIstFreigeschaltet(true)
+
+      // 1. Heartbeat senden → SuS erscheint als "bereit" in der LP-Lobby
+      if (apiService.istKonfiguriert()) {
+        try {
+          const response = await apiService.heartbeat(config.id, user.email)
+          // SEB-Ausnahme prüfen
+          if (response.sebAusnahme) setHatSebAusnahme(true)
+        } catch { /* ignore */ }
       }
+
+      // 2. Freischaltung prüfen
+      try {
+        const result = await apiService.ladePruefung(config.id, user.email)
+        if (result?.config.freigeschaltet) {
+          setIstFreigeschaltet(true)
+        }
+      } catch { /* ignore */ }
     }, 3000)
 
     return () => clearInterval(interval)
   }, [istFreigeschaltet, istDemoModus, config.id, user])
 
-  // SEB-Ausnahme per Heartbeat-Polling prüfen
+  // Initiale SEB-Ausnahme prüfen (E-Mail bereits in sebAusnahmen?)
   useEffect(() => {
-    if (!config.sebErforderlich || istImSEB() || hatSebAusnahme || istDemoModus || !user) return
-
-    // Initiale Prüfung: E-Mail bereits in sebAusnahmen?
+    if (!config.sebErforderlich || !user) return
     if (config.sebAusnahmen?.includes(user.email)) {
       setHatSebAusnahme(true)
-      return
     }
-
-    const interval = setInterval(async () => {
-      if (!user) return
-      const response = await apiService.heartbeat(config.id, user.email)
-      if (response.sebAusnahme) {
-        setHatSebAusnahme(true)
-      }
-    }, 3000)
-
-    return () => clearInterval(interval)
-  }, [config.sebErforderlich, config.id, config.sebAusnahmen, hatSebAusnahme, istDemoModus, user])
+  }, [config.sebErforderlich, config.sebAusnahmen, user])
 
   function handleStart() {
     if (wiederhergestellt) {
