@@ -8,28 +8,38 @@
 
 ## Offene Punkte
 
-### Kritisch (vor nächstem Klassentest)
-- **Fortschritt 0% in LP-Sicht**: Backend-Fix deployed (beantworteteFragen/gesamtFragen in speichereAntworten), aber noch nicht getestet ob es im Live-Betrieb funktioniert
-- **Korrektur-Tab**: Synthetisiert jetzt Schüler aus Abgaben wenn kein Korrektur-Sheet existiert — manuelle Punktevergabe noch nicht getestet
-- **Zeichnen-Tool**: Text-Werkzeug funktioniert nicht, Objekt-Radierer fehlt
+### 🔴 TOP-PRIORITÄT: Einrichtungsprüfung = echte Prüfung
+
+Die Einrichtungsprüfung hatte einen Sonderweg (hardcodiert im Frontend-Bundle) statt den normalen Backend-Datenfluss zu nutzen. Das hat zu einer Kaskade von Problemen geführt (fehlende Felder, Crashes, Fallback-Hacks). **Das muss sauber aufgesetzt werden:**
+
+1. **Alle 16 Fragen in der Fragenbank-Sheet** eintragen (mit korrektem `typDaten`-JSON für PDF, Visualisierung, etc.)
+2. **Config im Configs-Sheet** vollständig (inkl. `materialien`-Spalte mit JSON)
+3. **PDF (witzsammlung.pdf) in Google Drive** hochladen und `pdfDriveFileId` in der Fragenbank setzen
+4. **Built-in Fallback entfernen** — `EINGEBAUTE_PRUEFUNGEN` in App.tsx und `einrichtungsFragen.ts` werden nicht mehr als Datenquelle gebraucht
+5. **Einrichtungsprüfung durchspielen** (LP + SuS) und verifizieren: Login → Lobby → Freischalten → alle 16 Fragen → PDF-Annotation → Material-Panel → Abgabe → Korrektur
+
+**Grundsatz:** Kein Sonderweg, keine Fallbacks. Die Einrichtungsprüfung muss exakt den gleichen Datenfluss haben wie eine echte Prüfung.
+
+### Noch nicht getestet (nach Backend-Fixes)
+- **Fortschritt in LP-Sicht**: Backend schreibt jetzt `beantworteteFragen`/`gesamtFragen` — muss im Live-Betrieb getestet werden
+- **Korrektur-Tab**: Synthetisiert Schüler aus Abgaben ohne KI — manuelle Punktevergabe noch nicht getestet
+- **Material-Panel**: Backend liefert jetzt `materialien` — noch nicht getestet (braucht Eintrag in Configs-Sheet)
+
+### Zeichnen-Tool
+- Text-Werkzeug funktioniert nicht
+- Objekt-Radierer fehlt (nur Pixel-Radierer vorhanden)
 
 ### SEB / iPad-Strategie
 - SEB-System ist vollständig implementiert (Erkennung, Blocking, Ausnahmen, .seb-Datei)
-- **Problem**: Schule hat BYOD (gemischte Geräte), SEB auf iPads nicht verfügbar/installiert
-- **Aktueller Workflow**: LP setzt "SEB erforderlich" → Schüler ohne SEB werden blockiert → LP erteilt manuell Ausnahmen
+- **Problem**: Schule hat BYOD (gemischte Geräte), SEB auf iPads nicht immer verfügbar
+- **Aktueller Workflow**: LP setzt "SEB erforderlich" → Schüler ohne SEB blockiert → LP erteilt manuell Ausnahmen
 - **TODO**: Klären ob das praktikabel ist oder ob ein automatischer Fallback-Modus nötig ist
 
 ### State-Management / UX
-- **Multi-Tab-Isolation**: Persist-Key enthält jetzt pruefungId (`pruefung-state-{id}`)
-- **Notfall-Reset**: `?reset=true` URL-Parameter löscht alles (localStorage, IndexedDB, SW) — Notausgang für Schüler
-- **Abmelden**: Löscht jetzt auch persistierten State, aber alte Browser-Caches (SW) können Probleme machen
-- **TODO**: Robustere SW-Update-Strategie (skipWaiting + clients.claim bei neuen Versionen)
-
-### Einrichtungsprüfung (Testfragen)
-- Frage 9 (Visualisierung): Untertyp wird jetzt vom Backend durchgereicht ✅
-- Frage 10 (PDF): Nutzt jetzt lokale URL statt fehlende API ✅
-- Frage 15 (Material): witzsammlung.pdf existiert, MaterialPanel sollte funktionieren — noch nicht getestet
-- Frage 16 (Features): Text aktualisiert (Cmd+Enter, «?»-Button), Shortcut implementiert ✅
+- **Multi-Tab-Isolation**: Persist-Key enthält pruefungId (`pruefung-state-{id}`)
+- **Notfall-Reset**: `?reset=true` löscht alles (localStorage, IndexedDB, SW)
+- **TODO**: Robustere SW-Update-Strategie (skipWaiting + clients.claim)
+- **SuS-Landingpage ohne ?id=**: Zeigt jetzt Korrektur-Übersicht mit Hinweis + Abmelden-Button (kein toter Bildschirm mehr)
 
 ---
 
