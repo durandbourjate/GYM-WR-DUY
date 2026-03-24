@@ -2110,6 +2110,9 @@ function kiAssistentEndpoint(body) {
         return jsonResponse({ success: true, ergebnis: ergebnis || { punkte: 0, begruendung: 'KI-Vorschlag konnte nicht generiert werden.' } });
       }
 
+      case 'korrigierePDFAnnotation':
+        return korrigierePDFAnnotation(daten);
+
       default:
         return jsonResponse({ error: 'Unbekannte KI-Aktion: ' + aktion });
     }
@@ -2151,6 +2154,43 @@ function rufeClaudeAuf(systemPrompt, userPrompt, maxTokens) {
   const text = result.content[0].text;
   const cleaned = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
   return JSON.parse(cleaned);
+}
+
+function korrigierePDFAnnotation(params) {
+  const { pdfBilder, annotationen, musterloesungAnnotationen, bewertungsraster, maxPunkte } = params;
+
+  const prompt = `Du bist Korrektur-Assistent für eine Prüfung am Gymnasium Hofwil.
+
+Aufgabe: Bewerte die PDF-Annotationen eines Schülers.
+
+Bewertungsraster:
+${JSON.stringify(bewertungsraster)}
+
+Musterlösung (Annotationen):
+${JSON.stringify(musterloesungAnnotationen)}
+
+Schüler-Annotationen:
+${JSON.stringify(annotationen)}
+
+Maximale Punktzahl: ${maxPunkte}
+
+Antworte mit JSON: { "punkte": <number>, "begruendung": "<text>" }`;
+
+  const messages = [{
+    role: 'user',
+    content: [
+      ...pdfBilder.map(bild => ({
+        type: 'image',
+        source: { type: 'base64', media_type: 'image/png', data: bild }
+      })),
+      { type: 'text', text: prompt }
+    ]
+  }];
+
+  const sysPrompt = 'Du bist ein erfahrener Prüfungskorrektor an einem Schweizer Gymnasium. ' +
+    'Antworte ausschliesslich als JSON: { "punkte": number, "begruendung": string }';
+
+  return rufeClaudeAufMitBild(sysPrompt, messages);
 }
 
 function rufeClaudeAufMitBild(systemPrompt, messages) {
