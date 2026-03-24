@@ -454,6 +454,16 @@ export default function DurchfuehrenDashboard({ pruefungId }: { pruefungId: stri
                   downloadCSV(csv, dateiname)
                 }
               }}
+              onNeueDurchfuehrung={async () => {
+                if (!user) return
+                const erfolg = await apiService.resetPruefung(config.id, user.email)
+                if (erfolg) {
+                  // Lokalen State zurücksetzen → springt zu Vorbereitung
+                  setConfig({ ...config, freigeschaltet: false, beendetUm: undefined, teilnehmer: [], sebAusnahmen: [] })
+                  setActiveTab('vorbereitung')
+                  ladeDaten()
+                }
+              }}
             />
           )}
 

@@ -146,6 +146,8 @@ function doPost(e) {
       return schreibePoolAenderung(body);
     case 'beendePruefung':
       return beendePruefungEndpoint(body);
+    case 'resetPruefung':
+      return resetPruefungEndpoint(body);
     case 'sebAusnahmeErlauben':
       return sebAusnahmeErlauben(body);
     case 'ladeTrackerDaten':
@@ -1004,6 +1006,68 @@ function beendePruefungEndpoint(body) {
     }
 
     return jsonResponse({ success: true, beendetUm: beendetUm });
+  } catch (error) {
+    return jsonResponse({ success: false, error: error.message });
+  }
+}
+
+// === PRÜFUNG ZURÜCKSETZEN (für neue Durchführung) ===
+
+function resetPruefungEndpoint(body) {
+  try {
+    var pruefungId = body.pruefungId;
+    var email = body.email;
+
+    // Auth: nur LP
+    if (!email || !email.endsWith('@' + LP_DOMAIN)) {
+      return jsonResponse({ success: false, error: 'nicht_autorisiert' });
+    }
+    if (!pruefungId) {
+      return jsonResponse({ success: false, error: 'pruefungId erforderlich' });
+    }
+
+    // 1. Config zurücksetzen: beendetUm löschen, freigeschaltet=false, teilnehmer=[], sebAusnahmen=[]
+    var configSheet = SpreadsheetApp.openById(CONFIGS_ID).getSheetByName('Configs');
+    if (!configSheet) return jsonResponse({ success: false, error: 'configs_nicht_gefunden' });
+
+    var headers = configSheet.getRange(1, 1, 1, configSheet.getLastColumn()).getValues()[0];
+    var idCol = headers.indexOf('id');
+    var data = configSheet.getDataRange().getValues();
+
+    for (var i = 1; i < data.length; i++) {
+      if (data[i][idCol] === pruefungId) {
+        // freigeschaltet → false
+        var freiCol = headers.indexOf('freigeschaltet');
+        if (freiCol >= 0) configSheet.getRange(i + 1, freiCol + 1).setValue(false);
+
+        // beendetUm → leer
+        var beendetCol = headers.indexOf('beendetUm');
+        if (beendetCol >= 0) configSheet.getRange(i + 1, beendetCol + 1).setValue('');
+
+        // restzeitMinuten → leer
+        var restzeitCol = headers.indexOf('restzeitMinuten');
+        if (restzeitCol >= 0) configSheet.getRange(i + 1, restzeitCol + 1).setValue('');
+
+        // teilnehmer → []
+        var teilnehmerCol = headers.indexOf('teilnehmer');
+        if (teilnehmerCol >= 0) configSheet.getRange(i + 1, teilnehmerCol + 1).setValue('[]');
+
+        // sebAusnahmen → []
+        var sebCol = headers.indexOf('sebAusnahmen');
+        if (sebCol >= 0) configSheet.getRange(i + 1, sebCol + 1).setValue('[]');
+
+        break;
+      }
+    }
+
+    // 2. Antworten-Sheet leeren (alle Zeilen ausser Header)
+    var ss = SpreadsheetApp.openById(CONFIGS_ID);
+    var antwortenSheet = ss.getSheetByName('Antworten_' + pruefungId);
+    if (antwortenSheet && antwortenSheet.getLastRow() > 1) {
+      antwortenSheet.deleteRows(2, antwortenSheet.getLastRow() - 1);
+    }
+
+    return jsonResponse({ success: true });
   } catch (error) {
     return jsonResponse({ success: false, error: error.message });
   }

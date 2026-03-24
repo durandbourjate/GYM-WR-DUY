@@ -12,10 +12,12 @@ interface Props {
   abgaben: Record<string, SchuelerAbgabe>
   korrektur?: PruefungsKorrektur
   onExportieren: () => void
+  onNeueDurchfuehrung?: () => void
 }
 
-export default function BeendetPhase({ config, schuelerStatus, fragen, abgaben, korrektur, onExportieren }: Props) {
+export default function BeendetPhase({ config, schuelerStatus, fragen, abgaben, korrektur, onExportieren, onNeueDurchfuehrung }: Props) {
   const [backupLaden, setBackupLaden] = useState(false)
+  const [resetBestaetigung, setResetBestaetigung] = useState(false)
   const abgegeben = schuelerStatus.filter((s) => s.status === 'abgegeben')
   const erzwungen = schuelerStatus.filter((s) => s.status === 'beendet-lp')
   const nichtErschienen = schuelerStatus.filter((s) => s.status === 'nicht-gestartet')
@@ -92,6 +94,41 @@ export default function BeendetPhase({ config, schuelerStatus, fragen, abgaben, 
           >
             {backupLaden ? 'Exportiert…' : '📥 Backup exportieren'}
           </button>
+        )}
+
+        {/* Neue Durchführung starten */}
+        {onNeueDurchfuehrung && (
+          <>
+            {!resetBestaetigung ? (
+              <button
+                type="button"
+                onClick={() => setResetBestaetigung(true)}
+                className="px-4 py-2 text-sm bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 rounded-lg hover:bg-amber-200 dark:hover:bg-amber-900/50 cursor-pointer"
+              >
+                🔄 Neue Durchführung starten
+              </button>
+            ) : (
+              <div className="flex items-center gap-2 px-3 py-2 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800">
+                <span className="text-sm text-amber-700 dark:text-amber-300">
+                  Lobby wird geleert, alte Daten gelöscht. Fortfahren?
+                </span>
+                <button
+                  type="button"
+                  onClick={() => { onNeueDurchfuehrung(); setResetBestaetigung(false) }}
+                  className="px-3 py-1.5 text-sm bg-amber-600 text-white rounded-lg hover:bg-amber-700 cursor-pointer font-medium"
+                >
+                  Ja, zurücksetzen
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setResetBestaetigung(false)}
+                  className="px-3 py-1.5 text-sm bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-600 cursor-pointer"
+                >
+                  Abbrechen
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

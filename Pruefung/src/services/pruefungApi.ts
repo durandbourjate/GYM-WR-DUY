@@ -163,3 +163,22 @@ export async function beendePruefung(payload: {
     return { success: false, error: 'netzwerk_fehler' }
   }
 }
+
+/** Prüfung zurücksetzen für neue Durchführung (LP) */
+export async function resetPruefung(pruefungId: string, email: string): Promise<boolean> {
+  if (!APPS_SCRIPT_URL) return true
+
+  try {
+    const response = await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ action: 'resetPruefung', pruefungId, email }),
+    })
+    if (!response.ok) return false
+    const text = await response.text()
+    try {
+      const data = JSON.parse(text)
+      return data.success === true
+    } catch { return false }
+  } catch { return false }
+}
