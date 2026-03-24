@@ -8,11 +8,60 @@
 
 ## Offene Punkte
 
-Keine offenen Punkte.
+### Kritisch (vor nächstem Klassentest)
+- **Fortschritt 0% in LP-Sicht**: Backend-Fix deployed (beantworteteFragen/gesamtFragen in speichereAntworten), aber noch nicht getestet ob es im Live-Betrieb funktioniert
+- **Korrektur-Tab**: Synthetisiert jetzt Schüler aus Abgaben wenn kein Korrektur-Sheet existiert — manuelle Punktevergabe noch nicht getestet
+- **Zeichnen-Tool**: Text-Werkzeug funktioniert nicht, Objekt-Radierer fehlt
+
+### SEB / iPad-Strategie
+- SEB-System ist vollständig implementiert (Erkennung, Blocking, Ausnahmen, .seb-Datei)
+- **Problem**: Schule hat BYOD (gemischte Geräte), SEB auf iPads nicht verfügbar/installiert
+- **Aktueller Workflow**: LP setzt "SEB erforderlich" → Schüler ohne SEB werden blockiert → LP erteilt manuell Ausnahmen
+- **TODO**: Klären ob das praktikabel ist oder ob ein automatischer Fallback-Modus nötig ist
+
+### State-Management / UX
+- **Multi-Tab-Isolation**: Persist-Key enthält jetzt pruefungId (`pruefung-state-{id}`)
+- **Notfall-Reset**: `?reset=true` URL-Parameter löscht alles (localStorage, IndexedDB, SW) — Notausgang für Schüler
+- **Abmelden**: Löscht jetzt auch persistierten State, aber alte Browser-Caches (SW) können Probleme machen
+- **TODO**: Robustere SW-Update-Strategie (skipWaiting + clients.claim bei neuen Versionen)
+
+### Einrichtungsprüfung (Testfragen)
+- Frage 9 (Visualisierung): Untertyp wird jetzt vom Backend durchgereicht ✅
+- Frage 10 (PDF): Nutzt jetzt lokale URL statt fehlende API ✅
+- Frage 15 (Material): witzsammlung.pdf existiert, MaterialPanel sollte funktionieren — noch nicht getestet
+- Frage 16 (Features): Text aktualisiert (Cmd+Enter, «?»-Button), Shortcut implementiert ✅
 
 ---
 
 ## Letzte Sessions
+
+### 24.03.2026 (Session 4) — Erster Klassentest + Bugfix-Paket
+
+Erster Live-Test mit Schülern. Login-Problem gelöst, dann umfangreiche Bugfixes:
+
+**Gelöste Probleme:**
+- **Login/Backend**: Deployment-Fix, Scope-Autorisierung (Drive, Spreadsheets), Klassenliste-Check für Einrichtungsprüfung übersprungen
+- **Heartbeat**: Erstellt jetzt neue Zeile für unbekannte Schüler (statt sie zu ignorieren)
+- **Fortschritt 0%**: `speichereAntworten` schreibt jetzt `beantworteteFragen` + `gesamtFragen` Spalten
+- **Crashschutz**: try-catch in Heartbeat + Remote-Save, Session-Recovery ohne Backend-Fetch
+- **Freischaltung-Bypass**: Fallback auf eingebaute Prüfungen im Backend-Modus entfernt
+- **Abgabe-Loop**: Abmelden löscht persistierten State, Session-Recovery greift nicht bei abgegebenen Prüfungen
+- **UX**: Freischalten ohne Bestätigung, Beenden bei 0 SuS ohne Dialog, Cmd+Enter Shortcut
+- **Korrektur-Tab**: Zeigt Schüler-Liste aus Abgaben wenn kein Korrektur-Sheet existiert
+- **Notfall-Reset**: `?reset=true` URL-Parameter als Notausgang
+- **Abmelden-Button**: Auf SuS-Korrekturübersicht hinzugefügt
+
+**Apps Script Änderungen (manuell kopieren!):**
+- `speichereAntworten`: beantworteteFragen/gesamtFragen Spalten
+- `parseFrage`: case 'visualisierung' mit untertyp
+- `findOrCreateAntwortenSheet`: Neue Header-Spalten
+- `heartbeat`: Erstellt neue Schüler-Zeilen
+- `ladePruefung`: Klassenprüfung übersprungen wenn erlaubteKlasse = — oder leer
+
+**Wichtig für nächste Session:**
+- Apps Script Code (`apps-script-code.js`) IMMER über "Bereitstellungen verwalten" → bestehende Version aktualisieren (Stift-Icon). NICHT "Neue Bereitstellung" (ändert URL!)
+- Vor jedem `git push`: `npx vite build` lokal laufen lassen (nicht nur tsc)
+- Google Cloud Console: Drive API + Sheets API müssen aktiviert sein im verknüpften GCP-Projekt
 
 ### 24.03.2026 (Session 3) — Apps Script Deployment Fix
 
