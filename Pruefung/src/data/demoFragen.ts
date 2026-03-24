@@ -1,4 +1,5 @@
 import type { Frage } from '../types/fragen.ts'
+import { einrichtungsFragen } from './einrichtungsFragen.ts'
 
 const jetzt = '2026-03-22T00:00:00.000Z'
 
@@ -663,4 +664,6 @@ export const demoFragen: Frage[] = [
     kontext: '**Fallbeispiel: Gründung einer GmbH**\n\nDrei Absolventinnen der Fachhochschule — Lea, Mia und Nina — planen, gemeinsam ein Start-up im Bereich nachhaltige Verpackungen zu gründen. Sie entscheiden sich für die Rechtsform einer **GmbH** mit einem Stammkapital von CHF 30 000. Die Gründungskosten (Notar, Handelsregistereintrag) belaufen sich auf CHF 4 500.\n\nBeantworten Sie die folgenden Teilaufgaben zum Fallbeispiel.',
     teilaufgabenIds: ['demo-ag-gmbh-mc', 'demo-ag-gmbh-freitext', 'demo-ag-gmbh-berechnung'],
   },
+  // Einrichtungsfragen für Einrichtungsprüfung (alle Fragetypen testen)
+  ...einrichtungsFragen,
 ]

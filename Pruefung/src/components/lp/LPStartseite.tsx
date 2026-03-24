@@ -13,6 +13,7 @@ import HilfeSeite from './HilfeSeite.tsx'
 import PoolSyncDialog from './PoolSyncDialog.tsx'
 import TrackerSection from './TrackerSection.tsx'
 import { demoPruefung } from '../../data/demoPruefung.ts'
+import { einrichtungsPruefung } from '../../data/einrichtungsPruefung.ts'
 
 /** Startseite für Lehrpersonen: Prüfungen verwalten + erstellen */
 export default function LPStartseite() {
@@ -509,5 +510,5 @@ function TrackerBadge({ summary: s }: { summary: TrackerPruefungSummary }) {
 
 /** Demo-Konfigurationen für den Demo-Modus — nutzt die Musterprüfung aus demoPruefung.ts */
 function demoConfigs(): PruefungsConfig[] {
-  return [demoPruefung]
+  return [einrichtungsPruefung, demoPruefung]
 }

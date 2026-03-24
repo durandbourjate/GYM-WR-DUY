@@ -1,0 +1,686 @@
+import type { Frage } from '../types/fragen.ts'
+
+const jetzt = '2026-03-24T00:00:00.000Z'
+const autor = 'yannick.durand@gymhofwil.ch'
+
+// ═══════════════════════════════════════════════════════════════
+// Einrichtungsprüfung — Alle Funktionalitäten testen
+// Tags: einrichtung, test
+// Fächerunabhängig, kein Fachwissen nötig
+// ═══════════════════════════════════════════════════════════════
+
+export const einrichtungsFragen: Frage[] = [
+  // ═══════════════════════════════════════════════════════
+  // TEIL A: Ankommen & Orientierung
+  // ═══════════════════════════════════════════════════════
+
+  // A1 — MC Single: Orientierung auf der Prüfungsoberfläche
+  {
+    id: 'einr-mc-orientierung',
+    typ: 'mc',
+    version: 1,
+    erstelltAm: jetzt,
+    geaendertAm: jetzt,
+    fachbereich: 'VWL',
+    thema: 'Einrichtung',
+    unterthema: 'Orientierung',
+    bloom: 'K1',
+    semester: ['S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8'],
+    gefaesse: ['SF', 'EF', 'EWR', 'GF'],
+    tags: ['einrichtung', 'test'],
+    punkte: 1,
+    zeitbedarf: 1,
+    musterlosung: 'Die Prüfung hat 16 Fragen — sichtbar in der Navigationsleiste unten.',
+    bewertungsraster: [{ beschreibung: 'Korrekte Antwort gewählt', punkte: 1 }],
+    verwendungen: [],
+    quelle: 'manuell',
+    autor,
+    fragetext: 'Schauen Sie sich die Prüfungsoberfläche an. **Wie viele Fragen** hat diese Testprüfung insgesamt? Tipp: Schauen Sie auf die Navigationsleiste am unteren Bildschirmrand.',
+    optionen: [
+      { id: 'a', text: '10 Fragen', korrekt: false },
+      { id: 'b', text: '16 Fragen', korrekt: true },
+      { id: 'c', text: '20 Fragen', korrekt: false },
+      { id: 'd', text: '25 Fragen', korrekt: false },
+    ],
+    mehrfachauswahl: false,
+    zufallsreihenfolge: false,
+  },
+
+  // A2 — MC Multiple: UI-Elemente erkennen
+  {
+    id: 'einr-mc-uielemente',
+    typ: 'mc',
+    version: 1,
+    erstelltAm: jetzt,
+    geaendertAm: jetzt,
+    fachbereich: 'BWL',
+    thema: 'Einrichtung',
+    unterthema: 'UI-Elemente',
+    bloom: 'K1',
+    semester: ['S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8'],
+    gefaesse: ['SF', 'EF', 'EWR', 'GF'],
+    tags: ['einrichtung', 'test'],
+    punkte: 2,
+    zeitbedarf: 2,
+    musterlosung: 'Sichtbar: Stoppuhr/Timer, Fortschrittsbalken, Navigationsleiste unten. Nicht sichtbar: Druckknopf (gibt es nicht).',
+    bewertungsraster: [
+      { beschreibung: 'Alle 3 korrekten Elemente gewählt', punkte: 2 },
+      { beschreibung: '2 korrekte Elemente gewählt', punkte: 1 },
+    ],
+    verwendungen: [],
+    quelle: 'manuell',
+    autor,
+    fragetext: 'Welche der folgenden Elemente sehen Sie **auf Ihrem Bildschirm**? Schauen Sie sich um! (Mehrere Antworten möglich)',
+    optionen: [
+      { id: 'a', text: 'Eine Stoppuhr oder einen Timer (oben)', korrekt: true },
+      { id: 'b', text: 'Einen Fortschrittsbalken', korrekt: true },
+      { id: 'c', text: 'Eine Navigationsleiste mit Fragennummern (unten)', korrekt: true },
+      { id: 'd', text: 'Einen Druckknopf zum Ausdrucken der Prüfung', korrekt: false },
+    ],
+    mehrfachauswahl: true,
+    zufallsreihenfolge: false,
+  },
+
+  // A3 — Richtig/Falsch: Tool-Aussagen
+  {
+    id: 'einr-rf-toolfunktionen',
+    typ: 'richtigfalsch',
+    version: 1,
+    erstelltAm: jetzt,
+    geaendertAm: jetzt,
+    fachbereich: 'Recht',
+    thema: 'Einrichtung',
+    unterthema: 'Tool-Funktionen',
+    bloom: 'K2',
+    semester: ['S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8'],
+    gefaesse: ['SF', 'EF', 'EWR', 'GF'],
+    tags: ['einrichtung', 'test'],
+    punkte: 4,
+    zeitbedarf: 3,
+    musterlosung: '1: Richtig (Rücknavigation ist aktiviert). 2: Richtig (AutoSave alle 30s). 3: Falsch (man kann frei navigieren). 4: Richtig (Dark Mode ist verfügbar).',
+    bewertungsraster: [
+      { beschreibung: 'Alle 4 korrekt', punkte: 4 },
+      { beschreibung: '3 korrekt', punkte: 3 },
+      { beschreibung: '2 korrekt', punkte: 2 },
+      { beschreibung: '1 korrekt', punkte: 1 },
+    ],
+    verwendungen: [],
+    quelle: 'manuell',
+    autor,
+    fragetext: 'Beurteilen Sie die folgenden Aussagen über das Prüfungstool als **richtig** oder **falsch**.',
+    aussagen: [
+      { id: '1', text: 'Man kann zwischen Fragen vor- und zurücknavigieren.', korrekt: true, erklaerung: 'Rücknavigation ist bei dieser Prüfung aktiviert.' },
+      { id: '2', text: 'Die Antworten werden automatisch gespeichert (AutoSave).', korrekt: true, erklaerung: 'AutoSave speichert alle 30 Sekunden.' },
+      { id: '3', text: 'Man muss die Fragen zwingend in der vorgegebenen Reihenfolge lösen.', korrekt: false, erklaerung: 'Man kann über die Navigationsleiste zu jeder Frage springen.' },
+      { id: '4', text: 'Es gibt einen Dark Mode (dunkles Farbschema).', korrekt: true, erklaerung: 'Dark Mode kann über das Zahnrad-Symbol umgeschaltet werden.' },
+    ],
+  },
+
+  // ═══════════════════════════════════════════════════════
+  // TEIL B: Texteingabe
+  // ═══════════════════════════════════════════════════════
+
+  // B1 — Freitext kurz: Formatierung testen
+  {
+    id: 'einr-ft-formatierung',
+    typ: 'freitext',
+    version: 1,
+    erstelltAm: jetzt,
+    geaendertAm: jetzt,
+    fachbereich: 'VWL',
+    thema: 'Einrichtung',
+    unterthema: 'Textformatierung',
+    bloom: 'K1',
+    semester: ['S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8'],
+    gefaesse: ['SF', 'EF', 'EWR', 'GF'],
+    tags: ['einrichtung', 'test'],
+    punkte: 2,
+    zeitbedarf: 2,
+    musterlosung: 'Ein Satz mit einem fetten und einem kursiven Wort, z.B.: «Ich teste gerade das Prüfungstool und finde es spannend.»',
+    bewertungsraster: [
+      { beschreibung: 'Ein Wort ist fett formatiert', punkte: 1 },
+      { beschreibung: 'Ein Wort ist kursiv formatiert', punkte: 1 },
+    ],
+    verwendungen: [],
+    quelle: 'manuell',
+    autor,
+    fragetext: 'Schreiben Sie einen kurzen Satz (frei wählbarer Inhalt). Formatieren Sie dabei **ein Wort fett** und *ein Wort kursiv*.\n\n💡 **Tipp:** Nutzen Sie die Formatierungsleiste über dem Textfeld oder die Tastenkürzel Ctrl+B (fett) und Ctrl+I (kursiv).',
+    laenge: 'kurz',
+    hilfstextPlaceholder: 'Schreiben Sie hier Ihren Satz...',
+  },
+
+  // B2 — Lückentext: Gymnasium Hofwil
+  {
+    id: 'einr-lt-hofwil',
+    typ: 'lueckentext',
+    version: 1,
+    erstelltAm: jetzt,
+    geaendertAm: jetzt,
+    fachbereich: 'Recht',
+    thema: 'Einrichtung',
+    unterthema: 'Lückentext',
+    bloom: 'K1',
+    semester: ['S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8'],
+    gefaesse: ['SF', 'EF', 'EWR', 'GF'],
+    tags: ['einrichtung', 'test'],
+    punkte: 3,
+    zeitbedarf: 2,
+    musterlosung: 'Hofwil, Münchenbuchsee, Bern',
+    bewertungsraster: [
+      { beschreibung: 'Alle 3 Lücken korrekt', punkte: 3 },
+      { beschreibung: '2 Lücken korrekt', punkte: 2 },
+      { beschreibung: '1 Lücke korrekt', punkte: 1 },
+    ],
+    verwendungen: [],
+    quelle: 'manuell',
+    autor,
+    fragetext: 'Ergänzen Sie die Lücken. Tippen Sie die fehlenden Wörter in die Eingabefelder.',
+    textMitLuecken: 'Das Gymnasium {{1}} liegt in der Gemeinde {{2}} im Kanton {{3}}.',
+    luecken: [
+      { id: '1', korrekteAntworten: ['Hofwil'], caseSensitive: false },
+      { id: '2', korrekteAntworten: ['Münchenbuchsee', 'Muenchenbuchsee'], caseSensitive: false },
+      { id: '3', korrekteAntworten: ['Bern'], caseSensitive: false },
+    ],
+  },
+
+  // B3 — Freitext lang: Morgenroutine mit Liste
+  {
+    id: 'einr-ft-morgen',
+    typ: 'freitext',
+    version: 1,
+    erstelltAm: jetzt,
+    geaendertAm: jetzt,
+    fachbereich: 'BWL',
+    thema: 'Einrichtung',
+    unterthema: 'Texteditor',
+    bloom: 'K1',
+    semester: ['S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8'],
+    gefaesse: ['SF', 'EF', 'EWR', 'GF'],
+    tags: ['einrichtung', 'test'],
+    punkte: 3,
+    zeitbedarf: 4,
+    musterlosung: 'Individuelle Antwort mit mind. 3 Sätzen und einer Aufzählung. Inhalt ist nebensächlich — getestet wird die Bedienung des Editors.',
+    bewertungsraster: [
+      { beschreibung: 'Mindestens 3 Sätze geschrieben', punkte: 1 },
+      { beschreibung: 'Aufzählungsliste verwendet (Bullets oder nummeriert)', punkte: 1 },
+      { beschreibung: 'Text ist lesbar und zusammenhängend', punkte: 1 },
+    ],
+    verwendungen: [],
+    quelle: 'manuell',
+    autor,
+    fragetext: 'Beschreiben Sie in **3–5 Sätzen**, was Sie heute Morgen gemacht haben (vom Aufstehen bis zum Schulbeginn). Verwenden Sie dabei eine **Aufzählungsliste** (Bulletpoints).\n\n💡 **Tipp:** Klicken Sie auf das Listen-Symbol in der Formatierungsleiste, um eine Aufzählung zu starten.',
+    laenge: 'lang',
+    hilfstextPlaceholder: 'Heute Morgen habe ich:\n• ...\n• ...\n• ...',
+  },
+
+  // ═══════════════════════════════════════════════════════
+  // TEIL C: Auswahl & Rechnen
+  // ═══════════════════════════════════════════════════════
+
+  // C1 — Zuordnung: Emojis
+  {
+    id: 'einr-zu-emojis',
+    typ: 'zuordnung',
+    version: 1,
+    erstelltAm: jetzt,
+    geaendertAm: jetzt,
+    fachbereich: 'VWL',
+    thema: 'Einrichtung',
+    unterthema: 'Zuordnung',
+    bloom: 'K1',
+    semester: ['S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8'],
+    gefaesse: ['SF', 'EF', 'EWR', 'GF'],
+    tags: ['einrichtung', 'test'],
+    punkte: 4,
+    zeitbedarf: 2,
+    musterlosung: '🎓 → Bildung, 🏔️ → Berge, 🧀 → Käse, 🕐 → Uhren',
+    bewertungsraster: [
+      { beschreibung: 'Alle 4 korrekt', punkte: 4 },
+      { beschreibung: '3 korrekt', punkte: 3 },
+      { beschreibung: '2 korrekt', punkte: 2 },
+      { beschreibung: '1 korrekt', punkte: 1 },
+    ],
+    verwendungen: [],
+    quelle: 'manuell',
+    autor,
+    fragetext: 'Ordnen Sie die Emojis den passenden Begriffen zu. Verwenden Sie dafür die **Dropdown-Menüs** auf der rechten Seite.',
+    paare: [
+      { links: '🎓 Emoji 1', rechts: 'Bildung' },
+      { links: '🏔️ Emoji 2', rechts: 'Berge' },
+      { links: '🧀 Emoji 3', rechts: 'Käse' },
+      { links: '🕐 Emoji 4', rechts: 'Uhren' },
+    ],
+    zufallsreihenfolge: true,
+  },
+
+  // C2 — Berechnung: Pizza-Rechnung
+  {
+    id: 'einr-be-pizza',
+    typ: 'berechnung',
+    version: 1,
+    erstelltAm: jetzt,
+    geaendertAm: jetzt,
+    fachbereich: 'BWL',
+    thema: 'Einrichtung',
+    unterthema: 'Berechnung',
+    bloom: 'K3',
+    semester: ['S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8'],
+    gefaesse: ['SF', 'EF', 'EWR', 'GF'],
+    tags: ['einrichtung', 'test'],
+    punkte: 3,
+    zeitbedarf: 3,
+    musterlosung: 'Pizzas: 3 × CHF 18.50 = CHF 55.50. Trinkgeld: 10% von 55.50 = CHF 5.55. Total: CHF 55.50 + CHF 5.55 = CHF 61.05.',
+    bewertungsraster: [
+      { beschreibung: 'Zwischentotal korrekt (55.50)', punkte: 1 },
+      { beschreibung: 'Gesamttotal korrekt (61.05)', punkte: 1 },
+      { beschreibung: 'Rechenweg nachvollziehbar', punkte: 1 },
+    ],
+    verwendungen: [],
+    quelle: 'manuell',
+    autor,
+    fragetext: 'Eine Pizza kostet **CHF 18.50**. Sie bestellen **3 Pizzas** und geben **10% Trinkgeld** auf den Gesamtbetrag.\n\nBerechnen Sie den **Gesamtbetrag** (Pizzas + Trinkgeld). Zeigen Sie den Rechenweg im Feld darunter.\n\n💡 **Tipp:** Geben Sie die Zahl ohne «CHF» ein. Nutzen Sie einen Punkt als Dezimalzeichen.',
+    ergebnisse: [
+      { id: '1', label: 'Pizzas ohne Trinkgeld', korrekt: 55.50, toleranz: 0, einheit: 'CHF' },
+      { id: '2', label: 'Gesamtbetrag mit Trinkgeld', korrekt: 61.05, toleranz: 0.05, einheit: 'CHF' },
+    ],
+    rechenwegErforderlich: true,
+  },
+
+  // ═══════════════════════════════════════════════════════
+  // TEIL D: Zeichnen & PDF
+  // ═══════════════════════════════════════════════════════
+
+  // D1 — Visualisierung: Smiley zeichnen
+  {
+    id: 'einr-vis-smiley',
+    typ: 'visualisierung',
+    version: 1,
+    erstelltAm: jetzt,
+    geaendertAm: jetzt,
+    fachbereich: 'Recht',
+    thema: 'Einrichtung',
+    unterthema: 'Zeichenwerkzeuge',
+    bloom: 'K1',
+    semester: ['S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8'],
+    gefaesse: ['SF', 'EF', 'EWR', 'GF'],
+    tags: ['einrichtung', 'test'],
+    punkte: 2,
+    zeitbedarf: 3,
+    musterlosung: 'Ein erkennbarer Smiley, gezeichnet mit mind. 2 verschiedenen Werkzeugen (z.B. Kreis + Stift, oder Linie + Text).',
+    bewertungsraster: [
+      { beschreibung: 'Ein Smiley ist erkennbar', punkte: 1 },
+      { beschreibung: 'Mindestens 2 verschiedene Werkzeuge verwendet', punkte: 1 },
+    ],
+    verwendungen: [],
+    quelle: 'manuell',
+    autor,
+    fragetext: 'Zeichnen Sie einen **Smiley** 😊 auf die Zeichenfläche unten.\n\n💡 **Aufgabe:** Testen Sie dabei mindestens **2 verschiedene Werkzeuge** aus der Werkzeugleiste (z.B. Stift, Linie, Kreis, Text, Pfeil). Probieren Sie auch verschiedene Farben aus!',
+    untertyp: 'zeichnen',
+    canvasConfig: { breite: 600, hoehe: 400 },
+  },
+
+  // D2 — PDF-Annotation: Witz markieren
+  {
+    id: 'einr-pdf-witz',
+    typ: 'pdf',
+    version: 1,
+    erstelltAm: jetzt,
+    geaendertAm: jetzt,
+    fachbereich: 'VWL',
+    thema: 'Einrichtung',
+    unterthema: 'PDF-Annotation',
+    bloom: 'K2',
+    semester: ['S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8'],
+    gefaesse: ['SF', 'EF', 'EWR', 'GF'],
+    tags: ['einrichtung', 'test'],
+    punkte: 3,
+    zeitbedarf: 4,
+    musterlosung: 'Individuelle Auswahl. Bewertet wird: gelbe Markierung vorhanden, Kommentar hinzugefügt, mehrere Seiten besucht.',
+    bewertungsraster: [
+      { beschreibung: 'Text mit gelber Farbe markiert (Highlight)', punkte: 1 },
+      { beschreibung: 'Ein Kommentar hinzugefügt', punkte: 1 },
+      { beschreibung: 'Mindestens 2 verschiedene Seiten besucht', punkte: 1 },
+    ],
+    verwendungen: [],
+    quelle: 'manuell',
+    autor,
+    fragetext: 'In dieser Aufgabe arbeiten Sie mit einem **PDF-Dokument** (Amtliche Witzsammlung der Schweiz).\n\n**Aufträge:**\n1. Blättern Sie durch das Dokument (mind. 2 Seiten)\n2. Suchen Sie Ihren **Lieblingswitz** und markieren Sie ihn mit dem **Textmarker** (gelbe Farbe)\n3. Fügen Sie einen **Kommentar** hinzu, in dem Sie kurz schreiben, warum Sie diesen Witz lustig finden\n\n💡 **Tipp:** Wählen Sie oben das Werkzeug «Textmarker» und dann die gelbe Farbe. Für einen Kommentar nutzen Sie das Kommentar-Werkzeug.',
+    pdfDateiname: 'witzsammlung.pdf',
+    seitenAnzahl: 5,
+    kategorien: [
+      { id: 'lustig', label: 'Lustig', farbe: '#FFEB3B' },
+      { id: 'okay', label: 'Okay', farbe: '#90CAF9' },
+    ],
+    erlaubteWerkzeuge: ['highlight', 'comment', 'freehand'],
+  },
+
+  // ═══════════════════════════════════════════════════════
+  // TEIL E: Buchhaltung — Eingabefelder testen
+  // ═══════════════════════════════════════════════════════
+
+  // E1 — Buchungssatz: Eiskauf
+  {
+    id: 'einr-bs-eis',
+    typ: 'buchungssatz',
+    version: 1,
+    erstelltAm: jetzt,
+    geaendertAm: jetzt,
+    fachbereich: 'BWL',
+    thema: 'Einrichtung',
+    unterthema: 'Buchungssatz-Eingabe',
+    bloom: 'K1',
+    semester: ['S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8'],
+    gefaesse: ['SF', 'EF', 'EWR', 'GF'],
+    tags: ['einrichtung', 'test'],
+    punkte: 2,
+    zeitbedarf: 3,
+    musterlosung: 'Soll: 4200 Warenaufwand CHF 5.00 / Haben: 1000 Kasse CHF 5.00',
+    bewertungsraster: [
+      { beschreibung: 'Soll-Konto korrekt gewählt (4200) mit Betrag', punkte: 1 },
+      { beschreibung: 'Haben-Konto korrekt gewählt (1000) mit Betrag', punkte: 1 },
+    ],
+    verwendungen: [],
+    quelle: 'manuell',
+    autor,
+    geschaeftsfall: '**Übungsaufgabe zum Testen der Eingabefelder:**\n\nSie kaufen ein Eis für CHF 5.00 und bezahlen bar.\n\n📋 **Anleitung — die Lösung ist hier angegeben:**\n- **Soll:** Konto 4200 (Warenaufwand), Betrag: 5.00\n- **Haben:** Konto 1000 (Kasse), Betrag: 5.00\n\nGeben Sie diese Buchung in die Felder unten ein. Wählen Sie die Konten aus dem Dropdown und tippen Sie den Betrag.',
+    buchungen: [
+      {
+        id: 'bs-eis',
+        sollKonten: [{ kontonummer: '4200', betrag: 5 }],
+        habenKonten: [{ kontonummer: '1000', betrag: 5 }],
+        buchungstext: 'Eiskauf bar',
+      },
+    ],
+    kontenauswahl: {
+      modus: 'eingeschraenkt',
+      konten: ['1000', '1020', '2000', '3200', '4200', '5200'],
+    },
+  },
+
+  // E2 — T-Konto: Kasse führen
+  {
+    id: 'einr-tk-kasse',
+    typ: 'tkonto',
+    version: 1,
+    erstelltAm: jetzt,
+    geaendertAm: jetzt,
+    fachbereich: 'BWL',
+    thema: 'Einrichtung',
+    unterthema: 'T-Konto-Eingabe',
+    bloom: 'K1',
+    semester: ['S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8'],
+    gefaesse: ['SF', 'EF', 'EWR', 'GF'],
+    tags: ['einrichtung', 'test'],
+    punkte: 2,
+    zeitbedarf: 3,
+    musterlosung: 'T-Konto Kasse (1000): Anfangsbestand Soll CHF 100. Haben: Abgang CHF 30 (Eiskauf). Saldo: CHF 70 (Soll).',
+    bewertungsraster: [
+      { beschreibung: 'Anfangsbestand korrekt eingetragen', punkte: 1 },
+      { beschreibung: 'Abgang auf Haben-Seite eingetragen', punkte: 1 },
+    ],
+    verwendungen: [],
+    quelle: 'manuell',
+    autor,
+    aufgabentext: '**Übungsaufgabe zum Testen des T-Konto-Editors:**\n\nDer Anfangsbestand ist bereits eingetragen (CHF 100).\n\n📋 **Anleitung:** Tragen Sie einen **Abgang von CHF 30** auf der **Haben-Seite** ein (Gegenkonto: 4200). Das ist die rechte Seite des T-Kontos.',
+    geschaeftsfaelle: [
+      'Einkauf bar: CHF 30 aus der Kasse bezahlt.',
+    ],
+    konten: [
+      {
+        id: 'tk-1000',
+        kontonummer: '1000',
+        anfangsbestand: 100,
+        anfangsbestandVorgegeben: true,
+        eintraege: [
+          { seite: 'haben', gegenkonto: '4200', betrag: 30, buchungstext: 'Einkauf bar' },
+        ],
+        saldo: { betrag: 70, seite: 'soll' },
+      },
+    ],
+    kontenauswahl: {
+      modus: 'eingeschraenkt',
+      konten: ['1000', '1020', '2000', '4200', '5200'],
+    },
+    bewertungsoptionen: {
+      beschriftungSollHaben: false,
+      kontenkategorie: false,
+      zunahmeAbnahme: false,
+      buchungenKorrekt: true,
+      saldoKorrekt: false,
+    },
+  },
+
+  // E3 — Kontenbestimmung: Einfach
+  {
+    id: 'einr-kb-einfach',
+    typ: 'kontenbestimmung',
+    version: 1,
+    erstelltAm: jetzt,
+    geaendertAm: jetzt,
+    fachbereich: 'BWL',
+    thema: 'Einrichtung',
+    unterthema: 'Kontenbestimmung-Eingabe',
+    bloom: 'K1',
+    semester: ['S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8'],
+    gefaesse: ['SF', 'EF', 'EWR', 'GF'],
+    tags: ['einrichtung', 'test'],
+    punkte: 2,
+    zeitbedarf: 2,
+    musterlosung: 'Kasse (1000) = Aktivkonto. Mietaufwand (6000) = Aufwandkonto.',
+    bewertungsraster: [
+      { beschreibung: 'Kasse korrekt als Aktiv bestimmt', punkte: 1 },
+      { beschreibung: 'Mietaufwand korrekt als Aufwand bestimmt', punkte: 1 },
+    ],
+    verwendungen: [],
+    quelle: 'manuell',
+    autor,
+    aufgabentext: '**Übungsaufgabe zum Testen der Eingabefelder:**\n\nBestimmen Sie die Kontenkategorie. Die Lösung ist angegeben — tippen Sie sie einfach ein!\n\n📋 **Lösung:** Kasse = **Aktivkonto** | Mietaufwand = **Aufwandkonto**',
+    modus: 'kategorie_bestimmen',
+    aufgaben: [
+      {
+        id: 'kb-kasse',
+        text: 'Kasse (1000) — Welche Kategorie? (Tipp: Aktivkonto)',
+        erwarteteAntworten: [{ kontonummer: '1000', kategorie: 'aktiv' }],
+      },
+      {
+        id: 'kb-miete',
+        text: 'Mietaufwand (6000) — Welche Kategorie? (Tipp: Aufwandkonto)',
+        erwarteteAntworten: [{ kontonummer: '6000', kategorie: 'aufwand' }],
+      },
+    ],
+    kontenauswahl: {
+      modus: 'eingeschraenkt',
+      konten: ['1000', '1020', '2000', '3200', '4200', '5200', '6000'],
+    },
+  },
+
+  // E4 — Bilanzstruktur: Einfache Zuordnung
+  {
+    id: 'einr-bilanz-einfach',
+    typ: 'bilanzstruktur',
+    version: 1,
+    erstelltAm: jetzt,
+    geaendertAm: jetzt,
+    fachbereich: 'BWL',
+    thema: 'Einrichtung',
+    unterthema: 'Bilanz-Eingabe',
+    bloom: 'K1',
+    semester: ['S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8'],
+    gefaesse: ['SF', 'EF', 'EWR', 'GF'],
+    tags: ['einrichtung', 'test'],
+    punkte: 2,
+    zeitbedarf: 3,
+    musterlosung: 'Aktiven: Kasse (1000) CHF 50, Bank (1020) CHF 150. Passiven: Kreditoren (2000) CHF 80, Eigenkapital (2800) CHF 120. Bilanzsumme: CHF 200.',
+    bewertungsraster: [
+      { beschreibung: 'Konten korrekt Aktiv/Passiv zugeordnet', punkte: 1 },
+      { beschreibung: 'Bilanzsumme stimmt beidseitig (200)', punkte: 1 },
+    ],
+    verwendungen: [],
+    quelle: 'manuell',
+    autor,
+    aufgabentext: '**Übungsaufgabe zum Testen der Bilanz-Eingabe:**\n\nOrdnen Sie die 4 Konten den **Aktiven** (linke Seite) oder **Passiven** (rechte Seite) zu.\n\n📋 **Tipp:** Kasse und Bank = Aktiven (links). Kreditoren und Eigenkapital = Passiven (rechts).',
+    modus: 'bilanz',
+    kontenMitSaldi: [
+      { kontonummer: '1000', saldo: 50 },
+      { kontonummer: '1020', saldo: 150 },
+      { kontonummer: '2000', saldo: 80 },
+      { kontonummer: '2800', saldo: 120 },
+    ],
+    loesung: {
+      bilanz: {
+        aktivSeite: {
+          label: 'Aktiven',
+          gruppen: [
+            { label: 'Umlaufvermögen', konten: ['1000', '1020'] },
+          ],
+        },
+        passivSeite: {
+          label: 'Passiven',
+          gruppen: [
+            { label: 'Fremdkapital', konten: ['2000'] },
+            { label: 'Eigenkapital', konten: ['2800'] },
+          ],
+        },
+        bilanzsumme: 200,
+      },
+    },
+    bewertungsoptionen: {
+      seitenbeschriftung: false,
+      gruppenbildung: false,
+      gruppenreihenfolge: false,
+      kontenreihenfolge: false,
+      betraegeKorrekt: true,
+      zwischentotale: false,
+      bilanzsummeOderGewinn: true,
+      mehrstufigkeit: false,
+    },
+  },
+
+  // ═══════════════════════════════════════════════════════
+  // TEIL F: Material & Features
+  // ═══════════════════════════════════════════════════════
+
+  // F1a — Teilaufgabe MC: Materialpanel nutzen
+  {
+    id: 'einr-ag-material-mc',
+    typ: 'mc',
+    version: 1,
+    erstelltAm: jetzt,
+    geaendertAm: jetzt,
+    fachbereich: 'Recht',
+    thema: 'Einrichtung',
+    unterthema: 'Materialpanel',
+    bloom: 'K2',
+    semester: ['S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8'],
+    gefaesse: ['SF', 'EF', 'EWR', 'GF'],
+    tags: ['einrichtung', 'test'],
+    punkte: 1,
+    zeitbedarf: 2,
+    musterlosung: 'Art. 5 — Die Schulglocke: «Warum hat die Schulglocke nie Ferien? Weil sie immer geschlagen wird.»',
+    bewertungsraster: [{ beschreibung: 'Korrekte Antwort gewählt', punkte: 1 }],
+    verwendungen: [],
+    quelle: 'manuell',
+    autor,
+    fragetext: 'Öffnen Sie das **Materialpanel** (rechte Seite) und schlagen Sie in der «Amtlichen Witzsammlung» nach:\n\nWie lautet der Titel von **Art. 5** (Kapitel 2, Seite 3)?',
+    optionen: [
+      { id: 'a', text: 'Der Taschenrechner', korrekt: false },
+      { id: 'b', text: 'Die Schulglocke', korrekt: true },
+      { id: 'c', text: 'Das Klassenzimmer', korrekt: false },
+      { id: 'd', text: 'Der Sportlehrer', korrekt: false },
+    ],
+    mehrfachauswahl: false,
+    zufallsreihenfolge: false,
+  },
+
+  // F1b — Teilaufgabe Freitext: Witz umschreiben
+  {
+    id: 'einr-ag-material-freitext',
+    typ: 'freitext',
+    version: 1,
+    erstelltAm: jetzt,
+    geaendertAm: jetzt,
+    fachbereich: 'Recht',
+    thema: 'Einrichtung',
+    unterthema: 'Materialpanel',
+    bloom: 'K2',
+    semester: ['S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8'],
+    gefaesse: ['SF', 'EF', 'EWR', 'GF'],
+    tags: ['einrichtung', 'test'],
+    punkte: 2,
+    zeitbedarf: 3,
+    musterlosung: 'Individuelle Umschreibung eines Witzes aus dem Dokument.',
+    bewertungsraster: [
+      { beschreibung: 'Ein Witz aus dem Dokument wurde umgeschrieben', punkte: 1 },
+      { beschreibung: 'Umschreibung ist in eigenen Worten', punkte: 1 },
+    ],
+    verwendungen: [],
+    quelle: 'manuell',
+    autor,
+    fragetext: 'Wählen Sie einen beliebigen Witz aus der «Amtlichen Witzsammlung» und schreiben Sie ihn **in eigenen Worten** um. Der Witz soll weiterhin lustig sein, aber anders formuliert.\n\n💡 **Tipp:** Sie können das Materialpanel neben dem Textfeld offen lassen (Split-Ansicht).',
+    laenge: 'kurz',
+    hilfstextPlaceholder: 'Mein umgeschriebener Witz: ...',
+  },
+
+  // F1 — Aufgabengruppe: Material nutzen
+  {
+    id: 'einr-ag-material',
+    typ: 'aufgabengruppe',
+    version: 1,
+    erstelltAm: jetzt,
+    geaendertAm: jetzt,
+    fachbereich: 'Recht',
+    thema: 'Einrichtung',
+    unterthema: 'Aufgabengruppe',
+    bloom: 'K2',
+    semester: ['S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8'],
+    gefaesse: ['SF', 'EF', 'EWR', 'GF'],
+    tags: ['einrichtung', 'test'],
+    punkte: 3,
+    zeitbedarf: 5,
+    musterlosung: 'Siehe Teilaufgaben a und b.',
+    bewertungsraster: [
+      { beschreibung: 'Teilaufgabe a: MC korrekt (Schulglocke)', punkte: 1 },
+      { beschreibung: 'Teilaufgabe b: Witz umgeschrieben', punkte: 2 },
+    ],
+    verwendungen: [],
+    quelle: 'manuell',
+    autor,
+    kontext: '**Aufgabengruppe: Material nutzen**\n\nBei dieser Aufgabe arbeiten Sie mit dem **Materialpanel**. Öffnen Sie es über den Button oben rechts (📄-Symbol).\n\nDas Materialpanel zeigt Ihnen die «Amtliche Witzsammlung der Schweiz» an — ein mehrseitiges Dokument, das Sie durchblättern können.\n\nBeantworten Sie die beiden Teilaufgaben.',
+    teilaufgabenIds: ['einr-ag-material-mc', 'einr-ag-material-freitext'],
+  },
+
+  // F2 — MC Multiple: Features ausprobieren
+  {
+    id: 'einr-mc-features',
+    typ: 'mc',
+    version: 1,
+    erstelltAm: jetzt,
+    geaendertAm: jetzt,
+    fachbereich: 'VWL',
+    thema: 'Einrichtung',
+    unterthema: 'Features',
+    bloom: 'K2',
+    semester: ['S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8'],
+    gefaesse: ['SF', 'EF', 'EWR', 'GF'],
+    tags: ['einrichtung', 'test'],
+    punkte: 2,
+    zeitbedarf: 3,
+    musterlosung: 'Alle 4 Funktionen sollten funktionieren: Dark Mode, Frage markieren, Tastaturkürzel, Material-Panel.',
+    bewertungsraster: [
+      { beschreibung: 'Alle 4 Features angekreuzt', punkte: 2 },
+      { beschreibung: '2–3 Features angekreuzt', punkte: 1 },
+    ],
+    verwendungen: [],
+    quelle: 'manuell',
+    autor,
+    fragetext: '**Letzte Aufgabe — Feature-Check!** Probieren Sie die folgenden Funktionen aus und kreuzen Sie an, welche **funktioniert** haben:\n\n- **Dark Mode**: Klicken Sie auf das Mond/Sonnen-Symbol oben\n- **Frage markieren**: Klicken Sie auf das Stern- oder Flaggen-Symbol bei einer Frage\n- **Tastaturkürzel**: Drücken Sie Ctrl+Enter, um zur nächsten Frage zu springen\n- **Material-Panel**: Klicken Sie auf das Dokument-Symbol oben rechts\n\nKreuzen Sie **alle** an, die funktioniert haben:',
+    optionen: [
+      { id: 'a', text: 'Dark Mode umschalten hat funktioniert', korrekt: true },
+      { id: 'b', text: 'Frage markieren hat funktioniert', korrekt: true },
+      { id: 'c', text: 'Tastaturkürzel (Ctrl+Enter) hat funktioniert', korrekt: true },
+      { id: 'd', text: 'Material-Panel öffnen/schliessen hat funktioniert', korrekt: true },
+    ],
+    mehrfachauswahl: true,
+    zufallsreihenfolge: false,
+  },
+]
