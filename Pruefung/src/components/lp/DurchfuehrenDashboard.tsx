@@ -83,8 +83,8 @@ export default function DurchfuehrenDashboard({ pruefungId }: { pruefungId: stri
   const [autoRefresh, setAutoRefresh] = useState(true)
 
   // Abgaben + Fragen (einmalig geladen)
-  const [_abgaben, setAbgaben] = useState<Record<string, SchuelerAbgabe>>({})
-  const [_fragen, setFragen] = useState<Frage[]>([])
+  const [abgaben, setAbgaben] = useState<Record<string, SchuelerAbgabe>>({})
+  const [fragen, setFragen] = useState<Frage[]>([])
   const abgabenGeladen = useRef(false)
 
   // Nachrichten (LP → SuS)
@@ -435,6 +435,8 @@ export default function DurchfuehrenDashboard({ pruefungId }: { pruefungId: stri
             <BeendetPhase
               config={config}
               schuelerStatus={daten.schueler}
+              fragen={fragen}
+              abgaben={abgaben}
               onExportieren={() => {
                 const csv = exportiereTeilnahmeCSV(config, daten.schueler)
                 if (csv) {

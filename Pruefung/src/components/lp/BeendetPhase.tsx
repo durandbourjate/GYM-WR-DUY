@@ -1,13 +1,21 @@
+import { useState } from 'react'
 import type { PruefungsConfig } from '../../types/pruefung'
 import type { SchuelerStatus } from '../../types/monitoring'
+import type { Frage } from '../../types/fragen'
+import type { SchuelerAbgabe, PruefungsKorrektur } from '../../types/korrektur'
+import { exportiereBackupXlsx } from '../../utils/backupExport'
 
 interface Props {
   config: PruefungsConfig
   schuelerStatus: SchuelerStatus[]
+  fragen: Frage[]
+  abgaben: Record<string, SchuelerAbgabe>
+  korrektur?: PruefungsKorrektur
   onExportieren: () => void
 }
 
-export default function BeendetPhase({ config, schuelerStatus, onExportieren }: Props) {
+export default function BeendetPhase({ config, schuelerStatus, fragen, abgaben, korrektur, onExportieren }: Props) {
+  const [backupLaden, setBackupLaden] = useState(false)
   const abgegeben = schuelerStatus.filter((s) => s.status === 'abgegeben')
   const erzwungen = schuelerStatus.filter((s) => s.status === 'beendet-lp')
   const nichtErschienen = schuelerStatus.filter((s) => s.status === 'nicht-gestartet')
@@ -65,6 +73,26 @@ export default function BeendetPhase({ config, schuelerStatus, onExportieren }: 
         >
           Ergebnisse exportieren
         </button>
+        {fragen.length > 0 && (
+          <button
+            type="button"
+            disabled={backupLaden}
+            onClick={async () => {
+              setBackupLaden(true)
+              try {
+                await exportiereBackupXlsx({ config, fragen, abgaben, korrektur })
+              } catch (e) {
+                console.error('[Backup] Export fehlgeschlagen:', e)
+                alert('Backup-Export fehlgeschlagen. Bitte erneut versuchen.')
+              } finally {
+                setBackupLaden(false)
+              }
+            }}
+            className="px-4 py-2 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-500 disabled:opacity-50 cursor-pointer"
+          >
+            {backupLaden ? 'Exportiert…' : '📥 Backup exportieren'}
+          </button>
+        )}
       </div>
     </div>
   )
