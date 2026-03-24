@@ -54,15 +54,8 @@ export default function ZeichnenFrage({ frage }: Props) {
   // Aktive Farbe (erste aus Konfiguration)
   const [aktiveFarbe, setAktiveFarbe] = useState<string>(verfuegbareFarben[0] ?? '#000000')
 
-  // Toolbar-Layout: aus localStorage oder automatisch aus Viewport-Verhältnis
+  // Toolbar-Layout: immer horizontal (vertikal überlappt den Canvas)
   const [toolbarLayout, setToolbarLayout] = useState<ToolbarLayout>(() => {
-    try {
-      const gespeichert = localStorage.getItem(TOOLBAR_LAYOUT_KEY)
-      if (gespeichert === 'horizontal' || gespeichert === 'vertikal') return gespeichert
-    } catch {
-      // localStorage nicht verfügbar
-    }
-    // Standard: immer horizontal (vertikal nur auf expliziten Wunsch)
     return 'horizontal'
   })
 
