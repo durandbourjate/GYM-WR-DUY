@@ -6,6 +6,24 @@
 
 ---
 
+## Session 25.03.2026 (8) — Auto-Korrektur Fix + Button-Loading
+
+### Erledigt
+
+- **F10: Auto-Korrektur übernimmt Punkte:** Frontend-Auto-Korrektur (MC, R/F, Lückentext, Zuordnung, Berechnung) wird jetzt automatisch in `kiPunkte` geschrieben wenn noch keine Punkte vergeben sind. Kein KI-Batch nötig für deterministische Fragetypen.
+- **F8: Button-Feedback:** Loading-States für alle langsamen API-Buttons:
+  - KorrekturDashboard: "KI-Korrektur starten", "Einsicht freigeben", "PDF freigeben", "Ergebnisse freigeben"
+  - AktivPhase: "Prüfung beenden" (direkter Path bei 0 aktiven SuS)
+  - Alle Buttons zeigen "Wird..." Text und sind während des API-Calls disabled
+
+### Geänderte Dateien
+```
+src/components/lp/KorrekturDashboard.tsx  — Auto-Korrektur → Bewertungen + aktionLaeuft State
+src/components/lp/AktivPhase.tsx          — beendenLaeuft State für direkten Beenden-Button
+```
+
+---
+
 ## Session 25.03.2026 (7) — Login-Reset, Material-Fix, SuS-Benachrichtigung
 
 ### Erledigt

@@ -25,6 +25,7 @@ export default function AktivPhase({ config, schuelerStatus, onBeenden, onConfig
   const [quickFilter, setQuickFilter] = useState<QuickFilter>('alle')
   const [detailSus, setDetailSus] = useState<string | null>(null)
   const [zeigBeendenDialog, setZeigBeendenDialog] = useState(false)
+  const [beendenLaeuft, setBeendenLaeuft] = useState(false)
   const [zeigZeitzuschlag, setZeigZeitzuschlag] = useState(false)
   const [sebAusnahmenLokal, setSebAusnahmenLokal] = useState<Set<string>>(
     new Set(config.sebAusnahmen ?? [])
@@ -234,24 +235,27 @@ export default function AktivPhase({ config, schuelerStatus, onBeenden, onConfig
       <div className="flex justify-center pt-2 border-t border-slate-200 dark:border-slate-700">
         <button
           type="button"
+          disabled={beendenLaeuft}
           onClick={() => {
             // Bei 0 aktiven SuS: direkt beenden ohne Dialog
             const aktive = schuelerStatus.filter((s) => s.status === 'aktiv').length
             if (aktive === 0) {
+              setBeendenLaeuft(true)
               apiService.beendePruefung({
                 pruefungId: config.id,
                 email: user?.email ?? '',
                 modus: 'sofort',
               }).then((result) => {
                 if (result.success) onBeenden()
+                else setBeendenLaeuft(false)
               })
               return
             }
             setZeigBeendenDialog(true)
           }}
-          className="px-6 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 cursor-pointer font-medium"
+          className="px-6 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 cursor-pointer font-medium disabled:opacity-50"
         >
-          Prüfung beenden
+          {beendenLaeuft ? 'Wird beendet...' : 'Prüfung beenden'}
         </button>
       </div>
 

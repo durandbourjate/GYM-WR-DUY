@@ -54,6 +54,7 @@ export default function KorrekturDashboard({ pruefungId, eingebettet = false }: 
   const [zeigFragenbank, setZeigFragenbank] = useState(false)
   const [zeigHilfe, setZeigHilfe] = useState(false)
   const [pdfSchuelerEmail, setPdfSchuelerEmail] = useState<string | null>(null)
+  const [aktionLaeuft, setAktionLaeuft] = useState<string | null>(null) // Loading-State für Toolbar-Buttons
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   // Korrektur-Daten für IndexedDB-Backup aktuell halten
@@ -73,6 +74,44 @@ export default function KorrekturDashboard({ pruefungId, eingebettet = false }: 
     }
     return result
   }, [fragen, abgaben])
+
+  // Auto-Korrektur-Ergebnisse in Bewertungen übernehmen (wenn kiPunkte noch null)
+  useEffect(() => {
+    if (!korrektur || Object.keys(autoErgebnisseAlle).length === 0) return
+
+    let hatAenderungen = false
+    const aktualisierteSchueler = korrektur.schueler.map((s) => {
+      const autoErgebnisse = autoErgebnisseAlle[s.email]
+      if (!autoErgebnisse) return s
+
+      let schuelerGeaendert = false
+      const neueBewertungen = { ...s.bewertungen }
+
+      for (const [frageId, ergebnis] of Object.entries(autoErgebnisse)) {
+        if (!ergebnis) continue
+        const bew = neueBewertungen[frageId]
+        if (!bew) continue
+        // Nur übernehmen wenn noch keine Punkte vergeben (weder KI noch LP)
+        if (bew.kiPunkte === null && bew.lpPunkte === null) {
+          neueBewertungen[frageId] = {
+            ...bew,
+            kiPunkte: ergebnis.erreichtePunkte,
+            quelle: 'auto' as const,
+          }
+          schuelerGeaendert = true
+          hatAenderungen = true
+        }
+      }
+
+      return schuelerGeaendert ? { ...s, bewertungen: neueBewertungen } : s
+    })
+
+    if (hatAenderungen) {
+      setKorrektur((prev) => prev ? { ...prev, schueler: aktualisierteSchueler } : prev)
+    }
+  // Nur einmal nach dem ersten Laden ausführen
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoErgebnisseAlle])
 
   // Daten laden
   useEffect(() => {
@@ -257,6 +296,7 @@ export default function KorrekturDashboard({ pruefungId, eingebettet = false }: 
   // KI-Korrektur starten
   async function handleStarteKorrektur(): Promise<void> {
     if (!user) return
+    setAktionLaeuft('ki')
     setBatchLaeuft(true)
     setKorrektur((prev) => prev ? { ...prev, batchStatus: 'laeuft', batchFortschritt: { erledigt: 0, gesamt: 1 } } : prev)
     const result = await apiService.starteKorrektur(pruefungId, user.email)
@@ -373,8 +413,8 @@ export default function KorrekturDashboard({ pruefungId, eingebettet = false }: 
         </span>
       )}
       {korrektur?.batchStatus === 'idle' && (
-        <button onClick={handleStarteKorrektur} className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors cursor-pointer">
-          KI-Korrektur starten
+        <button onClick={handleStarteKorrektur} disabled={aktionLaeuft === 'ki'} className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors cursor-pointer disabled:opacity-50">
+          {aktionLaeuft === 'ki' ? 'Wird gestartet...' : 'KI-Korrektur starten'}
         </button>
       )}
       {korrektur?.batchStatus === 'fertig' && (
@@ -385,46 +425,51 @@ export default function KorrekturDashboard({ pruefungId, eingebettet = false }: 
       {korrektur && (
         <button
           type="button"
+          disabled={aktionLaeuft === 'einsicht'}
           onClick={async () => {
             if (!user) return
+            setAktionLaeuft('einsicht')
             const neuerWert = !einsichtFreigegeben
             const ok = await apiService.korrekturFreigeben(pruefungId, neuerWert, user.email, 'einsicht')
             if (ok) {
               setEinsichtFreigegeben(neuerWert)
-              // PDF-Freigabe zurücknehmen wenn Einsicht gesperrt wird
               if (!neuerWert && pdfFreigegeben) {
                 await apiService.korrekturFreigeben(pruefungId, false, user.email, 'pdf')
                 setPdfFreigegeben(false)
               }
             }
+            setAktionLaeuft(null)
           }}
-          className={`text-sm px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
+          className={`text-sm px-3 py-1.5 rounded-lg transition-colors cursor-pointer disabled:opacity-50 ${
             einsichtFreigegeben
               ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-900/50'
               : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'
           }`}
           title={einsichtFreigegeben ? 'Einsicht für SuS sperren' : 'Einsicht für SuS freigeben'}
         >
-          {einsichtFreigegeben ? '✓ Einsicht' : 'Einsicht freigeben'}
+          {aktionLaeuft === 'einsicht' ? 'Wird gespeichert...' : einsichtFreigegeben ? '✓ Einsicht' : 'Einsicht freigeben'}
         </button>
       )}
       {korrektur && einsichtFreigegeben && (
         <button
           type="button"
+          disabled={aktionLaeuft === 'pdf'}
           onClick={async () => {
             if (!user) return
+            setAktionLaeuft('pdf')
             const neuerWert = !pdfFreigegeben
             const ok = await apiService.korrekturFreigeben(pruefungId, neuerWert, user.email, 'pdf')
             if (ok) setPdfFreigegeben(neuerWert)
+            setAktionLaeuft(null)
           }}
-          className={`text-sm px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
+          className={`text-sm px-3 py-1.5 rounded-lg transition-colors cursor-pointer disabled:opacity-50 ${
             pdfFreigegeben
               ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-900/50'
               : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'
           }`}
           title={pdfFreigegeben ? 'PDF-Download für SuS sperren' : 'PDF-Download für SuS freigeben'}
         >
-          {pdfFreigegeben ? '✓ PDF-Download' : 'PDF freigeben'}
+          {aktionLaeuft === 'pdf' ? 'Wird gespeichert...' : pdfFreigegeben ? '✓ PDF-Download' : 'PDF freigeben'}
         </button>
       )}
       {korrektur && korrektur.schueler.length > 0 && (
@@ -700,14 +745,17 @@ export default function KorrekturDashboard({ pruefungId, eingebettet = false }: 
               </p>
             </div>
             <button
+              disabled={aktionLaeuft === 'freigabe'}
               onClick={async () => {
                 if (!user) return
+                setAktionLaeuft('freigabe')
                 const ok = await apiService.korrekturFreigeben(pruefungId, true, user.email, 'einsicht')
                 if (ok) setEinsichtFreigegeben(true)
+                setAktionLaeuft(null)
               }}
-              className="shrink-0 px-4 py-2 text-sm font-medium bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors cursor-pointer"
+              className="shrink-0 px-4 py-2 text-sm font-medium bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors cursor-pointer disabled:opacity-50"
             >
-              Ergebnisse freigeben
+              {aktionLaeuft === 'freigabe' ? 'Wird freigegeben...' : 'Ergebnisse freigeben'}
             </button>
           </div>
         )}
