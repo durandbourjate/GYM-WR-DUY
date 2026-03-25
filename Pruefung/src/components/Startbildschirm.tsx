@@ -29,6 +29,8 @@ export default function Startbildschirm({ config, fragen, wiederhergestellt, wur
 
   // SEB-Ausnahme: LP hat für diesen SuS eine Ausnahme erteilt
   const [hatSebAusnahme, setHatSebAusnahme] = useState(false)
+  // Heartbeat erfolgreich: Verbindung zum Server steht
+  const [heartbeatErfolgreich, setHeartbeatErfolgreich] = useState(false)
   // SuS hat Ausnahme bei LP angefragt
   const [ausnahmeAngefragt, setAusnahmeAngefragt] = useState(false)
 
@@ -40,6 +42,7 @@ export default function Startbildschirm({ config, fragen, wiederhergestellt, wur
     // Sofort einen initialen Heartbeat senden
     if (apiService.istKonfiguriert()) {
       apiService.heartbeat(config.id, user.email).then((response) => {
+        setHeartbeatErfolgreich(true)
         if (response.sebAusnahme) setHatSebAusnahme(true)
       }).catch(() => {})
     }
@@ -56,15 +59,16 @@ export default function Startbildschirm({ config, fragen, wiederhergestellt, wur
       ])
 
       // SEB-Ausnahme aus Heartbeat prüfen
-      if (heartbeatResult.status === 'fulfilled' && heartbeatResult.value?.sebAusnahme) {
-        setHatSebAusnahme(true)
+      if (heartbeatResult.status === 'fulfilled' && heartbeatResult.value) {
+        setHeartbeatErfolgreich(true)
+        if (heartbeatResult.value.sebAusnahme) setHatSebAusnahme(true)
       }
 
       // Freischaltung prüfen
       if (pruefungResult.status === 'fulfilled' && pruefungResult.value?.config.freigeschaltet) {
         setIstFreigeschaltet(true)
       }
-    }, 3000)
+    }, 2000)
 
     return () => clearInterval(interval)
   }, [istFreigeschaltet, istDemoModus, config.id, user])
@@ -134,9 +138,15 @@ export default function Startbildschirm({ config, fragen, wiederhergestellt, wur
             <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-2">
               {config.titel}
             </h1>
-            <p className="text-sm text-slate-600 dark:text-slate-300 mb-1">
-              Warte auf Freischaltung durch die Lehrperson ...
-            </p>
+            {heartbeatErfolgreich ? (
+              <p className="text-sm text-green-600 dark:text-green-400 mb-1">
+                ✓ Verbunden — warte auf Freischaltung durch Lehrperson
+              </p>
+            ) : (
+              <p className="text-sm text-slate-600 dark:text-slate-300 mb-1">
+                Verbinde mit Prüfungsserver...
+              </p>
+            )}
             <p className="text-xs text-slate-400 dark:text-slate-500">
               Die Seite aktualisiert sich automatisch.
             </p>
