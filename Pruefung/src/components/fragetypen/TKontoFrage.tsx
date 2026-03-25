@@ -38,7 +38,7 @@ interface KontoEingabe {
   eintraegeLinks: EintragZeile[]
   eintraegeRechts: EintragZeile[]
   saldoBetrag: string
-  saldoSeite: 'links' | 'rechts'
+  saldoSeite: '' | 'links' | 'rechts'
 }
 
 function leereZeile(): EintragZeile {
@@ -56,7 +56,7 @@ function leereKontoEingabe(id: string): KontoEingabe {
     eintraegeLinks: [leereZeile()],
     eintraegeRechts: [leereZeile()],
     saldoBetrag: '',
-    saldoSeite: 'links',
+    saldoSeite: '',
   }
 }
 
@@ -79,9 +79,9 @@ function zuAntwort(konten: KontoEingabe[]) {
         betrag: parseFloat(e.betrag) || 0,
         gfNr: e.gfNr ? parseInt(e.gfNr) : undefined,
       })),
-      saldo: k.saldoBetrag ? {
+      saldo: k.saldoBetrag && k.saldoSeite ? {
         betrag: parseFloat(k.saldoBetrag) || 0,
-        seite: k.saldoSeite,
+        seite: k.saldoSeite as 'links' | 'rechts',
       } : undefined,
     })),
   }
@@ -109,7 +109,7 @@ function vonAntwort(
         ? eingabe.eintraegeRechts.map((e) => ({ id: neueId(), gegenkonto: e.gegenkonto, betrag: e.betrag ? String(e.betrag) : '', gfNr: e.gfNr ? String(e.gfNr) : '' }))
         : [leereZeile()],
       saldoBetrag: eingabe.saldo ? String(eingabe.saldo.betrag) : '',
-      saldoSeite: eingabe.saldo?.seite ?? 'links',
+      saldoSeite: eingabe.saldo?.seite ?? '',
     }
   })
 }
@@ -480,6 +480,7 @@ export default function TKontoFrage({ frage }: Props) {
                     disabled={readOnly}
                     className={`min-h-[36px] rounded border bg-white px-2 py-1 text-sm text-slate-900 dark:bg-slate-700 dark:text-slate-100 focus:outline-none disabled:opacity-50 ${brd(konto.saldoSeite, readOnly)}`}
                   >
+                    <option value="">-- Seite --</option>
                     <option value="links">Links (Soll)</option>
                     <option value="rechts">Rechts (Haben)</option>
                   </select>
