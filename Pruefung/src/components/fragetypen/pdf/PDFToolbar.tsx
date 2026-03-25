@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import type { PDFAnnotationsWerkzeug, PDFToolbarWerkzeug, PDFKategorie, ZoomStufe } from './PDFTypes.ts'
 import { ZOOM_STUFEN, STANDARD_HIGHLIGHT_FARBEN } from './PDFTypes.ts'
 
@@ -21,8 +21,8 @@ interface Props {
   readOnly?: boolean
 }
 
-const WERKZEUG_DEFS: { id: PDFAnnotationsWerkzeug; icon: string; label: string }[] = [
-  { id: 'highlighter', icon: '🖍', label: 'Markieren' },
+const WERKZEUG_DEFS: { id: PDFAnnotationsWerkzeug; icon: string | ReactNode; label: string }[] = [
+  { id: 'highlighter', icon: <span className="inline-block w-4 h-1.5 bg-yellow-400 rounded-sm align-middle" />, label: 'Markieren' },
   { id: 'kommentar', icon: '💬', label: 'Kommentar' },
   { id: 'freihand', icon: '✏️', label: 'Freihand' },
   { id: 'label', icon: '🏷', label: 'Kategorie zuweisen' },

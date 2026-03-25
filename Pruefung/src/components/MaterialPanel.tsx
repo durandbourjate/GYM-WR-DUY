@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { PruefungsMaterial } from '../types/pruefung.ts'
 import AudioPlayer from './AudioPlayer.tsx'
+import { useAuthStore } from '../store/authStore.ts'
 
 export type MaterialModus = 'split' | 'overlay'
 
@@ -193,6 +194,7 @@ function MaterialAuswahl({ materialien, onWaehlen }: { materialien: PruefungsMat
 
 /** Zeigt den Inhalt eines einzelnen Materials */
 function MaterialInhalt({ material }: { material: PruefungsMaterial }) {
+  const user = useAuthStore(s => s.user)
   // Audio-Dateien
   if (material.typ === 'dateiUpload' && material.mimeType?.startsWith('audio/') && material.url) {
     return (
@@ -235,7 +237,7 @@ function MaterialInhalt({ material }: { material: PruefungsMaterial }) {
         <div className="flex-1 relative">
           <iframe
             src={material.embedUrl}
-            className="absolute inset-0 w-full h-full border-0"
+            className="absolute inset-0 w-full h-full border-0 min-h-[200px] md:min-h-[300px]"
             title={material.titel}
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
@@ -257,7 +259,7 @@ function MaterialInhalt({ material }: { material: PruefungsMaterial }) {
         </div>
         <iframe
           src={embedUrl}
-          className="flex-1 w-full border-0"
+          className="flex-1 w-full border-0 min-h-[200px] md:min-h-[300px]"
           title={material.titel}
           sandbox="allow-scripts allow-same-origin"
         />
@@ -283,18 +285,20 @@ function MaterialInhalt({ material }: { material: PruefungsMaterial }) {
       <div className="h-full flex flex-col">
         <div className="px-4 py-2 bg-slate-50 dark:bg-slate-700/30 text-xs text-slate-500 dark:text-slate-400 flex items-center gap-2 shrink-0">
           <span>{material.titel}</span>
-          <a
-            href={material.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-500 dark:text-blue-400 hover:underline ml-auto"
-          >
-            In neuem Tab öffnen ↗
-          </a>
+          {user?.rolle === 'lp' && (
+            <a
+              href={material.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-500 dark:text-blue-400 hover:underline ml-auto"
+            >
+              In neuem Tab öffnen ↗
+            </a>
+          )}
         </div>
         <iframe
           src={material.url}
-          className="flex-1 w-full border-0"
+          className="flex-1 w-full border-0 min-h-[200px] md:min-h-[300px]"
           title={material.titel}
           sandbox="allow-scripts allow-same-origin"
         />
