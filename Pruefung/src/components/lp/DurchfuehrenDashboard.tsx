@@ -138,7 +138,8 @@ export default function DurchfuehrenDashboard({ pruefungId }: { pruefungId: stri
     // Abgebrochene Requests ignorieren (nicht als Fehler werten)
     if (controller.signal.aborted) return
     // Verbindungsfehler erkennen: result ist null bei Timeout/Netzwerkfehler
-    if (!result && !istDemoModus) {
+    // ABER: Beim ersten Laden ist null normal (kein Antworten-Sheet in Vorbereitungsphase)
+    if (!result && !istDemoModus && ladeStatus !== 'laden') {
       fehlerCountRef.current++
       if (fehlerCountRef.current >= 3) {
         setZeigeVerbindungsBanner(true)
@@ -146,8 +147,10 @@ export default function DurchfuehrenDashboard({ pruefungId }: { pruefungId: stri
       return // Bestehende Daten sichtbar lassen, nicht mit leeren überschreiben
     }
     // Erfolg → Fehlerzähler zurücksetzen
-    fehlerCountRef.current = 0
-    if (zeigeVerbindungsBanner) setZeigeVerbindungsBanner(false)
+    if (result) {
+      fehlerCountRef.current = 0
+      if (zeigeVerbindungsBanner) setZeigeVerbindungsBanner(false)
+    }
     // result kann null sein wenn noch kein Antworten-Sheet existiert (Vorbereitungsphase)
     // → Leere Monitoring-Daten statt Fehler, damit die LP normal weiterarbeiten kann
     const effectiveResult = result || { pruefungTitel: '', schueler: [], gesamtSus: 0 }
