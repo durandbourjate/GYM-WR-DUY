@@ -5,7 +5,7 @@ Digitale Prüfungsplattform für den Wirtschaft-&-Recht-Unterricht am Gymnasium 
 ## Features
 
 **Für Schülerinnen und Schüler**
-- 12 Fragetypen: Multiple Choice, Freitext (Rich Text), Lückentext, Zuordnung, Richtig/Falsch, Berechnung, Buchungssatz, T-Konto, Kontenbestimmung, Bilanz/ER, Aufgabengruppe, PDF-Annotation
+- 13 Fragetypen: Multiple Choice, Freitext (Rich Text), Lückentext, Zuordnung, Richtig/Falsch, Berechnung, Buchungssatz, T-Konto, Kontenbestimmung, Bilanz/ER, Aufgabengruppe, PDF-Annotation, Zeichnen/Visualisierung
 - Automatisches Speichern (lokal + remote) — kein Datenverlust
 - Timer mit Countdown oder Open-End (Stoppuhr), Fortschrittsanzeige pro Abschnitt
 - Offline-fähig (PWA): Antworten werden bei Reconnect nachgesendet
@@ -29,7 +29,10 @@ Digitale Prüfungsplattform für den Wirtschaft-&-Recht-Unterricht am Gymnasium 
 - Prüfungstracker: Fehlende SuS, Nachprüfungen, Noten-Stand pro Kurs (MiSDV)
 - Ergebnis-Export: Detaillierter CSV mit Antworten + Punkten (wie Google Forms) + individuelle SuS-PDFs
 - In-App Hilfe: Anleitung, FAQ und Tipps direkt in der Plattform
-- Zeitzuschläge (Nachteilsausgleich) pro SuS konfigurierbar
+- Zeitzuschläge (Nachteilsausgleich) pro SuS mit frei wählbarer Minutenzahl
+- Auto-Korrektur: MC, R/F, Lückentext, Zuordnung, Berechnung werden sofort automatisch bewertet
+- Korrektur-Workflow: Auto-Geprüft bei LP-Aktion, Status-Tracking, Freigabe-Banner
+- Material-Panel: Split-Screen (55%) oder Overlay, unterstützt PDF, Video, Audio, Links
 - SEB-Integration: Auto-Config-Download, harte Durchsetzung, LP-Ausnahmen, SuS-Anleitung
 
 **Backend**
@@ -63,7 +66,7 @@ npm run dev
 
 Öffne `http://localhost:5174/GYM-WR-DUY/Pruefung/`
 
-Ohne Backend-Konfiguration startet die App im **Demo-Modus** mit 16 Beispielfragen (alle 11 Fragetypen).
+Ohne Backend-Konfiguration startet die App im **Demo-Modus** mit 18 Beispielfragen (alle 13 Fragetypen inkl. Zeichnen + PDF).
 
 ### Mit Backend (Google Workspace)
 
@@ -124,7 +127,7 @@ Environment-Variablen werden über GitHub Secrets gesetzt:
 src/
 ├── components/
 │   ├── lp/                    LP-Komponenten (Composer, Monitoring)
-│   ├── fragetypen/            12 Typen: MC, Freitext, Lückentext, Zuordnung, R/F, Berechnung + 4 FiBu + Aufgabengruppe + PDF-Annotation
+│   ├── fragetypen/            13 Typen: MC, Freitext, Lückentext, Zuordnung, R/F, Berechnung + 4 FiBu + Aufgabengruppe + PDF + Zeichnen
 │   └── ...                    Login, Layout, Timer, Abgabe, etc.
 ├── services/                  API, Auth, SEB, Auto-Save, Retry-Queue
 ├── store/                     Zustand Stores (Prüfung, Auth, Theme)

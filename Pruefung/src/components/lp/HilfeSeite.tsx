@@ -385,9 +385,10 @@ function HilfeDurchfuehrung() {
 
       <Untertitel>Phase 1: Vorbereitung</Untertitel>
       <Schritt nr={1}>Klassenlisten werden automatisch aus Google Sheets geladen.</Schritt>
-      <Schritt nr={2}>Wählen Sie die Kurse aus (pro Gefäss, z.B. SF WR). SuS können in mehreren Kursen vorkommen — Duplikate werden automatisch erkannt.</Schritt>
-      <Schritt nr={3}>Optional: Einladungs-E-Mails an die ausgewählten SuS versenden.</Schritt>
-      <Schritt nr={4}>Klicken Sie &laquo;Prüfung starten&raquo; — die Prüfung wird freigeschaltet und SuS werden weitergeleitet.</Schritt>
+      <Schritt nr={2}>Wählen Sie die Kurse aus (pro Gefäss, z.B. SF WR). SuS können in mehreren Kursen vorkommen — Duplikate werden automatisch erkannt. Einzelne SuS können über die Checkboxen innerhalb der Kursübersicht ab-/angewählt werden.</Schritt>
+      <Schritt nr={3}>Zeitzuschläge (Nachteilsausgleich): Geben Sie die Zusatzminuten direkt neben dem SuS-Namen ein (Eingabefeld in der Teilnehmerliste).</Schritt>
+      <Schritt nr={4}>Optional: Einladungs-E-Mails an die ausgewählten SuS versenden.</Schritt>
+      <Schritt nr={5}>Klicken Sie &laquo;Weiter zur Lobby&raquo; — die Teilnehmer werden gespeichert.</Schritt>
 
       <Untertitel>Phase 2: Lobby</Untertitel>
       <Text>
@@ -442,9 +443,10 @@ function HilfeKorrektur() {
       </Text>
 
       <Untertitel>Review-Workflow</Untertitel>
-      <Schritt nr={1}><strong>KI bewertet</strong> — Automatische Punktevergabe pro Frage und SuS.</Schritt>
-      <Schritt nr={2}><strong>LP prüft</strong> — Sie können KI-Vorschläge bestätigen oder anpassen. Ihre Punkte haben immer Vorrang.</Schritt>
-      <Schritt nr={3}><strong>Feedback senden</strong> — Generiert individuelles Feedback pro SuS und versendet es per E-Mail.</Schritt>
+      <Schritt nr={1}><strong>Auto-Korrektur</strong> — MC, R/F, Lückentext, Zuordnung und Berechnung werden sofort automatisch bewertet. Punkte erscheinen direkt.</Schritt>
+      <Schritt nr={2}><strong>KI-Korrektur</strong> — Für komplexe Fragetypen (Freitext, FiBu, Zeichnen) kann die KI-Korrektur gestartet werden.</Schritt>
+      <Schritt nr={3}><strong>LP prüft</strong> — Punkte ändern, Kommentar schreiben oder Audio aufnehmen markiert die Frage automatisch als &laquo;Geprüft&raquo;. Wenn alle Fragen eines SuS geprüft sind, wechselt der Status auf &laquo;Review fertig&raquo;.</Schritt>
+      <Schritt nr={4}><strong>Ergebnisse freigeben</strong> — Wenn alle SuS korrigiert sind, erscheint ein grünes Banner. Mit einem Klick wird die Einsicht für SuS freigeschaltet. SuS erhalten eine E-Mail mit Link.</Schritt>
 
       <Untertitel>SuS-PDFs & Export</Untertitel>
       <Text>
