@@ -12,9 +12,10 @@ interface Props {
   config: PruefungsConfig
   fragen: Frage[]
   wiederhergestellt: boolean
+  wurdeZurueckgesetzt?: boolean
 }
 
-export default function Startbildschirm({ config, fragen, wiederhergestellt }: Props) {
+export default function Startbildschirm({ config, fragen, wiederhergestellt, wurdeZurueckgesetzt }: Props) {
   const pruefungStarten = usePruefungStore((s) => s.pruefungStarten)
   const setPhase = usePruefungStore((s) => s.setPhase)
   const user = useAuthStore((s) => s.user)
@@ -216,8 +217,15 @@ export default function Startbildschirm({ config, fragen, wiederhergestellt }: P
           </div>
         )}
 
+        {/* Reset-Hinweis (LP hat Prüfung zurückgesetzt) */}
+        {wurdeZurueckgesetzt && (
+          <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg text-sm text-blue-800 dark:text-blue-200">
+            Diese Prüfung wurde von der Lehrperson zurückgesetzt. Ihre vorherigen Antworten wurden gelöscht.
+          </div>
+        )}
+
         {/* Wiederherstellungs-Hinweis */}
-        {wiederhergestellt && (
+        {wiederhergestellt && !wurdeZurueckgesetzt && (
           <div className="mb-6 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg text-sm text-amber-800 dark:text-amber-200">
             Gespeicherte Sitzung gefunden. Ihre bisherigen Antworten werden wiederhergestellt.
           </div>

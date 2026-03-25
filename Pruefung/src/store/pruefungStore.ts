@@ -36,6 +36,9 @@ interface PruefungState {
   beendetUm: string | null
   restzeitMinuten: number | null
 
+  // Durchführungs-ID (erkennt Reset durch LP)
+  durchfuehrungId: string | null
+
   // Actions
   setAntwort: (frageId: string, antwort: Antwort) => void
   toggleMarkierung: (frageId: string) => void
@@ -53,6 +56,7 @@ interface PruefungState {
   incrementNetzwerkFehler: () => void
   addUnterbrechung: (unterbrechung: Unterbrechung) => void
   setBeendetUm: (beendetUm: string, restzeitMinuten?: number) => void
+  setDurchfuehrungId: (id: string | null) => void
   zuruecksetzen: () => void
 }
 
@@ -74,6 +78,7 @@ const initialState = {
   unterbrechungen: [] as Unterbrechung[],
   beendetUm: null,
   restzeitMinuten: null,
+  durchfuehrungId: null,
 }
 
 export const usePruefungStore = create<PruefungState>()(
@@ -158,11 +163,13 @@ export const usePruefungStore = create<PruefungState>()(
       setBeendetUm: (beendetUm, restzeitMinuten) =>
         set({ beendetUm, restzeitMinuten: restzeitMinuten ?? null }),
 
+      setDurchfuehrungId: (id) => set({ durchfuehrungId: id }),
+
       zuruecksetzen: () => set(initialState),
     }),
     {
       name: 'pruefung-state-' + (new URLSearchParams(window.location.search).get('id') || 'default'),
-      version: 3,
+      version: 4,
       migrate: (persisted, version) => {
         const state = persisted as Record<string, unknown>
         if (version < 2) {
@@ -174,6 +181,10 @@ export const usePruefungStore = create<PruefungState>()(
           // v2→v3: LP-Beenden Felder
           state.beendetUm = null
           state.restzeitMinuten = null
+        }
+        if (version < 4) {
+          // v3→v4: durchfuehrungId für Reset-Erkennung
+          state.durchfuehrungId = null
         }
         return persisted as PruefungState
       },
@@ -192,6 +203,7 @@ export const usePruefungStore = create<PruefungState>()(
         unterbrechungen: state.unterbrechungen,
         beendetUm: state.beendetUm,
         restzeitMinuten: state.restzeitMinuten,
+        durchfuehrungId: state.durchfuehrungId,
       }),
     }
   )

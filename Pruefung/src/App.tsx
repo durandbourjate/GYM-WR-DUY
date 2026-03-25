@@ -4,6 +4,8 @@ import { useAuthStore } from './store/authStore.ts'
 import { demoPruefung } from './data/demoPruefung.ts'
 import { demoFragen } from './data/demoFragen.ts'
 import { apiService } from './services/apiService.ts'
+import { clearIndexedDB } from './services/autoSave.ts'
+import { clearQueue } from './services/retryQueue.ts'
 import type { Frage } from './types/fragen.ts'
 import type { PruefungsConfig } from './types/pruefung.ts'
 import LoginScreen from './components/LoginScreen.tsx'
@@ -66,6 +68,7 @@ export default function App() {
   const [wiederhergestellt, setWiederhergestellt] = useState(false)
   const [ladeFehler, setLadeFehler] = useState<string | null>(null)
   const [korrekturId, setKorrekturId] = useState<string | null>(null)
+  const [wurdeZurueckgesetzt, setWurdeZurueckgesetzt] = useState(false)
 
   // Prüfungs-ID aus URL lesen (?id=...)
   const pruefungIdAusUrl = new URLSearchParams(window.location.search).get('id')
@@ -90,11 +93,28 @@ export default function App() {
         try {
           const result = await apiService.ladePruefung(pruefungIdAusUrl, user!.email)
           if (result) {
+            // durchfuehrungId-Check: Wenn LP die Prüfung zurückgesetzt hat, stale State löschen
+            const storeDfId = usePruefungStore.getState().durchfuehrungId
+            const backendDfId = result.config.durchfuehrungId
+            if (backendDfId && storeDfId && backendDfId !== storeDfId) {
+              console.log('[App] Prüfung wurde zurückgesetzt (durchfuehrungId geändert). State wird gelöscht.')
+              usePruefungStore.getState().zuruecksetzen()
+              try { localStorage.removeItem(`pruefung-state-${pruefungIdAusUrl}`) } catch { /* ignore */ }
+              clearIndexedDB(pruefungIdAusUrl).catch(() => {})
+              clearQueue().catch(() => {})
+              setWurdeZurueckgesetzt(true)
+            }
+
             const resolvedFragen = resolveFragenFuerPruefung(result.config, result.fragen)
             setPruefungsConfig(result.config)
             setPruefungsFragen(resolvedFragen)
 
-            if (config && config.id === result.config.id && phase !== 'start') {
+            // durchfuehrungId im Store speichern für zukünftige Vergleiche
+            if (backendDfId) {
+              usePruefungStore.getState().setDurchfuehrungId(backendDfId)
+            }
+
+            if (config && config.id === result.config.id && phase !== 'start' && !wurdeZurueckgesetzt) {
               setWiederhergestellt(true)
               usePruefungStore.getState().setPhase('start')
             }
@@ -187,6 +207,7 @@ export default function App() {
           config={pruefungsConfig}
           fragen={pruefungsFragen}
           wiederhergestellt={wiederhergestellt}
+          wurdeZurueckgesetzt={wurdeZurueckgesetzt}
         />
       )
     case 'pruefung':

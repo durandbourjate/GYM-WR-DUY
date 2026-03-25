@@ -38,9 +38,9 @@ PDF wird via Apps Script Proxy (`ladeDriveFile` → Base64) geladen. SW-Problem 
 
 SuS sehen keinen visuellen Unterschied zwischen "Lobby" und "Warteraum". Der Screen ändert erst bei Freischaltung. SuS sollten sehen, dass sie in der Lobby sind und auf die LP warten.
 
-### 🟡 SuS-Storage nach Prüfungsreset
+### ✅ SuS-Storage nach Prüfungsreset — GELÖST (25.03.2026)
 
-Wenn LP eine Prüfung zurücksetzt und neu startet, haben SuS noch den alten State im localStorage/IndexedDB. `?reset=true` existiert als Workaround, aber automatisches Reset bei neuer Durchführung fehlt.
+`durchfuehrungId`-Mechanismus: LP-Reset generiert neue UUID im Backend. SuS vergleichen beim Laden — bei Mismatch wird State automatisch gelöscht. Info-Banner "Prüfung wurde zurückgesetzt". IndexedDB + RetryQueue werden bei Logout aufgeräumt.
 
 ### Zeichnen-Tool
 - ✅ Toolbar horizontal als Default (vertikal überlappt Canvas)
@@ -76,21 +76,24 @@ Jeder API-Call braucht 1-3 Sekunden (Cold Starts, Google-Infrastruktur). Optimis
 
 ### Erledigt
 - **Phase 0 — Service Worker:** `autoUpdate` + `skipWaiting` + `clientsClaim`. Build-Timestamp (`__BUILD_TIMESTAMP__`). RetryQueue-DB im Reset aufgeräumt.
-- **Phase 1.1 — remoteSaveVersion Bug:** Version wird jetzt erst nach erfolgreichem API-Call erhöht (vorher: vor dem Call → Versions-Sprung bei Fehler).
-- **Phase 1.2 — Idempotenz-Key:** `requestId` (UUID) pro Save-Versuch. Backend prüft `letzteRequestId` gegen Duplikate. RetryQueue führt requestId mit.
-- **Phase 1.3 — Column Auto-Creation:** Neue `ensureColumns()` Helper-Funktion. `speichereAntworten`, `speichereFrage`, `speichereConfig` erstellen fehlende Sheet-Spalten automatisch.
-- **Phase 1.4 — safeJsonParse Logging:** `console.warn` bei Parse-Fehlern mit erstem 200-Zeichen-Ausschnitt.
+- **Phase 1.1 — remoteSaveVersion Bug:** Version wird jetzt erst nach erfolgreichem API-Call erhöht.
+- **Phase 1.2 — Idempotenz-Key:** `requestId` (UUID) pro Save. Backend prüft `letzteRequestId` gegen Duplikate.
+- **Phase 1.3 — Column Auto-Creation:** `ensureColumns()` Helper für alle 3 Speicher-Funktionen.
+- **Phase 1.4 — safeJsonParse Logging:** `console.warn` bei Parse-Fehlern.
+- **Phase 2.1 — IndexedDB bei Logout:** `clearIndexedDB()` + `clearQueue()` in `abmelden()`.
+- **Phase 2.2 — durchfuehrungId:** LP-Reset generiert UUID, SuS erkennen stale State automatisch. Info-Banner.
+- **Phase 2.3 — Reset-Benachrichtigung:** "Prüfung wurde zurückgesetzt" im Startbildschirm.
 
 ### Apps Script Änderungen (manuell kopieren!)
-- Neue Helper: `ensureColumns()` — automatische Spalten-Erstellung
-- `speichereAntworten`: Idempotenz via `letzteRequestId`, `ensureColumns` statt manuelle Migration
-- `speichereFrage`: `ensureColumns` eingebaut
-- `speichereConfig`: `ensureColumns` eingebaut
+- `ensureColumns()` Helper
+- `speichereAntworten`: Idempotenz + `ensureColumns`
+- `speichereFrage` + `speichereConfig`: `ensureColumns`
 - `safeJsonParse`: Warnung bei Fehler
+- `resetPruefungEndpoint`: generiert `durchfuehrungId` (UUID)
+- `ladePruefung`: gibt `durchfuehrungId` zurück
 
 ### Gesamtplan (noch offen)
-- **Phase 2:** State-Cleanup (IndexedDB bei Logout, `durchfuehrungId`, Timestamp-Check)
-- **Phase 3:** UI/UX (Material-Panel, Warteraum, Reset-Benachrichtigung, Korrektur-Test)
+- **Phase 3:** UI/UX (Material-Panel, Warteraum, Korrektur-Test)
 - **Phase 4:** Feature — Einzelne SuS an-/abwählen
 - **Phase 5:** Feature — Mehrere Prüfungen gleichzeitig
 - Plan-Dokument: `.claude/plans/humming-dancing-waffle.md`

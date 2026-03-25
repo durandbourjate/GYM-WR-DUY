@@ -81,6 +81,9 @@ export interface PruefungsConfig {
 
   // Notenberechnung
   notenConfig?: NotenConfig;
+
+  // Durchführungs-ID (wird bei Reset neu generiert — erkennt stale State)
+  durchfuehrungId?: string;
 }
 
 export interface NotenConfig {

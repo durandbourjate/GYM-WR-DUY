@@ -1,6 +1,8 @@
 import { create } from 'zustand'
 import type { AuthUser, Rolle } from '../types/auth.ts'
 import { usePruefungStore } from './pruefungStore.ts'
+import { clearIndexedDB } from '../services/autoSave.ts'
+import { clearQueue } from '../services/retryQueue.ts'
 
 // Zugelassene LP-E-Mail-Adressen (vorerst nur DUY)
 const ZUGELASSENE_LP: string[] = [
@@ -95,6 +97,9 @@ export const useAuthStore = create<AuthStore>((set) => ({
     // Persistierten Prüfungszustand löschen (dynamischer Key mit pruefungId)
     const pruefungId = new URLSearchParams(window.location.search).get('id') || 'default'
     try { localStorage.removeItem(`pruefung-state-${pruefungId}`) } catch { /* ignore */ }
+    // IndexedDB-Backup + RetryQueue aufräumen (verhindert Zombie-Daten)
+    clearIndexedDB(pruefungId).catch(() => {})
+    clearQueue().catch(() => {})
     set({ user: null, istDemoModus: false, ladeStatus: 'idle', fehler: null })
   },
 

@@ -597,6 +597,7 @@ function ladePruefung(pruefungId, email) {
       teilnehmer: safeJsonParse(configRow.teilnehmer, []),
       materialien: safeJsonParse(configRow.materialien, []),
       beendetUm: configRow.beendetUm || undefined,
+      durchfuehrungId: configRow.durchfuehrungId || undefined,
       korrektur: { aktiviert: false, modus: 'batch' },
       feedback: { zeitpunkt: 'nach-review', format: 'pdf', detailgrad: 'vollstaendig' },
     };
@@ -1194,6 +1195,15 @@ function resetPruefungEndpoint(body) {
         // sebAusnahmen → []
         var sebCol = headers.indexOf('sebAusnahmen');
         if (sebCol >= 0) configSheet.getRange(i + 1, sebCol + 1).setValue('[]');
+
+        // durchfuehrungId → neue UUID (damit SuS stale State erkennen)
+        var dfIdCol = headers.indexOf('durchfuehrungId');
+        if (dfIdCol < 0) {
+          // Spalte automatisch anlegen
+          dfIdCol = headers.length;
+          configSheet.getRange(1, dfIdCol + 1).setValue('durchfuehrungId').setFontWeight('bold');
+        }
+        configSheet.getRange(i + 1, dfIdCol + 1).setValue(Utilities.getUuid());
 
         break;
       }
