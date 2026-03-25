@@ -28,7 +28,7 @@
 
 ## Session 25.03.2026 (13) — Bugfixes + UX aus Live-Tests (Runde 2)
 
-### Status: ERLEDIGT (12 Tasks)
+### Status: ERLEDIGT (12 Tasks + 5 Nachbesserungen)
 
 **Plan:** `docs/superpowers/plans/scalable-prancing-chipmunk.md`
 
@@ -45,41 +45,63 @@
 
 | Feature | Beschreibung |
 |---------|-------------|
-| U21 Fragen-Navigation Farben | Beantwortet=grün, Offen=violett, Unsicher=amber. Leere Eingabefelder violett umrahmt (FreitextFrage, LueckentextFrage, ZuordnungFrage, MCFrage, BilanzERFrage) |
+| U21 Fragen-Navigation Farben | Beantwortet=grün, Offen=violett, Unsicher=amber |
 | U14 Zeitzuschlag Lobby + Live | Inline-Badge ⏱+N′ pro SuS in Lobby. Live: Info-Badge=solid blau, +5 Button=outline klein |
-| U24 Kontrollstufe "Keine" | 4. Stufe ⚪ Keine — keine Einschränkungen (für Übungen). Typ, Select, Hook, Startbildschirm |
+| U24 Kontrollstufe "Keine" | 4. Stufe ⚪ Keine — keine Einschränkungen (für Übungen) |
 | U18 Zeitzuschlag Auswertung | Zeit+-Spalte in BeendetPhase-Tabelle mit ⏱+N′ Badge |
 | U22 Canvas vergrösserbar | ⊞/⊟ Toggle über Zeichenfläche, max-w-3xl ↔ max-w-none |
 | U23 PDF-Toolbar vertikal | Layout-Toggle ⇅/⇆ in PDFToolbar, flex-row Wrapper in PDFFrage |
-| U17 Demo-Prüfung | Einrichtungsprüfung hat bereits alle Fragetypen (Zeichnen, PDF, Bilanz, Lückentext, Zuordnung) |
+| U17 Demo-Prüfung | Nur Einrichtungsprüfung (Musterprüfung entfernt), kontrollStufe 'keine', Resultate-Button entfernt |
+
+### Block 3: Farbschema-Harmonisierung (5 Nachbesserungen)
+
+Alle 13 Fragetypen konsistent: **Leer = violett**, **Ausgefüllt = neutral**, **Gewählt = nur Symbol farbig**
+
+| Fragetyp | Leer | Gewählt/Ausgefüllt |
+|----------|------|--------------------|
+| MC | Violetter Container | Nur grüner Kreis, Button neutral |
+| R/F | Violette Karte | Nur ✓ grüner / ✗ roter Kreis (wie MC) |
+| Zuordnung | Violette Zeile + Select | Nur Dropdown grün |
+| Freitext | Violetter Rahmen (auch bei Focus) | Neutral (slate) |
+| Lückentext | Violette Unterstriche | Neutral |
+| Berechnung | Violette Inputs + Textarea | Neutral |
+| Buchungssatz | Violett: KontenSelect + Betrag | Neutral |
+| TKonto | Violett: KontenSelect + Betrag + GF-Nr + Saldo + Seite | Neutral |
+| Kontenbestimmung | Violett: Kategorie + Seite Selects | Neutral |
+| Bilanz/ER | Violett: Seite-wählen + Kontenhauptgruppe + Konto + Betrag + Bilanzsumme | Neutral |
+| Zeichnen/PDF | n/a (Canvas/Annotationen) | n/a |
 
 ### Geschlossen (aus Tests bestätigt)
 - ~~B24~~ Text-Tool ✅ | ~~B27~~ PDF Spiegelung ✅ | ~~B30~~ Fragen-Navigation ✅
 - ~~U12~~ SuS-Direktauswahl ✅ | ~~U15~~ Farbpalette ✅ | ~~U19~~ MC Auto-Confirm ✅ | ~~U20~~ Kurs einklappbar ✅
 
-### Geänderte Dateien
+### Geänderte Dateien (25 Dateien)
 
 ```
-apps-script-code.js                         — B31 (const→let), B28 (phase in Heartbeat-Response)
-src/types/lockdown.ts                       — U24 (KontrollStufe um 'keine')
-src/types/monitoring.ts                     — B28 (HeartbeatResponse.phase), U24 (kontrollStufe)
-src/types/pruefung.ts                       — U24 (kontrollStufe um 'keine')
-src/services/pruefungApi.ts                 — B28 (phase parsen)
-src/components/Startbildschirm.tsx          — B28 (3-State Wartescreen), U24 (kein Vollbild)
-src/components/FragenNavigation.tsx         — U21 (grün für beantwortet, Legende)
-src/components/fragetypen/FreitextFrage.tsx — U21 (violette Border leer)
-src/components/fragetypen/LueckentextFrage.tsx — U21 (violette Border leer)
-src/components/fragetypen/ZuordnungFrage.tsx   — U21 (violette Border leer)
-src/components/fragetypen/MCFrage.tsx          — U21 (violetter Ring leer)
-src/components/fragetypen/BilanzERFrage.tsx    — B32 (Overflow), U21 (violette Border)
+apps-script-code.js                            — B31 (const→let), B28 (phase in Heartbeat-Response)
+src/App.tsx                                     — Demo: einrichtungsPruefung statt demoPruefung, Resultate-Button entfernt
+src/types/lockdown.ts                          — U24 (KontrollStufe um 'keine')
+src/types/monitoring.ts                        — B28 (HeartbeatResponse.phase), U24 (kontrollStufe)
+src/types/pruefung.ts                          — U24 (kontrollStufe um 'keine')
+src/services/pruefungApi.ts                    — B28 (phase parsen)
+src/data/einrichtungsPruefung.ts               — kontrollStufe: 'keine'
+src/components/Startbildschirm.tsx             — B28 (3-State), U24 (kein Vollbild bei 'keine')
+src/components/FragenNavigation.tsx            — U21 (grün beantwortet, Legende)
+src/components/shared/KontenSelect.tsx         — Violett leer, neutral ausgefüllt (alle FiBu)
+src/components/fragetypen/FreitextFrage.tsx    — Violett leer (auch bei Focus), neutral ausgefüllt
+src/components/fragetypen/LueckentextFrage.tsx — Violett leer, neutral ausgefüllt
+src/components/fragetypen/MCFrage.tsx          — Nur grüner Kreis, violetter Container
+src/components/fragetypen/RichtigFalschFrage.tsx — Grüner/roter Kreis-Icon, violette Karte
+src/components/fragetypen/ZuordnungFrage.tsx   — Nur Dropdown grün, violette Zeile
+src/components/fragetypen/BerechnungFrage.tsx  — Violett Inputs + Textarea
+src/components/fragetypen/BuchungssatzFrage.tsx — Violett Betrag-Inputs, neutral Label
+src/components/fragetypen/TKontoFrage.tsx      — Violett alle Inputs, Saldo-Seite startet leer
+src/components/fragetypen/KontenbestimmungFrage.tsx — Violett Kategorie/Seite Selects
+src/components/fragetypen/BilanzERFrage.tsx    — B32 + Violett Seite/Gruppe/Summe
 src/components/fragetypen/ZeichnenFrage.tsx    — B26 (flex-row), U22 (vergrösserbar)
-src/components/fragetypen/pdf/PDFToolbar.tsx   — U23 (Layout-Toggle vertikal)
-src/components/fragetypen/PDFFrage.tsx          — U23 (flex-row bei vertikal)
-src/components/lp/LobbyPhase.tsx               — U14 (Zeitzuschlag inline)
-src/components/lp/AktivPhase.tsx               — U14 (Badge/Button Differenzierung)
-src/components/lp/BeendetPhase.tsx             — U18 (Zeit+-Spalte)
-src/components/lp/KontrollStufeSelect.tsx      — U24 (⚪ Keine Option)
-src/components/lp/DurchfuehrenDashboard.tsx    — U24 (Mapping)
+src/components/fragetypen/pdf/PDFToolbar.tsx   — U23 (vertikal + Farben vertikal)
+src/components/fragetypen/PDFFrage.tsx         — U23 (flex-row bei vertikal)
+src/components/lp/*                            — U14, U18, U24, Demo-Config
 src/hooks/useLockdown.ts                       — U24 ('keine' deaktiviert alles)
 ```
 

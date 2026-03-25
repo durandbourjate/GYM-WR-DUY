@@ -388,12 +388,12 @@ function HilfeDurchfuehrung() {
       <Schritt nr={2}>Wählen Sie die Kurse aus (pro Gefäss, z.B. SF WR). SuS können in mehreren Kursen vorkommen — Duplikate werden automatisch erkannt. Einzelne SuS können über die Checkboxen innerhalb der Kursübersicht ab-/angewählt werden.</Schritt>
       <Schritt nr={3}>Zeitzuschläge (Nachteilsausgleich): Geben Sie die Zusatzminuten direkt neben dem SuS-Namen ein (Eingabefeld in der Teilnehmerliste).</Schritt>
       <Schritt nr={4}>Optional: Einladungs-E-Mails an die ausgewählten SuS versenden.</Schritt>
-      <Schritt nr={5}>Wählen Sie die <strong>Kontrollstufe</strong> (Soft-Lockdown): Locker (Nur Logging), Standard (Copy/Paste-Block, Vollbild, 3 Verstösse = Sperre) oder Streng (Sofort-Pause). iPads werden automatisch auf maximal Standard heruntergestuft.</Schritt>
+      <Schritt nr={5}>Wählen Sie die <strong>Kontrollstufe</strong> (Soft-Lockdown): Keine (keine Einschränkungen, für Übungen), Locker (Nur Logging), Standard (Copy/Paste-Block, Vollbild, 3 Verstösse = Sperre) oder Streng (Sofort-Pause). iPads werden automatisch auf maximal Standard heruntergestuft.</Schritt>
       <Schritt nr={6}>Klicken Sie &laquo;Weiter zur Lobby&raquo; — die Teilnehmer werden gespeichert.</Schritt>
 
       <Untertitel>Phase 2: Lobby</Untertitel>
       <Text>
-        Hier sehen Sie, welche SuS bereit sind (eingeloggt und wartend). Ein Fortschrittsbalken zeigt bereit/ausstehend an. Unerwartete SuS (nicht auf der Teilnehmerliste) werden separat angezeigt. Gerät, Kontrollstufe und SEB-Status sind pro SuS sichtbar. Der Nachteilsausgleich (Zeitzuschlag) kann hier ebenfalls eingesehen und angepasst werden.
+        Hier sehen Sie, welche SuS bereit sind (eingeloggt und wartend). Ein Fortschrittsbalken zeigt bereit/ausstehend an. Unerwartete SuS (nicht auf der Teilnehmerliste) werden separat angezeigt. Gerät, Kontrollstufe und SEB-Status sind pro SuS sichtbar. Zeitzuschläge werden inline pro SuS als ⏱-Badge angezeigt und können über den Nachteilsausgleich-Bereich angepasst werden.
       </Text>
 
       <Untertitel>Phase 3: Live-Monitoring</Untertitel>
@@ -623,7 +623,7 @@ function HilfeFAQ() {
       </FAQItem>
 
       <FAQItem frage="Was ist der Soft-Lockdown?">
-        Der Soft-Lockdown bietet SEB-unabhängige Sicherheit in 3 Stufen: Locker (nur Logging), Standard (Copy/Paste-Block, Vollbild, 3 Verstösse = Sperre) und Streng (Sofort-Pause bei Vollbild-Verlust). iPads werden automatisch erkannt und maximal auf Standard heruntergestuft (da Vollbild dort nicht erzwingbar ist). Bei einer Sperre muss die LP den SuS manuell entsperren.
+        Der Soft-Lockdown bietet SEB-unabhängige Sicherheit in 4 Stufen: Keine (keine Einschränkungen — ideal für Übungen und Einrichtungstests), Locker (nur Logging), Standard (Copy/Paste-Block, Vollbild, 3 Verstösse = Sperre) und Streng (Sofort-Pause bei Vollbild-Verlust). iPads werden automatisch erkannt und maximal auf Standard heruntergestuft (da Vollbild dort nicht erzwingbar ist). Bei einer Sperre muss die LP den SuS manuell entsperren.
       </FAQItem>
 
       <FAQItem frage="Kann ich mehrere Prüfungen gleichzeitig überwachen?">

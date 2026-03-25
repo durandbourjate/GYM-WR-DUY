@@ -10,7 +10,8 @@ Digitale Prüfungsplattform für den Wirtschaft-&-Recht-Unterricht am Gymnasium 
 - Timer mit Countdown oder Open-End (Stoppuhr), Fortschrittsanzeige pro Abschnitt
 - Offline-fähig (PWA): Antworten werden bei Reconnect nachgesendet
 - Light/Dark Mode
-- Korrektur-Einsicht: MC-Optionen mit ✓/✗-Icons, R/F mit farbigen Buttons, Punkte, Kommentare und Audio-Feedback
+- Korrektur-Einsicht: MC-Optionen mit ✓/✗-Icons, R/F mit farbigen Kreisen, Punkte, Kommentare und Audio-Feedback
+- Visuelles Leitsystem: Leere Felder violett umrahmt (Handlungsbedarf), ausgefüllte neutral, Auswahl-Entscheidungen mit grünem/rotem Kreis-Icon
 - FiBu-Farbsystem: Konten-Kategoriefarben nach Lehrmittel (Aktiv=gelb, Passiv=rot, Aufwand=blau, Ertrag=grün)
 
 **Für Lehrpersonen**
@@ -34,7 +35,7 @@ Digitale Prüfungsplattform für den Wirtschaft-&-Recht-Unterricht am Gymnasium 
 - Korrektur-Workflow: Auto-Geprüft bei LP-Aktion, Status-Tracking, Freigabe-Banner
 - Material-Panel: Split-Screen (55%) oder Overlay, unterstützt PDF, Video, Audio, Links
 - SEB-Integration: Auto-Config-Download, harte Durchsetzung, LP-Ausnahmen, SuS-Anleitung
-- Soft-Lockdown (3 Stufen): SEB-unabhängige Sicherheit — Locker (Logging), Standard (Copy/Paste-Block, Vollbild, 3 Verstösse = Sperre), Streng (Sofort-Pause). Automatische iPad-Erkennung mit Downgrade.
+- Soft-Lockdown (4 Stufen): SEB-unabhängige Sicherheit — Keine (für Übungen), Locker (Logging), Standard (Copy/Paste-Block, Vollbild, 3 Verstösse = Sperre), Streng (Sofort-Pause). Automatische iPad-Erkennung mit Downgrade.
 - Multi-Prüfungs-Dashboard: Mehrere Prüfungen parallel in einem Tab überwachen (`?ids=a,b`). Live-Zusammenfassung + Einzelansicht.
 
 **Backend**
@@ -68,7 +69,7 @@ npm run dev
 
 Öffne `http://localhost:5174/GYM-WR-DUY/Pruefung/`
 
-Ohne Backend-Konfiguration startet die App im **Demo-Modus** mit 18 Beispielfragen (alle 13 Fragetypen inkl. Zeichnen + PDF).
+Ohne Backend-Konfiguration startet die App im **Demo-Modus** mit der Einrichtungsprüfung (16 Fragen, alle 13 Fragetypen inkl. Zeichnen + PDF). Kontrollstufe ist auf "Keine" gesetzt (kein Lockdown).
 
 ### Mit Backend (Google Workspace)
 
@@ -149,10 +150,11 @@ seb/                           SEB-Konfiguration
 - Anleitung: [`seb/README.md`](seb/README.md)
 - Wenn `sebErforderlich: true` gesetzt, wird ohne SEB der Start blockiert
 
-**Soft-Lockdown (3 Stufen, SEB-unabhängig):**
+**Soft-Lockdown (4 Stufen, SEB-unabhängig):**
 
 | Stufe | Beschreibung |
 |-------|-------------|
+| Keine | Keine Einschränkungen (für Übungen und Einrichtungstests) |
 | Locker | Nur Logging + Warnung bei Verstössen |
 | Standard | Copy/Paste-Block, Vollbild, Rechtsklick/DevTools gesperrt, 3 Verstösse = Sperre |
 | Streng | Sofort-Pause bei Vollbild-Verlust, SEB empfohlen |
