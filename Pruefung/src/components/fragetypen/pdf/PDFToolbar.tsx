@@ -2,6 +2,8 @@ import { useState, type ReactNode } from 'react'
 import type { PDFAnnotationsWerkzeug, PDFToolbarWerkzeug, PDFKategorie, ZoomStufe } from './PDFTypes.ts'
 import { ZOOM_STUFEN, STANDARD_HIGHLIGHT_FARBEN } from './PDFTypes.ts'
 
+type ToolbarLayout = 'horizontal' | 'vertikal'
+
 interface Props {
   aktivesWerkzeug: PDFToolbarWerkzeug
   onWerkzeugWechsel: (w: PDFToolbarWerkzeug) => void
@@ -19,6 +21,8 @@ interface Props {
   onRedo: () => void
   annotationCount: number
   readOnly?: boolean
+  layout?: ToolbarLayout
+  onLayoutToggle?: () => void
 }
 
 const WERKZEUG_DEFS: { id: PDFAnnotationsWerkzeug; icon: string | ReactNode; label: string }[] = [
@@ -46,7 +50,10 @@ export function PDFToolbar({
   onRedo,
   annotationCount,
   readOnly,
+  layout = 'horizontal',
+  onLayoutToggle,
 }: Props) {
+  const isHorizontal = layout === 'horizontal'
   const [farbPickerOffen, setFarbPickerOffen] = useState(false)
 
   if (readOnly) return null
@@ -75,8 +82,8 @@ export function PDFToolbar({
     <div
       role="toolbar"
       aria-label="PDF-Werkzeuge"
-      aria-orientation="horizontal"
-      className="flex flex-wrap items-center gap-1 p-2 bg-slate-100 dark:bg-slate-800 rounded-lg"
+      aria-orientation={isHorizontal ? 'horizontal' : 'vertical'}
+      className={`flex gap-1 p-2 bg-slate-100 dark:bg-slate-800 rounded-lg ${isHorizontal ? 'flex-wrap items-center' : 'flex-col items-center max-h-full overflow-y-auto'}`}
     >
       {/* Auswahl (immer sichtbar) */}
       <button
@@ -125,7 +132,7 @@ export function PDFToolbar({
       </button>
 
       {/* Separator */}
-      <div className="w-px h-6 bg-slate-300 dark:bg-slate-600 mx-1" aria-hidden="true" />
+      <div className={isHorizontal ? 'w-px h-6 bg-slate-300 dark:bg-slate-600 mx-1' : 'h-px w-6 bg-slate-300 dark:bg-slate-600 my-1'} aria-hidden="true" />
 
       {/* Farbpicker-Dropdown */}
       {zeigeFarbPicker && (
@@ -154,7 +161,7 @@ export function PDFToolbar({
               />
             </button>
           ))}
-          <div className="w-px h-6 bg-slate-300 dark:bg-slate-600 mx-1" aria-hidden="true" />
+          <div className={isHorizontal ? 'w-px h-6 bg-slate-300 dark:bg-slate-600 mx-1' : 'h-px w-6 bg-slate-300 dark:bg-slate-600 my-1'} aria-hidden="true" />
         </div>
       )}
 
@@ -176,7 +183,7 @@ export function PDFToolbar({
               </option>
             ))}
           </select>
-          <div className="w-px h-6 bg-slate-300 dark:bg-slate-600 mx-1" aria-hidden="true" />
+          <div className={isHorizontal ? 'w-px h-6 bg-slate-300 dark:bg-slate-600 mx-1' : 'h-px w-6 bg-slate-300 dark:bg-slate-600 my-1'} aria-hidden="true" />
         </div>
       )}
 
@@ -207,7 +214,7 @@ export function PDFToolbar({
       </div>
 
       {/* Separator */}
-      <div className="w-px h-6 bg-slate-300 dark:bg-slate-600 mx-1" aria-hidden="true" />
+      <div className={isHorizontal ? 'w-px h-6 bg-slate-300 dark:bg-slate-600 mx-1' : 'h-px w-6 bg-slate-300 dark:bg-slate-600 my-1'} aria-hidden="true" />
 
       {/* Zoom-Dropdown */}
       <div role="group" aria-label="Zoom" className="flex items-center">
@@ -225,8 +232,19 @@ export function PDFToolbar({
         </select>
       </div>
 
-      {/* Spacer */}
-      <div className="flex-1" aria-hidden="true" />
+      {/* Spacer (nur horizontal) */}
+      {isHorizontal && <div className="flex-1" aria-hidden="true" />}
+
+      {/* Layout-Toggle */}
+      {onLayoutToggle && (
+        <button
+          title={isHorizontal ? 'Vertikal anordnen' : 'Horizontal anordnen'}
+          onClick={onLayoutToggle}
+          className={btnKlassen(false)}
+        >
+          {isHorizontal ? '⇅' : '⇆'}
+        </button>
+      )}
 
       {/* Annotation-Zähler */}
       <span

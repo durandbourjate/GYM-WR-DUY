@@ -185,7 +185,7 @@ export default function DurchfuehrenDashboard({ pruefungId }: { pruefungId: stri
         // Lockdown-Felder (B19-Fix: fehlten im Mapping)
         geraet: (s.geraet as 'laptop' | 'tablet' | 'unbekannt') || undefined,
         vollbild: s.vollbild === true || s.vollbild === 'true',
-        kontrollStufe: (s.kontrollStufe as 'locker' | 'standard' | 'streng') || undefined,
+        kontrollStufe: (s.kontrollStufe as 'keine' | 'locker' | 'standard' | 'streng') || undefined,
         verstossZaehler: Number(s.verstossZaehler) || 0,
         gesperrt: s.gesperrt === true || s.gesperrt === 'true',
         verstoesse: Array.isArray(s.verstoesse) ? s.verstoesse : (typeof s.verstoesse === 'string' ? (() => { try { return JSON.parse(s.verstoesse as string) } catch { return [] } })() : []),

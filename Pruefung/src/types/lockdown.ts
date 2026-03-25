@@ -1,4 +1,4 @@
-export type KontrollStufe = 'locker' | 'standard' | 'streng'
+export type KontrollStufe = 'keine' | 'locker' | 'standard' | 'streng'
 export type GeraetTyp = 'laptop' | 'tablet' | 'unbekannt'
 
 export interface Verstoss {

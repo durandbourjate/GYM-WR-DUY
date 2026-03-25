@@ -3,6 +3,7 @@ import type { KontrollStufe, Verstoss, LockdownState, GeraetTyp } from '../types
 import { useGeraetErkennung } from './useGeraetErkennung'
 
 function berechneEffektiveStufe(stufe: KontrollStufe, geraet: GeraetTyp): KontrollStufe {
+  if (stufe === 'keine') return 'keine'
   if (geraet === 'tablet' && stufe === 'streng') return 'standard'
   return stufe
 }
@@ -77,7 +78,7 @@ export function useLockdown({ kontrollStufe, maxVerstoesse = 3, aktiv }: UseLock
 
   // === Copy/Paste blockieren (Standard + Streng) ===
   useEffect(() => {
-    if (!aktiv || effektiv === 'locker') return
+    if (!aktiv || effektiv === 'keine' || effektiv === 'locker') return
 
     function blockiere(e: Event) {
       e.preventDefault()
@@ -96,7 +97,7 @@ export function useLockdown({ kontrollStufe, maxVerstoesse = 3, aktiv }: UseLock
 
   // === Rechtsklick blockieren (Standard + Streng) ===
   useEffect(() => {
-    if (!aktiv || effektiv === 'locker') return
+    if (!aktiv || effektiv === 'keine' || effektiv === 'locker') return
 
     function blockiere(e: Event) { e.preventDefault() }
     document.addEventListener('contextmenu', blockiere)
@@ -105,7 +106,7 @@ export function useLockdown({ kontrollStufe, maxVerstoesse = 3, aktiv }: UseLock
 
   // === DevTools-Shortcuts blockieren (Standard + Streng) ===
   useEffect(() => {
-    if (!aktiv || effektiv === 'locker') return
+    if (!aktiv || effektiv === 'keine' || effektiv === 'locker') return
 
     function handleKeydown(e: KeyboardEvent) {
       if (e.key === 'F12') { e.preventDefault(); return }
@@ -123,7 +124,7 @@ export function useLockdown({ kontrollStufe, maxVerstoesse = 3, aktiv }: UseLock
 
   // === Vollbild-Überwachung (Standard + Streng) ===
   useEffect(() => {
-    if (!aktiv || effektiv === 'locker' || !vollbildUnterstuetzt) return
+    if (!aktiv || effektiv === 'keine' || effektiv === 'locker' || !vollbildUnterstuetzt) return
 
     function handleFullscreenChange() {
       const istVollbild = !!document.fullscreenElement
@@ -143,7 +144,7 @@ export function useLockdown({ kontrollStufe, maxVerstoesse = 3, aktiv }: UseLock
 
   // === Split-View-Erkennung (iPad, Standard + Streng) ===
   useEffect(() => {
-    if (!aktiv || effektiv === 'locker' || geraet !== 'tablet') return
+    if (!aktiv || effektiv === 'keine' || effektiv === 'locker' || geraet !== 'tablet') return
 
     const originalBreite = window.innerWidth
 
@@ -159,7 +160,7 @@ export function useLockdown({ kontrollStufe, maxVerstoesse = 3, aktiv }: UseLock
 
   // === iPad CSS-Massnahmen (Standard + Streng) ===
   useEffect(() => {
-    if (!aktiv || effektiv === 'locker') return
+    if (!aktiv || effektiv === 'keine' || effektiv === 'locker') return
 
     const body = document.body
     body.style.setProperty('-webkit-touch-callout', 'none')

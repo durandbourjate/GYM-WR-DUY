@@ -11,38 +11,81 @@
 ### Bekannte Bugs
 | ID | Beschreibung | Priorität |
 |----|-------------|-----------|
-| B24 | Zeichnen Text-Tool: Textfeld erscheint nur ~0.5s (wiederholt — B10-Fix evtl. regressiert) | Hoch |
 | B25 | PDF Text-Annotationen: Bestehende nicht editierbar (wiederholt — B11-Fix prüfen) | Hoch |
-| B26 | Zeichnen Toolbar vertikal spinnt beim Bild (wiederholt — B12 evtl. regressiert) | Hoch |
-| B27 | PDF Spiegelung: Doppelt gespiegelt + rausgezoomt (Touch/Transform-Bug, Undo ging) | Mittel |
-| B28 | SuS zeigt grün im Wartebildschirm vor Lobby-Phase (B14/B17-Fix unvollständig?) | Mittel |
 | B29 | Material PDF halbe Höhe (wiederholt — B18-Fix evtl. regressiert) | Mittel |
-| B30 | Fragen-Navigation buggy: Frage 16 zeigt Inhalt von 15a, Fragen 17+18 fehlen (evtl. B6/B16-Regression) | Hoch |
 
 ### UX-Verbesserungen ausstehend
 | ID | Beschreibung | Priorität |
 |----|-------------|-----------|
-| U12 | Kurs-Auswahl: Direkt einzelne SuS anklicken (nicht erst Kurs), Indeterminate-Checkbox | Hoch |
 | U13 | Ergebnisse + Korrektur zusammenlegen (Accordion-Style, 4→3 Tabs) | Mittel |
-| U14 | Zeitzuschlag inline im Live-Monitoring: Countdown bei Überzeit, "+5 Min" Quick-Button | Hoch |
-| U15 | Farbpalette Zeichnen/PDF: Schwarz + kräftige Farben für Text, Pastell nur für Highlighting | Mittel |
-| U16 | Monitoring-Infos (Verbindung, Gerät) bereits in Lobby anzeigen | Mittel |
-| U17 | Demo-Prüfung an aktuelle Version anpassen (neue Fragetypen) | Niedrig |
-| U18 | Zeitzuschlag im Dashboard/Auswertung sichtbar (aktuell unsichtbar bei erzwungener Abgabe) | Hoch |
-| U19 | MC/Auto-Korrektur: Automatisch korrigierbare Fragen nicht mehr bestätigen müssen (vorgewählt) | Mittel |
-| U20 | Kurs-Auswahl einklappbar in Vorbereitung | Mittel |
 
 ### Performance
 | ID | Beschreibung | Priorität |
 |----|-------------|-----------|
 | P1 | Ladezeit >1 Minute reduzieren (Apps Script + Frontend Optimierung) | Hoch (für breiten Einsatz) |
 
-### Kontext aus Tests (25.03.2026)
-- Toolbar vertikal beim Bild-Fragetyp weiterhin buggy (Screenshot vorhanden)
-- Nachteilsausgleich sollte in Lobby angezeigt werden, nicht nur Vorbereitung
-- SuS-Checkboxen sollten auch bei nicht-angewähltem Kurs sichtbar sein
-- Bei gesperrtem SuS mit Zeitzuschlag: "Erzwungen 0" nach Beenden, Zeitzuschlag nicht in Auswertung sichtbar
-- Gewisse Monitoring-Infos wären schon in Lobby nützlich
+---
+
+## Session 25.03.2026 (13) — Bugfixes + UX aus Live-Tests (Runde 2)
+
+### Status: ERLEDIGT (12 Tasks)
+
+**Plan:** `docs/superpowers/plans/scalable-prancing-chipmunk.md`
+
+### Block 1: Bugfixes (4 Tasks)
+
+| Bug | Beschreibung | Fix |
+|-----|-------------|-----|
+| B31 | Verstösse/Gerät/Kontrolle in Live-Tab immer "—" | Root cause: `const headers` → `let headers` in heartbeat() (const-Reassignment crashte Lockdown-Schreibung) |
+| B28 | SuS "Verbunden" vor Lobby-Eröffnung | 3-State Wartescreen: verbinde → Server erreichbar → Verbunden. Backend sendet `phase` im Heartbeat |
+| B32 | Bilanz Kontenfelder Overflow | `min-w-0 truncate` auf Select, `overflow-hidden` auf BilanzSeite-Container |
+| B26 | Zeichnen Toolbar vertikal mitten im Screen | `flex-row` Wrapper: Toolbar links neben Canvas, `sticky top-20` |
+
+### Block 2: UX-Verbesserungen (8 Tasks)
+
+| Feature | Beschreibung |
+|---------|-------------|
+| U21 Fragen-Navigation Farben | Beantwortet=grün, Offen=violett, Unsicher=amber. Leere Eingabefelder violett umrahmt (FreitextFrage, LueckentextFrage, ZuordnungFrage, MCFrage, BilanzERFrage) |
+| U14 Zeitzuschlag Lobby + Live | Inline-Badge ⏱+N′ pro SuS in Lobby. Live: Info-Badge=solid blau, +5 Button=outline klein |
+| U24 Kontrollstufe "Keine" | 4. Stufe ⚪ Keine — keine Einschränkungen (für Übungen). Typ, Select, Hook, Startbildschirm |
+| U18 Zeitzuschlag Auswertung | Zeit+-Spalte in BeendetPhase-Tabelle mit ⏱+N′ Badge |
+| U22 Canvas vergrösserbar | ⊞/⊟ Toggle über Zeichenfläche, max-w-3xl ↔ max-w-none |
+| U23 PDF-Toolbar vertikal | Layout-Toggle ⇅/⇆ in PDFToolbar, flex-row Wrapper in PDFFrage |
+| U17 Demo-Prüfung | Einrichtungsprüfung hat bereits alle Fragetypen (Zeichnen, PDF, Bilanz, Lückentext, Zuordnung) |
+
+### Geschlossen (aus Tests bestätigt)
+- ~~B24~~ Text-Tool ✅ | ~~B27~~ PDF Spiegelung ✅ | ~~B30~~ Fragen-Navigation ✅
+- ~~U12~~ SuS-Direktauswahl ✅ | ~~U15~~ Farbpalette ✅ | ~~U19~~ MC Auto-Confirm ✅ | ~~U20~~ Kurs einklappbar ✅
+
+### Geänderte Dateien
+
+```
+apps-script-code.js                         — B31 (const→let), B28 (phase in Heartbeat-Response)
+src/types/lockdown.ts                       — U24 (KontrollStufe um 'keine')
+src/types/monitoring.ts                     — B28 (HeartbeatResponse.phase), U24 (kontrollStufe)
+src/types/pruefung.ts                       — U24 (kontrollStufe um 'keine')
+src/services/pruefungApi.ts                 — B28 (phase parsen)
+src/components/Startbildschirm.tsx          — B28 (3-State Wartescreen), U24 (kein Vollbild)
+src/components/FragenNavigation.tsx         — U21 (grün für beantwortet, Legende)
+src/components/fragetypen/FreitextFrage.tsx — U21 (violette Border leer)
+src/components/fragetypen/LueckentextFrage.tsx — U21 (violette Border leer)
+src/components/fragetypen/ZuordnungFrage.tsx   — U21 (violette Border leer)
+src/components/fragetypen/MCFrage.tsx          — U21 (violetter Ring leer)
+src/components/fragetypen/BilanzERFrage.tsx    — B32 (Overflow), U21 (violette Border)
+src/components/fragetypen/ZeichnenFrage.tsx    — B26 (flex-row), U22 (vergrösserbar)
+src/components/fragetypen/pdf/PDFToolbar.tsx   — U23 (Layout-Toggle vertikal)
+src/components/fragetypen/PDFFrage.tsx          — U23 (flex-row bei vertikal)
+src/components/lp/LobbyPhase.tsx               — U14 (Zeitzuschlag inline)
+src/components/lp/AktivPhase.tsx               — U14 (Badge/Button Differenzierung)
+src/components/lp/BeendetPhase.tsx             — U18 (Zeit+-Spalte)
+src/components/lp/KontrollStufeSelect.tsx      — U24 (⚪ Keine Option)
+src/components/lp/DurchfuehrenDashboard.tsx    — U24 (Mapping)
+src/hooks/useLockdown.ts                       — U24 ('keine' deaktiviert alles)
+```
+
+### Apps Script: Änderungen nötig!
+
+→ User muss apps-script-code.js in Apps Script Editor kopieren + neue Bereitstellung erstellen
 
 ---
 

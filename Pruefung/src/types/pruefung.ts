@@ -86,7 +86,7 @@ export interface PruefungsConfig {
   durchfuehrungId?: string;
 
   // Soft-Lockdown: Kontrollstufe (Default: 'standard')
-  kontrollStufe?: 'locker' | 'standard' | 'streng';
+  kontrollStufe?: 'keine' | 'locker' | 'standard' | 'streng';
 }
 
 export interface NotenConfig {

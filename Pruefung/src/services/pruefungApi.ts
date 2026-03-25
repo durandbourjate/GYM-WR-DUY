@@ -103,6 +103,7 @@ export async function heartbeat(
         sebAusnahme: data.sebAusnahme === true ? true : undefined,
         kontrollStufeOverride: data.kontrollStufeOverride || undefined,
         entsperrt: data.entsperrt === true ? true : undefined,
+        phase: data.phase || undefined,
       }
     } catch {
       return { success: response.ok }

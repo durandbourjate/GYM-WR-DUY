@@ -61,6 +61,12 @@ export default function LobbyPhase({ config, schuelerStatus, onFreischalten, onZ
           <div key={s.email} className="flex items-center gap-2 px-3 py-2">
             <span className="text-green-500">🟢</span>
             <span className="flex-1 text-sm text-slate-700 dark:text-slate-200">{s.name}</span>
+            {/* Zeitzuschlag inline */}
+            {(config.zeitverlaengerungen?.[s.email] ?? 0) > 0 && (
+              <span className="text-xs px-1.5 py-0.5 bg-blue-600 dark:bg-blue-700 text-white rounded font-bold" title={`+${config.zeitverlaengerungen![s.email]} Min. Zeitzuschlag`}>
+                ⏱ +{config.zeitverlaengerungen![s.email]}′
+              </span>
+            )}
             {/* Gerät-Icon */}
             <span title={s.geraet === 'tablet' ? 'Tablet' : s.geraet === 'laptop' ? 'Laptop' : 'Gerät unbekannt'}>
               {s.geraet === 'tablet' ? '📱' : '💻'}
@@ -93,6 +99,11 @@ export default function LobbyPhase({ config, schuelerStatus, onFreischalten, onZ
           <div key={t.email} className="flex items-center gap-3 px-3 py-2 opacity-60">
             <span>⚪</span>
             <span className="flex-1 text-sm text-slate-700 dark:text-slate-200">{t.name}, {t.vorname}</span>
+            {(config.zeitverlaengerungen?.[t.email] ?? 0) > 0 && (
+              <span className="text-xs px-1.5 py-0.5 bg-blue-600 dark:bg-blue-700 text-white rounded font-bold" title={`+${config.zeitverlaengerungen![t.email]} Min. Zeitzuschlag`}>
+                ⏱ +{config.zeitverlaengerungen![t.email]}′
+              </span>
+            )}
             <span className="text-xs text-slate-500 dark:text-slate-400">{t.klasse}</span>
             <span className="text-xs text-slate-400 dark:text-slate-500">ausstehend</span>
             <button

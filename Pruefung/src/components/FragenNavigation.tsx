@@ -46,8 +46,8 @@ export default function FragenNavigation() {
                 bgClass = 'bg-amber-50 text-amber-800 border border-amber-300 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-700'
                 statusIcon = '?'
               } else if (istBeantwortet) {
-                // Beantwortet: neutral (erledigt), dezenter Haken
-                bgClass = 'bg-white text-slate-700 border border-slate-300 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-600'
+                // Beantwortet: grün (erledigt), Haken
+                bgClass = 'bg-green-50 text-green-800 border border-green-300 dark:bg-green-900/30 dark:text-green-300 dark:border-green-700'
                 statusIcon = '\u2713'
               } else {
                 // Offen: violett hervorgehoben (noch zu tun)
@@ -68,7 +68,7 @@ export default function FragenNavigation() {
                   {idx + 1}
                   {statusIcon && (
                     <span className={`absolute -top-1 -right-1 text-[10px] font-bold leading-none
-                      ${istMarkiert ? 'text-amber-600 dark:text-amber-400' : 'text-slate-500 dark:text-slate-400'}
+                      ${istMarkiert ? 'text-amber-600 dark:text-amber-400' : 'text-green-600 dark:text-green-400'}
                     `}>
                       {statusIcon}
                     </span>
@@ -86,7 +86,7 @@ export default function FragenNavigation() {
           <span className="w-3 h-3 rounded border border-violet-300 dark:border-violet-700 bg-violet-50 dark:bg-violet-900/30 inline-block" /> Offen
         </span>
         <span className="flex items-center gap-1">
-          <span className="text-slate-500 dark:text-slate-400 font-bold">{'\u2713'}</span> Beantwortet
+          <span className="w-3 h-3 rounded border border-green-300 dark:border-green-700 bg-green-50 dark:bg-green-900/30 inline-block" /> <span className="text-green-600 dark:text-green-400 font-bold">{'\u2713'}</span> Beantwortet
         </span>
         <span className="flex items-center gap-1">
           <span className="text-amber-600 dark:text-amber-400 font-bold">?</span> Unsicher

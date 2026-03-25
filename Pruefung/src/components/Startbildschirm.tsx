@@ -33,6 +33,8 @@ export default function Startbildschirm({ config, fragen, alleFragen, wiederherg
   const [hatSebAusnahme, setHatSebAusnahme] = useState(false)
   // Heartbeat erfolgreich: Verbindung zum Server steht
   const [heartbeatErfolgreich, setHeartbeatErfolgreich] = useState(false)
+  // Phase: LP hat Lobby eröffnet (freigeschaltet im Backend)
+  const [lobbyOffen, setLobbyOffen] = useState(false)
   // SuS hat Ausnahme bei LP angefragt
   const [ausnahmeAngefragt, setAusnahmeAngefragt] = useState(false)
 
@@ -45,6 +47,7 @@ export default function Startbildschirm({ config, fragen, alleFragen, wiederherg
     if (apiService.istKonfiguriert()) {
       apiService.heartbeat(config.id, user.email).then((response) => {
         setHeartbeatErfolgreich(true)
+        if (response.phase === 'lobby') setLobbyOffen(true)
         if (response.sebAusnahme) setHatSebAusnahme(true)
       }).catch(() => {})
     }
@@ -60,9 +63,10 @@ export default function Startbildschirm({ config, fragen, alleFragen, wiederherg
         apiService.ladePruefung(config.id, user.email),
       ])
 
-      // SEB-Ausnahme aus Heartbeat prüfen
+      // SEB-Ausnahme + Phase aus Heartbeat prüfen
       if (heartbeatResult.status === 'fulfilled' && heartbeatResult.value) {
         setHeartbeatErfolgreich(true)
+        if (heartbeatResult.value.phase === 'lobby') setLobbyOffen(true)
         if (heartbeatResult.value.sebAusnahme) setHatSebAusnahme(true)
       }
 
@@ -87,7 +91,7 @@ export default function Startbildschirm({ config, fragen, alleFragen, wiederherg
     // Vollbild bei Standard/Streng auf Laptop
     const stufe = config.kontrollStufe || 'standard'
     const geraet = erkenneGeraet()
-    if (stufe !== 'locker' && geraet === 'laptop') {
+    if (stufe !== 'keine' && stufe !== 'locker' && geraet === 'laptop') {
       try {
         const el = document.documentElement
         if (el.requestFullscreen) await el.requestFullscreen()
@@ -153,9 +157,13 @@ export default function Startbildschirm({ config, fragen, alleFragen, wiederherg
             <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-2">
               {config.titel}
             </h1>
-            {heartbeatErfolgreich ? (
+            {heartbeatErfolgreich && lobbyOffen ? (
+              <p className="text-sm text-green-600 dark:text-green-400 mb-1">
+                ● Verbunden — warte auf Freischaltung durch Lehrperson
+              </p>
+            ) : heartbeatErfolgreich ? (
               <p className="text-sm text-slate-500 dark:text-slate-400 mb-1">
-                ● Verbindung hergestellt — warte auf Freischaltung durch Lehrperson
+                ● Server erreichbar — Warteraum noch nicht geöffnet
               </p>
             ) : (
               <p className="text-sm text-slate-500 dark:text-slate-400 mb-1 animate-pulse">

@@ -131,7 +131,7 @@ export default function ZuordnungFrage({ frage }: Props) {
                 className={`flex-1 max-w-[50%] px-3 py-2 rounded-lg border text-sm transition-colors
                   ${aktuelleZuordnung
                     ? 'border-indigo-400 dark:border-indigo-500 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100'
-                    : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400'
+                    : 'border-violet-400 dark:border-violet-500 bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400'
                   }
                   ${abgegeben ? 'cursor-not-allowed' : 'cursor-pointer'}
                 `}

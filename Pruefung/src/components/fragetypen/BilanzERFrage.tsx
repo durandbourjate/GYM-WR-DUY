@@ -171,12 +171,12 @@ function KontoRow({ konto, konten, readOnly, onNrChange, onBetragChange, onRemov
   return (
     <div className="flex items-center gap-1">
       <select value={konto.nr} onChange={e => onNrChange(e.target.value)} disabled={readOnly}
-        className={`${inputSm} flex-1`}>
+        className={`${inputSm} flex-1 min-w-0 truncate ${!readOnly && !konto.nr ? 'border-violet-400 dark:border-violet-500' : ''}`}>
         <option value="">Konto...</option>
         {konten.map(nr => <option key={nr} value={nr}>{nr} {kontoLabel(nr)}</option>)}
       </select>
       <input type="number" value={konto.betrag} onChange={e => onBetragChange(e.target.value)} disabled={readOnly}
-        placeholder="CHF" min="0" step="0.01" className={`${numInput} w-24`} />
+        placeholder="CHF" min="0" step="0.01" className={`${numInput} w-24 ${!readOnly && !konto.betrag ? 'border-violet-400 dark:border-violet-500' : ''}`} />
       {!readOnly && canRemove && (
         <button type="button" onClick={onRemove} className={btnRemove} title="Entfernen">×</button>
       )}
@@ -219,7 +219,7 @@ function BilanzSeiteUI({ seite, bilanzsumme, readOnly, konten, onUpdate, onBsCha
       : 'border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/30'
 
   return (
-    <div className={`rounded-lg border p-3 ${farbe}`}>
+    <div className={`rounded-lg border p-3 min-w-0 overflow-hidden ${farbe}`}>
       <select value={seite.label} onChange={e => onUpdate(s => { s.label = e.target.value })} disabled={readOnly}
         className={`${inputSm} w-full font-bold mb-3`}>
         <option value="">-- Seite wählen --</option>

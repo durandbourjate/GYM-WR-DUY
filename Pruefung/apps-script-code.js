@@ -936,7 +936,7 @@ function heartbeat(body) {
 
     if (existingRow >= 0) {
       const rowIndex = existingRow + 2;
-      const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+      let headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
       const heartbeatCol = headers.indexOf('letzterHeartbeat');
       const countCol = headers.indexOf('heartbeats');
       if (heartbeatCol >= 0) {
@@ -1049,8 +1049,9 @@ function heartbeat(body) {
         }
       }
 
-      // 2. Global (aus Configs-Sheet) falls kein individuelles + SEB-Ausnahme prüfen
+      // 2. Global (aus Configs-Sheet) falls kein individuelles + SEB-Ausnahme + Phase prüfen
       var sebAusnahme = false;
+      var pruefungFreigeschaltet = false;
       if (!beendetUm) {
         const configSheet = SpreadsheetApp.openById(CONFIGS_ID).getSheetByName('Configs');
         if (configSheet) {
@@ -1075,6 +1076,11 @@ function heartbeat(body) {
                   sebAusnahme = true;
                 }
               }
+              // Freischaltung prüfen (für Phase-Info an SuS)
+              const freiCol = configHeaders.indexOf('freigeschaltet');
+              if (freiCol >= 0 && configData[i][freiCol] === 'true') {
+                pruefungFreigeschaltet = true;
+              }
               break;
             }
           }
@@ -1087,11 +1093,17 @@ function heartbeat(body) {
           const cd2 = configSheet2.getDataRange().getValues();
           const ci2 = ch2.indexOf('id');
           const sa2 = ch2.indexOf('sebAusnahmen');
-          if (sa2 >= 0) {
+          const fr2 = ch2.indexOf('freigeschaltet');
+          if (sa2 >= 0 || fr2 >= 0) {
             for (var j = 1; j < cd2.length; j++) {
               if (cd2[j][ci2] === pruefungId) {
-                var ausn2 = safeJsonParse(cd2[j][sa2], []);
-                if (ausn2.indexOf(email) >= 0) sebAusnahme = true;
+                if (sa2 >= 0) {
+                  var ausn2 = safeJsonParse(cd2[j][sa2], []);
+                  if (ausn2.indexOf(email) >= 0) sebAusnahme = true;
+                }
+                if (fr2 >= 0 && cd2[j][fr2] === 'true') {
+                  pruefungFreigeschaltet = true;
+                }
                 break;
               }
             }
@@ -1104,7 +1116,8 @@ function heartbeat(body) {
         ...(beendetUm ? { beendetUm: beendetUm, restzeitMinuten: restzeitMinutenWert } : {}),
         ...(sebAusnahme ? { sebAusnahme: true } : {}),
         ...(kontrollStufeOverride ? { kontrollStufeOverride: kontrollStufeOverride } : {}),
-        ...(entsperrt ? { entsperrt: true } : {})
+        ...(entsperrt ? { entsperrt: true } : {}),
+        ...(pruefungFreigeschaltet ? { phase: 'lobby' } : { phase: 'vorbereitung' })
       });
     }
 

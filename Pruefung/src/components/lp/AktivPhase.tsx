@@ -465,7 +465,7 @@ function ZeitzuschlagInline({ email, zuschlagMin, basisEndeMs, jetzt, istAktiv, 
         <button
           type="button"
           onClick={() => onAendern(email, zuschlagMin + 5)}
-          className="text-xs px-1 py-0.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:text-blue-400 dark:hover:bg-blue-900/20 rounded cursor-pointer transition-colors"
+          className="text-[10px] px-1 py-0.5 border border-slate-300 dark:border-slate-600 text-slate-500 dark:text-slate-400 hover:border-blue-400 hover:text-blue-600 dark:hover:border-blue-500 dark:hover:text-blue-400 rounded cursor-pointer transition-colors"
           title="+5 Min. hinzufügen"
         >
           +5
@@ -480,15 +480,15 @@ function ZeitzuschlagInline({ email, zuschlagMin, basisEndeMs, jetzt, istAktiv, 
       <button
         type="button"
         onClick={() => setZeigEditor(true)}
-        className="text-xs px-1.5 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded cursor-pointer hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors"
+        className="text-xs px-2 py-0.5 bg-blue-600 dark:bg-blue-700 text-white rounded font-bold cursor-pointer hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors"
         title={`+${zuschlagMin} Min. Zeitzuschlag — klicken zum Bearbeiten`}
       >
-        +{zuschlagMin}′
+        ⏱ +{zuschlagMin}′
       </button>
       <button
         type="button"
         onClick={() => onAendern(email, zuschlagMin + 5)}
-        className="text-xs px-1 py-0.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:text-blue-400 dark:hover:bg-blue-900/20 rounded cursor-pointer transition-colors"
+        className="text-[10px] px-1 py-0.5 border border-slate-300 dark:border-slate-600 text-slate-500 dark:text-slate-400 hover:border-blue-400 hover:text-blue-600 dark:hover:border-blue-500 dark:hover:text-blue-400 rounded cursor-pointer transition-colors"
         title="+5 Min. hinzufügen"
       >
         +5

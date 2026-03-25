@@ -7,6 +7,7 @@ interface Props {
 }
 
 const STUFEN: { key: KontrollStufe; label: string; icon: string; beschreibung: string }[] = [
+  { key: 'keine', label: 'Keine', icon: '⚪', beschreibung: 'Keine Einschränkungen (für Übungen)' },
   { key: 'locker', label: 'Locker', icon: '🟢', beschreibung: 'Nur Logging + Warnung' },
   { key: 'standard', label: 'Standard', icon: '🟡', beschreibung: 'Copy/Paste-Block, Vollbild, 3 Verstösse → Sperre' },
   { key: 'streng', label: 'Streng', icon: '🔴', beschreibung: 'Sofort-Pause bei Verstoss, SEB empfohlen' },
@@ -33,7 +34,7 @@ export function KontrollStufeSelect({ value, onChange, disabled }: Props) {
                   : disabled
                     ? 'bg-slate-100 text-slate-400 cursor-not-allowed dark:bg-slate-800 dark:text-slate-600'
                     : 'bg-white text-slate-700 hover:bg-slate-50 dark:bg-slate-900 dark:text-slate-300'
-              } ${s.key !== 'locker' ? 'border-l border-slate-300 dark:border-slate-600' : ''}`}
+              } ${s.key !== 'keine' ? 'border-l border-slate-300 dark:border-slate-600' : ''}`}
             >
               {s.icon} {s.label}
             </button>

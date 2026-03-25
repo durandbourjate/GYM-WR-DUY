@@ -41,6 +41,7 @@ export default function BeendetPhase({ config, schuelerStatus, fragen, abgaben, 
               <th className="px-3 py-2">Name</th>
               <th className="px-3 py-2">Status</th>
               <th className="px-3 py-2">Abgabe</th>
+              <th className="px-3 py-2">Zeit+</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
@@ -59,6 +60,13 @@ export default function BeendetPhase({ config, schuelerStatus, fragen, abgaben, 
                     {s.abgabezeit
                       ? new Date(s.abgabezeit).toLocaleTimeString('de-CH', { hour: '2-digit', minute: '2-digit' })
                       : '—'}
+                  </td>
+                  <td className="px-3 py-2 text-xs">
+                    {(config.zeitverlaengerungen?.[s.email] ?? 0) > 0 ? (
+                      <span className="px-1.5 py-0.5 bg-blue-600 dark:bg-blue-700 text-white rounded font-bold">
+                        ⏱ +{config.zeitverlaengerungen![s.email]}′
+                      </span>
+                    ) : null}
                   </td>
                 </tr>
               ))}

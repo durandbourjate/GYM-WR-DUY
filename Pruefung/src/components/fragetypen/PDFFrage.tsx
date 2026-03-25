@@ -48,6 +48,7 @@ export default function PDFFrage({ frage }: Props) {
     frage.kategorien?.[0]?.id,
   )
   const [zoom, setZoom] = useState<ZoomStufe>(1)
+  const [toolbarLayout, setToolbarLayout] = useState<'horizontal' | 'vertikal'>('horizontal')
 
   // Refs for stale-closure safety
   const frageIdRef = useRef(frage.id)
@@ -198,32 +199,37 @@ export default function PDFFrage({ frage }: Props) {
         dangerouslySetInnerHTML={{ __html: renderMarkdown(frage.fragetext) }}
       />
 
-      {/* Toolbar (hidden when submitted) */}
-      {!abgegeben && (
-        <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-1">
-          <PDFToolbar
-            aktivesWerkzeug={aktivesWerkzeug}
-            onWerkzeugWechsel={setAktivesWerkzeug}
-            erlaubteWerkzeuge={frage.erlaubteWerkzeuge}
-            kategorien={frage.kategorien}
-            aktiveFarbe={aktiveFarbe}
-            onFarbeWechsel={setAktiveFarbe}
-            aktiveKategorieId={aktiveKategorieId}
-            onKategorieWechsel={setAktiveKategorieId}
-            zoom={zoom}
-            onZoomWechsel={setZoom}
-            kannUndo={kannUndo}
-            kannRedo={kannRedo}
-            onUndo={undo}
-            onRedo={redo}
-            annotationCount={annotationen.length}
-            readOnly={abgegeben}
-          />
-        </div>
-      )}
+      {/* Toolbar + Viewer Container */}
+      <div className={toolbarLayout === 'vertikal' ? 'flex flex-row gap-2' : 'flex flex-col gap-4'}>
+        {/* Toolbar (hidden when submitted) */}
+        {!abgegeben && (
+          <div className={`bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-1 ${toolbarLayout === 'vertikal' ? 'flex-shrink-0 self-start sticky top-20' : ''}`}>
+            <PDFToolbar
+              aktivesWerkzeug={aktivesWerkzeug}
+              onWerkzeugWechsel={setAktivesWerkzeug}
+              erlaubteWerkzeuge={frage.erlaubteWerkzeuge}
+              kategorien={frage.kategorien}
+              aktiveFarbe={aktiveFarbe}
+              onFarbeWechsel={setAktiveFarbe}
+              aktiveKategorieId={aktiveKategorieId}
+              onKategorieWechsel={setAktiveKategorieId}
+              zoom={zoom}
+              onZoomWechsel={setZoom}
+              kannUndo={kannUndo}
+              kannRedo={kannRedo}
+              onUndo={undo}
+              onRedo={redo}
+              annotationCount={annotationen.length}
+              readOnly={abgegeben}
+              layout={toolbarLayout}
+              onLayoutToggle={() => setToolbarLayout(l => l === 'horizontal' ? 'vertikal' : 'horizontal')}
+            />
+          </div>
+        )}
 
-      {/* PDF Viewer */}
-      <PDFViewer
+        {/* PDF Viewer */}
+        <div className={toolbarLayout === 'vertikal' ? 'flex-1 min-w-0' : 'w-full'}>
+        <PDFViewer
         renderer={renderer}
         seitenAnzahl={seitenAnzahl}
         zoom={zoom}
@@ -237,6 +243,8 @@ export default function PDFFrage({ frage }: Props) {
         onAnnotationEditieren={handleAnnotationEditieren}
         readOnly={abgegeben}
       />
+        </div>
+      </div>
 
       {/* Status bar */}
       <div className="flex items-center justify-between text-xs text-slate-400 dark:text-slate-500">

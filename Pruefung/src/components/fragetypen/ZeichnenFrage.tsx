@@ -54,10 +54,17 @@ export default function ZeichnenFrage({ frage }: Props) {
   // Aktive Farbe (erste aus Konfiguration)
   const [aktiveFarbe, setAktiveFarbe] = useState<string>(verfuegbareFarben[0] ?? '#000000')
 
-  // Toolbar-Layout: immer horizontal (vertikal überlappt den Canvas)
+  // Toolbar-Layout: aus localStorage laden (Standard: horizontal)
   const [toolbarLayout, setToolbarLayout] = useState<ToolbarLayout>(() => {
+    try {
+      const saved = localStorage.getItem(TOOLBAR_LAYOUT_KEY)
+      if (saved === 'vertikal' || saved === 'horizontal') return saved
+    } catch { /* ignorieren */ }
     return 'horizontal'
   })
+
+  // Canvas vergrössern/verkleinern
+  const [canvasGross, setCanvasGross] = useState(false)
 
   // Aktuell geladene Daten aus Store (beim Fragewechsel synchronisieren)
   const gespeicherteAntwort = antworten[frage.id]
@@ -198,40 +205,53 @@ export default function ZeichnenFrage({ frage }: Props) {
         dangerouslySetInnerHTML={{ __html: renderMarkdown(frage.fragetext) }}
       />
 
-      {/* Toolbar (nur wenn nicht abgegeben) */}
-      {!abgegeben && (
-        <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-1">
-          <ZeichnenToolbar
+      {/* Toolbar + Canvas Container */}
+      <div className={toolbarLayout === 'vertikal' ? 'flex flex-row gap-2' : 'flex flex-col gap-4'}>
+        {/* Toolbar (nur wenn nicht abgegeben) */}
+        {!abgegeben && (
+          <div className={`bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-1 ${toolbarLayout === 'vertikal' ? 'flex-shrink-0 self-start sticky top-20' : ''}`}>
+            <ZeichnenToolbar
+              aktivesTool={aktivesTool}
+              onToolChange={setAktivesTool}
+              aktiveFarbe={aktiveFarbe}
+              onFarbeChange={setAktiveFarbe}
+              verfuegbareWerkzeuge={canvasConfig.werkzeuge}
+              verfuegbareFarben={verfuegbareFarben}
+              radiererAktiv={canvasConfig.radierer ?? true}
+              layout={toolbarLayout}
+              onLayoutToggle={handleLayoutToggle}
+              onUndo={handleUndo}
+              onRedo={handleRedo}
+              onAllesLoeschen={handleAllesLoeschen}
+              kannUndo={kannUndoRef.current}
+              kannRedo={kannRedoRef.current}
+              disabled={abgegeben}
+            />
+          </div>
+        )}
+
+        {/* Vergrössern-Button + Zeichenfläche */}
+        <div className={`overflow-x-auto ${toolbarLayout === 'vertikal' ? 'flex-1 min-w-0' : 'w-full'} ${canvasGross ? 'max-w-none' : 'max-w-3xl'}`}>
+          {!abgegeben && (
+            <button
+              type="button"
+              onClick={() => setCanvasGross(!canvasGross)}
+              className="mb-1 text-xs px-2 py-1 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded cursor-pointer transition-colors"
+              title={canvasGross ? 'Zeichenfläche verkleinern' : 'Zeichenfläche vergrössern'}
+            >
+              {canvasGross ? '⊟ Verkleinern' : '⊞ Vergrössern'}
+            </button>
+          )}
+          <ZeichnenCanvas
+            canvasConfig={canvasConfig}
             aktivesTool={aktivesTool}
-            onToolChange={setAktivesTool}
             aktiveFarbe={aktiveFarbe}
-            onFarbeChange={setAktiveFarbe}
-            verfuegbareWerkzeuge={canvasConfig.werkzeuge}
-            verfuegbareFarben={verfuegbareFarben}
-            radiererAktiv={canvasConfig.radierer ?? true}
-            layout={toolbarLayout}
-            onLayoutToggle={handleLayoutToggle}
-            onUndo={handleUndo}
-            onRedo={handleRedo}
-            onAllesLoeschen={handleAllesLoeschen}
-            kannUndo={kannUndoRef.current}
-            kannRedo={kannRedoRef.current}
+            initialDaten={gespeicherteDaten}
+            onDatenChange={handleDatenChange}
+            onPNGExport={handlePNGExport}
             disabled={abgegeben}
           />
         </div>
-      )}
-
-      {/* Zeichenfläche */}
-      <div className="w-full overflow-x-auto">
-        <ZeichnenCanvas
-          canvasConfig={canvasConfig}
-          aktivesTool={aktivesTool}
-          aktiveFarbe={aktiveFarbe}
-          initialDaten={gespeicherteDaten}
-          onDatenChange={handleDatenChange}
-          onPNGExport={handlePNGExport}
-          disabled={abgegeben}
-        />
       </div>
 
       {/* Daten-Grösse-Warnung */}

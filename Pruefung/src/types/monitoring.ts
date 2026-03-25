@@ -49,7 +49,7 @@ export interface SchuelerStatus {
   /** Lockdown-Info */
   geraet?: 'laptop' | 'tablet' | 'unbekannt'
   vollbild?: boolean
-  kontrollStufe?: 'locker' | 'standard' | 'streng'
+  kontrollStufe?: 'keine' | 'locker' | 'standard' | 'streng'
   verstossZaehler?: number
   gesperrt?: boolean
   verstoesse?: Array<{ zeitpunkt: string; typ: string; dauer_sekunden?: number }>
@@ -71,8 +71,9 @@ export interface HeartbeatResponse {
   beendetUm?: string        // ISO-Timestamp — LP hat Prüfung beendet
   restzeitMinuten?: number   // Original-Restzeit (für Nachteilsausgleich)
   sebAusnahme?: boolean      // LP hat SEB-Ausnahme für diesen SuS erteilt
-  kontrollStufeOverride?: 'locker' | 'standard' | 'streng'  // LP hat Kontrollstufe geändert
+  kontrollStufeOverride?: 'keine' | 'locker' | 'standard' | 'streng'  // LP hat Kontrollstufe geändert
   entsperrt?: boolean        // LP hat SuS entsperrt
+  phase?: 'vorbereitung' | 'lobby'  // Aktuelle Phase (für Warteraum-Anzeige)
 }
 
 /** Nachricht von LP an SuS während einer Prüfung */
