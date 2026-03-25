@@ -166,9 +166,8 @@ export default function TKontoFrage({ frage }: Props) {
 
   function feldAendern(kontoIdx: number, feld: keyof KontoEingabe, wert: string) {
     const kopie = deepCopy()
-    const k = kopie[kontoIdx]
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ;(k as any)[feld] = wert
+    // Typsicheres Update: feld ist garantiert ein Key von KontoEingabe
+    Object.assign(kopie[kontoIdx], { [feld]: wert })
     aktualisiere(kopie)
   }
 

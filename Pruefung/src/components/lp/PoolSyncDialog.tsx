@@ -73,17 +73,10 @@ export default function PoolSyncDialog({ offen, onSchliessen, bestehendeFragen, 
       setFortschritt('Berechne Änderungen...')
       setFortschrittProzent(100)
 
-      // Debug: Fragenbank-Infos loggen
       const poolFragen = bestehendeFragen.filter(f => f.poolId)
-      console.log(`[PoolSync] Bestehende Fragen: ${bestehendeFragen.length}, davon mit poolId: ${poolFragen.length}`)
-      if (poolFragen.length > 0) {
-        console.log('[PoolSync] Beispiel poolId:', poolFragen[0].poolId)
-      }
-
       const fragenMap = new Map(
         poolFragen.map(f => [f.poolId!, f])
       )
-      console.log(`[PoolSync] FragenMap Grösse: ${fragenMap.size}`)
 
       const delta = await berechneDelta(configs, fragenMap)
 
