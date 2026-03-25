@@ -1520,7 +1520,8 @@ function speichereConfig(body) {
       freigeschaltet: config.freigeschaltet ? 'true' : 'false',
       zeitverlaengerungen: JSON.stringify(config.zeitverlaengerungen || {}),
       sebAusnahmen: JSON.stringify(config.sebAusnahmen || []),
-      materialien: JSON.stringify(config.materialien || []),
+      // materialien nur schreiben wenn explizit vorhanden (verhindert Überschreiben mit [])
+      ...(config.materialien !== undefined ? { materialien: JSON.stringify(config.materialien) } : {}),
       zeitModus: config.zeitModus || 'countdown',
     };
 
@@ -3213,7 +3214,40 @@ function korrekturFreigebenEndpoint(body) {
     }
     configSheet.getRange(rowIndex + 2, col + 1).setValue(freigegeben ? 'true' : 'false');
 
-    return jsonResponse({ success: true });
+    // Bei Einsicht-Freigabe: SuS per E-Mail benachrichtigen
+    let benachrichtigt = 0;
+    if (freigegeben && typ !== 'pdf') {
+      try {
+        const configRow = data[rowIndex];
+        const titel = configRow.titel || pruefungId;
+        const teilnehmer = safeJsonParse(configRow.teilnehmer, []);
+        const appUrl = ScriptApp.getService().getUrl().replace('/exec', '').replace('/dev', '');
+        // Basis-URL aus der Deployment-URL ableiten (GitHub Pages)
+        const pruefungUrl = 'https://durandbourjate.github.io/GYM-WR-DUY/Pruefung/';
+
+        for (const sus of teilnehmer) {
+          if (!sus.email) continue;
+          try {
+            MailApp.sendEmail({
+              to: sus.email,
+              subject: 'Korrektur verfügbar: ' + titel,
+              htmlBody: '<p>Hallo ' + (sus.vorname || sus.name || '') + '</p>' +
+                '<p>Die Korrektur für <strong>' + titel + '</strong> ist verfügbar.</p>' +
+                '<p><a href="' + pruefungUrl + '">Jetzt einsehen →</a></p>' +
+                '<p style="color:#888;font-size:12px">Öffne den Link und melde dich mit deinem Schulkonto an, um deine Korrektur einzusehen.</p>',
+            });
+            benachrichtigt++;
+          } catch (mailErr) {
+            console.log('Mail-Fehler für ' + sus.email + ': ' + mailErr.message);
+          }
+        }
+      } catch (notifyErr) {
+        console.log('Benachrichtigung fehlgeschlagen: ' + notifyErr.message);
+        // Freigabe war erfolgreich, Benachrichtigung ist optional
+      }
+    }
+
+    return jsonResponse({ success: true, benachrichtigt: benachrichtigt });
   } catch (error) {
     return jsonResponse({ error: error.message });
   }

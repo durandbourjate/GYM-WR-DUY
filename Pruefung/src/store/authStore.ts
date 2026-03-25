@@ -38,6 +38,27 @@ interface AuthStore {
   setFehler: (fehler: string | null) => void
 }
 
+/**
+ * Räumt den Prüfungszustand auf — aber NUR wenn die Prüfung bereits abgegeben
+ * oder beendet wurde. Bei laufender Prüfung bleibt der State erhalten,
+ * damit SuS sich nach Browser-Crash wieder einloggen können.
+ */
+function resetPruefungState(): void {
+  const pruefungId = new URLSearchParams(window.location.search).get('id') || 'default'
+  const state = usePruefungStore.getState()
+
+  // Nur aufräumen wenn abgegeben oder beendet — NICHT bei laufender Prüfung!
+  if (state.abgegeben || state.beendetUm) {
+    console.log(`[auth] Prüfung ${pruefungId}: State wird aufgeräumt (abgegeben=${state.abgegeben}, beendet=${!!state.beendetUm})`)
+    usePruefungStore.getState().zuruecksetzen()
+    try { localStorage.removeItem(`pruefung-state-${pruefungId}`) } catch { /* ignore */ }
+    clearIndexedDB(pruefungId).catch(() => {})
+    clearQueue().catch(() => {})
+  } else {
+    console.log(`[auth] Prüfung ${pruefungId}: State bleibt erhalten (Prüfung läuft oder noch nicht gestartet)`)
+  }
+}
+
 export const useAuthStore = create<AuthStore>((set) => ({
   user: restoreSession(),
   istDemoModus: restoreDemoFlag(),
@@ -54,6 +75,8 @@ export const useAuthStore = create<AuthStore>((set) => ({
       bild: credential.picture,
       rolle,
     }
+    // Alten Prüfungszustand aufräumen (verhindert stale State nach Re-Login)
+    resetPruefungState()
     saveSession(user, false)
     set({ user, istDemoModus: false, ladeStatus: 'fertig', fehler: null })
   },
@@ -67,6 +90,8 @@ export const useAuthStore = create<AuthStore>((set) => ({
       rolle: 'sus',
       schuelerId,
     }
+    // Alten Prüfungszustand aufräumen (verhindert stale State nach Re-Login)
+    resetPruefungState()
     saveSession(user, false)
     set({ user, istDemoModus: false, ladeStatus: 'fertig', fehler: null })
   },
@@ -93,13 +118,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
 
   abmelden: () => {
     clearSession()
-    usePruefungStore.getState().zuruecksetzen()
-    // Persistierten Prüfungszustand löschen (dynamischer Key mit pruefungId)
-    const pruefungId = new URLSearchParams(window.location.search).get('id') || 'default'
-    try { localStorage.removeItem(`pruefung-state-${pruefungId}`) } catch { /* ignore */ }
-    // IndexedDB-Backup + RetryQueue aufräumen (verhindert Zombie-Daten)
-    clearIndexedDB(pruefungId).catch(() => {})
-    clearQueue().catch(() => {})
+    resetPruefungState()
     set({ user: null, istDemoModus: false, ladeStatus: 'idle', fehler: null })
   },
 

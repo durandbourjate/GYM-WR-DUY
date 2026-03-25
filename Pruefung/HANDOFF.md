@@ -6,6 +6,26 @@
 
 ---
 
+## Session 25.03.2026 (7) — Login-Reset, Material-Fix, SuS-Benachrichtigung
+
+### Erledigt
+
+- **F4: Smart Login-Reset:** Bei jedem Login wird geprüft ob die Prüfung bereits abgegeben oder beendet wurde. Nur dann wird der State aufgeräumt. Bei laufender Prüfung bleibt der State erhalten → SuS können sich nach Browser-Crash wieder einloggen.
+- **F7: Material-Button verschwindet:** Bug in `speichereConfig()` (Apps Script) — `materialien` wurde bei jedem Config-Save mit `[]` überschrieben wenn das Frontend-Objekt kein `materialien`-Feld enthielt. Fix: `materialien` wird nur noch geschrieben wenn explizit vorhanden.
+- **F12: SuS-Benachrichtigung bei Freigabe:** `korrekturFreigebenEndpoint` sendet jetzt automatisch E-Mail an alle Teilnehmer wenn Einsicht freigegeben wird. E-Mail enthält Link zur App.
+
+### Apps Script Änderungen (manuell kopieren!)
+- `korrekturFreigebenEndpoint`: E-Mail-Versand an SuS bei Einsicht-Freigabe
+- `speichereConfig`: `materialien` nur schreiben wenn explizit im Config-Objekt vorhanden
+
+### Geänderte Dateien
+```
+src/store/authStore.ts     — resetPruefungState() (smart: nur bei abgegeben/beendet)
+apps-script-code.js        — korrekturFreigebenEndpoint + speichereConfig Fix
+```
+
+---
+
 ## Session 25.03.2026 (6) — LP-Test-Feedback Runde 3
 
 ### Erledigt (9 Fixes)
