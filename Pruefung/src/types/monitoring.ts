@@ -45,6 +45,14 @@ export interface SchuelerStatus {
   /** SEB-Info */
   sebVersion?: string
   browserInfo?: string
+
+  /** Lockdown-Info */
+  geraet?: 'laptop' | 'tablet' | 'unbekannt'
+  vollbild?: boolean
+  kontrollStufe?: 'locker' | 'standard' | 'streng'
+  verstossZaehler?: number
+  gesperrt?: boolean
+  verstoesse?: Array<{ zeitpunkt: string; typ: string; dauer_sekunden?: number }>
 }
 
 /** Zusammenfassung der Prüfungs-Monitoring-Daten für LP */
@@ -63,6 +71,8 @@ export interface HeartbeatResponse {
   beendetUm?: string        // ISO-Timestamp — LP hat Prüfung beendet
   restzeitMinuten?: number   // Original-Restzeit (für Nachteilsausgleich)
   sebAusnahme?: boolean      // LP hat SEB-Ausnahme für diesen SuS erteilt
+  kontrollStufeOverride?: 'locker' | 'standard' | 'streng'  // LP hat Kontrollstufe geändert
+  entsperrt?: boolean        // LP hat SuS entsperrt
 }
 
 /** Nachricht von LP an SuS während einer Prüfung */

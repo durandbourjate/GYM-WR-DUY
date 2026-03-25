@@ -6,6 +6,69 @@
 
 ---
 
+## Session 25.03.2026 (10) — Multi-Prüfung + Soft-Lockdown (Beginn)
+
+### Status: IN ARBEIT (Tasks 1-5 von 12 erledigt)
+
+**Spec:** `docs/superpowers/specs/2026-03-25-multi-pruefung-soft-lockdown-design.md`
+**Plan:** `docs/superpowers/plans/2026-03-25-multi-pruefung-soft-lockdown.md`
+
+### Zwei Features
+
+1. **Multi-Prüfungs-Dashboard:** LP kann mehrere Prüfungen parallel in einem Tab überwachen (Use-Case: Nachprüfungstermin). URL: `?ids=pruefung-a,pruefung-b`. Vorbereitung/Korrektur pro Prüfung, Live-Monitoring zusammengefasst.
+
+2. **Soft-Lockdown (3 Stufen):** SEB-unabhängige Sicherheit mit automatischer Geräteerkennung.
+   - 🟢 **Locker:** Nur Logging + Warnung (Übungen)
+   - 🟡 **Standard (Default):** Copy/Paste-Block, Vollbild, Rechtsklick, DevTools gesperrt, 3 Verstösse → Sperre
+   - 🔴 **Streng:** Sofort-Pause bei Vollbild-Verlust, SEB empfohlen
+   - iPad: automatisches Downgrade (kein Vollbild möglich)
+   - SuS sieht Warnung mit Zähler bei jedem Verstoss
+   - LP muss bei Sperre entsperren
+
+### Erledigt (Tasks 1-5)
+
+- **Task 1:** `src/types/lockdown.ts` + `src/hooks/useGeraetErkennung.ts` — Types + Geräteerkennung
+- **Task 2:** `src/hooks/useLockdown.ts` — Zentral-Hook (Copy/Paste, Vollbild, DevTools, Verstoss-Zähler, Split-View)
+- **Task 3:** `src/components/VerstossOverlay.tsx` + `src/components/SperreOverlay.tsx` — SuS-Overlays
+- **Task 4:** `src/components/Layout.tsx` + `src/components/Startbildschirm.tsx` — Lockdown-Integration + Vollbild beim Start
+- **Task 5:** Types erweitert: `PruefungsConfig.kontrollStufe`, `SchuelerStatus` Lockdown-Felder, `HeartbeatResponse` Override-Felder, `Unterbrechung.typ` erweitert
+
+### Offen (Tasks 6-12)
+
+| Task | Beschreibung |
+|------|-------------|
+| 6 | Heartbeat + API erweitern (Lockdown-Daten mitsenden) |
+| 7 | Apps Script Backend (neue Felder + 2 Endpoints: entsperreSuS, setzeKontrollStufe) |
+| 8 | KontrollStufeSelect-Komponente + VorbereitungPhase-Integration |
+| 9 | LP-Monitoring: Verstoss-Spalte, Gerät, Kontrollgrad, Entsperren-Button, Tooltip |
+| 10 | MultiDurchfuehrenDashboard + `?ids=` URL-Parameter |
+| 11 | visibilitychange → Lockdown-Verstoss verbinden |
+| 12 | Build, HANDOFF, Commit + Push |
+
+### Neue Dateien
+
+```
+src/types/lockdown.ts                    — KontrollStufe, GeraetTyp, Verstoss, LockdownState
+src/hooks/useGeraetErkennung.ts          — Geräteerkennung (Laptop/Tablet) + Fullscreen-Check
+src/hooks/useLockdown.ts                 — Zentral-Hook (Copy/Paste, Vollbild, DevTools, Zähler, Sperre)
+src/components/VerstossOverlay.tsx       — SuS-Warnung bei Verstoss
+src/components/SperreOverlay.tsx         — SuS-Sperre bei max Verstössen
+docs/superpowers/specs/2026-03-25-multi-pruefung-soft-lockdown-design.md
+docs/superpowers/plans/2026-03-25-multi-pruefung-soft-lockdown.md
+```
+
+### Geänderte Dateien
+
+```
+src/types/pruefung.ts     — kontrollStufe Feld
+src/types/monitoring.ts   — SchuelerStatus Lockdown-Felder + HeartbeatResponse Override
+src/types/antworten.ts    — Unterbrechung.typ erweitert
+src/components/Layout.tsx — useLockdown Hook + Overlays
+src/components/Startbildschirm.tsx — Vollbild beim Prüfungsstart
+```
+
+---
+
 ## Session 25.03.2026 (9) — LP-Test-Feedback Runde 4
 
 ### Erledigt (6 Fixes)

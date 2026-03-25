@@ -22,7 +22,7 @@ export interface PruefungsAbgabe {
 export interface Unterbrechung {
   zeitpunkt: string;
   dauer_sekunden: number;
-  typ: 'heartbeat-ausfall' | 'focus-verloren' | 'seb-warnung';
+  typ: 'heartbeat-ausfall' | 'focus-verloren' | 'seb-warnung' | 'tab-wechsel' | 'copy-versuch' | 'vollbild-verlassen' | 'split-view';
 }
 
 export type Antwort =

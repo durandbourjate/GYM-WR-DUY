@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { usePruefungStore } from '../store/pruefungStore.ts'
 import { useAuthStore } from '../store/authStore.ts'
 import { apiService } from '../services/apiService.ts'
@@ -6,7 +6,11 @@ import type { PruefungsNachricht } from '../types/monitoring.ts'
 import { usePruefungsMonitoring } from '../hooks/usePruefungsMonitoring.ts'
 import { usePruefungsUX } from '../hooks/usePruefungsUX.ts'
 import { useTabKonflikt } from '../hooks/useTabKonflikt.ts'
+import { useLockdown } from '../hooks/useLockdown.ts'
+import { VerstossOverlay } from './VerstossOverlay.tsx'
+import { SperreOverlay } from './SperreOverlay.tsx'
 import { istImSEB } from '../services/sebService.ts'
+import type { KontrollStufe, Verstoss } from '../types/lockdown.ts'
 import Timer from './Timer.tsx'
 import VerbindungsStatus from './VerbindungsStatus.tsx'
 import AutoSaveIndikator from './AutoSaveIndikator.tsx'
@@ -53,6 +57,27 @@ export default function Layout() {
 
   // Monitoring: Auto-Save (lokal + remote), Heartbeat, Focus-Detection, Online/Offline
   usePruefungsMonitoring()
+
+  // Lockdown: Copy/Paste, Vollbild, DevTools, Verstoss-Zähler
+  const kontrollStufe = ((config?.kontrollStufe as KontrollStufe) || 'standard') as KontrollStufe
+  const lockdown = useLockdown({
+    kontrollStufe,
+    aktiv: !!config && !abgegeben,
+  })
+
+  // Verstoss-Overlay State
+  const [zeigeVerstossOverlay, setZeigeVerstossOverlay] = useState(false)
+  const [letzterVerstoss, setLetzterVerstoss] = useState<Verstoss | null>(null)
+  const vorherigerZaehler = useRef(0)
+
+  // Bei neuem Verstoss (der zählt): Overlay zeigen
+  useEffect(() => {
+    if (lockdown.verstossZaehler > vorherigerZaehler.current && lockdown.verstossZaehler < lockdown.maxVerstoesse) {
+      setLetzterVerstoss(lockdown.verstoesse[lockdown.verstoesse.length - 1])
+      setZeigeVerstossOverlay(true)
+    }
+    vorherigerZaehler.current = lockdown.verstossZaehler
+  }, [lockdown.verstossZaehler, lockdown.maxVerstoesse, lockdown.verstoesse])
 
   // UX: beforeunload-Warnung, Tastaturnavigation, Escape
   const handleAbgabeDialogSchliessen = useCallback(() => setZeigAbgabeDialog(false), [])
@@ -394,6 +419,19 @@ export default function Layout() {
           modus="overlay"
           onSchliessen={() => setMaterialModus('aus')}
           onModusWechsel={handleMaterialModusWechsel}
+        />
+      )}
+
+      {/* Lockdown: Sperre-Overlay (höchste Priorität) */}
+      {lockdown.gesperrt && <SperreOverlay />}
+
+      {/* Lockdown: Verstoss-Warnung */}
+      {zeigeVerstossOverlay && letzterVerstoss && !lockdown.gesperrt && (
+        <VerstossOverlay
+          verstoss={letzterVerstoss}
+          verstossZaehler={lockdown.verstossZaehler}
+          maxVerstoesse={lockdown.maxVerstoesse}
+          onZurueck={() => setZeigeVerstossOverlay(false)}
         />
       )}
     </div>

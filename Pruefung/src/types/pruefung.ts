@@ -84,6 +84,9 @@ export interface PruefungsConfig {
 
   // Durchführungs-ID (wird bei Reset neu generiert — erkennt stale State)
   durchfuehrungId?: string;
+
+  // Soft-Lockdown: Kontrollstufe (Default: 'standard')
+  kontrollStufe?: 'locker' | 'standard' | 'streng';
 }
 
 export interface NotenConfig {

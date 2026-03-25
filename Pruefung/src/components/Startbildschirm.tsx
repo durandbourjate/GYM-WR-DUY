@@ -5,6 +5,7 @@ import { usePruefungStore } from '../store/pruefungStore.ts'
 import { useAuthStore } from '../store/authStore.ts'
 import { apiService } from '../services/apiService.ts'
 import { istImSEB } from '../services/sebService.ts'
+import { erkenneGeraet } from '../hooks/useGeraetErkennung.ts'
 import { formatDatum } from '../utils/zeit.ts'
 import ThemeToggle from './ThemeToggle.tsx'
 
@@ -81,7 +82,20 @@ export default function Startbildschirm({ config, fragen, wiederhergestellt, wur
     }
   }, [config.sebErforderlich, config.sebAusnahmen, user])
 
-  function handleStart() {
+  async function handleStart() {
+    // Vollbild bei Standard/Streng auf Laptop
+    const stufe = config.kontrollStufe || 'standard'
+    const geraet = erkenneGeraet()
+    if (stufe !== 'locker' && geraet === 'laptop') {
+      try {
+        const el = document.documentElement
+        if (el.requestFullscreen) await el.requestFullscreen()
+        else if ((el as unknown as { webkitRequestFullscreen?: () => Promise<void> }).webkitRequestFullscreen) {
+          await (el as unknown as { webkitRequestFullscreen: () => Promise<void> }).webkitRequestFullscreen()
+        }
+      } catch { /* SuS hat abgelehnt — wird via fullscreenchange geloggt */ }
+    }
+
     if (wiederhergestellt) {
       setPhase('pruefung')
     } else {
