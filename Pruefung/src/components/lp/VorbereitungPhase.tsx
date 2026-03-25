@@ -21,15 +21,20 @@ export default function VorbereitungPhase({ config, onTeilnehmerGesetzt, onWeite
   const [rohDaten, setRohDaten] = useState<KlassenlistenSuS[]>([])
   const [ladeStatus, setLadeStatus] = useState<'idle' | 'laden' | 'fertig' | 'fehler'>('idle')
   const [fehler, setFehler] = useState('')
-  const [ausgewaehlteKurse, setAusgewaehlteKurse] = useState<Set<string>>(new Set())
-  const [abgewaehlte, setAbgewaehlte] = useState<Set<string>>(new Set())
-  const [teilnehmer, setTeilnehmer] = useState<Teilnehmer[]>(config.teilnehmer ?? [])
+  // Neues State-Modell: Set aller ausgewählten SuS-Emails (ersetzt ausgewaehlteKurse + abgewaehlte)
+  const [ausgewaehlteSuS, setAusgewaehlteSuS] = useState<Set<string>>(new Set())
+  // Manuell hinzugefügte Teilnehmer (nicht aus Klassenlisten)
+  const [manuelleTeilnehmer, setManuelleTeilnehmer] = useState<Teilnehmer[]>([])
   const [einladungStatus, setEinladungStatus] = useState<'idle' | 'senden' | 'fertig' | 'fehler'>('idle')
   const [einladungFehler, setEinladungFehler] = useState<string[]>([])
   const [lobbySpeichern, setLobbySpeichern] = useState(false)
   const [lobbyFehler, setLobbyFehler] = useState('')
   const [zeitverlaengerungen, setZeitverlaengerungen] = useState<Record<string, number>>(config.zeitverlaengerungen ?? {})
   const [kontrollStufe, setKontrollStufe] = useState<KontrollStufe>((config.kontrollStufe as KontrollStufe) || 'standard')
+  // Track einladungGesendet separat (Email → true)
+  const [einladungGesendetMap, setEinladungGesendetMap] = useState<Set<string>>(
+    new Set((config.teilnehmer ?? []).filter((t) => t.einladungGesendet).map((t) => t.email))
+  )
 
   // Klassenlisten laden
   const ladeKlassenlisten = useCallback(async () => {
@@ -38,7 +43,6 @@ export default function VorbereitungPhase({ config, onTeilnehmerGesetzt, onWeite
     setFehler('')
     try {
       const daten = await apiService.ladeKlassenlisten(user.email)
-      // Rohdaten speichern (jeder Eintrag hat kurs = Sheet-Name)
       const sus: KlassenlistenSuS[] = daten.map((e) => ({
         email: e.email,
         name: e.name,
@@ -69,84 +73,138 @@ export default function VorbereitungPhase({ config, onTeilnehmerGesetzt, onWeite
       .map(([kurs, schueler]) => ({ kurs, schueler }))
   }, [rohDaten])
 
-  // Kurs togglen → Teilnehmer-Liste aktualisieren
+  // Alle SuS-Emails aus Klassenlisten (für schnelle Lookups)
+  const alleKursEmails = useMemo(() => new Set(rohDaten.map((s) => s.email)), [rohDaten])
+
+  // Kurs togglen: Empty/Indeterminate → alle an, Full → alle aus
   const handleToggleKurs = (kurs: string) => {
-    const neueAuswahl = new Set(ausgewaehlteKurse)
+    const gruppe = kursGruppen.find((g) => g.kurs === kurs)
+    if (!gruppe) return
 
-    if (neueAuswahl.has(kurs)) {
-      // Kurs abwählen: nur SuS entfernen, die nicht durch andere gewählte Kurse abgedeckt sind
-      neueAuswahl.delete(kurs)
+    const emails = gruppe.schueler.map((s) => s.email)
+    const alleAusgewaehlt = emails.every((e) => ausgewaehlteSuS.has(e))
 
-      // Emails aller SuS in den verbleibenden gewählten Kursen sammeln
-      const abgedeckteEmails = new Set<string>()
-      for (const kg of kursGruppen) {
-        if (neueAuswahl.has(kg.kurs)) {
-          for (const s of kg.schueler) abgedeckteEmails.add(s.email)
-        }
+    setAusgewaehlteSuS((prev) => {
+      const neu = new Set(prev)
+      if (alleAusgewaehlt) {
+        // Alle aus
+        for (const e of emails) neu.delete(e)
+      } else {
+        // Alle an
+        for (const e of emails) neu.add(e)
       }
-
-      setTeilnehmer((prev) =>
-        prev.filter((t) => t.quelle === 'manuell' || abgedeckteEmails.has(t.email)),
-      )
-    } else {
-      // Kurs auswählen: SuS hinzufügen, die noch nicht in der Teilnehmer-Liste sind
-      neueAuswahl.add(kurs)
-      const gruppe = kursGruppen.find((g) => g.kurs === kurs)
-      if (gruppe) {
-        const neue: Teilnehmer[] = gruppe.schueler
-          .filter((s) => !teilnehmer.some((t) => t.email === s.email))
-          .map((s) => ({
-            email: s.email,
-            name: s.name,
-            vorname: s.vorname,
-            klasse: s.klasse,
-            quelle: 'klassenliste' as const,
-          }))
-        setTeilnehmer((prev) => [...prev, ...neue])
-      }
-    }
-    setAusgewaehlteKurse(neueAuswahl)
+      return neu
+    })
   }
 
-  const handleToggleEinzelne = (email: string) => {
-    const neues = new Set(abgewaehlte)
-    if (neues.has(email)) neues.delete(email)
-    else neues.add(email)
-    setAbgewaehlte(neues)
+  // Einzelne/r SuS togglen
+  const handleToggleSuS = (email: string) => {
+    setAusgewaehlteSuS((prev) => {
+      const neu = new Set(prev)
+      if (neu.has(email)) neu.delete(email)
+      else neu.add(email)
+      return neu
+    })
+  }
+
+  // Alle SuS aller Kurse auswählen
+  const handleAlleAuswaehlen = () => {
+    setAusgewaehlteSuS((prev) => {
+      const neu = new Set(prev)
+      for (const s of rohDaten) neu.add(s.email)
+      return neu
+    })
+  }
+
+  // Keine SuS auswählen (nur Klassenlisten-SuS entfernen, manuelle behalten)
+  const handleKeineAuswaehlen = () => {
+    setAusgewaehlteSuS((prev) => {
+      const neu = new Set(prev)
+      for (const s of rohDaten) neu.delete(s.email)
+      return neu
+    })
+  }
+
+  // Teilnehmer-Liste ableiten aus ausgewaehlteSuS + manuelleTeilnehmer
+  const teilnehmer = useMemo((): Teilnehmer[] => {
+    // SuS aus Klassenlisten die ausgewählt sind
+    const klassenlistenTeilnehmer: Teilnehmer[] = rohDaten
+      .filter((s) => ausgewaehlteSuS.has(s.email))
+      .map((s) => ({
+        email: s.email,
+        name: s.name,
+        vorname: s.vorname,
+        klasse: s.klasse,
+        quelle: 'klassenliste' as const,
+        einladungGesendet: einladungGesendetMap.has(s.email),
+      }))
+
+    // Manuelle Teilnehmer (immer dabei)
+    const manuellMitStatus = manuelleTeilnehmer.map((t) => ({
+      ...t,
+      einladungGesendet: einladungGesendetMap.has(t.email),
+    }))
+
+    return [...klassenlistenTeilnehmer, ...manuellMitStatus]
+  }, [rohDaten, ausgewaehlteSuS, manuelleTeilnehmer, einladungGesendetMap])
+
+  // Abgewaehlte für TeilnehmerListe ableiten (leeres Set — alle in der Liste sind ausgewählt)
+  // TeilnehmerListe zeigt nur SuS die in `teilnehmer` sind; die sind per Definition ausgewählt.
+  const abgewaehlte = useMemo(() => new Set<string>(), [])
+
+  // Toggle in TeilnehmerListe: SuS ab-/anwählen
+  const handleTeilnehmerToggle = (email: string) => {
+    // Wenn aus Klassenliste: über ausgewaehlteSuS steuern
+    if (alleKursEmails.has(email)) {
+      handleToggleSuS(email)
+    } else {
+      // Manueller Teilnehmer: entfernen
+      setManuelleTeilnehmer((prev) => prev.filter((t) => t.email !== email))
+    }
   }
 
   const handleManuellHinzufuegen = (email: string) => {
     if (teilnehmer.some((t) => t.email === email)) return
-    setTeilnehmer((prev) => [...prev, {
-      email,
-      name: email.split('@')[0],
-      vorname: '',
-      klasse: '—',
-      quelle: 'manuell' as const,
-    }])
+    // Prüfen ob Email in Klassenlisten existiert
+    if (alleKursEmails.has(email)) {
+      // Einfach zur Auswahl hinzufügen
+      setAusgewaehlteSuS((prev) => new Set(prev).add(email))
+    } else {
+      setManuelleTeilnehmer((prev) => [...prev, {
+        email,
+        name: email.split('@')[0],
+        vorname: '',
+        klasse: '—',
+        quelle: 'manuell' as const,
+      }])
+    }
   }
 
   const handleSuSHinzufuegen = (sus: AlleSuS) => {
     if (teilnehmer.some((t) => t.email === sus.email)) return
-    setTeilnehmer((prev) => [...prev, {
-      email: sus.email,
-      name: sus.name,
-      vorname: sus.vorname,
-      klasse: sus.klasse,
-      quelle: 'klassenliste' as const,
-    }])
+    // SuS aus Klassenliste → einfach auswählen
+    if (alleKursEmails.has(sus.email)) {
+      setAusgewaehlteSuS((prev) => new Set(prev).add(sus.email))
+    } else {
+      setManuelleTeilnehmer((prev) => [...prev, {
+        email: sus.email,
+        name: sus.name,
+        vorname: sus.vorname,
+        klasse: sus.klasse,
+        quelle: 'klassenliste' as const,
+      }])
+    }
   }
 
   const handleSpeichern = async () => {
     if (!user) return
     setLobbySpeichern(true)
     setLobbyFehler('')
-    const effektiveTeilnehmer = teilnehmer.filter((t) => !abgewaehlte.has(t.email))
-    // Optimistic: Sofort zur Lobby wechseln, API im Hintergrund
-    onTeilnehmerGesetzt(effektiveTeilnehmer)
+    // Alle Teilnehmer sind effektiv (keine abgewaehlten mehr im neuen Modell)
+    onTeilnehmerGesetzt(teilnehmer)
     onWeiterZurLobby?.()
     try {
-      const erfolg = await apiService.setzeTeilnehmer(user.email, config.id, effektiveTeilnehmer)
+      const erfolg = await apiService.setzeTeilnehmer(user.email, config.id, teilnehmer)
       if (!erfolg) {
         setLobbyFehler('Teilnehmer konnten nicht gespeichert werden. Bitte erneut versuchen.')
       }
@@ -162,8 +220,7 @@ export default function VorbereitungPhase({ config, onTeilnehmerGesetzt, onWeite
     if (!user) return
     setEinladungStatus('senden')
     setEinladungFehler([])
-    const zuSenden = teilnehmer
-      .filter((t) => !abgewaehlte.has(t.email) && !t.einladungGesendet)
+    const zuSenden = teilnehmer.filter((t) => !t.einladungGesendet)
     const pruefungUrl = `${window.location.origin}${window.location.pathname}?id=${config.id}`
     try {
       const ergebnisse = await apiService.sendeEinladungen(
@@ -174,9 +231,11 @@ export default function VorbereitungPhase({ config, onTeilnehmerGesetzt, onWeite
         zuSenden.map((t) => ({ email: t.email, name: t.name, vorname: t.vorname })),
       )
       const erfolgreich = new Set(ergebnisse.filter((e) => e.erfolg).map((e) => e.email))
-      setTeilnehmer((prev) =>
-        prev.map((t) => erfolgreich.has(t.email) ? { ...t, einladungGesendet: true } : t),
-      )
+      setEinladungGesendetMap((prev) => {
+        const neu = new Set(prev)
+        for (const email of erfolgreich) neu.add(email)
+        return neu
+      })
       const fehler = ergebnisse.filter((e) => !e.erfolg)
       if (fehler.length > 0) {
         setEinladungFehler(fehler.map((f) => `${f.email}: ${f.fehler}`))
@@ -194,8 +253,6 @@ export default function VorbereitungPhase({ config, onTeilnehmerGesetzt, onWeite
     const url = `${window.location.origin}${window.location.pathname}?id=${config.id}`
     navigator.clipboard.writeText(url)
   }
-
-  const effektiveTeilnehmer = teilnehmer.filter((t) => !abgewaehlte.has(t.email))
 
   return (
     <div className="space-y-6">
@@ -221,10 +278,11 @@ export default function VorbereitungPhase({ config, onTeilnehmerGesetzt, onWeite
         {ladeStatus === 'fertig' && (
           <KursAuswahl
             kursGruppen={kursGruppen}
-            ausgewaehlteKurse={ausgewaehlteKurse}
+            ausgewaehlteSuS={ausgewaehlteSuS}
             onToggleKurs={handleToggleKurs}
-            abgewaehlte={abgewaehlte}
-            onToggleSuS={handleToggleEinzelne}
+            onToggleSuS={handleToggleSuS}
+            onAlleAuswaehlen={handleAlleAuswaehlen}
+            onKeineAuswaehlen={handleKeineAuswaehlen}
           />
         )}
       </div>
@@ -233,7 +291,7 @@ export default function VorbereitungPhase({ config, onTeilnehmerGesetzt, onWeite
       {teilnehmer.length > 0 && (
         <TeilnehmerListe
           teilnehmer={teilnehmer}
-          onToggle={handleToggleEinzelne}
+          onToggle={handleTeilnehmerToggle}
           onManuellHinzufuegen={handleManuellHinzufuegen}
           onSuSHinzufuegen={handleSuSHinzufuegen}
           abgewaehlte={abgewaehlte}
@@ -252,7 +310,7 @@ export default function VorbereitungPhase({ config, onTeilnehmerGesetzt, onWeite
         />
       )}
 
-      {/* Manuell hinzufügen (wenn noch kein Kurs gewählt) */}
+      {/* Manuell hinzufügen (wenn noch kein SuS gewählt) */}
       {teilnehmer.length === 0 && ladeStatus === 'fertig' && (
         <TeilnehmerListe
           teilnehmer={[]}
@@ -275,7 +333,7 @@ export default function VorbereitungPhase({ config, onTeilnehmerGesetzt, onWeite
           className="text-xs px-2 py-1 bg-slate-200 dark:bg-slate-700 rounded hover:bg-slate-300 dark:hover:bg-slate-600 cursor-pointer"
           title="Link kopieren"
         >
-          📋 Kopieren
+          Kopieren
         </button>
         {config.sebErforderlich && (
           <button
@@ -284,7 +342,7 @@ export default function VorbereitungPhase({ config, onTeilnehmerGesetzt, onWeite
             className="text-xs px-2 py-1 bg-slate-200 dark:bg-slate-700 rounded hover:bg-slate-300 dark:hover:bg-slate-600 cursor-pointer"
             title="SEB-Konfigurationsdatei herunterladen"
           >
-            📥 SEB-Datei
+            SEB-Datei
           </button>
         )}
       </div>
@@ -301,7 +359,7 @@ export default function VorbereitungPhase({ config, onTeilnehmerGesetzt, onWeite
       {/* Einladungs-Fehler */}
       {einladungFehler.length > 0 && (
         <div className="text-sm text-red-600 dark:text-red-400 space-y-1">
-          {einladungFehler.map((f, i) => <p key={i}>❌ {f}</p>)}
+          {einladungFehler.map((f, i) => <p key={i}>{f}</p>)}
         </div>
       )}
 
@@ -310,19 +368,19 @@ export default function VorbereitungPhase({ config, onTeilnehmerGesetzt, onWeite
         <button
           type="button"
           onClick={handleEinladungen}
-          disabled={effektiveTeilnehmer.length === 0 || einladungStatus === 'senden'}
+          disabled={teilnehmer.length === 0 || einladungStatus === 'senden'}
           className="px-4 py-2 text-sm bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-600 disabled:opacity-50 cursor-pointer"
         >
-          {einladungStatus === 'senden' ? 'Sende...' : '✉️ Einladungen versenden'}
+          {einladungStatus === 'senden' ? 'Sende...' : 'Einladungen versenden'}
         </button>
 
         <button
           type="button"
           onClick={handleSpeichern}
-          disabled={effektiveTeilnehmer.length === 0 || lobbySpeichern}
+          disabled={teilnehmer.length === 0 || lobbySpeichern}
           className="px-4 py-2 text-sm bg-slate-800 dark:bg-slate-200 text-white dark:text-slate-800 rounded-lg hover:bg-slate-900 dark:hover:bg-slate-100 disabled:opacity-50 cursor-pointer font-medium"
         >
-          {lobbySpeichern ? 'Speichere...' : 'Weiter zur Lobby →'}
+          {lobbySpeichern ? 'Speichere...' : 'Weiter zur Lobby'}
         </button>
       </div>
 

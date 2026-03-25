@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 
 /** Ein SuS-Eintrag aus der Klassenliste */
 export interface KlassenlistenSuS {
@@ -17,15 +17,35 @@ export interface KursGruppe {
 
 interface Props {
   kursGruppen: KursGruppe[]
-  ausgewaehlteKurse: Set<string>
+  ausgewaehlteSuS: Set<string>
   onToggleKurs: (kurs: string) => void
-  /** Individuell abgewählte SuS (Email-Set) */
-  abgewaehlte?: Set<string>
-  /** Callback für individuelle SuS-Auswahl */
-  onToggleSuS?: (email: string) => void
+  onToggleSuS: (email: string) => void
+  onAlleAuswaehlen: () => void
+  onKeineAuswaehlen: () => void
 }
 
-export default function KursAuswahl({ kursGruppen, ausgewaehlteKurse, onToggleKurs, abgewaehlte, onToggleSuS }: Props) {
+/** Indeterminate-Checkbox für Kurs-Header */
+function KursCheckbox({ checked, indeterminate }: { checked: boolean; indeterminate: boolean }) {
+  const ref = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (ref.current) {
+      ref.current.indeterminate = indeterminate
+    }
+  }, [indeterminate])
+
+  return (
+    <input
+      ref={ref}
+      type="checkbox"
+      checked={checked}
+      readOnly
+      className="w-4 h-4 shrink-0 accent-blue-600 cursor-pointer pointer-events-none"
+    />
+  )
+}
+
+export default function KursAuswahl({ kursGruppen, ausgewaehlteSuS, onToggleKurs, onToggleSuS, onAlleAuswaehlen, onKeineAuswaehlen }: Props) {
   const [zugeklappt, setZugeklappt] = useState<Set<string>>(new Set())
 
   const toggleDetails = (kurs: string) => {
@@ -47,41 +67,36 @@ export default function KursAuswahl({ kursGruppen, ausgewaehlteKurse, onToggleKu
       <div className="flex gap-2 mb-1">
         <button
           type="button"
-          onClick={() => {
-            for (const kg of kursGruppen) {
-              if (!ausgewaehlteKurse.has(kg.kurs)) onToggleKurs(kg.kurs)
-            }
-          }}
+          onClick={onAlleAuswaehlen}
           className="text-xs text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
         >
           Alle
         </button>
         <button
           type="button"
-          onClick={() => {
-            for (const kg of kursGruppen) {
-              if (ausgewaehlteKurse.has(kg.kurs)) onToggleKurs(kg.kurs)
-            }
-          }}
+          onClick={onKeineAuswaehlen}
           className="text-xs text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
         >
           Keine
         </button>
       </div>
 
-      {/* Kurs-Buttons */}
+      {/* Kurs-Karten */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
         {kursGruppen.map((kg) => {
-          const ausgewaehlt = ausgewaehlteKurse.has(kg.kurs)
+          const emails = kg.schueler.map((s) => s.email)
+          const anzahlAusgewaehlt = emails.filter((e) => ausgewaehlteSuS.has(e)).length
+          const alleAusgewaehlt = anzahlAusgewaehlt === emails.length
+          const keineAusgewaehlt = anzahlAusgewaehlt === 0
+          const indeterminate = !alleAusgewaehlt && !keineAusgewaehlt
           const istOffen = !zugeklappt.has(kg.kurs)
-          // Klassen innerhalb des Kurses zählen
           const klassen = [...new Set(kg.schueler.map((s) => s.klasse))].sort()
 
           return (
             <div
               key={kg.kurs}
               className={`rounded-lg border transition-colors overflow-hidden
-                ${ausgewaehlt
+                ${!keineAusgewaehlt
                   ? 'bg-blue-50 border-blue-300 dark:bg-blue-900/30 dark:border-blue-600'
                   : 'bg-white border-slate-200 dark:bg-slate-800 dark:border-slate-600'
                 }`}
@@ -92,18 +107,12 @@ export default function KursAuswahl({ kursGruppen, ausgewaehlteKurse, onToggleKu
                 onClick={() => onToggleKurs(kg.kurs)}
                 className="w-full flex items-center gap-2 px-3 py-2.5 cursor-pointer hover:bg-blue-100/50 dark:hover:bg-blue-900/20"
               >
-                <span className={`w-4 h-4 rounded border flex items-center justify-center text-xs flex-shrink-0
-                  ${ausgewaehlt
-                    ? 'bg-blue-500 border-blue-500 text-white'
-                    : 'border-slate-300 dark:border-slate-500'
-                  }`}>
-                  {ausgewaehlt ? '✓' : ''}
-                </span>
-                <span className={`font-semibold text-sm ${ausgewaehlt ? 'text-blue-800 dark:text-blue-200' : 'text-slate-700 dark:text-slate-200'}`}>
+                <KursCheckbox checked={alleAusgewaehlt} indeterminate={indeterminate} />
+                <span className={`font-semibold text-sm ${!keineAusgewaehlt ? 'text-blue-800 dark:text-blue-200' : 'text-slate-700 dark:text-slate-200'}`}>
                   {kg.kurs}
                 </span>
                 <span className="text-xs text-slate-500 dark:text-slate-400 ml-auto">
-                  {kg.schueler.length} SuS
+                  {anzahlAusgewaehlt}/{kg.schueler.length} SuS
                 </span>
               </button>
 
@@ -125,7 +134,7 @@ export default function KursAuswahl({ kursGruppen, ausgewaehlteKurse, onToggleKu
                   </span>
                 </button>
 
-                {/* SuS-Liste (ausgeklappt) */}
+                {/* SuS-Liste (immer mit Checkboxen) */}
                 {istOffen && (
                   <div className="px-3 pb-2 max-h-40 overflow-y-auto">
                     {klassen.map((kl) => {
@@ -136,23 +145,21 @@ export default function KursAuswahl({ kursGruppen, ausgewaehlteKurse, onToggleKu
                             {kl} ({susInKlasse.length})
                           </div>
                           {susInKlasse.map((s) => {
-                            const istAbgewaehlt = abgewaehlte?.has(s.email) ?? false
+                            const istAusgewaehlt = ausgewaehlteSuS.has(s.email)
                             return (
                               <label
                                 key={s.email}
                                 className={`flex items-center gap-1.5 pl-2 py-0.5 cursor-pointer text-xs transition-opacity ${
-                                  istAbgewaehlt ? 'opacity-40' : ''
+                                  !istAusgewaehlt ? 'opacity-40' : ''
                                 }`}
                                 onClick={(e) => e.stopPropagation()}
                               >
-                                {onToggleSuS && ausgewaehlt && (
-                                  <input
-                                    type="checkbox"
-                                    checked={!istAbgewaehlt}
-                                    onChange={() => onToggleSuS(s.email)}
-                                    className="w-3 h-3 shrink-0 accent-green-600 cursor-pointer"
-                                  />
-                                )}
+                                <input
+                                  type="checkbox"
+                                  checked={istAusgewaehlt}
+                                  onChange={() => onToggleSuS(s.email)}
+                                  className="w-3 h-3 shrink-0 accent-green-600 cursor-pointer"
+                                />
                                 <span className="text-slate-600 dark:text-slate-300">
                                   {s.name} {s.vorname}
                                 </span>
