@@ -69,8 +69,36 @@ export default function BeendenDialog({
     ? `Prüfung für ${einzelnerSuS.name} beenden?`
     : `Prüfung für alle ${anzahlAktiv} aktiven SuS beenden?`
 
-  // Bei 0 aktiven SuS: Bestätigung überspringen (direkt beendbar)
-  const keineAktivenSuS = anzahlAktiv === 0 && !einzelnerSuS
+  // Bei 0 aktiven SuS: 1-Klick-Dialog (alle haben abgegeben)
+  if (anzahlAktiv === 0 && !einzelnerSuS) {
+    return (
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-6 max-w-sm w-full">
+          <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-2">Prüfung beenden</h3>
+          <p className="text-sm text-slate-600 dark:text-slate-300 mb-4">
+            Alle SuS haben bereits abgegeben.
+          </p>
+          <textarea
+            rows={2}
+            value={bemerkung}
+            onChange={(e) => setBemerkung(e.target.value)}
+            placeholder="Bemerkungen (optional)..."
+            className="w-full rounded border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-1.5 text-sm text-slate-700 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500 mb-4 resize-none focus:outline-none focus:ring-1 focus:ring-slate-400"
+          />
+          {fehler && <p className="text-sm text-red-600 dark:text-red-400 mb-3">{fehler}</p>}
+          <div className="flex gap-3">
+            <button onClick={onAbbrechen} className="flex-1 py-2 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer font-medium text-sm transition-colors">
+              Abbrechen
+            </button>
+            <button onClick={handleBeenden} disabled={lade}
+              className="flex-1 py-2 bg-slate-800 hover:bg-slate-900 dark:bg-slate-200 dark:hover:bg-slate-100 text-white dark:text-slate-800 rounded-lg cursor-pointer font-medium text-sm disabled:opacity-50 transition-colors">
+              {lade ? 'Wird beendet...' : 'Prüfung beenden'}
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[70] p-4">
@@ -79,34 +107,7 @@ export default function BeendenDialog({
           Prüfung beenden
         </h3>
 
-        {keineAktivenSuS ? (
-          <>
-            {/* Keine aktiven SuS: vereinfachte Ansicht */}
-            <p className="text-sm text-slate-700 dark:text-slate-300 mb-4">
-              Alle SuS haben bereits abgegeben oder sind nicht mehr aktiv. Prüfung kann beendet werden.
-            </p>
-            {fehler && (
-              <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-700 dark:text-red-300">
-                {fehler}
-              </div>
-            )}
-            <div className="flex gap-2 justify-end">
-              <button
-                onClick={onAbbrechen}
-                className="px-4 py-2 text-sm border border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
-              >
-                Abbrechen
-              </button>
-              <button
-                onClick={handleBeenden}
-                disabled={lade}
-                className="px-4 py-2 text-sm bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors cursor-pointer disabled:opacity-50"
-              >
-                {lade ? 'Wird beendet...' : 'Prüfung beenden'}
-              </button>
-            </div>
-          </>
-        ) : !bestaetigung ? (
+        {!bestaetigung ? (
           <>
             {/* Modus-Auswahl */}
             <div className="space-y-3 mb-4">
