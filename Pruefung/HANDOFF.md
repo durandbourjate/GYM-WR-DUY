@@ -6,6 +6,69 @@
 
 ---
 
+## Session 25.03.2026 (11) — Bugfixes + UX-Verbesserungen
+
+### Status: ERLEDIGT (14 Tasks)
+
+**Spec:** `docs/superpowers/specs/2026-03-25-session11-bugs-ux-design.md`
+**Plan:** `docs/superpowers/plans/2026-03-25-session11-bugfixes-ux.md`
+
+### Block A: Bugfixes (8 Tasks)
+
+| Bug | Beschreibung | Fix |
+|-----|-------------|-----|
+| B6/B16 | Aufgabengruppe Zählung + Navigation (Teilfragen doppelt im Index) | `fragen[]` (Navigation) + `alleFragen[]` (inkl. Teilfragen) getrennt. 10 Dateien. |
+| B7 | Abgabe-Count Mismatch | Durch B6-Fix mit erledigt — AbgabeDialog nutzt nun `istVollstaendigBeantwortet()` |
+| B10 | Zeichnen Text-Tool verschwindet nach 0.5s | `usePointerEvents` Guard + stopPropagation auf Text-Overlay |
+| B11 | PDF Text-Annotationen nicht editierbar | Doppelklick → Edit-Mode in `PDFSeite.tsx` |
+| B12 | Zeichnen Toolbar vertikal buggy | `max-h-full overflow-y-auto` + Spacer nur horizontal |
+| B13 | PDF Spiegelung | Zoom-Clamping (0.25–3) + `touchAction: pan-x pan-y` |
+| B14 | SuS grün vor Lobby | Verbindungsstatus blau statt grün in Warteraum |
+| B15 | Material nicht volle Höhe | `h-0` Trick auf Main-Container in Layout.tsx |
+| B8 | Button-Feedback | War bereits vorhanden (freischaltenLaedt) |
+| B9 | Material-Icon / Anhänge fehlen | `FrageAnhaenge` in Layout + AufgabengruppeFrage eingebaut |
+
+### Block B: UX-Verbesserungen (6 Tasks)
+
+| Feature | Beschreibung |
+|---------|-------------|
+| U1 Kurs-Auswahl | Komplett-Rewrite: `ausgewaehlteSuS: Set<string>`, Indeterminate-Checkbox, SuS immer sichtbar, Direktauswahl |
+| U2 Auswertung-Tab | Ergebnisse + Korrektur zu 1 Tab zusammengelegt (Accordion), URL-Fallback |
+| U3 Zeitzuschlag inline | Pro Schüler-Zeile im Live-Monitoring: "+5" Button, Countdown bei Überzeit |
+| U4 Farbpalette | 9 Farben (5 kräftig + 4 Pastell), Schwarz Default, Zeichnen + PDF |
+| U5 Lobby-Monitoring | Gerät, Kontrollstufe, SEB-Badge in Lobby sichtbar |
+| U6 Demo-Prüfung | PDF + Zeichnen Fragetypen ergänzt, Abschnitte A-F |
+
+### Geänderte Dateien (Kern)
+
+```
+src/store/pruefungStore.ts          — alleFragen + fragen Trennung
+src/App.tsx                         — resolveFragenFuerPruefung returns both arrays
+src/components/Layout.tsx           — Material-Höhe, FrageAnhaenge
+src/components/Startbildschirm.tsx  — Blauer Verbindungsstatus
+src/components/AbgabeDialog.tsx     — istVollstaendigBeantwortet
+src/components/FragenNavigation.tsx — alleFragen für Status-Check
+src/components/lp/KursAuswahl.tsx   — Komplett-Rewrite (Indeterminate)
+src/components/lp/VorbereitungPhase.tsx — ausgewaehlteSuS State-Modell
+src/components/lp/DurchfuehrenDashboard.tsx — 4 Tabs, Auswertung-Accordion
+src/components/lp/AktivPhase.tsx    — Inline-Zeitzuschlag + startTimestamp
+src/components/lp/BeendetPhase.tsx  — onWeiterZurKorrektur entfernt
+src/components/lp/LobbyPhase.tsx    — Gerät/Kontrolle/SEB Badges
+src/components/fragetypen/zeichnen/ZeichnenCanvas.tsx  — Text-Tool Fix
+src/components/fragetypen/zeichnen/usePointerEvents.ts — textOverlay Guard
+src/components/fragetypen/zeichnen/ZeichnenToolbar.tsx — Vertikal-Fix + Farben
+src/components/fragetypen/zeichnen/ZeichnenTypes.ts    — STANDARD_FARBEN
+src/components/fragetypen/pdf/PDFSeite.tsx    — Text-Edit Doppelklick
+src/components/fragetypen/pdf/PDFViewer.tsx   — touchAction
+src/components/fragetypen/pdf/PDFTypes.ts     — STANDARD_HIGHLIGHT_FARBEN
+src/components/fragetypen/pdf/usePDFRenderer.ts — Zoom-Clamping
+src/data/demoFragen.ts              — PDF + Zeichnen Fragen
+```
+
+### Apps Script: Keine Änderungen nötig
+
+---
+
 ## Session 25.03.2026 (10) — Multi-Prüfung + Soft-Lockdown (komplett)
 
 ### Status: ERLEDIGT (alle 12 Tasks)
