@@ -7,6 +7,9 @@ interface UsePointerEventsOptions {
   breite: number;  // Logische Canvas-Breite
   hoehe: number;   // Logische Canvas-Höhe
   disabled: boolean;
+  /** Ref auf den aktuellen textOverlay.sichtbar-Wert — verhindert, dass ein pointerdown
+   *  den Text-Overlay-Modus beendet, während das Eingabefeld offen ist. */
+  textOverlaySichtbarRef: React.RefObject<boolean>;
   onStart: (punkt: Point, pointerType: string) => void;
   onMove: (punkt: Point, pointerType: string) => void;
   onEnd: (punkt: Point, pointerType: string) => void;
@@ -23,6 +26,7 @@ export function usePointerEvents({
   breite,
   hoehe,
   disabled,
+  textOverlaySichtbarRef,
   onStart,
   onMove,
   onEnd,
@@ -56,6 +60,10 @@ export function usePointerEvents({
 
     function handlePointerDown(event: PointerEvent): void {
       if (disabled) return;
+
+      // Text-Overlay ist offen: pointerdown ignorieren, damit das Eingabefeld stabil bleibt.
+      // Das Overlay schliesst sich über Enter, Escape oder Klick ausserhalb.
+      if (textOverlaySichtbarRef.current) return;
 
       // Text-Tool: Kein Pointer-Capture, sonst kann das Text-Input keinen Focus bekommen
       if (aktivesTool !== 'text') {
@@ -108,5 +116,5 @@ export function usePointerEvents({
       // touch-action zurücksetzen beim Cleanup
       canvas.style.touchAction = '';
     };
-  }, [canvasRef, aktivesTool, disabled, breite, hoehe, onStart, onMove, onEnd]);
+  }, [canvasRef, aktivesTool, disabled, breite, hoehe, textOverlaySichtbarRef, onStart, onMove, onEnd]);
 }

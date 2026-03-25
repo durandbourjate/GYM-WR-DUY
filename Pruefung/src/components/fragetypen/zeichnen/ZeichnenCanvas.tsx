@@ -131,6 +131,13 @@ export function ZeichnenCanvas({
   const [textOverlay, setTextOverlay] = useState<TextOverlay>(TEXT_OVERLAY_LEER);
   const textInputRef = useRef<HTMLInputElement | null>(null);
 
+  // Ref-Spiegel für textOverlay.sichtbar — wird von usePointerEvents als Guard genutzt,
+  // damit kein pointerdown das Overlay schliesst während es offen ist.
+  const textOverlaySichtbarRef = useRef<boolean>(false);
+  useEffect(() => {
+    textOverlaySichtbarRef.current = textOverlay.sichtbar;
+  }, [textOverlay.sichtbar]);
+
   // Zustand für Drag (Auswahl-Werkzeug)
   const letzterPunktRef = useRef<Point | null>(null);
 
@@ -247,6 +254,30 @@ export function ZeichnenCanvas({
       return () => clearTimeout(timer);
     }
   }, [textOverlay.sichtbar]);
+
+  // Klick ausserhalb des Overlays: Text abschliessen (abbrechen wenn kein Text eingegeben)
+  useEffect(() => {
+    if (!textOverlay.sichtbar) return;
+
+    function handleAussenklick(e: PointerEvent) {
+      const input = textInputRef.current;
+      if (!input) return;
+      // Wenn das Ziel innerhalb des Input-Overlays liegt: ignorieren
+      if (input.closest('div')?.contains(e.target as Node)) return;
+      textAbschliessen(false);
+    }
+
+    // Auf document registrieren — nach dem aktuellen Event-Loop-Tick,
+    // damit der Click, der das Overlay geöffnet hat, nicht sofort abfängt.
+    const timer = setTimeout(() => {
+      document.addEventListener('pointerdown', handleAussenklick, { capture: true });
+    }, 0);
+
+    return () => {
+      clearTimeout(timer);
+      document.removeEventListener('pointerdown', handleAussenklick, { capture: true });
+    };
+  }, [textOverlay.sichtbar, textAbschliessen]);
 
   // ============================================================
   // Pointer-Event-Handler
@@ -465,6 +496,7 @@ export function ZeichnenCanvas({
     breite: logischeBreite,
     hoehe: logischeHoehe,
     disabled,
+    textOverlaySichtbarRef,
     onStart: handleStart,
     onMove: handleMove,
     onEnd: handleEnd,
@@ -569,6 +601,8 @@ export function ZeichnenCanvas({
             alignItems: 'center',
           }}
           onPointerDown={e => e.stopPropagation()}
+          onMouseDown={e => e.stopPropagation()}
+          onTouchStart={e => e.stopPropagation()}
           onClick={e => e.stopPropagation()}
         >
           <input
@@ -581,6 +615,9 @@ export function ZeichnenCanvas({
             onChange={e =>
               setTextOverlay(prev => ({ ...prev, text: e.target.value }))
             }
+            onPointerDown={e => e.stopPropagation()}
+            onMouseDown={e => e.stopPropagation()}
+            onTouchStart={e => e.stopPropagation()}
             onKeyDown={e => {
               if (e.key === 'Enter') {
                 e.preventDefault();
