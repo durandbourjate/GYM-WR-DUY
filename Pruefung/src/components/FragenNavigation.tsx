@@ -46,10 +46,12 @@ export default function FragenNavigation() {
                 bgClass = 'bg-amber-50 text-amber-800 border border-amber-300 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-700'
                 statusIcon = '?'
               } else if (istBeantwortet) {
-                bgClass = 'bg-green-50 text-green-800 border border-green-300 dark:bg-green-900/20 dark:text-green-300 dark:border-green-700'
+                // Beantwortet: neutral (erledigt), dezenter Haken
+                bgClass = 'bg-white text-slate-700 border border-slate-300 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-600'
                 statusIcon = '\u2713'
               } else {
-                bgClass = 'bg-white text-slate-500 border border-slate-300 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-500'
+                // Offen: violett hervorgehoben (noch zu tun)
+                bgClass = 'bg-violet-50 text-violet-800 border border-violet-300 dark:bg-violet-900/30 dark:text-violet-300 dark:border-violet-700'
               }
 
               return (
@@ -66,7 +68,7 @@ export default function FragenNavigation() {
                   {idx + 1}
                   {statusIcon && (
                     <span className={`absolute -top-1 -right-1 text-[10px] font-bold leading-none
-                      ${istMarkiert ? 'text-amber-600 dark:text-amber-400' : 'text-green-600 dark:text-green-400'}
+                      ${istMarkiert ? 'text-amber-600 dark:text-amber-400' : 'text-slate-500 dark:text-slate-400'}
                     `}>
                       {statusIcon}
                     </span>
@@ -81,10 +83,10 @@ export default function FragenNavigation() {
       {/* Legende */}
       <div className="flex flex-wrap gap-3 text-xs text-slate-500 dark:text-slate-400 mt-2 pt-2 border-t border-slate-200 dark:border-slate-700">
         <span className="flex items-center gap-1">
-          <span className="w-3 h-3 rounded border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 inline-block" /> Offen
+          <span className="w-3 h-3 rounded border border-violet-300 dark:border-violet-700 bg-violet-50 dark:bg-violet-900/30 inline-block" /> Offen
         </span>
         <span className="flex items-center gap-1">
-          <span className="text-green-600 dark:text-green-400 font-bold">{'\u2713'}</span> Beantwortet
+          <span className="text-slate-500 dark:text-slate-400 font-bold">{'\u2713'}</span> Beantwortet
         </span>
         <span className="flex items-center gap-1">
           <span className="text-amber-600 dark:text-amber-400 font-bold">?</span> Unsicher

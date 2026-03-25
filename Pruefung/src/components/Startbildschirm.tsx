@@ -154,12 +154,12 @@ export default function Startbildschirm({ config, fragen, alleFragen, wiederherg
               {config.titel}
             </h1>
             {heartbeatErfolgreich ? (
-              <p className="text-sm text-blue-600 dark:text-blue-400 mb-1">
-                ✓ Verbunden — warte auf Freischaltung durch Lehrperson
+              <p className="text-sm text-slate-500 dark:text-slate-400 mb-1">
+                ● Verbindung hergestellt — warte auf Freischaltung durch Lehrperson
               </p>
             ) : (
-              <p className="text-sm text-slate-600 dark:text-slate-300 mb-1">
-                Verbinde mit Prüfungsserver...
+              <p className="text-sm text-slate-500 dark:text-slate-400 mb-1 animate-pulse">
+                ○ Verbinde mit Prüfungsserver…
               </p>
             )}
             <p className="text-xs text-slate-400 dark:text-slate-500">

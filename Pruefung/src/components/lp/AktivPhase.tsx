@@ -25,6 +25,7 @@ export default function AktivPhase({ config, schuelerStatus, startTimestamp, onB
   const [quickFilter, setQuickFilter] = useState<QuickFilter>('alle')
   const [detailSus, setDetailSus] = useState<string | null>(null)
   const [zeigBeendenDialog, setZeigBeendenDialog] = useState(false)
+  const [einzelBeendenSuS, setEinzelBeendenSuS] = useState<{ email: string; name: string } | null>(null)
   const [beendenLaeuft, setBeendenLaeuft] = useState(false)
   const [sebAusnahmenLokal, setSebAusnahmenLokal] = useState<Set<string>>(
     new Set(config.sebAusnahmen ?? [])
@@ -168,6 +169,7 @@ export default function AktivPhase({ config, schuelerStatus, startTimestamp, onB
               <th className="px-3 py-2">Fortschritt</th>
               <th className="px-2 py-2" title="Zeitzuschlag (Nachteilsausgleich)">⏱ Zeit+</th>
               {config.sebErforderlich && <th className="px-3 py-2">SEB</th>}
+              <th className="px-2 py-2 w-10"></th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
@@ -290,6 +292,22 @@ export default function AktivPhase({ config, schuelerStatus, startTimestamp, onB
                       )}
                     </td>
                   )}
+                  {/* Einzeln beenden */}
+                  <td className="px-2 py-2">
+                    {(s.status === 'aktiv' || s.status === 'inaktiv') && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setEinzelBeendenSuS({ email: s.email, name: s.name || s.email })
+                        }}
+                        className="w-6 h-6 flex items-center justify-center text-xs text-red-400 hover:text-white hover:bg-red-500 rounded cursor-pointer transition-colors"
+                        title={`Prüfung für ${s.name || s.email} beenden`}
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </td>
                 </tr>
               )
             })}
@@ -339,7 +357,7 @@ export default function AktivPhase({ config, schuelerStatus, startTimestamp, onB
         />
       )}
 
-      {/* Beenden-Dialog */}
+      {/* Beenden-Dialog (alle) */}
       {zeigBeendenDialog && (
         <BeendenDialog
           pruefungId={config.id}
@@ -347,6 +365,18 @@ export default function AktivPhase({ config, schuelerStatus, startTimestamp, onB
           anzahlAktiv={schuelerStatus.filter((s) => s.status === 'aktiv').length}
           onBeendet={onBeenden}
           onAbbrechen={() => setZeigBeendenDialog(false)}
+        />
+      )}
+
+      {/* Beenden-Dialog (einzelner SuS) */}
+      {einzelBeendenSuS && (
+        <BeendenDialog
+          pruefungId={config.id}
+          lpEmail={user?.email ?? ''}
+          einzelnerSuS={einzelBeendenSuS}
+          anzahlAktiv={1}
+          onBeendet={() => setEinzelBeendenSuS(null)}
+          onAbbrechen={() => setEinzelBeendenSuS(null)}
         />
       )}
     </div>

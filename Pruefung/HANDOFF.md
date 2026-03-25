@@ -6,6 +6,61 @@
 
 ---
 
+## Session 25.03.2026 (12) — Bugfixes + UX aus Live-Tests
+
+### Status: ERLEDIGT (11 Tasks)
+
+**Plan:** `docs/superpowers/plans/drifting-sniffing-scott.md`
+
+### Block 1: Kritische Bugs (4 Tasks)
+
+| Bug | Beschreibung | Fix |
+|-----|-------------|-----|
+| B19 | Verstoss-Sperre: LP sieht nichts im Dashboard | Lockdown-Felder (gesperrt, verstossZaehler, verstoesse, geraet) fehlten im DurchfuehrenDashboard Mapping + apps-script neue Row-Init |
+| B21 | Beenden → SuS bleibt auf Gesperrt-Overlay | SperreOverlay-Bedingung: nicht rendern wenn beendetUm oder abgegeben |
+| B22 | Erzwungene Abgabe "0 Punkte" + SuS noch aktiv | Server-seitiges Safety-Net: beendePruefung sofort markiert alle als abgegeben; ladeMonitoring: beendet-lp Status |
+| B18 | Material PDF halbe Höhe (wiederholt) | `min-h-0` im Overlay-Modus von MaterialPanel.tsx |
+
+### Block 2: UX-Bugs (3 Tasks)
+
+| Bug | Beschreibung | Fix |
+|-----|-------------|-----|
+| B23 | Violett-Hervorhebung invertiert | Offen = violett (Aufmerksamkeit), Beantwortet = neutral + ✓, Unsicher = amber |
+| B20 | Autosave-Zähler zeigt 0 | autoSaveCount wird nun via Heartbeat ans Backend gesendet |
+| B17 | Verbindungs-Bestätigung zu früh | Neutrales Grau statt Blau ✓, "Verbindung hergestellt" statt "Verbunden" |
+
+### Block 3: UX-Verbesserungen (4 Tasks)
+
+| Feature | Beschreibung |
+|---------|-------------|
+| U9 Individuelles Beenden | ✕-Button pro Schüler im Live-Monitoring → BeendenDialog mit einzelnerSuS |
+| U10 MC Auto-Confirm | Automatisch korrigierbare Fragen (MC, Zuordnung, etc.) werden als geprueft vorgewählt |
+| U7 Nachteilsausgleich Lobby | ZeitzuschlagEditor (kompakt, collapsible) in LobbyPhase integriert |
+| U11 Kurs-Auswahl einklappbar | Collapsible Section in VorbereitungPhase mit SuS-Zähler im Header |
+
+### Geänderte Dateien
+
+```
+src/components/lp/DurchfuehrenDashboard.tsx — Lockdown-Felder Mapping (B19)
+src/components/Layout.tsx                   — SperreOverlay-Bedingung (B21)
+src/components/MaterialPanel.tsx            — min-h-0 Overlay-Modus (B18)
+src/components/FragenNavigation.tsx         — Violett-Hervorhebung (B23)
+src/components/FragenUebersicht.tsx         — Violett-Hervorhebung (B23)
+src/components/Startbildschirm.tsx          — Neutrale Verbindungs-Message (B17)
+src/services/pruefungApi.ts                 — autoSaveCount im Heartbeat (B20)
+src/hooks/usePruefungsMonitoring.ts         — autoSaveCount übergeben (B20)
+src/components/lp/AktivPhase.tsx            — Individuelles Beenden X-Button (U9)
+src/components/lp/LobbyPhase.tsx            — Nachteilsausgleich + onConfigUpdate (U7)
+src/components/lp/VorbereitungPhase.tsx     — Kurs-Auswahl einklappbar (U11)
+apps-script-code.js                         — B19 (Row-Init), B20 (autoSaveCount), B22 (Safety-Net + beendet-lp), U10 (auto-bewertet)
+```
+
+### Apps Script: Änderungen nötig!
+
+→ User muss apps-script-code.js in Apps Script Editor kopieren + neue Bereitstellung erstellen
+
+---
+
 ## Session 25.03.2026 (11) — Bugfixes + UX-Verbesserungen
 
 ### Status: ERLEDIGT (14 Tasks)

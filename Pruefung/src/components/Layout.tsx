@@ -453,8 +453,8 @@ export default function Layout() {
         />
       )}
 
-      {/* Lockdown: Sperre-Overlay (höchste Priorität) */}
-      {lockdown.gesperrt && <SperreOverlay />}
+      {/* Lockdown: Sperre-Overlay (höchste Priorität, aber nicht wenn LP beendet hat oder SuS abgegeben) */}
+      {lockdown.gesperrt && !beendetUm && !abgegeben && <SperreOverlay />}
 
       {/* Lockdown: Verstoss-Warnung */}
       {zeigeVerstossOverlay && letzterVerstoss && !lockdown.gesperrt && (

@@ -182,6 +182,13 @@ export default function DurchfuehrenDashboard({ pruefungId }: { pruefungId: stri
         sebVersion: s.sebVersion || undefined,
         browserInfo: s.browserInfo || undefined,
         aktuelleFrage: typeof s.aktuelleFrage === 'number' ? s.aktuelleFrage : (s.aktuelleFrage != null && s.aktuelleFrage !== '' ? Number(s.aktuelleFrage) : null),
+        // Lockdown-Felder (B19-Fix: fehlten im Mapping)
+        geraet: (s.geraet as 'laptop' | 'tablet' | 'unbekannt') || undefined,
+        vollbild: s.vollbild === true || s.vollbild === 'true',
+        kontrollStufe: (s.kontrollStufe as 'locker' | 'standard' | 'streng') || undefined,
+        verstossZaehler: Number(s.verstossZaehler) || 0,
+        gesperrt: s.gesperrt === true || s.gesperrt === 'true',
+        verstoesse: Array.isArray(s.verstoesse) ? s.verstoesse : (typeof s.verstoesse === 'string' ? (() => { try { return JSON.parse(s.verstoesse as string) } catch { return [] } })() : []),
       }))),
     }
     setDaten(mappedResult as MonitoringDaten)
@@ -470,6 +477,13 @@ export default function DurchfuehrenDashboard({ pruefungId }: { pruefungId: stri
               config={config}
               schuelerStatus={daten.schueler}
               freischaltenLaedt={freischaltenLaedt}
+              onConfigUpdate={async (updates) => {
+                const neueConfig = { ...config, ...updates }
+                setConfig(neueConfig)
+                if (user) {
+                  await apiService.speichereConfig(user.email, neueConfig)
+                }
+              }}
               onFreischalten={async () => {
                 if (!user || freischaltenLaedt) return
                 // Optimistic UI: sofort freigeschaltet anzeigen

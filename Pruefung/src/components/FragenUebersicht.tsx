@@ -122,10 +122,11 @@ export default function FragenUebersicht() {
                   statusColor = 'text-amber-700 dark:text-amber-400'
                 } else if (istBeantwortet) {
                   statusIcon = '\u2713'
-                  statusColor = 'text-green-700 dark:text-green-400'
+                  statusColor = 'text-slate-500 dark:text-slate-400'
                 } else {
-                  statusIcon = '\u2014'
-                  statusColor = 'text-slate-400 dark:text-slate-500'
+                  // Offen: violett hervorgehoben
+                  statusIcon = '!'
+                  statusColor = 'text-violet-700 dark:text-violet-400'
                 }
 
                 return (

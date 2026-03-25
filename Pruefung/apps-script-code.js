@@ -919,6 +919,13 @@ function heartbeat(body) {
           case 'heartbeats': return 1;
           case 'version': return 0;
           case 'istAbgabe': return 'false';
+          case 'gesperrt': return 'false';
+          case 'verstossZaehler': return 0;
+          case 'verstoesse': return '[]';
+          case 'geraet': return '';
+          case 'vollbild': return 'false';
+          case 'kontrollStufe': return '';
+          case 'autoSaveCount': return 0;
           default: return '';
         }
       });
@@ -960,6 +967,17 @@ function heartbeat(body) {
           headers.push('beantworteteFragen');
         }
         sheet.getRange(rowIndex, beantwortetCol + 1).setValue(body.beantworteteFragen);
+      }
+
+      // autoSaveCount-Spalte aktualisieren (falls vom Client mitgesendet)
+      if (body.autoSaveCount !== undefined) {
+        let asCCol = headers.indexOf('autoSaveCount');
+        if (asCCol < 0) {
+          asCCol = headers.length;
+          sheet.getRange(1, asCCol + 1).setValue('autoSaveCount');
+          headers.push('autoSaveCount');
+        }
+        sheet.getRange(rowIndex, asCCol + 1).setValue(body.autoSaveCount);
       }
 
       // Lockdown-Metadaten speichern (falls vom Client mitgesendet)
@@ -1212,6 +1230,35 @@ function beendePruefungEndpoint(body) {
           }
           break;
         }
+      }
+    }
+
+    // Server-seitiges Safety-Net: Bei Modus "sofort" alle aktiven SuS als abgegeben markieren
+    if (modus === 'sofort') {
+      try {
+        var antSheetName = 'Antworten_' + pruefungId;
+        var antSheet = findOrCreateAntwortenSheet(antSheetName, pruefungId);
+        if (antSheet) {
+          var antHeaders = antSheet.getRange(1, 1, 1, antSheet.getLastColumn()).getValues()[0];
+          var istAbgabeCol = antHeaders.indexOf('istAbgabe');
+          var abgabezeitCol = antHeaders.indexOf('abgabezeit');
+          if (istAbgabeCol >= 0) {
+            var antData = antSheet.getDataRange().getValues();
+            for (var j = 1; j < antData.length; j++) {
+              // Nur aktive SuS markieren (die noch nicht abgegeben haben)
+              if (antData[j][istAbgabeCol] !== 'true') {
+                sheet = antSheet; // Referenz für getRange
+                antSheet.getRange(j + 1, istAbgabeCol + 1).setValue('true');
+                if (abgabezeitCol >= 0) {
+                  antSheet.getRange(j + 1, abgabezeitCol + 1).setValue(beendetUm);
+                }
+              }
+            }
+          }
+        }
+      } catch (e) {
+        // Safety-Net Fehler nicht blockierend — Hauptoperation war erfolgreich
+        console.log('Safety-Net Markierung fehlgeschlagen: ' + e.message);
       }
     }
 
@@ -1736,6 +1783,9 @@ function ladeMonitoring(pruefungId, email) {
       return jsonResponse({ error: 'Prüfung nicht gefunden' });
     }
 
+    // Globales beendetUm aus Configs-Sheet prüfen
+    const globalBeendetUm = configRow.beendetUm || null;
+
     const sheetName = 'Antworten_' + pruefungId;
     const ordner = DriveApp.getFolderById(ANTWORTEN_ORDNER_ID);
     const files = ordner.getFilesByName(sheetName);
@@ -1745,11 +1795,13 @@ function ladeMonitoring(pruefungId, email) {
       const sheet = SpreadsheetApp.open(files.next()).getSheets()[0];
       const data = getSheetData(sheet);
       for (const row of data) {
+        // Status: abgegeben > beendet-lp (individuell oder global) > aktiv > nicht-gestartet
+        var susBeendetUm = row.beendetUm || globalBeendetUm;
         schueler.push({
           email: row.email || '',
           name: row.name || row.email || '',
           klasse: row.klasse || '',
-          status: row.istAbgabe === 'true' ? 'abgegeben' : (row.letzterHeartbeat ? 'aktiv' : 'nicht-gestartet'),
+          status: row.istAbgabe === 'true' ? 'abgegeben' : (susBeendetUm ? 'beendet-lp' : (row.letzterHeartbeat ? 'aktiv' : 'nicht-gestartet')),
           letzterSave: row.letzterSave || '',
           letzterHeartbeat: row.letzterHeartbeat || '',
           heartbeats: Number(row.heartbeats) || 0,
@@ -2763,7 +2815,7 @@ function batchKorrektur(pruefungId, lpEmail, korrekturSheet) {
           fragenTyp: frage.typ, maxPunkte: frage.punkte,
           kiPunkte: autoBewertung.punkte, lpPunkte: '',
           kiBegruendung: autoBewertung.begruendung, kiFeedback: '',
-          lpKommentar: '', quelle: autoBewertung.quelle, geprueft: 'false', status: 'ki-bewertet',
+          lpKommentar: '', quelle: autoBewertung.quelle, geprueft: autoBewertung.quelle === 'auto' ? 'true' : 'false', status: autoBewertung.quelle === 'auto' ? 'auto-bewertet' : 'ki-bewertet',
         });
       } else {
         try {

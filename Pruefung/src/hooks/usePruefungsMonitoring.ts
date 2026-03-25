@@ -130,7 +130,8 @@ export function usePruefungsMonitoring(lockdownCallbacks?: MonitoringLockdownCal
         const aktuelleFrageIndex = state.aktuelleFrageIndex
         const beantworteteFragen = Object.keys(state.antworten).length
         const lockdownMeta = lockdownCallbacksRef.current?.getLockdownMeta?.()
-        const response = await apiService.heartbeat(config.id, user.email, aktuelleFrageIndex, beantworteteFragen, lockdownMeta)
+        const currentAutoSaveCount = state.autoSaveCount
+        const response = await apiService.heartbeat(config.id, user.email, aktuelleFrageIndex, beantworteteFragen, lockdownMeta, currentAutoSaveCount)
         if (response.success) {
           incrementHeartbeats()
           setVerbindungsstatus('online')

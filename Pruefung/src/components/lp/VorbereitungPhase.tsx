@@ -35,6 +35,7 @@ export default function VorbereitungPhase({ config, onTeilnehmerGesetzt, onWeite
   const [einladungGesendetMap, setEinladungGesendetMap] = useState<Set<string>>(
     new Set((config.teilnehmer ?? []).filter((t) => t.einladungGesendet).map((t) => t.email))
   )
+  const [kursAuswahlOffen, setKursAuswahlOffen] = useState(true)
 
   // Klassenlisten laden
   const ladeKlassenlisten = useCallback(async () => {
@@ -256,34 +257,51 @@ export default function VorbereitungPhase({ config, onTeilnehmerGesetzt, onWeite
 
   return (
     <div className="space-y-6">
-      {/* Kurs-Auswahl */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-200">Kurs auswählen</h3>
-          <button
-            type="button"
-            onClick={ladeKlassenlisten}
-            className="text-xs text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
-          >
-            Neu laden
-          </button>
-        </div>
-
-        {ladeStatus === 'laden' && (
-          <p className="text-sm text-slate-500 dark:text-slate-400">Klassenlisten werden geladen...</p>
-        )}
-        {ladeStatus === 'fehler' && (
-          <p className="text-sm text-red-600 dark:text-red-400">{fehler}</p>
-        )}
-        {ladeStatus === 'fertig' && (
-          <KursAuswahl
-            kursGruppen={kursGruppen}
-            ausgewaehlteSuS={ausgewaehlteSuS}
-            onToggleKurs={handleToggleKurs}
-            onToggleSuS={handleToggleSuS}
-            onAlleAuswaehlen={handleAlleAuswaehlen}
-            onKeineAuswaehlen={handleKeineAuswaehlen}
-          />
+      {/* Kurs-Auswahl (Collapsible) */}
+      <div className="border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden">
+        <button
+          type="button"
+          onClick={() => setKursAuswahlOffen(!kursAuswahlOffen)}
+          className="w-full flex items-center justify-between px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+        >
+          <span className="text-sm font-medium text-slate-700 dark:text-slate-200 flex items-center gap-2">
+            <span>Kurs auswählen</span>
+            <span className="text-xs font-normal text-slate-500 dark:text-slate-400">
+              ({kursGruppen.length} {kursGruppen.length === 1 ? 'Kurs' : 'Kurse'}, {ausgewaehlteSuS.size} SuS ausgewählt)
+            </span>
+          </span>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); ladeKlassenlisten() }}
+              className="text-xs text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
+            >
+              Neu laden
+            </button>
+            <span className={`text-slate-400 dark:text-slate-500 transition-transform duration-200 ${kursAuswahlOffen ? 'rotate-180' : ''}`}>
+              ▼
+            </span>
+          </div>
+        </button>
+        {kursAuswahlOffen && (
+          <div className="px-4 py-3 border-t border-slate-200 dark:border-slate-700 space-y-3">
+            {ladeStatus === 'laden' && (
+              <p className="text-sm text-slate-500 dark:text-slate-400">Klassenlisten werden geladen...</p>
+            )}
+            {ladeStatus === 'fehler' && (
+              <p className="text-sm text-red-600 dark:text-red-400">{fehler}</p>
+            )}
+            {ladeStatus === 'fertig' && (
+              <KursAuswahl
+                kursGruppen={kursGruppen}
+                ausgewaehlteSuS={ausgewaehlteSuS}
+                onToggleKurs={handleToggleKurs}
+                onToggleSuS={handleToggleSuS}
+                onAlleAuswaehlen={handleAlleAuswaehlen}
+                onKeineAuswaehlen={handleKeineAuswaehlen}
+              />
+            )}
+          </div>
         )}
       </div>
 
