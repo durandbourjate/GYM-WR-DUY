@@ -147,8 +147,8 @@ export default function KontenbestimmungFrage({ frage }: Props) {
                             text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500
                             disabled:cursor-not-allowed disabled:opacity-50
                             ${antwort.kategorie
-                              ? 'border-indigo-400 bg-indigo-50 text-slate-900 dark:border-indigo-500 dark:bg-indigo-900/15 dark:text-slate-100'
-                              : 'border-slate-300 bg-white text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100'
+                              ? 'border-slate-300 bg-white text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100'
+                              : readOnly ? 'border-slate-300 bg-white text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100' : 'border-violet-400 bg-white text-slate-900 dark:border-violet-500 dark:bg-slate-700 dark:text-slate-100'
                             }`}
                         >
                           <option value="">--</option>
@@ -171,8 +171,8 @@ export default function KontenbestimmungFrage({ frage }: Props) {
                             text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500
                             disabled:cursor-not-allowed disabled:opacity-50
                             ${antwort.seite
-                              ? 'border-indigo-400 bg-indigo-50 text-slate-900 dark:border-indigo-500 dark:bg-indigo-900/15 dark:text-slate-100'
-                              : 'border-slate-300 bg-white text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100'
+                              ? 'border-slate-300 bg-white text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100'
+                              : readOnly ? 'border-slate-300 bg-white text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100' : 'border-violet-400 bg-white text-slate-900 dark:border-violet-500 dark:bg-slate-700 dark:text-slate-100'
                             }`}
                         >
                           <option value="">--</option>

@@ -10,6 +10,7 @@ interface Props {
   frage: TKontoFrageType
 }
 
+
 function neueId(): string {
   return crypto.randomUUID()
 }

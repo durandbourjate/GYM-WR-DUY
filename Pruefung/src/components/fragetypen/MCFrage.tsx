@@ -67,7 +67,7 @@ export default function MCFrage({ frage }: Props) {
               disabled={abgegeben}
               className={`flex items-start gap-3 p-4 rounded-xl border-2 text-left transition-all cursor-pointer
                 ${istGewaehlt
-                  ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 dark:border-indigo-400'
+                  ? 'border-green-500 bg-green-50 dark:bg-green-900/20 dark:border-green-400'
                   : 'border-slate-200 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-500 bg-white dark:bg-slate-800'
                 }
                 ${abgegeben ? 'opacity-75 cursor-not-allowed' : ''}
@@ -76,7 +76,7 @@ export default function MCFrage({ frage }: Props) {
               {/* Radio / Checkbox Icon */}
               <span className={`mt-0.5 flex-shrink-0 w-5 h-5 rounded-${frage.mehrfachauswahl ? 'md' : 'full'} border-2 flex items-center justify-center
                 ${istGewaehlt
-                  ? 'border-indigo-600 bg-indigo-600 dark:border-indigo-400 dark:bg-indigo-400'
+                  ? 'border-green-600 bg-green-600 dark:border-green-400 dark:bg-green-400'
                   : 'border-slate-300 dark:border-slate-600'
                 }
               `}>

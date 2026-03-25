@@ -65,7 +65,7 @@ export default function LueckentextFrage({ frage }: Props) {
                   ${abgegeben
                     ? 'border-slate-300 dark:border-slate-600 bg-transparent opacity-75'
                     : wert
-                      ? 'border-indigo-500 dark:border-indigo-400 bg-indigo-50/50 dark:bg-indigo-900/10'
+                      ? 'border-slate-400 dark:border-slate-500 bg-transparent'
                       : 'border-violet-400 dark:border-violet-500 bg-transparent focus:border-indigo-500 dark:focus:border-indigo-400'
                   }
                 `}
