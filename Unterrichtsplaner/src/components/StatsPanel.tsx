@@ -56,7 +56,7 @@ function getTypeLabel(lt: number): { label: string; color: string } {
 }
 
 function MiniBar({ byType, total }: { byType: Record<number, number>; total: number }) {
-  if (total === 0) return <div className="h-2 bg-gray-800 rounded" />;
+  if (total === 0) return <div className="h-2 bg-slate-800 rounded" />;
   const order = [1, 2, 3, 0, 4, 5, 6];
   return (
     <div className="h-2 rounded overflow-hidden flex">
@@ -172,19 +172,19 @@ export function StatsPanel({ onClose }: { onClose: () => void }) {
   return (
     <div className="fixed inset-0 bg-black/60 z-[70] flex items-center justify-center" onClick={onClose}>
       <div
-        className="bg-slate-800 rounded-lg p-5 max-w-3xl w-full max-h-[80vh] overflow-y-auto border border-gray-700 shadow-2xl"
+        className="bg-slate-800 rounded-lg p-5 max-w-3xl w-full max-h-[80vh] overflow-y-auto border border-slate-700 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-sm font-bold text-gray-100">📊 Statistik</h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-300 cursor-pointer text-xs">✕</button>
+          <h2 className="text-sm font-bold text-slate-100">📊 Statistik</h2>
+          <button onClick={onClose} className="text-slate-500 hover:text-slate-300 cursor-pointer text-xs">✕</button>
         </div>
 
         {stats.length === 0 && (
           <div className="text-center py-8">
             <div className="text-2xl mb-2">📊</div>
-            <p className="text-gray-400 text-sm">Keine Daten vorhanden</p>
-            <p className="text-gray-500 text-[12px] mt-1">Lege zuerst Kurse an und plane Lektionen.</p>
+            <p className="text-slate-400 text-sm">Keine Daten vorhanden</p>
+            <p className="text-slate-500 text-[12px] mt-1">Lege zuerst Kurse an und plane Lektionen.</p>
           </div>
         )}
 
@@ -192,39 +192,39 @@ export function StatsPanel({ onClose }: { onClose: () => void }) {
         {/* Summary */}
         <div className="grid grid-cols-4 gap-3 mb-4">
           <div className="bg-slate-700/50 rounded p-2.5 text-center">
-            <div className="text-lg font-bold text-gray-100">{totalExams}</div>
-            <div className="text-[11px] text-gray-400">Prüfungen total</div>
+            <div className="text-lg font-bold text-slate-100">{totalExams}</div>
+            <div className="text-[11px] text-slate-400">Prüfungen total</div>
           </div>
           <div className="bg-slate-700/50 rounded p-2.5 text-center">
-            <div className="text-lg font-bold text-gray-100">{plannerCourses.length}</div>
-            <div className="text-[11px] text-gray-400">Kurse</div>
+            <div className="text-lg font-bold text-slate-100">{plannerCourses.length}</div>
+            <div className="text-[11px] text-slate-400">Kurse</div>
           </div>
           <div className="bg-slate-700/50 rounded p-2.5 text-center">
-            <div className="text-lg font-bold text-gray-100">{teachingWeeks}</div>
-            <div className="text-[11px] text-gray-400">Unterrichts-Einträge</div>
+            <div className="text-lg font-bold text-slate-100">{teachingWeeks}</div>
+            <div className="text-[11px] text-slate-400">Unterrichts-Einträge</div>
           </div>
           <div className="rounded p-2.5 text-center" style={collisions.length > 0 ? { background: 'var(--status-crit-bg)', border: '1px solid var(--status-crit-border)' } : undefined}>
-            <div className={`text-lg font-bold ${collisions.length > 0 ? '' : 'text-gray-100'}`} style={collisions.length > 0 ? { color: 'var(--status-crit-text)' } : undefined}>
+            <div className={`text-lg font-bold ${collisions.length > 0 ? '' : 'text-slate-100'}`} style={collisions.length > 0 ? { color: 'var(--status-crit-text)' } : undefined}>
               {collisions.length}
             </div>
-            <div className="text-[11px] text-gray-400">Prüfungskollisionen</div>
+            <div className="text-[11px] text-slate-400">Prüfungskollisionen</div>
           </div>
         </div>
 
         {/* Sequenz-Übersicht */}
         <div className="bg-slate-700/30 rounded p-2.5 mb-4 flex gap-6">
-          <div className="text-[12px] text-gray-400">
-            <span className="font-semibold text-gray-300">{totalSequences}</span> Sequenzen
+          <div className="text-[12px] text-slate-400">
+            <span className="font-semibold text-slate-300">{totalSequences}</span> Sequenzen
           </div>
-          <div className="text-[12px] text-gray-400">
-            <span className="font-semibold text-gray-300">{totalBlocks}</span> Blöcke
+          <div className="text-[12px] text-slate-400">
+            <span className="font-semibold text-slate-300">{totalBlocks}</span> Blöcke
           </div>
         </div>
 
         {/* Per-course table */}
         <table className="w-full text-[12px] mb-4">
           <thead>
-            <tr className="text-gray-500 border-b border-gray-700">
+            <tr className="text-slate-500 border-b border-slate-700">
               <th className="text-left py-1 pr-2">Kurs</th>
               <th className="text-left py-1 pr-2">Typ</th>
               <th className="text-right py-1 pr-2">Lekt.</th>
@@ -235,18 +235,18 @@ export function StatsPanel({ onClose }: { onClose: () => void }) {
           </thead>
           <tbody>
             {stats.map((s) => (
-              <tr key={s.course.id} className="border-b border-gray-800 hover:bg-slate-700/30">
-                <td className="py-1.5 pr-2 font-semibold text-gray-200">{s.course.cls}</td>
+              <tr key={s.course.id} className="border-b border-slate-800 hover:bg-slate-700/30">
+                <td className="py-1.5 pr-2 font-semibold text-slate-200">{s.course.cls}</td>
                 <td className="py-1.5 pr-2">
                   <span className="px-1 py-px rounded text-[9px] font-bold" style={{
                     background: s.course.typ === 'SF' ? '#16a34a' : s.course.typ === 'IN' ? '#0ea5e9' : s.course.typ === 'EWR' ? '#d97706' : '#7c3aed',
                     color: '#fff',
                   }}>{s.course.typ}</span>
                 </td>
-                <td className="py-1.5 pr-2 text-right text-gray-300">{s.totalLessons - s.holidays}</td>
+                <td className="py-1.5 pr-2 text-right text-slate-300">{s.totalLessons - s.holidays}</td>
                 <td className="py-1.5 pr-2 text-right font-semibold text-red-400">{s.exams || '–'}</td>
                 <td className="py-1.5 px-2"><MiniBar byType={s.byType} total={s.totalLessons} /></td>
-                <td className="py-1.5 text-gray-500">
+                <td className="py-1.5 text-slate-500">
                   {s.examWeeks.length > 0 ? s.examWeeks.map((w) => `KW${w}`).join(', ') : '–'}
                 </td>
               </tr>
@@ -322,7 +322,7 @@ export function StatsPanel({ onClose }: { onClose: () => void }) {
         {/* Legend */}
         <div className="mt-3 flex gap-3 flex-wrap">
           {[1, 2, 3, 0, 4, 5].map((t) => (
-            <span key={t} className="flex items-center gap-1 text-[9px] text-gray-500">
+            <span key={t} className="flex items-center gap-1 text-[9px] text-slate-500">
               <span className="w-2 h-2 rounded-sm" style={{ background: getTypeLabel(t).color }} />
               {getTypeLabel(t).label}
             </span>

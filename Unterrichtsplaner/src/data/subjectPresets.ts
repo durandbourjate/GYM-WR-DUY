@@ -81,11 +81,11 @@ export const SUBJECT_PRESETS: SubjectPreset[] = [
   // ── Geistes-/Sozialwiss. ──
   {
     id: 'geschichte', label: 'Geschichte', icon: '📜', group: 'Geistes-/Sozialwiss.',
-    subjects: [{ id: 'geschichte', label: 'Geschichte', shortLabel: 'GS', color: '#b45309', courseType: 'KS' }],
+    subjects: [{ id: 'geschichte', label: 'Geschichte', shortLabel: 'GS', color: '#92400e', courseType: 'KS' }],
   },
   {
     id: 'geografie', label: 'Geografie', icon: '🌎', group: 'Geistes-/Sozialwiss.',
-    subjects: [{ id: 'geografie', label: 'Geografie', shortLabel: 'GG', color: '#0891b2', courseType: 'KS' }],
+    subjects: [{ id: 'geografie', label: 'Geografie', shortLabel: 'GG', color: '#0e7490', courseType: 'KS' }],
   },
   {
     id: 'philosophie', label: 'Philosophie', icon: '🤔', group: 'Geistes-/Sozialwiss.',
@@ -109,7 +109,7 @@ export const SUBJECT_PRESETS: SubjectPreset[] = [
   // ── Mathe & Info ──
   {
     id: 'mathematik', label: 'Mathematik', icon: '📐', group: 'Mathe & Info',
-    subjects: [{ id: 'mathematik', label: 'Mathematik', shortLabel: 'MA', color: '#1d4ed8', courseType: 'KS' }],
+    subjects: [{ id: 'mathematik', label: 'Mathematik', shortLabel: 'MA', color: '#2563eb', courseType: 'KS' }],
   },
   {
     id: 'informatik', label: 'Informatik', icon: '💻', group: 'Mathe & Info',

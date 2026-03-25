@@ -39,12 +39,12 @@ function ImportDialog({ item, onClose }: { item: CollectionItem; onClose: () => 
   return (
     <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center" onClick={onClose}>
       <div className="bg-slate-800 border border-slate-600 rounded-lg p-4 w-80 shadow-xl" onClick={(e) => e.stopPropagation()}>
-        <div className="text-[13px] font-bold text-gray-200 mb-3">
+        <div className="text-[13px] font-bold text-slate-200 mb-3">
           {TYPE_LABELS[item.type].icon} Import: {item.title}
         </div>
         <div className="space-y-2">
           <div>
-            <label className="text-[11px] text-gray-400">Zielkurs</label>
+            <label className="text-[11px] text-slate-400">Zielkurs</label>
             <select value={targetKursId} onChange={(e) => setTargetKursId(e.target.value)}
               className="w-full bg-slate-700 text-slate-200 border border-slate-600 rounded px-2 py-1 text-[12px] outline-none focus:border-indigo-400">
               {COURSES.map((c) => (
@@ -53,24 +53,24 @@ function ImportDialog({ item, onClose }: { item: CollectionItem; onClose: () => 
             </select>
           </div>
           <div className="space-y-1">
-            <label className="flex items-center gap-1.5 text-[11px] text-gray-300 cursor-pointer">
+            <label className="flex items-center gap-1.5 text-[11px] text-slate-300 cursor-pointer">
               <input type="checkbox" checked={includeMaterialLinks} onChange={(e) => setIncludeMaterialLinks(e.target.checked)}
                 className="rounded border-slate-600" />
               Materiallinks übernehmen
             </label>
-            <label className="flex items-center gap-1.5 text-[11px] text-gray-300 cursor-pointer">
+            <label className="flex items-center gap-1.5 text-[11px] text-slate-300 cursor-pointer">
               <input type="checkbox" checked={includeNotes} onChange={(e) => setIncludeNotes(e.target.checked)}
                 className="rounded border-slate-600" />
               Notizen & Reflexionen übernehmen
             </label>
           </div>
-          <div className="text-[9px] text-gray-400 bg-slate-900/50 rounded p-1.5">
+          <div className="text-[9px] text-slate-400 bg-slate-900/50 rounded p-1.5">
             ℹ Wochen werden nicht importiert — du weist sie nach dem Import manuell oder per AutoPlace zu.
             {item.units.length > 1 && ` ${item.units.length} Blöcke werden als neue Sequenz erstellt.`}
           </div>
           <div className="flex gap-1 justify-end pt-1">
             <button onClick={onClose}
-              className="px-2 py-1 rounded text-[11px] text-gray-400 border border-gray-700 cursor-pointer hover:text-gray-200">
+              className="px-2 py-1 rounded text-[11px] text-slate-400 border border-slate-700 cursor-pointer hover:text-slate-200">
               Abbrechen
             </button>
             <button onClick={handleImport} disabled={imported}
@@ -124,20 +124,20 @@ function ArchiveDialog({ onClose }: { onClose: () => void }) {
   return (
     <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center" onClick={onClose}>
       <div className="bg-slate-800 border border-slate-600 rounded-lg p-4 w-80 shadow-xl" onClick={(e) => e.stopPropagation()}>
-        <div className="text-[13px] font-bold text-gray-200 mb-3">📦 Archivieren</div>
+        <div className="text-[13px] font-bold text-slate-200 mb-3">📦 Archivieren</div>
         <div className="space-y-2">
           <div className="flex gap-1">
             <button onClick={() => setMode('schoolyear')}
-              className={`flex-1 px-2 py-1 rounded text-[11px] border cursor-pointer ${mode === 'schoolyear' ? 'bg-indigo-500/20 border-indigo-500 text-indigo-300' : 'border-gray-600 text-gray-400'}`}>
+              className={`flex-1 px-2 py-1 rounded text-[11px] border cursor-pointer ${mode === 'schoolyear' ? 'bg-indigo-500/20 border-indigo-500 text-indigo-300' : 'border-slate-600 text-slate-400'}`}>
               📅 Schuljahr
             </button>
             <button onClick={() => setMode('curriculum')}
-              className={`flex-1 px-2 py-1 rounded text-[11px] border cursor-pointer ${mode === 'curriculum' ? 'bg-purple-500/20 border-purple-500 text-purple-300' : 'border-gray-600 text-gray-400'}`}>
+              className={`flex-1 px-2 py-1 rounded text-[11px] border cursor-pointer ${mode === 'curriculum' ? 'bg-purple-500/20 border-purple-500 text-purple-300' : 'border-slate-600 text-slate-400'}`}>
               🎓 Bildungsgang
             </button>
           </div>
           <div>
-            <label className="text-[11px] text-gray-400">Kurs</label>
+            <label className="text-[11px] text-slate-400">Kurs</label>
             <select value={`${selectedType}|${selectedCls}`}
               onChange={(e) => { const [t, c] = e.target.value.split('|'); setSelectedType(t as CourseType); setSelectedCls(c); }}
               className="w-full bg-slate-700 text-slate-200 border border-slate-600 rounded px-2 py-1 text-[12px] outline-none">
@@ -147,19 +147,19 @@ function ArchiveDialog({ onClose }: { onClose: () => void }) {
             </select>
           </div>
           <div>
-            <label className="text-[11px] text-gray-400">Schuljahr</label>
+            <label className="text-[11px] text-slate-400">Schuljahr</label>
             <input value={schoolYear} onChange={(e) => setSchoolYear(e.target.value)}
               className="w-full bg-slate-700 text-slate-200 border border-slate-600 rounded px-2 py-1 text-[12px] outline-none" />
           </div>
           {mode === 'curriculum' && (
             <div>
-              <label className="text-[11px] text-gray-400">GYM-Jahre</label>
+              <label className="text-[11px] text-slate-400">GYM-Jahre</label>
               <input value={gymYears} onChange={(e) => setGymYears(e.target.value)}
                 className="w-full bg-slate-700 text-slate-200 border border-slate-600 rounded px-2 py-1 text-[12px] outline-none" />
             </div>
           )}
           <div className="flex gap-1 justify-end pt-1">
-            <button onClick={onClose} className="px-2 py-1 rounded text-[11px] text-gray-400 border border-gray-700 cursor-pointer hover:text-gray-200">Abbrechen</button>
+            <button onClick={onClose} className="px-2 py-1 rounded text-[11px] text-slate-400 border border-slate-700 cursor-pointer hover:text-slate-200">Abbrechen</button>
             <button onClick={handleArchive} disabled={archived || !selectedCls}
               className={`px-2 py-1 rounded text-[11px] border cursor-pointer ${archived ? 'bg-green-700 border-green-600 text-green-200' : 'bg-amber-600 border-amber-500 text-white hover:bg-amber-500'}`}>
               {archived ? '✓ Archiviert' : 'Archivieren'}
@@ -199,8 +199,8 @@ function CollectionCard({ item, onImport }: { item: CollectionItem; onImport: (i
         <span className="text-[11px]">{typeInfo.icon}</span>
         {saColor && <div className="w-1 h-4 rounded-full shrink-0" style={{ background: saColor.bg }} />}
         <div className="flex-1 min-w-0">
-          <div className="text-[12px] font-semibold text-gray-200 truncate">{item.title}</div>
-          <div className="text-[9px] text-gray-400 flex items-center gap-1.5">
+          <div className="text-[12px] font-semibold text-slate-200 truncate">{item.title}</div>
+          <div className="text-[9px] text-slate-400 flex items-center gap-1.5">
             <span>{typeInfo.label}</span>
             {item.type === 'settings' ? (
               <span>· {(() => { try { const s = JSON.parse(item.settingsSnapshot || '{}'); return `${s.courses?.length || 0} Kurse`; } catch { return ''; } })()}</span>
@@ -212,14 +212,14 @@ function CollectionCard({ item, onImport }: { item: CollectionItem; onImport: (i
             <span className="ml-auto">{dateStr}</span>
           </div>
         </div>
-        <span className="text-[11px] text-gray-400">{expanded ? '▾' : '▸'}</span>
+        <span className="text-[11px] text-slate-400">{expanded ? '▾' : '▸'}</span>
       </div>
 
       {expanded && (
         <div className="px-2 pb-2 pt-0.5 border-t border-slate-700/50 space-y-1.5">
           {/* Content — settings summary or unit list */}
           {item.type === 'settings' && item.settingsSnapshot ? (
-            <div className="text-[9px] text-gray-400 space-y-0.5 px-1">
+            <div className="text-[9px] text-slate-400 space-y-0.5 px-1">
               {(() => { try { const s = JSON.parse(item.settingsSnapshot);
                 return (<>
                   <div>📚 {s.courses?.length || 0} Kurse</div>
@@ -232,15 +232,15 @@ function CollectionCard({ item, onImport }: { item: CollectionItem; onImport: (i
             <div className="space-y-0.5 max-h-40 overflow-y-auto">
               {item.units.map((u, i) => (
                 <div key={i} className="flex items-center gap-1 text-[9px] px-1 py-0.5 rounded hover:bg-slate-700/30">
-                  <span className="text-gray-600">{i + 1}.</span>
-                  <span className="text-gray-300 truncate">{u.block.label || '(ohne Titel)'}</span>
+                  <span className="text-slate-600">{i + 1}.</span>
+                  <span className="text-slate-300 truncate">{u.block.label || '(ohne Titel)'}</span>
                   {u.block.fachbereich && (
                     <span className="ml-auto text-[8px] px-1 rounded" style={{
                       color: FACHBEREICH_COLORS[u.block.fachbereich]?.fg,
                       background: FACHBEREICH_COLORS[u.block.fachbereich]?.bg + '20',
                     }}>{u.block.fachbereich}</span>
                   )}
-                  <span className="text-gray-600">{u.lessonTitles.filter(Boolean).length}L</span>
+                  <span className="text-slate-600">{u.lessonTitles.filter(Boolean).length}L</span>
                 </div>
               ))}
             </div>
@@ -250,7 +250,7 @@ function CollectionCard({ item, onImport }: { item: CollectionItem; onImport: (i
           {item.tags && item.tags.length > 0 && (
             <div className="flex flex-wrap gap-0.5">
               {item.tags.map((t, i) => (
-                <span key={i} className="text-[8px] px-1 py-px rounded bg-slate-700 text-gray-400">#{t}</span>
+                <span key={i} className="text-[8px] px-1 py-px rounded bg-slate-700 text-slate-400">#{t}</span>
               ))}
             </div>
           )}
@@ -264,7 +264,7 @@ function CollectionCard({ item, onImport }: { item: CollectionItem; onImport: (i
                 placeholder="Tags (kommagetrennt)…"
                 className="w-full bg-slate-700/50 text-slate-200 border border-slate-600 rounded px-1.5 py-0.5 text-[11px] outline-none" />
               <div className="flex gap-1 justify-end">
-                <button onClick={() => setEditing(false)} className="text-[9px] text-gray-400 cursor-pointer">Abbrechen</button>
+                <button onClick={() => setEditing(false)} className="text-[9px] text-slate-400 cursor-pointer">Abbrechen</button>
                 <button onClick={handleSave} className="text-[9px] text-indigo-400 cursor-pointer">Speichern</button>
               </div>
             </div>
@@ -275,9 +275,9 @@ function CollectionCard({ item, onImport }: { item: CollectionItem; onImport: (i
                   <button onClick={() => onImport(item)} className="text-[9px] text-indigo-400 hover:text-indigo-300 cursor-pointer">↗ Importieren</button>
                 )}
                 {item.type === 'settings' && (
-                  <span className="text-[9px] text-gray-500">Laden via Einstellungen-Tab</span>
+                  <span className="text-[9px] text-slate-500">Laden via Einstellungen-Tab</span>
                 )}
-                <button onClick={() => setEditing(true)} className="text-[9px] text-gray-400 hover:text-gray-300 cursor-pointer">✏ Bearbeiten</button>
+                <button onClick={() => setEditing(true)} className="text-[9px] text-slate-400 hover:text-slate-300 cursor-pointer">✏ Bearbeiten</button>
               </div>
               <button onClick={() => { if (confirm(`"${item.title}" aus Sammlung löschen?`)) deleteCollectionItem(item.id); }}
                 className="text-[9px] text-red-400 hover:text-red-300 cursor-pointer">🗑</button>
@@ -325,7 +325,7 @@ export function CollectionPanel() {
         <div className="flex gap-0.5 flex-wrap">
           {(['ALL', 'unit', 'sequence', 'schoolyear', 'curriculum', 'settings'] as const).map((t) => (
             <button key={t} onClick={() => setFilterType(t)}
-              className={`px-1.5 py-0.5 rounded text-[9px] border cursor-pointer ${filterType === t ? 'bg-amber-500/20 border-amber-500 text-amber-300' : 'border-gray-600 text-gray-400'}`}>
+              className={`px-1.5 py-0.5 rounded text-[9px] border cursor-pointer ${filterType === t ? 'bg-amber-500/20 border-amber-500 text-amber-300' : 'border-slate-600 text-slate-400'}`}>
               {t === 'ALL' ? 'Alle' : TYPE_LABELS[t].icon + ' ' + TYPE_LABELS[t].label}
             </button>
           ))}
@@ -333,12 +333,12 @@ export function CollectionPanel() {
         {/* Subject area filter */}
         <div className="flex gap-0.5">
           <button onClick={() => setFilterSA('ALL')}
-            className={`px-1.5 py-0.5 rounded text-[9px] border cursor-pointer ${filterSA === 'ALL' ? 'bg-slate-600 border-slate-500 text-gray-200' : 'border-gray-700 text-gray-400'}`}>
+            className={`px-1.5 py-0.5 rounded text-[9px] border cursor-pointer ${filterSA === 'ALL' ? 'bg-slate-600 border-slate-500 text-slate-200' : 'border-slate-700 text-slate-400'}`}>
             Alle FB
           </button>
           {categories.map((sa) => (
             <button key={sa.key} onClick={() => setFilterSA(filterSA === sa.key ? 'ALL' : sa.key as Fachbereich)}
-              className={`px-1.5 py-0.5 rounded text-[9px] border cursor-pointer ${filterSA === sa.key ? 'bg-opacity-20 border-current' : 'border-gray-700'}`}
+              className={`px-1.5 py-0.5 rounded text-[9px] border cursor-pointer ${filterSA === sa.key ? 'bg-opacity-20 border-current' : 'border-slate-700'}`}
               style={{ color: filterSA === sa.key ? sa.color : '#6b7280', borderColor: filterSA === sa.key ? sa.color : undefined }}>
               {sa.label}
             </button>
@@ -353,12 +353,12 @@ export function CollectionPanel() {
         {filtered.length === 0 && (
           <div className="text-center py-8 space-y-2">
             <div className="text-[24px]">📚</div>
-            <div className="text-[12px] text-gray-400">
+            <div className="text-[12px] text-slate-400">
               {collection.length === 0
                 ? 'Noch keine Einträge in der Sammlung'
                 : 'Keine Treffer für diese Filter'}
             </div>
-            <div className="text-[9px] text-gray-600">
+            <div className="text-[9px] text-slate-600">
               Speichere Unterrichtseinheiten, Sequenzen oder ganze Schuljahre
               über den 💾-Button im Sequenzen-Tab.
             </div>

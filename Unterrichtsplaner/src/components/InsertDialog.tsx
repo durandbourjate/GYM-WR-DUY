@@ -28,15 +28,15 @@ export function InsertDialog() {
       onClick={() => setInsertDialog(null)}
     >
       <div
-        className="bg-slate-800 rounded-lg p-5 max-w-md border border-gray-700 shadow-2xl"
+        className="bg-slate-800 rounded-lg p-5 max-w-md border border-slate-700 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <h3 className="text-sm font-bold text-gray-100 mb-2">
+        <h3 className="text-sm font-bold text-slate-100 mb-2">
           Einfügen & Verschieben
         </h3>
         <p className="text-[13px] text-slate-400 mb-3">
-          Neuer leerer Eintrag vor <b className="text-gray-200">KW {week}</b> für{' '}
-          <b className="text-gray-200">{course.cls} ({course.typ})</b>.
+          Neuer leerer Eintrag vor <b className="text-slate-200">KW {week}</b> für{' '}
+          <b className="text-slate-200">{course.cls} ({course.typ})</b>.
           Alle folgenden Einträge verschieben sich um 1 Slot.
         </p>
 
@@ -82,7 +82,7 @@ export function InsertDialog() {
           )}
           <button
             onClick={() => setInsertDialog(null)}
-            className="px-3 py-1.5 rounded bg-gray-700 text-gray-400 text-[12px] cursor-pointer hover:text-gray-200"
+            className="px-3 py-1.5 rounded bg-slate-700 text-slate-400 text-[12px] cursor-pointer hover:text-slate-200"
           >
             Abbrechen
           </button>

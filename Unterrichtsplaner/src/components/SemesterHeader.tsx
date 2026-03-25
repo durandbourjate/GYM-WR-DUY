@@ -36,7 +36,7 @@ export function SemesterHeader({ courses, semester, weeks }: Props) {
     <thead className="sticky z-40" style={{ top: 0 }}>
       {/* Day row */}
       <tr>
-        <th className="w-12 bg-gray-900 sticky left-0 z-50 py-1 border-b border-gray-800">
+        <th className="w-12 bg-slate-900 sticky left-0 z-50 py-1 border-b border-slate-800">
           <span className={`font-bold ${semester === 1 ? 'text-indigo-400' : 'text-amber-400'}`} style={{ fontSize: z(9) }}>
             {semester === 1 ? 'S1' : 'S2'}
           </span>
@@ -47,7 +47,7 @@ export function SemesterHeader({ courses, semester, weeks }: Props) {
           return (
             <Fragment key={`${c.id}-day`}>
               <th
-                className="bg-gray-900 px-0 pt-0.5 border-b border-gray-800 text-center"
+                className="bg-slate-900 px-0 pt-0.5 border-b border-slate-800 text-center"
                 style={{
                   borderLeft: newDay ? `2px solid ${DAY_COLORS[c.day]}40` : 'none',
                   fontSize: z(10), fontWeight: 700, color: DAY_COLORS[c.day],
@@ -56,7 +56,7 @@ export function SemesterHeader({ courses, semester, weeks }: Props) {
                 {newDay ? c.day : ''}
               </th>
               {expanded && (
-                <th className="bg-gray-900 border-b border-gray-800"
+                <th className="bg-slate-900 border-b border-slate-800"
                   style={{ width: ncw, minWidth: ncw, maxWidth: ncw }} />
               )}
             </Fragment>
@@ -65,8 +65,8 @@ export function SemesterHeader({ courses, semester, weeks }: Props) {
       </tr>
       {/* Course info row */}
       <tr>
-        <th className="w-12 bg-gray-900 sticky left-0 z-50 px-1 pb-1 border-b-2 border-gray-700">
-          <span className="text-gray-500 font-semibold" style={{ fontSize: z(7) }}>KW</span>
+        <th className="w-12 bg-slate-900 sticky left-0 z-50 px-1 pb-1 border-b-2 border-slate-700">
+          <span className="text-slate-500 font-semibold" style={{ fontSize: z(7) }}>KW</span>
         </th>
         {courses.map((c, i) => {
           const newDay = i === 0 || c.day !== courses[i - 1]?.day;
@@ -75,7 +75,7 @@ export function SemesterHeader({ courses, semester, weeks }: Props) {
           return (
             <Fragment key={`${c.id}-info`}>
               <th
-                className={`bg-gray-900 px-0.5 pb-1 border-b-2 text-center ${courseFilter === `${c.cls}|${c.typ}` ? 'border-indigo-500' : 'border-gray-700'}`}
+                className={`bg-slate-900 px-0.5 pb-1 border-b-2 text-center ${courseFilter === `${c.cls}|${c.typ}` ? 'border-indigo-500' : 'border-slate-700'}`}
                 style={{
                   borderLeft: newDay ? `2px solid ${DAY_COLORS[c.day]}40` : 'none',
                   ...(autoFitZoom ? {} : { width: colW, minWidth: colW, maxWidth: colW }),
@@ -85,7 +85,7 @@ export function SemesterHeader({ courses, semester, weeks }: Props) {
                 <div className="flex items-center justify-center gap-0.5 overflow-hidden">
                   <div
                     className={`font-bold cursor-pointer transition-colors truncate ${
-                      classFilter === c.cls ? 'text-indigo-400' : 'text-gray-200 hover:text-indigo-300'
+                      classFilter === c.cls ? 'text-indigo-400' : 'text-slate-200 hover:text-indigo-300'
                     }`}
                     style={{ fontSize: Math.max(z(8), zoomCfg.fontSize - 1) }}
                     onClick={(e) => {
@@ -105,7 +105,7 @@ export function SemesterHeader({ courses, semester, weeks }: Props) {
                   <button
                     onClick={(e) => { e.stopPropagation(); toggleNoteCol(c.id); }}
                     className={`px-1 py-0.5 rounded cursor-pointer transition-all ${
-                      expanded ? 'text-indigo-400 bg-indigo-900/40 border border-indigo-700/50' : 'text-gray-500 hover:text-gray-300 bg-slate-800/60 hover:bg-slate-700/60'
+                      expanded ? 'text-indigo-400 bg-indigo-900/40 border border-indigo-700/50' : 'text-slate-500 hover:text-slate-300 bg-slate-800/60 hover:bg-slate-700/60'
                     }`}
                     style={{ fontSize: z(9) }}
                     title={expanded ? 'Notizen-Spalte ausblenden' : 'Notizen-Spalte einblenden'}
@@ -142,13 +142,13 @@ export function SemesterHeader({ courses, semester, weeks }: Props) {
                     const planned = weeks.filter(w => { const e = w.lessons[c.col]; return e && e.type !== 6; }).length;
                     const free = weeks.filter(w => !w.lessons[c.col]).length;
                     return free > 0 ? (
-                      <span className="px-0.5 rounded bg-slate-800/60 text-gray-500" style={{ fontSize: z(6) }} title={`${free} freie Wochen (${planned} geplant)`}>
+                      <span className="px-0.5 rounded bg-slate-800/60 text-slate-500" style={{ fontSize: z(6) }} title={`${free} freie Wochen (${planned} geplant)`}>
                         {free} frei
                       </span>
                     ) : null;
                   })()}
                 </div>
-                <div className="text-gray-500 font-mono mt-0.5" style={{ fontSize: z(7) }}>{c.from}–{c.to}</div>
+                <div className="text-slate-500 font-mono mt-0.5" style={{ fontSize: z(7) }}>{c.from}–{c.to}</div>
                 {/* v3.102: Redundante Notes filtern (HK/Praktikum als Badge, Phase als Badge) */}
                 {c.note && !(/^(praktikum\s*)?(hk)?$/i.test(c.note.trim())) && !(/phasenunterricht/i.test(c.note)) && (
                   <div className="text-amber-600 mt-0.5" style={{ fontSize: z(6) }}>{c.note}</div>
@@ -156,9 +156,9 @@ export function SemesterHeader({ courses, semester, weeks }: Props) {
               </th>
               {expanded && (
                 <th
-                  className="bg-gray-900/80 px-1 pb-1 border-b-2 border-gray-700 text-center border-l border-gray-800 relative"
+                  className="bg-slate-900/80 px-1 pb-1 border-b-2 border-slate-700 text-center border-l border-slate-800 relative"
                   style={{ width: ncw, minWidth: ncw, maxWidth: ncw }}>
-                  <div className="text-gray-500" style={{ fontSize: z(8) }}>📝 Notizen</div>
+                  <div className="text-slate-500" style={{ fontSize: z(8) }}>📝 Notizen</div>
                   {/* Resize handle */}
                   <div
                     className="absolute right-0 top-0 bottom-0 w-1.5 cursor-col-resize hover:bg-indigo-500/40 transition-colors"

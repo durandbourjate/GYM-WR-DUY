@@ -88,10 +88,10 @@ export function AppHeader() {
   return (
     <div ref={toolbarRef} className="border-b px-4 py-2 sticky top-0 z-[60] flex items-center gap-2 no-print overflow-hidden app-header" style={{ background: 'var(--toolbar-bg)', borderColor: 'var(--toolbar-border)' }}>
       <div className="flex items-baseline gap-2 flex-shrink-0">
-        <span className="text-base font-bold text-gray-50">
+        <span className="text-base font-bold text-slate-50">
           <span className="text-indigo-400">⊞</span> Planer
         </span>
-        <span className="text-[12px] text-gray-500">{APP_VERSION}</span>
+        <span className="text-[12px] text-slate-500">{APP_VERSION}</span>
       </div>
       {/* v3.98: PlannerTabs inline in der Toolbar */}
       <PlannerTabs />
@@ -104,12 +104,12 @@ export function AppHeader() {
           onChange={(e) => setSearchQuery(e.target.value)}
           onKeyDown={(e) => { if (e.key === 'Escape') { setSearchQuery(''); (e.target as HTMLInputElement).blur(); } }}
           placeholder="🔍 Suche…"
-          className="w-full px-2 py-0.5 rounded text-[12px] bg-slate-800 border border-gray-700 text-gray-300 outline-none focus:border-indigo-400 placeholder-gray-600"
+          className="w-full px-2 py-0.5 rounded text-[12px] bg-slate-800 border border-slate-700 text-slate-300 outline-none focus:border-indigo-400 placeholder-gray-600"
         />
         {searchQuery && (
           <button
             onClick={() => { setSearchQuery(''); searchInputRef.current?.focus(); }}
-            className="absolute right-1 top-1/2 -translate-y-1/2 text-[11px] text-gray-500 hover:text-gray-300 cursor-pointer"
+            className="absolute right-1 top-1/2 -translate-y-1/2 text-[11px] text-slate-500 hover:text-slate-300 cursor-pointer"
           >✕</button>
         )}
       </div>
@@ -127,7 +127,7 @@ export function AppHeader() {
           className={`px-2 py-0.5 rounded text-[12px] font-semibold border cursor-pointer transition-colors ${
             filter !== 'ALL' || classFilter
               ? 'bg-indigo-500/20 text-indigo-300 border-indigo-500'
-              : 'bg-transparent text-gray-400 border-gray-700 hover:border-gray-500 hover:text-gray-200'
+              : 'bg-transparent text-slate-400 border-slate-700 hover:border-slate-500 hover:text-slate-200'
           }`}
           title="Kursfilter"
         >
@@ -139,7 +139,7 @@ export function AppHeader() {
           style={{ position: 'fixed', top: courseDropdownPos.top, left: courseDropdownPos.left, zIndex: 9999 }}>
           <button onClick={() => { setFilter('ALL'); setShowCourseMenu(false); }}
             className={`w-full px-3 py-1.5 text-left text-[12px] cursor-pointer flex items-center gap-2 ${
-              filter === 'ALL' ? 'text-indigo-300 bg-indigo-500/10' : 'text-gray-200 hover:bg-slate-700'
+              filter === 'ALL' ? 'text-indigo-300 bg-indigo-500/10' : 'text-slate-200 hover:bg-slate-700'
             }`}>
             {filter === 'ALL' ? '✓' : '\u2003'} Alle Kurse
           </button>
@@ -147,7 +147,7 @@ export function AppHeader() {
           {courseTypeFilters.map((typ) => (
             <button key={typ} onClick={() => { setFilter(typ); setShowCourseMenu(false); }}
               className={`w-full px-3 py-1.5 text-left text-[12px] cursor-pointer flex items-center gap-2 ${
-                filter === typ ? 'text-indigo-300 bg-indigo-500/10' : 'text-gray-200 hover:bg-slate-700'
+                filter === typ ? 'text-indigo-300 bg-indigo-500/10' : 'text-slate-200 hover:bg-slate-700'
               }`}>
               {filter === typ ? '✓' : '\u2003'} {typ}
             </button>
@@ -190,7 +190,7 @@ export function AppHeader() {
             setSequencePanelOpen(true);
             setShowAddMenu(false);
           }}
-            className="w-full px-3 py-1.5 text-left text-[12px] text-gray-200 hover:bg-slate-700 cursor-pointer flex items-center gap-2">
+            className="w-full px-3 py-1.5 text-left text-[12px] text-slate-200 hover:bg-slate-700 cursor-pointer flex items-center gap-2">
             <span className="text-green-400">▧</span> Neue Sequenz
           </button>
           <button onClick={() => {
@@ -198,7 +198,7 @@ export function AppHeader() {
             setSidePanelTab('details');
             setShowAddMenu(false);
           }}
-            className="w-full px-3 py-1.5 text-left text-[12px] text-gray-200 hover:bg-slate-700 cursor-pointer flex items-center gap-2">
+            className="w-full px-3 py-1.5 text-left text-[12px] text-slate-200 hover:bg-slate-700 cursor-pointer flex items-center gap-2">
             <span className="text-indigo-400">📖</span> Neue UE
           </button>
         </div>,
@@ -209,7 +209,7 @@ export function AppHeader() {
         {undoStack.length > 0 && (
           <button
             onClick={undo}
-            className="px-2 py-0.5 rounded text-[12px] border border-gray-700 text-gray-400 cursor-pointer hover:text-gray-200 hover:border-gray-500"
+            className="px-2 py-0.5 rounded text-[12px] border border-slate-700 text-slate-400 cursor-pointer hover:text-slate-200 hover:border-slate-500"
             title="Rückgängig (⌘Z)"
           >
             ↩
@@ -231,12 +231,12 @@ export function AppHeader() {
               if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
           }}
-          className="px-2 py-0.5 rounded text-[12px] border border-gray-700 text-gray-400 cursor-pointer hover:text-gray-200 hover:border-gray-500"
+          className="px-2 py-0.5 rounded text-[12px] border border-slate-700 text-slate-400 cursor-pointer hover:text-slate-200 hover:border-slate-500"
           title={`Zur aktuellen Woche (KW ${CURRENT_WEEK}) scrollen`}
         >
           ◉
         </button>
-        <div className="flex items-center border border-gray-700 rounded overflow-hidden">
+        <div className="flex items-center border border-slate-700 rounded overflow-hidden">
           {([1, 3] as const).map((z, i) => (
             <button
               key={z}
@@ -244,8 +244,8 @@ export function AppHeader() {
               className={`px-1.5 py-0.5 text-[11px] font-semibold cursor-pointer transition-colors ${
                 zoomLevel === z
                   ? 'bg-cyan-600 text-white'
-                  : 'text-gray-500 hover:text-gray-300 hover:bg-gray-800'
-              } ${i === 0 ? 'border-r border-gray-700' : ''}`}
+                  : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800'
+              } ${i === 0 ? 'border-r border-slate-700' : ''}`}
               title={z === 1 ? 'Jahresübersicht' : 'Wochenansicht'}
             >
               {z === 1 ? '◫' : '▦'}
@@ -256,7 +256,7 @@ export function AppHeader() {
           <button
             onClick={() => setAutoFitZoom(!autoFitZoom)}
             className={`px-1.5 py-0.5 rounded text-[11px] font-semibold cursor-pointer transition-colors border ${
-              autoFitZoom ? 'bg-cyan-600/30 border-cyan-500 text-cyan-300' : 'border-gray-700 text-gray-500 hover:text-gray-300'
+              autoFitZoom ? 'bg-cyan-600/30 border-cyan-500 text-cyan-300' : 'border-slate-700 text-slate-500 hover:text-slate-300'
             }`}
             title={autoFitZoom ? 'Auto-Fit: Tabelle passt sich an Bildschirmbreite an' : 'Auto-Fit: Tabelle hat feste Spaltenbreite'}
           >
@@ -264,11 +264,11 @@ export function AppHeader() {
           </button>
         )}
         {/* v3.91 N3: Zoom − / + Buttons */}
-        <div className="flex items-center border border-gray-700 rounded overflow-hidden">
+        <div className="flex items-center border border-slate-700 rounded overflow-hidden">
           <button
             onClick={() => setColumnZoom(columnZoom - 1)}
             disabled={columnZoom <= 0}
-            className={`px-1.5 py-0.5 text-[11px] font-semibold cursor-pointer transition-colors border-r border-gray-700 ${columnZoom <= 0 ? 'text-gray-500 opacity-50 cursor-not-allowed' : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800'}`}
+            className={`px-1.5 py-0.5 text-[11px] font-semibold cursor-pointer transition-colors border-r border-slate-700 ${columnZoom <= 0 ? 'text-slate-500 opacity-50 cursor-not-allowed' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'}`}
             title={`Zoom verkleinern (Stufe ${columnZoom + 1}/${ZOOM_LEVELS.length})`}
           >
             −
@@ -276,7 +276,7 @@ export function AppHeader() {
           <button
             onClick={() => setColumnZoom(columnZoom + 1)}
             disabled={columnZoom >= ZOOM_LEVELS.length - 1}
-            className={`px-1.5 py-0.5 text-[11px] font-semibold cursor-pointer transition-colors ${columnZoom >= ZOOM_LEVELS.length - 1 ? 'text-gray-500 opacity-50 cursor-not-allowed' : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800'}`}
+            className={`px-1.5 py-0.5 text-[11px] font-semibold cursor-pointer transition-colors ${columnZoom >= ZOOM_LEVELS.length - 1 ? 'text-slate-500 opacity-50 cursor-not-allowed' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'}`}
             title={`Zoom vergrössern (Stufe ${columnZoom + 1}/${ZOOM_LEVELS.length})`}
           >
             +
@@ -284,21 +284,21 @@ export function AppHeader() {
         </div>
         <button
           onClick={() => setDimPastWeeks(!dimPastWeeks)}
-          className={`px-2 py-0.5 rounded text-[11px] cursor-pointer transition-colors ${dimPastWeeks ? 'text-amber-400 bg-amber-900/30 border border-amber-700' : 'text-gray-500 border border-gray-700 hover:text-gray-300'}`}
+          className={`px-2 py-0.5 rounded text-[11px] cursor-pointer transition-colors ${dimPastWeeks ? 'text-amber-400 bg-amber-900/30 border border-amber-700' : 'text-slate-500 border border-slate-700 hover:text-slate-300'}`}
           title={dimPastWeeks ? 'Vergangene Wochen: abgedunkelt' : 'Vergangene Wochen: volle Helligkeit'}
         >
           ≋
         </button>
         <button
           onClick={toggleTheme}
-          className={`px-2 py-0.5 rounded text-[11px] cursor-pointer transition-colors border ${isLight ? 'text-amber-500 bg-amber-100 border-amber-300' : 'text-gray-500 border-gray-700 hover:text-yellow-300'}`}
+          className={`px-2 py-0.5 rounded text-[11px] cursor-pointer transition-colors border ${isLight ? 'text-amber-500 bg-amber-100 border-amber-300' : 'text-slate-500 border-slate-700 hover:text-yellow-300'}`}
           title={isLight ? 'Wechsel zu Darkmode' : 'Wechsel zu Lightmode'}
         >
           {isLight ? '☀' : '☽'}
         </button>
         <button
           onClick={() => setShowStats(true)}
-          className="px-2 py-0.5 rounded text-[12px] border border-gray-700 text-gray-500 cursor-pointer hover:text-gray-300 hover:border-gray-500 relative"
+          className="px-2 py-0.5 rounded text-[12px] border border-slate-700 text-slate-500 cursor-pointer hover:text-slate-300 hover:border-slate-500 relative"
           title="Statistik"
         >
           📊
@@ -314,7 +314,7 @@ export function AppHeader() {
             setSidePanelOpen(true);
             setSidePanelTab('settings');
           }}
-          className="px-2 py-0.5 rounded text-[12px] border border-gray-700 text-gray-500 cursor-pointer hover:text-indigo-300 hover:border-indigo-700"
+          className="px-2 py-0.5 rounded text-[12px] border border-slate-700 text-slate-500 cursor-pointer hover:text-indigo-300 hover:border-indigo-700"
           title="Einstellungen (Export/Import hier)"
         >
           ⚙️
@@ -322,7 +322,7 @@ export function AppHeader() {
         <button
           onClick={toggleHelp}
           className={`px-2 py-0.5 rounded text-[12px] border cursor-pointer ${
-            showHelp ? 'bg-slate-800 border-gray-600 text-gray-300' : 'border-gray-700 text-gray-500'
+            showHelp ? 'bg-slate-800 border-slate-600 text-slate-300' : 'border-slate-700 text-slate-500'
           }`}
           title="Kurzanleitung & Tastenkürzel"
         >
@@ -361,7 +361,7 @@ export function HelpBar() {
 
   return (
     <div className="border-b px-4 py-2 text-[12px] leading-relaxed no-print" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)', color: 'var(--text-muted)' }}>
-      <b className="text-gray-200">Bedienung:</b>{' '}
+      <b className="text-slate-200">Bedienung:</b>{' '}
       <b>1× Klick</b> = Auswählen (Mini-Buttons: + ↓ i) ·{' '}
       <b>2× Klick</b> = Details öffnen ·{' '}
       <b>Hover</b> = Vorschau ·{' '}
@@ -377,7 +377,7 @@ export function HelpBar() {
       <br />
       <b className="text-amber-400">⚠ 1L↔2L:</b> Bei Kursen mit alternierenden Slots warnt das Tool bei Verschiebungskonflikten.
       <br />
-      <b className="text-gray-200">Legende:</b>{' '}
+      <b className="text-slate-200">Legende:</b>{' '}
       {activeCategories.map(cat => (
         <span key={cat.key} className="inline-flex items-center gap-0.5 mr-2">
           <span className="inline-block w-2 h-2 rounded-sm border border-black/10" style={{ background: cat.bg }} />

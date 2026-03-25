@@ -180,7 +180,7 @@ export function ZoomBlockView({ semester }: Props) {
       <table className="border-collapse w-max min-w-full">
         <thead className="sticky z-40" style={{ top: 0 }}>
           <tr>
-            <th className="w-10 bg-gray-900 sticky left-0 z-50 py-0.5 border-b border-gray-800">
+            <th className="w-10 bg-slate-900 sticky left-0 z-50 py-0.5 border-b border-slate-800">
               <span className={`font-bold ${semester === 1 ? 'text-indigo-400' : 'text-amber-400'}`} style={{ fontSize: z(8) }}>
                 {semester === 1 ? 'S1' : 'S2'}
               </span>
@@ -188,7 +188,7 @@ export function ZoomBlockView({ semester }: Props) {
             {courses.map((c, i) => {
               const newDay = i === 0 || c.day !== courses[i - 1]?.day;
               return (
-                <th key={`${c.id}-day`} className="bg-gray-900 px-0 pt-0.5 border-b border-gray-800 text-center"
+                <th key={`${c.id}-day`} className="bg-slate-900 px-0 pt-0.5 border-b border-slate-800 text-center"
                   style={{ borderLeft: newDay ? `2px solid ${DAY_COLORS[c.day]}40` : 'none', fontSize: z(9), fontWeight: 700, color: DAY_COLORS[c.day] }}>
                   {newDay ? c.day : ''}
                 </th>
@@ -196,16 +196,16 @@ export function ZoomBlockView({ semester }: Props) {
             })}
           </tr>
           <tr>
-            <th className="w-10 bg-gray-900 sticky left-0 z-50 px-0.5 pb-0.5 border-b-2 border-gray-700">
-              <span className="text-gray-500 font-semibold" style={{ fontSize: z(7) }}>KW</span>
+            <th className="w-10 bg-slate-900 sticky left-0 z-50 px-0.5 pb-0.5 border-b-2 border-slate-700">
+              <span className="text-slate-500 font-semibold" style={{ fontSize: z(7) }}>KW</span>
             </th>
             {courses.map((c, i) => {
               const newDay = i === 0 || c.day !== courses[i - 1]?.day;
               const badge = TYPE_BADGES[c.typ];
               return (
-                <th key={`${c.id}-info`} className="bg-gray-900 px-0.5 pb-0.5 border-b-2 border-gray-700 text-center"
+                <th key={`${c.id}-info`} className="bg-slate-900 px-0.5 pb-0.5 border-b-2 border-slate-700 text-center"
                   style={{ borderLeft: newDay ? `2px solid ${DAY_COLORS[c.day]}40` : 'none', width: COL_W, minWidth: COL_W, maxWidth: COL_W }}>
-                  <div className={`font-bold cursor-pointer transition-colors ${classFilter === c.cls ? 'text-indigo-400' : 'text-gray-200 hover:text-indigo-300'}`}
+                  <div className={`font-bold cursor-pointer transition-colors ${classFilter === c.cls ? 'text-indigo-400' : 'text-slate-200 hover:text-indigo-300'}`}
                     style={{ fontSize: z(9) }}
                     onClick={() => setClassFilter(classFilter === c.cls ? null : c.cls)}>
                     {c.cls}
@@ -238,10 +238,10 @@ export function ZoomBlockView({ semester }: Props) {
               <tr key={weekW} data-week={weekW}
                 style={{ opacity: past && !isCurrent ? 0.5 : 1, height: isHolidayWeek ? HOLIDAY_ROW_H : ROW_H }}>
                 {/* KW label — always present */}
-                <td className={`bg-gray-900 sticky left-0 z-10 text-center border-b py-0 px-0.5 ${
+                <td className={`bg-slate-900 sticky left-0 z-10 text-center border-b py-0 px-0.5 ${
                   isCurrent ? 'border-amber-500 bg-amber-950/30' : 'border-slate-800/50'
                 }`}>
-                  <span className={`font-mono font-bold ${isCurrent ? 'text-amber-400' : 'text-gray-500'}`} style={{ fontSize: z(8) }}>
+                  <span className={`font-mono font-bold ${isCurrent ? 'text-amber-400' : 'text-slate-500'}`} style={{ fontSize: z(8) }}>
                     {weekW}
                   </span>
                 </td>
@@ -250,12 +250,12 @@ export function ZoomBlockView({ semester }: Props) {
                 {isHolidayWeek ? (
                   <td colSpan={courses.length} className="border-b border-slate-800/30 text-center py-0"
                     style={{ background: '#ffffff06' }}>
-                    <span className="text-gray-600 italic" style={{ fontSize: z(7) }}>{holidayLabel || 'Ferien'}</span>
+                    <span className="text-slate-600 italic" style={{ fontSize: z(7) }}>{holidayLabel || 'Ferien'}</span>
                   </td>
                 ) : isEventWeek ? (
                   <td colSpan={courses.length} className="border-b border-slate-800/30 text-center py-0"
                     style={{ background: '#4b556312' }}>
-                    <span className="text-gray-400 font-semibold" style={{ fontSize: z(8) }}>{eventLabel || 'Sonderwoche'}</span>
+                    <span className="text-slate-400 font-semibold" style={{ fontSize: z(8) }}>{eventLabel || 'Sonderwoche'}</span>
                   </td>
                 ) : (
                   /* Normal week — per course cells */
@@ -281,7 +281,7 @@ export function ZoomBlockView({ semester }: Props) {
                       return (
                         <td key={c.id} className="border-b border-slate-800/20 p-0" style={cellStyle}>
                           <div className="h-full flex items-center justify-center">
-                            <span className="text-gray-600 italic" style={{ fontSize: z(6) }}>—</span>
+                            <span className="text-slate-600 italic" style={{ fontSize: z(6) }}>—</span>
                           </div>
                         </td>
                       );
@@ -292,7 +292,7 @@ export function ZoomBlockView({ semester }: Props) {
                       return (
                         <td key={c.id} className="border-b border-slate-800/20 p-0" style={cellStyle}>
                           <div className="h-full flex items-center px-1" style={{ background: '#4b556312' }}>
-                            <span className="text-gray-500 truncate" style={{ fontSize: z(7) }}>{evTitle}</span>
+                            <span className="text-slate-500 truncate" style={{ fontSize: z(7) }}>{evTitle}</span>
                           </div>
                         </td>
                       );

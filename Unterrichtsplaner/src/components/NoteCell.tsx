@@ -25,7 +25,7 @@ export function NoteCell({ weekW, col, cellHeight }: { weekW: string; col: numbe
 
   if (editing) {
     return (
-      <td className="border-b border-slate-900/40 bg-slate-900/60 p-0 border-l border-gray-800/50"
+      <td className="border-b border-slate-900/40 bg-slate-900/60 p-0 border-l border-slate-800/50"
         style={{ width: ncw, minWidth: ncw, maxWidth: ncw, height: cellHeight, verticalAlign: 'top' }}>
         <textarea
           ref={ref}
@@ -51,17 +51,17 @@ export function NoteCell({ weekW, col, cellHeight }: { weekW: string; col: numbe
 
   return (
     <td
-      className="border-b border-slate-900/40 bg-slate-950/30 p-0 cursor-text border-l border-gray-800/50"
+      className="border-b border-slate-900/40 bg-slate-950/30 p-0 cursor-text border-l border-slate-800/50"
       style={{ width: ncw, minWidth: ncw, maxWidth: ncw, height: cellHeight, verticalAlign: 'top' }}
       onClick={() => setEditing(true)}
       title={displayNotes || 'Klick für Notiz'}
     >
       {displayNotes ? (
-        <div className="text-gray-300 leading-tight p-1 overflow-hidden whitespace-pre-line" style={{ fontSize: nz(8), maxHeight: cellHeight }}>
+        <div className="text-slate-300 leading-tight p-1 overflow-hidden whitespace-pre-line" style={{ fontSize: nz(8), maxHeight: cellHeight }}>
           {displayNotes}
         </div>
       ) : (
-        <div className="text-gray-500 p-1 italic" style={{ fontSize: nz(7) }}>…</div>
+        <div className="text-slate-500 p-1 italic" style={{ fontSize: nz(7) }}>…</div>
       )}
     </td>
   );

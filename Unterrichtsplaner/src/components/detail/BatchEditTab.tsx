@@ -139,7 +139,7 @@ export function BatchEditTab() {
 
       {/* Subject Area */}
       <div className="space-y-1">
-        <label className="text-[11px] text-gray-400 font-medium">Fachbereich setzen {currentValues.mixedArea && <span className="text-amber-400">(gemischt)</span>}</label>
+        <label className="text-[11px] text-slate-400 font-medium">Fachbereich setzen {currentValues.mixedArea && <span className="text-amber-400">(gemischt)</span>}</label>
         <div className="flex gap-1 flex-wrap">
           {categories.map(sa => {
             const isActive = currentValues.fachbereich === sa.key;
@@ -152,19 +152,19 @@ export function BatchEditTab() {
             );
           })}
           <button onClick={() => applyToAll('fachbereich', undefined)}
-            className="px-2 py-0.5 rounded text-[11px] border border-gray-600 text-gray-400 cursor-pointer hover:text-gray-300">✕</button>
+            className="px-2 py-0.5 rounded text-[11px] border border-slate-600 text-slate-400 cursor-pointer hover:text-slate-300">✕</button>
         </div>
       </div>
 
       {/* Category */}
       <div className="space-y-1">
-        <label className="text-[11px] text-gray-400 font-medium">Kategorie setzen {currentValues.mixedCat && <span className="text-amber-400">(gemischt)</span>}</label>
+        <label className="text-[11px] text-slate-400 font-medium">Kategorie setzen {currentValues.mixedCat && <span className="text-amber-400">(gemischt)</span>}</label>
         <div className="flex gap-1 flex-wrap">
           {CATEGORIES.map(cat => {
             const isActive = currentValues.blockCategory === cat.key;
             return (
               <button key={cat.key} onClick={() => applyToAll('blockCategory', cat.key)}
-                className={`px-2 py-0.5 rounded text-[11px] border cursor-pointer ${isActive ? 'bg-indigo-900/40 border-indigo-500 text-indigo-300 ring-1 ring-indigo-500/30' : 'border-gray-600 text-gray-300 hover:bg-slate-700'}`}>
+                className={`px-2 py-0.5 rounded text-[11px] border cursor-pointer ${isActive ? 'bg-indigo-900/40 border-indigo-500 text-indigo-300 ring-1 ring-indigo-500/30' : 'border-slate-600 text-slate-300 hover:bg-slate-700'}`}>
                 {cat.icon} {cat.label}
               </button>
             );
@@ -174,31 +174,31 @@ export function BatchEditTab() {
 
       {/* Duration */}
       <div className="space-y-1">
-        <label className="text-[11px] text-gray-400 font-medium">Dauer setzen {currentValues.mixedDur && <span className="text-amber-400">(gemischt)</span>}</label>
+        <label className="text-[11px] text-slate-400 font-medium">Dauer setzen {currentValues.mixedDur && <span className="text-amber-400">(gemischt)</span>}</label>
         <div className="flex gap-1 flex-wrap">
           {getDurationPresets(settings?.school?.lessonDurationMin).map(preset => {
             const isActive = currentValues.duration === preset.key;
             return (
               <button key={preset.key} onClick={() => applyToAll('duration', preset.key)}
-                className={`px-2 py-0.5 rounded text-[11px] border cursor-pointer ${isActive ? 'bg-indigo-900/40 border-indigo-500 text-indigo-300 ring-1 ring-indigo-500/30' : 'border-gray-600 text-gray-300 hover:bg-slate-700'}`}>
+                className={`px-2 py-0.5 rounded text-[11px] border cursor-pointer ${isActive ? 'bg-indigo-900/40 border-indigo-500 text-indigo-300 ring-1 ring-indigo-500/30' : 'border-slate-600 text-slate-300 hover:bg-slate-700'}`}>
                 {preset.label}
               </button>
             );
           })}
           <button onClick={() => applyToAll('duration', undefined)}
-            className="px-2 py-0.5 rounded text-[11px] border border-gray-600 text-gray-400 cursor-pointer hover:text-gray-300">✕</button>
+            className="px-2 py-0.5 rounded text-[11px] border border-slate-600 text-slate-400 cursor-pointer hover:text-slate-300">✕</button>
         </div>
       </div>
 
       {/* SOL toggle */}
       <div className="space-y-1">
-        <label className="text-[11px] text-gray-400 font-medium">SOL (Selbstorganisiertes Lernen) {currentValues.mixedSol && <span className="text-amber-400">(gemischt)</span>}</label>
+        <label className="text-[11px] text-slate-400 font-medium">SOL (Selbstorganisiertes Lernen) {currentValues.mixedSol && <span className="text-amber-400">(gemischt)</span>}</label>
         <div className="flex gap-1">
           <button onClick={() => applyToAll('sol', currentValues.sol === true ? { enabled: false } : { enabled: true })}
             className={`px-2 py-0.5 rounded text-[11px] border cursor-pointer transition-all ${
               currentValues.sol === true
                 ? 'bg-green-900/40 border-green-500 text-green-300 ring-1 ring-green-500/30'
-                : 'border-gray-600 text-gray-400 hover:border-green-600 hover:text-green-400'
+                : 'border-slate-600 text-slate-400 hover:border-green-600 hover:text-green-400'
             }`}>
             🎒 SOL{currentValues.sol === true ? ' ✓' : ''}{currentValues.mixedSol ? ' (gemischt)' : ''}
           </button>
@@ -208,7 +208,7 @@ export function BatchEditTab() {
       {/* Sequence actions */}
       {sharedKursId && (
         <div className="space-y-1 pt-2 border-t border-slate-700">
-          <label className="text-[11px] text-gray-400 font-medium">Sequenz</label>
+          <label className="text-[11px] text-slate-400 font-medium">Sequenz</label>
           <div className="relative" ref={seqMenuRef}>
             <div className="flex gap-1 flex-wrap">
               <button
@@ -239,11 +239,11 @@ export function BatchEditTab() {
                     return (
                       <button key={`${seq.id}-${bi}`}
                         onClick={() => handleAddToBlock(seq.id, bi)}
-                        className="w-full px-3 py-1.5 text-left text-[12px] text-gray-300 hover:bg-slate-700 cursor-pointer flex items-center gap-1.5"
+                        className="w-full px-3 py-1.5 text-left text-[12px] text-slate-300 hover:bg-slate-700 cursor-pointer flex items-center gap-1.5"
                         disabled={allIncluded}>
                         <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: seq.color || '#16a34a' }} />
                         <span className="truncate">{seq.title} → {block.label}</span>
-                        {allIncluded && <span className="text-[9px] text-gray-500 ml-auto shrink-0">bereits</span>}
+                        {allIncluded && <span className="text-[9px] text-slate-500 ml-auto shrink-0">bereits</span>}
                       </button>
                     );
                   })
@@ -259,7 +259,7 @@ export function BatchEditTab() {
         </div>
       )}
 
-      <div className="text-[9px] text-gray-500 pt-2 border-t border-slate-700">
+      <div className="text-[9px] text-slate-500 pt-2 border-t border-slate-700">
         Tipp: Wähle mehrere Zellen mit Shift+Klick oder Cmd+Klick, dann setze Eigenschaften hier.
       </div>
     </div>

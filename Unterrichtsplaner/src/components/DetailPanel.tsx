@@ -123,7 +123,7 @@ export function DetailPanel() {
             onClick={() => setSidePanelTab('settings')}
             className={`px-2.5 py-1 rounded text-[13px] font-semibold border cursor-pointer transition-colors ${
               sidePanelTab === 'settings'
-                ? 'bg-gray-500/15 border-gray-500/50'
+                ? 'bg-slate-500/15 border-slate-500/50'
                 : 'border-transparent'
             }`}
             style={{ color: sidePanelTab === 'settings' ? 'var(--text-primary)' : 'var(--text-muted)' }}
@@ -138,7 +138,7 @@ export function DetailPanel() {
             usePlannerStore.getState().setSequencePanelOpen(false);
             usePlannerStore.getState().setEditingSequenceId(null);
           }}
-          className="text-gray-400 hover:text-gray-200 cursor-pointer text-xs px-1"
+          className="text-slate-400 hover:text-slate-200 cursor-pointer text-xs px-1"
           title="Panel schliessen (Esc)"
         >
           ✕

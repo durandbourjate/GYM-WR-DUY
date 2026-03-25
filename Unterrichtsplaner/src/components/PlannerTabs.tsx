@@ -284,8 +284,8 @@ export function PlannerTabs() {
           <div className="bg-slate-800 rounded-xl shadow-2xl border border-slate-700 w-[480px] max-h-[80vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}>
             <div className="px-4 py-3 border-b border-slate-700 flex justify-between items-center">
-              <h2 className="text-sm font-bold text-gray-200">Neuer Planer erstellen</h2>
-              <button onClick={resetNewDialog} className="text-gray-500 hover:text-gray-300 cursor-pointer text-lg">✕</button>
+              <h2 className="text-sm font-bold text-slate-200">Neuer Planer erstellen</h2>
+              <button onClick={resetNewDialog} className="text-slate-500 hover:text-slate-300 cursor-pointer text-lg">✕</button>
             </div>
             <div className="p-4 space-y-3">
               <div className="flex gap-2 items-center flex-wrap">

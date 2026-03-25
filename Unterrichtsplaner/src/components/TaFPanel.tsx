@@ -83,7 +83,7 @@ export function TaFSection() {
   return (
     <div className="space-y-3">
       {tafPhases.length === 0 && !showNew && (
-        <div className="text-[12px] text-gray-500 text-center py-4">
+        <div className="text-[12px] text-slate-500 text-center py-4">
           Noch keine TaF-Phasen definiert.
         </div>
       )}
@@ -99,7 +99,7 @@ export function TaFSection() {
 
       {/* Import & Presets (v3.80 C7) */}
       <div className="flex gap-1.5 flex-wrap">
-        <label className="text-[11px] px-2 py-1 rounded border border-slate-600 text-gray-400 hover:text-gray-200 cursor-pointer hover:border-slate-500">
+        <label className="text-[11px] px-2 py-1 rounded border border-slate-600 text-slate-400 hover:text-slate-200 cursor-pointer hover:border-slate-500">
           📥 Import (JSON)
           <input type="file" accept=".json" className="hidden" onChange={handleImport} />
         </label>
@@ -118,22 +118,22 @@ export function TaFSection() {
           />
           <div className="flex gap-3">
             <div className="flex items-center gap-1">
-              <label className="text-[11px] text-gray-400">Von:</label>
+              <label className="text-[11px] text-slate-400">Von:</label>
               <select value={newStart} onChange={(e) => setNewStart(e.target.value)}
-                className="text-[11px] bg-slate-700 border border-slate-600 rounded px-1 py-0.5 text-gray-200">
+                className="text-[11px] bg-slate-700 border border-slate-600 rounded px-1 py-0.5 text-slate-200">
                 {allWeeks.map(w => <option key={w} value={w}>KW {w}</option>)}
               </select>
             </div>
             <div className="flex items-center gap-1">
-              <label className="text-[11px] text-gray-400">Bis:</label>
+              <label className="text-[11px] text-slate-400">Bis:</label>
               <select value={newEnd} onChange={(e) => setNewEnd(e.target.value)}
-                className="text-[11px] bg-slate-700 border border-slate-600 rounded px-1 py-0.5 text-gray-200">
+                className="text-[11px] bg-slate-700 border border-slate-600 rounded px-1 py-0.5 text-slate-200">
                 {allWeeks.map(w => <option key={w} value={w}>KW {w}</option>)}
               </select>
             </div>
           </div>
           <div className="flex items-center gap-1">
-            <span className="text-[11px] text-gray-400">Farbe:</span>
+            <span className="text-[11px] text-slate-400">Farbe:</span>
             {PHASE_COLORS.map(c => (
               <button key={c} onClick={() => setNewColor(c)}
                 className="w-4 h-4 rounded-full cursor-pointer border-2"
@@ -147,7 +147,7 @@ export function TaFSection() {
               Hinzufügen
             </button>
             <button onClick={() => setShowNew(false)}
-              className="text-[11px] text-gray-400 hover:text-gray-300 cursor-pointer px-2 py-1">
+              className="text-[11px] text-slate-400 hover:text-slate-300 cursor-pointer px-2 py-1">
               Abbrechen
             </button>
           </div>
@@ -176,8 +176,8 @@ export function TaFPanel({ onClose }: { onClose: () => void }) {
       <div className="bg-slate-800 rounded-xl shadow-2xl border border-slate-700 w-[480px] max-h-[70vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}>
         <div className="px-4 py-3 border-b border-slate-700 flex justify-between items-center">
-          <h2 className="text-sm font-bold text-gray-200">TaF Phasenmodell</h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-300 cursor-pointer text-lg">✕</button>
+          <h2 className="text-sm font-bold text-slate-200">TaF Phasenmodell</h2>
+          <button onClick={onClose} className="text-slate-500 hover:text-slate-300 cursor-pointer text-lg">✕</button>
         </div>
         <div className="p-4">
           <TaFSection />
@@ -204,31 +204,31 @@ function PhaseRow({ phase, onUpdate, onDelete }: {
             className="flex-1 bg-slate-700 text-slate-200 border border-indigo-400 rounded px-1.5 py-0.5 text-[12px] outline-none"
           />
         ) : (
-          <span className="text-[12px] font-semibold text-gray-200 flex-1 cursor-pointer"
+          <span className="text-[12px] font-semibold text-slate-200 flex-1 cursor-pointer"
             onDoubleClick={() => setEditing(true)}>{phase.name}</span>
         )}
-        <span className="text-[9px] text-gray-500">KW {phase.startWeek}–{phase.endWeek}</span>
+        <span className="text-[9px] text-slate-500">KW {phase.startWeek}–{phase.endWeek}</span>
         <button onClick={onDelete}
           className="text-[11px] text-red-400 hover:text-red-300 cursor-pointer px-1">✕</button>
       </div>
       <div className="mt-1.5 flex gap-3">
         <div className="flex items-center gap-1">
-          <label className="text-[9px] text-gray-500">Von:</label>
+          <label className="text-[9px] text-slate-500">Von:</label>
           <select value={phase.startWeek} onChange={(e) => onUpdate({ startWeek: e.target.value })}
-            className="text-[9px] bg-slate-700 border border-slate-600 rounded px-1 py-0.5 text-gray-300">
+            className="text-[9px] bg-slate-700 border border-slate-600 rounded px-1 py-0.5 text-slate-300">
             {allWeeks.map(w => <option key={w} value={w}>KW {w}</option>)}
           </select>
         </div>
         <div className="flex items-center gap-1">
-          <label className="text-[9px] text-gray-500">Bis:</label>
+          <label className="text-[9px] text-slate-500">Bis:</label>
           <select value={phase.endWeek} onChange={(e) => onUpdate({ endWeek: e.target.value })}
-            className="text-[9px] bg-slate-700 border border-slate-600 rounded px-1 py-0.5 text-gray-300">
+            className="text-[9px] bg-slate-700 border border-slate-600 rounded px-1 py-0.5 text-slate-300">
             {allWeeks.map(w => <option key={w} value={w}>KW {w}</option>)}
           </select>
         </div>
       </div>
       {(phase.absentClasses.length > 0 || phase.presentClasses.length > 0) && (
-        <div className="mt-1 text-[9px] text-gray-500">
+        <div className="mt-1 text-[9px] text-slate-500">
           {phase.absentClasses.length > 0 && <span>Abwesend: {phase.absentClasses.join(', ')} </span>}
           {phase.presentClasses.length > 0 && <span>Anwesend: {phase.presentClasses.join(', ')}</span>}
         </div>

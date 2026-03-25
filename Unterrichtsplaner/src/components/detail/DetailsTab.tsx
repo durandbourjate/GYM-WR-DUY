@@ -157,7 +157,7 @@ function BadgeEditor({ badges, onChange }: { badges: import('../../types').CellB
           className="w-5 h-5 rounded cursor-pointer border-0 bg-transparent" />
         <button onClick={() => { if (customLabel.trim()) { addBadge(customLabel.trim(), customColor); setCustomLabel(''); } }}
           disabled={!customLabel.trim()}
-          className="px-1.5 py-0.5 rounded text-[9px] border border-dashed border-gray-600 text-gray-400 hover:text-gray-200 cursor-pointer disabled:opacity-30">+</button>
+          className="px-1.5 py-0.5 rounded text-[9px] border border-dashed border-slate-600 text-slate-400 hover:text-slate-200 cursor-pointer disabled:opacity-30">+</button>
       </div>
     </div>
   );
@@ -335,7 +335,7 @@ export function DetailsTab() {
 
   if (!selection || !c) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-start text-[12px] text-gray-400 p-4 pt-8 gap-3">
+      <div className="flex-1 flex flex-col items-center justify-start text-[12px] text-slate-400 p-4 pt-8 gap-3">
         <NewUEButton />
         <span>Wähle eine Unterrichtseinheit aus, um Details zu bearbeiten.</span>
       </div>
@@ -354,11 +354,11 @@ export function DetailsTab() {
       {/* Header info */}
       <div>
         <div className="flex gap-2 items-center mb-1">
-          <span className="text-xs font-bold text-gray-100">{c.cls}</span>
+          <span className="text-xs font-bold text-slate-100">{c.cls}</span>
           <span className="text-[11px] px-1.5 py-px rounded text-white" style={{ background: badge?.bg }}>{c.typ}</span>
-          <span className="text-[11px] text-gray-400">{c.day} {c.from}–{c.to} · KW {selection.week}</span>
+          <span className="text-[11px] text-slate-400">{c.day} {c.from}–{c.to} · KW {selection.week}</span>
         </div>
-        <div className="text-sm text-gray-200">{selection.title}</div>
+        <div className="text-sm text-slate-200">{selection.title}</div>
         {/* Tags */}
         <div className="flex gap-1 mt-1.5 flex-wrap">
           {effectiveDetail.fachbereich && (() => {
@@ -378,12 +378,12 @@ export function DetailsTab() {
             </span>
           )}
           {subtypeDef && (
-            <span className="text-[9px] px-1 py-px rounded border border-gray-600 text-gray-400">
+            <span className="text-[9px] px-1 py-px rounded border border-slate-600 text-slate-400">
               {subtypeDef.icon} {subtypeDef.label}
             </span>
           )}
           {effectiveDetail.duration && (
-            <span className="text-[9px] px-1 py-px rounded border border-gray-600 text-gray-400">
+            <span className="text-[9px] px-1 py-px rounded border border-slate-600 text-slate-400">
               ⏱ {effectiveDetail.duration}
             </span>
           )}
@@ -440,10 +440,10 @@ export function DetailsTab() {
       {/* Form fields */}
       <div className="space-y-2.5">
         <div>
-          <label className="text-[11px] text-gray-400 font-medium mb-1 block">
+          <label className="text-[11px] text-slate-400 font-medium mb-1 block">
             Fachbereich
             {!detail.fachbereich && effectiveDetail.fachbereich && (
-              <span className="text-[9px] text-gray-500 font-normal ml-1">(geerbt von Sequenz)</span>
+              <span className="text-[9px] text-slate-500 font-normal ml-1">(geerbt von Sequenz)</span>
             )}
           </label>
           <PillSelect options={categories.map(s => s.key)} value={detail.fachbereich}
@@ -470,12 +470,12 @@ export function DetailsTab() {
           onChangeSubtype={handleSubtypeChange}
         />
         <div>
-          <label className="text-[11px] text-gray-400 font-medium mb-1 block">Dauer</label>
+          <label className="text-[11px] text-slate-400 font-medium mb-1 block">Dauer</label>
           <DurationSelector value={effectiveDetail.duration} onChange={(v) => updateField('duration', v)} baseDuration={settings?.school?.lessonDurationMin} />
         </div>
         {/* v3.100 #3b: SOL-Section entfernt (wird jetzt pro Kurs in Einstellungen konfiguriert) */}
         <div>
-          <label className="text-[11px] text-gray-400 font-medium mb-1 block">Thema</label>
+          <label className="text-[11px] text-slate-400 font-medium mb-1 block">Thema</label>
           {parentBlock?.thema && !detail.thema && (
             <div className="text-[9px] text-indigo-400/60 mb-0.5">↳ Block: {parentBlock.thema}</div>
           )}
@@ -505,20 +505,20 @@ export function DetailsTab() {
         </div>
         {/* v3.100 #4: Notizen vor Lehrplanziel (häufiger genutzt) */}
         <div>
-          <label className="text-[11px] text-gray-400 font-medium mb-1 block">Notizen</label>
+          <label className="text-[11px] text-slate-400 font-medium mb-1 block">Notizen</label>
           <textarea value={detail.notes || ''} onChange={(e) => updateField('notes', e.target.value)}
             placeholder="Notizen, Hinweise…" rows={3}
             className="w-full bg-slate-700 text-slate-200 border border-slate-600 rounded px-2 py-1 text-[12px] outline-none focus:border-indigo-400 resize-y" />
         </div>
         <div>
-          <label className="text-[11px] text-gray-400 font-medium mb-1 block">Lehrplanziel (LP17)</label>
+          <label className="text-[11px] text-slate-400 font-medium mb-1 block">Lehrplanziel (LP17)</label>
           {parentBlock?.curriculumGoal && !detail.curriculumGoal && (
             <div className="text-[9px] text-indigo-400/60 mb-0.5">↳ Block: {parentBlock.curriculumGoal}</div>
           )}
           <CurriculumGoalPicker value={detail.curriculumGoal || effectiveDetail.curriculumGoal} onChange={(v) => updateField('curriculumGoal', v)} fachbereich={effectiveDetail.fachbereich} goals={effectiveGoals} />
         </div>
         <div>
-          <label className="text-[11px] text-gray-400 font-medium mb-1 block">Material</label>
+          <label className="text-[11px] text-slate-400 font-medium mb-1 block">Material</label>
           <MaterialLinks links={[
             ...(detail.learningviewUrl ? [detail.learningviewUrl] : []),
             ...(detail.materialLinks || []),
@@ -535,13 +535,13 @@ export function DetailsTab() {
         </div>
         {/* Badges */}
         <div>
-          <label className="text-[11px] text-gray-400 font-medium mb-1 block">Badges</label>
+          <label className="text-[11px] text-slate-400 font-medium mb-1 block">Badges</label>
           <BadgeEditor badges={detail.badges || []} onChange={(badges) => updateField('badges', badges.length > 0 ? badges : undefined)} />
         </div>
 
         {/* Collection: Save / Load */}
         <div className="border-t border-slate-700 pt-2 space-y-1.5">
-          <label className="text-[11px] text-gray-400 font-medium block">Sammlung</label>
+          <label className="text-[11px] text-slate-400 font-medium block">Sammlung</label>
           <div className="flex gap-1.5">
             <button onClick={() => {
               if (!selection || !c) return;
@@ -581,7 +581,7 @@ export function DetailsTab() {
             });
             return (
               <div className="bg-slate-800 border border-slate-600 rounded p-1.5 max-h-48 overflow-y-auto space-y-1">
-                {sorted.length === 0 && <p className="text-[9px] text-gray-500 italic px-1">Keine UEs in der Sammlung.</p>}
+                {sorted.length === 0 && <p className="text-[9px] text-slate-500 italic px-1">Keine UEs in der Sammlung.</p>}
                 {sorted.map(item => {
                   const unit = item.units[0];
                   if (!unit) return null;
@@ -609,11 +609,11 @@ export function DetailsTab() {
                       setTimeout(() => setSavedMsg(null), 2500);
                     }}
                       className="w-full text-left px-2 py-1.5 rounded text-[11px] hover:bg-slate-700 cursor-pointer transition-all flex items-center gap-2">
-                      <span className={`px-1 py-px rounded text-[8px] ${item.fachbereich === area ? 'bg-indigo-900/40 text-indigo-300' : 'bg-slate-700 text-gray-400'}`}>
+                      <span className={`px-1 py-px rounded text-[8px] ${item.fachbereich === area ? 'bg-indigo-900/40 text-indigo-300' : 'bg-slate-700 text-slate-400'}`}>
                         {item.fachbereich || '—'}
                       </span>
-                      <span className="text-gray-200 truncate flex-1">{item.title}</span>
-                      {item.cls && <span className="text-[8px] text-gray-500">{item.cls}</span>}
+                      <span className="text-slate-200 truncate flex-1">{item.title}</span>
+                      {item.cls && <span className="text-[8px] text-slate-500">{item.cls}</span>}
                     </button>
                   );
                 })}

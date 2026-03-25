@@ -222,7 +222,7 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
               style={{ opacity: dimPastWeeks && past && !isCurrent ? 0.5 : 1 }}>
               <td className="sticky left-0 z-30 px-1 text-center border-b border-slate-900/60"
                 style={{ background: 'var(--holiday-bg)' }}>
-                <span className="font-mono font-medium text-gray-500" style={{ fontSize: z(9) }}>{week.w}</span>
+                <span className="font-mono font-medium text-slate-500" style={{ fontSize: z(9) }}>{week.w}</span>
               </td>
               <td colSpan={courses.length}
                 className="border-b border-slate-800/30 text-center align-middle"
@@ -267,7 +267,7 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
               }}
               title="Doppelklick: Ferien hinzufügen"
             >
-              <div className={`font-mono ${isCurrent ? 'font-extrabold text-indigo-400' : 'font-medium text-gray-500'}`} style={{ fontSize: z(9) }}>
+              <div className={`font-mono ${isCurrent ? 'font-extrabold text-indigo-400' : 'font-medium text-slate-500'}`} style={{ fontSize: z(9) }}>
                 {week.w}
               </div>
               {isCurrent && <div className="w-1 h-1 rounded-full bg-indigo-400 mx-auto mt-0.5 animate-pulse" />}
@@ -593,7 +593,7 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                       title="Doppelklick: Bearbeiten · Rechtsklick: Aufheben"
                     >
                       <span className="mr-1" style={{ fontSize: z(9) }}>🏖</span>
-                      <span className="font-medium leading-tight text-gray-400"
+                      <span className="font-medium leading-tight text-slate-400"
                         style={{ fontSize: z(9), display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                         {displayTitle}
                       </span>
@@ -688,14 +688,14 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                           <button
                             onClick={(e) => { e.stopPropagation(); if (prevFree) { pushUndo(); usePlannerStore.getState().swapLessons(c.col, week.w, prevFree); } }}
                             disabled={!prevFree}
-                            className={`rounded bg-slate-700/90 flex items-center justify-center border border-slate-600 ${!prevFree ? 'text-gray-600 cursor-not-allowed' : 'text-gray-300 cursor-pointer hover:bg-indigo-600 hover:text-white'}`}
+                            className={`rounded bg-slate-700/90 flex items-center justify-center border border-slate-600 ${!prevFree ? 'text-slate-600 cursor-not-allowed' : 'text-slate-300 cursor-pointer hover:bg-indigo-600 hover:text-white'}`}
                             style={{ width: z(16), height: z(16), fontSize: z(8) }}
                             title="Nach oben verschieben (überspringt Ferien)"
                           >↑</button>
                           <button
                             onClick={(e) => { e.stopPropagation(); if (nextFree) { pushUndo(); usePlannerStore.getState().swapLessons(c.col, week.w, nextFree); } }}
                             disabled={!nextFree}
-                            className={`rounded bg-slate-700/90 flex items-center justify-center border border-slate-600 ${!nextFree ? 'text-gray-600 cursor-not-allowed' : 'text-gray-300 cursor-pointer hover:bg-indigo-600 hover:text-white'}`}
+                            className={`rounded bg-slate-700/90 flex items-center justify-center border border-slate-600 ${!nextFree ? 'text-slate-600 cursor-not-allowed' : 'text-slate-300 cursor-pointer hover:bg-indigo-600 hover:text-white'}`}
                             style={{ width: z(16), height: z(16), fontSize: z(8) }}
                             title="Nach unten verschieben (überspringt Ferien)"
                           >↓</button>
@@ -708,7 +708,7 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                       className="mx-0.5 ml-1.5 px-1.5 py-1 rounded flex items-center justify-center"
                       style={{ minHeight: Math.max(cellHeight, z(32)), background: 'color-mix(in srgb, var(--holiday-bar) 60%, transparent)', border: '1px solid var(--border)' }}
                     >
-                      <span className="text-gray-600 italic" style={{ fontSize: z(8) }}>— keine Phase —</span>
+                      <span className="text-slate-600 italic" style={{ fontSize: z(8) }}>— keine Phase —</span>
                     </div>
                   ) : (
                     <div
@@ -755,7 +755,7 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                 onClick={(e) => e.stopPropagation()}
                 onMouseDown={(e) => e.stopPropagation()}
                 style={{ top: drag.multiDayPrompt.position.y - 40, left: drag.multiDayPrompt.position.x - 60 }}>
-                <div className="text-[11px] text-gray-300 mb-1">Auch <span className="font-bold text-purple-300">{otherDays}</span> auswählen?</div>
+                <div className="text-[11px] text-slate-300 mb-1">Auch <span className="font-bold text-purple-300">{otherDays}</span> auswählen?</div>
                 <div className="flex gap-1">
                   <button onClick={() => {
                     const currentMulti = usePlannerStore.getState().multiSelection;
@@ -782,7 +782,7 @@ export function WeekRows({ weeks, courses, allWeeks: allWeeksProp, currentRef }:
                     drag.setMultiDayPrompt(null);
                   }} className="px-2 py-0.5 rounded text-[11px] bg-purple-600 text-white cursor-pointer hover:bg-purple-500">Ja, beide Tage</button>
                   <button onClick={() => drag.setMultiDayPrompt(null)}
-                    className="px-2 py-0.5 rounded text-[11px] border border-gray-600 text-gray-400 cursor-pointer hover:text-gray-200">Nein</button>
+                    className="px-2 py-0.5 rounded text-[11px] border border-slate-600 text-slate-400 cursor-pointer hover:text-slate-200">Nein</button>
                 </div>
               </div>
             </td>
