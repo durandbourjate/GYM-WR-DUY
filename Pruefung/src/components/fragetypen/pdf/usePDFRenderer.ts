@@ -45,8 +45,10 @@ export function usePDFRenderer() {
     const doc = docRef.current
     if (!doc) return null
 
+    // Defensiv: Zoom auf gültigen Bereich begrenzen (verhindert Spiegelung durch negative/extreme Werte)
+    const safeZoom = Math.max(0.25, Math.min(3, zoom))
     const page = await doc.getPage(seitenNr + 1)
-    const viewport = page.getViewport({ scale: zoom * window.devicePixelRatio })
+    const viewport = page.getViewport({ scale: safeZoom * window.devicePixelRatio })
 
     canvas.width = viewport.width
     canvas.height = viewport.height
