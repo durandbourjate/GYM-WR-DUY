@@ -1,4 +1,4 @@
-import type { Frage, MCFrage, RichtigFalschFrage, LueckentextFrage, ZuordnungFrage, BerechnungFrage, BuchungssatzFrage, TKontoFrage, KontenbestimmungFrage, BilanzERFrage, FreitextFrage, VisualisierungFrage } from '../../types/fragen'
+import type { Frage, MCFrage, RichtigFalschFrage, LueckentextFrage, ZuordnungFrage, BerechnungFrage, KontenbestimmungFrage } from '../../types/fragen'
 import type { Antwort } from '../../types/antworten'
 import type { KorrekturErgebnis } from '../../utils/autoKorrektur'
 
@@ -330,12 +330,12 @@ function AutoKorrekturDetails({ ergebnis, frageTyp }: { ergebnis: KorrekturErgeb
 /** Musterlösung-Box */
 function MusterloesungBox({ frage }: { frage: Frage }) {
   // Visualisierung mit Musterlösungsbild
-  if (frage.typ === 'visualisierung' && (frage as VisualisierungFrage).musterloesungBild) {
+  if (frage.typ === 'visualisierung' && frage.musterloesungBild) {
     return (
       <div className="mt-3 rounded border border-amber-200 dark:border-amber-700/40 bg-amber-50 dark:bg-amber-900/15 px-3 py-2">
         <span className="text-xs font-medium text-amber-700 dark:text-amber-300">Musterlösung:</span>
         <img
-          src={(frage as VisualisierungFrage).musterloesungBild}
+          src={frage.musterloesungBild}
           alt="Musterlösung"
           className="mt-1 max-w-full rounded border border-amber-200 dark:border-amber-700/30"
         />
@@ -345,11 +345,10 @@ function MusterloesungBox({ frage }: { frage: Frage }) {
 
   // Buchungssatz: korrekte Buchungen aus Frage-Daten
   if (frage.typ === 'buchungssatz') {
-    const bf = frage as BuchungssatzFrage
     return (
       <div className="mt-3 rounded border border-amber-200 dark:border-amber-700/40 bg-amber-50 dark:bg-amber-900/15 px-3 py-2">
         <span className="text-xs font-medium text-amber-700 dark:text-amber-300">Musterlösung:</span>
-        {bf.buchungen.map((b, i) => (
+        {frage.buchungen.map((b, i) => (
           <div key={b.id ?? i} className="text-sm mt-1 text-amber-800 dark:text-amber-200">
             <span className="text-xs text-amber-600 dark:text-amber-400">Buchung {i + 1}: </span>
             Soll [{b.sollKonten.map(k => `${k.kontonummer}: ${k.betrag}`).join(', ')}]
@@ -363,11 +362,10 @@ function MusterloesungBox({ frage }: { frage: Frage }) {
 
   // T-Konto: korrekte Konten aus Frage-Daten
   if (frage.typ === 'tkonto') {
-    const tf = frage as TKontoFrage
     return (
       <div className="mt-3 rounded border border-amber-200 dark:border-amber-700/40 bg-amber-50 dark:bg-amber-900/15 px-3 py-2">
         <span className="text-xs font-medium text-amber-700 dark:text-amber-300">Musterlösung:</span>
-        {tf.konten.map((k, i) => (
+        {frage.konten.map((k, i) => (
           <div key={k.id ?? i} className="text-sm mt-1 text-amber-800 dark:text-amber-200">
             <span className="text-xs text-amber-600 dark:text-amber-400">Konto {k.kontonummer}: </span>
             Soll [{k.eintraege.filter(e => e.seite === 'soll').map(e => `${e.gegenkonto}: ${e.betrag}`).join(', ')}]
@@ -382,7 +380,7 @@ function MusterloesungBox({ frage }: { frage: Frage }) {
 
   // Kontenbestimmung: erwartete Antworten
   if (frage.typ === 'kontenbestimmung') {
-    const kf = frage as KontenbestimmungFrage
+    const kf = frage
     return (
       <div className="mt-3 rounded border border-amber-200 dark:border-amber-700/40 bg-amber-50 dark:bg-amber-900/15 px-3 py-2">
         <span className="text-xs font-medium text-amber-700 dark:text-amber-300">Musterlösung:</span>
@@ -398,7 +396,7 @@ function MusterloesungBox({ frage }: { frage: Frage }) {
 
   // Bilanz/ER: Lösungsstruktur
   if (frage.typ === 'bilanzstruktur') {
-    const bf = frage as BilanzERFrage
+    const bf = frage
     return (
       <div className="mt-3 rounded border border-amber-200 dark:border-amber-700/40 bg-amber-50 dark:bg-amber-900/15 px-3 py-2">
         <span className="text-xs font-medium text-amber-700 dark:text-amber-300">Musterlösung:</span>

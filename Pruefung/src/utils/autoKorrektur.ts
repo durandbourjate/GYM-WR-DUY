@@ -2,7 +2,7 @@
  * Auto-Korrektur-Engine für deterministische Fragetypen.
  * Nicht-deterministische Typen (freitext, visualisierung, pdf) → null (manuelle Korrektur).
  */
-import type { Frage, MCFrage, RichtigFalschFrage, LueckentextFrage, ZuordnungFrage, BerechnungFrage, BuchungssatzFrage, TKontoFrage, KontenbestimmungFrage, BilanzERFrage } from '../types/fragen'
+import type { Frage, MCFrage, RichtigFalschFrage, LueckentextFrage, ZuordnungFrage, BerechnungFrage } from '../types/fragen'
 import type { Antwort } from '../types/antworten'
 import { korrigiereBuchungssatz, korrigiereTKonto, korrigiereKontenbestimmung, korrigiereBilanzER } from './fibuAutoKorrektur'
 export type { KorrekturErgebnis, KorrekturDetail } from './fibuAutoKorrektur'
@@ -57,7 +57,7 @@ export function autoKorrigiere(frage: Frage, antwort: Antwort | undefined): Korr
       case 'kontenbestimmung':
         return korrigiereKontenbestimmung(frage, (antwort as Extract<Antwort, { typ: 'kontenbestimmung' }>).aufgaben)
       case 'bilanzstruktur':
-        return korrigiereBilanzER(frage as BilanzERFrage, antwort as Extract<Antwort, { typ: 'bilanzstruktur' }>)
+        return korrigiereBilanzER(frage, antwort as Extract<Antwort, { typ: 'bilanzstruktur' }>)
       default:
         return null
     }
