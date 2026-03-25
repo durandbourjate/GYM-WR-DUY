@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { useAuthStore } from '../../store/authStore.ts'
 import { apiService } from '../../services/apiService.ts'
 import type { PruefungsKorrektur, SchuelerAbgabe } from '../../types/korrektur.ts'
@@ -9,6 +9,8 @@ import type { NotenConfig } from '../../types/pruefung.ts'
 import { exportiereAlsCSV, exportiereErgebnisseAlsCSV, downloadCSV } from '../../utils/exportUtils.ts'
 import { exportiereBackupXlsx } from '../../utils/backupExport.ts'
 import { formatDatum } from '../../utils/zeit.ts'
+import { autoKorrigiere } from '../../utils/autoKorrektur.ts'
+import type { KorrekturErgebnis } from '../../utils/autoKorrektur.ts'
 import LPHeader from './LPHeader.tsx'
 import FragenBrowser from './FragenBrowser.tsx'
 import HilfeSeite from './HilfeSeite.tsx'
@@ -45,6 +47,21 @@ export default function KorrekturDashboard({ pruefungId, eingebettet = false }: 
   const [zeigHilfe, setZeigHilfe] = useState(false)
   const [pdfSchuelerEmail, setPdfSchuelerEmail] = useState<string | null>(null)
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  // Auto-Korrektur für alle SuS × Fragen berechnen
+  const autoErgebnisseAlle = useMemo<Record<string, Record<string, KorrekturErgebnis | null>>>(() => {
+    if (fragen.length === 0 || Object.keys(abgaben).length === 0) return {}
+    const result: Record<string, Record<string, KorrekturErgebnis | null>> = {}
+    for (const [email, abgabe] of Object.entries(abgaben)) {
+      const schuelerErgebnisse: Record<string, KorrekturErgebnis | null> = {}
+      for (const frage of fragen) {
+        const antwort = abgabe.antworten[frage.id]
+        schuelerErgebnisse[frage.id] = autoKorrigiere(frage, antwort)
+      }
+      result[email] = schuelerErgebnisse
+    }
+    return result
+  }, [fragen, abgaben])
 
   // Daten laden
   useEffect(() => {
@@ -699,6 +716,7 @@ export default function KorrekturDashboard({ pruefungId, eingebettet = false }: 
               schueler={schueler}
               abgabe={abgaben[schueler.email]}
               fragen={fragen}
+              autoErgebnisse={autoErgebnisseAlle[schueler.email] ?? {}}
               notenConfig={notenConfig}
               onBewertungUpdate={handleBewertungUpdate}
               onNoteOverride={handleNoteOverride}

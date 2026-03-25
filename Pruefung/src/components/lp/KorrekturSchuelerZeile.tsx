@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { SchuelerKorrektur, SchuelerAbgabe } from '../../types/korrektur.ts'
 import type { Frage, PDFAnnotation, PDFFrage } from '../../types/fragen.ts'
-import type { Antwort } from '../../types/antworten.ts'
+import type { KorrekturErgebnis } from '../../utils/autoKorrektur.ts'
 import { effektivePunkte, berechneNote, statusLabel, statusFarbe } from '../../utils/korrekturUtils.ts'
 import type { NotenConfig } from '../../types/pruefung.ts'
 import KorrekturFrageZeile from './KorrekturFrageZeile.tsx'
@@ -14,6 +14,7 @@ interface Props {
   schueler: SchuelerKorrektur
   abgabe: SchuelerAbgabe | undefined
   fragen: Frage[]
+  autoErgebnisse: Record<string, KorrekturErgebnis | null>
   notenConfig?: Partial<NotenConfig>
   onBewertungUpdate: (
     schuelerEmail: string,
@@ -26,109 +27,7 @@ interface Props {
   onPDF?: () => void
 }
 
-/** Wandelt eine Antwort in lesbaren Text um */
-function antwortAlsText(antwort: Antwort | undefined, frage: Frage): string {
-  if (!antwort) return '(keine Antwort)'
-
-  switch (antwort.typ) {
-    case 'mc':
-      if (antwort.gewaehlteOptionen.length === 0) return '(keine Auswahl)'
-      if (frage.typ === 'mc') {
-        return antwort.gewaehlteOptionen
-          .map((id) => frage.optionen.find((o) => o.id === id)?.text ?? id)
-          .join(', ')
-      }
-      return antwort.gewaehlteOptionen.join(', ')
-
-    case 'freitext':
-      return antwort.text || '(leer)'
-
-    case 'zuordnung': {
-      const paare = Object.entries(antwort.zuordnungen)
-      if (paare.length === 0) return '(keine Zuordnung)'
-      return paare.map(([links, rechts]) => `${links} → ${rechts}`).join(', ')
-    }
-
-    case 'lueckentext': {
-      const eintraege = Object.entries(antwort.eintraege)
-      if (eintraege.length === 0) return '(keine Einträge)'
-      return eintraege
-        .sort(([a], [b]) => a.localeCompare(b, 'de', { numeric: true }))
-        .map(([_id, text], i) => `Lücke ${i + 1}: ${text || '–'}`)
-        .join(', ')
-    }
-
-    case 'richtigfalsch': {
-      const bewertungen = Object.entries(antwort.bewertungen)
-      if (bewertungen.length === 0) return '(keine Angaben)'
-      return bewertungen
-        .sort(([a], [b]) => a.localeCompare(b, 'de', { numeric: true }))
-        .map(([_id, wert], i) => `Aussage ${i + 1}: ${wert ? 'R' : 'F'}`)
-        .join(', ')
-    }
-
-    case 'berechnung': {
-      const ergebnisse = Object.entries(antwort.ergebnisse)
-      if (ergebnisse.length === 0 && !antwort.rechenweg) return '(keine Angaben)'
-      const teile = ergebnisse
-        .sort(([a], [b]) => a.localeCompare(b, 'de', { numeric: true }))
-        .map(([_id, wert], i) => `Ergebnis ${i + 1}: ${wert || '–'}`)
-      if (antwort.rechenweg) teile.push(`Rechenweg: ${antwort.rechenweg}`)
-      return teile.join(', ')
-    }
-
-    case 'buchungssatz': {
-      if (antwort.buchungen.length === 0) return '(keine Buchungen)'
-      return antwort.buchungen.map((b, i) => {
-        const soll = b.sollKonten.map(k => `${k.kontonummer || '?'}: ${k.betrag}`).join(', ')
-        const haben = b.habenKonten.map(k => `${k.kontonummer || '?'}: ${k.betrag}`).join(', ')
-        return `Buchung ${i + 1}: Soll [${soll}] / Haben [${haben}]`
-      }).join('; ')
-    }
-
-    case 'tkonto': {
-      if (antwort.konten.length === 0) return '(keine T-Konten)'
-      return antwort.konten.map((k, i) => {
-        const left = k.eintraegeLinks.map(e => `${e.gegenkonto}: ${e.betrag}`).join(', ')
-        const right = k.eintraegeRechts.map(e => `${e.gegenkonto}: ${e.betrag}`).join(', ')
-        return `T-Konto ${i + 1}: Links [${left}] | Rechts [${right}]${k.saldo ? ` Saldo: ${k.saldo.betrag}` : ''}`
-      }).join('; ')
-    }
-
-    case 'kontenbestimmung': {
-      const entries = Object.entries(antwort.aufgaben)
-      if (entries.length === 0) return '(keine Antworten)'
-      return entries.map(([_id, a]) =>
-        a.antworten.map(ant => [ant.kontonummer, ant.kategorie, ant.seite].filter(Boolean).join(' / ')).join(', ')
-      ).join('; ')
-    }
-
-    case 'bilanzstruktur': {
-      const parts: string[] = []
-      if (antwort.bilanz) {
-        const links = antwort.bilanz.linkeSeite.gruppen.flatMap(g => g.konten.map(k => k.nr)).length
-        const rechts = antwort.bilanz.rechteSeite.gruppen.flatMap(g => g.konten.map(k => k.nr)).length
-        parts.push(`Bilanz: ${links}+${rechts} Konten`)
-      }
-      if (antwort.erfolgsrechnung) {
-        const stufen = antwort.erfolgsrechnung.stufen.length
-        parts.push(`ER: ${stufen} Stufen`)
-      }
-      return parts.length > 0 ? parts.join(', ') : '(leer)'
-    }
-
-    case 'pdf': {
-      const pdfA = antwort as { typ: 'pdf'; annotationen: PDFAnnotation[] }
-      const count = pdfA.annotationen?.length ?? 0
-      return count > 0 ? `${count} Annotationen` : '(keine)'
-    }
-
-    default:
-      return '(unbekannter Typ)'
-  }
-}
-
-export default function KorrekturSchuelerZeile({ pruefungId, schueler, abgabe, fragen, notenConfig, onBewertungUpdate, onNoteOverride, onAudioUpload, onGesamtAudioUpdate, onPDF }: Props) {
+export default function KorrekturSchuelerZeile({ pruefungId, schueler, abgabe, fragen, autoErgebnisse, notenConfig, onBewertungUpdate, onNoteOverride, onAudioUpload, onGesamtAudioUpdate, onPDF }: Props) {
   const [offen, setOffen] = useState(false)
   const [noteEditModus, setNoteEditModus] = useState(false)
   const [noteInput, setNoteInput] = useState('')
@@ -338,16 +237,14 @@ export default function KorrekturSchuelerZeile({ pruefungId, schueler, abgabe, f
               )
             }
 
-            const antwortText = antwortAlsText(antwort, frage)
-
             return (
               <KorrekturFrageZeile
                 key={frage.id}
                 frageId={frage.id}
-                fragetext={(frage as { fragetext?: string }).fragetext ?? frage.id}
-                fragenTyp={frage.typ}
+                frage={frage}
+                antwort={antwort}
+                autoErgebnis={autoErgebnisse[frage.id] ?? null}
                 bewertung={bewertung}
-                antwortText={antwortText}
                 onUpdate={(updates) => onBewertungUpdate(schueler.email, frage.id, updates)}
                 onAudioUpload={(frageId, blob) => onAudioUpload(schueler.email, frageId, blob)}
               />

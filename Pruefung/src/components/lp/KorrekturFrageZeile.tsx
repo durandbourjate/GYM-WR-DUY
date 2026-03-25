@@ -1,12 +1,16 @@
 import type { FragenBewertung } from '../../types/korrektur.ts'
+import type { Frage } from '../../types/fragen.ts'
+import type { Antwort } from '../../types/antworten.ts'
+import type { KorrekturErgebnis } from '../../utils/autoKorrektur.ts'
 import { effektivePunkte, quelleLabel } from '../../utils/korrekturUtils.ts'
 import AudioRecorder from '../AudioRecorder.tsx'
+import KorrekturFrageVollansicht from './KorrekturFrageVollansicht.tsx'
 
 interface Props {
   frageId: string
-  fragetext: string
-  fragenTyp: string
-  antwortText: string
+  frage: Frage
+  antwort: Antwort | undefined
+  autoErgebnis: KorrekturErgebnis | null
   bewertung: FragenBewertung
   onUpdate: (updates: { lpPunkte?: number | null; lpKommentar?: string | null; geprueft?: boolean; audioKommentarId?: string | null }) => void
   onAudioUpload: (frageId: string, blob: Blob) => Promise<string | null>
@@ -38,15 +42,16 @@ function fragenTypFarbe(typ: string): string {
 
 export default function KorrekturFrageZeile({
   frageId,
-  fragetext,
-  fragenTyp,
-  antwortText,
+  frage,
+  antwort,
+  autoErgebnis,
   bewertung,
   onUpdate,
   onAudioUpload,
 }: Props) {
   const aktuellePunkte = effektivePunkte(bewertung)
   const hatKiErgebnis = bewertung.quelle === 'ki' || bewertung.quelle === 'auto'
+  const fragenTyp = frage.typ
 
   // Wert im Eingabefeld: LP-Anpassung > KI-Vorschlag > leer
   const punkteWert = bewertung.lpPunkte ?? bewertung.kiPunkte ?? ''
@@ -73,19 +78,12 @@ export default function KorrekturFrageZeile({
         </span>
       </div>
 
-      {/* Zeile 2: Fragetext (gekürzt) */}
-      <p className="text-sm text-slate-500 dark:text-slate-400 mb-2 truncate" title={fragetext}>
-        {fragetext}
-      </p>
-
-      {/* Zeile 3: Schülerantwort */}
-      <div className="rounded bg-slate-50 dark:bg-slate-700/50 px-3 py-2 mb-3">
-        <p className="text-sm text-slate-700 dark:text-slate-200 line-clamp-4 whitespace-pre-wrap">
-          {antwortText || <span className="italic text-slate-400 dark:text-slate-500">Keine Antwort</span>}
-        </p>
+      {/* Vollansicht: Frage + Antwort + Auto-Korrektur + Musterlösung */}
+      <div className="mb-3">
+        <KorrekturFrageVollansicht frage={frage} antwort={antwort} autoErgebnis={autoErgebnis} />
       </div>
 
-      {/* Zeile 4: KI-Ergebnis (nur bei ki/auto) */}
+      {/* KI-Ergebnis (nur bei ki/auto) */}
       {hatKiErgebnis && bewertung.kiPunkte !== null && (
         <div className="mb-3 space-y-1">
           <div className="flex items-baseline gap-2">
@@ -108,7 +106,7 @@ export default function KorrekturFrageZeile({
         </div>
       )}
 
-      {/* Zeile 5: LP-Override */}
+      {/* LP-Override */}
       <div className="flex flex-wrap items-start gap-3 pt-3 border-t border-slate-100 dark:border-slate-700/50">
         {/* Punkte-Eingabe */}
         <div className="flex items-center gap-1.5">
