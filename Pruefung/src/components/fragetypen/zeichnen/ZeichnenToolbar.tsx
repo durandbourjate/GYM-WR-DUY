@@ -57,7 +57,7 @@ export function ZeichnenToolbar({
 
   const containerKlassen = [
     'flex items-center gap-1.5 p-1',
-    isHorizontal ? 'flex-row flex-wrap' : 'flex-col',
+    isHorizontal ? 'flex-row flex-wrap' : 'flex-col max-h-full overflow-y-auto',
     disabled ? 'pointer-events-none opacity-50' : '',
   ]
     .filter(Boolean)
@@ -172,8 +172,8 @@ export function ZeichnenToolbar({
         </button>
       </div>
 
-      {/* Spacer */}
-      <div className="flex-1" aria-hidden="true" />
+      {/* Spacer — nur horizontal, damit flex-1 den Container vertikal nicht sprengt */}
+      {isHorizontal && <div className="flex-1" aria-hidden="true" />}
 
       {/* Layout-Toggle */}
       <button
