@@ -388,7 +388,8 @@ function HilfeDurchfuehrung() {
       <Schritt nr={2}>Wählen Sie die Kurse aus (pro Gefäss, z.B. SF WR). SuS können in mehreren Kursen vorkommen — Duplikate werden automatisch erkannt. Einzelne SuS können über die Checkboxen innerhalb der Kursübersicht ab-/angewählt werden.</Schritt>
       <Schritt nr={3}>Zeitzuschläge (Nachteilsausgleich): Geben Sie die Zusatzminuten direkt neben dem SuS-Namen ein (Eingabefeld in der Teilnehmerliste).</Schritt>
       <Schritt nr={4}>Optional: Einladungs-E-Mails an die ausgewählten SuS versenden.</Schritt>
-      <Schritt nr={5}>Klicken Sie &laquo;Weiter zur Lobby&raquo; — die Teilnehmer werden gespeichert.</Schritt>
+      <Schritt nr={5}>Wählen Sie die <strong>Kontrollstufe</strong> (Soft-Lockdown): Locker (Nur Logging), Standard (Copy/Paste-Block, Vollbild, 3 Verstösse = Sperre) oder Streng (Sofort-Pause). iPads werden automatisch auf maximal Standard heruntergestuft.</Schritt>
+      <Schritt nr={6}>Klicken Sie &laquo;Weiter zur Lobby&raquo; — die Teilnehmer werden gespeichert.</Schritt>
 
       <Untertitel>Phase 2: Lobby</Untertitel>
       <Text>
@@ -397,13 +398,21 @@ function HilfeDurchfuehrung() {
 
       <Untertitel>Phase 3: Live-Monitoring</Untertitel>
       <Text>
-        Im Live-Dashboard sehen Sie pro SuS: Fortschritt, aktuelle Frage, letzte Aktivität und Netzwerkstatus. Inaktivitäts-Warnstufen zeigen an, wenn SuS länger als 1/3/5 Minuten nichts tun.
+        Im Live-Dashboard sehen Sie pro SuS: Status, Verstösse, Kontrollstufe, Gerät (Laptop/iPad), aktuelle Frage und Fortschritt. Inaktivitäts-Warnstufen zeigen an, wenn SuS länger als 1/3/5 Minuten nichts tun.
+      </Text>
+      <Text>
+        <strong>Soft-Lockdown:</strong> Die Verstoss-Spalte zeigt den Zähler (z.B. ⚠️ 2/3). Bei Hover sehen Sie Details (Zeitpunkt, Typ). Wird ein SuS gesperrt (max. Verstösse erreicht), erscheint ein 🔒-Symbol mit &laquo;Entsperren&raquo;-Button. Die Kontrollstufe zeigt an, ob ein automatisches Downgrade stattgefunden hat (z.B. bei iPads).
       </Text>
       <Text>
         Sie können die Prüfung jederzeit beenden — sofort oder mit Restzeit (z.B. noch 5 Minuten). Auch einzelne SuS können individuell beendet werden.
       </Text>
       <Text>
         Antworten werden alle 30 Sekunden automatisch gespeichert. Bei Verbindungsabbruch werden sie lokal zwischengespeichert und bei Reconnect nachgesendet.
+      </Text>
+
+      <Untertitel>Multi-Prüfungs-Dashboard</Untertitel>
+      <Text>
+        Bei Nachprüfungsterminen (verschiedene Prüfungen gleichzeitig) können Sie alle in einem Tab überwachen. Verwenden Sie den URL-Parameter <code className="text-xs bg-slate-200 dark:bg-slate-600 px-1.5 py-0.5 rounded">?ids=pruefung-a,pruefung-b</code> um das Multi-Dashboard zu öffnen. Sie sehen eine Gesamtübersicht aller SuS, gruppiert nach Prüfung, und können jederzeit in die Einzelansicht einer Prüfung wechseln.
       </Text>
 
       <Untertitel>Phase 4: Ergebnisse</Untertitel>
@@ -422,6 +431,7 @@ function HilfeDurchfuehrung() {
       <Untertitel>URL-Schema</Untertitel>
       <div className="bg-slate-50 dark:bg-slate-700/50 rounded-lg p-4 text-sm space-y-2 mb-4">
         <div><code className="text-xs bg-slate-200 dark:bg-slate-600 px-1.5 py-0.5 rounded">/Pruefung/?id=abc</code> — Prüfung für SuS / Durchführen für LP</div>
+        <div><code className="text-xs bg-slate-200 dark:bg-slate-600 px-1.5 py-0.5 rounded">/Pruefung/?ids=abc,def</code> — Multi-Dashboard: mehrere Prüfungen parallel überwachen</div>
         <div><code className="text-xs bg-slate-200 dark:bg-slate-600 px-1.5 py-0.5 rounded">/Pruefung/?id=abc&ansicht=korrektur</code> — Korrektur-Dashboard</div>
       </div>
     </div>
@@ -609,7 +619,15 @@ function HilfeFAQ() {
       </FAQItem>
 
       <FAQItem frage="Brauche ich den Safe Exam Browser (SEB)?">
-        SEB ist optional. Wenn aktiviert, werden SuS ohne SEB gewarnt und können die Prüfung nicht starten. SEB verhindert den Zugriff auf andere Apps und Websites während der Prüfung.
+        SEB ist optional. Wenn aktiviert, werden SuS ohne SEB gewarnt und können die Prüfung nicht starten. SEB verhindert den Zugriff auf andere Apps und Websites während der Prüfung. Alternativ bietet der Soft-Lockdown (3 Stufen) SEB-unabhängige Sicherheit direkt im Browser.
+      </FAQItem>
+
+      <FAQItem frage="Was ist der Soft-Lockdown?">
+        Der Soft-Lockdown bietet SEB-unabhängige Sicherheit in 3 Stufen: Locker (nur Logging), Standard (Copy/Paste-Block, Vollbild, 3 Verstösse = Sperre) und Streng (Sofort-Pause bei Vollbild-Verlust). iPads werden automatisch erkannt und maximal auf Standard heruntergestuft (da Vollbild dort nicht erzwingbar ist). Bei einer Sperre muss die LP den SuS manuell entsperren.
+      </FAQItem>
+
+      <FAQItem frage="Kann ich mehrere Prüfungen gleichzeitig überwachen?">
+        Ja. Verwenden Sie den URL-Parameter ?ids=pruefung-a,pruefung-b um das Multi-Dashboard zu öffnen. Sie sehen eine Gesamtübersicht aller SuS, gruppiert nach Prüfung, und können in die Einzelansicht wechseln. Ideal für Nachprüfungstermine mit verschiedenen Prüfungen gleichzeitig.
       </FAQItem>
 
       <FAQItem frage="Wie funktioniert der Demo-Modus?">

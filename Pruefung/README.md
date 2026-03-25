@@ -21,7 +21,7 @@ Digitale Prüfungsplattform für den Wirtschaft-&-Recht-Unterricht am Gymnasium 
 - KI-Assistent: Fragetext, Musterlösung, MC-Optionen, Zuordnungspaare, R/F-Aussagen, Lücken, Berechnungsergebnisse und FiBu-Aufgaben generieren oder prüfen lassen
 - KI-Korrektur: Automatische Bewertung mit manueller Übersteuerung + individuelles Feedback per E-Mail
 - Audio-Korrektur: Audio-Feedback pro Frage und gesamt
-- Live-Monitoring: Fortschritt, Heartbeat, Inaktivitäts-Warnstufen, SEB-Status aller SuS in Echtzeit
+- Live-Monitoring: Fortschritt, Heartbeat, Inaktivitäts-Warnstufen, SEB-Status, Lockdown-Verstösse, Geräteerkennung, Entsperren-Button — alles in Echtzeit
 - Fragenbank: Fragen nach Fachbereich, Typ, Bloom-Stufe, Pool-Status, Anhänge (📎) filtern
 - Fragen-Statistiken: Lösungsquoten und Verwendungen pro Frage über alle Prüfungen (📊 Badges)
 - Pool-Brücke: Bidirektionaler Sync mit Übungspools (Import + Rück-Sync via GitHub API)
@@ -34,6 +34,8 @@ Digitale Prüfungsplattform für den Wirtschaft-&-Recht-Unterricht am Gymnasium 
 - Korrektur-Workflow: Auto-Geprüft bei LP-Aktion, Status-Tracking, Freigabe-Banner
 - Material-Panel: Split-Screen (55%) oder Overlay, unterstützt PDF, Video, Audio, Links
 - SEB-Integration: Auto-Config-Download, harte Durchsetzung, LP-Ausnahmen, SuS-Anleitung
+- Soft-Lockdown (3 Stufen): SEB-unabhängige Sicherheit — Locker (Logging), Standard (Copy/Paste-Block, Vollbild, 3 Verstösse = Sperre), Streng (Sofort-Pause). Automatische iPad-Erkennung mit Downgrade.
+- Multi-Prüfungs-Dashboard: Mehrere Prüfungen parallel in einem Tab überwachen (`?ids=a,b`). Live-Zusammenfassung + Einzelansicht.
 
 **Backend**
 - Google Sheets als Datenbank (Fragenbank, Klassenlisten, Configs, Antworten)
@@ -120,6 +122,7 @@ Environment-Variablen werden über GitHub Secrets gesetzt:
 | `/Pruefung/?id=abc` | Login → Prüfung `abc` laden |
 | LP ohne `?id=` | LP-Startseite (Prüfungen verwalten, Composer) |
 | LP mit `?id=abc` | Live-Monitoring für Prüfung `abc` |
+| LP mit `?ids=abc,def` | Multi-Dashboard: mehrere Prüfungen parallel überwachen |
 
 ## Verzeichnisstruktur
 
@@ -131,21 +134,33 @@ src/
 │   └── ...                    Login, Layout, Timer, Abgabe, etc.
 ├── services/                  API, Auth, SEB, Auto-Save, Retry-Queue
 ├── store/                     Zustand Stores (Prüfung, Auth, Theme)
-├── hooks/                     Monitoring, UX, Tab-Konflikt
+├── hooks/                     Monitoring, UX, Tab-Konflikt, Lockdown, Geräteerkennung
 ├── types/                     TypeScript Interfaces
 ├── data/                      Demo-Daten
 └── utils/                     Hilfsfunktionen
 seb/                           SEB-Konfiguration
 ```
 
-## Safe Exam Browser (SEB)
+## Safe Exam Browser (SEB) & Soft-Lockdown
 
-Die Plattform unterstützt den Safe Exam Browser:
+**SEB (harte Sicherheit):**
 - Erkennung via User-Agent (automatisch)
 - SEB-Konfigurationsvorlage in `seb/GymHofwil_Pruefung_Konfig.xml`
 - Anleitung: [`seb/README.md`](seb/README.md)
+- Wenn `sebErforderlich: true` gesetzt, wird ohne SEB der Start blockiert
 
-Wenn `sebErforderlich: true` in der Prüfungs-Config gesetzt ist, wird ohne SEB eine Warnung angezeigt und der Start blockiert.
+**Soft-Lockdown (3 Stufen, SEB-unabhängig):**
+
+| Stufe | Beschreibung |
+|-------|-------------|
+| Locker | Nur Logging + Warnung bei Verstössen |
+| Standard | Copy/Paste-Block, Vollbild, Rechtsklick/DevTools gesperrt, 3 Verstösse = Sperre |
+| Streng | Sofort-Pause bei Vollbild-Verlust, SEB empfohlen |
+
+- Automatische Geräteerkennung: iPads werden auf Standard heruntergestuft (kein Vollbild möglich)
+- LP sieht Verstösse, Gerät und Kontrollstufe live im Monitoring
+- Bei Sperre: LP kann SuS über Entsperren-Button freischalten
+- Kontrollstufe wird in der Vorbereitung gewählt (Segmented Control)
 
 ## Dokumentation
 
