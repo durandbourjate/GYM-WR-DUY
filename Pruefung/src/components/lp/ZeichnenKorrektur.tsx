@@ -22,6 +22,7 @@ interface Props {
 }
 
 /** Rendert JSON-Zeichenbefehle auf ein Off-Screen-Canvas und gibt Base64-PNG zurück */
+/** Rendert alle Zeichenbefehl-Typen (stift, linie, pfeil, rechteck, text) auf ein Canvas */
 function datenAlsBildLink(daten: string): string | null {
   try {
     const befehle = JSON.parse(daten) as unknown[]
@@ -35,42 +36,98 @@ function datenAlsBildLink(daten: string): string | null {
 
     ctx.fillStyle = '#ffffff'
     ctx.fillRect(0, 0, canvas.width, canvas.height)
-    ctx.strokeStyle = '#000000'
-    ctx.lineWidth = 2
     ctx.lineCap = 'round'
     ctx.lineJoin = 'round'
 
     for (const befehl of befehle) {
-      if (
-        typeof befehl !== 'object' ||
-        befehl === null ||
-        !('typ' in befehl)
-      ) continue
-
+      if (typeof befehl !== 'object' || befehl === null || !('typ' in befehl)) continue
       const b = befehl as Record<string, unknown>
+      const farbe = typeof b.farbe === 'string' ? b.farbe : '#000000'
+      const breite = typeof b.breite === 'number' ? b.breite : 2
 
-      if (b.typ === 'linie' && typeof b.farbe === 'string') {
-        ctx.strokeStyle = b.farbe
-        ctx.lineWidth = typeof b.breite === 'number' ? b.breite : 2
-        const punkte = b.punkte as { x: number; y: number }[] | undefined
-        if (!punkte || punkte.length < 2) continue
-        ctx.beginPath()
-        ctx.moveTo(punkte[0].x, punkte[0].y)
-        for (let i = 1; i < punkte.length; i++) {
-          ctx.lineTo(punkte[i].x, punkte[i].y)
+      switch (b.typ) {
+        case 'stift':
+        case 'linie': {
+          // Stift hat 'punkte[]', Linie hat 'von'+'bis' — beide als Pfad rendern
+          ctx.strokeStyle = farbe
+          ctx.lineWidth = breite
+          const punkte = b.punkte as { x: number; y: number }[] | undefined
+          if (punkte && punkte.length >= 2) {
+            ctx.beginPath()
+            ctx.moveTo(punkte[0].x, punkte[0].y)
+            for (let i = 1; i < punkte.length; i++) {
+              ctx.lineTo(punkte[i].x, punkte[i].y)
+            }
+            ctx.stroke()
+          } else {
+            // Linie mit von/bis
+            const von = b.von as { x: number; y: number } | undefined
+            const bis = b.bis as { x: number; y: number } | undefined
+            if (von && bis) {
+              ctx.beginPath()
+              ctx.moveTo(von.x, von.y)
+              ctx.lineTo(bis.x, bis.y)
+              ctx.stroke()
+            }
+          }
+          break
         }
-        ctx.stroke()
-      } else if (b.typ === 'text' && typeof b.text === 'string') {
-        ctx.fillStyle = typeof b.farbe === 'string' ? b.farbe : '#000000'
-        ctx.font = `${typeof b.groesse === 'number' ? b.groesse : 16}px sans-serif`
-        const x = typeof b.x === 'number' ? b.x : 0
-        const y = typeof b.y === 'number' ? b.y : 0
-        ctx.fillText(b.text, x, y)
+        case 'pfeil': {
+          const von = b.von as { x: number; y: number } | undefined
+          const bis = b.bis as { x: number; y: number } | undefined
+          if (!von || !bis) break
+          ctx.strokeStyle = farbe
+          ctx.lineWidth = breite
+          ctx.beginPath()
+          ctx.moveTo(von.x, von.y)
+          ctx.lineTo(bis.x, bis.y)
+          ctx.stroke()
+          // Pfeilspitze
+          const angle = Math.atan2(bis.y - von.y, bis.x - von.x)
+          const headLen = 12
+          ctx.beginPath()
+          ctx.moveTo(bis.x, bis.y)
+          ctx.lineTo(bis.x - headLen * Math.cos(angle - Math.PI / 6), bis.y - headLen * Math.sin(angle - Math.PI / 6))
+          ctx.moveTo(bis.x, bis.y)
+          ctx.lineTo(bis.x - headLen * Math.cos(angle + Math.PI / 6), bis.y - headLen * Math.sin(angle + Math.PI / 6))
+          ctx.stroke()
+          break
+        }
+        case 'rechteck': {
+          const von = b.von as { x: number; y: number } | undefined
+          const bis = b.bis as { x: number; y: number } | undefined
+          if (!von || !bis) break
+          ctx.strokeStyle = farbe
+          ctx.lineWidth = breite
+          const x = Math.min(von.x, bis.x)
+          const y = Math.min(von.y, bis.y)
+          const w = Math.abs(bis.x - von.x)
+          const h = Math.abs(bis.y - von.y)
+          if (b.gefuellt) {
+            ctx.fillStyle = farbe
+            ctx.fillRect(x, y, w, h)
+          } else {
+            ctx.strokeRect(x, y, w, h)
+          }
+          break
+        }
+        case 'text': {
+          ctx.fillStyle = farbe
+          const groesse = typeof b.groesse === 'number' ? b.groesse : 16
+          ctx.font = `${groesse}px sans-serif`
+          ctx.textBaseline = 'alphabetic'
+          const pos = b.position as { x: number; y: number } | undefined
+          const x = pos ? pos.x : (typeof b.x === 'number' ? b.x : 0)
+          const y = pos ? pos.y : (typeof b.y === 'number' ? b.y : 0)
+          if (typeof b.text === 'string') ctx.fillText(b.text, x, y)
+          break
+        }
       }
     }
 
     return canvas.toDataURL('image/png')
-  } catch {
+  } catch (e) {
+    console.warn('[datenAlsBildLink] Fehler:', e)
     return null
   }
 }
@@ -96,7 +153,13 @@ export default function ZeichnenKorrektur({
   // Bild ermitteln (direkt oder aus daten rendern)
   const [gerendertesBild] = useState<string | null>(() => {
     if (bildLink) return bildLink
-    if (daten) return datenAlsBildLink(daten)
+    if (daten) {
+      console.log(`[ZeichnenKorrektur] ${frageId}: Rendere aus daten (${daten.length} Zeichen)`)
+      const bild = datenAlsBildLink(daten)
+      if (!bild) console.warn(`[ZeichnenKorrektur] ${frageId}: datenAlsBildLink gab null zurück`, daten.slice(0, 200))
+      return bild
+    }
+    console.warn(`[ZeichnenKorrektur] ${frageId}: Weder bildLink noch daten vorhanden`)
     return null
   })
 

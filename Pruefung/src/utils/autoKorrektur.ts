@@ -35,8 +35,18 @@ export function autoKorrigiere(frage: Frage, antwort: Antwort | undefined): Korr
 
     // Typ-Mismatch zwischen Frage und Antwort
     if (frage.typ !== antwort.typ) {
-      console.warn(`[autoKorrektur] Typ-Mismatch: Frage=${frage.typ}, Antwort=${antwort.typ}`)
+      console.warn(`[autoKorrektur] Typ-Mismatch: Frage=${frage.typ}, Antwort=${antwort.typ}`, { frageId: frage.id, antwort })
       return null
+    }
+
+    // Debug-Logging für Zuordnung
+    if (frage.typ === 'zuordnung') {
+      const zAntwort = antwort as Extract<Antwort, { typ: 'zuordnung' }>
+      const zFrage = frage as ZuordnungFrage
+      console.log(`[autoKorrektur] Zuordnung ${frage.id}:`, {
+        paare: zFrage.paare,
+        zuordnungen: zAntwort.zuordnungen,
+      })
     }
 
     switch (frage.typ) {

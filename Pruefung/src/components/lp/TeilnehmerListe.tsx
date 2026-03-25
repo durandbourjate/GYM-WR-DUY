@@ -16,9 +16,13 @@ interface Props {
   onSuSHinzufuegen?: (sus: AlleSuS) => void
   abgewaehlte: Set<string>
   alleSuS?: AlleSuS[]
+  /** Zeitzuschläge (Email → Minuten) */
+  zeitverlaengerungen?: Record<string, number>
+  /** Callback bei Zeitzuschlag-Änderung */
+  onZeitzuschlagChange?: (email: string, minuten: number | null) => void
 }
 
-export default function TeilnehmerListe({ teilnehmer, onToggle, onManuellHinzufuegen, onSuSHinzufuegen, abgewaehlte, alleSuS = [] }: Props) {
+export default function TeilnehmerListe({ teilnehmer, onToggle, onManuellHinzufuegen, onSuSHinzufuegen, abgewaehlte, alleSuS = [], zeitverlaengerungen = {}, onZeitzuschlagChange }: Props) {
   const [manuelleEmail, setManuelleEmail] = useState('')
   const [zugeklappt, setZugeklappt] = useState<Set<string>>(new Set())
   const [suchText, setSuchText] = useState('')
@@ -163,13 +167,17 @@ export default function TeilnehmerListe({ teilnehmer, onToggle, onManuellHinzufu
                   {schueler.map((t) => (
                     <label
                       key={t.email}
-                      className="flex items-center gap-3 px-3 py-1.5 pl-8 hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer"
+                      className={`flex items-center gap-3 px-3 py-2 pl-6 cursor-pointer transition-colors ${
+                        abgewaehlte.has(t.email)
+                          ? 'bg-slate-100/50 dark:bg-slate-800/30 opacity-60'
+                          : 'hover:bg-slate-50 dark:hover:bg-slate-800/50'
+                      }`}
                     >
                       <input
                         type="checkbox"
                         checked={!abgewaehlte.has(t.email)}
                         onChange={() => onToggle(t.email)}
-                        className="rounded border-slate-300 dark:border-slate-600"
+                        className="w-4 h-4 shrink-0 accent-green-600 cursor-pointer"
                       />
                       <span className="flex-1 text-sm text-slate-700 dark:text-slate-200">
                         {t.name}, {t.vorname}
@@ -179,6 +187,29 @@ export default function TeilnehmerListe({ teilnehmer, onToggle, onManuellHinzufu
                       )}
                       {t.quelle === 'manuell' && (
                         <span className="text-xs px-1.5 py-0.5 bg-slate-100 dark:bg-slate-700 rounded text-slate-500 dark:text-slate-400">manuell</span>
+                      )}
+                      {/* Zeitzuschlag inline */}
+                      {onZeitzuschlagChange && !abgewaehlte.has(t.email) && (
+                        <div className="flex items-center gap-1 ml-auto shrink-0" onClick={(e) => e.preventDefault()}>
+                          {zeitverlaengerungen[t.email] ? (
+                            <>
+                              <span className="text-xs text-blue-600 dark:text-blue-400">+{zeitverlaengerungen[t.email]}′</span>
+                              <button
+                                type="button"
+                                onClick={(e) => { e.preventDefault(); onZeitzuschlagChange(t.email, null) }}
+                                className="text-xs text-slate-400 hover:text-red-500 cursor-pointer"
+                                title="Zeitzuschlag entfernen"
+                              >✕</button>
+                            </>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={(e) => { e.preventDefault(); onZeitzuschlagChange(t.email, 15) }}
+                              className="text-[10px] px-1.5 py-0.5 text-slate-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded cursor-pointer"
+                              title="Zeitzuschlag hinzufügen (+15 Min.)"
+                            >⏱</button>
+                          )}
+                        </div>
                       )}
                     </label>
                   ))}

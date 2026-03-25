@@ -6,7 +6,6 @@ import KursAuswahl from './KursAuswahl'
 import type { KursGruppe, KlassenlistenSuS } from './KursAuswahl'
 import TeilnehmerListe, { type AlleSuS } from './TeilnehmerListe'
 import { downloadSebDatei } from '../../utils/sebConfigGenerator'
-import ZeitzuschlagEditor from './ZeitzuschlagEditor'
 
 interface Props {
   config: PruefungsConfig
@@ -234,6 +233,17 @@ export default function VorbereitungPhase({ config, onTeilnehmerGesetzt, onWeite
           onSuSHinzufuegen={handleSuSHinzufuegen}
           abgewaehlte={abgewaehlte}
           alleSuS={rohDaten}
+          zeitverlaengerungen={zeitverlaengerungen}
+          onZeitzuschlagChange={(email, minuten) => {
+            const neueZV = { ...zeitverlaengerungen }
+            if (minuten === null) {
+              delete neueZV[email]
+            } else {
+              neueZV[email] = minuten
+            }
+            setZeitverlaengerungen(neueZV)
+            onConfigUpdate?.({ zeitverlaengerungen: neueZV })
+          }}
         />
       )}
 
@@ -247,20 +257,6 @@ export default function VorbereitungPhase({ config, onTeilnehmerGesetzt, onWeite
           abgewaehlte={abgewaehlte}
           alleSuS={rohDaten}
         />
-      )}
-
-      {/* Zeitzuschläge (Nachteilsausgleich) */}
-      {teilnehmer.length > 0 && (
-        <div className="p-4 bg-white dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-slate-700">
-          <ZeitzuschlagEditor
-            zeitverlaengerungen={zeitverlaengerungen}
-            teilnehmer={teilnehmer.filter((t) => !abgewaehlte.has(t.email))}
-            onChange={(neueZV) => {
-              setZeitverlaengerungen(neueZV)
-              onConfigUpdate?.({ zeitverlaengerungen: neueZV })
-            }}
-          />
-        </div>
       )}
 
       {/* Prüfungs-Link */}

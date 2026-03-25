@@ -418,7 +418,8 @@ export default function DurchfuehrenDashboard({ pruefungId }: { pruefungId: stri
       {/* === Tab-Content === */}
       {config && (
         <div className="max-w-6xl mx-auto w-full px-4 py-4 space-y-4 flex-1">
-          {activeTab === 'vorbereitung' && (
+          {/* Vorbereitung: hidden statt unmount, damit State erhalten bleibt bei "Zurück" */}
+          <div className={activeTab === 'vorbereitung' ? '' : 'hidden'}>
             <VorbereitungPhase
               config={config}
               onTeilnehmerGesetzt={(teilnehmer) => {
@@ -433,7 +434,7 @@ export default function DurchfuehrenDashboard({ pruefungId }: { pruefungId: stri
                 }
               }}
             />
-          )}
+          </div>
 
           {activeTab === 'lobby' && daten && (
             <LobbyPhase
@@ -505,6 +506,7 @@ export default function DurchfuehrenDashboard({ pruefungId }: { pruefungId: stri
               schuelerStatus={daten.schueler}
               fragen={fragen}
               abgaben={abgaben}
+              onWeiterZurKorrektur={() => wechsleTab('korrektur')}
               onExportieren={() => {
                 const csv = exportiereTeilnahmeCSV(config, daten.schueler)
                 if (csv) {

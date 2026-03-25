@@ -57,8 +57,10 @@ export function usePointerEvents({
     function handlePointerDown(event: PointerEvent): void {
       if (disabled) return;
 
-      // Pointer-Capture sicherstellt move/up auch ausserhalb des Canvas
-      canvas!.setPointerCapture(event.pointerId);
+      // Text-Tool: Kein Pointer-Capture, sonst kann das Text-Input keinen Focus bekommen
+      if (aktivesTool !== 'text') {
+        canvas!.setPointerCapture(event.pointerId);
+      }
 
       istAmZeichnenRef.current = true;
 

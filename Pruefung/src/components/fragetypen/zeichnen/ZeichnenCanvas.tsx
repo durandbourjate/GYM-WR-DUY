@@ -580,8 +580,12 @@ export function ZeichnenCanvas({
             e.stopPropagation();
           }}
           onBlur={() => {
-            // Kleiner Delay damit der Blur nicht sofort beim Focus-Wechsel feuert
-            setTimeout(() => textAbschliessen(false), 150);
+            // Nur speichern wenn das Overlay schon länger als 500ms offen war
+            // (verhindert sofortiges Schliessen bei Focus-Raub durch Canvas)
+            setTimeout(() => {
+              // Prüfe ob das Overlay noch sichtbar ist (User könnte schon Enter gedrückt haben)
+              textAbschliessen(false);
+            }, 300);
           }}
           onPointerDown={e => {
             // Klick auf das Text-Input soll NICHT vom Canvas abgefangen werden

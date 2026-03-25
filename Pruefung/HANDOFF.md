@@ -6,6 +6,41 @@
 
 ---
 
+## Session 25.03.2026 (6) — LP-Test-Feedback Runde 3
+
+### Erledigt (9 Fixes)
+
+- **F1: Checkboxen sichtbar:** `w-4 h-4 accent-green-600` statt unsichtbare native Checkboxen. Abgewählte SuS visuell abgeblendet.
+- **F2: Zeitzuschlag inline:** ⏱-Button direkt in jeder SuS-Zeile der TeilnehmerListe. Klick → +15 Min. Kein separates Menü mehr.
+- **F3: SuS-State bei Zurück:** VorbereitungPhase wird mit `hidden` statt `{condition && ...}` gerendert → State bleibt bei Tab-Wechsel erhalten.
+- **F5: Zeichnen Text-Tool:** Pointer-Capture deaktiviert bei Text-Tool (verhinderte Focus-Raub). onBlur-Timer auf 300ms erhöht.
+- **F6: PDF Text-Werkzeug immer verfügbar:** 'text' wird unabhängig von `erlaubteWerkzeuge` in der Toolbar angezeigt.
+- **F9: Ergebnisse → Korrektur:** "Weiter zur Korrektur →"-Button prominent im Ergebnisse-Tab.
+- **F10: Debug-Logging Zuordnung:** `console.log` zeigt paare vs. zuordnungen zum Debuggen.
+- **F11: Zeichnung in Korrektur:** `datenAlsBildLink()` komplett neu geschrieben — rendert jetzt alle Typen (stift, linie, pfeil, rechteck, text) statt nur 'linie'. DAS war der Bug warum Zeichnungen nicht angezeigt wurden.
+- **ZeitzuschlagEditor entfernt** aus VorbereitungPhase (ersetzt durch inline).
+
+### Nicht gefixt (Klärung nötig)
+- **F4 (Warteraum):** SuS kommt direkt zu "Prüfung starten" — wahrscheinlich Stale-Cache. War mit Inkognito-Fenster behoben. Service Worker autoUpdate ist aktiv.
+- **F7 (Material-Button):** Button rendert nur wenn `config.materialien.length > 0`. Prüfe ob die Test-Prüfung Materialien hat.
+- **F8 (Button-Feedback):** Für einen späteren Pass — alle API-Calls brauchen Loading-States auf den Buttons.
+- **F12 (SuS-Einsicht):** SuS öffnet die App OHNE `?id=...` → sieht KorrekturListe → klickt auf Prüfung → sieht Korrektur-Einsicht. Voraussetzung: Einsicht muss von LP freigegeben sein UND SuS muss eingeloggt sein.
+
+### Geänderte Dateien
+```
+src/components/lp/TeilnehmerListe.tsx        — Checkboxen sichtbar + Zeitzuschlag inline
+src/components/lp/VorbereitungPhase.tsx      — ZeitzuschlagEditor entfernt, Zeitzuschlag via TeilnehmerListe
+src/components/lp/DurchfuehrenDashboard.tsx  — VorbereitungPhase hidden statt unmount + Korrektur-Button
+src/components/lp/BeendetPhase.tsx           — "Weiter zur Korrektur" Button
+src/components/lp/ZeichnenKorrektur.tsx      — datenAlsBildLink komplett neu (alle DrawCommand-Typen)
+src/components/fragetypen/zeichnen/usePointerEvents.ts — Kein setPointerCapture bei text-Tool
+src/components/fragetypen/zeichnen/ZeichnenCanvas.tsx  — onBlur-Timer 300ms
+src/components/fragetypen/pdf/PDFToolbar.tsx — Text immer in Toolbar
+src/utils/autoKorrektur.ts                   — Debug-Logging für Zuordnung
+```
+
+---
+
 ## Session 25.03.2026 (5) — LP-Test-Feedback Runde 2
 
 ### Erledigt (10 Tasks in 3 Clustern)

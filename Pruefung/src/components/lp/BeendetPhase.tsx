@@ -13,9 +13,10 @@ interface Props {
   korrektur?: PruefungsKorrektur
   onExportieren: () => void
   onNeueDurchfuehrung?: () => void
+  onWeiterZurKorrektur?: () => void
 }
 
-export default function BeendetPhase({ config, schuelerStatus, fragen, abgaben, korrektur, onExportieren, onNeueDurchfuehrung }: Props) {
+export default function BeendetPhase({ config, schuelerStatus, fragen, abgaben, korrektur, onExportieren, onNeueDurchfuehrung, onWeiterZurKorrektur }: Props) {
   const [backupLaden, setBackupLaden] = useState(false)
   const [resetBestaetigung, setResetBestaetigung] = useState(false)
   const abgegeben = schuelerStatus.filter((s) => s.status === 'abgegeben')
@@ -65,6 +66,19 @@ export default function BeendetPhase({ config, schuelerStatus, fragen, abgaben, 
           </tbody>
         </table>
       </div>
+
+      {/* Weiter zur Korrektur */}
+      {onWeiterZurKorrektur && (
+        <div className="flex justify-center">
+          <button
+            type="button"
+            onClick={onWeiterZurKorrektur}
+            className="px-6 py-2.5 text-sm bg-slate-800 dark:bg-slate-200 text-white dark:text-slate-800 rounded-lg hover:bg-slate-900 dark:hover:bg-slate-100 cursor-pointer font-medium"
+          >
+            Weiter zur Korrektur →
+          </button>
+        </div>
+      )}
 
       {/* Aktionen */}
       <div className="flex flex-wrap gap-3 pt-2 border-t border-slate-200 dark:border-slate-700">
