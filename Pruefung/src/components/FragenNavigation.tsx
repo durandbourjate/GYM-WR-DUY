@@ -34,7 +34,7 @@ export default function FragenNavigation() {
               const idx = startIndex + i
               const frage = fragen[idx]
               const istAktuell = idx === aktuelleFrageIndex
-              const istBeantwortet = frage ? istVollstaendigBeantwortet(frage, antworten[frageId]) : !!antworten[frageId]
+              const istBeantwortet = frage ? istVollstaendigBeantwortet(frage, antworten[frageId], fragen, antworten) : !!antworten[frageId]
               const istMarkiert = !!markierungen[frageId]
 
               // Status: Icons + dezente Farbe

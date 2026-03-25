@@ -1,12 +1,31 @@
-import type { Frage } from '../types/fragen.ts'
+import type { Frage, AufgabengruppeFrage } from '../types/fragen.ts'
 import type { Antwort } from '../types/antworten.ts'
 
 /**
  * Prüft ob eine Frage vollständig beantwortet ist.
  * Bei Fragetypen mit Teilfragen (R/F, Lückentext, Berechnung, Zuordnung)
  * müssen ALLE Teile ausgefüllt sein, damit die Frage als grün/beantwortet gilt.
+ * Bei Aufgabengruppen werden die Antworten der Teilaufgaben geprüft.
  */
-export function istVollstaendigBeantwortet(frage: Frage, antwort: Antwort | undefined): boolean {
+export function istVollstaendigBeantwortet(
+  frage: Frage,
+  antwort: Antwort | undefined,
+  alleFragen?: Frage[],
+  alleAntworten?: Record<string, Antwort>
+): boolean {
+  // Aufgabengruppe: Prüfe ob ALLE Teilaufgaben beantwortet sind
+  if (frage.typ === 'aufgabengruppe') {
+    const gruppe = frage as AufgabengruppeFrage
+    if (!gruppe.teilaufgabenIds || gruppe.teilaufgabenIds.length === 0) return true
+    if (!alleAntworten || !alleFragen) return false
+
+    return gruppe.teilaufgabenIds.every(teilId => {
+      const teilFrage = alleFragen.find(f => f.id === teilId)
+      if (!teilFrage) return true // Frage nicht geladen → nicht blockieren
+      return istVollstaendigBeantwortet(teilFrage, alleAntworten[teilId])
+    })
+  }
+
   if (!antwort) return false
 
   switch (antwort.typ) {

@@ -93,7 +93,7 @@ export default function FragenUebersicht() {
                 if (i === abschnitt.fragenIds.length - 1) globalIdx = idx + 1
                 const frage = fragen[idx]
                 if (!frage) return null
-                const istBeantwortet = frage ? istVollstaendigBeantwortet(frage, antworten[frageId]) : !!antworten[frageId]
+                const istBeantwortet = frage ? istVollstaendigBeantwortet(frage, antworten[frageId], fragen, antworten) : !!antworten[frageId]
                 const istMarkiert = !!markierungen[frageId]
                 const antwort = antworten[frageId]
 

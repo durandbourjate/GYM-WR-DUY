@@ -58,7 +58,7 @@ export function berechneAbschnittFortschritt(
       const frage = fragenMap.get(id)
       const p = frage?.punkte ?? 0
       punkte += p
-      if (frage && istVollstaendigBeantwortet(frage, antworten[id])) {
+      if (frage && istVollstaendigBeantwortet(frage, antworten[id], fragen, antworten)) {
         beantwortet++
         punkteBeantwortet += p
       }
