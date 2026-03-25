@@ -8,17 +8,13 @@
 
 ## Offene Punkte
 
-### 🔴 Service Worker Cache verhindert Updates bei SuS
+### ✅ Service Worker Cache — GELÖST (25.03.2026)
 
-SuS sehen nach Deployments noch alte Versionen. Der SW cached aggressiv.
+Umgestellt von `registerType: 'prompt'` auf `autoUpdate` mit `skipWaiting + clientsClaim`. SuS bekommen Updates automatisch. Build-Timestamp im Console-Log zur Verifikation. `?reset=true` als Notfall-Escape bleibt erhalten.
 
-**Workaround:** SuS müssen `?reset=true` an die URL hängen oder Hard Refresh (Cmd+Shift+R).
+### 🟢 PDF-Frage: Laden via Google Drive
 
-**TODO:** Robustere SW-Update-Strategie (skipWaiting + clients.claim + Versions-Check beim Laden).
-
-### 🔴 PDF-Frage: Laden via Google Drive
-
-PDF wird via Apps Script Proxy (`ladeDriveFile` → Base64) geladen. Der Endpoint existiert im Apps Script, **aber SuS sehen die Änderung erst wenn der SW-Cache gelöscht ist** (siehe oben).
+PDF wird via Apps Script Proxy (`ladeDriveFile` → Base64) geladen. SW-Problem gelöst, sollte jetzt funktionieren.
 
 - `witzsammlung.pdf` ist in Google Drive hochgeladen (ID: `1Yi8WYN0HFm9iiVWYhsr-dn-1QO-5oyZy`)
 - Apps Script hat `ladeDriveFile`-Endpoint (gibt Base64 zurück)
@@ -73,6 +69,31 @@ Jeder API-Call braucht 1-3 Sekunden (Cold Starts, Google-Infrastruktur). Optimis
 
 ### Apps Script manuell aktualisieren
 `apps-script-code.js` muss nach Änderungen manuell in den Apps Script Editor kopiert werden → "Bereitstellungen verwalten" → bestehende Version aktualisieren (Stift-Icon). **NICHT** "Neue Bereitstellung" (ändert URL!).
+
+---
+
+## Session 25.03.2026 (2) — Production-Readiness Phase 0+1
+
+### Erledigt
+- **Phase 0 — Service Worker:** `autoUpdate` + `skipWaiting` + `clientsClaim`. Build-Timestamp (`__BUILD_TIMESTAMP__`). RetryQueue-DB im Reset aufgeräumt.
+- **Phase 1.1 — remoteSaveVersion Bug:** Version wird jetzt erst nach erfolgreichem API-Call erhöht (vorher: vor dem Call → Versions-Sprung bei Fehler).
+- **Phase 1.2 — Idempotenz-Key:** `requestId` (UUID) pro Save-Versuch. Backend prüft `letzteRequestId` gegen Duplikate. RetryQueue führt requestId mit.
+- **Phase 1.3 — Column Auto-Creation:** Neue `ensureColumns()` Helper-Funktion. `speichereAntworten`, `speichereFrage`, `speichereConfig` erstellen fehlende Sheet-Spalten automatisch.
+- **Phase 1.4 — safeJsonParse Logging:** `console.warn` bei Parse-Fehlern mit erstem 200-Zeichen-Ausschnitt.
+
+### Apps Script Änderungen (manuell kopieren!)
+- Neue Helper: `ensureColumns()` — automatische Spalten-Erstellung
+- `speichereAntworten`: Idempotenz via `letzteRequestId`, `ensureColumns` statt manuelle Migration
+- `speichereFrage`: `ensureColumns` eingebaut
+- `speichereConfig`: `ensureColumns` eingebaut
+- `safeJsonParse`: Warnung bei Fehler
+
+### Gesamtplan (noch offen)
+- **Phase 2:** State-Cleanup (IndexedDB bei Logout, `durchfuehrungId`, Timestamp-Check)
+- **Phase 3:** UI/UX (Material-Panel, Warteraum, Reset-Benachrichtigung, Korrektur-Test)
+- **Phase 4:** Feature — Einzelne SuS an-/abwählen
+- **Phase 5:** Feature — Mehrere Prüfungen gleichzeitig
+- Plan-Dokument: `.claude/plans/humming-dancing-waffle.md`
 
 ---
 

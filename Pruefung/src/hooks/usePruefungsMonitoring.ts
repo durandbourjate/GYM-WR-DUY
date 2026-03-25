@@ -60,18 +60,21 @@ export function usePruefungsMonitoring(): void {
     const interval = setInterval(async () => {
       try {
         setVerbindungsstatus('syncing')
-        incrementRemoteSaveVersion()
+        const neueVersion = remoteSaveVersionRef.current + 1
+        const requestId = crypto.randomUUID()
 
         const erfolg = await apiService.speichereAntworten({
           pruefungId: config.id,
           email: user.email,
           antworten: antwortenRef.current as Record<string, Antwort>,
-          version: remoteSaveVersionRef.current + 1,
+          version: neueVersion,
           istAbgabe: false,
           gesamtFragen: fragen?.length || 0,
+          requestId,
         })
 
         if (erfolg) {
+          incrementRemoteSaveVersion()
           setVerbindungsstatus('online')
           setLetzterSave(new Date().toISOString())
           incrementAutoSaveCount()
@@ -83,8 +86,9 @@ export function usePruefungsMonitoring(): void {
             pruefungId: config.id,
             email: user.email,
             antworten: antwortenRef.current as Record<string, Antwort>,
-            version: remoteSaveVersionRef.current + 1,
+            version: neueVersion,
             istAbgabe: false,
+            requestId,
           })
         }
       } catch {
@@ -95,7 +99,7 @@ export function usePruefungsMonitoring(): void {
     }, intervallMs)
 
     return () => clearInterval(interval)
-  }, [config, abgegeben, backendVerfuegbar, user, setVerbindungsstatus, incrementRemoteSaveVersion, setLetzterSave, incrementAutoSaveCount, incrementNetzwerkFehler])
+  }, [config, abgegeben, backendVerfuegbar, user, fragen, setVerbindungsstatus, incrementRemoteSaveVersion, setLetzterSave, incrementAutoSaveCount, incrementNetzwerkFehler])
 
   // === 3. Heartbeat (alle 10s, konfigurierbar) + Beenden-Signal ===
   useEffect(() => {

@@ -19,6 +19,7 @@ interface PendingSave {
   version: number
   istAbgabe: boolean
   retryCount: number
+  requestId?: string
 }
 
 /** Öffnet die IndexedDB-Datenbank */
@@ -43,6 +44,7 @@ export async function enqueue(payload: {
   antworten: Record<string, Antwort>
   version: number
   istAbgabe: boolean
+  requestId?: string
 }): Promise<void> {
   try {
     const db = await openDB()
@@ -86,6 +88,7 @@ export async function processQueue(): Promise<{ processed: number; failed: numbe
         antworten: item.antworten,
         version: item.version,
         istAbgabe: item.istAbgabe,
+        requestId: item.requestId,
       })
 
       if (erfolg) {

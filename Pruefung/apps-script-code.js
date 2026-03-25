@@ -386,9 +386,38 @@ function safeJsonParse(str, fallback) {
   if (!str) return fallback;
   try {
     return JSON.parse(str);
-  } catch {
+  } catch (e) {
+    console.warn('[safeJsonParse] Parse-Fehler für Wert (erste 200 Zeichen): ' + String(str).substring(0, 200) + ' — Fehler: ' + e.message);
     return fallback;
   }
+}
+
+/**
+ * Stellt sicher, dass alle Schlüssel aus rowData als Spaltenheader existieren.
+ * Fehlende Spalten werden automatisch am Ende hinzugefügt.
+ * Gibt die aktualisierten Headers zurück.
+ */
+function ensureColumns(sheet, headers, rowData) {
+  var headerSet = {};
+  for (var i = 0; i < headers.length; i++) {
+    headerSet[headers[i]] = true;
+  }
+  var keys = Object.keys(rowData);
+  var added = [];
+  for (var j = 0; j < keys.length; j++) {
+    var key = keys[j];
+    if (rowData[key] !== undefined && !headerSet[key]) {
+      var nextCol = headers.length + 1;
+      sheet.getRange(1, nextCol).setValue(key).setFontWeight('bold');
+      headers.push(key);
+      headerSet[key] = true;
+      added.push(key);
+    }
+  }
+  if (added.length > 0) {
+    console.log('[ensureColumns] Neue Spalten hinzugefügt: ' + added.join(', '));
+  }
+  return headers;
 }
 
 // === SYNERGY ENDPOINTS (Zentrale Kurs-Verwaltung) ===
@@ -797,7 +826,7 @@ function parseFrage(row, fachbereich) {
 
 function speichereAntworten(body) {
   try {
-    const { pruefungId, email, antworten, version, istAbgabe, gesamtFragen } = body;
+    const { pruefungId, email, antworten, version, istAbgabe, gesamtFragen, requestId } = body;
     if (!pruefungId || !email || !antworten) {
       return jsonResponse({ error: 'Fehlende Daten' });
     }
@@ -817,19 +846,14 @@ function speichereAntworten(body) {
     const sheetName = 'Antworten_' + pruefungId;
     let sheet = findOrCreateAntwortenSheet(sheetName, pruefungId);
 
-    // Spalten-Migration: beantworteteFragen/gesamtFragen hinzufügen falls fehlend
-    const aktuelleHeaders = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
-    if (!aktuelleHeaders.includes('beantworteteFragen')) {
-      sheet.getRange(1, aktuelleHeaders.length + 1).setValue('beantworteteFragen').setFontWeight('bold');
-      aktuelleHeaders.push('beantworteteFragen');
-    }
-    if (!aktuelleHeaders.includes('gesamtFragen')) {
-      sheet.getRange(1, aktuelleHeaders.length + 1).setValue('gesamtFragen').setFontWeight('bold');
-      aktuelleHeaders.push('gesamtFragen');
-    }
-
+    var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
     const data = getSheetData(sheet);
     const existingRow = data.findIndex(row => row.email === email);
+
+    // Idempotenz-Check: Gleiche requestId = bereits verarbeitet
+    if (requestId && existingRow >= 0 && data[existingRow].letzteRequestId === requestId) {
+      return jsonResponse({ success: true, message: 'Bereits verarbeitet (idempotent)' });
+    }
 
     const rowData = {
       email: email,
@@ -839,7 +863,11 @@ function speichereAntworten(body) {
       istAbgabe: istAbgabe ? 'true' : 'false',
       beantworteteFragen: beantwortetCount,
       gesamtFragen: gesamtFragen || 0,
+      letzteRequestId: requestId || '',
     };
+
+    // Fehlende Spalten automatisch hinzufügen
+    headers = ensureColumns(sheet, headers, rowData);
 
     if (existingRow >= 0) {
       const altVersion = Number(data[existingRow].version) || 0;
@@ -847,14 +875,12 @@ function speichereAntworten(body) {
         return jsonResponse({ success: true, message: 'Version nicht neuer' });
       }
       const rowIndex = existingRow + 2;
-      const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
       headers.forEach((header, colIndex) => {
         if (rowData[header] !== undefined) {
           sheet.getRange(rowIndex, colIndex + 1).setValue(rowData[header]);
         }
       });
     } else {
-      const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
       const newRow = headers.map(h => rowData[h] || '');
       sheet.appendRow(newRow);
     }
@@ -1205,7 +1231,7 @@ function speichereFrage(body) {
       return jsonResponse({ error: 'Fachbereich-Tab "' + tabName + '" nicht gefunden' });
     }
 
-    const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+    var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
     const data = getSheetData(sheet);
 
     const rowData = {
@@ -1231,6 +1257,9 @@ function speichereFrage(body) {
       geteilt: frage.geteilt || 'privat',
       geteiltVon: frage.geteiltVon || '',
     };
+
+    // Fehlende Spalten automatisch hinzufügen
+    headers = ensureColumns(sheet, headers, rowData);
 
     const existingRow = data.findIndex(row => row.id === frage.id);
     if (existingRow >= 0) {
@@ -1444,7 +1473,7 @@ function speichereConfig(body) {
 
     const configSheet = SpreadsheetApp.openById(CONFIGS_ID).getSheetByName('Configs');
     const data = getSheetData(configSheet);
-    const headers = configSheet.getRange(1, 1, 1, configSheet.getLastColumn()).getValues()[0];
+    var headers = configSheet.getRange(1, 1, 1, configSheet.getLastColumn()).getValues()[0];
 
     const rowData = {
       id: config.id,
@@ -1472,6 +1501,9 @@ function speichereConfig(body) {
       materialien: JSON.stringify(config.materialien || []),
       zeitModus: config.zeitModus || 'countdown',
     };
+
+    // Fehlende Spalten automatisch hinzufügen
+    headers = ensureColumns(configSheet, headers, rowData);
 
     const existingRow = data.findIndex(row => row.id === config.id);
     if (existingRow >= 0) {

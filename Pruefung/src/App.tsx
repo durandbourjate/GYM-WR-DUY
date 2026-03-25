@@ -25,6 +25,11 @@ import './store/themeStore.ts'
 // Im Demo-Modus wird die demoPruefung aus data/demoPruefung.ts verwendet.
 
 export default function App() {
+  // Build-Timestamp für Versions-Verifikation
+  useEffect(() => {
+    console.log('[Pruefung] Build:', __BUILD_TIMESTAMP__)
+  }, [])
+
   // Notfall-Reset: ?reset=true löscht alles und leitet zum Login weiter
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
@@ -39,6 +44,7 @@ export default function App() {
         })
         // IndexedDB löschen
         indexedDB.deleteDatabase('pruefung-backup')
+        indexedDB.deleteDatabase('pruefung-retry-queue')
         // Service Worker deregistrieren
         navigator.serviceWorker?.getRegistrations().then(regs =>
           regs.forEach(r => r.unregister())
