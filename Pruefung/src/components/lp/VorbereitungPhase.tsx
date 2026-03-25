@@ -6,14 +6,16 @@ import KursAuswahl from './KursAuswahl'
 import type { KursGruppe, KlassenlistenSuS } from './KursAuswahl'
 import TeilnehmerListe, { type AlleSuS } from './TeilnehmerListe'
 import { downloadSebDatei } from '../../utils/sebConfigGenerator'
+import ZeitzuschlagEditor from './ZeitzuschlagEditor'
 
 interface Props {
   config: PruefungsConfig
   onTeilnehmerGesetzt: (teilnehmer: Teilnehmer[]) => void
   onWeiterZurLobby?: () => void
+  onConfigUpdate?: (updates: Partial<PruefungsConfig>) => void
 }
 
-export default function VorbereitungPhase({ config, onTeilnehmerGesetzt, onWeiterZurLobby }: Props) {
+export default function VorbereitungPhase({ config, onTeilnehmerGesetzt, onWeiterZurLobby, onConfigUpdate }: Props) {
   const user = useAuthStore((s) => s.user)
   const [rohDaten, setRohDaten] = useState<KlassenlistenSuS[]>([])
   const [ladeStatus, setLadeStatus] = useState<'idle' | 'laden' | 'fertig' | 'fehler'>('idle')
@@ -25,6 +27,7 @@ export default function VorbereitungPhase({ config, onTeilnehmerGesetzt, onWeite
   const [einladungFehler, setEinladungFehler] = useState<string[]>([])
   const [lobbySpeichern, setLobbySpeichern] = useState(false)
   const [lobbyFehler, setLobbyFehler] = useState('')
+  const [zeitverlaengerungen, setZeitverlaengerungen] = useState<Record<string, number>>(config.zeitverlaengerungen ?? {})
 
   // Klassenlisten laden
   const ladeKlassenlisten = useCallback(async () => {
@@ -244,6 +247,20 @@ export default function VorbereitungPhase({ config, onTeilnehmerGesetzt, onWeite
           abgewaehlte={abgewaehlte}
           alleSuS={rohDaten}
         />
+      )}
+
+      {/* Zeitzuschläge (Nachteilsausgleich) */}
+      {teilnehmer.length > 0 && (
+        <div className="p-4 bg-white dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-slate-700">
+          <ZeitzuschlagEditor
+            zeitverlaengerungen={zeitverlaengerungen}
+            teilnehmer={teilnehmer.filter((t) => !abgewaehlte.has(t.email))}
+            onChange={(neueZV) => {
+              setZeitverlaengerungen(neueZV)
+              onConfigUpdate?.({ zeitverlaengerungen: neueZV })
+            }}
+          />
+        </div>
       )}
 
       {/* Prüfungs-Link */}

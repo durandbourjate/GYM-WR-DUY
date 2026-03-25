@@ -7,6 +7,7 @@ import { apiService } from '../../services/apiService'
 import ZusammenfassungsLeiste from './ZusammenfassungsLeiste'
 import SusDetailPanel from './SusDetailPanel'
 import BeendenDialog from './BeendenDialog'
+import ZeitzuschlagEditor from './ZeitzuschlagEditor'
 
 type Sortierung = 'name' | 'klasse' | 'fortschritt' | 'status'
 type QuickFilter = 'alle' | 'aktiv' | 'abgegeben' | 'nicht-erschienen'
@@ -15,14 +16,16 @@ interface Props {
   config: PruefungsConfig
   schuelerStatus: SchuelerStatus[]
   onBeenden: () => void
+  onConfigUpdate?: (updates: Partial<PruefungsConfig>) => void
 }
 
-export default function AktivPhase({ config, schuelerStatus, onBeenden }: Props) {
+export default function AktivPhase({ config, schuelerStatus, onBeenden, onConfigUpdate }: Props) {
   const user = useAuthStore((s) => s.user)
   const [sortierung, setSortierung] = useState<Sortierung>('name')
   const [quickFilter, setQuickFilter] = useState<QuickFilter>('alle')
   const [detailSus, setDetailSus] = useState<string | null>(null)
   const [zeigBeendenDialog, setZeigBeendenDialog] = useState(false)
+  const [zeigZeitzuschlag, setZeigZeitzuschlag] = useState(false)
   const [sebAusnahmenLokal, setSebAusnahmenLokal] = useState<Set<string>>(
     new Set(config.sebAusnahmen ?? [])
   )
@@ -195,6 +198,37 @@ export default function AktivPhase({ config, schuelerStatus, onBeenden }: Props)
       <p className="text-sm text-slate-500 dark:text-slate-400">
         Abgegeben: {schuelerStatus.filter((s) => s.status === 'abgegeben').length} / {config.teilnehmer?.length ?? schuelerStatus.length}
       </p>
+
+      {/* Zeitzuschlag (klappbar) */}
+      <div className="border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden">
+        <button
+          type="button"
+          onClick={() => setZeigZeitzuschlag(!zeigZeitzuschlag)}
+          className="w-full flex items-center justify-between px-4 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer transition-colors"
+        >
+          <span className="flex items-center gap-2">
+            <span>⏱ Zeitzuschläge</span>
+            {Object.keys(config.zeitverlaengerungen ?? {}).length > 0 && (
+              <span className="text-xs px-1.5 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded">
+                {Object.keys(config.zeitverlaengerungen ?? {}).length}
+              </span>
+            )}
+          </span>
+          <span className="text-xs text-slate-400">{zeigZeitzuschlag ? '▲' : '▼'}</span>
+        </button>
+        {zeigZeitzuschlag && (
+          <div className="px-4 pb-3 border-t border-slate-100 dark:border-slate-700">
+            <div className="pt-3">
+              <ZeitzuschlagEditor
+                zeitverlaengerungen={config.zeitverlaengerungen ?? {}}
+                teilnehmer={config.teilnehmer}
+                onChange={(neueZV) => onConfigUpdate?.({ zeitverlaengerungen: neueZV })}
+                kompakt
+              />
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Beenden-Button */}
       <div className="flex justify-center pt-2 border-t border-slate-200 dark:border-slate-700">

@@ -425,6 +425,13 @@ export default function DurchfuehrenDashboard({ pruefungId }: { pruefungId: stri
                 setConfig({ ...config, teilnehmer })
               }}
               onWeiterZurLobby={() => wechsleTab('lobby')}
+              onConfigUpdate={async (updates) => {
+                const neueConfig = { ...config, ...updates }
+                setConfig(neueConfig)
+                if (user) {
+                  await apiService.speichereConfig(user.email, neueConfig)
+                }
+              }}
             />
           )}
 
@@ -475,6 +482,13 @@ export default function DurchfuehrenDashboard({ pruefungId }: { pruefungId: stri
             <AktivPhase
               config={config}
               schuelerStatus={daten.schueler}
+              onConfigUpdate={async (updates) => {
+                const neueConfig = { ...config, ...updates }
+                setConfig(neueConfig)
+                if (user) {
+                  await apiService.speichereConfig(user.email, neueConfig)
+                }
+              }}
               onBeenden={() => {
                 // Im Demo-Modus: Config lokal als beendet markieren (kein Backend)
                 if (istDemoModus && config) {
