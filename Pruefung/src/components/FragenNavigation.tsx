@@ -6,6 +6,7 @@ import type { PruefungsAbschnitt } from '../types/pruefung.ts'
 export default function FragenNavigation() {
   const config = usePruefungStore((s) => s.config)
   const fragen = usePruefungStore((s) => s.fragen)
+  const alleFragen = usePruefungStore((s) => s.alleFragen)
   const aktuelleFrageIndex = usePruefungStore((s) => s.aktuelleFrageIndex)
   const antworten = usePruefungStore((s) => s.antworten)
   const markierungen = usePruefungStore((s) => s.markierungen)
@@ -34,7 +35,7 @@ export default function FragenNavigation() {
               const idx = startIndex + i
               const frage = fragen[idx]
               const istAktuell = idx === aktuelleFrageIndex
-              const istBeantwortet = frage ? istVollstaendigBeantwortet(frage, antworten[frageId], fragen, antworten) : !!antworten[frageId]
+              const istBeantwortet = frage ? istVollstaendigBeantwortet(frage, antworten[frageId], alleFragen, antworten) : !!antworten[frageId]
               const istMarkiert = !!markierungen[frageId]
 
               // Status: Icons + dezente Farbe

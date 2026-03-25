@@ -12,11 +12,12 @@ import ThemeToggle from './ThemeToggle.tsx'
 interface Props {
   config: PruefungsConfig
   fragen: Frage[]
+  alleFragen?: Frage[]
   wiederhergestellt: boolean
   wurdeZurueckgesetzt?: boolean
 }
 
-export default function Startbildschirm({ config, fragen, wiederhergestellt, wurdeZurueckgesetzt }: Props) {
+export default function Startbildschirm({ config, fragen, alleFragen, wiederhergestellt, wurdeZurueckgesetzt }: Props) {
   const pruefungStarten = usePruefungStore((s) => s.pruefungStarten)
   const setPhase = usePruefungStore((s) => s.setPhase)
   const user = useAuthStore((s) => s.user)
@@ -99,7 +100,7 @@ export default function Startbildschirm({ config, fragen, wiederhergestellt, wur
     if (wiederhergestellt) {
       setPhase('pruefung')
     } else {
-      pruefungStarten(config, fragen)
+      pruefungStarten(config, fragen, alleFragen)
     }
   }
 

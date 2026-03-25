@@ -13,13 +13,14 @@ interface AbgabeZusammenfassungProps {
 export default function AbgabeZusammenfassung({ onZurueck }: AbgabeZusammenfassungProps) {
   const config = usePruefungStore((s) => s.config)
   const fragen = usePruefungStore((s) => s.fragen)
+  const alleFragen = usePruefungStore((s) => s.alleFragen)
   const antworten = usePruefungStore((s) => s.antworten)
   const user = useAuthStore((s) => s.user)
 
   if (!config) return null
 
   const { abschnitte: fortschrittAbschnitte, gesamtBeantwortet, gesamtFragen } =
-    berechneAbschnittFortschritt(config, fragen, antworten)
+    berechneAbschnittFortschritt(config, alleFragen, antworten)
 
   let globalIdx = 0
 

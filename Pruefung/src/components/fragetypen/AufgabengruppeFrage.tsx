@@ -34,7 +34,7 @@ interface Props {
 const BUCHSTABEN = 'abcdefghijklmnopqrstuvwxyz'
 
 export default function AufgabengruppeFrage({ frage }: Props) {
-  const alleFragen = usePruefungStore((s) => s.fragen)
+  const alleFragen = usePruefungStore((s) => s.alleFragen)
   const abgegeben = usePruefungStore((s) => s.abgegeben)
   const [kontextOffen, setKontextOffen] = useState(true)
 

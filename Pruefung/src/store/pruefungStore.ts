@@ -9,7 +9,8 @@ export type AppPhase = 'start' | 'pruefung' | 'uebersicht' | 'abgegeben'
 interface PruefungState {
   // Prüfungsdaten
   config: PruefungsConfig | null
-  fragen: Frage[]
+  fragen: Frage[]  // Navigierbare Fragen (ohne Teilaufgaben von Aufgabengruppen)
+  alleFragen: Frage[]  // Alle Fragen inkl. Teilaufgaben (für Lookup in AufgabengruppeFrage)
 
   // Navigation
   aktuelleFrageIndex: number
@@ -46,7 +47,7 @@ interface PruefungState {
   naechsteFrage: () => void
   vorherigeFrage: () => void
   setPhase: (phase: AppPhase) => void
-  pruefungStarten: (config: PruefungsConfig, fragen: Frage[]) => void
+  pruefungStarten: (config: PruefungsConfig, fragen: Frage[], alleFragen?: Frage[]) => void
   pruefungAbgeben: () => void
   setVerbindungsstatus: (status: 'online' | 'offline' | 'syncing') => void
   setLetzterSave: (timestamp: string) => void
@@ -63,6 +64,7 @@ interface PruefungState {
 const initialState = {
   config: null,
   fragen: [],
+  alleFragen: [],
   aktuelleFrageIndex: 0,
   phase: 'start' as AppPhase,
   antworten: {},
@@ -122,10 +124,11 @@ export const usePruefungStore = create<PruefungState>()(
 
       setPhase: (phase) => set({ phase }),
 
-      pruefungStarten: (config, fragen) =>
+      pruefungStarten: (config, fragen, alleFragen) =>
         set({
           config,
           fragen,
+          alleFragen: alleFragen ?? fragen,
           aktuelleFrageIndex: 0,
           phase: 'pruefung',
           antworten: {},

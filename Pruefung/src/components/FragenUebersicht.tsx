@@ -6,6 +6,7 @@ import { istVollstaendigBeantwortet } from '../utils/antwortStatus.ts'
 export default function FragenUebersicht() {
   const config = usePruefungStore((s) => s.config)
   const fragen = usePruefungStore((s) => s.fragen)
+  const alleFragen = usePruefungStore((s) => s.alleFragen)
   const antworten = usePruefungStore((s) => s.antworten)
   const markierungen = usePruefungStore((s) => s.markierungen)
   const navigiere = usePruefungStore((s) => s.navigiere)
@@ -15,7 +16,7 @@ export default function FragenUebersicht() {
 
   const markiert = fragen.filter((f) => !!markierungen[f.id]).length
   const { abschnitte: fortschrittAbschnitte, gesamtBeantwortet, gesamtFragen } =
-    berechneAbschnittFortschritt(config, fragen, antworten)
+    berechneAbschnittFortschritt(config, alleFragen, antworten)
   const gesamtProzent = gesamtFragen > 0 ? (gesamtBeantwortet / gesamtFragen) * 100 : 0
 
   let globalIdx = 0
@@ -93,7 +94,7 @@ export default function FragenUebersicht() {
                 if (i === abschnitt.fragenIds.length - 1) globalIdx = idx + 1
                 const frage = fragen[idx]
                 if (!frage) return null
-                const istBeantwortet = frage ? istVollstaendigBeantwortet(frage, antworten[frageId], fragen, antworten) : !!antworten[frageId]
+                const istBeantwortet = frage ? istVollstaendigBeantwortet(frage, antworten[frageId], alleFragen, antworten) : !!antworten[frageId]
                 const istMarkiert = !!markierungen[frageId]
                 const antwort = antworten[frageId]
 

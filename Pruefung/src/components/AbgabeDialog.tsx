@@ -7,6 +7,7 @@ import { clearIndexedDB } from '../services/autoSave.ts'
 import { sebVersion, browserInfo } from '../services/sebService.ts'
 import { formatUhrzeit } from '../utils/zeit.ts'
 import type { PruefungsAbgabe } from '../types/antworten.ts'
+import { istVollstaendigBeantwortet } from '../utils/antwortStatus.ts'
 
 interface Props {
   onSchliessen: () => void
@@ -16,6 +17,7 @@ type AbgabeStatus = 'bereit' | 'senden' | 'erfolg' | 'fehler'
 
 export default function AbgabeDialog({ onSchliessen }: Props) {
   const fragen = usePruefungStore((s) => s.fragen)
+  const alleFragen = usePruefungStore((s) => s.alleFragen)
   const antworten = usePruefungStore((s) => s.antworten)
   const markierungen = usePruefungStore((s) => s.markierungen)
   const config = usePruefungStore((s) => s.config)
@@ -36,7 +38,7 @@ export default function AbgabeDialog({ onSchliessen }: Props) {
   const dialogRef = useRef<HTMLDivElement>(null)
   useFocusTrap(dialogRef)
 
-  const beantwortet = fragen.filter((f) => !!antworten[f.id]).length
+  const beantwortet = fragen.filter((f) => istVollstaendigBeantwortet(f, antworten[f.id], alleFragen, antworten)).length
   const unbeantwortet = fragen.length - beantwortet
   const markiert = fragen.filter((f) => !!markierungen[f.id]).length
 

@@ -33,11 +33,13 @@ import ZeichnenFrage from './fragetypen/ZeichnenFrage.tsx'
 import PDFFrage from './fragetypen/PDFFrage.tsx'
 import type { Frage, MCFrage as MCFrageType, FreitextFrage as FreitextFrageType, LueckentextFrage as LueckentextFrageType, ZuordnungFrage as ZuordnungFrageType, RichtigFalschFrage as RichtigFalschFrageType, BerechnungFrage as BerechnungFrageType, BuchungssatzFrage as BuchungssatzFrageType, TKontoFrage as TKontoFrageType, KontenbestimmungFrage as KontenbestimmungFrageType, BilanzERFrage as BilanzERFrageType, AufgabengruppeFrage as AufgabengruppeFrageType, VisualisierungFrage as VisualisierungFrageType, PDFFrage as PDFFrageTyp } from '../types/fragen.ts'
 import { findeAbschnitt } from '../utils/abschnitte.ts'
+import { istVollstaendigBeantwortet } from '../utils/antwortStatus.ts'
 
 export default function Layout() {
   const user = useAuthStore((s) => s.user)
   const config = usePruefungStore((s) => s.config)
   const fragen = usePruefungStore((s) => s.fragen)
+  const alleFragen = usePruefungStore((s) => s.alleFragen)
   const aktuelleFrageIndex = usePruefungStore((s) => s.aktuelleFrageIndex)
   const antworten = usePruefungStore((s) => s.antworten)
   const markierungen = usePruefungStore((s) => s.markierungen)
@@ -158,8 +160,8 @@ export default function Layout() {
   // Abschnitt-Kontext für aktuelle Frage
   const abschnittInfo = findeAbschnitt(config, aktuelleFrageIndex, fragen)
 
-  // Fortschritt: Anzahl beantworteter Fragen
-  const beantwortetAnzahl = fragen.filter((f) => !!antworten[f.id]).length
+  // Fortschritt: Anzahl beantworteter Fragen (mit korrekter Aufgabengruppen-Prüfung)
+  const beantwortetAnzahl = fragen.filter((f) => istVollstaendigBeantwortet(f, antworten[f.id], alleFragen, antworten)).length
   const fortschrittProzent = fragen.length > 0 ? (beantwortetAnzahl / fragen.length) * 100 : 0
 
   /** Header-Button: aus → split (Desktop) / overlay (Mobile), split/overlay → aus */

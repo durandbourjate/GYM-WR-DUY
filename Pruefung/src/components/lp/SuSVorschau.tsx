@@ -25,7 +25,7 @@ export default function SuSVorschau({ config, onSchliessen }: Props) {
   const storeSnapshotRef = useRef<Record<string, unknown> | null>(null)
 
   // Fragen für die Vorschau auflösen (aus demoFragen)
-  const vorschauFragen = useRef<Frage[]>(resolveVorschauFragen(config))
+  const vorschauResolved = useRef(resolveVorschauFragen(config))
 
   useEffect(() => {
     // Aktuellen Store-State sichern
@@ -33,6 +33,7 @@ export default function SuSVorschau({ config, onSchliessen }: Props) {
     storeSnapshotRef.current = {
       config: state.config,
       fragen: state.fragen,
+      alleFragen: state.alleFragen,
       aktuelleFrageIndex: state.aktuelleFrageIndex,
       phase: state.phase,
       antworten: state.antworten,
@@ -64,7 +65,8 @@ export default function SuSVorschau({ config, onSchliessen }: Props) {
   const handleStart = useCallback(() => {
     usePruefungStore.getState().pruefungStarten(
       { ...config, freigeschaltet: true },
-      vorschauFragen.current,
+      vorschauResolved.current.navigationsFragen,
+      vorschauResolved.current.alleFragen,
     )
     setPhase('pruefung')
   }, [config])
@@ -107,7 +109,7 @@ export default function SuSVorschau({ config, onSchliessen }: Props) {
         {phase === 'start' && (
           <VorschauStartbildschirm
             config={config}
-            fragen={vorschauFragen.current}
+            fragen={vorschauResolved.current.navigationsFragen}
             onStart={handleStart}
           />
         )}
@@ -135,7 +137,7 @@ function VorschauStartbildschirm({
   useEffect(() => {
     const original = usePruefungStore.getState().pruefungStarten
     usePruefungStore.setState({
-      pruefungStarten: (_config, _fragen) => {
+      pruefungStarten: (_config, _fragen, _alleFragen) => {
         onStart()
       },
     })
@@ -154,14 +156,30 @@ function VorschauStartbildschirm({
 }
 
 /** Löst die Fragen-IDs aus der Config gegen die demoFragen auf */
-function resolveVorschauFragen(config: PruefungsConfig): Frage[] {
+function resolveVorschauFragen(config: PruefungsConfig): { navigationsFragen: Frage[]; alleFragen: Frage[] } {
   const fragenMap = new Map(demoFragen.map((f) => [f.id, f]))
-  const result: Frage[] = []
+  const navigationsFragen: Frage[] = []
+  const alleFragen: Frage[] = []
+  const hinzugefuegt = new Set<string>()
   for (const abschnitt of config.abschnitte) {
     for (const id of abschnitt.fragenIds) {
       const frage = fragenMap.get(id)
-      if (frage) result.push(frage)
+      if (frage && !hinzugefuegt.has(id)) {
+        navigationsFragen.push(frage)
+        alleFragen.push(frage)
+        hinzugefuegt.add(id)
+        // Aufgabengruppen: Teilaufgaben nur in alleFragen
+        if (frage.typ === 'aufgabengruppe' && 'teilaufgabenIds' in frage) {
+          for (const tid of (frage as { teilaufgabenIds: string[] }).teilaufgabenIds) {
+            const teilfrage = fragenMap.get(tid)
+            if (teilfrage && !hinzugefuegt.has(tid)) {
+              alleFragen.push(teilfrage)
+              hinzugefuegt.add(tid)
+            }
+          }
+        }
+      }
     }
   }
-  return result
+  return { navigationsFragen, alleFragen }
 }

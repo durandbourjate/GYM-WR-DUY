@@ -66,6 +66,7 @@ export default function App() {
 
   const [pruefungsConfig, setPruefungsConfig] = useState<PruefungsConfig | null>(null)
   const [pruefungsFragen, setPruefungsFragen] = useState<Frage[]>([])
+  const [pruefungsAlleFragen, setPruefungsAlleFragen] = useState<Frage[]>([])
   const [wiederhergestellt, setWiederhergestellt] = useState(false)
   const [ladeFehler, setLadeFehler] = useState<string | null>(null)
   const [korrekturId, setKorrekturId] = useState<string | null>(null)
@@ -108,9 +109,10 @@ export default function App() {
               setWurdeZurueckgesetzt(true)
             }
 
-            const resolvedFragen = resolveFragenFuerPruefung(result.config, result.fragen)
+            const { navigationsFragen, alleFragen } = resolveFragenFuerPruefung(result.config, result.fragen)
             setPruefungsConfig(result.config)
-            setPruefungsFragen(resolvedFragen)
+            setPruefungsFragen(navigationsFragen)
+            setPruefungsAlleFragen(alleFragen)
 
             // durchfuehrungId im Store speichern für zukünftige Vergleiche
             if (backendDfId) {
@@ -135,9 +137,10 @@ export default function App() {
 
       // Fallback: Im Demo-Modus die Demo-Prüfung laden
       const resolvedConfig = { ...demoPruefung, freigeschaltet: true }
-      const resolvedFragen = resolveFragenFuerPruefung(resolvedConfig, demoFragen)
+      const { navigationsFragen, alleFragen } = resolveFragenFuerPruefung(resolvedConfig, demoFragen)
       setPruefungsConfig(resolvedConfig)
-      setPruefungsFragen(resolvedFragen)
+      setPruefungsFragen(navigationsFragen)
+      setPruefungsAlleFragen(alleFragen)
 
       if (config && config.id === resolvedConfig.id && phase !== 'start') {
         setWiederhergestellt(true)
@@ -212,6 +215,7 @@ export default function App() {
         <Startbildschirm
           config={pruefungsConfig}
           fragen={pruefungsFragen}
+          alleFragen={pruefungsAlleFragen}
           wiederhergestellt={wiederhergestellt}
           wurdeZurueckgesetzt={wurdeZurueckgesetzt}
         />
@@ -232,23 +236,31 @@ export default function App() {
 }
 
 /** Löst die Fragen-IDs aus den Abschnitten auf */
-function resolveFragenFuerPruefung(config: PruefungsConfig, alleFragen: Frage[]): Frage[] {
-  const fragenMap = new Map(alleFragen.map((f) => [f.id, f]))
-  const result: Frage[] = []
+/**
+ * Löst Fragen für eine Prüfung auf.
+ * Gibt zwei Arrays zurück:
+ * - navigationsFragen: Nur die Top-Level-Fragen (1:1 mit fragenIds in abschnitte), für Navigation/Index
+ * - alleFragen: Inkl. Teilaufgaben von Aufgabengruppen (für Lookup in AufgabengruppeFrage)
+ */
+function resolveFragenFuerPruefung(config: PruefungsConfig, apiFragen: Frage[]): { navigationsFragen: Frage[]; alleFragen: Frage[] } {
+  const fragenMap = new Map(apiFragen.map((f) => [f.id, f]))
+  const navigationsFragen: Frage[] = []
+  const alleFragen: Frage[] = []
   const hinzugefuegt = new Set<string>()
 
   for (const abschnitt of config.abschnitte) {
     for (const id of abschnitt.fragenIds) {
       const frage = fragenMap.get(id)
       if (frage && !hinzugefuegt.has(id)) {
-        result.push(frage)
+        navigationsFragen.push(frage)
+        alleFragen.push(frage)
         hinzugefuegt.add(id)
-        // Aufgabengruppen: Teilaufgaben auch einschliessen
+        // Aufgabengruppen: Teilaufgaben nur in alleFragen (nicht in Navigation)
         if (frage.typ === 'aufgabengruppe' && 'teilaufgabenIds' in frage) {
           for (const tid of (frage as { teilaufgabenIds: string[] }).teilaufgabenIds) {
             const teilfrage = fragenMap.get(tid)
             if (teilfrage && !hinzugefuegt.has(tid)) {
-              result.push(teilfrage)
+              alleFragen.push(teilfrage)
               hinzugefuegt.add(tid)
             }
           }
@@ -256,7 +268,7 @@ function resolveFragenFuerPruefung(config: PruefungsConfig, alleFragen: Frage[])
       }
     }
   }
-  return result
+  return { navigationsFragen, alleFragen }
 }
 
 function AbgabeBestaetigung() {
