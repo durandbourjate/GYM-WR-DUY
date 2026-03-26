@@ -85,10 +85,36 @@ export default function App() {
       // Aber NICHT bei abgegebenen Prüfungen — dort muss neu geladen werden
       const storeFragen = usePruefungStore.getState().fragen
       const storeAbgegeben = usePruefungStore.getState().abgegeben
+      const storeAntworten = usePruefungStore.getState().antworten
       if (config && config.id === pruefungIdAusUrl && phase !== 'start' && !storeAbgegeben && storeFragen && storeFragen.length > 0) {
         setWiederhergestellt(true)
         usePruefungStore.getState().setPhase('start')
         return
+      }
+
+      // Recovery nach Reload: phase ist 'pruefung' aber config fehlt (nicht persistiert)
+      // → config+fragen vom Backend laden OHNE antworten zurückzusetzen
+      if (!config && phase === 'pruefung' && Object.keys(storeAntworten).length > 0 && pruefungIdAusUrl && apiService.istKonfiguriert() && !istDemoModus) {
+        try {
+          const result = await apiService.ladePruefung(pruefungIdAusUrl, user!.email)
+          if (result) {
+            const { navigationsFragen, alleFragen } = resolveFragenFuerPruefung(result.config, result.fragen)
+            // setConfigUndFragen statt pruefungStarten — behält antworten bei
+            usePruefungStore.getState().setConfigUndFragen(result.config, navigationsFragen, alleFragen)
+            if (result.config.durchfuehrungId) {
+              usePruefungStore.getState().setDurchfuehrungId(result.config.durchfuehrungId)
+            }
+            setPruefungsConfig(result.config)
+            setPruefungsFragen(navigationsFragen)
+            setPruefungsAlleFragen(alleFragen)
+            setWiederhergestellt(true)
+            console.log('[App] Recovery nach Reload — config+fragen wiederhergestellt, antworten beibehalten')
+            return
+          }
+        } catch (error) {
+          console.error('[App] Recovery nach Reload fehlgeschlagen:', error)
+          // Weiter zum normalen Ladevorgang — Layout.tsx hat eigene Recovery-Logik als Fallback
+        }
       }
 
       // Backend konfiguriert + Prüfungs-ID vorhanden + kein Demo → vom Backend laden
@@ -241,7 +267,7 @@ export default function App() {
  * - navigationsFragen: Nur die Top-Level-Fragen (1:1 mit fragenIds in abschnitte), für Navigation/Index
  * - alleFragen: Inkl. Teilaufgaben von Aufgabengruppen (für Lookup in AufgabengruppeFrage)
  */
-function resolveFragenFuerPruefung(config: PruefungsConfig, apiFragen: Frage[]): { navigationsFragen: Frage[]; alleFragen: Frage[] } {
+export function resolveFragenFuerPruefung(config: PruefungsConfig, apiFragen: Frage[]): { navigationsFragen: Frage[]; alleFragen: Frage[] } {
   const fragenMap = new Map(apiFragen.map((f) => [f.id, f]))
   const navigationsFragen: Frage[] = []
   const alleFragen: Frage[] = []

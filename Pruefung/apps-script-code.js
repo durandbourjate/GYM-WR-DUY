@@ -1014,10 +1014,15 @@ function heartbeat(body) {
       }
 
       // Entsperrt-Flag lesen und zurücksetzen
+      // WICHTIG: Wenn LP entsperrt hat, Client-lockdownMeta (gesperrt/verstossZaehler) ignorieren
+      // → verhindert Race-Condition wo Heartbeat die LP-Entsperrung sofort überschreibt
       var entsperrt = false;
       if (getCol('entsperrt') === 'true') {
         entsperrt = true;
         setCol('entsperrt', '');
+        // LP hat entsperrt → gesperrt=false und Zähler=0 beibehalten (nicht vom Client überschreiben)
+        setCol('gesperrt', 'false');
+        setCol('verstossZaehler', 0);
       }
 
       // KontrollStufe-Override lesen
@@ -1265,15 +1270,22 @@ function beendePruefungEndpoint(body) {
                 bestRowPerEmail[em] = { row: j, hb: hb };
               }
             }
-            // Nur die beste Row pro Email markieren
+            // Batch-Write: Werte in antData aktualisieren, dann gesamtes Sheet einmal schreiben
+            // (statt einzelne setValue pro SuS → 2×N API-Calls → Timeout bei 25+ SuS)
+            var hatAenderungen = false;
             for (var em in bestRowPerEmail) {
               var rowIdx = bestRowPerEmail[em].row;
               if (antData[rowIdx][istAbgabeCol] !== 'true') {
-                antSheet.getRange(rowIdx + 1, istAbgabeCol + 1).setValue('true');
+                antData[rowIdx][istAbgabeCol] = 'true';
                 if (abgabezeitCol >= 0) {
-                  antSheet.getRange(rowIdx + 1, abgabezeitCol + 1).setValue(beendetUm);
+                  antData[rowIdx][abgabezeitCol] = beendetUm;
                 }
+                hatAenderungen = true;
               }
+            }
+            // Ein einziger setValues-Call für alle Zeilen (1 API-Call statt 50+)
+            if (hatAenderungen) {
+              antSheet.getRange(1, 1, antData.length, antData[0].length).setValues(antData);
             }
           }
         }

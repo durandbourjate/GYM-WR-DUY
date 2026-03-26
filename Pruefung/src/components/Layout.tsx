@@ -1,7 +1,8 @@
-import { useState, useCallback, useEffect, useRef } from 'react'
+import { useState, useCallback, useEffect, useRef, useMemo } from 'react'
 import { usePruefungStore } from '../store/pruefungStore.ts'
 import { useAuthStore } from '../store/authStore.ts'
 import { apiService } from '../services/apiService.ts'
+import { resolveFragenFuerPruefung } from '../App.tsx'
 import type { PruefungsNachricht } from '../types/monitoring.ts'
 import { usePruefungsMonitoring } from '../hooks/usePruefungsMonitoring.ts'
 import { usePruefungsUX } from '../hooks/usePruefungsUX.ts'
@@ -52,6 +53,7 @@ export default function Layout() {
   const [materialModus, setMaterialModus] = useState<'aus' | MaterialModus>('aus')
   const [tabKonfliktGeschlossen, setTabKonfliktGeschlossen] = useState(false)
   const [zeitAbgelaufen, setZeitAbgelaufen] = useState(false)
+  const [kontrollStufeOverride, setKontrollStufeOverride] = useState<KontrollStufe | null>(null)
   const beendetUm = usePruefungStore((s) => s.beendetUm)
   const restzeitMinuten = usePruefungStore((s) => s.restzeitMinuten)
   const multiTabWarnung = usePruefungStore((s) => s.multiTabWarnung)
@@ -61,7 +63,7 @@ export default function Layout() {
   const istTabKonflikt = tabKonflikt || multiTabWarnung
 
   // Lockdown: Copy/Paste, Vollbild, DevTools, Verstoss-Zähler
-  const kontrollStufe = ((config?.kontrollStufe as KontrollStufe) || 'standard') as KontrollStufe
+  const kontrollStufe = (kontrollStufeOverride || (config?.kontrollStufe as KontrollStufe) || 'standard') as KontrollStufe
   const lockdown = useLockdown({
     kontrollStufe,
     aktiv: !!config && !abgegeben,
@@ -87,9 +89,8 @@ export default function Layout() {
     onEntsperrt: () => {
       lockdown.entsperre()
     },
-    onKontrollStufeOverride: (_stufe) => {
-      // Kontrollstufe wird beim nächsten Heartbeat-Cycle über config aktualisiert
-      // Hier könnte man eine lokale State-Aktualisierung machen
+    onKontrollStufeOverride: (stufe) => {
+      setKontrollStufeOverride(stufe as KontrollStufe)
     },
   })
 
@@ -145,15 +146,77 @@ export default function Layout() {
 
   const ungelesenNachrichten = lpNachrichten.filter((n) => !geschlosseneNachrichten.has(n.id))
 
+  // Prüfungs-ID aus URL für Recovery
+  const pruefungIdAusUrl = useMemo(() => new URLSearchParams(window.location.search).get('id'), [])
+
+  // Recovery: config/fragen fehlen nach Reload (werden nicht persistiert)
+  const [recoveryStatus, setRecoveryStatus] = useState<'idle' | 'loading' | 'failed'>('idle')
+  const recoveryAttempted = useRef(false)
+
+  useEffect(() => {
+    if (config && fragen.length > 0) return // Alles vorhanden
+    if (recoveryAttempted.current) return // Schon versucht
+    if (!pruefungIdAusUrl || !user?.email) {
+      setRecoveryStatus('failed')
+      return
+    }
+
+    recoveryAttempted.current = true
+    setRecoveryStatus('loading')
+
+    const timeout = setTimeout(() => {
+      setRecoveryStatus('failed')
+    }, 10000)
+
+    apiService.ladePruefung(pruefungIdAusUrl, user.email)
+      .then((result) => {
+        clearTimeout(timeout)
+        if (result) {
+          const { navigationsFragen, alleFragen: resolvedAlle } = resolveFragenFuerPruefung(result.config, result.fragen)
+          usePruefungStore.getState().setConfigUndFragen(result.config, navigationsFragen, resolvedAlle)
+          // durchfuehrungId aktualisieren falls nötig
+          if (result.config.durchfuehrungId) {
+            usePruefungStore.getState().setDurchfuehrungId(result.config.durchfuehrungId)
+          }
+          console.log('[Layout] Recovery erfolgreich — config+fragen wiederhergestellt')
+        } else {
+          setRecoveryStatus('failed')
+        }
+      })
+      .catch((err) => {
+        clearTimeout(timeout)
+        console.error('[Layout] Recovery fehlgeschlagen:', err)
+        setRecoveryStatus('failed')
+      })
+
+    return () => clearTimeout(timeout)
+  }, [config, fragen, pruefungIdAusUrl, user])
+
   if (!config || fragen.length === 0) {
+    // Recovery läuft oder noch nicht gestartet
+    if (recoveryStatus !== 'failed') {
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900">
+          <div className="text-center">
+            <div className="w-8 h-8 mx-auto mb-4 border-2 border-slate-300 dark:border-slate-600 border-t-slate-700 dark:border-t-slate-300 rounded-full animate-spin" />
+            <p className="text-slate-500 dark:text-slate-400">Sitzung wird wiederhergestellt...</p>
+          </div>
+        </div>
+      )
+    }
+
+    // Recovery fehlgeschlagen
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900">
         <div className="text-center">
-          <p className="text-slate-500 dark:text-slate-400 mb-4">Keine Prüfungsdaten vorhanden.</p>
+          <p className="text-slate-500 dark:text-slate-400 mb-2">Prüfungsdaten konnten nicht wiederhergestellt werden.</p>
+          <p className="text-xs text-slate-400 dark:text-slate-500 mb-4">Ihre bisherigen Antworten gehen beim Zurücksetzen verloren.</p>
           <button
             onClick={() => {
-              usePruefungStore.getState().zuruecksetzen()
-              window.location.reload()
+              if (window.confirm('Alle bisherigen Antworten gehen verloren. Fortfahren?')) {
+                usePruefungStore.getState().zuruecksetzen()
+                window.location.reload()
+              }
             }}
             className="px-4 py-2 text-sm bg-slate-800 dark:bg-slate-200 text-white dark:text-slate-800 rounded-lg hover:bg-slate-900 dark:hover:bg-slate-100 transition-colors cursor-pointer"
           >

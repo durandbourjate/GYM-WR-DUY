@@ -32,35 +32,50 @@ export default function BeendenDialog({
   async function handleBeenden(): Promise<void> {
     setLade(true)
     setFehler('')
-    const result = await apiService.beendePruefung({
-      pruefungId,
-      email: lpEmail,
-      modus,
-      restzeitMinuten: modus === 'restzeit' ? restzeitMinuten : undefined,
-      einzelneSuS: einzelnerSuS ? [einzelnerSuS.email] : undefined,
-    })
 
-    if (result.success) {
-      // Bemerkung lokal speichern (LP-Notizen)
-      if (bemerkung.trim()) {
-        try {
-          const key = `pruefung-bemerkungen-${pruefungId}`
-          const bisherige = JSON.parse(localStorage.getItem(key) || '[]') as Array<{zeitpunkt: string; text: string; sus?: string}>
-          bisherige.push({
-            zeitpunkt: new Date().toISOString(),
-            text: bemerkung.trim(),
-            sus: einzelnerSuS?.email,
-          })
-          localStorage.setItem(key, JSON.stringify(bisherige))
-        } catch { /* ignorieren */ }
-      }
-      onBeendet()
-      return
-    } else {
+    // Timeout-Schutz: Falls Backend zu lange braucht, Spinner beenden + Fehlermeldung
+    const timeoutId = setTimeout(() => {
       setLade(false)
-      setFehler(result.error === 'nicht_konfiguriert'
-        ? 'Backend nicht konfiguriert (Demo-Modus). Prüfung kann nur mit aktivem Backend beendet werden.'
-        : `Fehler beim Beenden: ${result.error || 'Unbekannter Fehler'}`)
+      setFehler('Zeitüberschreitung — die Anfrage wurde an den Server gesendet. Bitte Seite aktualisieren und prüfen ob die Prüfung beendet wurde.')
+    }, 30000)
+
+    try {
+      const result = await apiService.beendePruefung({
+        pruefungId,
+        email: lpEmail,
+        modus,
+        restzeitMinuten: modus === 'restzeit' ? restzeitMinuten : undefined,
+        einzelneSuS: einzelnerSuS ? [einzelnerSuS.email] : undefined,
+      })
+
+      clearTimeout(timeoutId)
+
+      if (result.success) {
+        // Bemerkung lokal speichern (LP-Notizen)
+        if (bemerkung.trim()) {
+          try {
+            const key = `pruefung-bemerkungen-${pruefungId}`
+            const bisherige = JSON.parse(localStorage.getItem(key) || '[]') as Array<{zeitpunkt: string; text: string; sus?: string}>
+            bisherige.push({
+              zeitpunkt: new Date().toISOString(),
+              text: bemerkung.trim(),
+              sus: einzelnerSuS?.email,
+            })
+            localStorage.setItem(key, JSON.stringify(bisherige))
+          } catch { /* ignorieren */ }
+        }
+        onBeendet()
+        return
+      } else {
+        setLade(false)
+        setFehler(result.error === 'nicht_konfiguriert'
+          ? 'Backend nicht konfiguriert (Demo-Modus). Prüfung kann nur mit aktivem Backend beendet werden.'
+          : `Fehler beim Beenden: ${result.error || 'Unbekannter Fehler'}`)
+      }
+    } catch {
+      clearTimeout(timeoutId)
+      setLade(false)
+      setFehler('Netzwerkfehler — bitte Seite aktualisieren und prüfen ob die Prüfung beendet wurde.')
     }
   }
 

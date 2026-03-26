@@ -62,6 +62,7 @@ interface PruefungState {
   setBeendetUm: (beendetUm: string, restzeitMinuten?: number) => void
   setDurchfuehrungId: (id: string | null) => void
   setMultiTabWarnung: (warnung: boolean) => void
+  setConfigUndFragen: (config: PruefungsConfig, fragen: Frage[], alleFragen?: Frage[]) => void
   zuruecksetzen: () => void
 }
 
@@ -174,6 +175,10 @@ export const usePruefungStore = create<PruefungState>()(
       setDurchfuehrungId: (id) => set({ durchfuehrungId: id }),
 
       setMultiTabWarnung: (warnung) => set({ multiTabWarnung: warnung }),
+
+      // Recovery nach Reload: Setzt config+fragen OHNE antworten/markierungen/phase zurückzusetzen
+      setConfigUndFragen: (config, fragen, alleFragen) =>
+        set({ config, fragen, alleFragen: alleFragen ?? fragen }),
 
       zuruecksetzen: () => set(initialState),
     }),

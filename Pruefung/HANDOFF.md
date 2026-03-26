@@ -11,6 +11,17 @@
 - **Manuelle Punktevergabe** — Korrektur-Tab noch nicht live getestet
 - **SEB / iPad** — SEB weiterhin deaktiviert (`sebErforderlich: false`)
 - **Zeichnen Text-Werkzeug** — Grundfunktion live testen (Rotation, Grösse, Fett)
+- **Apps Script Code aktualisieren** — B36 (Entsperrung Race) + B38 (Batch-Write) in apps-script-code.js. User muss Code kopieren und neu bereitstellen.
+
+### Session 18 — 5 Bugfixes aus Klassentest (26.03.2026 Nachmittag)
+
+| Bug | Beschreibung | Fix | Dateien |
+|-----|-------------|-----|---------|
+| B37 | **SuS Reload = Datenverlust** (config/fragen nicht persistiert → Fehlerscreen → zuruecksetzen löscht Antworten) | Recovery-Ladescreen in Layout.tsx: lädt config+fragen vom Backend, behält Antworten. Neue Store-Action `setConfigUndFragen`. Bestätigungsdialog vor Reset. | Layout.tsx, App.tsx, pruefungStore.ts |
+| B39 | **PDF lädt nicht** (Material-Split + PDF-Frage) | `absolute inset-0` auf iframe entfernt → `w-full h-full` direkt (3 Stellen: Video, PDF, Link) | MaterialPanel.tsx |
+| B35 | **Kontrollstufe 'locker' sperrt** nach 3 Tab-Wechseln | Guard in `registriereVerstoss`: `'locker'` return wie `'keine'`. `onKontrollStufeOverride` implementiert (war No-Op). | useLockdown.ts, Layout.tsx |
+| B36 | **LP-Entsperrung Race** (Heartbeat überschreibt LP-Unlock) | Im Heartbeat: wenn `entsperrt=true`, Client-lockdownMeta ignorieren + `gesperrt=false` forcieren. | apps-script-code.js |
+| B38 | **"Beenden" hängt** (50+ einzelne setValue-Calls) | Safety-Net Batch-Write: `setValues()` statt N× `setValue()`. Frontend: 30s-Timeout + Fehlermeldung. | apps-script-code.js, BeendenDialog.tsx |
 
 ### Erledigt (26.03.2026)
 - ~~K1~~ `.env.local` + GitHub Secret korrekt ✅

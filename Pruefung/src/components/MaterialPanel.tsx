@@ -234,10 +234,10 @@ function MaterialInhalt({ material }: { material: PruefungsMaterial }) {
         <div className="px-4 py-2 bg-slate-50 dark:bg-slate-700/30 text-xs text-slate-500 dark:text-slate-400 shrink-0">
           {material.titel}
         </div>
-        <div className="flex-1 relative" style={{ minHeight: 0 }}>
+        <div className="flex-1" style={{ minHeight: 0 }}>
           <iframe
             src={material.embedUrl}
-            className="absolute inset-0 w-full h-full border-0"
+            className="w-full h-full border-0"
             title={material.titel}
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
@@ -257,10 +257,10 @@ function MaterialInhalt({ material }: { material: PruefungsMaterial }) {
         <div className="px-4 py-2 bg-slate-50 dark:bg-slate-700/30 text-xs text-slate-500 dark:text-slate-400 shrink-0">
           {material.titel}
         </div>
-        <div className="flex-1 relative" style={{ minHeight: 0 }}>
+        <div className="flex-1" style={{ minHeight: 0 }}>
           <iframe
             src={embedUrl}
-            className="absolute inset-0 w-full h-full border-0"
+            className="w-full h-full border-0"
             title={material.titel}
             sandbox="allow-scripts allow-same-origin"
           />
@@ -288,10 +288,10 @@ function MaterialInhalt({ material }: { material: PruefungsMaterial }) {
         <div className="px-4 py-2 bg-slate-50 dark:bg-slate-700/30 text-xs text-slate-500 dark:text-slate-400 shrink-0">
           {material.titel}
         </div>
-        <div className="flex-1 relative" style={{ minHeight: 0 }}>
+        <div className="flex-1" style={{ minHeight: 0 }}>
           <iframe
             src={material.url}
-            className="absolute inset-0 w-full h-full border-0"
+            className="w-full h-full border-0"
             title={material.titel}
             sandbox="allow-scripts allow-same-origin"
           />
