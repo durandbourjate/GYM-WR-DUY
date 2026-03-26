@@ -63,7 +63,7 @@ export default function Layout() {
   const istTabKonflikt = tabKonflikt || multiTabWarnung
 
   // Lockdown: Copy/Paste, Vollbild, DevTools, Verstoss-Zähler
-  const kontrollStufe = (kontrollStufeOverride || (config?.kontrollStufe as KontrollStufe) || 'standard') as KontrollStufe
+  const kontrollStufe = (kontrollStufeOverride || (config?.kontrollStufe as KontrollStufe) || 'keine') as KontrollStufe
   const lockdown = useLockdown({
     kontrollStufe,
     aktiv: !!config && !abgegeben,

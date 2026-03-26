@@ -1849,7 +1849,7 @@ function ladeMonitoring(pruefungId, email) {
           email: row.email || '',
           name: row.name || row.email || '',
           klasse: row.klasse || '',
-          status: row.istAbgabe === 'true' ? 'abgegeben' : (susBeendetUm ? 'beendet-lp' : (row.letzterHeartbeat ? 'aktiv' : 'nicht-gestartet')),
+          status: susBeendetUm ? 'beendet-lp' : (row.istAbgabe === 'true' ? 'abgegeben' : (row.letzterHeartbeat ? 'aktiv' : 'nicht-gestartet')),
           letzterSave: row.letzterSave || '',
           letzterHeartbeat: row.letzterHeartbeat || '',
           heartbeats: Number(row.heartbeats) || 0,

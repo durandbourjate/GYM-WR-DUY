@@ -280,11 +280,21 @@ function findeCommandBeiPunkt(commands: DrawCommand[], punkt: Point): CommandId 
         // Näherung: Breite = groesse * 0.6 * Zeichen-Anzahl, Höhe = groesse
         const textBreite = cmd.groesse * 0.6 * cmd.text.length;
         const textHoehe = cmd.groesse;
+        // Bei Rotation: Klickpunkt relativ zum Text-Ursprung zurückdrehen
+        let testX = punkt.x;
+        let testY = punkt.y;
+        if (cmd.rotation) {
+          const rad = -(cmd.rotation * Math.PI) / 180;
+          const dx = punkt.x - cmd.position.x;
+          const dy = punkt.y - cmd.position.y;
+          testX = cmd.position.x + dx * Math.cos(rad) - dy * Math.sin(rad);
+          testY = cmd.position.y + dx * Math.sin(rad) + dy * Math.cos(rad);
+        }
         if (
-          punkt.x >= cmd.position.x &&
-          punkt.x <= cmd.position.x + textBreite &&
-          punkt.y >= cmd.position.y - textHoehe &&
-          punkt.y <= cmd.position.y
+          testX >= cmd.position.x &&
+          testX <= cmd.position.x + textBreite &&
+          testY >= cmd.position.y - textHoehe &&
+          testY <= cmd.position.y
         ) {
           return cmd.id;
         }

@@ -23,11 +23,13 @@ export function useLockdown({ kontrollStufe, maxVerstoesse = 3, aktiv }: UseLock
   const [verstoesse, setVerstoesse] = useState<Verstoss[]>([])
   const [vollbildAktiv, setVollbildAktiv] = useState(false)
   const letzterSyncIndex = useRef(0)
+  const schonfristBisRef = useRef(0) // Schonfrist nach Entsperrung
 
   // Verstoss registrieren
   const registriereVerstoss = useCallback((typ: Verstoss['typ'], dauer?: number) => {
     if (!aktiv || gesperrt) return
     if (effektiv === 'keine' || effektiv === 'locker') return // keine/locker: nur Warnungen, keine Sperre
+    if (Date.now() < schonfristBisRef.current) return // Schonfrist nach LP-Entsperrung
 
     const verstoss: Verstoss = {
       zeitpunkt: new Date().toISOString(),
@@ -47,11 +49,24 @@ export function useLockdown({ kontrollStufe, maxVerstoesse = 3, aktiv }: UseLock
     }
   }, [aktiv, gesperrt, effektiv, maxVerstoesse])
 
-  // LP-Entsperrung
+  // LP-Entsperrung (mit 5s Schonfrist + Vollbild-Wiederherstellung)
   const entsperre = useCallback(() => {
     setGesperrt(false)
     setVerstossZaehler(0)
-  }, [])
+    // 5s Schonfrist: Keine Verstösse nach Entsperrung registrieren,
+    // damit SuS Zeit hat ins Vollbild zurückzukehren
+    schonfristBisRef.current = Date.now() + 5000
+    // Vollbild automatisch wiederherstellen (wenn nötig)
+    if (vollbildUnterstuetzt && (effektiv === 'standard' || effektiv === 'streng')) {
+      const el = document.documentElement
+      if (el.requestFullscreen) {
+        el.requestFullscreen().catch(() => {})
+      } else {
+        const webkitEl = el as unknown as { webkitRequestFullscreen?: () => Promise<void> }
+        if (webkitEl.webkitRequestFullscreen) webkitEl.webkitRequestFullscreen().catch(() => {})
+      }
+    }
+  }, [vollbildUnterstuetzt, effektiv])
 
   // Verstoesse seit letztem Sync (für Heartbeat)
   const neueVerstoesseSeitLetztemSync = useCallback(() => {

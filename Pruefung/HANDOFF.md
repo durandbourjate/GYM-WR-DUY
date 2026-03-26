@@ -13,6 +13,27 @@
 - **Zeichnen Text-Werkzeug** — Grundfunktion live testen (Rotation, Grösse, Fett)
 - **Apps Script Code aktualisieren** — Session 19 Änderungen (Safety-Net entfernt, Individual-Beenden Batch-Write) in apps-script-code.js. User muss Code kopieren und neu bereitstellen.
 
+### Session 22 — 4 Bugfixes aus Live-Test (26.03.2026 Nacht, 2. Runde)
+
+| Task | Beschreibung | Root Cause | Fix | Dateien |
+|------|-------------|------------|-----|---------|
+| B44 | **Kontrollstufe auto-upgrade** (LP setzt 'locker', SuS sieht 'standard') | Fallback in Layout.tsx war `|| 'standard'` — wenn Config noch nicht geladen, wurde automatisch 'standard' (härter) angewendet. | Fallback auf `'keine'` geändert — nie härter als LP explizit konfiguriert. | Layout.tsx |
+| B45 | **Entsperren funktioniert nicht** (Button klickt, SuS bleibt gesperrt) | Nach Entsperrung registrierte der Client sofort neue Verstösse (Vollbild nicht aktiv → vollbild-verlassen), Zähler ging hoch → sofortige Re-Sperre. | 5s Schonfrist nach Entsperrung (keine Verstösse registriert) + automatische Vollbild-Wiederherstellung. | useLockdown.ts |
+| B46 | **'abgegeben' statt 'beendet-lp'** in Auswertung bei LP-Beenden | Backend prüfte `istAbgabe === 'true'` VOR `beendetUm` — aber SuS auto-submit nach LP-Beenden setzte `istAbgabe=true`, damit wurde Status 'abgegeben' statt 'beendet-lp'. | `beendetUm` hat jetzt Vorrang: wenn gesetzt → immer `'beendet-lp'`, unabhängig von `istAbgabe`. | apps-script-code.js |
+| B43 | **Rotierter Text nicht anwählbar** (Zeichnen-Tool) | `findeCommandBeiPunkt()` prüfte nur axis-aligned Bounding Box, ignorierte `cmd.rotation`. Klick auf rotierten Text lag ausserhalb der unrotierten Box. | Klickpunkt wird vor AABB-Test um -rotation zurückgedreht (inverse Rotation um Text-Ursprung). | useDrawingEngine.ts |
+
+### Offen (nächste Session)
+- **B42: Text-Tool PDF** — Schriftgrösse/Fett hardcodiert (16px, nicht fett). Auswahl/Rotation nach Platzierung fehlt. Muss `textGroesse`/`textFett` Props durch PDFFrage→PDFViewer→PDFSeite-Kette schleusen + Auswahl-Modus implementieren.
+
+### Geänderte Dateien (4 Dateien, Session 22)
+
+```
+src/components/Layout.tsx                              — B44 (Fallback 'keine')
+src/hooks/useLockdown.ts                               — B45 (Schonfrist + Vollbild)
+apps-script-code.js                                    — B46 (beendet-lp Vorrang)
+src/components/fragetypen/zeichnen/useDrawingEngine.ts — B43 (rotierter Hit-Test)
+```
+
 ### Session 21 — Scroll-Bug + Beenden-Button (26.03.2026 Nacht)
 
 | Task | Beschreibung | Root Cause | Fix | Dateien |
