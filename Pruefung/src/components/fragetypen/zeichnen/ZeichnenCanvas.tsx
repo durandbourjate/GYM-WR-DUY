@@ -244,10 +244,14 @@ export function ZeichnenCanvas({
     [aktiveFarbe, textRotation, engine]
   );
 
+  // Zeitpunkt der Overlay-Öffnung — damit onBlur den initialen Click-Event ignoriert
+  const textOverlayGeoeffnetRef = useRef<number>(0);
+
   // Text-Input Auto-Focus wenn Overlay erscheint
   // Mehrfacher Versuch wegen iOS/Tablet-Einschränkungen bei programmatischem Focus
   useEffect(() => {
     if (textOverlay.sichtbar && textInputRef.current) {
+      textOverlayGeoeffnetRef.current = Date.now();
       // Sofort versuchen
       textInputRef.current.focus();
       // Fallback nach kurzer Verzögerung (iOS braucht manchmal einen Frame)
@@ -628,7 +632,12 @@ export function ZeichnenCanvas({
               }
               e.stopPropagation();
             }}
-            onBlur={() => setTimeout(() => textAbschliessen(false), 150)}
+            onBlur={() => {
+              // Blur in den ersten 400ms nach Öffnen ignorieren — der Browser-Click-Event
+              // auf dem Canvas löst sonst sofort ein Blur aus bevor der User tippen kann.
+              if (Date.now() - textOverlayGeoeffnetRef.current < 400) return;
+              setTimeout(() => textAbschliessen(false), 150);
+            }}
             style={{
               fontSize: '18px',
               fontFamily: 'sans-serif',

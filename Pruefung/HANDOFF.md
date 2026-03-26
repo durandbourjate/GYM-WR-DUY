@@ -31,6 +31,7 @@
 | Fix | Beschreibung |
 |-----|-------------|
 | HTML | `button > button` Nesting-Warnung in VorbereitungPhase (Kurs-Accordion) → innerer Button zu `<span role="button">` |
+| Blur-Fix | Textfeld bei Bild/Zeichnen verschwand nach ~0.5s — Race-Condition: Canvas-Click löste `onBlur` aus. Fix: 400ms Guard nach Overlay-Öffnung (ZeichnenCanvas.tsx) |
 
 ### Block 1: Bugfixes (4 Tasks)
 
