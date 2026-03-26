@@ -248,7 +248,12 @@ function MaterialInhalt({ material }: { material: PruefungsMaterial }) {
   // PDF / Datei-Upload (Bilder, PDFs)
   const materialUrl = material.url || (material.driveFileId ? `https://drive.google.com/file/d/${material.driveFileId}/view` : '')
   if ((material.typ === 'pdf' || material.typ === 'dateiUpload') && materialUrl) {
-    const embedUrl = convertToEmbedUrl(materialUrl)
+    let embedUrl = convertToEmbedUrl(materialUrl)
+    // Lokale PDFs: Toolbar ausblenden (kein Download/Print für SuS)
+    // Google Drive Preview hat eigene Toolbar-Steuerung
+    if (!embedUrl.includes('drive.google.com')) {
+      embedUrl += (embedUrl.includes('#') ? '&' : '#') + 'toolbar=0&navpanes=0'
+    }
 
     return (
       <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
