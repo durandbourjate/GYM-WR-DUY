@@ -8,6 +8,12 @@
 
 ## Offene Punkte (nächste Session)
 
+### Kritisch (vor nächstem Klassentest)
+| ID | Beschreibung | Priorität |
+|----|-------------|-----------|
+| K1 | **Apps Script URL geändert** — Neue Bereitstellung (DriveApp-Scope). URL: `AKfycbxvCHzbCnP...`. GitHub Secret `VITE_APPS_SCRIPT_URL` ist aktualisiert. Bei lokaler Entwicklung `.env.local` prüfen. | Info |
+| K2 | **ANTWORTEN_MASTER_ID** im Apps Script setzen — Spreadsheet-ID: `1r4CAoCkE0VxON4MbviqHlklSL3qJRe0uZO7bgPoo1KI`. Muss als Konstante im Apps Script Code stehen. | Hoch |
+
 ### UX-Verbesserungen ausstehend
 | ID | Beschreibung | Priorität |
 |----|-------------|-----------|
@@ -49,6 +55,8 @@
 | T7 | iPad Tastatur bei Freitext: `user-select:text` Override in `.ProseMirror` (Lockdown setzt `user-select:none` auf body) | index.css |
 | T8 | **Antworten-System auf Master-Spreadsheet umgestellt.** Google Workspace blockierte DriveApp-Schreiboperationen → Heartbeat/Save scheiterten für neue Prüfungen. Komplett-Refactor: Statt separate Dateien pro Prüfung nutzt das System jetzt ein zentrales Spreadsheet (`ANTWORTEN_MASTER_ID`) mit Tabs pro Prüfung (`Antworten_`, `Korrektur_`, `Nachrichten_`). 3 neue Helper (`getOrCreateAntwortenSheet/KorrekturSheet/NachrichtenSheet`), 18+ DriveApp-Stellen ersetzt, Fallback auf alte Dateien im Ordner für Migration. |
 | T8b | **Duplikation bereinigt:** `handleDuplizieren` resettet jetzt alle Session-Felder (teilnehmer, beendetUm, durchfuehrungId, zeitverlaengerungen, sebAusnahmen, erlaubteKlasse). `handleSpeichernIntern`: `erlaubteKlasse === '—'` wird als leer behandelt. |
+| T9 | **speichereConfig Partial-Update Fix:** Backend überschrieb nicht-gesendete Felder mit Defaults (z.B. abschnitte→[]). Fix: Nur explizit gesendete Felder werden geschrieben (`config.hasOwnProperty()`). |
+| T10 | **Multi-Duplikat Race-Condition Fix:** 3 statt 1 Kopie beim Duplizieren. Root cause: Autosave-Timer liest stale Closure mit `id:''`, generiert jeweils neue ID. Fix: `pruefungRef.current` statt Closure + `speichertRef` Guard gegen parallele Saves. |
 
 ### Block 1: Bugfixes (4 Tasks)
 
@@ -99,6 +107,8 @@ src/components/lp/KorrekturDashboard.tsx               — U30 (Auto-geprüft) +
 src/components/lp/KorrekturFragenAnsicht.tsx           — U31 (NEU: Frage-für-Frage Komponente)
 src/components/lp/MultiDurchfuehrenDashboard.tsx       — U32 (Auswertung-Tab mit Prüfungs-Tabs)
 src/components/lp/VorbereitungPhase.tsx                — HTML button-nesting Fix (Kurs-Accordion)
+src/components/lp/PruefungsComposer.tsx                — T10 (pruefungRef + speichertRef gegen Race)
+apps-script-code.js                                    — T8 (Master-Spreadsheet) + T9 (Partial Update)
 ```
 
 ---
