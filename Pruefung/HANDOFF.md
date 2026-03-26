@@ -6,22 +6,38 @@
 
 ---
 
-## Offene Punkte (nächste Session)
+## Offene Punkte (nächste Session) — PRIORITÄT
+
+### 3 ungelöste Bugs aus Klassentest (systematisch debuggt, Root Causes identifiziert)
+
+| Bug | Problem | Root Cause (verifiziert) | Fix |
+|-----|---------|------------------------|-----|
+| B39a | **Material-PDF lädt nicht im Split-Modus** (Overlay/Vollbild geht) | `Layout.tsx` Z.260: `min-h-screen` statt `h-screen`. Der flex-Container bekommt keine explizite Höhe → `h-full` auf MaterialPanel löst zu 0px auf → iframe unsichtbar. | `min-h-screen` → `h-screen` auf dem Root-Container, ODER den Main-Container (Z.371) mit expliziter Höhe versehen. CSS-Kette komplett durchverifizieren. |
+| B39b | **PDF in Frage 10 lädt nicht** | `PDFFrage.tsx` Z.87-91: Wenn `pdfDriveFileId` gesetzt ist aber `ladeDriveFile()` null zurückgibt (API-Fehler), wird `renderer.ladePDF()` nie aufgerufen. State bleibt `idle` → **endloser Ladebildschirm**. Kein Fallback auf `pdfUrl`/`pdfDateiname`, kein Error-State. | Fallthrough: Nach Drive-API-Fehler auf `pdfUrl`/`pdfDateiname` zurückfallen. Minimum: Error-State setzen statt endlos laden. |
+| B38 | **"Beenden" hängt immer noch** | `pruefungApi.ts` Z.228-244: `beendePruefung()` nutzt raw `fetch()` OHNE `fetchMitTimeout`-Wrapper (alle anderen API-Funktionen nutzen ihn). Kein AbortController → fetch hängt endlos wenn Apps Script langsam antwortet. **Zusätzlich:** Apps Script `beendePruefungEndpoint` macht mehrere `SpreadsheetApp.openById()` + `getDataRange()` Calls (15-30s+). User muss auch sicherstellen dass eine **neue Bereitstellung** (nicht nur Code-Speicherung) erstellt wurde. | (a) `fetchMitTimeout` in `beendePruefung` verwenden. (b) Apps Script: Sheets-Zugriffe reduzieren (nicht 2× öffnen). (c) Prüfen ob User tatsächlich neue Bereitstellung (neue Version, nicht "Speichern") erstellt hat. |
+
+### UX-Wünsche
+
+| ID | Beschreibung |
+|----|-------------|
+| U33 | **KontrollStufeSelect**: Details nicht als Toggle-Button, sondern mit Klick auf Titel "Kontrollstufe" ein-/ausblenden. Details als Spalten unter den Stufen-Buttons. iPad-Hinweis nur wenn ausgeklappt. |
+
+### Weiteres (niedrigere Priorität)
 
 - **Manuelle Punktevergabe** — Korrektur-Tab noch nicht live getestet
 - **SEB / iPad** — SEB weiterhin deaktiviert (`sebErforderlich: false`)
 - **Zeichnen Text-Werkzeug** — Grundfunktion live testen (Rotation, Grösse, Fett)
-- **Apps Script Code aktualisieren** — B36 (Entsperrung Race) + B38 (Batch-Write) in apps-script-code.js. User muss Code kopieren und neu bereitstellen.
+- **Apps Script Code aktualisieren** — B36 (Entsperrung Race) + B38 (Batch-Write) bereitgestellt? User muss **neue Bereitstellung** erstellen (nicht nur speichern).
 
 ### Session 18 — 5 Bugfixes aus Klassentest (26.03.2026 Nachmittag)
 
 | Bug | Beschreibung | Fix | Dateien |
 |-----|-------------|-----|---------|
-| B37 | **SuS Reload = Datenverlust** (config/fragen nicht persistiert → Fehlerscreen → zuruecksetzen löscht Antworten) | Recovery-Ladescreen in Layout.tsx: lädt config+fragen vom Backend, behält Antworten. Neue Store-Action `setConfigUndFragen`. Bestätigungsdialog vor Reset. | Layout.tsx, App.tsx, pruefungStore.ts |
-| B39 | **PDF lädt nicht** (Material-Split + PDF-Frage) | `absolute inset-0` auf iframe entfernt → `w-full h-full` direkt (3 Stellen: Video, PDF, Link) | MaterialPanel.tsx |
+| B37 | **SuS Reload = Datenverlust** (config/fragen nicht persistiert → Fehlerscreen → zuruecksetzen löscht Antworten) | Recovery-Ladescreen in Layout.tsx: lädt config+fragen vom Backend, behält Antworten. Neue Store-Action `setConfigUndFragen`. Bestätigungsdialog vor Reset. ✅ **FUNKTIONIERT** | Layout.tsx, App.tsx, pruefungStore.ts |
+| B39 | **PDF lädt nicht** (Material-Split + PDF-Frage) | CSS-Fix `h-0` → `min-h-0` + iframe `absolute inset-0` zurück. ⚠️ **NICHT GELÖST** — siehe offene Punkte oben (B39a, B39b) | MaterialPanel.tsx, Layout.tsx |
 | B35 | **Kontrollstufe 'locker' sperrt** nach 3 Tab-Wechseln | Guard in `registriereVerstoss`: `'locker'` return wie `'keine'`. `onKontrollStufeOverride` implementiert (war No-Op). | useLockdown.ts, Layout.tsx |
 | B36 | **LP-Entsperrung Race** (Heartbeat überschreibt LP-Unlock) | Im Heartbeat: wenn `entsperrt=true`, Client-lockdownMeta ignorieren + `gesperrt=false` forcieren. | apps-script-code.js |
-| B38 | **"Beenden" hängt** (50+ einzelne setValue-Calls) | Safety-Net Batch-Write: `setValues()` statt N× `setValue()`. Frontend: 30s-Timeout + Fehlermeldung. | apps-script-code.js, BeendenDialog.tsx |
+| B38 | **"Beenden" hängt** (50+ einzelne setValue-Calls) | Backend: Batch-Write. Frontend: 30s-Timeout. ⚠️ **NICHT GELÖST** — zusätzliche Root Cause: `pruefungApi.ts` nutzt raw `fetch()` ohne Timeout. Siehe offene Punkte oben. | apps-script-code.js, BeendenDialog.tsx, pruefungApi.ts |
 
 ### Erledigt (26.03.2026)
 - ~~K1~~ `.env.local` + GitHub Secret korrekt ✅
