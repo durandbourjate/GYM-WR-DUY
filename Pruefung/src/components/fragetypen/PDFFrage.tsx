@@ -78,21 +78,31 @@ export default function PDFFrage({ frage }: Props) {
 
   // --- Load PDF ---
   useEffect(() => {
-    if (frage.pdfBase64) {
-      renderer.ladePDF({ base64: frage.pdfBase64 })
-    } else if (frage.pdfUrl) {
-      renderer.ladePDF({ url: frage.pdfUrl })
-    } else if (frage.pdfDriveFileId && apiService.istKonfiguriert()) {
-      // PDF aus Google Drive via Apps Script Proxy laden (vermeidet CORS)
-      apiService.ladeDriveFile(frage.pdfDriveFileId, user?.email ?? '').then((result) => {
-        if (result?.base64) {
-          renderer.ladePDF({ base64: result.base64 })
+    let abgebrochen = false
+
+    async function ladePDFAsync() {
+      try {
+        if (frage.pdfBase64) {
+          await renderer.ladePDF({ base64: frage.pdfBase64 })
+        } else if (frage.pdfDriveFileId && apiService.istKonfiguriert()) {
+          // PDF aus Google Drive via Apps Script Proxy laden (vermeidet CORS)
+          const result = await apiService.ladeDriveFile(frage.pdfDriveFileId, user?.email ?? '')
+          if (!abgebrochen && result?.base64) {
+            await renderer.ladePDF({ base64: result.base64 })
+          }
+        } else if (frage.pdfUrl) {
+          await renderer.ladePDF({ url: frage.pdfUrl })
+        } else if (frage.pdfDateiname) {
+          // Fallback: lokale Datei im materialien-Ordner
+          await renderer.ladePDF({ url: `./materialien/${frage.pdfDateiname}` })
         }
-      })
-    } else if (frage.pdfDateiname) {
-      // Fallback: lokale Datei im materialien-Ordner
-      renderer.ladePDF({ url: `./materialien/${frage.pdfDateiname}` })
+      } catch (err) {
+        console.error('[PDFFrage] PDF laden fehlgeschlagen:', err)
+      }
     }
+
+    ladePDFAsync()
+    return () => { abgebrochen = true }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [frage.id])
 

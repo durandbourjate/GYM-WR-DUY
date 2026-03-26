@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import type { PruefungsMaterial } from '../types/pruefung.ts'
 import AudioPlayer from './AudioPlayer.tsx'
-import { useAuthStore } from '../store/authStore.ts'
 
 export type MaterialModus = 'split' | 'overlay'
 
@@ -29,7 +28,7 @@ export default function MaterialPanel({ materialien, modus, onSchliessen, onModu
   // Split-Modus: Seitliches Panel ohne Backdrop
   if (modus === 'split') {
     return (
-      <div className="w-[55%] min-w-[400px] bg-white dark:bg-slate-800 border-l border-slate-200 dark:border-slate-700 flex flex-col h-full">
+      <div className="w-[55%] min-w-[400px] bg-white dark:bg-slate-800 border-l border-slate-200 dark:border-slate-700 flex flex-col overflow-hidden" style={{ height: '100%', minHeight: 0 }}>
         {/* Header — kompakt im Split-Modus */}
         <div className="flex items-center justify-between px-3 py-2 border-b border-slate-200 dark:border-slate-700 shrink-0">
           <h2 className="text-xs font-semibold text-slate-700 dark:text-slate-200">
@@ -81,7 +80,7 @@ export default function MaterialPanel({ materialien, modus, onSchliessen, onModu
         )}
 
         {/* Inhalt — overflow-hidden damit iframe/PDF volle Höhe nutzt */}
-        <div className="flex-1 min-h-0 flex flex-col">
+        <div className="flex-1 overflow-hidden" style={{ minHeight: 0 }}>
           {!aktivesMaterial ? (
             <div className="overflow-auto h-full">
               <MaterialAuswahl materialien={materialien} onWaehlen={setAktivesId} />
@@ -156,7 +155,7 @@ export default function MaterialPanel({ materialien, modus, onSchliessen, onModu
         )}
 
         {/* Inhalt */}
-        <div className="flex-1 min-h-0 flex flex-col">
+        <div className="flex-1 overflow-hidden" style={{ minHeight: 0 }}>
           {!aktivesMaterial ? (
             <MaterialAuswahl materialien={materialien} onWaehlen={setAktivesId} />
           ) : (
@@ -196,7 +195,6 @@ function MaterialAuswahl({ materialien, onWaehlen }: { materialien: PruefungsMat
 
 /** Zeigt den Inhalt eines einzelnen Materials */
 function MaterialInhalt({ material }: { material: PruefungsMaterial }) {
-  const user = useAuthStore(s => s.user)
   // Audio-Dateien
   if (material.typ === 'dateiUpload' && material.mimeType?.startsWith('audio/') && material.url) {
     return (
@@ -212,11 +210,11 @@ function MaterialInhalt({ material }: { material: PruefungsMaterial }) {
   // Video-Dateien (Upload)
   if (material.typ === 'dateiUpload' && material.mimeType?.startsWith('video/') && material.url) {
     return (
-      <div className="flex-1 min-h-0 flex flex-col">
+      <div className="h-full flex flex-col overflow-hidden">
         <div className="px-4 py-2 bg-slate-50 dark:bg-slate-700/30 text-xs text-slate-500 dark:text-slate-400 shrink-0">
           {material.titel}
         </div>
-        <div className="flex-1 flex items-center justify-center p-4">
+        <div className="flex-1 flex items-center justify-center p-4" style={{ minHeight: 0 }}>
           <video
             src={material.url}
             controls
@@ -232,14 +230,14 @@ function MaterialInhalt({ material }: { material: PruefungsMaterial }) {
   // Video-Embed (YouTube, Vimeo, nanoo.tv)
   if (material.typ === 'videoEmbed' && material.embedUrl) {
     return (
-      <div className="flex-1 min-h-0 flex flex-col">
+      <div className="h-full flex flex-col overflow-hidden">
         <div className="px-4 py-2 bg-slate-50 dark:bg-slate-700/30 text-xs text-slate-500 dark:text-slate-400 shrink-0">
           {material.titel}
         </div>
-        <div className="flex-1 relative">
+        <div className="flex-1 relative" style={{ minHeight: 0 }}>
           <iframe
             src={material.embedUrl}
-            className="absolute inset-0 w-full h-full border-0 min-h-[200px] md:min-h-[300px]"
+            className="absolute inset-0 w-full h-full border-0"
             title={material.titel}
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
@@ -255,16 +253,18 @@ function MaterialInhalt({ material }: { material: PruefungsMaterial }) {
     const embedUrl = convertToEmbedUrl(materialUrl)
 
     return (
-      <div className="flex-1 min-h-0 flex flex-col">
+      <div className="h-full flex flex-col overflow-hidden">
         <div className="px-4 py-2 bg-slate-50 dark:bg-slate-700/30 text-xs text-slate-500 dark:text-slate-400 shrink-0">
           {material.titel}
         </div>
-        <iframe
-          src={embedUrl}
-          className="flex-1 w-full border-0 min-h-0"
-          title={material.titel}
-          sandbox="allow-scripts allow-same-origin"
-        />
+        <div className="flex-1 relative" style={{ minHeight: 0 }}>
+          <iframe
+            src={embedUrl}
+            className="absolute inset-0 w-full h-full border-0"
+            title={material.titel}
+            sandbox="allow-scripts allow-same-origin"
+          />
+        </div>
       </div>
     )
   }
@@ -284,26 +284,18 @@ function MaterialInhalt({ material }: { material: PruefungsMaterial }) {
 
   if (material.typ === 'link' && material.url) {
     return (
-      <div className="h-full flex flex-col">
-        <div className="px-4 py-2 bg-slate-50 dark:bg-slate-700/30 text-xs text-slate-500 dark:text-slate-400 flex items-center gap-2 shrink-0">
-          <span>{material.titel}</span>
-          {user?.rolle === 'lp' && (
-            <a
-              href={material.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-500 dark:text-blue-400 hover:underline ml-auto"
-            >
-              In neuem Tab öffnen ↗
-            </a>
-          )}
+      <div className="h-full flex flex-col overflow-hidden">
+        <div className="px-4 py-2 bg-slate-50 dark:bg-slate-700/30 text-xs text-slate-500 dark:text-slate-400 shrink-0">
+          {material.titel}
         </div>
-        <iframe
-          src={material.url}
-          className="flex-1 w-full border-0 min-h-0"
-          title={material.titel}
-          sandbox="allow-scripts allow-same-origin"
-        />
+        <div className="flex-1 relative" style={{ minHeight: 0 }}>
+          <iframe
+            src={material.url}
+            className="absolute inset-0 w-full h-full border-0"
+            title={material.titel}
+            sandbox="allow-scripts allow-same-origin"
+          />
+        </div>
       </div>
     )
   }

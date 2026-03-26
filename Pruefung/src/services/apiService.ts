@@ -2,7 +2,7 @@
 // Alle bestehenden Imports `import { apiService } from '../services/apiService'` bleiben funktional
 
 import { istKonfiguriert, getJson } from './apiClient'
-import { ladePruefung, speichereAntworten, heartbeat, schaltePruefungFrei, beendePruefung, resetPruefung, sebAusnahmeErlauben, entsperreSuS, setzeKontrollStufe } from './pruefungApi'
+import { ladePruefung, ladeEinzelConfig, speichereAntworten, heartbeat, schaltePruefungFrei, beendePruefung, resetPruefung, sebAusnahmeErlauben, entsperreSuS, setzeKontrollStufe } from './pruefungApi'
 import { ladeAlleConfigs, ladeFragenbank, speichereConfig, loeschePruefung, speichereFrage, loescheFrage } from './fragenbankApi'
 import { ladeKorrektur, ladeAbgaben, starteKorrektur, ladeKorrekturFortschritt, ladeKorrekturStatus, speichereKorrekturZeile, generiereUndSendeFeedback, korrekturFreigeben, ladeKorrekturenFuerSuS, ladeKorrekturDetail } from './korrekturApi'
 import { importierePoolFragen, importiereLernziele, schreibePoolAenderung, ladeLernziele } from './poolApi'
@@ -16,6 +16,7 @@ import { ladeKurse, ladeKursDetails, ladeSchuljahr, ladeLehrplan } from './syner
 export const apiService = {
   istKonfiguriert,
   ladePruefung,
+  ladeEinzelConfig,
   speichereAntworten,
   heartbeat,
   ladeMonitoring,

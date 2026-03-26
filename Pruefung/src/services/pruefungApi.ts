@@ -2,7 +2,13 @@ import type { Frage } from '../types/fragen.ts'
 import type { PruefungsConfig } from '../types/pruefung.ts'
 import type { Antwort } from '../types/antworten.ts'
 import type { HeartbeatResponse } from '../types/monitoring.ts'
-import { APPS_SCRIPT_URL } from './apiClient'
+import { APPS_SCRIPT_URL, getJson } from './apiClient'
+
+/** Einzelne Prüfungs-Config laden (leichtgewichtig, für Polling) */
+export async function ladeEinzelConfig(pruefungId: string, email: string): Promise<PruefungsConfig | null> {
+  const result = await getJson<{ config: PruefungsConfig }>('ladeEinzelConfig', { id: pruefungId, email })
+  return result?.config ?? null
+}
 
 /** Prüfungskonfiguration + Fragen laden */
 export async function ladePruefung(pruefungId: string, email: string): Promise<{

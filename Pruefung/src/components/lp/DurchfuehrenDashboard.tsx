@@ -103,6 +103,11 @@ export default function DurchfuehrenDashboard({ pruefungId }: { pruefungId: stri
   // Config der Prüfung
   const [config, setConfig] = useState<PruefungsConfig | null>(null)
 
+  // Phase früh ableiten (wird in Polling-Effekten als Dependency gebraucht)
+  const phase: PruefungsPhase = config && daten
+    ? bestimmePhase(config, daten.schueler)
+    : 'vorbereitung'
+
   // Loading-State für Freischalten-Button
   const [freischaltenLaedt, setFreischaltenLaedt] = useState(false)
 
@@ -126,7 +131,7 @@ export default function DurchfuehrenDashboard({ pruefungId }: { pruefungId: stri
 
   useEffect(() => {
     ladeNachrichten()
-    const interval = setInterval(ladeNachrichten, 10000)
+    const interval = setInterval(ladeNachrichten, 20000)
     return () => clearInterval(interval)
   }, [ladeNachrichten])
 
@@ -197,14 +202,15 @@ export default function DurchfuehrenDashboard({ pruefungId }: { pruefungId: stri
 
   useEffect(() => { ladeDaten() }, [ladeDaten])
 
-  // Auto-Refresh (alle 5s) — läuft unabhängig vom Tab
+  // Auto-Refresh: 5s in Live-Phase (kritisch), 15s sonst (spart Connections für Button-Clicks)
   useEffect(() => {
     if (!autoRefresh || ladeStatus === 'fehler') return
-    const interval = setInterval(ladeDaten, 5000)
+    const intervallMs = phase === 'aktiv' ? 5000 : 15000
+    const interval = setInterval(ladeDaten, intervallMs)
     return () => clearInterval(interval)
-  }, [autoRefresh, ladeStatus, ladeDaten])
+  }, [autoRefresh, ladeStatus, ladeDaten, phase])
 
-  // Abgaben + Fragen einmalig laden
+  // Abgaben + Fragen + Config einmalig laden (ladePruefung gibt beides zurück)
   useEffect(() => {
     if (abgabenGeladen.current || !user) return
     async function ladeAbgabenUndFragen() {
@@ -220,15 +226,16 @@ export default function DurchfuehrenDashboard({ pruefungId }: { pruefungId: stri
       ])
       if (abgabenResult) setAbgaben(abgabenResult)
       if (pruefungResult?.fragen) setFragen(pruefungResult.fragen)
+      // Config aus ladePruefung übernehmen (spart separaten ladeAlleConfigs-Call)
+      if (pruefungResult?.config) setConfig(pruefungResult.config)
       abgabenGeladen.current = true
     }
     ladeAbgabenUndFragen()
   }, [user, istDemoModus, pruefungId])
 
-  // Config laden und periodisch aktualisieren
+  // Config: Demo-Modus direkt setzen
   useEffect(() => {
     if (!user || !pruefungId) return
-    // Demo-Modus: Demo-Config direkt setzen
     if (istDemoModus || pruefungId === 'demo') {
       setConfig({
         id: 'demo',
@@ -282,24 +289,24 @@ export default function DurchfuehrenDashboard({ pruefungId }: { pruefungId: stri
         feedback: { zeitpunkt: 'nach-review', format: 'in-app-und-pdf', detailgrad: 'vollstaendig' },
         freigeschaltet: true,
       })
-      return
     }
+  }, [user, pruefungId, istDemoModus])
+
+  // Config periodisch aktualisieren (leichtgewichtig via ladeEinzelConfig)
+  // Nur in Vorbereitung/Lobby — dort ändert sich Config (Freischaltung, Teilnehmer)
+  useEffect(() => {
+    if (!user || !pruefungId || istDemoModus || pruefungId === 'demo') return
+    if (phase !== 'vorbereitung' && phase !== 'lobby') return
     const ladeConfig = async () => {
       try {
-        const configs = await apiService.ladeAlleConfigs(user.email)
-        const found = configs?.find((c) => c.id === pruefungId)
+        const found = await apiService.ladeEinzelConfig(pruefungId, user.email)
         if (found) setConfig(found)
       } catch { /* ignore */ }
     }
-    ladeConfig()
-    const interval = setInterval(ladeConfig, 15000)
+    // Nicht sofort laden — initialer Load kommt aus ladePruefung (oben)
+    const interval = setInterval(ladeConfig, 30000)
     return () => clearInterval(interval)
-  }, [user, pruefungId, istDemoModus])
-
-  // Phase ableiten
-  const phase: PruefungsPhase = config && daten
-    ? bestimmePhase(config, daten.schueler)
-    : 'vorbereitung'
+  }, [user, pruefungId, istDemoModus, phase])
 
   // Phase-Wechsel → Tab automatisch vorwärts setzen
   useEffect(() => {

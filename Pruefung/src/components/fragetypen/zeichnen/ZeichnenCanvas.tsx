@@ -15,6 +15,8 @@ interface ZeichnenCanvasProps {
   aktiveFarbe: string;
   stiftBreite?: number;
   textRotation?: 0 | 90 | 180 | 270;
+  textGroesse?: number;
+  textFett?: boolean;
   initialDaten?: string;
   onDatenChange: (daten: string) => void;
   onPNGExport: (png: string) => void;
@@ -25,6 +27,9 @@ interface ZeichnenCanvasProps {
     allesLoeschen: () => void;
     kannUndo: boolean;
     kannRedo: boolean;
+    updateCommand: (id: string, updates: Partial<import('./ZeichnenTypes').DrawCommand>) => void;
+    selektierterCommand: string | null;
+    commands: import('./ZeichnenTypes').DrawCommand[];
   }) => void;
 }
 
@@ -102,6 +107,8 @@ export function ZeichnenCanvas({
   aktiveFarbe,
   stiftBreite = 2,
   textRotation = 0,
+  textGroesse = 18,
+  textFett = false,
   initialDaten,
   onDatenChange,
   onPNGExport,
@@ -145,8 +152,11 @@ export function ZeichnenCanvas({
       allesLoeschen: engine.allesLoeschen,
       kannUndo: engine.kannUndo,
       kannRedo: engine.kannRedo,
+      updateCommand: engine.updateCommand,
+      selektierterCommand: engine.state.selektierterCommand,
+      commands: engine.state.commands,
     });
-  }, [engine.state.commands, engine.undo, engine.redo, engine.allesLoeschen, engine.kannUndo, engine.kannRedo, onEngineActions]);
+  }, [engine.state.commands, engine.state.selektierterCommand, engine.undo, engine.redo, engine.allesLoeschen, engine.kannUndo, engine.kannRedo, engine.updateCommand, onEngineActions]);
 
   // Text-Overlay-Zustand
   const [textOverlay, setTextOverlay] = useState<TextOverlay>(TEXT_OVERLAY_LEER);
@@ -252,15 +262,16 @@ export function ZeichnenCanvas({
             position: { x: prev.logischX, y: prev.logischY },
             text: prev.text.trim(),
             farbe: aktiveFarbe,
-            groesse: 18,
+            groesse: textGroesse,
             rotation: textRotation || undefined,
+            fett: textFett || undefined,
           } as Omit<DrawCommand, 'id'>);
         }
 
         return TEXT_OVERLAY_LEER;
       });
     },
-    [aktiveFarbe, textRotation, engine]
+    [aktiveFarbe, textRotation, textGroesse, textFett, engine]
   );
 
   // Zeitpunkt der Overlay-Öffnung — damit onBlur den initialen Click-Event ignoriert

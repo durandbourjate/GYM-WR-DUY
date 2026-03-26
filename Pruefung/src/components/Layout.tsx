@@ -107,6 +107,13 @@ export default function Layout() {
     vorherigerZaehler.current = lockdown.verstossZaehler
   }, [lockdown.verstossZaehler, lockdown.maxVerstoesse, lockdown.verstoesse])
 
+  // Vollbild verlassen wenn Prüfung abgegeben (manuell, Auto-Abgabe, oder LP beendet)
+  useEffect(() => {
+    if (abgegeben && document.fullscreenElement) {
+      document.exitFullscreen().catch(() => {})
+    }
+  }, [abgegeben])
+
   // UX: beforeunload-Warnung, Tastaturnavigation, Escape
   const handleAbgabeDialogSchliessen = useCallback(() => setZeigAbgabeDialog(false), [])
   const handleAbgabeDialogOeffnen = useCallback(() => setZeigAbgabeDialog(true), [])
@@ -261,7 +268,7 @@ export default function Layout() {
               <button
                 onClick={handleMaterialToggle}
                 title={materialOffen ? 'Material schliessen' : 'Material anzeigen'}
-                className={`px-2 py-1.5 text-xs rounded-lg border transition-colors cursor-pointer flex items-center gap-1
+                className={`px-3 py-2 text-xs rounded-lg border transition-colors cursor-pointer flex items-center gap-1 min-h-[44px]
                   ${materialOffen
                     ? 'bg-green-50 border-green-300 text-green-700 dark:bg-green-900/30 dark:border-green-700 dark:text-green-300'
                     : 'border-slate-300 text-slate-500 dark:border-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
@@ -381,23 +388,6 @@ export default function Layout() {
                 <div className="mb-3 text-xs text-slate-400 dark:text-slate-500">
                   {abschnittInfo.abschnitt.titel} · Frage {abschnittInfo.positionImAbschnitt + 1} von {abschnittInfo.abschnitt.fragenIds.length}
                 </div>
-              )}
-
-              {/* Material-Hinweis (prominent, wenn Materialien vorhanden + Panel nicht offen) */}
-              {config.materialien && config.materialien.length > 0 && materialModus === 'aus' && (
-                <button
-                  type="button"
-                  onClick={() => setMaterialModus('overlay')}
-                  className="w-full mb-3 px-3 py-2 text-sm text-left bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors cursor-pointer flex items-center gap-2"
-                >
-                  <span>📎</span>
-                  <span className="text-blue-700 dark:text-blue-300 font-medium">
-                    {config.materialien.length === 1
-                      ? `Material: ${config.materialien[0].titel}`
-                      : `${config.materialien.length} Materialien verfügbar`}
-                  </span>
-                  <span className="text-blue-400 dark:text-blue-500 text-xs ml-auto">Öffnen</span>
-                </button>
               )}
 
               {aktuelleFrage && (

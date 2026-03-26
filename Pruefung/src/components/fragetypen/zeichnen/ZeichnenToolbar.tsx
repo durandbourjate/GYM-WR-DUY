@@ -18,6 +18,11 @@ interface ZeichnenToolbarProps {
   disabled: boolean;
   textRotation?: 0 | 90 | 180 | 270;
   onTextRotationChange?: (r: 0 | 90 | 180 | 270) => void;
+  textGroesse?: number;
+  onTextGroesseChange?: (g: number) => void;
+  textFett?: boolean;
+  onTextFettChange?: (f: boolean) => void;
+  istTextSelektiert?: boolean;
 }
 
 const TOOL_DEFS: { id: Tool; icon: string; label: string; configKey?: string }[] = [
@@ -48,6 +53,11 @@ export function ZeichnenToolbar({
   disabled,
   textRotation = 0,
   onTextRotationChange,
+  textGroesse = 18,
+  onTextGroesseChange,
+  textFett = false,
+  onTextFettChange,
+  istTextSelektiert = false,
 }: ZeichnenToolbarProps) {
   const isHorizontal = layout === 'horizontal';
 
@@ -139,16 +149,72 @@ export function ZeichnenToolbar({
         })}
       </div>
 
-      {/* Text-Rotation (nur bei Text-Werkzeug) */}
-      {aktivesTool === 'text' && onTextRotationChange && (
-        <button
-          type="button"
-          onClick={() => onTextRotationChange(((textRotation + 90) % 360) as 0 | 90 | 180 | 270)}
-          className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded text-sm font-medium transition-colors hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 border border-slate-300 dark:border-slate-600"
-          title={`Rotation: ${textRotation}°`}
-        >
-          ⟳{textRotation > 0 ? ` ${textRotation}°` : ''}
-        </button>
+      {/* Text-Kontrollen (bei Text-Werkzeug oder selektiertem Text) */}
+      {(aktivesTool === 'text' || istTextSelektiert) && (
+        <>
+          <div className={separatorKlassen} aria-hidden="true" />
+          <div
+            role="group"
+            aria-label="Text-Formatierung"
+            className={`flex gap-0.5 items-center ${isHorizontal ? 'flex-row' : 'flex-col'}`}
+          >
+            {/* Grösse S/M/L/XL */}
+            {onTextGroesseChange && (
+              <>
+                {([
+                  { label: 'S', wert: 14 },
+                  { label: 'M', wert: 18 },
+                  { label: 'L', wert: 24 },
+                  { label: 'XL', wert: 32 },
+                ] as const).map(({ label, wert }) => (
+                  <button
+                    key={label}
+                    type="button"
+                    onClick={() => onTextGroesseChange(wert)}
+                    className={[
+                      'min-w-[36px] min-h-[36px] flex items-center justify-center rounded text-xs font-medium transition-colors',
+                      textGroesse === wert
+                        ? 'bg-white dark:bg-slate-600 shadow-sm text-slate-900 dark:text-slate-100'
+                        : 'bg-transparent hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300',
+                    ].join(' ')}
+                    title={`Textgrösse ${label} (${wert}px)`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </>
+            )}
+
+            {/* Fett-Toggle */}
+            {onTextFettChange && (
+              <button
+                type="button"
+                onClick={() => onTextFettChange(!textFett)}
+                className={[
+                  'min-w-[36px] min-h-[36px] flex items-center justify-center rounded text-sm transition-colors',
+                  textFett
+                    ? 'bg-white dark:bg-slate-600 shadow-sm text-slate-900 dark:text-slate-100 font-bold'
+                    : 'bg-transparent hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300',
+                ].join(' ')}
+                title={textFett ? 'Fett aus' : 'Fett ein'}
+              >
+                B
+              </button>
+            )}
+
+            {/* Rotation */}
+            {onTextRotationChange && (
+              <button
+                type="button"
+                onClick={() => onTextRotationChange(((textRotation + 90) % 360) as 0 | 90 | 180 | 270)}
+                className="min-w-[36px] min-h-[36px] flex items-center justify-center rounded text-sm font-medium transition-colors hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300"
+                title={`Rotation: ${textRotation}°`}
+              >
+                ⟳{textRotation > 0 ? `${textRotation}°` : ''}
+              </button>
+            )}
+          </div>
+        </>
       )}
 
       {/* Trennlinie */}
@@ -205,7 +271,7 @@ export function ZeichnenToolbar({
       <button
         role="button"
         title="Alles löschen"
-        onClick={onAllesLoeschen}
+        onClick={() => { if (window.confirm('Alle Zeichnungen löschen?')) onAllesLoeschen() }}
         className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded text-sm transition-colors bg-red-50 dark:bg-red-950 text-red-600 border border-red-200 dark:border-red-800 hover:bg-red-100 dark:hover:bg-red-900"
       >
         🗑

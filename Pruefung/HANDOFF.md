@@ -8,21 +8,77 @@
 
 ## Offene Punkte (nächste Session)
 
-### Kritisch (vor nächstem Klassentest)
-| ID | Beschreibung | Priorität |
-|----|-------------|-----------|
-| K1 | **Apps Script URL geändert** — Neue Bereitstellung (DriveApp-Scope). URL: `AKfycbxvCHzbCnP...`. GitHub Secret `VITE_APPS_SCRIPT_URL` ist aktualisiert. Bei lokaler Entwicklung `.env.local` prüfen. | Info |
-| K2 | **ANTWORTEN_MASTER_ID** im Apps Script setzen — Spreadsheet-ID: `1r4CAoCkE0VxON4MbviqHlklSL3qJRe0uZO7bgPoo1KI`. Muss als Konstante im Apps Script Code stehen. | Hoch |
+Keine kritischen offenen Punkte.
 
-### UX-Verbesserungen ausstehend
-| ID | Beschreibung | Priorität |
-|----|-------------|-----------|
-| U13 | Ergebnisse + Korrektur zusammenlegen (Accordion-Style, 4→3 Tabs) | Mittel |
+### Erledigt (26.03.2026)
+- ~~K1~~ `.env.local` + GitHub Secret korrekt ✅
+- ~~K2~~ `ANTWORTEN_MASTER_ID` gesetzt ✅
+- ~~U13~~ Ergebnisse + Korrektur im Auswertung-Tab ✅
+- ~~P1~~ Performance optimiert ✅
+- ~~B35~~ Fortschritt 0% Fix ✅
+- ~~B36~~ Material-PDF Höhe ✅
+- ~~B37~~ Demo-PDF URL ✅
+- ~~U33~~ Lösch-Bestätigung ✅
+- ~~U34~~ Tab-öffnen Button entfernt ✅
+- ~~U35~~ Vollbild nach Abgabe verlassen ✅
+- ~~Cleanup~~ Fallback-Code + Alias-Funktionen entfernt ✅
 
-### Performance
-| ID | Beschreibung | Priorität |
-|----|-------------|-----------|
-| P1 | Ladezeit >1 Minute reduzieren (Apps Script + Frontend Optimierung) | Hoch (für breiten Einsatz) |
+---
+
+## Session 26.03.2026 (16) — Bugfixes + UX aus Live-Tests (Runde 4) + Cleanup
+
+### Status: ERLEDIGT (7 Tasks)
+
+| Task | Beschreibung | Datei(en) |
+|------|-------------|-----------|
+| B35 | **Fortschritt 0%**: `beantworteteFragen` zählt jetzt nur nicht-leere Antworten. `gesamtFragen` nutzt `alleFragen` (inkl. Aufgabengruppen-Teilfragen). | usePruefungsMonitoring.ts |
+| B36 | **Material-PDF Höhe**: iframe in `position: absolute` Container → volle Bildschirmhöhe. Fix für PDF und Link-Typ. | MaterialPanel.tsx |
+| B37 | **Demo-PDF F10**: `pdfUrl` auf Fedlex OR-PDF gesetzt (war leer). | demoFragen.ts |
+| U33 | **Lösch-Bestätigung**: `window.confirm()` vor Alles-Löschen im Zeichnen-Tool. | ZeichnenToolbar.tsx |
+| U34 | **Tab-öffnen Button entfernt**: "In neuem Tab öffnen" im Material-Panel entfernt + ungenutzter Import. | MaterialPanel.tsx |
+| U35 | **Vollbild nach Abgabe**: `document.exitFullscreen()` in AbgabeDialog, Timer, Layout (useEffect). | AbgabeDialog.tsx, Timer.tsx, Layout.tsx |
+| Cleanup | **Fallback-Code entfernt**: 3 Fallback-Blöcke (alte DriveApp-Einzel-Dateien) + 3 Alias-Funktionen aus Apps Script entfernt. Alle Aufrufe auf direkte Funktionen umgestellt. | apps-script-code.js |
+
+### Geänderte Dateien (8 Dateien)
+
+```
+src/hooks/usePruefungsMonitoring.ts                — B35 (Fortschritt-Zählung)
+src/components/MaterialPanel.tsx                   — B36 (PDF-Höhe) + U34 (Button entfernt)
+src/data/demoFragen.ts                             — B37 (pdfUrl)
+src/components/fragetypen/zeichnen/ZeichnenToolbar.tsx — U33 (confirm)
+src/components/AbgabeDialog.tsx                    — U35 (exitFullscreen)
+src/components/Timer.tsx                           — U35 (exitFullscreen)
+src/components/Layout.tsx                          — U35 (exitFullscreen useEffect)
+apps-script-code.js                                — Cleanup (Fallbacks + Aliase entfernt)
+```
+
+### Hinweis
+**Apps Script aktualisieren:** Code in Editor einfügen → Bereitstellen → Bereitstellungen verwalten → Stift-Icon → "Neue Version" → Bereitstellen. URL bleibt gleich.
+
+---
+
+## Session 26.03.2026 (15) — Performance-Optimierung (P1)
+
+### Status: ERLEDIGT (4 Tasks)
+
+| Task | Beschreibung | Datei(en) |
+|------|-------------|-----------|
+| P1a | **Neuer Backend-Endpoint `ladeEinzelConfig`** — Lädt nur eine Config statt alle (~50KB→~1KB). Shared Helper `mapConfigRow()` für `ladeAlleConfigs` und `ladeEinzelConfig`. | apps-script-code.js |
+| P1b | **Frontend API-Funktion** `ladeEinzelConfig` via `getJson` | pruefungApi.ts, apiService.ts |
+| P1c | **Config aus `ladePruefung` übernehmen** — Initialer Load spart separaten Config-Call. Config-Polling nur noch in Vorbereitung/Lobby (30s statt 15s, leichtgewichtig). | DurchfuehrenDashboard.tsx |
+| P1d | **Polling-Frequenzen optimiert** — Monitoring: 5s (Live) / 15s (sonst). Nachrichten: 20s statt 10s. Config: 30s nur in Vorb./Lobby. Spart ~40% Connection-Slots → Buttons reagieren schneller. | DurchfuehrenDashboard.tsx |
+
+### Geänderte Dateien (4 Dateien)
+
+```
+apps-script-code.js                               — P1a (ladeEinzelConfig + mapConfigRow)
+src/services/pruefungApi.ts                        — P1b (ladeEinzelConfig Funktion)
+src/services/apiService.ts                         — P1b (Export)
+src/components/lp/DurchfuehrenDashboard.tsx        — P1c+P1d (Config-Load + Polling)
+```
+
+### Hinweis
+**Apps Script aktualisieren:** Code in Editor einfügen → Bereitstellungen verwalten → Stift → "Neue Version" → Bereitstellen. URL bleibt gleich.
 
 ---
 

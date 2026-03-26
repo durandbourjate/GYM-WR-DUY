@@ -16,6 +16,7 @@ interface UseDrawingEngineReturn {
   state: CanvasState;
   addCommand: (cmd: Omit<DrawCommand, 'id'>) => void;
   updateAktiverCommand: (cmd: DrawCommand | null) => void;
+  updateCommand: (id: CommandId, updates: Partial<DrawCommand>) => void;
   undo: () => void;
   redo: () => void;
   allesLoeschen: () => void;
@@ -45,6 +46,7 @@ type CanvasAction =
   | { type: 'DELETE_SELECTED' }
   | { type: 'DELETE_BY_ID'; id: CommandId }
   | { type: 'MOVE_SELECTED'; dx: number; dy: number }
+  | { type: 'UPDATE_COMMAND'; id: CommandId; updates: Partial<DrawCommand> }
   | { type: 'LOAD'; commands: DrawCommand[] };
 
 // ============================================================
@@ -163,6 +165,16 @@ function canvasReducer(state: CanvasState, action: CanvasAction): CanvasState {
           cmd.id === state.selektierterCommand ? verschiebeCommand(cmd, dx, dy) : cmd
         ),
       };
+    }
+
+    case 'UPDATE_COMMAND': {
+      const idx = state.commands.findIndex(c => c.id === action.id);
+      if (idx === -1) return state;
+      const aktuell = state.commands[idx];
+      const aktualisiert = { ...aktuell, ...action.updates, id: aktuell.id, typ: aktuell.typ } as DrawCommand;
+      const neueCommands = [...state.commands];
+      neueCommands[idx] = aktualisiert;
+      return { ...state, commands: neueCommands };
     }
 
     case 'LOAD':
@@ -410,7 +422,7 @@ function zeichneCommand(ctx: CanvasRenderingContext2D, cmd: DrawCommand): void {
 
     case 'text': {
       ctx.fillStyle = cmd.farbe;
-      ctx.font = `${cmd.groesse}px sans-serif`;
+      ctx.font = `${cmd.fett ? 'bold ' : ''}${cmd.groesse}px sans-serif`;
       ctx.textBaseline = 'alphabetic';
       if (cmd.rotation) {
         ctx.save();
@@ -619,6 +631,10 @@ export function useDrawingEngine(options: UseDrawingEngineOptions): UseDrawingEn
     dispatch({ type: 'MOVE_SELECTED', dx, dy });
   }, []);
 
+  const updateCommand = useCallback((id: CommandId, updates: Partial<DrawCommand>) => {
+    dispatch({ type: 'UPDATE_COMMAND', id, updates });
+  }, []);
+
   const render = useCallback(
     (ctx: CanvasRenderingContext2D) => {
       renderCanvas(ctx, stateRef.current, hintergrundbild, breite, hoehe);
@@ -656,6 +672,7 @@ export function useDrawingEngine(options: UseDrawingEngineOptions): UseDrawingEn
     state,
     addCommand,
     updateAktiverCommand,
+    updateCommand,
     undo,
     redo,
     allesLoeschen,

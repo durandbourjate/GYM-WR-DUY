@@ -71,6 +71,9 @@ export default function AbgabeDialog({ onSchliessen }: Props) {
     // Lokal als abgegeben markieren (auch wenn Remote fehlschlägt)
     pruefungAbgeben()
 
+    // Vollbild verlassen (Prüfung ist vorbei)
+    if (document.fullscreenElement) document.exitFullscreen().catch(() => {})
+
     // Abgabe-Daten in localStorage sichern als Fallback
     try {
       localStorage.setItem(`pruefung-abgabe-${abgabe.pruefungId}`, JSON.stringify(abgabe))

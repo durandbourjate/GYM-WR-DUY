@@ -7,7 +7,7 @@ import { fachbereichFarbe } from '../../utils/fachbereich.ts'
 import { ZeichnenCanvas } from './zeichnen/ZeichnenCanvas.tsx'
 import { ZeichnenToolbar } from './zeichnen/ZeichnenToolbar.tsx'
 import { STANDARD_FARBEN } from './zeichnen/ZeichnenTypes.ts'
-import type { Tool, ToolbarLayout } from './zeichnen/ZeichnenTypes.ts'
+import type { Tool, ToolbarLayout, DrawCommand, CommandId } from './zeichnen/ZeichnenTypes.ts'
 
 interface Props {
   frage: VisualisierungFrage
@@ -56,6 +56,12 @@ export default function ZeichnenFrage({ frage }: Props) {
 
   // Text-Rotation (0°, 90°, 180°, 270°)
   const [textRotation, setTextRotation] = useState<0 | 90 | 180 | 270>(0)
+
+  // Text-Grösse (S=14, M=18, L=24, XL=32)
+  const [textGroesse, setTextGroesse] = useState<number>(18)
+
+  // Text-Fett
+  const [textFett, setTextFett] = useState<boolean>(false)
 
   // Toolbar-Layout: aus localStorage laden (Standard: horizontal)
   const [toolbarLayout, setToolbarLayout] = useState<ToolbarLayout>(() => {
@@ -160,8 +166,11 @@ export default function ZeichnenFrage({ frage }: Props) {
   const undoRef = useRef<(() => void) | null>(null)
   const redoRef = useRef<(() => void) | null>(null)
   const clearRef = useRef<(() => void) | null>(null)
+  const updateCommandRef = useRef<((id: CommandId, updates: Partial<DrawCommand>) => void) | null>(null)
   const kannUndoRef = useRef(false)
   const kannRedoRef = useRef(false)
+  const selektierterCommandRef = useRef<CommandId | null>(null)
+  const commandsRef = useRef<DrawCommand[]>([])
 
   // Trigger-State damit Toolbar-Buttons re-rendern können
   const [undoState, setUndoState] = useState(0)
@@ -181,20 +190,56 @@ export default function ZeichnenFrage({ frage }: Props) {
     setUndoState((n) => n + 1)
   }, [])
 
-  // Engine-Aktionen von ZeichnenCanvas empfangen (Undo/Redo/Clear)
+  // Engine-Aktionen von ZeichnenCanvas empfangen (Undo/Redo/Clear + Selektion)
   const handleEngineActions = useCallback((actions: {
     undo: () => void;
     redo: () => void;
     allesLoeschen: () => void;
     kannUndo: boolean;
     kannRedo: boolean;
+    updateCommand: (id: string, updates: Partial<DrawCommand>) => void;
+    selektierterCommand: string | null;
+    commands: DrawCommand[];
   }) => {
     undoRef.current = actions.undo
     redoRef.current = actions.redo
     clearRef.current = actions.allesLoeschen
+    updateCommandRef.current = actions.updateCommand
     kannUndoRef.current = actions.kannUndo
     kannRedoRef.current = actions.kannRedo
+    selektierterCommandRef.current = actions.selektierterCommand
+    commandsRef.current = actions.commands
     setUndoState(n => n + 1)
+  }, [])
+
+  // Selektierter Text-Command (für Rotation/Grösse-Buttons bei Selektion)
+  const selektierterCmd = selektierterCommandRef.current
+    ? commandsRef.current.find(c => c.id === selektierterCommandRef.current)
+    : null
+  const istTextSelektiert = selektierterCmd?.typ === 'text'
+
+  // Rotation-Handler: aktualisiert selektierten Text ODER setzt Default für neuen Text
+  const handleTextRotation = useCallback((r: 0 | 90 | 180 | 270) => {
+    if (selektierterCommandRef.current && commandsRef.current.find(c => c.id === selektierterCommandRef.current && c.typ === 'text')) {
+      updateCommandRef.current?.(selektierterCommandRef.current, { rotation: r || undefined })
+    }
+    setTextRotation(r)
+  }, [])
+
+  // Grösse-Handler: aktualisiert selektierten Text ODER setzt Default
+  const handleTextGroesse = useCallback((g: number) => {
+    if (selektierterCommandRef.current && commandsRef.current.find(c => c.id === selektierterCommandRef.current && c.typ === 'text')) {
+      updateCommandRef.current?.(selektierterCommandRef.current, { groesse: g })
+    }
+    setTextGroesse(g)
+  }, [])
+
+  // Fett-Handler: aktualisiert selektierten Text ODER setzt Default
+  const handleTextFett = useCallback((f: boolean) => {
+    if (selektierterCommandRef.current && commandsRef.current.find(c => c.id === selektierterCommandRef.current && c.typ === 'text')) {
+      updateCommandRef.current?.(selektierterCommandRef.current, { fett: f || undefined })
+    }
+    setTextFett(f)
   }, [])
 
   // Daten-Grösse für Warnanzeige
@@ -245,8 +290,13 @@ export default function ZeichnenFrage({ frage }: Props) {
               kannUndo={kannUndoRef.current}
               kannRedo={kannRedoRef.current}
               disabled={abgegeben}
-              textRotation={textRotation}
-              onTextRotationChange={setTextRotation}
+              textRotation={istTextSelektiert && selektierterCmd.typ === 'text' ? (selektierterCmd.rotation ?? 0) : textRotation}
+              onTextRotationChange={handleTextRotation}
+              textGroesse={istTextSelektiert && selektierterCmd.typ === 'text' ? selektierterCmd.groesse : textGroesse}
+              onTextGroesseChange={handleTextGroesse}
+              textFett={istTextSelektiert && selektierterCmd.typ === 'text' ? (selektierterCmd.fett ?? false) : textFett}
+              onTextFettChange={handleTextFett}
+              istTextSelektiert={istTextSelektiert}
             />
           </div>
         )}
@@ -268,6 +318,8 @@ export default function ZeichnenFrage({ frage }: Props) {
             aktivesTool={aktivesTool}
             aktiveFarbe={aktiveFarbe}
             textRotation={textRotation}
+            textGroesse={textGroesse}
+            textFett={textFett}
             initialDaten={gespeicherteDaten}
             onDatenChange={handleDatenChange}
             onPNGExport={handlePNGExport}

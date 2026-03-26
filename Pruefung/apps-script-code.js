@@ -39,6 +39,8 @@ function doGet(e) {
       return ladePruefung(e.parameter.id, email);
     case 'ladeAlleConfigs':
       return ladeAlleConfigs(email);
+    case 'ladeEinzelConfig':
+      return ladeEinzelConfig(e.parameter.id, email);
     case 'ladeFragenbank':
       return ladeFragenbank(email);
     case 'monitoring':
@@ -367,21 +369,7 @@ function getOrCreateAntwortenSheet(pruefungId) {
     return sheet;
   }
 
-  // 2. Fallback: alte Methode (DriveApp-Ordner) für Migration
-  try {
-    var ordner = DriveApp.getFolderById(ANTWORTEN_ORDNER_ID);
-    var files = ordner.getFilesByName(tabName);
-    if (files.hasNext()) {
-      return SpreadsheetApp.open(files.next()).getSheets()[0];
-    }
-  } catch (e) { /* DriveApp nicht verfügbar */ }
-
   return null;
-}
-
-// Hilfsfunktion: Antworten-Sheet finden (Alias für Abwärtskompatibilität)
-function findeAntwortenSheet(pruefungId) {
-  return getOrCreateAntwortenSheet(pruefungId);
 }
 
 
@@ -1546,37 +1534,69 @@ function ladeAlleConfigs(email) {
     const configSheet = SpreadsheetApp.openById(CONFIGS_ID).getSheetByName('Configs');
     const data = getSheetData(configSheet);
 
-    const configs = data.map(row => ({
-      id: row.id,
-      titel: row.titel,
-      klasse: row.klasse,
-      gefaess: row.gefaess,
-      semester: row.semester,
-      fachbereiche: (row.fachbereiche || '').split(',').map(s => s.trim()).filter(Boolean),
-      datum: row.datum,
-      typ: row.typ,
-      modus: row.modus || 'pruefung',
-      dauerMinuten: Number(row.dauerMinuten),
-      zeitModus: row.zeitModus || 'countdown',
-      gesamtpunkte: Number(row.gesamtpunkte),
-      erlaubteKlasse: row.erlaubteKlasse,
-      sebErforderlich: row.sebErforderlich === 'true',
-      abschnitte: safeJsonParse(row.abschnitte, []),
-      zeitanzeigeTyp: row.zeitanzeigeTyp || 'countdown',
-      ruecknavigation: row.ruecknavigation !== 'false',
-      zufallsreihenfolgeFragen: row.zufallsreihenfolgeFragen === 'true',
-      autoSaveIntervallSekunden: Number(row.autoSaveIntervallSekunden) || 30,
-      heartbeatIntervallSekunden: Number(row.heartbeatIntervallSekunden) || 10,
-      freigeschaltet: row.freigeschaltet === 'true',
-      zeitverlaengerungen: safeJsonParse(row.zeitverlaengerungen, {}),
-      teilnehmer: safeJsonParse(row.teilnehmer, []),
-      materialien: safeJsonParse(row.materialien, []),
-      beendetUm: row.beendetUm || undefined,
-      korrektur: { aktiviert: false, modus: 'batch' },
-      feedback: { zeitpunkt: 'nach-review', format: 'pdf', detailgrad: 'vollstaendig' },
-    }));
+    const configs = data.map(mapConfigRow);
 
     return jsonResponse({ configs });
+  } catch (error) {
+    return jsonResponse({ error: error.message });
+  }
+}
+
+// === EINZELNE CONFIG LADEN (für Polling im DurchfuehrenDashboard) ===
+
+function mapConfigRow(row) {
+  return {
+    id: row.id,
+    titel: row.titel,
+    klasse: row.klasse,
+    gefaess: row.gefaess,
+    semester: row.semester,
+    fachbereiche: (row.fachbereiche || '').split(',').map(s => s.trim()).filter(Boolean),
+    datum: row.datum,
+    typ: row.typ,
+    modus: row.modus || 'pruefung',
+    dauerMinuten: Number(row.dauerMinuten),
+    zeitModus: row.zeitModus || 'countdown',
+    gesamtpunkte: Number(row.gesamtpunkte),
+    erlaubteKlasse: row.erlaubteKlasse,
+    sebErforderlich: row.sebErforderlich === 'true',
+    abschnitte: safeJsonParse(row.abschnitte, []),
+    zeitanzeigeTyp: row.zeitanzeigeTyp || 'countdown',
+    ruecknavigation: row.ruecknavigation !== 'false',
+    zufallsreihenfolgeFragen: row.zufallsreihenfolgeFragen === 'true',
+    autoSaveIntervallSekunden: Number(row.autoSaveIntervallSekunden) || 30,
+    heartbeatIntervallSekunden: Number(row.heartbeatIntervallSekunden) || 10,
+    freigeschaltet: row.freigeschaltet === 'true',
+    zeitverlaengerungen: safeJsonParse(row.zeitverlaengerungen, {}),
+    teilnehmer: safeJsonParse(row.teilnehmer, []),
+    materialien: safeJsonParse(row.materialien, []),
+    beendetUm: row.beendetUm || undefined,
+    kontrollStufe: row.kontrollStufe || 'standard',
+    sebAusnahmen: safeJsonParse(row.sebAusnahmen, []),
+    durchfuehrungId: row.durchfuehrungId || undefined,
+    korrektur: { aktiviert: false, modus: 'batch' },
+    feedback: { zeitpunkt: 'nach-review', format: 'pdf', detailgrad: 'vollstaendig' },
+  };
+}
+
+function ladeEinzelConfig(pruefungId, email) {
+  try {
+    if (!email.endsWith('@' + LP_DOMAIN)) {
+      return jsonResponse({ error: 'Nur für Lehrpersonen' });
+    }
+    if (!pruefungId) {
+      return jsonResponse({ error: 'Keine Prüfungs-ID angegeben' });
+    }
+
+    const configSheet = SpreadsheetApp.openById(CONFIGS_ID).getSheetByName('Configs');
+    const data = getSheetData(configSheet);
+    const row = data.find(r => r.id === pruefungId);
+
+    if (!row) {
+      return jsonResponse({ error: 'Prüfung nicht gefunden: ' + pruefungId });
+    }
+
+    return jsonResponse({ config: mapConfigRow(row) });
   } catch (error) {
     return jsonResponse({ error: error.message });
   }
@@ -1744,7 +1764,7 @@ function entsperreSuSEndpoint(body) {
       return jsonResponse({ error: 'pruefungId und schuelerEmail erforderlich' });
     }
 
-    var sheet = findeAntwortenSheet(pruefungId);
+    var sheet = getOrCreateAntwortenSheet(pruefungId);
     if (!sheet) return jsonResponse({ error: 'Antworten-Sheet nicht gefunden' });
 
     var data = getSheetData(sheet);
@@ -1787,7 +1807,7 @@ function setzeKontrollStufeEndpoint(body) {
       return jsonResponse({ error: 'Ungültige Kontrollstufe: ' + stufe });
     }
 
-    var sheet = findeAntwortenSheet(pruefungId);
+    var sheet = getOrCreateAntwortenSheet(pruefungId);
     if (!sheet) return jsonResponse({ error: 'Antworten-Sheet nicht gefunden' });
 
     var data = getSheetData(sheet);
@@ -1829,7 +1849,7 @@ function ladeMonitoring(pruefungId, email) {
     const globalBeendetUm = configRow.beendetUm || null;
 
     const schueler = [];
-    const sheet = findeAntwortenSheet(pruefungId);
+    const sheet = getOrCreateAntwortenSheet(pruefungId);
 
     if (sheet) {
       const data = getSheetData(sheet);
@@ -2818,7 +2838,7 @@ function starteKorrekturEndpoint(body) {
       return jsonResponse({ error: 'Nur für Lehrpersonen' });
     }
 
-    const statusSheet = findOrCreateKorrekturSheet(pruefungId);
+    const statusSheet = getOrCreateKorrekturSheet(pruefungId);
     setKorrekturStatus(statusSheet, 'laeuft', 0, 1);
     batchKorrektur(pruefungId, email, statusSheet);
     return jsonResponse({ success: true });
@@ -2948,18 +2968,7 @@ function getOrCreateKorrekturSheet(pruefungId) {
     return sheet;
   }
 
-  // Fallback
-  try {
-    var ordner = DriveApp.getFolderById(ANTWORTEN_ORDNER_ID);
-    var files = ordner.getFilesByName(tabName);
-    if (files.hasNext()) return SpreadsheetApp.open(files.next()).getSheets()[0];
-  } catch (e) {}
   return null;
-}
-
-// Alias für Abwärtskompatibilität
-function findOrCreateKorrekturSheet(pruefungId) {
-  return getOrCreateKorrekturSheet(pruefungId);
 }
 
 function setKorrekturStatus(sheet, status, erledigt, gesamt) {
@@ -3351,18 +3360,7 @@ function getOrCreateNachrichtenSheet(pruefungId) {
     return sheet;
   }
 
-  // Fallback
-  try {
-    var ordner = DriveApp.getFolderById(ANTWORTEN_ORDNER_ID);
-    var files = ordner.getFilesByName(tabName);
-    if (files.hasNext()) return SpreadsheetApp.open(files.next()).getSheets()[0];
-  } catch (e) {}
   return null;
-}
-
-// Alias für Abwärtskompatibilität
-function findOrCreateNachrichtenSheet(pruefungId) {
-  return getOrCreateNachrichtenSheet(pruefungId);
 }
 
 /**
@@ -3382,7 +3380,7 @@ function sendeNachrichtEndpoint(body) {
       return jsonResponse({ error: 'Nur Lehrpersonen können Nachrichten senden' });
     }
 
-    const sheet = findOrCreateNachrichtenSheet(pruefungId);
+    const sheet = getOrCreateNachrichtenSheet(pruefungId);
     const id = new Date().getTime().toString() + '_' + Math.random().toString(36).substr(2, 5);
     const zeitpunkt = new Date().toISOString();
 

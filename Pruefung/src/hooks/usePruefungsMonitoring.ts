@@ -27,6 +27,7 @@ export interface MonitoringLockdownCallbacks {
 export function usePruefungsMonitoring(lockdownCallbacks?: MonitoringLockdownCallbacks): void {
   const config = usePruefungStore((s) => s.config)
   const fragen = usePruefungStore((s) => s.fragen)
+  const alleFragen = usePruefungStore((s) => s.alleFragen)
   const antworten = usePruefungStore((s) => s.antworten)
   const startzeit = usePruefungStore((s) => s.startzeit)
   const abgegeben = usePruefungStore((s) => s.abgegeben)
@@ -98,7 +99,7 @@ export function usePruefungsMonitoring(lockdownCallbacks?: MonitoringLockdownCal
           antworten: antwortenRef.current as Record<string, Antwort>,
           version: neueVersion,
           istAbgabe: false,
-          gesamtFragen: fragen?.length || 0,
+          gesamtFragen: alleFragen?.length || fragen?.length || 0,
           requestId,
         })
 
@@ -128,7 +129,7 @@ export function usePruefungsMonitoring(lockdownCallbacks?: MonitoringLockdownCal
     }, intervallMs)
 
     return () => clearInterval(interval)
-  }, [config, abgegeben, backendVerfuegbar, user, fragen, setVerbindungsstatus, incrementRemoteSaveVersion, setLetzterSave, incrementAutoSaveCount, incrementNetzwerkFehler])
+  }, [config, abgegeben, backendVerfuegbar, user, fragen, alleFragen, setVerbindungsstatus, incrementRemoteSaveVersion, setLetzterSave, incrementAutoSaveCount, incrementNetzwerkFehler])
 
   // === 3. Heartbeat (alle 10s, konfigurierbar) + Beenden-Signal ===
   useEffect(() => {
@@ -140,7 +141,19 @@ export function usePruefungsMonitoring(lockdownCallbacks?: MonitoringLockdownCal
       try {
         const state = usePruefungStore.getState()
         const aktuelleFrageIndex = state.aktuelleFrageIndex
-        const beantworteteFragen = Object.keys(state.antworten).length
+        // Nur nicht-leere Antworten zählen (leere Keys entstehen beim Navigieren)
+        const beantworteteFragen = Object.entries(state.antworten).filter(([, a]) => {
+          if (!a) return false
+          const val = a as Record<string, unknown>
+          // Freitext: text nicht leer
+          if (val.typ === 'freitext') return !!(val.text && String(val.text).trim())
+          // MC/RF: mindestens eine Option gewählt
+          if (val.typ === 'multipleChoice' || val.typ === 'richtigFalsch') return Array.isArray(val.gewaehlteOptionen) && (val.gewaehlteOptionen as unknown[]).length > 0
+          // Lückentext: mindestens eine Lücke ausgefüllt
+          if (val.typ === 'lueckentext') return Array.isArray(val.luecken) && (val.luecken as string[]).some(l => !!l?.trim())
+          // Alle anderen Typen: Key existiert = beantwortet
+          return true
+        }).length
         const lockdownMeta = lockdownCallbacksRef.current?.getLockdownMeta?.()
         const currentAutoSaveCount = state.autoSaveCount
         const response = await apiService.heartbeat(config.id, user.email, aktuelleFrageIndex, beantworteteFragen, lockdownMeta, currentAutoSaveCount, tabSessionIdRef.current)

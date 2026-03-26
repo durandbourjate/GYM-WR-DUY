@@ -692,6 +692,8 @@ export const demoFragen: Frage[] = [
     autor: 'yannick.durand@gymhofwil.ch',
     fragetext: '**Aufgabe:** Lesen Sie den Ausschnitt aus dem Obligationenrecht (OR) zum Kaufvertrag.\n\n1. **Markieren** Sie (gelb) die Artikel, die die Haftung des Verkäufers für Sachmängel regeln.\n2. **Kommentieren** Sie Art. 201 OR: Was muss der Käufer tun, um seine Ansprüche zu wahren?\n3. **Markieren** Sie (blau) den Artikel, der die Rechte des Käufers bei Mängeln auflistet.',
     pdfDateiname: 'OR_Kaufvertrag_Auszug.pdf',
+    // Demo-Platzhalter-PDF (Fedlex OR Art. 184-210)
+    pdfUrl: 'https://www.fedlex.admin.ch/filestore/fedlex.data.admin.ch/eli/cc/27/317_321_377/20250101/de/pdf-a/fedlex-data-admin-ch-eli-cc-27-317_321_377-20250101-de-pdf-a.pdf',
     seitenAnzahl: 1,
     erlaubteWerkzeuge: ['highlighter', 'kommentar'],
     kategorien: [

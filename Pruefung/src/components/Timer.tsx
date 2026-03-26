@@ -60,6 +60,8 @@ export default function Timer({ onZeitAbgelaufen }: Props) {
     abgegebenRef.current = true
     pruefungAbgeben()
     onZeitAbgelaufen?.()
+    // Vollbild verlassen (Prüfung ist vorbei)
+    if (document.fullscreenElement) document.exitFullscreen().catch(() => {})
 
     try {
       const abgabeObjekt = {
