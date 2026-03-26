@@ -423,7 +423,7 @@ export default function DurchfuehrenDashboard({ pruefungId }: { pruefungId: stri
               onConfigUpdate={async (updates) => {
                 const neueConfig = { ...config, ...updates }
                 setConfig(neueConfig)
-                if (user) {
+                if (user && !istDemoModus && apiService.istKonfiguriert()) {
                   await apiService.speichereConfig(user.email, neueConfig)
                 }
               }}
@@ -481,7 +481,7 @@ export default function DurchfuehrenDashboard({ pruefungId }: { pruefungId: stri
               onConfigUpdate={async (updates) => {
                 const neueConfig = { ...config, ...updates }
                 setConfig(neueConfig)
-                if (user) {
+                if (user && !istDemoModus && apiService.istKonfiguriert()) {
                   await apiService.speichereConfig(user.email, neueConfig)
                 }
               }}
