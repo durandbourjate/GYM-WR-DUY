@@ -341,7 +341,7 @@ export function PDFSeite({
   }, [editierendeAnnotation, onAnnotationEditieren])
 
   // --- Freehand drawing ---
-  const handleDrawStart = useCallback((e: React.MouseEvent) => {
+  const handleDrawStart = useCallback((e: React.PointerEvent) => {
     if (readOnly || aktivesWerkzeug !== 'freihand' || !seitenInfo) return
     istZeichnung.current = true
     const rect = zeichenCanvasRef.current?.getBoundingClientRect()
@@ -362,7 +362,7 @@ export function PDFSeite({
     ctx.moveTo((e.clientX - rect.left) * dpr, (e.clientY - rect.top) * dpr)
   }, [readOnly, aktivesWerkzeug, seitenInfo, aktiveFarbe])
 
-  const handleDrawMove = useCallback((e: React.MouseEvent) => {
+  const handleDrawMove = useCallback((e: React.PointerEvent) => {
     if (!istZeichnung.current || !seitenInfo) return
     const rect = zeichenCanvasRef.current?.getBoundingClientRect()
     if (!rect) return
@@ -425,8 +425,8 @@ export function PDFSeite({
       onClick={handleClick}
       onDoubleClick={handleDoubleClick}
       onMouseUp={handleMouseUp}
-      onMouseDown={handleDrawStart}
-      onMouseMove={handleDrawMove}
+      onPointerDown={handleDrawStart}
+      onPointerMove={handleDrawMove}
     >
       {/* Layer 1: PDF canvas */}
       <canvas ref={pdfCanvasRef} className="absolute inset-0" />
@@ -453,8 +453,8 @@ export function PDFSeite({
       <canvas
         ref={zeichenCanvasRef}
         className="absolute inset-0"
-        style={{ pointerEvents: aktivesWerkzeug === 'freihand' ? 'auto' : 'none' }}
-        onMouseUp={handleDrawEnd}
+        style={{ pointerEvents: aktivesWerkzeug === 'freihand' ? 'auto' : 'none', touchAction: 'none' }}
+        onPointerUp={handleDrawEnd}
       />
 
       {/* Text-Eingabe-Overlay */}

@@ -36,6 +36,19 @@
 | Doppel-Save | Duplizieren erzeugte 2 Kopien — Race zwischen manuellem Speichern und Autosave-Timer. Beide sahen `id:''`, generierten je eine zufällige ID. Fix: (1) handleSpeichern bricht Autosave-Timer ab, (2) vorherigePruefungRef wird in handleSpeichernIntern mit `zuSpeichern` aktualisiert statt stale closure |
 | Materialien | `ladeAlleConfigs` + `ladePruefung` im Backend gaben `materialien` nicht zurück → Duplikat hatte keine Materialien, SuS sahen keine. Fix: `materialien: safeJsonParse(row.materialien, [])` in beide Funktionen (apps-script-code.js) |
 
+### Block 0b: Session 15 — 8 Fixes aus Klassentest 26.03.
+
+| Task | Beschreibung | Datei(en) |
+|------|-------------|-----------|
+| T1 | VorschauTab: Bild/PDF-Platzhalter für fehlende Fragetypen | VorschauTab.tsx |
+| T2 | KontrollStufeSelect: Ausklappbare Details pro Stufe | KontrollStufeSelect.tsx |
+| T3 | LobbyPhase: Prüfungs-URL anzeigen (wie Vorbereitung) | LobbyPhase.tsx |
+| T4 | Material-PDF volle Höhe: Flex-Kette repariert (Split + Overlay + MaterialInhalt) | MaterialPanel.tsx |
+| T5 | Bild Undo/Clear: Engine-Aktionen über `onEngineActions`-Callback exponiert | ZeichnenCanvas.tsx, ZeichnenFrage.tsx |
+| T6 | iPad PDF-Annotation: Mouse→Pointer Events + `touch-action:none` | PDFSeite.tsx |
+| T7 | iPad Tastatur bei Freitext: `user-select:text` Override in `.ProseMirror` (Lockdown setzt `user-select:none` auf body) | index.css |
+| T8 | Offline/Monitoring: Kein Code-Bug — Backend prüft `freigeschaltet` nicht bei Heartbeat/Save. Problem war transient (initiale Duplikat-Probleme). Braucht Live-Diagnose beim nächsten Test. |
+
 ### Block 1: Bugfixes (4 Tasks)
 
 | Bug | Beschreibung | Fix |

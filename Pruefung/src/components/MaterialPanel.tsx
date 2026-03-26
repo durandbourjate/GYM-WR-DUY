@@ -81,7 +81,7 @@ export default function MaterialPanel({ materialien, modus, onSchliessen, onModu
         )}
 
         {/* Inhalt — overflow-hidden damit iframe/PDF volle Höhe nutzt */}
-        <div className="flex-1 min-h-0">
+        <div className="flex-1 min-h-0 flex flex-col">
           {!aktivesMaterial ? (
             <div className="overflow-auto h-full">
               <MaterialAuswahl materialien={materialien} onWaehlen={setAktivesId} />
@@ -156,7 +156,7 @@ export default function MaterialPanel({ materialien, modus, onSchliessen, onModu
         )}
 
         {/* Inhalt */}
-        <div className="flex-1 min-h-0">
+        <div className="flex-1 min-h-0 flex flex-col">
           {!aktivesMaterial ? (
             <MaterialAuswahl materialien={materialien} onWaehlen={setAktivesId} />
           ) : (
@@ -212,7 +212,7 @@ function MaterialInhalt({ material }: { material: PruefungsMaterial }) {
   // Video-Dateien (Upload)
   if (material.typ === 'dateiUpload' && material.mimeType?.startsWith('video/') && material.url) {
     return (
-      <div className="h-full flex flex-col">
+      <div className="flex-1 min-h-0 flex flex-col">
         <div className="px-4 py-2 bg-slate-50 dark:bg-slate-700/30 text-xs text-slate-500 dark:text-slate-400 shrink-0">
           {material.titel}
         </div>
@@ -232,7 +232,7 @@ function MaterialInhalt({ material }: { material: PruefungsMaterial }) {
   // Video-Embed (YouTube, Vimeo, nanoo.tv)
   if (material.typ === 'videoEmbed' && material.embedUrl) {
     return (
-      <div className="h-full flex flex-col">
+      <div className="flex-1 min-h-0 flex flex-col">
         <div className="px-4 py-2 bg-slate-50 dark:bg-slate-700/30 text-xs text-slate-500 dark:text-slate-400 shrink-0">
           {material.titel}
         </div>
@@ -255,7 +255,7 @@ function MaterialInhalt({ material }: { material: PruefungsMaterial }) {
     const embedUrl = convertToEmbedUrl(materialUrl)
 
     return (
-      <div className="h-full flex flex-col">
+      <div className="flex-1 min-h-0 flex flex-col">
         <div className="px-4 py-2 bg-slate-50 dark:bg-slate-700/30 text-xs text-slate-500 dark:text-slate-400 shrink-0">
           {material.titel}
         </div>

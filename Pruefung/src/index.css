@@ -90,6 +90,10 @@ html:not(.dark) {
   min-height: 100%;
   padding: 1rem;
   color: #1e293b;
+  /* Override user-select:none von Lockdown — iPad braucht text-selection
+     damit contentEditable die Tastatur öffnet */
+  -webkit-user-select: text;
+  user-select: text;
 }
 .dark .tiptap-editor .ProseMirror {
   color: #f1f5f9;

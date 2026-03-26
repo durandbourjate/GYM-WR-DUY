@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import type { KontrollStufe } from '../../types/lockdown'
 
 interface Props {
@@ -14,6 +15,7 @@ const STUFEN: { key: KontrollStufe; label: string; icon: string; beschreibung: s
 ]
 
 export function KontrollStufeSelect({ value, onChange, disabled }: Props) {
+  const [detailsOffen, setDetailsOffen] = useState(false)
   return (
     <div>
       <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">
@@ -47,6 +49,30 @@ export function KontrollStufeSelect({ value, onChange, disabled }: Props) {
       <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
         Auf iPads wird die Stufe automatisch angepasst (kein Vollbild möglich).
       </p>
+      <button
+        type="button"
+        onClick={() => setDetailsOffen(!detailsOffen)}
+        className="text-xs text-blue-600 dark:text-blue-400 hover:underline cursor-pointer mt-1"
+      >
+        {detailsOffen ? 'Details ausblenden ▲' : 'Details anzeigen ▼'}
+      </button>
+
+      {detailsOffen && (
+        <div className="mt-2 text-xs text-slate-600 dark:text-slate-400 space-y-2 bg-slate-50 dark:bg-slate-800/50 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
+          <div>
+            <span className="font-medium">⚪ Keine:</span> Kein Logging, keine Einschränkungen. Für Übungen.
+          </div>
+          <div>
+            <span className="font-medium">🟢 Locker:</span> Verstösse werden geloggt und als Warnung angezeigt. Kein automatischer Block.
+          </div>
+          <div>
+            <span className="font-medium">🟡 Standard:</span> Copy/Paste blockiert, Vollbild erzwungen, Tab-Wechsel erkannt. Nach 3 Verstössen wird der SuS gesperrt (LP kann entsperren).
+          </div>
+          <div>
+            <span className="font-medium">🔴 Streng:</span> Sofortige Pause bei erstem Verstoss. SEB (Safe Exam Browser) empfohlen. Kein Tab-Wechsel möglich.
+          </div>
+        </div>
+      )}
     </div>
   )
 }

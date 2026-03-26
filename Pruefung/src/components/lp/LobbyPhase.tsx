@@ -32,6 +32,11 @@ export default function LobbyPhase({ config, schuelerStatus, onFreischalten, onZ
     ? Math.round((bereite.length / teilnehmer.length) * 100)
     : 0
 
+  const handleLinkKopieren = () => {
+    const url = `${window.location.origin}${window.location.pathname}?id=${config.id}`
+    navigator.clipboard.writeText(url)
+  }
+
   return (
     <div className="space-y-4">
       {/* Fortschrittsbalken */}
@@ -158,6 +163,21 @@ export default function LobbyPhase({ config, schuelerStatus, onFreischalten, onZ
           }`}
         >
           {freischaltenLaedt ? '⏳ Wird freigeschaltet...' : config.freigeschaltet ? '✓ Freigeschaltet' : '▶ Freischalten'}
+        </button>
+      </div>
+
+      {/* Prüfungs-Link */}
+      <div className="flex items-center gap-2 p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-slate-700">
+        <span className="text-xs text-slate-500 dark:text-slate-400 flex-1 font-mono truncate">
+          {window.location.origin}{window.location.pathname}?id={config.id}
+        </span>
+        <button
+          type="button"
+          onClick={handleLinkKopieren}
+          className="text-xs px-2 py-1 bg-slate-200 dark:bg-slate-700 rounded hover:bg-slate-300 dark:hover:bg-slate-600 cursor-pointer"
+          title="Link kopieren"
+        >
+          Kopieren
         </button>
       </div>
     </div>

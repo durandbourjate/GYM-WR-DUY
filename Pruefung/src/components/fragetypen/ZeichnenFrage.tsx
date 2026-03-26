@@ -181,6 +181,22 @@ export default function ZeichnenFrage({ frage }: Props) {
     setUndoState((n) => n + 1)
   }, [])
 
+  // Engine-Aktionen von ZeichnenCanvas empfangen (Undo/Redo/Clear)
+  const handleEngineActions = useCallback((actions: {
+    undo: () => void;
+    redo: () => void;
+    allesLoeschen: () => void;
+    kannUndo: boolean;
+    kannRedo: boolean;
+  }) => {
+    undoRef.current = actions.undo
+    redoRef.current = actions.redo
+    clearRef.current = actions.allesLoeschen
+    kannUndoRef.current = actions.kannUndo
+    kannRedoRef.current = actions.kannRedo
+    setUndoState(n => n + 1)
+  }, [])
+
   // Daten-Grösse für Warnanzeige
   const datenGroesse = aktuellerDatenRef.current.length
 
@@ -256,6 +272,7 @@ export default function ZeichnenFrage({ frage }: Props) {
             onDatenChange={handleDatenChange}
             onPNGExport={handlePNGExport}
             disabled={abgegeben}
+            onEngineActions={handleEngineActions}
           />
         </div>
       </div>

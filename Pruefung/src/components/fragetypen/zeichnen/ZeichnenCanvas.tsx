@@ -19,6 +19,13 @@ interface ZeichnenCanvasProps {
   onDatenChange: (daten: string) => void;
   onPNGExport: (png: string) => void;
   disabled: boolean;
+  onEngineActions?: (actions: {
+    undo: () => void;
+    redo: () => void;
+    allesLoeschen: () => void;
+    kannUndo: boolean;
+    kannRedo: boolean;
+  }) => void;
 }
 
 // Text-Overlay-Zustand
@@ -99,6 +106,7 @@ export function ZeichnenCanvas({
   onDatenChange,
   onPNGExport,
   disabled,
+  onEngineActions,
 }: ZeichnenCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -128,6 +136,17 @@ export function ZeichnenCanvas({
     breite: logischeBreite,
     hoehe: logischeHoehe,
   });
+
+  // Engine-Aktionen an Elternkomponente melden
+  useEffect(() => {
+    onEngineActions?.({
+      undo: engine.undo,
+      redo: engine.redo,
+      allesLoeschen: engine.allesLoeschen,
+      kannUndo: engine.kannUndo,
+      kannRedo: engine.kannRedo,
+    });
+  }, [engine.state.commands, engine.undo, engine.redo, engine.allesLoeschen, engine.kannUndo, engine.kannRedo, onEngineActions]);
 
   // Text-Overlay-Zustand
   const [textOverlay, setTextOverlay] = useState<TextOverlay>(TEXT_OVERLAY_LEER);
