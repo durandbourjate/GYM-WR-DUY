@@ -350,23 +350,89 @@ function uploadMaterial(body) {
 // === HILFSFUNKTIONEN ===
 
 function findOrCreateAntwortenSheet(sheetName, pruefungId) {
-  const ordner = DriveApp.getFolderById(ANTWORTEN_ORDNER_ID);
-  const files = ordner.getFilesByName(sheetName);
+  // 1. Config-Zeile prüfen ob antwortenSheetId gespeichert ist
+  var configSheet = SpreadsheetApp.openById(CONFIGS_ID).getSheetByName('Configs');
+  var configData = getSheetData(configSheet);
+  var configRow = configData.find(function(row) { return row.id === pruefungId; });
 
-  if (files.hasNext()) {
-    return SpreadsheetApp.open(files.next()).getSheets()[0];
+  if (configRow && configRow.antwortenSheetId) {
+    try {
+      return SpreadsheetApp.openById(configRow.antwortenSheetId).getSheets()[0];
+    } catch (e) {
+      // Sheet wurde gelöscht — weiter zum Fallback
+    }
   }
 
-  const ss = SpreadsheetApp.create(sheetName);
-  const sheet = ss.getSheets()[0];
-  const headers = ['email', 'name', 'version', 'antworten', 'letzterSave', 'istAbgabe', 'letzterHeartbeat', 'heartbeats', 'beantworteteFragen', 'gesamtFragen'];
+  // 2. Fallback: Im Drive-Ordner suchen (funktioniert für bestehende Sheets)
+  try {
+    var ordner = DriveApp.getFolderById(ANTWORTEN_ORDNER_ID);
+    var files = ordner.getFilesByName(sheetName);
+    if (files.hasNext()) {
+      var gefundenesSS = SpreadsheetApp.open(files.next());
+      // ID in Config speichern für zukünftige Lookups
+      speichereAntwortenSheetId(configSheet, configData, pruefungId, gefundenesSS.getId());
+      return gefundenesSS.getSheets()[0];
+    }
+  } catch (e) {
+    // DriveApp-Berechtigung fehlt — ignorieren, neues Sheet erstellen
+  }
+
+  // 3. Neues Sheet erstellen (nur SpreadsheetApp, kein DriveApp nötig)
+  var ss = SpreadsheetApp.create(sheetName);
+  var sheet = ss.getSheets()[0];
+  var headers = ['email', 'name', 'version', 'antworten', 'letzterSave', 'istAbgabe', 'letzterHeartbeat', 'heartbeats', 'beantworteteFragen', 'gesamtFragen'];
   sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
   sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold');
 
-  const file = DriveApp.getFileById(ss.getId());
-  ordner.addFile(file);
-  DriveApp.getRootFolder().removeFile(file);
+  // ID in Config-Zeile speichern
+  speichereAntwortenSheetId(configSheet, configData, pruefungId, ss.getId());
   return sheet;
+}
+
+// Hilfsfunktion: Antworten-Sheet finden (erst Config-ID, dann Ordner-Fallback)
+// Gibt null zurück wenn kein Sheet existiert (im Gegensatz zu findOrCreateAntwortenSheet)
+function findeAntwortenSheet(pruefungId) {
+  var configSheet = SpreadsheetApp.openById(CONFIGS_ID).getSheetByName('Configs');
+  var configData = getSheetData(configSheet);
+  var configRow = configData.find(function(row) { return row.id === pruefungId; });
+
+  // 1. Über gespeicherte ID
+  if (configRow && configRow.antwortenSheetId) {
+    try {
+      return SpreadsheetApp.openById(configRow.antwortenSheetId).getSheets()[0];
+    } catch (e) { /* gelöscht */ }
+  }
+
+  // 2. Fallback: Im Drive-Ordner suchen
+  var sheetName = 'Antworten_' + pruefungId;
+  try {
+    var ordner = DriveApp.getFolderById(ANTWORTEN_ORDNER_ID);
+    var files = ordner.getFilesByName(sheetName);
+    if (files.hasNext()) {
+      var ss = SpreadsheetApp.open(files.next());
+      // ID cachen
+      if (configSheet && configData) {
+        speichereAntwortenSheetId(configSheet, configData, pruefungId, ss.getId());
+      }
+      return ss.getSheets()[0];
+    }
+  } catch (e) { /* DriveApp nicht verfügbar */ }
+
+  return null;
+}
+
+// Hilfsfunktion: antwortenSheetId in Config-Zeile speichern
+function speichereAntwortenSheetId(configSheet, configData, pruefungId, sheetId) {
+  var headers = configSheet.getRange(1, 1, 1, configSheet.getLastColumn()).getValues()[0];
+  var colIdx = headers.indexOf('antwortenSheetId');
+  if (colIdx < 0) {
+    colIdx = headers.length;
+    configSheet.getRange(1, colIdx + 1).setValue('antwortenSheetId');
+  }
+  var rowIdx = configData.findIndex(function(row) { return row.id === pruefungId; });
+  if (rowIdx >= 0) {
+    configSheet.getRange(rowIdx + 2, colIdx + 1).setValue(sheetId);
+  }
 }
 
 function getSheetData(sheet) {
@@ -1711,12 +1777,9 @@ function entsperreSuSEndpoint(body) {
       return jsonResponse({ error: 'pruefungId und schuelerEmail erforderlich' });
     }
 
-    var sheetName = 'Antworten_' + pruefungId;
-    var ordner = DriveApp.getFolderById(ANTWORTEN_ORDNER_ID);
-    var files = ordner.getFilesByName(sheetName);
-    if (!files.hasNext()) return jsonResponse({ error: 'Antworten-Sheet nicht gefunden' });
+    var sheet = findeAntwortenSheet(pruefungId);
+    if (!sheet) return jsonResponse({ error: 'Antworten-Sheet nicht gefunden' });
 
-    var sheet = SpreadsheetApp.open(files.next()).getSheets()[0];
     var data = getSheetData(sheet);
     var rowIdx = data.findIndex(function(r) { return r.email === schuelerEmail; });
     if (rowIdx < 0) return jsonResponse({ error: 'SuS nicht gefunden' });
@@ -1757,12 +1820,9 @@ function setzeKontrollStufeEndpoint(body) {
       return jsonResponse({ error: 'Ungültige Kontrollstufe: ' + stufe });
     }
 
-    var sheetName = 'Antworten_' + pruefungId;
-    var ordner = DriveApp.getFolderById(ANTWORTEN_ORDNER_ID);
-    var files = ordner.getFilesByName(sheetName);
-    if (!files.hasNext()) return jsonResponse({ error: 'Antworten-Sheet nicht gefunden' });
+    var sheet = findeAntwortenSheet(pruefungId);
+    if (!sheet) return jsonResponse({ error: 'Antworten-Sheet nicht gefunden' });
 
-    var sheet = SpreadsheetApp.open(files.next()).getSheets()[0];
     var data = getSheetData(sheet);
     var rowIdx = data.findIndex(function(r) { return r.email === schuelerEmail; });
     if (rowIdx < 0) return jsonResponse({ error: 'SuS nicht gefunden' });
@@ -1801,13 +1861,10 @@ function ladeMonitoring(pruefungId, email) {
     // Globales beendetUm aus Configs-Sheet prüfen
     const globalBeendetUm = configRow.beendetUm || null;
 
-    const sheetName = 'Antworten_' + pruefungId;
-    const ordner = DriveApp.getFolderById(ANTWORTEN_ORDNER_ID);
-    const files = ordner.getFilesByName(sheetName);
     const schueler = [];
+    const sheet = findeAntwortenSheet(pruefungId);
 
-    if (files.hasNext()) {
-      const sheet = SpreadsheetApp.open(files.next()).getSheets()[0];
+    if (sheet) {
       const data = getSheetData(sheet);
       for (const row of data) {
         // Status: abgegeben > beendet-lp (individuell oder global) > aktiv > nicht-gestartet
@@ -4312,4 +4369,23 @@ function ladeTrackerDatenEndpoint(body) {
   } catch (error) {
     return jsonResponse({ error: error.message });
   }
+}
+
+// === AUTORISIERUNG TRIGGERN ===
+// Diese Funktion im Editor manuell ausführen (▶) um alle Berechtigungen zu genehmigen.
+// Kann danach wieder gelöscht werden.
+function autorisiereBerechtigungen() {
+  // Drive-Scope triggern
+  var ordner = DriveApp.getRootFolder();
+  Logger.log('Drive OK: ' + ordner.getName());
+
+  // Spreadsheet-Scope triggern
+  SpreadsheetApp.getActive();
+  Logger.log('Spreadsheets OK');
+
+  // External Request-Scope triggern
+  var response = UrlFetchApp.fetch('https://httpbin.org/get');
+  Logger.log('External Request OK: ' + response.getResponseCode());
+
+  Logger.log('Alle Berechtigungen erfolgreich autorisiert!');
 }
