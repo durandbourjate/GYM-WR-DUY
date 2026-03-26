@@ -604,6 +604,7 @@ function ladePruefung(pruefungId, email) {
       materialien: safeJsonParse(configRow.materialien, []),
       beendetUm: configRow.beendetUm || undefined,
       durchfuehrungId: configRow.durchfuehrungId || undefined,
+      materialien: safeJsonParse(configRow.materialien, []),
       korrektur: { aktiviert: false, modus: 'batch' },
       feedback: { zeitpunkt: 'nach-review', format: 'pdf', detailgrad: 'vollstaendig' },
     };
@@ -1548,6 +1549,7 @@ function ladeAlleConfigs(email) {
       freigeschaltet: row.freigeschaltet === 'true',
       zeitverlaengerungen: safeJsonParse(row.zeitverlaengerungen, {}),
       teilnehmer: safeJsonParse(row.teilnehmer, []),
+      materialien: safeJsonParse(row.materialien, []),
       beendetUm: row.beendetUm || undefined,
       korrektur: { aktiviert: false, modus: 'batch' },
       feedback: { zeitpunkt: 'nach-review', format: 'pdf', detailgrad: 'vollstaendig' },
