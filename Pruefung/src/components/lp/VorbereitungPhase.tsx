@@ -271,13 +271,15 @@ export default function VorbereitungPhase({ config, onTeilnehmerGesetzt, onWeite
             </span>
           </span>
           <div className="flex items-center gap-2">
-            <button
-              type="button"
+            <span
+              role="button"
+              tabIndex={0}
               onClick={(e) => { e.stopPropagation(); ladeKlassenlisten() }}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); ladeKlassenlisten() } }}
               className="text-xs text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
             >
               Neu laden
-            </button>
+            </span>
             <span className={`text-slate-400 dark:text-slate-500 transition-transform duration-200 ${kursAuswahlOffen ? 'rotate-180' : ''}`}>
               ▼
             </span>

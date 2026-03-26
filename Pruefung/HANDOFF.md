@@ -22,9 +22,15 @@
 
 ## Session 26.03.2026 (14) — Bugfixes + UX aus Live-Tests (Runde 3)
 
-### Status: ERLEDIGT (11 Tasks)
+### Status: ERLEDIGT (12 Tasks)
 
 **Plan:** `docs/superpowers/plans/2026-03-26-session14-bugfixes-ux.md`
+
+### Block 0: Cleanup
+
+| Fix | Beschreibung |
+|-----|-------------|
+| HTML | `button > button` Nesting-Warnung in VorbereitungPhase (Kurs-Accordion) → innerer Button zu `<span role="button">` |
 
 ### Block 1: Bugfixes (4 Tasks)
 
@@ -74,6 +80,7 @@ src/components/lp/DurchfuehrenDashboard.tsx            — U29 (onConfigUpdate P
 src/components/lp/KorrekturDashboard.tsx               — U30 (Auto-geprüft) + U31 (Modus-Toggle)
 src/components/lp/KorrekturFragenAnsicht.tsx           — U31 (NEU: Frage-für-Frage Komponente)
 src/components/lp/MultiDurchfuehrenDashboard.tsx       — U32 (Auswertung-Tab mit Prüfungs-Tabs)
+src/components/lp/VorbereitungPhase.tsx                — HTML button-nesting Fix (Kurs-Accordion)
 ```
 
 ---
