@@ -78,6 +78,11 @@ export default function PruefungsComposer({ config, onZurueck, onDuplizieren }: 
   const autoSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [autoSaveStatus, setAutoSaveStatus] = useState<'idle' | 'gespeichert'>('idle')
 
+  // Ref-Spiegel für aktuellen Zustand — verhindert stale Closures in Autosave-Timern
+  const pruefungRef = useRef(pruefung)
+  pruefungRef.current = pruefung
+  const speichertRef = useRef(false)
+
   // Fragen-Map laden
   const [fragenMap, setFragenMap] = useState<Record<string, Frage>>({})
   const [fragenGeladen, setFragenGeladen] = useState(false)
@@ -236,30 +241,37 @@ export default function PruefungsComposer({ config, onZurueck, onDuplizieren }: 
 
   /** Interne Speicher-Logik (wiederverwendbar für Autosave und manuelles Speichern) */
   async function handleSpeichernIntern(): Promise<boolean> {
-    const zuSpeichern = { ...pruefung }
-    if (!zuSpeichern.id) {
-      zuSpeichern.id = generiereId(zuSpeichern)
-    }
-    if (!zuSpeichern.erlaubteKlasse || zuSpeichern.erlaubteKlasse === '—' || zuSpeichern.erlaubteKlasse === '-') {
-      zuSpeichern.erlaubteKlasse = zuSpeichern.klasse
-    }
+    // Guard: Verhindert parallele Saves (Race zwischen Autosave und manuellem Save)
+    if (speichertRef.current) return true
+    speichertRef.current = true
 
-    if (istDemoModus || !apiService.istKonfiguriert()) {
-      await new Promise((r) => setTimeout(r, 300))
-      setPruefung(zuSpeichern)
-      // Ref aktualisieren damit Autosave keinen Phantom-Change sieht
-      vorherigePruefungRef.current = JSON.stringify(zuSpeichern)
-      return true
-    }
+    try {
+      // WICHTIG: pruefungRef.current statt pruefung — immer aktueller Zustand,
+      // nicht der Closure-Snapshot vom Zeitpunkt der Timer-Erstellung
+      const zuSpeichern = { ...pruefungRef.current }
+      if (!zuSpeichern.id) {
+        zuSpeichern.id = generiereId(zuSpeichern)
+      }
+      if (!zuSpeichern.erlaubteKlasse || zuSpeichern.erlaubteKlasse === '—' || zuSpeichern.erlaubteKlasse === '-') {
+        zuSpeichern.erlaubteKlasse = zuSpeichern.klasse
+      }
 
-    const ok = await apiService.speichereConfig(user!.email, zuSpeichern)
-    if (ok) {
-      setPruefung(zuSpeichern)
-      // Ref aktualisieren damit Autosave keinen Phantom-Change sieht
-      // (zuSpeichern enthält die generierte ID — pruefung aus dem Closure noch nicht)
-      vorherigePruefungRef.current = JSON.stringify(zuSpeichern)
+      if (istDemoModus || !apiService.istKonfiguriert()) {
+        await new Promise((r) => setTimeout(r, 300))
+        setPruefung(zuSpeichern)
+        vorherigePruefungRef.current = JSON.stringify(zuSpeichern)
+        return true
+      }
+
+      const ok = await apiService.speichereConfig(user!.email, zuSpeichern)
+      if (ok) {
+        setPruefung(zuSpeichern)
+        vorherigePruefungRef.current = JSON.stringify(zuSpeichern)
+      }
+      return ok
+    } finally {
+      speichertRef.current = false
     }
-    return ok
   }
 
   async function handleSpeichern(): Promise<void> {
