@@ -65,6 +65,8 @@ export default function PDFFrage({ frage }: Props) {
   )
   const [zoom, setZoom] = useState<ZoomStufe>(1)
   const [textRotation, setTextRotation] = useState<0 | 90 | 180 | 270>(0)
+  const [textGroesse, setTextGroesse] = useState(18)
+  const [textFett, setTextFett] = useState(false)
   const [toolbarLayout, setToolbarLayout] = useState<'horizontal' | 'vertikal'>('horizontal')
   const [ladeFehler, setLadeFehler] = useState<string | null>(null)
 
@@ -304,6 +306,10 @@ export default function PDFFrage({ frage }: Props) {
               onLayoutToggle={() => setToolbarLayout(l => l === 'horizontal' ? 'vertikal' : 'horizontal')}
               textRotation={textRotation}
               onTextRotationChange={setTextRotation}
+              textGroesse={textGroesse}
+              onTextGroesseChange={setTextGroesse}
+              textFett={textFett}
+              onTextFettChange={setTextFett}
             />
           </div>
         )}
@@ -320,6 +326,8 @@ export default function PDFFrage({ frage }: Props) {
         kategorien={frage.kategorien}
         aktiveKategorieId={aktiveKategorieId}
         textRotation={textRotation}
+        textGroesse={textGroesse}
+        textFett={textFett}
         onAnnotationHinzufuegen={handleAnnotationHinzufuegen}
         onAnnotationLoeschen={handleAnnotationLoeschen}
         onAnnotationEditieren={handleAnnotationEditieren}

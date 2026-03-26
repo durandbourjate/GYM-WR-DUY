@@ -25,6 +25,10 @@ interface Props {
   onLayoutToggle?: () => void
   textRotation?: 0 | 90 | 180 | 270
   onTextRotationChange?: (r: 0 | 90 | 180 | 270) => void
+  textGroesse?: number
+  onTextGroesseChange?: (g: number) => void
+  textFett?: boolean
+  onTextFettChange?: (f: boolean) => void
 }
 
 const WERKZEUG_DEFS: { id: PDFAnnotationsWerkzeug; icon: string | ReactNode; label: string }[] = [
@@ -56,6 +60,10 @@ export function PDFToolbar({
   onLayoutToggle,
   textRotation = 0,
   onTextRotationChange,
+  textGroesse = 18,
+  onTextGroesseChange,
+  textFett = false,
+  onTextFettChange,
 }: Props) {
   const isHorizontal = layout === 'horizontal'
   const [farbPickerOffen, setFarbPickerOffen] = useState(false)
@@ -191,19 +199,52 @@ export function PDFToolbar({
         </div>
       )}
 
-      {/* Text-Rotation (nur bei Text-Werkzeug) */}
-      {aktivesWerkzeug === 'text' && onTextRotationChange && (
-        <button
-          type="button"
-          onClick={() => onTextRotationChange(((textRotation + 90) % 360) as 0 | 90 | 180 | 270)}
-          className={[
-            btnKlassen(false),
-            'border border-slate-300 dark:border-slate-600',
-          ].join(' ')}
-          title={`Rotation: ${textRotation}°`}
-        >
-          ⟳{textRotation > 0 ? ` ${textRotation}°` : ''}
-        </button>
+      {/* Text-Optionen (nur bei Text-Werkzeug) */}
+      {aktivesWerkzeug === 'text' && (
+        <>
+          {/* Schriftgrösse S/M/L/XL */}
+          {onTextGroesseChange && (
+            <div role="group" aria-label="Schriftgrösse" className={`flex gap-0.5 ${isHorizontal ? '' : 'flex-col'}`}>
+              {([{ label: 'S', px: 14 }, { label: 'M', px: 18 }, { label: 'L', px: 24 }, { label: 'XL', px: 32 }] as const).map(({ label, px }) => (
+                <button
+                  key={label}
+                  type="button"
+                  onClick={() => onTextGroesseChange(px)}
+                  className={btnKlassen(textGroesse === px)}
+                  title={`Schriftgrösse ${label} (${px}px)`}
+                  style={{ fontSize: Math.max(11, px * 0.6) }}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          )}
+          {/* Fett-Toggle */}
+          {onTextFettChange && (
+            <button
+              type="button"
+              onClick={() => onTextFettChange(!textFett)}
+              className={btnKlassen(textFett)}
+              title={textFett ? 'Fett (aktiv)' : 'Fett'}
+            >
+              <span style={{ fontWeight: 'bold' }}>B</span>
+            </button>
+          )}
+          {/* Rotation */}
+          {onTextRotationChange && (
+            <button
+              type="button"
+              onClick={() => onTextRotationChange(((textRotation + 90) % 360) as 0 | 90 | 180 | 270)}
+              className={[
+                btnKlassen(false),
+                'border border-slate-300 dark:border-slate-600',
+              ].join(' ')}
+              title={`Rotation: ${textRotation}°`}
+            >
+              ⟳{textRotation > 0 ? ` ${textRotation}°` : ''}
+            </button>
+          )}
+        </>
       )}
 
       {/* Undo / Redo */}

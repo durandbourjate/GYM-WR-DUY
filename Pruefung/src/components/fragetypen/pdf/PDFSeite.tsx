@@ -22,6 +22,8 @@ interface Props {
   onAnnotationLoeschen: (id: string) => void
   onAnnotationEditieren?: (id: string, updates: Partial<PDFAnnotation>) => void
   textRotation?: 0 | 90 | 180 | 270
+  textGroesse?: number
+  textFett?: boolean
   readOnly?: boolean
 }
 
@@ -95,7 +97,7 @@ function leseTextauswahl(container: HTMLDivElement): PDFTextRange | null {
 export function PDFSeite({
   seitenNr, zoom, renderer, annotationen, aktivesWerkzeug, aktiveFarbe,
   kategorien, aktiveKategorieId: _aktiveKategorieId, onAnnotationHinzufuegen, onAnnotationLoeschen,
-  onAnnotationEditieren, textRotation = 0, readOnly,
+  onAnnotationEditieren, textRotation = 0, textGroesse = 18, textFett = false, readOnly,
 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null)
   const pdfCanvasRef = useRef<HTMLCanvasElement>(null)
@@ -110,6 +112,8 @@ export function PDFSeite({
     sichtbar: boolean; relX: number; relY: number; cssX: number; cssY: number; text: string
   }>({ sichtbar: false, relX: 0, relY: 0, cssX: 0, cssY: 0, text: '' })
   const textInputRef = useRef<HTMLInputElement>(null)
+  // Auswahl-State für Text-Annotationen
+  const [selectedAnnotation, setSelectedAnnotation] = useState<string | null>(null)
   // Edit state for existing text annotations (double-click to edit)
   const [editierendeAnnotation, setEditierendeAnnotation] = useState<{
     id: string; text: string; cssX: number; cssY: number; farbe: string; groesse: number
@@ -228,6 +232,19 @@ export function PDFSeite({
       return
     }
 
+    // Auswahl: Text-Annotation anklicken → selektieren/deselektieren
+    if (aktivesWerkzeug === 'auswahl') {
+      let node: Element | null = e.target as Element
+      let annotId: string | null = null
+      while (node && node !== e.currentTarget) {
+        annotId = node.getAttribute('data-annotation-id')
+        if (annotId) break
+        node = node.parentElement
+      }
+      setSelectedAnnotation(annotId === selectedAnnotation ? null : (annotId ?? null))
+      return
+    }
+
     if (!seitenInfo) return
 
     // Text-Werkzeug: Input-Overlay an Klickposition
@@ -288,13 +305,13 @@ export function PDFSeite({
       position: { x: textOverlay.relX, y: textOverlay.relY },
       text: textOverlay.text.trim(),
       farbe: aktiveFarbe,
-      groesse: 16,
-      fett: false,
+      groesse: textGroesse,
+      fett: textFett,
       rotation: textRotation || undefined,
     }
     onAnnotationHinzufuegen(annotation)
     setTextOverlay({ sichtbar: false, relX: 0, relY: 0, cssX: 0, cssY: 0, text: '' })
-  }, [textOverlay, seitenNr, aktiveFarbe, textRotation, onAnnotationHinzufuegen])
+  }, [textOverlay, seitenNr, aktiveFarbe, textRotation, textGroesse, textFett, onAnnotationHinzufuegen])
 
   // --- Doppelklick: Text-Annotation editieren ---
   const handleDoubleClick = useCallback((e: React.MouseEvent) => {
@@ -401,7 +418,7 @@ export function PDFSeite({
 
   // --- Render SVG overlay content ---
   const svgContent = seitenInfo ? renderSVGOverlay(
-    annotationen, seitenInfo, textLayerRef.current, zoom
+    annotationen, seitenInfo, textLayerRef.current, zoom, selectedAnnotation
   ) : null
 
   // Container dimensions
@@ -478,8 +495,9 @@ export function PDFSeite({
             position: 'absolute',
             left: textOverlay.cssX,
             top: textOverlay.cssY,
-            fontSize: '16px',
+            fontSize: `${textGroesse}px`,
             fontFamily: 'sans-serif',
+            fontWeight: textFett ? 'bold' : 'normal',
             color: aktiveFarbe,
             background: 'rgba(255,255,255,0.9)',
             border: '2px solid #3b82f6',
@@ -530,6 +548,44 @@ export function PDFSeite({
         />
       )}
 
+      {/* Aktionsleiste für selektierte Text-Annotation */}
+      {selectedAnnotation && (() => {
+        const ann = annotationen.find(a => a.id === selectedAnnotation && a.werkzeug === 'text') as PDFTextAnnotation | undefined
+        if (!ann || !seitenInfo) return null
+        const px = ann.position.x * seitenInfo.breite
+        const py = ann.position.y * seitenInfo.hoehe
+        return (
+          <div
+            style={{ position: 'absolute', left: px, top: py + 8, zIndex: 25 }}
+            className="flex gap-1 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg shadow-lg p-1"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              className="px-2 py-1 text-xs hover:bg-slate-100 dark:hover:bg-slate-700 rounded"
+              title="Rotation ändern"
+              onClick={() => {
+                const neueRotation = (((ann.rotation || 0) + 90) % 360) as 0 | 90 | 180 | 270
+                onAnnotationEditieren?.(ann.id, { rotation: neueRotation || undefined } as Partial<PDFAnnotation>)
+              }}
+            >
+              ⟳ {ann.rotation || 0}°
+            </button>
+            <button
+              type="button"
+              className="px-2 py-1 text-xs text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded"
+              title="Löschen"
+              onClick={() => {
+                onAnnotationLoeschen(ann.id)
+                setSelectedAnnotation(null)
+              }}
+            >
+              ✕
+            </button>
+          </div>
+        )
+      })()}
+
       {/* Popover: comment */}
       {kommentarPopover && (
         <PDFKommentarPopover
@@ -562,6 +618,7 @@ function renderSVGOverlay(
   seitenInfo: PDFSeitenInfo,
   textLayer: HTMLDivElement | null,
   zoom: ZoomStufe,
+  selectedAnnotationId?: string | null,
 ): React.ReactNode[] {
   const elements: React.ReactNode[] = []
 
@@ -580,7 +637,7 @@ function renderSVGOverlay(
         elements.push(renderFreihand(ann, seitenInfo))
         break
       case 'text':
-        elements.push(renderTextAnnotation(ann, seitenInfo))
+        elements.push(renderTextAnnotation(ann, seitenInfo, ann.id === selectedAnnotationId))
         break
     }
   }
@@ -707,27 +764,44 @@ function renderFreihand(
 function renderTextAnnotation(
   ann: PDFTextAnnotation,
   seitenInfo: PDFSeitenInfo,
+  selected = false,
 ): React.ReactNode {
   const px = ann.position.x * seitenInfo.breite
   const py = ann.position.y * seitenInfo.hoehe
   const fontSize = ann.groesse || 16
 
   return (
-    <text
-      key={`txt-${ann.id}`}
-      data-annotation-id={ann.id}
-      x={px}
-      y={py}
-      fill={ann.farbe}
-      fontSize={fontSize}
-      fontFamily="sans-serif"
-      fontWeight={ann.fett ? 'bold' : 'normal'}
-      className="pointer-events-auto cursor-pointer"
-      style={{ userSelect: 'none' }}
-      transform={ann.rotation ? `rotate(${ann.rotation}, ${px}, ${py})` : undefined}
-    >
-      {ann.text}
-    </text>
+    <g key={`txt-${ann.id}`} data-annotation-id={ann.id}>
+      {/* Selektions-Rahmen */}
+      {selected && (
+        <rect
+          x={px - 4}
+          y={py - fontSize - 2}
+          width={fontSize * 0.6 * ann.text.length + 8}
+          height={fontSize + 6}
+          fill="none"
+          stroke="#3b82f6"
+          strokeWidth={2}
+          strokeDasharray="4,2"
+          rx={3}
+          transform={ann.rotation ? `rotate(${ann.rotation}, ${px}, ${py})` : undefined}
+        />
+      )}
+      <text
+        data-annotation-id={ann.id}
+        x={px}
+        y={py}
+        fill={ann.farbe}
+        fontSize={fontSize}
+        fontFamily="sans-serif"
+        fontWeight={ann.fett ? 'bold' : 'normal'}
+        className="pointer-events-auto cursor-pointer"
+        style={{ userSelect: 'none' }}
+        transform={ann.rotation ? `rotate(${ann.rotation}, ${px}, ${py})` : undefined}
+      >
+        {ann.text}
+      </text>
+    </g>
   )
 }
 
