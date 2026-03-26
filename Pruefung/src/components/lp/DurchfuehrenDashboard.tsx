@@ -486,8 +486,8 @@ export default function DurchfuehrenDashboard({ pruefungId }: { pruefungId: stri
                 }
               }}
               onBeenden={() => {
-                // Im Demo-Modus: Config lokal als beendet markieren (kein Backend)
-                if (istDemoModus && config) {
+                // Config als beendet markieren → Phase wechselt sofort zu 'beendet'
+                if (config) {
                   setConfig({ ...config, beendetUm: new Date().toISOString() })
                 }
                 ladeDaten()
