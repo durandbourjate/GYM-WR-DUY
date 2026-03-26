@@ -25,6 +25,7 @@ export default function LPStartseite() {
   const [backendFehler, setBackendFehler] = useState(false)
   const [ansicht, setAnsicht] = useState<'liste' | 'composer'>('liste')
   const [editConfig, setEditConfig] = useState<PruefungsConfig | null>(null)
+  const [composerKey, setComposerKey] = useState(0)
   const [zeigFragenbank, setZeigFragenbank] = useState(false)
   const [zeigHilfe, setZeigHilfe] = useState(false)
   const [zeigSyncDialog, setZeigSyncDialog] = useState(false)
@@ -140,6 +141,7 @@ export default function LPStartseite() {
       freigeschaltet: false,
     }
     setEditConfig(kopie)
+    setComposerKey(k => k + 1)  // Composer komplett neu mounten
     setAnsicht('composer')
   }
 
@@ -177,7 +179,7 @@ export default function LPStartseite() {
   }
 
   if (ansicht === 'composer') {
-    return <PruefungsComposer config={editConfig} onZurueck={handleZurueck} onDuplizieren={handleDuplizieren} />
+    return <PruefungsComposer key={composerKey} config={editConfig} onZurueck={handleZurueck} onDuplizieren={handleDuplizieren} />
   }
 
   return (
