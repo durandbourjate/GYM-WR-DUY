@@ -139,6 +139,12 @@ export default function LPStartseite() {
       titel: `${config.titel} (Kopie)`,
       datum: new Date().toISOString().split('T')[0],
       freigeschaltet: false,
+      erlaubteKlasse: '',
+      teilnehmer: [],
+      beendetUm: undefined,
+      durchfuehrungId: undefined,
+      zeitverlaengerungen: {},
+      sebAusnahmen: [],
     }
     setEditConfig(kopie)
     setComposerKey(k => k + 1)  // Composer komplett neu mounten

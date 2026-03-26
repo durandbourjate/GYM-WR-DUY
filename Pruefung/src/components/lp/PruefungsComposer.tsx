@@ -240,7 +240,7 @@ export default function PruefungsComposer({ config, onZurueck, onDuplizieren }: 
     if (!zuSpeichern.id) {
       zuSpeichern.id = generiereId(zuSpeichern)
     }
-    if (!zuSpeichern.erlaubteKlasse) {
+    if (!zuSpeichern.erlaubteKlasse || zuSpeichern.erlaubteKlasse === '—' || zuSpeichern.erlaubteKlasse === '-') {
       zuSpeichern.erlaubteKlasse = zuSpeichern.klasse
     }
 

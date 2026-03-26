@@ -10,6 +10,7 @@
 const FRAGENBANK_ID = '1ASSRv7mSpmyD22PAMUJ8iekHwuamYkHpy9E6yxWNIVs';
 const CONFIGS_ID = '1QpcC44Ly7BUTLgUkVQtdqjTUDXmgdWdVD8ajjzsd7tE';
 const ANTWORTEN_ORDNER_ID = '1PAF1SUnR7nQ175muXn4iQERdQLJ-UnQQ';
+const ANTWORTEN_MASTER_ID = '1r4CAoCkE0VxON4MbviqHlklSL3qJRe0uZO7bgPoo1KI';
 const ANHAENGE_ORDNER_ID = '1Ql4XuKmxyNW9ZIGsn4getcaB4FhLbjtm';       // LP-Anhänge bei Fragen (Bilder, PDFs)
 const MATERIALIEN_ORDNER_ID = '1yBqm-9iKOcp8QptnISmwKaZGbR63mF5V';    // LP-Materialien bei Prüfungen (Gesetze etc.)
 const SUS_UPLOADS_ORDNER_ID = '1pQdSujvdzTp5MAbBdJU3ipiaG3zstyu8';     // SuS-Uploads während Prüfung (im Antworten-Ordner)
@@ -349,91 +350,40 @@ function uploadMaterial(body) {
 
 // === HILFSFUNKTIONEN ===
 
-function findOrCreateAntwortenSheet(sheetName, pruefungId) {
-  // 1. Config-Zeile prüfen ob antwortenSheetId gespeichert ist
-  var configSheet = SpreadsheetApp.openById(CONFIGS_ID).getSheetByName('Configs');
-  var configData = getSheetData(configSheet);
-  var configRow = configData.find(function(row) { return row.id === pruefungId; });
+function getOrCreateAntwortenSheet(pruefungId) {
+  var tabName = 'Antworten_' + pruefungId;
 
-  if (configRow && configRow.antwortenSheetId) {
-    try {
-      return SpreadsheetApp.openById(configRow.antwortenSheetId).getSheets()[0];
-    } catch (e) {
-      // Sheet wurde gelöscht — weiter zum Fallback
-    }
+  // 1. Master-Spreadsheet: Tab suchen oder erstellen
+  if (ANTWORTEN_MASTER_ID) {
+    var ss = SpreadsheetApp.openById(ANTWORTEN_MASTER_ID);
+    var sheet = ss.getSheetByName(tabName);
+    if (sheet) return sheet;
+
+    // Tab erstellen
+    sheet = ss.insertSheet(tabName);
+    var headers = ['email', 'name', 'version', 'antworten', 'letzterSave', 'istAbgabe', 'letzterHeartbeat', 'heartbeats', 'beantworteteFragen', 'gesamtFragen'];
+    sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+    sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold');
+    return sheet;
   }
 
-  // 2. Fallback: Im Drive-Ordner suchen (funktioniert für bestehende Sheets)
+  // 2. Fallback: alte Methode (DriveApp-Ordner) für Migration
   try {
     var ordner = DriveApp.getFolderById(ANTWORTEN_ORDNER_ID);
-    var files = ordner.getFilesByName(sheetName);
+    var files = ordner.getFilesByName(tabName);
     if (files.hasNext()) {
-      var gefundenesSS = SpreadsheetApp.open(files.next());
-      // ID in Config speichern für zukünftige Lookups
-      speichereAntwortenSheetId(configSheet, configData, pruefungId, gefundenesSS.getId());
-      return gefundenesSS.getSheets()[0];
-    }
-  } catch (e) {
-    // DriveApp-Berechtigung fehlt — ignorieren, neues Sheet erstellen
-  }
-
-  // 3. Neues Sheet erstellen (nur SpreadsheetApp, kein DriveApp nötig)
-  var ss = SpreadsheetApp.create(sheetName);
-  var sheet = ss.getSheets()[0];
-  var headers = ['email', 'name', 'version', 'antworten', 'letzterSave', 'istAbgabe', 'letzterHeartbeat', 'heartbeats', 'beantworteteFragen', 'gesamtFragen'];
-  sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
-  sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold');
-
-  // ID in Config-Zeile speichern
-  speichereAntwortenSheetId(configSheet, configData, pruefungId, ss.getId());
-  return sheet;
-}
-
-// Hilfsfunktion: Antworten-Sheet finden (erst Config-ID, dann Ordner-Fallback)
-// Gibt null zurück wenn kein Sheet existiert (im Gegensatz zu findOrCreateAntwortenSheet)
-function findeAntwortenSheet(pruefungId) {
-  var configSheet = SpreadsheetApp.openById(CONFIGS_ID).getSheetByName('Configs');
-  var configData = getSheetData(configSheet);
-  var configRow = configData.find(function(row) { return row.id === pruefungId; });
-
-  // 1. Über gespeicherte ID
-  if (configRow && configRow.antwortenSheetId) {
-    try {
-      return SpreadsheetApp.openById(configRow.antwortenSheetId).getSheets()[0];
-    } catch (e) { /* gelöscht */ }
-  }
-
-  // 2. Fallback: Im Drive-Ordner suchen
-  var sheetName = 'Antworten_' + pruefungId;
-  try {
-    var ordner = DriveApp.getFolderById(ANTWORTEN_ORDNER_ID);
-    var files = ordner.getFilesByName(sheetName);
-    if (files.hasNext()) {
-      var ss = SpreadsheetApp.open(files.next());
-      // ID cachen
-      if (configSheet && configData) {
-        speichereAntwortenSheetId(configSheet, configData, pruefungId, ss.getId());
-      }
-      return ss.getSheets()[0];
+      return SpreadsheetApp.open(files.next()).getSheets()[0];
     }
   } catch (e) { /* DriveApp nicht verfügbar */ }
 
   return null;
 }
 
-// Hilfsfunktion: antwortenSheetId in Config-Zeile speichern
-function speichereAntwortenSheetId(configSheet, configData, pruefungId, sheetId) {
-  var headers = configSheet.getRange(1, 1, 1, configSheet.getLastColumn()).getValues()[0];
-  var colIdx = headers.indexOf('antwortenSheetId');
-  if (colIdx < 0) {
-    colIdx = headers.length;
-    configSheet.getRange(1, colIdx + 1).setValue('antwortenSheetId');
-  }
-  var rowIdx = configData.findIndex(function(row) { return row.id === pruefungId; });
-  if (rowIdx >= 0) {
-    configSheet.getRange(rowIdx + 2, colIdx + 1).setValue(sheetId);
-  }
+// Hilfsfunktion: Antworten-Sheet finden (Alias für Abwärtskompatibilität)
+function findeAntwortenSheet(pruefungId) {
+  return getOrCreateAntwortenSheet(pruefungId);
 }
+
 
 function getSheetData(sheet) {
   const data = sheet.getDataRange().getValues();
@@ -917,8 +867,7 @@ function speichereAntworten(body) {
       }
     }
 
-    const sheetName = 'Antworten_' + pruefungId;
-    let sheet = findOrCreateAntwortenSheet(sheetName, pruefungId);
+    let sheet = getOrCreateAntwortenSheet(pruefungId);
 
     var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
     const data = getSheetData(sheet);
@@ -970,8 +919,7 @@ function speichereAntworten(body) {
 function heartbeat(body) {
   try {
     const { pruefungId, email, timestamp } = body;
-    const sheetName = 'Antworten_' + pruefungId;
-    const sheet = findOrCreateAntwortenSheet(sheetName, pruefungId);
+    const sheet = getOrCreateAntwortenSheet(pruefungId);
     const data = getSheetData(sheet);
     let existingRow = data.findIndex(row => row.email === email);
 
@@ -1254,8 +1202,7 @@ function beendePruefungEndpoint(body) {
 
     if (einzelneSuS && einzelneSuS.length > 0) {
       // Individuelles Beenden: in Antworten-Sheet pro SuS
-      const sheetName = 'Antworten_' + pruefungId;
-      const sheet = findOrCreateAntwortenSheet(sheetName, pruefungId);
+      const sheet = getOrCreateAntwortenSheet(pruefungId);
       if (!sheet) return jsonResponse({ success: false, error: 'pruefung_nicht_gefunden' });
 
       // Spalten-Migration: beendetUm + restzeitMinuten hinzufügen falls fehlend
@@ -1316,8 +1263,7 @@ function beendePruefungEndpoint(body) {
     // Server-seitiges Safety-Net: Bei Modus "sofort" alle aktiven SuS als abgegeben markieren
     if (modus === 'sofort') {
       try {
-        var antSheetName = 'Antworten_' + pruefungId;
-        var antSheet = findOrCreateAntwortenSheet(antSheetName, pruefungId);
+        var antSheet = getOrCreateAntwortenSheet(pruefungId);
         if (antSheet) {
           var antHeaders = antSheet.getRange(1, 1, 1, antSheet.getLastColumn()).getValues()[0];
           var istAbgabeCol = antHeaders.indexOf('istAbgabe');
@@ -1407,10 +1353,12 @@ function resetPruefungEndpoint(body) {
     }
 
     // 2. Antworten-Sheet leeren (alle Zeilen ausser Header)
-    var ss = SpreadsheetApp.openById(CONFIGS_ID);
-    var antwortenSheet = ss.getSheetByName('Antworten_' + pruefungId);
-    if (antwortenSheet && antwortenSheet.getLastRow() > 1) {
-      antwortenSheet.deleteRows(2, antwortenSheet.getLastRow() - 1);
+    if (ANTWORTEN_MASTER_ID) {
+      var masterSS = SpreadsheetApp.openById(ANTWORTEN_MASTER_ID);
+      var antwortenSheet = masterSS.getSheetByName('Antworten_' + pruefungId);
+      if (antwortenSheet && antwortenSheet.getLastRow() > 1) {
+        antwortenSheet.deleteRows(2, antwortenSheet.getLastRow() - 1);
+      }
     }
 
     return jsonResponse({ success: true });
@@ -2857,15 +2805,11 @@ function batchKorrektur(pruefungId, lpEmail, korrekturSheet) {
   const fragenMap = {};
   for (const f of fragen) fragenMap[f.id] = f;
 
-  const sheetName = 'Antworten_' + pruefungId;
-  const ordner = DriveApp.getFolderById(ANTWORTEN_ORDNER_ID);
-  const files = ordner.getFilesByName(sheetName);
-  if (!files.hasNext()) {
+  const antwortenSheet = getOrCreateAntwortenSheet(pruefungId);
+  if (!antwortenSheet) {
     setKorrekturStatus(korrekturSheet, 'fehler', 0, 0);
     return;
   }
-
-  const antwortenSheet = SpreadsheetApp.open(files.next()).getSheets()[0];
   const antwortenData = getSheetData(antwortenSheet);
   const gesamt = antwortenData.length * fragenIds.length;
   let erledigt = 0;
@@ -2955,21 +2899,33 @@ function buildKorrekturPrompt(frage) {
 
 // === KORREKTUR HILFSFUNKTIONEN ===
 
-function findOrCreateKorrekturSheet(pruefungId) {
-  const sheetName = 'Korrektur_' + pruefungId;
-  const ordner = DriveApp.getFolderById(ANTWORTEN_ORDNER_ID);
-  const files = ordner.getFilesByName(sheetName);
+function getOrCreateKorrekturSheet(pruefungId) {
+  var tabName = 'Korrektur_' + pruefungId;
 
-  if (files.hasNext()) {
-    return SpreadsheetApp.open(files.next()).getSheets()[0];
+  if (ANTWORTEN_MASTER_ID) {
+    var ss = SpreadsheetApp.openById(ANTWORTEN_MASTER_ID);
+    var sheet = ss.getSheetByName(tabName);
+    if (sheet) return sheet;
+
+    sheet = ss.insertSheet(tabName);
+    var headers = ['email', 'name', 'klasse'];
+    sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+    sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold');
+    return sheet;
   }
 
-  const ss = SpreadsheetApp.create(sheetName);
-  const sheet = ss.getSheets()[0];
-  const file = DriveApp.getFileById(ss.getId());
-  ordner.addFile(file);
-  DriveApp.getRootFolder().removeFile(file);
-  return sheet;
+  // Fallback
+  try {
+    var ordner = DriveApp.getFolderById(ANTWORTEN_ORDNER_ID);
+    var files = ordner.getFilesByName(tabName);
+    if (files.hasNext()) return SpreadsheetApp.open(files.next()).getSheets()[0];
+  } catch (e) {}
+  return null;
+}
+
+// Alias für Abwärtskompatibilität
+function findOrCreateKorrekturSheet(pruefungId) {
+  return getOrCreateKorrekturSheet(pruefungId);
 }
 
 function setKorrekturStatus(sheet, status, erledigt, gesamt) {
@@ -2982,11 +2938,11 @@ function ladeKorrektur(pruefungId, email) {
       return jsonResponse({ error: 'Nur für Lehrpersonen' });
     }
 
-    const sheetName = 'Korrektur_' + pruefungId;
-    const ordner = DriveApp.getFolderById(ANTWORTEN_ORDNER_ID);
-    const files = ordner.getFilesByName(sheetName);
+    const sheet = ANTWORTEN_MASTER_ID
+      ? SpreadsheetApp.openById(ANTWORTEN_MASTER_ID).getSheetByName('Korrektur_' + pruefungId)
+      : null;
 
-    if (!files.hasNext()) {
+    if (!sheet) {
       const configSheet = SpreadsheetApp.openById(CONFIGS_ID).getSheetByName('Configs');
       const configRow = getSheetData(configSheet).find(r => r.id === pruefungId);
       return jsonResponse({
@@ -2999,8 +2955,6 @@ function ladeKorrektur(pruefungId, email) {
         letzteAktualisierung: new Date().toISOString(),
       });
     }
-
-    const sheet = SpreadsheetApp.open(files.next()).getSheets()[0];
     const data = getSheetData(sheet);
     const statusJson = safeJsonParse(sheet.getRange('Z1').getValue(), { status: 'idle' });
     const configSheet = SpreadsheetApp.openById(CONFIGS_ID).getSheetByName('Configs');
@@ -3060,12 +3014,11 @@ function ladeAbgaben(pruefungId, email) {
   try {
     if (!email.endsWith('@' + LP_DOMAIN)) return jsonResponse({ error: 'Nur für Lehrpersonen' });
 
-    const sheetName = 'Antworten_' + pruefungId;
-    const ordner = DriveApp.getFolderById(ANTWORTEN_ORDNER_ID);
-    const files = ordner.getFilesByName(sheetName);
-    if (!files.hasNext()) return jsonResponse({ abgaben: {} });
+    const sheet = ANTWORTEN_MASTER_ID
+      ? SpreadsheetApp.openById(ANTWORTEN_MASTER_ID).getSheetByName('Antworten_' + pruefungId)
+      : null;
+    if (!sheet) return jsonResponse({ abgaben: {} });
 
-    const sheet = SpreadsheetApp.open(files.next()).getSheets()[0];
     const data = getSheetData(sheet);
     const abgaben = {};
 
@@ -3088,12 +3041,10 @@ function ladeKorrekturFortschritt(pruefungId, email) {
   try {
     if (!email.endsWith('@' + LP_DOMAIN)) return jsonResponse({ error: 'Nur für Lehrpersonen' });
 
-    const sheetName = 'Korrektur_' + pruefungId;
-    const ordner = DriveApp.getFolderById(ANTWORTEN_ORDNER_ID);
-    const files = ordner.getFilesByName(sheetName);
-    if (!files.hasNext()) return jsonResponse({ status: 'idle', fortschritt: { erledigt: 0, gesamt: 0 } });
-
-    const sheet = SpreadsheetApp.open(files.next()).getSheets()[0];
+    const sheet = ANTWORTEN_MASTER_ID
+      ? SpreadsheetApp.openById(ANTWORTEN_MASTER_ID).getSheetByName('Korrektur_' + pruefungId)
+      : null;
+    if (!sheet) return jsonResponse({ status: 'idle', fortschritt: { erledigt: 0, gesamt: 0 } });
     const statusJson = safeJsonParse(sheet.getRange('Z1').getValue(), { status: 'idle', erledigt: 0, gesamt: 0 });
 
     return jsonResponse({
@@ -3118,14 +3069,12 @@ function ladeKorrekturStatusEndpoint(pruefungId, email) {
       return jsonResponse({ error: 'Keine Prüfungs-ID angegeben' });
     }
 
-    const sheetName = 'Korrektur_' + pruefungId;
-    const ordner = DriveApp.getFolderById(ANTWORTEN_ORDNER_ID);
-    const files = ordner.getFilesByName(sheetName);
-    if (!files.hasNext()) {
+    const sheet = ANTWORTEN_MASTER_ID
+      ? SpreadsheetApp.openById(ANTWORTEN_MASTER_ID).getSheetByName('Korrektur_' + pruefungId)
+      : null;
+    if (!sheet) {
       return jsonResponse({ korrigiert: 0, offen: 0, gesamt: 0 });
     }
-
-    const sheet = SpreadsheetApp.open(files.next()).getSheets()[0];
     const data = getSheetData(sheet);
     var korrigiert = 0;
     var offen = 0;
@@ -3147,12 +3096,10 @@ function speichereKorrekturZeile(body) {
     const { email, pruefungId, schuelerEmail, frageId } = body;
     if (!email || !email.endsWith('@' + LP_DOMAIN)) return jsonResponse({ error: 'Nur für Lehrpersonen' });
 
-    const sheetName = 'Korrektur_' + pruefungId;
-    const ordner = DriveApp.getFolderById(ANTWORTEN_ORDNER_ID);
-    const files = ordner.getFilesByName(sheetName);
-    if (!files.hasNext()) return jsonResponse({ error: 'Korrektur-Sheet nicht gefunden' });
-
-    const sheet = SpreadsheetApp.open(files.next()).getSheets()[0];
+    const sheet = ANTWORTEN_MASTER_ID
+      ? SpreadsheetApp.openById(ANTWORTEN_MASTER_ID).getSheetByName('Korrektur_' + pruefungId)
+      : null;
+    if (!sheet) return jsonResponse({ error: 'Korrektur-Sheet nicht gefunden' });
     const data = getSheetData(sheet);
     const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
     const rowIndex = data.findIndex(r => r.email === schuelerEmail && r.frageId === frageId);
@@ -3198,12 +3145,11 @@ function generiereUndSendeFeedbackEndpoint(body) {
     const configRow = getSheetData(configSheet).find(r => r.id === pruefungId);
     if (!configRow) return jsonResponse({ error: 'Prüfung nicht gefunden' });
 
-    const sheetName = 'Korrektur_' + pruefungId;
-    const ordner = DriveApp.getFolderById(ANTWORTEN_ORDNER_ID);
-    const files = ordner.getFilesByName(sheetName);
-    if (!files.hasNext()) return jsonResponse({ error: 'Korrektur nicht gefunden' });
+    const sheet = ANTWORTEN_MASTER_ID
+      ? SpreadsheetApp.openById(ANTWORTEN_MASTER_ID).getSheetByName('Korrektur_' + pruefungId)
+      : null;
+    if (!sheet) return jsonResponse({ error: 'Korrektur nicht gefunden' });
 
-    const sheet = SpreadsheetApp.open(files.next()).getSheets()[0];
     const data = getSheetData(sheet);
     const erfolg = [];
     const fehler = [];
@@ -3354,27 +3300,35 @@ function validiereSchuelercode(body) {
 
 /**
  * Nachrichten-Sheet finden oder erstellen.
- * Speichert Nachrichten in einem eigenen Sheet pro Prüfung.
+ * Speichert Nachrichten als Tab im Master-Spreadsheet.
  */
-function findOrCreateNachrichtenSheet(pruefungId) {
-  const sheetName = 'Nachrichten_' + pruefungId;
-  const ordner = DriveApp.getFolderById(ANTWORTEN_ORDNER_ID);
-  const files = ordner.getFilesByName(sheetName);
+function getOrCreateNachrichtenSheet(pruefungId) {
+  var tabName = 'Nachrichten_' + pruefungId;
 
-  if (files.hasNext()) {
-    return SpreadsheetApp.open(files.next()).getSheets()[0];
+  if (ANTWORTEN_MASTER_ID) {
+    var ss = SpreadsheetApp.openById(ANTWORTEN_MASTER_ID);
+    var sheet = ss.getSheetByName(tabName);
+    if (sheet) return sheet;
+
+    sheet = ss.insertSheet(tabName);
+    var headers = ['id', 'pruefungId', 'von', 'an', 'typ', 'inhalt', 'zeitstempel', 'gelesen'];
+    sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+    sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold');
+    return sheet;
   }
 
-  const ss = SpreadsheetApp.create(sheetName);
-  const sheet = ss.getSheets()[0];
-  const headers = ['id', 'von', 'an', 'text', 'zeitpunkt', 'gelesen'];
-  sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
-  sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold');
+  // Fallback
+  try {
+    var ordner = DriveApp.getFolderById(ANTWORTEN_ORDNER_ID);
+    var files = ordner.getFilesByName(tabName);
+    if (files.hasNext()) return SpreadsheetApp.open(files.next()).getSheets()[0];
+  } catch (e) {}
+  return null;
+}
 
-  const file = DriveApp.getFileById(ss.getId());
-  ordner.addFile(file);
-  DriveApp.getRootFolder().removeFile(file);
-  return sheet;
+// Alias für Abwärtskompatibilität
+function findOrCreateNachrichtenSheet(pruefungId) {
+  return getOrCreateNachrichtenSheet(pruefungId);
 }
 
 /**
@@ -3418,16 +3372,14 @@ function ladeNachrichtenEndpoint(pruefungId, email) {
       return jsonResponse({ error: 'Fehlende Prüfungs-ID' });
     }
 
-    const sheetName = 'Nachrichten_' + pruefungId;
-    const ordner = DriveApp.getFolderById(ANTWORTEN_ORDNER_ID);
-    const files = ordner.getFilesByName(sheetName);
+    const sheet = ANTWORTEN_MASTER_ID
+      ? SpreadsheetApp.openById(ANTWORTEN_MASTER_ID).getSheetByName('Nachrichten_' + pruefungId)
+      : null;
 
     // Kein Nachrichten-Sheet vorhanden → leeres Array
-    if (!files.hasNext()) {
+    if (!sheet) {
       return jsonResponse({ nachrichten: [] });
     }
-
-    const sheet = SpreadsheetApp.open(files.next()).getSheets()[0];
     const data = sheet.getDataRange().getValues();
     if (data.length <= 1) {
       return jsonResponse({ nachrichten: [] });
@@ -3535,18 +3487,15 @@ function ladeKorrekturenFuerSuSEndpoint(body) {
 
     const configSheet = SpreadsheetApp.openById(CONFIGS_ID).getSheetByName('Configs');
     const configs = getSheetData(configSheet);
-    const ordner = DriveApp.getFolderById(ANTWORTEN_ORDNER_ID);
+    const masterSS = ANTWORTEN_MASTER_ID ? SpreadsheetApp.openById(ANTWORTEN_MASTER_ID) : null;
 
     const ergebnis = [];
     for (const configRow of configs) {
       if (configRow.korrekturFreigegeben !== 'true') continue;
 
       const pruefungId = configRow.id;
-      const sheetName = 'Korrektur_' + pruefungId;
-      const files = ordner.getFilesByName(sheetName);
-      if (!files.hasNext()) continue;
-
-      const sheet = SpreadsheetApp.open(files.next()).getSheets()[0];
+      const sheet = masterSS ? masterSS.getSheetByName('Korrektur_' + pruefungId) : null;
+      if (!sheet) continue;
       const data = getSheetData(sheet);
       const zeilen = data.filter(r => r.email === schuelerEmail);
       if (zeilen.length === 0) continue;
@@ -3594,11 +3543,9 @@ function ladeKorrekturDetailEndpoint(body) {
     }
 
     // Korrektur-Daten laden
-    const ordner = DriveApp.getFolderById(ANTWORTEN_ORDNER_ID);
-    const korrekturFiles = ordner.getFilesByName('Korrektur_' + pruefungId);
-    if (!korrekturFiles.hasNext()) return jsonResponse({ error: 'Korrektur nicht gefunden' });
-
-    const korrekturSheet = SpreadsheetApp.open(korrekturFiles.next()).getSheets()[0];
+    const masterSS = ANTWORTEN_MASTER_ID ? SpreadsheetApp.openById(ANTWORTEN_MASTER_ID) : null;
+    const korrekturSheet = masterSS ? masterSS.getSheetByName('Korrektur_' + pruefungId) : null;
+    if (!korrekturSheet) return jsonResponse({ error: 'Korrektur nicht gefunden' });
     const korrekturData = getSheetData(korrekturSheet);
     const zeilen = korrekturData.filter(r => r.email === schuelerEmail);
     if (zeilen.length === 0) return jsonResponse({ error: 'Keine Daten gefunden' });
@@ -3633,10 +3580,9 @@ function ladeKorrekturDetailEndpoint(body) {
     }
 
     // Antworten laden
-    const antwortFiles = ordner.getFilesByName('Antworten_' + pruefungId);
+    const antwortSheet = masterSS ? masterSS.getSheetByName('Antworten_' + pruefungId) : null;
     const antworten = {};
-    if (antwortFiles.hasNext()) {
-      const antwortSheet = SpreadsheetApp.open(antwortFiles.next()).getSheets()[0];
+    if (antwortSheet) {
       const antwortData = getSheetData(antwortSheet);
       const susAntwort = antwortData.find(r => r.email === schuelerEmail);
       if (susAntwort && susAntwort.antworten) {
@@ -4108,7 +4054,7 @@ function ladeTrackerDatenEndpoint(body) {
     // 1. Alle Configs laden
     var configSheet = SpreadsheetApp.openById(CONFIGS_ID).getSheetByName('Configs');
     var rows = getSheetData(configSheet);
-    var ordner = DriveApp.getFolderById(ANTWORTEN_ORDNER_ID);
+    var masterSS = ANTWORTEN_MASTER_ID ? SpreadsheetApp.openById(ANTWORTEN_MASTER_ID) : null;
 
     var pruefungen = [];
 
@@ -4147,10 +4093,8 @@ function ladeTrackerDatenEndpoint(body) {
       // 2. Nur für beendete Prüfungen: Antworten-Sheet lesen
       if (beendetUm && teilnehmer.length > 0) {
         try {
-          var antwortenName = 'Antworten_' + pruefungId;
-          var antwortenFiles = ordner.getFilesByName(antwortenName);
-          if (antwortenFiles.hasNext()) {
-            var antwortenSheet = SpreadsheetApp.open(antwortenFiles.next()).getSheets()[0];
+          var antwortenSheet = masterSS ? masterSS.getSheetByName('Antworten_' + pruefungId) : null;
+          if (antwortenSheet) {
             var antwortenData = getSheetData(antwortenSheet);
 
             // Emails die abgegeben haben
@@ -4185,10 +4129,8 @@ function ladeTrackerDatenEndpoint(body) {
       // 3. Korrektur-Sheet lesen (nur wenn beendet)
       if (beendetUm) {
         try {
-          var korrekturName = 'Korrektur_' + pruefungId;
-          var korrekturFiles = ordner.getFilesByName(korrekturName);
-          if (korrekturFiles.hasNext()) {
-            var korrekturSheet = SpreadsheetApp.open(korrekturFiles.next()).getSheets()[0];
+          var korrekturSheet = masterSS ? masterSS.getSheetByName('Korrektur_' + pruefungId) : null;
+          if (korrekturSheet) {
 
             // Status aus Z1 lesen
             var statusZelle = korrekturSheet.getRange('Z1').getValue();
@@ -4371,21 +4313,4 @@ function ladeTrackerDatenEndpoint(body) {
   }
 }
 
-// === AUTORISIERUNG TRIGGERN ===
-// Diese Funktion im Editor manuell ausführen (▶) um alle Berechtigungen zu genehmigen.
-// Kann danach wieder gelöscht werden.
-function autorisiereBerechtigungen() {
-  // Drive-Scope triggern
-  var ordner = DriveApp.getRootFolder();
-  Logger.log('Drive OK: ' + ordner.getName());
-
-  // Spreadsheet-Scope triggern
-  SpreadsheetApp.getActive();
-  Logger.log('Spreadsheets OK');
-
-  // External Request-Scope triggern
-  var response = UrlFetchApp.fetch('https://httpbin.org/get');
-  Logger.log('External Request OK: ' + response.getResponseCode());
-
-  Logger.log('Alle Berechtigungen erfolgreich autorisiert!');
-}
+// autorisiereBerechtigungen entfernt — DriveApp-Write-Permissions nicht mehr nötig
