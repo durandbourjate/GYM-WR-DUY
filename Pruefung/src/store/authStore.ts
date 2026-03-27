@@ -8,14 +8,23 @@ import { ladeLehrpersonen, type LPInfo } from '../services/lpApi.ts'
 // Cache für LP-Liste (pro Session geladen)
 let lpCache: LPInfo[] | null = null
 
+/** Demo-LP-Liste für den Demo-Modus */
+const demoLPs: LPInfo[] = [
+  { email: 'demo-lp@gymhofwil.ch', name: 'Demo-Lehrperson', kuerzel: 'DEM', fachschaft: 'WR', rolle: 'lp' },
+  { email: 'kollegin@gymhofwil.ch', name: 'Maria Muster', kuerzel: 'MUM', fachschaft: 'WR', rolle: 'lp' },
+  { email: 'hans.meier@gymhofwil.ch', name: 'Hans Meier', kuerzel: 'MEH', fachschaft: 'WR', rolle: 'lp' },
+  { email: 'anna.keller@gymhofwil.ch', name: 'Anna Keller', kuerzel: 'KEA', fachschaft: 'IN', rolle: 'lp' },
+]
+
 /** Lädt LP-Liste vom Backend (gecacht pro Session). Kann von Komponenten importiert werden. */
 export async function ladeUndCacheLPs(): Promise<LPInfo[]> {
   if (lpCache) return lpCache
   try {
     lpCache = await ladeLehrpersonen()
-    return lpCache ?? []
+    // Im Demo-Modus (kein Backend) Demo-LPs zurückgeben
+    return lpCache && lpCache.length > 0 ? lpCache : demoLPs
   } catch {
-    return []
+    return demoLPs
   }
 }
 

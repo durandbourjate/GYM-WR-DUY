@@ -8,10 +8,22 @@
 ## Offene Punkte
 
 - **SEB / iPad** — SEB weiterhin deaktiviert (`sebErforderlich: false`)
-- **LP-Liste im BerechtigungenEditor** — Aktuell `lpListe={[]}` hardcodiert im FragenEditor. Muss beim Öffnen aus `ladeLehrpersonen()` geladen werden (gecacht pro Session).
-- **Duplikat-Buttons** — "Als Kopie übernehmen" Button im FragenBrowser + "Prüfung duplizieren" im Prüfungs-Dashboard. Backend-Endpoints existieren (`dupliziereFrage`, `duplizierePruefung`), Frontend-UI fehlt.
-- **Rechte-Badges** — Geteilte Fragen/Prüfungen im Browser mit Rolle-Badge (Inhaber/Bearbeiter/Betrachter) anzeigen. `_recht` Feld wird vom Backend geliefert.
-- **Prüfungs-Sharing UI** — `BerechtigungenEditor` im VorbereitungDashboard einbauen (analog zu Frageneditor). Backend-Endpoint `setzeBerechtigungen` existiert.
+
+---
+
+## Session 26 — Multi-Teacher Frontend-UI komplett (27.03.2026)
+
+| # | Feature | Details |
+|---|---------|---------|
+| 1 | LP-Liste laden | `ladeUndCacheLPs()` exportiert, FragenEditor + VorbereitungPhase laden LP-Liste dynamisch |
+| 2 | API-Wrapper | `sharingApi.ts`: `setzeBerechtigungen()`, `dupliziereFrage()`, `duplizierePruefung()` |
+| 3 | Duplikat-Buttons | Copy-Icon in DetailKarte + KompaktZeile (FragenBrowser), "Duplizieren" in PruefungsKarte |
+| 4 | Rechte-Badges | Bearbeiter (blau) / Betrachter (grau) in DetailKarte + KompaktZeile, `_recht` vom Backend |
+| 5 | Prüfungs-Sharing | BerechtigungenEditor in VorbereitungPhase (Privat/Fachschaft/Schule + individuelle LP) |
+| 6 | Demo-Modus | Duplikat-Button erstellt lokale Kopie, Demo-LPs für Dropdown, Demo-Fragen mit _recht-Badges |
+| 7 | Hilfe-Seite | Neue Kategorie "Zusammenarbeit" (Rollen, Sichtbarkeit, Duplizieren, Badges) |
+
+**Multi-Teacher Phase 5 jetzt komplett:** Backend + Frontend fertig. Alle 4 offenen Punkte (LP-Liste, Duplikat, Badges, Sharing-UI) erledigt.
 
 ---
 
@@ -25,7 +37,7 @@ Zentralisierte Multi-LP-Vorbereitung (2–50 LP am Hofwil).
 | 2 | **Prüfungs-Isolation**: `erstelltVon` Feld, Filter in `ladeAlleConfigs()`, Ownership-Checks in `speichereConfig/loeschePruefung` | ✅ Code fertig |
 | 3 | **Fachschaft-Sharing**: `geteilt: 'fachschaft'` Stufe, `fachschaftZuFachbereiche()` Mapping, Filter in `ladeFragenbank()`, 3-Wege-Select im Frageneditor | ✅ Code fertig |
 | 4 | **Per-LP API Key**: `getApiKeyFuerLP()`, `callerEmail` Parameter in allen Claude-Calls | ✅ Code fertig |
-| 5 | **Rechte-System**: Google-Docs-Modell (Inhaber/Bearbeiter/Betrachter), `hatRecht()`/`istSichtbar()`/`ermittleRecht()`, BerechtigungenEditor-Komponente, Duplikat-/Berechtigungs-Endpoints | ✅ Backend + Typen fertig, Frontend-UI teilweise |
+| 5 | **Rechte-System**: Google-Docs-Modell (Inhaber/Bearbeiter/Betrachter), `hatRecht()`/`istSichtbar()`/`ermittleRecht()`, BerechtigungenEditor-Komponente, Duplikat-/Berechtigungs-Endpoints | ✅ Komplett (Backend + Frontend + Demo) |
 
 **Aktivierung:** ✅ Lehrpersonen-Tab + erstelltVon-Backfill erledigt (27.03.2026). Apps Script deployed.
 

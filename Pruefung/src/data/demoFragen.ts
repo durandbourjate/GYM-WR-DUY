@@ -75,7 +75,10 @@ export const demoFragen: Frage[] = [
     ],
     verwendungen: [],
     quelle: 'pool',
-    autor: 'yannick.durand@gymhofwil.ch',
+    autor: 'kollegin@gymhofwil.ch',
+    geteilt: 'fachschaft',
+    geteiltVon: 'M. Muster',
+    _recht: 'bearbeiter',
     fragetext: 'Welche der folgenden Voraussetzungen müssen **zwingend** erfüllt sein, damit ein Vertrag nach OR gültig zustande kommt? (Mehrere Antworten möglich)',
     optionen: [
       { id: 'a', text: 'Handlungsfähigkeit beider Vertragsparteien', korrekt: true },
@@ -254,7 +257,10 @@ export const demoFragen: Frage[] = [
     ],
     verwendungen: [],
     quelle: 'manuell',
-    autor: 'yannick.durand@gymhofwil.ch',
+    autor: 'hans.meier@gymhofwil.ch',
+    geteilt: 'schule',
+    geteiltVon: 'H. Meier',
+    _recht: 'betrachter',
     fragetext: 'Beurteilen Sie die folgenden Aussagen zur **Schweizerischen Nationalbank (SNB)** und zur Geldpolitik als richtig oder falsch.',
     aussagen: [
       { id: '1', text: 'Die Schweizerische Nationalbank (SNB) ist von der Politik unabhängig.', korrekt: true, erklaerung: 'Art. 99 BV: Die SNB führt als unabhängige Zentralbank die Geld- und Währungspolitik.' },

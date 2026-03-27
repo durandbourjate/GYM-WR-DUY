@@ -188,7 +188,15 @@ export default function FragenBrowser({ onHinzufuegen, onEntfernen, onSchliessen
   }
 
   async function handleFrageDuplizieren(frage: Frage): Promise<void> {
-    if (!user || istDemoModus || !apiService.istKonfiguriert()) return
+    if (!user) return
+
+    if (istDemoModus || !apiService.istKonfiguriert()) {
+      // Demo: Lokale Kopie erstellen
+      const kopie = { ...structuredClone(frage), id: `kopie-${Date.now()}`, autor: user.email } as Frage
+      setAlleFragen(prev => [kopie, ...prev])
+      return
+    }
+
     const neueId = await apiService.dupliziereFrage(user.email, frage.id)
     if (neueId) {
       // Fragenbank neu laden um die Kopie anzuzeigen
@@ -328,7 +336,7 @@ export default function FragenBrowser({ onHinzufuegen, onEntfernen, onSchliessen
                                 istInPruefung={bereitsVerwendetSet.has(frage.id)}
                                 onToggle={() => toggleFrageInPruefung(frage.id)}
                                 onEdit={() => { setEditFrage(frage); setZeigEditor(true) }}
-                                onDuplizieren={apiService.istKonfiguriert() && !istDemoModus ? () => handleFrageDuplizieren(frage) : undefined}
+                                onDuplizieren={() => handleFrageDuplizieren(frage)}
                                 zeigeGruppierung={filter.gruppierung}
                                 performance={fragenStats.get(frage.id)}
                               />
@@ -339,7 +347,7 @@ export default function FragenBrowser({ onHinzufuegen, onEntfernen, onSchliessen
                                 onToggle={() => toggleFrageInPruefung(frage.id)}
                                 onEdit={() => { setEditFrage(frage); setZeigEditor(true) }}
                                 onLoeschen={() => setLoeschKandidat(frage)}
-                                onDuplizieren={apiService.istKonfiguriert() && !istDemoModus ? () => handleFrageDuplizieren(frage) : undefined}
+                                onDuplizieren={() => handleFrageDuplizieren(frage)}
                                 performance={fragenStats.get(frage.id)}
                               />
                         ))}
