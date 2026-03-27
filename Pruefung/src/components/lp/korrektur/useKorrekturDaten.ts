@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
+import { useAuthStore } from '../../../store/authStore.ts'
 import { apiService } from '../../../services/apiService.ts'
 import type { PruefungsKorrektur, SchuelerAbgabe } from '../../../types/korrektur.ts'
 import type { Frage } from '../../../types/fragen.ts'
@@ -6,6 +7,8 @@ import type { NotenConfig } from '../../../types/pruefung.ts'
 import { berechneStatistiken, berechneFragenStatistiken } from '../../../utils/korrekturUtils.ts'
 import { autoKorrigiere, istAutoKorrigierbar } from '../../../utils/autoKorrektur.ts'
 import type { KorrekturErgebnis } from '../../../utils/autoKorrektur.ts'
+import { erstelleDemoAbgaben, erstelleDemoKorrektur } from '../../../data/demoKorrektur.ts'
+import { einrichtungsFragen } from '../../../data/einrichtungsFragen.ts'
 
 type Sortierung = 'name' | 'punkte' | 'status'
 
@@ -82,9 +85,21 @@ export function useKorrekturDaten({ pruefungId, userEmail, queueSave, updateKorr
     })
   }, [autoErgebnisseAlle])
 
+  const istDemoModus = useAuthStore((s) => s.istDemoModus)
+
   // Daten laden
   useEffect(() => {
     if (!userEmail) return
+
+    // Demo-Modus: Lokale Demo-Daten verwenden
+    if (istDemoModus || !apiService.istKonfiguriert()) {
+      const demoFragen = einrichtungsFragen.filter((f) => f.typ !== 'aufgabengruppe')
+      setFragen(demoFragen)
+      setAbgaben(erstelleDemoAbgaben())
+      setKorrektur(erstelleDemoKorrektur())
+      setLadeStatus('fertig')
+      return
+    }
 
     async function lade(): Promise<void> {
       const [korrekturResult, abgabenResult, pruefungResult] = await Promise.all([
@@ -137,7 +152,7 @@ export function useKorrekturDaten({ pruefungId, userEmail, queueSave, updateKorr
       setLadeStatus(korrekturResult || abgabenResult ? 'fertig' : 'fehler')
     }
     lade()
-  }, [userEmail, pruefungId])
+  }, [userEmail, pruefungId, istDemoModus])
 
   // Auto-korrigierbare Fragen als geprüft markieren
   const autoGeprueftGesetzt = useRef(false)

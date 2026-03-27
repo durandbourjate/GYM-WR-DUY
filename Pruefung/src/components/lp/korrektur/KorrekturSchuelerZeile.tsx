@@ -84,8 +84,10 @@ export default function KorrekturSchuelerZeile({ pruefungId, schueler, abgabe, f
       >
         {/* Name + Klasse */}
         <div className="flex items-center gap-2 min-w-0">
-          <span className="text-slate-400 dark:text-slate-500 text-xs w-4 shrink-0">
-            {offen ? '▼' : '▶'}
+          <span className="text-[10px] text-slate-400 dark:text-slate-500 w-4 shrink-0 transition-transform duration-150 inline-block"
+            style={{ transform: offen ? 'rotate(90deg)' : 'rotate(0deg)' }}
+          >
+            ▶
           </span>
           <span className="text-sm font-medium text-slate-800 dark:text-slate-100 truncate">
             {schueler.name}

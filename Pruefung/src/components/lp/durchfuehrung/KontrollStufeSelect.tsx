@@ -57,8 +57,10 @@ export function KontrollStufeSelect({ value, onChange, disabled }: Props) {
         <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
           Kontrollstufe
         </span>
-        <span className={`text-xs text-slate-400 dark:text-slate-500 transition-transform ${detailsOffen ? 'rotate-180' : ''}`}>
-          ▼
+        <span className="text-[10px] text-slate-400 dark:text-slate-500 transition-transform duration-150 inline-block"
+          style={{ transform: detailsOffen ? 'rotate(90deg)' : 'rotate(0deg)' }}
+        >
+          ▶
         </span>
       </button>
 

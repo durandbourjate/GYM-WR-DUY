@@ -88,6 +88,16 @@ export function erstelleDemoMonitoring(): MonitoringDaten {
         ],
         browserInfo: 'Chrome 131 macOS',
         aktuelleFrage: 5,
+        geraet: 'laptop',
+        vollbild: false,
+        kontrollStufe: 'standard',
+        verstossZaehler: 3,
+        gesperrt: true,
+        verstoesse: [
+          { zeitpunkt: vor(20), typ: 'tab-wechsel', dauer_sekunden: 8 },
+          { zeitpunkt: vor(12), typ: 'vollbild-verlassen', dauer_sekunden: 15 },
+          { zeitpunkt: vor(5), typ: 'tab-wechsel', dauer_sekunden: 3 },
+        ],
       },
       {
         email: 'eva.schneider@stud.gymhofwil.ch',
@@ -129,6 +139,14 @@ export function erstelleDemoMonitoring(): MonitoringDaten {
         sebVersion: '3.7.1',
         browserInfo: 'SEB/3.7.1 Win10',
         aktuelleFrage: 8,
+        geraet: 'laptop',
+        vollbild: true,
+        kontrollStufe: 'standard',
+        verstossZaehler: 1,
+        gesperrt: false,
+        verstoesse: [
+          { zeitpunkt: vor(8), typ: 'tab-wechsel', dauer_sekunden: 5 },
+        ],
       },
       {
         email: 'gina.huber@stud.gymhofwil.ch',

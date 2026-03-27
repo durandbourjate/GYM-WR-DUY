@@ -111,8 +111,8 @@ export default function SchuelerZeile({ schueler, aufgeklappt, onToggle, zeitver
 
         {/* Detail-Toggle */}
         <div className="hidden md:flex justify-center">
-          <span className={`text-slate-400 dark:text-slate-500 text-xs transition-transform ${aufgeklappt ? 'rotate-180' : ''}`}>
-            ▾
+          <span className={`text-slate-400 dark:text-slate-500 text-xs transition-transform duration-200 ${aufgeklappt ? 'rotate-180' : ''}`}>
+            ▼
           </span>
         </div>
       </button>

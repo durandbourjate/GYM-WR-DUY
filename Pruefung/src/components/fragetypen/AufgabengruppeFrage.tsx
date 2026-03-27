@@ -70,8 +70,8 @@ export default function AufgabengruppeFrage({ frage }: Props) {
           <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">
             Kontext / Ausgangslage
           </span>
-          <span className="text-xs text-slate-400 dark:text-slate-500">
-            {kontextOffen ? '▲' : '▼'}
+          <span className={`text-xs text-slate-400 dark:text-slate-500 transition-transform duration-200 ${kontextOffen ? 'rotate-180' : ''}`}>
+            ▼
           </span>
         </button>
         {kontextOffen && (

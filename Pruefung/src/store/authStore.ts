@@ -10,6 +10,7 @@ let lpCache: LPInfo[] | null = null
 
 /** Demo-LP-Liste für den Demo-Modus */
 const demoLPs: LPInfo[] = [
+  { email: 'yannick.durand@gymhofwil.ch', name: 'Yannick Durand Bourjate', kuerzel: 'DUY', fachschaft: 'WR', rolle: 'lp' },
   { email: 'demo-lp@gymhofwil.ch', name: 'Demo-Lehrperson', kuerzel: 'DEM', fachschaft: 'WR', rolle: 'lp' },
   { email: 'kollegin@gymhofwil.ch', name: 'Maria Muster', kuerzel: 'MUM', fachschaft: 'WR', rolle: 'lp' },
   { email: 'hans.meier@gymhofwil.ch', name: 'Hans Meier', kuerzel: 'MEH', fachschaft: 'WR', rolle: 'lp' },
