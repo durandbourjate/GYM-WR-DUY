@@ -14,6 +14,7 @@ interface ZeichnenCanvasProps {
   aktivesTool: Tool;
   aktiveFarbe: string;
   stiftBreite?: number;
+  stiftGestrichelt?: boolean;
   textRotation?: 0 | 90 | 180 | 270;
   textGroesse?: number;
   textFett?: boolean;
@@ -108,6 +109,7 @@ export function ZeichnenCanvas({
   aktivesTool,
   aktiveFarbe,
   stiftBreite = 2,
+  stiftGestrichelt = false,
   textRotation = 0,
   textGroesse = 18,
   textFett = false,
@@ -345,6 +347,7 @@ export function ZeichnenCanvas({
             punkte: [punkt],
             farbe: aktiveFarbe,
             breite: stiftBreite,
+            gestrichelt: stiftGestrichelt || undefined,
           };
           engine.updateAktiverCommand(cmd);
           break;
@@ -365,6 +368,7 @@ export function ZeichnenCanvas({
             bis: punkt,
             farbe: aktiveFarbe,
             breite: stiftBreite,
+            gestrichelt: stiftGestrichelt || undefined,
           };
           engine.updateAktiverCommand(cmd);
           break;
@@ -378,20 +382,23 @@ export function ZeichnenCanvas({
             bis: punkt,
             farbe: aktiveFarbe,
             breite: stiftBreite,
+            gestrichelt: stiftGestrichelt || undefined,
           };
           engine.updateAktiverCommand(cmd);
           break;
         }
 
-        case 'rechteck': {
+        case 'rechteck':
+        case 'ellipse': {
           const cmd: DrawCommand = {
             id: generiereCommandId(),
-            typ: 'rechteck',
+            typ: aktivesTool as 'rechteck' | 'ellipse',
             von: punkt,
             bis: punkt,
             farbe: aktiveFarbe,
             breite: stiftBreite,
             gefuellt: false,
+            gestrichelt: stiftGestrichelt || undefined,
           };
           engine.updateAktiverCommand(cmd);
           break;
@@ -414,7 +421,7 @@ export function ZeichnenCanvas({
         }
       }
     },
-    [aktivesTool, aktiveFarbe, stiftBreite, engine, logischeBreite, logischeHoehe]
+    [aktivesTool, aktiveFarbe, stiftBreite, stiftGestrichelt, engine, logischeBreite, logischeHoehe]
   );
 
   const handleMove = useCallback(
@@ -462,9 +469,10 @@ export function ZeichnenCanvas({
           break;
         }
 
-        case 'rechteck': {
+        case 'rechteck':
+        case 'ellipse': {
           const aktiver = engine.state.aktiverCommand;
-          if (!aktiver || aktiver.typ !== 'rechteck') break;
+          if (!aktiver || (aktiver.typ !== 'rechteck' && aktiver.typ !== 'ellipse')) break;
           engine.updateAktiverCommand({ ...aktiver, bis: punkt });
           break;
         }
@@ -517,10 +525,12 @@ export function ZeichnenCanvas({
           break;
         }
 
-        case 'rechteck': {
+        case 'rechteck':
+        case 'ellipse': {
           const aktiver = engine.state.aktiverCommand;
-          if (!aktiver || aktiver.typ !== 'rechteck') break;
-          engine.addCommand({ ...aktiver, bis: punkt } as Omit<DrawCommand, 'id'>);
+          if (!aktiver || (aktiver.typ !== 'rechteck' && aktiver.typ !== 'ellipse')) break;
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          engine.addCommand({ ...aktiver, bis: punkt } as any);
           engine.updateAktiverCommand(null);
           break;
         }
@@ -557,6 +567,7 @@ export function ZeichnenCanvas({
       case 'linie':     return 'crosshair';
       case 'pfeil':     return 'crosshair';
       case 'rechteck':  return 'crosshair';
+      case 'ellipse':   return 'crosshair';
       case 'text':      return 'text';
       case 'radierer':  return 'cell';
       default:          return 'default';

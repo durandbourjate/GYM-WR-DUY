@@ -13,6 +13,28 @@
 - **Apps Script aktualisieren** — Session 19 Änderungen (Safety-Net, Individual-Beenden Batch-Write) noch nicht deployed. Code kopieren → Apps Script Editor → Bereitstellen → Bereitstellungen verwalten → Stift → "Neue Version".
 - **Phase 3 (optional):** `useKorrekturDaten` + `useKorrekturActions` Hooks — KorrekturDashboard von 579 → ~250 Z.
 
+- **Demo-Prüfung aktualisieren** — Zweites PDF im Material hinzufügen, alle Fragetypen prüfen
+
+---
+
+## Session 24 — Toolbar-Redesign + Fixes (27.03.2026)
+
+| # | Task | Fix |
+|---|------|-----|
+| A1 | PDF Radierer-Icon + Alles-Löschen | SVG RadiererIcon + React-Modal + `onAllesLoeschen` Prop |
+| A2 | Icons harmonisieren (Zeichnen + PDF) | Identische Icons in beiden Toolbars |
+| A3 | Standard vertikal + Toggle zuerst | Default 'vertikal', Layout-Toggle als erstes Element |
+| B1 | Formen-Menü (Dropdown) | Linie/Pfeil/Rechteck/Ellipse gruppiert in ToolbarDropdown |
+| B2 | Stift-Menü (Stärke + Stil) | 3 Stärken (dünn/mittel/dick) + durchgehend/gestrichelt |
+| B3 | Farben-Menü (Dropdown) | Farben als Dropdown statt Buttons-Reihe |
+| B1+ | Ellipse-Zeichentyp | Neuer DrawCommand-Typ, Rendering, Hit-Testing, Bounding-Box |
+| B2+ | Gestrichelt-Support | `gestrichelt?: boolean` auf Stift/Linie/Pfeil/Rechteck/Ellipse |
+| C1 | Farbe für selektierte Elemente | Farbwechsel aktualisiert selektiertes Element |
+| D1 | T-Konten Saldo unter Betrag-Feldern | `justify-end` für bündige Ausrichtung |
+| D2 | Bilanzsumme unter Betrag-Feldern | `justify-end` für bündige Ausrichtung |
+
+Neue Dateien: `components/shared/ToolbarDropdown.tsx` (wiederverwendbar für beide Toolbars)
+
 ---
 
 ## Session 23 — 16 Bugfixes & UX aus Live-Test (27.03.2026)

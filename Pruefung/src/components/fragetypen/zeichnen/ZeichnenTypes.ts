@@ -10,15 +10,16 @@ export type CommandId = string;
 
 // Alle Zeichenbefehle als Discriminated Union
 export type DrawCommand =
-  | { id: CommandId; typ: 'stift'; punkte: Point[]; farbe: string; breite: number }
-  | { id: CommandId; typ: 'linie'; von: Point; bis: Point; farbe: string; breite: number }
-  | { id: CommandId; typ: 'pfeil'; von: Point; bis: Point; farbe: string; breite: number }
-  | { id: CommandId; typ: 'rechteck'; von: Point; bis: Point; farbe: string; breite: number; gefuellt: boolean }
+  | { id: CommandId; typ: 'stift'; punkte: Point[]; farbe: string; breite: number; gestrichelt?: boolean }
+  | { id: CommandId; typ: 'linie'; von: Point; bis: Point; farbe: string; breite: number; gestrichelt?: boolean }
+  | { id: CommandId; typ: 'pfeil'; von: Point; bis: Point; farbe: string; breite: number; gestrichelt?: boolean }
+  | { id: CommandId; typ: 'rechteck'; von: Point; bis: Point; farbe: string; breite: number; gefuellt: boolean; gestrichelt?: boolean }
+  | { id: CommandId; typ: 'ellipse'; von: Point; bis: Point; farbe: string; breite: number; gefuellt: boolean; gestrichelt?: boolean }
   | { id: CommandId; typ: 'text'; position: Point; text: string; farbe: string; groesse: number; rotation?: 0 | 90 | 180 | 270; fett?: boolean }
   | { id: CommandId; typ: 'radierer'; punkte: Point[]; breite: number };
 
 // Aktives Werkzeug
-export type Tool = 'auswahl' | 'stift' | 'linie' | 'pfeil' | 'rechteck' | 'text' | 'radierer';
+export type Tool = 'auswahl' | 'stift' | 'linie' | 'pfeil' | 'rechteck' | 'ellipse' | 'text' | 'radierer';
 
 // Canvas-Gesamtzustand
 export interface CanvasState {

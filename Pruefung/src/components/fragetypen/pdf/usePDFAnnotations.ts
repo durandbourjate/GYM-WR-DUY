@@ -96,6 +96,13 @@ export function usePDFAnnotations(initialAnnotationen?: PDFAnnotation[]) {
     })
   }, [])
 
+  const allesLoeschen = useCallback(() => {
+    // Leeren und Undo/Redo zurücksetzen (nicht einzeln undo-fähig)
+    setAnnotationen([])
+    setUndoStack([])
+    setRedoStack([])
+  }, [])
+
   const kannUndo = undoStack.length > 0
   const kannRedo = redoStack.length > 0
 
@@ -106,6 +113,7 @@ export function usePDFAnnotations(initialAnnotationen?: PDFAnnotation[]) {
   return {
     annotationen, setAnnotationen,
     hinzufuegen, loeschen, editieren,
+    allesLoeschen,
     undo, redo, kannUndo, kannRedo,
     fuerSeite,
   }

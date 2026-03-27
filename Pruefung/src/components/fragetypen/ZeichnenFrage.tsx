@@ -63,13 +63,17 @@ export default function ZeichnenFrage({ frage }: Props) {
   // Text-Fett
   const [textFett, setTextFett] = useState<boolean>(false)
 
+  // Stift-Stärke + Stil
+  const [stiftBreite, setStiftBreite] = useState<number>(2)
+  const [stiftGestrichelt, setStiftGestrichelt] = useState<boolean>(false)
+
   // Toolbar-Layout: aus localStorage laden (Standard: horizontal)
   const [toolbarLayout, setToolbarLayout] = useState<ToolbarLayout>(() => {
     try {
       const saved = localStorage.getItem(TOOLBAR_LAYOUT_KEY)
       if (saved === 'vertikal' || saved === 'horizontal') return saved
     } catch { /* ignorieren */ }
-    return 'horizontal'
+    return 'vertikal'
   })
 
   // Canvas vergrössern/verkleinern
@@ -228,6 +232,17 @@ export default function ZeichnenFrage({ frage }: Props) {
     setTextFett(f)
   }, [])
 
+  // C1: Farb-Handler — aktualisiert selektiertes Element ODER setzt Default
+  const handleFarbeChange = useCallback((farbe: string) => {
+    if (selektierterCommandRef.current) {
+      const cmd = commandsRef.current.find(c => c.id === selektierterCommandRef.current)
+      if (cmd && 'farbe' in cmd) {
+        updateCommandRef.current?.(selektierterCommandRef.current, { farbe } as Partial<import('./zeichnen/ZeichnenTypes').DrawCommand>)
+      }
+    }
+    setAktiveFarbe(farbe)
+  }, [])
+
   // Daten-Grösse für Warnanzeige
   const datenGroesse = aktuellerDatenRef.current.length
 
@@ -264,7 +279,7 @@ export default function ZeichnenFrage({ frage }: Props) {
               aktivesTool={aktivesTool}
               onToolChange={setAktivesTool}
               aktiveFarbe={aktiveFarbe}
-              onFarbeChange={setAktiveFarbe}
+              onFarbeChange={handleFarbeChange}
               verfuegbareWerkzeuge={canvasConfig.werkzeuge}
               verfuegbareFarben={verfuegbareFarben}
               radiererAktiv={canvasConfig.radierer ?? true}
@@ -283,6 +298,10 @@ export default function ZeichnenFrage({ frage }: Props) {
               textFett={istTextSelektiert && selektierterCmd.typ === 'text' ? (selektierterCmd.fett ?? false) : textFett}
               onTextFettChange={handleTextFett}
               istTextSelektiert={istTextSelektiert}
+              stiftBreite={stiftBreite}
+              onStiftBreiteChange={setStiftBreite}
+              stiftGestrichelt={stiftGestrichelt}
+              onStiftGestricheltChange={setStiftGestrichelt}
             />
           </div>
         )}
@@ -303,6 +322,8 @@ export default function ZeichnenFrage({ frage }: Props) {
             canvasConfig={canvasConfig}
             aktivesTool={aktivesTool}
             aktiveFarbe={aktiveFarbe}
+            stiftBreite={stiftBreite}
+            stiftGestrichelt={stiftGestrichelt}
             textRotation={textRotation}
             textGroesse={textGroesse}
             textFett={textFett}

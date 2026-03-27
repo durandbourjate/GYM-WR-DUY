@@ -77,6 +77,7 @@ function verschiebeCommand(cmd: DrawCommand, dx: number, dy: number): DrawComman
     case 'pfeil':
       return { ...cmd, von: verschiebePoint(cmd.von, dx, dy), bis: verschiebePoint(cmd.bis, dx, dy) };
     case 'rechteck':
+    case 'ellipse':
       return { ...cmd, von: verschiebePoint(cmd.von, dx, dy), bis: verschiebePoint(cmd.bis, dx, dy) };
     case 'text':
       return { ...cmd, position: verschiebePoint(cmd.position, dx, dy) };
@@ -265,7 +266,8 @@ function findeCommandBeiPunkt(commands: DrawCommand[], punkt: Point): CommandId 
     const cmd = commands[i];
 
     switch (cmd.typ) {
-      case 'rechteck': {
+      case 'rechteck':
+      case 'ellipse': {
         const minX = Math.min(cmd.von.x, cmd.bis.x);
         const maxX = Math.max(cmd.von.x, cmd.bis.x);
         const minY = Math.min(cmd.von.y, cmd.bis.y);
@@ -377,12 +379,14 @@ function zeichneCommand(ctx: CanvasRenderingContext2D, cmd: DrawCommand): void {
       ctx.lineWidth = cmd.breite;
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
+      if (cmd.gestrichelt) ctx.setLineDash([8, 4]);
       ctx.beginPath();
       ctx.moveTo(cmd.punkte[0].x, cmd.punkte[0].y);
       for (let i = 1; i < cmd.punkte.length; i++) {
         ctx.lineTo(cmd.punkte[i].x, cmd.punkte[i].y);
       }
       ctx.stroke();
+      if (cmd.gestrichelt) ctx.setLineDash([]);
       break;
     }
 
@@ -390,10 +394,12 @@ function zeichneCommand(ctx: CanvasRenderingContext2D, cmd: DrawCommand): void {
       ctx.strokeStyle = cmd.farbe;
       ctx.lineWidth = cmd.breite;
       ctx.lineCap = 'round';
+      if (cmd.gestrichelt) ctx.setLineDash([8, 4]);
       ctx.beginPath();
       ctx.moveTo(cmd.von.x, cmd.von.y);
       ctx.lineTo(cmd.bis.x, cmd.bis.y);
       ctx.stroke();
+      if (cmd.gestrichelt) ctx.setLineDash([]);
       break;
     }
 
@@ -401,12 +407,14 @@ function zeichneCommand(ctx: CanvasRenderingContext2D, cmd: DrawCommand): void {
       ctx.strokeStyle = cmd.farbe;
       ctx.lineWidth = cmd.breite;
       ctx.lineCap = 'round';
+      if (cmd.gestrichelt) ctx.setLineDash([8, 4]);
 
       // Linie zeichnen
       ctx.beginPath();
       ctx.moveTo(cmd.von.x, cmd.von.y);
       ctx.lineTo(cmd.bis.x, cmd.bis.y);
       ctx.stroke();
+      if (cmd.gestrichelt) ctx.setLineDash([]);
 
       // Pfeilspitze zeichnen
       zeichnePfeilspitze(ctx, cmd.von, cmd.bis, cmd.breite);
@@ -419,6 +427,7 @@ function zeichneCommand(ctx: CanvasRenderingContext2D, cmd: DrawCommand): void {
       const w = Math.abs(cmd.bis.x - cmd.von.x);
       const h = Math.abs(cmd.bis.y - cmd.von.y);
 
+      if (cmd.gestrichelt) ctx.setLineDash([8, 4]);
       if (cmd.gefuellt) {
         ctx.fillStyle = cmd.farbe;
         ctx.fillRect(x, y, w, h);
@@ -427,6 +436,23 @@ function zeichneCommand(ctx: CanvasRenderingContext2D, cmd: DrawCommand): void {
         ctx.lineWidth = cmd.breite;
         ctx.strokeRect(x, y, w, h);
       }
+      if (cmd.gestrichelt) ctx.setLineDash([]);
+      break;
+    }
+
+    case 'ellipse': {
+      const cx = (cmd.von.x + cmd.bis.x) / 2;
+      const cy = (cmd.von.y + cmd.bis.y) / 2;
+      const rx = Math.abs(cmd.bis.x - cmd.von.x) / 2;
+      const ry = Math.abs(cmd.bis.y - cmd.von.y) / 2;
+      ctx.strokeStyle = cmd.farbe;
+      ctx.lineWidth = cmd.breite;
+      if (cmd.gestrichelt) ctx.setLineDash([8, 4]);
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, Math.max(rx, 1), Math.max(ry, 1), 0, 0, Math.PI * 2);
+      if (cmd.gefuellt) { ctx.fillStyle = cmd.farbe; ctx.fill(); }
+      ctx.stroke();
+      if (cmd.gestrichelt) ctx.setLineDash([]);
       break;
     }
 
@@ -497,7 +523,8 @@ function berechneBoundingBox(
       return { x: minX, y: minY, breite: maxX - minX, hoehe: maxY - minY };
     }
 
-    case 'rechteck': {
+    case 'rechteck':
+    case 'ellipse': {
       const minX = Math.min(cmd.von.x, cmd.bis.x) - PADDING;
       const minY = Math.min(cmd.von.y, cmd.bis.y) - PADDING;
       const maxX = Math.max(cmd.von.x, cmd.bis.x) + PADDING;
@@ -586,6 +613,7 @@ function serializiereCommand(cmd: DrawCommand): DrawCommand {
     case 'pfeil':
       return { ...cmd, von: rundePoint(cmd.von), bis: rundePoint(cmd.bis) };
     case 'rechteck':
+    case 'ellipse':
       return { ...cmd, von: rundePoint(cmd.von), bis: rundePoint(cmd.bis) };
     case 'text':
       return { ...cmd, position: rundePoint(cmd.position) };

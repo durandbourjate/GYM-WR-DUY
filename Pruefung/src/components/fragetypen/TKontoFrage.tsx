@@ -456,10 +456,10 @@ export default function TKontoFrage({ frage }: Props) {
                   </div>
                 </div>
 
-                {/* U3: Saldo — Eingabefeld auf BEIDEN Seiten, kein Dropdown */}
-                <div className="grid grid-cols-2 border-t-2 border-slate-800 dark:border-slate-300 mt-1">
-                  <div className="pr-2 border-r border-slate-800 dark:border-slate-300 pt-2">
-                    <div className="flex items-center gap-2">
+                {/* D1: Saldo — bündig unter den Betrag-Feldern */}
+                <div className="grid grid-cols-2 border-t-2 border-slate-800 dark:border-slate-300 mt-1 pt-2">
+                  <div className="pr-2 border-r border-slate-800 dark:border-slate-300">
+                    <div className="flex items-center justify-end gap-2">
                       <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Saldo</span>
                       <input
                         type="number"
@@ -473,8 +473,8 @@ export default function TKontoFrage({ frage }: Props) {
                       />
                     </div>
                   </div>
-                  <div className="pl-2 pt-2">
-                    <div className="flex items-center gap-2">
+                  <div className="pl-2">
+                    <div className="flex items-center justify-end gap-2">
                       <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Saldo</span>
                       <input
                         type="number"

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { Tool, ToolbarLayout } from './ZeichnenTypes';
+import ToolbarDropdown from '../../shared/ToolbarDropdown';
 
 /** Inline SVG Radierer-Icon */
 function RadiererIcon() {
@@ -10,6 +11,21 @@ function RadiererIcon() {
     </svg>
   );
 }
+
+/** Stift-Stärken */
+const STIFT_STAERKEN = [
+  { label: 'Dünn', wert: 1 },
+  { label: 'Mittel', wert: 2 },
+  { label: 'Dick', wert: 4 },
+] as const;
+
+/** Formen-Icons */
+const FORM_ICONS: Record<string, string> = {
+  linie: '╱',
+  pfeil: '→',
+  rechteck: '▭',
+  ellipse: '○',
+};
 
 interface ZeichnenToolbarProps {
   aktivesTool: Tool;
@@ -27,6 +43,10 @@ interface ZeichnenToolbarProps {
   kannUndo: boolean;
   kannRedo: boolean;
   disabled: boolean;
+  stiftBreite?: number;
+  onStiftBreiteChange?: (breite: number) => void;
+  stiftGestrichelt?: boolean;
+  onStiftGestricheltChange?: (gestrichelt: boolean) => void;
   textRotation?: 0 | 90 | 180 | 270;
   onTextRotationChange?: (r: 0 | 90 | 180 | 270) => void;
   textGroesse?: number;
@@ -36,15 +56,7 @@ interface ZeichnenToolbarProps {
   istTextSelektiert?: boolean;
 }
 
-const TOOL_DEFS: { id: Tool; icon: string | null; label: string; configKey?: string }[] = [
-  { id: 'auswahl', icon: '↖', label: 'Auswahl' },
-  { id: 'stift', icon: '✏️', label: 'Freihand', configKey: 'stift' },
-  { id: 'linie', icon: '╱', label: 'Linie', configKey: 'linie' },
-  { id: 'pfeil', icon: '→', label: 'Pfeil', configKey: 'pfeil' },
-  { id: 'rechteck', icon: '▭', label: 'Rechteck', configKey: 'rechteck' },
-  { id: 'text', icon: 'T', label: 'Text', configKey: 'text' },
-  { id: 'radierer', icon: null, label: 'Radierer' },
-];
+const FORMEN_TOOLS: Tool[] = ['linie', 'pfeil', 'rechteck', 'ellipse'];
 
 export function ZeichnenToolbar({
   aktivesTool,
@@ -62,6 +74,10 @@ export function ZeichnenToolbar({
   kannUndo,
   kannRedo,
   disabled,
+  stiftBreite = 2,
+  onStiftBreiteChange,
+  stiftGestrichelt = false,
+  onStiftGestricheltChange,
   textRotation = 0,
   onTextRotationChange,
   textGroesse = 18,
@@ -73,21 +89,28 @@ export function ZeichnenToolbar({
   const [zeigeLoeschenDialog, setZeigeLoeschenDialog] = useState(false);
   const isHorizontal = layout === 'horizontal';
 
-  // Filter tools based on config
-  const sichtbareTools = TOOL_DEFS.filter((def) => {
-    if (def.id === 'auswahl') return true;
-    if (def.id === 'radierer') return radiererAktiv;
-    if (def.configKey) return (verfuegbareWerkzeuge || []).includes(def.configKey);
-    return false;
-  });
+  // Verfügbare Formen aus Konfiguration
+  const verfuegbareFormen = FORMEN_TOOLS.filter((t) =>
+    t === 'ellipse' || (verfuegbareWerkzeuge || []).includes(t)
+  );
+  const istFormenAktiv = FORMEN_TOOLS.includes(aktivesTool);
+  const aktiveFormIcon = FORM_ICONS[aktivesTool] ?? FORM_ICONS['rechteck'];
+
+  const hatStift = (verfuegbareWerkzeuge || []).includes('stift');
+  const hatText = (verfuegbareWerkzeuge || []).includes('text');
 
   const containerKlassen = [
     'flex items-center gap-1.5 p-1',
     isHorizontal ? 'flex-row flex-wrap' : 'flex-col max-h-full overflow-y-auto',
     disabled ? 'pointer-events-none opacity-50' : '',
-  ]
-    .filter(Boolean)
-    .join(' ');
+  ].filter(Boolean).join(' ');
+
+  const btnKlassen = (aktiv: boolean) => [
+    'min-w-[44px] min-h-[44px] flex items-center justify-center rounded text-sm font-medium transition-colors',
+    aktiv
+      ? 'bg-white dark:bg-slate-600 shadow-sm text-slate-900 dark:text-slate-100'
+      : 'bg-transparent hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300',
+  ].join(' ');
 
   const separatorKlassen = isHorizontal
     ? 'w-px h-6 bg-slate-200 dark:bg-slate-600 self-center'
@@ -100,66 +123,140 @@ export function ZeichnenToolbar({
       aria-orientation={isHorizontal ? 'horizontal' : 'vertical'}
       className={containerKlassen}
     >
-      {/* Werkzeug-Gruppe */}
-      <div
-        role="group"
-        aria-label="Werkzeuge"
-        className={`flex gap-0.5 bg-slate-100 dark:bg-slate-700 rounded-md p-0.5 ${isHorizontal ? 'flex-row' : 'flex-col'}`}
+      {/* Layout-Toggle (erstes Element) */}
+      <button
+        type="button"
+        title={isHorizontal ? 'Vertikal anordnen' : 'Horizontal anordnen'}
+        onClick={onLayoutToggle}
+        className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded text-sm transition-colors bg-transparent hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-500 dark:text-slate-400"
       >
-        {sichtbareTools.map((def) => {
-          const aktiv = aktivesTool === def.id;
-          return (
-            <button
-              key={def.id}
-              role="button"
-              aria-pressed={aktiv}
-              title={def.label}
-              onClick={() => onToolChange(def.id)}
-              className={[
-                'min-w-[44px] min-h-[44px] flex items-center justify-center rounded text-sm font-medium transition-colors',
-                aktiv
-                  ? 'bg-white dark:bg-slate-600 shadow-sm text-slate-900 dark:text-slate-100'
-                  : 'bg-transparent hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300',
-              ].join(' ')}
-            >
-              {def.icon !== null ? def.icon : <RadiererIcon />}
-            </button>
-          );
-        })}
-      </div>
+        {isHorizontal ? '⇅' : '⇆'}
+      </button>
 
-      {/* Trennlinie */}
       <div className={separatorKlassen} aria-hidden="true" />
 
-      {/* Farb-Gruppe */}
-      <div
-        role="group"
-        aria-label="Farben"
-        className={`flex gap-1 items-center ${isHorizontal ? 'flex-row' : 'flex-col'}`}
+      {/* Auswahl */}
+      <button type="button" title="Auswahl" onClick={() => onToolChange('auswahl')} className={btnKlassen(aktivesTool === 'auswahl')}>
+        ↖
+      </button>
+
+      {/* Stift-Menü (Stärke + Stil) */}
+      {hatStift && (
+        <ToolbarDropdown
+          icon={<span style={{ fontSize: stiftBreite > 2 ? 18 : 14 }}>✏️</span>}
+          label="Freihand"
+          aktiv={aktivesTool === 'stift'}
+          horizontal={isHorizontal}
+        >
+          <div className="flex flex-col gap-1 min-w-[120px]">
+            <span className="text-xs text-slate-500 dark:text-slate-400 font-medium px-1">Stärke</span>
+            {STIFT_STAERKEN.map(({ label, wert }) => (
+              <button
+                key={wert}
+                type="button"
+                onClick={() => {
+                  onStiftBreiteChange?.(wert);
+                  onToolChange('stift');
+                }}
+                className={[
+                  'flex items-center gap-2 px-2 py-1.5 rounded text-sm transition-colors',
+                  stiftBreite === wert && aktivesTool === 'stift'
+                    ? 'bg-slate-200 dark:bg-slate-600 font-medium'
+                    : 'hover:bg-slate-100 dark:hover:bg-slate-700',
+                ].join(' ')}
+              >
+                <span className="inline-block rounded-full bg-current" style={{ width: wert * 3, height: wert * 3 }} />
+                {label}
+              </button>
+            ))}
+            <div className="h-px bg-slate-200 dark:bg-slate-600 my-1" />
+            <span className="text-xs text-slate-500 dark:text-slate-400 font-medium px-1">Stil</span>
+            <button
+              type="button"
+              onClick={() => { onStiftGestricheltChange?.(false); onToolChange('stift'); }}
+              className={`flex items-center gap-2 px-2 py-1.5 rounded text-sm transition-colors ${!stiftGestrichelt ? 'bg-slate-200 dark:bg-slate-600 font-medium' : 'hover:bg-slate-100 dark:hover:bg-slate-700'}`}
+            >
+              <span className="inline-block w-6 h-0.5 bg-current" /> Durchgehend
+            </button>
+            <button
+              type="button"
+              onClick={() => { onStiftGestricheltChange?.(true); onToolChange('stift'); }}
+              className={`flex items-center gap-2 px-2 py-1.5 rounded text-sm transition-colors ${stiftGestrichelt ? 'bg-slate-200 dark:bg-slate-600 font-medium' : 'hover:bg-slate-100 dark:hover:bg-slate-700'}`}
+            >
+              <span className="inline-block w-6 border-t-2 border-dashed border-current" /> Gestrichelt
+            </button>
+          </div>
+        </ToolbarDropdown>
+      )}
+
+      {/* Formen-Menü (Linie, Pfeil, Rechteck, Ellipse) */}
+      {verfuegbareFormen.length > 0 && (
+        <ToolbarDropdown
+          icon={aktiveFormIcon}
+          label="Formen"
+          aktiv={istFormenAktiv}
+          horizontal={isHorizontal}
+        >
+          <div className="flex flex-col gap-0.5 min-w-[100px]">
+            {verfuegbareFormen.map((formTool) => (
+              <button
+                key={formTool}
+                type="button"
+                onClick={() => onToolChange(formTool)}
+                className={[
+                  'flex items-center gap-2 px-2 py-1.5 rounded text-sm transition-colors',
+                  aktivesTool === formTool
+                    ? 'bg-slate-200 dark:bg-slate-600 font-medium'
+                    : 'hover:bg-slate-100 dark:hover:bg-slate-700',
+                ].join(' ')}
+              >
+                <span className="w-5 text-center">{FORM_ICONS[formTool]}</span>
+                {formTool === 'linie' ? 'Linie' : formTool === 'pfeil' ? 'Pfeil' : formTool === 'rechteck' ? 'Rechteck' : 'Ellipse'}
+              </button>
+            ))}
+          </div>
+        </ToolbarDropdown>
+      )}
+
+      {/* Text */}
+      {hatText && (
+        <button type="button" title="Text" onClick={() => onToolChange('text')} className={btnKlassen(aktivesTool === 'text')}>
+          T
+        </button>
+      )}
+
+      {/* Radierer */}
+      {radiererAktiv && (
+        <button type="button" title="Radierer" onClick={() => onToolChange('radierer')} className={btnKlassen(aktivesTool === 'radierer')}>
+          <RadiererIcon />
+        </button>
+      )}
+
+      <div className={separatorKlassen} aria-hidden="true" />
+
+      {/* Farben-Menü */}
+      <ToolbarDropdown
+        icon={<span className="block rounded-full" style={{ width: 18, height: 18, backgroundColor: aktiveFarbe }} />}
+        label="Farbe"
+        horizontal={isHorizontal}
       >
-        {verfuegbareFarben.map((farbe) => {
-          const aktiv = aktiveFarbe === farbe;
-          return (
+        <div className="flex flex-wrap gap-1 max-w-[140px]">
+          {verfuegbareFarben.map((farbe) => (
             <button
               key={farbe}
-              role="button"
-              aria-pressed={aktiv}
-              aria-label={`Farbe ${farbe}`}
+              type="button"
               title={farbe}
               onClick={() => onFarbeChange(farbe)}
               className={[
-                'min-w-[44px] min-h-[44px] flex items-center justify-center rounded transition-all',
-                aktiv ? 'ring-2 ring-blue-500 ring-offset-1' : 'hover:scale-110',
+                'min-w-[36px] min-h-[36px] flex items-center justify-center rounded transition-all',
+                aktiveFarbe === farbe ? 'ring-2 ring-blue-500 ring-offset-1' : 'hover:scale-110',
               ].join(' ')}
             >
-              <span
-                className="block rounded-full"
-                style={{ width: 22, height: 22, backgroundColor: farbe }}
-              />
+              <span className="block rounded-full" style={{ width: 20, height: 20, backgroundColor: farbe }} />
             </button>
-          );
-        })}
-      </div>
+          ))}
+        </div>
+      </ToolbarDropdown>
 
       {/* Text-Kontrollen (bei Text-Werkzeug oder selektiertem Text) */}
       {(aktivesTool === 'text' || istTextSelektiert) && (
@@ -170,7 +267,6 @@ export function ZeichnenToolbar({
             aria-label="Text-Formatierung"
             className={`flex gap-0.5 items-center ${isHorizontal ? 'flex-row' : 'flex-col'}`}
           >
-            {/* Grösse S/M/L/XL */}
             {onTextGroesseChange && (
               <>
                 {([
@@ -196,8 +292,6 @@ export function ZeichnenToolbar({
                 ))}
               </>
             )}
-
-            {/* Fett-Toggle */}
             {onTextFettChange && (
               <button
                 type="button"
@@ -213,8 +307,6 @@ export function ZeichnenToolbar({
                 B
               </button>
             )}
-
-            {/* Rotation */}
             {onTextRotationChange && (
               <button
                 type="button"
@@ -229,59 +321,21 @@ export function ZeichnenToolbar({
         </>
       )}
 
-      {/* Trennlinie */}
       <div className={separatorKlassen} aria-hidden="true" />
 
       {/* Undo/Redo */}
-      <div
-        role="group"
-        aria-label="Verlauf"
-        className={`flex gap-0.5 ${isHorizontal ? 'flex-row' : 'flex-col'}`}
-      >
-        <button
-          role="button"
-          title="Rückgängig"
-          onClick={onUndo}
-          disabled={!kannUndo}
-          className={[
-            'min-w-[44px] min-h-[44px] flex items-center justify-center rounded text-sm transition-colors',
-            'bg-transparent hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300',
-            !kannUndo ? 'opacity-40 cursor-not-allowed' : '',
-          ].join(' ')}
-        >
-          ↩
-        </button>
-        <button
-          role="button"
-          title="Wiederherstellen"
-          onClick={onRedo}
-          disabled={!kannRedo}
-          className={[
-            'min-w-[44px] min-h-[44px] flex items-center justify-center rounded text-sm transition-colors',
-            'bg-transparent hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300',
-            !kannRedo ? 'opacity-40 cursor-not-allowed' : '',
-          ].join(' ')}
-        >
-          ↪
-        </button>
+      <div role="group" aria-label="Verlauf" className={`flex gap-0.5 ${isHorizontal ? 'flex-row' : 'flex-col'}`}>
+        <button type="button" title="Rückgängig" onClick={onUndo} disabled={!kannUndo}
+          className={`${btnKlassen(false)} ${!kannUndo ? 'opacity-40 cursor-not-allowed' : ''}`}>↩</button>
+        <button type="button" title="Wiederherstellen" onClick={onRedo} disabled={!kannRedo}
+          className={`${btnKlassen(false)} ${!kannRedo ? 'opacity-40 cursor-not-allowed' : ''}`}>↪</button>
       </div>
 
-      {/* Spacer — nur horizontal, damit flex-1 den Container vertikal nicht sprengt */}
       {isHorizontal && <div className="flex-1" aria-hidden="true" />}
-
-      {/* Layout-Toggle */}
-      <button
-        role="button"
-        title={isHorizontal ? 'Vertikal anordnen' : 'Horizontal anordnen'}
-        onClick={onLayoutToggle}
-        className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded text-sm transition-colors bg-transparent hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-500 dark:text-slate-400"
-      >
-        {isHorizontal ? '⇅' : '⇆'}
-      </button>
 
       {/* Alles löschen */}
       <button
-        role="button"
+        type="button"
         title="Alles löschen"
         onClick={() => setZeigeLoeschenDialog(true)}
         className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded text-sm transition-colors bg-red-50 dark:bg-red-950 text-red-600 border border-red-200 dark:border-red-800 hover:bg-red-100 dark:hover:bg-red-900"
@@ -289,25 +343,19 @@ export function ZeichnenToolbar({
         🗑
       </button>
 
-      {/* Bestätigungsdialog (kein window.confirm — bleibt im Fullscreen) */}
+      {/* Bestätigungsdialog */}
       {zeigeLoeschenDialog && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => setZeigeLoeschenDialog(false)}>
           <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl p-6 max-w-sm mx-4" onClick={(e) => e.stopPropagation()}>
             <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-2">Alles löschen?</h3>
             <p className="text-sm text-slate-600 dark:text-slate-300 mb-5">Alle Zeichnungen werden unwiderruflich entfernt.</p>
             <div className="flex justify-end gap-3">
-              <button
-                type="button"
-                onClick={() => setZeigeLoeschenDialog(false)}
-                className="px-4 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
-              >
+              <button type="button" onClick={() => setZeigeLoeschenDialog(false)}
+                className="px-4 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer">
                 Abbrechen
               </button>
-              <button
-                type="button"
-                onClick={() => { onAllesLoeschen(); setZeigeLoeschenDialog(false) }}
-                className="px-4 py-2 text-sm rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors cursor-pointer"
-              >
+              <button type="button" onClick={() => { onAllesLoeschen(); setZeigeLoeschenDialog(false) }}
+                className="px-4 py-2 text-sm rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors cursor-pointer">
                 Löschen
               </button>
             </div>

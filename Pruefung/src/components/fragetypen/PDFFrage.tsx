@@ -37,6 +37,7 @@ export default function PDFFrage({ frage }: Props) {
   const {
     annotationen, setAnnotationen,
     hinzufuegen, loeschen, editieren,
+    allesLoeschen,
     undo, redo, kannUndo, kannRedo,
     fuerSeite: _fuerSeite,
   } = usePDFAnnotations(gespeicherteAnnotationen)
@@ -67,7 +68,13 @@ export default function PDFFrage({ frage }: Props) {
   const [textRotation, setTextRotation] = useState<0 | 90 | 180 | 270>(0)
   const [textGroesse, setTextGroesse] = useState(18)
   const [textFett, setTextFett] = useState(false)
-  const [toolbarLayout, setToolbarLayout] = useState<'horizontal' | 'vertikal'>('horizontal')
+  const [toolbarLayout, setToolbarLayout] = useState<'horizontal' | 'vertikal'>(() => {
+    try {
+      const saved = localStorage.getItem('pdf-toolbar-layout')
+      if (saved === 'vertikal' || saved === 'horizontal') return saved
+    } catch { /* ignorieren */ }
+    return 'vertikal'
+  })
   const [ladeFehler, setLadeFehler] = useState<string | null>(null)
   const [selectedAnnotation, setSelectedAnnotation] = useState<string | null>(null)
 
@@ -304,7 +311,12 @@ export default function PDFFrage({ frage }: Props) {
               annotationCount={annotationen.length}
               readOnly={abgegeben}
               layout={toolbarLayout}
-              onLayoutToggle={() => setToolbarLayout(l => l === 'horizontal' ? 'vertikal' : 'horizontal')}
+              onLayoutToggle={() => setToolbarLayout(l => {
+                const neu = l === 'horizontal' ? 'vertikal' : 'horizontal'
+                try { localStorage.setItem('pdf-toolbar-layout', neu) } catch { /* ignorieren */ }
+                return neu
+              })}
+              onAllesLoeschen={allesLoeschen}
               textRotation={selectedAnnotation
                 ? ((annotationen.find(a => a.id === selectedAnnotation) as { rotation?: number } | undefined)?.rotation ?? 0) as 0 | 90 | 180 | 270
                 : textRotation}

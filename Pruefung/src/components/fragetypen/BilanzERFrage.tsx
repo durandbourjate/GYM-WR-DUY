@@ -261,7 +261,8 @@ function BilanzSeiteUI({ seite, bilanzsumme, readOnly, konten, onUpdate, onBsCha
 
       {!readOnly && <button type="button" onClick={() => onUpdate(s => { s.gruppen.push(leereGruppe()) })} className={btnAdd}>+ Gruppe</button>}
 
-      <div className="mt-3 pt-2 border-t border-slate-200 dark:border-slate-600 flex items-center gap-2">
+      {/* D2: Bilanzsumme unter den Betrag-Feldern ausgerichtet */}
+      <div className="mt-3 pt-2 border-t border-slate-200 dark:border-slate-600 flex items-center justify-end gap-2">
         <span className="text-xs font-bold text-slate-600 dark:text-slate-300">Bilanzsumme:</span>
         <input type="number" value={bilanzsumme} onChange={e => onBsChange(e.target.value)} disabled={readOnly}
           placeholder="CHF" min="0" step="0.01" className={`${numInput} w-32 font-bold ${!readOnly && !bilanzsumme ? 'border-violet-400 dark:border-violet-500' : ''}`} />
