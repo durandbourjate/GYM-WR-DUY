@@ -1,6 +1,7 @@
 import { fachbereichFarbe, typLabel } from '../../../../utils/fachbereich.ts'
 import { loesungsquoteBgFarbe } from '../../../../utils/trackerUtils.ts'
-import type { Frage } from '../../../../types/fragen.ts'
+import type { Frage, FrageBase } from '../../../../types/fragen.ts'
+import type { EffektivesRecht } from '../../../../types/auth.ts'
 import type { FragenPerformance } from '../../../../types/tracker.ts'
 import type { Gruppierung } from './gruppenHelfer.ts'
 import PoolBadges from './PoolBadges.tsx'
@@ -10,16 +11,23 @@ interface Props {
   istInPruefung: boolean
   onToggle: () => void
   onEdit: () => void
+  onDuplizieren?: () => void
   zeigeGruppierung: Gruppierung
   performance?: FragenPerformance
 }
 
+function rechteBadge(recht?: EffektivesRecht): { label: string; farbe: string } | null {
+  if (!recht || recht === 'inhaber') return null
+  if (recht === 'bearbeiter') return { label: 'B', farbe: 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' }
+  return { label: 'L', farbe: 'bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-400' }
+}
+
 /** Kompakte Zeile für grosse Listen */
-export default function KompaktZeile({ frage, istInPruefung, onToggle, onEdit, zeigeGruppierung, performance }: Props) {
+export default function KompaktZeile({ frage, istInPruefung, onToggle, onEdit, onDuplizieren, zeigeGruppierung, performance }: Props) {
   return (
     <div
       onClick={onEdit}
-      className={`flex items-center gap-2 px-5 py-1.5 text-sm border-b transition-colors cursor-pointer
+      className={`flex items-center gap-2 px-5 py-1.5 text-sm border-b transition-colors cursor-pointer group
         ${istInPruefung
           ? 'border-l-4 border-l-green-500 border-b-slate-100 dark:border-b-slate-700/50 bg-green-50/50 dark:bg-green-900/10'
           : 'border-l-4 border-l-transparent border-b-slate-100 dark:border-b-slate-700/50 hover:bg-slate-50 dark:hover:bg-slate-700/30'
@@ -50,6 +58,14 @@ export default function KompaktZeile({ frage, istInPruefung, onToggle, onEdit, z
         </span>
       )}
       <PoolBadges frage={frage} />
+      {(() => {
+        const badge = rechteBadge((frage as FrageBase)._recht)
+        return badge ? (
+          <span className={`text-[10px] px-1 py-0.5 rounded shrink-0 ${badge.farbe}`} title={badge.label === 'B' ? 'Bearbeiter' : 'Betrachter'}>
+            {badge.label}
+          </span>
+        ) : null
+      })()}
 
       {/* Typ */}
       <span className="text-[10px] px-1 py-0.5 bg-slate-100 dark:bg-slate-600 text-slate-600 dark:text-slate-300 rounded shrink-0">
@@ -66,6 +82,15 @@ export default function KompaktZeile({ frage, istInPruefung, onToggle, onEdit, z
         {frage.thema}{frage.unterthema ? ` \u203A ${frage.unterthema}` : ''}
       </span>
 
+      {onDuplizieren && (
+        <button
+          onClick={(e) => { e.stopPropagation(); onDuplizieren() }}
+          className="p-0.5 text-slate-400 hover:text-blue-500 dark:text-slate-500 dark:hover:text-blue-400 transition-colors cursor-pointer shrink-0 opacity-0 group-hover:opacity-100"
+          title="Als Kopie übernehmen"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </button>
+      )}
       {performance && (
         <span
           className={`w-2.5 h-2.5 rounded-full shrink-0 ${loesungsquoteBgFarbe(performance.durchschnittLoesungsquote)}`}

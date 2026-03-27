@@ -1,6 +1,7 @@
 import { fachbereichFarbe, typLabel } from '../../../../utils/fachbereich.ts'
 import { loesungsquoteFarbe } from '../../../../utils/trackerUtils.ts'
-import type { Frage } from '../../../../types/fragen.ts'
+import type { Frage, FrageBase } from '../../../../types/fragen.ts'
+import type { EffektivesRecht } from '../../../../types/auth.ts'
 import type { FragenPerformance } from '../../../../types/tracker.ts'
 import PoolBadges from './PoolBadges.tsx'
 
@@ -10,11 +11,18 @@ interface Props {
   onToggle: () => void
   onEdit: () => void
   onLoeschen: () => void
+  onDuplizieren?: () => void
   performance?: FragenPerformance
 }
 
+function rechteBadge(recht?: EffektivesRecht): { label: string; farbe: string } | null {
+  if (!recht || recht === 'inhaber') return null
+  if (recht === 'bearbeiter') return { label: 'Bearbeiter', farbe: 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' }
+  return { label: 'Betrachter', farbe: 'bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-400' }
+}
+
 /** Detaillierte Karte mit Fragetext-Vorschau */
-export default function DetailKarte({ frage, istInPruefung, onToggle, onEdit, onLoeschen, performance }: Props) {
+export default function DetailKarte({ frage, istInPruefung, onToggle, onEdit, onLoeschen, onDuplizieren, performance }: Props) {
   const fragetext = 'fragetext' in frage ? (frage as { fragetext: string }).fragetext : ''
 
   return (
@@ -87,6 +95,14 @@ export default function DetailKarte({ frage, istInPruefung, onToggle, onEdit, on
                 Geteilt{frage.geteiltVon ? ` \u00B7 ${frage.geteiltVon}` : ''}
               </span>
             )}
+            {(() => {
+              const badge = rechteBadge((frage as FrageBase)._recht)
+              return badge ? (
+                <span className={`text-[10px] px-1.5 py-0.5 rounded ${badge.farbe}`}>
+                  {badge.label}
+                </span>
+              ) : null
+            })()}
           </div>
 
           {/* Fragen-Statistiken */}
@@ -98,14 +114,25 @@ export default function DetailKarte({ frage, istInPruefung, onToggle, onEdit, on
             </div>
           )}
         </div>
-        {/* Löschen-Button */}
-        <button
-          onClick={(e) => { e.stopPropagation(); onLoeschen() }}
-          className="self-start p-1.5 text-slate-400 hover:text-red-500 dark:text-slate-500 dark:hover:text-red-400 transition-colors cursor-pointer shrink-0 opacity-0 group-hover:opacity-100"
-          title="Frage löschen"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-        </button>
+        {/* Aktions-Buttons */}
+        <div className="flex flex-col gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+          {onDuplizieren && (
+            <button
+              onClick={(e) => { e.stopPropagation(); onDuplizieren() }}
+              className="p-1.5 text-slate-400 hover:text-blue-500 dark:text-slate-500 dark:hover:text-blue-400 transition-colors cursor-pointer"
+              title="Als Kopie übernehmen"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            </button>
+          )}
+          <button
+            onClick={(e) => { e.stopPropagation(); onLoeschen() }}
+            className="p-1.5 text-slate-400 hover:text-red-500 dark:text-slate-500 dark:hover:text-red-400 transition-colors cursor-pointer"
+            title="Frage löschen"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          </button>
+        </div>
       </div>
     </div>
   )

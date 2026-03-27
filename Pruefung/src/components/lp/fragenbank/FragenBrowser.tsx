@@ -187,6 +187,24 @@ export default function FragenBrowser({ onHinzufuegen, onEntfernen, onSchliessen
     }
   }
 
+  async function handleFrageDuplizieren(frage: Frage): Promise<void> {
+    if (!user || istDemoModus || !apiService.istKonfiguriert()) return
+    const neueId = await apiService.dupliziereFrage(user.email, frage.id)
+    if (neueId) {
+      // Fragenbank neu laden um die Kopie anzuzeigen
+      const result = await apiService.ladeFragenbank(user.email)
+      if (result) {
+        const gesehen = new Set<string>()
+        const eindeutig = result.filter((f) => {
+          if (gesehen.has(f.id)) return false
+          gesehen.add(f.id)
+          return true
+        })
+        setAlleFragen(eindeutig)
+      }
+    }
+  }
+
   async function handleFrageLoeschen(): Promise<void> {
     if (!loeschKandidat) return
     setAlleFragen(prev => prev.filter(f => f.id !== loeschKandidat.id))
@@ -310,6 +328,7 @@ export default function FragenBrowser({ onHinzufuegen, onEntfernen, onSchliessen
                                 istInPruefung={bereitsVerwendetSet.has(frage.id)}
                                 onToggle={() => toggleFrageInPruefung(frage.id)}
                                 onEdit={() => { setEditFrage(frage); setZeigEditor(true) }}
+                                onDuplizieren={apiService.istKonfiguriert() && !istDemoModus ? () => handleFrageDuplizieren(frage) : undefined}
                                 zeigeGruppierung={filter.gruppierung}
                                 performance={fragenStats.get(frage.id)}
                               />
@@ -320,6 +339,7 @@ export default function FragenBrowser({ onHinzufuegen, onEntfernen, onSchliessen
                                 onToggle={() => toggleFrageInPruefung(frage.id)}
                                 onEdit={() => { setEditFrage(frage); setZeigEditor(true) }}
                                 onLoeschen={() => setLoeschKandidat(frage)}
+                                onDuplizieren={apiService.istKonfiguriert() && !istDemoModus ? () => handleFrageDuplizieren(frage) : undefined}
                                 performance={fragenStats.get(frage.id)}
                               />
                         ))}

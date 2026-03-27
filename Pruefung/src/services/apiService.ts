@@ -12,6 +12,7 @@ import { sendeNachricht, ladeNachrichten } from './nachrichtenApi'
 import { ladeMonitoring } from './monitoringApi'
 import { ladeTrackerDaten } from './api/trackerApi'
 import { ladeKurse, ladeKursDetails, ladeSchuljahr, ladeLehrplan } from './synergyApi'
+import { setzeBerechtigungen, dupliziereFrage, duplizierePruefung } from './sharingApi'
 
 export const apiService = {
   istKonfiguriert,
@@ -63,6 +64,9 @@ export const apiService = {
   ladeKursDetails,
   ladeSchuljahr,
   ladeLehrplan,
+  setzeBerechtigungen,
+  dupliziereFrage,
+  duplizierePruefung,
 }
 
 // Typ-Re-Exports für Abwärtskompatibilität

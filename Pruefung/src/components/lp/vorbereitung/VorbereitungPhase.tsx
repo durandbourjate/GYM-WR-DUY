@@ -1,13 +1,16 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
-import { useAuthStore } from '../../../store/authStore'
+import { useAuthStore, ladeUndCacheLPs } from '../../../store/authStore'
 import { apiService } from '../../../services/apiService'
 import type { PruefungsConfig, Teilnehmer } from '../../../types/pruefung'
+import type { Berechtigung } from '../../../types/auth'
+import type { LPInfo } from '../../../services/lpApi'
 import KursAuswahl from './KursAuswahl'
 import type { KursGruppe, KlassenlistenSuS } from './KursAuswahl'
 import TeilnehmerListe, { type AlleSuS } from './TeilnehmerListe'
 import { downloadSebDatei } from '../../../utils/sebConfigGenerator'
 import { KontrollStufeSelect } from '../durchfuehrung/KontrollStufeSelect'
 import type { KontrollStufe } from '../../../types/lockdown'
+import BerechtigungenEditor from '../../shared/BerechtigungenEditor'
 
 interface Props {
   config: PruefungsConfig
@@ -36,6 +39,10 @@ export default function VorbereitungPhase({ config, onTeilnehmerGesetzt, onWeite
     new Set((config.teilnehmer ?? []).filter((t) => t.einladungGesendet).map((t) => t.email))
   )
   const [kursAuswahlOffen, setKursAuswahlOffen] = useState(true)
+  const [lpListe, setLpListe] = useState<LPInfo[]>([])
+  const [berechtigungen, setBerechtigungen] = useState<Berechtigung[]>(
+    (config.berechtigungen as Berechtigung[] | undefined) ?? []
+  )
 
   // Klassenlisten laden
   const ladeKlassenlisten = useCallback(async () => {
@@ -60,6 +67,7 @@ export default function VorbereitungPhase({ config, onTeilnehmerGesetzt, onWeite
   }, [user])
 
   useEffect(() => { ladeKlassenlisten() }, [ladeKlassenlisten])
+  useEffect(() => { ladeUndCacheLPs().then(setLpListe) }, [])
 
   // Nach Kurs gruppieren (Sheet-Name)
   const kursGruppen = useMemo((): KursGruppe[] => {
@@ -375,6 +383,20 @@ export default function VorbereitungPhase({ config, onTeilnehmerGesetzt, onWeite
           onConfigUpdate?.({ kontrollStufe: stufe })
         }}
       />
+
+      {/* Prüfungs-Sharing */}
+      <div className="border border-slate-200 dark:border-slate-700 rounded-lg p-4">
+        <h3 className="text-sm font-medium text-slate-700 dark:text-slate-200 mb-3">Prüfung teilen</h3>
+        <BerechtigungenEditor
+          berechtigungen={berechtigungen}
+          onChange={(neueB) => {
+            setBerechtigungen(neueB)
+            onConfigUpdate?.({ berechtigungen: neueB as PruefungsConfig['berechtigungen'] })
+          }}
+          lpListe={lpListe}
+          eigeneFachschaft={user?.fachschaft}
+        />
+      </div>
 
       {/* Einladungs-Fehler */}
       {einladungFehler.length > 0 && (

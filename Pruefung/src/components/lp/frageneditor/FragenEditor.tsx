@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
-import { useAuthStore } from '../../../store/authStore.ts'
+import { useAuthStore, ladeUndCacheLPs } from '../../../store/authStore.ts'
+import type { LPInfo } from '../../../services/lpApi.ts'
 import { apiService } from '../../../services/apiService.ts'
 import { useFocusTrap } from '../../../hooks/useFocusTrap.ts'
 import { usePanelResize } from '../../../hooks/usePanelResize.ts'
@@ -53,6 +54,12 @@ interface Props {
 /** Vollbild-Editor zum Erstellen und Bearbeiten von Prüfungsfragen */
 export default function FragenEditor({ frage, onSpeichern, onAbbrechen, performance }: Props) {
   const user = useAuthStore((s) => s.user)
+
+  // LP-Liste für BerechtigungenEditor (gecacht pro Session)
+  const [lpListe, setLpListe] = useState<LPInfo[]>([])
+  useEffect(() => {
+    ladeUndCacheLPs().then(setLpListe)
+  }, [])
 
   // Grunddaten
   const [typ, setTyp] = useState<FrageTyp>(frage?.typ as FrageTyp ?? 'mc')
@@ -572,7 +579,7 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen, performa
             gefaesse={gefaesse} setGefaesse={setGefaesse}
             geteilt={geteilt} setGeteilt={setGeteilt}
             berechtigungen={berechtigungen} setBerechtigungen={setBerechtigungen}
-            lpListe={[]} eigeneFachschaft={user?.fachschaft}
+            lpListe={lpListe} eigeneFachschaft={user?.fachschaft}
             ki={ki}
             performance={performance}
           />

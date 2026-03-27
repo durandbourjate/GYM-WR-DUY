@@ -8,7 +8,8 @@ import { ladeLehrpersonen, type LPInfo } from '../services/lpApi.ts'
 // Cache für LP-Liste (pro Session geladen)
 let lpCache: LPInfo[] | null = null
 
-async function ladeUndCacheLPs(): Promise<LPInfo[]> {
+/** Lädt LP-Liste vom Backend (gecacht pro Session). Kann von Komponenten importiert werden. */
+export async function ladeUndCacheLPs(): Promise<LPInfo[]> {
   if (lpCache) return lpCache
   try {
     lpCache = await ladeLehrpersonen()
