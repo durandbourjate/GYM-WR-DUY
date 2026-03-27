@@ -116,7 +116,9 @@ export default function PDFEditor({
       const base64 = result.split(',')[1] ?? result
       setPdfBase64(base64)
       setPdfDateiname(datei.name)
-      // TODO: Integrate with uploadApi.ts for Google Drive upload
+      // PDF wird als Base64 in der Fragen-Config gespeichert.
+      // Drive-Upload (uploadMaterial) wäre für grosse PDFs effizienter,
+      // ist aber nicht nötig solange PDFs unter 10 MB bleiben (MAX_DATEIGROESSE).
       setPdfDriveFileId('')
 
       // Load PDF to get page count

@@ -8,10 +8,13 @@ import { ladeLehrpersonen, type LPInfo } from '../services/lpApi.ts'
 // Cache für LP-Liste (pro Session geladen)
 let lpCache: LPInfo[] | null = null
 
-/** Demo-LP-Liste für den Demo-Modus */
+/**
+ * Demo-LP-Liste — nur für den expliziten Demo-Modus (ohne Backend).
+ * Echte LP-Logins laufen über ladeLehrpersonen() → Backend.
+ * Keine echten E-Mail-Adressen hier — nur generische Demo-Accounts.
+ */
 const demoLPs: LPInfo[] = [
-  { email: 'yannick.durand@gymhofwil.ch', name: 'Yannick Durand Bourjate', kuerzel: 'DUY', fachschaft: 'WR', rolle: 'lp' },
-  { email: 'demo-lp@gymhofwil.ch', name: 'Demo-Lehrperson', kuerzel: 'DEM', fachschaft: 'WR', rolle: 'lp' },
+  { email: 'demo-lp@gymhofwil.ch', name: 'Demo-Lehrperson', kuerzel: 'DEM', fachschaft: 'WR', rolle: 'admin' },
   { email: 'kollegin@gymhofwil.ch', name: 'Maria Muster', kuerzel: 'MUM', fachschaft: 'WR', rolle: 'lp' },
   { email: 'hans.meier@gymhofwil.ch', name: 'Hans Meier', kuerzel: 'MEH', fachschaft: 'WR', rolle: 'lp' },
   { email: 'anna.keller@gymhofwil.ch', name: 'Anna Keller', kuerzel: 'KEA', fachschaft: 'IN', rolle: 'lp' },

@@ -195,7 +195,7 @@ export async function sebAusnahmeErlauben(pruefungId: string, lpEmail: string, s
 
 /** Prüfung freischalten (Warteraum aufheben) */
 export async function schaltePruefungFrei(pruefungId: string, email: string): Promise<boolean> {
-  if (!APPS_SCRIPT_URL) return true // Demo-Modus: Freischaltung simulieren
+  if (!APPS_SCRIPT_URL) return false // Kein Backend → Aktion nicht möglich
 
   try {
     const response = await fetch(APPS_SCRIPT_URL, {
@@ -225,7 +225,7 @@ export async function beendePruefung(payload: {
   restzeitMinuten?: number
   einzelneSuS?: string[]
 }): Promise<{ success: boolean; beendetUm?: string; error?: string }> {
-  if (!APPS_SCRIPT_URL) return { success: true, beendetUm: new Date().toISOString() } // Demo-Modus: Beenden simulieren
+  if (!APPS_SCRIPT_URL) return { success: false, error: 'kein_backend' } // Kein Backend → Aktion nicht möglich
 
   try {
     const response = await fetch(APPS_SCRIPT_URL, {
@@ -248,7 +248,7 @@ export async function beendePruefung(payload: {
 
 /** Prüfung zurücksetzen für neue Durchführung (LP) */
 export async function resetPruefung(pruefungId: string, email: string): Promise<boolean> {
-  if (!APPS_SCRIPT_URL) return true
+  if (!APPS_SCRIPT_URL) return false // Kein Backend → Aktion nicht möglich
 
   try {
     const response = await fetch(APPS_SCRIPT_URL, {

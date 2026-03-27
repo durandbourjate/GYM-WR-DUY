@@ -3,6 +3,7 @@ import type { PDFFrage, PDFAnnotation } from '../../../types/fragen.ts'
 import type { FragenBewertung } from '../../../types/korrektur.ts'
 import { effektivePunkte } from '../../../utils/korrekturUtils.ts'
 import { apiService } from '../../../services/apiService.ts'
+import { kiAssistent } from '../../../services/uploadApi.ts'
 import { usePDFRenderer } from '../../fragetypen/pdf/usePDFRenderer.ts'
 import { PDFViewer } from '../../fragetypen/pdf/PDFViewer.tsx'
 import AudioRecorder from '../../AudioRecorder.tsx'
@@ -117,23 +118,46 @@ export default function PDFKorrektur({
     }
   }, [])
 
-  // KI-Vorschlag (placeholder)
+  // KI-Vorschlag
   const [kiLaedt, setKiLaedt] = useState(false)
   const [kiVorschlagGeladen, setKiVorschlagGeladen] = useState(false)
-  const [kiPunkte, _setKiPunkte] = useState<number | null>(null)
-  const [kiBegruendung, _setKiBegruendung] = useState<string | null>(null)
+  const [kiPunkte, setKiPunkte] = useState<number | null>(null)
+  const [kiBegruendung, setKiBegruendung] = useState<string | null>(null)
   const [kiFehler, setKiFehler] = useState(false)
 
   async function handleKiVorschlag(): Promise<void> {
     setKiLaedt(true)
     setKiFehler(false)
 
-    // TODO: Actual API call for PDF correction
-    // For now, simulate a delay and show placeholder
-    await new Promise((resolve) => setTimeout(resolve, 1500))
+    const annotationenText = annotationen.map((a) => {
+      let detail = ''
+      if (a.werkzeug === 'kommentar') detail = a.kommentarText
+      else if (a.werkzeug === 'text') detail = a.text
+      else if (a.werkzeug === 'highlighter' || a.werkzeug === 'label') detail = a.textRange?.text || ''
+      return `[${a.werkzeug} S.${a.seite}] ${detail || '(visuell)'}`
+    }).join('\n')
+
+    const ergebnis = await kiAssistent(schuelerEmail, 'korrigierePDF', {
+      fragetext: frage.fragetext,
+      musterlosung: frage.musterlosung || '',
+      bewertungsraster: JSON.stringify(frage.bewertungsraster || []),
+      maxPunkte: String(maxPunkte),
+      annotationenAnzahl: String(annotationen.length),
+      annotationenDetail: annotationenText,
+      erlaubteWerkzeuge: JSON.stringify(frage.erlaubteWerkzeuge || []),
+    })
 
     setKiLaedt(false)
-    setKiFehler(true) // Show error since not implemented
+
+    if (ergebnis && !ergebnis.fehler) {
+      const punkte = typeof ergebnis.punkte === 'number' ? ergebnis.punkte : null
+      setKiPunkte(punkte)
+      const text = (ergebnis.begruendung || ergebnis.feedback || null) as string | null
+      setKiBegruendung(text)
+      setKiVorschlagGeladen(true)
+    } else {
+      setKiFehler(true)
+    }
   }
 
   function handleKiUebernehmen(): void {

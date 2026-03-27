@@ -18,11 +18,13 @@ const APPS_SCRIPT_URL = import.meta.env.VITE_APPS_SCRIPT_URL
  */
 export async function ladeLehrpersonen(callerEmail?: string): Promise<LPInfo[] | null> {
   if (!APPS_SCRIPT_URL) return null
+  if (!callerEmail) {
+    console.warn('[lpApi] ladeLehrpersonen ohne callerEmail aufgerufen — Backend braucht echte Email')
+    return null
+  }
 
   try {
-    // Echte E-Mail verwenden — Backend prüft istZugelasseneLP()
-    const email = callerEmail || 'check@gymhofwil.ch'
-    const url = `${APPS_SCRIPT_URL}?action=ladeLehrpersonen&email=${encodeURIComponent(email)}`
+    const url = `${APPS_SCRIPT_URL}?action=ladeLehrpersonen&email=${encodeURIComponent(callerEmail)}`
     const res = await fetch(url)
     if (!res.ok) return null
     const data = await res.json()
