@@ -8,7 +8,7 @@ import type { Berechtigung } from '../../../../types/auth.ts'
 import type { FragenPerformance } from '../../../../types/tracker.ts'
 import type { useKIAssistent } from '../useKIAssistent.ts'
 import type { LPInfo } from '../../../../services/lpApi.ts'
-import { bloomLabel } from '../../../../utils/fachbereich.ts'
+import { bloomLabel, istWRFachschaft } from '../../../../utils/fachbereich.ts'
 import { loesungsquoteFarbe } from '../../../../utils/trackerUtils.ts'
 import BerechtigungenEditor from '../../../shared/BerechtigungenEditor.tsx'
 import { Abschnitt, Feld } from '../EditorBausteine.tsx'
@@ -121,7 +121,7 @@ export default function MetadataSection({
             onUebernehmen={() => {
               const d = ki.ergebnisse.klassifiziereFrage?.daten
               if (d) {
-                if (typeof d.fachbereich === 'string' && ['VWL', 'BWL', 'Recht'].includes(d.fachbereich)) {
+                if (typeof d.fachbereich === 'string' && ['VWL', 'BWL', 'Recht', 'Informatik', 'Allgemein'].includes(d.fachbereich)) {
                   setFachbereich(d.fachbereich as Fachbereich)
                 }
                 if (typeof d.thema === 'string' && d.thema.trim()) setThema(d.thema.trim())
@@ -137,13 +137,19 @@ export default function MetadataSection({
       )}
 
       <div className="grid grid-cols-2 gap-3">
-        <Feld label="Fachbereich">
-          <select value={fachbereich} onChange={(e) => setFachbereich(e.target.value as Fachbereich)} className="input-field">
-            <option value="VWL">VWL</option>
-            <option value="BWL">BWL</option>
-            <option value="Recht">Recht</option>
-          </select>
-        </Feld>
+        {istWRFachschaft(eigeneFachschaft) ? (
+          <Feld label="Fachbereich">
+            <select value={fachbereich} onChange={(e) => setFachbereich(e.target.value as Fachbereich)} className="input-field">
+              <option value="VWL">VWL</option>
+              <option value="BWL">BWL</option>
+              <option value="Recht">Recht</option>
+            </select>
+          </Feld>
+        ) : (
+          <Feld label="Fachbereich">
+            <input type="text" value={fachbereich} readOnly className="input-field bg-slate-50 dark:bg-slate-700/50 text-slate-500 cursor-not-allowed" />
+          </Feld>
+        )}
         <Feld label="Bloom-Stufe">
           <select value={bloom} onChange={(e) => setBloom(e.target.value as BloomStufe)} className="input-field">
             {(['K1', 'K2', 'K3', 'K4', 'K5', 'K6'] as BloomStufe[]).map((k) => (

@@ -4,7 +4,7 @@ import type { LPInfo } from '../../../services/lpApi.ts'
 import { apiService } from '../../../services/apiService.ts'
 import { useFocusTrap } from '../../../hooks/useFocusTrap.ts'
 import { usePanelResize } from '../../../hooks/usePanelResize.ts'
-import { typLabel } from '../../../utils/fachbereich.ts'
+import { typLabel, defaultFachbereich } from '../../../utils/fachbereich.ts'
 import { validiereFrage } from '../../../utils/fragenValidierung.ts'
 import { erstelleFrageObjekt } from '../../../utils/fragenFactory.ts'
 import type { FrageBasis, TypSpezifischeDaten } from '../../../utils/fragenFactory.ts'
@@ -63,7 +63,7 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen, performa
 
   // Grunddaten
   const [typ, setTyp] = useState<FrageTyp>(frage?.typ as FrageTyp ?? 'mc')
-  const [fachbereich, setFachbereich] = useState<Fachbereich>(frage?.fachbereich ?? 'VWL')
+  const [fachbereich, setFachbereich] = useState<Fachbereich>(frage?.fachbereich ?? defaultFachbereich(user?.fachschaft))
   const [thema, setThema] = useState(frage?.thema ?? '')
   const [unterthema, setUnterthema] = useState(frage?.unterthema ?? '')
   const [bloom, setBloom] = useState<BloomStufe>(frage?.bloom ?? 'K2')

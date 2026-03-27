@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { berechneNote, effektivePunkte, berechneGesamtpunkte, DEFAULT_NOTEN_CONFIG } from './korrekturUtils'
+import { berechneNote, effektivePunkte, berechneGesamtpunkte, DEFAULT_NOTEN_CONFIG, quelleLabel } from './korrekturUtils'
 import type { FragenBewertung } from '../types/korrektur'
 
 describe('berechneNote', () => {
@@ -85,5 +85,33 @@ describe('DEFAULT_NOTEN_CONFIG', () => {
   it('hat korrekte Standardwerte', () => {
     expect(DEFAULT_NOTEN_CONFIG.punkteFuerSechs).toBe(0)
     expect(DEFAULT_NOTEN_CONFIG.rundung).toBe(0.5)
+  })
+})
+
+describe('quelleLabel', () => {
+  it.each([
+    ['auto', 'Auto'],
+    ['ki', 'KI'],
+    ['manuell', 'Manuell'],
+    ['fehler', 'Fehler'],
+  ] as const)('gibt "%s" → "%s"', (quelle, label) => {
+    expect(quelleLabel(quelle)).toBe(label)
+  })
+})
+
+describe('berechneNote — Edge-Cases', () => {
+  it('rundet auf ganze Noten', () => {
+    // Note = 1 + 5 * (14/20) = 4.5 → gerundet auf 1 = 5
+    expect(berechneNote(14, 20, { rundung: 1 })).toBe(5)
+  })
+
+  it('behandelt halbe Punkte korrekt', () => {
+    // Note = 1 + 5 * (0.5/20) = 1.125 → gerundet auf 0.5 = 1
+    expect(berechneNote(0.5, 20)).toBe(1)
+  })
+
+  it('behandelt sehr kleine Punkte', () => {
+    // Note = 1 + 5 * (1/20) = 1.25 → gerundet auf 0.5 = 1.5
+    expect(berechneNote(1, 20)).toBe(1.5)
   })
 })

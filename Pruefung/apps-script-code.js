@@ -31,6 +31,36 @@ function istZugelasseneLP(email) {
   return info !== null && info.aktiv;
 }
 
+// === SICHERHEIT: Session-Tokens für SuS ===
+
+/**
+ * Generiert ein Session-Token für einen authentifizierten SuS.
+ * Token wird in CacheService gespeichert (TTL 3 Stunden).
+ */
+function generiereSessionToken_(email, pruefungId) {
+  var token = Utilities.getUuid();
+  var cache = CacheService.getScriptCache();
+  var daten = JSON.stringify({ email: email.toLowerCase(), pruefungId: pruefungId, ts: new Date().toISOString() });
+  cache.put('sus_session_' + token, daten, 10800); // 3h
+  return token;
+}
+
+/**
+ * Validiert ein SuS-Session-Token. Prüft ob Token existiert und E-Mail übereinstimmt.
+ */
+function validiereSessionToken_(token, email) {
+  if (!token || !email) return false;
+  var cache = CacheService.getScriptCache();
+  var raw = cache.get('sus_session_' + token);
+  if (!raw) return false;
+  try {
+    var daten = JSON.parse(raw);
+    return daten.email === email.toLowerCase();
+  } catch (e) {
+    return false;
+  }
+}
+
 /**
  * Gibt LP-Infos zurück (fachschaft, rolle, apiKey, aktiv) oder null.
  * Gecached via CacheService (5 Min).
@@ -1190,9 +1220,14 @@ function parseFrage(row, fachbereich) {
 
 function speichereAntworten(body) {
   try {
-    const { pruefungId, email, antworten, version, istAbgabe, gesamtFragen, requestId } = body;
+    const { pruefungId, email, antworten, version, istAbgabe, gesamtFragen, requestId, sessionToken } = body;
     if (!pruefungId || !email || !antworten) {
       return jsonResponse({ error: 'Fehlende Daten' });
+    }
+
+    // SICHERHEIT: Session-Token prüfen (verhindert E-Mail-Spoofing)
+    if (sessionToken && !validiereSessionToken_(sessionToken, email)) {
+      return jsonResponse({ error: 'Ungültiges Session-Token. Bitte neu anmelden.' });
     }
 
     // Beantwortete Fragen zählen
@@ -1258,7 +1293,13 @@ function speichereAntworten(body) {
 
 function heartbeat(body) {
   try {
-    const { pruefungId, email, timestamp } = body;
+    const { pruefungId, email, timestamp, sessionToken } = body;
+
+    // SICHERHEIT: Session-Token prüfen wenn vorhanden
+    if (sessionToken && !validiereSessionToken_(sessionToken, email)) {
+      return jsonResponse({ error: 'Ungültiges Session-Token' });
+    }
+
     const sheet = getOrCreateAntwortenSheet(pruefungId);
     const data = getSheetData(sheet);
     let existingRow = data.findIndex(row => row.email === email);
@@ -3181,7 +3222,44 @@ function kiAssistentEndpoint(body) {
         result = rufeClaudeAuf(systemPrompt, userPrompt, 2048, email);
         return jsonResponse({ success: true, ergebnis: result });
 
+      case 'korrigiereFreitext': {
+        // DATENSCHUTZ: Nur Antwort-Text + Frage-Kontext an Claude — KEINE Schüler-Identifikatoren
+        var ftFragetext = daten.fragetext || '';
+        var ftAntwortText = daten.antwortText || '(keine Antwort)';
+        var ftMusterlosung = daten.musterlosung || '';
+        var ftMaxPunkte = daten.maxPunkte || 1;
+        var ftBloom = daten.bloom || '';
+        var ftBewertungsraster = daten.bewertungsraster || null;
+        var ftLernziel = daten.lernziel || '';
+
+        var ftSysPrompt = korrekturSystemPrompt();
+        var ftRaster = '';
+        if (ftBewertungsraster && Array.isArray(ftBewertungsraster)) {
+          ftRaster = ftBewertungsraster.map(function(b) { return '- ' + b.beschreibung + ' (' + b.punkte + ' P.)'; }).join('\n');
+        }
+
+        var ftUserPrompt = 'Frage: ' + ftFragetext + '\n' +
+          'Maximale Punkte: ' + ftMaxPunkte + '\n' +
+          'Musterlösung: ' + (ftMusterlosung || '(keine)') + '\n' +
+          (ftBloom ? 'Taxonomie-Stufe: ' + ftBloom + '\n' : '') +
+          (ftLernziel ? 'Lernziel: ' + ftLernziel + '\n' : '') +
+          (ftRaster ? 'Bewertungsraster:\n' + ftRaster + '\n' : '') +
+          '\nSchülerantwort:\n' + ftAntwortText + '\n\n' +
+          'Antworte ausschliesslich als JSON: {"punkte": <number>, "begruendung": "<1-2 Sätze>"}';
+
+        var ftResult = rufeClaudeAuf(ftSysPrompt, ftUserPrompt, 1024, email);
+
+        // Punkte auf [0, maxPunkte] begrenzen
+        var ftPunkte = Number(ftResult.punkte) || 0;
+        ftPunkte = Math.max(0, Math.min(ftMaxPunkte, ftPunkte));
+
+        var ftBegruendung = (ftResult.begruendung || '').substring(0, 500);
+
+        return jsonResponse({ success: true, ergebnis: { punkte: ftPunkte, begruendung: ftBegruendung } });
+      }
+
       case 'korrigiereZeichnung': {
+        // DATENSCHUTZ: Nur Bild + Frage-Kontext an Claude — KEINE Schüler-Identifikatoren
         var bild = daten.bild;           // base64 PNG (without data:image/png;base64, prefix)
         var fragetext = daten.fragetext;
         var musterloesungBild = daten.musterloesungBild || null;
@@ -3281,6 +3359,7 @@ function korrekturSystemPrompt() {
     'Antworte ausschliesslich als JSON: { "punkte": number, "begruendung": string }';
 }
 
+// DATENSCHUTZ: Nur PDF-Annotationen + Frage-Kontext an Claude — KEINE Schüler-Identifikatoren
 function korrigierePDFAnnotation(params) {
   const { pdfBilder, annotationen, musterloesungAnnotationen, bewertungsraster, maxPunkte } = params;
   const fragetext = params.fragetext || '';
@@ -3483,6 +3562,7 @@ function batchKorrektur(pruefungId, lpEmail, korrekturSheet) {
         });
       } else {
         try {
+          // DATENSCHUTZ: Nur Frage-/Antwort-Inhalt an Claude — KEINE Schüler-Identifikatoren (E-Mail, Name, Klasse)
           const systemPrompt = buildKorrekturPrompt(frage);
           const userPrompt = antwort ? antwort.text || '(keine Antwort)' : '(keine Antwort)';
           const kiResult = rufeClaudeAuf(systemPrompt, userPrompt, undefined, lpEmail);
@@ -3905,8 +3985,17 @@ function schalteFreiEndpoint(body) {
 
 function validiereSchuelercode(body) {
   try {
-    const { email, code } = body;
+    const { email, code, pruefungId } = body;
     if (!email || !code) return jsonResponse({ success: false, error: 'E-Mail und Code erforderlich' });
+
+    // SICHERHEIT: Rate-Limiting — max. 5 Fehlversuche pro E-Mail in 15 Minuten
+    var cache = CacheService.getScriptCache();
+    var rateLimitKey = 'ratelimit_code_' + email.toLowerCase();
+    var versucheStr = cache.get(rateLimitKey);
+    var versuche = versucheStr ? parseInt(versucheStr, 10) : 0;
+    if (versuche >= 5) {
+      return jsonResponse({ success: false, error: 'Zu viele Fehlversuche. Bitte 15 Minuten warten.' });
+    }
 
     const kurseSS = SpreadsheetApp.openById(KURSE_SHEET_ID);
     const sheets = kurseSS.getSheets();
@@ -3918,15 +4007,21 @@ function validiereSchuelercode(body) {
       const data = getSheetData(sheet);
       const eintrag = data.find(r => r.email === email && String(r.schuelerCode || r.schuelerID || '') === String(code));
       if (eintrag) {
+        // Erfolg: Rate-Limit-Counter zurücksetzen + Session-Token generieren
+        cache.remove(rateLimitKey);
+        var sessionToken = generiereSessionToken_(email, pruefungId || '');
         return jsonResponse({
           success: true,
           name: eintrag.name || '',
           vorname: eintrag.vorname || '',
           klasse: eintrag.klasse || sheetName,
+          sessionToken: sessionToken,
         });
       }
     }
 
+    // Fehlversuch: Counter erhöhen (TTL 900s = 15 Minuten)
+    cache.put(rateLimitKey, String(versuche + 1), 900);
     return jsonResponse({ success: false, error: 'Code ungültig oder E-Mail nicht in Klassenliste.' });
   } catch (error) {
     return jsonResponse({ success: false, error: error.message });

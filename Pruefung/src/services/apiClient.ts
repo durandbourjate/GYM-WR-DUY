@@ -26,6 +26,18 @@ function fetchMitTimeout(
   return fetch(url, { ...options, signal: controller.signal }).finally(() => clearTimeout(timeoutId))
 }
 
+/** Liest Session-Token aus sessionStorage (für SuS-Authentifizierung) */
+function getSessionToken(): string | undefined {
+  try {
+    const raw = sessionStorage.getItem('pruefung-auth')
+    if (!raw) return undefined
+    const parsed = JSON.parse(raw)
+    return parsed?.sessionToken || undefined
+  } catch {
+    return undefined
+  }
+}
+
 /** POST-Request an Apps Script (text/plain um CORS-Preflight zu vermeiden), gibt T | null zurück */
 export async function postJson<T>(
   action: string,
@@ -34,10 +46,13 @@ export async function postJson<T>(
 ): Promise<T | null> {
   if (!APPS_SCRIPT_URL) return null
   try {
+    // Session-Token automatisch mitsenden wenn vorhanden (SuS-Authentifizierung)
+    const sessionToken = getSessionToken()
+    const body = sessionToken ? { action, sessionToken, ...payload } : { action, ...payload }
     const response = await fetchMitTimeout(APPS_SCRIPT_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain' },
-      body: JSON.stringify({ action, ...payload }),
+      body: JSON.stringify(body),
       signal: options?.signal,
     }, options?.timeoutMs)
     if (!response.ok) return null
@@ -71,10 +86,12 @@ export async function postBool(
 ): Promise<boolean> {
   if (!APPS_SCRIPT_URL) return false
   try {
+    const sessionToken = getSessionToken()
+    const body = sessionToken ? { action, sessionToken, ...payload } : { action, ...payload }
     const response = await fetchMitTimeout(APPS_SCRIPT_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain' },
-      body: JSON.stringify({ action, ...payload }),
+      body: JSON.stringify(body),
       signal: options?.signal,
     })
     if (!response.ok) return false

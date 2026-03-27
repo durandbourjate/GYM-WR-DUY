@@ -56,7 +56,7 @@ interface AuthStore {
   fehler: string | null
 
   anmelden: (credential: GoogleCredential) => void
-  anmeldenMitCode: (schuelerId: string, name: string, email: string) => void
+  anmeldenMitCode: (schuelerId: string, name: string, email: string, sessionToken?: string) => void
   demoStarten: (rolle?: 'sus' | 'lp') => void
   abmelden: () => void
   setFehler: (fehler: string | null) => void
@@ -111,7 +111,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
     set({ user, istDemoModus: false, ladeStatus: 'fertig', fehler: null })
   },
 
-  anmeldenMitCode: (schuelerId: string, name: string, email: string) => {
+  anmeldenMitCode: (schuelerId: string, name: string, email: string, sessionToken?: string) => {
     const user: AuthUser = {
       email,
       name,
@@ -119,6 +119,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
       nachname: name.split(' ').slice(1).join(' ') || '',
       rolle: 'sus',
       schuelerId,
+      sessionToken,
     }
     // Alten Prüfungszustand aufräumen (verhindert stale State nach Re-Login)
     resetPruefungState()

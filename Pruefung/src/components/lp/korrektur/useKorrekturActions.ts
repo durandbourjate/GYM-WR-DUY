@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { apiService } from '../../../services/apiService.ts'
-import type { PruefungsKorrektur, SchuelerAbgabe } from '../../../types/korrektur.ts'
+import type { PruefungsKorrektur, SchuelerAbgabe, FragenBewertung } from '../../../types/korrektur.ts'
 import type { Frage } from '../../../types/fragen.ts'
 import { exportiereAlsCSV, exportiereErgebnisseAlsCSV, downloadCSV } from '../../../utils/exportUtils.ts'
 import { exportiereBackupXlsx } from '../../../utils/backupExport.ts'
@@ -52,7 +52,7 @@ export function useKorrekturActions({
   }, [batchLaeuft, userEmail, pruefungId, setKorrektur])
 
   const handleBewertungUpdate = useCallback((schuelerEmail: string, frageId: string, updates: {
-    lpPunkte?: number | null; lpKommentar?: string | null; geprueft?: boolean
+    lpPunkte?: number | null; lpKommentar?: string | null; geprueft?: boolean; audioKommentarId?: string | null; kiPunkte?: number | null; kiBegruendung?: string | null; quelle?: FragenBewertung['quelle']
   }) => {
     setKorrektur((prev) => {
       if (!prev) return prev
@@ -62,7 +62,10 @@ export function useKorrekturActions({
           if (s.email !== schuelerEmail) return s
           const bewertung = s.bewertungen[frageId]
           if (!bewertung) return s
-          const neueBewertungen = { ...s.bewertungen, [frageId]: { ...bewertung, ...updates } }
+          // null → undefined für optionale Felder (audioKommentarId)
+          const cleanUpdates = { ...updates } as Record<string, unknown>
+          if (cleanUpdates.audioKommentarId === null) cleanUpdates.audioKommentarId = undefined
+          const neueBewertungen = { ...s.bewertungen, [frageId]: { ...bewertung, ...cleanUpdates } as FragenBewertung }
           const alleGeprueft = Object.values(neueBewertungen).every((b) => b.geprueft)
           const neuerStatus = alleGeprueft ? 'review-fertig' as const : s.korrekturStatus === 'review-fertig' ? 'offen' as const : s.korrekturStatus
           return { ...s, bewertungen: neueBewertungen, korrekturStatus: neuerStatus }

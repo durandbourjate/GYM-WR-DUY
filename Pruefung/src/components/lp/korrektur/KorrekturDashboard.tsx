@@ -118,7 +118,7 @@ export default function KorrekturDashboard({ pruefungId, eingebettet = false }: 
           zurueck={() => { window.location.href = window.location.pathname }}
           statusText={
             (korrektur?.batchStatus === 'laeuft' || batchLaeuft)
-              ? `KI korrigiert... ${korrektur?.batchFortschritt ? `${korrektur.batchFortschritt.erledigt}/${korrektur.batchFortschritt.gesamt}` : ''}`
+              ? `Korrektur läuft... ${korrektur?.batchFortschritt ? `${korrektur.batchFortschritt.erledigt}/${korrektur.batchFortschritt.gesamt}` : ''}`
             : korrektur?.batchStatus === 'fehler'
               ? `Fehler: ${korrektur.batchFehler}`
             : undefined
@@ -249,7 +249,7 @@ export default function KorrekturDashboard({ pruefungId, eingebettet = false }: 
         {(!korrektur || korrektur.schueler.length === 0) && ladeStatus === 'fertig' && (
           <div className="text-center py-12">
             <p className="text-slate-500 dark:text-slate-400 mb-4">Noch keine Korrektur-Daten vorhanden.</p>
-            <p className="text-sm text-slate-400 dark:text-slate-500">Starten Sie die KI-Korrektur, sobald alle SuS abgegeben haben.</p>
+            <p className="text-sm text-slate-400 dark:text-slate-500">Starten Sie die Autokorrektur, sobald alle SuS abgegeben haben.</p>
           </div>
         )}
 
@@ -278,6 +278,7 @@ export default function KorrekturDashboard({ pruefungId, eingebettet = false }: 
                 fragen={fragen}
                 autoErgebnisse={autoErgebnisseAlle[sortierteSchueler[susNavIndex].email] ?? {}}
                 notenConfig={notenConfig}
+                userEmail={user?.email}
                 onBewertungUpdate={handleBewertungUpdate}
                 onNoteOverride={handleNoteOverride}
                 onAudioUpload={handleAudioUpload}

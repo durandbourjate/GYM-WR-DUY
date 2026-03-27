@@ -42,12 +42,12 @@ export default function KorrekturAktionsLeiste({
     <>
       {(korrektur?.batchStatus === 'laeuft' || batchLaeuft) && (
         <span className="text-sm text-amber-600 dark:text-amber-400">
-          KI korrigiert... {korrektur?.batchFortschritt ? `${korrektur.batchFortschritt.erledigt}/${korrektur.batchFortschritt.gesamt}` : ''}
+          Korrektur läuft... {korrektur?.batchFortschritt ? `${korrektur.batchFortschritt.erledigt}/${korrektur.batchFortschritt.gesamt}` : ''}
         </span>
       )}
       {korrektur?.batchStatus === 'idle' && (
         <button onClick={onStarteKorrektur} disabled={aktionLaeuft === 'ki'} className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors cursor-pointer disabled:opacity-50">
-          {aktionLaeuft === 'ki' ? 'Wird gestartet...' : 'KI-Korrektur starten'}
+          {aktionLaeuft === 'ki' ? 'Wird gestartet...' : 'Autokorrektur starten'}
         </button>
       )}
       {korrektur?.batchStatus === 'fertig' && (

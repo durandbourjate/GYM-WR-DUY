@@ -69,7 +69,7 @@ export interface FrageBase {
   lernzielIds?: string[]              // Referenzen auf Lernziel-Einträge
 }
 
-export type Fachbereich = 'VWL' | 'BWL' | 'Recht' | 'Informatik';
+export type Fachbereich = 'VWL' | 'BWL' | 'Recht' | 'Informatik' | 'Allgemein';
 export type Gefaess = 'SF' | 'EF' | 'EWR' | 'GF';
 export type BloomStufe = 'K1' | 'K2' | 'K3' | 'K4' | 'K5' | 'K6';
 

@@ -57,7 +57,7 @@ export interface PruefungsConfig {
   autoSaveIntervallSekunden: number;
   heartbeatIntervallSekunden: number;
 
-  // KI-Korrektur
+  // Korrektur
   korrektur: {
     aktiviert: boolean;
     modus: 'sofort' | 'batch';

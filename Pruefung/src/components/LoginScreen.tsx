@@ -92,7 +92,8 @@ export default function LoginScreen() {
     if (apiService.istKonfiguriert()) {
       setCodeWirdValidiert(true)
       setFehler(null)
-      const result = await apiService.validiereSchuelercode(volleEmail, code)
+      const pruefungId = new URLSearchParams(window.location.search).get('id') || ''
+      const result = await apiService.validiereSchuelercode(volleEmail, code, pruefungId)
       setCodeWirdValidiert(false)
 
       if (result === null) {
@@ -109,7 +110,7 @@ export default function LoginScreen() {
       const validierterName = result.vorname && result.name
         ? `${result.vorname} ${result.name}`
         : nameAusEmail(volleEmail)
-      anmeldenMitCode(code, validierterName, volleEmail)
+      anmeldenMitCode(code, validierterName, volleEmail, result.sessionToken)
     } else {
       // Kein Backend → direkt anmelden
       anmeldenMitCode(code, nameAusEmail(volleEmail), volleEmail)

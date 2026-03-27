@@ -69,11 +69,12 @@ export async function sendeEinladungen(
 }
 
 /** Schülercode gegen Klassenliste validieren */
-export async function validiereSchuelercode(email: string, code: string): Promise<{
+export async function validiereSchuelercode(email: string, code: string, pruefungId?: string): Promise<{
   success: boolean
   name?: string
   vorname?: string
   klasse?: string
+  sessionToken?: string
   error?: string
 } | null> {
   if (!APPS_SCRIPT_URL) return null
@@ -82,7 +83,7 @@ export async function validiereSchuelercode(email: string, code: string): Promis
     const response = await fetch(APPS_SCRIPT_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain' },
-      body: JSON.stringify({ action: 'validiereSchuelercode', email, code }),
+      body: JSON.stringify({ action: 'validiereSchuelercode', email, code, pruefungId }),
     })
     if (!response.ok) return null
 

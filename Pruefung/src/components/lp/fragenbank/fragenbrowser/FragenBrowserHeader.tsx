@@ -186,16 +186,21 @@ export default function FragenBrowserHeader({
 
       {/* Filter-Zeile */}
       <div className="flex items-center gap-2 mt-2 flex-wrap">
-        <select
-          value={filterFachbereich}
-          onChange={(e) => { setFilterFachbereich(e.target.value as Fachbereich | ''); setAngezeigteMenge(seitenGroesse) }}
-          className="text-xs px-2 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-300 cursor-pointer"
-        >
-          <option value="">Fachbereich</option>
-          <option value="VWL">VWL ({stats.fachbereiche.get('VWL') ?? 0})</option>
-          <option value="BWL">BWL ({stats.fachbereiche.get('BWL') ?? 0})</option>
-          <option value="Recht">Recht ({stats.fachbereiche.get('Recht') ?? 0})</option>
-        </select>
+        {/* Fachbereich-Filter nur anzeigen wenn Fragen aus mehreren Fachbereichen vorhanden */}
+        {stats.fachbereiche.size > 1 && (
+          <select
+            value={filterFachbereich}
+            onChange={(e) => { setFilterFachbereich(e.target.value as Fachbereich | ''); setAngezeigteMenge(seitenGroesse) }}
+            className="text-xs px-2 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-300 cursor-pointer"
+          >
+            <option value="">Fachbereich</option>
+            {Array.from(stats.fachbereiche.entries())
+              .filter(([, count]) => count > 0)
+              .map(([fb, count]) => (
+                <option key={fb} value={fb}>{fb} ({count})</option>
+              ))}
+          </select>
+        )}
         <select
           value={filterTyp}
           onChange={(e) => { setFilterTyp(e.target.value); setAngezeigteMenge(seitenGroesse) }}

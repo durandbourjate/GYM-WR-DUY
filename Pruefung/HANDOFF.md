@@ -8,7 +8,29 @@
 ## Offene Punkte
 
 - **SEB / iPad** — SEB weiterhin deaktiviert (`sebErforderlich: false`)
-- ~~Fragenbank im Composer "nicht gefunden"~~ ✅ 27.03.2026 — War Timing-Problem: Fragenbank lud langsam, Composer zeigte "nicht gefunden" statt "laden...". Fixes: fragenbankStore (einmal laden, überall nutzen), "laden..." statt "nicht gefunden", Backend CacheService.
+- ~~Fragenbank im Composer "nicht gefunden"~~ ✅ 27.03.2026
+- **Apps Script Deploy nötig** — Session 29 enthält Backend-Änderungen (Rate-Limiting, Session-Tokens, KI-Freitext-Endpoint, DATENSCHUTZ-Guards)
+
+---
+
+## Session 29 — Sicherheit, Fachbereich, Autokorrektur, KI-Vorschlag (27.03.2026)
+
+| # | Feature | Details |
+|---|---------|---------|
+| 1 | **"KI-Korrektur" → "Autokorrektur"** | Button und Texte umbenannt (KorrekturAktionsLeiste, KorrekturDashboard, HilfeSeite, korrekturApi). "KI:" Label dynamisch nach Quelle (Auto/KI). |
+| 2 | **Fachbereich nur bei WR** | Fachbereich-Dropdown nur bei LP-Fachschaft WR. Neue Werte: 'Informatik', 'Allgemein'. Default aus Fachschaft abgeleitet. Filter nur bei mehreren Fachbereichen. |
+| 3 | **Tests erweitert (46→89)** | Neues `fachbereich.test.ts` (26 Tests). Erweiterte korrekturUtils + autoKorrektur Tests. |
+| 4 | **Rate-Limiting Schülercode** | Max 5 Fehlversuche/15 Min pro E-Mail via CacheService. Counter bei Erfolg zurückgesetzt. |
+| 5 | **Session-Tokens für SuS** | `generiereSessionToken_()` bei Login (UUID, 3h TTL). `validiereSessionToken_()` in speichereAntworten + heartbeat. Frontend sendet Token automatisch (apiClient). |
+| 6 | **Auth-Audit** | Alle 18 LP-Endpoints haben `istZugelasseneLP()`-Checks ✅ |
+| 7 | **KI-Anonymisierung** | DATENSCHUTZ-Kommentar-Guards in batchKorrektur, korrigiereZeichnung, korrigierePDFAnnotation. Verifiziert: Keine Schüler-Identifikatoren in Claude-Prompts. |
+| 8 | **KI-Vorschlag Freitext** | Neuer Backend-Case `korrigiereFreitext` in kiAssistentEndpoint. Frontend: "KI-Vorschlag"-Button in KorrekturFrageZeile (amber, nur bei Freitext). onUpdate erweitert um kiPunkte/kiBegruendung/quelle. |
+
+**Backend-Dateien:** `apps-script-code.js` (Rate-Limiting, Session-Tokens, korrigiereFreitext, DATENSCHUTZ-Guards)
+**Frontend-Dateien:** `KorrekturAktionsLeiste.tsx`, `KorrekturDashboard.tsx`, `KorrekturFrageZeile.tsx`, `KorrekturSchuelerZeile.tsx`, `useKorrekturActions.ts`, `HilfeSeite.tsx`, `korrekturApi.ts`, `MetadataSection.tsx`, `FragenBrowserHeader.tsx`, `FragenEditor.tsx`, `fachbereich.ts`, `fragen.ts`, `auth.ts`, `apiClient.ts`, `klassenlistenApi.ts`, `LoginScreen.tsx`
+**Tests:** `fachbereich.test.ts` (neu), `korrekturUtils.test.ts`, `autoKorrektur.test.ts`
+
+**Wichtig:** Apps Script muss neu deployed werden für Rate-Limiting, Session-Tokens und KI-Freitext-Endpoint.
 
 ---
 

@@ -498,14 +498,14 @@ function HilfeKorrektur() {
         Nach der Prüfung können Sie über &laquo;Korrektur&raquo; auf der Startseite das Korrektur-Dashboard öffnen.
       </Text>
 
-      <Untertitel>KI-Korrektur</Untertitel>
+      <Untertitel>Autokorrektur</Untertitel>
       <Text>
-        Mit &laquo;KI-Korrektur starten&raquo; werden alle Antworten automatisch durch die KI bewertet. Die KI vergibt Punkte und schreibt eine Begründung. Sie können jeden Wert manuell überschreiben.
+        Mit &laquo;Autokorrektur starten&raquo; werden alle Antworten automatisch bewertet. Deterministische Fragetypen (MC, R/F, Lückentext, Zuordnung, Berechnung, FiBu) werden algorithmisch korrigiert. Für komplexe Fragetypen (Freitext, Zeichnen, PDF) können Sie pro Frage einen KI-Vorschlag via Claude API anfordern. Sie können jeden Wert manuell überschreiben.
       </Text>
 
       <Untertitel>Review-Workflow</Untertitel>
-      <Schritt nr={1}><strong>Auto-Korrektur</strong> — MC, R/F, Lückentext, Zuordnung und Berechnung werden sofort automatisch bewertet. Punkte erscheinen direkt. Diese Fragen werden automatisch als «Geprüft» markiert.</Schritt>
-      <Schritt nr={2}><strong>KI-Korrektur</strong> — Für komplexe Fragetypen (Freitext, FiBu, Zeichnen) kann die KI-Korrektur gestartet werden.</Schritt>
+      <Schritt nr={1}><strong>Autokorrektur</strong> — MC, R/F, Lückentext, Zuordnung, Berechnung und FiBu werden algorithmisch bewertet. Punkte erscheinen direkt. Diese Fragen werden automatisch als «Geprüft» markiert.</Schritt>
+      <Schritt nr={2}><strong>KI-Vorschlag</strong> — Für Freitext, Zeichnen und PDF-Annotation können Sie pro Frage einen KI-Korrekturvorschlag (Claude API) anfordern.</Schritt>
       <Schritt nr={3}><strong>LP prüft</strong> — Punkte ändern, Kommentar schreiben oder Audio aufnehmen markiert die Frage automatisch als &laquo;Geprüft&raquo;. Wenn alle Fragen eines SuS geprüft sind, wechselt der Status auf &laquo;Review fertig&raquo;.</Schritt>
       <Schritt nr={4}><strong>Ergebnisse freigeben</strong> — Wenn alle SuS korrigiert sind, erscheint ein grünes Banner. Die Freigabe ist blockiert solange Bewertungen ohne Punkte existieren (Schutz vor versehentlich unvollständiger Korrektur). Export und Feedback zeigen eine Warnung bei fehlenden Punkten.</Schritt>
 

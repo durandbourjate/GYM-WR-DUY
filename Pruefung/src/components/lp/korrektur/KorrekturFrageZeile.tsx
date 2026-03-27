@@ -1,10 +1,15 @@
+import { useState } from 'react'
 import type { FragenBewertung } from '../../../types/korrektur.ts'
-import type { Frage } from '../../../types/fragen.ts'
+import type { Frage, FreitextFrage } from '../../../types/fragen.ts'
 import type { Antwort } from '../../../types/antworten.ts'
 import type { KorrekturErgebnis } from '../../../utils/autoKorrektur.ts'
 import { effektivePunkte, quelleLabel } from '../../../utils/korrekturUtils.ts'
+import { apiService } from '../../../services/apiService.ts'
 import AudioRecorder from '../../AudioRecorder.tsx'
 import KorrekturFrageVollansicht from './KorrekturFrageVollansicht.tsx'
+
+/** KI-korrigierbare Fragetypen (nicht-deterministische, brauchen Claude API) */
+const KI_KORRIGIERBARE_TYPEN = new Set(['freitext'])
 
 interface Props {
   frageId: string
@@ -14,7 +19,9 @@ interface Props {
   bewertung: FragenBewertung
   /** Aufgabennummer (1-basiert) für Anzeige (U6) */
   aufgabeNr?: number
-  onUpdate: (updates: { lpPunkte?: number | null; lpKommentar?: string | null; geprueft?: boolean; audioKommentarId?: string | null }) => void
+  /** E-Mail der LP (für API-Key-Routing bei KI-Korrektur) */
+  userEmail?: string
+  onUpdate: (updates: { lpPunkte?: number | null; lpKommentar?: string | null; geprueft?: boolean; audioKommentarId?: string | null; kiPunkte?: number | null; kiBegruendung?: string | null; quelle?: 'auto' | 'ki' | 'manuell' | 'fehler' }) => void
   onAudioUpload: (frageId: string, blob: Blob) => Promise<string | null>
 }
 
@@ -49,12 +56,45 @@ export default function KorrekturFrageZeile({
   autoErgebnis,
   bewertung,
   aufgabeNr,
+  userEmail,
   onUpdate,
   onAudioUpload,
 }: Props) {
+  const [kiLaedt, setKiLaedt] = useState(false)
   const aktuellePunkte = effektivePunkte(bewertung)
   const hatKiErgebnis = bewertung.quelle === 'ki' || bewertung.quelle === 'auto'
   const fragenTyp = frage.typ
+
+  // KI-Vorschlag für Freitext anfordern
+  const handleKiVorschlag = async () => {
+    if (kiLaedt || !antwort || !userEmail) return
+    setKiLaedt(true)
+    try {
+      const ftFrage = frage as FreitextFrage
+      const antwortText = 'text' in antwort ? (antwort as { text: string }).text : ''
+      const result = await apiService.kiAssistent(userEmail, 'korrigiereFreitext', {
+        fragetext: ftFrage.fragetext || '',
+        antwortText,
+        musterlosung: frage.musterlosung || '',
+        maxPunkte: frage.punkte,
+        bloom: frage.bloom || '',
+        bewertungsraster: frage.bewertungsraster || [],
+        lernziel: frage.lehrplanziel || '',
+      })
+      const ergebnis = result?.ergebnis as { punkte?: number; begruendung?: string } | undefined
+      if (ergebnis) {
+        onUpdate({
+          kiPunkte: ergebnis.punkte ?? null,
+          kiBegruendung: ergebnis.begruendung || null,
+          quelle: 'ki' as const,
+        })
+      }
+    } catch (err) {
+      console.error('[KI-Vorschlag] Fehler:', err)
+    } finally {
+      setKiLaedt(false)
+    }
+  }
 
   // Wert im Eingabefeld: LP-Anpassung > KI-Vorschlag > leer
   const punkteWert = bewertung.lpPunkte ?? bewertung.kiPunkte ?? ''
@@ -88,12 +128,33 @@ export default function KorrekturFrageZeile({
         <KorrekturFrageVollansicht frage={frage} antwort={antwort} autoErgebnis={autoErgebnis} />
       </div>
 
+      {/* KI-Vorschlag-Button für Freitext (wenn noch kein KI-Ergebnis) */}
+      {KI_KORRIGIERBARE_TYPEN.has(fragenTyp) && !hatKiErgebnis && antwort && (
+        <div className="mb-3">
+          <button
+            onClick={handleKiVorschlag}
+            disabled={kiLaedt}
+            className="px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors cursor-pointer disabled:opacity-50 border-amber-300 dark:border-amber-600 text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-900/20 hover:bg-amber-100 dark:hover:bg-amber-900/30"
+            title="KI-Korrekturvorschlag via Claude API anfordern"
+          >
+            {kiLaedt ? (
+              <>
+                <span className="inline-block w-3 h-3 border-2 border-amber-400 border-t-transparent rounded-full animate-spin mr-1.5 align-text-bottom" />
+                KI bewertet...
+              </>
+            ) : (
+              'KI-Vorschlag'
+            )}
+          </button>
+        </div>
+      )}
+
       {/* KI-Ergebnis (nur bei ki/auto) */}
       {hatKiErgebnis && bewertung.kiPunkte !== null && (
         <div className="mb-3 space-y-1">
           <div className="flex items-baseline gap-2">
             <span className="text-sm font-medium text-slate-700 dark:text-slate-200 tabular-nums">
-              KI: {bewertung.kiPunkte}/{bewertung.maxPunkte} Pkt.
+              {quelleLabel(bewertung.quelle)}: {bewertung.kiPunkte}/{bewertung.maxPunkte} Pkt.
             </span>
             {bewertung.kiBegruendung && (
               <span className="text-xs text-slate-500 dark:text-slate-400 italic truncate">

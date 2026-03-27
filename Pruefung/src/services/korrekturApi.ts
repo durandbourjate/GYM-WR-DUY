@@ -84,7 +84,7 @@ export async function ladeAbgaben(pruefungId: string, email: string): Promise<Re
   return data.abgaben ?? {}
 }
 
-/** KI-Korrektur-Batch starten (Auto-Korrektur + Claude API) */
+/** Autokorrektur-Batch starten (algorithmische Korrektur für deterministische Fragetypen) */
 export async function starteKorrektur(pruefungId: string, email: string): Promise<{ success: boolean; fehler?: string } | null> {
   return postJson<{ success: boolean; fehler?: string }>('starteKorrektur', { pruefungId, email })
 }

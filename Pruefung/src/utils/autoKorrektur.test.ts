@@ -84,6 +84,42 @@ describe('autoKorrigiere', () => {
     expect(result).toBeNull()
   })
 
+  it('korrigiert MC Mehrfachauswahl teilweise korrekt', () => {
+    const frage = makeMCFrage([
+      { id: 'o1', text: 'A', korrekt: true },
+      { id: 'o2', text: 'B', korrekt: true },
+      { id: 'o3', text: 'C', korrekt: false },
+    ], true)
+    const antwort: Antwort = { typ: 'mc', gewaehlteOptionen: ['o1', 'o3'] }
+    const result = autoKorrigiere(frage, antwort)
+    expect(result).not.toBeNull()
+    // o1 korrekt (+1/3 * 2), o3 falsch (-1/3 * 2) → ~ 0 (minimum 0)
+    expect(result!.erreichtePunkte).toBeGreaterThanOrEqual(0)
+    expect(result!.erreichtePunkte).toBeLessThanOrEqual(2)
+  })
+
+  it('korrigiert MC Mehrfachauswahl alle korrekt', () => {
+    const frage = makeMCFrage([
+      { id: 'o1', text: 'A', korrekt: true },
+      { id: 'o2', text: 'B', korrekt: true },
+      { id: 'o3', text: 'C', korrekt: false },
+    ], true)
+    const antwort: Antwort = { typ: 'mc', gewaehlteOptionen: ['o1', 'o2'] }
+    const result = autoKorrigiere(frage, antwort)
+    expect(result).not.toBeNull()
+    expect(result!.erreichtePunkte).toBe(2)
+  })
+
+  it('gibt 0 bei leerem gewaehlteOptionen-Array', () => {
+    const frage = makeMCFrage([
+      { id: 'o1', text: 'A', korrekt: true },
+    ])
+    const antwort: Antwort = { typ: 'mc', gewaehlteOptionen: [] }
+    const result = autoKorrigiere(frage, antwort)
+    expect(result).not.toBeNull()
+    expect(result!.erreichtePunkte).toBe(0)
+  })
+
   it('korrigiert RichtigFalsch', () => {
     const frage = {
       id: 'rf-1',

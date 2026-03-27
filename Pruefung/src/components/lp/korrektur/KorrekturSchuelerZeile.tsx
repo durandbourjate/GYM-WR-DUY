@@ -16,10 +16,11 @@ interface Props {
   fragen: Frage[]
   autoErgebnisse: Record<string, KorrekturErgebnis | null>
   notenConfig?: Partial<NotenConfig>
+  userEmail?: string
   onBewertungUpdate: (
     schuelerEmail: string,
     frageId: string,
-    updates: { lpPunkte?: number | null; lpKommentar?: string | null; geprueft?: boolean; audioKommentarId?: string | null }
+    updates: { lpPunkte?: number | null; lpKommentar?: string | null; geprueft?: boolean; audioKommentarId?: string | null; kiPunkte?: number | null; kiBegruendung?: string | null; quelle?: 'auto' | 'ki' | 'manuell' | 'fehler' }
   ) => void
   onNoteOverride: (schuelerEmail: string, noteOverride: number | null) => void
   onAudioUpload: (schuelerEmail: string, frageId: string, blob: Blob) => Promise<string | null>
@@ -28,7 +29,7 @@ interface Props {
   defaultOffen?: boolean
 }
 
-export default function KorrekturSchuelerZeile({ pruefungId, schueler, abgabe, fragen, autoErgebnisse, notenConfig, onBewertungUpdate, onNoteOverride, onAudioUpload, onGesamtAudioUpdate, onPDF, defaultOffen = false }: Props) {
+export default function KorrekturSchuelerZeile({ pruefungId, schueler, abgabe, fragen, autoErgebnisse, notenConfig, userEmail, onBewertungUpdate, onNoteOverride, onAudioUpload, onGesamtAudioUpdate, onPDF, defaultOffen = false }: Props) {
   const [offen, setOffen] = useState(defaultOffen)
   const [noteEditModus, setNoteEditModus] = useState(false)
   const [noteInput, setNoteInput] = useState('')
@@ -252,6 +253,7 @@ export default function KorrekturSchuelerZeile({ pruefungId, schueler, abgabe, f
                 autoErgebnis={autoErgebnisse[frage.id] ?? null}
                 bewertung={bewertung}
                 aufgabeNr={fragenIdx + 1}
+                userEmail={userEmail}
                 onUpdate={(updates) => onBewertungUpdate(schueler.email, frage.id, updates)}
                 onAudioUpload={(frageId, blob) => onAudioUpload(schueler.email, frageId, blob)}
               />
