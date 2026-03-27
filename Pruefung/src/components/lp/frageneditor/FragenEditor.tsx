@@ -268,7 +268,7 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen, performa
   const [zeitbedarfManuell, setZeitbedarfManuell] = useState(!!frage?.zeitbedarf)
 
   // Sharing
-  const [geteilt, setGeteilt] = useState<'privat' | 'schule'>(frage?.geteilt ?? 'privat')
+  const [geteilt, setGeteilt] = useState<'privat' | 'fachschaft' | 'schule'>(frage?.geteilt ?? 'privat')
 
   // Anhänge
   const [anhaenge, setAnhaenge] = useState<FrageAnhang[]>(frage?.anhaenge ?? [])

@@ -8,8 +8,33 @@
 ## Offene Punkte
 
 - **SEB / iPad** — SEB weiterhin deaktiviert (`sebErforderlich: false`)
-- **Apps Script aktualisieren** — Session 25 KI-Prompt-Verbesserungen noch nicht deployed. Code kopieren → Apps Script Editor → Bereitstellen → Bereitstellungen verwalten → Stift → "Neue Version".
-- **Phase 3 (optional):** `useKorrekturDaten` + `useKorrekturActions` Hooks — KorrekturDashboard von 612 → ~250 Z.
+- **Apps Script aktualisieren** — Multi-Teacher + KI-Prompts. Code kopieren → Apps Script Editor → Bereitstellen → Neue Version.
+- **Lehrpersonen-Tab anlegen** — Im CONFIGS-Sheet einen Tab "Lehrpersonen" mit Spalten: email, name, kuerzel, fachschaft, rolle, apiKey, aktiv. Erste Zeile: DUY-Daten mit rolle=admin.
+- **erstelltVon Backfill** — Bestehende Prüfungen im Configs-Sheet: Spalte "erstelltVon" hinzufügen, alle auf `yannick.durand@gymhofwil.ch` setzen.
+
+---
+
+## Multi-Teacher-Architektur (27.03.2026)
+
+Zentralisierte Multi-LP-Vorbereitung (2–50 LP am Hofwil).
+
+| Phase | Was | Status |
+|-------|-----|--------|
+| 1 | **LP-Verwaltung**: Lehrpersonen-Tab in CONFIGS-Sheet, `istZugelasseneLP()` ersetzt hardcodierte Allowlist (~40 Stellen), `ladeLehrpersonen` Endpoint, Frontend auth dynamisch | ✅ Code fertig |
+| 2 | **Prüfungs-Isolation**: `erstelltVon` Feld, Filter in `ladeAlleConfigs()`, Ownership-Checks in `speichereConfig/loeschePruefung` | ✅ Code fertig |
+| 3 | **Fachschaft-Sharing**: `geteilt: 'fachschaft'` Stufe, `fachschaftZuFachbereiche()` Mapping, Filter in `ladeFragenbank()`, 3-Wege-Select im Frageneditor | ✅ Code fertig |
+| 4 | **Per-LP API Key**: `getApiKeyFuerLP()`, `callerEmail` Parameter in allen Claude-Calls | ✅ Code fertig |
+
+**Aktivierung:** Lehrpersonen-Tab + erstelltVon-Backfill manuell im Google Sheet anlegen. Dann Apps Script deployen.
+
+**Dateien geändert:**
+- `apps-script-code.js` — ~100 Stellen (LP-Checks, Helpers, Endpoints, Filter, API-Key-Routing)
+- `src/store/authStore.ts` — Dynamische LP-Liste statt Allowlist
+- `src/types/auth.ts`, `pruefung.ts`, `fragen.ts` — Neue Felder
+- `src/services/lpApi.ts` — Neuer Service
+- `src/hooks/useFragenFilter.ts` — Erweiterte Filter
+- `src/utils/fragenFactory.ts` — geteilt-Enum erweitert
+- `src/components/lp/frageneditor/` — 3-Wege Sharing UI
 
 ---
 

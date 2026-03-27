@@ -44,7 +44,7 @@ export interface FrageBasis {
   quelle: Frage['quelle']
   anhaenge?: FrageAnhang[]
   autor?: string
-  geteilt: 'privat' | 'schule'
+  geteilt: 'privat' | 'fachschaft' | 'schule'
 }
 
 /** Typ-spezifische Daten — discriminated union */

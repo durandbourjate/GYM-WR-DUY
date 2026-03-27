@@ -8,7 +8,7 @@ import type { Gruppierung } from '../components/lp/fragenbank/fragenbrowser/grup
 import type { Frage, Fachbereich, BloomStufe } from '../types/fragen.ts'
 
 export type Sortierung = 'thema' | 'bloom' | 'punkte' | 'typ' | 'id'
-export type FilterQuelle = 'alle' | 'meine' | 'pool'
+export type FilterQuelle = 'alle' | 'meine' | 'fachschaft' | 'schule' | 'pool'
 export type FilterPoolStatus = 'alle' | 'ungeprueft' | 'pool_geprueft' | 'pruefungstauglich' | 'update'
 
 const SEITEN_GROESSE = 30
@@ -110,6 +110,8 @@ export function useFragenFilter(
       }
       // Quelle-Filter (zusammengelegt: Meine = mein Autor, Pool = aus Pool)
       if (filterQuelle === 'meine' && userEmail && f.autor && f.autor !== userEmail) return false
+      if (filterQuelle === 'fachschaft' && f.geteilt !== 'fachschaft') return false
+      if (filterQuelle === 'schule' && f.geteilt !== 'schule') return false
       if (filterQuelle === 'pool' && f.quelle !== 'pool') return false
       // Pool-Status-Filter
       if (filterPoolStatus !== 'alle') {

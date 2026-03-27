@@ -3,16 +3,26 @@ import type { AuthUser, Rolle } from '../types/auth.ts'
 import { usePruefungStore } from './pruefungStore.ts'
 import { clearIndexedDB } from '../services/autoSave.ts'
 import { clearQueue } from '../services/retryQueue.ts'
+import { ladeLehrpersonen, type LPInfo } from '../services/lpApi.ts'
 
-// Zugelassene LP-E-Mail-Adressen (vorerst nur DUY)
-const ZUGELASSENE_LP: string[] = [
-  'yannick.durand@gymhofwil.ch',
-]
+// Cache für LP-Liste (pro Session geladen)
+let lpCache: LPInfo[] | null = null
 
-function rolleAusDomain(email: string): Rolle {
+async function ladeUndCacheLPs(): Promise<LPInfo[]> {
+  if (lpCache) return lpCache
+  try {
+    lpCache = await ladeLehrpersonen()
+    return lpCache ?? []
+  } catch {
+    return []
+  }
+}
+
+function rolleAusDomain(email: string, lpListe?: LPInfo[]): Rolle {
   if (email.endsWith('@stud.gymhofwil.ch')) return 'sus'
-  if (ZUGELASSENE_LP.includes(email.toLowerCase())) return 'lp'
-  // Andere @gymhofwil.ch-Adressen → SuS-Rolle (kein Zugriff auf Composer/Fragenbank)
+  // Dynamisch: LP wenn in Lehrpersonen-Tab
+  if (lpListe && lpListe.some(lp => lp.email === email.toLowerCase())) return 'lp'
+  // Andere @gymhofwil.ch-Adressen → SuS-Rolle
   if (email.endsWith('@gymhofwil.ch')) return 'sus'
   return 'unbekannt'
 }
@@ -65,8 +75,12 @@ export const useAuthStore = create<AuthStore>((set) => ({
   ladeStatus: 'idle',
   fehler: null,
 
-  anmelden: (credential: GoogleCredential) => {
-    const rolle = rolleAusDomain(credential.email)
+  anmelden: async (credential: GoogleCredential) => {
+    set({ ladeStatus: 'laden' })
+    // LP-Liste vom Backend laden (gecached pro Session)
+    const lps = await ladeUndCacheLPs()
+    const rolle = rolleAusDomain(credential.email, lps)
+    const lpInfo = lps.find(lp => lp.email === credential.email.toLowerCase())
     const user: AuthUser = {
       email: credential.email,
       name: credential.name,
@@ -74,6 +88,8 @@ export const useAuthStore = create<AuthStore>((set) => ({
       nachname: credential.family_name || credential.name.split(' ').slice(1).join(' ') || '',
       bild: credential.picture,
       rolle,
+      fachschaft: lpInfo?.fachschaft,
+      adminRolle: lpInfo?.rolle === 'admin',
     }
     // Alten Prüfungszustand aufräumen (verhindert stale State nach Re-Login)
     resetPruefungState()

@@ -34,8 +34,8 @@ interface MetadataSectionProps {
   setSemester: React.Dispatch<React.SetStateAction<string[]>>
   gefaesse: Gefaess[]
   setGefaesse: React.Dispatch<React.SetStateAction<Gefaess[]>>
-  geteilt: 'privat' | 'schule'
-  setGeteilt: (v: 'privat' | 'schule') => void
+  geteilt: 'privat' | 'fachschaft' | 'schule'
+  setGeteilt: (v: 'privat' | 'fachschaft' | 'schule') => void
   ki: ReturnType<typeof useKIAssistent>
   performance?: FragenPerformance
 }
@@ -213,30 +213,23 @@ export default function MetadataSection({
         {/* Sharing / Teilen */}
         <div>
           <label className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Sichtbarkeit</label>
-          <div className="flex w-48 rounded-lg border border-slate-300 dark:border-slate-600 overflow-hidden">
-            <button
-              onClick={() => setGeteilt('privat')}
-              className={`flex-1 px-3 py-1 text-xs transition-colors cursor-pointer ${
-                geteilt === 'privat'
-                  ? 'bg-slate-800 dark:bg-slate-200 text-white dark:text-slate-800'
-                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
-              }`}
-            >
-              Privat
-            </button>
-            <button
-              onClick={() => setGeteilt('schule')}
-              className={`flex-1 px-3 py-1 text-xs transition-colors cursor-pointer border-l border-slate-300 dark:border-slate-600 ${
-                geteilt === 'schule'
-                  ? 'bg-slate-800 dark:bg-slate-200 text-white dark:text-slate-800'
-                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
-              }`}
-            >
-              Schule
-            </button>
+          <div className="flex rounded-lg border border-slate-300 dark:border-slate-600 overflow-hidden">
+            {(['privat', 'fachschaft', 'schule'] as const).map((stufe, i) => (
+              <button
+                key={stufe}
+                onClick={() => setGeteilt(stufe)}
+                className={`flex-1 px-3 py-1 text-xs transition-colors cursor-pointer ${i > 0 ? 'border-l border-slate-300 dark:border-slate-600' : ''} ${
+                  geteilt === stufe
+                    ? 'bg-slate-800 dark:bg-slate-200 text-white dark:text-slate-800'
+                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
+                }`}
+              >
+                {stufe === 'privat' ? 'Privat' : stufe === 'fachschaft' ? 'Fachschaft' : 'Schule'}
+              </button>
+            ))}
           </div>
           <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">
-            {geteilt === 'schule' ? 'Sichtbar für alle @gymhofwil.ch Lehrpersonen' : 'Nur für Sie sichtbar'}
+            {geteilt === 'schule' ? 'Sichtbar für alle Lehrpersonen' : geteilt === 'fachschaft' ? 'Sichtbar für LP der gleichen Fachschaft' : 'Nur für Sie sichtbar'}
           </p>
         </div>
       </div>

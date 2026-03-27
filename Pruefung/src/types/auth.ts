@@ -10,4 +10,6 @@ export interface AuthUser {
   bild?: string
   rolle: Rolle
   schuelerId?: string // 4-stelliger Fallback-Code
+  fachschaft?: string // LP-Fachschaft (z.B. 'WR')
+  adminRolle?: boolean // Admin-LP (sieht alles)
 }

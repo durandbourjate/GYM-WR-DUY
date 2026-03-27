@@ -87,6 +87,9 @@ export interface PruefungsConfig {
 
   // Soft-Lockdown: Kontrollstufe (Default: 'standard')
   kontrollStufe?: 'keine' | 'locker' | 'standard' | 'streng';
+
+  // Multi-Teacher: Ersteller der Prüfung
+  erstelltVon?: string;
 }
 
 export interface NotenConfig {

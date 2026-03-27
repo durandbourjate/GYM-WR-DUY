@@ -54,7 +54,7 @@ export interface FrageBase {
 
   // Sharing / Zusammenarbeit
   autor?: string;  // E-Mail der erstellenden LP
-  geteilt?: 'privat' | 'schule';  // Standard: privat; 'schule' = sichtbar für alle @gymhofwil.ch
+  geteilt?: 'privat' | 'fachschaft' | 'schule';  // Standard: privat; 'fachschaft' = LP in gleicher Fachschaft; 'schule' = alle LP
   geteiltVon?: string;  // Anzeigename bei geteilten Fragen
 
   // Pool-Sync (importierte Fragen aus Übungspools)

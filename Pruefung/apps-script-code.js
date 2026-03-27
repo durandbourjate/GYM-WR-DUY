@@ -18,6 +18,107 @@ const LP_DOMAIN = 'gymhofwil.ch';
 const SUS_DOMAIN = 'stud.gymhofwil.ch';
 const LERNZIELE_TAB = 'Lernziele';
 
+// === MULTI-TEACHER HELPERS ===
+
+/**
+ * Prüft ob eine E-Mail eine zugelassene Lehrperson ist.
+ * Liest aus dem Tab "Lehrpersonen" im CONFIGS-Sheet (gecached 5 Min).
+ * Ersetzt die alte domain-basierte Prüfung.
+ */
+function istZugelasseneLP(email) {
+  if (!email || !istZugelasseneLP(email)) return false;
+  var info = getLPInfo(email);
+  return info !== null && info.aktiv;
+}
+
+/**
+ * Gibt LP-Infos zurück (fachschaft, rolle, apiKey, aktiv) oder null.
+ * Gecached via CacheService (5 Min).
+ */
+function getLPInfo(email) {
+  if (!email) return null;
+  var emailLower = email.toLowerCase();
+  var cache = CacheService.getScriptCache();
+  var cacheKey = 'lp_data_v1';
+
+  // Cache lesen
+  var cached = cache.get(cacheKey);
+  if (cached) {
+    try {
+      var lpMap = JSON.parse(cached);
+      return lpMap[emailLower] || null;
+    } catch (e) { /* Cache ungültig, neu laden */ }
+  }
+
+  // Aus Sheet laden
+  var sheet = SpreadsheetApp.openById(CONFIGS_ID).getSheetByName('Lehrpersonen');
+  if (!sheet) return null;
+
+  var data = sheet.getDataRange().getValues();
+  if (data.length < 2) return null;
+
+  var headers = data[0].map(function(h) { return String(h).toLowerCase().trim(); });
+  var emailIdx = headers.indexOf('email');
+  var nameIdx = headers.indexOf('name');
+  var kuerzelIdx = headers.indexOf('kuerzel');
+  var fachschaftIdx = headers.indexOf('fachschaft');
+  var rolleIdx = headers.indexOf('rolle');
+  var apiKeyIdx = headers.indexOf('apikey');
+  var aktivIdx = headers.indexOf('aktiv');
+
+  if (emailIdx === -1) return null;
+
+  var lpMap = {};
+  for (var i = 1; i < data.length; i++) {
+    var row = data[i];
+    var e = String(row[emailIdx] || '').toLowerCase().trim();
+    if (!e) continue;
+    lpMap[e] = {
+      email: e,
+      name: nameIdx >= 0 ? String(row[nameIdx] || '') : '',
+      kuerzel: kuerzelIdx >= 0 ? String(row[kuerzelIdx] || '') : '',
+      fachschaft: fachschaftIdx >= 0 ? String(row[fachschaftIdx] || '') : '',
+      rolle: rolleIdx >= 0 ? String(row[rolleIdx] || 'lp') : 'lp',
+      apiKey: apiKeyIdx >= 0 ? String(row[apiKeyIdx] || '') : '',
+      aktiv: aktivIdx >= 0 ? String(row[aktivIdx]).toLowerCase() !== 'false' : true,
+    };
+  }
+
+  // 5 Min cachen
+  try { cache.put(cacheKey, JSON.stringify(lpMap), 300); } catch (e) { /* ignorieren */ }
+
+  return lpMap[emailLower] || null;
+}
+
+/**
+ * Mapping Fachschaft → Fachbereiche in der Fragenbank
+ */
+function fachschaftZuFachbereiche(fachschaft) {
+  var mapping = {
+    'WR': ['VWL', 'BWL', 'Recht'],
+    'Informatik': ['Informatik'],
+    'Deutsch': ['Deutsch'],
+    'Mathematik': ['Mathematik'],
+    'Sprachen': ['Französisch', 'Englisch', 'Latein', 'Italienisch'],
+    'MINT': ['Physik', 'Chemie', 'Biologie', 'Mathematik'],
+    'GW': ['Geschichte', 'Geografie'],
+  };
+  return mapping[fachschaft] || [];
+}
+
+/**
+ * API-Key für eine LP (oder globaler Fallback)
+ */
+function getApiKeyFuerLP(email) {
+  if (email) {
+    var info = getLPInfo(email);
+    if (info && info.apiKey) return info.apiKey;
+  }
+  // Fallback: globaler Key
+  return PropertiesService.getScriptProperties().getProperty('CLAUDE_API_KEY')
+    || PropertiesService.getScriptProperties().getProperty('ANTHROPIC_API_KEY');
+}
+
 // Zentrale Daten-Sheets (Synergien)
 const KURSE_SHEET_ID = '1inmEds_g48-lTFCqo9NUqAcxhDxF2mFSoBM5fO6uJng';       // User muss ID einsetzen
 const STUNDENPLAN_SHEET_ID = '1mesBOmPuLewvnY5iNb4iD2zNDUn8-ruK5HE0DsKwUSs';
@@ -30,11 +131,13 @@ function doGet(e) {
   const action = e.parameter.action;
   const email = e.parameter.email;
 
-  if (!email || (!email.endsWith('@' + LP_DOMAIN) && !email.endsWith('@' + SUS_DOMAIN))) {
+  if (!email || (!istZugelasseneLP(email) && !email.endsWith('@' + SUS_DOMAIN))) {
     return jsonResponse({ error: 'Nicht autorisiert' });
   }
 
   switch (action) {
+    case 'ladeLehrpersonen':
+      return ladeLehrpersonenEndpoint(email);
     case 'ladePruefung':
       return ladePruefung(e.parameter.id, email);
     case 'ladeAlleConfigs':
@@ -70,7 +173,7 @@ function doGet(e) {
     }
     case 'ladeKlassenlisten': {
       // Nur LP darf Klassenlisten laden
-      if (!email || !email.endsWith('@' + LP_DOMAIN)) {
+      if (!email || !istZugelasseneLP(email)) {
         return jsonResponse({ error: 'Nur LP kann Klassenlisten laden' });
       }
       try {
@@ -176,7 +279,7 @@ function doPost(e) {
       return ladeTrackerDatenEndpoint(body);
     case 'setzeTeilnehmer': {
       const email = body.email;
-      if (!email || !email.endsWith('@' + LP_DOMAIN)) {
+      if (!email || !istZugelasseneLP(email)) {
         return jsonResponse({ error: 'Nur LP darf Teilnehmer setzen' });
       }
       const pruefungId = body.pruefungId;
@@ -224,7 +327,7 @@ function doPost(e) {
     }
     case 'sendeEinladungen': {
       const email = body.email;
-      if (!email || !email.endsWith('@' + LP_DOMAIN)) {
+      if (!email || !istZugelasseneLP(email)) {
         return jsonResponse({ error: 'Nur LP darf Einladungen senden' });
       }
       const { pruefungId, pruefungTitel, pruefungUrl, empfaenger } = body;
@@ -270,7 +373,7 @@ function uploadAnhang(body) {
     var groesseBytes = body.groesseBytes;
     var base64Data = body.base64Data;
 
-    if (!email || !email.endsWith('@' + LP_DOMAIN)) {
+    if (!email || !istZugelasseneLP(email)) {
       return jsonResponse({ error: 'Nur für Lehrpersonen' });
     }
     if (!base64Data || !dateiname) {
@@ -315,7 +418,7 @@ function uploadMaterial(body) {
     var groesseBytes = body.groesseBytes;
     var base64Data = body.base64Data;
 
-    if (!email || !email.endsWith('@' + LP_DOMAIN)) {
+    if (!email || !istZugelasseneLP(email)) {
       return jsonResponse({ error: 'Nur für Lehrpersonen' });
     }
     if (!base64Data || !dateiname) {
@@ -435,7 +538,7 @@ function ensureColumns(sheet, headers, rowData) {
 function ladeKurseEndpoint(body) {
   try {
     var email = body.email;
-    if (!email || !email.endsWith('@' + LP_DOMAIN)) {
+    if (!email || !istZugelasseneLP(email)) {
       return jsonResponse({ error: 'Nur für Lehrpersonen' });
     }
     var sheet = SpreadsheetApp.openById(KURSE_SHEET_ID).getSheetByName('Kurse');
@@ -486,7 +589,7 @@ function ladeKursDetailsEndpoint(body) {
 function ladeSchuljahrEndpoint(body) {
   try {
     var email = body.email;
-    if (!email || !email.endsWith('@' + LP_DOMAIN)) {
+    if (!email || !istZugelasseneLP(email)) {
       return jsonResponse({ error: 'Nur für Lehrpersonen' });
     }
     var ss = SpreadsheetApp.openById(SCHULJAHR_SHEET_ID);
@@ -512,7 +615,7 @@ function ladeSchuljahrEndpoint(body) {
 function ladeLehrplanEndpoint(body) {
   try {
     var email = body.email;
-    if (!email || !email.endsWith('@' + LP_DOMAIN)) {
+    if (!email || !istZugelasseneLP(email)) {
       return jsonResponse({ error: 'Nur für Lehrpersonen' });
     }
     var fach = body.fach || null;
@@ -552,7 +655,7 @@ function ladePruefung(pruefungId, email) {
       return jsonResponse({ error: 'Prüfung nicht gefunden' });
     }
 
-    const istLP = email.endsWith('@' + LP_DOMAIN);
+    const istLP = istZugelasseneLP(email);
     const erlaubteKlasse = configRow.erlaubteKlasse || '';
     const klasseGesetzt = erlaubteKlasse && erlaubteKlasse !== '—' && erlaubteKlasse !== '-';
 
@@ -1136,7 +1239,7 @@ function sebAusnahmeErlauben(body) {
     const { pruefungId, email, susEmail } = body;
 
     // Auth: nur LP
-    if (!email || !email.endsWith('@' + LP_DOMAIN)) {
+    if (!email || !istZugelasseneLP(email)) {
       return jsonResponse({ success: false, error: 'nicht_autorisiert' });
     }
     if (!pruefungId || !susEmail) {
@@ -1179,7 +1282,7 @@ function beendePruefungEndpoint(body) {
     const { pruefungId, email, modus, restzeitMinuten, einzelneSuS } = body;
 
     // Auth: nur LP
-    if (!email || !email.endsWith('@' + LP_DOMAIN)) {
+    if (!email || !istZugelasseneLP(email)) {
       return jsonResponse({ success: false, error: 'nicht_autorisiert' });
     }
 
@@ -1271,7 +1374,7 @@ function resetPruefungEndpoint(body) {
     var email = body.email;
 
     // Auth: nur LP
-    if (!email || !email.endsWith('@' + LP_DOMAIN)) {
+    if (!email || !istZugelasseneLP(email)) {
       return jsonResponse({ success: false, error: 'nicht_autorisiert' });
     }
     if (!pruefungId) {
@@ -1341,7 +1444,7 @@ function resetPruefungEndpoint(body) {
 function speichereFrage(body) {
   try {
     const { email, frage } = body;
-    if (!email || !email.endsWith('@' + LP_DOMAIN)) {
+    if (!email || !istZugelasseneLP(email)) {
       return jsonResponse({ error: 'Nur für Lehrpersonen' });
     }
     if (!frage || !frage.id || !frage.typ || !frage.fachbereich) {
@@ -1412,7 +1515,7 @@ function loescheFrage(body) {
     var frageId = body.frageId;
     var fachbereich = body.fachbereich;
 
-    if (!email || !email.endsWith('@' + LP_DOMAIN)) {
+    if (!email || !istZugelasseneLP(email)) {
       return jsonResponse({ error: 'Nur für Lehrpersonen' });
     }
     if (!frageId || !fachbereich) {
@@ -1501,7 +1604,7 @@ function getTypDaten(frage) {
 
 function ladeAlleConfigs(email) {
   try {
-    if (!email.endsWith('@' + LP_DOMAIN)) {
+    if (!istZugelasseneLP(email)) {
       return jsonResponse({ error: 'Nur für Lehrpersonen' });
     }
 
@@ -1510,7 +1613,61 @@ function ladeAlleConfigs(email) {
 
     const configs = data.map(mapConfigRow);
 
-    return jsonResponse({ configs });
+    // Phase 2: Nur eigene Prüfungen (Admin sieht alle, Legacy ohne erstelltVon auch)
+    const lpInfo = getLPInfo(email);
+    const istAdmin = lpInfo && lpInfo.rolle === 'admin';
+    const gefilterteConfigs = istAdmin
+      ? configs
+      : configs.filter(c => !c.erstelltVon || c.erstelltVon === email);
+
+    return jsonResponse({ configs: gefilterteConfigs });
+  } catch (error) {
+    return jsonResponse({ error: error.message });
+  }
+}
+
+// === LEHRPERSONEN LADEN (Multi-Teacher) ===
+
+function ladeLehrpersonenEndpoint(email) {
+  try {
+    // Jeder mit gültigem Domain darf LP-Liste laden (für Auth-Check)
+    if (!email || (!email.endsWith('@' + LP_DOMAIN) && !email.endsWith('@' + SUS_DOMAIN))) {
+      return jsonResponse({ error: 'Nicht autorisiert' });
+    }
+
+    var sheet = SpreadsheetApp.openById(CONFIGS_ID).getSheetByName('Lehrpersonen');
+    if (!sheet) return jsonResponse({ lehrpersonen: [] });
+
+    var data = sheet.getDataRange().getValues();
+    if (data.length < 2) return jsonResponse({ lehrpersonen: [] });
+
+    var headers = data[0].map(function(h) { return String(h).toLowerCase().trim(); });
+    var emailIdx = headers.indexOf('email');
+    var nameIdx = headers.indexOf('name');
+    var kuerzelIdx = headers.indexOf('kuerzel');
+    var fachschaftIdx = headers.indexOf('fachschaft');
+    var rolleIdx = headers.indexOf('rolle');
+    var aktivIdx = headers.indexOf('aktiv');
+
+    if (emailIdx === -1) return jsonResponse({ lehrpersonen: [] });
+
+    var lps = [];
+    for (var i = 1; i < data.length; i++) {
+      var row = data[i];
+      var e = String(row[emailIdx] || '').trim();
+      if (!e) continue;
+      var aktiv = aktivIdx >= 0 ? String(row[aktivIdx]).toLowerCase() !== 'false' : true;
+      if (!aktiv) continue; // Nur aktive LPs zurückgeben
+      lps.push({
+        email: e.toLowerCase(),
+        name: nameIdx >= 0 ? String(row[nameIdx] || '') : '',
+        kuerzel: kuerzelIdx >= 0 ? String(row[kuerzelIdx] || '') : '',
+        fachschaft: fachschaftIdx >= 0 ? String(row[fachschaftIdx] || '') : '',
+        rolle: rolleIdx >= 0 ? String(row[rolleIdx] || 'lp') : 'lp',
+      });
+    }
+
+    return jsonResponse({ lehrpersonen: lps });
   } catch (error) {
     return jsonResponse({ error: error.message });
   }
@@ -1548,6 +1705,7 @@ function mapConfigRow(row) {
     kontrollStufe: row.kontrollStufe || 'standard',
     sebAusnahmen: safeJsonParse(row.sebAusnahmen, []),
     durchfuehrungId: row.durchfuehrungId || undefined,
+    erstelltVon: row.erstelltVon || '',
     korrektur: { aktiviert: false, modus: 'batch' },
     feedback: { zeitpunkt: 'nach-review', format: 'pdf', detailgrad: 'vollstaendig' },
   };
@@ -1555,7 +1713,7 @@ function mapConfigRow(row) {
 
 function ladeEinzelConfig(pruefungId, email) {
   try {
-    if (!email.endsWith('@' + LP_DOMAIN)) {
+    if (!istZugelasseneLP(email)) {
       return jsonResponse({ error: 'Nur für Lehrpersonen' });
     }
     if (!pruefungId) {
@@ -1580,13 +1738,17 @@ function ladeEinzelConfig(pruefungId, email) {
 
 function ladeFragenbank(email) {
   try {
-    if (!email.endsWith('@' + LP_DOMAIN)) {
+    if (!istZugelasseneLP(email)) {
       return jsonResponse({ error: 'Nur für Lehrpersonen' });
     }
 
     const fragenbank = SpreadsheetApp.openById(FRAGENBANK_ID);
     const tabs = ['VWL', 'BWL', 'Recht', 'Informatik'];
     const alleFragen = [];
+
+    // Phase 3: LP-Fachschaft für Fachschaft-Sharing
+    const lpInfo = getLPInfo(email);
+    const meineFachbereiche = lpInfo ? fachschaftZuFachbereiche(lpInfo.fachschaft) : [];
 
     for (const tab of tabs) {
       const sheet = fragenbank.getSheetByName(tab);
@@ -1595,13 +1757,14 @@ function ladeFragenbank(email) {
       for (const row of data) {
         if (row.id) {
           const frage = parseFrage(row, tab);
-          // Sichtbarkeitsfilter: eigene Fragen immer, geteilte wenn 'schule', Pool-Fragen immer
+          // Sichtbarkeitsfilter: eigene, fachschaft-geteilt, schule-geteilt, Pool
           const istEigene = !frage.autor || frage.autor === email;
-          const istGeteilt = frage.geteilt === 'schule';
+          const istSchulweit = frage.geteilt === 'schule';
+          const istFachschaft = frage.geteilt === 'fachschaft' && meineFachbereiche.includes(frage.fachbereich);
           const istPool = frage.quelle === 'pool';
-          if (istEigene || istGeteilt || istPool) {
+          if (istEigene || istSchulweit || istFachschaft || istPool) {
             // Bei geteilten Fragen den Autor-Namen als geteiltVon setzen
-            if (!istEigene && istGeteilt && frage.autor) {
+            if (!istEigene && (istSchulweit || istFachschaft) && frage.autor) {
               frage.geteiltVon = frage.autor.split('@')[0];
             }
             alleFragen.push(frage);
@@ -1621,7 +1784,7 @@ function ladeFragenbank(email) {
 function speichereConfig(body) {
   try {
     const { email, config } = body;
-    if (!email || !email.endsWith('@' + LP_DOMAIN)) {
+    if (!email || !istZugelasseneLP(email)) {
       return jsonResponse({ error: 'Nur für Lehrpersonen' });
     }
     if (!config || !config.id || !config.titel) {
@@ -1665,6 +1828,7 @@ function speichereConfig(body) {
       beendetUm:                  function(v) { return v || ''; },
       durchfuehrungId:            function(v) { return v || ''; },
       zufallsreihenfolgeOptionen: function(v) { return v ? 'true' : 'false'; },
+      erstelltVon:                function(v) { return v || ''; },
     };
 
     for (var key in feldMapping) {
@@ -1678,6 +1842,14 @@ function speichereConfig(body) {
 
     const existingRow = data.findIndex(row => row.id === config.id);
     if (existingRow >= 0) {
+      // Phase 2: Ownership-Check — nur Ersteller oder Admin darf bearbeiten
+      const bestehendeRow = data[existingRow];
+      if (bestehendeRow.erstelltVon && bestehendeRow.erstelltVon !== email) {
+        var lpInfo = getLPInfo(email);
+        if (!lpInfo || lpInfo.rolle !== 'admin') {
+          return jsonResponse({ error: 'Nur die erstellende LP darf diese Prüfung bearbeiten' });
+        }
+      }
       const rowIndex = existingRow + 2;
       headers.forEach((header, colIndex) => {
         if (rowData[header] !== undefined) {
@@ -1685,6 +1857,9 @@ function speichereConfig(body) {
         }
       });
     } else {
+      // Neue Prüfung: erstelltVon automatisch setzen
+      rowData.erstelltVon = email;
+      headers = ensureColumns(configSheet, headers, rowData);
       const newRow = headers.map(h => rowData[h] || '');
       configSheet.appendRow(newRow);
     }
@@ -1700,7 +1875,7 @@ function speichereConfig(body) {
 function loeschePruefung(body) {
   try {
     const { email, pruefungId } = body;
-    if (!email || !email.endsWith('@' + LP_DOMAIN)) {
+    if (!email || !istZugelasseneLP(email)) {
       return jsonResponse({ error: 'Nur für Lehrpersonen' });
     }
     if (!pruefungId) {
@@ -1713,6 +1888,15 @@ function loeschePruefung(body) {
     const rowIndex = data.findIndex(row => row.id === pruefungId);
     if (rowIndex < 0) {
       return jsonResponse({ error: 'Prüfung nicht gefunden' });
+    }
+
+    // Phase 2: Ownership-Check
+    const row = data[rowIndex];
+    if (row.erstelltVon && row.erstelltVon !== email) {
+      var lpInfo = getLPInfo(email);
+      if (!lpInfo || lpInfo.rolle !== 'admin') {
+        return jsonResponse({ error: 'Nur die erstellende LP darf diese Prüfung löschen' });
+      }
     }
 
     // Zeile löschen (rowIndex + 2 wegen Header-Zeile und 1-basiertem Index)
@@ -1729,7 +1913,7 @@ function loeschePruefung(body) {
 function entsperreSuSEndpoint(body) {
   try {
     var email = body.email;
-    if (!email || !email.endsWith('@' + LP_DOMAIN)) {
+    if (!email || !istZugelasseneLP(email)) {
       return jsonResponse({ error: 'Nur für Lehrpersonen' });
     }
     var pruefungId = body.pruefungId;
@@ -1768,7 +1952,7 @@ function entsperreSuSEndpoint(body) {
 function setzeKontrollStufeEndpoint(body) {
   try {
     var email = body.email;
-    if (!email || !email.endsWith('@' + LP_DOMAIN)) {
+    if (!email || !istZugelasseneLP(email)) {
       return jsonResponse({ error: 'Nur für Lehrpersonen' });
     }
     var pruefungId = body.pruefungId;
@@ -1805,7 +1989,7 @@ function setzeKontrollStufeEndpoint(body) {
 
 function ladeMonitoring(pruefungId, email) {
   try {
-    if (!email.endsWith('@' + LP_DOMAIN)) {
+    if (!istZugelasseneLP(email)) {
       return jsonResponse({ error: 'Nur für Lehrpersonen' });
     }
     if (!pruefungId) {
@@ -1902,7 +2086,7 @@ function importierePoolFragen(body) {
     var email = body.email;
     var fragen = body.fragen || [];
 
-    if (!email || !email.endsWith('@' + LP_DOMAIN)) {
+    if (!email || !istZugelasseneLP(email)) {
       return jsonResponse({ error: 'Nur für Lehrpersonen' });
     }
     if (!fragen.length) {
@@ -2038,7 +2222,7 @@ function importiereLernziele(body) {
     var email = body.email;
     var lernziele = body.lernziele || [];
 
-    if (!email || !email.endsWith('@' + LP_DOMAIN)) {
+    if (!email || !istZugelasseneLP(email)) {
       return jsonResponse({ error: 'Nur für Lehrpersonen' });
     }
     if (!lernziele.length) {
@@ -2112,7 +2296,7 @@ function importiereLernziele(body) {
 function importiereLehrplanzieleEndpoint(body) {
   try {
     var email = body.email;
-    if (!email || !email.endsWith('@' + LP_DOMAIN)) {
+    if (!email || !istZugelasseneLP(email)) {
       return jsonResponse({ error: 'Nur für Lehrpersonen' });
     }
     var ziele = body.lehrplanziele || [];
@@ -2160,7 +2344,7 @@ function ladeLernziele(body) {
     var email = body.email;
     var fachFilter = body.fach || '';
 
-    if (!email || !email.endsWith('@' + LP_DOMAIN)) {
+    if (!email || !istZugelasseneLP(email)) {
       return jsonResponse({ error: 'Nur für Lehrpersonen' });
     }
 
@@ -2229,7 +2413,7 @@ function kiAssistentEndpoint(body) {
     var aktion = body.aktion;
     var daten = body.daten || {};
 
-    if (!email || !email.endsWith('@' + LP_DOMAIN)) {
+    if (!email || !istZugelasseneLP(email)) {
       return jsonResponse({ error: 'Nur für Lehrpersonen' });
     }
     if (!aktion) {
@@ -2253,7 +2437,7 @@ function kiAssistentEndpoint(body) {
           'Fragetyp: ' + (daten.typ || 'freitext') + '\n' +
           'Bloom-Stufe: ' + (daten.bloom || 'K2') + '\n\n' +
           'Antworte als JSON: { "fragetext": "...", "musterlosung": "..." }';
-        result = rufeClaudeAuf(systemPrompt, userPrompt);
+        result = rufeClaudeAuf(systemPrompt, userPrompt, undefined, email);
         return jsonResponse({ success: true, ergebnis: result });
 
       case 'verbessereFragetext':
@@ -2262,7 +2446,7 @@ function kiAssistentEndpoint(body) {
           'Korrigiere allfällige Fehler und mache die Frage unmissverständlich.\n\n' +
           'Originaler Fragetext:\n' + daten.fragetext + '\n\n' +
           'Antworte als JSON: { "fragetext": "..." , "aenderungen": "kurze Zusammenfassung der Änderungen" }';
-        result = rufeClaudeAuf(systemPrompt, userPrompt);
+        result = rufeClaudeAuf(systemPrompt, userPrompt, undefined, email);
         return jsonResponse({ success: true, ergebnis: result });
 
       case 'pruefeMusterloesung':
@@ -2271,7 +2455,7 @@ function kiAssistentEndpoint(body) {
           'Fragetext:\n' + daten.fragetext + '\n\n' +
           'Musterlösung:\n' + daten.musterlosung + '\n\n' +
           'Antworte als JSON: { "korrekt": true/false, "bewertung": "...", "verbesserteLosung": "..." }';
-        result = rufeClaudeAuf(systemPrompt, userPrompt);
+        result = rufeClaudeAuf(systemPrompt, userPrompt, undefined, email);
         return jsonResponse({ success: true, ergebnis: result });
 
       case 'generiereOptionen':
@@ -2280,7 +2464,7 @@ function kiAssistentEndpoint(body) {
           'Genau eine Option soll korrekt sein, die anderen 3 sollen plausible Distraktoren sein.\n\n' +
           'Fragetext:\n' + daten.fragetext + '\n\n' +
           'Antworte als JSON: { "optionen": [{ "text": "...", "korrekt": true/false }, ...] }';
-        result = rufeClaudeAuf(systemPrompt, userPrompt);
+        result = rufeClaudeAuf(systemPrompt, userPrompt, undefined, email);
         return jsonResponse({ success: true, ergebnis: result });
 
       case 'generiereDistraktoren':
@@ -2289,7 +2473,7 @@ function kiAssistentEndpoint(body) {
           'Fragetext:\n' + daten.fragetext + '\n\n' +
           'Korrekte Antwort: ' + daten.korrekteAntwort + '\n\n' +
           'Antworte als JSON: { "distraktoren": ["...", "...", "..."] }';
-        result = rufeClaudeAuf(systemPrompt, userPrompt);
+        result = rufeClaudeAuf(systemPrompt, userPrompt, undefined, email);
         return jsonResponse({ success: true, ergebnis: result });
 
       case 'generiereMusterloesung':
@@ -2301,7 +2485,7 @@ function kiAssistentEndpoint(body) {
           'Fragetyp: ' + (daten.typ || 'freitext') + '\n' +
           'Fragetext:\n' + daten.fragetext + '\n\n' +
           'Antworte als JSON: { "musterlosung": "..." }';
-        result = rufeClaudeAuf(systemPrompt, userPrompt);
+        result = rufeClaudeAuf(systemPrompt, userPrompt, undefined, email);
         return jsonResponse({ success: true, ergebnis: result });
 
       case 'generierePaare':
@@ -2312,7 +2496,7 @@ function kiAssistentEndpoint(body) {
           'Thema: ' + (daten.thema || '') + '\n' +
           'Fragetext:\n' + daten.fragetext + '\n\n' +
           'Antworte als JSON: { "paare": [{ "links": "...", "rechts": "..." }, ...] }';
-        result = rufeClaudeAuf(systemPrompt, userPrompt);
+        result = rufeClaudeAuf(systemPrompt, userPrompt, undefined, email);
         return jsonResponse({ success: true, ergebnis: result });
 
       case 'pruefePaare':
@@ -2322,7 +2506,7 @@ function kiAssistentEndpoint(body) {
           'Fragetext:\n' + daten.fragetext + '\n\n' +
           'Paare:\n' + JSON.stringify(daten.paare) + '\n\n' +
           'Antworte als JSON: { "bewertung": "...", "verbesserungen": "..." }';
-        result = rufeClaudeAuf(systemPrompt, userPrompt);
+        result = rufeClaudeAuf(systemPrompt, userPrompt, undefined, email);
         return jsonResponse({ success: true, ergebnis: result });
 
       case 'generiereAussagen':
@@ -2334,7 +2518,7 @@ function kiAssistentEndpoint(body) {
           'Thema: ' + (daten.thema || '') + '\n' +
           'Fragetext:\n' + daten.fragetext + '\n\n' +
           'Antworte als JSON: { "aussagen": [{ "text": "...", "korrekt": true/false, "erklaerung": "..." }, ...] }';
-        result = rufeClaudeAuf(systemPrompt, userPrompt);
+        result = rufeClaudeAuf(systemPrompt, userPrompt, undefined, email);
         return jsonResponse({ success: true, ergebnis: result });
 
       case 'pruefeAussagen':
@@ -2344,7 +2528,7 @@ function kiAssistentEndpoint(body) {
           'Fragetext:\n' + daten.fragetext + '\n\n' +
           'Aussagen:\n' + JSON.stringify(daten.aussagen) + '\n\n' +
           'Antworte als JSON: { "bewertung": "...", "verbesserungen": "..." }';
-        result = rufeClaudeAuf(systemPrompt, userPrompt);
+        result = rufeClaudeAuf(systemPrompt, userPrompt, undefined, email);
         return jsonResponse({ success: true, ergebnis: result });
 
       case 'generiereLuecken':
@@ -2356,7 +2540,7 @@ function kiAssistentEndpoint(body) {
           'Fragetext:\n' + daten.fragetext + '\n' +
           (daten.textMitLuecken ? 'Basistext:\n' + daten.textMitLuecken + '\n' : '') + '\n' +
           'Antworte als JSON: { "textMitLuecken": "...", "luecken": [{ "id": "1", "korrekteAntworten": ["antwort1", "synonym"] }, ...] }';
-        result = rufeClaudeAuf(systemPrompt, userPrompt);
+        result = rufeClaudeAuf(systemPrompt, userPrompt, undefined, email);
         return jsonResponse({ success: true, ergebnis: result });
 
       case 'pruefeLueckenAntworten':
@@ -2366,7 +2550,7 @@ function kiAssistentEndpoint(body) {
           'Text mit Lücken:\n' + daten.textMitLuecken + '\n\n' +
           'Aktuelle Lücken-Antworten:\n' + JSON.stringify(daten.luecken) + '\n\n' +
           'Antworte als JSON: { "bewertung": "...", "ergaenzteAntworten": [{ "id": "1", "korrekteAntworten": ["erweiterte", "liste"] }, ...] }';
-        result = rufeClaudeAuf(systemPrompt, userPrompt);
+        result = rufeClaudeAuf(systemPrompt, userPrompt, undefined, email);
         return jsonResponse({ success: true, ergebnis: result });
 
       case 'berechneErgebnis':
@@ -2375,7 +2559,7 @@ function kiAssistentEndpoint(body) {
           'Gib das numerische Ergebnis (oder mehrere Teilergebnisse) mit passenden Einheiten und einer sinnvollen Toleranz an.\n\n' +
           'Fragetext:\n' + daten.fragetext + '\n\n' +
           'Antworte als JSON: { "ergebnisse": [{ "label": "...", "korrekt": 42.5, "toleranz": 0.5, "einheit": "CHF" }, ...], "rechenweg": "..." }';
-        result = rufeClaudeAuf(systemPrompt, userPrompt);
+        result = rufeClaudeAuf(systemPrompt, userPrompt, undefined, email);
         return jsonResponse({ success: true, ergebnis: result });
 
       case 'pruefeToleranz':
@@ -2385,7 +2569,7 @@ function kiAssistentEndpoint(body) {
           'Fragetext:\n' + daten.fragetext + '\n\n' +
           'Ergebnisse mit Toleranzen:\n' + JSON.stringify(daten.ergebnisse) + '\n\n' +
           'Antworte als JSON: { "bewertung": "...", "empfohleneToleranz": "..." }';
-        result = rufeClaudeAuf(systemPrompt, userPrompt);
+        result = rufeClaudeAuf(systemPrompt, userPrompt, undefined, email);
         return jsonResponse({ success: true, ergebnis: result });
 
       case 'bewertungsrasterGenerieren':
@@ -2400,7 +2584,7 @@ function kiAssistentEndpoint(body) {
           'Erstelle ein Bewertungsraster mit konkreten, messbaren Kriterien. ' +
           'Die Summe der Kriterien-Punkte muss exakt ' + (daten.punkte || '?') + ' ergeben.\n\n' +
           'Antworte als JSON: { "kriterien": [{ "beschreibung": "...", "punkte": 1 }, ...] }';
-        result = rufeClaudeAuf(systemPrompt, userPrompt);
+        result = rufeClaudeAuf(systemPrompt, userPrompt, undefined, email);
         return jsonResponse({ success: true, ergebnis: result });
 
       case 'bewertungsrasterVerbessern':
@@ -2416,7 +2600,7 @@ function kiAssistentEndpoint(body) {
           'Prüfe: Sind die Kriterien messbar und eindeutig? Stimmt die Punkteverteilung? Fehlen wichtige Aspekte? ' +
           'Vorschläge für Verbesserungen machen.\n\n' +
           'Antworte als JSON: { "bewertung": "Freitext-Analyse des Rasters", "verbesserteKriterien": [{ "beschreibung": "...", "punkte": 1 }, ...] }';
-        result = rufeClaudeAuf(systemPrompt, userPrompt);
+        result = rufeClaudeAuf(systemPrompt, userPrompt, undefined, email);
         return jsonResponse({ success: true, ergebnis: result });
 
       case 'klassifiziereFrage':
@@ -2430,7 +2614,7 @@ function kiAssistentEndpoint(body) {
           '4. Bloom-Stufe: K1 (Wissen), K2 (Verstehen), K3 (Anwenden), K4 (Analysieren), K5 (Bewerten), K6 (Erschaffen)\n' +
           '5. Tags: 3–5 relevante Schlagwörter als Array\n\n' +
           'Antworte als JSON: { "fachbereich": "VWL"|"BWL"|"Recht", "thema": "...", "unterthema": "...", "bloom": "K1"-"K6", "tags": ["...", "..."] }';
-        result = rufeClaudeAuf(systemPrompt, userPrompt);
+        result = rufeClaudeAuf(systemPrompt, userPrompt, undefined, email);
         return jsonResponse({ success: true, ergebnis: result });
 
       case 'importiereFragen':
@@ -2454,7 +2638,7 @@ function kiAssistentEndpoint(body) {
           '"paare": [{"links": "...", "rechts": "..."}] (nur bei Zuordnung), ' +
           '"aussagen": [{"text": "...", "korrekt": true/false, "erklaerung": "..."}] (nur bei R/F) ' +
           '}, ...] }';
-        result = rufeClaudeAuf(systemPrompt, userPrompt, 4096);
+        result = rufeClaudeAuf(systemPrompt, userPrompt, 4096, email);
         return jsonResponse({ success: true, ergebnis: result });
 
       case 'analysierePruefung':
@@ -2472,7 +2656,7 @@ function kiAssistentEndpoint(body) {
           '"typenMix": { "mc": 0, "freitext": 0, ... }, ' +
           '"zeitschaetzung": { "gesamt": 0, "proFrage": [{ "frageNr": 1, "minuten": 0 }, ...] }, ' +
           '"themenAbdeckung": "...", "schwierigkeitsBalance": "...", "verbesserungen": ["...", "..."] }';
-        result = rufeClaudeAuf(systemPrompt, userPrompt, 2048);
+        result = rufeClaudeAuf(systemPrompt, userPrompt, 2048, email);
         return jsonResponse({ success: true, ergebnis: result });
 
       case 'generiereFrageZuLernziel':
@@ -2503,7 +2687,7 @@ function kiAssistentEndpoint(body) {
             '  "ergebnisse": [{ "label": "...", "korrekt": 0, "toleranz": 0, "einheit": "CHF" }], "rechenwegErforderlich": true\n' :
             '') +
           '}';
-        result = rufeClaudeAuf(systemPrompt, userPrompt, 1536);
+        result = rufeClaudeAuf(systemPrompt, userPrompt, 1536, email);
         return jsonResponse({ success: true, ergebnis: result });
 
       // === Buchhaltung / FiBu ===
@@ -2514,7 +2698,7 @@ function kiAssistentEndpoint(body) {
           'Gegeben ist ein Geschäftsfall. Schlage 8–12 relevante Konten vor (die korrekten + plausible Distraktoren).\n\n' +
           'Geschäftsfall:\n' + daten.geschaeftsfall + '\n\n' +
           'Antworte als JSON: { "konten": [{ "nummer": "1000", "name": "Kasse" }, ...] }';
-        result = rufeClaudeAuf(systemPrompt, userPrompt);
+        result = rufeClaudeAuf(systemPrompt, userPrompt, undefined, email);
         return jsonResponse({ success: true, ergebnis: result });
 
       case 'generiereBuchungssaetze':
@@ -2523,7 +2707,7 @@ function kiAssistentEndpoint(body) {
           'Verwende den Schweizer KMU-Kontenrahmen.\n\n' +
           'Geschäftsfall:\n' + daten.geschaeftsfall + '\n\n' +
           'Antworte als JSON: { "buchungen": [{ "sollKonten": [{ "kontonummer": "1000", "betrag": 500 }], "habenKonten": [{ "kontonummer": "2000", "betrag": 500 }], "buchungstext": "..." }] }';
-        result = rufeClaudeAuf(systemPrompt, userPrompt);
+        result = rufeClaudeAuf(systemPrompt, userPrompt, undefined, email);
         return jsonResponse({ success: true, ergebnis: result });
 
       case 'pruefeBuchungssaetze':
@@ -2532,7 +2716,7 @@ function kiAssistentEndpoint(body) {
           'Geschäftsfall:\n' + daten.geschaeftsfall + '\n\n' +
           'Buchungen:\n' + JSON.stringify(daten.buchungen) + '\n\n' +
           'Antworte als JSON: { "korrekt": true/false, "bewertung": "...", "korrigiert": [{ "sollKonten": [...], "habenKonten": [...], "buchungstext": "..." }] }';
-        result = rufeClaudeAuf(systemPrompt, userPrompt);
+        result = rufeClaudeAuf(systemPrompt, userPrompt, undefined, email);
         return jsonResponse({ success: true, ergebnis: result });
 
       case 'generiereTKonten':
@@ -2541,7 +2725,7 @@ function kiAssistentEndpoint(body) {
           'Verwende den Schweizer KMU-Kontenrahmen.\n\n' +
           'Aufgabe:\n' + daten.aufgabentext + '\n\n' +
           'Antworte als JSON: { "konten": [{ "kontonummer": "1000", "name": "Kasse", "anfangsbestand": 5000, "eintraege": [{ "seite": "soll", "gegenkonto": "2000", "betrag": 500 }], "saldo": { "betrag": 5500, "seite": "soll" } }] }';
-        result = rufeClaudeAuf(systemPrompt, userPrompt);
+        result = rufeClaudeAuf(systemPrompt, userPrompt, undefined, email);
         return jsonResponse({ success: true, ergebnis: result });
 
       case 'generiereKontenaufgaben':
@@ -2550,7 +2734,7 @@ function kiAssistentEndpoint(body) {
           'Für jeden Geschäftsfall: welches Konto, welche Kategorie (aktiv/passiv/aufwand/ertrag), welche Buchungsseite (Soll/Haben).\n\n' +
           'Thema:\n' + daten.aufgabentext + '\n\n' +
           'Antworte als JSON: { "aufgaben": [{ "text": "Barverkauf von Waren", "erwarteteAntworten": [{ "kontonummer": "1000", "kategorie": "aktiv", "seite": "soll" }, { "kontonummer": "3200", "kategorie": "ertrag", "seite": "haben" }] }] }';
-        result = rufeClaudeAuf(systemPrompt, userPrompt, 1536);
+        result = rufeClaudeAuf(systemPrompt, userPrompt, 1536, email);
         return jsonResponse({ success: true, ergebnis: result });
 
       case 'generiereBilanzStruktur':
@@ -2562,7 +2746,7 @@ function kiAssistentEndpoint(body) {
           (daten.modus === 'erfolgsrechnung' ?
             'Antworte als JSON: { "erfolgsrechnung": { "stufen": [{ "label": "Bruttogewinn", "aufwandKonten": ["4200"], "ertragKonten": ["3200"], "zwischentotal": 50000 }] } }' :
             'Antworte als JSON: { "bilanz": { "aktivSeite": { "label": "Aktiven", "gruppen": [{ "label": "Umlaufvermögen", "positionen": [{ "konto": "1000", "name": "Kasse", "betrag": 5000 }] }] }, "passivSeite": { "label": "Passiven", "gruppen": [{ "label": "Fremdkapital", "positionen": [{ "konto": "2000", "name": "Kreditoren", "betrag": 3000 }] }] }, "bilanzsumme": 100000 } }');
-        result = rufeClaudeAuf(systemPrompt, userPrompt, 1536);
+        result = rufeClaudeAuf(systemPrompt, userPrompt, 1536, email);
         return jsonResponse({ success: true, ergebnis: result });
 
       case 'generiereFallbeispiel':
@@ -2572,7 +2756,7 @@ function kiAssistentEndpoint(body) {
           'Thema: ' + daten.thema + '\n' +
           (daten.schwierigkeit ? 'Schwierigkeit: ' + daten.schwierigkeit + '\n' : '') +
           '\nAntworte als JSON: { "titel": "...", "beschreibung": "Ausgangslage des Unternehmens", "geschaeftsfaelle": [{ "nr": 1, "text": "...", "loesung": { "sollKonten": [{ "kontonummer": "1000", "betrag": 500 }], "habenKonten": [{ "kontonummer": "2000", "betrag": 500 }] } }] }';
-        result = rufeClaudeAuf(systemPrompt, userPrompt, 2048);
+        result = rufeClaudeAuf(systemPrompt, userPrompt, 2048, email);
         return jsonResponse({ success: true, ergebnis: result });
 
       case 'korrigiereZeichnung': {
@@ -2603,7 +2787,7 @@ function kiAssistentEndpoint(body) {
           content.push({ type: 'image', source: { type: 'base64', media_type: 'image/png', data: musterloesungBild } });
         }
 
-        var ergebnis = rufeClaudeAufMitBild(sysPrompt, [{ role: 'user', content: content }]);
+        var ergebnis = rufeClaudeAufMitBild(sysPrompt, [{ role: 'user', content: content }], email);
 
         // Clamp points to [0, maxPunkte]
         if (ergebnis && typeof ergebnis.punkte === 'number') {
@@ -2618,6 +2802,7 @@ function kiAssistentEndpoint(body) {
       }
 
       case 'korrigierePDFAnnotation':
+        daten.callerEmail = email;
         return korrigierePDFAnnotation(daten);
 
       default:
@@ -2629,11 +2814,11 @@ function kiAssistentEndpoint(body) {
   }
 }
 
-function rufeClaudeAuf(systemPrompt, userPrompt, maxTokens) {
+function rufeClaudeAuf(systemPrompt, userPrompt, maxTokens, callerEmail) {
   maxTokens = maxTokens || 1024;
-  const apiKey = PropertiesService.getScriptProperties().getProperty('CLAUDE_API_KEY');
+  const apiKey = callerEmail ? getApiKeyFuerLP(callerEmail) : (PropertiesService.getScriptProperties().getProperty('CLAUDE_API_KEY') || PropertiesService.getScriptProperties().getProperty('ANTHROPIC_API_KEY'));
   if (!apiKey) {
-    throw new Error('CLAUDE_API_KEY nicht als Script Property gesetzt');
+    throw new Error('Kein API Key verfügbar (weder pro LP noch global)');
   }
 
   const response = UrlFetchApp.fetch('https://api.anthropic.com/v1/messages', {
@@ -2704,13 +2889,13 @@ ${JSON.stringify(annotationen)}`;
     ]
   }];
 
-  return rufeClaudeAufMitBild(korrekturSystemPrompt(), messages);
+  return rufeClaudeAufMitBild(korrekturSystemPrompt(), messages, params.callerEmail);
 }
 
-function rufeClaudeAufMitBild(systemPrompt, messages) {
-  var apiKey = PropertiesService.getScriptProperties().getProperty('ANTHROPIC_API_KEY');
+function rufeClaudeAufMitBild(systemPrompt, messages, callerEmail) {
+  var apiKey = callerEmail ? getApiKeyFuerLP(callerEmail) : (PropertiesService.getScriptProperties().getProperty('CLAUDE_API_KEY') || PropertiesService.getScriptProperties().getProperty('ANTHROPIC_API_KEY'));
   if (!apiKey) {
-    Logger.log('ANTHROPIC_API_KEY nicht gesetzt');
+    Logger.log('Kein API Key verfügbar');
     return null;
   }
 
@@ -2821,7 +3006,7 @@ function autoBewerteAntwort(frage, antwort) {
 function starteKorrekturEndpoint(body) {
   try {
     const { pruefungId, email } = body;
-    if (!email || !email.endsWith('@' + LP_DOMAIN)) {
+    if (!email || !istZugelasseneLP(email)) {
       return jsonResponse({ error: 'Nur für Lehrpersonen' });
     }
 
@@ -2878,7 +3063,7 @@ function batchKorrektur(pruefungId, lpEmail, korrekturSheet) {
         try {
           const systemPrompt = buildKorrekturPrompt(frage);
           const userPrompt = antwort ? antwort.text || '(keine Antwort)' : '(keine Antwort)';
-          const kiResult = rufeClaudeAuf(systemPrompt, userPrompt);
+          const kiResult = rufeClaudeAuf(systemPrompt, userPrompt, undefined, lpEmail);
 
           korrekturZeilen.push({
             email: sus.email, name: sus.name || sus.email, frageId: frageId,
@@ -2964,7 +3149,7 @@ function setKorrekturStatus(sheet, status, erledigt, gesamt) {
 
 function ladeKorrektur(pruefungId, email) {
   try {
-    if (!email.endsWith('@' + LP_DOMAIN)) {
+    if (!istZugelasseneLP(email)) {
       return jsonResponse({ error: 'Nur für Lehrpersonen' });
     }
 
@@ -3042,7 +3227,7 @@ function ladeKorrektur(pruefungId, email) {
 
 function ladeAbgaben(pruefungId, email) {
   try {
-    if (!email.endsWith('@' + LP_DOMAIN)) return jsonResponse({ error: 'Nur für Lehrpersonen' });
+    if (!istZugelasseneLP(email)) return jsonResponse({ error: 'Nur für Lehrpersonen' });
 
     const sheet = ANTWORTEN_MASTER_ID
       ? SpreadsheetApp.openById(ANTWORTEN_MASTER_ID).getSheetByName('Antworten_' + pruefungId)
@@ -3069,7 +3254,7 @@ function ladeAbgaben(pruefungId, email) {
 
 function ladeKorrekturFortschritt(pruefungId, email) {
   try {
-    if (!email.endsWith('@' + LP_DOMAIN)) return jsonResponse({ error: 'Nur für Lehrpersonen' });
+    if (!istZugelasseneLP(email)) return jsonResponse({ error: 'Nur für Lehrpersonen' });
 
     const sheet = ANTWORTEN_MASTER_ID
       ? SpreadsheetApp.openById(ANTWORTEN_MASTER_ID).getSheetByName('Korrektur_' + pruefungId)
@@ -3092,7 +3277,7 @@ function ladeKorrekturFortschritt(pruefungId, email) {
  */
 function ladeKorrekturStatusEndpoint(pruefungId, email) {
   try {
-    if (!email || !email.endsWith('@' + LP_DOMAIN)) {
+    if (!email || !istZugelasseneLP(email)) {
       return jsonResponse({ error: 'Nur für Lehrpersonen' });
     }
     if (!pruefungId) {
@@ -3124,7 +3309,7 @@ function ladeKorrekturStatusEndpoint(pruefungId, email) {
 function speichereKorrekturZeile(body) {
   try {
     const { email, pruefungId, schuelerEmail, frageId } = body;
-    if (!email || !email.endsWith('@' + LP_DOMAIN)) return jsonResponse({ error: 'Nur für Lehrpersonen' });
+    if (!email || !istZugelasseneLP(email)) return jsonResponse({ error: 'Nur für Lehrpersonen' });
 
     const sheet = ANTWORTEN_MASTER_ID
       ? SpreadsheetApp.openById(ANTWORTEN_MASTER_ID).getSheetByName('Korrektur_' + pruefungId)
@@ -3169,7 +3354,7 @@ function speichereKorrekturZeile(body) {
 function generiereUndSendeFeedbackEndpoint(body) {
   try {
     const { email, pruefungId, schuelerEmails } = body;
-    if (!email || !email.endsWith('@' + LP_DOMAIN)) return jsonResponse({ error: 'Nur für Lehrpersonen' });
+    if (!email || !istZugelasseneLP(email)) return jsonResponse({ error: 'Nur für Lehrpersonen' });
 
     const configSheet = SpreadsheetApp.openById(CONFIGS_ID).getSheetByName('Configs');
     const configRow = getSheetData(configSheet).find(r => r.id === pruefungId);
@@ -3267,7 +3452,7 @@ function findOrCreatePdfOrdner() {
 function schalteFreiEndpoint(body) {
   try {
     const { pruefungId, email } = body;
-    if (!email || !email.endsWith('@' + LP_DOMAIN)) {
+    if (!email || !istZugelasseneLP(email)) {
       return jsonResponse({ error: 'Nur für Lehrpersonen' });
     }
     if (!pruefungId) {
@@ -3405,7 +3590,7 @@ function ladeNachrichtenEndpoint(pruefungId, email) {
     }
 
     const headers = data[0];
-    const istLP = email.endsWith('@' + LP_DOMAIN);
+    const istLP = istZugelasseneLP(email);
     const nachrichten = [];
 
     for (var i = 1; i < data.length; i++) {
@@ -3438,7 +3623,7 @@ function ladeNachrichtenEndpoint(pruefungId, email) {
 function korrekturFreigebenEndpoint(body) {
   try {
     const { email, pruefungId, freigegeben, typ } = body;
-    if (!email || !email.endsWith('@' + LP_DOMAIN)) {
+    if (!email || !istZugelasseneLP(email)) {
       return jsonResponse({ error: 'Nur für Lehrpersonen' });
     }
 
@@ -3870,7 +4055,7 @@ function generiereNeueFrageId(jsContent, topicKey) {
 
 function schreibePoolAenderung(body) {
   var email = body.email;
-  if (!email || !email.endsWith('@gymhofwil.ch')) {
+  if (!email || !istZugelasseneLP(email)) {
     return jsonResponse({ erfolg: false, fehler: ['Nicht autorisiert'] });
   }
 
@@ -4066,7 +4251,7 @@ function serialisiereNeuePoolFrage(felder) {
 function ladeTrackerDatenEndpoint(body) {
   try {
     var email = body.email;
-    if (!email || !email.endsWith('@' + LP_DOMAIN)) {
+    if (!email || !istZugelasseneLP(email)) {
       return jsonResponse({ error: 'Nur für Lehrpersonen' });
     }
 
