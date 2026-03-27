@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useAuthStore } from '../../store/authStore.ts'
+import { useFragenbankStore } from '../../store/fragenbankStore.ts'
 import { apiService } from '../../services/apiService.ts'
 import type { PruefungsConfig } from '../../types/pruefung.ts'
 import type { Frage } from '../../types/fragen.ts'
@@ -105,10 +106,12 @@ export default function LPStartseite() {
         return
       }
 
-      // Configs und Tracker-Daten parallel laden
+      // Configs, Tracker-Daten und Fragenbank parallel laden
+      const fragenbankLade = useFragenbankStore.getState().lade(user.email)
       const [configResult, trackerResult] = await Promise.all([
         apiService.ladeAlleConfigs(user.email),
         apiService.ladeTrackerDaten(user.email),
+        fragenbankLade,
       ])
 
       if (configResult) {
@@ -159,11 +162,11 @@ export default function LPStartseite() {
   }
 
   async function handleOeffneSyncDialog(): Promise<void> {
-    // Fragenbank IMMER frisch laden (nicht aus Cache), damit Delta-Berechnung korrekt ist
+    // Fragenbank frisch laden (force), damit Delta-Berechnung korrekt ist
     if (user && apiService.istKonfiguriert() && !istDemoModus) {
-      const result = await apiService.ladeFragenbank(user.email)
-      if (result) setFragenbank(result)
+      await useFragenbankStore.getState().lade(user.email, true)
     }
+    setFragenbank(useFragenbankStore.getState().fragen)
     setZeigSyncDialog(true)
   }
 

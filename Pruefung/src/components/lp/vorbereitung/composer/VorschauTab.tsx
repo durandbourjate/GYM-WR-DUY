@@ -9,10 +9,11 @@ import MediaAnhang from '../../../MediaAnhang.tsx'
 interface Props {
   pruefung: PruefungsConfig
   fragenMap: Record<string, Frage>
+  fragenGeladen?: boolean
   onSuSVorschau: () => void
 }
 
-export default function VorschauTab({ pruefung, fragenMap, onSuSVorschau }: Props) {
+export default function VorschauTab({ pruefung, fragenMap, fragenGeladen = true, onSuSVorschau }: Props) {
   const gesamtFragen = pruefung.abschnitte.reduce((s, a) => s + a.fragenIds.length, 0)
 
   // Gesamtpunkte und geschätzte Zeit berechnen
@@ -119,8 +120,8 @@ export default function VorschauTab({ pruefung, fragenMap, onSuSVorschau }: Prop
                 const frage = fragenMap[frageId]
                 if (!frage) {
                   return (
-                    <div key={frageId} className="px-5 py-3 bg-red-50 dark:bg-red-900/20 rounded-xl border border-red-200 dark:border-red-800 text-sm text-red-600 dark:text-red-400">
-                      Frage nicht gefunden: {frageId}
+                    <div key={frageId} className={`px-5 py-3 rounded-xl border text-sm ${fragenGeladen ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-600 dark:text-red-400' : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400'}`}>
+                      {fragenGeladen ? `Frage nicht gefunden: ${frageId}` : `${frageId} (laden...)`}
                     </div>
                   )
                 }

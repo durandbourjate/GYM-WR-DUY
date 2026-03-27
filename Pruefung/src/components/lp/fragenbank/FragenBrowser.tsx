@@ -3,6 +3,7 @@ import { useFocusTrap } from '../../../hooks/useFocusTrap.ts'
 import { usePanelResize } from '../../../hooks/usePanelResize.ts'
 import { useFragenFilter } from '../../../hooks/useFragenFilter.ts'
 import { useAuthStore } from '../../../store/authStore.ts'
+import { useFragenbankStore } from '../../../store/fragenbankStore.ts'
 import { apiService } from '../../../services/apiService.ts'
 import { demoFragen } from '../../../data/demoFragen.ts'
 import { typLabel } from '../../../utils/fachbereich.ts'
@@ -51,8 +52,17 @@ export default function FragenBrowser({ onHinzufuegen, onEntfernen, onSchliessen
   // Resizable Panel (wiederverwendbarer Hook)
   const { panelBreite, handleZiehStart } = usePanelResize(1008, 600, 0.9)
 
-  const [alleFragen, setAlleFragen] = useState<Frage[]>([])
-  const [ladeStatus, setLadeStatus] = useState<'laden' | 'fertig'>('laden')
+  // Fragen aus Store (wird beim Login parallel geladen)
+  const storeFragen = useFragenbankStore(s => s.fragen)
+  const storeStatus = useFragenbankStore(s => s.status)
+
+  // Im Demo-Modus Demo-Fragen, sonst Store
+  const alleFragen = (istDemoModus || !apiService.istKonfiguriert()) ? demoFragen : storeFragen
+  const ladeStatus = (istDemoModus || !apiService.istKonfiguriert()) ? 'fertig' as const : (storeStatus === 'fertig' ? 'fertig' as const : 'laden' as const)
+
+  // Store-Mutationen
+  const { setFragen: setAlleFragen, aktualisiereFrage, entferneFrage, fuegeFragenHinzu } = useFragenbankStore.getState()
+
   const [fragenStats, setFragenStats] = useState<Map<string, FragenPerformance>>(new Map())
 
   // Set für schnellen Lookup der bereits verwendeten Fragen
@@ -68,37 +78,12 @@ export default function FragenBrowser({ onHinzufuegen, onEntfernen, onSchliessen
   // Filter/Sort/Gruppierungs-Hook
   const filter = useFragenFilter(alleFragen, user?.email, ladeStatus)
 
-  // Fragen laden
+  // Falls Store noch nicht geladen: Laden anstossen (Fallback)
   useEffect(() => {
-    async function lade(): Promise<void> {
-      if (istDemoModus || !apiService.istKonfiguriert()) {
-        setAlleFragen(demoFragen)
-        setLadeStatus('fertig')
-        return
-      }
-
-      if (!user) return
-      const result = await apiService.ladeFragenbank(user.email)
-      if (result && result.length > 0) {
-        // Duplikate entfernen (Backend könnte gleiche ID mehrfach liefern)
-        const gesehen = new Set<string>()
-        const eindeutig = result.filter((f) => {
-          if (gesehen.has(f.id)) {
-            console.warn(`[FragenBrowser] Duplikat-ID übersprungen: ${f.id}`)
-            return false
-          }
-          gesehen.add(f.id)
-          return true
-        })
-        setAlleFragen(eindeutig)
-      } else {
-        console.warn('[FragenBrowser] Backend-Fragen nicht ladbar — zeige Demo-Fragen')
-        setAlleFragen(demoFragen)
-      }
-      setLadeStatus('fertig')
+    if (!istDemoModus && apiService.istKonfiguriert() && user && storeStatus === 'idle') {
+      useFragenbankStore.getState().lade(user.email)
     }
-    lade()
-  }, [user, istDemoModus])
+  }, [istDemoModus, user, storeStatus])
 
   // Tracker-Daten laden für Fragen-Statistiken
   useEffect(() => {
@@ -148,10 +133,7 @@ export default function FragenBrowser({ onHinzufuegen, onEntfernen, onSchliessen
   }
 
   async function handleFrageGespeichert(neueFrage: Frage): Promise<void> {
-    setAlleFragen((prev) => {
-      const ohneAlt = prev.filter((f) => f.id !== neueFrage.id)
-      return [...ohneAlt, neueFrage]
-    })
+    aktualisiereFrage(neueFrage)
     setZeigEditor(false)
     setEditFrage(null)
 
@@ -168,7 +150,7 @@ export default function FragenBrowser({ onHinzufuegen, onEntfernen, onSchliessen
   }
 
   async function handleImportFragen(importierteFragen: Frage[]): Promise<void> {
-    setAlleFragen((prev) => [...prev, ...importierteFragen])
+    fuegeFragenHinzu(importierteFragen)
     setZeigImport(false)
 
     // fragenMap im Composer synchronisieren
@@ -193,29 +175,20 @@ export default function FragenBrowser({ onHinzufuegen, onEntfernen, onSchliessen
     if (istDemoModus || !apiService.istKonfiguriert()) {
       // Demo: Lokale Kopie erstellen
       const kopie = { ...structuredClone(frage), id: `kopie-${Date.now()}`, autor: user.email } as Frage
-      setAlleFragen(prev => [kopie, ...prev])
+      fuegeFragenHinzu([kopie])
       return
     }
 
     const neueId = await apiService.dupliziereFrage(user.email, frage.id)
     if (neueId) {
       // Fragenbank neu laden um die Kopie anzuzeigen
-      const result = await apiService.ladeFragenbank(user.email)
-      if (result) {
-        const gesehen = new Set<string>()
-        const eindeutig = result.filter((f) => {
-          if (gesehen.has(f.id)) return false
-          gesehen.add(f.id)
-          return true
-        })
-        setAlleFragen(eindeutig)
-      }
+      await useFragenbankStore.getState().lade(user.email, true)
     }
   }
 
   async function handleFrageLoeschen(): Promise<void> {
     if (!loeschKandidat) return
-    setAlleFragen(prev => prev.filter(f => f.id !== loeschKandidat.id))
+    entferneFrage(loeschKandidat.id)
     const frage = loeschKandidat
     setLoeschKandidat(null)
     if (user && apiService.istKonfiguriert() && !istDemoModus) {
@@ -431,7 +404,8 @@ export default function FragenBrowser({ onHinzufuegen, onEntfernen, onSchliessen
           fragen={filter.gefilterteFragen}
           onSchliessen={() => setZeigBatchExport(false)}
           onErfolg={(updates) => {
-            setAlleFragen(prev => prev.map(f => {
+            const aktuell = useFragenbankStore.getState().fragen
+            setAlleFragen(aktuell.map(f => {
               const upd = updates.find(u => u.frageId === f.id)
               if (!upd) return f
               return { ...f, poolId: upd.poolId, quelle: 'pool' as const, poolContentHash: upd.poolContentHash }

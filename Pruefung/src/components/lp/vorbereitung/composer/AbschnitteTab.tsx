@@ -8,6 +8,7 @@ import { berechneZeitbedarf } from '../../../../utils/zeitbedarf.ts'
 interface Props {
   pruefung: PruefungsConfig
   fragenMap: Record<string, Frage>
+  fragenGeladen?: boolean
   fragenStats?: Map<string, FragenPerformance>
   onAddAbschnitt: () => void
   onRemoveAbschnitt: (index: number) => void
@@ -22,6 +23,7 @@ interface Props {
 export default function AbschnitteTab({
   pruefung,
   fragenMap,
+  fragenGeladen = true,
   fragenStats,
   onAddAbschnitt,
   onRemoveAbschnitt,
@@ -168,7 +170,10 @@ export default function AbschnitteTab({
                           </span>
                         )
                       })()}
-                      {!frage && (
+                      {!frage && !fragenGeladen && (
+                        <span className="font-mono text-xs text-slate-400 dark:text-slate-500 italic">{frageId} (laden...)</span>
+                      )}
+                      {!frage && fragenGeladen && (
                         <span className="font-mono text-xs text-red-400 dark:text-red-500 italic">{frageId} (nicht gefunden)</span>
                       )}
                       <span className="flex-1" />

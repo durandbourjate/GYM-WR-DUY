@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
 import { useFocusTrap } from '../../../hooks/useFocusTrap.ts'
 import { useAuthStore } from '../../../store/authStore.ts'
+import { useFragenbankStore } from '../../../store/fragenbankStore.ts'
 import { apiService } from '../../../services/apiService.ts'
 import { demoFragen } from '../../../data/demoFragen.ts'
 import { erstelleDemoTrackerDaten, aggregiereFragenPerformance } from '../../../utils/trackerUtils.ts'
@@ -83,26 +84,24 @@ export default function PruefungsComposer({ config, onZurueck, onDuplizieren }: 
   pruefungRef.current = pruefung
   const speichertRef = useRef(false)
 
-  // Fragen-Map laden
-  const [fragenMap, setFragenMap] = useState<Record<string, Frage>>({})
-  const [fragenGeladen, setFragenGeladen] = useState(false)
+  // Fragen-Map aus Store (wird beim Login parallel geladen)
+  const storeFragenMap = useFragenbankStore(s => s.fragenMap)
+  const storeStatus = useFragenbankStore(s => s.status)
+
+  // Im Demo-Modus: Demo-Fragen direkt nutzen, sonst Store
+  const fragenMap = (istDemoModus || !apiService.istKonfiguriert())
+    ? Object.fromEntries(demoFragen.map(f => [f.id, f]))
+    : storeFragenMap
+  const fragenGeladen = (istDemoModus || !apiService.istKonfiguriert())
+    ? true
+    : storeStatus === 'fertig'
+
+  // Falls Store noch nicht geladen: Laden anstossen (Fallback)
   useEffect(() => {
-    async function ladeFragen(): Promise<void> {
-      let fragen: Frage[]
-      if (istDemoModus || !apiService.istKonfiguriert()) {
-        fragen = demoFragen
-      } else if (user) {
-        fragen = await apiService.ladeFragenbank(user.email) ?? []
-      } else {
-        return
-      }
-      const map: Record<string, Frage> = {}
-      for (const f of fragen) map[f.id] = f
-      setFragenMap(map)
-      setFragenGeladen(true)
+    if (!istDemoModus && apiService.istKonfiguriert() && user && storeStatus === 'idle') {
+      useFragenbankStore.getState().lade(user.email)
     }
-    ladeFragen()
-  }, [istDemoModus, user])
+  }, [istDemoModus, user, storeStatus])
 
   // Tracker-Daten laden für Fragen-Statistiken
   const [fragenStats, setFragenStats] = useState<Map<string, FragenPerformance>>(new Map())
@@ -236,7 +235,7 @@ export default function PruefungsComposer({ config, onZurueck, onDuplizieren }: 
 
   /** fragenMap aktualisieren wenn Frage im Browser erstellt/bearbeitet wird */
   const handleFrageAktualisiert = useCallback((frage: Frage) => {
-    setFragenMap((prev) => ({ ...prev, [frage.id]: frage }))
+    useFragenbankStore.getState().aktualisiereFrage(frage)
   }, [])
 
   /** Interne Speicher-Logik (wiederverwendbar für Autosave und manuelles Speichern) */
@@ -395,6 +394,7 @@ export default function PruefungsComposer({ config, onZurueck, onDuplizieren }: 
           <AbschnitteTab
             pruefung={pruefung}
             fragenMap={fragenMap}
+            fragenGeladen={fragenGeladen}
             fragenStats={fragenStats}
             onAddAbschnitt={addAbschnitt}
             onRemoveAbschnitt={removeAbschnitt}
@@ -412,7 +412,7 @@ export default function PruefungsComposer({ config, onZurueck, onDuplizieren }: 
             }}
           />
         )}
-        {tab === 'vorschau' && <VorschauTab pruefung={pruefung} fragenMap={fragenMap} onSuSVorschau={() => setZeigSuSVorschau(true)} />}
+        {tab === 'vorschau' && <VorschauTab pruefung={pruefung} fragenMap={fragenMap} fragenGeladen={fragenGeladen} onSuSVorschau={() => setZeigSuSVorschau(true)} />}
         {tab === 'analyse' && (
           <AnalyseTab pruefung={pruefung} fragenMap={fragenMap} fragenGeladen={fragenGeladen} />
         )}
