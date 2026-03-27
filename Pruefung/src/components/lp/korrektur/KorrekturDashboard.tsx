@@ -1,16 +1,10 @@
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
+import { useState } from 'react'
 import { useAuthStore } from '../../../store/authStore.ts'
 import { apiService } from '../../../services/apiService.ts'
 import { useKorrekturAutoSave } from '../../../hooks/useKorrekturAutoSave.ts'
-import type { PruefungsKorrektur, SchuelerAbgabe } from '../../../types/korrektur.ts'
-import type { Frage } from '../../../types/fragen.ts'
-import { berechneStatistiken, berechneFragenStatistiken } from '../../../utils/korrekturUtils.ts'
-import type { NotenConfig } from '../../../types/pruefung.ts'
-import { exportiereAlsCSV, exportiereErgebnisseAlsCSV, downloadCSV } from '../../../utils/exportUtils.ts'
-import { exportiereBackupXlsx } from '../../../utils/backupExport.ts'
+import { useKorrekturDaten } from './useKorrekturDaten.ts'
+import { useKorrekturActions } from './useKorrekturActions.ts'
 import { formatDatum } from '../../../utils/zeit.ts'
-import { autoKorrigiere, istAutoKorrigierbar } from '../../../utils/autoKorrektur.ts'
-import type { KorrekturErgebnis } from '../../../utils/autoKorrektur.ts'
 import LPHeader from '../LPHeader.tsx'
 import FragenBrowser from '../fragenbank/FragenBrowser.tsx'
 import HilfeSeite from '../HilfeSeite.tsx'
@@ -28,8 +22,6 @@ interface Props {
   eingebettet?: boolean
 }
 
-type Sortierung = 'name' | 'punkte' | 'status'
-
 export default function KorrekturDashboard({ pruefungId, eingebettet = false }: Props) {
   const user = useAuthStore((s) => s.user)
   const istDemoModus = useAuthStore((s) => s.istDemoModus)
@@ -40,317 +32,43 @@ export default function KorrekturDashboard({ pruefungId, eingebettet = false }: 
     enabled: !istDemoModus && !!user,
   })
 
-  const [korrektur, setKorrektur] = useState<PruefungsKorrektur | null>(null)
-  const [abgaben, setAbgaben] = useState<Record<string, SchuelerAbgabe>>({})
-  const [fragen, setFragen] = useState<Frage[]>([])
-  const [ladeStatus, setLadeStatus] = useState<'laden' | 'fertig' | 'fehler'>('laden')
+  // Daten-Hook
+  const daten = useKorrekturDaten({
+    pruefungId,
+    userEmail: user?.email ?? '',
+    queueSave,
+    updateKorrekturRef,
+  })
+
+  // Actions-Hook
+  const actions = useKorrekturActions({
+    pruefungId,
+    userEmail: user?.email ?? '',
+    korrektur: daten.korrektur,
+    setKorrektur: daten.setKorrektur,
+    abgaben: daten.abgaben,
+    fragen: daten.fragen,
+    queueSave,
+  })
+
+  // Lokaler UI-State
   const [korrekturModus, setKorrekturModus] = useState<'schueler' | 'frage'>('schueler')
   const [susNavIndex, setSusNavIndex] = useState(0)
-  const [sortierung, setSortierung] = useState<Sortierung>('name')
-  const [batchLaeuft, setBatchLaeuft] = useState(false)
-  const [feedbackDialog, setFeedbackDialog] = useState(false)
-  const [feedbackStatus, setFeedbackStatus] = useState<'idle' | 'senden' | 'fertig'>('idle')
-  const [feedbackErgebnis, setFeedbackErgebnis] = useState<{ erfolg: string[]; fehler: string[] } | null>(null)
   const [analyseOffen, setAnalyseOffen] = useState(false)
   const [notenConfigOffen, setNotenConfigOffen] = useState(false)
-  const [notenConfig, setNotenConfig] = useState<NotenConfig>({ punkteFuerSechs: 0, rundung: 0.5 })
-  const [einsichtFreigegeben, setEinsichtFreigegeben] = useState(false)
-  const [pdfFreigegeben, setPdfFreigegeben] = useState(false)
   const [zeigFragenbank, setZeigFragenbank] = useState(false)
   const [zeigHilfe, setZeigHilfe] = useState(false)
   const [pdfSchuelerEmail, setPdfSchuelerEmail] = useState<string | null>(null)
-  const [aktionLaeuft, setAktionLaeuft] = useState<string | null>(null)
-  const [backupLaden, setBackupLaden] = useState(false)
-  const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
-  // Korrektur-Daten für IndexedDB-Backup aktuell halten
-  useEffect(() => { updateKorrekturRef(korrektur) }, [korrektur, updateKorrekturRef])
+  const { korrektur, fragen, abgaben, ladeStatus, sortierteSchueler, autoErgebnisseAlle,
+    notenConfig, setNotenConfig, einsichtFreigegeben, setEinsichtFreigegeben,
+    pdfFreigegeben, setPdfFreigegeben, sortierung, setSortierung,
+    bewertungenOhnePunkte, stats, fragenStats, maxPunkte } = daten
 
-  // Auto-Korrektur für alle SuS × Fragen berechnen
-  const autoErgebnisseAlle = useMemo<Record<string, Record<string, KorrekturErgebnis | null>>>(() => {
-    if (fragen.length === 0 || Object.keys(abgaben).length === 0) return {}
-    const result: Record<string, Record<string, KorrekturErgebnis | null>> = {}
-    for (const [email, abgabe] of Object.entries(abgaben)) {
-      const schuelerErgebnisse: Record<string, KorrekturErgebnis | null> = {}
-      for (const frage of fragen) {
-        const antwort = abgabe.antworten[frage.id]
-        schuelerErgebnisse[frage.id] = autoKorrigiere(frage, antwort)
-      }
-      result[email] = schuelerErgebnisse
-    }
-    return result
-  }, [fragen, abgaben])
-
-  // Auto-Korrektur-Ergebnisse in Bewertungen übernehmen (wenn kiPunkte noch null)
-  useEffect(() => {
-    if (Object.keys(autoErgebnisseAlle).length === 0) return
-
-    setKorrektur((prev) => {
-      if (!prev) return prev
-
-      let hatAenderungen = false
-      const aktualisierteSchueler = prev.schueler.map((s) => {
-        const autoErgebnisse = autoErgebnisseAlle[s.email]
-        if (!autoErgebnisse) return s
-
-        let schuelerGeaendert = false
-        const neueBewertungen = { ...s.bewertungen }
-
-        for (const [frageId, ergebnis] of Object.entries(autoErgebnisse)) {
-          if (!ergebnis) continue
-          const bew = neueBewertungen[frageId]
-          if (!bew) continue
-          if (bew.kiPunkte === null && bew.lpPunkte === null) {
-            neueBewertungen[frageId] = {
-              ...bew,
-              kiPunkte: ergebnis.erreichtePunkte,
-              lpPunkte: ergebnis.erreichtePunkte, // B53: Punkte direkt zuweisen (deterministisch korrekt)
-              quelle: 'auto' as const,
-            }
-            schuelerGeaendert = true
-            hatAenderungen = true
-          }
-        }
-
-        return schuelerGeaendert ? { ...s, bewertungen: neueBewertungen } : s
-      })
-
-      return hatAenderungen ? { ...prev, schueler: aktualisierteSchueler } : prev
-    })
-  }, [autoErgebnisseAlle])
-
-  // Daten laden
-  useEffect(() => {
-    if (!user) return
-
-    async function lade(): Promise<void> {
-      const [korrekturResult, abgabenResult, pruefungResult] = await Promise.all([
-        apiService.ladeKorrektur(pruefungId, user!.email),
-        apiService.ladeAbgaben(pruefungId, user!.email),
-        apiService.ladePruefung(pruefungId, user!.email),
-      ])
-
-      if (abgabenResult) setAbgaben(abgabenResult)
-      if (pruefungResult) setFragen(pruefungResult.fragen)
-
-      if (korrekturResult && korrekturResult.schueler.length > 0) {
-        setKorrektur(korrekturResult)
-      } else if (abgabenResult && Object.keys(abgabenResult).length > 0) {
-        const gesamtPunkte = pruefungResult?.config?.gesamtpunkte || 0
-        const synthetisiert: PruefungsKorrektur = {
-          pruefungId,
-          pruefungTitel: pruefungResult?.config?.titel || pruefungId,
-          datum: pruefungResult?.config?.datum || '',
-          klasse: pruefungResult?.config?.klasse || '',
-          schueler: Object.values(abgabenResult).map((abgabe) => ({
-            email: abgabe.email,
-            name: abgabe.name,
-            klasse: '',
-            bewertungen: Object.fromEntries(
-              (pruefungResult?.fragen || []).map((f) => [f.id, {
-                frageId: f.id,
-                fragenTyp: f.typ,
-                maxPunkte: f.punkte,
-                kiPunkte: null,
-                lpPunkte: null,
-                kiBegruendung: null,
-                kiFeedback: null,
-                lpKommentar: null,
-                quelle: 'manuell' as const,
-                geprueft: false,
-              }])
-            ),
-            gesamtPunkte: 0,
-            maxPunkte: gesamtPunkte,
-            korrekturStatus: 'offen' as const,
-          })),
-          batchStatus: 'idle',
-          letzteAktualisierung: new Date().toISOString(),
-        }
-        setKorrektur(synthetisiert)
-      } else if (korrekturResult) {
-        setKorrektur(korrekturResult)
-      }
-      setLadeStatus(korrekturResult || abgabenResult ? 'fertig' : 'fehler')
-    }
-    lade()
-  }, [user, pruefungId])
-
-  // Auto-korrigierbare Fragen als geprüft markieren
-  const autoGeprueftGesetzt = useRef(false)
-  useEffect(() => {
-    if (!korrektur || fragen.length === 0 || autoGeprueftGesetzt.current) return
-
-    const autoFragen = fragen.filter((f) => istAutoKorrigierbar(f.typ))
-    if (autoFragen.length === 0) { autoGeprueftGesetzt.current = true; return }
-
-    const aenderungen: Array<{ schuelerEmail: string; frageId: string }> = []
-    const aktualisierteSchueler = korrektur.schueler.map((schueler) => {
-      let schuelerGeaendert = false
-      const neueBewertungen = { ...schueler.bewertungen }
-      for (const frage of autoFragen) {
-        const bewertung = neueBewertungen[frage.id]
-        if (bewertung && bewertung.geprueft) continue
-        neueBewertungen[frage.id] = {
-          ...(bewertung || { kiPunkte: null, lpPunkte: null, kommentar: '' }),
-          geprueft: true,
-        }
-        schuelerGeaendert = true
-        aenderungen.push({ schuelerEmail: schueler.email, frageId: frage.id })
-      }
-      return schuelerGeaendert ? { ...schueler, bewertungen: neueBewertungen } : schueler
-    })
-
-    autoGeprueftGesetzt.current = true
-    if (aenderungen.length > 0) {
-      setKorrektur({ ...korrektur, schueler: aktualisierteSchueler })
-      for (const { schuelerEmail, frageId } of aenderungen) {
-        queueSave({ pruefungId, schuelerEmail, frageId, geprueft: true })
-      }
-    }
-  }, [korrektur, fragen, pruefungId, queueSave])
-
-  // Polling für Batch-Fortschritt
-  useEffect(() => {
-    if (!batchLaeuft || !user) return
-
-    pollingRef.current = setInterval(async () => {
-      const fortschritt = await apiService.ladeKorrekturFortschritt(pruefungId, user!.email)
-      if (!fortschritt) return
-
-      if (fortschritt.status === 'fertig' || fortschritt.status === 'fehler') {
-        setBatchLaeuft(false)
-        if (pollingRef.current) clearInterval(pollingRef.current)
-        const result = await apiService.ladeKorrektur(pruefungId, user!.email)
-        if (result) setKorrektur(result)
-      } else if (korrektur) {
-        setKorrektur((prev) => prev ? {
-          ...prev,
-          batchStatus: fortschritt.status as PruefungsKorrektur['batchStatus'],
-          batchFortschritt: fortschritt.fortschritt,
-        } : prev)
-      }
-    }, 3000)
-
-    return () => { if (pollingRef.current) clearInterval(pollingRef.current) }
-  }, [batchLaeuft, user, pruefungId, korrektur])
-
-  // === Handler ===
-
-  const handleNoteOverride = useCallback((schuelerEmail: string, noteOverride: number | null) => {
-    setKorrektur((prev) => {
-      if (!prev) return prev
-      return { ...prev, schueler: prev.schueler.map((s) => s.email !== schuelerEmail ? s : { ...s, noteOverride }) }
-    })
-    queueSave({ pruefungId, schuelerEmail, frageId: '__note_override__', lpPunkte: noteOverride })
-  }, [pruefungId, queueSave])
-
-  const handleBewertungUpdate = useCallback((schuelerEmail: string, frageId: string, updates: {
-    lpPunkte?: number | null; lpKommentar?: string | null; geprueft?: boolean
-  }) => {
-    setKorrektur((prev) => {
-      if (!prev) return prev
-      return {
-        ...prev,
-        schueler: prev.schueler.map((s) => {
-          if (s.email !== schuelerEmail) return s
-          const bewertung = s.bewertungen[frageId]
-          if (!bewertung) return s
-          const neueBewertungen = { ...s.bewertungen, [frageId]: { ...bewertung, ...updates } }
-          const alleGeprueft = Object.values(neueBewertungen).every((b) => b.geprueft)
-          const neuerStatus = alleGeprueft ? 'review-fertig' as const : s.korrekturStatus === 'review-fertig' ? 'offen' as const : s.korrekturStatus
-          return { ...s, bewertungen: neueBewertungen, korrekturStatus: neuerStatus }
-        }),
-      }
-    })
-    queueSave({ pruefungId, schuelerEmail, frageId, ...updates })
-  }, [pruefungId, queueSave])
-
-  const handleAudioUpload = useCallback(async (schuelerEmail: string, frageId: string, blob: Blob): Promise<string | null> => {
-    if (!user) return null
-    return apiService.uploadAudioKommentar(user.email, pruefungId, schuelerEmail, frageId, blob)
-  }, [pruefungId, user])
-
-  const handleGesamtAudioUpdate = useCallback((email: string, audioId: string) => {
-    setKorrektur((prev) => {
-      if (!prev) return prev
-      return { ...prev, schueler: prev.schueler.map((s) => s.email === email ? { ...s, audioGesamtkommentarId: audioId } : s) }
-    })
-    queueSave({ pruefungId, schuelerEmail: email, frageId: '_gesamt', audioKommentarId: audioId })
-  }, [pruefungId, user])
-
-  async function handleStarteKorrektur(): Promise<void> {
-    if (!user) return
-    setAktionLaeuft('ki')
-    setBatchLaeuft(true)
-    setKorrektur((prev) => prev ? { ...prev, batchStatus: 'laeuft', batchFortschritt: { erledigt: 0, gesamt: 1 } } : prev)
-    const result = await apiService.starteKorrektur(pruefungId, user.email)
-    if (!result?.success) {
-      setBatchLaeuft(false)
-      setKorrektur((prev) => prev ? { ...prev, batchStatus: 'fehler', batchFehler: result?.fehler ?? 'Unbekannter Fehler' } : prev)
-    }
-  }
-
-  async function handleFeedbackSenden(): Promise<void> {
-    if (!user || !korrektur) return
-    setFeedbackStatus('senden')
-    const emails = korrektur.schueler.filter((s) => s.korrekturStatus !== 'versendet').map((s) => s.email)
-    const result = await apiService.generiereUndSendeFeedback({ pruefungId, schuelerEmails: emails }, user.email)
-    setFeedbackErgebnis(result)
-    setFeedbackStatus('fertig')
-  }
-
-  function handleCSVExport(): void {
-    if (!korrektur) return
-    downloadCSV(exportiereAlsCSV(korrektur, fragen), `${korrektur.pruefungTitel.replace(/[^a-zA-Z0-9äöüÄÖÜ\-_ ]/g, '')}_Ergebnisse.csv`)
-  }
-
-  function handleDetailExport(): void {
-    if (!korrektur) return
-    downloadCSV(exportiereErgebnisseAlsCSV(korrektur, fragen, abgaben), `${korrektur.pruefungTitel.replace(/[^a-zA-Z0-9äöüÄÖÜ\-_ ]/g, '')}_Detailliert.csv`)
-  }
-
-  async function handleBackupExport(): Promise<void> {
-    if (!korrektur || !fragen.length) return
-    setBackupLaden(true)
-    try {
-      await exportiereBackupXlsx({
-        config: { titel: korrektur.pruefungTitel, id: pruefungId } as import('../../../types/pruefung').PruefungsConfig,
-        fragen, abgaben, korrektur,
-      })
-    } catch (e) {
-      console.error('[Backup] Export fehlgeschlagen:', e)
-    } finally {
-      setBackupLaden(false)
-    }
-  }
-
-  // === Berechnete Werte ===
-
-  const sortierteSchueler = [...(korrektur?.schueler ?? [])].sort((a, b) => {
-    switch (sortierung) {
-      case 'name': return a.name.localeCompare(b.name)
-      case 'punkte': return b.gesamtPunkte - a.gesamtPunkte
-      case 'status': return a.korrekturStatus.localeCompare(b.korrekturStatus)
-      default: return 0
-    }
-  })
-
-  // U7: Bewertungen ohne Punkte zählen (für Freigabe-/Export-Sperre)
-  const bewertungenOhnePunkte = useMemo(() => {
-    if (!korrektur) return 0
-    let count = 0
-    for (const s of korrektur.schueler) {
-      for (const b of Object.values(s.bewertungen)) {
-        if (b.lpPunkte === null && b.kiPunkte === null) count++
-      }
-    }
-    return count
-  }, [korrektur])
-
-  const stats = korrektur ? berechneStatistiken(korrektur.schueler, notenConfig) : null
-  const fragenStats = korrektur ? berechneFragenStatistiken(korrektur) : []
-  const maxPunkte = korrektur?.schueler[0]?.maxPunkte || 0
+  const { batchLaeuft, aktionLaeuft, setAktionLaeuft, backupLaden,
+    feedbackDialog, setFeedbackDialog, feedbackStatus, setFeedbackStatus, feedbackErgebnis,
+    handleBewertungUpdate, handleNoteOverride, handleAudioUpload, handleGesamtAudioUpdate,
+    handleStarteKorrektur, handleFeedbackSenden, handleCSVExport, handleDetailExport, handleBackupExport } = actions
 
   // === Render ===
 
@@ -475,7 +193,7 @@ export default function KorrekturDashboard({ pruefungId, eingebettet = false }: 
           </div>
         )}
 
-        {/* Warnung: Fragen als geprüft markiert, aber ohne Punkte (U7) */}
+        {/* Warnung: Fragen als geprüft markiert, aber ohne Punkte */}
         {korrektur && korrektur.schueler.length > 0 && (() => {
           let ohnePunkte = 0
           for (const s of korrektur.schueler) {
@@ -515,7 +233,7 @@ export default function KorrekturDashboard({ pruefungId, eingebettet = false }: 
           {korrekturModus === 'schueler' && (
             <div className="flex items-center gap-2">
               <span className="text-xs text-slate-500 dark:text-slate-400">Sortierung:</span>
-              {(['name', 'punkte', 'status'] as Sortierung[]).map((s) => (
+              {(['name', 'punkte', 'status'] as const).map((s) => (
                 <button key={s} onClick={() => setSortierung(s)}
                   className={`text-xs px-2 py-1 rounded-lg border transition-colors cursor-pointer ${
                     sortierung === s ? 'bg-slate-800 dark:bg-slate-200 text-white dark:text-slate-800 border-slate-800 dark:border-slate-200' : 'border-slate-300 dark:border-slate-600 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'}`}
