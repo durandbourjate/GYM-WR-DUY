@@ -19,11 +19,11 @@
 
 | # | Task | Fix |
 |---|------|-----|
-| B47 | Zeichnen: Striche gehen bei langem Zeichnen verloren | Max-Save-Intervall 5s in ZeichnenFrage.tsx (zusätzlich zu 2s Debounce) |
+| B47 | Zeichnen: Striche gehen bei kurzem Zeichnen verloren | Root-Cause: 2s-Debounce in ZeichnenFrage entfernt (Store-Update verzögert → Datenverlust bei Fragewechsel/Remote-Save). 400ms Canvas-Debounce reicht. |
 | B48 | Alles-Löschen verlässt Vollbild (Chrome confirm-Popup) | React-Modal statt `window.confirm()` in ZeichnenToolbar.tsx |
 | B49 | Neues Textfeld erbt Rotation vom letzten | `setTextRotation(0)` nach Text-Commit via onTextCommit-Callback |
 | B50 | Fortschritt-Diskrepanz SuS 100% vs LP 89% | Heartbeat nutzt jetzt `istVollstaendigBeantwortet()` + sendet `gesamtFragen` |
-| B51 | LP zeigt 0% nach Abgabe | Abgegebene SuS immer als 100% in AktivPhase.tsx |
+| B51 | LP zeigt 0% nach Abgabe | Echter Fortschritt beibehalten + finaler Heartbeat vor Abgabe-Flag |
 | B52 | Formatierung-Aufgabe zeigt HTML-Tags | DOMPurify-Rendering in FreitextAnzeige (KorrekturFrageVollansicht.tsx) |
 | B53 | Auto-Korrektur markiert korrekt, vergibt keine Punkte | `lpPunkte = kiPunkte` bei auto-korrigierbaren Typen (KorrekturDashboard.tsx) |
 | B54 | Kommentar ohne Punkte markiert als geprüft | `geprueft: true` nur wenn auch Punkte vorhanden (KorrekturFrageZeile.tsx) |
@@ -33,8 +33,10 @@
 | U4 | SuS-Übersicht: Punkte-Anzeige + Link oben | Keine "beantwortet/gesamt P." mehr, Übersicht-Link über Fragen-Kacheln |
 | U5 | Fachbereich-Badge redundant | Fachbereich-Badge unten in Sidebar entfernt |
 | U6 | Korrektur: Aufgabennummern fehlen | "Aufgabe N" als Label in KorrekturFrageZeile.tsx |
-| U7 | Warnung bei leeren Punkten | Amber-Warnung in KorrekturDashboard wenn geprüft aber ohne Punkte |
+| U7 | Warnung bei leeren Punkten | Amber-Warnung + Einsicht-Freigabe blockiert + Export/Feedback mit Bestätigung |
 | U8 | Beenden-Button nach Ende → grau | "Prüfung beendet ✓" wenn config.beendetUm gesetzt |
+
+| B55 | Kontrollstufe locker: Verstösse nicht gezählt | Zähler hochzählen ohne Sperre (Logging im Monitoring sichtbar) |
 
 **Breaking Changes:** FiBu-Typen Buchungssatz + T-Konten haben neues Datenformat (keine alten Prüfungen betroffen).
 
