@@ -267,8 +267,9 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen, performa
   )
   const [zeitbedarfManuell, setZeitbedarfManuell] = useState(!!frage?.zeitbedarf)
 
-  // Sharing
+  // Sharing (Google-Docs-Modell)
   const [geteilt, setGeteilt] = useState<'privat' | 'fachschaft' | 'schule'>(frage?.geteilt ?? 'privat')
+  const [berechtigungen, setBerechtigungen] = useState<import('../../../types/auth').Berechtigung[]>(frage?.berechtigungen ?? [])
 
   // Anhänge
   const [anhaenge, setAnhaenge] = useState<FrageAnhang[]>(frage?.anhaenge ?? [])
@@ -370,6 +371,7 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen, performa
       anhaenge: alleAnhaenge.length > 0 ? alleAnhaenge : undefined,
       autor: frage?.autor ?? user?.email,
       geteilt,
+      berechtigungen: berechtigungen.length > 0 ? berechtigungen : undefined,
     }
 
     // Typ-spezifische Daten zusammenstellen
@@ -569,6 +571,8 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen, performa
             semester={semester} setSemester={setSemester}
             gefaesse={gefaesse} setGefaesse={setGefaesse}
             geteilt={geteilt} setGeteilt={setGeteilt}
+            berechtigungen={berechtigungen} setBerechtigungen={setBerechtigungen}
+            lpListe={[]} eigeneFachschaft={user?.fachschaft}
             ki={ki}
             performance={performance}
           />

@@ -90,6 +90,8 @@ export interface PruefungsConfig {
 
   // Multi-Teacher: Ersteller der Prüfung
   erstelltVon?: string;
+  berechtigungen?: import('./auth').Berechtigung[];
+  _recht?: import('./auth').EffektivesRecht;  // Vom Backend berechnet
 }
 
 export interface NotenConfig {

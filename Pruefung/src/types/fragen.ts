@@ -52,10 +52,12 @@ export interface FrageBase {
   quelle?: 'pool' | 'papier' | 'manuell' | 'ki-generiert';
   quellReferenz?: string;
 
-  // Sharing / Zusammenarbeit
-  autor?: string;  // E-Mail der erstellenden LP
-  geteilt?: 'privat' | 'fachschaft' | 'schule';  // Standard: privat; 'fachschaft' = LP in gleicher Fachschaft; 'schule' = alle LP
+  // Sharing / Zusammenarbeit (Google-Docs-Modell)
+  autor?: string;  // E-Mail der erstellenden LP (= Inhaber)
+  berechtigungen?: import('./auth').Berechtigung[];  // Rechte-Array (ersetzt geteilt)
+  geteilt?: 'privat' | 'fachschaft' | 'schule';  // Legacy/abgeleitet — wird durch berechtigungen ersetzt
   geteiltVon?: string;  // Anzeigename bei geteilten Fragen
+  _recht?: import('./auth').EffektivesRecht;  // Vom Backend berechnet (nicht gespeichert)
 
   // Pool-Sync (importierte Fragen aus Übungspools)
   poolId?: string                     // Compound-Key '{pool}:{frage}', z.B. 'vwl_bip:d01'

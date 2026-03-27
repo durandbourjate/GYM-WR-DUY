@@ -45,6 +45,7 @@ export interface FrageBasis {
   anhaenge?: FrageAnhang[]
   autor?: string
   geteilt: 'privat' | 'fachschaft' | 'schule'
+  berechtigungen?: import('../types/auth').Berechtigung[]
 }
 
 /** Typ-spezifische Daten — discriminated union */

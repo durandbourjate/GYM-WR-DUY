@@ -4,10 +4,13 @@
  */
 import { useState } from 'react'
 import type { Fachbereich, BloomStufe, Gefaess } from '../../../../types/fragen.ts'
+import type { Berechtigung } from '../../../../types/auth.ts'
 import type { FragenPerformance } from '../../../../types/tracker.ts'
 import type { useKIAssistent } from '../useKIAssistent.ts'
+import type { LPInfo } from '../../../../services/lpApi.ts'
 import { bloomLabel } from '../../../../utils/fachbereich.ts'
 import { loesungsquoteFarbe } from '../../../../utils/trackerUtils.ts'
+import BerechtigungenEditor from '../../../shared/BerechtigungenEditor.tsx'
 import { Abschnitt, Feld } from '../EditorBausteine.tsx'
 import { ErgebnisAnzeige } from '../KIBausteine.tsx'
 
@@ -36,6 +39,10 @@ interface MetadataSectionProps {
   setGefaesse: React.Dispatch<React.SetStateAction<Gefaess[]>>
   geteilt: 'privat' | 'fachschaft' | 'schule'
   setGeteilt: (v: 'privat' | 'fachschaft' | 'schule') => void
+  berechtigungen: Berechtigung[]
+  setBerechtigungen: (b: Berechtigung[]) => void
+  lpListe: LPInfo[]
+  eigeneFachschaft?: string
   ki: ReturnType<typeof useKIAssistent>
   performance?: FragenPerformance
 }
@@ -52,7 +59,9 @@ export default function MetadataSection({
   punkte, setPunkte,
   semester, setSemester,
   gefaesse, setGefaesse,
-  geteilt, setGeteilt,
+  geteilt: _geteilt, setGeteilt: _setGeteilt,
+  berechtigungen, setBerechtigungen,
+  lpListe, eigeneFachschaft,
   ki,
   performance,
 }: MetadataSectionProps) {
@@ -210,28 +219,13 @@ export default function MetadataSection({
           </div>
         </div>
 
-        {/* Sharing / Teilen */}
-        <div>
-          <label className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Sichtbarkeit</label>
-          <div className="flex rounded-lg border border-slate-300 dark:border-slate-600 overflow-hidden">
-            {(['privat', 'fachschaft', 'schule'] as const).map((stufe, i) => (
-              <button
-                key={stufe}
-                onClick={() => setGeteilt(stufe)}
-                className={`flex-1 px-3 py-1 text-xs transition-colors cursor-pointer ${i > 0 ? 'border-l border-slate-300 dark:border-slate-600' : ''} ${
-                  geteilt === stufe
-                    ? 'bg-slate-800 dark:bg-slate-200 text-white dark:text-slate-800'
-                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
-                }`}
-              >
-                {stufe === 'privat' ? 'Privat' : stufe === 'fachschaft' ? 'Fachschaft' : 'Schule'}
-              </button>
-            ))}
-          </div>
-          <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">
-            {geteilt === 'schule' ? 'Sichtbar für alle Lehrpersonen' : geteilt === 'fachschaft' ? 'Sichtbar für LP der gleichen Fachschaft' : 'Nur für Sie sichtbar'}
-          </p>
-        </div>
+        {/* Sharing / Teilen (Google-Docs-Modell) */}
+        <BerechtigungenEditor
+          berechtigungen={berechtigungen}
+          onChange={setBerechtigungen}
+          lpListe={lpListe}
+          eigeneFachschaft={eigeneFachschaft}
+        />
       </div>
 
       {/* Fragen-Statistiken (nur wenn Performance-Daten vorhanden) */}

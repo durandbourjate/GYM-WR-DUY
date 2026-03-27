@@ -26,7 +26,7 @@ const LERNZIELE_TAB = 'Lernziele';
  * Ersetzt die alte domain-basierte Prüfung.
  */
 function istZugelasseneLP(email) {
-  if (!email || !istZugelasseneLP(email)) return false;
+  if (!email || !email.endsWith('@' + LP_DOMAIN)) return false;
   var info = getLPInfo(email);
   return info !== null && info.aktiv;
 }
@@ -111,12 +111,104 @@ function fachschaftZuFachbereiche(fachschaft) {
  */
 function getApiKeyFuerLP(email) {
   if (email) {
+    // 1. Persönlicher Key
     var info = getLPInfo(email);
     if (info && info.apiKey) return info.apiKey;
+
+    // 2. Fachschaft-Key (z.B. _fachschaft_wr@intern)
+    if (info && info.fachschaft) {
+      var fsKey = getLPInfo('_fachschaft_' + info.fachschaft.toLowerCase() + '@intern');
+      if (fsKey && fsKey.apiKey) return fsKey.apiKey;
+    }
+
+    // 3. Schul-Key (z.B. _schule@intern)
+    var schulKey = getLPInfo('_schule@intern');
+    if (schulKey && schulKey.apiKey) return schulKey.apiKey;
   }
-  // Fallback: globaler Key
+  // 4. Globaler Fallback (Script Properties)
   return PropertiesService.getScriptProperties().getProperty('CLAUDE_API_KEY')
     || PropertiesService.getScriptProperties().getProperty('ANTHROPIC_API_KEY');
+}
+
+// === RECHTE-SYSTEM (Google-Docs-Modell) ===
+
+/**
+ * Prüft ob eine LP mindestens das geforderte Recht hat.
+ * berechtigungen: Array von { email, recht } (aus JSON geparst)
+ * Spezialwerte: '*' = schulweit, 'fachschaft:WR' = Fachschaft
+ */
+function hatRecht(email, berechtigungen, mindestRecht) {
+  if (!berechtigungen || !Array.isArray(berechtigungen) || berechtigungen.length === 0) return false;
+
+  var lpInfo = getLPInfo(email);
+  var rechteStufen = { 'betrachter': 1, 'bearbeiter': 2 };
+  var minStufe = rechteStufen[mindestRecht] || 1;
+
+  for (var i = 0; i < berechtigungen.length; i++) {
+    var b = berechtigungen[i];
+    var stufe = rechteStufen[b.recht] || 1;
+    if (stufe < minStufe) continue;
+
+    if (b.email === email || b.email === email.toLowerCase()) return true;
+    if (b.email === '*') return true;
+    if (b.email.indexOf('fachschaft:') === 0 && lpInfo) {
+      var fs = b.email.split(':')[1];
+      if (lpInfo.fachschaft === fs) return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Prüft ob ein Item (Frage oder Prüfung) für eine LP sichtbar ist.
+ * Berücksichtigt: Eigentum, Admin, Pool, Berechtigungen, Legacy-geteilt-Feld.
+ */
+function istSichtbar(email, item) {
+  var inhaber = item.autor || item.erstelltVon;
+  if (!inhaber || inhaber === email) return true;
+
+  var lpInfo = getLPInfo(email);
+  if (lpInfo && lpInfo.rolle === 'admin') return true;
+
+  if (item.quelle === 'pool') return true;
+
+  // Neues System: berechtigungen-Array
+  var berechtigungen = item.berechtigungen;
+  if (typeof berechtigungen === 'string') {
+    try { berechtigungen = JSON.parse(berechtigungen); } catch(e) { berechtigungen = []; }
+  }
+  if (berechtigungen && berechtigungen.length > 0) {
+    return hatRecht(email, berechtigungen, 'betrachter');
+  }
+
+  // Legacy-Kompatibilität: altes geteilt-Feld
+  if (item.geteilt === 'schule') return true;
+  if (item.geteilt === 'fachschaft' && lpInfo) {
+    var fachbereiche = fachschaftZuFachbereiche(lpInfo.fachschaft);
+    if (fachbereiche.indexOf(item.fachbereich) >= 0) return true;
+  }
+
+  return false;
+}
+
+/**
+ * Ermittelt das effektive Recht einer LP für ein Item.
+ * Rückgabe: 'inhaber' | 'bearbeiter' | 'betrachter'
+ */
+function ermittleRecht(email, item) {
+  var inhaber = item.autor || item.erstelltVon;
+  if (!inhaber || inhaber === email) return 'inhaber';
+
+  var lpInfo = getLPInfo(email);
+  if (lpInfo && lpInfo.rolle === 'admin') return 'inhaber';
+
+  var berechtigungen = item.berechtigungen;
+  if (typeof berechtigungen === 'string') {
+    try { berechtigungen = JSON.parse(berechtigungen); } catch(e) { berechtigungen = []; }
+  }
+
+  if (hatRecht(email, berechtigungen || [], 'bearbeiter')) return 'bearbeiter';
+  return 'betrachter';
 }
 
 // Zentrale Daten-Sheets (Synergien)
@@ -247,6 +339,12 @@ function doPost(e) {
       return uploadMaterial(body);
     case 'loeschePruefung':
       return loeschePruefung(body);
+    case 'setzeBerechtigungen':
+      return setzeBerechtigungenEndpoint(body);
+    case 'dupliziereFrage':
+      return dupliziereFrageEndpoint(body);
+    case 'duplizierePruefung':
+      return duplizierePruefungEndpoint(body);
     case 'kiAssistent':
       return kiAssistentEndpoint(body);
     case 'korrekturFreigeben':
@@ -1613,12 +1711,11 @@ function ladeAlleConfigs(email) {
 
     const configs = data.map(mapConfigRow);
 
-    // Phase 2: Nur eigene Prüfungen (Admin sieht alle, Legacy ohne erstelltVon auch)
-    const lpInfo = getLPInfo(email);
-    const istAdmin = lpInfo && lpInfo.rolle === 'admin';
-    const gefilterteConfigs = istAdmin
-      ? configs
-      : configs.filter(c => !c.erstelltVon || c.erstelltVon === email);
+    // Rechte-System: istSichtbar() prüft Eigentum, Admin, Berechtigungen, Legacy
+    const gefilterteConfigs = configs.filter(c => istSichtbar(email, c)).map(c => {
+      c._recht = ermittleRecht(email, c);
+      return c;
+    });
 
     return jsonResponse({ configs: gefilterteConfigs });
   } catch (error) {
@@ -1706,6 +1803,7 @@ function mapConfigRow(row) {
     sebAusnahmen: safeJsonParse(row.sebAusnahmen, []),
     durchfuehrungId: row.durchfuehrungId || undefined,
     erstelltVon: row.erstelltVon || '',
+    berechtigungen: row.berechtigungen || '',
     korrektur: { aktiviert: false, modus: 'batch' },
     feedback: { zeitpunkt: 'nach-review', format: 'pdf', detailgrad: 'vollstaendig' },
   };
@@ -1746,10 +1844,6 @@ function ladeFragenbank(email) {
     const tabs = ['VWL', 'BWL', 'Recht', 'Informatik'];
     const alleFragen = [];
 
-    // Phase 3: LP-Fachschaft für Fachschaft-Sharing
-    const lpInfo = getLPInfo(email);
-    const meineFachbereiche = lpInfo ? fachschaftZuFachbereiche(lpInfo.fachschaft) : [];
-
     for (const tab of tabs) {
       const sheet = fragenbank.getSheetByName(tab);
       if (!sheet) continue;
@@ -1757,14 +1851,11 @@ function ladeFragenbank(email) {
       for (const row of data) {
         if (row.id) {
           const frage = parseFrage(row, tab);
-          // Sichtbarkeitsfilter: eigene, fachschaft-geteilt, schule-geteilt, Pool
-          const istEigene = !frage.autor || frage.autor === email;
-          const istSchulweit = frage.geteilt === 'schule';
-          const istFachschaft = frage.geteilt === 'fachschaft' && meineFachbereiche.includes(frage.fachbereich);
-          const istPool = frage.quelle === 'pool';
-          if (istEigene || istSchulweit || istFachschaft || istPool) {
-            // Bei geteilten Fragen den Autor-Namen als geteiltVon setzen
-            if (!istEigene && (istSchulweit || istFachschaft) && frage.autor) {
+          if (istSichtbar(email, frage)) {
+            // Recht ermitteln für Frontend-UI
+            frage._recht = ermittleRecht(email, frage);
+            // Bei geteilten Fragen den Autor-Namen anzeigen
+            if (frage.autor && frage.autor !== email) {
               frage.geteiltVon = frage.autor.split('@')[0];
             }
             alleFragen.push(frage);
@@ -1829,6 +1920,7 @@ function speichereConfig(body) {
       durchfuehrungId:            function(v) { return v || ''; },
       zufallsreihenfolgeOptionen: function(v) { return v ? 'true' : 'false'; },
       erstelltVon:                function(v) { return v || ''; },
+      berechtigungen:             function(v) { return typeof v === 'string' ? v : JSON.stringify(v || []); },
     };
 
     for (var key in feldMapping) {
@@ -1842,12 +1934,12 @@ function speichereConfig(body) {
 
     const existingRow = data.findIndex(row => row.id === config.id);
     if (existingRow >= 0) {
-      // Phase 2: Ownership-Check — nur Ersteller oder Admin darf bearbeiten
+      // Rechte-Check: Inhaber, Admin oder Bearbeiter darf ändern
       const bestehendeRow = data[existingRow];
       if (bestehendeRow.erstelltVon && bestehendeRow.erstelltVon !== email) {
-        var lpInfo = getLPInfo(email);
-        if (!lpInfo || lpInfo.rolle !== 'admin') {
-          return jsonResponse({ error: 'Nur die erstellende LP darf diese Prüfung bearbeiten' });
+        var recht = ermittleRecht(email, bestehendeRow);
+        if (recht !== 'inhaber' && recht !== 'bearbeiter') {
+          return jsonResponse({ error: 'Keine Berechtigung zum Bearbeiten dieser Prüfung' });
         }
       }
       const rowIndex = existingRow + 2;
@@ -1903,6 +1995,169 @@ function loeschePruefung(body) {
     configSheet.deleteRow(rowIndex + 2);
 
     return jsonResponse({ success: true });
+  } catch (error) {
+    return jsonResponse({ error: error.message });
+  }
+}
+
+// === BERECHTIGUNGEN SETZEN (Inhaber/Admin) ===
+
+function setzeBerechtigungenEndpoint(body) {
+  try {
+    var email = body.email;
+    var typ = body.typ; // 'frage' oder 'pruefung'
+    var id = body.id;
+    var berechtigungen = body.berechtigungen; // Array von { email, recht }
+
+    if (!email || !istZugelasseneLP(email)) return jsonResponse({ error: 'Nur für Lehrpersonen' });
+    if (!id || !typ) return jsonResponse({ error: 'id und typ erforderlich' });
+    if (!Array.isArray(berechtigungen)) return jsonResponse({ error: 'berechtigungen muss ein Array sein' });
+
+    if (typ === 'pruefung') {
+      var configSheet = SpreadsheetApp.openById(CONFIGS_ID).getSheetByName('Configs');
+      var data = getSheetData(configSheet);
+      var rowIdx = data.findIndex(function(r) { return r.id === id; });
+      if (rowIdx < 0) return jsonResponse({ error: 'Prüfung nicht gefunden' });
+
+      // Nur Inhaber oder Admin darf Rechte vergeben
+      var recht = ermittleRecht(email, data[rowIdx]);
+      if (recht !== 'inhaber') return jsonResponse({ error: 'Nur der Inhaber darf Berechtigungen vergeben' });
+
+      var headers = configSheet.getRange(1, 1, 1, configSheet.getLastColumn()).getValues()[0];
+      headers = ensureColumns(configSheet, headers, { berechtigungen: '' });
+      var colIdx = headers.indexOf('berechtigungen');
+      if (colIdx >= 0) configSheet.getRange(rowIdx + 2, colIdx + 1).setValue(JSON.stringify(berechtigungen));
+
+      return jsonResponse({ success: true });
+    }
+
+    if (typ === 'frage') {
+      var fragenbank = SpreadsheetApp.openById(FRAGENBANK_ID);
+      var tabs = ['VWL', 'BWL', 'Recht', 'Informatik'];
+      for (var t = 0; t < tabs.length; t++) {
+        var sheet = fragenbank.getSheetByName(tabs[t]);
+        if (!sheet) continue;
+        var fData = getSheetData(sheet);
+        var fIdx = fData.findIndex(function(r) { return r.id === id; });
+        if (fIdx < 0) continue;
+
+        var fRecht = ermittleRecht(email, fData[fIdx]);
+        if (fRecht !== 'inhaber') return jsonResponse({ error: 'Nur der Inhaber darf Berechtigungen vergeben' });
+
+        var fHeaders = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+        fHeaders = ensureColumns(sheet, fHeaders, { berechtigungen: '' });
+        var fColIdx = fHeaders.indexOf('berechtigungen');
+        if (fColIdx >= 0) sheet.getRange(fIdx + 2, fColIdx + 1).setValue(JSON.stringify(berechtigungen));
+
+        return jsonResponse({ success: true });
+      }
+      return jsonResponse({ error: 'Frage nicht gefunden' });
+    }
+
+    return jsonResponse({ error: 'Unbekannter Typ: ' + typ });
+  } catch (error) {
+    return jsonResponse({ error: error.message });
+  }
+}
+
+// === FRAGE DUPLIZIEREN ===
+
+function dupliziereFrageEndpoint(body) {
+  try {
+    var email = body.email;
+    var frageId = body.frageId;
+    if (!email || !istZugelasseneLP(email)) return jsonResponse({ error: 'Nur für Lehrpersonen' });
+    if (!frageId) return jsonResponse({ error: 'frageId erforderlich' });
+
+    var fragenbank = SpreadsheetApp.openById(FRAGENBANK_ID);
+    var tabs = ['VWL', 'BWL', 'Recht', 'Informatik'];
+
+    for (var t = 0; t < tabs.length; t++) {
+      var sheet = fragenbank.getSheetByName(tabs[t]);
+      if (!sheet) continue;
+      var data = getSheetData(sheet);
+      var srcIdx = data.findIndex(function(r) { return r.id === frageId; });
+      if (srcIdx < 0) continue;
+
+      // Sichtbarkeits-Check
+      var src = data[srcIdx];
+      if (!istSichtbar(email, src)) return jsonResponse({ error: 'Kein Zugriff auf diese Frage' });
+
+      // Kopie erstellen
+      var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+      var srcRow = sheet.getRange(srcIdx + 2, 1, 1, headers.length).getValues()[0];
+      var neuId = Utilities.getUuid();
+      var jetzt = new Date().toISOString();
+
+      // Werte übernehmen, aber ID, Autor, Berechtigungen, Version überschreiben
+      var neueRow = srcRow.slice();
+      var idCol = headers.indexOf('id');
+      var autorCol = headers.indexOf('autor');
+      var geteiltCol = headers.indexOf('geteilt');
+      var berechtigungenCol = headers.indexOf('berechtigungen');
+      var versionCol = headers.indexOf('version');
+      var erstelltAmCol = headers.indexOf('erstelltAm');
+      var geaendertAmCol = headers.indexOf('geaendertAm');
+
+      if (idCol >= 0) neueRow[idCol] = neuId;
+      if (autorCol >= 0) neueRow[autorCol] = email;
+      if (geteiltCol >= 0) neueRow[geteiltCol] = 'privat';
+      if (berechtigungenCol >= 0) neueRow[berechtigungenCol] = '[]';
+      if (versionCol >= 0) neueRow[versionCol] = 1;
+      if (erstelltAmCol >= 0) neueRow[erstelltAmCol] = jetzt;
+      if (geaendertAmCol >= 0) neueRow[geaendertAmCol] = jetzt;
+
+      sheet.appendRow(neueRow);
+      return jsonResponse({ success: true, neueId: neuId });
+    }
+
+    return jsonResponse({ error: 'Frage nicht gefunden' });
+  } catch (error) {
+    return jsonResponse({ error: error.message });
+  }
+}
+
+// === PRÜFUNG DUPLIZIEREN ===
+
+function duplizierePruefungEndpoint(body) {
+  try {
+    var email = body.email;
+    var pruefungId = body.pruefungId;
+    if (!email || !istZugelasseneLP(email)) return jsonResponse({ error: 'Nur für Lehrpersonen' });
+    if (!pruefungId) return jsonResponse({ error: 'pruefungId erforderlich' });
+
+    var configSheet = SpreadsheetApp.openById(CONFIGS_ID).getSheetByName('Configs');
+    var data = getSheetData(configSheet);
+    var srcIdx = data.findIndex(function(r) { return r.id === pruefungId; });
+    if (srcIdx < 0) return jsonResponse({ error: 'Prüfung nicht gefunden' });
+
+    var src = data[srcIdx];
+    if (!istSichtbar(email, src)) return jsonResponse({ error: 'Kein Zugriff auf diese Prüfung' });
+
+    // Kopie erstellen
+    var headers = configSheet.getRange(1, 1, 1, configSheet.getLastColumn()).getValues()[0];
+    var srcRow = configSheet.getRange(srcIdx + 2, 1, 1, headers.length).getValues()[0];
+    var neuId = Utilities.getUuid();
+
+    var neueRow = srcRow.slice();
+    var idCol = headers.indexOf('id');
+    var erstelltVonCol = headers.indexOf('erstelltVon');
+    var berechtigungenCol = headers.indexOf('berechtigungen');
+    var titelCol = headers.indexOf('titel');
+    var freigeschaltetCol = headers.indexOf('freigeschaltet');
+    var beendetUmCol = headers.indexOf('beendetUm');
+    var durchfuehrungIdCol = headers.indexOf('durchfuehrungId');
+
+    if (idCol >= 0) neueRow[idCol] = neuId;
+    if (erstelltVonCol >= 0) neueRow[erstelltVonCol] = email;
+    if (berechtigungenCol >= 0) neueRow[berechtigungenCol] = '[]';
+    if (titelCol >= 0) neueRow[titelCol] = neueRow[titelCol] + ' (Kopie)';
+    if (freigeschaltetCol >= 0) neueRow[freigeschaltetCol] = 'false';
+    if (beendetUmCol >= 0) neueRow[beendetUmCol] = '';
+    if (durchfuehrungIdCol >= 0) neueRow[durchfuehrungIdCol] = '';
+
+    configSheet.appendRow(neueRow);
+    return jsonResponse({ success: true, neueId: neuId });
   } catch (error) {
     return jsonResponse({ error: error.message });
   }
