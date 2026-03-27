@@ -1,4 +1,15 @@
+import { useState } from 'react';
 import type { Tool, ToolbarLayout } from './ZeichnenTypes';
+
+/** Inline SVG Radierer-Icon */
+function RadiererIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20 20H7L3 16a1 1 0 0 1 0-1.41l9.59-9.59a2 2 0 0 1 2.82 0l5.18 5.18a2 2 0 0 1 0 2.82L14 20" />
+      <path d="M6 12l4 4" />
+    </svg>
+  );
+}
 
 interface ZeichnenToolbarProps {
   aktivesTool: Tool;
@@ -25,14 +36,14 @@ interface ZeichnenToolbarProps {
   istTextSelektiert?: boolean;
 }
 
-const TOOL_DEFS: { id: Tool; icon: string; label: string; configKey?: string }[] = [
+const TOOL_DEFS: { id: Tool; icon: string | null; label: string; configKey?: string }[] = [
   { id: 'auswahl', icon: '↖', label: 'Auswahl' },
   { id: 'stift', icon: '✏️', label: 'Freihand', configKey: 'stift' },
   { id: 'linie', icon: '╱', label: 'Linie', configKey: 'linie' },
   { id: 'pfeil', icon: '→', label: 'Pfeil', configKey: 'pfeil' },
   { id: 'rechteck', icon: '▭', label: 'Rechteck', configKey: 'rechteck' },
   { id: 'text', icon: 'T', label: 'Text', configKey: 'text' },
-  { id: 'radierer', icon: '🧹', label: 'Radierer' },
+  { id: 'radierer', icon: null, label: 'Radierer' },
 ];
 
 export function ZeichnenToolbar({
@@ -59,6 +70,7 @@ export function ZeichnenToolbar({
   onTextFettChange,
   istTextSelektiert = false,
 }: ZeichnenToolbarProps) {
+  const [zeigeLoeschenDialog, setZeigeLoeschenDialog] = useState(false);
   const isHorizontal = layout === 'horizontal';
 
   // Filter tools based on config
@@ -110,7 +122,7 @@ export function ZeichnenToolbar({
                   : 'bg-transparent hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300',
               ].join(' ')}
             >
-              {def.icon}
+              {def.icon !== null ? def.icon : <RadiererIcon />}
             </button>
           );
         })}
@@ -271,11 +283,37 @@ export function ZeichnenToolbar({
       <button
         role="button"
         title="Alles löschen"
-        onClick={() => { if (window.confirm('Alle Zeichnungen löschen?')) onAllesLoeschen() }}
+        onClick={() => setZeigeLoeschenDialog(true)}
         className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded text-sm transition-colors bg-red-50 dark:bg-red-950 text-red-600 border border-red-200 dark:border-red-800 hover:bg-red-100 dark:hover:bg-red-900"
       >
         🗑
       </button>
+
+      {/* Bestätigungsdialog (kein window.confirm — bleibt im Fullscreen) */}
+      {zeigeLoeschenDialog && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => setZeigeLoeschenDialog(false)}>
+          <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl p-6 max-w-sm mx-4" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-2">Alles löschen?</h3>
+            <p className="text-sm text-slate-600 dark:text-slate-300 mb-5">Alle Zeichnungen werden unwiderruflich entfernt.</p>
+            <div className="flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setZeigeLoeschenDialog(false)}
+                className="px-4 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+              >
+                Abbrechen
+              </button>
+              <button
+                type="button"
+                onClick={() => { onAllesLoeschen(); setZeigeLoeschenDialog(false) }}
+                className="px-4 py-2 text-sm rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors cursor-pointer"
+              >
+                Löschen
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

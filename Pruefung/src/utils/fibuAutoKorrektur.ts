@@ -1,4 +1,4 @@
-import type { BuchungssatzFrage, SollHabenZeile, BuchungsKonto, TKontoFrage, TKontoEintrag, KontenbestimmungFrage, BilanzERFrage } from '../types/fragen'
+import type { BuchungssatzFrage, BuchungssatzZeile, TKontoFrage, TKontoEintrag, KontenbestimmungFrage, BilanzERFrage } from '../types/fragen'
 import type { Antwort } from '../types/antworten'
 import { findKonto } from './kontenrahmen'
 
@@ -16,14 +16,14 @@ export interface KorrekturDetail {
   kommentar?: string
 }
 
-/** Auto-correct a Buchungssatz answer */
+/** U2: Auto-correct a Buchungssatz answer (vereinfachtes Format) */
 export function korrigiereBuchungssatz(
   frage: BuchungssatzFrage,
   antwortBuchungen: {
     id: string
-    sollKonten: { kontonummer: string; betrag: number }[]
-    habenKonten: { kontonummer: string; betrag: number }[]
-    buchungstext?: string
+    sollKonto: string
+    habenKonto: string
+    betrag: number
   }[]
 ): KorrekturErgebnis {
   const details: KorrekturDetail[] = []
@@ -39,7 +39,7 @@ export function korrigiereBuchungssatz(
 
     for (let j = 0; j < antwortBuchungen.length; j++) {
       if (verwendeteAntworten.has(j)) continue
-      const score = bewerteBuchung(erwartet, antwortBuchungen[j])
+      const score = bewerteBuchungVereinfacht(erwartet, antwortBuchungen[j])
       if (score > bestScore) {
         bestScore = score
         bestMatch = j
@@ -51,12 +51,20 @@ export function korrigiereBuchungssatz(
     }
 
     const erreicht = bestScore * punkteProBuchung
+    const eingabe = bestMatch >= 0 ? antwortBuchungen[bestMatch] : undefined
     details.push({
       bezeichnung: `Buchung ${i + 1}`,
       korrekt: bestScore >= 0.99,
       erreicht: Math.round(erreicht * 100) / 100,
       max: Math.round(punkteProBuchung * 100) / 100,
-      kommentar: bestScore < 0.99 ? beschreibeFehler(erwartet, bestMatch >= 0 ? antwortBuchungen[bestMatch] : undefined) : undefined,
+      kommentar: bestScore < 0.99
+        ? !eingabe ? 'Buchung fehlt'
+          : [
+              eingabe.sollKonto !== erwartet.sollKonto ? 'Soll-Konto falsch' : '',
+              eingabe.habenKonto !== erwartet.habenKonto ? 'Haben-Konto falsch' : '',
+              eingabe.betrag !== erwartet.betrag ? 'Betrag falsch' : '',
+            ].filter(Boolean).join(', ')
+        : undefined,
     })
   }
 
@@ -68,61 +76,17 @@ export function korrigiereBuchungssatz(
   }
 }
 
-/** Score how well a submitted Buchung matches an expected one (0-1) */
-function bewerteBuchung(
-  erwartet: SollHabenZeile,
-  eingabe: { sollKonten: { kontonummer: string; betrag: number }[]; habenKonten: { kontonummer: string; betrag: number }[] }
+/** Score: 1/3 je Soll-Konto, Haben-Konto, Betrag */
+function bewerteBuchungVereinfacht(
+  erwartet: BuchungssatzZeile,
+  eingabe: { sollKonto: string; habenKonto: string; betrag: number }
 ): number {
   if (!eingabe) return 0
-
-  const sollScore = bewerteKontenListe(erwartet.sollKonten, eingabe.sollKonten)
-  const habenScore = bewerteKontenListe(erwartet.habenKonten, eingabe.habenKonten)
-
-  // 50% for Soll, 50% for Haben
-  return (sollScore + habenScore) / 2
-}
-
-/** Score how well submitted Konten match expected ones (0-1) */
-function bewerteKontenListe(
-  erwartet: BuchungsKonto[],
-  eingabe: { kontonummer: string; betrag: number }[]
-): number {
-  if (erwartet.length === 0) return eingabe.length === 0 ? 1 : 0
-  if (eingabe.length === 0) return 0
-
-  let treffer = 0
-  const verwendet = new Set<number>()
-
-  for (const ek of erwartet) {
-    for (let j = 0; j < eingabe.length; j++) {
-      if (verwendet.has(j)) continue
-      if (eingabe[j].kontonummer === ek.kontonummer && eingabe[j].betrag === ek.betrag) {
-        treffer++
-        verwendet.add(j)
-        break
-      }
-    }
-  }
-
-  // Partial credit: correct matches / max(expected, submitted)
-  return treffer / Math.max(erwartet.length, eingabe.length)
-}
-
-/** Describe what's wrong with a Buchung */
-function beschreibeFehler(
-  erwartet: SollHabenZeile,
-  eingabe?: { sollKonten: { kontonummer: string; betrag: number }[]; habenKonten: { kontonummer: string; betrag: number }[] }
-): string {
-  if (!eingabe) return 'Buchung fehlt'
-  const teile: string[] = []
-
-  const sollOk = bewerteKontenListe(erwartet.sollKonten, eingabe.sollKonten) >= 0.99
-  const habenOk = bewerteKontenListe(erwartet.habenKonten, eingabe.habenKonten) >= 0.99
-
-  if (!sollOk) teile.push('Soll-Seite fehlerhaft')
-  if (!habenOk) teile.push('Haben-Seite fehlerhaft')
-
-  return teile.join(', ')
+  let score = 0
+  if (eingabe.sollKonto === erwartet.sollKonto) score += 1 / 3
+  if (eingabe.habenKonto === erwartet.habenKonto) score += 1 / 3
+  if (eingabe.betrag === erwartet.betrag) score += 1 / 3
+  return score
 }
 
 // === T-KONTO AUTO-KORREKTUR ===
@@ -221,12 +185,14 @@ export function korrigiereTKonto(
       })
     }
 
-    // Saldo korrekt
+    // U3: Saldo korrekt — neues Format mit betragLinks/betragRechts
     if (opts.saldoKorrekt) {
-      const korrekt = eingabe.saldo
-        && eingabe.saldo.betrag === erwartet.saldo.betrag
-        && ((eingabe.saldo.seite === 'links' && erwartet.saldo.seite === 'soll')
-          || (eingabe.saldo.seite === 'rechts' && erwartet.saldo.seite === 'haben'))
+      const erwartetBetrag = erwartet.saldo.betrag
+      const erwartetSeite = erwartet.saldo.seite // 'soll' oder 'haben'
+      const korrekt = eingabe.saldo && (
+        (erwartetSeite === 'soll' && eingabe.saldo.betragLinks === erwartetBetrag && !eingabe.saldo.betragRechts) ||
+        (erwartetSeite === 'haben' && eingabe.saldo.betragRechts === erwartetBetrag && !eingabe.saldo.betragLinks)
+      )
       details.push({
         bezeichnung: `T-Konto ${i + 1}: Saldo`,
         korrekt: !!korrekt,

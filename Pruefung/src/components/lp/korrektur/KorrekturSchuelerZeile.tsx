@@ -151,7 +151,7 @@ export default function KorrekturSchuelerZeile({ pruefungId, schueler, abgabe, f
       {/* Aufgeklappter Bereich */}
       {offen && (
         <div className="px-4 pb-3 space-y-1">
-          {fragen.map((frage) => {
+          {fragen.map((frage, fragenIdx) => {
             const bewertung = schueler.bewertungen[frage.id]
             const antwort = abgabe?.antworten[frage.id]
 
@@ -246,6 +246,7 @@ export default function KorrekturSchuelerZeile({ pruefungId, schueler, abgabe, f
                 antwort={antwort}
                 autoErgebnis={autoErgebnisse[frage.id] ?? null}
                 bewertung={bewertung}
+                aufgabeNr={fragenIdx + 1}
                 onUpdate={(updates) => onBewertungUpdate(schueler.email, frage.id, updates)}
                 onAudioUpload={(frageId, blob) => onAudioUpload(schueler.email, frageId, blob)}
               />

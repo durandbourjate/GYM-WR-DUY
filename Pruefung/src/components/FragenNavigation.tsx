@@ -1,5 +1,4 @@
 import { usePruefungStore } from '../store/pruefungStore.ts'
-import { fachbereichFarbe } from '../utils/fachbereich.ts'
 import { istVollstaendigBeantwortet } from '../utils/antwortStatus.ts'
 import type { PruefungsAbschnitt } from '../types/pruefung.ts'
 
@@ -25,6 +24,14 @@ export default function FragenNavigation() {
 
   return (
     <div className="flex flex-col gap-3">
+      {/* Übersicht-Link oben (U4) */}
+      <button
+        onClick={() => setPhase('uebersicht')}
+        className="text-sm text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:underline cursor-pointer text-left font-medium"
+      >
+        📋 Übersicht
+      </button>
+
       {abschnitteMitIndex.map(({ abschnitt, startIndex }) => (
         <div key={abschnitt.titel}>
           <div className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wide">
@@ -93,22 +100,7 @@ export default function FragenNavigation() {
         </span>
       </div>
 
-      {/* Übersicht-Button */}
-      <button
-        onClick={() => setPhase('uebersicht')}
-        className="mt-2 text-sm text-slate-600 dark:text-slate-400 hover:underline cursor-pointer"
-      >
-        Übersicht anzeigen
-      </button>
-
-      {/* Fachbereich-Info der aktuellen Frage */}
-      {fragen[aktuelleFrageIndex] && (
-        <div className="mt-1">
-          <span className={`text-xs px-2 py-0.5 rounded-full ${fachbereichFarbe(fragen[aktuelleFrageIndex].fachbereich)}`}>
-            {fragen[aktuelleFrageIndex].fachbereich}
-          </span>
-        </div>
-      )}
+      {/* U5: Fachbereich-Badge entfernt (redundant, da in Übersicht jede Frage ein Badge hat) */}
     </div>
   )
 }

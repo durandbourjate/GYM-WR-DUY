@@ -15,6 +15,31 @@
 
 ---
 
+## Session 23 — 16 Bugfixes & UX aus Live-Test (27.03.2026)
+
+| # | Task | Fix |
+|---|------|-----|
+| B47 | Zeichnen: Striche gehen bei langem Zeichnen verloren | Max-Save-Intervall 5s in ZeichnenFrage.tsx (zusätzlich zu 2s Debounce) |
+| B48 | Alles-Löschen verlässt Vollbild (Chrome confirm-Popup) | React-Modal statt `window.confirm()` in ZeichnenToolbar.tsx |
+| B49 | Neues Textfeld erbt Rotation vom letzten | `setTextRotation(0)` nach Text-Commit via onTextCommit-Callback |
+| B50 | Fortschritt-Diskrepanz SuS 100% vs LP 89% | Heartbeat nutzt jetzt `istVollstaendigBeantwortet()` + sendet `gesamtFragen` |
+| B51 | LP zeigt 0% nach Abgabe | Abgegebene SuS immer als 100% in AktivPhase.tsx |
+| B52 | Formatierung-Aufgabe zeigt HTML-Tags | DOMPurify-Rendering in FreitextAnzeige (KorrekturFrageVollansicht.tsx) |
+| B53 | Auto-Korrektur markiert korrekt, vergibt keine Punkte | `lpPunkte = kiPunkte` bei auto-korrigierbaren Typen (KorrekturDashboard.tsx) |
+| B54 | Kommentar ohne Punkte markiert als geprüft | `geprueft: true` nur wenn auch Punkte vorhanden (KorrekturFrageZeile.tsx) |
+| U1 | Radierer-Icon (Besen → Radierer) | SVG Radierer-Icon in ZeichnenToolbar.tsx |
+| U2 | FiBu Buchungssatz vereinfachen | Neues Format: "Soll-Konto an Haben-Konto Betrag" (Breaking Change, 13 Dateien) |
+| U3 | FiBu T-Konten Saldo beidseitig | Saldo-Feld auf beiden Seiten, kein Dropdown (Breaking Change) |
+| U4 | SuS-Übersicht: Punkte-Anzeige + Link oben | Keine "beantwortet/gesamt P." mehr, Übersicht-Link über Fragen-Kacheln |
+| U5 | Fachbereich-Badge redundant | Fachbereich-Badge unten in Sidebar entfernt |
+| U6 | Korrektur: Aufgabennummern fehlen | "Aufgabe N" als Label in KorrekturFrageZeile.tsx |
+| U7 | Warnung bei leeren Punkten | Amber-Warnung in KorrekturDashboard wenn geprüft aber ohne Punkte |
+| U8 | Beenden-Button nach Ende → grau | "Prüfung beendet ✓" wenn config.beendetUm gesetzt |
+
+**Breaking Changes:** FiBu-Typen Buchungssatz + T-Konten haben neues Datenformat (keine alten Prüfungen betroffen).
+
+---
+
 ## Refactoring — lp/ Sub-Module + Vitest (27.03.2026)
 
 Kein Funktionsumfang geändert — reine Wartbarkeits-Verbesserung. `tsc -b` + `npm run build` + 46 Tests grün.

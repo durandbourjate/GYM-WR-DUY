@@ -329,18 +329,8 @@ export const demoFragen: Frage[] = [
     autor: 'yannick.durand@gymhofwil.ch',
     geschaeftsfall: 'Buchen Sie die folgenden Geschäftsfälle gemäss **Kontenplan KMU**:\n\n**Geschäftsfall 1:** Wareneinkauf auf Kredit, CHF 8 500\n**Geschäftsfall 2:** Lohnzahlung per Banküberweisung, CHF 6 200',
     buchungen: [
-      {
-        id: 'bs1',
-        sollKonten: [{ kontonummer: '4200', betrag: 8500 }],
-        habenKonten: [{ kontonummer: '2000', betrag: 8500 }],
-        buchungstext: 'Wareneinkauf auf Kredit',
-      },
-      {
-        id: 'bs2',
-        sollKonten: [{ kontonummer: '5200', betrag: 6200 }],
-        habenKonten: [{ kontonummer: '1020', betrag: 6200 }],
-        buchungstext: 'Lohnzahlung per Bank',
-      },
+      { id: 'bs1', sollKonto: '4200', habenKonto: '2000', betrag: 8500 },
+      { id: 'bs2', sollKonto: '5200', habenKonto: '1020', betrag: 6200 },
     ],
     kontenauswahl: {
       modus: 'eingeschraenkt',

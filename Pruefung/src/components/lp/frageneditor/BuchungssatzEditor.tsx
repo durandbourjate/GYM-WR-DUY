@@ -1,4 +1,4 @@
-import type { SollHabenZeile, BuchungsKonto, KontenauswahlConfig } from '../../../types/fragen.ts'
+import type { BuchungssatzZeile, KontenauswahlConfig } from '../../../types/fragen.ts'
 import { Abschnitt } from './EditorBausteine.tsx'
 import KontenSelect from '../../shared/KontenSelect.tsx'
 import { sucheKonten } from '../../../utils/kontenrahmen.ts'
@@ -6,8 +6,8 @@ import { sucheKonten } from '../../../utils/kontenrahmen.ts'
 interface BuchungssatzEditorProps {
   geschaeftsfall: string
   setGeschaeftsfall: (v: string) => void
-  buchungen: SollHabenZeile[]
-  setBuchungen: (b: SollHabenZeile[]) => void
+  buchungen: BuchungssatzZeile[]
+  setBuchungen: (b: BuchungssatzZeile[]) => void
   kontenauswahl: KontenauswahlConfig
   setKontenauswahl: (k: KontenauswahlConfig) => void
   /** Optionaler Inhalt rechts im Abschnitt-Header (z.B. KI-Buttons) */
@@ -33,8 +33,9 @@ export default function BuchungssatzEditor({
     const nextId = String(Date.now())
     setBuchungen([...buchungen, {
       id: nextId,
-      sollKonten: [{ kontonummer: '', betrag: 0 }],
-      habenKonten: [{ kontonummer: '', betrag: 0 }],
+      sollKonto: '',
+      habenKonto: '',
+      betrag: 0,
     }])
   }
 
@@ -43,39 +44,9 @@ export default function BuchungssatzEditor({
     setBuchungen(buchungen.filter((_, i) => i !== index))
   }
 
-  function updateBuchung(index: number, partial: Partial<SollHabenZeile>): void {
+  function updateBuchung(index: number, partial: Partial<BuchungssatzZeile>): void {
     const neu = [...buchungen]
     neu[index] = { ...neu[index], ...partial }
-    setBuchungen(neu)
-  }
-
-  // --- Konto-Zeilen CRUD ---
-
-  function updateKonto(
-    buchungIdx: number,
-    seite: 'sollKonten' | 'habenKonten',
-    kontoIdx: number,
-    partial: Partial<BuchungsKonto>,
-  ): void {
-    const neu = [...buchungen]
-    const konten = [...neu[buchungIdx][seite]]
-    konten[kontoIdx] = { ...konten[kontoIdx], ...partial }
-    neu[buchungIdx] = { ...neu[buchungIdx], [seite]: konten }
-    setBuchungen(neu)
-  }
-
-  function addKonto(buchungIdx: number, seite: 'sollKonten' | 'habenKonten'): void {
-    const neu = [...buchungen]
-    const konten = [...neu[buchungIdx][seite], { kontonummer: '', betrag: 0 }]
-    neu[buchungIdx] = { ...neu[buchungIdx], [seite]: konten }
-    setBuchungen(neu)
-  }
-
-  function removeKonto(buchungIdx: number, seite: 'sollKonten' | 'habenKonten', kontoIdx: number): void {
-    const neu = [...buchungen]
-    const konten = neu[buchungIdx][seite]
-    if (konten.length <= 1) return
-    neu[buchungIdx] = { ...neu[buchungIdx], [seite]: konten.filter((_, i) => i !== kontoIdx) }
     setBuchungen(neu)
   }
 
@@ -199,68 +170,53 @@ export default function BuchungssatzEditor({
                 )}
               </div>
 
-              {/* Soll-Seite */}
+              {/* Soll-Konto */}
               <div className="mb-2">
                 <label className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">
                   Soll
                 </label>
-                <div className="space-y-1">
-                  {buchung.sollKonten.map((konto, kIdx) => (
-                    <KontoZeile
-                      key={kIdx}
-                      konto={konto}
+                <div className="flex items-center gap-2">
+                  <div className="flex-[2] min-w-0">
+                    <KontenSelect
+                      value={buchung.sollKonto}
+                      onChange={(nummer) => updateBuchung(bIdx, { sollKonto: nummer })}
                       config={kontenauswahl}
-                      onChangeKonto={(nummer) => updateKonto(bIdx, 'sollKonten', kIdx, { kontonummer: nummer })}
-                      onChangeBetrag={(betrag) => updateKonto(bIdx, 'sollKonten', kIdx, { betrag })}
-                      onRemove={buchung.sollKonten.length > 1 ? () => removeKonto(bIdx, 'sollKonten', kIdx) : undefined}
+                      placeholder="Soll-Konto wählen..."
                     />
-                  ))}
+                  </div>
                 </div>
-                {buchung.sollKonten.length < 5 && (
-                  <button
-                    onClick={() => addKonto(bIdx, 'sollKonten')}
-                    className="mt-1 text-xs text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer"
-                  >
-                    + Soll-Konto
-                  </button>
-                )}
               </div>
 
-              {/* Haben-Seite */}
+              {/* Haben-Konto */}
               <div className="mb-2">
                 <label className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">
                   Haben
                 </label>
-                <div className="space-y-1">
-                  {buchung.habenKonten.map((konto, kIdx) => (
-                    <KontoZeile
-                      key={kIdx}
-                      konto={konto}
+                <div className="flex items-center gap-2">
+                  <div className="flex-[2] min-w-0">
+                    <KontenSelect
+                      value={buchung.habenKonto}
+                      onChange={(nummer) => updateBuchung(bIdx, { habenKonto: nummer })}
                       config={kontenauswahl}
-                      onChangeKonto={(nummer) => updateKonto(bIdx, 'habenKonten', kIdx, { kontonummer: nummer })}
-                      onChangeBetrag={(betrag) => updateKonto(bIdx, 'habenKonten', kIdx, { betrag })}
-                      onRemove={buchung.habenKonten.length > 1 ? () => removeKonto(bIdx, 'habenKonten', kIdx) : undefined}
+                      placeholder="Haben-Konto wählen..."
                     />
-                  ))}
+                  </div>
                 </div>
-                {buchung.habenKonten.length < 5 && (
-                  <button
-                    onClick={() => addKonto(bIdx, 'habenKonten')}
-                    className="mt-1 text-xs text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer"
-                  >
-                    + Haben-Konto
-                  </button>
-                )}
               </div>
 
-              {/* Buchungstext */}
+              {/* Betrag */}
               <div>
+                <label className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">
+                  Betrag (CHF)
+                </label>
                 <input
-                  type="text"
-                  value={buchung.buchungstext ?? ''}
-                  onChange={(e) => updateBuchung(bIdx, { buchungstext: e.target.value || undefined })}
-                  placeholder="Buchungstext (optional)"
-                  className="input-field w-full text-sm"
+                  type="number"
+                  value={buchung.betrag || ''}
+                  onChange={(e) => updateBuchung(bIdx, { betrag: parseFloat(e.target.value) || 0 })}
+                  placeholder="Betrag (CHF)"
+                  className="input-field-narrow w-36 text-right font-mono"
+                  min={0}
+                  step={0.01}
                 />
               </div>
             </div>
@@ -277,54 +233,5 @@ export default function BuchungssatzEditor({
         )}
       </Abschnitt>
     </>
-  )
-}
-
-/* ─── Konto-Zeile (Soll/Haben) ─── */
-
-function KontoZeile({
-  konto,
-  config,
-  onChangeKonto,
-  onChangeBetrag,
-  onRemove,
-}: {
-  konto: BuchungsKonto
-  config: KontenauswahlConfig
-  onChangeKonto: (nummer: string) => void
-  onChangeBetrag: (betrag: number) => void
-  onRemove?: () => void
-}) {
-  return (
-    <div className="flex items-center gap-2">
-      <div className="flex-[2] min-w-0">
-        <KontenSelect
-          value={konto.kontonummer}
-          onChange={onChangeKonto}
-          config={config}
-          placeholder="Konto wählen..."
-        />
-      </div>
-      <input
-        type="number"
-        value={konto.betrag || ''}
-        onChange={(e) => onChangeBetrag(parseFloat(e.target.value) || 0)}
-        placeholder="Betrag (CHF)"
-        className="input-field-narrow w-36 text-right font-mono"
-        min={0}
-        step={0.01}
-      />
-      {onRemove ? (
-        <button
-          onClick={onRemove}
-          className="w-7 h-7 text-red-400 hover:text-red-600 dark:hover:text-red-300 cursor-pointer text-sm shrink-0"
-          title="Zeile entfernen"
-        >
-          x
-        </button>
-      ) : (
-        <span className="w-7 shrink-0" />
-      )}
-    </div>
   )
 }

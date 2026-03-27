@@ -2,7 +2,7 @@
  * Validierung von Prüfungsfragen.
  * Extrahiert aus FragenEditor.tsx — pure Funktion ohne Komponentenabhängigkeiten.
  */
-import type { MCOption, SollHabenZeile, Kontenaufgabe, KontoMitSaldo } from '../types/fragen.ts'
+import type { MCOption, BuchungssatzZeile, Kontenaufgabe, KontoMitSaldo } from '../types/fragen.ts'
 
 export interface FrageValidierungsParams {
   typ: string
@@ -16,7 +16,7 @@ export interface FrageValidierungsParams {
   aussagen?: Array<{ text: string }>
   ergebnisse?: Array<{ bezeichnung?: string; label?: string; ergebnis?: string | number }>
   geschaeftsfall?: string
-  buchungen?: SollHabenZeile[]
+  buchungen?: BuchungssatzZeile[]
   tkAufgabentext?: string
   tkKonten?: Array<{ kontonummer: string }>
   kbAufgabentext?: string
@@ -56,7 +56,7 @@ export function validiereFrage(params: FrageValidierungsParams): string[] {
   }
   if (typ === 'buchungssatz') {
     if (!params.geschaeftsfall?.trim()) errs.push('Geschäftsfall erforderlich')
-    if ((params.buchungen?.filter(b => b.sollKonten.some(k => k.kontonummer) || b.habenKonten.some(k => k.kontonummer)).length ?? 0) < 1) {
+    if ((params.buchungen?.filter(b => b.sollKonto || b.habenKonto).length ?? 0) < 1) {
       errs.push('Mindestens 1 Buchung mit Konten nötig')
     }
   }

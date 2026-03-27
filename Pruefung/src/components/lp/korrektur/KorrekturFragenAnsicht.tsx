@@ -95,11 +95,7 @@ function renderAntwort(antwort: Antwort | undefined, frage: Frage): string {
     case 'buchungssatz':
       if (antwort.buchungen.length === 0) return '(leer)'
       return antwort.buchungen
-        .map((b) => {
-          const soll = b.sollKonten.map((k) => `${k.kontonummer} ${k.betrag}`).join('+')
-          const haben = b.habenKonten.map((k) => `${k.kontonummer} ${k.betrag}`).join('+')
-          return `S: ${soll} / H: ${haben}`
-        })
+        .map((b) => `S: ${b.sollKonto} ${b.betrag} / H: ${b.habenKonto} ${b.betrag}`)
         .join(' | ')
 
     case 'tkonto':

@@ -9,7 +9,7 @@ import type {
   TKontoFrage, TKontoDefinition, TKontoBewertung,
   KontenbestimmungFrage, Kontenaufgabe,
   BilanzERFrage, KontoMitSaldo, BilanzERLoesung, BilanzERBewertung,
-  SollHabenZeile, KontenauswahlConfig,
+  BuchungssatzZeile, KontenauswahlConfig,
   MCOption, Bewertungskriterium,
   AufgabengruppeFrage,
   VisualisierungFrage, CanvasConfig,
@@ -55,7 +55,7 @@ export type TypSpezifischeDaten =
   | { typ: 'zuordnung'; fragetext: string; paare: { links: string; rechts: string }[] }
   | { typ: 'richtigfalsch'; fragetext: string; aussagen: RichtigFalschFrage['aussagen'] }
   | { typ: 'berechnung'; fragetext: string; ergebnisse: BerechnungFrage['ergebnisse']; rechenwegErforderlich: boolean; hilfsmittel: string }
-  | { typ: 'buchungssatz'; geschaeftsfall: string; buchungen: SollHabenZeile[]; kontenauswahl: KontenauswahlConfig }
+  | { typ: 'buchungssatz'; geschaeftsfall: string; buchungen: BuchungssatzZeile[]; kontenauswahl: KontenauswahlConfig }
   | { typ: 'tkonto'; aufgabentext: string; geschaeftsfaelle: string[]; konten: TKontoDefinition[]; kontenauswahl: KontenauswahlConfig; bewertungsoptionen: TKontoBewertung }
   | { typ: 'kontenbestimmung'; aufgabentext: string; modus: KontenbestimmungFrage['modus']; aufgaben: Kontenaufgabe[]; kontenauswahl: KontenauswahlConfig }
   | { typ: 'bilanzstruktur'; aufgabentext: string; modus: BilanzERFrage['modus']; kontenMitSaldi: KontoMitSaldo[]; loesung: BilanzERLoesung; bewertungsoptionen: BilanzERBewertung }

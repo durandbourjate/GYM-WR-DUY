@@ -67,8 +67,8 @@ function antwortAlsText(antwort: Antwort | undefined, frage: Frage): string {
     case 'buchungssatz': {
       if (antwort.buchungen.length === 0) return '(keine Buchungen)'
       return antwort.buchungen.map((b, i) => {
-        const soll = b.sollKonten.map(k => `${k.kontonummer || '?'}: ${k.betrag}`).join(', ')
-        const haben = b.habenKonten.map(k => `${k.kontonummer || '?'}: ${k.betrag}`).join(', ')
+        const soll = `${b.sollKonto || '?'}: ${b.betrag}`
+        const haben = `${b.habenKonto || '?'}: ${b.betrag}`
         return `Buchung ${i + 1}: Soll [${soll}] / Haben [${haben}]`
       }).join('; ')
     }
@@ -78,7 +78,8 @@ function antwortAlsText(antwort: Antwort | undefined, frage: Frage): string {
       return antwort.konten.map((k, i) => {
         const left = k.eintraegeLinks.map(e => `${e.gegenkonto}: ${e.betrag}`).join(', ')
         const right = k.eintraegeRechts.map(e => `${e.gegenkonto}: ${e.betrag}`).join(', ')
-        return `T-Konto ${i + 1}: Links [${left}] | Rechts [${right}]${k.saldo ? ` Saldo: ${k.saldo.betrag}` : ''}`
+        const saldoText = k.saldo ? (k.saldo.betragLinks ? ` Saldo Links: ${k.saldo.betragLinks}` : k.saldo.betragRechts ? ` Saldo Rechts: ${k.saldo.betragRechts}` : '') : ''
+        return `T-Konto ${i + 1}: Links [${left}] | Rechts [${right}]${saldoText}`
       }).join('; ')
     }
 

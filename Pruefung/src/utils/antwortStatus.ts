@@ -73,8 +73,7 @@ export function istVollstaendigBeantwortet(
       // Mindestens eine Buchung mit Soll- und Haben-Konto ausgefüllt
       if (!antwort.buchungen || antwort.buchungen.length === 0) return false
       return antwort.buchungen.some(b =>
-        b.sollKonten?.some(k => k.kontonummer && k.betrag > 0) &&
-        b.habenKonten?.some(k => k.kontonummer && k.betrag > 0)
+        b.sollKonto && b.habenKonto && b.betrag > 0
       )
     }
 

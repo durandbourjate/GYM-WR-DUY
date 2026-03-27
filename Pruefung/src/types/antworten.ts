@@ -35,9 +35,9 @@ export type Antwort =
   | { typ: 'berechnung'; ergebnisse: Record<string, string>; rechenweg?: string }
   | { typ: 'buchungssatz'; buchungen: {
       id: string;
-      sollKonten: { kontonummer: string; betrag: number }[];
-      habenKonten: { kontonummer: string; betrag: number }[];
-      buchungstext?: string;
+      sollKonto: string;
+      habenKonto: string;
+      betrag: number;
     }[] }
   | { typ: 'tkonto'; konten: {
       id: string;
@@ -46,7 +46,7 @@ export type Antwort =
       kontenkategorie?: string;
       eintraegeLinks: { gegenkonto: string; betrag: number }[];
       eintraegeRechts: { gegenkonto: string; betrag: number }[];
-      saldo?: { betrag: number; seite: 'links' | 'rechts' };
+      saldo?: { betragLinks: number; betragRechts: number };
     }[] }
   | { typ: 'kontenbestimmung'; aufgaben: Record<string, {
       antworten: { kontonummer?: string; kategorie?: string; seite?: string }[];

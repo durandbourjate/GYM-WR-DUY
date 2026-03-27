@@ -4,7 +4,7 @@
  */
 import type {
   MCOption, RichtigFalschFrage, BerechnungFrage,
-  SollHabenZeile, KontenauswahlConfig,
+  BuchungssatzZeile, KontenauswahlConfig,
   TKontoDefinition,
   KontenbestimmungFrage, Kontenaufgabe,
   BilanzERFrage, KontoMitSaldo, BilanzERLoesung,
@@ -66,8 +66,8 @@ interface TypEditorDispatcherProps {
   // Buchungssatz
   geschaeftsfall: string
   setGeschaeftsfall: (v: string) => void
-  buchungen: SollHabenZeile[]
-  setBuchungen: React.Dispatch<React.SetStateAction<SollHabenZeile[]>>
+  buchungen: BuchungssatzZeile[]
+  setBuchungen: React.Dispatch<React.SetStateAction<BuchungssatzZeile[]>>
   kontenauswahl: KontenauswahlConfig
   setKontenauswahl: React.Dispatch<React.SetStateAction<KontenauswahlConfig>>
 

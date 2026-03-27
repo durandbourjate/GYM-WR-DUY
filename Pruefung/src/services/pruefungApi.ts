@@ -81,6 +81,7 @@ export async function heartbeat(
   lockdownMeta?: LockdownMeta,
   autoSaveCount?: number,
   tabSessionId?: string,
+  gesamtFragen?: number,
 ): Promise<HeartbeatResponse> {
   if (!APPS_SCRIPT_URL) return { success: false }
 
@@ -98,6 +99,7 @@ export async function heartbeat(
         ...(lockdownMeta ? { lockdownMeta } : {}),
         ...(autoSaveCount !== undefined ? { autoSaveCount } : {}),
         ...(tabSessionId ? { tabSessionId } : {}),
+        ...(gesamtFragen !== undefined ? { gesamtFragen } : {}),
       }),
     })
     if (!response.ok) return { success: false }

@@ -208,6 +208,15 @@ export interface BuchungsKonto {
   betrag: number
 }
 
+/** U2: Vereinfachter Buchungssatz — "Soll-Konto an Haben-Konto Betrag" */
+export interface BuchungssatzZeile {
+  id: string
+  sollKonto: string
+  habenKonto: string
+  betrag: number
+}
+
+/** @deprecated Altes Format — nur noch für Referenz */
 export interface SollHabenZeile {
   id: string
   sollKonten: BuchungsKonto[]
@@ -218,7 +227,7 @@ export interface SollHabenZeile {
 export interface BuchungssatzFrage extends FrageBase {
   typ: 'buchungssatz'
   geschaeftsfall: string
-  buchungen: SollHabenZeile[]
+  buchungen: BuchungssatzZeile[]
   kontenauswahl: KontenauswahlConfig
 }
 

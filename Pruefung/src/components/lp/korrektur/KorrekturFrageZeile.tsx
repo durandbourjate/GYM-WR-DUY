@@ -12,6 +12,8 @@ interface Props {
   antwort: Antwort | undefined
   autoErgebnis: KorrekturErgebnis | null
   bewertung: FragenBewertung
+  /** Aufgabennummer (1-basiert) für Anzeige (U6) */
+  aufgabeNr?: number
   onUpdate: (updates: { lpPunkte?: number | null; lpKommentar?: string | null; geprueft?: boolean; audioKommentarId?: string | null }) => void
   onAudioUpload: (frageId: string, blob: Blob) => Promise<string | null>
 }
@@ -46,6 +48,7 @@ export default function KorrekturFrageZeile({
   antwort,
   autoErgebnis,
   bewertung,
+  aufgabeNr,
   onUpdate,
   onAudioUpload,
 }: Props) {
@@ -62,11 +65,13 @@ export default function KorrekturFrageZeile({
         ? 'border-green-200 bg-green-50/30 dark:border-green-800/40 dark:bg-green-900/10'
         : 'border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800'
     }`}>
-      {/* Zeile 1: ID, Typ, Quelle, Max-Punkte */}
+      {/* Zeile 1: Aufgabennummer, Typ, Quelle, Max-Punkte (U6) */}
       <div className="flex flex-wrap items-center gap-2 mb-2">
-        <span className="font-mono text-xs text-slate-400 dark:text-slate-500">
-          {frageId}
-        </span>
+        {aufgabeNr !== undefined && (
+          <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+            Aufgabe {aufgabeNr}
+          </span>
+        )}
         <span className={`inline-block px-1.5 py-0.5 text-xs rounded font-medium ${fragenTypFarbe(fragenTyp)}`}>
           {fragenTyp}
         </span>
@@ -114,8 +119,9 @@ export default function KorrekturFrageZeile({
           placeholder="Kommentar für SuS..."
           onChange={(e) => {
             const wert = e.target.value || null
-            // Auto-Geprüft wenn Kommentar geschrieben wird
-            onUpdate({ lpKommentar: wert, ...(wert ? { geprueft: true } : {}) })
+            // Auto-Geprüft nur wenn auch Punkte vorhanden (B54)
+            const hatPunkte = bewertung.lpPunkte !== null || bewertung.kiPunkte !== null
+            onUpdate({ lpKommentar: wert, ...(wert && hatPunkte ? { geprueft: true } : {}) })
           }}
           className="w-full rounded border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-1.5 text-sm text-slate-700 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-400 dark:focus:ring-slate-500 resize-none"
         />

@@ -385,12 +385,7 @@ export const einrichtungsFragen: Frage[] = [
     autor,
     geschaeftsfall: '**Übungsaufgabe zum Testen der Eingabefelder:**\n\nSie kaufen ein Eis für CHF 5.00 und bezahlen bar.\n\n📋 **Anleitung — die Lösung ist hier angegeben:**\n- **Soll:** Konto 4200 (Warenaufwand), Betrag: 5.00\n- **Haben:** Konto 1000 (Kasse), Betrag: 5.00\n\nGeben Sie diese Buchung in die Felder unten ein. Wählen Sie die Konten aus dem Dropdown und tippen Sie den Betrag.',
     buchungen: [
-      {
-        id: 'bs-eis',
-        sollKonten: [{ kontonummer: '4200', betrag: 5 }],
-        habenKonten: [{ kontonummer: '1000', betrag: 5 }],
-        buchungstext: 'Eiskauf bar',
-      },
+      { id: 'bs-eis', sollKonto: '4200', habenKonto: '1000', betrag: 5 },
     ],
     kontenauswahl: {
       modus: 'eingeschraenkt',

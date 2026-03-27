@@ -183,9 +183,13 @@ export default function AktivPhase({ config, schuelerStatus, startTimestamp, onB
           <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
             {gefilterteSchueler.map((s) => {
               const stufe = inaktivitaetsStufe(s)
-              const fortschrittProzent = s.gesamtFragen > 0
-                ? Math.round((s.beantworteteFragen / s.gesamtFragen) * 100)
-                : 0
+              // B51: Abgegebene SuS immer 100% anzeigen (Heartbeat stoppt nach Abgabe)
+              const istAbgegeben = s.status === 'abgegeben' || s.status === 'beendet-lp'
+              const fortschrittProzent = istAbgegeben
+                ? 100
+                : s.gesamtFragen > 0
+                  ? Math.round((s.beantworteteFragen / s.gesamtFragen) * 100)
+                  : 0
               const zuschlagMin = zeitverlaengerungen[s.email] ?? 0
               return (
                 <tr
@@ -331,43 +335,49 @@ export default function AktivPhase({ config, schuelerStatus, startTimestamp, onB
         Abgegeben: {schuelerStatus.filter((s) => s.status === 'abgegeben' || s.status === 'beendet-lp').length} / {config.teilnehmer?.length ?? schuelerStatus.length}
       </p>
 
-      {/* Beenden-Button */}
+      {/* Beenden-Button (U8: grau wenn bereits beendet) */}
       <div className="flex justify-center pt-2 border-t border-slate-200 dark:border-slate-700">
-        <button
-          type="button"
-          disabled={beendenLaeuft}
-          onClick={() => {
-            // Bei 0 aktiven SuS: direkt beenden ohne Dialog
-            const aktive = schuelerStatus.filter((s) => s.status === 'aktiv').length
-            if (aktive === 0) {
-              setBeendenLaeuft(true)
-              const timeoutId = setTimeout(() => {
-                setBeendenLaeuft(false)
-              }, 30000)
-              apiService.beendePruefung({
-                pruefungId: config.id,
-                email: user?.email ?? '',
-                modus: 'sofort',
-              }).then((result) => {
-                clearTimeout(timeoutId)
-                if (result.success) {
+        {config.beendetUm ? (
+          <span className="px-6 py-2 text-sm bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400 rounded-lg font-medium">
+            Prüfung beendet ✓
+          </span>
+        ) : (
+          <button
+            type="button"
+            disabled={beendenLaeuft}
+            onClick={() => {
+              // Bei 0 aktiven SuS: direkt beenden ohne Dialog
+              const aktive = schuelerStatus.filter((s) => s.status === 'aktiv').length
+              if (aktive === 0) {
+                setBeendenLaeuft(true)
+                const timeoutId = setTimeout(() => {
                   setBeendenLaeuft(false)
-                  onBeenden()
-                } else {
+                }, 30000)
+                apiService.beendePruefung({
+                  pruefungId: config.id,
+                  email: user?.email ?? '',
+                  modus: 'sofort',
+                }).then((result) => {
+                  clearTimeout(timeoutId)
+                  if (result.success) {
+                    setBeendenLaeuft(false)
+                    onBeenden()
+                  } else {
+                    setBeendenLaeuft(false)
+                  }
+                }).catch(() => {
+                  clearTimeout(timeoutId)
                   setBeendenLaeuft(false)
-                }
-              }).catch(() => {
-                clearTimeout(timeoutId)
-                setBeendenLaeuft(false)
-              })
-              return
-            }
-            setZeigBeendenDialog(true)
-          }}
-          className="px-6 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 cursor-pointer font-medium disabled:opacity-50"
-        >
-          {beendenLaeuft ? 'Wird beendet...' : 'Prüfung beenden'}
-        </button>
+                })
+                return
+              }
+              setZeigBeendenDialog(true)
+            }}
+            className="px-6 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 cursor-pointer font-medium disabled:opacity-50"
+          >
+            {beendenLaeuft ? 'Wird beendet...' : 'Prüfung beenden'}
+          </button>
+        )}
       </div>
 
       {/* Detail-Panel */}

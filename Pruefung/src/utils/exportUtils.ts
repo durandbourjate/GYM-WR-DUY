@@ -247,11 +247,9 @@ export function antwortAlsText(antwort: Antwort | undefined, frage: Frage): stri
 
     case 'buchungssatz': {
       // "Soll Kto/Betrag / Haben Kto/Betrag" pro Buchung
-      return antwort.buchungen.map((b) => {
-        const soll = b.sollKonten.map((k) => `${k.kontonummer} ${k.betrag}`).join('+')
-        const haben = b.habenKonten.map((k) => `${k.kontonummer} ${k.betrag}`).join('+')
-        return `Soll ${soll} / Haben ${haben}`
-      }).join('; ')
+      return antwort.buchungen.map((b) =>
+        `Soll ${b.sollKonto} ${b.betrag} / Haben ${b.habenKonto} ${b.betrag}`
+      ).join('; ')
     }
 
     case 'tkonto': {

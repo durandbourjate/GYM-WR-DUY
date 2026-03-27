@@ -9,35 +9,21 @@ interface Props {
   frage: BuchungssatzFrageType
 }
 
-/** Erzeugt eine zufällige ID für neue Buchungssätze/Zeilen */
+/** U2: Vereinfachter Buchungssatz — "Soll-Konto an Haben-Konto Betrag" */
+
+interface BuchungEingabe {
+  id: string
+  sollKonto: string
+  habenKonto: string
+  betrag: string
+}
+
 function neueId(): string {
   return crypto.randomUUID()
 }
 
-interface KontoZeile {
-  id: string
-  kontonummer: string
-  betrag: string
-}
-
-interface BuchungEingabe {
-  id: string
-  sollKonten: KontoZeile[]
-  habenKonten: KontoZeile[]
-  buchungstext: string
-}
-
-function leereKontoZeile(): KontoZeile {
-  return { id: neueId(), kontonummer: '', betrag: '' }
-}
-
 function leereBuchung(): BuchungEingabe {
-  return {
-    id: neueId(),
-    sollKonten: [leereKontoZeile()],
-    habenKonten: [leereKontoZeile()],
-    buchungstext: '',
-  }
+  return { id: neueId(), sollKonto: '', habenKonto: '', betrag: '' }
 }
 
 /** Konvertiert die interne Eingabe ins Antwort-Format für den Store */
@@ -46,15 +32,9 @@ function zuAntwort(buchungen: BuchungEingabe[]) {
     typ: 'buchungssatz' as const,
     buchungen: buchungen.map((b) => ({
       id: b.id,
-      sollKonten: b.sollKonten.map((z) => ({
-        kontonummer: z.kontonummer,
-        betrag: parseFloat(z.betrag) || 0,
-      })),
-      habenKonten: b.habenKonten.map((z) => ({
-        kontonummer: z.kontonummer,
-        betrag: parseFloat(z.betrag) || 0,
-      })),
-      buchungstext: b.buchungstext || undefined,
+      sollKonto: b.sollKonto,
+      habenKonto: b.habenKonto,
+      betrag: parseFloat(b.betrag) || 0,
     })),
   }
 }
@@ -63,32 +43,15 @@ function zuAntwort(buchungen: BuchungEingabe[]) {
 function vonAntwort(
   antwort: {
     typ: 'buchungssatz'
-    buchungen: {
-      id: string
-      sollKonten: { kontonummer: string; betrag: number }[]
-      habenKonten: { kontonummer: string; betrag: number }[]
-      buchungstext?: string
-    }[]
+    buchungen: { id: string; sollKonto: string; habenKonto: string; betrag: number }[]
   } | undefined
 ): BuchungEingabe[] {
   if (!antwort || antwort.buchungen.length === 0) return [leereBuchung()]
   return antwort.buchungen.map((b) => ({
     id: b.id,
-    sollKonten: b.sollKonten.length > 0
-      ? b.sollKonten.map((z) => ({
-          id: neueId(),
-          kontonummer: z.kontonummer,
-          betrag: z.betrag ? String(z.betrag) : '',
-        }))
-      : [leereKontoZeile()],
-    habenKonten: b.habenKonten.length > 0
-      ? b.habenKonten.map((z) => ({
-          id: neueId(),
-          kontonummer: z.kontonummer,
-          betrag: z.betrag ? String(z.betrag) : '',
-        }))
-      : [leereKontoZeile()],
-    buchungstext: b.buchungstext ?? '',
+    sollKonto: b.sollKonto,
+    habenKonto: b.habenKonto,
+    betrag: b.betrag ? String(b.betrag) : '',
   }))
 }
 
@@ -101,7 +64,6 @@ export default function BuchungssatzFrage({ frage }: Props) {
   const gespeicherteAntwort =
     aktuelleAntwort?.typ === 'buchungssatz' ? aktuelleAntwort : undefined
 
-  // Lokaler State statt Neuberechnung bei jedem Render (verhindert Cursor-Sprung bei Inputs)
   const [buchungen, setBuchungenLokal] = useState<BuchungEingabe[]>(() =>
     vonAntwort(gespeicherteAntwort)
   )
@@ -119,53 +81,9 @@ export default function BuchungssatzFrage({ frage }: Props) {
     setAntwort(frage.id, zuAntwort(neueBuchungen))
   }
 
-  function kontoAendern(
-    buchungIdx: number,
-    seite: 'soll' | 'haben',
-    zeileIdx: number,
-    feld: 'kontonummer' | 'betrag',
-    wert: string
-  ) {
-    const kopie = buchungen.map((b) => ({
-      ...b,
-      sollKonten: b.sollKonten.map((z) => ({ ...z })),
-      habenKonten: b.habenKonten.map((z) => ({ ...z })),
-    }))
-    const zeilen = seite === 'soll' ? kopie[buchungIdx].sollKonten : kopie[buchungIdx].habenKonten
-    zeilen[zeileIdx] = { ...zeilen[zeileIdx], [feld]: wert }
-    aktualisiere(kopie)
-  }
-
-  function buchungstextAendern(buchungIdx: number, text: string) {
-    const kopie = buchungen.map((b) => ({
-      ...b,
-      sollKonten: b.sollKonten.map((z) => ({ ...z })),
-      habenKonten: b.habenKonten.map((z) => ({ ...z })),
-    }))
-    kopie[buchungIdx] = { ...kopie[buchungIdx], buchungstext: text }
-    aktualisiere(kopie)
-  }
-
-  function zeileHinzufuegen(buchungIdx: number, seite: 'soll' | 'haben') {
-    const kopie = buchungen.map((b) => ({
-      ...b,
-      sollKonten: b.sollKonten.map((z) => ({ ...z })),
-      habenKonten: b.habenKonten.map((z) => ({ ...z })),
-    }))
-    const zeilen = seite === 'soll' ? kopie[buchungIdx].sollKonten : kopie[buchungIdx].habenKonten
-    zeilen.push(leereKontoZeile())
-    aktualisiere(kopie)
-  }
-
-  function zeileEntfernen(buchungIdx: number, seite: 'soll' | 'haben', zeileIdx: number) {
-    const kopie = buchungen.map((b) => ({
-      ...b,
-      sollKonten: b.sollKonten.map((z) => ({ ...z })),
-      habenKonten: b.habenKonten.map((z) => ({ ...z })),
-    }))
-    const zeilen = seite === 'soll' ? kopie[buchungIdx].sollKonten : kopie[buchungIdx].habenKonten
-    if (zeilen.length <= 1) return // Mindestens eine Zeile behalten
-    zeilen.splice(zeileIdx, 1)
+  function feldAendern(buchungIdx: number, feld: keyof BuchungEingabe, wert: string) {
+    const kopie = buchungen.map((b) => ({ ...b }))
+    kopie[buchungIdx] = { ...kopie[buchungIdx], [feld]: wert }
     aktualisiere(kopie)
   }
 
@@ -175,8 +93,7 @@ export default function BuchungssatzFrage({ frage }: Props) {
 
   function buchungEntfernen(buchungIdx: number) {
     if (buchungen.length <= 1) return
-    const kopie = buchungen.filter((_, i) => i !== buchungIdx)
-    aktualisiere(kopie)
+    aktualisiere(buchungen.filter((_, i) => i !== buchungIdx))
   }
 
   const readOnly = abgegeben
@@ -199,7 +116,7 @@ export default function BuchungssatzFrage({ frage }: Props) {
         </span>
       </div>
 
-      {/* Geschäftsfall (sticky) */}
+      {/* Geschäftsfall */}
       <div
         className="text-base leading-relaxed text-slate-800 dark:text-slate-100 bg-slate-50 dark:bg-slate-800/80 p-4 rounded-lg border border-slate-200 dark:border-slate-700"
         dangerouslySetInnerHTML={{ __html: renderMarkdown(frage.geschaeftsfall) }}
@@ -231,50 +148,56 @@ export default function BuchungssatzFrage({ frage }: Props) {
               )}
             </div>
 
-            {/* Soll/Haben Tabelle */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {/* Soll-Seite */}
-              <KontoSeite
-                label="Soll"
-                zeilen={buchung.sollKonten}
-                kontenauswahl={frage.kontenauswahl}
-                readOnly={readOnly}
-                onKontoChange={(zIdx, nr) => kontoAendern(bIdx, 'soll', zIdx, 'kontonummer', nr)}
-                onBetragChange={(zIdx, val) => kontoAendern(bIdx, 'soll', zIdx, 'betrag', val)}
-                onZeileHinzufuegen={() => zeileHinzufuegen(bIdx, 'soll')}
-                onZeileEntfernen={(zIdx) => zeileEntfernen(bIdx, 'soll', zIdx)}
-              />
+            {/* Soll-Konto "an" Haben-Konto Betrag — inline */}
+            <div className="flex flex-wrap items-center gap-2">
+              {/* Soll-Konto */}
+              <div className="flex-1 min-w-[140px]">
+                <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Soll</label>
+                <KontenSelect
+                  value={buchung.sollKonto}
+                  onChange={(nr) => feldAendern(bIdx, 'sollKonto', nr)}
+                  config={frage.kontenauswahl}
+                  placeholder="Soll-Konto..."
+                  disabled={readOnly}
+                />
+              </div>
 
-              {/* Haben-Seite */}
-              <KontoSeite
-                label="Haben"
-                zeilen={buchung.habenKonten}
-                kontenauswahl={frage.kontenauswahl}
-                readOnly={readOnly}
-                onKontoChange={(zIdx, nr) => kontoAendern(bIdx, 'haben', zIdx, 'kontonummer', nr)}
-                onBetragChange={(zIdx, val) => kontoAendern(bIdx, 'haben', zIdx, 'betrag', val)}
-                onZeileHinzufuegen={() => zeileHinzufuegen(bIdx, 'haben')}
-                onZeileEntfernen={(zIdx) => zeileEntfernen(bIdx, 'haben', zIdx)}
-              />
-            </div>
+              {/* "an" */}
+              <span className="text-sm font-medium text-slate-500 dark:text-slate-400 self-end pb-2.5">
+                an
+              </span>
 
-            {/* Buchungstext */}
-            <div className="mt-3">
-              <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
-                Buchungstext (optional)
-              </label>
-              <input
-                type="text"
-                value={buchung.buchungstext}
-                onChange={(e) => buchungstextAendern(bIdx, e.target.value)}
-                disabled={readOnly}
-                placeholder="z.B. Wareneinkauf auf Kredit"
-                className="min-h-[44px] w-full rounded-md border border-slate-300 bg-white px-3 py-2
-                  text-sm text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100
-                  focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500
-                  disabled:cursor-not-allowed disabled:opacity-50
-                  placeholder:text-slate-400 dark:placeholder:text-slate-500"
-              />
+              {/* Haben-Konto */}
+              <div className="flex-1 min-w-[140px]">
+                <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Haben</label>
+                <KontenSelect
+                  value={buchung.habenKonto}
+                  onChange={(nr) => feldAendern(bIdx, 'habenKonto', nr)}
+                  config={frage.kontenauswahl}
+                  placeholder="Haben-Konto..."
+                  disabled={readOnly}
+                />
+              </div>
+
+              {/* Betrag */}
+              <div className="w-28 shrink-0">
+                <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Betrag</label>
+                <input
+                  type="number"
+                  value={buchung.betrag}
+                  onChange={(e) => feldAendern(bIdx, 'betrag', e.target.value)}
+                  disabled={readOnly}
+                  placeholder="CHF"
+                  min="0"
+                  step="0.01"
+                  className={`min-h-[44px] w-full rounded-md border bg-white px-3 py-2
+                    text-sm text-right text-slate-900 dark:bg-slate-700 dark:text-slate-100
+                    focus:outline-none focus:ring-1 focus:ring-slate-400
+                    disabled:cursor-not-allowed disabled:opacity-50
+                    placeholder:text-slate-400 dark:placeholder:text-slate-500
+                    ${!readOnly && !buchung.betrag ? 'border-violet-400 dark:border-violet-500' : 'border-slate-300 dark:border-slate-600'}`}
+                />
+              </div>
             </div>
           </div>
         ))}
@@ -293,105 +216,7 @@ export default function BuchungssatzFrage({ frage }: Props) {
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
           </svg>
-          Buchungssatz hinzufuegen
-        </button>
-      )}
-    </div>
-  )
-}
-
-/* ─── Soll/Haben-Seite (wiederverwendbar) ─── */
-
-interface KontoSeiteProps {
-  label: string
-  zeilen: KontoZeile[]
-  kontenauswahl: BuchungssatzFrageType['kontenauswahl']
-  readOnly: boolean
-  onKontoChange: (zeileIdx: number, kontonummer: string) => void
-  onBetragChange: (zeileIdx: number, betrag: string) => void
-  onZeileHinzufuegen: () => void
-  onZeileEntfernen: (zeileIdx: number) => void
-}
-
-function KontoSeite({
-  label,
-  zeilen,
-  kontenauswahl,
-  readOnly,
-  onKontoChange,
-  onBetragChange,
-  onZeileHinzufuegen,
-  onZeileEntfernen,
-}: KontoSeiteProps) {
-  // Neutral: keine farbliche Vorwegnahme der Kontenart
-  const hatEingabe = zeilen.some(z => z.kontonummer || z.betrag)
-  const labelFarbe = hatEingabe
-    ? 'text-slate-700 dark:text-slate-200 bg-slate-50 dark:bg-slate-800/50 border-slate-300 dark:border-slate-600'
-    : 'text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700'
-
-  return (
-    <div className={`rounded-lg border p-3 ${labelFarbe}`}>
-      <div className="flex items-center justify-between mb-2">
-        <span className="text-xs font-bold uppercase tracking-wider">{label}</span>
-      </div>
-
-      <div className="flex flex-col gap-2">
-        {zeilen.map((zeile, zIdx) => (
-          <div key={zeile.id} className="flex items-center gap-2">
-            <div className="flex-1 min-w-0">
-              <KontenSelect
-                value={zeile.kontonummer}
-                onChange={(nr) => onKontoChange(zIdx, nr)}
-                config={kontenauswahl}
-                placeholder="Konto..."
-                disabled={readOnly}
-              />
-            </div>
-            <div className="w-28 shrink-0">
-              <input
-                type="number"
-                value={zeile.betrag}
-                onChange={(e) => onBetragChange(zIdx, e.target.value)}
-                disabled={readOnly}
-                placeholder="CHF"
-                min="0"
-                step="0.01"
-                className={`min-h-[44px] w-full rounded-md border bg-white px-3 py-2
-                  text-sm text-right text-slate-900 dark:bg-slate-700 dark:text-slate-100
-                  focus:outline-none focus:ring-1 focus:ring-slate-400
-                  disabled:cursor-not-allowed disabled:opacity-50
-                  placeholder:text-slate-400 dark:placeholder:text-slate-500
-                  ${!readOnly && !zeile.betrag ? 'border-violet-400 dark:border-violet-500' : 'border-slate-300 dark:border-slate-600'}`}
-              />
-            </div>
-            {!readOnly && zeilen.length > 1 && (
-              <button
-                type="button"
-                onClick={() => onZeileEntfernen(zIdx)}
-                className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg
-                  text-slate-400 hover:text-red-500 transition-colors"
-                title="Zeile entfernen"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            )}
-          </div>
-        ))}
-      </div>
-
-      {/* Zeile hinzufügen */}
-      {!readOnly && (
-        <button
-          type="button"
-          onClick={onZeileHinzufuegen}
-          className="mt-2 min-h-[44px] flex items-center gap-1 text-xs font-medium opacity-60 hover:opacity-100 transition-opacity"
-        >
-          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-          {label === 'Soll' ? '+ Soll-Zeile' : '+ Haben-Zeile'}
+          Buchungssatz hinzufügen
         </button>
       )}
     </div>

@@ -3,7 +3,7 @@
  * Extrahiert aus FragenEditor.tsx — reine Funktionen ohne Komponentenabhängigkeiten.
  */
 import type {
-  SollHabenZeile, TKontoDefinition, Kontenaufgabe,
+  BuchungssatzZeile, TKontoDefinition, Kontenaufgabe,
   BilanzERLoesung, KontoMitSaldo,
 } from '../types/fragen.ts'
 import { kontoLabel } from './kontenrahmen.ts'
@@ -14,12 +14,10 @@ export function chf(betrag: number): string {
 }
 
 /** Buchungssatz → Musterlösung-Text */
-export function generiereMuserloesungBuchungssatz(buchungen: SollHabenZeile[]): string {
+export function generiereMuserloesungBuchungssatz(buchungen: BuchungssatzZeile[]): string {
   return buchungen.map((b, i) => {
-    const sollTeile = b.sollKonten.map(k => `Soll ${kontoLabel(k.kontonummer)} CHF ${chf(k.betrag)}`)
-    const habenTeile = b.habenKonten.map(k => `Haben ${kontoLabel(k.kontonummer)} CHF ${chf(k.betrag)}`)
     const prefix = buchungen.length > 1 ? `Buchung ${i + 1}: ` : ''
-    return prefix + [...sollTeile, ...habenTeile].join(', ')
+    return prefix + `Soll ${kontoLabel(b.sollKonto)} CHF ${chf(b.betrag)}, Haben ${kontoLabel(b.habenKonto)} CHF ${chf(b.betrag)}`
   }).join('\n')
 }
 

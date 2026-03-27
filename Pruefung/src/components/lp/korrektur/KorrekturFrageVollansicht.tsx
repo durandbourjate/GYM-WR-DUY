@@ -1,3 +1,4 @@
+import DOMPurify from 'dompurify'
 import type { Frage, MCFrage, RichtigFalschFrage, LueckentextFrage, ZuordnungFrage, BerechnungFrage, KontenbestimmungFrage } from '../../../types/fragen'
 import type { Antwort } from '../../../types/antworten'
 import type { KorrekturErgebnis } from '../../../utils/autoKorrektur'
@@ -83,12 +84,20 @@ function RFAnzeige({ frage, antwort }: { frage: RichtigFalschFrage; antwort: Ext
   )
 }
 
-/** Freitext-Antwort */
+/** Freitext-Antwort (B52: HTML korrekt rendern wenn formatiert) */
 function FreitextAnzeige({ antwort }: { antwort: Extract<Antwort, { typ: 'freitext' }> | undefined }) {
   if (!antwort?.text) return <KeineAntwort />
+  const istHTML = antwort.formatierung === 'html' || antwort.text.includes('<p>')
   return (
     <div className="rounded bg-slate-50 dark:bg-slate-700/50 px-3 py-2 mt-2">
-      <p className="text-sm text-slate-700 dark:text-slate-200 whitespace-pre-wrap">{antwort.text}</p>
+      {istHTML ? (
+        <div
+          className="text-sm text-slate-700 dark:text-slate-200 prose prose-sm dark:prose-invert max-w-none"
+          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(antwort.text) }}
+        />
+      ) : (
+        <p className="text-sm text-slate-700 dark:text-slate-200 whitespace-pre-wrap">{antwort.text}</p>
+      )}
     </div>
   )
 }
@@ -169,19 +178,15 @@ function BuchungssatzAnzeige({ antwort }: { antwort: Extract<Antwort, { typ: 'bu
           <div className="flex gap-4 mt-0.5">
             <div>
               <span className="text-xs text-slate-400 dark:text-slate-500">Soll: </span>
-              {b.sollKonten.map((k, j) => (
-                <span key={j} className="text-slate-700 dark:text-slate-200">
-                  {k.kontonummer || '?'}: {k.betrag}{j < b.sollKonten.length - 1 ? ', ' : ''}
-                </span>
-              ))}
+              <span className="text-slate-700 dark:text-slate-200">
+                {b.sollKonto || '?'}: {b.betrag}
+              </span>
             </div>
             <div>
               <span className="text-xs text-slate-400 dark:text-slate-500">Haben: </span>
-              {b.habenKonten.map((k, j) => (
-                <span key={j} className="text-slate-700 dark:text-slate-200">
-                  {k.kontonummer || '?'}: {k.betrag}{j < b.habenKonten.length - 1 ? ', ' : ''}
-                </span>
-              ))}
+              <span className="text-slate-700 dark:text-slate-200">
+                {b.habenKonto || '?'}: {b.betrag}
+              </span>
             </div>
           </div>
         </div>
@@ -222,7 +227,7 @@ function TKontoAnzeige({ antwort }: { antwort: Extract<Antwort, { typ: 'tkonto' 
           </div>
           {k.saldo && (
             <span className="text-xs text-slate-500 dark:text-slate-400">
-              Saldo: {k.saldo.betrag} ({k.saldo.seite})
+              Saldo: {k.saldo.betragLinks ? `Links ${k.saldo.betragLinks}` : ''}{k.saldo.betragRechts ? `Rechts ${k.saldo.betragRechts}` : ''}
             </span>
           )}
         </div>
@@ -351,9 +356,9 @@ function MusterloesungBox({ frage }: { frage: Frage }) {
         {frage.buchungen.map((b, i) => (
           <div key={b.id ?? i} className="text-sm mt-1 text-amber-800 dark:text-amber-200">
             <span className="text-xs text-amber-600 dark:text-amber-400">Buchung {i + 1}: </span>
-            Soll [{b.sollKonten.map(k => `${k.kontonummer}: ${k.betrag}`).join(', ')}]
+            Soll [{b.sollKonto}: {b.betrag}]
             {' / '}
-            Haben [{b.habenKonten.map(k => `${k.kontonummer}: ${k.betrag}`).join(', ')}]
+            Haben [{b.habenKonto}: {b.betrag}]
           </div>
         ))}
       </div>

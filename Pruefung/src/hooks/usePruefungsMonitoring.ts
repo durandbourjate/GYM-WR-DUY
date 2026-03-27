@@ -6,6 +6,7 @@ import { saveToIndexedDB } from '../services/autoSave.ts'
 import { enqueue, processQueue } from '../services/retryQueue.ts'
 import type { Antwort } from '../types/antworten.ts'
 import type { LockdownMeta } from '../services/pruefungApi.ts'
+import { istVollstaendigBeantwortet } from '../utils/antwortStatus.ts'
 
 /** Optionale Callbacks für Lockdown-Integration */
 export interface MonitoringLockdownCallbacks {
@@ -141,22 +142,15 @@ export function usePruefungsMonitoring(lockdownCallbacks?: MonitoringLockdownCal
       try {
         const state = usePruefungStore.getState()
         const aktuelleFrageIndex = state.aktuelleFrageIndex
-        // Nur nicht-leere Antworten zählen (leere Keys entstehen beim Navigieren)
-        const beantworteteFragen = Object.entries(state.antworten).filter(([, a]) => {
-          if (!a) return false
-          const val = a as Record<string, unknown>
-          // Freitext: text nicht leer
-          if (val.typ === 'freitext') return !!(val.text && String(val.text).trim())
-          // MC/RF: mindestens eine Option gewählt
-          if (val.typ === 'multipleChoice' || val.typ === 'richtigFalsch') return Array.isArray(val.gewaehlteOptionen) && (val.gewaehlteOptionen as unknown[]).length > 0
-          // Lückentext: mindestens eine Lücke ausgefüllt
-          if (val.typ === 'lueckentext') return Array.isArray(val.luecken) && (val.luecken as string[]).some(l => !!l?.trim())
-          // Alle anderen Typen: Key existiert = beantwortet
-          return true
-        }).length
+        // B50: Gleiche Zählung wie SuS-View (istVollstaendigBeantwortet)
+        const beantworteteFragen = state.fragen.filter((f) =>
+          istVollstaendigBeantwortet(f, state.antworten[f.id], state.alleFragen, state.antworten)
+        ).length
         const lockdownMeta = lockdownCallbacksRef.current?.getLockdownMeta?.()
         const currentAutoSaveCount = state.autoSaveCount
-        const response = await apiService.heartbeat(config.id, user.email, aktuelleFrageIndex, beantworteteFragen, lockdownMeta, currentAutoSaveCount, tabSessionIdRef.current)
+        // B50: gesamtFragen mitsenden (= navigationsFragen.length, konsistent mit SuS-View)
+        const gesamtFragen = state.fragen.length
+        const response = await apiService.heartbeat(config.id, user.email, aktuelleFrageIndex, beantworteteFragen, lockdownMeta, currentAutoSaveCount, tabSessionIdRef.current, gesamtFragen)
         if (response.success) {
           incrementHeartbeats()
           setVerbindungsstatus('online')

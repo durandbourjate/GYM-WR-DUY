@@ -14,7 +14,7 @@ import type {
   TKontoFrage, TKontoDefinition, TKontoBewertung,
   KontenbestimmungFrage, Kontenaufgabe,
   BilanzERFrage, KontoMitSaldo, BilanzERLoesung, BilanzERBewertung,
-  SollHabenZeile, KontenauswahlConfig,
+  BuchungssatzZeile, KontenauswahlConfig,
   MCOption, Bewertungskriterium,
   AufgabengruppeFrage,
   VisualisierungFrage, CanvasConfig,
@@ -138,9 +138,9 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen, performa
   const [geschaeftsfall, setGeschaeftsfall] = useState(
     frage?.typ === 'buchungssatz' ? (frage as BuchungssatzFrage).geschaeftsfall : ''
   )
-  const [buchungen, setBuchungen] = useState<SollHabenZeile[]>(
+  const [buchungen, setBuchungen] = useState<BuchungssatzZeile[]>(
     frage?.typ === 'buchungssatz' ? (frage as BuchungssatzFrage).buchungen : [
-      { id: '1', sollKonten: [{ kontonummer: '', betrag: 0 }], habenKonten: [{ kontonummer: '', betrag: 0 }] },
+      { id: '1', sollKonto: '', habenKonto: '', betrag: 0 },
     ]
   )
   const [kontenauswahl, setKontenauswahl] = useState<KontenauswahlConfig>(

@@ -62,7 +62,7 @@ export default function FragenUebersicht() {
                 {abschnitt.titel}
               </h3>
               <span className="text-xs text-slate-500 dark:text-slate-400">
-                {fortschritt.beantwortet}/{fortschritt.gesamt} · {fortschritt.punkteBeantwortet}/{fortschritt.punkte} P.
+                {fortschritt.beantwortet}/{fortschritt.gesamt} · {fortschritt.punkte} P.
               </span>
             </div>
 

@@ -31,6 +31,8 @@ interface ZeichnenCanvasProps {
     selektierterCommand: string | null;
     commands: import('./ZeichnenTypes').DrawCommand[];
   }) => void;
+  /** Wird nach dem Abschliessen eines Text-Overlays aufgerufen (Reset für Rotation etc.) */
+  onTextCommit?: () => void;
 }
 
 // Text-Overlay-Zustand
@@ -114,9 +116,12 @@ export function ZeichnenCanvas({
   onPNGExport,
   disabled,
   onEngineActions,
+  onTextCommit,
 }: ZeichnenCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const onTextCommitRef = useRef(onTextCommit);
+  onTextCommitRef.current = onTextCommit;
 
   // Hintergrundbild laden
   const [hintergrundbild, setHintergrundbild] = useState<HTMLImageElement | null>(null);
@@ -266,6 +271,8 @@ export function ZeichnenCanvas({
             rotation: textRotation || undefined,
             fett: textFett || undefined,
           } as Omit<DrawCommand, 'id'>);
+          // Rotation nach Text-Commit zurücksetzen (B49)
+          onTextCommitRef.current?.();
         }
 
         return TEXT_OVERLAY_LEER;

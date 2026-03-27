@@ -90,6 +90,10 @@ export default function ZeichnenFrage({ frage }: Props) {
   // Debounce-Ref für 2s-Auto-Save
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
+  // B47: Max-Intervall — letzter Save-Zeitpunkt + forced Save nach 5s
+  const letzterSaveRef = useRef<number>(Date.now())
+  const MAX_SAVE_INTERVALL_MS = 5000
+
   // Inaktivitäts-Timer (10s ohne Änderung → PNG-Export)
   const inaktivitaetRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -102,16 +106,26 @@ export default function ZeichnenFrage({ frage }: Props) {
     })
   }, [setAntwort])
 
-  // Daten-Änderungs-Handler: debounced Save + Inaktivitäts-Reset
+  // Daten-Änderungs-Handler: debounced Save + Max-Intervall + Inaktivitäts-Reset
   const handleDatenChange = useCallback((daten: string) => {
     aktuellerDatenRef.current = daten
 
-    // Debounced Store-Save (2s)
-    if (debounceRef.current) clearTimeout(debounceRef.current)
-    debounceRef.current = setTimeout(() => {
+    // B47: Bei langem kontinuierlichem Zeichnen — sofort speichern wenn >5s seit letztem Save
+    const jetzt = Date.now()
+    if (jetzt - letzterSaveRef.current >= MAX_SAVE_INTERVALL_MS) {
+      if (debounceRef.current) clearTimeout(debounceRef.current)
       debounceRef.current = null
+      letzterSaveRef.current = jetzt
       setAntwort(frageIdRef.current, { typ: 'visualisierung', daten })
-    }, 2000)
+    } else {
+      // Debounced Store-Save (2s)
+      if (debounceRef.current) clearTimeout(debounceRef.current)
+      debounceRef.current = setTimeout(() => {
+        debounceRef.current = null
+        letzterSaveRef.current = Date.now()
+        setAntwort(frageIdRef.current, { typ: 'visualisierung', daten })
+      }, 2000)
+    }
 
     // Inaktivitäts-Timer zurücksetzen (10s → PNG-Export)
     if (inaktivitaetRef.current) clearTimeout(inaktivitaetRef.current)
@@ -325,6 +339,7 @@ export default function ZeichnenFrage({ frage }: Props) {
             onPNGExport={handlePNGExport}
             disabled={abgegeben}
             onEngineActions={handleEngineActions}
+            onTextCommit={() => setTextRotation(0)}
           />
         </div>
       </div>

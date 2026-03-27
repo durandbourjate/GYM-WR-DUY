@@ -37,8 +37,8 @@ interface KontoEingabe {
   anfangsbestandRechts: string
   eintraegeLinks: EintragZeile[]
   eintraegeRechts: EintragZeile[]
-  saldoBetrag: string
-  saldoSeite: '' | 'links' | 'rechts'
+  saldoLinks: string   // U3: Saldo-Feld auf der linken Seite
+  saldoRechts: string  // U3: Saldo-Feld auf der rechten Seite
 }
 
 function leereZeile(): EintragZeile {
@@ -55,8 +55,8 @@ function leereKontoEingabe(id: string): KontoEingabe {
     anfangsbestandRechts: '',
     eintraegeLinks: [leereZeile()],
     eintraegeRechts: [leereZeile()],
-    saldoBetrag: '',
-    saldoSeite: '',
+    saldoLinks: '',
+    saldoRechts: '',
   }
 }
 
@@ -79,9 +79,9 @@ function zuAntwort(konten: KontoEingabe[]) {
         betrag: parseFloat(e.betrag) || 0,
         gfNr: e.gfNr ? parseInt(e.gfNr) : undefined,
       })),
-      saldo: k.saldoBetrag && k.saldoSeite ? {
-        betrag: parseFloat(k.saldoBetrag) || 0,
-        seite: k.saldoSeite as 'links' | 'rechts',
+      saldo: (k.saldoLinks || k.saldoRechts) ? {
+        betragLinks: parseFloat(k.saldoLinks) || 0,
+        betragRechts: parseFloat(k.saldoRechts) || 0,
       } : undefined,
     })),
   }
@@ -108,8 +108,8 @@ function vonAntwort(
       eintraegeRechts: eingabe.eintraegeRechts.length > 0
         ? eingabe.eintraegeRechts.map((e) => ({ id: neueId(), gegenkonto: e.gegenkonto, betrag: e.betrag ? String(e.betrag) : '', gfNr: e.gfNr ? String(e.gfNr) : '' }))
         : [leereZeile()],
-      saldoBetrag: eingabe.saldo ? String(eingabe.saldo.betrag) : '',
-      saldoSeite: eingabe.saldo?.seite ?? '',
+      saldoLinks: eingabe.saldo?.betragLinks ? String(eingabe.saldo.betragLinks) : '',
+      saldoRechts: eingabe.saldo?.betragRechts ? String(eingabe.saldo.betragRechts) : '',
     }
   })
 }
@@ -456,34 +456,38 @@ export default function TKontoFrage({ frage }: Props) {
                   </div>
                 </div>
 
-                {/* Saldo */}
-                <div className="grid grid-cols-2 border-t-2 border-slate-800 dark:border-slate-300 pt-2 mt-1">
-                  <div className="pr-2 border-r border-slate-800 dark:border-slate-300">
-                    <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Saldo</span>
+                {/* U3: Saldo — Eingabefeld auf BEIDEN Seiten, kein Dropdown */}
+                <div className="grid grid-cols-2 border-t-2 border-slate-800 dark:border-slate-300 mt-1">
+                  <div className="pr-2 border-r border-slate-800 dark:border-slate-300 pt-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Saldo</span>
+                      <input
+                        type="number"
+                        value={konto.saldoLinks}
+                        onChange={(e) => feldAendern(kIdx, 'saldoLinks', e.target.value)}
+                        disabled={readOnly}
+                        placeholder="CHF"
+                        min="0"
+                        step="0.01"
+                        className={`min-h-[36px] w-24 rounded border bg-white px-2 py-1 text-sm text-right text-slate-900 dark:bg-slate-700 dark:text-slate-100 focus:outline-none disabled:opacity-50 placeholder:text-slate-400 ${brd(konto.saldoLinks, readOnly)}`}
+                      />
+                    </div>
                   </div>
-                  <div className="pl-2" />
-                </div>
-                <div className="flex items-center gap-2 mt-1 px-1">
-                  <input
-                    type="number"
-                    value={konto.saldoBetrag}
-                    onChange={(e) => feldAendern(kIdx, 'saldoBetrag', e.target.value)}
-                    disabled={readOnly}
-                    placeholder="Betrag"
-                    min="0"
-                    step="0.01"
-                    className={`min-h-[36px] w-28 rounded border bg-white px-2 py-1 text-sm text-right text-slate-900 dark:bg-slate-700 dark:text-slate-100 focus:outline-none disabled:opacity-50 placeholder:text-slate-400 ${brd(konto.saldoBetrag, readOnly)}`}
-                  />
-                  <select
-                    value={konto.saldoSeite}
-                    onChange={(e) => feldAendern(kIdx, 'saldoSeite', e.target.value)}
-                    disabled={readOnly}
-                    className={`min-h-[36px] rounded border bg-white px-2 py-1 text-sm text-slate-900 dark:bg-slate-700 dark:text-slate-100 focus:outline-none disabled:opacity-50 ${brd(konto.saldoSeite, readOnly)}`}
-                  >
-                    <option value="">-- Seite --</option>
-                    <option value="links">Links (Soll)</option>
-                    <option value="rechts">Rechts (Haben)</option>
-                  </select>
+                  <div className="pl-2 pt-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Saldo</span>
+                      <input
+                        type="number"
+                        value={konto.saldoRechts}
+                        onChange={(e) => feldAendern(kIdx, 'saldoRechts', e.target.value)}
+                        disabled={readOnly}
+                        placeholder="CHF"
+                        min="0"
+                        step="0.01"
+                        className={`min-h-[36px] w-24 rounded border bg-white px-2 py-1 text-sm text-right text-slate-900 dark:bg-slate-700 dark:text-slate-100 focus:outline-none disabled:opacity-50 placeholder:text-slate-400 ${brd(konto.saldoRechts, readOnly)}`}
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

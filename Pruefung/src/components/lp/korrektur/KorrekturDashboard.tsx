@@ -104,6 +104,7 @@ export default function KorrekturDashboard({ pruefungId, eingebettet = false }: 
             neueBewertungen[frageId] = {
               ...bew,
               kiPunkte: ergebnis.erreichtePunkte,
+              lpPunkte: ergebnis.erreichtePunkte, // B53: Punkte direkt zuweisen (deterministisch korrekt)
               quelle: 'auto' as const,
             }
             schuelerGeaendert = true
@@ -460,6 +461,25 @@ export default function KorrekturDashboard({ pruefungId, eingebettet = false }: 
             </button>
           </div>
         )}
+
+        {/* Warnung: Fragen als geprüft markiert, aber ohne Punkte (U7) */}
+        {korrektur && korrektur.schueler.length > 0 && (() => {
+          let ohnePunkte = 0
+          for (const s of korrektur.schueler) {
+            for (const b of Object.values(s.bewertungen)) {
+              if (b.geprueft && b.lpPunkte === null && b.kiPunkte === null) ohnePunkte++
+            }
+          }
+          if (ohnePunkte === 0) return null
+          return (
+            <div className="mb-4 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+              <p className="text-sm text-amber-800 dark:text-amber-200">
+                ⚠ {ohnePunkte} {ohnePunkte === 1 ? 'Bewertung' : 'Bewertungen'} als geprüft markiert, aber ohne Punkte.
+                Leere Punkte bedeuten: noch nicht beurteilt.
+              </p>
+            </div>
+          )
+        })()}
 
         {/* Modus-Toggle + Sortierung */}
         <div className="flex items-center gap-3 mb-4">
