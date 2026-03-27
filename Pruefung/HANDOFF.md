@@ -2,7 +2,6 @@
 
 > Digitale Prüfungsplattform für Wirtschaft & Recht am Gymnasium Hofwil.
 > Stack: React 19 + TypeScript + Vite + Zustand + Tailwind CSS v4 + Tiptap
-> Spec: `Pruefung/Pruefungsplattform_Spec_v2.md`
 
 ---
 
@@ -12,6 +11,37 @@
 - **SEB / iPad** — SEB weiterhin deaktiviert (`sebErforderlich: false`)
 - **Zeichnen Text-Werkzeug** — Grundfunktion live testen (Rotation, Grösse, Fett)
 - **Apps Script Code aktualisieren** — Session 19 Änderungen (Safety-Net entfernt, Individual-Beenden Batch-Write) in apps-script-code.js. User muss Code kopieren und neu bereitstellen.
+- **Phase 3 (optional):** `useKorrekturDaten` + `useKorrekturActions` Hooks — würde KorrekturDashboard von 579 → ~250 Z. reduzieren.
+
+---
+
+### Refactoring — lp/ Sub-Module + Vitest (27.03.2026)
+
+Kein Funktionsumfang geändert — reine Wartbarkeits-Verbesserung. `tsc -b` + `npm run build` + 46 Tests grün.
+
+| Bereich | Vorher | Nachher |
+|---------|--------|---------|
+| `KorrekturDashboard.tsx` | 1007 Z. | 579 Z. (+ 5 Sub-Komponenten) |
+| `App.tsx` | 341 Z. | 263 Z. |
+| `Layout.tsx` | 588 Z. | 515 Z. |
+| `components/lp/` | 35+ flache Dateien | 4 Sub-Module mit `index.ts` |
+| Tests | 0 | 46 (4 Dateien) |
+
+**Neue Sub-Module:**
+- `lp/korrektur/` — KorrekturDashboard + StatKarte, FeedbackDialog, NotenConfigPanel, FragenAnalysePanel, KorrekturAktionsLeiste
+- `lp/durchfuehrung/` — DurchfuehrenDashboard, Multi*, AktivPhase, LobbyPhase, BeendenDialog, BeendetPhase + 7 weitere
+- `lp/vorbereitung/` — VorbereitungPhase, PruefungsComposer, KursAuswahl + composer/
+- `lp/fragenbank/` — FragenBrowser, FragenImport, PoolSyncDialog, RueckSyncDialog + fragenbrowser/
+
+**Neue Dateien:**
+- `src/utils/fragenResolver.ts` — aus App.tsx extrahiert, löst zirkuläre Abhängigkeit App↔Layout
+- `src/components/AbgabeBestaetigung.tsx` — aus App.tsx extrahiert
+- `src/components/FrageRenderer.tsx` — Switch/Case aus Layout.tsx extrahiert
+- `src/hooks/useLPNachrichten.ts` — 10s-Polling aus Layout.tsx extrahiert
+- `src/hooks/useEditableList.ts` — generischer CRUD-Hook für Array-State
+- `vitest.config.ts` — Vitest + jsdom Konfiguration
+
+**Tests:** `fragenResolver.test.ts` (6), `korrekturUtils.test.ts` (13), `autoKorrektur.test.ts` (17), `useEditableList.test.ts` (5)
 
 ### Session 22 — 4 Bugfixes aus Live-Test (26.03.2026 Nacht, 2. Runde)
 

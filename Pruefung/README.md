@@ -52,6 +52,7 @@ Digitale Prüfungsplattform für den Wirtschaft-&-Recht-Unterricht am Gymnasium 
 | State | Zustand (mit Persist) |
 | Styling | Tailwind CSS v4 |
 | Rich Text | Tiptap |
+| Tests | Vitest + @testing-library/react |
 | Backend | Google Apps Script |
 | Daten | Google Sheets + Drive |
 | Auth | Google Identity Services (OAuth 2.0) |
@@ -130,15 +131,21 @@ Environment-Variablen werden über GitHub Secrets gesetzt:
 ```
 src/
 ├── components/
-│   ├── lp/                    LP-Komponenten (Composer, Monitoring)
+│   ├── lp/
+│   │   ├── korrektur/         KorrekturDashboard + Sub-Komponenten (Noten, Analyse, Aktionen)
+│   │   ├── durchfuehrung/     DurchfuehrenDashboard, AktivPhase, LobbyPhase, Monitoring
+│   │   ├── vorbereitung/      VorbereitungPhase, PruefungsComposer, KursAuswahl + composer/
+│   │   ├── fragenbank/        FragenBrowser, FragenImport, Pool-Sync + fragenbrowser/
+│   │   ├── frageneditor/      Fragen-Editor mit allen Typen
+│   │   └── ...                LPStartseite, LPHeader, HilfeSeite, TrackerSection
 │   ├── fragetypen/            13 Typen: MC, Freitext, Lückentext, Zuordnung, R/F, Berechnung + 4 FiBu + Aufgabengruppe + PDF + Zeichnen
-│   └── ...                    Login, Layout, Timer, Abgabe, etc.
+│   └── ...                    Login, Layout, FrageRenderer, AbgabeBestaetigung, etc.
 ├── services/                  API, Auth, SEB, Auto-Save, Retry-Queue
 ├── store/                     Zustand Stores (Prüfung, Auth, Theme)
-├── hooks/                     Monitoring, UX, Tab-Konflikt, Lockdown, Geräteerkennung
+├── hooks/                     Monitoring, UX, Tab-Konflikt, Lockdown, LP-Nachrichten, EditableList
 ├── types/                     TypeScript Interfaces
 ├── data/                      Demo-Daten
-└── utils/                     Hilfsfunktionen
+└── utils/                     Hilfsfunktionen (fragenResolver, korrekturUtils, autoKorrektur)
 seb/                           SEB-Konfiguration
 ```
 
@@ -170,7 +177,6 @@ seb/                           SEB-Konfiguration
 |----------|--------|
 | [`HANDOFF.md`](HANDOFF.md) | Aktueller Entwicklungsstand, Architektur, offene Tasks |
 | [`Google_Workspace_Setup.md`](Google_Workspace_Setup.md) | Backend-Einrichtung Schritt für Schritt |
-| [`Pruefungsplattform_Spec_v2.md`](Pruefungsplattform_Spec_v2.md) | Gesamtspezifikation |
 | [`seb/README.md`](seb/README.md) | SEB-Konfiguration |
 
 ## Lizenz
