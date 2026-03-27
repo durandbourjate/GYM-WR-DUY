@@ -8,9 +8,10 @@
 ## Offene Punkte
 
 - **SEB / iPad** — SEB weiterhin deaktiviert (`sebErforderlich: false`)
-- **Apps Script aktualisieren** — Multi-Teacher + KI-Prompts. Code kopieren → Apps Script Editor → Bereitstellen → Neue Version.
-- **Lehrpersonen-Tab anlegen** — Im CONFIGS-Sheet einen Tab "Lehrpersonen" mit Spalten: email, name, kuerzel, fachschaft, rolle, apiKey, aktiv. Erste Zeile: DUY-Daten mit rolle=admin.
-- **erstelltVon Backfill** — Bestehende Prüfungen im Configs-Sheet: Spalte "erstelltVon" hinzufügen, alle auf `yannick.durand@gymhofwil.ch` setzen.
+- **LP-Liste im BerechtigungenEditor** — Aktuell `lpListe={[]}` hardcodiert im FragenEditor. Muss beim Öffnen aus `ladeLehrpersonen()` geladen werden (gecacht pro Session).
+- **Duplikat-Buttons** — "Als Kopie übernehmen" Button im FragenBrowser + "Prüfung duplizieren" im Prüfungs-Dashboard. Backend-Endpoints existieren (`dupliziereFrage`, `duplizierePruefung`), Frontend-UI fehlt.
+- **Rechte-Badges** — Geteilte Fragen/Prüfungen im Browser mit Rolle-Badge (Inhaber/Bearbeiter/Betrachter) anzeigen. `_recht` Feld wird vom Backend geliefert.
+- **Prüfungs-Sharing UI** — `BerechtigungenEditor` im VorbereitungDashboard einbauen (analog zu Frageneditor). Backend-Endpoint `setzeBerechtigungen` existiert.
 
 ---
 
@@ -24,8 +25,20 @@ Zentralisierte Multi-LP-Vorbereitung (2–50 LP am Hofwil).
 | 2 | **Prüfungs-Isolation**: `erstelltVon` Feld, Filter in `ladeAlleConfigs()`, Ownership-Checks in `speichereConfig/loeschePruefung` | ✅ Code fertig |
 | 3 | **Fachschaft-Sharing**: `geteilt: 'fachschaft'` Stufe, `fachschaftZuFachbereiche()` Mapping, Filter in `ladeFragenbank()`, 3-Wege-Select im Frageneditor | ✅ Code fertig |
 | 4 | **Per-LP API Key**: `getApiKeyFuerLP()`, `callerEmail` Parameter in allen Claude-Calls | ✅ Code fertig |
+| 5 | **Rechte-System**: Google-Docs-Modell (Inhaber/Bearbeiter/Betrachter), `hatRecht()`/`istSichtbar()`/`ermittleRecht()`, BerechtigungenEditor-Komponente, Duplikat-/Berechtigungs-Endpoints | ✅ Backend + Typen fertig, Frontend-UI teilweise |
 
-**Aktivierung:** Lehrpersonen-Tab + erstelltVon-Backfill manuell im Google Sheet anlegen. Dann Apps Script deployen.
+**Aktivierung:** ✅ Lehrpersonen-Tab + erstelltVon-Backfill erledigt (27.03.2026). Apps Script deployed.
+
+**Datenmodell Berechtigungen** (JSON-Array pro Frage/Prüfung):
+```
+berechtigungen: [
+  { email: "*", recht: "betrachter" }                    // Schulweit
+  { email: "fachschaft:WR", recht: "betrachter" }        // Fachschaft
+  { email: "kollegin@gymhofwil.ch", recht: "bearbeiter" } // Individuell
+]
+```
+Rollen: Inhaber (alles) > Bearbeiter (ändern, nicht löschen) > Betrachter (lesen + duplizieren).
+API-Key-Kaskade: LP → Fachschaft (`_fachschaft_wr@intern`) → Schule (`_schule@intern`) → Global.
 
 **Dateien geändert:**
 - `apps-script-code.js` — ~100 Stellen (LP-Checks, Helpers, Endpoints, Filter, API-Key-Routing)
