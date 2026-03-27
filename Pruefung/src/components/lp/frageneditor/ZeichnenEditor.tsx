@@ -29,6 +29,7 @@ const ALLE_WERKZEUGE: { key: CanvasConfig['werkzeuge'][number]; label: string }[
   { key: 'linie', label: 'Linie' },
   { key: 'pfeil', label: 'Pfeil' },
   { key: 'rechteck', label: 'Rechteck' },
+  { key: 'ellipse', label: 'Ellipse' },
   { key: 'text', label: 'Text' },
 ]
 

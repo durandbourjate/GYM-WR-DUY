@@ -155,7 +155,7 @@ export interface CanvasConfig {
   hoehe: number;
   koordinatensystem: boolean;
   achsenBeschriftung?: { x: string; y: string };
-  werkzeuge: ('stift' | 'linie' | 'pfeil' | 'text' | 'rechteck')[];
+  werkzeuge: ('stift' | 'linie' | 'pfeil' | 'text' | 'rechteck' | 'ellipse')[];
   hintergrundbild?: string;
   hintergrundbildId?: string;
   groessePreset?: 'klein' | 'mittel' | 'gross' | 'auto';
