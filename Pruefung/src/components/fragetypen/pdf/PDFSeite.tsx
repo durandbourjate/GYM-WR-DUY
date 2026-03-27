@@ -266,8 +266,10 @@ export function PDFSeite({
       const cssX = e.clientX - containerRect.left
       const cssY = e.clientY - containerRect.top
       setTextOverlay({ sichtbar: true, relX, relY, cssX, cssY, text: '' })
-      // Focus nach kurzer Verzögerung (DOM muss erst rendern)
-      setTimeout(() => textInputRef.current?.focus(), 30)
+      // iOS: focus() muss im synchronen Event-Stack aufgerufen werden für Tastatur
+      // Zuerst sofort (falls Input schon im DOM), dann nach Render
+      textInputRef.current?.focus()
+      requestAnimationFrame(() => textInputRef.current?.focus())
       return
     }
 
@@ -353,7 +355,7 @@ export function PDFSeite({
       cssX,
       cssY,
       farbe: ann.farbe,
-      groesse: ann.groesse || 16,
+      groesse: ann.groesse || 18,
     })
     setTimeout(() => textEditInputRef.current?.focus(), 30)
   }, [readOnly, onAnnotationEditieren, seitenInfo, annotationen])
@@ -493,7 +495,7 @@ export function PDFSeite({
     <div
       ref={containerRef}
       className="relative mx-auto border border-slate-200 dark:border-slate-700 shadow-sm bg-white"
-      style={{ width: breite, height: hoehe, cursor }}
+      style={{ width: breite, height: hoehe, cursor, touchAction: aktivesWerkzeug === 'freihand' ? 'none' : undefined }}
       onClick={handleClick}
       onDoubleClick={handleDoubleClick}
       onMouseUp={handleMouseUp}
@@ -612,7 +614,7 @@ export function PDFSeite({
         return (
           <button
             type="button"
-            style={{ position: 'absolute', left: px - 8, top: py - (ann.groesse || 16) - 24, zIndex: 25 }}
+            style={{ position: 'absolute', left: px - 8, top: py - (ann.groesse || 18) - 24, zIndex: 25 }}
             className="px-2 py-1 text-xs text-red-600 bg-white dark:bg-slate-800 border border-red-300 dark:border-red-700 rounded shadow-lg hover:bg-red-50 dark:hover:bg-red-900/30"
             title="Löschen"
             onClick={(e) => {
@@ -808,7 +810,7 @@ function renderTextAnnotation(
 ): React.ReactNode {
   const px = ann.position.x * seitenInfo.breite
   const py = ann.position.y * seitenInfo.hoehe
-  const fontSize = ann.groesse || 16
+  const fontSize = ann.groesse || 18
 
   return (
     <g key={`txt-${ann.id}`} data-annotation-id={ann.id}>

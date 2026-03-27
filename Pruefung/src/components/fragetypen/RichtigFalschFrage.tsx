@@ -83,7 +83,7 @@ export default function RichtigFalschFrage({ frage }: Props) {
                 <button
                   onClick={() => handleKlick(aussage.id, true)}
                   disabled={abgegeben}
-                  className={`flex-1 py-2 text-sm font-medium rounded-lg border-2 transition-all cursor-pointer
+                  className={`flex-1 flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-lg border-2 transition-all cursor-pointer
                     ${gewaehlt === true
                       ? 'border-slate-300 dark:border-slate-500 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200'
                       : 'border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-400 hover:border-slate-400 dark:hover:border-slate-500'
@@ -91,12 +91,13 @@ export default function RichtigFalschFrage({ frage }: Props) {
                     ${abgegeben ? 'cursor-not-allowed' : ''}
                   `}
                 >
-                  <span className={`inline-flex items-center justify-center w-5 h-5 rounded-full border-2 mr-1 text-xs ${gewaehlt === true ? 'border-green-600 bg-green-600 text-white dark:border-green-400 dark:bg-green-400 dark:text-slate-900' : 'border-slate-300 dark:border-slate-600'}`}>{gewaehlt === true ? '✓' : ''}</span> Richtig
+                  <span className={`inline-flex items-center justify-center w-5 h-5 rounded-full border-2 text-xs shrink-0 ${gewaehlt === true ? 'border-green-600 bg-green-600 text-white dark:border-green-400 dark:bg-green-400 dark:text-slate-900' : 'border-slate-300 dark:border-slate-600'}`}>{gewaehlt === true ? '✓' : ''}</span>
+                  <span>Richtig</span>
                 </button>
                 <button
                   onClick={() => handleKlick(aussage.id, false)}
                   disabled={abgegeben}
-                  className={`flex-1 py-2 text-sm font-medium rounded-lg border-2 transition-all cursor-pointer
+                  className={`flex-1 flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-lg border-2 transition-all cursor-pointer
                     ${gewaehlt === false
                       ? 'border-slate-300 dark:border-slate-500 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200'
                       : 'border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-400 hover:border-slate-400 dark:hover:border-slate-500'
@@ -104,7 +105,8 @@ export default function RichtigFalschFrage({ frage }: Props) {
                     ${abgegeben ? 'cursor-not-allowed' : ''}
                   `}
                 >
-                  <span className={`inline-flex items-center justify-center w-5 h-5 rounded-full border-2 mr-1 text-xs ${gewaehlt === false ? 'border-red-600 bg-red-600 text-white dark:border-red-400 dark:bg-red-400 dark:text-slate-900' : 'border-slate-300 dark:border-slate-600'}`}>{gewaehlt === false ? '✗' : ''}</span> Falsch
+                  <span className={`inline-flex items-center justify-center w-5 h-5 rounded-full border-2 text-xs shrink-0 ${gewaehlt === false ? 'border-red-600 bg-red-600 text-white dark:border-red-400 dark:bg-red-400 dark:text-slate-900' : 'border-slate-300 dark:border-slate-600'}`}>{gewaehlt === false ? '✗' : ''}</span>
+                  <span>Falsch</span>
                 </button>
               </div>
             </div>

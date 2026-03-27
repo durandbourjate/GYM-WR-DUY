@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useCallback } from 'react'
 import type { PruefungsMaterial } from '../types/pruefung.ts'
 import AudioPlayer from './AudioPlayer.tsx'
 
@@ -22,13 +22,55 @@ export default function MaterialPanel({ materialien, modus, onSchliessen, onModu
   const [aktivesId, setAktivesId] = useState<string | null>(
     materialien.length === 1 ? materialien[0].id : null
   )
+  // Resize-State für Split-Modus (Breite in px, null = Standard 55%)
+  const [splitBreite, setSplitBreite] = useState<number | null>(null)
+  const resizingRef = useRef(false)
+  const startXRef = useRef(0)
+  const startBreiteRef = useRef(0)
+
+  const handleResizeStart = useCallback((e: React.PointerEvent) => {
+    e.preventDefault()
+    resizingRef.current = true
+    startXRef.current = e.clientX
+    const panel = (e.target as HTMLElement).closest('[data-material-panel]')
+    startBreiteRef.current = panel?.getBoundingClientRect().width ?? 500
+
+    const handleMove = (ev: PointerEvent) => {
+      if (!resizingRef.current) return
+      // Panel wächst nach links → kleinerer clientX = grössere Breite
+      const diff = startXRef.current - ev.clientX
+      const neueBreite = Math.max(300, Math.min(window.innerWidth * 0.8, startBreiteRef.current + diff))
+      setSplitBreite(neueBreite)
+    }
+    const handleUp = () => {
+      resizingRef.current = false
+      document.removeEventListener('pointermove', handleMove)
+      document.removeEventListener('pointerup', handleUp)
+      document.body.style.cursor = ''
+      document.body.style.userSelect = ''
+    }
+    document.addEventListener('pointermove', handleMove)
+    document.addEventListener('pointerup', handleUp)
+    document.body.style.cursor = 'col-resize'
+    document.body.style.userSelect = 'none'
+  }, [])
 
   const aktivesMaterial = materialien.find((m) => m.id === aktivesId)
 
   // Split-Modus: Seitliches Panel ohne Backdrop
   if (modus === 'split') {
     return (
-      <div className="w-[55%] min-w-[400px] h-full min-h-0 bg-white dark:bg-slate-800 border-l border-slate-200 dark:border-slate-700 flex flex-col overflow-hidden">
+      <div
+        data-material-panel
+        className="h-full min-h-0 bg-white dark:bg-slate-800 border-l border-slate-200 dark:border-slate-700 flex flex-col overflow-hidden relative"
+        style={{ width: splitBreite ? `${splitBreite}px` : '55%', minWidth: 300 }}
+      >
+        {/* Resize-Handle am linken Rand */}
+        <div
+          onPointerDown={handleResizeStart}
+          className="absolute left-0 top-0 bottom-0 w-1.5 cursor-col-resize hover:bg-indigo-500/30 active:bg-indigo-500/50 z-10 transition-colors"
+          title="Breite anpassen"
+        />
         {/* Header — kompakt im Split-Modus */}
         <div className="flex items-center justify-between px-3 py-2 border-b border-slate-200 dark:border-slate-700 shrink-0">
           <h2 className="text-xs font-semibold text-slate-700 dark:text-slate-200">

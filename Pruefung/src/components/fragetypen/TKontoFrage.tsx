@@ -33,6 +33,8 @@ interface KontoEingabe {
   beschriftungLinks: string
   beschriftungRechts: string
   kontenkategorie: string
+  sollHaben: string          // Soll oder Haben (Titel-Dropdown)
+  zunahmeAbnahme: string     // +Zunahme oder -Abnahme (Titel-Dropdown)
   anfangsbestandLinks: string
   anfangsbestandRechts: string
   eintraegeLinks: EintragZeile[]
@@ -51,6 +53,8 @@ function leereKontoEingabe(id: string): KontoEingabe {
     beschriftungLinks: '',
     beschriftungRechts: '',
     kontenkategorie: '',
+    sollHaben: '',
+    zunahmeAbnahme: '',
     anfangsbestandLinks: '',
     anfangsbestandRechts: '',
     eintraegeLinks: [leereZeile()],
@@ -69,6 +73,8 @@ function zuAntwort(konten: KontoEingabe[]) {
       beschriftungLinks: k.beschriftungLinks || undefined,
       beschriftungRechts: k.beschriftungRechts || undefined,
       kontenkategorie: k.kontenkategorie || undefined,
+      sollHaben: k.sollHaben || undefined,
+      zunahmeAbnahme: k.zunahmeAbnahme || undefined,
       eintraegeLinks: k.eintraegeLinks.map((e) => ({
         gegenkonto: e.gegenkonto,
         betrag: parseFloat(e.betrag) || 0,
@@ -100,6 +106,8 @@ function vonAntwort(
       beschriftungLinks: eingabe.beschriftungLinks ?? '',
       beschriftungRechts: eingabe.beschriftungRechts ?? '',
       kontenkategorie: eingabe.kontenkategorie ?? '',
+      sollHaben: (eingabe as Record<string, unknown>).sollHaben as string ?? '',
+      zunahmeAbnahme: (eingabe as Record<string, unknown>).zunahmeAbnahme as string ?? '',
       anfangsbestandLinks: '',
       anfangsbestandRechts: '',
       eintraegeLinks: eingabe.eintraegeLinks.length > 0
@@ -224,11 +232,35 @@ export default function TKontoFrage({ frage }: Props) {
           const def = frage.konten[kIdx]
           return (
             <div key={konto.id} className="rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 overflow-hidden">
-              {/* Konto-Header */}
+              {/* Konto-Header — zentriert, mit Soll/Haben + Zunahme/Abnahme */}
               <div className="px-4 py-3 bg-slate-50 dark:bg-slate-700/50 border-b border-slate-200 dark:border-slate-700">
-                <span className="text-sm font-bold text-slate-800 dark:text-slate-100">
+                <div className="text-center text-sm font-bold text-slate-800 dark:text-slate-100 mb-2">
                   {kontoLabel(def.kontonummer)}
-                </span>
+                </div>
+                {opts.beschriftungSollHaben && (
+                  <div className="flex items-center justify-center gap-3">
+                    <select
+                      value={konto.sollHaben}
+                      onChange={(e) => feldAendern(kIdx, 'sollHaben', e.target.value)}
+                      disabled={readOnly}
+                      className={`min-h-[32px] rounded border bg-white px-2 py-0.5 text-xs font-medium text-slate-700 dark:bg-slate-700 dark:text-slate-200 focus:outline-none disabled:opacity-50 ${brd(konto.sollHaben, readOnly)}`}
+                    >
+                      <option value="">Soll/Haben...</option>
+                      <option value="Soll">Soll</option>
+                      <option value="Haben">Haben</option>
+                    </select>
+                    <select
+                      value={konto.zunahmeAbnahme}
+                      onChange={(e) => feldAendern(kIdx, 'zunahmeAbnahme', e.target.value)}
+                      disabled={readOnly}
+                      className={`min-h-[32px] rounded border bg-white px-2 py-0.5 text-xs font-medium text-slate-700 dark:bg-slate-700 dark:text-slate-200 focus:outline-none disabled:opacity-50 ${brd(konto.zunahmeAbnahme, readOnly)}`}
+                    >
+                      <option value="">+/−...</option>
+                      <option value="+Zunahme">(+) Zunahme</option>
+                      <option value="-Abnahme">(−) Abnahme</option>
+                    </select>
+                  </div>
+                )}
               </div>
 
               {/* Kontenkategorie */}

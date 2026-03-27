@@ -24,6 +24,14 @@ const leereBilanz = (): BilanzEingabe => ({ linkeSeite: leereSeite(''), rechteSe
 const leereStufe = (): StufeEingabe => ({ id: neueId(), label: '', konten: [leereKZ()], zwischentotal: '' })
 const leereER = (): ERFeldEingabe => ({ stufen: [leereStufe()], gewinnVerlust: '' })
 
+/** Standard-Kontenhauptgruppen KMU (Schweiz) */
+const KONTENHAUPTGRUPPEN = [
+  'Umlaufvermögen', 'Anlagevermögen',
+  'Kurzfristiges Fremdkapital', 'Langfristiges Fremdkapital', 'Eigenkapital',
+  'Betrieblicher Ertrag aus Lieferungen und Leistungen', 'Übriger betrieblicher Ertrag',
+  'Materialaufwand', 'Personalaufwand', 'Übriger Betriebsaufwand', 'Abschreibungen',
+]
+
 // CSS Klassen-Helfer
 const inputSm = 'min-h-[36px] rounded border border-slate-300 bg-white px-2 py-1 text-sm text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 focus:border-indigo-500 focus:outline-none disabled:opacity-50'
 const numInput = `${inputSm} text-right placeholder:text-slate-400`
@@ -210,13 +218,17 @@ function BilanzSeiteUI({ seite, bilanzsumme, readOnly, konten, onUpdate, onBsCha
   seite: SeiteEingabe; bilanzsumme: string; readOnly: boolean; konten: string[]
   onUpdate: (fn: (s: SeiteEingabe) => void) => void; onBsChange: (v: string) => void
 }) {
-  // Farbe erst nach SuS-Auswahl: Aktiven=gelb, Passiven=rot, sonst neutral
+  // Farbe erst nach SuS-Auswahl
   const labelWert = seite.label
   const farbe = labelWert === 'Aktiven'
     ? 'border-yellow-300 dark:border-yellow-700 bg-yellow-50/50 dark:bg-yellow-900/10'
     : labelWert === 'Passiven'
       ? 'border-red-200 dark:border-red-800 bg-red-50/50 dark:bg-red-900/10'
-      : 'border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/30'
+      : labelWert === 'Aufwand'
+        ? 'border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-900/10'
+        : labelWert === 'Ertrag'
+          ? 'border-green-200 dark:border-green-800 bg-green-50/50 dark:bg-green-900/10'
+          : 'border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/30'
 
   return (
     <div className={`rounded-lg border p-3 min-w-0 overflow-hidden ${farbe}`}>
@@ -225,14 +237,19 @@ function BilanzSeiteUI({ seite, bilanzsumme, readOnly, konten, onUpdate, onBsCha
         <option value="">-- Seite wählen --</option>
         <option value="Aktiven">Aktiven</option>
         <option value="Passiven">Passiven</option>
+        <option value="Aufwand">Aufwand</option>
+        <option value="Ertrag">Ertrag</option>
       </select>
 
       <div className="space-y-3">
         {seite.gruppen.map((gruppe, gi) => (
           <div key={gruppe.id} className="rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 p-2">
             <div className="flex items-center gap-1 mb-2">
-              <input type="text" value={gruppe.label} onChange={e => onUpdate(s => { s.gruppen[gi].label = e.target.value })} disabled={readOnly}
-                placeholder="Kontenhauptgruppe" className={`${inputSm} flex-1 font-medium placeholder:text-slate-400 ${!readOnly && !gruppe.label ? 'border-violet-400 dark:border-violet-500' : ''}`} />
+              <select value={gruppe.label} onChange={e => onUpdate(s => { s.gruppen[gi].label = e.target.value })} disabled={readOnly}
+                className={`${inputSm} flex-1 font-medium ${!readOnly && !gruppe.label ? 'border-violet-400 dark:border-violet-500' : ''}`}>
+                <option value="">Kontenhauptgruppe...</option>
+                {KONTENHAUPTGRUPPEN.map(khg => <option key={khg} value={khg}>{khg}</option>)}
+              </select>
               {!readOnly && (
                 <>
                   <button type="button" onClick={() => onUpdate(s => { if (gi > 0) [s.gruppen[gi], s.gruppen[gi-1]] = [s.gruppen[gi-1], s.gruppen[gi]] })} disabled={gi === 0}
@@ -265,7 +282,7 @@ function BilanzSeiteUI({ seite, bilanzsumme, readOnly, konten, onUpdate, onBsCha
       <div className="mt-3 pt-2 border-t border-slate-200 dark:border-slate-600 flex items-center justify-end gap-2">
         <span className="text-xs font-bold text-slate-600 dark:text-slate-300">Bilanzsumme:</span>
         <input type="number" value={bilanzsumme} onChange={e => onBsChange(e.target.value)} disabled={readOnly}
-          placeholder="CHF" min="0" step="0.01" className={`${numInput} w-32 font-bold ${!readOnly && !bilanzsumme ? 'border-violet-400 dark:border-violet-500' : ''}`} />
+          placeholder="CHF" min="0" step="0.01" className={`${numInput} w-24 font-bold ${!readOnly && !bilanzsumme ? 'border-violet-400 dark:border-violet-500' : ''}`} />
       </div>
     </div>
   )
