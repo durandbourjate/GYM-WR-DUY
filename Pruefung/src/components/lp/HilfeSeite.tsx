@@ -249,10 +249,10 @@ function HilfeFragen() {
 
       <Untertitel>Finanzbuchhaltung (FiBu)</Untertitel>
       <Text>
-        <strong>Buchungssatz</strong> — Geschäftsfälle mit Soll/Haben-Konten aus dem Schweizer KMU-Kontenrahmen. Compound Entries möglich. Soll/Haben-Seiten sind farblich neutral (kein Hinweis auf Kontenart).
+        <strong>Buchungssatz</strong> — Geschäftsfälle im Format «Soll-Konto an Haben-Konto Betrag». Konten aus dem Schweizer KMU-Kontenrahmen. Ein Betrag pro Buchungssatz, klar strukturiert.
       </Text>
       <Text>
-        <strong>T-Konto</strong> — T-Konten-Form mit Soll/Haben-Buchungen, Gegenkonten, Geschäftsfall-Nummer und Saldo. Kontenkategorie-Badge in FiBu-Farben (Aktiv=gelb, Passiv=rot, Aufwand=blau, Ertrag=grün).
+        <strong>T-Konto</strong> — T-Konten-Form mit Soll/Haben-Buchungen, Gegenkonten, Geschäftsfall-Nummer und Saldo (Eingabefeld auf beiden Seiten des T). Kontenkategorie-Badge in FiBu-Farben (Aktiv=gelb, Passiv=rot, Aufwand=blau, Ertrag=grün).
       </Text>
       <Text>
         <strong>Kontenbestimmung</strong> — Geschäftsfall → Konto/Kategorie/Seite bestimmen. 3 Modi verfügbar.
@@ -269,7 +269,10 @@ function HilfeFragen() {
         <strong>Aufgabengruppe</strong> — Bündelt mehrere Teilaufgaben unter einem gemeinsamen Kontext/Fallbeispiel. Fächerübergreifend nutzbar.
       </Text>
       <Text>
-        <strong>PDF-Annotation</strong> — LP lädt ein PDF hoch (z.B. Zeitungsartikel, Gesetzestext). SuS annotieren direkt auf dem PDF mit 4 Werkzeugen: Text-Highlighter, Kommentar, Freihand-Zeichnung und Label-Zuordnung. LP kann vordefinierte Kategorien festlegen (z.B. Stilmittel, Argumentationstypen). Korrektur mit optionalem KI-Vorschlag.
+        <strong>Zeichnen/Visualisierung</strong> — Zeichenfläche mit 6 Werkzeugen: Stift (3 Stärken, durchgehend/gestrichelt), Linie, Pfeil, Rechteck, Ellipse, Text. Alle Werkzeuge in Dropdown-Menüs. Farben (3×3 Grid), Textformatierung (Grösse S/M/L/XL, Fett, Rotation). Selektierte Elemente nachträglich bearbeitbar.
+      </Text>
+      <Text>
+        <strong>PDF-Annotation</strong> — LP lädt ein PDF hoch (z.B. Zeitungsartikel, Gesetzestext). SuS annotieren direkt auf dem PDF mit Werkzeugen: Text-Highlighter, Kommentar, Freihand-Zeichnung (3 Stärken + gestrichelt) und Label-Zuordnung. LP kann vordefinierte Kategorien festlegen (z.B. Stilmittel, Argumentationstypen). Korrektur mit optionalem KI-Vorschlag.
       </Text>
 
       <Untertitel>Metadaten pro Frage</Untertitel>
@@ -388,7 +391,7 @@ function HilfeDurchfuehrung() {
       <Schritt nr={2}>Wählen Sie die Kurse aus (pro Gefäss, z.B. SF WR). SuS können in mehreren Kursen vorkommen — Duplikate werden automatisch erkannt. Einzelne SuS können über die Checkboxen innerhalb der Kursübersicht ab-/angewählt werden.</Schritt>
       <Schritt nr={3}>Zeitzuschläge (Nachteilsausgleich): Geben Sie die Zusatzminuten direkt neben dem SuS-Namen ein (Eingabefeld in der Teilnehmerliste).</Schritt>
       <Schritt nr={4}>Optional: Einladungs-E-Mails an die ausgewählten SuS versenden.</Schritt>
-      <Schritt nr={5}>Wählen Sie die <strong>Kontrollstufe</strong> (Soft-Lockdown): Keine (keine Einschränkungen, für Übungen), Locker (Nur Logging), Standard (Copy/Paste-Block, Vollbild, 3 Verstösse = Sperre) oder Streng (Sofort-Pause). iPads werden automatisch auf maximal Standard heruntergestuft.</Schritt>
+      <Schritt nr={5}>Wählen Sie die <strong>Kontrollstufe</strong> (Soft-Lockdown): Keine (keine Einschränkungen, für Übungen), Locker (Verstösse werden gezählt und im Monitoring angezeigt, aber keine Sperre), Standard (Copy/Paste-Block, Vollbild, 3 Verstösse = Sperre) oder Streng (Sofort-Pause). iPads werden automatisch auf maximal Standard heruntergestuft.</Schritt>
       <Schritt nr={6}>Klicken Sie &laquo;Weiter zur Lobby&raquo; — die Teilnehmer werden gespeichert.</Schritt>
 
       <Untertitel>Phase 2: Lobby</Untertitel>
@@ -456,7 +459,7 @@ function HilfeKorrektur() {
       <Schritt nr={1}><strong>Auto-Korrektur</strong> — MC, R/F, Lückentext, Zuordnung und Berechnung werden sofort automatisch bewertet. Punkte erscheinen direkt. Diese Fragen werden automatisch als «Geprüft» markiert.</Schritt>
       <Schritt nr={2}><strong>KI-Korrektur</strong> — Für komplexe Fragetypen (Freitext, FiBu, Zeichnen) kann die KI-Korrektur gestartet werden.</Schritt>
       <Schritt nr={3}><strong>LP prüft</strong> — Punkte ändern, Kommentar schreiben oder Audio aufnehmen markiert die Frage automatisch als &laquo;Geprüft&raquo;. Wenn alle Fragen eines SuS geprüft sind, wechselt der Status auf &laquo;Review fertig&raquo;.</Schritt>
-      <Schritt nr={4}><strong>Ergebnisse freigeben</strong> — Wenn alle SuS korrigiert sind, erscheint ein grünes Banner. Mit einem Klick wird die Einsicht für SuS freigeschaltet. SuS erhalten eine E-Mail mit Link.</Schritt>
+      <Schritt nr={4}><strong>Ergebnisse freigeben</strong> — Wenn alle SuS korrigiert sind, erscheint ein grünes Banner. Die Freigabe ist blockiert solange Bewertungen ohne Punkte existieren (Schutz vor versehentlich unvollständiger Korrektur). Export und Feedback zeigen eine Warnung bei fehlenden Punkten.</Schritt>
 
       <Untertitel>SuS-PDFs & Export</Untertitel>
       <Text>

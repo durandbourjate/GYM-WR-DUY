@@ -32,10 +32,11 @@ Digitale Prüfungsplattform für den Wirtschaft-&-Recht-Unterricht am Gymnasium 
 - In-App Hilfe: Anleitung, FAQ und Tipps direkt in der Plattform
 - Zeitzuschläge (Nachteilsausgleich) pro SuS mit frei wählbarer Minutenzahl
 - Auto-Korrektur: MC, R/F, Lückentext, Zuordnung, Berechnung werden sofort automatisch bewertet
-- Korrektur-Workflow: Auto-Geprüft bei LP-Aktion, Status-Tracking, Freigabe-Banner
+- Korrektur-Workflow: Auto-Geprüft bei LP-Aktion, Status-Tracking, Freigabe-Banner, Schutz vor Freigabe bei fehlenden Punkten
 - Material-Panel: Split-Screen (55%) oder Overlay, unterstützt PDF, Video, Audio, Links
 - SEB-Integration: Auto-Config-Download, harte Durchsetzung, LP-Ausnahmen, SuS-Anleitung
-- Soft-Lockdown (4 Stufen): SEB-unabhängige Sicherheit — Keine (für Übungen), Locker (Logging), Standard (Copy/Paste-Block, Vollbild, 3 Verstösse = Sperre), Streng (Sofort-Pause). Automatische iPad-Erkennung mit Downgrade.
+- Zeichnen-Toolbar: 6 Werkzeuge (Stift, Linie, Pfeil, Rechteck, Ellipse, Text) mit Dropdown-Menüs (Stärke, Stil gestrichelt/durchgehend, Farben 3×3 Grid). Selektierte Elemente nachträglich bearbeitbar (Farbe, Grösse, Rotation).
+- Soft-Lockdown (4 Stufen): SEB-unabhängige Sicherheit — Keine (für Übungen), Locker (Logging mit Verstoss-Zähler, ohne Sperre), Standard (Copy/Paste-Block, Vollbild, 3 Verstösse = Sperre), Streng (Sofort-Pause). Automatische iPad-Erkennung mit Downgrade.
 - Multi-Prüfungs-Dashboard: Mehrere Prüfungen parallel in einem Tab überwachen (`?ids=a,b`). Live-Zusammenfassung + Einzelansicht.
 
 **Backend**
@@ -162,7 +163,7 @@ seb/                           SEB-Konfiguration
 | Stufe | Beschreibung |
 |-------|-------------|
 | Keine | Keine Einschränkungen (für Übungen und Einrichtungstests) |
-| Locker | Nur Logging + Warnung bei Verstössen |
+| Locker | Logging mit Verstoss-Zähler (sichtbar im Monitoring), keine Sperre |
 | Standard | Copy/Paste-Block, Vollbild, Rechtsklick/DevTools gesperrt, 3 Verstösse = Sperre |
 | Streng | Sofort-Pause bei Vollbild-Verlust, SEB empfohlen |
 
