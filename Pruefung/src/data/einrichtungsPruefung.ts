@@ -61,6 +61,12 @@ export const einrichtungsPruefung: PruefungsConfig = {
       typ: 'pdf',
       url: './materialien/witzsammlung.pdf',
     },
+    {
+      id: 'mat-or-auszug',
+      titel: 'OR-Auszug: Kaufvertrag (Art. 184–215)',
+      typ: 'pdf',
+      url: './materialien/or_auszug.pdf',
+    },
   ],
 
   zufallsreihenfolgeFragen: false,
