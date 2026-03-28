@@ -27,6 +27,11 @@ export default function FreitextEditor({ laenge, setLaenge, placeholder, setPlac
             placeholder="Hinweis für SuS..." className="input-field" />
         </Feld>
       </div>
+      {/* Hinweis Rechtschreibprüfung */}
+      <div className="mt-3 p-2.5 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg text-xs text-blue-700 dark:text-blue-300">
+        💡 <strong>Rechtschreibprüfung:</strong> Die Browser-Autokorrektur kann pro Prüfung deaktiviert werden (z.B. für Diktate). Einstellung unter: Prüfung bearbeiten → Konfiguration → Rechtschreibprüfung.
+      </div>
+
       <div className="flex gap-3 mt-3">
         <Feld label="Min. Wörter (optional)">
           <input

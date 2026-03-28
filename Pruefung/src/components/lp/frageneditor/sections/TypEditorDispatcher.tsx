@@ -75,6 +75,8 @@ interface TypEditorDispatcherProps {
   // Richtig/Falsch
   aussagen: RichtigFalschFrage['aussagen']
   setAussagen: React.Dispatch<React.SetStateAction<RichtigFalschFrage['aussagen']>>
+  erklaerungSichtbar?: boolean
+  setErklaerungSichtbar?: (v: boolean) => void
 
   // Berechnung
   ergebnisse: BerechnungFrage['ergebnisse']
@@ -454,6 +456,8 @@ export default function TypEditorDispatcher(props: TypEditorDispatcherProps) {
           <RichtigFalschEditor
             aussagen={props.aussagen}
             setAussagen={props.setAussagen}
+            erklaerungSichtbar={props.erklaerungSichtbar}
+            setErklaerungSichtbar={props.setErklaerungSichtbar}
             titelRechts={ki.verfuegbar ? (
               <div className="flex gap-1.5">
                 <InlineAktionButton

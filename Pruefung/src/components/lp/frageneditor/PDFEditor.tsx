@@ -310,12 +310,17 @@ export default function PDFEditor({
                 <select
                   value=""
                   onChange={(e) => {
-                    const vorlage = KATEGORIEN_VORLAGEN.find((v) => v.label === e.target.value)
-                    if (vorlage) handleVorlageAnwenden(vorlage)
+                    if (e.target.value === '__keine__') {
+                      setKategorien([])
+                    } else {
+                      const vorlage = KATEGORIEN_VORLAGEN.find((v) => v.label === e.target.value)
+                      if (vorlage) handleVorlageAnwenden(vorlage)
+                    }
                   }}
                   className="input-field text-sm"
                 >
                   <option value="" disabled>Vorlage wählen...</option>
+                  <option value="__keine__">Keine Kategorien</option>
                   {KATEGORIEN_VORLAGEN.map((v) => (
                     <option key={v.label} value={v.label}>{v.label}</option>
                   ))}

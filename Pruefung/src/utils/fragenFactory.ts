@@ -59,7 +59,7 @@ export type TypSpezifischeDaten =
   | { typ: 'freitext'; fragetext: string; laenge: 'kurz' | 'mittel' | 'lang'; placeholder: string; minWoerter?: number; maxWoerter?: number }
   | { typ: 'lueckentext'; fragetext: string; textMitLuecken: string; luecken: LueckentextFrage['luecken'] }
   | { typ: 'zuordnung'; fragetext: string; paare: { links: string; rechts: string }[] }
-  | { typ: 'richtigfalsch'; fragetext: string; aussagen: RichtigFalschFrage['aussagen'] }
+  | { typ: 'richtigfalsch'; fragetext: string; aussagen: RichtigFalschFrage['aussagen']; erklaerungSichtbar?: boolean }
   | { typ: 'berechnung'; fragetext: string; ergebnisse: BerechnungFrage['ergebnisse']; rechenwegErforderlich: boolean; hilfsmittel: string }
   | { typ: 'buchungssatz'; geschaeftsfall: string; buchungen: BuchungssatzZeile[]; kontenauswahl: KontenauswahlConfig }
   | { typ: 'tkonto'; aufgabentext: string; geschaeftsfaelle: string[]; konten: TKontoDefinition[]; kontenauswahl: KontenauswahlConfig; bewertungsoptionen: TKontoBewertung }
@@ -127,6 +127,7 @@ export function erstelleFrageObjekt(basis: FrageBasis, typDaten: TypSpezifischeD
           ...a,
           text: a.text.trim(),
         })),
+        ...(typDaten.erklaerungSichtbar ? { erklaerungSichtbar: true } : {}),
       } as RichtigFalschFrage
 
     case 'berechnung':

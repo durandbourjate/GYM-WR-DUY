@@ -6,9 +6,12 @@ interface RichtigFalschEditorProps {
   setAussagen: (a: RichtigFalschFrage['aussagen']) => void
   /** Optionaler Inhalt rechts im Abschnitt-Header (z.B. KI-Buttons) */
   titelRechts?: React.ReactNode
+  /** Erklärungen den SuS in der Korrektur-Einsicht zeigen */
+  erklaerungSichtbar?: boolean
+  setErklaerungSichtbar?: (v: boolean) => void
 }
 
-export default function RichtigFalschEditor({ aussagen, setAussagen, titelRechts }: RichtigFalschEditorProps) {
+export default function RichtigFalschEditor({ aussagen, setAussagen, titelRechts, erklaerungSichtbar, setErklaerungSichtbar }: RichtigFalschEditorProps) {
   function updateAussage(index: number, partial: Partial<RichtigFalschFrage['aussagen'][0]>): void {
     const neu = [...aussagen]
     neu[index] = { ...neu[index], ...partial }
@@ -82,6 +85,19 @@ export default function RichtigFalschEditor({ aussagen, setAussagen, titelRechts
         >
           + Aussage hinzufügen
         </button>
+      )}
+
+      {/* Erklärung-Sichtbarkeit Toggle */}
+      {setErklaerungSichtbar && (
+        <label className="mt-3 flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={erklaerungSichtbar ?? false}
+            onChange={(e) => setErklaerungSichtbar(e.target.checked)}
+            className="rounded border-slate-300 dark:border-slate-600"
+          />
+          Erklärungen den SuS in der Korrektur-Einsicht zeigen
+        </label>
       )}
     </Abschnitt>
   )

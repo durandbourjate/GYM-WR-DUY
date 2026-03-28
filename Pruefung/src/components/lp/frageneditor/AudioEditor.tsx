@@ -16,6 +16,9 @@ export default function AudioEditor({ maxDauerSekunden, setMaxDauerSekunden }: P
       <p className="text-xs text-slate-500 dark:text-slate-400">
         SuS nehmen eine Audio-Antwort auf (Browser-Mikrofon). Korrektur erfolgt manuell.
       </p>
+      <p className="text-xs text-amber-600 dark:text-amber-400">
+        💡 Hinweis: Auf Mac/iPhone kann Chrome einen Dialog anzeigen, der die Aufnahme ans iPhone weiterleitet (Continuity Camera). Dies ist ein Browser-Feature und kein Fehler.
+      </p>
 
       <div className="flex items-center gap-3">
         <label className="text-sm text-slate-600 dark:text-slate-300">

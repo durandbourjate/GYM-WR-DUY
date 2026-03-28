@@ -186,6 +186,8 @@ export interface RichtigFalschFrage extends FrageBase {
     korrekt: boolean;
     erklaerung?: string;
   }[];
+  /** Erklärungen in der Korrektur-Einsicht den SuS zeigen (Default: false = nur LP) */
+  erklaerungSichtbar?: boolean;
 }
 
 export interface BerechnungFrage extends FrageBase {

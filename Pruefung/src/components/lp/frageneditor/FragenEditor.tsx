@@ -4,7 +4,7 @@ import type { LPInfo } from '../../../services/lpApi.ts'
 import { apiService } from '../../../services/apiService.ts'
 import { useFocusTrap } from '../../../hooks/useFocusTrap.ts'
 import { usePanelResize } from '../../../hooks/usePanelResize.ts'
-import { typLabel, defaultFachbereich } from '../../../utils/fachUtils.ts'
+import { defaultFachbereich } from '../../../utils/fachUtils.ts'
 import { validiereFrage } from '../../../utils/fragenValidierung.ts'
 import { erstelleFrageObjekt } from '../../../utils/fragenFactory.ts'
 import type { FrageBasis, TypSpezifischeDaten } from '../../../utils/fragenFactory.ts'
@@ -26,6 +26,7 @@ import type {
 } from '../../../types/fragen.ts'
 import type { FrageTyp } from './editorUtils.ts'
 import { generiereFrageId } from './editorUtils.ts'
+import FrageTypAuswahl from './FrageTypAuswahl.tsx'
 import { Abschnitt } from './EditorBausteine.tsx'
 import AnhangEditor from './AnhangEditor.tsx'
 import BewertungsrasterEditor from './BewertungsrasterEditor.tsx'
@@ -68,7 +69,37 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen, performa
   }, [])
 
   // Grunddaten
-  const [typ, setTyp] = useState<FrageTyp>(frage?.typ as FrageTyp ?? 'mc')
+  const [typ, setTypRaw] = useState<FrageTyp>(frage?.typ as FrageTyp ?? 'mc')
+
+  // Beim Typ-Wechsel: Standard-Bewertungsraster setzen (nur bei neuen Fragen)
+  function setTyp(neuerTyp: FrageTyp) {
+    setTypRaw(neuerTyp)
+    if (frage) return // Bestehende Frage: Raster nicht überschreiben
+    const defaults: Record<string, Bewertungskriterium[]> = {
+      mc: [{ beschreibung: 'Korrekte Antwort(en)', punkte: 1 }],
+      richtigfalsch: [{ beschreibung: 'Korrekte Bewertung', punkte: 1 }],
+      freitext: [{ beschreibung: 'Inhalt & Sachkenntnis', punkte: 2 }, { beschreibung: 'Argumentation', punkte: 2 }, { beschreibung: 'Sprache & Darstellung', punkte: 1 }],
+      lueckentext: [{ beschreibung: 'Korrekte Lücken', punkte: 2 }],
+      zuordnung: [{ beschreibung: 'Korrekte Zuordnung', punkte: 2 }],
+      berechnung: [{ beschreibung: 'Lösungsweg', punkte: 2 }, { beschreibung: 'Ergebnis', punkte: 1 }],
+      sortierung: [{ beschreibung: 'Korrekte Reihenfolge', punkte: 2 }],
+      hotspot: [{ beschreibung: 'Korrekte Position', punkte: 2 }],
+      bildbeschriftung: [{ beschreibung: 'Korrekte Beschriftungen', punkte: 2 }],
+      dragdrop_bild: [{ beschreibung: 'Korrekte Zuordnung', punkte: 2 }],
+      code: [{ beschreibung: 'Funktionalität', punkte: 2 }, { beschreibung: 'Codequalität', punkte: 1 }],
+      formel: [{ beschreibung: 'Korrekte Formel', punkte: 2 }],
+      audio: [{ beschreibung: 'Inhalt & Verständlichkeit', punkte: 2 }],
+      visualisierung: [{ beschreibung: 'Zeichnung korrekt', punkte: 2 }],
+      pdf: [{ beschreibung: 'Annotation vollständig', punkte: 2 }],
+      buchungssatz: [{ beschreibung: 'Konten korrekt', punkte: 1 }, { beschreibung: 'Betrag korrekt', punkte: 1 }],
+      tkonto: [{ beschreibung: 'Buchungen korrekt', punkte: 2 }, { beschreibung: 'Saldo korrekt', punkte: 1 }],
+      kontenbestimmung: [{ beschreibung: 'Korrekte Konten', punkte: 2 }],
+      bilanzstruktur: [{ beschreibung: 'Korrekte Zuordnung', punkte: 2 }],
+      aufgabengruppe: [{ beschreibung: '', punkte: 1 }],
+    }
+    const raster = defaults[neuerTyp] ?? [{ beschreibung: '', punkte: 1 }]
+    setBewertungsraster(raster)
+  }
   const [fachbereich, setFachbereich] = useState<Fachbereich>(frage?.fachbereich ?? defaultFachbereich(user?.fachschaft) as Fachbereich)
   const [thema, setThema] = useState(frage?.thema ?? '')
   const [unterthema, setUnterthema] = useState(frage?.unterthema ?? '')
@@ -146,6 +177,9 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen, performa
       { id: '2', text: '', korrekt: false },
       { id: '3', text: '', korrekt: true },
     ]
+  )
+  const [erklaerungSichtbar, setErklaerungSichtbar] = useState(
+    frage?.typ === 'richtigfalsch' ? (frage as RichtigFalschFrage).erklaerungSichtbar ?? false : false
   )
 
   // Berechnung-spezifisch
@@ -477,7 +511,7 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen, performa
       case 'zuordnung':
         typDaten = { typ: 'zuordnung', fragetext, paare }; break
       case 'richtigfalsch':
-        typDaten = { typ: 'richtigfalsch', fragetext, aussagen }; break
+        typDaten = { typ: 'richtigfalsch', fragetext, aussagen, erklaerungSichtbar }; break
       case 'berechnung':
         typDaten = { typ: 'berechnung', fragetext, ergebnisse, rechenwegErforderlich, hilfsmittel }; break
       case 'buchungssatz':
@@ -639,26 +673,9 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen, performa
             </div>
           )}
 
-          {/* Fragetyp wählen */}
+          {/* Fragetyp wählen — kategorisiert */}
           <Abschnitt titel="Fragetyp" einklappbar standardOffen={!frage}>
-            <div className="flex gap-2 flex-wrap">
-              {(['freitext', 'mc', 'richtigfalsch', 'lueckentext', 'zuordnung', 'berechnung', 'sortierung', 'hotspot', 'bildbeschriftung', 'dragdrop_bild', 'code', 'formel', 'audio', 'buchungssatz', 'tkonto', 'kontenbestimmung', 'bilanzstruktur', 'aufgabengruppe', 'visualisierung', 'pdf'] as FrageTyp[]).map((t) => (
-                <button
-                  key={t}
-                  onClick={() => setTyp(t)}
-                  disabled={!!frage}
-                  className={`px-3 py-2 text-sm rounded-lg border transition-colors cursor-pointer
-                    ${typ === t
-                      ? 'bg-slate-800 dark:bg-slate-200 text-white dark:text-slate-800 border-slate-800 dark:border-slate-200'
-                      : 'border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
-                    }
-                    ${frage ? 'opacity-60 cursor-not-allowed' : ''}
-                  `}
-                >
-                  {typLabel(t)}
-                </button>
-              ))}
-            </div>
+            <FrageTypAuswahl typ={typ} setTyp={setTyp} gesperrt={!!frage} />
           </Abschnitt>
 
           {/* Grunddaten / Zuordnung */}
@@ -723,6 +740,7 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen, performa
             luecken={luecken} setLuecken={setLuecken}
             paare={paare} setPaare={setPaare}
             aussagen={aussagen} setAussagen={setAussagen}
+            erklaerungSichtbar={erklaerungSichtbar} setErklaerungSichtbar={setErklaerungSichtbar}
             ergebnisse={ergebnisse} setErgebnisse={setErgebnisse}
             rechenwegErforderlich={rechenwegErforderlich} setRechenwegErforderlich={setRechenwegErforderlich}
             hilfsmittel={hilfsmittel} setHilfsmittel={setHilfsmittel}
