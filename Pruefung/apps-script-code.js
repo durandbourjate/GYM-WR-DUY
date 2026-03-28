@@ -1772,7 +1772,9 @@ function speichereFrage(body) {
       thema: frage.thema || '',
       unterthema: frage.unterthema || '',
       semester: (frage.semester || []).join(','),
-      gefaesse: (frage.gefaesse || []).join(','),
+      gefaesse: (frage.gefaesse || []).filter(function(g) {
+        return g !== '' && ladeSchulConfig_().gefaesse.includes(g);
+      }).join(','),
       bloom: frage.bloom || 'K1',
       tags: (frage.tags || []).join(','),
       punkte: String(frage.punkte || 0),
@@ -2117,7 +2119,10 @@ function speichereConfig(body) {
     // Feld-Mapping: config-Key → Serialisierung
     var feldMapping = {
       klasse:                     function(v) { return v || ''; },
-      gefaess:                    function(v) { return v || 'SF'; },
+      gefaess:                    function(v) {
+        var gueltigeGefaesse = ladeSchulConfig_().gefaesse;
+        return (v && gueltigeGefaesse.includes(v)) ? v : (gueltigeGefaesse[0] || 'SF');
+      },
       semester:                   function(v) { return v || ''; },
       fachbereiche:               function(v) { return (v || []).join(','); },
       datum:                      function(v) { return v || ''; },

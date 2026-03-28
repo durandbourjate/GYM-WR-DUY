@@ -31,6 +31,8 @@ import { BilanzERBewertungsoptionen } from './BilanzEREditor.tsx'
 import { useKIAssistent } from './KIAssistentPanel.tsx'
 import { InlineAktionButton, ErgebnisAnzeige } from './KIBausteine.tsx'
 import { berechneZeitbedarf } from '../../../utils/zeitbedarf.ts'
+import { useSchulConfig } from '../../../store/schulConfigStore.ts'
+import { istGueltigesGefaess } from '../../../utils/gefaessUtils.ts'
 import type { Lernziel } from '../../../types/pool.ts'
 import PoolUpdateVergleich from './PoolUpdateVergleich.tsx'
 import RueckSyncDialog from '../fragenbank/RueckSyncDialog.tsx'
@@ -54,6 +56,7 @@ interface Props {
 /** Vollbild-Editor zum Erstellen und Bearbeiten von Prüfungsfragen */
 export default function FragenEditor({ frage, onSpeichern, onAbbrechen, performance }: Props) {
   const user = useAuthStore((s) => s.user)
+  const schulConfig = useSchulConfig((s) => s.config)
 
   // LP-Liste für BerechtigungenEditor (gecacht pro Session)
   const [lpListe, setLpListe] = useState<LPInfo[]>([])
@@ -363,7 +366,7 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen, performa
       thema: thema.trim(),
       unterthema: unterthema.trim() || undefined,
       semester,
-      gefaesse,
+      gefaesse: gefaesse.filter((g) => istGueltigesGefaess(g, schulConfig)),
       bloom,
       tags: tagListe,
       punkte,

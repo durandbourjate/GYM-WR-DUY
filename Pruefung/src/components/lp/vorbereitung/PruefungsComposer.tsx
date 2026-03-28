@@ -1,6 +1,8 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
 import { useFocusTrap } from '../../../hooks/useFocusTrap.ts'
 import { useAuthStore } from '../../../store/authStore.ts'
+import { useSchulConfig } from '../../../store/schulConfigStore.ts'
+import { istGueltigesGefaess } from '../../../utils/gefaessUtils.ts'
 import { useFragenbankStore } from '../../../store/fragenbankStore.ts'
 import { apiService } from '../../../services/apiService.ts'
 import { demoFragen } from '../../../data/demoFragen.ts'
@@ -57,6 +59,7 @@ const leerePruefung: PruefungsConfig = {
 export default function PruefungsComposer({ config, onZurueck, onDuplizieren }: Props) {
   const user = useAuthStore((s) => s.user)
   const istDemoModus = useAuthStore((s) => s.istDemoModus)
+  const schulConfig = useSchulConfig((s) => s.config)
 
   const [pruefung, setPruefung] = useState<PruefungsConfig>(config ?? { ...leerePruefung })
   const [tab, setTab] = useState<ComposerTab>('config')
@@ -253,6 +256,9 @@ export default function PruefungsComposer({ config, onZurueck, onDuplizieren }: 
       }
       if (!zuSpeichern.erlaubteKlasse || zuSpeichern.erlaubteKlasse === '—' || zuSpeichern.erlaubteKlasse === '-') {
         zuSpeichern.erlaubteKlasse = zuSpeichern.klasse
+      }
+      if (!istGueltigesGefaess(zuSpeichern.gefaess, schulConfig)) {
+        zuSpeichern.gefaess = schulConfig.gefaesse[0] ?? 'SF'
       }
 
       if (istDemoModus || !apiService.istKonfiguriert()) {
