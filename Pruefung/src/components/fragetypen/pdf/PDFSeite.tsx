@@ -240,6 +240,10 @@ export function PDFSeite({
 
     // Auswahl: Text-Annotation anklicken → selektieren/deselektieren
     if (aktivesWerkzeug === 'auswahl') {
+      // Bearbeitungsmodus beenden bei Klick ausserhalb
+      if (editierendeAnnotation) {
+        setEditierendeAnnotation(null)
+      }
       let node: Element | null = e.target as Element
       let annotId: string | null = null
       while (node && node !== e.currentTarget) {
@@ -287,7 +291,7 @@ export function PDFSeite({
 
     // Store relative position in a data attribute for later use
     containerRef.current?.setAttribute('data-kommentar-rel', JSON.stringify({ x: relX, y: relY }))
-  }, [readOnly, aktivesWerkzeug, seitenInfo, onAnnotationLoeschen])
+  }, [readOnly, aktivesWerkzeug, seitenInfo, onAnnotationLoeschen, editierendeAnnotation, selectedAnnotation])
 
   const handleKommentarSave = useCallback((text: string) => {
     const relStr = containerRef.current?.getAttribute('data-kommentar-rel')

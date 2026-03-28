@@ -49,11 +49,15 @@ export default function Layout() {
   const tabKonflikt = useTabKonflikt(config?.id ?? null)
   const istTabKonflikt = tabKonflikt || multiTabWarnung
 
+  // Demo-Modus (keine Sperre bei Verstössen, nur Warnung)
+  const istDemoModus = useAuthStore((s) => s.istDemoModus)
+
   // Lockdown: Copy/Paste, Vollbild, DevTools, Verstoss-Zähler
   const kontrollStufe = (kontrollStufeOverride || (config?.kontrollStufe as KontrollStufe) || 'keine') as KontrollStufe
   const lockdown = useLockdown({
     kontrollStufe,
     aktiv: !!config && !abgegeben,
+    istDemoModus,
   })
 
   // Monitoring: Auto-Save (lokal + remote), Heartbeat, Focus-Detection, Online/Offline
@@ -358,9 +362,9 @@ export default function Layout() {
           {/* Fragenbereich */}
           <main className={`flex-1 overflow-auto min-w-0 ${istSplitModus ? 'p-3 md:p-5' : 'p-4 md:p-8'}`}>
             <div className={istSplitModus ? 'max-w-2xl mx-auto' : 'max-w-3xl mx-auto'}>
-              {/* Navigation über der Frage: Zurück / Frage X von Y / Weiter + Unsicher */}
-              <div className="mb-4">
-                <div className="flex items-center justify-between gap-2">
+              {/* Navigation über der Frage: Zurück / Frage X von Y / Weiter + Unsicher — sticky */}
+              <div className="sticky top-0 z-10 pb-3 -mt-1 pt-1 bg-slate-50 dark:bg-slate-900">
+                <div className="flex items-center justify-between gap-2 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 px-3 py-2 shadow-sm">
                   <button
                     onClick={vorherigeFrage}
                     disabled={aktuelleFrageIndex === 0}

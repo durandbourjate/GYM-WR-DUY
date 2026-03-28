@@ -12,9 +12,10 @@ interface UseLockdownOptions {
   kontrollStufe: KontrollStufe
   maxVerstoesse?: number
   aktiv: boolean
+  istDemoModus?: boolean
 }
 
-export function useLockdown({ kontrollStufe, maxVerstoesse = 3, aktiv }: UseLockdownOptions) {
+export function useLockdown({ kontrollStufe, maxVerstoesse = 3, aktiv, istDemoModus = false }: UseLockdownOptions) {
   const { geraet, vollbildUnterstuetzt } = useGeraetErkennung()
   const effektiv = berechneEffektiveStufe(kontrollStufe, geraet)
 
@@ -43,8 +44,8 @@ export function useLockdown({ kontrollStufe, maxVerstoesse = 3, aktiv }: UseLock
     if (zaehlt) {
       setVerstossZaehler(prev => {
         const neu = prev + 1
-        // Locker: Zähler hochzählen (für Logging), aber KEINE Sperre
-        if (effektiv !== 'locker' && neu >= maxVerstoesse) setGesperrt(true)
+        // Locker oder Demo-Modus: Zähler hochzählen (für Logging), aber KEINE Sperre
+        if (!istDemoModus && effektiv !== 'locker' && neu >= maxVerstoesse) setGesperrt(true)
         return neu
       })
     }
@@ -68,6 +69,17 @@ export function useLockdown({ kontrollStufe, maxVerstoesse = 3, aktiv }: UseLock
       }
     }
   }, [vollbildUnterstuetzt, effektiv])
+
+  // Globales Event für temporäre Schonfrist (z.B. Audio-Aufnahme braucht getUserMedia,
+  // welches den Vollbild-Modus unterbricht → kein Verstoss registrieren)
+  useEffect(() => {
+    function handleSchonfrist(e: Event) {
+      const ms = (e as CustomEvent).detail?.ms ?? 5000
+      schonfristBisRef.current = Date.now() + ms
+    }
+    window.addEventListener('lockdown-schonfrist', handleSchonfrist)
+    return () => window.removeEventListener('lockdown-schonfrist', handleSchonfrist)
+  }, [])
 
   // Verstoesse seit letztem Sync (für Heartbeat)
   const neueVerstoesseSeitLetztemSync = useCallback(() => {

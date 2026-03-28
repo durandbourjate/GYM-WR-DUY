@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react'
+import { useMemo, useRef, useState, useCallback } from 'react'
 import { usePruefungStore } from '../../store/pruefungStore.ts'
 import type { SortierungFrage as SortierungFrageType } from '../../types/fragen.ts'
 import { renderMarkdown } from '../../utils/markdown.ts'
@@ -11,7 +11,6 @@ interface Props {
 /** Mische ein Array deterministisch (Fisher-Yates mit seed aus frage.id) */
 function mischen(arr: string[], seed: string): string[] {
   const result = [...arr]
-  // Einfacher Seed-Hash aus der Frage-ID
   let h = 0
   for (let i = 0; i < seed.length; i++) {
     h = ((h << 5) - h + seed.charCodeAt(i)) | 0
@@ -49,6 +48,44 @@ export default function SortierungFrage({ frage }: Props) {
     setAntwort(frage.id, { typ: 'sortierung', reihenfolge: neueReihenfolge })
   }
 
+  // Drag & Drop State
+  const [dragIndex, setDragIndex] = useState<number | null>(null)
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
+
+  const handleDragStart = useCallback((index: number) => {
+    if (abgegeben) return
+    setDragIndex(index)
+  }, [abgegeben])
+
+  const handleDragOver = useCallback((e: React.DragEvent, index: number) => {
+    e.preventDefault()
+    setDragOverIndex(index)
+  }, [])
+
+  const handleDragLeave = useCallback(() => {
+    setDragOverIndex(null)
+  }, [])
+
+  const handleDrop = useCallback((e: React.DragEvent, zielIndex: number) => {
+    e.preventDefault()
+    setDragOverIndex(null)
+    if (dragIndex === null || dragIndex === zielIndex || abgegeben) {
+      setDragIndex(null)
+      return
+    }
+    // Element von dragIndex nach zielIndex verschieben
+    const neueReihenfolge = [...reihenfolge]
+    const [element] = neueReihenfolge.splice(dragIndex, 1)
+    neueReihenfolge.splice(zielIndex, 0, element)
+    setAntwort(frage.id, { typ: 'sortierung', reihenfolge: neueReihenfolge })
+    setDragIndex(null)
+  }, [dragIndex, abgegeben, reihenfolge, setAntwort, frage.id])
+
+  const handleDragEnd = useCallback(() => {
+    setDragIndex(null)
+    setDragOverIndex(null)
+  }, [])
+
   return (
     <div className="flex flex-col gap-5">
       {/* Header: Badges */}
@@ -73,16 +110,33 @@ export default function SortierungFrage({ frage }: Props) {
         dangerouslySetInnerHTML={{ __html: renderMarkdown(frage.fragetext) }}
       />
 
-      {/* Sortier-Liste */}
+      {/* Sortier-Liste mit Drag & Drop */}
       <div className={`flex flex-col gap-2 ${!abgegeben && (!aktuelleAntwort || aktuelleAntwort.typ !== 'sortierung') ? 'rounded-xl border-2 border-violet-400 dark:border-violet-500 p-1' : ''}`}>
         {reihenfolge.map((element, index) => (
           <div
             key={`${element}-${index}`}
-            className={`flex items-center gap-3 p-3 rounded-xl border-2 bg-white dark:bg-slate-800
-              border-slate-200 dark:border-slate-700
-              ${abgegeben ? 'opacity-75' : ''}
+            draggable={!abgegeben}
+            onDragStart={() => handleDragStart(index)}
+            onDragOver={(e) => handleDragOver(e, index)}
+            onDragLeave={handleDragLeave}
+            onDrop={(e) => handleDrop(e, index)}
+            onDragEnd={handleDragEnd}
+            className={`flex items-center gap-3 p-3 rounded-xl border-2 bg-white dark:bg-slate-800 transition-all select-none
+              ${abgegeben ? 'opacity-75' : 'cursor-grab active:cursor-grabbing'}
+              ${dragIndex === index ? 'opacity-40 border-blue-400 dark:border-blue-500' : ''}
+              ${dragOverIndex === index && dragIndex !== index
+                ? 'border-blue-500 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/20'
+                : 'border-slate-200 dark:border-slate-700'
+              }
             `}
           >
+            {/* Drag-Handle */}
+            {!abgegeben && (
+              <span className="flex-shrink-0 text-slate-400 dark:text-slate-500 cursor-grab" title="Ziehen zum Sortieren">
+                ⠿
+              </span>
+            )}
+
             {/* Position */}
             <span className="flex-shrink-0 w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-sm font-semibold text-slate-500 dark:text-slate-400">
               {index + 1}

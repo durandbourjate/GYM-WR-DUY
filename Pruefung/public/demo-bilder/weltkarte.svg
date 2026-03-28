@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500">
+  <rect width="800" height="500" fill="#d6eaf8"/>
+  <!-- Vereinfachte Weltkarte -->
+  <!-- Nordamerika -->
+  <path d="M80 100 L200 80 L240 120 L250 200 L220 260 L180 280 L140 260 L100 220 L60 160 Z" fill="#c8e6c9" stroke="#666" stroke-width="1.5"/>
+  <text x="155" y="180" text-anchor="middle" font-size="11" fill="#333">Nord-</text>
+  <text x="155" y="195" text-anchor="middle" font-size="11" fill="#333">amerika</text>
+  <!-- Südamerika -->
+  <path d="M180 310 L230 290 L260 320 L270 400 L240 440 L200 450 L170 420 L160 370 Z" fill="#c8e6c9" stroke="#666" stroke-width="1.5"/>
+  <text x="215" y="380" text-anchor="middle" font-size="11" fill="#333">Süd-</text>
+  <text x="215" y="395" text-anchor="middle" font-size="11" fill="#333">amerika</text>
+  <!-- Europa -->
+  <path d="M350 100 L420 80 L450 100 L460 150 L440 180 L410 200 L370 190 L340 160 Z" fill="#c8e6c9" stroke="#666" stroke-width="1.5"/>
+  <text x="400" y="150" text-anchor="middle" font-size="11" fill="#333">Europa</text>
+  <!-- Afrika -->
+  <path d="M370 220 L440 210 L470 260 L480 340 L460 400 L420 430 L380 420 L360 370 L350 300 Z" fill="#c8e6c9" stroke="#666" stroke-width="1.5"/>
+  <text x="415" y="330" text-anchor="middle" font-size="11" fill="#333">Afrika</text>
+  <!-- Asien -->
+  <path d="M460 80 L600 60 L700 100 L720 180 L690 240 L640 270 L580 260 L520 230 L480 200 L460 150 Z" fill="#c8e6c9" stroke="#666" stroke-width="1.5"/>
+  <text x="590" y="170" text-anchor="middle" font-size="11" fill="#333">Asien</text>
+  <!-- Australien -->
+  <path d="M620 340 L700 320 L730 360 L720 400 L680 420 L640 410 L610 380 Z" fill="#c8e6c9" stroke="#666" stroke-width="1.5"/>
+  <text x="670" y="375" text-anchor="middle" font-size="10" fill="#333">Australien</text>
+  <!-- Zielzonen (gestrichelt) -->
+  <!-- Zone 1: Nordamerika -->
+  <rect x="96" y="175" width="160" height="125" fill="none" stroke="#1565c0" stroke-width="2" stroke-dasharray="6,4" rx="4"/>
+  <text x="176" y="290" text-anchor="middle" font-size="9" fill="#1565c0">Zone 1</text>
+  <!-- Zone 2: Europa -->
+  <rect x="360" y="125" width="120" height="150" fill="none" stroke="#1565c0" stroke-width="2" stroke-dasharray="6,4" rx="4"/>
+  <text x="420" y="265" text-anchor="middle" font-size="9" fill="#1565c0">Zone 2</text>
+  <!-- Zone 3: Asien -->
+  <rect x="560" y="175" width="160" height="150" fill="none" stroke="#1565c0" stroke-width="2" stroke-dasharray="6,4" rx="4"/>
+  <text x="640" y="315" text-anchor="middle" font-size="9" fill="#1565c0">Zone 3</text>
+  <!-- Zone 4: Südamerika -->
+  <rect x="160" y="325" width="120" height="100" fill="none" stroke="#1565c0" stroke-width="2" stroke-dasharray="6,4" rx="4"/>
+  <text x="220" y="415" text-anchor="middle" font-size="9" fill="#1565c0">Zone 4</text>
+  <!-- Titel -->
+  <text x="400" y="30" text-anchor="middle" font-size="18" fill="#333" font-weight="bold">Weltkarte</text>
+  <text x="400" y="48" text-anchor="middle" font-size="12" fill="#666">Ziehen Sie die Kontinente in die Zielzonen</text>
+</svg>

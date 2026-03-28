@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600">
+  <rect width="800" height="600" fill="#e8f4f8"/>
+  <!-- Vereinfachte Europakarte -->
+  <!-- Skandinavien -->
+  <path d="M380 80 L400 60 L420 80 L430 140 L420 180 L400 200 L380 190 L370 140 Z" fill="#d4e6d4" stroke="#888" stroke-width="1.5"/>
+  <!-- Grossbritannien -->
+  <path d="M290 160 L310 140 L320 160 L315 200 L295 210 L280 190 Z" fill="#d4e6d4" stroke="#888" stroke-width="1.5"/>
+  <!-- Irland -->
+  <ellipse cx="265" cy="185" rx="20" ry="25" fill="#d4e6d4" stroke="#888" stroke-width="1.5"/>
+  <!-- Frankreich -->
+  <path d="M300 240 L350 220 L370 240 L380 300 L340 320 L290 300 Z" fill="#d4e6d4" stroke="#888" stroke-width="1.5"/>
+  <!-- Spanien/Portugal -->
+  <path d="M250 310 L340 300 L350 340 L340 380 L280 390 L240 360 Z" fill="#d4e6d4" stroke="#888" stroke-width="1.5"/>
+  <!-- Italien -->
+  <path d="M380 280 L400 260 L420 300 L410 360 L400 380 L390 370 L385 320 Z" fill="#d4e6d4" stroke="#888" stroke-width="1.5"/>
+  <!-- Deutschland -->
+  <path d="M360 200 L400 190 L420 210 L410 260 L380 270 L350 250 Z" fill="#d4e6d4" stroke="#888" stroke-width="1.5"/>
+  <!-- Schweiz (rot hervorgehoben) -->
+  <path d="M365 268 L390 262 L395 275 L385 285 L365 280 Z" fill="#ffcccc" stroke="#cc0000" stroke-width="2"/>
+  <text x="380" y="278" text-anchor="middle" font-size="8" fill="#cc0000" font-weight="bold">CH</text>
+  <!-- Polen -->
+  <path d="M420 190 L470 180 L490 210 L480 250 L440 260 L415 240 Z" fill="#d4e6d4" stroke="#888" stroke-width="1.5"/>
+  <!-- Osteuropa -->
+  <path d="M490 100 L580 80 L620 200 L600 300 L520 320 L480 260 L490 180 Z" fill="#d4e6d4" stroke="#888" stroke-width="1.5"/>
+  <!-- Griechenland/Balkan -->
+  <path d="M440 300 L480 280 L500 310 L490 370 L460 380 L440 350 Z" fill="#d4e6d4" stroke="#888" stroke-width="1.5"/>
+  <!-- Türkei (Teilansicht) -->
+  <path d="M510 310 L580 300 L620 320 L600 350 L540 350 L510 330 Z" fill="#d4e6d4" stroke="#888" stroke-width="1.5"/>
+  <!-- Nordafrika (Küste) -->
+  <path d="M200 420 L600 400 L620 430 L200 450 Z" fill="#f5e6c8" stroke="#888" stroke-width="1"/>
+  <!-- Meer -->
+  <text x="180" y="350" font-size="14" fill="#5b9bd5" font-style="italic">Atlantik</text>
+  <text x="430" y="430" font-size="14" fill="#5b9bd5" font-style="italic">Mittelmeer</text>
+  <text x="550" y="150" font-size="14" fill="#5b9bd5" font-style="italic">Ostsee</text>
+  <!-- Titel -->
+  <text x="400" y="30" text-anchor="middle" font-size="18" fill="#333" font-weight="bold">Europakarte</text>
+  <text x="400" y="50" text-anchor="middle" font-size="12" fill="#666">Klicken Sie auf die Schweiz</text>
+</svg>

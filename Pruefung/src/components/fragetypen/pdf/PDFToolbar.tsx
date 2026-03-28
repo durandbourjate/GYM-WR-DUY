@@ -149,19 +149,15 @@ export function PDFToolbar({
         </button>
       )}
 
-      {/* Text-Menü (Grösse, Fett, Rotation — alles im Dropdown) */}
+      {/* Text-Werkzeug (Klick aktiviert direkt, Dropdown nur für Optionen) */}
       <ToolbarDropdown
         icon="T"
         label="Text"
         aktiv={aktivesWerkzeug === 'text' || hatSelektierteTextAnnotation}
         horizontal={isHorizontal}
+        onIconClick={() => onWerkzeugWechsel('text')}
       >
         <div className="flex flex-col gap-1 min-w-[120px]" onClick={(e) => e.stopPropagation()}>
-          <button type="button" onClick={() => onWerkzeugWechsel('text')}
-            className={`flex items-center gap-2 px-2 py-1.5 rounded text-sm transition-colors ${aktivesWerkzeug === 'text' ? 'bg-slate-200 dark:bg-slate-600 font-medium' : 'hover:bg-slate-100 dark:hover:bg-slate-700'}`}>
-            Text einfügen
-          </button>
-          <div className="h-px bg-slate-200 dark:bg-slate-600 my-0.5" />
           <span className="text-xs text-slate-500 dark:text-slate-400 font-medium px-1">Grösse</span>
           <div className="flex gap-0.5 px-1">
             {([{ label: 'S', px: 14 }, { label: 'M', px: 18 }, { label: 'L', px: 24 }, { label: 'XL', px: 32 }] as const).map(({ label, px }) => (
@@ -258,7 +254,7 @@ export function PDFToolbar({
         label="Farbe"
         horizontal={isHorizontal}
       >
-        <div className="grid grid-cols-3 gap-1">
+        <div className="grid grid-cols-3 gap-2 p-1">
           {STANDARD_HIGHLIGHT_FARBEN.map((farbe) => (
             <button
               key={farbe}
@@ -266,11 +262,11 @@ export function PDFToolbar({
               title={farbe}
               onClick={() => onFarbeWechsel(farbe)}
               className={[
-                'w-[34px] h-[34px] flex items-center justify-center rounded transition-all',
-                aktiveFarbe === farbe ? 'ring-2 ring-blue-500 ring-offset-1' : 'hover:scale-110',
+                'w-[40px] h-[40px] flex items-center justify-center rounded-lg transition-all',
+                aktiveFarbe === farbe ? 'ring-2 ring-blue-500 ring-offset-2' : 'hover:scale-110',
               ].join(' ')}
             >
-              <span className="block rounded-full" style={{ width: 20, height: 20, backgroundColor: farbe }} />
+              <span className="block rounded-full border border-slate-300 dark:border-slate-500" style={{ width: 28, height: 28, backgroundColor: farbe }} />
             </button>
           ))}
         </div>

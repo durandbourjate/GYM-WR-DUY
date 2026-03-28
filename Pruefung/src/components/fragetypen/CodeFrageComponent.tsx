@@ -63,16 +63,18 @@ export default function CodeFrageComponent({ frage }: Props) {
     let abgebrochen = false
 
     async function init() {
-      const [{ EditorView, lineNumbers }, { EditorState }, oneDarkModule] = await Promise.all([
+      const [{ EditorView, lineNumbers, keymap }, { EditorState }, oneDarkModule, { indentWithTab }] = await Promise.all([
         import('@codemirror/view'),
         import('@codemirror/state'),
         import('@codemirror/theme-one-dark'),
+        import('@codemirror/commands'),
       ])
 
       if (abgebrochen || !containerRef.current) return
 
       const extensions = [
         lineNumbers(),
+        keymap.of([indentWithTab]),
         EditorView.theme({
           '&': { fontSize: '14px', borderRadius: '8px', minHeight: '200px' },
           '.cm-gutters': { borderRight: 'none', paddingRight: '4px' },

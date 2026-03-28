@@ -723,12 +723,12 @@ export const einrichtungsFragen: Frage[] = [
     quelle: 'manuell',
     autor,
     fragetext: 'Klicken Sie auf die **Schweiz** auf der Europakarte.\n\n💡 **Tipp:** Die Schweiz liegt im Herzen Europas, südlich von Deutschland und nördlich von Italien.',
-    bildUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Europe_blank_map.png/800px-Europe_blank_map.png',
+    bildUrl: './demo-bilder/europa-karte.svg',
     bereiche: [
       {
         id: 'schweiz',
         form: 'rechteck' as const,
-        koordinaten: { x: 48, y: 55, breite: 5, hoehe: 4 },
+        koordinaten: { x: 45, y: 43, breite: 6, hoehe: 5 },
         label: 'Schweiz',
         punkte: 2,
       },
@@ -763,7 +763,7 @@ export const einrichtungsFragen: Frage[] = [
     quelle: 'manuell',
     autor,
     fragetext: 'Beschriften Sie die markierten **Teile der Zelle**. Tippen Sie den korrekten Begriff in das jeweilige Eingabefeld.\n\n💡 **Tipp:** Akzeptiert werden wissenschaftliche und deutsche Bezeichnungen.',
-    bildUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Animal_Cell.svg/800px-Animal_Cell.svg.png',
+    bildUrl: './demo-bilder/tierzelle.svg',
     beschriftungen: [
       { id: '1', position: { x: 50, y: 50 }, korrekt: ['Zellkern', 'Nukleus', 'Nucleus'] },
       { id: '2', position: { x: 25, y: 30 }, korrekt: ['Zellmembran', 'Membran'] },
@@ -828,7 +828,7 @@ export const einrichtungsFragen: Frage[] = [
     quelle: 'manuell',
     autor,
     fragetext: 'Ordnen Sie die **Kontinente** den richtigen Positionen auf der Weltkarte zu. Ziehen Sie die Labels in die markierten Zielzonen.\n\n💡 **Tipp:** Afrika und Australien sind Distraktoren — sie haben keine Zielzone auf dieser Karte.',
-    bildUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/World_map_blank_without_borders.svg/800px-World_map_blank_without_borders.svg.png',
+    bildUrl: './demo-bilder/weltkarte.svg',
     zielzonen: [
       { id: '1', position: { x: 12, y: 35, breite: 20, hoehe: 25 }, korrektesLabel: 'Nordamerika' },
       { id: '2', position: { x: 45, y: 25, breite: 15, hoehe: 30 }, korrektesLabel: 'Europa' },
@@ -924,7 +924,7 @@ export const einrichtungsFragen: Frage[] = [
     verwendungen: [],
     quelle: 'manuell',
     autor,
-    fragetext: '**Letzte Aufgabe — Feature-Check!** Probieren Sie die folgenden Funktionen aus und kreuzen Sie an, welche **funktioniert** haben:\n\n- **Dark Mode**: Klicken Sie auf das Mond/Sonnen-Symbol oben\n- **Frage markieren**: Klicken Sie auf den «?»-Button (Unsicher) bei einer Frage\n- **Tastaturkürzel**: Drücken Sie Cmd+Enter (Mac) oder Ctrl+Enter (Windows), um zur nächsten Frage zu springen\n- **Material-Panel**: Klicken Sie auf das Dokument-Symbol oben rechts\n\nKreuzen Sie **alle** an, die funktioniert haben:',
+    fragetext: '**Feature-Check!** Probieren Sie die folgenden Funktionen aus und kreuzen Sie an, welche **funktioniert** haben:\n\n- **Dark Mode**: Klicken Sie auf das Mond/Sonnen-Symbol oben\n- **Frage markieren**: Klicken Sie auf den «?»-Button (Unsicher) bei einer Frage\n- **Tastaturkürzel**: Drücken Sie Cmd+Enter (Mac) oder Ctrl+Enter (Windows), um zur nächsten Frage zu springen\n- **Material-Panel**: Klicken Sie auf das Dokument-Symbol oben rechts\n\nKreuzen Sie **alle** an, die funktioniert haben:',
     optionen: [
       { id: 'a', text: 'Dark Mode umschalten hat funktioniert', korrekt: true },
       { id: 'b', text: 'Frage markieren hat funktioniert', korrekt: true },

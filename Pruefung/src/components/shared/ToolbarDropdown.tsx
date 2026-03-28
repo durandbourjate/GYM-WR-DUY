@@ -13,6 +13,8 @@ interface Props {
   children: ReactNode
   /** Optionale zusätzliche CSS-Klassen für den Button */
   className?: string
+  /** Wenn gesetzt: Klick auf Icon ruft diese Funktion auf, nur ▾ öffnet Dropdown */
+  onIconClick?: () => void
 }
 
 /**
@@ -28,6 +30,7 @@ export default function ToolbarDropdown({
   horizontal = false,
   children,
   className,
+  onIconClick,
 }: Props) {
   const [offen, setOffen] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -44,24 +47,48 @@ export default function ToolbarDropdown({
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [offen])
 
+  const btnKlassen = [
+    'min-w-[44px] min-h-[44px] flex items-center justify-center rounded text-sm font-medium transition-colors',
+    aktiv
+      ? 'bg-white dark:bg-slate-600 shadow-sm text-slate-900 dark:text-slate-100'
+      : 'bg-transparent hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300',
+    offen ? 'ring-1 ring-slate-400 dark:ring-slate-500' : '',
+    className ?? '',
+  ].join(' ')
+
   return (
     <div ref={containerRef} className="relative">
-      <button
-        type="button"
-        title={label}
-        onClick={() => setOffen(!offen)}
-        className={[
-          'min-w-[44px] min-h-[44px] flex items-center justify-center rounded text-sm font-medium transition-colors',
-          aktiv
-            ? 'bg-white dark:bg-slate-600 shadow-sm text-slate-900 dark:text-slate-100'
-            : 'bg-transparent hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300',
-          offen ? 'ring-1 ring-slate-400 dark:ring-slate-500' : '',
-          className ?? '',
-        ].join(' ')}
-      >
-        {icon}
-        <span className="text-[8px] ml-0.5 opacity-50">▾</span>
-      </button>
+      {onIconClick ? (
+        // Zwei-Teil-Button: Icon aktiviert Werkzeug, ▾ öffnet Dropdown
+        <div className={`flex items-center ${btnKlassen}`}>
+          <button
+            type="button"
+            title={label}
+            onClick={() => { onIconClick(); setOffen(false) }}
+            className="flex-1 flex items-center justify-center min-h-[44px] cursor-pointer"
+          >
+            {icon}
+          </button>
+          <button
+            type="button"
+            title={`${label}-Optionen`}
+            onClick={() => setOffen(!offen)}
+            className="px-0.5 flex items-center justify-center min-h-[44px] cursor-pointer opacity-50 hover:opacity-100"
+          >
+            <span className="text-[8px]">▾</span>
+          </button>
+        </div>
+      ) : (
+        <button
+          type="button"
+          title={label}
+          onClick={() => setOffen(!offen)}
+          className={btnKlassen}
+        >
+          {icon}
+          <span className="text-[8px] ml-0.5 opacity-50">▾</span>
+        </button>
+      )}
 
       {offen && (
         <div

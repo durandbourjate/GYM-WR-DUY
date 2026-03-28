@@ -303,7 +303,13 @@ export default function PDFFrage({ frage }: Props) {
               erlaubteWerkzeuge={frage.erlaubteWerkzeuge}
               kategorien={frage.kategorien}
               aktiveFarbe={aktiveFarbe}
-              onFarbeWechsel={setAktiveFarbe}
+              onFarbeWechsel={(farbe) => {
+                setAktiveFarbe(farbe)
+                // Farbe auf selektierte Annotation anwenden
+                if (selectedAnnotation) {
+                  handleAnnotationEditieren(selectedAnnotation, { farbe })
+                }
+              }}
               aktiveKategorieId={aktiveKategorieId}
               onKategorieWechsel={setAktiveKategorieId}
               zoom={zoom}

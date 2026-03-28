@@ -40,6 +40,9 @@ export default function AudioFrage({ frage }: Props) {
   const startRecording = useCallback(async () => {
     try {
       setFehler(null)
+      // getUserMedia kann den Vollbild-Modus unterbrechen (Browser-Permission-Dialog)
+      // → Schonfrist setzen, damit kein Verstoss registriert wird
+      window.dispatchEvent(new CustomEvent('lockdown-schonfrist', { detail: { ms: 8000 } }))
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
       streamRef.current = stream
 
@@ -74,6 +77,11 @@ export default function AudioFrage({ frage }: Props) {
       startZeitRef.current = Date.now()
       setDauer(0)
       setStatus('recording')
+
+      // Vollbild wiederherstellen falls nötig (getUserMedia kann es beenden)
+      if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen().catch(() => {})
+      }
 
       // Timer fuer Anzeige
       timerRef.current = setInterval(() => {
