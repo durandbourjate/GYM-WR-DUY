@@ -14,6 +14,35 @@
 - **Übungspools ↔ Prüfungstool** — Lern-Analytik, Login, KI-Empfehlungen (eigenes Designprojekt)
 - **Bewertungsraster-Vertiefung** — Überfachliche Kriterien, kriterienbasiertes KI-Feedback
 - **TaF Phasen-UI** — klassenTyp-Feld vorhanden, UI für Phasen-Auswahl noch nicht
+- **Bild-Upload für Hotspot/Bildbeschriftung/DragDrop** — Aktuell nur URL-Eingabe, Upload via Drive geplant
+- **Aufgabengruppe Inline-Teilaufgaben** — Redesign: statt Frage-IDs verlinken → Teilaufgaben direkt im Editor erstellen (jeder Fragetyp möglich, a/b/c Nummerierung)
+
+---
+
+## Session 32 — LP-Editor UX + Demo-Layout (28.03.2026)
+
+### Strang 1: SuS-Layout
+
+| # | Feature | Details |
+|---|---------|---------|
+| 1 | **Header-Navigation** | Zurück/Weiter/Unsicher in den Header integriert (eine Leiste, kein separater Block) |
+| 2 | **Volle Breite** | `max-w-3xl` entfernt — Fragen nutzen gesamte Bildschirmbreite |
+| 3 | **Demo-Fragen verteilt** | "Teil G" aufgelöst → 6 thematische Teile (A: Orientierung, B: Text, C: Zuordnung, D: Zeichnen, E: FiBu, F: Features) |
+| 4 | **PDF Freihand-Select** | Freihand-Annotationen selektierbar (blauer Rahmen), verschiebbar, Farbe änderbar |
+| 5 | **Toolbar-Harmonisierung** | Bild + PDF: onOpen aktiviert Werkzeug direkt, "Text einfügen" entfernt, Farben 3x3 Grid (44px), pointerdown |
+
+### Strang 2: LP-Editor
+
+| # | Feature | Details |
+|---|---------|---------|
+| A | **Fragetypen-Menü** | 6 Kategorien (Text, Auswahl, Bilder, MINT, FiBu, Struktur) + Suchfeld. FiBu nur bei WR. Neue Komponente `FrageTypAuswahl.tsx`. |
+| B | **Standard-Bewertungsraster** | Sinnvolle Defaults pro Fragetyp beim Erstellen (z.B. Freitext: Inhalt + Argumentation + Sprache) |
+| C | **R/F Erklärung-Sichtbarkeit** | Neues Feld `erklaerungSichtbar` + Toggle "Erklärungen den SuS in Korrektur-Einsicht zeigen" |
+| D | **Rechtschreibprüfung Hinweis** | Info-Box im FreitextEditor mit Verweis auf Prüfungskonfiguration |
+| E | **PDF "keine" Vorlage** | Dropdown-Option "Keine Kategorien" setzt `kategorien: []` |
+| F | **Audio iPhone-Hinweis** | Hinweis zu Continuity Camera im LP-Editor |
+
+**Tests:** 161 grün. `tsc -b` sauber.
 
 ---
 
