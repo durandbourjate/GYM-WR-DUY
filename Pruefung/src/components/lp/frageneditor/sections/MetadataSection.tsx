@@ -34,6 +34,8 @@ interface MetadataSectionProps {
   setZeitbedarfManuell: (v: boolean) => void
   punkte: number
   setPunkte: (v: number) => void
+  /** Wenn true: Punkte werden automatisch aus dem Bewertungsraster berechnet */
+  bewertungsrasterAktiv?: boolean
   semester: string[]
   setSemester: React.Dispatch<React.SetStateAction<string[]>>
   gefaesse: string[]
@@ -58,6 +60,7 @@ export default function MetadataSection({
   zeitbedarf, setZeitbedarf,
   zeitbedarfManuell, setZeitbedarfManuell,
   punkte, setPunkte,
+  bewertungsrasterAktiv = false,
   semester, setSemester,
   gefaesse, setGefaesse,
   geteilt: _geteilt, setGeteilt: _setGeteilt,
@@ -182,9 +185,11 @@ export default function MetadataSection({
           <input type="text" value={unterthema} onChange={(e) => setUnterthema(e.target.value)}
             placeholder="z.B. Angebot & Nachfrage" className="input-field" />
         </Feld>
-        <Feld label="Punkte *">
+        <Feld label={bewertungsrasterAktiv ? 'Punkte (aus Bewertungsraster)' : 'Punkte *'}>
           <input type="number" value={punkte} onChange={(e) => setPunkte(parseInt(e.target.value) || 0)}
-            min={1} max={20} className="input-field" />
+            min={1} max={20} className="input-field"
+            disabled={bewertungsrasterAktiv}
+            title={bewertungsrasterAktiv ? 'Punkte werden automatisch aus dem Bewertungsraster berechnet' : undefined} />
         </Feld>
         <Feld label="Tags (Komma-getrennt)">
           <input type="text" value={tags} onChange={(e) => setTags(e.target.value)}

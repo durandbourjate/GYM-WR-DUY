@@ -84,6 +84,14 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen, performa
     frage?.bewertungsraster ?? [{ beschreibung: '', punkte: 1 }]
   )
 
+  // Punkte automatisch aus Bewertungsraster berechnen (nur gefüllte Kriterien)
+  const bewertungsrasterGefuellt = bewertungsraster.filter((b) => b.beschreibung.trim())
+  useEffect(() => {
+    if (bewertungsrasterGefuellt.length > 0) {
+      const summe = bewertungsrasterGefuellt.reduce((sum, k) => sum + k.punkte, 0)
+      setPunkte(summe)
+    }
+  }, [bewertungsraster]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // MC-spezifisch
   const [optionen, setOptionen] = useState<MCOption[]>(
@@ -579,6 +587,7 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen, performa
             zeitbedarf={zeitbedarf} setZeitbedarf={setZeitbedarf}
             zeitbedarfManuell={zeitbedarfManuell} setZeitbedarfManuell={setZeitbedarfManuell}
             punkte={punkte} setPunkte={setPunkte}
+            bewertungsrasterAktiv={bewertungsrasterGefuellt.length > 0}
             semester={semester} setSemester={setSemester}
             gefaesse={gefaesse} setGefaesse={setGefaesse}
             geteilt={geteilt} setGeteilt={setGeteilt}
