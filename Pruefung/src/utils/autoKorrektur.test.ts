@@ -1,18 +1,18 @@
 import { describe, it, expect } from 'vitest'
 import { istAutoKorrigierbar, autoKorrigiere } from './autoKorrektur'
-import type { Frage, MCFrage, RichtigFalschFrage, SortierungFrage, HotspotFrage, BildbeschriftungFrage, DragDropBildFrage } from '../types/fragen'
+import type { Frage, MCFrage, RichtigFalschFrage, SortierungFrage, HotspotFrage, BildbeschriftungFrage, DragDropBildFrage, FormelFrage } from '../types/fragen'
 import type { Antwort } from '../types/antworten'
 
 describe('istAutoKorrigierbar', () => {
   it.each([
     'mc', 'richtigfalsch', 'lueckentext', 'zuordnung', 'berechnung',
     'buchungssatz', 'tkonto', 'kontenbestimmung', 'bilanzstruktur',
-    'sortierung', 'hotspot', 'bildbeschriftung', 'dragdrop_bild',
+    'sortierung', 'hotspot', 'bildbeschriftung', 'dragdrop_bild', 'formel',
   ])('gibt true für %s', (typ) => {
     expect(istAutoKorrigierbar(typ)).toBe(true)
   })
 
-  it.each(['freitext', 'pdf', 'visualisierung', 'aufgabengruppe', 'audio'])('gibt false für %s', (typ) => {
+  it.each(['freitext', 'pdf', 'visualisierung', 'aufgabengruppe', 'audio', 'code'])('gibt false für %s', (typ) => {
     expect(istAutoKorrigierbar(typ)).toBe(false)
   })
 })
@@ -434,5 +434,43 @@ describe('autoKorrigiere', () => {
     expect(result).not.toBeNull()
     expect(result!.erreichtePunkte).toBe(0)
     expect(result!.details.every(d => !d.korrekt)).toBe(true)
+  })
+
+  // === FORMEL ===
+
+  function makeFormelFrage(korrekteFormel: string): FormelFrage {
+    return {
+      id: 'fo-1', typ: 'formel', version: 1, erstelltAm: '2026-01-01', geaendertAm: '2026-01-01',
+      fachbereich: 'VWL', fach: 'Wirtschaft & Recht', thema: 'Test',
+      semester: ['S3'], gefaesse: ['SF'], bloom: 'K3', tags: [],
+      punkte: 2, musterlosung: '', bewertungsraster: [], verwendungen: [],
+      fragetext: 'Geben Sie die Formel ein',
+      korrekteFormel,
+      vergleichsModus: 'exakt',
+    }
+  }
+
+  it('korrigiert Formel exakt korrekt', () => {
+    const frage = makeFormelFrage('\\frac{a}{b}')
+    const antwort: Antwort = { typ: 'formel', latex: '\\frac{a}{b}' }
+    const result = autoKorrigiere(frage, antwort)
+    expect(result).not.toBeNull()
+    expect(result!.erreichtePunkte).toBe(2)
+  })
+
+  it('korrigiert Formel mit Whitespace-Normalisierung', () => {
+    const frage = makeFormelFrage('x^{2} + y^{2}')
+    const antwort: Antwort = { typ: 'formel', latex: ' x^2 + y^2 ' }
+    const result = autoKorrigiere(frage, antwort)
+    expect(result).not.toBeNull()
+    expect(result!.erreichtePunkte).toBe(2)
+  })
+
+  it('korrigiert Formel falsch', () => {
+    const frage = makeFormelFrage('\\frac{a}{b}')
+    const antwort: Antwort = { typ: 'formel', latex: '\\frac{b}{a}' }
+    const result = autoKorrigiere(frage, antwort)
+    expect(result).not.toBeNull()
+    expect(result!.erreichtePunkte).toBe(0)
   })
 })

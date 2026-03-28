@@ -27,6 +27,7 @@ export interface FrageValidierungsParams {
   agTeilaufgabenIds?: string[]
   pdfDriveFileId?: string
   pdfErlaubteWerkzeuge?: string[]
+  korrekteFormel?: string
 }
 
 /** Validiert eine Frage und gibt eine Liste von Fehlermeldungen zurück (leer = valide) */
@@ -86,6 +87,9 @@ export function validiereFrage(params: FrageValidierungsParams): string[] {
     if (!params.pdfDriveFileId) errs.push('Bitte PDF hochladen')
     if (!params.fragetext?.trim()) errs.push('Fragestellung eingeben')
     if (!params.pdfErlaubteWerkzeuge?.length) errs.push('Mindestens ein Werkzeug auswählen')
+  }
+  if (typ === 'formel') {
+    if (!params.korrekteFormel?.trim()) errs.push('Korrekte Formel erforderlich')
   }
 
   return errs

@@ -510,4 +510,24 @@ export interface DragDropBildFrage extends FrageBase {
   labels: string[]  // Pool von Labels (kann Distraktoren enthalten)
 }
 
-export type Frage = MCFrage | FreitextFrage | ZuordnungFrage | LueckentextFrage | VisualisierungFrage | RichtigFalschFrage | BerechnungFrage | BuchungssatzFrage | TKontoFrage | KontenbestimmungFrage | BilanzERFrage | AufgabengruppeFrage | PDFFrage | SortierungFrage | HotspotFrage | BildbeschriftungFrage | AudioFrage | DragDropBildFrage;
+// === CODE-EDITOR ===
+
+export interface CodeFrage extends FrageBase {
+  typ: 'code'
+  fragetext: string
+  sprache: string        // 'python' | 'javascript' | 'sql' | 'html' | 'css' | 'java'
+  starterCode?: string   // Vorgabe-Code
+  musterLoesung?: string // LP-Musterlösung (Code)
+}
+
+// === FORMEL-EDITOR (LaTeX) ===
+
+export interface FormelFrage extends FrageBase {
+  typ: 'formel'
+  fragetext: string
+  korrekteFormel: string       // LaTeX der korrekten Formel
+  vergleichsModus: 'exakt'     // 'symbolisch' reserviert für später
+  toleranz?: number
+}
+
+export type Frage = MCFrage | FreitextFrage | ZuordnungFrage | LueckentextFrage | VisualisierungFrage | RichtigFalschFrage | BerechnungFrage | BuchungssatzFrage | TKontoFrage | KontenbestimmungFrage | BilanzERFrage | AufgabengruppeFrage | PDFFrage | SortierungFrage | HotspotFrage | BildbeschriftungFrage | AudioFrage | DragDropBildFrage | CodeFrage | FormelFrage;

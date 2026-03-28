@@ -37,6 +37,8 @@ function typLabel(typ: string): string {
     case 'bildbeschriftung': return 'Beschriftung'
     case 'audio': return 'Audio'
     case 'dragdrop_bild': return 'Drag&Drop'
+    case 'code': return 'Code'
+    case 'formel': return 'Formel'
     default: return typ
   }
 }
@@ -127,6 +129,12 @@ function renderAntwort(antwort: Antwort | undefined, frage: Frage): string {
 
     case 'pdf':
       return `[PDF-Annotation] (${antwort.annotationen?.length ?? 0} Markierungen)`
+
+    case 'code':
+      return antwort.code ? `[Code] ${antwort.code.substring(0, 80)}${antwort.code.length > 80 ? '...' : ''}` : '(leer)'
+
+    case 'formel':
+      return antwort.latex ? `[LaTeX] ${antwort.latex}` : '(leer)'
 
     default:
       return '(unbekannter Typ)'

@@ -17,6 +17,7 @@ import type {
   SortierungFrage, HotspotFrage, HotspotBereich,
   BildbeschriftungFrage, BildbeschriftungLabel,
   AudioFrage, DragDropBildFrage, DragDropBildZielzone,
+  CodeFrage, FormelFrage,
 } from '../types/fragen.ts'
 import { parseLuecken } from '../components/lp/frageneditor/editorUtils.ts'
 import {
@@ -72,6 +73,8 @@ export type TypSpezifischeDaten =
   | { typ: 'bildbeschriftung'; fragetext: string; bildUrl: string; beschriftungen: BildbeschriftungLabel[] }
   | { typ: 'audio'; fragetext: string; maxDauerSekunden?: number }
   | { typ: 'dragdrop_bild'; fragetext: string; bildUrl: string; zielzonen: DragDropBildZielzone[]; labels: string[] }
+  | { typ: 'code'; fragetext: string; sprache: string; starterCode: string; musterLoesungCode: string }
+  | { typ: 'formel'; fragetext: string; korrekteFormel: string; vergleichsModus: 'exakt' }
 
 /** Erstellt ein vollständiges Frage-Objekt aus Basisdaten + typ-spezifischen Daten */
 export function erstelleFrageObjekt(basis: FrageBasis, typDaten: TypSpezifischeDaten): Frage {
@@ -258,5 +261,24 @@ export function erstelleFrageObjekt(basis: FrageBasis, typDaten: TypSpezifischeD
         zielzonen: typDaten.zielzonen,
         labels: typDaten.labels.filter(l => l.trim()),
       } as DragDropBildFrage
+
+    case 'code':
+      return {
+        ...basis,
+        typ: 'code',
+        fragetext: typDaten.fragetext.trim(),
+        sprache: typDaten.sprache,
+        starterCode: typDaten.starterCode.trim() || undefined,
+        musterLoesung: typDaten.musterLoesungCode.trim() || undefined,
+      } as CodeFrage
+
+    case 'formel':
+      return {
+        ...basis,
+        typ: 'formel',
+        fragetext: typDaten.fragetext.trim(),
+        korrekteFormel: typDaten.korrekteFormel.trim(),
+        vergleichsModus: typDaten.vergleichsModus,
+      } as FormelFrage
   }
 }

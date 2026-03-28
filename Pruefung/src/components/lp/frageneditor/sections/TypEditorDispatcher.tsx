@@ -34,6 +34,8 @@ import HotspotEditor from '../HotspotEditor.tsx'
 import BildbeschriftungEditor from '../BildbeschriftungEditor.tsx'
 import AudioEditor from '../AudioEditor.tsx'
 import DragDropBildEditor from '../DragDropBildEditor.tsx'
+import CodeEditor from '../CodeEditor.tsx'
+import FormelEditor from '../FormelEditor.tsx'
 import { KIBuchungssatzButtons, KITKontoButtons, KIKontenbestimmungButtons, KIBilanzERButtons } from '../KIFiBuButtons.tsx'
 import { InlineAktionButton, ErgebnisAnzeige } from '../KIBausteine.tsx'
 
@@ -178,6 +180,20 @@ interface TypEditorDispatcherProps {
   setDdZielzonen: React.Dispatch<React.SetStateAction<DragDropBildZielzone[]>>
   ddLabels: string[]
   setDdLabels: React.Dispatch<React.SetStateAction<string[]>>
+
+  // Code
+  codeSprache: string
+  setCodeSprache: (v: string) => void
+  codeStarterCode: string
+  setCodeStarterCode: (v: string) => void
+  codeMusterLoesungCode: string
+  setCodeMusterLoesungCode: (v: string) => void
+
+  // Formel
+  formelKorrekteFormel: string
+  setFormelKorrekteFormel: (v: string) => void
+  formelVergleichsModus: 'exakt'
+  setFormelVergleichsModus: (v: 'exakt') => void
 }
 
 export default function TypEditorDispatcher(props: TypEditorDispatcherProps) {
@@ -729,6 +745,26 @@ export default function TypEditorDispatcher(props: TypEditorDispatcherProps) {
           setZielzonen={props.setDdZielzonen}
           labels={props.ddLabels}
           setLabels={props.setDdLabels}
+        />
+      )}
+
+      {typ === 'code' && (
+        <CodeEditor
+          sprache={props.codeSprache}
+          setSprache={props.setCodeSprache}
+          starterCode={props.codeStarterCode}
+          setStarterCode={props.setCodeStarterCode}
+          musterLoesungCode={props.codeMusterLoesungCode}
+          setMusterLoesungCode={props.setCodeMusterLoesungCode}
+        />
+      )}
+
+      {typ === 'formel' && (
+        <FormelEditor
+          korrekteFormel={props.formelKorrekteFormel}
+          setKorrekteFormel={props.setFormelKorrekteFormel}
+          vergleichsModus={props.formelVergleichsModus}
+          setVergleichsModus={props.setFormelVergleichsModus}
         />
       )}
     </>

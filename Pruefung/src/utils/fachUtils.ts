@@ -69,6 +69,8 @@ export function typLabel(typ: string): string {
     bildbeschriftung: 'Bildbeschriftung',
     audio: 'Audio-Aufnahme',
     dragdrop_bild: 'Drag & Drop Bild',
+    code: 'Code-Editor',
+    formel: 'Formel (LaTeX)',
   }
   return labels[typ] || typ
 }

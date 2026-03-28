@@ -90,7 +90,7 @@ export default function FragetextSection({
         className="input-field resize-y"
       />
       <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
-        Tipp: **fett** für Hervorhebungen, \n für Absätze
+        Tipp: **fett** für Hervorhebungen, \n für Absätze, <code className="bg-slate-100 dark:bg-slate-700 px-1 rounded">$x^2$</code> für LaTeX inline, <code className="bg-slate-100 dark:bg-slate-700 px-1 rounded">$$\sum_&#123;i=1&#125;^n$$</code> für Block, <code className="bg-slate-100 dark:bg-slate-700 px-1 rounded">```python</code> für Code-Blöcke
       </p>
       {/* KI-Ergebnisse */}
       {ki.ergebnisse.generiereFragetext && (

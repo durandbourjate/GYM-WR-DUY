@@ -16,6 +16,8 @@ import HotspotFrageComponent from './fragetypen/HotspotFrage.tsx'
 import BildbeschriftungFrageComponent from './fragetypen/BildbeschriftungFrage.tsx'
 import AudioFrageComponent from './fragetypen/AudioFrage.tsx'
 import DragDropBildFrageComponent from './fragetypen/DragDropBildFrage.tsx'
+import CodeFrageComponent from './fragetypen/CodeFrageComponent.tsx'
+import FormelFrageComponent from './fragetypen/FormelFrageComponent.tsx'
 import MedienPlayer from './shared/MedienPlayer.tsx'
 import type {
   Frage,
@@ -37,6 +39,8 @@ import type {
   BildbeschriftungFrage as BildbeschriftungFrageType,
   AudioFrage as AudioFrageType,
   DragDropBildFrage as DragDropBildFrageType,
+  CodeFrage as CodeFrageType,
+  FormelFrage as FormelFrageType,
 } from '../types/fragen.ts'
 
 interface FrageRendererProps {
@@ -92,6 +96,10 @@ export default function FrageRenderer({ frage }: FrageRendererProps) {
       return <AudioFrageComponent frage={frage as AudioFrageType} />
     case 'dragdrop_bild':
       return <DragDropBildFrageComponent frage={frage as DragDropBildFrageType} />
+    case 'code':
+      return <CodeFrageComponent frage={frage as CodeFrageType} />
+    case 'formel':
+      return <FormelFrageComponent frage={frage as FormelFrageType} />
     default:
       return (
         <div className="p-6 bg-slate-100 dark:bg-slate-800 rounded-xl text-slate-500 dark:text-slate-400 text-center">

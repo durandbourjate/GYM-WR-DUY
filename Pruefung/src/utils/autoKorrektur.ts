@@ -2,9 +2,10 @@
  * Auto-Korrektur-Engine für deterministische Fragetypen.
  * Nicht-deterministische Typen (freitext, visualisierung, pdf) → null (manuelle Korrektur).
  */
-import type { Frage, MCFrage, RichtigFalschFrage, LueckentextFrage, ZuordnungFrage, BerechnungFrage, SortierungFrage, HotspotFrage, BildbeschriftungFrage, DragDropBildFrage } from '../types/fragen'
+import type { Frage, MCFrage, RichtigFalschFrage, LueckentextFrage, ZuordnungFrage, BerechnungFrage, SortierungFrage, HotspotFrage, BildbeschriftungFrage, DragDropBildFrage, FormelFrage } from '../types/fragen'
 import type { Antwort } from '../types/antworten'
 import { korrigiereBuchungssatz, korrigiereTKonto, korrigiereKontenbestimmung, korrigiereBilanzER } from './fibuAutoKorrektur'
+import { normalisiereLatex } from './latexRenderer'
 export type { KorrekturErgebnis, KorrekturDetail } from './fibuAutoKorrektur'
 import type { KorrekturErgebnis, KorrekturDetail } from './fibuAutoKorrektur'
 
@@ -13,6 +14,7 @@ const AUTO_TYPEN = new Set([
   'mc', 'richtigfalsch', 'lueckentext', 'zuordnung', 'berechnung',
   'buchungssatz', 'tkonto', 'kontenbestimmung', 'bilanzstruktur',
   'sortierung', 'hotspot', 'bildbeschriftung', 'dragdrop_bild',
+  'formel',
 ])
 
 /** Prüft ob ein Fragetyp automatisch korrigierbar ist */
@@ -77,6 +79,8 @@ export function autoKorrigiere(frage: Frage, antwort: Antwort | undefined): Korr
         return korrigiereBildbeschriftung(frage, antwort as Extract<Antwort, { typ: 'bildbeschriftung' }>)
       case 'dragdrop_bild':
         return korrigiereDragDropBild(frage, antwort as Extract<Antwort, { typ: 'dragdrop_bild' }>)
+      case 'formel':
+        return korrigiereFormel(frage as FormelFrage, antwort as Extract<Antwort, { typ: 'formel' }>)
       default:
         return null
     }
@@ -394,5 +398,28 @@ function korrigiereDragDropBild(
     erreichtePunkte: Math.round(erreichDd * 100) / 100,
     maxPunkte: frage.punkte,
     details,
+  }
+}
+
+// === FORMEL ===
+
+function korrigiereFormel(
+  frage: FormelFrage,
+  antwort: Extract<Antwort, { typ: 'formel' }>
+): KorrekturErgebnis {
+  const eingabe = normalisiereLatex(antwort.latex)
+  const erwartet = normalisiereLatex(frage.korrekteFormel)
+  const korrekt = eingabe === erwartet
+
+  return {
+    erreichtePunkte: korrekt ? frage.punkte : 0,
+    maxPunkte: frage.punkte,
+    details: [{
+      bezeichnung: 'Formel',
+      korrekt,
+      erreicht: korrekt ? frage.punkte : 0,
+      max: frage.punkte,
+      kommentar: korrekt ? undefined : `Erwartet: ${frage.korrekteFormel}`,
+    }],
   }
 }

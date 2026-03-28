@@ -6,7 +6,7 @@ const ALLE_GENERISCHEN_TYPEN = [
   'mc', 'freitext', 'zuordnung', 'lueckentext', 'richtigfalsch',
   'berechnung', 'aufgabengruppe', 'visualisierung', 'pdf',
   'sortierung', 'hotspot', 'bildbeschriftung',
-  'audio', 'dragdrop_bild'
+  'audio', 'dragdrop_bild', 'code', 'formel'
 ]
 
 const FIBU_TYPEN_LISTE = ['buchungssatz', 'tkonto', 'kontenbestimmung', 'bilanzstruktur']

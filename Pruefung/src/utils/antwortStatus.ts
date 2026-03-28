@@ -138,6 +138,14 @@ export function istVollstaendigBeantwortet(
       return zugeordnet >= anzahlZonen
     }
 
+    case 'code':
+      // Code darf nicht leer sein
+      return antwort.code.trim().length > 0
+
+    case 'formel':
+      // LaTeX darf nicht leer sein
+      return antwort.latex.trim().length > 0
+
     default:
       // Alle anderen Typen: Existenz reicht
       return true
