@@ -23,39 +23,34 @@ export const einrichtungsPruefung: PruefungsConfig = {
 
   abschnitte: [
     {
-      titel: 'Teil A: Ankommen & Orientierung',
+      titel: 'Teil A: Orientierung & Auswahl',
       beschreibung: 'Schauen Sie sich auf der Prüfungsoberfläche um. Beantworten Sie die Fragen, indem Sie das Tool erkunden.',
-      fragenIds: ['einr-mc-orientierung', 'einr-mc-uielemente', 'einr-rf-toolfunktionen'],
+      fragenIds: ['einr-mc-orientierung', 'einr-mc-uielemente', 'einr-rf-toolfunktionen', 'einr-sort-planeten', 'einr-hs-europa'],
     },
     {
-      titel: 'Teil B: Texteingabe',
-      beschreibung: 'Testen Sie die verschiedenen Eingabemöglichkeiten: Freitext mit Formatierung und Lückentext.',
-      fragenIds: ['einr-ft-formatierung', 'einr-lt-hofwil', 'einr-ft-morgen'],
+      titel: 'Teil B: Texteingabe & Sprache',
+      beschreibung: 'Testen Sie die verschiedenen Eingabemöglichkeiten: Freitext, Lückentext, Formel und Audio-Aufnahme.',
+      fragenIds: ['einr-ft-formatierung', 'einr-lt-hofwil', 'einr-ft-morgen', 'einr-formel-pythagoras', 'einr-audio-vorstellen'],
     },
     {
-      titel: 'Teil C: Auswahl & Rechnen',
-      beschreibung: 'Testen Sie Zuordnungsaufgaben und numerische Eingaben mit Rechenweg.',
-      fragenIds: ['einr-zu-emojis', 'einr-be-pizza'],
+      titel: 'Teil C: Zuordnung & Bilder',
+      beschreibung: 'Testen Sie Zuordnungsaufgaben, Bildbeschriftungen und Drag & Drop.',
+      fragenIds: ['einr-zu-emojis', 'einr-be-pizza', 'einr-bb-zelle', 'einr-dd-kontinente'],
     },
     {
-      titel: 'Teil D: Zeichnen & PDF',
-      beschreibung: 'Testen Sie die Zeichenwerkzeuge und die PDF-Annotation. Lassen Sie Ihrer Kreativität freien Lauf!',
-      fragenIds: ['einr-vis-smiley', 'einr-pdf-witz'],
+      titel: 'Teil D: Zeichnen, PDF & Code',
+      beschreibung: 'Testen Sie die Zeichenwerkzeuge, PDF-Annotation und den Code-Editor.',
+      fragenIds: ['einr-vis-smiley', 'einr-pdf-witz', 'einr-code-python'],
     },
     {
-      titel: 'Teil E: Buchhaltung — Eingabefelder testen',
-      beschreibung: 'Diese Aufgaben testen spezielle Eingabefelder für Buchhaltung. Die Lösungen stehen in der Aufgabenstellung — geben Sie sie einfach ein, um die Felder kennenzulernen.',
+      titel: 'Teil E: Buchhaltung',
+      beschreibung: 'Spezielle Eingabefelder für Buchhaltung testen. Die Lösungen stehen in der Aufgabenstellung — geben Sie sie einfach ein.',
       fragenIds: ['einr-bs-eis', 'einr-tk-kasse', 'einr-kb-einfach', 'einr-bilanz-einfach'],
     },
     {
       titel: 'Teil F: Material & Features',
-      beschreibung: 'Zum Abschluss: Nutzen Sie das Materialpanel und entdecken Sie versteckte Features des Tools!',
+      beschreibung: 'Nutzen Sie das Materialpanel und entdecken Sie Features des Tools!',
       fragenIds: ['einr-ag-material', 'einr-mc-features'],
-    },
-    {
-      titel: 'Teil G: Neue Fragetypen',
-      beschreibung: 'Testen Sie die 7 neusten Fragetypen: Sortierung, Hotspot, Bildbeschriftung, Audio-Aufnahme, Drag & Drop auf Bilder, Code-Editor und Formel-Editor.',
-      fragenIds: ['einr-sort-planeten', 'einr-hs-europa', 'einr-bb-zelle', 'einr-audio-vorstellen', 'einr-dd-kontinente', 'einr-code-python', 'einr-formel-pythagoras'],
     },
   ],
 

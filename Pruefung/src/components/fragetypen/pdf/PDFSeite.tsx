@@ -386,15 +386,28 @@ export function PDFSeite({
       }
       if (annotId === selectedAnnotation) {
         const ann = annotationen.find(a => a.id === selectedAnnotation)
-        if (ann?.werkzeug === 'text') {
+        if (ann?.werkzeug === 'text' || ann?.werkzeug === 'freihand') {
           const containerRect = containerRef.current?.getBoundingClientRect()
           if (containerRect) {
-            dragRef.current = {
-              annotId: selectedAnnotation,
-              startRelX: (e.clientX - containerRect.left) / seitenInfo.breite,
-              startRelY: (e.clientY - containerRect.top) / seitenInfo.hoehe,
-              origX: (ann as PDFTextAnnotation).position.x,
-              origY: (ann as PDFTextAnnotation).position.y,
+            const startRelX = (e.clientX - containerRect.left) / seitenInfo.breite
+            const startRelY = (e.clientY - containerRect.top) / seitenInfo.hoehe
+            if (ann.werkzeug === 'text') {
+              dragRef.current = {
+                annotId: selectedAnnotation,
+                startRelX,
+                startRelY,
+                origX: (ann as PDFTextAnnotation).position.x,
+                origY: (ann as PDFTextAnnotation).position.y,
+              }
+            } else {
+              // Freihand: Startpunkt merken, Punkte werden beim Drop verschoben
+              dragRef.current = {
+                annotId: selectedAnnotation,
+                startRelX,
+                startRelY,
+                origX: 0,
+                origY: 0,
+              }
             }
             e.preventDefault()
             return
@@ -423,7 +436,7 @@ export function PDFSeite({
   }, [readOnly, aktivesWerkzeug, seitenInfo, aktiveFarbe, selectedAnnotation, annotationen])
 
   const handleDrawMove = useCallback((e: React.PointerEvent) => {
-    // Drag: Annotation verschieben
+    // Drag: Annotation verschieben (Text oder Freihand)
     if (dragRef.current && seitenInfo) {
       const containerRect = containerRef.current?.getBoundingClientRect()
       if (!containerRect) return
@@ -431,9 +444,33 @@ export function PDFSeite({
       const relY = (e.clientY - containerRect.top) / seitenInfo.hoehe
       const dx = relX - dragRef.current.startRelX
       const dy = relY - dragRef.current.startRelY
-      onAnnotationEditieren?.(dragRef.current.annotId, {
-        position: { x: dragRef.current.origX + dx, y: dragRef.current.origY + dy },
-      } as Partial<PDFAnnotation>)
+      const ann = annotationen.find(a => a.id === dragRef.current!.annotId)
+      if (ann?.werkzeug === 'freihand') {
+        // Freihand: alle Punkte verschieben
+        try {
+          const punkte = JSON.parse((ann as PDFFreihandAnnotation).zeichnungsDaten) as { x: number; y: number }[]
+          // Beim ersten Move die Originalpunkte merken
+          if (dragRef.current.origX === 0 && dragRef.current.origY === 0) {
+            dragRef.current.origX = punkte[0]?.x ?? 0
+            dragRef.current.origY = punkte[0]?.y ?? 0
+            // Original-Punkte in einem data-Attribut zwischenspeichern
+            containerRef.current?.setAttribute('data-drag-orig-punkte', (ann as PDFFreihandAnnotation).zeichnungsDaten)
+          }
+          const origPunkteStr = containerRef.current?.getAttribute('data-drag-orig-punkte')
+          if (origPunkteStr) {
+            const origPunkte = JSON.parse(origPunkteStr) as { x: number; y: number }[]
+            const verschoben = origPunkte.map(p => ({ x: p.x + dx, y: p.y + dy }))
+            onAnnotationEditieren?.(dragRef.current.annotId, {
+              zeichnungsDaten: JSON.stringify(verschoben),
+            } as Partial<PDFAnnotation>)
+          }
+        } catch { /* JSON-Parse-Fehler ignorieren */ }
+      } else {
+        // Text: Position verschieben
+        onAnnotationEditieren?.(dragRef.current.annotId, {
+          position: { x: dragRef.current.origX + dx, y: dragRef.current.origY + dy },
+        } as Partial<PDFAnnotation>)
+      }
       return
     }
     if (!istZeichnung.current || !seitenInfo) return
@@ -454,6 +491,7 @@ export function PDFSeite({
   const handleDrawEnd = useCallback(() => {
     // Drag-Ende
     if (dragRef.current) {
+      containerRef.current?.removeAttribute('data-drag-orig-punkte')
       dragRef.current = null
       return
     }
@@ -680,7 +718,7 @@ function renderSVGOverlay(
         elements.push(renderKommentarMarker(ann, seitenInfo))
         break
       case 'freihand':
-        elements.push(renderFreihand(ann, seitenInfo))
+        elements.push(renderFreihand(ann, seitenInfo, ann.id === selectedAnnotationId))
         break
       case 'text':
         elements.push(renderTextAnnotation(ann, seitenInfo, ann.id === selectedAnnotationId))
@@ -775,6 +813,7 @@ function renderKommentarMarker(
 function renderFreihand(
   ann: PDFFreihandAnnotation,
   seitenInfo: PDFSeitenInfo,
+  selected = false,
 ): React.ReactNode {
   let punkte: { x: number; y: number }[]
   try {
@@ -792,7 +831,27 @@ function renderFreihand(
     })
     .join(' ')
 
-  return (
+  // Bounding Box für Selection-Rahmen
+  const nodes: React.ReactNode[] = []
+
+  if (selected) {
+    const xs = punkte.map(p => p.x * seitenInfo.breite)
+    const ys = punkte.map(p => p.y * seitenInfo.hoehe)
+    const minX = Math.min(...xs) - 4
+    const minY = Math.min(...ys) - 4
+    const maxX = Math.max(...xs) + 4
+    const maxY = Math.max(...ys) + 4
+    nodes.push(
+      <rect
+        key={`fh-sel-${ann.id}`}
+        x={minX} y={minY} width={maxX - minX} height={maxY - minY}
+        fill="none" stroke="#3b82f6" strokeWidth={2} strokeDasharray="4,2" rx={3}
+        className="pointer-events-none"
+      />
+    )
+  }
+
+  nodes.push(
     <path
       key={`fh-${ann.id}`}
       data-annotation-id={ann.id}
@@ -805,6 +864,8 @@ function renderFreihand(
       className="pointer-events-auto cursor-pointer"
     />
   )
+
+  return <g key={`fh-g-${ann.id}`}>{nodes}</g>
 }
 
 function renderTextAnnotation(

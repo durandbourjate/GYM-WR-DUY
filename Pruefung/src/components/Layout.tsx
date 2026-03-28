@@ -285,56 +285,96 @@ export default function Layout() {
         </div>
       )}
 
-      {/* Header — kompakt: Timer, Counter, Material, Abgeben, Theme */}
-      <header className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-3 py-2 sticky top-0 z-20">
-        <div className="flex items-center justify-between gap-2">
-          {/* Links: Timer + AutoSave */}
-          <div className="flex items-center gap-2">
+      {/* Header — Navigation + Timer + Material + Abgeben (alles in einer Leiste) */}
+      <header className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-2 py-1.5 sticky top-0 z-20">
+        <div className="flex items-center gap-1.5">
+          {/* Zurück */}
+          <button
+            onClick={vorherigeFrage}
+            disabled={aktuelleFrageIndex === 0}
+            title="Vorherige Frage"
+            className="px-2.5 py-1.5 text-sm font-medium text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer min-h-[40px] flex items-center gap-1"
+          >
+            <span>&larr;</span>
+            <span className="hidden sm:inline">Zurück</span>
+          </button>
+
+          {/* Frage-Counter */}
+          <span className="text-sm text-slate-600 dark:text-slate-300 tabular-nums font-semibold whitespace-nowrap">
+            {aktuelleFrageIndex + 1} / {fragen.length}
+          </span>
+
+          {/* Weiter */}
+          <button
+            onClick={naechsteFrage}
+            disabled={aktuelleFrageIndex === fragen.length - 1}
+            title="Nächste Frage"
+            className="px-2.5 py-1.5 text-sm font-medium text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer min-h-[40px] flex items-center gap-1"
+          >
+            <span className="hidden sm:inline">Weiter</span>
+            <span>&rarr;</span>
+          </button>
+
+          {/* Unsicher-Toggle */}
+          {aktuelleFrage && (
+            <button
+              onClick={() => toggleMarkierung(aktuelleFrage.id)}
+              title={istMarkiert ? 'Markierung entfernen' : 'Als unsicher markieren'}
+              className={`px-2 py-1.5 text-sm rounded-lg border transition-colors cursor-pointer flex items-center gap-1 min-h-[40px]
+                ${istMarkiert
+                  ? 'bg-amber-100 border-amber-400 text-amber-800 font-semibold dark:bg-amber-900/40 dark:border-amber-600 dark:text-amber-300'
+                  : 'border-slate-300 text-slate-500 dark:border-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
+                }
+              `}
+            >
+              <span>?</span>
+              <span className="hidden lg:inline">{istMarkiert ? 'Markiert ✓' : 'Unsicher'}</span>
+            </button>
+          )}
+
+          {/* Spacer */}
+          <div className="flex-1" />
+
+          {/* Timer + AutoSave */}
+          <div className="flex items-center gap-1.5">
             <AutoSaveIndikator />
             <Timer onZeitAbgelaufen={() => setZeitAbgelaufen(true)} />
           </div>
 
-          {/* Mitte: Frage-Counter */}
-          <span className="text-sm text-slate-600 dark:text-slate-300 tabular-nums font-medium">
-            {aktuelleFrageIndex + 1} / {fragen.length}
-          </span>
+          {/* Material-Button */}
+          {config.materialien && config.materialien.length > 0 && (
+            <button
+              onClick={handleMaterialToggle}
+              title={materialOffen ? 'Material schliessen' : 'Material anzeigen'}
+              className={`px-2 py-1.5 text-xs rounded-lg border transition-colors cursor-pointer flex items-center gap-1 min-h-[40px]
+                ${materialOffen
+                  ? 'bg-green-50 border-green-300 text-green-700 dark:bg-green-900/30 dark:border-green-700 dark:text-green-300'
+                  : 'border-slate-300 text-slate-500 dark:border-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
+                }
+              `}
+            >
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <span className="hidden sm:inline">Material</span>
+            </button>
+          )}
 
-          {/* Rechts: Material + Abgeben + Status + Theme */}
-          <div className="flex items-center gap-1.5">
-            {/* Material-Button (nur wenn Materialien vorhanden) */}
-            {config.materialien && config.materialien.length > 0 && (
-              <button
-                onClick={handleMaterialToggle}
-                title={materialOffen ? 'Material schliessen' : 'Material anzeigen'}
-                className={`px-3 py-2 text-xs rounded-lg border transition-colors cursor-pointer flex items-center gap-1 min-h-[44px]
-                  ${materialOffen
-                    ? 'bg-green-50 border-green-300 text-green-700 dark:bg-green-900/30 dark:border-green-700 dark:text-green-300'
-                    : 'border-slate-300 text-slate-500 dark:border-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
-                  }
-                `}
-              >
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                <span className="hidden sm:inline">Material</span>
-              </button>
-            )}
+          {/* Abgeben */}
+          {!abgegeben && (
+            <button
+              onClick={() => setZeigAbgabeDialog(true)}
+              className="px-3 py-1.5 text-sm font-semibold text-white bg-green-600 rounded-lg hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-500 transition-colors cursor-pointer min-h-[40px]"
+            >
+              Abgeben
+            </button>
+          )}
 
-            {!abgegeben && (
-              <button
-                onClick={() => setZeigAbgabeDialog(true)}
-                className="px-4 py-2 text-sm font-semibold text-white bg-green-600 rounded-lg hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-500 transition-colors cursor-pointer min-h-[44px] sm:min-h-0 sm:py-1.5 sm:text-xs"
-              >
-                Abgeben
-              </button>
-            )}
-
-            <VerbindungsStatus />
-            <ThemeToggle />
-          </div>
+          <VerbindungsStatus />
+          <ThemeToggle />
         </div>
         {/* Fortschrittsbalken */}
-        <div className="mt-1.5 h-1 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+        <div className="mt-1 h-1 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
           <div
             className="h-full bg-slate-500 dark:bg-slate-400 transition-all duration-500"
             style={{ width: `${fortschrittProzent}%` }}
@@ -359,54 +399,9 @@ export default function Layout() {
             <FragenNavigation />
           </aside>
 
-          {/* Fragenbereich */}
-          <main className={`flex-1 overflow-auto min-w-0 ${istSplitModus ? 'p-3 md:p-5' : 'p-4 md:p-8'}`}>
-            <div className={istSplitModus ? 'max-w-2xl mx-auto' : 'max-w-3xl mx-auto'}>
-              {/* Navigation über der Frage: Zurück / Frage X von Y / Weiter + Unsicher — sticky */}
-              <div className="sticky top-0 z-10 pb-3 -mt-1 pt-1 bg-slate-50 dark:bg-slate-900">
-                <div className="flex items-center justify-between gap-2 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 px-3 py-2 shadow-sm">
-                  <button
-                    onClick={vorherigeFrage}
-                    disabled={aktuelleFrageIndex === 0}
-                    title="Vorherige Frage"
-                    className="px-4 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer min-h-[44px] flex items-center gap-1"
-                  >
-                    <span>&larr;</span>
-                    <span className="hidden sm:inline">Zurück</span>
-                  </button>
-                  <span className="text-sm text-slate-600 dark:text-slate-300 tabular-nums font-semibold">
-                    Frage {aktuelleFrageIndex + 1} von {fragen.length}
-                  </span>
-                  <div className="flex items-center gap-2">
-                    {/* Unsicher-Toggle links neben Weiter */}
-                    {aktuelleFrage && (
-                      <button
-                        onClick={() => toggleMarkierung(aktuelleFrage.id)}
-                        title={istMarkiert ? 'Markierung entfernen' : 'Als unsicher markieren'}
-                        className={`px-3 py-2.5 text-sm rounded-lg border transition-colors cursor-pointer flex items-center gap-1.5 min-h-[44px]
-                          ${istMarkiert
-                            ? 'bg-amber-100 border-amber-400 text-amber-800 font-semibold dark:bg-amber-900/40 dark:border-amber-600 dark:text-amber-300'
-                            : 'border-slate-300 text-slate-500 dark:border-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
-                          }
-                        `}
-                      >
-                        <span>?</span>
-                        <span className="hidden sm:inline">{istMarkiert ? 'Markiert \u2713' : 'Unsicher'}</span>
-                      </button>
-                    )}
-                    <button
-                      onClick={naechsteFrage}
-                      disabled={aktuelleFrageIndex === fragen.length - 1}
-                      title="Nächste Frage"
-                      className="px-4 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer min-h-[44px] flex items-center gap-1"
-                    >
-                      <span className="hidden sm:inline">Weiter</span>
-                      <span>&rarr;</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-
+          {/* Fragenbereich — volle Breite nutzen */}
+          <main className={`flex-1 overflow-auto min-w-0 ${istSplitModus ? 'px-3 py-3 md:px-4 md:py-4' : 'px-3 py-3 md:px-6 md:py-4'}`}>
+            <div>
               {/* Abschnitt-Header */}
               {abschnittInfo && abschnittInfo.istErsteFrage && (
                 <div className="mb-5 pb-3 border-b border-slate-200 dark:border-slate-700">
