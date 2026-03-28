@@ -12,6 +12,7 @@ import type {
   PDFKategorie, PDFAnnotationsWerkzeug, PDFAnnotation,
   LueckentextFrage,
   HotspotBereich, BildbeschriftungLabel,
+  DragDropBildZielzone,
 } from '../../../../types/fragen.ts'
 import type { FrageTyp } from '../editorUtils.ts'
 import type { useKIAssistent } from '../useKIAssistent.ts'
@@ -31,6 +32,8 @@ import PDFEditor from '../PDFEditor.tsx'
 import SortierungEditor from '../SortierungEditor.tsx'
 import HotspotEditor from '../HotspotEditor.tsx'
 import BildbeschriftungEditor from '../BildbeschriftungEditor.tsx'
+import AudioEditor from '../AudioEditor.tsx'
+import DragDropBildEditor from '../DragDropBildEditor.tsx'
 import { KIBuchungssatzButtons, KITKontoButtons, KIKontenbestimmungButtons, KIBilanzERButtons } from '../KIFiBuButtons.tsx'
 import { InlineAktionButton, ErgebnisAnzeige } from '../KIBausteine.tsx'
 
@@ -163,6 +166,18 @@ interface TypEditorDispatcherProps {
   setBbBildUrl: (v: string) => void
   bbBeschriftungen: BildbeschriftungLabel[]
   setBbBeschriftungen: React.Dispatch<React.SetStateAction<BildbeschriftungLabel[]>>
+
+  // Audio
+  audioMaxDauer: number | undefined
+  setAudioMaxDauer: (v: number | undefined) => void
+
+  // DragDrop Bild
+  ddBildUrl: string
+  setDdBildUrl: (v: string) => void
+  ddZielzonen: DragDropBildZielzone[]
+  setDdZielzonen: React.Dispatch<React.SetStateAction<DragDropBildZielzone[]>>
+  ddLabels: string[]
+  setDdLabels: React.Dispatch<React.SetStateAction<string[]>>
 }
 
 export default function TypEditorDispatcher(props: TypEditorDispatcherProps) {
@@ -696,6 +711,24 @@ export default function TypEditorDispatcher(props: TypEditorDispatcherProps) {
           setBildUrl={props.setBbBildUrl}
           beschriftungen={props.bbBeschriftungen}
           setBeschriftungen={props.setBbBeschriftungen}
+        />
+      )}
+
+      {typ === 'audio' && (
+        <AudioEditor
+          maxDauerSekunden={props.audioMaxDauer}
+          setMaxDauerSekunden={props.setAudioMaxDauer}
+        />
+      )}
+
+      {typ === 'dragdrop_bild' && (
+        <DragDropBildEditor
+          bildUrl={props.ddBildUrl}
+          setBildUrl={props.setDdBildUrl}
+          zielzonen={props.ddZielzonen}
+          setZielzonen={props.setDdZielzonen}
+          labels={props.ddLabels}
+          setLabels={props.setDdLabels}
         />
       )}
     </>

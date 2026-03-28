@@ -2,7 +2,7 @@
  * Auto-Korrektur-Engine für deterministische Fragetypen.
  * Nicht-deterministische Typen (freitext, visualisierung, pdf) → null (manuelle Korrektur).
  */
-import type { Frage, MCFrage, RichtigFalschFrage, LueckentextFrage, ZuordnungFrage, BerechnungFrage, SortierungFrage, HotspotFrage, BildbeschriftungFrage } from '../types/fragen'
+import type { Frage, MCFrage, RichtigFalschFrage, LueckentextFrage, ZuordnungFrage, BerechnungFrage, SortierungFrage, HotspotFrage, BildbeschriftungFrage, DragDropBildFrage } from '../types/fragen'
 import type { Antwort } from '../types/antworten'
 import { korrigiereBuchungssatz, korrigiereTKonto, korrigiereKontenbestimmung, korrigiereBilanzER } from './fibuAutoKorrektur'
 export type { KorrekturErgebnis, KorrekturDetail } from './fibuAutoKorrektur'
@@ -12,7 +12,7 @@ import type { KorrekturErgebnis, KorrekturDetail } from './fibuAutoKorrektur'
 const AUTO_TYPEN = new Set([
   'mc', 'richtigfalsch', 'lueckentext', 'zuordnung', 'berechnung',
   'buchungssatz', 'tkonto', 'kontenbestimmung', 'bilanzstruktur',
-  'sortierung', 'hotspot', 'bildbeschriftung',
+  'sortierung', 'hotspot', 'bildbeschriftung', 'dragdrop_bild',
 ])
 
 /** Prüft ob ein Fragetyp automatisch korrigierbar ist */
@@ -75,6 +75,8 @@ export function autoKorrigiere(frage: Frage, antwort: Antwort | undefined): Korr
         return korrigiereHotspot(frage, antwort as Extract<Antwort, { typ: 'hotspot' }>)
       case 'bildbeschriftung':
         return korrigiereBildbeschriftung(frage, antwort as Extract<Antwort, { typ: 'bildbeschriftung' }>)
+      case 'dragdrop_bild':
+        return korrigiereDragDropBild(frage, antwort as Extract<Antwort, { typ: 'dragdrop_bild' }>)
       default:
         return null
     }
@@ -361,6 +363,35 @@ function korrigiereBildbeschriftung(
   const erreicht = details.reduce((s, d) => s + d.erreicht, 0)
   return {
     erreichtePunkte: Math.round(erreicht * 100) / 100,
+    maxPunkte: frage.punkte,
+    details,
+  }
+}
+
+// === DRAG & DROP BILD ===
+
+function korrigiereDragDropBild(
+  frage: DragDropBildFrage,
+  antwort: Extract<Antwort, { typ: 'dragdrop_bild' }>
+): KorrekturErgebnis {
+  const details: KorrekturDetail[] = []
+  const punkteProZone = frage.punkte / Math.max(1, frage.zielzonen.length)
+
+  for (const zone of frage.zielzonen) {
+    const zugeordnet = antwort.zuordnungen[zone.id] ?? ''
+    const korrekt = zugeordnet.trim().toLowerCase() === zone.korrektesLabel.trim().toLowerCase()
+    details.push({
+      bezeichnung: `Zone: ${zone.korrektesLabel}`,
+      korrekt,
+      erreicht: korrekt ? punkteProZone : 0,
+      max: punkteProZone,
+      kommentar: korrekt ? undefined : (zugeordnet ? `Zugeordnet: ${zugeordnet}` : 'Nicht zugeordnet'),
+    })
+  }
+
+  const erreichDd = details.reduce((s, d) => s + d.erreicht, 0)
+  return {
+    erreichtePunkte: Math.round(erreichDd * 100) / 100,
     maxPunkte: frage.punkte,
     details,
   }

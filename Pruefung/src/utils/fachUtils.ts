@@ -67,6 +67,8 @@ export function typLabel(typ: string): string {
     sortierung: 'Sortierung',
     hotspot: 'Hotspot',
     bildbeschriftung: 'Bildbeschriftung',
+    audio: 'Audio-Aufnahme',
+    dragdrop_bild: 'Drag & Drop Bild',
   }
   return labels[typ] || typ
 }

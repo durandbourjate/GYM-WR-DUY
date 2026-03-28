@@ -32,6 +32,11 @@ function typLabel(typ: string): string {
     case 'visualisierung': return 'Zeichnen'
     case 'pdf': return 'PDF'
     case 'aufgabengruppe': return 'Gruppe'
+    case 'sortierung': return 'Sortierung'
+    case 'hotspot': return 'Hotspot'
+    case 'bildbeschriftung': return 'Beschriftung'
+    case 'audio': return 'Audio'
+    case 'dragdrop_bild': return 'Drag&Drop'
     default: return typ
   }
 }

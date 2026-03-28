@@ -21,6 +21,7 @@ import type {
   VisualisierungFrage, CanvasConfig,
   PDFFrage, PDFKategorie, PDFAnnotationsWerkzeug, PDFAnnotation,
   SortierungFrage, HotspotFrage, HotspotBereich, BildbeschriftungFrage, BildbeschriftungLabel,
+  AudioFrage, DragDropBildFrage, DragDropBildZielzone,
 } from '../../../types/fragen.ts'
 import type { FrageTyp } from './editorUtils.ts'
 import { generiereFrageId } from './editorUtils.ts'
@@ -309,6 +310,22 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen, performa
     frage?.typ === 'bildbeschriftung' ? (frage as BildbeschriftungFrage).beschriftungen : []
   )
 
+  // Audio-spezifisch
+  const [audioMaxDauer, setAudioMaxDauer] = useState<number | undefined>(
+    frage?.typ === 'audio' ? (frage as AudioFrage).maxDauerSekunden : undefined
+  )
+
+  // DragDrop-Bild-spezifisch
+  const [ddBildUrl, setDdBildUrl] = useState(
+    frage?.typ === 'dragdrop_bild' ? (frage as DragDropBildFrage).bildUrl : ''
+  )
+  const [ddZielzonen, setDdZielzonen] = useState<DragDropBildZielzone[]>(
+    frage?.typ === 'dragdrop_bild' ? (frage as DragDropBildFrage).zielzonen : []
+  )
+  const [ddLabels, setDdLabels] = useState<string[]>(
+    frage?.typ === 'dragdrop_bild' ? (frage as DragDropBildFrage).labels : []
+  )
+
   // Zeitbedarf
   const [zeitbedarf, setZeitbedarf] = useState<number>(
     frage?.zeitbedarf ?? berechneZeitbedarf(
@@ -468,6 +485,10 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen, performa
         typDaten = { typ: 'hotspot', fragetext, bildUrl: hsBildUrl, bereiche: hsBereiche, mehrfachauswahl: hsMehrfachauswahl }; break
       case 'bildbeschriftung':
         typDaten = { typ: 'bildbeschriftung', fragetext, bildUrl: bbBildUrl, beschriftungen: bbBeschriftungen }; break
+      case 'audio':
+        typDaten = { typ: 'audio', fragetext, maxDauerSekunden: audioMaxDauer }; break
+      case 'dragdrop_bild':
+        typDaten = { typ: 'dragdrop_bild', fragetext, bildUrl: ddBildUrl, zielzonen: ddZielzonen, labels: ddLabels }; break
       default:
         setSpeicherLaeuft(false)
         return
@@ -713,6 +734,10 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen, performa
             hsMehrfachauswahl={hsMehrfachauswahl} setHsMehrfachauswahl={setHsMehrfachauswahl}
             bbBildUrl={bbBildUrl} setBbBildUrl={setBbBildUrl}
             bbBeschriftungen={bbBeschriftungen} setBbBeschriftungen={setBbBeschriftungen}
+            audioMaxDauer={audioMaxDauer} setAudioMaxDauer={setAudioMaxDauer}
+            ddBildUrl={ddBildUrl} setDdBildUrl={setDdBildUrl}
+            ddZielzonen={ddZielzonen} setDdZielzonen={setDdZielzonen}
+            ddLabels={ddLabels} setDdLabels={setDdLabels}
           />
 
           {/* Musterlösung */}

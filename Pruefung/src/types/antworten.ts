@@ -64,4 +64,6 @@ export type Antwort =
   | { typ: 'pdf'; annotationen: import('./fragen').PDFAnnotation[] }
   | { typ: 'sortierung'; reihenfolge: string[] }
   | { typ: 'hotspot'; geklickt: { x: number; y: number }[] }
-  | { typ: 'bildbeschriftung'; eintraege: Record<string, string> };
+  | { typ: 'bildbeschriftung'; eintraege: Record<string, string> }
+  | { typ: 'audio'; aufnahmeUrl: string; dauer: number }
+  | { typ: 'dragdrop_bild'; zuordnungen: Record<string, string> };

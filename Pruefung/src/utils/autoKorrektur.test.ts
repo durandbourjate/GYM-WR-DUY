@@ -1,18 +1,18 @@
 import { describe, it, expect } from 'vitest'
 import { istAutoKorrigierbar, autoKorrigiere } from './autoKorrektur'
-import type { Frage, MCFrage, RichtigFalschFrage, SortierungFrage, HotspotFrage, BildbeschriftungFrage } from '../types/fragen'
+import type { Frage, MCFrage, RichtigFalschFrage, SortierungFrage, HotspotFrage, BildbeschriftungFrage, DragDropBildFrage } from '../types/fragen'
 import type { Antwort } from '../types/antworten'
 
 describe('istAutoKorrigierbar', () => {
   it.each([
     'mc', 'richtigfalsch', 'lueckentext', 'zuordnung', 'berechnung',
     'buchungssatz', 'tkonto', 'kontenbestimmung', 'bilanzstruktur',
-    'sortierung', 'hotspot', 'bildbeschriftung',
+    'sortierung', 'hotspot', 'bildbeschriftung', 'dragdrop_bild',
   ])('gibt true für %s', (typ) => {
     expect(istAutoKorrigierbar(typ)).toBe(true)
   })
 
-  it.each(['freitext', 'pdf', 'visualisierung', 'aufgabengruppe'])('gibt false für %s', (typ) => {
+  it.each(['freitext', 'pdf', 'visualisierung', 'aufgabengruppe', 'audio'])('gibt false für %s', (typ) => {
     expect(istAutoKorrigierbar(typ)).toBe(false)
   })
 })
@@ -339,5 +339,100 @@ describe('autoKorrigiere', () => {
     const result = autoKorrigiere(frage, antwort)
     expect(result).not.toBeNull()
     expect(result!.erreichtePunkte).toBe(1) // Nur l1 korrekt
+  })
+
+  // === DRAG & DROP BILD ===
+
+  it('korrigiert DragDropBild alle korrekt', () => {
+    const frage: DragDropBildFrage = {
+      id: 'dd-1', typ: 'dragdrop_bild', version: 1, erstelltAm: '2026-01-01', geaendertAm: '2026-01-01',
+      fachbereich: 'VWL', fach: 'Wirtschaft & Recht', thema: 'Test',
+      semester: ['S3'], gefaesse: ['SF'], bloom: 'K2', tags: [],
+      punkte: 3, musterlosung: '', bewertungsraster: [], verwendungen: [],
+      fragetext: 'Ordne die Labels zu',
+      bildUrl: 'https://example.com/bild.png',
+      zielzonen: [
+        { id: 'z1', position: { x: 10, y: 10, breite: 20, hoehe: 20 }, korrektesLabel: 'Angebot' },
+        { id: 'z2', position: { x: 50, y: 50, breite: 20, hoehe: 20 }, korrektesLabel: 'Nachfrage' },
+        { id: 'z3', position: { x: 80, y: 20, breite: 10, hoehe: 10 }, korrektesLabel: 'Preis' },
+      ],
+      labels: ['Angebot', 'Nachfrage', 'Preis', 'Menge'],
+    }
+    const antwort: Antwort = {
+      typ: 'dragdrop_bild',
+      zuordnungen: { z1: 'Angebot', z2: 'Nachfrage', z3: 'Preis' },
+    }
+    const result = autoKorrigiere(frage, antwort)
+    expect(result).not.toBeNull()
+    expect(result!.erreichtePunkte).toBe(3)
+  })
+
+  it('korrigiert DragDropBild teilweise korrekt', () => {
+    const frage: DragDropBildFrage = {
+      id: 'dd-2', typ: 'dragdrop_bild', version: 1, erstelltAm: '2026-01-01', geaendertAm: '2026-01-01',
+      fachbereich: 'VWL', fach: 'Wirtschaft & Recht', thema: 'Test',
+      semester: ['S3'], gefaesse: ['SF'], bloom: 'K2', tags: [],
+      punkte: 2, musterlosung: '', bewertungsraster: [], verwendungen: [],
+      fragetext: 'Ordne zu',
+      bildUrl: 'https://example.com/bild.png',
+      zielzonen: [
+        { id: 'z1', position: { x: 10, y: 10, breite: 20, hoehe: 20 }, korrektesLabel: 'BIP' },
+        { id: 'z2', position: { x: 50, y: 50, breite: 20, hoehe: 20 }, korrektesLabel: 'Inflation' },
+      ],
+      labels: ['BIP', 'Inflation', 'Deflation'],
+    }
+    const antwort: Antwort = {
+      typ: 'dragdrop_bild',
+      zuordnungen: { z1: 'BIP', z2: 'Deflation' },
+    }
+    const result = autoKorrigiere(frage, antwort)
+    expect(result).not.toBeNull()
+    expect(result!.erreichtePunkte).toBe(1) // Nur z1 korrekt
+  })
+
+  it('korrigiert DragDropBild case-insensitive', () => {
+    const frage: DragDropBildFrage = {
+      id: 'dd-3', typ: 'dragdrop_bild', version: 1, erstelltAm: '2026-01-01', geaendertAm: '2026-01-01',
+      fachbereich: 'VWL', fach: 'Wirtschaft & Recht', thema: 'Test',
+      semester: ['S3'], gefaesse: ['SF'], bloom: 'K2', tags: [],
+      punkte: 2, musterlosung: '', bewertungsraster: [], verwendungen: [],
+      fragetext: 'Ordne zu',
+      bildUrl: 'https://example.com/bild.png',
+      zielzonen: [
+        { id: 'z1', position: { x: 10, y: 10, breite: 20, hoehe: 20 }, korrektesLabel: 'BIP' },
+      ],
+      labels: ['BIP'],
+    }
+    const antwort: Antwort = {
+      typ: 'dragdrop_bild',
+      zuordnungen: { z1: 'bip' },
+    }
+    const result = autoKorrigiere(frage, antwort)
+    expect(result).not.toBeNull()
+    expect(result!.erreichtePunkte).toBe(2) // Case-insensitive match
+  })
+
+  it('korrigiert DragDropBild leere Zuordnung', () => {
+    const frage: DragDropBildFrage = {
+      id: 'dd-4', typ: 'dragdrop_bild', version: 1, erstelltAm: '2026-01-01', geaendertAm: '2026-01-01',
+      fachbereich: 'VWL', fach: 'Wirtschaft & Recht', thema: 'Test',
+      semester: ['S3'], gefaesse: ['SF'], bloom: 'K2', tags: [],
+      punkte: 2, musterlosung: '', bewertungsraster: [], verwendungen: [],
+      fragetext: 'Ordne zu',
+      bildUrl: 'https://example.com/bild.png',
+      zielzonen: [
+        { id: 'z1', position: { x: 10, y: 10, breite: 20, hoehe: 20 }, korrektesLabel: 'BIP' },
+        { id: 'z2', position: { x: 50, y: 50, breite: 20, hoehe: 20 }, korrektesLabel: 'Inflation' },
+      ],
+      labels: ['BIP', 'Inflation'],
+    }
+    const antwort: Antwort = {
+      typ: 'dragdrop_bild',
+      zuordnungen: {},
+    }
+    const result = autoKorrigiere(frage, antwort)
+    expect(result).not.toBeNull()
+    expect(result!.erreichtePunkte).toBe(0)
+    expect(result!.details.every(d => !d.korrekt)).toBe(true)
   })
 })

@@ -125,6 +125,19 @@ export function istVollstaendigBeantwortet(
       return ausgefuellt >= anzahlLabels
     }
 
+    case 'audio':
+      // Audio-Aufnahme muss URL haben
+      return !!(antwort.aufnahmeUrl && antwort.aufnahmeUrl.length > 0)
+
+    case 'dragdrop_bild': {
+      if (frage.typ !== 'dragdrop_bild') return true
+      // Alle Zielzonen muessen zugeordnet sein
+      const ddFrage = frage as import('../types/fragen.ts').DragDropBildFrage
+      const anzahlZonen = ddFrage.zielzonen.length
+      const zugeordnet = Object.keys(antwort.zuordnungen).length
+      return zugeordnet >= anzahlZonen
+    }
+
     default:
       // Alle anderen Typen: Existenz reicht
       return true

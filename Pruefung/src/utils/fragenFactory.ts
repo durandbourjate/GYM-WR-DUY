@@ -16,6 +16,7 @@ import type {
   PDFFrage, PDFKategorie, PDFAnnotationsWerkzeug, PDFAnnotation,
   SortierungFrage, HotspotFrage, HotspotBereich,
   BildbeschriftungFrage, BildbeschriftungLabel,
+  AudioFrage, DragDropBildFrage, DragDropBildZielzone,
 } from '../types/fragen.ts'
 import { parseLuecken } from '../components/lp/frageneditor/editorUtils.ts'
 import {
@@ -69,6 +70,8 @@ export type TypSpezifischeDaten =
   | { typ: 'sortierung'; fragetext: string; elemente: string[]; teilpunkte: boolean }
   | { typ: 'hotspot'; fragetext: string; bildUrl: string; bereiche: HotspotBereich[]; mehrfachauswahl: boolean }
   | { typ: 'bildbeschriftung'; fragetext: string; bildUrl: string; beschriftungen: BildbeschriftungLabel[] }
+  | { typ: 'audio'; fragetext: string; maxDauerSekunden?: number }
+  | { typ: 'dragdrop_bild'; fragetext: string; bildUrl: string; zielzonen: DragDropBildZielzone[]; labels: string[] }
 
 /** Erstellt ein vollständiges Frage-Objekt aus Basisdaten + typ-spezifischen Daten */
 export function erstelleFrageObjekt(basis: FrageBasis, typDaten: TypSpezifischeDaten): Frage {
@@ -237,5 +240,23 @@ export function erstelleFrageObjekt(basis: FrageBasis, typDaten: TypSpezifischeD
         bildUrl: typDaten.bildUrl.trim(),
         beschriftungen: typDaten.beschriftungen,
       } as BildbeschriftungFrage
+
+    case 'audio':
+      return {
+        ...basis,
+        typ: 'audio',
+        fragetext: typDaten.fragetext.trim(),
+        maxDauerSekunden: typDaten.maxDauerSekunden,
+      } as AudioFrage
+
+    case 'dragdrop_bild':
+      return {
+        ...basis,
+        typ: 'dragdrop_bild',
+        fragetext: typDaten.fragetext.trim(),
+        bildUrl: typDaten.bildUrl.trim(),
+        zielzonen: typDaten.zielzonen,
+        labels: typDaten.labels.filter(l => l.trim()),
+      } as DragDropBildFrage
   }
 }
