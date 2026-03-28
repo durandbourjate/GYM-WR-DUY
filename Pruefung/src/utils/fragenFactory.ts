@@ -52,7 +52,7 @@ export interface FrageBasis {
 /** Typ-spezifische Daten — discriminated union */
 export type TypSpezifischeDaten =
   | { typ: 'mc'; fragetext: string; optionen: MCOption[]; mehrfachauswahl: boolean }
-  | { typ: 'freitext'; fragetext: string; laenge: 'kurz' | 'mittel' | 'lang'; placeholder: string }
+  | { typ: 'freitext'; fragetext: string; laenge: 'kurz' | 'mittel' | 'lang'; placeholder: string; minWoerter?: number; maxWoerter?: number }
   | { typ: 'lueckentext'; fragetext: string; textMitLuecken: string; luecken: LueckentextFrage['luecken'] }
   | { typ: 'zuordnung'; fragetext: string; paare: { links: string; rechts: string }[] }
   | { typ: 'richtigfalsch'; fragetext: string; aussagen: RichtigFalschFrage['aussagen'] }
@@ -85,6 +85,8 @@ export function erstelleFrageObjekt(basis: FrageBasis, typDaten: TypSpezifischeD
         fragetext: typDaten.fragetext.trim(),
         laenge: typDaten.laenge,
         hilfstextPlaceholder: typDaten.placeholder.trim() || undefined,
+        minWoerter: typDaten.minWoerter,
+        maxWoerter: typDaten.maxWoerter,
       } as FreitextFrage
 
     case 'lueckentext':

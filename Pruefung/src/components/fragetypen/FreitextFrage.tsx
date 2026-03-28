@@ -125,6 +125,8 @@ export default function FreitextFrage({ frage }: Props) {
   const zeichenAnzahl = text.length
   const wortAnzahl = text.trim() ? text.trim().split(/\s+/).length : 0
   const zeichenUeberschritten = frage.maxZeichen ? zeichenAnzahl > frage.maxZeichen : false
+  const woerterZuWenig = frage.minWoerter ? wortAnzahl < frage.minWoerter && wortAnzahl > 0 : false
+  const woerterZuViele = frage.maxWoerter ? wortAnzahl > frage.maxWoerter : false
 
   return (
     <div className="flex flex-col gap-4">
@@ -213,8 +215,22 @@ export default function FreitextFrage({ frage }: Props) {
       </div>
 
       {/* Zähler */}
-      <div className="flex justify-end gap-4 text-xs text-slate-500 dark:text-slate-400">
-        <span>{wortAnzahl} {wortAnzahl === 1 ? 'Wort' : 'Wörter'}</span>
+      <div className="flex flex-wrap justify-end gap-4 text-xs text-slate-500 dark:text-slate-400">
+        <span className={
+          woerterZuViele ? 'text-red-600 dark:text-red-400 font-semibold' :
+          woerterZuWenig ? 'text-amber-600 dark:text-amber-400 font-semibold' : ''
+        }>
+          {wortAnzahl}
+          {(frage.minWoerter || frage.maxWoerter) ? (
+            frage.minWoerter && frage.maxWoerter
+              ? ` / ${frage.minWoerter}–${frage.maxWoerter}`
+              : frage.minWoerter
+                ? ` / min. ${frage.minWoerter}`
+                : ` / max. ${frage.maxWoerter}`
+          ) : ''} {wortAnzahl === 1 ? 'Wort' : 'Wörter'}
+          {woerterZuViele && <span className="ml-1">(zu viele)</span>}
+          {woerterZuWenig && <span className="ml-1">(zu wenige)</span>}
+        </span>
         <span className={zeichenUeberschritten ? 'text-red-600 dark:text-red-400 font-semibold' : ''}>
           {zeichenAnzahl}{frage.maxZeichen ? ` / ${frage.maxZeichen}` : ''} Zeichen
         </span>

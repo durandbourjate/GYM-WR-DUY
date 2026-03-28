@@ -111,6 +111,8 @@ export interface FreitextFrage extends FrageBase {
   fragetext: string;
   laenge: 'kurz' | 'mittel' | 'lang';
   maxZeichen?: number;
+  minWoerter?: number;
+  maxWoerter?: number;
   hilfstextPlaceholder?: string;
 }
 
@@ -129,6 +131,7 @@ export interface LueckentextFrage extends FrageBase {
     id: string;
     korrekteAntworten: string[];
     caseSensitive: boolean;
+    dropdownOptionen?: string[]  // wenn gesetzt und nicht leer → Dropdown statt Texteingabe
   }[];
 }
 

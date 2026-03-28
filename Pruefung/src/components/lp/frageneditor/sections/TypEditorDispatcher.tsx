@@ -10,10 +10,12 @@ import type {
   BilanzERFrage, KontoMitSaldo, BilanzERLoesung,
   CanvasConfig,
   PDFKategorie, PDFAnnotationsWerkzeug, PDFAnnotation,
+  LueckentextFrage,
 } from '../../../../types/fragen.ts'
 import type { FrageTyp } from '../editorUtils.ts'
 import type { useKIAssistent } from '../useKIAssistent.ts'
 import MCEditor from '../MCEditor.tsx'
+import FreitextEditor from '../FreitextEditor.tsx'
 import LueckentextEditor from '../LueckentextEditor.tsx'
 import ZuordnungEditor from '../ZuordnungEditor.tsx'
 import RichtigFalschEditor from '../RichtigFalschEditor.tsx'
@@ -41,11 +43,21 @@ interface TypEditorDispatcherProps {
   mehrfachauswahl: boolean
   setMehrfachauswahl: (v: boolean) => void
 
+  // Freitext
+  laenge: 'kurz' | 'mittel' | 'lang'
+  setLaenge: (v: 'kurz' | 'mittel' | 'lang') => void
+  placeholder: string
+  setPlaceholder: (v: string) => void
+  minWoerter?: number
+  setMinWoerter: (v: number | undefined) => void
+  maxWoerter?: number
+  setMaxWoerter: (v: number | undefined) => void
+
   // Lückentext
   textMitLuecken: string
   setTextMitLuecken: (v: string) => void
-  luecken: { id: string; korrekteAntworten: string[]; caseSensitive: boolean }[]
-  setLuecken: React.Dispatch<React.SetStateAction<{ id: string; korrekteAntworten: string[]; caseSensitive: boolean }[]>>
+  luecken: LueckentextFrage['luecken']
+  setLuecken: React.Dispatch<React.SetStateAction<LueckentextFrage['luecken']>>
 
   // Zuordnung
   paare: { links: string; rechts: string }[]
@@ -134,6 +146,19 @@ export default function TypEditorDispatcher(props: TypEditorDispatcherProps) {
 
   return (
     <>
+      {typ === 'freitext' && (
+        <FreitextEditor
+          laenge={props.laenge}
+          setLaenge={props.setLaenge}
+          placeholder={props.placeholder}
+          setPlaceholder={props.setPlaceholder}
+          minWoerter={props.minWoerter}
+          setMinWoerter={props.setMinWoerter}
+          maxWoerter={props.maxWoerter}
+          setMaxWoerter={props.setMaxWoerter}
+        />
+      )}
+
       {typ === 'mc' && (
         <>
           <MCEditor

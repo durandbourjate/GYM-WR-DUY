@@ -106,12 +106,18 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen, performa
     frage?.typ === 'mc' ? (frage as MCFrage).mehrfachauswahl : false
   )
 
-  // Freitext-spezifisch (State beibehalten für Speicherung, UI-Editor entfernt)
-  const [laenge] = useState<'kurz' | 'mittel' | 'lang'>(
+  // Freitext-spezifisch
+  const [laenge, setLaenge] = useState<'kurz' | 'mittel' | 'lang'>(
     frage?.typ === 'freitext' ? (frage as FreitextFrage).laenge : 'mittel'
   )
-  const [placeholder] = useState(
+  const [placeholder, setPlaceholder] = useState(
     frage?.typ === 'freitext' ? (frage as FreitextFrage).hilfstextPlaceholder ?? '' : ''
+  )
+  const [minWoerter, setMinWoerter] = useState<number | undefined>(
+    frage?.typ === 'freitext' ? (frage as FreitextFrage).minWoerter : undefined
+  )
+  const [maxWoerter, setMaxWoerter] = useState<number | undefined>(
+    frage?.typ === 'freitext' ? (frage as FreitextFrage).maxWoerter : undefined
   )
 
   // Lückentext-spezifisch
@@ -399,7 +405,7 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen, performa
       case 'mc':
         typDaten = { typ: 'mc', fragetext, optionen, mehrfachauswahl }; break
       case 'freitext':
-        typDaten = { typ: 'freitext', fragetext, laenge, placeholder }; break
+        typDaten = { typ: 'freitext', fragetext, laenge, placeholder, minWoerter, maxWoerter }; break
       case 'lueckentext':
         typDaten = { typ: 'lueckentext', fragetext, textMitLuecken, luecken }; break
       case 'zuordnung':
@@ -627,6 +633,10 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen, performa
             fachbereich={fachbereich}
             thema={thema}
             ki={ki}
+            laenge={laenge} setLaenge={setLaenge}
+            placeholder={placeholder} setPlaceholder={setPlaceholder}
+            minWoerter={minWoerter} setMinWoerter={setMinWoerter}
+            maxWoerter={maxWoerter} setMaxWoerter={setMaxWoerter}
             optionen={optionen} setOptionen={setOptionen}
             mehrfachauswahl={mehrfachauswahl} setMehrfachauswahl={setMehrfachauswahl}
             textMitLuecken={textMitLuecken} setTextMitLuecken={setTextMitLuecken}
