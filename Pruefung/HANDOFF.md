@@ -14,8 +14,8 @@
 - **Übungspools ↔ Prüfungstool** — Lern-Analytik, Login, KI-Empfehlungen (eigenes Designprojekt)
 - **Bewertungsraster-Vertiefung** — Überfachliche Kriterien, kriterienbasiertes KI-Feedback
 - **TaF Phasen-UI** — klassenTyp-Feld vorhanden, UI für Phasen-Auswahl noch nicht
-- **Bild-Upload für Hotspot/Bildbeschriftung/DragDrop** — Aktuell nur URL-Eingabe, Upload via Drive geplant
-- **Aufgabengruppe Inline-Teilaufgaben** — Redesign: statt Frage-IDs verlinken → Teilaufgaben direkt im Editor erstellen (jeder Fragetyp möglich, a/b/c Nummerierung)
+- ~~Bild-Upload für Hotspot/Bildbeschriftung/DragDrop~~ ✅ 28.03.2026
+- ~~Aufgabengruppe Inline-Teilaufgaben~~ ✅ 28.03.2026
 
 ---
 
