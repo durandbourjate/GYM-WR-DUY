@@ -49,6 +49,13 @@ Digitale Prüfungsplattform für alle Fachschaften am Gymnasium Hofwil (München
 - Audio-Aufnahme als Fragetyp: SuS nehmen Audio auf (Aussprache, mündliche Erklärung)
 - LaTeX in Aufgaben: Formeln im Fragentext mit `$...$` (inline) und `$$...$$` (Block) — automatisches Rendering
 - Code-Blöcke in Aufgaben: Syntax-Highlighting im Fragentext (7 Sprachen: Python, JavaScript, SQL, HTML, CSS, Java, TypeScript)
+- Fragetypen-Menü kategorisiert: 6 Kategorien (Text & Sprache, Auswahl, Bilder & Medien, MINT, Buchhaltung, Struktur) + Suchfeld
+- Bild-Upload: Für Hotspot, Bildbeschriftung und Drag & Drop (Bild) — Drag & Drop Upload oder URL, max 5 MB
+- Aufgabengruppe mit Inline-Teilaufgaben: Teilaufgaben direkt im Editor erstellen (alle Fragetypen wählbar), mit eigenem Fragetext, Punkten, Musterlösung und Bewertungsraster
+- Standard-Bewertungsraster: Sinnvolle Defaults pro Fragetyp (MC: Korrekte Antwort 1P, Freitext: Inhalt + Argumentation + Sprache)
+- Erklärung-Sichtbarkeit: R/F + MC-Optionen mit Erklärungsfeld + Toggle ob SuS diese in der Korrektur-Einsicht sehen
+- Sortierung mit Drag & Drop: Elemente per Drag & Drop oder Pfeil-Buttons sortieren
+- PDF-Freihand selektierbar: Freihand-Zeichnungen in PDF-Annotation mit Auswahl-Tool verschieben und Farbe ändern
 
 **Backend**
 - Google Sheets als Datenbank (Fragenbank, Klassenlisten, Configs, Antworten)

@@ -762,6 +762,131 @@ export const demoFragen: Frage[] = [
     },
   },
 
+  // ═══════════════════════════════════════════════════════
+  // Neue Fragetypen (Session 30) — LP-Demo-Beispiele
+  // ═══════════════════════════════════════════════════════
+
+  // Sortierung — Rechtsquellen nach Hierarchie
+  {
+    id: 'demo-sort-rechtsquellen',
+    typ: 'sortierung',
+    version: 1, erstelltAm: jetzt, geaendertAm: jetzt,
+    fachbereich: 'Recht', fach: 'Wirtschaft & Recht', thema: 'Rechtsgrundlagen', unterthema: 'Normenhierarchie',
+    bloom: 'K2', semester: ['S3', 'S4'], gefaesse: ['SF'], tags: ['Normenhierarchie', 'Rechtsquellen'],
+    punkte: 3, zeitbedarf: 2,
+    musterlosung: 'Bundesverfassung → Bundesgesetz → Verordnung → Weisung',
+    bewertungsraster: [{ beschreibung: 'Korrekte Reihenfolge', punkte: 3 }],
+    verwendungen: [], quelle: 'manuell', autor: 'yannick.durand@gymhofwil.ch',
+    fragetext: 'Ordnen Sie die folgenden **Rechtsquellen** nach ihrer Hierarchie — von **oben nach unten**.',
+    elemente: ['Bundesverfassung', 'Bundesgesetz', 'Verordnung', 'Weisung'],
+    teilpunkte: true,
+  },
+
+  // Hotspot — Bilanz-Bereiche
+  {
+    id: 'demo-hs-bilanz',
+    typ: 'hotspot',
+    version: 1, erstelltAm: jetzt, geaendertAm: jetzt,
+    fachbereich: 'BWL', fach: 'Wirtschaft & Recht', thema: 'Bilanz', unterthema: 'Bilanzstruktur',
+    bloom: 'K1', semester: ['S1', 'S2'], gefaesse: ['SF'], tags: ['Bilanz', 'Aktiven', 'Passiven'],
+    punkte: 2, zeitbedarf: 1,
+    musterlosung: 'Die Aktiven befinden sich auf der linken Seite der Bilanz.',
+    bewertungsraster: [{ beschreibung: 'Korrekte Position angeklickt', punkte: 2 }],
+    verwendungen: [], quelle: 'manuell', autor: 'yannick.durand@gymhofwil.ch',
+    fragetext: 'Klicken Sie auf den Bereich der Bilanz, in dem die **Aktiven** dargestellt werden.',
+    bildUrl: './demo-bilder/europa-karte.svg',
+    bereiche: [{ id: 'aktiven', form: 'rechteck' as const, koordinaten: { x: 5, y: 10, breite: 45, hoehe: 80 }, label: 'Aktiven', punkte: 2 }],
+    mehrfachauswahl: false,
+  },
+
+  // Bildbeschriftung — Kreislaufmodell
+  {
+    id: 'demo-bb-kreislauf',
+    typ: 'bildbeschriftung',
+    version: 1, erstelltAm: jetzt, geaendertAm: jetzt,
+    fachbereich: 'VWL', fach: 'Wirtschaft & Recht', thema: 'Wirtschaftskreislauf', unterthema: 'Einfacher Kreislauf',
+    bloom: 'K1', semester: ['S5', 'S6'], gefaesse: ['SF'], tags: ['Kreislauf', 'Güter', 'Geld'],
+    punkte: 3, zeitbedarf: 2,
+    musterlosung: '1: Haushalte, 2: Unternehmen, 3: Gütermarkt',
+    bewertungsraster: [{ beschreibung: 'Alle 3 korrekt', punkte: 3 }],
+    verwendungen: [], quelle: 'manuell', autor: 'yannick.durand@gymhofwil.ch',
+    fragetext: 'Beschriften Sie die markierten Stellen im **einfachen Wirtschaftskreislauf**.',
+    bildUrl: './demo-bilder/tierzelle.svg',
+    beschriftungen: [
+      { id: '1', position: { x: 30, y: 40 }, korrekt: ['Haushalte', 'Haushalt'] },
+      { id: '2', position: { x: 70, y: 40 }, korrekt: ['Unternehmen', 'Firma', 'Firmen'] },
+      { id: '3', position: { x: 50, y: 15 }, korrekt: ['Gütermarkt', 'Markt'] },
+    ],
+  },
+
+  // Drag & Drop Bild — Bilanzpositionen
+  {
+    id: 'demo-dd-bilanz',
+    typ: 'dragdrop_bild',
+    version: 1, erstelltAm: jetzt, geaendertAm: jetzt,
+    fachbereich: 'BWL', fach: 'Wirtschaft & Recht', thema: 'Bilanz', unterthema: 'Bilanzpositionen',
+    bloom: 'K2', semester: ['S1', 'S2'], gefaesse: ['SF'], tags: ['Bilanz', 'Konten'],
+    punkte: 4, zeitbedarf: 2,
+    musterlosung: 'Aktiven: Kasse, Debitoren; Passiven: Kreditoren, Eigenkapital',
+    bewertungsraster: [{ beschreibung: 'Alle korrekt zugeordnet', punkte: 4 }],
+    verwendungen: [], quelle: 'manuell', autor: 'yannick.durand@gymhofwil.ch',
+    fragetext: 'Ordnen Sie die **Konten** den richtigen Bilanzseiten zu.',
+    bildUrl: './demo-bilder/weltkarte.svg',
+    zielzonen: [
+      { id: 'a', position: { x: 5, y: 20, breite: 40, hoehe: 60 }, korrektesLabel: 'Kasse' },
+      { id: 'b', position: { x: 55, y: 20, breite: 40, hoehe: 60 }, korrektesLabel: 'Kreditoren' },
+    ],
+    labels: ['Kasse', 'Kreditoren', 'Debitoren', 'Eigenkapital'],
+  },
+
+  // Formel — Zinsformel
+  {
+    id: 'demo-formel-zins',
+    typ: 'formel',
+    version: 1, erstelltAm: jetzt, geaendertAm: jetzt,
+    fachbereich: 'BWL', fach: 'Wirtschaft & Recht', thema: 'Finanzierung', unterthema: 'Zinsberechnung',
+    bloom: 'K1', semester: ['S3', 'S4'], gefaesse: ['SF'], tags: ['Zins', 'Formel'],
+    punkte: 2, zeitbedarf: 2,
+    musterlosung: 'Z = K × p × t / (100 × 360)',
+    bewertungsraster: [{ beschreibung: 'Korrekte Formel', punkte: 2 }],
+    verwendungen: [], quelle: 'manuell', autor: 'yannick.durand@gymhofwil.ch',
+    fragetext: 'Geben Sie die **Zinsformel** ein (kaufmännische Zinsberechnung).\n\n💡 Variablen: K = Kapital, p = Zinssatz (%), t = Tage',
+    korrekteFormel: 'Z = \\frac{K \\cdot p \\cdot t}{100 \\cdot 360}',
+    vergleichsModus: 'exakt',
+  },
+
+  // Audio — Mündliche Vertragserklärung
+  {
+    id: 'demo-audio-vertrag',
+    typ: 'audio',
+    version: 1, erstelltAm: jetzt, geaendertAm: jetzt,
+    fachbereich: 'Recht', fach: 'Wirtschaft & Recht', thema: 'Vertragsrecht', unterthema: 'Vertragsschluss',
+    bloom: 'K3', semester: ['S3', 'S4'], gefaesse: ['SF'], tags: ['Vertrag', 'mündlich'],
+    punkte: 3, zeitbedarf: 3,
+    musterlosung: 'Erwartet: Erklärung der 4 Voraussetzungen mit Beispiel.',
+    bewertungsraster: [{ beschreibung: 'Alle 4 Voraussetzungen genannt', punkte: 2 }, { beschreibung: 'Beispiel korrekt', punkte: 1 }],
+    verwendungen: [], quelle: 'manuell', autor: 'yannick.durand@gymhofwil.ch',
+    fragetext: 'Erklären Sie mündlich die **4 Voraussetzungen eines gültigen Vertrags** gemäss OR. Nennen Sie zu jeder Voraussetzung ein **Beispiel**.',
+    maxDauerSekunden: 120,
+  },
+
+  // Code — SQL-Abfrage
+  {
+    id: 'demo-code-sql',
+    typ: 'code',
+    version: 1, erstelltAm: jetzt, geaendertAm: jetzt,
+    fachbereich: 'BWL', fach: 'Wirtschaft & Recht', thema: 'Datenbanken', unterthema: 'SQL',
+    bloom: 'K3', semester: ['S5', 'S6'], gefaesse: ['SF'], tags: ['SQL', 'Datenbank', 'SELECT'],
+    punkte: 3, zeitbedarf: 5,
+    musterlosung: "SELECT name, umsatz FROM kunden WHERE umsatz > 10000 ORDER BY umsatz DESC;",
+    bewertungsraster: [{ beschreibung: 'SELECT korrekt', punkte: 1 }, { beschreibung: 'WHERE-Bedingung', punkte: 1 }, { beschreibung: 'ORDER BY', punkte: 1 }],
+    verwendungen: [], quelle: 'manuell', autor: 'yannick.durand@gymhofwil.ch',
+    fragetext: 'Schreiben Sie eine **SQL-Abfrage**, die aus der Tabelle `kunden` die Spalten `name` und `umsatz` abfragt, wobei nur Kunden mit einem **Umsatz über CHF 10\'000** angezeigt werden. Sortieren Sie nach Umsatz **absteigend**.',
+    sprache: 'sql',
+    starterCode: 'SELECT\n  -- Ihre Abfrage hier\nFROM kunden;',
+    musterLoesung: "SELECT name, umsatz\nFROM kunden\nWHERE umsatz > 10000\nORDER BY umsatz DESC;",
+  },
+
   // Einrichtungsfragen für Einrichtungsprüfung (alle Fragetypen testen)
   ...einrichtungsFragen,
 ]

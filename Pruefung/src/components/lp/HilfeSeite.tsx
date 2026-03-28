@@ -268,7 +268,7 @@ function HilfeFragen() {
 
       <Untertitel>Weitere</Untertitel>
       <Text>
-        <strong>Aufgabengruppe</strong> — Bündelt mehrere Teilaufgaben unter einem gemeinsamen Kontext/Fallbeispiel. Fächerübergreifend nutzbar.
+        <strong>Aufgabengruppe</strong> — Bündelt mehrere Teilaufgaben unter einem gemeinsamen Kontext/Fallbeispiel. Teilaufgaben werden direkt im Editor erstellt (alle Fragetypen wählbar). Jede Teilaufgabe hat einen eigenen Fragetext, Punkte, Musterlösung und Bewertungsraster. Die Nummerierung (a, b, c, ...) erfolgt automatisch.
       </Text>
       <Text>
         <strong>Zeichnen/Visualisierung</strong> — Zeichenfläche mit 6 Werkzeugen: Stift (3 Stärken, durchgehend/gestrichelt), Linie, Pfeil, Rechteck, Ellipse, Text. Alle Werkzeuge in Dropdown-Menüs. Farben (3×3 Grid), Textformatierung (Grösse S/M/L/XL, Fett, Rotation). Selektierte Elemente nachträglich bearbeitbar.
@@ -282,13 +282,13 @@ function HilfeFragen() {
         <strong>Sortierung</strong> — Elemente in die richtige Reihenfolge bringen (Drag & Drop). Auto-Korrektur mit optionalen Teilpunkten.
       </Text>
       <Text>
-        <strong>Hotspot</strong> — Klickbereiche auf einem Bild markieren. LP definiert Rechteck-/Kreis-Bereiche, SuS klickt die richtigen Stellen. Auto-Korrektur.
+        <strong>Hotspot</strong> — Klickbereiche auf einem Bild markieren. LP definiert Rechteck-/Kreis-Bereiche, SuS klickt die richtigen Stellen. Bild per Drag &amp; Drop hochladen oder URL eingeben. Auto-Korrektur.
       </Text>
       <Text>
-        <strong>Bildbeschriftung</strong> — Labels an vordefinierten Positionen auf einem Bild eintragen. Mehrere akzeptierte Antworten pro Position möglich. Auto-Korrektur.
+        <strong>Bildbeschriftung</strong> — Labels an vordefinierten Positionen auf einem Bild eintragen. Bild per Upload oder URL. Mehrere akzeptierte Antworten pro Position möglich. Auto-Korrektur.
       </Text>
       <Text>
-        <strong>Drag & Drop (Bild)</strong> — Labels aus einem Pool auf Zielzonen im Bild ziehen. Kann Distraktoren enthalten. Auto-Korrektur.
+        <strong>Drag & Drop (Bild)</strong> — Labels aus einem Pool auf Zielzonen im Bild ziehen. Bild per Upload oder URL. Kann Distraktoren enthalten. Auto-Korrektur.
       </Text>
 
       <Untertitel>MINT & Code</Untertitel>
@@ -310,6 +310,31 @@ function HilfeFragen() {
       <Untertitel>Zeitbedarf</Untertitel>
       <Text>
         Der Zeitbedarf wird automatisch geschätzt basierend auf Fragetyp und Taxonomiestufe (z.B. MC K1 = 1 Min., Freitext lang K4 = 12 Min.). Sie können den Wert jederzeit manuell anpassen.
+      </Text>
+
+      <Untertitel>Fragetypen-Menü</Untertitel>
+      <Text>
+        Die 20 Fragetypen sind in 6 Kategorien organisiert: <strong>Text &amp; Sprache</strong>, <strong>Auswahl &amp; Zuordnung</strong>, <strong>Bilder &amp; Medien</strong>, <strong>MINT</strong>, <strong>Buchhaltung</strong> und <strong>Struktur</strong>. FiBu-Typen erscheinen nur bei WR-Fachschaft. Ein Suchfeld ermöglicht schnelles Filtern.
+      </Text>
+
+      <Untertitel>Bild-Upload</Untertitel>
+      <Text>
+        Für Hotspot, Bildbeschriftung und Drag &amp; Drop (Bild) können Bilder per <strong>Drag &amp; Drop</strong> oder Klick hochgeladen werden (max. 5 MB). Alternativ kann eine URL eingefügt werden. Im Demo-Modus werden Bilder als Data-URL gespeichert.
+      </Text>
+
+      <Untertitel>Standard-Bewertungsraster</Untertitel>
+      <Text>
+        Beim Erstellen einer neuen Frage wird automatisch ein sinnvolles Bewertungsraster vorgeschlagen (z.B. MC: &laquo;Korrekte Antwort, 1 P.&raquo;, Freitext: &laquo;Inhalt, Argumentation, Sprache&raquo;). Das Raster kann jederzeit angepasst werden.
+      </Text>
+
+      <Untertitel>Erklärungen (R/F &amp; MC)</Untertitel>
+      <Text>
+        Bei Richtig/Falsch und Multiple-Choice können Sie pro Option eine <strong>Erklärung</strong> hinterlegen. Mit dem Toggle &laquo;Erklärungen den SuS in der Korrektur-Einsicht zeigen&raquo; steuern Sie, ob die Erklärungen nur für die LP (Korrekturhilfe) oder auch für SuS sichtbar sind.
+      </Text>
+
+      <Untertitel>Rechtschreibprüfung</Untertitel>
+      <Text>
+        Die Browser-Autokorrektur kann pro Prüfung deaktiviert werden — z.B. für Diktate oder Sprachprüfungen. Einstellung unter: Prüfung bearbeiten → Konfiguration → Rechtschreibprüfung. Im Freitext-Editor erscheint ein Hinweis-Link dazu.
       </Text>
     </div>
   )
@@ -752,6 +777,18 @@ function HilfeFAQ() {
 
       <FAQItem frage="Welche Materialtypen unterstützt das Material-Panel?">
         Das Material-Panel (Split-Screen 55% oder Overlay) unterstützt: PDF, Video, Audio, Links und Rich-Text. Rich-Text-Materialien können direkt in der Plattform als formatierter Text gepflegt werden — ohne externe Dateien.
+      </FAQItem>
+
+      <FAQItem frage="Wie funktioniert die Aufgabengruppe?">
+        Eine Aufgabengruppe bündelt mehrere Teilaufgaben (a, b, c, ...) unter einem gemeinsamen Kontext. Teilaufgaben werden direkt im Editor erstellt — jeder Fragetyp ist wählbar. Jede Teilaufgabe hat eigenen Fragetext, Punkte, Musterlösung und Bewertungsraster. In der Prüfung sehen SuS den Kontext einmal oben und die Teilaufgaben darunter.
+      </FAQItem>
+
+      <FAQItem frage="Kann ich Bilder für Hotspot/Bildbeschriftung/Drag & Drop hochladen?">
+        Ja. In allen drei Bild-Fragetypen können Sie Bilder per Drag &amp; Drop oder Klick hochladen (max. 5 MB). Alternativ können Sie eine URL einfügen. Im Demo-Modus werden Bilder lokal gespeichert.
+      </FAQItem>
+
+      <FAQItem frage="Was sind die Standard-Bewertungsraster?">
+        Beim Erstellen einer neuen Frage wird automatisch ein sinnvolles Bewertungsraster vorgeschlagen (abhängig vom Fragetyp). Sie können es jederzeit anpassen. Eigene Raster-Vorlagen können gespeichert und wiederverwendet werden.
       </FAQItem>
     </div>
   )
