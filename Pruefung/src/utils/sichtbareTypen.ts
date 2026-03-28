@@ -4,7 +4,8 @@ const STORAGE_KEY = 'pruefung_sichtbareTypen'
 
 const ALLE_GENERISCHEN_TYPEN = [
   'mc', 'freitext', 'zuordnung', 'lueckentext', 'richtigfalsch',
-  'berechnung', 'aufgabengruppe', 'visualisierung', 'pdf'
+  'berechnung', 'aufgabengruppe', 'visualisierung', 'pdf',
+  'sortierung', 'hotspot', 'bildbeschriftung'
 ]
 
 const FIBU_TYPEN_LISTE = ['buchungssatz', 'tkonto', 'kontenbestimmung', 'bilanzstruktur']

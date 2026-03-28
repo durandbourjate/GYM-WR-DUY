@@ -2,7 +2,7 @@
  * Auto-Korrektur-Engine für deterministische Fragetypen.
  * Nicht-deterministische Typen (freitext, visualisierung, pdf) → null (manuelle Korrektur).
  */
-import type { Frage, MCFrage, RichtigFalschFrage, LueckentextFrage, ZuordnungFrage, BerechnungFrage } from '../types/fragen'
+import type { Frage, MCFrage, RichtigFalschFrage, LueckentextFrage, ZuordnungFrage, BerechnungFrage, SortierungFrage, HotspotFrage, BildbeschriftungFrage } from '../types/fragen'
 import type { Antwort } from '../types/antworten'
 import { korrigiereBuchungssatz, korrigiereTKonto, korrigiereKontenbestimmung, korrigiereBilanzER } from './fibuAutoKorrektur'
 export type { KorrekturErgebnis, KorrekturDetail } from './fibuAutoKorrektur'
@@ -12,6 +12,7 @@ import type { KorrekturErgebnis, KorrekturDetail } from './fibuAutoKorrektur'
 const AUTO_TYPEN = new Set([
   'mc', 'richtigfalsch', 'lueckentext', 'zuordnung', 'berechnung',
   'buchungssatz', 'tkonto', 'kontenbestimmung', 'bilanzstruktur',
+  'sortierung', 'hotspot', 'bildbeschriftung',
 ])
 
 /** Prüft ob ein Fragetyp automatisch korrigierbar ist */
@@ -68,6 +69,12 @@ export function autoKorrigiere(frage: Frage, antwort: Antwort | undefined): Korr
         return korrigiereKontenbestimmung(frage, (antwort as Extract<Antwort, { typ: 'kontenbestimmung' }>).aufgaben)
       case 'bilanzstruktur':
         return korrigiereBilanzER(frage, antwort as Extract<Antwort, { typ: 'bilanzstruktur' }>)
+      case 'sortierung':
+        return korrigiereSortierung(frage, antwort as Extract<Antwort, { typ: 'sortierung' }>)
+      case 'hotspot':
+        return korrigiereHotspot(frage, antwort as Extract<Antwort, { typ: 'hotspot' }>)
+      case 'bildbeschriftung':
+        return korrigiereBildbeschriftung(frage, antwort as Extract<Antwort, { typ: 'bildbeschriftung' }>)
       default:
         return null
     }
@@ -239,6 +246,115 @@ function korrigiereBerechnung(
       erreicht: korrekt ? punkteProErgebnis : 0,
       max: punkteProErgebnis,
       kommentar: korrekt ? undefined : `Erwartet: ${ergebnis.korrekt}${ergebnis.einheit ? ' ' + ergebnis.einheit : ''}${ergebnis.toleranz > 0 ? ` (±${ergebnis.toleranz})` : ''}`,
+    })
+  }
+
+  const erreicht = details.reduce((s, d) => s + d.erreicht, 0)
+  return {
+    erreichtePunkte: Math.round(erreicht * 100) / 100,
+    maxPunkte: frage.punkte,
+    details,
+  }
+}
+
+// === SORTIERUNG ===
+
+function korrigiereSortierung(
+  frage: SortierungFrage,
+  antwort: Extract<Antwort, { typ: 'sortierung' }>
+): KorrekturErgebnis {
+  const details: KorrekturDetail[] = []
+  const punkteProElement = frage.punkte / Math.max(1, frage.elemente.length)
+
+  for (let i = 0; i < frage.elemente.length; i++) {
+    const korrektesElement = frage.elemente[i]
+    const susElement = antwort.reihenfolge[i]
+    const korrekt = susElement === korrektesElement
+
+    details.push({
+      bezeichnung: `Position ${i + 1}: ${korrektesElement}`,
+      korrekt,
+      erreicht: korrekt ? punkteProElement : 0,
+      max: punkteProElement,
+      kommentar: korrekt ? undefined : `Eingegeben: ${susElement ?? '(leer)'}`,
+    })
+  }
+
+  const erreicht = frage.teilpunkte
+    ? details.reduce((s, d) => s + d.erreicht, 0)
+    : (details.every(d => d.korrekt) ? frage.punkte : 0)
+  return {
+    erreichtePunkte: Math.round(erreicht * 100) / 100,
+    maxPunkte: frage.punkte,
+    details,
+  }
+}
+
+// === HOTSPOT ===
+
+function korrigiereHotspot(
+  frage: HotspotFrage,
+  antwort: Extract<Antwort, { typ: 'hotspot' }>
+): KorrekturErgebnis {
+  const details: KorrekturDetail[] = []
+  const getroffeneBereiche = new Set<string>()
+
+  for (const klick of antwort.geklickt) {
+    for (const bereich of frage.bereiche) {
+      if (getroffeneBereiche.has(bereich.id)) continue
+      const k = bereich.koordinaten
+      let treffer = false
+      if (bereich.form === 'rechteck') {
+        treffer = klick.x >= k.x && klick.x <= k.x + (k.breite ?? 0) &&
+                  klick.y >= k.y && klick.y <= k.y + (k.hoehe ?? 0)
+      } else if (bereich.form === 'kreis') {
+        const dx = klick.x - k.x
+        const dy = klick.y - k.y
+        treffer = Math.sqrt(dx * dx + dy * dy) <= (k.radius ?? 0)
+      }
+      if (treffer) getroffeneBereiche.add(bereich.id)
+    }
+  }
+
+  for (const bereich of frage.bereiche) {
+    const korrekt = getroffeneBereiche.has(bereich.id)
+    details.push({
+      bezeichnung: bereich.label,
+      korrekt,
+      erreicht: korrekt ? bereich.punkte : 0,
+      max: bereich.punkte,
+      kommentar: korrekt ? undefined : 'Nicht getroffen',
+    })
+  }
+
+  const erreicht = details.reduce((s, d) => s + d.erreicht, 0)
+  return {
+    erreichtePunkte: Math.round(erreicht * 100) / 100,
+    maxPunkte: frage.bereiche.reduce((s, b) => s + b.punkte, 0),
+    details,
+  }
+}
+
+// === BILDBESCHRIFTUNG ===
+
+function korrigiereBildbeschriftung(
+  frage: BildbeschriftungFrage,
+  antwort: Extract<Antwort, { typ: 'bildbeschriftung' }>
+): KorrekturErgebnis {
+  const details: KorrekturDetail[] = []
+  const punkteProLabel = frage.punkte / Math.max(1, frage.beschriftungen.length)
+
+  for (const beschriftung of frage.beschriftungen) {
+    const eingabe = (antwort.eintraege[beschriftung.id] ?? '').trim()
+    const korrekt = beschriftung.korrekt.some(ka =>
+      eingabe.toLowerCase() === ka.trim().toLowerCase()
+    )
+    details.push({
+      bezeichnung: `Label: ${beschriftung.korrekt[0] ?? beschriftung.id}`,
+      korrekt,
+      erreicht: korrekt ? punkteProLabel : 0,
+      max: punkteProLabel,
+      kommentar: korrekt ? undefined : `Erwartet: ${beschriftung.korrekt.join(' / ')}`,
     })
   }
 

@@ -20,6 +20,7 @@ import type {
   AufgabengruppeFrage,
   VisualisierungFrage, CanvasConfig,
   PDFFrage, PDFKategorie, PDFAnnotationsWerkzeug, PDFAnnotation,
+  SortierungFrage, HotspotFrage, HotspotBereich, BildbeschriftungFrage, BildbeschriftungLabel,
 } from '../../../types/fragen.ts'
 import type { FrageTyp } from './editorUtils.ts'
 import { generiereFrageId } from './editorUtils.ts'
@@ -281,6 +282,33 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen, performa
     frage?.typ === 'pdf' ? (frage as PDFFrage).musterloesungAnnotationen ?? [] : []
   )
 
+  // Sortierung-spezifisch
+  const [sortElemente, setSortElemente] = useState<string[]>(
+    frage?.typ === 'sortierung' ? (frage as SortierungFrage).elemente : []
+  )
+  const [sortTeilpunkte, setSortTeilpunkte] = useState(
+    frage?.typ === 'sortierung' ? (frage as SortierungFrage).teilpunkte : true
+  )
+
+  // Hotspot-spezifisch
+  const [hsBildUrl, setHsBildUrl] = useState(
+    frage?.typ === 'hotspot' ? (frage as HotspotFrage).bildUrl : ''
+  )
+  const [hsBereiche, setHsBereiche] = useState<HotspotBereich[]>(
+    frage?.typ === 'hotspot' ? (frage as HotspotFrage).bereiche : []
+  )
+  const [hsMehrfachauswahl, setHsMehrfachauswahl] = useState(
+    frage?.typ === 'hotspot' ? (frage as HotspotFrage).mehrfachauswahl : false
+  )
+
+  // Bildbeschriftung-spezifisch
+  const [bbBildUrl, setBbBildUrl] = useState(
+    frage?.typ === 'bildbeschriftung' ? (frage as BildbeschriftungFrage).bildUrl : ''
+  )
+  const [bbBeschriftungen, setBbBeschriftungen] = useState<BildbeschriftungLabel[]>(
+    frage?.typ === 'bildbeschriftung' ? (frage as BildbeschriftungFrage).beschriftungen : []
+  )
+
   // Zeitbedarf
   const [zeitbedarf, setZeitbedarf] = useState<number>(
     frage?.zeitbedarf ?? berechneZeitbedarf(
@@ -434,6 +462,12 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen, performa
           erlaubteWerkzeuge: pdfErlaubteWerkzeuge,
           musterloesungAnnotationen: pdfMusterloesungAnnotationen.length > 0 ? pdfMusterloesungAnnotationen : undefined,
         }; break
+      case 'sortierung':
+        typDaten = { typ: 'sortierung', fragetext, elemente: sortElemente, teilpunkte: sortTeilpunkte }; break
+      case 'hotspot':
+        typDaten = { typ: 'hotspot', fragetext, bildUrl: hsBildUrl, bereiche: hsBereiche, mehrfachauswahl: hsMehrfachauswahl }; break
+      case 'bildbeschriftung':
+        typDaten = { typ: 'bildbeschriftung', fragetext, bildUrl: bbBildUrl, beschriftungen: bbBeschriftungen }; break
       default:
         setSpeicherLaeuft(false)
         return
@@ -672,6 +706,13 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen, performa
             pdfKategorien={pdfKategorien} setPdfKategorien={setPdfKategorien}
             pdfErlaubteWerkzeuge={pdfErlaubteWerkzeuge} setPdfErlaubteWerkzeuge={setPdfErlaubteWerkzeuge}
             pdfMusterloesungAnnotationen={pdfMusterloesungAnnotationen} setPdfMusterloesungAnnotationen={setPdfMusterloesungAnnotationen}
+            sortElemente={sortElemente} setSortElemente={setSortElemente}
+            sortTeilpunkte={sortTeilpunkte} setSortTeilpunkte={setSortTeilpunkte}
+            hsBildUrl={hsBildUrl} setHsBildUrl={setHsBildUrl}
+            hsBereiche={hsBereiche} setHsBereiche={setHsBereiche}
+            hsMehrfachauswahl={hsMehrfachauswahl} setHsMehrfachauswahl={setHsMehrfachauswahl}
+            bbBildUrl={bbBildUrl} setBbBildUrl={setBbBildUrl}
+            bbBeschriftungen={bbBeschriftungen} setBbBeschriftungen={setBbBeschriftungen}
           />
 
           {/* Musterlösung */}

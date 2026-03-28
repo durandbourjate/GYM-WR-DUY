@@ -33,6 +33,9 @@ describe('getAlleVerfuegbarenTypen', () => {
     expect(typen).toContain('aufgabengruppe')
     expect(typen).toContain('visualisierung')
     expect(typen).toContain('pdf')
+    expect(typen).toContain('sortierung')
+    expect(typen).toContain('hotspot')
+    expect(typen).toContain('bildbeschriftung')
   })
 
   it('enthält FiBu-Typen für WR-Fachschaft', () => {

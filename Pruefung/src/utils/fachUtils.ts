@@ -64,6 +64,9 @@ export function typLabel(typ: string): string {
     bilanzstruktur: 'Bilanz/ER',
     aufgabengruppe: 'Aufgabengruppe',
     pdf: 'PDF-Annotation',
+    sortierung: 'Sortierung',
+    hotspot: 'Hotspot',
+    bildbeschriftung: 'Bildbeschriftung',
   }
   return labels[typ] || typ
 }

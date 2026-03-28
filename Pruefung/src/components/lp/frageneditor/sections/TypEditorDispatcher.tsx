@@ -11,6 +11,7 @@ import type {
   CanvasConfig,
   PDFKategorie, PDFAnnotationsWerkzeug, PDFAnnotation,
   LueckentextFrage,
+  HotspotBereich, BildbeschriftungLabel,
 } from '../../../../types/fragen.ts'
 import type { FrageTyp } from '../editorUtils.ts'
 import type { useKIAssistent } from '../useKIAssistent.ts'
@@ -27,6 +28,9 @@ import BilanzEREditor from '../BilanzEREditor.tsx'
 import AufgabengruppeEditor from '../AufgabengruppeEditor.tsx'
 import ZeichnenEditor from '../ZeichnenEditor.tsx'
 import PDFEditor from '../PDFEditor.tsx'
+import SortierungEditor from '../SortierungEditor.tsx'
+import HotspotEditor from '../HotspotEditor.tsx'
+import BildbeschriftungEditor from '../BildbeschriftungEditor.tsx'
 import { KIBuchungssatzButtons, KITKontoButtons, KIKontenbestimmungButtons, KIBilanzERButtons } from '../KIFiBuButtons.tsx'
 import { InlineAktionButton, ErgebnisAnzeige } from '../KIBausteine.tsx'
 
@@ -139,6 +143,26 @@ interface TypEditorDispatcherProps {
   setPdfErlaubteWerkzeuge: React.Dispatch<React.SetStateAction<PDFAnnotationsWerkzeug[]>>
   pdfMusterloesungAnnotationen: PDFAnnotation[]
   setPdfMusterloesungAnnotationen: React.Dispatch<React.SetStateAction<PDFAnnotation[]>>
+
+  // Sortierung
+  sortElemente: string[]
+  setSortElemente: React.Dispatch<React.SetStateAction<string[]>>
+  sortTeilpunkte: boolean
+  setSortTeilpunkte: (v: boolean) => void
+
+  // Hotspot
+  hsBildUrl: string
+  setHsBildUrl: (v: string) => void
+  hsBereiche: HotspotBereich[]
+  setHsBereiche: React.Dispatch<React.SetStateAction<HotspotBereich[]>>
+  hsMehrfachauswahl: boolean
+  setHsMehrfachauswahl: (v: boolean) => void
+
+  // Bildbeschriftung
+  bbBildUrl: string
+  setBbBildUrl: (v: string) => void
+  bbBeschriftungen: BildbeschriftungLabel[]
+  setBbBeschriftungen: React.Dispatch<React.SetStateAction<BildbeschriftungLabel[]>>
 }
 
 export default function TypEditorDispatcher(props: TypEditorDispatcherProps) {
@@ -643,6 +667,35 @@ export default function TypEditorDispatcher(props: TypEditorDispatcherProps) {
           setErlaubteWerkzeuge={props.setPdfErlaubteWerkzeuge}
           musterloesungAnnotationen={props.pdfMusterloesungAnnotationen}
           setMusterloesungAnnotationen={props.setPdfMusterloesungAnnotationen}
+        />
+      )}
+
+      {typ === 'sortierung' && (
+        <SortierungEditor
+          elemente={props.sortElemente}
+          setElemente={props.setSortElemente}
+          teilpunkte={props.sortTeilpunkte}
+          setTeilpunkte={props.setSortTeilpunkte}
+        />
+      )}
+
+      {typ === 'hotspot' && (
+        <HotspotEditor
+          bildUrl={props.hsBildUrl}
+          setBildUrl={props.setHsBildUrl}
+          bereiche={props.hsBereiche}
+          setBereiche={props.setHsBereiche}
+          mehrfachauswahl={props.hsMehrfachauswahl}
+          setMehrfachauswahl={props.setHsMehrfachauswahl}
+        />
+      )}
+
+      {typ === 'bildbeschriftung' && (
+        <BildbeschriftungEditor
+          bildUrl={props.bbBildUrl}
+          setBildUrl={props.setBbBildUrl}
+          beschriftungen={props.bbBeschriftungen}
+          setBeschriftungen={props.setBbBeschriftungen}
         />
       )}
     </>

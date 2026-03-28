@@ -14,6 +14,8 @@ import type {
   AufgabengruppeFrage,
   VisualisierungFrage, CanvasConfig,
   PDFFrage, PDFKategorie, PDFAnnotationsWerkzeug, PDFAnnotation,
+  SortierungFrage, HotspotFrage, HotspotBereich,
+  BildbeschriftungFrage, BildbeschriftungLabel,
 } from '../types/fragen.ts'
 import { parseLuecken } from '../components/lp/frageneditor/editorUtils.ts'
 import {
@@ -64,6 +66,9 @@ export type TypSpezifischeDaten =
   | { typ: 'aufgabengruppe'; kontext: string; teilaufgabenIds: string[] }
   | { typ: 'visualisierung'; untertyp?: VisualisierungFrage['untertyp']; fragetext?: string; canvasConfig?: CanvasConfig; musterloesungBild?: string }
   | { typ: 'pdf'; fragetext: string; pdfDriveFileId?: string; pdfBase64?: string; pdfUrl?: string; pdfDateiname: string; seitenAnzahl: number; kategorien?: PDFKategorie[]; erlaubteWerkzeuge: PDFAnnotationsWerkzeug[]; musterloesungAnnotationen?: PDFAnnotation[] }
+  | { typ: 'sortierung'; fragetext: string; elemente: string[]; teilpunkte: boolean }
+  | { typ: 'hotspot'; fragetext: string; bildUrl: string; bereiche: HotspotBereich[]; mehrfachauswahl: boolean }
+  | { typ: 'bildbeschriftung'; fragetext: string; bildUrl: string; beschriftungen: BildbeschriftungLabel[] }
 
 /** Erstellt ein vollständiges Frage-Objekt aus Basisdaten + typ-spezifischen Daten */
 export function erstelleFrageObjekt(basis: FrageBasis, typDaten: TypSpezifischeDaten): Frage {
@@ -204,5 +209,33 @@ export function erstelleFrageObjekt(basis: FrageBasis, typDaten: TypSpezifischeD
         erlaubteWerkzeuge: typDaten.erlaubteWerkzeuge,
         musterloesungAnnotationen: typDaten.musterloesungAnnotationen,
       } as PDFFrage
+
+    case 'sortierung':
+      return {
+        ...basis,
+        typ: 'sortierung',
+        fragetext: typDaten.fragetext.trim(),
+        elemente: typDaten.elemente.filter(e => e.trim()),
+        teilpunkte: typDaten.teilpunkte,
+      } as SortierungFrage
+
+    case 'hotspot':
+      return {
+        ...basis,
+        typ: 'hotspot',
+        fragetext: typDaten.fragetext.trim(),
+        bildUrl: typDaten.bildUrl.trim(),
+        bereiche: typDaten.bereiche,
+        mehrfachauswahl: typDaten.mehrfachauswahl,
+      } as HotspotFrage
+
+    case 'bildbeschriftung':
+      return {
+        ...basis,
+        typ: 'bildbeschriftung',
+        fragetext: typDaten.fragetext.trim(),
+        bildUrl: typDaten.bildUrl.trim(),
+        beschriftungen: typDaten.beschriftungen,
+      } as BildbeschriftungFrage
   }
 }

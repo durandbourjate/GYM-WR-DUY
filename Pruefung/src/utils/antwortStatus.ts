@@ -108,6 +108,23 @@ export function istVollstaendigBeantwortet(
       // Mindestens eine Annotation
       return (antwort.annotationen ?? []).length > 0
 
+    case 'sortierung':
+      // Reihenfolge muss gesetzt sein
+      return antwort.reihenfolge.length > 0
+
+    case 'hotspot':
+      // Mindestens ein Klick
+      return antwort.geklickt.length > 0
+
+    case 'bildbeschriftung': {
+      if (frage.typ !== 'bildbeschriftung') return true
+      // Alle Labels muessen ausgefuellt sein
+      const bbFrage = frage as import('../types/fragen.ts').BildbeschriftungFrage
+      const anzahlLabels = bbFrage.beschriftungen.length
+      const ausgefuellt = Object.values(antwort.eintraege).filter(v => v.trim() !== '').length
+      return ausgefuellt >= anzahlLabels
+    }
+
     default:
       // Alle anderen Typen: Existenz reicht
       return true

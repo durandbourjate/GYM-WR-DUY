@@ -61,4 +61,7 @@ export type Antwort =
       stufen: { label: string; konten: { nr: string; betrag: number }[]; zwischentotal?: number }[];
       gewinnVerlust?: number;
     } }
-  | { typ: 'pdf'; annotationen: import('./fragen').PDFAnnotation[] };
+  | { typ: 'pdf'; annotationen: import('./fragen').PDFAnnotation[] }
+  | { typ: 'sortierung'; reihenfolge: string[] }
+  | { typ: 'hotspot'; geklickt: { x: number; y: number }[] }
+  | { typ: 'bildbeschriftung'; eintraege: Record<string, string> };

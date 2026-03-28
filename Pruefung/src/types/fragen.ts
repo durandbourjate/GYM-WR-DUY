@@ -436,4 +436,46 @@ export interface PDFFrage extends FrageBase {
   musterloesungAnnotationen?: PDFAnnotation[]
 }
 
-export type Frage = MCFrage | FreitextFrage | ZuordnungFrage | LueckentextFrage | VisualisierungFrage | RichtigFalschFrage | BerechnungFrage | BuchungssatzFrage | TKontoFrage | KontenbestimmungFrage | BilanzERFrage | AufgabengruppeFrage | PDFFrage;
+// === SORTIERUNG ===
+
+export interface SortierungFrage extends FrageBase {
+  typ: 'sortierung'
+  fragetext: string
+  elemente: string[]        // korrekte Reihenfolge (LP definiert)
+  teilpunkte: boolean       // Teilpunkte pro korrektem Element
+}
+
+// === HOTSPOT ===
+
+export interface HotspotBereich {
+  id: string
+  form: 'rechteck' | 'kreis'
+  koordinaten: { x: number; y: number; breite?: number; hoehe?: number; radius?: number }  // Prozent 0-100
+  label: string
+  punkte: number
+}
+
+export interface HotspotFrage extends FrageBase {
+  typ: 'hotspot'
+  fragetext: string
+  bildUrl: string
+  bereiche: HotspotBereich[]
+  mehrfachauswahl: boolean
+}
+
+// === BILDBESCHRIFTUNG ===
+
+export interface BildbeschriftungLabel {
+  id: string
+  position: { x: number; y: number }  // Prozent 0-100
+  korrekt: string[]                     // akzeptierte Antworten
+}
+
+export interface BildbeschriftungFrage extends FrageBase {
+  typ: 'bildbeschriftung'
+  fragetext: string
+  bildUrl: string
+  beschriftungen: BildbeschriftungLabel[]
+}
+
+export type Frage = MCFrage | FreitextFrage | ZuordnungFrage | LueckentextFrage | VisualisierungFrage | RichtigFalschFrage | BerechnungFrage | BuchungssatzFrage | TKontoFrage | KontenbestimmungFrage | BilanzERFrage | AufgabengruppeFrage | PDFFrage | SortierungFrage | HotspotFrage | BildbeschriftungFrage;

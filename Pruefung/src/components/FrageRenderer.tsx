@@ -11,6 +11,9 @@ import BilanzERFrageComponent from './fragetypen/BilanzERFrage.tsx'
 import AufgabengruppeFrageComponent from './fragetypen/AufgabengruppeFrage.tsx'
 import ZeichnenFrage from './fragetypen/ZeichnenFrage.tsx'
 import PDFFrage from './fragetypen/PDFFrage.tsx'
+import SortierungFrageComponent from './fragetypen/SortierungFrage.tsx'
+import HotspotFrageComponent from './fragetypen/HotspotFrage.tsx'
+import BildbeschriftungFrageComponent from './fragetypen/BildbeschriftungFrage.tsx'
 import type {
   Frage,
   MCFrage as MCFrageType,
@@ -26,6 +29,9 @@ import type {
   AufgabengruppeFrage as AufgabengruppeFrageType,
   VisualisierungFrage as VisualisierungFrageType,
   PDFFrage as PDFFrageTyp,
+  SortierungFrage as SortierungFrageType,
+  HotspotFrage as HotspotFrageType,
+  BildbeschriftungFrage as BildbeschriftungFrageType,
 } from '../types/fragen.ts'
 
 interface FrageRendererProps {
@@ -68,6 +74,12 @@ export default function FrageRenderer({ frage }: FrageRendererProps) {
       )
     case 'pdf':
       return <PDFFrage frage={frage as PDFFrageTyp} />
+    case 'sortierung':
+      return <SortierungFrageComponent frage={frage as SortierungFrageType} />
+    case 'hotspot':
+      return <HotspotFrageComponent frage={frage as HotspotFrageType} />
+    case 'bildbeschriftung':
+      return <BildbeschriftungFrageComponent frage={frage as BildbeschriftungFrageType} />
     default:
       return (
         <div className="p-6 bg-slate-100 dark:bg-slate-800 rounded-xl text-slate-500 dark:text-slate-400 text-center">

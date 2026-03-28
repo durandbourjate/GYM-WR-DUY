@@ -1,12 +1,13 @@
 import { describe, it, expect } from 'vitest'
 import { istAutoKorrigierbar, autoKorrigiere } from './autoKorrektur'
-import type { Frage, MCFrage, RichtigFalschFrage } from '../types/fragen'
+import type { Frage, MCFrage, RichtigFalschFrage, SortierungFrage, HotspotFrage, BildbeschriftungFrage } from '../types/fragen'
 import type { Antwort } from '../types/antworten'
 
 describe('istAutoKorrigierbar', () => {
   it.each([
     'mc', 'richtigfalsch', 'lueckentext', 'zuordnung', 'berechnung',
     'buchungssatz', 'tkonto', 'kontenbestimmung', 'bilanzstruktur',
+    'sortierung', 'hotspot', 'bildbeschriftung',
   ])('gibt true für %s', (typ) => {
     expect(istAutoKorrigierbar(typ)).toBe(true)
   })
@@ -154,5 +155,189 @@ describe('autoKorrigiere', () => {
     const result = autoKorrigiere(frage, antwort)
     expect(result).not.toBeNull()
     expect(result!.erreichtePunkte).toBe(3) // Alle korrekt
+  })
+
+  // === SORTIERUNG ===
+
+  it('korrigiert Sortierung alle korrekt', () => {
+    const frage: SortierungFrage = {
+      id: 'so-1', typ: 'sortierung', version: 1, erstelltAm: '2026-01-01', geaendertAm: '2026-01-01',
+      fachbereich: 'VWL', fach: 'Wirtschaft & Recht', thema: 'Test',
+      semester: ['S3'], gefaesse: ['SF'], bloom: 'K2', tags: [],
+      punkte: 4, musterlosung: '', bewertungsraster: [], verwendungen: [],
+      fragetext: 'Sortiere chronologisch',
+      elemente: ['A', 'B', 'C', 'D'],
+      teilpunkte: true,
+    }
+    const antwort: Antwort = { typ: 'sortierung', reihenfolge: ['A', 'B', 'C', 'D'] }
+    const result = autoKorrigiere(frage, antwort)
+    expect(result).not.toBeNull()
+    expect(result!.erreichtePunkte).toBe(4)
+  })
+
+  it('korrigiert Sortierung teilweise korrekt (Teilpunkte)', () => {
+    const frage: SortierungFrage = {
+      id: 'so-2', typ: 'sortierung', version: 1, erstelltAm: '2026-01-01', geaendertAm: '2026-01-01',
+      fachbereich: 'VWL', fach: 'Wirtschaft & Recht', thema: 'Test',
+      semester: ['S3'], gefaesse: ['SF'], bloom: 'K2', tags: [],
+      punkte: 4, musterlosung: '', bewertungsraster: [], verwendungen: [],
+      fragetext: 'Sortiere',
+      elemente: ['A', 'B', 'C', 'D'],
+      teilpunkte: true,
+    }
+    const antwort: Antwort = { typ: 'sortierung', reihenfolge: ['A', 'B', 'D', 'C'] }
+    const result = autoKorrigiere(frage, antwort)
+    expect(result).not.toBeNull()
+    expect(result!.erreichtePunkte).toBe(2) // A + B korrekt
+  })
+
+  it('korrigiert Sortierung ohne Teilpunkte (alles-oder-nichts)', () => {
+    const frage: SortierungFrage = {
+      id: 'so-3', typ: 'sortierung', version: 1, erstelltAm: '2026-01-01', geaendertAm: '2026-01-01',
+      fachbereich: 'VWL', fach: 'Wirtschaft & Recht', thema: 'Test',
+      semester: ['S3'], gefaesse: ['SF'], bloom: 'K2', tags: [],
+      punkte: 4, musterlosung: '', bewertungsraster: [], verwendungen: [],
+      fragetext: 'Sortiere',
+      elemente: ['A', 'B', 'C', 'D'],
+      teilpunkte: false,
+    }
+    const antwort: Antwort = { typ: 'sortierung', reihenfolge: ['A', 'B', 'D', 'C'] }
+    const result = autoKorrigiere(frage, antwort)
+    expect(result).not.toBeNull()
+    expect(result!.erreichtePunkte).toBe(0) // Nicht alles korrekt → 0
+  })
+
+  // === HOTSPOT ===
+
+  it('korrigiert Hotspot Treffer in Rechteck', () => {
+    const frage: HotspotFrage = {
+      id: 'hs-1', typ: 'hotspot', version: 1, erstelltAm: '2026-01-01', geaendertAm: '2026-01-01',
+      fachbereich: 'VWL', fach: 'Wirtschaft & Recht', thema: 'Test',
+      semester: ['S3'], gefaesse: ['SF'], bloom: 'K2', tags: [],
+      punkte: 2, musterlosung: '', bewertungsraster: [], verwendungen: [],
+      fragetext: 'Klicke auf das richtige Feld',
+      bildUrl: 'https://example.com/bild.png',
+      bereiche: [{
+        id: 'b1', form: 'rechteck',
+        koordinaten: { x: 10, y: 10, breite: 20, hoehe: 20 },
+        label: 'Bereich 1', punkte: 2,
+      }],
+      mehrfachauswahl: false,
+    }
+    const antwort: Antwort = { typ: 'hotspot', geklickt: [{ x: 15, y: 15 }] }
+    const result = autoKorrigiere(frage, antwort)
+    expect(result).not.toBeNull()
+    expect(result!.erreichtePunkte).toBe(2)
+  })
+
+  it('korrigiert Hotspot Fehltreffer', () => {
+    const frage: HotspotFrage = {
+      id: 'hs-2', typ: 'hotspot', version: 1, erstelltAm: '2026-01-01', geaendertAm: '2026-01-01',
+      fachbereich: 'VWL', fach: 'Wirtschaft & Recht', thema: 'Test',
+      semester: ['S3'], gefaesse: ['SF'], bloom: 'K2', tags: [],
+      punkte: 2, musterlosung: '', bewertungsraster: [], verwendungen: [],
+      fragetext: 'Klicke auf das richtige Feld',
+      bildUrl: 'https://example.com/bild.png',
+      bereiche: [{
+        id: 'b1', form: 'rechteck',
+        koordinaten: { x: 10, y: 10, breite: 20, hoehe: 20 },
+        label: 'Bereich 1', punkte: 2,
+      }],
+      mehrfachauswahl: false,
+    }
+    const antwort: Antwort = { typ: 'hotspot', geklickt: [{ x: 50, y: 50 }] }
+    const result = autoKorrigiere(frage, antwort)
+    expect(result).not.toBeNull()
+    expect(result!.erreichtePunkte).toBe(0)
+  })
+
+  it('korrigiert Hotspot Treffer in Kreis', () => {
+    const frage: HotspotFrage = {
+      id: 'hs-3', typ: 'hotspot', version: 1, erstelltAm: '2026-01-01', geaendertAm: '2026-01-01',
+      fachbereich: 'VWL', fach: 'Wirtschaft & Recht', thema: 'Test',
+      semester: ['S3'], gefaesse: ['SF'], bloom: 'K2', tags: [],
+      punkte: 3, musterlosung: '', bewertungsraster: [], verwendungen: [],
+      fragetext: 'Klicke auf den Kreis',
+      bildUrl: 'https://example.com/bild.png',
+      bereiche: [{
+        id: 'b1', form: 'kreis',
+        koordinaten: { x: 50, y: 50, radius: 10 },
+        label: 'Zentrum', punkte: 3,
+      }],
+      mehrfachauswahl: false,
+    }
+    const antwort: Antwort = { typ: 'hotspot', geklickt: [{ x: 55, y: 50 }] }
+    const result = autoKorrigiere(frage, antwort)
+    expect(result).not.toBeNull()
+    expect(result!.erreichtePunkte).toBe(3) // Innerhalb des Radius
+  })
+
+  // === BILDBESCHRIFTUNG ===
+
+  it('korrigiert Bildbeschriftung alle korrekt', () => {
+    const frage: BildbeschriftungFrage = {
+      id: 'bb-1', typ: 'bildbeschriftung', version: 1, erstelltAm: '2026-01-01', geaendertAm: '2026-01-01',
+      fachbereich: 'VWL', fach: 'Wirtschaft & Recht', thema: 'Test',
+      semester: ['S3'], gefaesse: ['SF'], bloom: 'K2', tags: [],
+      punkte: 3, musterlosung: '', bewertungsraster: [], verwendungen: [],
+      fragetext: 'Beschrifte das Bild',
+      bildUrl: 'https://example.com/bild.png',
+      beschriftungen: [
+        { id: 'l1', position: { x: 10, y: 10 }, korrekt: ['Angebot', 'Supply'] },
+        { id: 'l2', position: { x: 50, y: 50 }, korrekt: ['Nachfrage'] },
+        { id: 'l3', position: { x: 80, y: 20 }, korrekt: ['Gleichgewicht', 'GGW'] },
+      ],
+    }
+    const antwort: Antwort = {
+      typ: 'bildbeschriftung',
+      eintraege: { l1: 'Angebot', l2: 'Nachfrage', l3: 'GGW' },
+    }
+    const result = autoKorrigiere(frage, antwort)
+    expect(result).not.toBeNull()
+    expect(result!.erreichtePunkte).toBe(3)
+  })
+
+  it('korrigiert Bildbeschriftung case-insensitive', () => {
+    const frage: BildbeschriftungFrage = {
+      id: 'bb-2', typ: 'bildbeschriftung', version: 1, erstelltAm: '2026-01-01', geaendertAm: '2026-01-01',
+      fachbereich: 'VWL', fach: 'Wirtschaft & Recht', thema: 'Test',
+      semester: ['S3'], gefaesse: ['SF'], bloom: 'K2', tags: [],
+      punkte: 2, musterlosung: '', bewertungsraster: [], verwendungen: [],
+      fragetext: 'Beschrifte',
+      bildUrl: 'https://example.com/bild.png',
+      beschriftungen: [
+        { id: 'l1', position: { x: 10, y: 10 }, korrekt: ['BIP'] },
+        { id: 'l2', position: { x: 50, y: 50 }, korrekt: ['Inflation'] },
+      ],
+    }
+    const antwort: Antwort = {
+      typ: 'bildbeschriftung',
+      eintraege: { l1: 'bip', l2: 'INFLATION' },
+    }
+    const result = autoKorrigiere(frage, antwort)
+    expect(result).not.toBeNull()
+    expect(result!.erreichtePunkte).toBe(2)
+  })
+
+  it('korrigiert Bildbeschriftung teilweise falsch', () => {
+    const frage: BildbeschriftungFrage = {
+      id: 'bb-3', typ: 'bildbeschriftung', version: 1, erstelltAm: '2026-01-01', geaendertAm: '2026-01-01',
+      fachbereich: 'VWL', fach: 'Wirtschaft & Recht', thema: 'Test',
+      semester: ['S3'], gefaesse: ['SF'], bloom: 'K2', tags: [],
+      punkte: 2, musterlosung: '', bewertungsraster: [], verwendungen: [],
+      fragetext: 'Beschrifte',
+      bildUrl: 'https://example.com/bild.png',
+      beschriftungen: [
+        { id: 'l1', position: { x: 10, y: 10 }, korrekt: ['BIP'] },
+        { id: 'l2', position: { x: 50, y: 50 }, korrekt: ['Inflation'] },
+      ],
+    }
+    const antwort: Antwort = {
+      typ: 'bildbeschriftung',
+      eintraege: { l1: 'BIP', l2: 'Deflation' },
+    }
+    const result = autoKorrigiere(frage, antwort)
+    expect(result).not.toBeNull()
+    expect(result!.erreichtePunkte).toBe(1) // Nur l1 korrekt
   })
 })
