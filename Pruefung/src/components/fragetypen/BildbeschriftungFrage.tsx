@@ -1,0 +1,95 @@
+import { usePruefungStore } from '../../store/pruefungStore.ts'
+import type { BildbeschriftungFrage as BildbeschriftungFrageType } from '../../types/fragen.ts'
+import { renderMarkdown } from '../../utils/markdown.ts'
+import { fachbereichFarbe } from '../../utils/fachUtils.ts'
+
+interface Props {
+  frage: BildbeschriftungFrageType
+}
+
+export default function BildbeschriftungFrage({ frage }: Props) {
+  const antworten = usePruefungStore((s) => s.antworten)
+  const setAntwort = usePruefungStore((s) => s.setAntwort)
+  const abgegeben = usePruefungStore((s) => s.abgegeben)
+
+  const aktuelleAntwort = antworten[frage.id]
+  const eintraege: Record<string, string> =
+    aktuelleAntwort?.typ === 'bildbeschriftung' ? aktuelleAntwort.eintraege : {}
+
+  function handleEingabe(beschriftungId: string, text: string) {
+    if (abgegeben) return
+    const neueEintraege = { ...eintraege, [beschriftungId]: text }
+    setAntwort(frage.id, { typ: 'bildbeschriftung', eintraege: neueEintraege })
+  }
+
+  const alleAusgefuellt = frage.beschriftungen.every(b => (eintraege[b.id] ?? '').trim() !== '')
+
+  return (
+    <div className="flex flex-col gap-5">
+      {/* Header: Badges */}
+      <div className="flex flex-wrap items-center gap-2">
+        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${fachbereichFarbe(frage.fachbereich)}`}>
+          {frage.fachbereich}
+        </span>
+        <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300">
+          {frage.bloom}
+        </span>
+        <span className="text-xs text-slate-500 dark:text-slate-400">
+          {frage.punkte} {frage.punkte === 1 ? 'Punkt' : 'Punkte'}
+        </span>
+        <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300">
+          {frage.beschriftungen.length} {frage.beschriftungen.length === 1 ? 'Label' : 'Labels'}
+        </span>
+      </div>
+
+      {/* Fragetext */}
+      <div
+        className="text-base leading-relaxed text-slate-800 dark:text-slate-100 bg-slate-50 dark:bg-slate-800/80 p-4 rounded-lg border border-slate-200 dark:border-slate-700"
+        dangerouslySetInnerHTML={{ __html: renderMarkdown(frage.fragetext) }}
+      />
+
+      {/* Bild mit Labels */}
+      <div className={`relative inline-block ${!abgegeben && !alleAusgefuellt ? 'rounded-xl border-2 border-violet-400 dark:border-violet-500 p-1' : ''}`}>
+        <div className="relative">
+          <img
+            src={frage.bildUrl}
+            alt="Bildbeschriftung"
+            className="max-w-full rounded-lg select-none"
+            style={{ objectFit: 'contain' }}
+            draggable={false}
+          />
+
+          {/* Label-Eingabefelder */}
+          {frage.beschriftungen.map((beschriftung, i) => (
+            <div
+              key={beschriftung.id}
+              className="absolute -translate-x-1/2 -translate-y-1/2"
+              style={{
+                left: `${beschriftung.position.x}%`,
+                top: `${beschriftung.position.y}%`,
+              }}
+            >
+              {/* Nummern-Marker */}
+              <div className="absolute -top-3 -left-3 w-6 h-6 rounded-full bg-blue-500 text-white text-xs flex items-center justify-center font-bold shadow-md z-10">
+                {i + 1}
+              </div>
+              <input
+                type="text"
+                value={eintraege[beschriftung.id] ?? ''}
+                onChange={(e) => handleEingabe(beschriftung.id, e.target.value)}
+                disabled={abgegeben}
+                placeholder={`Label ${i + 1}`}
+                className={`w-28 px-2 py-1 text-sm rounded border shadow-sm
+                  bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100
+                  border-slate-300 dark:border-slate-600
+                  focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none
+                  ${abgegeben ? 'opacity-75 cursor-not-allowed' : ''}
+                `}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
