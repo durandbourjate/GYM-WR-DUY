@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { usePruefungStore } from '../../store/pruefungStore.ts'
 import type { LueckentextFrage as LueckentextFrageType } from '../../types/fragen.ts'
 import { renderMarkdown } from '../../utils/markdown.ts'
@@ -5,6 +6,18 @@ import { fachbereichFarbe } from '../../utils/fachUtils.ts'
 
 interface Props {
   frage: LueckentextFrageType
+}
+
+/** Fisher-Yates-Shuffle mit stabilem Seed-Key (frage.id + lueckenId) */
+function shuffleOptionen(optionen: string[], stableKey: string): string[] {
+  // Einfacher deterministischer Pseudo-Shuffle basierend auf Key-Hash
+  const seed = stableKey.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0)
+  const arr = [...optionen]
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = (seed * (i + 1)) % (i + 1)
+    ;[arr[i], arr[j]] = [arr[j], arr[i]]
+  }
+  return arr
 }
 
 export default function LueckentextFrage({ frage }: Props) {
@@ -15,6 +28,17 @@ export default function LueckentextFrage({ frage }: Props) {
   const aktuelleAntwort = antworten[frage.id]
   const eintraege: Record<string, string> =
     aktuelleAntwort?.typ === 'lueckentext' ? aktuelleAntwort.eintraege : {}
+
+  // Gemischte Dropdown-Optionen einmalig pro Frage berechnen
+  const gemischteOptionen = useMemo(() => {
+    const result: Record<string, string[]> = {}
+    for (const luecke of frage.luecken) {
+      if (luecke.dropdownOptionen && luecke.dropdownOptionen.length > 0) {
+        result[luecke.id] = shuffleOptionen(luecke.dropdownOptionen, `${frage.id}-${luecke.id}`)
+      }
+    }
+    return result
+  }, [frage.id, frage.luecken])
 
   function handleChange(lueckenId: string, wert: string) {
     if (abgegeben) return
@@ -53,6 +77,34 @@ export default function LueckentextFrage({ frage }: Props) {
           if (match) {
             const lueckenId = match[1]
             const wert = eintraege[lueckenId] ?? ''
+            const dropdownOpts = gemischteOptionen[lueckenId]
+
+            if (dropdownOpts) {
+              // Dropdown-Modus
+              return (
+                <select
+                  key={i}
+                  value={wert}
+                  onChange={(e) => handleChange(lueckenId, e.target.value)}
+                  disabled={abgegeben}
+                  className={`inline-block mx-1 px-2 py-1 text-base border-b-2 outline-none transition-colors text-slate-800 dark:text-slate-100 bg-transparent cursor-pointer
+                    ${abgegeben
+                      ? 'border-slate-300 dark:border-slate-600 opacity-75'
+                      : wert
+                        ? 'border-slate-400 dark:border-slate-500'
+                        : 'border-violet-400 dark:border-violet-500 focus:border-indigo-500 dark:focus:border-indigo-400'
+                    }
+                  `}
+                >
+                  <option value="">– wählen –</option>
+                  {dropdownOpts.map((opt) => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
+                </select>
+              )
+            }
+
+            // Texteingabe-Modus (Standard)
             return (
               <input
                 key={i}

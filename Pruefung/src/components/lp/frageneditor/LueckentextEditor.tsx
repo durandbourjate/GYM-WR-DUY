@@ -97,31 +97,62 @@ export default function LueckentextEditor({ textMitLuecken, setTextMitLuecken, l
       </Feld>
 
       {luecken.length > 0 && (
-        <div className="mt-3 space-y-2">
+        <div className="mt-3 space-y-3">
           <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">
             Korrekte Antworten pro Lücke
           </label>
-          {luecken.map((luecke) => (
-            <div key={luecke.id} className="flex items-center gap-2">
-              <span className="text-xs text-slate-500 dark:text-slate-400 font-mono w-8 shrink-0">
-                {`{{${luecke.id}}}`}
-              </span>
-              <input
-                type="text"
-                value={luecke.korrekteAntworten.join(', ')}
-                onChange={(e) => {
-                  const neu = luecken.map((l) =>
-                    l.id === luecke.id
-                      ? { ...l, korrekteAntworten: e.target.value.split(',').map((a) => a.trim()).filter(Boolean) }
-                      : l
-                  )
-                  setLuecken(neu)
-                }}
-                placeholder="Korrekte Antworten (Komma-getrennt, z.B. Antwort1, Antwort2)"
-                className="input-field flex-1"
-              />
-            </div>
-          ))}
+          {luecken.map((luecke) => {
+            const dropdownText = luecke.dropdownOptionen?.join(', ') ?? ''
+            const korrekteImDropdown =
+              luecke.dropdownOptionen && luecke.dropdownOptionen.length > 0
+                ? luecke.korrekteAntworten.some((a) => luecke.dropdownOptionen!.includes(a))
+                : true
+            return (
+              <div key={luecke.id} className="space-y-1.5">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-slate-500 dark:text-slate-400 font-mono w-8 shrink-0">
+                    {`{{${luecke.id}}}`}
+                  </span>
+                  <input
+                    type="text"
+                    value={luecke.korrekteAntworten.join(', ')}
+                    onChange={(e) => {
+                      const neu = luecken.map((l) =>
+                        l.id === luecke.id
+                          ? { ...l, korrekteAntworten: e.target.value.split(',').map((a) => a.trim()).filter(Boolean) }
+                          : l
+                      )
+                      setLuecken(neu)
+                    }}
+                    placeholder="Korrekte Antworten (Komma-getrennt, z.B. Antwort1, Antwort2)"
+                    className="input-field flex-1"
+                  />
+                </div>
+                <div className="flex items-start gap-2 pl-10">
+                  <input
+                    type="text"
+                    value={dropdownText}
+                    onChange={(e) => {
+                      const optionen = e.target.value.split(',').map((a) => a.trim()).filter(Boolean)
+                      const neu = luecken.map((l) =>
+                        l.id === luecke.id
+                          ? { ...l, dropdownOptionen: optionen.length > 0 ? optionen : undefined }
+                          : l
+                      )
+                      setLuecken(neu)
+                    }}
+                    placeholder="Dropdown-Optionen (optional, Komma-getrennt)"
+                    className="input-field flex-1 text-xs"
+                  />
+                </div>
+                {luecke.dropdownOptionen && luecke.dropdownOptionen.length > 0 && !korrekteImDropdown && (
+                  <p className="pl-10 text-xs text-amber-600 dark:text-amber-400">
+                    Korrekte Antwort nicht in Dropdown-Optionen enthalten
+                  </p>
+                )}
+              </div>
+            )
+          })}
         </div>
       )}
     </Abschnitt>
