@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback } from 'react'
+import DOMPurify from 'dompurify'
 import type { PruefungsMaterial } from '../types/pruefung.ts'
 import AudioPlayer from './AudioPlayer.tsx'
 
@@ -225,7 +226,7 @@ function MaterialAuswahl({ materialien, onWaehlen }: { materialien: PruefungsMat
               <span>{typIcon(mat.typ)}</span>
               <span className="text-sm font-medium text-slate-700 dark:text-slate-200">{mat.titel}</span>
               <span className="text-xs text-slate-400 dark:text-slate-500 ml-auto">
-                {mat.typ === 'pdf' ? 'PDF' : mat.typ === 'text' ? 'Text' : mat.typ === 'dateiUpload' ? 'Datei' : mat.typ === 'videoEmbed' ? 'Video' : 'Link'}
+                {mat.typ === 'pdf' ? 'PDF' : mat.typ === 'text' ? 'Text' : mat.typ === 'richtext' ? 'Rich-Text' : mat.typ === 'dateiUpload' ? 'Datei' : mat.typ === 'videoEmbed' ? 'Video' : 'Link'}
               </span>
             </div>
           </button>
@@ -311,6 +312,17 @@ function MaterialInhalt({ material }: { material: PruefungsMaterial }) {
     )
   }
 
+  if (material.typ === 'richtext' && material.inhalt) {
+    return (
+      <div className="overflow-y-auto flex-1 min-h-0">
+        <div
+          className="prose prose-sm dark:prose-invert max-w-none p-4 md:p-6"
+          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(material.inhalt) }}
+        />
+      </div>
+    )
+  }
+
   if (material.typ === 'text' && material.inhalt) {
     return (
       <div className="p-4 md:p-6">
@@ -385,6 +397,7 @@ function typIcon(typ: PruefungsMaterial['typ']): string {
   switch (typ) {
     case 'pdf': return '\u{1F4C4}'
     case 'text': return '\u{1F4DD}'
+    case 'richtext': return '\u{1F5B9}'
     case 'link': return '\u{1F517}'
     case 'dateiUpload': return '\u{1F4CE}'
     case 'videoEmbed': return '\u{1F3AC}'
