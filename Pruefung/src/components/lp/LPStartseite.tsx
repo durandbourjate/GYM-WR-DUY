@@ -15,6 +15,8 @@ import PoolSyncDialog from './fragenbank/PoolSyncDialog.tsx'
 import TrackerSection from './TrackerSection.tsx'
 // demoPruefung entfernt — nur noch Einrichtungsprüfung im Demo-Modus
 import { einrichtungsPruefung } from '../../data/einrichtungsPruefung.ts'
+import { einrichtungsFragen } from '../../data/einrichtungsFragen.ts'
+import { speichereConfig, speichereFrage } from '../../services/fragenbankApi.ts'
 
 /** Startseite für Lehrpersonen: Prüfungen verwalten + erstellen */
 export default function LPStartseite() {
@@ -93,6 +95,28 @@ export default function LPStartseite() {
     setFilterFach(prev => prev.includes(fach) ? prev.filter(f => f !== fach) : [...prev, fach])
   }
 
+  // Einrichtungsprüfung ins Backend synchronisieren (einmalig pro Session)
+  // Versionierung über gesamtpunkte — wenn sich die Punktzahl ändert, wird neu geschrieben
+  async function syncEinrichtungsPruefung(email: string, backendConfigs: PruefungsConfig[]): Promise<void> {
+    const backendVersion = backendConfigs.find(c => c.id === einrichtungsPruefung.id)
+    // Sync wenn: nicht vorhanden ODER Punktzahl anders (= Fragen geändert)
+    if (backendVersion && backendVersion.gesamtpunkte === einrichtungsPruefung.gesamtpunkte) return
+
+    console.log('[LP] Einrichtungsprüfung sync starten...', backendVersion ? 'update' : 'neu')
+    try {
+      // Config speichern
+      await speichereConfig(email, { ...einrichtungsPruefung, erstelltVon: email })
+      // Alle Fragen speichern (parallel in Batches von 5)
+      for (let i = 0; i < einrichtungsFragen.length; i += 5) {
+        const batch = einrichtungsFragen.slice(i, i + 5)
+        await Promise.all(batch.map(f => speichereFrage(email, f)))
+      }
+      console.log(`[LP] Einrichtungsprüfung sync fertig (${einrichtungsFragen.length} Fragen)`)
+    } catch (error) {
+      console.error('[LP] Einrichtungsprüfung sync fehlgeschlagen:', error)
+    }
+  }
+
   // Alle Prüfungs-Configs + Tracker-Daten laden
   useEffect(() => {
     async function lade(): Promise<void> {
@@ -117,6 +141,14 @@ export default function LPStartseite() {
       if (configResult) {
         setConfigs(configResult)
         setBackendFehler(false)
+        // Einrichtungsprüfung im Hintergrund synchronisieren
+        syncEinrichtungsPruefung(user.email, configResult).then(() => {
+          // Nach Sync: Configs neu laden falls Einrichtungsprüfung neu hinzugekommen ist
+          const hatEinrichtung = configResult.some(c => c.id === einrichtungsPruefung.id)
+          if (!hatEinrichtung) {
+            apiService.ladeAlleConfigs(user.email).then(r => { if (r) setConfigs(r) })
+          }
+        })
       } else {
         console.warn("[LP] Configs nicht ladbar — Composer bleibt nutzbar")
         setConfigs([])
