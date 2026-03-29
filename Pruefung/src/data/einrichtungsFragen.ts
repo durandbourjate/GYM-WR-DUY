@@ -767,7 +767,7 @@ export const einrichtungsFragen: Frage[] = [
     beschriftungen: [
       { id: '1', position: { x: 50, y: 50 }, korrekt: ['Zellkern', 'Nukleus', 'Nucleus'] },
       { id: '2', position: { x: 25, y: 30 }, korrekt: ['Zellmembran', 'Membran'] },
-      { id: '3', position: { x: 70, y: 60 }, korrekt: ['Mitochondrium', 'Mitochondrien'] },
+      { id: '3', position: { x: 62, y: 55 }, korrekt: ['Mitochondrium', 'Mitochondrien'] },
     ],
   },
 

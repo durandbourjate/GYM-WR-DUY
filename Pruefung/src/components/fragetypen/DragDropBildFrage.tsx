@@ -91,7 +91,7 @@ export default function DragDropBildFrage({ frage }: Props) {
 
       {/* Bild mit Zielzonen */}
       <div className={`relative inline-block ${!abgegeben && !alleZugeordnet ? 'rounded-xl border-2 border-violet-400 dark:border-violet-500 p-1' : ''}`}>
-        <div className="relative">
+        <div className="relative overflow-hidden">
           <img
             src={frage.bildUrl}
             alt="Drag & Drop Bild"

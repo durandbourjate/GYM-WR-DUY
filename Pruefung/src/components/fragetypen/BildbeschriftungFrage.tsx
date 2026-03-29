@@ -50,7 +50,7 @@ export default function BildbeschriftungFrage({ frage }: Props) {
 
       {/* Bild mit Labels */}
       <div className={`relative inline-block ${!abgegeben && !alleAusgefuellt ? 'rounded-xl border-2 border-violet-400 dark:border-violet-500 p-1' : ''}`}>
-        <div className="relative">
+        <div className="relative overflow-hidden">
           <img
             src={frage.bildUrl}
             alt="Bildbeschriftung"
