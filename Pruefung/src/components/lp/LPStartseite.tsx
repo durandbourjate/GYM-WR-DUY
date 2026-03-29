@@ -95,12 +95,22 @@ export default function LPStartseite() {
     setFilterFach(prev => prev.includes(fach) ? prev.filter(f => f !== fach) : [...prev, fach])
   }
 
-  // Einrichtungsprüfung ins Backend synchronisieren (einmalig pro Session)
-  // Versionierung über gesamtpunkte — wenn sich die Punktzahl ändert, wird neu geschrieben
+  // Einrichtungsprüfung ins Backend synchronisieren (einmalig)
+  // localStorage-Guard verhindert Duplikate bei Reloads
+  const SYNC_KEY = 'einrichtung-sync-version'
+  const SYNC_VERSION = `${einrichtungsPruefung.id}-${einrichtungsPruefung.gesamtpunkte}`
+
   async function syncEinrichtungsPruefung(email: string, backendConfigs: PruefungsConfig[]): Promise<void> {
+    // Guard: Bereits für diese Version synchronisiert?
+    try { if (localStorage.getItem(SYNC_KEY) === SYNC_VERSION) return } catch { /* ignore */ }
+
     const backendVersion = backendConfigs.find(c => c.id === einrichtungsPruefung.id)
     // Sync wenn: nicht vorhanden ODER Punktzahl anders (= Fragen geändert)
-    if (backendVersion && backendVersion.gesamtpunkte === einrichtungsPruefung.gesamtpunkte) return
+    if (backendVersion && backendVersion.gesamtpunkte === einrichtungsPruefung.gesamtpunkte) {
+      // Bereits aktuell — Guard setzen und fertig
+      try { localStorage.setItem(SYNC_KEY, SYNC_VERSION) } catch { /* ignore */ }
+      return
+    }
 
     console.log('[LP] Einrichtungsprüfung sync starten...', backendVersion ? 'update' : 'neu')
     try {
@@ -111,6 +121,8 @@ export default function LPStartseite() {
         const batch = einrichtungsFragen.slice(i, i + 5)
         await Promise.all(batch.map(f => speichereFrage(email, f)))
       }
+      // Guard setzen — nicht nochmal syncen
+      try { localStorage.setItem(SYNC_KEY, SYNC_VERSION) } catch { /* ignore */ }
       console.log(`[LP] Einrichtungsprüfung sync fertig (${einrichtungsFragen.length} Fragen)`)
     } catch (error) {
       console.error('[LP] Einrichtungsprüfung sync fehlgeschlagen:', error)
