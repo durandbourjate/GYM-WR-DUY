@@ -313,10 +313,13 @@ export default function Layout() {
             </button>
           </div>
 
-          {/* === MITTE: Counter (zentriert) === */}
-          <span className="text-sm text-slate-500 dark:text-slate-400 tabular-nums font-semibold whitespace-nowrap px-2">
-            {aktuelleFrageIndex + 1} / {fragen.length}
-          </span>
+          {/* === MITTE: Counter + Online (zentriert) === */}
+          <div className="flex items-center gap-2 px-2">
+            <span className="text-sm text-slate-500 dark:text-slate-400 tabular-nums font-semibold whitespace-nowrap">
+              {aktuelleFrageIndex + 1} / {fragen.length}
+            </span>
+            <VerbindungsStatus />
+          </div>
 
           {/* === RECHTS: Unsicher + Weiter + Abgeben === */}
           <div className="flex items-center gap-1.5 flex-1 min-w-0 justify-end">
@@ -403,9 +406,8 @@ export default function Layout() {
               <FragenNavigation />
             </div>
 
-            {/* Sidebar-Fusszeile: Online + Hilfe + Theme */}
-            <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between gap-1">
-              <VerbindungsStatus />
+            {/* Sidebar-Fusszeile: Hilfe + Theme */}
+            <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700 flex items-center justify-end gap-1">
               <SuSHilfeButton />
               <ThemeToggle />
             </div>
