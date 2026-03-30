@@ -1054,10 +1054,10 @@ function ladePruefung(pruefungId, email) {
     const fragenIds = config.abschnitte.flatMap(a => a.fragenIds);
     const fragen = ladeFragen(fragenIds);
 
-    // Sicherheit: Lösungsdaten NUR für authentifizierte LPs (nicht SuS-Domain)
-    // Verhindert dass SuS mit LP-E-Mail in URL Lösungen abrufen
-    const gibLPDaten = istLP && !email.endsWith('@' + SUS_DOMAIN);
-    const sichereFragen = gibLPDaten ? fragen : fragen.map(bereinigeFrageFuerSuS_);
+    // Sicherheit: Lösungsdaten IMMER entfernen in ladePruefung()
+    // LP braucht Lösungen hier nicht (Fragenbank + Korrektur laden separat mit eigenem Auth)
+    // Verhindert dass SuS mit LP-E-Mail in URL Lösungen abrufen können
+    const sichereFragen = fragen.map(bereinigeFrageFuerSuS_);
 
     return jsonResponse({ config, fragen: sichereFragen });
   } catch (error) {
