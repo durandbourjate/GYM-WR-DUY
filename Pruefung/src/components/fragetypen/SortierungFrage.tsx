@@ -86,6 +86,48 @@ export default function SortierungFrage({ frage }: Props) {
     setDragOverIndex(null)
   }, [])
 
+  // Touch-DnD (iPad/Mobile — HTML5 DnD funktioniert nicht auf iOS)
+  const touchStartY = useRef<number>(0)
+  const touchCurrentIndex = useRef<number | null>(null)
+  const listRef = useRef<HTMLDivElement>(null)
+
+  const handleTouchStart = useCallback((e: React.PointerEvent, index: number) => {
+    if (abgegeben || e.pointerType === 'mouse') return // Maus nutzt HTML5-DnD
+    touchStartY.current = e.clientY
+    touchCurrentIndex.current = index
+    setDragIndex(index)
+    ;(e.target as HTMLElement).setPointerCapture?.(e.pointerId)
+  }, [abgegeben])
+
+  const handleTouchMove = useCallback((e: React.PointerEvent) => {
+    if (touchCurrentIndex.current === null || e.pointerType === 'mouse') return
+    e.preventDefault()
+    if (!listRef.current) return
+    const items = listRef.current.querySelectorAll('[data-sort-item]')
+    for (let i = 0; i < items.length; i++) {
+      const rect = items[i].getBoundingClientRect()
+      if (e.clientY >= rect.top && e.clientY <= rect.bottom) {
+        setDragOverIndex(i)
+        return
+      }
+    }
+  }, [])
+
+  const handleTouchEnd = useCallback(() => {
+    if (touchCurrentIndex.current === null) return
+    const von = touchCurrentIndex.current
+    const nach = dragOverIndex
+    if (nach !== null && von !== nach && !abgegeben) {
+      const neueReihenfolge = [...reihenfolge]
+      const [element] = neueReihenfolge.splice(von, 1)
+      neueReihenfolge.splice(nach, 0, element)
+      setAntwort(frage.id, { typ: 'sortierung', reihenfolge: neueReihenfolge })
+    }
+    touchCurrentIndex.current = null
+    setDragIndex(null)
+    setDragOverIndex(null)
+  }, [dragOverIndex, abgegeben, reihenfolge, setAntwort, frage.id])
+
   return (
     <div className="flex flex-col gap-5">
       {/* Header: Badges */}
@@ -110,17 +152,26 @@ export default function SortierungFrage({ frage }: Props) {
         dangerouslySetInnerHTML={{ __html: renderMarkdown(frage.fragetext) }}
       />
 
-      {/* Sortier-Liste mit Drag & Drop */}
-      <div className={`flex flex-col gap-2 ${!abgegeben && (!aktuelleAntwort || aktuelleAntwort.typ !== 'sortierung') ? 'rounded-xl border-2 border-violet-400 dark:border-violet-500 p-1' : ''}`}>
+      {/* Sortier-Liste mit Drag & Drop (Desktop) + Pointer-DnD (Touch/iPad) */}
+      <div
+        ref={listRef}
+        className={`flex flex-col gap-2 ${!abgegeben && (!aktuelleAntwort || aktuelleAntwort.typ !== 'sortierung') ? 'rounded-xl border-2 border-violet-400 dark:border-violet-500 p-1' : ''}`}
+        style={{ touchAction: abgegeben ? 'auto' : 'none' }}
+      >
         {reihenfolge.map((element, index) => (
           <div
             key={`${element}-${index}`}
+            data-sort-item
             draggable={!abgegeben}
             onDragStart={() => handleDragStart(index)}
             onDragOver={(e) => handleDragOver(e, index)}
             onDragLeave={handleDragLeave}
             onDrop={(e) => handleDrop(e, index)}
             onDragEnd={handleDragEnd}
+            onPointerDown={(e) => handleTouchStart(e, index)}
+            onPointerMove={handleTouchMove}
+            onPointerUp={handleTouchEnd}
+            onPointerCancel={handleTouchEnd}
             className={`flex items-center gap-3 p-3 rounded-xl border-2 bg-white dark:bg-slate-800 transition-all select-none
               ${abgegeben ? 'opacity-75' : 'cursor-grab active:cursor-grabbing'}
               ${dragIndex === index ? 'opacity-40 border-blue-400 dark:border-blue-500' : ''}

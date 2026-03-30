@@ -1,7 +1,10 @@
+import { useState, useEffect } from 'react'
 import DOMPurify from 'dompurify'
-import type { Frage, MCFrage, RichtigFalschFrage, LueckentextFrage, ZuordnungFrage, BerechnungFrage, KontenbestimmungFrage } from '../../../types/fragen'
+import type { Frage, MCFrage, RichtigFalschFrage, LueckentextFrage, ZuordnungFrage, BerechnungFrage, KontenbestimmungFrage, FrageAnhang } from '../../../types/fragen'
 import type { Antwort } from '../../../types/antworten'
 import type { KorrekturErgebnis } from '../../../utils/autoKorrektur'
+import MediaAnhang from '../../MediaAnhang.tsx'
+import AudioPlayer from '../../AudioPlayer.tsx'
 
 interface Props {
   frage: Frage
@@ -293,6 +296,146 @@ function BilanzERAnzeige({ antwort }: { antwort: Extract<Antwort, { typ: 'bilanz
   )
 }
 
+/** Formel-Antwort (LaTeX via KaTeX) */
+function FormelAnzeige({ antwort }: { antwort: Extract<Antwort, { typ: 'formel' }> | undefined }) {
+  const [html, setHtml] = useState('')
+
+  useEffect(() => {
+    if (!antwort?.latex) return
+    import('katex').then((katex) => {
+      try {
+        setHtml(katex.default.renderToString(antwort.latex, { throwOnError: false, displayMode: true }))
+      } catch {
+        setHtml('')
+      }
+    })
+  }, [antwort?.latex])
+
+  if (!antwort?.latex) return <KeineAntwort />
+  return (
+    <div className="rounded bg-slate-50 dark:bg-slate-700/50 px-3 py-2 mt-2">
+      <span className="text-xs text-slate-500 dark:text-slate-400">Eingegebene Formel:</span>
+      {html ? (
+        <div className="mt-1" dangerouslySetInnerHTML={{ __html: html }} />
+      ) : (
+        <code className="text-sm text-slate-700 dark:text-slate-200 block mt-1">{antwort.latex}</code>
+      )}
+    </div>
+  )
+}
+
+/** Zeichnung/Visualisierung-Antwort (PNG-Export) */
+function VisualisierungAnzeige({ antwort }: { antwort: Extract<Antwort, { typ: 'visualisierung' }> | undefined }) {
+  if (!antwort) return <KeineAntwort />
+  if (antwort.bildLink) {
+    return (
+      <div className="rounded bg-slate-50 dark:bg-slate-700/50 px-3 py-2 mt-2">
+        <img src={antwort.bildLink} alt="SuS-Zeichnung" className="max-w-full border border-slate-200 dark:border-slate-600 rounded" />
+      </div>
+    )
+  }
+  return (
+    <div className="rounded bg-slate-50 dark:bg-slate-700/50 px-3 py-2 mt-2">
+      <span className="text-sm italic text-slate-400">[Zeichnungsdaten vorhanden, kein Bild-Export]</span>
+    </div>
+  )
+}
+
+/** PDF-Annotation-Antwort */
+function PDFAnnotationAnzeige({ antwort }: { antwort: Extract<Antwort, { typ: 'pdf' }> | undefined }) {
+  if (!antwort) return <KeineAntwort />
+  return (
+    <div className="rounded bg-slate-50 dark:bg-slate-700/50 px-3 py-2 mt-2">
+      <span className="text-sm text-slate-700 dark:text-slate-200">
+        PDF-Annotation: {antwort.annotationen?.length ?? 0} Markierungen
+      </span>
+    </div>
+  )
+}
+
+/** Audio-Antwort */
+function AudioAnzeige({ antwort }: { antwort: Extract<Antwort, { typ: 'audio' }> | undefined }) {
+  if (!antwort) return <KeineAntwort />
+  const src = antwort.aufnahmeUrl
+  if (!src) return <KeineAntwort />
+  return (
+    <div className="rounded bg-slate-50 dark:bg-slate-700/50 px-3 py-2 mt-2">
+      <span className="text-xs text-slate-500 dark:text-slate-400 block mb-1">
+        Aufnahme ({antwort.dauer ? `${Math.round(antwort.dauer)}s` : '–'})
+      </span>
+      <AudioPlayer src={src} />
+    </div>
+  )
+}
+
+/** Code-Antwort */
+function CodeAnzeige({ antwort }: { antwort: Extract<Antwort, { typ: 'code' }> | undefined }) {
+  if (!antwort?.code) return <KeineAntwort />
+  return (
+    <div className="rounded bg-slate-50 dark:bg-slate-700/50 mt-2 overflow-x-auto">
+      <pre className="text-sm text-slate-700 dark:text-slate-200 px-3 py-2 font-mono whitespace-pre-wrap">{antwort.code}</pre>
+    </div>
+  )
+}
+
+/** Sortierung-Antwort */
+function SortierungAnzeige({ antwort }: { antwort: Extract<Antwort, { typ: 'sortierung' }> | undefined }) {
+  if (!antwort) return <KeineAntwort />
+  return (
+    <div className="rounded bg-slate-50 dark:bg-slate-700/50 px-3 py-2 mt-2 space-y-0.5">
+      {antwort.reihenfolge.map((item, i) => (
+        <div key={i} className="text-sm text-slate-700 dark:text-slate-200">
+          {i + 1}. {item}
+        </div>
+      ))}
+    </div>
+  )
+}
+
+/** Hotspot-Antwort */
+function HotspotAnzeige({ antwort }: { antwort: Extract<Antwort, { typ: 'hotspot' }> | undefined }) {
+  if (!antwort) return <KeineAntwort />
+  return (
+    <div className="rounded bg-slate-50 dark:bg-slate-700/50 px-3 py-2 mt-2">
+      <span className="text-sm text-slate-700 dark:text-slate-200">
+        {antwort.geklickt?.length ?? 0} Markierungen gesetzt
+      </span>
+    </div>
+  )
+}
+
+/** Bildbeschriftung-Antwort */
+function BildbeschriftungAnzeige({ antwort }: { antwort: Extract<Antwort, { typ: 'bildbeschriftung' }> | undefined }) {
+  if (!antwort) return <KeineAntwort />
+  const eintraege = Object.entries(antwort.eintraege ?? {})
+  if (eintraege.length === 0) return <KeineAntwort />
+  return (
+    <div className="rounded bg-slate-50 dark:bg-slate-700/50 px-3 py-2 mt-2 space-y-0.5">
+      {eintraege.map(([key, val]) => (
+        <div key={key} className="text-sm text-slate-700 dark:text-slate-200">
+          <span className="text-slate-500 dark:text-slate-400">{key}: </span>{val}
+        </div>
+      ))}
+    </div>
+  )
+}
+
+/** DragDrop-Bild-Antwort */
+function DragDropBildAnzeige({ antwort }: { antwort: Extract<Antwort, { typ: 'dragdrop_bild' }> | undefined }) {
+  if (!antwort) return <KeineAntwort />
+  const zuordnungen = Object.entries(antwort.zuordnungen ?? {})
+  if (zuordnungen.length === 0) return <KeineAntwort />
+  return (
+    <div className="rounded bg-slate-50 dark:bg-slate-700/50 px-3 py-2 mt-2 space-y-0.5">
+      {zuordnungen.map(([zone, label]) => (
+        <div key={zone} className="text-sm text-slate-700 dark:text-slate-200">
+          <span className="text-slate-500 dark:text-slate-400">{zone}: </span>{label}
+        </div>
+      ))}
+    </div>
+  )
+}
+
 /** Platzhalter für fehlende Antwort */
 function KeineAntwort() {
   return (
@@ -419,6 +562,24 @@ function MusterloesungBox({ frage }: { frage: Frage }) {
     )
   }
 
+  // Lückentext: Korrekte Antworten als Musterlösung
+  if (frage.typ === 'lueckentext') {
+    const lf = frage as LueckentextFrage
+    if (lf.luecken?.some(l => (l as { korrekteAntworten?: string[] }).korrekteAntworten?.length)) {
+      return (
+        <div className="mt-3 rounded border border-amber-200 dark:border-amber-700/40 bg-amber-50 dark:bg-amber-900/15 px-3 py-2">
+          <span className="text-xs font-medium text-amber-700 dark:text-amber-300">Musterlösung:</span>
+          {lf.luecken.map((l, i) => (
+            <div key={l.id} className="text-sm mt-1 text-amber-800 dark:text-amber-200">
+              <span className="text-xs text-amber-600 dark:text-amber-400">Lücke {i + 1}: </span>
+              {(l as { korrekteAntworten?: string[] }).korrekteAntworten?.join(' / ') || '–'}
+            </div>
+          ))}
+        </div>
+      )
+    }
+  }
+
   // Allgemein: Text-Musterlösung
   if (frage.musterlosung) {
     return (
@@ -436,10 +597,22 @@ function MusterloesungBox({ frage }: { frage: Frage }) {
 export default function KorrekturFrageVollansicht({ frage, antwort, autoErgebnis }: Props) {
   const text = frageHaupttext(frage)
 
+  // Anhänge aus Frage extrahieren (Bilder, PDFs)
+  const anhaenge = 'anhaenge' in frage ? (frage as { anhaenge?: FrageAnhang[] }).anhaenge : undefined
+
   return (
     <div>
       {/* Fragetext */}
       <p className="text-sm text-slate-700 dark:text-slate-200 whitespace-pre-wrap mb-1">{text}</p>
+
+      {/* Anhänge (Bilder, PDFs, Materialien) */}
+      {anhaenge && anhaenge.length > 0 && (
+        <div className="space-y-2 my-2">
+          {anhaenge.map((a) => (
+            <MediaAnhang key={a.id} anhang={a} />
+          ))}
+        </div>
+      )}
 
       {/* Typ-spezifische Antwortdarstellung */}
       {frage.typ === 'mc' && (
@@ -471,6 +644,33 @@ export default function KorrekturFrageVollansicht({ frage, antwort, autoErgebnis
       )}
       {frage.typ === 'bilanzstruktur' && (
         <BilanzERAnzeige antwort={antwort?.typ === 'bilanzstruktur' ? antwort : undefined} />
+      )}
+      {frage.typ === 'formel' && (
+        <FormelAnzeige antwort={antwort?.typ === 'formel' ? antwort : undefined} />
+      )}
+      {frage.typ === 'visualisierung' && (
+        <VisualisierungAnzeige antwort={antwort?.typ === 'visualisierung' ? antwort : undefined} />
+      )}
+      {frage.typ === 'pdf' && (
+        <PDFAnnotationAnzeige antwort={antwort?.typ === 'pdf' ? antwort : undefined} />
+      )}
+      {frage.typ === 'audio' && (
+        <AudioAnzeige antwort={antwort?.typ === 'audio' ? antwort : undefined} />
+      )}
+      {frage.typ === 'code' && (
+        <CodeAnzeige antwort={antwort?.typ === 'code' ? antwort : undefined} />
+      )}
+      {frage.typ === 'sortierung' && (
+        <SortierungAnzeige antwort={antwort?.typ === 'sortierung' ? antwort : undefined} />
+      )}
+      {frage.typ === 'hotspot' && (
+        <HotspotAnzeige antwort={antwort?.typ === 'hotspot' ? antwort : undefined} />
+      )}
+      {frage.typ === 'bildbeschriftung' && (
+        <BildbeschriftungAnzeige antwort={antwort?.typ === 'bildbeschriftung' ? antwort : undefined} />
+      )}
+      {frage.typ === 'dragdrop_bild' && (
+        <DragDropBildAnzeige antwort={antwort?.typ === 'dragdrop_bild' ? antwort : undefined} />
       )}
 
       {/* Auto-Korrektur-Details */}

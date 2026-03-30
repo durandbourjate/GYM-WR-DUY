@@ -198,7 +198,7 @@ export default function AudioFrage({ frage }: Props) {
         {/* Preview / bestehende Aufnahme */}
         {(status === 'preview' || (status === 'idle' && audioUrl)) && audioUrl && (
           <div className="flex flex-col gap-3">
-            <audio controls src={audioUrl} className="w-full" preload="metadata" />
+            <audio controls controlsList="nodownload noplaybackrate" src={audioUrl} className="w-full" preload="metadata" />
             {!abgegeben && (
               <button
                 type="button"

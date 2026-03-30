@@ -25,7 +25,7 @@ export interface PDFTextItem {
   transform: number[]
 }
 
-export const ZOOM_STUFEN = [0.75, 1, 1.25, 1.5] as const
+export const ZOOM_STUFEN = [0.75, 1, 1.25, 1.5, 2, 3] as const
 export type ZoomStufe = typeof ZOOM_STUFEN[number]
 
 export const STANDARD_HIGHLIGHT_FARBEN = [

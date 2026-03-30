@@ -68,7 +68,7 @@ export default function PDFFrage({ frage }: Props) {
   const [aktiveKategorieId, setAktiveKategorieId] = useState<string | undefined>(
     frage.kategorien?.[0]?.id,
   )
-  const [zoom, setZoom] = useState<ZoomStufe>(1)
+  const [zoom, setZoom] = useState<ZoomStufe>(1.25)
   const [textRotation, setTextRotation] = useState<0 | 90 | 180 | 270>(0)
   const [textGroesse, setTextGroesse] = useState(18)
   const [textFett, setTextFett] = useState(false)

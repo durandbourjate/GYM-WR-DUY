@@ -26,6 +26,57 @@
 
 ---
 
+## Session 36 — iPad-Test Bugfixes (30.03.2026)
+
+Systematische Behebung aller Probleme aus dem iPad-Test (Demo-SuS + LP/SuS-Login).
+
+### Strang A: Korrektur-Regression — LP sieht vollen Fragekontext
+
+| # | Fix | Details |
+|---|-----|---------|
+| A1 | **Anhänge in LP-Korrektur** | `KorrekturFrageVollansicht.tsx`: Bilder, PDFs, Materialien werden jetzt über `MediaAnhang` angezeigt. |
+| A2 | **Formel-Korrektur (KaTeX)** | Neue `FormelAnzeige`-Komponente: Rendert SuS-LaTeX via KaTeX mit Fallback auf Raw-Code. |
+| A3 | **Zeichnung-Korrektur (PNG)** | Neue `VisualisierungAnzeige`: Zeigt PNG-Export der SuS-Zeichnung. |
+| A4 | **PDF-Annotation-Korrektur** | Neue `PDFAnnotationAnzeige`: Zeigt Anzahl Markierungen. |
+| A5 | **Audio-Korrektur** | Neue `AudioAnzeige`: Abspielbarer AudioPlayer für SuS-Aufnahme. |
+| A6 | **Code-Korrektur** | Neue `CodeAnzeige`: Monospace-Darstellung des SuS-Codes. |
+| A7 | **Sortierung/Hotspot/Bildbeschriftung/DragDrop** | Neue Anzeige-Komponenten für alle verbleibenden Fragetypen. |
+| A8 | **Lückentext-Musterlösung** | `MusterloesungBox`: Zeigt korrekte Antworten pro Lücke. |
+
+### Strang B: iPad Touch-Kompatibilität
+
+| # | Fix | Details |
+|---|-----|---------|
+| B1 | **Sticky Header (iOS)** | `Layout.tsx`: `h-screen` → `h-dvh` (dynamic viewport height, korrekt auf iOS). |
+| B2 | **Sortierung Touch-DnD** | `SortierungFrage.tsx`: Pointer-Events für Touch-Geräte. `pointerdown`/`pointermove`/`pointerup` zusätzlich zu HTML5-DnD. `touchAction: none` auf Container. |
+| B3 | **DragDrop-Karte Tap-to-select** | `DragDropBildFrage.tsx`: Tap-to-select + Tap-to-place Mechanismus für Touch. Label antippen → grün markiert → Zone antippen → platziert. |
+| B7 | **PDF Zoom erweitert** | `PDFTypes.ts`: Neue Stufen 200%, 300%. `PDFFrage.tsx`: Standardzoom 125% statt 100%. |
+| B8 | **Material-PDFs (CSP)** | `index.html`: `frame-src` um `drive.google.com` + `docs.google.com` erweitert. Material-iframes wurden durch CSP blockiert. |
+
+### Strang C: UX-Verbesserungen
+
+| # | Fix | Details |
+|---|-----|---------|
+| C1 | **Formel Operatoren + Undo** | `FormelFrageComponent.tsx`: Neue Gruppen (Klammern, `<>`, `=`, `→`). Undo-Stack (max 20 Schritte) + ↩ Button. |
+| C2 | **Audio AirPlay** | `AudioFrage.tsx`: `controlsList="nodownload noplaybackrate"` auf `<audio>` Element. |
+
+### Offen (Browser-Verifikation am iPad nötig)
+
+| # | Problem | Status |
+|---|---------|--------|
+| B4-B5 | Freitext/Code Auto-Focus Tastatur | iOS erlaubt Keyboard nur bei direkter User-Geste — Workaround nötig |
+| B6 | Zeichnen Rendering-Performance + Selection-Timeout | Muss am echten iPad debuggt werden |
+| B7 Rest | PDF Highlight-Tool schiebt PDF statt zu markieren | Touch-Event-Konflikt, iPad-Debugging nötig |
+| C4 | Dictation deaktivieren | iOS-System-Feature, nur via SEB/MDM möglich |
+| C5 | Status bleibt "aktiv" nach Abgabe → "erzwungen" nach LP-Beenden | Backend-Fix in apps-script-code.js nötig |
+| C6 | SuS lädt Prüfung vor LP-Freigabe (Restore-Bug) | pruefungId-Vergleich bei Restore nötig |
+
+**Dateien geändert:** `KorrekturFrageVollansicht.tsx`, `Layout.tsx`, `SortierungFrage.tsx`, `DragDropBildFrage.tsx`, `PDFTypes.ts`, `PDFFrage.tsx`, `index.html`, `FormelFrageComponent.tsx`, `AudioFrage.tsx`
+
+**Tests:** 161 grün. `tsc -b` sauber.
+
+---
+
 ## Session 35 — Sicherheitsaudit + Heartbeat-Fix (30.03.2026)
 
 Systematischer Sicherheits- & Qualitätsaudit mit Chrome-in-Chrome (LP + 2 SuS). 10 Kategorien getestet.

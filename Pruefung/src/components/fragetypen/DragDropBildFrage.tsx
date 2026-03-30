@@ -17,9 +17,11 @@ export default function DragDropBildFrage({ frage }: Props) {
   const zuordnungen: Record<string, string> =
     aktuelleAntwort?.typ === 'dragdrop_bild' ? aktuelleAntwort.zuordnungen : {}
 
-  // Dragging State
+  // Dragging State (Desktop: HTML5 DnD, Touch: Tap-to-select + Tap-to-place)
   const [draggingLabel, setDraggingLabel] = useState<string | null>(null)
   const [dragOverZone, setDragOverZone] = useState<string | null>(null)
+  // Tap-Select: Label wurde per Touch ausgewählt, wartet auf Zone-Tap
+  const [selectedLabel, setSelectedLabel] = useState<string | null>(null)
 
   // Labels, die bereits einer Zone zugeordnet sind
   const zugeordneteLabels = new Set(Object.values(zuordnungen))
@@ -55,13 +57,27 @@ export default function DragDropBildFrage({ frage }: Props) {
 
   const handleZoneKlick = useCallback((zoneId: string) => {
     if (abgegeben) return
+    // Tap-to-place: Wenn ein Label ausgewählt ist, in diese Zone platzieren
+    if (selectedLabel) {
+      const neueZuordnungen = { ...zuordnungen }
+      neueZuordnungen[zoneId] = selectedLabel
+      setAntwort(frage.id, { typ: 'dragdrop_bild', zuordnungen: neueZuordnungen })
+      setSelectedLabel(null)
+      return
+    }
     // Label aus Zone entfernen (zurueck in Pool)
     if (zuordnungen[zoneId]) {
       const neueZuordnungen = { ...zuordnungen }
       delete neueZuordnungen[zoneId]
       setAntwort(frage.id, { typ: 'dragdrop_bild', zuordnungen: neueZuordnungen })
     }
-  }, [abgegeben, zuordnungen, setAntwort, frage.id])
+  }, [abgegeben, zuordnungen, setAntwort, frage.id, selectedLabel])
+
+  /** Label per Touch auswählen (Tap-to-select) */
+  const handleLabelTap = useCallback((label: string) => {
+    if (abgegeben) return
+    setSelectedLabel(prev => prev === label ? null : label) // Toggle
+  }, [abgegeben])
 
   const alleZugeordnet = (frage.zielzonen ?? []).every(z => zuordnungen[z.id])
 
@@ -141,6 +157,11 @@ export default function DragDropBildFrage({ frage }: Props) {
       </div>
 
       {/* Label-Pool */}
+      {!abgegeben && selectedLabel && (
+        <p className="text-xs text-green-600 dark:text-green-400 font-medium">
+          &laquo;{selectedLabel}&raquo; ausgewählt — tippe auf eine Zone zum Platzieren
+        </p>
+      )}
       {!abgegeben && (
         <div className="flex flex-wrap gap-2">
           {verfuegbareLabels.length > 0 ? (
@@ -150,20 +171,24 @@ export default function DragDropBildFrage({ frage }: Props) {
                 draggable={!abgegeben}
                 onDragStart={() => handleDragStart(label)}
                 onDragEnd={() => setDraggingLabel(null)}
+                onClick={() => handleLabelTap(label)}
                 className={`px-3 py-1.5 text-sm rounded-lg border cursor-grab select-none transition-all
-                  ${draggingLabel === label
-                    ? 'bg-blue-100 dark:bg-blue-900/30 border-blue-400 dark:border-blue-500 text-blue-700 dark:text-blue-300 opacity-60'
-                    : 'bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 hover:border-slate-400 dark:hover:border-slate-500 hover:shadow-sm'
+                  ${selectedLabel === label
+                    ? 'bg-green-100 dark:bg-green-900/30 border-green-500 dark:border-green-400 text-green-700 dark:text-green-300 ring-2 ring-green-400 dark:ring-green-500'
+                    : draggingLabel === label
+                      ? 'bg-blue-100 dark:bg-blue-900/30 border-blue-400 dark:border-blue-500 text-blue-700 dark:text-blue-300 opacity-60'
+                      : 'bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 hover:border-slate-400 dark:hover:border-slate-500 hover:shadow-sm'
                   }
                   active:cursor-grabbing
                 `}
               >
                 {label}
+                {selectedLabel === label && <span className="ml-1 text-green-600 dark:text-green-400">&#x2713;</span>}
               </div>
             ))
           ) : (
             <p className="text-xs text-slate-400 dark:text-slate-500 italic">
-              Alle Labels zugeordnet.
+              Alle Labels zugeordnet. Auf Zone tippen zum Entfernen.
             </p>
           )}
         </div>

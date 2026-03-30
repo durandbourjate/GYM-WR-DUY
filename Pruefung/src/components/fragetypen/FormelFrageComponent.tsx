@@ -35,12 +35,21 @@ const SYMBOLE = [
   { gruppe: 'Operatoren', symbole: [
     { label: '\u00B1', einfuegen: '\\pm' },
     { label: '\u2260', einfuegen: '\\neq' },
+    { label: '<', einfuegen: '<' },
+    { label: '>', einfuegen: '>' },
     { label: '\u2264', einfuegen: '\\leq' },
     { label: '\u2265', einfuegen: '\\geq' },
+    { label: '=', einfuegen: '=' },
     { label: '\u221E', einfuegen: '\\infty' },
     { label: '\u2248', einfuegen: '\\approx' },
     { label: '\u00D7', einfuegen: '\\times' },
     { label: '\u00F7', einfuegen: '\\div' },
+    { label: '\u2192', einfuegen: '\\rightarrow' },
+  ]},
+  { gruppe: 'Klammern', symbole: [
+    { label: '()', einfuegen: '\\left( \\right)' },
+    { label: '[]', einfuegen: '\\left[ \\right]' },
+    { label: '||', einfuegen: '\\left| \\right|' },
   ]},
   { gruppe: 'Funktionen', symbole: [
     { label: '\u221A', einfuegen: '\\sqrt{}' },
@@ -67,6 +76,7 @@ export default function FormelFrageComponent({ frage }: Props) {
   const [vorschauHtml, setVorschauHtml] = useState('')
   const [fehler, setFehler] = useState('')
   const [katexGeladen, setKatexGeladen] = useState(istKatexGeladen())
+  const [undoStack, setUndoStack] = useState<string[]>([])
 
   // KaTeX laden
   useEffect(() => {
@@ -116,8 +126,17 @@ export default function FormelFrageComponent({ frage }: Props) {
   }, [frage.id, setAntwort])
 
   function handleEingabe(value: string): void {
+    setUndoStack(prev => [...prev.slice(-20), eingabe]) // Max 20 Schritte
     setEingabe(value)
     speichereAntwort(value)
+  }
+
+  function handleUndo(): void {
+    if (undoStack.length === 0 || abgegeben) return
+    const vorherigerWert = undoStack[undoStack.length - 1]
+    setUndoStack(prev => prev.slice(0, -1))
+    setEingabe(vorherigerWert)
+    speichereAntwort(vorherigerWert)
   }
 
   function symbolEinfuegen(symbol: string): void {
@@ -126,6 +145,7 @@ export default function FormelFrageComponent({ frage }: Props) {
     const start = input.selectionStart ?? eingabe.length
     const end = input.selectionEnd ?? eingabe.length
     const neuerText = eingabe.slice(0, start) + symbol + eingabe.slice(end)
+    setUndoStack(prev => [...prev.slice(-20), eingabe])
     setEingabe(neuerText)
     speichereAntwort(neuerText)
     // Cursor nach dem eingefügten Symbol positionieren
@@ -158,7 +178,17 @@ export default function FormelFrageComponent({ frage }: Props) {
 
       {/* Symbol-Toolbar */}
       {!abgegeben && (
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-wrap gap-3 items-start">
+          {/* Undo-Button */}
+          <button
+            type="button"
+            onClick={handleUndo}
+            disabled={undoStack.length === 0}
+            title="Rückgängig"
+            className="px-2 py-1 text-sm bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded border border-slate-200 dark:border-slate-600 transition-colors disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+          >
+            ↩
+          </button>
           {SYMBOLE.map(gruppe => (
             <div key={gruppe.gruppe} className="flex flex-wrap gap-1 items-center">
               <span className="text-xs text-slate-400 dark:text-slate-500 mr-1">{gruppe.gruppe}:</span>
