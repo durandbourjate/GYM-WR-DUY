@@ -26,9 +26,66 @@
 
 ---
 
-## Session 37 — Browser-Test + Bugfixes + iPad-Fixes (30.03.2026)
+## Session 37 — ROOT CAUSE Fixes + Browser-Test + iPad (30–31.03.2026)
 
-Systematischer Browser-Test (LP + SuS) der Einrichtungsprüfung + iPad-Test durch User.
+Systematischer Browser-Test (LP + SuS) + iPad-Test. Zwei kritische Root Causes gefunden und gefixt.
+
+### ROOT CAUSE: LP bekam keine korrekt-Felder
+
+`ladePruefung()` (Zeile 1060) wendete `bereinigeFrageFuerSuS_()` auf ALLE Requests an — auch LP. Die LP-Korrektur nutzt denselben Endpoint (`useKorrekturDaten.ts:116`), brauchte aber `korrekt` für:
+- MCAnzeige (grün/rot Markierung)
+- autoKorrigiere() (Punkteberechnung)
+- Musterlösung-Anzeige
+
+**Fix:** `istLP ? fragen : fragen.map(bereinigeFrageFuerSuS_)` — LP bekommt volle Daten, SuS weiterhin gestrippte.
+
+### ROOT CAUSE: gesamtFragen nie im Heartbeat geschrieben
+
+`heartbeat()` ignorierte `body.gesamtFragen` obwohl Frontend es alle 10s sendete. Nur `speichereAntworten()` schrieb es → nach Abgabe war der letzte Heartbeat-Wert 0.
+
+**Fix:** `heartbeat()` schreibt jetzt `gesamtFragen` + Spalten-Migration.
+
+### Weitere Fixes
+
+| # | Fix | Details |
+|---|-----|---------|
+| 1 | **effektivePunkte() leere Strings** | Backend `lpPunkte: ''` als null behandelt |
+| 2 | **useEffect Timing** | Abhängig von `korrektur` UND `autoErgebnisseAlle` (vorher nur autoErgebnisse → feuerte vor Datenladung) |
+| 3 | **Abgabe-Status** | `istAbgabe === 'true'` → immer `'abgegeben'` (alte Logik verglich Zeitstempel falsch) |
+| 4 | **Korrektur-Vollansicht** | Hotspot/Bildbeschriftung/DragDrop/PDF zeigen jetzt Bild + Kontext |
+| 5 | **Fortschritt nach Abgabe** | 100%/✓ statt 0%/X/0 |
+| 6 | **Audio iOS** | WebM/Opus → MP4/AAC Fallback + Blob-Validierung + URL.createObjectURL |
+| 7 | **DragDrop Touch** | `touchAction: 'manipulation'` |
+| 8 | **Stifteingabe** | RDP-Toleranz 1.5 → 0.8 |
+| 9 | **Sticky Header iOS** | `overflow-hidden` von äusserem Container entfernt |
+| 10 | **CSP frame-src** | `*.googleusercontent.com` für Material-PDFs |
+| 11 | **Material-PDF Fallback** | "In neuem Tab öffnen" Link |
+| 12 | **E2E-Smoke-Checklist** | `docs/e2e-smoke-test.md` mit 50+ Prüfpunkten |
+| 13 | **6 neue Tests** | `effektivePunkte()` Edge Cases (167 total) |
+
+### Browser-Verifiziert (31.03.2026)
+
+| Test | Ergebnis |
+|------|----------|
+| Frage 1: C "23 Fragen" korrekt markiert | ✅ |
+| Musterlösung in Korrektur sichtbar | ✅ |
+| Auto-Korrektur: 1/1 Pkt. im Punkte-Feld | ✅ |
+| Status "Abgegeben" (nicht "Erzwungen") | ✅ |
+| Erzwungen: 0 in Ergebnis-Übersicht | ✅ |
+| Fortschritt 4% erhalten nach Abgabe | ✅ |
+| Frage 2/23 korrekt im Monitoring | ✅ |
+| Heartbeat + Auto-Save funktioniert | ✅ |
+
+### Offen (iPad — nach Deploy verifizieren)
+
+| # | Problem | Status |
+|---|---------|--------|
+| — | Audio-Aufnahme iOS | Codec-Fallback deployed, muss verifiziert werden |
+| — | PDF-Annotation iPad | Touch-Probleme, nicht gefixt |
+| — | Stifteingabe iPad | Toleranz reduziert, muss verifiziert werden |
+| — | Material-PDFs | Google Drive Freigabe prüfen + Fallback-Link vorhanden |
+
+**Tests:** 167 grün. `tsc -b` sauber. **Apps Script Deploy nötig.**
 
 ### Strang 1: Auto-Korrektur + Monitoring-Bugs
 
