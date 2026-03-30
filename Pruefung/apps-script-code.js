@@ -1294,10 +1294,17 @@ function parseFrage(row, fachbereich) {
         kategorien: typDaten.kategorien || [],
         erlaubteWerkzeuge: typDaten.erlaubteWerkzeuge || ['highlighter', 'kommentar', 'freihand'],
       };
-    default:
+    default: {
       // Alle übrigen Typen (sortierung, hotspot, bildbeschriftung, dragdrop_bild, audio, code, formel, etc.)
-      // → typDaten komplett übernehmen, damit keine Felder verloren gehen
+      // Primär: json/daten-Spalte (vollständige Frage als JSON), Fallback: typDaten + Einzel-Spalten
+      var vollstaendig = safeJsonParse(row.json || row.daten, null);
+      if (vollstaendig && typeof vollstaendig === 'object') {
+        // json-Spalte hat die komplette Frage — base-Felder überschreiben damit Metadaten konsistent sind
+        return { ...vollstaendig, ...base, typ: vollstaendig.typ || row.typ };
+      }
+      // Fallback: typDaten + fragetext
       return { ...base, typ: row.typ, fragetext: row.fragetext || '', ...typDaten };
+    }
   }
 }
 
