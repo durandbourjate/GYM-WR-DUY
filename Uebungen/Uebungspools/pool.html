@@ -207,6 +207,124 @@ body{min-height:auto!important;background:#fff!important}
 .topic-bar{print-color-adjust:exact;-webkit-print-color-adjust:exact}
 .topic-bar-fill{print-color-adjust:exact;-webkit-print-color-adjust:exact}
 }
+/* ═══ FIBU: KONTEN-DROPDOWN ═══ */
+.konto-select{width:100%;padding:8px 10px;border:2px solid var(--c-border);border-radius:6px;font-family:inherit;font-size:.88rem;background:var(--c-surface);color:var(--c-text);outline:none;cursor:pointer;appearance:auto}
+.konto-select:focus{border-color:var(--c-primary)}
+.konto-select.correct{border-color:var(--c-success);background:var(--c-success-bg)}
+.konto-select.wrong{border-color:var(--c-error);background:var(--c-error-bg)}
+html.dark .konto-select{background:var(--c-surface);color:var(--c-text);border-color:var(--c-border)}
+
+/* ═══ BUCHUNGSSATZ ═══ */
+.bs-entries{display:flex;flex-direction:column;gap:12px}
+.bs-entry{display:grid;grid-template-columns:1fr auto 1fr auto;gap:8px;align-items:center;padding:12px;background:var(--c-bg);border-radius:var(--radius);border:1px solid var(--c-border)}
+.bs-entry-label{font-size:.78rem;font-weight:600;color:var(--c-text-soft);text-transform:uppercase;letter-spacing:.03em;text-align:center}
+.bs-entry .an-label{font-size:.85rem;font-weight:600;color:var(--c-text-soft);text-align:center;padding:0 4px}
+.bs-amount{width:100px;padding:8px 10px;border:2px solid var(--c-border);border-radius:6px;font-family:'DM Mono',monospace;font-size:.92rem;text-align:right;outline:none;background:var(--c-surface);color:var(--c-text)}
+.bs-amount:focus{border-color:var(--c-primary)}
+.bs-amount.correct{border-color:var(--c-success);background:var(--c-success-bg)}
+.bs-amount.wrong{border-color:var(--c-error);background:var(--c-error-bg)}
+.bs-header{display:grid;grid-template-columns:1fr auto 1fr auto;gap:8px;padding:0 12px;margin-bottom:4px}
+.bs-add{display:flex;align-items:center;justify-content:center;padding:10px;border:2px dashed var(--c-border);border-radius:var(--radius);cursor:pointer;color:var(--c-text-soft);font-size:.88rem;font-weight:500;transition:.15s;margin-top:4px}
+.bs-add:hover{border-color:var(--c-primary);color:var(--c-primary)}
+.bs-remove{background:none;border:none;color:var(--c-text-soft);cursor:pointer;font-size:1rem;padding:2px 6px;border-radius:4px;line-height:1}
+.bs-remove:hover{background:var(--c-error-bg);color:var(--c-error)}
+html.dark .bs-entry{background:var(--c-surface);border-color:var(--c-border)}
+html.dark .bs-amount{background:var(--c-bg);color:var(--c-text);border-color:var(--c-border)}
+
+/* ═══ T-KONTO ═══ */
+.tk-container{display:flex;flex-direction:column;gap:16px}
+.tk-card{border:2px solid var(--c-border);border-radius:var(--radius);overflow:hidden}
+.tk-title{text-align:center;font-weight:700;font-size:.95rem;padding:8px 12px;background:var(--c-bg);border-bottom:2px solid var(--c-border)}
+.tk-table{display:grid;grid-template-columns:1fr 1fr;min-height:80px}
+.tk-side{padding:8px}
+.tk-side-header{font-size:.78rem;font-weight:700;text-transform:uppercase;color:var(--c-text-soft);text-align:center;padding-bottom:6px;border-bottom:1px solid var(--c-border);margin-bottom:6px;letter-spacing:.03em}
+.tk-divider{width:2px;background:var(--c-border)}
+.tk-row{display:grid;grid-template-columns:auto 1fr auto;gap:6px;align-items:center;margin-bottom:4px;font-size:.88rem}
+.tk-row .tk-gf{font-family:'DM Mono',monospace;font-size:.75rem;color:var(--c-text-soft);min-width:20px}
+.tk-row input[type="number"]{width:80px;padding:6px 8px;border:2px solid var(--c-border);border-radius:6px;font-family:'DM Mono',monospace;font-size:.85rem;text-align:right;outline:none;background:var(--c-surface);color:var(--c-text)}
+.tk-row input[type="number"]:focus{border-color:var(--c-primary)}
+.tk-row input.correct{border-color:var(--c-success);background:var(--c-success-bg)}
+.tk-row input.wrong{border-color:var(--c-error);background:var(--c-error-bg)}
+.tk-ab{font-size:.82rem;color:var(--c-text-soft);font-style:italic;padding:4px 0}
+.tk-saldo{display:grid;grid-template-columns:1fr 1fr;border-top:2px solid var(--c-border);font-size:.85rem;font-weight:600}
+.tk-saldo-side{padding:8px;display:flex;align-items:center;gap:6px;justify-content:center}
+.tk-saldo-side label{font-size:.78rem;color:var(--c-text-soft)}
+.tk-add-row{background:none;border:none;color:var(--c-text-soft);cursor:pointer;font-size:.78rem;padding:4px 8px;border-radius:4px;transition:.15s}
+.tk-add-row:hover{color:var(--c-primary);background:var(--c-bg)}
+.tk-gf-list{margin-bottom:12px;padding:12px 16px;background:var(--c-bg);border-radius:var(--radius);border-left:4px solid var(--c-info)}
+.tk-gf-list ol{margin:4px 0 0 18px;font-size:.88rem;line-height:1.6}
+html.dark .tk-card{border-color:var(--c-border)}
+html.dark .tk-title{background:var(--c-surface)}
+html.dark .tk-row input[type="number"]{background:var(--c-bg);color:var(--c-text);border-color:var(--c-border)}
+html.dark .tk-gf-list{background:var(--c-surface)}
+
+/* ═══ BILANZ ═══ */
+.bilanz-container{display:flex;flex-direction:column;gap:16px}
+.bilanz-ref{margin-bottom:12px;overflow-x:auto}
+.bilanz-ref table{width:100%;border-collapse:collapse;font-size:.82rem}
+.bilanz-ref th{background:var(--c-bg);font-weight:600;padding:6px 10px;text-align:left;border:1px solid var(--c-border)}
+.bilanz-ref td{padding:6px 10px;border:1px solid var(--c-border)}
+.bilanz-ref .ref-nr{font-family:'DM Mono',monospace;font-weight:500}
+.bilanz-ref .ref-saldo{font-family:'DM Mono',monospace;text-align:right}
+.bilanz-layout{display:grid;grid-template-columns:1fr 1fr;gap:0;border:2px solid var(--c-border);border-radius:var(--radius);overflow:hidden}
+.bilanz-seite{padding:12px}
+.bilanz-seite:first-child{border-right:2px solid var(--c-border)}
+.bilanz-seite-title{font-weight:700;font-size:.9rem;text-align:center;padding-bottom:8px;border-bottom:1px solid var(--c-border);margin-bottom:8px}
+.bilanz-row{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;margin-bottom:6px}
+.bilanz-row .konto-select{font-size:.82rem;padding:6px 8px}
+.bilanz-row input[type="number"]{width:80px;padding:6px 8px;border:2px solid var(--c-border);border-radius:6px;font-family:'DM Mono',monospace;font-size:.85rem;text-align:right;outline:none;background:var(--c-surface);color:var(--c-text)}
+.bilanz-row input:focus{border-color:var(--c-primary)}
+.bilanz-row input.correct{border-color:var(--c-success);background:var(--c-success-bg)}
+.bilanz-row input.wrong{border-color:var(--c-error);background:var(--c-error-bg)}
+.bilanz-summe{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-top:2px solid var(--c-border);margin-top:8px;font-weight:700;font-size:.88rem}
+.bilanz-summe input{width:90px;padding:6px 8px;border:2px solid var(--c-border);border-radius:6px;font-family:'DM Mono',monospace;font-size:.88rem;text-align:right;font-weight:700;outline:none;background:var(--c-surface);color:var(--c-text)}
+.bilanz-summe input:focus{border-color:var(--c-primary)}
+.bilanz-summe input.correct{border-color:var(--c-success);background:var(--c-success-bg)}
+.bilanz-summe input.wrong{border-color:var(--c-error);background:var(--c-error-bg)}
+html.dark .bilanz-layout{border-color:var(--c-border)}
+html.dark .bilanz-seite:first-child{border-right-color:var(--c-border)}
+html.dark .bilanz-ref th{background:var(--c-surface)}
+html.dark .bilanz-row input[type="number"],html.dark .bilanz-summe input{background:var(--c-bg);color:var(--c-text);border-color:var(--c-border)}
+
+/* ═══ KONTENBESTIMMUNG ═══ */
+.kb-table{width:100%;border-collapse:collapse;font-size:.88rem}
+.kb-table th{background:var(--c-bg);font-weight:600;padding:8px 10px;text-align:left;border:1px solid var(--c-border);font-size:.82rem}
+.kb-table td{padding:8px 10px;border:1px solid var(--c-border);vertical-align:middle}
+.kb-table .kb-nr{font-family:'DM Mono',monospace;font-weight:500;text-align:center;width:30px}
+.kb-table .kb-gf{min-width:150px}
+.kb-table select.correct{border-color:var(--c-success);background:var(--c-success-bg)}
+.kb-table select.wrong{border-color:var(--c-error);background:var(--c-error-bg)}
+.kb-seite-select{width:100%;padding:6px 8px;border:2px solid var(--c-border);border-radius:6px;font-family:inherit;font-size:.85rem;background:var(--c-surface);color:var(--c-text);outline:none;cursor:pointer}
+.kb-seite-select:focus{border-color:var(--c-primary)}
+.kb-seite-select.correct{border-color:var(--c-success);background:var(--c-success-bg)}
+.kb-seite-select.wrong{border-color:var(--c-error);background:var(--c-error-bg)}
+html.dark .kb-table th{background:var(--c-surface)}
+html.dark .kb-seite-select{background:var(--c-surface);color:var(--c-text);border-color:var(--c-border)}
+
+/* ═══ AUFGABENGRUPPE ═══ */
+.gruppe-container{display:flex;flex-direction:column;gap:16px}
+.gruppe-teil{padding:16px;background:var(--c-bg);border-radius:var(--radius);border:1px solid var(--c-border)}
+.gruppe-teil-header{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.gruppe-teil-nr{font-family:'DM Mono',monospace;font-weight:700;font-size:.9rem;background:var(--c-primary);color:#fff;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:50%;flex-shrink:0}
+.gruppe-teil-type{font-size:.72rem;font-weight:600;padding:2px 8px;border-radius:10px;background:var(--c-surface);color:var(--c-text-soft);border:1px solid var(--c-border)}
+.gruppe-teil .q-text{font-size:.95rem;margin-bottom:14px}
+.gruppe-teil .feedback{margin-top:12px}
+.gruppe-teil-result{display:flex;align-items:center;gap:6px;font-size:.85rem;font-weight:600;margin-top:8px}
+html.dark .gruppe-teil{background:var(--c-surface);border-color:var(--c-border)}
+
+/* ═══ MOBILE für neue Typen ═══ */
+@media(max-width:600px){
+  .bs-entry{grid-template-columns:1fr;gap:6px}
+  .bs-entry .an-label{display:none}
+  .bs-header{display:none}
+  .bs-amount{width:100%}
+  .bilanz-layout{grid-template-columns:1fr}
+  .bilanz-seite:first-child{border-right:none;border-bottom:2px solid var(--c-border)}
+  .tk-table{grid-template-columns:1fr}
+  .tk-side:first-child{border-bottom:2px solid var(--c-border)}
+  .kb-table{font-size:.8rem}
+  .kb-table td,.kb-table th{padding:6px}
+}
 .print-header{display:none}
 .info-row{display:flex;align-items:stretch;gap:10px;margin-bottom:10px;flex-wrap:wrap}
 .info-row .info-topic{flex:1;min-width:150px}
@@ -700,7 +818,7 @@ const COLOR_SCHEMES = {
 
 // Labels (shared across all pools)
 const DIFF_LABELS = {1:"⭐ Einfach",2:"⭐⭐ Mittel",3:"⭐⭐⭐ Schwer"};
-const TYPE_LABELS = {mc:"📝 Einzelauswahl",multi:"☑️ Mehrfachauswahl",tf:"✓✗ Richtig/Falsch",fill:"📖 Lückentext",calc:"🔢 Berechnung",sort:"🔀 Zuordnung",open:"✏️ Offene Frage"};
+const TYPE_LABELS = {mc:"📝 Einzelauswahl",multi:"☑️ Mehrfachauswahl",tf:"✓✗ Richtig/Falsch",fill:"📖 Lückentext",calc:"🔢 Berechnung",sort:"🔀 Zuordnung",open:"✏️ Offene Frage",buchungssatz:"📒 Buchungssatz",tkonto:"📊 T-Konto",bilanz:"📋 Bilanz/ER",kontenbestimmung:"🏷️ Kontenbestimmung",gruppe:"📦 Aufgabengruppe"};
 
 // ══════════════════════════════════════════
 // FiBu Konten-Highlighting (Lehrmittel-Farben)
@@ -961,6 +1079,21 @@ function restoreAnswerState(q,answer){
   } else if(q.type==='open'){
     var ta=document.getElementById('openAnswer');if(ta)ta.disabled=true;
     var sample=document.getElementById('openSample');if(sample){document.getElementById('openSampleText').textContent=q.sample||'';sample.classList.add('show')}
+  } else if(q.type==='buchungssatz'){
+    document.querySelectorAll('.konto-select,.bs-amount').forEach(function(el){el.disabled=true;el.classList.add('correct')});
+    var addBtn=document.querySelector('.bs-add');if(addBtn)addBtn.style.display='none';
+  } else if(q.type==='tkonto'){
+    document.querySelectorAll('.tk-card .konto-select,.tk-card input[type="number"]').forEach(function(el){el.disabled=true;el.classList.add('correct')});
+    document.querySelectorAll('.tk-add-row').forEach(function(b){b.style.display='none'});
+  } else if(q.type==='bilanz'){
+    document.querySelectorAll('.bilanz-layout .konto-select,.bilanz-layout input[type="number"],.bilanz-summe input').forEach(function(el){el.disabled=true;el.classList.add('correct')});
+  } else if(q.type==='kontenbestimmung'){
+    document.querySelectorAll('.kb-table .konto-select,.kb-seite-select').forEach(function(el){el.disabled=true;el.classList.add('correct')});
+  } else if(q.type==='gruppe'){
+    // Disable all inputs in group
+    document.querySelectorAll('.gruppe-teil .konto-select,.gruppe-teil .bs-amount,.gruppe-teil input,.gruppe-teil .mc-opt,.gruppe-teil .tf-btn,.gruppe-teil select').forEach(function(el){
+      el.disabled=true;if(el.style)el.style.pointerEvents='none';
+    });
   }
   const fb=document.getElementById('feedback');
   fb.className='feedback show '+(answer.correct?'correct':'wrong');
@@ -1151,7 +1284,14 @@ function sendReport(){
 function init(){
   buildChips('topicChips',TOPICS,'topics',t=>TOPICS[t].short);
   buildChips('diffChips',DIFF_LABELS,'diffs',d=>DIFF_LABELS[d]);
-  buildChips('typeChips',TYPE_LABELS,'types',t=>TYPE_LABELS[t]);
+  // Nur Fragetypen anzeigen, die im Pool auch vorkommen
+  var usedTypes={};
+  QUESTIONS.forEach(function(q){
+    if(TYPE_LABELS[q.type])usedTypes[q.type]=TYPE_LABELS[q.type];
+    // Aufgabengruppe: auch Unter-Typen zählen
+    if(q.type==='gruppe'&&q.teil){q.teil.forEach(function(t){if(TYPE_LABELS[t.type])usedTypes[t.type]=TYPE_LABELS[t.type]})}
+  });
+  buildChips('typeChips',usedTypes,'types',t=>usedTypes[t]);
   buildTagChips();
   buildSchnellstart();
   setMode('mix');
@@ -1481,6 +1621,138 @@ function renderQuestion(){
     html+='<button class="btn btn-outline" onclick="answerOpen(\''+q.id+'\',false)">❌ Nicht gewusst</button>';
     html+='</div>';
   }
+  // ── BUCHUNGSSATZ ──
+  else if(q.type==='buchungssatz'){
+    _bsCount=q.correct.length;
+    html+='<div class="bs-header"><span class="bs-entry-label">Soll</span><span></span><span class="bs-entry-label">Haben</span><span class="bs-entry-label">Betrag</span></div>';
+    html+='<div class="bs-entries" id="bsEntries">';
+    for(var bi=0;bi<q.correct.length;bi++){
+      html+='<div class="bs-entry" id="bsEntry'+(bi+1)+'">';
+      html+=renderKontenSelect(q.konten,'bsSoll'+(bi+1),'Soll-Konto');
+      html+='<span class="an-label">an</span>';
+      html+=renderKontenSelect(q.konten,'bsHaben'+(bi+1),'Haben-Konto');
+      html+='<div style="display:flex;align-items:center;gap:4px"><input type="number" class="bs-amount" id="bsBetrag'+(bi+1)+'" min="0" step="0.01" placeholder="CHF"></div>';
+      html+='</div>';
+    }
+    html+='</div>';
+    html+='<div class="bs-add" onclick="addBsEntry(\''+q.id+'\')">+ Buchungssatz hinzufügen</div>';
+  }
+  // ── T-KONTO ──
+  else if(q.type==='tkonto'){
+    if(q.geschaeftsfaelle&&q.geschaeftsfaelle.length){
+      html+='<div class="tk-gf-list"><strong>Geschäftsfälle:</strong><ol>';
+      q.geschaeftsfaelle.forEach(function(gf){html+='<li>'+highlightKonten(gf)+'</li>'});
+      html+='</ol></div>';
+    }
+    html+='<div class="tk-container">';
+    q.konten.forEach(function(konto,ki){
+      var totalSoll=(konto.correctSoll||[]).length;
+      var totalHaben=(konto.correctHaben||[]).length;
+      var rowsSoll=Math.max(totalSoll,1);
+      var rowsHaben=Math.max(totalHaben,1);
+      html+='<div class="tk-card" data-ki="'+ki+'">';
+      html+='<div class="tk-title">'+konto.nr+' '+konto.name+'</div>';
+      html+='<div class="tk-table">';
+      // Soll-Seite
+      html+='<div class="tk-side" id="tkSoll'+ki+'">';
+      html+='<div class="tk-side-header">Soll</div>';
+      if(typeof konto.ab==='number')html+='<div class="tk-ab">AB: '+konto.ab.toLocaleString('de-CH')+' CHF</div>';
+      for(var si=0;si<rowsSoll;si++){
+        html+='<div class="tk-row">';
+        if(q.geschaeftsfaelle)html+='<span class="tk-gf">Gf</span>';
+        html+=renderKontenSelect(q.konten.concat(q.gegenkonten||[]),'tkSollKonto'+ki+'_'+si,'Gegenkonto');
+        html+='<input type="number" step="any" id="tkSollBetrag'+ki+'_'+si+'" placeholder="CHF">';
+        html+='</div>';
+      }
+      html+='<button class="tk-add-row" onclick="addTkRow('+ki+',\'soll\')">+ Zeile</button>';
+      html+='</div>';
+      // Haben-Seite
+      html+='<div class="tk-side" id="tkHaben'+ki+'" style="border-left:2px solid var(--c-border)">';
+      html+='<div class="tk-side-header">Haben</div>';
+      if(typeof konto.ab==='number')html+='<div class="tk-ab" style="visibility:hidden">AB</div>';
+      for(var hi=0;hi<rowsHaben;hi++){
+        html+='<div class="tk-row">';
+        if(q.geschaeftsfaelle)html+='<span class="tk-gf">Gf</span>';
+        html+=renderKontenSelect(q.konten.concat(q.gegenkonten||[]),'tkHabenKonto'+ki+'_'+hi,'Gegenkonto');
+        html+='<input type="number" step="any" id="tkHabenBetrag'+ki+'_'+hi+'" placeholder="CHF">';
+        html+='</div>';
+      }
+      html+='<button class="tk-add-row" onclick="addTkRow('+ki+',\'haben\')">+ Zeile</button>';
+      html+='</div>';
+      html+='</div>'; // tk-table
+      // Saldo
+      html+='<div class="tk-saldo">';
+      html+='<div class="tk-saldo-side"><label>Saldo Soll</label><input type="number" step="any" id="tkSaldoSoll'+ki+'" placeholder="0"></div>';
+      html+='<div class="tk-saldo-side" style="border-left:2px solid var(--c-border)"><label>Saldo Haben</label><input type="number" step="any" id="tkSaldoHaben'+ki+'" placeholder="0"></div>';
+      html+='</div>';
+      html+='</div>'; // tk-card
+    });
+    html+='</div>';
+  }
+  // ── BILANZ ──
+  else if(q.type==='bilanz'){
+    // Referenztabelle
+    html+='<div class="bilanz-ref"><table><tr><th>Nr.</th><th>Konto</th><th>Saldo (CHF)</th></tr>';
+    var shuffledKonten=[...q.kontenMitSaldi];shuffle(shuffledKonten);
+    shuffledKonten.forEach(function(k){
+      html+='<tr><td class="ref-nr">'+k.nr+'</td><td>'+k.name+'</td><td class="ref-saldo">'+k.saldo.toLocaleString('de-CH')+'</td></tr>';
+    });
+    html+='</table></div>';
+    // Bilanz-Layout
+    var leftTitle=q.modus==='erfolgsrechnung'?'Aufwand':'Aktiven';
+    var rightTitle=q.modus==='erfolgsrechnung'?'Ertrag':'Passiven';
+    var rowCount=q.kontenMitSaldi.length;
+    var leftRows=Math.ceil(rowCount/2);var rightRows=rowCount-leftRows;
+    html+='<div class="bilanz-layout">';
+    // Linke Seite
+    html+='<div class="bilanz-seite" id="bilanzLinks">';
+    html+='<div class="bilanz-seite-title">'+leftTitle+'</div>';
+    for(var li=0;li<leftRows;li++){
+      html+='<div class="bilanz-row">'+renderKontenSelect(q.kontenMitSaldi,'bilanzL'+li,'Konto wählen');
+      html+='<input type="number" step="any" id="bilanzLBetrag'+li+'" placeholder="CHF"></div>';
+    }
+    html+='<div class="bilanz-summe"><span>Summe '+leftTitle+'</span><input type="number" step="any" id="bilanzSummeL" placeholder="CHF"></div>';
+    html+='</div>';
+    // Rechte Seite
+    html+='<div class="bilanz-seite" id="bilanzRechts">';
+    html+='<div class="bilanz-seite-title">'+rightTitle+'</div>';
+    for(var ri=0;ri<rightRows;ri++){
+      html+='<div class="bilanz-row">'+renderKontenSelect(q.kontenMitSaldi,'bilanzR'+ri,'Konto wählen');
+      html+='<input type="number" step="any" id="bilanzRBetrag'+ri+'" placeholder="CHF"></div>';
+    }
+    html+='<div class="bilanz-summe"><span>Summe '+rightTitle+'</span><input type="number" step="any" id="bilanzSummeR" placeholder="CHF"></div>';
+    html+='</div>';
+    html+='</div>';
+  }
+  // ── KONTENBESTIMMUNG ──
+  else if(q.type==='kontenbestimmung'){
+    html+='<div style="overflow-x:auto"><table class="kb-table"><tr><th class="kb-nr">#</th><th class="kb-gf">Geschäftsfall</th><th>Konto</th><th>Seite</th></tr>';
+    q.aufgaben.forEach(function(a,ai){
+      var rows=a.correct.length;
+      for(var ri=0;ri<rows;ri++){
+        html+='<tr>';
+        if(ri===0)html+='<td class="kb-nr" rowspan="'+rows+'">'+(ai+1)+'</td><td class="kb-gf" rowspan="'+rows+'">'+highlightKonten(a.text)+'</td>';
+        html+='<td>'+renderKontenSelect(q.konten,'kbKonto'+ai+'_'+ri,'Konto')+'</td>';
+        html+='<td><select class="kb-seite-select" id="kbSeite'+ai+'_'+ri+'"><option value="">–</option><option value="soll">Soll</option><option value="haben">Haben</option></select></td>';
+        html+='</tr>';
+      }
+    });
+    html+='</table></div>';
+  }
+  // ── AUFGABENGRUPPE ──
+  else if(q.type==='gruppe'){
+    html+='<div class="gruppe-container" id="gruppeContainer">';
+    q.teil.forEach(function(t,ti){
+      html+='<div class="gruppe-teil" id="gruppeTeil'+ti+'" data-ti="'+ti+'">';
+      html+='<div class="gruppe-teil-header"><span class="gruppe-teil-nr">'+t.sub+'</span>';
+      html+='<span class="gruppe-teil-type">'+TYPE_LABELS[t.type]+'</span></div>';
+      html+='<div class="q-text">'+highlightKonten(t.q)+'</div>';
+      html+=renderGruppeTeilInner(q,t,ti);
+      html+='<div class="feedback" id="gruppeFb'+ti+'"></div>';
+      html+='</div>';
+    });
+    html+='</div>';
+  }
   // Unified action row: type-specific button + skip (same line)
   html+='<div class="feedback" id="feedback"></div>';
   // Hints container for all types that support hints
@@ -1509,6 +1781,11 @@ function renderQuestion(){
     if(q.hints&&q.hints.length)html+='<button class="btn btn-outline" id="hintsBtn" onclick="showHints(\''+q.id+'\')">💡 Tipps</button>';
     html+='<button class="btn btn-primary" onclick="showOpenSample(\''+q.id+'\')">💡 Lösung anzeigen</button>';
   }
+  else if(q.type==='buchungssatz') html+='<button class="btn btn-primary" onclick="answerBuchungssatz(\''+q.id+'\')">🔍 Überprüfen</button>';
+  else if(q.type==='tkonto') html+='<button class="btn btn-primary" onclick="answerTKonto(\''+q.id+'\')">🔍 Überprüfen</button>';
+  else if(q.type==='bilanz') html+='<button class="btn btn-primary" onclick="answerBilanz(\''+q.id+'\')">🔍 Überprüfen</button>';
+  else if(q.type==='kontenbestimmung') html+='<button class="btn btn-primary" onclick="answerKontenbestimmung(\''+q.id+'\')">🔍 Überprüfen</button>';
+  else if(q.type==='gruppe') html+='<button class="btn btn-primary" onclick="answerGruppe(\''+q.id+'\')">🔍 Alle prüfen</button>';
   html+='<button class="btn btn-skip" onclick="skipQuestion()">⏭️ Überspringen</button>';
   html+='<button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()" style="display:none;margin-left:auto">Nächste Aufgabe →</button>';
   html+='</div>';
@@ -1658,6 +1935,402 @@ function answerOpen(qid,correct){
   document.getElementById('openSelf').style.display='none';
   document.getElementById('openAnswer').disabled=true;
   finishAnswer(q,correct,q.explain);
+}
+
+// ── T-Konto: Zeile dynamisch hinzufügen ──
+function addTkRow(ki,seite){
+  var container=document.getElementById(seite==='soll'?'tkSoll'+ki:'tkHaben'+ki);
+  var rows=container.querySelectorAll('.tk-row');
+  var idx=rows.length;
+  var prefix=seite==='soll'?'tkSollKonto':'tkHabenKonto';
+  var betragPrefix=seite==='soll'?'tkSollBetrag':'tkHabenBetrag';
+  var div=document.createElement('div');div.className='tk-row';
+  // Wir brauchen die aktuelle Frage für die Konten-Liste
+  var q=state.queue[state.current];
+  var allKonten=q.konten.concat(q.gegenkonten||[]);
+  div.innerHTML=renderKontenSelect(allKonten,prefix+ki+'_'+idx,'Gegenkonto')+
+    '<input type="number" step="any" id="'+betragPrefix+ki+'_'+idx+'" placeholder="CHF">';
+  // Vor dem add-row Button einfügen
+  var addBtn=container.querySelector('.tk-add-row');
+  container.insertBefore(div,addBtn);
+}
+
+// ── Aufgabengruppe: inneres Rendering pro Teilfrage ──
+function renderGruppeTeilInner(parentQ,t,ti){
+  var h='';
+  if(t.type==='mc'){
+    h+='<div class="mc-options">';
+    t.options.forEach(function(o){
+      h+='<div class="mc-opt" data-val="'+o.v+'" onclick="answerGruppeMC(this,'+ti+',\''+o.v+'\')">';
+      h+='<span class="opt-letter">'+o.v+'</span><span class="opt-text">'+highlightKonten(o.t)+'</span></div>';
+    });
+    h+='</div>';
+  } else if(t.type==='multi'){
+    h+='<div class="multi-hint">☑️ Mehrere Antworten können richtig sein.</div>';
+    h+='<div class="mc-options" id="gruppeMulti'+ti+'">';
+    t.options.forEach(function(o){
+      h+='<div class="mc-opt" data-val="'+o.v+'" onclick="toggleMulti(this)">';
+      h+='<span class="opt-check"></span><span class="opt-letter">'+o.v+'</span><span class="opt-text">'+highlightKonten(o.t)+'</span></div>';
+    });
+    h+='</div>';
+  } else if(t.type==='tf'){
+    h+='<div class="tf-btns"><div class="tf-btn" onclick="answerGruppeTF(this,'+ti+',true)">✅ Richtig</div>';
+    h+='<div class="tf-btn" onclick="answerGruppeTF(this,'+ti+',false)">❌ Falsch</div></div>';
+  } else if(t.type==='fill'){
+    var parts=t.q.split(/\{(\d+)\}/g);
+    h+='<div class="q-text">';
+    var bIdx=0;
+    for(var i=0;i<parts.length;i++){
+      if(i%2===0)h+=highlightKonten(parts[i]);
+      else h+='<input class="fill-input gruppe-fill-'+ti+'" data-bidx="'+bIdx+'" placeholder="…" autocomplete="off">';
+      if(i%2===1)bIdx++;
+    }
+    h+='</div>';
+  } else if(t.type==='calc'){
+    h+='<div class="calc-rows">';
+    t.rows.forEach(function(r,i){
+      h+='<div class="calc-row"><label>'+r.label+'</label><input type="number" step="any" class="gruppe-calc-'+ti+'" data-ridx="'+i+'" placeholder="?"><span class="unit">'+r.unit+'</span></div>';
+    });
+    h+='</div>';
+  } else if(t.type==='buchungssatz'){
+    h+='<div class="bs-entries" id="gruppeBs'+ti+'">';
+    for(var bi=0;bi<t.correct.length;bi++){
+      h+='<div class="bs-entry">';
+      h+=renderKontenSelect(t.konten||parentQ.konten||[],'gruppeBsSoll'+ti+'_'+bi,'Soll-Konto');
+      h+='<span class="an-label">an</span>';
+      h+=renderKontenSelect(t.konten||parentQ.konten||[],'gruppeBsHaben'+ti+'_'+bi,'Haben-Konto');
+      h+='<input type="number" class="bs-amount" id="gruppeBsBetrag'+ti+'_'+bi+'" min="0" step="0.01" placeholder="CHF">';
+      h+='</div>';
+    }
+    h+='</div>';
+  }
+  return h;
+}
+
+// ── BUCHUNGSSATZ: Check ──
+function answerBuchungssatz(qid){
+  var q=QUESTIONS.find(function(x){return x.id===qid});
+  var entries=document.querySelectorAll('.bs-entry');
+  var userBuchungen=[];
+  entries.forEach(function(entry){
+    var selects=entry.querySelectorAll('.konto-select');
+    var betragInput=entry.querySelector('.bs-amount');
+    userBuchungen.push({
+      soll:selects[0]?selects[0].value:'',
+      haben:selects[1]?selects[1].value:'',
+      betrag:betragInput?parseFloat(betragInput.value):NaN
+    });
+  });
+  // Matching: Jede korrekte Buchung muss in den User-Buchungen vorkommen
+  var correctUsed=new Array(q.correct.length).fill(false);
+  var userCorrect=new Array(userBuchungen.length).fill(false);
+  q.correct.forEach(function(c,ci){
+    userBuchungen.forEach(function(u,ui){
+      if(!correctUsed[ci]&&!userCorrect[ui]&&u.soll===c.soll&&u.haben===c.haben&&!isNaN(u.betrag)&&Math.abs(u.betrag-c.betrag)<0.01){
+        correctUsed[ci]=true;userCorrect[ui]=true;
+      }
+    });
+  });
+  var allCorrect=correctUsed.every(Boolean)&&userBuchungen.length===q.correct.length;
+  // Visuelles Feedback
+  var entryArr=Array.from(entries);
+  entryArr.forEach(function(entry,i){
+    var selects=entry.querySelectorAll('.konto-select');
+    var betrag=entry.querySelector('.bs-amount');
+    selects.forEach(function(s){s.disabled=true;s.classList.add(userCorrect[i]?'correct':'wrong')});
+    if(betrag){betrag.disabled=true;betrag.classList.add(userCorrect[i]?'correct':'wrong')}
+  });
+  document.querySelector('.bs-add').style.display='none';
+  // Korrekte Lösung anzeigen wenn falsch
+  var explainExtra='';
+  if(!allCorrect){
+    explainExtra='<br><strong>Korrekt:</strong> '+q.correct.map(function(c){
+      var sName=q.konten.find(function(k){return k.nr===c.soll});
+      var hName=q.konten.find(function(k){return k.nr===c.haben});
+      return (sName?sName.name:c.soll)+' / '+(hName?hName.name:c.haben)+' CHF '+c.betrag.toLocaleString('de-CH');
+    }).join(' · ');
+  }
+  finishAnswer(q,allCorrect,q.explain+explainExtra);
+}
+
+// ── T-KONTO: Check ──
+function answerTKonto(qid){
+  var q=QUESTIONS.find(function(x){return x.id===qid});
+  var allCorrect=true;
+  q.konten.forEach(function(konto,ki){
+    // Soll-Einträge prüfen
+    var sollRows=document.querySelectorAll('#tkSoll'+ki+' .tk-row');
+    var userSoll=[];
+    sollRows.forEach(function(row){
+      var sel=row.querySelector('.konto-select');
+      var inp=row.querySelector('input[type="number"]');
+      if(sel&&inp&&(sel.value||inp.value)){
+        userSoll.push({gegen:sel.value,betrag:parseFloat(inp.value)});
+      }
+    });
+    var correctSollUsed=new Array((konto.correctSoll||[]).length).fill(false);
+    userSoll.forEach(function(u,ui){
+      var row=sollRows[ui];
+      var sel=row.querySelector('.konto-select');
+      var inp=row.querySelector('input[type="number"]');
+      var matched=false;
+      (konto.correctSoll||[]).forEach(function(c,ci){
+        if(!correctSollUsed[ci]&&u.gegen===c.gegen&&!isNaN(u.betrag)&&Math.abs(u.betrag-c.betrag)<0.01){
+          correctSollUsed[ci]=true;matched=true;
+        }
+      });
+      if(sel){sel.disabled=true;sel.classList.add(matched?'correct':'wrong')}
+      if(inp){inp.disabled=true;inp.classList.add(matched?'correct':'wrong')}
+      if(!matched)allCorrect=false;
+    });
+    if(!correctSollUsed.every(Boolean))allCorrect=false;
+    // Haben-Einträge prüfen
+    var habenRows=document.querySelectorAll('#tkHaben'+ki+' .tk-row');
+    var userHaben=[];
+    habenRows.forEach(function(row){
+      var sel=row.querySelector('.konto-select');
+      var inp=row.querySelector('input[type="number"]');
+      if(sel&&inp&&(sel.value||inp.value)){
+        userHaben.push({gegen:sel.value,betrag:parseFloat(inp.value)});
+      }
+    });
+    var correctHabenUsed=new Array((konto.correctHaben||[]).length).fill(false);
+    userHaben.forEach(function(u,ui){
+      var row=habenRows[ui];
+      var sel=row.querySelector('.konto-select');
+      var inp=row.querySelector('input[type="number"]');
+      var matched=false;
+      (konto.correctHaben||[]).forEach(function(c,ci){
+        if(!correctHabenUsed[ci]&&u.gegen===c.gegen&&!isNaN(u.betrag)&&Math.abs(u.betrag-c.betrag)<0.01){
+          correctHabenUsed[ci]=true;matched=true;
+        }
+      });
+      if(sel){sel.disabled=true;sel.classList.add(matched?'correct':'wrong')}
+      if(inp){inp.disabled=true;inp.classList.add(matched?'correct':'wrong')}
+      if(!matched)allCorrect=false;
+    });
+    if(!correctHabenUsed.every(Boolean))allCorrect=false;
+    // Saldo prüfen
+    if(konto.correctSaldo){
+      var saldoSoll=document.getElementById('tkSaldoSoll'+ki);
+      var saldoHaben=document.getElementById('tkSaldoHaben'+ki);
+      if(saldoSoll&&saldoHaben){
+        var uSaldoSoll=parseFloat(saldoSoll.value)||0;
+        var uSaldoHaben=parseFloat(saldoHaben.value)||0;
+        var expectSoll=konto.correctSaldo.seite==='soll'?konto.correctSaldo.betrag:0;
+        var expectHaben=konto.correctSaldo.seite==='haben'?konto.correctSaldo.betrag:0;
+        var saldoOk=Math.abs(uSaldoSoll-expectSoll)<0.01&&Math.abs(uSaldoHaben-expectHaben)<0.01;
+        saldoSoll.disabled=true;saldoSoll.classList.add(saldoOk?'correct':'wrong');
+        saldoHaben.disabled=true;saldoHaben.classList.add(saldoOk?'correct':'wrong');
+        if(!saldoOk)allCorrect=false;
+      }
+    }
+    // Disable add buttons
+    document.querySelectorAll('.tk-add-row').forEach(function(b){b.style.display='none'});
+  });
+  finishAnswer(q,allCorrect,q.explain);
+}
+
+// ── BILANZ: Check ──
+function answerBilanz(qid){
+  var q=QUESTIONS.find(function(x){return x.id===qid});
+  var allCorrect=true;
+  var correctLeft=new Set(q.correct.aktiven||q.correct.aufwand||[]);
+  var correctRight=new Set(q.correct.passiven||q.correct.ertrag||[]);
+  var expectedSumme=q.correct.bilanzsumme;
+  // Linke Seite prüfen
+  var leftUsed=new Set();
+  var leftRows=document.querySelectorAll('#bilanzLinks .bilanz-row');
+  leftRows.forEach(function(row,i){
+    var sel=row.querySelector('.konto-select');
+    var inp=row.querySelector('input[type="number"]');
+    if(!sel||!inp)return;
+    var kNr=sel.value;
+    var betrag=parseFloat(inp.value);
+    var kontoObj=q.kontenMitSaldi.find(function(k){return k.nr===kNr});
+    var ok=kNr&&correctLeft.has(kNr)&&!leftUsed.has(kNr)&&kontoObj&&!isNaN(betrag)&&Math.abs(betrag-kontoObj.saldo)<0.01;
+    if(ok)leftUsed.add(kNr);else allCorrect=false;
+    sel.disabled=true;sel.classList.add(ok?'correct':'wrong');
+    inp.disabled=true;inp.classList.add(ok?'correct':'wrong');
+  });
+  if(leftUsed.size!==correctLeft.size)allCorrect=false;
+  // Rechte Seite prüfen
+  var rightUsed=new Set();
+  var rightRows=document.querySelectorAll('#bilanzRechts .bilanz-row');
+  rightRows.forEach(function(row,i){
+    var sel=row.querySelector('.konto-select');
+    var inp=row.querySelector('input[type="number"]');
+    if(!sel||!inp)return;
+    var kNr=sel.value;
+    var betrag=parseFloat(inp.value);
+    var kontoObj=q.kontenMitSaldi.find(function(k){return k.nr===kNr});
+    var ok=kNr&&correctRight.has(kNr)&&!rightUsed.has(kNr)&&kontoObj&&!isNaN(betrag)&&Math.abs(betrag-kontoObj.saldo)<0.01;
+    if(ok)rightUsed.add(kNr);else allCorrect=false;
+    sel.disabled=true;sel.classList.add(ok?'correct':'wrong');
+    inp.disabled=true;inp.classList.add(ok?'correct':'wrong');
+  });
+  if(rightUsed.size!==correctRight.size)allCorrect=false;
+  // Summen prüfen
+  var summeL=document.getElementById('bilanzSummeL');
+  var summeR=document.getElementById('bilanzSummeR');
+  if(summeL){
+    var vL=parseFloat(summeL.value);var okL=!isNaN(vL)&&Math.abs(vL-expectedSumme)<0.01;
+    summeL.disabled=true;summeL.classList.add(okL?'correct':'wrong');
+    if(!okL)allCorrect=false;
+  }
+  if(summeR){
+    var vR=parseFloat(summeR.value);var okR=!isNaN(vR)&&Math.abs(vR-expectedSumme)<0.01;
+    summeR.disabled=true;summeR.classList.add(okR?'correct':'wrong');
+    if(!okR)allCorrect=false;
+  }
+  finishAnswer(q,allCorrect,q.explain);
+}
+
+// ── KONTENBESTIMMUNG: Check ──
+function answerKontenbestimmung(qid){
+  var q=QUESTIONS.find(function(x){return x.id===qid});
+  var allCorrect=true;
+  q.aufgaben.forEach(function(a,ai){
+    a.correct.forEach(function(c,ri){
+      var kontoSel=document.getElementById('kbKonto'+ai+'_'+ri);
+      var seiteSel=document.getElementById('kbSeite'+ai+'_'+ri);
+      if(kontoSel){
+        var kontoOk=kontoSel.value===c.konto;
+        kontoSel.disabled=true;kontoSel.classList.add(kontoOk?'correct':'wrong');
+        if(!kontoOk){allCorrect=false;
+          var kName=q.konten.find(function(k){return k.nr===c.konto});
+          kontoSel.title='Korrekt: '+(kName?kName.nr+' '+kName.name:c.konto);
+        }
+      }
+      if(seiteSel){
+        var seiteOk=seiteSel.value===c.seite;
+        seiteSel.disabled=true;seiteSel.classList.add(seiteOk?'correct':'wrong');
+        if(!seiteOk){allCorrect=false;seiteSel.title='Korrekt: '+c.seite}
+      }
+    });
+  });
+  finishAnswer(q,allCorrect,q.explain);
+}
+
+// ── AUFGABENGRUPPE: Check ──
+function answerGruppe(qid){
+  var q=QUESTIONS.find(function(x){return x.id===qid});
+  var totalCorrect=0;var totalParts=q.teil.length;
+  q.teil.forEach(function(t,ti){
+    var fb=document.getElementById('gruppeFb'+ti);
+    var ok=checkGruppeTeil(q,t,ti);
+    if(ok)totalCorrect++;
+    if(fb){
+      fb.className='feedback show '+(ok?'correct':'wrong');
+      fb.innerHTML='<div class="feedback-title">'+(ok?'✅ Richtig':'❌ Falsch')+'</div><div>'+highlightKonten(t.explain||'')+'</div>';
+    }
+  });
+  var allCorrect=totalCorrect===totalParts;
+  finishAnswer(q,allCorrect,q.explain+(allCorrect?'':' ('+totalCorrect+'/'+totalParts+' Teilfragen korrekt)'));
+}
+
+function checkGruppeTeil(parentQ,t,ti){
+  if(t.type==='mc'){
+    var teil=document.getElementById('gruppeTeil'+ti);
+    var opts=teil.querySelectorAll('.mc-opt');
+    var selected=null;
+    opts.forEach(function(o){if(o.classList.contains('selected-gruppe'))selected=o.dataset.val});
+    // Falls noch nichts markiert: erste angeklickte suchen
+    if(!selected){
+      opts.forEach(function(o){
+        o.style.pointerEvents='none';
+        if(o.dataset.val===t.correct)o.classList.add('correct');
+      });
+      return false;
+    }
+    opts.forEach(function(o){
+      o.style.pointerEvents='none';
+      if(o.dataset.val===t.correct)o.classList.add('correct');
+      else if(o.dataset.val===selected)o.classList.add('wrong');
+    });
+    return selected===t.correct;
+  }
+  if(t.type==='tf'){
+    // TF in Gruppe wird über answerGruppeTF behandelt, hier nur prüfen
+    var teil=document.getElementById('gruppeTeil'+ti);
+    var btns=teil.querySelectorAll('.tf-btn');
+    var answered=false,ok=false;
+    btns.forEach(function(b){if(b.classList.contains('correct')||b.classList.contains('wrong'))answered=true;if(b.classList.contains('correct'))ok=true});
+    if(!answered){btns.forEach(function(b){b.style.pointerEvents='none'});return false}
+    return ok;
+  }
+  if(t.type==='fill'){
+    var inputs=document.querySelectorAll('.gruppe-fill-'+ti);
+    var ok=true;
+    inputs.forEach(function(inp){
+      var bi=parseInt(inp.dataset.bidx);var blank=t.blanks[bi];
+      var uv=inp.value.trim().toLowerCase();
+      var match=uv===blank.answer.toLowerCase()||blank.alts.some(function(a){return uv===a.toLowerCase()});
+      inp.classList.add(match?'correct':'wrong');inp.disabled=true;
+      if(!match){ok=false;inp.value=inp.value+' → '+blank.answer}
+    });
+    return ok;
+  }
+  if(t.type==='calc'){
+    var inputs=document.querySelectorAll('.gruppe-calc-'+ti);
+    var ok=true;
+    inputs.forEach(function(inp){
+      var ri=parseInt(inp.dataset.ridx);var row=t.rows[ri];
+      var val=parseFloat(inp.value);
+      var match=!isNaN(val)&&Math.abs(val-row.answer)<=row.tolerance;
+      inp.classList.add(match?'correct':'wrong');inp.disabled=true;
+      if(!match){ok=false;inp.value=inp.value+' → '+row.answer}
+    });
+    return ok;
+  }
+  if(t.type==='buchungssatz'){
+    var container=document.getElementById('gruppeBs'+ti);
+    if(!container)return false;
+    var entries=container.querySelectorAll('.bs-entry');
+    var userB=[];
+    entries.forEach(function(entry){
+      var sels=entry.querySelectorAll('.konto-select');
+      var betrag=entry.querySelector('.bs-amount');
+      userB.push({soll:sels[0]?sels[0].value:'',haben:sels[1]?sels[1].value:'',betrag:betrag?parseFloat(betrag.value):NaN});
+    });
+    var used=new Array(t.correct.length).fill(false);
+    var uOk=new Array(userB.length).fill(false);
+    t.correct.forEach(function(c,ci){
+      userB.forEach(function(u,ui){
+        if(!used[ci]&&!uOk[ui]&&u.soll===c.soll&&u.haben===c.haben&&!isNaN(u.betrag)&&Math.abs(u.betrag-c.betrag)<0.01){
+          used[ci]=true;uOk[ui]=true;
+        }
+      });
+    });
+    entries.forEach(function(entry,i){
+      var sels=entry.querySelectorAll('.konto-select');
+      var betrag=entry.querySelector('.bs-amount');
+      sels.forEach(function(s){s.disabled=true;s.classList.add(uOk[i]?'correct':'wrong')});
+      if(betrag){betrag.disabled=true;betrag.classList.add(uOk[i]?'correct':'wrong')}
+    });
+    return used.every(Boolean)&&userB.length===t.correct.length;
+  }
+  return false;
+}
+
+// Gruppe MC/TF Einzelhandler
+function answerGruppeMC(el,ti,val){
+  var teil=document.getElementById('gruppeTeil'+ti);
+  if(teil.querySelector('.mc-opt.selected-gruppe')){
+    teil.querySelectorAll('.mc-opt').forEach(function(o){o.classList.remove('selected-gruppe')});
+  }
+  el.classList.add('selected-gruppe');
+  el.classList.add('selected');
+}
+function answerGruppeTF(el,ti,val){
+  var teil=document.getElementById('gruppeTeil'+ti);
+  if(teil.querySelector('.tf-btn.correct,.tf-btn.wrong'))return;
+  var q=state.queue[state.current];
+  var t=q.teil[ti];
+  var ok=val===t.correct;
+  teil.querySelectorAll('.tf-btn').forEach(function(b){b.style.pointerEvents='none'});
+  el.classList.add(ok?'correct':'wrong');
+  if(!ok)teil.querySelectorAll('.tf-btn').forEach(function(b){if(b!==el)b.classList.add('correct')});
 }
 
 function finishAnswer(q,correct,explain,userAnswer){
@@ -1828,6 +2501,25 @@ function getCorrectAnswer(q){
     }).join(' · ');
   }
   if(q.type==='open'){ return q.sample||'Siehe Lösungsvorschlag'; }
+  if(q.type==='buchungssatz'){ return q.correct.map(function(c){
+    var sN=q.konten.find(function(k){return k.nr===c.soll});
+    var hN=q.konten.find(function(k){return k.nr===c.haben});
+    return (sN?sN.name:c.soll)+' / '+(hN?hN.name:c.haben)+' CHF '+c.betrag.toLocaleString('de-CH');
+  }).join(' · '); }
+  if(q.type==='tkonto'){ return q.konten.map(function(k){
+    var s=(k.correctSoll||[]).map(function(e){return e.gegen+' '+e.betrag}).join(', ');
+    var h=(k.correctHaben||[]).map(function(e){return e.gegen+' '+e.betrag}).join(', ');
+    return '<strong>'+k.name+':</strong> Soll ['+s+'] Haben ['+h+']'+(k.correctSaldo?' Saldo: '+k.correctSaldo.betrag+' ('+k.correctSaldo.seite+')':'');
+  }).join(' · '); }
+  if(q.type==='bilanz'){
+    var left=(q.correct.aktiven||q.correct.aufwand||[]).map(function(nr){var k=q.kontenMitSaldi.find(function(x){return x.nr===nr});return k?k.name+' '+k.saldo.toLocaleString('de-CH'):nr}).join(', ');
+    var right=(q.correct.passiven||q.correct.ertrag||[]).map(function(nr){var k=q.kontenMitSaldi.find(function(x){return x.nr===nr});return k?k.name+' '+k.saldo.toLocaleString('de-CH'):nr}).join(', ');
+    return '<strong>Links:</strong> '+left+' · <strong>Rechts:</strong> '+right+' · Summe: '+q.correct.bilanzsumme.toLocaleString('de-CH');
+  }
+  if(q.type==='kontenbestimmung'){ return q.aufgaben.map(function(a,i){
+    return (i+1)+') '+a.correct.map(function(c){var k=q.konten.find(function(x){return x.nr===c.konto});return (k?k.name:c.konto)+' ('+c.seite+')'}).join(', ');
+  }).join(' · '); }
+  if(q.type==='gruppe'){ return q.teil.map(function(t){return t.sub+') '+getCorrectAnswer(t)}).join(' · '); }
   return '';
 }
 
@@ -1919,6 +2611,36 @@ function renderImg(q){
 }
 
 function toggleZoom(img){ img.classList.toggle('zoomed'); }
+
+// ══════════════════════════════════════════
+// FIBU HELPERS — Shared across FiBu types
+// ══════════════════════════════════════════
+function renderKontenSelect(konten, id, placeholder){
+  var h='<select class="konto-select" id="'+id+'">';
+  h+='<option value="">'+( placeholder||'– Konto wählen –')+'</option>';
+  konten.forEach(function(k){ h+='<option value="'+k.nr+'">'+k.nr+' '+k.name+'</option>'; });
+  h+='</select>';
+  return h;
+}
+
+// ── Buchungssatz: dynamisch Zeilen hinzufügen/entfernen ──
+var _bsCount=1;
+function addBsEntry(qid){
+  _bsCount++;
+  var container=document.getElementById('bsEntries');
+  var q=QUESTIONS.find(function(x){return x.id===qid});
+  var div=document.createElement('div');
+  div.className='bs-entry';div.id='bsEntry'+_bsCount;
+  div.innerHTML=renderKontenSelect(q.konten,'bsSoll'+_bsCount,'Soll-Konto')+
+    '<span class="an-label">an</span>'+
+    renderKontenSelect(q.konten,'bsHaben'+_bsCount,'Haben-Konto')+
+    '<div style="display:flex;align-items:center;gap:4px"><input type="number" class="bs-amount" id="bsBetrag'+_bsCount+'" min="0" step="0.01" placeholder="CHF"><button class="bs-remove" onclick="removeBsEntry(\'bsEntry'+_bsCount+'\')" title="Entfernen">✕</button></div>';
+  container.appendChild(div);
+}
+function removeBsEntry(entryId){
+  var el=document.getElementById(entryId);
+  if(el&&document.querySelectorAll('.bs-entry').length>1)el.remove();
+}
 
 // ══════════════════════════════════════════
 // LERNZIELE — Mini-Modal (Topic) & Vollständiges Modal (Header)

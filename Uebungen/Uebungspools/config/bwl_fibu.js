@@ -2318,6 +2318,334 @@ window.QUESTIONS = [
       {answer: "Transitorische Aktiven", alts: ["TA"]}
     ],
     explain: "Die Gegenbuchung im neuen Jahr: Versicherungsaufwand an TA 9'000. Der Aufwand wird im neuen Jahr erfasst, die TA wird aufgelöst."
+  },
+
+  // ══════════════════════════════════════════
+  // NEUE FRAGETYPEN: Buchungssatz
+  // ══════════════════════════════════════════
+  {
+    id: "bs01", topic: "buchungssatz", type: "buchungssatz", diff: 1, tax: "K3", reviewed: false,
+    q: "Buchen Sie: Barverkauf von Waren für CHF 800.–",
+    konten: [
+      {nr: "1000", name: "Kasse"},
+      {nr: "1020", name: "Bank"},
+      {nr: "1100", name: "Debitoren"},
+      {nr: "2000", name: "Kreditoren"},
+      {nr: "3200", name: "Warenertrag"},
+      {nr: "4200", name: "Warenaufwand"}
+    ],
+    correct: [
+      {soll: "1000", haben: "3200", betrag: 800}
+    ],
+    explain: "Barverkauf: Kasse (Aktivkonto) nimmt zu → Soll. Warenertrag (Ertragskonto) nimmt zu → Haben."
+  },
+  {
+    id: "bs02", topic: "buchungssatz", type: "buchungssatz", diff: 1, tax: "K3", reviewed: false,
+    q: "Buchen Sie: Wareneinkauf auf Kredit für CHF 2'500.–",
+    konten: [
+      {nr: "1000", name: "Kasse"},
+      {nr: "1020", name: "Bank"},
+      {nr: "1100", name: "Debitoren"},
+      {nr: "2000", name: "Kreditoren"},
+      {nr: "3200", name: "Warenertrag"},
+      {nr: "4200", name: "Warenaufwand"}
+    ],
+    correct: [
+      {soll: "4200", haben: "2000", betrag: 2500}
+    ],
+    explain: "Wareneinkauf auf Kredit: Warenaufwand (Aufwandskonto) nimmt zu → Soll. Kreditoren (Passivkonto) nehmen zu → Haben."
+  },
+  {
+    id: "bs03", topic: "buchungssatz", type: "buchungssatz", diff: 2, tax: "K3", reviewed: false,
+    q: "Buchen Sie: Ein Kunde bezahlt seine Rechnung von CHF 1'200.– per Banküberweisung.",
+    konten: [
+      {nr: "1000", name: "Kasse"},
+      {nr: "1020", name: "Bank"},
+      {nr: "1100", name: "Debitoren"},
+      {nr: "2000", name: "Kreditoren"},
+      {nr: "3200", name: "Warenertrag"},
+      {nr: "4200", name: "Warenaufwand"}
+    ],
+    correct: [
+      {soll: "1020", haben: "1100", betrag: 1200}
+    ],
+    explain: "Debitorenzahlung per Bank: Bank (Aktivkonto) nimmt zu → Soll. Debitoren (Aktivkonto) nehmen ab → Haben."
+  },
+  {
+    id: "bs04", topic: "buchungssatz", type: "buchungssatz", diff: 2, tax: "K3", reviewed: false,
+    q: "Buchen Sie: Wir bezahlen die Lieferantenrechnung von CHF 3'000.– bar.",
+    konten: [
+      {nr: "1000", name: "Kasse"},
+      {nr: "1020", name: "Bank"},
+      {nr: "1100", name: "Debitoren"},
+      {nr: "2000", name: "Kreditoren"},
+      {nr: "3200", name: "Warenertrag"},
+      {nr: "4200", name: "Warenaufwand"}
+    ],
+    correct: [
+      {soll: "2000", haben: "1000", betrag: 3000}
+    ],
+    explain: "Kreditorenzahlung bar: Kreditoren (Passivkonto) nehmen ab → Soll. Kasse (Aktivkonto) nimmt ab → Haben."
+  },
+  {
+    id: "bs05", topic: "buchungssatz", type: "buchungssatz", diff: 2, tax: "K3", reviewed: false,
+    q: "Buchen Sie: Warenverkauf auf Rechnung CHF 4'000.– und gleichzeitiger Barkauf von Material CHF 600.–",
+    konten: [
+      {nr: "1000", name: "Kasse"},
+      {nr: "1020", name: "Bank"},
+      {nr: "1100", name: "Debitoren"},
+      {nr: "2000", name: "Kreditoren"},
+      {nr: "3200", name: "Warenertrag"},
+      {nr: "4200", name: "Warenaufwand"}
+    ],
+    correct: [
+      {soll: "1100", haben: "3200", betrag: 4000},
+      {soll: "4200", haben: "1000", betrag: 600}
+    ],
+    explain: "Zwei Buchungen: 1) Verkauf auf Rechnung: Debitoren/Warenertrag 4'000. 2) Barkauf: Warenaufwand/Kasse 600."
+  },
+  {
+    id: "bs06", topic: "erfolgsrechnung", type: "buchungssatz", diff: 2, tax: "K3", reviewed: false,
+    q: "Buchen Sie: Banküberweisung der Monatsmiete CHF 1'500.–",
+    konten: [
+      {nr: "1000", name: "Kasse"},
+      {nr: "1020", name: "Bank"},
+      {nr: "2000", name: "Kreditoren"},
+      {nr: "6000", name: "Mietaufwand"},
+      {nr: "6500", name: "Lohnaufwand"},
+      {nr: "3200", name: "Warenertrag"}
+    ],
+    correct: [
+      {soll: "6000", haben: "1020", betrag: 1500}
+    ],
+    explain: "Miete: Mietaufwand (Aufwandskonto) nimmt zu → Soll. Bank (Aktivkonto) nimmt ab → Haben."
+  },
+
+  // ══════════════════════════════════════════
+  // NEUE FRAGETYPEN: Kontenbestimmung
+  // ══════════════════════════════════════════
+  {
+    id: "kb01", topic: "kontentypen", type: "kontenbestimmung", diff: 1, tax: "K2", reviewed: false,
+    q: "Bestimmen Sie für jeden Geschäftsfall die betroffenen Konten und die Buchungsseite (Soll/Haben).",
+    konten: [
+      {nr: "1000", name: "Kasse", kategorie: "aktiv"},
+      {nr: "1020", name: "Bank", kategorie: "aktiv"},
+      {nr: "1100", name: "Debitoren", kategorie: "aktiv"},
+      {nr: "2000", name: "Kreditoren", kategorie: "passiv"},
+      {nr: "3200", name: "Warenertrag", kategorie: "ertrag"},
+      {nr: "4200", name: "Warenaufwand", kategorie: "aufwand"}
+    ],
+    aufgaben: [
+      {text: "Barverkauf von Waren CHF 500", correct: [
+        {konto: "1000", seite: "soll"},
+        {konto: "3200", seite: "haben"}
+      ]},
+      {text: "Wareneinkauf auf Kredit CHF 1'200", correct: [
+        {konto: "4200", seite: "soll"},
+        {konto: "2000", seite: "haben"}
+      ]}
+    ],
+    explain: "Barverkauf: Kasse nimmt zu (Soll), Warenertrag nimmt zu (Haben). Wareneinkauf: Warenaufwand nimmt zu (Soll), Kreditoren nehmen zu (Haben)."
+  },
+  {
+    id: "kb02", topic: "kontentypen", type: "kontenbestimmung", diff: 2, tax: "K3", reviewed: false,
+    q: "Bestimmen Sie die Buchungsseite für folgende Geschäftsfälle.",
+    konten: [
+      {nr: "1000", name: "Kasse", kategorie: "aktiv"},
+      {nr: "1020", name: "Bank", kategorie: "aktiv"},
+      {nr: "1100", name: "Debitoren", kategorie: "aktiv"},
+      {nr: "2000", name: "Kreditoren", kategorie: "passiv"},
+      {nr: "2400", name: "Bankdarlehen", kategorie: "passiv"},
+      {nr: "6000", name: "Mietaufwand", kategorie: "aufwand"},
+      {nr: "3200", name: "Warenertrag", kategorie: "ertrag"}
+    ],
+    aufgaben: [
+      {text: "Überweisung der Miete per Bank CHF 1'800", correct: [
+        {konto: "6000", seite: "soll"},
+        {konto: "1020", seite: "haben"}
+      ]},
+      {text: "Rückzahlung des Bankdarlehens per Bank CHF 5'000", correct: [
+        {konto: "2400", seite: "soll"},
+        {konto: "1020", seite: "haben"}
+      ]},
+      {text: "Kunde bezahlt Rechnung bar CHF 750", correct: [
+        {konto: "1000", seite: "soll"},
+        {konto: "1100", seite: "haben"}
+      ]}
+    ],
+    explain: "Miete: Aufwand/Bank. Darlehensrückzahlung: Passiv nimmt ab → Soll, Aktiv nimmt ab → Haben. Debitorenzahlung bar: Kasse/Debitoren."
+  },
+
+  // ══════════════════════════════════════════
+  // NEUE FRAGETYPEN: T-Konto
+  // ══════════════════════════════════════════
+  {
+    id: "tk01", topic: "buchungssatz", type: "tkonto", diff: 2, tax: "K3", reviewed: false,
+    q: "Führen Sie das T-Konto «Kasse» nach folgenden Geschäftsfällen. Bestimmen Sie den Saldo.",
+    geschaeftsfaelle: [
+      "Barverkauf von Waren CHF 600",
+      "Barzahlung an Lieferant CHF 400",
+      "Bareinzahlung eines Kunden CHF 300"
+    ],
+    konten: [{
+      nr: "1000", name: "Kasse", ab: 2000,
+      correctSoll: [
+        {gegen: "3200", betrag: 600, gf: 1},
+        {gegen: "1100", betrag: 300, gf: 3}
+      ],
+      correctHaben: [
+        {gegen: "2000", betrag: 400, gf: 2}
+      ],
+      correctSaldo: {seite: "soll", betrag: 2500}
+    }],
+    gegenkonten: [
+      {nr: "3200", name: "Warenertrag"},
+      {nr: "2000", name: "Kreditoren"},
+      {nr: "1100", name: "Debitoren"},
+      {nr: "4200", name: "Warenaufwand"},
+      {nr: "6000", name: "Mietaufwand"}
+    ],
+    explain: "AB 2'000 + 600 (Barverkauf) + 300 (Kundenzahlung) = 2'900 Soll. Abzüglich 400 (Lieferant) = Saldo 2'500 Soll."
+  },
+  {
+    id: "tk02", topic: "buchungssatz", type: "tkonto", diff: 2, tax: "K3", reviewed: false,
+    q: "Führen Sie das T-Konto «Bank» und bestimmen Sie den Saldo.",
+    geschaeftsfaelle: [
+      "Kundenzahlung per Bank CHF 1'500",
+      "Mietzahlung per Bank CHF 800",
+      "Lohnzahlung per Bank CHF 3'200"
+    ],
+    konten: [{
+      nr: "1020", name: "Bank", ab: 5000,
+      correctSoll: [
+        {gegen: "1100", betrag: 1500, gf: 1}
+      ],
+      correctHaben: [
+        {gegen: "6000", betrag: 800, gf: 2},
+        {gegen: "6500", betrag: 3200, gf: 3}
+      ],
+      correctSaldo: {seite: "soll", betrag: 2500}
+    }],
+    gegenkonten: [
+      {nr: "1100", name: "Debitoren"},
+      {nr: "6000", name: "Mietaufwand"},
+      {nr: "6500", name: "Lohnaufwand"},
+      {nr: "2000", name: "Kreditoren"},
+      {nr: "3200", name: "Warenertrag"}
+    ],
+    explain: "AB 5'000 + 1'500 (Kundenzahlung) = 6'500 Soll. Abzüglich 800 (Miete) + 3'200 (Lohn) = Saldo 2'500 Soll."
+  },
+
+  // ══════════════════════════════════════════
+  // NEUE FRAGETYPEN: Bilanz
+  // ══════════════════════════════════════════
+  {
+    id: "bi01", topic: "bilanz", type: "bilanz", diff: 2, tax: "K3", reviewed: false,
+    q: "Erstellen Sie die Schlussbilanz aus folgenden Konten. Ordnen Sie jedes Konto der richtigen Seite zu und berechnen Sie die Bilanzsumme.",
+    modus: "bilanz",
+    kontenMitSaldi: [
+      {nr: "1000", name: "Kasse", saldo: 5000},
+      {nr: "1020", name: "Bank", saldo: 15000},
+      {nr: "1500", name: "Maschinen", saldo: 30000},
+      {nr: "2000", name: "Kreditoren", saldo: 12000},
+      {nr: "2400", name: "Bankdarlehen", saldo: 20000},
+      {nr: "2800", name: "Eigenkapital", saldo: 18000}
+    ],
+    correct: {
+      aktiven: ["1000", "1020", "1500"],
+      passiven: ["2000", "2400", "2800"],
+      bilanzsumme: 50000
+    },
+    explain: "Aktiven: Kasse 5'000 + Bank 15'000 + Maschinen 30'000 = 50'000. Passiven: Kreditoren 12'000 + Bankdarlehen 20'000 + EK 18'000 = 50'000."
+  },
+  {
+    id: "bi02", topic: "bilanz", type: "bilanz", diff: 1, tax: "K3", reviewed: false,
+    q: "Ordnen Sie die Konten der korrekten Bilanzseite zu und berechnen Sie die Bilanzsumme.",
+    modus: "bilanz",
+    kontenMitSaldi: [
+      {nr: "1000", name: "Kasse", saldo: 3000},
+      {nr: "1100", name: "Debitoren", saldo: 7000},
+      {nr: "2000", name: "Kreditoren", saldo: 4000},
+      {nr: "2800", name: "Eigenkapital", saldo: 6000}
+    ],
+    correct: {
+      aktiven: ["1000", "1100"],
+      passiven: ["2000", "2800"],
+      bilanzsumme: 10000
+    },
+    explain: "Aktiven: Kasse 3'000 + Debitoren 7'000 = 10'000. Passiven: Kreditoren 4'000 + Eigenkapital 6'000 = 10'000."
+  },
+
+  // ══════════════════════════════════════════
+  // NEUE FRAGETYPEN: Aufgabengruppe
+  // ══════════════════════════════════════════
+  {
+    id: "ag01", topic: "buchungssatz", type: "gruppe", diff: 2, tax: "K3", reviewed: false,
+    q: "Die Schreinerei Müller hat am 15. Januar folgende Geschäftsfälle:",
+    context: "Anfangsbestand Kasse: CHF 10'000. Anfangsbestand Bank: CHF 25'000.",
+    teil: [
+      {
+        sub: "a", type: "buchungssatz",
+        q: "Buchen Sie: Barverkauf von Holzprodukten CHF 1'500.",
+        konten: [
+          {nr: "1000", name: "Kasse"}, {nr: "1020", name: "Bank"},
+          {nr: "3200", name: "Warenertrag"}, {nr: "4200", name: "Warenaufwand"}
+        ],
+        correct: [{soll: "1000", haben: "3200", betrag: 1500}],
+        explain: "Kasse/Warenertrag 1'500."
+      },
+      {
+        sub: "b", type: "mc",
+        q: "Wie verändert sich die Bilanzsumme durch den Barverkauf?",
+        options: [
+          {v: "A", t: "Sie nimmt zu"},
+          {v: "B", t: "Sie bleibt gleich"},
+          {v: "C", t: "Sie nimmt ab"}
+        ],
+        correct: "A",
+        explain: "Erfolgswirksamer Geschäftsfall: Kasse nimmt zu (Aktiven ↑), Warenertrag erhöht den Gewinn → Eigenkapital ↑ (Passiven ↑). Bilanzsumme nimmt zu."
+      },
+      {
+        sub: "c", type: "calc",
+        q: "Wie hoch ist der neue Kassenbestand nach dem Barverkauf?",
+        rows: [{label: "Kassenbestand", answer: 11500, tolerance: 0, unit: "CHF"}],
+        explain: "10'000 + 1'500 = 11'500 CHF."
+      }
+    ],
+    explain: "Ein erfolgswirksamer Geschäftsfall verändert die Bilanzsumme. Der Barverkauf erhöht Kasse und Eigenkapital (via Warenertrag)."
+  },
+  {
+    id: "ag02", topic: "erfolgsrechnung", type: "gruppe", diff: 2, tax: "K3", reviewed: false,
+    q: "Analysieren Sie die folgenden Geschäftsfälle der Bäckerei Huber:",
+    context: "Warenvorrat per 1.1.: CHF 8'000. Kasse: CHF 5'000.",
+    teil: [
+      {
+        sub: "a", type: "tf",
+        q: "Die Zahlung einer Lieferantenrechnung ist ein erfolgswirksamer Geschäftsfall.",
+        correct: false,
+        explain: "Falsch. Die Zahlung einer Lieferantenrechnung (Kreditoren/Bank) ist ein Aktivtausch bzw. Aktiv-Passiv-Minderung — erfolgsneutral."
+      },
+      {
+        sub: "b", type: "buchungssatz",
+        q: "Buchen Sie: Wareneinkauf bar CHF 2'000.",
+        konten: [
+          {nr: "1000", name: "Kasse"}, {nr: "4200", name: "Warenaufwand"},
+          {nr: "2000", name: "Kreditoren"}, {nr: "3200", name: "Warenertrag"}
+        ],
+        correct: [{soll: "4200", haben: "1000", betrag: 2000}],
+        explain: "Warenaufwand/Kasse 2'000."
+      },
+      {
+        sub: "c", type: "fill",
+        q: "Der Wareneinkauf erhöht den {0} und reduziert das {1}.",
+        blanks: [
+          {answer: "Aufwand", alts: ["Warenaufwand"]},
+          {answer: "Eigenkapital", alts: ["EK"]}
+        ],
+        explain: "Aufwand erhöht sich → Eigenkapital sinkt (via Erfolgsrechnung)."
+      }
+    ],
+    explain: "Erfolgswirksame Geschäftsfälle (Aufwand/Ertrag) verändern die Bilanzsumme und das Eigenkapital. Reine Bilanzbuchungen sind erfolgsneutral."
   }
 
 ];
