@@ -5319,3 +5319,37 @@ function migriereFachbereich_() {
     return { success: false, error: error.message, migriertFragen: migriertFragen, migriertConfigs: migriertConfigs };
   }
 }
+
+// === EINMALIG: Reparatur Einrichtungsprüfung (fehlende typDaten) ===
+// Nach Ausführung kann diese Funktion gelöscht werden.
+function repariereEinrichtungsFragen() {
+  var reparaturen = {
+    'einr-sort-planeten': { elemente: ['Merkur','Venus','Erde','Mars','Jupiter','Saturn','Uranus','Neptun'], teilpunkte: true },
+    'einr-hs-europa': { bildUrl: './demo-bilder/europa-karte.svg', bereiche: [{ id: 'schweiz', form: 'rechteck', koordinaten: { x: 45, y: 43, breite: 6, hoehe: 5 }, label: 'Schweiz', punkte: 2 }], mehrfachauswahl: false },
+    'einr-bb-zelle': { bildUrl: './demo-bilder/tierzelle.svg', beschriftungen: [{ id: '1', position: { x: 50, y: 50 }, korrekt: ['Zellkern','Nukleus','Nucleus'] }, { id: '2', position: { x: 25, y: 30 }, korrekt: ['Zellmembran','Membran'] }, { id: '3', position: { x: 62, y: 55 }, korrekt: ['Mitochondrium','Mitochondrien'] }] },
+    'einr-audio-vorstellen': { maxDauerSekunden: 60 },
+    'einr-dd-kontinente': { bildUrl: './demo-bilder/weltkarte.svg', zielzonen: [{ id: '1', position: { x: 12, y: 35, breite: 20, hoehe: 25 }, korrektesLabel: 'Nordamerika' }, { id: '2', position: { x: 45, y: 25, breite: 15, hoehe: 30 }, korrektesLabel: 'Europa' }, { id: '3', position: { x: 70, y: 35, breite: 20, hoehe: 30 }, korrektesLabel: 'Asien' }, { id: '4', position: { x: 20, y: 65, breite: 15, hoehe: 20 }, korrektesLabel: 'Südamerika' }], labels: ['Nordamerika','Europa','Asien','Südamerika','Afrika','Australien'] },
+    'einr-code-python': { sprache: 'python', starterCode: 'def ist_primzahl(n):\n    # Ihre Lösung hier\n    pass' },
+    'einr-formel-pythagoras': { korrekteFormel: 'a^2 + b^2 = c^2', vergleichsModus: 'exakt' }
+  };
+  var fragenbank = SpreadsheetApp.openById(FRAGENBANK_ID);
+  var tabs = ['VWL','BWL','Recht','Informatik'];
+  var count = 0;
+  for (var t = 0; t < tabs.length; t++) {
+    var sheet = fragenbank.getSheetByName(tabs[t]);
+    if (!sheet) continue;
+    var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+    var typDatenCol = headers.indexOf('typDaten');
+    var idCol = headers.indexOf('id');
+    if (typDatenCol < 0 || idCol < 0) continue;
+    var data = sheet.getRange(2, 1, sheet.getLastRow() - 1, sheet.getLastColumn()).getValues();
+    for (var r = 0; r < data.length; r++) {
+      if (reparaturen[data[r][idCol]]) {
+        sheet.getRange(r + 2, typDatenCol + 1).setValue(JSON.stringify(reparaturen[data[r][idCol]]));
+        Logger.log('Repariert: ' + data[r][idCol]);
+        count++;
+      }
+    }
+  }
+  Logger.log('Fertig! ' + count + '/7 Fragen repariert.');
+}
