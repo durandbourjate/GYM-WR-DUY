@@ -13,6 +13,7 @@ export default function Timer({ onZeitAbgelaufen }: Props) {
   const config = usePruefungStore((s) => s.config)
   const startzeit = usePruefungStore((s) => s.startzeit)
   const abgegeben = usePruefungStore((s) => s.abgegeben)
+  const fragen = usePruefungStore((s) => s.fragen)
   const antworten = usePruefungStore((s) => s.antworten)
   const autoSaveCount = usePruefungStore((s) => s.autoSaveCount)
   const heartbeats = usePruefungStore((s) => s.heartbeats)
@@ -93,6 +94,7 @@ export default function Timer({ onZeitAbgelaufen }: Props) {
         antworten: antwortenRef.current,
         version: -1,
         istAbgabe: true,
+        gesamtFragen: fragen.length,
       })
     }
   }

@@ -46,7 +46,11 @@ export default function AudioFrage({ frage }: Props) {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
       streamRef.current = stream
 
-      const recorder = new MediaRecorder(stream, { mimeType: 'audio/webm;codecs=opus' })
+      // iOS Safari unterstützt kein WebM/Opus → Fallback auf MP4/AAC
+      const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+        ? 'audio/webm;codecs=opus'
+        : 'audio/mp4'
+      const recorder = new MediaRecorder(stream, { mimeType })
       mediaRecorderRef.current = recorder
       chunksRef.current = []
 
@@ -55,7 +59,7 @@ export default function AudioFrage({ frage }: Props) {
       }
 
       recorder.onstop = () => {
-        const blob = new Blob(chunksRef.current, { type: 'audio/webm' })
+        const blob = new Blob(chunksRef.current, { type: mimeType })
         // Blob als Base64 Data URL speichern
         const reader = new FileReader()
         reader.onload = () => {

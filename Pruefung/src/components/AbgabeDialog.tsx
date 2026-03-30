@@ -89,6 +89,7 @@ export default function AbgabeDialog({ onSchliessen }: Props) {
         antworten: abgabe.antworten,
         version: -1, // -1 = finale Abgabe
         istAbgabe: true,
+        gesamtFragen: fragen.length,
       })
 
       if (erfolg) {
@@ -120,6 +121,7 @@ export default function AbgabeDialog({ onSchliessen }: Props) {
       antworten,
       version: -1,
       istAbgabe: true,
+      gesamtFragen: fragen.length,
     })
 
     if (erfolg) {

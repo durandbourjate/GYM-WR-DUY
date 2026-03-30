@@ -209,7 +209,8 @@ function punktZuLinieAbstand(punkt: Point, start: Point, end: Point): number {
   return Math.abs(dy * punkt.x - dx * punkt.y + end.x * start.y - end.y * start.x) / laenge;
 }
 
-function vereinfachePunkte(punkte: Point[], toleranz = 1.5): Point[] {
+// Toleranz 0.8: Kompromiss — genug Vereinfachung für Speicher, behält aber Stift-Details bei iPad-Stylus
+function vereinfachePunkte(punkte: Point[], toleranz = 0.8): Point[] {
   if (punkte.length <= 2) return punkte;
 
   const start = punkte[0];

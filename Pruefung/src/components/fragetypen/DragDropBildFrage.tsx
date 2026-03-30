@@ -106,7 +106,7 @@ export default function DragDropBildFrage({ frage }: Props) {
       />
 
       {/* Bild mit Zielzonen */}
-      <div className={`relative inline-block ${!abgegeben && !alleZugeordnet ? 'rounded-xl border-2 border-violet-400 dark:border-violet-500 p-1' : ''}`}>
+      <div className={`relative inline-block ${!abgegeben && !alleZugeordnet ? 'rounded-xl border-2 border-violet-400 dark:border-violet-500 p-1' : ''}`} style={{ touchAction: 'manipulation' }}>
         <div className="relative overflow-hidden w-fit max-w-full">
           <img
             src={frage.bildUrl}
