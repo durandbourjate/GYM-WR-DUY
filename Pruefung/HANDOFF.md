@@ -17,11 +17,57 @@
 - ~~Bild-Upload für Hotspot/Bildbeschriftung/DragDrop~~ ✅ 28.03.2026
 - ~~Aufgabengruppe Inline-Teilaufgaben~~ ✅ 28.03.2026
 - **Verbleibende Security-Themen (nicht kritisch):**
-  - Rollen-Bypass via sessionStorage (LP-UI sichtbar, aber API-Endpoints prüfen serverseitig → kein Datenzugriff)
+  - ~~Rollen-Bypass via sessionStorage~~ ✅ 30.03.2026 — restoreSession() validiert Rolle aus E-Mail-Domain
   - Timer-Manipulation via localStorage (startzeit änderbar, aber Backend trackt Heartbeats)
   - Demo-Modus Bypass via sessionStorage (Lockdown deaktivierbar, nur relevant bei Kontrolle)
   - Rate Limiting auf API-Endpoints fehlt (DoS-Schutz)
   - Prompt Injection bei KI-Assistent (User-Input unsanitisiert an Claude)
+  - `pruefung-state-*` in localStorage bleibt nach Abgabe (Zustand persist schreibt neu; wird bei Re-Login aufgeräumt)
+
+---
+
+## Session 35 — Sicherheitsaudit + Heartbeat-Fix (30.03.2026)
+
+Systematischer Sicherheits- & Qualitätsaudit mit Chrome-in-Chrome (LP + 2 SuS). 10 Kategorien getestet.
+
+### Strang 1: Kritischer Heartbeat-Bug
+
+| # | Fix | Schwere | Details |
+|---|-----|---------|---------|
+| 1 | **sessionToken in heartbeat()** | KRITISCH | Session 34 (B1) machte Token mandatory, aber `pruefungApi.ts:heartbeat()` nutzte raw `fetch()` statt `apiClient`-Helpers → Token nie gesendet. Alle SuS-Heartbeats = "Nicht autorisiert" → LP sah 0 SuS im Monitoring. |
+| 2 | **sessionToken in speichereAntworten()** | KRITISCH | Gleicher Bug: `speichereAntworten()` nutzte ebenfalls raw `fetch()` → Auto-Save für SuS funktionierte nicht. |
+| 3 | **getSessionToken() exportiert** | — | `apiClient.ts:getSessionToken()` von `function` zu `export function` geändert, damit `pruefungApi.ts` darauf zugreifen kann. |
+
+### Strang 2: 5 Findings aus Audit
+
+| # | Fix | Schwere | Details |
+|---|-----|---------|---------|
+| H1 | **Rollen-Bypass Schutz** | HOCH | `restoreSession()` in `authStore.ts` validiert Rolle aus E-Mail-Domain. SuS mit `@stud.gymhofwil.ch` kann nicht mehr `rolle: 'lp'` vortäuschen. |
+| H2 | **CSP meta-Tag** | HOCH | `Content-Security-Policy` in `index.html`: default-src self, script-src self + Google, connect-src self + Apps Script. |
+| M1 | **localStorage-Cleanup** | MITTEL | `AbgabeDialog.tsx` löscht `pruefung-abgabe-*` nach erfolgreicher Abgabe (Datenschutz). |
+| M3 | **Heartbeat-Backoff** | MITTEL | Exponentielles Backoff bei Fehlern (10s → 20s → 40s → 60s max). `setInterval` → `setTimeout`-Kette. Verhindert Error-Spam (vorher 91 Errors in 4 Min). |
+| M4 | **Touch-Targets 44px** | MITTEL | Frage-Buttons `w-9 h-9` → `w-11 h-11` (36→44px). Header-Buttons `min-h-[40px]` → `min-h-[44px]`. WCAG-konform für iPad-Prüfungen. |
+
+### Audit-Ergebnisse (verifiziert im Browser)
+
+| Test | Ergebnis |
+|------|----------|
+| Heartbeat + Monitoring | ✅ 2 SuS sichtbar, Echtzeit-Fortschritt, Frage-Nummer |
+| Auto-Save | ✅ "Speichert..." Indikator, Daten ans Backend |
+| Rollen-Bypass (H1) | ✅ @stud-Email wird bei Manipulation auf SuS zurückgesetzt |
+| CSP (H2) | ✅ meta-Tag vorhanden, Inline-Scripts blockiert |
+| Touch-Targets (M4) | ✅ 44×44px Buttons |
+| Abgabe-Flow | ✅ Dialog → Abgabe → LP sieht "Abgegeben" |
+| localStorage-Cleanup (M1) | ✅ pruefung-abgabe-* entfernt (state-* bleibt wegen Zustand persist) |
+| Zwei SuS unabhängig | ✅ Verschiedene Fortschritte, keine Interferenz |
+| Lösungsdaten-Schutz | ✅ Keine Musterlösungen in SuS-Response (auch bei LP-Email-Spoofing) |
+| IDOR-Schutz | ✅ Fremde Korrekturen nicht abrufbar |
+| XSS-Schutz | ✅ Script-Tags als Plaintext, DOMPurify korrekt in 4 Komponenten |
+| Token-Manipulation | ✅ Ohne/Fake/Fremder Token blockiert |
+
+**Dateien geändert:** `apiClient.ts`, `pruefungApi.ts`, `authStore.ts`, `index.html`, `Layout.tsx`, `FragenNavigation.tsx`, `AbgabeDialog.tsx`, `usePruefungsMonitoring.ts`
+
+**Tests:** 161 grün. `tsc -b` sauber.
 
 ---
 
