@@ -9,13 +9,74 @@
 
 - **SEB / iPad** — SEB weiterhin deaktiviert (`sebErforderlich: false`)
 - ~~Fragenbank im Composer "nicht gefunden"~~ ✅ 27.03.2026
-- **Apps Script Deploy nötig** — Session 33 enthält Backend-Änderungen (Security + parseFrage + getTypDaten + Feedback-Endpoint + Reparatur)
+- ~~Apps Script Deploy nötig~~ ✅ 30.03.2026 — Session 33 + 34 deployed
 - **Tier 2 Features (später):** Diktat, GeoGebra/Desmos, Randomisierte Zahlenvarianten, Code-Ausführung (Sandbox)
 - **Übungspools ↔ Prüfungstool** — Lern-Analytik, Login, KI-Empfehlungen (eigenes Designprojekt)
 - **Bewertungsraster-Vertiefung** — Überfachliche Kriterien, kriterienbasiertes KI-Feedback
 - **TaF Phasen-UI** — klassenTyp-Feld vorhanden, UI für Phasen-Auswahl noch nicht
 - ~~Bild-Upload für Hotspot/Bildbeschriftung/DragDrop~~ ✅ 28.03.2026
 - ~~Aufgabengruppe Inline-Teilaufgaben~~ ✅ 28.03.2026
+- **Verbleibende Security-Themen (nicht kritisch):**
+  - Rollen-Bypass via sessionStorage (LP-UI sichtbar, aber API-Endpoints prüfen serverseitig → kein Datenzugriff)
+  - Timer-Manipulation via localStorage (startzeit änderbar, aber Backend trackt Heartbeats)
+  - Demo-Modus Bypass via sessionStorage (Lockdown deaktivierbar, nur relevant bei Kontrolle)
+  - Rate Limiting auf API-Endpoints fehlt (DoS-Schutz)
+  - Prompt Injection bei KI-Assistent (User-Input unsanitisiert an Claude)
+
+---
+
+## Session 34 — Bugfixes + Sicherheits-Härtung (30.03.2026)
+
+### Strang 1: Bugfixes aus systematischem Test
+
+| # | Fix | Details |
+|---|-----|---------|
+| 1 | **React Error #310 (Crash)** | `Layout.tsx`: `useCallback`-Hooks vor Early Return verschoben. Verhinderte Crash bei Recovery nach Reload. |
+| 2 | **PDF Canvas Race Condition** | `usePDFRenderer.ts`: `renderTask.cancel()` vor neuem Render, `RenderingCancelledException` abgefangen. |
+| 3 | **Fragen-Zählung LP vs SuS** | `usePruefungsMonitoring.ts`: Auto-Save sendet `fragen.length` (23) statt `alleFragen.length` (25). |
+| 4 | **"Durchgefallen" für aktive SuS** | `useKorrekturDaten.ts` + `KorrekturDashboard.tsx`: Statistik nur für abgegebene SuS. |
+| 5 | **Markdown in Aufgabengruppe** | `AufgabengruppeFrage.tsx`: `renderMarkdown()` für Kontext-Text. |
+| 6 | **ZeichnenKorrektur Warning** | `ZeichnenKorrektur.tsx`: Leere Zeichnung (`[]`) früh abgefangen. |
+
+### Strang 2: Sicherheits-Audit + Härtung
+
+Systematischer Security-Audit mit Browser-Tests (Chrome DevTools, API-Manipulation). 6 kritische + 6 hohe Schwachstellen gefunden und gefixt.
+
+#### Backend (apps-script-code.js) — 8 Fixes
+
+| # | Fix | Schwere | Details |
+|---|-----|---------|---------|
+| B1 | **Session-Token mandatory** | KRITISCH | `speichereAntworten` + `heartbeat`: Token-Prüfung nicht mehr optional. Google OAuth SuS bekommen Token automatisch via `ladePruefung`. |
+| B2 | **IDOR Korrektur-Endpoints** | KRITISCH | `ladeKorrekturenFuerSuS` + `ladeKorrekturDetail`: Session-Token muss zur angefragten E-Mail passen. Fremde Noten nicht mehr abrufbar. |
+| B3 | **Lösungsdaten-Leak** | KRITISCH | `ladePruefung` wendet `bereinigeFrageFuerSuS_()` IMMER an — auch bei LP-E-Mail. LP braucht Lösungen hier nicht (Fragenbank/Korrektur laden separat). |
+| B4 | **Nachträgliche Abgabe** | KRITISCH | `speichereAntworten` blockiert bei `status=beendet` und bei bereits abgegebenen SuS. |
+| B5 | **LP-Ownership Monitoring** | HOCH | `ladeMonitoring`: Nur Ersteller oder berechtigte LPs. |
+| B6 | **Drive-File-Zugriff** | HOCH | `ladeDriveFile`: Nur Dateien aus erlaubten Ordnern (Anhänge, Materialien, SuS-Uploads). |
+| B7 | **MIME-Type Whitelist** | HOCH | `uploadAnhang` + `uploadMaterial`: Nur erlaubte Dateitypen (Bilder, PDF, Audio, Video, Office). |
+| B8 | **doPost Auth-Layer** | HOCH | Zentrale Auth-Prüfung: LP-Aktionen brauchen LP-E-Mail, SuS-Aktionen brauchen gültige Domain. |
+
+#### Frontend — 3 Fixes
+
+| # | Fix | Details |
+|---|-----|---------|
+| F1 | **Security Headers** | `index.html`: X-Frame-Options (SAMEORIGIN), X-Content-Type-Options (nosniff), Referrer-Policy (strict-origin-when-cross-origin). |
+| F3 | **localStorage Hardening** | `pruefungStore.ts`: heartbeats/netzwerkFehler/unterbrechungen nicht mehr persistiert. |
+| F4 | **Session-Token bei GET** | `apiClient.ts`: Session-Token auch bei GET-Requests mitgesendet. `pruefungApi.ts`: Token aus `ladePruefung`-Response in sessionStorage gespeichert. |
+
+#### Verifizierte Angriffsvektoren (alle blockiert)
+
+| Angriff | Ergebnis |
+|---------|----------|
+| `ladePruefung` mit LP-E-Mail → Lösungen | ✅ Keine Lösungen |
+| IDOR: Noten anderer SuS abrufen | ✅ "Nicht autorisiert" |
+| `speichereAntworten` ohne Token | ✅ "Nicht autorisiert" |
+| E-Mail-Spoofing mit eigenem Token | ✅ "Nicht autorisiert" |
+| LP-Aktion als SuS | ✅ "Nur für Lehrpersonen" |
+| Heartbeat ohne Token | ✅ "Nicht autorisiert" |
+| Ungültige E-Mail-Domain | ✅ "Nicht autorisiert" |
+| Drive-File mit beliebiger ID | ✅ "Zugriff verweigert" |
+
+**Tests:** 161 grün. `tsc -b` sauber. Apps Script deployed + Browser-verifiziert.
 
 ---
 

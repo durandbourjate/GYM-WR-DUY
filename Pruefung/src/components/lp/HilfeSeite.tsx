@@ -573,6 +573,22 @@ function HilfeKorrektur() {
       <Hinweis>
         Die KI-Punkte sind Vorschläge. Sie entscheiden — Ihre manuellen Punkte überschreiben die KI-Bewertung immer.
       </Hinweis>
+
+      <Untertitel>Korrektur-Einsicht freigeben</Untertitel>
+      <Text>
+        Die Freigabe erfolgt zweistufig: <strong>Einsicht freigeben</strong> (SuS sehen ihre Korrektur online) und <strong>PDF freigeben</strong> (SuS können ihr Korrektur-PDF herunterladen). Beide können unabhängig voneinander aktiviert und jederzeit zurückgenommen werden.
+      </Text>
+
+      <Untertitel>Feedback-System</Untertitel>
+      <Text>
+        SuS und LP können direkt aus der Plattform Probleme oder Wünsche melden. Das Feedback wird in einem eigenen Tab im Google Sheet gesammelt.
+      </Text>
+      <Text>
+        <strong>Für LP:</strong> Im Header finden Sie ein 💬-Icon neben dem Theme-Toggle. In der Korrektur-Ansicht erscheint zusätzlich ein &laquo;Problem melden&raquo;-Link unter jeder Frage — damit können Sie fachliche Fehler oder technische Probleme direkt im Kontext der Frage melden.
+      </Text>
+      <Text>
+        <strong>Für SuS:</strong> In der Korrektur-Einsicht (nach Freigabe) finden SuS ein 💬-Icon im Header und einen &laquo;Problem melden&raquo;-Link unter jeder Frage — z.B. wenn eine Bewertung unklar ist.
+      </Text>
     </div>
   )
 }
@@ -789,6 +805,14 @@ function HilfeFAQ() {
 
       <FAQItem frage="Was sind die Standard-Bewertungsraster?">
         Beim Erstellen einer neuen Frage wird automatisch ein sinnvolles Bewertungsraster vorgeschlagen (abhängig vom Fragetyp). Sie können es jederzeit anpassen. Eigene Raster-Vorlagen können gespeichert und wiederverwendet werden.
+      </FAQItem>
+
+      <FAQItem frage="Wie kann ich ein Problem oder einen Wunsch melden?">
+        Über das 💬-Icon im Header oder den &laquo;Problem melden&raquo;-Link unter jeder Frage (in der Korrektur-Ansicht). Wählen Sie den Typ (Problem/Wunsch), eine Kategorie und optional einen Kommentar. Das Feedback wird direkt im Google Sheet erfasst.
+      </FAQItem>
+
+      <FAQItem frage="Können SuS Feedback geben?">
+        Ja, aber erst nach Freigabe der Korrektur-Einsicht. SuS sehen dann ein 💬-Icon im Header und können pro Frage Feedback geben — z.B. wenn eine Bewertung unklar ist oder ein technisches Problem aufgetreten ist.
       </FAQItem>
     </div>
   )
