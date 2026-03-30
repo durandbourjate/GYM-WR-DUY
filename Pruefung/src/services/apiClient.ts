@@ -27,7 +27,7 @@ function fetchMitTimeout(
 }
 
 /** Liest Session-Token aus sessionStorage (für SuS-Authentifizierung) */
-function getSessionToken(): string | undefined {
+export function getSessionToken(): string | undefined {
   try {
     const raw = sessionStorage.getItem('pruefung-auth')
     if (!raw) return undefined

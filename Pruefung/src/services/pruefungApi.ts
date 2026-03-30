@@ -2,7 +2,7 @@ import type { Frage } from '../types/fragen.ts'
 import type { PruefungsConfig } from '../types/pruefung.ts'
 import type { Antwort } from '../types/antworten.ts'
 import type { HeartbeatResponse } from '../types/monitoring.ts'
-import { APPS_SCRIPT_URL, getJson } from './apiClient'
+import { APPS_SCRIPT_URL, getJson, getSessionToken } from './apiClient'
 
 /** Einzelne Prüfungs-Config laden (leichtgewichtig, für Polling) */
 export async function ladeEinzelConfig(pruefungId: string, email: string): Promise<PruefungsConfig | null> {
@@ -61,7 +61,7 @@ export async function speichereAntworten(payload: {
     const response = await fetch(APPS_SCRIPT_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain' },
-      body: JSON.stringify({ action: 'speichereAntworten', ...payload }),
+      body: JSON.stringify({ action: 'speichereAntworten', sessionToken: getSessionToken(), ...payload }),
     })
     if (!response.ok) return false
 
@@ -105,6 +105,7 @@ export async function heartbeat(
         pruefungId,
         email,
         timestamp: new Date().toISOString(),
+        sessionToken: getSessionToken(),
         ...(aktuelleFrage !== undefined ? { aktuelleFrage } : {}),
         ...(beantworteteFragen !== undefined ? { beantworteteFragen } : {}),
         ...(lockdownMeta ? { lockdownMeta } : {}),
