@@ -349,7 +349,7 @@ export default function Layout() {
               onClick={vorherigeFrage}
               disabled={aktuelleFrageIndex === 0}
               title="Vorherige Frage (← Pfeiltaste)"
-              className="px-2.5 py-1.5 text-sm font-medium text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer min-h-[40px] flex items-center gap-1"
+              className="px-2.5 py-1.5 text-sm font-medium text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer min-h-[44px] flex items-center gap-1"
             >
               <span>&larr;</span>
               <span className="hidden sm:inline">Zurück</span>
@@ -370,7 +370,7 @@ export default function Layout() {
               <button
                 onClick={() => toggleMarkierung(aktuelleFrage.id)}
                 title={istMarkiert ? 'Markierung entfernen' : 'Als unsicher markieren'}
-                className={`px-2 py-1.5 text-sm rounded-lg border transition-colors cursor-pointer flex items-center gap-1 min-h-[40px]
+                className={`px-2 py-1.5 text-sm rounded-lg border transition-colors cursor-pointer flex items-center gap-1 min-h-[44px]
                   ${istMarkiert
                     ? 'bg-amber-100 border-amber-400 text-amber-800 font-semibold dark:bg-amber-900/40 dark:border-amber-600 dark:text-amber-300'
                     : 'border-slate-300 text-slate-500 dark:border-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
@@ -386,7 +386,7 @@ export default function Layout() {
               onClick={naechsteFrage}
               disabled={aktuelleFrageIndex === fragen.length - 1}
               title="Nächste Frage (→ Pfeiltaste)"
-              className="px-3 py-1.5 text-sm font-medium text-white bg-slate-700 dark:bg-slate-200 dark:text-slate-800 rounded-lg hover:bg-slate-800 dark:hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer min-h-[40px] flex items-center gap-1"
+              className="px-3 py-1.5 text-sm font-medium text-white bg-slate-700 dark:bg-slate-200 dark:text-slate-800 rounded-lg hover:bg-slate-800 dark:hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer min-h-[44px] flex items-center gap-1"
             >
               <span className="hidden sm:inline">Weiter</span>
               <span>&rarr;</span>
@@ -395,7 +395,7 @@ export default function Layout() {
             {!abgegeben && (
               <button
                 onClick={() => setZeigAbgabeDialog(true)}
-                className="px-3 py-1.5 text-sm font-semibold text-white bg-green-600 rounded-lg hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-500 transition-colors cursor-pointer min-h-[40px]"
+                className="px-3 py-1.5 text-sm font-semibold text-white bg-green-600 rounded-lg hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-500 transition-colors cursor-pointer min-h-[44px]"
               >
                 Abgeben
               </button>

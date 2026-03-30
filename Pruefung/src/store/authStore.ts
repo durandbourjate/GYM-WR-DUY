@@ -177,6 +177,16 @@ function restoreSession(): AuthUser | null {
     if (!raw) return null
     const parsed = JSON.parse(raw)
     if (parsed && typeof parsed.email === 'string' && typeof parsed.name === 'string' && typeof parsed.rolle === 'string') {
+      // SICHERHEIT: Rolle aus E-Mail-Domain re-validieren (verhindert sessionStorage-Manipulation)
+      // SuS-Domain ist eindeutig — wenn E-Mail auf @stud.gymhofwil.ch endet, MUSS Rolle 'sus' sein
+      if (parsed.email.endsWith('@stud.gymhofwil.ch') && parsed.rolle !== 'sus') {
+        console.warn('[auth] Rollen-Manipulation erkannt — setze auf SuS zurück')
+        parsed.rolle = 'sus'
+        parsed.adminRolle = false
+        parsed.fachschaften = []
+        parsed.fachschaft = undefined
+        sessionStorage.setItem('pruefung-auth', JSON.stringify(parsed))
+      }
       return parsed as AuthUser
     }
     return null

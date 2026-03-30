@@ -95,6 +95,11 @@ export default function AbgabeDialog({ onSchliessen }: Props) {
         setStatus('erfolg')
         // IndexedDB-Backup nach erfolgreicher Abgabe leeren
         clearIndexedDB(abgabe.pruefungId)
+        // localStorage-Daten aufräumen (Datenschutz: personenbezogene Daten entfernen)
+        try {
+          localStorage.removeItem(`pruefung-abgabe-${abgabe.pruefungId}`)
+          localStorage.removeItem(`pruefung-state-${abgabe.pruefungId}`)
+        } catch { /* ignorieren */ }
       } else {
         setStatus('fehler')
       }

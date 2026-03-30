@@ -66,7 +66,7 @@ export default function FragenNavigation() {
                   key={frageId}
                   onClick={() => navigiere(idx)}
                   title={frage ? `${frage.fachbereich}: ${frage.thema}` : frageId}
-                  className={`w-9 h-9 rounded-lg text-sm font-medium transition-all flex items-center justify-center relative
+                  className={`w-11 h-11 rounded-lg text-sm font-medium transition-all flex items-center justify-center relative
                     ${istAktuell ? 'ring-2 ring-slate-500 ring-offset-1 dark:ring-slate-400 dark:ring-offset-slate-800' : ''}
                     ${bgClass}
                     hover:scale-110 cursor-pointer

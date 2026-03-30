@@ -132,13 +132,21 @@ export function usePruefungsMonitoring(lockdownCallbacks?: MonitoringLockdownCal
     return () => clearInterval(interval)
   }, [config, abgegeben, backendVerfuegbar, user, fragen, alleFragen, setVerbindungsstatus, incrementRemoteSaveVersion, setLetzterSave, incrementAutoSaveCount, incrementNetzwerkFehler])
 
-  // === 3. Heartbeat (alle 10s, konfigurierbar) + Beenden-Signal ===
+  // === 3. Heartbeat (alle 10s, konfigurierbar) + Beenden-Signal + Backoff ===
   useEffect(() => {
     if (!config || abgegeben || !backendVerfuegbar || !user) return
 
-    const intervallMs = (config.heartbeatIntervallSekunden || 10) * 1000
+    const basisIntervallMs = (config.heartbeatIntervallSekunden || 10) * 1000
+    let fehlerZaehler = 0
+    let timeoutId: ReturnType<typeof setTimeout> | null = null
 
-    const interval = setInterval(async () => {
+    function berechneIntervall(): number {
+      if (fehlerZaehler === 0) return basisIntervallMs
+      // Exponentielles Backoff: 10s → 20s → 40s → 60s (max)
+      return Math.min(basisIntervallMs * Math.pow(2, fehlerZaehler), 60_000)
+    }
+
+    async function sendeHeartbeat() {
       try {
         const state = usePruefungStore.getState()
         const aktuelleFrageIndex = state.aktuelleFrageIndex
@@ -150,8 +158,9 @@ export function usePruefungsMonitoring(lockdownCallbacks?: MonitoringLockdownCal
         const currentAutoSaveCount = state.autoSaveCount
         // B50: gesamtFragen mitsenden (= navigationsFragen.length, konsistent mit SuS-View)
         const gesamtFragen = state.fragen.length
-        const response = await apiService.heartbeat(config.id, user.email, aktuelleFrageIndex, beantworteteFragen, lockdownMeta, currentAutoSaveCount, tabSessionIdRef.current, gesamtFragen)
+        const response = await apiService.heartbeat(config!.id, user!.email, aktuelleFrageIndex, beantworteteFragen, lockdownMeta, currentAutoSaveCount, tabSessionIdRef.current, gesamtFragen)
         if (response.success) {
+          fehlerZaehler = 0
           incrementHeartbeats()
           setVerbindungsstatus('online')
           // Multi-Tab-Schutz: Wenn dieser Tab nicht mehr die aktive Session ist
@@ -171,6 +180,8 @@ export function usePruefungsMonitoring(lockdownCallbacks?: MonitoringLockdownCal
             lockdownCallbacksRef.current?.onKontrollStufeOverride?.(response.kontrollStufeOverride)
           }
         } else {
+          fehlerZaehler = Math.min(fehlerZaehler + 1, 4)
+          setVerbindungsstatus('offline')
           addUnterbrechung({
             zeitpunkt: new Date().toISOString(),
             dauer_sekunden: 0,
@@ -178,13 +189,18 @@ export function usePruefungsMonitoring(lockdownCallbacks?: MonitoringLockdownCal
           })
         }
       } catch {
-        // Netzwerkfehler: nie werfen, nur Status setzen
+        fehlerZaehler = Math.min(fehlerZaehler + 1, 4)
         setVerbindungsstatus('offline')
         incrementNetzwerkFehler()
       }
-    }, intervallMs)
+      // Nächsten Heartbeat mit ggf. längerem Intervall planen
+      timeoutId = setTimeout(sendeHeartbeat, berechneIntervall())
+    }
 
-    return () => clearInterval(interval)
+    // Ersten Heartbeat nach Basis-Intervall starten
+    timeoutId = setTimeout(sendeHeartbeat, basisIntervallMs)
+
+    return () => { if (timeoutId) clearTimeout(timeoutId) }
   }, [config, abgegeben, backendVerfuegbar, user, incrementHeartbeats, addUnterbrechung, setBeendetUm])
 
   // === 3b. Finaler Heartbeat bei Abgabe (B51: letzte %-Werte ans Backend) ===
