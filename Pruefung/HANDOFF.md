@@ -9,13 +9,57 @@
 
 - **SEB / iPad** — SEB weiterhin deaktiviert (`sebErforderlich: false`)
 - ~~Fragenbank im Composer "nicht gefunden"~~ ✅ 27.03.2026
-- **Apps Script Deploy nötig** — Session 29 + 30 enthalten Backend-Änderungen
+- **Apps Script Deploy nötig** — Session 33 enthält Backend-Änderungen (Security + parseFrage + getTypDaten + Feedback-Endpoint + Reparatur)
 - **Tier 2 Features (später):** Diktat, GeoGebra/Desmos, Randomisierte Zahlenvarianten, Code-Ausführung (Sandbox)
 - **Übungspools ↔ Prüfungstool** — Lern-Analytik, Login, KI-Empfehlungen (eigenes Designprojekt)
 - **Bewertungsraster-Vertiefung** — Überfachliche Kriterien, kriterienbasiertes KI-Feedback
 - **TaF Phasen-UI** — klassenTyp-Feld vorhanden, UI für Phasen-Auswahl noch nicht
 - ~~Bild-Upload für Hotspot/Bildbeschriftung/DragDrop~~ ✅ 28.03.2026
 - ~~Aufgabengruppe Inline-Teilaufgaben~~ ✅ 28.03.2026
+
+---
+
+## Session 33 — Übungspools Fragetypen + Security + Bugfixes (30.03.2026)
+
+### Strang 1: Übungspools — Neue Fragetypen
+
+| # | Feature | Details |
+|---|---------|---------|
+| 1 | **5 neue Fragetypen in pool.html** | Buchungssatz, T-Konto, Bilanz/ER, Kontenbestimmung, Aufgabengruppe. CSS, Render, Check-Logik, restoreAnswerState, getCorrectAnswer. |
+| 2 | **44 neue FiBu-Übungsfragen** | bwl_fibu.js: 19 Buchungssatz + 5 T-Konto + 4 Bilanz + 5 Kontenbestimmung + 5 Aufgabengruppen. Themen: Erfolgsrechnung, Warenkonten, Eigentümer, Wertberichtigungen, Abgrenzungen. |
+| 3 | **Dynamische Zähler** | index.html: Hardcodierte questions/topics durch dynamisches Laden aus config/*.js ersetzt. Regex für beide Formate (id: und "id":). |
+| 4 | **Typ-Filter intelligent** | pool.html: Fragetyp-Chips nur für im Pool vorhandene Typen anzeigen. |
+| 5 | **Fehlender Pool** | vwl_konjunktur im POOLS-Array ergänzt (74 Fragen). |
+
+### Strang 2: Prüfungstool — Security
+
+| # | Fix | Details |
+|---|-----|---------|
+| A | **🔴 Lösungsdaten aus SuS-Response entfernt** | `bereinigeFrageFuerSuS_()` entfernt musterlosung, bewertungsraster, korrekt (MC/RF), korrekteAntworten (Lückentext), toleranz (Berechnung). LP bekommt weiterhin alles. Korrektur-Einsicht (nach Freigabe) nicht betroffen. |
+| B | **Verifiziert im Browser** | API-Response geprüft: 0 Lösungsfelder in SuS-Response. |
+
+### Strang 3: Prüfungstool — Bugfixes
+
+| # | Fix | Details |
+|---|-----|---------|
+| C | **Crash "t is not iterable"** | `fragenResolver.ts`: Inline-Teilaufgaben bekommen Default-Arrays statt undefined. |
+| D | **Defensive Array-Checks** | 11 Fragetyp-Komponenten: 25× `?? []` eingefügt (MCFrage, RichtigFalsch, Lückentext, Zuordnung, Berechnung, Sortierung, Kontenbestimmung, BilanzER, Aufgabengruppe, Bildbeschriftung, DragDrop). |
+| E | **parseFrage Default-Case** | Neuere Fragetypen (Sortierung, Hotspot, Bildbeschriftung, DragDrop, Audio, Code, Formel) fielen in Default und bekamen nur base-Felder. Jetzt: 3-stufiger Fallback (json-Spalte → typDaten → alle Spalten). |
+| F | **getTypDaten() erweitert** | Explizite Cases für 7 fehlende Fragetypen + Default-Fallback der alle nicht-base Felder speichert. |
+| G | **Einrichtungsprüfung repariert** | `repariereEinrichtungsFragen()` — 7 Fragen mit leeren typDaten direkt im Sheet korrigiert. Funktion kann nach Ausführung gelöscht werden. |
+
+### Strang 4: Prüfungstool — Feedback-System
+
+| # | Feature | Details |
+|---|---------|---------|
+| H | **FeedbackModal.tsx** | Typ-Auswahl (Problem/Wunsch), kontextabhängige Kategorien, optionaler Kommentar, Image-Ping an Übungspool-Endpoint. |
+| I | **FeedbackButton.tsx** | 3 Varianten: icon (Header), text (Action-Bar), link (unter Fragen). |
+| J | **LP-Header** | 💬 Feedback-Icon neben Theme-Toggle. |
+| K | **Korrektur-Fragenansicht** | ⚠️ "Problem melden"-Link unter jeder Frage (LP). |
+| L | **SuS-Korrektur-Einsicht** | 💬 Icon im Header + ⚠️ Link pro Frage. |
+| M | **Apps Script Endpoint** | `source=pruefung` → Tab `Pruefung-Feedback` (automatisch erstellt). |
+
+**Tests:** Alle 23 Fragen der Einrichtungsprüfung crash-frei durchgeklickt (SuS). LP-Dashboard zeigt SuS korrekt. `tsc -b` sauber.
 
 ---
 
