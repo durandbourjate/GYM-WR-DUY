@@ -58,7 +58,7 @@ export default function MCFrage({ frage }: Props) {
 
       {/* Optionen */}
       <div className={`flex flex-col gap-2.5 ${!abgegeben && gewaehlte.length === 0 ? 'rounded-xl border-2 border-violet-400 dark:border-violet-500 p-1' : ''}`}>
-        {frage.optionen.map((option) => {
+        {(frage.optionen ?? []).map((option) => {
           const istGewaehlt = gewaehlte.includes(option.id)
           return (
             <button

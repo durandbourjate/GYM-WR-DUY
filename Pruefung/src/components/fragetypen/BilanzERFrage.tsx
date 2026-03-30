@@ -100,7 +100,7 @@ export default function BilanzERFrage({ frage }: Props) {
     setAntwort(frage.id, zuAntwort(b, e))
   }
   const readOnly = abgegeben
-  const verfuegbar = frage.kontenMitSaldi.map(k => k.kontonummer)
+  const verfuegbar = (frage.kontenMitSaldi ?? []).map(k => k.kontonummer)
 
   return (
     <div className="flex flex-col gap-5">

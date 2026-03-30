@@ -21,8 +21,8 @@ function vonAntwort(
 
   // Leere Antworten initialisieren
   const leer: Record<string, AufgabeAntwort> = {}
-  for (const a of aufgaben) {
-    leer[a.id] = { antworten: a.erwarteteAntworten.map(() => ({})) }
+  for (const a of (aufgaben ?? [])) {
+    leer[a.id] = { antworten: (a.erwarteteAntworten ?? []).map(() => ({})) }
   }
   return leer
 }
@@ -36,7 +36,7 @@ export default function KontenbestimmungFrage({ frage }: Props) {
   const gespeicherteAntwort =
     aktuelleAntwort?.typ === 'kontenbestimmung' ? aktuelleAntwort : undefined
 
-  const aufgabenAntworten = vonAntwort(gespeicherteAntwort, frage.aufgaben)
+  const aufgabenAntworten = vonAntwort(gespeicherteAntwort, frage.aufgaben ?? [])
 
   function aktualisiere(neueAufgaben: Record<string, AufgabeAntwort>) {
     setAntwort(frage.id, { typ: 'kontenbestimmung' as const, aufgaben: neueAufgaben })
@@ -101,11 +101,11 @@ export default function KontenbestimmungFrage({ frage }: Props) {
             </tr>
           </thead>
           <tbody>
-            {frage.aufgaben.map((aufgabe) => {
+            {(frage.aufgaben ?? []).map((aufgabe) => {
               const antwortDaten = aufgabenAntworten[aufgabe.id] ?? { antworten: [] }
-              const zeilen = aufgabe.erwarteteAntworten.length
+              const zeilen = (aufgabe.erwarteteAntworten ?? []).length
 
-              return aufgabe.erwarteteAntworten.map((_, aIdx) => {
+              return (aufgabe.erwarteteAntworten ?? []).map((_, aIdx) => {
                 zeileNr++
                 const antwort = antwortDaten.antworten[aIdx] ?? {}
 

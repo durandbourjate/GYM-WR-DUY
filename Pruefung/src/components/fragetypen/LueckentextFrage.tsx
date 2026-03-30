@@ -35,8 +35,8 @@ export default function LueckentextFrage({ frage }: Props) {
   // Gemischte Dropdown-Optionen einmalig pro Frage berechnen
   const gemischteOptionen = useMemo(() => {
     const result: Record<string, string[]> = {}
-    for (const luecke of frage.luecken) {
-      if (luecke.dropdownOptionen && luecke.dropdownOptionen.length > 0) {
+    for (const luecke of (frage.luecken ?? [])) {
+      if (luecke.dropdownOptionen && luecke.dropdownOptionen?.length > 0) {
         result[luecke.id] = shuffleOptionen(luecke.dropdownOptionen, `${frage.id}-${luecke.id}`)
       }
     }

@@ -41,7 +41,7 @@ export default function AufgabengruppeFrage({ frage }: Props) {
 
   // Inline-Teilaufgaben (neues Format) ODER Legacy-ID-Auflösung
   const teilaufgabenIds = frage.teilaufgaben
-    ? frage.teilaufgaben.map(ta => ta.id)
+    ? (frage.teilaufgaben ?? []).map(ta => ta.id)
     : (frage.teilaufgabenIds ?? [])
   const teilaufgaben = teilaufgabenIds
     .map((id) => alleFragen.find((f) => f.id === id))

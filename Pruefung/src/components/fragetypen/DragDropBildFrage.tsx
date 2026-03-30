@@ -25,7 +25,7 @@ export default function DragDropBildFrage({ frage }: Props) {
   const zugeordneteLabels = new Set(Object.values(zuordnungen))
 
   // Verfuegbare Labels (Pool)
-  const verfuegbareLabels = frage.labels.filter(l => !zugeordneteLabels.has(l))
+  const verfuegbareLabels = (frage.labels ?? []).filter(l => !zugeordneteLabels.has(l))
 
   const handleDragStart = useCallback((label: string) => {
     if (abgegeben) return
@@ -63,7 +63,7 @@ export default function DragDropBildFrage({ frage }: Props) {
     }
   }, [abgegeben, zuordnungen, setAntwort, frage.id])
 
-  const alleZugeordnet = frage.zielzonen.every(z => zuordnungen[z.id])
+  const alleZugeordnet = (frage.zielzonen ?? []).every(z => zuordnungen[z.id])
 
   return (
     <div className="flex flex-col gap-5">
@@ -79,7 +79,7 @@ export default function DragDropBildFrage({ frage }: Props) {
           {frage.punkte} {frage.punkte === 1 ? 'Punkt' : 'Punkte'}
         </span>
         <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300">
-          {frage.zielzonen.length} {frage.zielzonen.length === 1 ? 'Zone' : 'Zonen'}
+          {(frage.zielzonen ?? []).length} {(frage.zielzonen ?? []).length === 1 ? 'Zone' : 'Zonen'}
         </span>
       </div>
 
@@ -101,7 +101,7 @@ export default function DragDropBildFrage({ frage }: Props) {
           />
 
           {/* Zielzonen */}
-          {frage.zielzonen.map((zone) => {
+          {(frage.zielzonen ?? []).map((zone) => {
             const istBelegt = !!zuordnungen[zone.id]
             const istDragOver = dragOverZone === zone.id
 
@@ -172,7 +172,7 @@ export default function DragDropBildFrage({ frage }: Props) {
       {/* Abgegeben: Zuordnungen anzeigen */}
       {abgegeben && (
         <div className="text-sm text-slate-600 dark:text-slate-300 space-y-1">
-          {frage.zielzonen.map((zone) => (
+          {(frage.zielzonen ?? []).map((zone) => (
             <div key={zone.id} className="flex items-center gap-2">
               <span className="text-slate-400">Zone:</span>
               <span>{zuordnungen[zone.id] || '(leer)'}</span>

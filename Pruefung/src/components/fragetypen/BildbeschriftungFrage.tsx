@@ -22,7 +22,7 @@ export default function BildbeschriftungFrage({ frage }: Props) {
     setAntwort(frage.id, { typ: 'bildbeschriftung', eintraege: neueEintraege })
   }
 
-  const alleAusgefuellt = frage.beschriftungen.every(b => (eintraege[b.id] ?? '').trim() !== '')
+  const alleAusgefuellt = (frage.beschriftungen ?? []).every(b => (eintraege[b.id] ?? '').trim() !== '')
 
   return (
     <div className="flex flex-col gap-5">
@@ -38,7 +38,7 @@ export default function BildbeschriftungFrage({ frage }: Props) {
           {frage.punkte} {frage.punkte === 1 ? 'Punkt' : 'Punkte'}
         </span>
         <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300">
-          {frage.beschriftungen.length} {frage.beschriftungen.length === 1 ? 'Label' : 'Labels'}
+          {(frage.beschriftungen ?? []).length} {(frage.beschriftungen ?? []).length === 1 ? 'Label' : 'Labels'}
         </span>
       </div>
 
@@ -60,7 +60,7 @@ export default function BildbeschriftungFrage({ frage }: Props) {
           />
 
           {/* Label-Eingabefelder */}
-          {frage.beschriftungen.map((beschriftung, i) => (
+          {(frage.beschriftungen ?? []).map((beschriftung, i) => (
             <div
               key={beschriftung.id}
               className="absolute -translate-x-1/2 -translate-y-1/2"

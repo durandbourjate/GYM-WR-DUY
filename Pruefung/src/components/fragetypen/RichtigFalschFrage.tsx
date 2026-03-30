@@ -55,7 +55,7 @@ export default function RichtigFalschFrage({ frage }: Props) {
 
       {/* Aussagen */}
       <div className="flex flex-col gap-3">
-        {frage.aussagen.map((aussage, index) => {
+        {(frage.aussagen ?? []).map((aussage, index) => {
           const gewaehlt = bewertungen[aussage.id]
           return (
             <div

@@ -60,7 +60,7 @@ export default function BerechnungFrage({ frage }: Props) {
 
       {/* Ergebnis-Eingaben */}
       <div className="flex flex-col gap-3">
-        {frage.ergebnisse.map((erg) => (
+        {(frage.ergebnisse ?? []).map((erg) => (
           <div key={erg.id} className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
             <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-2">
               {erg.label}

@@ -29,7 +29,7 @@ export default function SortierungFrage({ frage }: Props) {
   const abgegeben = usePruefungStore((s) => s.abgegeben)
 
   // Gemischte Anfangsreihenfolge (einmalig berechnet)
-  const gemischt = useRef<string[]>(mischen(frage.elemente, frage.id))
+  const gemischt = useRef<string[]>(mischen((frage.elemente ?? []), frage.id))
 
   const aktuelleAntwort = antworten[frage.id]
   const reihenfolge: string[] = useMemo(() => {

@@ -19,7 +19,7 @@ export default function ZuordnungFrage({ frage }: Props) {
 
   // Rechte Seite mischen wenn zufallsreihenfolge aktiviert (einmalig pro Render-Zyklus)
   const rechteOptionen = useMemo(() => {
-    const optionen = frage.paare.map((p) => p.rechts)
+    const optionen = (frage.paare ?? []).map((p) => p.rechts)
     if (frage.zufallsreihenfolge) {
       // Fisher-Yates Shuffle mit festem Seed basierend auf frage.id
       const shuffled = [...optionen]
@@ -36,7 +36,7 @@ export default function ZuordnungFrage({ frage }: Props) {
 
   // Linke Seite ebenfalls mischen wenn aktiviert
   const linkeElemente = useMemo(() => {
-    const elemente = frage.paare.map((p) => p.links)
+    const elemente = (frage.paare ?? []).map((p) => p.links)
     if (frage.zufallsreihenfolge) {
       const shuffled = [...elemente]
       // Anderer Seed damit Links und Rechts nicht gleich gemischt werden
@@ -82,7 +82,7 @@ export default function ZuordnungFrage({ frage }: Props) {
           {frage.punkte} {frage.punkte === 1 ? 'Punkt' : 'Punkte'}
         </span>
         <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300">
-          {frage.paare.length} Zuordnungen
+          {(frage.paare ?? []).length} Zuordnungen
         </span>
       </div>
 
