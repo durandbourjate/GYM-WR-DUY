@@ -47,46 +47,51 @@ export function useKorrekturDaten({ pruefungId, userEmail, queueSave, updateKorr
     return result
   }, [fragen, abgaben])
 
-  // Auto-Korrektur-Ergebnisse in Bewertungen übernehmen (wenn kiPunkte noch null)
+  // Auto-Korrektur-Ergebnisse in Bewertungen übernehmen (wenn kiPunkte noch leer)
+  // Abhängig von korrektur UND autoErgebnisse — weil korrektur async geladen wird
+  const autoAppliedRef = useRef(false)
   useEffect(() => {
     if (Object.keys(autoErgebnisseAlle).length === 0) return
+    if (!korrektur) return // Korrektur noch nicht geladen — warten
 
-    setKorrektur((prev) => {
-      if (!prev) return prev
+    // Prüfen ob bereits angewendet (verhindert Endlos-Loop)
+    if (autoAppliedRef.current) return
 
-      let hatAenderungen = false
-      const aktualisierteSchueler = prev.schueler.map((s) => {
-        const autoErgebnisse = autoErgebnisseAlle[s.email]
-        if (!autoErgebnisse) return s
+    let hatAenderungen = false
+    const aktualisierteSchueler = korrektur.schueler.map((s) => {
+      const autoErgebnisse = autoErgebnisseAlle[s.email]
+      if (!autoErgebnisse) return s
 
-        let schuelerGeaendert = false
-        const neueBewertungen = { ...s.bewertungen }
+      let schuelerGeaendert = false
+      const neueBewertungen = { ...s.bewertungen }
 
-        for (const [frageId, ergebnis] of Object.entries(autoErgebnisse)) {
-          if (!ergebnis) continue
-          const bew = neueBewertungen[frageId]
-          if (!bew) continue
-          // Backend schreibt leere Strings statt null — beides als "nicht gesetzt" behandeln
-          const kiLeer = bew.kiPunkte == null || bew.kiPunkte === ('' as unknown as number)
-          const lpLeer = bew.lpPunkte == null || bew.lpPunkte === ('' as unknown as number)
-          if (kiLeer && lpLeer) {
-            neueBewertungen[frageId] = {
-              ...bew,
-              kiPunkte: ergebnis.erreichtePunkte,
-              lpPunkte: ergebnis.erreichtePunkte,
-              quelle: 'auto' as const,
-            }
-            schuelerGeaendert = true
-            hatAenderungen = true
+      for (const [frageId, ergebnis] of Object.entries(autoErgebnisse)) {
+        if (!ergebnis) continue
+        const bew = neueBewertungen[frageId]
+        if (!bew) continue
+        // Nur überschreiben wenn noch keine Punkte gesetzt (null, undefined, leerer String)
+        const kiLeer = bew.kiPunkte == null || bew.kiPunkte === ('' as unknown as number)
+        const lpLeer = bew.lpPunkte == null || bew.lpPunkte === ('' as unknown as number)
+        if (kiLeer && lpLeer) {
+          neueBewertungen[frageId] = {
+            ...bew,
+            kiPunkte: ergebnis.erreichtePunkte,
+            lpPunkte: ergebnis.erreichtePunkte,
+            quelle: 'auto' as const,
           }
+          schuelerGeaendert = true
+          hatAenderungen = true
         }
+      }
 
-        return schuelerGeaendert ? { ...s, bewertungen: neueBewertungen } : s
-      })
-
-      return hatAenderungen ? { ...prev, schueler: aktualisierteSchueler } : prev
+      return schuelerGeaendert ? { ...s, bewertungen: neueBewertungen } : s
     })
-  }, [autoErgebnisseAlle])
+
+    if (hatAenderungen) {
+      autoAppliedRef.current = true
+      setKorrektur({ ...korrektur, schueler: aktualisierteSchueler })
+    }
+  }, [autoErgebnisseAlle, korrektur])
 
   const istDemoModus = useAuthStore((s) => s.istDemoModus)
 

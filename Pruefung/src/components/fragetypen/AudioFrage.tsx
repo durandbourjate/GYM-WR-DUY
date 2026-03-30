@@ -60,21 +60,32 @@ export default function AudioFrage({ frage }: Props) {
 
       recorder.onstop = () => {
         const blob = new Blob(chunksRef.current, { type: mimeType })
-        // Blob als Base64 Data URL speichern
+        stream.getTracks().forEach(t => t.stop())
+
+        if (blob.size === 0) {
+          setFehler('Aufnahme enthält keine Daten. Bitte erneut versuchen.')
+          setStatus('idle')
+          return
+        }
+
+        // URL.createObjectURL ist schneller und zuverlässiger als FileReader/DataURL
+        const url = URL.createObjectURL(blob)
+        setAudioUrl(url)
+        setStatus('preview')
+
+        // Blob als DataURL für Persistenz (localStorage/Backend) speichern
         const reader = new FileReader()
         reader.onload = () => {
-          const dataUrl = reader.result as string
-          setAudioUrl(dataUrl)
-          setStatus('preview')
-          // Antwort speichern
           setAntwort(frage.id, {
             typ: 'audio',
-            aufnahmeUrl: dataUrl,
+            aufnahmeUrl: reader.result as string,
             dauer: Math.round((Date.now() - startZeitRef.current) / 1000),
           })
         }
+        reader.onerror = () => {
+          setFehler('Audio konnte nicht gespeichert werden.')
+        }
         reader.readAsDataURL(blob)
-        stream.getTracks().forEach(t => t.stop())
       }
 
       recorder.start(1000) // Chunks alle 1s
