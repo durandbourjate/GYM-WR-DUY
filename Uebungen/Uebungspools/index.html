@@ -225,208 +225,33 @@ window.matchMedia('(prefers-color-scheme:dark)').addEventListener('change',funct
 // ══════════════════════════════════════════
 // Add new pools here. The index page reads this to display all available pools.
 const POOLS = [
-  {
-    id: "vwl_beduerfnisse",
-    fach: "VWL",
-    title: "Bedürfnisse, Knappheit & Produktionsfaktoren",
-    meta: "SF GYM1",
-    questions: 70,
-    topics: 7
-  },
-  {
-    id: "vwl_menschenbild",
-    fach: "VWL",
-    title: "Ökonomisches Menschenbild",
-    meta: "SF GYM1",
-    questions: 66,
-    topics: 7
-  },
-  {
-    id: "vwl_bip",
-    fach: "VWL",
-    title: "Bruttoinlandprodukt (BIP)",
-    meta: "EWR GYM2",
-    questions: 78,
-    topics: 7
-  },
-  {
-    id: "vwl_wachstum",
-    fach: "VWL",
-    title: "Wirtschaftswachstum – Triebkräfte und Effekte",
-    meta: "SF GYM1–GYM4",
-    questions: 76,
-    topics: 6
-  },
-  {
-    id: "vwl_steuern",
-    fach: "VWL",
-    title: "Steuern und Staatseinnahmen",
-    meta: "SF GYM3",
-    questions: 98,
-    topics: 6
-  },
-  {
-    id: "vwl_arbeitslosigkeit",
-    fach: "VWL",
-    title: "Arbeitslosigkeit & Armut",
-    meta: "SF GYM3",
-    questions: 74,
-    topics: 7
-  },
-  {
-    id: "vwl_staatsverschuldung",
-    fach: "VWL",
-    title: "Staatsverschuldung",
-    meta: "SF GYM3",
-    questions: 87,
-    topics: 7
-  },
-  {
-    id: "vwl_sozialpolitik",
-    fach: "VWL",
-    title: "Sozialpolitik und Sozialversicherungen",
-    meta: "SF GYM3",
-    questions: 105,
-    topics: 7
-  },
-  {
-    id: "vwl_markteffizienz",
-    fach: "VWL",
-    title: "Markteffizienz",
-    meta: "SF GYM2/GYM3",
-    questions: 162,
-    topics: 13
-  },
-  {
-    id: "vwl_geld",
-    fach: "VWL",
-    title: "Geld, Geldpolitik und Finanzmärkte",
-    meta: "SF GYM3–GYM4",
-    questions: 100,
-    topics: 13
-  },
+  { id: "vwl_beduerfnisse", fach: "VWL", title: "Bedürfnisse, Knappheit & Produktionsfaktoren", meta: "SF GYM1" },
+  { id: "vwl_menschenbild", fach: "VWL", title: "Ökonomisches Menschenbild", meta: "SF GYM1" },
+  { id: "vwl_bip", fach: "VWL", title: "Bruttoinlandprodukt (BIP)", meta: "EWR GYM2" },
+  { id: "vwl_wachstum", fach: "VWL", title: "Wirtschaftswachstum – Triebkräfte und Effekte", meta: "SF GYM1–GYM4" },
+  { id: "vwl_steuern", fach: "VWL", title: "Steuern und Staatseinnahmen", meta: "SF GYM3" },
+  { id: "vwl_arbeitslosigkeit", fach: "VWL", title: "Arbeitslosigkeit & Armut", meta: "SF GYM3" },
+  { id: "vwl_staatsverschuldung", fach: "VWL", title: "Staatsverschuldung", meta: "SF GYM3" },
+  { id: "vwl_sozialpolitik", fach: "VWL", title: "Sozialpolitik und Sozialversicherungen", meta: "SF GYM3" },
+  { id: "vwl_markteffizienz", fach: "VWL", title: "Markteffizienz", meta: "SF GYM2/GYM3" },
+  { id: "vwl_geld", fach: "VWL", title: "Geld, Geldpolitik und Finanzmärkte", meta: "SF GYM3–GYM4" },
   // ── BWL ──
-  {
-    id: "bwl_fibu",
-    fach: "BWL",
-    title: "Finanzbuchhaltung (FIBU)",
-    meta: "SF GYM1–GYM2",
-    questions: 222,
-    topics: 10
-  },
-  {
-    id: "bwl_einfuehrung",
-    fach: "BWL",
-    title: "Einführung BWL – Grundlagen der Betriebswirtschaftslehre",
-    meta: "SF GYM1",
-    questions: 68,
-    topics: 7
-  },
-  {
-    id: "bwl_marketing",
-    fach: "BWL",
-    title: "Markt- und Leistungsanalyse",
-    meta: "SF GYM3",
-    questions: 63,
-    topics: 6
-  },
-  {
-    id: "bwl_stratfuehrung",
-    fach: "BWL",
-    title: "Strategische Unternehmensführung",
-    meta: "SF GYM1",
-    questions: 65,
-    topics: 7
-  },
-  {
-    id: "bwl_unternehmensmodell",
-    fach: "BWL",
-    title: "Unternehmensmodell – Umweltsphären & Anspruchsgruppen",
-    meta: "SF GYM1",
-    questions: 71,
-    topics: 7
-  },
+  { id: "bwl_fibu", fach: "BWL", title: "Finanzbuchhaltung (FIBU)", meta: "SF GYM1–GYM2" },
+  { id: "bwl_einfuehrung", fach: "BWL", title: "Einführung BWL – Grundlagen der Betriebswirtschaftslehre", meta: "SF GYM1" },
+  { id: "bwl_marketing", fach: "BWL", title: "Markt- und Leistungsanalyse", meta: "SF GYM3" },
+  { id: "bwl_stratfuehrung", fach: "BWL", title: "Strategische Unternehmensführung", meta: "SF GYM1" },
+  { id: "bwl_unternehmensmodell", fach: "BWL", title: "Unternehmensmodell – Umweltsphären & Anspruchsgruppen", meta: "SF GYM1" },
   // ── Recht ──
-  {
-    id: "recht_einfuehrung",
-    fach: "Recht",
-    title: "Einführung Recht – Grundsätze der Rechtsordnung",
-    meta: "SF GYM1–GYM2",
-    questions: 56,
-    topics: 5
-  },
-  {
-    id: "recht_einleitungsartikel",
-    fach: "Recht",
-    title: "Rechtsquellen und Rechtsgrundsätze",
-    meta: "SF GYM1–GYM2",
-    questions: 56,
-    topics: 6
-  },
-  {
-    id: "recht_personenrecht",
-    fach: "Recht",
-    title: "Personenrecht",
-    meta: "SF GYM2",
-    questions: 52,
-    topics: 5
-  },
-  {
-    id: "recht_sachenrecht",
-    fach: "Recht",
-    title: "Sachenrecht",
-    meta: "SF GYM2",
-    questions: 69,
-    topics: 7
-  },
-  {
-    id: "recht_mietrecht",
-    fach: "Recht",
-    title: "Mietrecht",
-    meta: "SF GYM3",
-    questions: 80,
-    topics: 7
-  },
-  {
-    id: "recht_strafrecht",
-    fach: "Recht",
-    title: "Strafrecht – Grundlagen, Strafbarkeit und Strafzumessung",
-    meta: "SF GYM3–GYM4",
-    questions: 96,
-    topics: 10
-  },
-  {
-    id: "recht_grundrechte",
-    fach: "Recht",
-    title: "Menschenrechte und Grundrechte",
-    meta: "SF GYM2 / EWR GYM2",
-    questions: 55,
-    topics: 4
-  },
-  {
-    id: "recht_arbeitsrecht",
-    fach: "Recht",
-    title: "Arbeitsrecht",
-    meta: "SF GYM3–GYM4",
-    questions: 91,
-    topics: 8
-  },
-  {
-    id: "recht_prozessrecht",
-    fach: "Recht",
-    title: "Prozessrecht – Zivilprozess und Strafverfahren",
-    meta: "EWR GYM2",
-    questions: 59,
-    topics: 6
-  },
-  {
-    id: "recht_or_at",
-    fach: "Recht",
-    title: "OR AT – Vertragslehre",
-    meta: "SF GYM3–GYM4",
-    questions: 124,
-    topics: 9
-  },
+  { id: "recht_einfuehrung", fach: "Recht", title: "Einführung Recht – Grundsätze der Rechtsordnung", meta: "SF GYM1–GYM2" },
+  { id: "recht_einleitungsartikel", fach: "Recht", title: "Rechtsquellen und Rechtsgrundsätze", meta: "SF GYM1–GYM2" },
+  { id: "recht_personenrecht", fach: "Recht", title: "Personenrecht", meta: "SF GYM2" },
+  { id: "recht_sachenrecht", fach: "Recht", title: "Sachenrecht", meta: "SF GYM2" },
+  { id: "recht_mietrecht", fach: "Recht", title: "Mietrecht", meta: "SF GYM3" },
+  { id: "recht_strafrecht", fach: "Recht", title: "Strafrecht – Grundlagen, Strafbarkeit und Strafzumessung", meta: "SF GYM3–GYM4" },
+  { id: "recht_grundrechte", fach: "Recht", title: "Menschenrechte und Grundrechte", meta: "SF GYM2 / EWR GYM2" },
+  { id: "recht_arbeitsrecht", fach: "Recht", title: "Arbeitsrecht", meta: "SF GYM3–GYM4" },
+  { id: "recht_prozessrecht", fach: "Recht", title: "Prozessrecht – Zivilprozess und Strafverfahren", meta: "EWR GYM2" },
+  { id: "recht_or_at", fach: "Recht", title: "OR AT – Vertragslehre", meta: "SF GYM3–GYM4" },
 ];
 
 // ══════════════════════════════════════════
@@ -437,16 +262,48 @@ const FACH_COLORS = { VWL: "vwl", BWL: "bwl", Recht: "recht" };
 const FACH_DOT_COLORS = { VWL: "#f89907", BWL: "#01a9f4", Recht: "#73ab2c" };
 const CHEVRON_SVG = '<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
-function render() {
+// ── Dynamische Zähler: Pool-Configs laden und Fragen/Themen zählen ──
+async function loadPoolCounts() {
+  var results = await Promise.all(POOLS.map(async function(p) {
+    try {
+      var resp = await fetch('config/' + p.id + '.js');
+      if (!resp.ok) return { id: p.id, questions: 0, topics: 0 };
+      var code = await resp.text();
+      // QUESTIONS-Array zählen: Einträge mit id: "..."
+      var qMatches = code.match(/\n\s*\{\s*\n?\s*id:\s*"/g);
+      var questions = qMatches ? qMatches.length : 0;
+      // TOPICS-Objekt zählen: Keys in window.TOPICS = { ... }
+      var topicsBlock = code.match(/window\.TOPICS\s*=\s*\{([\s\S]*?)\n\};/);
+      var topics = 0;
+      if (topicsBlock) {
+        var topicKeys = topicsBlock[1].match(/"[^"]+"\s*:\s*\{/g);
+        topics = topicKeys ? topicKeys.length : 0;
+      }
+      return { id: p.id, questions: questions, topics: topics };
+    } catch (e) {
+      return { id: p.id, questions: 0, topics: 0 };
+    }
+  }));
+  // Counts auf POOLS übertragen
+  results.forEach(function(r) {
+    var pool = POOLS.find(function(p) { return p.id === r.id; });
+    if (pool) { pool.questions = r.questions; pool.topics = r.topics; }
+  });
+}
+
+async function render() {
   const container = document.getElementById('poolContent');
+
+  // Zähler dynamisch laden
+  await loadPoolCounts();
+
   let html = '';
 
   FACH_ORDER.forEach(fach => {
     const pools = POOLS.filter(p => p.fach === fach);
     const colorClass = FACH_COLORS[fach];
     const dotColor = FACH_DOT_COLORS[fach];
-    const totalQ = pools.reduce((s, p) => s + p.questions, 0);
-    // Fachbereiche mit Pools: offen. Leere: eingeklappt.
+    const totalQ = pools.reduce((s, p) => s + (p.questions || 0), 0);
     const isOpen = false;
 
     html += '<div class="fach-section fach-' + colorClass + (isOpen ? ' open' : '') + '">';
@@ -475,13 +332,15 @@ function render() {
     } else {
       html += '<div class="pool-grid">';
       pools.forEach(p => {
+        var q = p.questions || 0;
+        var t = p.topics || 0;
         html += '<a class="pool-card ' + colorClass + '" href="pool.html?pool=' + p.id + '">';
         html += '<button class="card-lz-btn" data-pool="' + p.id + '" onclick="event.preventDefault();event.stopPropagation();loadPoolLernziele(\'' + p.id + '\',\'' + p.title + '\')" title="Lernziele">🏁</button>';
         html += '<div class="pool-title">' + p.title + '</div>';
         html += '<div class="pool-meta">' + p.meta + '</div>';
         html += '<div class="pool-stats">';
-        html += '<span class="stat">' + p.questions + ' Aufgaben</span>';
-        html += '<span class="stat">' + p.topics + ' Themen</span>';
+        html += '<span class="stat">' + q + ' Aufgaben</span>';
+        html += '<span class="stat">' + t + ' Themen</span>';
         html += '</div>';
         html += '</a>';
       });
