@@ -270,7 +270,7 @@ function hatRecht(email, berechtigungen, mindestRecht) {
     var stufe = rechteStufen[b.recht] || 1;
     if (stufe < minStufe) continue;
 
-    if (b.email === email || b.email === email.toLowerCase()) return true;
+    if ((b.email || '').toLowerCase() === (email || '').toLowerCase()) return true;
     if (b.email === '*') return true;
     if (b.email.indexOf('fachschaft:') === 0 && lpInfo) {
       var fs = b.email.split(':')[1];
@@ -285,8 +285,9 @@ function hatRecht(email, berechtigungen, mindestRecht) {
  * Berücksichtigt: Eigentum, Admin, Pool, Berechtigungen, Legacy-geteilt-Feld.
  */
 function istSichtbar(email, item) {
-  var inhaber = item.autor || item.erstelltVon;
-  if (!inhaber || inhaber === email) return true;
+  var inhaber = (item.autor || item.erstelltVon || '').toLowerCase();
+  var emailLc = (email || '').toLowerCase();
+  if (!inhaber || inhaber === emailLc) return true;
 
   var lpInfo = getLPInfo(email);
   if (lpInfo && lpInfo.rolle === 'admin') return true;
@@ -317,8 +318,9 @@ function istSichtbar(email, item) {
  * Rückgabe: 'inhaber' | 'bearbeiter' | 'betrachter'
  */
 function ermittleRecht(email, item) {
-  var inhaber = item.autor || item.erstelltVon;
-  if (!inhaber || inhaber === email) return 'inhaber';
+  var inhaber = (item.autor || item.erstelltVon || '').toLowerCase();
+  var emailLc = (email || '').toLowerCase();
+  if (!inhaber || inhaber === emailLc) return 'inhaber';
 
   var lpInfo = getLPInfo(email);
   if (lpInfo && lpInfo.rolle === 'admin') return 'inhaber';
@@ -337,8 +339,9 @@ function ermittleRecht(email, item) {
  * Wird von ladeFragenbank verwendet (Performance: LP-Info nur 1× laden statt pro Frage).
  */
 function istSichtbarMitLP(email, item, lpInfo, istAdmin) {
-  var inhaber = item.autor || item.erstelltVon;
-  if (!inhaber || inhaber === email) return true;
+  var inhaber = (item.autor || item.erstelltVon || '').toLowerCase();
+  var emailLc = (email || '').toLowerCase();
+  if (!inhaber || inhaber === emailLc) return true;
   if (istAdmin) return true;
   if (item.quelle === 'pool') return true;
 
@@ -360,8 +363,9 @@ function istSichtbarMitLP(email, item, lpInfo, istAdmin) {
  * Optimierte Variante von ermittleRecht — bekommt lpInfo als Parameter.
  */
 function ermittleRechtMitLP(email, item, lpInfo, istAdmin) {
-  var inhaber = item.autor || item.erstelltVon;
-  if (!inhaber || inhaber === email) return 'inhaber';
+  var inhaber = (item.autor || item.erstelltVon || '').toLowerCase();
+  var emailLc = (email || '').toLowerCase();
+  if (!inhaber || inhaber === emailLc) return 'inhaber';
   if (istAdmin) return 'inhaber';
 
   var berechtigungen = parseBerechtigungen(item.berechtigungen);
@@ -382,7 +386,7 @@ function hatRechtMitLP(email, berechtigungen, mindestRecht, lpInfo) {
     var b = berechtigungen[i];
     var stufe = rechteStufen[b.recht] || 1;
     if (stufe < minStufe) continue;
-    if (b.email === email || b.email === email.toLowerCase()) return true;
+    if ((b.email || '').toLowerCase() === (email || '').toLowerCase()) return true;
     if (b.email === '*') return true;
     if (b.email.indexOf('fachschaft:') === 0 && lpInfo) {
       var fs = b.email.split(':')[1];
@@ -2432,11 +2436,9 @@ function speichereConfig(body) {
     if (existingRow >= 0) {
       // Rechte-Check: Inhaber, Admin oder Bearbeiter darf ändern
       const bestehendeRow = data[existingRow];
-      if (bestehendeRow.erstelltVon && bestehendeRow.erstelltVon !== email) {
-        var recht = ermittleRecht(email, bestehendeRow);
-        if (recht !== 'inhaber' && recht !== 'bearbeiter') {
-          return jsonResponse({ error: 'Keine Berechtigung zum Bearbeiten dieser Prüfung' });
-        }
+      var recht = ermittleRecht(email, bestehendeRow);
+      if (recht !== 'inhaber' && recht !== 'bearbeiter') {
+        return jsonResponse({ error: 'Keine Berechtigung zum Bearbeiten dieser Prüfung' });
       }
       const rowIndex = existingRow + 2;
       headers.forEach((header, colIndex) => {
@@ -2478,13 +2480,11 @@ function loeschePruefung(body) {
       return jsonResponse({ error: 'Prüfung nicht gefunden' });
     }
 
-    // Phase 2: Ownership-Check
+    // Phase 2: Ownership-Check (nur Ersteller oder Admin darf löschen)
     const row = data[rowIndex];
-    if (row.erstelltVon && row.erstelltVon !== email) {
-      var lpInfo = getLPInfo(email);
-      if (!lpInfo || lpInfo.rolle !== 'admin') {
-        return jsonResponse({ error: 'Nur die erstellende LP darf diese Prüfung löschen' });
-      }
+    var recht = ermittleRecht(email, row);
+    if (recht !== 'inhaber') {
+      return jsonResponse({ error: 'Nur die erstellende LP oder Admins dürfen diese Prüfung löschen' });
     }
 
     // Zeile löschen (rowIndex + 2 wegen Header-Zeile und 1-basiertem Index)
@@ -2754,12 +2754,10 @@ function ladeMonitoring(pruefungId, email) {
       return jsonResponse({ error: 'Prüfung nicht gefunden' });
     }
 
-    // SICHERHEIT: LP muss Ersteller sein oder Berechtigung haben
-    if (configRow.erstelltVon && configRow.erstelltVon !== email) {
-      const berechtigungen = safeJsonParse(configRow.berechtigungen, []);
-      if (!Array.isArray(berechtigungen) || !berechtigungen.some(function(b) { return b.email === email; })) {
-        return jsonResponse({ error: 'Kein Zugriff auf diese Prüfung' });
-      }
+    // SICHERHEIT: LP muss Ersteller, Admin oder berechtigt sein
+    var recht = ermittleRecht(email, configRow);
+    if (recht !== 'inhaber' && recht !== 'bearbeiter') {
+      return jsonResponse({ error: 'Kein Zugriff auf diese Prüfung' });
     }
 
     // Globales beendetUm aus Configs-Sheet prüfen
