@@ -3,8 +3,13 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
+// Base-Path: Standard = Production, überschreibbar für Staging via VITE_BASE_PATH
+const basePath = process.env.VITE_BASE_PATH || '/GYM-WR-DUY/Pruefung/'
+// RegExp für navigateFallbackAllowlist aus basePath ableiten
+const basePathEscaped = basePath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
 export default defineConfig({
-  base: '/GYM-WR-DUY/Pruefung/',
+  base: basePath,
   define: {
     __BUILD_TIMESTAMP__: JSON.stringify(new Date().toISOString()),
   },
@@ -21,8 +26,8 @@ export default defineConfig({
         theme_color: '#1e40af',
         background_color: '#f8fafc',
         display: 'standalone',
-        scope: '/GYM-WR-DUY/Pruefung/',
-        start_url: '/GYM-WR-DUY/Pruefung/',
+        scope: basePath,
+        start_url: basePath,
         icons: [
           {
             src: 'icon.svg',
@@ -36,7 +41,7 @@ export default defineConfig({
         clientsClaim: true,
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
         navigateFallback: 'index.html',
-        navigateFallbackAllowlist: [/^\/GYM-WR-DUY\/Pruefung(\/|$)/],
+        navigateFallbackAllowlist: [new RegExp(`^${basePathEscaped}(\\/|$)`)],
         // Statische Dateien (PDFs, Bilder, Audio/Video) NICHT durch SPA-Fallback ersetzen
         navigateFallbackDenylist: [/\.pdf$/i, /\.png$/i, /\.jpg$/i, /\.jpeg$/i, /\.gif$/i, /\.svg$/i, /\.mp3$/i, /\.mp4$/i, /\.webm$/i, /\/materialien\//],
       },

@@ -2,7 +2,7 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [main]
+    branches: [main, preview]
   workflow_dispatch:
 
 permissions:
@@ -18,7 +18,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      # Production immer von main bauen (auch wenn preview-Push den Workflow triggert)
       - uses: actions/checkout@v4
+        with:
+          ref: main
 
       - uses: actions/setup-node@v4
         with:
@@ -60,6 +63,35 @@ jobs:
           cp -r Pruefung/dist/* _site/Pruefung/
           # Clean up macOS artifacts
           find _site -name '.DS_Store' -delete
+
+      # === Staging: Pruefung vom preview-Branch bauen (falls vorhanden) ===
+      - name: Checkout preview branch
+        uses: actions/checkout@v4
+        with:
+          ref: preview
+          path: preview-src
+        continue-on-error: true
+        id: checkout-preview
+
+      - name: Install Staging dependencies
+        if: steps.checkout-preview.outcome == 'success'
+        working-directory: preview-src/Pruefung
+        run: npm ci
+
+      - name: Build Staging (Pruefung from preview)
+        if: steps.checkout-preview.outcome == 'success'
+        working-directory: preview-src/Pruefung
+        env:
+          VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
+          VITE_APPS_SCRIPT_URL: ${{ secrets.VITE_APPS_SCRIPT_URL }}
+          VITE_BASE_PATH: /GYM-WR-DUY/staging/
+        run: npx tsc -b && npx vite build
+
+      - name: Add staging to site
+        if: steps.checkout-preview.outcome == 'success'
+        run: |
+          mkdir -p _site/staging
+          cp -r preview-src/Pruefung/dist/* _site/staging/
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
