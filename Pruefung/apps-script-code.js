@@ -1603,6 +1603,19 @@ function heartbeat(body) {
       var ksoVal = getCol('kontrollStufeOverride');
       if (ksoVal) kontrollStufeOverride = String(ksoVal);
 
+      // RACE-CONDITION-SCHUTZ: speichereAntworten schreibt Zelle-für-Zelle,
+      // heartbeat schreibt die gesamte Zeile. Ohne Schutz überschreibt heartbeat
+      // die von speichereAntworten geschriebenen Werte mit veralteten Daten.
+      // → Vor dem Batch-Write die Antwort-Spalten frisch nachlesen.
+      var geschuetzteSpalten = ['antworten', 'version', 'letzterSave', 'istAbgabe', 'letzteRequestId'];
+      var frischeZeile = sheet.getRange(rowIndex, 1, 1, headers.length).getValues()[0];
+      for (var sc = 0; sc < geschuetzteSpalten.length; sc++) {
+        var scIdx = headers.indexOf(geschuetzteSpalten[sc]);
+        if (scIdx >= 0) {
+          rowValues[scIdx] = frischeZeile[scIdx];
+        }
+      }
+
       // Batch-Write: Gesamte Zeile einmal schreiben (statt ~15 einzelne setValue)
       rowRange.setValues([rowValues]);
 
