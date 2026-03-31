@@ -27,6 +27,141 @@
 
 ---
 
+## Session 41 — PDF Annotation Fix + Bug-Analyse (31.03.2026)
+
+### Erledigte Fixes
+
+| # | Fix | Branch | Status |
+|---|-----|--------|--------|
+| 1 | **KaTeX Doppel-Rendering** (CSS Race Condition) | main | ✅ deployed (LP-Test ausstehend) |
+| 2 | **PDF Annotation: Auswahl-Bug** | `fix/pdf-auswahl-toolswitch` | ⚠️ LP-Test ausstehend |
+
+#### Fix 1: KaTeX (main, noch nicht LP-bestätigt)
+CSS wurde nach JS geladen → `.katex-mathml { display: none }` war inaktiv bis CDN CSS geladen → Formel kurz 2× sichtbar.
+- `latexRenderer.ts`: CSS vor JS-Promise injizieren
+- `index.css`: `.katex-mathml { display: none !important }` als Permanentregel
+
+#### Fix 2: PDF Annotation Text-Properties (Branch: fix/pdf-auswahl-toolswitch)
+T-Dropdown-Button rief `onOpen={() => onWerkzeugWechsel('text')}` — wechselte Tool von 'auswahl' zu 'text'. Danach deselektierte jeder PDF-Klick die Annotation statt zu navigieren.
+
+**Root Cause:** ToolbarDropdown öffnet T-Panel und schaltet auf 'text'-Tool. Selektierte Annotation bleibt zwar gesetzt, aber alle folgenden PDF-Klicks platzieren neue Textannotation statt zu selektieren/deselektieren.
+
+**Fix:** In `PDFToolbar.tsx`: wenn `hatSelektierteTextAnnotation` → Properties (Grösse S/M/L/XL, Fett, Rotation) INLINE direkt im Toolbar anzeigen (kein Dropdown → kein Tool-Switch, kein Deselektions-Problem). Nur wenn keine Annotation ausgewählt: Dropdown öffnet + 'text'-Tool aktivieren.
+
+---
+
+### Analysierte aber noch nicht gefixte Bugs (nächste Session)
+
+**Wichtig:** Alle unten stehenden Bugs wurden analysiert und Root Causes identifiziert. Die Implementierung ist für die nächste Session vorbereitet.
+
+#### 🔴 KRITISCH 1: SuS kann nach Abgabe Prüfung erneut laden/abgeben
+
+**Root Cause (2 Szenarien):**
+
+**Szenario A — localStorage noch vorhanden:**
+In `App.tsx` Zeile 157: `if (config && config.id === result.config.id && phase !== 'start' && !wurdeZurueckgesetzt)` → Bedingung ist `true` wenn phase = `'abgegeben'` → `setPhase('start')` setzt Phase zurück!
+
+```typescript
+// BUGGY (App.tsx ~157):
+if (config && config.id === result.config.id && phase !== 'start' && !wurdeZurueckgesetzt) {
+  setWiederhergestellt(true)
+  usePruefungStore.getState().setPhase('start')  // ← SETZT 'abgegeben' auf 'start'!
+}
+
+// FIX:
+if (config && config.id === result.config.id && phase !== 'start' && phase !== 'abgegeben' && !wurdeZurueckgesetzt) {
+```
+
+**Szenario B — localStorage gelöscht (z.B. Incognito/Cache-Clear):**
+`ladePruefung` im Backend prüft die Antworten-Sheet NICHT. SuS bekommt frische Prüfung auch wenn `istAbgabe === 'true'` im Sheet steht.
+
+Fix in `apps-script-code.js` in `ladePruefung()` nach dem Klassen-Check:
+```javascript
+// Abgabe-Check (nur für SuS, nicht LP)
+if (!istLP && ANTWORTEN_MASTER_ID) {
+  try {
+    var antwortenSheet = SpreadsheetApp.openById(ANTWORTEN_MASTER_ID)
+      .getSheetByName('Antworten_' + pruefungId);
+    if (antwortenSheet) {
+      var antwortenData = getSheetData(antwortenSheet);
+      var susRow = antwortenData.find(function(r) {
+        return r.email && r.email.toLowerCase() === email.toLowerCase();
+      });
+      if (susRow && susRow.istAbgabe === 'true') {
+        return jsonResponse({ hatAbgegeben: true, abgabezeit: susRow.letzterSave || '' });
+      }
+    }
+  } catch(e) {
+    console.warn('[ladePruefung] Abgabe-Check fehlgeschlagen: ' + e.message);
+    // Bei Fehler: Prüfung normal laden (kein Datenverlust-Risiko)
+  }
+}
+```
+
+In `pruefungApi.ts`: Return-Type um `{ hatAbgegeben: true } | null` erweitern.
+In `App.tsx`: Wenn `result.hatAbgegeben === true` → `usePruefungStore.getState().setAbgegeben()` aufrufen.
+
+⚠️ **Apps Script Deploy nötig nach diesem Fix.**
+
+---
+
+#### 🔴 KRITISCH 2: LP Live-Tab zeigt abgegebene SuS noch als aktiv
+
+Zu analysieren: `ladeMonitoring()` gibt `status` aus dem Antworten-Sheet zurück. Wenn SuS abgegeben hat, sollte `istAbgabe === 'true'` sein. Prüfen ob Monitoring diesen Status korrekt mapped (Abgegeben vs. Online).
+
+---
+
+#### 🟠 Login-Screen flackert nach Login zurück
+
+**Root Cause (Vermutung):** Doppelklick beim Login → zweite `signIn()`-Anfrage während erste läuft → Race Condition setzt Auth-State kurz zurück.
+**Zu prüfen:** `LoginScreen.tsx` — gibt es Debouncing/Loading-State beim Login-Button?
+
+---
+
+#### 🟠 NaN-Note in Auswertung/Korrektur
+
+**Zu prüfen:** Wo wird Note berechnet? Wahrscheinlich in `korrekturUtils.ts`. Wenn `erreichtePunkte` oder `gesamtpunkte` `undefined`/`NaN` ist → `NaN / NaN * 6 = NaN`.
+**Files:** `Pruefung/src/utils/korrekturUtils.ts`, Korrektur-Komponenten.
+
+---
+
+#### 🟡 Beendete Prüfung öffnen: direkt zu Auswertung-Tab
+
+**Root Cause:** LP öffnet Prüfung mit `?id=` → `DurchfuehrenDashboard` startet immer auf "Durchführen"-Tab. Wenn `configRow.status === 'beendet'`, sollte initial Tab = 'auswertung' sein.
+**File:** `Pruefung/src/components/lp/DurchfuehrenDashboard.tsx`
+
+---
+
+#### 🟡 PDF-Korrektur: fehlender Zurück-Button
+
+Wenn LP PDF-Korrektur öffnet, gibt es kein Zurück zur Korrekturübersicht.
+**File:** Suchen in `Pruefung/src/components/lp/` (KorrekturPDFAnsicht o.ä.)
+
+---
+
+#### 🟡 Excel-Export: Backup-Button entfernen
+
+Nur der detaillierte Export soll bleiben. Redundanten Backup-Button entfernen.
+**File:** Suchen in `Pruefung/src/components/lp/` (AuswertungPanel o.ä.)
+
+---
+
+#### 🟢 PDF-Frage: Scroll-Verhalten verbessern
+
+PDF-Viewer scrollt nicht wenn Maus neben dem PDF ist. `overflow-auto` Container mit `maxHeight: 85vh` in `PDFViewer.tsx`.
+**Möglicher Fix:** `overflow-y: auto` auf äusserem Container statt nur auf PDF-Viewer.
+
+---
+
+### Branch-Status
+
+| Branch | Inhalt | Nächster Schritt |
+|--------|--------|-----------------|
+| `main` | KaTeX Fix (Session 41) | LP testet KaTeX (Formel-Frage) |
+| `fix/pdf-auswahl-toolswitch` | PDF Annotation Auswahl-Fix | LP testet PDF-Annotation → bei OK: merge |
+
+---
+
 ## Session 40 — Ownership-Fix + E2E-Test (31.03.2026)
 
 Kritischer Bug gefunden und gefixt: LP mit Admin-Rolle hatte keinen Monitoring-Zugriff auf fremde Prüfungen. Zusätzlich alle Email-Vergleiche in Ownership-Checks case-insensitive gemacht.
