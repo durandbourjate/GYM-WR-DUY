@@ -27,30 +27,40 @@
 
 ---
 
-## Session 38 — E2E-Test + KRITISCHER Bug-Fix (31.03.2026)
+## Session 38 — E2E-Tests + Security Hardening + Bug-Fixes (31.03.2026)
 
-Vollständiger E2E-Test mit LP + SuS (Chrome-in-Chrome). Alle 23 Fragetypen gerendert ✅. Kritischer Datenverlust-Bug entdeckt und gefixt.
+Umfassende E2E-Tests mit LP + SuS (Chrome-in-Chrome). Kritische Bugs gefunden und gefixt. Security-Audit + 3 Härtungen. Mehrere Runden Testing.
 
-### KRITISCH: Race Condition — Heartbeat überschreibt Antworten
+### KRITISCH: Heartbeat Race Condition (3 Iterationen)
 
-`heartbeat()` las die gesamte Sheet-Zeile (`getValues`), modifizierte nur Monitoring-Felder und schrieb die gesamte Zeile zurück (`setValues`). `speichereAntworten()` schrieb dazwischen Zelle-für-Zelle. Heartbeat überschrieb dabei die `antworten`-Spalte mit dem veralteten leeren Wert.
+`heartbeat()` las die gesamte Sheet-Zeile und schrieb sie zurück → überschrieb `speichereAntworten()`-Daten.
 
-- Heartbeat: alle 10s, Auto-Save: alle 30s → min. 2 Heartbeats zwischen jedem Save
-- Frontend meldete "Gespeichert ✓" (Backend gab `success: true`), aber Heartbeat löschte die Daten sofort wieder
-- **Fix:** Vor Batch-Write im Heartbeat die geschützten Spalten (`antworten`, `version`, `letzterSave`, `istAbgabe`, `letzteRequestId`) frisch nachlesen
+- **v1 Fix:** Geschützte Spalten vor Batch-Write nachlesen → unzureichend (Timing-Fenster)
+- **v3 Fix (final):** Heartbeat schreibt NUR seine ~15 eigenen Spalten einzeln. Kein Batch-Write mehr. `speichereAntworten`-Spalten werden vom Heartbeat NIE angefasst → Race Condition eliminiert.
 
-### Fix 2: Audio-Aufnahme "enthält keine Daten"
+### Audio-Aufnahme "enthält keine Daten"
 
-`recorder.start(1000)` mit timeslice produzierte leere Chunks → `blob.size === 0`. Zusätzlich: Permission-Dialog verzögert `getUserMedia`, User klickt nochmals → zweiter Recorder überschreibt `chunksRef`.
+`recorder.start(1000)` mit timeslice produzierte leere Chunks. Doppelklick durch Permission-Dialog erstellte zweiten Recorder.
 
 - **Fix:** `recorder.start()` ohne timeslice + Doppelklick-Guard + sofortiges `setStatus('recording')`
-- **Verifiziert:** Audio-Player erscheint nach Stopp, Aufnahme abspielbar ✅
+- **Verifiziert:** Audio-Aufnahme + Playback funktioniert ✅
+
+### Security Hardening
+
+| # | Fix | Details |
+|---|-----|---------|
+| 1 | **Rate Limiting** | 4 SuS-Endpoints (speichereAntworten 10/min, heartbeat 15/min, ladePruefung 10/min, ladeKorrekturenFuerSuS 10/min). LP nicht limitiert. |
+| 2 | **Server-seitige Timer-Validierung** | Bei Abgabe: Backend prüft erlaubte Zeit (dauerMinuten + Nachteilsausgleich + 2min Puffer). Logging, keine Blockierung. |
+| 3 | **Session-Token an Prüfung gebunden** | `validiereSessionToken_()` prüft neu auch `pruefungId`. Cross-Exam Token Reuse verhindert. |
 
 ### Weitere Fixes
 
 | # | Fix | Details |
 |---|-----|---------|
-| 1 | **TypeScript Build-Fehler** | `global` → `globalThis` in 2 Test-Dateien (3 Stellen), Type-Assertion für `result.optionen` |
+| 1 | **TypeScript Build-Fehler** | `global` → `globalThis` in 2 Test-Dateien, Type-Assertion für `result.optionen` |
+| 2 | **Material-PDF CSP blockiert** | `frame-src` fehlte `'self'` → lokale PDFs wurden geblockt |
+| 3 | **Abgabe-Status "aktiv" statt "abgegeben"** | Heartbeat v1 überschrieb `istAbgabe` → v3 Fix |
+| 4 | **DragDrop/Bildbeschriftung "nicht platziert"** | Selbe Race Condition → v3 Fix |
 
 ### E2E-Test Ergebnis
 
@@ -65,10 +75,27 @@ Vollständiger E2E-Test mit LP + SuS (Chrome-in-Chrome). Alle 23 Fragetypen gere
 | Bestätigungsseite (Name + E-Mail) | ✅ |
 | LP Live-Monitoring (Status, Frage, %) | ✅ |
 | LP Auswertung + Auto-Korrektur | ✅ |
-| Musterlösung + Korrektur-Vollansicht | ✅ |
-| **Antworten im Backend** | 🔴→✅ (nach Fix) |
+| Audio-Aufnahme + Playback | ✅ |
+| PDF-Tools (Stift, Farbe, Textmarker, Kommentar) | ✅ |
+| Rate Limiting (16. Heartbeat blockiert) | ✅ |
+| Token-Binding (falscher pruefungId → rejected) | ✅ |
+| Antworten im Backend nach Heartbeats | ✅ (v3) |
 
-### Apps Script Deploy nötig ✅ 31.03.2026
+### Offen (nächste Session verifizieren)
+
+| # | Problem | Status |
+|---|---------|--------|
+| — | Code-Editor (F17) kann nicht tippen | Nicht reproduzierbar, vermutlich stale localStorage-State |
+| — | Heartbeat v3 + Security Fixes | ⚠️ **Apps Script Deploy nötig** |
+| — | Material-PDF CSP Fix | ⚠️ **GitHub Pages Build nötig** (auto nach Push) |
+
+### Tests
+
+192 grün (+2 neue Security-Regression-Tests). `tsc -b` sauber. Build OK.
+
+### Test-Account
+
+`wr.test@gymhofwil.ch` (Kürzel WRT) als LP mit Fachschaft WR + Admin im Lehrpersonen-Tab eingetragen.
 
 ---
 
