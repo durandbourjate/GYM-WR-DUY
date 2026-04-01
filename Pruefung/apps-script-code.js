@@ -1582,17 +1582,17 @@ function heartbeat(body) {
     // Ausnahme: Warteraum-Heartbeats (kein Token, da ladePruefung noch nicht aufgerufen)
     // → erlaubt ohne Token, aber nur mit Rate Limiting und minimaler Funktionalität
     var istWarteraumHeartbeat = false;
-    if (!istZugelasseneLP(email)) {
+    // Warteraum-Heartbeat erkennen: SuS-Domain + keine aktuelleFrage (unabhängig vom Token)
+    // Wichtig: VOR der Token-Prüfung, damit Warteraum-Heartbeats mit altem Token
+    // nicht den authentifizierten hb-Bucket füllen und sich selbst rate-limiten
+    if (!istZugelasseneLP(email) && email.endsWith('@stud.gymhofwil.ch') && body.aktuelleFrage === undefined) {
+      istWarteraumHeartbeat = true;
+      // Rate Limiting für Warteraum-Heartbeats (pollt alle 5s = 12/min)
+      var rlWr = rateLimitCheck_('hb-wr', email, 15, 60);
+      if (rlWr.blocked) return jsonResponse({ error: rlWr.error });
+    } else if (!istZugelasseneLP(email)) {
       if (!sessionToken || !validiereSessionToken_(sessionToken, email, pruefungId)) {
-        // Prüfe ob es ein Warteraum-Heartbeat sein könnte (SuS-Domain, keine aktuelleFrage)
-        if (email.endsWith('@stud.gymhofwil.ch') && body.aktuelleFrage === undefined) {
-          istWarteraumHeartbeat = true;
-          // Rate Limiting für unauthentifizierte Heartbeats (Warteraum pollt alle 5s = 12/min)
-          var rlWr = rateLimitCheck_('hb-wr', email, 15, 60);
-          if (rlWr.blocked) return jsonResponse({ error: rlWr.error });
-        } else {
-          return jsonResponse({ error: 'Nicht autorisiert' });
-        }
+        return jsonResponse({ error: 'Nicht autorisiert' });
       } else {
         // Rate Limiting: max 15 Heartbeats pro Minute (normal: 6/min bei 10s-Intervall)
         var rl = rateLimitCheck_('hb', email, 15, 60);
