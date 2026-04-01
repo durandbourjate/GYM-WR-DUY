@@ -87,9 +87,24 @@ export default function App() {
       const storeAbgegeben = usePruefungStore.getState().abgegeben
       const storeAntworten = usePruefungStore.getState().antworten
 
-      // SICHERHEIT: Wenn Backend verfuegbar → IMMER Backend-Check bei Reload
-      // Verhindert dass localStorage-State ohne Backend-Bestaetigung vertraut wird
-      // (z.B. SuS hat abgegeben aber Backend-Save schlug fehl → muss nochmal abgeben koennen)
+      // SICHERHEIT: Lokaler Abgabe-Schutz (erste Verteidigungslinie)
+      // Wenn der lokale State abgegeben=true hat, SOFORT Abgabe-Screen zeigen.
+      // Das Backend wird zusätzlich geprüft, aber der lokale State verhindert Re-Entry
+      // selbst wenn der Backend-Save fehlschlug.
+      if (storeAbgegeben && user!.rolle !== 'lp') {
+        console.log('[App] Lokaler State: abgegeben=true — Abgabe-Screen erzwingen (Re-Entry-Schutz)')
+        // Config aus Store wiederherstellen falls vorhanden (für AbgabeBestaetigung)
+        const storeConfig = usePruefungStore.getState().config
+        if (storeConfig) {
+          setPruefungsConfig(storeConfig)
+          const resolved = resolveFragenFuerPruefung(storeConfig, storeFragen || [])
+          setPruefungsFragen(resolved.navigationsFragen)
+          setPruefungsAlleFragen(resolved.alleFragen)
+        }
+        usePruefungStore.getState().pruefungAbgeben()
+        return
+      }
+
       // Session-Recovery NUR wenn kein Backend oder Demo-Modus
       if (config && config.id === pruefungIdAusUrl && phase !== 'start' && !storeAbgegeben && storeFragen && storeFragen.length > 0
           && (!apiService.istKonfiguriert() || istDemoModus)) {

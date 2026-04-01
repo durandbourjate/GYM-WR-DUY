@@ -66,17 +66,28 @@ interface AuthStore {
 }
 
 /**
- * Räumt den Prüfungszustand auf — aber NUR wenn die Prüfung bereits abgegeben
- * oder beendet wurde. Bei laufender Prüfung bleibt der State erhalten,
- * damit SuS sich nach Browser-Crash wieder einloggen können.
+ * Räumt den Prüfungszustand auf bei Re-Login.
+ * KRITISCH: Bei bereits abgegebener Prüfung wird der State NICHT gelöscht,
+ * sondern beibehalten — damit App.tsx den Abgabe-Screen sofort zeigen kann.
+ * Nur bei laufender Prüfung (nicht abgegeben, nicht beendet) bleibt alles erhalten
+ * für Browser-Crash-Recovery.
+ * Bei beendeter Prüfung (LP hat beendet) wird aufgeräumt, da App.tsx
+ * den Status ohnehin vom Backend holt.
  */
 function resetPruefungState(): void {
   const pruefungId = new URLSearchParams(window.location.search).get('id') || 'default'
   const state = usePruefungStore.getState()
 
-  // Nur aufräumen wenn abgegeben oder beendet — NICHT bei laufender Prüfung!
-  if (state.abgegeben || state.beendetUm) {
-    console.log(`[auth] Prüfung ${pruefungId}: State wird aufgeräumt (abgegeben=${state.abgegeben}, beendet=${!!state.beendetUm})`)
+  if (state.abgegeben) {
+    // NICHT löschen! abgegeben=true bleibt erhalten als lokale Absicherung.
+    // App.tsx prüft abgegeben und zeigt direkt den Abgabe-Screen.
+    console.log(`[auth] Prüfung ${pruefungId}: Bereits abgegeben — State wird BEIBEHALTEN (Re-Entry-Schutz)`)
+    return
+  }
+
+  if (state.beendetUm) {
+    // LP hat beendet → aufräumen, Backend liefert istBeendet=true
+    console.log(`[auth] Prüfung ${pruefungId}: LP-beendet — State wird aufgeräumt`)
     usePruefungStore.getState().zuruecksetzen()
     try { localStorage.removeItem(`pruefung-state-${pruefungId}`) } catch { /* ignore */ }
     clearIndexedDB(pruefungId).catch(() => {})

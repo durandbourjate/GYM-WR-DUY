@@ -1491,10 +1491,11 @@ function speichereAntworten(body) {
     const data = getSheetData(sheet);
     const existingRow = data.findIndex(row => row.email === email);
 
-    // SICHERHEIT: Bereits abgegeben → keine normalen Saves mehr, aber erneute Abgabe erlauben
-    // (SuS-Frontend kann Abgabe wiederholen wenn der erste Save fehlschlug)
-    if (existingRow >= 0 && data[existingRow].istAbgabe === 'true' && !istAbgabe && !istZugelasseneLP(email)) {
-      return jsonResponse({ error: 'Bereits abgegeben — keine Änderungen mehr möglich' });
+    // SICHERHEIT: Bereits abgegeben → KOMPLETT blockieren (keine Saves, keine erneute Abgabe)
+    // Verhindert Datenüberschreibung bei Re-Entry. LP-Saves sind ausgenommen (Korrektur).
+    if (existingRow >= 0 && data[existingRow].istAbgabe === 'true' && !istZugelasseneLP(email)) {
+      console.log('[SECURITY] Save blockiert: ' + email + ' hat bereits abgegeben bei ' + pruefungId);
+      return jsonResponse({ success: true, bereitsAbgegeben: true });
     }
 
     // Idempotenz-Check: Gleiche requestId = bereits verarbeitet
@@ -1578,13 +1579,25 @@ function heartbeat(body) {
     const { pruefungId, email, timestamp, sessionToken } = body;
 
     // SICHERHEIT: Session-Token mandatory für SuS (+ Prüfungs-Binding)
+    // Ausnahme: Warteraum-Heartbeats (kein Token, da ladePruefung noch nicht aufgerufen)
+    // → erlaubt ohne Token, aber nur mit Rate Limiting und minimaler Funktionalität
+    var istWarteraumHeartbeat = false;
     if (!istZugelasseneLP(email)) {
       if (!sessionToken || !validiereSessionToken_(sessionToken, email, pruefungId)) {
-        return jsonResponse({ error: 'Nicht autorisiert' });
+        // Prüfe ob es ein Warteraum-Heartbeat sein könnte (SuS-Domain, keine aktuelleFrage)
+        if (email.endsWith('@stud.gymhofwil.ch') && body.aktuelleFrage === undefined) {
+          istWarteraumHeartbeat = true;
+          // Strengeres Rate Limiting für unauthentifizierte Heartbeats
+          var rlWr = rateLimitCheck_('hb-wr', email, 8, 60);
+          if (rlWr.blocked) return jsonResponse({ error: rlWr.error });
+        } else {
+          return jsonResponse({ error: 'Nicht autorisiert' });
+        }
+      } else {
+        // Rate Limiting: max 15 Heartbeats pro Minute (normal: 6/min bei 10s-Intervall)
+        var rl = rateLimitCheck_('hb', email, 15, 60);
+        if (rl.blocked) return jsonResponse({ error: rl.error });
       }
-      // Rate Limiting: max 15 Heartbeats pro Minute (normal: 6/min bei 10s-Intervall)
-      var rl = rateLimitCheck_('hb', email, 15, 60);
-      if (rl.blocked) return jsonResponse({ error: rl.error });
     }
 
     const sheet = getOrCreateAntwortenSheet(pruefungId);
@@ -1712,26 +1725,19 @@ function heartbeat(body) {
       var ksoVal = getCol('kontrollStufeOverride');
       if (ksoVal) kontrollStufeOverride = String(ksoVal);
 
-      // RACE-CONDITION-SCHUTZ v4: Heartbeat schreibt NUR seine eigenen Spalten.
-      // Antwort-Spalten (antworten, version, letzterSave, istAbgabe, letzteRequestId, zeitUeberschritten)
-      // werden NICHT angefasst. Batch-Write: Alle Heartbeat-Spalten in einem einzigen setValues()-Call.
-      // Frontend-seitige Request-Serialisierung verhindert zusätzlich concurrent Writes.
+      // RACE-CONDITION-SCHUTZ v5: Heartbeat schreibt NUR seine eigenen Spalten
+      // via einzelne setValue()-Calls. NIEMALS die ganze Zeile zurückschreiben!
+      // Grund: Zwischen Batch-Read und Write könnte speichereAntworten istAbgabe=true
+      // gesetzt haben — ein setValues() der ganzen Zeile würde das überschreiben.
       var heartbeatSpalten = ['letzterHeartbeat', 'heartbeats', 'aktuelleFrage', 'beantworteteFragen',
         'gesamtFragen', 'autoSaveCount', 'tabSessionId', 'geraet', 'vollbild', 'kontrollStufe',
         'verstossZaehler', 'gesperrt', 'verstoesse', 'entsperrt'];
-      // Nur die betroffenen Spalten per Batch schreiben (statt 14 einzelne setValue-Calls)
       for (var hc = 0; hc < heartbeatSpalten.length; hc++) {
         var hcIdx = headers.indexOf(heartbeatSpalten[hc]);
         if (hcIdx >= 0) {
-          // Werte in rowValues sind bereits gesetzt (via setCol oben)
-          // Sammle zusammenhängende Bereiche für effizienten Write
+          sheet.getRange(rowIndex, hcIdx + 1).setValue(rowValues[hcIdx]);
         }
       }
-      // Gesamte Zeile zurückschreiben — aber nur Heartbeat-Spalten wurden verändert (via setCol).
-      // Da speichereAntworten-Spalten im rowValues NICHT modifiziert wurden (kein setCol dafür),
-      // bleiben sie beim Zurückschreiben auf ihrem aktuellen Wert aus dem initialen Read (Zeile 1633).
-      // Die Frontend-Request-Queue stellt sicher, dass kein speichereAntworten gleichzeitig läuft.
-      rowRange.setValues([rowValues]);
 
       // Beenden-Signal prüfen (individuell → global)
       var beendetUm = null;
