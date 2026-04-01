@@ -2021,6 +2021,14 @@ function resetPruefungEndpoint(body) {
         var sebCol = headers.indexOf('sebAusnahmen');
         if (sebCol >= 0) configSheet.getRange(i + 1, sebCol + 1).setValue('[]');
 
+        // zeitverlaengerungen → {} (Nachteilsausgleiche zurücksetzen)
+        var zvCol = headers.indexOf('zeitverlaengerungen');
+        if (zvCol >= 0) configSheet.getRange(i + 1, zvCol + 1).setValue('{}');
+
+        // kontrollStufe → 'standard' (sicherster Default)
+        var ksCol = headers.indexOf('kontrollStufe');
+        if (ksCol >= 0) configSheet.getRange(i + 1, ksCol + 1).setValue('standard');
+
         // durchfuehrungId → neue UUID (damit SuS stale State erkennen)
         var dfIdCol = headers.indexOf('durchfuehrungId');
         if (dfIdCol < 0) {

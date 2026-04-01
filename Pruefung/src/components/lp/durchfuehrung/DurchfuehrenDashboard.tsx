@@ -227,8 +227,7 @@ export default function DurchfuehrenDashboard({ pruefungId }: { pruefungId: stri
     if (abgabenGeladen.current || !user) return
     async function ladeAbgabenUndFragen() {
       if (istDemoModus || !apiService.istKonfiguriert() || !pruefungId || pruefungId === 'demo') {
-        // Alle Demo-Fragen ausser einrichtungsFragen (erkennbar am Prefix 'einr-')
-        setFragen(demoFragen.filter((f) => !f.id.startsWith('einr-')))
+        setFragen(demoFragen)
         abgabenGeladen.current = true
         return
       }
@@ -555,7 +554,16 @@ export default function DurchfuehrenDashboard({ pruefungId }: { pruefungId: stri
                           setAbgaben({})
                           setFragen([])
                           // Config sofort lokal zurücksetzen (verhindert phase='beendet')
-                          const resetConfig = { ...config, freigeschaltet: false, beendetUm: undefined, teilnehmer: [], sebAusnahmen: [], durchfuehrungId: crypto.randomUUID() }
+                          const resetConfig = {
+                          ...config,
+                          freigeschaltet: false,
+                          beendetUm: undefined,
+                          teilnehmer: [],
+                          sebAusnahmen: [],
+                          zeitverlaengerungen: {},
+                          kontrollStufe: 'standard' as const,
+                          durchfuehrungId: crypto.randomUUID(),
+                        }
                           setConfig(resetConfig)
                           // URL-Parameter ?tab=... löschen (verhindert Tab-Sprung zu Auswertung)
                           const url = new URL(window.location.href)
