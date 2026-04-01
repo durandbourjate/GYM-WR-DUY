@@ -1,4 +1,26 @@
-# Regression Prevention — Pflichtworkflow (ab Session 39)
+# Regression Prevention — Pflichtworkflow
+
+> **HARD-STOP-REGELN** (nicht verhandelbar, keine Ausnahmen):
+> 1. **KEIN Commit auf `main`.** Immer Feature/Fix-Branch.
+> 2. **KEIN Merge ohne Browser-Test.** "Mach weiter" = "weiter testen", nicht "weiter mergen".
+> 3. **KEIN Browser-Test ohne schriftlichen Test-Plan.** Erst Plan, dann klicken.
+> 4. **KEINE Security-Phase ueberspringen.** Phase 4 ist Pflicht, nicht optional.
+> 5. **KEIN Raten.** Immer zuerst im Browser verifizieren, dann Code aendern.
+
+## Phase 0: Session-Start (VOR allem anderen)
+
+Jede neue Session beginnt mit diesen Schritten — keine Ausnahmen:
+
+1. **HANDOFF.md lesen** — Was ist der aktuelle Stand? Was steht an?
+2. **Arbeitsplan erstellen** — Konkrete Liste: Was wird heute gemacht, in welcher Reihenfolge?
+3. **Test-Plan schreiben** (wenn Tests anstehen) — Pro Bug/Feature:
+   - Was genau testen?
+   - Erwartetes Verhalten (vorher/nachher)?
+   - Welche Regressions-Risiken?
+   - Welche Security-Aspekte pruefen?
+4. **Erst dann** Browser/Tabs oeffnen und arbeiten.
+
+**Token-Budget:** Session-Start (Handoff lesen + Plan) darf max. 5% der Tokens brauchen. Keine ueberfluessigen Screenshots, kein Explorieren ohne Plan.
 
 ## Phase 1: Analyse & Planung (VOR jeder Code-Aenderung)
 
@@ -62,11 +84,46 @@ Alle 3 muessen gruen sein BEVOR im Browser getestet wird.
 
 ## Phase 3: E2E-Browser-Test (Chrome-in-Chrome)
 
+### 3.0 Test-Plan schreiben (PFLICHT, VOR dem Testen)
+
+Bevor ein Tab geoeffnet wird, muss ein schriftlicher Test-Plan im Chat stehen:
+
+```
+## Test-Plan: [Bug/Feature-Name]
+
+### Zu testende Aenderungen
+| # | Aenderung | Erwartetes Verhalten | Regressions-Risiko |
+|---|-----------|---------------------|-------------------|
+| 1 | ... | ... | ... |
+
+### Security-Check fuer diese Aenderung
+- [ ] Leakt die Aenderung Loesungsdaten? → Wie pruefen?
+- [ ] Ermoelicht sie Rollen-Bypass? → Wie pruefen?
+- [ ] Erleichtert sie Fraud? → Wie pruefen?
+- [ ] Schwaecht sie bestehende Sicherheit? → Wie pruefen?
+
+### Betroffene kritische Pfade (aus 1.3)
+- [ ] Pfad X → Was genau pruefen?
+
+### Regressions-Tests (verwandte Funktionen)
+- [ ] ...
+```
+
+Ohne diesen Plan: KEIN Testen starten. Das verhindert planloses Durchklicken.
+
 ### Setup
 
+- **Echte Logins, KEIN Demo-Modus.** Tests im Demo-Modus sind wertlos — sie testen nicht das Backend, keine API-Calls, keine Authentifizierung, keine Datenbank-Interaktion.
+- **Chrome-in-Chrome Tab-Gruppe:** Claude erstellt eine Tab-Gruppe (`tabs_context_mcp` mit `createIfEmpty: true`). Der User loggt Claude in den Tabs ein (LP + SuS). Claude testet erst NACHDEM der User die Logins gemacht hat.
+- **Ablauf:**
+  1. Claude erstellt Tab-Gruppe und sagt dem User Bescheid
+  2. User gibt 2 Tabs in die Gruppe (oder Claude erstellt sie) und loggt ein:
+     - Tab 1: LP = wr.test@gymhofwil.ch
+     - Tab 2: SuS = wr.test@stud.gymhofwil.ch
+  3. User meldet "kannst loslegen"
+  4. Claude testet gemaess Test-Plan
 - **Kontrollstufe: Locker** (damit Logging/Konsole/Netzwerk pruefbar)
 - **Test-Pruefung:** "Einrichtungspruefung — Lerne das Pruefungstool kennen" (enthaelt alle Fragetypen)
-- **Test-Accounts:** LP = wr.test@gymhofwil.ch, SuS = wr.test@stud.gymhofwil.ch
 - LP muss den Test-SuS in der Lobby hinzufuegen
 
 ### LP-Testpfad
@@ -132,7 +189,24 @@ Nach jeder Aenderung diese Checkliste durchgehen:
 
 ## Phase 5: Review & Merge
 
-1. **Claude meldet: "Bereit fuer LP-Test"** — mit Zusammenfassung was geaendert wurde
+### Merge-Gate (HARD-STOP)
+
+Bevor `git merge` auf `main` ausgefuehrt wird, muessen ALLE diese Bedingungen erfuellt sein:
+
+- [ ] Browser-Test durchgefuehrt (Phase 3) — mit dokumentiertem Ergebnis
+- [ ] Security-Verifikation durchgefuehrt (Phase 4) — mit dokumentiertem Ergebnis
+- [ ] LP hat explizit "Merge OK" oder "Freigabe" geschrieben
+- [ ] HANDOFF.md ist aktualisiert
+
+**Wenn auch nur ein Punkt fehlt: NICHT mergen.** Stattdessen melden was fehlt.
+
+### Ablauf
+
+1. **Claude meldet: "Bereit fuer LP-Test"** — mit Zusammenfassung:
+   - Was geaendert wurde
+   - Browser-Test-Ergebnisse (bestanden/fehlgeschlagen)
+   - Security-Check-Ergebnisse
+   - Offene Punkte / Risiken
 2. **LP testet im Browser** (deployed via `npm run preview` oder Feature-Branch)
 3. **Erst nach LP-Freigabe:**
    - `git checkout main && git merge feature/...`
@@ -166,6 +240,11 @@ Wenn `apiClient.ts`, `pruefungApi.ts`, `korrekturUtils.ts` oder `apps-script-cod
 
 - Direkt auf `main` committen
 - Ohne Browser-Test mergen
+- Ohne schriftlichen Test-Plan testen
+- Ohne Security-Check (Phase 4) mergen
+- Ohne LP-Freigabe mergen
 - Raten statt im Browser verifizieren
 - Security-Massnahmen implementieren die Kernfunktionalitaet blockieren
 - Deployen waehrend aktiver Pruefungen
+- Session-Start mit Browser-Aktionen bevor Handoff gelesen und Plan erstellt ist
+- Planlos durch die Pruefung klicken statt gezielt Bug-spezifisch zu testen
