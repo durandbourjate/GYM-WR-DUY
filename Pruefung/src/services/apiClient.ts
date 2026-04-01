@@ -9,6 +9,19 @@ export function istKonfiguriert(): boolean {
 /** Standard-Timeout für API-Calls (30s — Apps Script kann langsam sein) */
 const DEFAULT_TIMEOUT_MS = 30_000
 
+// === Write-Serialisierung (nur SuS-Writes) ===
+// Heartbeat und speichereAntworten (beide via postBool) dürfen nicht parallel laufen,
+// weil sie in dieselbe Sheet-Zeile schreiben → Race Condition.
+// LP-GETs (Monitoring, Nachrichten, Config) bleiben parallel — keine Queue.
+let writeQueue: Promise<unknown> = Promise.resolve()
+
+/** Reiht einen SuS-Write in die serielle Queue ein. Wartet auf vorherigen Write. */
+function enqueueWrite<T>(fn: () => Promise<T>): Promise<T> {
+  const queued = writeQueue.then(fn, fn) // Auch nach Fehler weiter
+  writeQueue = queued.then(() => {}, () => {}) // Fehler nicht propagieren in Queue
+  return queued
+}
+
 /** Fetch mit AbortController-Timeout. Optionaler externer AbortSignal für Caller-Cancellation. */
 function fetchMitTimeout(
   url: string,
@@ -63,7 +76,7 @@ export async function postJson<T>(
         console.error(`[API] ${action}:`, data.error)
         return null
       }
-      return data
+      return data as T
     } catch {
       console.error(`[API] ${action}: Antwort ist kein JSON`)
       return null
@@ -78,37 +91,40 @@ export async function postJson<T>(
   }
 }
 
-/** POST-Request der boolean zurückgibt (success-Feld) */
+/** POST-Request der boolean zurückgibt (success-Feld).
+ *  Läuft durch Write-Queue (serialisiert heartbeat + speichereAntworten). */
 export async function postBool(
   action: string,
   payload: Record<string, unknown>,
   options?: { signal?: AbortSignal }
 ): Promise<boolean> {
   if (!APPS_SCRIPT_URL) return false
-  try {
-    const sessionToken = getSessionToken()
-    const body = sessionToken ? { action, sessionToken, ...payload } : { action, ...payload }
-    const response = await fetchMitTimeout(APPS_SCRIPT_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain' },
-      body: JSON.stringify(body),
-      signal: options?.signal,
-    })
-    if (!response.ok) return false
-    const text = await response.text()
+  return enqueueWrite(async () => {
     try {
-      const data = JSON.parse(text)
-      return data.success === true
-    } catch { return false }
-  } catch (error) {
-    if (error instanceof DOMException && error.name === 'AbortError') {
-      console.warn(`[API] ${action}: Timeout oder abgebrochen`)
+      const sessionToken = getSessionToken()
+      const body = sessionToken ? { action, sessionToken, ...payload } : { action, ...payload }
+      const response = await fetchMitTimeout(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify(body),
+        signal: options?.signal,
+      })
+      if (!response.ok) return false
+      const text = await response.text()
+      try {
+        const data = JSON.parse(text)
+        return data.success === true
+      } catch { return false }
+    } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') {
+        console.warn(`[API] ${action}: Timeout oder abgebrochen`)
+      }
+      return false
     }
-    return false
-  }
+  })
 }
 
-/** GET-Request an Apps Script */
+/** GET-Request an Apps Script (ohne Queue — GETs dürfen parallel laufen) */
 export async function getJson<T>(
   action: string,
   params: Record<string, string> = {},
@@ -132,7 +148,7 @@ export async function getJson<T>(
         console.error(`[API] ${action}:`, data.error)
         return null
       }
-      return data
+      return data as T
     } catch {
       console.error(`[API] ${action}: Antwort ist kein JSON`)
       return null
