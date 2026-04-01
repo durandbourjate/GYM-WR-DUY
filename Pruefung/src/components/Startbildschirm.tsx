@@ -48,8 +48,9 @@ export default function Startbildschirm({ config, fragen, alleFragen, wiederherg
       apiService.heartbeat(config.id, user.email).then((response) => {
         setHeartbeatErfolgreich(true)
         const phase = response.phase
-        if (phase === 'lobby') setLobbyOffen(true)
-        if (phase === 'aktiv' || phase === 'live') {
+        // Backend gibt 'lobby' wenn freigeschaltet, 'vorbereitung' wenn nicht
+        if (phase === 'lobby' || phase === 'aktiv' || phase === 'live') {
+          setLobbyOffen(true)
           setIstFreigeschaltet(true)
         }
         if (response.sebAusnahme) setHatSebAusnahme(true)
@@ -67,8 +68,9 @@ export default function Startbildschirm({ config, fragen, alleFragen, wiederherg
         if (response) {
           setHeartbeatErfolgreich(true)
           const phase = response.phase
-          if (phase === 'lobby') setLobbyOffen(true)
-          if (phase === 'aktiv' || phase === 'live') {
+          // Backend gibt 'lobby' wenn freigeschaltet, 'vorbereitung' wenn nicht
+          if (phase === 'lobby' || phase === 'aktiv' || phase === 'live') {
+            setLobbyOffen(true)
             setIstFreigeschaltet(true)
           }
           if (response.sebAusnahme) setHatSebAusnahme(true)
