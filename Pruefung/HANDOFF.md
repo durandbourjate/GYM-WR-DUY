@@ -27,7 +27,56 @@
 
 ---
 
-## Session 45 — Batch-Writes, Request-Queue, 4 Bugfixes (01.04.2026) ⚠️ TEST AUSSTEHEND
+## Session 46 — Re-Entry-Schutz, Teilnehmer-Filter, Heartbeat-Fixes (01.04.2026) ✅ GETESTET
+
+### Stand
+Branch `fix/warteraum-polling-rate-limit` + `preview`. **Noch NICHT auf main.** Apps Script deployed.
+
+### Erledigte Fixes (getestet + verifiziert)
+
+| Fix | Beschreibung | Datei(en) |
+|-----|-------------|-----------|
+| **Re-Entry-Schutz (Frontend)** | `resetPruefungState()` löscht State bei `abgegeben=true` NICHT mehr. `App.tsx` prüft lokalen `abgegeben`-State als erste Verteidigungslinie vor Backend-Check. | authStore.ts, App.tsx |
+| **Re-Entry-Schutz (Backend)** | `speichereAntworten` blockiert KOMPLETT wenn `istAbgabe=true` (auch erneute Abgabe). Response: `{ success: true, bereitsAbgegeben: true }` | apps-script-code.js |
+| **Heartbeat Race-Condition** | Heartbeat liest `istAbgabe` frisch vor Batch-Write (1 getValue + 1 setValues statt 14 einzelne setValue). Verhindert Überschreibung durch Race. | apps-script-code.js |
+| **Teilnehmer-Filter (zentral)** | `gefilterteSchueler` via `useMemo` — Live-Tab, Auswertung, CSV-Export zeigen nur eingeladene SuS. Nicht-eingeladene werden ausgeblendet. | DurchfuehrenDashboard.tsx |
+| **Warteraum-Heartbeat Token** | SuS im Warteraum dürfen Heartbeat ohne Session-Token senden (SuS-Domain + kein aktuelleFrage). Strengeres Rate Limiting (8/min). | apps-script-code.js |
+| **Warteraum Phase-Info** | Heartbeat bei neuer Zeile prüft Config und gibt `phase: 'lobby'` zurück. | apps-script-code.js |
+
+### Browser-Test-Ergebnisse (Session 46)
+
+| Test | Ergebnis |
+|------|----------|
+| SuS Abgabe → Re-Login → Abgabe-Screen (lokaler Schutz) | ✅ |
+| SuS Storage löschen + Reload → Backend blockiert Re-Entry | ✅ |
+| Nicht-eingeladener SuS: Teilnehmer-Check (Fehlermeldung) | ✅ |
+| LP Lobby: eingeladener = bereit, nicht-eingeladener = unerwartet | ✅ |
+| LP Live-Tab: nur eingeladene SuS sichtbar | ✅ |
+| LP Auswertung: nur eingeladene SuS, kein "Erzwungen" | ✅ |
+| LP Monitoring: Frage, Fortschritt, Gerät live | ✅ (~10s Verzögerung) |
+| LP Status: Abgegeben korrekt angezeigt | ✅ |
+| Warteraum erkennt Freischaltung automatisch | ❌ Braucht Reload |
+| Neue Durchführung → Tab Vorbereitung | ❌ Springt zu Auswertung |
+
+### Offene Bugs (nächste Session)
+
+| Prio | Bug | Beschreibung |
+|------|-----|-------------|
+| 🟠 | **Warteraum-Freischaltung** | SuS muss nach LP-Freischaltung manuell reloaden. Heartbeat-Phase-Check funktioniert im Backend, aber Frontend reagiert nicht. |
+| 🟠 | **Neue Durchführung → Auswertung** | Nach "Neue Durchführung" springt Tab auf Auswertung statt Vorbereitung. |
+| 🟡 | **Monitoring-Verzögerung ~10s** | Erster Heartbeat-Zyklus + Apps Script Latenz. Akzeptabel für 1 Klasse. |
+
+### Branch-Status
+
+| Branch | Inhalt | Status |
+|--------|--------|--------|
+| `fix/warteraum-polling-rate-limit` | Alle Session 44–46 Fixes | Auf GitHub |
+| `preview` | = fix/warteraum-polling-rate-limit | Staging deployed (Frontend + Apps Script) |
+| `main` | Production | Unverändert seit Session 43 |
+
+---
+
+## Session 45 — Batch-Writes, Request-Queue, 4 Bugfixes (01.04.2026)
 
 ### Stand
 Branch `fix/warteraum-polling-rate-limit` + `preview`. **Noch NICHT auf main.** Apps Script Deploy ausstehend.
