@@ -15,17 +15,18 @@ export default function LobbyPhase({ config, schuelerStatus, onFreischalten, onZ
   const teilnehmer = config.teilnehmer ?? []
   const teilnehmerEmails = new Set(teilnehmer.map((t) => t.email))
 
-  // Bereit = eingeloggt und in Teilnehmerliste
+  // Bereit = Heartbeat empfangen (im Warteraum) und in Teilnehmerliste
+  // Hinweis: status kann 'nicht-gestartet' sein (kein aktuelleFrage), aber letzterHeartbeat zeigt Anwesenheit
   const bereite = schuelerStatus.filter(
-    (s) => s.status !== 'nicht-gestartet' && teilnehmerEmails.has(s.email),
+    (s) => s.letzterHeartbeat && teilnehmerEmails.has(s.email),
   )
-  // Unerwartete = eingeloggt aber nicht in Teilnehmerliste
+  // Unerwartete = Heartbeat empfangen aber nicht in Teilnehmerliste
   const unerwartete = schuelerStatus.filter(
-    (s) => s.status !== 'nicht-gestartet' && !teilnehmerEmails.has(s.email),
+    (s) => s.letzterHeartbeat && !teilnehmerEmails.has(s.email),
   )
-  // Ausstehend = in Teilnehmerliste aber nicht eingeloggt
+  // Ausstehend = in Teilnehmerliste aber kein Heartbeat empfangen
   const ausstehende = teilnehmer.filter(
-    (t) => !schuelerStatus.some((s) => s.email === t.email && s.status !== 'nicht-gestartet'),
+    (t) => !schuelerStatus.some((s) => s.email === t.email && s.letzterHeartbeat),
   )
 
   const fortschritt = teilnehmer.length > 0
