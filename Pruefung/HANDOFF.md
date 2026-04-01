@@ -27,6 +27,88 @@
 
 ---
 
+## Session 48 — Security, Cleanup, Demo-Update, Reset (01.04.2026)
+
+### Stand
+Branch `feature/session48-improvements`. **Noch NICHT auf main.** Apps Script Deploy ausstehend.
+
+### Erledigte Änderungen
+
+| AP | Beschreibung | Datei(en) |
+|----|-------------|-----------|
+| **A1: sessionStorage Demo-Bypass** | `istDemoModus` nur noch via `demoStarten()` setzbar (in-memory). `restoreDemoFlag()` entfernt. Verhindert Lockdown-Umgehung via DevTools. | authStore.ts, securityInvarianten.test.ts |
+| **A2: Prompt Injection** | `wrapUserData()` Helper wrappt alle User-Inputs in `<user_data>`-Tags. System-Prompt gehärtet. 27 KI-Aktionen refactored. | apps-script-code.js |
+| **B: localStorage Cleanup** | `cleanupNachAbgabe()` shared Helper für 3 Abgabe-Pfade: freiwillig, Demo, LP-Beenden. Löscht pruefung-state-*, pruefung-abgabe-*, IndexedDB. | cleanupNachAbgabe.ts (neu), AbgabeDialog.tsx, Timer.tsx |
+| **C: Demo = Einführungsprüfung** | demoFragen.ts = Re-Export der einrichtungsFragen (~890 Zeilen entfernt). demoMonitoring auf 23 Fragen umgestellt. Aufgabengruppen-Filter entfernt. | demoFragen.ts, demoMonitoring.ts, useKorrekturDaten.ts |
+| **D: Neue Durchführung Reset** | zeitverlaengerungen → {} und kontrollStufe → 'standard' bei Reset. Backend + Frontend. | apps-script-code.js, DurchfuehrenDashboard.tsx |
+
+### Offene Punkte (nächste Sessions)
+
+| Prio | Thema | Beschreibung |
+|------|-------|-------------|
+| 🟠 | **Apps Script Deploy** | apps-script-code.js (AP-A2 + AP-D) muss in Apps Script Editor kopiert + neue Bereitstellung erstellt werden. |
+| 🟡 | **Browser-Test** | Alle 5 APs im Browser testen (Demo SuS+LP, Lockdown, Reset, Cleanup). |
+| 🟡 | **Übungspools: 9 neue Fragetypen** | sortierung, hotspot, bildbeschriftung, dragdrop_bild, code, formel, audio, zeichnen, pdf. Spec: `docs/superpowers/specs/2026-04-01-session48-improvements-design.md` AP-E. Sessions 49–51. |
+| 🟡 | **Zeichnen Input-Verlust (Refactoring)** | React Re-Renders verschlucken pointerdown bei schnellem Zeichnen. Fix: Events imperativ binden (useEffect+addEventListener), Stroke-Daten in useRef sammeln, Batch-Commit nach pointerup. Betroffene Dateien: usePointerEvents.ts, ZeichnenCanvas.tsx, useDrawingEngine.ts. Eigene Session mit Browser-Test (Stift/Touch). |
+
+### Branch-Status
+
+| Branch | Inhalt | Status |
+|--------|--------|--------|
+| `feature/session48-improvements` | Alle Session 48 Änderungen | Auf GitHub |
+| `preview` | Staging | Noch nicht aktualisiert |
+| `main` | Production | Unverändert |
+
+---
+
+## Session 47 — 6 Bugfixes verifiziert, Merge auf main (01.04.2026)
+
+### Stand
+Branch `fix/warteraum-polling-rate-limit` → **merged auf main.** Apps Script deployed.
+Alle 6 Bugs aus Session 46 gefixt und im Browser verifiziert.
+
+### Erledigte Fixes (alle verifiziert im Browser)
+
+| Fix | Beschreibung | Datei(en) |
+|-----|-------------|-----------|
+| **Bug 1: Warteraum-Freischaltung** | Root Cause: Google Sheets Boolean `true` vs String `'true'` — strenger `===` Vergleich schlug fehl. Alle 6 Stellen akzeptieren jetzt `=== 'true' \|\| === true`. Zusätzlich: Rate-Limit Bucket-Fix (Warteraum-HB immer `hb-wr`), Rate-Limit auf 25/min erhöht. | apps-script-code.js |
+| **Bug 2: Neue Durchführung → Auswertung** | URL-Parameter `?tab=auswertung` wird bei Reset gelöscht via `history.replaceState`. | DurchfuehrenDashboard.tsx |
+| **Bug 3: Neue Durchführung crasht** | `setDaten()` mit leerem MonitoringDaten-Objekt statt `null` — verhindert `.some()` TypeError in Kind-Komponenten. | DurchfuehrenDashboard.tsx |
+| **Bug 4: Warteraum-SuS als Aktiv** | `ladeMonitoring` Status basiert auf `aktuelleFrage` statt `letzterHeartbeat`. Warteraum-SuS = "Nicht da". | apps-script-code.js |
+| **Bug 4b: Lobby-Regression** | Lobby prüft `letzterHeartbeat` (kürzlich <60s) für Anwesenheit, nicht `status`. Keine Geister-Einträge. | LobbyPhase.tsx |
+| **Bug 5: Durchschnitt/Note falsch** | `gesamtPunkte` nach Auto-Korrektur via `berechneGesamtpunkte()` berechnen. `maxPunkte` nicht überschreiben (NaN-Regression). | useKorrekturDaten.ts |
+
+### Browser-Test-Ergebnisse (Session 47)
+
+| Test | Ergebnis |
+|------|----------|
+| SuS Warteraum → LP schaltet frei → SuS wechselt automatisch zum Startbildschirm | ✅ |
+| LP Lobby: SuS grün wenn eingeloggt, ausstehend wenn nicht, keine Geister | ✅ |
+| LP Live-Tab: SuS als "Nicht da" im Warteraum, "Aktiv" nach Prüfungsstart | ✅ |
+| info.test (nicht eingeladen): Fehlermeldung | ✅ |
+| wr.test: Re-Entry nach Abgabe blockiert | ✅ |
+| LP Auswertung: Durchschnitt 1 Pkt., Note 1.0 (korrekt, vorher 6.0/NaN) | ✅ |
+| Neue Durchführung: Tab = Vorbereitung (nicht Auswertung) | ✅ |
+| Neue Durchführung: Kein Crash | ✅ |
+| LP Abgabe-Status: "Abgegeben" korrekt angezeigt | ✅ |
+
+### Offene Punkte (nächste Session)
+
+| Prio | Thema | Beschreibung |
+|------|-------|-------------|
+| 🟡 | **Neue Durchführung: vollständiger Reset** | Teilnehmer, Nachteilsausgleiche, Kontrollstufe, Berechtigungen sollen auf Default zurückgesetzt werden. Aktuell bleiben alte Teilnehmer in der Kurs-Auswahl sichtbar. |
+| 🟡 | **Monitoring-Verzögerung ~28s** | Abgabe-POST ~8s + LP-Monitoring-Polling ~20s bis Status-Update. Akzeptabel für 1 Klasse, aber UX-Verbesserung möglich. |
+
+### Branch-Status
+
+| Branch | Inhalt | Status |
+|--------|--------|--------|
+| `fix/warteraum-polling-rate-limit` | Alle Session 44–47 Fixes | Merged auf main |
+| `preview` | Staging | = main |
+| `main` | Production | Aktuell |
+
+---
+
 ## Session 46 — Re-Entry-Schutz, Teilnehmer-Filter, Heartbeat-Fixes (01.04.2026)
 
 ### Stand
