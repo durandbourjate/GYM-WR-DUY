@@ -551,12 +551,16 @@ export default function DurchfuehrenDashboard({ pruefungId }: { pruefungId: stri
                           // Alles zurücksetzen: Phase-Tracking, Daten, Config
                           letztePhaseRef.current = 'vorbereitung'
                           abgabenGeladen.current = false
-                          setDaten(null)
+                          setDaten({ pruefungId: config.id, pruefungTitel: '', schueler: [], gesamtSus: 0, aktualisiert: new Date().toISOString() })
                           setAbgaben({})
                           setFragen([])
                           // Config sofort lokal zurücksetzen (verhindert phase='beendet')
                           const resetConfig = { ...config, freigeschaltet: false, beendetUm: undefined, teilnehmer: [], sebAusnahmen: [], durchfuehrungId: crypto.randomUUID() }
                           setConfig(resetConfig)
+                          // URL-Parameter ?tab=... löschen (verhindert Tab-Sprung zu Auswertung)
+                          const url = new URL(window.location.href)
+                          url.searchParams.delete('tab')
+                          window.history.replaceState({}, '', url.toString())
                           setActiveTab('vorbereitung')
                           // Frische Config vom Backend laden (nach kurzer Wartezeit für Backend-Verarbeitung)
                           setTimeout(async () => {

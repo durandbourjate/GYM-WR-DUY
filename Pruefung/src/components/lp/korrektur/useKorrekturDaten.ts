@@ -4,7 +4,7 @@ import { apiService } from '../../../services/apiService.ts'
 import type { PruefungsKorrektur, SchuelerAbgabe } from '../../../types/korrektur.ts'
 import type { Frage } from '../../../types/fragen.ts'
 import type { NotenConfig } from '../../../types/pruefung.ts'
-import { berechneStatistiken, berechneFragenStatistiken } from '../../../utils/korrekturUtils.ts'
+import { berechneStatistiken, berechneFragenStatistiken, berechneGesamtpunkte } from '../../../utils/korrekturUtils.ts'
 import { autoKorrigiere, istAutoKorrigierbar } from '../../../utils/autoKorrektur.ts'
 import type { KorrekturErgebnis } from '../../../utils/autoKorrektur.ts'
 import { erstelleDemoAbgaben, erstelleDemoKorrektur } from '../../../data/demoKorrektur.ts'
@@ -86,7 +86,12 @@ export function useKorrekturDaten({ pruefungId, userEmail, queueSave, updateKorr
     // Nur setKorrektur aufrufen wenn wirklich Änderungen → kein Endlos-Loop
     // (kiLeer/lpLeer ist beim nächsten Durchlauf false → hatAenderungen bleibt false)
     if (hatAenderungen) {
-      setKorrektur({ ...korrektur, schueler: aktualisierteSchueler })
+      // gesamtPunkte für alle SuS neu berechnen (sonst bleibt gesamtPunkte=0 nach Auto-Korrektur)
+      const mitGesamtpunkten = aktualisierteSchueler.map((s) => {
+        const { punkte, maxPunkte } = berechneGesamtpunkte(s.bewertungen)
+        return { ...s, gesamtPunkte: punkte, maxPunkte }
+      })
+      setKorrektur({ ...korrektur, schueler: mitGesamtpunkten })
     }
   }, [autoErgebnisseAlle, korrektur])
 

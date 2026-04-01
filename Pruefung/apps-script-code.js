@@ -2851,9 +2851,11 @@ function ladeMonitoring(pruefungId, email) {
           name: row.name || row.email || '',
           klasse: row.klasse || '',
           // Freiwillige Abgabe = immer 'abgegeben', nie 'beendet-lp'
+          // 'aktiv' nur wenn aktuelleFrage gesetzt (= Prüfung gestartet), nicht nur letzterHeartbeat
+          // (Warteraum-Heartbeats setzen letzterHeartbeat, aber keine aktuelleFrage)
           status: row.istAbgabe === 'true'
             ? 'abgegeben'
-            : (susBeendetUm ? 'beendet-lp' : (row.letzterHeartbeat ? 'aktiv' : 'nicht-gestartet')),
+            : (susBeendetUm ? 'beendet-lp' : (row.aktuelleFrage !== undefined && row.aktuelleFrage !== '' ? 'aktiv' : 'nicht-gestartet')),
           letzterSave: row.letzterSave || '',
           letzterHeartbeat: row.letzterHeartbeat || '',
           heartbeats: Number(row.heartbeats) || 0,
