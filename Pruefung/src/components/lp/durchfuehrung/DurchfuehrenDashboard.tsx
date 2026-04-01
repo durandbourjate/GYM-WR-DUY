@@ -548,13 +548,24 @@ export default function DurchfuehrenDashboard({ pruefungId }: { pruefungId: stri
                         if (!user) return
                         const erfolg = await apiService.resetPruefung(config.id, user.email)
                         if (erfolg) {
-                          // Phase-Tracking zurücksetzen damit Tab nicht auf 'auswertung' springt
+                          // Alles zurücksetzen: Phase-Tracking, Daten, Config
                           letztePhaseRef.current = 'vorbereitung'
                           abgabenGeladen.current = false
-                          setConfig({ ...config, freigeschaltet: false, beendetUm: undefined, teilnehmer: [], sebAusnahmen: [] })
+                          setDaten(null)
                           setAbgaben({})
+                          setFragen([])
+                          // Config sofort lokal zurücksetzen (verhindert phase='beendet')
+                          const resetConfig = { ...config, freigeschaltet: false, beendetUm: undefined, teilnehmer: [], sebAusnahmen: [], durchfuehrungId: crypto.randomUUID() }
+                          setConfig(resetConfig)
                           setActiveTab('vorbereitung')
-                          ladeDaten()
+                          // Frische Config vom Backend laden (nach kurzer Wartezeit für Backend-Verarbeitung)
+                          setTimeout(async () => {
+                            try {
+                              const frisch = await apiService.ladeEinzelConfig(config.id, user!.email)
+                              if (frisch) setConfig(frisch)
+                            } catch { /* ignore */ }
+                            ladeDaten()
+                          }, 1000)
                         }
                       }}
                     />

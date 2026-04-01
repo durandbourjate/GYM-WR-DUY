@@ -1587,8 +1587,8 @@ function heartbeat(body) {
         // Prüfe ob es ein Warteraum-Heartbeat sein könnte (SuS-Domain, keine aktuelleFrage)
         if (email.endsWith('@stud.gymhofwil.ch') && body.aktuelleFrage === undefined) {
           istWarteraumHeartbeat = true;
-          // Strengeres Rate Limiting für unauthentifizierte Heartbeats
-          var rlWr = rateLimitCheck_('hb-wr', email, 8, 60);
+          // Rate Limiting für unauthentifizierte Heartbeats (Warteraum pollt alle 5s = 12/min)
+          var rlWr = rateLimitCheck_('hb-wr', email, 15, 60);
           if (rlWr.blocked) return jsonResponse({ error: rlWr.error });
         } else {
           return jsonResponse({ error: 'Nicht autorisiert' });
