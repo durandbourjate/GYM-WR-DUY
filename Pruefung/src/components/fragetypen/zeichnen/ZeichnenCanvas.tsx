@@ -180,6 +180,89 @@ export function ZeichnenCanvas({
   const letzterPunktRef = useRef<Point | null>(null);
 
   // ============================================================
+  // Stift-Buffer: Punkte sammeln ohne React-State-Updates (Session 50)
+  // Verhindert Re-Render pro Pointer-Event bei schnellem Zeichnen.
+  // ============================================================
+
+  /** Punkte des aktuellen Strichs — wird bei pointerup als Command committed */
+  const stiftBufferRef = useRef<Point[]>([]);
+  /** Aktive Stift-Metadaten (Farbe, Breite, gestrichelt) für den laufenden Strich */
+  const stiftMetaRef = useRef<{ farbe: string; breite: number; id: string; gestrichelt?: boolean } | null>(null);
+  /** rAF-ID für Cleanup */
+  const rafIdRef = useRef<number | null>(null);
+  /** Flag: läuft gerade ein rAF-basiertes Stift-Rendering? */
+  const stiftAktivRef = useRef(false);
+
+  // ============================================================
+  // rAF-Loop: Stift-Buffer als Preview rendern (kein React-State)
+  // Imperativ gestartet/gestoppt aus den Pointer-Handlern.
+  // ============================================================
+
+  // Stabile Refs für Engine-Methoden (vermeidet Closure-Stale-Reads)
+  const renderMitPreviewRef = useRef(engine.renderMitPreview);
+  renderMitPreviewRef.current = engine.renderMitPreview;
+
+  /** Startet die rAF-Render-Loop für den Stift-Buffer */
+  const starteStiftRendering = useCallback(() => {
+    if (stiftAktivRef.current) return; // Bereits aktiv
+    stiftAktivRef.current = true;
+
+    const cvs: HTMLCanvasElement | null = canvasRef.current;
+    if (!cvs) return;
+    const context: CanvasRenderingContext2D | null = cvs.getContext('2d');
+    if (!context) return;
+    // Lokale Kopien für die Closure (TS-Narrowing geht in nested functions verloren)
+    const c = context;
+    const el = cvs;
+    const dpr = window.devicePixelRatio || 1;
+
+    function frame() {
+      if (!stiftAktivRef.current) return;
+
+      const meta = stiftMetaRef.current;
+      const punkte = stiftBufferRef.current;
+
+      // Preview-Command aus Buffer bauen
+      const previewCmd: DrawCommand | null = meta && punkte.length > 0
+        ? { id: meta.id, typ: 'stift', punkte, farbe: meta.farbe, breite: meta.breite, gestrichelt: meta.gestrichelt }
+        : null;
+
+      c.save();
+      c.fillStyle = '#ffffff';
+      c.fillRect(0, 0, el.width, el.height);
+      c.restore();
+
+      c.save();
+      c.scale(dpr, dpr);
+      renderMitPreviewRef.current(c, previewCmd);
+      c.restore();
+
+      rafIdRef.current = requestAnimationFrame(frame);
+    }
+
+    rafIdRef.current = requestAnimationFrame(frame);
+  }, [canvasRef]);
+
+  /** Stoppt die rAF-Render-Loop */
+  const stoppeStiftRendering = useCallback(() => {
+    stiftAktivRef.current = false;
+    if (rafIdRef.current !== null) {
+      cancelAnimationFrame(rafIdRef.current);
+      rafIdRef.current = null;
+    }
+  }, []);
+
+  // Cleanup bei Unmount
+  useEffect(() => {
+    return () => {
+      stiftAktivRef.current = false;
+      if (rafIdRef.current !== null) {
+        cancelAnimationFrame(rafIdRef.current);
+      }
+    };
+  }, []);
+
+  // ============================================================
   // Daten laden wenn initialDaten sich ändert (Fragen-Wechsel)
   // ============================================================
 
@@ -195,6 +278,9 @@ export function ZeichnenCanvas({
   // ============================================================
 
   useEffect(() => {
+    // Wenn die rAF-Loop aktiv ist, übernimmt sie das Rendering — kein doppeltes Zeichnen
+    if (stiftAktivRef.current) return;
+
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -341,15 +427,16 @@ export function ZeichnenCanvas({
         }
 
         case 'stift': {
-          const cmd: DrawCommand = {
-            id: generiereCommandId(),
-            typ: 'stift',
-            punkte: [punkt],
+          // Punkte im Ref-Buffer sammeln statt pro Event ein State-Update (Session 50)
+          const id = generiereCommandId();
+          stiftBufferRef.current = [punkt];
+          stiftMetaRef.current = {
+            id,
             farbe: aktiveFarbe,
             breite: stiftBreite,
             gestrichelt: stiftGestrichelt || undefined,
           };
-          engine.updateAktiverCommand(cmd);
+          starteStiftRendering();
           break;
         }
 
@@ -421,7 +508,7 @@ export function ZeichnenCanvas({
         }
       }
     },
-    [aktivesTool, aktiveFarbe, stiftBreite, stiftGestrichelt, engine, logischeBreite, logischeHoehe]
+    [aktivesTool, aktiveFarbe, stiftBreite, stiftGestrichelt, engine, logischeBreite, logischeHoehe, starteStiftRendering]
   );
 
   const handleMove = useCallback(
@@ -439,12 +526,8 @@ export function ZeichnenCanvas({
         }
 
         case 'stift': {
-          const aktiver = engine.state.aktiverCommand;
-          if (!aktiver || aktiver.typ !== 'stift') break;
-          engine.updateAktiverCommand({
-            ...aktiver,
-            punkte: [...aktiver.punkte, punkt],
-          });
+          // Punkt zum Buffer hinzufügen — kein State-Update, rAF rendert direkt
+          stiftBufferRef.current.push(punkt);
           break;
         }
 
@@ -494,14 +577,21 @@ export function ZeichnenCanvas({
         }
 
         case 'stift': {
-          const aktiver = engine.state.aktiverCommand;
-          if (!aktiver || aktiver.typ !== 'stift') break;
-          const mitEndpunkt = {
-            ...aktiver,
-            punkte: [...aktiver.punkte, punkt],
-          };
-          engine.addCommand(mitEndpunkt as Omit<DrawCommand, 'id'>);
-          // updateAktiverCommand(null) nicht noetig — ADD_COMMAND setzt aktiverCommand auf null
+          // Batch-Commit: Buffer → 1x addCommand (Session 50)
+          stoppeStiftRendering();
+          stiftBufferRef.current.push(punkt);
+          const meta = stiftMetaRef.current;
+          if (meta && stiftBufferRef.current.length > 0) {
+            engine.addCommand({
+              typ: 'stift',
+              punkte: stiftBufferRef.current,
+              farbe: meta.farbe,
+              breite: meta.breite,
+              gestrichelt: meta.gestrichelt,
+            } as Omit<DrawCommand, 'id'>);
+          }
+          stiftBufferRef.current = [];
+          stiftMetaRef.current = null;
           break;
         }
 
@@ -537,7 +627,7 @@ export function ZeichnenCanvas({
           break;
       }
     },
-    [aktivesTool, engine]
+    [aktivesTool, engine, stoppeStiftRendering]
   );
 
   // Pointer Events registrieren

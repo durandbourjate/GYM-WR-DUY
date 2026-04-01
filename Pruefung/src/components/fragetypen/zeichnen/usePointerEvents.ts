@@ -19,6 +19,11 @@ interface UsePointerEventsOptions {
  * Normalisiert Canvas-Pointer-Events über Maus, Touch und Stift.
  * Wandelt Display-Pixel in logische Canvas-Koordinaten um,
  * extrahiert Druckwert bei Stifteingabe und verhindert Scroll-Hijacking.
+ *
+ * REFACTORING (Session 50): Alle Callbacks und Laufzeitwerte werden in Refs
+ * gehalten. Der useEffect bindet die Listener nur 1x (bei Canvas-Wechsel),
+ * nicht bei jedem Render. Das verhindert Event-Verlust durch Re-Binding
+ * während schnellem Zeichnen (60-240 Events/sec).
  */
 export function usePointerEvents({
   canvasRef,
@@ -34,6 +39,24 @@ export function usePointerEvents({
   // Referenz ob gerade ein Strich aktiv ist (verhindert spurious pointermove-Events)
   const istAmZeichnenRef = useRef(false);
 
+  // Stabile Callback-Refs — verhindert Effect-Re-Runs bei jedem Render
+  const onStartRef = useRef(onStart);
+  const onMoveRef = useRef(onMove);
+  const onEndRef = useRef(onEnd);
+  onStartRef.current = onStart;
+  onMoveRef.current = onMove;
+  onEndRef.current = onEnd;
+
+  // Stabile Refs für Laufzeitwerte die sich ändern können
+  const aktivesToolRef = useRef(aktivesTool);
+  const disabledRef = useRef(disabled);
+  const breiteRef = useRef(breite);
+  const hoeheRef = useRef(hoehe);
+  aktivesToolRef.current = aktivesTool;
+  disabledRef.current = disabled;
+  breiteRef.current = breite;
+  hoeheRef.current = hoehe;
+
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -47,8 +70,8 @@ export function usePointerEvents({
      */
     function konvertiereKoordinaten(event: PointerEvent): Point {
       const rect = canvas!.getBoundingClientRect();
-      const x = (event.offsetX / rect.width) * breite;
-      const y = (event.offsetY / rect.height) * hoehe;
+      const x = (event.offsetX / rect.width) * breiteRef.current;
+      const y = (event.offsetY / rect.height) * hoeheRef.current;
 
       // Druckwert: Stift liefert 0.0–1.0, Maus defaultet auf 0.5
       const druck = event.pointerType === 'mouse'
@@ -59,33 +82,32 @@ export function usePointerEvents({
     }
 
     function handlePointerDown(event: PointerEvent): void {
-      if (disabled) return;
+      if (disabledRef.current) return;
 
       // Text-Overlay ist offen: pointerdown ignorieren, damit das Eingabefeld stabil bleibt.
-      // Das Overlay schliesst sich über Enter, Escape oder Klick ausserhalb.
       if (textOverlaySichtbarRef.current) return;
 
       // Text-Tool: Kein Pointer-Capture, sonst kann das Text-Input keinen Focus bekommen
-      if (aktivesTool !== 'text') {
+      if (aktivesToolRef.current !== 'text') {
         canvas!.setPointerCapture(event.pointerId);
       }
 
       istAmZeichnenRef.current = true;
 
       const punkt = konvertiereKoordinaten(event);
-      onStart(punkt, event.pointerType);
+      onStartRef.current(punkt, event.pointerType);
     }
 
     function handlePointerMove(event: PointerEvent): void {
-      if (disabled) return;
+      if (disabledRef.current) return;
       if (!istAmZeichnenRef.current) return;
 
       const punkt = konvertiereKoordinaten(event);
-      onMove(punkt, event.pointerType);
+      onMoveRef.current(punkt, event.pointerType);
     }
 
     function handlePointerUp(event: PointerEvent): void {
-      if (disabled) return;
+      if (disabledRef.current) return;
       if (!istAmZeichnenRef.current) return;
 
       istAmZeichnenRef.current = false;
@@ -94,7 +116,7 @@ export function usePointerEvents({
       try { canvas!.releasePointerCapture(event.pointerId); } catch { /* bereits freigegeben */ }
 
       const punkt = konvertiereKoordinaten(event);
-      onEnd(punkt, event.pointerType);
+      onEndRef.current(punkt, event.pointerType);
     }
 
     function handlePointerCancel(event: PointerEvent): void {
@@ -105,7 +127,7 @@ export function usePointerEvents({
       try { canvas!.releasePointerCapture(event.pointerId); } catch { /* bereits freigegeben */ }
 
       const punkt = konvertiereKoordinaten(event);
-      onEnd(punkt, event.pointerType);
+      onEndRef.current(punkt, event.pointerType);
     }
 
     canvas.addEventListener('pointerdown', handlePointerDown);
@@ -121,5 +143,7 @@ export function usePointerEvents({
       // touch-action zurücksetzen beim Cleanup
       canvas.style.touchAction = '';
     };
-  }, [canvasRef, aktivesTool, disabled, breite, hoehe, textOverlaySichtbarRef, onStart, onMove, onEnd]);
+    // Nur Canvas-Ref und textOverlaySichtbarRef als Dependencies —
+    // Listener werden 1x gebunden, Callbacks/Werte via Refs gelesen
+  }, [canvasRef, textOverlaySichtbarRef]);
 }
