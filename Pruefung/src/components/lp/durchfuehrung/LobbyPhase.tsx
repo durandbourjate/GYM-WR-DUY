@@ -15,18 +15,25 @@ export default function LobbyPhase({ config, schuelerStatus, onFreischalten, onZ
   const teilnehmer = config.teilnehmer ?? []
   const teilnehmerEmails = new Set(teilnehmer.map((t) => t.email))
 
-  // Bereit = Heartbeat empfangen (im Warteraum) und in Teilnehmerliste
-  // Hinweis: status kann 'nicht-gestartet' sein (kein aktuelleFrage), aber letzterHeartbeat zeigt Anwesenheit
+  // Kürzlich = Heartbeat in den letzten 60 Sekunden (nicht nur irgendwann)
+  const jetztMs = Date.now()
+  const istKuerzlich = (hb: string | null | undefined): boolean => {
+    if (!hb) return false
+    const diff = jetztMs - new Date(hb).getTime()
+    return diff < 60_000 // 60 Sekunden
+  }
+
+  // Bereit = kürzlicher Heartbeat und in Teilnehmerliste
   const bereite = schuelerStatus.filter(
-    (s) => s.letzterHeartbeat && teilnehmerEmails.has(s.email),
+    (s) => istKuerzlich(s.letzterHeartbeat as string | null) && teilnehmerEmails.has(s.email),
   )
-  // Unerwartete = Heartbeat empfangen aber nicht in Teilnehmerliste
+  // Unerwartete = kürzlicher Heartbeat aber nicht in Teilnehmerliste
   const unerwartete = schuelerStatus.filter(
-    (s) => s.letzterHeartbeat && !teilnehmerEmails.has(s.email),
+    (s) => istKuerzlich(s.letzterHeartbeat as string | null) && !teilnehmerEmails.has(s.email),
   )
-  // Ausstehend = in Teilnehmerliste aber kein Heartbeat empfangen
+  // Ausstehend = in Teilnehmerliste aber kein kürzlicher Heartbeat
   const ausstehende = teilnehmer.filter(
-    (t) => !schuelerStatus.some((s) => s.email === t.email && s.letzterHeartbeat),
+    (t) => !schuelerStatus.some((s) => s.email === t.email && istKuerzlich(s.letzterHeartbeat as string | null)),
   )
 
   const fortschritt = teilnehmer.length > 0
