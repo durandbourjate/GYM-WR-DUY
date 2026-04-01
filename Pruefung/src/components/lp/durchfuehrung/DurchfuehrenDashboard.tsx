@@ -480,10 +480,15 @@ export default function DurchfuehrenDashboard({ pruefungId }: { pruefungId: stri
             />
           )}
 
-          {activeTab === 'live' && daten && (
-            <AktivPhase
+          {activeTab === 'live' && daten && (() => {
+            // Nur Teilnehmer im Live-Tab anzeigen (nicht-eingeladene SuS ausfiltern)
+            const teilnehmerEmails = new Set((config.teilnehmer ?? []).map((t) => t.email.toLowerCase()))
+            const gefilterteSchueler = teilnehmerEmails.size > 0
+              ? daten.schueler.filter((s) => teilnehmerEmails.has(s.email.toLowerCase()))
+              : daten.schueler
+            return <AktivPhase
               config={config}
-              schuelerStatus={daten.schueler}
+              schuelerStatus={gefilterteSchueler}
               startTimestamp={startTimestamp}
               onConfigUpdate={async (updates) => {
                 const neueConfig = { ...config, ...updates }
@@ -500,7 +505,7 @@ export default function DurchfuehrenDashboard({ pruefungId }: { pruefungId: stri
                 ladeDaten()
               }}
             />
-          )}
+          })()}
 
           {activeTab === 'auswertung' && daten && pruefungId && (
             <div className="space-y-4">
