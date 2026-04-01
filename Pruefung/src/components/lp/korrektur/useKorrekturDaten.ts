@@ -87,9 +87,10 @@ export function useKorrekturDaten({ pruefungId, userEmail, queueSave, updateKorr
     // (kiLeer/lpLeer ist beim nächsten Durchlauf false → hatAenderungen bleibt false)
     if (hatAenderungen) {
       // gesamtPunkte für alle SuS neu berechnen (sonst bleibt gesamtPunkte=0 nach Auto-Korrektur)
+      // NUR punkte aktualisieren, maxPunkte beibehalten (kommt korrekt aus config.gesamtpunkte)
       const mitGesamtpunkten = aktualisierteSchueler.map((s) => {
-        const { punkte, maxPunkte } = berechneGesamtpunkte(s.bewertungen)
-        return { ...s, gesamtPunkte: punkte, maxPunkte }
+        const { punkte } = berechneGesamtpunkte(s.bewertungen)
+        return { ...s, gesamtPunkte: punkte }
       })
       setKorrektur({ ...korrektur, schueler: mitGesamtpunkten })
     }
