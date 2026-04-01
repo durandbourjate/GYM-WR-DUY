@@ -27,9 +27,42 @@
 
 ---
 
-## Session 42 — 8 Bugfixes (31.03.2026)
+## Session 43 — Staging-Umgebung + ausstehende Tests (31.03.2026)
 
-Kritische und mittlere Bugs gefixt. Branch: `fix/bugfixes-2026-03-31`.
+### Stand
+- 8 Bugfixes aus Session 42 sind auf `main` deployed (Production + Staging)
+- Staging unter: `https://durandbourjate.github.io/GYM-WR-DUY/staging/`
+- **Apps Script Deploy noch ausstehend** für Bug 1 (istAbgegeben-Flag in ladePruefung)
+
+### Nächste Schritte (nächste Session)
+
+| Priorität | Aufgabe | Details |
+|-----------|---------|---------|
+| 🔴 | **Apps Script deployen** | `ladePruefung()` wurde erweitert → neue Bereitstellung nötig damit Bug 1 greift |
+| 🟠 | **Browser-Test: 8 Bugfixes auf Staging** | `https://durandbourjate.github.io/GYM-WR-DUY/staging/?id=...` — mit echtem Login (wr.test@gymhofwil.ch) testen |
+| 🟡 | **KaTeX verifizieren (main)** | Formel-Doppel-Anzeige gefixt in cc7c6fb — im Browser prüfen ob keine Doppel-Anzeige mehr |
+| 🟡 | **PDF Annotation Toolswitch mergen** | Branch `fix/pdf-auswahl-toolswitch` testen + merge to main |
+
+### Staging-Workflow
+
+```bash
+# Feature entwickeln:
+git checkout -b fix/mein-feature
+# ... Änderungen ...
+git commit && git push
+
+# Auf Staging deployen:
+git checkout preview && git merge fix/mein-feature && git push
+
+# Nach Test auf Production:
+git checkout main && git merge fix/mein-feature && git push
+```
+
+---
+
+## Session 42 — 8 Bugfixes (31.03.2026) ⚠️ BROWSER-TEST AUSSTEHEND
+
+Kritische und mittlere Bugs gefixt. Code ist auf `main` (commit e3cadc0), **aber ohne Browser-Test**. Tests müssen in nächster Session nachgeholt werden.
 
 | # | Bug | Fix | Dateien |
 |---|-----|-----|---------|
