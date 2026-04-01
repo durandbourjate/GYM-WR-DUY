@@ -821,6 +821,390 @@ const DIFF_LABELS = {1:"⭐ Einfach",2:"⭐⭐ Mittel",3:"⭐⭐⭐ Schwer"};
 const TYPE_LABELS = {mc:"📝 Einzelauswahl",multi:"☑️ Mehrfachauswahl",tf:"✓✗ Richtig/Falsch",fill:"📖 Lückentext",calc:"🔢 Berechnung",sort:"🔀 Zuordnung",open:"✏️ Offene Frage",buchungssatz:"📒 Buchungssatz",tkonto:"📊 T-Konto",bilanz:"📋 Bilanz/ER",kontenbestimmung:"🏷️ Kontenbestimmung",gruppe:"📦 Aufgabengruppe"};
 
 // ══════════════════════════════════════════
+// TYPE_HANDLERS Registry — polymorphes Dispatch pro Fragetyp
+// Jeder Handler: { render(q), buttons(q), restore(q,answer), check(qid), correctAnswer(q) }
+// render() gibt den typ-spezifischen HTML-Body zurück (ohne Header/Badges)
+// buttons() gibt die Action-Buttons zurück (Tipps, Überprüfen etc.)
+// restore() stellt den Zustand bei Zurück-Navigation wieder her
+// check() wird nicht direkt verwendet — die bestehenden answerXxx()-Funktionen bleiben
+// correctAnswer() gibt die Musterlösung als String zurück (für Review-Screen)
+// ══════════════════════════════════════════
+const TYPE_HANDLERS = {
+  mc: {
+    render(q) {
+      let h='<div class="mc-options">';
+      q.options.forEach(o=>{
+        h+='<div class="mc-opt" data-val="'+o.v+'" onclick="answerMC(this,\''+q.id+'\',\''+o.v+'\')">';
+        h+='<span class="opt-letter">'+o.v+'</span><span class="opt-text">'+highlightKonten(o.t)+'</span></div>';
+      });
+      return h+'</div>';
+    },
+    buttons(q) {
+      let h='';
+      if(q.hints&&q.hints.length)h+='<button class="btn btn-outline" id="hintsBtn" onclick="showHints(\''+q.id+'\')">💡 Tipps</button>';
+      return h;
+    },
+    restore(q,answer) {
+      document.querySelectorAll('.mc-opt').forEach(o=>{
+        o.style.pointerEvents='none';
+        if(o.dataset.val===q.correct)o.classList.add('correct');
+      });
+    },
+    correctAnswer(q) {
+      const opt=q.options.find(o=>o.v===q.correct); return q.correct+') '+(opt?opt.t:'');
+    }
+  },
+  multi: {
+    render(q) {
+      let h='<div class="multi-hint">☑️ Mehrere Antworten können richtig sein.</div>';
+      h+='<div class="mc-options" id="multiOpts">';
+      q.options.forEach(o=>{
+        h+='<div class="mc-opt" data-val="'+o.v+'" onclick="toggleMulti(this)">';
+        h+='<span class="opt-check"></span><span class="opt-letter">'+o.v+'</span><span class="opt-text">'+highlightKonten(o.t)+'</span></div>';
+      });
+      return h+'</div>';
+    },
+    buttons(q) {
+      let h='';
+      if(q.hints&&q.hints.length)h+='<button class="btn btn-outline" id="hintsBtn" onclick="showHints(\''+q.id+'\')">💡 Tipps</button>';
+      h+='<button class="btn btn-primary" onclick="answerMulti(\''+q.id+'\')">🔍 Überprüfen</button>';
+      return h;
+    },
+    restore(q,answer) {
+      const cs=new Set(q.correct);
+      document.querySelectorAll('#multiOpts .mc-opt').forEach(o=>{
+        o.style.pointerEvents='none';
+        if(cs.has(o.dataset.val)){o.classList.add('correct');o.querySelector('.opt-check').textContent='✓'}
+        else o.classList.add('multi-neutral');
+      });
+    },
+    correctAnswer(q) {
+      return q.correct.map(function(v){ const opt=q.options.find(o=>o.v===v); return v+') '+(opt?opt.t:''); }).join(' · ');
+    }
+  },
+  tf: {
+    render(q) {
+      return '<div class="tf-btns"><div class="tf-btn" onclick="answerTF(this,\''+q.id+'\',true)">✅ Richtig</div>'+
+        '<div class="tf-btn" onclick="answerTF(this,\''+q.id+'\',false)">❌ Falsch</div></div>';
+    },
+    buttons(q) { return ''; },
+    restore(q,answer) {
+      document.querySelectorAll('.tf-btn').forEach(b=>{
+        b.style.pointerEvents='none';
+        const isTrue=b.textContent.includes('Richtig');
+        if((isTrue&&q.correct)||(!isTrue&&!q.correct))b.classList.add('correct');
+      });
+    },
+    correctAnswer(q) { return q.correct?'Richtig':'Falsch'; }
+  },
+  fill: {
+    render(q, pctProgress, total) {
+      // Fill überschreibt den Header wegen Split-Logik
+      let h='<div class="q-progress-bg"></div><div class="q-progress-bar" style="width:'+pctProgress+'%"></div>';
+      h+='<div class="q-badges">';
+      h+='<span class="badge badge-topic">'+TOPICS[q.topic].short+'</span>';
+      h+='<span class="badge badge-diff'+q.diff+'">'+DIFF_LABELS[q.diff]+'</span>';
+      h+='<span class="badge badge-tax">'+q.tax+'</span>';
+      h+='<span class="badge badge-type">'+TYPE_LABELS[q.type]+'</span>';
+      h+=renderTagBadges(q);
+      h+='<span class="badge badge-progress">'+(state.current+1)+' / '+total+'</span>';
+      h+='<span class="badge badge-score">'+state.score+' Pkt.</span>';
+      h+='</div>';
+      h+=renderContext(q);
+      let parts=q.q.split(/\{(\d+)\}/g);
+      h+='<div class="q-text">';
+      let bIdx=0;
+      for(let i=0;i<parts.length;i++){
+        if(i%2===0)h+=highlightKonten(parts[i]);
+        else h+='<input class="fill-input" data-bidx="'+bIdx+'" placeholder="…" autocomplete="off" autocapitalize="off">';
+        if(i%2===1)bIdx++;
+      }
+      h+='</div>';
+      h+=renderImg(q);
+      return h;
+    },
+    fullHeader: true, // Signal: render() liefert eigenen Header
+    buttons(q) {
+      return '<button class="btn btn-outline" id="hintsBtn" onclick="showHints(\''+q.id+'\')">💡 Tipps</button>'+
+        '<button class="btn btn-primary" onclick="answerFill(\''+q.id+'\')">🔍 Überprüfen</button>';
+    },
+    restore(q,answer) {
+      document.querySelectorAll('.fill-input').forEach(inp=>{
+        const bi=parseInt(inp.dataset.bidx);inp.value=q.blanks[bi].answer;
+        inp.classList.add('correct');inp.disabled=true;
+      });
+    },
+    correctAnswer(q) {
+      return q.blanks.map(function(b,i){return 'Lücke '+(i+1)+': '+b.answer}).join(' · ');
+    }
+  },
+  calc: {
+    render(q) {
+      let h='<div class="calc-rows">';
+      q.rows.forEach((r,i)=>{
+        h+='<div class="calc-row"><label>'+r.label+'</label><input type="number" step="any" data-ridx="'+i+'" placeholder="?"><span class="unit">'+r.unit+'</span></div>';
+      });
+      return h+'</div>';
+    },
+    buttons(q) {
+      let h='';
+      if(q.hints&&q.hints.length)h+='<button class="btn btn-outline" id="hintsBtn" onclick="showHints(\''+q.id+'\')">💡 Tipps</button>';
+      h+='<button class="btn btn-primary" onclick="answerCalc(\''+q.id+'\')">🔍 Überprüfen</button>';
+      return h;
+    },
+    restore(q,answer) {
+      document.querySelectorAll('.calc-row input').forEach(inp=>{
+        const ri=parseInt(inp.dataset.ridx);inp.value=q.rows[ri].answer;
+        inp.classList.add('correct');inp.disabled=true;
+      });
+    },
+    correctAnswer(q) {
+      return q.rows.map(function(r){return r.label+' '+r.answer+' '+r.unit}).join(' · ');
+    }
+  },
+  sort: {
+    render(q) {
+      let h='<div class="sort-pool" id="sortPool">';
+      let items=[...q.items];shuffle(items);
+      items.forEach((it,i)=>{
+        h+='<span class="sort-item" data-oidx="'+q.items.indexOf(it)+'" onclick="pickSortItem(this)">'+highlightKonten(it.t)+'</span>';
+      });
+      h+='</div><div class="sort-cats" id="sortCats" style="grid-template-columns:repeat('+q.categories.length+',1fr)">';
+      q.categories.forEach((cat,ci)=>{
+        h+='<div class="sort-cat" data-cidx="'+ci+'" onclick="placeSortItem(this,'+ci+')"><div class="sort-cat-title">'+highlightKonten(cat)+'</div><div class="sort-cat-items" id="sortCat'+ci+'"></div></div>';
+      });
+      return h+'</div>';
+    },
+    buttons(q) {
+      return '<button class="btn btn-primary" onclick="answerSort(\''+q.id+'\')">🔍 Überprüfen</button>';
+    },
+    restore(q,answer) {
+      document.querySelectorAll('.sort-item,.sort-cat').forEach(el=>el.style.pointerEvents='none');
+    },
+    correctAnswer(q) {
+      return q.categories.map(function(cat,ci){
+        const items=q.items.filter(function(it){return it.cat===ci}).map(function(it){return it.t});
+        return '<strong>'+cat+':</strong> '+items.join(', ');
+      }).join(' · ');
+    }
+  },
+  open: {
+    render(q) {
+      let h='<textarea class="open-answer" id="openAnswer" placeholder="Schreiben Sie Ihre Antwort hier…"></textarea>';
+      h+='<div class="open-sample" id="openSample"><div class="open-sample-title">Lösungsvorschlag:</div><div id="openSampleText"></div></div>';
+      h+='<div class="open-self" id="openSelf">';
+      h+='<button class="btn btn-primary" onclick="answerOpen(\''+q.id+'\',true)">✅ Gewusst</button>';
+      h+='<button class="btn btn-outline" onclick="answerOpen(\''+q.id+'\',false)">❌ Nicht gewusst</button>';
+      return h+'</div>';
+    },
+    buttons(q) {
+      let h='';
+      if(q.hints&&q.hints.length)h+='<button class="btn btn-outline" id="hintsBtn" onclick="showHints(\''+q.id+'\')">💡 Tipps</button>';
+      h+='<button class="btn btn-primary" onclick="showOpenSample(\''+q.id+'\')">💡 Lösung anzeigen</button>';
+      return h;
+    },
+    restore(q,answer) {
+      var ta=document.getElementById('openAnswer');if(ta)ta.disabled=true;
+      var sample=document.getElementById('openSample');if(sample){document.getElementById('openSampleText').textContent=q.sample||'';sample.classList.add('show')}
+    },
+    correctAnswer(q) { return q.sample||'Siehe Lösungsvorschlag'; }
+  },
+  buchungssatz: {
+    render(q) {
+      _bsCount=q.correct.length;
+      let h='<div class="bs-header"><span class="bs-entry-label">Soll</span><span></span><span class="bs-entry-label">Haben</span><span class="bs-entry-label">Betrag</span></div>';
+      h+='<div class="bs-entries" id="bsEntries">';
+      for(var bi=0;bi<q.correct.length;bi++){
+        h+='<div class="bs-entry" id="bsEntry'+(bi+1)+'">';
+        h+=renderKontenSelect(q.konten,'bsSoll'+(bi+1),'Soll-Konto');
+        h+='<span class="an-label">an</span>';
+        h+=renderKontenSelect(q.konten,'bsHaben'+(bi+1),'Haben-Konto');
+        h+='<div style="display:flex;align-items:center;gap:4px"><input type="number" class="bs-amount" id="bsBetrag'+(bi+1)+'" min="0" step="0.01" placeholder="CHF"></div>';
+        h+='</div>';
+      }
+      h+='</div>';
+      h+='<div class="bs-add" onclick="addBsEntry(\''+q.id+'\')">+ Buchungssatz hinzufügen</div>';
+      return h;
+    },
+    buttons(q) {
+      return '<button class="btn btn-primary" onclick="answerBuchungssatz(\''+q.id+'\')">🔍 Überprüfen</button>';
+    },
+    restore(q,answer) {
+      document.querySelectorAll('.konto-select,.bs-amount').forEach(function(el){el.disabled=true;el.classList.add('correct')});
+      var addBtn=document.querySelector('.bs-add');if(addBtn)addBtn.style.display='none';
+    },
+    correctAnswer(q) {
+      return q.correct.map(function(c){
+        var sN=q.konten.find(function(k){return k.nr===c.soll});
+        var hN=q.konten.find(function(k){return k.nr===c.haben});
+        return (sN?sN.name:c.soll)+' / '+(hN?hN.name:c.haben)+' CHF '+c.betrag.toLocaleString('de-CH');
+      }).join(' · ');
+    }
+  },
+  tkonto: {
+    render(q) {
+      let h='';
+      if(q.geschaeftsfaelle&&q.geschaeftsfaelle.length){
+        h+='<div class="tk-gf-list"><strong>Geschäftsfälle:</strong><ol>';
+        q.geschaeftsfaelle.forEach(function(gf){h+='<li>'+highlightKonten(gf)+'</li>'});
+        h+='</ol></div>';
+      }
+      h+='<div class="tk-container">';
+      q.konten.forEach(function(konto,ki){
+        var totalSoll=(konto.correctSoll||[]).length;
+        var totalHaben=(konto.correctHaben||[]).length;
+        var rowsSoll=Math.max(totalSoll,1);
+        var rowsHaben=Math.max(totalHaben,1);
+        h+='<div class="tk-card" data-ki="'+ki+'">';
+        h+='<div class="tk-title">'+konto.nr+' '+konto.name+'</div>';
+        h+='<div class="tk-table">';
+        h+='<div class="tk-side" id="tkSoll'+ki+'">';
+        h+='<div class="tk-side-header">Soll</div>';
+        if(typeof konto.ab==='number')h+='<div class="tk-ab">AB: '+konto.ab.toLocaleString('de-CH')+' CHF</div>';
+        for(var si=0;si<rowsSoll;si++){
+          h+='<div class="tk-row">';
+          if(q.geschaeftsfaelle)h+='<span class="tk-gf">Gf</span>';
+          h+=renderKontenSelect(q.konten.concat(q.gegenkonten||[]),'tkSollKonto'+ki+'_'+si,'Gegenkonto');
+          h+='<input type="number" step="any" id="tkSollBetrag'+ki+'_'+si+'" placeholder="CHF">';
+          h+='</div>';
+        }
+        h+='<button class="tk-add-row" onclick="addTkRow('+ki+',\'soll\')">+ Zeile</button>';
+        h+='</div>';
+        h+='<div class="tk-side" id="tkHaben'+ki+'" style="border-left:2px solid var(--c-border)">';
+        h+='<div class="tk-side-header">Haben</div>';
+        if(typeof konto.ab==='number')h+='<div class="tk-ab" style="visibility:hidden">AB</div>';
+        for(var hi=0;hi<rowsHaben;hi++){
+          h+='<div class="tk-row">';
+          if(q.geschaeftsfaelle)h+='<span class="tk-gf">Gf</span>';
+          h+=renderKontenSelect(q.konten.concat(q.gegenkonten||[]),'tkHabenKonto'+ki+'_'+hi,'Gegenkonto');
+          h+='<input type="number" step="any" id="tkHabenBetrag'+ki+'_'+hi+'" placeholder="CHF">';
+          h+='</div>';
+        }
+        h+='<button class="tk-add-row" onclick="addTkRow('+ki+',\'haben\')">+ Zeile</button>';
+        h+='</div>';
+        h+='</div>';
+        h+='<div class="tk-saldo">';
+        h+='<div class="tk-saldo-side"><label>Saldo Soll</label><input type="number" step="any" id="tkSaldoSoll'+ki+'" placeholder="0"></div>';
+        h+='<div class="tk-saldo-side" style="border-left:2px solid var(--c-border)"><label>Saldo Haben</label><input type="number" step="any" id="tkSaldoHaben'+ki+'" placeholder="0"></div>';
+        h+='</div>';
+        h+='</div>';
+      });
+      return h+'</div>';
+    },
+    buttons(q) {
+      return '<button class="btn btn-primary" onclick="answerTKonto(\''+q.id+'\')">🔍 Überprüfen</button>';
+    },
+    restore(q,answer) {
+      document.querySelectorAll('.tk-card .konto-select,.tk-card input[type="number"]').forEach(function(el){el.disabled=true;el.classList.add('correct')});
+      document.querySelectorAll('.tk-add-row').forEach(function(b){b.style.display='none'});
+    },
+    correctAnswer(q) {
+      return q.konten.map(function(k){
+        var s=(k.correctSoll||[]).map(function(e){return e.gegen+' '+e.betrag}).join(', ');
+        var h=(k.correctHaben||[]).map(function(e){return e.gegen+' '+e.betrag}).join(', ');
+        return '<strong>'+k.name+':</strong> Soll ['+s+'] Haben ['+h+']'+(k.correctSaldo?' Saldo: '+k.correctSaldo.betrag+' ('+k.correctSaldo.seite+')':'');
+      }).join(' · ');
+    }
+  },
+  bilanz: {
+    render(q) {
+      let h='<div class="bilanz-ref"><table><tr><th>Nr.</th><th>Konto</th><th>Saldo (CHF)</th></tr>';
+      var shuffledKonten=[...q.kontenMitSaldi];shuffle(shuffledKonten);
+      shuffledKonten.forEach(function(k){
+        h+='<tr><td class="ref-nr">'+k.nr+'</td><td>'+k.name+'</td><td class="ref-saldo">'+k.saldo.toLocaleString('de-CH')+'</td></tr>';
+      });
+      h+='</table></div>';
+      var leftTitle=q.modus==='erfolgsrechnung'?'Aufwand':'Aktiven';
+      var rightTitle=q.modus==='erfolgsrechnung'?'Ertrag':'Passiven';
+      var rowCount=q.kontenMitSaldi.length;
+      var leftRows=Math.ceil(rowCount/2);var rightRows=rowCount-leftRows;
+      h+='<div class="bilanz-layout">';
+      h+='<div class="bilanz-seite" id="bilanzLinks">';
+      h+='<div class="bilanz-seite-title">'+leftTitle+'</div>';
+      for(var li=0;li<leftRows;li++){
+        h+='<div class="bilanz-row">'+renderKontenSelect(q.kontenMitSaldi,'bilanzL'+li,'Konto wählen');
+        h+='<input type="number" step="any" id="bilanzLBetrag'+li+'" placeholder="CHF"></div>';
+      }
+      h+='<div class="bilanz-summe"><span>Summe '+leftTitle+'</span><input type="number" step="any" id="bilanzSummeL" placeholder="CHF"></div>';
+      h+='</div>';
+      h+='<div class="bilanz-seite" id="bilanzRechts">';
+      h+='<div class="bilanz-seite-title">'+rightTitle+'</div>';
+      for(var ri=0;ri<rightRows;ri++){
+        h+='<div class="bilanz-row">'+renderKontenSelect(q.kontenMitSaldi,'bilanzR'+ri,'Konto wählen');
+        h+='<input type="number" step="any" id="bilanzRBetrag'+ri+'" placeholder="CHF"></div>';
+      }
+      h+='<div class="bilanz-summe"><span>Summe '+rightTitle+'</span><input type="number" step="any" id="bilanzSummeR" placeholder="CHF"></div>';
+      h+='</div>';
+      return h+'</div>';
+    },
+    buttons(q) {
+      return '<button class="btn btn-primary" onclick="answerBilanz(\''+q.id+'\')">🔍 Überprüfen</button>';
+    },
+    restore(q,answer) {
+      document.querySelectorAll('.bilanz-layout .konto-select,.bilanz-layout input[type="number"],.bilanz-summe input').forEach(function(el){el.disabled=true;el.classList.add('correct')});
+    },
+    correctAnswer(q) {
+      var left=(q.correct.aktiven||q.correct.aufwand||[]).map(function(nr){var k=q.kontenMitSaldi.find(function(x){return x.nr===nr});return k?k.name+' '+k.saldo.toLocaleString('de-CH'):nr}).join(', ');
+      var right=(q.correct.passiven||q.correct.ertrag||[]).map(function(nr){var k=q.kontenMitSaldi.find(function(x){return x.nr===nr});return k?k.name+' '+k.saldo.toLocaleString('de-CH'):nr}).join(', ');
+      return '<strong>Links:</strong> '+left+' · <strong>Rechts:</strong> '+right+' · Summe: '+q.correct.bilanzsumme.toLocaleString('de-CH');
+    }
+  },
+  kontenbestimmung: {
+    render(q) {
+      let h='<div style="overflow-x:auto"><table class="kb-table"><tr><th class="kb-nr">#</th><th class="kb-gf">Geschäftsfall</th><th>Konto</th><th>Seite</th></tr>';
+      q.aufgaben.forEach(function(a,ai){
+        var rows=a.correct.length;
+        for(var ri=0;ri<rows;ri++){
+          h+='<tr>';
+          if(ri===0)h+='<td class="kb-nr" rowspan="'+rows+'">'+(ai+1)+'</td><td class="kb-gf" rowspan="'+rows+'">'+highlightKonten(a.text)+'</td>';
+          h+='<td>'+renderKontenSelect(q.konten,'kbKonto'+ai+'_'+ri,'Konto')+'</td>';
+          h+='<td><select class="kb-seite-select" id="kbSeite'+ai+'_'+ri+'"><option value="">–</option><option value="soll">Soll</option><option value="haben">Haben</option></select></td>';
+          h+='</tr>';
+        }
+      });
+      return h+'</table></div>';
+    },
+    buttons(q) {
+      return '<button class="btn btn-primary" onclick="answerKontenbestimmung(\''+q.id+'\')">🔍 Überprüfen</button>';
+    },
+    restore(q,answer) {
+      document.querySelectorAll('.kb-table .konto-select,.kb-seite-select').forEach(function(el){el.disabled=true;el.classList.add('correct')});
+    },
+    correctAnswer(q) {
+      return q.aufgaben.map(function(a,i){
+        return (i+1)+') '+a.correct.map(function(c){var k=q.konten.find(function(x){return x.nr===c.konto});return (k?k.name:c.konto)+' ('+c.seite+')'}).join(', ');
+      }).join(' · ');
+    }
+  },
+  gruppe: {
+    render(q) {
+      let h='<div class="gruppe-container" id="gruppeContainer">';
+      q.teil.forEach(function(t,ti){
+        h+='<div class="gruppe-teil" id="gruppeTeil'+ti+'" data-ti="'+ti+'">';
+        h+='<div class="gruppe-teil-header"><span class="gruppe-teil-nr">'+t.sub+'</span>';
+        h+='<span class="gruppe-teil-type">'+TYPE_LABELS[t.type]+'</span></div>';
+        h+='<div class="q-text">'+highlightKonten(t.q)+'</div>';
+        h+=renderGruppeTeilInner(q,t,ti);
+        h+='<div class="feedback" id="gruppeFb'+ti+'"></div>';
+        h+='</div>';
+      });
+      return h+'</div>';
+    },
+    buttons(q) {
+      return '<button class="btn btn-primary" onclick="answerGruppe(\''+q.id+'\')">🔍 Alle prüfen</button>';
+    },
+    restore(q,answer) {
+      document.querySelectorAll('.gruppe-teil .konto-select,.gruppe-teil .bs-amount,.gruppe-teil input,.gruppe-teil .mc-opt,.gruppe-teil .tf-btn,.gruppe-teil select').forEach(function(el){
+        el.disabled=true;if(el.style)el.style.pointerEvents='none';
+      });
+    },
+    correctAnswer(q) {
+      return q.teil.map(function(t){return t.sub+') '+getCorrectAnswer(t)}).join(' · ');
+    }
+  }
+};
+
+// ══════════════════════════════════════════
 // FiBu Konten-Highlighting (Lehrmittel-Farben)
 // ══════════════════════════════════════════
 const KONTO_KATEGORIEN = {
@@ -1046,55 +1430,9 @@ function showHints(qid){
 // RESTORE ANSWER STATE — for back navigation
 // ══════════════════════════════════════════
 function restoreAnswerState(q,answer){
-  if(q.type==='mc'){
-    document.querySelectorAll('.mc-opt').forEach(o=>{
-      o.style.pointerEvents='none';
-      if(o.dataset.val===q.correct)o.classList.add('correct');
-    });
-  } else if(q.type==='multi'){
-    const cs=new Set(q.correct);
-    document.querySelectorAll('#multiOpts .mc-opt').forEach(o=>{
-      o.style.pointerEvents='none';
-      if(cs.has(o.dataset.val)){o.classList.add('correct');o.querySelector('.opt-check').textContent='✓'}
-      else o.classList.add('multi-neutral');
-    });
-  } else if(q.type==='tf'){
-    document.querySelectorAll('.tf-btn').forEach(b=>{
-      b.style.pointerEvents='none';
-      const isTrue=b.textContent.includes('Richtig');
-      if((isTrue&&q.correct)||(!isTrue&&!q.correct))b.classList.add('correct');
-    });
-  } else if(q.type==='fill'){
-    document.querySelectorAll('.fill-input').forEach(inp=>{
-      const bi=parseInt(inp.dataset.bidx);inp.value=q.blanks[bi].answer;
-      inp.classList.add('correct');inp.disabled=true;
-    });
-  } else if(q.type==='calc'){
-    document.querySelectorAll('.calc-row input').forEach(inp=>{
-      const ri=parseInt(inp.dataset.ridx);inp.value=q.rows[ri].answer;
-      inp.classList.add('correct');inp.disabled=true;
-    });
-  } else if(q.type==='sort'){
-    document.querySelectorAll('.sort-item,.sort-cat').forEach(el=>el.style.pointerEvents='none');
-  } else if(q.type==='open'){
-    var ta=document.getElementById('openAnswer');if(ta)ta.disabled=true;
-    var sample=document.getElementById('openSample');if(sample){document.getElementById('openSampleText').textContent=q.sample||'';sample.classList.add('show')}
-  } else if(q.type==='buchungssatz'){
-    document.querySelectorAll('.konto-select,.bs-amount').forEach(function(el){el.disabled=true;el.classList.add('correct')});
-    var addBtn=document.querySelector('.bs-add');if(addBtn)addBtn.style.display='none';
-  } else if(q.type==='tkonto'){
-    document.querySelectorAll('.tk-card .konto-select,.tk-card input[type="number"]').forEach(function(el){el.disabled=true;el.classList.add('correct')});
-    document.querySelectorAll('.tk-add-row').forEach(function(b){b.style.display='none'});
-  } else if(q.type==='bilanz'){
-    document.querySelectorAll('.bilanz-layout .konto-select,.bilanz-layout input[type="number"],.bilanz-summe input').forEach(function(el){el.disabled=true;el.classList.add('correct')});
-  } else if(q.type==='kontenbestimmung'){
-    document.querySelectorAll('.kb-table .konto-select,.kb-seite-select').forEach(function(el){el.disabled=true;el.classList.add('correct')});
-  } else if(q.type==='gruppe'){
-    // Disable all inputs in group
-    document.querySelectorAll('.gruppe-teil .konto-select,.gruppe-teil .bs-amount,.gruppe-teil input,.gruppe-teil .mc-opt,.gruppe-teil .tf-btn,.gruppe-teil select').forEach(function(el){
-      el.disabled=true;if(el.style)el.style.pointerEvents='none';
-    });
-  }
+  // Typ-spezifische Wiederherstellung via TYPE_HANDLERS
+  const handler=TYPE_HANDLERS[q.type];
+  if(handler&&handler.restore)handler.restore(q,answer);
   const fb=document.getElementById('feedback');
   fb.className='feedback show '+(answer.correct?'correct':'wrong');
   fb.innerHTML='<div class="feedback-title">'+(answer.correct?'✅ Richtig!':'❌ Leider falsch')+'</div><div>'+highlightKonten(q.explain)+'</div>';
@@ -1553,205 +1891,23 @@ function renderQuestion(){
   html+='<span class="badge badge-progress">'+(state.current+1)+' / '+total+'</span>';
   html+='<span class="badge badge-score">'+state.score+' Pkt.</span>';
   html+='</div>';
-  html+=renderContext(q);
-  html+='<div class="q-text">'+highlightKonten(q.q)+'</div>';
-  html+=renderImg(q);
-  if(q.type==='mc'){
-    html+='<div class="mc-options">';
-    q.options.forEach(o=>{
-      html+='<div class="mc-opt" data-val="'+o.v+'" onclick="answerMC(this,\''+q.id+'\',\''+o.v+'\')">';
-      html+='<span class="opt-letter">'+o.v+'</span><span class="opt-text">'+highlightKonten(o.t)+'</span></div>';
-    });
-    html+='</div>';
-  } else if(q.type==='multi'){
-    html+='<div class="multi-hint">☑️ Mehrere Antworten können richtig sein.</div>';
-    html+='<div class="mc-options" id="multiOpts">';
-    q.options.forEach(o=>{
-      html+='<div class="mc-opt" data-val="'+o.v+'" onclick="toggleMulti(this)">';
-      html+='<span class="opt-check"></span><span class="opt-letter">'+o.v+'</span><span class="opt-text">'+highlightKonten(o.t)+'</span></div>';
-    });
-    html+='</div>';
-  } else if(q.type==='tf'){
-    html+='<div class="tf-btns"><div class="tf-btn" onclick="answerTF(this,\''+q.id+'\',true)">✅ Richtig</div>';
-    html+='<div class="tf-btn" onclick="answerTF(this,\''+q.id+'\',false)">❌ Falsch</div></div>';
-  } else if(q.type==='fill'){
-    let parts=q.q.split(/\{(\d+)\}/g);
-    html='<div class="q-progress-bg"></div><div class="q-progress-bar" style="width:'+pctProgress+'%"></div>';
-    html+='<div class="q-badges">';
-    html+='<span class="badge badge-topic">'+TOPICS[q.topic].short+'</span>';
-    html+='<span class="badge badge-diff'+q.diff+'">'+DIFF_LABELS[q.diff]+'</span>';
-    html+='<span class="badge badge-tax">'+q.tax+'</span>';
-    html+='<span class="badge badge-type">'+TYPE_LABELS[q.type]+'</span>';
-    html+=renderTagBadges(q);
-    html+='<span class="badge badge-progress">'+(state.current+1)+' / '+total+'</span>';
-    html+='<span class="badge badge-score">'+state.score+' Pkt.</span>';
-    html+='</div>';
+  // ── Typ-spezifischer Body via TYPE_HANDLERS ──
+  const handler=TYPE_HANDLERS[q.type];
+  if(handler){
+    if(handler.fullHeader){
+      // Fill etc. liefern eigenen Header (wegen Split-Logik)
+      html=handler.render(q, pctProgress, total);
+    } else {
+      html+=renderContext(q);
+      html+='<div class="q-text">'+highlightKonten(q.q)+'</div>';
+      html+=renderImg(q);
+      html+=handler.render(q, pctProgress, total);
+    }
+  } else {
+    // Fallback für unbekannte Typen
     html+=renderContext(q);
-    html+='<div class="q-text">';
-    let bIdx=0;
-    for(let i=0;i<parts.length;i++){
-      if(i%2===0)html+=highlightKonten(parts[i]);
-      else html+='<input class="fill-input" data-bidx="'+bIdx+'" placeholder="…" autocomplete="off" autocapitalize="off">';
-      if(i%2===1)bIdx++;
-    }
-    html+='</div>';
+    html+='<div class="q-text">'+highlightKonten(q.q)+'</div>';
     html+=renderImg(q);
-  } else if(q.type==='calc'){
-    html+='<div class="calc-rows">';
-    q.rows.forEach((r,i)=>{
-      html+='<div class="calc-row"><label>'+r.label+'</label><input type="number" step="any" data-ridx="'+i+'" placeholder="?"><span class="unit">'+r.unit+'</span></div>';
-    });
-    html+='</div>';
-  } else if(q.type==='sort'){
-    html+='<div class="sort-pool" id="sortPool">';
-    let items=[...q.items];shuffle(items);
-    items.forEach((it,i)=>{
-      html+='<span class="sort-item" data-oidx="'+q.items.indexOf(it)+'" onclick="pickSortItem(this)">'+highlightKonten(it.t)+'</span>';
-    });
-    html+='</div><div class="sort-cats" id="sortCats" style="grid-template-columns:repeat('+q.categories.length+',1fr)">';
-    q.categories.forEach((cat,ci)=>{
-      html+='<div class="sort-cat" data-cidx="'+ci+'" onclick="placeSortItem(this,'+ci+')"><div class="sort-cat-title">'+highlightKonten(cat)+'</div><div class="sort-cat-items" id="sortCat'+ci+'"></div></div>';
-    });
-    html+='</div>';
-  } else if(q.type==='open'){
-    html+='<textarea class="open-answer" id="openAnswer" placeholder="Schreiben Sie Ihre Antwort hier…"></textarea>';
-    html+='<div class="open-sample" id="openSample"><div class="open-sample-title">Lösungsvorschlag:</div><div id="openSampleText"></div></div>';
-    html+='<div class="open-self" id="openSelf">';
-    html+='<button class="btn btn-primary" onclick="answerOpen(\''+q.id+'\',true)">✅ Gewusst</button>';
-    html+='<button class="btn btn-outline" onclick="answerOpen(\''+q.id+'\',false)">❌ Nicht gewusst</button>';
-    html+='</div>';
-  }
-  // ── BUCHUNGSSATZ ──
-  else if(q.type==='buchungssatz'){
-    _bsCount=q.correct.length;
-    html+='<div class="bs-header"><span class="bs-entry-label">Soll</span><span></span><span class="bs-entry-label">Haben</span><span class="bs-entry-label">Betrag</span></div>';
-    html+='<div class="bs-entries" id="bsEntries">';
-    for(var bi=0;bi<q.correct.length;bi++){
-      html+='<div class="bs-entry" id="bsEntry'+(bi+1)+'">';
-      html+=renderKontenSelect(q.konten,'bsSoll'+(bi+1),'Soll-Konto');
-      html+='<span class="an-label">an</span>';
-      html+=renderKontenSelect(q.konten,'bsHaben'+(bi+1),'Haben-Konto');
-      html+='<div style="display:flex;align-items:center;gap:4px"><input type="number" class="bs-amount" id="bsBetrag'+(bi+1)+'" min="0" step="0.01" placeholder="CHF"></div>';
-      html+='</div>';
-    }
-    html+='</div>';
-    html+='<div class="bs-add" onclick="addBsEntry(\''+q.id+'\')">+ Buchungssatz hinzufügen</div>';
-  }
-  // ── T-KONTO ──
-  else if(q.type==='tkonto'){
-    if(q.geschaeftsfaelle&&q.geschaeftsfaelle.length){
-      html+='<div class="tk-gf-list"><strong>Geschäftsfälle:</strong><ol>';
-      q.geschaeftsfaelle.forEach(function(gf){html+='<li>'+highlightKonten(gf)+'</li>'});
-      html+='</ol></div>';
-    }
-    html+='<div class="tk-container">';
-    q.konten.forEach(function(konto,ki){
-      var totalSoll=(konto.correctSoll||[]).length;
-      var totalHaben=(konto.correctHaben||[]).length;
-      var rowsSoll=Math.max(totalSoll,1);
-      var rowsHaben=Math.max(totalHaben,1);
-      html+='<div class="tk-card" data-ki="'+ki+'">';
-      html+='<div class="tk-title">'+konto.nr+' '+konto.name+'</div>';
-      html+='<div class="tk-table">';
-      // Soll-Seite
-      html+='<div class="tk-side" id="tkSoll'+ki+'">';
-      html+='<div class="tk-side-header">Soll</div>';
-      if(typeof konto.ab==='number')html+='<div class="tk-ab">AB: '+konto.ab.toLocaleString('de-CH')+' CHF</div>';
-      for(var si=0;si<rowsSoll;si++){
-        html+='<div class="tk-row">';
-        if(q.geschaeftsfaelle)html+='<span class="tk-gf">Gf</span>';
-        html+=renderKontenSelect(q.konten.concat(q.gegenkonten||[]),'tkSollKonto'+ki+'_'+si,'Gegenkonto');
-        html+='<input type="number" step="any" id="tkSollBetrag'+ki+'_'+si+'" placeholder="CHF">';
-        html+='</div>';
-      }
-      html+='<button class="tk-add-row" onclick="addTkRow('+ki+',\'soll\')">+ Zeile</button>';
-      html+='</div>';
-      // Haben-Seite
-      html+='<div class="tk-side" id="tkHaben'+ki+'" style="border-left:2px solid var(--c-border)">';
-      html+='<div class="tk-side-header">Haben</div>';
-      if(typeof konto.ab==='number')html+='<div class="tk-ab" style="visibility:hidden">AB</div>';
-      for(var hi=0;hi<rowsHaben;hi++){
-        html+='<div class="tk-row">';
-        if(q.geschaeftsfaelle)html+='<span class="tk-gf">Gf</span>';
-        html+=renderKontenSelect(q.konten.concat(q.gegenkonten||[]),'tkHabenKonto'+ki+'_'+hi,'Gegenkonto');
-        html+='<input type="number" step="any" id="tkHabenBetrag'+ki+'_'+hi+'" placeholder="CHF">';
-        html+='</div>';
-      }
-      html+='<button class="tk-add-row" onclick="addTkRow('+ki+',\'haben\')">+ Zeile</button>';
-      html+='</div>';
-      html+='</div>'; // tk-table
-      // Saldo
-      html+='<div class="tk-saldo">';
-      html+='<div class="tk-saldo-side"><label>Saldo Soll</label><input type="number" step="any" id="tkSaldoSoll'+ki+'" placeholder="0"></div>';
-      html+='<div class="tk-saldo-side" style="border-left:2px solid var(--c-border)"><label>Saldo Haben</label><input type="number" step="any" id="tkSaldoHaben'+ki+'" placeholder="0"></div>';
-      html+='</div>';
-      html+='</div>'; // tk-card
-    });
-    html+='</div>';
-  }
-  // ── BILANZ ──
-  else if(q.type==='bilanz'){
-    // Referenztabelle
-    html+='<div class="bilanz-ref"><table><tr><th>Nr.</th><th>Konto</th><th>Saldo (CHF)</th></tr>';
-    var shuffledKonten=[...q.kontenMitSaldi];shuffle(shuffledKonten);
-    shuffledKonten.forEach(function(k){
-      html+='<tr><td class="ref-nr">'+k.nr+'</td><td>'+k.name+'</td><td class="ref-saldo">'+k.saldo.toLocaleString('de-CH')+'</td></tr>';
-    });
-    html+='</table></div>';
-    // Bilanz-Layout
-    var leftTitle=q.modus==='erfolgsrechnung'?'Aufwand':'Aktiven';
-    var rightTitle=q.modus==='erfolgsrechnung'?'Ertrag':'Passiven';
-    var rowCount=q.kontenMitSaldi.length;
-    var leftRows=Math.ceil(rowCount/2);var rightRows=rowCount-leftRows;
-    html+='<div class="bilanz-layout">';
-    // Linke Seite
-    html+='<div class="bilanz-seite" id="bilanzLinks">';
-    html+='<div class="bilanz-seite-title">'+leftTitle+'</div>';
-    for(var li=0;li<leftRows;li++){
-      html+='<div class="bilanz-row">'+renderKontenSelect(q.kontenMitSaldi,'bilanzL'+li,'Konto wählen');
-      html+='<input type="number" step="any" id="bilanzLBetrag'+li+'" placeholder="CHF"></div>';
-    }
-    html+='<div class="bilanz-summe"><span>Summe '+leftTitle+'</span><input type="number" step="any" id="bilanzSummeL" placeholder="CHF"></div>';
-    html+='</div>';
-    // Rechte Seite
-    html+='<div class="bilanz-seite" id="bilanzRechts">';
-    html+='<div class="bilanz-seite-title">'+rightTitle+'</div>';
-    for(var ri=0;ri<rightRows;ri++){
-      html+='<div class="bilanz-row">'+renderKontenSelect(q.kontenMitSaldi,'bilanzR'+ri,'Konto wählen');
-      html+='<input type="number" step="any" id="bilanzRBetrag'+ri+'" placeholder="CHF"></div>';
-    }
-    html+='<div class="bilanz-summe"><span>Summe '+rightTitle+'</span><input type="number" step="any" id="bilanzSummeR" placeholder="CHF"></div>';
-    html+='</div>';
-    html+='</div>';
-  }
-  // ── KONTENBESTIMMUNG ──
-  else if(q.type==='kontenbestimmung'){
-    html+='<div style="overflow-x:auto"><table class="kb-table"><tr><th class="kb-nr">#</th><th class="kb-gf">Geschäftsfall</th><th>Konto</th><th>Seite</th></tr>';
-    q.aufgaben.forEach(function(a,ai){
-      var rows=a.correct.length;
-      for(var ri=0;ri<rows;ri++){
-        html+='<tr>';
-        if(ri===0)html+='<td class="kb-nr" rowspan="'+rows+'">'+(ai+1)+'</td><td class="kb-gf" rowspan="'+rows+'">'+highlightKonten(a.text)+'</td>';
-        html+='<td>'+renderKontenSelect(q.konten,'kbKonto'+ai+'_'+ri,'Konto')+'</td>';
-        html+='<td><select class="kb-seite-select" id="kbSeite'+ai+'_'+ri+'"><option value="">–</option><option value="soll">Soll</option><option value="haben">Haben</option></select></td>';
-        html+='</tr>';
-      }
-    });
-    html+='</table></div>';
-  }
-  // ── AUFGABENGRUPPE ──
-  else if(q.type==='gruppe'){
-    html+='<div class="gruppe-container" id="gruppeContainer">';
-    q.teil.forEach(function(t,ti){
-      html+='<div class="gruppe-teil" id="gruppeTeil'+ti+'" data-ti="'+ti+'">';
-      html+='<div class="gruppe-teil-header"><span class="gruppe-teil-nr">'+t.sub+'</span>';
-      html+='<span class="gruppe-teil-type">'+TYPE_LABELS[t.type]+'</span></div>';
-      html+='<div class="q-text">'+highlightKonten(t.q)+'</div>';
-      html+=renderGruppeTeilInner(q,t,ti);
-      html+='<div class="feedback" id="gruppeFb'+ti+'"></div>';
-      html+='</div>';
-    });
-    html+='</div>';
   }
   // Unified action row: type-specific button + skip (same line)
   html+='<div class="feedback" id="feedback"></div>';
@@ -1761,31 +1917,8 @@ function renderQuestion(){
   }
   html+='<div class="q-action-row" id="skipRow">';
   if(state.current>0)html+='<button class="btn btn-back" onclick="prevQuestion()">← Zurück</button>';
-  if(q.type==='fill'){
-    html+='<button class="btn btn-outline" id="hintsBtn" onclick="showHints(\''+q.id+'\')">💡 Tipps</button>';
-    html+='<button class="btn btn-primary" onclick="answerFill(\''+q.id+'\')">🔍 Überprüfen</button>';
-  }
-  else if(q.type==='mc'){
-    if(q.hints&&q.hints.length)html+='<button class="btn btn-outline" id="hintsBtn" onclick="showHints(\''+q.id+'\')">💡 Tipps</button>';
-  }
-  else if(q.type==='multi'){
-    if(q.hints&&q.hints.length)html+='<button class="btn btn-outline" id="hintsBtn" onclick="showHints(\''+q.id+'\')">💡 Tipps</button>';
-    html+='<button class="btn btn-primary" onclick="answerMulti(\''+q.id+'\')">🔍 Überprüfen</button>';
-  }
-  else if(q.type==='calc'){
-    if(q.hints&&q.hints.length)html+='<button class="btn btn-outline" id="hintsBtn" onclick="showHints(\''+q.id+'\')">💡 Tipps</button>';
-    html+='<button class="btn btn-primary" onclick="answerCalc(\''+q.id+'\')">🔍 Überprüfen</button>';
-  }
-  else if(q.type==='sort') html+='<button class="btn btn-primary" onclick="answerSort(\''+q.id+'\')">🔍 Überprüfen</button>';
-  else if(q.type==='open'){
-    if(q.hints&&q.hints.length)html+='<button class="btn btn-outline" id="hintsBtn" onclick="showHints(\''+q.id+'\')">💡 Tipps</button>';
-    html+='<button class="btn btn-primary" onclick="showOpenSample(\''+q.id+'\')">💡 Lösung anzeigen</button>';
-  }
-  else if(q.type==='buchungssatz') html+='<button class="btn btn-primary" onclick="answerBuchungssatz(\''+q.id+'\')">🔍 Überprüfen</button>';
-  else if(q.type==='tkonto') html+='<button class="btn btn-primary" onclick="answerTKonto(\''+q.id+'\')">🔍 Überprüfen</button>';
-  else if(q.type==='bilanz') html+='<button class="btn btn-primary" onclick="answerBilanz(\''+q.id+'\')">🔍 Überprüfen</button>';
-  else if(q.type==='kontenbestimmung') html+='<button class="btn btn-primary" onclick="answerKontenbestimmung(\''+q.id+'\')">🔍 Überprüfen</button>';
-  else if(q.type==='gruppe') html+='<button class="btn btn-primary" onclick="answerGruppe(\''+q.id+'\')">🔍 Alle prüfen</button>';
+  // Typ-spezifische Buttons via Handler
+  if(handler)html+=handler.buttons(q);
   html+='<button class="btn btn-skip" onclick="skipQuestion()">⏭️ Überspringen</button>';
   html+='<button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()" style="display:none;margin-left:auto">Nächste Aufgabe →</button>';
   html+='</div>';
@@ -2489,37 +2622,8 @@ function getQuestionDisplay(q){
 }
 
 function getCorrectAnswer(q){
-  if(q.type==='mc'){ const opt=q.options.find(o=>o.v===q.correct); return q.correct+') '+(opt?opt.t:''); }
-  if(q.type==='multi'){ return q.correct.map(function(v){ const opt=q.options.find(o=>o.v===v); return v+') '+(opt?opt.t:''); }).join(' · '); }
-  if(q.type==='tf'){ return q.correct?'Richtig':'Falsch'; }
-  if(q.type==='fill'){ return q.blanks.map(function(b,i){return 'Lücke '+(i+1)+': '+b.answer}).join(' · '); }
-  if(q.type==='calc'){ return q.rows.map(function(r){return r.label+' '+r.answer+' '+r.unit}).join(' · '); }
-  if(q.type==='sort'){
-    return q.categories.map(function(cat,ci){
-      const items=q.items.filter(function(it){return it.cat===ci}).map(function(it){return it.t});
-      return '<strong>'+cat+':</strong> '+items.join(', ');
-    }).join(' · ');
-  }
-  if(q.type==='open'){ return q.sample||'Siehe Lösungsvorschlag'; }
-  if(q.type==='buchungssatz'){ return q.correct.map(function(c){
-    var sN=q.konten.find(function(k){return k.nr===c.soll});
-    var hN=q.konten.find(function(k){return k.nr===c.haben});
-    return (sN?sN.name:c.soll)+' / '+(hN?hN.name:c.haben)+' CHF '+c.betrag.toLocaleString('de-CH');
-  }).join(' · '); }
-  if(q.type==='tkonto'){ return q.konten.map(function(k){
-    var s=(k.correctSoll||[]).map(function(e){return e.gegen+' '+e.betrag}).join(', ');
-    var h=(k.correctHaben||[]).map(function(e){return e.gegen+' '+e.betrag}).join(', ');
-    return '<strong>'+k.name+':</strong> Soll ['+s+'] Haben ['+h+']'+(k.correctSaldo?' Saldo: '+k.correctSaldo.betrag+' ('+k.correctSaldo.seite+')':'');
-  }).join(' · '); }
-  if(q.type==='bilanz'){
-    var left=(q.correct.aktiven||q.correct.aufwand||[]).map(function(nr){var k=q.kontenMitSaldi.find(function(x){return x.nr===nr});return k?k.name+' '+k.saldo.toLocaleString('de-CH'):nr}).join(', ');
-    var right=(q.correct.passiven||q.correct.ertrag||[]).map(function(nr){var k=q.kontenMitSaldi.find(function(x){return x.nr===nr});return k?k.name+' '+k.saldo.toLocaleString('de-CH'):nr}).join(', ');
-    return '<strong>Links:</strong> '+left+' · <strong>Rechts:</strong> '+right+' · Summe: '+q.correct.bilanzsumme.toLocaleString('de-CH');
-  }
-  if(q.type==='kontenbestimmung'){ return q.aufgaben.map(function(a,i){
-    return (i+1)+') '+a.correct.map(function(c){var k=q.konten.find(function(x){return x.nr===c.konto});return (k?k.name:c.konto)+' ('+c.seite+')'}).join(', ');
-  }).join(' · '); }
-  if(q.type==='gruppe'){ return q.teil.map(function(t){return t.sub+') '+getCorrectAnswer(t)}).join(' · '); }
+  const handler=TYPE_HANDLERS[q.type];
+  if(handler&&handler.correctAnswer)return handler.correctAnswer(q);
   return '';
 }
 
