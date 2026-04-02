@@ -772,4 +772,44 @@ window.QUESTIONS = [
   explain: "Die Unschuldsvermutung ist ein fundamentaler Grundsatz des Rechtsstaats. Sie schützt den Einzelnen vor willkürlicher Bestrafung durch den Staat, indem sie verlangt, dass die Schuld zweifelsfrei bewiesen wird — und zwar durch die Staatsanwaltschaft (Beweislast). Der Beschuldigte muss seine Unschuld nicht beweisen. Ohne Unschuldsvermutung könnte der Staat beliebig Personen verurteilen."
 },
 
+// --- Sortierungsfragen ---
+{
+  id: "neu_sort_01", topic: "instanzenzug", type: "sortierung", diff: 2, tax: "K3", reviewed: false,
+  q: "Ordnen Sie den Instanzenzug im Schweizer Zivilprozess in die korrekte Reihenfolge – von der ersten zur letzten Instanz.",
+  items: [
+    "Schlichtungsbehörde (obligatorischer Schlichtungsversuch vor dem Prozess, Art. 197 ZPO)",
+    "Erstinstanzliches Gericht (Regionalgericht / Bezirksgericht)",
+    "Kantonales Obergericht (Berufungsinstanz – überprüft Sachverhalt und Recht)",
+    "Bundesgericht (letzte Instanz – überprüft nur noch Rechtsfragen)"
+  ],
+  correct: [0, 1, 2, 3],
+  explain: "In der Schweiz muss vor jedem Zivilprozess ein Schlichtungsversuch stattfinden (Ausnahmen z.B. bei hohem Streitwert möglich). Scheitert die Schlichtung, wird beim erstinstanzlichen Gericht Klage erhoben. Gegen das Urteil kann Berufung beim Obergericht eingelegt werden. Das Bundesgericht ist die letzte Instanz – es prüft nur noch Rechtsfragen, nicht den Sachverhalt."
+},
+{
+  id: "neu_sort_02", topic: "strafverfahren", type: "sortierung", diff: 2, tax: "K3", reviewed: false,
+  q: "Ordnen Sie die Phasen eines Schweizer Strafverfahrens in die korrekte Reihenfolge.",
+  items: [
+    "Vorverfahren: Polizeiliche Ermittlung und staatsanwaltliche Untersuchung",
+    "Anklageerhebung: Staatsanwaltschaft erhebt Anklage beim Gericht",
+    "Hauptverhandlung: Beweisaufnahme, Plädoyers, rechtliches Gehör",
+    "Urteil: Schuld- und Freispruch, Strafmass",
+    "Rechtsmittelverfahren: Berufung oder Beschwerde (falls eingelegt)"
+  ],
+  correct: [0, 1, 2, 3, 4],
+  explain: "Das Strafverfahren beginnt mit dem Vorverfahren (Polizei ermittelt, Staatsanwaltschaft untersucht). Reichen die Beweise, wird Anklage erhoben. Es folgt die Hauptverhandlung mit Beweisaufnahme und Plädoyers. Das Gericht fällt ein Urteil. Gegen das Urteil kann Berufung (kantonales Obergericht) oder Beschwerde (Bundesgericht) eingelegt werden."
+},
+{
+  id: "neu_sort_03", topic: "streitbeilegung", type: "sortierung", diff: 2, tax: "K3", reviewed: false,
+  q: "Ordnen Sie die Formen der Streitbeilegung nach dem Grad der Formalisierung – von der informellsten zur formellsten.",
+  items: [
+    "Direkte Verhandlung zwischen den Parteien (aussergerichtliche Einigung)",
+    "Mediation (neutrale Vermittlungsperson, freiwillig, keine Entscheidungsmacht)",
+    "Schlichtung (obligatorisch vor Zivilprozess, Schlichtungsbehörde kann Urteilsvorschlag machen)",
+    "Schiedsgericht (private Richter, bindender Entscheid, vertragliche Vereinbarung)",
+    "Staatliches Gericht (formelles Verfahren, gesetzlich geregelt, vollstreckbares Urteil)"
+  ],
+  correct: [0, 1, 2, 3, 4],
+  explain: "Die Streitbeilegung reicht von informell bis hochformalisiert: Direkte Verhandlung ist am einfachsten. Mediation ist freiwillig und auf Konsens ausgerichtet. Die Schlichtung ist in der Schweiz obligatorisch vor Zivilklagen. Schiedsgerichte sind vertraglich vereinbart und treffen bindende Entscheide (oft im internationalen Handel). Das staatliche Gericht ist die formellste und letzte Option."
+}
+
 ]; // Ende QUESTIONS

@@ -1,6 +1,6 @@
 // Übungspool: Markteffizienz
 // Fachbereich: VWL
-// Anzahl Fragen: 162
+// Anzahl Fragen: 165
 // Stufe: SF GYM2/GYM3
 
 window.POOL_META = {
@@ -1492,5 +1492,51 @@ window.QUESTIONS = [
    {v: "D", t:"Alle drei setzen gleich stark auf den Staat."}
  ],
  correct:"B",
- explain:"Beyond Growth fordert explizit eine stärkere Rolle des Staates: aktive Industriepolitik, stärkere Finanzregulierung, prädistributive Massnahmen (Chancengleichheit vor der Umverteilung). Green Growth setzt mehr auf Marktmechanismen (Preissignale). Degrowth setzt teilweise auf gesellschaftliche Veränderung von unten."}
+ explain:"Beyond Growth fordert explizit eine stärkere Rolle des Staates: aktive Industriepolitik, stärkere Finanzregulierung, prädistributive Massnahmen (Chancengleichheit vor der Umverteilung). Green Growth setzt mehr auf Marktmechanismen (Preissignale). Degrowth setzt teilweise auf gesellschaftliche Veränderung von unten."},
+
+// --- Sortierungsfragen ---
+{id: "neu_sort_01", topic: "externeffekte", type: "sortierung", diff: 2, tax: "K3", reviewed: false,
+ q: "Ordnen Sie die folgenden Instrumente zur Internalisierung negativer externer Effekte nach dem Grad des staatlichen Eingriffs – vom geringsten zum stärksten.",
+ items: [
+   "Coase-Verhandlungen (private Lösung durch Verhandlung der Betroffenen)",
+   "Informationspflichten und Transparenzvorschriften (z.B. Deklarationspflicht)",
+   "Pigou-Steuer / Lenkungsabgaben (z.B. CO₂-Abgabe in der Schweiz)",
+   "Handelbare Emissionszertifikate (staatlich festgelegte Obergrenze)",
+   "Ordnungsrechtliches Verbot (z.B. Verbot bestimmter Chemikalien)"
+ ],
+ correct: [0, 1, 2, 3, 4],
+ explain: "Die Instrumente reichen von privaten Lösungen (Coase: kein staatlicher Eingriff nötig) über Transparenz, marktbasierte Instrumente (Pigou-Steuer, Zertifikate) bis zum direkten Verbot. In der Schweiz wird die CO₂-Abgabe als Lenkungssteuer eingesetzt – ein mittlerer Eingriff, der Preissignale setzt, aber die Entscheidung dem Markt überlässt."
+},
+{id: "neu_sort_02", topic: "wettbewerb", type: "sortierung", diff: 3, tax: "K3", reviewed: false,
+ q: "Ordnen Sie die folgenden Marktformen nach dem Grad des Wettbewerbs – von der stärksten Konkurrenz zur geringsten.",
+ items: [
+   "Vollkommene Konkurrenz (viele kleine Anbieter, homogene Güter)",
+   "Monopolistische Konkurrenz (viele Anbieter, differenzierte Produkte)",
+   "Oligopol (wenige grosse Anbieter dominieren den Markt)",
+   "Monopol (ein einziger Anbieter ohne Konkurrenz)"
+ ],
+ correct: [0, 1, 2, 3],
+ explain: "Von der vollkommenen Konkurrenz (maximaler Wettbewerb, kein einzelner Anbieter hat Marktmacht) über die monopolistische Konkurrenz (Produktdifferenzierung verschafft etwas Marktmacht) und das Oligopol (wenige Anbieter können Preise beeinflussen, z.B. Schweizer Mobilfunk) bis zum Monopol (kein Wettbewerb, z.B. historisch die SBB im Schienenverkehr)."
+},
+{id: "neu_sort_03", topic: "gueterarten", type: "sortierung", diff: 2, tax: "K3", reviewed: false,
+ q: "Ordnen Sie die folgenden Güter nach dem Grad der staatlichen Bereitstellungspflicht – vom Gut, das der Markt am besten bereitstellt, bis zum Gut, das zwingend der Staat bereitstellen muss.",
+ items: [
+   "Privates Gut (z.B. Schokolade – rival und ausschliessbar)",
+   "Klubgut (z.B. Pay-TV – nicht-rival, aber ausschliessbar)",
+   "Allmendegut (z.B. Fischbestand – rival, aber nicht ausschliessbar)",
+   "Öffentliches Gut (z.B. Landesverteidigung – nicht-rival, nicht ausschliessbar)"
+ ],
+ correct: [0, 1, 2, 3],
+ explain: "Private Güter werden effizient vom Markt bereitgestellt. Klubgüter können privat angeboten werden (Zugang kontrollierbar). Allmendegüter erfordern staatliche Regulierung (Übernutzungsgefahr). Rein öffentliche Güter kann der Markt nicht bereitstellen (Trittbrettfahrer-Problem) – hier muss der Staat eingreifen."
+},
+
+// ──── ZEICHNEN ────
+  {
+    id: "neu_zeichnen_01", topic: "gleichgewicht", type: "zeichnen", diff: 2, tax: "K3", reviewed: false,
+    q: "Zeichne ein Angebot-Nachfrage-Diagramm mit korrekt beschrifteten Achsen. Markiere das Marktgleichgewicht (P* und M*) und beschrifte die Kurven.",
+    hints: ["Die x-Achse zeigt die Menge, die y-Achse den Preis.", "Die Angebotskurve steigt von links unten nach rechts oben.", "Die Nachfragekurve fällt von links oben nach rechts unten."],
+    sample: { src: "img/vwl/markteffizienz/markteffizienz_angebot_nachfrage_zeichnen.svg", alt: "Musterlösung: Angebot-Nachfrage-Diagramm" },
+    explain: "Das Marktgleichgewicht entsteht dort, wo sich Angebots- und Nachfragekurve schneiden. Beim Gleichgewichtspreis P* entspricht die angebotene Menge genau der nachgefragten Menge M*. Bei höheren Preisen entsteht ein Angebotsüberschuss, bei niedrigeren ein Nachfrageüberschuss."
+  }
+
 ];

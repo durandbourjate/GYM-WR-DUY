@@ -1227,6 +1227,42 @@ window.QUESTIONS = [
     ],
     correct: "B",
     explain: "Persönliche Leistung (JStG 23) bedeutet, dass der Jugendliche arbeiten muss, um sein Unrecht wiedergutzumachen — z.B. Strassen putzen. Es kann auch bedeuten, dass der Jugendliche verpflichtet wird, einen Kurs zu besuchen."
+  },
+
+  // --- Sortierungsfragen ---
+  {
+    id: "neu_sort_01", topic: "tatbestand", type: "sortierung", diff: 2, tax: "K3", reviewed: false,
+    q: "Ordnen Sie die drei Prüfungsebenen der Strafbarkeit in die korrekte Reihenfolge.",
+    items: [
+      "Tatbestandsmässigkeit: Ist der objektive und subjektive Tatbestand eines Straftatbestands erfüllt?",
+      "Rechtswidrigkeit: Liegt kein Rechtfertigungsgrund vor (z.B. Notwehr, Notstand)?",
+      "Schuld: Ist der Täter schuldfähig und hat er vorsätzlich oder fahrlässig gehandelt?"
+    ],
+    correct: [0, 1, 2],
+    explain: "Die dreistufige Deliktsprüfung ist das Fundament des Strafrechts: Erst wird geprüft, ob ein Tatbestand erfüllt ist (z.B. «Wer einen Menschen tötet» – Art. 111 StGB). Dann wird geprüft, ob ein Rechtfertigungsgrund vorliegt (z.B. Notwehr nach Art. 15 StGB). Zuletzt wird die persönliche Schuld geprüft (Schuldfähigkeit, Vorsatz/Fahrlässigkeit). Nur wenn alle drei Stufen bejaht werden, ist die Tat strafbar."
+  },
+  {
+    id: "neu_sort_02", topic: "strafarten", type: "sortierung", diff: 2, tax: "K3", reviewed: false,
+    q: "Ordnen Sie die folgenden Deliktsarten nach der Schwere der angedrohten Strafe – von der leichtesten zur schwersten.",
+    items: [
+      "Übertretung: nur mit Busse bedroht (z.B. Littering, einfache Verkehrsdelikte)",
+      "Vergehen: mit Freiheitsstrafe bis 3 Jahre oder Geldstrafe bedroht (z.B. einfacher Diebstahl)",
+      "Verbrechen: mit Freiheitsstrafe von mehr als 3 Jahren bedroht (z.B. Raub, Mord)"
+    ],
+    correct: [0, 1, 2],
+    explain: "Das StGB unterscheidet drei Deliktsarten nach der Schwere: Übertretungen (nur Busse, Art. 103 StGB), Vergehen (bis 3 Jahre Freiheitsstrafe oder Geldstrafe, Art. 10 Abs. 3 StGB) und Verbrechen (über 3 Jahre Freiheitsstrafe, Art. 10 Abs. 2 StGB). Die Einteilung hat praktische Folgen: z.B. für die Verjährung, die Zuständigkeit und die Möglichkeit des bedingten Vollzugs."
+  },
+  {
+    id: "neu_sort_03", topic: "vollzug", type: "sortierung", diff: 3, tax: "K3", reviewed: false,
+    q: "Ordnen Sie die folgenden Formen des Strafvollzugs nach der Strenge – von der mildesten zur härtesten.",
+    items: [
+      "Bedingter Vollzug (Strafe wird zur Bewährung ausgesetzt, Probezeit 2–5 Jahre)",
+      "Teilbedingter Vollzug (Teil der Strafe wird vollzogen, Rest auf Bewährung ausgesetzt)",
+      "Unbedingter Vollzug (Strafe wird vollständig vollzogen, Strafvollzug im Gefängnis)",
+      "Verwahrung (zeitlich unbefristete Sicherungsmassnahme bei gefährlichen Straftätern)"
+    ],
+    correct: [0, 1, 2, 3],
+    explain: "Bedingter Vollzug (Art. 42 StGB) ist die mildeste Form – der Verurteilte muss nicht ins Gefängnis, wenn er sich während der Probezeit bewährt. Teilbedingter Vollzug (Art. 43 StGB) kombiniert Strafe und Bewährung. Unbedingter Vollzug bedeutet tatsächlichen Freiheitsentzug. Verwahrung (Art. 64 StGB) ist die schärfste Massnahme – sie ist zeitlich unbefristet und kann lebenslänglich dauern."
   }
 
 ];

@@ -1,7 +1,7 @@
 // Übungspool: Steuern und Staatseinnahmen
 // Fachbereich: VWL
 // Stufe: SF GYM3
-// Anzahl Fragen: 98
+// Anzahl Fragen: 101
 // Version 3: Erweiterung um 14 Fragen zu Steuerparadiesen (Topic «wettbewerb»), 1 neues SVG
 
 window.POOL_META = {
@@ -255,6 +255,40 @@ window.QUESTIONS = [
 {"id":"e14","topic":"elastizitaeten","type":"mc","diff":1,"tax":"K1","reviewed":false,"q":"Was ist ein Wohlfahrtsverlust (Deadweight Loss) durch eine Steuer?","options":[{"v": "A","t":"Die Differenz zwischen Steuersatz und Inflation"},{"v": "B","t":"Die Kosten für die Erhebung der Steuer"},{"v": "C","t":"Der Verlust an Wohlfahrt, der entsteht, weil Transaktionen nicht mehr stattfinden"},{"v": "D","t":"Der Betrag, den der Staat durch die Steuer einnimmt"}],"correct":"C","explain":"Der Wohlfahrtsverlust (Deadweight Loss) entsteht, weil eine Steuer die Preise verzerrt und dadurch einige Transaktionen verhindert, die ohne Steuer für beide Seiten vorteilhaft gewesen wären. Diese «verlorenen» Tauschgewinne sind der Wohlfahrtsverlust – ein Nettoverlust für die Gesellschaft, der weder dem Staat noch den Marktteilnehmern zugutekommt."},
 
 // NEU: TF diff 1
-{"id":"e15","topic":"elastizitaeten","type":"tf","diff":1,"tax":"K1","reviewed":false,"q":"Die Steuerinzidenz zeigt, wer eine Steuer formal an den Staat abliefert.","correct":false,"explain":"Falsch. Die Steuerinzidenz zeigt, wer die Steuer wirtschaftlich tatsächlich trägt – nicht wer sie formal abliefert. Die formale Ablieferung (Steuerschuldner) und die tatsächliche wirtschaftliche Belastung (Steuerträger) können stark voneinander abweichen. Die Inzidenz hängt von den Elastizitäten ab, nicht von der gesetzlichen Regelung."}
+{"id":"e15","topic":"elastizitaeten","type":"tf","diff":1,"tax":"K1","reviewed":false,"q":"Die Steuerinzidenz zeigt, wer eine Steuer formal an den Staat abliefert.","correct":false,"explain":"Falsch. Die Steuerinzidenz zeigt, wer die Steuer wirtschaftlich tatsächlich trägt – nicht wer sie formal abliefert. Die formale Ablieferung (Steuerschuldner) und die tatsächliche wirtschaftliche Belastung (Steuerträger) können stark voneinander abweichen. Die Inzidenz hängt von den Elastizitäten ab, nicht von der gesetzlichen Regelung."},
+
+// --- Sortierungsfragen ---
+{id: "neu_sort_01", topic: "steuerarten", type: "sortierung", diff: 2, tax: "K3", reviewed: false,
+ q: "Ordnen Sie die folgenden Steuerarten nach der Ebene im föderalen System der Schweiz – von der Bundesebene zur Gemeindeebene.",
+ items: [
+   "Direkte Bundessteuer (nur Bund – Einkommens- und Gewinnsteuer)",
+   "Mehrwertsteuer (nur Bund – wichtigste indirekte Steuer)",
+   "Kantonale Einkommens- und Vermögenssteuer (Kanton)",
+   "Gemeindesteuerzuschlag (Gemeinde – als Prozentsatz der Kantonssteuer)"
+ ],
+ correct: [0, 1, 2, 3],
+ explain: "Die Schweiz hat ein dreistufiges Steuersystem: Der Bund erhebt die direkte Bundessteuer und die MWST. Die Kantone erheben eigene Einkommens- und Vermögenssteuern (mit unterschiedlichen Tarifen – daher Steuerwettbewerb). Die Gemeinden erheben einen Zuschlag auf die Kantonssteuer (Steuerfuss). Diese Dreigliedrigkeit ist weltweit einzigartig."
+},
+{id: "neu_sort_02", topic: "formen", type: "sortierung", diff: 2, tax: "K3", reviewed: false,
+ q: "Ordnen Sie die folgenden Steuertarife nach ihrer Wirkung auf die Einkommensverteilung – vom am stärksten umverteilenden zum am wenigsten umverteilenden.",
+ items: [
+   "Progressiver Tarif (höherer Steuersatz bei höherem Einkommen)",
+   "Proportionaler Tarif / Flat Tax (gleicher Steuersatz für alle)",
+   "Degressiver Tarif (niedrigerer Steuersatz bei höherem Einkommen)"
+ ],
+ correct: [0, 1, 2],
+ explain: "Ein progressiver Tarif (wie die Einkommenssteuer in der Schweiz) belastet hohe Einkommen überproportional und wirkt stark umverteilend. Ein proportionaler Tarif (z.B. Flat Tax) belastet alle gleich – keine Umverteilungswirkung. Ein degressiver Tarif belastet tiefe Einkommen relativ stärker – er wirkt sogar anti-umverteilend (z.B. indirekte Steuern wie die MWST wirken tendenziell degressiv)."
+},
+{id: "neu_sort_03", topic: "wettbewerb", type: "sortierung", diff: 3, tax: "K3", reviewed: false,
+ q: "Ordnen Sie die folgenden internationalen Massnahmen gegen Steuervermeidung in die chronologische Reihenfolge ihrer Einführung.",
+ items: [
+   "OECD-Doppelbesteuerungsabkommen (ab 1960er – Vermeidung doppelter Besteuerung)",
+   "Schweizer Bankgeheimnis gerät unter Druck (UBS-Fall 2008/2009)",
+   "Automatischer Informationsaustausch AIA (ab 2017 – Bankdaten werden zwischen Staaten ausgetauscht)",
+   "OECD/G20 BEPS-Mindeststeuer von 15% für Grosskonzerne (ab 2024)"
+ ],
+ correct: [0, 1, 2, 3],
+ explain: "Die internationale Steuerkooperation hat sich schrittweise verschärft: Von bilateralen Abkommen gegen Doppelbesteuerung über den Druck auf das Schweizer Bankgeheimnis (nach dem UBS-Skandal) zum automatischen Informationsaustausch (über 100 Länder) bis zur globalen Mindeststeuer von 15% für Unternehmen mit über 750 Mio. EUR Umsatz."
+}
 
 ];

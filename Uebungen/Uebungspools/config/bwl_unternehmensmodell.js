@@ -872,5 +872,54 @@ window.QUESTIONS = [
     ],
     correct: "C",
     explain: "Gemäss dem Lehrbuch-Beispiel ist die wichtigste Anspruchsgruppe der Alti Moschti die Kundschaft, die qualitativ hochstehende Konzerte und Veranstaltungen in einer angenehmen und speziellen Atmosphäre geniessen möchte."
+  },
+
+  // --- Sortierungsfragen ---
+  {
+    id: "neu_sort_01", topic: "umweltsphaeren", type: "sortierung", diff: 2, tax: "K3", reviewed: false,
+    q: "Ordnen Sie die fünf Umweltsphären nach dem Grad des direkten Einflusses auf die täglichen operativen Entscheide eines Unternehmens – vom direktesten zum indireksten Einfluss.",
+    items: [
+      "Ökonomische Umweltsphäre (Konjunktur, Zinsen, Wechselkurse, Konkurrenz)",
+      "Technologische Umweltsphäre (Digitalisierung, Innovationen, Automatisierung)",
+      "Rechtliche Umweltsphäre (Gesetze, Regulierungen, Branchenvorschriften)",
+      "Soziale Umweltsphäre (demografischer Wandel, Wertewandel, Bildungsniveau)",
+      "Ökologische Umweltsphäre (Klimawandel, Ressourcenknappheit, Umweltauflagen)"
+    ],
+    correct: [0, 1, 2, 3, 4],
+    explain: "Die ökonomische Umwelt beeinflusst Unternehmen am direktesten (Preise, Nachfrage, Zinsen wirken täglich). Technologie verändert Prozesse und Geschäftsmodelle. Rechtliche Rahmenbedingungen setzen Grenzen. Soziale Veränderungen wirken längerfristig. Ökologische Faktoren werden zunehmend wichtiger, wirken aber oft indirekt über Regulierung oder veränderte Kundenpräferenzen."
+  },
+  {
+    id: "neu_sort_02", topic: "verhaltensweisen", type: "sortierung", diff: 2, tax: "K3", reviewed: false,
+    q: "Ordnen Sie die Verhaltensweisen von Unternehmen gegenüber ihrer Umwelt nach dem Grad der Eigeninitiative – von der passivsten zur aktivsten.",
+    items: [
+      "Reaktiv: Abwarten und erst bei Druck reagieren (z.B. Gesetz wird erlassen)",
+      "Aktiv: Umweltveränderungen frühzeitig erkennen und sich anpassen",
+      "Proaktiv: Veränderungen vorwegnehmen und präventiv handeln",
+      "Interaktiv: Aktiv auf die Umwelt einwirken und sie mitgestalten (z.B. Lobbying, Innovation)"
+    ],
+    correct: [0, 1, 2, 3],
+    explain: "Reaktive Unternehmen warten ab (riskant). Aktive Unternehmen beobachten und passen sich an. Proaktive Unternehmen handeln vorausschauend (z.B. nachhaltige Produktion bevor Gesetze kommen). Interaktive Unternehmen gestalten ihre Umwelt mit – durch Innovation, Branchenstandards oder politische Einflussnahme."
+  },
+  {
+    id: "neu_sort_03", topic: "anspruchsgruppen", type: "sortierung", diff: 3, tax: "K3", reviewed: false,
+    q: "Ordnen Sie die folgenden Anspruchsgruppen nach der Direktheit ihrer Beziehung zum Unternehmen – von den engsten (internen) zu den weitesten (externen) Stakeholdern.",
+    items: [
+      "Mitarbeitende (direkt im Unternehmen tätig)",
+      "Eigentümer/Aktionäre (Kapitalgeber, tragen Risiko)",
+      "Kunden und Lieferanten (direkte Geschäftsbeziehung)",
+      "Staat und Behörden (Rahmenbedingungen, Steuern, Regulierung)",
+      "Öffentlichkeit und NGOs (gesellschaftliche Erwartungen, Reputation)"
+    ],
+    correct: [0, 1, 2, 3, 4],
+    explain: "Mitarbeitende sind die engsten Stakeholder (intern, tägliche Interaktion). Eigentümer sind ebenfalls intern, aber oft weniger operativ involviert. Kunden und Lieferanten haben direkte vertragliche Beziehungen. Staat und Behörden setzen die rechtlichen Rahmenbedingungen. Die breite Öffentlichkeit und NGOs haben den indireksten, aber durch Social Media zunehmend spürbaren Einfluss."
+  },
+
+// ──── ZEICHNEN ────
+  {
+    id: "neu_zeichnen_01", topic: "umweltsphaeren", type: "zeichnen", diff: 2, tax: "K3", reviewed: false,
+    q: "Zeichne das St. Galler Unternehmensmodell (vereinfacht): Unternehmen im Zentrum, umgeben von Umweltsphären und Anspruchsgruppen. Beschrifte die wichtigsten Elemente.",
+    hints: ["Das Unternehmen steht im Zentrum.", "Es gibt vier Umweltsphären: Gesellschaft, Natur, Technologie, Wirtschaft.", "Anspruchsgruppen (Stakeholder) stehen zwischen Unternehmen und Umwelt."],
+    sample: { src: "img/bwl/unternehmensmodell/unternehmensmodell_umweltsphaeren_zeichnen.svg", alt: "Musterlösung: St. Galler Unternehmensmodell" },
+    explain: "Das St. Galler Management-Modell zeigt das Unternehmen eingebettet in Umweltsphären (Gesellschaft, Natur, Technologie, Wirtschaft). Anspruchsgruppen (Eigentümer, Mitarbeitende, Kunden, Lieferanten, Staat, Öffentlichkeit, NGOs) stehen an der Schnittstelle und haben unterschiedliche Interessen."
   }
 ];

@@ -1,6 +1,6 @@
 // Übungspool: Bruttoinlandprodukt (BIP)
 // Fachbereich: VWL
-// Anzahl Fragen: 78
+// Anzahl Fragen: 81
 
 window.POOL_META = {
   id: "vwl_bip",
@@ -531,5 +531,49 @@ window.QUESTIONS = [
  q:"Was beschreibt die \u00abTragik der Allmende\u00bb (Tragedy of the Commons)?",
  options:[{v: "A",t:"Der Staat muss alle Ressourcen privatisieren."},{v: "B",t:"Gemeinsames Eigentum ist immer effizienter als privates."},{v: "C",t:"Wenn eine Ressource allen gehört, wird sie übernutzt, weil jeder seinen eigenen Nutzen maximiert, die Kosten aber die Allgemeinheit trägt."},{v: "D",t:"Die Allmende bezeichnet das BIP eines Landes."}],
  correct:"C",explain:"Beispiel: Eine gemeinsame Weide wird übernutzt, weil jeder Hirte ein zusätzliches Tier hinstellt – der Nutzen ist privat, die Kosten (Überweidung) tragen alle. Lösungen: Privatisierung, Regulierung, oder Selbstorganisation (Ostrom). Das Konzept ist zentral für Umweltprobleme wie Überfischung und Klimawandel."},
+
+// --- Sortierungsfragen ---
+{id: "neu_sort_01", topic: "kreislauf", type: "sortierung", diff: 2, tax: "K3", reviewed: false,
+ q: "Ordnen Sie die Sektoren des erweiterten Wirtschaftskreislaufs in der Reihenfolge, in der sie typischerweise in Lehrbüchern eingeführt werden – vom einfachsten zum komplexesten Modell.",
+ items: [
+   "Haushalte und Unternehmen (einfacher Kreislauf)",
+   "Hinzufügen des Staates (erweiterter Kreislauf mit Steuern und Staatsausgaben)",
+   "Hinzufügen der Banken (Sparen und Investitionen)",
+   "Hinzufügen des Auslands (Exporte und Importe)"
+ ],
+ correct: [0, 1, 2, 3],
+ explain: "Der Wirtschaftskreislauf wird schrittweise aufgebaut: Zuerst der einfache 2-Sektoren-Kreislauf (Haushalte ↔ Unternehmen), dann wird der Staat ergänzt (Steuern, Transfers, Staatskonsum), dann die Banken (Kapitalmarkt: Sparen und Investieren), und schliesslich das Ausland (Exporte, Importe, Kapitalströme)."
+},
+{id: "neu_sort_02", topic: "dreiseiten", type: "sortierung", diff: 3, tax: "K3", reviewed: false,
+ q: "Ordnen Sie die Komponenten des BIP nach dem Verwendungsansatz (Y = C + I + G + NX) nach ihrem typischen Anteil am Schweizer BIP – vom grössten zum kleinsten.",
+ items: [
+   "Privater Konsum (C) – ca. 50–55%",
+   "Staatskonsum (G) – ca. 10–12%",
+   "Investitionen (I) – ca. 25–30%",
+   "Nettoexporte (NX = Exporte − Importe) – ca. 5–10%"
+ ],
+ correct: [0, 2, 1, 3],
+ explain: "In der Schweiz ist der private Konsum mit über 50% die grösste BIP-Komponente, gefolgt von den Investitionen (ca. 25–30%). Der Staatskonsum liegt bei rund 10–12%. Die Nettoexporte (Exporte minus Importe) schwanken und machen nur wenige Prozent aus – trotz der starken Exportwirtschaft, weil die Schweiz auch viel importiert."
+},
+{id: "neu_sort_03", topic: "nomreal", type: "sortierung", diff: 2, tax: "K3", reviewed: false,
+ q: "Ordnen Sie die folgenden Schritte zur Berechnung des realen BIP in die korrekte Reihenfolge.",
+ items: [
+   "Nominales BIP des laufenden Jahres bestimmen (Menge × aktuelle Preise)",
+   "Ein Basisjahr als Referenz festlegen",
+   "BIP-Deflator berechnen (Preisindex: aktuelle Preise / Basisjahr-Preise × 100)",
+   "Reales BIP berechnen (Nominales BIP / BIP-Deflator × 100)"
+ ],
+ correct: [0, 1, 2, 3],
+ explain: "Um das reale BIP zu berechnen, muss zuerst das nominale BIP bekannt sein. Dann wählt man ein Basisjahr, berechnet den BIP-Deflator (Preisveränderung gegenüber dem Basisjahr) und bereinigt das nominale BIP um die Preisentwicklung. So erhält man ein Mass für die tatsächliche Mengenveränderung."
+},
+
+// ──── ZEICHNEN ────
+  {
+    id: "neu_zeichnen_01", topic: "dreiseiten", type: "zeichnen", diff: 2, tax: "K3", reviewed: false,
+    q: "Stelle die Verwendungsseite des BIP grafisch dar (z.B. als Balkendiagramm oder Kreisdiagramm). Beschrifte die vier Komponenten und gib ungefähre prozentuale Anteile für die Schweiz an.",
+    hints: ["Die vier Komponenten sind: Konsum (C), Investitionen (I), Staatsausgaben (G) und Nettoexporte (NX).", "Der private Konsum macht in der Schweiz über die Hälfte aus.", "Die Formel lautet: Y = C + I + G + NX."],
+    sample: { src: "img/vwl/bip/bip_verwendungsseite_zeichnen.svg", alt: "Musterlösung: BIP-Verwendungsseite" },
+    explain: "Das BIP nach Verwendungsseite: Y = C + I + G + NX. In der Schweiz: Konsum ca. 55%, Investitionen ca. 25%, Staatsausgaben ca. 12%, Nettoexporte ca. 8%. Die Aufteilung zeigt, dass der private Konsum die wichtigste Nachfragekomponente ist."
+  }
 
 ];

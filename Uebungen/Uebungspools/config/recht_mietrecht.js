@@ -1068,5 +1068,34 @@ window.QUESTIONS = [
     ],
     correct: ["A", "B", "C"],
     explain: "Obersatz: Es ist zu prüfen, welche Schäden über die normale Abnutzung hinausgehen. (1) Kratzer durch einen Schrank ohne Schutz = unsachgemässer Gebrauch → Mieter haftet (Zeitwert-Berechnung). (2) Vergilbte Wände durch Kochen = normale Abnutzung → Vermieter trägt die Kosten. (3) Ein Loch in der Wand = übermässige Beschädigung → Mieter haftet (Zeitwert-Berechnung). A und C sind richtig: Der Mieter muss für die Kratzer und das Loch aufkommen, aber nur zum Zeitwert. B ist auch richtig als Aussage: Vergilbte Wände sind normale Abnutzung."
+  },
+
+  // --- Sortierungsfragen ---
+  {
+    id: "neu_sort_01", topic: "kuendigung", type: "sortierung", diff: 2, tax: "K3", reviewed: false,
+    q: "Ordnen Sie die Schritte einer ordentlichen Kündigung eines Mietverhältnisses in die korrekte Reihenfolge.",
+    items: [
+      "Kündigungsfrist und -termin bestimmen (Wohnungen: 3 Monate auf ortsüblichen Termin)",
+      "Kündigung schriftlich mit amtlich genehmigtem Formular aussprechen",
+      "Bei Familienwohnungen: Zustimmung des Ehegatten/Partners einholen",
+      "Kündigung fristgerecht zustellen (Empfang muss vor Fristbeginn sein)",
+      "Mieter kann innerhalb von 30 Tagen bei der Schlichtungsbehörde anfechten oder Erstreckung verlangen"
+    ],
+    correct: [0, 1, 2, 3, 4],
+    explain: "Eine wirksame Kündigung erfordert die Einhaltung der Frist (3 Monate für Wohnungen, OR 266c) und das amtliche Formular. Bei Familienwohnungen muss der Partner zustimmen (OR 266n). Nach Zustellung kann der Mieter die Kündigung anfechten (missbräuchlich?) oder eine Erstreckung beantragen (OR 272 ff.)."
+  },
+  {
+    id: "neu_sort_02", topic: "maengel", type: "sortierung", diff: 2, tax: "K3", reviewed: false,
+    q: "Ordnen Sie die Rechte des Mieters bei einem schweren Mangel der Mietsache nach der Eskalationsstufe – vom mildesten zum schärfsten Mittel.",
+    items: [
+      "Mängelanzeige: Vermieter schriftlich über den Mangel informieren",
+      "Frist ansetzen: Vermieter eine angemessene Frist zur Behebung setzen",
+      "Mietzinsreduktion verlangen (proportional zur Einschränkung des Gebrauchs)",
+      "Mängel auf Kosten des Vermieters selbst beheben lassen (Ersatzvornahme)",
+      "Fristlose Kündigung bei schwerwiegenden Mängeln, die den Gebrauch verunmöglichen"
+    ],
+    correct: [0, 1, 2, 3, 4],
+    explain: "Der Mieter muss den Mangel zuerst anzeigen und eine Frist setzen (OR 259a ff.). Wird der Mangel nicht behoben, kann er eine Mietzinsreduktion verlangen. Bei Untätigkeit des Vermieters kann der Mieter den Mangel selbst beheben lassen. Die fristlose Kündigung ist das letzte Mittel – nur bei Mängeln, die die Gesundheit gefährden oder den Gebrauch verunmöglichen."
   }
+
 ];

@@ -1,6 +1,6 @@
 // Übungspool: Bedürfnisse, Knappheit & Produktionsfaktoren
 // Fachbereich: VWL
-// Anzahl Fragen: 70
+// Anzahl Fragen: 73
 
 window.POOL_META = {
   id: "vwl_beduerfnisse",
@@ -458,5 +458,55 @@ window.QUESTIONS = [
 
 {id:"s09",topic:"sektoren",type:"tf",diff:2,tax:"K2",reviewed:false,
  q:"Der Rückgang des primären Sektors in der Schweiz bedeutet, dass die Landwirtschaft weniger produziert als früher.",
- correct:false,explain:"Falsch. Der Rückgang bezieht sich auf den Anteil der Beschäftigten, nicht auf die Produktion. Dank technischem Fortschritt (Maschinen, Düngemittel, Züchtung) produziert die Schweizer Landwirtschaft heute mit viel weniger Arbeitskräften mehr als vor 200 Jahren. Die Produktivität pro Arbeitskraft ist massiv gestiegen."}
+ correct:false,explain:"Falsch. Der Rückgang bezieht sich auf den Anteil der Beschäftigten, nicht auf die Produktion. Dank technischem Fortschritt (Maschinen, Düngemittel, Züchtung) produziert die Schweizer Landwirtschaft heute mit viel weniger Arbeitskräften mehr als vor 200 Jahren. Die Produktivität pro Arbeitskraft ist massiv gestiegen."},
+
+// --- Sortierungsfragen ---
+{
+  id: "neu_sort_01", topic: "beduerfnisse", type: "sortierung", diff: 2, tax: "K3", reviewed: false,
+  q: "Ordnen Sie die folgenden Bedürfnisstufen gemäss der Maslowschen Bedürfnispyramide von der untersten (grundlegendsten) zur obersten Stufe.",
+  items: [
+    "Physiologische Bedürfnisse (Nahrung, Schlaf, Wärme)",
+    "Sicherheitsbedürfnisse (Schutz, Stabilität, Gesundheit)",
+    "Soziale Bedürfnisse (Zugehörigkeit, Freundschaft, Liebe)",
+    "Wertschätzungsbedürfnisse (Anerkennung, Status, Erfolg)",
+    "Selbstverwirklichung (Entfaltung, Kreativität, Sinnsuche)"
+  ],
+  correct: [0, 1, 2, 3, 4],
+  explain: "Maslow ordnet die Bedürfnisse hierarchisch: Zuerst müssen die grundlegenden Bedürfnisse (physiologisch, Sicherheit) befriedigt sein, bevor höhere Stufen (sozial, Wertschätzung, Selbstverwirklichung) relevant werden. Die Pyramide ist ein Modell – in der Realität können die Stufen sich überschneiden."
+},
+{
+  id: "neu_sort_02", topic: "sektoren", type: "sortierung", diff: 2, tax: "K3", reviewed: false,
+  q: "Ordnen Sie die folgenden Phasen des Strukturwandels in der Schweiz in die historisch korrekte Reihenfolge.",
+  items: [
+    "Agrargesellschaft: Über 60% der Beschäftigten arbeiten im primären Sektor",
+    "Beginn der Industrialisierung: Textilindustrie und Maschinenbau wachsen",
+    "Industriegesellschaft: Der sekundäre Sektor beschäftigt die meisten Menschen",
+    "Tertiarisierung: Dienstleistungen überholen Industrie und Landwirtschaft",
+    "Wissensgesellschaft: Hochqualifizierte Dienstleistungen dominieren (Banken, Pharma, IT)"
+  ],
+  correct: [0, 1, 2, 3, 4],
+  explain: "Die Schweiz durchlief den klassischen Strukturwandel: Von der Agrargesellschaft (vor 1800) über die Industrialisierung (19. Jh.) zur Dominanz des tertiären Sektors (ab ca. 1970). Heute arbeiten über 75% im Dienstleistungssektor. Der primäre Sektor beschäftigt nur noch ca. 3% der Erwerbstätigen."
+},
+{
+  id: "neu_sort_03", topic: "produktionsfaktoren", type: "sortierung", diff: 3, tax: "K3", reviewed: false,
+  q: "Ordnen Sie die volkswirtschaftlichen Produktionsfaktoren nach ihrer historischen Bedeutung – vom ältesten/ursprünglichsten zum jüngsten.",
+  items: [
+    "Boden/Natur (Grundlage der Agrarwirtschaft seit Jahrtausenden)",
+    "Arbeit (körperliche Arbeitskraft als zentraler Faktor)",
+    "Kapital (Maschinen, Werkzeuge – zentral seit der Industrialisierung)",
+    "Wissen/Humankapital (Bildung, Know-how – Schlüsselfaktor der modernen Wirtschaft)"
+  ],
+  correct: [0, 1, 2, 3],
+  explain: "In der Agrargesellschaft war Boden der knappste Faktor. Mit der Industrialisierung gewann Kapital (Maschinen) an Bedeutung. In der heutigen Wissensgesellschaft ist Humankapital (Bildung, Innovation) der entscheidende Wachstumstreiber. Alle vier Faktoren bleiben relevant, aber ihre relative Bedeutung hat sich verschoben."
+},
+
+// ──── ZEICHNEN ────
+  {
+    id: "neu_zeichnen_01", topic: "beduerfnisse", type: "zeichnen", diff: 2, tax: "K3", reviewed: false,
+    q: "Zeichne die Bedürfnispyramide nach Maslow mit allen fünf Stufen. Beschrifte jede Stufe und markiere die Grenze zwischen Defizit- und Wachstumsbedürfnissen.",
+    hints: ["Die Pyramide hat 5 Stufen, von unten nach oben.", "Die untersten 4 Stufen sind Defizitbedürfnisse.", "Ganz oben steht die Selbstverwirklichung."],
+    sample: { src: "img/vwl/beduerfnisse/beduerfnisse_maslow_zeichnen.svg", alt: "Musterlösung: Maslow-Pyramide mit 5 Stufen" },
+    explain: "Die Bedürfnispyramide nach Maslow (1943) ordnet menschliche Bedürfnisse hierarchisch: Grundbedürfnisse → Sicherheit → Soziale Bedürfnisse → Wertschätzung → Selbstverwirklichung. Die unteren vier sind Defizitbedürfnisse (Mangel motiviert), die oberste ist ein Wachstumsbedürfnis."
+  }
+
 ];
