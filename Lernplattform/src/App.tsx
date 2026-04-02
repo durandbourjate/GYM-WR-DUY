@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useAuthStore } from './store/authStore'
 import { useGruppenStore } from './store/gruppenStore'
 import { useUebungsStore } from './store/uebungsStore'
+import { useFortschrittStore } from './store/fortschrittStore'
 import LoginScreen from './components/LoginScreen'
 import GruppenAuswahl from './components/GruppenAuswahl'
 import Dashboard from './components/Dashboard'
@@ -9,18 +10,71 @@ import UebungsScreen from './components/UebungsScreen'
 import Zusammenfassung from './components/Zusammenfassung'
 import AdminDashboard from './components/admin/AdminDashboard'
 
+const DEMO_PARAM = new URLSearchParams(window.location.search).get('demo')
+const IST_DEMO = !!DEMO_PARAM
+const DEMO_ROLLE = DEMO_PARAM === 'eltern' ? 'admin' as const : 'lernend' as const
+
 export default function App() {
   const { user, istAngemeldet, sessionWiederherstellen, ladeStatus: authStatus } = useAuthStore()
   const { gruppen, aktiveGruppe, ladeGruppen, ladeStatus: gruppenStatus } = useGruppenStore()
   const { session, starteSession } = useUebungsStore()
   const [adminModus, setAdminModus] = useState(false)
+  const [demoAktiv, setDemoAktiv] = useState(false)
+
+  // Demo-Modus: ?demo=true in URL → Mock-Login ohne Backend
+  useEffect(() => {
+    if (IST_DEMO && !demoAktiv) {
+      setDemoAktiv(true)
+
+      const istEltern = DEMO_ROLLE === 'admin'
+      const email = istEltern ? 'eltern@demo.ch' : 'kind@demo.ch'
+      const name = istEltern ? 'Demo Elternteil' : 'Demo Kind'
+      const vorname = istEltern ? 'Elternteil' : 'Kind'
+
+      // Mock-User setzen
+      useAuthStore.setState({
+        user: {
+          email,
+          name,
+          vorname,
+          nachname: 'Demo',
+          rolle: DEMO_ROLLE,
+          sessionToken: 'demo-token',
+          loginMethode: 'google',
+        },
+        istAngemeldet: true,
+        ladeStatus: 'fertig',
+      })
+
+      // Mock-Gruppe setzen (adminEmail = eltern)
+      const gruppe = {
+        id: 'demo-gruppe',
+        name: 'Demo-Familie',
+        typ: 'privat' as const,
+        adminEmail: 'eltern@demo.ch',
+        fragebankSheetId: 'demo',
+        analytikSheetId: 'demo',
+        mitglieder: ['eltern@demo.ch', 'kind@demo.ch'],
+      }
+      useGruppenStore.setState({
+        gruppen: [gruppe],
+        aktiveGruppe: gruppe,
+        ladeStatus: 'fertig',
+      })
+
+      if (istEltern) setAdminModus(true)
+
+      // Fortschritt aus localStorage laden
+      useFortschrittStore.getState().ladeFortschritt()
+    }
+  }, [demoAktiv])
 
   useEffect(() => {
-    sessionWiederherstellen()
+    if (!IST_DEMO) sessionWiederherstellen()
   }, [sessionWiederherstellen])
 
   useEffect(() => {
-    if (istAngemeldet && user?.email) {
+    if (!IST_DEMO && istAngemeldet && user?.email) {
       ladeGruppen(user.email)
     }
   }, [istAngemeldet, user?.email, ladeGruppen])
@@ -37,8 +91,8 @@ export default function App() {
     }
   }, [aktiveGruppe, user?.email, user?.rolle])
 
-  // Laden
-  if (authStatus === 'laden') {
+  // Laden (nicht im Demo-Modus)
+  if (!IST_DEMO && authStatus === 'laden') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
         <p className="text-gray-500">Wird geladen...</p>
@@ -50,7 +104,7 @@ export default function App() {
   if (!istAngemeldet) return <LoginScreen />
 
   // Gruppen laden
-  if (gruppenStatus === 'laden') {
+  if (!IST_DEMO && gruppenStatus === 'laden') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
         <p className="text-gray-500">Gruppen werden geladen...</p>
