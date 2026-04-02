@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useAuthStore } from './store/authStore'
 import { useGruppenStore } from './store/gruppenStore'
 import { useUebungsStore } from './store/uebungsStore'
@@ -7,11 +7,13 @@ import GruppenAuswahl from './components/GruppenAuswahl'
 import Dashboard from './components/Dashboard'
 import UebungsScreen from './components/UebungsScreen'
 import Zusammenfassung from './components/Zusammenfassung'
+import AdminDashboard from './components/admin/AdminDashboard'
 
 export default function App() {
   const { user, istAngemeldet, sessionWiederherstellen, ladeStatus: authStatus } = useAuthStore()
   const { gruppen, aktiveGruppe, ladeGruppen, ladeStatus: gruppenStatus } = useGruppenStore()
   const { session, starteSession } = useUebungsStore()
+  const [adminModus, setAdminModus] = useState(false)
 
   useEffect(() => {
     sessionWiederherstellen()
@@ -28,6 +30,7 @@ export default function App() {
       const istAdmin = aktiveGruppe.adminEmail.toLowerCase() === user.email.toLowerCase()
       if (istAdmin && user.rolle !== 'admin') {
         useAuthStore.getState().setzeRolle('admin')
+        setAdminModus(true)
       } else if (!istAdmin && user.rolle !== 'lernend') {
         useAuthStore.getState().setzeRolle('lernend')
       }
@@ -92,6 +95,25 @@ export default function App() {
     return <UebungsScreen />
   }
 
-  // Dashboard
-  return <Dashboard />
+  // Admin-Dashboard (wenn Admin + Admin-Modus aktiv)
+  if (user?.rolle === 'admin' && adminModus) {
+    return <AdminDashboard onZuUeben={() => setAdminModus(false)} />
+  }
+
+  // Dashboard (mit Admin-Toggle wenn Admin)
+  return (
+    <>
+      <Dashboard />
+      {user?.rolle === 'admin' && (
+        <div className="fixed bottom-6 right-6">
+          <button
+            onClick={() => setAdminModus(true)}
+            className="bg-gray-800 dark:bg-gray-200 text-white dark:text-gray-800 px-4 py-2 rounded-full shadow-lg text-sm font-medium min-h-[44px]"
+          >
+            Admin-Dashboard
+          </button>
+        </div>
+      )}
+    </>
+  )
 }

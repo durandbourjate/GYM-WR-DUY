@@ -3,7 +3,7 @@
 ## Aktueller Stand
 
 **Branch:** `main`
-**Phase:** 3 von 7 (Fortschritt + Mastery)
+**Phase:** 4 von 7 (Eltern-/LP-Dashboard)
 **Status:** Implementation abgeschlossen, 64 Tests gruen, Build gruen
 
 ### Verifikation (03.04.2026)
@@ -12,60 +12,73 @@
 |-------|--------|
 | `npx tsc -b` | OK |
 | `npx vitest run` | 64 Tests gruen (8 Testdateien) |
-| `npm run build` | OK (dist/ erstellt, 234 KB JS) |
+| `npm run build` | OK (dist/ erstellt, 247 KB JS) |
 | Pruefungstool Regression | 193 Tests gruen, tsc OK |
 
 ---
 
 ## Phase 1 (02.04.2026) — Grundgeruest + Auth + Gruppen
-
-Scaffolding, Auth (Google OAuth + Code), Gruppen-System, Login/Dashboard UI.
-17 Tests (apiClient 6, authStore 6, gruppenStore 5).
+Scaffolding, Auth (Google OAuth + Code), Gruppen-System. 17 Tests.
 
 ## Phase 2 (03.04.2026) — Fragenbank + Uebungs-Engine
-
-8 Fragetypen (MC, Multi, TF, Fill, Calc, Sort, Sortierung, Zuordnung), Block-Builder,
-UebungsScreen + Zusammenfassung, Mock-Daten, Dashboard mit Themen-Browser.
-22 neue Tests (korrektur 12, blockBuilder 5, uebungsStore 5).
+8 Fragetypen, Block-Builder, UebungsScreen, Zusammenfassung, Mock-Daten. +22 Tests = 39.
 
 ## Phase 3 (03.04.2026) — Fortschritt + Mastery
+Mastery-System (neu→ueben→gefestigt→gemeistert), Fortschritt-Store (localStorage),
+priorisierter Block-Builder, Dashboard Fortschrittsbalken. +25 Tests = 64.
+
+## Phase 4 (03.04.2026) — Eltern-/LP-Dashboard
 
 | Task | Beschreibung |
 |------|-------------|
-| 1 | Fortschritt-Typen (FragenFortschritt, MasteryStufe, ThemenFortschritt, Dauerbaustelle) |
-| 2 | Mastery-Utils: berechneMastery, aktualisiereFortschritt, istDauerbaustelle (14 Tests) |
-| 3 | Fortschritt-Store (localStorage-persistiert, 9 Tests) |
-| 4 | Block-Builder Mastery-Priorisierung (ueben > neu > gefestigt > gemeistert, 7 Tests) |
-| 5 | UebungsStore Integration (nach Antwort → Fortschritt automatisch updaten) |
-| 6 | Dashboard Mastery-Badges + Fortschrittsbalken pro Thema |
+| 1 | Mock-Mitglieder-Daten (3 Kinder, Fortschritte, Sessions) |
+| 2 | AdminDashboard mit 3-Ebenen Navigation |
+| 3 | AdminUebersicht: Alle Kinder mit Fach-Fortschrittsbalken |
+| 4 | AdminKindDetail: Sessions, Dauerbaustellen, Themen-Drill-Down |
+| 5 | AdminThemaDetail: Einzelne Fragen mit Mastery + Versuche |
+| 6 | App.tsx: Admin-Routing (Admin-Modus Toggle, Ueben-Button) |
 
-### Mastery-System
+### Admin-Dashboard 3 Ebenen
 
-| Stufe | Bedingung | Farbe |
-|-------|-----------|-------|
-| neu | Noch nie beantwortet | Grau |
-| ueben | < 3x richtig in Folge | Gelb |
-| gefestigt | 3x richtig in Folge | Blau |
-| gemeistert | 5x richtig in Folge, 2+ Sessions | Gruen |
+**Ebene 1 — Uebersicht (alle Kinder):**
+- Pro Kind: Fach-Fortschrittsbalken (gruen/blau/gelb)
+- Sessions-Anzahl, gemeisterte Fragen
+- Klick → Ebene 2
 
-Fortschritt wird in localStorage persistiert (`lernplattform-fortschritt`).
-Block-Builder priorisiert: ueben-Fragen zuerst, gemeisterte zuletzt.
-Dashboard zeigt Mastery-Verteilung pro Thema als farbigen Balken.
+**Ebene 2 — Kind-Detail:**
+- 7-Tage-Statistik (Sessions, Fragen, Quote)
+- Dauerbaustellen-Warnung (>=10 Versuche, <50%)
+- Themen nach Fach mit Mastery-Verteilung
+- Session-Historie
+- Klick → Ebene 3
 
-### Architektur (nach Phase 3)
+**Ebene 3 — Thema-Detail:**
+- Gesamt-Statistik (Versuche, richtig, Quote)
+- Einzelne Fragen mit Mastery-Label + Detail (Versuche, richtigInFolge, Sessions)
+
+### Admin-Routing
+
+- Admin erkennt sich ueber `aktiveGruppe.adminEmail === user.email`
+- Admin startet im Admin-Dashboard
+- "Ueben"-Button wechselt zum normalen Dashboard
+- "Admin-Dashboard"-FAB wechselt zurueck
+- Lernende sehen nur das normale Dashboard
+
+### Architektur (nach Phase 4)
 
 ```
 Lernplattform/src/
 ├── types/           # auth, gruppen, fragen, uebung, fortschritt
 ├── services/        # interfaces, apiClient, authService
-├── adapters/        # appsScriptAdapter + mockDaten
+├── adapters/        # appsScriptAdapter, mockDaten, mockMitgliederDaten
 ├── store/           # authStore, gruppenStore, uebungsStore, fortschrittStore
 ├── utils/           # korrektur, blockBuilder, shuffle, mastery
 ├── components/
 │   ├── fragetypen/  # 8 Komponenten + Registry
-│   ├── LoginScreen, GruppenAuswahl, Dashboard (mit Mastery-Badges)
+│   ├── admin/       # AdminDashboard, AdminUebersicht, AdminKindDetail, AdminThemaDetail
+│   ├── LoginScreen, GruppenAuswahl, Dashboard
 │   ├── UebungsScreen, Zusammenfassung
-│   └── AdminLayout (Platzhalter)
+│   └── AdminLayout (deprecated, ersetzt durch admin/)
 ├── App.tsx
 └── __tests__/       # 8 Testdateien, 64 Tests
 ```
@@ -74,18 +87,19 @@ Lernplattform/src/
 
 ## Was fehlt (naechste Phasen)
 
-### Phase 4: Eltern-/LP-Dashboard
-- 3-Ebenen Drill-Down (Uebersicht → Kind → Thema)
-- Typische Fehler, Trends, Session-Historie
-- Dauerbaustellen-Anzeige
-
 ### Phase 5: Auftraege + Empfehlungen
+- Admin erstellt Auftraege (Fach/Thema/Frist)
+- System empfiehlt: groesste Luecke, Festigung, aktiver Auftrag
+- Empfehlungs-Karten im Dashboard
 
 ### Phase 6: Gamification + Kinder-UX
+- Sterne (0-3 pro Thema), Streaks, Session-Zusammenfassung
+- Touch-Optimierung, groessere Schrift, froehliches Feedback
 
 ### Phase 7: Gym-Pool-Migration
+- Bestehende 27 Pools in Sheets migrieren
 
 ### Apps Script Backend (noch nicht implementiert)
 - Alle `lernplattform*` Endpoints
 - Gruppen-Registry + Sheets
-- Fortschritt server-seitig persistieren
+- Fortschritt + Analytik server-seitig
