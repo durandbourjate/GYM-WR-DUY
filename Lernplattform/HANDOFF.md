@@ -2,84 +2,103 @@
 
 ## Aktueller Stand
 
-**Branch:** `feature/lernplattform-phase1`
-**Phase:** 1 von 7 (Grundgeruest + Auth + Gruppen)
-**Status:** Implementation abgeschlossen, Tests gruen, Build gruen
+**Branch:** `main`
+**Phase:** 2 von 7 (Fragenbank + Uebungs-Engine)
+**Status:** Implementation abgeschlossen, 39 Tests gruen, Build gruen
 
-### Verifikation (02.04.2026)
+### Verifikation (03.04.2026)
 
 | Check | Status |
 |-------|--------|
 | `npx tsc -b` | OK |
-| `npx vitest run` | 17 Tests gruen (3 Testdateien) |
-| `npm run build` | OK (dist/ erstellt) |
+| `npx vitest run` | 39 Tests gruen (6 Testdateien) |
+| `npm run build` | OK (dist/ erstellt, 230 KB JS) |
 | Pruefungstool Regression | 193 Tests gruen, tsc OK |
 | GitHub Actions deploy.yml | Erweitert um Lernplattform-Build |
 
-### Was wurde gemacht (Phase 1)
+---
 
-| Task | Beschreibung | Dateien |
-|------|-------------|---------|
-| 1 | Projekt-Scaffolding | package.json, tsconfig, vite.config, index.html |
-| 2 | TypeScript-Typen | types/auth.ts, types/gruppen.ts |
-| 3 | Service-Interfaces + API-Client | services/interfaces.ts, services/apiClient.ts + 6 Tests |
-| 4 | Auth-Service + Auth-Store | services/authService.ts, store/authStore.ts + 6 Tests |
-| 5 | Gruppen-Store + Adapter | adapters/appsScriptAdapter.ts, store/gruppenStore.ts + 5 Tests |
-| 6 | UI-Komponenten | LoginScreen, GruppenAuswahl, Dashboard, AdminLayout, App.tsx |
-| 7 | GitHub Actions Deploy | deploy.yml erweitert |
+## Phase 1 (02.04.2026) — Grundgeruest + Auth + Gruppen
 
-### Architektur (Phase 1)
+| Task | Beschreibung |
+|------|-------------|
+| 1 | Projekt-Scaffolding (React 19 + Vite + Tailwind) |
+| 2 | Auth- und Gruppen-Typen |
+| 3 | Service-Interfaces + API-Client (6 Tests) |
+| 4 | Auth-Service + Auth-Store (6 Tests) |
+| 5 | Gruppen-Store + Apps-Script-Adapter (5 Tests) |
+| 6 | UI-Komponenten (Login, Gruppen, Dashboard, Admin) |
+| 7 | GitHub Actions Deploy erweitert |
+
+## Phase 2 (03.04.2026) — Fragenbank + Uebungs-Engine
+
+| Task | Beschreibung |
+|------|-------------|
+| 1 | Fragen- + Uebungs-Typen (FrageTyp, AntwortTyp, Session, Ergebnis) |
+| 2 | Korrektur-Utils + Shuffle (12 Tests) |
+| 3 | Block-Builder (5 Tests) |
+| 4 | FragenService Interface + Mock-Daten-Adapter (13 Fragen, 5 Themen) |
+| 5 | UebungsStore (5 Tests) |
+| 6 | 8 Fragetypen-Komponenten (MC, Multi, TF, Fill, Calc, Sort, Sortierung, Zuordnung) |
+| 7 | UebungsScreen + Zusammenfassung |
+| 8 | Dashboard mit Themen-Browser + App Routing |
+
+### Architektur (nach Phase 2)
 
 ```
-Lernplattform/
-├── src/
-│   ├── types/           # AuthUser, Gruppe, Mitglied
-│   ├── services/        # Interfaces + apiClient + authService
-│   ├── adapters/        # appsScriptAdapter (implementiert GruppenService)
-│   ├── store/           # authStore + gruppenStore (Zustand)
-│   ├── components/      # LoginScreen, GruppenAuswahl, Dashboard, AdminLayout
-│   ├── __tests__/       # 3 Testdateien, 17 Tests
-│   └── App.tsx          # Auth-Guard + Routing-Logik
+Lernplattform/src/
+├── types/           # auth, gruppen, fragen, uebung
+├── services/        # interfaces, apiClient, authService
+├── adapters/        # appsScriptAdapter, mockDaten
+├── store/           # authStore, gruppenStore, uebungsStore
+├── utils/           # korrektur, blockBuilder, shuffle
+├── components/
+│   ├── fragetypen/  # 8 Komponenten + Registry
+│   ├── LoginScreen, GruppenAuswahl, Dashboard
+│   ├── UebungsScreen, Zusammenfassung
+│   └── AdminLayout (Platzhalter)
+├── App.tsx          # Auth-Guard + Session-Routing
+└── __tests__/       # 6 Testdateien, 39 Tests
 ```
 
-### Auth-Flow
+### Uebungs-Flow
 
-1. Login-Screen: Google OAuth oder Code-Login
-2. Backend: Session-Token generieren
-3. Gruppen laden fuer E-Mail
-4. 1 Gruppe → automatisch aktiv | >1 → GruppenAuswahl
-5. Dashboard (Platzhalter fuer Phase 2)
+1. Dashboard zeigt Themen nach Fach gruppiert (aus Mock-Daten)
+2. Klick auf Thema → UebungsStore laedt Fragen, erstellt 10er-Block
+3. UebungsScreen zeigt Frage + Fragetyp-Komponente
+4. Antwort → Korrektur → Feedback (gruen/rot + Erklaerung)
+5. Weiter → naechste Frage oder Ergebnis
+6. Zusammenfassung zeigt Score + Detail-Liste
+7. "Nochmal ueben" oder "Zurueck zum Dashboard"
+
+### Mock-Daten (kein Backend noetig zum Testen)
+
+13 Fragen in 5 Themen: Mathe (Addition, Multiplikation), Deutsch (Wortarten, Satzglieder), VWL (Markt und Preis).
+Alle 8 Fragetypen vertreten: mc, multi, tf, fill, calc, sort, sortierung, zuordnung.
 
 ---
 
 ## Was fehlt (naechste Phasen)
 
-### Phase 2: Fragenbank + Uebungs-Engine
-- Fragen aus Gruppen-Sheet laden
-- Block-Zusammenstellung (7 Thema + 2 Luecken + 1 Check)
-- Fragetypen-Rendering (MC, Fill, Calc, Sort, etc.)
-- Antwort-Feedback (richtig/falsch + Erklaerung)
+### Phase 3: Fortschritt + Mastery
+- FragenFortschritt-Tracking (versuche, richtigInFolge, mastery)
+- Mastery-Stufen: neu → ueben → gefestigt → gemeistert
+- Dauerbaustellen-Erkennung (>10 Versuche, <50%)
+- Block-Priorisierung nach Mastery-Status
+- Apps Script Backend fuer Analytik
+
+### Phase 4: Eltern-/LP-Dashboard
+- 3-Ebenen Drill-Down (Uebersicht → Kind → Thema)
+- Typische Fehler, Trends, Session-Historie
+
+### Phase 5: Auftraege + Empfehlungen
+
+### Phase 6: Gamification + Kinder-UX
+
+### Phase 7: Gym-Pool-Migration
 
 ### Apps Script Backend (noch nicht implementiert)
-- `lernplattformLogin` / `lernplattformValidiereToken`
-- `lernplattformLadeGruppen` / `lernplattformErstelleGruppe`
-- `lernplattformLadeMitglieder` / `lernplattformEinladen`
-- `lernplattformGeneriereCode` / `lernplattformCodeLogin`
-- Gruppen-Registry Sheet anlegen
-
-### Google Sheets Setup
-- Gruppen-Registry Sheet erstellen (zentral)
-- Pro Gruppe: Fragenbank-Sheet + Analytik-Sheet
-- Tabs gemaess Spec (Fortschritt, Sessions, Auftraege, Antworten)
-
----
-
-## Commits (Phase 1)
-
-1. Projekt-Scaffolding (React 19 + Vite + Tailwind)
-2. Auth- und Gruppen-Typen
-3. Service-Interfaces + API-Client mit Tests
-4. Auth-Service + Auth-Store mit Tests
-5. Gruppen-Store + Apps-Script-Adapter mit Tests
-6. UI-Komponenten (Login, Gruppen, Dashboard-Shell)
-7. GitHub Actions Deploy-Workflow erweitert
+- Alle `lernplattform*` Endpoints
+- Gruppen-Registry Sheet
+- Fragenbank aus Google Sheets lesen (statt Mock)
+- Antworten + Fortschritt persistieren
