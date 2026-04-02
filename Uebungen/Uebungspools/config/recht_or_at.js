@@ -1128,6 +1128,54 @@ window.QUESTIONS = [
     options: [{v: "A", t: "Schlechterfüllung"},{v: "B", t: "Unmöglichkeit der Vertragserfüllung"},{v: "C", t: "Gläubigerverzug"},{v: "D", t: "Schuldnerverzug – das Werbeatelier hat die Leistung nicht rechtzeitig erbracht"}],
     correct: "D",
     explain: "Das Werbeatelier (Schuldner) hat die vereinbarte Leistung nicht rechtzeitig erbracht. Es liegt Schuldnerverzug vor (OR 102 ff.). Die Weihnachtsdekoration Ende November hat Fixgeschäft-Charakter – ob eine Nachfrist gesetzt werden muss, hängt davon ab, ob die rechtzeitige Erfüllung wesentlich war."
+  },
+
+  // --- Sortierungsfragen ---
+  {
+    id: "neu_sort_01", topic: "vertragsvoraussetzungen", type: "sortierung", diff: 2, tax: "K3", reviewed: false,
+    q: "Ordnen Sie die Schritte eines gültigen Vertragsabschlusses in die korrekte Reihenfolge.",
+    items: [
+      "Antrag (Offerte): Eine Partei macht ein verbindliches Angebot",
+      "Annahme (Akzept): Die andere Partei nimmt das Angebot an",
+      "Übereinstimmende gegenseitige Willensäusserung (Konsens) liegt vor",
+      "Prüfung der Gültigkeitsvoraussetzungen (Handlungsfähigkeit, Form, Inhalt)",
+      "Vertrag ist gültig zustande gekommen → Rechte und Pflichten entstehen"
+    ],
+    correct: [0, 1, 2, 3, 4],
+    explain: "Ein Vertrag entsteht durch Antrag und Annahme (OR 1 ff.). Damit ein Konsens vorliegt, müssen sich die Parteien über alle wesentlichen Punkte einig sein. Zusätzlich müssen die Gültigkeitsvoraussetzungen erfüllt sein: Handlungsfähigkeit (ZGB 12 ff.), allfällige Formvorschriften (OR 11 ff.) und zulässiger Inhalt (OR 19/20). Erst dann ist der Vertrag gültig."
+  },
+  {
+    id: "neu_sort_02", topic: "stoerung", type: "sortierung", diff: 2, tax: "K3", reviewed: false,
+    q: "Ordnen Sie die Schritte, die ein Gläubiger beim Schuldnerverzug (OR 102 ff.) unternehmen muss, in die korrekte Reihenfolge.",
+    items: [
+      "Fälligkeit der Leistung tritt ein (Erfüllungszeitpunkt ist erreicht)",
+      "Mahnung des Schuldners (Aufforderung zur Leistung, sofern kein Verfalltag vereinbart)",
+      "Angemessene Nachfrist ansetzen (OR 107 – mit Androhung der Konsequenzen)",
+      "Nach erfolgloser Nachfrist: Wahlrecht des Gläubigers (Erfüllung, Schadenersatz oder Rücktritt)"
+    ],
+    correct: [0, 1, 2, 3],
+    explain: "Beim Schuldnerverzug muss der Gläubiger systematisch vorgehen: Erst muss die Leistung fällig sein. Dann muss gemahnt werden (ausser bei vereinbartem Verfalltag – dort tritt Verzug automatisch ein). Danach wird eine Nachfrist angesetzt. Nach deren Ablauf hat der Gläubiger drei Optionen: weiterhin auf Erfüllung bestehen, Schadenersatz wegen Nichterfüllung verlangen oder vom Vertrag zurücktreten."
+  },
+  {
+    id: "neu_sort_03", topic: "erloeschen", type: "sortierung", diff: 3, tax: "K3", reviewed: false,
+    q: "Ordnen Sie die folgenden Verjährungsfristen des OR nach ihrer Dauer – von der kürzesten zur längsten.",
+    items: [
+      "1 Jahr: Mängelansprüche bei beweglichen Sachen (OR 210)",
+      "2 Jahre: Forderungen aus Kaufverträgen des täglichen Verkehrs (OR 128)",
+      "5 Jahre: Forderungen für Mietzinse, periodische Leistungen (OR 128)",
+      "10 Jahre: Allgemeine Verjährungsfrist für Forderungen (OR 127)"
+    ],
+    correct: [0, 1, 2, 3],
+    explain: "Das OR kennt verschiedene Verjährungsfristen: 1 Jahr für Gewährleistungsansprüche beim Kauf, 2 Jahre für Forderungen aus täglichem Verkehr (Handwerkerrechnungen etc.), 5 Jahre für periodische Leistungen (Miete, Zinsen), und 10 Jahre als allgemeine Frist. Die Verjährung kann durch Anerkennung oder Betreibung unterbrochen werden."
+  },
+
+// ──── ZEICHNEN ────
+  {
+    id: "neu_zeichnen_01", topic: "vertragsvoraussetzungen", type: "zeichnen", diff: 2, tax: "K3", reviewed: false,
+    q: "Zeichne ein Schema zum Zustandekommen eines Vertrages nach OR 1. Zeige die beteiligten Parteien, Antrag, Annahme und den Konsens.",
+    hints: ["Zwei Parteien geben übereinstimmende Willenserklärungen ab.", "Eine Partei macht einen Antrag (Offerte), die andere nimmt an (Akzept).", "Der Vertrag kommt durch Konsens (Willensübereinstimmung) zustande."],
+    sample: { src: "img/recht/or_at/or_at_vertragsschema_zeichnen.svg", alt: "Musterlösung: Vertragsschema OR 1" },
+    explain: "Ein Vertrag nach OR 1 kommt durch übereinstimmende gegenseitige Willenserklärung zustande. Partei A macht einen Antrag (Offerte), Partei B erklärt die Annahme (Akzept). Stimmen beide Willenserklärungen überein (Konsens), ist der Vertrag geschlossen. Wichtig: OR 11 — Verträge bedürfen nur dann einer besonderen Form, wenn das Gesetz es vorschreibt."
   }
 
 ];

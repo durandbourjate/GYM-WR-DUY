@@ -1,6 +1,6 @@
 // Übungspool: Ökonomisches Menschenbild
 // Fachbereich: VWL
-// Anzahl Fragen: 66
+// Anzahl Fragen: 69
 
 window.POOL_META = {
   id: "vwl_menschenbild",
@@ -419,5 +419,43 @@ window.QUESTIONS = [
 {id:"z08",topic:"ziele",type:"mc",diff:3,tax:"K4",reviewed:false,
  q:"Die Schweiz hat eine tiefe Arbeitslosenquote (≈2%), aber hohe Mieten und Lebenshaltungskosten. Welche Zielbeziehung im magischen Sechseck wird hier sichtbar?",
  options:[{v: "A",t:"Zielharmonie: Tiefe Arbeitslosigkeit und hohe Mieten ergänzen sich optimal."},{v: "B",t:"Es handelt sich um kein wirtschaftspolitisches Thema."},{v: "C",t:"Zielneutralität: Die Arbeitslosenquote hat keinen Einfluss auf die Mietpreise."},{v: "D",t:"Zielkonkurrenz: Hohe Beschäftigung und Zuwanderung treiben die Nachfrage nach Wohnraum, was den sozialen Ausgleich (bezahlbares Wohnen) erschwert."}],
- correct:"D",explain:"Konkret: Vollbeschäftigung und wirtschaftliche Dynamik ziehen Arbeitskräfte an (Zuwanderung), was die Nachfrage nach Wohnraum erhöht und die Mieten steigen lässt. Das Ziel «sozialer Ausgleich» (bezahlbares Wohnen für alle) wird dadurch erschwert. Ein typisches Beispiel für die Zielkonflikte, die das Sechseck «magisch» machen."}
+ correct:"D",explain:"Konkret: Vollbeschäftigung und wirtschaftliche Dynamik ziehen Arbeitskräfte an (Zuwanderung), was die Nachfrage nach Wohnraum erhöht und die Mieten steigen lässt. Das Ziel «sozialer Ausgleich» (bezahlbares Wohnen für alle) wird dadurch erschwert. Ein typisches Beispiel für die Zielkonflikte, die das Sechseck «magisch» machen."},
+
+// --- Sortierungsfragen ---
+{id: "neu_sort_01", topic: "homo", type: "sortierung", diff: 2, tax: "K3", reviewed: false,
+ q: "Ordnen Sie die folgenden Annahmen des Homo Oeconomicus nach ihrer zunehmenden Realitätsferne – von der «noch einigermassen realistischen» zur «am stärksten vereinfachenden» Annahme.",
+ items: [
+   "Eigeninteresse: Menschen verfolgen ihre eigenen Ziele",
+   "Nutzenmaximierung: Menschen treffen bewusste Kosten-Nutzen-Abwägungen",
+   "Stabile Präferenzen: Vorlieben ändern sich nicht über die Zeit",
+   "Vollständige Information: Alle Alternativen und Konsequenzen sind bekannt"
+ ],
+ correct: [0, 1, 2, 3],
+ explain: "Eigeninteresse ist die realistischste Annahme – Menschen handeln tatsächlich oft eigennützig. Nutzenmaximierung ist schon vereinfacht (Verhaltensökonomie zeigt Heuristiken). Stabile Präferenzen sind empirisch widerlegt (Gewohnheiten, Moden). Vollständige Information ist die unrealistischste Annahme – sie ist in der Realität praktisch nie gegeben."
+},
+{id: "neu_sort_02", topic: "kritik", type: "sortierung", diff: 3, tax: "K3", reviewed: false,
+ q: "Ordnen Sie die folgenden ökonomischen Denkschulen chronologisch – von der ältesten zur jüngsten.",
+ items: [
+   "Klassische Ökonomie (Adam Smith: «unsichtbare Hand», Eigennutz führt zum Gemeinwohl)",
+   "Neoklassik (marginale Revolution: Grenznutzentheorie, Homo Oeconomicus als Modell)",
+   "Keynesianismus (John M. Keynes: Staat muss in Krisen eingreifen, Nachfragesteuerung)",
+   "Verhaltensökonomie (Kahneman/Thaler: Menschen handeln systematisch irrational, Nudging)"
+ ],
+ correct: [0, 1, 2, 3],
+ explain: "Adam Smith (1776, Wealth of Nations) begründete die klassische Ökonomie. Die Neoklassik (ab ca. 1870) formalisierte das Modell des rationalen Akteurs. Keynes (1936) kritisierte die Selbstheilungskräfte des Marktes. Die Verhaltensökonomie (ab ca. 1980, Nobelpreis Kahneman 2002, Thaler 2017) zeigt systematische Abweichungen vom Homo Oeconomicus."
+},
+{id: "neu_sort_03", topic: "ziele", type: "sortierung", diff: 2, tax: "K3", reviewed: false,
+ q: "Ordnen Sie die sechs Ziele des «magischen Sechsecks» der Schweizer Wirtschaftspolitik in der Reihenfolge, wie sie im Bundesverfassungsartikel 94–100 BV typischerweise priorisiert werden.",
+ items: [
+   "Preisstabilität (Inflationsbekämpfung – Hauptziel der SNB)",
+   "Vollbeschäftigung (tiefe Arbeitslosigkeit)",
+   "Wirtschaftswachstum (steigendes reales BIP)",
+   "Aussenwirtschaftliches Gleichgewicht (ausgeglichene Leistungsbilanz)",
+   "Gerechte Einkommensverteilung (sozialer Ausgleich)",
+   "Ökologische Nachhaltigkeit (Umweltschutz)"
+ ],
+ correct: [0, 1, 2, 3, 4, 5],
+ explain: "Traditionell stehen Preisstabilität und Vollbeschäftigung im Zentrum der Wirtschaftspolitik. Wachstum und Aussenhandelsgleichgewicht folgen. Verteilung und Nachhaltigkeit wurden historisch erst später als gleichwertige Ziele anerkannt. Alle sechs Ziele stehen in vielfältigen Wechselbeziehungen – daher «magisch»: Alle gleichzeitig zu erreichen ist kaum möglich."
+}
+
 ];

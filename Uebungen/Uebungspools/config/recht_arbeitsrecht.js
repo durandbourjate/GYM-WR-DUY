@@ -1390,5 +1390,43 @@ window.QUESTIONS = [
     ],
     correct: "C",
     explain: "Die Allgemeinverbindlichkeit eines GAV (erklär durch Bundesrat nach OR 356) bindet alle Betriebe und Arbeitnehmer der betreffenden Branche/Region, unabhängig von Verbandsmitgliedschaft oder Betriebsgrösse. Dies schützt faire Wettbewerbsbedingungen und verhindert ‹Lohndumping› durch Neu-/Kleinbetriebe. Die Bäckerei muss die GAV-Bestimmungen einhalten."
+  },
+
+  // --- Sortierungsfragen ---
+  {
+    id: "neu_sort_01", topic: "beendigung", type: "sortierung", diff: 2, tax: "K3", reviewed: false,
+    q: "Ordnen Sie die gesetzlichen Kündigungsfristen nach OR 335c in die korrekte Reihenfolge – von der kürzesten zur längsten.",
+    items: [
+      "Probezeit: 7 Tage Kündigungsfrist (auf beliebigen Tag)",
+      "1. Dienstjahr: 1 Monat Kündigungsfrist (auf Ende eines Monats)",
+      "2.–9. Dienstjahr: 2 Monate Kündigungsfrist (auf Ende eines Monats)",
+      "Ab dem 10. Dienstjahr: 3 Monate Kündigungsfrist (auf Ende eines Monats)"
+    ],
+    correct: [0, 1, 2, 3],
+    explain: "Die gesetzlichen Kündigungsfristen nach OR 335c staffeln sich nach Dienstjahren: In der Probezeit nur 7 Tage, dann 1 Monat im 1. Dienstjahr, 2 Monate im 2.–9. Dienstjahr und 3 Monate ab dem 10. Dienstjahr. Die Kündigung erfolgt jeweils auf Ende eines Monats (ausser in der Probezeit). GAV oder Einzelverträge können längere Fristen vorsehen."
+  },
+  {
+    id: "neu_sort_02", topic: "kuendigungsschutz", type: "sortierung", diff: 3, tax: "K3", reviewed: false,
+    q: "Ordnen Sie die folgenden Schritte, die ein Arbeitnehmer nach einer vermutlich missbräuchlichen Kündigung unternehmen muss, in die korrekte Reihenfolge.",
+    items: [
+      "Schriftlicher Einspruch gegen die Kündigung beim Arbeitgeber vor Ablauf der Kündigungsfrist (OR 336b)",
+      "Versuch einer Einigung mit dem Arbeitgeber (Verhandlung)",
+      "Einleitung des Schlichtungsverfahrens bei der zuständigen Schlichtungsbehörde",
+      "Klage beim Arbeitsgericht innerhalb von 180 Tagen nach Beendigung des Arbeitsverhältnisses"
+    ],
+    correct: [0, 1, 2, 3],
+    explain: "Bei einer missbräuchlichen Kündigung muss der Arbeitnehmer zuerst schriftlich Einspruch erheben (Frist: vor Ende der Kündigungsfrist). Dann wird eine gütliche Einigung versucht. Scheitert dies, folgt ein obligatorisches Schlichtungsverfahren. Erst danach kann beim Arbeitsgericht geklagt werden – innerhalb von 180 Tagen nach Beendigung des Arbeitsverhältnisses."
+  },
+  {
+    id: "neu_sort_03", topic: "grundlagen", type: "sortierung", diff: 2, tax: "K3", reviewed: false,
+    q: "Ordnen Sie die Rechtsquellen des Arbeitsrechts nach ihrer Rangordnung – von der höchsten zur tiefsten Normebene.",
+    items: [
+      "Bundesverfassung (BV) – Grundrechte, Koalitionsfreiheit, Streikrecht",
+      "Bundesgesetze (OR, ArG, GlG) – zwingend und relativ zwingende Bestimmungen",
+      "Gesamtarbeitsvertrag (GAV) – kollektive Vereinbarung zwischen Sozialpartnern",
+      "Einzelarbeitsvertrag (EAV) – individuelle Vereinbarung zwischen AG und AN"
+    ],
+    correct: [0, 1, 2, 3],
+    explain: "Im Arbeitsrecht gilt eine klare Normenhierarchie: Die BV steht zuoberst (Grundrechte). Dann folgen die Bundesgesetze (OR für den Arbeitsvertrag, ArG für den Arbeitsschutz). GAV-Bestimmungen gehen dem Einzelvertrag vor, dürfen aber nicht gegen zwingendes Gesetzesrecht verstossen. Der Einzelvertrag darf nur zugunsten des Arbeitnehmers vom GAV abweichen."
   }
 ];

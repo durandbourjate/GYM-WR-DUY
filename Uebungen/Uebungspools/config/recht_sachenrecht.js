@@ -878,5 +878,33 @@ window.QUESTIONS = [
     ],
     correct: "C",
     explain: "Obersatz: Es ist zu prüfen, wer Eigentümer des Bildes ist.\n\nDaniel hat Yvonne das Bild als Pfandsicherheit (Faustpfand) anvertraut. Yvonne hatte kein Recht, das Bild zu verkaufen — als Pfandgläubigerin durfte sie es nur aufbewahren.\n\nYvonne hat das Bild trotzdem an die Galerie verkauft. Da Daniel ihr das Bild anvertraut hat (Art. 933 ZGB), ist die Galerie als gutgläubige Erwerberin geschützt — sie wurde Eigentümerin. Die Galerie hat das Bild an die Käuferin weiterverkauft, die ebenfalls gutgläubig ist.\n\nSchlussfolgerung: Die Käuferin ist Eigentümerin des Bildes. Daniel kann es nicht herausverlangen, sondern muss sich an Yvonne halten (Schadenersatz)."
+  },
+
+  // --- Sortierungsfragen ---
+  {
+    id: "neu_sort_01", topic: "erwerb_verlust", type: "sortierung", diff: 2, tax: "K3", reviewed: false,
+    q: "Ordnen Sie die Schritte des Eigentumserwerbs an einem Grundstück in die korrekte Reihenfolge.",
+    items: [
+      "Kaufvertrag abschliessen (öffentliche Beurkundung durch Notar erforderlich, OR 216)",
+      "Grundbuchamt erhält die Anmeldung (mit beglaubigtem Vertrag)",
+      "Grundbuchamt prüft die formellen Voraussetzungen",
+      "Eintragung im Grundbuch: Käufer wird als neuer Eigentümer eingetragen",
+      "Eigentumsübergang: Erst mit dem Grundbucheintrag wird der Käufer Eigentümer (konstitutive Wirkung)"
+    ],
+    correct: [0, 1, 2, 3, 4],
+    explain: "Bei Grundstücken ist der Kaufvertrag formgebunden (öffentliche Beurkundung). Der Eigentumsübergang erfolgt erst mit dem Grundbucheintrag (konstitutiver Eintrag, Art. 656 ZGB) – nicht schon mit dem Vertragsabschluss. Dies unterscheidet sich von beweglichen Sachen, wo das Eigentum mit der Übergabe (Besitzübertragung) übergeht."
+  },
+  {
+    id: "neu_sort_02", topic: "eigentum_besitz", type: "sortierung", diff: 3, tax: "K3", reviewed: false,
+    q: "Ordnen Sie die folgenden dinglichen Rechte nach ihrem Umfang – vom umfassendsten zum eingeschränktesten Recht.",
+    items: [
+      "Eigentum (umfassendstes dingliches Recht: nutzen, verändern, veräussern, zerstören – Art. 641 ZGB)",
+      "Nutzniessung (Recht, eine fremde Sache zu nutzen und die Früchte zu ziehen – Art. 745 ZGB)",
+      "Wohnrecht (Recht, in einer fremden Liegenschaft zu wohnen – Art. 776 ZGB)",
+      "Grunddienstbarkeit (z.B. Wegrecht: beschränktes Nutzungsrecht an fremdem Grundstück – Art. 730 ZGB)"
+    ],
+    correct: [0, 1, 2, 3],
+    explain: "Eigentum ist das umfassendste dingliche Recht – der Eigentümer kann mit der Sache tun und lassen, was er will (im Rahmen des Gesetzes). Nutzniessung gibt das Recht auf Nutzung und Erträge, aber nicht auf Veräusserung oder Zerstörung. Wohnrecht ist noch enger (nur Wohnen). Grunddienstbarkeiten sind die eingeschränkteste Form – sie geben nur ein spezifisches Recht (z.B. Durchgang)."
   }
+
 ];

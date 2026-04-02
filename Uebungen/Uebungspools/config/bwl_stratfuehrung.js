@@ -798,5 +798,45 @@ window.QUESTIONS = [
     q: "Die Evaluation findet erst statt, wenn die gesamte Strategie vollständig umgesetzt wurde.",
     correct: false,
     explain: "Die Evaluation findet nicht nur am Schluss statt. Vielmehr finden Umsetzung, Evaluation und Kontrolle zeitlich parallel statt. So können korrigierende Rückkopplungen frühzeitig vorgenommen werden, statt erst am Ende festzustellen, dass etwas schiefgelaufen ist."
+  },
+
+  // --- Sortierungsfragen ---
+  {
+    id: "neu_sort_01", topic: "einfuehrung", type: "sortierung", diff: 2, tax: "K3", reviewed: false,
+    q: "Ordnen Sie die Schritte des strategischen Planungsprozesses in die korrekte Reihenfolge.",
+    items: [
+      "Grundsätze festlegen (Vision, Mission, Leitbild)",
+      "Unternehmensanalyse durchführen (Stärken und Schwächen identifizieren)",
+      "Umweltanalyse durchführen (Chancen und Gefahren erkennen)",
+      "SWOT-Analyse erstellen und Strategieoptionen ableiten",
+      "Strategie wählen, Massnahmen planen und umsetzen"
+    ],
+    correct: [0, 1, 2, 3, 4],
+    explain: "Der strategische Planungsprozess beginnt mit den normativen Grundlagen (Wofür stehen wir?), geht über die Analyse des Ist-Zustands (intern: Stärken/Schwächen, extern: Chancen/Gefahren), die Synthese in der SWOT-Matrix bis zur Strategieformulierung und Umsetzung. Evaluation und Kontrolle begleiten den gesamten Prozess."
+  },
+  {
+    id: "neu_sort_02", topic: "analyse_extern", type: "sortierung", diff: 3, tax: "K3", reviewed: false,
+    q: "Ordnen Sie die fünf Wettbewerbskräfte nach Porter typischerweise nach ihrer Bedrohlichkeit für ein etabliertes Schweizer KMU – von der grössten zur geringsten Bedrohung.",
+    items: [
+      "Rivalität unter bestehenden Wettbewerbern (direkter Preiskampf, Innovationsdruck)",
+      "Verhandlungsmacht der Kunden (können Preise drücken, Qualität fordern)",
+      "Bedrohung durch neue Konkurrenten (Markteintrittsbarrieren)",
+      "Verhandlungsmacht der Lieferanten (können Preise erhöhen)",
+      "Bedrohung durch Ersatzprodukte (Substitution durch Alternativen)"
+    ],
+    correct: [0, 1, 2, 3, 4],
+    explain: "Für KMU ist die direkte Rivalität oft die grösste Bedrohung (enger Markt, Preisdruck). Kundenverhandlungsmacht ist hoch, wenn wenige Grosskunden dominieren. Neue Konkurrenten sind je nach Branche eine reale Gefahr. Lieferantenmacht und Substitutionsbedrohung variieren stark. Porter's Modell hilft, die Branchenattraktivität systematisch zu analysieren."
+  },
+  {
+    id: "neu_sort_03", topic: "swot", type: "sortierung", diff: 2, tax: "K3", reviewed: false,
+    q: "Ordnen Sie die vier SWOT-Strategien nach dem Grad der Bedrohungslage – von der günstigsten zur ungünstigsten Ausgangslage für das Unternehmen.",
+    items: [
+      "SO-Strategie: Stärken nutzen, um Chancen zu ergreifen (Wachstum, Expansion)",
+      "WO-Strategie: Schwächen abbauen, um Chancen zu nutzen (Aufholen, Investieren)",
+      "ST-Strategie: Stärken einsetzen, um Gefahren abzuwehren (Verteidigung)",
+      "WT-Strategie: Schwächen minimieren und Gefahren vermeiden (Rückzug, Liquidation)"
+    ],
+    correct: [0, 1, 2, 3],
+    explain: "Die SO-Strategie ist die beste Ausgangslage – das Unternehmen kann offensiv agieren. WO bedeutet: Chancen existieren, aber das Unternehmen muss zuerst seine Schwächen beheben. ST erfordert eine defensive Strategie – die eigenen Stärken schützen vor Gefahren. WT ist die schwierigste Lage: Schwächen treffen auf Gefahren – hier geht es oft ums Überleben."
   }
 ];

@@ -2,7 +2,7 @@
 // Fachbereich: VWL
 // Klasse: 27abcd8f SF GYM3
 // Quellen: Eisenhut Kap. 10, LearningView-Export
-// Anzahl Fragen: 74
+// Anzahl Fragen: 77
 
 window.POOL_META = {
   id: "vwl_arbeitslosigkeit",
@@ -717,6 +717,45 @@ window.QUESTIONS = [
    {v:"D", t:"Der Übergang von Arbeitslosigkeit in Armut erfolgt oft schleichend über Aussteuerung und Sozialhilfe"}
  ],
  correct:["A","B","D"],
- explain:"Langzeitarbeitslosigkeit ist ein zentraler Risikofaktor für Armut: Nach der Aussteuerung (Ende der ALV-Leistungen) sinkt das Einkommen drastisch. Arbeitslosigkeit belastet zudem psychisch und sozial. Die ALV schützt nicht unbegrenzt – die Taggelder sind zeitlich befristet (max. 520 Taggelder für über 55-Jährige)."}
+ explain:"Langzeitarbeitslosigkeit ist ein zentraler Risikofaktor für Armut: Nach der Aussteuerung (Ende der ALV-Leistungen) sinkt das Einkommen drastisch. Arbeitslosigkeit belastet zudem psychisch und sozial. Die ALV schützt nicht unbegrenzt – die Taggelder sind zeitlich befristet (max. 520 Taggelder für über 55-Jährige)."},
+
+  // --- Sortierungsfragen ---
+  {
+    id: "neu_sort_01", topic: "bekaempfung", type: "sortierung", diff: 2, tax: "K3", reviewed: false,
+    q: "Ordnen Sie die folgenden Schritte der Arbeitslosenversicherung (ALV) in der Schweiz in die korrekte zeitliche Reihenfolge.",
+    items: [
+      "Anmeldung beim RAV innerhalb der ersten Tage nach Stellenverlust",
+      "Erstellung eines persönlichen Arbeitsvermittlungsplans mit dem RAV-Berater",
+      "Nachweis regelmässiger Bewerbungsbemühungen (Arbeitsbemühungen)",
+      "Bezug von Taggeldern (max. 400–520 je nach Alter und Beitragsdauer)",
+      "Aussteuerung bei Erschöpfung des Taggeldanspruchs"
+    ],
+    correct: [0, 1, 2, 3, 4],
+    explain: "Die ALV folgt einem klaren Ablauf: Zuerst meldet man sich beim RAV an, dann wird ein individueller Plan erstellt. Während des Bezugs muss man Bewerbungsbemühungen nachweisen. Die Taggelder sind zeitlich begrenzt – danach folgt die Aussteuerung, und die Person fällt ggf. in die Sozialhilfe."
+  },
+  {
+    id: "neu_sort_02", topic: "typen", type: "sortierung", diff: 3, tax: "K3", reviewed: false,
+    q: "Ordnen Sie die folgenden Ursachen von Arbeitslosigkeit nach ihrer typischen Dauer – von der kürzesten zur längsten.",
+    items: [
+      "Friktionelle Arbeitslosigkeit (Sucharbeitslosigkeit zwischen zwei Stellen)",
+      "Saisonale Arbeitslosigkeit (z.B. Baubranche im Winter)",
+      "Konjunkturelle Arbeitslosigkeit (Nachfragerückgang in einer Rezession)",
+      "Strukturelle Arbeitslosigkeit (Qualifikationen passen nicht mehr zur Nachfrage)"
+    ],
+    correct: [0, 1, 2, 3],
+    explain: "Friktionelle AL dauert typischerweise Tage bis wenige Wochen (Stellenwechsel). Saisonale AL dauert einige Monate (z.B. Winter). Konjunkturelle AL dauert so lange wie die Rezession (Monate bis wenige Jahre). Strukturelle AL ist oft langfristig, weil sie Umschulung oder Standortwechsel erfordert und ganze Branchen betreffen kann."
+  },
+  {
+    id: "neu_sort_03", topic: "statistik", type: "sortierung", diff: 2, tax: "K3", reviewed: false,
+    q: "Ordnen Sie die folgenden Personengruppen danach, ob sie in der Schweizer Arbeitslosenstatistik (SECO) erfasst werden – von «sicher erfasst» bis «nicht erfasst».",
+    items: [
+      "Beim RAV registrierte stellensuchende Person ohne Arbeit",
+      "Beim RAV registrierte Person in einem Beschäftigungsprogramm",
+      "Ausgesteuerte Person, die weiterhin Arbeit sucht (nicht mehr beim RAV)",
+      "Entmutigte Person, die die Stellensuche aufgegeben hat"
+    ],
+    correct: [0, 1, 2, 3],
+    explain: "Das SECO zählt nur beim RAV registrierte Arbeitslose. Personen in Beschäftigungsprogrammen gelten oft nicht als arbeitslos (je nach Programm). Ausgesteuerte und entmutigte Personen tauchen in der offiziellen Statistik gar nicht auf – sie gehören zur sogenannten «versteckten Arbeitslosigkeit». Die ILO-Statistik (BFS/SAKE) erfasst einen breiteren Kreis."
+  }
 
 ];

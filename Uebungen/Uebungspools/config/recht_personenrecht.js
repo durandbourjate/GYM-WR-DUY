@@ -679,5 +679,31 @@ window.QUESTIONS = [
     ],
     correct: "B",
     explain: "Die drei Sphären bilden ein Zwiebelmodell: Die Gemeinsphäre (aussen) betrifft das öffentliche Auftreten und ist am wenigsten geschützt. Die Privatsphäre (Mitte) umfasst den persönlichen Lebensbereich. Die Intimsphäre (innen) betrifft den innersten Bereich und geniesst den stärksten Schutz. Je tiefer die Verletzung in den Kern eindringt, desto schwerer wiegt sie."
+  },
+
+  // --- Sortierungsfragen ---
+  {
+    id: "neu_sort_01", topic: "handlungsfaehigkeit", type: "sortierung", diff: 2, tax: "K3", reviewed: false,
+    q: "Ordnen Sie die folgenden Stufen der Handlungsfähigkeit nach dem Umfang der Geschäftsfähigkeit – von der geringsten zur umfassendsten.",
+    items: [
+      "Handlungsunfähig (z.B. Kleinkind, dauerhaft urteilsunfähige Person – keine gültigen Rechtsgeschäfte)",
+      "Beschränkt handlungsunfähig (z.B. Kind ab ca. 7 Jahren – nur ausschliesslich vorteilhafte und geringfügige Geschäfte)",
+      "Beschränkt handlungsfähig (z.B. 16-Jährige/r – zusätzlich Taschengeld, Arbeitslohn, BUT nur mit Zustimmung)",
+      "Voll handlungsfähig (volljährig + urteilsfähig – unbeschränkte Geschäftsfähigkeit)"
+    ],
+    correct: [0, 1, 2, 3],
+    explain: "Die Handlungsfähigkeit ist abgestuft: Handlungsunfähige können gar keine gültigen Rechtsgeschäfte vornehmen. Beschränkt Handlungsunfähige (Kinder) können nur Geschäfte tätigen, die ihnen ausschliesslich Vorteile bringen (z.B. Geschenk annehmen). Beschränkt Handlungsfähige dürfen über ihr Taschengeld/Lohn verfügen. Volle Handlungsfähigkeit setzt Volljährigkeit (18) und Urteilsfähigkeit voraus."
+  },
+  {
+    id: "neu_sort_02", topic: "persoenlichkeit", type: "sortierung", diff: 2, tax: "K3", reviewed: false,
+    q: "Ordnen Sie die Schutzsphären der Persönlichkeit nach dem Grad des Schutzes – vom geringsten zum stärksten Schutz.",
+    items: [
+      "Gemeinsphäre (öffentliches Auftreten – geringster Schutz, z.B. Foto an öffentlicher Veranstaltung)",
+      "Privatsphäre (persönlicher Lebensbereich – mittlerer Schutz, z.B. Familienfotos, Adresse)",
+      "Intimsphäre (innerster Bereich – stärkster Schutz, z.B. Gesundheitsdaten, sexuelle Orientierung)"
+    ],
+    correct: [0, 1, 2],
+    explain: "Das Drei-Sphären-Modell stuft den Persönlichkeitsschutz ab: Die Gemeinsphäre betrifft das öffentliche Auftreten und ist am schwächsten geschützt (Berichterstattung oft zulässig). Die Privatsphäre umfasst den persönlichen Lebensbereich und ist stärker geschützt. Die Intimsphäre geniesst den absolut stärksten Schutz – Eingriffe sind fast nie gerechtfertigt."
   }
+
 ];

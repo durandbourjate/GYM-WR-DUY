@@ -699,5 +699,32 @@ window.QUESTIONS = [
     ],
     correct: "C",
     explain: "Die Kontroverse hatte mehrere Ebenen: (1) Demokratische Legitimation: Die Massnahmen wurden per Notverordnung des Bundesrates erlassen (Art. 185 Abs. 3 BV), ohne Mitsprache des Parlaments. Erst mit dem COVID-19-Gesetz wurde eine ordentliche gesetzliche Grundlage geschaffen. (2) Verhältnismässigkeit: Es war umstritten, ob die weitreichenden Einschränkungen (Lockdown, Versammlungsverbot, Schliessungen) in jedem Fall verhältnismässig waren. (3) Das COVID-Gesetz wurde in einer Volksabstimmung 2021 knapp angenommen, was die gesellschaftliche Spaltung zeigte."
+  },
+
+  // --- Sortierungsfragen ---
+  {
+    id: "neu_sort_01", topic: "einschraenkung", type: "sortierung", diff: 2, tax: "K3", reviewed: false,
+    q: "Ordnen Sie die vier Voraussetzungen für eine zulässige Grundrechtseinschränkung nach Art. 36 BV in die korrekte Prüfungsreihenfolge.",
+    items: [
+      "Gesetzliche Grundlage (die Einschränkung muss im Gesetz vorgesehen sein)",
+      "Öffentliches Interesse oder Schutz von Grundrechten Dritter (legitimer Zweck)",
+      "Verhältnismässigkeit (Eignung, Erforderlichkeit, Zumutbarkeit der Massnahme)",
+      "Kerngehalt unantastbar (der Wesensgehalt des Grundrechts darf nie verletzt werden)"
+    ],
+    correct: [0, 1, 2, 3],
+    explain: "Die Prüfung nach Art. 36 BV folgt einer festen Reihenfolge: (1) Gibt es eine gesetzliche Grundlage? (2) Liegt ein öffentliches Interesse vor? (3) Ist der Eingriff verhältnismässig (geeignet, erforderlich, zumutbar)? (4) Wird der Kerngehalt des Grundrechts gewahrt? Fehlt eine Voraussetzung, ist die Einschränkung verfassungswidrig. Das Folterverbot ist z.B. ein absoluter Kerngehalt."
+  },
+  {
+    id: "neu_sort_02", topic: "menschenrechte", type: "sortierung", diff: 3, tax: "K3", reviewed: false,
+    q: "Ordnen Sie die folgenden Meilensteine des internationalen Menschenrechtsschutzes in die chronologische Reihenfolge.",
+    items: [
+      "Allgemeine Erklärung der Menschenrechte (AEMR, UNO 1948)",
+      "Europäische Menschenrechtskonvention (EMRK, Europarat 1950)",
+      "UNO-Pakte I und II (wirtschaftliche/soziale und bürgerliche/politische Rechte, 1966)",
+      "Schweizer Bundesverfassung mit umfassendem Grundrechtskatalog (1999/2000)"
+    ],
+    correct: [0, 1, 2, 3],
+    explain: "Der Menschenrechtsschutz entwickelte sich nach dem 2. Weltkrieg: Die AEMR (1948) war die erste universelle Erklärung – allerdings rechtlich nicht bindend. Die EMRK (1950) schuf einen verbindlichen regionalen Schutz mit dem EGMR. Die UNO-Pakte (1966) machten die Menschenrechte völkerrechtlich verbindlich. Die aktuelle Schweizer BV (1999) enthält einen modernen Grundrechtskatalog (Art. 7–34)."
   }
+
 ];

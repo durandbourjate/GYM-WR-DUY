@@ -706,5 +706,31 @@ window.QUESTIONS = [
     ],
     correct: ["B", "C", "D"],
     explain: "A ist im ZGB verankert (Art. 2 Abs. 1 ZGB). B ist in der Bundesverfassung verankert (Art. 49 BV). C stammt aus dem Strafgesetzbuch (Art. 21 StGB). D ist ein allgemeiner, ungeschriebener Rechtsgrundsatz, der in keinem spezifischen Gesetz steht, sondern sich aus der Rechtslogik ergibt."
+  },
+
+  // --- Sortierungsfragen ---
+  {
+    id: "neu_sort_01", topic: "rechtsquellen", type: "sortierung", diff: 2, tax: "K3", reviewed: false,
+    q: "Ordnen Sie die Rechtsquellen gemäss Art. 1 ZGB in die Reihenfolge, in der ein Richter sie anwenden muss.",
+    items: [
+      "Geschriebenes Gesetz (Verfassung, Gesetze, Verordnungen)",
+      "Gewohnheitsrecht (ungeschriebene, durch langjährige Übung entstandene Normen)",
+      "Richterrecht (der Richter wird zum «Gesetzgeber» und füllt Lücken nach Art. 1 Abs. 2 ZGB)"
+    ],
+    correct: [0, 1, 2],
+    explain: "Art. 1 ZGB legt die Hierarchie der Rechtsquellen fest: Zuerst ist das geschriebene Gesetz anzuwenden (Wortlaut, Sinn). Fehlt eine Bestimmung, greift der Richter auf Gewohnheitsrecht zurück. Erst wenn auch dieses fehlt, soll der Richter nach der Regel entscheiden, die er als Gesetzgeber aufstellen würde – dabei folgt er bewährter Lehre und Überlieferung."
+  },
+  {
+    id: "neu_sort_02", topic: "beweislast", type: "sortierung", diff: 2, tax: "K3", reviewed: false,
+    q: "Ordnen Sie die folgenden Schritte der Beweisführung in einem Zivilprozess in die korrekte Reihenfolge.",
+    items: [
+      "Beweislastverteilung bestimmen: Wer muss was beweisen? (Art. 8 ZGB: wer aus einer Tatsache Rechte ableitet)",
+      "Beweismittel einreichen (Urkunden, Zeugen, Augenschein, Gutachten, Parteiaussage)",
+      "Beweismittel vom Gericht würdigen (freie Beweiswürdigung)",
+      "Beweisergebnis festhalten: Tatsache bewiesen oder nicht bewiesen?"
+    ],
+    correct: [0, 1, 2, 3],
+    explain: "Zuerst wird geklärt, wer die Beweislast trägt (Grundsatz Art. 8 ZGB: Wer ein Recht geltend macht, muss die entsprechenden Tatsachen beweisen). Dann werden Beweismittel eingereicht. Das Gericht würdigt die Beweise frei (keine gesetzlichen Beweisregeln). Am Ende steht fest, ob die Tatsache bewiesen ist – gelingt der Beweis nicht, geht dies zulasten der beweisbelasteten Partei."
   }
+
 ];

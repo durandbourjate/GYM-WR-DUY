@@ -787,6 +787,55 @@ window.QUESTIONS = [
     q: "Das Modell des Produktlebenszyklus lässt sich nutzen, um den exakten Zeitpunkt vorherzusagen, an dem ein Produkt in die Rückgangsphase eintritt.",
     correct: false,
     explain: "Der Produktlebenszyklus ist ein vereinfachtes Modell, das typische Muster beschreibt. Er kann nicht exakte Zeitpunkte vorhersagen. Die Dauer der Phasen ist von Produkt zu Produkt sehr unterschiedlich und hängt von vielen Faktoren ab (technologischer Wandel, Konsumverhalten, Konkurrenz). Um festzustellen, in welcher Phase sich ein Produkt befindet, wird Marktforschung betrieben."
+  },
+
+  // --- Sortierungsfragen ---
+  {
+    id: "neu_sort_01", topic: "plz", type: "sortierung", diff: 2, tax: "K3", reviewed: false,
+    q: "Ordnen Sie die Phasen des Produktlebenszyklus in die korrekte Reihenfolge.",
+    items: [
+      "Einführungsphase (hohe Marketingkosten, geringe Umsätze, oft noch Verluste)",
+      "Wachstumsphase (Umsatz steigt stark, erste Gewinne, Konkurrenz tritt ein)",
+      "Reifephase (Umsatz auf Höchststand, Gewinne maximal, intensiver Wettbewerb)",
+      "Sättigungsphase (Umsatz stagniert, Gewinne sinken, Markt gesättigt)",
+      "Degenerationsphase (Umsatz und Gewinne fallen, Produkt wird vom Markt genommen)"
+    ],
+    correct: [0, 1, 2, 3, 4],
+    explain: "Der PLZ beschreibt den idealtypischen Verlauf eines Produkts am Markt. In der Einführung entstehen hohe Kosten (Werbung, Distribution). Im Wachstum steigt der Umsatz stark. In der Reife erreicht der Umsatz sein Maximum. In der Sättigung stagniert der Markt. In der Degeneration sinkt die Nachfrage – das Produkt wird oft durch ein Nachfolgeprodukt ersetzt."
+  },
+  {
+    id: "neu_sort_02", topic: "marketing", type: "sortierung", diff: 2, tax: "K3", reviewed: false,
+    q: "Ordnen Sie die Schritte eines Marketingkonzepts in die logische Reihenfolge.",
+    items: [
+      "Marktanalyse (Marktforschung, Kundenbedürfnisse, Konkurrenz)",
+      "Marketingziele festlegen (Umsatz, Marktanteil, Bekanntheitsgrad)",
+      "Marketingstrategie wählen (Zielgruppe, Positionierung, Differenzierung)",
+      "Marketing-Mix gestalten (Product, Price, Place, Promotion)",
+      "Umsetzung und Kontrolle (Budget, Massnahmenplanung, Erfolgsmessung)"
+    ],
+    correct: [0, 1, 2, 3, 4],
+    explain: "Ein Marketingkonzept wird systematisch entwickelt: Zuerst wird der Markt analysiert (Wo stehen wir?), dann werden Ziele definiert (Wo wollen wir hin?), eine Strategie gewählt (Wie kommen wir dahin?) und der Marketing-Mix ausgestaltet (konkrete Massnahmen). Abschliessend folgen Umsetzung und Kontrolle."
+  },
+  {
+    id: "neu_sort_03", topic: "bcg", type: "sortierung", diff: 3, tax: "K3", reviewed: false,
+    q: "Ordnen Sie die BCG-Kategorien in die typische Reihenfolge, die ein erfolgreiches Produkt im Laufe seines Lebenszyklus durchläuft.",
+    items: [
+      "Question Mark (niedriger Marktanteil, hoher Marktwachstum – Investitionsentscheid nötig)",
+      "Star (hoher Marktanteil, hohes Marktwachstum – Investitionen zur Verteidigung)",
+      "Cash Cow (hoher Marktanteil, niedriges Marktwachstum – Gewinne «melken»)",
+      "Poor Dog (niedriger Marktanteil, niedriges Marktwachstum – Desinvestition prüfen)"
+    ],
+    correct: [0, 1, 2, 3],
+    explain: "Der idealtypische Weg: Ein neues Produkt startet als Question Mark (ungewisser Erfolg). Bei Erfolg wird es zum Star (Marktführer im Wachstumsmarkt). Wenn das Marktwachstum nachlässt, wird es zur Cash Cow (sichere Gewinne). Am Ende kann es zum Poor Dog werden, wenn der Marktanteil sinkt. Nicht alle Produkte durchlaufen alle Phasen – manche bleiben Question Marks und scheitern."
+  },
+
+// ──── ZEICHNEN ────
+  {
+    id: "neu_zeichnen_01", topic: "marketing", type: "zeichnen", diff: 2, tax: "K2", reviewed: false,
+    q: "Zeichne das Marketing-Mix-Modell (4P). Stelle die vier Instrumente dar und nenne jeweils 2–3 konkrete Massnahmen.",
+    hints: ["Die 4P stehen für: Product, Price, Place, Promotion.", "Auf Deutsch: Produkt, Preis, Distribution, Kommunikation.", "Jedes P umfasst verschiedene Teilentscheidungen."],
+    sample: { src: "img/bwl/marketing/marketing_4p_zeichnen.svg", alt: "Musterlösung: Marketing-Mix 4P" },
+    explain: "Der Marketing-Mix (McCarthy, 1960) umfasst vier Instrumente: Product (Sortiment, Qualität, Design), Price (Preisgestaltung, Rabatte, Konditionen), Place (Vertriebskanäle, Logistik, Standort), Promotion (Werbung, PR, Verkaufsförderung). Alle vier müssen aufeinander abgestimmt sein."
   }
 
 ];

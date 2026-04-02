@@ -1,7 +1,7 @@
 // Übungspool: Sozialpolitik und Sozialversicherungen
 // Fachbereich: VWL
 // Stufe: SF GYM3
-// Anzahl Fragen: 105
+// Anzahl Fragen: 108
 
 window.POOL_META = {
   id: "vwl_sozialpolitik",
@@ -1016,5 +1016,40 @@ window.QUESTIONS = [
 {id:"h15", topic:"herausforderungen", type:"open", diff:3, tax:"K5",reviewed:false,
  q:"Die Schweizer Krankenversicherungsprämien steigen seit Jahren stärker als die Löhne. Beurteilen Sie zwei mögliche Reformansätze: (a) Umstellung von Kopfprämien auf einkommensabhängige Prämien und (b) Stärkere Einschränkung des Leistungskatalogs.",
  sample:"(a) Einkommensabhängige Prämien würden die Finanzierung solidarischer gestalten und die Belastung für Einkommensschwache direkt reduzieren. Allerdings verliert das System seinen Versicherungscharakter und wird steuerähnlich. Es könnte auch die Eigenverantwortung reduzieren (weniger Kostenbewusstsein). (b) Eine Einschränkung des Leistungskatalogs könnte Kosten senken, birgt aber die Gefahr einer Zwei-Klassen-Medizin: Wer es sich leisten kann, versichert sich privat zusätzlich. Beide Ansätze haben Trade-offs zwischen Effizienz, Solidarität und Qualität der Versorgung.",
- explain:"Die KV-Reform ist eines der komplexesten sozialpolitischen Themen der Schweiz. Jeder Reformansatz berührt den Zielkonflikt zwischen Effizienz, Solidarität und Qualität. In der politischen Praxis scheitern Reformversuche oft an den unterschiedlichen Interessen der Akteure (Versicherer, Ärzte, Patienten, Kantone)."}
+ explain:"Die KV-Reform ist eines der komplexesten sozialpolitischen Themen der Schweiz. Jeder Reformansatz berührt den Zielkonflikt zwischen Effizienz, Solidarität und Qualität. In der politischen Praxis scheitern Reformversuche oft an den unterschiedlichen Interessen der Akteure (Versicherer, Ärzte, Patienten, Kantone)."},
+
+// --- Sortierungsfragen ---
+{id: "neu_sort_01", topic: "sozialversicherungen", type: "sortierung", diff: 2, tax: "K3", reviewed: false,
+ q: "Ordnen Sie die drei Säulen der schweizerischen Altersvorsorge in die korrekte Reihenfolge – von der staatlichen Vorsorge zur privaten.",
+ items: [
+   "1. Säule: AHV/IV – staatliche Vorsorge (Existenzsicherung, Umlageverfahren)",
+   "2. Säule: BVG – berufliche Vorsorge (Lebensstandard sichern, Kapitaldeckung)",
+   "3. Säule: Private Vorsorge (freiwillige Ergänzung, steuerbegünstigt)"
+ ],
+ correct: [0, 1, 2],
+ explain: "Das Drei-Säulen-System ist das Fundament der Schweizer Altersvorsorge. Die 1. Säule (AHV) sichert das Existenzminimum und wird im Umlageverfahren finanziert (Erwerbstätige zahlen für Rentner). Die 2. Säule (BVG/Pensionskasse) ist obligatorisch für Arbeitnehmende und im Kapitaldeckungsverfahren finanziert. Die 3. Säule ist freiwillig und steuerlich begünstigt (Säule 3a: gebunden, 3b: frei)."
+},
+{id: "neu_sort_02", topic: "finanzierung", type: "sortierung", diff: 3, tax: "K3", reviewed: false,
+ q: "Ordnen Sie die folgenden Entwicklungen chronologisch, die die Finanzierung der AHV zunehmend unter Druck setzen.",
+ items: [
+   "Babyboom-Generation (1946–1964) tritt in den Arbeitsmarkt ein und zahlt hohe AHV-Beiträge",
+   "Geburtenrate sinkt unter das Bestandserhaltungsniveau (weniger künftige Beitragszahler)",
+   "Steigende Lebenserwartung erhöht die durchschnittliche Bezugsdauer der AHV-Renten",
+   "Babyboom-Generation erreicht das Rentenalter (massiver Anstieg der Rentnerzahl ab ca. 2010)",
+   "Verhältnis Erwerbstätige zu Rentner sinkt unter 3:1 (demografische Zeitbombe)"
+ ],
+ correct: [0, 1, 2, 3, 4],
+ explain: "Die AHV-Finanzierung steht unter Druck, weil das Umlageverfahren auf einem günstigen Verhältnis von Beitragszahlern zu Rentnern basiert. Die demografische Entwicklung verschlechtert dieses Verhältnis: weniger Geburten, längeres Leben, Pensionierung der Babyboomer. Die AHV-Reform (AHV 21, 2024 in Kraft) erhöhte das Rentenalter der Frauen auf 65 und die MWST leicht."
+},
+{id: "neu_sort_03", topic: "gerechtigkeit", type: "sortierung", diff: 2, tax: "K3", reviewed: false,
+ q: "Ordnen Sie die folgenden Gerechtigkeitsprinzipien nach dem Grad der staatlichen Umverteilung – vom geringsten zum stärksten Eingriff.",
+ items: [
+   "Leistungsgerechtigkeit: Jeder erhält gemäss seiner Leistung (Marktprinzip)",
+   "Chancengerechtigkeit: Gleiche Startbedingungen für alle (Bildung, Gesundheit)",
+   "Bedarfsgerechtigkeit: Jeder erhält gemäss seinem Bedarf (Sozialhilfe, Prämienverbilligung)"
+ ],
+ correct: [0, 1, 2],
+ explain: "Leistungsgerechtigkeit erfordert kaum staatliche Umverteilung – der Markt belohnt Leistung. Chancengerechtigkeit erfordert staatliche Investitionen (z.B. kostenlose Bildung, Stipendien). Bedarfsgerechtigkeit erfordert die stärkste Umverteilung – der Staat muss aktiv Ressourcen von Bessergestellten zu Bedürftigen transferieren. In der Schweiz werden alle drei Prinzipien kombiniert."
+}
+
 ];

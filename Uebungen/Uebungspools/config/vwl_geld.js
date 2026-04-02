@@ -2508,5 +2508,55 @@ window.QUESTIONS = [
     ],
     "correct": "C",
     "explain": "Wenn die Nominalzinsen (R) sinken, sinken auch die Opportunitätskosten der Geldhaltung — der entgangene Ertrag durch das Halten von Geld statt Sparguthaben wird kleiner. Deshalb hält das Publikum mehr Geld, und die Geldnachfrage steigt."
+  },
+
+  // --- Sortierungsfragen ---
+  {
+    id: "neu_sort_01", topic: "geldarten", type: "sortierung", diff: 2, tax: "K3", reviewed: false,
+    q: "Ordnen Sie die folgenden Geldformen in die historisch korrekte Entwicklungsreihenfolge.",
+    items: [
+      "Warengeld (z.B. Muscheln, Salz, Vieh)",
+      "Münzgeld aus Edelmetallen (Gold- und Silbermünzen)",
+      "Banknoten mit Golddeckung (einlösbar gegen Gold)",
+      "Fiat-Geld ohne Golddeckung (modernes Papiergeld, gesetzliches Zahlungsmittel)",
+      "Buchgeld / Giralgeld (elektronische Bankguthaben)"
+    ],
+    correct: [0, 1, 2, 3, 4],
+    explain: "Die Geldentwicklung verlief über Jahrtausende: Erst Warengeld (Tauschgüter), dann Münzgeld (standardisiert, ca. 600 v. Chr.), später Banknoten mit Golddeckung (ab 17. Jh.), dann Fiat-Geld ohne Deckung (Nixon Shock 1971 beendete den Goldstandard), und schliesslich dominiert heute Buchgeld (über 90% der Geldmenge M1 in der Schweiz)."
+  },
+  {
+    id: "neu_sort_02", topic: "geldmengen", type: "sortierung", diff: 2, tax: "K3", reviewed: false,
+    q: "Ordnen Sie die Geldmengenaggregate der SNB vom engsten (liquidesten) zum weitesten.",
+    items: [
+      "M0 (Notenbankgeldmenge: Bargeld + Giroguthaben der Banken bei der SNB)",
+      "M1 (Bargeld + Sichteinlagen bei Banken)",
+      "M2 (M1 + Spareinlagen)",
+      "M3 (M2 + Termineinlagen)"
+    ],
+    correct: [0, 1, 2, 3],
+    explain: "Die Geldmengenaggregate werden immer breiter: M0 umfasst nur das Zentralbankgeld, M1 fügt Sichteinlagen hinzu (jederzeit verfügbar), M2 ergänzt Spareinlagen (etwas weniger liquide), und M3 schliesst auch Termineinlagen ein (festgelegt auf bestimmte Laufzeit). Je breiter das Aggregat, desto weniger liquide die enthaltenen Komponenten."
+  },
+  {
+    id: "neu_sort_03", topic: "zinssteuerung", type: "sortierung", diff: 3, tax: "K3", reviewed: false,
+    q: "Ordnen Sie die Schritte des geldpolitischen Transmissionsmechanismus in die korrekte Wirkungskette – von der SNB-Entscheidung bis zur Wirkung auf die Realwirtschaft.",
+    items: [
+      "Die SNB senkt den Leitzins (SNB-Leitzins / SARON)",
+      "Die Geschäftsbanken senken ihre Kreditzinsen",
+      "Unternehmen und Haushalte nehmen mehr Kredite auf",
+      "Konsum und Investitionen steigen",
+      "Das BIP wächst und die Beschäftigung nimmt zu"
+    ],
+    correct: [0, 1, 2, 3, 4],
+    explain: "Der Zinskanal der Geldpolitik wirkt stufenweise: Die SNB senkt den Leitzins → Banken geben die tieferen Zinsen weiter → Kredite werden günstiger → Unternehmen investieren mehr, Haushalte konsumieren mehr → Die gesamtwirtschaftliche Nachfrage steigt → BIP und Beschäftigung nehmen zu. Dieser Prozess dauert typischerweise 6–18 Monate (Time Lag)."
+  },
+
+// ──── ZEICHNEN ────
+  {
+    id: "neu_zeichnen_01", topic: "geldmengen", type: "zeichnen", diff: 3, tax: "K3", reviewed: false,
+    q: "Zeichne den Prozess der Geldschöpfung durch Geschäftsbanken (multiple Geldschöpfung). Zeige mindestens 3 Runden mit Einlage, Mindestreserve und Kreditvergabe bei einem Mindestreservesatz von 10%.",
+    hints: ["Starte mit einer Einlage von 1000 CHF bei Bank A.", "Bank A behält 10% (100 CHF) als Reserve und verleiht 900 CHF.", "Die 900 CHF werden bei Bank B eingelegt, die wieder 10% behält und den Rest verleiht."],
+    sample: { src: "img/vwl/geld/geld_geldschoepfung_zeichnen.svg", alt: "Musterlösung: Multiple Geldschöpfung" },
+    explain: "Bei einem Mindestreservesatz von 10% beträgt der Geldschöpfungsmultiplikator m = 1/0.1 = 10. Aus einer Einlage von 1000 CHF kann theoretisch bis zu 10'000 CHF Buchgeld entstehen. In der Praxis ist der Multiplikator kleiner, da Banken freiwillige Reserven halten und nicht alle Kredite als Einlagen zurückkehren."
   }
+
 ];

@@ -1,6 +1,6 @@
 // Übungspool: Wirtschaftswachstum – Triebkräfte und Effekte
 // Fachbereich: VWL
-// Anzahl Fragen: 76
+// Anzahl Fragen: 79
 
 window.POOL_META = {
   id: "vwl_wachstum",
@@ -708,5 +708,40 @@ window.QUESTIONS = [
    {v: "D", t:"Das Land hat mehr Einwohner als Hektaren Fläche."}
  ],
  correct:"B",
- explain:"Die 1,8-Hektaren-Linie zeigt die global verfügbare Biokapazität pro Person. Liegt ein Land darüber, verbraucht es mehr, als die Erde langfristig regenerieren kann. Würden alle so leben, bräuchte es mehrere Planeten."}
+ explain:"Die 1,8-Hektaren-Linie zeigt die global verfügbare Biokapazität pro Person. Liegt ein Land darüber, verbraucht es mehr, als die Erde langfristig regenerieren kann. Würden alle so leben, bräuchte es mehrere Planeten."},
+
+// --- Sortierungsfragen ---
+{id: "neu_sort_01", topic: "ebene3", type: "sortierung", diff: 3, tax: "K3", reviewed: false,
+ q: "Ordnen Sie die folgenden Faktoren nach ihrem Einfluss auf langfristiges Wirtschaftswachstum – von den unmittelbaren (proximaten) zu den tieferliegenden (fundamentalen) Ursachen.",
+ items: [
+   "Kapitalakkumulation (mehr Maschinen, Infrastruktur)",
+   "Technologischer Fortschritt und Innovation",
+   "Bildung und Humankapital (Fähigkeiten der Arbeitskräfte)",
+   "Institutionelle Qualität (Rechtsstaatlichkeit, Eigentumsrechte, politische Stabilität)"
+ ],
+ correct: [0, 1, 2, 3],
+ explain: "Die Wachstumstheorie unterscheidet Ebenen: Kapital und Technologie sind unmittelbare Wachstumstreiber. Bildung ermöglicht Innovation und effiziente Kapitalnutzung. Institutionen sind die fundamentalste Ebene – sie schaffen die Rahmenbedingungen, unter denen Kapital, Technologie und Bildung überhaupt gedeihen können. Länder mit schwachen Institutionen können trotz Kapital kaum wachsen."
+},
+{id: "neu_sort_02", topic: "nachhaltigkeit", type: "sortierung", diff: 2, tax: "K3", reviewed: false,
+ q: "Ordnen Sie die folgenden wachstumskritischen Positionen nach der Radikalität ihrer Forderungen – von der moderatesten zur radikalsten.",
+ items: [
+   "Green Growth: Wachstum ist möglich, wenn es ökologisch nachhaltig gestaltet wird (Entkopplung)",
+   "Beyond Growth: Wachstum soll nicht mehr das zentrale Ziel sein – Wohlbefinden statt BIP",
+   "Degrowth: Die Wirtschaft muss gezielt schrumpfen, um die ökologischen Grenzen einzuhalten"
+ ],
+ correct: [0, 1, 2],
+ explain: "Green Growth akzeptiert Wachstum grundsätzlich, fordert aber Entkopplung von Ressourcenverbrauch. Beyond Growth relativiert das Wachstumsziel und betont alternative Wohlstandsmasse (z.B. HDI, BLI). Degrowth fordert aktive Schrumpfung der Wirtschaft in Industrieländern – die radikalste Position, die das bestehende Wirtschaftssystem grundlegend in Frage stellt."
+},
+{id: "neu_sort_03", topic: "ebene2", type: "sortierung", diff: 2, tax: "K3", reviewed: false,
+ q: "Ordnen Sie die folgenden wirtschaftspolitischen Massnahmen zur Förderung des Wirtschaftswachstums nach ihrer typischen Wirkungsdauer – von der kurzfristigsten zur langfristigsten.",
+ items: [
+   "Konjunkturprogramme (staatliche Ausgabenerhöhung zur Nachfragestimulierung)",
+   "Steuersenkungen für Unternehmen (Anreize für Investitionen)",
+   "Investitionen in Infrastruktur (Strassen, Schienen, Glasfaser)",
+   "Investitionen in Bildung und Forschung (Humankapital, Innovation)"
+ ],
+ correct: [0, 1, 2, 3],
+ explain: "Konjunkturprogramme wirken kurzfristig (Monate bis 1–2 Jahre). Steuersenkungen wirken mittelfristig (fördern Investitionen über mehrere Jahre). Infrastruktur hat eine mittelfristige Bauphase, aber langfristigen Nutzen (Jahrzehnte). Bildung und Forschung wirken am langfristigsten – die Erträge zeigen sich erst nach Jahren bis Jahrzehnten, sind aber für nachhaltiges Wachstum am wichtigsten."
+}
+
 ];

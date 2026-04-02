@@ -2,7 +2,7 @@
 // Fachbereich: VWL
 // Kapitel: Eisenhut, Aktuelle Volkswirtschaftslehre (2021), Kapitel 11
 // Quellen: Eisenhut Kap. 11, Präsentation Staatsschulden, Arbeitsauftrag Staatsverschuldung
-// Anzahl Fragen: 87
+// Anzahl Fragen: 90
 
 window.POOL_META = {
   id: "vwl_staatsverschuldung",
@@ -798,5 +798,42 @@ window.QUESTIONS = [
    {t:"Strukturreformen verbessern Produktivität", cat:1},
    {t:"Kaufkraft der Gläubiger wird geschmälert", cat:2}
  ],
- explain:"Schulden können durch Haushaltsdisziplin (Sparen), Wirtschaftswachstum (Schuldenquote sinkt relativ) oder Inflation (realer Wert der Schulden sinkt) abgebaut werden. Alle drei Strategien haben Vor- und Nachteile: Sparen bremst kurzfristig, Wachstum braucht Zeit, und Inflation schadet den Gläubigern und der Bevölkerung."}
+ explain:"Schulden können durch Haushaltsdisziplin (Sparen), Wirtschaftswachstum (Schuldenquote sinkt relativ) oder Inflation (realer Wert der Schulden sinkt) abgebaut werden. Alle drei Strategien haben Vor- und Nachteile: Sparen bremst kurzfristig, Wachstum braucht Zeit, und Inflation schadet den Gläubigern und der Bevölkerung."},
+
+// --- Sortierungsfragen ---
+{id: "neu_sort_01", topic: "richtlinien", type: "sortierung", diff: 2, tax: "K3", reviewed: false,
+ q: "Ordnen Sie die Schritte der Schweizer Schuldenbremse in die korrekte funktionale Reihenfolge.",
+ items: [
+   "Konjunkturfaktor bestimmen (Verhältnis Trend-BIP zu aktuellem BIP)",
+   "Ausgabenplafond berechnen (geschätzte Einnahmen × Konjunkturfaktor)",
+   "Budget des Bundes an den Ausgabenplafond anpassen",
+   "In Boomphasen Überschüsse erzielen (Einnahmen > Ausgaben)",
+   "In Rezessionen moderate Defizite zulassen (Ausgaben > Einnahmen)"
+ ],
+ correct: [0, 1, 2, 3, 4],
+ explain: "Die Schweizer Schuldenbremse (seit 2003 in der BV verankert) funktioniert antizyklisch: Der Konjunkturfaktor erlaubt in Rezessionen höhere Ausgaben und erzwingt in Boomphasen Sparen. Über den Konjunkturzyklus hinweg sollen sich Defizite und Überschüsse ausgleichen. Die Schuldenbremse hat wesentlich zur Reduktion der Schweizer Schuldenquote beigetragen."
+},
+{id: "neu_sort_02", topic: "gefahren", type: "sortierung", diff: 3, tax: "K3", reviewed: false,
+ q: "Ordnen Sie die folgenden Gefahren einer hohen Staatsverschuldung nach ihrem typischen zeitlichen Auftreten – von der kurzfristigen zur langfristigen Gefahr.",
+ items: [
+   "Steigende Zinsausgaben schränken den Handlungsspielraum im laufenden Budget ein",
+   "Crowding-out: Staatliche Kreditaufnahme verdrängt private Investitionen",
+   "Verlust des Vertrauens der Finanzmärkte (steigende Risikoprämien)",
+   "Generationenungerechtigkeit: Künftige Generationen müssen die Schulden zurückzahlen"
+ ],
+ correct: [0, 1, 2, 3],
+ explain: "Zinsbelastung wirkt sofort (jedes Budgetjahr). Crowding-out zeigt sich mittelfristig, wenn der Staat die Kreditnachfrage hochtreibt. Vertrauensverlust kann plötzlich eintreten (Schuldenkrise, z.B. Griechenland 2010). Generationenungerechtigkeit ist ein langfristiges Problem – die heutigen Schulden werden von künftigen Steuerzahlern getragen."
+},
+{id: "neu_sort_03", topic: "international", type: "sortierung", diff: 2, tax: "K3", reviewed: false,
+ q: "Ordnen Sie die folgenden Länder nach ihrer Schuldenquote (Staatsverschuldung in % des BIP) – vom niedrigsten zum höchsten Wert.",
+ items: [
+   "Schweiz (ca. 27% des BIP)",
+   "Deutschland (ca. 65% des BIP)",
+   "USA (ca. 120% des BIP)",
+   "Japan (ca. 260% des BIP)"
+ ],
+ correct: [0, 1, 2, 3],
+ explain: "Die Schweiz hat dank der Schuldenbremse eine der tiefsten Schuldenquoten weltweit. Deutschland liegt im EU-Mittelfeld (Maastricht-Kriterium: max. 60%). Die USA haben ihre Verschuldung seit der Finanzkrise und COVID massiv erhöht. Japan hat die höchste Schuldenquote aller Industrieländer – finanziert aber den Grossteil im Inland."
+}
+
 ];

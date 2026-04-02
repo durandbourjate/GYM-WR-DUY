@@ -741,6 +741,53 @@ window.QUESTIONS = [
     {answer: "Rechtsfolge", alts: ["rechtsfolge"]}
   ],
   explain: "Die Rechtsanwendung folgt einem festen Schema: (1) Sachverhalt feststellen (Was ist passiert?), (2) Rechtsregel/Rechtsnorm finden (Welcher Artikel ist einschlägig?), (3) Subsumtion (Stimmen die TBM mit dem Sachverhalt überein?), (4) Rechtsfolge bestimmen (Was ist die rechtliche Konsequenz?)."
-}
+},
+
+// --- Sortierungsfragen ---
+{
+  id: "neu_sort_01", topic: "rechtsordnung", type: "sortierung", diff: 2, tax: "K3", reviewed: false,
+  q: "Ordnen Sie die folgenden Rechtserlasse nach ihrer Rangordnung in der schweizerischen Normenhierarchie – von der höchsten zur tiefsten Stufe.",
+  items: [
+    "Bundesverfassung (BV) – oberste Rechtsnorm der Schweiz",
+    "Bundesgesetz (z.B. OR, ZGB, StGB) – vom Parlament erlassen",
+    "Verordnung des Bundesrates – konkretisiert ein Gesetz",
+    "Weisung / Richtlinie einer Behörde – interne Verwaltungsanweisung"
+  ],
+  correct: [0, 1, 2, 3],
+  explain: "Der Stufenbau der Rechtsordnung folgt dem Legalitätsprinzip: Die BV steht zuoberst und bildet die Grundlage für alles weitere Recht. Gesetze werden vom Parlament erlassen und konkretisieren die Verfassung. Verordnungen werden vom Bundesrat (Exekutive) erlassen und regeln die Details. Weisungen sind behördeninterne Anweisungen ohne direkte Bindungswirkung für Bürger."
+},
+{
+  id: "neu_sort_02", topic: "rechtsanwendung", type: "sortierung", diff: 2, tax: "K3", reviewed: false,
+  q: "Ordnen Sie die vier Schritte der Rechtsanwendung (Subsumtionstechnik) in die korrekte Reihenfolge.",
+  items: [
+    "Sachverhalt feststellen: Was ist passiert? (Fakten klären)",
+    "Rechtsnorm finden: Welcher Gesetzesartikel ist einschlägig?",
+    "Subsumtion: Erfüllt der Sachverhalt alle Tatbestandsmerkmale der Norm?",
+    "Rechtsfolge bestimmen: Was ist die rechtliche Konsequenz?"
+  ],
+  correct: [0, 1, 2, 3],
+  explain: "Die Rechtsanwendung folgt immer diesem Schema: Erst den Sachverhalt klären (Was genau ist geschehen?), dann die passende Rechtsnorm suchen, den Sachverhalt unter die Norm subsumieren (Tatbestandsmerkmale einzeln prüfen) und schliesslich die Rechtsfolge bestimmen. Dieses Schema wird auch als «juristischer Syllogismus» bezeichnet."
+},
+{
+  id: "neu_sort_03", topic: "rechtsordnung", type: "sortierung", diff: 3, tax: "K3", reviewed: false,
+  q: "Ordnen Sie die folgenden historischen Meilensteine der Schweizer Rechtsordnung in die chronologische Reihenfolge.",
+  items: [
+    "Erste Bundesverfassung der modernen Schweiz (1848)",
+    "Totalrevision der Bundesverfassung (1874) – Einführung des fakultativen Referendums",
+    "Inkrafttreten des ZGB (1912) – einheitliches Zivilrecht für die ganze Schweiz",
+    "Totalrevision der Bundesverfassung (1999/2000) – aktuelle BV"
+  ],
+  correct: [0, 1, 2, 3],
+  explain: "Die Schweizer Rechtsordnung entwickelte sich schrittweise: 1848 entstand der Bundesstaat mit erster BV. 1874 wurde die BV totalrevidiert (mehr direkte Demokratie). 1912 trat das ZGB in Kraft und vereinheitlichte das zuvor kantonale Zivilrecht. 1999 wurde die aktuelle BV verabschiedet (in Kraft 2000) – primär eine Nachführung ohne grosse inhaltliche Änderungen."
+},
+
+// ──── ZEICHNEN ────
+  {
+    id: "neu_zeichnen_01", topic: "rechtsordnung", type: "zeichnen", diff: 1, tax: "K2", reviewed: false,
+    q: "Zeichne die Normenhierarchie der Schweizer Rechtsordnung als Pyramide. Beschrifte die Stufen und erkläre das Prinzip «lex superior derogat legi inferiori».",
+    hints: ["Die Pyramide hat mindestens 4 Stufen.", "Zuoberst steht die Bundesverfassung (BV).", "Darunter kommen Bundesgesetze, dann Verordnungen."],
+    sample: { src: "img/recht/einfuehrung/recht_rechtsquellen_zeichnen.svg", alt: "Musterlösung: Normenhierarchie" },
+    explain: "Die Normenhierarchie ordnet Rechtsquellen nach ihrer Rangstufe: Bundesverfassung (BV) > Bundesgesetze (OR, ZGB, StGB) > Verordnungen (Bundesrat, Departemente) > Gewohnheitsrecht. Das Prinzip «lex superior» besagt, dass höherrangiges Recht dem niederrangigen vorgeht. Widerspricht eine Verordnung einem Gesetz, gilt das Gesetz."
+  }
 
 ];

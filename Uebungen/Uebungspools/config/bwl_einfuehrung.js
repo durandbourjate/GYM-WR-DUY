@@ -838,5 +838,46 @@ window.QUESTIONS = [
     q: "Den idealen Standort gibt es in der Regel nicht – Unternehmen müssen Kompromisse eingehen.",
     correct: true,
     explain: "Richtig. Kein Standort erfüllt alle Kriterien perfekt. Unternehmen müssen abwägen, welche Standortfaktoren für sie am wichtigsten sind, und entsprechende Kompromisse eingehen."
+  },
+
+  // --- Sortierungsfragen ---
+  {
+    id: "neu_sort_01", topic: "standort", type: "sortierung", diff: 2, tax: "K3", reviewed: false,
+    q: "Ordnen Sie die Schritte einer Nutzwertanalyse (NWA) für die Standortwahl in die korrekte Reihenfolge.",
+    items: [
+      "Relevante Standortfaktoren (Kriterien) festlegen",
+      "Kriterien gewichten (prozentuale Gewichtung, Summe = 100%)",
+      "Standortalternativen anhand jedes Kriteriums bewerten (z.B. Skala 1–5)",
+      "Gewichtete Punktzahlen berechnen (Gewichtung × Bewertung)",
+      "Gesamtpunktzahl pro Standort berechnen und vergleichen"
+    ],
+    correct: [0, 1, 2, 3, 4],
+    explain: "Die NWA ist ein strukturiertes Entscheidungsinstrument: Zuerst werden die Kriterien definiert, dann gewichtet (nicht alle gleich wichtig). Danach werden die Alternativen bewertet und die gewichteten Punkte berechnet. Der Standort mit der höchsten Gesamtpunktzahl ist rechnerisch der beste – das Ergebnis muss aber kritisch reflektiert werden."
+  },
+  {
+    id: "neu_sort_02", topic: "ziele", type: "sortierung", diff: 2, tax: "K3", reviewed: false,
+    q: "Ordnen Sie die folgenden Schritte des betrieblichen Zielsetzungsprozesses in die logische Reihenfolge.",
+    items: [
+      "Unternehmensvision und Leitbild formulieren",
+      "Formalziele (Gewinn, Rentabilität, Liquidität) festlegen",
+      "Sachziele (Produkte, Märkte, Qualität) ableiten",
+      "Zielbeziehungen analysieren (komplementär, konkurrierend, indifferent)",
+      "Operative Massnahmen zur Zielerreichung planen"
+    ],
+    correct: [0, 1, 2, 3, 4],
+    explain: "Der Zielsetzungsprozess verläuft vom Allgemeinen zum Konkreten: Erst die Vision (Wohin?), dann die Formalziele (Welche finanziellen Ergebnisse?), dann die Sachziele (Was produzieren/anbieten?). Anschliessend werden Zielkonflikte identifiziert (z.B. Gewinn vs. Nachhaltigkeit), bevor operative Massnahmen geplant werden."
+  },
+  {
+    id: "neu_sort_03", topic: "unternehmen", type: "sortierung", diff: 2, tax: "K3", reviewed: false,
+    q: "Ordnen Sie die folgenden Unternehmensformen nach der Haftung der Eigentümer – von der umfassendsten zur beschränktesten Haftung.",
+    items: [
+      "Einzelunternehmung (unbeschränkte persönliche Haftung mit gesamtem Privatvermögen)",
+      "Kollektivgesellschaft (unbeschränkte solidarische Haftung aller Gesellschafter)",
+      "Kommanditgesellschaft (Komplementär unbeschränkt, Kommanditär nur bis Einlage)",
+      "GmbH (Haftung beschränkt auf Stammkapital, mind. CHF 20'000)",
+      "AG (Haftung beschränkt auf Aktienkapital, mind. CHF 100'000)"
+    ],
+    correct: [0, 1, 2, 3, 4],
+    explain: "Bei Einzelunternehmung und Kollektivgesellschaft haften die Eigentümer unbeschränkt mit ihrem Privatvermögen. Die Kommanditgesellschaft ist eine Mischform. GmbH und AG sind Kapitalgesellschaften mit beschränkter Haftung – das Risiko ist auf das eingebrachte Kapital begrenzt. Deshalb ist die AG die beliebteste Form für grössere Unternehmen."
   }
 ];
