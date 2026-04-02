@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="800" height="450">
+  <rect width="800" height="450" fill="#ffffff" rx="8"/>
+
+  <!-- Title -->
+  <text x="400" y="32" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="16" font-weight="700" fill="#1e293b">Handlungsfähigkeit — Beschrifte das Stufenmodell</text>
+
+  <!-- Stufe 1: Handlungsfähig (grün) -->
+  <rect x="60" y="55" width="680" height="80" rx="8" fill="#f0fdf4" stroke="#22c55e" stroke-width="2"/>
+  <text x="400" y="84" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="13" font-weight="700" fill="#15803d">Vollständig wirksame Rechtsgeschäfte möglich</text>
+  <text x="400" y="105" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="12" fill="#64748b">Kann selbständig Verträge abschliessen, Testament errichten etc.</text>
+  <text x="400" y="123" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="11" fill="#64748b">Voraussetzungen: → Urteilsfähigkeit + Mündigkeit (Vollendung 18. LJ, Art. 12–14 ZGB)</text>
+
+  <!-- Stufe 2: Beschränkt (orange) -->
+  <rect x="100" y="175" width="600" height="80" rx="8" fill="#fefce8" stroke="#ca8a04" stroke-width="2"/>
+  <text x="400" y="204" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="13" font-weight="700" fill="#92400e">Nur bestimmte Rechtsgeschäfte (mit Zustimmung ges. Vertr.)</text>
+  <text x="400" y="224" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="12" fill="#64748b">Eigener Lohn frei verfügbar, Schenkungen bis übliches Mass, Taschengeld</text>
+  <text x="400" y="243" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="11" fill="#64748b">Voraussetzung: → Urteilsfähig, aber unter 18 Jahren (Art. 19 ff. ZGB)</text>
+
+  <!-- Stufe 3: Handlungsunfähig (rot) -->
+  <rect x="160" y="295" width="480" height="80" rx="8" fill="#fef2f2" stroke="#ef4444" stroke-width="2"/>
+  <text x="400" y="324" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="13" font-weight="700" fill="#b91c1c">Keine Rechtsgeschäfte möglich</text>
+  <text x="400" y="344" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="12" fill="#64748b">Gesetzliche Vertretung handelt (Eltern, Beistand)</text>
+  <text x="400" y="363" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="11" fill="#64748b">Voraussetzung: → Urteilsunfähig (Kleinkinder, schwere geistige Beeintr., Art. 16 ZGB)</text>
+
+  <!-- Red numbered circles -->
+  <!-- 1: Handlungsfähigkeit -->
+  <line x1="40" y1="95" x2="20" y2="78" stroke="#ef4444" stroke-width="1" stroke-dasharray="3,3"/>
+  <circle cx="14" cy="68" r="14" fill="#ef4444"/>
+  <text x="14" y="73" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="12" font-weight="700" fill="#ffffff">1</text>
+
+  <!-- 2: Urteilsfähigkeit + Mündigkeit -->
+  <line x1="40" y1="120" x2="20" y2="138" stroke="#ef4444" stroke-width="1" stroke-dasharray="3,3"/>
+  <circle cx="14" cy="148" r="14" fill="#ef4444"/>
+  <text x="14" y="153" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="12" font-weight="700" fill="#ffffff">2</text>
+
+  <!-- 3: Beschränkte Handlungsfähigkeit -->
+  <line x1="80" y1="214" x2="44" y2="205" stroke="#ef4444" stroke-width="1" stroke-dasharray="3,3"/>
+  <circle cx="32" cy="202" r="14" fill="#ef4444"/>
+  <text x="32" y="207" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="12" font-weight="700" fill="#ffffff">3</text>
+
+  <!-- 4: Urteilsfähig aber unmündig -->
+  <line x1="80" y1="240" x2="44" y2="258" stroke="#ef4444" stroke-width="1" stroke-dasharray="3,3"/>
+  <circle cx="32" cy="268" r="14" fill="#ef4444"/>
+  <text x="32" y="273" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="12" font-weight="700" fill="#ffffff">4</text>
+
+  <!-- 5: Handlungsunfähigkeit -->
+  <line x1="140" y1="334" x2="100" y2="326" stroke="#ef4444" stroke-width="1" stroke-dasharray="3,3"/>
+  <circle cx="88" cy="323" r="14" fill="#ef4444"/>
+  <text x="88" y="328" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="12" font-weight="700" fill="#ffffff">5</text>
+
+  <!-- 6: Urteilsunfähig -->
+  <line x1="140" y1="360" x2="100" y2="378" stroke="#ef4444" stroke-width="1" stroke-dasharray="3,3"/>
+  <circle cx="88" cy="388" r="14" fill="#ef4444"/>
+  <text x="88" y="393" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="12" font-weight="700" fill="#ffffff">6</text>
+</svg>

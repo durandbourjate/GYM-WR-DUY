@@ -1265,4 +1265,43 @@ window.QUESTIONS = [
     explain: "Bedingter Vollzug (Art. 42 StGB) ist die mildeste Form – der Verurteilte muss nicht ins Gefängnis, wenn er sich während der Probezeit bewährt. Teilbedingter Vollzug (Art. 43 StGB) kombiniert Strafe und Bewährung. Unbedingter Vollzug bedeutet tatsächlichen Freiheitsentzug. Verwahrung (Art. 64 StGB) ist die schärfste Massnahme – sie ist zeitlich unbefristet und kann lebenslänglich dauern."
   }
 
+
+// ===== INTERAKTIVE FRAGETYPEN =====
+
+  {
+    id: "beschriftung01", topic: "tatbestand", type: "bildbeschriftung", diff: 2, tax: "K2", reviewed: false,
+    q: "Beschrifte die drei Stufen des strafrechtlichen Prüfschemas und ihre Unterelemente.",
+    img: { src: "img/recht/strafrecht/strafrecht_pruefschema_beschriftung.svg", alt: "Dreigliedriges Prüfschema: Tatbestandsmässigkeit, Rechtswidrigkeit, Schuld" },
+    labels: [
+      { id: "l1", text: "Tatbestandsmässigkeit", x: 50, y: 18 },
+      { id: "l2", text: "Objektiver Tatbestand (Tat, Erfolg, Kausalität)", x: 50, y: 32 },
+      { id: "l3", text: "Subjektiver Tatbestand (Vorsatz/Fahrlässigkeit)", x: 50, y: 46 },
+      { id: "l4", text: "Rechtswidrigkeit (keine Rechtfertigungsgründe)", x: 50, y: 64 },
+      { id: "l5", text: "Schuld (Schuldfähigkeit, keine Entschuldigung)", x: 50, y: 82 }
+    ],
+    explain: "Strafrechtliches Prüfschema: 1) Tatbestandsmässigkeit: objektiv (Handlung, Erfolg, Kausalität) + subjektiv (Vorsatz oder Fahrlässigkeit, Art. 12 StGB). 2) Rechtswidrigkeit: keine Notwehr (Art. 15), kein Notstand (Art. 17) etc. 3) Schuld: zurechnungsfähig (Art. 19) und keine Entschuldigung."
+  },
+
+  {
+    id: "dragdrop01", topic: "strafarten", type: "dragdrop_bild", diff: 2, tax: "K2", reviewed: false,
+    q: "Ordne die strafrechtlichen Sanktionen der richtigen Kategorie zu.",
+    img: { src: "img/recht/strafrecht/strafrecht_sanktionen_dragdrop.svg", alt: "Drei Spalten: Strafen, Massnahmen, Nebenfolgen" },
+    zones: [
+      { id: "strafen", x: 2.5, y: 13.75, w: 30, h: 82.5 },
+      { id: "massnahmen", x: 35, y: 13.75, w: 30, h: 82.5 },
+      { id: "nebenfolgen", x: 67.5, y: 13.75, w: 30, h: 82.5 }
+    ],
+    labels: [
+      { id: "freiheitsstrafe", text: "Freiheitsstrafe (Art. 40 StGB)", zone: "strafen" },
+      { id: "geldstrafe", text: "Geldstrafe (Art. 34 StGB)", zone: "strafen" },
+      { id: "gemeinnuetzig", text: "Gemeinnützige Arbeit (Art. 37)", zone: "strafen" },
+      { id: "therapeutisch", text: "Therapeutische Massnahme (Art. 59)", zone: "massnahmen" },
+      { id: "verwahrung", text: "Verwahrung (Art. 64 StGB)", zone: "massnahmen" },
+      { id: "ambulant", text: "Ambulante Behandlung (Art. 63)", zone: "massnahmen" },
+      { id: "berufsverbot", text: "Berufsverbot (Art. 67 StGB)", zone: "nebenfolgen" },
+      { id: "landesverweisung", text: "Landesverweisung (Art. 66a)", zone: "nebenfolgen" }
+    ],
+    explain: "Strafen (vergeltend): Freiheitsstrafe, Geldstrafe (Tagessätze), Gemeinnützige Arbeit. Massnahmen (sichernd/therapeutisch): therapeutisch, Verwahrung (zeitlich unbefristet!), ambulant. Nebenfolgen: Berufsverbot, Landesverweisung (Art. 66a StGB — obligatorisch bei Katalogtaten)."
+  }
+
 ];

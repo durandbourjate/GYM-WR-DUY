@@ -1098,4 +1098,42 @@ window.QUESTIONS = [
     explain: "Der Mieter muss den Mangel zuerst anzeigen und eine Frist setzen (OR 259a ff.). Wird der Mangel nicht behoben, kann er eine Mietzinsreduktion verlangen. Bei Untätigkeit des Vermieters kann der Mieter den Mangel selbst beheben lassen. Die fristlose Kündigung ist das letzte Mittel – nur bei Mängeln, die die Gesundheit gefährden oder den Gebrauch verunmöglichen."
   }
 
+
+// ===== INTERAKTIVE FRAGETYPEN =====
+
+  {
+    id: "beschriftung01", topic: "grundlagen", type: "bildbeschriftung", diff: 2, tax: "K2", reviewed: false,
+    q: "Beschrifte das Mietrecht-Diagramm: Vertragsgrundlage, Pflichten beider Parteien, Mängelrecht und Kündigung.",
+    img: { src: "img/recht/mietrecht/mietrecht_systematik_beschriftung.svg", alt: "Flussdiagramm Mietrecht: Vertrag, Pflichten, Mängel, Kündigung" },
+    labels: [
+      { id: "l1", text: "Mietvertrag (OR 253 ff.)", x: 50, y: 12 },
+      { id: "l2", text: "Gebrauchsüberlassung (Vermieter)", x: 25, y: 35 },
+      { id: "l3", text: "Mietzinszahlung (Mieter)", x: 75, y: 35 },
+      { id: "l4", text: "Mängelrecht (OR 259a–i)", x: 50, y: 58 },
+      { id: "l5", text: "Kündigung + Erstreckung", x: 50, y: 82 }
+    ],
+    explain: "Mietvertrag (OR 253): Vermieter überlässt Gebrauch, Mieter zahlt Mietzins. Bei Mängeln: Mängelrechte (Herabsetzung, Hinterlegung, fristlose Kündigung bei schweren Mängeln). Kündigung mit Formvorschriften (OR 266l), Erstreckung möglich (OR 272)."
+  },
+
+  {
+    id: "dragdrop01", topic: "grundlagen", type: "dragdrop_bild", diff: 2, tax: "K2", reviewed: false,
+    q: "Ordne die Pflichten der richtigen Vertragspartei zu: Vermieter oder Mieter?",
+    img: { src: "img/recht/mietrecht/mietrecht_pflichten_dragdrop.svg", alt: "Zwei Spalten: Pflichten Vermieter und Pflichten Mieter" },
+    zones: [
+      { id: "vermieter", x: 3.75, y: 13.75, w: 44.375, h: 82.5 },
+      { id: "mieter", x: 51.875, y: 13.75, w: 44.375, h: 82.5 }
+    ],
+    labels: [
+      { id: "gebrauch", text: "Gebrauchsüberlassung", zone: "vermieter" },
+      { id: "maengel", text: "Mängelbeseitigung", zone: "vermieter" },
+      { id: "nebenkosten", text: "Nebenkosten abrechnen", zone: "vermieter" },
+      { id: "mietzins", text: "Mietzins pünktlich zahlen", zone: "mieter" },
+      { id: "sorgfalt", text: "Sorgfältige Nutzung", zone: "mieter" },
+      { id: "kleinrep", text: "Kleine Reparaturen (OR 259)", zone: "mieter" },
+      { id: "besichtigung", text: "Duldung von Besichtigungen", zone: "mieter" },
+      { id: "untermiete", text: "Untermiete nur mit Zustimmung", zone: "mieter" }
+    ],
+    explain: "Vermieter: Sache übergeben (OR 256), Mängel beheben (OR 259a), Nebenkosten korrekt abrechnen (OR 257a). Mieter: Mietzins zahlen, sorgfältig nutzen (OR 257f), kleine Reparaturen selbst tragen, Untermiete nur mit Erlaubnis (OR 262)."
+  }
+
 ];

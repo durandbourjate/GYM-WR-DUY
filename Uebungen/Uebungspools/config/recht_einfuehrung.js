@@ -790,4 +790,41 @@ window.QUESTIONS = [
     explain: "Die Normenhierarchie ordnet Rechtsquellen nach ihrer Rangstufe: Bundesverfassung (BV) > Bundesgesetze (OR, ZGB, StGB) > Verordnungen (Bundesrat, Departemente) > Gewohnheitsrecht. Das Prinzip «lex superior» besagt, dass höherrangiges Recht dem niederrangigen vorgeht. Widerspricht eine Verordnung einem Gesetz, gilt das Gesetz."
   }
 
+
+// ===== INTERAKTIVE FRAGETYPEN =====
+
+  {
+    id: "beschriftung01", topic: "rechtsanwendung", type: "bildbeschriftung", diff: 2, tax: "K2", reviewed: false,
+    q: "Beschrifte die vier Schritte der Rechtsanwendung durch Subsumtion.",
+    img: { src: "img/recht/einfuehrung/einfuehrung_subsumtion_beschriftung.svg", alt: "Flussdiagramm der Subsumtion mit vier nummerierten Schritten" },
+    labels: [
+      { id: "l1", text: "Obersatz (Rechtsnorm)", x: 50, y: 18 },
+      { id: "l2", text: "Untersatz (Sachverhalt)", x: 50, y: 40 },
+      { id: "l3", text: "Subsumtion (Vergleich)", x: 50, y: 62 },
+      { id: "l4", text: "Schlussfolgerung (Rechtsfolge)", x: 50, y: 84 }
+    ],
+    explain: "Rechtsanwendung durch Subsumtion: 1) Obersatz (Tatbestandsmerkmale der Norm), 2) Untersatz (konkreter Sachverhalt), 3) Subsumtion (passt der Sachverhalt?), 4) Schlussfolgerung (Rechtsfolge anwenden)."
+  },
+
+  {
+    id: "dragdrop01", topic: "oeffentlich_privat", type: "dragdrop_bild", diff: 2, tax: "K2", reviewed: false,
+    q: "Ordne die Rechtsgebiete dem öffentlichen Recht oder dem Privatrecht zu.",
+    img: { src: "img/recht/einfuehrung/einfuehrung_rechtsgebiete_dragdrop.svg", alt: "Zwei Spalten: Öffentliches Recht und Privatrecht mit Drop-Slots" },
+    zones: [
+      { id: "oeffentlich", x: 3.75, y: 13.75, w: 44.375, h: 82.5 },
+      { id: "privat", x: 51.875, y: 13.75, w: 44.375, h: 82.5 }
+    ],
+    labels: [
+      { id: "verfassungsrecht", text: "Verfassungsrecht", zone: "oeffentlich" },
+      { id: "verwaltungsrecht", text: "Verwaltungsrecht", zone: "oeffentlich" },
+      { id: "strafrecht", text: "Strafrecht", zone: "oeffentlich" },
+      { id: "steuerrecht", text: "Steuerrecht", zone: "oeffentlich" },
+      { id: "obligationenrecht", text: "Obligationenrecht", zone: "privat" },
+      { id: "sachenrecht", text: "Sachenrecht", zone: "privat" },
+      { id: "familienrecht", text: "Familienrecht", zone: "privat" },
+      { id: "zgb_at", text: "ZGB Allg. Teil", zone: "privat" }
+    ],
+    explain: "Öffentliches Recht regelt das Staat-Bürger-Verhältnis (Verfassung, Verwaltung, Strafrecht, Steuern). Privatrecht regelt das Bürger-Bürger-Verhältnis (OR, ZGB: Sachen-, Familien-, Erbrecht)."
+  }
+
 ];

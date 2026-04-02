@@ -733,4 +733,43 @@ window.QUESTIONS = [
     explain: "Zuerst wird geklärt, wer die Beweislast trägt (Grundsatz Art. 8 ZGB: Wer ein Recht geltend macht, muss die entsprechenden Tatsachen beweisen). Dann werden Beweismittel eingereicht. Das Gericht würdigt die Beweise frei (keine gesetzlichen Beweisregeln). Am Ende steht fest, ob die Tatsache bewiesen ist – gelingt der Beweis nicht, geht dies zulasten der beweisbelasteten Partei."
   }
 
+
+// ===== INTERAKTIVE FRAGETYPEN =====
+
+  {
+    id: "beschriftung01", topic: "rechtsquellen", type: "bildbeschriftung", diff: 2, tax: "K2", reviewed: false,
+    q: "Beschrifte die fünf Stufen der Normenpyramide von oben (höchste Norm) nach unten.",
+    img: { src: "img/recht/einleitungsartikel/einleitungsartikel_pyramide_beschriftung.svg", alt: "Normenpyramide mit fünf Stufen und roten nummerierten Kreisen" },
+    labels: [
+      { id: "l1", text: "Bundesverfassung (BV)", x: 50, y: 15 },
+      { id: "l2", text: "Bundesgesetze (z.B. OR, StGB)", x: 50, y: 35 },
+      { id: "l3", text: "Verordnungen (Bundesrat)", x: 50, y: 55 },
+      { id: "l4", text: "Kantonales Recht", x: 50, y: 75 },
+      { id: "l5", text: "Gemeinderecht / Reglemente", x: 50, y: 90 }
+    ],
+    explain: "Die Normenpyramide zeigt die Hierarchie: Bundesverfassung (oberste Norm) → Bundesgesetze → Verordnungen → kantonales Recht → Gemeinderecht. Untere Normen dürfen oberen nicht widersprechen (lex superior)."
+  },
+
+  {
+    id: "dragdrop01", topic: "rechtsquellen", type: "dragdrop_bild", diff: 2, tax: "K2", reviewed: false,
+    q: "Ordne die Rechtsnormen der richtigen Stufe der Normenpyramide zu.",
+    img: { src: "img/recht/einleitungsartikel/einleitungsartikel_normen_dragdrop.svg", alt: "Drei Spalten: Verfassungsstufe, Gesetzesstufe, Verordnungsstufe" },
+    zones: [
+      { id: "verfassung", x: 2.5, y: 13.75, w: 30, h: 82.5 },
+      { id: "gesetz", x: 35, y: 13.75, w: 30, h: 82.5 },
+      { id: "verordnung", x: 67.5, y: 13.75, w: 30, h: 82.5 }
+    ],
+    labels: [
+      { id: "art8bv", text: "Art. 8 BV (Rechtsgleichheit)", zone: "verfassung" },
+      { id: "art10bv", text: "Art. 10 BV (Recht auf Leben)", zone: "verfassung" },
+      { id: "or", text: "OR (Vertragsrecht)", zone: "gesetz" },
+      { id: "stgb", text: "StGB (Strafrecht)", zone: "gesetz" },
+      { id: "zgb", text: "ZGB (Zivilrecht)", zone: "gesetz" },
+      { id: "covid_vo", text: "COVID-Verordnung", zone: "verordnung" },
+      { id: "lmvo", text: "Lebensmittelverordnung", zone: "verordnung" },
+      { id: "svgvo", text: "Strassenverkehrsverordnung", zone: "verordnung" }
+    ],
+    explain: "Verfassungsstufe: Bundesverfassung (Art. 8, 10 BV). Gesetzesstufe: OR, StGB, ZGB (vom Parlament erlassen). Verordnungsstufe: vom Bundesrat erlassen, müssen Gesetzen entsprechen (z.B. COVID-VO, Lebensmittel-VO, SVV)."
+  }
+
 ];

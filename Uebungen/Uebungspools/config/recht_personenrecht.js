@@ -706,4 +706,44 @@ window.QUESTIONS = [
     explain: "Das Drei-Sphären-Modell stuft den Persönlichkeitsschutz ab: Die Gemeinsphäre betrifft das öffentliche Auftreten und ist am schwächsten geschützt (Berichterstattung oft zulässig). Die Privatsphäre umfasst den persönlichen Lebensbereich und ist stärker geschützt. Die Intimsphäre geniesst den absolut stärksten Schutz – Eingriffe sind fast nie gerechtfertigt."
   }
 
+
+// ===== INTERAKTIVE FRAGETYPEN =====
+
+  {
+    id: "beschriftung01", topic: "handlungsfaehigkeit", type: "bildbeschriftung", diff: 2, tax: "K2", reviewed: false,
+    q: "Beschrifte das Stufenmodell der Handlungsfähigkeit mit den richtigen Begriffen und Voraussetzungen.",
+    img: { src: "img/recht/personenrecht/personenrecht_handlungsfaehigkeit_beschriftung.svg", alt: "Stufenmodell der Handlungsfähigkeit: voll, beschränkt, handlungsunfähig" },
+    labels: [
+      { id: "l1", text: "Handlungsfähigkeit", x: 50, y: 12 },
+      { id: "l2", text: "Urteilsfähigkeit + Mündigkeit", x: 50, y: 28 },
+      { id: "l3", text: "Beschränkte Handlungsfähigkeit", x: 50, y: 48 },
+      { id: "l4", text: "Urteilsfähig, aber unmündig (< 18 J.)", x: 50, y: 62 },
+      { id: "l5", text: "Handlungsunfähigkeit", x: 50, y: 80 },
+      { id: "l6", text: "Urteilsunfähig (z.B. Kleinkind)", x: 50, y: 92 }
+    ],
+    explain: "Handlungsfähigkeit = Urteilsfähigkeit + Mündigkeit (18 J., Art. 12–14 ZGB). Beschränkt handlungsfähig = urteilsfähig, aber unter 18 (Art. 19 ZGB). Handlungsunfähig = urteilsunfähig (Kleinkinder, schwere geistige Beeinträchtigung, Art. 16 ZGB)."
+  },
+
+  {
+    id: "dragdrop01", topic: "persoenlichkeit", type: "dragdrop_bild", diff: 2, tax: "K2", reviewed: false,
+    q: "Ordne die Lebensbereiche den drei Persönlichkeitsrechtssphären zu.",
+    img: { src: "img/recht/personenrecht/personenrecht_sphaeren_dragdrop.svg", alt: "Drei Spalten: Geheimsphäre, Privatsphäre, Öffentliche Sphäre" },
+    zones: [
+      { id: "geheim", x: 2.5, y: 13.75, w: 30, h: 82.5 },
+      { id: "privat", x: 35, y: 13.75, w: 30, h: 82.5 },
+      { id: "oeffentlich", x: 67.5, y: 13.75, w: 30, h: 82.5 }
+    ],
+    labels: [
+      { id: "tagebuch", text: "Tagebucheinträge", zone: "geheim" },
+      { id: "arzt", text: "Arzt-Patient-Kommunikation", zone: "geheim" },
+      { id: "bankgeheimnis", text: "Bankgeheimnis", zone: "geheim" },
+      { id: "familienleben", text: "Familienleben", zone: "privat" },
+      { id: "freundschaft", text: "Freundschaftsbeziehungen", zone: "privat" },
+      { id: "wohnung", text: "Wohnung", zone: "privat" },
+      { id: "beruf", text: "Berufliche Tätigkeit", zone: "oeffentlich" },
+      { id: "politik", text: "Politisches Engagement", zone: "oeffentlich" }
+    ],
+    explain: "Geheimsphäre (stärkster Schutz): Tagebuch, Arzt-Patient, Bankgeheimnis. Privatsphäre (mittlerer Schutz): Familie, Freundschaften, Wohnung. Öffentliche Sphäre (geringster Schutz): berufliches Wirken, politisches Engagement."
+  }
+
 ];

@@ -907,4 +907,42 @@ window.QUESTIONS = [
     explain: "Eigentum ist das umfassendste dingliche Recht – der Eigentümer kann mit der Sache tun und lassen, was er will (im Rahmen des Gesetzes). Nutzniessung gibt das Recht auf Nutzung und Erträge, aber nicht auf Veräusserung oder Zerstörung. Wohnrecht ist noch enger (nur Wohnen). Grunddienstbarkeiten sind die eingeschränkteste Form – sie geben nur ein spezifisches Recht (z.B. Durchgang)."
   }
 
+
+// ===== INTERAKTIVE FRAGETYPEN =====
+
+  {
+    id: "beschriftung01", topic: "eigentum_besitz", type: "bildbeschriftung", diff: 2, tax: "K2", reviewed: false,
+    q: "Beschrifte die Systematik des Sachenrechts: Eigentum, Besitz und die drei beschränkten dinglichen Rechte.",
+    img: { src: "img/recht/sachenrecht/sachenrecht_systematik_beschriftung.svg", alt: "Baumdiagramm Sachenrecht mit Eigentum, Besitz und beschränkten dinglichen Rechten" },
+    labels: [
+      { id: "l1", text: "Eigentum (umfassendes Recht)", x: 25, y: 35 },
+      { id: "l2", text: "Besitz (tatsächliche Herrschaft)", x: 75, y: 35 },
+      { id: "l3", text: "Grundpfandrecht (Hypothek)", x: 20, y: 70 },
+      { id: "l4", text: "Dienstbarkeiten (Wegrecht)", x: 50, y: 70 },
+      { id: "l5", text: "Fahrnispfandrecht", x: 80, y: 70 }
+    ],
+    explain: "Sachenrecht: Eigentum = umfassendstes dingliches Recht (Art. 641 ZGB). Besitz = tatsächliche Herrschaft (nicht gleich Eigentum, Art. 919 ZGB). Beschränkte dingliche Rechte: Grundpfand (Hypothek, Art. 793), Dienstbarkeiten (Wegrecht, Art. 730), Fahrnispfand (Art. 884)."
+  },
+
+  {
+    id: "dragdrop01", topic: "erwerb_verlust", type: "dragdrop_bild", diff: 2, tax: "K2", reviewed: false,
+    q: "Ordne die Eigentumserwerbsarten dem originären oder dem derivativen Erwerb zu.",
+    img: { src: "img/recht/sachenrecht/sachenrecht_erwerb_dragdrop.svg", alt: "Zwei Spalten: Originärer Erwerb und Derivativer Erwerb" },
+    zones: [
+      { id: "originar", x: 3.75, y: 13.75, w: 44.375, h: 82.5 },
+      { id: "derivativ", x: 51.875, y: 13.75, w: 44.375, h: 82.5 }
+    ],
+    labels: [
+      { id: "fund", text: "Fund (Art. 720 ZGB)", zone: "originar" },
+      { id: "ersitzung", text: "Ersitzung (Art. 661 ZGB)", zone: "originar" },
+      { id: "verarbeitung", text: "Verarbeitung (Art. 726 ZGB)", zone: "originar" },
+      { id: "aneignung", text: "Aneignung (Art. 718 ZGB)", zone: "originar" },
+      { id: "kauf", text: "Kauf (Art. 714 ZGB)", zone: "derivativ" },
+      { id: "schenkung", text: "Schenkung", zone: "derivativ" },
+      { id: "erbschaft", text: "Erbschaft", zone: "derivativ" },
+      { id: "tausch", text: "Tausch", zone: "derivativ" }
+    ],
+    explain: "Originärer Erwerb = Ersterwerb ohne Vorgänger (Fund, Ersitzung, Verarbeitung, Aneignung herrenloser Sachen). Derivativer Erwerb = Eigentumsübertragung vom Vorgänger (Kauf, Schenkung, Erbschaft, Tausch)."
+  }
+
 ];

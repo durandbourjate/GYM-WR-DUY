@@ -810,6 +810,57 @@ window.QUESTIONS = [
   ],
   correct: [0, 1, 2, 3, 4],
   explain: "Die Streitbeilegung reicht von informell bis hochformalisiert: Direkte Verhandlung ist am einfachsten. Mediation ist freiwillig und auf Konsens ausgerichtet. Die Schlichtung ist in der Schweiz obligatorisch vor Zivilklagen. Schiedsgerichte sind vertraglich vereinbart und treffen bindende Entscheide (oft im internationalen Handel). Das staatliche Gericht ist die formellste und letzte Option."
-}
+},
+
+// ===== INTERAKTIVE FRAGETYPEN =====
+
+  {
+    id: "hotspot01", topic: "instanzenzug", type: "hotspot", diff: 2, tax: "K2", reviewed: false,
+    q: "Klicke auf die Instanz, die als letztes innerstaatliches Gericht über einen Fall entscheidet.",
+    img: { src: "img/recht/prozessrecht/prozessrecht_instanzenzug_hotspot.svg", alt: "Instanzenzug-Diagramm mit Buchstaben-Markern A bis D" },
+    hotspots: [
+      { x: 20, y: 79, r: 8, label: "A: Bezirksgericht (1. Instanz)" },
+      { x: 52, y: 57, r: 8, label: "B: Obergericht (2. Instanz)" },
+      { x: 83, y: 35, r: 8, label: "C: Bundesgericht (letzte Instanz)" },
+      { x: 83, y: 9,  r: 8, label: "D: EGMR Strassburg" }
+    ],
+    correct: [2],
+    explain: "Das Bundesgericht (C) in Lausanne ist die letzte innerstaatliche Instanz der Schweiz. Es prüft primär Rechtsfragen, nicht den Sachverhalt. Danach kann nur noch der EGMR in Strassburg angerufen werden — aber nur bei Verletzungen der Europäischen Menschenrechtskonvention (EMRK)."
+  },
+
+  {
+    id: "beschriftung01", topic: "instanzenzug", type: "bildbeschriftung", diff: 2, tax: "K2", reviewed: false,
+    q: "Beschrifte die drei Stufen des Schweizer Instanzenzugs und die Rechtsmittel zwischen den Stufen.",
+    img: { src: "img/recht/prozessrecht/prozessrecht_instanzenzug_beschriftung.svg", alt: "Treppendiagramm des Instanzenzugs mit roten Kreisen" },
+    labels: [
+      { id: "l1", text: "1. Instanz: Bezirksgericht / Regionalgericht", x: 20, y: 78 },
+      { id: "l2", text: "Berufung / Beschwerde", x: 38, y: 60 },
+      { id: "l3", text: "2. Instanz: Obergericht / Kantonsgericht", x: 50, y: 45 },
+      { id: "l4", text: "Beschwerde in Zivilsachen / Strafsachen", x: 68, y: 30 },
+      { id: "l5", text: "3. Instanz: Bundesgericht (Lausanne)", x: 80, y: 15 }
+    ],
+    explain: "Schweizer Instanzenzug: 1. Instanz (Bezirks-/Regionalgericht) → 2. Instanz (Obergericht/Kantonsgericht, via Berufung/Beschwerde) → Bundesgericht (via Beschwerde in Zivil-/Strafsachen, letzte Instanz). Das Bundesgericht prüft primär Rechtsfragen, nicht den Sachverhalt."
+  },
+
+  {
+    id: "dragdrop01", topic: "grundlagen", type: "dragdrop_bild", diff: 2, tax: "K2", reviewed: false,
+    q: "Ordne die Merkmale dem Zivilprozess oder dem Strafprozess zu.",
+    img: { src: "img/recht/prozessrecht/prozessrecht_verfahren_dragdrop.svg", alt: "Zwei Spalten: Zivilprozess und Strafprozess" },
+    zones: [
+      { id: "zivil", x: 3.75, y: 13.75, w: 44.375, h: 82.5 },
+      { id: "straf", x: 51.875, y: 13.75, w: 44.375, h: 82.5 }
+    ],
+    labels: [
+      { id: "klaeger", text: "Kläger vs. Beklagter", zone: "zivil" },
+      { id: "verhandlung", text: "Verhandlungsgrundsatz", zone: "zivil" },
+      { id: "disposition", text: "Dispositionsmaxime", zone: "zivil" },
+      { id: "kostenvorschuss", text: "Kostenvorschusspflicht", zone: "zivil" },
+      { id: "sta", text: "Staatsanwaltschaft vs. Beschuldigter", zone: "straf" },
+      { id: "offizialprinzip", text: "Offizialprinzip / Legalitätsprinzip", zone: "straf" },
+      { id: "untersuchung", text: "Untersuchungsgrundsatz", zone: "straf" },
+      { id: "unschuld", text: "Unschuldsvermutung (in dubio)", zone: "straf" }
+    ],
+    explain: "Zivilprozess: Kläger vs. Beklagter, Parteien bestimmen Streitgegenstand (Dispositionsmaxime), tragen Kosten (Vorschusspflicht). Strafprozess: Staat (StA) vs. Beschuldigter, Offizialprinzip (Staat muss verfolgen), Untersuchungsgrundsatz (Gericht/StA ermittelt), Unschuldsvermutung."
+  }
 
 ]; // Ende QUESTIONS

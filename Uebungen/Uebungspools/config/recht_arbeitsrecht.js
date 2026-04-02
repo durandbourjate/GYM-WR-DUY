@@ -1429,4 +1429,42 @@ window.QUESTIONS = [
     correct: [0, 1, 2, 3],
     explain: "Im Arbeitsrecht gilt eine klare Normenhierarchie: Die BV steht zuoberst (Grundrechte). Dann folgen die Bundesgesetze (OR für den Arbeitsvertrag, ArG für den Arbeitsschutz). GAV-Bestimmungen gehen dem Einzelvertrag vor, dürfen aber nicht gegen zwingendes Gesetzesrecht verstossen. Der Einzelvertrag darf nur zugunsten des Arbeitnehmers vom GAV abweichen."
   }
+
+
+// ===== INTERAKTIVE FRAGETYPEN =====
+
+  {
+    id: "beschriftung01", topic: "grundlagen", type: "bildbeschriftung", diff: 2, tax: "K2", reviewed: false,
+    q: "Beschrifte die drei Schichten des Arbeitsrechts und ordne die Rechtsinstrumente den Ebenen zu.",
+    img: { src: "img/recht/arbeitsrecht/arbeitsrecht_bereiche_beschriftung.svg", alt: "Drei-Schichten-Diagramm des Arbeitsrechts: individual, kollektiv, öffentlich" },
+    labels: [
+      { id: "l1", text: "Einzelarbeitsvertrag (OR 319 ff.)", x: 50, y: 22 },
+      { id: "l2", text: "GAV (Gesamtarbeitsvertrag)", x: 50, y: 48 },
+      { id: "l3", text: "Normalarbeitsvertrag (NAV)", x: 50, y: 62 },
+      { id: "l4", text: "Arbeitsgesetz (ArG)", x: 50, y: 82 },
+      { id: "l5", text: "UVG (Unfallversicherung)", x: 25, y: 92 }
+    ],
+    explain: "3 Ebenen des Arbeitsrechts: 1) Individual (Einzelarbeitsvertrag, OR 319 ff.), 2) Kollektiv (GAV zwischen Gewerkschaft + Arbeitgeberverband; NAV = staatlich festgelegter Mindestvertrag), 3) Öffentlich (ArG: Arbeitszeiten, Gesundheitsschutz; UVG: Unfallversicherung)."
+  },
+
+  {
+    id: "dragdrop01", topic: "beendigung", type: "dragdrop_bild", diff: 2, tax: "K2", reviewed: false,
+    q: "Ordne die Kündigungsregelungen der richtigen Zeitspanne im Arbeitsverhältnis zu (OR 335b/c).",
+    img: { src: "img/recht/arbeitsrecht/arbeitsrecht_fristen_dragdrop.svg", alt: "Drei Spalten: Probezeit, 1. Dienstjahr, Ab 2. Dienstjahr" },
+    zones: [
+      { id: "probezeit", x: 2.5, y: 13.75, w: 30, h: 70 },
+      { id: "jahr1", x: 35, y: 13.75, w: 30, h: 70 },
+      { id: "ab2", x: 67.5, y: 13.75, w: 30, h: 70 }
+    ],
+    labels: [
+      { id: "7tage", text: "7 Tage Frist (OR 335b I)", zone: "probezeit" },
+      { id: "jederzeit", text: "Jederzeit kündbar", zone: "probezeit" },
+      { id: "1monat", text: "1 Monat auf Monatsende", zone: "jahr1" },
+      { id: "kein_schutz", text: "Kein besonderer Schutz", zone: "jahr1" },
+      { id: "2monate", text: "2 Monate auf Monatsende (2.–9. DJ)", zone: "ab2" },
+      { id: "3monate", text: "3 Monate auf Monatsende (ab 10. DJ)", zone: "ab2" }
+    ],
+    explain: "Probezeit (max. 3 Monate, OR 335b): 7 Tage Frist, jederzeit. 1. Dienstjahr: 1 Monat auf Monatsende. Ab 2. DJ: 2 Monate. Ab 10. DJ: 3 Monate (OR 335c). Vertraglich können längere Fristen vereinbart werden."
+  }
+
 ];

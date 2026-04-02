@@ -1178,4 +1178,43 @@ window.QUESTIONS = [
     explain: "Ein Vertrag nach OR 1 kommt durch übereinstimmende gegenseitige Willenserklärung zustande. Partei A macht einen Antrag (Offerte), Partei B erklärt die Annahme (Akzept). Stimmen beide Willenserklärungen überein (Konsens), ist der Vertrag geschlossen. Wichtig: OR 11 — Verträge bedürfen nur dann einer besonderen Form, wenn das Gesetz es vorschreibt."
   }
 
+
+// ===== INTERAKTIVE FRAGETYPEN =====
+
+  {
+    id: "beschriftung01", topic: "vertragsvoraussetzungen", type: "bildbeschriftung", diff: 2, tax: "K2", reviewed: false,
+    q: "Beschrifte das Vertragsschema: Antrag, Annahme, Konsens und die zwei Gültigkeitsvoraussetzungen.",
+    img: { src: "img/recht/or_at/or_at_vertrag_beschriftung.svg", alt: "Vertragsschema mit Antrag, Annahme, Konsens und Voraussetzungen" },
+    labels: [
+      { id: "l1", text: "Antrag (Offerte)", x: 25, y: 25 },
+      { id: "l2", text: "Annahme (Akzept)", x: 75, y: 25 },
+      { id: "l3", text: "Übereinstimmende Willensäusserung (Konsens)", x: 50, y: 48 },
+      { id: "l4", text: "Handlungsfähigkeit beider Parteien", x: 25, y: 72 },
+      { id: "l5", text: "Kein Formmangel / Inhaltsmangel", x: 75, y: 72 }
+    ],
+    explain: "Vertragsentstehung: Antrag + Annahme = Konsens (OR 1). Voraussetzungen für Gültigkeit: Handlungsfähigkeit (Art. 12 ZGB), erlaubter Inhalt, ev. vorgeschriebene Form (OR 11 — z.B. öffentliche Beurkundung bei Grundstückkauf)."
+  },
+
+  {
+    id: "dragdrop01", topic: "stoerung", type: "dragdrop_bild", diff: 3, tax: "K2", reviewed: false,
+    q: "Ordne die Vertragsstörungen den richtigen Kategorien zu.",
+    img: { src: "img/recht/or_at/or_at_stoerungen_dragdrop.svg", alt: "Drei Spalten: Leistungsstörung, Willensmangel, Formfehler" },
+    zones: [
+      { id: "leistung", x: 2.5, y: 13.75, w: 30, h: 82.5 },
+      { id: "willen", x: 35, y: 13.75, w: 30, h: 82.5 },
+      { id: "form", x: 67.5, y: 13.75, w: 30, h: 82.5 }
+    ],
+    labels: [
+      { id: "verzug", text: "Verzug des Schuldners (OR 102 ff.)", zone: "leistung" },
+      { id: "mangel", text: "Mangelhafte Lieferung (OR 97)", zone: "leistung" },
+      { id: "unmoeglichkeit", text: "Unmöglichkeit (OR 119)", zone: "leistung" },
+      { id: "irrtum", text: "Irrtum (Art. 23 OR)", zone: "willen" },
+      { id: "taeuschung", text: "Täuschung (Art. 28 OR)", zone: "willen" },
+      { id: "furcht", text: "Furchterregung (Art. 29 OR)", zone: "willen" },
+      { id: "schrift", text: "Fehlende Schriftform", zone: "form" },
+      { id: "beurkundung", text: "Fehlende öff. Beurkundung", zone: "form" }
+    ],
+    explain: "Leistungsstörungen: Verzug, Mangel, Unmöglichkeit (OR 97 ff., 107 ff.). Willensmängel: Irrtum, Täuschung, Furchterregung (OR 23–31) → Vertrag anfechtbar. Formfehler: Fehlende vorgeschriebene Form → Nichtigkeit des Vertrags (OR 11)."
+  }
+
 ];

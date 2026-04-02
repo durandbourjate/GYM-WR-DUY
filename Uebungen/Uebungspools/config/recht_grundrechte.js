@@ -727,4 +727,44 @@ window.QUESTIONS = [
     explain: "Der Menschenrechtsschutz entwickelte sich nach dem 2. Weltkrieg: Die AEMR (1948) war die erste universelle Erklärung – allerdings rechtlich nicht bindend. Die EMRK (1950) schuf einen verbindlichen regionalen Schutz mit dem EGMR. Die UNO-Pakte (1966) machten die Menschenrechte völkerrechtlich verbindlich. Die aktuelle Schweizer BV (1999) enthält einen modernen Grundrechtskatalog (Art. 7–34)."
   }
 
+
+// ===== INTERAKTIVE FRAGETYPEN =====
+
+  {
+    id: "beschriftung01", topic: "einschraenkung", type: "bildbeschriftung", diff: 2, tax: "K2", reviewed: false,
+    q: "Beschrifte die Prüfschritte und Voraussetzungen des Grundrechts-Prüfschemas.",
+    img: { src: "img/recht/grundrechte/grundrechte_pruefschema_beschriftung.svg", alt: "Flussdiagramm des Grundrechts-Prüfschemas mit vier Hauptschritten" },
+    labels: [
+      { id: "l1", text: "Schutzbereich (persönlich + sachlich)", x: 50, y: 14 },
+      { id: "l2", text: "Eingriff in das Grundrecht", x: 50, y: 34 },
+      { id: "l3", text: "Gesetzliche Grundlage", x: 20, y: 58 },
+      { id: "l4", text: "Öffentliches Interesse", x: 50, y: 58 },
+      { id: "l5", text: "Verhältnismässigkeit", x: 80, y: 58 },
+      { id: "l6", text: "Kerngehalt (unantastbar)", x: 50, y: 82 }
+    ],
+    explain: "Grundrechts-Prüfung: 1) Schutzbereich betroffen? 2) Eingriff vorhanden? 3) Rechtfertigung: gesetzliche Grundlage + öffentliches Interesse + Verhältnismässigkeit (Art. 36 BV). 4) Kerngehalt darf nie verletzt werden."
+  },
+
+  {
+    id: "dragdrop01", topic: "grundrechte_bv", type: "dragdrop_bild", diff: 2, tax: "K2", reviewed: false,
+    q: "Ordne die Grundrechte der richtigen Kategorie zu.",
+    img: { src: "img/recht/grundrechte/grundrechte_kategorien_dragdrop.svg", alt: "Drei Spalten: Freiheitsrechte, Gleichheitsrechte, Soziale Grundrechte" },
+    zones: [
+      { id: "freiheit", x: 2.5, y: 13.75, w: 30, h: 82.5 },
+      { id: "gleichheit", x: 35, y: 13.75, w: 30, h: 82.5 },
+      { id: "sozial", x: 67.5, y: 13.75, w: 30, h: 82.5 }
+    ],
+    labels: [
+      { id: "meinungsfreiheit", text: "Meinungsfreiheit (Art. 16 BV)", zone: "freiheit" },
+      { id: "religionsfreiheit", text: "Religionsfreiheit (Art. 15 BV)", zone: "freiheit" },
+      { id: "eigentumsgarantie", text: "Eigentumsgarantie (Art. 26 BV)", zone: "freiheit" },
+      { id: "rechtsgleichheit", text: "Rechtsgleichheit (Art. 8 BV)", zone: "gleichheit" },
+      { id: "diskriminierungsverbot", text: "Diskriminierungsverbot (Art. 8 II)", zone: "gleichheit" },
+      { id: "gleichstellung", text: "Gleichstellung Mann/Frau (Art. 8 III)", zone: "gleichheit" },
+      { id: "grundschule", text: "Recht auf Grundschulunterricht (Art. 19)", zone: "sozial" },
+      { id: "notlage", text: "Recht auf Hilfe in Notlagen (Art. 12)", zone: "sozial" }
+    ],
+    explain: "Freiheitsrechte schützen vor staatlichen Eingriffen (Meinung, Religion, Eigentum). Gleichheitsrechte garantieren Gleichbehandlung (Art. 8 BV). Soziale Grundrechte sind Leistungsansprüche an den Staat (Art. 12, 19 BV)."
+  }
+
 ];
