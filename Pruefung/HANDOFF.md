@@ -13,7 +13,8 @@
 - **Tier 2 Features (später):** Diktat, GeoGebra/Desmos, Randomisierte Zahlenvarianten, Code-Ausführung (Sandbox)
 - **Übungspools ↔ Prüfungstool** — Lern-Analytik, Login, KI-Empfehlungen (eigenes Designprojekt)
 - **Bewertungsraster-Vertiefung** — Überfachliche Kriterien, kriterienbasiertes KI-Feedback
-- **TaF Phasen-UI** — klassenTyp-Feld vorhanden, UI für Phasen-Auswahl noch nicht
+- **TaF Phasen-UI** — klassenTyp-Feld vorhanden, UI für Phasen-Auswahl noch nicht (auf nächstes SJ verschoben)
+- ~~**Zeichnen Input-Verlust (Prüfungstool)**~~ ✅ 01.04.2026 — Ref-basierter Stift-Buffer + rAF-Rendering. Browser-Test mit Stift/Touch ausstehend.
 - ~~Bild-Upload für Hotspot/Bildbeschriftung/DragDrop~~ ✅ 28.03.2026
 - ~~Aufgabengruppe Inline-Teilaufgaben~~ ✅ 28.03.2026
 - **Verbleibende Security-Themen:**
@@ -27,37 +28,39 @@
 
 ---
 
-## Session 48 — Security, Cleanup, Demo-Update, Reset (01.04.2026)
+## Session 50 — Zeichnen Input-Verlust Refactoring (01.04.2026)
 
 ### Stand
-Branch `feature/session48-improvements`. **Noch NICHT auf main.** Apps Script Deploy ausstehend.
+Branch `feature/zeichnen-refactoring` — **pushed auf GitHub.** Noch NICHT auf main — Browser-Test mit Stift/Touch ausstehend.
+`tsc -b` ✅ | 192 Tests ✅ | Build ✅
 
-### Erledigte Änderungen
+### Problem
+React Re-Renders verschluckten `pointerdown`-Events bei schnellem Zeichnen (60–240 Events/sec). Jeder Stift-Punkt löste ein State-Update + Re-Render aus, währenddessen neue Pointer-Events verloren gingen.
 
-| AP | Beschreibung | Datei(en) |
-|----|-------------|-----------|
-| **A1: sessionStorage Demo-Bypass** | `istDemoModus` nur noch via `demoStarten()` setzbar (in-memory). `restoreDemoFlag()` entfernt. Verhindert Lockdown-Umgehung via DevTools. | authStore.ts, securityInvarianten.test.ts |
-| **A2: Prompt Injection** | `wrapUserData()` Helper wrappt alle User-Inputs in `<user_data>`-Tags. System-Prompt gehärtet. 27 KI-Aktionen refactored. | apps-script-code.js |
-| **B: localStorage Cleanup** | `cleanupNachAbgabe()` shared Helper für 3 Abgabe-Pfade: freiwillig, Demo, LP-Beenden. Löscht pruefung-state-*, pruefung-abgabe-*, IndexedDB. | cleanupNachAbgabe.ts (neu), AbgabeDialog.tsx, Timer.tsx |
-| **C: Demo = Einführungsprüfung** | demoFragen.ts = Re-Export der einrichtungsFragen (~890 Zeilen entfernt). demoMonitoring auf 23 Fragen umgestellt. Aufgabengruppen-Filter entfernt. | demoFragen.ts, demoMonitoring.ts, useKorrekturDaten.ts |
-| **D: Neue Durchführung Reset** | zeitverlaengerungen → {} und kontrollStufe → 'standard' bei Reset. Backend + Frontend. | apps-script-code.js, DurchfuehrenDashboard.tsx |
+### Lösung (3 Dateien, +162 / -33 Zeilen)
 
-### Offene Punkte (nächste Sessions)
+| Datei | Änderung |
+|-------|----------|
+| `usePointerEvents.ts` | Alle Callbacks + Laufzeitwerte in Refs. useEffect bindet Listener nur 1x bei Canvas-Wechsel. |
+| `useDrawingEngine.ts` | Neue `renderMitPreview(ctx, previewCommand)` Methode für Echtzeit-Rendering ohne React-State. |
+| `ZeichnenCanvas.tsx` | Stift-Punkte in useRef-Buffer. rAF-Loop während Zeichnen. Batch-Commit bei pointerup. |
+
+### Offene Punkte
 
 | Prio | Thema | Beschreibung |
 |------|-------|-------------|
-| 🟠 | **Apps Script Deploy** | apps-script-code.js (AP-A2 + AP-D) muss in Apps Script Editor kopiert + neue Bereitstellung erstellt werden. |
-| 🟡 | **Browser-Test** | Alle 5 APs im Browser testen (Demo SuS+LP, Lockdown, Reset, Cleanup). |
-| 🟡 | **Übungspools: 9 neue Fragetypen** | sortierung, hotspot, bildbeschriftung, dragdrop_bild, code, formel, audio, zeichnen, pdf. Spec: `docs/superpowers/specs/2026-04-01-session48-improvements-design.md` AP-E. Sessions 49–51. |
-| 🟡 | **Zeichnen Input-Verlust (Refactoring)** | React Re-Renders verschlucken pointerdown bei schnellem Zeichnen. Fix: Events imperativ binden (useEffect+addEventListener), Stroke-Daten in useRef sammeln, Batch-Commit nach pointerup. Betroffene Dateien: usePointerEvents.ts, ZeichnenCanvas.tsx, useDrawingEngine.ts. Eigene Session mit Browser-Test (Stift/Touch). |
+| 🔴 | **Browser-Test Zeichnen** | Alle Werkzeuge testen, besonders Stift: schnelles Zeichnen, Drucksensitivität, keine verlorenen Striche. |
+| 🟡 | **Session 48 Browser-Test** | APs A–D auf `feature/session48-improvements` noch nicht getestet. |
+| 🟡 | **Pool-Fragetypen Browser-Test** | 8 neue Typen auf `feature/uebungspools-neue-typen` noch nicht getestet. |
 
 ### Branch-Status
 
 | Branch | Inhalt | Status |
 |--------|--------|--------|
-| `feature/session48-improvements` | Alle Session 48 Änderungen | Auf GitHub |
-| `preview` | Staging | Noch nicht aktualisiert |
-| `main` | Production | Unverändert |
+| `feature/zeichnen-refactoring` | Stift-Buffer + rAF | Pushed, nicht auf main |
+| `feature/uebungspools-neue-typen` | Pool-Typen E0–E3 | Pushed, nicht auf main |
+| `feature/session48-improvements` | Security/Cleanup | Pushed, nicht auf main |
+| `main` | Production | Unverändert seit Session 47 |
 
 ---
 

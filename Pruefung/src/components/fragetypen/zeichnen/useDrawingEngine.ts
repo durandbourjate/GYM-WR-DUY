@@ -25,6 +25,10 @@ interface UseDrawingEngineReturn {
   loescheById: (id: CommandId) => void;
   verschiebeSelektierten: (dx: number, dy: number) => void;
   render: (ctx: CanvasRenderingContext2D) => void;
+  /** Rendert den Canvas-Inhalt + einen optionalen Preview-Command (z.B. Stift-Buffer).
+   *  Wird für rAF-basiertes Echtzeit-Rendering während des Zeichnens genutzt,
+   *  ohne dass der Preview im React-State liegt. */
+  renderMitPreview: (ctx: CanvasRenderingContext2D, previewCommand: DrawCommand | null) => void;
   serialisiere: () => string;
   ladeDaten: (json: string) => void;
   exportierePNG: (canvas: HTMLCanvasElement) => string;
@@ -683,6 +687,16 @@ export function useDrawingEngine(options: UseDrawingEngineOptions): UseDrawingEn
     [hintergrundbild, breite, hoehe]
   );
 
+  const renderMitPreview = useCallback(
+    (ctx: CanvasRenderingContext2D, previewCommand: DrawCommand | null) => {
+      renderCanvas(ctx, stateRef.current, hintergrundbild, breite, hoehe);
+      if (previewCommand) {
+        zeichneCommand(ctx, previewCommand);
+      }
+    },
+    [hintergrundbild, breite, hoehe]
+  );
+
   const serialisiere = useCallback((): string => {
     const serialisiert = stateRef.current.commands.map(serializiereCommand);
     return JSON.stringify(serialisiert);
@@ -722,6 +736,7 @@ export function useDrawingEngine(options: UseDrawingEngineOptions): UseDrawingEn
     loescheById,
     verschiebeSelektierten,
     render,
+    renderMitPreview,
     serialisiere,
     ladeDaten,
     exportierePNG,
