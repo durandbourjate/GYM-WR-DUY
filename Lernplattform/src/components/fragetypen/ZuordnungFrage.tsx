@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { FrageKomponenteProps } from './index'
 import { seededShuffle } from '../../utils/shuffle'
+import FeedbackBox from './FeedbackBox'
 
 export default function ZuordnungFrage({ frage, onAntwort, disabled, feedbackSichtbar, korrekt }: FrageKomponenteProps) {
   const originalPaare = frage.paare || []
@@ -89,12 +90,7 @@ export default function ZuordnungFrage({ frage, onAntwort, disabled, feedbackSic
         </button>
       )}
 
-      {feedbackSichtbar && korrekt !== null && (
-        <div className={`p-4 rounded-xl ${korrekt ? 'bg-green-50 dark:bg-green-900/30 text-green-800 dark:text-green-200' : 'bg-red-50 dark:bg-red-900/30 text-red-800 dark:text-red-200'}`}>
-          <p className="font-medium">{korrekt ? 'Alle Paare richtig!' : 'Nicht ganz.'}</p>
-          {frage.erklaerung && <p className="mt-1 text-sm opacity-80">{frage.erklaerung}</p>}
-        </div>
-      )}
+      {feedbackSichtbar && korrekt !== null && <FeedbackBox korrekt={korrekt} erklaerung={frage.erklaerung} />}
     </div>
   )
 }

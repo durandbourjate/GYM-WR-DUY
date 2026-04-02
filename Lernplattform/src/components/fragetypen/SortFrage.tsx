@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { FrageKomponenteProps } from './index'
+import FeedbackBox from './FeedbackBox'
 
 export default function SortFrage({ frage, onAntwort, disabled, feedbackSichtbar, korrekt }: FrageKomponenteProps) {
   const kategorien = frage.kategorien || []
@@ -76,12 +77,7 @@ export default function SortFrage({ frage, onAntwort, disabled, feedbackSichtbar
         </button>
       )}
 
-      {feedbackSichtbar && korrekt !== null && (
-        <div className={`p-4 rounded-xl ${korrekt ? 'bg-green-50 dark:bg-green-900/30 text-green-800 dark:text-green-200' : 'bg-red-50 dark:bg-red-900/30 text-red-800 dark:text-red-200'}`}>
-          <p className="font-medium">{korrekt ? 'Alles richtig zugeordnet!' : 'Nicht ganz.'}</p>
-          {frage.erklaerung && <p className="mt-1 text-sm opacity-80">{frage.erklaerung}</p>}
-        </div>
-      )}
+      {feedbackSichtbar && korrekt !== null && <FeedbackBox korrekt={korrekt} erklaerung={frage.erklaerung} />}
     </div>
   )
 }

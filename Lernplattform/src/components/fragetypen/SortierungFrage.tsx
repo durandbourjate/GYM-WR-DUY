@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { FrageKomponenteProps } from './index'
 import { seededShuffle } from '../../utils/shuffle'
+import FeedbackBox from './FeedbackBox'
 
 export default function SortierungFrage({ frage, onAntwort, disabled, feedbackSichtbar, korrekt }: FrageKomponenteProps) {
   const korrektReihenfolge = frage.reihenfolge || []
@@ -62,11 +63,12 @@ export default function SortierungFrage({ frage, onAntwort, disabled, feedbackSi
       )}
 
       {feedbackSichtbar && korrekt !== null && (
-        <div className={`p-4 rounded-xl ${korrekt ? 'bg-green-50 dark:bg-green-900/30 text-green-800 dark:text-green-200' : 'bg-red-50 dark:bg-red-900/30 text-red-800 dark:text-red-200'}`}>
-          <p className="font-medium">{korrekt ? 'Perfekte Reihenfolge!' : 'Nicht ganz.'}</p>
-          {!korrekt && <p className="mt-1 text-sm opacity-80">Richtig: {korrektReihenfolge.join(' → ')}</p>}
-          {frage.erklaerung && <p className="mt-1 text-sm opacity-80">{frage.erklaerung}</p>}
-        </div>
+        <>
+          {!korrekt && (
+            <p className="text-sm text-red-500 mt-2">Richtig: {korrektReihenfolge.join(' \u2192 ')}</p>
+          )}
+          <FeedbackBox korrekt={korrekt} erklaerung={frage.erklaerung} />
+        </>
       )}
     </div>
   )

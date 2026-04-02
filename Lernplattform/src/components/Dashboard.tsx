@@ -9,6 +9,7 @@ import { berechneEmpfehlungen } from '../utils/empfehlungen'
 import type { Frage } from '../types/fragen'
 import type { ThemenFortschritt } from '../types/fortschritt'
 import type { Empfehlung } from '../types/auftrag'
+import { berechneSterne, sterneText } from '../utils/gamification'
 
 interface ThemenInfo {
   fach: string
@@ -134,8 +135,11 @@ export default function Dashboard() {
                       className="w-full text-left p-4 bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-md transition-shadow border border-gray-100 dark:border-gray-700 min-h-[48px]"
                     >
                       <div className="flex items-center justify-between mb-2">
-                        <span className="font-medium dark:text-white">{thema}</span>
-                        <MasteryBadges fortschritt={fortschritt} />
+                        <span className="font-medium dark:text-white text-base">{thema}</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm tracking-wide">{sterneText(berechneSterne(fortschritt.quote))}</span>
+                          <MasteryBadges fortschritt={fortschritt} />
+                        </div>
                       </div>
                       <FortschrittsBalken fortschritt={fortschritt} />
                     </button>

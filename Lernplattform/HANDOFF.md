@@ -3,16 +3,16 @@
 ## Aktueller Stand
 
 **Branch:** `main`
-**Phase:** 5 von 7 (Auftraege + Empfehlungen)
-**Status:** Implementation abgeschlossen, 69 Tests gruen, Build gruen
+**Phase:** 6 von 7 (Gamification + Kinder-UX)
+**Status:** Implementation abgeschlossen, 82 Tests gruen, Build gruen
 
 ### Verifikation (03.04.2026)
 
 | Check | Status |
 |-------|--------|
 | `npx tsc -b` | OK |
-| `npx vitest run` | 69 Tests gruen (9 Testdateien) |
-| `npm run build` | OK (dist/ erstellt, 257 KB JS) |
+| `npx vitest run` | 82 Tests gruen (10 Testdateien) |
+| `npm run build` | OK (dist/ erstellt, 256 KB JS) |
 | Pruefungstool Regression | 193 Tests gruen, tsc OK |
 
 ---
@@ -26,32 +26,35 @@
 | 3 | 03.04 | Mastery-System + Fortschritt | 64 |
 | 4 | 03.04 | Admin-Dashboard (3-Ebenen) | 64 |
 | 5 | 03.04 | Auftraege + Empfehlungen | 69 |
+| 6 | 03.04 | Gamification + Kinder-UX | 82 |
 
-## Phase 5 (03.04.2026) — Auftraege + Empfehlungen
+## Phase 6 (03.04.2026) — Gamification + Kinder-UX
 
 | Task | Beschreibung |
 |------|-------------|
-| 1 | Auftrag-Typen (Auftrag, Empfehlung) |
-| 2 | Empfehlungs-Utils: 3 Strategien (Auftrag, Luecke, Festigung) + 5 Tests |
-| 3 | AuftragStore (localStorage, CRUD) |
-| 4 | Dashboard: Empfehlungs-Karten oben (farbcodiert nach Typ) |
-| 5 | AdminAuftraege: Erstellen (Fach/Thema/Frist/Ziel), Abschliessen, Loeschen |
-| 6 | AdminDashboard: Tab-Leiste (Uebersicht / Auftraege) |
+| 1 | Gamification-Utils: berechneSterne, berechneStreak, sterneText (13 Tests) |
+| 2 | FeedbackBox-Komponente: variierende Lob-/Trost-Texte |
+| 3 | Alle 8 Fragetypen nutzen FeedbackBox statt hardkodierter Texte |
+| 4 | Zusammenfassung: Sterne (0-3), Motivationstext |
+| 5 | Dashboard: Sterne pro Thema neben Mastery-Badges |
 
-### Empfehlungs-Logik (max 3)
+### Gamification-Features
 
-1. **Aktive Auftraege** (immer zuoberst, blau)
-2. **Groesste Luecke** (Thema mit tiefstem Mastery-Score, gelb)
-3. **Festigung** (Thema mit gefestigten Fragen, kurz vor gemeistert, gruen)
+| Feature | Details |
+|---------|---------|
+| **Sterne** | 0-3 pro Thema: 0 (<20%), 1 (20-49%), 2 (50-74%), 3 (>=75%) |
+| **Streaks** | Sessions in Folge, Timeout nach 14 Tagen Pause |
+| **Feedback** | 10 Lob-Varianten ("Super!", "Genau!", "Stark!"), 5 Trost-Varianten |
+| **Zusammenfassung** | Sterne-Anzeige, Motivationstext nach Ergebnis-Quote |
 
-### Auftrag-System
+### Kinder-UX
 
-- Admin erstellt Auftraege mit: Titel, Fach, Thema, Frist, Ziel-Mitglieder
-- Auftraege erscheinen als Empfehlung im Lernenden-Dashboard
-- Admin kann Auftraege abschliessen oder loeschen
-- localStorage-persistiert (Backend kommt spaeter)
+- Min. 48px Touch-Targets (alle Buttons)
+- Text-Basis 16px (Tailwind default), Fragentext 18px (text-lg)
+- FeedbackBox mit variierendem Text (nicht immer "Richtig!"/"Falsch!")
+- Sterne visuell prominent in Dashboard + Zusammenfassung
 
-### Architektur (nach Phase 5)
+### Architektur (nach Phase 6)
 
 ```
 Lernplattform/src/
@@ -59,31 +62,32 @@ Lernplattform/src/
 ├── services/        # interfaces, apiClient, authService
 ├── adapters/        # appsScriptAdapter, mockDaten, mockMitgliederDaten
 ├── store/           # authStore, gruppenStore, uebungsStore, fortschrittStore, auftragStore
-├── utils/           # korrektur, blockBuilder, shuffle, mastery, empfehlungen
+├── utils/           # korrektur, blockBuilder, shuffle, mastery, empfehlungen, gamification
 ├── components/
-│   ├── fragetypen/  # 8 Komponenten + Registry
+│   ├── fragetypen/  # 8 Komponenten + Registry + FeedbackBox
 │   ├── admin/       # AdminDashboard, Uebersicht, KindDetail, ThemaDetail, Auftraege
-│   ├── LoginScreen, GruppenAuswahl, Dashboard (mit Empfehlungen)
-│   └── UebungsScreen, Zusammenfassung
+│   ├── LoginScreen, GruppenAuswahl, Dashboard (Empfehlungen + Sterne)
+│   └── UebungsScreen, Zusammenfassung (Sterne + Motivation)
 ├── App.tsx
-└── __tests__/       # 9 Testdateien, 69 Tests
+└── __tests__/       # 10 Testdateien, 82 Tests
 ```
 
 ---
 
-## Was fehlt (naechste Phasen)
-
-### Phase 6: Gamification + Kinder-UX
-- Sterne (0-3 pro Thema basierend auf Mastery-%)
-- Streaks (Sessions in Folge)
-- Session-Zusammenfassung aufwerten
-- Touch-Optimierung, groessere Schrift
-- Froehliches Feedback (variierend)
+## Was fehlt
 
 ### Phase 7: Gym-Pool-Migration
 - Bestehende 27 Pools in Sheets migrieren
+- Pool-Fragen in Lernplattform-Format konvertieren
 
-### Apps Script Backend (noch nicht implementiert)
+### Apps Script Backend
 - Alle `lernplattform*` Endpoints
-- Gruppen-Registry + Sheets
-- Fortschritt + Analytik + Auftraege server-seitig
+- Gruppen-Registry + Sheets Setup
+- Fortschritt + Analytik + Auftraege server-seitig persistieren
+- Aktuell: localStorage-only (funktioniert fuer Demo/Test)
+
+### Spaetere Verbesserungen
+- Streak-Anzeige im Dashboard (UI vorhanden, Daten fehlen ohne Backend)
+- Offline-Queue (Spec vorhanden, Implementation in spaeterer Phase)
+- Diktat-Typ (Browser-TTS)
+- Wortschatz/Konjugation-Typen fuer Sprachen
