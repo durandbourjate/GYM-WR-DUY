@@ -4,6 +4,7 @@ import type { UebungsSession, SessionErgebnis } from '../types/uebung'
 import { fragenAdapter } from '../adapters/appsScriptAdapter'
 import { erstelleBlock } from '../utils/blockBuilder'
 import { pruefeAntwort } from '../utils/korrektur'
+import { useFortschrittStore } from './fortschrittStore'
 
 interface UebungsState {
   session: UebungsSession | null
@@ -31,7 +32,15 @@ export const useUebungsStore = create<UebungsState>((set, get) => ({
 
     try {
       const alleFragen = await fragenAdapter.ladeFragen(gruppeId, { fach, thema, nurUebung: true })
-      const block = erstelleBlock(alleFragen, thema)
+
+      // Mastery-Daten fuer priorisierte Block-Zusammenstellung
+      const fortschritte = useFortschrittStore.getState().fortschritte
+      const mastery: Record<string, import('../types/fortschritt').MasteryStufe> = {}
+      for (const f of alleFragen) {
+        mastery[f.id] = fortschritte[f.id]?.mastery || 'neu'
+      }
+
+      const block = erstelleBlock(alleFragen, thema, { mastery })
 
       if (block.length === 0) {
         set({ ladeStatus: 'fehler' })
@@ -65,6 +74,9 @@ export const useUebungsStore = create<UebungsState>((set, get) => ({
     if (!frage) return
 
     const korrekt = pruefeAntwort(frage, antwort)
+
+    // Fortschritt aktualisieren
+    useFortschrittStore.getState().antwortVerarbeiten(frage.id, session.email, korrekt, session.id)
 
     set({
       session: {
