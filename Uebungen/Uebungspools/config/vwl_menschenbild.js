@@ -466,12 +466,12 @@ window.QUESTIONS = [
   q: "Beschrifte die Elemente des Gefangenendilemmas.",
   img: { src: "img/vwl/menschenbild/menschenbild_payoff_beschriftung.svg", alt: "Gefangenendilemma-Matrix mit sechs nummerierten Beschriftungspunkten" },
   labels: [
-    {id: "l1", text: "Beide gestehen: 5/5 Jahre", x: 37, y: 45},
-    {id: "l2", text: "A gesteht, B schweigt: 0/10 Jahre", x: 68, y: 45},
-    {id: "l3", text: "A schweigt, B gesteht: 10/0 Jahre", x: 37, y: 72},
-    {id: "l4", text: "Beide schweigen: 1/1 Jahr", x: 68, y: 72},
-    {id: "l5", text: "Spieler A (Strategien)", x: 8, y: 58},
-    {id: "l6", text: "Spieler B (Strategien)", x: 52, y: 18}
+    {id: "l1", text: "Beide gestehen: 5/5 Jahre", x: 52, y: 44},
+    {id: "l2", text: "A gesteht, B schweigt: 0/10 Jahre", x: 73, y: 44},
+    {id: "l3", text: "A schweigt, B gesteht: 10/0 Jahre", x: 52, y: 72},
+    {id: "l4", text: "Beide schweigen: 1/1 Jahr", x: 73, y: 72},
+    {id: "l5", text: "Spieler A (Strategien)", x: 33, y: 58},
+    {id: "l6", text: "Spieler B (Strategien)", x: 63, y: 24}
   ],
   explain: "Im Gefangenendilemma hat jeder Spieler die dominante Strategie zu gestehen, obwohl beidseitiges Schweigen (1/1) das kollektiv bessere Ergebnis wäre. Das Nash-Gleichgewicht liegt bei «beide gestehen» (5/5)."
 },

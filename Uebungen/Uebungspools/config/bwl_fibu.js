@@ -3136,12 +3136,12 @@ window.QUESTIONS = [
     q: "Beschrifte die sechs Bereiche der Bilanz.",
     img: { src: "img/bwl/fibu/fibu_bilanz_beschriftung.svg", alt: "T-förmige Bilanzstruktur ohne Beschriftungen" },
     labels: [
-      { id: "l1", text: "Umlaufvermögen (UV)", x: 20, y: 30 },
-      { id: "l2", text: "Anlagevermögen (AV)", x: 20, y: 65 },
-      { id: "l3", text: "Fremdkapital kurzfristig (FKk)", x: 80, y: 25 },
-      { id: "l4", text: "Fremdkapital langfristig (FKl)", x: 80, y: 45 },
-      { id: "l5", text: "Eigenkapital (EK)", x: 80, y: 72 },
-      { id: "l6", text: "Bilanzsumme = Aktiven = Passiven", x: 50, y: 92 }
+      { id: "l1", text: "Umlaufvermögen (UV)", x: 27, y: 38 },
+      { id: "l2", text: "Anlagevermögen (AV)", x: 27, y: 68 },
+      { id: "l3", text: "Fremdkapital kurzfristig (FKk)", x: 73, y: 32 },
+      { id: "l4", text: "Fremdkapital langfristig (FKl)", x: 73, y: 51 },
+      { id: "l5", text: "Eigenkapital (EK)", x: 73, y: 71 },
+      { id: "l6", text: "Bilanzsumme = Aktiven = Passiven", x: 50, y: 86 }
     ],
     explain: "Bilanz: Links Aktiven (UV oben, AV unten), rechts Passiven (FK oben, EK unten). UV = Kasse, Bank, Debitoren, Vorräte. AV = Maschinen, Gebäude, Fahrzeuge. FKk = Kreditoren, kurzfr. Darlehen. FKl = Hypothek. EK = Eigenkapital, Gewinnvortrag."
   },

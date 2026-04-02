@@ -1561,12 +1561,12 @@ window.QUESTIONS = [
   q: "Beschrifte die sechs markierten Elemente im Marktdiagramm.",
   img: { src: "img/vwl/markteffizienz/markteffizienz_an_beschriftung.svg", alt: "Angebot-Nachfrage-Diagramm mit sechs nummerierten Beschriftungspunkten" },
   labels: [
-    {id: "l1", text: "Angebotskurve (S)", x: 80, y: 25},
-    {id: "l2", text: "Nachfragekurve (D)", x: 80, y: 75},
-    {id: "l3", text: "Gleichgewichtspunkt", x: 50, y: 42},
-    {id: "l4", text: "Preis (P)", x: 7, y: 15},
-    {id: "l5", text: "Menge (Q)", x: 90, y: 90},
-    {id: "l6", text: "Konsumentenrente", x: 32, y: 25}
+    {id: "l1", text: "Angebotskurve (S)", x: 78, y: 33},
+    {id: "l2", text: "Nachfragekurve (D)", x: 78, y: 69},
+    {id: "l3", text: "Gleichgewichtspunkt", x: 52, y: 49},
+    {id: "l4", text: "Preis (P)", x: 14, y: 11},
+    {id: "l5", text: "Menge (Q)", x: 90, y: 84},
+    {id: "l6", text: "Konsumentenrente", x: 28, y: 38}
   ],
   explain: "Das Marktdiagramm zeigt: Angebotskurve (S, steigend), Nachfragekurve (D, fallend), Gleichgewichtspunkt (Schnittpunkt). Preis (P) auf der y-Achse, Menge (Q) auf der x-Achse. Die Konsumentenrente ist das Dreieck zwischen Nachfragekurve und Gleichgewichtspreis."
 },

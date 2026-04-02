@@ -780,12 +780,12 @@ window.QUESTIONS = [
   q: "Beschrifte die sechs markierten Elemente im Arbeitsmarktdiagramm.",
   img: { src: "img/vwl/arbeitslosigkeit/arbeitslosigkeit_arbeitsmarkt_beschriftung.svg", alt: "Arbeitsmarkt-Diagramm mit sechs nummerierten Beschriftungspunkten" },
   labels: [
-    {id: "l1", text: "Arbeitsangebot (Ls)", x: 80, y: 25},
-    {id: "l2", text: "Arbeitsnachfrage (Ld)", x: 80, y: 72},
-    {id: "l3", text: "Gleichgewichtslohn", x: 10, y: 42},
-    {id: "l4", text: "Mindestlohn (Lohnrigidität)", x: 10, y: 28},
-    {id: "l5", text: "Arbeitslosigkeit", x: 50, y: 88},
-    {id: "l6", text: "Gleichgewichtsmenge", x: 50, y: 50}
+    {id: "l1", text: "Arbeitsangebot (Ls)", x: 81, y: 31},
+    {id: "l2", text: "Arbeitsnachfrage (Ld)", x: 81, y: 80},
+    {id: "l3", text: "Gleichgewichtslohn", x: 12, y: 53},
+    {id: "l4", text: "Mindestlohn (Lohnrigidität)", x: 12, y: 41},
+    {id: "l5", text: "Arbeitslosigkeit", x: 51, y: 42},
+    {id: "l6", text: "Gleichgewichtsmenge", x: 48, y: 87}
   ],
   explain: "Der Arbeitsmarkt im Gleichgewicht: Arbeitsangebot (Ls, steigend) trifft Arbeitsnachfrage (Ld, fallend). Liegt der Lohn über dem Gleichgewicht (z.B. durch Mindestlohn), entsteht Arbeitslosigkeit."
 },

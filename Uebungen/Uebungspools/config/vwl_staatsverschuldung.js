@@ -844,11 +844,11 @@ window.QUESTIONS = [
   q: "Beschrifte die Elemente der Schweizer Schuldenbremse.",
   img: { src: "img/vwl/staatsverschuldung/staatsverschuldung_schuldenbremse_beschriftung.svg", alt: "Schuldenbremse-Mechanismus mit fünf nummerierten Beschriftungspunkten" },
   labels: [
-    {id: "l1", text: "Konjunkturfaktor (k)", x: 77, y: 12},
-    {id: "l2", text: "Ausgabenplafond = Einnahmen × k", x: 87, y: 30},
-    {id: "l3", text: "Boom: k < 1 → Pflicht zu Überschüssen", x: 5, y: 76},
-    {id: "l4", text: "Rezession: k > 1 → Defizite erlaubt", x: 95, y: 76},
-    {id: "l5", text: "Ausgleichskonto: Kontrolle über Zyklen", x: 50, y: 96}
+    {id: "l1", text: "Konjunkturfaktor (k)", x: 50, y: 17},
+    {id: "l2", text: "Ausgabenplafond = Einnahmen × k", x: 50, y: 37},
+    {id: "l3", text: "Boom: k < 1 → Pflicht zu Überschüssen", x: 19, y: 62},
+    {id: "l4", text: "Rezession: k > 1 → Defizite erlaubt", x: 81, y: 62},
+    {id: "l5", text: "Ausgleichskonto: Kontrolle über Zyklen", x: 50, y: 84}
   ],
   explain: "Schweizer Schuldenbremse (seit 2003): Der Konjunkturfaktor k steuert die erlaubten Ausgaben. Im Boom (k<1) Überschüsse, in der Rezession (k>1) Defizite. Das Ausgleichskonto überwacht den Ausgleich über den Zyklus."
 },

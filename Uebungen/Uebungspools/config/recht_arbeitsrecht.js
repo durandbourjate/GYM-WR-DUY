@@ -1438,11 +1438,11 @@ window.QUESTIONS = [
     q: "Beschrifte die drei Schichten des Arbeitsrechts und ordne die Rechtsinstrumente den Ebenen zu.",
     img: { src: "img/recht/arbeitsrecht/arbeitsrecht_bereiche_beschriftung.svg", alt: "Drei-Schichten-Diagramm des Arbeitsrechts: individual, kollektiv, öffentlich" },
     labels: [
-      { id: "l1", text: "Einzelarbeitsvertrag (OR 319 ff.)", x: 50, y: 22 },
-      { id: "l2", text: "GAV (Gesamtarbeitsvertrag)", x: 50, y: 48 },
-      { id: "l3", text: "Normalarbeitsvertrag (NAV)", x: 50, y: 62 },
-      { id: "l4", text: "Arbeitsgesetz (ArG)", x: 50, y: 82 },
-      { id: "l5", text: "UVG (Unfallversicherung)", x: 25, y: 92 }
+      { id: "l1", text: "Einzelarbeitsvertrag (OR 319 ff.)", x: 50, y: 45 },
+      { id: "l2", text: "GAV (Gesamtarbeitsvertrag)", x: 50, y: 33 },
+      { id: "l3", text: "Normalarbeitsvertrag (NAV)", x: 25, y: 33 },
+      { id: "l4", text: "Arbeitsgesetz (ArG)", x: 25, y: 86 },
+      { id: "l5", text: "UVG (Unfallversicherung)", x: 75, y: 86 }
     ],
     explain: "3 Ebenen des Arbeitsrechts: 1) Individual (Einzelarbeitsvertrag, OR 319 ff.), 2) Kollektiv (GAV zwischen Gewerkschaft + Arbeitgeberverband; NAV = staatlich festgelegter Mindestvertrag), 3) Öffentlich (ArG: Arbeitszeiten, Gesundheitsschutz; UVG: Unfallversicherung)."
   },

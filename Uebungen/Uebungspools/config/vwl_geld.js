@@ -2581,10 +2581,10 @@ window.QUESTIONS = [
   q: "Beschrifte die vier Geldmengenaggregate und ihre Bestandteile.",
   img: { src: "img/vwl/geld/geld_geldmengen_beschriftung.svg", alt: "Geldmengenaggregate M0–M3 als konzentrische Schichten mit vier nummerierten Beschriftungspunkten" },
   labels: [
-    {id: "l1", text: "M0: Notenbankgeld (Bargeld + Giroguthaben bei SNB)", x: 50, y: 55},
-    {id: "l2", text: "M1: Bargeld + Sichteinlagen", x: 50, y: 42},
-    {id: "l3", text: "M2: M1 + Spareinlagen", x: 50, y: 28},
-    {id: "l4", text: "M3: M2 + Termineinlagen", x: 50, y: 15}
+    {id: "l1", text: "M0: Notenbankgeld (Bargeld + Giroguthaben bei SNB)", x: 39, y: 57},
+    {id: "l2", text: "M1: Bargeld + Sichteinlagen", x: 24, y: 42},
+    {id: "l3", text: "M2: M1 + Spareinlagen", x: 16, y: 34},
+    {id: "l4", text: "M3: M2 + Termineinlagen", x: 10, y: 22}
   ],
   explain: "Die Geldmengenaggregate sind ineinander geschachtelt: M0 (monetäre Basis) → M1 (Transaktionsgeld) → M2 (+ Spareinlagen) → M3 (+ Termineinlagen). Je weiter aussen, desto weniger liquide."
 },

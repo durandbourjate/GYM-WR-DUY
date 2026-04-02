@@ -313,12 +313,12 @@ window.QUESTIONS = [
   q: "Beschrifte die Ebenen und wichtigsten Steuerarten des Schweizer Steuersystems.",
   img: { src: "img/vwl/steuern/steuern_system_beschriftung.svg", alt: "Steuersystem der Schweiz mit sechs nummerierten Beschriftungspunkten" },
   labels: [
-    {id: "l1", text: "Bundesebene", x: 5, y: 67},
-    {id: "l2", text: "Direkte Bundessteuer + MWST", x: 5, y: 79},
-    {id: "l3", text: "Kantonsebene", x: 50, y: 67},
-    {id: "l4", text: "Einkommens- und Vermögenssteuer", x: 50, y: 79},
-    {id: "l5", text: "Gemeindeebene", x: 95, y: 67},
-    {id: "l6", text: "Gemeindesteuerzuschlag", x: 95, y: 79}
+    {id: "l1", text: "Bundesebene", x: 19, y: 33},
+    {id: "l2", text: "Direkte Bundessteuer + MWST", x: 19, y: 46},
+    {id: "l3", text: "Kantonsebene", x: 50, y: 33},
+    {id: "l4", text: "Einkommens- und Vermögenssteuer", x: 50, y: 46},
+    {id: "l5", text: "Gemeindeebene", x: 81, y: 33},
+    {id: "l6", text: "Gemeindesteuerzuschlag", x: 81, y: 46}
   ],
   explain: "Dreistufiges System: Bund (direkte Bundessteuer + MWST), Kantone (Einkommens-/Vermögenssteuer mit unterschiedlichen Steuerfüssen = Steuerwettbewerb), Gemeinden (Zuschlag auf Kantonssteuern)."
 },

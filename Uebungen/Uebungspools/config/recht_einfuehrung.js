@@ -798,10 +798,10 @@ window.QUESTIONS = [
     q: "Beschrifte die vier Schritte der Rechtsanwendung durch Subsumtion.",
     img: { src: "img/recht/einfuehrung/einfuehrung_subsumtion_beschriftung.svg", alt: "Flussdiagramm der Subsumtion mit vier nummerierten Schritten" },
     labels: [
-      { id: "l1", text: "Obersatz (Rechtsnorm)", x: 50, y: 18 },
-      { id: "l2", text: "Untersatz (Sachverhalt)", x: 50, y: 40 },
-      { id: "l3", text: "Subsumtion (Vergleich)", x: 50, y: 62 },
-      { id: "l4", text: "Schlussfolgerung (Rechtsfolge)", x: 50, y: 84 }
+      { id: "l1", text: "Obersatz (Rechtsnorm)", x: 50, y: 22 },
+      { id: "l2", text: "Untersatz (Sachverhalt)", x: 50, y: 47 },
+      { id: "l3", text: "Subsumtion (Vergleich)", x: 50, y: 71 },
+      { id: "l4", text: "Schlussfolgerung (Rechtsfolge)", x: 50, y: 92 }
     ],
     explain: "Rechtsanwendung durch Subsumtion: 1) Obersatz (Tatbestandsmerkmale der Norm), 2) Untersatz (konkreter Sachverhalt), 3) Subsumtion (passt der Sachverhalt?), 4) Schlussfolgerung (Rechtsfolge anwenden)."
   },

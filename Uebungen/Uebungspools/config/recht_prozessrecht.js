@@ -833,11 +833,11 @@ window.QUESTIONS = [
     q: "Beschrifte die drei Stufen des Schweizer Instanzenzugs und die Rechtsmittel zwischen den Stufen.",
     img: { src: "img/recht/prozessrecht/prozessrecht_instanzenzug_beschriftung.svg", alt: "Treppendiagramm des Instanzenzugs mit roten Kreisen" },
     labels: [
-      { id: "l1", text: "1. Instanz: Bezirksgericht / Regionalgericht", x: 20, y: 78 },
-      { id: "l2", text: "Berufung / Beschwerde", x: 38, y: 60 },
-      { id: "l3", text: "2. Instanz: Obergericht / Kantonsgericht", x: 50, y: 45 },
-      { id: "l4", text: "Beschwerde in Zivilsachen / Strafsachen", x: 68, y: 30 },
-      { id: "l5", text: "3. Instanz: Bundesgericht (Lausanne)", x: 80, y: 15 }
+      { id: "l1", text: "1. Instanz: Bezirksgericht / Regionalgericht", x: 18, y: 83 },
+      { id: "l2", text: "Berufung / Beschwerde", x: 36, y: 64 },
+      { id: "l3", text: "2. Instanz: Obergericht / Kantonsgericht", x: 50, y: 63 },
+      { id: "l4", text: "Beschwerde in Zivilsachen / Strafsachen", x: 69, y: 44 },
+      { id: "l5", text: "3. Instanz: Bundesgericht (Lausanne)", x: 83, y: 30 }
     ],
     explain: "Schweizer Instanzenzug: 1. Instanz (Bezirks-/Regionalgericht) → 2. Instanz (Obergericht/Kantonsgericht, via Berufung/Beschwerde) → Bundesgericht (via Beschwerde in Zivil-/Strafsachen, letzte Instanz). Das Bundesgericht prüft primär Rechtsfragen, nicht den Sachverhalt."
   },

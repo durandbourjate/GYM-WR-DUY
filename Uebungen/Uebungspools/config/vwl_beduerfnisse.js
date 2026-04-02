@@ -533,11 +533,11 @@ window.QUESTIONS = [
   q: "Beschrifte die fünf Stufen der Bedürfnispyramide nach Maslow.",
   img: { src: "img/vwl/beduerfnisse/beduerfnisse_pyramide_beschriftung.svg", alt: "Maslow-Pyramide mit fünf Stufen und nummerierten roten Kreisen (1–5)" },
   labels: [
-    {id: "l1", text: "Grundbedürfnisse (physiologisch)", x: 15, y: 82},
-    {id: "l2", text: "Sicherheitsbedürfnisse",           x: 15, y: 66},
-    {id: "l3", text: "Soziale Bedürfnisse",              x: 15, y: 50},
-    {id: "l4", text: "Wertschätzung / Anerkennung",      x: 15, y: 34},
-    {id: "l5", text: "Selbstverwirklichung",             x: 15, y: 19}
+    {id: "l1", text: "Grundbedürfnisse (physiologisch)", x: 50, y: 86},
+    {id: "l2", text: "Sicherheitsbedürfnisse",           x: 50, y: 72},
+    {id: "l3", text: "Soziale Bedürfnisse",              x: 50, y: 59},
+    {id: "l4", text: "Wertschätzung / Anerkennung",      x: 50, y: 46},
+    {id: "l5", text: "Selbstverwirklichung",             x: 50, y: 29}
   ],
   explain: "Die fünf Stufen nach Maslow (1943): 1) Grundbedürfnisse (Nahrung, Schlaf), 2) Sicherheit (Wohnung, Gesundheit), 3) Soziale Bedürfnisse (Zugehörigkeit, Liebe), 4) Wertschätzung (Anerkennung, Status), 5) Selbstverwirklichung (persönliches Wachstum)."
 },

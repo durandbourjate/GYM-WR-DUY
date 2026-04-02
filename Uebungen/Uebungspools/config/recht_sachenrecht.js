@@ -915,11 +915,11 @@ window.QUESTIONS = [
     q: "Beschrifte die Systematik des Sachenrechts: Eigentum, Besitz und die drei beschränkten dinglichen Rechte.",
     img: { src: "img/recht/sachenrecht/sachenrecht_systematik_beschriftung.svg", alt: "Baumdiagramm Sachenrecht mit Eigentum, Besitz und beschränkten dinglichen Rechten" },
     labels: [
-      { id: "l1", text: "Eigentum (umfassendes Recht)", x: 25, y: 35 },
-      { id: "l2", text: "Besitz (tatsächliche Herrschaft)", x: 75, y: 35 },
-      { id: "l3", text: "Grundpfandrecht (Hypothek)", x: 20, y: 70 },
-      { id: "l4", text: "Dienstbarkeiten (Wegrecht)", x: 50, y: 70 },
-      { id: "l5", text: "Fahrnispfandrecht", x: 80, y: 70 }
+      { id: "l1", text: "Eigentum (umfassendes Recht)", x: 23, y: 42 },
+      { id: "l2", text: "Besitz (tatsächliche Herrschaft)", x: 50, y: 42 },
+      { id: "l3", text: "Grundpfandrecht (Hypothek)", x: 67, y: 68 },
+      { id: "l4", text: "Dienstbarkeiten (Wegrecht)", x: 78, y: 68 },
+      { id: "l5", text: "Fahrnispfandrecht", x: 89, y: 68 }
     ],
     explain: "Sachenrecht: Eigentum = umfassendstes dingliches Recht (Art. 641 ZGB). Besitz = tatsächliche Herrschaft (nicht gleich Eigentum, Art. 919 ZGB). Beschränkte dingliche Rechte: Grundpfand (Hypothek, Art. 793), Dienstbarkeiten (Wegrecht, Art. 730), Fahrnispfand (Art. 884)."
   },

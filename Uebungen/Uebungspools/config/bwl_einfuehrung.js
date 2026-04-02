@@ -887,11 +887,11 @@ window.QUESTIONS = [
     q: "Beschrifte die fünf Elemente einer Nutzwertanalyse.",
     img: { src: "img/bwl/einfuehrung/einfuehrung_nwa_beschriftung.svg", alt: "Nutzwertanalyse-Tabelle" },
     labels: [
-      { id: "l1", text: "Bewertungskriterien", x: 12, y: 30 },
-      { id: "l2", text: "Gewichtung (in %)", x: 28, y: 30 },
-      { id: "l3", text: "Punktbewertung (1–5)", x: 50, y: 30 },
-      { id: "l4", text: "Gewichtete Punkte", x: 72, y: 30 },
-      { id: "l5", text: "Gesamtnutzwert (Summe)", x: 50, y: 88 }
+      { id: "l1", text: "Bewertungskriterien", x: 15, y: 41 },
+      { id: "l2", text: "Gewichtung (in %)", x: 30, y: 41 },
+      { id: "l3", text: "Punktbewertung (1–5)", x: 39, y: 41 },
+      { id: "l4", text: "Gewichtete Punkte", x: 50, y: 41 },
+      { id: "l5", text: "Gesamtnutzwert (Summe)", x: 50, y: 79 }
     ],
     explain: "Die NWA bewertet Alternativen systematisch: Kriterien festlegen, gewichten (Summe = 100%), Punkte vergeben, gewichtete Punkte berechnen, Gesamtnutzwert vergleichen."
   },

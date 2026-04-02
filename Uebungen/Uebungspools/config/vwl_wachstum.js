@@ -752,12 +752,12 @@ window.QUESTIONS = [
   q: "Beschrifte die drei Ebenen des Wachstumsmodells und ihre Hauptkomponenten.",
   img: { src: "img/vwl/wachstum/wachstum_drei_ebenen_beschriftung.svg", alt: "Drei-Ebenen-Modell des Wirtschaftswachstums mit sechs nummerierten Beschriftungspunkten" },
   labels: [
-    {id: "l1", text: "Ebene 1: Unmittelbare Ursachen", x: 50, y: 18},
-    {id: "l2", text: "Arbeit und Kapital (Produktionsfaktoren)", x: 25, y: 32},
-    {id: "l3", text: "Ebene 2: Tiefere Ursachen", x: 50, y: 46},
-    {id: "l4", text: "Technologie, Bildung, Infrastruktur", x: 75, y: 58},
-    {id: "l5", text: "Ebene 3: Fundamentale Ursachen", x: 50, y: 72},
-    {id: "l6", text: "Institutionen, Geographie, Kultur", x: 25, y: 85}
+    {id: "l1", text: "Ebene 1: Unmittelbare Ursachen", x: 39, y: 17},
+    {id: "l2", text: "Arbeit und Kapital (Produktionsfaktoren)", x: 36, y: 27},
+    {id: "l3", text: "Ebene 2: Tiefere Ursachen", x: 39, y: 39},
+    {id: "l4", text: "Technologie, Bildung, Infrastruktur", x: 37, y: 50},
+    {id: "l5", text: "Ebene 3: Fundamentale Ursachen", x: 39, y: 64},
+    {id: "l6", text: "Institutionen, Geographie, Kultur", x: 39, y: 76}
   ],
   explain: "Ebene 1 (direkt): Produktionsfaktoren Arbeit und Kapital. Ebene 2 (tiefer): Technologie, Humankapital, Infrastruktur steigern die Produktivität. Ebene 3 (fundamental): Institutionen, Geographie und Kultur bestimmen, ob investiert und innoviert wird."
 },

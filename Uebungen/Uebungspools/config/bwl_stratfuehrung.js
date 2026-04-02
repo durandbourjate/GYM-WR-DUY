@@ -859,10 +859,10 @@ window.QUESTIONS = [
     q: "Beschrifte die vier Wachstumsstrategien der Ansoff-Matrix.",
     img: { src: "img/bwl/stratfuehrung/stratfuehrung_ansoff_beschriftung.svg", alt: "Ansoff-Matrix ohne Strategienamen" },
     labels: [
-      { id: "l1", text: "Marktdurchdringung", x: 30, y: 38 },
-      { id: "l2", text: "Produktentwicklung", x: 72, y: 38 },
-      { id: "l3", text: "Marktentwicklung", x: 30, y: 72 },
-      { id: "l4", text: "Diversifikation", x: 72, y: 72 }
+      { id: "l1", text: "Marktdurchdringung", x: 34, y: 32 },
+      { id: "l2", text: "Produktentwicklung", x: 73, y: 32 },
+      { id: "l3", text: "Marktentwicklung", x: 34, y: 70 },
+      { id: "l4", text: "Diversifikation", x: 73, y: 70 }
     ],
     explain: "Die Ansoff-Matrix: Marktdurchdringung (bestehendes Produkt, bestehender Markt), Produktentwicklung (neues Produkt, bestehender Markt), Marktentwicklung (bestehendes Produkt, neuer Markt), Diversifikation (neues Produkt, neuer Markt)."
   },

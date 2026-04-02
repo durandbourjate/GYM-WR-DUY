@@ -741,11 +741,11 @@ window.QUESTIONS = [
     q: "Beschrifte die fünf Stufen der Normenpyramide von oben (höchste Norm) nach unten.",
     img: { src: "img/recht/einleitungsartikel/einleitungsartikel_pyramide_beschriftung.svg", alt: "Normenpyramide mit fünf Stufen und roten nummerierten Kreisen" },
     labels: [
-      { id: "l1", text: "Bundesverfassung (BV)", x: 50, y: 15 },
-      { id: "l2", text: "Bundesgesetze (z.B. OR, StGB)", x: 50, y: 35 },
-      { id: "l3", text: "Verordnungen (Bundesrat)", x: 50, y: 55 },
-      { id: "l4", text: "Kantonales Recht", x: 50, y: 75 },
-      { id: "l5", text: "Gemeinderecht / Reglemente", x: 50, y: 90 }
+      { id: "l1", text: "Bundesverfassung (BV)", x: 50, y: 29 },
+      { id: "l2", text: "Bundesgesetze (z.B. OR, StGB)", x: 50, y: 44 },
+      { id: "l3", text: "Verordnungen (Bundesrat)", x: 50, y: 58 },
+      { id: "l4", text: "Kantonales Recht", x: 50, y: 71 },
+      { id: "l5", text: "Gemeinderecht / Reglemente", x: 50, y: 84 }
     ],
     explain: "Die Normenpyramide zeigt die Hierarchie: Bundesverfassung (oberste Norm) → Bundesgesetze → Verordnungen → kantonales Recht → Gemeinderecht. Untere Normen dürfen oberen nicht widersprechen (lex superior)."
   },

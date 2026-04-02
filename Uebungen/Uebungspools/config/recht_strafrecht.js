@@ -1273,11 +1273,11 @@ window.QUESTIONS = [
     q: "Beschrifte die drei Stufen des strafrechtlichen Prüfschemas und ihre Unterelemente.",
     img: { src: "img/recht/strafrecht/strafrecht_pruefschema_beschriftung.svg", alt: "Dreigliedriges Prüfschema: Tatbestandsmässigkeit, Rechtswidrigkeit, Schuld" },
     labels: [
-      { id: "l1", text: "Tatbestandsmässigkeit", x: 50, y: 18 },
-      { id: "l2", text: "Objektiver Tatbestand (Tat, Erfolg, Kausalität)", x: 50, y: 32 },
-      { id: "l3", text: "Subjektiver Tatbestand (Vorsatz/Fahrlässigkeit)", x: 50, y: 46 },
-      { id: "l4", text: "Rechtswidrigkeit (keine Rechtfertigungsgründe)", x: 50, y: 64 },
-      { id: "l5", text: "Schuld (Schuldfähigkeit, keine Entschuldigung)", x: 50, y: 82 }
+      { id: "l1", text: "Tatbestandsmässigkeit", x: 50, y: 15 },
+      { id: "l2", text: "Objektiver Tatbestand (Tat, Erfolg, Kausalität)", x: 28, y: 30 },
+      { id: "l3", text: "Subjektiver Tatbestand (Vorsatz/Fahrlässigkeit)", x: 72, y: 30 },
+      { id: "l4", text: "Rechtswidrigkeit (keine Rechtfertigungsgründe)", x: 50, y: 57 },
+      { id: "l5", text: "Schuld (Schuldfähigkeit, keine Entschuldigung)", x: 50, y: 84 }
     ],
     explain: "Strafrechtliches Prüfschema: 1) Tatbestandsmässigkeit: objektiv (Handlung, Erfolg, Kausalität) + subjektiv (Vorsatz oder Fahrlässigkeit, Art. 12 StGB). 2) Rechtswidrigkeit: keine Notwehr (Art. 15), kein Notstand (Art. 17) etc. 3) Schuld: zurechnungsfähig (Art. 19) und keine Entschuldigung."
   },

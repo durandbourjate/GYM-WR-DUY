@@ -857,10 +857,10 @@ window.QUESTIONS = [
     q: "Beschrifte die vier Elemente des Marketing-Mix (4P).",
     img: { src: "img/bwl/marketing/marketing_4p_beschriftung.svg", alt: "Marketing-Mix 4P ohne Labels" },
     labels: [
-      { id: "l1", text: "Product (Produktpolitik)", x: 25, y: 30 },
-      { id: "l2", text: "Price (Preispolitik)", x: 75, y: 30 },
-      { id: "l3", text: "Place (Distributionspolitik)", x: 25, y: 70 },
-      { id: "l4", text: "Promotion (Kommunikationspolitik)", x: 75, y: 70 }
+      { id: "l1", text: "Product (Produktpolitik)", x: 23, y: 32 },
+      { id: "l2", text: "Price (Preispolitik)", x: 77, y: 32 },
+      { id: "l3", text: "Place (Distributionspolitik)", x: 23, y: 81 },
+      { id: "l4", text: "Promotion (Kommunikationspolitik)", x: 77, y: 81 }
     ],
     explain: "Die 4P: Product (Was? Sortiment, Qualität, Design), Price (Wie teuer? Strategie, Rabatte), Place (Wo? Vertriebskanäle, Logistik), Promotion (Wie bekannt machen? Werbung, PR, Verkaufsförderung)."
   },

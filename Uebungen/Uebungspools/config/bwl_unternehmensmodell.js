@@ -942,12 +942,12 @@ window.QUESTIONS = [
     q: "Beschrifte die sechs Elemente des St. Galler Unternehmensmodells.",
     img: { src: "img/bwl/unternehmensmodell/unternehmensmodell_beschriftung.svg", alt: "St. Galler Unternehmensmodell mit leeren Bereichen" },
     labels: [
-      { id: "l1", text: "Unternehmen (Kern)", x: 50, y: 50 },
+      { id: "l1", text: "Unternehmen (Kern)", x: 50, y: 53 },
       { id: "l2", text: "Anspruchsgruppen (Stakeholder)", x: 50, y: 25 },
-      { id: "l3", text: "Umweltsphären", x: 85, y: 50 },
-      { id: "l4", text: "Interaktionsthemen", x: 50, y: 75 },
-      { id: "l5", text: "Ordnungsmomente (Strategie, Struktur, Kultur)", x: 15, y: 35 },
-      { id: "l6", text: "Prozesse (Management-, Geschäfts-, Unterstützungsproz.)", x: 15, y: 65 }
+      { id: "l3", text: "Umweltsphären", x: 85, y: 53 },
+      { id: "l4", text: "Interaktionsthemen", x: 50, y: 87 },
+      { id: "l5", text: "Ordnungsmomente (Strategie, Struktur, Kultur)", x: 41, y: 44 },
+      { id: "l6", text: "Prozesse (Management-, Geschäfts-, Unterstützungsproz.)", x: 41, y: 62 }
     ],
     explain: "Das St. Galler Modell zeigt: Unternehmen im Zentrum, umgeben von Anspruchsgruppen (Kunden, MA, Aktionäre...), eingebettet in Umweltsphären. Ordnungsmomente (Strategie, Struktur, Kultur) steuern die Prozesse."
   },

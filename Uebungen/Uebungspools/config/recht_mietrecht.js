@@ -1106,11 +1106,11 @@ window.QUESTIONS = [
     q: "Beschrifte das Mietrecht-Diagramm: Vertragsgrundlage, Pflichten beider Parteien, Mängelrecht und Kündigung.",
     img: { src: "img/recht/mietrecht/mietrecht_systematik_beschriftung.svg", alt: "Flussdiagramm Mietrecht: Vertrag, Pflichten, Mängel, Kündigung" },
     labels: [
-      { id: "l1", text: "Mietvertrag (OR 253 ff.)", x: 50, y: 12 },
-      { id: "l2", text: "Gebrauchsüberlassung (Vermieter)", x: 25, y: 35 },
-      { id: "l3", text: "Mietzinszahlung (Mieter)", x: 75, y: 35 },
-      { id: "l4", text: "Mängelrecht (OR 259a–i)", x: 50, y: 58 },
-      { id: "l5", text: "Kündigung + Erstreckung", x: 50, y: 82 }
+      { id: "l1", text: "Mietvertrag (OR 253 ff.)", x: 50, y: 17 },
+      { id: "l2", text: "Gebrauchsüberlassung (Vermieter)", x: 25, y: 40 },
+      { id: "l3", text: "Mietzinszahlung (Mieter)", x: 75, y: 40 },
+      { id: "l4", text: "Mängelrecht (OR 259a–i)", x: 50, y: 62 },
+      { id: "l5", text: "Kündigung + Erstreckung", x: 50, y: 83 }
     ],
     explain: "Mietvertrag (OR 253): Vermieter überlässt Gebrauch, Mieter zahlt Mietzins. Bei Mängeln: Mängelrechte (Herabsetzung, Hinterlegung, fristlose Kündigung bei schweren Mängeln). Kündigung mit Formvorschriften (OR 266l), Erstreckung möglich (OR 272)."
   },

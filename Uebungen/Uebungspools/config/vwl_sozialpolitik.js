@@ -1060,12 +1060,12 @@ window.QUESTIONS = [
   q: "Beschrifte die drei Säulen der Schweizer Altersvorsorge und ihre Merkmale.",
   img: { src: "img/vwl/sozialpolitik/sozialpolitik_drei_saeulen_beschriftung.svg", alt: "Drei-Säulen-System der Schweizer Altersvorsorge mit sechs nummerierten Beschriftungspunkten" },
   labels: [
-    {id: "l1", text: "1. Säule: AHV/IV (staatlich)", x: 20, y: 40},
-    {id: "l2", text: "Existenzsicherung", x: 20, y: 65},
-    {id: "l3", text: "2. Säule: BVG (beruflich)", x: 50, y: 40},
-    {id: "l4", text: "Gewohnten Lebensstandard sichern", x: 50, y: 65},
-    {id: "l5", text: "3. Säule: Private Vorsorge", x: 80, y: 40},
-    {id: "l6", text: "Individuelle Ergänzung (3a/3b)", x: 80, y: 65}
+    {id: "l1", text: "1. Säule: AHV/IV (staatlich)", x: 23, y: 32},
+    {id: "l2", text: "Existenzsicherung", x: 23, y: 55},
+    {id: "l3", text: "2. Säule: BVG (beruflich)", x: 50, y: 35},
+    {id: "l4", text: "Gewohnten Lebensstandard sichern", x: 50, y: 58},
+    {id: "l5", text: "3. Säule: Private Vorsorge", x: 78, y: 38},
+    {id: "l6", text: "Individuelle Ergänzung (3a/3b)", x: 78, y: 60}
   ],
   explain: "1. Säule (AHV/IV): Staatlich, Umlageverfahren, Existenzsicherung. 2. Säule (BVG): Beruflich, Kapitaldeckung, zusammen mit 1. Säule ca. 60% des Lohns. 3. Säule: Freiwillig, privat (3a steuerbegünstigt)."
 },

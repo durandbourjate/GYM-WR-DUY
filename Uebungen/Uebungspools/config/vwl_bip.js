@@ -584,11 +584,11 @@ window.QUESTIONS = [
   q: "Beschrifte die vier Komponenten des BIP nach Verwendungsseite und die Formel.",
   img: { src: "img/vwl/bip/bip_verwendung_beschriftung.svg", alt: "BIP-Verwendungskomponenten mit fünf nummerierten Beschriftungspunkten" },
   labels: [
-    {id: "l1", text: "Privater Konsum (C)", x: 30, y: 40},
-    {id: "l2", text: "Staatlicher Konsum (G)", x: 70, y: 35},
-    {id: "l3", text: "Investitionen (I)", x: 70, y: 65},
-    {id: "l4", text: "Nettoexporte (NX = X − M)", x: 30, y: 75},
-    {id: "l5", text: "Y = C + I + G + NX", x: 50, y: 10}
+    {id: "l1", text: "Privater Konsum (C)", x: 40, y: 41},
+    {id: "l2", text: "Staatlicher Konsum (G)", x: 32, y: 79},
+    {id: "l3", text: "Investitionen (I)", x: 49, y: 67},
+    {id: "l4", text: "Nettoexporte (NX = X − M)", x: 22, y: 57},
+    {id: "l5", text: "Y = C + I + G + NX", x: 85, y: 92}
   ],
   explain: "Das BIP nach Verwendungsseite: Y = C + I + G + NX. Privater Konsum (C, ca. 52%), Staatlicher Konsum (G, ca. 12%), Investitionen (I, ca. 25%), Nettoexporte (NX, ca. 11% in der Schweiz)."
 },

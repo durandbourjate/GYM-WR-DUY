@@ -714,12 +714,12 @@ window.QUESTIONS = [
     q: "Beschrifte das Stufenmodell der Handlungsfähigkeit mit den richtigen Begriffen und Voraussetzungen.",
     img: { src: "img/recht/personenrecht/personenrecht_handlungsfaehigkeit_beschriftung.svg", alt: "Stufenmodell der Handlungsfähigkeit: voll, beschränkt, handlungsunfähig" },
     labels: [
-      { id: "l1", text: "Handlungsfähigkeit", x: 50, y: 12 },
-      { id: "l2", text: "Urteilsfähigkeit + Mündigkeit", x: 50, y: 28 },
-      { id: "l3", text: "Beschränkte Handlungsfähigkeit", x: 50, y: 48 },
-      { id: "l4", text: "Urteilsfähig, aber unmündig (< 18 J.)", x: 50, y: 62 },
-      { id: "l5", text: "Handlungsunfähigkeit", x: 50, y: 80 },
-      { id: "l6", text: "Urteilsunfähig (z.B. Kleinkind)", x: 50, y: 92 }
+      { id: "l1", text: "Handlungsfähigkeit", x: 50, y: 15 },
+      { id: "l2", text: "Urteilsfähigkeit + Mündigkeit", x: 50, y: 26 },
+      { id: "l3", text: "Beschränkte Handlungsfähigkeit", x: 50, y: 42 },
+      { id: "l4", text: "Urteilsfähig, aber unmündig (< 18 J.)", x: 50, y: 52 },
+      { id: "l5", text: "Handlungsunfähigkeit", x: 50, y: 69 },
+      { id: "l6", text: "Urteilsunfähig (z.B. Kleinkind)", x: 50, y: 79 }
     ],
     explain: "Handlungsfähigkeit = Urteilsfähigkeit + Mündigkeit (18 J., Art. 12–14 ZGB). Beschränkt handlungsfähig = urteilsfähig, aber unter 18 (Art. 19 ZGB). Handlungsunfähig = urteilsunfähig (Kleinkinder, schwere geistige Beeinträchtigung, Art. 16 ZGB)."
   },

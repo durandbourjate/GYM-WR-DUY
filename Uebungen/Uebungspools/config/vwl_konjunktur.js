@@ -1002,11 +1002,11 @@ window.QUESTIONS = [
       alt: "Konjunkturzyklus mit fünf nummerierten Beschriftungspunkten"
     },
     labels: [
-      {id: "l1", text: "Trend (Produktionspotenzial)", x: 88.75, y: 20.4},
-      {id: "l2", text: "Aufschwung", x: 18.1, y: 24},
-      {id: "l3", text: "Hochkonjunktur (Boom)", x: 37.5, y: 15.1},
-      {id: "l4", text: "Abschwung", x: 57.25, y: 28.9},
-      {id: "l5", text: "Rezession (Talsohle)", x: 67.5, y: 81.3}
+      {id: "l1", text: "Trend (Produktionspotenzial)", x: 88.75, y: 34},
+      {id: "l2", text: "Aufschwung", x: 31, y: 56},
+      {id: "l3", text: "Hochkonjunktur (Boom)", x: 37.5, y: 42},
+      {id: "l4", text: "Abschwung", x: 53, y: 58},
+      {id: "l5", text: "Rezession (Talsohle)", x: 54, y: 67}
     ],
     explain: "Die fünf Elemente: (1) Die gestrichelte Trendlinie zeigt das Produktionspotenzial — die langfristige Wachstumskapazität. (2) Aufschwung: BIP steigt zum Trend. (3) Hochkonjunktur/Boom: BIP liegt über dem Trend (positive Outputlücke). (4) Abschwung: BIP fällt zurück. (5) Rezession/Talsohle: BIP liegt unter dem Trend (negative Outputlücke)."
   },
