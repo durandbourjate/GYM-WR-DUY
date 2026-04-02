@@ -48,4 +48,34 @@ describe('erstelleBlock', () => {
     const ids2 = block2.map(f => f.id).join(',')
     expect(ids1 !== ids2 || block1.length <= 2).toBe(true)
   })
+
+  it('priorisiert ueben-Fragen vor neuen', () => {
+    const fragen = [
+      macheFrage('f1', 'Add'), // wird neu
+      macheFrage('f2', 'Add'), // wird ueben
+      macheFrage('f3', 'Add'), // wird gefestigt
+    ]
+    const mastery = { f1: 'neu' as const, f2: 'ueben' as const, f3: 'gefestigt' as const }
+    const block = erstelleBlock(fragen, 'Add', { mastery, seed: 'test' })
+
+    // ueben (f2) sollte vor neu (f1) kommen, gefestigt (f3) zuletzt
+    const indexF2 = block.findIndex(f => f.id === 'f2')
+    const indexF1 = block.findIndex(f => f.id === 'f1')
+    const indexF3 = block.findIndex(f => f.id === 'f3')
+    expect(indexF2).toBeLessThan(indexF1)
+    expect(indexF1).toBeLessThan(indexF3)
+  })
+
+  it('gemeisterte Fragen kommen zuletzt', () => {
+    const fragen = [
+      macheFrage('f1', 'Add'),
+      macheFrage('f2', 'Add'),
+      macheFrage('f3', 'Add'),
+    ]
+    const mastery = { f1: 'gemeistert' as const, f2: 'neu' as const, f3: 'ueben' as const }
+    const block = erstelleBlock(fragen, 'Add', { mastery, seed: 'test' })
+
+    const indexF1 = block.findIndex(f => f.id === 'f1')
+    expect(indexF1).toBe(block.length - 1)
+  })
 })
