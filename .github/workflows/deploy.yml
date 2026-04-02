@@ -30,6 +30,7 @@ jobs:
           cache-dependency-path: |
             Unterrichtsplaner/package-lock.json
             Pruefung/package-lock.json
+            Lernplattform/package-lock.json
 
       - name: Install Unterrichtsplaner dependencies
         working-directory: Unterrichtsplaner
@@ -50,10 +51,22 @@ jobs:
           VITE_APPS_SCRIPT_URL: ${{ secrets.VITE_APPS_SCRIPT_URL }}
         run: npx tsc -b && npx vite build
 
-      # Combine: repo root (Uebungen etc.) + Unterrichtsplaner + Pruefung builds
+      - name: Install Lernplattform dependencies
+        working-directory: Lernplattform
+        run: npm ci
+
+      - name: Build Lernplattform
+        working-directory: Lernplattform
+        env:
+          VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
+          VITE_APPS_SCRIPT_URL: ${{ secrets.VITE_APPS_SCRIPT_URL }}
+          VITE_BASE_PATH: /GYM-WR-DUY/Lernplattform/
+        run: npx tsc -b && npx vite build
+
+      # Combine: repo root (Uebungen etc.) + Unterrichtsplaner + Pruefung + Lernplattform builds
       - name: Prepare combined site
         run: |
-          mkdir -p _site/Unterrichtsplaner _site/Pruefung
+          mkdir -p _site/Unterrichtsplaner _site/Pruefung _site/Lernplattform
           # Copy static content (Uebungen + root landing page)
           cp -r Uebungen _site/Uebungen
           cp index.html _site/ 2>/dev/null || true
@@ -61,6 +74,8 @@ jobs:
           cp -r Unterrichtsplaner/dist/* _site/Unterrichtsplaner/
           # Copy Pruefung build output
           cp -r Pruefung/dist/* _site/Pruefung/
+          # Copy Lernplattform build output
+          cp -r Lernplattform/dist/* _site/Lernplattform/
           # Clean up macOS artifacts
           find _site -name '.DS_Store' -delete
 
