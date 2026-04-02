@@ -814,6 +814,8 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen, performa
               <BewertungsrasterEditor
                 bewertungsraster={bewertungsraster}
                 setBewertungsraster={setBewertungsraster}
+                fachbereich={fachbereich}
+                fragePunkte={punkte}
                 extraContent={
                   typ === 'tkonto' ? (
                     <TKontoBewertungsoptionen

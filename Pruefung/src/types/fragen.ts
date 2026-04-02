@@ -82,10 +82,16 @@ export type Fachbereich = 'VWL' | 'BWL' | 'Recht' | 'Informatik' | 'Allgemein';
 export type Gefaess = 'SF' | 'EF' | 'EWR' | 'GF';
 export type BloomStufe = 'K1' | 'K2' | 'K3' | 'K4' | 'K5' | 'K6';
 
+export interface Niveaustufe {
+  punkte: number;        // z.B. 3, 2, 1, 0
+  beschreibung: string;  // z.B. "Schlüssige Argumentation mit mehreren Belegen"
+}
+
 export interface Bewertungskriterium {
   beschreibung: string;
   punkte: number;
   stichworte?: string[];
+  niveaustufen?: Niveaustufe[];  // Optionale Abstufungen für präzisere Bewertung
 }
 
 export interface Verwendung {

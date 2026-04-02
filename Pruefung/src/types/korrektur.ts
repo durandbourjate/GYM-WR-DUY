@@ -1,5 +1,15 @@
 import type { Antwort } from './antworten.ts'
 
+// === Bewertung eines einzelnen Kriteriums (kriterienbasierte KI-Korrektur) ===
+
+export interface KriteriumBewertung {
+  kriterium: string        // Beschreibung des Kriteriums (aus Bewertungsraster)
+  maxPunkte: number
+  kiPunkte: number | null  // KI-Vorschlag pro Kriterium
+  lpPunkte: number | null  // LP-Überschreibung pro Kriterium
+  kurzbegruendung?: string // KI-Erklärung für dieses Kriterium
+}
+
 // === Bewertung einer einzelnen Frage für einen SuS ===
 
 export interface FragenBewertung {
@@ -10,6 +20,9 @@ export interface FragenBewertung {
   maxPunkte: number
   kiPunkte: number | null       // KI-Vorschlag (null wenn nicht KI-bewertet)
   lpPunkte: number | null       // LP-Anpassung (null = KI-Wert übernehmen)
+
+  // Kriterienbasierte Bewertung (optional, bei Fragen mit Bewertungsraster)
+  kriterienBewertung?: KriteriumBewertung[]
 
   // Texte
   kiBegruendung: string | null  // Interne Begründung für LP

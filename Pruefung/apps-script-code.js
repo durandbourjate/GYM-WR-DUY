@@ -3414,7 +3414,7 @@ function kiAssistentEndpoint(body) {
 
       case 'bewertungsrasterGenerieren':
         if (!daten.fragetext) return jsonResponse({ error: 'Fragetext fehlt' });
-        userPrompt = 'Erstelle ein Bewertungsraster für die folgende Prüfungsfrage.\n\n' +
+        userPrompt = 'Erstelle ein Bewertungsraster mit Niveaustufen für die folgende Prüfungsfrage.\n\n' +
           'Fragetext:\n' + wrapUserData('fragetext', daten.fragetext) + '\n' +
           'Fragetyp: ' + wrapUserData('typ', daten.typ || 'freitext') + '\n' +
           'Fachbereich: ' + wrapUserData('fachbereich', daten.fachbereich || '?') + '\n' +
@@ -3422,8 +3422,10 @@ function kiAssistentEndpoint(body) {
           'Punkte: ' + wrapUserData('punkte', daten.punkte || '?') + '\n' +
           (daten.musterlosung ? 'Musterlösung:\n' + wrapUserData('musterlosung', daten.musterlosung) + '\n' : '') + '\n' +
           'Erstelle ein Bewertungsraster mit konkreten, messbaren Kriterien. ' +
-          'Die Summe der Kriterien-Punkte muss exakt ' + wrapUserData('punkte', daten.punkte || '?') + ' ergeben.\n\n' +
-          'Antworte als JSON: { "kriterien": [{ "beschreibung": "...", "punkte": 1 }, ...] }';
+          'Die Summe der Kriterien-Punkte muss exakt ' + wrapUserData('punkte', daten.punkte || '?') + ' ergeben.\n' +
+          'Erstelle für JEDES Kriterium Niveaustufen (Abstufungen von Max-Punkten bis 0), die beschreiben, ' +
+          'was für die jeweilige Punktzahl erwartet wird. Niveaustufen in 0.5- oder 1-Schritten.\n\n' +
+          'Antworte als JSON: { "kriterien": [{ "beschreibung": "...", "punkte": 2, "niveaustufen": [{ "punkte": 2, "beschreibung": "Volle Leistung..." }, { "punkte": 1, "beschreibung": "Teilleistung..." }, { "punkte": 0, "beschreibung": "Nicht erfüllt..." }] }, ...] }';
         result = rufeClaudeAuf(systemPrompt, userPrompt, undefined, email);
         return jsonResponse({ success: true, ergebnis: result });
 
@@ -3437,9 +3439,13 @@ function kiAssistentEndpoint(body) {
           'Punkte: ' + wrapUserData('punkte', daten.punkte || '?') + '\n' +
           (daten.musterlosung ? 'Musterlösung:\n' + wrapUserData('musterlosung', daten.musterlosung) + '\n' : '') + '\n' +
           'Aktuelles Bewertungsraster:\n' + wrapUserData('bewertungsraster', JSON.stringify(daten.bewertungsraster)) + '\n\n' +
-          'Prüfe: Sind die Kriterien messbar und eindeutig? Stimmt die Punkteverteilung? Fehlen wichtige Aspekte? ' +
-          'Vorschläge für Verbesserungen machen.\n\n' +
-          'Antworte als JSON: { "bewertung": "Freitext-Analyse des Rasters", "verbesserteKriterien": [{ "beschreibung": "...", "punkte": 1 }, ...] }';
+          'Prüfe:\n' +
+          '- Sind die Kriterien messbar und eindeutig?\n' +
+          '- Stimmt die Punkteverteilung?\n' +
+          '- Fehlen wichtige Aspekte?\n' +
+          '- Sind die Niveaustufen trennscharf (unterscheiden sich klar voneinander)?\n' +
+          '- Fehlen Niveaustufen? Wenn ja, ergänze sie.\n\n' +
+          'Antworte als JSON: { "bewertung": "Freitext-Analyse des Rasters", "verbesserteKriterien": [{ "beschreibung": "...", "punkte": 2, "niveaustufen": [{ "punkte": 2, "beschreibung": "..." }, { "punkte": 1, "beschreibung": "..." }, { "punkte": 0, "beschreibung": "..." }] }, ...] }';
         result = rufeClaudeAuf(systemPrompt, userPrompt, undefined, email);
         return jsonResponse({ success: true, ergebnis: result });
 
@@ -3610,10 +3616,27 @@ function kiAssistentEndpoint(body) {
         var ftLernziel = daten.lernziel || '';
 
         var ftSysPrompt = korrekturSystemPrompt();
+
+        // Bewertungsraster mit Niveaustufen aufbereiten
         var ftRaster = '';
+        var ftHatNiveaustufen = false;
         if (ftBewertungsraster && Array.isArray(ftBewertungsraster)) {
-          ftRaster = ftBewertungsraster.map(function(b) { return '- ' + b.beschreibung + ' (' + b.punkte + ' P.)'; }).join('\n');
+          ftRaster = ftBewertungsraster.map(function(b) {
+            var zeile = '- ' + b.beschreibung + ' (' + b.punkte + ' P.)';
+            if (b.niveaustufen && Array.isArray(b.niveaustufen) && b.niveaustufen.length > 0) {
+              ftHatNiveaustufen = true;
+              zeile += '\n' + b.niveaustufen.map(function(n) {
+                return '  ' + n.punkte + 'P: ' + n.beschreibung;
+              }).join('\n');
+            }
+            return zeile;
+          }).join('\n');
         }
+
+        // Prompt je nach Niveaustufen-Verfügbarkeit anpassen
+        var ftJsonFormat = ftHatNiveaustufen && ftBewertungsraster.length > 0
+          ? '{"punkte": <number>, "begruendung": "<1-2 Sätze>", "kriterienBewertung": [{"kriterium": "<Name>", "punkte": <number>, "kurzbegruendung": "<1 Satz>"}]}'
+          : '{"punkte": <number>, "begruendung": "<1-2 Sätze>"}';
 
         var ftUserPrompt = 'Frage: ' + wrapUserData('fragetext', ftFragetext) + '\n' +
           'Maximale Punkte: ' + wrapUserData('maxPunkte', ftMaxPunkte) + '\n' +
@@ -3621,10 +3644,11 @@ function kiAssistentEndpoint(body) {
           (ftBloom ? 'Taxonomie-Stufe: ' + wrapUserData('bloom', ftBloom) + '\n' : '') +
           (ftLernziel ? 'Lernziel: ' + wrapUserData('lernziel', ftLernziel) + '\n' : '') +
           (ftRaster ? 'Bewertungsraster:\n' + wrapUserData('bewertungsraster', ftRaster) + '\n' : '') +
+          (ftHatNiveaustufen ? '\nBewerte JEDES Kriterium einzeln anhand der Niveaustufen. Die Gesamtpunkte = Summe der Kriterien-Punkte.\n' : '') +
           '\nSchülerantwort:\n' + wrapUserData('antwortText', ftAntwortText) + '\n\n' +
-          'Antworte ausschliesslich als JSON: {"punkte": <number>, "begruendung": "<1-2 Sätze>"}';
+          'Antworte ausschliesslich als JSON: ' + ftJsonFormat;
 
-        var ftResult = rufeClaudeAuf(ftSysPrompt, ftUserPrompt, 1024, email);
+        var ftResult = rufeClaudeAuf(ftSysPrompt, ftUserPrompt, 1536, email);
 
         // Punkte auf [0, maxPunkte] begrenzen
         var ftPunkte = Number(ftResult.punkte) || 0;
@@ -3632,7 +3656,30 @@ function kiAssistentEndpoint(body) {
 
         var ftBegruendung = (ftResult.begruendung || '').substring(0, 500);
 
-        return jsonResponse({ success: true, ergebnis: { punkte: ftPunkte, begruendung: ftBegruendung } });
+        // KriterienBewertung aufbereiten (optional)
+        var ftKriterienBewertung = null;
+        if (ftResult.kriterienBewertung && Array.isArray(ftResult.kriterienBewertung)) {
+          ftKriterienBewertung = ftResult.kriterienBewertung.map(function(kb) {
+            var kbPunkte = Number(kb.punkte) || 0;
+            // Finde max-Punkte für dieses Kriterium
+            var maxKb = ftMaxPunkte;
+            if (ftBewertungsraster) {
+              var match = ftBewertungsraster.find(function(b) { return b.beschreibung === kb.kriterium; });
+              if (match) maxKb = match.punkte;
+            }
+            return {
+              kriterium: String(kb.kriterium || ''),
+              punkte: Math.max(0, Math.min(maxKb, kbPunkte)),
+              maxPunkte: maxKb,
+              kurzbegruendung: String(kb.kurzbegruendung || '').substring(0, 200)
+            };
+          });
+        }
+
+        var ftErgebnis = { punkte: ftPunkte, begruendung: ftBegruendung };
+        if (ftKriterienBewertung) ftErgebnis.kriterienBewertung = ftKriterienBewertung;
+
+        return jsonResponse({ success: true, ergebnis: ftErgebnis });
       }
 
       case 'korrigiereZeichnung': {
@@ -3732,8 +3779,9 @@ function korrekturSystemPrompt() {
     '- Punkte in 0.5-Schritten vergeben (0, 0.5, 1, 1.5, ...)\n' +
     '- Begründung: 1–2 Sätze, sachlich, mit Bezug auf die korrekte Lösung. Keine Lob-Floskeln.\n' +
     '- Bloom-Stufen beachten: K1–K2 = streng faktisch (Wissen/Verstehen), K3–K4 = Anwendung/Analyse bewerten, K5–K6 = Argumentation/Kreativität würdigen\n' +
-    '- Bei Teilleistungen: Teilpunkte vergeben, nicht alles-oder-nichts\n\n' +
-    'Antworte ausschliesslich als JSON: { "punkte": number, "begruendung": string }';
+    '- Bei Teilleistungen: Teilpunkte vergeben, nicht alles-oder-nichts\n' +
+    '- Wenn Niveaustufen vorhanden: Jedes Kriterium einzeln bewerten, Stufe zuordnen, Gesamtpunkte = Summe\n\n' +
+    'Antworte ausschliesslich als JSON gemäss dem im Prompt angegebenen Format.';
 }
 
 // DATENSCHUTZ: Nur PDF-Annotationen + Frage-Kontext an Claude — KEINE Schüler-Identifikatoren

@@ -12,7 +12,7 @@
 - ~~Apps Script Deploy nötig~~ ✅ 31.03.2026 — Session 38 + 40 deployed (Heartbeat v3, Security, Ownership-Fix)
 - **Tier 2 Features (später):** Diktat, GeoGebra/Desmos, Randomisierte Zahlenvarianten, Code-Ausführung (Sandbox)
 - **Übungspools ↔ Prüfungstool** — Lern-Analytik, Login, KI-Empfehlungen (eigenes Designprojekt)
-- **Bewertungsraster-Vertiefung** — Überfachliche Kriterien, kriterienbasiertes KI-Feedback
+- ~~**Bewertungsraster-Vertiefung**~~ ✅ 02.04.2026 — Niveaustufen, 12 Standard-Vorlagen, kriterienbasierte KI-Korrektur. **Apps Script Deploy nötig.**
 - **TaF Phasen-UI** — klassenTyp-Feld vorhanden, UI für Phasen-Auswahl noch nicht (auf nächstes SJ verschoben)
 - ~~**Übungspools: 8 neue Fragetypen**~~ ✅ 01.04.2026 — sortierung, formel, hotspot, bildbeschriftung, dragdrop_bild, code, zeichnen, pdf. Inkl. TYPE_HANDLERS Refactoring. Audio weggelassen (kein Backend in Pools).
 - ~~**Zeichnen Input-Verlust (Prüfungstool)**~~ ✅ 02.04.2026 — Ref-basierter Stift-Buffer + rAF-Rendering. Browser-verifiziert.
@@ -27,6 +27,47 @@
   - ~~Demo-Modus Bypass via sessionStorage~~ ✅ 02.04.2026 — istDemoModus nur in React-State, nicht manipulierbar
   - Prompt Injection bei KI-Assistent (User-Input unsanitisiert an Claude)
   - ~~`pruefung-state-*` in localStorage bleibt nach Abgabe~~ ✅ 02.04.2026 — persist.clearStorage() nach Abgabe
+
+---
+
+## Session 52 — Bewertungsraster-Vertiefung: Niveaustufen + 12 Vorlagen + KI-Kriterien (02.04.2026)
+
+### Stand
+Branch `feature/bewertungsraster-vertiefung`. tsc ✅ | 193 Tests ✅ | Build ✅. **Noch NICHT auf main** — Browser-Test ausstehend. **Apps Script Deploy nötig** nach Merge.
+
+### Änderungen
+
+| # | Änderung | Dateien |
+|---|----------|---------|
+| 1 | **Datenmodell:** `Niveaustufe` Interface + `niveaustufen?` in `Bewertungskriterium` | `types/fragen.ts` |
+| 2 | **Korrektur-Typen:** `KriteriumBewertung` Interface + `kriterienBewertung?` in `FragenBewertung` | `types/korrektur.ts` |
+| 3 | **12 Standard-Vorlagen** mit Niveaustufen: 5 fachübergreifend + 4 WR + 3 andere Fachschaften | `data/bewertungsrasterVorlagen.ts` (NEU) |
+| 4 | **BewertungsrasterEditor:** Fachbereich-Filter, Niveaustufen-UI (aufklappbar), Punkte-Skalierung, Custom-Vorlagen migriert | `BewertungsrasterEditor.tsx` |
+| 5 | **KI-Prompt: bewertungsrasterGenerieren** → generiert jetzt Niveaustufen mit | `apps-script-code.js` |
+| 6 | **KI-Prompt: bewertungsrasterVerbessern** → prüft Trennschärfe der Niveaustufen | `apps-script-code.js` |
+| 7 | **KI-Prompt: korrigiereFreitext** → bewertet pro Kriterium einzeln (wenn Niveaustufen vorhanden) | `apps-script-code.js` |
+| 8 | **KorrekturFrageZeile:** Zeigt kriterienbasierte Detailbewertung (Punkte + Kurzkommentar pro Kriterium) | `KorrekturFrageZeile.tsx` |
+
+### Vorlagen-Katalog
+
+| Kategorie | Vorlagen |
+|-----------|----------|
+| Fachübergreifend | Freitext Kurz, Freitext Lang, Analyse/Fallstudie, Berechnung mit Erklärung, Grafik interpretieren |
+| Recht | Rechtsfallanalyse (Sachverhalt → Norm → Subsumtion → Ergebnis) |
+| VWL | VWL-Modellanalyse (Modell → Grafik → Wirkungskette → Transfer) |
+| BWL | BWL Entscheidungsaufgabe, Buchhalterische Begründung |
+| Sprachen | Textproduktion (Inhalt, Sprache, Aufbau, Formalia) |
+| Geschichte | Quellenanalyse (Einordnung, Analyse, Kontext, Bewertung) |
+| MINT | Experimentbeschreibung (Hypothese, Methode, Beobachtung, Interpretation) |
+
+### Abwärtskompatibilität
+- Alle bestehenden Fragen/Raster funktionieren weiter (niveaustufen = optional)
+- Alte localStorage-Vorlagen werden automatisch migriert
+- KI-Korrektur fällt auf Gesamtpunkte-Modus zurück wenn keine Niveaustufen vorhanden
+
+### Offene Punkte
+- Browser-Test vor Merge
+- Apps Script Deploy nach Merge (User muss manuell neue Bereitstellung erstellen)
 
 ---
 

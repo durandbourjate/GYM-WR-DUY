@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { FragenBewertung } from '../../../types/korrektur.ts'
+import type { FragenBewertung, KriteriumBewertung } from '../../../types/korrektur.ts'
 import type { Frage, FreitextFrage } from '../../../types/fragen.ts'
 import type { Antwort } from '../../../types/antworten.ts'
 import type { KorrekturErgebnis } from '../../../utils/autoKorrektur.ts'
@@ -21,7 +21,7 @@ interface Props {
   aufgabeNr?: number
   /** E-Mail der LP (für API-Key-Routing bei KI-Korrektur) */
   userEmail?: string
-  onUpdate: (updates: { lpPunkte?: number | null; lpKommentar?: string | null; geprueft?: boolean; audioKommentarId?: string | null; kiPunkte?: number | null; kiBegruendung?: string | null; quelle?: 'auto' | 'ki' | 'manuell' | 'fehler' }) => void
+  onUpdate: (updates: { lpPunkte?: number | null; lpKommentar?: string | null; geprueft?: boolean; audioKommentarId?: string | null; kiPunkte?: number | null; kiBegruendung?: string | null; quelle?: 'auto' | 'ki' | 'manuell' | 'fehler'; kriterienBewertung?: KriteriumBewertung[] | null }) => void
   onAudioUpload: (frageId: string, blob: Blob) => Promise<string | null>
 }
 
@@ -81,13 +81,24 @@ export default function KorrekturFrageZeile({
         bewertungsraster: frage.bewertungsraster || [],
         lernziel: frage.lehrplanziel || '',
       })
-      const ergebnis = result?.ergebnis as { punkte?: number; begruendung?: string } | undefined
+      const ergebnis = result?.ergebnis as { punkte?: number; begruendung?: string; kriterienBewertung?: Array<{ kriterium: string; punkte: number; maxPunkte: number; kurzbegruendung?: string }> } | undefined
       if (ergebnis) {
-        onUpdate({
+        const updates: Parameters<typeof onUpdate>[0] = {
           kiPunkte: ergebnis.punkte ?? null,
           kiBegruendung: ergebnis.begruendung || null,
           quelle: 'ki' as const,
-        })
+        }
+        // Kriterienbasierte Bewertung übernehmen (wenn vorhanden)
+        if (ergebnis.kriterienBewertung && Array.isArray(ergebnis.kriterienBewertung)) {
+          updates.kriterienBewertung = ergebnis.kriterienBewertung.map(kb => ({
+            kriterium: kb.kriterium,
+            maxPunkte: kb.maxPunkte,
+            kiPunkte: kb.punkte ?? null,
+            lpPunkte: null,
+            kurzbegruendung: kb.kurzbegruendung,
+          }))
+        }
+        onUpdate(updates)
       }
     } catch (err) {
       console.error('[KI-Vorschlag] Fehler:', err)
@@ -162,6 +173,39 @@ export default function KorrekturFrageZeile({
               </span>
             )}
           </div>
+
+          {/* Kriterienbasierte Detailbewertung */}
+          {bewertung.kriterienBewertung && bewertung.kriterienBewertung.length > 0 && (
+            <div className="mt-1.5 rounded border border-slate-200 dark:border-slate-600 overflow-hidden">
+              <div className="px-3 py-1 bg-slate-50 dark:bg-slate-700/50 text-xs font-medium text-slate-500 dark:text-slate-400">
+                Bewertung pro Kriterium
+              </div>
+              <div className="divide-y divide-slate-100 dark:divide-slate-700">
+                {bewertung.kriterienBewertung.map((kb, idx) => (
+                  <div key={idx} className="flex items-start gap-2 px-3 py-1.5">
+                    <span className="text-xs text-slate-600 dark:text-slate-300 flex-1 min-w-0">
+                      {kb.kriterium}
+                    </span>
+                    <span className={`text-xs font-semibold tabular-nums shrink-0 ${
+                      (kb.lpPunkte ?? kb.kiPunkte ?? 0) === kb.maxPunkte
+                        ? 'text-green-600 dark:text-green-400'
+                        : (kb.lpPunkte ?? kb.kiPunkte ?? 0) === 0
+                          ? 'text-red-500 dark:text-red-400'
+                          : 'text-slate-700 dark:text-slate-200'
+                    }`}>
+                      {kb.lpPunkte ?? kb.kiPunkte ?? 0}/{kb.maxPunkte}
+                    </span>
+                    {kb.kurzbegruendung && (
+                      <span className="text-[10px] text-slate-400 dark:text-slate-500 italic max-w-[50%] truncate shrink-0" title={kb.kurzbegruendung}>
+                        {kb.kurzbegruendung}
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {bewertung.kiFeedback && (
             <div className="rounded bg-amber-50 dark:bg-amber-900/15 border border-amber-200/50 dark:border-amber-700/30 px-3 py-1.5">
               <p className="text-xs text-amber-800 dark:text-amber-300">
