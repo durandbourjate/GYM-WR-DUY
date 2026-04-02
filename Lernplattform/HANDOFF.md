@@ -3,98 +3,82 @@
 ## Aktueller Stand
 
 **Branch:** `main`
-**Phase:** 4 von 7 (Eltern-/LP-Dashboard)
-**Status:** Implementation abgeschlossen, 64 Tests gruen, Build gruen
+**Phase:** 5 von 7 (Auftraege + Empfehlungen)
+**Status:** Implementation abgeschlossen, 69 Tests gruen, Build gruen
 
 ### Verifikation (03.04.2026)
 
 | Check | Status |
 |-------|--------|
 | `npx tsc -b` | OK |
-| `npx vitest run` | 64 Tests gruen (8 Testdateien) |
-| `npm run build` | OK (dist/ erstellt, 247 KB JS) |
+| `npx vitest run` | 69 Tests gruen (9 Testdateien) |
+| `npm run build` | OK (dist/ erstellt, 257 KB JS) |
 | Pruefungstool Regression | 193 Tests gruen, tsc OK |
 
 ---
 
-## Phase 1 (02.04.2026) — Grundgeruest + Auth + Gruppen
-Scaffolding, Auth (Google OAuth + Code), Gruppen-System. 17 Tests.
+## Phasen-Uebersicht
 
-## Phase 2 (03.04.2026) — Fragenbank + Uebungs-Engine
-8 Fragetypen, Block-Builder, UebungsScreen, Zusammenfassung, Mock-Daten. +22 Tests = 39.
+| Phase | Datum | Beschreibung | Tests |
+|-------|-------|-------------|-------|
+| 1 | 02.04 | Scaffolding + Auth + Gruppen | 17 |
+| 2 | 03.04 | 8 Fragetypen + Uebungs-Engine | 39 |
+| 3 | 03.04 | Mastery-System + Fortschritt | 64 |
+| 4 | 03.04 | Admin-Dashboard (3-Ebenen) | 64 |
+| 5 | 03.04 | Auftraege + Empfehlungen | 69 |
 
-## Phase 3 (03.04.2026) — Fortschritt + Mastery
-Mastery-System (neu→ueben→gefestigt→gemeistert), Fortschritt-Store (localStorage),
-priorisierter Block-Builder, Dashboard Fortschrittsbalken. +25 Tests = 64.
-
-## Phase 4 (03.04.2026) — Eltern-/LP-Dashboard
+## Phase 5 (03.04.2026) — Auftraege + Empfehlungen
 
 | Task | Beschreibung |
 |------|-------------|
-| 1 | Mock-Mitglieder-Daten (3 Kinder, Fortschritte, Sessions) |
-| 2 | AdminDashboard mit 3-Ebenen Navigation |
-| 3 | AdminUebersicht: Alle Kinder mit Fach-Fortschrittsbalken |
-| 4 | AdminKindDetail: Sessions, Dauerbaustellen, Themen-Drill-Down |
-| 5 | AdminThemaDetail: Einzelne Fragen mit Mastery + Versuche |
-| 6 | App.tsx: Admin-Routing (Admin-Modus Toggle, Ueben-Button) |
+| 1 | Auftrag-Typen (Auftrag, Empfehlung) |
+| 2 | Empfehlungs-Utils: 3 Strategien (Auftrag, Luecke, Festigung) + 5 Tests |
+| 3 | AuftragStore (localStorage, CRUD) |
+| 4 | Dashboard: Empfehlungs-Karten oben (farbcodiert nach Typ) |
+| 5 | AdminAuftraege: Erstellen (Fach/Thema/Frist/Ziel), Abschliessen, Loeschen |
+| 6 | AdminDashboard: Tab-Leiste (Uebersicht / Auftraege) |
 
-### Admin-Dashboard 3 Ebenen
+### Empfehlungs-Logik (max 3)
 
-**Ebene 1 — Uebersicht (alle Kinder):**
-- Pro Kind: Fach-Fortschrittsbalken (gruen/blau/gelb)
-- Sessions-Anzahl, gemeisterte Fragen
-- Klick → Ebene 2
+1. **Aktive Auftraege** (immer zuoberst, blau)
+2. **Groesste Luecke** (Thema mit tiefstem Mastery-Score, gelb)
+3. **Festigung** (Thema mit gefestigten Fragen, kurz vor gemeistert, gruen)
 
-**Ebene 2 — Kind-Detail:**
-- 7-Tage-Statistik (Sessions, Fragen, Quote)
-- Dauerbaustellen-Warnung (>=10 Versuche, <50%)
-- Themen nach Fach mit Mastery-Verteilung
-- Session-Historie
-- Klick → Ebene 3
+### Auftrag-System
 
-**Ebene 3 — Thema-Detail:**
-- Gesamt-Statistik (Versuche, richtig, Quote)
-- Einzelne Fragen mit Mastery-Label + Detail (Versuche, richtigInFolge, Sessions)
+- Admin erstellt Auftraege mit: Titel, Fach, Thema, Frist, Ziel-Mitglieder
+- Auftraege erscheinen als Empfehlung im Lernenden-Dashboard
+- Admin kann Auftraege abschliessen oder loeschen
+- localStorage-persistiert (Backend kommt spaeter)
 
-### Admin-Routing
-
-- Admin erkennt sich ueber `aktiveGruppe.adminEmail === user.email`
-- Admin startet im Admin-Dashboard
-- "Ueben"-Button wechselt zum normalen Dashboard
-- "Admin-Dashboard"-FAB wechselt zurueck
-- Lernende sehen nur das normale Dashboard
-
-### Architektur (nach Phase 4)
+### Architektur (nach Phase 5)
 
 ```
 Lernplattform/src/
-├── types/           # auth, gruppen, fragen, uebung, fortschritt
+├── types/           # auth, gruppen, fragen, uebung, fortschritt, auftrag
 ├── services/        # interfaces, apiClient, authService
 ├── adapters/        # appsScriptAdapter, mockDaten, mockMitgliederDaten
-├── store/           # authStore, gruppenStore, uebungsStore, fortschrittStore
-├── utils/           # korrektur, blockBuilder, shuffle, mastery
+├── store/           # authStore, gruppenStore, uebungsStore, fortschrittStore, auftragStore
+├── utils/           # korrektur, blockBuilder, shuffle, mastery, empfehlungen
 ├── components/
 │   ├── fragetypen/  # 8 Komponenten + Registry
-│   ├── admin/       # AdminDashboard, AdminUebersicht, AdminKindDetail, AdminThemaDetail
-│   ├── LoginScreen, GruppenAuswahl, Dashboard
-│   ├── UebungsScreen, Zusammenfassung
-│   └── AdminLayout (deprecated, ersetzt durch admin/)
+│   ├── admin/       # AdminDashboard, Uebersicht, KindDetail, ThemaDetail, Auftraege
+│   ├── LoginScreen, GruppenAuswahl, Dashboard (mit Empfehlungen)
+│   └── UebungsScreen, Zusammenfassung
 ├── App.tsx
-└── __tests__/       # 8 Testdateien, 64 Tests
+└── __tests__/       # 9 Testdateien, 69 Tests
 ```
 
 ---
 
 ## Was fehlt (naechste Phasen)
 
-### Phase 5: Auftraege + Empfehlungen
-- Admin erstellt Auftraege (Fach/Thema/Frist)
-- System empfiehlt: groesste Luecke, Festigung, aktiver Auftrag
-- Empfehlungs-Karten im Dashboard
-
 ### Phase 6: Gamification + Kinder-UX
-- Sterne (0-3 pro Thema), Streaks, Session-Zusammenfassung
-- Touch-Optimierung, groessere Schrift, froehliches Feedback
+- Sterne (0-3 pro Thema basierend auf Mastery-%)
+- Streaks (Sessions in Folge)
+- Session-Zusammenfassung aufwerten
+- Touch-Optimierung, groessere Schrift
+- Froehliches Feedback (variierend)
 
 ### Phase 7: Gym-Pool-Migration
 - Bestehende 27 Pools in Sheets migrieren
@@ -102,4 +86,4 @@ Lernplattform/src/
 ### Apps Script Backend (noch nicht implementiert)
 - Alle `lernplattform*` Endpoints
 - Gruppen-Registry + Sheets
-- Fortschritt + Analytik server-seitig
+- Fortschritt + Analytik + Auftraege server-seitig

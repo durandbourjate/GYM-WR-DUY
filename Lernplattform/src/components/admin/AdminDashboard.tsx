@@ -4,6 +4,7 @@ import { useGruppenStore } from '../../store/gruppenStore'
 import AdminUebersicht from './AdminUebersicht'
 import AdminKindDetail from './AdminKindDetail'
 import AdminThemaDetail from './AdminThemaDetail'
+import AdminAuftraege from './AdminAuftraege'
 
 interface AdminDashboardProps {
   onZuUeben?: () => void
@@ -11,6 +12,7 @@ interface AdminDashboardProps {
 
 type AdminAnsicht =
   | { typ: 'uebersicht' }
+  | { typ: 'auftraege' }
   | { typ: 'kind'; email: string; name: string }
   | { typ: 'thema'; email: string; name: string; fach: string; thema: string }
 
@@ -59,6 +61,26 @@ export default function AdminDashboard({ onZuUeben }: AdminDashboardProps) {
         </div>
       </header>
 
+      {/* Tab-Leiste */}
+      {(ansicht.typ === 'uebersicht' || ansicht.typ === 'auftraege') && (
+        <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+          <div className="max-w-4xl mx-auto px-6 flex gap-4">
+            <button
+              onClick={() => setAnsicht({ typ: 'uebersicht' })}
+              className={`py-3 text-sm font-medium border-b-2 transition-colors ${ansicht.typ === 'uebersicht' ? 'border-blue-500 text-blue-600 dark:text-blue-400' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+            >
+              Uebersicht
+            </button>
+            <button
+              onClick={() => setAnsicht({ typ: 'auftraege' })}
+              className={`py-3 text-sm font-medium border-b-2 transition-colors ${ansicht.typ === 'auftraege' ? 'border-blue-500 text-blue-600 dark:text-blue-400' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+            >
+              Auftraege
+            </button>
+          </div>
+        </div>
+      )}
+
       <main className="max-w-4xl mx-auto p-6">
         {ansicht.typ === 'uebersicht' && (
           <AdminUebersicht
@@ -72,6 +94,7 @@ export default function AdminDashboard({ onZuUeben }: AdminDashboardProps) {
             onThemaKlick={(fach, thema) => setAnsicht({ typ: 'thema', email: ansicht.email, name: ansicht.name, fach, thema })}
           />
         )}
+        {ansicht.typ === 'auftraege' && <AdminAuftraege />}
         {ansicht.typ === 'thema' && (
           <AdminThemaDetail
             email={ansicht.email}
