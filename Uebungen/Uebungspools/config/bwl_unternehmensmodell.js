@@ -929,7 +929,7 @@ window.QUESTIONS = [
     q: "Klicke auf die Umweltsphäre, die Gesetze, gesellschaftliche Normen und demografische Entwicklungen umfasst.",
     img: { src: "img/bwl/unternehmensmodell/unternehmensmodell_umweltsphaeren_hotspot.svg", alt: "St. Galler Unternehmensmodell mit Umweltsphären A–D" },
     hotspots: [
-      { x: 50, y: 41, r: 8, label: "A: Technologische Sphäre" },
+      { x: 58.8, y: 35.7, r: 8, label: "A: Technologische Sphäre" },
       { x: 61, y: 52.4, r: 8, label: "B: Ökonomische Sphäre" },
       { x: 50, y: 81.9, r: 8, label: "C: Soziale Sphäre" },
       { x: 29.8, y: 52.4, r: 8, label: "D: Ökologische Sphäre" }

@@ -844,10 +844,10 @@ window.QUESTIONS = [
     q: "Klicke auf den Quadranten, in dem sich Produkte befinden, die hohe Gewinne abwerfen und wenig Investition brauchen (hoher Marktanteil, niedriges Wachstum).",
     img: { src: "img/bwl/marketing/marketing_bcg_hotspot.svg", alt: "BCG-Portfolio-Matrix mit vier Quadranten A–D" },
     hotspots: [
-      { x: 25, y: 32.6, r: 8, label: "A: Stars" },
-      { x: 77.5, y: 32.6, r: 8, label: "B: Question Marks" },
-      { x: 25, y: 71.9, r: 8, label: "C: Cash Cows" },
-      { x: 77.5, y: 71.9, r: 8, label: "D: Dogs" }
+      { x: 19.4, y: 23.8, r: 8, label: "A: Stars" },
+      { x: 83.1, y: 23.8, r: 8, label: "B: Question Marks" },
+      { x: 19.4, y: 83.3, r: 8, label: "C: Cash Cows" },
+      { x: 83.1, y: 83.3, r: 8, label: "D: Dogs" }
     ],
     correct: [2],
     explain: "Cash Cows (C): Hoher Marktanteil, niedriges Marktwachstum — diese Produkte generieren stabile Gewinne bei geringen Investitionen. Sie finanzieren Stars und Question Marks."

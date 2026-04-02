@@ -46,19 +46,19 @@
   <!-- Rahmen overlay -->
   <rect x="100" y="55" width="620" height="330" rx="6" fill="none" stroke="#cbd5e1" stroke-width="1.5"/>
 
-  <!-- Marker A -->
-  <circle cx="200" cy="137" r="16" fill="#e2e8f0" stroke="#475569" stroke-width="1.5"/>
-  <text x="200" y="142" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="13" font-weight="700" fill="#1e293b">A</text>
+  <!-- Marker A — links oben im Stars-Feld -->
+  <circle cx="155" cy="100" r="16" fill="#e2e8f0" stroke="#475569" stroke-width="1.5"/>
+  <text x="155" y="105" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="13" font-weight="700" fill="#1e293b">A</text>
 
-  <!-- Marker B -->
-  <circle cx="620" cy="137" r="16" fill="#e2e8f0" stroke="#475569" stroke-width="1.5"/>
-  <text x="620" y="142" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="13" font-weight="700" fill="#1e293b">B</text>
+  <!-- Marker B — rechts oben im Q-Marks-Feld -->
+  <circle cx="665" cy="100" r="16" fill="#e2e8f0" stroke="#475569" stroke-width="1.5"/>
+  <text x="665" y="105" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="13" font-weight="700" fill="#1e293b">B</text>
 
-  <!-- Marker C -->
-  <circle cx="200" cy="302" r="16" fill="#e2e8f0" stroke="#475569" stroke-width="1.5"/>
-  <text x="200" y="307" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="13" font-weight="700" fill="#1e293b">C</text>
+  <!-- Marker C — links unten im Cash-Cows-Feld -->
+  <circle cx="155" cy="350" r="16" fill="#e2e8f0" stroke="#475569" stroke-width="1.5"/>
+  <text x="155" y="355" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="13" font-weight="700" fill="#1e293b">C</text>
 
-  <!-- Marker D -->
-  <circle cx="620" cy="302" r="16" fill="#e2e8f0" stroke="#475569" stroke-width="1.5"/>
-  <text x="620" y="307" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="13" font-weight="700" fill="#1e293b">D</text>
+  <!-- Marker D — rechts unten im Dogs-Feld -->
+  <circle cx="665" cy="350" r="16" fill="#e2e8f0" stroke="#475569" stroke-width="1.5"/>
+  <text x="665" y="355" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="13" font-weight="700" fill="#1e293b">D</text>
 </svg>

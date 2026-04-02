@@ -846,10 +846,10 @@ window.QUESTIONS = [
     q: "Klicke auf das Feld, das die Strategie beschreibt, bei der ein Unternehmen auf dem Gesamtmarkt den niedrigsten Preis anbietet.",
     img: { src: "img/bwl/stratfuehrung/stratfuehrung_porter_hotspot.svg", alt: "Porter-Strategiematrix mit vier Feldern A–D" },
     hotspots: [
-      { x: 25, y: 32.6, r: 8, label: "A: Kostenführerschaft" },
-      { x: 77.5, y: 32.6, r: 8, label: "B: Differenzierung" },
-      { x: 25, y: 71.9, r: 8, label: "C: Kostenfokus (Nische)" },
-      { x: 77.5, y: 71.9, r: 8, label: "D: Differenzierungsfokus" }
+      { x: 19.4, y: 40.5, r: 8, label: "A: Kostenführerschaft" },
+      { x: 83.1, y: 40.5, r: 8, label: "B: Differenzierung" },
+      { x: 19.4, y: 79.8, r: 8, label: "C: Kostenfokus (Nische)" },
+      { x: 83.1, y: 79.8, r: 8, label: "D: Differenzierungsfokus" }
     ],
     correct: [0],
     explain: "Kostenführerschaft (A): Gesamtmarkt + Kostenvorteil — das Unternehmen produziert günstiger als alle Konkurrenten."

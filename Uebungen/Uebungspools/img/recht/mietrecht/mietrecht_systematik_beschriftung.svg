@@ -6,8 +6,8 @@
 
   <!-- Step 1: Mietvertrag -->
   <rect x="270" y="52" width="260" height="52" rx="8" fill="#22c55e" stroke="#15803d" stroke-width="2"/>
-  <text x="400" y="74" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="13" font-weight="700" fill="#ffffff">Mietvertrag (OR 253 ff.)</text>
-  <text x="400" y="93" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="11" fill="#dcfce7">Gebrauchsüberlassung gegen Mietzins</text>
+  <text x="400" y="74" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="13" font-weight="700" fill="#ffffff">?</text>
+  <text x="400" y="93" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="11" fill="#dcfce7">?</text>
 
   <!-- Arrow down -->
   <line x1="400" y1="104" x2="400" y2="130" stroke="#94a3b8" stroke-width="2"/>
@@ -17,13 +17,13 @@
 
   <!-- Step 2a: Pflichten Vermieter -->
   <rect x="60" y="155" width="280" height="55" rx="8" fill="#f0fdf4" stroke="#22c55e" stroke-width="2"/>
-  <text x="200" y="178" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="12" font-weight="600" fill="#15803d">Pflichten Vermieter</text>
-  <text x="200" y="198" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="11" fill="#64748b">Gebrauchsüberlassung (OR 256)</text>
+  <text x="200" y="178" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="12" font-weight="600" fill="#15803d">?</text>
+  <text x="200" y="198" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="11" fill="#64748b">?</text>
 
   <!-- Step 2b: Pflichten Mieter -->
   <rect x="460" y="155" width="280" height="55" rx="8" fill="#f0fdf4" stroke="#22c55e" stroke-width="2"/>
-  <text x="600" y="178" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="12" font-weight="600" fill="#15803d">Pflichten Mieter</text>
-  <text x="600" y="198" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="11" fill="#64748b">Mietzinszahlung (OR 257)</text>
+  <text x="600" y="178" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="12" font-weight="600" fill="#15803d">?</text>
+  <text x="600" y="198" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="11" fill="#64748b">?</text>
 
   <!-- Arrow to Mängel -->
   <line x1="400" y1="130" x2="400" y2="240" stroke="#94a3b8" stroke-width="2"/>
@@ -31,8 +31,8 @@
 
   <!-- Step 3: Mängelrecht -->
   <rect x="270" y="250" width="260" height="55" rx="8" fill="#f0fdf4" stroke="#22c55e" stroke-width="2"/>
-  <text x="400" y="272" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="12" font-weight="600" fill="#15803d">Mängelrecht (OR 259a–i)</text>
-  <text x="400" y="292" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="11" fill="#64748b">Anzeige → Frist → Reduktion/Hinterleg.</text>
+  <text x="400" y="272" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="12" font-weight="600" fill="#15803d">?</text>
+  <text x="400" y="292" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="11" fill="#64748b">?</text>
 
   <!-- Arrow to Kündigung -->
   <line x1="400" y1="305" x2="400" y2="335" stroke="#94a3b8" stroke-width="2"/>
@@ -40,8 +40,8 @@
 
   <!-- Step 4: Kündigung -->
   <rect x="270" y="345" width="260" height="55" rx="8" fill="#f0fdf4" stroke="#22c55e" stroke-width="2"/>
-  <text x="400" y="367" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="12" font-weight="600" fill="#15803d">Kündigung + Erstreckung</text>
-  <text x="400" y="387" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="11" fill="#64748b">Form + Fristen (OR 266a ff., 272 ff.)</text>
+  <text x="400" y="367" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="12" font-weight="600" fill="#15803d">?</text>
+  <text x="400" y="387" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="11" fill="#64748b">?</text>
 
   <!-- Red numbered circles -->
   <!-- 1: Mietvertrag -->

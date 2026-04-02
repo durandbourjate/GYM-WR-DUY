@@ -302,7 +302,7 @@ window.QUESTIONS = [
     {x: 50, y: 21.4, r: 8, label: "A: Optimaler Steuersatz"},
     {x: 25, y: 54.8, r: 8, label: "B: Tiefer Steuersatz"},
     {x: 75, y: 54.8, r: 8, label: "C: Hoher Steuersatz"},
-    {x: 91.9, y: 84.5, r: 8, label: "D: 100% Steuersatz"}
+    {x: 88.8, y: 78.6, r: 8, label: "D: 100% Steuersatz"}
   ],
   correct: [0],
   explain: "Die Laffer-Kurve zeigt: Bei 0% und 100% Steuersatz sind die Einnahmen null. Am Scheitelpunkt (A) sind sie maximal. Steigt der Satz über das Optimum, sinken die Einnahmen durch weniger Arbeit und Steuerflucht."

@@ -2568,7 +2568,7 @@ window.QUESTIONS = [
   img: { src: "img/vwl/geld/geld_geldmarkt_hotspot.svg", alt: "Geldmarkt-Diagramm mit vier markierten Punkten (A–D)" },
   hotspots: [
     {x: 50, y: 51.2, r: 8, label: "A: Gleichgewicht"},
-    {x: 50, y: 28.6, r: 8, label: "B: Überschüssiges Geldangebot"},
+    {x: 50, y: 33.3, r: 8, label: "B: Überschüssiges Geldangebot"},
     {x: 30, y: 36.9, r: 8, label: "C: Geldknappheit"},
     {x: 70, y: 71.4, r: 8, label: "D: Kein Schnittpunkt"}
   ],

@@ -3007,7 +3007,25 @@ function answerHotspot(qid){
 var _beschriftungPicked=null;
 var _beschriftungAssignments={}; // spotLid → labelLid
 function pickBeschriftungLabel(el){
-  if(el.classList.contains('placed'))return;
+  if(el.classList.contains('placed')){
+    // Undo: Bereits platziertes Label wieder lösen
+    var lid=el.dataset.lid;
+    for(var spotLid in _beschriftungAssignments){
+      if(_beschriftungAssignments[spotLid]===lid){
+        delete _beschriftungAssignments[spotLid];
+        var spot=document.querySelector('.beschriftung-spot[data-lid="'+spotLid+'"]');
+        if(spot){
+          var num=spot.querySelector('.beschriftung-spot-num');
+          spot.innerHTML='';
+          if(num)spot.appendChild(num);
+        }
+        break;
+      }
+    }
+    el.classList.remove('placed');
+    document.getElementById('beschriftungStatus').textContent='Label gelöst. Wähle es erneut oder ein anderes Label.';
+    return;
+  }
   document.querySelectorAll('.beschriftung-label').forEach(function(l){l.classList.remove('picked')});
   el.classList.add('picked');
   _beschriftungPicked=el;

@@ -35,9 +35,9 @@
   <circle cx="400" cy="215" r="16" fill="#e2e8f0" stroke="#475569" stroke-width="1.5"/>
   <text x="400" y="220" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="13" font-weight="700" fill="#1e293b">A</text>
 
-  <!-- Marker B: auf Ms oberhalb GG x=400, y=120 -->
-  <circle cx="400" cy="120" r="16" fill="#e2e8f0" stroke="#475569" stroke-width="1.5"/>
-  <text x="400" y="125" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="13" font-weight="700" fill="#1e293b">B</text>
+  <!-- Marker B: auf Ms oberhalb GG, 20px nach unten verschoben weg vom (ZB fixiert)-Label -->
+  <circle cx="400" cy="140" r="16" fill="#e2e8f0" stroke="#475569" stroke-width="1.5"/>
+  <text x="400" y="145" text-anchor="middle" font-family="'DM Sans',system-ui,sans-serif" font-size="13" font-weight="700" fill="#1e293b">B</text>
 
   <!-- Marker C: auf Md links x=240, y=155 -->
   <circle cx="240" cy="155" r="16" fill="#e2e8f0" stroke="#475569" stroke-width="1.5"/>
