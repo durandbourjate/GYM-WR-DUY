@@ -11,8 +11,8 @@
 - ~~Fragenbank im Composer "nicht gefunden"~~ ✅ 27.03.2026
 - ~~Apps Script Deploy nötig~~ ✅ 31.03.2026 — Session 38 + 40 deployed (Heartbeat v3, Security, Ownership-Fix)
 - **Tier 2 Features (später):** Diktat, GeoGebra/Desmos, Randomisierte Zahlenvarianten, Code-Ausführung (Sandbox)
-- **Übungspools ↔ Prüfungstool** — Lern-Analytik, Login, KI-Empfehlungen (eigenes Designprojekt)
-- ~~**Bewertungsraster-Vertiefung**~~ ✅ 02.04.2026 — Niveaustufen, 12 Standard-Vorlagen, kriterienbasierte KI-Korrektur. **Apps Script Deploy nötig.**
+- ~~**Übungspools ↔ Prüfungstool**~~ → Neues Projekt **Lernplattform** — Design Spec + Phase-1-Plan fertig (02.04.2026). Siehe `docs/superpowers/specs/2026-04-02-lernplattform-design.md`
+- ~~**Bewertungsraster-Vertiefung**~~ ✅ 02.04.2026 — Niveaustufen, 12 Standard-Vorlagen, kriterienbasierte KI-Korrektur. ✅ Apps Script deployed.
 - **TaF Phasen-UI** — klassenTyp-Feld vorhanden, UI für Phasen-Auswahl noch nicht (auf nächstes SJ verschoben)
 - ~~**Übungspools: 8 neue Fragetypen**~~ ✅ 01.04.2026 — sortierung, formel, hotspot, bildbeschriftung, dragdrop_bild, code, zeichnen, pdf. Inkl. TYPE_HANDLERS Refactoring. Audio weggelassen (kein Backend in Pools).
 - ~~**Zeichnen Input-Verlust (Prüfungstool)**~~ ✅ 02.04.2026 — Ref-basierter Stift-Buffer + rAF-Rendering. Browser-verifiziert.
@@ -27,6 +27,26 @@
   - ~~Demo-Modus Bypass via sessionStorage~~ ✅ 02.04.2026 — istDemoModus nur in React-State, nicht manipulierbar
   - Prompt Injection bei KI-Assistent (User-Input unsanitisiert an Claude)
   - ~~`pruefung-state-*` in localStorage bleibt nach Abgabe~~ ✅ 02.04.2026 — persist.clearStorage() nach Abgabe
+
+---
+
+## Session 53 — Lernplattform Design + Branch-Aufräumung (02.04.2026)
+
+### Stand
+Auf `main`. Design Spec + Phase-1-Implementierungsplan fertig. Keine Code-Änderungen am Prüfungstool.
+
+### Änderungen
+
+| # | Änderung | Dateien |
+|---|----------|---------|
+| 1 | **Lernplattform Design Spec** — Adaptive Übungsplattform mit Login, Mastery-System, Dauerbaustellen, Eltern-Dashboard. Zwei Kontexte: Gym-SuS + Familie (3.–6. Klasse). | `docs/superpowers/specs/2026-04-02-lernplattform-design.md` |
+| 2 | **Phase-1-Implementierungsplan** — 8 Tasks: Scaffolding, Auth, Gruppen, UI-Shell, Deploy. | `docs/superpowers/plans/2026-04-02-lernplattform-phase1.md` |
+| 3 | **Branch-Aufräumung** — 6 gemergte lokale + 6 Remote-Branches gelöscht. | — |
+| 4 | **Bewertungsraster Apps Script** — Deployed durch User. | — |
+
+### Nächste Schritte
+- **Lernplattform Phase 1 implementieren** — Branch `feature/lernplattform-phase1` erstellen und Plan abarbeiten
+- Weitere Phasen (2–7) nach Phase 1 planen
 
 ---
 
