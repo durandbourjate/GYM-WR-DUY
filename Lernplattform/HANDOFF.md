@@ -3,93 +3,81 @@
 ## Aktueller Stand
 
 **Branch:** `main`
-**Phase:** 2 von 7 (Fragenbank + Uebungs-Engine)
-**Status:** Implementation abgeschlossen, 39 Tests gruen, Build gruen
+**Phase:** 3 von 7 (Fortschritt + Mastery)
+**Status:** Implementation abgeschlossen, 64 Tests gruen, Build gruen
 
 ### Verifikation (03.04.2026)
 
 | Check | Status |
 |-------|--------|
 | `npx tsc -b` | OK |
-| `npx vitest run` | 39 Tests gruen (6 Testdateien) |
-| `npm run build` | OK (dist/ erstellt, 230 KB JS) |
+| `npx vitest run` | 64 Tests gruen (8 Testdateien) |
+| `npm run build` | OK (dist/ erstellt, 234 KB JS) |
 | Pruefungstool Regression | 193 Tests gruen, tsc OK |
-| GitHub Actions deploy.yml | Erweitert um Lernplattform-Build |
 
 ---
 
 ## Phase 1 (02.04.2026) — Grundgeruest + Auth + Gruppen
 
-| Task | Beschreibung |
-|------|-------------|
-| 1 | Projekt-Scaffolding (React 19 + Vite + Tailwind) |
-| 2 | Auth- und Gruppen-Typen |
-| 3 | Service-Interfaces + API-Client (6 Tests) |
-| 4 | Auth-Service + Auth-Store (6 Tests) |
-| 5 | Gruppen-Store + Apps-Script-Adapter (5 Tests) |
-| 6 | UI-Komponenten (Login, Gruppen, Dashboard, Admin) |
-| 7 | GitHub Actions Deploy erweitert |
+Scaffolding, Auth (Google OAuth + Code), Gruppen-System, Login/Dashboard UI.
+17 Tests (apiClient 6, authStore 6, gruppenStore 5).
 
 ## Phase 2 (03.04.2026) — Fragenbank + Uebungs-Engine
 
+8 Fragetypen (MC, Multi, TF, Fill, Calc, Sort, Sortierung, Zuordnung), Block-Builder,
+UebungsScreen + Zusammenfassung, Mock-Daten, Dashboard mit Themen-Browser.
+22 neue Tests (korrektur 12, blockBuilder 5, uebungsStore 5).
+
+## Phase 3 (03.04.2026) — Fortschritt + Mastery
+
 | Task | Beschreibung |
 |------|-------------|
-| 1 | Fragen- + Uebungs-Typen (FrageTyp, AntwortTyp, Session, Ergebnis) |
-| 2 | Korrektur-Utils + Shuffle (12 Tests) |
-| 3 | Block-Builder (5 Tests) |
-| 4 | FragenService Interface + Mock-Daten-Adapter (13 Fragen, 5 Themen) |
-| 5 | UebungsStore (5 Tests) |
-| 6 | 8 Fragetypen-Komponenten (MC, Multi, TF, Fill, Calc, Sort, Sortierung, Zuordnung) |
-| 7 | UebungsScreen + Zusammenfassung |
-| 8 | Dashboard mit Themen-Browser + App Routing |
+| 1 | Fortschritt-Typen (FragenFortschritt, MasteryStufe, ThemenFortschritt, Dauerbaustelle) |
+| 2 | Mastery-Utils: berechneMastery, aktualisiereFortschritt, istDauerbaustelle (14 Tests) |
+| 3 | Fortschritt-Store (localStorage-persistiert, 9 Tests) |
+| 4 | Block-Builder Mastery-Priorisierung (ueben > neu > gefestigt > gemeistert, 7 Tests) |
+| 5 | UebungsStore Integration (nach Antwort → Fortschritt automatisch updaten) |
+| 6 | Dashboard Mastery-Badges + Fortschrittsbalken pro Thema |
 
-### Architektur (nach Phase 2)
+### Mastery-System
+
+| Stufe | Bedingung | Farbe |
+|-------|-----------|-------|
+| neu | Noch nie beantwortet | Grau |
+| ueben | < 3x richtig in Folge | Gelb |
+| gefestigt | 3x richtig in Folge | Blau |
+| gemeistert | 5x richtig in Folge, 2+ Sessions | Gruen |
+
+Fortschritt wird in localStorage persistiert (`lernplattform-fortschritt`).
+Block-Builder priorisiert: ueben-Fragen zuerst, gemeisterte zuletzt.
+Dashboard zeigt Mastery-Verteilung pro Thema als farbigen Balken.
+
+### Architektur (nach Phase 3)
 
 ```
 Lernplattform/src/
-├── types/           # auth, gruppen, fragen, uebung
+├── types/           # auth, gruppen, fragen, uebung, fortschritt
 ├── services/        # interfaces, apiClient, authService
-├── adapters/        # appsScriptAdapter, mockDaten
-├── store/           # authStore, gruppenStore, uebungsStore
-├── utils/           # korrektur, blockBuilder, shuffle
+├── adapters/        # appsScriptAdapter + mockDaten
+├── store/           # authStore, gruppenStore, uebungsStore, fortschrittStore
+├── utils/           # korrektur, blockBuilder, shuffle, mastery
 ├── components/
 │   ├── fragetypen/  # 8 Komponenten + Registry
-│   ├── LoginScreen, GruppenAuswahl, Dashboard
+│   ├── LoginScreen, GruppenAuswahl, Dashboard (mit Mastery-Badges)
 │   ├── UebungsScreen, Zusammenfassung
 │   └── AdminLayout (Platzhalter)
-├── App.tsx          # Auth-Guard + Session-Routing
-└── __tests__/       # 6 Testdateien, 39 Tests
+├── App.tsx
+└── __tests__/       # 8 Testdateien, 64 Tests
 ```
-
-### Uebungs-Flow
-
-1. Dashboard zeigt Themen nach Fach gruppiert (aus Mock-Daten)
-2. Klick auf Thema → UebungsStore laedt Fragen, erstellt 10er-Block
-3. UebungsScreen zeigt Frage + Fragetyp-Komponente
-4. Antwort → Korrektur → Feedback (gruen/rot + Erklaerung)
-5. Weiter → naechste Frage oder Ergebnis
-6. Zusammenfassung zeigt Score + Detail-Liste
-7. "Nochmal ueben" oder "Zurueck zum Dashboard"
-
-### Mock-Daten (kein Backend noetig zum Testen)
-
-13 Fragen in 5 Themen: Mathe (Addition, Multiplikation), Deutsch (Wortarten, Satzglieder), VWL (Markt und Preis).
-Alle 8 Fragetypen vertreten: mc, multi, tf, fill, calc, sort, sortierung, zuordnung.
 
 ---
 
 ## Was fehlt (naechste Phasen)
 
-### Phase 3: Fortschritt + Mastery
-- FragenFortschritt-Tracking (versuche, richtigInFolge, mastery)
-- Mastery-Stufen: neu → ueben → gefestigt → gemeistert
-- Dauerbaustellen-Erkennung (>10 Versuche, <50%)
-- Block-Priorisierung nach Mastery-Status
-- Apps Script Backend fuer Analytik
-
 ### Phase 4: Eltern-/LP-Dashboard
 - 3-Ebenen Drill-Down (Uebersicht → Kind → Thema)
 - Typische Fehler, Trends, Session-Historie
+- Dauerbaustellen-Anzeige
 
 ### Phase 5: Auftraege + Empfehlungen
 
@@ -99,6 +87,5 @@ Alle 8 Fragetypen vertreten: mc, multi, tf, fill, calc, sort, sortierung, zuordn
 
 ### Apps Script Backend (noch nicht implementiert)
 - Alle `lernplattform*` Endpoints
-- Gruppen-Registry Sheet
-- Fragenbank aus Google Sheets lesen (statt Mock)
-- Antworten + Fortschritt persistieren
+- Gruppen-Registry + Sheets
+- Fortschritt server-seitig persistieren
