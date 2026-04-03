@@ -4,6 +4,7 @@ import AdminUebersicht from './AdminUebersicht'
 import AdminKindDetail from './AdminKindDetail'
 import AdminThemaDetail from './AdminThemaDetail'
 import AdminAuftraege from './AdminAuftraege'
+import AdminSettings from './AdminSettings'
 
 interface AdminDashboardProps {
   onZuUeben?: () => void
@@ -12,6 +13,7 @@ interface AdminDashboardProps {
 type AdminAnsicht =
   | { typ: 'uebersicht' }
   | { typ: 'auftraege' }
+  | { typ: 'einstellungen' }
   | { typ: 'kind'; email: string; name: string }
   | { typ: 'thema'; email: string; name: string; fach: string; thema: string }
 
@@ -27,21 +29,22 @@ export default function AdminDashboard({ onZuUeben: _onZuUeben }: AdminDashboard
     }
   }
 
+  const istHauptTab = ansicht.typ === 'uebersicht' || ansicht.typ === 'auftraege' || ansicht.typ === 'einstellungen'
+
   return (
     <div>
       {/* Breadcrumb / Titel */}
       <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-3">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            {ansicht.typ !== 'uebersicht' && ansicht.typ !== 'auftraege' && (
+            {!istHauptTab && (
               <button onClick={zurueck} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 min-w-[44px] min-h-[44px] flex items-center justify-center">
                 &#8592;
               </button>
             )}
             <div>
               <h2 className="text-lg font-bold dark:text-white">
-                {ansicht.typ === 'uebersicht' && 'Admin-Dashboard'}
-                {ansicht.typ === 'auftraege' && 'Admin-Dashboard'}
+                {istHauptTab && 'Admin-Dashboard'}
                 {ansicht.typ === 'kind' && ansicht.name}
                 {ansicht.typ === 'thema' && `${ansicht.name} — ${ansicht.thema}`}
               </h2>
@@ -52,7 +55,7 @@ export default function AdminDashboard({ onZuUeben: _onZuUeben }: AdminDashboard
       </div>
 
       {/* Tab-Leiste */}
-      {(ansicht.typ === 'uebersicht' || ansicht.typ === 'auftraege') && (
+      {istHauptTab && (
         <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
           <div className="max-w-4xl mx-auto px-6 flex gap-4">
             <button
@@ -66,6 +69,12 @@ export default function AdminDashboard({ onZuUeben: _onZuUeben }: AdminDashboard
               className={`py-3 text-sm font-medium border-b-2 transition-colors ${ansicht.typ === 'auftraege' ? 'border-blue-500 text-blue-600 dark:text-blue-400' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
             >
               Auftraege
+            </button>
+            <button
+              onClick={() => setAnsicht({ typ: 'einstellungen' })}
+              className={`py-3 text-sm font-medium border-b-2 transition-colors ${ansicht.typ === 'einstellungen' ? 'border-blue-500 text-blue-600 dark:text-blue-400' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+            >
+              Einstellungen
             </button>
           </div>
         </div>
@@ -85,6 +94,7 @@ export default function AdminDashboard({ onZuUeben: _onZuUeben }: AdminDashboard
           />
         )}
         {ansicht.typ === 'auftraege' && <AdminAuftraege />}
+        {ansicht.typ === 'einstellungen' && <AdminSettings />}
         {ansicht.typ === 'thema' && (
           <AdminThemaDetail
             email={ansicht.email}
