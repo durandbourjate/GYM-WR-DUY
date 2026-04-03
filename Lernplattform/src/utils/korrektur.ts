@@ -156,6 +156,12 @@ export function pruefeAntwort(frage: Frage, antwort: AntwortTyp): boolean {
     case 'code':
       return antwort.selbstbewertung === 'korrekt'
 
+    // Gruppe: alle Teile müssen beantwortet sein (Detailkorrektur in Komponente)
+    case 'gruppe': {
+      const teil = frage.teil || []
+      return teil.length > 0 && Object.keys(antwort.teilAntworten).length === teil.length
+    }
+
     // Formel: normalisierter String-Vergleich
     case 'formel': {
       const soll = normalisiereLatex(frage.korrekt as string || '')

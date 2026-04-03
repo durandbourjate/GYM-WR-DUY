@@ -18,6 +18,10 @@ import KontenbestimmungFrage from './KontenbestimmungFrage'
 import HotspotFrage from './HotspotFrage'
 import BildbeschriftungFrage from './BildbeschriftungFrage'
 import DragDropBildFrage from './DragDropBildFrage'
+import GruppeFrage from './GruppeFrage'
+import ZeichnenFrage from './ZeichnenFrage'
+import AudioFrage from './AudioFrage'
+import CodeFrage from './CodeFrage'
 
 export interface FrageKomponenteProps {
   frage: Frage
@@ -46,4 +50,8 @@ export const FRAGETYP_KOMPONENTEN: Record<string, ComponentType<FrageKomponenteP
   hotspot: HotspotFrage,
   bildbeschriftung: BildbeschriftungFrage,
   dragdrop_bild: DragDropBildFrage,
+  gruppe: GruppeFrage,
+  zeichnen: ZeichnenFrage,
+  audio: AudioFrage,
+  code: CodeFrage,
 }
