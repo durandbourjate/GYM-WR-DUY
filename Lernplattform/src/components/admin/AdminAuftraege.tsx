@@ -2,8 +2,6 @@ import { useState } from 'react'
 import { useAuftragStore } from '../../store/auftragStore'
 import { useGruppenStore } from '../../store/gruppenStore'
 import { useAuthStore } from '../../store/authStore'
-import { MOCK_FRAGEN } from '../../adapters/mockDaten'
-import { MOCK_MITGLIEDER } from '../../adapters/mockMitgliederDaten'
 
 export default function AdminAuftraege() {
   const { auftraege, erstelleAuftrag, schliesseAuftrag, loescheAuftrag, ladeAuftraege } = useAuftragStore()
@@ -11,12 +9,10 @@ export default function AdminAuftraege() {
   const { user } = useAuthStore()
   const [formOffen, setFormOffen] = useState(false)
 
-  // Mock-Mitglieder verwenden wenn keine echten da sind
-  const alleMitglieder = mitglieder.length > 0
-    ? mitglieder.filter(m => m.rolle === 'lernend')
-    : MOCK_MITGLIEDER
+  const alleMitglieder = mitglieder.filter(m => m.rolle === 'lernend')
 
-  const faecher = [...new Set(MOCK_FRAGEN.map(f => f.fach))]
+  // Fächer werden aus echten Fragen-Daten gezogen (leer bis geladen)
+  const faecher: string[] = []
 
   // Auftraege bei Mount laden
   useState(() => { ladeAuftraege() })
@@ -123,9 +119,8 @@ function AuftragForm({ faecher, mitglieder, onErstellen }: AuftragFormProps) {
   const [frist, setFrist] = useState('')
   const [zielEmails, setZielEmails] = useState<string[]>(mitglieder.map(m => m.email))
 
-  const themen = fach
-    ? [...new Set(MOCK_FRAGEN.filter(f => f.fach === fach).map(f => f.thema))]
-    : []
+  // Themen-Liste leer bis Fragen aus Backend geladen werden
+  const themen: string[] = []
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()

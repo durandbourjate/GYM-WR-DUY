@@ -524,16 +524,16 @@ function lernplattformEntfernen(body) {
 // ============================================================
 
 /**
- * Fragen laden für eine Gruppe (mit optionalem Filter).
- * Komplexe Felder (optionen, aussagen, etc.) sind als JSON-Strings gespeichert.
+ * Fragen laden für eine Gruppe aus dem Fragenbank-Sheet der Gruppe.
+ * Header-Zeile = Feldnamen. Werte die mit [ oder { beginnen werden als JSON geparst.
  */
 function lernplattformLadeFragen(body) {
   var gruppeId = body.gruppeId;
-  var filter = body.filter || {};
 
   var gruppen = alleGruppenLaden_();
   var gruppe = gruppen.find(function(g) { return g.id === gruppeId; });
   if (!gruppe) return jsonResponse({ success: false, error: 'Gruppe nicht gefunden' });
+  if (!gruppe.fragebankSheetId) return jsonResponse({ success: false, error: 'Fragenbank-Sheet nicht konfiguriert' });
 
   try {
     var ss = SpreadsheetApp.openById(gruppe.fragebankSheetId);
@@ -543,7 +543,7 @@ function lernplattformLadeFragen(body) {
     var daten = sheet.getDataRange().getValues();
     if (daten.length < 2) return jsonResponse({ success: true, data: [] });
 
-    var headers = daten[0].map(function(h) { return String(h).toLowerCase().trim(); });
+    var headers = daten[0].map(function(h) { return String(h).trim(); });
     var fragen = [];
 
     for (var i = 1; i < daten.length; i++) {
@@ -552,26 +552,20 @@ function lernplattformLadeFragen(body) {
       for (var j = 0; j < headers.length; j++) {
         var key = headers[j];
         var val = row[j];
-        if (val === '' || val === null || val === undefined) continue;
+        if (!key || val === '' || val === null || val === undefined) continue;
 
-        // JSON-Felder parsen
-        if (['optionen', 'korrekt', 'aussagen', 'luecken', 'kategorien',
-             'elemente', 'reihenfolge', 'daten'].indexOf(key) >= 0) {
-          try { frage[key] = JSON.parse(val); } catch (e) { frage[key] = val; }
+        // Auto-Parse: JSON-Arrays und -Objekte erkennen
+        var strVal = String(val);
+        if (strVal.charAt(0) === '[' || strVal.charAt(0) === '{') {
+          try { frage[key] = JSON.parse(strVal); } catch (e) { frage[key] = strVal; }
         } else if (key === 'schwierigkeit') {
           frage[key] = Number(val);
         } else if (key === 'uebung' || key === 'pruefungstauglich') {
           frage[key] = val === true || val === 'true' || val === 'TRUE';
         } else {
-          frage[key] = String(val);
+          frage[key] = strVal;
         }
       }
-
-      // Filter anwenden
-      if (filter.fach && frage.fach !== filter.fach) continue;
-      if (filter.thema && frage.thema !== filter.thema) continue;
-      if (filter.schwierigkeit && frage.schwierigkeit !== filter.schwierigkeit) continue;
-      if (filter.nurUebung && !frage.uebung) continue;
 
       fragen.push(frage);
     }

@@ -1,5 +1,5 @@
-import { MOCK_MITGLIEDER_FORTSCHRITTE } from '../../adapters/mockMitgliederDaten'
-import { MOCK_FRAGEN } from '../../adapters/mockDaten'
+import type { Frage } from '../../types/fragen'
+import type { FragenFortschritt } from '../../types/fortschritt'
 
 interface Props {
   email: string
@@ -8,9 +8,10 @@ interface Props {
   thema: string
 }
 
-export default function AdminThemaDetail({ email, fach, thema }: Props) {
-  const fortschritte = MOCK_MITGLIEDER_FORTSCHRITTE[email] || []
-  const themaFragen = MOCK_FRAGEN.filter(f => f.fach === fach && f.thema === thema)
+export default function AdminThemaDetail({ email: _email, fach, thema }: Props) {
+  // Platzhalter — Fortschritt-Daten werden in zukünftiger Phase aus Backend geladen
+  const fortschritte: FragenFortschritt[] = []
+  const themaFragen: Frage[] = []
 
   // Gesamt-Statistik
   const themaFortschritte = fortschritte.filter(fp =>

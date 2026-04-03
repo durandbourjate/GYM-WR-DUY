@@ -103,54 +103,50 @@ class AppsScriptGruppenAdapter implements GruppenService {
 
 export const gruppenAdapter = new AppsScriptGruppenAdapter()
 
-// --- Fragen-Adapter: Pool-Daten für Gym, Mock für Kinder ---
+// --- Fragen-Adapter: Lädt Fragen aus Google Sheets via Apps Script ---
 
 import type { Frage, FragenFilter } from '../types/fragen'
 import type { FragenService } from '../services/interfaces'
-import { MOCK_FRAGEN } from './mockDaten'
-import { PoolFragenAdapter } from './poolDaten'
 
-class MockFragenAdapter implements FragenService {
-  async ladeFragen(_gruppeId: string, filter?: FragenFilter): Promise<Frage[]> {
-    let fragen = [...MOCK_FRAGEN]
-    if (filter?.fach) fragen = fragen.filter(f => f.fach === filter.fach)
-    if (filter?.thema) fragen = fragen.filter(f => f.thema === filter.thema)
-    if (filter?.schwierigkeit) fragen = fragen.filter(f => f.schwierigkeit === filter.schwierigkeit)
-    if (filter?.nurUebung) fragen = fragen.filter(f => f.uebung)
-    return fragen
-  }
-
-  async ladeThemen(_gruppeId: string, fach?: string): Promise<string[]> {
-    let fragen: Frage[] = MOCK_FRAGEN
-    if (fach) fragen = fragen.filter(f => f.fach === fach)
-    return [...new Set(fragen.map(f => f.thema))]
-  }
-}
-
-// Kombinations-Adapter: nutzt Pool-Daten + Mock-Kinder-Fragen
-class KombinierterFragenAdapter implements FragenService {
-  private poolAdapter = new PoolFragenAdapter()
-  private mockAdapter = new MockFragenAdapter()
+class AppsScriptFragenAdapter implements FragenService {
+  private cache: Map<string, Frage[]> = new Map()
 
   async ladeFragen(gruppeId: string, filter?: FragenFilter): Promise<Frage[]> {
-    // Pool-Fragen laden (Gym-SuS: VWL, BWL, Recht)
-    const poolFragen = await this.poolAdapter.ladeFragen(gruppeId, filter)
-    // Falls kein Fach-Filter oder Fach nicht in Pools → Mock dazu
-    if (!filter?.fach || !['VWL', 'BWL', 'Recht'].includes(filter.fach)) {
-      const mockFragen = await this.mockAdapter.ladeFragen(gruppeId, filter)
-      return [...poolFragen, ...mockFragen]
+    let fragen = this.cache.get(gruppeId)
+    if (!fragen) {
+      const token = this.getToken()
+      const response = await apiClient.post<{ success: boolean; data: Frage[] }>(
+        'lernplattformLadeFragen', { gruppeId }, token
+      )
+      fragen = response?.data || []
+      this.cache.set(gruppeId, fragen)
     }
-    return poolFragen
+    let result = [...fragen]
+    if (filter?.fach) result = result.filter(f => f.fach === filter.fach)
+    if (filter?.thema) result = result.filter(f => f.thema === filter.thema)
+    if (filter?.schwierigkeit) result = result.filter(f => f.schwierigkeit === filter.schwierigkeit)
+    if (filter?.nurUebung) result = result.filter(f => f.uebung)
+    return result
   }
 
   async ladeThemen(gruppeId: string, fach?: string): Promise<string[]> {
-    const poolThemen = await this.poolAdapter.ladeThemen(gruppeId, fach)
-    if (!fach || !['VWL', 'BWL', 'Recht'].includes(fach)) {
-      const mockThemen = await this.mockAdapter.ladeThemen(gruppeId, fach)
-      return [...new Set([...poolThemen, ...mockThemen])]
-    }
-    return poolThemen
+    const fragen = await this.ladeFragen(gruppeId)
+    let gefiltert = fragen
+    if (fach) gefiltert = gefiltert.filter(f => f.fach === fach)
+    return [...new Set(gefiltert.map(f => f.thema))]
+  }
+
+  invalidateCache(gruppeId?: string) {
+    if (gruppeId) this.cache.delete(gruppeId)
+    else this.cache.clear()
+  }
+
+  private getToken(): string | undefined {
+    try {
+      const stored = localStorage.getItem('lernplattform-auth')
+      return stored ? JSON.parse(stored).sessionToken : undefined
+    } catch { return undefined }
   }
 }
 
-export const fragenAdapter: FragenService = new KombinierterFragenAdapter()
+export const fragenAdapter: FragenService = new AppsScriptFragenAdapter()

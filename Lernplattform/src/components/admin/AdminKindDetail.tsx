@@ -1,5 +1,4 @@
-import { MOCK_MITGLIEDER_FORTSCHRITTE, MOCK_SESSIONS } from '../../adapters/mockMitgliederDaten'
-import { MOCK_FRAGEN } from '../../adapters/mockDaten'
+import type { FragenFortschritt } from '../../types/fortschritt'
 
 interface Props {
   email: string
@@ -7,38 +6,13 @@ interface Props {
   onThemaKlick: (fach: string, thema: string) => void
 }
 
-export default function AdminKindDetail({ email, onThemaKlick }: Props) {
-  const fortschritte = MOCK_MITGLIEDER_FORTSCHRITTE[email] || []
-  const sessions = MOCK_SESSIONS[email] || []
+export default function AdminKindDetail({ email: _email, onThemaKlick }: Props) {
+  // Platzhalter — Fortschritt-Daten werden in zukünftiger Phase aus Backend geladen
+  const fortschritte: FragenFortschritt[] = []
+  const sessions: { datum: string; fach: string; thema: string; anzahl: number; richtig: number }[] = []
 
-  // Gruppiere nach Fach → Thema
+  // Leer bis Daten aus Backend geladen werden
   const fachThemen: Record<string, Record<string, { gesamt: number; gemeistert: number; gefestigt: number; ueben: number; neu: number }>> = {}
-
-  const alleFaecher = [...new Set(MOCK_FRAGEN.map(f => f.fach))]
-  for (const fach of alleFaecher) {
-    const fachFragen = MOCK_FRAGEN.filter(f => f.fach === fach)
-    const themen = [...new Set(fachFragen.map(f => f.thema))]
-
-    fachThemen[fach] = {}
-    for (const thema of themen) {
-      const themaFragen = fachFragen.filter(f => f.thema === thema)
-      const themaFortschritte = fortschritte.filter(fp =>
-        themaFragen.some(f => f.id === fp.fragenId)
-      )
-
-      let gemeistert = 0, gefestigt = 0, ueben = 0, neu = 0
-      for (const f of themaFragen) {
-        const fp = themaFortschritte.find(p => p.fragenId === f.id)
-        const mastery = fp?.mastery || 'neu'
-        if (mastery === 'gemeistert') gemeistert++
-        else if (mastery === 'gefestigt') gefestigt++
-        else if (mastery === 'ueben') ueben++
-        else neu++
-      }
-
-      fachThemen[fach][thema] = { gesamt: themaFragen.length, gemeistert, gefestigt, ueben, neu }
-    }
-  }
 
   // Dauerbaustellen erkennen (>= 10 Versuche, < 50% richtig)
   const dauerbaustellen = fortschritte.filter(fp =>
@@ -77,14 +51,11 @@ export default function AdminKindDetail({ email, onThemaKlick }: Props) {
         <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl p-5">
           <h3 className="font-semibold mb-2 text-yellow-800 dark:text-yellow-200">Dauerbaustellen</h3>
           <div className="space-y-1">
-            {dauerbaustellen.map(fp => {
-              const frage = MOCK_FRAGEN.find(f => f.id === fp.fragenId)
-              return (
-                <div key={fp.fragenId} className="text-sm text-yellow-700 dark:text-yellow-300">
-                  {frage?.thema}: {fp.richtig}/{fp.versuche} richtig ({Math.round((fp.richtig / fp.versuche) * 100)}%)
-                </div>
-              )
-            })}
+            {dauerbaustellen.map(fp => (
+              <div key={fp.fragenId} className="text-sm text-yellow-700 dark:text-yellow-300">
+                {fp.fragenId}: {fp.richtig}/{fp.versuche} richtig ({Math.round((fp.richtig / fp.versuche) * 100)}%)
+              </div>
+            ))}
           </div>
         </div>
       )}

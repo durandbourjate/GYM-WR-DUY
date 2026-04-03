@@ -1,5 +1,4 @@
-import { MOCK_MITGLIEDER, MOCK_MITGLIEDER_FORTSCHRITTE, MOCK_SESSIONS } from '../../adapters/mockMitgliederDaten'
-import { MOCK_FRAGEN } from '../../adapters/mockDaten'
+import { useGruppenStore } from '../../store/gruppenStore'
 import type { MasteryStufe } from '../../types/fortschritt'
 
 interface Props {
@@ -7,14 +6,17 @@ interface Props {
 }
 
 export default function AdminUebersicht({ onKindKlick }: Props) {
-  // Faecher aus Mock-Daten extrahieren
-  const faecher = [...new Set(MOCK_FRAGEN.map(f => f.fach))]
+  const { mitglieder } = useGruppenStore()
+  const lernende = mitglieder.filter(m => m.rolle === 'lernend')
+
+  // Platzhalter bis Fortschritt-Daten aus Backend geladen werden
+  const faecher: string[] = []
 
   return (
     <div className="space-y-4">
-      {MOCK_MITGLIEDER.map((mitglied) => {
-        const fortschritte = MOCK_MITGLIEDER_FORTSCHRITTE[mitglied.email] || []
-        const sessions = MOCK_SESSIONS[mitglied.email] || []
+      {lernende.map((mitglied) => {
+        const fortschritte: { fragenId: string; mastery: MasteryStufe }[] = []
+        const sessions: { datum: string }[] = []
         const letzteSession = sessions[0]
 
         return (
@@ -34,14 +36,8 @@ export default function AdminUebersicht({ onKindKlick }: Props) {
 
             <div className="space-y-2">
               {faecher.map(fach => {
-                const fachFragen = MOCK_FRAGEN.filter(f => f.fach === fach)
-                const fachFortschritte = fortschritte.filter(fp =>
-                  fachFragen.some(f => f.id === fp.fragenId)
-                )
-
-                if (fachFragen.length === 0) return null
-
-                const counts = zaehleMastery(fachFortschritte.map(f => f.mastery), fachFragen.length)
+                const fachFortschritte = fortschritte.filter(fp => fp.fragenId.startsWith(fach))
+                const counts = zaehleMastery(fachFortschritte.map(f => f.mastery), fachFortschritte.length || 1)
 
                 return (
                   <div key={fach} className="flex items-center gap-3">
