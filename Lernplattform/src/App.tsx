@@ -11,6 +11,7 @@ import UebungsScreen from './components/UebungsScreen'
 import Zusammenfassung from './components/Zusammenfassung'
 import AdminDashboard from './components/admin/AdminDashboard'
 import AppShell from './components/layout/AppShell'
+import { LernKontextProvider } from './context/LernKontextProvider'
 
 const DEMO_PARAM = new URLSearchParams(window.location.search).get('demo')
 const IST_DEMO = !!DEMO_PARAM
@@ -141,32 +142,34 @@ export default function App() {
 
   // Screen-Rendering
   return (
-    <AppShell>
-      {aktuellerScreen === 'admin' && (
-        <AdminDashboard onZuUeben={() => navigiere('dashboard')} />
-      )}
+    <LernKontextProvider>
+      <AppShell>
+        {aktuellerScreen === 'admin' && (
+          <AdminDashboard onZuUeben={() => navigiere('dashboard')} />
+        )}
 
-      {aktuellerScreen === 'ergebnis' && session?.beendet && (
-        <Zusammenfassung
-          onZurueck={() => {
-            useUebungsStore.setState({ session: null })
-            navigiere('dashboard')
-          }}
-          onNochmal={() => {
-            if (aktiveGruppe && user) {
-              starteSession(aktiveGruppe.id, user.email, session.fach, session.thema)
-            }
-          }}
-        />
-      )}
+        {aktuellerScreen === 'ergebnis' && session?.beendet && (
+          <Zusammenfassung
+            onZurueck={() => {
+              useUebungsStore.setState({ session: null })
+              navigiere('dashboard')
+            }}
+            onNochmal={() => {
+              if (aktiveGruppe && user) {
+                starteSession(aktiveGruppe.id, user.email, session.fach, session.thema)
+              }
+            }}
+          />
+        )}
 
-      {aktuellerScreen === 'uebung' && session && !session.beendet && (
-        <UebungsScreen />
-      )}
+        {aktuellerScreen === 'uebung' && session && !session.beendet && (
+          <UebungsScreen />
+        )}
 
-      {aktuellerScreen === 'dashboard' && (
-        <Dashboard />
-      )}
-    </AppShell>
+        {aktuellerScreen === 'dashboard' && (
+          <Dashboard />
+        )}
+      </AppShell>
+    </LernKontextProvider>
   )
 }
