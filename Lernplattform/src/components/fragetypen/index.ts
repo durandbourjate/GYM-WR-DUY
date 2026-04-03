@@ -11,6 +11,10 @@ import ZuordnungFrage from './ZuordnungFrage'
 import OpenFrage from './OpenFrage'
 import FormelFrage from './FormelFrage'
 import PdfFrage from './PdfFrage'
+import BuchungssatzFrage from './BuchungssatzFrage'
+import TKontoFrage from './TKontoFrage'
+import BilanzFrage from './BilanzFrage'
+import KontenbestimmungFrage from './KontenbestimmungFrage'
 
 export interface FrageKomponenteProps {
   frage: Frage
@@ -32,4 +36,8 @@ export const FRAGETYP_KOMPONENTEN: Record<string, ComponentType<FrageKomponenteP
   open: OpenFrage,
   formel: FormelFrage,
   pdf: PdfFrage,
+  buchungssatz: BuchungssatzFrage,
+  tkonto: TKontoFrage,
+  bilanz: BilanzFrage,
+  kontenbestimmung: KontenbestimmungFrage,
 }
