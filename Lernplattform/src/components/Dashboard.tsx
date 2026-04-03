@@ -4,6 +4,7 @@ import { useGruppenStore } from '../store/gruppenStore'
 import { useUebungsStore } from '../store/uebungsStore'
 import { useFortschrittStore } from '../store/fortschrittStore'
 import { useAuftragStore } from '../store/auftragStore'
+import { useNavigationStore } from '../store/navigationStore'
 import { fragenAdapter } from '../adapters/appsScriptAdapter'
 import { berechneEmpfehlungen } from '../utils/empfehlungen'
 import type { Frage, FrageTyp } from '../types/fragen'
@@ -39,11 +40,12 @@ interface ThemenInfo {
 }
 
 export default function Dashboard() {
-  const { user, abmelden } = useAuthStore()
+  const { user } = useAuthStore()
   const { aktiveGruppe } = useGruppenStore()
   const { starteSession } = useUebungsStore()
   const { ladeFortschritt, getThemenFortschritt, fortschritte } = useFortschrittStore()
   const { ladeAuftraege, auftraege } = useAuftragStore()
+  const { navigiere } = useNavigationStore()
   const [themenInfo, setThemenInfo] = useState<Record<string, ThemenInfo[]>>({})
   const [alleFragen, setAlleFragen] = useState<Frage[]>([])
   const [laden, setLaden] = useState(true)
@@ -52,7 +54,8 @@ export default function Dashboard() {
   const [fachFilter, setFachFilter] = useState<string | null>(null)
   const [schwierigkeitFilter, setSchwierigkeitFilter] = useState<number | null>(null)
   const [typFilter, setTypFilter] = useState<FrageTyp | null>(null)
-  const [eingeklappteF, setEingeklappteF] = useState<Set<string>>(new Set())
+  // Fächer default eingeklappt — wird nach dem Laden mit allen Fächern befüllt
+  const [eingeklappteF, setEingeklappteF] = useState<Set<string> | null>(null)
 
   useEffect(() => {
     ladeFortschritt()
@@ -81,6 +84,10 @@ export default function Dashboard() {
       }
 
       setThemenInfo(info)
+      // Alle Fächer default eingeklappt (nur beim ersten Laden)
+      if (eingeklappteF === null) {
+        setEingeklappteF(new Set(Object.keys(info)))
+      }
       setLaden(false)
     }
     ladeThemen()
@@ -136,7 +143,8 @@ export default function Dashboard() {
   const totalAnzahl = alleFragen.length
 
   const toggleFach = (fach: string) => {
-    const neu = new Set(eingeklappteF)
+    const basis = eingeklappteF || new Set<string>()
+    const neu = new Set(basis)
     if (neu.has(fach)) neu.delete(fach)
     else neu.add(fach)
     setEingeklappteF(neu)
@@ -157,22 +165,11 @@ export default function Dashboard() {
   const handleStarte = (fach: string, thema: string) => {
     if (!aktiveGruppe || !user) return
     starteSession(aktiveGruppe.id, user.email, fach, thema)
+    navigiere('uebung')
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <header className="bg-white dark:bg-gray-800 shadow-sm px-6 py-4 flex items-center justify-between">
-        <div>
-          <h1 className="text-lg font-bold dark:text-white">Lernplattform</h1>
-          {aktiveGruppe && <span className="text-sm text-gray-500">{aktiveGruppe.name}</span>}
-        </div>
-        <div className="flex items-center gap-3">
-          <span className="text-sm text-gray-600 dark:text-gray-400">{user?.vorname || user?.email}</span>
-          {user?.bild && <img src={user.bild} alt="" className="w-8 h-8 rounded-full" />}
-          <button onClick={abmelden} className="text-sm text-gray-400 hover:text-gray-600">Abmelden</button>
-        </div>
-      </header>
-
+    <div>
       <main className="max-w-2xl mx-auto p-6">
         <h2 className="text-xl font-bold mb-4 dark:text-white">
           Hallo {user?.vorname || 'dort'}!
@@ -281,7 +278,7 @@ export default function Dashboard() {
         ) : (
           <div className="space-y-4">
             {Object.entries(gefilterteThemen).map(([fach, themen]) => {
-              const istEingeklappt = eingeklappteF.has(fach)
+              const istEingeklappt = eingeklappteF?.has(fach) ?? true
               const fachFarbe = FACH_FARBEN[fach]
 
               return (

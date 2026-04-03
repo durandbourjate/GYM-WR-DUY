@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { useAuthStore } from '../../store/authStore'
 import { useGruppenStore } from '../../store/gruppenStore'
 import AdminUebersicht from './AdminUebersicht'
 import AdminKindDetail from './AdminKindDetail'
@@ -16,8 +15,7 @@ type AdminAnsicht =
   | { typ: 'kind'; email: string; name: string }
   | { typ: 'thema'; email: string; name: string; fach: string; thema: string }
 
-export default function AdminDashboard({ onZuUeben }: AdminDashboardProps) {
-  const { user, abmelden } = useAuthStore()
+export default function AdminDashboard({ onZuUeben: _onZuUeben }: AdminDashboardProps) {
   const { aktiveGruppe } = useGruppenStore()
   const [ansicht, setAnsicht] = useState<AdminAnsicht>({ typ: 'uebersicht' })
 
@@ -30,36 +28,28 @@ export default function AdminDashboard({ onZuUeben }: AdminDashboardProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <header className="bg-white dark:bg-gray-800 shadow-sm px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          {ansicht.typ !== 'uebersicht' && (
-            <button onClick={zurueck} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 min-w-[44px] min-h-[44px] flex items-center justify-center">
-              ←
-            </button>
-          )}
-          <div>
-            <h1 className="text-lg font-bold dark:text-white">
-              {ansicht.typ === 'uebersicht' && 'Admin-Dashboard'}
-              {ansicht.typ === 'kind' && ansicht.name}
-              {ansicht.typ === 'thema' && `${ansicht.name} — ${ansicht.thema}`}
-            </h1>
-            {aktiveGruppe && <span className="text-sm text-gray-500">{aktiveGruppe.name}</span>}
+    <div>
+      {/* Breadcrumb / Titel */}
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-3">
+        <div className="max-w-4xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            {ansicht.typ !== 'uebersicht' && ansicht.typ !== 'auftraege' && (
+              <button onClick={zurueck} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 min-w-[44px] min-h-[44px] flex items-center justify-center">
+                &#8592;
+              </button>
+            )}
+            <div>
+              <h2 className="text-lg font-bold dark:text-white">
+                {ansicht.typ === 'uebersicht' && 'Admin-Dashboard'}
+                {ansicht.typ === 'auftraege' && 'Admin-Dashboard'}
+                {ansicht.typ === 'kind' && ansicht.name}
+                {ansicht.typ === 'thema' && `${ansicht.name} — ${ansicht.thema}`}
+              </h2>
+              {aktiveGruppe && <span className="text-xs text-gray-500">{aktiveGruppe.name}</span>}
+            </div>
           </div>
         </div>
-        <div className="flex items-center gap-3">
-          {onZuUeben && (
-            <button
-              onClick={onZuUeben}
-              className="text-sm text-blue-500 hover:text-blue-700"
-            >
-              Ueben
-            </button>
-          )}
-          <span className="text-sm text-gray-600 dark:text-gray-400">{user?.vorname}</span>
-          <button onClick={abmelden} className="text-sm text-gray-400 hover:text-gray-600">Abmelden</button>
-        </div>
-      </header>
+      </div>
 
       {/* Tab-Leiste */}
       {(ansicht.typ === 'uebersicht' || ansicht.typ === 'auftraege') && (
