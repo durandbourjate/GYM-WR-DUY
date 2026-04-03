@@ -12,6 +12,12 @@ export interface UebungsSession {
   aktuelleFrageIndex: number
   gestartet: string
   beendet?: string
+  /** IDs der als "unsicher" markierten Fragen */
+  unsicher: Set<string>
+  /** IDs der übersprungenen Fragen */
+  uebersprungen: Set<string>
+  /** Punkte-Score (richtig = +1, falsch = 0) */
+  score: number
 }
 
 export interface SessionErgebnis {
@@ -27,5 +33,7 @@ export interface SessionErgebnis {
     typ: string
     korrekt: boolean
     erklaerung?: string
+    unsicher?: boolean
+    uebersprungen?: boolean
   }[]
 }

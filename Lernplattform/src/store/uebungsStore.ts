@@ -15,10 +15,15 @@ interface UebungsState {
   starteSession: (gruppeId: string, email: string, fach: string, thema: string) => Promise<void>
   beantworte: (antwort: AntwortTyp) => void
   naechsteFrage: () => void
+  vorherigeFrage: () => void
+  ueberspringen: () => void
+  toggleUnsicher: () => void
+  istUnsicher: () => boolean
   istSessionFertig: () => boolean
   berechneErgebnis: () => SessionErgebnis
   beendeSession: () => void
   aktuelleFrage: () => Frage | null
+  kannZurueck: () => boolean
 }
 
 export const useUebungsStore = create<UebungsState>((set, get) => ({
@@ -33,7 +38,6 @@ export const useUebungsStore = create<UebungsState>((set, get) => ({
     try {
       const alleFragen = await fragenAdapter.ladeFragen(gruppeId, { fach, thema, nurUebung: true })
 
-      // Mastery-Daten fuer priorisierte Block-Zusammenstellung
       const fortschritte = useFortschrittStore.getState().fortschritte
       const mastery: Record<string, import('../types/fortschritt').MasteryStufe> = {}
       for (const f of alleFragen) {
@@ -49,15 +53,15 @@ export const useUebungsStore = create<UebungsState>((set, get) => ({
 
       const session: UebungsSession = {
         id: `s_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-        gruppeId,
-        email,
-        fach,
-        thema,
+        gruppeId, email, fach, thema,
         fragen: block,
         antworten: {},
         ergebnisse: {},
         aktuelleFrageIndex: 0,
         gestartet: new Date().toISOString(),
+        unsicher: new Set(),
+        uebersprungen: new Set(),
+        score: 0,
       }
 
       set({ session, ladeStatus: 'fertig', feedbackSichtbar: false, letzteAntwortKorrekt: null })
@@ -75,7 +79,6 @@ export const useUebungsStore = create<UebungsState>((set, get) => ({
 
     const korrekt = pruefeAntwort(frage, antwort)
 
-    // Fortschritt aktualisieren
     useFortschrittStore.getState().antwortVerarbeiten(frage.id, session.email, korrekt, session.id)
 
     set({
@@ -83,6 +86,7 @@ export const useUebungsStore = create<UebungsState>((set, get) => ({
         ...session,
         antworten: { ...session.antworten, [frage.id]: antwort },
         ergebnisse: { ...session.ergebnisse, [frage.id]: korrekt },
+        score: session.score + (korrekt ? 1 : 0),
       },
       feedbackSichtbar: true,
       letzteAntwortKorrekt: korrekt,
@@ -103,6 +107,71 @@ export const useUebungsStore = create<UebungsState>((set, get) => ({
     })
   },
 
+  vorherigeFrage: () => {
+    const session = get().session
+    if (!session || session.aktuelleFrageIndex <= 0) return
+
+    const vorherigerIndex = session.aktuelleFrageIndex - 1
+    const vorherigeFrage = session.fragen[vorherigerIndex]
+    const hatAntwort = vorherigeFrage && vorherigeFrage.id in session.antworten
+
+    set({
+      session: { ...session, aktuelleFrageIndex: vorherigerIndex },
+      feedbackSichtbar: hatAntwort,
+      letzteAntwortKorrekt: hatAntwort ? (session.ergebnisse[vorherigeFrage.id] ?? null) : null,
+    })
+  },
+
+  ueberspringen: () => {
+    const session = get().session
+    if (!session) return
+
+    const frage = session.fragen[session.aktuelleFrageIndex]
+    if (!frage) return
+
+    const neueUebersprungen = new Set(session.uebersprungen)
+    neueUebersprungen.add(frage.id)
+
+    set({
+      session: {
+        ...session,
+        aktuelleFrageIndex: session.aktuelleFrageIndex + 1,
+        uebersprungen: neueUebersprungen,
+      },
+      feedbackSichtbar: false,
+      letzteAntwortKorrekt: null,
+    })
+  },
+
+  toggleUnsicher: () => {
+    const session = get().session
+    if (!session) return
+
+    const frage = session.fragen[session.aktuelleFrageIndex]
+    if (!frage) return
+
+    const neueUnsicher = new Set(session.unsicher)
+    if (neueUnsicher.has(frage.id)) {
+      neueUnsicher.delete(frage.id)
+    } else {
+      neueUnsicher.add(frage.id)
+    }
+
+    set({ session: { ...session, unsicher: neueUnsicher } })
+  },
+
+  istUnsicher: () => {
+    const session = get().session
+    if (!session) return false
+    const frage = session.fragen[session.aktuelleFrageIndex]
+    return frage ? session.unsicher.has(frage.id) : false
+  },
+
+  kannZurueck: () => {
+    const session = get().session
+    return session ? session.aktuelleFrageIndex > 0 : false
+  },
+
   istSessionFertig: () => {
     const session = get().session
     if (!session) return true
@@ -121,10 +190,12 @@ export const useUebungsStore = create<UebungsState>((set, get) => ({
       typ: f.typ,
       korrekt: session.ergebnisse[f.id] ?? false,
       erklaerung: f.erklaerung,
+      unsicher: session.unsicher.has(f.id),
+      uebersprungen: session.uebersprungen.has(f.id),
     }))
 
     const richtig = details.filter(d => d.korrekt).length
-    const falsch = details.filter(d => !d.korrekt).length
+    const falsch = details.filter(d => !d.korrekt && !d.uebersprungen).length
     const dauer = session.beendet
       ? new Date(session.beendet).getTime() - new Date(session.gestartet).getTime()
       : Date.now() - new Date(session.gestartet).getTime()
@@ -132,8 +203,7 @@ export const useUebungsStore = create<UebungsState>((set, get) => ({
     return {
       sessionId: session.id,
       anzahlFragen: session.fragen.length,
-      richtig,
-      falsch,
+      richtig, falsch,
       quote: session.fragen.length > 0 ? (richtig / session.fragen.length) * 100 : 0,
       dauer,
       details,

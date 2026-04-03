@@ -1,64 +1,100 @@
+import { useEffect, useCallback } from 'react'
 import { useUebungsStore } from '../store/uebungsStore'
+import { useNavigationStore } from '../store/navigationStore'
 import { FRAGETYP_KOMPONENTEN } from './fragetypen'
 import { bereinigePlatzhalter } from '../utils/fragetext'
+import QuizHeader from './uebung/QuizHeader'
+import QuizNavigation from './uebung/QuizNavigation'
+import QuizActions from './uebung/QuizActions'
+// FeedbackPanel wird von Fragetyp-Komponenten via FeedbackBox gerendert
 
 export default function UebungsScreen() {
-  const { session, feedbackSichtbar, letzteAntwortKorrekt, beantworte, naechsteFrage, istSessionFertig, beendeSession, aktuelleFrage } = useUebungsStore()
-
-  if (!session) return null
+  const {
+    session, feedbackSichtbar, letzteAntwortKorrekt,
+    beantworte, naechsteFrage, vorherigeFrage, ueberspringen,
+    toggleUnsicher, istUnsicher, istSessionFertig, beendeSession,
+    aktuelleFrage, kannZurueck,
+  } = useUebungsStore()
+  const { navigiere } = useNavigationStore()
 
   const frage = aktuelleFrage()
-  if (!frage) return null
+
+  // Keyboard-Shortcuts
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (!frage || !session) return
+    // Nicht abfangen wenn ein Input/Textarea fokussiert ist
+    const tag = (e.target as HTMLElement)?.tagName
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return
+
+    if (e.key === 'ArrowLeft' && kannZurueck()) {
+      e.preventDefault()
+      vorherigeFrage()
+    }
+    if (e.key === 'ArrowRight' && feedbackSichtbar) {
+      e.preventDefault()
+      if (istSessionFertig()) {
+        beendeSession()
+        navigiere('ergebnis')
+      } else {
+        naechsteFrage()
+      }
+    }
+    if (e.key === 'ArrowRight' && !feedbackSichtbar && !(frage.id in session.antworten)) {
+      e.preventDefault()
+      ueberspringen()
+    }
+  }, [frage, session, feedbackSichtbar, kannZurueck, vorherigeFrage, naechsteFrage, ueberspringen, istSessionFertig, beendeSession, navigiere])
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [handleKeyDown])
+
+  if (!session || !frage) return null
 
   const Komponente = FRAGETYP_KOMPONENTEN[frage.typ]
   const istBeantwortet = frage.id in session.antworten
   const fortschritt = Object.keys(session.antworten).length
-  const gesamt = session.fragen.length
 
-  const handleWeiter = () => {
-    if (istSessionFertig()) {
-      beendeSession()
-    } else {
-      naechsteFrage()
-    }
+  const handleWeiter = () => naechsteFrage()
+  const handleErgebnis = () => {
+    beendeSession()
+    navigiere('ergebnis')
+  }
+  const handleBeenden = () => {
+    beendeSession()
+    navigiere('ergebnis')
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Fortschrittsbalken */}
-      <div className="bg-white dark:bg-gray-800 shadow-sm">
-        <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
-          <span className="text-sm text-gray-500 dark:text-gray-400">
-            {session.fach} — {session.thema}
-          </span>
-          <span className="text-sm font-medium dark:text-white">
-            {fortschritt}/{gesamt}
-          </span>
-        </div>
-        <div className="h-1 bg-gray-200 dark:bg-gray-700">
-          <div
-            className="h-1 bg-blue-500 transition-all duration-300"
-            style={{ width: `${(fortschritt / gesamt) * 100}%` }}
-          />
-        </div>
-      </div>
+    <div>
+      <QuizHeader
+        fach={session.fach}
+        thema={session.thema}
+        fortschritt={fortschritt}
+        gesamt={session.fragen.length}
+        score={session.score}
+        schwierigkeit={frage.schwierigkeit}
+        typ={frage.typ}
+      />
 
-      {/* Frage */}
       <main className="max-w-2xl mx-auto p-4">
+        {/* Frage-Karte */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6 mb-4">
-          <div className="flex items-center gap-2 mb-3">
-            <span className={`text-xs px-2 py-1 rounded-full font-medium
-              ${frage.schwierigkeit === 1 ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' : ''}
-              ${frage.schwierigkeit === 2 ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300' : ''}
-              ${frage.schwierigkeit === 3 ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300' : ''}
-            `}>
-              {frage.schwierigkeit === 1 ? 'Einfach' : frage.schwierigkeit === 2 ? 'Mittel' : 'Schwer'}
-            </span>
-            <span className="text-xs text-gray-400 dark:text-gray-500">{frage.typ.toUpperCase()}</span>
-          </div>
+          {/* Kontext */}
+          {frage.kontext && (
+            <div className="mb-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50 text-sm text-gray-600 dark:text-gray-400">
+              <span className="text-xs font-medium text-gray-400 uppercase block mb-1">Situation</span>
+              {frage.kontext}
+            </div>
+          )}
 
-          <h2 className="text-lg font-medium mb-4 dark:text-white">{bereinigePlatzhalter(frage.frage)}</h2>
+          {/* Fragetext */}
+          <h2 className="text-lg font-medium mb-4 dark:text-white">
+            {bereinigePlatzhalter(frage.frage)}
+          </h2>
 
+          {/* Fragetyp-Komponente */}
           {Komponente ? (
             <Komponente
               frage={frage}
@@ -68,19 +104,39 @@ export default function UebungsScreen() {
               korrekt={letzteAntwortKorrekt}
             />
           ) : (
-            <p className="text-gray-500">Fragetyp "{frage.typ}" nicht unterstuetzt.</p>
+            <p className="text-gray-500">Fragetyp &ldquo;{frage.typ}&rdquo; nicht unterstuetzt.</p>
           )}
+
+          {/* Feedback wird von den Fragetyp-Komponenten via FeedbackBox angezeigt */}
         </div>
 
-        {/* Weiter-Button */}
-        {feedbackSichtbar && (
-          <button
-            onClick={handleWeiter}
-            className="w-full bg-gray-800 dark:bg-gray-200 text-white dark:text-gray-800 rounded-xl py-3 font-medium min-h-[48px]"
-          >
-            {istSessionFertig() ? 'Ergebnis anzeigen' : 'Weiter'}
-          </button>
-        )}
+        {/* Navigation (Zurück / Überspringen / Weiter) */}
+        <QuizNavigation
+          kannZurueck={kannZurueck()}
+          istBeantwortet={istBeantwortet}
+          feedbackSichtbar={feedbackSichtbar}
+          istLetzteFrage={session.aktuelleFrageIndex >= session.fragen.length - 1}
+          istSessionFertig={istSessionFertig()}
+          onZurueck={vorherigeFrage}
+          onUeberspringen={ueberspringen}
+          onWeiter={handleWeiter}
+          onErgebnis={handleErgebnis}
+        />
+
+        {/* Beenden + Unsicher */}
+        <div className="mt-4">
+          <QuizActions
+            istUnsicher={istUnsicher()}
+            feedbackSichtbar={feedbackSichtbar}
+            onToggleUnsicher={toggleUnsicher}
+            onBeenden={handleBeenden}
+          />
+        </div>
+
+        {/* Keyboard-Hinweis */}
+        <div className="mt-4 text-center text-xs text-gray-400 dark:text-gray-600 hidden sm:block">
+          Tastatur: &#8592; Zurueck &middot; &#8594; Weiter/Ueberspringen
+        </div>
       </main>
     </div>
   )

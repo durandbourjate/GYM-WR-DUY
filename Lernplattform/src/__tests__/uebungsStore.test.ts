@@ -50,6 +50,7 @@ describe('uebungsStore', () => {
         fach: 'Mathe', thema: 'Add', fragen: testFragen,
         antworten: {}, ergebnisse: {}, aktuelleFrageIndex: 0,
         gestartet: new Date().toISOString(),
+        unsicher: new Set(), uebersprungen: new Set(), score: 0,
       },
       ladeStatus: 'fertig',
     })
@@ -71,6 +72,7 @@ describe('uebungsStore', () => {
         antworten: { f1: { typ: 'mc', gewaehlt: 'A' } },
         ergebnisse: { f1: true }, aktuelleFrageIndex: 0,
         gestartet: new Date().toISOString(),
+        unsicher: new Set(), uebersprungen: new Set(), score: 0,
       },
       feedbackSichtbar: true,
     })
@@ -90,6 +92,7 @@ describe('uebungsStore', () => {
         antworten: { f1: { typ: 'mc', gewaehlt: 'A' }, f2: { typ: 'mc', gewaehlt: 'Y' }, f3: { typ: 'mc', gewaehlt: '2' } },
         ergebnisse: { f1: true, f2: true, f3: true }, aktuelleFrageIndex: 2,
         gestartet: new Date().toISOString(),
+        unsicher: new Set(), uebersprungen: new Set(), score: 0,
       },
       feedbackSichtbar: true,
     })
@@ -106,6 +109,7 @@ describe('uebungsStore', () => {
         antworten: { f1: { typ: 'mc', gewaehlt: 'A' }, f2: { typ: 'mc', gewaehlt: 'X' }, f3: { typ: 'mc', gewaehlt: '2' } },
         ergebnisse: { f1: true, f2: false, f3: true }, aktuelleFrageIndex: 2,
         gestartet: new Date().toISOString(),
+        unsicher: new Set(), uebersprungen: new Set(), score: 0,
       },
     })
 
