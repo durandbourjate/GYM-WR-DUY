@@ -2,6 +2,7 @@ import { apiClient } from '../services/apiClient'
 import type { Gruppe, Mitglied } from '../types/gruppen'
 import type { CodeLoginResponse } from '../types/auth'
 import type { GruppenService } from '../services/interfaces'
+import { defaultEinstellungen, type GruppenEinstellungen } from '../types/settings'
 
 class AppsScriptGruppenAdapter implements GruppenService {
   private getToken(): string | undefined {
@@ -83,6 +84,20 @@ class AppsScriptGruppenAdapter implements GruppenService {
       name: response?.data?.name,
       fehler: response?.error,
     }
+  }
+
+  async ladeEinstellungen(gruppeId: string): Promise<GruppenEinstellungen> {
+    const response = await apiClient.post<{ success: boolean; data: GruppenEinstellungen }>(
+      'lernplattformLadeEinstellungen', { gruppeId }, this.getToken()
+    )
+    return response?.data || defaultEinstellungen('gym')
+  }
+
+  async speichereEinstellungen(gruppeId: string, einstellungen: GruppenEinstellungen, email: string): Promise<void> {
+    const response = await apiClient.post<{ success: boolean; error?: string }>(
+      'lernplattformSpeichereEinstellungen', { gruppeId, einstellungen, email }, this.getToken()
+    )
+    if (response && !response.success) throw new Error(response.error || 'Speichern fehlgeschlagen')
   }
 }
 

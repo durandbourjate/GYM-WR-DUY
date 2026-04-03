@@ -156,6 +156,14 @@ function doPost(e) {
     case 'lernplattformSpeichereAuftrag':
       return lernplattformSpeichereAuftrag(body);
 
+    // === EINSTELLUNGEN ===
+
+    case 'lernplattformLadeEinstellungen':
+      return lernplattformLadeEinstellungen(body);
+
+    case 'lernplattformSpeichereEinstellungen':
+      return lernplattformSpeichereEinstellungen(body);
+
     default:
       return jsonResponse({ success: false, error: 'Unbekannte Aktion: ' + action });
   }
@@ -788,4 +796,106 @@ function lernplattformSpeichereAuftrag(body) {
   } catch (e) {
     return jsonResponse({ success: false, error: e.message });
   }
+}
+
+// ============================================================
+// EINSTELLUNGEN ENDPOINTS
+// ============================================================
+
+/**
+ * Gruppeneinstellungen laden.
+ * Liest die 'einstellungen'-Spalte aus der Registry.
+ * Falls leer oder fehlend: Defaults basierend auf 'typ'-Spalte zurückgeben.
+ */
+function lernplattformLadeEinstellungen(body) {
+  var gruppeId = body.gruppeId;
+  if (!gruppeId) return jsonResponse({ success: false, error: 'gruppeId fehlt' });
+
+  var sheet = getGruppenRegistry_();
+  if (!sheet) return jsonResponse({ success: false, error: 'Registry nicht gefunden' });
+
+  var daten = sheet.getDataRange().getValues();
+  if (daten.length < 2) return jsonResponse({ success: false, error: 'Gruppe nicht gefunden' });
+
+  var headers = daten[0].map(function(h) { return String(h).toLowerCase().trim(); });
+  var idIdx = headers.indexOf('id');
+  var typIdx = headers.indexOf('typ');
+  var einstellungenIdx = headers.indexOf('einstellungen');
+
+  for (var i = 1; i < daten.length; i++) {
+    if (String(daten[i][idIdx]).trim() !== gruppeId) continue;
+
+    var typ = String(daten[i][typIdx] || 'gym').trim();
+
+    // Defaults basierend auf Typ
+    var defaults = typ === 'familie'
+      ? { anrede: 'du', feedbackStil: 'ermutigend', sichtbareFaecher: [], sichtbareThemen: {}, fachFarben: {} }
+      : { anrede: 'sie', feedbackStil: 'sachlich', sichtbareFaecher: [], sichtbareThemen: {}, fachFarben: {} };
+
+    // 'einstellungen'-Spalte vorhanden und befüllt?
+    if (einstellungenIdx >= 0) {
+      var raw = String(daten[i][einstellungenIdx] || '').trim();
+      if (raw) {
+        try {
+          var parsed = JSON.parse(raw);
+          return jsonResponse({ success: true, data: parsed });
+        } catch (e) {
+          // Ungültiges JSON → Defaults verwenden
+        }
+      }
+    }
+
+    return jsonResponse({ success: true, data: defaults });
+  }
+
+  return jsonResponse({ success: false, error: 'Gruppe nicht gefunden' });
+}
+
+/**
+ * Gruppeneinstellungen speichern (nur Admin).
+ * Schreibt die Einstellungen als JSON-String in die 'einstellungen'-Spalte.
+ * Erstellt die Spalte falls nötig.
+ */
+function lernplattformSpeichereEinstellungen(body) {
+  var gruppeId = body.gruppeId;
+  var einstellungen = body.einstellungen;
+  var email = (body.email || '').toLowerCase().trim();
+
+  if (!gruppeId || !einstellungen || !email) {
+    return jsonResponse({ success: false, error: 'gruppeId, einstellungen und email sind Pflicht' });
+  }
+
+  var sheet = getGruppenRegistry_();
+  if (!sheet) return jsonResponse({ success: false, error: 'Registry nicht gefunden' });
+
+  var daten = sheet.getDataRange().getValues();
+  if (daten.length < 2) return jsonResponse({ success: false, error: 'Gruppe nicht gefunden' });
+
+  var headers = daten[0].map(function(h) { return String(h).toLowerCase().trim(); });
+  var idIdx = headers.indexOf('id');
+  var adminEmailIdx = headers.indexOf('adminemail');
+  var einstellungenIdx = headers.indexOf('einstellungen');
+
+  for (var i = 1; i < daten.length; i++) {
+    if (String(daten[i][idIdx]).trim() !== gruppeId) continue;
+
+    // Admin-Prüfung
+    var adminEmail = String(daten[i][adminEmailIdx] || '').toLowerCase().trim();
+    if (adminEmail !== email) {
+      return jsonResponse({ success: false, error: 'Keine Berechtigung: Nur Admin darf Einstellungen speichern' });
+    }
+
+    // 'einstellungen'-Spalte erstellen falls nicht vorhanden
+    if (einstellungenIdx < 0) {
+      var neueSpalteSpaltenNr = daten[0].length + 1;
+      sheet.getRange(1, neueSpalteSpaltenNr).setValue('einstellungen');
+      sheet.getRange(i + 1, neueSpalteSpaltenNr).setValue(JSON.stringify(einstellungen));
+    } else {
+      sheet.getRange(i + 1, einstellungenIdx + 1).setValue(JSON.stringify(einstellungen));
+    }
+
+    return jsonResponse({ success: true, data: { gespeichert: true } });
+  }
+
+  return jsonResponse({ success: false, error: 'Gruppe nicht gefunden' });
 }
