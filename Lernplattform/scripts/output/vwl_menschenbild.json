@@ -90,14 +90,38 @@
       "Gehört NICHT zum Modell"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Handelt rational",
+        "kategorie": "Eigenschaft des Homo oeconomicus"
+      },
+      {
+        "text": "Handelt immer aus dem Bauch heraus",
+        "kategorie": "Gehört NICHT zum Modell"
+      },
+      {
+        "text": "Maximiert seinen Nutzen",
+        "kategorie": "Eigenschaft des Homo oeconomicus"
+      },
+      {
+        "text": "Ist vollkommen altruistisch",
+        "kategorie": "Gehört NICHT zum Modell"
+      },
+      {
+        "text": "Wägt Kosten und Nutzen ab",
+        "kategorie": "Eigenschaft des Homo oeconomicus"
+      },
+      {
+        "text": "Kennt alle Informationen perfekt",
+        "kategorie": "Gehört NICHT zum Modell"
+      },
+      {
+        "text": "Reagiert auf Anreize",
+        "kategorie": "Eigenschaft des Homo oeconomicus"
+      },
+      {
+        "text": "Ignoriert sein Eigeninteresse",
+        "kategorie": "Gehört NICHT zum Modell"
+      }
     ]
   },
   {
@@ -267,12 +291,30 @@
       "Spricht GEGEN das Modell"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Kunde vergleicht Preise vor dem Kauf",
+        "kategorie": "Spricht FÜR das Modell"
+      },
+      {
+        "text": "Impulskauf an der Kasse",
+        "kategorie": "Spricht GEGEN das Modell"
+      },
+      {
+        "text": "Firma wählt günstigsten Lieferanten",
+        "kategorie": "Spricht FÜR das Modell"
+      },
+      {
+        "text": "Sportler dopt wider besseres Wissen",
+        "kategorie": "Spricht GEGEN das Modell"
+      },
+      {
+        "text": "Student wählt Studiengang nach Jobchancen",
+        "kategorie": "Spricht FÜR das Modell"
+      },
+      {
+        "text": "Jemand spendet anonym für Hilfswerk",
+        "kategorie": "Spricht GEGEN das Modell"
+      }
     ]
   },
   {
@@ -288,7 +330,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/menschenbild/menschenbild_nudging_01.svg",
+      "src": "pool-bilder/vwl/menschenbild/menschenbild_nudging_01.svg",
       "alt": "Vergleich zweier Ansätze zur Verhaltenssteuerung"
     },
     "optionen": [
@@ -667,12 +709,30 @@
       "Unerwünschter Nebeneffekt"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Kehrichtsackgebühren → weniger Abfall",
+        "kategorie": "Erwünschte Wirkung"
+      },
+      {
+        "text": "Kehrichtsackgebühren → wilde Deponien",
+        "kategorie": "Unerwünschter Nebeneffekt"
+      },
+      {
+        "text": "Kobra-Prämie → Inder züchten Kobras",
+        "kategorie": "Unerwünschter Nebeneffekt"
+      },
+      {
+        "text": "Nudge (Fussabdrücke) → weniger Abfall auf Strassen",
+        "kategorie": "Erwünschte Wirkung"
+      },
+      {
+        "text": "Alkoholrationierung → Schwarzbrennereien und Schmuggel",
+        "kategorie": "Unerwünschter Nebeneffekt"
+      },
+      {
+        "text": "Organspende-Widerspruchslösung → mehr Organspender",
+        "kategorie": "Erwünschte Wirkung"
+      }
     ]
   },
   {
@@ -751,7 +811,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/menschenbild/menschenbild_nudging_01.svg",
+      "src": "pool-bilder/vwl/menschenbild/menschenbild_nudging_01.svg",
       "alt": "Vergleich zweier Ansätze zur Verhaltenssteuerung"
     },
     "optionen": [
@@ -895,7 +955,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/menschenbild/menschenbild_payoff_matrix_01.svg",
+      "src": "pool-bilder/vwl/menschenbild/menschenbild_payoff_matrix_01.svg",
       "alt": "Auszahlungsmatrix des Gefangenendilemmas"
     },
     "optionen": [
@@ -923,12 +983,30 @@
       "KEIN Gefangenendilemma"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Doping im Radsport – alle dopen, niemand gewinnt einen Vorteil",
+        "kategorie": "Gefangenendilemma-Situation"
+      },
+      {
+        "text": "Zwei Firmen machen übermässig Werbung, obwohl Verzicht günstiger wäre",
+        "kategorie": "Gefangenendilemma-Situation"
+      },
+      {
+        "text": "Überfischung der Meere – jeder fischt zu viel",
+        "kategorie": "Gefangenendilemma-Situation"
+      },
+      {
+        "text": "Einkauf im Supermarkt",
+        "kategorie": "KEIN Gefangenendilemma"
+      },
+      {
+        "text": "Wettbewerb bei einem Sprintrennen",
+        "kategorie": "KEIN Gefangenendilemma"
+      },
+      {
+        "text": "Wettrüsten zwischen Staaten",
+        "kategorie": "Gefangenendilemma-Situation"
+      }
     ]
   },
   {
@@ -1100,12 +1178,30 @@
       "Beeinflussen"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Die Arbeitslosenquote beträgt 3.2%",
+        "kategorie": "Beschreiben"
+      },
+      {
+        "text": "Die Arbeitslosigkeit steigt wegen sinkender Nachfrage",
+        "kategorie": "Erklären"
+      },
+      {
+        "text": "Die Inflation wird voraussichtlich 2% betragen",
+        "kategorie": "Prognostizieren"
+      },
+      {
+        "text": "Der Staat sollte die Zinsen senken",
+        "kategorie": "Beeinflussen"
+      },
+      {
+        "text": "Das BIP ist im letzten Quartal um 0.5% gewachsen",
+        "kategorie": "Beschreiben"
+      },
+      {
+        "text": "Subventionen für erneuerbare Energien einführen",
+        "kategorie": "Beeinflussen"
+      }
     ]
   },
   {
@@ -1254,7 +1350,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/menschenbild/menschenbild_sechseck_01.svg",
+      "src": "pool-bilder/vwl/menschenbild/menschenbild_sechseck_01.svg",
       "alt": "Sechseck mit sechs wirtschaftspolitischen Zielen"
     },
     "optionen": [
@@ -1301,10 +1397,22 @@
       "Zielkonkurrenz"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Wirtschaftswachstum fördert Vollbeschäftigung",
+        "kategorie": "Zielharmonie"
+      },
+      {
+        "text": "Mehr Wachstum kann Umwelt belasten",
+        "kategorie": "Zielkonkurrenz"
+      },
+      {
+        "text": "Preisstabilität und Vollbeschäftigung können sich kurzfristig widersprechen",
+        "kategorie": "Zielkonkurrenz"
+      },
+      {
+        "text": "Bildungsinvestitionen fördern Wachstum und sozialen Ausgleich gleichzeitig",
+        "kategorie": "Zielharmonie"
+      }
     ]
   },
   {
@@ -1392,7 +1500,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/menschenbild/menschenbild_sechseck_01.svg",
+      "src": "pool-bilder/vwl/menschenbild/menschenbild_sechseck_01.svg",
       "alt": "Sechseck mit sechs wirtschaftspolitischen Zielen"
     },
     "optionen": [
@@ -1440,10 +1548,10 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1 · Gymnasium Hofwil · Individuell üben",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3
+      "Eigeninteresse: Menschen verfolgen ihre eigenen Ziele",
+      "Nutzenmaximierung: Menschen treffen bewusste Kosten-Nutzen-Abwägungen",
+      "Stabile Präferenzen: Vorlieben ändern sich nicht über die Zeit",
+      "Vollständige Information: Alle Alternativen und Konsequenzen sind bekannt"
     ]
   },
   {
@@ -1459,10 +1567,10 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1 · Gymnasium Hofwil · Individuell üben",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3
+      "Klassische Ökonomie (Adam Smith: «unsichtbare Hand», Eigennutz führt zum Gemeinwohl)",
+      "Neoklassik (marginale Revolution: Grenznutzentheorie, Homo Oeconomicus als Modell)",
+      "Keynesianismus (John M. Keynes: Staat muss in Krisen eingreifen, Nachfragesteuerung)",
+      "Verhaltensökonomie (Kahneman/Thaler: Menschen handeln systematisch irrational, Nudging)"
     ]
   },
   {
@@ -1478,12 +1586,12 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1 · Gymnasium Hofwil · Individuell üben",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3,
-      4,
-      5
+      "Preisstabilität (Inflationsbekämpfung – Hauptziel der SNB)",
+      "Vollbeschäftigung (tiefe Arbeitslosigkeit)",
+      "Wirtschaftswachstum (steigendes reales BIP)",
+      "Aussenwirtschaftliches Gleichgewicht (ausgeglichene Leistungsbilanz)",
+      "Gerechte Einkommensverteilung (sozialer Ausgleich)",
+      "Ökologische Nachhaltigkeit (Umweltschutz)"
     ]
   },
   {
@@ -1499,7 +1607,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/menschenbild/menschenbild_payoff_beschriftung.svg",
+      "src": "pool-bilder/vwl/menschenbild/menschenbild_payoff_beschriftung.svg",
       "alt": "Gefangenendilemma-Matrix mit sechs nummerierten Beschriftungspunkten"
     },
     "labels": [
@@ -1554,7 +1662,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/menschenbild/menschenbild_modelle_dragdrop.svg",
+      "src": "pool-bilder/vwl/menschenbild/menschenbild_modelle_dragdrop.svg",
       "alt": "Zwei Spalten: Homo oeconomicus und Behavioral Economics"
     },
     "zones": [

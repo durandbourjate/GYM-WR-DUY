@@ -176,14 +176,38 @@
       "Wissen"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Lohn einer Verkäuferin",
+        "kategorie": "Arbeit"
+      },
+      {
+        "text": "Rohstoffe aus der Erde",
+        "kategorie": "Boden / Natürl. Ressourcen"
+      },
+      {
+        "text": "Maschinen und Anlagen",
+        "kategorie": "Kapital"
+      },
+      {
+        "text": "Patente und Lizenzen",
+        "kategorie": "Wissen"
+      },
+      {
+        "text": "Standort / Grundstück",
+        "kategorie": "Boden / Natürl. Ressourcen"
+      },
+      {
+        "text": "Ausbildung / Know-how",
+        "kategorie": "Wissen"
+      },
+      {
+        "text": "Geldkapital für Investitionen",
+        "kategorie": "Kapital"
+      },
+      {
+        "text": "Körperliche Arbeitskraft",
+        "kategorie": "Arbeit"
+      }
     ]
   },
   {
@@ -363,14 +387,38 @@
       "NICHT im BIP erfasst"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Putzfrau offiziell angestellt",
+        "kategorie": "Im BIP erfasst"
+      },
+      {
+        "text": "Selber die Wohnung putzen",
+        "kategorie": "NICHT im BIP erfasst"
+      },
+      {
+        "text": "Kind in Krippe betreuen lassen",
+        "kategorie": "Im BIP erfasst"
+      },
+      {
+        "text": "Kind zu Hause selber betreuen",
+        "kategorie": "NICHT im BIP erfasst"
+      },
+      {
+        "text": "Schwarzarbeit (nicht angemeldet)",
+        "kategorie": "NICHT im BIP erfasst"
+      },
+      {
+        "text": "Kalbsbraten im Restaurant",
+        "kategorie": "Im BIP erfasst"
+      },
+      {
+        "text": "Kalbsbraten selber kochen",
+        "kategorie": "NICHT im BIP erfasst"
+      },
+      {
+        "text": "Reparatur durch eine Garage",
+        "kategorie": "Im BIP erfasst"
+      }
     ]
   },
   {
@@ -616,12 +664,30 @@
       "Verwendungsansatz"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Summe aller Löhne und Gewinne",
+        "kategorie": "Einkommensansatz"
+      },
+      {
+        "text": "Wertschöpfung aller Unternehmen",
+        "kategorie": "Produktionsansatz"
+      },
+      {
+        "text": "C + I + G + NX",
+        "kategorie": "Verwendungsansatz"
+      },
+      {
+        "text": "Produktionswert minus Vorleistungen",
+        "kategorie": "Produktionsansatz"
+      },
+      {
+        "text": "Export von Uhren ins Ausland",
+        "kategorie": "Verwendungsansatz"
+      },
+      {
+        "text": "Lohn einer Lehrerin",
+        "kategorie": "Einkommensansatz"
+      }
     ]
   },
   {
@@ -1005,12 +1071,30 @@
       "Unternehmen → Haushalte"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Arbeitskraft (Produktionsfaktor)",
+        "kategorie": "Haushalte → Unternehmen"
+      },
+      {
+        "text": "Lohnzahlung",
+        "kategorie": "Unternehmen → Haushalte"
+      },
+      {
+        "text": "Bezahlung für Güter",
+        "kategorie": "Haushalte → Unternehmen"
+      },
+      {
+        "text": "Güter und Dienstleistungen",
+        "kategorie": "Unternehmen → Haushalte"
+      },
+      {
+        "text": "Kapital (Produktionsfaktor)",
+        "kategorie": "Haushalte → Unternehmen"
+      },
+      {
+        "text": "Zinszahlung",
+        "kategorie": "Unternehmen → Haushalte"
+      }
     ]
   },
   {
@@ -1334,12 +1418,30 @@
       "Ursachenbekämpfung"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Progressive Besteuerung",
+        "kategorie": "Umverteilung"
+      },
+      {
+        "text": "Frühförderung für bildungsferne Familien",
+        "kategorie": "Ursachenbekämpfung"
+      },
+      {
+        "text": "Sozialhilfe und Transfers",
+        "kategorie": "Umverteilung"
+      },
+      {
+        "text": "Kostenloser Zugang zu Bildung",
+        "kategorie": "Ursachenbekämpfung"
+      },
+      {
+        "text": "AHV-Renten",
+        "kategorie": "Umverteilung"
+      },
+      {
+        "text": "Stipendien für talentierte Kinder",
+        "kategorie": "Ursachenbekämpfung"
+      }
     ]
   },
   {
@@ -1408,7 +1510,7 @@
     "pruefungstauglich": false,
     "stufe": "EWR GYM2 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/bip/lorenzkurve_vergleich.svg",
+      "src": "pool-bilder/vwl/bip/lorenzkurve_vergleich.svg",
       "alt": "Lorenzkurven von Land A und Land B im Vergleich"
     },
     "optionen": [
@@ -1555,12 +1657,30 @@
       "Umweltzertifikate"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "CO₂-Abgabe auf Brennstoffe",
+        "kategorie": "Lenkungsabgaben"
+      },
+      {
+        "text": "Schadstoff-Grenzwerte",
+        "kategorie": "Gebote und Verbote"
+      },
+      {
+        "text": "Handel mit Emissionsrechten",
+        "kategorie": "Umweltzertifikate"
+      },
+      {
+        "text": "Verbot von FCKW",
+        "kategorie": "Gebote und Verbote"
+      },
+      {
+        "text": "Klimarappen auf Benzin",
+        "kategorie": "Lenkungsabgaben"
+      },
+      {
+        "text": "EU-Emissionshandelssystem (ETS)",
+        "kategorie": "Umweltzertifikate"
+      }
     ]
   },
   {
@@ -1652,12 +1772,30 @@
       "Positiver externer Effekt"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Fabrik verschmutzt einen Fluss",
+        "kategorie": "Negativer externer Effekt"
+      },
+      {
+        "text": "Imker-Bienen bestäuben Nachbars Obstbäume",
+        "kategorie": "Positiver externer Effekt"
+      },
+      {
+        "text": "Fluglärm belästigt Anwohner",
+        "kategorie": "Negativer externer Effekt"
+      },
+      {
+        "text": "Impfung schützt auch Ungeimpfte",
+        "kategorie": "Positiver externer Effekt"
+      },
+      {
+        "text": "Abgase im Stadtverkehr",
+        "kategorie": "Negativer externer Effekt"
+      },
+      {
+        "text": "Forschung nützt der ganzen Gesellschaft",
+        "kategorie": "Positiver externer Effekt"
+      }
     ]
   },
   {
@@ -1736,10 +1874,10 @@
     "pruefungstauglich": false,
     "stufe": "EWR GYM2 · Gymnasium Hofwil · Individuell üben",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3
+      "Haushalte und Unternehmen (einfacher Kreislauf)",
+      "Hinzufügen des Staates (erweiterter Kreislauf mit Steuern und Staatsausgaben)",
+      "Hinzufügen der Banken (Sparen und Investitionen)",
+      "Hinzufügen des Auslands (Exporte und Importe)"
     ]
   },
   {
@@ -1755,10 +1893,10 @@
     "pruefungstauglich": false,
     "stufe": "EWR GYM2 · Gymnasium Hofwil · Individuell üben",
     "reihenfolge": [
-      0,
-      2,
-      1,
-      3
+      "Privater Konsum (C) – ca. 50–55%",
+      "Investitionen (I) – ca. 25–30%",
+      "Staatskonsum (G) – ca. 10–12%",
+      "Nettoexporte (NX = Exporte − Importe) – ca. 5–10%"
     ]
   },
   {
@@ -1774,10 +1912,10 @@
     "pruefungstauglich": false,
     "stufe": "EWR GYM2 · Gymnasium Hofwil · Individuell üben",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3
+      "Nominales BIP des laufenden Jahres bestimmen (Menge × aktuelle Preise)",
+      "Ein Basisjahr als Referenz festlegen",
+      "BIP-Deflator berechnen (Preisindex: aktuelle Preise / Basisjahr-Preise × 100)",
+      "Reales BIP berechnen (Nominales BIP / BIP-Deflator × 100)"
     ]
   },
   {
@@ -1798,7 +1936,7 @@
       "Die Formel lautet: Y = C + I + G + NX."
     ],
     "musterbild": {
-      "src": "/pool-bilder/vwl/bip/bip_verwendungsseite_zeichnen.svg",
+      "src": "pool-bilder/vwl/bip/bip_verwendungsseite_zeichnen.svg",
       "alt": "Musterlösung: BIP-Verwendungsseite"
     }
   },
@@ -1815,7 +1953,7 @@
     "pruefungstauglich": false,
     "stufe": "EWR GYM2 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/bip/bip_verwendung_beschriftung.svg",
+      "src": "pool-bilder/vwl/bip/bip_verwendung_beschriftung.svg",
       "alt": "BIP-Verwendungskomponenten mit fünf nummerierten Beschriftungspunkten"
     },
     "labels": [
@@ -1864,7 +2002,7 @@
     "pruefungstauglich": false,
     "stufe": "EWR GYM2 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/bip/bip_dreiseiten_dragdrop.svg",
+      "src": "pool-bilder/vwl/bip/bip_dreiseiten_dragdrop.svg",
       "alt": "Drei Spalten: Entstehungsseite, Verwendungsseite, Verteilungsseite"
     },
     "zones": [

@@ -1,6 +1,7 @@
 import { useRef, useEffect, useState, useCallback } from 'react'
 import type { FrageKomponenteProps } from './index'
 import FeedbackBox from './FeedbackBox'
+import { resolveAssetUrl } from '../../utils/assetUrl'
 
 export default function ZeichnenFrage({ frage, onAntwort, disabled, feedbackSichtbar, korrekt }: FrageKomponenteProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -147,7 +148,7 @@ export default function ZeichnenFrage({ frage, onAntwort, disabled, feedbackSich
           {frage.musterbild && (
             <div className="space-y-1">
               <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Musterloesung:</p>
-              <img src={frage.musterbild.src} alt={frage.musterbild.alt} className="w-full rounded-xl border border-gray-200 dark:border-gray-600" />
+              <img src={resolveAssetUrl(frage.musterbild.src)} alt={frage.musterbild.alt} className="w-full rounded-xl border border-gray-200 dark:border-gray-600" />
             </div>
           )}
 

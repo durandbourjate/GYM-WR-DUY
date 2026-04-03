@@ -12,7 +12,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM2/GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/markteffizienz/angebot_nachfrage_grunddiagramm.svg",
+      "src": "pool-bilder/vwl/markteffizienz/angebot_nachfrage_grunddiagramm.svg",
       "alt": "Preis-Mengen-Diagramm mit Angebots- und Nachfragekurve"
     },
     "optionen": [
@@ -168,12 +168,30 @@
       "Angebot (Einflussfaktoren)"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Einkommen der Konsumenten",
+        "kategorie": "Nachfrage (Einflussfaktoren)"
+      },
+      {
+        "text": "Produktionskosten",
+        "kategorie": "Angebot (Einflussfaktoren)"
+      },
+      {
+        "text": "Präferenzen und Modetrends",
+        "kategorie": "Nachfrage (Einflussfaktoren)"
+      },
+      {
+        "text": "Technologischer Fortschritt",
+        "kategorie": "Angebot (Einflussfaktoren)"
+      },
+      {
+        "text": "Preise von Substitutionsgütern",
+        "kategorie": "Nachfrage (Einflussfaktoren)"
+      },
+      {
+        "text": "Rohstoffpreise",
+        "kategorie": "Angebot (Einflussfaktoren)"
+      }
     ]
   },
   {
@@ -341,7 +359,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM2/GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/markteffizienz/angebot_nachfrage_grunddiagramm.svg",
+      "src": "pool-bilder/vwl/markteffizienz/angebot_nachfrage_grunddiagramm.svg",
       "alt": "Preis-Mengen-Diagramm mit Angebots- und Nachfragekurve"
     },
     "optionen": [
@@ -404,7 +422,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM2/GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/markteffizienz/ueberschuss_preis_ueber_gleichgewicht.svg",
+      "src": "pool-bilder/vwl/markteffizienz/ueberschuss_preis_ueber_gleichgewicht.svg",
       "alt": "Preis-Mengen-Diagramm bei P₁ über dem Gleichgewichtspreis"
     },
     "optionen": [
@@ -428,7 +446,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM2/GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/markteffizienz/hoechstpreis_diagramm.svg",
+      "src": "pool-bilder/vwl/markteffizienz/hoechstpreis_diagramm.svg",
       "alt": "Preis-Mengen-Diagramm bei einem Höchstpreis P_H"
     },
     "optionen": [
@@ -562,10 +580,22 @@
       "Viele Anbieter"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Monopol (z.B. lokaler Wasserversorger)",
+        "kategorie": "Ein Anbieter"
+      },
+      {
+        "text": "Oligopol (z.B. Mobilfunkanbieter in der Schweiz)",
+        "kategorie": "Wenige Anbieter"
+      },
+      {
+        "text": "Vollkommene Konkurrenz (z.B. Weizenmarkt)",
+        "kategorie": "Viele Anbieter"
+      },
+      {
+        "text": "Monopolistische Konkurrenz (z.B. Restaurants)",
+        "kategorie": "Viele Anbieter"
+      }
     ]
   },
   {
@@ -664,7 +694,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM2/GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/markteffizienz/ueberschuss_preis_ueber_gleichgewicht.svg",
+      "src": "pool-bilder/vwl/markteffizienz/ueberschuss_preis_ueber_gleichgewicht.svg",
       "alt": "Preis-Mengen-Diagramm bei P₁ über dem Gleichgewichtspreis"
     },
     "optionen": [
@@ -688,7 +718,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM2/GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/markteffizienz/hoechstpreis_flaechen_abcd.svg",
+      "src": "pool-bilder/vwl/markteffizienz/hoechstpreis_flaechen_abcd.svg",
       "alt": "Höchstpreisdiagramm mit beschrifteten Flächen A–D"
     },
     "optionen": [
@@ -712,7 +742,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM2/GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/markteffizienz/hoechstpreis_flaechen_abcd.svg",
+      "src": "pool-bilder/vwl/markteffizienz/hoechstpreis_flaechen_abcd.svg",
       "alt": "Höchstpreisdiagramm mit beschrifteten Flächen A–D"
     },
     "optionen": [
@@ -736,7 +766,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM2/GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/markteffizienz/hoechstpreis_flaechen_abcd.svg",
+      "src": "pool-bilder/vwl/markteffizienz/hoechstpreis_flaechen_abcd.svg",
       "alt": "Höchstpreisdiagramm mit beschrifteten Flächen A–D"
     },
     "optionen": [
@@ -787,12 +817,30 @@
       "Nachfrage verschiebt sich nach links (sinkt)"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Das Einkommen der Konsumenten steigt (normales Gut)",
+        "kategorie": "Nachfrage verschiebt sich nach rechts (steigt)"
+      },
+      {
+        "text": "Ein neuer Modetrend macht das Gut beliebt",
+        "kategorie": "Nachfrage verschiebt sich nach rechts (steigt)"
+      },
+      {
+        "text": "Der Preis eines Substitutes sinkt",
+        "kategorie": "Nachfrage verschiebt sich nach links (sinkt)"
+      },
+      {
+        "text": "Negative Berichte über Gesundheitsrisiken",
+        "kategorie": "Nachfrage verschiebt sich nach links (sinkt)"
+      },
+      {
+        "text": "Bevölkerungswachstum",
+        "kategorie": "Nachfrage verschiebt sich nach rechts (steigt)"
+      },
+      {
+        "text": "Der Preis eines Komplementärgutes steigt",
+        "kategorie": "Nachfrage verschiebt sich nach links (sinkt)"
+      }
     ]
   },
   {
@@ -812,11 +860,26 @@
       "Angebot verschiebt sich nach links (sinkt)"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Neue Produktionstechnologie senkt die Kosten",
+        "kategorie": "Angebot verschiebt sich nach rechts (steigt)"
+      },
+      {
+        "text": "Rohstoffpreise steigen",
+        "kategorie": "Angebot verschiebt sich nach links (sinkt)"
+      },
+      {
+        "text": "Der Staat führt eine Produktionssteuer ein",
+        "kategorie": "Angebot verschiebt sich nach links (sinkt)"
+      },
+      {
+        "text": "Subventionen für Produzenten",
+        "kategorie": "Angebot verschiebt sich nach rechts (steigt)"
+      },
+      {
+        "text": "Lohnerhöhungen in der Branche",
+        "kategorie": "Angebot verschiebt sich nach links (sinkt)"
+      }
     ]
   },
   {
@@ -832,7 +895,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM2/GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/markteffizienz/angebot_nachfrage_grunddiagramm.svg",
+      "src": "pool-bilder/vwl/markteffizienz/angebot_nachfrage_grunddiagramm.svg",
       "alt": "Preis-Mengen-Diagramm mit Angebots- und Nachfragekurve"
     },
     "optionen": [
@@ -985,7 +1048,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM2/GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/markteffizienz/angebot_nachfrage_grunddiagramm.svg",
+      "src": "pool-bilder/vwl/markteffizienz/angebot_nachfrage_grunddiagramm.svg",
       "alt": "Preis-Mengen-Diagramm mit Angebots- und Nachfragekurve"
     },
     "optionen": [
@@ -1066,7 +1129,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM2/GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/markteffizienz/nachfrageverschiebung_rechts.svg",
+      "src": "pool-bilder/vwl/markteffizienz/nachfrageverschiebung_rechts.svg",
       "alt": "Nachfrageverschiebung von N₁ nach N₂ (nach rechts)"
     },
     "musterantwort": "(a) Mögliche Ursachen für eine Rechtsverschiebung der Nachfrage: Einkommenssteigerung (bei normalen Gütern), Änderung der Präferenzen zugunsten des Gutes, Preisanstieg bei Substitutionsgütern, Bevölkerungswachstum oder positive Zukunftserwartungen.\n\n(b) Im neuen Gleichgewicht E₂ sind sowohl der Preis (P₂ > P₁) als auch die Menge höher als vorher. Die Angebotskurve bleibt unverändert — Produzenten bieten bei höherem Preis mehr an (Bewegung auf der Angebotskurve)."
@@ -1084,7 +1147,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM2/GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/markteffizienz/konsumenten_produzentenrente.svg",
+      "src": "pool-bilder/vwl/markteffizienz/konsumenten_produzentenrente.svg",
       "alt": "Konsumentenrente (KR) und Produzentenrente (PR) im Gleichgewicht"
     },
     "optionen": [
@@ -1176,7 +1239,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM2/GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/markteffizienz/steuerkeil_diagramm.svg",
+      "src": "pool-bilder/vwl/markteffizienz/steuerkeil_diagramm.svg",
       "alt": "Preis-Mengen-Diagramm mit Steuerkeil"
     },
     "optionen": [
@@ -1336,7 +1399,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM2/GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/markteffizienz/konsumenten_produzentenrente.svg",
+      "src": "pool-bilder/vwl/markteffizienz/konsumenten_produzentenrente.svg",
       "alt": "Konsumentenrente (KR) und Produzentenrente (PR) im Preis-Mengen-Diagramm"
     },
     "optionen": [
@@ -1360,7 +1423,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM2/GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/markteffizienz/steuer_flaechen_abcdef.svg",
+      "src": "pool-bilder/vwl/markteffizienz/steuer_flaechen_abcdef.svg",
       "alt": "Steuerdiagramm mit beschrifteten Flächen A–F"
     },
     "optionen": [
@@ -1389,7 +1452,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM2/GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/markteffizienz/steuer_flaechen_abcdef.svg",
+      "src": "pool-bilder/vwl/markteffizienz/steuer_flaechen_abcdef.svg",
       "alt": "Steuerdiagramm mit beschrifteten Flächen A–F"
     },
     "optionen": [
@@ -1418,7 +1481,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM2/GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/markteffizienz/steuer_flaechen_abcdef.svg",
+      "src": "pool-bilder/vwl/markteffizienz/steuer_flaechen_abcdef.svg",
       "alt": "Steuerdiagramm mit beschrifteten Flächen A–F"
     },
     "optionen": [
@@ -1442,7 +1505,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM2/GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/markteffizienz/steuer_flaechen_abcdef.svg",
+      "src": "pool-bilder/vwl/markteffizienz/steuer_flaechen_abcdef.svg",
       "alt": "Steuerdiagramm mit beschrifteten Flächen A–F"
     },
     "optionen": [
@@ -1498,14 +1561,38 @@
       "Klubgüter"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Brötchen beim Bäcker",
+        "kategorie": "Private Güter"
+      },
+      {
+        "text": "Landesverteidigung",
+        "kategorie": "Öffentliche Güter"
+      },
+      {
+        "text": "Fischbestand im Meer",
+        "kategorie": "Allmendegüter"
+      },
+      {
+        "text": "Pay-TV / Streaming-Abo",
+        "kategorie": "Klubgüter"
+      },
+      {
+        "text": "Strassenbeleuchtung",
+        "kategorie": "Öffentliche Güter"
+      },
+      {
+        "text": "Weideland",
+        "kategorie": "Allmendegüter"
+      },
+      {
+        "text": "Kinoeintritt",
+        "kategorie": "Klubgüter"
+      },
+      {
+        "text": "Trinkwasser aus dem Grundwasser",
+        "kategorie": "Allmendegüter"
+      }
     ]
   },
   {
@@ -1668,12 +1755,30 @@
       "Nicht-rival (Konsum mindert Verfügbarkeit nicht)"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Ein Stück Pizza",
+        "kategorie": "Rival (Konsum mindert Verfügbarkeit)"
+      },
+      {
+        "text": "Ein Radiosignal",
+        "kategorie": "Nicht-rival (Konsum mindert Verfügbarkeit nicht)"
+      },
+      {
+        "text": "Ein Parkplatz in der Innenstadt",
+        "kategorie": "Rival (Konsum mindert Verfügbarkeit)"
+      },
+      {
+        "text": "Die Nutzung einer Brücke (ohne Stau)",
+        "kategorie": "Nicht-rival (Konsum mindert Verfügbarkeit nicht)"
+      },
+      {
+        "text": "Sauberes Trinkwasser aus einer Quelle",
+        "kategorie": "Rival (Konsum mindert Verfügbarkeit)"
+      },
+      {
+        "text": "Ein Feuerwerk",
+        "kategorie": "Nicht-rival (Konsum mindert Verfügbarkeit nicht)"
+      }
     ]
   },
   {
@@ -1753,10 +1858,22 @@
       "Grosser WFV"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Vollkommene Konkurrenz",
+        "kategorie": "Kein/geringer WFV"
+      },
+      {
+        "text": "Monopolistische Konkurrenz",
+        "kategorie": "Mittlerer WFV"
+      },
+      {
+        "text": "Monopol (ohne Preisdifferenzierung)",
+        "kategorie": "Grosser WFV"
+      },
+      {
+        "text": "Oligopol mit Kartellabsprache",
+        "kategorie": "Grosser WFV"
+      }
     ]
   },
   {
@@ -1970,11 +2087,26 @@
       "Kein öffentliches Gut"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Landesverteidigung",
+        "kategorie": "Öffentliches Gut (nicht-rival + nicht-ausschliessbar)"
+      },
+      {
+        "text": "Öffentlicher Park (ohne Überfüllung)",
+        "kategorie": "Öffentliches Gut (nicht-rival + nicht-ausschliessbar)"
+      },
+      {
+        "text": "Öffentliche Schule (staatlich finanziert, aber kapazitätsbegrenzt)",
+        "kategorie": "Kein öffentliches Gut"
+      },
+      {
+        "text": "Leuchtturm",
+        "kategorie": "Öffentliches Gut (nicht-rival + nicht-ausschliessbar)"
+      },
+      {
+        "text": "Schwimmbad (öffentlich zugänglich, aber begrenzte Plätze)",
+        "kategorie": "Kein öffentliches Gut"
+      }
     ]
   },
   {
@@ -2155,11 +2287,26 @@
       "Selbstorganisation"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Zuteilung von Fischereilizenzen durch den Bund",
+        "kategorie": "Staatliche Regulierung"
+      },
+      {
+        "text": "Alpengenossenschaft regelt Alpwirtschaft selbst",
+        "kategorie": "Selbstorganisation"
+      },
+      {
+        "text": "Verkauf von Emissionsrechten an Unternehmen",
+        "kategorie": "Privatisierung"
+      },
+      {
+        "text": "Fahrverbot in der Innenstadt",
+        "kategorie": "Staatliche Regulierung"
+      },
+      {
+        "text": "Gemeinde vereinbart Bewässerungsplan gemeinsam",
+        "kategorie": "Selbstorganisation"
+      }
     ]
   },
   {
@@ -2308,12 +2455,30 @@
       "Positiver externer Effekt"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Eine Fabrik verschmutzt den Fluss",
+        "kategorie": "Negativer externer Effekt"
+      },
+      {
+        "text": "Impfung schützt auch nicht geimpfte Personen",
+        "kategorie": "Positiver externer Effekt"
+      },
+      {
+        "text": "Fluglärm belastet Anwohner",
+        "kategorie": "Negativer externer Effekt"
+      },
+      {
+        "text": "Ein schöner Garten erfreut die Nachbarn",
+        "kategorie": "Positiver externer Effekt"
+      },
+      {
+        "text": "Bildung erhöht die Produktivität der ganzen Gesellschaft",
+        "kategorie": "Positiver externer Effekt"
+      },
+      {
+        "text": "Autoverkehr erzeugt CO₂-Emissionen",
+        "kategorie": "Negativer externer Effekt"
+      }
     ]
   },
   {
@@ -2329,7 +2494,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM2/GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/markteffizienz/externe_effekte_negativ_pk_gk.svg",
+      "src": "pool-bilder/vwl/markteffizienz/externe_effekte_negativ_pk_gk.svg",
       "alt": "Negative externe Effekte: Private Kosten (PK) vs. Gesellschaftliche Kosten (GK)"
     },
     "optionen": [
@@ -2555,7 +2720,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM2/GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/markteffizienz/externe_effekte_negativ_pk_gk.svg",
+      "src": "pool-bilder/vwl/markteffizienz/externe_effekte_negativ_pk_gk.svg",
       "alt": "Negative externe Effekte: Gesellschaftliche Kosten (GK) über privaten Kosten (PK)"
     },
     "optionen": [
@@ -2579,7 +2744,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM2/GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/markteffizienz/externe_effekte_negativ_gk_ueber_pk.svg",
+      "src": "pool-bilder/vwl/markteffizienz/externe_effekte_negativ_gk_ueber_pk.svg",
       "alt": "Diagramm negative externe Effekte mit GK über PK"
     },
     "optionen": [
@@ -2603,7 +2768,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM2/GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/markteffizienz/externe_effekte_negativ_gk_ueber_pk.svg",
+      "src": "pool-bilder/vwl/markteffizienz/externe_effekte_negativ_gk_ueber_pk.svg",
       "alt": "Diagramm negative externe Effekte mit GK über PK"
     },
     "optionen": [
@@ -2710,11 +2875,26 @@
       "Adverse Selektion"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Vollkaskoversicherte fahren unvorsichtiger",
+        "kategorie": "Moral Hazard"
+      },
+      {
+        "text": "Nur kranke Menschen schliessen eine Krankenversicherung ab",
+        "kategorie": "Adverse Selektion"
+      },
+      {
+        "text": "Banken gehen höhere Risiken ein, weil sie auf staatliche Rettung zählen (Too Big to Fail)",
+        "kategorie": "Moral Hazard"
+      },
+      {
+        "text": "Auf dem Gebrauchtwagenmarkt werden vor allem schlechte Autos angeboten",
+        "kategorie": "Adverse Selektion"
+      },
+      {
+        "text": "Ein Arbeitnehmer arbeitet weniger hart, nachdem er festangestellt wurde",
+        "kategorie": "Moral Hazard"
+      }
     ]
   },
   {
@@ -2834,7 +3014,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM2/GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/markteffizienz/steuerkeil_diagramm.svg",
+      "src": "pool-bilder/vwl/markteffizienz/steuerkeil_diagramm.svg",
       "alt": "Steuerdiagramm: Konsumentenpreis P_K, Produzentenpreis P_P und Steuerkeil t"
     },
     "optionen": [
@@ -3012,10 +3192,22 @@
       "Wohlfahrtsverlust (geht an niemanden)"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Konsumentenrente sinkt durch höheren Preis",
+        "kategorie": "Verlust für Konsumenten"
+      },
+      {
+        "text": "Produzentenrente sinkt durch tieferen Erlös",
+        "kategorie": "Verlust für Produzenten"
+      },
+      {
+        "text": "Steuereinnahmen (Rechteck zwischen neuem und altem Preis × neue Menge)",
+        "kategorie": "Gewinn für den Staat"
+      },
+      {
+        "text": "Dreieck rechts der neuen Menge (verlorene Transaktionen)",
+        "kategorie": "Wohlfahrtsverlust (geht an niemanden)"
+      }
     ]
   },
   {
@@ -3050,7 +3242,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM2/GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/markteffizienz/steuerkeil_diagramm.svg",
+      "src": "pool-bilder/vwl/markteffizienz/steuerkeil_diagramm.svg",
       "alt": "Steuerinzidenz: Konsumentenpreis P_K, Produzentenpreis P_P und Steuerkeil t"
     },
     "optionen": [
@@ -3074,7 +3266,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM2/GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/markteffizienz/steuerinzidenz_elastische_nachfrage.svg",
+      "src": "pool-bilder/vwl/markteffizienz/steuerinzidenz_elastische_nachfrage.svg",
       "alt": "Steuerdiagramm bei elastischer Nachfrage und unelastischem Angebot"
     },
     "optionen": [
@@ -3098,7 +3290,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM2/GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/markteffizienz/steuerinzidenz_unelastische_nachfrage.svg",
+      "src": "pool-bilder/vwl/markteffizienz/steuerinzidenz_unelastische_nachfrage.svg",
       "alt": "Steuerdiagramm bei unelastischer Nachfrage und elastischem Angebot"
     },
     "optionen": [
@@ -3141,7 +3333,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM2/GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/markteffizienz/steuerinzidenz_elastische_nachfrage.svg",
+      "src": "pool-bilder/vwl/markteffizienz/steuerinzidenz_elastische_nachfrage.svg",
       "alt": "Steuerdiagramm bei elastischer Nachfrage"
     }
   },
@@ -3182,12 +3374,30 @@
       "Staatsversagen"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Monopolistische Preissetzung",
+        "kategorie": "Marktversagen"
+      },
+      {
+        "text": "Übermässige Bürokratie und Regulierungskosten",
+        "kategorie": "Staatsversagen"
+      },
+      {
+        "text": "Externe Effekte durch Umweltverschmutzung",
+        "kategorie": "Marktversagen"
+      },
+      {
+        "text": "Politisch motivierte Subventionen an ineffiziente Branchen",
+        "kategorie": "Staatsversagen"
+      },
+      {
+        "text": "Asymmetrische Information auf Versicherungsmärkten",
+        "kategorie": "Marktversagen"
+      },
+      {
+        "text": "Korruption und Ressourcenverschwendung in der Verwaltung",
+        "kategorie": "Staatsversagen"
+      }
     ]
   },
   {
@@ -3351,12 +3561,30 @@
       "Degrowth (Postwachstum)"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Wachstum und Umweltschutz gehen Hand in Hand dank technologischem Fortschritt",
+        "kategorie": "Green Growth (Grünes Wachstum)"
+      },
+      {
+        "text": "BIP ist der falsche Massstab — neue Wohlfahrtsindikatoren nötig",
+        "kategorie": "Beyond Growth"
+      },
+      {
+        "text": "Wirtschaftswachstum muss aktiv reduziert werden, um die Umwelt zu schützen",
+        "kategorie": "Degrowth (Postwachstum)"
+      },
+      {
+        "text": "Kostenwahrheit durch Internalisierung externer Effekte löst das Problem",
+        "kategorie": "Green Growth (Grünes Wachstum)"
+      },
+      {
+        "text": "Der Staat muss durch aktive Industriepolitik die Wirtschaft lenken",
+        "kategorie": "Beyond Growth"
+      },
+      {
+        "text": "Suffizienz (weniger Konsum) statt Effizienz (gleicher Konsum mit weniger Ressourcen)",
+        "kategorie": "Degrowth (Postwachstum)"
+      }
     ]
   },
   {
@@ -3493,11 +3721,11 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM2/GYM3 · Gymnasium Hofwil · Individuell üben",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3,
-      4
+      "Coase-Verhandlungen (private Lösung durch Verhandlung der Betroffenen)",
+      "Informationspflichten und Transparenzvorschriften (z.B. Deklarationspflicht)",
+      "Pigou-Steuer / Lenkungsabgaben (z.B. CO₂-Abgabe in der Schweiz)",
+      "Handelbare Emissionszertifikate (staatlich festgelegte Obergrenze)",
+      "Ordnungsrechtliches Verbot (z.B. Verbot bestimmter Chemikalien)"
     ]
   },
   {
@@ -3513,10 +3741,10 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM2/GYM3 · Gymnasium Hofwil · Individuell üben",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3
+      "Vollkommene Konkurrenz (viele kleine Anbieter, homogene Güter)",
+      "Monopolistische Konkurrenz (viele Anbieter, differenzierte Produkte)",
+      "Oligopol (wenige grosse Anbieter dominieren den Markt)",
+      "Monopol (ein einziger Anbieter ohne Konkurrenz)"
     ]
   },
   {
@@ -3532,10 +3760,10 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM2/GYM3 · Gymnasium Hofwil · Individuell üben",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3
+      "Privates Gut (z.B. Schokolade – rival und ausschliessbar)",
+      "Klubgut (z.B. Pay-TV – nicht-rival, aber ausschliessbar)",
+      "Allmendegut (z.B. Fischbestand – rival, aber nicht ausschliessbar)",
+      "Öffentliches Gut (z.B. Landesverteidigung – nicht-rival, nicht ausschliessbar)"
     ]
   },
   {
@@ -3556,7 +3784,7 @@
       "Die Nachfragekurve fällt von links oben nach rechts unten."
     ],
     "musterbild": {
-      "src": "/pool-bilder/vwl/markteffizienz/markteffizienz_angebot_nachfrage_zeichnen.svg",
+      "src": "pool-bilder/vwl/markteffizienz/markteffizienz_angebot_nachfrage_zeichnen.svg",
       "alt": "Musterlösung: Angebot-Nachfrage-Diagramm"
     }
   },
@@ -3573,7 +3801,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM2/GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/markteffizienz/markteffizienz_gleichgewicht_hotspot.svg",
+      "src": "pool-bilder/vwl/markteffizienz/markteffizienz_gleichgewicht_hotspot.svg",
       "alt": "Angebot-Nachfrage-Diagramm mit vier markierten Punkten (A–D)"
     },
     "hotspots": [
@@ -3619,7 +3847,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM2/GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/markteffizienz/markteffizienz_an_beschriftung.svg",
+      "src": "pool-bilder/vwl/markteffizienz/markteffizienz_an_beschriftung.svg",
       "alt": "Angebot-Nachfrage-Diagramm mit sechs nummerierten Beschriftungspunkten"
     },
     "labels": [
@@ -3674,7 +3902,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM2/GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/markteffizienz/markteffizienz_verschiebungen_dragdrop.svg",
+      "src": "pool-bilder/vwl/markteffizienz/markteffizienz_verschiebungen_dragdrop.svg",
       "alt": "Zwei Spalten: Nachfrageverschiebung und Angebotsverschiebung"
     },
     "zones": [

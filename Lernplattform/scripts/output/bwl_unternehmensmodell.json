@@ -435,7 +435,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1",
     "bild": {
-      "src": "/pool-bilder/bwl/unternehmensmodell/unternehmensmodell_vollstaendig_01.svg",
+      "src": "pool-bilder/bwl/unternehmensmodell/unternehmensmodell_vollstaendig_01.svg",
       "alt": "Unternehmensmodell mit Unternehmen im Zentrum, umgeben von acht Ellipsen mit Fragezeichen und fünf farbigen Umweltsphären-Segmenten"
     },
     "optionen": [
@@ -534,7 +534,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1",
     "bild": {
-      "src": "/pool-bilder/bwl/unternehmensmodell/shareholder_stakeholder_vergleich_01.svg",
+      "src": "pool-bilder/bwl/unternehmensmodell/shareholder_stakeholder_vergleich_01.svg",
       "alt": "Vergleich zweier Ansätze: Ansatz A mit Fokus auf eine Gruppe und Gewinnmaximierung, Ansatz B mit Fokus auf alle Gruppen und Ausgewogenheit"
     },
     "optionen": [
@@ -683,7 +683,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1",
     "bild": {
-      "src": "/pool-bilder/bwl/unternehmensmodell/zielbeziehungen_schema_01.svg",
+      "src": "pool-bilder/bwl/unternehmensmodell/zielbeziehungen_schema_01.svg",
       "alt": "Drei Typen von Zielbeziehungen: Typ A mit zwei steigenden Zielen, Typ B mit unabhängigen Zielen, Typ C mit gegenläufigen Zielen"
     },
     "optionen": [
@@ -879,7 +879,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1",
     "bild": {
-      "src": "/pool-bilder/bwl/unternehmensmodell/unternehmensmodell_oekologische_zielbereiche_01.svg",
+      "src": "pool-bilder/bwl/unternehmensmodell/unternehmensmodell_oekologische_zielbereiche_01.svg",
       "alt": "Diagramm: Drei ökologische Zielbereiche mit ihren Teilzielen"
     },
     "optionen": [
@@ -965,7 +965,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1",
     "bild": {
-      "src": "/pool-bilder/bwl/unternehmensmodell/umweltsphaeren_wechselwirkung_01.svg",
+      "src": "pool-bilder/bwl/unternehmensmodell/umweltsphaeren_wechselwirkung_01.svg",
       "alt": "Diagramm mit Unternehmen und Umweltsphären, drei nummerierte Pfeile zeigen verschiedene Wechselwirkungen"
     },
     "optionen": [
@@ -1072,7 +1072,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1",
     "bild": {
-      "src": "/pool-bilder/bwl/unternehmensmodell/unternehmensmodell_wechselwirkungen_01.svg",
+      "src": "pool-bilder/bwl/unternehmensmodell/unternehmensmodell_wechselwirkungen_01.svg",
       "alt": "Diagramm: Wechselwirkungskette zwischen Unternehmen und Umweltsphären"
     },
     "optionen": [
@@ -1530,11 +1530,11 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3,
-      4
+      "Ökonomische Umweltsphäre (Konjunktur, Zinsen, Wechselkurse, Konkurrenz)",
+      "Technologische Umweltsphäre (Digitalisierung, Innovationen, Automatisierung)",
+      "Rechtliche Umweltsphäre (Gesetze, Regulierungen, Branchenvorschriften)",
+      "Soziale Umweltsphäre (demografischer Wandel, Wertewandel, Bildungsniveau)",
+      "Ökologische Umweltsphäre (Klimawandel, Ressourcenknappheit, Umweltauflagen)"
     ]
   },
   {
@@ -1550,10 +1550,10 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3
+      "Reaktiv: Abwarten und erst bei Druck reagieren (z.B. Gesetz wird erlassen)",
+      "Aktiv: Umweltveränderungen frühzeitig erkennen und sich anpassen",
+      "Proaktiv: Veränderungen vorwegnehmen und präventiv handeln",
+      "Interaktiv: Aktiv auf die Umwelt einwirken und sie mitgestalten (z.B. Lobbying, Innovation)"
     ]
   },
   {
@@ -1569,11 +1569,11 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3,
-      4
+      "Mitarbeitende (direkt im Unternehmen tätig)",
+      "Eigentümer/Aktionäre (Kapitalgeber, tragen Risiko)",
+      "Kunden und Lieferanten (direkte Geschäftsbeziehung)",
+      "Staat und Behörden (Rahmenbedingungen, Steuern, Regulierung)",
+      "Öffentlichkeit und NGOs (gesellschaftliche Erwartungen, Reputation)"
     ]
   },
   {
@@ -1594,7 +1594,7 @@
       "Anspruchsgruppen (Stakeholder) stehen zwischen Unternehmen und Umwelt."
     ],
     "musterbild": {
-      "src": "/pool-bilder/bwl/unternehmensmodell/unternehmensmodell_umweltsphaeren_zeichnen.svg",
+      "src": "pool-bilder/bwl/unternehmensmodell/unternehmensmodell_umweltsphaeren_zeichnen.svg",
       "alt": "Musterlösung: St. Galler Unternehmensmodell"
     }
   },
@@ -1611,7 +1611,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1",
     "bild": {
-      "src": "/pool-bilder/bwl/unternehmensmodell/unternehmensmodell_umweltsphaeren_hotspot.svg",
+      "src": "pool-bilder/bwl/unternehmensmodell/unternehmensmodell_umweltsphaeren_hotspot.svg",
       "alt": "St. Galler Unternehmensmodell mit Umweltsphären A–D"
     },
     "hotspots": [
@@ -1657,7 +1657,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1",
     "bild": {
-      "src": "/pool-bilder/bwl/unternehmensmodell/unternehmensmodell_beschriftung.svg",
+      "src": "pool-bilder/bwl/unternehmensmodell/unternehmensmodell_beschriftung.svg",
       "alt": "St. Galler Unternehmensmodell mit leeren Bereichen"
     },
     "labels": [
@@ -1712,7 +1712,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1",
     "bild": {
-      "src": "/pool-bilder/bwl/unternehmensmodell/unternehmensmodell_stakeholder_dragdrop.svg",
+      "src": "pool-bilder/bwl/unternehmensmodell/unternehmensmodell_stakeholder_dragdrop.svg",
       "alt": "Vier Umweltsphären: Technologisch, Ökonomisch, Sozial, Ökologisch"
     },
     "zones": [

@@ -94,12 +94,30 @@
       "Neue Politische Ökonomie (Public Choice)"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Ausbau der Sozial- und Bildungspolitik",
+        "kategorie": "Zunehmende Staatsaufgaben"
+      },
+      {
+        "text": "Budgetmaximierung durch Verwaltungsbeamte",
+        "kategorie": "Neue Politische Ökonomie (Public Choice)"
+      },
+      {
+        "text": "Staatliche Eingriffe im Umwelt- und Gesundheitssektor",
+        "kategorie": "Zunehmende Staatsaufgaben"
+      },
+      {
+        "text": "Ausgabenfreudigkeit der Parlamente",
+        "kategorie": "Neue Politische Ökonomie (Public Choice)"
+      },
+      {
+        "text": "Wachsende Infrastrukturaufgaben",
+        "kategorie": "Zunehmende Staatsaufgaben"
+      },
+      {
+        "text": "Macht und Prestige durch hohes Budget",
+        "kategorie": "Neue Politische Ökonomie (Public Choice)"
+      }
     ]
   },
   {
@@ -262,7 +280,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/staatsverschuldung/bundesausgaben_zusammensetzung.svg",
+      "src": "pool-bilder/vwl/staatsverschuldung/bundesausgaben_zusammensetzung.svg",
       "alt": "Ausgaben des Bundes nach Aufgabengebieten 2018"
     },
     "kategorien": [
@@ -271,11 +289,26 @@
       "Rang 3"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Soziale Wohlfahrt (ca. 22 Mrd. Fr.)",
+        "kategorie": "Rang 1 (grösster)"
+      },
+      {
+        "text": "Finanzen und Steuern (ca. 10 Mrd. Fr.)",
+        "kategorie": "Rang 2"
+      },
+      {
+        "text": "Verkehr (ca. 10 Mrd. Fr.)",
+        "kategorie": "Rang 2"
+      },
+      {
+        "text": "Bildung (ca. 8 Mrd. Fr.)",
+        "kategorie": "Rang 3"
+      },
+      {
+        "text": "Landesverteidigung (ca. 6 Mrd. Fr.)",
+        "kategorie": "Rang 3"
+      }
     ]
   },
   {
@@ -388,12 +421,30 @@
       "Indirekte Steuern"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Einkommenssteuer",
+        "kategorie": "Direkte Steuern"
+      },
+      {
+        "text": "Mehrwertsteuer",
+        "kategorie": "Indirekte Steuern"
+      },
+      {
+        "text": "Vermögenssteuer",
+        "kategorie": "Direkte Steuern"
+      },
+      {
+        "text": "Mineralölsteuer",
+        "kategorie": "Indirekte Steuern"
+      },
+      {
+        "text": "Direkte Bundessteuer",
+        "kategorie": "Direkte Steuern"
+      },
+      {
+        "text": "Tabaksteuer",
+        "kategorie": "Indirekte Steuern"
+      }
     ]
   },
   {
@@ -581,7 +632,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/staatsverschuldung/defizite_konjunkturell_strukturell.svg",
+      "src": "pool-bilder/vwl/staatsverschuldung/defizite_konjunkturell_strukturell.svg",
       "alt": "Konjunkturelle und strukturelle Defizite im Konjunkturzyklus"
     },
     "kategorien": [
@@ -589,12 +640,30 @@
       "Strukturelles Defizit"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Verschwindet im Aufschwung von selbst",
+        "kategorie": "Konjunkturelles Defizit"
+      },
+      {
+        "text": "Nur durch Ausgabenkürzungen oder Steuererhöhungen beseitigbar",
+        "kategorie": "Strukturelles Defizit"
+      },
+      {
+        "text": "Wirkt als automatischer Stabilisator",
+        "kategorie": "Konjunkturelles Defizit"
+      },
+      {
+        "text": "Auch als 'selbstverschuldetes Defizit' bezeichenbar",
+        "kategorie": "Strukturelles Defizit"
+      },
+      {
+        "text": "Entsteht durch rezessionsbedingt tiefere Einnahmen",
+        "kategorie": "Konjunkturelles Defizit"
+      },
+      {
+        "text": "Dauerhaft nicht finanzierte Ausgaben",
+        "kategorie": "Strukturelles Defizit"
+      }
     ]
   },
   {
@@ -941,7 +1010,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/staatsverschuldung/schneeballeffekt.svg",
+      "src": "pool-bilder/vwl/staatsverschuldung/schneeballeffekt.svg",
       "alt": "Kreislaufdiagramm: Selbstverstärkende Dynamik der Staatsverschuldung"
     },
     "optionen": [
@@ -969,12 +1038,30 @@
       "Finanzierung bei der Nationalbank (Monetisierung)"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Zinsdruck nach oben",
+        "kategorie": "Finanzierung am Kapitalmarkt"
+      },
+      {
+        "text": "Geldmenge wird ausgeweitet",
+        "kategorie": "Finanzierung bei der Nationalbank (Monetisierung)"
+      },
+      {
+        "text": "Crowding-out privater Investitionen",
+        "kategorie": "Finanzierung am Kapitalmarkt"
+      },
+      {
+        "text": "Inflationsgefahr steigt",
+        "kategorie": "Finanzierung bei der Nationalbank (Monetisierung)"
+      },
+      {
+        "text": "Geldmenge bleibt unverändert",
+        "kategorie": "Finanzierung am Kapitalmarkt"
+      },
+      {
+        "text": "Zinsen sinken kurzfristig",
+        "kategorie": "Finanzierung bei der Nationalbank (Monetisierung)"
+      }
     ]
   },
   {
@@ -1083,7 +1170,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/staatsverschuldung/schuldenbremse_mechanismus.svg",
+      "src": "pool-bilder/vwl/staatsverschuldung/schuldenbremse_mechanismus.svg",
       "alt": "Mechanismus einer fiskalischen Regel über den Konjunkturverlauf"
     },
     "luecken": [
@@ -1176,12 +1263,30 @@
       "Problematisch"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Kredite für Infrastrukturinvestitionen",
+        "kategorie": "Gerechtfertigt"
+      },
+      {
+        "text": "Schulden zur Finanzierung von Konsumausgaben",
+        "kategorie": "Problematisch"
+      },
+      {
+        "text": "Defizite zur Konjunkturstabilisierung in der Rezession",
+        "kategorie": "Gerechtfertigt"
+      },
+      {
+        "text": "Dauerhaft über die Verhältnisse leben",
+        "kategorie": "Problematisch"
+      },
+      {
+        "text": "Kredite für Bildungsinvestitionen",
+        "kategorie": "Gerechtfertigt"
+      },
+      {
+        "text": "Schulden zur Finanzierung laufender Personalausgaben",
+        "kategorie": "Problematisch"
+      }
     ]
   },
   {
@@ -1641,7 +1746,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/staatsverschuldung/schuldenquoten_international.svg",
+      "src": "pool-bilder/vwl/staatsverschuldung/schuldenquoten_international.svg",
       "alt": "Schuldenquoten ausgewählter Länder"
     },
     "optionen": [
@@ -1816,12 +1921,30 @@
       "Inflation"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Ausgabenkürzungen bei Sozialleistungen",
+        "kategorie": "Haushaltsdisziplin"
+      },
+      {
+        "text": "BIP wächst schneller als die Schulden → Schuldenquote sinkt",
+        "kategorie": "Wirtschaftswachstum"
+      },
+      {
+        "text": "Geldmenge steigt → realer Wert der Schulden sinkt",
+        "kategorie": "Inflation"
+      },
+      {
+        "text": "Steuererhöhungen zur Erhöhung der Einnahmen",
+        "kategorie": "Haushaltsdisziplin"
+      },
+      {
+        "text": "Strukturreformen verbessern Produktivität",
+        "kategorie": "Wirtschaftswachstum"
+      },
+      {
+        "text": "Kaufkraft der Gläubiger wird geschmälert",
+        "kategorie": "Inflation"
+      }
     ]
   },
   {
@@ -1837,11 +1960,11 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3 · Gymnasium Hofwil · Individuell üben",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3,
-      4
+      "Konjunkturfaktor bestimmen (Verhältnis Trend-BIP zu aktuellem BIP)",
+      "Ausgabenplafond berechnen (geschätzte Einnahmen × Konjunkturfaktor)",
+      "Budget des Bundes an den Ausgabenplafond anpassen",
+      "In Boomphasen Überschüsse erzielen (Einnahmen > Ausgaben)",
+      "In Rezessionen moderate Defizite zulassen (Ausgaben > Einnahmen)"
     ]
   },
   {
@@ -1857,10 +1980,10 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3 · Gymnasium Hofwil · Individuell üben",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3
+      "Steigende Zinsausgaben schränken den Handlungsspielraum im laufenden Budget ein",
+      "Crowding-out: Staatliche Kreditaufnahme verdrängt private Investitionen",
+      "Verlust des Vertrauens der Finanzmärkte (steigende Risikoprämien)",
+      "Generationenungerechtigkeit: Künftige Generationen müssen die Schulden zurückzahlen"
     ]
   },
   {
@@ -1876,10 +1999,10 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3 · Gymnasium Hofwil · Individuell üben",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3
+      "Schweiz (ca. 27% des BIP)",
+      "Deutschland (ca. 65% des BIP)",
+      "USA (ca. 120% des BIP)",
+      "Japan (ca. 260% des BIP)"
     ]
   },
   {
@@ -1895,7 +2018,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/staatsverschuldung/staatsverschuldung_schuldenbremse_beschriftung.svg",
+      "src": "pool-bilder/vwl/staatsverschuldung/staatsverschuldung_schuldenbremse_beschriftung.svg",
       "alt": "Schuldenbremse-Mechanismus mit fünf nummerierten Beschriftungspunkten"
     },
     "labels": [
@@ -1944,7 +2067,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/staatsverschuldung/staatsverschuldung_fiskalpolitik_dragdrop.svg",
+      "src": "pool-bilder/vwl/staatsverschuldung/staatsverschuldung_fiskalpolitik_dragdrop.svg",
       "alt": "Zwei Spalten: Expansive und Restriktive Fiskalpolitik"
     },
     "zones": [

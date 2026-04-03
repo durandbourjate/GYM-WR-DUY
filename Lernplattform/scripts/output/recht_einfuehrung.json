@@ -12,7 +12,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1 / EWR GYM2",
     "bild": {
-      "src": "/pool-bilder/recht/einfuehrung/einfuehrung_moral_sitte_recht_01.svg",
+      "src": "pool-bilder/recht/einfuehrung/einfuehrung_moral_sitte_recht_01.svg",
       "alt": "Diagramm: Drei Normsysteme – Moral, Sitte, Recht – und ihr Einfluss auf menschliches Verhalten"
     },
     "optionen": [
@@ -447,7 +447,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1 / EWR GYM2",
     "bild": {
-      "src": "/pool-bilder/recht/einfuehrung/einfuehrung_rechtsstaat_01.svg",
+      "src": "pool-bilder/recht/einfuehrung/einfuehrung_rechtsstaat_01.svg",
       "alt": "Diagramm: Vom Gewaltmonopol zum Rechtsstaat"
     },
     "optionen": [
@@ -995,7 +995,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1 / EWR GYM2",
     "bild": {
-      "src": "/pool-bilder/recht/einfuehrung/einfuehrung_rechtsanwendung_01.svg",
+      "src": "pool-bilder/recht/einfuehrung/einfuehrung_rechtsanwendung_01.svg",
       "alt": "Flussdiagramm: Vier Schritte der Rechtsanwendung"
     },
     "optionen": [
@@ -1234,10 +1234,10 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1 / EWR GYM2",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3
+      "Bundesverfassung (BV) – oberste Rechtsnorm der Schweiz",
+      "Bundesgesetz (z.B. OR, ZGB, StGB) – vom Parlament erlassen",
+      "Verordnung des Bundesrates – konkretisiert ein Gesetz",
+      "Weisung / Richtlinie einer Behörde – interne Verwaltungsanweisung"
     ]
   },
   {
@@ -1253,10 +1253,10 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1 / EWR GYM2",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3
+      "Sachverhalt feststellen: Was ist passiert? (Fakten klären)",
+      "Rechtsnorm finden: Welcher Gesetzesartikel ist einschlägig?",
+      "Subsumtion: Erfüllt der Sachverhalt alle Tatbestandsmerkmale der Norm?",
+      "Rechtsfolge bestimmen: Was ist die rechtliche Konsequenz?"
     ]
   },
   {
@@ -1272,10 +1272,10 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1 / EWR GYM2",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3
+      "Erste Bundesverfassung der modernen Schweiz (1848)",
+      "Totalrevision der Bundesverfassung (1874) – Einführung des fakultativen Referendums",
+      "Inkrafttreten des ZGB (1912) – einheitliches Zivilrecht für die ganze Schweiz",
+      "Totalrevision der Bundesverfassung (1999/2000) – aktuelle BV"
     ]
   },
   {
@@ -1296,7 +1296,7 @@
       "Darunter kommen Bundesgesetze, dann Verordnungen."
     ],
     "musterbild": {
-      "src": "/pool-bilder/recht/einfuehrung/recht_rechtsquellen_zeichnen.svg",
+      "src": "pool-bilder/recht/einfuehrung/recht_rechtsquellen_zeichnen.svg",
       "alt": "Musterlösung: Normenhierarchie"
     }
   },
@@ -1313,7 +1313,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1 / EWR GYM2",
     "bild": {
-      "src": "/pool-bilder/recht/einfuehrung/einfuehrung_subsumtion_beschriftung.svg",
+      "src": "pool-bilder/recht/einfuehrung/einfuehrung_subsumtion_beschriftung.svg",
       "alt": "Flussdiagramm der Subsumtion mit vier nummerierten Schritten"
     },
     "labels": [
@@ -1356,7 +1356,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1 / EWR GYM2",
     "bild": {
-      "src": "/pool-bilder/recht/einfuehrung/einfuehrung_rechtsgebiete_dragdrop.svg",
+      "src": "pool-bilder/recht/einfuehrung/einfuehrung_rechtsgebiete_dragdrop.svg",
       "alt": "Zwei Spalten: Öffentliches Recht und Privatrecht mit Drop-Slots"
     },
     "zones": [

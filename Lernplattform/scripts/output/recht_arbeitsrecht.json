@@ -31,7 +31,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3–GYM4",
     "bild": {
-      "src": "/pool-bilder/recht/arbeitsrecht/arbeitsrecht_bereiche_01.svg",
+      "src": "pool-bilder/recht/arbeitsrecht/arbeitsrecht_bereiche_01.svg",
       "alt": "Diagramm: Bereiche des Arbeitsrechts mit Fragezeichen"
     },
     "optionen": [
@@ -288,7 +288,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3–GYM4",
     "bild": {
-      "src": "/pool-bilder/recht/arbeitsrecht/arbeitsrecht_vertragsarten_01.svg",
+      "src": "pool-bilder/recht/arbeitsrecht/arbeitsrecht_vertragsarten_01.svg",
       "alt": "Übersicht: Drei Vertragstypen auf Arbeitsleistung mit Fragezeichen"
     },
     "optionen": [
@@ -1017,7 +1017,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3–GYM4",
     "bild": {
-      "src": "/pool-bilder/recht/arbeitsrecht/arbeitsrecht_kuendigungsfristen_01.svg",
+      "src": "pool-bilder/recht/arbeitsrecht/arbeitsrecht_kuendigungsfristen_01.svg",
       "alt": "Zeitleiste: Kündigungsfristen nach Dienstjahren mit Fragezeichen"
     },
     "optionen": [
@@ -1973,10 +1973,10 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3–GYM4",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3
+      "Probezeit: 7 Tage Kündigungsfrist (auf beliebigen Tag)",
+      "1. Dienstjahr: 1 Monat Kündigungsfrist (auf Ende eines Monats)",
+      "2.–9. Dienstjahr: 2 Monate Kündigungsfrist (auf Ende eines Monats)",
+      "Ab dem 10. Dienstjahr: 3 Monate Kündigungsfrist (auf Ende eines Monats)"
     ]
   },
   {
@@ -1992,10 +1992,10 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3–GYM4",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3
+      "Schriftlicher Einspruch gegen die Kündigung beim Arbeitgeber vor Ablauf der Kündigungsfrist (OR 336b)",
+      "Versuch einer Einigung mit dem Arbeitgeber (Verhandlung)",
+      "Einleitung des Schlichtungsverfahrens bei der zuständigen Schlichtungsbehörde",
+      "Klage beim Arbeitsgericht innerhalb von 180 Tagen nach Beendigung des Arbeitsverhältnisses"
     ]
   },
   {
@@ -2011,10 +2011,10 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3–GYM4",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3
+      "Bundesverfassung (BV) – Grundrechte, Koalitionsfreiheit, Streikrecht",
+      "Bundesgesetze (OR, ArG, GlG) – zwingend und relativ zwingende Bestimmungen",
+      "Gesamtarbeitsvertrag (GAV) – kollektive Vereinbarung zwischen Sozialpartnern",
+      "Einzelarbeitsvertrag (EAV) – individuelle Vereinbarung zwischen AG und AN"
     ]
   },
   {
@@ -2030,7 +2030,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3–GYM4",
     "bild": {
-      "src": "/pool-bilder/recht/arbeitsrecht/arbeitsrecht_bereiche_beschriftung.svg",
+      "src": "pool-bilder/recht/arbeitsrecht/arbeitsrecht_bereiche_beschriftung.svg",
       "alt": "Drei-Schichten-Diagramm des Arbeitsrechts: individual, kollektiv, öffentlich"
     },
     "labels": [
@@ -2079,7 +2079,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3–GYM4",
     "bild": {
-      "src": "/pool-bilder/recht/arbeitsrecht/arbeitsrecht_fristen_dragdrop.svg",
+      "src": "pool-bilder/recht/arbeitsrecht/arbeitsrecht_fristen_dragdrop.svg",
       "alt": "Drei Spalten: Probezeit, 1. Dienstjahr, Ab 2. Dienstjahr"
     },
     "zones": [

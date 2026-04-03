@@ -1,5 +1,6 @@
 import { useUebungsStore } from '../store/uebungsStore'
 import { FRAGETYP_KOMPONENTEN } from './fragetypen'
+import { bereinigePlatzhalter } from '../utils/fragetext'
 
 export default function UebungsScreen() {
   const { session, feedbackSichtbar, letzteAntwortKorrekt, beantworte, naechsteFrage, istSessionFertig, beendeSession, aktuelleFrage } = useUebungsStore()
@@ -56,7 +57,7 @@ export default function UebungsScreen() {
             <span className="text-xs text-gray-400 dark:text-gray-500">{frage.typ.toUpperCase()}</span>
           </div>
 
-          <h2 className="text-lg font-medium mb-4 dark:text-white">{frage.frage}</h2>
+          <h2 className="text-lg font-medium mb-4 dark:text-white">{bereinigePlatzhalter(frage.frage)}</h2>
 
           {Komponente ? (
             <Komponente

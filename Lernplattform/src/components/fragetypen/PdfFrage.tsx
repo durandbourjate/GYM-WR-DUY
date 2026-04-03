@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { FrageKomponenteProps } from './index'
 import FeedbackBox from './FeedbackBox'
+import { resolveAssetUrl } from '../../utils/assetUrl'
 
 export default function PdfFrage({ frage, onAntwort, disabled, feedbackSichtbar, korrekt }: FrageKomponenteProps) {
   const [text, setText] = useState('')
@@ -22,7 +23,7 @@ export default function PdfFrage({ frage, onAntwort, disabled, feedbackSichtbar,
       {frage.pdfUrl && (
         <div className="rounded-xl border-2 border-gray-200 dark:border-gray-600 overflow-hidden">
           <iframe
-            src={frage.pdfUrl}
+            src={resolveAssetUrl(frage.pdfUrl)}
             title="PDF-Material"
             className="w-full"
             style={{ height: '500px' }}

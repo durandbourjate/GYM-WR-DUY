@@ -12,7 +12,7 @@
     "pruefungstauglich": false,
     "stufe": "EWR GYM2",
     "bild": {
-      "src": "/pool-bilder/recht/prozessrecht/prozessrecht_vergleich_zivil_straf_01.svg",
+      "src": "pool-bilder/recht/prozessrecht/prozessrecht_vergleich_zivil_straf_01.svg",
       "alt": "Vergleichstabelle: Zivilprozess und Strafverfahren – Parteien, Ziel, Grundsatz, Rechtsgebiet"
     },
     "optionen": [
@@ -416,7 +416,7 @@
     "pruefungstauglich": false,
     "stufe": "EWR GYM2",
     "bild": {
-      "src": "/pool-bilder/recht/prozessrecht/prozessrecht_instanzenzug_01.svg",
+      "src": "pool-bilder/recht/prozessrecht/prozessrecht_instanzenzug_01.svg",
       "alt": "Diagramm: Instanzenzug im Zivilprozess – Schlichtungsbehörde, Regionalgericht, Obergericht, Bundesgericht"
     },
     "optionen": [
@@ -1043,7 +1043,7 @@
     "pruefungstauglich": false,
     "stufe": "EWR GYM2",
     "bild": {
-      "src": "/pool-bilder/recht/prozessrecht/prozessrecht_strafverfahren_ablauf_01.svg",
+      "src": "pool-bilder/recht/prozessrecht/prozessrecht_strafverfahren_ablauf_01.svg",
       "alt": "Ablaufdiagramm: Phasen eines Strafverfahrens – Einleitung, Vorverfahren, Anklage, Hauptverhandlung, Urteil"
     },
     "optionen": [
@@ -1279,10 +1279,10 @@
     "pruefungstauglich": false,
     "stufe": "EWR GYM2",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3
+      "Schlichtungsbehörde (obligatorischer Schlichtungsversuch vor dem Prozess, Art. 197 ZPO)",
+      "Erstinstanzliches Gericht (Regionalgericht / Bezirksgericht)",
+      "Kantonales Obergericht (Berufungsinstanz – überprüft Sachverhalt und Recht)",
+      "Bundesgericht (letzte Instanz – überprüft nur noch Rechtsfragen)"
     ]
   },
   {
@@ -1298,11 +1298,11 @@
     "pruefungstauglich": false,
     "stufe": "EWR GYM2",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3,
-      4
+      "Vorverfahren: Polizeiliche Ermittlung und staatsanwaltliche Untersuchung",
+      "Anklageerhebung: Staatsanwaltschaft erhebt Anklage beim Gericht",
+      "Hauptverhandlung: Beweisaufnahme, Plädoyers, rechtliches Gehör",
+      "Urteil: Schuld- und Freispruch, Strafmass",
+      "Rechtsmittelverfahren: Berufung oder Beschwerde (falls eingelegt)"
     ]
   },
   {
@@ -1318,11 +1318,11 @@
     "pruefungstauglich": false,
     "stufe": "EWR GYM2",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3,
-      4
+      "Direkte Verhandlung zwischen den Parteien (aussergerichtliche Einigung)",
+      "Mediation (neutrale Vermittlungsperson, freiwillig, keine Entscheidungsmacht)",
+      "Schlichtung (obligatorisch vor Zivilprozess, Schlichtungsbehörde kann Urteilsvorschlag machen)",
+      "Schiedsgericht (private Richter, bindender Entscheid, vertragliche Vereinbarung)",
+      "Staatliches Gericht (formelles Verfahren, gesetzlich geregelt, vollstreckbares Urteil)"
     ]
   },
   {
@@ -1338,7 +1338,7 @@
     "pruefungstauglich": false,
     "stufe": "EWR GYM2",
     "bild": {
-      "src": "/pool-bilder/recht/prozessrecht/prozessrecht_instanzenzug_hotspot.svg",
+      "src": "pool-bilder/recht/prozessrecht/prozessrecht_instanzenzug_hotspot.svg",
       "alt": "Instanzenzug-Diagramm mit Buchstaben-Markern A bis D"
     },
     "hotspots": [
@@ -1384,7 +1384,7 @@
     "pruefungstauglich": false,
     "stufe": "EWR GYM2",
     "bild": {
-      "src": "/pool-bilder/recht/prozessrecht/prozessrecht_instanzenzug_beschriftung.svg",
+      "src": "pool-bilder/recht/prozessrecht/prozessrecht_instanzenzug_beschriftung.svg",
       "alt": "Treppendiagramm des Instanzenzugs mit roten Kreisen"
     },
     "labels": [
@@ -1433,7 +1433,7 @@
     "pruefungstauglich": false,
     "stufe": "EWR GYM2",
     "bild": {
-      "src": "/pool-bilder/recht/prozessrecht/prozessrecht_verfahren_dragdrop.svg",
+      "src": "pool-bilder/recht/prozessrecht/prozessrecht_verfahren_dragdrop.svg",
       "alt": "Zwei Spalten: Zivilprozess und Strafprozess"
     },
     "zones": [

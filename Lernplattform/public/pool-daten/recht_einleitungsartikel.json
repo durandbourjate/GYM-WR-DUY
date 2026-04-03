@@ -32,7 +32,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1–GYM2",
     "bild": {
-      "src": "/pool-bilder/recht/einleitungsartikel/einleitungsartikel_normenpyramide_01.svg",
+      "src": "pool-bilder/recht/einleitungsartikel/einleitungsartikel_normenpyramide_01.svg",
       "alt": "Normenpyramide mit drei Stufen des geschriebenen Rechts"
     },
     "luecken": [
@@ -1170,7 +1170,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1–GYM2",
     "bild": {
-      "src": "/pool-bilder/recht/einleitungsartikel/einleitungsartikel_ueberblick_01.svg",
+      "src": "pool-bilder/recht/einleitungsartikel/einleitungsartikel_ueberblick_01.svg",
       "alt": "Übersichtsdiagramm der ZGB-Einleitungsartikel mit Zuordnungsaufgabe"
     },
     "optionen": [
@@ -1198,9 +1198,9 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1–GYM2",
     "reihenfolge": [
-      0,
-      1,
-      2
+      "Geschriebenes Gesetz (Verfassung, Gesetze, Verordnungen)",
+      "Gewohnheitsrecht (ungeschriebene, durch langjährige Übung entstandene Normen)",
+      "Richterrecht (der Richter wird zum «Gesetzgeber» und füllt Lücken nach Art. 1 Abs. 2 ZGB)"
     ]
   },
   {
@@ -1216,10 +1216,10 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1–GYM2",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3
+      "Beweislastverteilung bestimmen: Wer muss was beweisen? (Art. 8 ZGB: wer aus einer Tatsache Rechte ableitet)",
+      "Beweismittel einreichen (Urkunden, Zeugen, Augenschein, Gutachten, Parteiaussage)",
+      "Beweismittel vom Gericht würdigen (freie Beweiswürdigung)",
+      "Beweisergebnis festhalten: Tatsache bewiesen oder nicht bewiesen?"
     ]
   },
   {
@@ -1235,7 +1235,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1–GYM2",
     "bild": {
-      "src": "/pool-bilder/recht/einleitungsartikel/einleitungsartikel_pyramide_beschriftung.svg",
+      "src": "pool-bilder/recht/einleitungsartikel/einleitungsartikel_pyramide_beschriftung.svg",
       "alt": "Normenpyramide mit fünf Stufen und roten nummerierten Kreisen"
     },
     "labels": [
@@ -1284,7 +1284,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1–GYM2",
     "bild": {
-      "src": "/pool-bilder/recht/einleitungsartikel/einleitungsartikel_normen_dragdrop.svg",
+      "src": "pool-bilder/recht/einleitungsartikel/einleitungsartikel_normen_dragdrop.svg",
       "alt": "Drei Spalten: Verfassungsstufe, Gesetzesstufe, Verordnungsstufe"
     },
     "zones": [

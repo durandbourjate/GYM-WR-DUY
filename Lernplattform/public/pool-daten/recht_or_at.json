@@ -2663,11 +2663,11 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3–GYM4",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3,
-      4
+      "Antrag (Offerte): Eine Partei macht ein verbindliches Angebot",
+      "Annahme (Akzept): Die andere Partei nimmt das Angebot an",
+      "Übereinstimmende gegenseitige Willensäusserung (Konsens) liegt vor",
+      "Prüfung der Gültigkeitsvoraussetzungen (Handlungsfähigkeit, Form, Inhalt)",
+      "Vertrag ist gültig zustande gekommen → Rechte und Pflichten entstehen"
     ]
   },
   {
@@ -2683,10 +2683,10 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3–GYM4",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3
+      "Fälligkeit der Leistung tritt ein (Erfüllungszeitpunkt ist erreicht)",
+      "Mahnung des Schuldners (Aufforderung zur Leistung, sofern kein Verfalltag vereinbart)",
+      "Angemessene Nachfrist ansetzen (OR 107 – mit Androhung der Konsequenzen)",
+      "Nach erfolgloser Nachfrist: Wahlrecht des Gläubigers (Erfüllung, Schadenersatz oder Rücktritt)"
     ]
   },
   {
@@ -2702,10 +2702,10 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3–GYM4",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3
+      "1 Jahr: Mängelansprüche bei beweglichen Sachen (OR 210)",
+      "2 Jahre: Forderungen aus Kaufverträgen des täglichen Verkehrs (OR 128)",
+      "5 Jahre: Forderungen für Mietzinse, periodische Leistungen (OR 128)",
+      "10 Jahre: Allgemeine Verjährungsfrist für Forderungen (OR 127)"
     ]
   },
   {
@@ -2726,7 +2726,7 @@
       "Der Vertrag kommt durch Konsens (Willensübereinstimmung) zustande."
     ],
     "musterbild": {
-      "src": "/pool-bilder/recht/or_at/or_at_vertragsschema_zeichnen.svg",
+      "src": "pool-bilder/recht/or_at/or_at_vertragsschema_zeichnen.svg",
       "alt": "Musterlösung: Vertragsschema OR 1"
     }
   },
@@ -2743,7 +2743,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3–GYM4",
     "bild": {
-      "src": "/pool-bilder/recht/or_at/or_at_vertrag_beschriftung.svg",
+      "src": "pool-bilder/recht/or_at/or_at_vertrag_beschriftung.svg",
       "alt": "Vertragsschema mit Antrag, Annahme, Konsens und Voraussetzungen"
     },
     "labels": [
@@ -2792,7 +2792,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3–GYM4",
     "bild": {
-      "src": "/pool-bilder/recht/or_at/or_at_stoerungen_dragdrop.svg",
+      "src": "pool-bilder/recht/or_at/or_at_stoerungen_dragdrop.svg",
       "alt": "Drei Spalten: Leistungsstörung, Willensmangel, Formfehler"
     },
     "zones": [

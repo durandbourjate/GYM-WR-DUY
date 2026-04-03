@@ -144,7 +144,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3–GYM4",
     "bild": {
-      "src": "/pool-bilder/vwl/konjunktur/konjunktur_zyklus_01.svg",
+      "src": "pool-bilder/vwl/konjunktur/konjunktur_zyklus_01.svg",
       "alt": "Modellhafter Konjunkturverlauf mit Phasen"
     },
     "optionen": [
@@ -271,7 +271,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3–GYM4",
     "bild": {
-      "src": "/pool-bilder/vwl/konjunktur/konjunktur_indikatoren_01.svg",
+      "src": "pool-bilder/vwl/konjunktur/konjunktur_indikatoren_01.svg",
       "alt": "Konjunkturindikatoren: Zeitliche Einordnung"
     },
     "optionen": [
@@ -512,7 +512,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3–GYM4",
     "bild": {
-      "src": "/pool-bilder/vwl/konjunktur/konjunktur_ursachen_01.svg",
+      "src": "pool-bilder/vwl/konjunktur/konjunktur_ursachen_01.svg",
       "alt": "Ursachen von Konjunkturschwankungen"
     },
     "optionen": [
@@ -688,7 +688,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3–GYM4",
     "bild": {
-      "src": "/pool-bilder/vwl/konjunktur/konjunktur_ursachen_01.svg",
+      "src": "pool-bilder/vwl/konjunktur/konjunktur_ursachen_01.svg",
       "alt": "Ursachen von Konjunkturschwankungen"
     },
     "optionen": [
@@ -835,7 +835,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3–GYM4",
     "bild": {
-      "src": "/pool-bilder/vwl/konjunktur/konjunktur_klassiker_01.svg",
+      "src": "pool-bilder/vwl/konjunktur/konjunktur_klassiker_01.svg",
       "alt": "Klassische Konzeption: Selbstheilungskräfte"
     },
     "optionen": [
@@ -1024,7 +1024,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3–GYM4",
     "bild": {
-      "src": "/pool-bilder/vwl/konjunktur/konjunktur_keynes_01.svg",
+      "src": "pool-bilder/vwl/konjunktur/konjunktur_keynes_01.svg",
       "alt": "Keynesianische Konzeption: Antizyklische Fiskalpolitik"
     },
     "optionen": [
@@ -1220,7 +1220,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3–GYM4",
     "bild": {
-      "src": "/pool-bilder/vwl/konjunktur/konjunktur_crowding_out_01.svg",
+      "src": "pool-bilder/vwl/konjunktur/konjunktur_crowding_out_01.svg",
       "alt": "Wirkungskette einer staatlichen Kreditaufnahme"
     },
     "optionen": [
@@ -1273,7 +1273,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3–GYM4",
     "bild": {
-      "src": "/pool-bilder/vwl/konjunktur/konjunktur_monetaristen_01.svg",
+      "src": "pool-bilder/vwl/konjunktur/konjunktur_monetaristen_01.svg",
       "alt": "Monetaristische Konzeption: Quantitätsgleichung"
     },
     "optionen": [
@@ -1505,7 +1505,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3–GYM4",
     "bild": {
-      "src": "/pool-bilder/vwl/konjunktur/konjunktur_konzeptionen_01.svg",
+      "src": "pool-bilder/vwl/konjunktur/konjunktur_konzeptionen_01.svg",
       "alt": "Konjunkturpolitische Konzeptionen im Vergleich"
     },
     "optionen": [
@@ -1643,10 +1643,10 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3–GYM4",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3
+      "Aufschwung (Erholung)",
+      "Hochkonjunktur (Boom)",
+      "Abschwung (Rezession beginnt)",
+      "Talsohle (Depression)"
     ]
   },
   {
@@ -1662,11 +1662,11 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3–GYM4",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3,
-      4
+      "SNB senkt den Leitzins",
+      "Geschäftsbanken vergeben günstigere Kredite",
+      "Unternehmen und Haushalte investieren und konsumieren mehr",
+      "Die gesamtwirtschaftliche Nachfrage steigt",
+      "Produktion und Beschäftigung nehmen zu"
     ]
   },
   {
@@ -1723,7 +1723,7 @@
       "Die Konjunkturkurve schwankt um den Trend herum."
     ],
     "musterbild": {
-      "src": "/pool-bilder/vwl/konjunktur/konjunktur_zyklus_01.svg",
+      "src": "pool-bilder/vwl/konjunktur/konjunktur_zyklus_01.svg",
       "alt": "Musterlösung: Konjunkturzyklus mit Trend und beschrifteten Phasen"
     }
   },
@@ -1740,7 +1740,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3–GYM4",
     "bild": {
-      "src": "/pool-bilder/vwl/konjunktur/konjunktur_zyklus_hotspot.svg",
+      "src": "pool-bilder/vwl/konjunktur/konjunktur_zyklus_hotspot.svg",
       "alt": "Konjunkturzyklus mit vier markierten Punkten (A–D)"
     },
     "hotspots": [
@@ -1786,7 +1786,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3–GYM4",
     "bild": {
-      "src": "/pool-bilder/vwl/konjunktur/konjunktur_zyklus_beschriftung.svg",
+      "src": "pool-bilder/vwl/konjunktur/konjunktur_zyklus_beschriftung.svg",
       "alt": "Konjunkturzyklus mit fünf nummerierten Beschriftungspunkten"
     },
     "labels": [
@@ -1835,7 +1835,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3–GYM4",
     "bild": {
-      "src": "/pool-bilder/vwl/konjunktur/konjunktur_phasen_dragdrop.svg",
+      "src": "pool-bilder/vwl/konjunktur/konjunktur_phasen_dragdrop.svg",
       "alt": "Vier Konjunkturphasen mit Drop-Zonen"
     },
     "zones": [
@@ -1943,7 +1943,7 @@
     "uebung": true,
     "pruefungstauglich": false,
     "stufe": "SF GYM3–GYM4",
-    "pdfUrl": "/pool-bilder/vwl/konjunktur/konjunktur_lagebericht.pdf",
+    "pdfUrl": "pool-bilder/vwl/konjunktur/konjunktur_lagebericht.pdf",
     "antwortTyp": "freitext",
     "musterantwort": "Die Schweiz befindet sich gemäss dem Lagebericht in einem Aufschwung, der sich der Hochkonjunktur nähert. Drei Belege: (1) Das BIP wächst mit 1,8 % solide — die Erholung setzt sich fort. (2) Die Arbeitslosenquote ist mit 2,1 % tief und weiter sinkend, bei gleichzeitig steigenden offenen Stellen. (3) Die Stimmungsindikatoren (KOF 102,5, PMI 51,3) liegen über der Wachstumsschwelle und steigen. Die moderate Inflation von 1,4 % spricht gegen einen Boom, da in der Hochkonjunktur typischerweise stärkerer Preisdruck herrscht.",
     "hinweise": [

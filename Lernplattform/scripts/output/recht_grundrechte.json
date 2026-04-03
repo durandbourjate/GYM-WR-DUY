@@ -226,7 +226,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM2 / EWR GYM2",
     "bild": {
-      "src": "/pool-bilder/recht/grundrechte/grundrechte_ebenen_01.svg",
+      "src": "pool-bilder/recht/grundrechte/grundrechte_ebenen_01.svg",
       "alt": "Übersicht: Menschenrechtsschutz auf internationaler, europäischer und nationaler Ebene"
     },
     "optionen": [
@@ -586,7 +586,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM2 / EWR GYM2",
     "bild": {
-      "src": "/pool-bilder/recht/grundrechte/grundrechte_pruefschema_01.svg",
+      "src": "pool-bilder/recht/grundrechte/grundrechte_pruefschema_01.svg",
       "alt": "Flussdiagramm: Prüfschema zur Einschränkung von Grundrechten nach Art. 36 BV"
     },
     "optionen": [
@@ -1196,10 +1196,10 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM2 / EWR GYM2",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3
+      "Gesetzliche Grundlage (die Einschränkung muss im Gesetz vorgesehen sein)",
+      "Öffentliches Interesse oder Schutz von Grundrechten Dritter (legitimer Zweck)",
+      "Verhältnismässigkeit (Eignung, Erforderlichkeit, Zumutbarkeit der Massnahme)",
+      "Kerngehalt unantastbar (der Wesensgehalt des Grundrechts darf nie verletzt werden)"
     ]
   },
   {
@@ -1215,10 +1215,10 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM2 / EWR GYM2",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3
+      "Allgemeine Erklärung der Menschenrechte (AEMR, UNO 1948)",
+      "Europäische Menschenrechtskonvention (EMRK, Europarat 1950)",
+      "UNO-Pakte I und II (wirtschaftliche/soziale und bürgerliche/politische Rechte, 1966)",
+      "Schweizer Bundesverfassung mit umfassendem Grundrechtskatalog (1999/2000)"
     ]
   },
   {
@@ -1234,7 +1234,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM2 / EWR GYM2",
     "bild": {
-      "src": "/pool-bilder/recht/grundrechte/grundrechte_pruefschema_beschriftung.svg",
+      "src": "pool-bilder/recht/grundrechte/grundrechte_pruefschema_beschriftung.svg",
       "alt": "Flussdiagramm des Grundrechts-Prüfschemas mit vier Hauptschritten"
     },
     "labels": [
@@ -1289,7 +1289,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM2 / EWR GYM2",
     "bild": {
-      "src": "/pool-bilder/recht/grundrechte/grundrechte_kategorien_dragdrop.svg",
+      "src": "pool-bilder/recht/grundrechte/grundrechte_kategorien_dragdrop.svg",
       "alt": "Drei Spalten: Freiheitsrechte, Gleichheitsrechte, Soziale Grundrechte"
     },
     "zones": [

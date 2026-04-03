@@ -75,12 +75,30 @@
       "Arbeitsnachfrage"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Arbeitnehmerinnen und Arbeitnehmer",
+        "kategorie": "Arbeitsangebot"
+      },
+      {
+        "text": "Unternehmen",
+        "kategorie": "Arbeitsnachfrage"
+      },
+      {
+        "text": "Der Staat als Arbeitgeber",
+        "kategorie": "Arbeitsnachfrage"
+      },
+      {
+        "text": "Stellensuchende Personen",
+        "kategorie": "Arbeitsangebot"
+      },
+      {
+        "text": "Firmen, die Personal rekrutieren",
+        "kategorie": "Arbeitsnachfrage"
+      },
+      {
+        "text": "Erwerbspersonen",
+        "kategorie": "Arbeitsangebot"
+      }
     ]
   },
   {
@@ -192,7 +210,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/arbeitslosigkeit/arbeitsmarkt_lohnrigid.svg",
+      "src": "pool-bilder/vwl/arbeitslosigkeit/arbeitsmarkt_lohnrigid.svg",
       "alt": "Arbeitsmarktdiagramm mit Angebots- und Nachfragekurve"
     },
     "optionen": [
@@ -297,12 +315,30 @@
       "Effizienzlohntheorie"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Mindestlöhne und Kündigungsschutz",
+        "kategorie": "Institutionelle Faktoren"
+      },
+      {
+        "text": "Beschäftigte handeln via Gewerkschaft höhere Löhne aus",
+        "kategorie": "Insider-Outsider-Modell"
+      },
+      {
+        "text": "Hohe Löhne senken Fluktuation und steigern Motivation",
+        "kategorie": "Effizienzlohntheorie"
+      },
+      {
+        "text": "Gesamtarbeitsverträge schreiben Mindestlöhne vor",
+        "kategorie": "Institutionelle Faktoren"
+      },
+      {
+        "text": "Neueinstellungen verursachen Transaktionskosten",
+        "kategorie": "Insider-Outsider-Modell"
+      },
+      {
+        "text": "Unternehmen zahlen bewusst über Marktlohn",
+        "kategorie": "Effizienzlohntheorie"
+      }
     ]
   },
   {
@@ -460,12 +496,30 @@
       "Strukturelle AL"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Skilehrer im Sommer ohne Anstellung",
+        "kategorie": "Friktionelle AL"
+      },
+      {
+        "text": "Massenentlassungen in einer Rezession",
+        "kategorie": "Konjunkturelle AL"
+      },
+      {
+        "text": "Fabrikarbeiter wird durch Roboter ersetzt",
+        "kategorie": "Strukturelle AL"
+      },
+      {
+        "text": "Bankangestellter sucht nach Kündigung neue Stelle",
+        "kategorie": "Friktionelle AL"
+      },
+      {
+        "text": "Unternehmen baut wegen schlechter Konjunktur Stellen ab",
+        "kategorie": "Konjunkturelle AL"
+      },
+      {
+        "text": "Druckerei schliesst wegen Digitalisierung",
+        "kategorie": "Strukturelle AL"
+      }
     ]
   },
   {
@@ -717,12 +771,30 @@
       "Rezession (rechts unten)"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Mehr offene Stellen als Arbeitslose",
+        "kategorie": "Hochkonjunktur (links oben)"
+      },
+      {
+        "text": "Mehr Arbeitslose als offene Stellen",
+        "kategorie": "Rezession (rechts unten)"
+      },
+      {
+        "text": "Unternehmen haben Schwierigkeiten, Personal zu finden",
+        "kategorie": "Hochkonjunktur (links oben)"
+      },
+      {
+        "text": "Unternehmen reagieren mit Entlassungen",
+        "kategorie": "Rezession (rechts unten)"
+      },
+      {
+        "text": "Stellenüberhang",
+        "kategorie": "Hochkonjunktur (links oben)"
+      },
+      {
+        "text": "Stellenmangel",
+        "kategorie": "Rezession (rechts unten)"
+      }
     ]
   },
   {
@@ -791,7 +863,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/arbeitslosigkeit/beveridge_kurve.svg",
+      "src": "pool-bilder/vwl/arbeitslosigkeit/beveridge_kurve.svg",
       "alt": "Beveridge-Kurve mit drei markierten Konjunkturpunkten"
     },
     "optionen": [
@@ -815,7 +887,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/arbeitslosigkeit/beveridge_verschiebung.svg",
+      "src": "pool-bilder/vwl/arbeitslosigkeit/beveridge_verschiebung.svg",
       "alt": "Verschiebung der Beveridge-Kurve nach aussen"
     },
     "optionen": [
@@ -887,12 +959,30 @@
       "Ansatz am Arbeitsmarkt"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Stärkung der Wettbewerbskraft",
+        "kategorie": "Ansatz am Gütermarkt"
+      },
+      {
+        "text": "Kurzarbeit einführen",
+        "kategorie": "Ansatz am Arbeitsmarkt"
+      },
+      {
+        "text": "Bildungspolitik und Weiterbildung",
+        "kategorie": "Ansatz am Arbeitsmarkt"
+      },
+      {
+        "text": "Beschäftigungsprogramme des Staates",
+        "kategorie": "Ansatz am Gütermarkt"
+      },
+      {
+        "text": "Erhöhung der Standortattraktivität",
+        "kategorie": "Ansatz am Gütermarkt"
+      },
+      {
+        "text": "Flexibilisierung des Arbeitsmarktes",
+        "kategorie": "Ansatz am Arbeitsmarkt"
+      }
     ]
   },
   {
@@ -1139,12 +1229,30 @@
       "Erwerbslosenquote (BFS/ILO)"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Basiert auf Registrierungen bei den Arbeitsämtern",
+        "kategorie": "Arbeitslosenquote (SECO)"
+      },
+      {
+        "text": "Basiert auf Stichprobenbefragung (SAKE)",
+        "kategorie": "Erwerbslosenquote (BFS/ILO)"
+      },
+      {
+        "text": "Geeignet für internationale Vergleiche",
+        "kategorie": "Erwerbslosenquote (BFS/ILO)"
+      },
+      {
+        "text": "Wird monatlich vom SECO veröffentlicht",
+        "kategorie": "Arbeitslosenquote (SECO)"
+      },
+      {
+        "text": "Zählt auch Langzeitarbeitslose und Ausgesteuerte mit",
+        "kategorie": "Erwerbslosenquote (BFS/ILO)"
+      },
+      {
+        "text": "Ist in der Regel tiefer als die andere Kennzahl",
+        "kategorie": "Arbeitslosenquote (SECO)"
+      }
     ]
   },
   {
@@ -1481,12 +1589,30 @@
       "Relative Armut"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Physisches Existenzminimum nicht gesichert",
+        "kategorie": "Absolute Armut"
+      },
+      {
+        "text": "Einkommen unter 60% des Medianeinkommens",
+        "kategorie": "Relative Armut"
+      },
+      {
+        "text": "Betrifft weltweit ca. 700 Mio. Menschen",
+        "kategorie": "Absolute Armut"
+      },
+      {
+        "text": "Wird im Verhältnis zum Wohlstand der Gesellschaft gemessen",
+        "kategorie": "Relative Armut"
+      },
+      {
+        "text": "In der Schweiz die relevantere Armutsdefinition",
+        "kategorie": "Relative Armut"
+      },
+      {
+        "text": "Hunger, mangelnde Gesundheitsversorgung, kein sauberes Wasser",
+        "kategorie": "Absolute Armut"
+      }
     ]
   },
   {
@@ -1603,11 +1729,11 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3 · Gymnasium Hofwil · Individuell üben",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3,
-      4
+      "Anmeldung beim RAV innerhalb der ersten Tage nach Stellenverlust",
+      "Erstellung eines persönlichen Arbeitsvermittlungsplans mit dem RAV-Berater",
+      "Nachweis regelmässiger Bewerbungsbemühungen (Arbeitsbemühungen)",
+      "Bezug von Taggeldern (max. 400–520 je nach Alter und Beitragsdauer)",
+      "Aussteuerung bei Erschöpfung des Taggeldanspruchs"
     ]
   },
   {
@@ -1623,10 +1749,10 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3 · Gymnasium Hofwil · Individuell üben",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3
+      "Friktionelle Arbeitslosigkeit (Sucharbeitslosigkeit zwischen zwei Stellen)",
+      "Saisonale Arbeitslosigkeit (z.B. Baubranche im Winter)",
+      "Konjunkturelle Arbeitslosigkeit (Nachfragerückgang in einer Rezession)",
+      "Strukturelle Arbeitslosigkeit (Qualifikationen passen nicht mehr zur Nachfrage)"
     ]
   },
   {
@@ -1642,10 +1768,10 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3 · Gymnasium Hofwil · Individuell üben",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3
+      "Beim RAV registrierte stellensuchende Person ohne Arbeit",
+      "Beim RAV registrierte Person in einem Beschäftigungsprogramm",
+      "Ausgesteuerte Person, die weiterhin Arbeit sucht (nicht mehr beim RAV)",
+      "Entmutigte Person, die die Stellensuche aufgegeben hat"
     ]
   },
   {
@@ -1661,7 +1787,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/arbeitslosigkeit/arbeitslosigkeit_beveridge_hotspot.svg",
+      "src": "pool-bilder/vwl/arbeitslosigkeit/arbeitslosigkeit_beveridge_hotspot.svg",
       "alt": "Beveridge-Kurve mit vier markierten Punkten (A–D)"
     },
     "hotspots": [
@@ -1707,7 +1833,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/arbeitslosigkeit/arbeitslosigkeit_arbeitsmarkt_beschriftung.svg",
+      "src": "pool-bilder/vwl/arbeitslosigkeit/arbeitslosigkeit_arbeitsmarkt_beschriftung.svg",
       "alt": "Arbeitsmarkt-Diagramm mit sechs nummerierten Beschriftungspunkten"
     },
     "labels": [
@@ -1762,7 +1888,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/arbeitslosigkeit/arbeitslosigkeit_typen_dragdrop.svg",
+      "src": "pool-bilder/vwl/arbeitslosigkeit/arbeitslosigkeit_typen_dragdrop.svg",
       "alt": "Drei Spalten: Friktionelle, Strukturelle, Konjunkturelle Arbeitslosigkeit"
     },
     "zones": [

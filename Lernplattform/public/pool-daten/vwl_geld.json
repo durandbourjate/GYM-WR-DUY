@@ -183,7 +183,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3–GYM4 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/geld/geld_funktionen_01.svg",
+      "src": "pool-bilder/vwl/geld/geld_funktionen_01.svg",
       "alt": "Übersicht der drei Geldfunktionen"
     },
     "optionen": [
@@ -570,7 +570,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3–GYM4 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/geld/geld_geldarten_01.svg",
+      "src": "pool-bilder/vwl/geld/geld_geldarten_01.svg",
       "alt": "Zeitstrahl der Entwicklung der Geldarten"
     },
     "luecken": [
@@ -967,7 +967,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3–GYM4 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/geld/geld_tauschwirtschaft_01.svg",
+      "src": "pool-bilder/vwl/geld/geld_tauschwirtschaft_01.svg",
       "alt": "Vergleich: Tauschbeziehungen bei Tausch- vs. Geldwirtschaft"
     },
     "calcZeilen": [
@@ -1267,7 +1267,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3–GYM4 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/geld/geld_geldmarkt_01.svg",
+      "src": "pool-bilder/vwl/geld/geld_geldmarkt_01.svg",
       "alt": "Diagramm: Gleichgewicht von Geldangebot und Geldnachfrage"
     },
     "optionen": [
@@ -1686,7 +1686,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3–GYM4 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/geld/geld_geldmengen_02.svg",
+      "src": "pool-bilder/vwl/geld/geld_geldmengen_02.svg",
       "alt": "Übersicht der Geldmengen M0, M1, M2, M3"
     },
     "optionen": [
@@ -1848,7 +1848,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3–GYM4 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/geld/geld_kreditkanal_03.svg",
+      "src": "pool-bilder/vwl/geld/geld_kreditkanal_03.svg",
       "alt": "Flussdiagramm: Kreditkanal der Geldpolitik"
     },
     "optionen": [
@@ -2208,11 +2208,11 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3–GYM4 · Gymnasium Hofwil · Individuell üben",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3,
-      4
+      "Warengeld (z.B. Muscheln, Salz, Vieh)",
+      "Münzgeld aus Edelmetallen (Gold- und Silbermünzen)",
+      "Banknoten mit Golddeckung (einlösbar gegen Gold)",
+      "Fiat-Geld ohne Golddeckung (modernes Papiergeld, gesetzliches Zahlungsmittel)",
+      "Buchgeld / Giralgeld (elektronische Bankguthaben)"
     ]
   },
   {
@@ -2228,10 +2228,10 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3–GYM4 · Gymnasium Hofwil · Individuell üben",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3
+      "M0 (Notenbankgeldmenge: Bargeld + Giroguthaben der Banken bei der SNB)",
+      "M1 (Bargeld + Sichteinlagen bei Banken)",
+      "M2 (M1 + Spareinlagen)",
+      "M3 (M2 + Termineinlagen)"
     ]
   },
   {
@@ -2247,11 +2247,11 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3–GYM4 · Gymnasium Hofwil · Individuell üben",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3,
-      4
+      "Die SNB senkt den Leitzins (SNB-Leitzins / SARON)",
+      "Die Geschäftsbanken senken ihre Kreditzinsen",
+      "Unternehmen und Haushalte nehmen mehr Kredite auf",
+      "Konsum und Investitionen steigen",
+      "Das BIP wächst und die Beschäftigung nimmt zu"
     ]
   },
   {
@@ -2272,7 +2272,7 @@
       "Die 900 CHF werden bei Bank B eingelegt, die wieder 10% behält und den Rest verleiht."
     ],
     "musterbild": {
-      "src": "/pool-bilder/vwl/geld/geld_geldschoepfung_zeichnen.svg",
+      "src": "pool-bilder/vwl/geld/geld_geldschoepfung_zeichnen.svg",
       "alt": "Musterlösung: Multiple Geldschöpfung"
     }
   },
@@ -2289,7 +2289,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3–GYM4 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/geld/geld_geldmarkt_hotspot.svg",
+      "src": "pool-bilder/vwl/geld/geld_geldmarkt_hotspot.svg",
       "alt": "Geldmarkt-Diagramm mit vier markierten Punkten (A–D)"
     },
     "hotspots": [
@@ -2335,7 +2335,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3–GYM4 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/geld/geld_geldmengen_beschriftung.svg",
+      "src": "pool-bilder/vwl/geld/geld_geldmengen_beschriftung.svg",
       "alt": "Geldmengenaggregate M0–M3 als konzentrische Schichten mit vier nummerierten Beschriftungspunkten"
     },
     "labels": [
@@ -2378,7 +2378,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3–GYM4 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/geld/geld_geldarten_dragdrop.svg",
+      "src": "pool-bilder/vwl/geld/geld_geldarten_dragdrop.svg",
       "alt": "Drei Spalten: Warengeld, Kreditgeld, Digitales Geld"
     },
     "zones": [

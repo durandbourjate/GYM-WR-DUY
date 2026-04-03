@@ -12,7 +12,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/sozialpolitik/lorenzkurve_ch.svg",
+      "src": "pool-bilder/vwl/sozialpolitik/lorenzkurve_ch.svg",
       "alt": "Lorenzkurve Schweiz – primäre und sekundäre Einkommensverteilung"
     },
     "optionen": [
@@ -128,12 +128,30 @@
       "Bedarfsgerechtigkeit"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Verteilung nach Produktivität",
+        "kategorie": "Leistungsgerechtigkeit"
+      },
+      {
+        "text": "Anrecht auf Existenzminimum unabhängig von Leistung",
+        "kategorie": "Bedarfsgerechtigkeit"
+      },
+      {
+        "text": "Wer mehr leistet, soll mehr verdienen",
+        "kategorie": "Leistungsgerechtigkeit"
+      },
+      {
+        "text": "Jeder Mensch hat Anrecht auf angemessenes Einkommen",
+        "kategorie": "Bedarfsgerechtigkeit"
+      },
+      {
+        "text": "Marktlöhne als gerechte Entlohnung",
+        "kategorie": "Leistungsgerechtigkeit"
+      },
+      {
+        "text": "Staatlich finanzierte Grundsicherung",
+        "kategorie": "Bedarfsgerechtigkeit"
+      }
     ]
   },
   {
@@ -153,12 +171,30 @@
       "Ausgabenseite (Staat gibt)"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Progressive Einkommenssteuer",
+        "kategorie": "Einnahmenseite (Staat nimmt)"
+      },
+      {
+        "text": "Sozialversicherungsleistungen (z.B. AHV-Rente)",
+        "kategorie": "Ausgabenseite (Staat gibt)"
+      },
+      {
+        "text": "Lohnprozente (Arbeitnehmer- und Arbeitgeberbeiträge)",
+        "kategorie": "Einnahmenseite (Staat nimmt)"
+      },
+      {
+        "text": "Prämienverbilligungen Krankenkasse",
+        "kategorie": "Ausgabenseite (Staat gibt)"
+      },
+      {
+        "text": "Subventionen für Kinderkrippen",
+        "kategorie": "Ausgabenseite (Staat gibt)"
+      },
+      {
+        "text": "Mehrwertsteuer",
+        "kategorie": "Einnahmenseite (Staat nimmt)"
+      }
     ]
   },
   {
@@ -386,7 +422,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/sozialpolitik/gerechtigkeitstheorien.svg",
+      "src": "pool-bilder/vwl/sozialpolitik/gerechtigkeitstheorien.svg",
       "alt": "Gerechtigkeitstheorien – Politisches Spektrum von Collectivists über Liberals zu Libertarians"
     },
     "kategorien": [
@@ -395,12 +431,30 @@
       "Collectivists (Sozialisten)"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Umverteilung ist eine Einschränkung der Freiheit",
+        "kategorie": "Libertarians (Neo-Liberale)"
+      },
+      {
+        "text": "Differenzprinzip: Nutzen des Schwächsten maximieren",
+        "kategorie": "Liberals (Sozial-Liberale)"
+      },
+      {
+        "text": "Verstaatlichung der Produktionsmittel",
+        "kategorie": "Collectivists (Sozialisten)"
+      },
+      {
+        "text": "Kombination von Kapitalismus und Staatseingriffen",
+        "kategorie": "Liberals (Sozial-Liberale)"
+      },
+      {
+        "text": "Mehrwert = Ausbeutung der Arbeiterschaft",
+        "kategorie": "Collectivists (Sozialisten)"
+      },
+      {
+        "text": "Staatseingriffe reduzieren die Wohlfahrt",
+        "kategorie": "Libertarians (Neo-Liberale)"
+      }
     ]
   },
   {
@@ -588,12 +642,30 @@
       "Collectivists (Sozialisten)"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Junge SVP: Rückbau des Sozialstaats, Eigenverantwortung",
+        "kategorie": "Libertarians (Neo-Liberale)"
+      },
+      {
+        "text": "Jungfreisinnige: Sozialstaat «fertig gebaut», Reform nötig",
+        "kategorie": "Liberals (Sozial-Liberale)"
+      },
+      {
+        "text": "Junge SP: Ausbau des Sozialstaats, mehr Kinderbetreuung",
+        "kategorie": "Collectivists (Sozialisten)"
+      },
+      {
+        "text": "Gegen Steuererhöhungen, für Wettbewerb",
+        "kategorie": "Libertarians (Neo-Liberale)"
+      },
+      {
+        "text": "Für gezielte Interventionen bei Marktversagen",
+        "kategorie": "Liberals (Sozial-Liberale)"
+      },
+      {
+        "text": "Für Verstaatlichung im Gesundheitswesen",
+        "kategorie": "Collectivists (Sozialisten)"
+      }
     ]
   },
   {
@@ -701,12 +773,30 @@
       "3. Säule (Individuelle Vorsorge)"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Deckung des Existenzbedarfs im Alter",
+        "kategorie": "1. Säule (AHV)"
+      },
+      {
+        "text": "Fortführung der gewohnten Lebenshaltung",
+        "kategorie": "2. Säule (BV)"
+      },
+      {
+        "text": "Individuelle Ergänzung der Altersvorsorge",
+        "kategorie": "3. Säule (Individuelle Vorsorge)"
+      },
+      {
+        "text": "Obligatorisch seit 1948",
+        "kategorie": "1. Säule (AHV)"
+      },
+      {
+        "text": "Obligatorisch seit 1985",
+        "kategorie": "2. Säule (BV)"
+      },
+      {
+        "text": "Steuerlich begünstigt, aber freiwillig",
+        "kategorie": "3. Säule (Individuelle Vorsorge)"
+      }
     ]
   },
   {
@@ -797,7 +887,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/sozialpolitik/sozialversicherungen_anteile.svg",
+      "src": "pool-bilder/vwl/sozialpolitik/sozialversicherungen_anteile.svg",
       "alt": "Sozialversicherungseinnahmen nach Zweig (2017)"
     },
     "aussagen": [
@@ -826,10 +916,22 @@
       "KV"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Stellenlose Erwerbstätige",
+        "kategorie": "ALV"
+      },
+      {
+        "text": "Personen mit dauerhafter Beeinträchtigung",
+        "kategorie": "IV"
+      },
+      {
+        "text": "Bei Betriebsunfall Verunglückte",
+        "kategorie": "UV"
+      },
+      {
+        "text": "Erkrankte Personen (ambulante Behandlung)",
+        "kategorie": "KV"
+      }
     ]
   },
   {
@@ -979,7 +1081,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/sozialpolitik/drei_saeulen.svg",
+      "src": "pool-bilder/vwl/sozialpolitik/drei_saeulen.svg",
       "alt": "Drei-Säulen-System der Altersvorsorge"
     },
     "optionen": [
@@ -1010,11 +1112,26 @@
       "KV"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Pensionierung mit 65 Jahren",
+        "kategorie": "AHV"
+      },
+      {
+        "text": "Schwere Behinderung nach Krankheit",
+        "kategorie": "IV"
+      },
+      {
+        "text": "Militärdienst (Rekrutenschule)",
+        "kategorie": "EO"
+      },
+      {
+        "text": "Kündigung durch den Arbeitgeber",
+        "kategorie": "ALV"
+      },
+      {
+        "text": "Grippe mit Arztbesuch",
+        "kategorie": "KV"
+      }
     ]
   },
   {
@@ -1083,7 +1200,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/sozialpolitik/umlage_vs_kapital.svg",
+      "src": "pool-bilder/vwl/sozialpolitik/umlage_vs_kapital.svg",
       "alt": "Umlageverfahren vs. Kapitaldeckungsverfahren im Vergleich"
     },
     "kategorien": [
@@ -1091,12 +1208,30 @@
       "Kapitaldeckungsverfahren"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Generationenvertrag: Junge finanzieren Alte",
+        "kategorie": "Umlageverfahren"
+      },
+      {
+        "text": "Individuelles Sparkonto mit Zins",
+        "kategorie": "Kapitaldeckungsverfahren"
+      },
+      {
+        "text": "Stark abhängig von der demografischen Entwicklung",
+        "kategorie": "Umlageverfahren"
+      },
+      {
+        "text": "Stark abhängig von der Entwicklung der Finanzmärkte",
+        "kategorie": "Kapitaldeckungsverfahren"
+      },
+      {
+        "text": "AHV als Beispiel",
+        "kategorie": "Umlageverfahren"
+      },
+      {
+        "text": "Pensionskasse als Beispiel",
+        "kategorie": "Kapitaldeckungsverfahren"
+      }
     ]
   },
   {
@@ -1294,12 +1429,30 @@
       "KV (Grundversicherung)"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Einkommensabhängige Lohnbeiträge",
+        "kategorie": "AHV (1. Säule)"
+      },
+      {
+        "text": "Individuelle Sparkonten mit Kapitalertrag",
+        "kategorie": "BV (2. Säule)"
+      },
+      {
+        "text": "Einheitliche Kopfprämie pro Kasse/Region",
+        "kategorie": "KV (Grundversicherung)"
+      },
+      {
+        "text": "Bundesbeiträge und MWST-Anteil",
+        "kategorie": "AHV (1. Säule)"
+      },
+      {
+        "text": "Mindestens paritätische Beiträge AG/AN",
+        "kategorie": "BV (2. Säule)"
+      },
+      {
+        "text": "Prämienverbilligungen für Einkommensschwache",
+        "kategorie": "KV (Grundversicherung)"
+      }
     ]
   },
   {
@@ -1414,7 +1567,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/sozialpolitik/adverse_selektion.svg",
+      "src": "pool-bilder/vwl/sozialpolitik/adverse_selektion.svg",
       "alt": "Flussdiagramm: Dynamik auf einem Versicherungsmarkt ohne Obligatorium"
     },
     "optionen": [
@@ -1462,10 +1615,22 @@
       "Gegen Adverse Selektion"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Selbstbehalt einführen",
+        "kategorie": "Gegen Moral Hazard"
+      },
+      {
+        "text": "Bonus-Malus-System",
+        "kategorie": "Gegen Moral Hazard"
+      },
+      {
+        "text": "Verschiedene Risikogruppen unterschiedlich versichern",
+        "kategorie": "Gegen Adverse Selektion"
+      },
+      {
+        "text": "Obligatorium (Versicherungspflicht)",
+        "kategorie": "Gegen Adverse Selektion"
+      }
     ]
   },
   {
@@ -1658,12 +1823,30 @@
       "Moral Hazard"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Junge, gesunde Personen verzichten auf eine freiwillige Zusatzversicherung",
+        "kategorie": "Adverse Selektion"
+      },
+      {
+        "text": "Ein vollkaskoversicherter Autobesitzer parkt sein Auto unabgeschlossen",
+        "kategorie": "Moral Hazard"
+      },
+      {
+        "text": "Eine Person mit chronischer Krankheit schliesst sofort eine Versicherung ab",
+        "kategorie": "Adverse Selektion"
+      },
+      {
+        "text": "Nach Abschluss einer Reiseversicherung wird die Reise in ein Risikogebiet gebucht",
+        "kategorie": "Moral Hazard"
+      },
+      {
+        "text": "Versicherte mit geringem Risiko wechseln zu einer günstigeren Kasse",
+        "kategorie": "Adverse Selektion"
+      },
+      {
+        "text": "Ein Hausbesitzer vernachlässigt den Brandschutz nach Abschluss der Feuerversicherung",
+        "kategorie": "Moral Hazard"
+      }
     ]
   },
   {
@@ -1719,12 +1902,30 @@
       "Transfers"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Obligatorische Sozialversicherungsbeiträge",
+        "kategorie": "Regulierung"
+      },
+      {
+        "text": "Verbilligung der Krankenkassenprämien",
+        "kategorie": "Finanzierung (Steuern/Subventionen)"
+      },
+      {
+        "text": "Staatliche Schulhäuser und Lehrpersonen",
+        "kategorie": "Produktion"
+      },
+      {
+        "text": "Sozialhilfe und Mietbeiträge",
+        "kategorie": "Transfers"
+      },
+      {
+        "text": "Mindestlöhne",
+        "kategorie": "Regulierung"
+      },
+      {
+        "text": "Einkommenssteuer",
+        "kategorie": "Finanzierung (Steuern/Subventionen)"
+      }
     ]
   },
   {
@@ -1912,12 +2113,30 @@
       "Unbeabsichtigte Nebenwirkungen"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Grosszügige Arbeitslosenversicherung verlängert die Stellensuche",
+        "kategorie": "Veränderte Leistungsanreize"
+      },
+      {
+        "text": "Einmal eingeführte Subventionen sind politisch kaum mehr abschaffbar",
+        "kategorie": "Eigendynamik / Überangebot"
+      },
+      {
+        "text": "Strenger Kündigungsschutz erschwert Neueinstellungen",
+        "kategorie": "Unbeabsichtigte Nebenwirkungen"
+      },
+      {
+        "text": "Hohe Sozialhilfe reduziert den Anreiz zu arbeiten",
+        "kategorie": "Veränderte Leistungsanreize"
+      },
+      {
+        "text": "Sozialausgaben wachsen schneller als das BIP",
+        "kategorie": "Eigendynamik / Überangebot"
+      },
+      {
+        "text": "Mietpreisbremse führt zu Wohnungsknappheit",
+        "kategorie": "Unbeabsichtigte Nebenwirkungen"
+      }
     ]
   },
   {
@@ -1996,7 +2215,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/sozialpolitik/alterslastquotient.svg",
+      "src": "pool-bilder/vwl/sozialpolitik/alterslastquotient.svg",
       "alt": "Alterslastquotient Schweiz 1948–2050"
     },
     "optionen": [
@@ -2063,12 +2282,30 @@
       "Finanzierungsseite (Einnahmen ändern)"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Heraufsetzung des Rentenalters",
+        "kategorie": "Leistungsseite (Ausgaben ändern)"
+      },
+      {
+        "text": "Umstellung auf Kapitaldeckungsverfahren",
+        "kategorie": "Finanzierungsseite (Einnahmen ändern)"
+      },
+      {
+        "text": "Einführung einer steuerfreien Einheitsrente",
+        "kategorie": "Leistungsseite (Ausgaben ändern)"
+      },
+      {
+        "text": "Finanzierung über Mehrwertsteuer statt Lohnprozente",
+        "kategorie": "Finanzierungsseite (Einnahmen ändern)"
+      },
+      {
+        "text": "Privatisierung der ALV",
+        "kategorie": "Leistungsseite (Ausgaben ändern)"
+      },
+      {
+        "text": "Finanzierung aus Ökosteuern",
+        "kategorie": "Finanzierungsseite (Einnahmen ändern)"
+      }
     ]
   },
   {
@@ -2234,12 +2471,30 @@
       "Argumente GEGEN das BGE"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Keine Stigmatisierung mehr, weil alle das BGE erhalten",
+        "kategorie": "Argumente FÜR das BGE"
+      },
+      {
+        "text": "Massive Kosten: CHF 2'500 × 12 × alle Einwohner",
+        "kategorie": "Argumente GEGEN das BGE"
+      },
+      {
+        "text": "Weniger Bürokratie als das heutige System",
+        "kategorie": "Argumente FÜR das BGE"
+      },
+      {
+        "text": "Sinkende Erwerbsmotivation bei grosszügigem BGE",
+        "kategorie": "Argumente GEGEN das BGE"
+      },
+      {
+        "text": "Mehr Freiheit für Pflege, Ehrenamt und Weiterbildung",
+        "kategorie": "Argumente FÜR das BGE"
+      },
+      {
+        "text": "Unklar, wie es finanziert werden soll",
+        "kategorie": "Argumente GEGEN das BGE"
+      }
     ]
   },
   {
@@ -2313,9 +2568,9 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3 · Gymnasium Hofwil · Individuell üben",
     "reihenfolge": [
-      0,
-      1,
-      2
+      "1. Säule: AHV/IV – staatliche Vorsorge (Existenzsicherung, Umlageverfahren)",
+      "2. Säule: BVG – berufliche Vorsorge (Lebensstandard sichern, Kapitaldeckung)",
+      "3. Säule: Private Vorsorge (freiwillige Ergänzung, steuerbegünstigt)"
     ]
   },
   {
@@ -2331,11 +2586,11 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3 · Gymnasium Hofwil · Individuell üben",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3,
-      4
+      "Babyboom-Generation (1946–1964) tritt in den Arbeitsmarkt ein und zahlt hohe AHV-Beiträge",
+      "Geburtenrate sinkt unter das Bestandserhaltungsniveau (weniger künftige Beitragszahler)",
+      "Steigende Lebenserwartung erhöht die durchschnittliche Bezugsdauer der AHV-Renten",
+      "Babyboom-Generation erreicht das Rentenalter (massiver Anstieg der Rentnerzahl ab ca. 2010)",
+      "Verhältnis Erwerbstätige zu Rentner sinkt unter 3:1 (demografische Zeitbombe)"
     ]
   },
   {
@@ -2351,9 +2606,9 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3 · Gymnasium Hofwil · Individuell üben",
     "reihenfolge": [
-      0,
-      1,
-      2
+      "Leistungsgerechtigkeit: Jeder erhält gemäss seiner Leistung (Marktprinzip)",
+      "Chancengerechtigkeit: Gleiche Startbedingungen für alle (Bildung, Gesundheit)",
+      "Bedarfsgerechtigkeit: Jeder erhält gemäss seinem Bedarf (Sozialhilfe, Prämienverbilligung)"
     ]
   },
   {
@@ -2369,7 +2624,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/sozialpolitik/sozialpolitik_drei_saeulen_beschriftung.svg",
+      "src": "pool-bilder/vwl/sozialpolitik/sozialpolitik_drei_saeulen_beschriftung.svg",
       "alt": "Drei-Säulen-System der Schweizer Altersvorsorge mit sechs nummerierten Beschriftungspunkten"
     },
     "labels": [
@@ -2424,7 +2679,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/sozialpolitik/sozialpolitik_saeulen_dragdrop.svg",
+      "src": "pool-bilder/vwl/sozialpolitik/sozialpolitik_saeulen_dragdrop.svg",
       "alt": "Drei Spalten: 1. Säule Staat, 2. Säule Beruf, 3. Säule Privat"
     },
     "zones": [

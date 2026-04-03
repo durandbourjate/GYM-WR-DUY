@@ -77,7 +77,7 @@ function convertQuestion(q, poolMeta, topics) {
   // Bild
   if (q.img) {
     base.bild = {
-      src: `/pool-bilder/${q.img.src.replace(/^img\//, '')}`,
+      src: `pool-bilder/${q.img.src.replace(/^img\//, '')}`,
       alt: q.img.alt
     }
   }
@@ -143,17 +143,30 @@ function convertQuestion(q, poolMeta, topics) {
       }
       break
 
-    case 'sort':
-      base.kategorien = q.kategorien || q.categories
+    case 'sort': {
+      const cats = q.kategorien || q.categories || []
+      base.kategorien = cats
       base.elemente = (q.elemente || q.items || []).map(e => ({
-        text: e.text,
-        kategorie: e.kategorie || e.category
+        text: e.text || e.t,
+        kategorie: typeof e.cat === 'number' ? cats[e.cat] : (e.kategorie || e.category)
       }))
       break
+    }
 
-    case 'sortierung':
-      base.reihenfolge = q.reihenfolge || q.correct || []
+    case 'sortierung': {
+      // Pool-Format: items = String-Array (Texte), correct = numerische Indizes (korrekte Reihenfolge)
+      // Lernplattform erwartet: reihenfolge = String-Array in korrekter Reihenfolge
+      const items = q.items || q.reihenfolge || []
+      const correctOrder = q.correct || q.reihenfolge || []
+      if (items.length > 0 && typeof items[0] === 'string' && correctOrder.length > 0 && typeof correctOrder[0] === 'number') {
+        // Indizes → Texte auflösen
+        base.reihenfolge = correctOrder.map(i => items[i])
+      } else {
+        // Bereits Strings oder anderes Format
+        base.reihenfolge = items
+      }
       break
+    }
 
     case 'zuordnung':
       base.paare = (q.paare || []).map(p => ({
@@ -265,7 +278,7 @@ function convertQuestion(q, poolMeta, topics) {
       base.hinweise = q.hints || undefined
       if (q.sample) {
         base.musterbild = {
-          src: typeof q.sample === 'string' ? q.sample : `/pool-bilder/${q.sample.src.replace(/^img\//, '')}`,
+          src: typeof q.sample === 'string' ? q.sample : `pool-bilder/${q.sample.src.replace(/^img\//, '')}`,
           alt: typeof q.sample === 'string' ? 'Musterlösung' : q.sample.alt
         }
       }
@@ -276,7 +289,7 @@ function convertQuestion(q, poolMeta, topics) {
       break
 
     case 'pdf':
-      base.pdfUrl = q.pdfUrl ? `/pool-bilder/${q.pdfUrl.replace(/^img\//, '')}` : undefined
+      base.pdfUrl = q.pdfUrl ? `pool-bilder/${q.pdfUrl.replace(/^img\//, '')}` : undefined
       base.antwortTyp = q.antwortTyp || 'freitext'
       base.musterantwort = q.sample || undefined
       base.hinweise = q.hints || undefined

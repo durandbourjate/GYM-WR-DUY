@@ -1,4 +1,5 @@
 import { useRef, useState, type ReactNode } from 'react'
+import { resolveAssetUrl } from '../../../utils/assetUrl'
 
 interface Props {
   src: string
@@ -26,7 +27,7 @@ export default function BildContainer({ src, alt, children }: Props) {
       ) : (
         <>
           <img
-            src={src}
+            src={resolveAssetUrl(src)}
             alt={alt}
             onLoad={handleLoad}
             onError={() => setFehler(true)}

@@ -1378,7 +1378,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3",
     "bild": {
-      "src": "/pool-bilder/recht/mietrecht/mietrecht_systematik_01.svg",
+      "src": "pool-bilder/recht/mietrecht/mietrecht_systematik_01.svg",
       "alt": "Übersicht Mietrecht OR 253–274"
     },
     "kontext": "Die Vermieterin verweigert seit Wochen die Reparatur einer defekten Heizung in Leonas Wohnung.",
@@ -1403,7 +1403,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3",
     "bild": {
-      "src": "/pool-bilder/recht/mietrecht/mietrecht_kuendigungsfristen_02.svg",
+      "src": "pool-bilder/recht/mietrecht/mietrecht_kuendigungsfristen_02.svg",
       "alt": "Kündigungsfristen im Mietrecht"
     },
     "kontext": "Betrachte die Zeitleiste auf dem Bild. Matteo möchte sein möbliertes Zimmer in Bern kündigen. Heute ist der 10. Oktober.",
@@ -1428,7 +1428,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3",
     "bild": {
-      "src": "/pool-bilder/recht/mietrecht/mietrecht_kuendigungsfristen_02.svg",
+      "src": "pool-bilder/recht/mietrecht/mietrecht_kuendigungsfristen_02.svg",
       "alt": "Kündigungsfristen im Mietrecht"
     },
     "kontext": "Ein Geschäftsinhaber in Bern will seinen Laden kündigen. Heute ist der 20. März. Die Kündigungstermine gemäss Ortsgebrauch sind der 30. April und der 31. Oktober.",
@@ -1453,7 +1453,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3",
     "bild": {
-      "src": "/pool-bilder/recht/mietrecht/mietrecht_maengelrecht_03.svg",
+      "src": "pool-bilder/recht/mietrecht/mietrecht_maengelrecht_03.svg",
       "alt": "Flussdiagramm Vorgehen bei Mängeln"
     },
     "kontext": "Der Abfluss in Sarahs Badewanne ist verstopft. Es handelt sich um eine einfache Verstopfung, die mit einem Saugnapf behoben werden kann.",
@@ -1478,7 +1478,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3",
     "bild": {
-      "src": "/pool-bilder/recht/mietrecht/mietrecht_maengelrecht_03.svg",
+      "src": "pool-bilder/recht/mietrecht/mietrecht_maengelrecht_03.svg",
       "alt": "Flussdiagramm Vorgehen bei Mängeln"
     },
     "kontext": "In Jonas' Wohnung ist die Geschirrspülmaschine seit zwei Wochen defekt. Er hat den Vermieter schriftlich informiert und eine Frist von 10 Tagen gesetzt. Die Frist ist abgelaufen, der Vermieter hat nicht reagiert.",
@@ -1503,7 +1503,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3",
     "bild": {
-      "src": "/pool-bilder/recht/mietrecht/mietrecht_zeitwert_04.svg",
+      "src": "pool-bilder/recht/mietrecht/mietrecht_zeitwert_04.svg",
       "alt": "Zeitwertberechnung bei Wohnungsabgabe"
     },
     "kontext": "Beim Auszug nach 4 Jahren wird festgestellt, dass der Teppichboden (Lebensdauer 10 Jahre gemäss Lebensdauertabelle) durch Brandflecken ersetzt werden muss. Die Kosten betragen CHF 5'000.",
@@ -1538,7 +1538,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3",
     "bild": {
-      "src": "/pool-bilder/recht/mietrecht/mietrecht_zeitwert_04.svg",
+      "src": "pool-bilder/recht/mietrecht/mietrecht_zeitwert_04.svg",
       "alt": "Zeitwertberechnung bei Wohnungsabgabe"
     },
     "kontext": "Familie Becker zieht nach 12 Jahren aus ihrer Wohnung aus. Bei der Wohnungsabgabe werden Schäden am Teppichboden und am Kühlschrank festgestellt (jeweils durch unsachgemässen Gebrauch).",
@@ -1563,7 +1563,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3",
     "bild": {
-      "src": "/pool-bilder/recht/mietrecht/mietrecht_pflichten_05.svg",
+      "src": "pool-bilder/recht/mietrecht/mietrecht_pflichten_05.svg",
       "alt": "Pflichten Vermieter und Mieter"
     },
     "kontext": "Herr Weber zahlt seit zwei Monaten keinen Mietzins, wohnt aber weiterhin in der Wohnung und nutzt alle Einrichtungen.",
@@ -1756,11 +1756,11 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3,
-      4
+      "Kündigungsfrist und -termin bestimmen (Wohnungen: 3 Monate auf ortsüblichen Termin)",
+      "Kündigung schriftlich mit amtlich genehmigtem Formular aussprechen",
+      "Bei Familienwohnungen: Zustimmung des Ehegatten/Partners einholen",
+      "Kündigung fristgerecht zustellen (Empfang muss vor Fristbeginn sein)",
+      "Mieter kann innerhalb von 30 Tagen bei der Schlichtungsbehörde anfechten oder Erstreckung verlangen"
     ]
   },
   {
@@ -1776,11 +1776,11 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3,
-      4
+      "Mängelanzeige: Vermieter schriftlich über den Mangel informieren",
+      "Frist ansetzen: Vermieter eine angemessene Frist zur Behebung setzen",
+      "Mietzinsreduktion verlangen (proportional zur Einschränkung des Gebrauchs)",
+      "Mängel auf Kosten des Vermieters selbst beheben lassen (Ersatzvornahme)",
+      "Fristlose Kündigung bei schwerwiegenden Mängeln, die den Gebrauch verunmöglichen"
     ]
   },
   {
@@ -1796,7 +1796,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3",
     "bild": {
-      "src": "/pool-bilder/recht/mietrecht/mietrecht_systematik_beschriftung.svg",
+      "src": "pool-bilder/recht/mietrecht/mietrecht_systematik_beschriftung.svg",
       "alt": "Flussdiagramm Mietrecht: Vertrag, Pflichten, Mängel, Kündigung"
     },
     "labels": [
@@ -1845,7 +1845,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3",
     "bild": {
-      "src": "/pool-bilder/recht/mietrecht/mietrecht_pflichten_dragdrop.svg",
+      "src": "pool-bilder/recht/mietrecht/mietrecht_pflichten_dragdrop.svg",
       "alt": "Zwei Spalten: Pflichten Vermieter und Pflichten Mieter"
     },
     "zones": [

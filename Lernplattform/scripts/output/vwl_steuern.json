@@ -115,11 +115,26 @@
       "Lenkungszweck"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Einkommenssteuer",
+        "kategorie": "Fiskalzweck"
+      },
+      {
+        "text": "Erbschaftssteuer",
+        "kategorie": "Umverteilungszweck"
+      },
+      {
+        "text": "Alkoholsteuer",
+        "kategorie": "Lenkungszweck"
+      },
+      {
+        "text": "Mehrwertsteuer",
+        "kategorie": "Fiskalzweck"
+      },
+      {
+        "text": "CO₂-Abgabe",
+        "kategorie": "Lenkungszweck"
+      }
     ]
   },
   {
@@ -390,12 +405,30 @@
       "Gebühr"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Einkommenssteuer",
+        "kategorie": "Direkte Steuer"
+      },
+      {
+        "text": "Mehrwertsteuer",
+        "kategorie": "Indirekte Steuer"
+      },
+      {
+        "text": "Kehrichtgebühr",
+        "kategorie": "Gebühr"
+      },
+      {
+        "text": "Zoll auf Importwaren",
+        "kategorie": "Indirekte Steuer"
+      },
+      {
+        "text": "Vermögenssteuer",
+        "kategorie": "Direkte Steuer"
+      },
+      {
+        "text": "Passgebühr",
+        "kategorie": "Gebühr"
+      }
     ]
   },
   {
@@ -540,7 +573,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/steuern/staatseinnahmen_uebersicht.svg",
+      "src": "pool-bilder/vwl/steuern/staatseinnahmen_uebersicht.svg",
       "alt": "Übersicht der Schweizer Staatseinnahmen nach Kategorie"
     },
     "optionen": [
@@ -843,7 +876,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/steuern/steuertarife_vergleich.svg",
+      "src": "pool-bilder/vwl/steuern/steuertarife_vergleich.svg",
       "alt": "Vergleich dreier Steuertarife: Steuersatz in Abhängigkeit vom Einkommen"
     },
     "optionen": [
@@ -1111,7 +1144,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/steuern/laffer_kurve.svg",
+      "src": "pool-bilder/vwl/steuern/laffer_kurve.svg",
       "alt": "Laffer-Kurve: Zusammenhang zwischen Steuersatz und Steuereinnahmen"
     },
     "optionen": [
@@ -1139,11 +1172,26 @@
       "Hohe Fiskalquote"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Schweiz (~28%)",
+        "kategorie": "Tiefe Fiskalquote"
+      },
+      {
+        "text": "Schweden (~43%)",
+        "kategorie": "Hohe Fiskalquote"
+      },
+      {
+        "text": "USA (~27%)",
+        "kategorie": "Tiefe Fiskalquote"
+      },
+      {
+        "text": "Dänemark (~46%)",
+        "kategorie": "Hohe Fiskalquote"
+      },
+      {
+        "text": "Frankreich (~45%)",
+        "kategorie": "Hohe Fiskalquote"
+      }
     ]
   },
   {
@@ -1355,12 +1403,30 @@
       "Nehmerkanton"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Zug",
+        "kategorie": "Geberkanton"
+      },
+      {
+        "text": "Uri",
+        "kategorie": "Nehmerkanton"
+      },
+      {
+        "text": "Zürich",
+        "kategorie": "Geberkanton"
+      },
+      {
+        "text": "Jura",
+        "kategorie": "Nehmerkanton"
+      },
+      {
+        "text": "Schwyz",
+        "kategorie": "Geberkanton"
+      },
+      {
+        "text": "Freiburg",
+        "kategorie": "Nehmerkanton"
+      }
     ]
   },
   {
@@ -1582,7 +1648,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/steuern/steuerparadiese_merkmale.svg",
+      "src": "pool-bilder/vwl/steuern/steuerparadiese_merkmale.svg",
       "alt": "Vier Merkmale eines Steuerparadieses mit Fragezeichen"
     },
     "optionen": [
@@ -1654,10 +1720,22 @@
       "Instrumente gegen Gewinnverschiebung"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Automatischer Informationsaustausch (AIA)",
+        "kategorie": "Transparenz-Instrumente"
+      },
+      {
+        "text": "OECD-BEPS-Projekt",
+        "kategorie": "Instrumente gegen Gewinnverschiebung"
+      },
+      {
+        "text": "Schwarze Listen der EU",
+        "kategorie": "Transparenz-Instrumente"
+      },
+      {
+        "text": "OECD-Mindeststeuer (15%)",
+        "kategorie": "Instrumente gegen Gewinnverschiebung"
+      }
     ]
   },
   {
@@ -2031,7 +2109,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/steuern/steuerinzidenz_elastizitaet.svg",
+      "src": "pool-bilder/vwl/steuern/steuerinzidenz_elastizitaet.svg",
       "alt": "Zwei Märkte: Links elastische Nachfrage, rechts unelastische Nachfrage, jeweils mit Steuerkeil"
     },
     "optionen": [
@@ -2117,10 +2195,10 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3 · Gymnasium Hofwil · Individuell üben",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3
+      "Direkte Bundessteuer (nur Bund – Einkommens- und Gewinnsteuer)",
+      "Mehrwertsteuer (nur Bund – wichtigste indirekte Steuer)",
+      "Kantonale Einkommens- und Vermögenssteuer (Kanton)",
+      "Gemeindesteuerzuschlag (Gemeinde – als Prozentsatz der Kantonssteuer)"
     ]
   },
   {
@@ -2136,9 +2214,9 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3 · Gymnasium Hofwil · Individuell üben",
     "reihenfolge": [
-      0,
-      1,
-      2
+      "Progressiver Tarif (höherer Steuersatz bei höherem Einkommen)",
+      "Proportionaler Tarif / Flat Tax (gleicher Steuersatz für alle)",
+      "Degressiver Tarif (niedrigerer Steuersatz bei höherem Einkommen)"
     ]
   },
   {
@@ -2154,10 +2232,10 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3 · Gymnasium Hofwil · Individuell üben",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3
+      "OECD-Doppelbesteuerungsabkommen (ab 1960er – Vermeidung doppelter Besteuerung)",
+      "Schweizer Bankgeheimnis gerät unter Druck (UBS-Fall 2008/2009)",
+      "Automatischer Informationsaustausch AIA (ab 2017 – Bankdaten werden zwischen Staaten ausgetauscht)",
+      "OECD/G20 BEPS-Mindeststeuer von 15% für Grosskonzerne (ab 2024)"
     ]
   },
   {
@@ -2173,7 +2251,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/steuern/steuern_laffer_hotspot.svg",
+      "src": "pool-bilder/vwl/steuern/steuern_laffer_hotspot.svg",
       "alt": "Laffer-Kurve mit vier markierten Punkten (A–D)"
     },
     "hotspots": [
@@ -2219,7 +2297,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/steuern/steuern_system_beschriftung.svg",
+      "src": "pool-bilder/vwl/steuern/steuern_system_beschriftung.svg",
       "alt": "Steuersystem der Schweiz mit sechs nummerierten Beschriftungspunkten"
     },
     "labels": [
@@ -2274,7 +2352,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/steuern/steuern_ebenen_dragdrop.svg",
+      "src": "pool-bilder/vwl/steuern/steuern_ebenen_dragdrop.svg",
       "alt": "Drei Spalten: Bund, Kanton, Gemeinde"
     },
     "zones": [

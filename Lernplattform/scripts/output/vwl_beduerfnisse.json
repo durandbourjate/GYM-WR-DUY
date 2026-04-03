@@ -266,14 +266,38 @@
       "Selbstverwirklichung"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Essen und Trinken",
+        "kategorie": "Körperliche Bedürfnisse"
+      },
+      {
+        "text": "Krankenversicherung",
+        "kategorie": "Sicherheitsbedürfnisse"
+      },
+      {
+        "text": "Freundschaften pflegen",
+        "kategorie": "Soziale Bedürfnisse"
+      },
+      {
+        "text": "Ein Buch schreiben",
+        "kategorie": "Selbstverwirklichung"
+      },
+      {
+        "text": "Ein Dach über dem Kopf",
+        "kategorie": "Körperliche Bedürfnisse"
+      },
+      {
+        "text": "Stabiler Arbeitsplatz",
+        "kategorie": "Sicherheitsbedürfnisse"
+      },
+      {
+        "text": "Zugehörigkeit zu einer Gruppe",
+        "kategorie": "Soziale Bedürfnisse"
+      },
+      {
+        "text": "Kreativ tätig sein",
+        "kategorie": "Selbstverwirklichung"
+      }
     ]
   },
   {
@@ -451,7 +475,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/beduerfnisse/beduerfnispyramide_01.svg",
+      "src": "pool-bilder/vwl/beduerfnisse/beduerfnispyramide_01.svg",
       "alt": "Bedürfnispyramide nach Maslow mit vier Stufen"
     },
     "kategorien": [
@@ -461,12 +485,30 @@
       "Selbstverwirklichung"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Eine obdachlose Person sucht eine Notunterkunft",
+        "kategorie": "Körperliche Bedürfnisse"
+      },
+      {
+        "text": "Jemand gründet ein Start-up, um seine Vision umzusetzen",
+        "kategorie": "Selbstverwirklichung"
+      },
+      {
+        "text": "Eine Familie schliesst eine Lebensversicherung ab",
+        "kategorie": "Sicherheitsbedürfnisse"
+      },
+      {
+        "text": "Ein Jugendlicher passt seinen Kleidungsstil an, um dazuzugehören",
+        "kategorie": "Soziale Bedürfnisse"
+      },
+      {
+        "text": "Eine Studentin postet Erfolge auf Social Media für Anerkennung",
+        "kategorie": "Selbstverwirklichung"
+      },
+      {
+        "text": "Ein Arbeiter fordert einen unbefristeten Vertrag",
+        "kategorie": "Sicherheitsbedürfnisse"
+      }
     ]
   },
   {
@@ -507,14 +549,38 @@
       "Freie Güter"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Smartphone",
+        "kategorie": "Konsumgüter"
+      },
+      {
+        "text": "Friteuse in einem Restaurant",
+        "kategorie": "Investitionsgüter"
+      },
+      {
+        "text": "Sonnenlicht",
+        "kategorie": "Freie Güter"
+      },
+      {
+        "text": "Schulbuch",
+        "kategorie": "Konsumgüter"
+      },
+      {
+        "text": "Lastwagen für Gütertransport",
+        "kategorie": "Investitionsgüter"
+      },
+      {
+        "text": "Luft zum Atmen",
+        "kategorie": "Freie Güter"
+      },
+      {
+        "text": "Fabrikgebäude",
+        "kategorie": "Investitionsgüter"
+      },
+      {
+        "text": "Kleidung",
+        "kategorie": "Konsumgüter"
+      }
     ]
   },
   {
@@ -610,12 +676,30 @@
       "Gebrauchsgüter"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Sandwich",
+        "kategorie": "Verbrauchsgüter"
+      },
+      {
+        "text": "Velo",
+        "kategorie": "Gebrauchsgüter"
+      },
+      {
+        "text": "Benzin",
+        "kategorie": "Verbrauchsgüter"
+      },
+      {
+        "text": "Winterjacke",
+        "kategorie": "Gebrauchsgüter"
+      },
+      {
+        "text": "Mineralwasser",
+        "kategorie": "Verbrauchsgüter"
+      },
+      {
+        "text": "Spielkonsole",
+        "kategorie": "Gebrauchsgüter"
+      }
     ]
   },
   {
@@ -687,7 +771,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/beduerfnisse/gueterklassifikation_01.svg",
+      "src": "pool-bilder/vwl/beduerfnisse/gueterklassifikation_01.svg",
       "alt": "Klassifikation der Güterarten: freie vs. wirtschaftliche Güter, Sachgüter und Dienstleistungen"
     },
     "optionen": [
@@ -751,14 +835,38 @@
       "Wissen"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Koch bereitet Pommes frites zu",
+        "kategorie": "Arbeit"
+      },
+      {
+        "text": "Kartoffeln vom Feld",
+        "kategorie": "Natürliche Ressourcen"
+      },
+      {
+        "text": "Friteuse im Restaurant",
+        "kategorie": "Realkapital"
+      },
+      {
+        "text": "Ausbildung des Kochs",
+        "kategorie": "Wissen"
+      },
+      {
+        "text": "Servierpersonal bedient Gäste",
+        "kategorie": "Arbeit"
+      },
+      {
+        "text": "Erdöl für Energie",
+        "kategorie": "Natürliche Ressourcen"
+      },
+      {
+        "text": "Gebäude des Restaurants",
+        "kategorie": "Realkapital"
+      },
+      {
+        "text": "Rezepte und Know-how",
+        "kategorie": "Wissen"
+      }
     ]
   },
   {
@@ -1007,12 +1115,30 @@
       "Minimumprinzip"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Mit CHF 50 möglichst viele Lebensmittel einkaufen",
+        "kategorie": "Maximumprinzip"
+      },
+      {
+        "text": "Die Note 5 mit möglichst wenig Lernaufwand erreichen",
+        "kategorie": "Minimumprinzip"
+      },
+      {
+        "text": "In 4 Stunden Lernzeit die bestmögliche Note erzielen",
+        "kategorie": "Maximumprinzip"
+      },
+      {
+        "text": "Die Strecke Bern-Zürich mit möglichst wenig Benzin fahren",
+        "kategorie": "Minimumprinzip"
+      },
+      {
+        "text": "Mit einem Tank Benzin möglichst weit kommen",
+        "kategorie": "Maximumprinzip"
+      },
+      {
+        "text": "Ein Haus bauen mit möglichst geringen Kosten",
+        "kategorie": "Minimumprinzip"
+      }
     ]
   },
   {
@@ -1226,12 +1352,30 @@
       "Wertaufbewahrungsmittel"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Mit Banknoten an der Kasse bezahlen",
+        "kategorie": "Zahlungsmittel"
+      },
+      {
+        "text": "Preise verschiedener Handys vergleichen",
+        "kategorie": "Rechnungseinheit"
+      },
+      {
+        "text": "Geld auf dem Sparkonto für die Ferien",
+        "kategorie": "Wertaufbewahrungsmittel"
+      },
+      {
+        "text": "Online-Überweisung für eine Bestellung",
+        "kategorie": "Zahlungsmittel"
+      },
+      {
+        "text": "Preis eines Autos in CHF angeben",
+        "kategorie": "Rechnungseinheit"
+      },
+      {
+        "text": "Geld für das Alter zurücklegen",
+        "kategorie": "Wertaufbewahrungsmittel"
+      }
     ]
   },
   {
@@ -1385,14 +1529,38 @@
       "Tertiärer Sektor"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Bauer",
+        "kategorie": "Primärer Sektor"
+      },
+      {
+        "text": "Automechaniker in Fabrik",
+        "kategorie": "Sekundärer Sektor"
+      },
+      {
+        "text": "Bankberaterin",
+        "kategorie": "Tertiärer Sektor"
+      },
+      {
+        "text": "Förster",
+        "kategorie": "Primärer Sektor"
+      },
+      {
+        "text": "Uhrmacher",
+        "kategorie": "Sekundärer Sektor"
+      },
+      {
+        "text": "Lehrerin",
+        "kategorie": "Tertiärer Sektor"
+      },
+      {
+        "text": "Fischer",
+        "kategorie": "Primärer Sektor"
+      },
+      {
+        "text": "Krankenpfleger",
+        "kategorie": "Tertiärer Sektor"
+      }
     ]
   },
   {
@@ -1526,7 +1694,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/beduerfnisse/strukturwandel_01.svg",
+      "src": "pool-bilder/vwl/beduerfnisse/strukturwandel_01.svg",
       "alt": "Drei Linien zeigen die Beschäftigungsentwicklung dreier Sektoren in der Schweiz von 1800 bis 2020"
     },
     "optionen": [
@@ -1569,11 +1737,11 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1 · Gymnasium Hofwil · Individuell üben",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3,
-      4
+      "Physiologische Bedürfnisse (Nahrung, Schlaf, Wärme)",
+      "Sicherheitsbedürfnisse (Schutz, Stabilität, Gesundheit)",
+      "Soziale Bedürfnisse (Zugehörigkeit, Freundschaft, Liebe)",
+      "Wertschätzungsbedürfnisse (Anerkennung, Status, Erfolg)",
+      "Selbstverwirklichung (Entfaltung, Kreativität, Sinnsuche)"
     ]
   },
   {
@@ -1589,11 +1757,11 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1 · Gymnasium Hofwil · Individuell üben",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3,
-      4
+      "Agrargesellschaft: Über 60% der Beschäftigten arbeiten im primären Sektor",
+      "Beginn der Industrialisierung: Textilindustrie und Maschinenbau wachsen",
+      "Industriegesellschaft: Der sekundäre Sektor beschäftigt die meisten Menschen",
+      "Tertiarisierung: Dienstleistungen überholen Industrie und Landwirtschaft",
+      "Wissensgesellschaft: Hochqualifizierte Dienstleistungen dominieren (Banken, Pharma, IT)"
     ]
   },
   {
@@ -1609,10 +1777,10 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1 · Gymnasium Hofwil · Individuell üben",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3
+      "Boden/Natur (Grundlage der Agrarwirtschaft seit Jahrtausenden)",
+      "Arbeit (körperliche Arbeitskraft als zentraler Faktor)",
+      "Kapital (Maschinen, Werkzeuge – zentral seit der Industrialisierung)",
+      "Wissen/Humankapital (Bildung, Know-how – Schlüsselfaktor der modernen Wirtschaft)"
     ]
   },
   {
@@ -1633,7 +1801,7 @@
       "Ganz oben steht die Selbstverwirklichung."
     ],
     "musterbild": {
-      "src": "/pool-bilder/vwl/beduerfnisse/beduerfnisse_maslow_zeichnen.svg",
+      "src": "pool-bilder/vwl/beduerfnisse/beduerfnisse_maslow_zeichnen.svg",
       "alt": "Musterlösung: Maslow-Pyramide mit 5 Stufen"
     }
   },
@@ -1650,7 +1818,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/beduerfnisse/beduerfnisse_pyramide_hotspot.svg",
+      "src": "pool-bilder/vwl/beduerfnisse/beduerfnisse_pyramide_hotspot.svg",
       "alt": "Maslow-Bedürfnispyramide mit fünf Stufen, markiert A (unten) bis E (oben)"
     },
     "hotspots": [
@@ -1702,7 +1870,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/beduerfnisse/beduerfnisse_pyramide_beschriftung.svg",
+      "src": "pool-bilder/vwl/beduerfnisse/beduerfnisse_pyramide_beschriftung.svg",
       "alt": "Maslow-Pyramide mit fünf Stufen und nummerierten roten Kreisen (1–5)"
     },
     "labels": [
@@ -1751,7 +1919,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/beduerfnisse/beduerfnisse_stufen_dragdrop.svg",
+      "src": "pool-bilder/vwl/beduerfnisse/beduerfnisse_stufen_dragdrop.svg",
       "alt": "Fünf Spalten: Grundbedürfnisse, Sicherheit, Sozial, Wertschätzung, Selbstverwirklichung"
     },
     "zones": [

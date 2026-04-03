@@ -73,7 +73,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1",
     "bild": {
-      "src": "/pool-bilder/bwl/stratfuehrung/stratfuehrung_planungsprozess_01.svg",
+      "src": "pool-bilder/bwl/stratfuehrung/stratfuehrung_planungsprozess_01.svg",
       "alt": "Kreisdiagramm: Prozess der strategischen Planung mit vier Phasen"
     },
     "optionen": [
@@ -448,7 +448,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1",
     "bild": {
-      "src": "/pool-bilder/bwl/stratfuehrung/stratfuehrung_faehigkeitsanalyse_01.svg",
+      "src": "pool-bilder/bwl/stratfuehrung/stratfuehrung_faehigkeitsanalyse_01.svg",
       "alt": "Raster einer Fähigkeitsanalyse mit verschiedenen Unternehmensbereichen"
     },
     "optionen": [
@@ -598,7 +598,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1",
     "bild": {
-      "src": "/pool-bilder/bwl/stratfuehrung/stratfuehrung_porter_01.svg",
+      "src": "pool-bilder/bwl/stratfuehrung/stratfuehrung_porter_01.svg",
       "alt": "Diagramm: Fünf-Kräfte-Modell nach Porter mit fünf Wettbewerbskräften"
     },
     "optionen": [
@@ -1015,7 +1015,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1",
     "bild": {
-      "src": "/pool-bilder/bwl/stratfuehrung/stratfuehrung_ansoff_01.svg",
+      "src": "pool-bilder/bwl/stratfuehrung/stratfuehrung_ansoff_01.svg",
       "alt": "Produkt-Markt-Matrix nach Ansoff mit vier Strategiefeldern"
     },
     "optionen": [
@@ -1393,11 +1393,11 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3,
-      4
+      "Grundsätze festlegen (Vision, Mission, Leitbild)",
+      "Unternehmensanalyse durchführen (Stärken und Schwächen identifizieren)",
+      "Umweltanalyse durchführen (Chancen und Gefahren erkennen)",
+      "SWOT-Analyse erstellen und Strategieoptionen ableiten",
+      "Strategie wählen, Massnahmen planen und umsetzen"
     ]
   },
   {
@@ -1413,11 +1413,11 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3,
-      4
+      "Rivalität unter bestehenden Wettbewerbern (direkter Preiskampf, Innovationsdruck)",
+      "Verhandlungsmacht der Kunden (können Preise drücken, Qualität fordern)",
+      "Bedrohung durch neue Konkurrenten (Markteintrittsbarrieren)",
+      "Verhandlungsmacht der Lieferanten (können Preise erhöhen)",
+      "Bedrohung durch Ersatzprodukte (Substitution durch Alternativen)"
     ]
   },
   {
@@ -1433,10 +1433,10 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3
+      "SO-Strategie: Stärken nutzen, um Chancen zu ergreifen (Wachstum, Expansion)",
+      "WO-Strategie: Schwächen abbauen, um Chancen zu nutzen (Aufholen, Investieren)",
+      "ST-Strategie: Stärken einsetzen, um Gefahren abzuwehren (Verteidigung)",
+      "WT-Strategie: Schwächen minimieren und Gefahren vermeiden (Rückzug, Liquidation)"
     ]
   },
   {
@@ -1452,7 +1452,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1",
     "bild": {
-      "src": "/pool-bilder/bwl/stratfuehrung/stratfuehrung_porter_hotspot.svg",
+      "src": "pool-bilder/bwl/stratfuehrung/stratfuehrung_porter_hotspot.svg",
       "alt": "Porter-Strategiematrix mit vier Feldern A–D"
     },
     "hotspots": [
@@ -1498,7 +1498,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1",
     "bild": {
-      "src": "/pool-bilder/bwl/stratfuehrung/stratfuehrung_ansoff_beschriftung.svg",
+      "src": "pool-bilder/bwl/stratfuehrung/stratfuehrung_ansoff_beschriftung.svg",
       "alt": "Ansoff-Matrix ohne Strategienamen"
     },
     "labels": [
@@ -1541,7 +1541,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1",
     "bild": {
-      "src": "/pool-bilder/bwl/stratfuehrung/stratfuehrung_swot_dragdrop.svg",
+      "src": "pool-bilder/bwl/stratfuehrung/stratfuehrung_swot_dragdrop.svg",
       "alt": "SWOT-Analyse: Stärken, Schwächen, Chancen, Risiken"
     },
     "zones": [

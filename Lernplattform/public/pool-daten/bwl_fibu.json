@@ -341,7 +341,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1–GYM2",
     "bild": {
-      "src": "/pool-bilder/bwl/fibu/fibu_bilanzstruktur_01.svg",
+      "src": "pool-bilder/bwl/fibu/fibu_bilanzstruktur_01.svg",
       "alt": "Diagramm: Aufbau der Bilanz mit Aktiven und Passiven"
     },
     "optionen": [
@@ -561,7 +561,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1–GYM2",
     "bild": {
-      "src": "/pool-bilder/bwl/fibu/fibu_bilanzstruktur_02.svg",
+      "src": "pool-bilder/bwl/fibu/fibu_bilanzstruktur_02.svg",
       "alt": "Bilanzstruktur mit Flüssigkeits- und Fälligkeitsprinzip"
     },
     "optionen": [
@@ -585,7 +585,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1–GYM2",
     "bild": {
-      "src": "/pool-bilder/bwl/fibu/fibu_bilanzstruktur_02.svg",
+      "src": "pool-bilder/bwl/fibu/fibu_bilanzstruktur_02.svg",
       "alt": "Bilanzstruktur mit Flüssigkeits- und Fälligkeitsprinzip"
     },
     "optionen": [
@@ -609,7 +609,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1–GYM2",
     "bild": {
-      "src": "/pool-bilder/bwl/fibu/fibu_bilanzstruktur_02.svg",
+      "src": "pool-bilder/bwl/fibu/fibu_bilanzstruktur_02.svg",
       "alt": "Bilanzstruktur mit Flüssigkeits- und Fälligkeitsprinzip"
     },
     "optionen": [
@@ -636,7 +636,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1–GYM2",
     "bild": {
-      "src": "/pool-bilder/bwl/fibu/fibu_kontentypen_01.svg",
+      "src": "pool-bilder/bwl/fibu/fibu_kontentypen_01.svg",
       "alt": "Übersicht der Kontentypen mit T-Konto-Darstellung"
     },
     "optionen": [
@@ -1359,7 +1359,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1–GYM2",
     "bild": {
-      "src": "/pool-bilder/bwl/fibu/fibu_kontentypen_02.svg",
+      "src": "pool-bilder/bwl/fibu/fibu_kontentypen_02.svg",
       "alt": "Vier leere T-Konten mit Fragezeichen statt Plus/Minus"
     },
     "optionen": [
@@ -1383,7 +1383,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1–GYM2",
     "bild": {
-      "src": "/pool-bilder/bwl/fibu/fibu_kontentypen_02.svg",
+      "src": "pool-bilder/bwl/fibu/fibu_kontentypen_02.svg",
       "alt": "Vier leere T-Konten mit Fragezeichen statt Plus/Minus"
     },
     "optionen": [
@@ -1407,7 +1407,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1–GYM2",
     "bild": {
-      "src": "/pool-bilder/bwl/fibu/fibu_kontentypen_02.svg",
+      "src": "pool-bilder/bwl/fibu/fibu_kontentypen_02.svg",
       "alt": "Vier leere T-Konten mit Fragezeichen statt Plus/Minus"
     },
     "aussagen": [
@@ -1430,7 +1430,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1–GYM2",
     "bild": {
-      "src": "/pool-bilder/bwl/fibu/fibu_konten_zuordnung_01.svg",
+      "src": "pool-bilder/bwl/fibu/fibu_konten_zuordnung_01.svg",
       "alt": "12 Konten zum Zuordnen auf verschiedene Kontentypen"
     },
     "optionen": [
@@ -1454,7 +1454,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1–GYM2",
     "bild": {
-      "src": "/pool-bilder/bwl/fibu/fibu_konten_zuordnung_01.svg",
+      "src": "pool-bilder/bwl/fibu/fibu_konten_zuordnung_01.svg",
       "alt": "12 Konten zum Zuordnen auf verschiedene Kontentypen"
     },
     "optionen": [
@@ -1482,7 +1482,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1–GYM2",
     "bild": {
-      "src": "/pool-bilder/bwl/fibu/fibu_tkonto_geschaeftsfall_02.svg",
+      "src": "pool-bilder/bwl/fibu/fibu_tkonto_geschaeftsfall_02.svg",
       "alt": "T-Konten Mietaufwand und Bank mit Fragezeichen"
     },
     "optionen": [
@@ -1506,7 +1506,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1–GYM2",
     "bild": {
-      "src": "/pool-bilder/bwl/fibu/fibu_tkonto_geschaeftsfall_03.svg",
+      "src": "pool-bilder/bwl/fibu/fibu_tkonto_geschaeftsfall_03.svg",
       "alt": "T-Konten Debitoren und Warenverkauf mit Fragezeichen"
     },
     "optionen": [
@@ -1530,7 +1530,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1–GYM2",
     "bild": {
-      "src": "/pool-bilder/bwl/fibu/fibu_tkonto_geschaeftsfall_04.svg",
+      "src": "pool-bilder/bwl/fibu/fibu_tkonto_geschaeftsfall_04.svg",
       "alt": "T-Konten Darlehen und Bank mit Fragezeichen"
     },
     "optionen": [
@@ -1554,7 +1554,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1–GYM2",
     "bild": {
-      "src": "/pool-bilder/bwl/fibu/fibu_tkonto_geschaeftsfall_04.svg",
+      "src": "pool-bilder/bwl/fibu/fibu_tkonto_geschaeftsfall_04.svg",
       "alt": "T-Konten Darlehen und Bank mit Fragezeichen"
     },
     "luecken": [
@@ -1609,7 +1609,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1–GYM2",
     "bild": {
-      "src": "/pool-bilder/bwl/fibu/fibu_buchungsregeln_01.svg",
+      "src": "pool-bilder/bwl/fibu/fibu_buchungsregeln_01.svg",
       "alt": "Übersicht der Kontentypen mit Buchungsseiten"
     },
     "luecken": [
@@ -2555,7 +2555,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1–GYM2",
     "bild": {
-      "src": "/pool-bilder/bwl/fibu/fibu_tkonto_geschaeftsfall_01.svg",
+      "src": "pool-bilder/bwl/fibu/fibu_tkonto_geschaeftsfall_01.svg",
       "alt": "T-Konten Fahrzeuge und Bank – Kauf Fahrzeug per Bank"
     },
     "optionen": [
@@ -2579,7 +2579,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1–GYM2",
     "bild": {
-      "src": "/pool-bilder/bwl/fibu/fibu_tkonto_geschaeftsfall_01.svg",
+      "src": "pool-bilder/bwl/fibu/fibu_tkonto_geschaeftsfall_01.svg",
       "alt": "T-Konten Fahrzeuge und Bank – Kauf Fahrzeug per Bank"
     },
     "calcZeilen": [
@@ -2613,7 +2613,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1–GYM2",
     "bild": {
-      "src": "/pool-bilder/bwl/fibu/fibu_saldo_berechnen_01.svg",
+      "src": "pool-bilder/bwl/fibu/fibu_saldo_berechnen_01.svg",
       "alt": "T-Konten Bank und Kreditoren mit mehreren Buchungen – Saldo berechnen"
     },
     "calcZeilen": [
@@ -3554,7 +3554,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1–GYM2",
     "bild": {
-      "src": "/pool-bilder/bwl/fibu/fibu_dreistufige_er_01.svg",
+      "src": "pool-bilder/bwl/fibu/fibu_dreistufige_er_01.svg",
       "alt": "Schema der dreistufigen Erfolgsrechnung mit drei Berechnungsstufen"
     },
     "calcZeilen": [
@@ -4036,7 +4036,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1–GYM2",
     "bild": {
-      "src": "/pool-bilder/bwl/fibu/fibu_abgrenzungen_01.svg",
+      "src": "pool-bilder/bwl/fibu/fibu_abgrenzungen_01.svg",
       "alt": "Übersicht: Transitorische Aktiven, Transitorische Passiven und Rückstellungen"
     },
     "optionen": [
@@ -6590,7 +6590,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1–GYM2",
     "bild": {
-      "src": "/pool-bilder/bwl/fibu/fibu_bilanz_beschriftung.svg",
+      "src": "pool-bilder/bwl/fibu/fibu_bilanz_beschriftung.svg",
       "alt": "T-förmige Bilanzstruktur ohne Beschriftungen"
     },
     "labels": [
@@ -6645,7 +6645,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1–GYM2",
     "bild": {
-      "src": "/pool-bilder/bwl/fibu/fibu_konten_dragdrop.svg",
+      "src": "pool-bilder/bwl/fibu/fibu_konten_dragdrop.svg",
       "alt": "Vier Bilanzpositionen: Umlaufverm., Anlageverm., Fremdkapital, Eigenkapital"
     },
     "zones": [

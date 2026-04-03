@@ -1016,7 +1016,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3",
     "bild": {
-      "src": "/pool-bilder/bwl/marketing/bcg_portfolio_01.svg",
+      "src": "pool-bilder/bwl/marketing/bcg_portfolio_01.svg",
       "alt": "BCG-Portfolio mit vier Leistungen eines Unternehmens"
     },
     "optionen": [
@@ -1345,11 +1345,11 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3,
-      4
+      "Einführungsphase (hohe Marketingkosten, geringe Umsätze, oft noch Verluste)",
+      "Wachstumsphase (Umsatz steigt stark, erste Gewinne, Konkurrenz tritt ein)",
+      "Reifephase (Umsatz auf Höchststand, Gewinne maximal, intensiver Wettbewerb)",
+      "Sättigungsphase (Umsatz stagniert, Gewinne sinken, Markt gesättigt)",
+      "Degenerationsphase (Umsatz und Gewinne fallen, Produkt wird vom Markt genommen)"
     ]
   },
   {
@@ -1365,11 +1365,11 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3,
-      4
+      "Marktanalyse (Marktforschung, Kundenbedürfnisse, Konkurrenz)",
+      "Marketingziele festlegen (Umsatz, Marktanteil, Bekanntheitsgrad)",
+      "Marketingstrategie wählen (Zielgruppe, Positionierung, Differenzierung)",
+      "Marketing-Mix gestalten (Product, Price, Place, Promotion)",
+      "Umsetzung und Kontrolle (Budget, Massnahmenplanung, Erfolgsmessung)"
     ]
   },
   {
@@ -1385,10 +1385,10 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3
+      "Question Mark (niedriger Marktanteil, hoher Marktwachstum – Investitionsentscheid nötig)",
+      "Star (hoher Marktanteil, hohes Marktwachstum – Investitionen zur Verteidigung)",
+      "Cash Cow (hoher Marktanteil, niedriges Marktwachstum – Gewinne «melken»)",
+      "Poor Dog (niedriger Marktanteil, niedriges Marktwachstum – Desinvestition prüfen)"
     ]
   },
   {
@@ -1409,7 +1409,7 @@
       "Jedes P umfasst verschiedene Teilentscheidungen."
     ],
     "musterbild": {
-      "src": "/pool-bilder/bwl/marketing/marketing_4p_zeichnen.svg",
+      "src": "pool-bilder/bwl/marketing/marketing_4p_zeichnen.svg",
       "alt": "Musterlösung: Marketing-Mix 4P"
     }
   },
@@ -1426,7 +1426,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3",
     "bild": {
-      "src": "/pool-bilder/bwl/marketing/marketing_bcg_hotspot.svg",
+      "src": "pool-bilder/bwl/marketing/marketing_bcg_hotspot.svg",
       "alt": "BCG-Portfolio-Matrix mit vier Quadranten A–D"
     },
     "hotspots": [
@@ -1472,7 +1472,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3",
     "bild": {
-      "src": "/pool-bilder/bwl/marketing/marketing_4p_beschriftung.svg",
+      "src": "pool-bilder/bwl/marketing/marketing_4p_beschriftung.svg",
       "alt": "Marketing-Mix 4P ohne Labels"
     },
     "labels": [
@@ -1515,7 +1515,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3",
     "bild": {
-      "src": "/pool-bilder/bwl/marketing/marketing_4p_dragdrop.svg",
+      "src": "pool-bilder/bwl/marketing/marketing_4p_dragdrop.svg",
       "alt": "Vier Spalten: Product, Price, Place, Promotion"
     },
     "zones": [

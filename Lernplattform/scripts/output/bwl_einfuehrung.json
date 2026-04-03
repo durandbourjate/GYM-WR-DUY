@@ -32,7 +32,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1",
     "bild": {
-      "src": "/pool-bilder/bwl/einfuehrung/einfuehrung_beduerfnispyramide_01.svg",
+      "src": "pool-bilder/bwl/einfuehrung/einfuehrung_beduerfnispyramide_01.svg",
       "alt": "Pyramide mit vier Stufen, Beschriftungen durch Fragezeichen ersetzt"
     },
     "optionen": [
@@ -251,7 +251,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1",
     "bild": {
-      "src": "/pool-bilder/bwl/einfuehrung/einfuehrung_gueterarten_01.svg",
+      "src": "pool-bilder/bwl/einfuehrung/einfuehrung_gueterarten_01.svg",
       "alt": "Übersicht der Güterarten als Baumdiagramm mit leeren Feldern"
     },
     "optionen": [
@@ -1352,7 +1352,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1",
     "bild": {
-      "src": "/pool-bilder/bwl/einfuehrung/einfuehrung_nwa_01.svg",
+      "src": "pool-bilder/bwl/einfuehrung/einfuehrung_nwa_01.svg",
       "alt": "Schematische Darstellung einer Nutzwertanalyse mit Kriterien, Gewichtung und Bewertung"
     },
     "optionen": [
@@ -1502,11 +1502,11 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3,
-      4
+      "Relevante Standortfaktoren (Kriterien) festlegen",
+      "Kriterien gewichten (prozentuale Gewichtung, Summe = 100%)",
+      "Standortalternativen anhand jedes Kriteriums bewerten (z.B. Skala 1–5)",
+      "Gewichtete Punktzahlen berechnen (Gewichtung × Bewertung)",
+      "Gesamtpunktzahl pro Standort berechnen und vergleichen"
     ]
   },
   {
@@ -1522,11 +1522,11 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3,
-      4
+      "Unternehmensvision und Leitbild formulieren",
+      "Formalziele (Gewinn, Rentabilität, Liquidität) festlegen",
+      "Sachziele (Produkte, Märkte, Qualität) ableiten",
+      "Zielbeziehungen analysieren (komplementär, konkurrierend, indifferent)",
+      "Operative Massnahmen zur Zielerreichung planen"
     ]
   },
   {
@@ -1542,11 +1542,11 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3,
-      4
+      "Einzelunternehmung (unbeschränkte persönliche Haftung mit gesamtem Privatvermögen)",
+      "Kollektivgesellschaft (unbeschränkte solidarische Haftung aller Gesellschafter)",
+      "Kommanditgesellschaft (Komplementär unbeschränkt, Kommanditär nur bis Einlage)",
+      "GmbH (Haftung beschränkt auf Stammkapital, mind. CHF 20'000)",
+      "AG (Haftung beschränkt auf Aktienkapital, mind. CHF 100'000)"
     ]
   },
   {
@@ -1562,7 +1562,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1",
     "bild": {
-      "src": "/pool-bilder/bwl/einfuehrung/einfuehrung_nwa_beschriftung.svg",
+      "src": "pool-bilder/bwl/einfuehrung/einfuehrung_nwa_beschriftung.svg",
       "alt": "Nutzwertanalyse-Tabelle"
     },
     "labels": [
@@ -1611,7 +1611,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1",
     "bild": {
-      "src": "/pool-bilder/bwl/einfuehrung/einfuehrung_gueterarten_dragdrop.svg",
+      "src": "pool-bilder/bwl/einfuehrung/einfuehrung_gueterarten_dragdrop.svg",
       "alt": "Güterarten: Freie, Wirtschaftliche und Öffentliche Güter"
     },
     "zones": [

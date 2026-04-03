@@ -71,7 +71,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1–GYM4 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/wachstum/wachstumsvergleich.svg",
+      "src": "pool-bilder/vwl/wachstum/wachstumsvergleich.svg",
       "alt": "Exponentielles Wachstum bei unterschiedlichen Wachstumsraten"
     },
     "calcZeilen": [
@@ -127,12 +127,30 @@
       "Nachteil / Herausforderung"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Bessere Bedürfnisbefriedigung",
+        "kategorie": "Vorteil des Wachstums"
+      },
+      {
+        "text": "Sinkende Arbeitslosigkeit",
+        "kategorie": "Vorteil des Wachstums"
+      },
+      {
+        "text": "Umweltverschmutzung",
+        "kategorie": "Nachteil / Herausforderung"
+      },
+      {
+        "text": "Erleichterte Sozialpolitik",
+        "kategorie": "Vorteil des Wachstums"
+      },
+      {
+        "text": "Ressourcenausbeutung",
+        "kategorie": "Nachteil / Herausforderung"
+      },
+      {
+        "text": "Mehr Freizeit bei gleichem Einkommen möglich",
+        "kategorie": "Vorteil des Wachstums"
+      }
     ]
   },
   {
@@ -373,12 +391,30 @@
       "Höhere Produktivität"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Erhöhung des Pensionierungsalters",
+        "kategorie": "Mehr Arbeitsstunden"
+      },
+      {
+        "text": "Bessere Ausbildung der Arbeitskräfte",
+        "kategorie": "Höhere Produktivität"
+      },
+      {
+        "text": "Zuwanderung von Fachkräften",
+        "kategorie": "Mehr Arbeitsstunden"
+      },
+      {
+        "text": "Einsatz neuer Technologien",
+        "kategorie": "Höhere Produktivität"
+      },
+      {
+        "text": "Mehr Kindertagesstätten (höhere Erwerbsquote)",
+        "kategorie": "Mehr Arbeitsstunden"
+      },
+      {
+        "text": "Investitionen in Maschinen und Anlagen",
+        "kategorie": "Höhere Produktivität"
+      }
     ]
   },
   {
@@ -418,7 +454,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1–GYM4 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/wachstum/bip_formel.svg",
+      "src": "pool-bilder/vwl/wachstum/bip_formel.svg",
       "alt": "Zerlegung des BIP pro Einwohner"
     },
     "musterantwort": "Da der Arbeitseinsatz pro Einwohner in der Schweiz seit Jahren sinkt (weniger Wochenstunden, alternde Bevölkerung), kann das BIP pro Kopf nur steigen, wenn die Produktivität überproportional wächst. Tatsächlich ist der gesamte Wohlstandszuwachs der Schweiz der letzten Jahrzehnte auf Produktivitätssteigerungen zurückzuführen."
@@ -529,7 +565,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1–GYM4 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/wachstum/bip_formel.svg",
+      "src": "pool-bilder/vwl/wachstum/bip_formel.svg",
       "alt": "Zerlegung des BIP pro Einwohner"
     },
     "optionen": [
@@ -704,12 +740,30 @@
       "Prozessinnovation"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Erfindung des Smartphones",
+        "kategorie": "Produktinnovation"
+      },
+      {
+        "text": "Einführung von Fliessbandarbeit",
+        "kategorie": "Prozessinnovation"
+      },
+      {
+        "text": "Entwicklung eines neuen Medikaments",
+        "kategorie": "Produktinnovation"
+      },
+      {
+        "text": "Automatisierung durch Roboter in der Fabrik",
+        "kategorie": "Prozessinnovation"
+      },
+      {
+        "text": "Elektroauto als neues Produkt",
+        "kategorie": "Produktinnovation"
+      },
+      {
+        "text": "3D-Druck als Herstellungsverfahren",
+        "kategorie": "Prozessinnovation"
+      }
     ]
   },
   {
@@ -851,7 +905,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1–GYM4 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/wachstum/strukturwandel_ch.svg",
+      "src": "pool-bilder/vwl/wachstum/strukturwandel_ch.svg",
       "alt": "Strukturwandel der Schweiz: Beschäftigungsanteile nach Sektoren"
     },
     "optionen": [
@@ -880,9 +934,18 @@
       "3. Zuletzt"
     ],
     "elemente": [
-      {},
-      {},
-      {}
+      {
+        "text": "Laissez-faire-Marktwirtschaft (Nachtwächterstaat)",
+        "kategorie": "1. Zuerst"
+      },
+      {
+        "text": "Neoliberale Wirtschaftsordnung (aktive Wettbewerbspolitik)",
+        "kategorie": "2. Dann"
+      },
+      {
+        "text": "Soziale Marktwirtschaft (Verteilungsaufgaben)",
+        "kategorie": "3. Zuletzt"
+      }
     ]
   },
   {
@@ -918,7 +981,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1–GYM4 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/wachstum/gueterarten_matrix.svg",
+      "src": "pool-bilder/vwl/wachstum/gueterarten_matrix.svg",
       "alt": "Güterarten nach Rivalität und Ausschliessbarkeit"
     },
     "kategorien": [
@@ -928,12 +991,30 @@
       "Öffentliches Gut"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Auto",
+        "kategorie": "Privates Gut"
+      },
+      {
+        "text": "Pay-TV",
+        "kategorie": "Klubgut"
+      },
+      {
+        "text": "Fischbestände im Meer",
+        "kategorie": "Allmendegut"
+      },
+      {
+        "text": "Landesverteidigung",
+        "kategorie": "Öffentliches Gut"
+      },
+      {
+        "text": "Kleider",
+        "kategorie": "Privates Gut"
+      },
+      {
+        "text": "Saubere Luft",
+        "kategorie": "Öffentliches Gut"
+      }
     ]
   },
   {
@@ -1096,7 +1177,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1–GYM4 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/wachstum/drei_ebenen_modell.svg",
+      "src": "pool-bilder/vwl/wachstum/drei_ebenen_modell.svg",
       "alt": "Drei-Ebenen-Modell des Wirtschaftswachstums"
     },
     "optionen": [
@@ -1184,9 +1265,18 @@
       "Spitze des Rüssels (starker Anstieg)"
     ],
     "elemente": [
-      {},
-      {},
-      {}
+      {
+        "text": "Aufstrebende Mittelschicht in China und Indien",
+        "kategorie": "Rücken des Elefanten (starker Anstieg)"
+      },
+      {
+        "text": "Westliche untere Mittelschicht",
+        "kategorie": "Knick des Rüssels (Stagnation)"
+      },
+      {
+        "text": "Globale Superverdiener (Top 1 %)",
+        "kategorie": "Spitze des Rüssels (starker Anstieg)"
+      }
     ]
   },
   {
@@ -1392,7 +1482,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1–GYM4 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/wachstum/elefantengrafik.svg",
+      "src": "pool-bilder/vwl/wachstum/elefantengrafik.svg",
       "alt": "Globale Einkommensentwicklung 1988–2008 (vereinfacht)"
     },
     "optionen": [
@@ -1468,7 +1558,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1–GYM4 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/wachstum/oekologischer_fussabdruck.svg",
+      "src": "pool-bilder/vwl/wachstum/oekologischer_fussabdruck.svg",
       "alt": "Ökologischer Fussabdruck im Ländervergleich"
     },
     "calcZeilen": [
@@ -1500,12 +1590,30 @@
       "Marktbasierte Instrumente"
     ],
     "elemente": [
-      {},
-      {},
-      {},
-      {},
-      {},
-      {}
+      {
+        "text": "Grenzwerte für Schadstoffausstoss",
+        "kategorie": "Gebote und Verbote"
+      },
+      {
+        "text": "CO₂-Lenkungsabgabe",
+        "kategorie": "Marktbasierte Instrumente"
+      },
+      {
+        "text": "Verbot von FCKW",
+        "kategorie": "Gebote und Verbote"
+      },
+      {
+        "text": "Emissionszertifikate (Handel)",
+        "kategorie": "Marktbasierte Instrumente"
+      },
+      {
+        "text": "Umweltverträglichkeitsprüfung",
+        "kategorie": "Gebote und Verbote"
+      },
+      {
+        "text": "Besteuerung umweltbelastender Aktivitäten",
+        "kategorie": "Marktbasierte Instrumente"
+      }
     ]
   },
   {
@@ -1671,7 +1779,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1–GYM4 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/wachstum/oekologischer_fussabdruck.svg",
+      "src": "pool-bilder/vwl/wachstum/oekologischer_fussabdruck.svg",
       "alt": "Ökologischer Fussabdruck im Ländervergleich"
     },
     "optionen": [
@@ -1695,10 +1803,10 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1–GYM4 · Gymnasium Hofwil · Individuell üben",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3
+      "Kapitalakkumulation (mehr Maschinen, Infrastruktur)",
+      "Technologischer Fortschritt und Innovation",
+      "Bildung und Humankapital (Fähigkeiten der Arbeitskräfte)",
+      "Institutionelle Qualität (Rechtsstaatlichkeit, Eigentumsrechte, politische Stabilität)"
     ]
   },
   {
@@ -1714,9 +1822,9 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1–GYM4 · Gymnasium Hofwil · Individuell üben",
     "reihenfolge": [
-      0,
-      1,
-      2
+      "Green Growth: Wachstum ist möglich, wenn es ökologisch nachhaltig gestaltet wird (Entkopplung)",
+      "Beyond Growth: Wachstum soll nicht mehr das zentrale Ziel sein – Wohlbefinden statt BIP",
+      "Degrowth: Die Wirtschaft muss gezielt schrumpfen, um die ökologischen Grenzen einzuhalten"
     ]
   },
   {
@@ -1732,10 +1840,10 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1–GYM4 · Gymnasium Hofwil · Individuell üben",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3
+      "Konjunkturprogramme (staatliche Ausgabenerhöhung zur Nachfragestimulierung)",
+      "Steuersenkungen für Unternehmen (Anreize für Investitionen)",
+      "Investitionen in Infrastruktur (Strassen, Schienen, Glasfaser)",
+      "Investitionen in Bildung und Forschung (Humankapital, Innovation)"
     ]
   },
   {
@@ -1751,7 +1859,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1–GYM4 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/wachstum/wachstum_drei_ebenen_beschriftung.svg",
+      "src": "pool-bilder/vwl/wachstum/wachstum_drei_ebenen_beschriftung.svg",
       "alt": "Drei-Ebenen-Modell des Wirtschaftswachstums mit sechs nummerierten Beschriftungspunkten"
     },
     "labels": [
@@ -1806,7 +1914,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM1–GYM4 · Gymnasium Hofwil · Individuell üben",
     "bild": {
-      "src": "/pool-bilder/vwl/wachstum/wachstum_faktoren_dragdrop.svg",
+      "src": "pool-bilder/vwl/wachstum/wachstum_faktoren_dragdrop.svg",
       "alt": "Drei Spalten: Ebene 1 Unmittelbar, Ebene 2 Tiefer, Ebene 3 Fundamental"
     },
     "zones": [

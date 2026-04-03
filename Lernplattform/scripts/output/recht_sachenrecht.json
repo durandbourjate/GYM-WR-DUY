@@ -782,7 +782,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM2",
     "bild": {
-      "src": "/pool-bilder/recht/sachenrecht/sachenrecht_erwerb_01.svg",
+      "src": "pool-bilder/recht/sachenrecht/sachenrecht_erwerb_01.svg",
       "alt": "Übersicht: Originärer und derivativer Eigentumserwerb mit Publizitätsprinzip"
     },
     "kontext": "Heinz hat seiner Schwester vor einigen Wochen ein Buch ausgeliehen. Nun möchte er es ihr schenken. Er teilt ihr mit, sie könne das Buch behalten.",
@@ -988,7 +988,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM2",
     "bild": {
-      "src": "/pool-bilder/recht/sachenrecht/sachenrecht_gutglaeubig_01.svg",
+      "src": "pool-bilder/recht/sachenrecht/sachenrecht_gutglaeubig_01.svg",
       "alt": "Entscheidungsbaum: Gutgläubiger Erwerb bei abhanden gekommenen Sachen (Art. 933/934/936 ZGB)"
     },
     "kontext": "Frau Tobler kauft bei einem Teppichhändler für CHF 4'000 einen Seidenteppich. Zwei Jahre nach dem Kauf erscheint die Polizei: Der Teppich sei vor 3½ Jahren bei einem Wohnungseinbruch gestohlen worden. Der Teppichhändler handelt gewerbsmässig mit Teppichen.",
@@ -1220,7 +1220,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM2",
     "bild": {
-      "src": "/pool-bilder/recht/sachenrecht/sachenrecht_systematik_01.svg",
+      "src": "pool-bilder/recht/sachenrecht/sachenrecht_systematik_01.svg",
       "alt": "Systematik der Sachenrechte im ZGB: Eigentum, beschränkte dingliche Rechte und Besitz"
     },
     "kontext": "In seinem Testament schreibt der Erblasser, dass seine Lebensgefährtin ein lebenslanges Wohnrecht in seiner Eigentumswohnung habe.",
@@ -1520,11 +1520,11 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM2",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3,
-      4
+      "Kaufvertrag abschliessen (öffentliche Beurkundung durch Notar erforderlich, OR 216)",
+      "Grundbuchamt erhält die Anmeldung (mit beglaubigtem Vertrag)",
+      "Grundbuchamt prüft die formellen Voraussetzungen",
+      "Eintragung im Grundbuch: Käufer wird als neuer Eigentümer eingetragen",
+      "Eigentumsübergang: Erst mit dem Grundbucheintrag wird der Käufer Eigentümer (konstitutive Wirkung)"
     ]
   },
   {
@@ -1540,10 +1540,10 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM2",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3
+      "Eigentum (umfassendstes dingliches Recht: nutzen, verändern, veräussern, zerstören – Art. 641 ZGB)",
+      "Nutzniessung (Recht, eine fremde Sache zu nutzen und die Früchte zu ziehen – Art. 745 ZGB)",
+      "Wohnrecht (Recht, in einer fremden Liegenschaft zu wohnen – Art. 776 ZGB)",
+      "Grunddienstbarkeit (z.B. Wegrecht: beschränktes Nutzungsrecht an fremdem Grundstück – Art. 730 ZGB)"
     ]
   },
   {
@@ -1559,7 +1559,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM2",
     "bild": {
-      "src": "/pool-bilder/recht/sachenrecht/sachenrecht_systematik_beschriftung.svg",
+      "src": "pool-bilder/recht/sachenrecht/sachenrecht_systematik_beschriftung.svg",
       "alt": "Baumdiagramm Sachenrecht mit Eigentum, Besitz und beschränkten dinglichen Rechten"
     },
     "labels": [
@@ -1608,7 +1608,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM2",
     "bild": {
-      "src": "/pool-bilder/recht/sachenrecht/sachenrecht_erwerb_dragdrop.svg",
+      "src": "pool-bilder/recht/sachenrecht/sachenrecht_erwerb_dragdrop.svg",
       "alt": "Zwei Spalten: Originärer Erwerb und Derivativer Erwerb"
     },
     "zones": [

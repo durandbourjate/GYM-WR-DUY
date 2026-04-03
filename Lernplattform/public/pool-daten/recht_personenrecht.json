@@ -459,7 +459,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM2",
     "bild": {
-      "src": "/pool-bilder/recht/personenrecht/personenrecht_handlungsfaehigkeit_01.svg",
+      "src": "pool-bilder/recht/personenrecht/personenrecht_handlungsfaehigkeit_01.svg",
       "alt": "Prüfungsschema Handlungsfähigkeit mit Entscheidungspunkten"
     },
     "optionen": [
@@ -989,7 +989,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM2",
     "bild": {
-      "src": "/pool-bilder/recht/personenrecht/personenrecht_sphaeren_01.svg",
+      "src": "pool-bilder/recht/personenrecht/personenrecht_sphaeren_01.svg",
       "alt": "Sphärenmodell des Persönlichkeitsschutzes mit drei konzentrischen Kreisen"
     },
     "optionen": [
@@ -1137,10 +1137,10 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM2",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3
+      "Handlungsunfähig (z.B. Kleinkind, dauerhaft urteilsunfähige Person – keine gültigen Rechtsgeschäfte)",
+      "Beschränkt handlungsunfähig (z.B. Kind ab ca. 7 Jahren – nur ausschliesslich vorteilhafte und geringfügige Geschäfte)",
+      "Beschränkt handlungsfähig (z.B. 16-Jährige/r – zusätzlich Taschengeld, Arbeitslohn, BUT nur mit Zustimmung)",
+      "Voll handlungsfähig (volljährig + urteilsfähig – unbeschränkte Geschäftsfähigkeit)"
     ]
   },
   {
@@ -1156,9 +1156,9 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM2",
     "reihenfolge": [
-      0,
-      1,
-      2
+      "Gemeinsphäre (öffentliches Auftreten – geringster Schutz, z.B. Foto an öffentlicher Veranstaltung)",
+      "Privatsphäre (persönlicher Lebensbereich – mittlerer Schutz, z.B. Familienfotos, Adresse)",
+      "Intimsphäre (innerster Bereich – stärkster Schutz, z.B. Gesundheitsdaten, sexuelle Orientierung)"
     ]
   },
   {
@@ -1174,7 +1174,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM2",
     "bild": {
-      "src": "/pool-bilder/recht/personenrecht/personenrecht_handlungsfaehigkeit_beschriftung.svg",
+      "src": "pool-bilder/recht/personenrecht/personenrecht_handlungsfaehigkeit_beschriftung.svg",
       "alt": "Stufenmodell der Handlungsfähigkeit: voll, beschränkt, handlungsunfähig"
     },
     "labels": [
@@ -1229,7 +1229,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM2",
     "bild": {
-      "src": "/pool-bilder/recht/personenrecht/personenrecht_sphaeren_dragdrop.svg",
+      "src": "pool-bilder/recht/personenrecht/personenrecht_sphaeren_dragdrop.svg",
       "alt": "Drei Spalten: Geheimsphäre, Privatsphäre, Öffentliche Sphäre"
     },
     "zones": [

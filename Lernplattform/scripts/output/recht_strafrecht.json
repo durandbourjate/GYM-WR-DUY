@@ -273,7 +273,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3–GYM4",
     "bild": {
-      "src": "/pool-bilder/recht/strafrecht/strafrecht_deliktsarten_01.svg",
+      "src": "pool-bilder/recht/strafrecht/strafrecht_deliktsarten_01.svg",
       "alt": "Übersicht der drei Deliktsarten nach Schweregrad"
     },
     "optionen": [
@@ -703,7 +703,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3–GYM4",
     "bild": {
-      "src": "/pool-bilder/recht/strafrecht/strafrecht_sanktionen_01.svg",
+      "src": "pool-bilder/recht/strafrecht/strafrecht_sanktionen_01.svg",
       "alt": "Strafrechtliche Sanktionen: Strafen und Massnahmen"
     },
     "optionen": [
@@ -874,7 +874,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3–GYM4",
     "bild": {
-      "src": "/pool-bilder/recht/strafrecht/strafrecht_pruefschema_01.svg",
+      "src": "pool-bilder/recht/strafrecht/strafrecht_pruefschema_01.svg",
       "alt": "Dreistufiges Prüfschema der Strafbarkeit"
     },
     "optionen": [
@@ -1490,7 +1490,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3–GYM4",
     "bild": {
-      "src": "/pool-bilder/recht/strafrecht/strafrecht_beteiligungsformen_01.svg",
+      "src": "pool-bilder/recht/strafrecht/strafrecht_beteiligungsformen_01.svg",
       "alt": "Übersicht der Beteiligungsformen bei mehreren Tatbeteiligten"
     },
     "optionen": [
@@ -2069,9 +2069,9 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3–GYM4",
     "reihenfolge": [
-      0,
-      1,
-      2
+      "Tatbestandsmässigkeit: Ist der objektive und subjektive Tatbestand eines Straftatbestands erfüllt?",
+      "Rechtswidrigkeit: Liegt kein Rechtfertigungsgrund vor (z.B. Notwehr, Notstand)?",
+      "Schuld: Ist der Täter schuldfähig und hat er vorsätzlich oder fahrlässig gehandelt?"
     ]
   },
   {
@@ -2087,9 +2087,9 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3–GYM4",
     "reihenfolge": [
-      0,
-      1,
-      2
+      "Übertretung: nur mit Busse bedroht (z.B. Littering, einfache Verkehrsdelikte)",
+      "Vergehen: mit Freiheitsstrafe bis 3 Jahre oder Geldstrafe bedroht (z.B. einfacher Diebstahl)",
+      "Verbrechen: mit Freiheitsstrafe von mehr als 3 Jahren bedroht (z.B. Raub, Mord)"
     ]
   },
   {
@@ -2105,10 +2105,10 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3–GYM4",
     "reihenfolge": [
-      0,
-      1,
-      2,
-      3
+      "Bedingter Vollzug (Strafe wird zur Bewährung ausgesetzt, Probezeit 2–5 Jahre)",
+      "Teilbedingter Vollzug (Teil der Strafe wird vollzogen, Rest auf Bewährung ausgesetzt)",
+      "Unbedingter Vollzug (Strafe wird vollständig vollzogen, Strafvollzug im Gefängnis)",
+      "Verwahrung (zeitlich unbefristete Sicherungsmassnahme bei gefährlichen Straftätern)"
     ]
   },
   {
@@ -2124,7 +2124,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3–GYM4",
     "bild": {
-      "src": "/pool-bilder/recht/strafrecht/strafrecht_pruefschema_beschriftung.svg",
+      "src": "pool-bilder/recht/strafrecht/strafrecht_pruefschema_beschriftung.svg",
       "alt": "Dreigliedriges Prüfschema: Tatbestandsmässigkeit, Rechtswidrigkeit, Schuld"
     },
     "labels": [
@@ -2173,7 +2173,7 @@
     "pruefungstauglich": false,
     "stufe": "SF GYM3–GYM4",
     "bild": {
-      "src": "/pool-bilder/recht/strafrecht/strafrecht_sanktionen_dragdrop.svg",
+      "src": "pool-bilder/recht/strafrecht/strafrecht_sanktionen_dragdrop.svg",
       "alt": "Drei Spalten: Strafen, Massnahmen, Nebenfolgen"
     },
     "zones": [
