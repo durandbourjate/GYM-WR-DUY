@@ -9,7 +9,7 @@
 
 // === KONFIGURATION ===
 // Diese IDs müssen nach dem Erstellen der Sheets eingetragen werden.
-const GRUPPEN_REGISTRY_ID = ''; // TODO: Gruppen-Registry Sheet erstellen + ID eintragen
+const GRUPPEN_REGISTRY_ID = '1VH7Vu7JIKYLic2-wK2uSa2nXA7WVvStKOjUDi9cpWnI';
 const LP_DOMAIN = 'gymhofwil.ch';
 const SUS_DOMAIN = 'stud.gymhofwil.ch';
 
