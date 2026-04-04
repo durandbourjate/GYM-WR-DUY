@@ -30,6 +30,79 @@
 
 ---
 
+## Session 55 — Shared Editor Phase 2: Typ-Editoren + Komponenten (04.04.2026)
+
+### Stand
+Branch `feature/shared-editor-phase1`. tsc ✅ | 193 Tests ✅ | Build ✅. **Nicht auf main** — Phase 3+4 noch ausstehend.
+
+### Änderungen
+
+| # | Änderung | Dateien |
+|---|----------|---------|
+| 1 | **Pruefung ↔ Shared verdrahtet** — tsconfig paths + vite alias + React dedupe | `Pruefung/tsconfig.app.json`, `Pruefung/vite.config.ts` |
+| 2 | **20 Typ-Editoren nach shared** — MC, RF, Freitext, Lückentext, Zuordnung, Berechnung, Sortierung, Code, Audio, Hotspot, Bildbeschriftung, DragDropBild, Formel, Zeichnen, Aufgabengruppe, Bewertungsraster, Buchungssatz, TKonto, BilanzER, Kontenbestimmung | `packages/shared/src/editor/typen/` (20 Dateien) |
+| 3 | **5 UI-Komponenten nach shared** — EditorBausteine, FormattierungsToolbar, BildUpload, KontenSelect, FrageTypAuswahl | `packages/shared/src/editor/components/` |
+| 4 | **4 KI-Komponenten nach shared** — KIBausteine, KITypButtons, KIFiBuButtons, KIAssistentPanel | `packages/shared/src/editor/ki/` |
+| 5 | **Refactoring** — BildUpload + ZeichnenEditor: EditorContext statt direkter Store-Zugriffe. FrageTypAuswahl: EditorConfig statt authStore. | — |
+| 6 | **Utilities/Data nach shared** — latexRenderer, bewertungsrasterVorlagen | `packages/shared/src/editor/utils/`, `data/` |
+| 7 | **Pruefung Re-Exports** — Alle 30 Originale als Re-Export-Proxy, keine Import-Änderungen in Konsumenten | `Pruefung/src/components/lp/frageneditor/` |
+
+### Shared-Package Struktur nach Phase 2
+
+```
+packages/shared/src/
+├── index.ts                    (Barrel mit allen Exports)
+├── types/
+│   ├── fragen.ts               (alle Frage-Types)
+│   └── auth.ts
+└── editor/
+    ├── types.ts                (EditorConfig, EditorServices, EditorFeatures)
+    ├── EditorContext.tsx        (Provider + Hooks)
+    ├── editorUtils.ts          (FrageTyp, Defaults)
+    ├── fragenValidierung.ts
+    ├── fragenFactory.ts
+    ├── zeitbedarf.ts
+    ├── fachUtils.ts
+    ├── kontenrahmen.ts
+    ├── musterloesungGenerierung.ts
+    ├── useKIAssistent.ts
+    ├── hooks/
+    │   ├── useFocusTrap.ts
+    │   └── usePanelResize.ts
+    ├── components/             ← NEU Phase 2
+    │   ├── EditorBausteine.tsx
+    │   ├── FormattierungsToolbar.tsx
+    │   ├── BildUpload.tsx
+    │   ├── KontenSelect.tsx
+    │   └── FrageTypAuswahl.tsx
+    ├── typen/                  ← NEU Phase 2
+    │   ├── MCEditor.tsx ... (20 Editoren)
+    │   └── AufgabengruppeEditor.tsx
+    ├── ki/                     ← NEU Phase 2
+    │   ├── KIBausteine.tsx
+    │   ├── KITypButtons.tsx
+    │   ├── KIFiBuButtons.tsx
+    │   └── KIAssistentPanel.tsx
+    ├── data/                   ← NEU Phase 2
+    │   └── bewertungsrasterVorlagen.ts
+    └── utils/                  ← NEU Phase 2
+        └── latexRenderer.ts
+```
+
+### Nächste Schritte (Phase 3)
+- **Sections verschieben** — TypEditorDispatcher, FragetextSection, MetadataSection, MusterloesungSection → shared
+- **FragenEditor.tsx (Hub)** → shared (EditorServices-Erweiterung nötig für ladeLernziele, klassifiziere etc.)
+- **PDFEditor** → evaluieren ob verschiebbar (komplexer PDF-Subbaum)
+- **EditorProvider in Pruefung wiren** — Host implementiert EditorServices/Config und wrapped den shared Editor
+
+### Nicht in Phase 2 verschoben
+- `FragenEditor.tsx` (Hub) — Phase 3
+- `sections/` (4 Dateien) — Phase 3
+- `PDFEditor.tsx` — Phase 3/4 (komplexer PDF-Rendering-Subbaum)
+- `editorUtils.ts` / `useKIAssistent.ts` in Pruefung — Original bleibt, wird von anderen Pruefung-Dateien noch direkt importiert
+
+---
+
 ## Session 53 — Lernplattform Design + Branch-Aufräumung (02.04.2026)
 
 ### Stand
