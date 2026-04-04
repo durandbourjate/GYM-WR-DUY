@@ -59,8 +59,8 @@ export default function BerechnungEditor({ ergebnisse, setErgebnisse, rechenwegE
         {/* Spalten-Header */}
         {ergebnisse.length > 0 && (
           <div className="flex gap-2 items-center text-xs text-slate-500 dark:text-slate-400">
-            <span className="w-36 shrink-0">Bezeichnung</span>
-            <span className="flex-1 min-w-0 text-center">Ergebnis</span>
+            <span className="flex-[3] min-w-0">Bezeichnung</span>
+            <span className="flex-[2] min-w-0 text-center">Ergebnis</span>
             <span className="flex-1 min-w-0 text-center">±Toleranz</span>
             <span className="w-16 text-center">Einheit</span>
             {ergebnisse.length > 1 && <span className="w-7" />}
@@ -72,15 +72,15 @@ export default function BerechnungEditor({ ergebnisse, setErgebnisse, rechenwegE
               type="text"
               value={erg.label}
               onChange={(e) => updateErgebnis(i, { label: e.target.value })}
-              placeholder="z.B. Gewinn"
-              className="input-field-narrow w-36 shrink-0"
+              placeholder="z.B. Gewinn, Umsatz..."
+              className="input-field flex-[3] min-w-0"
             />
             <input
               type="number"
               value={erg.korrekt}
               onChange={(e) => updateErgebnis(i, { korrekt: parseFloat(e.target.value) || 0 })}
               placeholder="Korrekt"
-              className="input-field flex-1 min-w-0 text-center font-mono"
+              className="input-field flex-[2] min-w-0 text-center font-mono"
               title="Korrekte Antwort"
             />
             <input

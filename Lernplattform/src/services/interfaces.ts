@@ -28,5 +28,6 @@ export interface FragenService {
   ladeFragen(gruppeId: string, filter?: FragenFilter): Promise<Frage[]>
   ladeThemen(gruppeId: string, fach?: string): Promise<string[]>
   speichereFrage(gruppeId: string, frage: Frage): Promise<{ success: boolean; id: string }>
+  loescheFrage(gruppeId: string, frageId: string, fachbereich: string): Promise<boolean>
   invalidateCache(gruppeId?: string): void
 }

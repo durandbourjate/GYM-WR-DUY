@@ -144,6 +144,9 @@ function doPost(e) {
     case 'lernplattformSpeichereFrage':
       return lernplattformSpeichereFrage(body);
 
+    case 'lernplattformLoescheFrage':
+      return lernplattformLoescheFrage(body);
+
     // === FORTSCHRITT ===
 
     case 'lernplattformSpeichereFortschritt':
@@ -966,6 +969,65 @@ function speichereFrageInGruppenSheet_(gruppe, frage) {
     }
 
     return jsonResponse({ success: true, id: frage.id });
+  } catch (e) {
+    return jsonResponse({ success: false, error: e.message });
+  }
+}
+
+/**
+ * Frage löschen (nur Admin der Gruppe).
+ * Gym-Gruppen: Löscht aus FRAGENBANK_ID (Fach-Tab).
+ * Familie-Gruppen: Löscht aus Gruppen-Sheet.
+ */
+function lernplattformLoescheFrage(body) {
+  var email = (body.email || '').toLowerCase().trim();
+  if (!validiereSessionToken_(body.token || body.sessionToken, email)) {
+    return jsonResponse({ success: false, error: 'Nicht authentifiziert' });
+  }
+
+  var gruppeId = body.gruppeId;
+  var frageId = body.frageId;
+  var fachbereich = body.fachbereich;
+
+  if (!frageId) {
+    return jsonResponse({ success: false, error: 'frageId fehlt' });
+  }
+
+  var gruppen = alleGruppenLaden_();
+  var gruppe = gruppen.find(function(g) { return g.id === gruppeId; });
+  if (!gruppe) return jsonResponse({ success: false, error: 'Gruppe nicht gefunden' });
+
+  if (gruppe.adminEmail !== email) {
+    return jsonResponse({ success: false, error: 'Keine Berechtigung (nur Admin)' });
+  }
+
+  try {
+    var ss, sheet;
+    if (gruppe.typ === 'familie' && gruppe.fragebankSheetId) {
+      ss = SpreadsheetApp.openById(gruppe.fragebankSheetId);
+      sheet = ss.getSheetByName('Fragen');
+    } else {
+      if (!fachbereich || FRAGENBANK_TABS.indexOf(fachbereich) === -1) {
+        return jsonResponse({ success: false, error: 'fachbereich fehlt oder ungültig' });
+      }
+      ss = SpreadsheetApp.openById(FRAGENBANK_ID);
+      sheet = ss.getSheetByName(fachbereich);
+    }
+
+    if (!sheet) return jsonResponse({ success: false, error: 'Sheet/Tab nicht gefunden' });
+
+    var daten = sheet.getDataRange().getValues();
+    var headers = daten[0].map(function(h) { return String(h).trim(); });
+    var idIdx = headers.indexOf('id');
+
+    for (var i = 1; i < daten.length; i++) {
+      if (String(daten[i][idIdx]) === frageId) {
+        sheet.deleteRow(i + 1); // 1-basiert
+        return jsonResponse({ success: true, id: frageId });
+      }
+    }
+
+    return jsonResponse({ success: false, error: 'Frage nicht gefunden: ' + frageId });
   } catch (e) {
     return jsonResponse({ success: false, error: e.message });
   }

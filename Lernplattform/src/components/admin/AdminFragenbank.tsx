@@ -65,6 +65,19 @@ export default function AdminFragenbank() {
     setEditorOffen(true)
   }
 
+  // Frage löschen
+  async function frageLoeschen(frage: Frage) {
+    if (!aktiveGruppe) return
+    if (!confirm(`Frage "${getFragetext(frage)?.substring(0, 60) || frage.id}" wirklich löschen?`)) return
+    try {
+      await fragenAdapter.loescheFrage(aktiveGruppe.id, frage.id, frage.fachbereich)
+      fragenAdapter.invalidateCache(aktiveGruppe.id)
+      await ladeFragen()
+    } catch (e) {
+      setFehler(e instanceof Error ? e.message : 'Löschen fehlgeschlagen')
+    }
+  }
+
   // Speichern-Handler — Frage kommt direkt im shared-Format, keine Konvertierung nötig
   async function handleSpeichern(frage: Frage) {
     if (!aktiveGruppe) return
@@ -251,6 +264,13 @@ export default function AdminFragenbank() {
                     </span>
                   </div>
                 </div>
+                <button
+                  onClick={(e) => { e.stopPropagation(); frageLoeschen(frage) }}
+                  className="text-gray-300 hover:text-red-500 dark:text-gray-600 dark:hover:text-red-400 text-sm transition-colors cursor-pointer p-1"
+                  title="Frage löschen"
+                >
+                  🗑
+                </button>
                 <span className="text-gray-300 dark:text-gray-600 text-lg">›</span>
               </div>
             </button>

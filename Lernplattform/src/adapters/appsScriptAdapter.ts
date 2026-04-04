@@ -149,6 +149,19 @@ class AppsScriptFragenAdapter implements FragenService {
     return response
   }
 
+  async loescheFrage(gruppeId: string, frageId: string, fachbereich: string): Promise<boolean> {
+    const token = this.getToken()
+    const email = this.getEmail()
+    const response = await apiClient.post<{ success: boolean }>(
+      'lernplattformLoescheFrage',
+      { gruppeId, frageId, fachbereich, email },
+      token
+    )
+    if (!response?.success) throw new Error('Frage löschen fehlgeschlagen')
+    this.invalidateCache(gruppeId)
+    return true
+  }
+
   invalidateCache(gruppeId?: string) {
     if (gruppeId) this.cache.delete(gruppeId)
     else this.cache.clear()
