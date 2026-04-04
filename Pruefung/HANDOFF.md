@@ -30,6 +30,43 @@
 
 ---
 
+## Session 56 — Shared Editor Phase 3: Sections + EditorServices (04.04.2026)
+
+### Stand
+Branch `feature/shared-editor-phase1`. tsc ✅ | 193 Tests ✅ | Build ✅. **Nicht auf main** — Phase 4 noch ausstehend.
+
+### Änderungen
+
+| # | Änderung | Dateien |
+|---|----------|---------|
+| 1 | **4 Sections nach shared** — TypEditorDispatcher, FragetextSection, MetadataSection, MusterloesungSection | `packages/shared/src/editor/sections/` |
+| 2 | **EditorServices erweitert** — `ladeLernziele()` für FragetextSection | `packages/shared/src/editor/types.ts` |
+| 3 | **MetadataSection: BerechtigungenEditor als Slot** — Host übergibt als `berechtigungenEditor` Prop | `FragenEditor.tsx` |
+| 4 | **TypEditorDispatcher: PDFEditor als Slot** — Host übergibt als `PDFEditorComponent` Prop | `FragenEditor.tsx` |
+| 5 | **Neue shared Types** — Lernziel, FragenPerformance, Berechtigung, RechteStufe, istWRFachschaft | `types/fragen.ts`, `types/auth.ts`, `fachUtils.ts` |
+| 6 | **Performance-Utils** — loesungsquoteFarbe, loesungsquoteBgFarbe | `editor/utils/performanceUtils.ts` |
+
+### Was jetzt in shared liegt (nach Phase 1+2+3)
+- **Infrastruktur:** EditorContext, EditorConfig, EditorServices, Types, Hooks
+- **20 Typ-Editoren** (alle ausser PDFEditor)
+- **5 UI-Komponenten** (EditorBausteine, FormattierungsToolbar, BildUpload, KontenSelect, FrageTypAuswahl)
+- **4 KI-Komponenten** (KIBausteine, KITypButtons, KIFiBuButtons, KIAssistentPanel)
+- **4 Sections** (TypEditorDispatcher, FragetextSection, MetadataSection, MusterloesungSection)
+- **Utilities** (fachUtils, editorUtils, fragenFactory, kontenrahmen, latexRenderer, performanceUtils, etc.)
+
+### Was in Pruefung bleibt
+- **FragenEditor.tsx** (Hub) — orchestriert alles, verdrahtet EditorProvider
+- **PDFEditor.tsx** (komplexer PDF-Subbaum mit usePDFRenderer etc.)
+- **AnhangEditor.tsx, PoolUpdateVergleich.tsx, RueckSyncDialog.tsx** — Pruefung-spezifisch
+- **Stores** (authStore, schulConfigStore) — Host-seitig, liefern Daten an EditorProvider
+
+### Nächste Schritte (Phase 4)
+- **EditorProvider in Pruefung verdrahten** — FragenEditor.tsx wrapped mit `<EditorProvider config={...} services={...}>`
+- **Lernplattform-Integration** — Lernplattform importiert shared Editor-Komponenten
+- **PDFEditor evaluieren** — optional in Phase 5
+
+---
+
 ## Session 55 — Shared Editor Phase 2: Typ-Editoren + Komponenten (04.04.2026)
 
 ### Stand
