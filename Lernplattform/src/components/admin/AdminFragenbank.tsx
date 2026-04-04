@@ -15,6 +15,14 @@ const FACH_FARBEN: Record<string, string> = {
   Informatik: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400',
 }
 
+// Intensivere Farben für aktiven (ausgewählten) Fach-Button
+const FACH_FARBEN_AKTIV: Record<string, string> = {
+  VWL: 'bg-orange-500 text-white dark:bg-orange-600 dark:text-white ring-2 ring-orange-300',
+  BWL: 'bg-blue-500 text-white dark:bg-blue-600 dark:text-white ring-2 ring-blue-300',
+  Recht: 'bg-green-500 text-white dark:bg-green-600 dark:text-white ring-2 ring-green-300',
+  Informatik: 'bg-gray-500 text-white dark:bg-gray-600 dark:text-white ring-2 ring-gray-300',
+}
+
 export default function AdminFragenbank() {
   const { aktiveGruppe } = useGruppenStore()
   const [fragen, setFragen] = useState<Frage[]>([])
@@ -143,7 +151,7 @@ export default function AdminFragenbank() {
                 onClick={() => { setFilterFach(fach === filterFach ? '' : fach); setFilterThema('') }}
                 className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
                   filterFach === fach
-                    ? 'bg-gray-800 text-white dark:bg-white dark:text-gray-800'
+                    ? FACH_FARBEN_AKTIV[fach] || 'bg-gray-800 text-white dark:bg-white dark:text-gray-800'
                     : FACH_FARBEN[fach] || 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300'
                 }`}
               >

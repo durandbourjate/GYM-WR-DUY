@@ -101,7 +101,7 @@ export default function LueckentextEditor({ textMitLuecken, setTextMitLuecken, l
           <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">
             Korrekte Antworten pro Lücke
           </label>
-          {luecken.map((luecke) => {
+          {luecken.map((luecke, lueckenIndex) => {
             const dropdownText = luecke.dropdownOptionen?.join(', ') ?? ''
             const korrekteImDropdown =
               luecke.dropdownOptionen && luecke.dropdownOptionen.length > 0
@@ -110,8 +110,8 @@ export default function LueckentextEditor({ textMitLuecken, setTextMitLuecken, l
             return (
               <div key={luecke.id} className="space-y-1.5">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-slate-500 dark:text-slate-400 font-mono w-8 shrink-0">
-                    {`{{${luecke.id}}}`}
+                  <span className="text-xs text-slate-500 dark:text-slate-400 font-mono w-8 shrink-0" title={`ID: ${luecke.id}`}>
+                    {`{{${lueckenIndex + 1}}}`}
                   </span>
                   <input
                     type="text"

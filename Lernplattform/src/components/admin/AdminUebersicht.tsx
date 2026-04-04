@@ -6,7 +6,8 @@ interface Props {
 
 export default function AdminUebersicht({ onKindKlick }: Props) {
   const { mitglieder, aktiveGruppe } = useGruppenStore()
-  const lernende = mitglieder.filter(m => m.rolle === 'lernend')
+  // 'mitglied' und 'lernend' sind gleichwertig (Backend default = 'mitglied')
+  const lernende = mitglieder.filter(m => m.rolle !== 'admin')
   const admins = mitglieder.filter(m => m.rolle === 'admin')
 
   if (mitglieder.length === 0) {
