@@ -52,6 +52,7 @@ export default function Dashboard() {
 
   // Filter-State
   const [fachFilter, setFachFilter] = useState<string | null>(null)
+  const [themaFilter, setThemaFilter] = useState<string | null>(null)
   const [schwierigkeitFilter, setSchwierigkeitFilter] = useState<number | null>(null)
   const [typFilter, setTypFilter] = useState<FrageTyp | null>(null)
   const [suchtext, setSuchtext] = useState('')
@@ -99,6 +100,12 @@ export default function Dashboard() {
     [...new Set(alleFragen.map(f => f.fach))].sort()
   , [alleFragen])
 
+  // Themen abhängig vom Fach-Filter
+  const verfuegbareThemen = useMemo(() => {
+    const fragen = fachFilter ? alleFragen.filter(f => f.fach === fachFilter) : alleFragen
+    return [...new Set(fragen.map(f => f.thema).filter(Boolean))].sort()
+  }, [alleFragen, fachFilter])
+
   const verfuegbareTypen = useMemo(() =>
     [...new Set(alleFragen.map(f => f.typ))].sort()
   , [alleFragen])
@@ -122,6 +129,8 @@ export default function Dashboard() {
       const gefiltert = themen.filter(t => {
         // Kontext-Filter: nur sichtbare Themen anzeigen (wenn gesetzt)
         if (sichtbareThemenFuerFach.length > 0 && !sichtbareThemenFuerFach.includes(t.thema)) return false
+        // Thema-Filter: nur gewähltes Thema anzeigen
+        if (themaFilter && t.thema !== themaFilter) return false
         // Suchtext-Filter: Themenname muss matchen
         if (suchtext && !t.thema.toLowerCase().includes(suchtext.toLowerCase())) return false
         let fragen = t.fragen
@@ -143,7 +152,7 @@ export default function Dashboard() {
     }
 
     return result
-  }, [themenInfo, fachFilter, schwierigkeitFilter, typFilter, suchtext, getThemenFortschritt, sichtbareFaecher, sichtbareThemen])
+  }, [themenInfo, fachFilter, themaFilter, schwierigkeitFilter, typFilter, suchtext, getThemenFortschritt, sichtbareFaecher, sichtbareThemen])
 
   // Anzahl gefilterter Fragen
   const gefilterteAnzahl = useMemo(() =>
@@ -160,9 +169,10 @@ export default function Dashboard() {
     setEingeklappteF(neu)
   }
 
-  const filterAktiv = fachFilter || schwierigkeitFilter || typFilter || suchtext
+  const filterAktiv = fachFilter || themaFilter || schwierigkeitFilter || typFilter || suchtext
   const filterZuruecksetzen = () => {
     setFachFilter(null)
+    setThemaFilter(null)
     setSchwierigkeitFilter(null)
     setTypFilter(null)
     setSuchtext('')
@@ -243,7 +253,7 @@ export default function Dashboard() {
                 return (
                   <button
                     key={fach}
-                    onClick={() => setFachFilter(fachFilter === fach ? null : fach)}
+                    onClick={() => { setFachFilter(fachFilter === fach ? null : fach); setThemaFilter(null) }}
                     className="px-3 py-1.5 rounded-lg text-xs font-medium min-h-[36px] border transition-colors"
                     style={fachFilter === fach
                       ? { backgroundColor: farbe + '1a', color: farbe, borderColor: farbe + '4d', outline: `1px solid ${farbe}` }
@@ -255,6 +265,24 @@ export default function Dashboard() {
                 )
               })}
             </div>
+
+            {/* Thema-Filter (abhängig von Fach) */}
+            {verfuegbareThemen.length > 1 && (
+              <select
+                value={themaFilter || ''}
+                onChange={(e) => setThemaFilter(e.target.value || null)}
+                className={`w-full px-3 py-2 rounded-xl text-sm border transition-colors cursor-pointer
+                  ${themaFilter
+                    ? 'bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 border-purple-300 dark:border-purple-700'
+                    : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-600'}
+                `}
+              >
+                <option value="">Alle Themen{fachFilter ? ` (${verfuegbareThemen.length})` : ''}</option>
+                {verfuegbareThemen.map(t => (
+                  <option key={t} value={t}>{t}</option>
+                ))}
+              </select>
+            )}
 
             {/* Schwierigkeits-Filter */}
             <div className="flex flex-wrap gap-1.5">

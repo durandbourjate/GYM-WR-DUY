@@ -19,6 +19,7 @@ export default function AppShell({ children }: Props) {
   const { anrede } = useLernKontext()
 
   const [hilfeOffen, setHilfeOffen] = useState(false)
+  const [lernzieleOffen, setLernzieleOffen] = useState(false)
   const istAngemeldet = !!user
   const istAdmin = user?.rolle === 'admin'
   const zeigeHeader = istAngemeldet && aktuellerScreen !== 'login'
@@ -81,10 +82,21 @@ export default function AppShell({ children }: Props) {
         </div>
 
         <div className="flex items-center gap-2">
+          {/* Lernziele-Button */}
+          {aktuellerScreen === 'dashboard' && (
+            <button
+              onClick={() => { setLernzieleOffen(!lernzieleOffen); setHilfeOffen(false) }}
+              className={`p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 min-w-[44px] min-h-[44px] flex items-center justify-center ${lernzieleOffen ? 'bg-gray-100 dark:bg-gray-700' : ''}`}
+              title="Lernziele"
+            >
+              <span className="text-lg">&#127937;</span>
+            </button>
+          )}
+
           {/* Hilfe-Button */}
           <button
-            onClick={() => setHilfeOffen(!hilfeOffen)}
-            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 min-w-[44px] min-h-[44px] flex items-center justify-center"
+            onClick={() => { setHilfeOffen(!hilfeOffen); setLernzieleOffen(false) }}
+            className={`p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 min-w-[44px] min-h-[44px] flex items-center justify-center ${hilfeOffen ? 'bg-gray-100 dark:bg-gray-700' : ''}`}
             title="Hilfe"
           >
             <span className="text-lg">?</span>
@@ -136,6 +148,28 @@ export default function AppShell({ children }: Props) {
               <div className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-yellow-400 inline-block" /> Üben</div>
               <div className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-blue-400 inline-block" /> Gefestigt</div>
               <div className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-green-500 inline-block" /> Gemeistert</div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Lernziele-Panel */}
+      {lernzieleOffen && (
+        <div className="bg-green-50 dark:bg-green-900/20 border-b border-green-200 dark:border-green-800 px-4 py-3">
+          <div className="max-w-2xl mx-auto text-sm text-gray-700 dark:text-gray-300 space-y-2">
+            <div className="flex justify-between items-start">
+              <h3 className="font-semibold dark:text-white">&#127937; Lernziele</h3>
+              <button onClick={() => setLernzieleOffen(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">x</button>
+            </div>
+            <p>Bearbeite die Übungsthemen im Dashboard, um deine Lernziele zu erreichen.</p>
+            <div className="text-xs space-y-1">
+              <p>Dein Ziel: Möglichst viele Fragen auf <strong className="text-green-600 dark:text-green-400">Gemeistert</strong> bringen.</p>
+              <div className="grid grid-cols-2 gap-1 mt-2">
+                <div className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-gray-300 inline-block" /> Neu — noch nicht bearbeitet</div>
+                <div className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-yellow-400 inline-block" /> Üben — mehr Wiederholungen nötig</div>
+                <div className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-blue-400 inline-block" /> Gefestigt — gut, weiter so</div>
+                <div className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-green-500 inline-block" /> Gemeistert — perfekt!</div>
+              </div>
             </div>
           </div>
         </div>
