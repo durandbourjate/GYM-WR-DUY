@@ -5,7 +5,7 @@
 **Branch:** `main`
 **Phase:** Bugfix-Runde + Umbenennung (04.04.2026)
 **Status:** TSC OK, 92 LP-Tests + 193 Prüfungs-Tests grün, Build OK
-**Apps Script:** Unverändert (keine Backend-Änderungen)
+**Apps Script:** GEÄNDERT — neue Bereitstellung nötig (Bug 11+12)
 
 ### Architektur
 - **Ein Format:** Kanonisch aus `@shared/types/fragen` (discriminated union)
@@ -31,15 +31,16 @@
 
 ---
 
-## Offene Bugs
+| **Bug 12: speichereFrage** | Gym-Gruppen speichern jetzt in FRAGENBANK_ID (Fach-Tab), Familie weiterhin eigenes Sheet |
+| **Bug 11: KI-Assistent** | 3 neue Endpoints: KI (Claude API), Upload (Drive), Lernziele (aus Fragenbank). ANTHROPIC_API_KEY in Script Properties nötig für KI. |
 
-### A) Architektur/Backend (nicht in dieser Session)
+## Offene Punkte
+
+### A) Noch zu prüfen
 
 | # | Thema | Details |
 |---|-------|---------|
-| 9 | **Übungspools-Lernziele weg?** | User meldet dass Lernziele in Übungspools verschwunden sind. Separat prüfen ob Deployment-Artefakt oder anderer Bug. |
-| 11 | **Backend KI/Upload/Lernziele** | Endpoints im EditorProvider vorbereitet, fehlen im Apps Script Backend |
-| 12 | **speichereFrage → FRAGENBANK_ID** | Speichert noch ins alte Gruppen-Sheet, muss auf gemeinsame Fragenbank umgestellt werden |
+| 9 | **Übungspools-Lernziele weg?** | Daten + Rendering im Code OK. Vermutlich Browser-Cache. User soll Hard-Refresh testen. |
 
 ### B) Wünsche (niedrige Priorität)
 
@@ -61,8 +62,7 @@ cd Pruefung && npx tsc -b && npx vitest run
 
 ## Nächste Session — Empfohlene Reihenfolge
 
-1. E2E-Test im Browser (Login, Gruppen, Dashboard, Übung, Admin)
-2. Bug 12: speichereFrage auf FRAGENBANK_ID umstellen
-3. Bug 11: KI/Upload/Lernziele-Endpoints im Apps Script Backend
-4. Bug 9: Übungspools-Lernziele prüfen
-5. Fortschritts-Daten pro Mitglied in AdminUebersicht
+1. **Apps Script deployen** — User muss Code aus `apps-script/lernplattform-backend.js` in den Apps Script Editor kopieren + neue Bereitstellung erstellen
+2. **ANTHROPIC_API_KEY setzen** — Im Apps Script Editor → Projekteinstellungen → Script Properties → `ANTHROPIC_API_KEY` hinzufügen (für KI-Assistent)
+3. E2E-Test im Browser (Login, Gruppen, Dashboard, Übung, Admin, Fragenbank-Editor)
+4. Fortschritts-Daten pro Mitglied in AdminUebersicht (Backend-Aggregation)

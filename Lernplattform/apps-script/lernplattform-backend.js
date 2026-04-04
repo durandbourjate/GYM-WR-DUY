@@ -168,6 +168,17 @@ function doPost(e) {
     case 'lernplattformSpeichereEinstellungen':
       return lernplattformSpeichereEinstellungen(body);
 
+    // === KI / UPLOAD / LERNZIELE ===
+
+    case 'lernplattformKIAssistent':
+      return lernplattformKIAssistent(body);
+
+    case 'lernplattformUploadAnhang':
+      return lernplattformUploadAnhang(body);
+
+    case 'lernplattformLadeLernziele':
+      return lernplattformLadeLernziele(body);
+
     default:
       return jsonResponse({ success: false, error: 'Unbekannte Aktion: ' + action });
   }
@@ -838,29 +849,28 @@ function lernplattformSpeichereFrage(body) {
     return jsonResponse({ success: false, error: 'Keine Berechtigung (nur Admin)' });
   }
 
-  if (!gruppe.fragebankSheetId) {
-    return jsonResponse({ success: false, error: 'Fragenbank-Sheet nicht konfiguriert' });
+  // Fachbereich bestimmt den Tab in der Fragenbank
+  var fachbereich = frage.fachbereich || frage.fach || '';
+
+  // Familie-Gruppen: weiterhin eigenes Sheet nutzen
+  if (gruppe.typ === 'familie' && gruppe.fragebankSheetId) {
+    return speichereFrageInGruppenSheet_(gruppe, frage);
   }
 
-  // Spalten-Definition (Reihenfolge = Header-Reihenfolge im Sheet)
-  var spalten = [
-    'id', 'fach', 'thema', 'typ', 'schwierigkeit', 'taxonomie',
-    'frage', 'erklaerung', 'uebung', 'pruefungstauglich',
-    'optionen', 'korrekt', 'aussagen', 'luecken', 'toleranz',
-    'einheit', 'kategorien', 'elemente', 'reihenfolge', 'daten'
-  ];
+  // Gym-Gruppen: Gemeinsame Fragenbank (wie Prüfungstool)
+  if (FRAGENBANK_TABS.indexOf(fachbereich) === -1) {
+    return jsonResponse({ success: false, error: 'Ungültiger Fachbereich: ' + fachbereich });
+  }
 
   try {
-    var ss = SpreadsheetApp.openById(gruppe.fragebankSheetId);
-    var sheet = ss.getSheetByName('Fragen');
-
-    // Tab erstellen falls nicht vorhanden
+    var fragenbank = SpreadsheetApp.openById(FRAGENBANK_ID);
+    var sheet = fragenbank.getSheetByName(fachbereich);
     if (!sheet) {
-      sheet = ss.insertSheet('Fragen');
-      sheet.appendRow(spalten);
+      return jsonResponse({ success: false, error: 'Tab "' + fachbereich + '" nicht gefunden in Fragenbank' });
     }
 
     var daten = sheet.getDataRange().getValues();
+    // Headers NICHT lowercasen — Prüfungstool-Sheet hat camelCase
     var headers = daten[0].map(function(h) { return String(h).trim(); });
     var idIdx = headers.indexOf('id');
 
@@ -872,12 +882,73 @@ function lernplattformSpeichereFrage(body) {
       return val;
     }
 
+    // geaendertAm aktualisieren
+    frage.geaendertAm = new Date().toISOString();
+    if (!frage.erstelltAm) frage.erstelltAm = frage.geaendertAm;
+    if (!frage.version) frage.version = 1;
+
     // Bestehende Zeile suchen
     var gefunden = false;
     for (var i = 1; i < daten.length; i++) {
       if (String(daten[i][idIdx]) === frage.id) {
-        // Update: Jede Spalte einzeln setzen
+        // Update: Jede Spalte anhand der vorhandenen Header setzen
         var zeilenIdx = i + 1; // 1-basiert
+        for (var h = 0; h < headers.length; h++) {
+          var key = headers[h];
+          if (!key) continue;
+          sheet.getRange(zeilenIdx, h + 1).setValue(wert(key));
+        }
+        gefunden = true;
+        break;
+      }
+    }
+
+    if (!gefunden) {
+      // Neue Zeile: Reihenfolge muss den Header-Spalten entsprechen
+      var neueZeile = headers.map(function(key) { return wert(key); });
+      sheet.appendRow(neueZeile);
+    }
+
+    return jsonResponse({ success: true, id: frage.id });
+  } catch (e) {
+    return jsonResponse({ success: false, error: e.message });
+  }
+}
+
+/**
+ * Frage ins Gruppen-eigene Sheet speichern (für Familie-Gruppen).
+ */
+function speichereFrageInGruppenSheet_(gruppe, frage) {
+  var spalten = [
+    'id', 'fach', 'thema', 'typ', 'schwierigkeit', 'taxonomie',
+    'frage', 'erklaerung', 'uebung', 'pruefungstauglich',
+    'optionen', 'korrekt', 'aussagen', 'luecken', 'toleranz',
+    'einheit', 'kategorien', 'elemente', 'reihenfolge', 'daten'
+  ];
+
+  function wert(key) {
+    var val = frage[key];
+    if (val === undefined || val === null) return '';
+    if (typeof val === 'object') return JSON.stringify(val);
+    return val;
+  }
+
+  try {
+    var ss = SpreadsheetApp.openById(gruppe.fragebankSheetId);
+    var sheet = ss.getSheetByName('Fragen');
+    if (!sheet) {
+      sheet = ss.insertSheet('Fragen');
+      sheet.appendRow(spalten);
+    }
+
+    var daten = sheet.getDataRange().getValues();
+    var headers = daten[0].map(function(h) { return String(h).trim(); });
+    var idIdx = headers.indexOf('id');
+
+    var gefunden = false;
+    for (var i = 1; i < daten.length; i++) {
+      if (String(daten[i][idIdx]) === frage.id) {
+        var zeilenIdx = i + 1;
         for (var s = 0; s < spalten.length; s++) {
           var colIdx = headers.indexOf(spalten[s]);
           if (colIdx >= 0) {
@@ -890,7 +961,6 @@ function lernplattformSpeichereFrage(body) {
     }
 
     if (!gefunden) {
-      // Neue Zeile anhängen
       var neueZeile = spalten.map(function(key) { return wert(key); });
       sheet.appendRow(neueZeile);
     }
@@ -1217,4 +1287,219 @@ function lernplattformSpeichereEinstellungen(body) {
   }
 
   return jsonResponse({ success: false, error: 'Gruppe nicht gefunden' });
+}
+
+// ============================================================
+// KI-ASSISTENT
+// ============================================================
+
+/**
+ * KI-Assistent für den SharedFragenEditor.
+ * Benötigt ANTHROPIC_API_KEY in Script Properties.
+ */
+function lernplattformKIAssistent(body) {
+  var email = (body.email || '').toLowerCase().trim();
+  if (!validiereSessionToken_(body.token || body.sessionToken, email)) {
+    return jsonResponse({ success: false, error: 'Nicht authentifiziert' });
+  }
+
+  var aktion = body.aktion;
+  var daten = body.daten || {};
+
+  var apiKey = PropertiesService.getScriptProperties().getProperty('ANTHROPIC_API_KEY');
+  if (!apiKey) {
+    return jsonResponse({ success: false, error: 'KI nicht konfiguriert (ANTHROPIC_API_KEY fehlt in Script Properties)' });
+  }
+
+  var systemPrompt = 'Du bist ein Assistent für Lehrpersonen am Gymnasium Hofwil (Kanton Bern). Du erstellst und verbesserst Prüfungsfragen für den Unterricht. Antworte IMMER mit validem JSON.';
+  var userPrompt = '';
+
+  switch (aktion) {
+    case 'generiereFragetext':
+      userPrompt = 'Erstelle eine Prüfungsfrage.\nFachbereich: ' + (daten.fachbereich || '') +
+        '\nThema: ' + (daten.thema || '') + '\nUnterthema: ' + (daten.unterthema || '') +
+        '\nFragetyp: ' + (daten.typ || 'mc') + '\nTaxonomie (Bloom): ' + (daten.bloom || 'K2') +
+        '\n\nAntwort als JSON: {"fragetext": "...", "musterlosung": "..."}';
+      break;
+    case 'verbessereFragetext':
+      userPrompt = 'Prüfe und verbessere diesen Fragetext:\n\n' + (daten.fragetext || '') +
+        '\n\nAntwort als JSON: {"fragetext": "...", "aenderungen": "..."}';
+      break;
+    case 'generiereMusterloesung':
+      userPrompt = 'Erstelle eine Musterlösung für diese Frage:\n\n' + (daten.fragetext || '') +
+        '\nFragetyp: ' + (daten.typ || '') + '\nFachbereich: ' + (daten.fachbereich || '') +
+        '\n\nAntwort als JSON: {"musterlosung": "..."}';
+      break;
+    case 'pruefeMusterloesung':
+      userPrompt = 'Prüfe diese Musterlösung auf Korrektheit:\nFrage: ' + (daten.fragetext || '') +
+        '\nMusterlösung: ' + (daten.musterlosung || '') +
+        '\n\nAntwort als JSON: {"bewertung": "...", "verbesserteLosung": "..."}';
+      break;
+    case 'generiereFrageZuLernziel':
+      userPrompt = 'Erstelle eine Prüfungsfrage basierend auf diesem Lernziel:\n\n' +
+        'Lernziel: ' + (daten.lernziel || '') + '\nBloom-Stufe: ' + (daten.bloom || 'K2') +
+        '\nThema: ' + (daten.thema || '') + '\nFragetyp: ' + (daten.fragetyp || 'mc') +
+        '\n\nAntwort als JSON: {"fragetext": "...", "musterlosung": "..."}';
+      break;
+    default:
+      return jsonResponse({ success: false, error: 'Unbekannte KI-Aktion: ' + aktion });
+  }
+
+  try {
+    var response = UrlFetchApp.fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01'
+      },
+      payload: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 2000,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: userPrompt }]
+      }),
+      muteHttpExceptions: true
+    });
+
+    var result = JSON.parse(response.getContentText());
+    if (result.error) {
+      return jsonResponse({ success: false, error: result.error.message || 'API-Fehler' });
+    }
+
+    var textAntwort = result.content && result.content[0] ? result.content[0].text : '';
+    var jsonMatch = textAntwort.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      return jsonResponse({ success: false, error: 'KI-Antwort enthält kein JSON' });
+    }
+
+    var kiDaten = JSON.parse(jsonMatch[0]);
+    return jsonResponse({ success: true, data: kiDaten });
+  } catch (e) {
+    return jsonResponse({ success: false, error: 'KI-Fehler: ' + e.message });
+  }
+}
+
+// ============================================================
+// UPLOAD (Anhänge an Google Drive)
+// ============================================================
+
+/**
+ * Datei-Anhang an Google Drive hochladen.
+ */
+function lernplattformUploadAnhang(body) {
+  var email = (body.email || '').toLowerCase().trim();
+  if (!validiereSessionToken_(body.token || body.sessionToken, email)) {
+    return jsonResponse({ success: false, error: 'Nicht authentifiziert' });
+  }
+
+  var frageId = body.frageId;
+  var dateiname = body.dateiname;
+  var mimeType = body.mimeType || 'application/octet-stream';
+  var base64 = body.base64;
+
+  if (!frageId || !dateiname || !base64) {
+    return jsonResponse({ success: false, error: 'Fehlende Upload-Daten' });
+  }
+
+  var erlaubteMimeTypes = [
+    'image/png', 'image/jpeg', 'image/gif', 'image/webp', 'image/svg+xml',
+    'application/pdf', 'audio/mpeg', 'audio/wav', 'audio/webm', 'video/mp4'
+  ];
+  if (erlaubteMimeTypes.indexOf(mimeType) === -1) {
+    return jsonResponse({ success: false, error: 'Dateityp nicht erlaubt: ' + mimeType });
+  }
+
+  try {
+    var ordnerName = 'Übungstool-Anhänge';
+    var ordner;
+    var ordnerSuche = DriveApp.getFoldersByName(ordnerName);
+    if (ordnerSuche.hasNext()) {
+      ordner = ordnerSuche.next();
+    } else {
+      ordner = DriveApp.createFolder(ordnerName);
+    }
+
+    var blob = Utilities.newBlob(Utilities.base64Decode(base64), mimeType, dateiname);
+    var datei = ordner.createFile(blob);
+    datei.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+
+    return jsonResponse({
+      success: true,
+      data: {
+        id: datei.getId(),
+        name: dateiname,
+        mimeType: mimeType,
+        url: 'https://drive.google.com/file/d/' + datei.getId() + '/view',
+        groesse: blob.getBytes().length
+      }
+    });
+  } catch (e) {
+    return jsonResponse({ success: false, error: 'Upload fehlgeschlagen: ' + e.message });
+  }
+}
+
+// ============================================================
+// LERNZIELE
+// ============================================================
+
+/**
+ * Lernziele aus der Fragenbank laden (aus lernzielIds-Spalte).
+ */
+function lernplattformLadeLernziele(body) {
+  var email = (body.email || '').toLowerCase().trim();
+  if (!validiereSessionToken_(body.token || body.sessionToken, email)) {
+    return jsonResponse({ success: false, error: 'Nicht authentifiziert' });
+  }
+
+  var fachbereich = body.fachbereich || '';
+
+  try {
+    var fragenbank = SpreadsheetApp.openById(FRAGENBANK_ID);
+    var tabs = fachbereich && FRAGENBANK_TABS.indexOf(fachbereich) >= 0
+      ? [fachbereich]
+      : FRAGENBANK_TABS;
+
+    var lernziele = [];
+    var gesehen = {};
+
+    for (var t = 0; t < tabs.length; t++) {
+      var sheet = fragenbank.getSheetByName(tabs[t]);
+      if (!sheet) continue;
+
+      var daten = sheet.getDataRange().getValues();
+      if (daten.length < 2) continue;
+
+      var headers = daten[0].map(function(h) { return String(h).trim(); });
+      var lzIdx = headers.indexOf('lernzielIds');
+      var themaIdx = headers.indexOf('thema');
+      var bloomIdx = headers.indexOf('bloom');
+
+      if (lzIdx < 0) continue;
+
+      for (var i = 1; i < daten.length; i++) {
+        var lzRaw = String(daten[i][lzIdx] || '');
+        if (!lzRaw) continue;
+
+        var ids = lzRaw.split(',').map(function(s) { return s.trim(); }).filter(Boolean);
+        for (var j = 0; j < ids.length; j++) {
+          var lzId = ids[j];
+          if (gesehen[lzId]) continue;
+          gesehen[lzId] = true;
+
+          lernziele.push({
+            id: lzId,
+            text: lzId,
+            thema: String(daten[i][themaIdx] || ''),
+            bloom: String(daten[i][bloomIdx] || 'K2'),
+            fachbereich: tabs[t]
+          });
+        }
+      }
+    }
+
+    return jsonResponse({ success: true, data: lernziele });
+  } catch (e) {
+    return jsonResponse({ success: false, error: 'Lernziele laden: ' + e.message });
+  }
 }
