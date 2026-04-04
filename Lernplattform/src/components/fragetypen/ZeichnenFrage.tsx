@@ -147,7 +147,7 @@ export default function ZeichnenFrage({ frage, onAntwort, disabled, feedbackSich
         <div className="space-y-3">
           {frage.musterbild && (
             <div className="space-y-1">
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Musterloesung:</p>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Musterlösung:</p>
               <img src={resolveAssetUrl(frage.musterbild.src)} alt={frage.musterbild.alt} className="w-full rounded-xl border border-gray-200 dark:border-gray-600" />
             </div>
           )}

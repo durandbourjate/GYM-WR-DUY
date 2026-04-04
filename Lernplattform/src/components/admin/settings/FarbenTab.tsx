@@ -72,13 +72,13 @@ export default function FarbenTab() {
   }
 
   if (sichtbareFaecher.length === 0) {
-    return <p className="text-sm text-gray-400">Keine Faecher gefunden.</p>
+    return <p className="text-sm text-gray-400">Keine Fächer gefunden.</p>
   }
 
   return (
     <div className="space-y-3">
       <p className="text-sm text-gray-500 dark:text-gray-400">
-        Farben pro Fach anpassen. Klicke auf das Farbfeld um eine Farbe zu waehlen.
+        Farben pro Fach anpassen. Klicke auf das Farbfeld um eine Farbe zu wählen.
       </p>
 
       <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 divide-y divide-gray-100 dark:divide-gray-700">
@@ -93,7 +93,7 @@ export default function FarbenTab() {
                 value={aktuellefarbe}
                 onChange={(e) => setzefarbe(fach, e.target.value)}
                 className="w-10 h-10 rounded cursor-pointer border border-gray-200 dark:border-gray-600 p-0.5"
-                title={`Farbe fuer ${fach}`}
+                title={`Farbe für ${fach}`}
               />
 
               {/* Name */}

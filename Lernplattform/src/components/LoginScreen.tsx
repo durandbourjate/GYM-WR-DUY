@@ -30,7 +30,7 @@ export default function LoginScreen() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 w-full max-w-sm text-center">
         <h1 className="text-2xl font-bold mb-2 dark:text-white">Lernplattform</h1>
-        <p className="text-gray-500 dark:text-gray-400 mb-6">Anmelden um zu ueben</p>
+        <p className="text-gray-500 dark:text-gray-400 mb-6">Anmelden um zu üben</p>
 
         {!codeLogin ? (
           <>
@@ -58,14 +58,14 @@ export default function LoginScreen() {
               disabled={code.length < 6 || ladeStatus === 'laden'}
               className="w-full bg-blue-500 text-white rounded-xl py-3 font-medium disabled:opacity-50"
             >
-              {ladeStatus === 'laden' ? 'Wird geprueft...' : 'Anmelden'}
+              {ladeStatus === 'laden' ? 'Wird geprüft...' : 'Anmelden'}
             </button>
             <button
               type="button"
               onClick={() => { setCodeLogin(false); setCode('') }}
               className="text-sm text-gray-400 hover:text-gray-600"
             >
-              Zurueck zu Google-Login
+              Zurück zu Google-Login
             </button>
           </form>
         )}

@@ -22,7 +22,7 @@ export default function QuizNavigation({
           onClick={onZurueck}
           className="px-4 py-2.5 rounded-xl text-sm font-medium min-h-[44px] bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
         >
-          &#8592; Zurueck
+          &#8592; Zurück
         </button>
       )}
 
@@ -32,7 +32,7 @@ export default function QuizNavigation({
           onClick={onUeberspringen}
           className="px-4 py-2.5 rounded-xl text-sm font-medium min-h-[44px] text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
         >
-          Ueberspringen &#8594;
+          Überspringen &#8594;
         </button>
       )}
 

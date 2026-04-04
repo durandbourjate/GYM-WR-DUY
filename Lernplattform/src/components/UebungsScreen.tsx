@@ -104,7 +104,7 @@ export default function UebungsScreen() {
               korrekt={letzteAntwortKorrekt}
             />
           ) : (
-            <p className="text-gray-500">Fragetyp &ldquo;{frage.typ}&rdquo; nicht unterstuetzt.</p>
+            <p className="text-gray-500">Fragetyp &ldquo;{frage.typ}&rdquo; nicht unterstützt.</p>
           )}
 
           {/* Feedback wird von den Fragetyp-Komponenten via FeedbackBox angezeigt */}
@@ -135,7 +135,7 @@ export default function UebungsScreen() {
 
         {/* Keyboard-Hinweis */}
         <div className="mt-4 text-center text-xs text-gray-400 dark:text-gray-600 hidden sm:block">
-          Tastatur: &#8592; Zurueck &middot; &#8594; Weiter/Ueberspringen
+          Tastatur: &#8592; Zurück &middot; &#8594; Weiter/Überspringen
         </div>
       </main>
     </div>

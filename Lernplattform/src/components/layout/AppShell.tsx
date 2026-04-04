@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { useAuthStore } from '../../store/authStore'
 import { useGruppenStore } from '../../store/gruppenStore'
 import { useNavigationStore } from '../../store/navigationStore'
+import { useUebungsStore } from '../../store/uebungsStore'
 import { useTheme } from '../../hooks/useTheme'
 import { useLernKontext } from '../../hooks/useLernKontext'
 import { t } from '../../utils/anrede'
@@ -12,7 +13,7 @@ interface Props {
 
 export default function AppShell({ children }: Props) {
   const { user, abmelden } = useAuthStore()
-  const { aktiveGruppe } = useGruppenStore()
+  const { gruppen, aktiveGruppe, gruppeAbwaehlen } = useGruppenStore()
   const { aktuellerScreen, zurueck, kannZurueck, navigiere } = useNavigationStore()
   const { istDark, toggleTheme } = useTheme()
   const { anrede } = useLernKontext()
@@ -20,6 +21,15 @@ export default function AppShell({ children }: Props) {
   const istAngemeldet = !!user
   const istAdmin = user?.rolle === 'admin'
   const zeigeHeader = istAngemeldet && aktuellerScreen !== 'login'
+  const istInUebung = aktuellerScreen === 'uebung' || aktuellerScreen === 'ergebnis'
+
+  const navigiereZuDashboard = () => {
+    // Session beenden/nullen wenn in Übung
+    if (istInUebung) {
+      useUebungsStore.setState({ session: null })
+    }
+    navigiere('dashboard')
+  }
 
   if (!zeigeHeader) return <>{children}</>
 
@@ -30,7 +40,7 @@ export default function AppShell({ children }: Props) {
           {/* Zurück-Button */}
           {kannZurueck() && aktuellerScreen !== 'dashboard' && (
             <button
-              onClick={zurueck}
+              onClick={istInUebung ? navigiereZuDashboard : zurueck}
               className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 min-w-[44px] min-h-[44px] flex items-center justify-center"
               title="Zurück"
             >
@@ -41,7 +51,7 @@ export default function AppShell({ children }: Props) {
           {/* Home-Button (nur wenn nicht auf Dashboard) */}
           {aktuellerScreen !== 'dashboard' && aktuellerScreen !== 'gruppenAuswahl' && (
             <button
-              onClick={() => navigiere('dashboard')}
+              onClick={navigiereZuDashboard}
               className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 min-w-[44px] min-h-[44px] flex items-center justify-center"
               title="Zum Dashboard"
             >
@@ -51,7 +61,21 @@ export default function AppShell({ children }: Props) {
 
           <div>
             <h1 className="text-base font-bold dark:text-white">Lernplattform</h1>
-            {aktiveGruppe && <span className="text-xs text-gray-500 dark:text-gray-400">{aktiveGruppe.name}</span>}
+            {aktiveGruppe && gruppen.length > 1 ? (
+              <button
+                onClick={() => {
+                  if (istInUebung) useUebungsStore.setState({ session: null })
+                  gruppeAbwaehlen()
+                  navigiere('gruppenAuswahl')
+                }}
+                className="text-xs text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400"
+                title="Gruppe wechseln"
+              >
+                {aktiveGruppe.name} &#8227;
+              </button>
+            ) : aktiveGruppe ? (
+              <span className="text-xs text-gray-500 dark:text-gray-400">{aktiveGruppe.name}</span>
+            ) : null}
           </div>
         </div>
 

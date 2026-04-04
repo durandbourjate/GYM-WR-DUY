@@ -27,8 +27,8 @@ export default function Zusammenfassung({ onZurueck, onNochmal }: Props) {
     : quoteGerundet >= 60
     ? 'Gut gemacht!'
     : quoteGerundet >= 40
-    ? 'Weiter ueben, du wirst besser!'
-    : 'Nicht aufgeben, Uebung macht den Meister!'
+    ? 'Weiter üben, du wirst besser!'
+    : 'Nicht aufgeben, Übung macht den Meister!'
 
   return (
     <div className="max-w-2xl mx-auto p-4">
@@ -65,7 +65,7 @@ export default function Zusammenfassung({ onZurueck, onNochmal }: Props) {
           </span>
           {uebersprungenAnzahl > 0 && (
             <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400">
-              {uebersprungenAnzahl} uebersprungen
+              {uebersprungenAnzahl} übersprungen
             </span>
           )}
           {unsichereAnzahl > 0 && (
@@ -82,7 +82,7 @@ export default function Zusammenfassung({ onZurueck, onNochmal }: Props) {
           onClick={() => setReviewOffen(!reviewOffen)}
           className="w-full p-4 flex items-center justify-between text-left min-h-[48px]"
         >
-          <span className="font-medium dark:text-white">Alle Fragen &amp; Loesungen</span>
+          <span className="font-medium dark:text-white">Alle Fragen &amp; Lösungen</span>
           <span className={`text-gray-400 transition-transform ${reviewOffen ? 'rotate-180' : ''}`}>&#9660;</span>
         </button>
 
@@ -135,7 +135,7 @@ export default function Zusammenfassung({ onZurueck, onNochmal }: Props) {
           onClick={onZurueck}
           className="w-full bg-gray-100 dark:bg-gray-700 dark:text-white rounded-xl py-3 font-medium min-h-[48px] text-base"
         >
-          Zurueck zum Dashboard
+          Zurück zum Dashboard
         </button>
       </div>
     </div>

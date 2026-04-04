@@ -14,6 +14,12 @@
       "port": 5174
     },
     {
+      "name": "lernplattform-dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--prefix", "/Users/durandbourjate/Documents/-Gym Hofwil/00 Automatisierung Unterricht/10 Github/GYM-WR-DUY/Lernplattform"],
+      "port": 5175
+    },
+    {
       "name": "pools",
       "runtimeExecutable": "python3",
       "runtimeArgs": ["-m", "http.server", "8765", "--directory", "/Users/durandbourjate/Documents/-Gym Hofwil/00 Automatisierung Unterricht/10 Github/GYM-WR-DUY/Uebungen/Uebungspools"],

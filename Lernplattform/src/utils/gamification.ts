@@ -40,10 +40,10 @@ const LOB_TEXTE = [
 
 const TROST_TEXTE = [
   'Fast! Schau dir die richtige Antwort an.',
-  'Nicht ganz. Beim naechsten Mal klappt es!',
+  'Nicht ganz. Beim nächsten Mal klappt es!',
   'Knapp daneben. Versuch es nochmal!',
-  'Das wird schon! Uebung macht den Meister.',
-  'Noch nicht ganz. Schau dir die Erklaerung an.',
+  'Das wird schon! Übung macht den Meister.',
+  'Noch nicht ganz. Schau dir die Erklärung an.',
 ]
 
 export function zufaelligesLob(): string {

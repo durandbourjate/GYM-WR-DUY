@@ -16,7 +16,7 @@ export default defineConfig({
       manifest: {
         name: 'Lernplattform — Gymnasium Hofwil',
         short_name: 'Lernen',
-        description: 'Ueben und Lernen',
+        description: 'Üben und Lernen',
         theme_color: '#3b82f6',
         background_color: '#f8fafc',
         display: 'standalone',

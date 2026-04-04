@@ -10,6 +10,7 @@ interface GruppenState {
 
   ladeGruppen: (email: string) => Promise<void>
   waehleGruppe: (gruppeId: string) => Promise<void>
+  gruppeAbwaehlen: () => void
   istAdmin: (email: string) => boolean
 }
 
@@ -28,9 +29,11 @@ export const useGruppenStore = create<GruppenState>((set, get) => ({
 
       set({ gruppen, aktiveGruppe, ladeStatus: 'fertig' })
 
+      // Mitglieder im Hintergrund laden (nicht blockierend)
       if (aktiveGruppe) {
-        const mitglieder = await gruppenAdapter.ladeMitglieder(aktiveGruppe.id)
-        set({ mitglieder })
+        gruppenAdapter.ladeMitglieder(aktiveGruppe.id)
+          .then(mitglieder => set({ mitglieder }))
+          .catch(() => {})
       }
     } catch {
       set({ ladeStatus: 'fehler' })
@@ -45,6 +48,10 @@ export const useGruppenStore = create<GruppenState>((set, get) => ({
 
     const mitglieder = await gruppenAdapter.ladeMitglieder(gruppeId)
     set({ mitglieder })
+  },
+
+  gruppeAbwaehlen: () => {
+    set({ aktiveGruppe: null, mitglieder: [] })
   },
 
   istAdmin: (email: string) => {

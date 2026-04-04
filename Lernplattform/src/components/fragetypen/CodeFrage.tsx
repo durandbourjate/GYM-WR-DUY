@@ -45,7 +45,7 @@ export default function CodeFrage({ frage, onAntwort, disabled, feedbackSichtbar
         <div className="space-y-3">
           {frage.musterantwort && (
             <div className="p-4 rounded-xl bg-gray-50 dark:bg-gray-800">
-              <p className="font-medium text-sm mb-2 text-gray-600 dark:text-gray-400">Musterloesung:</p>
+              <p className="font-medium text-sm mb-2 text-gray-600 dark:text-gray-400">Musterlösung:</p>
               <pre className="text-sm font-mono text-gray-800 dark:text-green-400 whitespace-pre-wrap">{frage.musterantwort}</pre>
             </div>
           )}

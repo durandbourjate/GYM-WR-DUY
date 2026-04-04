@@ -62,7 +62,7 @@ export default function AdminDashboard({ onZuUeben: _onZuUeben }: AdminDashboard
               onClick={() => setAnsicht({ typ: 'uebersicht' })}
               className={`py-3 text-sm font-medium border-b-2 transition-colors ${ansicht.typ === 'uebersicht' ? 'border-blue-500 text-blue-600 dark:text-blue-400' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
             >
-              Uebersicht
+              Übersicht
             </button>
             <button
               onClick={() => setAnsicht({ typ: 'auftraege' })}

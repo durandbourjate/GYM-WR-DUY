@@ -214,7 +214,7 @@ export default function Dashboard() {
               </h3>
               {filterAktiv && (
                 <button onClick={filterZuruecksetzen} className="text-xs text-blue-500 hover:underline">
-                  Filter zuruecksetzen
+                  Filter zurücksetzen
                 </button>
               )}
             </div>
@@ -279,7 +279,7 @@ export default function Dashboard() {
           <p className="text-gray-500">Themen werden geladen...</p>
         ) : Object.keys(gefilterteThemen).length === 0 ? (
           <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm text-gray-500">
-            <p>{filterAktiv ? 'Keine Themen fuer diesen Filter.' : 'Noch keine Uebungsfragen vorhanden.'}</p>
+            <p>{filterAktiv ? 'Keine Themen für diesen Filter.' : 'Noch keine Übungsfragen vorhanden.'}</p>
           </div>
         ) : (
           <div className="space-y-4">
