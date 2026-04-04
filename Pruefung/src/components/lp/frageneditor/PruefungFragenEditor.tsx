@@ -10,6 +10,8 @@ import { ladeLernziele as apiLadeLernziele } from '../../../services/poolApi.ts'
 import { istKonfiguriert } from '../../../services/apiClient.ts'
 import { EditorProvider } from '@shared/editor/EditorContext'
 import type { EditorConfig, EditorServices } from '@shared/editor/types'
+import { setKontenrahmenData } from '@shared/editor/kontenrahmen'
+import kontenrahmenDaten from '@shared/editor/kontenrahmenDaten'
 import SharedFragenEditor from '@shared/editor/SharedFragenEditor'
 import { istWRFachschaft } from '../../../utils/fachUtils.ts'
 import { useSchulConfig } from '../../../store/schulConfigStore.ts'
@@ -40,6 +42,9 @@ export default function PruefungFragenEditor({ frage, onSpeichern, onAbbrechen, 
   useEffect(() => {
     ladeUndCacheLPs().then(setLpListe)
   }, [])
+
+  // Kontenrahmen für FiBu-Fragetypen laden
+  useEffect(() => { setKontenrahmenData(kontenrahmenDaten) }, [])
 
   // EditorProvider Config + Services
   const semesterListe = useMemo(() => {

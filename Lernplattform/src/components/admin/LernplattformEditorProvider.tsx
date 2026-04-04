@@ -3,9 +3,11 @@
  * Konfiguriert den SharedFragenEditor mit allen Features.
  * Nutzt dieselben Endpoints wie das Prüfungstool für KI, Upload, Lernziele.
  */
-import { useMemo, type ReactNode } from 'react'
+import { useMemo, useEffect, type ReactNode } from 'react'
 import { EditorProvider } from '@shared/editor/EditorContext'
 import type { EditorConfig, EditorServices } from '@shared/editor/types'
+import { setKontenrahmenData } from '@shared/editor/kontenrahmen'
+import kontenrahmenDaten from '@shared/editor/kontenrahmenDaten'
 import { useAuthStore } from '../../store/authStore'
 import { apiClient } from '../../services/apiClient'
 
@@ -15,6 +17,9 @@ interface Props {
 
 export default function LernplattformEditorProvider({ children }: Props) {
   const user = useAuthStore(s => s.user)
+
+  // Kontenrahmen einmalig laden (für FiBu-Fragetypen)
+  useEffect(() => { setKontenrahmenData(kontenrahmenDaten) }, [])
 
   const config: EditorConfig = useMemo(() => ({
     benutzer: {
