@@ -20,7 +20,7 @@ export default function AdminAuftraege() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold dark:text-white">Auftraege</h3>
+        <h3 className="text-lg font-semibold dark:text-white">Aufträge</h3>
         <button
           onClick={() => setFormOffen(!formOffen)}
           className="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium min-h-[44px]"
@@ -78,7 +78,7 @@ export default function AdminAuftraege() {
         ))}
 
         {auftraege.filter(a => a.status === 'aktiv').length === 0 && (
-          <p className="text-sm text-gray-400">Keine aktiven Auftraege.</p>
+          <p className="text-sm text-gray-400">Keine aktiven Aufträge.</p>
         )}
       </div>
 
