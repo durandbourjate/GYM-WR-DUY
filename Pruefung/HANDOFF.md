@@ -30,6 +30,37 @@
 
 ---
 
+## Session 58 — Shared Editor Phase 5a: SharedFragenEditor extrahiert (04.04.2026)
+
+### Stand
+Branch `feature/shared-editor-phase1`. tsc ✅ | 193 Tests ✅ | Build ✅. **Nicht auf main.**
+
+### Änderungen
+
+| # | Änderung | Dateien |
+|---|----------|---------|
+| 1 | **SharedFragenEditor** — generischer Editor-Hub (~950 Zeilen) mit Slot-Props | `packages/shared/src/editor/SharedFragenEditor.tsx` |
+| 2 | **PruefungFragenEditor** — dünner Wrapper (~180 Zeilen) mit Pruefung-Slots | `Pruefung/.../PruefungFragenEditor.tsx` |
+| 3 | **FragenEditor.tsx** → Re-Export-Proxy | `Pruefung/.../FragenEditor.tsx` (2 Zeilen) |
+
+### Slot-System
+- `anhangEditorSlot` → AnhangEditor (Pruefung)
+- `berechtigungenSlot` → BerechtigungenEditor (Pruefung)
+- `poolInfoSlot` → pruefungstauglich-Toggle + PoolUpdateVergleich (Pruefung)
+- `poolSyncSlot` → "An Pool"/"In Pool exportieren" Buttons (Pruefung)
+- `PDFEditorComponent` → PDFEditor (Pruefung)
+- `rueckSyncSlot` → RueckSyncDialog (Pruefung)
+
+### Typ-Inkompatibilität (bekannt)
+Pruefung's `Frage` und shared's `Frage` sind leicht unterschiedlich (tags: `(string|Tag)[]` vs `string[]`, berechtigungen). PruefungFragenEditor bridged mit `as unknown as` Casts. Langfristig: Pruefung migriert auf shared Frage-Typen.
+
+### Nächste Schritte
+- **Lernplattform-Integration (Phase 5b):** LP erstellt eigenen Wrapper um SharedFragenEditor + Type-Adapter + Backend-Endpoint
+- **Typ-Harmonisierung:** Pruefung's fragen.ts auf shared-Typen migrieren (eliminiert Casts)
+- **Branch mergen:** Nach LP-Test auf main
+
+---
+
 ## Session 57 — Shared Editor Phase 4: EditorProvider verdrahtet (04.04.2026)
 
 ### Stand
