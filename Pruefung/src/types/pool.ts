@@ -35,19 +35,33 @@ export interface PoolFrage {
   id: string
   topic: string
   type: 'mc' | 'multi' | 'tf' | 'fill' | 'calc' | 'sort' | 'open'
+    | 'sortierung' | 'formel' | 'hotspot' | 'bildbeschriftung' | 'dragdrop_bild' | 'code'
   diff: number
   tax: string
   q: string
   reviewed?: boolean
   options?: { v: string; t: string }[]
-  correct?: string | string[] | boolean
+  correct?: string | string[] | boolean | number[]
   explain?: string
   blanks?: { answer: string; alts?: string[] }[]
   rows?: { label: string; answer: number; tolerance: number; unit?: string }[]
   categories?: string[]
-  items?: { t: string; cat: number }[]
+  items?: ({ t: string; cat: number } | string)[]
   sample?: string
   img?: { src: string; alt?: string }
+  // Sortierung
+  // items: string[] + correct: number[] (korrekte Reihenfolge als Indices)
+  // Hotspot
+  hotspots?: { x: number; y: number; r?: number; label?: string }[]
+  // Bildbeschriftung
+  labels?: { id: string; text?: string; x?: number; y?: number; zone?: string }[]
+  // DragDrop Bild
+  zones?: { id: string; x: number; y: number; w: number; h: number }[]
+  // Formel
+  hints?: string[]
+  // Code
+  sprache?: string
+  starterCode?: string
 }
 
 /** Geparstes Pool-Config-Ergebnis */

@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react'
 import type { HotspotBereich } from '../../types/fragen'
 import BildUpload from '../components/BildUpload'
+import { resolvePoolBildUrl } from '../utils/poolBildUrl'
 
 interface Props {
   bildUrl: string
@@ -64,7 +65,7 @@ export default function HotspotEditor({ bildUrl, setBildUrl, bereiche, setBereic
           </p>
           <div className="relative inline-block cursor-crosshair" onClick={handleBildKlick}>
             <img
-              src={bildUrl}
+              src={resolvePoolBildUrl(bildUrl)}
               alt="Hotspot-Vorschau"
               className="max-w-full rounded-lg select-none"
               style={{ objectFit: 'contain', maxHeight: '400px' }}

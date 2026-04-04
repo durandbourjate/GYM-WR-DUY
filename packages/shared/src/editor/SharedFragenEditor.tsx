@@ -45,6 +45,9 @@ import FragetextSection from './sections/FragetextSection'
 import TypEditorDispatcher from './sections/TypEditorDispatcher'
 import MusterloesungSection from './sections/MusterloesungSection'
 
+// Default-Komponente für Anhang (wenn kein Slot übergeben)
+import DefaultAnhangEditor from './components/AnhangEditor'
+
 
 export interface SharedFragenEditorProps {
   /** Bestehende Frage zum Bearbeiten, oder null für neue */
@@ -704,15 +707,24 @@ export default function SharedFragenEditor({
             gewaehlterLernzielId={gewaehlterLernzielId} setGewaehlterLernzielId={setGewaehlterLernzielId}
           />
 
-          {/* Anhänge (Host-Slot) */}
-          {anhangEditorSlot?.({
+          {/* Anhänge (Host-Slot oder Default) */}
+          {anhangEditorSlot ? anhangEditorSlot({
             anhaenge,
             neueAnhaenge,
             onAnhangHinzu: (file) => setNeueAnhaenge((prev) => [...prev, file]),
             onAnhangEntfernen: (id) => setAnhaenge((prev) => prev.filter((a) => a.id !== id)),
             onNeuenAnhangEntfernen: (idx) => setNeueAnhaenge((prev) => prev.filter((_, i) => i !== idx)),
             onUrlAnhangHinzu: (anhang) => setAnhaenge((prev) => [...prev, anhang]),
-          })}
+          }) : (
+            <DefaultAnhangEditor
+              anhaenge={anhaenge}
+              neueAnhaenge={neueAnhaenge}
+              onAnhangHinzu={(file) => setNeueAnhaenge((prev) => [...prev, file])}
+              onAnhangEntfernen={(id) => setAnhaenge((prev) => prev.filter((a) => a.id !== id))}
+              onNeuenAnhangEntfernen={(idx) => setNeueAnhaenge((prev) => prev.filter((_, i) => i !== idx))}
+              onUrlAnhangHinzu={(anhang) => setAnhaenge((prev) => [...prev, anhang])}
+            />
+          )}
 
           {/* Typ-spezifische Editoren */}
           <TypEditorDispatcher

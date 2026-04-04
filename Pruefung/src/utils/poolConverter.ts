@@ -13,6 +13,13 @@ import type {
   LueckentextFrage,
   RichtigFalschFrage,
   BerechnungFrage,
+  SortierungFrage,
+  FormelFrage,
+  HotspotFrage,
+  HotspotBereich,
+  BildbeschriftungFrage,
+  DragDropBildFrage,
+  CodeFrage,
 } from '../types/fragen'
 
 const POOL_IMG_BASE_URL = 'https://durandbourjate.github.io/GYM-WR-DUY/Uebungen/Uebungspools/'
@@ -21,13 +28,16 @@ const POOL_IMG_BASE_URL = 'https://durandbourjate.github.io/GYM-WR-DUY/Uebungen/
 
 /** Mappt den Pool-Fach-String auf einen Fachbereich-Enum */
 export function mapFachbereich(fach: string): Fachbereich {
-  const f = fach.toLowerCase()
+  const f = fach.toLowerCase().trim()
   if (f.includes('vwl') || f.includes('volkswirt')) return 'VWL'
   if (f.includes('bwl') || f.includes('betriebswirt')) return 'BWL'
   if (f.includes('recht') || f.includes('law')) return 'Recht'
-  if (f.includes('in') || f.includes('informatik') || f.includes('info')) return 'Informatik'
-  // Fallback: VWL
-  return 'VWL'
+  // "W&R" / "WR" / "Wirtschaft und Recht" — kein eindeutiger Fachbereich, Default BWL
+  if (f === 'w&r' || f === 'wr' || f === 'wirtschaft und recht' || f === 'wirtschaft & recht') return 'BWL'
+  // Informatik: exakt matchen (nicht 'in' allein, das matched z.B. "Einfuehrung")
+  if (f === 'in' || f === 'informatik' || f.startsWith('info')) return 'Informatik'
+  // Fallback: Allgemein (nicht VWL — das wäre irreführend)
+  return 'Allgemein'
 }
 
 /** Mappt die Pool-Taxonomie (K1–K6 oder Bloom-Namen) auf BloomStufe */
@@ -60,6 +70,18 @@ export function berechnePunkte(pf: PoolFrage): number {
       return Math.ceil((pf.items?.length ?? 2) / 2)
     case 'open':
       return 4
+    case 'sortierung':
+      return Math.max(2, (pf.items?.length ?? 3))
+    case 'formel':
+      return 2
+    case 'hotspot':
+      return pf.hotspots?.length ?? 1
+    case 'bildbeschriftung':
+      return pf.labels?.length ?? 2
+    case 'dragdrop_bild':
+      return pf.labels?.length ?? 2
+    case 'code':
+      return 4
     default:
       return 1
   }
@@ -81,6 +103,18 @@ export function schaetzeZeitbedarf(pf: PoolFrage): number {
     case 'sort':
       return Math.max(1, Math.ceil((pf.items?.length ?? 2) * 0.5))
     case 'open':
+      return 5
+    case 'sortierung':
+      return Math.max(2, (pf.items?.length ?? 3))
+    case 'formel':
+      return 3
+    case 'hotspot':
+      return 2
+    case 'bildbeschriftung':
+      return Math.max(2, (pf.labels?.length ?? 2))
+    case 'dragdrop_bild':
+      return Math.max(2, (pf.labels?.length ?? 2))
+    case 'code':
       return 5
     default:
       return 2
@@ -143,6 +177,18 @@ export function erzeugeSnapshot(poolFrage: PoolFrage): PoolFrageSnapshot {
     snapshot.spezifisch = poolFrage.rows
   } else if (poolFrage.type === 'sort') {
     snapshot.spezifisch = { categories: poolFrage.categories, items: poolFrage.items }
+  } else if (poolFrage.type === 'sortierung') {
+    snapshot.spezifisch = { items: poolFrage.items, correct: poolFrage.correct }
+  } else if (poolFrage.type === 'hotspot') {
+    snapshot.spezifisch = { hotspots: poolFrage.hotspots, correct: poolFrage.correct }
+  } else if (poolFrage.type === 'bildbeschriftung') {
+    snapshot.spezifisch = { labels: poolFrage.labels }
+  } else if (poolFrage.type === 'dragdrop_bild') {
+    snapshot.spezifisch = { zones: poolFrage.zones, labels: poolFrage.labels }
+  } else if (poolFrage.type === 'formel') {
+    snapshot.spezifisch = { correct: poolFrage.correct, hints: poolFrage.hints }
+  } else if (poolFrage.type === 'code') {
+    snapshot.spezifisch = { sprache: poolFrage.sprache, starterCode: poolFrage.starterCode }
   }
 
   return snapshot
@@ -328,10 +374,10 @@ export function konvertierePoolFrage(
     // -------------------------------------------------------
     case 'sort': {
       const cats = poolFrage.categories ?? []
-      const paare = (poolFrage.items ?? []).map((item) => ({
-        links: item.t,
-        rechts: cats[item.cat] ?? '',
-      }))
+      const paare = (poolFrage.items ?? []).map((item) => {
+        if (typeof item === 'string') return { links: item, rechts: '' }
+        return { links: item.t, rechts: cats[item.cat] ?? '' }
+      })
       const frage: ZuordnungFrage = {
         ...basis,
         typ: 'zuordnung',
@@ -357,10 +403,139 @@ export function konvertierePoolFrage(
       return frage
     }
 
+    // -------------------------------------------------------
+    // sortierung → SortierungFrage
+    // items: string[] in korrekter Reihenfolge
+    // -------------------------------------------------------
+    case 'sortierung': {
+      // items können als string[] oder {t,cat}[] kommen — normalisieren
+      const elemente = (poolFrage.items ?? []).map(item =>
+        typeof item === 'string' ? item : item.t
+      )
+      const frage: SortierungFrage = {
+        ...basis,
+        typ: 'sortierung',
+        fragetext: poolFrage.q,
+        elemente,
+        teilpunkte: true,
+      }
+      return frage
+    }
+
+    // -------------------------------------------------------
+    // formel → FormelFrage (LaTeX-basiert)
+    // -------------------------------------------------------
+    case 'formel': {
+      const frage: FormelFrage = {
+        ...basis,
+        typ: 'formel',
+        fragetext: poolFrage.q,
+        korrekteFormel: (typeof poolFrage.correct === 'string' ? poolFrage.correct : '') || '',
+        vergleichsModus: 'exakt',
+      }
+      return frage
+    }
+
+    // -------------------------------------------------------
+    // hotspot → HotspotFrage
+    // hotspots[].{x,y,r,label} + correct: number[] (Indices)
+    // -------------------------------------------------------
+    case 'hotspot': {
+      const korrektIndices = new Set(
+        Array.isArray(poolFrage.correct) ? (poolFrage.correct as number[]) : []
+      )
+      const bereiche: HotspotBereich[] = (poolFrage.hotspots ?? []).map((hs, idx) => ({
+        id: genId(),
+        form: 'kreis' as const,
+        koordinaten: {
+          x: hs.x,
+          y: hs.y,
+          radius: hs.r ?? 8,
+        },
+        label: hs.label || `Bereich ${idx + 1}`,
+        punkte: korrektIndices.has(idx) ? 1 : 0,
+      }))
+      const bildUrl = poolFrage.img ? POOL_IMG_BASE_URL + poolFrage.img.src : ''
+      const frage: HotspotFrage = {
+        ...basis,
+        typ: 'hotspot',
+        fragetext: poolFrage.q,
+        bildUrl,
+        bereiche,
+        mehrfachauswahl: korrektIndices.size > 1,
+      }
+      return frage
+    }
+
+    // -------------------------------------------------------
+    // bildbeschriftung → BildbeschriftungFrage
+    // labels[].{id,text,x,y} → beschriftungen
+    // -------------------------------------------------------
+    case 'bildbeschriftung': {
+      const beschriftungen = (poolFrage.labels ?? []).map(lbl => ({
+        id: lbl.id || genId(),
+        position: { x: lbl.x ?? 50, y: lbl.y ?? 50 },
+        korrekt: [lbl.text ?? ''],
+      }))
+      const bildUrl = poolFrage.img ? POOL_IMG_BASE_URL + poolFrage.img.src : ''
+      const frage: BildbeschriftungFrage = {
+        ...basis,
+        typ: 'bildbeschriftung',
+        fragetext: poolFrage.q,
+        bildUrl,
+        beschriftungen,
+      }
+      return frage
+    }
+
+    // -------------------------------------------------------
+    // dragdrop_bild → DragDropBildFrage
+    // zones[].{id,x,y,w,h} + labels[].{id,text,zone}
+    // -------------------------------------------------------
+    case 'dragdrop_bild': {
+      const zielzonen = (poolFrage.zones ?? []).map(zone => ({
+        id: zone.id || genId(),
+        position: { x: zone.x, y: zone.y, breite: zone.w, hoehe: zone.h },
+        // Finde das erste korrekte Label für diese Zone
+        korrektesLabel: (poolFrage.labels ?? []).find(l => l.zone === zone.id)?.text ?? '',
+      }))
+      const labelTexte = (poolFrage.labels ?? []).map(l => l.text ?? '')
+      const bildUrl = poolFrage.img ? POOL_IMG_BASE_URL + poolFrage.img.src : ''
+      const frage: DragDropBildFrage = {
+        ...basis,
+        typ: 'dragdrop_bild',
+        fragetext: poolFrage.q,
+        bildUrl,
+        zielzonen,
+        labels: labelTexte,
+      }
+      return frage
+    }
+
+    // -------------------------------------------------------
+    // code → CodeFrage
+    // -------------------------------------------------------
+    case 'code': {
+      const frage: CodeFrage = {
+        ...basis,
+        typ: 'code',
+        fragetext: poolFrage.q,
+        sprache: poolFrage.sprache ?? 'python',
+        starterCode: poolFrage.starterCode,
+        musterLoesung: poolFrage.sample,
+      }
+      return frage
+    }
+
     default: {
-      // Exhaustive check — TypeScript sollte hier nie ankommen
-      const _exhaustive: never = poolFrage.type
-      throw new Error(`Unbekannter Pool-Fragetyp: ${_exhaustive}`)
+      // Unbekannter Typ → als Freitext importieren (statt Error werfen)
+      const frage: FreitextFrage = {
+        ...basis,
+        typ: 'freitext',
+        fragetext: poolFrage.q,
+        laenge: 'mittel',
+      }
+      return frage
     }
   }
 }

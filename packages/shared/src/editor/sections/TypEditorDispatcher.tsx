@@ -36,6 +36,7 @@ import AudioEditor from '../typen/AudioEditor'
 import DragDropBildEditor from '../typen/DragDropBildEditor'
 import CodeEditor from '../typen/CodeEditor'
 import FormelEditor from '../typen/FormelEditor'
+import DefaultPDFEditor from '../components/PDFEditor'
 import { KIBuchungssatzButtons, KITKontoButtons, KIKontenbestimmungButtons, KIBilanzERButtons } from '../ki/KIFiBuButtons'
 import { InlineAktionButton, ErgebnisAnzeige } from '../ki/KIBausteine'
 
@@ -713,9 +714,22 @@ export default function TypEditorDispatcher(props: TypEditorDispatcherProps) {
             setMusterloesungAnnotationen={props.setPdfMusterloesungAnnotationen}
           />
         ) : (
-          <div className="p-4 text-center text-slate-500 dark:text-slate-400 border border-dashed border-slate-300 dark:border-slate-600 rounded-lg">
-            PDF-Editor nicht verfügbar
-          </div>
+          <DefaultPDFEditor
+            pdfBase64={props.pdfBase64}
+            setPdfBase64={props.setPdfBase64}
+            pdfDriveFileId={props.pdfDriveFileId}
+            setPdfDriveFileId={props.setPdfDriveFileId}
+            pdfDateiname={props.pdfDateiname}
+            setPdfDateiname={props.setPdfDateiname}
+            seitenAnzahl={props.pdfSeitenAnzahl}
+            setSeitenAnzahl={props.setPdfSeitenAnzahl}
+            kategorien={props.pdfKategorien}
+            setKategorien={props.setPdfKategorien}
+            erlaubteWerkzeuge={props.pdfErlaubteWerkzeuge}
+            setErlaubteWerkzeuge={props.setPdfErlaubteWerkzeuge}
+            musterloesungAnnotationen={props.pdfMusterloesungAnnotationen}
+            setMusterloesungAnnotationen={props.setPdfMusterloesungAnnotationen}
+          />
         )
       )}
 

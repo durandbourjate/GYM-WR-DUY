@@ -5,6 +5,7 @@
  */
 import { useRef, useState, useCallback } from 'react'
 import { useEditorConfig, useEditorServices } from '../EditorContext'
+import { resolvePoolBildUrl } from '../utils/poolBildUrl'
 
 const MAX_GROESSE = 5 * 1024 * 1024 // 5 MB
 const ERLAUBTE_TYPEN = ['image/png', 'image/jpeg', 'image/gif', 'image/webp', 'image/svg+xml']
@@ -17,7 +18,9 @@ interface Props {
   setBildDriveFileId?: (id: string | undefined) => void
 }
 
-export default function BildUpload({ bildUrl, setBildUrl, bildDriveFileId, setBildDriveFileId }: Props) {
+export default function BildUpload({ bildUrl: rawBildUrl, setBildUrl, bildDriveFileId, setBildDriveFileId }: Props) {
+  // Relative Pool-Pfade (img/...) zu absoluten URLs auflösen
+  const bildUrl = resolvePoolBildUrl(rawBildUrl)
   const inputRef = useRef<HTMLInputElement>(null)
   const [dragOver, setDragOver] = useState(false)
   const [ladetHoch, setLadetHoch] = useState(false)

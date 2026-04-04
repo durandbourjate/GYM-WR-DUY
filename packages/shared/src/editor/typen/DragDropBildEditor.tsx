@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react'
 import type { DragDropBildZielzone } from '../../types/fragen'
 import BildUpload from '../components/BildUpload'
+import { resolvePoolBildUrl } from '../utils/poolBildUrl'
 
 interface Props {
   bildUrl: string
@@ -78,7 +79,7 @@ export default function DragDropBildEditor({ bildUrl, setBildUrl, zielzonen, set
             onClick={handleBildKlick}
           >
             <img
-              src={bildUrl}
+              src={resolvePoolBildUrl(bildUrl)}
               alt="Drag & Drop Bild"
               className="max-w-full"
               draggable={false}
