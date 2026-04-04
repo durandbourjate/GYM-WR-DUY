@@ -2,26 +2,19 @@
 
 ## Aktueller Stand
 
-**Branch:** `feature/shared-editor-phase1` (gepusht, NICHT gemergt)
-**Phase:** Phase 5b abgeschlossen — Admin-Fragenbank mit SharedFragenEditor (04.04.2026)
-**Status:** TSC OK, 113 Tests grün, Build OK, Pruefung TSC OK (unverändert)
-**Apps Script:** Neuer Endpoint `lernplattformSpeichereFrage` — User muss neue Bereitstellung erstellen
+**Branch:** `main` (alles gemergt)
+**Phase:** Shared Editor komplett (Phasen 1–4 + 5a + 5b) + Admin-Fragenbank
+**Status:** TSC OK, 113 LP-Tests + 193 Pruefung-Tests grün, Build OK, CI grün (nach fix)
+**Apps Script:** Neuer Endpoint `lernplattformSpeichereFrage` — deployed am 04.04.2026
 
-### Letzte Commits (feature/shared-editor-phase1)
+### Letzte Commits (main)
 
 | Commit | Beschreibung |
 |--------|-------------|
+| f67d3eb | fix(ci): install shared dependencies for React type resolution |
+| 23e1806 | fix: Tailwind v4 @source für shared-Komponenten |
+| a5c0976 | fix: SharedFragenEditor Scroll in Tailwind v4 (inline styles) |
 | 398c64b | feat(LP): Phase 5b — Admin-Fragenbank mit SharedFragenEditor (6 Tasks) |
-| 7eb8907 | docs: Phase 5b Implementation Plan |
-| 2ef40e0 | Shared Editor Phase 1: Infrastructure (Interfaces, Context, Utilities, Hooks) |
-
-### Auf main (bereits gemergt)
-
-| Commit | Beschreibung |
-|--------|-------------|
-| 0ffc338 | HANDOFF.md aktualisiert |
-| 41e26b1 | Duplikat-Dateien entfernt |
-| 827ac74 | 5 UI-Bugfixes (Dark Mode, Navigation, Umlaute, Ladezeit) |
 
 ---
 
@@ -71,35 +64,17 @@
 
 **Wichtig:** Apps Script muss neu bereitgestellt werden (neuer Endpoint `lernplattformSpeichereFrage`).
 
-### Phase 2: Typ-Editoren nach Shared (NÄCHSTE SESSION)
+### Phase 2: Typ-Editoren nach Shared ✅
 
-**Ziel:** Alle 20 Typ-Editoren + UI-Komponenten nach `packages/shared/src/editor/` verschieben. Nutzen EditorContext statt Pruefung-Stores. Pruefung bleibt unverändert.
+20 Typ-Editoren + UI-Komponenten in `packages/shared/src/editor/typen/` (alle 20 Typen).
 
-**Was zu tun ist:**
+### Phase 3: Haupteditor + Lernplattform-Integration ✅
 
-1. **Basis-UI kopieren:** `EditorBausteine.tsx`, `FormattierungsToolbar.tsx`, `BildUpload.tsx` (pure UI, keine Anpassung)
-2. **KI-UI kopieren:** `KIBausteine.tsx`, `KIAssistentPanel.tsx`, `KIFiBuButtons.tsx`, `KITypButtons.tsx` (Import-Pfade anpassen)
-3. **Supporting anpassen:** `FrageTypAuswahl.tsx`, `AnhangEditor.tsx`, `BewertungsrasterEditor.tsx` (EditorContext statt authStore/apiService)
-4. **20 Typ-Editoren kopieren:** MCEditor bis FormelEditor → `packages/shared/src/editor/typeditors/`
-5. **Sections kopieren:** `TypEditorDispatcher.tsx` (783 Z.), `MetadataSection.tsx`, `FragetextSection.tsx`, `MusterloesungSection.tsx`
+SharedFragenEditor mit Slot-Props, frageAdapter, AdminFragenbank.
 
-**Anpassungsmuster:** `useAuthStore` → `useEditorConfig()`, `apiService` → `useEditorServices()`, `useSchulConfig` → `useEditorConfig()`
+### Phase 4: Prüfungstool umstellen ✅
 
-**Quell-Dateien:** `Pruefung/src/components/lp/frageneditor/` (~37 Dateien, ~8600 Zeilen)
-
-### Phase 3: Haupteditor + Lernplattform-Integration
-
-- FragenEditor-Shell nach shared (912 Z., Render-Slots für host-spezifische Features)
-- `frageKonverter.ts` (kanonisch ↔ flach)
-- 4 neue Apps Script Endpoints (CRUD + Upload)
-- Lernplattform-Adapter + UI (FragenbankListe, FragenEditorScreen, Admin-Tab)
-
-### Phase 4: Prüfungstool umstellen
-
-- Pruefung-Adapter + Wrapper
-- Imports auf shared umstellen
-- ~35 Dateien aus Pruefung löschen
-- Vollständiger Regressionstest
+PruefungFragenEditor als Wrapper um SharedFragenEditor. Imports umgestellt.
 
 ---
 
@@ -138,9 +113,45 @@ Host-App (Pruefung/Lernplattform)
 
 ---
 
-## Nächste Schritte
+## Offene Punkte (Priorität)
 
-1. **Apps Script neu bereitstellen** — `lernplattformSpeichereFrage` Endpoint ist im Code, muss deployed werden
-2. **Browser-Test** — AdminDashboard → Fragenbank-Tab → Neue Frage erstellen → Speichern testen
-3. **Phase 2 (Shared Editor)** — Typ-Editoren von Pruefung nach shared verschieben (gemäss Plan oben)
-4. **Branch mergen** — Nach LP-Freigabe auf main
+### A) Fragen laden — LP braucht Testdaten
+
+Die LP Fragenbank zeigt "0 Fragen" weil die Gruppen-Sheets leer sind. Fragen aus Übungspools (2360 konvertiert) und Prüfungstool müssen in die Gruppen-Fragenbank-Sheets geladen werden.
+
+**Optionen:**
+1. Konvertierungs-Script (`scripts/convertPools.mjs`) Ergebnis in Fragenbank-Sheets importieren
+2. Neuer Apps-Script-Endpoint `lernplattformImportiereFragen` (Bulk-Import)
+3. Manuell: Fragen im Editor erstellen (langsam, nur zum Testen)
+
+**Hinweis:** Anzahl Fragen in Pools ≠ Prüfungstool (Pools: flaches Format, Prüfungstool: kanonisches Format mit mehr Metadaten). Pool-Sync importiert nur Teilmenge.
+
+### B) Editor-Unterschiede LP vs. Prüfungstool
+
+| Feature | Prüfungstool | Lernplattform | Grund |
+|---------|-------------|---------------|-------|
+| KI-Buttons | ✅ | ❌ | `kiAssistent: false` — gewollt (kein API-Key in LP) |
+| Anhänge | ✅ | ❌ | `anhangUpload: false` — gewollt (kein Drive-Upload in LP) |
+| Sichtbarkeit/Sharing | ✅ | ❌ | `sharing: false` — gewollt (LP hat keine LP-Fachschaften) |
+| Lernziel-Button | ✅ | ❌ | Feature off — gewollt |
+| **Fachbereich-Dropdown** | ✅ Dropdown | ❌ Nur Text | **BUG: `verfuegbareGefaesse` leer** |
+| **Semester-Chips** | ✅ S1–S8 | ❌ fehlen | **BUG: `verfuegbareSemester` leer** |
+| **Gefäss-Chips** | ✅ SF/EF/EWR/GF | ❌ fehlen | **BUG: `verfuegbareGefaesse` leer** |
+| Punkte Default | 1 | 5 | Unterschied in BewertungsrasterEditor-Default |
+
+**Fix nötig:** `LernplattformEditorProvider` braucht sinnvolle Defaults für Gefässe und Semester.
+
+### C) UI-Verbesserungen
+
+- [ ] **Admin-Tab "Auftraege"** — Tippfehler, sollte "Aufträge" heissen
+- [ ] **Login-Screen:** Light/Dark-Mode Toggle fehlt
+- [ ] **Login-Screen:** Hilfe-Button / Info-Text ("Worum geht es?")
+- [ ] **Dashboard:** "Noch keine Übungsfragen vorhanden" — braucht Fragen (siehe Punkt A)
+- [ ] **Fächer-Anzeige** im Dashboard verbessern
+
+### D) Nächste Schritte
+
+1. **EditorProvider-Defaults fixen** — Gefässe, Semester, Fachbereich-Dropdown
+2. **Fragen importieren** — Pool-Fragen in Gruppen-Sheets laden
+3. **UI-Kleinigkeiten** — Aufträge-Typo, Login-Hilfe, Toggle
+4. **E2E-Test** — Frage erstellen → speichern → in Liste sehen → bearbeiten
