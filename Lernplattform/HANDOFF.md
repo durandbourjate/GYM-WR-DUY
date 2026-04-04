@@ -2,80 +2,115 @@
 
 ## Aktueller Stand
 
-**Branch:** `main` (gemergt + gepusht)
-**Phase:** 5+6 abgeschlossen + UI-Bugfixes (04.04.2026)
-**Status:** 93 Tests grün, Build OK (323 KB JS + PWA)
-**Apps Script:** Deployed, Registry-Sheet mit 8 Gruppen angelegt (Familie + 6 Gym + Test)
+**Branch:** `feature/shared-editor-phase1` (gepusht, NICHT gemergt)
+**Phase:** Shared Editor Phase 1 abgeschlossen (04.04.2026)
+**Status:** Shared TSC OK, Lernplattform 93 Tests grün, Pruefung TSC OK (unverändert)
+**Apps Script:** Deployed, Registry-Sheet mit 8 Gruppen (Familie + 6 Gym + Test)
 
-### Letzte Commits
+### Letzte Commits (feature/shared-editor-phase1)
 
 | Commit | Beschreibung |
 |--------|-------------|
-| 41e26b1 | Duplikat-Dateien entfernt (macOS Kopien) |
+| 2ef40e0 | Shared Editor Phase 1: Infrastructure (Interfaces, Context, Utilities, Hooks) |
+
+### Auf main (bereits gemergt)
+
+| Commit | Beschreibung |
+|--------|-------------|
+| 0ffc338 | HANDOFF.md aktualisiert |
+| 41e26b1 | Duplikat-Dateien entfernt |
 | 827ac74 | 5 UI-Bugfixes (Dark Mode, Navigation, Umlaute, Ladezeit) |
-
-### UI-Bugfixes (04.04.2026)
-
-1. **Dark Mode Toggle** — `@custom-variant dark` in index.css (Tailwind CSS v4 class-basiert)
-2. **Zurück/Home-Button während Übung** — Session wird genullt bevor Navigation, kein Effect-Loop mehr
-3. **Gruppe wechseln** — `gruppeAbwaehlen()` im Store, Gruppenname im Header klickbar (bei >1 Gruppe)
-4. **Umlaute** — 20+ UI-Texte korrigiert (ue→ü, ae→ä, oe→ö) in 10+ Dateien
-5. **Gruppen-Ladezeit** — Mitglieder non-blocking im Hintergrund laden
-
-### Verifikation
-
-| Check | Status |
-|-------|--------|
-| `npx tsc -b` | OK |
-| `npx vitest run` | 93 Tests grün |
-| `npm run build` | OK (323 KB JS, 198 Precache-Einträge) |
-| Preview Dark Mode | OK (Toggle, Farben, Persistenz) |
-| Preview Umlaute | OK (Login, Dashboard, Zusammenfassung) |
 
 ---
 
-## Offene Punkte
+## Shared Editor — 4-Phasen-Plan
 
-### Sofort testbar (nächster Schritt)
+**Ziel:** Ein FragenEditor in `packages/shared/`, den Prüfungstool UND Lernplattform importieren. Kein doppelter Code.
 
-1. **Browser-Test mit echtem Login** — Login → Gruppen → Dashboard → Übung → Zurück/Home → Gruppe wechseln
-2. **Dark Mode im echten Browser** — Toggle, Persistenz über Reload, System-Präferenz
+**Plan-Datei:** `.claude/plans/wild-booping-corbato.md`
 
-### Offene Features
+### Phase 1: Shared Infrastructure ✅ (04.04.2026)
 
-#### Pool.html-Features nachrüsten (Priorität: Mittel)
-- Suchfeld, Lernziele-Modal, Hilfe-Modal, Problem-melden, Schnellstart-Karten, Filter-Chips
+15 neue Dateien in `packages/shared/src/editor/` (1029 Zeilen):
 
-#### Shared Editor (Priorität: Hoch)
-- FragenEditor aus Prüfungstool nach `packages/shared/` extrahieren
-- ~12 Abhängigkeiten abstrahieren (authStore, apiService, KI-Assistent, Upload, etc.)
-- EditorConfig für kontextabhängige Felder (Punkte, Bewertungsraster nur im Prüfungstool)
-- Fragen erstellen/bearbeiten direkt in der Lernplattform
+| Datei | Inhalt |
+|-------|--------|
+| `types.ts` | `EditorConfig`, `EditorServices`, `EditorFeatures`, `EditorBenutzer` |
+| `EditorContext.tsx` | React Context + Provider + `useEditorConfig()` / `useEditorServices()` |
+| `editorUtils.ts` | `FrageTyp`, `generiereFrageId()`, `parseLuecken()` |
+| `fragenValidierung.ts` | `validiereFrage()` für alle 20 Typen |
+| `fragenFactory.ts` | `erstelleFrageObjekt()`, `FrageBasis`, `TypSpezifischeDaten` |
+| `zeitbedarf.ts` | `berechneZeitbedarf()` Richtwert-Tabelle |
+| `fachUtils.ts` | `typLabel()`, `bloomLabel()`, `FIBU_TYPEN`, `fachbereichFarbe()` etc. |
+| `kontenrahmen.ts` | KMU-Kontenrahmen Utility (mit `setKontenrahmenData()` DI) |
+| `musterloesungGenerierung.ts` | 4 FiBu-Musterlösungsgeneratoren |
+| `useKIAssistent.ts` | Abstrahierter KI-Hook (nutzt EditorContext) |
+| `hooks/useFocusTrap.ts` | Focus-Trap Hook |
+| `hooks/usePanelResize.ts` | Panel-Resize Hook |
 
-#### Prüfungstool Path Alias (Priorität: Niedrig)
-- `Pruefung/tsconfig.app.json` + `vite.config.ts` auf @shared umstellen
-- Re-Exports in Prüfung für Backward-Compatibility
+**Kontenrahmen-Hinweis:** `kontenrahmen.ts` nutzt Dependency Injection (`setKontenrahmenData()`) statt direktem JSON-Import, damit die Host-App die Daten liefert. Die JSON-Datei liegt weiterhin in `Pruefung/src/data/kontenrahmen-kmu.json`.
 
-#### Phase 7: Backend-Persistenz (Priorität: Mittel)
-- AuftragStore: localStorage → Apps Script
-- FortschrittStore: Backend-Sync vollständig (aktuell: IndexedDB + Offline-Queue, aber Backend-Endpoint noch nicht aufgerufen)
+### Phase 2: Typ-Editoren nach Shared (NÄCHSTE SESSION)
+
+**Ziel:** Alle 20 Typ-Editoren + UI-Komponenten nach `packages/shared/src/editor/` verschieben. Nutzen EditorContext statt Pruefung-Stores. Pruefung bleibt unverändert.
+
+**Was zu tun ist:**
+
+1. **Basis-UI kopieren:** `EditorBausteine.tsx`, `FormattierungsToolbar.tsx`, `BildUpload.tsx` (pure UI, keine Anpassung)
+2. **KI-UI kopieren:** `KIBausteine.tsx`, `KIAssistentPanel.tsx`, `KIFiBuButtons.tsx`, `KITypButtons.tsx` (Import-Pfade anpassen)
+3. **Supporting anpassen:** `FrageTypAuswahl.tsx`, `AnhangEditor.tsx`, `BewertungsrasterEditor.tsx` (EditorContext statt authStore/apiService)
+4. **20 Typ-Editoren kopieren:** MCEditor bis FormelEditor → `packages/shared/src/editor/typeditors/`
+5. **Sections kopieren:** `TypEditorDispatcher.tsx` (783 Z.), `MetadataSection.tsx`, `FragetextSection.tsx`, `MusterloesungSection.tsx`
+
+**Anpassungsmuster:** `useAuthStore` → `useEditorConfig()`, `apiService` → `useEditorServices()`, `useSchulConfig` → `useEditorConfig()`
+
+**Quell-Dateien:** `Pruefung/src/components/lp/frageneditor/` (~37 Dateien, ~8600 Zeilen)
+
+### Phase 3: Haupteditor + Lernplattform-Integration
+
+- FragenEditor-Shell nach shared (912 Z., Render-Slots für host-spezifische Features)
+- `frageKonverter.ts` (kanonisch ↔ flach)
+- 4 neue Apps Script Endpoints (CRUD + Upload)
+- Lernplattform-Adapter + UI (FragenbankListe, FragenEditorScreen, Admin-Tab)
+
+### Phase 4: Prüfungstool umstellen
+
+- Pruefung-Adapter + Wrapper
+- Imports auf shared umstellen
+- ~35 Dateien aus Pruefung löschen
+- Vollständiger Regressionstest
+
+---
+
+## Verifikation
+
+```bash
+# Shared
+cd packages/shared && npx tsc --noEmit  # (über Lernplattform: npx tsc --noEmit --project ../packages/shared/tsconfig.json)
+
+# Lernplattform
+cd Lernplattform && npx tsc -b && npx vitest run && npm run build
+
+# Pruefung (erst ab Phase 4 verändert)
+cd Pruefung && npx tsc -b && npx vitest run && npm run build
+```
 
 ---
 
 ## Architektur-Überblick
 
-### Stack
-React 19 + TypeScript + Vite + Zustand + Tailwind CSS v4 (PWA)
+### Dependency Injection Pattern
+```
+Host-App (Pruefung/Lernplattform)
+  └─ EditorProvider (config + services)
+       └─ FragenEditor (shared)
+            ├─ useEditorConfig() → Gefässe, Semester, Benutzer, Features
+            ├─ useEditorServices() → Upload, KI
+            └─ Typ-Editoren (shared, Phase 2)
+```
 
-### Kontext-System
-- **Gym** (Sie-Form, sachlich) vs. **Familie** (Du-Form, ermutigend) via LernKontextProvider
-- Rolle wird aus Gruppe abgeleitet (adminEmail → admin, sonst lernend)
-
-### Daten-Flow
-- Google Sheets via Apps Script Backend (14 Endpoints)
-- Fragenbank: Sheets-basiert (pro Gruppe eigenes fragebankSheetId)
-- Fortschritt: IndexedDB + Offline-Queue (Backend-Sync noch offen)
-- Auth: Google OAuth + Code-Login
-
-### Gruppen-Registry (Google Sheet)
-8 Gruppen angelegt: Familie, sf-wr-29c, sf-wr-28bc29fs, sf-wr-27a28f, in-28c, in-29f, in-30s, test
+### Was wo lebt
+- `packages/shared/src/editor/` — Geteilter Editor-Code (Interfaces, Utils, Hooks, ab Phase 2: Komponenten)
+- `packages/shared/src/types/` — Kanonische Frage-Types (bereits vorhanden)
+- `Pruefung/` — Host-App mit eigenen Adaptern (ab Phase 4)
+- `Lernplattform/` — Host-App mit eigenen Adaptern (ab Phase 3)
