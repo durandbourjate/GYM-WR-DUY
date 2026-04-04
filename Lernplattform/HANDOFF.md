@@ -2,19 +2,25 @@
 
 ## Aktueller Stand
 
-**Branch:** `main` (alles gemergt)
-**Phase:** Shared Editor komplett (Phasen 1–4 + 5a + 5b) + Admin-Fragenbank
-**Status:** TSC OK, 113 LP-Tests + 193 Pruefung-Tests grün, Build OK, CI grün (nach fix)
-**Apps Script:** Neuer Endpoint `lernplattformSpeichereFrage` — deployed am 04.04.2026
+**Branch:** `main`
+**Phase:** Shared Fragenbank Migration komplett (04.04.2026)
+**Status:** TSC OK, 92 LP-Tests + 193 Pruefung-Tests grün, Build OK
+**Apps Script:** Neuer Code — User muss Apps Script NEU BEREITSTELLEN
+
+### Architektur (nach Migration)
+- **Ein Format:** Kanonisch aus `@shared/types/fragen` (discriminated union)
+- **Eine Fragenbank:** `FRAGENBANK_ID` = Prüfungstool-Sheet (Gym-Gruppen), eigenes Sheet (Familie)
+- **Ein Editor:** SharedFragenEditor mit allen Features (KI, Anhänge, Sharing, Lernziele)
+- **Kein Adapter:** Keine Konvertierung zwischen LP und Prüfungstool-Format
 
 ### Letzte Commits (main)
 
 | Commit | Beschreibung |
 |--------|-------------|
-| f67d3eb | fix(ci): install shared dependencies for React type resolution |
+| 9d87de3 | feat(LP): Backend liest aus gemeinsamer Fragenbank (FRAGENBANK_ID) |
+| d0d08d6 | refactor(LP): Shared Fragenbank-Format — 42 Dateien, -700 Zeilen |
+| 990a0b1 | docs: HANDOFF aktualisiert — offene Punkte |
 | 23e1806 | fix: Tailwind v4 @source für shared-Komponenten |
-| a5c0976 | fix: SharedFragenEditor Scroll in Tailwind v4 (inline styles) |
-| 398c64b | feat(LP): Phase 5b — Admin-Fragenbank mit SharedFragenEditor (6 Tasks) |
 
 ---
 
@@ -106,52 +112,35 @@ Host-App (Pruefung/Lernplattform)
 ```
 
 ### Was wo lebt
-- `packages/shared/src/editor/` — Geteilter Editor-Code (Interfaces, Utils, Hooks, ab Phase 2: Komponenten)
-- `packages/shared/src/types/` — Kanonische Frage-Types (bereits vorhanden)
-- `Pruefung/` — Host-App mit eigenen Adaptern (ab Phase 4)
-- `Lernplattform/` — Host-App mit eigenen Adaptern (Phase 5b: frageAdapter, EditorProvider, AdminFragenbank)
+- `packages/shared/src/editor/` — SharedFragenEditor + alle 20 Typ-Editoren
+- `packages/shared/src/types/fragen.ts` — Kanonische Frage-Types (ein Format für beide Tools)
+- `Pruefung/` — PruefungFragenEditor (Wrapper) + eigenes Backend
+- `Lernplattform/` — LernplattformEditorProvider + AdminFragenbank + Übungsflow
 
 ---
 
-## Offene Punkte (Priorität)
+## Offene Punkte
 
-### A) Fragen laden — LP braucht Testdaten
+### A) Apps Script bereitstellen — PFLICHT
+Backend-Code wurde aktualisiert. User muss in Apps Script Editor neue Bereitstellung erstellen.
+Dann laden Gym-Gruppen automatisch alle Fragen aus der Prüfungstool-Fragenbank.
 
-Die LP Fragenbank zeigt "0 Fragen" weil die Gruppen-Sheets leer sind. Fragen aus Übungspools (2360 konvertiert) und Prüfungstool müssen in die Gruppen-Fragenbank-Sheets geladen werden.
+### B) Backend-Endpoints noch nicht implementiert (niedrige Priorität)
+- `lernplattformKIAssistent` — KI-Funktionen für LP (Fragen generieren etc.)
+- `lernplattformUploadAnhang` — Datei-Upload an Drive
+- `lernplattformLadeLernziele` — Lernziele laden
+Diese Endpoints sind im EditorProvider vorbereitet aber noch nicht im Backend. Editor funktioniert ohne sie (Buttons zeigen "nicht verfügbar").
 
-**Optionen:**
-1. Konvertierungs-Script (`scripts/convertPools.mjs`) Ergebnis in Fragenbank-Sheets importieren
-2. Neuer Apps-Script-Endpoint `lernplattformImportiereFragen` (Bulk-Import)
-3. Manuell: Fragen im Editor erstellen (langsam, nur zum Testen)
+### C) UI-Verbesserungen (niedrige Priorität)
 
-**Hinweis:** Anzahl Fragen in Pools ≠ Prüfungstool (Pools: flaches Format, Prüfungstool: kanonisches Format mit mehr Metadaten). Pool-Sync importiert nur Teilmenge.
-
-### B) Editor-Unterschiede LP vs. Prüfungstool
-
-| Feature | Prüfungstool | Lernplattform | Grund |
-|---------|-------------|---------------|-------|
-| KI-Buttons | ✅ | ❌ | `kiAssistent: false` — gewollt (kein API-Key in LP) |
-| Anhänge | ✅ | ❌ | `anhangUpload: false` — gewollt (kein Drive-Upload in LP) |
-| Sichtbarkeit/Sharing | ✅ | ❌ | `sharing: false` — gewollt (LP hat keine LP-Fachschaften) |
-| Lernziel-Button | ✅ | ❌ | Feature off — gewollt |
-| **Fachbereich-Dropdown** | ✅ Dropdown | ❌ Nur Text | **BUG: `verfuegbareGefaesse` leer** |
-| **Semester-Chips** | ✅ S1–S8 | ❌ fehlen | **BUG: `verfuegbareSemester` leer** |
-| **Gefäss-Chips** | ✅ SF/EF/EWR/GF | ❌ fehlen | **BUG: `verfuegbareGefaesse` leer** |
-| Punkte Default | 1 | 5 | Unterschied in BewertungsrasterEditor-Default |
-
-**Fix nötig:** `LernplattformEditorProvider` braucht sinnvolle Defaults für Gefässe und Semester.
-
-### C) UI-Verbesserungen
-
-- [ ] **Admin-Tab "Auftraege"** — Tippfehler, sollte "Aufträge" heissen
-- [ ] **Login-Screen:** Light/Dark-Mode Toggle fehlt
-- [ ] **Login-Screen:** Hilfe-Button / Info-Text ("Worum geht es?")
-- [ ] **Dashboard:** "Noch keine Übungsfragen vorhanden" — braucht Fragen (siehe Punkt A)
-- [ ] **Fächer-Anzeige** im Dashboard verbessern
+- [ ] Admin-Tab "Auftraege" → "Aufträge" (Typo)
+- [ ] Login-Screen: Light/Dark-Mode Toggle
+- [ ] Login-Screen: Hilfe-Button / Info-Text
+- [ ] Fächer-Anzeige im Dashboard verbessern
 
 ### D) Nächste Schritte
 
-1. **EditorProvider-Defaults fixen** — Gefässe, Semester, Fachbereich-Dropdown
-2. **Fragen importieren** — Pool-Fragen in Gruppen-Sheets laden
-3. **UI-Kleinigkeiten** — Aufträge-Typo, Login-Hilfe, Toggle
-4. **E2E-Test** — Frage erstellen → speichern → in Liste sehen → bearbeiten
+1. **Apps Script bereitstellen** → Fragen erscheinen automatisch
+2. **Browser-Test**: Dashboard → Übung starten (mit echten Fragen)
+3. **Browser-Test**: Admin → Fragenbank → Frage erstellen/bearbeiten
+4. Backend-Endpoints für KI/Upload/Lernziele (wenn benötigt)
