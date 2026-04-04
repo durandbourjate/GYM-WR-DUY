@@ -28,9 +28,14 @@ jobs:
           node-version: 22
           cache: npm
           cache-dependency-path: |
+            packages/shared/package-lock.json
             Unterrichtsplaner/package-lock.json
             Pruefung/package-lock.json
             Lernplattform/package-lock.json
+
+      - name: Install Shared dependencies
+        working-directory: packages/shared
+        run: npm ci
 
       - name: Install Unterrichtsplaner dependencies
         working-directory: Unterrichtsplaner
