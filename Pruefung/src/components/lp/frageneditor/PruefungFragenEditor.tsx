@@ -1,0 +1,184 @@
+/**
+ * PruefungFragenEditor — Dünner Wrapper um SharedFragenEditor.
+ * Stellt EditorProvider + Pruefung-spezifische Slots bereit.
+ */
+import { useState, useEffect, useMemo } from 'react'
+import { useAuthStore, ladeUndCacheLPs } from '../../../store/authStore.ts'
+import type { LPInfo } from '../../../services/lpApi.ts'
+import { uploadAnhang as apiUploadAnhang, kiAssistent as apiKiAssistent } from '../../../services/uploadApi.ts'
+import { ladeLernziele as apiLadeLernziele } from '../../../services/poolApi.ts'
+import { istKonfiguriert } from '../../../services/apiClient.ts'
+import { EditorProvider } from '@shared/editor/EditorContext'
+import type { EditorConfig, EditorServices } from '@shared/editor/types'
+import SharedFragenEditor from '@shared/editor/SharedFragenEditor'
+import { istWRFachschaft } from '../../../utils/fachUtils.ts'
+import { useSchulConfig } from '../../../store/schulConfigStore.ts'
+import type { Frage } from '../../../types/fragen.ts'
+import type { Frage as SharedFrage } from '@shared/types/fragen'
+import type { FragenPerformance } from '../../../types/tracker.ts'
+
+// Pruefung-spezifische Komponenten
+import AnhangEditor from './AnhangEditor.tsx'
+import PDFEditor from './PDFEditor.tsx'
+import BerechtigungenEditor from '../../shared/BerechtigungenEditor.tsx'
+import PoolUpdateVergleich from './PoolUpdateVergleich.tsx'
+import RueckSyncDialog from '../fragenbank/RueckSyncDialog.tsx'
+
+interface Props {
+  frage: Frage | null
+  onSpeichern: (frage: Frage) => void
+  onAbbrechen: () => void
+  performance?: FragenPerformance
+}
+
+export default function PruefungFragenEditor({ frage, onSpeichern, onAbbrechen, performance }: Props) {
+  const user = useAuthStore((s) => s.user)
+  const schulConfig = useSchulConfig((s) => s.config)
+
+  // LP-Liste für BerechtigungenEditor
+  const [lpListe, setLpListe] = useState<LPInfo[]>([])
+  useEffect(() => {
+    ladeUndCacheLPs().then(setLpListe)
+  }, [])
+
+  // EditorProvider Config + Services
+  const semesterListe = useMemo(() => {
+    const n = schulConfig.semesterModell.regel.anzahl
+    return Array.from({ length: n }, (_, i) => `S${i + 1}`)
+  }, [schulConfig.semesterModell.regel.anzahl])
+
+  const editorConfig: EditorConfig = useMemo(() => ({
+    benutzer: {
+      email: user?.email ?? '',
+      name: user?.name,
+      fachschaft: user?.fachschaft,
+      fachschaften: user?.fachschaften,
+    },
+    verfuegbareGefaesse: schulConfig.gefaesse,
+    verfuegbareSemester: semesterListe,
+    zeigeFiBuTypen: istWRFachschaft(user?.fachschaft),
+    lpListe: lpListe.map(lp => ({ email: lp.email, name: lp.name, kuerzel: lp.kuerzel })),
+    features: {
+      kiAssistent: istKonfiguriert(),
+      anhangUpload: istKonfiguriert(),
+      bewertungsraster: true,
+      sharing: true,
+      poolSync: true,
+      performance: !!performance,
+    },
+  }), [user, schulConfig, lpListe, performance, semesterListe])
+
+  const editorServices: EditorServices = useMemo(() => ({
+    uploadAnhang: async (frageId: string, datei: File) => {
+      if (!user) return null
+      return apiUploadAnhang(user.email, frageId, datei)
+    },
+    kiAssistent: async (aktion: string, daten: Record<string, unknown>) => {
+      if (!user) return null
+      return apiKiAssistent(user.email, aktion, daten)
+    },
+    istKIVerfuegbar: () => istKonfiguriert(),
+    istUploadVerfuegbar: () => istKonfiguriert() && !!user,
+    ladeLernziele: async (_gefaess: string, fachbereich: string) => {
+      if (!user) return []
+      return apiLadeLernziele(user.email, fachbereich)
+    },
+  }), [user])
+
+  return (
+    <EditorProvider config={editorConfig} services={editorServices}>
+      <SharedFragenEditor
+        frage={frage as unknown as SharedFrage | null}
+        onSpeichern={(f) => onSpeichern(f as unknown as Frage)}
+        onAbbrechen={onAbbrechen}
+        performance={performance as any}
+        PDFEditorComponent={PDFEditor}
+        anhangEditorSlot={(props) => (
+          <AnhangEditor
+            anhaenge={props.anhaenge}
+            neueAnhaenge={props.neueAnhaenge}
+            onAnhangHinzu={props.onAnhangHinzu}
+            onAnhangEntfernen={props.onAnhangEntfernen}
+            onNeuenAnhangEntfernen={props.onNeuenAnhangEntfernen}
+            onUrlAnhangHinzu={props.onUrlAnhangHinzu}
+          />
+        )}
+        berechtigungenSlot={(props) => (
+          <BerechtigungenEditor
+            berechtigungen={props.berechtigungen}
+            onChange={props.onChange}
+            lpListe={lpListe}
+            eigeneFachschaft={user?.fachschaft}
+          />
+        )}
+        poolInfoSlot={({ frage: f, onSpeichern: speichern }) => {
+          const pf = f as any as Frage | null
+          if (!pf || pf.quelle !== 'pool' || !pf.poolId) return null
+          return (
+            <div className="p-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg border border-slate-200 dark:border-slate-600">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-sm text-slate-600 dark:text-slate-300">
+                  Importiert aus Pool: <strong>{pf.quellReferenz || pf.poolId}</strong>
+                </span>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      const aktualisiert = { ...pf, pruefungstauglich: !pf.pruefungstauglich, geaendertAm: new Date().toISOString() }
+                      speichern(aktualisiert as any)
+                    }}
+                    className={pf.pruefungstauglich
+                      ? 'px-3 py-1 text-sm bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300 rounded hover:bg-green-200 dark:hover:bg-green-900/70 cursor-pointer'
+                      : 'px-3 py-1 text-sm bg-green-600 text-white rounded hover:bg-green-700 cursor-pointer'
+                    }
+                    title={pf.pruefungstauglich ? 'Klicken um Prüfungstauglichkeit aufzuheben' : 'Als prüfungstauglich markieren'}
+                  >
+                    {pf.pruefungstauglich ? '\u2713 Prüfungstauglich' : 'Prüfungstauglich \u2713'}
+                  </button>
+                </div>
+              </div>
+              {pf.poolUpdateVerfuegbar && pf.poolVersion && (
+                <PoolUpdateVergleich
+                  frage={pf}
+                  onUebernehmen={() => speichern({ ...pf, poolUpdateVerfuegbar: false, geaendertAm: new Date().toISOString() } as any)}
+                  onIgnorieren={() => speichern({ ...pf, poolUpdateVerfuegbar: false, geaendertAm: new Date().toISOString() } as any)}
+                />
+              )}
+            </div>
+          )
+        }}
+        poolSyncSlot={({ frage: f, typ, onRueckSync }) => (
+          <>
+            {f && f.poolId && f.poolVersion && (
+              <button
+                onClick={onRueckSync}
+                title="Änderungen an Pool zurückschreiben"
+                className="px-3 py-1.5 text-sm rounded-lg border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors cursor-pointer"
+              >
+                &uarr; An Pool
+              </button>
+            )}
+            {f && !f.poolId && typ !== 'visualisierung' && (
+              <button
+                onClick={onRueckSync}
+                title="Frage in einen Übungspool exportieren"
+                className="px-3 py-1.5 text-sm rounded-lg border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors cursor-pointer"
+              >
+                &uarr; In Pool exportieren
+              </button>
+            )}
+          </>
+        )}
+        rueckSyncSlot={({ offen, onSchliessen, onErfolg }) => (
+          frage ? (
+            <RueckSyncDialog
+              frage={frage}
+              offen={offen}
+              onSchliessen={onSchliessen}
+              onErfolg={onErfolg as any}
+            />
+          ) : null
+        )}
+      />
+    </EditorProvider>
+  )
+}
