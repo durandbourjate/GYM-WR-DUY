@@ -6,7 +6,6 @@ import { useState } from 'react'
 import type { Fachbereich, BloomStufe, FragenPerformance } from '../../types/fragen'
 import type { Berechtigung } from '../../types/auth'
 import type { useKIAssistent } from '../useKIAssistent'
-import type { EditorLPInfo } from '../types'
 import { useEditorConfig } from '../EditorContext'
 import { bloomLabel, istWRFachschaft } from '../fachUtils'
 import { loesungsquoteFarbe } from '../utils/performanceUtils'
@@ -42,8 +41,6 @@ interface MetadataSectionProps {
   setGeteilt: (v: 'privat' | 'fachschaft' | 'schule') => void
   berechtigungen: Berechtigung[]
   setBerechtigungen: (b: Berechtigung[]) => void
-  lpListe: EditorLPInfo[]
-  eigeneFachschaft?: string
   ki: ReturnType<typeof useKIAssistent>
   performance?: FragenPerformance
   /** Optionale Berechtigungen-Editor-Komponente (vom Host bereitgestellt) */
@@ -65,7 +62,6 @@ export default function MetadataSection({
   gefaesse, setGefaesse,
   geteilt: _geteilt, setGeteilt: _setGeteilt,
   berechtigungen: _berechtigungen, setBerechtigungen: _setBerechtigungen,
-  lpListe: _lpListe, eigeneFachschaft,
   ki,
   performance,
   berechtigungenEditor,
@@ -143,7 +139,7 @@ export default function MetadataSection({
       )}
 
       <div className="grid grid-cols-2 gap-3">
-        {istWRFachschaft(eigeneFachschaft) ? (
+        {istWRFachschaft(config.benutzer.fachschaft) ? (
           <Feld label="Fachbereich">
             <select value={fachbereich} onChange={(e) => setFachbereich(e.target.value as Fachbereich)} className="input-field">
               <option value="VWL">VWL</option>

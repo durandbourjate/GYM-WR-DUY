@@ -752,7 +752,6 @@ export default function FragenEditor({ frage, onSpeichern, onAbbrechen, performa
             gefaesse={gefaesse} setGefaesse={setGefaesse}
             geteilt={geteilt} setGeteilt={setGeteilt}
             berechtigungen={berechtigungen} setBerechtigungen={setBerechtigungen}
-            lpListe={lpListe} eigeneFachschaft={user?.fachschaft}
             ki={ki}
             performance={performance}
             berechtigungenEditor={
