@@ -8,10 +8,11 @@
 // ============================================================
 
 // === KONFIGURATION ===
-// Diese IDs müssen nach dem Erstellen der Sheets eingetragen werden.
 const GRUPPEN_REGISTRY_ID = '1VH7Vu7JIKYLic2-wK2uSa2nXA7WVvStKOjUDi9cpWnI';
+const FRAGENBANK_ID = '1ASSRv7mSpmyD22PAMUJ8iekHwuamYkHpy9E6yxWNIVs'; // Shared mit Prüfungstool
 const LP_DOMAIN = 'gymhofwil.ch';
 const SUS_DOMAIN = 'stud.gymhofwil.ch';
+const FRAGENBANK_TABS = ['VWL', 'BWL', 'Recht', 'Informatik'];
 
 // === HELPER: JSON-Response ===
 
@@ -530,14 +531,255 @@ function lernplattformEntfernen(body) {
  * Fragen laden für eine Gruppe aus dem Fragenbank-Sheet der Gruppe.
  * Header-Zeile = Feldnamen. Werte die mit [ oder { beginnen werden als JSON geparst.
  */
+/**
+ * Fragen laden aus der GEMEINSAMEN Fragenbank (gleiche Datenquelle wie Prüfungstool).
+ * Liest alle Fragen aus FRAGENBANK_ID, Tabs: VWL, BWL, Recht, Informatik.
+ * Gibt Fragen im kanonischen shared-Format zurück (fragetext, fachbereich, bloom, typDaten).
+ */
 function lernplattformLadeFragen(body) {
+  // gruppeId wird für Berechtigungsprüfung noch gebraucht, aber Fragen kommen aus der gemeinsamen Fragenbank
   var gruppeId = body.gruppeId;
 
+  // Prüfe ob Gruppe existiert (für Familie-Gruppen → eigenes Sheet)
   var gruppen = alleGruppenLaden_();
   var gruppe = gruppen.find(function(g) { return g.id === gruppeId; });
   if (!gruppe) return jsonResponse({ success: false, error: 'Gruppe nicht gefunden' });
-  if (!gruppe.fragebankSheetId) return jsonResponse({ success: false, error: 'Fragenbank-Sheet nicht konfiguriert' });
 
+  // Familie-Gruppen: weiterhin eigenes Sheet nutzen (falls vorhanden)
+  if (gruppe.typ === 'familie' && gruppe.fragebankSheetId) {
+    return lernplattformLadeFragenAusGruppenSheet_(gruppe);
+  }
+
+  // Gym-Gruppen: Gemeinsame Fragenbank (wie Prüfungstool)
+  try {
+    var fragenbank = SpreadsheetApp.openById(FRAGENBANK_ID);
+    var alleFragen = [];
+
+    for (var t = 0; t < FRAGENBANK_TABS.length; t++) {
+      var tabName = FRAGENBANK_TABS[t];
+      var sheet = fragenbank.getSheetByName(tabName);
+      if (!sheet) continue;
+
+      var daten = sheet.getDataRange().getValues();
+      if (daten.length < 2) continue;
+
+      var headers = daten[0].map(function(h) { return String(h).trim(); });
+
+      for (var i = 1; i < daten.length; i++) {
+        var row = {};
+        for (var j = 0; j < headers.length; j++) {
+          var key = headers[j];
+          var val = daten[i][j];
+          if (!key || val === '' || val === null || val === undefined) continue;
+          row[key] = String(val);
+        }
+        if (!row.id) continue;
+
+        // Frage im kanonischen Format parsen (wie Prüfungstool parseFrage)
+        var frage = parseFrageKanonisch_(row, tabName);
+        alleFragen.push(frage);
+      }
+    }
+
+    return jsonResponse({ success: true, data: alleFragen });
+  } catch (e) {
+    return jsonResponse({ success: false, error: e.message });
+  }
+}
+
+/** Frage aus einer Sheet-Zeile im kanonischen Format parsen (shared mit Prüfungstool) */
+function parseFrageKanonisch_(row, fachbereich) {
+  var base = {
+    id: row.id,
+    version: Number(row.version) || 1,
+    erstelltAm: row.erstelltAm || new Date().toISOString(),
+    geaendertAm: row.geaendertAm || new Date().toISOString(),
+    fachbereich: fachbereich,
+    fach: row.fach || fachbereich,
+    thema: row.thema || '',
+    unterthema: row.unterthema || '',
+    semester: (row.semester || '').split(',').map(function(s) { return s.trim(); }).filter(Boolean),
+    gefaesse: (row.gefaesse || '').split(',').map(function(s) { return s.trim(); }).filter(Boolean),
+    bloom: row.bloom || 'K1',
+    tags: (row.tags || '').split(',').map(function(s) { return s.trim(); }).filter(Boolean),
+    punkte: Number(row.punkte) || 1,
+    musterlosung: row.musterlosung || '',
+    bewertungsraster: safeJsonParse_(row.bewertungsraster, []),
+    anhaenge: safeJsonParse_(row.anhaenge, []),
+    verwendungen: [],
+    quelle: row.quelle || 'manuell',
+    autor: row.autor || '',
+    schwierigkeit: Number(row.schwierigkeit) || undefined,
+    poolId: row.poolId || '',
+    pruefungstauglich: row.pruefungstauglich === 'true',
+    lernzielIds: (row.lernzielIds || '').split(',').filter(Boolean),
+  };
+
+  var typ = row.typ || 'mc';
+  var typDaten = safeJsonParse_(row.typDaten, {});
+
+  // Typ-spezifische Felder aus typDaten oder direkt aus Spalten
+  switch (typ) {
+    case 'mc':
+      return Object.assign(base, {
+        typ: 'mc',
+        fragetext: row.fragetext || '',
+        optionen: typDaten.optionen || safeJsonParse_(row.optionen, []),
+        mehrfachauswahl: typDaten.mehrfachauswahl || row.mehrfachauswahl === 'true',
+        zufallsreihenfolge: typDaten.zufallsreihenfolge || row.zufallsreihenfolge === 'true',
+      });
+    case 'freitext':
+      return Object.assign(base, {
+        typ: 'freitext',
+        fragetext: row.fragetext || '',
+        laenge: typDaten.laenge || row.laenge || 'mittel',
+      });
+    case 'lueckentext':
+      return Object.assign(base, {
+        typ: 'lueckentext',
+        fragetext: row.fragetext || '',
+        textMitLuecken: typDaten.textMitLuecken || row.textMitLuecken || '',
+        luecken: typDaten.luecken || safeJsonParse_(row.luecken, []),
+      });
+    case 'richtigfalsch':
+      return Object.assign(base, {
+        typ: 'richtigfalsch',
+        fragetext: row.fragetext || '',
+        aussagen: typDaten.aussagen || safeJsonParse_(row.aussagen, []),
+      });
+    case 'berechnung':
+      return Object.assign(base, {
+        typ: 'berechnung',
+        fragetext: row.fragetext || '',
+        ergebnisse: typDaten.ergebnisse || safeJsonParse_(row.ergebnisse, []),
+        rechenwegErforderlich: typDaten.rechenwegErforderlich || false,
+      });
+    case 'zuordnung':
+      return Object.assign(base, {
+        typ: 'zuordnung',
+        fragetext: row.fragetext || '',
+        paare: typDaten.paare || safeJsonParse_(row.paare, []),
+        zufallsreihenfolge: typDaten.zufallsreihenfolge || false,
+      });
+    case 'sortierung':
+      return Object.assign(base, {
+        typ: 'sortierung',
+        fragetext: row.fragetext || '',
+        elemente: typDaten.elemente || safeJsonParse_(row.elemente, []),
+        teilpunkte: typDaten.teilpunkte !== false,
+      });
+    case 'buchungssatz':
+      return Object.assign(base, {
+        typ: 'buchungssatz',
+        geschaeftsfall: row.fragetext || typDaten.geschaeftsfall || '',
+        buchungen: typDaten.buchungen || safeJsonParse_(row.buchungen, []),
+        kontenauswahl: typDaten.kontenauswahl || { modus: 'voll' },
+      });
+    case 'tkonto':
+      return Object.assign(base, {
+        typ: 'tkonto',
+        aufgabentext: row.fragetext || typDaten.aufgabentext || '',
+        konten: typDaten.konten || safeJsonParse_(row.konten, []),
+        kontenauswahl: typDaten.kontenauswahl || { modus: 'voll' },
+        bewertungsoptionen: typDaten.bewertungsoptionen || {},
+      });
+    case 'kontenbestimmung':
+      return Object.assign(base, {
+        typ: 'kontenbestimmung',
+        aufgabentext: row.fragetext || typDaten.aufgabentext || '',
+        modus: typDaten.modus || 'konto_bestimmen',
+        aufgaben: typDaten.aufgaben || safeJsonParse_(row.aufgaben, []),
+        kontenauswahl: typDaten.kontenauswahl || { modus: 'voll' },
+      });
+    case 'bilanzstruktur':
+      return Object.assign(base, {
+        typ: 'bilanzstruktur',
+        aufgabentext: row.fragetext || typDaten.aufgabentext || '',
+        modus: typDaten.modus || 'bilanz',
+        kontenMitSaldi: typDaten.kontenMitSaldi || safeJsonParse_(row.kontenMitSaldi, []),
+        loesung: typDaten.loesung || safeJsonParse_(row.loesung, {}),
+        bewertungsoptionen: typDaten.bewertungsoptionen || {},
+      });
+    case 'aufgabengruppe':
+      return Object.assign(base, {
+        typ: 'aufgabengruppe',
+        kontext: row.fragetext || typDaten.kontext || '',
+        teilaufgaben: typDaten.teilaufgaben || safeJsonParse_(row.teilaufgaben, []),
+      });
+    case 'visualisierung':
+      return Object.assign(base, {
+        typ: 'visualisierung',
+        fragetext: row.fragetext || '',
+        untertyp: typDaten.untertyp || 'zeichnen',
+      });
+    case 'hotspot':
+      return Object.assign(base, {
+        typ: 'hotspot',
+        fragetext: row.fragetext || '',
+        bildUrl: typDaten.bildUrl || row.bildUrl || '',
+        bereiche: typDaten.bereiche || safeJsonParse_(row.bereiche, []),
+        mehrfachauswahl: typDaten.mehrfachauswahl || false,
+      });
+    case 'bildbeschriftung':
+      return Object.assign(base, {
+        typ: 'bildbeschriftung',
+        fragetext: row.fragetext || '',
+        bildUrl: typDaten.bildUrl || row.bildUrl || '',
+        beschriftungen: typDaten.beschriftungen || safeJsonParse_(row.beschriftungen, []),
+      });
+    case 'dragdrop_bild':
+      return Object.assign(base, {
+        typ: 'dragdrop_bild',
+        fragetext: row.fragetext || '',
+        bildUrl: typDaten.bildUrl || row.bildUrl || '',
+        zielzonen: typDaten.zielzonen || safeJsonParse_(row.zielzonen, []),
+        labels: typDaten.labels || safeJsonParse_(row.labels, []),
+      });
+    case 'pdf':
+      return Object.assign(base, {
+        typ: 'pdf',
+        fragetext: row.fragetext || '',
+        pdfUrl: typDaten.pdfUrl || row.pdfUrl || '',
+        pdfDateiname: typDaten.pdfDateiname || '',
+        seitenAnzahl: typDaten.seitenAnzahl || 1,
+        erlaubteWerkzeuge: typDaten.erlaubteWerkzeuge || ['freihand', 'text'],
+      });
+    case 'audio':
+      return Object.assign(base, {
+        typ: 'audio',
+        fragetext: row.fragetext || '',
+        maxDauerSekunden: typDaten.maxDauerSekunden || undefined,
+      });
+    case 'code':
+      return Object.assign(base, {
+        typ: 'code',
+        fragetext: row.fragetext || '',
+        sprache: typDaten.sprache || row.sprache || 'python',
+        starterCode: typDaten.starterCode || '',
+      });
+    case 'formel':
+      return Object.assign(base, {
+        typ: 'formel',
+        fragetext: row.fragetext || '',
+        korrekteFormel: typDaten.korrekteFormel || row.korrekteFormel || '',
+        vergleichsModus: 'exakt',
+      });
+    default:
+      return Object.assign(base, {
+        typ: typ,
+        fragetext: row.fragetext || '',
+      });
+  }
+}
+
+/** JSON sicher parsen */
+function safeJsonParse_(str, fallback) {
+  if (!str) return fallback;
+  try { return JSON.parse(str); } catch (e) { return fallback; }
+}
+
+/** Legacy: Fragen aus gruppenspezifischem Sheet laden (für Familie-Gruppen) */
+function lernplattformLadeFragenAusGruppenSheet_(gruppe) {
   try {
     var ss = SpreadsheetApp.openById(gruppe.fragebankSheetId);
     var sheet = ss.getSheetByName('Fragen');
@@ -556,20 +798,11 @@ function lernplattformLadeFragen(body) {
         var key = headers[j];
         var val = row[j];
         if (!key || val === '' || val === null || val === undefined) continue;
-
-        // Auto-Parse: JSON-Arrays und -Objekte erkennen
         var strVal = String(val);
         if (strVal.charAt(0) === '[' || strVal.charAt(0) === '{') {
           try { frage[key] = JSON.parse(strVal); } catch (e) { frage[key] = strVal; }
-        } else if (key === 'schwierigkeit') {
-          frage[key] = Number(val);
-        } else if (key === 'uebung' || key === 'pruefungstauglich') {
-          frage[key] = val === true || val === 'true' || val === 'TRUE';
-        } else {
-          frage[key] = strVal;
-        }
+        } else { frage[key] = strVal; }
       }
-
       fragen.push(frage);
     }
 
