@@ -7,7 +7,7 @@ import type { TrackerDaten, TrackerPruefungSummary } from '../../types/tracker.t
 import { formatDatum } from '../../utils/zeit.ts'
 import { bestimmePruefungsStatus, statusLabel, statusFarbe, korrekturLabel, erstelleDemoTrackerDaten } from '../../utils/trackerUtils.ts'
 import LPHeader from './LPHeader.tsx'
-import PruefungsComposer from './vorbereitung/PruefungsComposer.tsx'
+import PruefungsComposer, { leereUebung } from './vorbereitung/PruefungsComposer.tsx'
 import FragenBrowser from './fragenbank/FragenBrowser.tsx'
 import HilfeSeite from './HilfeSeite.tsx'
 import UebungsToolView from './UebungsToolView.tsx'
@@ -179,6 +179,12 @@ export default function LPStartseite() {
     setAnsicht('composer')
   }
 
+  function handleNeueUebung(): void {
+    setEditConfig({ ...leereUebung })
+    setComposerKey(k => k + 1)
+    setAnsicht('composer')
+  }
+
   function handleBearbeiten(config: PruefungsConfig): void {
     setEditConfig(config)
     setAnsicht('composer')
@@ -252,6 +258,9 @@ export default function LPStartseite() {
             </>
           ) : (
             <>
+              <button onClick={handleNeueUebung} className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer">
+                + Neue Übung
+              </button>
               <button onClick={() => { setZeigHilfe(false); setZeigFragenbank(true) }} className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer">
                 + Neue Frage
               </button>
@@ -268,7 +277,26 @@ export default function LPStartseite() {
       />
 
       {/* Übungstool-Ansicht */}
-      {modus === 'uebung' && <UebungsToolView />}
+      {modus === 'uebung' && (
+        <>
+          {/* Formative Übungen */}
+          {ladeStatus === 'fertig' && (() => {
+            const formativeUebungen = configs.filter(c => c.typ === 'formativ')
+            if (formativeUebungen.length === 0) return null
+            return (
+              <div className="max-w-5xl mx-auto px-6 pt-4 space-y-3">
+                <h2 className="text-sm font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wide">
+                  {formativeUebungen.length} Übung{formativeUebungen.length !== 1 ? 'en' : ''}
+                </h2>
+                {formativeUebungen.map(c => (
+                  <PruefungsKarte key={c.id} config={c} onBearbeiten={handleBearbeiten} onDuplizieren={handleDuplizieren} trackerSummary={findeTrackerSummary(c.id)} />
+                ))}
+              </div>
+            )
+          })()}
+          <UebungsToolView />
+        </>
+      )}
 
       {/* Prüfungstool-Ansicht */}
       {modus === 'pruefung' && <>
@@ -537,9 +565,9 @@ function PruefungsKarte({ config: c, onBearbeiten, onDuplizieren, trackerSummary
         <a
           href={`${window.location.pathname}?id=${c.id}`}
           className="px-4 py-2 text-xs font-medium text-white dark:text-slate-800 bg-slate-800 dark:bg-slate-200 rounded-lg hover:bg-slate-900 dark:hover:bg-slate-100 transition-colors"
-          title={c.beendetUm ? 'Prüfung auswerten' : 'Prüfung durchführen'}
+          title={c.beendetUm ? 'Auswerten' : c.typ === 'formativ' ? 'Übung starten' : 'Durchführen'}
         >
-          {c.beendetUm ? 'Auswerten' : 'Durchführen'}
+          {c.beendetUm ? 'Auswerten' : c.typ === 'formativ' ? 'Übung starten' : 'Durchführen'}
         </a>
         <button
           onClick={() => onDuplizieren(c)}

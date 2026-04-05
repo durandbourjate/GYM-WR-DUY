@@ -80,12 +80,16 @@ export default function LobbyPhase({ config, schuelerStatus, onFreischalten, onZ
             <span title={s.geraet === 'tablet' ? 'Tablet' : s.geraet === 'laptop' ? 'Laptop' : 'Gerät unbekannt'}>
               {s.geraet === 'tablet' ? '📱' : '💻'}
             </span>
-            {/* Kontrollstufe-Icon */}
-            {s.kontrollStufe === 'locker' && <span title="Kontrollstufe: Locker">🟢</span>}
-            {s.kontrollStufe === 'standard' && <span title="Kontrollstufe: Standard">🟡</span>}
-            {s.kontrollStufe === 'streng' && <span title="Kontrollstufe: Streng">🔴</span>}
-            {/* SEB-Badge */}
-            {s.sebVersion && (
+            {/* Kontrollstufe-Icon (nicht bei formativen Übungen) */}
+            {config.typ !== 'formativ' && (
+              <>
+                {s.kontrollStufe === 'locker' && <span title="Kontrollstufe: Locker">🟢</span>}
+                {s.kontrollStufe === 'standard' && <span title="Kontrollstufe: Standard">🟡</span>}
+                {s.kontrollStufe === 'streng' && <span title="Kontrollstufe: Streng">🔴</span>}
+              </>
+            )}
+            {/* SEB-Badge (nicht bei formativen Übungen) */}
+            {config.typ !== 'formativ' && s.sebVersion && (
               <span className="text-xs px-1.5 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded font-medium" title={`SEB ${s.sebVersion}`}>
                 SEB
               </span>

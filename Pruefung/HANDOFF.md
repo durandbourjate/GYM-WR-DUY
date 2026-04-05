@@ -22,6 +22,36 @@ Plan: `.claude/plans/toasty-popping-liskov.md`
 
 ---
 
+## Session 64 — UI-Anpassungen A–D (05.04.2026)
+
+### Stand
+Branch `main`. tsc ✅ | 193 Tests ✅ | Build ✅. **Deployed auf GitHub Pages.**
+
+### Änderungen
+
+| # | Änderung | Dateien |
+|---|----------|---------|
+| 1 | **Build-Timestamp** — APP_VERSION zeigt Build-Datum (z.B. "05.04.2026") statt hardcoded "v1.0" | `version.ts`, `vite.config.ts`, `vite-env.d.ts` |
+| 2 | **"Neue Frage" Button** — Im Übungsmodus in der Kopfzeile, öffnet FragenBrowser. Overlays (Fragenbank/Hilfe) funktionieren in beiden Modi | `LPStartseite.tsx` |
+| 3 | **Dashboard-Redesign** — "Admin-Dashboard" Titel entfernt, Fragenbank-Tab entfernt (über Header erreichbar), Gruppen-Info-Bar mit Dropdown + Stats (Lernende/Admins) | `AdminDashboard.tsx`, `UebungsToolView.tsx` |
+| 4 | **SuS-Header konsistent** — Startbildschirm: FeedbackButton hinzugefügt, Reihenfolge korrigiert (Feedback → Theme → Abmelden), text-sm statt text-xs | `Startbildschirm.tsx` |
+| 5 | **Duplikate aufgeräumt** — 405 macOS-Duplikate + Lernplattform/ (195MB) gelöscht | diverse |
+
+### Verifiziert
+- ✅ LP: Build-Datum sichtbar in Header (Prüfungs- und Übungsmodus)
+- ✅ LP: "+ Neue Frage" Button im Übungsmodus-Header
+- ✅ LP: Dashboard ohne redundanten Titel/Tab, Gruppen-Info-Bar
+- ✅ Console: Keine Errors
+
+### Nächste Session — Plan: `docs/superpowers/plans/uebungstool-integration-v2.md`
+
+| # | Aufgabe | Aufwand |
+|---|---------|--------|
+| E | Formatives Durchführen im Übungstool (gemeinsames Tool, istFormativ-Flag) | gross (2-3 Sessions) |
+| F | Fach-Filter dynamisch + LP-konfigurierbar | mittel |
+
+---
+
 ## Session 63 — Backend-Fusion + Übungstool funktional (05.04.2026)
 
 ### Stand

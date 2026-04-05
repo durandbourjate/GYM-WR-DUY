@@ -56,6 +56,17 @@ const leerePruefung: PruefungsConfig = {
   zeitverlaengerungen: {},
 }
 
+/** Vorlage für formative Übungen (aus Übungstool erstellt) */
+export const leereUebung: PruefungsConfig = {
+  ...leerePruefung,
+  typ: 'formativ',
+  modus: 'uebung',
+  zeitModus: 'open-end',
+  dauerMinuten: 0,
+  kontrollStufe: 'keine',
+  zeitanzeigeTyp: 'keine',
+}
+
 export default function PruefungsComposer({ config, onZurueck, onDuplizieren }: Props) {
   const user = useAuthStore((s) => s.user)
   const istDemoModus = useAuthStore((s) => s.istDemoModus)

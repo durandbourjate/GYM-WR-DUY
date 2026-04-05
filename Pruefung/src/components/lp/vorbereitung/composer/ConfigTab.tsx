@@ -145,7 +145,22 @@ export default function ConfigTab({ pruefung, updatePruefung, toggleFachbereich 
           <Field label="Typ">
             <select
               value={pruefung.typ}
-              onChange={(e) => updatePruefung({ typ: e.target.value as 'summativ' | 'formativ' })}
+              onChange={(e) => {
+                const neuerTyp = e.target.value as 'summativ' | 'formativ'
+                if (neuerTyp === 'formativ' && pruefung.typ !== 'formativ') {
+                  // Formativ-Defaults automatisch setzen
+                  updatePruefung({
+                    typ: 'formativ',
+                    modus: 'uebung',
+                    sebErforderlich: false,
+                    kontrollStufe: 'keine',
+                    zeitModus: 'open-end',
+                    zeitanzeigeTyp: 'keine',
+                  })
+                } else {
+                  updatePruefung({ typ: neuerTyp })
+                }
+              }}
               className="input-field"
             >
               <option value="summativ">Summativ (benotet)</option>
@@ -174,21 +189,25 @@ export default function ConfigTab({ pruefung, updatePruefung, toggleFachbereich 
             aktiv={pruefung.ruecknavigation}
             onChange={(v) => updatePruefung({ ruecknavigation: v })}
           />
-          <Toggle
-            label="SEB erforderlich"
-            beschreibung="Prüfung nur im Safe Exam Browser erlaubt"
-            aktiv={pruefung.sebErforderlich}
-            onChange={(v) => updatePruefung({ sebErforderlich: v })}
-          />
-          {pruefung.sebErforderlich && (
-            <button
-              type="button"
-              onClick={() => downloadSebDatei(pruefung.id, pruefung.titel)}
-              className="ml-8 px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors cursor-pointer"
-              title="SEB-Konfigurationsdatei herunterladen"
-            >
-              📥 SEB-Datei herunterladen
-            </button>
+          {pruefung.typ !== 'formativ' && (
+            <>
+              <Toggle
+                label="SEB erforderlich"
+                beschreibung="Prüfung nur im Safe Exam Browser erlaubt"
+                aktiv={pruefung.sebErforderlich}
+                onChange={(v) => updatePruefung({ sebErforderlich: v })}
+              />
+              {pruefung.sebErforderlich && (
+                <button
+                  type="button"
+                  onClick={() => downloadSebDatei(pruefung.id, pruefung.titel)}
+                  className="ml-8 px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors cursor-pointer"
+                  title="SEB-Konfigurationsdatei herunterladen"
+                >
+                  📥 SEB-Datei herunterladen
+                </button>
+              )}
+            </>
           )}
           <Toggle
             label="Zufällige Fragenreihenfolge"

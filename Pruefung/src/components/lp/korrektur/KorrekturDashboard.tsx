@@ -20,9 +20,11 @@ import KorrekturAktionsLeiste from './KorrekturAktionsLeiste.tsx'
 interface Props {
   pruefungId: string
   eingebettet?: boolean
+  config?: import('../../../types/pruefung').PruefungsConfig
 }
 
-export default function KorrekturDashboard({ pruefungId, eingebettet = false }: Props) {
+export default function KorrekturDashboard({ pruefungId, eingebettet = false, config: configProp }: Props) {
+  const istFormativ = configProp?.typ === 'formativ'
   const user = useAuthStore((s) => s.user)
   const istDemoModus = useAuthStore((s) => s.istDemoModus)
 
@@ -135,18 +137,22 @@ export default function KorrekturDashboard({ pruefungId, eingebettet = false }: 
       <main className={eingebettet ? '' : 'max-w-5xl mx-auto p-6'}>
         {/* Statistik-Leiste */}
         {stats && korrektur && korrektur.schueler.length > 0 && (
-          <div className="grid grid-cols-2 md:grid-cols-6 gap-3 mb-6">
+          <div className={`grid gap-3 mb-6 ${istFormativ ? 'grid-cols-2 md:grid-cols-2' : 'grid-cols-2 md:grid-cols-6'}`}>
             <StatKarte label="Durchschnitt" wert={`${stats.durchschnitt} Pkt.`} />
-            <StatKarte label="∅ Note" wert={stats.durchschnittNote.toFixed(1)} />
-            <StatKarte label="Median Note" wert={stats.medianNote.toFixed(1)} />
             <StatKarte label="Median" wert={`${stats.median} Pkt.`} />
-            <StatKarte label="Bestanden" wert={`${stats.bestanden}/${stats.bestanden + stats.durchgefallen}`} />
-            <StatKarte label="Durchgefallen" wert={String(stats.durchgefallen)} highlight={stats.durchgefallen > 0} />
+            {!istFormativ && (
+              <>
+                <StatKarte label="∅ Note" wert={stats.durchschnittNote.toFixed(1)} />
+                <StatKarte label="Median Note" wert={stats.medianNote.toFixed(1)} />
+                <StatKarte label="Bestanden" wert={`${stats.bestanden}/${stats.bestanden + stats.durchgefallen}`} />
+                <StatKarte label="Durchgefallen" wert={String(stats.durchgefallen)} highlight={stats.durchgefallen > 0} />
+              </>
+            )}
           </div>
         )}
 
-        {/* Notenskala */}
-        {korrektur && korrektur.schueler.length > 0 && (
+        {/* Notenskala (nicht bei formativen Übungen) */}
+        {!istFormativ && korrektur && korrektur.schueler.length > 0 && (
           <NotenConfigPanel
             notenConfig={notenConfig}
             setNotenConfig={setNotenConfig}

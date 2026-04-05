@@ -589,7 +589,7 @@ export default function DurchfuehrenDashboard({ pruefungId }: { pruefungId: stri
               </div>
 
               {/* Korrektur-Dashboard (immer sichtbar) */}
-              <KorrekturDashboard pruefungId={pruefungId} eingebettet />
+              <KorrekturDashboard pruefungId={pruefungId} eingebettet config={config} />
             </div>
           )}
         </div>
