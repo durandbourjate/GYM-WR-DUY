@@ -7,8 +7,7 @@ Lehrer: DUY. Fächer: Wirtschaft & Recht (SF, EWR, EF), Informatik. Klassenlehre
 
 ```
 Unterrichtsplaner/   → React/TS/Vite PWA (Semesterplaner)
-Pruefung/            → React/TS/Vite PWA (Prüfungstool)
-Lernplattform/       → React/TS/Vite PWA (Übungstool)
+Pruefung/            → React/TS/Vite PWA (Prüfungstool + Übungstool via VITE_APP_MODE)
 Uebungen/            → Übungspools (pool.html + config/*.js) + Informatik-Material
 Projektdateien/      → Claude-Projektanweisungen (nicht deployed)
 ```

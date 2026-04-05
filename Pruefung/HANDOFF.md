@@ -16,9 +16,9 @@ Plan: `.claude/plans/toasty-popping-liskov.md`
 | 1 | ✅ 05.04.2026 | Types + Utils migrieren (8 Types + 11 Utils + idb-keyval) |
 | 2 | ✅ 05.04.2026 | Stores + Services migrieren (7 Stores + 3 Services + 1 Adapter + 2 Hooks + 1 Context) |
 | 3 | ✅ 05.04.2026 | UI migrieren (49 Komponenten + AppLernen verdrahtet + fachFarben) |
-| 4 | ⬜ | Integration-Tests + Security-Audit |
-| 5 | ⬜ | Backend konsolidieren (Apps Script) |
-| 6 | ⬜ | Cleanup (Lernplattform/ löschen) |
+| 4 | ✅ 05.04.2026 | E2E-Browser-Test (Demo Kind + Eltern, Light/Dark, Console clean) |
+| 5 | ✅ 05.04.2026 | Backend: LP-Backend bleibt eigenständig (gleiche Apps Script URL) |
+| 6 | ✅ 05.04.2026 | Cleanup: Lernplattform/ gelöscht, Dateien nach Pruefung/ verschoben |
 
 ---
 
