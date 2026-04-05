@@ -13,7 +13,7 @@ Plan: `.claude/plans/toasty-popping-liskov.md`
 | Phase | Status | Beschreibung |
 |-------|--------|-------------|
 | 0 | ✅ 05.04.2026 | Build-System: appMode.ts, Dual-Build, deploy.yml |
-| 1 | ⬜ | Types + Utils migrieren |
+| 1 | ✅ 05.04.2026 | Types + Utils migrieren (8 Types + 11 Utils + idb-keyval) |
 | 2 | ⬜ | Stores + Services migrieren |
 | 3 | ⬜ | UI migrieren (Dashboard, UebungsScreen, Admin, Fragetypen-Override) |
 | 4 | ⬜ | Integration-Tests + Security-Audit |
@@ -44,6 +44,35 @@ Plan: `.claude/plans/toasty-popping-liskov.md`
   - ~~Demo-Modus Bypass via sessionStorage~~ ✅ 02.04.2026 — istDemoModus nur in React-State, nicht manipulierbar
   - Prompt Injection bei KI-Assistent (User-Input unsanitisiert an Claude)
   - ~~`pruefung-state-*` in localStorage bleibt nach Abgabe~~ ✅ 02.04.2026 — persist.clearStorage() nach Abgabe
+
+---
+
+## Session 59 — Fusion Phase 1: Types + Utils migriert (05.04.2026)
+
+### Stand
+Branch `feature/fusion-phase1`. tsc ✅ | 193 Tests ✅ | Build ✅ (beide Targets). **Nicht auf main.**
+
+### Änderungen
+
+| # | Änderung | Dateien |
+|---|----------|---------|
+| 1 | **8 LP-Types nach `types/lernen/`** — antworten, auftrag, auth (LernenRolle/LernenAuthUser), fortschritt, fragen, gruppen, settings, uebung | `Pruefung/src/types/lernen/*.ts` |
+| 2 | **11 LP-Utils nach `utils/lernen/`** — anrede, assetUrl, blockBuilder, empfehlungen, fragetext, gamification, indexedDB, korrektur, mastery, offlineQueue, shuffle | `Pruefung/src/utils/lernen/*.ts` |
+| 3 | **Barrel-Exports** — `index.ts` in beiden Ordnern | `types/lernen/index.ts`, `utils/lernen/index.ts` |
+| 4 | **idb-keyval** als Dependency hinzugefügt | `package.json` |
+
+### Import-Anpassungen
+- `../types/fragen` → `../../types/lernen/fragen` (interne Referenzen)
+- `@shared/types/fragen` bleibt (shared-Referenzen)
+- LP-Auth umbenannt: `Rolle` → `LernenRolle`, `AuthUser` → `LernenAuthUser` (Kollisionsvermeidung)
+
+### Nicht migriert (spätere Phasen)
+- `fachFarben.ts` → Phase 3 (DOM-abhängig)
+- `syncManager.ts` → Phase 2 (Store/Service-abhängig)
+
+### Nächste Schritte
+- **Phase 2:** Stores + Services migrieren (authStore, uebungStore, fortschrittStore, apiService)
+- **Branch mergen:** Nach Phase 2 zusammen auf main (oder einzeln nach LP-Freigabe)
 
 ---
 
