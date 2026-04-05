@@ -53,7 +53,6 @@ jobs:
         env:
           VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
           VITE_APPS_SCRIPT_URL: ${{ secrets.VITE_APPS_SCRIPT_URL }}
-          VITE_LERNPLATTFORM_APPS_SCRIPT_URL: ${{ secrets.VITE_LERNPLATTFORM_APPS_SCRIPT_URL }}
         run: npx tsc -b && npx vite build
 
       # Lernplattform: Zweiter Build aus Pruefung-Source mit VITE_APP_MODE=lernen
