@@ -35,6 +35,7 @@ export default defineConfig({
   base: basePath,
   define: {
     __BUILD_TIMESTAMP__: JSON.stringify(new Date().toISOString()),
+    __LERNEN_BACKEND_URL__: JSON.stringify(process.env.VITE_LERNPLATTFORM_APPS_SCRIPT_URL || ''),
   },
   resolve: {
     alias: {
