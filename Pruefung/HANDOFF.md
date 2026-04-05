@@ -45,13 +45,20 @@ Branch `main`. tsc ✅ | 193 Tests ✅ | Build ✅. **Deployed auf GitHub Pages.
 - ✅ LP: Fach-/Gefäss-Filter dynamisch aus vorhandenen Prüfungen
 - ✅ Console: Keine JS-Errors
 
+### Weitere Änderungen (gleiche Session)
+
+| # | Änderung | Dateien |
+|---|----------|---------|
+| G | **Formativ-Labels** — Composer: "Übung bearbeiten"/"Neue Übung", Durchführung: "Übung durchführen", Korrektur: "Auswertung" | `PruefungsComposer.tsx`, `DurchfuehrenDashboard.tsx`, `KorrekturDashboard.tsx` |
+| H | **Übungen-Tab** — Tab-System (Lernplattform | Übungen durchführen) mit Empty State + "Neue Übung erstellen" | `LPStartseite.tsx` |
+
 ### Nächste Session
 
 | # | Aufgabe | Aufwand |
 |---|---------|--------|
 | 1 | E2E-Browser-Test mit echtem Login (formative Übung erstellen → durchführen → auswerten) | mittel |
-| 2 | Composer-Titel anpassen: "Übung bearbeiten" statt "Prüfung bearbeiten" bei formativ | klein |
-| 3 | Übungstool-Dashboard: Tab "Übungen durchführen" (Liste der formativ-Übungen mit Status) | mittel |
+| 2 | Startbildschirm: "Übung" statt "Prüfung" in Texten bei formativ | klein |
+| 3 | KorrekturSchuelerZeile: Note-Spalte bei formativ ausblenden | klein |
 
 | # | Aufgabe | Aufwand |
 |---|---------|--------|
