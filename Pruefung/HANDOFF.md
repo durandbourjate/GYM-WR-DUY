@@ -22,6 +22,21 @@ Plan: `.claude/plans/toasty-popping-liskov.md`
 
 ---
 
+## Session 62 — Übungstool-Tab im Prüfungstool (05.04.2026)
+
+### Stand
+Branch `feature/uebungstool-tab`. tsc ✅ | 193 Tests ✅ | Build ✅.
+
+### Änderungen
+
+| # | Änderung | Dateien |
+|---|----------|---------|
+| 1 | **Modus-Toggle** — "↻ Pools sync" ersetzt durch "📚 Übungstool" / "← Prüfungstool" | `LPStartseite.tsx` |
+| 2 | **UebungsToolView** — Wrapper: initialisiert Lernen-Stores mit LP-User, Gruppenauswahl, AdminDashboard | `UebungsToolView.tsx` (NEU) |
+| 3 | **PoolSyncDialog entfernt** — Import, State, Handler aus LPStartseite | `LPStartseite.tsx` |
+
+---
+
 ## Offene Punkte
 
 - **SEB / iPad** — SEB weiterhin deaktiviert (`sebErforderlich: false`)

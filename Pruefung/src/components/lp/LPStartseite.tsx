@@ -3,7 +3,6 @@ import { useAuthStore } from '../../store/authStore.ts'
 import { useFragenbankStore } from '../../store/fragenbankStore.ts'
 import { apiService } from '../../services/apiService.ts'
 import type { PruefungsConfig } from '../../types/pruefung.ts'
-import type { Frage } from '../../types/fragen.ts'
 import type { TrackerDaten, TrackerPruefungSummary } from '../../types/tracker.ts'
 import { formatDatum } from '../../utils/zeit.ts'
 import { bestimmePruefungsStatus, statusLabel, statusFarbe, korrekturLabel, erstelleDemoTrackerDaten } from '../../utils/trackerUtils.ts'
@@ -11,7 +10,7 @@ import LPHeader from './LPHeader.tsx'
 import PruefungsComposer from './vorbereitung/PruefungsComposer.tsx'
 import FragenBrowser from './fragenbank/FragenBrowser.tsx'
 import HilfeSeite from './HilfeSeite.tsx'
-import PoolSyncDialog from './fragenbank/PoolSyncDialog.tsx'
+import UebungsToolView from './UebungsToolView.tsx'
 import TrackerSection from './TrackerSection.tsx'
 // demoPruefung entfernt — nur noch Einrichtungsprüfung im Demo-Modus
 import { einrichtungsPruefung } from '../../data/einrichtungsPruefung.ts'
@@ -31,8 +30,7 @@ export default function LPStartseite() {
   const [composerKey, setComposerKey] = useState(0)
   const [zeigFragenbank, setZeigFragenbank] = useState(false)
   const [zeigHilfe, setZeigHilfe] = useState(false)
-  const [zeigSyncDialog, setZeigSyncDialog] = useState(false)
-  const [fragenbank, setFragenbank] = useState<Frage[]>([])
+  const [modus, setModus] = useState<'pruefung' | 'uebung'>('pruefung')
   const [listenTab, setListenTab] = useState<'pruefungen' | 'tracker'>('pruefungen')
   const [trackerDaten, setTrackerDaten] = useState<TrackerDaten | null>(null)
 
@@ -205,15 +203,6 @@ export default function LPStartseite() {
     setAnsicht('composer')
   }
 
-  async function handleOeffneSyncDialog(): Promise<void> {
-    // Fragenbank frisch laden (force), damit Delta-Berechnung korrekt ist
-    if (user && apiService.istKonfiguriert() && !istDemoModus) {
-      await useFragenbankStore.getState().lade(user.email, true)
-    }
-    setFragenbank(useFragenbankStore.getState().fragen)
-    setZeigSyncDialog(true)
-  }
-
   function handleZurueck(): void {
     setAnsicht('liste')
     // Configs neu laden
@@ -245,28 +234,41 @@ export default function LPStartseite() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
       <LPHeader
-        titel="Prüfungstool"
+        titel={modus === 'pruefung' ? 'Prüfungstool' : 'Übungstool'}
         untertitel={user ? `${user.name} · Lehrperson` : undefined}
         ansichtsButtons={
-          <>
-            <button onClick={handleNeue} className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer">
-              + Neue Prüfung
-            </button>
-            <button
-              onClick={handleOeffneSyncDialog}
-              title="Übungspools synchronisieren"
-              className="px-3 py-1.5 text-sm border border-slate-300 rounded hover:bg-slate-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 transition-colors cursor-pointer"
-            >
-              ↻ Pools sync
-            </button>
-          </>
+          modus === 'pruefung' ? (
+            <>
+              <button onClick={handleNeue} className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer">
+                + Neue Prüfung
+              </button>
+              <button
+                onClick={() => setModus('uebung')}
+                title="Zum Übungstool wechseln"
+                className="px-3 py-1.5 text-sm border border-slate-300 rounded hover:bg-slate-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+              >
+                📚 Übungstool
+              </button>
+            </>
+          ) : (
+            <>
+              <button onClick={() => setModus('pruefung')} className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer">
+                ← Prüfungstool
+              </button>
+            </>
+          )
         }
-        onFragenbank={() => { setZeigHilfe(false); setZeigFragenbank(!zeigFragenbank) }}
-        onHilfe={() => { setZeigFragenbank(false); setZeigHilfe(!zeigHilfe) }}
+        onFragenbank={modus === 'pruefung' ? () => { setZeigHilfe(false); setZeigFragenbank(!zeigFragenbank) } : undefined}
+        onHilfe={modus === 'pruefung' ? () => { setZeigFragenbank(false); setZeigHilfe(!zeigHilfe) } : undefined}
         fragebankOffen={zeigFragenbank}
         hilfeOffen={zeigHilfe}
       />
 
+      {/* Übungstool-Ansicht */}
+      {modus === 'uebung' && <UebungsToolView />}
+
+      {/* Prüfungstool-Ansicht */}
+      {modus === 'pruefung' && <>
       {/* Tab-Leiste */}
       <div className="max-w-5xl mx-auto px-6 pt-4">
         <div className="flex gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-lg w-fit">
@@ -481,17 +483,7 @@ export default function LPStartseite() {
         <HilfeSeite onSchliessen={() => setZeigHilfe(false)} />
       )}
 
-      {/* Pool-Sync Dialog */}
-      <PoolSyncDialog
-        offen={zeigSyncDialog}
-        onSchliessen={() => setZeigSyncDialog(false)}
-        bestehendeFragen={fragenbank}
-        onImportAbgeschlossen={() => {
-          setZeigSyncDialog(false)
-          // Fragenbank-Cache zurücksetzen damit nächste Sync-Sitzung aktualisierte Daten lädt
-          setFragenbank([])
-        }}
-      />
+      </>}
     </div>
   )
 }
