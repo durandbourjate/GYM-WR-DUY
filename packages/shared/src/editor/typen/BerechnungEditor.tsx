@@ -59,10 +59,10 @@ export default function BerechnungEditor({ ergebnisse, setErgebnisse, rechenwegE
         {/* Spalten-Header */}
         {ergebnisse.length > 0 && (
           <div className="flex gap-2 items-center text-xs text-slate-500 dark:text-slate-400">
-            <span className="flex-[3] min-w-0">Bezeichnung</span>
-            <span className="flex-[2] min-w-0 text-center">Ergebnis</span>
-            <span className="flex-1 min-w-0 text-center">±Toleranz</span>
-            <span className="w-16 text-center">Einheit</span>
+            <span className="flex-[5] min-w-0">Bezeichnung</span>
+            <span className="w-24 text-center shrink-0">Ergebnis</span>
+            <span className="w-20 text-center shrink-0">±Toleranz</span>
+            <span className="w-16 text-center shrink-0">Einheit</span>
             {ergebnisse.length > 1 && <span className="w-7" />}
           </div>
         )}
@@ -73,14 +73,14 @@ export default function BerechnungEditor({ ergebnisse, setErgebnisse, rechenwegE
               value={erg.label}
               onChange={(e) => updateErgebnis(i, { label: e.target.value })}
               placeholder="z.B. Gewinn, Umsatz..."
-              className="input-field flex-[3] min-w-0"
+              className="input-field flex-[5] min-w-0"
             />
             <input
               type="number"
               value={erg.korrekt}
               onChange={(e) => updateErgebnis(i, { korrekt: parseFloat(e.target.value) || 0 })}
               placeholder="Korrekt"
-              className="input-field flex-[2] min-w-0 text-center font-mono"
+              className="input-field w-24 shrink-0 text-center font-mono"
               title="Korrekte Antwort"
             />
             <input
@@ -88,7 +88,7 @@ export default function BerechnungEditor({ ergebnisse, setErgebnisse, rechenwegE
               value={erg.toleranz}
               onChange={(e) => updateErgebnis(i, { toleranz: parseFloat(e.target.value) || 0 })}
               placeholder="±Tol."
-              className="input-field flex-1 min-w-0 text-center"
+              className="input-field w-20 shrink-0 text-center"
               title="Toleranz"
               min={0}
             />

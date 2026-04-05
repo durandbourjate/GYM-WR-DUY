@@ -13,6 +13,7 @@ const FACH_FARBEN: Record<string, string> = {
   BWL: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
   Recht: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
   Informatik: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400',
+  Andere: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
 }
 
 // Intensivere Farben für aktiven (ausgewählten) Fach-Button
@@ -21,17 +22,23 @@ const FACH_FARBEN_AKTIV: Record<string, string> = {
   BWL: 'bg-blue-500 text-white dark:bg-blue-600 dark:text-white ring-2 ring-blue-300',
   Recht: 'bg-green-500 text-white dark:bg-green-600 dark:text-white ring-2 ring-green-300',
   Informatik: 'bg-gray-500 text-white dark:bg-gray-600 dark:text-white ring-2 ring-gray-300',
+  Andere: 'bg-purple-500 text-white dark:bg-purple-600 dark:text-white ring-2 ring-purple-300',
 }
 
-export default function AdminFragenbank() {
+interface AdminFragenbankProps {
+  initialFach?: string
+}
+
+export default function AdminFragenbank({ initialFach }: AdminFragenbankProps = {}) {
   const { aktiveGruppe } = useGruppenStore()
   const [fragen, setFragen] = useState<Frage[]>([])
   const [laden, setLaden] = useState(false)
   const [fehler, setFehler] = useState<string | null>(null)
   const [editorOffen, setEditorOffen] = useState(false)
   const [aktiveFrage, setAktiveFrage] = useState<Frage | null>(null)
-  const [filterFach, setFilterFach] = useState<string>('')
+  const [filterFach, setFilterFach] = useState<string>(initialFach ?? '')
   const [filterThema, setFilterThema] = useState<string>('')
+  const [filterUnterthema, setFilterUnterthema] = useState<string>('')
   const [filterTyp, setFilterTyp] = useState<string>('')
   const [suchtext, setSuchtext] = useState('')
   const [speichern, setSpeichern] = useState(false)
@@ -65,10 +72,9 @@ export default function AdminFragenbank() {
     setEditorOffen(true)
   }
 
-  // Frage löschen
+  // Frage löschen (Bestätigung erfolgt im Aufrufer — Editor oder Listenansicht)
   async function frageLoeschen(frage: Frage) {
     if (!aktiveGruppe) return
-    if (!confirm(`Frage "${getFragetext(frage)?.substring(0, 60) || frage.id}" wirklich löschen?`)) return
     try {
       await fragenAdapter.loescheFrage(aktiveGruppe.id, frage.id, frage.fachbereich)
       fragenAdapter.invalidateCache(aktiveGruppe.id)
@@ -96,20 +102,33 @@ export default function AdminFragenbank() {
     }
   }
 
-  // Filter-Optionen aus Daten ableiten
+  // Filter-Optionen aus Daten ableiten (hierarchisch: Fach → Thema → Unterthema)
   const faecher = [...new Set(fragen.map(f => f.fach))].sort()
-  const themen = [...new Set(fragen.filter(f => !filterFach || f.fach === filterFach).map(f => f.thema).filter(Boolean))].sort()
+  const themen = [...new Set(
+    fragen
+      .filter(f => !filterFach || f.fach === filterFach)
+      .map(f => f.thema)
+      .filter(Boolean)
+  )].sort()
+  const unterthemen = [...new Set(
+    fragen
+      .filter(f => (!filterFach || f.fach === filterFach) && (!filterThema || f.thema === filterThema))
+      .map(f => (f as { unterthema?: string }).unterthema)
+      .filter(Boolean)
+  )].sort() as string[]
   const typen = [...new Set(fragen.map(f => f.typ))].sort()
 
   const gefilterteFragen = fragen.filter(f => {
     if (filterFach && f.fach !== filterFach) return false
     if (filterThema && f.thema !== filterThema) return false
+    if (filterUnterthema && (f as { unterthema?: string }).unterthema !== filterUnterthema) return false
     if (filterTyp && f.typ !== filterTyp) return false
     if (suchtext) {
       const s = suchtext.toLowerCase()
       const text = getFragetext(f)?.toLowerCase() ?? ''
       const thema = f.thema?.toLowerCase() ?? ''
-      if (!text.includes(s) && !thema.includes(s)) return false
+      const unterthema = ((f as { unterthema?: string }).unterthema ?? '').toLowerCase()
+      if (!text.includes(s) && !thema.includes(s) && !unterthema.includes(s)) return false
     }
     return true
   })
@@ -149,7 +168,7 @@ export default function AdminFragenbank() {
         {faecher.length > 1 && (
           <div className="flex gap-2 flex-wrap">
             <button
-              onClick={() => { setFilterFach(''); setFilterThema('') }}
+              onClick={() => { setFilterFach(''); setFilterThema(''); setFilterUnterthema('') }}
               className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
                 !filterFach
                   ? 'bg-gray-800 text-white dark:bg-white dark:text-gray-800'
@@ -161,7 +180,7 @@ export default function AdminFragenbank() {
             {faecher.map(fach => (
               <button
                 key={fach}
-                onClick={() => { setFilterFach(fach === filterFach ? '' : fach); setFilterThema('') }}
+                onClick={() => { setFilterFach(fach === filterFach ? '' : fach); setFilterThema(''); setFilterUnterthema('') }}
                 className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
                   filterFach === fach
                     ? FACH_FARBEN_AKTIV[fach] || 'bg-gray-800 text-white dark:bg-white dark:text-gray-800'
@@ -174,16 +193,26 @@ export default function AdminFragenbank() {
           </div>
         )}
 
-        {/* Thema + Typ Filter */}
+        {/* Thema + Unterthema + Typ Filter */}
         <div className="flex gap-2 flex-wrap">
           {themen.length > 1 && (
             <select
               value={filterThema}
-              onChange={(e) => setFilterThema(e.target.value)}
+              onChange={(e) => { setFilterThema(e.target.value); setFilterUnterthema('') }}
               className="px-2 py-1 text-xs border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white"
             >
               <option value="">Alle Themen</option>
               {themen.map(t => <option key={t} value={t}>{t}</option>)}
+            </select>
+          )}
+          {filterThema && unterthemen.length > 0 && (
+            <select
+              value={filterUnterthema}
+              onChange={(e) => setFilterUnterthema(e.target.value)}
+              className="px-2 py-1 text-xs border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white"
+            >
+              <option value="">Alle Unterthemen</option>
+              {unterthemen.map(t => <option key={t} value={t}>{t}</option>)}
             </select>
           )}
           {typen.length > 1 && (
@@ -196,9 +225,9 @@ export default function AdminFragenbank() {
               {typen.map(t => <option key={t} value={t}>{t}</option>)}
             </select>
           )}
-          {(filterFach || filterThema || filterTyp || suchtext) && (
+          {(filterFach || filterThema || filterUnterthema || filterTyp || suchtext) && (
             <button
-              onClick={() => { setFilterFach(''); setFilterThema(''); setFilterTyp(''); setSuchtext('') }}
+              onClick={() => { setFilterFach(''); setFilterThema(''); setFilterUnterthema(''); setFilterTyp(''); setSuchtext('') }}
               className="px-2 py-1 text-xs text-red-500 hover:text-red-600 dark:text-red-400"
             >
               Filter zurücksetzen
@@ -256,7 +285,7 @@ export default function AdminFragenbank() {
                     </span>
                     {frage.thema && (
                       <span className="text-xs text-gray-400 dark:text-gray-500">
-                        · {frage.thema}
+                        · {frage.thema}{(frage as { unterthema?: string }).unterthema ? ` › ${(frage as { unterthema?: string }).unterthema}` : ''}
                       </span>
                     )}
                     <span className="text-xs text-gray-400">
@@ -265,7 +294,12 @@ export default function AdminFragenbank() {
                   </div>
                 </div>
                 <button
-                  onClick={(e) => { e.stopPropagation(); frageLoeschen(frage) }}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    if (confirm(`Frage "${getFragetext(frage)?.substring(0, 60) || frage.id}" wirklich löschen?`)) {
+                      frageLoeschen(frage)
+                    }
+                  }}
                   className="text-gray-300 hover:text-red-500 dark:text-gray-600 dark:hover:text-red-400 text-sm transition-colors cursor-pointer p-1"
                   title="Frage löschen"
                 >
@@ -285,6 +319,11 @@ export default function AdminFragenbank() {
             frage={aktiveFrage}
             onSpeichern={handleSpeichern}
             onAbbrechen={() => {
+              setEditorOffen(false)
+              setAktiveFrage(null)
+            }}
+            onLoeschen={async (frage) => {
+              await frageLoeschen(frage)
               setEditorOffen(false)
               setAktiveFrage(null)
             }}

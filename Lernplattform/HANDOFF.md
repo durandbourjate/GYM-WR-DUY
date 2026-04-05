@@ -2,10 +2,10 @@
 
 ## Aktueller Stand
 
-**Branch:** `main`
-**Phase:** Fortschritt pro Mitglied + Lernziele (05.04.2026)
+**Branch:** `fix/lernplattform-ux-bugs`
+**Phase:** Bug-Fixes + UX-Verbesserungen (05.04.2026)
 **Status:** TSC OK, 101 LP-Tests + 193 Pruefungs-Tests gruen, Build OK
-**Apps Script:** Deployed (Security-Hardening + 3 neue Endpoints)
+**Apps Script:** Aenderungen pending (User muss deployen)
 
 ### Architektur
 - **Ein Format:** Kanonisch aus `@shared/types/fragen` (discriminated union)
@@ -17,52 +17,49 @@
 
 ---
 
-## In dieser Session erledigt (05.04.2026)
+## In dieser Session erledigt (05.04.2026 — Nachmittag)
 
-### Security-Hardening
+### Bug-Fixes
 | # | Fix | Details |
 |---|-----|---------|
-| 1 | IDOR-Fix: generiereCode | Admin-Check + Audit-Log |
-| 2 | IDOR-Fix: einladen | Admin-Check + Audit-Log |
-| 3 | IDOR-Fix: entfernen | Admin-Check + Audit-Log |
-| 4 | IDOR-Fix: ladeMitglieder | Mitglied-Check |
-| 5 | Rate Limiting Login | 20 Versuche/10min |
-| 6 | Audit-Logging | AuditLog-Tab im Registry-Sheet |
-| 7 | Helper-Funktionen | istGruppenAdmin_, istGruppenMitglied_, auditLog_ |
-| 8 | Refactoring | speichereFrage + loescheFrage auf Helper |
+| 1 | FRAGENBANK_TABS dynamisch | Nicht mehr hardcoded auf 4 Tabs — liest alle Tabs aus dem Sheet (exkl. System-Tabs) |
+| 2 | Fachbereich-Mapping | "Allgemein" und "Wirtschaft & Recht" werden auf "Andere" gemappt (lila Badge) |
+| 3 | Bilder-Fix | resolveAssetUrl() erkennt Pool-Bild-Pfade (img/, pool-bilder/) und loest auf GitHub-Pages-URL auf |
+| 4 | PDF CSP-Fix | frame-src um blob:, Google Drive domains erweitert |
+| 5 | SuS leerer Screen | Geloest durch Fix #1 (fehlende Tabs wurden nicht geladen) |
 
-### Fortschritt + Lernziele Feature
+### UX-Verbesserungen
 | # | Feature | Details |
 |---|---------|---------|
-| 1 | Lernziel-Interface erweitert | +fragenIds (optional), poolId/aktiv optional |
-| 2 | SessionEintrag + LernzielStatus | Neue Typen in fortschritt.ts |
-| 3 | lernzielStatus() | Berechnet Status aus Fragen-Mastery (5 Tests) |
-| 4 | FortschrittService | Interface + AppsScript-Adapter (3 Endpoints) |
-| 5 | FortschrittStore erweitert | +gruppenFortschritt, +lernziele, +Selektoren (4 Tests) |
-| 6 | Backend: ladeGruppenFortschritt | Admin-only, alle SuS-Daten einer Gruppe |
-| 7 | Backend: ladeLernzieleV2 | Aus Lernziele-Tab (Gym: Fragenbank, Familie: Gruppen-Sheet) |
-| 8 | Backend: speichereLernziel | Admin-only, Upsert, erstellt Tab automatisch |
-| 9 | AdminKindDetail | Backend-Anbindung: Sessions, Dauerbaustellen, Mastery pro Thema |
-| 10 | Lernziele-Panel | Dynamische Checkliste aus Backend, Fallback auf statischen Text |
+| 1 | Loeschen im Editor | "Frage loeschen"-Button unten im SharedFragenEditor (rot, mit Bestaetigungsdialog) |
+| 2 | Hierarchische Filter | Fach → Thema → Unterthema (3 Ebenen), Unterthema-Dropdown nur wenn Thema gewaehlt |
+| 3 | Berechnung Feldgroessen | Bezeichnung groesser (flex-5), Ergebnis + Toleranz kompakter (w-24, w-20) |
+| 4 | Klickbare Fach-Karten | Admin-Uebersicht: Fach-Karten navigieren zur Fragenbank mit Fach-Filter vorausgewaehlt |
 
-### Lernziele-Tab Struktur
-| Spalte | Typ | Beschreibung |
-|--------|-----|-------------|
-| id | string | z.B. LZ-BWL-001 |
-| text | string | Lernziel-Beschreibung |
-| fach | string | BWL, VWL, Recht, Informatik |
-| thema | string | Zugehoeriges Thema |
-| bloom | string | K1-K6 |
-| fragenIds | string | Komma-separierte Fragen-IDs |
+---
+
+## Geaenderte Dateien
+
+| Datei | Aenderung |
+|-------|----------|
+| `apps-script/lernplattform-backend.js` | getFragenbankTabs_(), FACHBEREICH_MAPPING, parseFrageKanonisch_ Mapping |
+| `index.html` | CSP frame-src erweitert |
+| `src/utils/assetUrl.ts` | Pool-Bild-Pfade erkennen + auf Uebungen-URL aufloesen |
+| `src/components/admin/AdminFragenbank.tsx` | Hierarchische Filter, initialFach, onLoeschen, Andere-Farbe |
+| `src/components/admin/AdminUebersicht.tsx` | Klickbare Fach-Karten (onFachKlick) |
+| `src/components/admin/AdminDashboard.tsx` | Fach-Filter Routing (initialFach in Ansicht) |
+| `packages/shared/src/editor/SharedFragenEditor.tsx` | onLoeschen Prop + Button |
+| `packages/shared/src/editor/typen/BerechnungEditor.tsx` | Feldgroessen angepasst |
 
 ---
 
 ## Offene Punkte
 
 | # | Thema | Details | Aufwand |
-|---|-------|---------|---------|
-| 1 | **E2E-Browser-Test** | LP testet manuell: Admin-Ansicht (Kind-Detail), SuS-Ansicht (Lernziele-Panel) | Mittel |
-| 2 | **Lernziele-Tab erstellen** | Wird automatisch beim ersten speichereLernziel erstellt, oder manuell im Sheet (Spalten: id, text, fach, thema, bloom, fragenIds) | Manuell |
+|---|-------|---------|--------|
+| 1 | **Apps Script deployen** | User muss lernplattform-backend.js in Apps Script Editor kopieren + neue Bereitstellung erstellen | User |
+| 2 | **E2E-Browser-Test** | Nach Deploy: Bilder, PDFs, Filter, Loeschen, SuS-Ansicht testen | Mittel |
+| 3 | **Lernziele-Tab erstellen** | Wird automatisch beim ersten speichereLernziel erstellt, oder manuell im Sheet | Manuell |
 
 ---
 

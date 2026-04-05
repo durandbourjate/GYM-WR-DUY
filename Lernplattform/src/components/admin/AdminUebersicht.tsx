@@ -7,9 +7,10 @@ import { useLernKontext } from '../../hooks/useLernKontext'
 
 interface Props {
   onKindKlick: (email: string, name: string) => void
+  onFachKlick?: (fach: string) => void
 }
 
-export default function AdminUebersicht({ onKindKlick }: Props) {
+export default function AdminUebersicht({ onKindKlick, onFachKlick }: Props) {
   const { mitglieder, aktiveGruppe } = useGruppenStore()
   const { fachFarben } = useLernKontext()
   const lernende = mitglieder.filter(m => m.rolle !== 'admin')
@@ -75,9 +76,10 @@ export default function AdminUebersicht({ onKindKlick }: Props) {
             {fachStats.map(stat => {
               const farbe = getFachFarbe(stat.fach, fachFarben)
               return (
-                <div
+                <button
                   key={stat.fach}
-                  className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-100 dark:border-gray-700"
+                  onClick={() => onFachKlick?.(stat.fach)}
+                  className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-100 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 transition-colors text-left cursor-pointer"
                 >
                   <div className="flex items-center gap-2 mb-2">
                     <span
@@ -86,12 +88,15 @@ export default function AdminUebersicht({ onKindKlick }: Props) {
                     />
                     <span className="font-medium dark:text-white">{stat.fach}</span>
                   </div>
-                  <div className="flex gap-4 text-xs text-gray-500 dark:text-gray-400">
-                    <span>{stat.anzahl} Fragen</span>
-                    <span>{stat.themen.size} Themen</span>
-                    <span>{stat.typen.size} Typen</span>
+                  <div className="flex items-center justify-between">
+                    <div className="flex gap-4 text-xs text-gray-500 dark:text-gray-400">
+                      <span>{stat.anzahl} Fragen</span>
+                      <span>{stat.themen.size} Themen</span>
+                      <span>{stat.typen.size} Typen</span>
+                    </div>
+                    <span className="text-gray-300 dark:text-gray-600 text-lg">›</span>
                   </div>
-                </div>
+                </button>
               )
             })}
           </div>

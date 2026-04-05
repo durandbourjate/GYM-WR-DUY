@@ -12,7 +12,23 @@ const GRUPPEN_REGISTRY_ID = '1VH7Vu7JIKYLic2-wK2uSa2nXA7WVvStKOjUDi9cpWnI';
 const FRAGENBANK_ID = '1ASSRv7mSpmyD22PAMUJ8iekHwuamYkHpy9E6yxWNIVs'; // Shared mit Prüfungstool
 const LP_DOMAIN = 'gymhofwil.ch';
 const SUS_DOMAIN = 'stud.gymhofwil.ch';
-const FRAGENBANK_TABS = ['VWL', 'BWL', 'Recht', 'Informatik'];
+// Dynamisch: Alle Tabs im Fragenbank-Sheet ausser System-Tabs
+const FRAGENBANK_SYSTEM_TABS = ['Mitglieder', 'Lernziele', 'AuditLog', 'Konfiguration', 'Meta'];
+// Fachbereich-Mapping: Unklare Tab-Namen auf saubere Bezeichnungen mappen
+const FACHBEREICH_MAPPING = { 'Allgemein': 'Andere', 'Wirtschaft & Recht': 'Andere' };
+
+function getFragenbankTabs_() {
+  var fragenbank = SpreadsheetApp.openById(FRAGENBANK_ID);
+  var sheets = fragenbank.getSheets();
+  var tabs = [];
+  for (var i = 0; i < sheets.length; i++) {
+    var name = sheets[i].getName();
+    if (FRAGENBANK_SYSTEM_TABS.indexOf(name) === -1) {
+      tabs.push(name);
+    }
+  }
+  return tabs;
+}
 
 // === HELPER: JSON-Response ===
 
@@ -688,9 +704,10 @@ function lernplattformLadeFragen(body) {
   try {
     var fragenbank = SpreadsheetApp.openById(FRAGENBANK_ID);
     var alleFragen = [];
+    var fragenbankTabs = getFragenbankTabs_();
 
-    for (var t = 0; t < FRAGENBANK_TABS.length; t++) {
-      var tabName = FRAGENBANK_TABS[t];
+    for (var t = 0; t < fragenbankTabs.length; t++) {
+      var tabName = fragenbankTabs[t];
       var sheet = fragenbank.getSheetByName(tabName);
       if (!sheet) continue;
 
@@ -724,13 +741,16 @@ function lernplattformLadeFragen(body) {
 
 /** Frage aus einer Sheet-Zeile im kanonischen Format parsen (shared mit Prüfungstool) */
 function parseFrageKanonisch_(row, fachbereich) {
+  // Fachbereich-Mapping anwenden (z.B. "Allgemein" → "Andere")
+  var mappedFachbereich = FACHBEREICH_MAPPING[fachbereich] || fachbereich;
+  var mappedFach = FACHBEREICH_MAPPING[row.fach] || row.fach;
   var base = {
     id: row.id,
     version: Number(row.version) || 1,
     erstelltAm: row.erstelltAm || new Date().toISOString(),
     geaendertAm: row.geaendertAm || new Date().toISOString(),
-    fachbereich: fachbereich,
-    fach: row.fach || fachbereich,
+    fachbereich: mappedFachbereich,
+    fach: mappedFach || mappedFachbereich,
     thema: row.thema || '',
     unterthema: row.unterthema || '',
     semester: (row.semester || '').split(',').map(function(s) { return s.trim(); }).filter(Boolean),
@@ -972,15 +992,12 @@ function lernplattformSpeichereFrage(body) {
   }
 
   // Gym-Gruppen: Gemeinsame Fragenbank (wie Prüfungstool)
-  if (FRAGENBANK_TABS.indexOf(fachbereich) === -1) {
-    return jsonResponse({ success: false, error: 'Ungültiger Fachbereich: ' + fachbereich });
-  }
-
   try {
     var fragenbank = SpreadsheetApp.openById(FRAGENBANK_ID);
     var sheet = fragenbank.getSheetByName(fachbereich);
     if (!sheet) {
-      return jsonResponse({ success: false, error: 'Tab "' + fachbereich + '" nicht gefunden in Fragenbank' });
+      // Tab existiert noch nicht → automatisch erstellen
+      sheet = fragenbank.insertSheet(fachbereich);
     }
 
     var daten = sheet.getDataRange().getValues();
@@ -1110,8 +1127,8 @@ function lernplattformLoescheFrage(body) {
       ss = SpreadsheetApp.openById(gruppe.fragebankSheetId);
       sheet = ss.getSheetByName('Fragen');
     } else {
-      if (!fachbereich || FRAGENBANK_TABS.indexOf(fachbereich) === -1) {
-        return jsonResponse({ success: false, error: 'fachbereich fehlt oder ungültig' });
+      if (!fachbereich) {
+        return jsonResponse({ success: false, error: 'fachbereich fehlt' });
       }
       ss = SpreadsheetApp.openById(FRAGENBANK_ID);
       sheet = ss.getSheetByName(fachbereich);
@@ -1621,9 +1638,10 @@ function lernplattformLadeLernziele(body) {
 
   try {
     var fragenbank = SpreadsheetApp.openById(FRAGENBANK_ID);
-    var tabs = fachbereich && FRAGENBANK_TABS.indexOf(fachbereich) >= 0
+    var alleTabs = getFragenbankTabs_();
+    var tabs = fachbereich && alleTabs.indexOf(fachbereich) >= 0
       ? [fachbereich]
-      : FRAGENBANK_TABS;
+      : alleTabs;
 
     var lernziele = [];
     var gesehen = {};

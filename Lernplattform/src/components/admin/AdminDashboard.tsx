@@ -15,7 +15,7 @@ type AdminAnsicht =
   | { typ: 'uebersicht' }
   | { typ: 'auftraege' }
   | { typ: 'einstellungen' }
-  | { typ: 'fragenbank' }
+  | { typ: 'fragenbank'; initialFach?: string }
   | { typ: 'kind'; email: string; name: string }
   | { typ: 'thema'; email: string; name: string; fach: string; thema: string }
 
@@ -92,6 +92,7 @@ export default function AdminDashboard({ onZuUeben: _onZuUeben }: AdminDashboard
         {ansicht.typ === 'uebersicht' && (
           <AdminUebersicht
             onKindKlick={(email, name) => setAnsicht({ typ: 'kind', email, name })}
+            onFachKlick={(fach) => setAnsicht({ typ: 'fragenbank', initialFach: fach })}
           />
         )}
         {ansicht.typ === 'kind' && (
@@ -103,7 +104,7 @@ export default function AdminDashboard({ onZuUeben: _onZuUeben }: AdminDashboard
           />
         )}
         {ansicht.typ === 'auftraege' && <AdminAuftraege />}
-        {ansicht.typ === 'fragenbank' && <AdminFragenbank />}
+        {ansicht.typ === 'fragenbank' && <AdminFragenbank initialFach={ansicht.initialFach} />}
         {ansicht.typ === 'einstellungen' && <AdminSettings />}
         {ansicht.typ === 'thema' && (
           <AdminThemaDetail
