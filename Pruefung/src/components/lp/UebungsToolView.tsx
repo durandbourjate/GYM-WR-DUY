@@ -146,7 +146,7 @@ export default function UebungsToolView() {
             >
               <div className="font-medium dark:text-white">{g.name}</div>
               <div className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                {g.typ === 'familie' ? 'Familie' : 'Schule'} · {g.mitglieder.length} Mitglieder
+                {g.typ === 'familie' ? 'Familie' : 'Schule'}{g.mitglieder?.length ? ` · ${g.mitglieder.length} Mitglieder` : ''}
               </div>
             </button>
           ))}
