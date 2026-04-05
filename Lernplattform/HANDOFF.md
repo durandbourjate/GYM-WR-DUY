@@ -1,40 +1,59 @@
-# Übungstool — HANDOFF
+# Uebungstool — HANDOFF
 
 ## Aktueller Stand
 
-**Branch:** `main`
-**Phase:** UI-Verbesserungen (05.04.2026)
-**Status:** TSC OK, 92 LP-Tests + 193 Prüfungs-Tests grün, Build OK
-**Apps Script:** Deployed (Frage löschen + KI/Upload/Lernziele + ANTHROPIC_API_KEY)
+**Branch:** `feature/fortschritt-lernziele`
+**Phase:** Fortschritt pro Mitglied + Lernziele (05.04.2026)
+**Status:** TSC OK, 101 LP-Tests + 193 Pruefungs-Tests gruen, Build OK
+**Apps Script:** Muss neu deployed werden (3 neue Endpoints + Security-Hardening)
 
 ### Architektur
 - **Ein Format:** Kanonisch aus `@shared/types/fragen` (discriminated union)
-- **Eine Fragenbank:** `FRAGENBANK_ID` = Prüfungstool-Sheet (Gym-Gruppen), eigenes Sheet (Familie)
-- **Ein Editor:** SharedFragenEditor mit allen Features (KI, Anhänge, Sharing, Lernziele)
-- **Kein Adapter:** Keine Konvertierung zwischen LP und Prüfungstool-Format
-- **CSS:** Identisch mit Prüfungstool (input-field, slate-Farben, Kontrast)
+- **Eine Fragenbank:** `FRAGENBANK_ID` = Pruefungstool-Sheet (Gym-Gruppen), eigenes Sheet (Familie)
+- **Ein Editor:** SharedFragenEditor mit allen Features (KI, Anhaenge, Sharing, Lernziele)
+- **Kein Adapter:** Keine Konvertierung zwischen LP und Pruefungstool-Format
+- **CSS:** Identisch mit Pruefungstool (input-field, slate-Farben, Kontrast)
 - **Kontenrahmen:** KMU-Kontenrahmen (CH) geladen in beiden EditorProviders
 
 ---
 
 ## In dieser Session erledigt (05.04.2026)
 
-### Bugfix-Runde 3 (Editor-Bugs)
-| # | Bug/Feature | Fix |
-|---|-------------|-----|
-| 1 | AnhangEditor fehlt | Nach shared verschoben, Default im SharedFragenEditor |
-| 2 | PDFEditor fehlt | Nach shared verschoben, Default im TypEditorDispatcher |
-| 3 | mediaUtils | Nach shared verschoben, Pruefung re-exportiert |
-| 4 | Bild-Preview relativ | `resolvePoolBildUrl()` in 4 Editoren |
-| 5 | Fachbereich "W&R" | `mapFachbereich()` korrigiert, Fallback Allgemein |
-| 6 | Pool-Import 6 Typen | sortierung, formel, hotspot, bildbeschriftung, dragdrop_bild, code |
+### Security-Hardening
+| # | Fix | Details |
+|---|-----|---------|
+| 1 | IDOR-Fix: generiereCode | Admin-Check + Audit-Log |
+| 2 | IDOR-Fix: einladen | Admin-Check + Audit-Log |
+| 3 | IDOR-Fix: entfernen | Admin-Check + Audit-Log |
+| 4 | IDOR-Fix: ladeMitglieder | Mitglied-Check |
+| 5 | Rate Limiting Login | 20 Versuche/10min |
+| 6 | Audit-Logging | AuditLog-Tab im Registry-Sheet |
+| 7 | Helper-Funktionen | istGruppenAdmin_, istGruppenMitglied_, auditLog_ |
+| 8 | Refactoring | speichereFrage + loescheFrage auf Helper |
 
-### UI-Verbesserungen
-| # | Bug/Feature | Fix |
-|---|-------------|-----|
-| 7 | Filter hierarchisch | Thema-Dropdown abhängig von Fach-Filter, Reset bei Fach-Wechsel |
-| 8 | Kopfzeile Lernziele | 🏁-Button im Header (Dashboard), ausklappbares Panel mit Mastery-Erklärung |
-| 9 | Übersicht-Tab | Fragen-Statistiken nach Fach (Anzahl, Themen, Typen) in AdminUebersicht |
+### Fortschritt + Lernziele Feature
+| # | Feature | Details |
+|---|---------|---------|
+| 1 | Lernziel-Interface erweitert | +fragenIds (optional), poolId/aktiv optional |
+| 2 | SessionEintrag + LernzielStatus | Neue Typen in fortschritt.ts |
+| 3 | lernzielStatus() | Berechnet Status aus Fragen-Mastery (5 Tests) |
+| 4 | FortschrittService | Interface + AppsScript-Adapter (3 Endpoints) |
+| 5 | FortschrittStore erweitert | +gruppenFortschritt, +lernziele, +Selektoren (4 Tests) |
+| 6 | Backend: ladeGruppenFortschritt | Admin-only, alle SuS-Daten einer Gruppe |
+| 7 | Backend: ladeLernzieleV2 | Aus Lernziele-Tab (Gym: Fragenbank, Familie: Gruppen-Sheet) |
+| 8 | Backend: speichereLernziel | Admin-only, Upsert, erstellt Tab automatisch |
+| 9 | AdminKindDetail | Backend-Anbindung: Sessions, Dauerbaustellen, Mastery pro Thema |
+| 10 | Lernziele-Panel | Dynamische Checkliste aus Backend, Fallback auf statischen Text |
+
+### Lernziele-Tab Struktur
+| Spalte | Typ | Beschreibung |
+|--------|-----|-------------|
+| id | string | z.B. LZ-BWL-001 |
+| text | string | Lernziel-Beschreibung |
+| fach | string | BWL, VWL, Recht, Informatik |
+| thema | string | Zugehoeriges Thema |
+| bloom | string | K1-K6 |
+| fragenIds | string | Komma-separierte Fragen-IDs |
 
 ---
 
@@ -42,9 +61,10 @@
 
 | # | Thema | Details | Aufwand |
 |---|-------|---------|---------|
-| 1 | **E2E-Test im Browser** | Editor öffnen, Bild-Frage bearbeiten, PDF-Editor, Filter testen | Mittel |
-| 2 | **Fortschritt pro Mitglied (Backend)** | Backend-Endpoint um Mastery-Daten aller SuS abzurufen — aktuell nur client-seitig | Gross |
-| 3 | **Lernziele aus Backend** | Lernziele im Lernziele-Panel dynamisch laden statt statischer Text | Mittel |
+| 1 | **E2E-Browser-Test** | Gesamtes Feature im Browser testen (Editor, Lernziele-Panel, Admin-Ansicht) | Mittel |
+| 2 | **Merge zu main** | Nach E2E-Test + LP-Freigabe | Klein |
+| 3 | **Apps Script Deploy** | User muss Code in Editor kopieren + neue Bereitstellung | Manuell |
+| 4 | **Lernziele-Tab erstellen** | Wird automatisch beim ersten speichereLernziel erstellt, oder manuell im Sheet | Manuell |
 
 ---
 
