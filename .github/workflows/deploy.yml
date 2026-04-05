@@ -31,7 +31,6 @@ jobs:
             packages/shared/package-lock.json
             Unterrichtsplaner/package-lock.json
             Pruefung/package-lock.json
-            Lernplattform/package-lock.json
 
       - name: Install Shared dependencies
         working-directory: packages/shared
@@ -56,17 +55,15 @@ jobs:
           VITE_APPS_SCRIPT_URL: ${{ secrets.VITE_APPS_SCRIPT_URL }}
         run: npx tsc -b && npx vite build
 
-      - name: Install Lernplattform dependencies
-        working-directory: Lernplattform
-        run: npm ci
-
-      - name: Build Lernplattform
-        working-directory: Lernplattform
+      # Lernplattform: Zweiter Build aus Pruefung-Source mit VITE_APP_MODE=lernen
+      - name: Build Lernplattform (from Pruefung source)
+        working-directory: Pruefung
         env:
+          VITE_APP_MODE: lernen
           VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
           VITE_APPS_SCRIPT_URL: ${{ secrets.VITE_LERNPLATTFORM_APPS_SCRIPT_URL }}
           VITE_BASE_PATH: /GYM-WR-DUY/Lernplattform/
-        run: npx tsc -b && npx vite build
+        run: npx vite build --outDir dist-lernen
 
       # Combine: repo root (Uebungen etc.) + Unterrichtsplaner + Pruefung + Lernplattform builds
       - name: Prepare combined site
@@ -80,7 +77,7 @@ jobs:
           # Copy Pruefung build output
           cp -r Pruefung/dist/* _site/Pruefung/
           # Copy Lernplattform build output
-          cp -r Lernplattform/dist/* _site/Lernplattform/
+          cp -r Pruefung/dist-lernen/* _site/Lernplattform/
           # Clean up macOS artifacts
           find _site -name '.DS_Store' -delete
 

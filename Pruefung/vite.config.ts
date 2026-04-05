@@ -4,10 +4,32 @@ import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
 import path from 'path'
 
-// Base-Path: Standard = Production, überschreibbar für Staging via VITE_BASE_PATH
-const basePath = process.env.VITE_BASE_PATH || '/GYM-WR-DUY/Pruefung/'
+// Dual-Build: VITE_APP_MODE bestimmt Prüfungs- oder Übungsmodus
+const appMode = process.env.VITE_APP_MODE || 'pruefung'
+const istLernen = appMode === 'lernen'
+
+// Base-Path: Standard = Production, überschreibbar via VITE_BASE_PATH
+const defaultBasePath = istLernen ? '/GYM-WR-DUY/Lernplattform/' : '/GYM-WR-DUY/Pruefung/'
+const basePath = process.env.VITE_BASE_PATH || defaultBasePath
 // RegExp für navigateFallbackAllowlist aus basePath ableiten
 const basePathEscaped = basePath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
+// PWA-Manifest je nach Modus
+const pwaManifest = istLernen
+  ? {
+      name: 'Übungstool — Gymnasium Hofwil',
+      short_name: 'Übungstool',
+      description: 'Digitales Übungstool zum Lernen und Üben',
+      theme_color: '#171717',
+      background_color: '#fafafa',
+    }
+  : {
+      name: 'Prüfungstool — Gymnasium Hofwil',
+      short_name: 'Prüfungstool',
+      description: 'Digitales Prüfungstool',
+      theme_color: '#1e40af',
+      background_color: '#f8fafc',
+    }
 
 export default defineConfig({
   base: basePath,
@@ -27,11 +49,7 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['icon.svg'],
       manifest: {
-        name: 'Prüfungstool — Gymnasium Hofwil',
-        short_name: 'Prüfungstool',
-        description: 'Digitales Prüfungstool',
-        theme_color: '#1e40af',
-        background_color: '#f8fafc',
+        ...pwaManifest,
         display: 'standalone',
         scope: basePath,
         start_url: basePath,
@@ -49,8 +67,16 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
         navigateFallback: 'index.html',
         navigateFallbackAllowlist: [new RegExp(`^${basePathEscaped}(\\/|$)`)],
-        // Statische Dateien (PDFs, Bilder, Audio/Video) NICHT durch SPA-Fallback ersetzen
+        // Statische Dateien NICHT durch SPA-Fallback ersetzen
         navigateFallbackDenylist: [/\.pdf$/i, /\.png$/i, /\.jpg$/i, /\.jpeg$/i, /\.gif$/i, /\.svg$/i, /\.mp3$/i, /\.mp4$/i, /\.webm$/i, /\/materialien\//],
+        ...(istLernen ? {
+          // Übungstool: Bilder für Pool-Fragen cachen
+          runtimeCaching: [{
+            urlPattern: /\.(?:png|jpg|jpeg|svg|gif)$/i,
+            handler: 'CacheFirst',
+            options: { cacheName: 'images', expiration: { maxEntries: 500, maxAgeSeconds: 30 * 24 * 60 * 60 } }
+          }]
+        } : {}),
       },
     }),
   ],

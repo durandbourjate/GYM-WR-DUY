@@ -5,9 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite --port 5174",
+    "dev:lernen": "VITE_APP_MODE=lernen vite --port 5175",
     "build": "tsc -b && vite build",
+    "build:lernen": "VITE_APP_MODE=lernen tsc -b && VITE_APP_MODE=lernen vite build --outDir dist-lernen",
     "lint": "eslint .",
     "preview": "vite preview",
+    "preview:lernen": "VITE_APP_MODE=lernen vite preview --outDir dist-lernen",
     "test": "vitest run",
     "test:watch": "vitest"
   },
