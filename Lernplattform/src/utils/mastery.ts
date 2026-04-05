@@ -1,4 +1,5 @@
-import type { MasteryStufe, FragenFortschritt } from '../types/fortschritt'
+import type { MasteryStufe, FragenFortschritt, LernzielStatus } from '../types/fortschritt'
+import type { Lernziel } from '@shared/types/fragen'
 
 const GEFESTIGT_SCHWELLE = 3
 const GEMEISTERT_SCHWELLE = 5
@@ -40,6 +41,33 @@ export function aktualisiereFortschritt(
     letzterVersuch: new Date().toISOString(),
     mastery,
   }
+}
+
+export function lernzielStatus(
+  lernziel: Lernziel,
+  fortschritte: Record<string, FragenFortschritt>
+): LernzielStatus {
+  const ids = lernziel.fragenIds
+  if (!ids || ids.length === 0) return 'offen'
+
+  let gemeistert = 0
+  let gefestigtOderBesser = 0
+  let geuebt = 0
+
+  for (const id of ids) {
+    const fp = fortschritte[id]
+    if (!fp) continue
+    switch (fp.mastery) {
+      case 'gemeistert': gemeistert++; gefestigtOderBesser++; geuebt++; break
+      case 'gefestigt': gefestigtOderBesser++; geuebt++; break
+      case 'ueben': geuebt++; break
+    }
+  }
+
+  if (gemeistert === ids.length) return 'gemeistert'
+  if (gefestigtOderBesser / ids.length >= 0.5) return 'gefestigt'
+  if (geuebt > 0) return 'inArbeit'
+  return 'offen'
 }
 
 export function istDauerbaustelle(

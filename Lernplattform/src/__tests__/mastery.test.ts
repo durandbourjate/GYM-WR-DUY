@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
-import { berechneMastery, aktualisiereFortschritt } from '../utils/mastery'
+import { berechneMastery, aktualisiereFortschritt, lernzielStatus } from '../utils/mastery'
 import type { FragenFortschritt } from '../types/fortschritt'
+import type { Lernziel } from '@shared/types/fragen'
 
 function macheFortschritt(overrides: Partial<FragenFortschritt> = {}): FragenFortschritt {
   return {
@@ -89,5 +90,42 @@ describe('aktualisiereFortschritt', () => {
     const f = macheFortschritt({ sessionIds: ['s1'] })
     const result = aktualisiereFortschritt(f, true, 's1')
     expect(result.sessionIds).toEqual(['s1'])
+  })
+})
+
+describe('lernzielStatus', () => {
+  const lz: Lernziel = { id: 'LZ-1', fach: 'BWL', thema: 'Bilanz', text: 'Test', bloom: 'K3', fragenIds: ['f1', 'f2', 'f3'] }
+
+  it('gibt offen zurück wenn alle Fragen neu', () => {
+    expect(lernzielStatus(lz, {})).toBe('offen')
+  })
+
+  it('gibt inArbeit zurück wenn mindestens eine Frage geübt', () => {
+    const fp: Record<string, FragenFortschritt> = {
+      f1: macheFortschritt({ fragenId: 'f1', versuche: 1, richtig: 1, richtigInFolge: 1, sessionIds: ['s1'], mastery: 'ueben' })
+    }
+    expect(lernzielStatus(lz, fp)).toBe('inArbeit')
+  })
+
+  it('gibt gefestigt zurück wenn >=50% gefestigt/gemeistert', () => {
+    const fp: Record<string, FragenFortschritt> = {
+      f1: macheFortschritt({ fragenId: 'f1', versuche: 5, richtig: 5, richtigInFolge: 5, sessionIds: ['s1', 's2'], mastery: 'gemeistert' }),
+      f2: macheFortschritt({ fragenId: 'f2', versuche: 3, richtig: 3, richtigInFolge: 3, sessionIds: ['s1'], mastery: 'gefestigt' })
+    }
+    expect(lernzielStatus(lz, fp)).toBe('gefestigt')
+  })
+
+  it('gibt gemeistert zurück wenn alle Fragen gemeistert', () => {
+    const fp: Record<string, FragenFortschritt> = {
+      f1: macheFortschritt({ fragenId: 'f1', mastery: 'gemeistert' }),
+      f2: macheFortschritt({ fragenId: 'f2', mastery: 'gemeistert' }),
+      f3: macheFortschritt({ fragenId: 'f3', mastery: 'gemeistert' })
+    }
+    expect(lernzielStatus(lz, fp)).toBe('gemeistert')
+  })
+
+  it('behandelt Lernziel ohne fragenIds als offen', () => {
+    const lzOhne: Lernziel = { id: 'LZ-2', fach: 'BWL', thema: 'X', text: 'Test', bloom: 'K1' }
+    expect(lernzielStatus(lzOhne, {})).toBe('offen')
   })
 })
