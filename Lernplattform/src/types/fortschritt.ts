@@ -29,3 +29,15 @@ export interface ThemenFortschritt {
   gemeistert: number
   quote: number
 }
+
+export interface SessionEintrag {
+  sessionId: string
+  email: string
+  fach: string
+  thema: string
+  datum: string
+  anzahlFragen: number
+  richtig: number
+}
+
+export type LernzielStatus = 'offen' | 'inArbeit' | 'gefestigt' | 'gemeistert'

@@ -621,11 +621,12 @@ export type Frage = MCFrage | FreitextFrage | ZuordnungFrage | LueckentextFrage 
 export interface Lernziel {
   id: string
   fach: string
-  poolId: string
+  poolId?: string
   thema: string
   text: string
   bloom: string
-  aktiv: boolean
+  aktiv?: boolean
+  fragenIds?: string[]
 }
 
 // === PERFORMANCE-TRACKING ===
