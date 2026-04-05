@@ -5,7 +5,7 @@ import AdminKindDetail from './AdminKindDetail'
 import AdminThemaDetail from './AdminThemaDetail'
 import AdminAuftraege from './AdminAuftraege'
 import AdminSettings from './AdminSettings'
-import AdminFragenbank from './AdminFragenbank'
+// AdminFragenbank entfernt — Fragenbank ist über LPHeader erreichbar
 
 interface AdminDashboardProps {
   onZuUeben?: () => void
@@ -15,7 +15,6 @@ type AdminAnsicht =
   | { typ: 'uebersicht' }
   | { typ: 'auftraege' }
   | { typ: 'einstellungen' }
-  | { typ: 'fragenbank'; initialFach?: string }
   | { typ: 'kind'; email: string; name: string }
   | { typ: 'thema'; email: string; name: string; fach: string; thema: string }
 
@@ -31,30 +30,24 @@ export default function AdminDashboard({ onZuUeben: _onZuUeben }: AdminDashboard
     }
   }
 
-  const istHauptTab = ansicht.typ === 'uebersicht' || ansicht.typ === 'auftraege' || ansicht.typ === 'einstellungen' || ansicht.typ === 'fragenbank'
+  const istHauptTab = ansicht.typ === 'uebersicht' || ansicht.typ === 'auftraege' || ansicht.typ === 'einstellungen'
 
   return (
     <div>
-      {/* Breadcrumb / Titel */}
-      <div className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-6 py-3">
-        <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            {!istHauptTab && (
-              <button onClick={zurueck} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 min-w-[44px] min-h-[44px] flex items-center justify-center">
-                &#8592;
-              </button>
-            )}
-            <div>
-              <h2 className="text-lg font-bold dark:text-white">
-                {istHauptTab && 'Admin-Dashboard'}
-                {ansicht.typ === 'kind' && ansicht.name}
-                {ansicht.typ === 'thema' && `${ansicht.name} — ${ansicht.thema}`}
-              </h2>
-              {aktiveGruppe && <span className="text-xs text-slate-500">{aktiveGruppe.name}</span>}
-            </div>
+      {/* Breadcrumb bei Detail-Ansichten */}
+      {!istHauptTab && (
+        <div className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-6 py-3">
+          <div className="max-w-4xl mx-auto flex items-center gap-3">
+            <button onClick={zurueck} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 min-w-[44px] min-h-[44px] flex items-center justify-center">
+              &#8592;
+            </button>
+            <h2 className="text-lg font-bold dark:text-white">
+              {ansicht.typ === 'kind' && ansicht.name}
+              {ansicht.typ === 'thema' && `${ansicht.name} — ${ansicht.thema}`}
+            </h2>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Tab-Leiste */}
       {istHauptTab && (
@@ -73,12 +66,6 @@ export default function AdminDashboard({ onZuUeben: _onZuUeben }: AdminDashboard
               Aufträge
             </button>
             <button
-              onClick={() => setAnsicht({ typ: 'fragenbank' })}
-              className={`py-3 text-sm font-medium border-b-2 transition-colors ${ansicht.typ === 'fragenbank' ? 'border-slate-800 text-slate-800 dark:border-slate-200 dark:text-slate-200' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
-            >
-              Fragenbank
-            </button>
-            <button
               onClick={() => setAnsicht({ typ: 'einstellungen' })}
               className={`py-3 text-sm font-medium border-b-2 transition-colors ${ansicht.typ === 'einstellungen' ? 'border-slate-800 text-slate-800 dark:border-slate-200 dark:text-slate-200' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
             >
@@ -92,7 +79,7 @@ export default function AdminDashboard({ onZuUeben: _onZuUeben }: AdminDashboard
         {ansicht.typ === 'uebersicht' && (
           <AdminUebersicht
             onKindKlick={(email, name) => setAnsicht({ typ: 'kind', email, name })}
-            onFachKlick={(fach) => setAnsicht({ typ: 'fragenbank', initialFach: fach })}
+            onFachKlick={() => {}}
           />
         )}
         {ansicht.typ === 'kind' && (
@@ -104,7 +91,6 @@ export default function AdminDashboard({ onZuUeben: _onZuUeben }: AdminDashboard
           />
         )}
         {ansicht.typ === 'auftraege' && <AdminAuftraege />}
-        {ansicht.typ === 'fragenbank' && <AdminFragenbank initialFach={ansicht.initialFach} />}
         {ansicht.typ === 'einstellungen' && <AdminSettings />}
         {ansicht.typ === 'thema' && (
           <AdminThemaDetail

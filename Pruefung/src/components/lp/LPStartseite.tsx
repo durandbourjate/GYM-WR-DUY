@@ -252,6 +252,9 @@ export default function LPStartseite() {
             </>
           ) : (
             <>
+              <button onClick={() => { setZeigHilfe(false); setZeigFragenbank(true) }} className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer">
+                + Neue Frage
+              </button>
               <button onClick={() => setModus('pruefung')} className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer">
                 Prüfungstool
               </button>
@@ -469,7 +472,9 @@ export default function LPStartseite() {
         )}
       </main>
 
-      {/* Fragenbank Overlay */}
+      </>}
+
+      {/* Fragenbank Overlay (beide Modi) */}
       {zeigFragenbank && (
         <FragenBrowser
           onHinzufuegen={() => setZeigFragenbank(false)}
@@ -478,12 +483,10 @@ export default function LPStartseite() {
         />
       )}
 
-      {/* Hilfe Overlay */}
+      {/* Hilfe Overlay (beide Modi) */}
       {zeigHilfe && (
         <HilfeSeite onSchliessen={() => setZeigHilfe(false)} />
       )}
-
-      </>}
     </div>
   )
 }

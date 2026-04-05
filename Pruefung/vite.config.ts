@@ -35,6 +35,7 @@ export default defineConfig({
   base: basePath,
   define: {
     __BUILD_TIMESTAMP__: JSON.stringify(new Date().toISOString()),
+    __BUILD_DATE__: JSON.stringify(new Date().toLocaleDateString('de-CH', { day: '2-digit', month: '2-digit', year: 'numeric' })),
   },
   resolve: {
     alias: {

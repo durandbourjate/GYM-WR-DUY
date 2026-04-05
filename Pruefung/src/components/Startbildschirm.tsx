@@ -8,6 +8,7 @@ import { istImSEB } from '../services/sebService.ts'
 import { erkenneGeraet } from '../hooks/useGeraetErkennung.ts'
 import { formatDatum } from '../utils/zeit.ts'
 import ThemeToggle from './ThemeToggle.tsx'
+import FeedbackButton from './shared/FeedbackButton.tsx'
 
 interface Props {
   config: PruefungsConfig
@@ -136,16 +137,17 @@ export default function Startbildschirm({ config, fragen, alleFragen, wiederherg
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900 p-4 relative">
         <div className="absolute top-4 right-4 flex items-center gap-3">
+          <FeedbackButton variant="icon" context={{ rolle: 'sus', ort: 'warteraum' }} />
+          <ThemeToggle />
           {user && (
             <button
               onClick={abmelden}
               title="Abmelden"
-              className="text-xs text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors cursor-pointer"
+              className="text-sm text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors cursor-pointer"
             >
               Abmelden
             </button>
           )}
-          <ThemeToggle />
         </div>
 
         <div className="max-w-lg w-full bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-blue-200 dark:border-blue-800 p-8">
@@ -202,18 +204,19 @@ export default function Startbildschirm({ config, fragen, alleFragen, wiederherg
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900 p-4 relative">
-      {/* Abmelden + Theme-Toggle oben rechts */}
+      {/* Feedback + Theme-Toggle + Abmelden oben rechts */}
       <div className="absolute top-4 right-4 flex items-center gap-3">
+        <FeedbackButton variant="icon" context={{ rolle: 'sus', ort: 'startbildschirm' }} />
+        <ThemeToggle />
         {user && (
           <button
             onClick={abmelden}
             title="Abmelden"
-            className="text-xs text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors cursor-pointer"
+            className="text-sm text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors cursor-pointer"
           >
             Abmelden
           </button>
         )}
-        <ThemeToggle />
       </div>
 
       <div className="max-w-lg w-full bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700 p-8">

@@ -155,25 +155,39 @@ export default function UebungsToolView() {
     )
   }
 
+  // Mitglieder-Stats aus dem Store (haben Rollen-Info)
+  const storeMitglieder = useLernenGruppenStore(s => s.mitglieder)
+  const lernende = storeMitglieder.filter(m => m.rolle !== 'admin').length
+  const admins = storeMitglieder.filter(m => m.rolle === 'admin').length
+
   // AdminDashboard mit Gruppen-Kontext
   return (
     <LernKontextProvider>
       <div className="relative">
-        {/* Gruppen-Wechsler wenn mehrere Gruppen */}
-        {gruppen.length > 1 && (
-          <div className="max-w-5xl mx-auto px-6 pt-3 flex items-center gap-2">
-            <span className="text-sm text-slate-500 dark:text-slate-400">Gruppe:</span>
-            <select
-              value={aktiveGruppe.id}
-              onChange={e => handleGruppeWaehlen(e.target.value)}
-              className="text-sm px-2 py-1 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-md dark:text-slate-200"
-            >
-              {gruppen.map(g => (
-                <option key={g.id} value={g.id}>{g.name}</option>
-              ))}
-            </select>
+        {/* Gruppen-Info-Bar */}
+        <div className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-6 py-2">
+          <div className="max-w-4xl mx-auto flex items-center gap-3">
+            {gruppen.length > 1 ? (
+              <>
+                <span className="text-sm text-slate-500 dark:text-slate-400">Gruppe:</span>
+                <select
+                  value={aktiveGruppe.id}
+                  onChange={e => handleGruppeWaehlen(e.target.value)}
+                  className="text-sm px-2 py-1 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-md dark:text-slate-200 font-medium"
+                >
+                  {gruppen.map(g => (
+                    <option key={g.id} value={g.id}>{g.name}</option>
+                  ))}
+                </select>
+              </>
+            ) : (
+              <span className="text-sm font-medium text-slate-700 dark:text-slate-200">{aktiveGruppe.name}</span>
+            )}
+            <span className="text-sm text-slate-400 dark:text-slate-500">
+              {lernende} Lernende · {admins} Admin{admins !== 1 ? 's' : ''}
+            </span>
           </div>
-        )}
+        </div>
         <AdminDashboard />
       </div>
     </LernKontextProvider>
