@@ -25,6 +25,8 @@ interface FragenFilterErgebnis {
   setFilterBloom: (v: BloomStufe | '') => void
   filterThema: string
   setFilterThema: (v: string) => void
+  filterUnterthema: string
+  setFilterUnterthema: (v: string) => void
   filterQuelle: FilterQuelle
   setFilterQuelle: (v: FilterQuelle) => void
   filterPoolStatus: FilterPoolStatus
@@ -46,6 +48,7 @@ interface FragenFilterErgebnis {
 
   // Berechnete Werte
   verfuegbareThemen: [string, number][]
+  verfuegbareUnterthemen: [string, number][]
   gefilterteFragen: Frage[]
   sortierteFragen: Frage[]
   gruppierteAnzeige: { key: string; label: string; fragen: Frage[] }[]
@@ -68,6 +71,7 @@ export function useFragenFilter(
   const [filterTyp, setFilterTyp] = useState<string>('')
   const [filterBloom, setFilterBloom] = useState<BloomStufe | ''>('')
   const [filterThema, setFilterThema] = useState('')
+  const [filterUnterthema, setFilterUnterthema] = useState('')
   const [filterQuelle, setFilterQuelle] = useState<FilterQuelle>('alle')
   const [filterPoolStatus, setFilterPoolStatus] = useState<FilterPoolStatus>('alle')
   const [filterMitAnhang, setFilterMitAnhang] = useState(false)
@@ -88,15 +92,25 @@ export function useFragenFilter(
   // eslint-disable-next-line react-hooks/exhaustive-deps — aufgeklappteGruppen absichtlich ausgeschlossen (wuerde Loop verursachen)
   }, [ladeStatus, alleFragen, gruppierung])
 
-  // Verfügbare Themen (für Filter-Dropdown)
+  // Verfügbare Themen (nur Thema, ohne Unterthema)
   const verfuegbareThemen = useMemo(() => {
     const themen = new Map<string, number>()
     for (const f of alleFragen) {
-      const key = f.thema + (f.unterthema ? ` \u203A ${f.unterthema}` : '')
-      themen.set(key, (themen.get(key) || 0) + 1)
+      themen.set(f.thema, (themen.get(f.thema) || 0) + 1)
     }
     return Array.from(themen.entries()).sort((a, b) => a[0].localeCompare(b[0]))
   }, [alleFragen])
+
+  // Verfügbare Unterthemen (kaskadierend: nur passend zum gewählten Thema)
+  const verfuegbareUnterthemen = useMemo(() => {
+    const unterthemen = new Map<string, number>()
+    for (const f of alleFragen) {
+      if (!f.unterthema) continue
+      if (filterThema && f.thema !== filterThema) continue
+      unterthemen.set(f.unterthema, (unterthemen.get(f.unterthema) || 0) + 1)
+    }
+    return Array.from(unterthemen.entries()).sort((a, b) => a[0].localeCompare(b[0]))
+  }, [alleFragen, filterThema])
 
   // Filtern
   const gefilterteFragen = useMemo(() => {
@@ -104,10 +118,8 @@ export function useFragenFilter(
       if (filterFachbereich && f.fachbereich !== filterFachbereich) return false
       if (filterTyp && f.typ !== filterTyp) return false
       if (filterBloom && f.bloom !== filterBloom) return false
-      if (filterThema) {
-        const key = f.thema + (f.unterthema ? ` \u203A ${f.unterthema}` : '')
-        if (key !== filterThema && f.thema !== filterThema) return false
-      }
+      if (filterThema && f.thema !== filterThema) return false
+      if (filterUnterthema && f.unterthema !== filterUnterthema) return false
       // Quelle-Filter (zusammengelegt: Meine = mein Autor, Pool = aus Pool)
       if (filterQuelle === 'meine' && userEmail && f.autor && f.autor !== userEmail) return false
       if (filterQuelle === 'fachschaft' && f.geteilt !== 'fachschaft') return false
@@ -138,7 +150,7 @@ export function useFragenFilter(
       }
       return true
     })
-  }, [alleFragen, filterFachbereich, filterTyp, filterBloom, filterThema, filterQuelle, filterPoolStatus, filterMitAnhang, suchtext, userEmail])
+  }, [alleFragen, filterFachbereich, filterTyp, filterBloom, filterThema, filterUnterthema, filterQuelle, filterPoolStatus, filterMitAnhang, suchtext, userEmail])
 
   // Sortieren
   const sortierteFragen = useMemo(() => {
@@ -190,7 +202,7 @@ export function useFragenFilter(
   }, [gefilterteFragen])
 
   // Aktive Filter zählen
-  const aktiveFilter = [filterFachbereich, filterTyp, filterBloom, filterThema, suchtext, filterQuelle !== 'alle' ? filterQuelle : '', filterPoolStatus !== 'alle' ? filterPoolStatus : '', filterMitAnhang ? 'anhang' : ''].filter(Boolean).length
+  const aktiveFilter = [filterFachbereich, filterTyp, filterBloom, filterThema, filterUnterthema, suchtext, filterQuelle !== 'alle' ? filterQuelle : '', filterPoolStatus !== 'alle' ? filterPoolStatus : '', filterMitAnhang ? 'anhang' : ''].filter(Boolean).length
 
   function filterZuruecksetzen(): void {
     setSuchtext('')
@@ -198,6 +210,7 @@ export function useFragenFilter(
     setFilterTyp('')
     setFilterBloom('')
     setFilterThema('')
+    setFilterUnterthema('')
     setFilterQuelle('alle')
     setFilterPoolStatus('alle')
     setFilterMitAnhang(false)
@@ -209,6 +222,7 @@ export function useFragenFilter(
     filterTyp, setFilterTyp,
     filterBloom, setFilterBloom,
     filterThema, setFilterThema,
+    filterUnterthema, setFilterUnterthema,
     filterQuelle, setFilterQuelle,
     filterPoolStatus, setFilterPoolStatus,
     filterMitAnhang, setFilterMitAnhang,
@@ -218,6 +232,7 @@ export function useFragenFilter(
     angezeigteMenge, setAngezeigteMenge,
     kompaktModus, setKompaktModus,
     verfuegbareThemen,
+    verfuegbareUnterthemen,
     gefilterteFragen,
     sortierteFragen,
     gruppierteAnzeige,

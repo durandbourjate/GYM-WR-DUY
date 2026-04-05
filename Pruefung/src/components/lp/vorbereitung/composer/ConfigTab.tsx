@@ -22,7 +22,7 @@ export default function ConfigTab({ pruefung, updatePruefung, toggleFachbereich 
               type="text"
               value={pruefung.titel}
               onChange={(e) => updatePruefung({ titel: e.target.value })}
-              placeholder="z.B. Prüfung VWL/Recht — Markt & Verträge"
+              placeholder={pruefung.typ === 'formativ' ? 'z.B. Übung VWL — Markt' : 'z.B. Prüfung VWL/Recht — Markt & Verträge'}
               className="input-field"
             />
           </Field>
@@ -102,7 +102,7 @@ export default function ConfigTab({ pruefung, updatePruefung, toggleFachbereich 
       </Section>
 
       {/* Prüfungsparameter */}
-      <Section titel="Prüfungsparameter">
+      <Section titel={pruefung.typ === 'formativ' ? 'Übungsparameter' : 'Prüfungsparameter'}>
         {/* Zeitmodus */}
         <div className="mb-4">
           <label className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1.5">Zeitmodus</label>
@@ -123,7 +123,7 @@ export default function ConfigTab({ pruefung, updatePruefung, toggleFachbereich 
           </div>
           {(pruefung.zeitModus ?? 'countdown') === 'open-end' && (
             <p className="mt-1.5 text-xs text-slate-500 dark:text-slate-400">
-              Kein Zeitlimit. Beenden Sie die Prüfung manuell im Monitoring.
+              Kein Zeitlimit. Beenden Sie die {pruefung.typ === 'formativ' ? 'Übung' : 'Prüfung'} manuell im Monitoring.
             </p>
           )}
         </div>
@@ -142,32 +142,9 @@ export default function ConfigTab({ pruefung, updatePruefung, toggleFachbereich 
           </Field>
           )}
 
-          <Field label="Typ">
-            <select
-              value={pruefung.typ}
-              onChange={(e) => {
-                const neuerTyp = e.target.value as 'summativ' | 'formativ'
-                if (neuerTyp === 'formativ' && pruefung.typ !== 'formativ') {
-                  // Formativ-Defaults automatisch setzen
-                  updatePruefung({
-                    typ: 'formativ',
-                    modus: 'uebung',
-                    sebErforderlich: false,
-                    kontrollStufe: 'keine',
-                    zeitModus: 'open-end',
-                    zeitanzeigeTyp: 'keine',
-                  })
-                } else {
-                  updatePruefung({ typ: neuerTyp })
-                }
-              }}
-              className="input-field"
-            >
-              <option value="summativ">Summativ (benotet)</option>
-              <option value="formativ">Formativ (unbenotet)</option>
-            </select>
-          </Field>
+          {/* Typ-Dropdown ausgeblendet — wird automatisch über den Modus (Prüfen/Üben) gesetzt */}
 
+          {pruefung.typ !== 'formativ' && (
           <Field label="Gesamtpunkte">
             <input
               type="number"
@@ -177,6 +154,7 @@ export default function ConfigTab({ pruefung, updatePruefung, toggleFachbereich 
               className="input-field"
             />
           </Field>
+          )}
         </div>
       </Section>
 
@@ -464,7 +442,7 @@ function MaterialienSection({ materialien, setMaterialien }: {
   return (
     <Section titel="Materialien (Hilfsmittel)">
       <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">
-        Referenzmaterialien für SuS während der Prüfung (z.B. Gesetzestexte, Formeln, Nachschlagewerke).
+        Referenzmaterialien für SuS (z.B. Gesetzestexte, Formeln, Nachschlagewerke).
       </p>
 
       {/* Bestehende Materialien */}

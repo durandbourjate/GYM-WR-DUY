@@ -397,7 +397,7 @@ export default function VorbereitungPhase({ config, onTeilnehmerGesetzt, onWeite
 
       {/* Prüfungs-Sharing */}
       <div className="border border-slate-200 dark:border-slate-700 rounded-lg p-4">
-        <h3 className="text-sm font-medium text-slate-700 dark:text-slate-200 mb-3">Prüfung teilen</h3>
+        <h3 className="text-sm font-medium text-slate-700 dark:text-slate-200 mb-3">{config.typ === 'formativ' ? 'Übung teilen' : 'Prüfung teilen'}</h3>
         <BerechtigungenEditor
           berechtigungen={berechtigungen}
           onChange={(neueB) => {

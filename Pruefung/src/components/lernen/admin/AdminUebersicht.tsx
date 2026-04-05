@@ -70,7 +70,7 @@ export default function AdminUebersicht({ onKindKlick, onFachKlick }: Props) {
       {!laden && fachStats.length > 0 && (
         <div>
           <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-3">
-            Fragenbank
+            Fragensammlung
           </h4>
           <div className="grid gap-2 sm:grid-cols-2">
             {fachStats.map(stat => {

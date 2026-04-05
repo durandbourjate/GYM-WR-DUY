@@ -16,6 +16,8 @@ import TrackerSection from './TrackerSection.tsx'
 // demoPruefung entfernt — nur noch Einrichtungsprüfung im Demo-Modus
 import { einrichtungsPruefung } from '../../data/einrichtungsPruefung.ts'
 import { einrichtungsFragen } from '../../data/einrichtungsFragen.ts'
+import { einrichtungsUebung } from '../../data/einrichtungsUebung.ts'
+import { einrichtungsUebungFragen } from '../../data/einrichtungsUebungFragen.ts'
 import { speichereConfig, speichereFrage } from '../../services/fragenbankApi.ts'
 
 /** Startseite für Lehrpersonen: Prüfungen verwalten + erstellen */
@@ -29,11 +31,20 @@ export default function LPStartseite() {
   const [ansicht, setAnsicht] = useState<'liste' | 'composer'>('liste')
   const [editConfig, setEditConfig] = useState<PruefungsConfig | null>(null)
   const [composerKey, setComposerKey] = useState(0)
-  const [zeigFragenbank, setZeigFragenbank] = useState(false)
   const [zeigHilfe, setZeigHilfe] = useState(false)
-  const [modus, setModus] = useState<'pruefung' | 'uebung'>('pruefung')
+  const [modus, setModusRaw] = useState<'pruefung' | 'uebung' | 'fragensammlung'>(() => {
+    try {
+      const gespeichert = sessionStorage.getItem('lp-modus')
+      if (gespeichert === 'pruefung' || gespeichert === 'uebung' || gespeichert === 'fragensammlung') return gespeichert
+    } catch { /* ignore */ }
+    return 'pruefung'
+  })
+  const setModus = (m: 'pruefung' | 'uebung' | 'fragensammlung') => {
+    setModusRaw(m)
+    try { sessionStorage.setItem('lp-modus', m) } catch { /* ignore */ }
+  }
   const [listenTab, setListenTab] = useState<'pruefungen' | 'tracker'>('pruefungen')
-  const [uebungsTab, setUebungsTab] = useState<'lernplattform' | 'uebungen'>('lernplattform')
+  const [uebungsTab, setUebungsTab] = useState<'uebungen' | 'durchfuehren'>('uebungen')
   const [trackerDaten, setTrackerDaten] = useState<TrackerDaten | null>(null)
 
   // Such- und Filterstate
@@ -142,6 +153,33 @@ export default function LPStartseite() {
     }
   }
 
+  // Einführungsübung ins Backend synchronisieren (einmalig)
+  const UEBUNG_SYNC_KEY = 'einrichtung-uebung-sync-version'
+  const UEBUNG_SYNC_VERSION = `${einrichtungsUebung.id}-${einrichtungsUebung.gesamtpunkte}`
+
+  async function syncEinrichtungsUebung(email: string, backendConfigs: PruefungsConfig[]): Promise<void> {
+    try { if (localStorage.getItem(UEBUNG_SYNC_KEY) === UEBUNG_SYNC_VERSION) return } catch { /* ignore */ }
+
+    const backendVersion = backendConfigs.find(c => c.id === einrichtungsUebung.id)
+    if (backendVersion && backendVersion.gesamtpunkte === einrichtungsUebung.gesamtpunkte) {
+      try { localStorage.setItem(UEBUNG_SYNC_KEY, UEBUNG_SYNC_VERSION) } catch { /* ignore */ }
+      return
+    }
+
+    console.log('[LP] Einführungsübung sync starten...', backendVersion ? 'update' : 'neu')
+    try {
+      await speichereConfig(email, { ...einrichtungsUebung, erstelltVon: email })
+      for (let i = 0; i < einrichtungsUebungFragen.length; i += 5) {
+        const batch = einrichtungsUebungFragen.slice(i, i + 5)
+        await Promise.all(batch.map(f => speichereFrage(email, f)))
+      }
+      try { localStorage.setItem(UEBUNG_SYNC_KEY, UEBUNG_SYNC_VERSION) } catch { /* ignore */ }
+      console.log(`[LP] Einführungsübung sync fertig (${einrichtungsUebungFragen.length} Fragen)`)
+    } catch (error) {
+      console.error('[LP] Einführungsübung sync fehlgeschlagen:', error)
+    }
+  }
+
   // Alle Prüfungs-Configs + Tracker-Daten laden
   useEffect(() => {
     async function lade(): Promise<void> {
@@ -166,11 +204,15 @@ export default function LPStartseite() {
       if (configResult) {
         setConfigs(configResult)
         setBackendFehler(false)
-        // Einrichtungsprüfung im Hintergrund synchronisieren
-        syncEinrichtungsPruefung(user.email, configResult).then(() => {
-          // Nach Sync: Configs neu laden falls Einrichtungsprüfung neu hinzugekommen ist
+        // Einrichtungsprüfung + Einführungsübung im Hintergrund synchronisieren
+        Promise.all([
+          syncEinrichtungsPruefung(user.email, configResult),
+          syncEinrichtungsUebung(user.email, configResult),
+        ]).then(() => {
+          // Nach Sync: Configs neu laden falls Einrichtungsprüfung/Übung neu hinzugekommen ist
           const hatEinrichtung = configResult.some(c => c.id === einrichtungsPruefung.id)
-          if (!hatEinrichtung) {
+          const hatUebung = configResult.some(c => c.id === einrichtungsUebung.id)
+          if (!hatEinrichtung || !hatUebung) {
             apiService.ladeAlleConfigs(user.email).then(r => { if (r) setConfigs(r) })
           }
         })
@@ -255,39 +297,21 @@ export default function LPStartseite() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
       <LPHeader
-        titel={modus === 'pruefung' ? 'Prüfungstool' : 'Übungstool'}
         untertitel={user ? `${user.name} · Lehrperson` : undefined}
-        ansichtsButtons={
+        modus={modus}
+        onModusChange={setModus}
+        aktionsButtons={
           modus === 'pruefung' ? (
-            <>
-              <button onClick={handleNeue} className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer">
-                + Neue Prüfung
-              </button>
-              <button
-                onClick={() => setModus('uebung')}
-                title="Zum Übungstool wechseln"
-                className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
-              >
-                Übungstool
-              </button>
-            </>
-          ) : (
-            <>
-              <button onClick={handleNeueUebung} className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer">
-                + Neue Übung
-              </button>
-              <button onClick={() => { setZeigHilfe(false); setZeigFragenbank(true) }} className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer">
-                + Neue Frage
-              </button>
-              <button onClick={() => setModus('pruefung')} className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer">
-                Prüfungstool
-              </button>
-            </>
-          )
+            <button onClick={handleNeue} className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer">
+              + Neue Prüfung
+            </button>
+          ) : modus === 'uebung' ? (
+            <button onClick={handleNeueUebung} className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer">
+              + Neue Übung
+            </button>
+          ) : undefined
         }
-        onFragenbank={() => { setZeigHilfe(false); setZeigFragenbank(!zeigFragenbank) }}
-        onHilfe={() => { setZeigFragenbank(false); setZeigHilfe(!zeigHilfe) }}
-        fragebankOffen={zeigFragenbank}
+        onHilfe={() => { setZeigHilfe(!zeigHilfe) }}
         hilfeOffen={zeigHilfe}
       />
 
@@ -295,18 +319,8 @@ export default function LPStartseite() {
       {modus === 'uebung' && (
         <>
           {/* Tab-Leiste */}
-          <div className="max-w-5xl mx-auto px-6 pt-4">
+          <div className="px-6 pt-4">
             <div className="flex gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-lg w-fit">
-              <button
-                onClick={() => setUebungsTab('lernplattform')}
-                className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors cursor-pointer ${
-                  uebungsTab === 'lernplattform'
-                    ? 'bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 shadow-sm'
-                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
-                }`}
-              >
-                Lernplattform
-              </button>
               <button
                 onClick={() => setUebungsTab('uebungen')}
                 className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors cursor-pointer ${
@@ -315,16 +329,26 @@ export default function LPStartseite() {
                     : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
                 }`}
               >
-                Übungen durchführen
+                Übungen
+              </button>
+              <button
+                onClick={() => setUebungsTab('durchfuehren')}
+                className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors cursor-pointer ${
+                  uebungsTab === 'durchfuehren'
+                    ? 'bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 shadow-sm'
+                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
+                }`}
+              >
+                Übung durchführen
               </button>
             </div>
           </div>
 
           {/* Tab-Content */}
-          {uebungsTab === 'lernplattform' && <UebungsToolView />}
+          {uebungsTab === 'uebungen' && <UebungsToolView />}
 
-          {uebungsTab === 'uebungen' && (
-            <main className="max-w-5xl mx-auto p-6">
+          {uebungsTab === 'durchfuehren' && (
+            <main className="p-6">
               {ladeStatus === 'laden' && (
                 <p className="text-slate-500 dark:text-slate-400 text-center py-12">Übungen werden geladen...</p>
               )}
@@ -361,7 +385,7 @@ export default function LPStartseite() {
       {/* Prüfungstool-Ansicht */}
       {modus === 'pruefung' && <>
       {/* Tab-Leiste */}
-      <div className="max-w-5xl mx-auto px-6 pt-4">
+      <div className="px-6 pt-4">
         <div className="flex gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-lg w-fit">
           <button
             onClick={() => setListenTab('pruefungen')}
@@ -387,7 +411,7 @@ export default function LPStartseite() {
       </div>
 
       {/* Content */}
-      <main className="max-w-5xl mx-auto p-6">
+      <main className="p-6">
         {ladeStatus === 'laden' && (
           <p className="text-slate-500 dark:text-slate-400 text-center py-12">
             Prüfungen werden geladen...
@@ -563,16 +587,19 @@ export default function LPStartseite() {
 
       </>}
 
-      {/* Fragenbank Overlay (beide Modi) */}
-      {zeigFragenbank && (
-        <FragenBrowser
-          onHinzufuegen={() => setZeigFragenbank(false)}
-          onSchliessen={() => setZeigFragenbank(false)}
-          bereitsVerwendet={[]}
-        />
+      {/* Fragensammlung als Vollseiteninhalt */}
+      {modus === 'fragensammlung' && (
+        <main className="p-6">
+          <FragenBrowser
+            inline
+            onHinzufuegen={() => {}}
+            onSchliessen={() => setModus('pruefung')}
+            bereitsVerwendet={[]}
+          />
+        </main>
       )}
 
-      {/* Hilfe Overlay (beide Modi) */}
+      {/* Hilfe Overlay (alle Modi) */}
       {zeigHilfe && (
         <HilfeSeite onSchliessen={() => setZeigHilfe(false)} />
       )}

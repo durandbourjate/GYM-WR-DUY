@@ -10,6 +10,8 @@ interface Props {
   anzahlMitNachteilsausgleich?: number
   /** Anzahl aktiver SuS (für Bestätigungstext) */
   anzahlAktiv?: number
+  /** Formative Übung → Labels anpassen */
+  istFormativ?: boolean
   onBeendet: () => void
   onAbbrechen: () => void
 }
@@ -20,6 +22,7 @@ export default function BeendenDialog({
   einzelnerSuS,
   anzahlMitNachteilsausgleich = 0,
   anzahlAktiv = 0,
+  istFormativ = false,
   onBeendet,
   onAbbrechen,
 }: Props) {
@@ -79,9 +82,10 @@ export default function BeendenDialog({
     }
   }
 
+  const label = istFormativ ? 'Übung' : 'Prüfung'
   const zielText = einzelnerSuS
-    ? `Prüfung für ${einzelnerSuS.name} beenden`
-    : `Prüfung für ${anzahlAktiv} aktive SuS beenden`
+    ? `${label} für ${einzelnerSuS.name} beenden`
+    : `${label} für ${anzahlAktiv} aktive SuS beenden`
 
   // 1-Schritt-Dialog: Modus wählen + direkt beenden
   return (
@@ -181,7 +185,7 @@ export default function BeendenDialog({
             disabled={lade}
             className="px-4 py-2 text-sm bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors cursor-pointer disabled:opacity-50"
           >
-            {lade ? 'Wird beendet...' : 'Prüfung beenden'}
+            {lade ? 'Wird beendet...' : `${label} beenden`}
           </button>
         </div>
       </div>

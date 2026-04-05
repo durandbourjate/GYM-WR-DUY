@@ -63,7 +63,7 @@ export const leereUebung: PruefungsConfig = {
   modus: 'uebung',
   zeitModus: 'open-end',
   dauerMinuten: 0,
-  kontrollStufe: 'keine',
+  kontrollStufe: 'locker',
   zeitanzeigeTyp: 'keine',
 }
 
@@ -351,7 +351,7 @@ export default function PruefungsComposer({ config, onZurueck, onDuplizieren }: 
           : autoSaveStatus === 'gespeichert' && speicherStatus === 'idle' ? 'Automatisch gespeichert ✓'
           : undefined
         }
-        ansichtsButtons={
+        aktionsButtons={
           <div className="flex items-center gap-1">
             {config && onDuplizieren && (
               <button
@@ -371,15 +371,15 @@ export default function PruefungsComposer({ config, onZurueck, onDuplizieren }: 
             </button>
           </div>
         }
-        onFragenbank={() => { setZeigHilfe(false); setZeigFragenBrowser(!zeigFragenBrowser) }}
+        onFragensammlung={() => { setZeigHilfe(false); setZeigFragenBrowser(!zeigFragenBrowser) }}
         onHilfe={() => { setZeigFragenBrowser(false); setZeigHilfe(!zeigHilfe) }}
-        fragebankOffen={zeigFragenBrowser}
+        fragensammlungOffen={zeigFragenBrowser}
         hilfeOffen={zeigHilfe}
       />
 
       {/* Tabs */}
       <div className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-6">
-        <div className="max-w-5xl mx-auto flex gap-1">
+        <div className="flex gap-1">
           {([
             { key: 'config' as ComposerTab, label: 'Einstellungen' },
             { key: 'abschnitte' as ComposerTab, label: `Abschnitte & Fragen (${gesamtFragen})` },
@@ -406,7 +406,7 @@ export default function PruefungsComposer({ config, onZurueck, onDuplizieren }: 
       </div>
 
       {/* Content */}
-      <main className="max-w-5xl mx-auto p-6">
+      <main className="p-6">
         {tab === 'config' && (
           <ConfigTab pruefung={pruefung} updatePruefung={updatePruefung} toggleFachbereich={toggleFachbereich} />
         )}
@@ -444,7 +444,7 @@ export default function PruefungsComposer({ config, onZurueck, onDuplizieren }: 
               onClick={() => setZeigLoeschPruefung(true)}
               className="text-sm text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 cursor-pointer transition-colors"
             >
-              Prüfung löschen...
+              {pruefung.typ === 'formativ' ? 'Übung löschen...' : 'Prüfung löschen...'}
             </button>
           </div>
         )}
@@ -458,7 +458,7 @@ export default function PruefungsComposer({ config, onZurueck, onDuplizieren }: 
           onSchliessen={() => { setZeigFragenBrowser(false); setInitialEditFrageId(undefined) }}
           bereitsVerwendet={pruefung.abschnitte.flatMap((a) => a.fragenIds)}
           initialEditFrageId={initialEditFrageId}
-          zielPruefungTitel={pruefung.titel || 'Neue Prüfung'}
+          zielPruefungTitel={pruefung.titel || (pruefung.typ === 'formativ' ? 'Neue Übung' : 'Neue Prüfung')}
           zielAbschnittTitel={pruefung.abschnitte[zielAbschnittIndex]?.titel}
           onFrageAktualisiert={handleFrageAktualisiert}
         />
@@ -485,7 +485,7 @@ export default function PruefungsComposer({ config, onZurueck, onDuplizieren }: 
               Abschnitt löschen?
             </h3>
             <p className="text-sm text-slate-600 dark:text-slate-300 mb-5">
-              Abschnitt &laquo;{loeschDialog.titel}&raquo; wirklich löschen? Die enthaltenen Fragen werden aus der Prüfung entfernt.
+              Abschnitt &laquo;{loeschDialog.titel}&raquo; wirklich löschen? Die enthaltenen Fragen werden entfernt.
             </p>
             <div className="flex gap-3">
               <button
@@ -510,13 +510,13 @@ export default function PruefungsComposer({ config, onZurueck, onDuplizieren }: 
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-6 max-w-sm w-full">
             <h3 className="text-lg font-bold text-red-600 dark:text-red-400 mb-2">
-              Prüfung löschen?
+              {pruefung.typ === 'formativ' ? 'Übung löschen?' : 'Prüfung löschen?'}
             </h3>
             <p className="text-sm text-slate-600 dark:text-slate-300 mb-2">
-              &laquo;{pruefung.titel || 'Unbenannte Prüfung'}&raquo; unwiderruflich löschen?
+              &laquo;{pruefung.titel || (pruefung.typ === 'formativ' ? 'Unbenannte Übung' : 'Unbenannte Prüfung')}&raquo; unwiderruflich löschen?
             </p>
             <p className="text-xs text-slate-500 dark:text-slate-400 mb-5">
-              Die Prüfungskonfiguration wird aus dem System entfernt. Bereits abgegebene Antworten bleiben in Google Drive erhalten.
+              Die Konfiguration wird aus dem System entfernt. Bereits abgegebene Antworten bleiben in Google Drive erhalten.
             </p>
             <div className="flex gap-3">
               <button

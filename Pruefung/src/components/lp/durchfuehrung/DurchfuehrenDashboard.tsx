@@ -334,7 +334,7 @@ export default function DurchfuehrenDashboard({ pruefungId }: { pruefungId: stri
     )
   }
 
-  const titel = config?.titel || daten.pruefungTitel || pruefungId || 'Prüfung'
+  const titel = config?.titel || daten.pruefungTitel || pruefungId || (config?.typ === 'formativ' ? 'Übung' : 'Prüfung')
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex flex-col">
@@ -342,7 +342,7 @@ export default function DurchfuehrenDashboard({ pruefungId }: { pruefungId: stri
         titel={config?.typ === 'formativ' ? 'Übung durchführen' : 'Prüfung durchführen'}
         untertitel={`${titel}${istDemoModus ? ' (Demo)' : ''}`}
         zurueck={zurueck}
-        ansichtsButtons={
+        aktionsButtons={
           <>
             <button
               onClick={() => setAutoRefresh(!autoRefresh)}
@@ -374,9 +374,9 @@ export default function DurchfuehrenDashboard({ pruefungId }: { pruefungId: stri
             )}
           </>
         }
-        onFragenbank={() => { setZeigHilfe(false); setZeigFragenbank(!zeigFragenbank) }}
+        onFragensammlung={() => { setZeigHilfe(false); setZeigFragenbank(!zeigFragenbank) }}
         onHilfe={() => { setZeigFragenbank(false); setZeigHilfe(!zeigHilfe) }}
-        fragebankOffen={zeigFragenbank}
+        fragensammlungOffen={zeigFragenbank}
         hilfeOffen={zeigHilfe}
       />
 

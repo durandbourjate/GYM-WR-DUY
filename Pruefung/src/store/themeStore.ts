@@ -33,10 +33,15 @@ export const useThemeStore = create<ThemeState>()(
 
       toggleMode: () => {
         const current = get().mode
-        // Zyklus: light → dark → system → light
-        const next: ThemeMode = current === 'light' ? 'dark' : current === 'dark' ? 'system' : 'light'
-        set({ mode: next })
-        applyTheme(next)
+        // 2-Stufen-Toggle: system ↔ manuell (Gegenteil der System-Präferenz)
+        if (current === 'system') {
+          const next: ThemeMode = systemPrefersDark() ? 'light' : 'dark'
+          set({ mode: next })
+          applyTheme(next)
+        } else {
+          set({ mode: 'system' })
+          applyTheme('system')
+        }
       },
     }),
     {

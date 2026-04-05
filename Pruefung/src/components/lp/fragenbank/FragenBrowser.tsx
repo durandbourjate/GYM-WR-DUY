@@ -31,10 +31,12 @@ interface Props {
   zielAbschnittTitel?: string
   /** Callback wenn eine Frage erstellt/aktualisiert wird (für fragenMap-Sync) */
   onFrageAktualisiert?: (frage: Frage) => void
+  /** Inline-Modus: als reguläre Seitenkomponente statt Overlay rendern */
+  inline?: boolean
 }
 
-/** Overlay-Panel zum Durchsuchen und Auswählen von Fragen aus der Fragenbank */
-export default function FragenBrowser({ onHinzufuegen, onEntfernen, onSchliessen, bereitsVerwendet, initialEditFrageId, zielPruefungTitel, zielAbschnittTitel, onFrageAktualisiert }: Props) {
+/** Panel zum Durchsuchen und Auswählen von Fragen aus der Fragensammlung (Overlay oder Inline) */
+export default function FragenBrowser({ onHinzufuegen, onEntfernen, onSchliessen, bereitsVerwendet, initialEditFrageId, zielPruefungTitel, zielAbschnittTitel, onFrageAktualisiert, inline }: Props) {
   const user = useAuthStore((s) => s.user)
   const istDemoModus = useAuthStore((s) => s.istDemoModus)
 
@@ -199,6 +201,210 @@ export default function FragenBrowser({ onHinzufuegen, onEntfernen, onSchliessen
     }
   }
 
+  // Inline-Modus: als reguläre Seitenkomponente rendern (kein Overlay)
+  if (inline) {
+    return (
+      <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 flex flex-col overflow-hidden">
+        {/* Header mit Suche + Filter */}
+        <FragenBrowserHeader
+          ladeStatus={ladeStatus}
+          gefilterteFragen={filter.gefilterteFragen}
+          stats={filter.stats}
+          verfuegbareThemen={filter.verfuegbareThemen}
+          verfuegbareUnterthemen={filter.verfuegbareUnterthemen}
+          aktiveFilter={filter.aktiveFilter}
+          seitenGroesse={filter.seitenGroesse}
+          suchtext={filter.suchtext}
+          setSuchtext={filter.setSuchtext}
+          filterFachbereich={filter.filterFachbereich}
+          setFilterFachbereich={filter.setFilterFachbereich}
+          filterTyp={filter.filterTyp}
+          setFilterTyp={filter.setFilterTyp}
+          filterBloom={filter.filterBloom}
+          setFilterBloom={filter.setFilterBloom}
+          filterThema={filter.filterThema}
+          setFilterThema={filter.setFilterThema}
+          filterUnterthema={filter.filterUnterthema}
+          setFilterUnterthema={filter.setFilterUnterthema}
+          filterPoolStatus={filter.filterPoolStatus}
+          setFilterPoolStatus={filter.setFilterPoolStatus}
+          filterMitAnhang={filter.filterMitAnhang}
+          setFilterMitAnhang={filter.setFilterMitAnhang}
+          filterZuruecksetzen={filter.filterZuruecksetzen}
+          sortierung={filter.sortierung}
+          setSortierung={filter.setSortierung}
+          gruppierung={filter.gruppierung}
+          setGruppierung={filter.setGruppierung}
+          setAufgeklappteGruppen={filter.setAufgeklappteGruppen}
+          setAngezeigteMenge={filter.setAngezeigteMenge}
+          kompaktModus={filter.kompaktModus}
+          setKompaktModus={filter.setKompaktModus}
+          onNeueFrageErstellen={() => { setEditFrage(null); setZeigEditor(true) }}
+          onBatchExport={() => setZeigBatchExport(true)}
+          onImport={() => setZeigImport(true)}
+          onSchliessen={onSchliessen}
+          inline
+          listeRef={listeRef}
+        />
+
+        {/* Fragen-Liste */}
+        <div ref={listeRef} className="flex-1 overflow-auto">
+          {ladeStatus === 'laden' && (
+            <p className="text-sm text-slate-500 dark:text-slate-400 text-center py-8">
+              Fragensammlung wird geladen...
+            </p>
+          )}
+
+          {ladeStatus === 'fertig' && filter.gefilterteFragen.length === 0 && (
+            <p className="text-sm text-slate-500 dark:text-slate-400 text-center py-8">
+              Keine Fragen gefunden.
+            </p>
+          )}
+
+          {ladeStatus === 'fertig' && filter.gefilterteFragen.length > 0 && (
+            <div>
+              {filter.gruppierteAnzeige.map((gruppe) => {
+                const istAufgeklappt = filter.gruppierung === 'keine' || filter.aufgeklappteGruppen.has(gruppe.key)
+                const inPruefungInGruppe = gruppe.fragen.filter((f) => bereitsVerwendetSet.has(f.id)).length
+
+                return (
+                  <div key={gruppe.key || '_alle'}>
+                    {filter.gruppierung !== 'keine' && (
+                      <div
+                        className="sticky top-0 z-10 flex items-center gap-2 px-5 py-2 bg-slate-100 dark:bg-slate-700/80 border-b border-slate-200 dark:border-slate-600 cursor-pointer select-none"
+                        onClick={() => toggleGruppe(gruppe.key)}
+                      >
+                        <span className="text-xs text-slate-500 dark:text-slate-400 w-4">
+                          {istAufgeklappt ? '\u25BC' : '\u25B6'}
+                        </span>
+                        <span className={`text-sm font-semibold ${gruppenLabelFarbe(gruppe.key, filter.gruppierung)}`}>
+                          {gruppenLabel(gruppe.key, filter.gruppierung)}
+                        </span>
+                        <span className="text-xs text-slate-500 dark:text-slate-400">
+                          {gruppe.fragen.length}
+                          {inPruefungInGruppe > 0 && (
+                            <span className="ml-1 text-blue-600 dark:text-blue-400">({inPruefungInGruppe} in Prüfung)</span>
+                          )}
+                        </span>
+                      </div>
+                    )}
+
+                    {istAufgeklappt && (
+                      <div className={filter.kompaktModus ? '' : 'px-4 py-2 space-y-1.5'}>
+                        {gruppe.fragen.map((frage) => (
+                          filter.kompaktModus
+                            ? <KompaktZeile
+                                key={frage.id}
+                                frage={frage}
+                                istInPruefung={bereitsVerwendetSet.has(frage.id)}
+                                onToggle={() => toggleFrageInPruefung(frage.id)}
+                                onEdit={() => { setEditFrage(frage); setZeigEditor(true) }}
+                                onDuplizieren={() => handleFrageDuplizieren(frage)}
+                                zeigeGruppierung={filter.gruppierung}
+                                performance={fragenStats.get(frage.id)}
+                              />
+                            : <DetailKarte
+                                key={frage.id}
+                                frage={frage}
+                                istInPruefung={bereitsVerwendetSet.has(frage.id)}
+                                onToggle={() => toggleFrageInPruefung(frage.id)}
+                                onEdit={() => { setEditFrage(frage); setZeigEditor(true) }}
+                                onLoeschen={() => setLoeschKandidat(frage)}
+                                onDuplizieren={() => handleFrageDuplizieren(frage)}
+                                performance={fragenStats.get(frage.id)}
+                              />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+
+              {filter.gruppierung === 'keine' && filter.angezeigteMenge < filter.sortierteFragen.length && (
+                <div className="px-5 py-4 text-center">
+                  <button
+                    onClick={() => filter.setAngezeigteMenge((p) => p + filter.seitenGroesse)}
+                    className="px-4 py-2 text-sm text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors cursor-pointer"
+                  >
+                    Weitere {Math.min(filter.seitenGroesse, filter.sortierteFragen.length - filter.angezeigteMenge)} von {filter.sortierteFragen.length} laden
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Fragen-Editor Overlay */}
+        {zeigEditor && (
+          <FragenEditor
+            frage={editFrage}
+            onSpeichern={handleFrageGespeichert}
+            onAbbrechen={() => { setZeigEditor(false); setEditFrage(null) }}
+            performance={editFrage ? fragenStats.get(editFrage.id) : undefined}
+          />
+        )}
+
+        {/* Lösch-Bestätigung */}
+        {loeschKandidat && (
+          <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/40 pointer-events-auto" onClick={() => setLoeschKandidat(null)}>
+            <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl p-6 max-w-md" onClick={(e) => e.stopPropagation()}>
+              <h3 className="text-lg font-bold dark:text-white mb-2">Frage löschen?</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                <strong>{loeschKandidat.id}</strong> · {loeschKandidat.fachbereich} · {typLabel(loeschKandidat.typ)}
+              </p>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                {'fragetext' in loeschKandidat
+                  ? (loeschKandidat as { fragetext: string }).fragetext?.replace(/\*\*/g, '').replace(/\n/g, ' ').slice(0, 120)
+                  : ''}
+              </p>
+              <p className="text-xs text-red-600 dark:text-red-400 mb-4">
+                Diese Aktion kann nicht rückgängig gemacht werden.
+              </p>
+              <div className="flex justify-end gap-2">
+                <button
+                  onClick={() => setLoeschKandidat(null)}
+                  className="px-4 py-2 text-sm rounded border dark:border-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
+                >
+                  Abbrechen
+                </button>
+                <button
+                  onClick={handleFrageLoeschen}
+                  className="px-4 py-2 text-sm rounded bg-red-600 text-white hover:bg-red-700 cursor-pointer"
+                >
+                  Endgültig löschen
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Import Overlay */}
+        {zeigImport && (
+          <FragenImport
+            onImportiert={handleImportFragen}
+            onSchliessen={() => setZeigImport(false)}
+          />
+        )}
+
+        {/* Batch-Export Overlay */}
+        {zeigBatchExport && (
+          <BatchExportDialog
+            fragen={filter.gefilterteFragen}
+            onSchliessen={() => setZeigBatchExport(false)}
+            onErfolg={(updates) => {
+              const aktuell = useFragenbankStore.getState().fragen
+              setAlleFragen(aktuell.map(f => {
+                const upd = updates.find(u => u.frageId === f.id)
+                if (!upd) return f
+                return { ...f, poolId: upd.poolId, quelle: 'pool' as const, poolContentHash: upd.poolContentHash }
+              }))
+            }}
+          />
+        )}
+      </div>
+    )
+  }
+
   return (
     <div className="fixed inset-0 z-50 flex pointer-events-none">
       {/* Backdrop */}
@@ -219,6 +425,7 @@ export default function FragenBrowser({ onHinzufuegen, onEntfernen, onSchliessen
           gefilterteFragen={filter.gefilterteFragen}
           stats={filter.stats}
           verfuegbareThemen={filter.verfuegbareThemen}
+          verfuegbareUnterthemen={filter.verfuegbareUnterthemen}
           aktiveFilter={filter.aktiveFilter}
           seitenGroesse={filter.seitenGroesse}
           suchtext={filter.suchtext}
@@ -231,8 +438,8 @@ export default function FragenBrowser({ onHinzufuegen, onEntfernen, onSchliessen
           setFilterBloom={filter.setFilterBloom}
           filterThema={filter.filterThema}
           setFilterThema={filter.setFilterThema}
-          filterQuelle={filter.filterQuelle}
-          setFilterQuelle={filter.setFilterQuelle}
+          filterUnterthema={filter.filterUnterthema}
+          setFilterUnterthema={filter.setFilterUnterthema}
           filterPoolStatus={filter.filterPoolStatus}
           setFilterPoolStatus={filter.setFilterPoolStatus}
           filterMitAnhang={filter.filterMitAnhang}
@@ -259,7 +466,7 @@ export default function FragenBrowser({ onHinzufuegen, onEntfernen, onSchliessen
         <div ref={listeRef} className="flex-1 overflow-auto">
           {ladeStatus === 'laden' && (
             <p className="text-sm text-slate-500 dark:text-slate-400 text-center py-8">
-              Fragenbank wird geladen...
+              Fragensammlung wird geladen...
             </p>
           )}
 

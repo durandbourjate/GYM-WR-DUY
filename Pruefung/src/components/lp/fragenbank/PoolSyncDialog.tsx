@@ -178,11 +178,11 @@ export default function PoolSyncDialog({ offen, onSchliessen, bestehendeFragen, 
         {phase === 'idle' && (
           <div>
             <p className="text-slate-600 dark:text-slate-300 mb-4">
-              Übungspools von GitHub Pages laden und mit der Fragenbank abgleichen.
+              Übungspools von GitHub Pages laden und mit der Fragensammlung abgleichen.
               Neue Fragen werden importiert, geänderte Fragen als &ldquo;Update verfügbar&rdquo; markiert.
             </p>
             <p className="text-sm text-slate-400 dark:text-slate-500 mb-4">
-              Bestehende Fragen in Fragenbank: {bestehendeFragen.length} (davon {bestehendeFragen.filter(f => f.poolId).length} aus Pools)
+              Bestehende Fragen in Fragensammlung: {bestehendeFragen.length} (davon {bestehendeFragen.filter(f => f.poolId).length} aus Pools)
             </p>
             <div className="flex gap-3">
               <button onClick={startSync}

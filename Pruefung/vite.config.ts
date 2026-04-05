@@ -17,15 +17,15 @@ const basePathEscaped = basePath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 // PWA-Manifest je nach Modus
 const pwaManifest = istLernen
   ? {
-      name: 'Übungstool — Gymnasium Hofwil',
-      short_name: 'Übungstool',
-      description: 'Digitales Übungstool zum Lernen und Üben',
+      name: 'ExamLab — Üben',
+      short_name: 'ExamLab',
+      description: 'Digitales Übungstool',
       theme_color: '#171717',
       background_color: '#fafafa',
     }
   : {
-      name: 'Prüfungstool — Gymnasium Hofwil',
-      short_name: 'Prüfungstool',
+      name: 'ExamLab — Prüfen',
+      short_name: 'ExamLab',
       description: 'Digitales Prüfungstool',
       theme_color: '#1e40af',
       background_color: '#f8fafc',

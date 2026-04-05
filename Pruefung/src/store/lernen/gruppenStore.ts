@@ -33,9 +33,12 @@ export const useLernenGruppenStore = create<LernenGruppenState>((set, get) => ({
         try {
           const mitglieder = await lernenGruppenAdapter.ladeMitglieder(aktiveGruppe.id)
           set({ mitglieder })
-        } catch { /* ignorieren */ }
+        } catch (err) {
+          console.error('[GruppenStore] Mitglieder laden fehlgeschlagen:', err)
+        }
       }
-    } catch {
+    } catch (err) {
+      console.error('[GruppenStore] Gruppen laden fehlgeschlagen:', err)
       set({ ladeStatus: 'fehler' })
     }
   },
@@ -46,8 +49,12 @@ export const useLernenGruppenStore = create<LernenGruppenState>((set, get) => ({
 
     set({ aktiveGruppe: gruppe })
 
-    const mitglieder = await lernenGruppenAdapter.ladeMitglieder(gruppeId)
-    set({ mitglieder })
+    try {
+      const mitglieder = await lernenGruppenAdapter.ladeMitglieder(gruppeId)
+      set({ mitglieder })
+    } catch (err) {
+      console.error('[GruppenStore] Mitglieder laden bei Gruppenwahl fehlgeschlagen:', err)
+    }
   },
 
   gruppeAbwaehlen: () => {

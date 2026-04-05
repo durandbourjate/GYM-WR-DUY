@@ -10,7 +10,7 @@ type HilfeKategorie = 'einstieg' | 'pruefung' | 'fragen' | 'zusammenarbeit' | 'k
 const KATEGORIEN: { key: HilfeKategorie; label: string }[] = [
   { key: 'einstieg', label: 'Erste Schritte' },
   { key: 'pruefung', label: 'Prüfung erstellen' },
-  { key: 'fragen', label: 'Fragen & Fragenbank' },
+  { key: 'fragen', label: 'Fragen & Fragensammlung' },
   { key: 'zusammenarbeit', label: 'Zusammenarbeit' },
   { key: 'ki', label: 'KI-Assistent' },
   { key: 'durchfuehrung', label: 'Durchführung' },
@@ -146,14 +146,14 @@ function Hinweis({ children }: { children: React.ReactNode }) {
 function HilfeEinstieg() {
   return (
     <div>
-      <Titel>Willkommen zum Prüfungstool</Titel>
+      <Titel>Willkommen bei ExamLab</Titel>
       <Text>
-        Das Prüfungstool ermöglicht digitale Prüfungen direkt im Browser — für alle Fachschaften am Gymnasium Hofwil. Sie erstellen Prüfungen im Composer, die Schülerinnen und Schüler bearbeiten sie online, und die Korrektur kann KI-unterstützt erfolgen.
+        ExamLab ermöglicht digitale Prüfungen direkt im Browser — für alle Fachschaften am Gymnasium Hofwil. Sie erstellen Prüfungen im Composer, die Schülerinnen und Schüler bearbeiten sie online, und die Korrektur kann KI-unterstützt erfolgen.
       </Text>
 
       <Untertitel>Anmeldung</Untertitel>
       <Text>
-        Melden Sie sich mit Ihrem <strong>@gymhofwil.ch</strong>-Konto über Google OAuth an. Die Rolle (Lehrperson oder SuS) wird automatisch anhand der E-Mail-Adresse zugewiesen. Lehrpersonen erhalten Zugriff auf Composer, Fragenbank, Monitoring und Korrektur.
+        Melden Sie sich mit Ihrem <strong>@gymhofwil.ch</strong>-Konto über Google OAuth an. Die Rolle (Lehrperson oder SuS) wird automatisch anhand der E-Mail-Adresse zugewiesen. Lehrpersonen erhalten Zugriff auf Composer, Fragensammlung, Monitoring und Korrektur.
       </Text>
       <Text>
         SuS melden sich mit dem gleichen Login an und sehen direkt die ihnen zugewiesene Prüfung (über den Link mit Prüfungs-ID).
@@ -161,10 +161,10 @@ function HilfeEinstieg() {
 
       <Untertitel>Überblick: Ihr Workflow</Untertitel>
       <Schritt nr={1}>
-        <strong>Fragen erstellen</strong> — In der Fragenbank Fragen mit 20 verschiedenen Typen anlegen (MC, Freitext, Lückentext, Zuordnung, Richtig/Falsch, Berechnung, Buchungssatz, T-Konto, Kontenbestimmung, Bilanz/ER, Aufgabengruppe, Zeichnen, PDF-Annotation, Sortierung, Hotspot, Bildbeschriftung, Audio-Aufnahme, Drag & Drop (Bild), Code-Editor, Formel (LaTeX)).
+        <strong>Fragen erstellen</strong> — In der Fragensammlung Fragen mit 20 verschiedenen Typen anlegen (MC, Freitext, Lückentext, Zuordnung, Richtig/Falsch, Berechnung, Buchungssatz, T-Konto, Kontenbestimmung, Bilanz/ER, Aufgabengruppe, Zeichnen, PDF-Annotation, Sortierung, Hotspot, Bildbeschriftung, Audio-Aufnahme, Drag & Drop (Bild), Code-Editor, Formel (LaTeX)).
       </Schritt>
       <Schritt nr={2}>
-        <strong>Prüfung zusammenstellen</strong> — Im Composer eine neue Prüfung erstellen: Einstellungen festlegen, Abschnitte bilden, Fragen aus der Fragenbank zuordnen.
+        <strong>Prüfung zusammenstellen</strong> — Im Composer eine neue Prüfung erstellen: Einstellungen festlegen, Abschnitte bilden, Fragen aus der Fragensammlung zuordnen.
       </Schritt>
       <Schritt nr={3}>
         <strong>Prüfung analysieren</strong> — Im Analyse-Tab die Prüfung auf Taxonomie-Verteilung, Zeitbedarf und Fragetypen-Mix prüfen.
@@ -205,7 +205,7 @@ function HilfePruefung() {
 
       <Untertitel>2. Abschnitte & Fragen</Untertitel>
       <Text>
-        Erstellen Sie Abschnitte (z.B. &laquo;Teil A: Multiple Choice&raquo;) und fügen Sie Fragen aus der Fragenbank hinzu. Abschnitte und Fragen können per Pfeiltasten umsortiert werden.
+        Erstellen Sie Abschnitte (z.B. &laquo;Teil A: Multiple Choice&raquo;) und fügen Sie Fragen aus der Fragensammlung hinzu. Abschnitte und Fragen können per Pfeiltasten umsortiert werden.
       </Text>
 
       <Untertitel>3. Vorschau</Untertitel>
@@ -224,9 +224,9 @@ function HilfePruefung() {
 function HilfeFragen() {
   return (
     <div>
-      <Titel>Fragen & Fragenbank</Titel>
+      <Titel>Fragen & Fragensammlung</Titel>
       <Text>
-        Die Fragenbank ist der zentrale Ort für alle Prüfungsfragen. Fragen können in mehreren Prüfungen wiederverwendet werden.
+        Die Fragensammlung ist der zentrale Ort für alle Prüfungsfragen. Fragen können in mehreren Prüfungen wiederverwendet werden.
       </Text>
 
       <Untertitel>20 Fragetypen</Untertitel>
@@ -391,7 +391,7 @@ function HilfeZusammenarbeit() {
 
       <Untertitel>Rechte-Badges</Untertitel>
       <Text>
-        In der Fragenbank zeigen farbige Badges Ihre Rolle bei geteilten Fragen an: <strong>Bearbeiter</strong> (blau) oder <strong>Betrachter</strong> (grau). Eigene Fragen (Inhaber) haben keinen Badge.
+        In der Fragensammlung zeigen farbige Badges Ihre Rolle bei geteilten Fragen an: <strong>Bearbeiter</strong> (blau) oder <strong>Betrachter</strong> (grau). Eigene Fragen (Inhaber) haben keinen Badge.
       </Text>
     </div>
   )
@@ -609,7 +609,7 @@ function HilfeBloom() {
     <div>
       <Titel>Bloom-Taxonomie (K1–K6)</Titel>
       <Text>
-        Die Bloom-Taxonomie ordnet Prüfungsfragen nach kognitivem Anforderungsniveau ein. Jede Frage in der Fragenbank wird einer Stufe K1–K6 zugeordnet. Der Analyse-Tab zeigt die Verteilung über die gesamte Prüfung.
+        Die Bloom-Taxonomie ordnet Prüfungsfragen nach kognitivem Anforderungsniveau ein. Jede Frage in der Fragensammlung wird einer Stufe K1–K6 zugeordnet. Der Analyse-Tab zeigt die Verteilung über die gesamte Prüfung.
       </Text>
 
       <Hinweis>
@@ -763,7 +763,7 @@ function HilfeFAQ() {
       </FAQItem>
 
       <FAQItem frage="Kann ich Fragen in mehreren Prüfungen verwenden?">
-        Ja. Die Fragenbank ist unabhängig von einzelnen Prüfungen. Eine Frage kann in beliebig vielen Prüfungen verwendet werden.
+        Ja. Die Fragensammlung ist unabhängig von einzelnen Prüfungen. Eine Frage kann in beliebig vielen Prüfungen verwendet werden.
       </FAQItem>
 
       <FAQItem frage="Was bedeuten die Bloom-Stufen K1-K6?">
@@ -775,7 +775,7 @@ function HilfeFAQ() {
       </FAQItem>
 
       <FAQItem frage="Wer kann meine Prüfungen sehen?">
-        Nur Lehrpersonen mit @gymhofwil.ch-Login haben Zugriff auf den Composer, die Fragenbank und die Korrektur. SuS sehen nur die ihnen zugewiesene Prüfung.
+        Nur Lehrpersonen mit @gymhofwil.ch-Login haben Zugriff auf den Composer, die Fragensammlung und die Korrektur. SuS sehen nur die ihnen zugewiesene Prüfung.
       </FAQItem>
 
       <FAQItem frage="Was ist der Open-End-Modus?">
@@ -790,7 +790,7 @@ function HilfeFAQ() {
         Ja. Im Korrektur-Dashboard können Sie pro Frage und als Gesamtkommentar Audio-Feedback aufnehmen (direkt im Browser). Die Audio-Dateien werden zu Google Drive hochgeladen und sind für die SuS in der Korrektur-Einsicht abspielbar.
       </FAQItem>
 
-      <FAQItem frage="Was sind die Pool-Badges in der Fragenbank?">
+      <FAQItem frage="Was sind die Pool-Badges in der Fragensammlung?">
         Pool-Badges zeigen den Sync-Status von importierten Übungspool-Fragen: Rot = ungeprüft (aus Pool importiert, noch nicht reviewt), Gelb = Pool ✓ (reviewt), Grün = prüfungstauglich (von LP abgesegnet für Prüfungen), Blau pulsierend = Update verfügbar.
       </FAQItem>
 

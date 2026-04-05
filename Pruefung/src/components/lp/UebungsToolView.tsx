@@ -21,6 +21,7 @@ const LP_AUTH_KEY = 'lernplattform-auth'
 export default function UebungsToolView() {
   const pruefungUser = useAuthStore(s => s.user)
   const { gruppen, aktiveGruppe, ladeGruppen, waehleGruppe, ladeStatus } = useLernenGruppenStore()
+  const storeMitglieder = useLernenGruppenStore(s => s.mitglieder)
   const [loginStatus, setLoginStatus] = useState<'idle' | 'laden' | 'fertig' | 'fehler'>('idle')
 
   // LP-Login auf dem LP-Backend ausführen um einen gültigen Session-Token zu bekommen
@@ -90,7 +91,7 @@ export default function UebungsToolView() {
     return (
       <div className="flex items-center justify-center py-24">
         <p className="text-slate-500 dark:text-slate-400">
-          {loginStatus === 'laden' ? 'Übungstool wird verbunden...' : 'Gruppen werden geladen...'}
+          {loginStatus === 'laden' ? 'Übungen werden verbunden...' : 'Gruppen werden geladen...'}
         </p>
       </div>
     )
@@ -104,7 +105,7 @@ export default function UebungsToolView() {
           <p className="text-4xl mb-3">⚠️</p>
           <h2 className="text-xl font-bold mb-2 dark:text-white">Verbindung fehlgeschlagen</h2>
           <p className="text-slate-500 dark:text-slate-400">
-            Das Übungstool-Backend konnte nicht erreicht werden.
+            Das Backend konnte nicht erreicht werden.
           </p>
           <button
             onClick={() => setLoginStatus('idle')}
@@ -125,7 +126,7 @@ export default function UebungsToolView() {
           <p className="text-4xl mb-3">📚</p>
           <h2 className="text-xl font-bold mb-2 dark:text-white">Keine Gruppen</h2>
           <p className="text-slate-500 dark:text-slate-400">
-            Keine Übungsgruppen gefunden. Erstelle eine Gruppe im Übungstool.
+            Keine Übungsgruppen gefunden. Erstellen Sie eine Gruppe unter Üben.
           </p>
         </div>
       </div>
@@ -156,7 +157,6 @@ export default function UebungsToolView() {
   }
 
   // Mitglieder-Stats aus dem Store (haben Rollen-Info)
-  const storeMitglieder = useLernenGruppenStore(s => s.mitglieder)
   const lernende = storeMitglieder.filter(m => m.rolle !== 'admin').length
   const admins = storeMitglieder.filter(m => m.rolle === 'admin').length
 

@@ -122,10 +122,10 @@ export default function KorrekturDashboard({ pruefungId, eingebettet = false, co
               ? `Fehler: ${korrektur.batchFehler}`
             : undefined
           }
-          ansichtsButtons={aktionsLeiste}
-          onFragenbank={() => { setZeigHilfe(false); setZeigFragenbank(!zeigFragenbank) }}
+          aktionsButtons={aktionsLeiste}
+          onFragensammlung={() => { setZeigHilfe(false); setZeigFragenbank(!zeigFragenbank) }}
           onHilfe={() => { setZeigFragenbank(false); setZeigHilfe(!zeigHilfe) }}
-          fragebankOffen={zeigFragenbank}
+          fragensammlungOffen={zeigFragenbank}
           hilfeOffen={zeigHilfe}
         />
       )}
@@ -134,20 +134,16 @@ export default function KorrekturDashboard({ pruefungId, eingebettet = false, co
         <div className="flex flex-wrap items-center gap-2 mb-4">{aktionsLeiste}</div>
       )}
 
-      <main className={eingebettet ? '' : 'max-w-5xl mx-auto p-6'}>
+      <main className={eingebettet ? '' : 'p-6'}>
         {/* Statistik-Leiste */}
-        {stats && korrektur && korrektur.schueler.length > 0 && (
-          <div className={`grid gap-3 mb-6 ${istFormativ ? 'grid-cols-2 md:grid-cols-2' : 'grid-cols-2 md:grid-cols-6'}`}>
+        {stats && korrektur && korrektur.schueler.length > 0 && !istFormativ && (
+          <div className="grid gap-3 mb-6 grid-cols-2 md:grid-cols-6">
             <StatKarte label="Durchschnitt" wert={`${stats.durchschnitt} Pkt.`} />
             <StatKarte label="Median" wert={`${stats.median} Pkt.`} />
-            {!istFormativ && (
-              <>
-                <StatKarte label="∅ Note" wert={stats.durchschnittNote.toFixed(1)} />
-                <StatKarte label="Median Note" wert={stats.medianNote.toFixed(1)} />
-                <StatKarte label="Bestanden" wert={`${stats.bestanden}/${stats.bestanden + stats.durchgefallen}`} />
-                <StatKarte label="Durchgefallen" wert={String(stats.durchgefallen)} highlight={stats.durchgefallen > 0} />
-              </>
-            )}
+            <StatKarte label="∅ Note" wert={stats.durchschnittNote.toFixed(1)} />
+            <StatKarte label="Median Note" wert={stats.medianNote.toFixed(1)} />
+            <StatKarte label="Bestanden" wert={`${stats.bestanden}/${stats.bestanden + stats.durchgefallen}`} />
+            <StatKarte label="Durchgefallen" wert={String(stats.durchgefallen)} highlight={stats.durchgefallen > 0} />
           </div>
         )}
 

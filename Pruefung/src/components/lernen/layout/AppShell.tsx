@@ -7,6 +7,7 @@ import { useLernenFortschrittStore } from '../../../store/lernen/fortschrittStor
 import { useLernenTheme } from '../../../hooks/lernen/useTheme'
 import { lernzielStatus } from '../../../utils/lernen/mastery'
 import FeedbackButton from '../../shared/FeedbackButton'
+import Tooltip from '../../ui/Tooltip'
 
 interface Props {
   children: ReactNode
@@ -45,30 +46,32 @@ export default function AppShell({ children }: Props) {
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
       <header className="bg-white dark:bg-slate-800 shadow-sm px-4 py-3 flex items-center justify-between sticky top-0 z-30">
         <div className="flex items-center gap-3">
-          {/* Zurück-Button */}
-          {kannZurueck() && aktuellerScreen !== 'dashboard' && (
-            <button
-              onClick={istInUebung ? navigiereZuDashboard : zurueck}
-              className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 min-w-[44px] min-h-[44px] flex items-center justify-center"
-              title="Zurück"
-            >
-              <span className="text-lg dark:text-white">&#8592;</span>
-            </button>
+          {/* Zurück-Button — nur wenn aktive Gruppe vorhanden (sonst nur Abmelden) */}
+          {kannZurueck() && aktuellerScreen !== 'dashboard' && aktiveGruppe && (
+            <Tooltip text="Zurück">
+              <button
+                onClick={istInUebung ? navigiereZuDashboard : zurueck}
+                className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 min-w-[44px] min-h-[44px] flex items-center justify-center"
+              >
+                <span className="text-lg dark:text-white">&#8592;</span>
+              </button>
+            </Tooltip>
           )}
 
-          {/* Home-Button (nur wenn nicht auf Dashboard) */}
-          {aktuellerScreen !== 'dashboard' && aktuellerScreen !== 'gruppenAuswahl' && (
-            <button
-              onClick={navigiereZuDashboard}
-              className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 min-w-[44px] min-h-[44px] flex items-center justify-center"
-              title="Zum Dashboard"
-            >
-              <span className="text-lg">&#127968;</span>
-            </button>
+          {/* Home-Button (nur wenn nicht auf Dashboard und Gruppe vorhanden) */}
+          {aktuellerScreen !== 'dashboard' && aktuellerScreen !== 'gruppenAuswahl' && aktiveGruppe && (
+            <Tooltip text="Zum Dashboard">
+              <button
+                onClick={navigiereZuDashboard}
+                className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 min-w-[44px] min-h-[44px] flex items-center justify-center"
+              >
+                <span className="text-lg">&#127968;</span>
+              </button>
+            </Tooltip>
           )}
 
           <div>
-            <h1 className="text-base font-bold dark:text-white">Übungstool</h1>
+            <h1 className="text-base font-bold dark:text-white">ExamLab</h1>
             {aktiveGruppe && gruppen.length > 1 ? (
               <button
                 onClick={() => {
@@ -77,7 +80,6 @@ export default function AppShell({ children }: Props) {
                   navigiere('gruppenAuswahl')
                 }}
                 className="text-xs text-slate-500 dark:text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
-                title="Gruppe wechseln"
               >
                 {aktiveGruppe.name} &#8227;
               </button>
@@ -90,23 +92,25 @@ export default function AppShell({ children }: Props) {
         <div className="flex items-center gap-2">
           {/* Lernziele-Button */}
           {aktuellerScreen === 'dashboard' && (
-            <button
-              onClick={() => { setLernzieleOffen(!lernzieleOffen); setHilfeOffen(false) }}
-              className={`p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 min-w-[44px] min-h-[44px] flex items-center justify-center ${lernzieleOffen ? 'bg-slate-100 dark:bg-slate-700' : ''}`}
-              title="Lernziele"
-            >
-              <span className="text-lg">&#127937;</span>
-            </button>
+            <Tooltip text="Lernziele">
+              <button
+                onClick={() => { setLernzieleOffen(!lernzieleOffen); setHilfeOffen(false) }}
+                className={`p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 min-w-[44px] min-h-[44px] flex items-center justify-center ${lernzieleOffen ? 'bg-slate-100 dark:bg-slate-700' : ''}`}
+              >
+                <span className="text-lg">&#127937;</span>
+              </button>
+            </Tooltip>
           )}
 
           {/* Hilfe-Button */}
-          <button
-            onClick={() => { setHilfeOffen(!hilfeOffen); setLernzieleOffen(false) }}
-            className={`p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 min-w-[44px] min-h-[44px] flex items-center justify-center ${hilfeOffen ? 'bg-slate-100 dark:bg-slate-700' : ''}`}
-            title="Hilfe"
-          >
-            <span className="text-lg">?</span>
-          </button>
+          <Tooltip text="Hilfe">
+            <button
+              onClick={() => { setHilfeOffen(!hilfeOffen); setLernzieleOffen(false) }}
+              className={`p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 min-w-[44px] min-h-[44px] flex items-center justify-center ${hilfeOffen ? 'bg-slate-100 dark:bg-slate-700' : ''}`}
+            >
+              <span className="text-lg">?</span>
+            </button>
+          </Tooltip>
 
           {/* Admin-Button */}
           {istAdmin && aktuellerScreen !== 'admin' && (
@@ -128,13 +132,14 @@ export default function AppShell({ children }: Props) {
           />
 
           {/* Theme-Toggle */}
-          <button
-            onClick={toggleTheme}
-            className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 min-w-[44px] min-h-[44px] flex items-center justify-center"
-            title={istDark ? 'Light Mode' : 'Dark Mode'}
-          >
-            <span className="text-lg">{istDark ? '\u2600\uFE0F' : '\uD83C\uDF19'}</span>
-          </button>
+          <Tooltip text={istDark ? 'Light Mode' : 'Dark Mode'}>
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 min-w-[44px] min-h-[44px] flex items-center justify-center"
+            >
+              <span className="text-lg">{istDark ? '\u2600\uFE0F' : '\uD83C\uDF19'}</span>
+            </button>
+          </Tooltip>
 
           {/* User-Info */}
           <span className="text-xs text-slate-500 dark:text-slate-400 hidden sm:inline">{user?.vorname}</span>

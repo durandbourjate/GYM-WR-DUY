@@ -1,0 +1,64 @@
+import type { PruefungsConfig } from '../types/pruefung.ts'
+
+export const einrichtungsUebung: PruefungsConfig = {
+  id: 'einrichtung-uebung',
+  titel: 'Einführungsübung — Lerne ExamLab Üben kennen',
+
+  klasse: 'sf-wr-27a28f',
+  gefaess: 'SF',
+  semester: 'S5',
+  fachbereiche: ['VWL', 'BWL', 'Recht'],
+  datum: '2026-04-05',
+
+  typ: 'formativ',
+  modus: 'uebung',
+  dauerMinuten: 30,
+  zeitModus: 'open-end',
+  gesamtpunkte: 22,
+
+  erlaubteKlasse: 'sf-wr-27a28f',
+
+  sebErforderlich: false,
+  kontrollStufe: 'locker',
+
+  abschnitte: [
+    {
+      titel: 'Teil A: Orientierung in der Übung',
+      beschreibung: 'Schauen Sie sich auf der Übungsoberfläche um. Beantworten Sie die Fragen, indem Sie ExamLab erkunden.',
+      fragenIds: ['ueb-mc-orientierung', 'ueb-mc-uielemente', 'ueb-rf-toolfunktionen'],
+    },
+    {
+      titel: 'Teil B: Texteingabe testen',
+      beschreibung: 'Testen Sie die verschiedenen Eingabemöglichkeiten: Freitext, Lückentext und Zuordnung.',
+      fragenIds: ['ueb-ft-formatierung', 'ueb-lt-hofwil', 'ueb-zu-emojis'],
+    },
+    {
+      titel: 'Teil C: Mastery-System & Features',
+      beschreibung: 'Lernen Sie das Mastery-System von ExamLab Üben kennen und testen Sie die wichtigsten Features.',
+      fragenIds: ['ueb-mc-mastery', 'ueb-mc-features'],
+    },
+  ],
+
+  materialien: [],
+
+  zufallsreihenfolgeFragen: false,
+  zufallsreihenfolgeOptionen: false,
+  ruecknavigation: true,
+  zeitanzeigeTyp: 'verstricheneZeit',
+
+  freigeschaltet: false,
+  autoSaveIntervallSekunden: 30,
+  heartbeatIntervallSekunden: 10,
+
+  korrektur: {
+    aktiviert: true,
+    modus: 'batch',
+    freigegeben: false,
+  },
+
+  feedback: {
+    zeitpunkt: 'manuell',
+    format: 'in-app-und-pdf',
+    detailgrad: 'vollstaendig',
+  },
+}

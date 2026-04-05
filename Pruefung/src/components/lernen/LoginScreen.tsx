@@ -41,7 +41,7 @@ export default function LoginScreen() {
       </button>
 
       <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-8 w-full max-w-sm text-center">
-        <h1 className="text-2xl font-bold mb-2 dark:text-white">Übungstool</h1>
+        <h1 className="text-2xl font-bold mb-2 dark:text-white">ExamLab</h1>
         <p className="text-slate-500 dark:text-slate-400 mb-4">Anmelden um zu üben</p>
 
         {/* Hilfe/Info */}
@@ -49,11 +49,11 @@ export default function LoginScreen() {
           onClick={() => setHilfeOffen(!hilfeOffen)}
           className="text-xs text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 mb-4 inline-flex items-center gap-1"
         >
-          {hilfeOffen ? '▾' : '▸'} Was ist das Übungstool?
+          {hilfeOffen ? '▾' : '▸'} Was ist ExamLab?
         </button>
         {hilfeOffen && (
           <div className="mb-6 p-3 rounded-lg bg-slate-50 dark:bg-slate-900/20 text-left text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-            <p className="mb-2">Das Übungstool ermöglicht dir, Übungsfragen zu deinen Fächern zu bearbeiten — mit sofortigem Feedback und Fortschrittsverfolgung.</p>
+            <p className="mb-2">ExamLab ermöglicht dir, Übungsfragen zu deinen Fächern zu bearbeiten — mit sofortigem Feedback und Fortschrittsverfolgung.</p>
             <p>Melde dich mit deinem Schulkonto (Google) oder einem Code an, den du von deiner Lehrperson erhalten hast.</p>
           </div>
         )}

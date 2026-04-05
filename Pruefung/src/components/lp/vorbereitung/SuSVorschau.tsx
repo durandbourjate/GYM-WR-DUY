@@ -1,9 +1,9 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useEffect, useRef, useCallback } from 'react'
 import { usePruefungStore } from '../../../store/pruefungStore.ts'
+import { useFragenbankStore } from '../../../store/fragenbankStore.ts'
 import { demoFragen } from '../../../data/demoFragen.ts'
 import type { PruefungsConfig } from '../../../types/pruefung.ts'
 import type { Frage } from '../../../types/fragen.ts'
-import Startbildschirm from '../../Startbildschirm.tsx'
 import Layout from '../../Layout.tsx'
 
 interface Props {
@@ -13,18 +13,18 @@ interface Props {
 
 /**
  * SuS-Vorschau: Zeigt die Prüfung exakt so an, wie die SuS sie sehen.
- * Nutzt die echten SuS-Komponenten (Startbildschirm + Layout).
+ * Nutzt die echten SuS-Komponenten (Layout).
  *
+ * Überspringt den Startbildschirm und zeigt direkt die Fragen.
  * Der pruefungStore wird temporär mit den Vorschau-Daten befüllt
  * und beim Schliessen wiederhergestellt.
  */
 export default function SuSVorschau({ config, onSchliessen }: Props) {
-  const [phase, setPhase] = useState<'start' | 'pruefung'>('start')
-
   // Store-Snapshot sichern beim Mounten, wiederherstellen beim Unmounten
   const storeSnapshotRef = useRef<Record<string, unknown> | null>(null)
+  const gestartetRef = useRef(false)
 
-  // Fragen für die Vorschau auflösen (aus demoFragen)
+  // Fragen auflösen: zuerst aus Fragenbank, Fallback auf demoFragen
   const vorschauResolved = useRef(resolveVorschauFragen(config))
 
   useEffect(() => {
@@ -42,13 +42,23 @@ export default function SuSVorschau({ config, onSchliessen }: Props) {
       abgegeben: state.abgegeben,
     }
 
+    // Direkt starten — Startbildschirm überspringen
+    if (!gestartetRef.current) {
+      gestartetRef.current = true
+      usePruefungStore.getState().pruefungStarten(
+        { ...config, freigeschaltet: true },
+        vorschauResolved.current.navigationsFragen,
+        vorschauResolved.current.alleFragen,
+      )
+    }
+
     return () => {
       // Store wiederherstellen beim Unmounten
       if (storeSnapshotRef.current) {
         usePruefungStore.setState(storeSnapshotRef.current)
       }
     }
-  }, [])
+  }, [config])
 
   // Escape-Taste zum Schliessen
   useEffect(() => {
@@ -61,28 +71,21 @@ export default function SuSVorschau({ config, onSchliessen }: Props) {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [onSchliessen])
 
-  // Prüfung in der Vorschau starten — befüllt den globalen Store
-  const handleStart = useCallback(() => {
-    usePruefungStore.getState().pruefungStarten(
-      { ...config, freigeschaltet: true },
-      vorschauResolved.current.navigationsFragen,
-      vorschauResolved.current.alleFragen,
-    )
-    setPhase('pruefung')
-  }, [config])
-
-  // Abgabe abfangen — in der Vorschau einfach zurück zum Start
+  // Abgabe abfangen — in der Vorschau zurück zur Bearbeitung
+  const abgabeAbfangenRef = useRef(false)
   useEffect(() => {
-    if (phase !== 'pruefung') return
-
     const unsub = usePruefungStore.subscribe((state) => {
-      if (state.abgegeben || state.phase === 'abgegeben') {
-        // Zurück zum Start statt echte Abgabe
-        setPhase('start')
+      if ((state.abgegeben || state.phase === 'abgegeben') && !abgabeAbfangenRef.current) {
+        abgabeAbfangenRef.current = true
+        onSchliessen()
       }
     })
     return unsub
-  }, [phase])
+  }, [onSchliessen])
+
+  const handleZurueck = useCallback(() => {
+    onSchliessen()
+  }, [onSchliessen])
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-slate-50 dark:bg-slate-900">
@@ -97,73 +100,37 @@ export default function SuSVorschau({ config, onSchliessen }: Props) {
           </span>
         </div>
         <button
-          onClick={onSchliessen}
+          onClick={handleZurueck}
           className="px-4 py-1.5 text-sm font-medium bg-white/20 hover:bg-white/30 rounded-lg transition-colors cursor-pointer"
         >
-          Vorschau schliessen
+          Zurück zur Bearbeitung
         </button>
       </div>
 
       {/* Inhalt */}
       <div className="flex-1 overflow-auto">
-        {phase === 'start' && (
-          <VorschauStartbildschirm
-            config={config}
-            fragen={vorschauResolved.current.navigationsFragen}
-            onStart={handleStart}
-          />
-        )}
-        {phase === 'pruefung' && <Layout />}
+        <Layout />
       </div>
     </div>
   )
 }
 
-/**
- * Wrapper um den Startbildschirm für die Vorschau.
- * Nutzt den echten Startbildschirm, fängt aber den Start-Click ab.
- */
-function VorschauStartbildschirm({
-  config,
-  fragen,
-  onStart,
-}: {
-  config: PruefungsConfig
-  fragen: Frage[]
-  onStart: () => void
-}) {
-  // Den echten Startbildschirm rendern, aber den pruefungStarten-Call abfangen
-  // Wir überschreiben pruefungStarten temporär
-  useEffect(() => {
-    const original = usePruefungStore.getState().pruefungStarten
-    usePruefungStore.setState({
-      pruefungStarten: (_config, _fragen, _alleFragen) => {
-        onStart()
-      },
-    })
-    return () => {
-      usePruefungStore.setState({ pruefungStarten: original })
-    }
-  }, [onStart])
-
-  return (
-    <Startbildschirm
-      config={{ ...config, freigeschaltet: true }}
-      fragen={fragen}
-      wiederhergestellt={false}
-    />
-  )
-}
-
-/** Löst die Fragen-IDs aus der Config gegen die demoFragen auf */
+/** Löst die Fragen-IDs aus der Config gegen die Fragenbank auf (Fallback: demoFragen) */
 function resolveVorschauFragen(config: PruefungsConfig): { navigationsFragen: Frage[]; alleFragen: Frage[] } {
-  const fragenMap = new Map(demoFragen.map((f) => [f.id, f]))
+  // Zuerst Fragenbank versuchen, dann demoFragen als Fallback
+  const fragenbankMap = useFragenbankStore.getState().fragenMap
+  const demoMap = new Map(demoFragen.map((f) => [f.id, f]))
+
+  function findeFrage(id: string): Frage | undefined {
+    return fragenbankMap[id] || demoMap.get(id)
+  }
+
   const navigationsFragen: Frage[] = []
   const alleFragen: Frage[] = []
   const hinzugefuegt = new Set<string>()
   for (const abschnitt of config.abschnitte) {
     for (const id of abschnitt.fragenIds) {
-      const frage = fragenMap.get(id)
+      const frage = findeFrage(id)
       if (frage && !hinzugefuegt.has(id)) {
         navigationsFragen.push(frage)
         alleFragen.push(frage)
@@ -171,7 +138,7 @@ function resolveVorschauFragen(config: PruefungsConfig): { navigationsFragen: Fr
         // Aufgabengruppen: Teilaufgaben nur in alleFragen
         if (frage.typ === 'aufgabengruppe' && 'teilaufgabenIds' in frage) {
           for (const tid of (frage as { teilaufgabenIds: string[] }).teilaufgabenIds) {
-            const teilfrage = fragenMap.get(tid)
+            const teilfrage = findeFrage(tid)
             if (teilfrage && !hinzugefuegt.has(tid)) {
               alleFragen.push(teilfrage)
               hinzugefuegt.add(tid)

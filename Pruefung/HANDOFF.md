@@ -1,7 +1,54 @@
-# HANDOFF.md — Prüfungsplattform
+# HANDOFF.md — ExamLab (ehemals Prüfungsplattform)
 
-> Digitale Prüfungsplattform für alle Fachschaften am Gymnasium Hofwil.
+> ExamLab — Digitale Prüfungs- und Übungsplattform für alle Fachschaften am Gymnasium Hofwil.
+> Domain: examlab.ch (noch nicht aktiv, GitHub Pages vorerst)
 > Stack: React 19 + TypeScript + Vite + Zustand + Tailwind CSS v4 + Tiptap + KaTeX + CodeMirror 6 + Vitest
+
+---
+
+## Session 65 — ExamLab UI/UX Overhaul (05.04.2026)
+
+### Stand
+Branch `feature/examlab-ui-overhaul`. tsc ✅ | 193 Tests ✅ | Build ✅. **Noch nicht auf main/deployed.**
+
+### Änderungen
+
+| Phase | Status | Beschreibung |
+|-------|--------|-------------|
+| 1 | ✅ | **Renaming + Navigation**: "ExamLab" Brand, 3-Tab-Nav (Prüfen \| Üben \| Fragensammlung), volle Breite (max-w-5xl entfernt), "Fragenbank"→"Fragensammlung", PWA-Manifest |
+| 2 | ✅ | **Formativ Auto-Config**: Typ-Dropdown ausgeblendet, Punkte bei formativ ausgeblendet, Default-Kontrollstufe 'locker', alle "Prüfung"→"Übung" Labels im Üben-Kontext, Noten bei formativ ausgeblendet |
+| 3 | ✅ | **Bug-Fixes**: React #310 (Hooks-Reihenfolge UebungsToolView), SuS Gruppen nicht sichtbar (Error-Logging), Zurück-Button (AppShell), SuS-Vorschau (Fragenbank-Quelle + direkt zu Fragen), Zurück zum richtigen Tool (sessionStorage), PDF in Korrektur (URL-Fallback) |
+| 4 | ✅ | **Theme Toggle**: 2-Stufen (System ↔ manuell), **Fragensammlung Filter**: "Fach" statt "Fachbereich", Unterthema als separates Dropdown (kaskadierend), Quellen-Filter entfernt, "Filter:"/"Sortieren:" Labels, Frage-ID ausgeblendet |
+| 5 | ✅ | **Einführungsübung**: Neue Daten (einrichtungsUebung.ts + 8 Fragen inkl. Mastery-Frage), Auto-Sync, **Tooltips**: Tooltip-Komponente (CSS-only), angewandt auf Header + ThemeToggle + AppShell |
+
+### Dateien (32 Dateien, 3 neu)
+
+**Neue Dateien:**
+- `src/components/ui/Tooltip.tsx` — Wiederverwendbare Tooltip-Komponente
+- `src/data/einrichtungsUebung.ts` — Einführungsübung Config
+- `src/data/einrichtungsUebungFragen.ts` — 8 Fragen für Einführungsübung (inkl. Mastery)
+
+**Modifizierte Dateien (29):** LPHeader, LPStartseite, LPHeader-Callers (Composer, Durchführen, Korrektur), ConfigTab, Startbildschirm, ThemeToggle, themeStore, FragenBrowser, FragenBrowserHeader, KompaktZeile, AppShell, LoginScreens, HilfeSeite, UebungsToolView, gruppenStore, useFragenFilter, SuSVorschau, PDFKorrektur, VorbereitungPhase, AktivPhase, BeendenDialog, vite.config, Admin-Komponenten
+
+### ⚠ Vor Merge: Browser-Test nötig
+Feature-Branch — LP muss im Browser testen bevor Merge auf main.
+
+### Nächste Session
+
+| # | Aufgabe | Aufwand |
+|---|---------|--------|
+| 1 | Browser-Test mit echtem Login (LP + SuS), dann Merge auf main | mittel |
+| 2 | Drag & Drop für Fragen-Sortierung im Composer (@dnd-kit) | mittel |
+| 3 | Code-Variablen-Renaming (Lernplattform → Üben etc.) | gross |
+| 4 | Prüfungstool für andere Fächer (Bedarfsanalyse liegt vor) | gross |
+
+### Offene Todos (nicht für nächste Session)
+- SuS Hilfe erweitern (mehr Inhalt)
+- Einstellungen-Button in Kopfzeile (Settings Panel)
+- Fachbereich-Konfiguration pro LP
+- GitHub Pages URL-Wechsel (/Pruefung/ → /ExamLab/)
+- Domain-Wechsel auf examlab.ch
+- Schule/Privat Filter-Logik in Fragensammlung definieren
 
 ---
 

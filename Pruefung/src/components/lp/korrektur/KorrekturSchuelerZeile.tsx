@@ -103,9 +103,11 @@ export default function KorrekturSchuelerZeile({ pruefungId, schueler, abgabe, f
 
         {/* Punkte + Note */}
         <div className="hidden md:flex items-center gap-2">
+          {!istFormativ && (
           <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">
             {totalPunkte} / {totalMax}
           </span>
+          )}
           {!istFormativ && (
             <span
               className={`text-xs font-medium px-1.5 py-0.5 rounded ${
@@ -144,16 +146,16 @@ export default function KorrekturSchuelerZeile({ pruefungId, schueler, abgabe, f
         </div>
 
         {/* Punkte + Note (Mobile, rechts oben) */}
+        {!istFormativ && (
         <div className="md:hidden text-right">
           <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">
             {totalPunkte}/{totalMax}
           </span>
-          {!istFormativ && (
-            <span className={`ml-1 text-xs ${note >= 4 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-              ({note.toFixed((notenConfig?.rundung ?? 0.5) < 0.5 ? 2 : 1)})
-            </span>
-          )}
+          <span className={`ml-1 text-xs ${note >= 4 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+            ({note.toFixed((notenConfig?.rundung ?? 0.5) < 0.5 ? 2 : 1)})
+          </span>
         </div>
+        )}
       </button>
 
       {/* Aufgeklappter Bereich */}

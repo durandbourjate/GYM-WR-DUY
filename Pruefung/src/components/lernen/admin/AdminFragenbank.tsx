@@ -139,7 +139,7 @@ export default function AdminFragenbank({ initialFach }: AdminFragenbankProps = 
       <div className="flex items-center justify-between mb-6">
         <div>
           <h3 className="text-lg font-semibold dark:text-white">
-            Fragenbank
+            Fragensammlung
           </h3>
           <p className="text-sm text-slate-500 dark:text-slate-400">
             {fragen.length} Fragen{filterFach ? ` (${gefilterteFragen.length} angezeigt)` : ''}

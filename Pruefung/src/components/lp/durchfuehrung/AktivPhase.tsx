@@ -371,7 +371,7 @@ export default function AktivPhase({ config, schuelerStatus, startTimestamp, onB
             }}
             className="px-6 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 cursor-pointer font-medium disabled:opacity-50"
           >
-            {beendenLaeuft ? 'Wird beendet...' : 'Prüfung beenden'}
+            {beendenLaeuft ? 'Wird beendet...' : (config.typ === 'formativ' ? 'Übung beenden' : 'Prüfung beenden')}
           </button>
         )}
       </div>
@@ -391,6 +391,7 @@ export default function AktivPhase({ config, schuelerStatus, startTimestamp, onB
           pruefungId={config.id}
           lpEmail={user?.email ?? ''}
           anzahlAktiv={schuelerStatus.filter((s) => s.status === 'aktiv').length}
+          istFormativ={config.typ === 'formativ'}
           onBeendet={onBeenden}
           onAbbrechen={() => setZeigBeendenDialog(false)}
         />
@@ -403,6 +404,7 @@ export default function AktivPhase({ config, schuelerStatus, startTimestamp, onB
           lpEmail={user?.email ?? ''}
           einzelnerSuS={einzelBeendenSuS}
           anzahlAktiv={1}
+          istFormativ={config.typ === 'formativ'}
           onBeendet={() => setEinzelBeendenSuS(null)}
           onAbbrechen={() => setEinzelBeendenSuS(null)}
         />

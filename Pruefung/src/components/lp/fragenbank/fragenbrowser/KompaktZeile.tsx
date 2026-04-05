@@ -46,11 +46,6 @@ export default function KompaktZeile({ frage, istInPruefung, onToggle, onEdit, o
         {istInPruefung ? '\u2013' : '+'}
       </button>
 
-      {/* ID */}
-      <span className="font-mono text-xs text-slate-500 dark:text-slate-400 w-28 truncate shrink-0">
-        {frage.id}
-      </span>
-
       {/* Fachbereich-Badge (nur wenn nicht nach Fachbereich gruppiert) */}
       {zeigeGruppierung !== 'fachbereich' && (
         <span className={`px-1 py-0.5 text-[10px] rounded shrink-0 ${fachbereichFarbe(frage.fachbereich)}`}>

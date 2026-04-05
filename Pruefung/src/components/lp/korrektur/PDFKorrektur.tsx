@@ -59,17 +59,31 @@ export default function PDFKorrektur({
   const renderer = usePDFRenderer()
   const [geladenesPdf, setGeladenesPdf] = useState<string | null>(null)
 
-  // PDF aus Drive nachladen wenn Base64 fehlt
+  // PDF aus Drive nachladen wenn Base64 fehlt, oder per URL laden als Fallback
   useEffect(() => {
+    if (frage.pdfBase64) return // Bereits vorhanden
     const driveId = frage.pdfDriveFileId || frage.anhaenge?.find(a => a.mimeType === 'application/pdf')?.driveFileId
-    if (!frage.pdfBase64 && driveId && apiService.istKonfiguriert()) {
+    if (driveId && apiService.istKonfiguriert()) {
       apiService.ladeDriveFile(driveId, schuelerEmail).then((result) => {
         if (result?.base64) {
           setGeladenesPdf(result.base64)
         }
       })
+    } else if (frage.pdfUrl && !driveId) {
+      // Fallback: PDF per URL laden und als Base64 konvertieren (z.B. Einrichtungsprüfung)
+      fetch(frage.pdfUrl)
+        .then(r => r.blob())
+        .then(blob => {
+          const reader = new FileReader()
+          reader.onload = () => {
+            const base64 = (reader.result as string).split(',')[1]
+            if (base64) setGeladenesPdf(base64)
+          }
+          reader.readAsDataURL(blob)
+        })
+        .catch(err => console.error('[PDFKorrektur] PDF per URL laden fehlgeschlagen:', err))
     }
-  }, [frage.pdfDriveFileId, frage.pdfBase64, frage.anhaenge, schuelerEmail])
+  }, [frage.pdfDriveFileId, frage.pdfBase64, frage.pdfUrl, frage.anhaenge, schuelerEmail])
 
   const effectivePdf = frage.pdfBase64 || geladenesPdf
 

@@ -281,11 +281,15 @@ export default function Startbildschirm({ config, fragen, alleFragen, wiederherg
         )}
 
         {/* Infos */}
-        <div className="grid grid-cols-2 gap-4 mb-6">
+        <div className={`grid gap-4 mb-6 ${config.typ === 'formativ' ? 'grid-cols-2' : 'grid-cols-2'}`}>
           <InfoCard label="Dauer" wert={config.zeitModus === 'open-end' ? 'Kein Zeitlimit' : `${config.dauerMinuten} Minuten`} />
           <InfoCard label="Fragen" wert={`${gesamtFragen}`} />
-          <InfoCard label="Punkte" wert={`${config.gesamtpunkte}`} />
-          <InfoCard label="Typ" wert={config.typ === 'summativ' ? 'Summativ' : 'Formativ'} />
+          {config.typ !== 'formativ' && (
+            <>
+              <InfoCard label="Punkte" wert={`${config.gesamtpunkte}`} />
+              <InfoCard label="Typ" wert="Summativ" />
+            </>
+          )}
         </div>
 
         {/* Abschnitte mit Punkten */}

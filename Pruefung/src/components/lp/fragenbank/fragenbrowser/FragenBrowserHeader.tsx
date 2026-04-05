@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import type { Frage, Fachbereich, BloomStufe } from '../../../../types/fragen.ts'
-import type { Sortierung, FilterQuelle, FilterPoolStatus } from '../../../../hooks/useFragenFilter.ts'
+import type { Sortierung, FilterPoolStatus } from '../../../../hooks/useFragenFilter.ts'
 import type { Gruppierung } from './gruppenHelfer.ts'
 
 interface Props {
@@ -9,6 +9,7 @@ interface Props {
   gefilterteFragen: Frage[]
   stats: { fachbereiche: Map<string, number>; typen: Map<string, number>; gesamt: number }
   verfuegbareThemen: [string, number][]
+  verfuegbareUnterthemen: [string, number][]
   aktiveFilter: number
   seitenGroesse: number
 
@@ -23,8 +24,8 @@ interface Props {
   setFilterBloom: (v: BloomStufe | '') => void
   filterThema: string
   setFilterThema: (v: string) => void
-  filterQuelle: FilterQuelle
-  setFilterQuelle: (v: FilterQuelle) => void
+  filterUnterthema: string
+  setFilterUnterthema: (v: string) => void
   filterPoolStatus: FilterPoolStatus
   setFilterPoolStatus: (v: FilterPoolStatus) => void
   filterMitAnhang: boolean
@@ -53,17 +54,20 @@ interface Props {
 
   // Scroll-Weiterleitung
   listeRef: React.RefObject<HTMLDivElement | null>
+
+  /** Inline-Modus: kein Schliessen-Button */
+  inline?: boolean
 }
 
 /** Header mit Suche, Filter, Sortierung und Aktions-Buttons */
 export default function FragenBrowserHeader({
-  ladeStatus, gefilterteFragen, stats, verfuegbareThemen, aktiveFilter, seitenGroesse,
+  ladeStatus, gefilterteFragen, stats, verfuegbareThemen, verfuegbareUnterthemen, aktiveFilter, seitenGroesse,
   suchtext, setSuchtext,
   filterFachbereich, setFilterFachbereich,
   filterTyp, setFilterTyp,
   filterBloom, setFilterBloom,
   filterThema, setFilterThema,
-  filterQuelle, setFilterQuelle,
+  filterUnterthema, setFilterUnterthema,
   filterPoolStatus, setFilterPoolStatus,
   filterMitAnhang, setFilterMitAnhang,
   filterZuruecksetzen,
@@ -74,6 +78,7 @@ export default function FragenBrowserHeader({
   onNeueFrageErstellen, onBatchExport, onImport, onSchliessen,
   zielPruefungTitel, zielAbschnittTitel,
   listeRef,
+  inline,
 }: Props) {
   const [exportOffen, setExportOffen] = useState(false)
   const exportRef = useRef<HTMLDivElement>(null)
@@ -93,7 +98,7 @@ export default function FragenBrowserHeader({
       <div className="flex items-center justify-between mb-3">
         <div>
           <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100">
-            Fragenbank
+            Fragensammlung
           </h2>
           {ladeStatus === 'fertig' && (
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
@@ -158,12 +163,14 @@ export default function FragenBrowserHeader({
               </div>
             )}
           </div>
-          <button
-            onClick={onSchliessen}
-            className="w-8 h-8 text-lg text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors cursor-pointer"
-          >
-            ×
-          </button>
+          {!inline && (
+            <button
+              onClick={onSchliessen}
+              className="w-8 h-8 text-lg text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors cursor-pointer"
+            >
+              ×
+            </button>
+          )}
         </div>
       </div>
 
@@ -186,14 +193,17 @@ export default function FragenBrowserHeader({
 
       {/* Filter-Zeile */}
       <div className="flex items-center gap-2 mt-2 flex-wrap">
-        {/* Fachbereich-Filter nur anzeigen wenn Fragen aus mehreren Fachbereichen vorhanden */}
+        {/* Filter-Label */}
+        <span className="text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-wide font-medium">Filter:</span>
+
+        {/* Fach-Filter (ehem. Fachbereich) — nur anzeigen wenn Fragen aus mehreren Fachbereichen vorhanden */}
         {stats.fachbereiche.size > 1 && (
           <select
             value={filterFachbereich}
             onChange={(e) => { setFilterFachbereich(e.target.value as Fachbereich | ''); setAngezeigteMenge(seitenGroesse) }}
             className="text-xs px-2 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-300 cursor-pointer"
           >
-            <option value="">Fachbereich</option>
+            <option value="">Fach</option>
             {Array.from(stats.fachbereiche.entries())
               .filter(([, count]) => count > 0)
               .map(([fb, count]) => (
@@ -229,30 +239,47 @@ export default function FragenBrowserHeader({
             <option key={k} value={k}>{k}</option>
           ))}
         </select>
-        {/* Quellen-Filter (Alle / Meine / Pool) */}
-        <select
-          value={filterQuelle}
-          onChange={(e) => { setFilterQuelle(e.target.value as FilterQuelle); if (e.target.value === 'meine') setFilterPoolStatus('alle'); setAngezeigteMenge(seitenGroesse) }}
-          className="text-xs px-2 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-300 cursor-pointer"
-        >
-          <option value="alle">Alle Quellen</option>
-          <option value="meine">Meine</option>
-          <option value="pool">Pool</option>
-        </select>
 
-        {filterQuelle !== 'meine' && (
+        {/* Thema-Filter */}
+        {verfuegbareThemen.length > 1 && (
           <select
-            value={filterPoolStatus}
-            onChange={(e) => { setFilterPoolStatus(e.target.value as FilterPoolStatus); setAngezeigteMenge(seitenGroesse) }}
-            className="text-xs px-2 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-300 cursor-pointer"
+            value={filterThema}
+            onChange={(e) => { setFilterThema(e.target.value); setFilterUnterthema(''); setAngezeigteMenge(seitenGroesse) }}
+            className="text-xs px-2 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-300 cursor-pointer max-w-[180px]"
           >
-            <option value="alle">Alle Status</option>
-            <option value="ungeprueft">Ungeprüft</option>
-            <option value="pool_geprueft">Pool ✓</option>
-            <option value="pruefungstauglich">Prüfungstauglich</option>
-            <option value="update">Update verfügbar</option>
+            <option value="">Thema</option>
+            {verfuegbareThemen.map(([thema, anzahl]) => (
+              <option key={thema} value={thema}>{thema} ({anzahl})</option>
+            ))}
           </select>
         )}
+
+        {/* Unterthema-Filter (kaskadierend nach Thema) */}
+        {verfuegbareUnterthemen.length > 0 && (
+          <select
+            value={filterUnterthema}
+            onChange={(e) => { setFilterUnterthema(e.target.value); setAngezeigteMenge(seitenGroesse) }}
+            className="text-xs px-2 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-300 cursor-pointer max-w-[180px]"
+          >
+            <option value="">Unterthema</option>
+            {verfuegbareUnterthemen.map(([ut, anzahl]) => (
+              <option key={ut} value={ut}>{ut} ({anzahl})</option>
+            ))}
+          </select>
+        )}
+
+        {/* Pool-Status-Filter */}
+        <select
+          value={filterPoolStatus}
+          onChange={(e) => { setFilterPoolStatus(e.target.value as FilterPoolStatus); setAngezeigteMenge(seitenGroesse) }}
+          className="text-xs px-2 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-300 cursor-pointer"
+        >
+          <option value="alle">Alle Status</option>
+          <option value="ungeprueft">Ungeprüft</option>
+          <option value="pool_geprueft">Pool ✓</option>
+          <option value="pruefungstauglich">Prüfungstauglich</option>
+          <option value="update">Update verfügbar</option>
+        </select>
 
         {/* Anhang-Filter */}
         <button
@@ -267,21 +294,15 @@ export default function FragenBrowserHeader({
           📎
         </button>
 
-        {verfuegbareThemen.length > 1 && (
-          <select
-            value={filterThema}
-            onChange={(e) => { setFilterThema(e.target.value); setAngezeigteMenge(seitenGroesse) }}
-            className="text-xs px-2 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-300 cursor-pointer max-w-[180px]"
-          >
-            <option value="">Thema</option>
-            {verfuegbareThemen.map(([thema, anzahl]) => (
-              <option key={thema} value={thema}>{thema} ({anzahl})</option>
-            ))}
-          </select>
-        )}
+        {/* TODO: Schule/Privat-Filter — Logik noch zu definieren.
+            Mögliche Ansätze: frage.quelle, frage.fachbereich, oder ein neues Feld frage.kontext.
+            Vorerst nur UI-Platzhalter. */}
 
         {/* Separator */}
         <div className="w-px h-5 bg-slate-300 dark:bg-slate-600" />
+
+        {/* Sortieren-Label */}
+        <span className="text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-wide font-medium">Sortieren:</span>
 
         {/* Gruppierung */}
         <select
