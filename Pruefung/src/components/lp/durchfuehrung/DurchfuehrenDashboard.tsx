@@ -312,7 +312,7 @@ export default function DurchfuehrenDashboard({ pruefungId }: { pruefungId: stri
   if (ladeStatus === 'laden') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900">
-        <p className="text-slate-500 dark:text-slate-400">Prüfung wird geladen...</p>
+        <p className="text-slate-500 dark:text-slate-400">Wird geladen...</p>
       </div>
     )
   }
@@ -339,7 +339,7 @@ export default function DurchfuehrenDashboard({ pruefungId }: { pruefungId: stri
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex flex-col">
       <LPHeader
-        titel="Prüfung durchführen"
+        titel={config?.typ === 'formativ' ? 'Übung durchführen' : 'Prüfung durchführen'}
         untertitel={`${titel}${istDemoModus ? ' (Demo)' : ''}`}
         zurueck={zurueck}
         ansichtsButtons={

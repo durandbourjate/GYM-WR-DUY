@@ -33,6 +33,7 @@ export default function LPStartseite() {
   const [zeigHilfe, setZeigHilfe] = useState(false)
   const [modus, setModus] = useState<'pruefung' | 'uebung'>('pruefung')
   const [listenTab, setListenTab] = useState<'pruefungen' | 'tracker'>('pruefungen')
+  const [uebungsTab, setUebungsTab] = useState<'lernplattform' | 'uebungen'>('lernplattform')
   const [trackerDaten, setTrackerDaten] = useState<TrackerDaten | null>(null)
 
   // Such- und Filterstate
@@ -293,22 +294,67 @@ export default function LPStartseite() {
       {/* Übungstool-Ansicht */}
       {modus === 'uebung' && (
         <>
-          {/* Formative Übungen */}
-          {ladeStatus === 'fertig' && (() => {
-            const formativeUebungen = configs.filter(c => c.typ === 'formativ')
-            if (formativeUebungen.length === 0) return null
-            return (
-              <div className="max-w-5xl mx-auto px-6 pt-4 space-y-3">
-                <h2 className="text-sm font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wide">
-                  {formativeUebungen.length} Übung{formativeUebungen.length !== 1 ? 'en' : ''}
-                </h2>
-                {formativeUebungen.map(c => (
-                  <PruefungsKarte key={c.id} config={c} onBearbeiten={handleBearbeiten} onDuplizieren={handleDuplizieren} trackerSummary={findeTrackerSummary(c.id)} />
-                ))}
-              </div>
-            )
-          })()}
-          <UebungsToolView />
+          {/* Tab-Leiste */}
+          <div className="max-w-5xl mx-auto px-6 pt-4">
+            <div className="flex gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-lg w-fit">
+              <button
+                onClick={() => setUebungsTab('lernplattform')}
+                className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors cursor-pointer ${
+                  uebungsTab === 'lernplattform'
+                    ? 'bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 shadow-sm'
+                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
+                }`}
+              >
+                Lernplattform
+              </button>
+              <button
+                onClick={() => setUebungsTab('uebungen')}
+                className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors cursor-pointer ${
+                  uebungsTab === 'uebungen'
+                    ? 'bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 shadow-sm'
+                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
+                }`}
+              >
+                Übungen durchführen
+              </button>
+            </div>
+          </div>
+
+          {/* Tab-Content */}
+          {uebungsTab === 'lernplattform' && <UebungsToolView />}
+
+          {uebungsTab === 'uebungen' && (
+            <main className="max-w-5xl mx-auto p-6">
+              {ladeStatus === 'laden' && (
+                <p className="text-slate-500 dark:text-slate-400 text-center py-12">Übungen werden geladen...</p>
+              )}
+              {ladeStatus === 'fertig' && (() => {
+                const formativeUebungen = configs.filter(c => c.typ === 'formativ')
+                if (formativeUebungen.length === 0) return (
+                  <div className="text-center py-12">
+                    <div className="w-16 h-16 mx-auto mb-4 bg-slate-200 dark:bg-slate-700 rounded-2xl flex items-center justify-center">
+                      <span className="text-2xl">📝</span>
+                    </div>
+                    <h2 className="text-lg font-semibold text-slate-700 dark:text-slate-200 mb-2">Noch keine Übungen</h2>
+                    <p className="text-slate-500 dark:text-slate-400 mb-4">Erstellen Sie Ihre erste formative Übung.</p>
+                    <button onClick={handleNeueUebung} className="px-4 py-2 text-sm font-semibold text-white bg-slate-800 dark:bg-slate-200 dark:text-slate-800 rounded-lg hover:bg-slate-900 dark:hover:bg-slate-100 transition-colors cursor-pointer">
+                      + Neue Übung erstellen
+                    </button>
+                  </div>
+                )
+                return (
+                  <div className="space-y-3">
+                    <h2 className="text-sm font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wide">
+                      {formativeUebungen.length} Übung{formativeUebungen.length !== 1 ? 'en' : ''}
+                    </h2>
+                    {formativeUebungen.map(c => (
+                      <PruefungsKarte key={c.id} config={c} onBearbeiten={handleBearbeiten} onDuplizieren={handleDuplizieren} trackerSummary={findeTrackerSummary(c.id)} />
+                    ))}
+                  </div>
+                )
+              })()}
+            </main>
+          )}
         </>
       )}
 

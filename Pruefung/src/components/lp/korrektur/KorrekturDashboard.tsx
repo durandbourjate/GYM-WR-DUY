@@ -112,7 +112,7 @@ export default function KorrekturDashboard({ pruefungId, eingebettet = false, co
     <div className={eingebettet ? '' : 'min-h-screen bg-slate-50 dark:bg-slate-900'}>
       {!eingebettet && (
         <LPHeader
-          titel={`Korrektur: ${korrektur?.pruefungTitel ?? pruefungId}`}
+          titel={`${istFormativ ? 'Auswertung' : 'Korrektur'}: ${korrektur?.pruefungTitel ?? pruefungId}`}
           untertitel={korrektur ? `${korrektur.klasse} · ${korrektur.datum ? formatDatum(korrektur.datum) : ''} · ${korrektur.schueler.length} SuS` : undefined}
           zurueck={() => { window.location.href = window.location.pathname }}
           statusText={

@@ -340,7 +340,10 @@ export default function PruefungsComposer({ config, onZurueck, onDuplizieren }: 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
       <LPHeader
-        titel={config ? 'Prüfung bearbeiten' : 'Neue Prüfung'}
+        titel={pruefung.typ === 'formativ'
+          ? (config ? 'Übung bearbeiten' : 'Neue Übung')
+          : (config ? 'Prüfung bearbeiten' : 'Neue Prüfung')
+        }
         zurueck={onZurueck}
         statusText={
           speicherStatus === 'erfolg' ? 'Gespeichert ✓'
@@ -354,7 +357,7 @@ export default function PruefungsComposer({ config, onZurueck, onDuplizieren }: 
               <button
                 onClick={() => onDuplizieren(pruefung)}
                 className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
-                title="Prüfung duplizieren (Kopie erstellen)"
+                title={pruefung.typ === 'formativ' ? 'Übung duplizieren' : 'Prüfung duplizieren'}
               >
                 Duplizieren
               </button>
