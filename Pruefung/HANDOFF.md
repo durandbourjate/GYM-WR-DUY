@@ -22,7 +22,7 @@ Plan: `.claude/plans/toasty-popping-liskov.md`
 
 ---
 
-## Session 64 — UI-Anpassungen A–D (05.04.2026)
+## Session 64 — Übungstool A–F komplett (05.04.2026)
 
 ### Stand
 Branch `main`. tsc ✅ | 193 Tests ✅ | Build ✅. **Deployed auf GitHub Pages.**
@@ -31,19 +31,27 @@ Branch `main`. tsc ✅ | 193 Tests ✅ | Build ✅. **Deployed auf GitHub Pages.
 
 | # | Änderung | Dateien |
 |---|----------|---------|
-| 1 | **Build-Timestamp** — APP_VERSION zeigt Build-Datum (z.B. "05.04.2026") statt hardcoded "v1.0" | `version.ts`, `vite.config.ts`, `vite-env.d.ts` |
-| 2 | **"Neue Frage" Button** — Im Übungsmodus in der Kopfzeile, öffnet FragenBrowser. Overlays (Fragenbank/Hilfe) funktionieren in beiden Modi | `LPStartseite.tsx` |
-| 3 | **Dashboard-Redesign** — "Admin-Dashboard" Titel entfernt, Fragenbank-Tab entfernt (über Header erreichbar), Gruppen-Info-Bar mit Dropdown + Stats (Lernende/Admins) | `AdminDashboard.tsx`, `UebungsToolView.tsx` |
-| 4 | **SuS-Header konsistent** — Startbildschirm: FeedbackButton hinzugefügt, Reihenfolge korrigiert (Feedback → Theme → Abmelden), text-sm statt text-xs | `Startbildschirm.tsx` |
-| 5 | **Duplikate aufgeräumt** — 405 macOS-Duplikate + Lernplattform/ (195MB) gelöscht | diverse |
+| A | **SuS-Header konsistent** — Startbildschirm: FeedbackButton, Reihenfolge (Feedback→Theme→Abmelden), text-sm | `Startbildschirm.tsx` |
+| B | **Build-Timestamp** — APP_VERSION zeigt Build-Datum statt "v1.0" | `version.ts`, `vite.config.ts`, `vite-env.d.ts` |
+| C | **Dashboard-Redesign** — "Admin-Dashboard" Titel weg, Fragenbank-Tab weg, Gruppen-Info-Bar | `AdminDashboard.tsx`, `UebungsToolView.tsx` |
+| D | **"Neue Frage" Button** — Im Übungsmodus-Header, öffnet FragenBrowser | `LPStartseite.tsx` |
+| E | **Formatives Durchführen** — `leereUebung` Vorlage, Auto-Defaults bei Typ-Wechsel, SEB ausblenden, Noten ausblenden, "Übung starten" Label, Formativ-Liste im Übungsmodus | `PruefungsComposer.tsx`, `ConfigTab.tsx`, `LPStartseite.tsx`, `LobbyPhase.tsx`, `KorrekturDashboard.tsx`, `DurchfuehrenDashboard.tsx` |
+| F | **Fach-Filter dynamisch** — Fachbereich- und Gefäss-Badges aus configs statt hardcoded, Farben über `getFachFarbe()` | `LPStartseite.tsx` |
 
 ### Verifiziert
-- ✅ LP: Build-Datum sichtbar in Header (Prüfungs- und Übungsmodus)
-- ✅ LP: "+ Neue Frage" Button im Übungsmodus-Header
-- ✅ LP: Dashboard ohne redundanten Titel/Tab, Gruppen-Info-Bar
-- ✅ Console: Keine Errors
+- ✅ LP: Build-Datum, "+ Neue Übung", "+ Neue Frage" im Übungsmodus
+- ✅ LP: Composer öffnet mit formativ-Defaults (typ=formativ, SEB aus, open-end)
+- ✅ LP: SEB-Toggle bei formativ ausgeblendet
+- ✅ LP: Fach-/Gefäss-Filter dynamisch aus vorhandenen Prüfungen
+- ✅ Console: Keine JS-Errors
 
-### Nächste Session — Plan: `docs/superpowers/plans/uebungstool-integration-v2.md`
+### Nächste Session
+
+| # | Aufgabe | Aufwand |
+|---|---------|--------|
+| 1 | E2E-Browser-Test mit echtem Login (formative Übung erstellen → durchführen → auswerten) | mittel |
+| 2 | Composer-Titel anpassen: "Übung bearbeiten" statt "Prüfung bearbeiten" bei formativ | klein |
+| 3 | Übungstool-Dashboard: Tab "Übungen durchführen" (Liste der formativ-Übungen mit Status) | mittel |
 
 | # | Aufgabe | Aufwand |
 |---|---------|--------|
