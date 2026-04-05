@@ -96,6 +96,7 @@ export default function AdminDashboard({ onZuUeben: _onZuUeben }: AdminDashboard
         )}
         {ansicht.typ === 'kind' && (
           <AdminKindDetail
+            gruppeId={aktiveGruppe?.id || ''}
             email={ansicht.email}
             name={ansicht.name}
             onThemaKlick={(fach, thema) => setAnsicht({ typ: 'thema', email: ansicht.email, name: ansicht.name, fach, thema })}

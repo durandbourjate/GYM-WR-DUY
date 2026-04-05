@@ -1,10 +1,12 @@
-import { useState, type ReactNode } from 'react'
+import { useState, useEffect, type ReactNode } from 'react'
 import { useAuthStore } from '../../store/authStore'
 import { useGruppenStore } from '../../store/gruppenStore'
 import { useNavigationStore } from '../../store/navigationStore'
 import { useUebungsStore } from '../../store/uebungsStore'
+import { useFortschrittStore } from '../../store/fortschrittStore'
 import { useTheme } from '../../hooks/useTheme'
 import { useLernKontext } from '../../hooks/useLernKontext'
+import { lernzielStatus } from '../../utils/mastery'
 import { t } from '../../utils/anrede'
 
 interface Props {
@@ -20,7 +22,13 @@ export default function AppShell({ children }: Props) {
 
   const [hilfeOffen, setHilfeOffen] = useState(false)
   const [lernzieleOffen, setLernzieleOffen] = useState(false)
+  const { lernziele, ladeLernziele, fortschritte } = useFortschrittStore()
   const istAngemeldet = !!user
+
+  // Lernziele beim App-Start laden
+  useEffect(() => {
+    if (aktiveGruppe?.id) ladeLernziele(aktiveGruppe.id)
+  }, [aktiveGruppe?.id, ladeLernziele])
   const istAdmin = user?.rolle === 'admin'
   const zeigeHeader = istAngemeldet && aktuellerScreen !== 'login'
   const istInUebung = aktuellerScreen === 'uebung' || aktuellerScreen === 'ergebnis'
@@ -161,16 +169,55 @@ export default function AppShell({ children }: Props) {
               <h3 className="font-semibold dark:text-white">&#127937; Lernziele</h3>
               <button onClick={() => setLernzieleOffen(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">x</button>
             </div>
-            <p>Bearbeite die Übungsthemen im Dashboard, um deine Lernziele zu erreichen.</p>
-            <div className="text-xs space-y-1">
-              <p>Dein Ziel: Möglichst viele Fragen auf <strong className="text-green-600 dark:text-green-400">Gemeistert</strong> bringen.</p>
-              <div className="grid grid-cols-2 gap-1 mt-2">
-                <div className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-gray-300 inline-block" /> Neu — noch nicht bearbeitet</div>
-                <div className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-yellow-400 inline-block" /> Üben — mehr Wiederholungen nötig</div>
-                <div className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-blue-400 inline-block" /> Gefestigt — gut, weiter so</div>
-                <div className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-green-500 inline-block" /> Gemeistert — perfekt!</div>
-              </div>
-            </div>
+
+            {lernziele.length > 0 ? (
+              <>
+                {Object.entries(
+                  lernziele.reduce<Record<string, typeof lernziele>>((acc, lz) => {
+                    if (!acc[lz.fach]) acc[lz.fach] = []
+                    acc[lz.fach].push(lz)
+                    return acc
+                  }, {})
+                ).map(([fach, fachLernziele]) => (
+                  <div key={fach}>
+                    <h4 className="font-medium text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 mt-2 mb-1">{fach}</h4>
+                    <div className="space-y-1">
+                      {fachLernziele
+                        .map(lz => ({ lz, status: lernzielStatus(lz, fortschritte) }))
+                        .sort((a, b) => {
+                          const order = { offen: 0, inArbeit: 1, gefestigt: 2, gemeistert: 3 }
+                          return order[a.status] - order[b.status]
+                        })
+                        .map(({ lz, status }) => (
+                          <div key={lz.id} className="flex items-start gap-2">
+                            <span className="mt-0.5 text-sm">
+                              {status === 'gemeistert' ? '\u2705' : status === 'gefestigt' ? '\uD83D\uDD35' : status === 'inArbeit' ? '\uD83D\uDFE1' : '\u2B1C'}
+                            </span>
+                            <div className="flex-1 min-w-0">
+                              <span className={status === 'gemeistert' ? 'line-through text-gray-400' : ''}>{lz.text}</span>
+                              <span className="ml-1 text-xs text-gray-400">{lz.bloom}</span>
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                ))}
+              </>
+            ) : (
+              <>
+                <p>Bearbeite die Themen im Dashboard, um deine Lernziele zu erreichen.</p>
+                <div className="text-xs space-y-1">
+                  <p>Dein Ziel: Fragen auf <strong className="text-green-600 dark:text-green-400">Gemeistert</strong> bringen.</p>
+                  <div className="grid grid-cols-2 gap-1 mt-2">
+                    <div className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-gray-300 inline-block" /> Neu</div>
+                    <div className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-yellow-400 inline-block" /> Ueben</div>
+                    <div className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-blue-400 inline-block" /> Gefestigt</div>
+                    <div className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-green-500 inline-block" /> Gemeistert</div>
+                  </div>
+                  <p className="text-gray-400 mt-2 italic">Lernziele werden von der Lehrperson definiert.</p>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}
