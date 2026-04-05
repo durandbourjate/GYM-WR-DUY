@@ -91,5 +91,10 @@ export class LernenApiClient {
 }
 
 // Singleton-Instanz für Lernplattform
-const APPS_SCRIPT_URL = import.meta.env.VITE_APPS_SCRIPT_URL || ''
-export const lernenApiClient = new LernenApiClient(APPS_SCRIPT_URL)
+// Im Lernen-Build: VITE_APPS_SCRIPT_URL zeigt direkt auf LP-Backend
+// Im Pruefung-Build: VITE_LERNPLATTFORM_APPS_SCRIPT_URL zeigt auf LP-Backend
+const LERNEN_APPS_SCRIPT_URL =
+  import.meta.env.VITE_LERNPLATTFORM_APPS_SCRIPT_URL ||
+  import.meta.env.VITE_APPS_SCRIPT_URL ||
+  ''
+export const lernenApiClient = new LernenApiClient(LERNEN_APPS_SCRIPT_URL)
