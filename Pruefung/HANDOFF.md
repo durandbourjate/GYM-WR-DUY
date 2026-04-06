@@ -10,12 +10,14 @@
 
 ### Stand
 Branch `main`. tsc ✅ | 193 Tests ✅ | Build ✅. **URL: /ExamLab/ (unified build).**
-Pool-Themen-Migration: 2178/2179 Fragen im Backend aktualisiert (thema/unterthema korrekt).
+Pool-Themen-Migration: 2178/2179 Fragen im Backend aktualisiert. Apps Script deployed (06.04.2026 15:00).
+**LP + SuS verifiziert:** Fachbereiche korrekt, Login-Bridge funktioniert, Gruppen laden.
 
 ### Architektur-Änderungen
 - **Unified Build:** Kein Dual-Build mehr. Ein Build unter `/ExamLab/`. Alte URLs `/Pruefung/` und `/Lernplattform/` leiten per Redirect um.
 - **Rollen-Routing:** LP → LPStartseite, SuS ohne ID → SuSStartseite (Üben/Prüfen-Auswahl), SuS mit ID → Prüfung
 - **Pool-Themen-Migration:** 2178 Pool-Fragen im Backend aktualisiert: `thema` = Pool-Titel, `unterthema` = Topic-Label. Frontend-Mapping (`poolTitelMapping.ts`) bleibt als Fallback.
+- **Apps Script Fix:** `FACHBEREICH_MAPPING` korrigiert — `'Wirtschaft & Recht'` wird zum konkreten Fachbereich (VWL/BWL/Recht) statt `'Andere'`.
 
 ### Alle Änderungen (Session 66a–c + Fixes)
 
@@ -67,21 +69,24 @@ Pool-Themen-Migration: 2178/2179 Fragen im Backend aktualisiert (thema/unterthem
 
 ### Nächste Session
 
-| # | Aufgabe | Aufwand |
-|---|---------|--------|
-| 1 | Browser-Test SuS-Dashboard mit migrierten Themen | klein |
-| 2 | Analyse-Dashboard mit echten Daten füllen (Fortschritt, Schwierigste Fragen) | mittel |
-| 3 | Einstellungen-Panel mit Funktionalität (Kurse, LP-Verwaltung) | mittel |
-| 4 | SuS-Übungserlebnis: Dark-Mode Kontrast in ThemaDetailView verifizieren | klein |
-| 5 | Fragetypen im SuS-Dashboard: Alle Pool-Typen korrekt anzeigen | klein |
-| 6 | Tooltip-Migration: Schrittweise title= → Tooltip Komponente (190 Stellen) | gross |
-| 7 | Drag & Drop für Fragen-Sortierung im Composer (@dnd-kit) | mittel |
-| 8 | Code-Variablen-Renaming (Lernplattform → Üben etc.) | gross |
+| # | Aufgabe | Prio | Aufwand |
+|---|---------|------|--------|
+| 1 | **Fragenbank Timeout erhöhen** (30s → 60s) — ladeFragenbank bricht bei 2218 Fragen ab | hoch | klein |
+| 2 | **Analyse-Dashboard** mit echten Daten (Fortschritt, Schwierigste Fragen) | mittel | mittel |
+| 3 | **Einstellungen-Panel** mit Funktionalität (Kurse, LP-Verwaltung) | mittel | mittel |
+| 4 | **SuS-Übungserlebnis**: Dark-Mode Kontrast, alle Fragetypen im Dashboard | mittel | klein |
+| 5 | **Tooltip-Migration**: Schrittweise title= → Tooltip Komponente (190 Stellen) | niedrig | gross |
+| 6 | **Drag & Drop** für Fragen-Sortierung im Composer (@dnd-kit) | niedrig | mittel |
+| 7 | **Code-Variablen-Renaming** (Lernplattform → Üben etc.) | niedrig | gross |
 
-### Offene Bugs (aus letztem Test)
-- "Geld (1)" in Fragenbank — wahrscheinlich eine manuell erstellte Frage ohne poolId (prüfen nach Migration)
-- SuS Dynamic Import Error bei altem Cache — Fix deployed (auto-reload), User muss Hard Refresh machen
-- 1 Frage (ID `1e363395...`) nicht migriert (Netzwerkfehler) — manuell prüfen oder Script nochmal laufen lassen
+### Offene Bugs
+- **Fragenbank Timeout**: `ladeFragenbank` bricht bei 2218 Fragen nach 30s ab (Cold Start + grosse Datenmenge)
+- **"Geld (1)"** in Fragenbank — wahrscheinlich eine manuell erstellte Frage ohne poolId
+- **1 Frage** (ID `1e363395...`) nicht migriert (Netzwerkfehler) — Script nochmal laufen lassen
+
+### ⚠ Apps Script Deploy
+`apps-script-code.js` wurde am 06.04.2026 geändert (FACHBEREICH_MAPPING Fix). **Ist deployed.**
+Bei zukünftigen Änderungen an apps-script-code.js: User muss Code im Apps Script Editor ersetzen + neue Bereitstellung erstellen.
 
 ---
 
