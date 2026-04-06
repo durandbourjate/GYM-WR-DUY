@@ -2489,24 +2489,23 @@ function loescheAllePoolFragen(body) {
       var quelleIdx = headers.indexOf('quelle');
       var poolIdIdx = headers.indexOf('poolId');
 
-      if (quelleIdx < 0 && poolIdIdx < 0) continue;
-
-      // Von unten nach oben löschen (damit Indizes stimmen)
-      var zuLoeschen = [];
+      // Manuelle Fragen behalten, Pool-Fragen entfernen
+      var behalten = [headers]; // Header-Zeile immer behalten
       for (var r = 1; r < data.length; r++) {
         var quelle = quelleIdx >= 0 ? String(data[r][quelleIdx] || '').trim() : '';
         var poolId = poolIdIdx >= 0 ? String(data[r][poolIdIdx] || '').trim() : '';
         if (quelle === 'pool' || poolId) {
-          zuLoeschen.push(r + 1); // Sheet-Zeile (1-basiert)
+          geloescht++;
         } else {
+          behalten.push(data[r]);
           erhalten++;
         }
       }
 
-      // Von unten nach oben löschen
-      for (var i = zuLoeschen.length - 1; i >= 0; i--) {
-        sheet.deleteRow(zuLoeschen[i]);
-        geloescht++;
+      // Sheet komplett ersetzen (viel schneller als einzelne deleteRow)
+      sheet.clearContents();
+      if (behalten.length > 0) {
+        sheet.getRange(1, 1, behalten.length, behalten[0].length).setValues(behalten);
       }
     }
 
