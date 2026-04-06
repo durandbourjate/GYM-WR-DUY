@@ -80,9 +80,20 @@ export default function Dashboard() {
 
     for (const f of alleFragen) {
       const themaRaw = f.thema || 'Allgemein'
-      // Einrichtungsfragen unter "Einführung" gruppieren (statt unter unbekanntem Fach)
+      // Einrichtungsfragen unter "Einführung" gruppieren
       const fach = themaRaw.startsWith('Einrichtung') ? 'Einführung' : (f.fach || 'Andere')
-      const thema = themaRaw
+
+      // Pool-Fragen: quellReferenz ("Pool: Titel") als Thema, bisheriges thema als Unterthema
+      const quellRef = (f as { quellReferenz?: string }).quellReferenz || ''
+      let thema = themaRaw
+      if (quellRef.startsWith('Pool: ') && !(f as { unterthema?: string }).unterthema) {
+        // Alte Pool-Fragen ohne unterthema: Pool-Titel → Thema, Topic-Label → Unterthema
+        const poolTitel = quellRef.replace('Pool: ', '').replace(/^(Einführung|Grundlagen)\s+/i, '').trim()
+        thema = poolTitel
+        // Unterthema on-the-fly setzen (für Filter im ThemaDetailView)
+        ;(f as { unterthema?: string }).unterthema = themaRaw
+      }
+
       if (sichtbareFaecher.length > 0 && !sichtbareFaecher.includes(fach) && fach !== 'Einführung') continue
       if (!fachThema[fach]) fachThema[fach] = {}
       if (!fachThema[fach][thema]) fachThema[fach][thema] = []
