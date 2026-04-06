@@ -6,6 +6,54 @@
 
 ---
 
+## Session 66b — Bugs + Features: ExamLab-URL, Einstellungen, Analyse, Schule/Privat (06.04.2026)
+
+### Stand
+Branch `main`. tsc ✅ | 193 Tests ✅ | Build ✅. **URL: /ExamLab/ (unified build).**
+
+### Bug-Fixes
+
+| # | Fix | Dateien |
+|---|-----|---------|
+| B1 | Einrichtungsprüfung `typ: 'summativ'` (war formativ) | `einrichtungsPruefung.ts` |
+| B2 | AppShell (SuS) Tooltips → position="bottom" | `AppShell.tsx` |
+| B3 | ThemeToggle konsistent: Emoji-Icons (🖥️/☀️/🌙) | `ThemeToggle.tsx` |
+| B4 | Einrichtungsfragen im SuS-Dashboard ausgeblendet | `Dashboard.tsx` |
+| B5 | Tooltip Default-Position → bottom (global) | `Tooltip.tsx` |
+
+### Features
+
+| # | Feature | Dateien |
+|---|---------|---------|
+| F1 | **/ExamLab/ als einzige URL** — Unified Build, SuS-Startseite (Üben/Prüfen), Redirects /Pruefung/+/Lernplattform/ → /ExamLab/ | `vite.config.ts`, `deploy.yml`, `main.tsx`, `appMode.ts`, `App.tsx`, `SuSStartseite.tsx` (neu) |
+| F2 | **Einstellungen-Button** (⚙) im LP-Header, Slide-over Panel (Tabs: LP/Kurse/Übungen, Platzhalter) | `LPHeader.tsx`, `LPStartseite.tsx`, `EinstellungenPanel.tsx` (neu) |
+| F3 | **Analyse-Tab** in Üben (Grundstruktur: Aktive Lernende, Sessions, Mastery-Quote, Fachbereich-Fortschritt, Schwierigste Fragen) | `LPStartseite.tsx`, `AnalyseDashboard.tsx` (neu) |
+| F4 | **Schule/Privat Toggle** in Fragensammlung (Alle/Schule/Privat basierend auf Fachbereich) | `useFragenFilter.ts`, `FragenBrowserHeader.tsx`, `FragenBrowser.tsx` |
+
+### Neue Dateien (3)
+- `src/components/sus/SuSStartseite.tsx` — SuS-Startseite mit Üben/Prüfen-Auswahl + Login-Bridging
+- `src/components/settings/EinstellungenPanel.tsx` — Einstellungen Slide-over (Grundstruktur)
+- `src/components/lp/ueben/AnalyseDashboard.tsx` — Analyse-Dashboard (Grundstruktur)
+
+### Architektur-Änderungen
+- **Kein Dual-Build mehr**: `VITE_APP_MODE` entfernt, `main.tsx` lädt immer `App.tsx`
+- **Rollen-basiertes Routing**: LP → LPStartseite, SuS ohne ID → SuSStartseite (Üben/Prüfen), SuS mit ID → Prüfung
+- **Base-Path**: Production = `/GYM-WR-DUY/ExamLab/`, Dev = `/`
+- **deploy.yml**: Ein Build statt drei, Redirects für alte URLs
+
+### Nächste Session
+
+| # | Aufgabe | Aufwand |
+|---|---------|--------|
+| 1 | Browser-Test mit echtem Login (LP + SuS über /ExamLab/) | mittel |
+| 2 | Analyse-Dashboard mit echten Daten füllen | mittel |
+| 3 | Einstellungen-Panel mit Funktionalität (Kurse, LP-Verwaltung) | mittel |
+| 4 | SuS-Übungserlebnis angleichen an Pools (Themen-Struktur aus LearningView) | gross |
+| 5 | Drag & Drop für Fragen-Sortierung im Composer (@dnd-kit) | mittel |
+| 6 | Code-Variablen-Renaming (Lernplattform → Üben etc.) | gross |
+
+---
+
 ## Session 66 — Browser-Test Fixes (06.04.2026)
 
 ### Stand
