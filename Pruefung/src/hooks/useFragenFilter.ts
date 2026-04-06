@@ -148,6 +148,10 @@ export function useFragenFilter(
   // Filtern
   const gefilterteFragen = useMemo(() => {
     return alleFragen.filter((f) => {
+      // Einrichtungsfragen ausblenden (hardcoded Tutorial-Fragen, nicht Teil der regulären Fragenbank)
+      const tags = f.tags || []
+      if (tags.some(t => (typeof t === 'string' ? t : t.name) === 'einrichtung')) return false
+
       // Schule/Privat-Filter
       if (filterKontext === 'schule' && !SCHUL_FACHBEREICHE.has(f.fachbereich)) return false
       if (filterKontext === 'privat' && SCHUL_FACHBEREICHE.has(f.fachbereich)) return false

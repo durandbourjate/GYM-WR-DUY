@@ -788,7 +788,7 @@ window.QUESTIONS = [
     hints: ["Die Pyramide hat mindestens 4 Stufen.", "Zuoberst steht die Bundesverfassung (BV).", "Darunter kommen Bundesgesetze, dann Verordnungen."],
     sample: { src: "img/recht/einfuehrung/recht_rechtsquellen_zeichnen.svg", alt: "Musterlösung: Normenhierarchie" },
     explain: "Die Normenhierarchie ordnet Rechtsquellen nach ihrer Rangstufe: Bundesverfassung (BV) > Bundesgesetze (OR, ZGB, StGB) > Verordnungen (Bundesrat, Departemente) > Gewohnheitsrecht. Das Prinzip «lex superior» besagt, dass höherrangiges Recht dem niederrangigen vorgeht. Widerspricht eine Verordnung einem Gesetz, gilt das Gesetz."
-  }
+  },
 
 
 // ===== INTERAKTIVE FRAGETYPEN =====

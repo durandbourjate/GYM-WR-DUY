@@ -1176,7 +1176,7 @@ window.QUESTIONS = [
     hints: ["Zwei Parteien geben übereinstimmende Willenserklärungen ab.", "Eine Partei macht einen Antrag (Offerte), die andere nimmt an (Akzept).", "Der Vertrag kommt durch Konsens (Willensübereinstimmung) zustande."],
     sample: { src: "img/recht/or_at/or_at_vertragsschema_zeichnen.svg", alt: "Musterlösung: Vertragsschema OR 1" },
     explain: "Ein Vertrag nach OR 1 kommt durch übereinstimmende gegenseitige Willenserklärung zustande. Partei A macht einen Antrag (Offerte), Partei B erklärt die Annahme (Akzept). Stimmen beide Willenserklärungen überein (Konsens), ist der Vertrag geschlossen. Wichtig: OR 11 — Verträge bedürfen nur dann einer besonderen Form, wenn das Gesetz es vorschreibt."
-  }
+  },
 
 
 // ===== INTERAKTIVE FRAGETYPEN =====

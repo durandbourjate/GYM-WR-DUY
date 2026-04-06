@@ -105,6 +105,7 @@ export interface FrageSummary {
   poolUpdateVerfuegbar?: boolean
   hatAnhang: boolean
   hatMaterial: boolean
+  schwierigkeit?: number
   fach: string
   berechtigungen?: import('./auth').Berechtigung[]
   _recht?: import('./auth').EffektivesRecht

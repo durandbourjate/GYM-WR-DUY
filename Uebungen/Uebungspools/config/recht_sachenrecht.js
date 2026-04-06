@@ -905,7 +905,7 @@ window.QUESTIONS = [
     ],
     correct: [0, 1, 2, 3],
     explain: "Eigentum ist das umfassendste dingliche Recht – der Eigentümer kann mit der Sache tun und lassen, was er will (im Rahmen des Gesetzes). Nutzniessung gibt das Recht auf Nutzung und Erträge, aber nicht auf Veräusserung oder Zerstörung. Wohnrecht ist noch enger (nur Wohnen). Grunddienstbarkeiten sind die eingeschränkteste Form – sie geben nur ein spezifisches Recht (z.B. Durchgang)."
-  }
+  },
 
 
 // ===== INTERAKTIVE FRAGETYPEN =====

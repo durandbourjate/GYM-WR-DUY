@@ -704,7 +704,7 @@ window.QUESTIONS = [
     ],
     correct: [0, 1, 2],
     explain: "Das Drei-Sphären-Modell stuft den Persönlichkeitsschutz ab: Die Gemeinsphäre betrifft das öffentliche Auftreten und ist am schwächsten geschützt (Berichterstattung oft zulässig). Die Privatsphäre umfasst den persönlichen Lebensbereich und ist stärker geschützt. Die Intimsphäre geniesst den absolut stärksten Schutz – Eingriffe sind fast nie gerechtfertigt."
-  }
+  },
 
 
 // ===== INTERAKTIVE FRAGETYPEN =====

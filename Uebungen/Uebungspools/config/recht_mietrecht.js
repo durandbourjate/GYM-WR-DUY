@@ -1096,7 +1096,7 @@ window.QUESTIONS = [
     ],
     correct: [0, 1, 2, 3, 4],
     explain: "Der Mieter muss den Mangel zuerst anzeigen und eine Frist setzen (OR 259a ff.). Wird der Mangel nicht behoben, kann er eine Mietzinsreduktion verlangen. Bei Untätigkeit des Vermieters kann der Mieter den Mangel selbst beheben lassen. Die fristlose Kündigung ist das letzte Mittel – nur bei Mängeln, die die Gesundheit gefährden oder den Gebrauch verunmöglichen."
-  }
+  },
 
 
 // ===== INTERAKTIVE FRAGETYPEN =====

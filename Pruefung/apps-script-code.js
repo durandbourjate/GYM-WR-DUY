@@ -1574,6 +1574,7 @@ function parseFrage(row, fachbereich) {
     poolVersion: safeJsonParse(row.poolVersion, undefined),
     lernzielIds: (row.lernzielIds || '').split(',').filter(Boolean),
     fach: row.fach || fachschaftZuFach_(fachbereich) || 'Allgemein',
+    schwierigkeit: row.schwierigkeit ? Number(row.schwierigkeit) : undefined,
   };
 
   // Typ-spezifische Felder aus typDaten-Spalte laden (falls vorhanden)
@@ -2394,6 +2395,7 @@ function speichereFrage(body) {
       geteilt: frage.geteilt || 'privat',
       geteiltVon: frage.geteiltVon || '',
       fach: frage.fach || fachschaftZuFach_(frage.fachbereich) || 'Allgemein',
+      schwierigkeit: frage.schwierigkeit !== undefined ? String(frage.schwierigkeit) : '',
     };
 
     // Fehlende Spalten automatisch hinzufügen
@@ -2819,6 +2821,7 @@ function frageZuSummary_(frage) {
     lernzielIds: frage.lernzielIds || [],
     semester: frage.semester || [],
     gefaesse: frage.gefaesse || [],
+    schwierigkeit: frage.schwierigkeit,
   };
 }
 

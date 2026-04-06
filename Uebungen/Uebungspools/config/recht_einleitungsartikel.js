@@ -731,7 +731,7 @@ window.QUESTIONS = [
     ],
     correct: [0, 1, 2, 3],
     explain: "Zuerst wird geklärt, wer die Beweislast trägt (Grundsatz Art. 8 ZGB: Wer ein Recht geltend macht, muss die entsprechenden Tatsachen beweisen). Dann werden Beweismittel eingereicht. Das Gericht würdigt die Beweise frei (keine gesetzlichen Beweisregeln). Am Ende steht fest, ob die Tatsache bewiesen ist – gelingt der Beweis nicht, geht dies zulasten der beweisbelasteten Partei."
-  }
+  },
 
 
 // ===== INTERAKTIVE FRAGETYPEN =====

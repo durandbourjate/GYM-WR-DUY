@@ -1263,7 +1263,7 @@ window.QUESTIONS = [
     ],
     correct: [0, 1, 2, 3],
     explain: "Bedingter Vollzug (Art. 42 StGB) ist die mildeste Form – der Verurteilte muss nicht ins Gefängnis, wenn er sich während der Probezeit bewährt. Teilbedingter Vollzug (Art. 43 StGB) kombiniert Strafe und Bewährung. Unbedingter Vollzug bedeutet tatsächlichen Freiheitsentzug. Verwahrung (Art. 64 StGB) ist die schärfste Massnahme – sie ist zeitlich unbefristet und kann lebenslänglich dauern."
-  }
+  },
 
 
 // ===== INTERAKTIVE FRAGETYPEN =====

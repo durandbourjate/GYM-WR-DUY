@@ -725,7 +725,7 @@ window.QUESTIONS = [
     ],
     correct: [0, 1, 2, 3],
     explain: "Der Menschenrechtsschutz entwickelte sich nach dem 2. Weltkrieg: Die AEMR (1948) war die erste universelle Erklärung – allerdings rechtlich nicht bindend. Die EMRK (1950) schuf einen verbindlichen regionalen Schutz mit dem EGMR. Die UNO-Pakte (1966) machten die Menschenrechte völkerrechtlich verbindlich. Die aktuelle Schweizer BV (1999) enthält einen modernen Grundrechtskatalog (Art. 7–34)."
-  }
+  },
 
 
 // ===== INTERAKTIVE FRAGETYPEN =====

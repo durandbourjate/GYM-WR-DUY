@@ -1428,7 +1428,7 @@ window.QUESTIONS = [
     ],
     correct: [0, 1, 2, 3],
     explain: "Im Arbeitsrecht gilt eine klare Normenhierarchie: Die BV steht zuoberst (Grundrechte). Dann folgen die Bundesgesetze (OR für den Arbeitsvertrag, ArG für den Arbeitsschutz). GAV-Bestimmungen gehen dem Einzelvertrag vor, dürfen aber nicht gegen zwingendes Gesetzesrecht verstossen. Der Einzelvertrag darf nur zugunsten des Arbeitnehmers vom GAV abweichen."
-  }
+  },
 
 
 // ===== INTERAKTIVE FRAGETYPEN =====
