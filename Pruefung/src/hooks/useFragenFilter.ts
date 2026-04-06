@@ -18,13 +18,24 @@ const SEITEN_GROESSE = 30
 
 /** Extrahiert Pool-Thema (Pool-Titel) und Unterthema (Topic-Label) für Pool-Fragen.
  *  Pool-Fragen im alten Format haben thema=Topic-Label und kein unterthema.
- *  Erkennung über quellReferenz "Pool: ..." */
+ *  Erkennung über quellReferenz "Pool: ...", poolId, oder quelle='pool' */
 function poolThemenMapping(f: Frage): { thema: string; unterthema: string } {
-  const quellRef = ('quellReferenz' in f ? (f as { quellReferenz?: string }).quellReferenz : '') || ''
+  const quellRef = (f as { quellReferenz?: string }).quellReferenz || ''
   const hatUnterthema = !!f.unterthema
+
+  // Pool-Fragen mit quellReferenz: Pool-Titel → Thema, bisheriges thema → Unterthema
   if (quellRef.startsWith('Pool: ') && !hatUnterthema) {
     return { thema: quellRef.replace('Pool: ', '').trim(), unterthema: f.thema }
   }
+
+  // Pool-Fragen ohne quellReferenz aber mit poolId (Fallback): nach poolId gruppieren
+  if (!hatUnterthema && f.quelle === 'pool' && (f as { poolId?: string }).poolId) {
+    const poolId = ((f as { poolId?: string }).poolId || '').split(':')[0] // z.B. "bwl_einfuehrung"
+    if (poolId) {
+      return { thema: poolId.replace(/_/g, ' '), unterthema: f.thema }
+    }
+  }
+
   return { thema: f.thema, unterthema: f.unterthema || '' }
 }
 

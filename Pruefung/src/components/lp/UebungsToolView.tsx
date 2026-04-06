@@ -35,6 +35,7 @@ export default function UebungsToolView({ onFachKlick }: UebungsToolViewProps = 
 
     async function login() {
       try {
+        console.log('[UebungsToolView] LP-Login starten für', pruefungUser!.email)
         const response = await lernenApiClient.post<{
           success: boolean
           data: { sessionToken: string }
@@ -43,7 +44,14 @@ export default function UebungsToolView({ onFachKlick }: UebungsToolViewProps = 
           name: pruefungUser!.name || pruefungUser!.email,
         })
 
-        const sessionToken = response?.data?.sessionToken || ''
+        if (!response || !response.data?.sessionToken) {
+          console.error('[UebungsToolView] LP-Login fehlgeschlagen — keine gültige Antwort:', response)
+          setLoginStatus('fehler')
+          return
+        }
+
+        const sessionToken = response.data.sessionToken
+        console.log('[UebungsToolView] LP-Login erfolgreich, Token erhalten')
 
         // In localStorage schreiben (Adapter lesen von dort)
         const lpUser = {
@@ -65,7 +73,8 @@ export default function UebungsToolView({ onFachKlick }: UebungsToolViewProps = 
         })
 
         setLoginStatus('fertig')
-      } catch {
+      } catch (error) {
+        console.error('[UebungsToolView] LP-Login Fehler:', error)
         setLoginStatus('fehler')
       }
     }

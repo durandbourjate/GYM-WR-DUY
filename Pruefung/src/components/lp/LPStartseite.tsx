@@ -220,12 +220,8 @@ export default function LPStartseite() {
           syncEinrichtungsPruefung(user.email, configResult),
           syncEinrichtungsUebung(user.email, configResult),
         ]).then(() => {
-          // Nach Sync: Configs neu laden falls Einrichtungsprüfung/Übung neu hinzugekommen ist
-          const hatEinrichtung = configResult.some(c => c.id === einrichtungsPruefung.id)
-          const hatUebung = configResult.some(c => c.id === einrichtungsUebung.id)
-          if (!hatEinrichtung || !hatUebung) {
-            apiService.ladeAlleConfigs(user.email).then(r => { if (r) setConfigs(r) })
-          }
+          // Nach Sync: Configs IMMER neu laden (typ könnte sich geändert haben)
+          apiService.ladeAlleConfigs(user.email).then(r => { if (r) setConfigs(r) })
         })
       } else {
         console.warn("[LP] Configs nicht ladbar — Composer bleibt nutzbar")

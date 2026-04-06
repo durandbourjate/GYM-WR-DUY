@@ -32,6 +32,7 @@ export default function SuSStartseite({ onKorrekturWaehle: _onKorrekturWaehle }:
 
     async function bridgeLogin() {
       try {
+        console.log('[SuSStartseite] Login-Bridge starten für', user!.email)
         const response = await lernenApiClient.post<{
           success: boolean
           data: { sessionToken: string }
@@ -40,7 +41,14 @@ export default function SuSStartseite({ onKorrekturWaehle: _onKorrekturWaehle }:
           name: user!.name || user!.email,
         })
 
-        const sessionToken = response?.data?.sessionToken || ''
+        if (!response || !response.data?.sessionToken) {
+          console.error('[SuSStartseite] Login-Bridge fehlgeschlagen — keine gültige Antwort:', response)
+          setLoginBridged(true)
+          return
+        }
+
+        const sessionToken = response.data.sessionToken
+        console.log('[SuSStartseite] Login-Bridge erfolgreich, Token erhalten')
         const lpUser = {
           email: user!.email,
           name: user!.name || user!.email,
@@ -57,8 +65,8 @@ export default function SuSStartseite({ onKorrekturWaehle: _onKorrekturWaehle }:
           ladeStatus: 'fertig',
         })
         setLoginBridged(true)
-      } catch {
-        // Login fehlgeschlagen — Üben bleibt trotzdem verfügbar
+      } catch (error) {
+        console.error('[SuSStartseite] Login-Bridge Fehler:', error)
         setLoginBridged(true)
       }
     }

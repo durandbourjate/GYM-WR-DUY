@@ -89,14 +89,19 @@ export default function Dashboard() {
 
       let thema = themaRaw
       // Pool-Fragen: Pool-Titel = Thema, Topic-Label = Unterthema
-      // Pool-Fragen erkennen: poolId vorhanden (Format "poolMetaId:frageId") oder quellReferenz "Pool: ..."
-      if ((poolId || quellRef.startsWith('Pool: ')) && !hatUnterthema) {
-        // Pool-Titel aus quellReferenz extrahieren
+      if (!hatUnterthema) {
         if (quellRef.startsWith('Pool: ')) {
+          // Pool-Titel aus quellReferenz
           thema = quellRef.replace('Pool: ', '').trim()
+          ;(f as { unterthema?: string }).unterthema = themaRaw
+        } else if (poolId) {
+          // Fallback: Pool-ID als Thema (z.B. "bwl einfuehrung")
+          const poolName = poolId.split(':')[0]
+          if (poolName) {
+            thema = poolName.replace(/_/g, ' ')
+            ;(f as { unterthema?: string }).unterthema = themaRaw
+          }
         }
-        // Bisheriges thema (= Topic-Label) wird zum Unterthema
-        ;(f as { unterthema?: string }).unterthema = themaRaw
       }
 
       if (sichtbareFaecher.length > 0 && !sichtbareFaecher.includes(fach) && fach !== 'Einführung') continue
