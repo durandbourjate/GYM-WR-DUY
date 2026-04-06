@@ -6,6 +6,7 @@ import { useState, useMemo, useEffect } from 'react'
 import { gruppenKey } from '../components/lp/fragenbank/fragenbrowser/gruppenHelfer.ts'
 import type { Gruppierung } from '../components/lp/fragenbank/fragenbrowser/gruppenHelfer.ts'
 import type { Frage, Fachbereich, BloomStufe } from '../types/fragen.ts'
+import { poolTitel } from '../utils/poolTitelMapping'
 
 export type Sortierung = 'thema' | 'bloom' | 'punkte' | 'typ' | 'id'
 export type FilterQuelle = 'alle' | 'meine' | 'fachschaft' | 'schule' | 'pool'
@@ -19,29 +20,16 @@ const SEITEN_GROESSE = 30
 /** Extrahiert Pool-Thema (Pool-Titel) und Unterthema (Topic-Label) für Pool-Fragen.
  *  Pool-Fragen im alten Format haben thema=Topic-Label und kein unterthema.
  *  Erkennung über quellReferenz "Pool: ...", poolId, oder quelle='pool' */
-/** Entfernt Fachbereich-Prefix und "Übungspool:" aus Pool-Titeln */
-function bereinigeTitel(titel: string): string {
-  return titel
-    .replace(/^Übungspool:\s*/i, '')
-    .replace(/^(VWL|BWL|Recht|Informatik|IN)\s*[-–—:]\s*/i, '')
-    .replace(/^(Einführung|Grundlagen)\s+/i, '')
-    .trim()
-}
-
+/** Pool-Themen-Mapping: Pool-Titel aus fester Tabelle, Topic-Label als Unterthema */
 function poolThemenMapping(f: Frage): { thema: string; unterthema: string } {
-  const quellRef = (f as { quellReferenz?: string }).quellReferenz || ''
   const hatUnterthema = !!f.unterthema
 
-  // Pool-Fragen mit quellReferenz: Pool-Titel → Thema, bisheriges thema → Unterthema
-  if (quellRef.startsWith('Pool: ') && !hatUnterthema) {
-    return { thema: bereinigeTitel(quellRef.replace('Pool: ', '')), unterthema: f.thema }
-  }
-
-  // Pool-Fragen ohne quellReferenz aber mit poolId (Fallback)
-  if (!hatUnterthema && f.quelle === 'pool' && (f as { poolId?: string }).poolId) {
-    const poolId = ((f as { poolId?: string }).poolId || '').split(':')[0]
-    if (poolId) {
-      return { thema: bereinigeTitel(poolId.replace(/_/g, ' ')), unterthema: f.thema }
+  // Pool-Fragen: über poolId identifizieren und Titel aus Mapping-Tabelle
+  if (!hatUnterthema && (f as { poolId?: string }).poolId) {
+    const poolMetaId = ((f as { poolId?: string }).poolId || '').split(':')[0]
+    const titel = poolTitel(poolMetaId)
+    if (titel) {
+      return { thema: titel, unterthema: f.thema }
     }
   }
 

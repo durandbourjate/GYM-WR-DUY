@@ -165,7 +165,7 @@ export default function LPStartseite() {
   }
 
   // Einführungsübung ins Backend synchronisieren (einmalig)
-  const UEBUNG_SYNC_KEY = 'einrichtung-uebung-sync-version'
+  const UEBUNG_SYNC_KEY = 'einrichtung-uebung-sync-v2'
   const UEBUNG_SYNC_VERSION = `${einrichtungsUebung.id}-${einrichtungsUebung.gesamtpunkte}`
 
   async function syncEinrichtungsUebung(email: string, backendConfigs: PruefungsConfig[]): Promise<void> {

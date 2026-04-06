@@ -13,6 +13,7 @@ import type { Empfehlung } from '../../types/lernen/auftrag'
 import { berechneSterne, sterneText } from '../../utils/lernen/gamification'
 import { useLernKontext } from '../../hooks/lernen/useLernKontext'
 import { getFachFarbe } from '../../utils/lernen/fachFarben'
+import { poolTitel } from '../../utils/poolTitelMapping'
 
 const SCHWIERIGKEIT_LABELS: Record<number, string> = { 1: 'Einfach', 2: 'Mittel', 3: 'Schwer' }
 const SCHWIERIGKEIT_STERNE: Record<number, string> = { 1: '⭐', 2: '⭐⭐', 3: '⭐⭐⭐' }
@@ -73,15 +74,6 @@ export default function Dashboard() {
     ladeThemen()
   }, [aktiveGruppe])
 
-  /** Entfernt Fachbereich-Prefix und "Übungspool:" aus Pool-Titeln */
-  function bereinigeTitel(titel: string): string {
-    return titel
-      .replace(/^Übungspool:\s*/i, '')
-      .replace(/^(VWL|BWL|Recht|Informatik|IN)\s*[-–—:]\s*/i, '')
-      .replace(/^(Einführung|Grundlagen)\s+/i, '')
-      .trim()
-  }
-
   // Themen-Infos: Fach → Thema → { unterthemen, fragen, fortschritt }
   const themenMap = useMemo(() => {
     const map: Record<string, ThemenInfo[]> = {}
@@ -90,26 +82,19 @@ export default function Dashboard() {
     for (const f of alleFragen) {
       const themaRaw = f.thema || 'Allgemein'
       const poolId = (f as { poolId?: string }).poolId || ''
-      const quellRef = (f as { quellReferenz?: string }).quellReferenz || ''
       const hatUnterthema = !!(f as { unterthema?: string }).unterthema
 
       // Einrichtungsfragen unter "Einführung" gruppieren
       const fach = themaRaw.startsWith('Einrichtung') ? 'Einführung' : (f.fach || 'Andere')
 
       let thema = themaRaw
-      // Pool-Fragen: Pool-Titel = Thema, Topic-Label = Unterthema
-      if (!hatUnterthema) {
-        if (quellRef.startsWith('Pool: ')) {
-          // Pool-Titel aus quellReferenz, bereinigt
-          thema = bereinigeTitel(quellRef.replace('Pool: ', ''))
+      // Pool-Fragen: Pool-Titel aus fester Mapping-Tabelle, Topic-Label = Unterthema
+      if (!hatUnterthema && poolId) {
+        const poolMetaId = poolId.split(':')[0]
+        const titel = poolTitel(poolMetaId)
+        if (titel) {
+          thema = titel
           ;(f as { unterthema?: string }).unterthema = themaRaw
-        } else if (poolId) {
-          // Fallback: Pool-ID als Thema (z.B. "bwl_einfuehrung" → "BWL Einführung")
-          const poolName = poolId.split(':')[0]
-          if (poolName) {
-            thema = bereinigeTitel(poolName.replace(/_/g, ' '))
-            ;(f as { unterthema?: string }).unterthema = themaRaw
-          }
         }
       }
 

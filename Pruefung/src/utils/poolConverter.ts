@@ -213,7 +213,7 @@ export function konvertierePoolFrage(
 ): Frage {
   const now = jetzt()
   const topic = topics[poolFrage.topic]
-  // Pool-Titel = Thema, Topic-Label = Unterthema (wie in pool.html: Fach → Pool → Topic)
+  // Pool-Titel = Thema, Topic-Label = Unterthema
   const thema = poolMeta.title || topic?.label || poolFrage.topic
   const unterthema = topic?.label ?? poolFrage.topic
 

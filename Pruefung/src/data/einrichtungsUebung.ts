@@ -14,7 +14,7 @@ export const einrichtungsUebung: PruefungsConfig = {
   modus: 'uebung',
   dauerMinuten: 30,
   zeitModus: 'open-end',
-  gesamtpunkte: 22,
+  gesamtpunkte: 36,
 
   erlaubteKlasse: 'sf-wr-27a28f',
 
@@ -36,6 +36,11 @@ export const einrichtungsUebung: PruefungsConfig = {
       titel: 'Teil C: Mastery-System & Features',
       beschreibung: 'Lernen Sie das Mastery-System von ExamLab Üben kennen und testen Sie die wichtigsten Features.',
       fragenIds: ['ueb-mc-mastery', 'ueb-mc-features'],
+    },
+    {
+      titel: 'Teil D: Weitere Fragetypen kennenlernen',
+      beschreibung: 'Testen Sie Berechnung, Sortierung, Buchhaltung und Zeichnen.',
+      fragenIds: ['ueb-be-rechnung', 'ueb-sort-wochentage', 'ueb-bs-einkauf', 'ueb-tk-bank', 'ueb-bilanz-einfach', 'ueb-kb-kategorien', 'ueb-vis-smiley'],
     },
   ],
 
