@@ -2590,7 +2590,7 @@ function getTypDaten(frage) {
     case 'code':
       return { sprache: frage.sprache, vorlageCode: frage.vorlageCode, testcases: frage.testcases };
     case 'formel':
-      return { formelTyp: frage.formelTyp, variablen: frage.variablen };
+      return { korrekteFormel: frage.korrekteFormel, vergleichsModus: frage.vergleichsModus, formelTyp: frage.formelTyp, variablen: frage.variablen };
     default:
       // Fallback: alle Felder ausser Base-Felder als typDaten speichern
       var baseKeys = ['id','typ','version','erstelltAm','geaendertAm','fachbereich','thema','unterthema',
