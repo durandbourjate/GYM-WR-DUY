@@ -74,6 +74,14 @@ export default function SuSStartseite({ onKorrekturWaehle: _onKorrekturWaehle }:
   }, [user?.email, user?.name, loginBridged])
 
   if (modus === 'ueben') {
+    // Warten bis Login-Bridge fertig, dann AppLernen laden
+    if (!loginBridged) {
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900">
+          <p className="text-slate-500 dark:text-slate-400">Übungen werden verbunden...</p>
+        </div>
+      )
+    }
     return (
       <Suspense fallback={
         <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900">
