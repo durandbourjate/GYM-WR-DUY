@@ -780,6 +780,8 @@ function doPost(e) {
       return speichereFrage(body);
     case 'loescheFrage':
       return loescheFrage(body);
+    case 'loescheAllePoolFragen':
+      return loescheAllePoolFragen(body);
     case 'starteKorrektur':
       return starteKorrekturEndpoint(body);
     case 'speichereKorrekturZeile':
@@ -2451,6 +2453,67 @@ function loescheFrage(body) {
     sheet.deleteRow(rowIndex + 2);
 
     return jsonResponse({ success: true, id: frageId });
+  } catch (error) {
+    return jsonResponse({ error: error.message });
+  }
+}
+
+/**
+ * Batch-Löschung: Alle Pool-Fragen (quelle='pool' ODER poolId gesetzt) aus allen Tabs löschen.
+ * Manuell erstellte Fragen bleiben erhalten. Ein einziger API-Call statt 2000+ einzelne.
+ */
+function loescheAllePoolFragen(body) {
+  try {
+    var email = body.email;
+    if (!email || !istZugelasseneLP(email)) {
+      return jsonResponse({ error: 'Nur für Lehrpersonen' });
+    }
+    var lpInfo = getLPInfo(email);
+    if (!lpInfo || lpInfo.rolle !== 'admin') {
+      return jsonResponse({ error: 'Nur für Admins' });
+    }
+
+    var fragenbank = SpreadsheetApp.openById(FRAGENBANK_ID);
+    var tabs = ['VWL', 'BWL', 'Recht', 'Informatik'];
+    var geloescht = 0;
+    var erhalten = 0;
+
+    for (var t = 0; t < tabs.length; t++) {
+      var sheet = fragenbank.getSheetByName(tabs[t]);
+      if (!sheet) continue;
+
+      var data = sheet.getDataRange().getValues();
+      if (data.length <= 1) continue;
+
+      var headers = data[0];
+      var quelleIdx = headers.indexOf('quelle');
+      var poolIdIdx = headers.indexOf('poolId');
+
+      if (quelleIdx < 0 && poolIdIdx < 0) continue;
+
+      // Von unten nach oben löschen (damit Indizes stimmen)
+      var zuLoeschen = [];
+      for (var r = 1; r < data.length; r++) {
+        var quelle = quelleIdx >= 0 ? String(data[r][quelleIdx] || '').trim() : '';
+        var poolId = poolIdIdx >= 0 ? String(data[r][poolIdIdx] || '').trim() : '';
+        if (quelle === 'pool' || poolId) {
+          zuLoeschen.push(r + 1); // Sheet-Zeile (1-basiert)
+        } else {
+          erhalten++;
+        }
+      }
+
+      // Von unten nach oben löschen
+      for (var i = zuLoeschen.length - 1; i >= 0; i--) {
+        sheet.deleteRow(zuLoeschen[i]);
+        geloescht++;
+      }
+    }
+
+    // Cache invalidieren
+    cacheInvalidieren_();
+
+    return jsonResponse({ success: true, geloescht: geloescht, erhalten: erhalten });
   } catch (error) {
     return jsonResponse({ error: error.message });
   }

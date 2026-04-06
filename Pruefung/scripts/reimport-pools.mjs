@@ -286,23 +286,19 @@ async function main() {
   console.log(`  ${manuelleFragen.length} manuelle Fragen → bleiben erhalten`)
 
   if (!DRY_RUN) {
-    console.log('\nPHASE 2: Pool-Fragen löschen...')
-    let geloescht = 0
-    let fehler = 0
-    for (const f of poolFragen) {
-      try {
-        const result = await apiPost('loescheFrage', { frageId: f.id, fachbereich: f.fachbereich })
-        if (result.success) { geloescht++ }
-        else { console.error(`  ✗ ${f.id}: ${result.error}`); fehler++ }
-        // Rate Limiting
-        if (geloescht % 10 === 0) await sleep(500)
-        if (geloescht % 100 === 0) console.log(`  ... ${geloescht}/${poolFragen.length} gelöscht`)
-      } catch (e) {
-        console.error(`  ✗ ${f.id}: ${e.message}`); fehler++
-        await sleep(2000)
+    console.log('\nPHASE 2: Pool-Fragen batch-löschen (ein API-Call)...')
+    try {
+      const result = await apiPost('loescheAllePoolFragen', {})
+      if (result.success) {
+        console.log(`  ✓ ${result.geloescht} gelöscht, ${result.erhalten} manuelle Fragen erhalten`)
+      } else {
+        console.error(`  ✗ Batch-Löschen fehlgeschlagen: ${result.error}`)
+        process.exit(1)
       }
+    } catch (e) {
+      console.error(`  ✗ Batch-Löschen fehlgeschlagen: ${e.message}`)
+      process.exit(1)
     }
-    console.log(`  ✓ ${geloescht} gelöscht, ${fehler} Fehler`)
   } else {
     console.log(`  [DRY] Würde ${poolFragen.length} Pool-Fragen löschen`)
   }
