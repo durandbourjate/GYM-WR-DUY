@@ -51,7 +51,7 @@ export default function LPHeader({ titel, untertitel, zurueck, statusText, aktio
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           {zurueck && (
-            <Tooltip text="Zurück zur Übersicht">
+            <Tooltip text="Zurück zur Übersicht" position="bottom">
               <button onClick={zurueck} className={buttonClass}>
                 ← Zurück
               </button>
@@ -94,12 +94,12 @@ export default function LPHeader({ titel, untertitel, zurueck, statusText, aktio
         <div className="flex items-center gap-2">
           {aktionsButtons}
           {onFragensammlung && (
-            <Tooltip text="Fragensammlung öffnen">
+            <Tooltip text="Fragensammlung öffnen" position="bottom">
               <button onClick={onFragensammlung} className={buttonClass}>Fragensammlung</button>
             </Tooltip>
           )}
           {onHilfe && (
-            <Tooltip text="Hilfe & Anleitungen">
+            <Tooltip text="Hilfe & Anleitungen" position="bottom">
               <button onClick={onHilfe} className={buttonClass}>Hilfe</button>
             </Tooltip>
           )}
@@ -108,7 +108,7 @@ export default function LPHeader({ titel, untertitel, zurueck, statusText, aktio
             context={{ rolle: 'lp', ort: 'lp-allgemein' }}
           />
           <ThemeToggle />
-          <Tooltip text="Von ExamLab abmelden">
+          <Tooltip text="Von ExamLab abmelden" position="bottom">
             <button
               onClick={abmelden}
               className="px-2 py-1.5 text-sm text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors cursor-pointer"

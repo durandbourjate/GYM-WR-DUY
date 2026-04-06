@@ -9,7 +9,7 @@ export default function ThemeToggle() {
     mode === 'light' ? 'Hell' : mode === 'dark' ? 'Dunkel' : 'System'
 
   return (
-    <Tooltip text={`Modus: ${label} (klicken zum Wechseln)`}>
+    <Tooltip text={`Modus: ${label} (klicken zum Wechseln)`} position="bottom">
     <button
       onClick={toggleMode}
       className="h-8 px-2 rounded-lg flex items-center gap-1.5 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer text-xs"

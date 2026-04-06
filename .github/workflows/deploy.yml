@@ -61,7 +61,7 @@ jobs:
         env:
           VITE_APP_MODE: lernen
           VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
-          VITE_APPS_SCRIPT_URL: ${{ secrets.VITE_LERNPLATTFORM_APPS_SCRIPT_URL }}
+          VITE_APPS_SCRIPT_URL: ${{ secrets.VITE_APPS_SCRIPT_URL }}
           VITE_BASE_PATH: /GYM-WR-DUY/Lernplattform/
         run: npx vite build --outDir dist-lernen
 

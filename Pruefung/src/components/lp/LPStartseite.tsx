@@ -70,9 +70,9 @@ export default function LPStartseite() {
     return [...gefaesse].sort()
   }, [configs])
 
-  // Gefilterte und sortierte Prüfungen
+  // Gefilterte und sortierte Prüfungen (nur summativ — formative laufen über Üben-Tab)
   const gefilterteConfigs = useMemo(() => {
-    let result = [...configs]
+    let result = configs.filter(c => c.typ !== 'formativ')
     // Status-Filter (Archiv)
     if (filterStatus === 'aktiv') {
       result = result.filter(c => !c.beendetUm)
@@ -109,11 +109,14 @@ export default function LPStartseite() {
     return result
   }, [configs, suchtext, filterFach, filterTyp, filterGefaess, sortierung, filterStatus])
 
+  // Nur summative Prüfungen (für Zähler und letzteFuenf)
+  const summativeConfigs = useMemo(() => configs.filter(c => c.typ !== 'formativ'), [configs])
+
   // Letzte 5 (nach Datum, nur ohne aktive Filter)
   const letzteFuenf = useMemo(() => {
-    if (hatAktiveFilter || configs.length <= 5) return []
-    return [...configs].sort((a, b) => b.datum.localeCompare(a.datum)).slice(0, 5)
-  }, [configs, hatAktiveFilter])
+    if (hatAktiveFilter || summativeConfigs.length <= 5) return []
+    return [...summativeConfigs].sort((a, b) => b.datum.localeCompare(a.datum)).slice(0, 5)
+  }, [summativeConfigs, hatAktiveFilter])
 
   function toggleFachFilter(fach: string): void {
     setFilterFach(prev => prev.includes(fach) ? prev.filter(f => f !== fach) : [...prev, fach])
@@ -345,7 +348,7 @@ export default function LPStartseite() {
           </div>
 
           {/* Tab-Content */}
-          {uebungsTab === 'uebungen' && <UebungsToolView />}
+          {uebungsTab === 'uebungen' && <UebungsToolView onFachKlick={() => setModus('fragensammlung')} />}
 
           {uebungsTab === 'durchfuehren' && (
             <main className="p-6">
@@ -437,7 +440,7 @@ export default function LPStartseite() {
         )}
 
         {/* Prüfungen-Ansicht */}
-        {listenTab === 'pruefungen' && ladeStatus === 'fertig' && configs.length === 0 && (
+        {listenTab === 'pruefungen' && ladeStatus === 'fertig' && summativeConfigs.length === 0 && (
           <div className="text-center py-12">
             <div className="w-16 h-16 mx-auto mb-4 bg-slate-200 dark:bg-slate-700 rounded-2xl flex items-center justify-center">
               <span className="text-2xl">📝</span>
@@ -457,7 +460,7 @@ export default function LPStartseite() {
           </div>
         )}
 
-        {listenTab === 'pruefungen' && ladeStatus === 'fertig' && configs.length > 0 && (
+        {listenTab === 'pruefungen' && ladeStatus === 'fertig' && summativeConfigs.length > 0 && (
           <div className="space-y-3">
             {/* Such- und Filterleiste */}
             <div className="space-y-2">
@@ -552,8 +555,8 @@ export default function LPStartseite() {
             {/* Zähler */}
             <h2 className="text-sm font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wide">
               {hatAktiveFilter
-                ? `${gefilterteConfigs.length} von ${configs.length} Prüfungen`
-                : `${configs.length} Prüfungen`}
+                ? `${gefilterteConfigs.length} von ${summativeConfigs.length} Prüfungen`
+                : `${summativeConfigs.length} Prüfungen`}
             </h2>
 
             {/* Zuletzt-Sektion (nur ohne Filter und wenn >5 Prüfungen) */}

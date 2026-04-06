@@ -18,7 +18,11 @@ const LP_AUTH_KEY = 'lernplattform-auth'
  * 3. Gruppen laden
  * 4. AdminDashboard rendern
  */
-export default function UebungsToolView() {
+interface UebungsToolViewProps {
+  onFachKlick?: () => void
+}
+
+export default function UebungsToolView({ onFachKlick }: UebungsToolViewProps = {}) {
   const pruefungUser = useAuthStore(s => s.user)
   const { gruppen, aktiveGruppe, ladeGruppen, waehleGruppe, ladeStatus } = useLernenGruppenStore()
   const storeMitglieder = useLernenGruppenStore(s => s.mitglieder)
@@ -136,7 +140,7 @@ export default function UebungsToolView() {
   // Gruppenauswahl (bei mehreren Gruppen)
   if (!aktiveGruppe) {
     return (
-      <div className="max-w-3xl mx-auto p-6">
+      <div className="max-w-7xl mx-auto p-6">
         <h2 className="text-lg font-bold mb-4 dark:text-white">Gruppe wählen</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {gruppen.map(g => (
@@ -166,7 +170,7 @@ export default function UebungsToolView() {
       <div className="relative">
         {/* Gruppen-Info-Bar */}
         <div className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-6 py-2">
-          <div className="max-w-4xl mx-auto flex items-center gap-3">
+          <div className="max-w-7xl mx-auto flex items-center gap-3">
             {gruppen.length > 1 ? (
               <>
                 <span className="text-sm text-slate-500 dark:text-slate-400">Gruppe:</span>
@@ -188,7 +192,7 @@ export default function UebungsToolView() {
             </span>
           </div>
         </div>
-        <AdminDashboard />
+        <AdminDashboard onFachKlick={onFachKlick} />
       </div>
     </LernKontextProvider>
   )

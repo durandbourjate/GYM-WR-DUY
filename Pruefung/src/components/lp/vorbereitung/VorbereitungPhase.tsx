@@ -33,7 +33,7 @@ export default function VorbereitungPhase({ config, onTeilnehmerGesetzt, onWeite
   const [lobbySpeichern, setLobbySpeichern] = useState(false)
   const [lobbyFehler, setLobbyFehler] = useState('')
   const [zeitverlaengerungen, setZeitverlaengerungen] = useState<Record<string, number>>(config.zeitverlaengerungen ?? {})
-  const [kontrollStufe, setKontrollStufe] = useState<KontrollStufe>((config.kontrollStufe as KontrollStufe) || 'standard')
+  const [kontrollStufe, setKontrollStufe] = useState<KontrollStufe>((config.kontrollStufe as KontrollStufe) || (config.typ === 'formativ' ? 'locker' : 'standard'))
   // Track einladungGesendet separat (Email → true)
   const [einladungGesendetMap, setEinladungGesendetMap] = useState<Set<string>>(
     new Set((config.teilnehmer ?? []).filter((t) => t.einladungGesendet).map((t) => t.email))
@@ -74,7 +74,7 @@ export default function VorbereitungPhase({ config, onTeilnehmerGesetzt, onWeite
     setAusgewaehlteSuS(new Set((config.teilnehmer ?? []).map((t) => t.email)))
     setManuelleTeilnehmer([])
     setZeitverlaengerungen(config.zeitverlaengerungen ?? {})
-    setKontrollStufe((config.kontrollStufe as KontrollStufe) || 'standard')
+    setKontrollStufe((config.kontrollStufe as KontrollStufe) || (config.typ === 'formativ' ? 'locker' : 'standard'))
     setEinladungGesendetMap(new Set((config.teilnehmer ?? []).filter((t) => t.einladungGesendet).map((t) => t.email)))
     setEinladungStatus('idle')
     setLobbyFehler('')

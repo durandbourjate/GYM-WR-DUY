@@ -191,12 +191,11 @@ export default function FragenBrowserHeader({
         className="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-400"
       />
 
-      {/* Filter-Zeile */}
+      {/* Filter-Zeile 1: Alle Filter */}
       <div className="flex items-center gap-2 mt-2 flex-wrap">
-        {/* Filter-Label */}
         <span className="text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-wide font-medium">Filter:</span>
 
-        {/* Fach-Filter (ehem. Fachbereich) — nur anzeigen wenn Fragen aus mehreren Fachbereichen vorhanden */}
+        {/* Fach */}
         {stats.fachbereiche.size > 1 && (
           <select
             value={filterFachbereich}
@@ -211,6 +210,36 @@ export default function FragenBrowserHeader({
               ))}
           </select>
         )}
+
+        {/* Thema */}
+        {verfuegbareThemen.length > 1 && (
+          <select
+            value={filterThema}
+            onChange={(e) => { setFilterThema(e.target.value); setFilterUnterthema(''); setAngezeigteMenge(seitenGroesse) }}
+            className="text-xs px-2 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-300 cursor-pointer max-w-[180px]"
+          >
+            <option value="">Thema</option>
+            {verfuegbareThemen.map(([thema, anzahl]) => (
+              <option key={thema} value={thema}>{thema} ({anzahl})</option>
+            ))}
+          </select>
+        )}
+
+        {/* Unterthema (kaskadierend) */}
+        {verfuegbareUnterthemen.length > 0 && (
+          <select
+            value={filterUnterthema}
+            onChange={(e) => { setFilterUnterthema(e.target.value); setAngezeigteMenge(seitenGroesse) }}
+            className="text-xs px-2 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-300 cursor-pointer max-w-[180px]"
+          >
+            <option value="">Unterthema</option>
+            {verfuegbareUnterthemen.map(([ut, anzahl]) => (
+              <option key={ut} value={ut}>{ut} ({anzahl})</option>
+            ))}
+          </select>
+        )}
+
+        {/* Typ */}
         <select
           value={filterTyp}
           onChange={(e) => { setFilterTyp(e.target.value); setAngezeigteMenge(seitenGroesse) }}
@@ -229,6 +258,8 @@ export default function FragenBrowserHeader({
           <option value="bilanzstruktur">Bilanz/ER ({stats.typen.get('bilanzstruktur') ?? 0})</option>
           <option value="aufgabengruppe">Aufgabengruppe ({stats.typen.get('aufgabengruppe') ?? 0})</option>
         </select>
+
+        {/* Bloom */}
         <select
           value={filterBloom}
           onChange={(e) => { setFilterBloom(e.target.value as BloomStufe | ''); setAngezeigteMenge(seitenGroesse) }}
@@ -240,48 +271,20 @@ export default function FragenBrowserHeader({
           ))}
         </select>
 
-        {/* Thema-Filter */}
-        {verfuegbareThemen.length > 1 && (
-          <select
-            value={filterThema}
-            onChange={(e) => { setFilterThema(e.target.value); setFilterUnterthema(''); setAngezeigteMenge(seitenGroesse) }}
-            className="text-xs px-2 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-300 cursor-pointer max-w-[180px]"
-          >
-            <option value="">Thema</option>
-            {verfuegbareThemen.map(([thema, anzahl]) => (
-              <option key={thema} value={thema}>{thema} ({anzahl})</option>
-            ))}
-          </select>
-        )}
-
-        {/* Unterthema-Filter (kaskadierend nach Thema) */}
-        {verfuegbareUnterthemen.length > 0 && (
-          <select
-            value={filterUnterthema}
-            onChange={(e) => { setFilterUnterthema(e.target.value); setAngezeigteMenge(seitenGroesse) }}
-            className="text-xs px-2 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-300 cursor-pointer max-w-[180px]"
-          >
-            <option value="">Unterthema</option>
-            {verfuegbareUnterthemen.map(([ut, anzahl]) => (
-              <option key={ut} value={ut}>{ut} ({anzahl})</option>
-            ))}
-          </select>
-        )}
-
-        {/* Pool-Status-Filter */}
+        {/* Status */}
         <select
           value={filterPoolStatus}
           onChange={(e) => { setFilterPoolStatus(e.target.value as FilterPoolStatus); setAngezeigteMenge(seitenGroesse) }}
           className="text-xs px-2 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-300 cursor-pointer"
         >
-          <option value="alle">Alle Status</option>
+          <option value="alle">Status</option>
           <option value="ungeprueft">Ungeprüft</option>
-          <option value="pool_geprueft">Pool ✓</option>
+          <option value="pool_geprueft">Pool geprüft</option>
           <option value="pruefungstauglich">Prüfungstauglich</option>
           <option value="update">Update verfügbar</option>
         </select>
 
-        {/* Anhang-Filter */}
+        {/* Anhang */}
         <button
           onClick={() => { setFilterMitAnhang(!filterMitAnhang); setAngezeigteMenge(seitenGroesse) }}
           className={`text-xs px-2 py-1.5 rounded-lg border transition-colors cursor-pointer
@@ -291,56 +294,7 @@ export default function FragenBrowserHeader({
             }`}
           title="Nur Fragen mit Anhängen (Bilder, Audio, Video)"
         >
-          📎
-        </button>
-
-        {/* TODO: Schule/Privat-Filter — Logik noch zu definieren.
-            Mögliche Ansätze: frage.quelle, frage.fachbereich, oder ein neues Feld frage.kontext.
-            Vorerst nur UI-Platzhalter. */}
-
-        {/* Separator */}
-        <div className="w-px h-5 bg-slate-300 dark:bg-slate-600" />
-
-        {/* Sortieren-Label */}
-        <span className="text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-wide font-medium">Sortieren:</span>
-
-        {/* Gruppierung */}
-        <select
-          value={gruppierung}
-          onChange={(e) => { setGruppierung(e.target.value as Gruppierung); setAufgeklappteGruppen(new Set()) }}
-          className="text-xs px-2 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-300 cursor-pointer"
-        >
-          <option value="keine">Keine Gruppierung</option>
-          <option value="fachbereich">Nach Fachbereich</option>
-          <option value="thema">Nach Thema</option>
-          <option value="typ">Nach Typ</option>
-          <option value="bloom">Nach Bloom-Stufe</option>
-        </select>
-
-        {/* Sortierung */}
-        <select
-          value={sortierung}
-          onChange={(e) => setSortierung(e.target.value as Sortierung)}
-          className="text-xs px-2 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-300 cursor-pointer"
-        >
-          <option value="thema">Sort: Thema</option>
-          <option value="id">Sort: ID</option>
-          <option value="bloom">Sort: Bloom</option>
-          <option value="punkte">Sort: Punkte ↓</option>
-          <option value="typ">Sort: Typ</option>
-        </select>
-
-        {/* Kompakt-Toggle */}
-        <button
-          onClick={() => setKompaktModus(!kompaktModus)}
-          className={`text-xs px-2 py-1.5 rounded-lg border transition-colors cursor-pointer
-            ${kompaktModus
-              ? 'bg-slate-800 dark:bg-slate-200 text-white dark:text-slate-800 border-slate-800 dark:border-slate-200'
-              : 'border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
-            }`}
-          title={kompaktModus ? 'Detailansicht' : 'Kompaktansicht'}
-        >
-          {kompaktModus ? '\u2630' : '\u25A4'}
+          Anhang
         </button>
 
         {/* Filter zurücksetzen */}
@@ -349,9 +303,51 @@ export default function FragenBrowserHeader({
             onClick={filterZuruecksetzen}
             className="text-xs text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer ml-auto"
           >
-            Filter ×
+            Filter zurücksetzen
           </button>
         )}
+      </div>
+
+      {/* Zeile 2: Sortieren + Ansicht */}
+      <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+        <span className="text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-wide font-medium">Gruppieren:</span>
+        <select
+          value={gruppierung}
+          onChange={(e) => { setGruppierung(e.target.value as Gruppierung); setAufgeklappteGruppen(new Set()) }}
+          className="text-xs px-2 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-300 cursor-pointer"
+        >
+          <option value="keine">Keine</option>
+          <option value="fachbereich">Fachbereich</option>
+          <option value="thema">Thema</option>
+          <option value="typ">Typ</option>
+          <option value="bloom">Bloom-Stufe</option>
+        </select>
+
+        <span className="text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-wide font-medium ml-2">Sortieren:</span>
+        <select
+          value={sortierung}
+          onChange={(e) => setSortierung(e.target.value as Sortierung)}
+          className="text-xs px-2 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-300 cursor-pointer"
+        >
+          <option value="thema">Thema</option>
+          <option value="bloom">Bloom</option>
+          <option value="punkte">Punkte</option>
+          <option value="typ">Typ</option>
+          <option value="id">ID</option>
+        </select>
+
+        {/* Kompakt-Toggle */}
+        <button
+          onClick={() => setKompaktModus(!kompaktModus)}
+          className={`text-xs px-2 py-1.5 rounded-lg border transition-colors cursor-pointer ml-auto
+            ${kompaktModus
+              ? 'bg-slate-800 dark:bg-slate-200 text-white dark:text-slate-800 border-slate-800 dark:border-slate-200'
+              : 'border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
+            }`}
+          title={kompaktModus ? 'Detailansicht' : 'Kompaktansicht'}
+        >
+          {kompaktModus ? 'Kompakt' : 'Detail'}
+        </button>
       </div>
     </div>
   )

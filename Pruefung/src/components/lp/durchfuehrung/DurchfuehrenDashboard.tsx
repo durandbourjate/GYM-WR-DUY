@@ -390,7 +390,7 @@ export default function DurchfuehrenDashboard({ pruefungId }: { pruefungId: stri
 
       {/* === Tab-Leiste === */}
       <div className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
-        <div className="max-w-6xl mx-auto w-full px-4">
+        <div className="max-w-7xl mx-auto w-full px-4">
           <nav className="flex gap-0 overflow-x-auto" role="tablist">
             {TAB_CONFIG.map(({ key, label, icon }) => {
               const verfuegbar = istTabVerfuegbar(key, phase)
@@ -428,7 +428,7 @@ export default function DurchfuehrenDashboard({ pruefungId }: { pruefungId: stri
 
       {/* === Tab-Content === */}
       {config && (
-        <div className="max-w-6xl mx-auto w-full px-4 py-4 space-y-4 flex-1">
+        <div className="max-w-7xl mx-auto w-full px-4 py-4 space-y-4 flex-1">
           {/* Vorbereitung: hidden statt unmount, damit State erhalten bleibt bei "Zurück" */}
           <div className={activeTab === 'vorbereitung' ? '' : 'hidden'}>
             <VorbereitungPhase
@@ -597,7 +597,7 @@ export default function DurchfuehrenDashboard({ pruefungId }: { pruefungId: stri
 
       {/* Demo-Modus: Config nicht geladen → Tab-Content mit Demo-Daten */}
       {!config && (
-        <div className="max-w-6xl mx-auto w-full px-4 py-4">
+        <div className="max-w-7xl mx-auto w-full px-4 py-4">
           <p className="text-sm text-slate-500 dark:text-slate-400 text-center py-8">
             Demo-Modus: Prüfungskonfiguration nicht verfügbar.
           </p>

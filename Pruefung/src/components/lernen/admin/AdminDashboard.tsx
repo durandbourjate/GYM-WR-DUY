@@ -9,6 +9,7 @@ import AdminSettings from './AdminSettings'
 
 interface AdminDashboardProps {
   onZuUeben?: () => void
+  onFachKlick?: () => void
 }
 
 type AdminAnsicht =
@@ -18,7 +19,7 @@ type AdminAnsicht =
   | { typ: 'kind'; email: string; name: string }
   | { typ: 'thema'; email: string; name: string; fach: string; thema: string }
 
-export default function AdminDashboard({ onZuUeben: _onZuUeben }: AdminDashboardProps) {
+export default function AdminDashboard({ onZuUeben: _onZuUeben, onFachKlick }: AdminDashboardProps) {
   const { aktiveGruppe } = useLernenGruppenStore()
   const [ansicht, setAnsicht] = useState<AdminAnsicht>({ typ: 'uebersicht' })
 
@@ -37,7 +38,7 @@ export default function AdminDashboard({ onZuUeben: _onZuUeben }: AdminDashboard
       {/* Breadcrumb bei Detail-Ansichten */}
       {!istHauptTab && (
         <div className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-6 py-3">
-          <div className="max-w-4xl mx-auto flex items-center gap-3">
+          <div className="max-w-7xl mx-auto flex items-center gap-3">
             <button onClick={zurueck} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 min-w-[44px] min-h-[44px] flex items-center justify-center">
               &#8592;
             </button>
@@ -52,7 +53,7 @@ export default function AdminDashboard({ onZuUeben: _onZuUeben }: AdminDashboard
       {/* Tab-Leiste */}
       {istHauptTab && (
         <div className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
-          <div className="max-w-4xl mx-auto px-6 flex gap-4">
+          <div className="max-w-7xl mx-auto px-6 flex gap-4">
             <button
               onClick={() => setAnsicht({ typ: 'uebersicht' })}
               className={`py-3 text-sm font-medium border-b-2 transition-colors ${ansicht.typ === 'uebersicht' ? 'border-slate-800 text-slate-800 dark:border-slate-200 dark:text-slate-200' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
@@ -75,11 +76,11 @@ export default function AdminDashboard({ onZuUeben: _onZuUeben }: AdminDashboard
         </div>
       )}
 
-      <main className="max-w-4xl mx-auto p-6">
+      <main className="max-w-7xl mx-auto p-6">
         {ansicht.typ === 'uebersicht' && (
           <AdminUebersicht
             onKindKlick={(email, name) => setAnsicht({ typ: 'kind', email, name })}
-            onFachKlick={() => {}}
+            onFachKlick={onFachKlick ? () => onFachKlick() : undefined}
           />
         )}
         {ansicht.typ === 'kind' && (
