@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useAuthStore } from '../../store/authStore'
+import { migratePoolThemen, type MigrationErgebnis } from '../../utils/migratePoolThemen'
 
 interface Props {
   onSchliessen: () => void
@@ -17,6 +18,8 @@ export default function EinstellungenPanel({ onSchliessen }: Props) {
   const user = useAuthStore(s => s.user)
   const istAdmin = user?.email === 'yannick.durand@gymhofwil.ch' // TODO: aus Config
   const [tab, setTab] = useState<EinstellungenTab>(istAdmin ? 'lp' : 'kurse')
+  const [migrationStatus, setMigrationStatus] = useState<'idle' | 'laeuft' | 'fertig'>('idle')
+  const [migrationErgebnis, setMigrationErgebnis] = useState<MigrationErgebnis | null>(null)
 
   const tabs: { key: EinstellungenTab; label: string; sichtbar: boolean }[] = [
     { key: 'lp', label: 'Lehrpersonen', sichtbar: istAdmin },
@@ -83,13 +86,59 @@ export default function EinstellungenPanel({ onSchliessen }: Props) {
           )}
 
           {tab === 'uebungen' && (
-            <div>
-              <h3 className="text-sm font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wide mb-4">Übungs-Einstellungen</h3>
-              <p className="text-sm text-slate-500 dark:text-slate-400">
-                Einstellungen für den Übungsmodus (Mastery-Schwellwerte, Standard-Filter etc.).
-              </p>
-              <div className="mt-4 p-4 bg-slate-50 dark:bg-slate-700/50 rounded-lg text-sm text-slate-500 dark:text-slate-400">
-                Wird in einer nächsten Version implementiert.
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-sm font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wide mb-4">Übungs-Einstellungen</h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400">
+                  Einstellungen für den Übungsmodus (Mastery-Schwellwerte, Standard-Filter etc.).
+                </p>
+                <div className="mt-4 p-4 bg-slate-50 dark:bg-slate-700/50 rounded-lg text-sm text-slate-500 dark:text-slate-400">
+                  Wird in einer nächsten Version implementiert.
+                </div>
+              </div>
+
+              {/* Migration: Pool-Fragen Themen korrigieren */}
+              <div className="border-t border-slate-200 dark:border-slate-700 pt-6">
+                <h3 className="text-sm font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wide mb-2">Daten-Migration</h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
+                  Pool-Fragen mit korrektem Thema/Unterthema versehen (einmalig).
+                  Setzt den Pool-Titel als Thema und das bisherige Thema als Unterthema.
+                </p>
+                <button
+                  onClick={async () => {
+                    if (!user?.email || migrationStatus === 'laeuft') return
+                    setMigrationStatus('laeuft')
+                    setMigrationErgebnis(null)
+                    try {
+                      const ergebnis = await migratePoolThemen(user.email)
+                      setMigrationErgebnis(ergebnis)
+                    } catch (error) {
+                      setMigrationErgebnis({ total: 0, aktualisiert: 0, uebersprungen: 0, fehler: 1, details: [`Unerwarteter Fehler: ${error}`] })
+                    }
+                    setMigrationStatus('fertig')
+                  }}
+                  disabled={migrationStatus === 'laeuft'}
+                  className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors cursor-pointer ${
+                    migrationStatus === 'laeuft'
+                      ? 'bg-slate-300 dark:bg-slate-600 text-slate-500 cursor-wait'
+                      : 'bg-slate-800 dark:bg-slate-200 text-white dark:text-slate-800 hover:bg-slate-900 dark:hover:bg-slate-100'
+                  }`}
+                >
+                  {migrationStatus === 'laeuft' ? 'Migration läuft...' : 'Pool-Themen migrieren'}
+                </button>
+
+                {migrationErgebnis && (
+                  <div className="mt-4 p-4 bg-slate-50 dark:bg-slate-700/50 rounded-lg text-sm space-y-2">
+                    <div className="flex gap-4">
+                      <span className="text-green-600 dark:text-green-400">✓ {migrationErgebnis.aktualisiert} aktualisiert</span>
+                      {migrationErgebnis.fehler > 0 && <span className="text-red-600 dark:text-red-400">✗ {migrationErgebnis.fehler} Fehler</span>}
+                      {migrationErgebnis.uebersprungen > 0 && <span className="text-slate-500">↷ {migrationErgebnis.uebersprungen} übersprungen</span>}
+                    </div>
+                    {migrationErgebnis.details.map((d, i) => (
+                      <p key={i} className="text-xs text-slate-500 dark:text-slate-400">{d}</p>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           )}
