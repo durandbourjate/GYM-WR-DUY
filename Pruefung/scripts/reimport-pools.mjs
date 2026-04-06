@@ -93,7 +93,7 @@ function konvertiereFrage(pf, meta, topics) {
     thema, unterthema,
     semester: [], gefaesse: [],
     bloom: mapBloom(pf.tax),
-    tags: [pf.topic, `diff:${pf.diff}`],
+    tags: [pf.topic, `diff:${pf.diff}`, 'pool-import'],
     punkte: berechnePunkte(pf),
     musterlosung: pf.explain ?? pf.sample ?? '',
     bewertungsraster: [],
