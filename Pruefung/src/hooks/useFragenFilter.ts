@@ -16,6 +16,18 @@ const SCHUL_FACHBEREICHE = new Set(['VWL', 'BWL', 'Recht', 'Informatik'])
 
 const SEITEN_GROESSE = 30
 
+/** Extrahiert Pool-Thema (Pool-Titel) und Unterthema (Topic-Label) für Pool-Fragen.
+ *  Pool-Fragen im alten Format haben thema=Topic-Label und kein unterthema.
+ *  Erkennung über quellReferenz "Pool: ..." */
+function poolThemenMapping(f: Frage): { thema: string; unterthema: string } {
+  const quellRef = ('quellReferenz' in f ? (f as { quellReferenz?: string }).quellReferenz : '') || ''
+  const hatUnterthema = !!f.unterthema
+  if (quellRef.startsWith('Pool: ') && !hatUnterthema) {
+    return { thema: quellRef.replace('Pool: ', '').trim(), unterthema: f.thema }
+  }
+  return { thema: f.thema, unterthema: f.unterthema || '' }
+}
+
 interface FragenFilterErgebnis {
   // Filter-State + Setter
   suchtext: string
@@ -98,22 +110,24 @@ export function useFragenFilter(
   // eslint-disable-next-line react-hooks/exhaustive-deps — aufgeklappteGruppen absichtlich ausgeschlossen (wuerde Loop verursachen)
   }, [ladeStatus, alleFragen, gruppierung])
 
-  // Verfügbare Themen (nur Thema, ohne Unterthema)
+  // Verfügbare Themen (Pool-Titel für Pool-Fragen, sonst f.thema)
   const verfuegbareThemen = useMemo(() => {
     const themen = new Map<string, number>()
     for (const f of alleFragen) {
-      themen.set(f.thema, (themen.get(f.thema) || 0) + 1)
+      const { thema } = poolThemenMapping(f)
+      themen.set(thema, (themen.get(thema) || 0) + 1)
     }
     return Array.from(themen.entries()).sort((a, b) => a[0].localeCompare(b[0]))
   }, [alleFragen])
 
-  // Verfügbare Unterthemen (kaskadierend: nur passend zum gewählten Thema)
+  // Verfügbare Unterthemen (Topic-Labels für Pool-Fragen, kaskadierend nach Thema)
   const verfuegbareUnterthemen = useMemo(() => {
     const unterthemen = new Map<string, number>()
     for (const f of alleFragen) {
-      if (!f.unterthema) continue
-      if (filterThema && f.thema !== filterThema) continue
-      unterthemen.set(f.unterthema, (unterthemen.get(f.unterthema) || 0) + 1)
+      const mapped = poolThemenMapping(f)
+      if (!mapped.unterthema) continue
+      if (filterThema && mapped.thema !== filterThema) continue
+      unterthemen.set(mapped.unterthema, (unterthemen.get(mapped.unterthema) || 0) + 1)
     }
     return Array.from(unterthemen.entries()).sort((a, b) => a[0].localeCompare(b[0]))
   }, [alleFragen, filterThema])
@@ -127,8 +141,10 @@ export function useFragenFilter(
       if (filterFachbereich && f.fachbereich !== filterFachbereich) return false
       if (filterTyp && f.typ !== filterTyp) return false
       if (filterBloom && f.bloom !== filterBloom) return false
-      if (filterThema && f.thema !== filterThema) return false
-      if (filterUnterthema && f.unterthema !== filterUnterthema) return false
+      // Thema/Unterthema: Pool-Mapping anwenden
+      const mapped = poolThemenMapping(f)
+      if (filterThema && mapped.thema !== filterThema) return false
+      if (filterUnterthema && mapped.unterthema !== filterUnterthema) return false
       // Quelle-Filter (zusammengelegt: Meine = mein Autor, Pool = aus Pool)
       if (filterQuelle === 'meine' && userEmail && f.autor && f.autor !== userEmail) return false
       if (filterQuelle === 'fachschaft' && f.geteilt !== 'fachschaft') return false

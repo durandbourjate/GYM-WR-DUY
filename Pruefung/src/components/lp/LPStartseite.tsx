@@ -42,7 +42,12 @@ export default function LPStartseite() {
     } catch { /* ignore */ }
     return 'pruefung'
   })
+  const [vorherigerModus, setVorherigerModus] = useState<'pruefung' | 'uebung'>('pruefung')
   const setModus = (m: 'pruefung' | 'uebung' | 'fragensammlung') => {
+    // Vorherigen Nicht-Fragensammlung-Modus merken für Zurück-Navigation
+    if (m === 'fragensammlung' && modus !== 'fragensammlung') {
+      setVorherigerModus(modus === 'uebung' ? 'uebung' : 'pruefung')
+    }
     setModusRaw(m)
     try { sessionStorage.setItem('lp-modus', m) } catch { /* ignore */ }
   }
@@ -612,7 +617,7 @@ export default function LPStartseite() {
           <FragenBrowser
             inline
             onHinzufuegen={() => {}}
-            onSchliessen={() => setModus('pruefung')}
+            onSchliessen={() => setModus(vorherigerModus)}
             bereitsVerwendet={[]}
           />
         </main>

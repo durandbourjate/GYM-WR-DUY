@@ -80,17 +80,22 @@ export default function Dashboard() {
 
     for (const f of alleFragen) {
       const themaRaw = f.thema || 'Allgemein'
+      const poolId = (f as { poolId?: string }).poolId || ''
+      const quellRef = (f as { quellReferenz?: string }).quellReferenz || ''
+      const hatUnterthema = !!(f as { unterthema?: string }).unterthema
+
       // Einrichtungsfragen unter "Einführung" gruppieren
       const fach = themaRaw.startsWith('Einrichtung') ? 'Einführung' : (f.fach || 'Andere')
 
-      // Pool-Fragen: quellReferenz ("Pool: Titel") als Thema, bisheriges thema als Unterthema
-      const quellRef = (f as { quellReferenz?: string }).quellReferenz || ''
       let thema = themaRaw
-      if (quellRef.startsWith('Pool: ') && !(f as { unterthema?: string }).unterthema) {
-        // Alte Pool-Fragen ohne unterthema: Pool-Titel → Thema, Topic-Label → Unterthema
-        const poolTitel = quellRef.replace('Pool: ', '').replace(/^(Einführung|Grundlagen)\s+/i, '').trim()
-        thema = poolTitel
-        // Unterthema on-the-fly setzen (für Filter im ThemaDetailView)
+      // Pool-Fragen: Pool-Titel = Thema, Topic-Label = Unterthema
+      // Pool-Fragen erkennen: poolId vorhanden (Format "poolMetaId:frageId") oder quellReferenz "Pool: ..."
+      if ((poolId || quellRef.startsWith('Pool: ')) && !hatUnterthema) {
+        // Pool-Titel aus quellReferenz extrahieren
+        if (quellRef.startsWith('Pool: ')) {
+          thema = quellRef.replace('Pool: ', '').trim()
+        }
+        // Bisheriges thema (= Topic-Label) wird zum Unterthema
         ;(f as { unterthema?: string }).unterthema = themaRaw
       }
 

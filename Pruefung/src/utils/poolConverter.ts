@@ -213,8 +213,8 @@ export function konvertierePoolFrage(
 ): Frage {
   const now = jetzt()
   const topic = topics[poolFrage.topic]
-  // Pool-Titel als Thema, Topic-Label als Unterthema (wie in pool.html: Fach → Pool → Topic)
-  const thema = poolMeta.title?.replace(/^(Einführung|Grundlagen)\s+/i, '').trim() || topic?.label || poolFrage.topic
+  // Pool-Titel = Thema, Topic-Label = Unterthema (wie in pool.html: Fach → Pool → Topic)
+  const thema = poolMeta.title || topic?.label || poolFrage.topic
   const unterthema = topic?.label ?? poolFrage.topic
 
   // Basis-Felder die alle konvertierten Fragen teilen
