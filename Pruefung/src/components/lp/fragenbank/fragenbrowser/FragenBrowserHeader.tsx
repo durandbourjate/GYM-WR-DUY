@@ -198,9 +198,8 @@ export default function FragenBrowserHeader({
       <div className="flex items-center gap-2 mt-2 flex-wrap">
         <span className="text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-wide font-medium">Filter:</span>
 
-        {/* Fach */}
-        {stats.fachbereiche.size > 1 && (
-          <select
+        {/* Fach — immer sichtbar */}
+        <select
             value={filterFachbereich}
             onChange={(e) => { setFilterFachbereich(e.target.value as Fachbereich | ''); setAngezeigteMenge(seitenGroesse) }}
             className="text-xs px-2 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-300 cursor-pointer"
@@ -212,11 +211,9 @@ export default function FragenBrowserHeader({
                 <option key={fb} value={fb}>{fb} ({count})</option>
               ))}
           </select>
-        )}
 
-        {/* Thema */}
-        {verfuegbareThemen.length > 1 && (
-          <select
+        {/* Thema — immer sichtbar */}
+        <select
             value={filterThema}
             onChange={(e) => { setFilterThema(e.target.value); setFilterUnterthema(''); setAngezeigteMenge(seitenGroesse) }}
             className="text-xs px-2 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-300 cursor-pointer max-w-[180px]"
@@ -226,11 +223,9 @@ export default function FragenBrowserHeader({
               <option key={thema} value={thema}>{thema} ({anzahl})</option>
             ))}
           </select>
-        )}
 
-        {/* Unterthema (kaskadierend) */}
-        {verfuegbareUnterthemen.length > 0 && (
-          <select
+        {/* Unterthema (kaskadierend) — immer sichtbar */}
+        <select
             value={filterUnterthema}
             onChange={(e) => { setFilterUnterthema(e.target.value); setAngezeigteMenge(seitenGroesse) }}
             className="text-xs px-2 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-300 cursor-pointer max-w-[180px]"
@@ -240,7 +235,6 @@ export default function FragenBrowserHeader({
               <option key={ut} value={ut}>{ut} ({anzahl})</option>
             ))}
           </select>
-        )}
 
         {/* Typ */}
         <select

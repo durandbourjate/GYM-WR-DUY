@@ -19,20 +19,29 @@ const SEITEN_GROESSE = 30
 /** Extrahiert Pool-Thema (Pool-Titel) und Unterthema (Topic-Label) für Pool-Fragen.
  *  Pool-Fragen im alten Format haben thema=Topic-Label und kein unterthema.
  *  Erkennung über quellReferenz "Pool: ...", poolId, oder quelle='pool' */
+/** Entfernt Fachbereich-Prefix und "Übungspool:" aus Pool-Titeln */
+function bereinigeTitel(titel: string): string {
+  return titel
+    .replace(/^Übungspool:\s*/i, '')
+    .replace(/^(VWL|BWL|Recht|Informatik|IN)\s*[-–—:]\s*/i, '')
+    .replace(/^(Einführung|Grundlagen)\s+/i, '')
+    .trim()
+}
+
 function poolThemenMapping(f: Frage): { thema: string; unterthema: string } {
   const quellRef = (f as { quellReferenz?: string }).quellReferenz || ''
   const hatUnterthema = !!f.unterthema
 
   // Pool-Fragen mit quellReferenz: Pool-Titel → Thema, bisheriges thema → Unterthema
   if (quellRef.startsWith('Pool: ') && !hatUnterthema) {
-    return { thema: quellRef.replace('Pool: ', '').trim(), unterthema: f.thema }
+    return { thema: bereinigeTitel(quellRef.replace('Pool: ', '')), unterthema: f.thema }
   }
 
-  // Pool-Fragen ohne quellReferenz aber mit poolId (Fallback): nach poolId gruppieren
+  // Pool-Fragen ohne quellReferenz aber mit poolId (Fallback)
   if (!hatUnterthema && f.quelle === 'pool' && (f as { poolId?: string }).poolId) {
-    const poolId = ((f as { poolId?: string }).poolId || '').split(':')[0] // z.B. "bwl_einfuehrung"
+    const poolId = ((f as { poolId?: string }).poolId || '').split(':')[0]
     if (poolId) {
-      return { thema: poolId.replace(/_/g, ' '), unterthema: f.thema }
+      return { thema: bereinigeTitel(poolId.replace(/_/g, ' ')), unterthema: f.thema }
     }
   }
 

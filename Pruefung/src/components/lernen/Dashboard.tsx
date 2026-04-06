@@ -73,6 +73,15 @@ export default function Dashboard() {
     ladeThemen()
   }, [aktiveGruppe])
 
+  /** Entfernt Fachbereich-Prefix und "Übungspool:" aus Pool-Titeln */
+  function bereinigeTitel(titel: string): string {
+    return titel
+      .replace(/^Übungspool:\s*/i, '')
+      .replace(/^(VWL|BWL|Recht|Informatik|IN)\s*[-–—:]\s*/i, '')
+      .replace(/^(Einführung|Grundlagen)\s+/i, '')
+      .trim()
+  }
+
   // Themen-Infos: Fach → Thema → { unterthemen, fragen, fortschritt }
   const themenMap = useMemo(() => {
     const map: Record<string, ThemenInfo[]> = {}
@@ -91,14 +100,14 @@ export default function Dashboard() {
       // Pool-Fragen: Pool-Titel = Thema, Topic-Label = Unterthema
       if (!hatUnterthema) {
         if (quellRef.startsWith('Pool: ')) {
-          // Pool-Titel aus quellReferenz
-          thema = quellRef.replace('Pool: ', '').trim()
+          // Pool-Titel aus quellReferenz, bereinigt
+          thema = bereinigeTitel(quellRef.replace('Pool: ', ''))
           ;(f as { unterthema?: string }).unterthema = themaRaw
         } else if (poolId) {
-          // Fallback: Pool-ID als Thema (z.B. "bwl einfuehrung")
+          // Fallback: Pool-ID als Thema (z.B. "bwl_einfuehrung" → "BWL Einführung")
           const poolName = poolId.split(':')[0]
           if (poolName) {
-            thema = poolName.replace(/_/g, ' ')
+            thema = bereinigeTitel(poolName.replace(/_/g, ' '))
             ;(f as { unterthema?: string }).unterthema = themaRaw
           }
         }
@@ -333,7 +342,8 @@ function ThemaDetailView({
   onZurueck, onStarte, fachFarben,
 }: ThemaDetailProps) {
   const farbe = getFachFarbe(themaDetail.fach, fachFarben)
-  const verfuegbareSchwierigkeiten = [...new Set(themaDetail.fragen.map(f => f.schwierigkeit ?? 2))].sort()
+  // Immer alle 3 Schwierigkeitsstufen anzeigen (Pool-Fragen haben diff 1-3)
+  const verfuegbareSchwierigkeiten = [1, 2, 3]
   const verfuegbareTypen = [...new Set(themaDetail.fragen.map(f => f.typ))].sort()
   const filterAktiv = unterthemaFilter.size > 0 || schwierigkeitFilter.size > 0 || typFilter.size > 0
 
@@ -408,7 +418,7 @@ function ThemaDetailView({
       </FilterSection>
 
       {/* Fragetyp-Chips */}
-      {verfuegbareTypen.length > 1 && (
+      {verfuegbareTypen.length > 0 && (
         <FilterSection titel="Fragetyp" emoji="✏️" onToggleAlle={onToggleAlleTypen}>
           {verfuegbareTypen.map(t => {
             const anzahl = themaDetail.fragen.filter(f => f.typ === t).length
@@ -480,10 +490,12 @@ function Chip({ label, count, aktiv, farbe, onClick }: {
   return (
     <button
       onClick={onClick}
-      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border-2 transition-colors cursor-pointer select-none"
+      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border-2 transition-colors cursor-pointer select-none ${
+        !aktiv ? 'text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-600' : ''
+      }`}
       style={aktiv
         ? { backgroundColor: farbe, color: '#fff', borderColor: farbe }
-        : { borderColor: '#e5e5e5', color: '#525252' }
+        : undefined
       }
     >
       {label}
