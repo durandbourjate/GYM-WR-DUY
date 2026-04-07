@@ -9,6 +9,7 @@ import { useUebenTheme } from '../../../hooks/ueben/useTheme'
 import { lernzielStatus } from '../../../utils/ueben/mastery'
 import FeedbackButton from '../../shared/FeedbackButton'
 import Tooltip from '../../ui/Tooltip'
+import SuSHilfePanel from '../SuSHilfePanel'
 
 interface Props {
   children: ReactNode
@@ -163,26 +164,8 @@ export default function AppShell({ children }: Props) {
         </div>
       </header>
 
-      {/* Hilfe-Panel */}
-      {hilfeOffen && (
-        <div className="bg-slate-50 dark:bg-slate-900/20 border-b border-slate-200 dark:border-slate-700 px-4 py-3">
-          <div className="max-w-2xl mx-auto text-sm text-slate-700 dark:text-slate-300 space-y-2">
-            <div className="flex justify-between items-start">
-              <h3 className="font-semibold dark:text-white">Hilfe</h3>
-              <button onClick={() => setHilfeOffen(false)} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">x</button>
-            </div>
-            <p>Wähle ein Thema aus und bearbeite Übungsfragen mit sofortigem Feedback.</p>
-            <div className="grid grid-cols-2 gap-2 text-xs">
-              <div><strong>Mastery-Stufen:</strong></div>
-              <div />
-              <div className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-slate-300 inline-block" /> Neu</div>
-              <div className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-yellow-400 inline-block" /> Üben</div>
-              <div className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-blue-400 inline-block" /> Gefestigt</div>
-              <div className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-green-500 inline-block" /> Gemeistert</div>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Hilfe-Panel (Slide-over) */}
+      {hilfeOffen && <SuSHilfePanel onSchliessen={() => setHilfeOffen(false)} />}
 
       {/* Lernziele-Panel */}
       {lernzieleOffen && (
