@@ -56,6 +56,91 @@ export function erstelleBlock(
 }
 
 /**
+ * Erstellt einen gemischten Block aus mehreren Themen (Cross-Topic-Mix).
+ * Verteilt proportional über die gewählten Themen, priorisiert nach Mastery.
+ */
+export function erstelleMixBlock(
+  alleFragen: Frage[],
+  quellen: { fach: string; thema: string }[],
+  options?: BlockOptions
+): Frage[] {
+  const mastery = options?.mastery || {}
+  const seed = options?.seed || `${Date.now()}`
+
+  // Fragen pro Quelle sammeln
+  const quellenFragen = quellen.map(q =>
+    alleFragen.filter(f => f.fach === q.fach && f.thema === q.thema)
+  ).filter(arr => arr.length > 0)
+
+  if (quellenFragen.length === 0) return []
+
+  // Pro Quelle nach Mastery sortieren + mischen
+  const sortiertProQuelle = quellenFragen.map((fragen, i) => {
+    const sortiert = [...fragen].sort((a, b) => {
+      const prioA = MASTERY_PRIORITAET[mastery[a.id] || 'neu']
+      const prioB = MASTERY_PRIORITAET[mastery[b.id] || 'neu']
+      return prioA - prioB
+    })
+    return seededShuffle(sortiert, seed + `q${i}`)
+  })
+
+  // Round-Robin: Abwechselnd je 1 Frage pro Quelle
+  const ergebnis: Frage[] = []
+  const indices = sortiertProQuelle.map(() => 0)
+  while (ergebnis.length < MAX_BLOCK_SIZE) {
+    let hinzugefuegt = false
+    for (let q = 0; q < sortiertProQuelle.length && ergebnis.length < MAX_BLOCK_SIZE; q++) {
+      if (indices[q] < sortiertProQuelle[q].length) {
+        ergebnis.push(sortiertProQuelle[q][indices[q]])
+        indices[q]++
+        hinzugefuegt = true
+      }
+    }
+    if (!hinzugefuegt) break
+  }
+
+  return seededShuffle(ergebnis, seed + 'mix')
+}
+
+/**
+ * Erstellt einen Repetitions-Block: schwache Fragen über alle Themen.
+ * Prio: Dauerbaustellen > üben > gefestigt. Exkludiert gemeistert + neu.
+ */
+export function erstelleRepetitionsBlock(
+  alleFragen: Frage[],
+  mastery: Record<string, MasteryStufe>,
+  dauerbaustellen?: Set<string>,
+  seed?: string
+): Frage[] {
+  const s = seed || `${Date.now()}`
+
+  const dauerBau: Frage[] = []
+  const ueben: Frage[] = []
+  const festigung: Frage[] = []
+
+  for (const f of alleFragen) {
+    const m = mastery[f.id] || 'neu'
+    if (dauerbaustellen?.has(f.id)) {
+      dauerBau.push(f)
+    } else if (m === 'ueben') {
+      ueben.push(f)
+    } else if (m === 'gefestigt') {
+      festigung.push(f)
+    }
+    // 'neu' und 'gemeistert' werden bei Repetition übersprungen
+  }
+
+  // Prio: Dauerbaustellen (4), üben (4), Festigung (2)
+  const ergebnis: Frage[] = [
+    ...seededShuffle(dauerBau, s + 'db').slice(0, 4),
+    ...seededShuffle(ueben, s + 'ue').slice(0, 4),
+    ...seededShuffle(festigung, s + 'fg').slice(0, 2),
+  ]
+
+  return seededShuffle(ergebnis, s + 'rep').slice(0, MAX_BLOCK_SIZE)
+}
+
+/**
  * Erstellt einen empfohlenen Block basierend auf Mastery-Lücken.
  * Zusammensetzung: 60% üben/neu, 25% Dauerbaustellen, 15% Festigung.
  */

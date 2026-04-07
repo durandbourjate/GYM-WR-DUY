@@ -2,10 +2,11 @@ import { create } from 'zustand'
 import type { Frage } from '../../types/ueben/fragen'
 import type { AntwortTyp } from '../../types/ueben/antworten'
 import { getFragetext } from '../../utils/ueben/fragetext'
-import type { UebungsSession, SessionErgebnis } from '../../types/ueben/uebung'
+import type { UebungsSession, SessionErgebnis, SessionModus, ThemaQuelle } from '../../types/ueben/uebung'
 import type { MasteryStufe } from '../../types/ueben/fortschritt'
 import { uebenFragenAdapter } from '../../adapters/ueben/appsScriptAdapter'
-import { erstelleBlock } from '../../utils/ueben/blockBuilder'
+import { erstelleBlock, erstelleMixBlock, erstelleRepetitionsBlock } from '../../utils/ueben/blockBuilder'
+import { istDauerbaustelle } from '../../utils/ueben/mastery'
 import { pruefeAntwort } from '../../utils/ueben/korrektur'
 import { useUebenFortschrittStore } from './fortschrittStore'
 
@@ -15,7 +16,7 @@ interface UebungsState {
   feedbackSichtbar: boolean
   letzteAntwortKorrekt: boolean | null
 
-  starteSession: (gruppeId: string, email: string, fach: string, thema: string, fragenOverride?: Frage[]) => Promise<void>
+  starteSession: (gruppeId: string, email: string, fach: string, thema: string, fragenOverride?: Frage[], modus?: SessionModus, quellen?: ThemaQuelle[]) => Promise<void>
   beantworte: (antwort: AntwortTyp) => void
   naechsteFrage: () => void
   vorherigeFrage: () => void
@@ -35,11 +36,19 @@ export const useUebenUebungsStore = create<UebungsState>((set, get) => ({
   feedbackSichtbar: false,
   letzteAntwortKorrekt: null,
 
-  starteSession: async (gruppeId, email, fach, thema, fragenOverride) => {
+  starteSession: async (gruppeId, email, fach, thema, fragenOverride, modus = 'standard', quellen) => {
     set({ ladeStatus: 'laden' })
 
     try {
-      const alleFragen = fragenOverride || await uebenFragenAdapter.ladeFragen(gruppeId, { fach, thema })
+      // Fragen laden — bei Mix/Repetition alle Fragen der Gruppe
+      let alleFragen: Frage[]
+      if (fragenOverride) {
+        alleFragen = fragenOverride
+      } else if (modus === 'mix' || modus === 'repetition') {
+        alleFragen = await uebenFragenAdapter.ladeFragen(gruppeId)
+      } else {
+        alleFragen = await uebenFragenAdapter.ladeFragen(gruppeId, { fach, thema })
+      }
 
       const fortschritte = useUebenFortschrittStore.getState().fortschritte
       const mastery: Record<string, MasteryStufe> = {}
@@ -47,7 +56,20 @@ export const useUebenUebungsStore = create<UebungsState>((set, get) => ({
         mastery[f.id] = fortschritte[f.id]?.mastery || 'neu'
       }
 
-      const block = erstelleBlock(alleFragen, thema, { mastery })
+      // Block erstellen je nach Modus
+      let block: Frage[]
+      if (modus === 'mix' && quellen) {
+        block = erstelleMixBlock(alleFragen, quellen, { mastery })
+      } else if (modus === 'repetition') {
+        // Dauerbaustellen ermitteln
+        const dauerBau = new Set<string>()
+        for (const [id, fp] of Object.entries(fortschritte)) {
+          if (istDauerbaustelle(fp.versuche, fp.richtig)) dauerBau.add(id)
+        }
+        block = erstelleRepetitionsBlock(alleFragen, mastery, dauerBau)
+      } else {
+        block = erstelleBlock(alleFragen, thema, { mastery })
+      }
 
       if (block.length === 0) {
         set({ ladeStatus: 'fehler' })
@@ -57,6 +79,8 @@ export const useUebenUebungsStore = create<UebungsState>((set, get) => ({
       const session: UebungsSession = {
         id: `s_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
         gruppeId, email, fach, thema,
+        modus,
+        quellen,
         fragen: block,
         antworten: {},
         ergebnisse: {},

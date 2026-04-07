@@ -20,6 +20,8 @@ import { ThemaKarte } from './ThemaKarte'
 import { EmpfehlungsKarte } from './EmpfehlungsKarte'
 import SuSAnalyse from './SuSAnalyse'
 import type { DeepLinkZiel } from '../../hooks/ueben/useDeepLinkAktivierung'
+import type { ThemaQuelle } from '../../types/ueben/uebung'
+import MixSessionDialog from './MixSessionDialog'
 
 const SCHWIERIGKEIT_LABELS: Record<number, string> = { 1: 'Einfach', 2: 'Mittel', 3: 'Schwer' }
 const SCHWIERIGKEIT_STERNE: Record<number, string> = { 1: '⭐', 2: '⭐⭐', 3: '⭐⭐⭐' }
@@ -226,6 +228,22 @@ export default function Dashboard({ deepLinkZiel }: DashboardProps = {}) {
     handleStarte(themaDetail.fach, themaDetail.thema, gefilterteFragen)
   }
 
+  // Mix/Repetition
+  const [mixDialogOffen, setMixDialogOffen] = useState(false)
+
+  const handleStarteMix = (quellen: ThemaQuelle[]) => {
+    if (!aktiveGruppe || !user || quellen.length < 2) return
+    starteSession(aktiveGruppe.id, user.email, 'Mix', 'Gemischte Übung', undefined, 'mix', quellen)
+    navigiere('uebung')
+    setMixDialogOffen(false)
+  }
+
+  const handleStarteRepetition = () => {
+    if (!aktiveGruppe || !user) return
+    starteSession(aktiveGruppe.id, user.email, 'Repetition', 'Schwächen trainieren', undefined, 'repetition')
+    navigiere('uebung')
+  }
+
   const toggleChip = <T,>(set: Set<T>, setFn: (s: Set<T>) => void, val: T) => {
     const neu = new Set(set)
     if (neu.has(val)) neu.delete(val)
@@ -294,6 +312,34 @@ export default function Dashboard({ deepLinkZiel }: DashboardProps = {}) {
               />
             ))}
           </div>
+        )}
+
+        {/* Mix / Repetition Buttons */}
+        {!aktivesThema && !laden && alleFragen.length > 0 && (
+          <div className="flex gap-2 mb-4">
+            <button
+              onClick={() => setMixDialogOffen(true)}
+              className="flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-medium text-slate-700 dark:text-slate-300 hover:border-slate-400 dark:hover:border-slate-500 hover:shadow-sm transition-all cursor-pointer"
+            >
+              <span>🔀</span> Gemischte Übung
+            </button>
+            <button
+              onClick={handleStarteRepetition}
+              className="flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-medium text-slate-700 dark:text-slate-300 hover:border-slate-400 dark:hover:border-slate-500 hover:shadow-sm transition-all cursor-pointer"
+            >
+              <span>🔄</span> Repetition
+            </button>
+          </div>
+        )}
+
+        {/* Mix-Dialog */}
+        {mixDialogOffen && (
+          <MixSessionDialog
+            themen={Object.values(themenMap).flat().map(t => ({ fach: t.fach, thema: t.thema, anzahl: t.fragen.length }))}
+            fachFarben={fachFarben}
+            onStarte={handleStarteMix}
+            onSchliessen={() => setMixDialogOffen(false)}
+          />
         )}
 
         {laden ? (

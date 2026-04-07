@@ -52,8 +52,13 @@ export default function Zusammenfassung({ onZurueck, onNochmal }: Props) {
         </div>
 
         <p className="text-sm text-slate-500 dark:text-slate-400">
-          {session.fach} — {session.thema}
+          {session.modus === 'mix' ? '🔀 Gemischte Übung' : session.modus === 'repetition' ? '🔄 Repetition' : `${session.fach} — ${session.thema}`}
         </p>
+        {session.quellen && session.quellen.length > 0 && (
+          <p className="text-xs text-slate-400 mt-1">
+            {session.quellen.map(q => q.thema).join(', ')}
+          </p>
+        )}
 
         {/* Statistik-Badges */}
         <div className="flex justify-center gap-3 mt-3">

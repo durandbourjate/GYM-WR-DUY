@@ -1,12 +1,21 @@
 import type { Frage } from './fragen'
 import type { AntwortTyp } from './antworten'
 
+export type SessionModus = 'standard' | 'mix' | 'repetition'
+
+export interface ThemaQuelle {
+  fach: string
+  thema: string
+}
+
 export interface UebungsSession {
   id: string
   gruppeId: string
   email: string
   fach: string
   thema: string
+  modus?: SessionModus
+  quellen?: ThemaQuelle[]
   fragen: Frage[]
   antworten: Record<string, AntwortTyp>
   ergebnisse: Record<string, boolean>
