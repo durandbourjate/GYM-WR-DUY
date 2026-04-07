@@ -37,17 +37,25 @@ Branch `main`. tsc ✅ | 193 Tests ✅ | Build ✅.
 | B2 | Doppelter Fragetext bei Aufgabengruppen im Üben-Modus | UebungsScreen.tsx |
 | B3 | FiBu-Dropdown leer: Fallback auf alle Konten wenn `konten` undefined | KontenSelect.tsx |
 | B4 | NaN in Auswertung: `Number.isFinite()` Guards bei Punkteberechnung | korrekturUtils.ts, KorrekturSchuelerZeile.tsx, KorrekturPDFAnsicht.tsx, useKorrekturDaten.ts |
-| B5 | Einrichtungsfragen: "Zahnrad-Symbol" / "Mond/Sonnen-Symbol" → "Sonnen-Symbol (☀️) im Header" | einrichtungsFragen.ts |
+| B5 | Einrichtungsfragen: Dark Mode "Zahnrad" → "Mond-Symbol (🌙) unten links" | einrichtungsFragen.ts |
+| **Einrichtungsübung repariert** | |
+| E1 | 10 Fragen-Datenstrukturen repariert (Berechnung, Sortierung, FiBu, Zeichnen etc.) | einrichtungsUebungFragen.ts |
+| E2 | MC Frageanzahl: Optionen auf 16/20/23/30 korrigiert (23 = korrekt) | einrichtungsUebungFragen.ts |
+| **UI-Texte aktualisiert (beide Dateien)** | |
+| U1 | "Navigationsleiste unten" → "Sidebar links" / "Header (X/23)" | einrichtungsFragen.ts, einrichtungsUebungFragen.ts |
+| U2 | "Fortschrittsbalken" → "Seitenzahl wie «1/23» (oben Mitte)" | einrichtungsFragen.ts, einrichtungsUebungFragen.ts |
+| U3 | "Materialpanel rechte Seite / Dokument-Symbol oben rechts" → "«📄 Material»-Button in Sidebar links oben" | einrichtungsFragen.ts |
 
 ### Nicht geändert (bewusst)
 - `lernziel`/`Lernziel`, `Lernende`/`lernend` (Fachbegriffe)
 - `components/lernen/`, `store/lernen/` etc. (Verzeichnisnamen — grösseres Refactoring)
 - Apps Script Endpoint-Strings (`lernplattformLogin` etc. — Backend-Kompatibilität)
 - ZeichnenToolbar/PDFToolbar title= (~30 Stellen — eigene Aufgabe wegen Toolbar-Komplexität)
+- 2 nicht referenzierte Fragen im `einrichtungsFragen.ts` Array (25 im Array, 23 in Config — harmlos)
 
 ### Zu verifizieren (nach Deploy)
-- Einrichtungsprüfung F9-F23: Daten sind korrekt, Rendering im Browser prüfen (Berechnung, FiBu, T-Konto etc.)
-- Einrichtungsübung (`einrichtungsUebungFragen.ts`): Sonne/Mond-Text dort noch nicht korrigiert
+- Einrichtungsübung: Alle 23 Fragen im Browser durchklicken (insbesondere FiBu-Typen F9-F15)
+- Demo-Prüfung: UI-Texte korrekt?
 - Übungs-Auswertung zeigt Punktevergabe (soll sie das bei formativen Übungen?)
 
 ### ⚠ Bekannt: localStorage-Key geändert
