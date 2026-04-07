@@ -6,16 +6,16 @@
 
 ---
 
-## Session 71 — Bugfix-Paket + Features (07.04.2026)
+## Session 71 — Grosses Bugfix & Feature-Paket (07.04.2026)
 
 ### Stand
-Branch `main`. tsc ✅ | 209 Tests ✅ | Build ✅.
+Branch `main`. tsc ✅ | 209 Tests ✅ | Build ✅. 11 Commits in dieser Session.
 
 ### Erledigte Arbeiten
 
 | # | Änderung | Dateien |
 |---|----------|---------|
-| **Bugfixes** | |
+| **Bugfixes (8)** | |
 | B1 | Doppelte Header-Bar bei SuS Korrektur-Liste entfernt | KorrekturListe.tsx |
 | B2 | Demo LP: Übungen-Tab + Fragensammlung laden korrekt (Mock-Gruppen) | UebungsToolView.tsx, LPStartseite.tsx |
 | B3 | Demo SuS: Übungen hängt nicht mehr (IST_DEMO prüft auch Haupt-Auth) | AppUeben.tsx |
@@ -23,38 +23,51 @@ Branch `main`. tsc ✅ | 209 Tests ✅ | Build ✅.
 | B5 | "Fuer" → "Für" + Aufträge-Filter aus Kontext befüllt | AdminAuftraege.tsx |
 | B6 | Skeleton-Header im Suspense-Fallback (kein Ladeblitz) | SuSStartseite.tsx |
 | B7 | Bloom-Guard: analyseUtils crasht nicht mehr bei undefined bloom | analyseUtils.ts |
-| **Features** | |
-| F1 | Unterthemen einzeln aktivierbar (Checkboxen pro Unterthema in Themensteuerung) | themenSichtbarkeit.ts, themenSichtbarkeitStore.ts, AdminThemensteuerung.tsx, appsScriptAdapter.ts |
-| F2 | Multi-Prüfungs-Dashboard per Button (Checkbox-Dialog auf Prüfungen-Liste) | LPStartseite.tsx |
+| B8 | ThemenSichtbarkeit: Header-Migration + robustes Lesen (leere fach/thema gefixt) | apps-script-code.js |
+| **Features (12)** | |
+| F1 | Unterthemen einzeln aktivierbar (Checkboxen, Auto-Aktivierung, immer sichtbar) | AdminThemensteuerung.tsx, themenSichtbarkeit.ts, themenSichtbarkeitStore.ts |
+| F2 | Multi-Prüfungs-Dashboard per Button (Checkbox-Dialog) | LPStartseite.tsx |
 | F3 | Teilen-Link pro Prüfung/Übung (🔗 Button in PruefungsKarte) | LPStartseite.tsx |
-| F4 | Lernziel-Panel: Gruppiert nach Fach+Thema, "▶ Üben"-Links pro Thema | AppShell.tsx (ueben) |
-| F5 | Metadaten-Rubrik: "Zuordnung" → "Metadaten", vor Fragetyp verschoben, Lernziel-Feld | MetadataSection.tsx, SharedFragenEditor.tsx |
+| F4 | Lernziel-Panel: 3-stufiges Akkordeon (Fach → Thema → Unterthema → LZ) | LernzieleAkkordeon.tsx (neu), AppShell.tsx |
+| F5 | Metadaten-Rubrik: "Zuordnung" → "Metadaten", vor Fragetyp, mit Lernziel-Checkboxen | MetadataSection.tsx, SharedFragenEditor.tsx, fragenFactory.ts |
+| F6 | Übungs-Einsicht für SuS: Session-Historie (localStorage) + Ergebnisse-Tab | UebungsEinsicht.tsx (neu), uebungsStore.ts, Dashboard.tsx |
+| F7 | Lernziel-Zuordnung: lernzielIds in FrageBasis persistierbar | SharedFragenEditor.tsx, fragenFactory.ts |
+| F8 | Fortschritt-Sync zum Backend: Debounced Queue (5s) | fortschrittStore.ts, appsScriptAdapter.ts |
+| F9 | SuS-Dashboard: Unterthemen-Filter (nur aktive Unterthemen anzeigen) | Dashboard.tsx |
+| F10 | LP Themen-Badge: "z.T. aktiv" bei partieller Unterthemen-Aktivierung | AdminThemensteuerung.tsx |
+| F11 | Themen-Karten: 🏁 Button + Mini-Modal mit Lernzielen pro Thema | ThemaKarte.tsx, Dashboard.tsx |
+| F12 | Lernziele-Import: 316 Pool-Lernziele mit thema+unterthema ins Backend | scripts/importLernziele.mjs, apps-script-code.js |
 
-### Typ-Erweiterung
-- `ThemenFreischaltung.unterthemen?: string[]` — Granulare Unterthemen-Aktivierung (undefined = alle)
+### Neue Dateien (3)
+- `src/components/ueben/LernzieleAkkordeon.tsx` — Akkordeon-Modal + Mini-Modal für Lernziele
+- `src/components/ueben/UebungsEinsicht.tsx` — Session-Historie + Detail-Ansicht
+- `scripts/importLernziele.mjs` — Pool-Lernziele Import-Script
+
+### Typ-Erweiterungen
+- `ThemenFreischaltung.unterthemen?: string[]` — Granulare Unterthemen-Aktivierung
+- `Lernziel.unterthema?: string` — Unterthema-Zuordnung (Pool-Topic = ExamLab-Unterthema)
+- `FrageBasis.lernzielIds?: string[]` — Lernziel-Zuordnung pro Frage
+- `GespeichertesErgebnis` — Persistierte Session-Ergebnisse für Übungs-Einsicht
 
 ### ⚠ Apps Script Deploy nötig
-- `lernplattformSetzeThemenStatus` erweitert: optionaler `unterthemen` Parameter
-- Backend muss Unterthemen-Array im ThemenSichtbarkeit-Tab speichern/laden
+- `lernplattformSetzeThemenStatus`: unterthemen-Parameter + Header-Migration
+- `lernplattformLadeThemenSichtbarkeit`: unterthemen-Feld + Header-Migration
+- `lernplattformSpeichereFortschritt`: wird jetzt vom Frontend aufgerufen (debounced)
+- `importiereLernziele`: unterthema-Spalte + Migration
+- `lernplattformLadeLernzieleV2`: gibt unterthema-Feld zurück
+- 316 Lernziele bereits importiert (Re-Import bei Bedarf via `node scripts/importLernziele.mjs`)
 
-| F6 | Übungs-Einsicht für SuS: Session-Historie in localStorage, Ergebnisse-Tab im Dashboard | uebungsStore.ts, UebungsEinsicht.tsx (neu), Dashboard.tsx |
-
-### Neue Dateien (1)
-- `src/components/ueben/UebungsEinsicht.tsx` — Session-Historie + Detail-Ansicht (Richtig/Falsch + Musterlösung)
-
-| F7 | Lernziel-Zuordnung in MetadataSection: Checkboxen + lernzielIds in FrageBasis persistierbar | SharedFragenEditor.tsx, MetadataSection.tsx, fragenFactory.ts |
-
-| F8 | Fortschritt-Sync zum Backend: Debounced Queue (5s), localStorage-Persistenz bei Offline | fortschrittStore.ts, appsScriptAdapter.ts, interfaces.ts |
-| F9 | Apps Script: unterthemen-Parameter in setzeThemenStatus + ladeThemenSichtbarkeit | apps-script-code.js |
-
-### ⚠ Apps Script Deploy nötig (erweitert)
-- `lernplattformSetzeThemenStatus`: neuer Parameter `unterthemen` (JSON-Array)
-- `lernplattformLadeThemenSichtbarkeit`: gibt `unterthemen`-Feld zurück
-- `lernplattformSpeichereFortschritt`: wird jetzt vom Frontend aufgerufen (debounced, 5s)
-- Bestehende ThemenSichtbarkeit-Tabs bekommen automatisch eine `unterthemen`-Spalte beim nächsten Schreiben
+### Verifiziert im Browser
+- ✅ LP Themensteuerung: Unterthemen-Checkboxen, z.T. aktiv Badge
+- ✅ SuS Dashboard: Themen-Karten mit AKTUELL-Badge
+- ✅ SuS Lernziel-Panel: 316 Lernziele im Akkordeon
+- ✅ LP Prüfungen: 🔗 Link-Button
+- ✅ SuS Ergebnisse-Tab sichtbar
 
 ### Offen (nächste Session)
-- **SuS-Dashboard: Unterthemen-Filter** — Dashboard filtert noch nicht nach aktiven Unterthemen (Frontend-TODO)
+- **Lernziele bei LP**: 🏁 Buttons auch in LP-Ansicht (Themensteuerung, Fragenbank)
+- **Lernziele-Vollständigkeit**: Nicht alle Pools/Topics haben Lernziele definiert
+- **Fortschritt-Sync verifizieren**: Debounced Queue im Live-Betrieb testen
 
 ---
 

@@ -8,9 +8,11 @@ const KATEGORIEN = [
   { id: 'start', label: 'Erste Schritte' },
   { id: 'ueben', label: 'Übung starten' },
   { id: 'waehrend', label: 'Während der Übung' },
+  { id: 'lernziele', label: 'Lernziele' },
   { id: 'mastery', label: 'Mastery-System' },
   { id: 'mix', label: 'Mix & Repetition' },
   { id: 'fortschritt', label: 'Mein Fortschritt' },
+  { id: 'ergebnisse', label: 'Ergebnisse' },
   { id: 'faq', label: 'Häufige Fragen' },
 ] as const
 
@@ -58,9 +60,11 @@ export default function SuSHilfePanel({ onSchliessen }: Props) {
           {aktiv === 'start' && <HilfeStart />}
           {aktiv === 'ueben' && <HilfeUeben />}
           {aktiv === 'waehrend' && <HilfeWaehrend />}
+          {aktiv === 'lernziele' && <HilfeLernziele />}
           {aktiv === 'mastery' && <HilfeMastery />}
           {aktiv === 'mix' && <HilfeMix />}
           {aktiv === 'fortschritt' && <HilfeFortschritt />}
+          {aktiv === 'ergebnisse' && <HilfeErgebnisse />}
           {aktiv === 'faq' && <HilfeFAQ />}
         </div>
       </div>
@@ -193,6 +197,38 @@ function HilfeFortschritt() {
   </>
 }
 
+function HilfeLernziele() {
+  return <>
+    <h3 className="font-semibold dark:text-white text-base">Lernziele</h3>
+    <p>Lernziele zeigen dir, was du am Ende eines Themas können solltest. Sie helfen dir, deinen Fortschritt einzuschätzen.</p>
+    <h4 className="font-medium dark:text-white mt-3">Wo finde ich Lernziele?</h4>
+    <ul className="list-disc list-inside space-y-1">
+      <li><strong>🏁 Button im Header</strong> — Öffnet alle Lernziele als Akkordeon (Fach → Thema → Unterthema).</li>
+      <li><strong>🏁 auf Themen-Karten</strong> — Zeigt die Lernziele für dieses spezifische Thema in einem Mini-Modal.</li>
+    </ul>
+    <h4 className="font-medium dark:text-white mt-3">Mastery-Status pro Lernziel</h4>
+    <div className="space-y-1.5 mt-2">
+      <div className="flex items-center gap-2"><span>🏁</span> <span>Offen — noch nicht bearbeitet.</span></div>
+      <div className="flex items-center gap-2"><span>🟡</span> <span>In Arbeit — erste Fragen beantwortet.</span></div>
+      <div className="flex items-center gap-2"><span>🔵</span> <span>Gefestigt — Fragen mehrmals richtig.</span></div>
+      <div className="flex items-center gap-2"><span>✅</span> <span>Gemeistert — Lernziel erreicht!</span></div>
+    </div>
+    <Tipp>Klicke auf "▶ Fragen üben" bei einem Lernziel um direkt zum entsprechenden Thema zu gelangen.</Tipp>
+  </>
+}
+
+function HilfeErgebnisse() {
+  return <>
+    <h3 className="font-semibold dark:text-white text-base">Ergebnisse</h3>
+    <p>Im Tab <strong>"Ergebnisse"</strong> siehst du alle deine abgeschlossenen Übungs-Sessions.</p>
+    <ul className="list-disc list-inside space-y-1">
+      <li>Pro Session: Fach, Thema, Datum, Richtig/Falsch-Quote.</li>
+      <li>Klicke auf eine Session für die <strong>Detail-Ansicht</strong>: Jede Frage mit Richtig/Falsch-Markierung und Musterlösung.</li>
+    </ul>
+    <Tipp>Die Ergebnisse werden lokal auf deinem Gerät gespeichert (bis 50 Sessions).</Tipp>
+  </>
+}
+
 function HilfeFAQ() {
   return <>
     <h3 className="font-semibold dark:text-white text-base">Häufige Fragen</h3>
@@ -216,6 +252,14 @@ function HilfeFAQ() {
       <div>
         <p className="font-medium dark:text-white">Wie funktioniert der Repetitions-Modus?</p>
         <p className="text-slate-500 dark:text-slate-400">Er sammelt deine schwächsten Fragen über alle Themen und erstellt eine gezielte Übung. Ideal für Prüfungsvorbereitung.</p>
+      </div>
+      <div>
+        <p className="font-medium dark:text-white">Was ist der 🏁 Button?</p>
+        <p className="text-slate-500 dark:text-slate-400">Er zeigt die Lernziele — im Header alle Lernziele als Akkordeon, auf den Themen-Karten die Lernziele des jeweiligen Themas.</p>
+      </div>
+      <div>
+        <p className="font-medium dark:text-white">Wo finde ich meine früheren Ergebnisse?</p>
+        <p className="text-slate-500 dark:text-slate-400">Im Tab "Ergebnisse" auf dem Dashboard. Klicke auf eine Session für die Detail-Ansicht mit Richtig/Falsch und Musterlösung.</p>
       </div>
     </div>
   </>

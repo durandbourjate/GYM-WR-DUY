@@ -575,7 +575,7 @@ function HilfeDurchfuehrung() {
 
       <Untertitel>Multi-Prüfungs-Dashboard</Untertitel>
       <Text>
-        Bei Nachprüfungsterminen (verschiedene Prüfungen gleichzeitig) können Sie alle in einem Tab überwachen. Verwenden Sie den URL-Parameter <code className="text-xs bg-slate-200 dark:bg-slate-600 px-1.5 py-0.5 rounded">?ids=pruefung-a,pruefung-b</code> um das Multi-Dashboard zu öffnen. Sie sehen eine Gesamtübersicht aller SuS, gruppiert nach Prüfung, und können jederzeit in die Einzelansicht einer Prüfung wechseln.
+        Bei Nachprüfungsterminen (verschiedene Prüfungen gleichzeitig) können Sie alle in einem Tab überwachen. Klicken Sie auf den &laquo;Multi-Dashboard&raquo;-Button auf der Prüfungsliste (erscheint ab 2 Prüfungen), wählen Sie die gewünschten Prüfungen per Checkbox und öffnen Sie das Dashboard in einem neuen Tab.
       </Text>
 
       <Untertitel>Phase 4: Ergebnisse</Untertitel>
@@ -810,7 +810,15 @@ function HilfeFAQ() {
       </FAQItem>
 
       <FAQItem frage="Kann ich mehrere Prüfungen gleichzeitig überwachen?">
-        Ja. Verwenden Sie den URL-Parameter ?ids=pruefung-a,pruefung-b um das Multi-Dashboard zu öffnen. Sie sehen eine Gesamtübersicht aller SuS, gruppiert nach Prüfung, und können in die Einzelansicht wechseln. Ideal für Nachprüfungstermine mit verschiedenen Prüfungen gleichzeitig.
+        Ja. Klicken Sie auf den &laquo;Multi-Dashboard&raquo;-Button auf der Prüfungsliste (ab 2 Prüfungen sichtbar), wählen Sie die Prüfungen per Checkbox und öffnen Sie das Dashboard in einem neuen Tab.
+      </FAQItem>
+
+      <FAQItem frage="Wie funktioniert die Unterthemen-Steuerung?">
+        Im Üben-Bereich unter Übungen → Themen können Sie Themen aktivieren. Klappen Sie ein Thema auf, um einzelne Unterthemen per Checkbox zu aktivieren/deaktivieren. Wenn nur einige Unterthemen aktiv sind, zeigt das Badge &laquo;z.T. aktiv&raquo;. SuS sehen dann nur Fragen zu den aktivierten Unterthemen.
+      </FAQItem>
+
+      <FAQItem frage="Was sind Lernziele und woher kommen sie?">
+        Lernziele stammen aus den Übungspools (316 importierte Lernziele). Sie werden pro Fach, Thema und Unterthema gruppiert. SuS sehen sie über den 🏁-Button im Header oder auf den Themen-Karten. Die Lernziele helfen bei der Orientierung und zeigen den Mastery-Fortschritt. Im Fragen-Editor (Metadaten-Rubrik) können Fragen einzelnen Lernzielen zugeordnet werden.
       </FAQItem>
 
       <FAQItem frage="Wie funktioniert der Demo-Modus?">
