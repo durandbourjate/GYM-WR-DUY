@@ -36,6 +36,11 @@ export default function AdminUebersicht({ onKindKlick, onFachKlick }: Props) {
   const fachStats = useMemo(() => {
     const stats: Record<string, { fach: string; anzahl: number; themen: Set<string>; typen: Set<string> }> = {}
     for (const f of fragen) {
+      // Einrichtungsfragen ausblenden (Tutorial-Fragen)
+      const tags = (f.tags || []) as (string | { name: string })[]
+      if (tags.some(t => (typeof t === 'string' ? t : t.name) === 'einrichtung')) continue
+      if (f.thema === 'Einrichtung' || f.thema === 'Einrichtungstest') continue
+
       if (!stats[f.fach]) stats[f.fach] = { fach: f.fach, anzahl: 0, themen: new Set(), typen: new Set() }
       stats[f.fach].anzahl++
       if (f.thema) stats[f.fach].themen.add(f.thema)

@@ -517,20 +517,6 @@ export default function LPStartseite() {
                   )
                 })}
                 <span className="w-px h-4 bg-slate-200 dark:bg-slate-700 mx-1" />
-                {(['summativ', 'formativ'] as const).map(t => (
-                  <button
-                    key={t}
-                    onClick={() => setFilterTyp(filterTyp === t ? null : t)}
-                    className={`px-2.5 py-1 text-xs font-medium rounded-full border transition-colors cursor-pointer ${
-                      filterTyp === t
-                        ? 'bg-slate-700 text-white border-slate-700 dark:bg-slate-200 dark:text-slate-800 dark:border-slate-200'
-                        : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700 dark:hover:bg-slate-750'
-                    }`}
-                  >
-                    {t.charAt(0).toUpperCase() + t.slice(1)}
-                  </button>
-                ))}
-                <span className="w-px h-4 bg-slate-200 dark:bg-slate-700 mx-1" />
                 {verfuegbareGefaesse.map(g => (
                   <button
                     key={g}

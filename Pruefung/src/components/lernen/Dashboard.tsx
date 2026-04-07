@@ -83,9 +83,13 @@ export default function Dashboard() {
       const themaRaw = f.thema || 'Allgemein'
       const poolId = (f as { poolId?: string }).poolId || ''
       const hatUnterthema = !!(f as { unterthema?: string }).unterthema
+      const tags = (f.tags || []) as (string | { name: string })[]
 
-      // Einrichtungsfragen unter "Einführung" gruppieren
-      const fach = themaRaw.startsWith('Einrichtung') ? 'Einführung' : (f.fach || 'Andere')
+      // Einrichtungsfragen komplett ausblenden (Tutorial-Fragen, nicht für reguläres Üben)
+      if (tags.some(t => (typeof t === 'string' ? t : t.name) === 'einrichtung')) continue
+      if (themaRaw === 'Einrichtung' || themaRaw === 'Einrichtungstest') continue
+
+      const fach = f.fach || 'Andere'
 
       let thema = themaRaw
       // Pool-Fragen: Pool-Titel aus fester Mapping-Tabelle, Topic-Label = Unterthema
@@ -98,7 +102,7 @@ export default function Dashboard() {
         }
       }
 
-      if (sichtbareFaecher.length > 0 && !sichtbareFaecher.includes(fach) && fach !== 'Einführung') continue
+      if (sichtbareFaecher.length > 0 && !sichtbareFaecher.includes(fach)) continue
       if (!fachThema[fach]) fachThema[fach] = {}
       if (!fachThema[fach][thema]) fachThema[fach][thema] = []
       fachThema[fach][thema].push(f)
