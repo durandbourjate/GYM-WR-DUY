@@ -78,9 +78,9 @@ export default function LPStartseite() {
     return [...gefaesse].sort()
   }, [configs])
 
-  // Gefilterte und sortierte Prüfungen (nur summativ — formative laufen über Üben-Tab)
-  const gefilterteConfigs = useMemo(() => {
-    let result = configs.filter(c => c.typ !== 'formativ')
+  // Generische Filter-Funktion für Configs (Prüfungen + Übungen)
+  function filtereConfigs(basisConfigs: PruefungsConfig[]): PruefungsConfig[] {
+    let result = [...basisConfigs]
     // Status-Filter (Archiv)
     if (filterStatus === 'aktiv') {
       result = result.filter(c => !c.beendetUm)
@@ -115,10 +115,19 @@ export default function LPStartseite() {
       return a.klasse.localeCompare(b.klasse)
     })
     return result
-  }, [configs, suchtext, filterFach, filterTyp, filterGefaess, sortierung, filterStatus])
+  }
 
-  // Nur summative Prüfungen (für Zähler und letzteFuenf)
+  // Gefilterte Prüfungen (summativ)
   const summativeConfigs = useMemo(() => configs.filter(c => c.typ !== 'formativ'), [configs])
+  const gefilterteConfigs = useMemo(() => filtereConfigs(summativeConfigs),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [summativeConfigs, suchtext, filterFach, filterTyp, filterGefaess, sortierung, filterStatus])
+
+  // Gefilterte Übungen (formativ)
+  const formativeConfigs = useMemo(() => configs.filter(c => c.typ === 'formativ'), [configs])
+  const gefilterteUebungen = useMemo(() => filtereConfigs(formativeConfigs),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [formativeConfigs, suchtext, filterFach, filterTyp, filterGefaess, sortierung, filterStatus])
 
   // Letzte 5 (nach Datum, nur ohne aktive Filter)
   const letzteFuenf = useMemo(() => {
@@ -370,31 +379,96 @@ export default function LPStartseite() {
               {ladeStatus === 'laden' && (
                 <p className="text-slate-500 dark:text-slate-400 text-center py-12">Übungen werden geladen...</p>
               )}
-              {ladeStatus === 'fertig' && (() => {
-                const formativeUebungen = configs.filter(c => c.typ === 'formativ')
-                if (formativeUebungen.length === 0) return (
-                  <div className="text-center py-12">
-                    <div className="w-16 h-16 mx-auto mb-4 bg-slate-200 dark:bg-slate-700 rounded-2xl flex items-center justify-center">
-                      <span className="text-2xl">📝</span>
+              {ladeStatus === 'fertig' && formativeConfigs.length === 0 && (
+                <div className="text-center py-12">
+                  <div className="w-16 h-16 mx-auto mb-4 bg-slate-200 dark:bg-slate-700 rounded-2xl flex items-center justify-center">
+                    <span className="text-2xl">📝</span>
+                  </div>
+                  <h2 className="text-lg font-semibold text-slate-700 dark:text-slate-200 mb-2">Noch keine Übungen</h2>
+                  <p className="text-slate-500 dark:text-slate-400 mb-4">Erstellen Sie Ihre erste formative Übung.</p>
+                  <button onClick={handleNeueUebung} className="px-4 py-2 text-sm font-semibold text-white bg-slate-800 dark:bg-slate-200 dark:text-slate-800 rounded-lg hover:bg-slate-900 dark:hover:bg-slate-100 transition-colors cursor-pointer">
+                    + Neue Übung erstellen
+                  </button>
+                </div>
+              )}
+              {ladeStatus === 'fertig' && formativeConfigs.length > 0 && (
+                <div className="space-y-3">
+                  {/* Such- und Filterleiste (analog Prüfen) */}
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="text"
+                        placeholder="Suche nach Titel, Klasse oder ID..."
+                        value={suchtext}
+                        onChange={(e) => setSuchtext(e.target.value)}
+                        className="input-field flex-1 px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-300 dark:focus:ring-slate-600"
+                      />
+                      <select
+                        value={sortierung}
+                        onChange={(e) => setSortierung(e.target.value as 'datum' | 'titel' | 'klasse')}
+                        className="px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-slate-300 dark:focus:ring-slate-600 cursor-pointer"
+                      >
+                        <option value="datum">Neueste zuerst</option>
+                        <option value="titel">Nach Titel</option>
+                        <option value="klasse">Nach Klasse</option>
+                      </select>
                     </div>
-                    <h2 className="text-lg font-semibold text-slate-700 dark:text-slate-200 mb-2">Noch keine Übungen</h2>
-                    <p className="text-slate-500 dark:text-slate-400 mb-4">Erstellen Sie Ihre erste formative Übung.</p>
-                    <button onClick={handleNeueUebung} className="px-4 py-2 text-sm font-semibold text-white bg-slate-800 dark:bg-slate-200 dark:text-slate-800 rounded-lg hover:bg-slate-900 dark:hover:bg-slate-100 transition-colors cursor-pointer">
-                      + Neue Übung erstellen
-                    </button>
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      {verfuegbareFachbereiche.map(fb => {
+                        const farbe = getFachFarbe(fb, {})
+                        const aktiv = filterFach.includes(fb)
+                        return (
+                          <button
+                            key={fb}
+                            onClick={() => toggleFachFilter(fb)}
+                            className={`px-2.5 py-1 text-xs font-medium rounded-full border transition-colors cursor-pointer ${
+                              !aktiv ? 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700 dark:hover:bg-slate-750' : ''
+                            }`}
+                            style={aktiv ? { backgroundColor: farbe + '20', color: farbe, borderColor: farbe + '60' } : undefined}
+                          >
+                            {fb}
+                          </button>
+                        )
+                      })}
+                      {verfuegbareGefaesse.length > 0 && <>
+                        <span className="w-px h-4 bg-slate-200 dark:bg-slate-700 mx-1" />
+                        {verfuegbareGefaesse.map(g => (
+                          <button
+                            key={g}
+                            onClick={() => setFilterGefaess(filterGefaess === g ? null : g)}
+                            className={`px-2.5 py-1 text-xs font-medium rounded-full border transition-colors cursor-pointer ${
+                              filterGefaess === g
+                                ? 'bg-slate-700 text-white border-slate-700 dark:bg-slate-200 dark:text-slate-800 dark:border-slate-200'
+                                : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700 dark:hover:bg-slate-750'
+                            }`}
+                          >
+                            {g}
+                          </button>
+                        ))}
+                      </>}
+                      {hatAktiveFilter && (
+                        <button
+                          onClick={() => { setSuchtext(''); setFilterFach([]); setFilterTyp(null); setFilterGefaess(null); setFilterStatus('aktiv') }}
+                          className="px-2 py-1 text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-pointer"
+                        >
+                          Zurücksetzen
+                        </button>
+                      )}
+                    </div>
                   </div>
-                )
-                return (
-                  <div className="space-y-3">
-                    <h2 className="text-sm font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wide">
-                      {formativeUebungen.length} Übung{formativeUebungen.length !== 1 ? 'en' : ''}
-                    </h2>
-                    {formativeUebungen.map(c => (
-                      <PruefungsKarte key={c.id} config={c} onBearbeiten={handleBearbeiten} onDuplizieren={handleDuplizieren} trackerSummary={findeTrackerSummary(c.id)} />
-                    ))}
-                  </div>
-                )
-              })()}
+
+                  {/* Zähler */}
+                  <h2 className="text-sm font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wide">
+                    {hatAktiveFilter
+                      ? `${gefilterteUebungen.length} von ${formativeConfigs.length} Übungen`
+                      : `${formativeConfigs.length} Übung${formativeConfigs.length !== 1 ? 'en' : ''}`}
+                  </h2>
+
+                  {gefilterteUebungen.map(c => (
+                    <PruefungsKarte key={c.id} config={c} onBearbeiten={handleBearbeiten} onDuplizieren={handleDuplizieren} trackerSummary={findeTrackerSummary(c.id)} />
+                  ))}
+                </div>
+              )}
             </main>
           )}
 

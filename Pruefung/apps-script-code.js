@@ -76,10 +76,22 @@ function istZugelasseneLP(email) {
  * Token wird in CacheService gespeichert (TTL 3 Stunden).
  */
 function generiereSessionToken_(email, pruefungId) {
-  var token = Utilities.getUuid();
   var cache = CacheService.getScriptCache();
-  var daten = JSON.stringify({ email: email.toLowerCase(), pruefungId: pruefungId, ts: new Date().toISOString() });
+  var emailLc = email.toLowerCase();
+
+  // Session-Lock: Altes Token für diese Email+Prüfung invalidieren
+  var lockKey = 'sus_active_' + emailLc + '_' + (pruefungId || '');
+  var altesToken = cache.get(lockKey);
+  if (altesToken) {
+    cache.remove('sus_session_' + altesToken); // Altes Token löschen
+  }
+
+  // Neues Token generieren und speichern
+  var token = Utilities.getUuid();
+  var daten = JSON.stringify({ email: emailLc, pruefungId: pruefungId, ts: new Date().toISOString() });
   cache.put('sus_session_' + token, daten, 10800); // 3h
+  cache.put(lockKey, token, 10800); // Lookup: Email+Prüfung → aktuelles Token
+
   return token;
 }
 
