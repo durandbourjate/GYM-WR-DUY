@@ -86,6 +86,7 @@ async function main() {
               fach,
               poolId,
               thema: poolTitle,
+              unterthema: '', // Pool-übergreifend, kein spezifisches Unterthema
               text: bereinigeLernzielText(lzText),
               bloom: extrahiereBloom(lzText),
               aktiv: true,
@@ -115,7 +116,8 @@ async function main() {
                 id: `pool-${poolId}-${topicKey}-${alleLernziele.length}`,
                 fach,
                 poolId,
-                thema: poolTitle, // Pool-Titel = Thema in ExamLab (nicht topicLabel)
+                thema: poolTitle,
+                unterthema: topicLabel, // Topic-Label = Unterthema in ExamLab
                 text: bereinigeLernzielText(lzText),
                 bloom: extrahiereBloom(lzText),
                 aktiv: true,

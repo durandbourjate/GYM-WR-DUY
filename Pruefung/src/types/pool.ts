@@ -86,6 +86,7 @@ export interface Lernziel {
   fach: string
   poolId?: string
   thema: string
+  unterthema?: string
   text: string
   bloom: string
   aktiv?: boolean

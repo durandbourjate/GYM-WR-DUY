@@ -3826,11 +3826,21 @@ function importiereLernziele(body) {
     var sheet = fragenbank.getSheetByName(LERNZIELE_TAB);
 
     // Tab erstellen falls nicht vorhanden
-    var lernzielHeaders = ['id', 'fach', 'poolId', 'thema', 'text', 'bloom', 'aktiv'];
+    var lernzielHeaders = ['id', 'fach', 'poolId', 'thema', 'unterthema', 'text', 'bloom', 'aktiv'];
     if (!sheet) {
       sheet = fragenbank.insertSheet(LERNZIELE_TAB);
       sheet.getRange(1, 1, 1, lernzielHeaders.length).setValues([lernzielHeaders]);
       sheet.getRange(1, 1, 1, lernzielHeaders.length).setFontWeight('bold');
+    }
+
+    // Migration: unterthema-Spalte hinzufügen wenn sie fehlt
+    var currentHeaders = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0].map(function(h) { return String(h).trim().toLowerCase(); });
+    if (currentHeaders.indexOf('unterthema') === -1) {
+      // Nach 'thema' einfügen (Position 5, 1-basiert)
+      var themaColIdx = currentHeaders.indexOf('thema');
+      var insertCol = themaColIdx >= 0 ? themaColIdx + 2 : sheet.getLastColumn() + 1;
+      sheet.insertColumnAfter(themaColIdx >= 0 ? themaColIdx + 1 : sheet.getLastColumn());
+      sheet.getRange(1, insertCol).setValue('unterthema');
     }
 
     var data = getSheetData(sheet);
@@ -3847,6 +3857,7 @@ function importiereLernziele(body) {
         fach: lz.fach || '',
         poolId: lz.poolId || '',
         thema: lz.thema || '',
+        unterthema: lz.unterthema || '',
         text: lz.text || '',
         bloom: lz.bloom || '',
         aktiv: lz.aktiv !== false ? 'true' : 'false'
@@ -8288,11 +8299,13 @@ function lernplattformLadeLernzieleV2(body) {
 
     for (var i = 1; i < daten.length; i++) {
       var fragenIdsRaw = String(daten[i][headers.indexOf('fragenids')] || '');
+      var utIdx = headers.indexOf('unterthema');
       lernziele.push({
         id: String(daten[i][headers.indexOf('id')]),
         text: String(daten[i][headers.indexOf('text')]),
         fach: String(daten[i][headers.indexOf('fach')]),
         thema: String(daten[i][headers.indexOf('thema')] || ''),
+        unterthema: utIdx >= 0 ? String(daten[i][utIdx] || '') : '',
         bloom: String(daten[i][headers.indexOf('bloom')] || 'K2'),
         fragenIds: fragenIdsRaw ? fragenIdsRaw.split(',').map(function(s) { return s.trim(); }).filter(Boolean) : [],
       });

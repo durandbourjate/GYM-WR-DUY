@@ -19,15 +19,21 @@ export default function LernzieleAkkordeon({ lernziele, fortschritte, onSchliess
   const [offeneFaecher, setOffeneFaecher] = useState<Set<string>>(new Set())
   const [offeneThemen, setOffeneThemen] = useState<Set<string>>(new Set())
 
-  // Gruppierung: Fach → Thema → Lernziele
-  const fachMap: Record<string, Record<string, Lernziel[]>> = {}
+  // Gruppierung: Fach → Thema → { meta: LZ[], unterthemen: { ut: LZ[] } }
+  interface ThemaGruppe { meta: Lernziel[]; unterthemen: Record<string, Lernziel[]> }
+  const fachMap: Record<string, Record<string, ThemaGruppe>> = {}
   for (const lz of lernziele) {
     if (lz.aktiv === false) continue
     const fach = lz.fach || 'Andere'
     const thema = lz.thema || 'Allgemein'
     if (!fachMap[fach]) fachMap[fach] = {}
-    if (!fachMap[fach][thema]) fachMap[fach][thema] = []
-    fachMap[fach][thema].push(lz)
+    if (!fachMap[fach][thema]) fachMap[fach][thema] = { meta: [], unterthemen: {} }
+    if (lz.unterthema) {
+      if (!fachMap[fach][thema].unterthemen[lz.unterthema]) fachMap[fach][thema].unterthemen[lz.unterthema] = []
+      fachMap[fach][thema].unterthemen[lz.unterthema].push(lz)
+    } else {
+      fachMap[fach][thema].meta.push(lz)
+    }
   }
 
   const faecher = Object.keys(fachMap).sort()
@@ -47,6 +53,25 @@ export default function LernzieleAkkordeon({ lernziele, fortschritte, onSchliess
       if (neu.has(key)) neu.delete(key)
       else neu.add(key)
       return neu
+    })
+  }
+
+  function renderLernzielListe(liste: Lernziel[], fp: Record<string, FragenFortschritt>) {
+    return liste.map(lz => {
+      const status = lernzielStatus(lz, fp)
+      return (
+        <div key={lz.id} className="flex items-start gap-2 text-sm">
+          <span className="mt-0.5 shrink-0">
+            {status === 'gemeistert' ? '✅' : status === 'gefestigt' ? '🔵' : status === 'inArbeit' ? '🟡' : '🏁'}
+          </span>
+          <span className={`flex-1 ${status === 'gemeistert' ? 'line-through text-slate-400' : 'dark:text-slate-300'}`}>
+            {lz.text}
+          </span>
+          <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400 shrink-0">
+            {lz.bloom}
+          </span>
+        </div>
+      )
     })
   }
 
@@ -83,7 +108,9 @@ export default function LernzieleAkkordeon({ lernziele, fortschritte, onSchliess
             const themenKeys = Object.keys(themen).sort()
             const fachOffen = offeneFaecher.has(fach)
             const farbe = getFachFarbe(fach, {})
-            const anzahlLZ = themenKeys.reduce((s, t) => s + themen[t].length, 0)
+            const anzahlLZ = themenKeys.reduce((s, t) => {
+              const g = themen[t]; return s + g.meta.length + Object.values(g.unterthemen).reduce((s2, arr) => s2 + arr.length, 0)
+            }, 0)
 
             return (
               <div key={fach} className="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden">
@@ -108,7 +135,9 @@ export default function LernzieleAkkordeon({ lernziele, fortschritte, onSchliess
                     {themenKeys.map(thema => {
                       const themaKey = `${fach}::${thema}`
                       const themaOffen = offeneThemen.has(themaKey)
-                      const themaLZ = themen[thema]
+                      const gruppe = themen[thema]
+                      const utKeys = Object.keys(gruppe.unterthemen).sort()
+                      const totalLZ = gruppe.meta.length + utKeys.reduce((s, ut) => s + gruppe.unterthemen[ut].length, 0)
 
                       return (
                         <div key={thema} className="border-b border-slate-100 dark:border-slate-700 last:border-0">
@@ -119,45 +148,46 @@ export default function LernzieleAkkordeon({ lernziele, fortschritte, onSchliess
                           >
                             <span className="text-sm font-medium dark:text-slate-200">{thema}</span>
                             <div className="flex items-center gap-2">
-                              <span className="text-xs text-slate-400">{themaLZ.length} LZ</span>
+                              <span className="text-xs text-slate-400">{totalLZ} LZ</span>
                               {!themaOffen && (
                                 <button
                                   onClick={(e) => { e.stopPropagation(); onThemaUeben(thema) }}
                                   className="text-xs px-2 py-0.5 rounded text-white transition-colors"
                                   style={{ backgroundColor: farbe }}
                                 >
-                                  {themaLZ.length} Fragen ▶
+                                  Fragen ▶
                                 </button>
                               )}
                               <span className="text-slate-400">{themaOffen ? '▲' : '▼'}</span>
                             </div>
                           </button>
 
-                          {/* Lernziele (aufgeklappt) */}
+                          {/* Inhalt (aufgeklappt): Meta-LZ + Unterthemen */}
                           {themaOffen && (
-                            <div className="bg-slate-50 dark:bg-slate-900/30 px-4 py-2 pl-10 space-y-1.5">
-                              {themaLZ.map(lz => {
-                                const status = lernzielStatus(lz, fortschritte)
-                                return (
-                                  <div key={lz.id} className="flex items-start gap-2 text-sm">
-                                    <span className="mt-0.5 shrink-0">
-                                      {status === 'gemeistert' ? '✅' : status === 'gefestigt' ? '🔵' : status === 'inArbeit' ? '🟡' : '🏁'}
-                                    </span>
-                                    <span className={`flex-1 ${status === 'gemeistert' ? 'line-through text-slate-400' : 'dark:text-slate-300'}`}>
-                                      {lz.text}
-                                    </span>
-                                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400 shrink-0">
-                                      {lz.bloom}
-                                    </span>
+                            <div className="bg-slate-50 dark:bg-slate-900/30 px-4 py-2 pl-10 space-y-2">
+                              {/* Pool-übergreifende Lernziele (ohne Unterthema) */}
+                              {gruppe.meta.length > 0 && (
+                                <div className="space-y-1.5">
+                                  <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">Übergeordnet</p>
+                                  {renderLernzielListe(gruppe.meta, fortschritte)}
+                                </div>
+                              )}
+                              {/* Unterthemen mit ihren Lernzielen */}
+                              {utKeys.map(ut => (
+                                <div key={ut} className="space-y-1">
+                                  <div className="flex items-center justify-between">
+                                    <p className="text-xs font-medium dark:text-slate-300">{ut}</p>
+                                    <span className="text-[10px] text-slate-400">{gruppe.unterthemen[ut].length} LZ</span>
                                   </div>
-                                )
-                              })}
+                                  {renderLernzielListe(gruppe.unterthemen[ut], fortschritte)}
+                                </div>
+                              ))}
                               <button
                                 onClick={() => onThemaUeben(thema)}
                                 className="w-full mt-2 py-2 rounded-lg text-sm font-medium text-white transition-colors"
                                 style={{ backgroundColor: farbe }}
                               >
-                                ▶ {themaLZ.length} Fragen zu «{thema}» üben
+                                ▶ Fragen zu «{thema}» üben
                               </button>
                             </div>
                           )}
@@ -192,10 +222,21 @@ export function LernzieleMiniModal({ thema, fach, lernziele, fortschritte, onSch
 
   if (relevante.length === 0) return null
 
+  // Nach Unterthema gruppieren
+  const meta = relevante.filter(lz => !lz.unterthema)
+  const utGruppen: Record<string, typeof relevante> = {}
+  for (const lz of relevante) {
+    if (lz.unterthema) {
+      if (!utGruppen[lz.unterthema]) utGruppen[lz.unterthema] = []
+      utGruppen[lz.unterthema].push(lz)
+    }
+  }
+  const utKeys = Object.keys(utGruppen).sort()
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={onSchliessen}>
       <div
-        className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-md mx-4 p-5"
+        className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-md mx-4 p-5 max-h-[70vh] flex flex-col"
         onClick={e => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-3">
@@ -206,33 +247,48 @@ export function LernzieleMiniModal({ thema, fach, lernziele, fortschritte, onSch
           <button onClick={onSchliessen} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">✕</button>
         </div>
 
-        <div className="space-y-2 mb-4">
-          {relevante.map(lz => {
-            const status = lernzielStatus(lz, fortschritte)
-            return (
-              <div key={lz.id} className="flex items-start gap-2 text-sm">
-                <span className="mt-0.5 shrink-0">
-                  {status === 'gemeistert' ? '✅' : status === 'gefestigt' ? '🔵' : status === 'inArbeit' ? '🟡' : '🏁'}
-                </span>
-                <span className={`flex-1 ${status === 'gemeistert' ? 'line-through text-slate-400' : 'dark:text-slate-300'}`}>
-                  {lz.text}
-                </span>
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400 shrink-0">
-                  {lz.bloom}
-                </span>
+        <div className="overflow-y-auto flex-1 space-y-3 mb-4">
+          {meta.length > 0 && (
+            <div className="space-y-1.5">
+              {meta.map(lz => renderLZ(lz, fortschritte))}
+            </div>
+          )}
+          {utKeys.map(ut => (
+            <div key={ut}>
+              <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">{ut}</p>
+              <div className="space-y-1.5">
+                {utGruppen[ut].map(lz => renderLZ(lz, fortschritte))}
               </div>
-            )
-          })}
+            </div>
+          ))}
         </div>
 
         <button
           onClick={onUeben}
-          className="w-full py-2.5 rounded-lg text-sm font-medium text-white transition-colors"
+          className="w-full py-2.5 rounded-lg text-sm font-medium text-white transition-colors shrink-0"
           style={{ backgroundColor: farbe }}
         >
           ▶ Fragen zu «{thema}» üben
         </button>
       </div>
+    </div>
+  )
+}
+
+/** Einzelnes Lernziel rendern (für Mini-Modal) */
+function renderLZ(lz: Lernziel, fortschritte: Record<string, FragenFortschritt>) {
+  const status = lernzielStatus(lz, fortschritte)
+  return (
+    <div key={lz.id} className="flex items-start gap-2 text-sm">
+      <span className="mt-0.5 shrink-0">
+        {status === 'gemeistert' ? '✅' : status === 'gefestigt' ? '🔵' : status === 'inArbeit' ? '🟡' : '🏁'}
+      </span>
+      <span className={`flex-1 ${status === 'gemeistert' ? 'line-through text-slate-400' : 'dark:text-slate-300'}`}>
+        {lz.text}
+      </span>
+      <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400 shrink-0">
+        {lz.bloom}
+      </span>
     </div>
   )
 }
