@@ -130,7 +130,9 @@ export default function SuSStartseite({ onKorrekturWaehle: _onKorrekturWaehle }:
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex flex-col">
       <header className="bg-white dark:bg-slate-800 shadow-sm px-4 py-3 flex items-center justify-between">
-        <h1 className="text-lg font-bold dark:text-white">ExamLab</h1>
+        <a href={window.location.pathname.replace(/\/[^/]*$/, '/')} className="text-lg font-bold dark:text-white hover:text-slate-600 dark:hover:text-slate-300 transition-colors">
+          ExamLab
+        </a>
         <div className="flex items-center gap-2">
           <ThemeToggle />
           <span className="text-sm text-slate-500 dark:text-slate-400">{user?.name}</span>

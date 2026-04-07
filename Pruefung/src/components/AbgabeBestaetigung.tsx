@@ -34,7 +34,12 @@ export default function AbgabeBestaetigung() {
         <p className="text-slate-500 dark:text-slate-400 mb-6">
           Ihre Antworten wurden gespeichert. Sie können das Fenster schliessen.
         </p>
-        {/* Antworten-Einsicht im Demo-Modus entfernt — SuS-Tester sollen realistischen Ablauf erleben */}
+        <a
+          href={window.location.pathname.replace(/\/[^/]*$/, '/')}
+          className="inline-block px-6 py-2.5 bg-slate-800 dark:bg-slate-200 text-white dark:text-slate-800 rounded-xl font-medium text-sm hover:bg-slate-900 dark:hover:bg-slate-100 transition-colors mb-4 min-h-[44px] leading-[44px]"
+        >
+          Zurück zu ExamLab
+        </a>
         <p className="text-xs text-slate-400 dark:text-slate-500">
           Bei Fragen wenden Sie sich an Ihre Lehrperson.
         </p>
