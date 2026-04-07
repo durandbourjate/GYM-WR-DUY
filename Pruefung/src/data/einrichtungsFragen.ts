@@ -115,7 +115,7 @@ export const einrichtungsFragen: Frage[] = [
       { id: '1', text: 'Man kann zwischen Fragen vor- und zurücknavigieren.', korrekt: true, erklaerung: 'Rücknavigation ist bei dieser Prüfung aktiviert.' },
       { id: '2', text: 'Die Antworten werden automatisch gespeichert (AutoSave).', korrekt: true, erklaerung: 'AutoSave speichert alle 30 Sekunden.' },
       { id: '3', text: 'Man muss die Fragen zwingend in der vorgegebenen Reihenfolge lösen.', korrekt: false, erklaerung: 'Man kann über die Navigationsleiste zu jeder Frage springen.' },
-      { id: '4', text: 'Es gibt einen Dark Mode (dunkles Farbschema).', korrekt: true, erklaerung: 'Dark Mode kann über das Sonnen-Symbol (☀️) im Header umgeschaltet werden.' },
+      { id: '4', text: 'Es gibt einen Dark Mode (dunkles Farbschema).', korrekt: true, erklaerung: 'Dark Mode kann über das Mond-Symbol (🌙) unten links umgeschaltet werden.' },
     ],
   },
 
@@ -924,7 +924,7 @@ export const einrichtungsFragen: Frage[] = [
     verwendungen: [],
     quelle: 'manuell',
     autor,
-    fragetext: '**Feature-Check!** Probieren Sie die folgenden Funktionen aus und kreuzen Sie an, welche **funktioniert** haben:\n\n- **Dark Mode**: Klicken Sie auf das Sonnen-Symbol (☀️) im Header\n- **Frage markieren**: Klicken Sie auf den «?»-Button (Unsicher) bei einer Frage\n- **Tastaturkürzel**: Drücken Sie Cmd+Enter (Mac) oder Ctrl+Enter (Windows), um zur nächsten Frage zu springen\n- **Material-Panel**: Klicken Sie auf das Dokument-Symbol oben rechts\n\nKreuzen Sie **alle** an, die funktioniert haben:',
+    fragetext: '**Feature-Check!** Probieren Sie die folgenden Funktionen aus und kreuzen Sie an, welche **funktioniert** haben:\n\n- **Dark Mode**: Klicken Sie auf das Mond-Symbol (🌙) unten links\n- **Frage markieren**: Klicken Sie auf den «?»-Button (Unsicher) bei einer Frage\n- **Tastaturkürzel**: Drücken Sie Cmd+Enter (Mac) oder Ctrl+Enter (Windows), um zur nächsten Frage zu springen\n- **Material-Panel**: Klicken Sie auf das Dokument-Symbol oben rechts\n\nKreuzen Sie **alle** an, die funktioniert haben:',
     optionen: [
       { id: 'a', text: 'Dark Mode umschalten hat funktioniert', korrekt: true },
       { id: 'b', text: 'Frage markieren hat funktioniert', korrekt: true },
