@@ -435,6 +435,20 @@ export default function LPStartseite() {
                           </button>
                         ))}
                       </>}
+                      <span className="w-px h-4 bg-slate-200 dark:bg-slate-700 mx-1" />
+                      {(['aktiv', 'archiviert', 'alle'] as const).map(s => (
+                        <button
+                          key={s}
+                          onClick={() => setFilterStatus(s)}
+                          className={`px-2.5 py-1 text-xs font-medium rounded-full border transition-colors cursor-pointer ${
+                            filterStatus === s
+                              ? 'bg-slate-700 text-white border-slate-700 dark:bg-slate-200 dark:text-slate-800 dark:border-slate-200'
+                              : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700 dark:hover:bg-slate-750'
+                          }`}
+                        >
+                          {s === 'aktiv' ? 'Aktiv' : s === 'archiviert' ? 'Archiviert' : 'Alle'}
+                        </button>
+                      ))}
                       {hatAktiveFilter && (
                         <button
                           onClick={() => { setSuchtext(''); setFilterFach([]); setFilterTyp(null); setFilterGefaess(null); setFilterStatus('aktiv') }}
