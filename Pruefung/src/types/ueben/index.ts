@@ -37,5 +37,9 @@ export type { Gruppe, Mitglied } from './gruppen'
 export type { GruppenEinstellungen } from './settings'
 export { DEFAULT_GYM, DEFAULT_FAMILIE, defaultEinstellungen } from './settings'
 
+// Themen-Sichtbarkeit
+export type { ThemenStatus, AktivierungsTyp, ThemenFreischaltung } from './themenSichtbarkeit'
+export { MAX_AKTIVE_THEMEN } from './themenSichtbarkeit'
+
 // Übungssession
 export type { UebungsSession, SessionErgebnis } from './uebung'

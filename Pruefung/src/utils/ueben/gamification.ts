@@ -53,3 +53,44 @@ export function zufaelligesLob(): string {
 export function zufaelligerTrost(): string {
   return TROST_TEXTE[Math.floor(Math.random() * TROST_TEXTE.length)]
 }
+
+// ──────────────────────────────────────────────
+// Level & Meilensteine (dezent)
+// ──────────────────────────────────────────────
+
+export interface Meilenstein {
+  id: string
+  titel: string
+  icon: string
+  erreicht: boolean
+}
+
+/**
+ * Berechnet das Level basierend auf Gesamtanzahl gemeisterter Fragen.
+ * Einfache Progression: alle 10 gemeisterten Fragen ein Level.
+ */
+export function berechneLevel(gemeisterteFragen: number): number {
+  return Math.floor(gemeisterteFragen / 10) + 1
+}
+
+/**
+ * Berechnet Meilensteine basierend auf Fortschrittsdaten.
+ */
+export function berechneMeilensteine(stats: {
+  gemeistert: number
+  gefestigt: number
+  versuche: number
+  streak: number
+  themenAbgeschlossen: number
+}): Meilenstein[] {
+  return [
+    { id: 'erste-frage', titel: 'Erste Frage beantwortet', icon: '🎯', erreicht: stats.versuche >= 1 },
+    { id: '10-gemeistert', titel: '10 Fragen gemeistert', icon: '⭐', erreicht: stats.gemeistert >= 10 },
+    { id: '50-gemeistert', titel: '50 Fragen gemeistert', icon: '🌟', erreicht: stats.gemeistert >= 50 },
+    { id: '100-gemeistert', titel: '100 Fragen gemeistert', icon: '💫', erreicht: stats.gemeistert >= 100 },
+    { id: 'streak-5', titel: '5 Sessions in Folge', icon: '🔥', erreicht: stats.streak >= 5 },
+    { id: 'streak-10', titel: '10 Sessions in Folge', icon: '🔥🔥', erreicht: stats.streak >= 10 },
+    { id: 'thema-1', titel: 'Erstes Thema abgeschlossen', icon: '📚', erreicht: stats.themenAbgeschlossen >= 1 },
+    { id: 'thema-5', titel: '5 Themen abgeschlossen', icon: '🏆', erreicht: stats.themenAbgeschlossen >= 5 },
+  ]
+}

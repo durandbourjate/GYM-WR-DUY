@@ -981,6 +981,12 @@ function doPost(e) {
     case 'lernplattformSpeichereAuftrag':
       return lernplattformSpeichereAuftrag(body);
 
+    // Themen-Sichtbarkeit
+    case 'lernplattformLadeThemenSichtbarkeit':
+      return lernplattformLadeThemenSichtbarkeit(body);
+    case 'lernplattformSetzeThemenStatus':
+      return lernplattformSetzeThemenStatus(body);
+
     // Einstellungen
     case 'lernplattformLadeEinstellungen':
       return lernplattformLadeEinstellungen(body);
@@ -7265,6 +7271,22 @@ function berechneMastery_(richtigInFolge) {
 }
 
 /**
+ * Mastery mit Recency-Gewichtung.
+ * >30 Tage: 1 Stufe runter, >90 Tage: zurück auf 'ueben'.
+ */
+function berechneMasteryMitRecency_(baseMastery, letzterVersuch) {
+  if (!letzterVersuch || baseMastery === 'neu') return baseMastery;
+  var ms = new Date().getTime() - new Date(letzterVersuch).getTime();
+  var tage = Math.floor(ms / (1000 * 60 * 60 * 24));
+  if (tage < 30) return baseMastery;
+  var stufen = ['neu', 'ueben', 'gefestigt', 'gemeistert'];
+  var rang = stufen.indexOf(baseMastery);
+  if (tage >= 90) return 'ueben';
+  // 30–90 Tage: 1 Stufe runter, min 'ueben'
+  return stufen[Math.max(rang - 1, 1)];
+}
+
+/**
  * Fortschritt laden für ein Mitglied (alle Fragen oder gefiltert).
  */
 function lernplattformLadeFortschritt(body) {
@@ -7327,14 +7349,27 @@ function lernplattformLadeAuftraege(body) {
     var auftraege = [];
 
     for (var i = 1; i < daten.length; i++) {
-      var aktiv = daten[i][headers.indexOf('aktiv')];
+      var statusWert = String(daten[i][headers.indexOf('status')] || '');
+      // Rückwärtskompatibilität: 'aktiv' boolean → status string
+      if (!statusWert) {
+        var aktiv = daten[i][headers.indexOf('aktiv')];
+        statusWert = (aktiv === true || aktiv === 'true' || aktiv === 'TRUE') ? 'aktiv' : 'abgeschlossen';
+      }
+
+      var zielEmailRaw = String(daten[i][headers.indexOf('zielemails')] || '');
+      var zielEmail = zielEmailRaw ? zielEmailRaw.split(',').map(function(e) { return e.trim(); }) : [];
+
       auftraege.push({
         id: String(daten[i][headers.indexOf('id')]),
         titel: String(daten[i][headers.indexOf('titel')]),
         fach: String(daten[i][headers.indexOf('fach')]),
         thema: String(daten[i][headers.indexOf('thema')]),
-        deadline: String(daten[i][headers.indexOf('deadline')]),
-        aktiv: aktiv === true || aktiv === 'true' || aktiv === 'TRUE',
+        frist: String(daten[i][headers.indexOf('deadline')] || daten[i][headers.indexOf('frist')] || ''),
+        status: statusWert,
+        erstelltVon: String(daten[i][headers.indexOf('erstelltvon')] || ''),
+        erstelltAm: String(daten[i][headers.indexOf('erstelltam')] || ''),
+        zielEmail: zielEmail,
+        gruppeId: gruppeId,
       });
     }
 
@@ -7358,31 +7393,193 @@ function lernplattformSpeichereAuftrag(body) {
   try {
     var ss = SpreadsheetApp.openById(gruppe.fragebankSheetId);
     var sheet = ss.getSheetByName('Auftraege');
-    if (!sheet) return jsonResponse({ success: false, error: 'Aufträge-Tab fehlt' });
 
-    // Prüfen ob Update oder Neu
+    // Tab erstellen wenn nötig (mit erweiterten Spalten)
+    if (!sheet) {
+      sheet = ss.insertSheet('Auftraege');
+      sheet.appendRow(['id', 'titel', 'fach', 'thema', 'frist', 'status', 'erstelltVon', 'erstelltAm', 'zielEmails']);
+    }
+
     var daten = sheet.getDataRange().getValues();
     var headers = daten[0].map(function(h) { return String(h).toLowerCase().trim(); });
     var idIdx = headers.indexOf('id');
 
+    // Felder vorbereiten
+    var status = auftrag.status || 'aktiv';
+    var zielEmails = Array.isArray(auftrag.zielEmail) ? auftrag.zielEmail.join(',') : '';
+
     for (var i = 1; i < daten.length; i++) {
       if (String(daten[i][idIdx]) === auftrag.id) {
         // Update
-        var zeilenIdx = i + 1;
-        sheet.getRange(zeilenIdx, headers.indexOf('titel') + 1).setValue(auftrag.titel || '');
-        sheet.getRange(zeilenIdx, headers.indexOf('fach') + 1).setValue(auftrag.fach || '');
-        sheet.getRange(zeilenIdx, headers.indexOf('thema') + 1).setValue(auftrag.thema || '');
-        sheet.getRange(zeilenIdx, headers.indexOf('deadline') + 1).setValue(auftrag.deadline || '');
-        sheet.getRange(zeilenIdx, headers.indexOf('aktiv') + 1).setValue(auftrag.aktiv !== false);
+        var zeile = i + 1;
+        var setVal = function(header, val) {
+          var idx = headers.indexOf(header);
+          if (idx >= 0) sheet.getRange(zeile, idx + 1).setValue(val);
+        };
+        setVal('titel', auftrag.titel || '');
+        setVal('fach', auftrag.fach || '');
+        setVal('thema', auftrag.thema || '');
+        setVal('frist', auftrag.frist || auftrag.deadline || '');
+        setVal('status', status);
+        setVal('erstelltvon', auftrag.erstelltVon || '');
+        setVal('zielemails', zielEmails);
+        // Rückwärtskompatibilität: altes 'aktiv'-Feld
+        setVal('aktiv', status === 'aktiv');
         return jsonResponse({ success: true });
       }
     }
 
     // Neu
     sheet.appendRow([
-      auftrag.id, auftrag.titel || '', auftrag.fach || '',
-      auftrag.thema || '', auftrag.deadline || '', auftrag.aktiv !== false
+      auftrag.id,
+      auftrag.titel || '',
+      auftrag.fach || '',
+      auftrag.thema || '',
+      auftrag.frist || auftrag.deadline || '',
+      status,
+      auftrag.erstelltVon || '',
+      auftrag.erstelltAm || new Date().toISOString(),
+      zielEmails,
     ]);
+
+    return jsonResponse({ success: true });
+  } catch (e) {
+    return jsonResponse({ success: false, error: e.message });
+  }
+}
+
+// ============================================================
+// LERNPLATTFORM — THEMEN-SICHTBARKEIT ENDPOINTS
+// ============================================================
+
+/**
+ * Themen-Sichtbarkeit laden.
+ * Liest den Tab "ThemenSichtbarkeit" aus dem Gruppen-Sheet.
+ * Fallback: Wenn Tab nicht existiert → leere Liste (alle Themen sichtbar).
+ */
+function lernplattformLadeThemenSichtbarkeit(body) {
+  var gruppeId = body.gruppeId;
+
+  var gruppen = alleGruppenLaden_();
+  var gruppe = gruppen.find(function(g) { return g.id === gruppeId; });
+  if (!gruppe) return jsonResponse({ success: false, error: 'Gruppe nicht gefunden' });
+
+  try {
+    var ss = SpreadsheetApp.openById(gruppe.fragebankSheetId);
+    var sheet = ss.getSheetByName('ThemenSichtbarkeit');
+    if (!sheet) return jsonResponse({ success: true, data: [] });
+
+    var daten = sheet.getDataRange().getValues();
+    if (daten.length < 2) return jsonResponse({ success: true, data: [] });
+
+    var headers = daten[0].map(function(h) { return String(h).toLowerCase().trim(); });
+    var eintraege = [];
+
+    for (var i = 1; i < daten.length; i++) {
+      eintraege.push({
+        fach: String(daten[i][headers.indexOf('fach')] || ''),
+        thema: String(daten[i][headers.indexOf('thema')] || ''),
+        status: String(daten[i][headers.indexOf('status')] || 'nicht_freigeschaltet'),
+        aktiviertAm: String(daten[i][headers.indexOf('aktiviertam')] || ''),
+        aktiviertVon: String(daten[i][headers.indexOf('aktiviertvon')] || ''),
+        typ: String(daten[i][headers.indexOf('typ')] || 'manuell'),
+      });
+    }
+
+    return jsonResponse({ success: true, data: eintraege });
+  } catch (e) {
+    return jsonResponse({ success: false, error: e.message });
+  }
+}
+
+/**
+ * Themen-Status setzen (aktivieren, abschliessen, freischalten).
+ * Erstellt Tab automatisch wenn nötig.
+ * FIFO: Wenn >3 Themen aktiv → ältestes wird abgeschlossen.
+ */
+function lernplattformSetzeThemenStatus(body) {
+  var gruppeId = body.gruppeId;
+  var fach = body.fach;
+  var thema = body.thema;
+  var status = body.status;
+  var aktiviertVon = body.aktiviertVon || '';
+  var typ = body.typ || 'manuell';
+  var maxAktiv = 3;
+
+  if (!fach || !thema || !status) {
+    return jsonResponse({ success: false, error: 'fach, thema und status sind Pflicht' });
+  }
+  if (['nicht_freigeschaltet', 'aktiv', 'abgeschlossen'].indexOf(status) === -1) {
+    return jsonResponse({ success: false, error: 'Ungültiger Status: ' + status });
+  }
+
+  var gruppen = alleGruppenLaden_();
+  var gruppe = gruppen.find(function(g) { return g.id === gruppeId; });
+  if (!gruppe) return jsonResponse({ success: false, error: 'Gruppe nicht gefunden' });
+
+  try {
+    var ss = SpreadsheetApp.openById(gruppe.fragebankSheetId);
+    var sheet = ss.getSheetByName('ThemenSichtbarkeit');
+
+    // Tab erstellen wenn nötig
+    if (!sheet) {
+      sheet = ss.insertSheet('ThemenSichtbarkeit');
+      sheet.appendRow(['fach', 'thema', 'status', 'aktiviertAm', 'aktiviertVon', 'typ']);
+    }
+
+    var daten = sheet.getDataRange().getValues();
+    var headers = daten[0].map(function(h) { return String(h).toLowerCase().trim(); });
+    var fachIdx = headers.indexOf('fach');
+    var themaIdx = headers.indexOf('thema');
+    var statusIdx = headers.indexOf('status');
+    var amIdx = headers.indexOf('aktiviertam');
+    var vonIdx = headers.indexOf('aktiviertvon');
+    var typIdx = headers.indexOf('typ');
+    var jetzt = new Date().toISOString();
+
+    // Bestehenden Eintrag suchen
+    var gefunden = false;
+    for (var i = 1; i < daten.length; i++) {
+      if (String(daten[i][fachIdx]) === fach && String(daten[i][themaIdx]) === thema) {
+        // Update
+        var zeile = i + 1;
+        sheet.getRange(zeile, statusIdx + 1).setValue(status);
+        sheet.getRange(zeile, amIdx + 1).setValue(jetzt);
+        sheet.getRange(zeile, vonIdx + 1).setValue(aktiviertVon);
+        sheet.getRange(zeile, typIdx + 1).setValue(typ);
+        gefunden = true;
+        break;
+      }
+    }
+
+    // Neuer Eintrag
+    if (!gefunden) {
+      sheet.appendRow([fach, thema, status, jetzt, aktiviertVon, typ]);
+    }
+
+    // FIFO: Wenn zu viele aktive Themen → ältestes abschliessen
+    if (status === 'aktiv') {
+      // Daten neu laden (nach möglichem appendRow)
+      daten = sheet.getDataRange().getValues();
+      var aktive = [];
+      for (var j = 1; j < daten.length; j++) {
+        if (String(daten[j][statusIdx]) === 'aktiv') {
+          aktive.push({
+            zeile: j + 1,
+            aktiviertAm: String(daten[j][amIdx] || ''),
+          });
+        }
+      }
+
+      // Nach Aktivierungszeitpunkt sortieren (älteste zuerst)
+      aktive.sort(function(a, b) { return a.aktiviertAm.localeCompare(b.aktiviertAm); });
+
+      // Überzählige abschliessen
+      while (aktive.length > maxAktiv) {
+        var aelteste = aktive.shift();
+        sheet.getRange(aelteste.zeile, statusIdx + 1).setValue('abgeschlossen');
+      }
+    }
 
     return jsonResponse({ success: true });
   } catch (e) {

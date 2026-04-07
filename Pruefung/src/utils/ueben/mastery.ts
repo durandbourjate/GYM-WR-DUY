@@ -70,6 +70,53 @@ export function lernzielStatus(
   return 'offen'
 }
 
+// ──────────────────────────────────────────────
+// Recency-gewichtete Mastery
+// ──────────────────────────────────────────────
+
+const TAGE_BIS_VERBLASSEN = 30   // Nach 30 Tagen: 1 Stufe runter (visuell)
+const TAGE_BIS_ZURUECK = 90     // Nach 90 Tagen: zurück auf "üben"
+
+const STUFEN_RANG: Record<MasteryStufe, number> = {
+  'neu': 0, 'ueben': 1, 'gefestigt': 2, 'gemeistert': 3,
+}
+const RANG_STUFEN: MasteryStufe[] = ['neu', 'ueben', 'gefestigt', 'gemeistert']
+
+/**
+ * Berechnet Mastery unter Berücksichtigung des Zeitabstands.
+ * Lange nicht geübt → Stufe sinkt visuell.
+ *
+ * @param baseMastery  Die berechnete Mastery ohne Recency
+ * @param letzterVersuch  ISO-Timestamp des letzten Versuchs
+ * @returns { mastery, istVerblasst } — angepasste Stufe + Flag ob verblasst
+ */
+export function berechneMasteryMitRecency(
+  baseMastery: MasteryStufe,
+  letzterVersuch: string | undefined
+): { mastery: MasteryStufe; istVerblasst: boolean } {
+  if (!letzterVersuch || baseMastery === 'neu') {
+    return { mastery: baseMastery, istVerblasst: false }
+  }
+
+  const tageHer = Math.floor(
+    (Date.now() - new Date(letzterVersuch).getTime()) / (1000 * 60 * 60 * 24)
+  )
+
+  if (tageHer < TAGE_BIS_VERBLASSEN) {
+    return { mastery: baseMastery, istVerblasst: false }
+  }
+
+  if (tageHer >= TAGE_BIS_ZURUECK) {
+    // Mindestens auf "üben" (nicht auf "neu" — SuS hat ja schon geübt)
+    const rang = Math.min(STUFEN_RANG[baseMastery], STUFEN_RANG['ueben'])
+    return { mastery: RANG_STUFEN[rang], istVerblasst: true }
+  }
+
+  // 30–90 Tage: 1 Stufe runter
+  const rang = Math.max(STUFEN_RANG[baseMastery] - 1, STUFEN_RANG['ueben'])
+  return { mastery: RANG_STUFEN[rang], istVerblasst: true }
+}
+
 export function istDauerbaustelle(
   versuche: number,
   richtig: number,

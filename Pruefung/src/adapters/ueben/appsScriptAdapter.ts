@@ -248,3 +248,48 @@ class AppsScriptFortschrittAdapter implements FortschrittService {
 }
 
 export const uebenFortschrittAdapter: FortschrittService = new AppsScriptFortschrittAdapter()
+
+// ──────────────────────────────────────────────
+// Themen-Sichtbarkeit Adapter
+// ──────────────────────────────────────────────
+
+import type { ThemenFreischaltung, ThemenStatus, AktivierungsTyp } from '../../types/ueben/themenSichtbarkeit'
+
+class AppsScriptThemenSichtbarkeitAdapter {
+  private getToken(): string | undefined {
+    try {
+      const stored = localStorage.getItem('ueben-auth')
+      if (!stored) return undefined
+      return JSON.parse(stored).sessionToken
+    } catch {
+      return undefined
+    }
+  }
+
+  async ladeFreischaltungen(gruppeId: string): Promise<ThemenFreischaltung[]> {
+    const response = await uebenApiClient.post<{ success: boolean; data: ThemenFreischaltung[] }>(
+      'lernplattformLadeThemenSichtbarkeit',
+      { gruppeId },
+      this.getToken()
+    )
+    return response?.data || []
+  }
+
+  async setzeStatus(
+    gruppeId: string,
+    fach: string,
+    thema: string,
+    status: ThemenStatus,
+    aktiviertVon: string,
+    typ: AktivierungsTyp = 'manuell'
+  ): Promise<boolean> {
+    const response = await uebenApiClient.post<{ success: boolean }>(
+      'lernplattformSetzeThemenStatus',
+      { gruppeId, fach, thema, status, aktiviertVon, typ },
+      this.getToken()
+    )
+    return response?.success ?? false
+  }
+}
+
+export const uebenThemenSichtbarkeitAdapter = new AppsScriptThemenSichtbarkeitAdapter()

@@ -14,6 +14,11 @@ import { berechneSterne, sterneText } from '../../utils/ueben/gamification'
 import { useUebenKontext } from '../../hooks/ueben/useUebenKontext'
 import { getFachFarbe } from '../../utils/ueben/fachFarben'
 import { poolTitel } from '../../utils/poolTitelMapping'
+import { useThemenSichtbarkeitStore } from '../../store/ueben/themenSichtbarkeitStore'
+import { useUebenSettingsStore } from '../../store/ueben/settingsStore'
+import { ThemaKarte } from './ThemaKarte'
+import { EmpfehlungsKarte } from './EmpfehlungsKarte'
+import SuSAnalyse from './SuSAnalyse'
 
 const SCHWIERIGKEIT_LABELS: Record<number, string> = { 1: 'Einfach', 2: 'Mittel', 3: 'Schwer' }
 const SCHWIERIGKEIT_STERNE: Record<number, string> = { 1: '⭐', 2: '⭐⭐', 3: '⭐⭐⭐' }
@@ -46,8 +51,12 @@ export default function Dashboard() {
   const { ladeAuftraege, auftraege } = useUebenAuftragStore()
   const { navigiere } = useUebenNavigationStore()
   const { sichtbareFaecher, fachFarben } = useUebenKontext()
+  const { freischaltungen, ladeFreischaltungen, getStatus } = useThemenSichtbarkeitStore()
+  const { einstellungen } = useUebenSettingsStore()
   const [alleFragen, setAlleFragen] = useState<Frage[]>([])
   const [laden, setLaden] = useState(true)
+  const [alleThemenAnzeigen, setAlleThemenAnzeigen] = useState(false)
+  const [dashboardTab, setDashboardTab] = useState<'themen' | 'fortschritt'>('themen')
 
   // Navigation: Fachbereich → Thema → Filter → Übung starten
   const [aktiverFach, setAktiverFach] = useState<string | null>(null)
@@ -60,8 +69,8 @@ export default function Dashboard() {
 
   useEffect(() => {
     ladeFortschritt()
-    ladeAuftraege()
-  }, [ladeFortschritt, ladeAuftraege])
+    if (aktiveGruppe) ladeAuftraege(aktiveGruppe.id)
+  }, [ladeFortschritt, ladeAuftraege, aktiveGruppe])
 
   useEffect(() => {
     if (!aktiveGruppe) return
@@ -72,7 +81,8 @@ export default function Dashboard() {
       setLaden(false)
     }
     ladeThemen()
-  }, [aktiveGruppe])
+    ladeFreischaltungen(aktiveGruppe.id)
+  }, [aktiveGruppe, ladeFreischaltungen])
 
   // Themen-Infos: Fach → Thema → { unterthemen, fragen, fortschritt }
   const themenMap = useMemo(() => {
@@ -121,11 +131,22 @@ export default function Dashboard() {
 
   const verfuegbareFaecher = useMemo(() => Object.keys(themenMap).sort(), [themenMap])
 
-  // Sichtbare Themen (abhängig vom Fach-Filter)
+  // Sichtbare Themen (abhängig vom Fach-Filter + Sichtbarkeitsfilter)
   const sichtbareThemenListe = useMemo(() => {
-    if (aktiverFach) return themenMap[aktiverFach] || []
-    return Object.values(themenMap).flat()
-  }, [themenMap, aktiverFach])
+    const alleFachThemen = aktiverFach ? (themenMap[aktiverFach] || []) : Object.values(themenMap).flat()
+
+    // Wenn keine Freischaltungen existieren → alle anzeigen (Fallback)
+    if (freischaltungen.length === 0) return alleFachThemen
+
+    // Wenn "Alle Themen anzeigen" aktiv → alles zeigen
+    if (alleThemenAnzeigen) return alleFachThemen
+
+    // Nur aktive + abgeschlossene Themen anzeigen
+    return alleFachThemen.filter(info => {
+      const status = getStatus(info.fach, info.thema)
+      return status === 'aktiv' || status === 'abgeschlossen'
+    })
+  }, [themenMap, aktiverFach, freischaltungen, alleThemenAnzeigen, getStatus])
 
   // Aktives Thema-Detail
   const themaDetail = useMemo(() => {
@@ -144,11 +165,14 @@ export default function Dashboard() {
     })
   }, [themaDetail, unterthemaFilter, schwierigkeitFilter, typFilter])
 
-  // Empfehlungen
+  // Empfehlungen (erweitert: Freischaltungen + LP-Fokus)
   const empfehlungen: Empfehlung[] = useMemo(() => {
     if (!user || alleFragen.length === 0) return []
-    return berechneEmpfehlungen(alleFragen, fortschritte, auftraege, user.email)
-  }, [alleFragen, fortschritte, auftraege, user])
+    return berechneEmpfehlungen(
+      alleFragen, fortschritte, auftraege, user.email,
+      freischaltungen, einstellungen || undefined,
+    )
+  }, [alleFragen, fortschritte, auftraege, user, freischaltungen, einstellungen])
 
   const handleStarte = (fach: string, thema: string, fragenOverride?: Frage[]) => {
     if (!aktiveGruppe || !user) return
@@ -183,29 +207,50 @@ export default function Dashboard() {
   return (
     <div>
       <main className="max-w-5xl mx-auto p-6">
-        <h2 className="text-xl font-bold mb-4 dark:text-white">
-          Hallo {user?.vorname || 'dort'}!
-        </h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-bold dark:text-white">
+            Hallo {user?.vorname || 'dort'}!
+          </h2>
+          {/* Tab-Wechsel: Themen | Mein Fortschritt */}
+          <div className="flex gap-1 bg-slate-100 dark:bg-slate-800 rounded-lg p-0.5">
+            <button
+              onClick={() => setDashboardTab('themen')}
+              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                dashboardTab === 'themen'
+                  ? 'bg-white dark:bg-slate-700 text-slate-800 dark:text-white shadow-sm'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-700'
+              }`}
+            >
+              Themen
+            </button>
+            <button
+              onClick={() => setDashboardTab('fortschritt')}
+              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                dashboardTab === 'fortschritt'
+                  ? 'bg-white dark:bg-slate-700 text-slate-800 dark:text-white shadow-sm'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-700'
+              }`}
+            >
+              Mein Fortschritt
+            </button>
+          </div>
+        </div>
 
+        {dashboardTab === 'fortschritt' ? (
+          <SuSAnalyse />
+        ) : (
+          <>
         {/* Empfehlungen */}
         {!aktivesThema && empfehlungen.length > 0 && (
           <div className="mb-6 space-y-2">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Für dich empfohlen</h3>
             {empfehlungen.map((e, i) => (
-              <button
+              <EmpfehlungsKarte
                 key={i}
-                onClick={() => handleStarte(e.fach, e.thema)}
-                className={`w-full text-left p-4 rounded-xl shadow-sm border min-h-[48px] transition-shadow hover:shadow-md
-                  ${e.typ === 'auftrag' ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800' : ''}
-                  ${e.typ === 'luecke' ? 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800' : ''}
-                  ${e.typ === 'festigung' ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800' : ''}
-                `}
-              >
-                <div className="text-xs font-medium uppercase tracking-wide text-slate-400 mb-1">
-                  {e.typ === 'auftrag' ? 'Auftrag' : e.typ === 'luecke' ? 'Empfohlen' : 'Festigung'}
-                </div>
-                <div className="font-medium dark:text-white">{e.titel}</div>
-                <div className="text-sm text-slate-500 dark:text-slate-400">{e.beschreibung}</div>
-              </button>
+                empfehlung={e}
+                fachFarben={fachFarben}
+                onStarte={() => handleStarte(e.fach, e.thema)}
+              />
             ))}
           </div>
         )}
@@ -273,31 +318,41 @@ export default function Dashboard() {
               })}
             </div>
 
+            {/* Alle-Themen-Toggle (nur wenn Freischaltungen existieren) */}
+            {freischaltungen.length > 0 && (
+              <div className="flex justify-end mb-2">
+                <button
+                  onClick={() => setAlleThemenAnzeigen(!alleThemenAnzeigen)}
+                  className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
+                    alleThemenAnzeigen
+                      ? 'bg-slate-700 text-white border-slate-700 dark:bg-slate-300 dark:text-slate-800 dark:border-slate-300'
+                      : 'text-slate-500 dark:text-slate-400 border-slate-300 dark:border-slate-600 hover:border-slate-400'
+                  }`}
+                >
+                  {alleThemenAnzeigen ? 'Nur freigeschaltete' : 'Alle Themen anzeigen'}
+                </button>
+              </div>
+            )}
+
             {/* Thema-Karten Grid */}
             <div className="grid gap-3 sm:grid-cols-2">
-              {sichtbareThemenListe.map(info => {
-                const farbe = getFachFarbe(info.fach, fachFarben)
-                return (
-                  <button
-                    key={`${info.fach}-${info.thema}`}
-                    onClick={() => { setAktivesThema(info.thema); setAktiverFach(info.fach) }}
-                    className="text-left p-4 bg-white dark:bg-slate-800 rounded-xl border-2 border-slate-200 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-500 transition-colors min-h-[48px]"
-                  >
-                    <div className="flex items-start justify-between gap-2 mb-2">
-                      <span className="font-semibold dark:text-white text-sm leading-tight">{info.thema}</span>
-                      <span className="shrink-0 w-3 h-3 rounded-full mt-1" style={{ backgroundColor: farbe }} />
-                    </div>
-                    <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
-                      <span>{info.fragen.length} Fragen</span>
-                      {info.unterthemen.length > 0 && <span>{info.unterthemen.length} Unterthemen</span>}
-                      <span>{sterneText(berechneSterne(info.fortschritt.quote))}</span>
-                    </div>
-                    <FortschrittsBalken fortschritt={info.fortschritt} />
-                  </button>
-                )
-              })}
+              {sichtbareThemenListe.map(info => (
+                <ThemaKarte
+                  key={`${info.fach}-${info.thema}`}
+                  thema={info.thema}
+                  fach={info.fach}
+                  anzahlFragen={info.fragen.length}
+                  anzahlUnterthemen={info.unterthemen.length}
+                  fortschritt={info.fortschritt}
+                  themenStatus={freischaltungen.length > 0 ? getStatus(info.fach, info.thema) : 'abgeschlossen'}
+                  fachFarben={fachFarben}
+                  onClick={() => { setAktivesThema(info.thema); setAktiverFach(info.fach) }}
+                />
+              ))}
             </div>
           </>
+        )}
+        </>
         )}
       </main>
     </div>

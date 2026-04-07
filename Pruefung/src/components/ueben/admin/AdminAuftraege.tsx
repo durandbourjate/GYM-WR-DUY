@@ -15,7 +15,7 @@ export default function AdminAuftraege() {
   const faecher: string[] = []
 
   // Auftraege bei Mount laden
-  useState(() => { ladeAuftraege() })
+  useState(() => { if (aktiveGruppe) ladeAuftraege(aktiveGruppe.id) })
 
   return (
     <div className="space-y-6">
@@ -34,8 +34,9 @@ export default function AdminAuftraege() {
           faecher={faecher}
           mitglieder={alleMitglieder.map(m => ({ email: m.email, name: m.name }))}
           onErstellen={(daten) => {
-            erstelleAuftrag({
-              gruppeId: aktiveGruppe?.id || '',
+            if (!aktiveGruppe) return
+            erstelleAuftrag(aktiveGruppe.id, {
+              gruppeId: aktiveGruppe.id,
               erstelltVon: user?.email || '',
               ...daten,
             })
@@ -62,7 +63,7 @@ export default function AdminAuftraege() {
             </div>
             <div className="flex gap-2">
               <button
-                onClick={() => schliesseAuftrag(auftrag.id)}
+                onClick={() => aktiveGruppe && schliesseAuftrag(aktiveGruppe.id, auftrag.id)}
                 className="text-xs text-green-600 hover:text-green-800"
               >
                 Abschliessen

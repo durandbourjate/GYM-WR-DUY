@@ -13,6 +13,7 @@ import AdminDashboard from './components/ueben/admin/AdminDashboard'
 import AppShell from './components/ueben/layout/AppShell'
 import { UebenKontextProvider } from './context/ueben/UebenKontextProvider'
 import type { UebenRolle } from './types/ueben/auth'
+import { useDeepLinkAktivierung } from './hooks/ueben/useDeepLinkAktivierung'
 
 const DEMO_PARAM = new URLSearchParams(window.location.search).get('demo')
 const IST_DEMO = !!DEMO_PARAM
@@ -29,6 +30,9 @@ export default function AppUeben({ onZurueck: _onZurueck }: AppUebenProps = {}) 
   const { session, starteSession } = useUebenUebungsStore()
   const { aktuellerScreen, navigiere } = useUebenNavigationStore()
   const [demoAktiv, setDemoAktiv] = useState(false)
+
+  // Deep-Link: ?fach=...&thema=... → Thema automatisch aktivieren
+  useDeepLinkAktivierung(aktiveGruppe?.id, user?.email, istAngemeldet)
 
   // Demo-Modus: ?demo=true in URL → Mock-Login ohne Backend
   useEffect(() => {

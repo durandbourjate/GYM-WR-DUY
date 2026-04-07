@@ -54,3 +54,46 @@ export function erstelleBlock(
 
   return ergebnis.slice(0, MAX_BLOCK_SIZE)
 }
+
+/**
+ * Erstellt einen empfohlenen Block basierend auf Mastery-Lücken.
+ * Zusammensetzung: 60% üben/neu, 25% Dauerbaustellen, 15% Festigung.
+ */
+export function erstelleEmpfohlenenBlock(
+  alleFragen: Frage[],
+  mastery: Record<string, MasteryStufe>,
+  dauerbaustellen?: Set<string>,
+  seed?: string,
+): Frage[] {
+  const s = seed || `${Date.now()}`
+
+  // Fragen kategorisieren
+  const ueben: Frage[] = []
+  const festigung: Frage[] = []
+  const dauerBau: Frage[] = []
+
+  for (const f of alleFragen) {
+    const m = mastery[f.id] || 'neu'
+    if (dauerbaustellen?.has(f.id)) {
+      dauerBau.push(f)
+    } else if (m === 'neu' || m === 'ueben') {
+      ueben.push(f)
+    } else if (m === 'gefestigt') {
+      festigung.push(f)
+    }
+    // gemeistert wird nicht empfohlen
+  }
+
+  // Kontingente: 6 üben/neu, 2-3 Dauerbaustellen, 1-2 Festigung
+  const maxUeben = 6
+  const maxDauer = 3
+  const maxFest = MAX_BLOCK_SIZE - maxUeben - maxDauer
+
+  const ergebnis: Frage[] = [
+    ...seededShuffle(ueben, s).slice(0, maxUeben),
+    ...seededShuffle(dauerBau, s + 'db').slice(0, maxDauer),
+    ...seededShuffle(festigung, s + 'fg').slice(0, maxFest),
+  ]
+
+  return seededShuffle(ergebnis, s + 'mix').slice(0, MAX_BLOCK_SIZE)
+}
