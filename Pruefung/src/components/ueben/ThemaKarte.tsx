@@ -12,6 +12,10 @@ interface ThemaKarteProps {
   themenStatus: ThemenStatus
   fachFarben: Record<string, string>
   onClick: () => void
+  /** Anzahl Lernziele für dieses Thema (0 = kein 🏁 Button) */
+  anzahlLernziele?: number
+  /** Callback wenn 🏁 Button geklickt wird */
+  onLernzieleKlick?: () => void
 }
 
 /**
@@ -24,6 +28,7 @@ interface ThemaKarteProps {
 export function ThemaKarte({
   thema, fach, anzahlFragen, anzahlUnterthemen,
   fortschritt, themenStatus, fachFarben, onClick,
+  anzahlLernziele = 0, onLernzieleKlick,
 }: ThemaKarteProps) {
   const farbe = getFachFarbe(fach, fachFarben)
   const istAktiv = themenStatus === 'aktiv'
@@ -72,6 +77,15 @@ export function ThemaKarte({
         <span>{anzahlFragen} Fragen</span>
         {anzahlUnterthemen > 0 && <span>{anzahlUnterthemen} Unterthemen</span>}
         {!istGesperrt && <span>{sterneText(berechneSterne(fortschritt.quote))}</span>}
+        {anzahlLernziele > 0 && onLernzieleKlick && !istGesperrt && (
+          <span
+            onClick={(e) => { e.stopPropagation(); onLernzieleKlick() }}
+            className="cursor-pointer hover:opacity-80"
+            title={`${anzahlLernziele} Lernziele`}
+          >
+            🏁
+          </span>
+        )}
       </div>
       {!istGesperrt && <FortschrittsBalkenKompakt fortschritt={fortschritt} />}
     </button>

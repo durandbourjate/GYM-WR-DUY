@@ -6,7 +6,8 @@ import { useUebenNavigationStore } from '../../../store/ueben/navigationStore'
 import { useUebenUebungsStore } from '../../../store/ueben/uebungsStore'
 import { useUebenFortschrittStore } from '../../../store/ueben/fortschrittStore'
 import { useUebenTheme } from '../../../hooks/ueben/useTheme'
-import { lernzielStatus } from '../../../utils/ueben/mastery'
+import { lernzielStatus as _lernzielStatus } from '../../../utils/ueben/mastery'
+import LernzieleAkkordeon from '../LernzieleAkkordeon'
 import FeedbackButton from '../../shared/FeedbackButton'
 import Tooltip from '../../ui/Tooltip'
 import SuSHilfePanel from '../SuSHilfePanel'
@@ -167,69 +168,18 @@ export default function AppShell({ children }: Props) {
       {/* Hilfe-Panel (Slide-over) */}
       {hilfeOffen && <SuSHilfePanel onSchliessen={() => setHilfeOffen(false)} />}
 
-      {/* Lernziele-Panel */}
+      {/* Lernziele-Panel — Akkordeon nach Pool-Vorbild */}
       {lernzieleOffen && (
-        <div className="bg-green-50 dark:bg-green-900/20 border-b border-green-200 dark:border-green-800 px-4 py-3">
-          <div className="max-w-2xl mx-auto text-sm text-slate-700 dark:text-slate-300 space-y-2">
-            <div className="flex justify-between items-start">
-              <h3 className="font-semibold dark:text-white">&#127937; Lernziele</h3>
-              <button onClick={() => setLernzieleOffen(false)} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">x</button>
-            </div>
-
-            {lernziele.length > 0 ? (
-              <>
-                {Object.entries(
-                  lernziele.reduce<Record<string, typeof lernziele>>((acc, lz) => {
-                    const key = `${lz.fach}::${lz.thema}`
-                    if (!acc[key]) acc[key] = []
-                    acc[key].push(lz)
-                    return acc
-                  }, {})
-                ).map(([key, themaLernziele]) => {
-                  const [fach, thema] = key.split('::')
-                  return (
-                    <div key={key}>
-                      <div className="flex items-center justify-between mt-2 mb-1">
-                        <h4 className="font-medium text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">{fach} — {thema}</h4>
-                        <button
-                          onClick={() => {
-                            setLernzieleOffen(false)
-                            // Zum Thema im Dashboard navigieren
-                            navigiere('dashboard')
-                          }}
-                          className="text-xs px-2 py-0.5 rounded text-green-700 dark:text-green-400 bg-green-100 dark:bg-green-900/30 hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors"
-                        >
-                          ▶ {themaLernziele.length} LZ · {thema} üben
-                        </button>
-                      </div>
-                      <div className="space-y-1">
-                        {themaLernziele
-                          .map(lz => ({ lz, status: lernzielStatus(lz, fortschritte) }))
-                          .sort((a, b) => {
-                            const order: Record<string, number> = { offen: 0, inArbeit: 1, gefestigt: 2, gemeistert: 3 }
-                            return (order[a.status] ?? 0) - (order[b.status] ?? 0)
-                          })
-                          .map(({ lz, status }) => (
-                            <div key={lz.id} className="flex items-start gap-2">
-                              <span className="mt-0.5 text-sm">
-                                {status === 'gemeistert' ? '\u2705' : status === 'gefestigt' ? '\uD83D\uDD35' : status === 'inArbeit' ? '\uD83D\uDFE1' : '\u2B1C'}
-                              </span>
-                              <div className="flex-1 min-w-0">
-                                <span className={status === 'gemeistert' ? 'line-through text-slate-400' : ''}>{lz.text}</span>
-                                <span className="ml-1 text-xs text-slate-400">{lz.bloom}</span>
-                              </div>
-                            </div>
-                          ))}
-                      </div>
-                    </div>
-                  )
-                })}
-              </>
-            ) : (
-              <p className="text-slate-500 dark:text-slate-400 italic">Lernziele werden von der Lehrperson definiert. Sobald Themen aktiviert sind, erscheinen hier die zugehörigen Lernziele.</p>
-            )}
-          </div>
-        </div>
+        <LernzieleAkkordeon
+          lernziele={lernziele}
+          fortschritte={fortschritte}
+          onSchliessen={() => setLernzieleOffen(false)}
+          onThemaUeben={(_thema) => {
+            setLernzieleOffen(false)
+            navigiere('dashboard')
+            // TODO: Thema im Dashboard filtern
+          }}
+        />
       )}
 
       {children}

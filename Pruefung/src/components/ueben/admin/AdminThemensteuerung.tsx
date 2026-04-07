@@ -212,15 +212,24 @@ export default function AdminThemensteuerung() {
                     {kopiert === key ? '✓ Kopiert' : '🔗 Link'}
                   </button>
 
-                  {/* Status-Badge */}
-                  <span className={`text-xs px-2 py-0.5 rounded-full ${
-                    eintrag.status === 'aktiv' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' :
-                    eintrag.status === 'abgeschlossen' ? 'bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-400' :
-                    'bg-slate-50 text-slate-400 dark:bg-slate-800 dark:text-slate-500'
-                  }`}>
-                    {eintrag.status === 'aktiv' ? 'Aktiv' :
-                     eintrag.status === 'abgeschlossen' ? 'Abgeschl.' : 'Nicht freig.'}
-                  </span>
+                  {/* Status-Badge — "z.T. aktiv" wenn nur einige Unterthemen */}
+                  {(() => {
+                    const aktiveUT = getAktiveUnterthemen(eintrag.fach, eintrag.thema)
+                    const istPartiell = eintrag.status === 'aktiv' && aktiveUT && aktiveUT.length > 0 && aktiveUT.length < eintrag.unterthemen.length
+                    return (
+                      <span className={`text-xs px-2 py-0.5 rounded-full ${
+                        eintrag.status === 'aktiv'
+                          ? (istPartiell
+                            ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300'
+                            : 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300')
+                          : eintrag.status === 'abgeschlossen' ? 'bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-400'
+                          : 'bg-slate-50 text-slate-400 dark:bg-slate-800 dark:text-slate-500'
+                      }`}>
+                        {eintrag.status === 'aktiv' ? (istPartiell ? 'z.T. aktiv' : 'Aktiv') :
+                         eintrag.status === 'abgeschlossen' ? 'Abgeschl.' : 'Nicht freig.'}
+                      </span>
+                    )
+                  })()}
 
                   {/* Aktions-Buttons */}
                   {eintrag.status !== 'aktiv' && (

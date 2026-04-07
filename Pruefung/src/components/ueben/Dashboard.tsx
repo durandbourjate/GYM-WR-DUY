@@ -23,6 +23,7 @@ import type { DeepLinkZiel } from '../../hooks/ueben/useDeepLinkAktivierung'
 import type { ThemaQuelle } from '../../types/ueben/uebung'
 import MixSessionDialog from './MixSessionDialog'
 import UebungsEinsicht from './UebungsEinsicht'
+import { LernzieleMiniModal } from './LernzieleAkkordeon'
 
 const SCHWIERIGKEIT_LABELS: Record<number, string> = { 1: 'Einfach', 2: 'Mittel', 3: 'Schwer' }
 const SCHWIERIGKEIT_STERNE: Record<number, string> = { 1: '⭐', 2: '⭐⭐', 3: '⭐⭐⭐' }
@@ -55,7 +56,7 @@ export default function Dashboard({ deepLinkZiel }: DashboardProps = {}) {
   const { user } = useUebenAuthStore()
   const { aktiveGruppe } = useUebenGruppenStore()
   const { starteSession } = useUebenUebungsStore()
-  const { ladeFortschritt, getThemenFortschritt, fortschritte } = useUebenFortschrittStore()
+  const { ladeFortschritt, getThemenFortschritt, fortschritte, lernziele } = useUebenFortschrittStore()
   const { ladeAuftraege, auftraege } = useUebenAuftragStore()
   const { navigiere } = useUebenNavigationStore()
   const { sichtbareFaecher, fachFarben } = useUebenKontext()
@@ -65,6 +66,7 @@ export default function Dashboard({ deepLinkZiel }: DashboardProps = {}) {
   const [laden, setLaden] = useState(true)
   const [alleThemenAnzeigen, setAlleThemenAnzeigen] = useState(false)
   const [dashboardTab, setDashboardTab] = useState<'themen' | 'fortschritt' | 'ergebnisse'>('themen')
+  const [lzMiniModal, setLzMiniModal] = useState<{ fach: string; thema: string } | null>(null)
 
   // Navigation: Fachbereich → Thema → Filter → Übung starten
   const [aktiverFach, setAktiverFach] = useState<string | null>(null)
@@ -472,9 +474,27 @@ export default function Dashboard({ deepLinkZiel }: DashboardProps = {}) {
                   themenStatus={freischaltungen.length > 0 ? getStatus(info.fach, info.thema) : 'abgeschlossen'}
                   fachFarben={fachFarben}
                   onClick={() => { setAktivesThema(info.thema); setAktiverFach(info.fach) }}
+                  anzahlLernziele={lernziele.filter(lz => lz.aktiv && lz.fach === info.fach && lz.thema === info.thema).length}
+                  onLernzieleKlick={() => setLzMiniModal({ fach: info.fach, thema: info.thema })}
                 />
               ))}
             </div>
+
+            {/* Lernziele Mini-Modal */}
+            {lzMiniModal && (
+              <LernzieleMiniModal
+                fach={lzMiniModal.fach}
+                thema={lzMiniModal.thema}
+                lernziele={lernziele}
+                fortschritte={fortschritte}
+                onSchliessen={() => setLzMiniModal(null)}
+                onUeben={() => {
+                  setLzMiniModal(null)
+                  setAktivesThema(lzMiniModal.thema)
+                  setAktiverFach(lzMiniModal.fach)
+                }}
+              />
+            )}
           </>
         )}
         </>
