@@ -84,7 +84,7 @@ function konvertiereBild(img, poolId) {
 function konvertiereFrage(pf, meta, topics) {
   const now = new Date().toISOString()
   const topic = topics[pf.topic] || {}
-  const thema = meta.title || topic.label || pf.topic
+  const thema = (meta.title || topic.label || pf.topic).replace(/^Übungspool:\s*/i, '')
   const unterthema = topic.label ?? pf.topic
 
   const basis = {
@@ -298,6 +298,7 @@ async function main() {
       const result = await apiPost('loescheAllePoolFragen', {})
       if (result.success) {
         console.log(`  ✓ ${result.geloescht} gelöscht, ${result.erhalten} manuelle Fragen erhalten`)
+        bestehendePools.clear() // Pool-Fragen sind gelöscht → alles neu importieren
       } else {
         console.error(`  ✗ Batch-Löschen fehlgeschlagen: ${result.error}`)
         process.exit(1)
