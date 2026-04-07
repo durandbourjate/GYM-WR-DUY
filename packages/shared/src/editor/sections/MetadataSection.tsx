@@ -1,9 +1,9 @@
 /**
- * Zuordnungs-Abschnitt: Fachbereich, Bloom, Thema, Unterthema, Tags, Zeitbedarf, Punkte, Semester, Gefässe, Sharing, KI-Klassifizierung.
+ * Metadaten-Abschnitt: Fachbereich, Bloom, Thema, Unterthema, Lernziele, Tags, Zeitbedarf, Punkte, Semester, Gefässe, Sharing, KI-Klassifizierung.
  * Shared Version — Host-Apps übergeben pruefungsspezifische Komponenten als Props.
  */
 import { useState } from 'react'
-import type { Fachbereich, BloomStufe, FragenPerformance } from '../../types/fragen'
+import type { Fachbereich, BloomStufe, FragenPerformance, Lernziel } from '../../types/fragen'
 import type { Berechtigung } from '../../types/auth'
 import type { useKIAssistent } from '../useKIAssistent'
 import { useEditorConfig } from '../EditorContext'
@@ -45,6 +45,13 @@ interface MetadataSectionProps {
   performance?: FragenPerformance
   /** Optionale Berechtigungen-Editor-Komponente (vom Host bereitgestellt) */
   berechtigungenEditor?: React.ReactNode
+  /** Lernziel-Zuordnung (optional — nur wenn Editor Lernziele unterstützt) */
+  lernziele?: Lernziel[]
+  setLernziele?: (v: Lernziel[]) => void
+  zeigLernzielDialog?: boolean
+  setZeigLernzielDialog?: (v: boolean) => void
+  gewaehlterLernzielId?: string
+  setGewaehlterLernzielId?: (v: string) => void
 }
 
 export default function MetadataSection({
@@ -65,13 +72,16 @@ export default function MetadataSection({
   ki,
   performance,
   berechtigungenEditor,
+  lernziele, setLernziele: _setLernziele,
+  zeigLernzielDialog: _zeigLernzielDialog, setZeigLernzielDialog: _setZeigLernzielDialog,
+  gewaehlterLernzielId: _gewaehlterLernzielId, setGewaehlterLernzielId: _setGewaehlterLernzielId,
 }: MetadataSectionProps) {
   const [statsOffen, setStatsOffen] = useState(false)
   const config = useEditorConfig()
 
   return (
     <Abschnitt
-      titel="Zuordnung"
+      titel="Metadaten"
       einklappbar
       standardOffen={istNeu}
       titelRechts={ki.verfuegbar ? (
@@ -232,6 +242,23 @@ export default function MetadataSection({
         {/* Berechtigungen-Editor (vom Host bereitgestellt) */}
         {berechtigungenEditor}
       </div>
+
+      {/* Lernziele zuordnen */}
+      {lernziele && lernziele.length > 0 && (
+        <div className="mt-3">
+          <label className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Lernziele</label>
+          <div className="space-y-1 max-h-40 overflow-y-auto border border-slate-200 dark:border-slate-700 rounded-lg p-2">
+            {lernziele.filter(lz => lz.aktiv).map(lz => (
+              <label key={lz.id} className="flex items-start gap-2 text-xs cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50 rounded px-1 py-0.5">
+                <input type="checkbox" className="mt-0.5 rounded border-slate-300 dark:border-slate-600" />
+                <span className="dark:text-slate-300">{lz.text}</span>
+                {lz.bloom && <span className="text-slate-400 shrink-0">{lz.bloom}</span>}
+              </label>
+            ))}
+          </div>
+          <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">Lernziele aus den Übungspools</p>
+        </div>
+      )}
 
       {/* Fragen-Statistiken (nur wenn Performance-Daten vorhanden) */}
       {performance && (

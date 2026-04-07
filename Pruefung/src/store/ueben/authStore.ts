@@ -118,7 +118,8 @@ export const useUebenAuthStore = create<UebenAuthState>((set, get) => ({
 
   abmelden: () => {
     localStorage.removeItem(STORAGE_KEY)
-    set({ user: null, istAngemeldet: false, ladeStatus: 'idle', fehler: null })
+    // ladeStatus='fertig' (nicht 'idle'), damit embedded AppUeben korrekt zurücknavigiert
+    set({ user: null, istAngemeldet: false, ladeStatus: 'fertig', fehler: null })
   },
 
   setzeRolle: (rolle: UebenRolle) => {

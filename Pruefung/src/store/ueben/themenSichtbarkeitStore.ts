@@ -20,11 +20,23 @@ interface ThemenSichtbarkeitState {
     typ?: AktivierungsTyp
   ) => Promise<boolean>
 
+  // Unterthemen granular steuern
+  setzeUnterthemen: (
+    gruppeId: string,
+    fach: string,
+    thema: string,
+    unterthemen: string[] | undefined,
+  ) => void
+
   // Abfragen
   getStatus: (fach: string, thema: string) => ThemenStatus
   getAktiveThemen: () => ThemenFreischaltung[]
   getAbgeschlosseneThemen: () => ThemenFreischaltung[]
   istThemaSichtbar: (fach: string, thema: string) => boolean
+  /** Prüft ob ein Unterthema aktiv ist. Wenn keine unterthemen-Einschränkung → immer true */
+  istUnterthemaAktiv: (fach: string, thema: string, unterthema: string) => boolean
+  /** Gibt die aktiven Unterthemen zurück. undefined = alle */
+  getAktiveUnterthemen: (fach: string, thema: string) => string[] | undefined
 }
 
 export const useThemenSichtbarkeitStore = create<ThemenSichtbarkeitState>((set, get) => ({
@@ -81,6 +93,23 @@ export const useThemenSichtbarkeitStore = create<ThemenSichtbarkeitState>((set, 
     return true
   },
 
+  setzeUnterthemen: (gruppeId, fach, thema, unterthemen) => {
+    set(state => ({
+      freischaltungen: state.freischaltungen.map(f =>
+        f.fach === fach && f.thema === thema
+          ? { ...f, unterthemen }
+          : f
+      ),
+    }))
+    // Backend im Hintergrund
+    uebenThemenSichtbarkeitAdapter.setzeStatus(
+      gruppeId, fach, thema,
+      get().getStatus(fach, thema),
+      '', 'manuell',
+      unterthemen,
+    ).catch(err => console.warn('[ThemenSichtbarkeit] Backend-Update Unterthemen fehlgeschlagen:', err))
+  },
+
   getStatus: (fach, thema) => {
     const eintrag = get().freischaltungen.find(
       f => f.fach === fach && f.thema === thema
@@ -99,5 +128,18 @@ export const useThemenSichtbarkeitStore = create<ThemenSichtbarkeitState>((set, 
   istThemaSichtbar: (fach, thema) => {
     const status = get().getStatus(fach, thema)
     return status === 'aktiv' || status === 'abgeschlossen'
+  },
+
+  istUnterthemaAktiv: (fach, thema, unterthema) => {
+    const eintrag = get().freischaltungen.find(f => f.fach === fach && f.thema === thema)
+    if (!eintrag || eintrag.status === 'nicht_freigeschaltet') return false
+    // Keine Unterthemen-Einschränkung → alle aktiv
+    if (!eintrag.unterthemen || eintrag.unterthemen.length === 0) return true
+    return eintrag.unterthemen.includes(unterthema)
+  },
+
+  getAktiveUnterthemen: (fach, thema) => {
+    const eintrag = get().freischaltungen.find(f => f.fach === fach && f.thema === thema)
+    return eintrag?.unterthemen
   },
 }))

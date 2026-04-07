@@ -5,6 +5,7 @@ import { useUebenGruppenStore } from '../../store/ueben/gruppenStore'
 import { uebenApiClient } from '../../services/ueben/apiClient'
 import { UebenKontextProvider } from '../../context/ueben/UebenKontextProvider'
 import AdminDashboard from '../ueben/admin/AdminDashboard'
+import { apiService } from '../../services/apiService'
 
 const LP_AUTH_KEY = 'ueben-auth'
 
@@ -24,13 +25,41 @@ interface UebungsToolViewProps {
 
 export default function UebungsToolView({ onFachKlick }: UebungsToolViewProps = {}) {
   const pruefungUser = useAuthStore(s => s.user)
+  const istDemoModus = useAuthStore(s => s.istDemoModus)
   const { gruppen, aktiveGruppe, ladeGruppen, waehleGruppe, ladeStatus } = useUebenGruppenStore()
   const storeMitglieder = useUebenGruppenStore(s => s.mitglieder)
   const [loginStatus, setLoginStatus] = useState<'idle' | 'laden' | 'fertig' | 'fehler'>('idle')
 
+  // Demo-Modus: Kein Backend-Login nötig, Mock-Daten verwenden
+  useEffect(() => {
+    if (!istDemoModus || loginStatus !== 'idle') return
+    const demoGruppe = {
+      id: 'demo-gruppe', name: 'Demo-Klasse', typ: 'gym' as const,
+      adminEmail: 'demo.lp@gymhofwil.ch', fragebankSheetId: 'demo',
+      analytikSheetId: 'demo', mitglieder: ['demo.lp@gymhofwil.ch', 'demo.sus@stud.gymhofwil.ch'],
+    }
+    useUebenAuthStore.setState({
+      user: {
+        email: pruefungUser?.email || 'demo.lp@gymhofwil.ch',
+        name: pruefungUser?.name || 'Demo LP',
+        vorname: 'Demo', nachname: 'LP',
+        rolle: 'admin', sessionToken: 'demo-token', loginMethode: 'google',
+      },
+      istAngemeldet: true, ladeStatus: 'fertig',
+    })
+    useUebenGruppenStore.setState({
+      gruppen: [demoGruppe], aktiveGruppe: demoGruppe, ladeStatus: 'fertig',
+      mitglieder: [
+        { email: 'demo.lp@gymhofwil.ch', name: 'Demo LP', rolle: 'admin' as const, beigetreten: new Date().toISOString() },
+        { email: 'demo.sus@stud.gymhofwil.ch', name: 'Demo SuS', rolle: 'lernend' as const, beigetreten: new Date().toISOString() },
+      ],
+    })
+    setLoginStatus('fertig')
+  }, [istDemoModus, loginStatus, pruefungUser?.email, pruefungUser?.name])
+
   // LP-Login auf dem Üben-Backend ausführen um einen gültigen Session-Token zu bekommen
   useEffect(() => {
-    if (!pruefungUser?.email || loginStatus !== 'idle') return
+    if (!pruefungUser?.email || loginStatus !== 'idle' || istDemoModus || !apiService.istKonfiguriert()) return
     setLoginStatus('laden')
 
     async function login() {

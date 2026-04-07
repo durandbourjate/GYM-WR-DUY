@@ -20,7 +20,7 @@ interface ThemaEintrag {
 export default function AdminThemensteuerung() {
   const { aktiveGruppe } = useUebenGruppenStore()
   const { user } = useUebenAuthStore()
-  const { freischaltungen, ladeFreischaltungen, setzeStatus, getStatus, getAktiveThemen } = useThemenSichtbarkeitStore()
+  const { freischaltungen, ladeFreischaltungen, setzeStatus, getStatus, getAktiveThemen, getAktiveUnterthemen, setzeUnterthemen } = useThemenSichtbarkeitStore()
   const { fachFarben } = useUebenKontext()
   const [alleFragen, setAlleFragen] = useState<Frage[]>([])
   const [laden, setLaden] = useState(true)
@@ -243,29 +243,67 @@ export default function AdminThemensteuerung() {
                 </div>
               </div>
 
-              {/* Unterthemen (ausgeklappt) */}
-              {istOffen && hatUnterthemen && (
-                <div className="border-t border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 divide-y divide-slate-100 dark:divide-slate-700">
-                  {eintrag.unterthemen.sort((a, b) => a.name.localeCompare(b.name)).map(ut => {
-                    const utKey = `${key}::${ut.name}`
-                    return (
-                      <div key={ut.name} className="flex items-center justify-between px-4 py-2.5 pl-14">
-                        <div>
-                          <span className="text-sm text-slate-600 dark:text-slate-300">{ut.name}</span>
-                          <span className="text-xs text-slate-400 ml-2">{ut.anzahl} Fragen</span>
+              {/* Unterthemen (ausgeklappt) — mit Checkboxen zur granularen Aktivierung */}
+              {istOffen && hatUnterthemen && (() => {
+                const aktiveUT = getAktiveUnterthemen(eintrag.fach, eintrag.thema)
+                const alleAktiv = !aktiveUT || aktiveUT.length === 0
+                const themaIstAktivOderAbgeschlossen = eintrag.status === 'aktiv' || eintrag.status === 'abgeschlossen'
+
+                const toggleUnterthema = (utName: string) => {
+                  if (!aktiveGruppe) return
+                  if (alleAktiv) {
+                    // Alle waren aktiv → alle ausser dieses
+                    const alle = eintrag.unterthemen.map(u => u.name).filter(n => n !== utName)
+                    setzeUnterthemen(aktiveGruppe.id, eintrag.fach, eintrag.thema, alle)
+                  } else {
+                    const istAktiv = aktiveUT!.includes(utName)
+                    if (istAktiv) {
+                      // Deaktivieren
+                      const neueUT = aktiveUT!.filter(n => n !== utName)
+                      setzeUnterthemen(aktiveGruppe.id, eintrag.fach, eintrag.thema, neueUT.length > 0 ? neueUT : undefined)
+                    } else {
+                      // Aktivieren
+                      const neueUT = [...aktiveUT!, utName]
+                      // Wenn alle Unterthemen aktiv → undefined (= alle)
+                      const alleNamen = eintrag.unterthemen.map(u => u.name)
+                      const sindAlle = alleNamen.every(n => neueUT.includes(n))
+                      setzeUnterthemen(aktiveGruppe.id, eintrag.fach, eintrag.thema, sindAlle ? undefined : neueUT)
+                    }
+                  }
+                }
+
+                return (
+                  <div className="border-t border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 divide-y divide-slate-100 dark:divide-slate-700">
+                    {eintrag.unterthemen.sort((a, b) => a.name.localeCompare(b.name)).map(ut => {
+                      const utKey = `${key}::${ut.name}`
+                      const istChecked = alleAktiv || (aktiveUT?.includes(ut.name) ?? false)
+                      return (
+                        <div key={ut.name} className="flex items-center justify-between px-4 py-2.5 pl-14">
+                          <label className="flex items-center gap-2.5 cursor-pointer flex-1 min-w-0">
+                            {themaIstAktivOderAbgeschlossen && (
+                              <input
+                                type="checkbox"
+                                checked={istChecked}
+                                onChange={() => toggleUnterthema(ut.name)}
+                                className="rounded border-slate-300 dark:border-slate-600 text-slate-600 focus:ring-slate-500"
+                              />
+                            )}
+                            <span className={`text-sm ${istChecked ? 'text-slate-600 dark:text-slate-300' : 'text-slate-400 dark:text-slate-500'}`}>{ut.name}</span>
+                            <span className="text-xs text-slate-400">{ut.anzahl} Fragen</span>
+                          </label>
+                          <button
+                            onClick={() => kopiereLink(erzeugeDeepLink(eintrag.fach, eintrag.thema, ut.name), utKey)}
+                            className="text-xs px-2 py-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 border border-slate-200 dark:border-slate-600 hover:border-slate-400 transition-colors"
+                            title={`Deep-Link für ${ut.name} kopieren`}
+                          >
+                            {kopiert === utKey ? '✓ Kopiert' : '🔗'}
+                          </button>
                         </div>
-                        <button
-                          onClick={() => kopiereLink(erzeugeDeepLink(eintrag.fach, eintrag.thema, ut.name), utKey)}
-                          className="text-xs px-2 py-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 border border-slate-200 dark:border-slate-600 hover:border-slate-400 transition-colors"
-                          title={`Deep-Link für ${ut.name} kopieren`}
-                        >
-                          {kopiert === utKey ? '✓ Kopiert' : '🔗'}
-                        </button>
-                      </div>
-                    )
-                  })}
-                </div>
-              )}
+                      )
+                    })}
+                  </div>
+                )
+              })()}
             </div>
           )
         })}

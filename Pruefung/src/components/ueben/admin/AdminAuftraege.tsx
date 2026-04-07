@@ -2,17 +2,19 @@ import { useState } from 'react'
 import { useUebenAuftragStore } from '../../../store/ueben/auftragStore'
 import { useUebenGruppenStore } from '../../../store/ueben/gruppenStore'
 import { useUebenAuthStore } from '../../../store/ueben/authStore'
+import { useUebenKontext } from '../../../hooks/ueben/useUebenKontext'
 
 export default function AdminAuftraege() {
   const { auftraege, erstelleAuftrag, schliesseAuftrag, loescheAuftrag, ladeAuftraege } = useUebenAuftragStore()
   const { aktiveGruppe, mitglieder } = useUebenGruppenStore()
   const { user } = useUebenAuthStore()
+  const kontext = useUebenKontext()
   const [formOffen, setFormOffen] = useState(false)
 
   const alleMitglieder = mitglieder.filter(m => m.rolle === 'lernend')
 
-  // Fächer werden aus echten Fragen-Daten gezogen (leer bis geladen)
-  const faecher: string[] = []
+  // Fächer und Themen aus dem Kontext (sichtbare Einstellungen der Gruppe)
+  const faecher = kontext.sichtbareFaecher.length > 0 ? kontext.sichtbareFaecher : []
 
   // Auftraege bei Mount laden
   useState(() => { if (aktiveGruppe) ladeAuftraege(aktiveGruppe.id) })
@@ -32,6 +34,7 @@ export default function AdminAuftraege() {
       {formOffen && (
         <AuftragForm
           faecher={faecher}
+          themenProFach={kontext.sichtbareThemen}
           mitglieder={alleMitglieder.map(m => ({ email: m.email, name: m.name }))}
           onErstellen={(daten) => {
             if (!aktiveGruppe) return
@@ -59,7 +62,7 @@ export default function AdminAuftraege() {
               {auftrag.frist && ` | Bis ${auftrag.frist}`}
             </div>
             <div className="text-xs text-slate-400 mb-3">
-              Fuer: {auftrag.zielEmail.join(', ')}
+              Für: {auftrag.zielEmail.join(', ')}
             </div>
             <div className="flex gap-2">
               <button
@@ -103,6 +106,7 @@ export default function AdminAuftraege() {
 
 interface AuftragFormProps {
   faecher: string[]
+  themenProFach: Record<string, string[]>
   mitglieder: { email: string; name: string }[]
   onErstellen: (daten: {
     titel: string
@@ -113,15 +117,15 @@ interface AuftragFormProps {
   }) => void
 }
 
-function AuftragForm({ faecher, mitglieder, onErstellen }: AuftragFormProps) {
+function AuftragForm({ faecher, themenProFach, mitglieder, onErstellen }: AuftragFormProps) {
   const [titel, setTitel] = useState('')
   const [fach, setFach] = useState('')
   const [thema, setThema] = useState('')
   const [frist, setFrist] = useState('')
   const [zielEmails, setZielEmails] = useState<string[]>(mitglieder.map(m => m.email))
 
-  // Themen-Liste leer bis Fragen aus Backend geladen werden
-  const themen: string[] = []
+  // Themen für das gewählte Fach
+  const themen = fach && themenProFach[fach] ? themenProFach[fach] : []
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -188,7 +192,7 @@ function AuftragForm({ faecher, mitglieder, onErstellen }: AuftragFormProps) {
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-1 dark:text-white">Fuer</label>
+        <label className="block text-sm font-medium mb-1 dark:text-white">Für</label>
         <div className="space-y-1">
           {mitglieder.map(m => (
             <label key={m.email} className="flex items-center gap-2 text-sm dark:text-slate-300">

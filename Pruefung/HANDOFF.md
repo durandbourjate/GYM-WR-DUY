@@ -6,6 +6,43 @@
 
 ---
 
+## Session 71 — Bugfix-Paket + Features (07.04.2026)
+
+### Stand
+Branch `main`. tsc ✅ | 209 Tests ✅ | Build ✅.
+
+### Erledigte Arbeiten
+
+| # | Änderung | Dateien |
+|---|----------|---------|
+| **Bugfixes** | |
+| B1 | Doppelte Header-Bar bei SuS Korrektur-Liste entfernt | KorrekturListe.tsx |
+| B2 | Demo LP: Übungen-Tab + Fragensammlung laden korrekt (Mock-Gruppen) | UebungsToolView.tsx, LPStartseite.tsx |
+| B3 | Demo SuS: Übungen hängt nicht mehr (IST_DEMO prüft auch Haupt-Auth) | AppUeben.tsx |
+| B4 | SuS Abmelden-Bug: ladeStatus 'fertig' nach Logout (nicht 'idle') | authStore.ts (ueben) |
+| B5 | "Fuer" → "Für" + Aufträge-Filter aus Kontext befüllt | AdminAuftraege.tsx |
+| B6 | Skeleton-Header im Suspense-Fallback (kein Ladeblitz) | SuSStartseite.tsx |
+| B7 | Bloom-Guard: analyseUtils crasht nicht mehr bei undefined bloom | analyseUtils.ts |
+| **Features** | |
+| F1 | Unterthemen einzeln aktivierbar (Checkboxen pro Unterthema in Themensteuerung) | themenSichtbarkeit.ts, themenSichtbarkeitStore.ts, AdminThemensteuerung.tsx, appsScriptAdapter.ts |
+| F2 | Multi-Prüfungs-Dashboard per Button (Checkbox-Dialog auf Prüfungen-Liste) | LPStartseite.tsx |
+| F3 | Teilen-Link pro Prüfung/Übung (🔗 Button in PruefungsKarte) | LPStartseite.tsx |
+| F4 | Lernziel-Panel: Gruppiert nach Fach+Thema, "▶ Üben"-Links pro Thema | AppShell.tsx (ueben) |
+| F5 | Metadaten-Rubrik: "Zuordnung" → "Metadaten", vor Fragetyp verschoben, Lernziel-Feld | MetadataSection.tsx, SharedFragenEditor.tsx |
+
+### Typ-Erweiterung
+- `ThemenFreischaltung.unterthemen?: string[]` — Granulare Unterthemen-Aktivierung (undefined = alle)
+
+### ⚠ Apps Script Deploy nötig
+- `lernplattformSetzeThemenStatus` erweitert: optionaler `unterthemen` Parameter
+- Backend muss Unterthemen-Array im ThemenSichtbarkeit-Tab speichern/laden
+
+### Offen (nächste Session)
+- **3D Übungs-Einsicht für SuS** — Backend-Endpoint nötig (`lernplattformLadeSessionErgebnisse`)
+- **Lernziel-Zuordnung in MetadataSection** — Checkboxen vorhanden, lernzielIds noch nicht mit Frage gespeichert
+
+---
+
 ## Session 70 — Strategische Features + Bugfixes (07.04.2026)
 
 ### Stand

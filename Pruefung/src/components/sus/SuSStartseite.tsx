@@ -101,8 +101,18 @@ export default function SuSStartseite({ onKorrekturWaehle: _onKorrekturWaehle }:
     }
     return (
       <Suspense fallback={
-        <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900">
-          <p className="text-slate-500 dark:text-slate-400">Üben wird geladen...</p>
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
+          {/* Skeleton-Header damit kein Ladeblitz entsteht */}
+          <div className="bg-white dark:bg-slate-800 shadow-sm px-4 py-3 flex items-center justify-between sticky top-0 z-30">
+            <div className="h-5 w-24 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+            <div className="flex items-center gap-2">
+              <div className="h-8 w-8 bg-slate-200 dark:bg-slate-700 rounded-lg animate-pulse" />
+              <div className="h-4 w-16 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+            </div>
+          </div>
+          <div className="flex items-center justify-center py-24">
+            <p className="text-slate-500 dark:text-slate-400">Üben wird geladen...</p>
+          </div>
         </div>
       }>
         <AppUeben onZurueck={() => setModus('start')} />

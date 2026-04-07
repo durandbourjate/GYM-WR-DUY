@@ -669,12 +669,7 @@ export default function SharedFragenEditor({
           {/* Pool-Info (Host-Slot) */}
           {poolInfoSlot?.({ frage, typ, onSpeichern })}
 
-          {/* Fragetyp wählen — kategorisiert */}
-          <Abschnitt titel="Fragetyp" einklappbar standardOffen={!frage}>
-            <FrageTypAuswahl typ={typ} setTyp={setTyp} gesperrt={!!frage} />
-          </Abschnitt>
-
-          {/* Grunddaten / Zuordnung */}
+          {/* Metadaten (vor Fragetyp — LP wählt zuerst Fach/Thema/Bloom/Lernziele) */}
           <MetadataSection
             istNeu={!frage}
             fragetext={fragetext}
@@ -694,7 +689,15 @@ export default function SharedFragenEditor({
             ki={ki}
             performance={performance}
             berechtigungenEditor={berechtigungenSlot?.({ berechtigungen, onChange: setBerechtigungen })}
+            lernziele={lernziele} setLernziele={setLernziele}
+            zeigLernzielDialog={zeigLernzielDialog} setZeigLernzielDialog={setZeigLernzielDialog}
+            gewaehlterLernzielId={gewaehlterLernzielId} setGewaehlterLernzielId={setGewaehlterLernzielId}
           />
+
+          {/* Fragetyp wählen — kategorisiert */}
+          <Abschnitt titel="Fragetyp" einklappbar standardOffen={!frage}>
+            <FrageTypAuswahl typ={typ} setTyp={setTyp} gesperrt={!!frage} />
+          </Abschnitt>
 
           {/* Fragetext */}
           <FragetextSection

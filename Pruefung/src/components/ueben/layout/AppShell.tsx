@@ -180,49 +180,53 @@ export default function AppShell({ children }: Props) {
               <>
                 {Object.entries(
                   lernziele.reduce<Record<string, typeof lernziele>>((acc, lz) => {
-                    if (!acc[lz.fach]) acc[lz.fach] = []
-                    acc[lz.fach].push(lz)
+                    const key = `${lz.fach}::${lz.thema}`
+                    if (!acc[key]) acc[key] = []
+                    acc[key].push(lz)
                     return acc
                   }, {})
-                ).map(([fach, fachLernziele]) => (
-                  <div key={fach}>
-                    <h4 className="font-medium text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 mt-2 mb-1">{fach}</h4>
-                    <div className="space-y-1">
-                      {fachLernziele
-                        .map(lz => ({ lz, status: lernzielStatus(lz, fortschritte) }))
-                        .sort((a, b) => {
-                          const order = { offen: 0, inArbeit: 1, gefestigt: 2, gemeistert: 3 }
-                          return order[a.status] - order[b.status]
-                        })
-                        .map(({ lz, status }) => (
-                          <div key={lz.id} className="flex items-start gap-2">
-                            <span className="mt-0.5 text-sm">
-                              {status === 'gemeistert' ? '\u2705' : status === 'gefestigt' ? '\uD83D\uDD35' : status === 'inArbeit' ? '\uD83D\uDFE1' : '\u2B1C'}
-                            </span>
-                            <div className="flex-1 min-w-0">
-                              <span className={status === 'gemeistert' ? 'line-through text-slate-400' : ''}>{lz.text}</span>
-                              <span className="ml-1 text-xs text-slate-400">{lz.bloom}</span>
+                ).map(([key, themaLernziele]) => {
+                  const [fach, thema] = key.split('::')
+                  return (
+                    <div key={key}>
+                      <div className="flex items-center justify-between mt-2 mb-1">
+                        <h4 className="font-medium text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">{fach} — {thema}</h4>
+                        <button
+                          onClick={() => {
+                            setLernzieleOffen(false)
+                            // Zum Thema im Dashboard navigieren
+                            navigiere('dashboard')
+                          }}
+                          className="text-xs px-2 py-0.5 rounded text-green-700 dark:text-green-400 bg-green-100 dark:bg-green-900/30 hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors"
+                        >
+                          ▶ {themaLernziele.length} LZ · {thema} üben
+                        </button>
+                      </div>
+                      <div className="space-y-1">
+                        {themaLernziele
+                          .map(lz => ({ lz, status: lernzielStatus(lz, fortschritte) }))
+                          .sort((a, b) => {
+                            const order: Record<string, number> = { offen: 0, inArbeit: 1, gefestigt: 2, gemeistert: 3 }
+                            return (order[a.status] ?? 0) - (order[b.status] ?? 0)
+                          })
+                          .map(({ lz, status }) => (
+                            <div key={lz.id} className="flex items-start gap-2">
+                              <span className="mt-0.5 text-sm">
+                                {status === 'gemeistert' ? '\u2705' : status === 'gefestigt' ? '\uD83D\uDD35' : status === 'inArbeit' ? '\uD83D\uDFE1' : '\u2B1C'}
+                              </span>
+                              <div className="flex-1 min-w-0">
+                                <span className={status === 'gemeistert' ? 'line-through text-slate-400' : ''}>{lz.text}</span>
+                                <span className="ml-1 text-xs text-slate-400">{lz.bloom}</span>
+                              </div>
                             </div>
-                          </div>
-                        ))}
+                          ))}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  )
+                })}
               </>
             ) : (
-              <>
-                <p>Bearbeite die Themen im Dashboard, um deine Lernziele zu erreichen.</p>
-                <div className="text-xs space-y-1">
-                  <p>Dein Ziel: Fragen auf <strong className="text-green-600 dark:text-green-400">Gemeistert</strong> bringen.</p>
-                  <div className="grid grid-cols-2 gap-1 mt-2">
-                    <div className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-slate-300 inline-block" /> Neu</div>
-                    <div className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-yellow-400 inline-block" /> Ueben</div>
-                    <div className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-blue-400 inline-block" /> Gefestigt</div>
-                    <div className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-green-500 inline-block" /> Gemeistert</div>
-                  </div>
-                  <p className="text-slate-400 mt-2 italic">Lernziele werden von der Lehrperson definiert.</p>
-                </div>
-              </>
+              <p className="text-slate-500 dark:text-slate-400 italic">Lernziele werden von der Lehrperson definiert. Sobald Themen aktiviert sind, erscheinen hier die zugehörigen Lernziele.</p>
             )}
           </div>
         </div>

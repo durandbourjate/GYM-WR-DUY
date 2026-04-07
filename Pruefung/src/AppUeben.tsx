@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useAuthStore } from './store/authStore'
 import { useUebenAuthStore } from './store/ueben/authStore'
 import { useUebenGruppenStore } from './store/ueben/gruppenStore'
 import { useUebenUebungsStore } from './store/ueben/uebungsStore'
@@ -16,7 +17,6 @@ import type { UebenRolle } from './types/ueben/auth'
 import { useDeepLinkAktivierung } from './hooks/ueben/useDeepLinkAktivierung'
 
 const DEMO_PARAM = new URLSearchParams(window.location.search).get('demo')
-const IST_DEMO = !!DEMO_PARAM
 const DEMO_ROLLE: UebenRolle = DEMO_PARAM === 'eltern' ? 'admin' : 'lernend'
 
 interface AppUebenProps {
@@ -30,6 +30,9 @@ export default function AppUeben({ onZurueck: _onZurueck }: AppUebenProps = {}) 
   const { session, starteSession } = useUebenUebungsStore()
   const { aktuellerScreen, navigiere } = useUebenNavigationStore()
   const [demoAktiv, setDemoAktiv] = useState(false)
+  // Demo-Modus: URL-Parameter ODER Haupt-Auth-Store (bei Einbettung via SuSStartseite)
+  const hauptAuthDemo = useAuthStore(s => s.istDemoModus)
+  const IST_DEMO = !!DEMO_PARAM || hauptAuthDemo
 
   // Deep-Link: ?fach=...&thema=... → Thema automatisch aktivieren + Ziel merken
   const deepLinkZiel = useDeepLinkAktivierung(aktiveGruppe?.id, user?.email, istAngemeldet)
@@ -59,7 +62,8 @@ export default function AppUeben({ onZurueck: _onZurueck }: AppUebenProps = {}) 
       }
       useUebenGruppenStore.setState({ gruppen: [gruppe], aktiveGruppe: gruppe, ladeStatus: 'fertig' })
 
-      useUebenFortschrittStore.getState().ladeFortschritt().catch(() => {})
+      // Demo: Leeren Fortschritt setzen statt Backend aufzurufen
+      useUebenFortschrittStore.setState({ fortschritte: {} })
       navigiere('dashboard')
     }
   }, [demoAktiv, navigiere])

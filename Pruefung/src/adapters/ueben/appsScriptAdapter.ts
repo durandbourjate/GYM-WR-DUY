@@ -299,11 +299,12 @@ class AppsScriptThemenSichtbarkeitAdapter {
     thema: string,
     status: ThemenStatus,
     aktiviertVon: string,
-    typ: AktivierungsTyp = 'manuell'
+    typ: AktivierungsTyp = 'manuell',
+    unterthemen?: string[],
   ): Promise<boolean> {
     const response = await uebenApiClient.post<{ success: boolean }>(
       'lernplattformSetzeThemenStatus',
-      { gruppeId, fach, thema, status, aktiviertVon, typ },
+      { gruppeId, fach, thema, status, aktiviertVon, typ, ...(unterthemen ? { unterthemen } : {}) },
       this.getToken()
     )
     return response?.success ?? false

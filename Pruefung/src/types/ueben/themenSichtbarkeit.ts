@@ -20,6 +20,8 @@ export interface ThemenFreischaltung {
   aktiviertAm: string          // ISO-Timestamp
   aktiviertVon: string         // Email der LP oder SuS (bei Deep-Link)
   typ: AktivierungsTyp
+  /** Aktive Unterthemen. undefined/leer = alle Unterthemen aktiv */
+  unterthemen?: string[]
 }
 
 /** Maximale Anzahl gleichzeitig aktiver Themen */

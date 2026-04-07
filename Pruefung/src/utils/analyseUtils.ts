@@ -87,7 +87,7 @@ export function berechnePruefungsAnalyse(
 
   // Taxonomie
   const bloomCounts: Record<BloomStufe, number> = { K1: 0, K2: 0, K3: 0, K4: 0, K5: 0, K6: 0 }
-  for (const f of fragen) bloomCounts[f.bloom]++
+  for (const f of fragen) { if (f.bloom && bloomCounts[f.bloom] !== undefined) bloomCounts[f.bloom]++ }
   const taxonomie: TaxonomieVerteilung[] = (['K1', 'K2', 'K3', 'K4', 'K5', 'K6'] as BloomStufe[]).map((stufe) => ({
     stufe,
     anzahl: bloomCounts[stufe],
@@ -135,7 +135,7 @@ export function berechnePruefungsAnalyse(
   const zeitbedarfDetails: ZeitbedarfDetail[] = fragen.map((f) => {
     const minuten = f.zeitbedarf ?? berechneZeitbedarf(
       f.typ as 'mc' | 'freitext' | 'lueckentext' | 'zuordnung' | 'richtigfalsch' | 'berechnung' | 'visualisierung',
-      f.bloom,
+      f.bloom || 'K2',
       f.typ === 'freitext' && 'laenge' in f ? { laenge: (f as { laenge: 'kurz' | 'mittel' | 'lang' }).laenge } : undefined,
     )
     return { frageId: f.id, typ: f.typ, minuten }

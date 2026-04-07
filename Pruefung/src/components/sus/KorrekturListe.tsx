@@ -3,16 +3,17 @@ import { useAuthStore } from '../../store/authStore.ts'
 import { apiService } from '../../services/apiService.ts'
 import type { KorrekturListeEintrag } from '../../services/apiService.ts'
 import { formatDatum } from '../../utils/zeit.ts'
-import ThemeToggle from '../ThemeToggle.tsx'
-import FeedbackButton from '../shared/FeedbackButton.tsx'
 
 interface Props {
   onWaehle: (pruefungId: string) => void
 }
 
+/**
+ * Liste der freigegebenen Korrekturen für SuS.
+ * Wird innerhalb von SuSStartseite gerendert — Header kommt von dort.
+ */
 export default function KorrekturListe({ onWaehle }: Props) {
   const user = useAuthStore((s) => s.user)
-  const abmelden = useAuthStore((s) => s.abmelden)
   const [korrekturen, setKorrekturen] = useState<KorrekturListeEintrag[]>([])
   const [laden, setLaden] = useState(true)
   const [fehler, setFehler] = useState<string | null>(null)
@@ -31,23 +32,7 @@ export default function KorrekturListe({ onWaehle }: Props) {
   }, [user])
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 transition-colors">
-      <header className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-4 py-3 flex items-center justify-between">
-        <h1 className="text-lg font-semibold text-slate-800 dark:text-slate-100">Meine Korrekturen</h1>
-        <div className="flex items-center gap-2">
-          <FeedbackButton variant="icon" context={{ rolle: 'sus', ort: 'korrektur-einsicht' }} />
-          <ThemeToggle />
-          <span className="text-xs text-slate-400 dark:text-slate-500">{user?.name || user?.email}</span>
-          <button
-            onClick={abmelden}
-            className="px-2 py-1.5 text-sm text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors cursor-pointer"
-          >
-            Abmelden
-          </button>
-        </div>
-      </header>
-
-      <main className="max-w-2xl mx-auto p-4 space-y-3">
+    <div className="space-y-3">
         {laden && (
           <div className="text-center py-12 text-slate-400 dark:text-slate-500">
             Lade Korrekturen...
@@ -104,7 +89,6 @@ export default function KorrekturListe({ onWaehle }: Props) {
             </div>
           </button>
         ))}
-      </main>
     </div>
   )
 }
