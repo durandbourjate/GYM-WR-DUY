@@ -6,6 +6,53 @@
 
 ---
 
+## Session 70 — Strategische Features + Bugfixes (07.04.2026)
+
+### Stand
+Branch `main`. tsc ✅ | 209 Tests ✅ | Build ✅.
+
+### Erledigte Arbeiten
+
+| # | Änderung | Dateien |
+|---|----------|---------|
+| **Bugfixes** | |
+| B1 | LP Übungen-Tab: Status-Filter (Aktiv/Archiviert/Alle) hinzugefügt | LPStartseite.tsx |
+| B2 | SuS Logout: Räumt alle Stores auf (Üben-Auth + Gruppen + Prüfungs-Auth) | SuSStartseite.tsx, AppShell.tsx |
+| B3 | SuS-Startseite: Lobby-Prüfungen anzeigen (phase='lobby' → "Warteraum", 'aktiv' → "Bereit") | apps-script-code.js, AktivePruefungen.tsx |
+| **Phase 1: LP-Einstellungen** | |
+| 1A | Gruppenname editierbar (Inline-Edit + Backend-Endpoint) | AllgemeinTab.tsx, apps-script-code.js, appsScriptAdapter.ts |
+| 1B | Rollen verwalten (Admin↔Lernend Toggle, letzter-Admin-Schutz) | MitgliederTab.tsx, apps-script-code.js, appsScriptAdapter.ts |
+| 1C | Mastery-Schwellwerte konfigurierbar (Gefestigt/Gemeistert/Min-Sessions Slider) | AllgemeinTab.tsx, mastery.ts, settings.ts, fortschrittStore.ts |
+| **Phase 2: Freie Übungszusammenstellung** | |
+| 2A | Cross-Topic Logik: erstelleMixBlock + erstelleRepetitionsBlock | blockBuilder.ts, uebungsStore.ts, uebung.ts |
+| 2B | Cross-Topic UI: MixSessionDialog + "Gemischte Übung"/"Repetition" Buttons im Dashboard | MixSessionDialog.tsx (neu), Dashboard.tsx, Zusammenfassung.tsx |
+| **Phase 3: SuS-Hilfe** | |
+| 3 | SuS-Hilfe als Slide-over Panel (7 Kategorien, ersetzt altes Dropdown) | SuSHilfePanel.tsx (neu), AppShell.tsx |
+| **Housekeeping** | |
+| H1 | HANDOFF.md gekürzt (1300+ → 267 Zeilen, Sessions 20–64 als Archiv) | HANDOFF.md |
+
+### Neue Dateien (2)
+- `src/components/ueben/MixSessionDialog.tsx` — Multi-Select Themen-Picker für gemischte Sessions
+- `src/components/ueben/SuSHilfePanel.tsx` — 7-Kategorien Hilfe-Panel
+
+### Apps Script — Neue Endpoints
+- `lernplattformUmbenneGruppe` — Gruppenname ändern (Admin)
+- `lernplattformAendereRolle` — Mitglied-Rolle ändern (Admin, letzter-Admin-Schutz)
+- `ladeAktivePruefungenFuerSuS` erweitert: gibt auch Lobby-Configs zurück (phase='lobby')
+
+### ⚠ Apps Script Deploy nötig
+3 neue/geänderte Endpoints. User muss Code im Apps Script Editor ersetzen + neue Bereitstellung.
+
+### Verifiziert
+- ✅ V1: Einrichtungsübung (23 Fragen, FiBu, Materialien)
+- ✅ V2: Themensteuerung (Aktivieren/Abschliessen, Deep-Link kopieren)
+- ✅ V3: SuS-Dashboard (Empfehlungen, Filter, "Mein Fortschritt")
+- ✅ V5: Aktive Prüfungen (Endpoint 200 OK)
+- ✅ V6: Deep-Links navigiert SuS direkt zum Thema
+- ✅ SuS-Startseite: Lobby-Prüfungen mit "Warteraum" angezeigt
+
+---
+
 ## Session 69 — Paket A-C: Lernsteuerung + Navigation + Bugfixes (07.04.2026)
 
 ### Stand
@@ -228,13 +275,10 @@ Branch `main`. tsc ✅ | 193 Tests ✅ | Build ✅. **URL: /ExamLab/ (unified bu
 - **TaF Phasen-UI** — klassenTyp-Feld vorhanden, UI für Phasen-Auswahl noch nicht (auf nächstes SJ verschoben)
 - **Monitoring-Verzögerung ~28s** — Abwarten, aktuell akzeptabel
 
-### Strategische Features (Planung nötig)
-
-| # | Feature | Beschreibung | Prio |
-|---|---------|-------------|------|
-| 1 | **Einstellungen-Panel** | Gruppennamen ändern, Rollen verwalten, alles aus App statt Sheet | mittel |
-| 2 | **Freie Übungszusammenstellung** | SuS stellt sich Übung aus mehreren Themen/Fächern zusammen (Repetition) | mittel |
-| 3 | **SuS-Hilfe erweitern** | Ausführlichere Hinweise (wie bei Übungspools) | niedrig |
+### Strategische Features (alle erledigt ✅ Session 70)
+- ~~Einstellungen-Panel~~ ✅ Gruppenname editierbar, Rollen verwalten, Mastery-Schwellwerte
+- ~~Freie Übungszusammenstellung~~ ✅ Cross-Topic-Mix + Repetitions-Modus
+- ~~SuS-Hilfe erweitern~~ ✅ 7-Kategorien Slide-over Panel
 
 ---
 
