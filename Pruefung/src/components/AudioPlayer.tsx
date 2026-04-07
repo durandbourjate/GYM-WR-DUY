@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import Tooltip from './ui/Tooltip.tsx'
 
 interface Props {
   src: string
@@ -43,9 +44,8 @@ export default function AudioPlayer({ src, kompakt = false }: Props) {
         type="button"
         onClick={togglePlay}
         className={`${kompakt ? 'w-7 h-7' : 'w-8 h-8'} flex items-center justify-center rounded-full bg-slate-200 dark:bg-slate-600 hover:bg-slate-300 dark:hover:bg-slate-500 transition-colors cursor-pointer`}
-        title={spielt ? 'Pause' : 'Abspielen'}
       >
-        {spielt ? '⏸' : '▶'}
+        <Tooltip text={spielt ? 'Pause' : 'Abspielen'}><span>{spielt ? '⏸' : '▶'}</span></Tooltip>
       </button>
       <span className="text-slate-500 dark:text-slate-400 tabular-nums min-w-[3rem]">
         {formatZeit(position)} / {formatZeit(dauer)}

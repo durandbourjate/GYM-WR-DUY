@@ -294,7 +294,6 @@ export default function AktivPhase({ config, schuelerStatus, startTimestamp, onB
                           type="button"
                           onClick={(e) => { e.stopPropagation(); handleSebAusnahme(s.email) }}
                           className="px-2 py-0.5 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-full hover:bg-red-200 dark:hover:bg-red-900/50 cursor-pointer transition-colors"
-                          title="SEB-Ausnahme für diesen SuS erlauben"
                         >
                           Kein SEB — Ausnahme?
                         </button>
@@ -313,7 +312,6 @@ export default function AktivPhase({ config, schuelerStatus, startTimestamp, onB
                           setEinzelBeendenSuS({ email: s.email, name: s.name || s.email })
                         }}
                         className="w-6 h-6 flex items-center justify-center text-xs text-red-400 hover:text-white hover:bg-red-500 rounded cursor-pointer transition-colors"
-                        title={`Prüfung für ${s.name || s.email} beenden`}
                       >
                         ✕
                       </button>
@@ -440,7 +438,6 @@ function ZeitzuschlagInline({ email, zuschlagMin, basisEndeMs, jetzt, istAktiv, 
         type="button"
         onClick={() => onAendern(email, 5)}
         className="text-xs px-1.5 py-0.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:text-blue-400 dark:hover:bg-blue-900/20 rounded cursor-pointer transition-colors"
-        title="5 Min. Zeitzuschlag hinzufügen"
       >
         +5
       </button>
@@ -496,7 +493,6 @@ function ZeitzuschlagInline({ email, zuschlagMin, basisEndeMs, jetzt, istAktiv, 
           type="button"
           onClick={() => onAendern(email, zuschlagMin + 5)}
           className="text-[10px] px-1 py-0.5 border border-slate-300 dark:border-slate-600 text-slate-500 dark:text-slate-400 hover:border-blue-400 hover:text-blue-600 dark:hover:border-blue-500 dark:hover:text-blue-400 rounded cursor-pointer transition-colors"
-          title="+5 Min. hinzufügen"
         >
           +5
         </button>
@@ -519,7 +515,6 @@ function ZeitzuschlagInline({ email, zuschlagMin, basisEndeMs, jetzt, istAktiv, 
         type="button"
         onClick={() => onAendern(email, zuschlagMin + 5)}
         className="text-[10px] px-1 py-0.5 border border-slate-300 dark:border-slate-600 text-slate-500 dark:text-slate-400 hover:border-blue-400 hover:text-blue-600 dark:hover:border-blue-500 dark:hover:text-blue-400 rounded cursor-pointer transition-colors"
-        title="+5 Min. hinzufügen"
       >
         +5
       </button>

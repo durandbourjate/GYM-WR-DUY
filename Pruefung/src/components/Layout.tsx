@@ -298,7 +298,6 @@ export default function Layout() {
           <button
             onClick={() => setTabKonfliktGeschlossen(true)}
             className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-200 text-lg leading-none cursor-pointer"
-            title="Warnung schliessen"
           >
             &times;
           </button>
@@ -320,7 +319,6 @@ export default function Layout() {
               <button
                 onClick={() => schliesseNachricht(n.id)}
                 className="text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-200 text-lg leading-none flex-shrink-0 cursor-pointer"
-                title="Nachricht schliessen"
               >
                 &times;
               </button>
@@ -348,7 +346,6 @@ export default function Layout() {
             <button
               onClick={vorherigeFrage}
               disabled={aktuelleFrageIndex === 0}
-              title="Vorherige Frage (← Pfeiltaste)"
               className="px-2.5 py-1.5 text-sm font-medium text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer min-h-[44px] flex items-center gap-1"
             >
               <span>&larr;</span>
@@ -369,7 +366,6 @@ export default function Layout() {
             {aktuelleFrage && (
               <button
                 onClick={() => toggleMarkierung(aktuelleFrage.id)}
-                title={istMarkiert ? 'Markierung entfernen' : 'Als unsicher markieren'}
                 className={`px-2 py-1.5 text-sm rounded-lg border transition-colors cursor-pointer flex items-center gap-1 min-h-[44px]
                   ${istMarkiert
                     ? 'bg-amber-100 border-amber-400 text-amber-800 font-semibold dark:bg-amber-900/40 dark:border-amber-600 dark:text-amber-300'
@@ -385,7 +381,6 @@ export default function Layout() {
             <button
               onClick={naechsteFrage}
               disabled={aktuelleFrageIndex === fragen.length - 1}
-              title="Nächste Frage (→ Pfeiltaste)"
               className="px-3 py-1.5 text-sm font-medium text-white bg-slate-700 dark:bg-slate-200 dark:text-slate-800 rounded-lg hover:bg-slate-800 dark:hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer min-h-[44px] flex items-center gap-1"
             >
               <span className="hidden sm:inline">Weiter</span>

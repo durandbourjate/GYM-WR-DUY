@@ -51,7 +51,7 @@ export default function PoolUpdateVergleich({ frage, onUebernehmen, onIgnorieren
             </button>
             <button onClick={() => setOffen(false)}
               className="px-3 py-1 text-sm border border-slate-300 rounded hover:bg-slate-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700"
-              title="Vergleich zuklappen — editiere die Frage manuell, die Pool-Version bleibt über den Vergleich-Link erreichbar">
+            >
               Manuell anpassen
             </button>
           </div>

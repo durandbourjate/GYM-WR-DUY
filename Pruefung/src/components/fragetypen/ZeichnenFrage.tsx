@@ -313,7 +313,6 @@ export default function ZeichnenFrage({ frage }: Props) {
               type="button"
               onClick={() => setCanvasGross(!canvasGross)}
               className="mb-1 text-xs px-2 py-1 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded cursor-pointer transition-colors"
-              title={canvasGross ? 'Zeichenfläche verkleinern' : 'Zeichenfläche vergrössern'}
             >
               {canvasGross ? '⊟ Verkleinern' : '⊞ Vergrössern'}
             </button>

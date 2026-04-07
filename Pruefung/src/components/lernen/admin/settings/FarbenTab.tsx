@@ -111,7 +111,6 @@ export default function FarbenTab() {
                 <button
                   onClick={() => resetFarbe(fach)}
                   className="text-xs text-slate-400 hover:text-red-500 min-h-[44px] px-2"
-                  title="Standard-Farbe wiederherstellen"
                 >
                   Zuruecksetzen
                 </button>

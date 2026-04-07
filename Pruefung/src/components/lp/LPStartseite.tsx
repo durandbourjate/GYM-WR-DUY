@@ -737,14 +737,12 @@ function PruefungsKarte({ config: c, onBearbeiten, onDuplizieren, trackerSummary
         <a
           href={`${window.location.pathname}?id=${c.id}`}
           className="px-4 py-2 text-xs font-medium text-white dark:text-slate-800 bg-slate-800 dark:bg-slate-200 rounded-lg hover:bg-slate-900 dark:hover:bg-slate-100 transition-colors"
-          title={c.beendetUm ? 'Auswerten' : c.typ === 'formativ' ? 'Übung starten' : 'Durchführen'}
         >
           {c.beendetUm ? 'Auswerten' : c.typ === 'formativ' ? 'Übung starten' : 'Durchführen'}
         </a>
         <button
           onClick={() => onDuplizieren(c)}
           className="px-4 py-2 text-xs font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors cursor-pointer"
-          title="Prüfung duplizieren"
         >
           Duplizieren
         </button>

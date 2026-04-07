@@ -658,7 +658,6 @@ export function PDFSeite({
             type="button"
             style={{ position: 'absolute', left: px - 8, top: py - (ann.groesse || 18) - 24, zIndex: 25 }}
             className="px-2 py-1 text-xs text-red-600 bg-white dark:bg-slate-800 border border-red-300 dark:border-red-700 rounded shadow-lg hover:bg-red-50 dark:hover:bg-red-900/30"
-            title="Löschen"
             onClick={(e) => {
               e.stopPropagation()
               onAnnotationLoeschen(ann.id)

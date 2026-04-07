@@ -146,7 +146,6 @@ export default function KorrekturFrageZeile({
             onClick={handleKiVorschlag}
             disabled={kiLaedt}
             className="px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors cursor-pointer disabled:opacity-50 border-amber-300 dark:border-amber-600 text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-900/20 hover:bg-amber-100 dark:hover:bg-amber-900/30"
-            title="KI-Korrekturvorschlag via Claude API anfordern"
           >
             {kiLaedt ? (
               <>

@@ -2,6 +2,7 @@ import { useRef, useEffect, useState } from 'react'
 import { initializeLernenGoogleAuth, renderLernenGoogleButton } from '../../services/lernen/authService'
 import { useUebenAuthStore } from '../../store/lernen/authStore'
 import { useUebenTheme } from '../../hooks/lernen/useTheme'
+import Tooltip from '../ui/Tooltip.tsx'
 
 export default function LoginScreen() {
   const googleButtonRef = useRef<HTMLDivElement>(null)
@@ -35,9 +36,8 @@ export default function LoginScreen() {
       <button
         onClick={toggleTheme}
         className="fixed top-4 right-4 p-2 rounded-lg bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700 text-lg min-w-[44px] min-h-[44px] flex items-center justify-center"
-        title={istDark ? 'Light Mode' : 'Dark Mode'}
       >
-        {istDark ? '☀️' : '🌙'}
+        <Tooltip text={istDark ? 'Light Mode' : 'Dark Mode'}><span>{istDark ? '☀️' : '🌙'}</span></Tooltip>
       </button>
 
       <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-8 w-full max-w-sm text-center">

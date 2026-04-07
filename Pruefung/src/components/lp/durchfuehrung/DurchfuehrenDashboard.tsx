@@ -346,7 +346,6 @@ export default function DurchfuehrenDashboard({ pruefungId }: { pruefungId: stri
           <>
             <button
               onClick={() => setAutoRefresh(!autoRefresh)}
-              title={autoRefresh ? 'Auto-Refresh pausieren' : 'Auto-Refresh aktivieren'}
               className={`px-2.5 py-1.5 text-xs rounded-lg border transition-colors cursor-pointer flex items-center gap-1.5
                 ${autoRefresh
                   ? 'bg-green-50 border-green-300 text-green-700 dark:bg-green-900/20 dark:border-green-700 dark:text-green-300'
@@ -358,7 +357,6 @@ export default function DurchfuehrenDashboard({ pruefungId }: { pruefungId: stri
             </button>
             <button
               onClick={ladeDaten}
-              title="Jetzt aktualisieren"
               className="px-2.5 py-1.5 text-xs border border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
             >
               ↻

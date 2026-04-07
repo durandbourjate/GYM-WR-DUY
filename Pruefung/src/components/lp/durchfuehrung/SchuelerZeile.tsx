@@ -45,7 +45,6 @@ export default function SchuelerZeile({ schueler, aufgeklappt, onToggle, zeitver
           {zeitverlaengerung && zeitverlaengerung > 0 && (
             <span
               className="text-xs px-1 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded"
-              title="Nachteilsausgleich"
             >
               +{zeitverlaengerung} Min.
             </span>
@@ -54,7 +53,6 @@ export default function SchuelerZeile({ schueler, aufgeklappt, onToggle, zeitver
             <button
               onClick={(e) => { e.stopPropagation(); setZeigBeendenDialog(true) }}
               className="text-xs px-1.5 py-0.5 border border-red-300 dark:border-red-700 text-red-600 dark:text-red-400 rounded hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors cursor-pointer"
-              title="Prüfung für diesen SuS beenden"
             >
               Beenden
             </button>

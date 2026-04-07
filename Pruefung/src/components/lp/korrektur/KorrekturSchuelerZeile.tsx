@@ -138,7 +138,6 @@ export default function KorrekturSchuelerZeile({ pruefungId, schueler, abgabe, f
             <button
               onClick={(e) => { e.stopPropagation(); onPDF() }}
               className="text-xs px-1.5 py-0.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-600 rounded transition-colors cursor-pointer"
-              title="Korrektur-PDF anzeigen"
             >
               PDF
             </button>
@@ -322,7 +321,6 @@ export default function KorrekturSchuelerZeile({ pruefungId, schueler, abgabe, f
                 <button
                   onClick={(e) => { e.stopPropagation(); handleNoteEdit() }}
                   className="text-[10px] px-1.5 py-0.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-600 rounded transition-colors cursor-pointer"
-                  title="Note überschreiben"
                 >
                   Anpassen
                 </button>

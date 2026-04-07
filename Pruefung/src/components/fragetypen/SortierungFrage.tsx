@@ -203,7 +203,6 @@ export default function SortierungFrage({ frage }: Props) {
                   onClick={() => verschieben(index, 'hoch')}
                   disabled={index === 0}
                   className="px-2 py-0.5 text-sm rounded bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
-                  title="Nach oben"
                 >
                   {'\u2191'}
                 </button>
@@ -211,7 +210,6 @@ export default function SortierungFrage({ frage }: Props) {
                   onClick={() => verschieben(index, 'runter')}
                   disabled={index === reihenfolge.length - 1}
                   className="px-2 py-0.5 text-sm rounded bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
-                  title="Nach unten"
                 >
                   {'\u2193'}
                 </button>

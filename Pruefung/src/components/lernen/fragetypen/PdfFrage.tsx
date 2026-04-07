@@ -28,7 +28,6 @@ export default function PdfFrage({ frage, onAntwort, disabled, feedbackSichtbar,
         <div className="rounded-xl border-2 border-slate-200 dark:border-slate-600 overflow-hidden">
           <iframe
             src={resolveAssetUrl(pdf.pdfUrl)}
-            title="PDF-Material"
             className="w-full"
             style={{ height: '500px' }}
           />

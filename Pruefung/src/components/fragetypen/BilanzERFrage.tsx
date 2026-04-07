@@ -186,7 +186,7 @@ function KontoRow({ konto, konten, readOnly, onNrChange, onBetragChange, onRemov
       <input type="number" value={konto.betrag} onChange={e => onBetragChange(e.target.value)} disabled={readOnly}
         placeholder="CHF" min="0" step="0.01" className={`${numInput} w-24 ${!readOnly && !konto.betrag ? 'border-violet-400 dark:border-violet-500' : ''}`} />
       {!readOnly && canRemove && (
-        <button type="button" onClick={onRemove} className={btnRemove} title="Entfernen">×</button>
+        <button type="button" onClick={onRemove} className={btnRemove}>×</button>
       )}
     </div>
   )
@@ -257,7 +257,7 @@ function BilanzSeiteUI({ seite, bilanzsumme, readOnly, konten, onUpdate, onBsCha
                   <button type="button" onClick={() => onUpdate(s => { if (gi < s.gruppen.length-1) [s.gruppen[gi], s.gruppen[gi+1]] = [s.gruppen[gi+1], s.gruppen[gi]] })} disabled={gi === seite.gruppen.length - 1}
                     className="min-h-[36px] min-w-[28px] flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 disabled:opacity-30">↓</button>
                   {seite.gruppen.length > 1 && (
-                    <button type="button" onClick={() => onUpdate(s => { s.gruppen.splice(gi, 1) })} className={btnRemove} title="Gruppe entfernen">×</button>
+                    <button type="button" onClick={() => onUpdate(s => { s.gruppen.splice(gi, 1) })} className={btnRemove}>×</button>
                   )}
                 </>
               )}
@@ -302,7 +302,7 @@ function ERUI({ er, onChange, readOnly, konten }: { er: ERFeldEingabe; onChange:
               <input type="text" value={stufe.label} onChange={e => { const k = dc(); k.stufen[si].label = e.target.value; onChange(k) }} disabled={readOnly}
                 placeholder="Stufe (z.B. Bruttogewinn)" className={`${inputSm} flex-1 font-medium placeholder:text-slate-400`} />
               {!readOnly && er.stufen.length > 1 && (
-                <button type="button" onClick={() => { const k = dc(); k.stufen.splice(si, 1); onChange(k) }} className={btnRemove} title="Stufe entfernen">×</button>
+                <button type="button" onClick={() => { const k = dc(); k.stufen.splice(si, 1); onChange(k) }} className={btnRemove}>×</button>
               )}
             </div>
             <div className="space-y-1">

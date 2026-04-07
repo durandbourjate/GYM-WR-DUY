@@ -8,6 +8,7 @@ import FeedbackButton from '../shared/FeedbackButton.tsx'
 import { formatDatum } from '../../utils/zeit.ts'
 import { driveStreamUrl } from '../../utils/mediaUtils.ts'
 import ThemeToggle from '../ThemeToggle.tsx'
+import Tooltip from '../ui/Tooltip.tsx'
 
 interface Props {
   pruefungId: string
@@ -76,9 +77,8 @@ export default function KorrekturEinsicht({ pruefungId, onZurueck }: Props) {
             <button
               onClick={onZurueck}
               className="text-sm text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 cursor-pointer"
-              title="Zurück zur Liste"
             >
-              ← Zurück
+              <Tooltip text="Zurück zur Liste"><span>← Zurück</span></Tooltip>
             </button>
             <div>
               <h1 className="text-lg font-semibold text-slate-800 dark:text-slate-100">{daten.titel}</h1>
@@ -98,9 +98,8 @@ export default function KorrekturEinsicht({ pruefungId, onZurueck }: Props) {
               <button
                 onClick={() => window.print()}
                 className="px-3 py-1.5 text-xs font-medium bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors cursor-pointer"
-                title="Korrektur als PDF drucken/speichern"
               >
-                PDF
+                <Tooltip text="Korrektur als PDF drucken/speichern"><span>PDF</span></Tooltip>
               </button>
             )}
             <FeedbackButton

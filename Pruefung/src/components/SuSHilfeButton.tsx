@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import Tooltip from './ui/Tooltip.tsx'
 
 /**
  * Hilfe-Button für SuS während der Prüfungsdurchführung.
@@ -9,17 +10,18 @@ export default function SuSHilfeButton() {
 
   return (
     <>
-      <button
-        onClick={() => setOffen(true)}
-        title="Hilfe zur Bedienung"
-        className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-lg text-sm text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+      <Tooltip text="Hilfe zur Bedienung">
+        <button
+          onClick={() => setOffen(true)}
+          className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-lg text-sm text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
       >
         <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
           <circle cx="12" cy="12" r="10" />
           <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
           <circle cx="12" cy="17" r="0.5" fill="currentColor" />
         </svg>
-      </button>
+        </button>
+      </Tooltip>
 
       {offen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={() => setOffen(false)}>

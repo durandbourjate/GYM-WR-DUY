@@ -25,6 +25,7 @@ import PDFEditor from './PDFEditor.tsx'
 import BerechtigungenEditor from '../../shared/BerechtigungenEditor.tsx'
 import PoolUpdateVergleich from './PoolUpdateVergleich.tsx'
 import RueckSyncDialog from '../fragenbank/RueckSyncDialog.tsx'
+import Tooltip from '../../ui/Tooltip.tsx'
 
 interface Props {
   frage: Frage | null
@@ -135,7 +136,6 @@ export default function PruefungFragenEditor({ frage, onSpeichern, onAbbrechen, 
                       ? 'px-3 py-1 text-sm bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300 rounded hover:bg-green-200 dark:hover:bg-green-900/70 cursor-pointer'
                       : 'px-3 py-1 text-sm bg-green-600 text-white rounded hover:bg-green-700 cursor-pointer'
                     }
-                    title={pf.pruefungstauglich ? 'Klicken um Prüfungstauglichkeit aufzuheben' : 'Als prüfungstauglich markieren'}
                   >
                     {pf.pruefungstauglich ? '\u2713 Prüfungstauglich' : 'Prüfungstauglich \u2713'}
                   </button>
@@ -156,19 +156,17 @@ export default function PruefungFragenEditor({ frage, onSpeichern, onAbbrechen, 
             {f && f.poolId && f.poolVersion && (
               <button
                 onClick={onRueckSync}
-                title="Änderungen an Pool zurückschreiben"
                 className="px-3 py-1.5 text-sm rounded-lg border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors cursor-pointer"
               >
-                &uarr; An Pool
+                <Tooltip text="Änderungen an Pool zurückschreiben"><span>&uarr; An Pool</span></Tooltip>
               </button>
             )}
             {f && !f.poolId && typ !== 'visualisierung' && (
               <button
                 onClick={onRueckSync}
-                title="Frage in einen Übungspool exportieren"
                 className="px-3 py-1.5 text-sm rounded-lg border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors cursor-pointer"
               >
-                &uarr; In Pool exportieren
+                <Tooltip text="Frage in einen Übungspool exportieren"><span>&uarr; In Pool exportieren</span></Tooltip>
               </button>
             )}
           </>

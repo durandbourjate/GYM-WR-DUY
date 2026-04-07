@@ -134,7 +134,6 @@ export default function KorrekturAktionsLeiste({
         <button
           onClick={onPDFOeffnen}
           className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors cursor-pointer"
-          title="Einzelne Korrektur-PDFs nacheinander anzeigen und drucken"
         >
           Korrektur-PDFs
         </button>

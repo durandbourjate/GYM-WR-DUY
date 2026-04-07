@@ -64,13 +64,11 @@ export default function AbschnitteTab({
                 onClick={() => onMoveAbschnitt(aIndex, 'hoch')}
                 disabled={aIndex === 0}
                 className="w-7 h-7 text-xs text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600 rounded disabled:opacity-20 cursor-pointer disabled:cursor-not-allowed transition-colors"
-                title="Nach oben"
               >↑</button>
               <button
                 onClick={() => onMoveAbschnitt(aIndex, 'runter')}
                 disabled={aIndex === pruefung.abschnitte.length - 1}
                 className="w-7 h-7 text-xs text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600 rounded disabled:opacity-20 cursor-pointer disabled:cursor-not-allowed transition-colors"
-                title="Nach unten"
               >↓</button>
             </div>
             <input
@@ -85,7 +83,6 @@ export default function AbschnitteTab({
             <button
               onClick={() => onRemoveAbschnitt(aIndex)}
               className="w-7 h-7 text-xs text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 rounded cursor-pointer transition-colors"
-              title="Abschnitt löschen"
             >×</button>
           </div>
 
@@ -125,7 +122,6 @@ export default function AbschnitteTab({
                     key={frageId}
                     onClick={() => onEditFrage(frageId)}
                     className="px-3 py-2.5 bg-slate-50 dark:bg-slate-700/30 rounded-lg text-sm cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-colors"
-                    title="Klicken zum Bearbeiten"
                   >
                     {/* Zeile 1: Nummer, Badges, Aktionen */}
                     <div className="flex items-center gap-2">
@@ -191,7 +187,6 @@ export default function AbschnitteTab({
                         <button
                           onClick={() => onRemoveFrage(aIndex, frageId)}
                           className="w-6 h-6 text-xs text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 rounded cursor-pointer"
-                          title="Frage entfernen"
                         >×</button>
                       </div>
                     </div>

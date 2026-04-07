@@ -92,7 +92,7 @@ export default function BuchungssatzFrage({ frage, onAntwort, disabled, feedback
               `}
             />
             {zeilen.length > 1 && !disabled && (
-              <button onClick={() => zeileEntfernen(i)} className="text-red-400 hover:text-red-600 min-w-[44px] min-h-[44px] flex items-center justify-center" title="Zeile entfernen">
+              <button onClick={() => zeileEntfernen(i)} className="text-red-400 hover:text-red-600 min-w-[44px] min-h-[44px] flex items-center justify-center">
                 ✕
               </button>
             )}

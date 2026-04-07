@@ -301,7 +301,6 @@ export default function AdminFragenbank({ initialFach }: AdminFragenbankProps = 
                     }
                   }}
                   className="text-slate-300 hover:text-red-500 dark:text-slate-600 dark:hover:text-red-400 text-sm transition-colors cursor-pointer p-1"
-                  title="Frage löschen"
                 >
                   🗑
                 </button>

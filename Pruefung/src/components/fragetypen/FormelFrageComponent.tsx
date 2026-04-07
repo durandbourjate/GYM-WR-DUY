@@ -9,6 +9,7 @@ import type { FormelFrage } from '../../types/fragen.ts'
 import { fachbereichFarbe } from '../../utils/fachUtils.ts'
 import { ladeKatexAsync, istKatexGeladen } from '../../utils/latexRenderer.ts'
 import FrageText from '../shared/FrageText.tsx'
+import Tooltip from '../ui/Tooltip.tsx'
 
 interface Props {
   frage: FormelFrage
@@ -184,10 +185,9 @@ export default function FormelFrageComponent({ frage }: Props) {
             type="button"
             onClick={handleUndo}
             disabled={undoStack.length === 0}
-            title="Rückgängig"
             className="px-2 py-1 text-sm bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded border border-slate-200 dark:border-slate-600 transition-colors disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
           >
-            ↩
+            <Tooltip text="Rückgängig"><span>↩</span></Tooltip>
           </button>
           {SYMBOLE.map(gruppe => (
             <div key={gruppe.gruppe} className="flex flex-wrap gap-1 items-center">
@@ -197,10 +197,9 @@ export default function FormelFrageComponent({ frage }: Props) {
                   key={s.label}
                   type="button"
                   onClick={() => symbolEinfuegen(s.einfuegen)}
-                  title={s.einfuegen}
                   className="px-2 py-1 text-sm font-mono bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded border border-slate-200 dark:border-slate-600 transition-colors min-w-[32px] text-center"
                 >
-                  {s.label}
+                  <Tooltip text={s.einfuegen}><span>{s.label}</span></Tooltip>
                 </button>
               ))}
             </div>

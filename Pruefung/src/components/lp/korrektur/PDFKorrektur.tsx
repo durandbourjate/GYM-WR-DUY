@@ -312,7 +312,6 @@ export default function PDFKorrektur({
                   ? 'bg-slate-100 dark:bg-slate-700 text-slate-400 dark:text-slate-500 cursor-not-allowed'
                   : 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 hover:bg-amber-200 dark:hover:bg-amber-900/50'
                 }`}
-              title={kiVorschlagGeladen ? 'KI-Vorschlag bereits geladen' : 'KI-Korrekturvorschlag generieren'}
             >
               {kiLaedt ? (
                 <>

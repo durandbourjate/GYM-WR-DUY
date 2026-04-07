@@ -180,7 +180,6 @@ export default function ConfigTab({ pruefung, updatePruefung, toggleFachbereich 
                   type="button"
                   onClick={() => downloadSebDatei(pruefung.id, pruefung.titel)}
                   className="ml-8 px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors cursor-pointer"
-                  title="SEB-Konfigurationsdatei herunterladen"
                 >
                   📥 SEB-Datei herunterladen
                 </button>
@@ -508,7 +507,6 @@ function MaterialienSection({ materialien, setMaterialien }: {
               <button
                 onClick={() => removeMaterial(mat.id)}
                 className="w-6 h-6 text-xs text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 rounded cursor-pointer transition-colors shrink-0 mt-0.5"
-                title="Entfernen"
               >
                 ×
               </button>
@@ -669,7 +667,6 @@ function MaterialienSection({ materialien, setMaterialien }: {
                     onClick={() => { setUploadDatei(null); setUploadFehler(null) }}
                     disabled={uploadLaeuft}
                     className="w-6 h-6 text-xs text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 rounded cursor-pointer transition-colors shrink-0"
-                    title="Datei entfernen"
                   >
                     ×
                   </button>

@@ -111,7 +111,7 @@ export default function ZeichnenFrage({ frage, onAntwort, disabled, feedbackSich
     <div className="space-y-3">
       {/* Toolbar */}
       <div className="flex gap-2 items-center flex-wrap">
-        <input type="color" value={farbe} onChange={(e) => setFarbe(e.target.value)} disabled={disabled} className="w-10 h-10 rounded cursor-pointer" title="Farbe" />
+        <input type="color" value={farbe} onChange={(e) => setFarbe(e.target.value)} disabled={disabled} className="w-10 h-10 rounded cursor-pointer" />
         <select value={dicke} onChange={(e) => setDicke(Number(e.target.value))} disabled={disabled} className="p-2 rounded border border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-white text-sm min-h-[44px]">
           <option value={1}>Fein</option>
           <option value={3}>Normal</option>

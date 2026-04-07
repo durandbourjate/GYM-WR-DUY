@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { FrageAnhang } from '../types/fragen.ts'
 import MediaAnhang from './MediaAnhang.tsx'
+import Tooltip from './ui/Tooltip.tsx'
 
 interface Props {
   anhaenge: FrageAnhang[]
@@ -37,9 +38,8 @@ export default function FrageAnhaenge({ anhaenge }: Props) {
             type="button"
             onClick={() => setLightboxId(null)}
             className="absolute top-4 right-4 w-10 h-10 text-white text-2xl bg-black/40 rounded-full hover:bg-black/60 transition-colors cursor-pointer flex items-center justify-center"
-            title="Schliessen"
           >
-            ×
+            <Tooltip text="Schliessen" position="left"><span>×</span></Tooltip>
           </button>
           <img
             src={`https://drive.google.com/thumbnail?id=${lightboxAnhang.driveFileId}&sz=w1600`}

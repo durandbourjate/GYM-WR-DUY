@@ -96,7 +96,6 @@ export default function MitgliederTab() {
                     onClick={() => handleKodeGenerieren(m.email)}
                     disabled={kodeStatus[m.email] === 'laden'}
                     className="text-xs text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 min-h-[44px] px-2 disabled:opacity-50"
-                    title="Login-Code generieren"
                   >
                     {kodeStatus[m.email] === 'laden' ? '…' : kodeStatus[m.email] === 'fehler' ? 'Fehler' : 'Code'}
                   </button>
@@ -107,7 +106,6 @@ export default function MitgliederTab() {
                   <button
                     onClick={() => handleEntfernen(m.email, m.name)}
                     className="text-xs text-red-400 hover:text-red-600 min-h-[44px] px-2"
-                    title={`${m.name} entfernen`}
                   >
                     ✕
                   </button>

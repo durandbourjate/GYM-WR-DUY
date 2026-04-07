@@ -636,7 +636,7 @@ function AnhangMedien({ anhaenge }: { anhaenge: FrageAnhang[] }) {
       </div>
       {lightboxAnhang && lightboxAnhang.mimeType.startsWith('image/') && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80" onClick={() => setLightboxId(null)}>
-          <button type="button" onClick={() => setLightboxId(null)} className="absolute top-4 right-4 w-10 h-10 text-white text-2xl bg-black/40 rounded-full hover:bg-black/60 cursor-pointer flex items-center justify-center" title="Schliessen">×</button>
+          <button type="button" onClick={() => setLightboxId(null)} className="absolute top-4 right-4 w-10 h-10 text-white text-2xl bg-black/40 rounded-full hover:bg-black/60 cursor-pointer flex items-center justify-center">×</button>
           <img
             src={`https://drive.google.com/thumbnail?id=${lightboxAnhang.driveFileId}&sz=w800`}
             alt={lightboxAnhang.beschreibung || lightboxAnhang.dateiname}

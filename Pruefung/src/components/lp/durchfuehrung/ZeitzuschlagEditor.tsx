@@ -80,14 +80,12 @@ export default function ZeitzuschlagEditor({ zeitverlaengerungen, teilnehmer, on
                 min={1}
                 max={120}
                 className="w-16 px-2 py-0.5 text-xs text-center border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200"
-                title="Zusatzminuten"
               />
               <span className="text-xs text-slate-500 dark:text-slate-400">Min.</span>
               <button
                 type="button"
                 onClick={() => entfernen(email)}
                 className="w-6 h-6 text-xs text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 rounded cursor-pointer transition-colors flex items-center justify-center"
-                title="Zeitzuschlag entfernen"
               >
                 ×
               </button>

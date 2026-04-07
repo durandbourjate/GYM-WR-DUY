@@ -115,14 +115,12 @@ export default function FragenBrowserHeader({
           <button
             onClick={onNeueFrageErstellen}
             className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors cursor-pointer"
-            title="Neue Frage erstellen"
           >
             + Neue Frage
           </button>
           <button
             onClick={onImport}
             className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors cursor-pointer"
-            title="Fragen via KI aus Text importieren"
           >
             Import via KI
           </button>
@@ -131,7 +129,6 @@ export default function FragenBrowserHeader({
             <button
               onClick={() => setExportOffen(!exportOffen)}
               className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors cursor-pointer flex items-center gap-1"
-              title="Fragen exportieren"
             >
               Export
               <span className="text-xs">{exportOffen ? '▲' : '▼'}</span>
@@ -284,7 +281,6 @@ export default function FragenBrowserHeader({
               ? 'bg-slate-800 dark:bg-slate-200 text-white dark:text-slate-800 border-slate-800 dark:border-slate-200'
               : 'border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
             }`}
-          title="Nur Fragen mit Anhängen (Bilder, Audio, Video)"
         >
           Anhang
         </button>
@@ -354,7 +350,6 @@ export default function FragenBrowserHeader({
               ? 'bg-slate-800 dark:bg-slate-200 text-white dark:text-slate-800 border-slate-800 dark:border-slate-200'
               : 'border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
             }`}
-          title={kompaktModus ? 'Detailansicht' : 'Kompaktansicht'}
         >
           {kompaktModus ? 'Kompakt' : 'Detail'}
         </button>

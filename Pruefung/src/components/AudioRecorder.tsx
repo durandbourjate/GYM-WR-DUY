@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useAudioRecorder } from '../hooks/useAudioRecorder.ts'
 import AudioPlayer from './AudioPlayer.tsx'
+import Tooltip from './ui/Tooltip.tsx'
 
 interface Props {
   /** Wird aufgerufen wenn Aufnahme gespeichert werden soll */
@@ -26,9 +27,8 @@ export default function AudioRecorder({ onSpeichern, bestehendeAudioId, kompakt 
           type="button"
           onClick={startRecording}
           className="text-xs text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 underline cursor-pointer"
-          title="Neue Aufnahme"
         >
-          Ersetzen
+          <Tooltip text="Neue Aufnahme"><span>Ersetzen</span></Tooltip>
         </button>
       </div>
     )
@@ -41,9 +41,8 @@ export default function AudioRecorder({ onSpeichern, bestehendeAudioId, kompakt 
         type="button"
         onClick={startRecording}
         className={`${kompakt ? 'w-7 h-7 text-sm' : 'w-8 h-8 text-base'} flex items-center justify-center rounded-full bg-slate-200 dark:bg-slate-600 hover:bg-slate-300 dark:hover:bg-slate-500 transition-colors cursor-pointer`}
-        title="Audio-Kommentar aufnehmen"
       >
-        🎤
+        <Tooltip text="Audio-Kommentar aufnehmen"><span>🎤</span></Tooltip>
       </button>
     )
   }
