@@ -52,7 +52,7 @@ export default function LPStartseite() {
     try { sessionStorage.setItem('lp-modus', m) } catch { /* ignore */ }
   }
   const [listenTab, setListenTab] = useState<'pruefungen' | 'tracker'>('pruefungen')
-  const [uebungsTab, setUebungsTab] = useState<'uebungen' | 'durchfuehren' | 'analyse'>('uebungen')
+  const [uebungsTab, setUebungsTab] = useState<'uebungen' | 'durchfuehren' | 'analyse'>('durchfuehren')
   const [trackerDaten, setTrackerDaten] = useState<TrackerDaten | null>(null)
 
   // Such- und Filterstate
@@ -339,16 +339,6 @@ export default function LPStartseite() {
           <div className="px-6 pt-4">
             <div className="flex gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-lg w-fit">
               <button
-                onClick={() => setUebungsTab('uebungen')}
-                className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors cursor-pointer ${
-                  uebungsTab === 'uebungen'
-                    ? 'bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 shadow-sm'
-                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
-                }`}
-              >
-                Übungen
-              </button>
-              <button
                 onClick={() => setUebungsTab('durchfuehren')}
                 className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors cursor-pointer ${
                   uebungsTab === 'durchfuehren'
@@ -357,6 +347,16 @@ export default function LPStartseite() {
                 }`}
               >
                 Übung durchführen
+              </button>
+              <button
+                onClick={() => setUebungsTab('uebungen')}
+                className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors cursor-pointer ${
+                  uebungsTab === 'uebungen'
+                    ? 'bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 shadow-sm'
+                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
+                }`}
+              >
+                Übungen
               </button>
               <button
                 onClick={() => setUebungsTab('analyse')}
