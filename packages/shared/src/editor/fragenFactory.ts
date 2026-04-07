@@ -50,6 +50,7 @@ export interface FrageBasis {
   autor?: string
   geteilt: 'privat' | 'fachschaft' | 'schule'
   berechtigungen?: unknown[]
+  lernzielIds?: string[]
 }
 
 /** Typ-spezifische Daten — discriminated union */

@@ -52,6 +52,9 @@ interface MetadataSectionProps {
   setZeigLernzielDialog?: (v: boolean) => void
   gewaehlterLernzielId?: string
   setGewaehlterLernzielId?: (v: string) => void
+  /** Zugeordnete Lernziel-IDs (Persistierung) */
+  lernzielIds?: string[]
+  setLernzielIds?: (v: string[]) => void
 }
 
 export default function MetadataSection({
@@ -75,6 +78,7 @@ export default function MetadataSection({
   lernziele, setLernziele: _setLernziele,
   zeigLernzielDialog: _zeigLernzielDialog, setZeigLernzielDialog: _setZeigLernzielDialog,
   gewaehlterLernzielId: _gewaehlterLernzielId, setGewaehlterLernzielId: _setGewaehlterLernzielId,
+  lernzielIds = [], setLernzielIds,
 }: MetadataSectionProps) {
   const [statsOffen, setStatsOffen] = useState(false)
   const config = useEditorConfig()
@@ -246,11 +250,25 @@ export default function MetadataSection({
       {/* Lernziele zuordnen */}
       {lernziele && lernziele.length > 0 && (
         <div className="mt-3">
-          <label className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Lernziele</label>
+          <label className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">
+            Lernziele {lernzielIds.length > 0 && <span className="text-slate-400">({lernzielIds.length} zugeordnet)</span>}
+          </label>
           <div className="space-y-1 max-h-40 overflow-y-auto border border-slate-200 dark:border-slate-700 rounded-lg p-2">
             {lernziele.filter(lz => lz.aktiv).map(lz => (
               <label key={lz.id} className="flex items-start gap-2 text-xs cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50 rounded px-1 py-0.5">
-                <input type="checkbox" className="mt-0.5 rounded border-slate-300 dark:border-slate-600" />
+                <input
+                  type="checkbox"
+                  checked={lernzielIds.includes(lz.id)}
+                  onChange={() => {
+                    if (!setLernzielIds) return
+                    setLernzielIds(
+                      lernzielIds.includes(lz.id)
+                        ? lernzielIds.filter(id => id !== lz.id)
+                        : [...lernzielIds, lz.id]
+                    )
+                  }}
+                  className="mt-0.5 rounded border-slate-300 dark:border-slate-600"
+                />
                 <span className="dark:text-slate-300">{lz.text}</span>
                 {lz.bloom && <span className="text-slate-400 shrink-0">{lz.bloom}</span>}
               </label>

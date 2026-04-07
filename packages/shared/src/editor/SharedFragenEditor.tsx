@@ -456,10 +456,11 @@ export default function SharedFragenEditor({
   // KI-Assistent
   const ki = useKIAssistent()
 
-  // Lernziel-Generierung
+  // Lernziel-Generierung + Zuordnung
   const [lernziele, setLernziele] = useState<Lernziel[]>([])
   const [zeigLernzielDialog, setZeigLernzielDialog] = useState(false)
   const [gewaehlterLernzielId, setGewaehlterLernzielId] = useState('')
+  const [lernzielIds, setLernzielIds] = useState<string[]>(frage?.lernzielIds ?? [])
 
   const panelRef = useRef<HTMLDivElement>(null)
   const fragetextRef = useRef<HTMLTextAreaElement>(null)
@@ -545,6 +546,7 @@ export default function SharedFragenEditor({
       autor: frage?.autor ?? config.benutzer.email,
       geteilt,
       berechtigungen: berechtigungen.length > 0 ? berechtigungen : undefined,
+      lernzielIds: lernzielIds.length > 0 ? lernzielIds : undefined,
     }
 
     // Typ-spezifische Daten zusammenstellen
@@ -692,6 +694,7 @@ export default function SharedFragenEditor({
             lernziele={lernziele} setLernziele={setLernziele}
             zeigLernzielDialog={zeigLernzielDialog} setZeigLernzielDialog={setZeigLernzielDialog}
             gewaehlterLernzielId={gewaehlterLernzielId} setGewaehlterLernzielId={setGewaehlterLernzielId}
+            lernzielIds={lernzielIds} setLernzielIds={setLernzielIds}
           />
 
           {/* Fragetyp wählen — kategorisiert */}
