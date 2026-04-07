@@ -270,17 +270,19 @@ async function loadPoolCounts() {
       var resp = await fetch('config/' + p.id + '.js');
       if (!resp.ok) return { id: p.id, questions: 0, topics: 0 };
       var code = await resp.text();
-      // QUESTIONS-Array zählen (nach window.QUESTIONS), beide Formate: {id: und {"id":
-      var qsPart = code.split('window.QUESTIONS')[1] || '';
-      var qMatches = qsPart.match(/\{\s*(?:\n\s*)?(?:"id"|id)\s*:\s*"/g);
-      var questions = qMatches ? qMatches.length : 0;
-      // TOPICS-Objekt zählen: Keys in window.TOPICS = { ... }
-      // Beide Formate: quoted ("key":{) und unquoted (key:{)
-      var topicsBlock = code.match(/window\.TOPICS\s*=\s*\{([\s\S]*?)\n?\};/);
-      var topics = 0;
-      if (topicsBlock) {
-        var topicKeys = topicsBlock[1].match(/(?:"[^"]+"|[a-zA-Z_]\w*)\s*:\s*\{/g);
-        topics = topicKeys ? topicKeys.length : 0;
+      // Echtes Parsing: window-Objekt simulieren und QUESTIONS.length zählen
+      var questions = 0, topics = 0;
+      try {
+        var w = {};
+        var fn = new Function('window', code + '\nreturn { q: (window.QUESTIONS || []).length, t: window.TOPICS ? Object.keys(window.TOPICS).length : 0 }');
+        var result = fn(w);
+        questions = result.q;
+        topics = result.t;
+      } catch (e) {
+        // Fallback: Regex-Zählung
+        var qsPart = code.split('window.QUESTIONS')[1] || '';
+        var qMatches = qsPart.match(/\{\s*(?:\n\s*)?(?:"id"|id)\s*:\s*"/g);
+        questions = qMatches ? qMatches.length : 0;
       }
       return { id: p.id, questions: questions, topics: topics };
     } catch (e) {
