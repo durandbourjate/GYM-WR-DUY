@@ -1,6 +1,7 @@
 import { useState, useEffect, Suspense, lazy } from 'react'
 import { useAuthStore } from '../../store/authStore'
 import { useUebenAuthStore } from '../../store/ueben/authStore'
+import { useUebenGruppenStore } from '../../store/ueben/gruppenStore'
 import { uebenApiClient } from '../../services/ueben/apiClient'
 import ThemeToggle from '../ThemeToggle'
 import KorrekturListe from './KorrekturListe'
@@ -28,10 +29,19 @@ type SuSModus = 'start' | 'ueben' | 'pruefen'
  */
 export default function SuSStartseite({ onKorrekturWaehle: _onKorrekturWaehle }: { onKorrekturWaehle: (id: string) => void }) {
   const user = useAuthStore(s => s.user)
-  const abmelden = useAuthStore(s => s.abmelden)
+  const pruefungAbmelden = useAuthStore(s => s.abmelden)
   const [modus, setModus] = useState<SuSModus>('start')
   const [korrekturId, setKorrekturId] = useState<string | null>(null)
   const [loginBridged, setLoginBridged] = useState(false)
+
+  // Vollständiges Abmelden: Prüfungs-Auth + Üben-Auth + Gruppen-Store
+  function abmelden() {
+    useUebenAuthStore.getState().abmelden()
+    useUebenGruppenStore.setState({ gruppen: [], aktiveGruppe: null, mitglieder: [], ladeStatus: 'idle' })
+    setLoginBridged(false)
+    setModus('start')
+    pruefungAbmelden()
+  }
 
   // Login-Bridging: Pruefung-Auth → Üben-Auth synchronisieren
   useEffect(() => {
