@@ -9,6 +9,8 @@ export default function MitgliederTab() {
   const [einladenFehler, setEinladenFehler] = useState('')
   const [generierteKodes, setGenerierteKodes] = useState<Record<string, string>>({})
   const [kodeStatus, setKodeStatus] = useState<Record<string, 'laden' | 'fehler'>>({})
+  const [rolleStatus, setRolleStatus] = useState<Record<string, 'laden' | 'fehler' | 'ok'>>({})
+  const [rolleFehler, setRolleFehler] = useState<Record<string, string>>({})
 
   if (!aktiveGruppe) {
     return <p className="text-sm text-slate-400">Keine Gruppe aktiv.</p>
@@ -60,6 +62,21 @@ export default function MitgliederTab() {
     }
   }
 
+  const handleRolleAendern = async (email: string, neueRolle: 'admin' | 'lernend') => {
+    setRolleStatus(prev => ({ ...prev, [email]: 'laden' }))
+    setRolleFehler(prev => { const n = { ...prev }; delete n[email]; return n })
+    try {
+      await uebenGruppenAdapter.aendereRolle(aktiveGruppe.id, email, neueRolle)
+      setRolleStatus(prev => ({ ...prev, [email]: 'ok' }))
+      refreshMitglieder()
+      setTimeout(() => setRolleStatus(prev => { const n = { ...prev }; delete n[email]; return n }), 2000)
+    } catch (e) {
+      setRolleFehler(prev => ({ ...prev, [email]: e instanceof Error ? e.message : 'Fehler' }))
+      setRolleStatus(prev => ({ ...prev, [email]: 'fehler' }))
+    }
+  }
+
+  const adminAnzahl = mitglieder.filter(m => m.rolle === 'admin').length
   const istFamilie = aktiveGruppe.typ === 'familie'
 
   return (
@@ -84,11 +101,28 @@ export default function MitgliederTab() {
               </div>
 
               <div className="flex items-center gap-2 shrink-0">
-                {istAdmin && (
-                  <span className="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">
-                    Admin
-                  </span>
+                {/* Rollen-Toggle */}
+                {rolleStatus[m.email] === 'laden' ? (
+                  <span className="text-xs text-slate-400 px-2">…</span>
+                ) : (
+                  <button
+                    onClick={() => {
+                      if (istAdmin && adminAnzahl <= 1) return // Letzter Admin
+                      handleRolleAendern(m.email, istAdmin ? 'lernend' : 'admin')
+                    }}
+                    disabled={istAdmin && adminAnzahl <= 1}
+                    className={`text-xs px-2 py-0.5 rounded-full font-medium transition-colors cursor-pointer ${
+                      istAdmin
+                        ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300 hover:bg-amber-200 dark:hover:bg-amber-900/50'
+                        : 'bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600'
+                    } ${istAdmin && adminAnzahl <= 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    title={istAdmin ? (adminAnzahl <= 1 ? 'Letzter Admin' : 'Zu Lernend herabstufen') : 'Zu Admin hochstufen'}
+                  >
+                    {istAdmin ? 'Admin' : 'Lernend'}
+                  </button>
                 )}
+                {rolleStatus[m.email] === 'ok' && <span className="text-xs text-green-500">✓</span>}
+                {rolleFehler[m.email] && <span className="text-xs text-red-500">{rolleFehler[m.email]}</span>}
 
                 {/* Code generieren (nur Familie, nur nicht-Admin) */}
                 {istFamilie && !istAdmin && (

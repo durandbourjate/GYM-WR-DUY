@@ -960,6 +960,10 @@ function doPost(e) {
       return lernplattformEinladen(body);
     case 'lernplattformEntfernen':
       return lernplattformEntfernen(body);
+    case 'lernplattformUmbenneGruppe':
+      return lernplattformUmbenneGruppe(body);
+    case 'lernplattformAendereRolle':
+      return lernplattformAendereRolle(body);
 
     // Fragen
     case 'lernplattformLadeFragen':
@@ -6782,6 +6786,100 @@ function lernplattformEntfernen(body) {
       }
     }
 
+    return jsonResponse({ success: false, error: 'Mitglied nicht gefunden' });
+  } catch (e) {
+    return jsonResponse({ success: false, error: e.message });
+  }
+}
+
+/**
+ * Gruppenname ändern (nur Admin).
+ */
+function lernplattformUmbenneGruppe(body) {
+  var gruppeId = body.gruppeId;
+  var neuerName = (body.neuerName || '').trim();
+
+  if (!neuerName) return jsonResponse({ success: false, error: 'Name darf nicht leer sein' });
+
+  var adminBody = { email: body.adminEmail || body.email, token: body.token, sessionToken: body.sessionToken };
+  var auth = istGruppenAdmin_(adminBody, gruppeId);
+  if (!auth) return jsonResponse({ success: false, error: 'Keine Berechtigung' });
+
+  auditLog_('umbenneGruppe', auth.email, { gruppeId: gruppeId, neuerName: neuerName });
+
+  try {
+    var sheet = getGruppenRegistry_();
+    var daten = sheet.getDataRange().getValues();
+    var headers = daten[0].map(function(h) { return String(h).toLowerCase().trim(); });
+    var idIdx = headers.indexOf('id');
+    var nameIdx = headers.indexOf('name');
+
+    for (var i = 1; i < daten.length; i++) {
+      if (String(daten[i][idIdx]) === gruppeId) {
+        sheet.getRange(i + 1, nameIdx + 1).setValue(neuerName);
+        return jsonResponse({ success: true });
+      }
+    }
+    return jsonResponse({ success: false, error: 'Gruppe nicht gefunden' });
+  } catch (e) {
+    return jsonResponse({ success: false, error: e.message });
+  }
+}
+
+/**
+ * Rolle eines Mitglieds ändern (nur Admin). Letzter Admin kann nicht degradiert werden.
+ */
+function lernplattformAendereRolle(body) {
+  var gruppeId = body.gruppeId;
+  var mitgliedEmail = (body.mitgliedEmail || '').toLowerCase().trim();
+  var neueRolle = body.neueRolle; // 'admin' oder 'lernend'
+
+  if (neueRolle !== 'admin' && neueRolle !== 'lernend') {
+    return jsonResponse({ success: false, error: 'Ungültige Rolle' });
+  }
+
+  var adminBody = { email: body.adminEmail || body.email, token: body.token, sessionToken: body.sessionToken };
+  var auth = istGruppenAdmin_(adminBody, gruppeId);
+  if (!auth) return jsonResponse({ success: false, error: 'Keine Berechtigung' });
+
+  auditLog_('aendereRolle', auth.email, { gruppeId: gruppeId, mitglied: mitgliedEmail, neueRolle: neueRolle });
+
+  try {
+    var ss = SpreadsheetApp.openById(auth.gruppe.fragebankSheetId);
+    var sheet = ss.getSheetByName('Mitglieder');
+    if (!sheet) return jsonResponse({ success: false, error: 'Mitglieder-Tab fehlt' });
+
+    var daten = sheet.getDataRange().getValues();
+    var headers = daten[0].map(function(h) { return String(h).toLowerCase().trim(); });
+    var emailIdx = headers.indexOf('email');
+    var rolleIdx = headers.indexOf('rolle');
+
+    // Letzter-Admin-Schutz: Zähle aktuelle Admins
+    if (neueRolle === 'lernend') {
+      var adminCount = 0;
+      // Gruppen-Ersteller zählt immer als Admin
+      if (auth.gruppe.adminEmail) adminCount++;
+      for (var j = 1; j < daten.length; j++) {
+        if (String(daten[j][rolleIdx]) === 'admin') adminCount++;
+      }
+      // Wenn Gruppen-Ersteller == Mitglied, nicht doppelt zählen
+      for (var k = 1; k < daten.length; k++) {
+        if (String(daten[k][emailIdx]).toLowerCase().trim() === auth.gruppe.adminEmail && String(daten[k][rolleIdx]) === 'admin') {
+          adminCount--; // Wurde doppelt gezählt
+          break;
+        }
+      }
+      if (adminCount <= 1) {
+        return jsonResponse({ success: false, error: 'Der letzte Admin kann nicht degradiert werden' });
+      }
+    }
+
+    for (var i = 1; i < daten.length; i++) {
+      if (String(daten[i][emailIdx]).toLowerCase().trim() === mitgliedEmail) {
+        sheet.getRange(i + 1, rolleIdx + 1).setValue(neueRolle);
+        return jsonResponse({ success: true });
+      }
+    }
     return jsonResponse({ success: false, error: 'Mitglied nicht gefunden' });
   } catch (e) {
     return jsonResponse({ success: false, error: e.message });

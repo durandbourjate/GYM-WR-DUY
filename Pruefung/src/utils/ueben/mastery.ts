@@ -1,19 +1,21 @@
 import type { MasteryStufe, FragenFortschritt, LernzielStatus } from '../../types/ueben/fortschritt'
 import type { Lernziel } from '@shared/types/fragen'
+import { DEFAULT_MASTERY_SCHWELLWERTE, type MasterySchwellwerte } from '../../types/ueben/settings'
 
-const GEFESTIGT_SCHWELLE = 3
-const GEMEISTERT_SCHWELLE = 5
-const GEMEISTERT_MIN_SESSIONS = 2
-
-export function berechneMastery(richtigInFolge: number, sessionIds: string[]): MasteryStufe {
+export function berechneMastery(
+  richtigInFolge: number,
+  sessionIds: string[],
+  schwellwerte?: Partial<MasterySchwellwerte>
+): MasteryStufe {
   if (richtigInFolge === 0 && sessionIds.length === 0) return 'neu'
 
+  const s = { ...DEFAULT_MASTERY_SCHWELLWERTE, ...schwellwerte }
   const uniqueSessions = new Set(sessionIds).size
 
-  if (richtigInFolge >= GEMEISTERT_SCHWELLE && uniqueSessions >= GEMEISTERT_MIN_SESSIONS) {
+  if (richtigInFolge >= s.gemeistert && uniqueSessions >= s.gemeistertMinSessions) {
     return 'gemeistert'
   }
-  if (richtigInFolge >= GEFESTIGT_SCHWELLE) {
+  if (richtigInFolge >= s.gefestigt) {
     return 'gefestigt'
   }
   return 'ueben'
@@ -22,7 +24,8 @@ export function berechneMastery(richtigInFolge: number, sessionIds: string[]): M
 export function aktualisiereFortschritt(
   fortschritt: FragenFortschritt,
   korrekt: boolean,
-  sessionId: string
+  sessionId: string,
+  schwellwerte?: Partial<MasterySchwellwerte>
 ): FragenFortschritt {
   const sessionIds = fortschritt.sessionIds.includes(sessionId)
     ? fortschritt.sessionIds
@@ -30,7 +33,7 @@ export function aktualisiereFortschritt(
 
   const richtigInFolge = korrekt ? fortschritt.richtigInFolge + 1 : 0
 
-  const mastery = berechneMastery(richtigInFolge, sessionIds)
+  const mastery = berechneMastery(richtigInFolge, sessionIds, schwellwerte)
 
   return {
     ...fortschritt,

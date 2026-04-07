@@ -68,6 +68,24 @@ class AppsScriptGruppenAdapter implements GruppenService {
     )
   }
 
+  async umbenneGruppe(gruppeId: string, neuerName: string): Promise<void> {
+    const response = await uebenApiClient.post<{ success: boolean; error?: string }>(
+      'lernplattformUmbenneGruppe',
+      { gruppeId, neuerName, adminEmail: this.getEmail() },
+      this.getToken()
+    )
+    if (response && !response.success) throw new Error(response.error || 'Umbenennen fehlgeschlagen')
+  }
+
+  async aendereRolle(gruppeId: string, mitgliedEmail: string, neueRolle: 'admin' | 'lernend'): Promise<void> {
+    const response = await uebenApiClient.post<{ success: boolean; error?: string }>(
+      'lernplattformAendereRolle',
+      { gruppeId, mitgliedEmail, neueRolle, adminEmail: this.getEmail() },
+      this.getToken()
+    )
+    if (response && !response.success) throw new Error(response.error || 'Rolle ändern fehlgeschlagen')
+  }
+
   async generiereCode(gruppeId: string, email: string): Promise<string> {
     const response = await uebenApiClient.post<{ success: boolean; data: { code: string } }>(
       'lernplattformGeneriereCode',

@@ -5,6 +5,7 @@ import type { Lernziel } from '@shared/types/fragen'
 import { aktualisiereFortschritt } from '../../utils/ueben/mastery'
 import { db } from '../../utils/ueben/indexedDB'
 import { uebenFortschrittAdapter } from '../../adapters/ueben/appsScriptAdapter'
+import { useUebenSettingsStore } from './settingsStore'
 
 const STORAGE_KEY = 'ueben-fortschritt'
 
@@ -56,7 +57,8 @@ export const useUebenFortschrittStore = create<UebenFortschrittState>((set, get)
       mastery: 'neu' as MasteryStufe,
     }
 
-    const aktualisiert = aktualisiereFortschritt(aktuell, korrekt, sessionId)
+    const schwellwerte = useUebenSettingsStore.getState().einstellungen?.masterySchwellwerte
+    const aktualisiert = aktualisiereFortschritt(aktuell, korrekt, sessionId, schwellwerte)
     const neueFortschritte = { ...get().fortschritte, [fragenId]: aktualisiert }
 
     set({ fortschritte: neueFortschritte })
