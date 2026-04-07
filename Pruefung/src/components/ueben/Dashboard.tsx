@@ -59,7 +59,7 @@ export default function Dashboard({ deepLinkZiel }: DashboardProps = {}) {
   const { ladeAuftraege, auftraege } = useUebenAuftragStore()
   const { navigiere } = useUebenNavigationStore()
   const { sichtbareFaecher, fachFarben } = useUebenKontext()
-  const { freischaltungen, ladeFreischaltungen, getStatus } = useThemenSichtbarkeitStore()
+  const { freischaltungen, ladeFreischaltungen, getStatus, getAktiveUnterthemen } = useThemenSichtbarkeitStore()
   const { einstellungen } = useUebenSettingsStore()
   const [alleFragen, setAlleFragen] = useState<Frage[]>([])
   const [laden, setLaden] = useState(true)
@@ -172,11 +172,25 @@ export default function Dashboard({ deepLinkZiel }: DashboardProps = {}) {
     // Wenn "Alle Themen anzeigen" aktiv → alles zeigen
     if (alleThemenAnzeigen) return alleFachThemen
 
-    // Nur aktive + abgeschlossene Themen anzeigen
-    let gefiltert = alleFachThemen.filter(info => {
-      const status = getStatus(info.fach, info.thema)
-      return status === 'aktiv' || status === 'abgeschlossen'
-    })
+    // Nur aktive + abgeschlossene Themen anzeigen, Fragen nach aktiven Unterthemen filtern
+    let gefiltert = alleFachThemen
+      .filter(info => {
+        const status = getStatus(info.fach, info.thema)
+        return status === 'aktiv' || status === 'abgeschlossen'
+      })
+      .map(info => {
+        // Unterthemen-Filter: Wenn nur bestimmte Unterthemen aktiv → Fragen filtern
+        const aktiveUT = getAktiveUnterthemen(info.fach, info.thema)
+        if (!aktiveUT || aktiveUT.length === 0) return info // Alle Unterthemen aktiv
+        const gefilterteFragen = info.fragen.filter(f => {
+          const ut = (f as { unterthema?: string }).unterthema
+          return !ut || aktiveUT.includes(ut) // Fragen ohne Unterthema immer zeigen
+        })
+        if (gefilterteFragen.length === 0) return null // Keine Fragen übrig → Thema ausblenden
+        const gefilteterteUnterthemen = info.unterthemen.filter(ut => aktiveUT.includes(ut))
+        return { ...info, fragen: gefilterteFragen, unterthemen: gefilteterteUnterthemen, fortschritt: getThemenFortschritt(gefilterteFragen) }
+      })
+      .filter((info): info is ThemenInfo => info !== null)
 
     // Suchtext: Themen + Unterthemen + Fachtitel durchsuchen
     if (suchtext.trim()) {
