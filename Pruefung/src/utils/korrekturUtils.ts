@@ -35,7 +35,8 @@ export function berechneGesamtpunkte(bewertungen: Record<string, FragenBewertung
   let maxPunkte = 0
   for (const b of Object.values(bewertungen)) {
     punkte += effektivePunkte(b)
-    maxPunkte += b.maxPunkte
+    // NaN-Schutz: maxPunkte kann bei Daten aus dem Backend fehlen
+    maxPunkte += (Number.isFinite(b.maxPunkte) ? b.maxPunkte : 0)
   }
   return { punkte, maxPunkte }
 }

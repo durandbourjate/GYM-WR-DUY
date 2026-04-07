@@ -271,11 +271,11 @@ export default function App() {
     )
   }
 
-  // Prüfung wird geladen
+  // Wird geladen (kontextabhängig: Prüfung oder Übung)
   if (!pruefungsConfig) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900">
-        <p className="text-slate-500 dark:text-slate-400">Prüfung wird geladen...</p>
+        <p className="text-slate-500 dark:text-slate-400">Wird geladen...</p>
       </div>
     )
   }

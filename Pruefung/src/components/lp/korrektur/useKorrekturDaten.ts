@@ -138,7 +138,7 @@ export function useKorrekturDaten({ pruefungId, userEmail, queueSave, updateKorr
               (pruefungResult?.fragen || []).map((f) => [f.id, {
                 frageId: f.id,
                 fragenTyp: f.typ,
-                maxPunkte: f.punkte,
+                maxPunkte: f.punkte ?? 0,
                 kiPunkte: null,
                 lpPunkte: null,
                 kiBegruendung: null,

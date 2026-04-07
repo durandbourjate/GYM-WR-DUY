@@ -35,10 +35,10 @@ export default function KorrekturSchuelerZeile({ pruefungId, schueler, abgabe, f
   const [noteEditModus, setNoteEditModus] = useState(false)
   const [noteInput, setNoteInput] = useState('')
 
-  // Aggregierte Werte
+  // Aggregierte Werte (mit NaN-Schutz für maxPunkte aus Backend-Daten)
   const bewertungenListe = Object.values(schueler.bewertungen)
   const totalPunkte = bewertungenListe.reduce((s, b) => s + effektivePunkte(b), 0)
-  const totalMax = bewertungenListe.reduce((s, b) => s + b.maxPunkte, 0)
+  const totalMax = bewertungenListe.reduce((s, b) => s + (Number.isFinite(b.maxPunkte) ? b.maxPunkte : 0), 0)
   const berechneteNote = berechneNote(totalPunkte, totalMax, notenConfig)
   const note = schueler.noteOverride ?? berechneteNote
   const hatOverride = schueler.noteOverride != null

@@ -125,16 +125,18 @@ function antwortAlsText(antwort: Antwort | undefined, frage: Frage): string {
 
 /** Punkte-Indikator: Volle Punktzahl, Teilpunkte oder Null */
 function PunkteIndikator({ punkte, maxPunkte }: { punkte: number; maxPunkte: number }) {
-  const symbol = punkte >= maxPunkte ? '✓' : punkte > 0 ? '~' : '✗'
-  const farbe = punkte >= maxPunkte
+  const safePunkte = Number.isFinite(punkte) ? punkte : 0
+  const safeMax = Number.isFinite(maxPunkte) ? maxPunkte : 0
+  const symbol = safePunkte >= safeMax ? '✓' : safePunkte > 0 ? '~' : '✗'
+  const farbe = safePunkte >= safeMax
     ? 'text-green-700 print:text-green-800'
-    : punkte > 0
+    : safePunkte > 0
       ? 'text-amber-700 print:text-amber-800'
       : 'text-red-700 print:text-red-800'
 
   return (
     <span className={`font-bold ${farbe}`}>
-      {symbol} {punkte} / {maxPunkte}
+      {symbol} {safePunkte} / {safeMax}
     </span>
   )
 }

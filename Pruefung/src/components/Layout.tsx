@@ -530,12 +530,12 @@ export default function Layout() {
               </svg>
             </div>
             <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-2">
-              {beendetUm ? 'Prüfung beendet' : 'Zeit abgelaufen'}
+              {beendetUm ? (config?.typ === 'formativ' ? 'Übung beendet' : 'Prüfung beendet') : 'Zeit abgelaufen'}
             </h2>
             <p className="text-slate-600 dark:text-slate-300 mb-1">
               {beendetUm
-                ? 'Die Lehrperson hat die Prüfung beendet. Ihre Antworten wurden automatisch abgegeben.'
-                : 'Ihre Prüfung wurde automatisch abgegeben.'}
+                ? `Die Lehrperson hat die ${config?.typ === 'formativ' ? 'Übung' : 'Prüfung'} beendet. Ihre Antworten wurden automatisch abgegeben.`
+                : `Ihre ${config?.typ === 'formativ' ? 'Übung' : 'Prüfung'} wurde automatisch abgegeben.`}
             </p>
             <p className="text-sm text-slate-400 dark:text-slate-500">
               Alle Antworten wurden gespeichert. Sie können das Fenster schliessen.

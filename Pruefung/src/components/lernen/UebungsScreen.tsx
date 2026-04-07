@@ -81,18 +81,12 @@ export default function UebungsScreen() {
       <main className="max-w-2xl mx-auto p-4">
         {/* Frage-Karte */}
         <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm p-6 mb-4">
-          {/* Kontext (bei Aufgabengruppe) */}
-          {frage.typ === 'aufgabengruppe' && frage.kontext && (
-            <div className="mb-3 p-3 rounded-lg bg-slate-50 dark:bg-slate-700/50 text-sm text-slate-600 dark:text-slate-400">
-              <span className="text-xs font-medium text-slate-400 uppercase block mb-1">Situation</span>
-              {frage.kontext}
-            </div>
+          {/* Fragetext — nicht bei Aufgabengruppe (GruppeFrage rendert Kontext selbst) */}
+          {frage.typ !== 'aufgabengruppe' && (
+            <h2 className="text-lg font-medium mb-4 dark:text-white">
+              {bereinigePlatzhalter(getFragetext(frage))}
+            </h2>
           )}
-
-          {/* Fragetext */}
-          <h2 className="text-lg font-medium mb-4 dark:text-white">
-            {bereinigePlatzhalter(getFragetext(frage))}
-          </h2>
 
           {/* Fragetyp-Komponente */}
           {Komponente ? (

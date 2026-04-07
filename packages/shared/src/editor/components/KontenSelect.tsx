@@ -52,15 +52,19 @@ export default function KontenSelect({
   compact = false,
   zeigeKategoriefarben,
 }: KontenSelectProps) {
-  // Farben: explizites Prop > Config-Wert > default true
-  const farbenAktiv = zeigeKategoriefarben ?? config.zeigeKategoriefarben ?? true
+  // Fallback wenn config fehlt oder ungültig
+  const safeConfig: KontenauswahlConfig = config ?? { modus: 'voll' }
 
-  if (config.modus === 'eingeschraenkt') {
+  // Farben: explizites Prop > Config-Wert > default true
+  const farbenAktiv = zeigeKategoriefarben ?? safeConfig.zeigeKategoriefarben ?? true
+
+  // Eingeschränkt nur wenn tatsächlich Konten definiert sind, sonst Fallback auf Voll-Modus
+  if (safeConfig.modus === 'eingeschraenkt' && safeConfig.konten && safeConfig.konten.length > 0) {
     return (
       <EingeschraenktSelect
         value={value}
         onChange={onChange}
-        konten={config.konten ?? []}
+        konten={safeConfig.konten}
         placeholder={placeholder}
         disabled={disabled}
         className={className}

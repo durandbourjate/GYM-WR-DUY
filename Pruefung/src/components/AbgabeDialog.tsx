@@ -203,7 +203,7 @@ export default function AbgabeDialog({ onSchliessen }: Props) {
         <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-8 max-w-md w-full text-center">
           <div className="w-12 h-12 mx-auto mb-4 border-4 border-slate-200 dark:border-slate-600 border-t-slate-700 dark:border-t-slate-300 rounded-full animate-spin" />
           <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100">
-            Prüfung wird abgegeben…
+            {config?.typ === 'formativ' ? 'Übung' : 'Prüfung'} wird abgegeben…
           </h2>
         </div>
       </div>
@@ -215,7 +215,7 @@ export default function AbgabeDialog({ onSchliessen }: Props) {
     <div ref={dialogRef} className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-8 max-w-md w-full">
         <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-4">
-          Prüfung abgeben?
+          {config?.typ === 'formativ' ? 'Übung' : 'Prüfung'} abgeben?
         </h2>
 
         {/* Status */}
