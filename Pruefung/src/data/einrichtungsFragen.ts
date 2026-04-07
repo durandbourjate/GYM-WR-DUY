@@ -31,12 +31,12 @@ export const einrichtungsFragen: Frage[] = [
     tags: ['einrichtung', 'test'],
     punkte: 1,
     zeitbedarf: 1,
-    musterlosung: 'Die Prüfung hat 23 Fragen — sichtbar in der Navigationsleiste unten.',
+    musterlosung: 'Die Prüfung hat 23 Fragen — sichtbar in der Sidebar links und im Header (X/23).',
     bewertungsraster: [{ beschreibung: 'Korrekte Antwort gewählt', punkte: 1 }],
     verwendungen: [],
     quelle: 'manuell',
     autor,
-    fragetext: 'Schauen Sie sich die Prüfungsoberfläche an. **Wie viele Fragen** hat diese Testprüfung insgesamt? Tipp: Schauen Sie auf die Navigationsleiste am unteren Bildschirmrand.',
+    fragetext: 'Schauen Sie sich die Prüfungsoberfläche an. **Wie viele Fragen** hat diese Testprüfung insgesamt? Tipp: Schauen Sie in der Sidebar links oder im Header (z.B. «1/??»).',
     optionen: [
       { id: 'a', text: '16 Fragen', korrekt: false },
       { id: 'b', text: '20 Fragen', korrekt: false },
@@ -64,7 +64,7 @@ export const einrichtungsFragen: Frage[] = [
     tags: ['einrichtung', 'test'],
     punkte: 2,
     zeitbedarf: 2,
-    musterlosung: 'Sichtbar: Stoppuhr/Timer, Fortschrittsbalken, Navigationsleiste unten. Nicht sichtbar: Druckknopf (gibt es nicht).',
+    musterlosung: 'Sichtbar: Stoppuhr/Timer (oben links), Seitenzahl (oben Mitte), Sidebar mit Fragennummern (links). Nicht sichtbar: Druckknopf (gibt es nicht).',
     bewertungsraster: [
       { beschreibung: 'Alle 3 korrekten Elemente gewählt', punkte: 2 },
       { beschreibung: '2 korrekte Elemente gewählt', punkte: 1 },
@@ -74,9 +74,9 @@ export const einrichtungsFragen: Frage[] = [
     autor,
     fragetext: 'Welche der folgenden Elemente sehen Sie **auf Ihrem Bildschirm**? Schauen Sie sich um! (Mehrere Antworten möglich)',
     optionen: [
-      { id: 'a', text: 'Eine Stoppuhr oder einen Timer (oben)', korrekt: true },
-      { id: 'b', text: 'Einen Fortschrittsbalken', korrekt: true },
-      { id: 'c', text: 'Eine Navigationsleiste mit Fragennummern (unten)', korrekt: true },
+      { id: 'a', text: 'Eine Stoppuhr oder einen Timer (oben links)', korrekt: true },
+      { id: 'b', text: 'Eine Seitenzahl wie «1/23» (oben in der Mitte)', korrekt: true },
+      { id: 'c', text: 'Eine Sidebar mit Fragennummern (links)', korrekt: true },
       { id: 'd', text: 'Einen Druckknopf zum Ausdrucken der Prüfung', korrekt: false },
     ],
     mehrfachauswahl: true,
@@ -114,7 +114,7 @@ export const einrichtungsFragen: Frage[] = [
     aussagen: [
       { id: '1', text: 'Man kann zwischen Fragen vor- und zurücknavigieren.', korrekt: true, erklaerung: 'Rücknavigation ist bei dieser Prüfung aktiviert.' },
       { id: '2', text: 'Die Antworten werden automatisch gespeichert (AutoSave).', korrekt: true, erklaerung: 'AutoSave speichert alle 30 Sekunden.' },
-      { id: '3', text: 'Man muss die Fragen zwingend in der vorgegebenen Reihenfolge lösen.', korrekt: false, erklaerung: 'Man kann über die Navigationsleiste zu jeder Frage springen.' },
+      { id: '3', text: 'Man muss die Fragen zwingend in der vorgegebenen Reihenfolge lösen.', korrekt: false, erklaerung: 'Man kann über die Sidebar links zu jeder Frage springen.' },
       { id: '4', text: 'Es gibt einen Dark Mode (dunkles Farbschema).', korrekt: true, erklaerung: 'Dark Mode kann über das Mond-Symbol (🌙) unten links umgeschaltet werden.' },
     ],
   },
@@ -592,7 +592,7 @@ export const einrichtungsFragen: Frage[] = [
     verwendungen: [],
     quelle: 'manuell',
     autor,
-    fragetext: 'Öffnen Sie das **Materialpanel** (rechte Seite) und schlagen Sie in der «Amtlichen Witzsammlung» nach:\n\nWie lautet der Titel von **Art. 5** (Kapitel 2, Seite 3)?',
+    fragetext: 'Öffnen Sie das **Materialpanel** (über den «📄 Material»-Button in der Sidebar links oben) und schlagen Sie in der «Amtlichen Witzsammlung» nach:\n\nWie lautet der Titel von **Art. 5** (Kapitel 2, Seite 3)?',
     optionen: [
       { id: 'a', text: 'Der Taschenrechner', korrekt: false },
       { id: 'b', text: 'Die Schulglocke', korrekt: true },
@@ -658,7 +658,7 @@ export const einrichtungsFragen: Frage[] = [
     verwendungen: [],
     quelle: 'manuell',
     autor,
-    kontext: '**Aufgabengruppe: Material nutzen**\n\nBei dieser Aufgabe arbeiten Sie mit dem **Materialpanel**. Öffnen Sie es über den Button oben rechts (📄-Symbol).\n\nDas Materialpanel zeigt Ihnen die «Amtliche Witzsammlung der Schweiz» an — ein mehrseitiges Dokument, das Sie durchblättern können.\n\nBeantworten Sie die beiden Teilaufgaben.',
+    kontext: '**Aufgabengruppe: Material nutzen**\n\nBei dieser Aufgabe arbeiten Sie mit dem **Materialpanel**. Öffnen Sie es über den «📄 Material»-Button in der Sidebar links oben.\n\nDas Materialpanel zeigt Ihnen die «Amtliche Witzsammlung der Schweiz» an — ein mehrseitiges Dokument, das Sie durchblättern können.\n\nBeantworten Sie die beiden Teilaufgaben.',
     teilaufgabenIds: ['einr-ag-material-mc', 'einr-ag-material-freitext'],
   },
 
@@ -924,7 +924,7 @@ export const einrichtungsFragen: Frage[] = [
     verwendungen: [],
     quelle: 'manuell',
     autor,
-    fragetext: '**Feature-Check!** Probieren Sie die folgenden Funktionen aus und kreuzen Sie an, welche **funktioniert** haben:\n\n- **Dark Mode**: Klicken Sie auf das Mond-Symbol (🌙) unten links\n- **Frage markieren**: Klicken Sie auf den «?»-Button (Unsicher) bei einer Frage\n- **Tastaturkürzel**: Drücken Sie Cmd+Enter (Mac) oder Ctrl+Enter (Windows), um zur nächsten Frage zu springen\n- **Material-Panel**: Klicken Sie auf das Dokument-Symbol oben rechts\n\nKreuzen Sie **alle** an, die funktioniert haben:',
+    fragetext: '**Feature-Check!** Probieren Sie die folgenden Funktionen aus und kreuzen Sie an, welche **funktioniert** haben:\n\n- **Dark Mode**: Klicken Sie auf das Mond-Symbol (🌙) unten links\n- **Frage markieren**: Klicken Sie auf den «?»-Button (Unsicher) bei einer Frage\n- **Tastaturkürzel**: Drücken Sie Cmd+Enter (Mac) oder Ctrl+Enter (Windows), um zur nächsten Frage zu springen\n- **Material-Panel**: Klicken Sie auf den «📄 Material»-Button in der Sidebar links oben\n\nKreuzen Sie **alle** an, die funktioniert haben:',
     optionen: [
       { id: 'a', text: 'Dark Mode umschalten hat funktioniert', korrekt: true },
       { id: 'b', text: 'Frage markieren hat funktioniert', korrekt: true },
