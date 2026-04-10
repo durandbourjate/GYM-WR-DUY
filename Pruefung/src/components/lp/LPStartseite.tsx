@@ -8,6 +8,7 @@ import { formatDatum } from '../../utils/zeit.ts'
 import { getFachFarbe } from '../../utils/ueben/fachFarben.ts'
 import { bestimmePruefungsStatus, statusLabel, statusFarbe, korrekturLabel, erstelleDemoTrackerDaten } from '../../utils/trackerUtils.ts'
 import LPHeader from './LPHeader.tsx'
+import LPSkeleton from './LPSkeleton.tsx'
 import PruefungsComposer, { leereUebung } from './vorbereitung/PruefungsComposer.tsx'
 import FragenBrowser from './fragenbank/FragenBrowser.tsx'
 import HilfeSeite from './HilfeSeite.tsx'
@@ -215,14 +216,20 @@ export default function LPStartseite() {
       if (configResult) {
         setConfigs(configResult)
         setBackendFehler(false)
-        // Einrichtungsprüfung + Einführungsübung im Hintergrund synchronisieren
-        Promise.all([
-          syncEinrichtungsPruefung(user.email, configResult),
-          syncEinrichtungsUebung(user.email, configResult),
-        ]).then(() => {
-          // Nach Sync: Configs IMMER neu laden (typ könnte sich geändert haben)
-          apiService.ladeAlleConfigs(user.email).then(r => { if (r) setConfigs(r) })
-        })
+        // Einrichtungsprüfung/-übung: nur einmal pro Browser-Session syncen
+        const SYNC_DONE_KEY = 'examlab-sync-done'
+        if (!sessionStorage.getItem(SYNC_DONE_KEY)) {
+          Promise.all([
+            syncEinrichtungsPruefung(user.email, configResult),
+            syncEinrichtungsUebung(user.email, configResult),
+          ]).then(async () => {
+            sessionStorage.setItem(SYNC_DONE_KEY, '1')
+            const neueConfigs = await apiService.ladeAlleConfigs(user.email)
+            if (neueConfigs) setConfigs(neueConfigs)
+          }).catch(err => {
+            console.warn('[LP] Sync fehlgeschlagen, wird beim nächsten Mount erneut versucht:', err)
+          })
+        }
       } else {
         console.warn("[LP] Configs nicht ladbar — Composer bleibt nutzbar")
         setConfigs([])
@@ -234,6 +241,19 @@ export default function LPStartseite() {
       }
 
       setLadeStatus("fertig")
+
+      // Hintergrund-Prefetch für Fragenbank-Details
+      const schedulePrefetch = () => {
+        const fbState = useFragenbankStore.getState()
+        if (fbState.status === 'summary_fertig') {
+          fbState.ladeAlleDetails(user.email)
+        }
+      }
+      if ('requestIdleCallback' in window) {
+        (window as any).requestIdleCallback(schedulePrefetch)
+      } else {
+        setTimeout(schedulePrefetch, 2000)
+      }
     }
     lade()
   }, [user, istDemoModus])
@@ -302,6 +322,9 @@ export default function LPStartseite() {
     { label: editConfig?.modus === 'uebung' ? 'Üben' : 'Prüfen', aktion: handleZurueck },
     { label: editConfig?.titel || (editConfig?.id ? 'Bearbeiten' : 'Neu erstellen') },
   ] : undefined
+
+  // Skeleton während Laden — nicht beim Composer (direkter Aufruf möglich)
+  if (ladeStatus !== 'fertig' && ansicht !== 'composer') return <LPSkeleton />
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
