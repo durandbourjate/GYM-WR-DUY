@@ -1,6 +1,11 @@
 import { create } from 'zustand'
 import type { Frage, FrageSummary } from '../types/fragen.ts'
 import { ladeFragenbank, ladeFragenbankSummary, ladeFrageDetail } from '../services/fragenbankApi.ts'
+import {
+  getCachedSummaries, setCachedSummaries,
+  getCachedDetails, setCachedDetails,
+  clearFragenbankCache
+} from '../services/fragenbankCache.ts'
 
 /**
  * Progressive Loading:
@@ -21,6 +26,7 @@ interface FragenbankStore {
   fragen: Frage[]
   fragenMap: Record<string, Frage>
   status: FragenbankStatus
+  _cacheInvalid: boolean
 
   /** Summaries laden (schnell, für Listenansicht) */
   ladeSummaries: (email: string, force?: boolean) => Promise<void>
@@ -64,6 +70,7 @@ export const useFragenbankStore = create<FragenbankStore>((set, get) => ({
   fragen: [],
   fragenMap: {},
   status: 'idle',
+  _cacheInvalid: false,
 
   ladeSummaries: async (email: string, force = false) => {
     const { status } = get()
@@ -84,6 +91,7 @@ export const useFragenbankStore = create<FragenbankStore>((set, get) => ({
         summaryMap: bauSummaryMap(eindeutig),
         status: 'summary_fertig',
       })
+      setCachedSummaries(eindeutig)
     } else {
       set({ status: 'fehler' })
     }
@@ -129,18 +137,75 @@ export const useFragenbankStore = create<FragenbankStore>((set, get) => ({
         detailCache: fragenMap,
         status: 'fertig',
       })
+      setCachedDetails(eindeutig)
     }
     // Bei Fehler bleiben wir auf summary_fertig — UI funktioniert weiterhin
   },
 
   lade: async (email: string, force = false) => {
-    const { status } = get()
+    const { status, _cacheInvalid } = get()
     if (status === 'summary_laden' || status === 'detail_laden') return
     if ((status === 'fertig' || status === 'summary_fertig') && !force) return
 
     set({ status: 'summary_laden' })
 
-    // Versuche zuerst Summaries (schnell)
+    // --- Stale-While-Revalidate: Cache zuerst ---
+    if (!force && !_cacheInvalid) {
+      const cachedSummaries = await getCachedSummaries()
+      if (cachedSummaries && cachedSummaries.length > 0) {
+        const gesehen = new Set<string>()
+        const eindeutig = cachedSummaries.filter((s: FrageSummary) => {
+          if (gesehen.has(s.id)) return false
+          gesehen.add(s.id)
+          return true
+        })
+        set({
+          summaries: eindeutig,
+          summaryMap: bauSummaryMap(eindeutig),
+          status: 'summary_fertig',
+        })
+
+        // Cached Details auch laden wenn vorhanden
+        const cachedDetails = await getCachedDetails()
+        if (cachedDetails && cachedDetails.length > 0) {
+          const dGesehen = new Set<string>()
+          const dEindeutig = cachedDetails.filter((f: Frage) => {
+            if (dGesehen.has(f.id)) return false
+            dGesehen.add(f.id)
+            return true
+          })
+          set({
+            fragen: dEindeutig,
+            fragenMap: bauFragenMap(dEindeutig),
+            detailCache: bauFragenMap(dEindeutig),
+            status: 'fertig',
+          })
+        }
+
+        // Hintergrund-Revalidierung: Server-Daten holen OHNE Status zu ändern (kein UI-Flicker)
+        ladeFragenbankSummary(email).then(serverSummaries => {
+          if (!serverSummaries) return
+          const sGesehen = new Set<string>()
+          const sEindeutig = serverSummaries.filter((s: FrageSummary) => {
+            if (sGesehen.has(s.id)) return false
+            sGesehen.add(s.id)
+            return true
+          })
+          const currentCount = get().summaries.length
+          if (sEindeutig.length !== currentCount) {
+            set({ summaries: sEindeutig, summaryMap: bauSummaryMap(sEindeutig) })
+          }
+          setCachedSummaries(sEindeutig)
+          // Details auch im Hintergrund aktualisieren
+          get().ladeAlleDetails(email)
+        })
+        return
+      }
+    }
+
+    // --- Kein Cache: normal vom Server laden ---
+    set({ _cacheInvalid: false })
+
     const summaryResult = await ladeFragenbankSummary(email)
     if (summaryResult) {
       const gesehen = new Set<string>()
@@ -154,8 +219,7 @@ export const useFragenbankStore = create<FragenbankStore>((set, get) => ({
         summaryMap: bauSummaryMap(eindeutig),
         status: 'summary_fertig',
       })
-
-      // Details im Hintergrund nachladen
+      setCachedSummaries(eindeutig)
       get().ladeAlleDetails(email)
       return
     }
@@ -207,6 +271,8 @@ export const useFragenbankStore = create<FragenbankStore>((set, get) => ({
         summaryMap: bauSummaryMap(summaries),
         status: 'fertig',
       })
+      setCachedSummaries(summaries)
+      setCachedDetails(eindeutig)
     } else {
       set({ status: 'fehler' })
     }
@@ -257,6 +323,7 @@ export const useFragenbankStore = create<FragenbankStore>((set, get) => ({
         detailCache: { ...state.detailCache, [frage.id]: frage },
         summaries,
         summaryMap: bauSummaryMap(summaries),
+        _cacheInvalid: true,
       }
     })
   },
@@ -273,6 +340,7 @@ export const useFragenbankStore = create<FragenbankStore>((set, get) => ({
         summaries,
         summaryMap: bauSummaryMap(summaries),
         detailCache,
+        _cacheInvalid: true,
       }
     })
   },
@@ -318,6 +386,7 @@ export const useFragenbankStore = create<FragenbankStore>((set, get) => ({
         summaries,
         summaryMap: bauSummaryMap(summaries),
         detailCache: { ...state.detailCache, ...neueDetails },
+        _cacheInvalid: true,
       }
     })
   },
@@ -339,6 +408,8 @@ export const useFragenbankStore = create<FragenbankStore>((set, get) => ({
       fragen: [],
       fragenMap: {},
       status: 'idle',
+      _cacheInvalid: false,
     })
+    clearFragenbankCache()
   },
 }))
