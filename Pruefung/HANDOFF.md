@@ -6,6 +6,41 @@
 
 ---
 
+## Session 74 — Navigation & Kopfzeile (10.04.2026)
+
+### Stand
+Branch `feature/navigation-breadcrumbs`. tsc ✅ | 209 Tests ✅ | Build ✅.
+
+### Erledigte Arbeiten
+
+| # | Änderung | Dateien |
+|---|----------|---------|
+| **Persistente Kopfzeile** | |
+| N1 | Composer rendert jetzt INNERHALB des Layouts (Header bleibt sichtbar) | LPStartseite.tsx |
+| N2 | Breadcrumbs im Header: "ExamLab › Prüfen › Prüfungstitel" | LPHeader.tsx |
+| N3 | ExamLab-Titel klickbar → zurück zum Dashboard (onHome Prop) | LPHeader.tsx |
+| N4 | Zurück-Button im Composer zeigt Tabs nicht (korrekt) | LPHeader.tsx |
+| **LP Navigation Store** | |
+| N5 | `lpNavigationStore.ts` erstellt (Zustand, History-Stack, Breadcrumbs, sessionStorage) | lpNavigationStore.ts (neu) |
+| **SuS-Navigation** | |
+| N6 | ExamLab-Link: `<a href>` → `<button onClick>`, navigiert zum Start statt weg | SuSStartseite.tsx |
+
+### Neue Dateien (1)
+- `src/store/lpNavigationStore.ts` — LP Navigation Store (noch nicht vollständig integriert, Grundlage für weitere Refactoring)
+
+### Verifiziert im Browser (Preview)
+- ✅ Composer: Header mit Breadcrumbs sichtbar
+- ✅ ExamLab-Klick → Dashboard
+- ✅ Zurück-Button → Dashboard
+- ✅ Keine Console-Errors
+- ✅ SuS ExamLab-Link navigiert zum Start
+
+### Nicht umgesetzt (Folge-Sessions)
+- LP-Favoriten (⭐-Button): Grundstruktur geplant, nicht implementiert
+- Vollständige Store-Migration: `LPStartseite` useState → lpNavigationStore
+
+---
+
 ## Session 73 — Üben-Fragetyp-Crashes + Korrektur-Guard (10.04.2026)
 
 ### Stand

@@ -20,6 +20,10 @@ interface Props {
   onEinstellungen?: () => void
   fragensammlungOffen?: boolean
   hilfeOffen?: boolean
+  /** Breadcrumb-Pfad, z.B. [{label: 'Prüfen'}, {label: 'Einrichtungsprüfung'}] */
+  breadcrumbs?: { label: string; aktion?: () => void }[]
+  /** Klick auf ExamLab-Logo/Titel → zum Dashboard */
+  onHome?: () => void
 }
 
 const TABS: { key: Modus; label: string }[] = [
@@ -28,7 +32,7 @@ const TABS: { key: Modus; label: string }[] = [
   { key: 'fragensammlung', label: 'Fragensammlung' },
 ]
 
-export default function LPHeader({ titel, untertitel, zurueck, statusText, aktionsButtons, modus, onModusChange, onFragensammlung, onHilfe, onEinstellungen, fragensammlungOffen, hilfeOffen }: Props) {
+export default function LPHeader({ titel, untertitel, zurueck, statusText, aktionsButtons, modus, onModusChange, onFragensammlung, onHilfe, onEinstellungen, fragensammlungOffen, hilfeOffen, breadcrumbs, onHome }: Props) {
   const abmelden = useAuthStore((s) => s.abmelden)
 
   // ESC-Handler: schliesst oberstes Panel
@@ -60,10 +64,33 @@ export default function LPHeader({ titel, untertitel, zurueck, statusText, aktio
           )}
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-lg font-bold text-slate-800 dark:text-slate-100">
-                {istDashboard ? 'ExamLab' : (titel || 'ExamLab')}
-              </h1>
+              {onHome ? (
+                <button onClick={onHome} className="text-lg font-bold text-slate-800 dark:text-slate-100 hover:text-slate-600 dark:hover:text-slate-300 transition-colors cursor-pointer">
+                  ExamLab
+                </button>
+              ) : (
+                <h1 className="text-lg font-bold text-slate-800 dark:text-slate-100">
+                  {istDashboard ? 'ExamLab' : (titel || 'ExamLab')}
+                </h1>
+              )}
               <span className="text-[11px] text-slate-400 dark:text-slate-500">{APP_VERSION}</span>
+              {/* Breadcrumbs */}
+              {breadcrumbs && breadcrumbs.length > 0 && (
+                <nav className="flex items-center gap-1 ml-2 text-sm text-slate-500 dark:text-slate-400">
+                  {breadcrumbs.map((crumb, i) => (
+                    <span key={i} className="flex items-center gap-1">
+                      <span className="text-slate-300 dark:text-slate-600">›</span>
+                      {crumb.aktion ? (
+                        <button onClick={crumb.aktion} className="hover:text-slate-700 dark:hover:text-slate-200 transition-colors cursor-pointer">
+                          {crumb.label}
+                        </button>
+                      ) : (
+                        <span className="text-slate-700 dark:text-slate-200 font-medium">{crumb.label}</span>
+                      )}
+                    </span>
+                  ))}
+                </nav>
+              )}
             </div>
             {untertitel && (
               <p className="text-sm text-slate-500 dark:text-slate-400">{untertitel}</p>

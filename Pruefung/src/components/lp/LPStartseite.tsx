@@ -297,17 +297,23 @@ export default function LPStartseite() {
     return trackerDaten.pruefungen.find((p) => p.pruefungId === pruefungId)
   }
 
-  if (ansicht === 'composer') {
-    return <PruefungsComposer key={composerKey} config={editConfig} onZurueck={handleZurueck} onDuplizieren={handleDuplizieren} />
-  }
+  // Breadcrumbs für Composer
+  const composerBreadcrumbs = ansicht === 'composer' ? [
+    { label: editConfig?.modus === 'uebung' ? 'Üben' : 'Prüfen', aktion: handleZurueck },
+    { label: editConfig?.titel || (editConfig?.id ? 'Bearbeiten' : 'Neu erstellen') },
+  ] : undefined
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
       <LPHeader
         untertitel={user ? `${user.name} · Lehrperson` : undefined}
-        modus={modus}
-        onModusChange={setModus}
+        modus={ansicht === 'composer' ? undefined : modus}
+        onModusChange={ansicht === 'composer' ? undefined : setModus}
+        zurueck={ansicht === 'composer' ? handleZurueck : undefined}
+        breadcrumbs={composerBreadcrumbs}
+        onHome={ansicht === 'composer' ? handleZurueck : undefined}
         aktionsButtons={
+          ansicht === 'composer' ? undefined :
           modus === 'pruefung' ? (
             <button onClick={handleNeue} className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer">
               + Neue Prüfung
@@ -318,13 +324,17 @@ export default function LPStartseite() {
             </button>
           ) : undefined
         }
-        onEinstellungen={() => setZeigEinstellungen(true)}
-        onHilfe={() => { setZeigHilfe(!zeigHilfe) }}
+        onEinstellungen={ansicht === 'composer' ? undefined : () => setZeigEinstellungen(true)}
+        onHilfe={ansicht === 'composer' ? undefined : () => { setZeigHilfe(!zeigHilfe) }}
         hilfeOffen={zeigHilfe}
       />
 
-      {/* Übungstool-Ansicht */}
-      {modus === 'uebung' && (
+      {ansicht === 'composer' && (
+        <PruefungsComposer key={composerKey} config={editConfig} onZurueck={handleZurueck} onDuplizieren={handleDuplizieren} />
+      )}
+
+      {/* Dashboard-Inhalte — nur wenn nicht im Composer */}
+      {ansicht !== 'composer' && modus === 'uebung' && (
         <>
           {/* Tab-Leiste */}
           <div className="px-6 pt-4">
@@ -482,7 +492,7 @@ export default function LPStartseite() {
       )}
 
       {/* Prüfen-Ansicht */}
-      {modus === 'pruefung' && <>
+      {ansicht !== 'composer' && modus === 'pruefung' && <>
       {/* Tab-Leiste */}
       <div className="px-6 pt-4">
         <div className="flex gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-lg w-fit">
@@ -729,7 +739,7 @@ export default function LPStartseite() {
       </>}
 
       {/* Fragensammlung als Vollseiteninhalt */}
-      {modus === 'fragensammlung' && (
+      {ansicht !== 'composer' && modus === 'fragensammlung' && (
         <main className="p-6">
           <FragenBrowser
             inline
