@@ -6,6 +6,49 @@
 
 ---
 
+## Session 85 — Block E: LernzielWähler (10.04.2026)
+
+### Stand
+Branch `main`. tsc ✅ | 209 Tests ✅ | Build ✅.
+
+### Erledigte Arbeiten
+
+| # | Änderung | Dateien |
+|---|----------|---------|
+| E1 | **LernzielWähler-Komponente:** Multi-Select mit Suchfeld (ab 5+ LZ), Fach→Thema-Gruppierung (einklappbar), Bloom-Badges, lila Chips für gewählte LZ | `packages/shared/src/editor/components/LernzielWaehler.tsx` (NEU) |
+| E2 | **Neues Lernziel erstellen:** Inline-Formular (Fach, Bloom, Thema, Text) im Wähler. Erstellt im Backend + sofort auswählbar | LernzielWaehler.tsx |
+| E3 | **MetadataSection:** Einfache Checkbox-Liste ersetzt durch LernzielWähler | MetadataSection.tsx |
+| E4 | **Auto-Load:** Lernziele beim Editor-Öffnen automatisch laden (useEffect, nicht mehr nur bei KI-Button) | SharedFragenEditor.tsx |
+| E5 | **EditorServices erweitert:** `speichereLernziel` Typ + PruefungFragenEditor-Verdrahtung | types.ts, PruefungFragenEditor.tsx |
+| E6 | **Backend:** `speichereLernziel`-Aktion (LP-only, schreibt in Lehrplanziele-Sheet) | apps-script-code.js |
+| E7 | **API:** `speichereLernziel()` Funktion | poolApi.ts |
+
+### Neue Dateien (1)
+- `packages/shared/src/editor/components/LernzielWaehler.tsx` — 328 Zeilen
+
+### Geänderte Dateien (6)
+- `packages/shared/src/editor/sections/MetadataSection.tsx` — LernzielWähler statt Checkbox-Liste
+- `packages/shared/src/editor/SharedFragenEditor.tsx` — Auto-Load + handleNeuLernzielErstellen
+- `packages/shared/src/editor/types.ts` — speichereLernziel in EditorServices
+- `Pruefung/src/components/lp/frageneditor/PruefungFragenEditor.tsx` — speichereLernziel Service
+- `Pruefung/src/services/poolApi.ts` — speichereLernziel API-Funktion
+- `Pruefung/apps-script-code.js` — speichereLernzielEndpoint Aktion
+
+### Verifiziert
+- ✅ tsc -b grün
+- ✅ 209 Tests grün
+- ✅ Build erfolgreich
+- ✅ Preview: LernzielWähler im Frageneditor sichtbar
+- ✅ Preview: "Neues Lernziel"-Formular öffnet korrekt
+- ✅ Preview: Keine Konsolen-Fehler
+- ⬜ Browser-Test mit echtem Login: Lernziele laden + zuordnen
+- ⬜ Browser-Test: Neues Lernziel erstellen + Backend-Speicherung
+
+### Ausstehend (Folge-Sessions)
+- **Block G2:** Favoriten Account-verknüpft + Direktlinks (eigene Session)
+
+---
+
 ## Session 84 — Blöcke D, F, G: Analyse + Druckansicht + Gesperrte Themen (10.04.2026)
 
 ### Stand
