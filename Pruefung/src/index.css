@@ -218,4 +218,21 @@ textarea {
   .prose-zusammenfassung ol {
     list-style-type: decimal;
   }
+  /* DruckAnsicht: Seitenumbruch-Steuerung */
+  .druck-header {
+    break-after: avoid;
+  }
+  .druck-abschnitt {
+    break-before: always;
+  }
+  .druck-abschnitt:first-of-type {
+    break-before: auto;
+  }
+  .druck-frage {
+    break-inside: avoid;
+  }
+  .druck-linie {
+    border-bottom: 1px dotted #94a3b8;
+    height: 1.8em;
+  }
 }

@@ -1,10 +1,12 @@
-import { useState, type ReactNode } from 'react'
+import { useState } from 'react'
 import type { PruefungsConfig } from '../../../../types/pruefung.ts'
 import type { Frage, FrageAnhang, MCFrage, FreitextFrage, LueckentextFrage, ZuordnungFrage, RichtigFalschFrage, BerechnungFrage, BuchungssatzFrage, TKontoFrage, KontenbestimmungFrage, BilanzERFrage, AufgabengruppeFrage } from '../../../../types/fragen.ts'
 import { kontoLabel } from '../../../../utils/kontenrahmen.ts'
 import { formatDatum } from '../../../../utils/zeit.ts'
 import { typLabel, fachbereichFarbe } from '../../../../utils/fachUtils.ts'
 import MediaAnhang from '../../../MediaAnhang.tsx'
+import { formatFragetext } from '../../../../utils/textFormatierung.tsx'
+import DruckAnsicht from './DruckAnsicht.tsx'
 
 interface Props {
   pruefung: PruefungsConfig
@@ -14,6 +16,7 @@ interface Props {
 }
 
 export default function VorschauTab({ pruefung, fragenMap, fragenGeladen = true, onSuSVorschau }: Props) {
+  const [druckAnsichtOffen, setDruckAnsichtOffen] = useState(false)
   const gesamtFragen = pruefung.abschnitte.reduce((s, a) => s + a.fragenIds.length, 0)
 
   // Gesamtpunkte und geschätzte Zeit berechnen
@@ -39,15 +42,24 @@ export default function VorschauTab({ pruefung, fragenMap, fragenGeladen = true,
               {pruefung.titel || '(Kein Titel)'}
             </h2>
           </div>
-          {pruefung.id && (
+          <div className="flex items-center gap-2">
             <button
-              onClick={onSuSVorschau}
+              onClick={() => setDruckAnsichtOffen(true)}
               disabled={gesamtFragen === 0}
               className="px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
             >
-              Interaktive SuS-Vorschau
+              Druckbare Ansicht
             </button>
-          )}
+            {pruefung.id && (
+              <button
+                onClick={onSuSVorschau}
+                disabled={gesamtFragen === 0}
+                className="px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+              >
+                Interaktive SuS-Vorschau
+              </button>
+            )}
+          </div>
         </div>
         <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
           {pruefung.klasse || '(Keine Klasse)'} · {formatDatum(pruefung.datum)}
@@ -149,6 +161,15 @@ export default function VorschauTab({ pruefung, fragenMap, fragenGeladen = true,
           {pruefung.sebErforderlich && <p className="text-amber-600 dark:text-amber-400">SEB erforderlich</p>}
         </div>
       )}
+
+      {/* Druckbare Ansicht (Fullscreen-Overlay) */}
+      {druckAnsichtOffen && (
+        <DruckAnsicht
+          pruefung={pruefung}
+          fragenMap={fragenMap}
+          onSchliessen={() => setDruckAnsichtOffen(false)}
+        />
+      )}
     </div>
   )
 }
@@ -169,34 +190,6 @@ function schaetzeZeitbedarf(frage: Frage): number {
     case 'aufgabengruppe': return Math.max(5, frage.punkte * 2)
     default: return frage.punkte
   }
-}
-
-/** Formatiert Text mit **fett** Markdown zu React-Elementen und wandelt \n in Zeilenumbrueche */
-function formatFragetext(text: string): ReactNode[] {
-  // Zuerst nach Zeilenumbruechen splitten
-  const zeilen = text.split('\n')
-  const ergebnis: ReactNode[] = []
-
-  for (let z = 0; z < zeilen.length; z++) {
-    if (z > 0) ergebnis.push(<br key={`br-${z}`} />)
-
-    // Dann innerhalb jeder Zeile nach **fett** Markierungen splitten
-    const teile = zeilen[z].split(/(\*\*[^*]+\*\*)/)
-    for (let i = 0; i < teile.length; i++) {
-      const teil = teile[i]
-      if (teil.startsWith('**') && teil.endsWith('**')) {
-        ergebnis.push(
-          <strong key={`${z}-${i}`} className="font-semibold">
-            {teil.slice(2, -2)}
-          </strong>
-        )
-      } else {
-        ergebnis.push(<span key={`${z}-${i}`}>{teil}</span>)
-      }
-    }
-  }
-
-  return ergebnis
 }
 
 /** Read-only Vorschau einer einzelnen Frage wie SuS sie sehen */
