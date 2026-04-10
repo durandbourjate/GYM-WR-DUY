@@ -6,6 +6,47 @@
 
 ---
 
+## Session 77 — B2: Druckbare Ansicht (10.04.2026)
+
+### Stand
+Branch `feature/ux-polish-session5`. tsc ✅ | 209 Tests ✅ | Build ✅.
+
+### Erledigte Arbeiten
+
+| # | Änderung | Dateien |
+|---|----------|---------|
+| B2a | `DruckAnsicht.tsx` (neu, 420 Z.): Fullscreen-Overlay mit professionellem Prüfungsblatt — Schulname aus `useSchulConfig`, Name/Vorname/Klasse-Felder, Metadaten, Abschnitte, Footer | DruckAnsicht.tsx |
+| B2b | 20 Fragetyp-Renderer: MC (○/□), R/F (Tabelle), Freitext (liniert), Lückentext (Blanks), Zuordnung, Berechnung, Buchungssatz (Soll/Haben-Tabelle), T-Konto (Vorlagen), Kontenbestimmung, Bilanz/ER (Struktur), Aufgabengruppe (rekursiv), Sortierung, Code, Formel, Zeichnen/Hotspot/Bildbeschriftung/DragDrop/Audio/PDF → "nur digital" Hinweis | DruckAnsicht.tsx |
+| B2c | Bilder inline (`<img>` via Drive-Thumbnail), Audio/Video/PDF-Embeds → Texthinweis | DruckAnsicht.tsx |
+| B2d | Print-CSS: Seitenumbrüche zwischen Abschnitten, Fragen nicht zerrissen, linierte Antwortfelder | index.css |
+| B2e | Button "Druckbare Ansicht" neben "Interaktive SuS-Vorschau" im VorschauTab | VorschauTab.tsx |
+| B2f | `formatFragetext()` in `textFormatierung.tsx` extrahiert (shared zwischen VorschauTab + DruckAnsicht) | textFormatierung.tsx, VorschauTab.tsx |
+| B2g | z-Index Fix: Overlay `z-[70]` statt `z-50` (LP-Header hat `z-[60]`) | DruckAnsicht.tsx |
+
+### Neue Dateien (2)
+- `src/components/lp/vorbereitung/composer/DruckAnsicht.tsx` — Druckbare Prüfungsansicht (420 Z.)
+- `src/utils/textFormatierung.tsx` — Extrahierte `formatFragetext()` Utility (27 Z.)
+
+### Geänderte Dateien (2)
+- `src/components/lp/vorbereitung/composer/VorschauTab.tsx` — Button + Import + State (+15 Z., lokale formatFragetext entfernt)
+- `src/index.css` — Print-CSS für DruckAnsicht (+15 Z.)
+
+### Verifiziert
+- ✅ tsc -b grün (0 Errors)
+- ✅ 209 Tests grün
+- ✅ Build erfolgreich
+- ✅ Button sichtbar im Browser (Demo-LP → Bearbeiten → Vorschau)
+- ✅ DruckAnsicht öffnet sich als Overlay mit Name-Feldern, Abschnitten, MC-Fragen
+- ⬜ Noch nicht getestet: Alle 20 Fragetypen visuell im Browser (vom User geplant)
+- ⬜ Noch nicht getestet: Druckvorschau Cmd+P (Seitenumbrüche, weiss/schwarz)
+
+### Offen (Folge-Sessions)
+- F5 vollständig: Lernziele-Crosslinking in LP-Ansichten (Themensteuerung, Fragenbank)
+- Session 6 aus IMPROVEMENT_PLAN: Performance + Erweiterte Features
+- Branch auf main mergen (nach User-Test + Freigabe)
+
+---
+
 ## Session 76 — UX-Polish + Analyse-Verbesserungen (10.04.2026)
 
 ### Stand
@@ -36,27 +77,10 @@ Branch `feature/ux-polish-session5`. tsc ✅ | 209 Tests ✅ | Build ✅.
 | **Material-Sidebar (D1)** | |
 | D1 | Vollbild-Button im Split-Modus entfernt (Overlay→Split bleibt) | MaterialPanel.tsx |
 
-### Geänderte Dateien (9)
-- `src/utils/analyseUtils.ts` — TYP_LABELS entfernt → `typLabel()`, Interfaces erweitert (fragenNummern, frageNummer, label), Themen-Normalisierung
-- `src/components/lp/vorbereitung/composer/AnalyseTab.tsx` — Legende, Zeitbedarf pro Frage, Frage-Nrn in Taxonomie + Fragetypen
-- `src/components/lp/vorbereitung/composer/AbschnitteTab.tsx` — Abschnitt-Header Layout (Pfeile rechts)
-- `src/components/lp/TrackerSection.tsx` — CSS hover-Fix
-- `src/components/ueben/EmpfehlungsKarte.tsx` — cursor-pointer
-- `src/components/ueben/Dashboard.tsx` — Repetition disabled, TYP_LABELS volle Namen, Chip title
-- `src/components/ueben/ThemaKarte.tsx` — Gesperrte Themen anklickbar mit Info, Lernziele sichtbar
-- `src/components/MaterialPanel.tsx` — Vollbild-Button entfernt
-
 ### Verifiziert
 - ✅ tsc -b grün (0 Errors)
 - ✅ 209 Tests grün
 - ✅ Build erfolgreich
-- ✅ App startet im Browser ohne Crashes
-- ✅ Abschnitt-Layout (C1) im Browser verifiziert
-
-### Offen (Folge-Sessions)
-- B2: Druckbare Ansicht (PDF-Export-ähnlich) in VorschauTab — eigene Session
-- F5 vollständig: Lernziele-Crosslinking in LP-Ansichten (Themensteuerung, Fragenbank)
-- Session 6 aus IMPROVEMENT_PLAN: Performance + Erweiterte Features
 
 ---
 
