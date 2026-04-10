@@ -45,7 +45,7 @@ interface UebungsState {
   /** Session-Historie für Übungs-Einsicht */
   historie: GespeichertesErgebnis[]
 
-  starteSession: (gruppeId: string, email: string, fach: string, thema: string, fragenOverride?: Frage[], modus?: SessionModus, quellen?: ThemaQuelle[]) => Promise<void>
+  starteSession: (gruppeId: string, email: string, fach: string, thema: string, fragenOverride?: Frage[], modus?: SessionModus, quellen?: ThemaQuelle[], freiwillig?: boolean) => Promise<void>
   beantworte: (antwort: AntwortTyp) => void
   naechsteFrage: () => void
   vorherigeFrage: () => void
@@ -67,7 +67,7 @@ export const useUebenUebungsStore = create<UebungsState>((set, get) => ({
   letzteAntwortKorrekt: null,
   historie: ladeHistorie(),
 
-  starteSession: async (gruppeId, email, fach, thema, fragenOverride, modus = 'standard', quellen) => {
+  starteSession: async (gruppeId, email, fach, thema, fragenOverride, modus = 'standard', quellen, freiwillig = false) => {
     set({ ladeStatus: 'laden' })
 
     try {
@@ -120,6 +120,7 @@ export const useUebenUebungsStore = create<UebungsState>((set, get) => ({
         unsicher: new Set(),
         uebersprungen: new Set(),
         score: 0,
+        freiwillig,
       }
 
       set({ session, ladeStatus: 'fertig', feedbackSichtbar: false, letzteAntwortKorrekt: null })
@@ -137,7 +138,10 @@ export const useUebenUebungsStore = create<UebungsState>((set, get) => ({
 
     const korrekt = pruefeAntwort(frage, antwort)
 
-    useUebenFortschrittStore.getState().antwortVerarbeiten(frage.id, session.email, korrekt, session.id)
+    // Bei freiwilligem Üben (gesperrtes Thema): Fortschritt NICHT speichern
+    if (!session.freiwillig) {
+      useUebenFortschrittStore.getState().antwortVerarbeiten(frage.id, session.email, korrekt, session.id)
+    }
 
     set({
       session: {

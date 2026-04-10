@@ -236,7 +236,9 @@ export default function Dashboard({ deepLinkZiel }: DashboardProps = {}) {
 
   const handleStarte = (fach: string, thema: string, fragenOverride?: Frage[]) => {
     if (!aktiveGruppe || !user) return
-    starteSession(aktiveGruppe.id, user.email, fach, thema, fragenOverride)
+    // Gesperrtes Thema → freiwilliges Üben ohne Tracking
+    const istFreiwillig = freischaltungen.length > 0 && getStatus(fach, thema) === 'nicht_freigeschaltet'
+    starteSession(aktiveGruppe.id, user.email, fach, thema, fragenOverride, 'standard', undefined, istFreiwillig)
     navigiere('uebung')
   }
 

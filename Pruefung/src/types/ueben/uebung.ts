@@ -28,6 +28,8 @@ export interface UebungsSession {
   uebersprungen: Set<string>
   /** Punkte-Score (richtig = +1, falsch = 0) */
   score: number
+  /** Freiwilliges Üben (gesperrtes Thema) — Fortschritt wird NICHT gespeichert */
+  freiwillig?: boolean
 }
 
 export interface SessionErgebnis {

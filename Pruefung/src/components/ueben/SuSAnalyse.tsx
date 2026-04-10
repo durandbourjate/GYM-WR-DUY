@@ -23,20 +23,33 @@ export default function SuSAnalyse() {
   const { fachFarben } = useUebenKontext()
   const [fragen, setFragen] = useState<Frage[]>([])
   const [laden, setLaden] = useState(true)
+  const [fehler, setFehler] = useState(false)
 
   useEffect(() => {
     if (!aktiveGruppe) return
+    let abgebrochen = false
     const lade = async () => {
       setLaden(true)
-      const f = await uebenFragenAdapter.ladeFragen(aktiveGruppe.id)
-      setFragen(f.filter(fr => {
-        const tags = (fr.tags || []) as (string | { name: string })[]
-        if (tags.some(t => (typeof t === 'string' ? t : t.name) === 'einrichtung')) return false
-        return fr.thema !== 'Einrichtung' && fr.thema !== 'Einrichtungstest'
-      }))
-      setLaden(false)
+      setFehler(false)
+      try {
+        // Timeout: 15 Sekunden, dann Fehler anzeigen statt endlos laden
+        const timeout = new Promise<Frage[]>((_, reject) => setTimeout(() => reject(new Error('Timeout')), 15000))
+        const laden = uebenFragenAdapter.ladeFragen(aktiveGruppe.id)
+        const f = await Promise.race([laden, timeout])
+        if (abgebrochen) return
+        setFragen(f.filter(fr => {
+          const tags = (fr.tags || []) as (string | { name: string })[]
+          if (tags.some(t => (typeof t === 'string' ? t : t.name) === 'einrichtung')) return false
+          return fr.thema !== 'Einrichtung' && fr.thema !== 'Einrichtungstest'
+        }))
+      } catch {
+        if (!abgebrochen) setFehler(true)
+      } finally {
+        if (!abgebrochen) setLaden(false)
+      }
     }
     lade()
+    return () => { abgebrochen = true }
   }, [aktiveGruppe])
 
   // Themen-Analyse mit Recency
@@ -86,7 +99,22 @@ export default function SuSAnalyse() {
     return { gemeistert, gefestigt, versuche, streak, level, meilensteine, themenAbgeschlossen }
   }, [fortschritte, themenAnalyse])
 
-  if (laden) return <p className="text-slate-500">Wird geladen...</p>
+  if (laden) return (
+    <div className="space-y-4 animate-pulse">
+      <div className="h-6 w-48 bg-slate-200 dark:bg-slate-700 rounded" />
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {[1, 2, 3, 4].map(i => <div key={i} className="h-20 bg-slate-200 dark:bg-slate-700 rounded-xl" />)}
+      </div>
+      <div className="h-40 bg-slate-200 dark:bg-slate-700 rounded-xl" />
+    </div>
+  )
+
+  if (fehler) return (
+    <div className="text-center py-8">
+      <p className="text-slate-500 dark:text-slate-400 mb-2">Analyse konnte nicht geladen werden.</p>
+      <button onClick={() => setLaden(true)} className="text-sm text-blue-500 hover:text-blue-600 cursor-pointer">Nochmal versuchen</button>
+    </div>
+  )
 
   return (
     <div className="space-y-6">

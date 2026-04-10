@@ -6,6 +6,55 @@
 
 ---
 
+## Session 84 — Blöcke D, F, G: Analyse + Druckansicht + Gesperrte Themen (10.04.2026)
+
+### Stand
+Branch `feature/blocks-D-E-F-G`. tsc ✅ | 209 Tests ✅ | Build ✅.
+
+### Erledigte Arbeiten
+
+| # | Änderung | Dateien |
+|---|----------|---------|
+| **Block D: Analyse-Tab** | |
+| D1 | Zeitbedarf: Gestapelter Balken (1 Balken, Segmente pro Frage mit Hover-Tooltip) statt N einzelne Balken + Legende darunter | AnalyseTab.tsx |
+| D2 | Taxonomie: Alle Fragenummern sichtbar (kein 7er-Limit mehr) + title-Tooltip | AnalyseTab.tsx |
+| D3 | Üben-Analyse: 15s Timeout + Skeleton-Loading + Fehlermeldung + Retry-Button statt endlosem Spinner | SuSAnalyse.tsx |
+| **Block F: Druckansicht** | |
+| F1 | Hotspot druckbar: Bild + Anweisung "Markiere N Stellen" | DruckAnsicht.tsx |
+| F2 | Bildbeschriftung druckbar: Bild mit nummerierten Markern + Antwortlinien | DruckAnsicht.tsx |
+| F3 | DragDrop-Bild druckbar: Bild mit Zielzonen (A,B,C) + Begriffe-Liste zum Zuordnen | DruckAnsicht.tsx |
+| F4 | Zeichnen: Leerer Zeichenbereich mit Rahmen statt "nur digital" | DruckAnsicht.tsx |
+| **Block G: Gesperrte Themen** | |
+| G1 | Gesperrte Themen: 1. Klick → Info-Hinweis, 2. Klick → Freiwilliges Üben starten | ThemaKarte.tsx |
+| G2 | `freiwillig` Flag in UebungsSession — Fortschritt wird NICHT gespeichert | uebung.ts, uebungsStore.ts |
+| G3 | Dashboard `handleStarte` erkennt gesperrte Themen und setzt `freiwillig=true` | Dashboard.tsx |
+
+### Geänderte Dateien (8)
+- `src/components/lp/vorbereitung/composer/AnalyseTab.tsx` — Gestapelter Zeitbedarf + Taxonomie ohne Limit
+- `src/components/ueben/SuSAnalyse.tsx` — Timeout + Skeleton + Fehlerbehandlung
+- `src/components/lp/vorbereitung/composer/DruckAnsicht.tsx` — 4 neue Druck-Renderer
+- `src/components/ueben/ThemaKarte.tsx` — Doppelklick für freiwilliges Üben
+- `src/components/ueben/Dashboard.tsx` — freiwillig-Flag bei gesperrten Themen
+- `src/types/ueben/uebung.ts` — `freiwillig?` Feld in UebungsSession
+- `src/store/ueben/uebungsStore.ts` — `freiwillig` Parameter + kein Fortschritt-Speichern
+
+### Verifiziert
+- ✅ tsc -b grün
+- ✅ 209 Tests grün
+- ✅ Build erfolgreich
+- ⬜ Browser-Test: Gestapelter Zeitbedarf-Balken im Analyse-Tab
+- ⬜ Browser-Test: Alle Taxonomie-Nummern sichtbar
+- ⬜ Browser-Test: Üben-Analyse lädt ohne Endlos-Spinner
+- ⬜ Browser-Test: Druckansicht Hotspot/Bildbeschriftung/DragDrop/Zeichnen
+- ⬜ Browser-Test: Gesperrte Themen: 2× klicken → freiwilliges Üben startet
+- ⬜ Browser-Test: Freiwilliges Üben → Fortschritt nicht im Backend gespeichert
+
+### Ausstehend (Folge-Sessions)
+- **Block E:** Lernziele-UX — LernzielWähler mit DB-Suche + neue Lernziele erstellen (eigene Session)
+- **Block G2:** Favoriten Account-verknüpft + Direktlinks (eigene Session)
+
+---
+
 ## Session 83 — Üben-Fragetypen Daten-Normalisierung (Block B) (10.04.2026)
 
 ### Stand

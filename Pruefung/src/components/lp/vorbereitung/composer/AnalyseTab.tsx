@@ -161,25 +161,37 @@ export default function AnalyseTab({ pruefung, fragenMap, fragenGeladen }: Props
                   : 'Zeitbedarf liegt unter der Prüfungsdauer — Puffer vorhanden'}
             </p>
           </div>
-          {/* Pro Frage */}
-          <div className="space-y-1">
-            {analyse.zeitbedarfDetails.map((z) => {
-              const anteil = analyse.dauerMinuten > 0 ? (z.minuten / analyse.dauerMinuten) * 100 : 0
-              return (
-                <div key={z.frageId} className="flex items-center gap-2">
-                  <span className="text-[10px] text-slate-500 dark:text-slate-400 w-5 text-right tabular-nums shrink-0">{z.frageNummer}.</span>
-                  <div className="flex-1 bg-slate-100 dark:bg-slate-700 rounded h-3 overflow-hidden">
-                    <div
-                      className="h-full bg-slate-400 dark:bg-slate-400 rounded transition-all"
-                      style={{ width: `${Math.min(anteil, 100)}%` }}
-                    />
+          {/* Gestapelter Balken — ein Balken, Segmente pro Frage */}
+          <div className="space-y-2">
+            <div className="flex-1 bg-slate-100 dark:bg-slate-700 rounded-lg h-8 overflow-hidden flex">
+              {analyse.zeitbedarfDetails.map((z, i) => {
+                const anteil = analyse.zeitbedarfSumme > 0 ? (z.minuten / analyse.zeitbedarfSumme) * 100 : 0
+                if (anteil < 0.5) return null
+                // Abwechselnde Farben für Lesbarkeit
+                const farben = ['bg-slate-500', 'bg-slate-400', 'bg-slate-600', 'bg-slate-350']
+                const farbKlasse = farben[i % farben.length]
+                return (
+                  <div
+                    key={z.frageId}
+                    className={`h-full ${farbKlasse} flex items-center justify-center relative group`}
+                    style={{ width: `${anteil}%`, minWidth: anteil > 3 ? undefined : '8px' }}
+                    title={`${z.frageNummer}. ${z.label}: ${z.minuten} Min.`}
+                  >
+                    {anteil > 5 && (
+                      <span className="text-[9px] font-medium text-white truncate px-0.5">{z.frageNummer}</span>
+                    )}
                   </div>
-                  <span className="text-[10px] text-slate-500 dark:text-slate-400 w-20 text-right shrink-0">
-                    {z.minuten} Min. · {z.label}
-                  </span>
-                </div>
-              )
-            })}
+                )
+              })}
+            </div>
+            {/* Legende unter dem Balken */}
+            <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-[10px] text-slate-500 dark:text-slate-400">
+              {analyse.zeitbedarfDetails.map((z) => (
+                <span key={z.frageId} className="whitespace-nowrap">
+                  <span className="font-medium">{z.frageNummer}.</span> {z.minuten} Min. ({z.label})
+                </span>
+              ))}
+            </div>
           </div>
         </div>
       </Section>
@@ -196,8 +208,8 @@ export default function AnalyseTab({ pruefung, fragenMap, fragenGeladen }: Props
                   style={{ width: `${t.prozent}%` }}
                 />
                 {t.fragenNummern.length > 0 && (
-                  <span className="absolute inset-0 flex items-center px-2 text-[10px] text-white dark:text-slate-800 font-medium truncate pointer-events-none">
-                    {t.fragenNummern.length <= 8 ? t.fragenNummern.join(', ') : `${t.fragenNummern.slice(0, 7).join(', ')}…`}
+                  <span className="absolute inset-0 flex items-center px-2 text-[10px] text-white dark:text-slate-800 font-medium pointer-events-none overflow-hidden" title={`Fr. ${t.fragenNummern.join(', ')}`}>
+                    {t.fragenNummern.join(', ')}
                   </span>
                 )}
               </div>

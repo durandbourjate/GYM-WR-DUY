@@ -38,8 +38,15 @@ export function ThemaKarte({
 
   const handleKlick = () => {
     if (istGesperrt) {
-      setZeigeGesperrtInfo(true)
-      setTimeout(() => setZeigeGesperrtInfo(false), 3000)
+      // Beim ersten Klick: Hinweis anzeigen
+      if (!zeigeGesperrtInfo) {
+        setZeigeGesperrtInfo(true)
+        setTimeout(() => setZeigeGesperrtInfo(false), 4000)
+      } else {
+        // Beim zweiten Klick (innerhalb 4s): Freiwilliges Üben starten
+        setZeigeGesperrtInfo(false)
+        onClick()
+      }
     } else {
       onClick()
     }
@@ -80,7 +87,7 @@ export function ThemaKarte({
       {/* Info-Hinweis bei Klick auf gesperrtes Thema */}
       {zeigeGesperrtInfo && (
         <div className="absolute inset-x-4 top-1/2 -translate-y-1/2 bg-slate-800 dark:bg-slate-200 text-white dark:text-slate-800 text-xs font-medium px-3 py-2 rounded-lg text-center z-10 shadow-lg">
-          Dieses Thema wird von der Lehrperson freigeschaltet
+          Noch nicht freigeschaltet — nochmal klicken für freiwilliges Üben (wird nicht getrackt)
         </div>
       )}
 

@@ -4,7 +4,8 @@ import type {
   ZuordnungFrage, RichtigFalschFrage, BerechnungFrage,
   BuchungssatzFrage, TKontoFrage, KontenbestimmungFrage,
   BilanzERFrage, AufgabengruppeFrage, SortierungFrage,
-  InlineTeilaufgabe
+  InlineTeilaufgabe,
+  HotspotFrage, BildbeschriftungFrage, DragDropBildFrage
 } from '../../../../types/fragen.ts'
 import { kontoLabel } from '../../../../utils/kontenrahmen.ts'
 import { formatDatum } from '../../../../utils/zeit.ts'
@@ -239,9 +240,9 @@ function FrageInhalt({ frage }: { frage: Frage }) {
     case 'audio': return <DigitalHinweis typ="Audio-Aufnahme" />
     case 'code': return <CodeDruck />
     case 'formel': return <FormelDruck />
-    case 'hotspot': return <DigitalHinweis typ="Hotspot-Aufgabe" />
-    case 'bildbeschriftung': return <DigitalHinweis typ="Bildbeschriftung" />
-    case 'dragdrop_bild': return <DigitalHinweis typ="Drag & Drop" />
+    case 'hotspot': return <HotspotDruck frage={frage as HotspotFrage} />
+    case 'bildbeschriftung': return <BildbeschriftungDruck frage={frage as BildbeschriftungFrage} />
+    case 'dragdrop_bild': return <DragDropBildDruck frage={frage as DragDropBildFrage} />
     default: return null
   }
 }
@@ -674,8 +675,90 @@ function SortierungDruck({ frage }: { frage: SortierungFrage }) {
 
 function ZeichenDruck() {
   return (
-    <div className="border-2 border-dashed border-slate-300 print:border-slate-400 rounded-lg h-40 flex items-center justify-center">
-      <span className="text-sm text-slate-400 print:text-slate-500">Zeichenfläche (nur digital verfügbar)</span>
+    <div className="border-2 border-slate-300 print:border-slate-400 rounded-lg h-48">
+      <p className="text-xs text-slate-400 print:text-slate-500 p-2">Zeichne hier:</p>
+    </div>
+  )
+}
+
+function HotspotDruck({ frage }: { frage: HotspotFrage }) {
+  return (
+    <div className="space-y-2">
+      {frage.bildUrl && (
+        <img src={frage.bildUrl} alt="Hotspot-Bild" className="max-w-full rounded border border-slate-300 print:border-slate-400" />
+      )}
+      <p className="text-sm text-slate-600 print:text-black">
+        Markiere {frage.bereiche?.length || 1} Stelle{(frage.bereiche?.length || 1) > 1 ? 'n' : ''} auf dem Bild.
+      </p>
+    </div>
+  )
+}
+
+function BildbeschriftungDruck({ frage }: { frage: BildbeschriftungFrage }) {
+  const beschriftungen = frage.beschriftungen || []
+  return (
+    <div className="space-y-3">
+      {frage.bildUrl && (
+        <div className="relative inline-block">
+          <img src={frage.bildUrl} alt="Bildbeschriftung" className="max-w-full rounded border border-slate-300 print:border-slate-400" />
+          {/* Nummerierte Marker auf dem Bild */}
+          {beschriftungen.map((b, i) => (
+            <div
+              key={b.id}
+              className="absolute w-5 h-5 rounded-full bg-slate-700 print:bg-black text-white text-[9px] font-bold flex items-center justify-center -translate-x-1/2 -translate-y-1/2"
+              style={{ left: `${b.position.x}%`, top: `${b.position.y}%` }}
+            >
+              {i + 1}
+            </div>
+          ))}
+        </div>
+      )}
+      {/* Antwortlinien */}
+      {beschriftungen.map((_, i) => (
+        <div key={i} className="flex items-center gap-2">
+          <span className="w-5 h-5 rounded-full bg-slate-200 print:bg-slate-300 text-[9px] font-bold flex items-center justify-center shrink-0">{i + 1}</span>
+          <div className="druck-linie flex-1" />
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function DragDropBildDruck({ frage }: { frage: DragDropBildFrage }) {
+  const zielzonen = frage.zielzonen || []
+  const labels = frage.labels || []
+  return (
+    <div className="space-y-3">
+      {frage.bildUrl && (
+        <div className="relative inline-block">
+          <img src={frage.bildUrl} alt="Drag & Drop" className="max-w-full rounded border border-slate-300 print:border-slate-400" />
+          {/* Nummerierte Zielzonen auf dem Bild */}
+          {zielzonen.map((z, i) => (
+            <div
+              key={z.id}
+              className="absolute border-2 border-dashed border-slate-500 print:border-black rounded flex items-center justify-center"
+              style={{
+                left: `${z.position.x}%`, top: `${z.position.y}%`,
+                width: `${z.position.breite}%`, height: `${z.position.hoehe}%`,
+              }}
+            >
+              <span className="text-xs font-bold text-slate-500 print:text-black">{String.fromCharCode(65 + i)}</span>
+            </div>
+          ))}
+        </div>
+      )}
+      {/* Begriffe zum Zuordnen */}
+      <div>
+        <p className="text-xs font-medium text-slate-600 print:text-black mb-1">Ordne folgende Begriffe den Zonen (A, B, C...) zu:</p>
+        <div className="grid grid-cols-2 gap-1">
+          {labels.map((label, i) => (
+            <div key={i} className="flex items-center gap-2 text-sm">
+              <span className="dark:text-white">{label}</span>
+              <span className="text-slate-400">→ Zone ___</span>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   )
 }
