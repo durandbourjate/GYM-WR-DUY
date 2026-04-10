@@ -6,6 +6,74 @@
 
 ---
 
+## Session 87 — Browser-Tests + Bild-Fragetypen Reparatur (10.04.2026)
+
+### Stand
+Branch `main`. tsc ✅ | 209 Tests ✅ | Build ✅. Apps Script deployed (3×).
+
+### Erledigte Arbeiten
+
+| # | Änderung | Dateien |
+|---|----------|---------|
+| **Browser-Tests (9 Punkte)** | |
+| T1 | ✅ Kontenbestimmung (Üben): BUG gefunden — leere Konto-Dropdowns | 3 Üben-Komponenten |
+| T2 | ✅ Bildbeschriftung (Üben): BUG gefunden — beschriftungen=[] im Sheet | apps-script-code.js |
+| T3 | ✅ DragDrop-Bild (Üben): BUG gefunden — labels="[object Object]", zielzonen=[] | apps-script-code.js |
+| T4 | ✅ Hotspot (Üben): OK — funktioniert korrekt | — |
+| T5 | ✅ Gesperrte Themen → freiwilliges Üben: OK | — |
+| T6 | ✅ Üben-Analyse ohne Endlos-Spinner: OK | — |
+| T7 | ✅ LP Analyse-Tab: OK (Heatmap, Lücken, Lernende) | — |
+| T8 | ✅ LP LernzielWähler im Frageneditor: OK (100 Lernziele) | — |
+| T9 | ✅ LP Druckansicht neue Fragetypen: OK (T-Konto, Kontenbestimmung, Code, Bildbeschriftung) | — |
+| **Code-Fixes** | |
+| F1 | **KontenSelect shared:** 3 Üben-FiBu-Komponenten nutzen jetzt den shared KontenSelect mit `config`-Prop (voller KMU-Kontenrahmen) statt lokalem mit leerem `konten`-Array | KontenbestimmungFrage.tsx, BuchungssatzFrage.tsx, TKontoFrage.tsx |
+| F2 | **lernplattformSpeichereFrage:** Berechnet `typDaten` via `getTypDaten()` vor dem Speichern (verhindert leere typDaten bei ExamLab-Format-Objekten) | apps-script-code.js |
+| F3 | **importierePoolFragen:** Schreibt bei Updates jetzt auch `typDaten`, `fragetext`, `musterlosung`, `bildUrl` (vorher nur Sync-Felder) | apps-script-code.js |
+| F4 | **normalizeLabels:** Defensiver gegen Objekt-Input ({text, name}) | normalizeKonten.ts |
+| **SVG-Reparatur (62 Bilder)** | |
+| S1 | Alle 62 Bild-Fragetyp-SVGs (bildbeschriftung, dragdrop_bild, hotspot) neutral erstellt — ohne Lösungstext | 62 SVG-Dateien in img/ |
+| S2 | Nur Grundstruktur: Diagramme, Achsen, Nummern/Buchstaben als Marker | BWL: 13, Recht: 21, VWL: 28 |
+| **Daten-Reparatur** | |
+| R1 | Repair-Script: Liest Pool-JS-Dateien, konvertiert korrekt, importiert via API | scripts/repair-bild-fragen.mjs |
+| R2 | 62 Bild-Fragen im Fragenbank-Sheet mit korrekten typDaten aktualisiert | — |
+
+### Geänderte Dateien (Code)
+- `Pruefung/src/components/ueben/fragetypen/KontenbestimmungFrage.tsx` — shared KontenSelect
+- `Pruefung/src/components/ueben/fragetypen/BuchungssatzFrage.tsx` — shared KontenSelect
+- `Pruefung/src/components/ueben/fragetypen/TKontoFrage.tsx` — shared KontenSelect
+- `Pruefung/src/utils/ueben/normalizeKonten.ts` — normalizeLabels defensiver
+- `Pruefung/apps-script-code.js` — 3 Fixes (lernplattformSpeichereFrage, importierePoolFragen, typDaten)
+- `Pruefung/scripts/repair-bild-fragen.mjs` — NEU: Repair-Script für Bild-Fragen
+
+### Geänderte Dateien (SVGs) — 62 Stück
+- `Uebungen/Uebungspools/img/bwl/**/*.svg` (13 Dateien)
+- `Uebungen/Uebungspools/img/recht/**/*.svg` (21 Dateien)
+- `Uebungen/Uebungspools/img/vwl/**/*.svg` (28 Dateien)
+
+### Verifiziert im Browser (Chrome-in-Chrome)
+- ✅ Bildbeschriftung: Neutrales SVG + 6 Marker + 6 Eingabefelder
+- ✅ DragDrop-Bild: Korrekte Label-Texte + neutrale Zonen (kein [object Object])
+- ✅ Hotspot: Klick + Feedback + Erklärung
+- ✅ Gesperrte Themen: FIBU (abgeschlossen) weiterhin zugänglich
+- ✅ Ergebnisse/Fortschritt: Kein Endlos-Spinner
+- ✅ LP Analyse-Tab: Heatmap, Lücken, Lernende
+- ✅ LernzielWähler: 100 Lernziele im Dropdown
+- ✅ Druckansicht: Alle neuen Fragetypen korrekt
+
+### Noch zu testen (nächste Session)
+⬜ Kontenbestimmung im Browser (braucht neuen Frontend-Build — GitHub Actions)
+⬜ Buchungssatz + T-Konto Dropdowns (gleicher Fix wie Kontenbestimmung)
+⬜ SVGs visuell prüfen (neue neutrale Bilder nach GitHub Pages Deploy)
+⬜ Feature-Branch `feature/favoriten-g2` mergen + testen
+
+### Hinweise für nächste Session
+- Apps Script wurde 3× deployed (typDaten-Fix + importierePoolFragen-Fix)
+- 62 SVGs sind neutral — keine Lösungstexte mehr im Bild
+- Repair-Script `scripts/repair-bild-fragen.mjs` kann wiederverwendet werden falls Daten nochmal kaputt gehen
+- `feature/favoriten-g2` Branch ist noch offen (Session 86) — Browser-Tests ausstehend
+
+---
+
 ## Session 86 — Block G2: Favoriten Account-verknüpft + Direktlinks (10.04.2026)
 
 ### Stand
