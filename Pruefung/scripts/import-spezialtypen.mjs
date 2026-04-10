@@ -4,7 +4,7 @@
  * formel, code, zeichnen, gruppe, bilanz, buchungssatz, tkonto, kontenbestimmung, pdf)
  * in die Fragenbank nachimportieren.
  *
- * Liest Pool-JS-Dateien, extrahiert Spezialtyp-Fragen, konvertiert sie ins Prüfungstool-Format,
+ * Liest Pool-JS-Dateien, extrahiert Spezialtyp-Fragen, konvertiert sie ins ExamLab-Format,
  * und sendet sie via speichereFrage API ans Backend.
  *
  * Usage: node scripts/import-spezialtypen.mjs [--dry-run]
@@ -82,7 +82,7 @@ function konvertiereBild(img, poolId) {
   }
 }
 
-// Konvertiere eine Pool-Frage mit Spezialtyp ins Prüfungstool-Format
+// Konvertiere eine Pool-Frage mit Spezialtyp ins ExamLab-Format
 function konvertiereFrage(poolFrage, poolMeta, topics) {
   const now = new Date().toISOString()
   const topic = topics[poolFrage.topic] || {}

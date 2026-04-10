@@ -194,7 +194,7 @@
           "punkte": 1
         }
       ],
-      "fragetext": "Beurteilen Sie die folgenden Aussagen über das Prüfungstool als **richtig** oder **falsch**.",
+      "fragetext": "Beurteilen Sie die folgenden Aussagen über das ExamLab als **richtig** oder **falsch**.",
       "aussagen": [
         {
           "id": "1",
@@ -1275,7 +1275,7 @@
   ],
   "config": {
     "id": "einrichtung-sf-wr-27a28f",
-    "titel": "Einrichtungsprüfung — Lerne das Prüfungstool kennen",
+    "titel": "Einrichtungsprüfung — Lerne das ExamLab kennen",
     "klasse": "sf-wr-27a28f",
     "gefaess": "SF",
     "semester": "S5",

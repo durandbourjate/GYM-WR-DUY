@@ -123,7 +123,7 @@ Ohne diesen Plan: KEIN Testen starten. Das verhindert planloses Durchklicken.
   3. User meldet "kannst loslegen"
   4. Claude testet gemaess Test-Plan
 - **Kontrollstufe: Locker** (damit Logging/Konsole/Netzwerk pruefbar)
-- **Test-Pruefung:** "Einrichtungspruefung — Lerne das Pruefungstool kennen" (enthaelt alle Fragetypen)
+- **Test-Pruefung:** "Einrichtungspruefung — Lerne ExamLab kennen" (enthaelt alle Fragetypen)
 - LP muss den Test-SuS in der Lobby hinzufuegen
 
 ### LP-Testpfad

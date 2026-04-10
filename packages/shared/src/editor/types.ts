@@ -1,6 +1,6 @@
 /**
  * Interfaces für den Shared FragenEditor.
- * Host-Apps (Prüfungstool, Lernplattform) implementieren diese Interfaces
+ * Host-Apps (ExamLab) implementieren diese Interfaces
  * und übergeben sie via EditorContext.
  */
 import type { FrageAnhang, Lernziel } from '../types/fragen'

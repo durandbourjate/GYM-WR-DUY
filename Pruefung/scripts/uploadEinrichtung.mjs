@@ -107,7 +107,7 @@ const fragen = [
       { beschreibung: '2 korrekt', punkte: 2 },
       { beschreibung: '1 korrekt', punkte: 1 },
     ],
-    fragetext: 'Beurteilen Sie die folgenden Aussagen über das Prüfungstool als **richtig** oder **falsch**.',
+    fragetext: 'Beurteilen Sie die folgenden Aussagen über das ExamLab als **richtig** oder **falsch**.',
     aussagen: [
       { id: '1', text: 'Man kann zwischen Fragen vor- und zurücknavigieren.', korrekt: true, erklaerung: 'Rücknavigation ist aktiviert.' },
       { id: '2', text: 'Die Antworten werden automatisch gespeichert (AutoSave).', korrekt: true, erklaerung: 'AutoSave alle 30 Sekunden.' },
@@ -380,7 +380,7 @@ const fragen = [
 
 const config = {
   id: 'einrichtung-sf-wr-27a28f',
-  titel: 'Einrichtungsprüfung — Lerne das Prüfungstool kennen',
+  titel: 'Einrichtungsprüfung — Lerne das ExamLab kennen',
   klasse: 'sf-wr-27a28f',
   gefaess: 'SF',
   semester: 'S5',
