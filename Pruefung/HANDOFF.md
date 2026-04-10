@@ -64,13 +64,14 @@ Branch `main`. tsc ✅ | 209 Tests ✅ | Build ✅. Apps Script deployed (3×).
 ⬜ Kontenbestimmung im Browser (braucht neuen Frontend-Build — GitHub Actions)
 ⬜ Buchungssatz + T-Konto Dropdowns (gleicher Fix wie Kontenbestimmung)
 ⬜ SVGs visuell prüfen (neue neutrale Bilder nach GitHub Pages Deploy)
-⬜ Feature-Branch `feature/favoriten-g2` mergen + testen
+⬜ Favoriten: Backend-Sync + Direktlinks im Browser testen
 
 ### Hinweise für nächste Session
+- Alles auf `main`, keine offenen Feature-Branches
 - Apps Script wurde 3× deployed (typDaten-Fix + importierePoolFragen-Fix)
 - 62 SVGs sind neutral — keine Lösungstexte mehr im Bild
 - Repair-Script `scripts/repair-bild-fragen.mjs` kann wiederverwendet werden falls Daten nochmal kaputt gehen
-- `feature/favoriten-g2` Branch ist noch offen (Session 86) — Browser-Tests ausstehend
+- Alte Remote-Branches können aufgeräumt werden (10 Stück, alle gemergt)
 
 ---
 
