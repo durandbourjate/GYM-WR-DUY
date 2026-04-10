@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useAuthStore } from '../../store/authStore.ts'
 import { useFragenbankStore } from '../../store/fragenbankStore.ts'
+import { useStammdatenStore } from '../../store/stammdatenStore.ts'
 import { apiService } from '../../services/apiService.ts'
 import type { PruefungsConfig } from '../../types/pruefung.ts'
 import type { TrackerDaten, TrackerPruefungSummary } from '../../types/tracker.ts'
@@ -204,6 +205,11 @@ export default function LPStartseite() {
         setLadeStatus('fertig')
         return
       }
+
+      // Stammdaten + LP-Profil parallel laden (Fire-and-forget, blockiert nicht)
+      const { ladeStammdaten, ladeLPProfil } = useStammdatenStore.getState()
+      ladeStammdaten(user.email)
+      ladeLPProfil(user.email)
 
       // Configs, Tracker-Daten und Fragenbank parallel laden
       const fragenbankLade = useFragenbankStore.getState().lade(user.email)

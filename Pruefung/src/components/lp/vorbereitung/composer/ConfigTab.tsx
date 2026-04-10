@@ -4,14 +4,41 @@ import { Section, Field, Toggle } from './ComposerUI.tsx'
 import { apiService } from '../../../../services/apiService.ts'
 import { parseVideoUrl } from '../../../../utils/mediaUtils.ts'
 import { downloadSebDatei } from '../../../../utils/sebConfigGenerator.ts'
+import { useStammdatenStore } from '../../../../store/stammdatenStore.ts'
 
 interface Props {
   pruefung: PruefungsConfig
   updatePruefung: (partial: Partial<PruefungsConfig>) => void
   toggleFachbereich: (fb: string) => void
+  /** Berechnete Gesamtpunkte aus Fragen (wenn verfügbar) */
+  berechnetePunkte?: number
 }
 
-export default function ConfigTab({ pruefung, updatePruefung, toggleFachbereich }: Props) {
+export default function ConfigTab({ pruefung, updatePruefung, toggleFachbereich, berechnetePunkte }: Props) {
+  const { stammdaten } = useStammdatenStore()
+
+  // Fachbereich-Optionen aus Stammdaten: alle Fachbereiche die in Fachschaften definiert sind
+  const fachbereichOptionen = (() => {
+    const tags: { name: string; farbe: string }[] = []
+    for (const fs of stammdaten.fachschaften) {
+      if (fs.fachbereichTags) {
+        for (const t of fs.fachbereichTags) {
+          if (!tags.some(existing => existing.name === t.name)) tags.push(t)
+        }
+      } else {
+        // Fachschaft ohne Tags: Kürzel als Fachbereich
+        if (!tags.some(existing => existing.name === fs.kuerzel)) {
+          tags.push({ name: fs.kuerzel, farbe: '#6b7280' })
+        }
+      }
+    }
+    // Fallback wenn keine Stammdaten: VWL, BWL, Recht
+    return tags.length > 0 ? tags : [
+      { name: 'VWL', farbe: '#f97316' },
+      { name: 'BWL', farbe: '#3b82f6' },
+      { name: 'Recht', farbe: '#22c55e' },
+    ]
+  })()
   return (
     <div className="space-y-6">
       {/* Grunddaten */}
@@ -72,28 +99,26 @@ export default function ConfigTab({ pruefung, updatePruefung, toggleFachbereich 
           </Field>
         </div>
 
-        {/* Fachbereiche */}
+        {/* Fach */}
         <div className="mt-4">
           <label className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-2">
-            Fachbereiche
+            Fach
           </label>
-          <div className="flex gap-2">
-            {['VWL', 'BWL', 'Recht'].map((fb) => {
-              const aktiv = pruefung.fachbereiche.includes(fb)
+          <div className="flex gap-2 flex-wrap">
+            {fachbereichOptionen.map((fb) => {
+              const aktiv = pruefung.fachbereiche.includes(fb.name)
               return (
                 <button
-                  key={fb}
-                  onClick={() => toggleFachbereich(fb)}
-                  className={`px-3 py-1.5 text-sm rounded-lg border transition-colors cursor-pointer
-                    ${aktiv
-                      ? fb === 'VWL' ? 'bg-orange-100 border-orange-300 text-orange-800 dark:bg-orange-900/30 dark:border-orange-700 dark:text-orange-300'
-                      : fb === 'BWL' ? 'bg-blue-100 border-blue-300 text-blue-800 dark:bg-blue-900/30 dark:border-blue-700 dark:text-blue-300'
-                      : 'bg-green-100 border-green-300 text-green-800 dark:bg-green-900/30 dark:border-green-700 dark:text-green-300'
+                  key={fb.name}
+                  onClick={() => toggleFachbereich(fb.name)}
+                  className={`px-3 py-1.5 text-sm rounded-lg border transition-colors cursor-pointer ${
+                    aktiv
+                      ? 'text-white font-medium'
                       : 'bg-slate-50 border-slate-300 text-slate-500 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-400'
-                    }
-                  `}
+                  }`}
+                  style={aktiv ? { backgroundColor: fb.farbe + 'dd', borderColor: fb.farbe } : undefined}
                 >
-                  {fb}
+                  {fb.name}
                 </button>
               )
             })}
@@ -146,13 +171,19 @@ export default function ConfigTab({ pruefung, updatePruefung, toggleFachbereich 
 
           {pruefung.typ !== 'formativ' && (
           <Field label="Gesamtpunkte">
-            <input
-              type="number"
-              value={pruefung.gesamtpunkte}
-              onChange={(e) => updatePruefung({ gesamtpunkte: parseInt(e.target.value) || 0 })}
-              min={0}
-              className="input-field"
-            />
+            <div className="flex items-center gap-2">
+              <input
+                type="number"
+                value={berechnetePunkte ?? pruefung.gesamtpunkte}
+                onChange={(e) => updatePruefung({ gesamtpunkte: parseInt(e.target.value) || 0 })}
+                readOnly={berechnetePunkte !== undefined}
+                min={0}
+                className={`input-field ${berechnetePunkte !== undefined ? 'bg-slate-50 dark:bg-slate-700/50' : ''}`}
+              />
+              {berechnetePunkte !== undefined && (
+                <span className="text-[10px] text-slate-400 dark:text-slate-500 whitespace-nowrap">auto</span>
+              )}
+            </div>
           </Field>
           )}
         </div>

@@ -6,6 +6,50 @@
 
 ---
 
+## Session 80 — Admin-CRUD + LP-Profil Auto-Load + Fach/Punkte (10.04.2026)
+
+### Stand
+Branch `main`. tsc ✅ | 209 Tests ✅ | Build ✅.
+
+### Erledigte Arbeiten
+
+| # | Änderung | Dateien |
+|---|----------|---------|
+| **Kurse/Fächer/Fachschaften CRUD** | |
+| C1 | Admin-Tab komplett umgebaut: Kurse, Fächer, Fachschaften jetzt editierbar (hinzufügen/entfernen) | EinstellungenPanel.tsx |
+| C2 | InlineKursEditor: Name, Fach, Fachschaft-Dropdown, Gefäss-Dropdown, Klassen-Input | EinstellungenPanel.tsx |
+| C3 | InlineTextEditor: Generischer Kürzel+Name Editor für Fächer/Fachschaften | EinstellungenPanel.tsx |
+| C4 | Speichern sendet jetzt alle Stammdaten (inkl. Kurse, Fächer, Fachschaften) ans Backend | EinstellungenPanel.tsx |
+| **LP-Profil Auto-Load** | |
+| P1 | Stammdaten + LP-Profil werden beim LP-Login parallel geladen (Fire-and-forget) | LPStartseite.tsx |
+| P2 | Kein extra Klick auf Einstellungen nötig — Stammdaten sofort verfügbar | LPStartseite.tsx |
+| **Fach-Label + Gesamtpunkte** | |
+| F1 | "Fachbereiche" → "Fach" umbenannt im ConfigTab | ConfigTab.tsx |
+| F2 | Fach-Optionen dynamisch aus Stammdaten (statt hardcoded VWL/BWL/Recht) | ConfigTab.tsx |
+| F3 | Fach-Buttons mit Fachbereich-Farben aus Stammdaten (style-basiert) | ConfigTab.tsx |
+| F4 | Gesamtpunkte auto-berechnet aus Fragen-Summe (readonly + "auto" Label) | ConfigTab.tsx, PruefungsComposer.tsx |
+
+### Geänderte Dateien (4)
+- `src/components/settings/EinstellungenPanel.tsx` — CRUD für Kurse/Fächer/Fachschaften
+- `src/components/lp/LPStartseite.tsx` — Stammdaten + LP-Profil Auto-Load
+- `src/components/lp/vorbereitung/composer/ConfigTab.tsx` — Fach-Label + dynamische Optionen + Punkte-Auto
+- `src/components/lp/vorbereitung/PruefungsComposer.tsx` — berechnetePunkte Logik
+
+### Verifiziert
+- ✅ tsc -b grün
+- ✅ 209 Tests grün
+- ✅ Build erfolgreich
+- ⬜ Browser-Test: CRUD in Admin-Einstellungen
+- ⬜ Browser-Test: Fach-Buttons im ConfigTab mit Stammdaten-Farben
+- ⬜ Browser-Test: Gesamtpunkte auto-berechnet
+
+### Offen (Folge-Sessions)
+- LP-Favoriten (⭐-Button, Favoriten-Dropdown)
+- Store-Migration LPStartseite useState → lpNavigationStore
+- Stammdaten-Tab initial befüllen (manuelle Erstbefüllung via Admin-UI)
+
+---
+
 ## Session 79 — Excel-Import + Lernziele überall (10.04.2026)
 
 ### Stand

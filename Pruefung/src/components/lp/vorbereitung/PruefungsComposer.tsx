@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from 'react'
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react'
 import { useFocusTrap } from '../../../hooks/useFocusTrap.ts'
 import { useAuthStore } from '../../../store/authStore.ts'
 import { useSchulConfig } from '../../../store/schulConfigStore.ts'
@@ -166,6 +166,19 @@ export default function PruefungsComposer({ config, onZurueck, onDuplizieren }: 
   }, [pruefung])
 
   const gesamtFragen = pruefung.abschnitte.reduce((s, a) => s + a.fragenIds.length, 0)
+
+  // Gesamtpunkte aus Fragen berechnen (wenn Fragen vorhanden)
+  const berechnetePunkte = useMemo(() => {
+    if (gesamtFragen === 0) return undefined
+    let total = 0
+    for (const abschnitt of pruefung.abschnitte) {
+      for (const fid of abschnitt.fragenIds) {
+        const frage = fragenMap[fid]
+        if (frage) total += frage.punkte ?? 0
+      }
+    }
+    return total
+  }, [pruefung.abschnitte, fragenMap, gesamtFragen])
 
   function updatePruefung(partial: Partial<PruefungsConfig>): void {
     setPruefung((prev) => ({ ...prev, ...partial }))
@@ -413,7 +426,7 @@ export default function PruefungsComposer({ config, onZurueck, onDuplizieren }: 
       {/* Content */}
       <main className="p-6">
         {tab === 'config' && (
-          <ConfigTab pruefung={pruefung} updatePruefung={updatePruefung} toggleFachbereich={toggleFachbereich} />
+          <ConfigTab pruefung={pruefung} updatePruefung={updatePruefung} toggleFachbereich={toggleFachbereich} berechnetePunkte={berechnetePunkte} />
         )}
         {tab === 'abschnitte' && (
           <AbschnitteTab
