@@ -139,7 +139,7 @@ export default function AppShell({ children }: Props) {
           {/* Feedback-Button */}
           <FeedbackButton
             variant="icon"
-            context={{ rolle: user?.rolle === 'admin' ? 'lp' : 'sus', ort: 'uebungstool' }}
+            context={{ rolle: user?.rolle === 'admin' ? 'lp' : 'sus', ort: 'uebungstool', modus: 'ueben', bildschirm: 'dashboard' }}
           />
 
           {/* Theme-Toggle */}

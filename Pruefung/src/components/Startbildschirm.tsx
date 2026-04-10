@@ -137,7 +137,7 @@ export default function Startbildschirm({ config, fragen, alleFragen, wiederherg
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900 p-4 relative">
         <div className="absolute top-4 right-4 flex items-center gap-3">
-          <FeedbackButton variant="icon" context={{ rolle: 'sus', ort: 'warteraum' }} />
+          <FeedbackButton variant="icon" context={{ rolle: 'sus', ort: 'warteraum', modus: 'pruefen', bildschirm: 'warteraum' }} />
           <ThemeToggle />
           {user && (
             <button
@@ -205,7 +205,7 @@ export default function Startbildschirm({ config, fragen, alleFragen, wiederherg
     <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900 p-4 relative">
       {/* Feedback + Theme-Toggle + Abmelden oben rechts */}
       <div className="absolute top-4 right-4 flex items-center gap-3">
-        <FeedbackButton variant="icon" context={{ rolle: 'sus', ort: 'startbildschirm' }} />
+        <FeedbackButton variant="icon" context={{ rolle: 'sus', ort: 'startbildschirm', bildschirm: 'start' }} />
         <ThemeToggle />
         {user && (
           <button

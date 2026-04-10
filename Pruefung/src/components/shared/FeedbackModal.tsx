@@ -10,6 +10,11 @@ export interface FeedbackContext {
   frageId?: string
   frageText?: string
   zusatzinfo?: string
+  frageTyp?: string
+  modus?: 'pruefen' | 'ueben' | 'fragensammlung'
+  bildschirm?: string
+  appVersion?: string
+  gruppeId?: string
 }
 
 interface Props {
@@ -70,6 +75,11 @@ export default function FeedbackModal({ isOpen, onClose, context }: Props) {
       frageId: context.frageId || '',
       frageText: (context.frageText || '').replace(/<[^>]*>/g, '').substring(0, 200),
       zusatzinfo: context.zusatzinfo || '',
+      frageTyp: context.frageTyp || '',
+      modus: context.modus || '',
+      bildschirm: context.bildschirm || '',
+      appVersion: context.appVersion || (typeof __BUILD_TIMESTAMP__ === 'string' ? __BUILD_TIMESTAMP__ : ''),
+      gruppeId: context.gruppeId || '',
     })
 
     // Image-Ping — zuverlässigste Cross-Origin Methode

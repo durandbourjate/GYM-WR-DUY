@@ -250,6 +250,9 @@ export default function KorrekturFragenAnsicht({
               ort: 'korrektur-frage',
               frageId: aktiveFrage.id,
               frageText: fragetext,
+              frageTyp: aktiveFrage.typ,
+              modus: 'pruefen',
+              bildschirm: 'korrektur',
             }}
           />
         </div>

@@ -138,7 +138,7 @@ export default function LPHeader({ titel, untertitel, zurueck, statusText, aktio
           )}
           <FeedbackButton
             variant="icon"
-            context={{ rolle: 'lp', ort: 'lp-allgemein' }}
+            context={{ rolle: 'lp', ort: 'lp-allgemein', modus: 'pruefen', bildschirm: 'header' }}
           />
           <ThemeToggle />
           <Tooltip text="Von ExamLab abmelden" position="bottom">

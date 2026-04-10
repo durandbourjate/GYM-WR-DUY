@@ -104,7 +104,7 @@ export default function KorrekturEinsicht({ pruefungId, onZurueck }: Props) {
             )}
             <FeedbackButton
               variant="icon"
-              context={{ rolle: 'sus', ort: 'einsicht-allgemein', pruefungId }}
+              context={{ rolle: 'sus', ort: 'einsicht-allgemein', pruefungId, modus: 'pruefen', bildschirm: 'einsicht' }}
             />
             <ThemeToggle />
           </div>
@@ -224,6 +224,8 @@ function FrageKarte({ index, frage, bewertung, antwort }: FrageKarteProps) {
             ort: 'einsicht-frage',
             frageId: frage.id,
             frageText: frage.fragetext || frage.aufgabentext || frage.geschaeftsfall || '',
+            modus: 'pruefen',
+            bildschirm: 'einsicht-frage',
           }}
         />
       </div>
