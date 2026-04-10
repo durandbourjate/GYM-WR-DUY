@@ -304,9 +304,10 @@ function korrigiereHotspot(
 ): KorrekturErgebnis {
   const details: KorrekturDetail[] = []
   const getroffeneBereiche = new Set<string>()
+  const bereiche = frage.bereiche ?? []
 
   for (const klick of antwort.geklickt) {
-    for (const bereich of frage.bereiche) {
+    for (const bereich of bereiche) {
       if (getroffeneBereiche.has(bereich.id)) continue
       const k = bereich.koordinaten
       let treffer = false
@@ -322,7 +323,7 @@ function korrigiereHotspot(
     }
   }
 
-  for (const bereich of frage.bereiche) {
+  for (const bereich of bereiche) {
     const korrekt = getroffeneBereiche.has(bereich.id)
     details.push({
       bezeichnung: bereich.label,

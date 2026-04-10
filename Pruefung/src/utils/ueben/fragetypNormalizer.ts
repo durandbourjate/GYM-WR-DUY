@@ -26,21 +26,37 @@ export function normalisiereFrageDaten(frage: Frage): Frage {
 }
 
 function normalisiereTKonto(f: TKontoFrage): TKontoFrage {
-  // Konten-Definitionen sicherstellen
-  const konten = Array.isArray(f.konten) ? f.konten : []
+  // Konten-Definitionen sicherstellen — Backend kann "nr" statt "kontonummer" liefern
+  const rawKonten = Array.isArray(f.konten) ? f.konten : []
+  const konten = rawKonten.map(k => {
+    const raw = k as unknown as Record<string, unknown>
+    return {
+      ...k,
+      id: k.id || String(raw.nr || ''),
+      kontonummer: k.kontonummer || String(raw.nr || raw.name || ''),
+    }
+  })
 
-  // Kontenauswahl: Wenn leer → aus den definierten Konten selbst ableiten
+  // Kontenauswahl: Null/undefined-Einträge filtern, dann ggf. Fallback
   let kontenauswahl = f.kontenauswahl
-  if (!kontenauswahl || !Array.isArray(kontenauswahl.konten) || kontenauswahl.konten.length === 0) {
-    // Fallback: Alle definierten Konten als Auswahl-Optionen
-    const kontenListe = konten.map(k => k.kontonummer)
+  const vorhandeneKonten = kontenauswahl?.konten?.filter((k): k is string => k != null && k !== undefined) ?? []
+  if (!kontenauswahl || vorhandeneKonten.length === 0) {
+    // Fallback: Alle definierten Konten als Auswahl-Optionen (mit nr+name als Objekte)
+    const raw = rawKonten as unknown as Record<string, unknown>[]
+    const kontenObjekte = raw.map(k => ({
+      nr: String(k.nr || k.kontonummer || ''),
+      name: String(k.name || k.nr || k.kontonummer || ''),
+    })).filter(k => k.nr)
+    // kontenauswahl.konten ist string[], aber normalizeKonten akzeptiert auch Objekte
     kontenauswahl = {
       ...kontenauswahl,
-      konten: kontenListe,
+      konten: kontenObjekte as unknown as string[],
     }
-    if (kontenListe.length === 0) {
+    if (kontenObjekte.length === 0) {
       console.warn('[fragetypNormalizer] T-Konto ohne Konten-Definitionen:', f.id)
     }
+  } else {
+    kontenauswahl = { ...kontenauswahl, konten: vorhandeneKonten }
   }
 
   return {

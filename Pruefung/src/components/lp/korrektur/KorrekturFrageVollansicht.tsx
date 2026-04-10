@@ -424,7 +424,7 @@ function HotspotAnzeige({ frage, antwort }: { frage: HotspotFrage; antwort: Extr
         <div className="relative inline-block">
           <img src={frage.bildUrl} alt="Hotspot" className="max-w-full rounded" />
           {/* Korrekte Bereiche (gestrichelt) */}
-          {frage.bereiche.map((b) => (
+          {(frage.bereiche ?? []).map((b) => (
             <div key={b.id} className="absolute border-2 border-dashed border-green-500/60" style={
               b.form === 'kreis'
                 ? { left: `${b.koordinaten.x - (b.koordinaten.radius ?? 5)}%`, top: `${b.koordinaten.y - (b.koordinaten.radius ?? 5)}%`, width: `${(b.koordinaten.radius ?? 5) * 2}%`, height: `${(b.koordinaten.radius ?? 5) * 2}%`, borderRadius: '50%' }
