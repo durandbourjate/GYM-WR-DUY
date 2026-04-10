@@ -131,7 +131,7 @@ function AkkordeonSektion({
     <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
       <button
         onClick={onToggle}
-        className="w-full flex items-center justify-between px-5 py-4 text-left cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-750 transition-colors"
+        className="w-full flex items-center justify-between px-5 py-4 text-left cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
       >
         <div className="flex items-center gap-2">
           <h3 className="font-semibold text-slate-800 dark:text-slate-100">{titel}</h3>

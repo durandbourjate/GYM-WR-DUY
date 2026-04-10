@@ -29,15 +29,15 @@ const SCHWIERIGKEIT_LABELS: Record<number, string> = { 1: 'Einfach', 2: 'Mittel'
 const SCHWIERIGKEIT_STERNE: Record<number, string> = { 1: '⭐', 2: '⭐⭐', 3: '⭐⭐⭐' }
 
 const TYP_LABELS: Record<string, string> = {
-  mc: 'MC', multi: 'Multi', tf: 'R/F', fill: 'Lücken', calc: 'Berechnung',
+  mc: 'Multiple Choice', multi: 'Multi', tf: 'Richtig/Falsch', fill: 'Lückentext', calc: 'Berechnung',
   sort: 'Zuordnung', sortierung: 'Sortierung', zuordnung: 'Paare',
-  open: 'Freitext', formel: 'Formel', pdf: 'PDF',
-  buchungssatz: 'Buchungssatz', tkonto: 'T-Konto', bilanz: 'Bilanz', kontenbestimmung: 'Kontenb.',
-  hotspot: 'Hotspot', bildbeschriftung: 'Beschriftung', dragdrop_bild: 'DragDrop',
-  gruppe: 'Gruppe', zeichnen: 'Zeichnen', audio: 'Audio', code: 'Code',
-  richtigfalsch: 'R/F', lueckentext: 'Lücken', berechnung: 'Berechnung',
+  open: 'Freitext', formel: 'Formel', pdf: 'PDF-Annotation',
+  buchungssatz: 'Buchungssatz', tkonto: 'T-Konto', bilanz: 'Bilanz', kontenbestimmung: 'Kontenbestimmung',
+  hotspot: 'Hotspot', bildbeschriftung: 'Bildbeschriftung', dragdrop_bild: 'Drag & Drop',
+  gruppe: 'Aufgabengruppe', zeichnen: 'Zeichnen', audio: 'Audio', code: 'Code',
+  richtigfalsch: 'Richtig/Falsch', lueckentext: 'Lückentext', berechnung: 'Berechnung',
   freitext: 'Freitext', visualisierung: 'Zeichnen', bilanzstruktur: 'Bilanz',
-  aufgabengruppe: 'Gruppe',
+  aufgabengruppe: 'Aufgabengruppe',
 }
 
 interface ThemenInfo {
@@ -246,6 +246,7 @@ export default function Dashboard({ deepLinkZiel }: DashboardProps = {}) {
   }
 
   // Mix/Repetition
+  const hatFortschrittDaten = Object.keys(fortschritte).length > 0
   const [mixDialogOffen, setMixDialogOffen] = useState(false)
 
   const handleStarteMix = (quellen: ThemaQuelle[]) => {
@@ -353,8 +354,14 @@ export default function Dashboard({ deepLinkZiel }: DashboardProps = {}) {
               <span>🔀</span> Gemischte Übung
             </button>
             <button
-              onClick={handleStarteRepetition}
-              className="flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-medium text-slate-700 dark:text-slate-300 hover:border-slate-400 dark:hover:border-slate-500 hover:shadow-sm transition-all cursor-pointer"
+              onClick={hatFortschrittDaten ? handleStarteRepetition : undefined}
+              disabled={!hatFortschrittDaten}
+              title={hatFortschrittDaten ? 'Schwächen gezielt trainieren' : 'Löse zuerst Übungen, um Repetitionsdaten zu sammeln'}
+              className={`flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-medium transition-all ${
+                hatFortschrittDaten
+                  ? 'text-slate-700 dark:text-slate-300 hover:border-slate-400 dark:hover:border-slate-500 hover:shadow-sm cursor-pointer'
+                  : 'text-slate-400 dark:text-slate-500 opacity-60 cursor-not-allowed'
+              }`}
             >
               <span>🔄</span> Repetition
             </button>
@@ -679,6 +686,7 @@ function Chip({ label, count, aktiv, farbe, onClick }: {
   return (
     <button
       onClick={onClick}
+      title={label}
       className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border-2 transition-colors cursor-pointer select-none ${
         !aktiv ? 'text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-600' : ''
       }`}

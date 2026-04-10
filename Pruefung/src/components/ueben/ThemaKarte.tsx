@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import type { ThemenFortschritt } from '../../types/ueben/fortschritt'
 import type { ThemenStatus } from '../../types/ueben/themenSichtbarkeit'
 import { berechneSterne, sterneText } from '../../utils/ueben/gamification'
@@ -33,15 +34,24 @@ export function ThemaKarte({
   const farbe = getFachFarbe(fach, fachFarben)
   const istAktiv = themenStatus === 'aktiv'
   const istGesperrt = themenStatus === 'nicht_freigeschaltet'
+  const [zeigeGesperrtInfo, setZeigeGesperrtInfo] = useState(false)
+
+  const handleKlick = () => {
+    if (istGesperrt) {
+      setZeigeGesperrtInfo(true)
+      setTimeout(() => setZeigeGesperrtInfo(false), 3000)
+    } else {
+      onClick()
+    }
+  }
 
   return (
     <button
-      onClick={istGesperrt ? undefined : onClick}
-      disabled={istGesperrt}
-      className={`text-left p-4 rounded-xl border-2 transition-colors min-h-[48px] relative
+      onClick={handleKlick}
+      className={`text-left p-4 rounded-xl border-2 transition-colors min-h-[48px] relative cursor-pointer
         ${istGesperrt
-          ? 'opacity-50 cursor-not-allowed bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700'
-          : 'bg-white dark:bg-slate-800 hover:border-slate-400 dark:hover:border-slate-500 cursor-pointer'
+          ? 'opacity-60 bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 hover:opacity-75'
+          : 'bg-white dark:bg-slate-800 hover:border-slate-400 dark:hover:border-slate-500'
         }
         ${istAktiv
           ? 'border-l-4'
@@ -67,6 +77,13 @@ export function ThemaKarte({
         </span>
       )}
 
+      {/* Info-Hinweis bei Klick auf gesperrtes Thema */}
+      {zeigeGesperrtInfo && (
+        <div className="absolute inset-x-4 top-1/2 -translate-y-1/2 bg-slate-800 dark:bg-slate-200 text-white dark:text-slate-800 text-xs font-medium px-3 py-2 rounded-lg text-center z-10 shadow-lg">
+          Dieses Thema wird von der Lehrperson freigeschaltet
+        </div>
+      )}
+
       <div className="flex items-start justify-between gap-2 mb-2">
         <span className="font-semibold dark:text-white text-sm leading-tight">{thema}</span>
         {!istAktiv && !istGesperrt && (
@@ -77,7 +94,7 @@ export function ThemaKarte({
         <span>{anzahlFragen} Fragen</span>
         {anzahlUnterthemen > 0 && <span>{anzahlUnterthemen} Unterthemen</span>}
         {!istGesperrt && <span>{sterneText(berechneSterne(fortschritt.quote))}</span>}
-        {anzahlLernziele > 0 && onLernzieleKlick && !istGesperrt && (
+        {anzahlLernziele > 0 && onLernzieleKlick && (
           <span
             onClick={(e) => { e.stopPropagation(); onLernzieleKlick() }}
             className="cursor-pointer hover:opacity-80"

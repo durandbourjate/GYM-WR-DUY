@@ -105,13 +105,13 @@ export default function AbschnitteTab({ pruefung, fragenMap, fragenGeladen = tru
       {pruefung.abschnitte.map((abschnitt, aIndex) => (
         <div key={aIndex} className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
           <div className="flex items-center gap-3 px-5 py-3 bg-slate-50 dark:bg-slate-700/50 border-b border-slate-200 dark:border-slate-700">
-            <div className="flex gap-1">
+            <input type="text" value={abschnitt.titel} onChange={(e) => onUpdateAbschnitt(aIndex, { titel: e.target.value })} className="flex-1 font-semibold text-slate-800 dark:text-slate-100 bg-transparent border-none outline-none focus:ring-2 focus:ring-slate-400 rounded px-2 py-1" />
+            <span className="text-xs text-slate-500 dark:text-slate-400 shrink-0">{abschnitt.fragenIds.length} {abschnitt.fragenIds.length === 1 ? 'Frage' : 'Fragen'}</span>
+            <div className="flex gap-0.5 shrink-0">
               <button onClick={() => onMoveAbschnitt(aIndex, 'hoch')} disabled={aIndex === 0} className="w-7 h-7 text-xs text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600 rounded disabled:opacity-20 cursor-pointer disabled:cursor-not-allowed transition-colors" title="Nach oben">↑</button>
               <button onClick={() => onMoveAbschnitt(aIndex, 'runter')} disabled={aIndex === pruefung.abschnitte.length - 1} className="w-7 h-7 text-xs text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600 rounded disabled:opacity-20 cursor-pointer disabled:cursor-not-allowed transition-colors" title="Nach unten">↓</button>
+              <button onClick={() => onRemoveAbschnitt(aIndex)} className="w-7 h-7 text-xs text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 rounded cursor-pointer transition-colors" title="Abschnitt löschen">×</button>
             </div>
-            <input type="text" value={abschnitt.titel} onChange={(e) => onUpdateAbschnitt(aIndex, { titel: e.target.value })} className="flex-1 font-semibold text-slate-800 dark:text-slate-100 bg-transparent border-none outline-none focus:ring-2 focus:ring-slate-400 rounded px-2 py-1" />
-            <span className="text-xs text-slate-500 dark:text-slate-400">{abschnitt.fragenIds.length} {abschnitt.fragenIds.length === 1 ? 'Frage' : 'Fragen'}</span>
-            <button onClick={() => onRemoveAbschnitt(aIndex)} className="w-7 h-7 text-xs text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 rounded cursor-pointer transition-colors" title="Abschnitt löschen">×</button>
           </div>
           <div className="px-5 pt-3"><input type="text" value={abschnitt.beschreibung || ''} onChange={(e) => onUpdateAbschnitt(aIndex, { beschreibung: e.target.value || undefined })} placeholder="Optionale Beschreibung für die SuS..." className="w-full text-sm text-slate-600 dark:text-slate-300 bg-transparent border-none outline-none placeholder-slate-400 dark:placeholder-slate-500 focus:ring-2 focus:ring-slate-400 rounded px-2 py-1" /></div>
           <div className="px-5 py-3">

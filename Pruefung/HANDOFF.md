@@ -6,6 +6,60 @@
 
 ---
 
+## Session 76 — UX-Polish + Analyse-Verbesserungen (10.04.2026)
+
+### Stand
+Branch `feature/ux-polish-session5`. tsc ✅ | 209 Tests ✅ | Build ✅.
+
+### Erledigte Arbeiten
+
+| # | Änderung | Dateien |
+|---|----------|---------|
+| **Analyse-Tab (A1–A7 aus IMPROVEMENT_PLAN)** | |
+| A1 | Farbcode-Legende (grün=OK, amber=Warnung, rot=Überschreitung, blau=KI) | AnalyseTab.tsx |
+| A2 | Zeitbedarf-Balken pro Frage (Nummer, Anteil-Balken, Minutenzahl + Fragetyp) | AnalyseTab.tsx |
+| A3 | Frage-Nummern in Taxonomie-Balken eingeblendet (max. 8, dann …) | AnalyseTab.tsx, analyseUtils.ts |
+| A4 | Frage-Nummern unter Fragetypen-Mix-Karten ("Fr. 1, 3, 5") | AnalyseTab.tsx, analyseUtils.ts |
+| A5 | TYP_LABELS dedupliziert → nutzt `typLabel()` aus fachUtils.ts (alle 20 Typen) | analyseUtils.ts |
+| A6 | "Gesch. Zeit" → "Zeitbedarf" in MiniCard | AnalyseTab.tsx |
+| A7 | Themen-Normalisierung (Trim + erster Buchstabe gross) | analyseUtils.ts |
+| **Layout (C1)** | |
+| C1 | Abschnitt-Header: Pfeile (↑↓) + Löschen (×) einheitlich rechts | AbschnitteTab.tsx |
+| **CSS-Fixes (E1)** | |
+| E1 | Hover-Fix: `dark:hover:bg-slate-750` → `dark:hover:bg-slate-700` (gültige Tailwind-Klasse) | TrackerSection.tsx |
+| **SuS-Üben UX (F1–F5)** | |
+| F1 | `cursor-pointer` explizit auf EmpfehlungsKarte | EmpfehlungsKarte.tsx |
+| F2 | Repetition-Button disabled + Tooltip wenn keine Fortschrittsdaten | Dashboard.tsx |
+| F3 | Gesperrte Themen anklickbar: Klick zeigt Info-Overlay (3s) statt disabled | ThemaKarte.tsx |
+| F4 | Fragetyp-Abkürzungen → volle Namen (MC→Multiple Choice etc.) + title-Tooltips | Dashboard.tsx |
+| F5 | 🏁 Lernziele-Button auch bei gesperrten Themen sichtbar | ThemaKarte.tsx |
+| **Material-Sidebar (D1)** | |
+| D1 | Vollbild-Button im Split-Modus entfernt (Overlay→Split bleibt) | MaterialPanel.tsx |
+
+### Geänderte Dateien (9)
+- `src/utils/analyseUtils.ts` — TYP_LABELS entfernt → `typLabel()`, Interfaces erweitert (fragenNummern, frageNummer, label), Themen-Normalisierung
+- `src/components/lp/vorbereitung/composer/AnalyseTab.tsx` — Legende, Zeitbedarf pro Frage, Frage-Nrn in Taxonomie + Fragetypen
+- `src/components/lp/vorbereitung/composer/AbschnitteTab.tsx` — Abschnitt-Header Layout (Pfeile rechts)
+- `src/components/lp/TrackerSection.tsx` — CSS hover-Fix
+- `src/components/ueben/EmpfehlungsKarte.tsx` — cursor-pointer
+- `src/components/ueben/Dashboard.tsx` — Repetition disabled, TYP_LABELS volle Namen, Chip title
+- `src/components/ueben/ThemaKarte.tsx` — Gesperrte Themen anklickbar mit Info, Lernziele sichtbar
+- `src/components/MaterialPanel.tsx` — Vollbild-Button entfernt
+
+### Verifiziert
+- ✅ tsc -b grün (0 Errors)
+- ✅ 209 Tests grün
+- ✅ Build erfolgreich
+- ✅ App startet im Browser ohne Crashes
+- ✅ Abschnitt-Layout (C1) im Browser verifiziert
+
+### Offen (Folge-Sessions)
+- B2: Druckbare Ansicht (PDF-Export-ähnlich) in VorschauTab — eigene Session
+- F5 vollständig: Lernziele-Crosslinking in LP-Ansichten (Themensteuerung, Fragenbank)
+- Session 6 aus IMPROVEMENT_PLAN: Performance + Erweiterte Features
+
+---
+
 ## Session 75 — Einstellungen + Stammdaten + Hardcoded-Audit (10.04.2026)
 
 ### Stand

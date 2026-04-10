@@ -1,12 +1,14 @@
 import type { Frage, BloomStufe } from '../types/fragen.ts'
 import type { PruefungsConfig } from '../types/pruefung.ts'
 import { berechneZeitbedarf } from './zeitbedarf.ts'
+import { typLabel } from './fachUtils.ts'
 
 /** Taxonomie-Verteilung (K1-K6) */
 export interface TaxonomieVerteilung {
   stufe: BloomStufe
   anzahl: number
   prozent: number
+  fragenNummern: number[]
 }
 
 /** Fragetypen-Mix */
@@ -14,6 +16,7 @@ export interface FragetypMix {
   typ: string
   label: string
   anzahl: number
+  fragenNummern: number[]
 }
 
 /** Punkte pro Abschnitt */
@@ -41,6 +44,8 @@ export interface ZeitbedarfDetail {
   frageId: string
   typ: string
   minuten: number
+  frageNummer: number
+  label: string
 }
 
 /** Warnung */
@@ -66,15 +71,6 @@ export interface PruefungsAnalyse {
   warnungen: AnalyseWarnung[]
 }
 
-const TYP_LABELS: Record<string, string> = {
-  mc: 'Multiple Choice',
-  freitext: 'Freitext',
-  lueckentext: 'Lückentext',
-  zuordnung: 'Zuordnung',
-  richtigfalsch: 'Richtig/Falsch',
-  berechnung: 'Berechnung',
-  visualisierung: 'Visualisierung',
-}
 
 /** Berechnet die komplette lokale Analyse einer Prüfung */
 export function berechnePruefungsAnalyse(
@@ -85,20 +81,34 @@ export function berechnePruefungsAnalyse(
   const fragenIds = pruefung.abschnitte.flatMap((a) => a.fragenIds)
   const fragen = fragenIds.map((id) => fragenMap[id]).filter(Boolean)
 
-  // Taxonomie
+  // Taxonomie (mit Frage-Nummern)
   const bloomCounts: Record<BloomStufe, number> = { K1: 0, K2: 0, K3: 0, K4: 0, K5: 0, K6: 0 }
-  for (const f of fragen) { if (f.bloom && bloomCounts[f.bloom] !== undefined) bloomCounts[f.bloom]++ }
+  const bloomFragen: Record<BloomStufe, number[]> = { K1: [], K2: [], K3: [], K4: [], K5: [], K6: [] }
+  for (let i = 0; i < fragen.length; i++) {
+    const f = fragen[i]
+    if (f.bloom && bloomCounts[f.bloom] !== undefined) {
+      bloomCounts[f.bloom]++
+      bloomFragen[f.bloom].push(i + 1)
+    }
+  }
   const taxonomie: TaxonomieVerteilung[] = (['K1', 'K2', 'K3', 'K4', 'K5', 'K6'] as BloomStufe[]).map((stufe) => ({
     stufe,
     anzahl: bloomCounts[stufe],
     prozent: fragen.length > 0 ? Math.round((bloomCounts[stufe] / fragen.length) * 100) : 0,
+    fragenNummern: bloomFragen[stufe],
   }))
 
-  // Fragetypen
+  // Fragetypen (mit Frage-Nummern)
   const typCounts: Record<string, number> = {}
-  for (const f of fragen) typCounts[f.typ] = (typCounts[f.typ] || 0) + 1
+  const typFragen: Record<string, number[]> = {}
+  for (let i = 0; i < fragen.length; i++) {
+    const typ = fragen[i].typ
+    typCounts[typ] = (typCounts[typ] || 0) + 1
+    if (!typFragen[typ]) typFragen[typ] = []
+    typFragen[typ].push(i + 1)
+  }
   const fragetypen: FragetypMix[] = Object.entries(typCounts)
-    .map(([typ, anzahl]) => ({ typ, label: TYP_LABELS[typ] ?? typ, anzahl }))
+    .map(([typ, anzahl]) => ({ typ, label: typLabel(typ), anzahl, fragenNummern: typFragen[typ] || [] }))
     .sort((a, b) => b.anzahl - a.anzahl)
 
   // Punkte pro Abschnitt
@@ -112,10 +122,11 @@ export function berechnePruefungsAnalyse(
     }
   })
 
-  // Themen
+  // Themen (normalisiert: Trim + erster Buchstabe gross)
   const themenMap: Record<string, number> = {}
   for (const f of fragen) {
-    const t = f.thema || '(Kein Thema)'
+    const raw = (f.thema || '').trim()
+    const t = raw ? raw.charAt(0).toUpperCase() + raw.slice(1) : '(Kein Thema)'
     themenMap[t] = (themenMap[t] || 0) + 1
   }
   const themen: ThemaAbdeckung[] = Object.entries(themenMap)
@@ -131,14 +142,14 @@ export function berechnePruefungsAnalyse(
     konfiguriert: pruefung.fachbereiche.includes(fb),
   }))
 
-  // Zeitbedarf
-  const zeitbedarfDetails: ZeitbedarfDetail[] = fragen.map((f) => {
+  // Zeitbedarf (mit Frage-Nummer und Label)
+  const zeitbedarfDetails: ZeitbedarfDetail[] = fragen.map((f, i) => {
     const minuten = f.zeitbedarf ?? berechneZeitbedarf(
       f.typ as 'mc' | 'freitext' | 'lueckentext' | 'zuordnung' | 'richtigfalsch' | 'berechnung' | 'visualisierung',
       f.bloom || 'K2',
       f.typ === 'freitext' && 'laenge' in f ? { laenge: (f as { laenge: 'kurz' | 'mittel' | 'lang' }).laenge } : undefined,
     )
-    return { frageId: f.id, typ: f.typ, minuten }
+    return { frageId: f.id, typ: f.typ, minuten, frageNummer: i + 1, label: typLabel(f.typ) }
   })
   const zeitbedarfSumme = zeitbedarfDetails.reduce((s, z) => s + z.minuten, 0)
   const zeitbedarfProzent = pruefung.dauerMinuten > 0
@@ -168,7 +179,7 @@ export function berechnePruefungsAnalyse(
 
   const verwendeteTypen = Object.keys(typCounts).length
   if (verwendeteTypen === 1 && fragen.length >= 3) {
-    warnungen.push({ text: `Nur ein Fragetyp (${TYP_LABELS[Object.keys(typCounts)[0]] ?? Object.keys(typCounts)[0]}) verwendet`, schwere: 'info' })
+    warnungen.push({ text: `Nur ein Fragetyp (${typLabel(Object.keys(typCounts)[0])}) verwendet`, schwere: 'info' })
   }
 
   for (const fb of fachbereiche) {

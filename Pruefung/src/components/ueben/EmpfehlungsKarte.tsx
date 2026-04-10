@@ -35,7 +35,7 @@ export function EmpfehlungsKarte({ empfehlung, fachFarben, onStarte }: Empfehlun
   return (
     <button
       onClick={onStarte}
-      className={`w-full text-left p-4 rounded-xl shadow-sm border min-h-[48px] transition-shadow hover:shadow-md
+      className={`w-full text-left p-4 rounded-xl shadow-sm border min-h-[48px] transition-shadow hover:shadow-md cursor-pointer
         ${config.bgLight} ${config.bgDark} ${config.borderLight} ${config.borderDark}
       `}
     >

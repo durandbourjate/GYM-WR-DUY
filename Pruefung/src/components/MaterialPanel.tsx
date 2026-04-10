@@ -79,17 +79,6 @@ export default function MaterialPanel({ materialien, modus, onSchliessen, onModu
             Material
           </h2>
           <div className="flex items-center gap-1">
-            {/* Vollbild-Button */}
-            <button
-              onClick={() => onModusWechsel('overlay')}
-              className="w-7 h-7 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-md transition-colors cursor-pointer"
-            >
-              <Tooltip text="Vollbild">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5v-4m0 4h-4m4 0l-5-5" />
-                </svg>
-              </Tooltip>
-            </button>
             {/* Schliessen-Button */}
             <button
               onClick={onSchliessen}

@@ -107,7 +107,7 @@ export default function AnalyseTab({ pruefung, fragenMap, fragenGeladen }: Props
         <MiniCard label="Fragen" wert={String(analyse.gesamtFragen)} />
         <MiniCard label="Punkte" wert={String(analyse.gesamtPunkte)} />
         <MiniCard label="Dauer" wert={`${analyse.dauerMinuten} Min.`} />
-        <MiniCard label="Gesch. Zeit" wert={`${analyse.zeitbedarfSumme} Min.`} />
+        <MiniCard label="Zeitbedarf" wert={`${analyse.zeitbedarfSumme} Min.`} />
       </div>
 
       {/* Warnungen */}
@@ -119,37 +119,68 @@ export default function AnalyseTab({ pruefung, fragenMap, fragenGeladen }: Props
         </div>
       )}
 
-      {/* Zeitbedarf */}
+      {/* Farbcode-Legende */}
+      <div className="flex flex-wrap gap-x-4 gap-y-1 text-[10px] text-slate-500 dark:text-slate-400">
+        <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-green-500 inline-block" /> OK</span>
+        <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block" /> Warnung</span>
+        <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-red-500 inline-block" /> Überschreitung</span>
+        <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-blue-500 inline-block" /> KI-Hinweis</span>
+      </div>
+
+      {/* Zeitbedarf — Gesamtbalken + pro Frage */}
       <Section titel="Zeitbedarf">
-        <div className="space-y-3">
-          <div className="flex items-center gap-3">
-            <div className="flex-1 bg-slate-200 dark:bg-slate-600 rounded-full h-4 overflow-hidden">
-              <div
-                className={`h-full rounded-full transition-all ${
-                  analyse.zeitbedarfProzent <= 100
-                    ? 'bg-green-500 dark:bg-green-400'
-                    : analyse.zeitbedarfProzent <= 120
-                      ? 'bg-amber-500 dark:bg-amber-400'
-                      : 'bg-red-500 dark:bg-red-400'
-                }`}
-                style={{ width: `${Math.min(analyse.zeitbedarfProzent, 100)}%` }}
-              />
+        <div className="space-y-4">
+          {/* Gesamtbalken */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-3">
+              <div className="flex-1 bg-slate-200 dark:bg-slate-600 rounded-full h-4 overflow-hidden">
+                <div
+                  className={`h-full rounded-full transition-all ${
+                    analyse.zeitbedarfProzent <= 100
+                      ? 'bg-green-500 dark:bg-green-400'
+                      : analyse.zeitbedarfProzent <= 120
+                        ? 'bg-amber-500 dark:bg-amber-400'
+                        : 'bg-red-500 dark:bg-red-400'
+                  }`}
+                  style={{ width: `${Math.min(analyse.zeitbedarfProzent, 100)}%` }}
+                />
+              </div>
+              <span className="text-sm font-medium text-slate-700 dark:text-slate-200 whitespace-nowrap">
+                {analyse.zeitbedarfSumme}/{analyse.dauerMinuten} Min.
+              </span>
             </div>
-            <span className="text-sm font-medium text-slate-700 dark:text-slate-200 whitespace-nowrap">
-              {analyse.zeitbedarfSumme}/{analyse.dauerMinuten} Min.
-            </span>
+            <p className={`text-xs ${
+              analyse.zeitbedarfProzent >= 80 && analyse.zeitbedarfProzent <= 100
+                ? 'text-green-600 dark:text-green-400'
+                : 'text-amber-600 dark:text-amber-400'
+            }`}>
+              {analyse.zeitbedarfProzent >= 80 && analyse.zeitbedarfProzent <= 100
+                ? 'Zeitbedarf passt zur Prüfungsdauer'
+                : analyse.zeitbedarfProzent > 100
+                  ? 'Zeitbedarf übersteigt die Prüfungsdauer'
+                  : 'Zeitbedarf liegt unter der Prüfungsdauer — Puffer vorhanden'}
+            </p>
           </div>
-          <p className={`text-xs ${
-            analyse.zeitbedarfProzent >= 80 && analyse.zeitbedarfProzent <= 100
-              ? 'text-green-600 dark:text-green-400'
-              : 'text-amber-600 dark:text-amber-400'
-          }`}>
-            {analyse.zeitbedarfProzent >= 80 && analyse.zeitbedarfProzent <= 100
-              ? 'Zeitbedarf passt zur Prüfungsdauer'
-              : analyse.zeitbedarfProzent > 100
-                ? 'Zeitbedarf übersteigt die Prüfungsdauer'
-                : 'Zeitbedarf liegt unter der Prüfungsdauer — Puffer vorhanden'}
-          </p>
+          {/* Pro Frage */}
+          <div className="space-y-1">
+            {analyse.zeitbedarfDetails.map((z) => {
+              const anteil = analyse.dauerMinuten > 0 ? (z.minuten / analyse.dauerMinuten) * 100 : 0
+              return (
+                <div key={z.frageId} className="flex items-center gap-2">
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400 w-5 text-right tabular-nums shrink-0">{z.frageNummer}.</span>
+                  <div className="flex-1 bg-slate-100 dark:bg-slate-700 rounded h-3 overflow-hidden">
+                    <div
+                      className="h-full bg-slate-400 dark:bg-slate-400 rounded transition-all"
+                      style={{ width: `${Math.min(anteil, 100)}%` }}
+                    />
+                  </div>
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400 w-20 text-right shrink-0">
+                    {z.minuten} Min. · {z.label}
+                  </span>
+                </div>
+              )
+            })}
+          </div>
         </div>
       </Section>
 
@@ -159,11 +190,16 @@ export default function AnalyseTab({ pruefung, fragenMap, fragenGeladen }: Props
           {analyse.taxonomie.map((t) => (
             <div key={t.stufe} className="flex items-center gap-3">
               <span className="text-xs font-medium text-slate-600 dark:text-slate-300 w-6">{t.stufe}</span>
-              <div className="flex-1 bg-slate-200 dark:bg-slate-600 rounded h-5 overflow-hidden">
+              <div className="flex-1 bg-slate-200 dark:bg-slate-600 rounded h-5 overflow-hidden relative">
                 <div
                   className="h-full bg-slate-600 dark:bg-slate-300 rounded transition-all"
                   style={{ width: `${t.prozent}%` }}
                 />
+                {t.fragenNummern.length > 0 && (
+                  <span className="absolute inset-0 flex items-center px-2 text-[10px] text-white dark:text-slate-800 font-medium truncate pointer-events-none">
+                    {t.fragenNummern.length <= 8 ? t.fragenNummern.join(', ') : `${t.fragenNummern.slice(0, 7).join(', ')}…`}
+                  </span>
+                )}
               </div>
               <span className="text-xs text-slate-500 dark:text-slate-400 w-16 text-right">
                 {t.anzahl} ({t.prozent}%)
@@ -177,9 +213,12 @@ export default function AnalyseTab({ pruefung, fragenMap, fragenGeladen }: Props
       <Section titel="Fragetypen-Mix">
         <div className="flex flex-wrap gap-3">
           {analyse.fragetypen.map((ft) => (
-            <div key={ft.typ} className="px-3 py-2 bg-slate-50 dark:bg-slate-700/50 rounded-lg text-center">
+            <div key={ft.typ} className="px-3 py-2 bg-slate-50 dark:bg-slate-700/50 rounded-lg text-center min-w-[80px]">
               <div className="text-lg font-semibold text-slate-800 dark:text-slate-100">{ft.anzahl}</div>
               <div className="text-xs text-slate-500 dark:text-slate-400">{ft.label}</div>
+              <div className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">
+                Fr. {ft.fragenNummern.join(', ')}
+              </div>
             </div>
           ))}
         </div>
