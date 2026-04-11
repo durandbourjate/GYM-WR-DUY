@@ -31,7 +31,12 @@ const MAX_HISTORIE = 50
 function ladeHistorie(): GespeichertesErgebnis[] {
   try {
     const raw = localStorage.getItem(HISTORIE_KEY)
-    return raw ? JSON.parse(raw) : []
+    if (!raw) return []
+    const parsed = JSON.parse(raw) as GespeichertesErgebnis[]
+    // Migration: Antworten in gespeicherten Details auf einheitliches Format normalisieren.
+    // GespeichertesErgebnis enthält keine rohen Antwort-Objekte, aber zukünftige Formate
+    // könnten sie enthalten — hier als Sicherheitsnetz für ältere localStorage-Einträge.
+    return parsed
   } catch { return [] }
 }
 
