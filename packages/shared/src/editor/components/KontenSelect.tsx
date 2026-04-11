@@ -59,12 +59,16 @@ export default function KontenSelect({
   const farbenAktiv = zeigeKategoriefarben ?? safeConfig.zeigeKategoriefarben ?? true
 
   // Eingeschränkt nur wenn tatsächlich Konten definiert sind, sonst Fallback auf Voll-Modus
-  if (safeConfig.modus === 'eingeschraenkt' && safeConfig.konten && safeConfig.konten.length > 0) {
+  // Konten normalisieren: Backend kann {nr, name} Objekte statt Strings liefern
+  const safeKontenList = (safeConfig.konten || []).map(k =>
+    typeof k === 'string' ? k : (k as Record<string, unknown>)?.nr ? String((k as Record<string, unknown>).nr) : String(k)
+  )
+  if (safeConfig.modus === 'eingeschraenkt' && safeKontenList.length > 0) {
     return (
       <EingeschraenktSelect
         value={value}
         onChange={onChange}
-        konten={safeConfig.konten}
+        konten={safeKontenList}
         placeholder={placeholder}
         disabled={disabled}
         className={className}

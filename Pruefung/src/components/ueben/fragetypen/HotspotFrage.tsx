@@ -64,8 +64,13 @@ export default function HotspotFrage({ frage, onAntwort, disabled, feedbackSicht
                 let markerClass = 'bg-slate-600 border-white'
                 if (feedbackSichtbar) {
                   const istKorrekt = bereiche.some((bereich) => {
-                    const radius = bereich.koordinaten.radius || 5
-                    return Math.hypot(bereich.koordinaten.x - k.x, bereich.koordinaten.y - k.y) < radius
+                    const bk = bereich.koordinaten
+                    // Rechteck-basierter Hit-Test (breite/hoehe) oder Radius-Fallback
+                    if (bk.breite && bk.hoehe) {
+                      return k.x >= bk.x && k.x <= bk.x + bk.breite && k.y >= bk.y && k.y <= bk.y + bk.hoehe
+                    }
+                    const radius = bk.radius || 5
+                    return Math.hypot(bk.x - k.x, bk.y - k.y) < radius
                   })
                   markerClass = istKorrekt ? 'bg-green-500 border-white' : 'bg-red-500 border-white'
                 }

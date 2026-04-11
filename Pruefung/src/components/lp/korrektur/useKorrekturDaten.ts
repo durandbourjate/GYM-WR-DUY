@@ -137,9 +137,9 @@ export function useKorrekturDaten({ pruefungId, userEmail, queueSave, updateKorr
           pruefungTitel: pruefungResult?.config?.titel || pruefungId,
           datum: pruefungResult?.config?.datum || '',
           klasse: pruefungResult?.config?.klasse || '',
-          schueler: Object.values(abgabenResult).map((abgabe) => ({
+          schueler: Object.values(abgabenResult).filter((abgabe) => abgabe && typeof abgabe === 'object' && abgabe.email).map((abgabe) => ({
             email: abgabe.email,
-            name: abgabe.name,
+            name: abgabe.name || abgabe.email,
             klasse: '',
             bewertungen: Object.fromEntries(
               (pruefungResult?.fragen || []).map((f) => [f.id, {
