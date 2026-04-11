@@ -141,7 +141,13 @@ export default function LPHeader({ titel, untertitel, zurueck, statusText, aktio
           )}
           <FeedbackButton
             variant="icon"
-            context={{ rolle: 'lp', ort: 'lp-allgemein', modus: 'pruefen', bildschirm: 'header' }}
+            context={{
+              rolle: 'lp',
+              ort: `lp-${useLPNavigationStore.getState().modus}`,
+              modus: useLPNavigationStore.getState().modus === 'uebung' ? 'ueben' : useLPNavigationStore.getState().modus === 'fragensammlung' ? 'fragensammlung' : 'pruefen',
+              bildschirm: useLPNavigationStore.getState().ansicht === 'composer' ? 'composer' : 'dashboard',
+              appVersion: typeof __BUILD_TIMESTAMP__ !== 'undefined' ? __BUILD_TIMESTAMP__ : 'dev',
+            }}
           />
           <ThemeToggle />
           <Tooltip text="Von ExamLab abmelden" position="bottom">

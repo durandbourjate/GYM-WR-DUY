@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, lazy, Suspense } from 'react'
 import { useAuthStore } from '../../store/authStore.ts'
 import { useFragenbankStore } from '../../store/fragenbankStore.ts'
 import { useStammdatenStore } from '../../store/stammdatenStore.ts'
@@ -11,9 +11,6 @@ import { getFachFarbe } from '../../utils/ueben/fachFarben.ts'
 import { bestimmePruefungsStatus, statusLabel, statusFarbe, korrekturLabel, erstelleDemoTrackerDaten } from '../../utils/trackerUtils.ts'
 import LPHeader from './LPHeader.tsx'
 import LPSkeleton from './LPSkeleton.tsx'
-import PruefungsComposer, { leereUebung } from './vorbereitung/PruefungsComposer.tsx'
-import FragenBrowser from './fragenbank/FragenBrowser.tsx'
-import HilfeSeite from './HilfeSeite.tsx'
 import UebungsToolView from './UebungsToolView.tsx'
 import TrackerSection from './TrackerSection.tsx'
 import { einrichtungsPruefung } from '../../data/einrichtungsPruefung.ts'
@@ -21,8 +18,15 @@ import { einrichtungsFragen } from '../../data/einrichtungsFragen.ts'
 import { einrichtungsUebung } from '../../data/einrichtungsUebung.ts'
 import { einrichtungsUebungFragen } from '../../data/einrichtungsUebungFragen.ts'
 import { speichereConfig, speichereFrage } from '../../services/fragenbankApi.ts'
-import EinstellungenPanel from '../settings/EinstellungenPanel.tsx'
-import AnalyseDashboard from './ueben/AnalyseDashboard.tsx'
+
+import { leereUebung } from './vorbereitung/configVorlagen'
+
+// Lazy-loaded Komponenten: Werden erst bei Bedarf geladen (spart ~400KB beim Initial Load)
+const PruefungsComposer = lazy(() => import('./vorbereitung/PruefungsComposer.tsx'))
+const FragenBrowser = lazy(() => import('./fragenbank/FragenBrowser.tsx'))
+const HilfeSeite = lazy(() => import('./HilfeSeite.tsx'))
+const EinstellungenPanel = lazy(() => import('../settings/EinstellungenPanel.tsx'))
+const AnalyseDashboard = lazy(() => import('./ueben/AnalyseDashboard.tsx'))
 
 /** Startseite für Lehrpersonen: Prüfungen verwalten + erstellen */
 export default function LPStartseite() {
@@ -245,13 +249,10 @@ export default function LPStartseite() {
         })
       })
 
-      // Configs, Tracker-Daten und Fragenbank parallel laden
-      const fragenbankLade = useFragenbankStore.getState().lade(user.email)
-      const [configResult, trackerResult] = await Promise.all([
-        apiService.ladeAlleConfigs(user.email),
-        apiService.ladeTrackerDaten(user.email),
-        fragenbankLade,
-      ])
+      // Configs + Fragenbank-Summaries parallel laden (schnell ~3-5s)
+      // TrackerDaten separat im Hintergrund (langsam ~6-8s, blockiert UI nicht)
+      useFragenbankStore.getState().lade(user.email)
+      const configResult = await apiService.ladeAlleConfigs(user.email)
 
       if (configResult) {
         setConfigs(configResult)
@@ -276,24 +277,13 @@ export default function LPStartseite() {
         setBackendFehler(true)
       }
 
-      if (trackerResult) {
-        setTrackerDaten(trackerResult)
-      }
-
+      // Dashboard sofort interaktiv zeigen (Tracker lädt im Hintergrund)
       setLadeStatus("fertig")
 
-      // Hintergrund-Prefetch für Fragenbank-Details
-      const schedulePrefetch = () => {
-        const fbState = useFragenbankStore.getState()
-        if (fbState.status === 'summary_fertig') {
-          fbState.ladeAlleDetails(user.email)
-        }
-      }
-      if ('requestIdleCallback' in window) {
-        (window as any).requestIdleCallback(schedulePrefetch)
-      } else {
-        setTimeout(schedulePrefetch, 2000)
-      }
+      // TrackerDaten im Hintergrund nachladen (non-blocking, ~6-8s)
+      apiService.ladeTrackerDaten(user.email).then(trackerResult => {
+        if (trackerResult) setTrackerDaten(trackerResult)
+      }).catch(err => console.warn('[LP] Tracker-Laden fehlgeschlagen:', err))
     }
     lade()
   }, [user, istDemoModus])
@@ -422,7 +412,9 @@ export default function LPStartseite() {
       )}
 
       {ansicht === 'composer' && (
-        <PruefungsComposer key={composerKey} config={editConfig} onZurueck={handleZurueck} onDuplizieren={handleDuplizieren} />
+        <Suspense fallback={<LazyFallback />}>
+          <PruefungsComposer key={composerKey} config={editConfig} onZurueck={handleZurueck} onDuplizieren={handleDuplizieren} />
+        </Suspense>
       )}
 
       {/* Dashboard-Inhalte — nur wenn nicht im Composer */}
@@ -592,7 +584,7 @@ export default function LPStartseite() {
             </main>
           )}
 
-          {uebungsTab === 'analyse' && <AnalyseDashboard />}
+          {uebungsTab === 'analyse' && <Suspense fallback={<LazyFallback />}><AnalyseDashboard /></Suspense>}
         </>
       )}
 
@@ -859,25 +851,30 @@ export default function LPStartseite() {
       {/* Fragensammlung als Vollseiteninhalt */}
       {ansicht !== 'composer' && modus === 'fragensammlung' && (
         <main className="p-6">
-          <FragenBrowser
-            inline
-            onHinzufuegen={() => {}}
-            onSchliessen={() => useLPNavigationStore.getState().zurueck()}
-            bereitsVerwendet={[]}
-            initialEditFrageId={deepLinkFrageId ?? undefined}
-            onFrageAktualisiert={() => { clearDeepLinkFrageId() }}
-          />
+          <Suspense fallback={<LazyFallback />}>
+            <FragenBrowser
+              inline
+              onHinzufuegen={() => {}}
+              onSchliessen={() => useLPNavigationStore.getState().zurueck()}
+              bereitsVerwendet={[]}
+              initialEditFrageId={deepLinkFrageId ?? undefined}
+              onFrageAktualisiert={() => { clearDeepLinkFrageId() }}
+            />
+          </Suspense>
         </main>
       )}
 
       {/* Hilfe Overlay (alle Modi) */}
       {zeigHilfe && (
-        <HilfeSeite onSchliessen={toggleHilfe} />
+        <Suspense fallback={<LazyFallback />}>
+          <HilfeSeite onSchliessen={toggleHilfe} />
+        </Suspense>
       )}
 
       {/* Einstellungen Panel */}
       {zeigEinstellungen && (
-        <EinstellungenPanel
+        <Suspense fallback={<LazyFallback />}>
+          <EinstellungenPanel
           initialTab={useLPNavigationStore.getState().einstellungenTab ?? undefined}
           onSchliessen={() => {
             setZeigEinstellungen(false)
@@ -885,7 +882,17 @@ export default function LPStartseite() {
             setTimeout(() => useLPNavigationStore.getState().aktualisiereHash(), 0)
           }}
         />
+        </Suspense>
       )}
+    </div>
+  )
+}
+
+/** Fallback-Spinner für lazy-geladene Komponenten */
+function LazyFallback() {
+  return (
+    <div className="flex items-center justify-center py-12">
+      <div className="animate-spin h-6 w-6 border-2 border-slate-300 dark:border-slate-600 border-t-blue-500 rounded-full" />
     </div>
   )
 }

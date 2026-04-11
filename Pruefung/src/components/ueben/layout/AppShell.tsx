@@ -175,7 +175,14 @@ export default function AppShell({ children, onExamLabHome, onModusWechsel }: Pr
           {/* Feedback-Button */}
           <FeedbackButton
             variant="icon"
-            context={{ rolle: user?.rolle === 'admin' ? 'lp' : 'sus', ort: 'uebungstool', modus: 'ueben', bildschirm: 'dashboard' }}
+            context={{
+              rolle: user?.rolle === 'admin' ? 'lp' : 'sus',
+              ort: 'uebungstool',
+              modus: 'ueben',
+              bildschirm: aktuellerScreen,
+              gruppeId: aktiveGruppe?.id,
+              appVersion: typeof __BUILD_TIMESTAMP__ !== 'undefined' ? __BUILD_TIMESTAMP__ : 'dev',
+            }}
           />
 
           {/* Theme-Toggle */}

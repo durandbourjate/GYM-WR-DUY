@@ -6,7 +6,7 @@
 
 ---
 
-## Session 90 — Deep Links + Fachkürzel (11.04.2026)
+## Session 90 — Deep Links + Fachkürzel + Performance S6 (11.04.2026)
 
 ### Stand
 Branch `feature/deep-links-fachkuerzel`. tsc ✅ | 209 Tests ✅ | Build ✅.
@@ -66,12 +66,43 @@ Branch `feature/deep-links-fachkuerzel`. tsc ✅ | 209 Tests ✅ | Build ✅.
 - `Pruefung/src/types/stammdaten.ts` — 37 Fächer, 16 Fachschaften, FACHKUERZEL_MAP, LP_KUERZEL_MAP
 - `Pruefung/src/utils/fachUtils.ts` — FACHSCHAFT_ZU_FACH Abwärtskompatibilität (alte + neue Kürzel)
 
+### Performance-Optimierungen (IMPROVEMENT_PLAN S6A–C)
+
+| # | Änderung | Dateien |
+|---|----------|---------|
+| **S6A: Performance LP-Laden** | |
+| P1 | **TrackerDaten non-blocking:** Aus Promise.all raus, lädt im Hintergrund (~6-8s schneller) | LPStartseite.tsx |
+| P2 | **React.lazy für 5 Komponenten:** PruefungsComposer (153KB), FragenBrowser, HilfeSeite, EinstellungenPanel (24KB), AnalyseDashboard (11KB) | LPStartseite.tsx |
+| P3 | **configVorlagen extrahiert:** leereUebung/leerePruefung in eigene Datei (Tree-Shaking für PruefungsComposer) | configVorlagen.ts (NEU), PruefungsComposer.tsx |
+| P4 | **Bundle-Reduktion:** App-Chunk 1629KB → 1477KB (-153KB), PruefungsComposer als eigener Chunk | — |
+| **S6B: SuS-Skeleton** | |
+| P5 | **Login-Bridge Skeleton:** Header + Spinner statt leerer Text ("Verbinde...") | SuSStartseite.tsx |
+| **S6C: Problem-Melden Kontext** | |
+| P6 | **LP-Header:** Dynamischer Kontext aus NavigationStore (modus, ansicht, appVersion) | LPHeader.tsx |
+| P7 | **Üben-AppShell:** Screen-Name + gruppeId + appVersion automatisch mitschicken | AppShell.tsx |
+
+### Erwartete Ladezeit-Verbesserung
+- **Vorher:** ~25s bis Dashboard interaktiv (TrackerDaten + Summaries + Configs blockierend)
+- **Nachher:** ~3-5s bis Dashboard interaktiv (nur Configs blockiert, Tracker + Details im Hintergrund)
+- Tracker-Badges erscheinen nachträglich (progressive enhancement)
+
+### Geänderte Dateien (9)
+- `Pruefung/src/store/lpNavigationStore.ts` — Deep Links
+- `Pruefung/src/components/lp/LPStartseite.tsx` — Lazy imports, non-blocking Tracker, Deep Links
+- `Pruefung/src/components/lp/LPHeader.tsx` — FeedbackButton dynamischer Kontext
+- `Pruefung/src/components/lp/vorbereitung/PruefungsComposer.tsx` — configVorlagen-Import
+- `Pruefung/src/components/lp/vorbereitung/configVorlagen.ts` — NEU: Extrahierte Vorlagen
+- `Pruefung/src/components/settings/EinstellungenPanel.tsx` — initialTab-Prop
+- `Pruefung/src/components/sus/SuSStartseite.tsx` — Login-Bridge Skeleton
+- `Pruefung/src/components/ueben/layout/AppShell.tsx` — FeedbackButton Kontext
+- `Pruefung/src/types/stammdaten.ts` — Fachkürzel + FACHKUERZEL_MAP
+- `Pruefung/src/utils/fachUtils.ts` — Abwärtskompatible Kürzel
+
 ### Noch offen
-- Browser-Test: Deep Links im Browser verifizieren (Hash-Navigation)
-- Browser-Test: Fachkürzel in Einstellungen-Panel sichtbar
+- Browser-Test: Deep Links, Performance, Fachkürzel im Browser verifizieren
 - Apps Script: Kein Deploy nötig (nur Frontend-Änderungen)
-- Performance S6A: LP-Laden noch ~25s — eigene Session
 - Excel-Import S6D: Session 79 teilweise, Feinschliff offen
+- Prefetching S6E: requestIdleCallback für Detail-Prefetch (bereits teilimplementiert)
 - KI-Bild-Generator Backend: generiereFrageBild fehlt noch
 
 ---

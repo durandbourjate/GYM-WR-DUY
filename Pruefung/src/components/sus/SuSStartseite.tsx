@@ -94,8 +94,19 @@ export default function SuSStartseite({ onKorrekturWaehle: _onKorrekturWaehle }:
     // Warten bis Login-Bridge fertig, dann AppUeben laden
     if (!loginBridged) {
       return (
-        <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900">
-          <p className="text-slate-500 dark:text-slate-400">Übungen werden verbunden...</p>
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
+          {/* Skeleton-Header — nie blank zeigen */}
+          <div className="bg-white dark:bg-slate-800 shadow-sm px-4 py-3 flex items-center justify-between sticky top-0 z-30">
+            <div className="flex items-center gap-3">
+              <div className="h-5 w-20 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+              <div className="h-4 w-32 bg-slate-100 dark:bg-slate-600 rounded animate-pulse" />
+            </div>
+            <div className="h-8 w-8 bg-slate-200 dark:bg-slate-700 rounded-lg animate-pulse" />
+          </div>
+          <div className="flex flex-col items-center justify-center py-16">
+            <div className="animate-spin h-6 w-6 border-2 border-slate-300 dark:border-slate-600 border-t-blue-500 rounded-full mb-3" />
+            <p className="text-sm text-slate-400 dark:text-slate-500">Verbinde...</p>
+          </div>
         </div>
       )
     }
