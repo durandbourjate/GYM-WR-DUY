@@ -31,7 +31,7 @@ export default function PDFFrage({ frage }: Props) {
   // Load saved annotations from store
   const gespeicherteAntwort = antworten[frage.id]
   const gespeicherteAnnotationen: PDFAnnotation[] =
-    gespeicherteAntwort?.typ === 'pdf' ? gespeicherteAntwort.annotationen : []
+    gespeicherteAntwort?.typ === 'pdf' ? (gespeicherteAntwort.annotationen ?? []) : []
 
   // Annotations hook
   const {
@@ -164,7 +164,7 @@ export default function PDFFrage({ frage }: Props) {
   // --- Sync annotations from store on frage change ---
   useEffect(() => {
     const antwort = antworten[frage.id]
-    const saved: PDFAnnotation[] = antwort?.typ === 'pdf' ? antwort.annotationen : []
+    const saved: PDFAnnotation[] = antwort?.typ === 'pdf' ? (antwort.annotationen ?? []) : []
     setAnnotationen(saved)
 
     return () => {

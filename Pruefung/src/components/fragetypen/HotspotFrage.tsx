@@ -15,7 +15,7 @@ export default function HotspotFrage({ frage }: Props) {
 
   const aktuelleAntwort = antworten[frage.id]
   const geklickt: { x: number; y: number }[] =
-    aktuelleAntwort?.typ === 'hotspot' ? aktuelleAntwort.geklickt : []
+    aktuelleAntwort?.typ === 'hotspot' ? aktuelleAntwort.klicks : []
 
   const handleKlick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     if (abgegeben) return
@@ -29,12 +29,12 @@ export default function HotspotFrage({ frage }: Props) {
     } else {
       neueKlicks = [{ x, y }]
     }
-    setAntwort(frage.id, { typ: 'hotspot', geklickt: neueKlicks })
+    setAntwort(frage.id, { typ: 'hotspot', klicks: neueKlicks })
   }, [abgegeben, frage.id, frage.mehrfachauswahl, geklickt, setAntwort])
 
   function handleZuruecksetzen() {
     if (abgegeben) return
-    setAntwort(frage.id, { typ: 'hotspot', geklickt: [] })
+    setAntwort(frage.id, { typ: 'hotspot', klicks: [] })
   }
 
   return (
