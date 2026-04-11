@@ -1096,6 +1096,35 @@ Tooltip-Migration + Verzeichnis-Renaming komplett ✅. Einzig verbleibend:
 
 ---
 
+## Session 89 — Improvement Plan S1–S5 (11.04.2026)
+
+### Stand
+Branch `main`. tsc ✅ | 209 Tests ✅ | Build ✅.
+
+### Erledigte Arbeiten (5 von 6 Sessions)
+
+| # | Änderung | Dateien |
+|---|----------|---------|
+| **S1: Editor-Crashes** | 6 Typ-Editoren defensiv mit `?? []` abgesichert (Schicht 2) | LueckentextEditor, BildbeschriftungEditor, DragDropBildEditor, HotspotEditor, KontenbestimmungEditor, TKontoEditor |
+| **S1: Dropdowns** | Reset-Labels vereinheitlicht ("Alle Fächer", "Alle Typen", etc.) | FragenBrowserHeader.tsx |
+| **S2: KontenSelect** | Defensive Normalisierung von konten-Objekten ({nr,name}→string) | KontenSelect.tsx (shared) |
+| **S2: HotspotFrage** | Rechteck-basierter Hit-Test statt nur Radius-Check | HotspotFrage.tsx (ueben) |
+| **S2: GruppeFrage** | Leere-Teilaufgaben-Hinweis statt stiller leerer Render | GruppeFrage.tsx (ueben) |
+| **S2: Korrektur** | Defensive Filter + Name-Fallback bei abgabenResult | useKorrekturDaten.ts |
+| **S3: Breadcrumbs** | Composer übergibt Breadcrumbs aus NavigationStore an LPHeader | PruefungsComposer.tsx |
+| **S3: SuS-Nav** | ExamLab-Titel im SuS-Prüfen-Header klickbar (→ Üben) | SuSStartseite.tsx |
+| **S4** | Bereits vollständig implementiert (Stammdaten, Profil, Admin-Panel, istAdmin) | — |
+| **S5: Drag-Handle** | Drag-Handle von links nach rechts verschoben (neben Pfeile/Löschen) | AbschnitteTab.tsx |
+
+### Hinweise
+- SharedFragenEditor hatte bereits `?? []` in allen useState-Initialisierern (Schicht 1)
+- LP Navigation Store mit History-Stack, Breadcrumbs, Favoriten, Hash-Router war vollständig implementiert
+- typLabel() hatte bereits konsistente Gross-Labels (Multiple Choice, Kontenbestimmung, etc.)
+- FeedbackModal hatte bereits erweiterte Kontext-Felder
+- **S6 bleibt offen:** Performance (~25s LP-Laden), Excel-Import, Prefetching — erfordert eigene Session
+
+---
+
 ## Session 67/67a — Performance + Datenbereinigung + Features (06.–07.04.2026)
 
 ### Stand
@@ -1181,12 +1210,12 @@ Branch `main`. tsc ✅ | 193 Tests ✅ | Build ✅. **URL: /ExamLab/ (unified bu
 
 | Session | Branch | Inhalt | Status |
 |---------|--------|--------|--------|
-| **1** | `fix/editor-array-undefined-crashes` | Fragensammlung-Editor Crashes: 6 Fragetypen (Lückentext, Bildbeschriftung, DragDrop, Hotspot, Kontenbestimmung, T-Konto) + Dropdown-Vereinheitlichung | offen |
-| **2** | `fix/ueben-fragetypen-korrektur` | Üben-Modus Crashes: 9 Fragetypen (FiBu, Bilanz, DragDrop, Hotspot, Zeichnen, Aufgabengruppe) + Korrektur-Loading-Bug + Backup-Export | offen |
-| **3** | `feature/navigation-breadcrumbs` | Navigation & Kopfzeile: Zurück-Stack, Breadcrumbs, persistente Kopfzeile, Favoriten, Loading-Skeleton | offen |
-| **4** | `feature/einstellungen-stammdaten` | Einstellungen-Menü: Stammdaten-System, LP-Profil, Hardcoded-Audit, Prüfungs-Einstellungen | ✅ bereits erledigt (Session 66–70) |
-| **5** | `feature/ux-polish` | UX-Polish: Analyse-Tab, Vorschau, Drag-Handles, Fragetyp-Labels, SuS-Üben UX | ✅ erledigt |
-| **6** | `feature/performance-features` | Performance (~25s Laden), Problem-Melden-Kontext, Excel-Import, Prefetching, Lernziele | offen |
+| **1** | `fix/editor-array-undefined-crashes` | Fragensammlung-Editor Crashes: 6 Fragetypen + Dropdown-Labels | ✅ erledigt (Session 89) |
+| **2** | `fix/ueben-fragetypen-korrektur` | Üben-Modus: KontenSelect, Hotspot Hit-Test, Korrektur-Loading | ✅ erledigt (Session 89) |
+| **3** | `feature/navigation-breadcrumbs` | Composer-Breadcrumbs, SuS ExamLab-Klick | ✅ erledigt (Session 89) |
+| **4** | `feature/einstellungen-stammdaten` | Stammdaten-System, LP-Profil, Hardcoded-Audit | ✅ bereits erledigt (Session 66–70) |
+| **5** | `feature/ux-polish` | Drag-Handle rechts, Labels konsistent | ✅ erledigt (Session 89) |
+| **6** | `feature/performance-features` | Performance, Problem-Melden-Kontext, Excel-Import, Prefetching, Lernziele | offen — Grössere Features, eigene Session nötig |
 
 **Reihenfolge:** 1 → 2 → 3 → 4 → 5 → 6 (1+3 oder 1+4 können parallel)
 **Priorität bei Zeitmangel:** Sessions 1–3 sind kritisch, Session 4 architektonisch wichtig.
