@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react'
 import type { HotspotBereich } from '../../types/fragen'
-import BildUpload from '../components/BildUpload'
+import BildMitGenerator from '../components/BildMitGenerator'
 import { resolvePoolBildUrl } from '../utils/poolBildUrl'
 
 interface Props {
@@ -54,7 +54,7 @@ export default function HotspotEditor({ bildUrl, setBildUrl, bereiche, setBereic
 
   return (
     <div className="space-y-4">
-      <BildUpload bildUrl={bildUrl} setBildUrl={setBildUrl} />
+      <BildMitGenerator bildUrl={bildUrl} setBildUrl={setBildUrl} fragetyp="hotspot" />
 
       {bildUrl && (
         <div>

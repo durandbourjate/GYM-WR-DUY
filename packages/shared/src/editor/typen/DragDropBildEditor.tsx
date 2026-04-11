@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react'
 import type { DragDropBildZielzone } from '../../types/fragen'
-import BildUpload from '../components/BildUpload'
+import BildMitGenerator from '../components/BildMitGenerator'
 import { resolvePoolBildUrl } from '../utils/poolBildUrl'
 
 interface Props {
@@ -65,7 +65,7 @@ export default function DragDropBildEditor({ bildUrl, setBildUrl, zielzonen, set
         Drag & Drop auf Bild
       </h4>
 
-      <BildUpload bildUrl={bildUrl} setBildUrl={setBildUrl} />
+      <BildMitGenerator bildUrl={bildUrl} setBildUrl={setBildUrl} fragetyp="dragdrop_bild" />
 
       {bildUrl && (
         <div>

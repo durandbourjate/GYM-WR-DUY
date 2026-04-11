@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react'
 import type { BildbeschriftungLabel } from '../../types/fragen'
-import BildUpload from '../components/BildUpload'
+import BildMitGenerator from '../components/BildMitGenerator'
 import { resolvePoolBildUrl } from '../utils/poolBildUrl'
 
 interface Props {
@@ -39,7 +39,7 @@ export default function BildbeschriftungEditor({ bildUrl, setBildUrl, beschriftu
 
   return (
     <div className="space-y-4">
-      <BildUpload bildUrl={bildUrl} setBildUrl={setBildUrl} />
+      <BildMitGenerator bildUrl={bildUrl} setBildUrl={setBildUrl} fragetyp="bildbeschriftung" />
 
       {bildUrl && (
         <div>
