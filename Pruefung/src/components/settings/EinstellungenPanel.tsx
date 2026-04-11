@@ -2,12 +2,13 @@ import { useState, useEffect, useCallback } from 'react'
 import { useAuthStore } from '../../store/authStore'
 import { useStammdatenStore } from '../../store/stammdatenStore'
 import type { Stammdaten, LPProfil, KursDefinition, FachDefinition, FachschaftDefinition } from '../../types/stammdaten'
+import LernzielTab from './LernzielTab'
 
 interface Props {
   onSchliessen: () => void
 }
 
-type EinstellungenTab = 'profil' | 'admin'
+type EinstellungenTab = 'profil' | 'lernziele' | 'admin'
 
 /**
  * Einstellungen-Panel: Slide-over Panel.
@@ -32,6 +33,7 @@ export default function EinstellungenPanel({ onSchliessen }: Props) {
 
   const tabs: { key: EinstellungenTab; label: string; sichtbar: boolean }[] = [
     { key: 'profil', label: 'Mein Profil', sichtbar: true },
+    { key: 'lernziele', label: 'Lernziele', sichtbar: true },
     { key: 'admin', label: 'Admin', sichtbar: admin },
   ]
 
@@ -71,6 +73,9 @@ export default function EinstellungenPanel({ onSchliessen }: Props) {
         <div className="p-6">
           {tab === 'profil' && user?.email && (
             <ProfilTab email={user.email} stammdaten={stammdaten} profil={lpProfil} />
+          )}
+          {tab === 'lernziele' && user?.email && (
+            <LernzielTab email={user.email} />
           )}
           {tab === 'admin' && admin && user?.email && (
             <AdminTab email={user.email} stammdaten={stammdaten} />

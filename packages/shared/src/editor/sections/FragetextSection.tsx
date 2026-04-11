@@ -64,8 +64,8 @@ export default function FragetextSection({
             onClick={() => ki.ausfuehren('verbessereFragetext', { fragetext })}
           />
           <InlineAktionButton
-            label="🎯 Lernziel"
-            tooltip="Frage basierend auf einem Lernziel aus den Übungspools generieren"
+            label="🤖 KI: Frage aus Lernziel"
+            tooltip="KI generiert eine Frage basierend auf einem Lernziel"
             disabled={ki.ladeAktion !== null}
             ladend={ki.ladeAktion === 'generiereFrageZuLernziel'}
             onClick={async () => {

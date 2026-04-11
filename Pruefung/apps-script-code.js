@@ -752,6 +752,7 @@ function doPost(e) {
     'dupliziereFrage', 'duplizierePruefung', 'korrekturFreigeben', 'resetPruefung',
     'uploadAnhang', 'uploadMaterial',
     'ladeStammdaten', 'speichereStammdaten', 'ladeLPProfil', 'speichereLPProfil',
+    'aktualisiereLernziel', 'loescheLernziel',
   ];
   if (LP_AKTIONEN.indexOf(action) >= 0) {
     var lpEmail = body.email || body.callerEmail;
@@ -842,6 +843,10 @@ function doPost(e) {
       return ladeLernziele(body);
     case 'speichereLernziel':
       return speichereLernzielEndpoint(body);
+    case 'aktualisiereLernziel':
+      return aktualisiereLernzielEndpoint(body);
+    case 'loescheLernziel':
+      return loescheLernzielEndpoint(body);
     case 'schreibePoolAenderung':
       return schreibePoolAenderung(body);
     case 'beendePruefung':
@@ -4058,6 +4063,75 @@ function speichereLernzielEndpoint(body) {
     return jsonResponse({ erfolg: true, id: id });
   } catch (e) {
     return jsonResponse({ error: 'Lernziel speichern: ' + e.message });
+  }
+}
+
+/**
+ * Bestehendes Lernziel aktualisieren (LP-only).
+ */
+function aktualisiereLernzielEndpoint(body) {
+  try {
+    var email = body.email || body.callerEmail;
+    if (!email || !istZugelasseneLP(email)) {
+      return jsonResponse({ error: 'Nur für Lehrpersonen' });
+    }
+    var lz = body.lernziel;
+    if (!lz || !lz.id) {
+      return jsonResponse({ error: 'Lernziel-ID fehlt' });
+    }
+
+    var ss = SpreadsheetApp.openById(LEHRPLAN_SHEET_ID);
+    var sheet = ss.getSheetByName('Lehrplanziele');
+    if (!sheet) return jsonResponse({ error: 'Lehrplanziele-Sheet nicht gefunden' });
+
+    var data = sheet.getDataRange().getValues();
+    for (var i = 1; i < data.length; i++) {
+      if (String(data[i][0]) === String(lz.id)) {
+        // Spalten: id, ebene, parentId, fach, gefaess, semester, thema, text, bloom
+        if (lz.fach !== undefined) sheet.getRange(i + 1, 4).setValue(lz.fach);
+        if (lz.thema !== undefined) sheet.getRange(i + 1, 7).setValue(lz.thema);
+        if (lz.text !== undefined) sheet.getRange(i + 1, 8).setValue(lz.text);
+        if (lz.bloom !== undefined) sheet.getRange(i + 1, 9).setValue(lz.bloom);
+
+        auditLog_('aktualisiereLernziel:UPDATE', email, { lernzielId: lz.id });
+        return jsonResponse({ erfolg: true, id: lz.id });
+      }
+    }
+    return jsonResponse({ error: 'Lernziel nicht gefunden: ' + lz.id });
+  } catch (e) {
+    return jsonResponse({ error: 'Lernziel aktualisieren: ' + e.message });
+  }
+}
+
+/**
+ * Lernziel löschen (Soft-Delete: Zeile entfernen aus Sheet, LP-only).
+ */
+function loescheLernzielEndpoint(body) {
+  try {
+    var email = body.email || body.callerEmail;
+    if (!email || !istZugelasseneLP(email)) {
+      return jsonResponse({ error: 'Nur für Lehrpersonen' });
+    }
+    var lernzielId = body.lernzielId;
+    if (!lernzielId) {
+      return jsonResponse({ error: 'Lernziel-ID fehlt' });
+    }
+
+    var ss = SpreadsheetApp.openById(LEHRPLAN_SHEET_ID);
+    var sheet = ss.getSheetByName('Lehrplanziele');
+    if (!sheet) return jsonResponse({ error: 'Lehrplanziele-Sheet nicht gefunden' });
+
+    var data = sheet.getDataRange().getValues();
+    for (var i = 1; i < data.length; i++) {
+      if (String(data[i][0]) === String(lernzielId)) {
+        sheet.deleteRow(i + 1);
+        auditLog_('loescheLernziel:DELETE', email, { lernzielId: lernzielId });
+        return jsonResponse({ erfolg: true });
+      }
+    }
+    return jsonResponse({ error: 'Lernziel nicht gefunden: ' + lernzielId });
+  } catch (e) {
+    return jsonResponse({ error: 'Lernziel löschen: ' + e.message });
   }
 }
 
