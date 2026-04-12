@@ -6,6 +6,90 @@
 
 ---
 
+## Session 91 — Code-Vereinfachung: Adapter-Hook Refactoring (12.04.2026)
+
+### Stand
+Branch `refactor/code-vereinfachung` gemergt auf `main`. tsc ✅ | 209 Tests ✅ | Build ✅. **Noch NICHT im Browser getestet (LP + SuS).**
+
+### Erledigte Arbeiten
+
+| # | Änderung | Dateien |
+|---|----------|---------|
+| **Shared UI Components** | |
+| U1 | **BaseDialog:** Shared Overlay mit Focus-Trap, ESC, Backdrop-Click, a11y (aria-labelledby) | ui/BaseDialog.tsx (NEU) |
+| U2 | **Button:** 4 Varianten (primary/secondary/danger/ghost), 3 Grössen, Loading, Icon | ui/Button.tsx (NEU) |
+| U3 | **Dialog-Migrationen:** AbgabeDialog, BeendenDialog, FeedbackDialog, Layout-Zeitablauf, PruefungsComposer (2 Dialoge) → BaseDialog | 5 Dateien |
+| **Unified Antwort Type** | |
+| T1 | **Kanonischer Typ:** `Antwort` in types/antworten.ts — Selbstbewertung optional, hotspot.klicks (war geklickt), audio/pdf erweitert, aufgabengruppe-Variante | types/antworten.ts |
+| T2 | **Normalizer:** `normalizeAntwort()` — konvertiert 10+ Legacy-Alias-Typen (tf→richtigfalsch, fill→lueckentext, calc→berechnung, etc.) + Feld-Mapping | utils/normalizeAntwort.ts (NEU) |
+| T3 | **pruefeAntwort:** Akzeptiert unified Antwort, normalisiert intern | utils/ueben/korrektur.ts |
+| T4 | **uebungsStore:** `beantworteById(frageId, antwort)` + `toggleUnsicherById(frageId)`, delegiert beantworte() intern | store/ueben/uebungsStore.ts |
+| T5 | **types/ueben/antworten.ts gelöscht** — AntwortTyp existiert nicht mehr | GELÖSCHT |
+| **Adapter-Hook Pattern** | |
+| A1 | **FrageModeContext:** `'pruefung' \| 'ueben'` Provider, in App.tsx + AppUeben.tsx gewrappt | context/FrageModeContext.tsx (NEU) |
+| A2 | **useFrageAdapter:** Unified Interface (antwort, onAntwort, disabled, feedbackSichtbar, korrekt, markiertAlsUnsicher, toggleUnsicher). Beide Stores unconditional aufgerufen (Rules of Hooks). | hooks/useFrageAdapter.ts (NEU) |
+| A3 | **Alle 20 Fragetypen migriert:** usePruefungStore → useFrageAdapter. Feedback-Sektion hinzugefügt (feedbackSichtbar && korrekt). | 20 Dateien in fragetypen/ |
+| **Unified Dispatcher** | |
+| D1 | **fragetypenRegistry:** Eine Map für alle 20 Typen + Alias-Mappings | shared/fragetypenRegistry.ts (NEU) |
+| D2 | **FrageRenderer:** Switch → Registry-Lookup | FrageRenderer.tsx |
+| D3 | **UebungsScreen:** Nutzt shared FrageRenderer statt lokaler FRAGETYP_KOMPONENTEN | ueben/UebungsScreen.tsx |
+| D4 | **26 Duplikat-Dateien gelöscht:** Gesamtes ueben/fragetypen/ Verzeichnis | GELÖSCHT |
+| **Cleanup** | |
+| C1 | **LoginLayout:** Shared Card-Layout für beide LoginScreens | shared/LoginLayout.tsx (NEU) |
+| C2 | **BildContainer:** Verschoben von ueben/fragetypen/shared/ nach shared/ | shared/BildContainer.tsx |
+| C3 | **korrekturStatusFarbe:** Umbenannt (war statusFarbe, Namenskollision mit trackerUtils) | korrekturUtils.ts |
+
+### Statistiken
+- **77 Dateien** geändert, **3312 Zeilen gelöscht**, **1227 hinzugefügt** (netto ~2085 weniger)
+- **26 Duplikat-Dateien** eliminiert
+- **11 Commits** auf Feature-Branch
+
+### Geänderte Dateien (Schlüsseldateien)
+- `src/components/ui/BaseDialog.tsx` — NEU: Shared Dialog
+- `src/components/ui/Button.tsx` — NEU: Shared Button
+- `src/context/FrageModeContext.tsx` — NEU: Modus-Provider
+- `src/hooks/useFrageAdapter.ts` — NEU: Adapter-Hook
+- `src/components/shared/fragetypenRegistry.ts` — NEU: Unified Registry
+- `src/utils/normalizeAntwort.ts` — NEU: Antwort-Normalizer
+- `src/components/shared/LoginLayout.tsx` — NEU: Login-Card-Layout
+- `src/types/antworten.ts` — Erweitert (Selbstbewertung, klicks, aufgabengruppe)
+- `src/store/ueben/uebungsStore.ts` — beantworteById, toggleUnsicherById
+- `src/utils/ueben/korrektur.ts` — Unified Antwort akzeptiert
+- `src/components/FrageRenderer.tsx` — Registry statt Switch
+- `src/components/ueben/UebungsScreen.tsx` — Shared FrageRenderer
+- `src/components/fragetypen/*.tsx` — Alle 20 auf useFrageAdapter
+- `src/components/AbgabeDialog.tsx` — BaseDialog
+- `src/App.tsx` — FrageModeProvider
+- `src/AppUeben.tsx` — FrageModeProvider
+
+### Architektur-Entscheide
+- **Adapter-Hook statt Wrapper-Pattern:** useFrageAdapter(frageId) abstrahiert Store-Zugriff komplett. Fragetypen sind reine Presentation-Komponenten.
+- **Rules-of-Hooks-konform:** Beide Stores werden IMMER aufgerufen, nur das Ergebnis des aktiven Modus wird zurückgegeben.
+- **Normalizer statt Typ-Vereinheitlichung zur Laufzeit:** Legacy-Daten (localStorage, alte Sessions) werden beim Laden normalisiert.
+- **3 Dialoge NICHT migriert:** FeedbackModal (eigenes Design), MixSessionDialog (Scrolling), SuSHilfePanel (Side-Panel) — inkompatibel mit BaseDialog.
+
+### Noch offene Browser-Tests ⚠️
+**KRITISCH: Übungsmodus ist Hauptrisiko** — State-Anbindung komplett umgebaut.
+
+| # | Test | Modus | Fokus |
+|---|------|-------|-------|
+| B1 | MC beantworten → Antwort bleibt nach Navigation | Prüfung | Store-Persistenz |
+| B2 | Freitext eingeben → bleibt nach Hin-und-Her | Prüfung | Store-Persistenz |
+| B3 | Unsicher-Markierung setzen/entfernen | Prüfung | toggleMarkierung |
+| B4 | AbgabeDialog öffnet/schliesst korrekt | Prüfung | BaseDialog-Migration |
+| B5 | MC beantworten → sofortiges Feedback (grün/rot) | Üben | useFrageAdapter + feedbackSichtbar |
+| B6 | Zuordnung/Lückentext/RF → Feedback | Üben | Verschiedene Typen |
+| B7 | Navigation Weiter/Zurück | Üben | Session-State |
+| B8 | Session beenden → Ergebnis-Übersicht | Üben | beantworteById |
+| B9 | FiBu-Fragetypen (Buchungssatz, TKonto) | Beide | Komplexe Antwort-Strukturen |
+| B10 | Dialoge öffnen/schliessen (ESC, Backdrop) | Beide | BaseDialog |
+
+### Design-Docs
+- Spec: `docs/superpowers/specs/2026-04-12-examlab-code-vereinfachung-design.md`
+- Plan: `docs/superpowers/plans/2026-04-12-examlab-code-vereinfachung.md`
+
+---
+
 ## Session 90 — Deep Links + Fachkürzel + Performance S6 (11.04.2026)
 
 ### Stand
