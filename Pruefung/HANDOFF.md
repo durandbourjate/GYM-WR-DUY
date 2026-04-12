@@ -6,10 +6,47 @@
 
 ---
 
+## Session 95 — FiBu-Musterlösungen repariert (13.04.2026)
+
+### Stand
+Auf `main`. tsc ✅ | 209 Tests ✅ | Build ✅. **14 FiBu-Fragen im Google Sheet repariert.**
+
+### Kontext
+Diagnose ergab: 14 von 41 spezialisierten FiBu-Fragen in der Fragensammlung (Google Sheet) hatten Musterlösungen im falschen Datenformat. Die Fragen waren in einer früheren Session mit Legacy-Feldnamen erstellt worden (`correct` statt `erwarteteAntworten`, `nr` statt `kontonummer`, `correctSoll/Haben` statt `eintraege`, fehlende `loesung` bei Bilanzfragen).
+
+### Erledigte Arbeiten
+
+| # | Änderung | Betroffene Fragen |
+|---|----------|-------------------|
+| R1 | **Kontenbestimmung (5x):** `correct[]` → `erwarteteAntworten[]`, `konto` → `kontonummer`, `id` ergänzt | Z281, Z282, Z302, Z303, Z304 |
+| R2 | **T-Konto (5x):** `correctSoll/Haben` → `eintraege[]`, `nr` → `kontonummer`, `ab` → `anfangsbestand`, Saldo berechnet, `bewertungsoptionen` ergänzt | Z283, Z284, Z305, Z306, Z307 |
+| R3 | **Bilanzstruktur (4x):** `nr` → `kontonummer` in kontenMitSaldi, `loesung` generiert (Bilanzgruppen nach CH-KMU-Kontenrahmen), `bewertungsoptionen` ergänzt | Z285, Z286, Z308, Z309 |
+| R4 | **Sync-Version bumped (v4→v5):** Einrichtungsfragen Re-Sync zum Sheet erzwungen (harmlos, Daten waren bereits korrekt) | LPStartseite.tsx |
+
+### Geänderte Dateien (1 Code + Sheet-Daten)
+- `Pruefung/src/components/lp/LPStartseite.tsx` — Sync-Key v4→v5
+- `Pruefung/scripts/diagnose-fibu-fragen.js` — Diagnose-Script (nicht deployed)
+- `Pruefung/scripts/repair-fibu-fragen.js` — Repair-Script (nicht deployed)
+- **Google Sheet BWL-Tab:** 14 Zeilen typDaten-Spalte aktualisiert
+
+### Offene Punkte
+
+| # | Thema | Status |
+|---|-------|--------|
+| F1 | **Buchungssatz-Bewertung** | ✅ ERLEDIGT — typDaten repariert (war Legacy-Format) |
+| F4 | **Bilanz/ER Musterlösung** | ✅ ERLEDIGT — loesung + kontenMitSaldi repariert |
+| E1/E2 | **Editor-Crashes (Null-Guards)** | Deployed, Browser-Test ausstehend |
+| B1 | **Bild-Upload fehlgeschlagen** | Offen — Konsole prüfen |
+| B2 | **Audio iPhone-Trigger** | Offen — iPhone-spezifisch |
+| B3 | **Abgabe-Timeout** | Offen — Apps Script Execution Log prüfen |
+| B4 | **Fachkürzel stimmen nicht** | Offen — PDF-Abgleich mit stammdaten.ts |
+
+---
+
 ## Session 94 — FiBu-Fixes + Dashboard-Filter + Black Screen (12.04.2026)
 
 ### Stand
-Branch `fix/session94-fibu-bugs`. tsc ✅ | 209 Tests ✅ | Build ✅. **Browser-Tests ausstehend.**
+Auf `main`. tsc ✅ | 209 Tests ✅ | Build ✅.
 
 ### Kontext
 Ausführliche Testphase durch User deckte FiBu-Probleme, Dashboard-Filter-Regression und wiederkehrenden schwarzen Bildschirm auf. 6 Fixes in 7 Dateien.
