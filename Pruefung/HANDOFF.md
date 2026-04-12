@@ -6,6 +6,65 @@
 
 ---
 
+## Session 93 — Browser-Test Bugfixes (12.04.2026)
+
+### Stand
+Branch `fix/session93-bugfixes`. tsc ✅ | 209 Tests ✅ | Build ✅.
+
+### Kontext
+Ausführlicher Browser-Test durch User deckte diverse Bugs auf. 8 Fixes in 15 Dateien.
+
+### Erledigte Arbeiten
+
+| # | Änderung | Dateien |
+|---|----------|---------|
+| **FiBu Sofortiger Lösungsabgleich (KRITISCH)** | |
+| F1 | **speichereZwischenstand im Adapter:** Neues Feld in `FrageAdapterResult`. Im Üben-Modus: Zwischenstand ohne Korrektur, im Prüfungsmodus: null (onAntwort reicht). | useFrageAdapter.ts |
+| F2 | **speichereZwischenstandById im Store:** Speichert in `session.zwischenstande` ohne Korrektur/Locking | uebungsStore.ts, uebung.ts |
+| F3 | **4 FiBu-Fragetypen migriert:** Feldänderungen → speichereZwischenstand, expliziter "Antwort prüfen"-Button → onAntwort | BuchungssatzFrage, TKontoFrage, BilanzERFrage, KontenbestimmungFrage |
+| **Schwarzer Bildschirm (Race Condition)** | |
+| B1 | **Zusammenfassung sofort bei session.beendet:** Rendering-Guard erweitert — Zusammenfassung wird auch gezeigt wenn session.beendet aber Screen noch 'uebung' | AppUeben.tsx |
+| **Gesperrte Themen Regression** | |
+| G1 | **Dashboard-Filter erweitert:** `nicht_freigeschaltet` wird jetzt in sichtbareThemenListe aufgenommen (mit Overlay) | Dashboard.tsx |
+| **UI-Fixes** | |
+| U1 | **Einstellungsbutton in Durchführen:** onEinstellungen Prop + EinstellungenPanel im DurchfuehrenDashboard | DurchfuehrenDashboard.tsx |
+| U2 | **SuS-Einladen:** Manuelles Hinzufügen-Feld auch vor Kurse-Laden sichtbar | VorbereitungPhase.tsx |
+| U3 | **Lernziele-Tab Links:** deepLinkThema in NavigationStore, Dashboard konsumiert Thema | AppShell.tsx, navigationStore.ts, Dashboard.tsx |
+| U4 | **LernzieleAkkordeon:** Verschachtelter button→span (valides HTML) | LernzieleAkkordeon.tsx |
+| U5 | **Deep Links Default:** uebungsTab Default von 'durchfuehren' → 'uebungen' | lpNavigationStore.ts |
+
+### Geänderte Dateien (15)
+- `Pruefung/src/hooks/useFrageAdapter.ts` — speichereZwischenstand
+- `Pruefung/src/store/ueben/uebungsStore.ts` — speichereZwischenstandById
+- `Pruefung/src/types/ueben/uebung.ts` — zwischenstande Feld
+- `Pruefung/src/components/fragetypen/BuchungssatzFrage.tsx` — Zwischenstand + Prüfen-Button
+- `Pruefung/src/components/fragetypen/TKontoFrage.tsx` — Zwischenstand + Prüfen-Button
+- `Pruefung/src/components/fragetypen/BilanzERFrage.tsx` — Zwischenstand + Prüfen-Button
+- `Pruefung/src/components/fragetypen/KontenbestimmungFrage.tsx` — Zwischenstand + Prüfen-Button
+- `Pruefung/src/AppUeben.tsx` — Race Condition Fix
+- `Pruefung/src/components/ueben/Dashboard.tsx` — Gesperrte Themen + deepLinkThema
+- `Pruefung/src/components/ueben/LernzieleAkkordeon.tsx` — Verschachtelter Button Fix
+- `Pruefung/src/components/ueben/layout/AppShell.tsx` — deepLinkThema
+- `Pruefung/src/store/ueben/navigationStore.ts` — deepLinkThema State
+- `Pruefung/src/store/lpNavigationStore.ts` — Default uebungsTab
+- `Pruefung/src/components/lp/durchfuehrung/DurchfuehrenDashboard.tsx` — Einstellungen-Button
+- `Pruefung/src/components/lp/vorbereitung/VorbereitungPhase.tsx` — ladeStatus-Guard entfernt
+
+### Manuelle Schritte nach Merge
+- ⬜ Configs-Sheet: `einrichtung-demo` und `sf-wr-27a28f` Configs löschen
+- ⬜ Apps Script NICHT neu deployen nötig (nur Frontend-Änderungen)
+
+### Noch offen (nächste Session)
+- **Bild-Upload:** Root Cause im Backend prüfen (Konsole öffnen → `[BildUpload] Upload fehlgeschlagen, result:` ansehen)
+- **Fachkürzel:** Stimmen nicht mit hochgeladenem Dokument überein — konkret abklären welche falsch sind
+- **Audio iPhone-Trigger:** 19s Aufnahme speichert 4s, iPhone wird nicht mehr getriggert nach erneutem Aufnehmen
+- **Abgabe-Timeout:** Sowohl Prüfung als auch Übung zeigen "Abgabe gespeichert, Übertragung ausstehend" — Resilienz weiter verbessern
+- **Bilanzstruktur Erfolg:** Gewinn/Verlust-Eingabe ergänzen (ER-Feld existiert, aber Korrektur fehlt evtl.)
+- **Neues Feature:** KI-Zusammenfassung Audio-Rückmeldungen (Konzept erstellen)
+- **KI-Bild-Generator Backend:** generiereFrageBild Endpoint fehlt
+
+---
+
 ## Session 92 — Save-Resilienz + IDs + Quick-Fixes (12.04.2026)
 
 ### Stand
