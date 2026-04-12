@@ -357,6 +357,9 @@ export const useLPNavigationStore = create<LPNavigationState>((set, get) => ({
       else if (teile[1]) {
         const subTab = teile[2] || null
         set({ aktiveConfigId: teile[1], deepLinkComposerTab: subTab })
+      } else {
+        // #/uebung ohne Sub-Tab → Übungen-Liste anzeigen (nicht Durchführen)
+        set({ uebungsTab: 'uebungen' })
       }
       return
     }

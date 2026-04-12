@@ -92,11 +92,12 @@ export async function postJson<T>(
 }
 
 /** POST-Request der boolean zurückgibt (success-Feld).
- *  Läuft durch Write-Queue (serialisiert heartbeat + speichereAntworten). */
+ *  Läuft durch Write-Queue (serialisiert speichereAntworten).
+ *  timeoutMs: Optional erhöhter Timeout (z.B. 60s für Abgabe). */
 export async function postBool(
   action: string,
   payload: Record<string, unknown>,
-  options?: { signal?: AbortSignal }
+  options?: { signal?: AbortSignal; timeoutMs?: number }
 ): Promise<boolean> {
   if (!APPS_SCRIPT_URL) return false
   return enqueueWrite(async () => {
@@ -108,7 +109,7 @@ export async function postBool(
         headers: { 'Content-Type': 'text/plain' },
         body: JSON.stringify(body),
         signal: options?.signal,
-      })
+      }, options?.timeoutMs)
       if (!response.ok) return false
       const text = await response.text()
       try {
@@ -122,6 +123,36 @@ export async function postBool(
       return false
     }
   })
+}
+
+/** POST-Request OHNE Write-Queue (für Heartbeat — darf nie von Saves blockiert werden). */
+export async function postBoolDirekt(
+  action: string,
+  payload: Record<string, unknown>,
+  options?: { signal?: AbortSignal; timeoutMs?: number }
+): Promise<boolean> {
+  if (!APPS_SCRIPT_URL) return false
+  try {
+    const sessionToken = getSessionToken()
+    const body = sessionToken ? { action, sessionToken, ...payload } : { action, ...payload }
+    const response = await fetchMitTimeout(APPS_SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify(body),
+      signal: options?.signal,
+    }, options?.timeoutMs)
+    if (!response.ok) return false
+    const text = await response.text()
+    try {
+      const data = JSON.parse(text)
+      return data.success === true
+    } catch { return false }
+  } catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      console.warn(`[API] ${action}: Timeout oder abgebrochen`)
+    }
+    return false
+  }
 }
 
 /** GET-Request an Apps Script (ohne Queue — GETs dürfen parallel laufen) */

@@ -108,6 +108,54 @@ export async function uploadAudioKommentar(email: string, pruefungId: string, sc
   }
 }
 
+/** SuS-Audio-Antwort als Drive-File hochladen (statt inline Base64 im Antwort-JSON).
+ *  Gibt die Drive-URL zurück die im Antwort-JSON gespeichert wird.
+ *  Reduziert Payload von ~300KB auf wenige Bytes. */
+export async function uploadAudioAntwort(pruefungId: string, email: string, frageId: string, blob: Blob): Promise<string | null> {
+  if (!APPS_SCRIPT_URL) return null
+
+  try {
+    const base64 = await fileToBase64(blob)
+    const mimeType = blob.type || 'audio/webm'
+    const dateiname = `audio_${pruefungId}_${email.replace('@', '_')}_${frageId}_${Date.now()}.${mimeType.includes('mp4') ? 'm4a' : 'webm'}`
+
+    const sessionToken = sessionStorage.getItem('pruefung-auth')
+    let token: string | undefined
+    try { token = JSON.parse(sessionToken || '{}')?.sessionToken } catch { /* ignore */ }
+
+    const response = await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({
+        action: 'uploadAnhang',
+        email,
+        frageId: `audio-antwort-${pruefungId}`,
+        dateiname,
+        mimeType,
+        groesseBytes: blob.size,
+        base64Data: base64,
+        ...(token ? { sessionToken: token } : {}),
+      }),
+    })
+    if (!response.ok) return null
+
+    const text = await response.text()
+    try {
+      const data = JSON.parse(text)
+      if (data.error) {
+        console.error('[API] uploadAudioAntwort:', data.error)
+        return null
+      }
+      return data.url ?? null
+    } catch {
+      return null
+    }
+  } catch (error) {
+    console.error('[API] uploadAudioAntwort: Fehler:', error)
+    return null
+  }
+}
+
 /** KI-Assistent: Claude-basierte Hilfe beim Fragenschreiben */
 export async function kiAssistent(email: string, aktion: string, daten: Record<string, unknown>): Promise<Record<string, unknown> | null> {
   if (!APPS_SCRIPT_URL) return null

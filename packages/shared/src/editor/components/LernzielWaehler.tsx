@@ -321,7 +321,7 @@ export default function LernzielWaehler({
       )}
 
       <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1">
-        Lernziele aus der Fragenbank und den Übungspools
+        Lernziele aus der Fragenbank
       </p>
     </div>
   )

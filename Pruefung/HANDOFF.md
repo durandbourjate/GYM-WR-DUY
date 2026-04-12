@@ -6,6 +6,61 @@
 
 ---
 
+## Session 92 — Save-Resilienz + IDs + Quick-Fixes (12.04.2026)
+
+### Stand
+Branch `fix/session91-save-resilienz`. tsc ✅ | 209 Tests ✅ | Build ✅.
+
+### Kontext
+Beim Testen der Einführungsübung scheiterte die Abgabe reproduzierbar wenn alle 23 Fragen (inkl. Audio ~304KB) beantwortet waren. Root Cause: Die Einrichtungs-Sync (48 Fragen, ~15 parallele Backend-Requests) überlädt Apps Script → nachfolgende SuS-Saves kommen nicht an. Bestätigt durch Apps Script Execution Log: 335s-doGet + 11-Min-Lücke.
+
+### Erledigte Arbeiten
+
+| # | Änderung | Dateien |
+|---|----------|---------|
+| **Save-Resilienz (KRITISCH)** | |
+| R1 | **Sync entschärft:** Fragen seriell statt 5er-Batches parallel, 200ms Pause, 10s Startverzögerung, nicht bei aktiver Durchführung | LPStartseite.tsx |
+| R2 | **Retry + Timeout:** 60s Timeout bei Abgabe (statt 30s), `postBool` mit optionalem `timeoutMs` | apiClient.ts, pruefungApi.ts |
+| R3 | **postBoolDirekt:** Neue Funktion ohne Write-Queue (für zukünftige Nutzung) | apiClient.ts |
+| R4 | **Chunk-Load-Retry:** `lazyMitRetry()` — bei fehlgeschlagenem dynamischem Import auto-reload | LPStartseite.tsx |
+| **ID-Konsistenz** | |
+| I1 | **Einrichtungsprüfung ID:** `einrichtung-demo` → `einrichtung-pruefung` (konsistent mit `einrichtung-uebung`) | demoConfig.ts |
+| I2 | **Test-Kurs:** `DEMO_KURS_ID = 'test'` (statt `'demo'`, passt zum Test-Kurs mit wr.test) | demoConfig.ts |
+| I3 | **Sync-Guard v4:** Hochgezählt damit Re-Sync mit neuen IDs getriggert wird | LPStartseite.tsx |
+| **Quick-Fixes** | |
+| Q1 | **Deep-Links:** `#/uebung` ohne Sub-Tab → `uebungsTab: 'uebungen'` (nicht 'durchfuehren') | lpNavigationStore.ts |
+| Q2 | **Lernziel-Label:** "Übungspools" entfernt aus UI-Text | LernzielWaehler.tsx |
+| Q3 | **Audio NaN-Fix:** `dauer: ... \|\| 0` Fallback | AudioFrage.tsx |
+| **Audio-Optimierung** | |
+| A1 | **Drive-Upload:** Audio-Antwort wird sofort als Drive-File hochgeladen, nur URL im JSON (~50 Bytes statt ~304KB) | AudioFrage.tsx, uploadApi.ts |
+| A2 | **Fallback:** Bei Upload-Fehler oder Demo-Modus → inline Base64 wie bisher | AudioFrage.tsx |
+| A3 | **iPhone-Fix:** `startZeitRef` bei `recorder.onstart` setzen (nicht bei Button-Click) | AudioFrage.tsx |
+| Q4 | **Bild-Upload Logging:** Fehlerdetails in Konsole bei fehlgeschlagenem Upload | BildUpload.tsx |
+
+### Geänderte Dateien (9)
+- `Pruefung/src/components/lp/LPStartseite.tsx` — Sync seriell + verzögert, lazyMitRetry, Sync-Guard v4
+- `Pruefung/src/services/apiClient.ts` — postBool mit timeoutMs, postBoolDirekt
+- `Pruefung/src/services/pruefungApi.ts` — 60s Timeout bei Abgabe
+- `Pruefung/src/services/uploadApi.ts` — uploadAudioAntwort (NEU)
+- `Pruefung/src/data/demoConfig.ts` — einrichtung-pruefung + test
+- `Pruefung/src/store/lpNavigationStore.ts` — Deep-Link Default-Tab Fix
+- `Pruefung/src/components/fragetypen/AudioFrage.tsx` — Drive-Upload, NaN-Fix, onstart-Timing
+- `packages/shared/src/editor/components/LernzielWaehler.tsx` — Label
+- `packages/shared/src/editor/components/BildUpload.tsx` — Logging
+
+### Manuelle Schritte nach Merge
+- ⬜ Alte Backend-Configs löschen: `einrichtung-demo` und `sf-wr-27a28f` aus Configs-Sheet entfernen
+- ⬜ Apps Script NICHT neu deployen nötig (nur Frontend-Änderungen)
+- ⬜ Browser-Test: Einführungsübung mit allen 23 Fragen inkl. Audio abgeben
+
+### Noch offen (nächste Session)
+- Bilanzstruktur beim selbstständigen Üben: Klären ob `kontenbestimmung` durch `bilanzstruktur` ersetzt werden soll (59 Dateien betroffen)
+- Testdaten-Generator für wr.test (Mastery-System + Tracking testen)
+- Features: Fachkürzel bei neue Prüfung/Übung, Lernziele-Tab einklappbar, Resizable Sidebar, Favoriten erweitern, Ähnliche Fragen erkennen
+- Bild-Upload "fehlgeschlagen" — Root Cause im Backend prüfen (jetzt mit Logging)
+
+---
+
 ## Session 91 — Code-Vereinfachung: Adapter-Hook Refactoring (12.04.2026)
 
 ### Stand

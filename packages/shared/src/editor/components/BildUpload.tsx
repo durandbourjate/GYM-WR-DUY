@@ -63,10 +63,12 @@ export default function BildUpload({ bildUrl: rawBildUrl, setBildUrl, bildDriveF
         setBildUrl(previewUrl)
         setBildDriveFileId?.(result.driveFileId)
       } else {
-        setFehler('Upload fehlgeschlagen. Bitte erneut versuchen.')
+        console.error('[BildUpload] Upload fehlgeschlagen, result:', result)
+        setFehler('Upload fehlgeschlagen. Bitte erneut versuchen oder Bild-URL eingeben.')
       }
-    } catch {
-      setFehler('Upload fehlgeschlagen (Netzwerkfehler).')
+    } catch (err) {
+      console.error('[BildUpload] Netzwerkfehler:', err)
+      setFehler('Upload fehlgeschlagen (Netzwerkfehler). Bitte erneut versuchen.')
     } finally {
       setLadetHoch(false)
     }

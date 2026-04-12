@@ -3,11 +3,11 @@
  * Zentral definiert statt hardcoded in mehreren Dateien.
  */
 
-/** Demo-Kurs-ID (Einrichtungsprüfung/-übung) — generisch, nicht an einen echten Kurs gebunden */
-export const DEMO_KURS_ID = 'demo'
+/** Test-Kurs-ID für Einrichtungsprüfung/-übung — passt zum Test-Kurs mit wr.test@stud.gymhofwil.ch */
+export const DEMO_KURS_ID = 'test'
 
-/** Demo-Prüfungs-ID */
-export const DEMO_PRUEFUNG_ID = 'einrichtung-demo'
+/** Einrichtungsprüfungs-ID (konsistent mit einrichtung-uebung) */
+export const DEMO_PRUEFUNG_ID = 'einrichtung-pruefung'
 
 /** Demo-Autor-Email */
 export const DEMO_AUTOR_EMAIL = 'yannick.durand@gymhofwil.ch'

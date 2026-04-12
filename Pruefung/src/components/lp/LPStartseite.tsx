@@ -22,11 +22,21 @@ import { speichereConfig, speichereFrage } from '../../services/fragenbankApi.ts
 import { leereUebung } from './vorbereitung/configVorlagen'
 
 // Lazy-loaded Komponenten: Werden erst bei Bedarf geladen (spart ~400KB beim Initial Load)
-const PruefungsComposer = lazy(() => import('./vorbereitung/PruefungsComposer.tsx'))
-const FragenBrowser = lazy(() => import('./fragenbank/FragenBrowser.tsx'))
-const HilfeSeite = lazy(() => import('./HilfeSeite.tsx'))
-const EinstellungenPanel = lazy(() => import('../settings/EinstellungenPanel.tsx'))
-const AnalyseDashboard = lazy(() => import('./ueben/AnalyseDashboard.tsx'))
+// Bei Chunk-Load-Fehler (z.B. nach Deploy mit neuem Hash): Auto-Retry mit Page-Reload
+function lazyMitRetry(importFn: () => Promise<{ default: React.ComponentType<any> }>) {
+  return lazy(() => importFn().catch(() => {
+    // Chunk nicht gefunden (z.B. nach Deploy) → Seite neu laden
+    console.warn('[LP] Chunk-Load fehlgeschlagen, Seite wird neu geladen...')
+    window.location.reload()
+    // Nie erreicht, aber TypeScript braucht einen Return-Typ
+    return new Promise(() => {})
+  }))
+}
+const PruefungsComposer = lazyMitRetry(() => import('./vorbereitung/PruefungsComposer.tsx'))
+const FragenBrowser = lazyMitRetry(() => import('./fragenbank/FragenBrowser.tsx'))
+const HilfeSeite = lazyMitRetry(() => import('./HilfeSeite.tsx'))
+const EinstellungenPanel = lazyMitRetry(() => import('../settings/EinstellungenPanel.tsx'))
+const AnalyseDashboard = lazyMitRetry(() => import('./ueben/AnalyseDashboard.tsx'))
 
 /** Startseite für Lehrpersonen: Prüfungen verwalten + erstellen */
 export default function LPStartseite() {
@@ -162,8 +172,19 @@ export default function LPStartseite() {
 
   // Einrichtungsprüfung ins Backend synchronisieren (einmalig)
   // localStorage-Guard verhindert Duplikate bei Reloads
-  const SYNC_KEY = 'einrichtung-sync-v3'
+  const SYNC_KEY = 'einrichtung-sync-v4'
   const SYNC_VERSION = `${einrichtungsPruefung.id}-${einrichtungsPruefung.gesamtpunkte}-${einrichtungsPruefung.typ}-${einrichtungsFragen.length}`
+
+  /** Sync-Helper: Fragen einzeln (seriell) speichern um Backend nicht zu überlasten.
+   *  Vorher: 5er-Batches parallel → 10+ gleichzeitige Requests → Backend-Stau.
+   *  Jetzt: 1 Request nach dem anderen, mit 200ms Pause dazwischen. */
+  async function syncFragenSeriell(email: string, fragen: typeof einrichtungsFragen): Promise<void> {
+    for (const frage of fragen) {
+      await speichereFrage(email, frage)
+      // Kleine Pause um Backend nicht zu überlasten
+      await new Promise(r => setTimeout(r, 200))
+    }
+  }
 
   async function syncEinrichtungsPruefung(email: string, _backendConfigs: PruefungsConfig[]): Promise<void> {
     // Guard: Nur localStorage-basiert (Backend-Check entfernt — Config kann
@@ -174,11 +195,8 @@ export default function LPStartseite() {
     try {
       // Config speichern
       await speichereConfig(email, { ...einrichtungsPruefung, erstelltVon: email })
-      // Alle Fragen speichern (parallel in Batches von 5)
-      for (let i = 0; i < einrichtungsFragen.length; i += 5) {
-        const batch = einrichtungsFragen.slice(i, i + 5)
-        await Promise.all(batch.map(f => speichereFrage(email, f)))
-      }
+      // Fragen seriell speichern (verhindert Backend-Überlastung)
+      await syncFragenSeriell(email, einrichtungsFragen)
       // Guard setzen — nicht nochmal syncen
       try { localStorage.setItem(SYNC_KEY, SYNC_VERSION) } catch { /* ignore */ }
       console.log(`[LP] Einrichtungsprüfung sync fertig (${einrichtungsFragen.length} Fragen)`)
@@ -188,7 +206,7 @@ export default function LPStartseite() {
   }
 
   // Einführungsübung ins Backend synchronisieren (einmalig)
-  const UEBUNG_SYNC_KEY = 'einrichtung-uebung-sync-v3'
+  const UEBUNG_SYNC_KEY = 'einrichtung-uebung-sync-v4'
   const UEBUNG_SYNC_VERSION = `${einrichtungsUebung.id}-${einrichtungsUebung.gesamtpunkte}-${einrichtungsUebungFragen.length}`
 
   async function syncEinrichtungsUebung(email: string, _backendConfigs: PruefungsConfig[]): Promise<void> {
@@ -199,10 +217,8 @@ export default function LPStartseite() {
     console.log('[LP] Einführungsübung sync starten...')
     try {
       await speichereConfig(email, { ...einrichtungsUebung, erstelltVon: email })
-      for (let i = 0; i < einrichtungsUebungFragen.length; i += 5) {
-        const batch = einrichtungsUebungFragen.slice(i, i + 5)
-        await Promise.all(batch.map(f => speichereFrage(email, f)))
-      }
+      // Fragen seriell speichern (verhindert Backend-Überlastung)
+      await syncFragenSeriell(email, einrichtungsUebungFragen)
       try { localStorage.setItem(UEBUNG_SYNC_KEY, UEBUNG_SYNC_VERSION) } catch { /* ignore */ }
       console.log(`[LP] Einführungsübung sync fertig (${einrichtungsUebungFragen.length} Fragen)`)
     } catch (error) {
@@ -258,18 +274,24 @@ export default function LPStartseite() {
         setConfigs(configResult)
         setBackendFehler(false)
         // Einrichtungsprüfung/-übung: nur einmal pro Browser-Session syncen
+        // WICHTIG: Verzögert + seriell um Backend nicht zu überlasten (Session 91 Fix)
+        // Nicht starten wenn LP gerade eine Durchführung hat (SuS-Saves haben Priorität)
         const SYNC_DONE_KEY = 'examlab-sync-done'
-        if (!sessionStorage.getItem(SYNC_DONE_KEY)) {
-          Promise.all([
-            syncEinrichtungsPruefung(user.email, configResult),
-            syncEinrichtungsUebung(user.email, configResult),
-          ]).then(async () => {
-            sessionStorage.setItem(SYNC_DONE_KEY, '1')
-            const neueConfigs = await apiService.ladeAlleConfigs(user.email)
-            if (neueConfigs) setConfigs(neueConfigs)
-          }).catch(err => {
-            console.warn('[LP] Sync fehlgeschlagen, wird beim nächsten Mount erneut versucht:', err)
-          })
+        const istDurchfuehrung = window.location.search.includes('id=')
+        if (!sessionStorage.getItem(SYNC_DONE_KEY) && !istDurchfuehrung) {
+          // 10s Verzögerung damit Dashboard-Laden + LP-Monitoring Vorrang haben
+          setTimeout(async () => {
+            try {
+              // Seriell: erst Prüfung, dann Übung (nicht parallel!)
+              await syncEinrichtungsPruefung(user.email, configResult)
+              await syncEinrichtungsUebung(user.email, configResult)
+              sessionStorage.setItem(SYNC_DONE_KEY, '1')
+              const neueConfigs = await apiService.ladeAlleConfigs(user.email)
+              if (neueConfigs) setConfigs(neueConfigs)
+            } catch (err) {
+              console.warn('[LP] Sync fehlgeschlagen, wird beim nächsten Mount erneut versucht:', err)
+            }
+          }, 10_000)
         }
       } else {
         console.warn("[LP] Configs nicht ladbar — Composer bleibt nutzbar")

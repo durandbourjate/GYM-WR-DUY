@@ -65,13 +65,16 @@ export async function speichereAntworten(payload: {
     console.warn(`[API] Save-Payload gross: ${Math.round(payloadStr.length / 1024)} KB`)
   }
 
+  // Bei Abgabe: längerer Timeout (60s statt 30s) um Backend-Queue-Wartezeit abzufangen
+  const timeoutMs = payload.istAbgabe ? 60_000 : undefined
+
   // Erster Versuch
-  const erfolg = await postBool('speichereAntworten', payload)
+  const erfolg = await postBool('speichereAntworten', payload, { timeoutMs })
   if (erfolg) return true
 
   // Retry nach 3s (einmal) — verhindert Datenverlust bei transienten Netzwerkfehlern
   await new Promise(r => setTimeout(r, 3000))
-  return postBool('speichereAntworten', payload)
+  return postBool('speichereAntworten', payload, { timeoutMs })
 }
 
 /** Lockdown-Metadaten für Heartbeat */

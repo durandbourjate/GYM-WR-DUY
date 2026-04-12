@@ -3,6 +3,9 @@ import { useFrageAdapter } from '../../hooks/useFrageAdapter.ts'
 import type { AudioFrage as AudioFrageType } from '../../types/fragen.ts'
 import { renderMarkdown } from '../../utils/markdown.ts'
 import { fachbereichFarbe } from '../../utils/fachUtils.ts'
+import { uploadAudioAntwort } from '../../services/uploadApi.ts'
+import { usePruefungStore } from '../../store/pruefungStore.ts'
+import { useAuthStore } from '../../store/authStore.ts'
 
 interface Props {
   frage: AudioFrageType
@@ -63,7 +66,7 @@ export default function AudioFrage({ frage }: Props) {
         chunksRef.current.push(e.data)
       }
 
-      recorder.onstop = () => {
+      recorder.onstop = async () => {
         const blob = new Blob(chunksRef.current, { type: mimeType })
         stream.getTracks().forEach(t => t.stop())
 
@@ -73,18 +76,35 @@ export default function AudioFrage({ frage }: Props) {
           return
         }
 
-        // URL.createObjectURL ist schneller und zuverlässiger als FileReader/DataURL
+        // URL.createObjectURL für lokale Wiedergabe (sofort)
         const url = URL.createObjectURL(blob)
         setAudioUrl(url)
         setStatus('preview')
 
-        // Blob als DataURL für Persistenz (localStorage/Backend) speichern
+        const dauerSek = Math.round((Date.now() - startZeitRef.current) / 1000) || 0
+        const pruefungId = usePruefungStore.getState().config?.id || ''
+        const email = useAuthStore.getState().user?.email || ''
+        const istDemo = useAuthStore.getState().istDemoModus
+
+        // Sofort Drive-Upload starten (parallel zur Anzeige) — Payload ~300KB → Drive statt inline
+        // Im Demo-Modus: Fallback auf inline Base64 (kein Backend verfügbar)
+        if (pruefungId && email && !istDemo) {
+          const driveUrl = await uploadAudioAntwort(pruefungId, email, frage.id, blob)
+          if (driveUrl) {
+            // Nur Drive-URL speichern (~50 Bytes statt ~300KB)
+            onAntwort({ typ: 'audio', aufnahmeUrl: driveUrl, dauer: dauerSek })
+            return
+          }
+          console.warn('[AudioFrage] Drive-Upload fehlgeschlagen, Fallback auf inline Base64')
+        }
+
+        // Fallback: Inline Base64 (Demo-Modus oder Upload-Fehler)
         const reader = new FileReader()
         reader.onload = () => {
           onAntwort({
             typ: 'audio',
             aufnahmeUrl: reader.result as string,
-            dauer: Math.round((Date.now() - startZeitRef.current) / 1000),
+            dauer: dauerSek,
           })
         }
         reader.onerror = () => {
@@ -93,10 +113,14 @@ export default function AudioFrage({ frage }: Props) {
         reader.readAsDataURL(blob)
       }
 
+      // Startzeit erst setzen wenn Recording tatsächlich läuft (iOS-Warmup beachten)
+      recorder.onstart = () => {
+        startZeitRef.current = Date.now()
+      }
+
       // start() OHNE timeslice: ondataavailable feuert einmal bei stop().
       // timeslice (z.B. 1000ms) produziert auf manchen Browsern leere Chunks → blob.size === 0.
       recorder.start()
-      startZeitRef.current = Date.now()
       setDauer(0)
 
       // Vollbild wiederherstellen falls nötig (getUserMedia kann es beenden)
