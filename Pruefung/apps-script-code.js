@@ -8680,3 +8680,26 @@ function speichereLPProfilEndpoint(body) {
     return jsonResponse({ error: 'LP-Profil speichern: ' + e.message });
   }
 }
+
+// === AUTORISIERUNGS-TRIGGER ===
+// Diese Funktion manuell ausführen um alle OAuth-Scopes zu autorisieren.
+// Danach löschen oder stehen lassen — sie macht nichts Schädliches.
+function autorisiereAlleScopes() {
+  // Drive-Scope triggern
+  var testOrdner = DriveApp.getFolderById(ANHAENGE_ORDNER_ID);
+  Logger.log('Drive OK: ' + testOrdner.getName());
+
+  // Spreadsheet-Scope triggern
+  var testSheet = SpreadsheetApp.openById(FRAGENBANK_ID);
+  Logger.log('Sheets OK: ' + testSheet.getName());
+
+  // External Request Scope triggern
+  var response = UrlFetchApp.fetch('https://httpbin.org/get');
+  Logger.log('UrlFetch OK: ' + response.getResponseCode());
+
+  // Mail Scope triggern (nur Info, sendet nichts)
+  var email = Session.getActiveUser().getEmail();
+  Logger.log('Mail OK: ' + email);
+
+  Logger.log('Alle Scopes autorisiert!');
+}

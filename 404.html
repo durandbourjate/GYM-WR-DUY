@@ -7,7 +7,8 @@
     (function() {
       var l = window.location;
       var base = '/GYM-WR-DUY/ExamLab/';
-      // Nur ExamLab-Pfade umleiten (nicht Unterrichtsplaner, Uebungen etc.)
+
+      // 1. ExamLab-Pfade: SPA-Redirect mit Query-Parameter
       if (l.pathname.startsWith(base) && l.pathname !== base) {
         var route = l.pathname.slice(base.length);
         l.replace(
@@ -16,6 +17,27 @@
           (l.search ? '&q=' + encodeURIComponent(l.search.slice(1)) : '') +
           l.hash
         );
+        return;
+      }
+
+      // 2. Bekannte ExamLab-Routes OHNE Base-Path (z.B. /login, /sus, /home, /pruefung)
+      //    → auf Base-Path umleiten
+      var examLabRoutes = [
+        '/login', '/home', '/sus', '/pruefung', '/uebung',
+        '/fragensammlung', '/einstellungen'
+      ];
+      var pfad = l.pathname;
+      for (var i = 0; i < examLabRoutes.length; i++) {
+        if (pfad === examLabRoutes[i] || pfad.startsWith(examLabRoutes[i] + '/')) {
+          var route = pfad.slice(1); // ohne führendes /
+          l.replace(
+            l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+            base + '?p=/' + encodeURIComponent(route) +
+            (l.search ? '&q=' + encodeURIComponent(l.search.slice(1)) : '') +
+            l.hash
+          );
+          return;
+        }
       }
     })();
   </script>

@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef, useMemo } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../../store/authStore.ts'
 import { useLPNavigationStore } from '../../store/lpUIStore.ts'
 import { useFavoritenStore, type Favorit } from '../../store/favoritenStore.ts'
@@ -167,6 +168,7 @@ export default function LPHeader({ titel, untertitel, zurueck, statusText, aktio
 
 /** Favoriten-Dropdown: Zeigt gespeicherte Favoriten mit Direktlinks */
 function FavoritenDropdown() {
+  const navigate = useNavigate()
   const favoriten = useFavoritenStore(s => s.favoriten)
   const entferneFavorit = useFavoritenStore(s => s.entferneFavorit)
   const sortiert = useMemo(() => [...favoriten].sort((a, b) => a.sortierung - b.sortierung), [favoriten])
@@ -204,7 +206,7 @@ function FavoritenDropdown() {
 
   function navigiereZu(fav: Favorit): void {
     const pfad = pfadFuerFavorit(fav)
-    window.location.pathname = `${import.meta.env.BASE_URL}${pfad.slice(1)}`
+    navigate(pfad)
     setOffen(false)
   }
 
