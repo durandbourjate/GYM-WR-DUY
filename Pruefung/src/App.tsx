@@ -18,7 +18,7 @@ import Layout from './components/Layout.tsx'
 import FragenUebersicht from './components/FragenUebersicht.tsx'
 import AbgabeBestaetigung from './components/AbgabeBestaetigung.tsx'
 import DurchfuehrenDashboard from './components/lp/durchfuehrung/DurchfuehrenDashboard.tsx'
-import { MultiDurchfuehrenDashboard } from './components/lp/durchfuehrung/MultiDurchfuehrenDashboard.tsx'
+
 import LPStartseite from './components/lp/LPStartseite.tsx'
 import ThemeToggle from './components/ThemeToggle.tsx'
 import SuSStartseite from './components/sus/SuSStartseite.tsx'
@@ -81,10 +81,9 @@ export default function App() {
   const [korrekturId, setKorrekturId] = useState<string | null>(null)
   const [wurdeZurueckgesetzt, setWurdeZurueckgesetzt] = useState(false)
 
-  // Prüfungs-ID aus URL lesen (?id=... oder ?ids=a,b,c für Multi-Modus)
+  // Prüfungs-ID aus URL lesen (?id=...)
   const urlParams = new URLSearchParams(window.location.search)
   const pruefungIdAusUrl = urlParams.get('id')
-  const pruefungIdsAusUrl = urlParams.get('ids')?.split(',').filter(Boolean) ?? []
 
   // Prüfung laden wenn User eingeloggt ist
   useEffect(() => {
@@ -258,11 +257,9 @@ export default function App() {
     return <LoginScreen />
   }
 
-  // LP-Modus: mit ?ids= → Multi-Dashboard, mit ?id= → Durchführen, ohne → Startseite
+  // LP-Modus: mit ?id= → Durchführen, ohne → Startseite
+  // Multi-Dashboard (?ids=) wird jetzt in LPStartseite unter /pruefung/monitoring gehandhabt
   if (user.rolle === 'lp') {
-    if (pruefungIdsAusUrl.length > 1) {
-      return <MultiDurchfuehrenDashboard pruefungIds={pruefungIdsAusUrl} />
-    }
     if (pruefungIdAusUrl) {
       return <DurchfuehrenDashboard pruefungId={pruefungIdAusUrl} />
     }

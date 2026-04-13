@@ -21,6 +21,7 @@ import { einrichtungsFragen } from '../../data/einrichtungsFragen.ts'
 import { einrichtungsUebung } from '../../data/einrichtungsUebung.ts'
 import { einrichtungsUebungFragen } from '../../data/einrichtungsUebungFragen.ts'
 import { speichereConfig, speichereFrage } from '../../services/fragenbankApi.ts'
+import { MultiDurchfuehrenDashboard } from './durchfuehrung/MultiDurchfuehrenDashboard.tsx'
 
 import { leereUebung } from './vorbereitung/configVorlagen'
 
@@ -45,6 +46,15 @@ const AnalyseDashboard = lazyMitRetry(() => import('./ueben/AnalyseDashboard.tsx
 export default function LPStartseite() {
   const user = useAuthStore((s) => s.user)
   const istDemoModus = useAuthStore((s) => s.istDemoModus)
+
+  // Multi-Dashboard: ?ids=abc,def → Vollbild-Dashboard für mehrere Prüfungen
+  const multiIds = useMemo(() => {
+    const params = new URLSearchParams(window.location.search)
+    return params.get('ids')?.split(',').filter(Boolean) ?? []
+  }, [])
+  if (multiIds.length > 1) {
+    return <MultiDurchfuehrenDashboard pruefungIds={multiIds} />
+  }
 
   // Navigation aus dem Store
   const ansicht = useLPNavigationStore(s => s.ansicht)
@@ -799,7 +809,7 @@ export default function LPStartseite() {
                     disabled={multiDashboardAuswahl.size < 2}
                     onClick={() => {
                       const ids = [...multiDashboardAuswahl].join(',')
-                      window.open(`${window.location.pathname}?ids=${ids}`, '_blank')
+                      window.open(`${import.meta.env.BASE_URL}pruefung/monitoring?ids=${ids}`, '_blank')
                       setMultiDashboardOffen(false)
                     }}
                     className="text-xs px-3 py-1.5 rounded-lg font-medium text-white bg-slate-800 dark:bg-slate-200 dark:text-slate-800 disabled:opacity-40 hover:bg-slate-900 dark:hover:bg-slate-100 transition-colors"
