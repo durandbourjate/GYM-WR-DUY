@@ -49,15 +49,34 @@ Feature A1 aus HANDOFF: Echte Deep Links + App-Strukturverzeichnis. Hash-basiert
 - `Pruefung/src/components/settings/EinstellungenPanel.tsx` — FavoritenTab hinzugefügt
 - `.github/workflows/deploy.yml` — 404.html kopieren
 
-### Noch offen (Phase 4+5)
+### Browser-Test (Demo-Modus, localhost)
 
-| # | Thema | Status |
-|---|-------|--------|
-| P4 | **SuS-Üben Routes migrieren** | Offen — Eigenständige Erweiterung, nicht blockierend |
-| P5.1 | **lpNavigationStore → lpUIStore umbenennen** | Offen — Cleanup |
-| P5.2 | **?ids= Legacy entfernen** | Offen — Multi-Monitoring jetzt unter /pruefung/monitoring |
-| P5.3 | **Route-Tests** | Offen — Unit-Tests für Routing/Auth |
-| BT | **Browser-Test** | ⬜ Alle LP-Routes testen, Home-Dashboard, Favoriten, Back/Forward |
+| Test | Ergebnis |
+|------|----------|
+| `/` → Redirect `/login` (unauthentifiziert) | ✅ |
+| Demo-Login → Redirect `/home` | ✅ (Fix: LoginScreen navigate nach Login) |
+| Home-Dashboard 5 Sektionen | ✅ (Fix: Favoriten Infinite-Loop mit useMemo) |
+| Tab Prüfen → URL `/pruefung` | ✅ |
+| Tab Üben → URL `/uebung` | ✅ |
+| Browser Back/Forward | ✅ |
+| Test mit echtem Backend (GitHub Pages) | ⬜ Ausstehend |
+
+### Noch offen (eigene Sessions, nicht blockierend für Merge)
+
+| # | Thema | Beschreibung | Abhängigkeit |
+|---|-------|-------------|-------------|
+| P4 | **SuS-Üben Routes** | `useUebenNavigationStore` durch SuS-Routes ersetzen (`/sus`, `/sus/ueben`, `/sus/ueben/:themaId`) | — |
+| P5.1 | **lpNavigationStore → lpUIStore** | Umbenennen, Favoriten-Code entfernen (ist jetzt in favoritenStore), nur UI-State behalten | — |
+| P5.2 | **?ids= Legacy entfernen** | Multi-Monitoring unter `/pruefung/monitoring` statt `?ids=` | P5.1 |
+| P5.3 | **Route-Tests** | Unit-Tests für Auth Guard, Rollen-Mismatch, Hash-Migration | — |
+
+### Kontext für nächste Sessions
+- **Spec:** `docs/superpowers/specs/2026-04-13-deep-links-home-design.md`
+- **Plan:** `docs/superpowers/plans/2026-04-13-deep-links-home.md`
+- **Branch:** `feature/a1-deep-links-router` (10 Commits, gepusht)
+- **Architektur:** BrowserRouter in `src/router/Router.tsx`, App.tsx unverändert (rendert SuS-Flow), LP-Routes nutzen `useLPRouteSync` + `useLPNavigation` für URL↔Store Bridge
+- **Wichtig:** `lpNavigationStore` hat NOCH alten Favoriten-Code (parallel zu neuem `favoritenStore`). P5.1 räumt das auf.
+- **Wichtig:** `selectFavoritenSortiert` darf NICHT als Zustand-Selector verwendet werden (erzeugt neues Array → Infinite Loop). Immer `useMemo` verwenden.
 
 ### Manuelle Schritte nach Merge
 - ✅ Apps Script: Kein neues Deploy nötig (nur Frontend-Änderungen)
