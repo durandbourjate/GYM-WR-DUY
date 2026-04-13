@@ -6,6 +6,30 @@
 
 ---
 
+## Session 99 — Bundle 2: Favoriten-Redesign (13.04.2026)
+
+### Stand
+Auf `main`. tsc ✅ | 227 Tests ✅ | Build ✅. Browser-Test ✅ (Demo-Modus, localhost).
+
+### Erledigte Arbeiten
+
+| # | Änderung | Dateien |
+|---|----------|---------|
+| 1 | **Route-Registry `APP_NAVIGATION`** — Zentrale Baumstruktur aller navigierbaren LP-Orte als Single Source of Truth. 4 Kategorien (Prüfen, Üben, Fragensammlung, Einstellungen) mit Kindern. `nurAdmin`-Flag für Admin-Tab. | `src/config/appNavigation.ts` (NEU) |
+| 2 | **Home → Favoriten umbenannt** — Route `/home` → `/favoriten`, Komponente Home.tsx → Favoriten.tsx, `navigiereZuHome` → `navigiereZuFavoriten`, alle Redirects (AuthGuard, LoginScreen, Router) aktualisiert | Favoriten.tsx, Router.tsx, AuthGuard.tsx, useLPNavigation.ts, useLPRouteSync.ts, LoginScreen.tsx |
+| 3 | **FavoritenTab Baumstruktur** — Flaches Dropdown ersetzt durch aufklappbare Baumansicht aus `APP_NAVIGATION` mit ☆ Stern-Toggle pro Eintrag. `istAdmin` Prop von EinstellungenPanel durchgereicht. | FavoritenTab.tsx, EinstellungenPanel.tsx |
+| 4 | **Header-Umbau** — Neuer Tab "Favoriten" (Direktnavigation, nicht via Modus-System). ⭐-Dropdown + FavoritenDropdown komplett entfernt. Logo-Klick → `/favoriten`. `onHome` Prop entfernt (aus LPHeader, Favoriten, LPStartseite, PruefungsComposer). | LPHeader.tsx, Favoriten.tsx, LPStartseite.tsx, PruefungsComposer.tsx |
+
+### Kontext
+- **Spec:** `docs/superpowers/specs/2026-04-13-bundle2-favoriten-redesign-design.md`
+- **Plan:** `docs/superpowers/plans/2026-04-13-bundle2-favoriten-redesign.md`
+- **Tabs im Header:** Favoriten | Prüfen | Üben | Fragensammlung
+- **Logo-Klick:** Geht immer zu `/favoriten` (auch aus Composer). "← Zurück"-Button existiert separat fürs Dashboard.
+- **Favoriten-Seite:** Inhalt identisch mit ehemaliger Home-Seite (Favoriten-Karten + Korrekturen + Prüfungen/Übungen)
+- **FavoritenTab (Einstellungen):** Oben sortierbare Favoriten (Drag & Drop), unten Baumansicht mit Stern-Toggles
+
+---
+
 ## Session 98 — Bundle 1: Quick Wins UX-Korrekturen (13.04.2026)
 
 ### Stand
@@ -130,7 +154,7 @@ Auf `main`. tsc ✅ | 209 Tests ✅ | Build ✅.
 | Bundle | Inhalt | Status |
 |--------|--------|--------|
 | **1** | Quick Wins (N3, N5, N6, N10, N13, N17, N18) | ✅ S98 |
-| **2** | Favoriten-Redesign (N1 dynamische Struktur, N2 Tab + Home) | Offen |
+| **2** | Favoriten-Redesign (N1 dynamische Struktur, N2 Tab + Home) | ✅ S99 |
 | **3** | Übungs-Themen UX (N9 max 5 aktuelle, N11 SuS-Sortierung, N12 LP-Status, N14 Einstellungen verschieben) | Offen |
 | **4** | Layout-Umbau Durchführen (N15 Tabs+Suche+CTA, N16 Buttons konsistent) | Offen |
 | **5** | Bildfragen-Editor (N7 violette Pins/Zonen, N19 Bild-Persistenz) | Offen |

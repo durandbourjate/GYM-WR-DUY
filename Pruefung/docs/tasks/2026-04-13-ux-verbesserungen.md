@@ -157,10 +157,10 @@
 
 ## Empfohlene Bündelung für Umsetzung
 
-### Bundle 1 — Quick Wins (klein, isoliert)
+### Bundle 1 — Quick Wins (klein, isoliert) ✅ S98
 N3, N17, N18, N13, N5, N10 (Begriffe)
 
-### Bundle 2 — Favoriten-Redesign
+### Bundle 2 — Favoriten-Redesign ✅ S99
 N1 (dynamische Struktur), N2 (Tab + Home-Zugang)
 
 ### Bundle 3 — Übungs-Themen UX
