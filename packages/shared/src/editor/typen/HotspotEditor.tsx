@@ -92,7 +92,7 @@ export default function HotspotEditor({ bildUrl, setBildUrl, bereiche, setBereic
                     height: `${k.hoehe ?? 0}%`,
                   }}
                 >
-                  <span className="absolute -top-5 left-0 text-xs font-bold text-violet-600 dark:text-violet-400 bg-white dark:bg-slate-800 px-1 rounded shadow">
+                  <span className="absolute -top-5 left-0 text-xs font-bold text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-800 px-1 rounded shadow">
                     {i + 1}
                   </span>
                 </div>
@@ -109,8 +109,8 @@ export default function HotspotEditor({ bildUrl, setBildUrl, bereiche, setBereic
           </p>
           <div className="space-y-2">
             {bereiche.map((bereich, i) => (
-              <div key={bereich.id} className="flex items-center gap-2 p-2 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
-                <span className="flex-shrink-0 w-7 h-7 rounded-full bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center text-xs font-bold text-violet-600 dark:text-violet-400">
+              <div key={bereich.id} className="flex items-center gap-2 p-2 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                <span className="flex-shrink-0 w-7 h-7 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs font-bold text-slate-600 dark:text-slate-300">
                   {i + 1}
                 </span>
                 <input
@@ -119,7 +119,7 @@ export default function HotspotEditor({ bildUrl, setBildUrl, bereiche, setBereic
                   onChange={(e) => handleBereichAendern(bereich.id, 'label', e.target.value)}
                   autoFocus={editLabel === bereich.id}
                   onFocus={() => setEditLabel(null)}
-                  className="flex-1 px-2 py-1 text-sm rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:border-violet-500 focus:outline-none"
+                  className="flex-1 px-2 py-1 text-sm rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:border-slate-500 focus:outline-none"
                   placeholder="Label"
                 />
                 <input
@@ -128,7 +128,7 @@ export default function HotspotEditor({ bildUrl, setBildUrl, bereiche, setBereic
                   onChange={(e) => handleBereichAendern(bereich.id, 'punkte', Number(e.target.value))}
                   min={0}
                   step={0.5}
-                  className="w-16 px-2 py-1 text-sm rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:border-violet-500 focus:outline-none text-center"
+                  className="w-16 px-2 py-1 text-sm rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:border-slate-500 focus:outline-none text-center"
                   title="Punkte"
                 />
                 <span className="text-xs text-slate-400">Pkt</span>

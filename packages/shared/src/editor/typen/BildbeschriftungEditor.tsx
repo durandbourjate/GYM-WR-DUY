@@ -77,8 +77,8 @@ export default function BildbeschriftungEditor({ bildUrl, setBildUrl, beschriftu
           </p>
           <div className="space-y-2">
             {beschriftungen.map((b, i) => (
-              <div key={b.id} className="flex items-center gap-2 p-2 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
-                <span className="flex-shrink-0 w-7 h-7 rounded-full bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center text-xs font-bold text-violet-600 dark:text-violet-400">
+              <div key={b.id} className="flex items-center gap-2 p-2 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                <span className="flex-shrink-0 w-7 h-7 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs font-bold text-slate-600 dark:text-slate-300">
                   {i + 1}
                 </span>
                 <div className="flex-1">
