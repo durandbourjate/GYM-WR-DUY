@@ -4,7 +4,7 @@
  * Upload geht über EditorServices.uploadAnhang (Dependency Injection).
  */
 import { useRef, useState, useCallback } from 'react'
-import { useEditorConfig, useEditorServices } from '../EditorContext'
+import { useEditorServices } from '../EditorContext'
 import { resolvePoolBildUrl } from '../utils/poolBildUrl'
 
 const MAX_GROESSE = 5 * 1024 * 1024 // 5 MB
@@ -25,7 +25,6 @@ export default function BildUpload({ bildUrl: rawBildUrl, setBildUrl, bildDriveF
   const [dragOver, setDragOver] = useState(false)
   const [ladetHoch, setLadetHoch] = useState(false)
   const [fehler, setFehler] = useState<string | null>(null)
-  const { benutzer } = useEditorConfig()
   const services = useEditorServices()
   const backendVerfuegbar = services.istUploadVerfuegbar()
 
@@ -57,7 +56,11 @@ export default function BildUpload({ bildUrl: rawBildUrl, setBildUrl, bildDriveF
     setLadetHoch(true)
     try {
       const result = await services.uploadAnhang('bild-upload', datei)
-      if (result?.driveFileId) {
+      if (result && 'error' in result) {
+        // Backend hat einen Fehler zurückgegeben
+        console.error('[BildUpload] Backend-Fehler:', result.error)
+        setFehler(`Upload fehlgeschlagen: ${result.error}`)
+      } else if (result?.driveFileId) {
         // Drive-Preview-URL generieren
         const previewUrl = `https://drive.google.com/uc?id=${result.driveFileId}&export=view`
         setBildUrl(previewUrl)
@@ -72,7 +75,7 @@ export default function BildUpload({ bildUrl: rawBildUrl, setBildUrl, bildDriveF
     } finally {
       setLadetHoch(false)
     }
-  }, [backendVerfuegbar, benutzer.email, setBildUrl, setBildDriveFileId, services])
+  }, [backendVerfuegbar, setBildUrl, setBildDriveFileId, services])
 
   const handleDateiWaehlen = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const datei = e.target.files?.[0]

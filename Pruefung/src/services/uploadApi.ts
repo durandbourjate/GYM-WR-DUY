@@ -35,8 +35,9 @@ export async function uploadMaterial(email: string, datei: File): Promise<{ driv
   }
 }
 
-/** Anhang (Bild/PDF) zu einer Frage hochladen */
-export async function uploadAnhang(email: string, frageId: string, datei: File): Promise<FrageAnhang | null> {
+/** Anhang (Bild/PDF) zu einer Frage hochladen.
+ *  Gibt {FrageAnhang} bei Erfolg, {error: string} bei Backend-Fehler, oder null bei Netzwerkfehler. */
+export async function uploadAnhang(email: string, frageId: string, datei: File): Promise<FrageAnhang | { error: string } | null> {
   if (!APPS_SCRIPT_URL) return null
 
   try {
@@ -55,17 +56,18 @@ export async function uploadAnhang(email: string, frageId: string, datei: File):
         base64Data: base64,
       }),
     })
-    if (!response.ok) return null
+    if (!response.ok) return { error: `HTTP ${response.status}` }
 
     const text = await response.text()
     try {
       const data = JSON.parse(text)
-      if (data.error) return null
+      if (data.error) return { error: data.error }
       return data as FrageAnhang
     } catch {
-      return null
+      return { error: 'Ungültige Server-Antwort' }
     }
-  } catch {
+  } catch (err) {
+    console.error('[uploadAnhang] Netzwerkfehler:', err)
     return null
   }
 }

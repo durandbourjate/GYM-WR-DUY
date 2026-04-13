@@ -99,8 +99,8 @@ export default function ZeichnenEditor({
         return
       }
       const ergebnis = await services.uploadAnhang('zeichnen-hintergrund', datei)
-      if (!ergebnis?.driveFileId) {
-        setUploadFehler('Upload fehlgeschlagen. Bitte erneut versuchen.')
+      if (!ergebnis || 'error' in ergebnis) {
+        setUploadFehler(ergebnis && 'error' in ergebnis ? `Upload fehlgeschlagen: ${ergebnis.error}` : 'Upload fehlgeschlagen. Bitte erneut versuchen.')
         return
       }
       const url = `https://drive.google.com/uc?id=${ergebnis.driveFileId}&export=view`
@@ -162,7 +162,7 @@ export default function ZeichnenEditor({
     try {
       if (!services.istUploadVerfuegbar() || !services.uploadAnhang) return
       const ergebnis = await services.uploadAnhang('zeichnen-musterloesung', datei)
-      if (ergebnis?.driveFileId) {
+      if (ergebnis && !('error' in ergebnis) && ergebnis.driveFileId) {
         onMusterloesungBildChange(`https://drive.google.com/uc?id=${ergebnis.driveFileId}&export=view`)
       }
     } finally {

@@ -550,7 +550,9 @@ export default function SharedFragenEditor({
       for (const datei of neueAnhaenge) {
         try {
           const ergebnis = await services.uploadAnhang?.(id, datei) ?? null
-          if (ergebnis) {
+          if (ergebnis && 'error' in ergebnis) {
+            console.warn(`[SharedFragenEditor] Upload fehlgeschlagen für ${datei.name}: ${ergebnis.error}`)
+          } else if (ergebnis) {
             alleAnhaenge.push(ergebnis)
           } else {
             console.warn(`[SharedFragenEditor] Upload fehlgeschlagen für: ${datei.name}`)

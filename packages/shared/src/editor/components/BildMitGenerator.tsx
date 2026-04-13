@@ -19,7 +19,7 @@ interface Props {
 }
 
 export default function BildMitGenerator({ bildUrl, setBildUrl, bildDriveFileId, setBildDriveFileId, fragetyp }: Props) {
-  const [modus, setModus] = useState<BildModus>(bildUrl ? 'upload' : 'upload')
+  const [modus, setModus] = useState<BildModus>('upload')
 
   // Wenn bereits ein Bild vorhanden, direkt den Upload-Tab (zeigt Vorschau)
   if (bildUrl) {

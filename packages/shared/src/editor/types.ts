@@ -42,8 +42,8 @@ export interface EditorConfig {
 
 /** Services die der Host implementiert (Dependency Injection) */
 export interface EditorServices {
-  /** Datei-Upload (Bilder, PDFs). Null = Upload nicht verfügbar. */
-  uploadAnhang?: (frageId: string, datei: File) => Promise<FrageAnhang | null>
+  /** Datei-Upload (Bilder, PDFs). Null = Upload nicht verfügbar, {error} = Backend-Fehler. */
+  uploadAnhang?: (frageId: string, datei: File) => Promise<FrageAnhang | { error: string } | null>
 
   /** KI-Assistent API-Aufruf. Null = KI nicht verfügbar. */
   kiAssistent?: (aktion: string, daten: Record<string, unknown>) => Promise<Record<string, unknown> | null>
