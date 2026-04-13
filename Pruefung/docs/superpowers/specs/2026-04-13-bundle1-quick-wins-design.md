@@ -9,11 +9,13 @@
 
 **Problem:** LPHeader.tsx zeigt "Fragensammlung" zweimal — einmal als Tab (TABS-Array Zeile 36) und einmal als separater Button (Zeile 130).
 
-**Lösung:** Den separaten Button (Zeile 130) entfernen. Der Tab im TABS-Array reicht als einziger Zugang.
+**Lösung:** Den Button nur ausblenden wenn die Tabs sichtbar sind (Dashboard ohne `zurueck`). Auf Sub-Pages (PruefungsComposer, KorrekturDashboard etc.) sind die Tabs verborgen und der Button ist der einzige Zugang zur Fragensammlung-Seitenleiste — dort muss er bleiben.
+
+Konkret: Button nur rendern wenn `!istDashboard || zurueck` (d.h. Tabs nicht sichtbar).
 
 **Dateien:** `src/components/lp/LPHeader.tsx`
 
-**Risiko:** Gering. Prüfen ob der Button eine andere Funktion hat als der Tab (z.B. andere Navigation). Falls identisch → entfernen.
+**Risiko:** Gering, aber wichtig: Der Button hat auf Sub-Pages eine andere Funktion (togglet Seitenleiste) als der Tab (setzt Modus). Daher nicht pauschal entfernen.
 
 ---
 
@@ -23,8 +25,9 @@
 
 **Lösung:**
 1. Kleine Bildvorschau (`<img>` + roter X-Button) in BildUpload.tsx entfernen
-2. Neuer dezenter "Bild entfernen"-Textbutton rechts neben dem URL-Eingabefeld
+2. Neuer dezenter "Bild entfernen"-Textbutton rechts neben dem URL-Eingabefeld, **nur sichtbar wenn `bildUrl` gesetzt ist**
 3. Layout URL-Zeile: `[oder] [URL-Feld] [Bild entfernen]` — flex-row, gap
+4. Bei Data-URL-Uploads (wo URL-Feld leer bleibt): Kleiner Hinweis "(Bild geladen)" neben dem URL-Feld, damit User weiss dass ein Bild vorhanden ist
 
 **Dateien:** `packages/shared/src/editor/components/BildUpload.tsx`
 
@@ -40,11 +43,15 @@
 
 | Datei | Zeile | Alt | Neu |
 |-------|-------|-----|-----|
-| `src/components/lp/Home.tsx` | 207 | `'Aktiv'` | `'Aktuell'` |
+| `src/components/ueben/admin/AdminThemensteuerung.tsx` | 253 | `'Aktiv'` | `'Aktuell'` |
+| `src/components/ueben/admin/AdminThemensteuerung.tsx` | 253 | `'z.T. aktiv'` | `'z.T. aktuell'` |
 | `src/components/ueben/admin/AdminThemensteuerung.tsx` | 254 | `'Abgeschl.'` | `'Freigegeben'` |
-| `src/components/ueben/admin/AdminThemensteuerung.tsx` | 254 | `'Nicht freig.'` | entfernen oder leer lassen |
+| `src/components/ueben/admin/AdminThemensteuerung.tsx` | 254 | `'Nicht freig.'` | Badge komplett entfernen (kein leerer Span, `null` zurückgeben) |
 
-**Nicht ändern:** "Aktiv" in SchuelerZeile.tsx und AktivPhase.tsx — dort ist "Aktiv" ein Prüfungsstatus (Schüler schreibt gerade), kein Übungsthema-Status.
+**Nicht ändern:**
+- `Home.tsx:207` — dort ist "Aktiv" ein **Prüfungsstatus** (configStatus für Prüfungen), nicht für Übungsthemen
+- `SchuelerZeile.tsx`, `AktivPhase.tsx` — ebenfalls Prüfungsstatus
+- `ThemaKarte.tsx:80` — zeigt bereits "Aktuell" (SuS-Ansicht, korrekt)
 
 **Risiko:** Gering. Nur UI-Labels, keine Logik-Änderung. Grep nach weiteren Vorkommen im Übungs-Kontext vor Umsetzung.
 
@@ -92,20 +99,20 @@
 
 | Datei | Änderungen |
 |-------|-----------|
-| `src/components/lp/LPHeader.tsx` | N3: Button entfernen |
+| `src/components/lp/LPHeader.tsx` | N3: Button nur auf Dashboard ausblenden |
 | `packages/shared/src/editor/components/BildUpload.tsx` | N5+N6: Vorschau entfernen, Textbutton neben URL |
-| `src/components/lp/Home.tsx` | N10: "Aktiv" → "Aktuell" |
-| `src/components/ueben/admin/AdminThemensteuerung.tsx` | N10: "Abgeschl." → "Freigegeben" |
+| `src/components/ueben/admin/AdminThemensteuerung.tsx` | N10: Labels umbenennen (Aktuell, Freigegeben) |
 | `src/components/ueben/ThemaKarte.tsx` | N13: Farbpunkt nach links |
 | `src/components/lp/fragenbank/fragenbrowser/FragenBrowserHeader.tsx` | N17: "Fachbereich" → "Fach" |
 | `packages/shared/src/editor/components/FrageTypAuswahl.tsx` | N18: Icons entfernen |
 
 ## Testplan
 
-- [ ] LPHeader: Nur ein "Fragensammlung"-Eintrag sichtbar, Tab funktioniert
+- [ ] LPHeader Dashboard: Nur ein "Fragensammlung"-Eintrag sichtbar (Tab), kein separater Button
+- [ ] LPHeader Sub-Page (z.B. PruefungsComposer): Fragensammlung-Button weiterhin sichtbar und funktional
 - [ ] BildUpload: Kein kleines Vorschaubild, "Bild entfernen" rechts neben URL, grosses Bild im Editor weiterhin korrekt
-- [ ] Home-Dashboard: Übungsthemen zeigen "Aktuell" statt "Aktiv"
-- [ ] AdminThemensteuerung: "Freigegeben" statt "Abgeschl.", nicht freigegebene ohne/mit leerem Label
+- [ ] AdminThemensteuerung: "Aktuell" statt "Aktiv", "z.T. aktuell" statt "z.T. aktiv"
+- [ ] AdminThemensteuerung: "Freigegeben" statt "Abgeschl.", kein Badge für nicht freigegebene
 - [ ] ThemaKarte (SuS): Farbpunkt links vom Themennamen
 - [ ] FragenBrowserHeader: Dropdown zeigt "Fach" statt "Fachbereich"
 - [ ] FrageTypAuswahl: Keine Emoji-Icons vor Kategorienamen
