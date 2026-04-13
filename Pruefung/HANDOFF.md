@@ -6,6 +6,26 @@
 
 ---
 
+## Session 101 — Bundle 4: Layout-Umbau Durchführen (13.04.2026)
+
+### Stand
+Auf `feature/bundle4-layout-umbau`. tsc ✅ | 226 Tests ✅ | Build ✅. Browser-Test ausstehend.
+
+### Erledigte Arbeiten
+
+| # | Änderung | Dateien |
+|---|----------|---------|
+| N15 | **Suchfeld in Tab-Zeile** — Suchfeld aus eigener Zeile in die Tab-Zeile verschoben (rechtsbündig). Sort-Dropdown in Filterzeile verschoben. Gilt für Prüfen und Üben. | LPStartseite.tsx |
+| N16 | **CTA-Buttons konsistent primary** — "+Neue Prüfung", "+Neue Übung", "+Neue Frage" nutzen jetzt shared `Button` variant="primary". Aus Header in Filterzeile verschoben. Empty-State Buttons ebenfalls umgestellt. `cursor-pointer` in Button.tsx ergänzt. | LPStartseite.tsx, Button.tsx, FragenBrowserHeader.tsx |
+
+### Kontext
+- **Spec:** `docs/superpowers/specs/2026-04-13-bundle4-layout-umbau-durchfuehren-design.md`
+- **Plan:** `docs/superpowers/plans/2026-04-13-bundle4-layout-umbau-durchfuehren.md`
+- **aktionsButtons Prop:** Wird nicht mehr von LPStartseite für Prüfen/Üben übergeben (`undefined`). Prop bleibt auf LPHeader für andere Aufrufer (PruefungsComposer etc.).
+- **Nächste Session:** Bundle 5 (Bildfragen-Editor) oder anderes offenes Bundle.
+
+---
+
 ## Session 100 — Bundle 3: Übungs-Themen UX (13.04.2026)
 
 ### Stand
@@ -178,7 +198,7 @@ Auf `main`. tsc ✅ | 209 Tests ✅ | Build ✅.
 | **1** | Quick Wins (N3, N5, N6, N10, N13, N17, N18) | ✅ S98 |
 | **2** | Favoriten-Redesign (N1 dynamische Struktur, N2 Tab + Home) | ✅ S99 |
 | **3** | Übungs-Themen UX (N9 max 5 aktuelle, N11 SuS-Sortierung, N12 LP-Status, N14 Einstellungen verschieben) | ✅ S100 |
-| **4** | Layout-Umbau Durchführen (N15 Tabs+Suche+CTA, N16 Buttons konsistent) | Offen |
+| **4** | Layout-Umbau Durchführen (N15 Tabs+Suche+CTA, N16 Buttons konsistent) | ✅ S101 |
 | **5** | Bildfragen-Editor (N7 violette Pins/Zonen, N19 Bild-Persistenz) | Offen |
 | **6** | KI-UI (N20 Buttons/Farben/Cursor) | Offen |
 | **7** | Design-Konzept (N8 Design-Schliff, N21 violette Felder, N4 resizable Sidebar) — braucht Mockups | Offen |
