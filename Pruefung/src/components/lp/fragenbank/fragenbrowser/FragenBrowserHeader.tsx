@@ -3,6 +3,7 @@ import type { Frage, FrageSummary, Fachbereich, BloomStufe } from '../../../../t
 import type { Sortierung, FilterPoolStatus, FilterKontext } from '../../../../hooks/useFragenFilter.ts'
 import type { Gruppierung } from './gruppenHelfer.ts'
 import { typLabel } from '../../../../utils/fachUtils.ts'
+import Button from '../../../ui/Button.tsx'
 
 interface Props {
   // Daten
@@ -118,12 +119,9 @@ export default function FragenBrowserHeader({
           )}
         </div>
         <div className="flex items-center gap-2">
-          <button
-            onClick={onNeueFrageErstellen}
-            className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors cursor-pointer"
-          >
+          <Button variant="primary" size="sm" onClick={onNeueFrageErstellen}>
             + Neue Frage
-          </button>
+          </Button>
           <button
             onClick={onImport}
             className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors cursor-pointer"
