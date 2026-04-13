@@ -53,18 +53,35 @@ html:not(.dark) {
 
 /* Composer: input-field Utility */
 .input-field {
-  @apply w-full px-3 py-2 text-sm border border-slate-300 rounded-lg bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-400;
+  @apply w-full px-3 py-2 text-sm border border-slate-300 rounded-lg bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500;
 }
 .dark .input-field {
-  @apply border-slate-600 bg-slate-700 text-slate-100 placeholder-slate-500 focus:ring-slate-500;
+  @apply border-slate-600 bg-slate-700 text-slate-100 placeholder-slate-500 focus:ring-violet-500;
 }
 
 /* input-field-narrow: wie input-field, aber ohne w-full (für schmale Felder mit eigener Breite) */
 .input-field-narrow {
-  @apply px-3 py-2 text-sm border border-slate-300 rounded-lg bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-400;
+  @apply px-3 py-2 text-sm border border-slate-300 rounded-lg bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500;
 }
 .dark .input-field-narrow {
-  @apply border-slate-600 bg-slate-700 text-slate-100 placeholder-slate-500 focus:ring-slate-500;
+  @apply border-slate-600 bg-slate-700 text-slate-100 placeholder-slate-500 focus:ring-violet-500;
+}
+
+/* Pflichtfeld-Hervorhebung: Violetter Rahmen + Hintergrund */
+.input-pflicht {
+  @apply border-2 border-violet-500 bg-violet-50;
+}
+.dark .input-pflicht {
+  background-color: #2d2040;
+  @apply border-violet-500;
+}
+
+/* Dark Mode: Stärkere Schatten für bessere Sichtbarkeit */
+.dark .shadow-sm {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+.dark .shadow {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 /* line-clamp Utility */
