@@ -5,6 +5,7 @@ import { useLPNavigationStore } from '../../store/lpUIStore.ts'
 import ThemeToggle from '../ThemeToggle.tsx'
 import FeedbackButton from '../shared/FeedbackButton.tsx'
 import Tooltip from '../ui/Tooltip.tsx'
+import { TabBar } from '../ui/TabBar.tsx'
 import { APP_VERSION } from '../../version'
 
 
@@ -27,10 +28,11 @@ interface Props {
   breadcrumbs?: { label: string; aktion?: () => void }[]
 }
 
-const TABS: { key: Modus; label: string }[] = [
-  { key: 'pruefung', label: 'Prüfen' },
-  { key: 'uebung', label: 'Üben' },
-  { key: 'fragensammlung', label: 'Fragensammlung' },
+const HEADER_TABS = [
+  { id: 'favoriten', label: 'Favoriten' },
+  { id: 'pruefung', label: 'Prüfen' },
+  { id: 'uebung', label: 'Üben' },
+  { id: 'fragensammlung', label: 'Fragensammlung' },
 ]
 
 export default function LPHeader({ untertitel, zurueck, statusText, aktionsButtons, modus, onModusChange, onFragensammlung, onHilfe, onEinstellungen, fragensammlungOffen, hilfeOffen, breadcrumbs }: Props) {
@@ -103,31 +105,18 @@ export default function LPHeader({ untertitel, zurueck, statusText, aktionsButto
 
           {/* Tabs im Dashboard-Modus (nicht bei Sub-Pages mit Zurück-Button) */}
           {istDashboard && !zurueck && (
-            <div className="flex gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-lg ml-4">
-              {/* Favoriten-Tab (Direktnavigation, nicht via Modus) */}
-              <button
-                onClick={() => navigate('/favoriten')}
-                className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors cursor-pointer ${
-                  istFavoritenAktiv
-                    ? 'bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 shadow-sm'
-                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
-                }`}
-              >
-                Favoriten
-              </button>
-              {TABS.map((t) => (
-                <button
-                  key={t.key}
-                  onClick={() => onModusChange(t.key)}
-                  className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors cursor-pointer ${
-                    !istFavoritenAktiv && modus === t.key
-                      ? 'bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 shadow-sm'
-                      : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
-                  }`}
-                >
-                  {t.label}
-                </button>
-              ))}
+            <div className="ml-4">
+              <TabBar
+                tabs={HEADER_TABS}
+                activeTab={istFavoritenAktiv ? 'favoriten' : (modus ?? 'pruefung')}
+                onTabChange={(id) => {
+                  if (id === 'favoriten') {
+                    navigate('/favoriten');
+                  } else {
+                    onModusChange(id as Modus);
+                  }
+                }}
+              />
             </div>
           )}
         </div>
