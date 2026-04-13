@@ -19,10 +19,14 @@
         var params = new URLSearchParams(window.location.search);
         var p = params.get('p');
         if (p) {
-          var path = decodeURIComponent(p);
+          // Base-Path aus aktuellem Pfad ableiten (z.B. /GYM-WR-DUY/ExamLab/)
+          var base = window.location.pathname;
+          var route = decodeURIComponent(p);
+          // Route an Base-Path anhängen (ohne doppelten Slash)
+          var fullPath = base.replace(/\/$/, '') + route;
           var q = params.get('q');
           var search = q ? '?' + decodeURIComponent(q) : '';
-          window.history.replaceState(null, '', path + search + window.location.hash);
+          window.history.replaceState(null, '', fullPath + search + window.location.hash);
         }
       })();
     </script>
