@@ -95,7 +95,7 @@ export function AppRouter() {
         } />
 
         {/* LP-Bereich: Alle Routes rendern LPStartseite (mit URL-Sync) */}
-        <Route path="/home" element={<LPGuard><FavoritenFlow /></LPGuard>} />
+        <Route path="/favoriten" element={<LPGuard><FavoritenFlow /></LPGuard>} />
         <Route path="/pruefung" element={<LPGuard><LPFlow /></LPGuard>} />
         <Route path="/pruefung/tracker" element={<LPGuard><LPFlow /></LPGuard>} />
         <Route path="/pruefung/monitoring" element={<LPGuard><LPFlow /></LPGuard>} />
