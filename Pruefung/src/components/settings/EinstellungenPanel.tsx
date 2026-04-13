@@ -81,7 +81,7 @@ export default function EinstellungenPanel({ onSchliessen, initialTab }: Props) 
             <LernzielTab email={user.email} />
           )}
           {tab === 'favoriten' && (
-            <FavoritenTab />
+            <FavoritenTab istAdmin={admin} />
           )}
           {tab === 'admin' && admin && user?.email && (
             <AdminTab email={user.email} stammdaten={stammdaten} />

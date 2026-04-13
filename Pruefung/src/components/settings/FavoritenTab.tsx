@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import { useFavoritenStore, type Favorit } from '../../store/favoritenStore'
+import { APP_NAVIGATION, type NavigationsEintrag } from '../../config/appNavigation'
 import {
   DndContext,
   closestCenter,
@@ -17,28 +18,13 @@ import {
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 
-/** Vordefinierte App-Orte die als Favoriten gesetzt werden können */
-const APP_ORTE: Array<{ ziel: string; label: string; icon: string }> = [
-  { ziel: '/favoriten', label: 'Favoriten', icon: '⭐' },
-  { ziel: '/pruefung', label: 'Prüfungsliste', icon: '📝' },
-  { ziel: '/pruefung/tracker', label: 'Prüfungs-Tracker', icon: '📊' },
-  { ziel: '/pruefung/monitoring', label: 'Multi-Monitoring', icon: '👁️' },
-  { ziel: '/uebung', label: 'Übungsliste', icon: '🎯' },
-  { ziel: '/uebung/durchfuehren', label: 'Übung durchführen', icon: '▶️' },
-  { ziel: '/uebung/analyse', label: 'Analyse', icon: '📈' },
-  { ziel: '/fragensammlung', label: 'Fragensammlung', icon: '📚' },
-  { ziel: '/einstellungen/profil', label: 'Mein Profil', icon: '👤' },
-  { ziel: '/einstellungen/lernziele', label: 'Lernziele', icon: '🎓' },
-]
-
-/** Favoriten verwalten: Sortierbare Liste + App-Orte hinzufügen */
-export default function FavoritenTab() {
+/** Favoriten verwalten: Sortierbare Liste + App-Struktur als Baum */
+export default function FavoritenTab({ istAdmin }: { istAdmin: boolean }) {
   const rawFavoriten = useFavoritenStore(s => s.favoriten)
   const favoriten = useMemo(() =>
     [...rawFavoriten].sort((a, b) => a.sortierung - b.sortierung),
   [rawFavoriten])
-  const { toggleFavorit, updateSortierung, entferneFavorit } = useFavoritenStore()
-  const [ortDropdownOffen, setOrtDropdownOffen] = useState(false)
+  const { updateSortierung, entferneFavorit } = useFavoritenStore()
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -59,15 +45,13 @@ export default function FavoritenTab() {
     updateSortierung(neueReihenfolge)
   }
 
-  // Noch nicht als Favorit gesetzte App-Orte
-  const verfuegbareOrte = APP_ORTE.filter(o => !favoriten.some(f => f.ziel === o.ziel))
-
   return (
     <div className="space-y-6">
+      {/* Aktive Favoriten (sortierbar) */}
       <div>
         <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1">Favoriten verwalten</h3>
         <p className="text-xs text-slate-400 dark:text-slate-500 mb-4">
-          Per Drag & Drop umsortieren. Favoriten erscheinen auf der Home-Seite.
+          Per Drag & Drop umsortieren. Favoriten erscheinen auf der Favoriten-Seite.
         </p>
 
         {favoriten.length === 0 ? (
@@ -87,37 +71,89 @@ export default function FavoritenTab() {
         )}
       </div>
 
-      {/* App-Orte hinzufügen */}
-      {verfuegbareOrte.length > 0 && (
-        <div>
-          <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">App-Ort hinzufügen</h3>
-          <div className="relative">
-            <button
-              onClick={() => setOrtDropdownOffen(!ortDropdownOffen)}
-              className="w-full px-3 py-2 text-left text-sm border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:border-blue-300 dark:hover:border-blue-600 cursor-pointer"
-            >
-              + App-Ort auswählen...
-            </button>
-            {ortDropdownOffen && (
-              <div className="absolute left-0 right-0 mt-1 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg shadow-lg z-10 max-h-60 overflow-y-auto">
-                {verfuegbareOrte.map(ort => (
-                  <button
-                    key={ort.ziel}
-                    onClick={() => {
-                      toggleFavorit({ typ: 'ort', ziel: ort.ziel, label: ort.label, icon: ort.icon })
-                      setOrtDropdownOffen(false)
-                    }}
-                    className="w-full px-3 py-2 text-left text-sm hover:bg-slate-50 dark:hover:bg-slate-600 flex items-center gap-2 cursor-pointer"
-                  >
-                    <span>{ort.icon}</span>
-                    <span className="text-slate-700 dark:text-slate-200">{ort.label}</span>
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+      {/* App-Struktur als Baum */}
+      <div>
+        <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">App-Ort hinzufügen</h3>
+        <NavigationsBaum istAdmin={istAdmin} />
+      </div>
+    </div>
+  )
+}
+
+/** Baumansicht der App-Navigation mit Stern-Toggles */
+function NavigationsBaum({ istAdmin }: { istAdmin: boolean }) {
+  const { toggleFavorit, istFavorit } = useFavoritenStore()
+
+  return (
+    <div className="space-y-0.5">
+      {APP_NAVIGATION.map(eintrag => (
+        <BaumEintrag
+          key={eintrag.pfad}
+          eintrag={eintrag}
+          istAdmin={istAdmin}
+          toggleFavorit={toggleFavorit}
+          istFavorit={istFavorit}
+        />
+      ))}
+    </div>
+  )
+}
+
+function BaumEintrag({ eintrag, istAdmin, toggleFavorit, istFavorit, tiefe = 0 }: {
+  eintrag: NavigationsEintrag
+  istAdmin: boolean
+  toggleFavorit: (fav: Omit<Favorit, 'sortierung'> & { sortierung?: number }) => void
+  istFavorit: (ziel: string) => boolean
+  tiefe?: number
+}) {
+  const [offen, setOffen] = useState(false)
+  const hatKinder = eintrag.kinder && eintrag.kinder.length > 0
+  const istFav = istFavorit(eintrag.pfad)
+
+  if (eintrag.nurAdmin && !istAdmin) return null
+
+  return (
+    <div>
+      <div
+        className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-slate-50 dark:hover:bg-slate-700/50"
+        style={{ paddingLeft: `${8 + tiefe * 16}px` }}
+      >
+        {/* Aufklapp-Button oder Platzhalter */}
+        {hatKinder ? (
+          <button
+            onClick={() => setOffen(!offen)}
+            className="w-5 text-center text-slate-400 dark:text-slate-500 cursor-pointer text-xs"
+          >
+            {offen ? '▼' : '▶'}
+          </button>
+        ) : (
+          <span className="w-5" />
+        )}
+
+        {/* Icon + Label */}
+        <span className="text-sm">{eintrag.icon}</span>
+        <span className="flex-1 text-sm text-slate-700 dark:text-slate-200">{eintrag.label}</span>
+
+        {/* Stern-Toggle */}
+        <button
+          onClick={() => toggleFavorit({ typ: 'ort', ziel: eintrag.pfad, label: eintrag.label, icon: eintrag.icon })}
+          className="text-lg leading-none cursor-pointer hover:scale-110 transition-transform"
+          title={istFav ? 'Aus Favoriten entfernen' : 'Zu Favoriten hinzufügen'}
+        >
+          {istFav ? '⭐' : '☆'}
+        </button>
+      </div>
+
+      {hatKinder && offen && eintrag.kinder!.map(kind => (
+        <BaumEintrag
+          key={kind.pfad}
+          eintrag={kind}
+          istAdmin={istAdmin}
+          toggleFavorit={toggleFavorit}
+          istFavorit={istFavorit}
+          tiefe={tiefe + 1}
+        />
+      ))}
     </div>
   )
 }
@@ -145,7 +181,6 @@ function SortableFavoritItem({ fav, onEntfernen }: { fav: Favorit; onEntfernen: 
       style={style}
       className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg"
     >
-      {/* Drag Handle */}
       <button
         {...attributes}
         {...listeners}
@@ -155,12 +190,10 @@ function SortableFavoritItem({ fav, onEntfernen }: { fav: Favorit; onEntfernen: 
         ⠿
       </button>
 
-      {/* Icon + Label */}
       <span className="text-sm">{fav.icon || typIcon(fav.typ)}</span>
       <span className="flex-1 text-sm text-slate-700 dark:text-slate-200 truncate">{fav.label || fav.ziel}</span>
       <span className="text-xs text-slate-400 dark:text-slate-500">{typLabel(fav.typ)}</span>
 
-      {/* Entfernen */}
       <button
         onClick={onEntfernen}
         className="text-slate-400 hover:text-red-500 dark:text-slate-500 dark:hover:text-red-400 cursor-pointer"
