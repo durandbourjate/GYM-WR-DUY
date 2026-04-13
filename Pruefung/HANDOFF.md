@@ -6,6 +6,27 @@
 
 ---
 
+## Session 102 — Bundle 5: Bildfragen-Editor (14.04.2026)
+
+### Stand
+Auf `main`. tsc ✅ | 226 Tests ✅ | Build ✅. Browser-Test ausstehend (violet-Farben + Bild-Persistenz).
+
+### Erledigte Arbeiten
+
+| # | Änderung | Dateien |
+|---|----------|---------|
+| N7 | **Violette Pins/Zonen** — `@source`-Direktive in index.css hinzugefügt, damit Tailwind v4 die violet-Klassen aus `packages/shared/src/` scannt. Klassen waren korrekt im Code, aber nicht im generierten CSS. | index.css |
+| N19 | **Bild-Persistenz bei Fragetyp-Wechsel** — 3 separate bildUrl-States (hsBildUrl, bbBildUrl, ddBildUrl) zu einem gemeinsamen `bildUrl`-State konsolidiert. Bild bleibt beim Wechsel zwischen Hotspot/Bildbeschriftung/DragDrop erhalten. | SharedFragenEditor.tsx, TypEditorDispatcher.tsx |
+
+### Kontext
+- **Spec:** `docs/superpowers/specs/2026-04-13-bundle5-bildfragen-editor-design.md`
+- **Plan:** `docs/superpowers/plans/2026-04-13-bundle5-bildfragen-editor.md`
+- **N6 (doppeltes Bild):** War bereits gelöst, kein Handlungsbedarf.
+- **@source Direktive:** `@source "../../packages/shared/src";` in Zeile 2 von `index.css`. Muss beibehalten werden, damit shared-package Tailwind-Klassen funktionieren.
+- **Nächste Session:** Browser-Test Bundle 5, dann Bundle 6 (KI-UI) oder Bundle 7 (Design-Konzept).
+
+---
+
 ## Session 101 — Bundle 4: Layout-Umbau Durchführen (13.04.2026)
 
 ### Stand
@@ -199,7 +220,7 @@ Auf `main`. tsc ✅ | 209 Tests ✅ | Build ✅.
 | **2** | Favoriten-Redesign (N1 dynamische Struktur, N2 Tab + Home) | ✅ S99 |
 | **3** | Übungs-Themen UX (N9 max 5 aktuelle, N11 SuS-Sortierung, N12 LP-Status, N14 Einstellungen verschieben) | ✅ S100 |
 | **4** | Layout-Umbau Durchführen (N15 Tabs+Suche+CTA, N16 Buttons konsistent) | ✅ S101 |
-| **5** | Bildfragen-Editor (N7 violette Pins/Zonen, N19 Bild-Persistenz) | Offen |
+| **5** | Bildfragen-Editor (N7 violette Pins/Zonen, N19 Bild-Persistenz) | ✅ S102 |
 | **6** | KI-UI (N20 Buttons/Farben/Cursor) | Offen |
 | **7** | Design-Konzept (N8 Design-Schliff, N21 violette Felder, N4 resizable Sidebar) — braucht Mockups | Offen |
 
