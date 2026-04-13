@@ -66,6 +66,18 @@ export default function Dashboard({ deepLinkZiel }: DashboardProps = {}) {
   const [alleFragen, setAlleFragen] = useState<Frage[]>([])
   const [laden, setLaden] = useState(true)
   const [alleThemenAnzeigen, setAlleThemenAnzeigen] = useState(false)
+  const [sortierung, setSortierung] = useState<'alphabetisch' | 'zuletztGeuebt'>(() => {
+    try {
+      const gespeichert = localStorage.getItem('examlab-ueben-sortierung')
+      if (gespeichert === 'zuletztGeuebt') return 'zuletztGeuebt'
+    } catch { /* ignorieren */ }
+    return 'alphabetisch'
+  })
+
+  const handleSortierungAendern = (neu: 'alphabetisch' | 'zuletztGeuebt') => {
+    setSortierung(neu)
+    try { localStorage.setItem('examlab-ueben-sortierung', neu) } catch { /* ignorieren */ }
+  }
   const [dashboardTab, setDashboardTab] = useState<'themen' | 'fortschritt' | 'ergebnisse'>('themen')
   const [lzMiniModal, setLzMiniModal] = useState<{ fach: string; thema: string } | null>(null)
 
@@ -220,6 +232,64 @@ export default function Dashboard({ deepLinkZiel }: DashboardProps = {}) {
 
     return gefiltert
   }, [themenMap, aktiverFach, freischaltungen, alleThemenAnzeigen, getStatus, suchtext])
+
+  // Letzte Übung pro Thema (für Sortierung "Zuletzt geübt")
+  const letzteUebungProThema = useMemo(() => {
+    const map = new Map<string, string>() // "fach|thema" → ISO-Timestamp
+    for (const f of Object.values(fortschritte)) {
+      if (!f.letzterVersuch) continue
+      for (const thema of sichtbareThemenListe) {
+        const gehoertZuThema = thema.fragen.some(frage => frage.id === f.fragenId)
+        if (gehoertZuThema) {
+          const key = `${thema.fach}|${thema.thema}`
+          const bisheriger = map.get(key)
+          if (!bisheriger || f.letzterVersuch > bisheriger) {
+            map.set(key, f.letzterVersuch)
+          }
+        }
+      }
+    }
+    return map
+  }, [sichtbareThemenListe, fortschritte])
+
+  // Themen in Sektionen aufteilen (aktuelle, freigegebene nach Fach, weitere)
+  const themenSektionen = useMemo(() => {
+    const aktuelle: ThemenInfo[] = []
+    const freigegebeneNachFach = new Map<string, ThemenInfo[]>()
+    const weitere: ThemenInfo[] = []
+
+    for (const t of sichtbareThemenListe) {
+      const status = freischaltungen.length > 0 ? getStatus(t.fach, t.thema) : 'abgeschlossen'
+      if (status === 'aktiv') {
+        aktuelle.push(t)
+      } else if (status === 'abgeschlossen') {
+        const liste = freigegebeneNachFach.get(t.fach) ?? []
+        liste.push(t)
+        freigegebeneNachFach.set(t.fach, liste)
+      } else if (status === 'nicht_freigeschaltet') {
+        weitere.push(t)
+      }
+    }
+
+    const sortiereFn = (a: ThemenInfo, b: ThemenInfo) => {
+      if (sortierung === 'zuletztGeuebt') {
+        const tA = letzteUebungProThema.get(`${a.fach}|${a.thema}`) ?? ''
+        const tB = letzteUebungProThema.get(`${b.fach}|${b.thema}`) ?? ''
+        if (tA !== tB) return tB.localeCompare(tA) // neueste zuerst
+      }
+      return a.thema.localeCompare(b.thema)
+    }
+
+    aktuelle.sort(sortiereFn)
+    for (const [, themen] of freigegebeneNachFach) {
+      themen.sort(sortiereFn)
+    }
+    weitere.sort(sortiereFn)
+
+    const faecherSortiert = [...freigegebeneNachFach.entries()].sort((a, b) => a[0].localeCompare(b[0]))
+
+    return { aktuelle, faecherSortiert, weitere }
+  }, [sichtbareThemenListe, freischaltungen, sortierung, letzteUebungProThema, getStatus])
 
   // Aktives Thema-Detail
   const themaDetail = useMemo(() => {
@@ -467,9 +537,9 @@ export default function Dashboard({ deepLinkZiel }: DashboardProps = {}) {
               })}
             </div>
 
-            {/* Alle-Themen-Toggle (nur wenn Freischaltungen existieren) */}
-            {freischaltungen.length > 0 && (
-              <div className="flex justify-end mb-2">
+            {/* Alle-Themen-Toggle + Sortierung */}
+            <div className="flex items-center justify-between mb-3">
+              {freischaltungen.length > 0 ? (
                 <button
                   onClick={() => setAlleThemenAnzeigen(!alleThemenAnzeigen)}
                   className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
@@ -480,26 +550,97 @@ export default function Dashboard({ deepLinkZiel }: DashboardProps = {}) {
                 >
                   {alleThemenAnzeigen ? 'Nur freigeschaltete' : 'Alle Themen anzeigen'}
                 </button>
-              </div>
-            )}
+              ) : <div />}
+              <select
+                value={sortierung}
+                onChange={e => handleSortierungAendern(e.target.value as 'alphabetisch' | 'zuletztGeuebt')}
+                className="text-xs px-3 py-1.5 rounded-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 focus:outline-none focus:border-slate-400 cursor-pointer"
+              >
+                <option value="alphabetisch">A–Z</option>
+                <option value="zuletztGeuebt">Zuletzt geuebt</option>
+              </select>
+            </div>
 
-            {/* Thema-Karten Grid */}
-            <div className="grid gap-3 sm:grid-cols-2">
-              {sichtbareThemenListe.map(info => (
-                <ThemaKarte
-                  key={`${info.fach}-${info.thema}`}
-                  thema={info.thema}
-                  fach={info.fach}
-                  anzahlFragen={info.fragen.length}
-                  anzahlUnterthemen={info.unterthemen.length}
-                  fortschritt={info.fortschritt}
-                  themenStatus={freischaltungen.length > 0 ? getStatus(info.fach, info.thema) : 'abgeschlossen'}
-                  fachFarben={fachFarben}
-                  onClick={() => { setAktivesThema(info.thema); setAktiverFach(info.fach) }}
-                  anzahlLernziele={lernziele.filter(lz => lz.aktiv !== false && lz.fach === info.fach && (lz.thema === info.thema || lz.thema?.includes(info.thema) || info.thema?.includes(lz.thema))).length}
-                  onLernzieleKlick={() => setLzMiniModal({ fach: info.fach, thema: info.thema })}
-                />
+            {/* Thema-Karten nach Sektionen */}
+            <div className="space-y-6">
+              {/* Aktuelle Themen */}
+              {themenSektionen.aktuelle.length > 0 && (
+                <div>
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 mb-2 flex items-center gap-1.5">
+                    <span>★</span> Aktuelle Themen
+                  </h3>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {themenSektionen.aktuelle.map(info => (
+                      <ThemaKarte
+                        key={`${info.fach}-${info.thema}`}
+                        thema={info.thema}
+                        fach={info.fach}
+                        anzahlFragen={info.fragen.length}
+                        anzahlUnterthemen={info.unterthemen.length}
+                        fortschritt={info.fortschritt}
+                        themenStatus="aktiv"
+                        fachFarben={fachFarben}
+                        onClick={() => { setAktivesThema(info.thema); setAktiverFach(info.fach) }}
+                        anzahlLernziele={lernziele.filter(lz => lz.aktiv !== false && lz.fach === info.fach && (lz.thema === info.thema || lz.thema?.includes(info.thema) || info.thema?.includes(lz.thema))).length}
+                        onLernzieleKlick={() => setLzMiniModal({ fach: info.fach, thema: info.thema })}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Freigegebene Themen nach Fach */}
+              {themenSektionen.faecherSortiert.map(([fach, themen]) => (
+                <div key={fach}>
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2 flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: getFachFarbe(fach, fachFarben) }} />
+                    {fach}
+                  </h3>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {themen.map(info => (
+                      <ThemaKarte
+                        key={`${info.fach}-${info.thema}`}
+                        thema={info.thema}
+                        fach={info.fach}
+                        anzahlFragen={info.fragen.length}
+                        anzahlUnterthemen={info.unterthemen.length}
+                        fortschritt={info.fortschritt}
+                        themenStatus="abgeschlossen"
+                        fachFarben={fachFarben}
+                        onClick={() => { setAktivesThema(info.thema); setAktiverFach(info.fach) }}
+                        anzahlLernziele={lernziele.filter(lz => lz.aktiv !== false && lz.fach === info.fach && (lz.thema === info.thema || lz.thema?.includes(info.thema) || info.thema?.includes(lz.thema))).length}
+                        onLernzieleKlick={() => setLzMiniModal({ fach: info.fach, thema: info.thema })}
+                      />
+                    ))}
+                  </div>
+                </div>
               ))}
+
+              {/* Weitere Themen (nicht freigeschaltet) */}
+              {themenSektionen.weitere.length > 0 && (
+                <div className="opacity-60">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2 flex items-center gap-1.5">
+                    <span>🔒</span> Weitere Themen
+                  </h3>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {themenSektionen.weitere.map(info => (
+                      <ThemaKarte
+                        key={`${info.fach}-${info.thema}`}
+                        thema={info.thema}
+                        fach={info.fach}
+                        anzahlFragen={info.fragen.length}
+                        anzahlUnterthemen={info.unterthemen.length}
+                        fortschritt={info.fortschritt}
+                        themenStatus="nicht_freigeschaltet"
+                        fachFarben={fachFarben}
+                        onClick={() => { setAktivesThema(info.thema); setAktiverFach(info.fach) }}
+                        anzahlLernziele={lernziele.filter(lz => lz.aktiv !== false && lz.fach === info.fach && (lz.thema === info.thema || lz.thema?.includes(info.thema) || info.thema?.includes(lz.thema))).length}
+                        onLernzieleKlick={() => setLzMiniModal({ fach: info.fach, thema: info.thema })}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Lernziele Mini-Modal */}
