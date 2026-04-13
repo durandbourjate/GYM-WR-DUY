@@ -111,8 +111,16 @@ export function AppRouter() {
         <Route path="/einstellungen" element={<LPGuard><LPFlow /></LPGuard>} />
         <Route path="/einstellungen/:tab" element={<LPGuard><LPFlow /></LPGuard>} />
 
-        {/* SuS-Bereich: App.tsx handhabt intern (?id=, Prüfungs-Phasen, etc.) */}
-        <Route path="/sus/*" element={<SuSFlow />} />
+        {/* SuS-Bereich: Spezifische Routes für Deep Links + Browser-History */}
+        <Route path="/sus" element={<SuSFlow />} />
+        <Route path="/sus/ueben" element={<SuSFlow />} />
+        <Route path="/sus/ueben/ergebnis" element={<SuSFlow />} />
+        <Route path="/sus/ueben/:themaId" element={<SuSFlow />} />
+        <Route path="/sus/pruefen" element={<SuSFlow />} />
+        <Route path="/sus/pruefung" element={<SuSFlow />} />
+        <Route path="/sus/korrektur/:pruefungId" element={<SuSFlow />} />
+        <Route path="/sus/admin" element={<SuSFlow />} />
+        <Route path="/sus/gruppen" element={<SuSFlow />} />
 
         {/* Catch-all → Root-Redirect */}
         <Route path="*" element={<RootRedirect />} />

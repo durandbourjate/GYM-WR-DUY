@@ -1,6 +1,6 @@
 import { useEffect, useCallback } from 'react'
 import { useUebenUebungsStore } from '../../store/ueben/uebungsStore'
-import { useUebenNavigationStore } from '../../store/ueben/navigationStore'
+import { useSuSNavigation } from '../../hooks/ueben/useSuSNavigation'
 import FrageRenderer from '../FrageRenderer'
 import { normalisiereFrageDaten } from '../../utils/ueben/fragetypNormalizer'
 import type { Frage } from '../../types/fragen'
@@ -17,7 +17,7 @@ export default function UebungsScreen() {
     toggleUnsicher, istUnsicher, istSessionFertig, beendeSession,
     aktuelleFrage, kannZurueck,
   } = useUebenUebungsStore()
-  const { navigiere } = useUebenNavigationStore()
+  const { zuErgebnis } = useSuSNavigation()
 
   const frage = aktuelleFrage()
 
@@ -36,7 +36,7 @@ export default function UebungsScreen() {
       e.preventDefault()
       if (istSessionFertig()) {
         beendeSession()
-        navigiere('ergebnis')
+        zuErgebnis()
       } else {
         naechsteFrage()
       }
@@ -45,7 +45,7 @@ export default function UebungsScreen() {
       e.preventDefault()
       ueberspringen()
     }
-  }, [frage, session, feedbackSichtbar, kannZurueck, vorherigeFrage, naechsteFrage, ueberspringen, istSessionFertig, beendeSession, navigiere])
+  }, [frage, session, feedbackSichtbar, kannZurueck, vorherigeFrage, naechsteFrage, ueberspringen, istSessionFertig, beendeSession, zuErgebnis])
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown)
@@ -56,9 +56,9 @@ export default function UebungsScreen() {
   useEffect(() => {
     if (session && !frage && !session.beendet) {
       beendeSession()
-      navigiere('ergebnis')
+      zuErgebnis()
     }
-  }, [session, frage, beendeSession, navigiere])
+  }, [session, frage, beendeSession, zuErgebnis])
 
   if (!session || !frage) return null
 
@@ -70,11 +70,11 @@ export default function UebungsScreen() {
   const handleWeiter = () => naechsteFrage()
   const handleErgebnis = () => {
     beendeSession()
-    navigiere('ergebnis')
+    zuErgebnis()
   }
   const handleBeenden = () => {
     beendeSession()
-    navigiere('ergebnis')
+    zuErgebnis()
   }
 
   return (

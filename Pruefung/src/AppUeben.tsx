@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import { useAuthStore } from './store/authStore'
 import { useUebenAuthStore } from './store/ueben/authStore'
 import { useUebenGruppenStore } from './store/ueben/gruppenStore'
 import { useUebenUebungsStore } from './store/ueben/uebungsStore'
 import { useUebenFortschrittStore } from './store/ueben/fortschrittStore'
-import { useUebenNavigationStore } from './store/ueben/navigationStore'
 import LoginScreen from './components/ueben/LoginScreen'
 import GruppenAuswahl from './components/ueben/GruppenAuswahl'
 import Dashboard from './components/ueben/Dashboard'
@@ -16,6 +16,8 @@ import { UebenKontextProvider } from './context/ueben/UebenKontextProvider'
 import { FrageModeProvider } from './context/FrageModeContext'
 import type { UebenRolle } from './types/ueben/auth'
 import { useDeepLinkAktivierung } from './hooks/ueben/useDeepLinkAktivierung'
+import { useSuSNavigation } from './hooks/ueben/useSuSNavigation'
+import { useSuSRouteSync } from './hooks/ueben/useSuSRouteSync'
 
 const DEMO_PARAM = new URLSearchParams(window.location.search).get('demo')
 const DEMO_ROLLE: UebenRolle = DEMO_PARAM === 'eltern' ? 'admin' : 'lernend'
@@ -31,11 +33,20 @@ export default function AppUeben({ onZurueck, onModusWechsel }: AppUebenProps = 
   const { user, istAngemeldet, sessionWiederherstellen, ladeStatus: authStatus } = useUebenAuthStore()
   const { gruppen, aktiveGruppe, ladeGruppen, ladeStatus: gruppenStatus } = useUebenGruppenStore()
   const { session, starteSession } = useUebenUebungsStore()
-  const { aktuellerScreen, navigiere } = useUebenNavigationStore()
   const [demoAktiv, setDemoAktiv] = useState(false)
   // Demo-Modus: URL-Parameter ODER Haupt-Auth-Store (bei Einbettung via SuSStartseite)
   const hauptAuthDemo = useAuthStore(s => s.istDemoModus)
   const IST_DEMO = !!DEMO_PARAM || hauptAuthDemo
+
+  // Router-basierte Navigation
+  const { zuDashboard, zuUebung, zuErgebnis, zuAdmin, zuGruppenAuswahl } = useSuSNavigation()
+
+  // URL → Store Sync (Übergangs-Hook)
+  useSuSRouteSync()
+
+  // Aktuellen Screen aus URL ableiten
+  const location = useLocation()
+  const aktuellerScreen = ermittleScreen(location.pathname)
 
   // Deep-Link: ?fach=...&thema=... → Thema automatisch aktivieren + Ziel merken
   const deepLinkZiel = useDeepLinkAktivierung(aktiveGruppe?.id, user?.email, istAngemeldet)
@@ -67,9 +78,9 @@ export default function AppUeben({ onZurueck, onModusWechsel }: AppUebenProps = 
 
       // Demo: Leeren Fortschritt setzen statt Backend aufzurufen
       useUebenFortschrittStore.setState({ fortschritte: {} })
-      navigiere('dashboard')
+      zuDashboard()
     }
-  }, [demoAktiv, navigiere])
+  }, [demoAktiv, zuDashboard])
 
   // Session nur wiederherstellen wenn NICHT embedded (standalone Üben-Login)
   // Bei embedded (via SuSStartseite/UebungsToolView) wurde der Login bereits gebrückt
@@ -89,41 +100,42 @@ export default function AppUeben({ onZurueck, onModusWechsel }: AppUebenProps = 
       const istAdmin = aktiveGruppe.adminEmail.toLowerCase() === user.email.toLowerCase()
       if (istAdmin) {
         if (user.rolle !== 'admin') useUebenAuthStore.getState().setzeRolle('admin')
-        if (aktuellerScreen !== 'admin') navigiere('admin')
+        if (aktuellerScreen !== 'admin') zuAdmin()
       } else {
         if (user.rolle !== 'lernend') useUebenAuthStore.getState().setzeRolle('lernend')
         if (aktuellerScreen !== 'dashboard' && aktuellerScreen !== 'uebung' && aktuellerScreen !== 'ergebnis') {
-          navigiere('dashboard')
+          zuDashboard()
         }
       }
     }
-  }, [aktiveGruppe, user?.email, user?.rolle, aktuellerScreen, navigiere])
+  }, [aktiveGruppe, user?.email, user?.rolle, aktuellerScreen, zuAdmin, zuDashboard])
 
   // Navigation-State synchronisieren
   useEffect(() => {
     if (!istAngemeldet) {
-      if (aktuellerScreen !== 'login') navigiere('login')
+      // Nicht eingeloggt — kein Redirect nötig (wird unten behandelt)
       return
     }
     if (istAngemeldet && aktuellerScreen === 'login') {
-      navigiere(aktiveGruppe ? 'dashboard' : 'gruppenAuswahl')
+      if (aktiveGruppe) zuDashboard()
+      else zuGruppenAuswahl()
     }
-  }, [istAngemeldet, aktiveGruppe, aktuellerScreen, navigiere])
+  }, [istAngemeldet, aktiveGruppe, aktuellerScreen, zuDashboard, zuGruppenAuswahl])
 
   // Session → Übung/Ergebnis-Screen
   useEffect(() => {
     if (session && !session.beendet && aktuellerScreen !== 'uebung') {
-      navigiere('uebung')
+      zuUebung(session.thema)
     }
     if (session?.beendet && aktuellerScreen !== 'ergebnis') {
-      navigiere('ergebnis')
+      zuErgebnis()
     }
     // Nur von 'uebung' zurück zum Dashboard wenn keine Session — NICHT von 'ergebnis'
     // (Zusammenfassung zeigt Fallback-UI wenn Session bereits null ist)
     if (!session && aktuellerScreen === 'uebung') {
-      navigiere('dashboard')
+      zuDashboard()
     }
-  }, [session, session?.beendet, aktuellerScreen, navigiere])
+  }, [session, session?.beendet, aktuellerScreen, zuUebung, zuErgebnis, zuDashboard])
 
   // Laden
   if (!IST_DEMO && authStatus === 'laden') {
@@ -193,14 +205,14 @@ export default function AppUeben({ onZurueck, onModusWechsel }: AppUebenProps = 
       <UebenKontextProvider>
         <AppShell onExamLabHome={onZurueck} onModusWechsel={onModusWechsel}>
           {aktuellerScreen === 'admin' && (
-            <AdminDashboard onZuUeben={() => navigiere('dashboard')} />
+            <AdminDashboard onZuUeben={zuDashboard} />
           )}
 
           {(aktuellerScreen === 'ergebnis' || (session?.beendet && aktuellerScreen === 'uebung')) && (
             <Zusammenfassung
               onZurueck={() => {
                 useUebenUebungsStore.setState({ session: null })
-                navigiere('dashboard')
+                zuDashboard()
               }}
               onNochmal={() => {
                 if (aktiveGruppe && user && session) {
@@ -226,4 +238,20 @@ export default function AppUeben({ onZurueck, onModusWechsel }: AppUebenProps = 
       </UebenKontextProvider>
     </FrageModeProvider>
   )
+}
+
+/**
+ * Leitet den aktuellerScreen-Wert aus dem URL-Pfad ab.
+ * Wird für die Übergangsphase benötigt, bis alle Komponenten
+ * direkt useLocation() nutzen.
+ */
+function ermittleScreen(pathname: string): string {
+  if (pathname.startsWith('/sus/admin')) return 'admin'
+  if (pathname.startsWith('/sus/ueben/ergebnis')) return 'ergebnis'
+  if (pathname.match(/^\/sus\/ueben\/[^/]+/)) return 'uebung'
+  if (pathname.startsWith('/sus/ueben')) return 'dashboard'
+  if (pathname.startsWith('/sus/gruppen')) return 'gruppenAuswahl'
+  if (pathname.startsWith('/sus/login')) return 'login'
+  // Default: dashboard (wenn auf /sus oder /sus/*)
+  return 'dashboard'
 }

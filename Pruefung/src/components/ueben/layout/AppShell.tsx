@@ -1,11 +1,12 @@
 import { useState, useEffect, type ReactNode } from 'react'
+import { useLocation } from 'react-router-dom'
 import { useUebenAuthStore } from '../../../store/ueben/authStore'
 import { useUebenGruppenStore } from '../../../store/ueben/gruppenStore'
 import { useAuthStore } from '../../../store/authStore'
-import { useUebenNavigationStore } from '../../../store/ueben/navigationStore'
 import { useUebenUebungsStore } from '../../../store/ueben/uebungsStore'
 import { useUebenFortschrittStore } from '../../../store/ueben/fortschrittStore'
 import { useUebenTheme } from '../../../hooks/ueben/useTheme'
+import { useSuSNavigation } from '../../../hooks/ueben/useSuSNavigation'
 import { lernzielStatus as _lernzielStatus } from '../../../utils/ueben/mastery'
 import LernzieleAkkordeon from '../LernzieleAkkordeon'
 import FeedbackButton from '../../shared/FeedbackButton'
@@ -31,8 +32,12 @@ export default function AppShell({ children, onExamLabHome, onModusWechsel }: Pr
     pruefungAbmelden()
   }
   const { gruppen, aktiveGruppe, gruppeAbwaehlen } = useUebenGruppenStore()
-  const { aktuellerScreen, zurueck, kannZurueck, navigiere } = useUebenNavigationStore()
+  const { zuDashboard, zuAdmin, zuGruppenAuswahl, zurueck } = useSuSNavigation()
   const { istDark, toggleTheme } = useUebenTheme()
+
+  // Screen aus URL ableiten
+  const location = useLocation()
+  const aktuellerScreen = ermittleScreen(location.pathname)
 
   const [hilfeOffen, setHilfeOffen] = useState(false)
   const [lernzieleOffen, setLernzieleOffen] = useState(false)
@@ -52,7 +57,7 @@ export default function AppShell({ children, onExamLabHome, onModusWechsel }: Pr
     if (istInUebung) {
       useUebenUebungsStore.setState({ session: null })
     }
-    navigiere('dashboard')
+    zuDashboard()
   }
 
   if (!zeigeHeader) return <>{children}</>
@@ -62,7 +67,7 @@ export default function AppShell({ children, onExamLabHome, onModusWechsel }: Pr
       <header className="bg-white dark:bg-slate-800 shadow-sm px-4 py-3 flex items-center justify-between sticky top-0 z-30">
         <div className="flex items-center gap-3">
           {/* Zurück-Button — nur wenn aktive Gruppe vorhanden (sonst nur Abmelden) */}
-          {kannZurueck() && aktuellerScreen !== 'dashboard' && aktiveGruppe && (
+          {aktuellerScreen !== 'dashboard' && aktuellerScreen !== 'gruppenAuswahl' && aktiveGruppe && (
             <Tooltip text="Zurück" position="bottom">
               <button
                 onClick={istInUebung ? navigiereZuDashboard : zurueck}
@@ -105,7 +110,7 @@ export default function AppShell({ children, onExamLabHome, onModusWechsel }: Pr
                     onClick={() => {
                       if (istInUebung) useUebenUebungsStore.setState({ session: null })
                       gruppeAbwaehlen()
-                      navigiere('gruppenAuswahl')
+                      zuGruppenAuswahl()
                     }}
                     className="hover:text-slate-600 dark:hover:text-slate-300 underline"
                   >
@@ -162,7 +167,7 @@ export default function AppShell({ children, onExamLabHome, onModusWechsel }: Pr
           {/* Admin-Button */}
           {istAdmin && aktuellerScreen !== 'admin' && (
             <button
-              onClick={() => navigiere('admin')}
+              onClick={zuAdmin}
               className="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 min-h-[36px]"
             >
               Admin
@@ -216,8 +221,11 @@ export default function AppShell({ children, onExamLabHome, onModusWechsel }: Pr
           onSchliessen={() => setLernzieleOffen(false)}
           onThemaUeben={(thema) => {
             setLernzieleOffen(false)
-            useUebenNavigationStore.getState().setDeepLinkThema(thema)
-            navigiere('dashboard')
+            // Deep-Link-Thema im Store setzen, dann zum Dashboard navigieren
+            import('../../../store/ueben/navigationStore').then(m => {
+              m.useUebenNavigationStore.getState().setDeepLinkThema(thema)
+            })
+            zuDashboard()
           }}
         />
       )}
@@ -225,4 +233,15 @@ export default function AppShell({ children, onExamLabHome, onModusWechsel }: Pr
       {children}
     </div>
   )
+}
+
+/** Leitet den Screen-Typ aus dem URL-Pfad ab */
+function ermittleScreen(pathname: string): string {
+  if (pathname.startsWith('/sus/admin')) return 'admin'
+  if (pathname.startsWith('/sus/ueben/ergebnis')) return 'ergebnis'
+  if (pathname.match(/^\/sus\/ueben\/[^/]+/)) return 'uebung'
+  if (pathname.startsWith('/sus/ueben')) return 'dashboard'
+  if (pathname.startsWith('/sus/gruppen')) return 'gruppenAuswahl'
+  if (pathname.startsWith('/sus/login')) return 'login'
+  return 'dashboard'
 }

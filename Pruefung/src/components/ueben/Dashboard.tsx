@@ -5,6 +5,7 @@ import { useUebenUebungsStore } from '../../store/ueben/uebungsStore'
 import { useUebenFortschrittStore } from '../../store/ueben/fortschrittStore'
 import { useUebenAuftragStore } from '../../store/ueben/auftragStore'
 import { useUebenNavigationStore } from '../../store/ueben/navigationStore'
+import { useSuSNavigation } from '../../hooks/ueben/useSuSNavigation'
 import { uebenFragenAdapter } from '../../adapters/ueben/appsScriptAdapter'
 import { berechneEmpfehlungen } from '../../utils/ueben/empfehlungen'
 import type { Frage } from '../../types/ueben/fragen'
@@ -58,7 +59,7 @@ export default function Dashboard({ deepLinkZiel }: DashboardProps = {}) {
   const { starteSession } = useUebenUebungsStore()
   const { ladeFortschritt, getThemenFortschritt, fortschritte, lernziele } = useUebenFortschrittStore()
   const { ladeAuftraege, auftraege } = useUebenAuftragStore()
-  const { navigiere } = useUebenNavigationStore()
+  const { zuUebung } = useSuSNavigation()
   const { sichtbareFaecher, fachFarben } = useUebenKontext()
   const { freischaltungen, ladeFreischaltungen, getStatus, getAktiveUnterthemen } = useThemenSichtbarkeitStore()
   const { einstellungen } = useUebenSettingsStore()
@@ -251,7 +252,7 @@ export default function Dashboard({ deepLinkZiel }: DashboardProps = {}) {
     // Gesperrtes Thema → freiwilliges Üben ohne Tracking
     const istFreiwillig = freischaltungen.length > 0 && getStatus(fach, thema) === 'nicht_freigeschaltet'
     starteSession(aktiveGruppe.id, user.email, fach, thema, fragenOverride, 'standard', undefined, istFreiwillig)
-    navigiere('uebung')
+    zuUebung(thema)
   }
 
   const handleStarteGefiltert = () => {
@@ -266,14 +267,14 @@ export default function Dashboard({ deepLinkZiel }: DashboardProps = {}) {
   const handleStarteMix = (quellen: ThemaQuelle[]) => {
     if (!aktiveGruppe || !user || quellen.length < 2) return
     starteSession(aktiveGruppe.id, user.email, 'Mix', 'Gemischte Übung', undefined, 'mix', quellen)
-    navigiere('uebung')
+    zuUebung('mix')
     setMixDialogOffen(false)
   }
 
   const handleStarteRepetition = () => {
     if (!aktiveGruppe || !user) return
     starteSession(aktiveGruppe.id, user.email, 'Repetition', 'Schwächen trainieren', undefined, 'repetition')
-    navigiere('uebung')
+    zuUebung('repetition')
   }
 
   const toggleChip = <T,>(set: Set<T>, setFn: (s: Set<T>) => void, val: T) => {

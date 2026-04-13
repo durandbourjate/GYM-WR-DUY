@@ -1,8 +1,10 @@
 import { useState, useEffect, Suspense, lazy } from 'react'
+import { useLocation } from 'react-router-dom'
 import { useAuthStore } from '../../store/authStore'
 import { useUebenAuthStore } from '../../store/ueben/authStore'
 import { useUebenGruppenStore } from '../../store/ueben/gruppenStore'
 import { uebenApiClient } from '../../services/ueben/apiClient'
+import { useSuSNavigation } from '../../hooks/ueben/useSuSNavigation'
 import ThemeToggle from '../ThemeToggle'
 import KorrekturListe from './KorrekturListe'
 import KorrekturEinsicht from './KorrekturEinsicht'
@@ -19,18 +21,22 @@ const AppUeben = lazy(() =>
 
 const LP_AUTH_KEY = 'ueben-auth'
 
-type SuSModus = 'ueben' | 'pruefen'
-
 /**
  * Startseite für SuS: Tab-Navigation zwischen Üben und Prüfen.
  * - Üben (Default): Gruppen → Dashboard → Übungen (= AppUeben)
  * - Prüfen: Warteraum für Prüfungen + Korrektur-Einsicht
+ *
+ * Der Modus wird aus der URL abgeleitet (/sus/pruefen = Prüfen, alles andere = Üben).
  */
 export default function SuSStartseite({ onKorrekturWaehle: _onKorrekturWaehle }: { onKorrekturWaehle: (id: string) => void }) {
   const user = useAuthStore(s => s.user)
   const pruefungAbmelden = useAuthStore(s => s.abmelden)
-  // Default: direkt in Üben starten (kein Start-Screen mehr)
-  const [modus, setModus] = useState<SuSModus>('ueben')
+  const { zuPruefen, zuDashboard } = useSuSNavigation()
+
+  // Modus aus URL ableiten
+  const location = useLocation()
+  const modus = location.pathname.startsWith('/sus/pruefen') ? 'pruefen' as const : 'ueben' as const
+
   const [korrekturId, setKorrekturId] = useState<string | null>(null)
   const [loginBridged, setLoginBridged] = useState(false)
 
@@ -39,7 +45,6 @@ export default function SuSStartseite({ onKorrekturWaehle: _onKorrekturWaehle }:
     useUebenAuthStore.getState().abmelden()
     useUebenGruppenStore.setState({ gruppen: [], aktiveGruppe: null, mitglieder: [], ladeStatus: 'idle' })
     setLoginBridged(false)
-    setModus('ueben')
     pruefungAbmelden()
   }
 
@@ -136,7 +141,7 @@ export default function SuSStartseite({ onKorrekturWaehle: _onKorrekturWaehle }:
           </div>
         </div>
       }>
-        <AppUeben onZurueck={() => setModus('pruefen')} onModusWechsel={setModus} />
+        <AppUeben onZurueck={zuPruefen} onModusWechsel={(m) => m === 'pruefen' ? zuPruefen() : zuDashboard()} />
       </Suspense>
     )
   }
@@ -151,7 +156,7 @@ export default function SuSStartseite({ onKorrekturWaehle: _onKorrekturWaehle }:
       <header className="bg-white dark:bg-slate-800 shadow-sm px-4 py-3 flex items-center justify-between sticky top-0 z-30">
         <div className="flex items-center gap-3">
           <div>
-            <button onClick={() => setModus('ueben')} className="text-base font-bold dark:text-white hover:text-slate-600 dark:hover:text-slate-300 transition-colors cursor-pointer">ExamLab</button>
+            <button onClick={zuDashboard} className="text-base font-bold dark:text-white hover:text-slate-600 dark:hover:text-slate-300 transition-colors cursor-pointer">ExamLab</button>
             <p className="text-xs text-slate-500 dark:text-slate-400">
               {user?.name} · Schüler/in
             </p>
@@ -160,7 +165,7 @@ export default function SuSStartseite({ onKorrekturWaehle: _onKorrekturWaehle }:
           {/* Tabs: Üben | Prüfen */}
           <nav className="flex items-center gap-1 ml-4">
             <button
-              onClick={() => setModus('ueben')}
+              onClick={zuDashboard}
               className="px-3 py-1.5 rounded-lg text-sm font-medium text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
             >
               Üben
