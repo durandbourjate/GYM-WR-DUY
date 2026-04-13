@@ -23,6 +23,3 @@ export interface ThemenFreischaltung {
   /** Aktive Unterthemen. undefined/leer = alle Unterthemen aktiv */
   unterthemen?: string[]
 }
-
-/** Maximale Anzahl gleichzeitig aktiver Themen */
-export const MAX_AKTIVE_THEMEN = 3

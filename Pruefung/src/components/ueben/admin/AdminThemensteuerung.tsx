@@ -7,7 +7,7 @@ import { uebenFragenAdapter } from '../../../adapters/ueben/appsScriptAdapter'
 import { getFachFarbe } from '../../../utils/ueben/fachFarben'
 import { useUebenKontext } from '../../../hooks/ueben/useUebenKontext'
 import { LernzieleMiniModal } from '../LernzieleAkkordeon'
-import { MAX_AKTIVE_THEMEN } from '../../../types/ueben/themenSichtbarkeit'
+import { useUebenSettingsStore } from '../../../store/ueben/settingsStore'
 import type { ThemenStatus } from '../../../types/ueben/themenSichtbarkeit'
 import type { Frage } from '../../../types/ueben/fragen'
 
@@ -25,6 +25,7 @@ export default function AdminThemensteuerung() {
   const { user } = useUebenAuthStore()
   const { freischaltungen, ladeFreischaltungen, setzeStatus, getStatus, getAktiveThemen, getAktiveUnterthemen, setzeUnterthemen } = useThemenSichtbarkeitStore()
   const { fachFarben } = useUebenKontext()
+  const maxAktiveThemen = useUebenSettingsStore(s => s.einstellungen?.maxAktiveThemen ?? 5)
   const [alleFragen, setAlleFragen] = useState<Frage[]>([])
   const [laden, setLaden] = useState(true)
   const [filterFach, setFilterFach] = useState<string | null>(null)
@@ -130,15 +131,15 @@ export default function AdminThemensteuerung() {
         <div>
           <h3 className="text-lg font-semibold dark:text-white">Themensteuerung</h3>
           <p className="text-sm text-slate-500 dark:text-slate-400">
-            Aktivierte Themen werden im SuS-Dashboard hervorgehoben. Max. {MAX_AKTIVE_THEMEN} gleichzeitig aktiv.
+            Aktivierte Themen werden im SuS-Dashboard hervorgehoben. Max. {maxAktiveThemen} gleichzeitig aktiv.
           </p>
         </div>
         <span className={`text-sm font-medium px-3 py-1 rounded-full ${
-          aktiveAnzahl >= MAX_AKTIVE_THEMEN
+          aktiveAnzahl >= maxAktiveThemen
             ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300'
             : 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300'
         }`}>
-          {aktiveAnzahl}/{MAX_AKTIVE_THEMEN} aktiv
+          {aktiveAnzahl}/{maxAktiveThemen} aktiv
         </span>
       </div>
 

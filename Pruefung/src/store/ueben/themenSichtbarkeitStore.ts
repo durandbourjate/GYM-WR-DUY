@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import type { ThemenFreischaltung, ThemenStatus, AktivierungsTyp } from '../../types/ueben/themenSichtbarkeit'
-import { MAX_AKTIVE_THEMEN } from '../../types/ueben/themenSichtbarkeit'
+import { useUebenSettingsStore } from './settingsStore'
 import { uebenThemenSichtbarkeitAdapter } from '../../adapters/ueben/appsScriptAdapter'
 
 interface ThemenSichtbarkeitState {
@@ -71,8 +71,9 @@ export const useThemenSichtbarkeitStore = create<ThemenSichtbarkeitState>((set, 
           .filter(f => f.status === 'aktiv')
           .sort((a, b) => a.aktiviertAm.localeCompare(b.aktiviertAm))
 
-        if (aktive.length > MAX_AKTIVE_THEMEN) {
-          const zuSchliessen = aktive.slice(0, aktive.length - MAX_AKTIVE_THEMEN)
+        const maxAktive = useUebenSettingsStore.getState().einstellungen?.maxAktiveThemen ?? 5
+        if (aktive.length > maxAktive) {
+          const zuSchliessen = aktive.slice(0, aktive.length - maxAktive)
           aktualisiert = aktualisiert.map(f => {
             if (zuSchliessen.some(z => z.fach === f.fach && z.thema === f.thema)) {
               return { ...f, status: 'abgeschlossen' as const }

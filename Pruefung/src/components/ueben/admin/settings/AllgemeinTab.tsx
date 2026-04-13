@@ -223,6 +223,28 @@ export default function AllgemeinTab() {
         })}
       </div>
 
+      {/* Max aktuelle Themen */}
+      <div className="bg-white dark:bg-slate-800 rounded-xl p-5 border border-slate-100 dark:border-slate-700">
+        <h4 className="font-medium mb-1">Maximale aktuelle Themen</h4>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mb-3">
+          Wie viele Themen dürfen gleichzeitig als «aktuell» markiert sein?
+          Bei Überschreitung wird das älteste automatisch freigegeben.
+        </p>
+        <div className="flex items-center gap-3">
+          <input
+            type="range"
+            min={1}
+            max={20}
+            value={einstellungen.maxAktiveThemen ?? 5}
+            onChange={e => aktualisiereEinstellungen({ maxAktiveThemen: Number(e.target.value) })}
+            className="flex-1"
+          />
+          <span className="text-sm font-mono w-8 text-center">
+            {einstellungen.maxAktiveThemen ?? 5}
+          </span>
+        </div>
+      </div>
+
       {/* Speichern */}
       <button
         onClick={handleSpeichern}

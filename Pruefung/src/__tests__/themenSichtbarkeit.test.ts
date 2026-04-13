@@ -1,12 +1,10 @@
 import { describe, it, expect } from 'vitest'
 import type { ThemenFreischaltung, ThemenStatus } from '../types/ueben/themenSichtbarkeit'
-import { MAX_AKTIVE_THEMEN } from '../types/ueben/themenSichtbarkeit'
+
+/** Default aus GruppenEinstellungen (konfigurierbar, hier für Tests hardcoded) */
+const DEFAULT_MAX_AKTIVE_THEMEN = 5
 
 describe('ThemenSichtbarkeit Typen', () => {
-  it('MAX_AKTIVE_THEMEN ist 3', () => {
-    expect(MAX_AKTIVE_THEMEN).toBe(3)
-  })
-
   it('ThemenFreischaltung hat korrekte Struktur', () => {
     const eintrag: ThemenFreischaltung = {
       fach: 'VWL',
@@ -27,7 +25,7 @@ describe('ThemenSichtbarkeit Typen', () => {
   })
 })
 
-describe('FIFO-Logik (max 3 aktive Themen)', () => {
+describe('FIFO-Logik (max 5 aktive Themen, konfigurierbar)', () => {
   function fifoSimulation(freischaltungen: ThemenFreischaltung[], neuesFach: string, neuesThema: string): ThemenFreischaltung[] {
     const bestehend = freischaltungen.filter(
       f => !(f.fach === neuesFach && f.thema === neuesThema)
@@ -46,8 +44,8 @@ describe('FIFO-Logik (max 3 aktive Themen)', () => {
       .filter(f => f.status === 'aktiv')
       .sort((a, b) => a.aktiviertAm.localeCompare(b.aktiviertAm))
 
-    if (aktive.length > MAX_AKTIVE_THEMEN) {
-      const zuSchliessen = aktive.slice(0, aktive.length - MAX_AKTIVE_THEMEN)
+    if (aktive.length > DEFAULT_MAX_AKTIVE_THEMEN) {
+      const zuSchliessen = aktive.slice(0, aktive.length - DEFAULT_MAX_AKTIVE_THEMEN)
       aktualisiert = aktualisiert.map(f => {
         if (zuSchliessen.some(z => z.fach === f.fach && z.thema === f.thema)) {
           return { ...f, status: 'abgeschlossen' as const }
@@ -59,7 +57,7 @@ describe('FIFO-Logik (max 3 aktive Themen)', () => {
     return aktualisiert
   }
 
-  it('erlaubt bis zu 3 aktive Themen', () => {
+  it('erlaubt bis zu 5 aktive Themen (Default)', () => {
     const ergebnis = fifoSimulation([], 'VWL', 'Konjunktur')
     expect(ergebnis.filter(f => f.status === 'aktiv')).toHaveLength(1)
 
@@ -68,16 +66,24 @@ describe('FIFO-Logik (max 3 aktive Themen)', () => {
 
     const ergebnis3 = fifoSimulation(ergebnis2, 'Recht', 'OR AT')
     expect(ergebnis3.filter(f => f.status === 'aktiv')).toHaveLength(3)
+
+    const ergebnis4 = fifoSimulation(ergebnis3, 'VWL', 'Geldpolitik')
+    expect(ergebnis4.filter(f => f.status === 'aktiv')).toHaveLength(4)
+
+    const ergebnis5 = fifoSimulation(ergebnis4, 'BWL', 'Marketing')
+    expect(ergebnis5.filter(f => f.status === 'aktiv')).toHaveLength(5)
   })
 
-  it('schliesst ältestes Thema ab wenn 4. aktiviert wird', () => {
+  it('schliesst ältestes Thema ab wenn 6. aktiviert wird', () => {
     let daten: ThemenFreischaltung[] = []
 
-    // 3 Themen aktivieren mit unterschiedlichen Zeitstempeln
+    // 5 Themen aktivieren mit unterschiedlichen Zeitstempeln
     const themen = [
       { fach: 'VWL', thema: 'Konjunktur', zeit: '2026-04-01T00:00:00Z' },
       { fach: 'BWL', thema: 'FIBU', zeit: '2026-04-02T00:00:00Z' },
       { fach: 'Recht', thema: 'OR AT', zeit: '2026-04-03T00:00:00Z' },
+      { fach: 'VWL', thema: 'Geldpolitik', zeit: '2026-04-04T00:00:00Z' },
+      { fach: 'BWL', thema: 'Marketing', zeit: '2026-04-05T00:00:00Z' },
     ]
 
     for (const t of themen) {
@@ -91,12 +97,12 @@ describe('FIFO-Logik (max 3 aktive Themen)', () => {
       })
     }
 
-    // 4. Thema aktivieren → ältestes (Konjunktur) sollte abgeschlossen werden
-    const ergebnis = fifoSimulation(daten, 'VWL', 'Geldpolitik')
+    // 6. Thema aktivieren → ältestes (Konjunktur) sollte abgeschlossen werden
+    const ergebnis = fifoSimulation(daten, 'Recht', 'Sachenrecht')
     const aktive = ergebnis.filter(f => f.status === 'aktiv')
     const abgeschlossene = ergebnis.filter(f => f.status === 'abgeschlossen')
 
-    expect(aktive).toHaveLength(3)
+    expect(aktive).toHaveLength(5)
     expect(abgeschlossene).toHaveLength(1)
     expect(abgeschlossene[0].thema).toBe('Konjunktur')
   })

@@ -16,16 +16,19 @@ export interface GruppenEinstellungen {
   fachFarben: Record<string, string>
   fokusThema?: { fach: string; thema: string }
   masterySchwellwerte?: MasterySchwellwerte
+  maxAktiveThemen?: number
 }
 
 export const DEFAULT_GYM: GruppenEinstellungen = {
   anrede: 'sie', feedbackStil: 'sachlich',
   sichtbareFaecher: [], sichtbareThemen: {}, fachFarben: {},
+  maxAktiveThemen: 5,
 }
 
 export const DEFAULT_FAMILIE: GruppenEinstellungen = {
   anrede: 'du', feedbackStil: 'ermutigend',
   sichtbareFaecher: [], sichtbareThemen: {}, fachFarben: {},
+  maxAktiveThemen: 5,
 }
 
 export function defaultEinstellungen(typ: 'gym' | 'familie'): GruppenEinstellungen {
