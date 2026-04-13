@@ -26,7 +26,7 @@ export default function LoginScreen() {
     if (returnTo) {
       navigate(decodeURIComponent(returnTo), { replace: true })
     } else {
-      navigate(user.rolle === 'lp' ? '/home' : '/sus', { replace: true })
+      navigate(user.rolle === 'lp' ? '/favoriten' : '/sus', { replace: true })
     }
   }, [user, navigate, searchParams])
 

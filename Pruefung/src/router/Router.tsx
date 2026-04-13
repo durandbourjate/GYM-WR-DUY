@@ -7,7 +7,7 @@ import { lazy, Suspense } from 'react'
 const App = lazy(() => import('../App'))
 const LoginScreen = lazy(() => import('../components/LoginScreen'))
 const LPStartseite = lazy(() => import('../components/lp/LPStartseite'))
-const Home = lazy(() => import('../components/lp/Home'))
+const Favoriten = lazy(() => import('../components/lp/Favoriten'))
 
 const basePath = import.meta.env.BASE_URL
 
@@ -28,7 +28,7 @@ function LoadingFallback() {
 function RootRedirect() {
   const user = useAuthStore(s => s.user)
   if (!user) return <Navigate to="/login" replace />
-  return <Navigate to={user.rolle === 'lp' ? '/home' : '/sus'} replace />
+  return <Navigate to={user.rolle === 'lp' ? '/favoriten' : '/sus'} replace />
 }
 
 /**
@@ -72,10 +72,10 @@ function LPFlow() {
 /**
  * Home-Flow: Rendert Home-Dashboard.
  */
-function HomeFlow() {
+function FavoritenFlow() {
   return (
     <Suspense fallback={<LoadingFallback />}>
-      <Home />
+      <Favoriten />
     </Suspense>
   )
 }
@@ -95,7 +95,7 @@ export function AppRouter() {
         } />
 
         {/* LP-Bereich: Alle Routes rendern LPStartseite (mit URL-Sync) */}
-        <Route path="/home" element={<LPGuard><HomeFlow /></LPGuard>} />
+        <Route path="/home" element={<LPGuard><FavoritenFlow /></LPGuard>} />
         <Route path="/pruefung" element={<LPGuard><LPFlow /></LPGuard>} />
         <Route path="/pruefung/tracker" element={<LPGuard><LPFlow /></LPGuard>} />
         <Route path="/pruefung/monitoring" element={<LPGuard><LPFlow /></LPGuard>} />

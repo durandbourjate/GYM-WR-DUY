@@ -23,7 +23,7 @@ export function AuthGuard({ children, erlaubteRolle }: AuthGuardProps) {
 
   // Rollen-Mismatch → zur eigenen Home
   if (user.rolle !== erlaubteRolle) {
-    const home = user.rolle === 'lp' ? '/home' : '/sus'
+    const home = user.rolle === 'lp' ? '/favoriten' : '/sus'
     return <Navigate to={home} replace />
   }
 

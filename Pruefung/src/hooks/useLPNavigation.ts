@@ -66,8 +66,8 @@ export function useLPNavigation() {
     navigate(`/fragensammlung/${frageId}`)
   }, [navigate])
 
-  const navigiereZuHome = useCallback(() => {
-    navigate('/home')
+  const navigiereZuFavoriten = useCallback(() => {
+    navigate('/favoriten')
   }, [navigate])
 
   return {
@@ -80,7 +80,7 @@ export function useLPNavigation() {
     navigiereZuKorrektur,
     navigiereZuMonitoring,
     navigiereZuFrageneditor,
-    navigiereZuHome,
+    navigiereZuFavoriten,
     navigate,
   }
 }

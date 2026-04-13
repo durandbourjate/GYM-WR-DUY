@@ -9,8 +9,8 @@ import type { PruefungsConfig } from '../../types/pruefung'
 import LPHeader from './LPHeader'
 import LPSkeleton from './LPSkeleton'
 
-/** Home-Startseite für Lehrpersonen: Favoriten, Korrekturen, anstehende/letzte Prüfungen */
-export default function Home() {
+/** Favoriten-Startseite für Lehrpersonen: Favoriten, Korrekturen, anstehende/letzte Prüfungen */
+export default function Favoriten() {
   const user = useAuthStore(s => s.user)
   const istDemoModus = useAuthStore(s => s.istDemoModus)
   const rawFavoriten = useFavoritenStore(s => s.favoriten)
@@ -18,7 +18,7 @@ export default function Home() {
     [...rawFavoriten].sort((a, b) => a.sortierung - b.sortierung),
   [rawFavoriten])
 
-  const { setModus, navigiereZuEinstellungen, navigiereZuHome } = useLPNavigation()
+  const { setModus, navigiereZuEinstellungen, navigiereZuFavoriten } = useLPNavigation()
   const [configs, setConfigs] = useState<PruefungsConfig[]>([])
   const [ladeStatus, setLadeStatus] = useState<'laden' | 'fertig'>('laden')
 
@@ -75,7 +75,7 @@ export default function Home() {
         untertitel={user ? `${user.name} · Lehrperson` : undefined}
         modus="pruefung"
         onModusChange={(m) => setModus(m as 'pruefung' | 'uebung' | 'fragensammlung')}
-        onHome={navigiereZuHome}
+        onHome={navigiereZuFavoriten}
         aktionsButtons={null}
         onFragensammlung={() => setModus('fragensammlung')}
         onEinstellungen={() => navigiereZuEinstellungen()}

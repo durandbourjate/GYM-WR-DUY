@@ -70,6 +70,6 @@ export function useLPRouteSync(): void {
       return
     }
 
-    // Home: /home — kein Store-Sync nötig
+    // Favoriten: /favoriten — kein Store-Sync nötig
   }, [location.pathname])
 }

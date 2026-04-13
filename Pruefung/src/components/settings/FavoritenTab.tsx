@@ -19,7 +19,7 @@ import { CSS } from '@dnd-kit/utilities'
 
 /** Vordefinierte App-Orte die als Favoriten gesetzt werden können */
 const APP_ORTE: Array<{ ziel: string; label: string; icon: string }> = [
-  { ziel: '/home', label: 'Home', icon: '🏠' },
+  { ziel: '/favoriten', label: 'Favoriten', icon: '⭐' },
   { ziel: '/pruefung', label: 'Prüfungsliste', icon: '📝' },
   { ziel: '/pruefung/tracker', label: 'Prüfungs-Tracker', icon: '📊' },
   { ziel: '/pruefung/monitoring', label: 'Multi-Monitoring', icon: '👁️' },
