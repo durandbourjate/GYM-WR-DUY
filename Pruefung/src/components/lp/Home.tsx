@@ -1,8 +1,9 @@
 import { useState, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuthStore } from '../../store/authStore'
-import { useFavoritenStore, selectFavoritenSortiert } from '../../store/favoritenStore'
+import { useFavoritenStore } from '../../store/favoritenStore'
 import { apiService } from '../../services/apiService'
+import { useLPNavigation } from '../../hooks/useLPNavigation'
 import type { PruefungsConfig } from '../../types/pruefung'
 // Status direkt aus PruefungsConfig ableiten (ohne TrackerDaten)
 import LPHeader from './LPHeader'
@@ -12,8 +13,12 @@ import LPSkeleton from './LPSkeleton'
 export default function Home() {
   const user = useAuthStore(s => s.user)
   const istDemoModus = useAuthStore(s => s.istDemoModus)
-  const favoriten = useFavoritenStore(selectFavoritenSortiert)
+  const rawFavoriten = useFavoritenStore(s => s.favoriten)
+  const favoriten = useMemo(() =>
+    [...rawFavoriten].sort((a, b) => a.sortierung - b.sortierung),
+  [rawFavoriten])
 
+  const { setModus, navigiereZuEinstellungen, navigiereZuHome } = useLPNavigation()
   const [configs, setConfigs] = useState<PruefungsConfig[]>([])
   const [ladeStatus, setLadeStatus] = useState<'laden' | 'fertig'>('laden')
 
@@ -69,11 +74,11 @@ export default function Home() {
       <LPHeader
         untertitel={user ? `${user.name} · Lehrperson` : undefined}
         modus="pruefung"
-        onModusChange={() => {}}
-        onHome={() => {}}
+        onModusChange={(m) => setModus(m as 'pruefung' | 'uebung' | 'fragensammlung')}
+        onHome={navigiereZuHome}
         aktionsButtons={null}
-        onFragensammlung={() => {}}
-        onEinstellungen={() => {}}
+        onFragensammlung={() => setModus('fragensammlung')}
+        onEinstellungen={() => navigiereZuEinstellungen()}
         onHilfe={() => {}}
       />
 

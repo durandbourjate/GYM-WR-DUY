@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore.ts'
 import { apiService } from '../services/apiService.ts'
 import { initializeGoogleAuth, renderGoogleButton, CLIENT_ID } from '../services/authService.ts'
@@ -8,12 +9,26 @@ import LoginLayout from './shared/LoginLayout.tsx'
 
 export default function LoginScreen() {
   const { config } = useSchulConfig()
+  const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const user = useAuthStore((s) => s.user)
   const anmelden = useAuthStore((s) => s.anmelden)
   const anmeldenMitCode = useAuthStore((s) => s.anmeldenMitCode)
   const demoStarten = useAuthStore((s) => s.demoStarten)
   const fehler = useAuthStore((s) => s.fehler)
   const setFehler = useAuthStore((s) => s.setFehler)
   const ladeStatus = useAuthStore((s) => s.ladeStatus)
+
+  // Nach Login: Redirect zur returnTo-URL oder rollen-basierte Home
+  useEffect(() => {
+    if (!user) return
+    const returnTo = searchParams.get('returnTo')
+    if (returnTo) {
+      navigate(decodeURIComponent(returnTo), { replace: true })
+    } else {
+      navigate(user.rolle === 'lp' ? '/home' : '/sus', { replace: true })
+    }
+  }, [user, navigate, searchParams])
 
   const googleButtonRef = useRef<HTMLDivElement>(null)
   const [zeigeFallback, setZeigeFallback] = useState(false)

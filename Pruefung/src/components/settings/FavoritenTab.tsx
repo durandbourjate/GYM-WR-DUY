@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { useFavoritenStore, selectFavoritenSortiert, type Favorit } from '../../store/favoritenStore'
+import { useState, useMemo } from 'react'
+import { useFavoritenStore, type Favorit } from '../../store/favoritenStore'
 import {
   DndContext,
   closestCenter,
@@ -33,7 +33,10 @@ const APP_ORTE: Array<{ ziel: string; label: string; icon: string }> = [
 
 /** Favoriten verwalten: Sortierbare Liste + App-Orte hinzufügen */
 export default function FavoritenTab() {
-  const favoriten = useFavoritenStore(selectFavoritenSortiert)
+  const rawFavoriten = useFavoritenStore(s => s.favoriten)
+  const favoriten = useMemo(() =>
+    [...rawFavoriten].sort((a, b) => a.sortierung - b.sortierung),
+  [rawFavoriten])
   const { toggleFavorit, updateSortierung, entferneFavorit } = useFavoritenStore()
   const [ortDropdownOffen, setOrtDropdownOffen] = useState(false)
 
