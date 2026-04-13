@@ -43,7 +43,7 @@ interface LPNavigationState {
   // Favoriten (Account-verknüpfte App-Orte)
   favoriten: AppOrt[]
 
-  // Aktuelle Config-ID (für Hash-Router)
+  // Aktuelle Config-ID (gesetzt per URL-Sync)
   aktiveConfigId: string | null
 
   // Aktionen
@@ -61,16 +61,14 @@ interface LPNavigationState {
   zurueck: () => void
   setBreadcrumbs: (crumbs: BreadcrumbEintrag[]) => void
 
-  // Favoriten — erweitert
+  // Favoriten
   toggleFavorit: (ort: AppOrt) => void
   toggleFavoritById: (id: string, screen?: 'pruefung' | 'uebung' | 'fragensammlung') => void
   istFavorit: (id: string) => boolean
   setFavoriten: (favoriten: AppOrt[]) => void
   favoritenSyncMitBackend: () => void
 
-  // Hash-Router
-  navigiereZuHash: (hash: string) => void
-  aktualisiereHash: () => void
+  // Config-ID (wird per useLPRouteSync aus URL gesetzt)
   setAktiveConfigId: (id: string | null) => void
 
   reset: () => void
@@ -120,37 +118,6 @@ function generiereId(): string {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 7)
 }
 
-/** Hash aus aktuellem Navigations-State bauen */
-function bauHash(state: {
-  modus: LPModus; ansicht: LPAnsicht; aktiveConfigId: string | null;
-  listenTab: ListenTab; uebungsTab: UebungsTab;
-  zeigEinstellungen: boolean; einstellungenTab: EinstellungenTab | null;
-  deepLinkFrageId: string | null; deepLinkComposerTab: string | null;
-}): string {
-  // Einstellungen-Overlay hat eigenen Hash
-  if (state.zeigEinstellungen) {
-    return state.einstellungenTab ? `#/einstellungen/${state.einstellungenTab}` : '#/einstellungen'
-  }
-  // Composer mit Sub-Tab (z.B. /korrektur)
-  if (state.ansicht === 'composer' && state.aktiveConfigId) {
-    const base = `#/${state.modus === 'uebung' ? 'uebung' : 'pruefung'}/${state.aktiveConfigId}`
-    return state.deepLinkComposerTab ? `${base}/${state.deepLinkComposerTab}` : base
-  }
-  // Fragensammlung mit optionaler Frage-ID
-  if (state.modus === 'fragensammlung') {
-    return state.deepLinkFrageId ? `#/fragensammlung/${state.deepLinkFrageId}` : '#/fragensammlung'
-  }
-  if (state.modus === 'uebung') {
-    if (state.uebungsTab !== 'uebungen') return `#/uebung/${state.uebungsTab}`
-    return '#/uebung'
-  }
-  if (state.modus === 'pruefung') {
-    if (state.listenTab === 'tracker') return '#/pruefung/tracker'
-    return '#/pruefung'
-  }
-  return ''
-}
-
 export const useLPNavigationStore = create<LPNavigationState>((set, get) => ({
   ansicht: 'dashboard',
   modus: gespeicherterModus(),
@@ -178,13 +145,11 @@ export const useLPNavigationStore = create<LPNavigationState>((set, get) => ({
         { label: titel },
       ],
     }))
-    // Hash aktualisieren
-    setTimeout(() => get().aktualisiereHash(), 0)
+    // Keine Hash-Aktualisierung mehr — URL wird via React Router gesetzt
   },
 
   zurueckZumDashboard: () => {
     set({ ansicht: 'dashboard', ansichtHistory: [], breadcrumbs: [], aktiveConfigId: null })
-    setTimeout(() => get().aktualisiereHash(), 0)
   },
 
   setModus: (m) => {
@@ -198,17 +163,10 @@ export const useLPNavigationStore = create<LPNavigationState>((set, get) => ({
       vorherigerModus,
       ...(m === 'fragensammlung' && state.ansicht === 'composer' ? { ansicht: 'dashboard', ansichtHistory: [] } : {}),
     })
-    setTimeout(() => get().aktualisiereHash(), 0)
   },
 
-  setListenTab: (tab) => {
-    set({ listenTab: tab })
-    setTimeout(() => get().aktualisiereHash(), 0)
-  },
-  setUebungsTab: (tab) => {
-    set({ uebungsTab: tab })
-    setTimeout(() => get().aktualisiereHash(), 0)
-  },
+  setListenTab: (tab) => set({ listenTab: tab }),
+  setUebungsTab: (tab) => set({ uebungsTab: tab }),
   toggleHilfe: () => set(s => ({ zeigHilfe: !s.zeigHilfe })),
   setZeigEinstellungen: (zeig, tab) => set({
     zeigEinstellungen: zeig,
@@ -225,7 +183,6 @@ export const useLPNavigationStore = create<LPNavigationState>((set, get) => ({
     if (modus === 'fragensammlung') {
       try { sessionStorage.setItem(MODUS_KEY, vorherigerModus) } catch { /* ignore */ }
       set({ modus: vorherigerModus })
-      setTimeout(() => get().aktualisiereHash(), 0)
       return
     }
     if (ansichtHistory.length > 0) {
@@ -236,7 +193,6 @@ export const useLPNavigationStore = create<LPNavigationState>((set, get) => ({
         breadcrumbs: [],
         aktiveConfigId: null,
       })
-      setTimeout(() => get().aktualisiereHash(), 0)
       return
     }
   },
@@ -256,7 +212,6 @@ export const useLPNavigationStore = create<LPNavigationState>((set, get) => ({
       : [...favoriten, { ...ort, id: ort.id || generiereId() }]
     speichereFavoriten(neueFavoriten)
     set({ favoriten: neueFavoriten })
-    // Backend-Sync async (fire-and-forget)
     get().favoritenSyncMitBackend()
   },
 
@@ -268,7 +223,6 @@ export const useLPNavigationStore = create<LPNavigationState>((set, get) => ({
       speichereFavoriten(neueFavoriten)
       set({ favoriten: neueFavoriten })
     } else {
-      // Vereinfachter AppOrt — Titel wird beim Rendering ergänzt
       const neuerOrt: AppOrt = {
         id: generiereId(),
         titel: '',
@@ -291,78 +245,7 @@ export const useLPNavigationStore = create<LPNavigationState>((set, get) => ({
   },
 
   favoritenSyncMitBackend: () => {
-    // Wird von LPStartseite aufgerufen wenn LP-Profil geladen ist
-    // Lazy import vermeiden — wird extern verdrahtet
-  },
-
-  // --- Hash-Router ---
-
-  aktualisiereHash: () => {
-    const state = get()
-    const hash = bauHash(state)
-    if (hash && window.location.hash !== hash) {
-      window.history.replaceState(null, '', hash)
-    } else if (!hash && window.location.hash) {
-      window.history.replaceState(null, '', window.location.pathname + window.location.search)
-    }
-  },
-
-  navigiereZuHash: (hash: string) => {
-    const teile = hash.replace('#/', '').split('/')
-    if (teile.length === 0 || !teile[0]) return
-
-    const screen = teile[0]
-
-    // Einstellungen: #/einstellungen oder #/einstellungen/{tab}
-    if (screen === 'einstellungen') {
-      const tab = teile[1] as EinstellungenTab | undefined
-      const gueltigesTabs: EinstellungenTab[] = ['profil', 'lernziele', 'admin']
-      set({
-        zeigEinstellungen: true,
-        einstellungenTab: tab && gueltigesTabs.includes(tab) ? tab : null,
-      })
-      return
-    }
-
-    // Fragensammlung: #/fragensammlung oder #/fragensammlung/{frageId}
-    if (screen === 'fragensammlung') {
-      set({
-        modus: 'fragensammlung',
-        deepLinkFrageId: teile[1] || null,
-      })
-      try { sessionStorage.setItem(MODUS_KEY, 'fragensammlung') } catch { /* ignore */ }
-      return
-    }
-
-    // Prüfung: #/pruefung, #/pruefung/tracker, #/pruefung/{configId}, #/pruefung/{configId}/korrektur
-    if (screen === 'pruefung') {
-      set({ modus: 'pruefung' })
-      try { sessionStorage.setItem(MODUS_KEY, 'pruefung') } catch { /* ignore */ }
-      if (teile[1] === 'tracker') {
-        set({ listenTab: 'tracker' })
-      } else if (teile[1]) {
-        // Config-ID mit optionalem Sub-Tab (korrektur, monitoring)
-        const subTab = teile[2] || null
-        set({ aktiveConfigId: teile[1], deepLinkComposerTab: subTab })
-      }
-      return
-    }
-
-    // Übung: #/uebung, #/uebung/durchfuehren, #/uebung/analyse, #/uebung/{configId}
-    if (screen === 'uebung') {
-      set({ modus: 'uebung' })
-      try { sessionStorage.setItem(MODUS_KEY, 'uebung') } catch { /* ignore */ }
-      if (teile[1] === 'durchfuehren') set({ uebungsTab: 'durchfuehren' })
-      else if (teile[1] === 'analyse') set({ uebungsTab: 'analyse' })
-      else if (teile[1]) {
-        const subTab = teile[2] || null
-        set({ aktiveConfigId: teile[1], deepLinkComposerTab: subTab })
-      } else {
-        // #/uebung ohne Sub-Tab → Übungen-Liste anzeigen (nicht Durchführen)
-        set({ uebungsTab: 'uebungen' })
-      }
-      return
-    }
+    // Wird extern verdrahtet wenn LP-Profil geladen ist
   },
 
   setAktiveConfigId: (id) => set({ aktiveConfigId: id }),

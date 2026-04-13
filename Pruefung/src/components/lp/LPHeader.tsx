@@ -183,7 +183,8 @@ function FavoritenDropdown() {
   }, [offen])
 
   function kopiereLink(ort: AppOrt): void {
-    const url = `${window.location.origin}${window.location.pathname}#/${ort.screen}/${ort.params.configId || ''}`
+    const pfad = ort.params.configId ? `/${ort.screen}/${ort.params.configId}` : `/${ort.screen}`
+    const url = `${window.location.origin}${import.meta.env.BASE_URL}${pfad.slice(1)}`
     navigator.clipboard.writeText(url).catch(() => {
       const input = document.createElement('input')
       input.value = url; document.body.appendChild(input); input.select()
@@ -194,8 +195,9 @@ function FavoritenDropdown() {
   }
 
   function navigiereZu(ort: AppOrt): void {
-    const hash = `#/${ort.screen}/${ort.params.configId || ''}`
-    window.location.hash = hash
+    // React Router Navigation via window.location (FavoritenDropdown hat keinen Router-Kontext)
+    const pfad = ort.params.configId ? `/${ort.screen}/${ort.params.configId}` : `/${ort.screen}`
+    window.location.pathname = `${import.meta.env.BASE_URL}${pfad.slice(1)}`
     setOffen(false)
   }
 

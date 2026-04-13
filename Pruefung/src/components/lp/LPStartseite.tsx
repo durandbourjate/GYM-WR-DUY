@@ -3,6 +3,8 @@ import { useAuthStore } from '../../store/authStore.ts'
 import { useFragenbankStore } from '../../store/fragenbankStore.ts'
 import { useStammdatenStore } from '../../store/stammdatenStore.ts'
 import { useLPNavigationStore } from '../../store/lpNavigationStore.ts'
+import { useLPRouteSync } from '../../hooks/useLPRouteSync.ts'
+import { useLPNavigation } from '../../hooks/useLPNavigation.ts'
 import { apiService } from '../../services/apiService.ts'
 import type { PruefungsConfig } from '../../types/pruefung.ts'
 import type { TrackerDaten, TrackerPruefungSummary } from '../../types/tracker.ts'
@@ -51,11 +53,16 @@ export default function LPStartseite() {
   const zeigHilfe = useLPNavigationStore(s => s.zeigHilfe)
   const zeigEinstellungen = useLPNavigationStore(s => s.zeigEinstellungen)
   const composerKey = useLPNavigationStore(s => s.composerKey)
-  const setModus = useLPNavigationStore(s => s.setModus)
-  const setListenTab = useLPNavigationStore(s => s.setListenTab)
-  const setUebungsTab = useLPNavigationStore(s => s.setUebungsTab)
-  const zurueckZumDashboard = useLPNavigationStore(s => s.zurueckZumDashboard)
-  const navigiereZuComposer = useLPNavigationStore(s => s.navigiereZuComposer)
+  // Navigation via React Router (URL-basiert)
+  const {
+    setModus,
+    setListenTab,
+    setUebungsTab,
+    zurueckZumDashboard,
+    navigiereZuComposer,
+  } = useLPNavigation()
+
+  // UI-State bleibt im Store (Panels, Keys)
   const neuerComposerKey = useLPNavigationStore(s => s.neuerComposerKey)
   const toggleHilfe = useLPNavigationStore(s => s.toggleHilfe)
   const setZeigEinstellungen = useLPNavigationStore(s => s.setZeigEinstellungen)
@@ -310,40 +317,19 @@ export default function LPStartseite() {
     lade()
   }, [user, istDemoModus])
 
-  // Hash-Router: Beim Mount und bei hashchange den State wiederherstellen
-  useEffect(() => {
-    const { navigiereZuHash } = useLPNavigationStore.getState()
-    // Initiales Parsen
-    if (window.location.hash) {
-      navigiereZuHash(window.location.hash)
-    }
-    // hashchange-Listener (Browser Back/Forward)
-    function handleHashChange(): void {
-      navigiereZuHash(window.location.hash)
-    }
-    window.addEventListener('hashchange', handleHashChange)
-    return () => window.removeEventListener('hashchange', handleHashChange)
-  }, [])
+  // URL → Store Sync (ersetzt den alten hashchange-Listener)
+  useLPRouteSync()
 
-  // Hash-Router: Config via aktiveConfigId öffnen (nachdem Configs geladen)
-  const deepLinkComposerTab = useLPNavigationStore(s => s.deepLinkComposerTab)
+  // Deep Link: Config via aktiveConfigId öffnen (nachdem Configs geladen)
+  // aktiveConfigId wird per useLPRouteSync aus der URL gesetzt
   useEffect(() => {
     if (ladeStatus !== 'fertig' || !aktiveConfigId || ansicht === 'composer') return
     const config = configs.find(c => c.id === aktiveConfigId)
     if (!config) return
-
-    // Deep Link zu Monitoring/Korrektur → DurchfuehrenDashboard via ?id=
-    if (deepLinkComposerTab === 'korrektur' || deepLinkComposerTab === 'monitoring') {
-      const url = new URL(window.location.href)
-      url.hash = ''
-      url.searchParams.set('id', config.id)
-      window.location.href = url.toString()
-      return
-    }
-
     setEditConfig(config)
-    navigiereZuComposer(config.titel || 'Bearbeiten', config.id)
-  }, [ladeStatus, aktiveConfigId, configs, deepLinkComposerTab])
+    // navigiereZuComposer nicht nötig — URL ist bereits korrekt (Router hat hierher navigiert)
+    useLPNavigationStore.getState().navigiereZuComposer(config.titel || 'Bearbeiten', config.id)
+  }, [ladeStatus, aktiveConfigId, configs])
 
   function handleNeue(): void {
     setEditConfig(null)
@@ -900,8 +886,8 @@ export default function LPStartseite() {
           initialTab={useLPNavigationStore.getState().einstellungenTab ?? undefined}
           onSchliessen={() => {
             setZeigEinstellungen(false)
-            // Hash zurücksetzen auf aktuellen Modus
-            setTimeout(() => useLPNavigationStore.getState().aktualisiereHash(), 0)
+            // Zurück zum aktuellen Modus-Dashboard
+            zurueckZumDashboard()
           }}
         />
         </Suspense>
