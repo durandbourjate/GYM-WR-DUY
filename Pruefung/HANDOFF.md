@@ -6,6 +6,42 @@
 
 ---
 
+## Session 98 — Bundle 1: Quick Wins UX-Korrekturen (13.04.2026)
+
+### Stand
+Auf `main`. tsc ✅ | 227 Tests ✅ | Build ✅. Browser-Test auf GitHub Pages ausstehend.
+
+### Erledigte Arbeiten
+
+| # | Änderung | Dateien |
+|---|----------|---------|
+| N17 | **Dropdown-Label "Fachbereich" → "Fach"** — Nur UI-Label im Gruppieren-Dropdown, interner Value bleibt `fachbereich` | FragenBrowserHeader.tsx |
+| N18 | **Icons bei Fragetyp-Kategorien entfernt** — Emoji-Icons (📝, ☑️, 🖼️, 🔬, 📊, 📦) aus der Fragetyp-Auswahl entfernt, nur Text | FrageTypAuswahl.tsx |
+| N10 | **Übungs-Labels umbenannt** — "Aktiv"→"Aktuell", "z.T. aktiv"→"z.T. aktuell", "Abgeschl."→"Freigegeben", kein Badge für nicht freigeschaltete Themen | AdminThemensteuerung.tsx |
+| N13 | **Fach-Farbpunkt links (SuS)** — Farbpunkt vor den Themennamen verschoben (wie LP-Ansicht), `justify-between` entfernt | ThemaKarte.tsx |
+| N3 | **Fragensammlung-Button auf Dashboard ausgeblendet** — Button nur noch auf Sub-Pages sichtbar (wo Tabs nicht angezeigt werden), auf Dashboard reicht der Tab | LPHeader.tsx |
+| N5+N6 | **Bildvorschau entfernt** — Kleine Bildvorschau in BildUpload entfernt (redundant mit grossem Editor-Bild). "Bild entfernen" als Textbutton rechts neben URL-Feld. "(Bild geladen)" Hinweis bei Data-URL-Uploads. | BildUpload.tsx |
+
+### Kontext
+- **Task-Liste:** `docs/tasks/2026-04-13-ux-verbesserungen.md` — Alle 21 UX-Punkte aus User-Test, in 7 Bundles gruppiert. Bundle 1 erledigt.
+- **Design-Spec:** `docs/superpowers/specs/2026-04-13-bundle1-quick-wins-design.md`
+- **Plan:** `docs/superpowers/plans/2026-04-13-bundle1-quick-wins.md`
+- **Prüfungs-Labels "Aktiv" (SchuelerZeile, AktivPhase) NICHT geändert** — dort ist "Aktiv" ein anderer Kontext (Schüler schreibt gerade)
+- **ThemaKarte "Aktuell" (SuS-Ansicht) war bereits korrekt** — nur LP-Admin-Seite musste angepasst werden
+
+### Offene Punkte
+- Browser-Test Bundle 1 auf GitHub Pages
+- **Bundle 2:** Favoriten-Redesign (N1+N2) — dynamische App-Struktur, Favoriten-Tab
+- **Bundle 3:** Übungs-Themen UX (N9, N11, N12, N14) — 5 aktuelle Themen, SuS-Sortierung
+- **Bundle 4:** Layout-Umbau Durchführen (N15+N16) — Tabs + Suche + CTA-Buttons
+- **Bundle 5:** Bildfragen-Editor (N6, N7, N19) — violette Pins/Zonen, Bild-Persistenz
+- **Bundle 6:** KI-UI (N20) — Buttons, Farben, Cursor
+- **Bundle 7:** Design-Konzept (N8, N21, N4) — braucht Mockups zuerst
+- Bestehende Bugs: B2 (Audio iPhone), B3 (Abgabe-Timeout), B4 (Fachkürzel)
+- Bestehende Features: A2 (KI-Bild Backend), V1 (Bilanz Gewinn/Verlust)
+
+---
+
 ## Session 97 — Bild-Upload Fix + Routing + Bild-Editor Farben (13.04.2026)
 
 ### Stand
