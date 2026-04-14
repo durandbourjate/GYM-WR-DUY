@@ -147,15 +147,11 @@ export default function AdminThemensteuerung() {
         </span>
       </div>
 
-      {/* Fach-Filter */}
+      {/* Fach-Filter — Standard: slate-Hintergrund + Fachfarb-Border, aktiv: voll farbig */}
       <div className="flex flex-wrap gap-2">
         <button
           onClick={() => setFilterFach(null)}
-          className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
-            !filterFach
-              ? 'bg-slate-800 text-white border-slate-800 dark:bg-slate-200 dark:text-slate-800'
-              : 'text-slate-500 border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 hover:border-slate-400'
-          }`}
+          className={!filterFach ? 'filter-btn filter-btn-active' : 'filter-btn'}
         >
           Alle
         </button>
@@ -166,12 +162,10 @@ export default function AdminThemensteuerung() {
             <button
               key={fach}
               onClick={() => setFilterFach(aktiv ? null : fach)}
-              className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
-                aktiv ? '' : 'hover:bg-slate-100 dark:hover:bg-slate-700'
-              }`}
+              className="filter-btn"
               style={aktiv
                 ? { backgroundColor: farbe, color: '#fff', borderColor: farbe }
-                : { borderColor: farbe, color: farbe }
+                : { borderColor: farbe }
               }
             >
               {fach}
@@ -192,10 +186,8 @@ export default function AdminThemensteuerung() {
             <div key={key} className={`rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden${eintrag.status === 'nicht_freigeschaltet' ? ' opacity-70' : ''}`}>
               {/* Thema-Zeile */}
               <div
-                className={`hover-card flex items-center justify-between p-4 bg-white dark:bg-slate-800 ${
-                  eintrag.status === 'aktiv' ? 'border-l-4' : ''
-                }`}
-                style={eintrag.status === 'aktiv' ? { borderLeftColor: farbe } : undefined}
+                className="hover-card flex items-center justify-between p-4 bg-white dark:bg-slate-800 border-l-4"
+                style={{ borderLeftColor: farbe }}
               >
                 <div className="flex items-center gap-3 flex-1 min-w-0">
                   {/* Aufklapp-Pfeil */}
@@ -209,7 +201,6 @@ export default function AdminThemensteuerung() {
                   ) : (
                     <span className="w-5" />
                   )}
-                  <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: farbe }} />
                   <div className="min-w-0">
                     <span className="font-medium text-sm dark:text-white">{eintrag.status === 'nicht_freigeschaltet' && <span className="mr-1">🔒</span>}{eintrag.thema}</span>
                     <div className="text-xs text-slate-400">
@@ -399,7 +390,6 @@ export default function AdminThemensteuerung() {
           lernziele={lernziele}
           fortschritte={{}}
           onSchliessen={() => setLzModal(null)}
-          onUeben={() => setLzModal(null)}
         />
       )}
     </div>

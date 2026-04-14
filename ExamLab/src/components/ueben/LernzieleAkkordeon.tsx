@@ -218,7 +218,7 @@ export function LernzieleMiniModal({ thema, fach, lernziele, fortschritte, onSch
   lernziele: Lernziel[]
   fortschritte: Record<string, FragenFortschritt>
   onSchliessen: () => void
-  onUeben: () => void
+  onUeben?: () => void
 }) {
   const farbe = getFachFarbe(fach, {})
   const relevante = lernziele.filter(lz => lz.aktiv !== false && lz.fach === fach && (lz.thema === thema || lz.thema?.includes(thema) || thema?.includes(lz.thema)))
@@ -266,13 +266,15 @@ export function LernzieleMiniModal({ thema, fach, lernziele, fortschritte, onSch
           ))}
         </div>
 
-        <button
-          onClick={onUeben}
-          className="w-full py-2.5 rounded-lg text-sm font-medium text-white transition-colors shrink-0"
-          style={{ backgroundColor: farbe }}
-        >
-          ▶ Fragen zu «{thema}» üben
-        </button>
+        {onUeben && (
+          <button
+            onClick={onUeben}
+            className="w-full py-2.5 rounded-lg text-sm font-medium text-white transition-colors shrink-0"
+            style={{ backgroundColor: farbe }}
+          >
+            ▶ Fragen zu «{thema}» üben
+          </button>
+        )}
       </div>
     </div>
   )
