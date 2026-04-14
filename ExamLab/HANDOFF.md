@@ -6,6 +6,50 @@
 
 ---
 
+## Session 111 — Bundle 11: Themen-Kacheln Refactor (Cluster J) (15.04.2026)
+
+### Stand
+Auf `main` gemergt. tsc ✅ | 239 Tests ✅ | Build ✅. Auf Staging von User grün verifiziert.
+
+### Erledigte Arbeiten
+
+**AdminThemensteuerung.tsx — Button-Reihenfolge**
+- Pro Status feste Reihenfolge rechtsbündig, Lernziele + Link **konstant ganz rechts** (wandern nicht mehr):
+  - `aktiv`:              `[Aktuell]`      `Abschliessen`   `Deaktivieren`   `🏁 LZ`  `🔗 Link`
+  - `abgeschlossen`:      `[Freigegeben]`  `Aktuell setzen` `Deaktivieren`   `🏁 LZ`  `🔗 Link`
+  - `nicht_freigeschaltet`: `Aktivieren`                                     `🏁 LZ`  `🔗 Link`
+- **Neu:** Abgeschlossene Themen wieder als "Aktuell" markierbar (`Aktuell setzen`-Button).
+
+**AdminThemensteuerung.tsx — Design-Harmonisierung**
+- Thema-Zeile auf globalen `.hover-card` (S110-Utility).
+- Alle Aktions-Buttons (Abschliessen/Deaktivieren/Aktuell setzen/Lernziele/Link) via `.filter-btn` + `min-h-[36px]`.
+- Farbige Punkt-Marker (`w-2.5 h-2.5 rounded-full`) entfernt.
+- `border-l-4` in Fachfarbe auf **allen Status** (vorher nur bei aktiv). `opacity-70` dämpft bei nicht_freigeschaltet.
+- Fach-Filter: Border + Text in Fachfarbe bei inaktiv, voll fachfarbig bei aktiv. "Alle"-Button neutral slate (`.filter-btn` + `.filter-btn-active`).
+
+**LernzieleAkkordeon.tsx — LP-Kontext**
+- `LernzieleMiniModal.onUeben`-Prop optional gemacht.
+- Button "▶ Fragen zu X üben" rendert nur wenn `onUeben` gesetzt.
+- `AdminThemensteuerung` übergibt `onUeben` nicht mehr → im LP-Kontext verschwindet der nicht-funktionierende Üben-Button.
+- SuS-Kontext (`Dashboard.tsx`) unverändert.
+
+### Entscheidungen (bestätigt im Chat)
+- Lernziele + Deep-Link als konstanter Rechts-Anker (kein Layout-Jitter beim Status-Wechsel).
+- Dark-Mode-Basis-BG für `.filter-btn` NICHT jetzt angehen — die Fach-Filter werden bei Bundle 13 (Cluster I) ohnehin neben den Tabs neu positioniert. Dann global mitbehandeln.
+
+### Offen / Backlog (neu aus dieser Session)
+- **Settings-Persistenz (Bug):** `useUebenSettingsStore.aktualisiereEinstellungen` schreibt nur in-memory. Adapter-Methode `speichereEinstellungen` existiert, wird aber nie aufgerufen → maxAktiveThemen, Fachfarben, sichtbare Fächer etc. gehen nach Reload verloren. **Nächste Session:** Fix-Branch `fix/ueben-settings-persistenz`.
+- **Deep-Link SuS-Flow (Bug):** Gepasteter Deep-Link zwingt zum Login, danach landet SuS auf generischer Üben-Themen-Seite — Query-String geht verloren. Zusätzlich: LP-aktivierte Themen sind bei SuS wr.test nicht sichtbar. Zwei separate Probleme, eigene Session.
+- **Dark-Mode `.filter-btn` Basis-BG:** Bei Bundle 13 mitnehmen (globaler Fix, nicht Bundle-11-spezifisch).
+
+### Commits
+- `89d0ab9` Bundle 11 Teil 1 (Button-Reihenfolge, Aktuell setzen, hover-card, filter-btn)
+- `1aa1d71` Bundle 11 Nachtrag (Punkte weg, border-l-4 alle Status, Fach-Filter standardisiert, Üben-Button im LP-Modal)
+- `36d9513` Bundle 11 Fix (Fach-Filter inaktiv Text in Fachfarbe)
+- Merge-Commit auf main (Session 111)
+
+---
+
 ## Session 110 — Bundle 10: Design-System Hover/Active + React #185 Bugfix (14.04.2026)
 
 ### Stand
@@ -58,10 +102,11 @@ Aus User-Testrunde nach S109. Bundle 10 erledigt (S110). Vorgehen: Bundles nache
 ### Reihenfolge
 1. ~~Bugfix React #185~~ ✅ S110
 2. ~~Bundle 10 — Cluster F + G + H~~ ✅ S110
-3. **Bundle 11 — Cluster J** (Themen-Kacheln Refactor)
-4. **Bundle 12 — Cluster K** (Frageneditor + Namens-Refactor + Einstellungen erweitern)
-5. **Bundle 13 — Cluster I** (Üben-Übungen Tab-Architektur, separate Session)
-6. **Cluster L** — Üben-Analyse Heatmap-Neudarstellung: geparkt bis echte SuS-Daten vorliegen.
+3. ~~Bundle 11 — Cluster J~~ ✅ S111
+4. **Fix: Ueben-Settings-Persistenz** (Backend-Save für LP-Einstellungen, neu aus S111)
+5. **Bundle 12 — Cluster K** (Frageneditor + Namens-Refactor + Einstellungen erweitern)
+6. **Bundle 13 — Cluster I** (Üben-Übungen Tab-Architektur, separate Session)
+7. **Cluster L** — Üben-Analyse Heatmap-Neudarstellung: geparkt bis echte SuS-Daten vorliegen.
 
 ### Cluster F — Modal/Sidebar ESC-Einheitlichkeit
 - Problem-Melden-Modal schliesst nicht mit ESC. Einheitlich: ESC + Klick-daneben + auslösender Button toggelt zu. Alle übrigen Modals gegen diesen Standard auditieren.
