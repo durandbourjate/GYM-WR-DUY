@@ -6,6 +6,57 @@
 
 ---
 
+## Session 106 — E1 FiBu-Fix + Feedback-System-Aufräumarbeiten (14.04.2026)
+
+### Stand
+Auf `main`. tsc ✅ | Tests ✅. E2E im Browser verifiziert (3 Fragen).
+
+### E1 — FiBu-Buchungssatz Fixes (Hauptarbeit)
+
+**Bug A** (Dropdown-Konten fehlten) + **Bug B** (richtige Antworten als falsch gewertet) — Root Cause: 19 von 41 FiBu-Fragen im **dritten Format** `{soll, haben, betrag}` (Kurz-Feldnamen ohne `Konto`-Suffix). Auto-Korrektur erwartet `{sollKonto, habenKonto, betrag}`.
+
+| Fix | Datei |
+|-----|-------|
+| KI-Prompts vereinfachtes Format | `apps-script-code.js` (`generiereBuchungssaetze`, `generiereFallbeispiel`, `generiereBilanzStruktur`, `pruefeBuchungssaetze`) |
+| Save-Guard `ergaenzeFehlendeKontenInAuswahl_` | `apps-script-code.js` |
+| Diagnose-Script v2 (alle 3 Formate erkennen) | `Pruefung/scripts/diagnose-fibu-fragen-v2.js` |
+| Migrations-Script (3. Format unterstützen) | `Pruefung/scripts/migrate-fibu-fragen.js` |
+
+**Migration-Ergebnis (LIVE):** 19/41 Fragen konvertiert, 0 Fehler. Re-Diagnose: 0 Probleme.
+
+**Browser-Test bestätigt:**
+- Z292 Warenverkauf 6'000 (1100/3200/6000) → ✅ Richtig
+- Z295 Privatentnahme 2'000 (2850/1000/2000) → ✅ Richtig
+- Z299 Transitorische Aktive 3'000 (1300/6000/3000) → ✅ Richtig
+
+### Feedback-System neu aufgesetzt
+
+| Schritt | Ergebnis |
+|---------|----------|
+| Sheet umbenannt: `uebungspool_analyse` → `ExamLab Problemmeldungen` | ✅ |
+| Tab `Pruefung-Feedback` → `ExamLab-Problemmeldungen` (15 Spalten) | ✅ |
+| Apps Script (gleiches Sheet) Code aktualisiert + neu bereitgestellt | ✅ |
+| **Bug:** Image-Ping → 503 wegen Multi-Account-Routing (`/u/N/`) | gefixt → `fetch(no-cors)` in `FeedbackModal.tsx` |
+| **Bug:** SuS in aktiver Übung bekam App-Kategorien statt Frage-Kategorien | gefixt → `ort = 'frage-ueben'` bei `aktuellerScreen === 'uebung'` in `AppShell.tsx` |
+| Endpoint-URL in `pool.html` + `analytics/SETUP.md` mit aktualisiert | ✅ |
+
+### Offene Punkte (für nächste Session)
+
+- **Kontenrahmen-Labeling-Bug:** Konto **2850 wird als "Aktienkapital" gelistet**, sollte aber im KMU-Schweizer-Kontenrahmen "Privatkonto / Privatbezüge" sein. Sichtbar bei Z295 (Privatentnahme): Korrekturhinweis sagt "Privat (Unterkonto EK)", Dropdown-Label aber "Aktienkapital". Quelle: `packages/shared/src/editor/kontenrahmenDaten.ts`.
+- Re-Diagnose nach Re-Migration nochmal nach KI-Generierung neuer Buchungssätze (zur Bestätigung dass der neue KI-Prompt direkt vereinfachtes Format erzeugt).
+
+### Commits
+- `2cb9563` E1: KI-Prompts + Save-Guard + Scripts
+- `616834e` Feedback: dediziertes Sheet (verworfen)
+- `b1699e1` Feedback: Tab-Rename + Spalten
+- `0244f5b` Feedback: neue Endpoint-URL
+- `760c09e` Pool.html + SETUP.md URL-Update
+- `532dfc9` FeedbackModal: Image-Ping → fetch
+- `e42339f` AppShell: SuS-Übung Frage-Kategorien
+- `9e6e781`, `535d7a7`, `fc03cdc` Diagnose-/Migrations-Iterationen
+
+---
+
 ## Session 105 — C11 + C9 + Wording-Nacharbeit (14.04.2026)
 
 ### Stand
