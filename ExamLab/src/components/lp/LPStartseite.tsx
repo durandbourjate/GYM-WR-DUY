@@ -442,7 +442,7 @@ export default function LPStartseite() {
                   className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors cursor-pointer ${
                     uebungsTab === 'durchfuehren'
                       ? 'bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 shadow-sm'
-                      : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
+                      : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
                   }`}
                 >
                   Übung durchführen
@@ -452,7 +452,7 @@ export default function LPStartseite() {
                   className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors cursor-pointer ${
                     uebungsTab === 'uebungen'
                       ? 'bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 shadow-sm'
-                      : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
+                      : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
                   }`}
                 >
                   Übungen
@@ -462,7 +462,7 @@ export default function LPStartseite() {
                   className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors cursor-pointer ${
                     uebungsTab === 'analyse'
                       ? 'bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 shadow-sm'
-                      : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
+                      : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
                   }`}
                 >
                   Analyse
