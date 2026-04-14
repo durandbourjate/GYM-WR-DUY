@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { TabBar } from '../ui/TabBar'
-import { ResizableSidebar } from '../ui/ResizableSidebar'
+import { ResizableSidebar } from '@shared/ui/ResizableSidebar'
 import { useAuthStore } from '../../store/authStore'
 import { useStammdatenStore } from '../../store/stammdatenStore'
 import type { Stammdaten, LPProfil, KursDefinition, FachDefinition, FachschaftDefinition } from '../../types/stammdaten'
