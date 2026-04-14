@@ -6,13 +6,58 @@
 
 ---
 
-## Backlog — UX-Testrunde 14.04.2026 (offen, Bundle 10–13)
+## Session 110 — Bundle 10: Design-System Hover/Active + React #185 Bugfix (14.04.2026)
 
-Aus User-Testrunde nach S109. Vorgehen: Bundles nacheinander, jeweils Staging-Test → Freigabe → main.
+### Stand
+Auf `main` gemergt. tsc ✅ | 239 Tests ✅ | Build ✅. Auf Staging von User grün verifiziert.
 
-### Reihenfolge (bestätigt)
-1. **Bugfix sofort** — React #185 Crash beim Klick auf Kachel unter Rubrik "Lernende" in LP-Üben-Übungen.
-2. **Bundle 10 — Cluster F + G + H** (Design-System Drop)
+### Erledigte Arbeiten
+
+**Bugfix React #185 (Crash beim Klick auf Lernende-Kachel)**
+- `AdminKindDetail.tsx`: Zustand-Selector gab neues Array pro Render zurück (`filter()` im Selector) → React #185 Endlos-Loop. Fix: Rohdaten selektieren, mit `useMemo` filtern.
+- Neue Rule: `code-quality.md` → "Zustand-Selektoren (React #185 vermeiden)".
+
+**Cluster F — Modal/Sidebar ESC**
+- `FeedbackModal.tsx`: ESC-Handler ergänzt (war nur Klick-daneben, kein ESC).
+- `FeedbackButton.tsx`: `onClick` togglet jetzt (zweiter Klick schliesst das offene Modal).
+
+**Cluster G — Design-System Hover/Active**
+- `index.css`: Utility-Klassen `hover-card`, `hover-card-active`, `hover-card-fach`, `hover-tab`, `hover-tab-active` bereit für künftige Nutzung.
+- `index.css` `.filter-btn` Hover: slate-100 → slate-200 + border-darken (nicht mehr "fast weiss").
+- `LPStartseite.tsx`: Prüfen-/Üben-Sub-Tabs Hover mit bg-slate-200 (vorher nur Text-Farbe).
+- `LPStartseite.tsx`: Filter-Buttons (Fach/Gefäss/Status) `hover:bg-slate-50` → slate-200 + border-slate-400.
+- `EditorBausteine.tsx` (shared `Abschnitt`): dezenter Border-Hover auf Editor-Bereichen.
+- `FrageTypAuswahl.tsx` (shared): Hover sichtbar (bg-slate-200 + border-slate-400).
+
+**Cluster H — LP-Favoriten**
+- `Favoriten.tsx`: Hover-Rand blau → violett (Farbkonzept).
+- `Favoriten.tsx`: "Entwurf"-Badge amber → neutral slate (nicht mehr als Warnung codiert).
+
+### Entscheidungen (bestätigt im Chat)
+- Active-Akzent = violett, Hover-Akzent = slate.
+- Frageneditor-Bereichs-Kacheln: dezenter Hover (Border), Buttons darin stärker.
+
+### Offen (Bundle 11–13, nächste Sessions)
+- **Bundle 11 — Cluster J** (Themen-Kacheln Refactor): Kachel-Hover, Button-Harmonisierung, "Aktuell"-Button nach links, abgeschlossene Themen wieder "Aktuell" markierbar, **farbige Fach-Filter-Buttons VWL/BWL/Recht in Themensteuerung** (vom User im Staging-Screenshot markiert).
+- **Bundle 12 — Cluster K** (Frageneditor, Metadaten-Defaults, Namens-Refactor Fachbereich→Fach, Fragenbank→Fragensammlung, Semester→Zeitpunkt konfigurierbar, Gefässe in Einstellungen).
+- **Bundle 13 — Cluster I** (Üben-Übungen Tab-Architektur: Übersicht/Themen entfernen, Kurs-Sub-Tabs neben "Übungen").
+- **Cluster L** — Üben-Analyse Heatmap: geparkt bis SuS-Daten vorliegen.
+
+### Commits
+- `62db3f1` Bundle 10 Teil 1 + Bugfix
+- `066356a` Bundle 10 Teil 2 (Sub-Tabs, Editor-Bereiche, Fragetyp-Buttons)
+- `8059910` Bundle 10 Nachtrag (Prüfen-Tabs + Filter-Buttons)
+- Merge-Commit auf main (Session 110)
+
+---
+
+## Backlog — UX-Testrunde 14.04.2026 (offen, Bundle 11–13)
+
+Aus User-Testrunde nach S109. Bundle 10 erledigt (S110). Vorgehen: Bundles nacheinander, jeweils Staging-Test → Freigabe → main.
+
+### Reihenfolge
+1. ~~Bugfix React #185~~ ✅ S110
+2. ~~Bundle 10 — Cluster F + G + H~~ ✅ S110
 3. **Bundle 11 — Cluster J** (Themen-Kacheln Refactor)
 4. **Bundle 12 — Cluster K** (Frageneditor + Namens-Refactor + Einstellungen erweitern)
 5. **Bundle 13 — Cluster I** (Üben-Übungen Tab-Architektur, separate Session)
