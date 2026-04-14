@@ -165,7 +165,7 @@ export default function AdminThemensteuerung() {
               className="filter-btn"
               style={aktiv
                 ? { backgroundColor: farbe, color: '#fff', borderColor: farbe }
-                : { borderColor: farbe }
+                : { borderColor: farbe, color: farbe }
               }
             >
               {fach}
