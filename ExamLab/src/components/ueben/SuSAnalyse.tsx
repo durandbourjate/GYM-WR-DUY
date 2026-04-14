@@ -56,7 +56,7 @@ export default function SuSAnalyse() {
         setFragen(f.filter(fr => {
           if (istDemo) return true
           const tags = (fr.tags || []) as (string | { name: string })[]
-          if (tags.some(t => (typeof t === 'string' ? t : t.name) === 'einrichtung')) return false
+          if (tags.some(t => (typeof t === 'string' ? t : t.name) === 'einrichtung' || (typeof t === 'string' ? t : t.name) === 'einführung')) return false
           return fr.thema !== 'Einrichtung' && fr.thema !== 'Einrichtungstest'
         }))
       } catch {
