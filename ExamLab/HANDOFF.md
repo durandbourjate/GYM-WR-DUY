@@ -6,6 +6,55 @@
 
 ---
 
+## Session 112 — Ueben-Settings-Persistenz + Begriffs-Klärung + UX-Wünsche (15.04.2026)
+
+### Stand
+Auf `main` gemergt. tsc ✅ | 246 Tests ✅ | Build ✅. Auf Staging von User grün verifiziert.
+**⚠️ Apps-Script-Deploy manuell nötig** (Backend-Fehlermeldung geändert).
+
+### Erledigte Arbeiten
+
+**Settings-Persistenz (Hauptfix)**
+- `useUebenSettingsStore.aktualisiereEinstellungen` schrieb bisher nur in-memory. Backend-Adapter-Methode `speichereEinstellungen` existierte, wurde nie gerufen → maxAktiveThemen, Fachfarben, sichtbare Fächer etc. gingen nach Reload verloren.
+- Fix zentral im Store: Optimistic Update sofort, debounced Backend-Save (500 ms), liest Gruppe+User via `getState()` zur Ausführungszeit.
+- `setzeEinstellungen` (Load-Pfad) persistiert NICHT zurück — kein Loop.
+- `abbrecheSave()` beim Gruppen-Wechsel in `UebenKontextProvider` → keine Cross-Kontamination.
+- `saveFehler` + `speichertGerade` als Store-State → roter Dismiss-Banner + dezentes "Speichern…" im `AdminSettings`.
+- **Wichtig für künftige Settings:** Jedes neue Feld in `GruppenEinstellungen`, das via `aktualisiereEinstellungen` gesetzt wird, wird automatisch mit persistiert. Kein Extra-Code nötig.
+- **7 neue Tests** (`src/tests/uebenSettingsStore.test.ts`): Load-Pfad triggert nicht, Debounce-Verhalten, abbrecheSave, Fehler-Handling, kein Save ohne User/Gruppe.
+
+**Begriffs-Klärung "Admin" → "Kurs-Leitung"**
+- Plattform-Admin bleibt **Admin** (darf Fächer/Fachschaften/Klassen/Gefässe/Kurse plattformweit).
+- Gruppen-Admin (= Besitzer einer Üben-Gruppe) heisst jetzt **Kurs-Leitung** (darf Einstellungen + Mitglieder + Fragenbank dieser Gruppe).
+- UI-Änderungen: `AppShell.tsx` (Rolle unter User-Name), `MitgliederTab.tsx` (Rolle-Label).
+- Backend-Fehler spezifischer: "Diese Einstellungen können nur von der Kurs-Leitung gespeichert werden. Kurs-Leitung: {email}" + "Keine Berechtigung (nur Kurs-Leitung)" bei Fragen speichern/löschen.
+- **Datenfelder unverändert** (`adminEmail` in Registry, `rolle: 'admin'` im Mitglied-Type) → keine Sheet-Migration.
+
+**UX-Wünsche aus derselben Session**
+- `MitgliederTab`: Rolle-Toggle-Button → `<select>`-Dropdown (intuitiver). Amber-Farbe für Kurs-Leitung entfernt, neutrale slate-Optik (Farbkonzept). "Letzte Kurs-Leitung" bleibt disabled.
+- Einstellungen → Tab **"Übungen" immer sichtbar** (vorher nur bei aktiver Gruppe). AdminSettings hat jetzt einen **Kurs-Dropdown links neben den Sub-Tabs** in einer Kopfzeile. Ohne Auswahl: Hinweistext statt leere Tabs. Bei Wechsel wird `waehleGruppe()` gerufen → globaler Store updated, AppShell-Header zieht nach.
+
+### Entscheidungen (bestätigt im Chat)
+- Gruppen-Einstellungen bleiben **pro Gruppe** (nicht pro LP). Kurs-Leitung ist Single-Admin der Gruppe. Team-Teaching / Multi-Admin → späteres Backlog falls Bedarf.
+- Begriff-Scope: Nur UI + User-sichtbare Backend-Fehler umbenannt. Datenstruktur (`admins`-Spalte, `adminEmail`-Feld, `rolle: 'admin'`) bleibt aus Backward-Compat-Gründen identisch.
+
+### Commits
+- `99de6b1` Settings-Persistenz (Store + Provider + Banner + 7 Tests)
+- `abe6300` Admin → Kurs-Leitung (UI + Backend-Fehler)
+- `b8592b1` Rolle-Dropdown + Übungen-Tab immer sichtbar + Kurs-Auswahl
+- `f44e73f` Kurs-Dropdown neben Sub-Tabs (eine Kopfzeile)
+- Merge-Commit auf main (Session 112)
+
+### Offen / Backlog
+- **Apps-Script-Deploy:** User muss `ExamLab/apps-script-code.js` in Apps Script Editor kopieren + neue Bereitstellung erstellen. Sonst sehen Nicht-Kurs-Leitungen die alte generische Fehlermeldung statt der neuen präzisen.
+- **Deep-Link SuS-Flow** (aus S111): Gepasteter Deep-Link verliert Query-String beim Login, SuS sieht aktivierte LP-Themen nicht. Eigene Session.
+- **Dark-Mode `.filter-btn` Basis-BG:** Bei Bundle 13 global adressieren.
+- **Bundle 12 — Cluster K** (Frageneditor + Namens-Refactor + Einstellungen erweitern).
+- **Bundle 13 — Cluster I** (Üben-Übungen Tab-Architektur).
+- **Cluster L** — Üben-Analyse Heatmap (geparkt bis SuS-Daten).
+
+---
+
 ## Session 111 — Bundle 11: Themen-Kacheln Refactor (Cluster J) (15.04.2026)
 
 ### Stand
@@ -103,7 +152,7 @@ Aus User-Testrunde nach S109. Bundle 10 erledigt (S110). Vorgehen: Bundles nache
 1. ~~Bugfix React #185~~ ✅ S110
 2. ~~Bundle 10 — Cluster F + G + H~~ ✅ S110
 3. ~~Bundle 11 — Cluster J~~ ✅ S111
-4. **Fix: Ueben-Settings-Persistenz** (Backend-Save für LP-Einstellungen, neu aus S111)
+4. ~~Fix: Ueben-Settings-Persistenz~~ ✅ S112 (+ Begriffs-Klärung + UX-Wünsche)
 5. **Bundle 12 — Cluster K** (Frageneditor + Namens-Refactor + Einstellungen erweitern)
 6. **Bundle 13 — Cluster I** (Üben-Übungen Tab-Architektur, separate Session)
 7. **Cluster L** — Üben-Analyse Heatmap-Neudarstellung: geparkt bis echte SuS-Daten vorliegen.
