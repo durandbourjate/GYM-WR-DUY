@@ -6,36 +6,38 @@
   <script>
     (function() {
       var l = window.location;
-      var base = '/GYM-WR-DUY/ExamLab/';
+      // Unterstützte App-Bases (Production + Staging). Reihenfolge: spezifischste zuerst.
+      var bases = ['/GYM-WR-DUY/staging/', '/GYM-WR-DUY/ExamLab/'];
+      var defaultBase = bases[1];
 
-      // 1. ExamLab-Pfade: SPA-Redirect mit Query-Parameter
-      if (l.pathname.startsWith(base) && l.pathname !== base) {
-        var route = l.pathname.slice(base.length);
+      function redirectUnterBase(base, route) {
         l.replace(
           l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
           base + '?p=/' + encodeURIComponent(route) +
           (l.search ? '&q=' + encodeURIComponent(l.search.slice(1)) : '') +
           l.hash
         );
-        return;
       }
 
-      // 2. Bekannte ExamLab-Routes OHNE Base-Path (z.B. /login, /sus, /home, /pruefung)
-      //    → auf Base-Path umleiten
+      // 1. Pfad liegt bereits unter einer bekannten Base → SPA-Redirect mit Query-Parameter
+      for (var i = 0; i < bases.length; i++) {
+        var base = bases[i];
+        if (l.pathname.startsWith(base) && l.pathname !== base) {
+          redirectUnterBase(base, l.pathname.slice(base.length));
+          return;
+        }
+      }
+
+      // 2. Bekannte ExamLab-Routes OHNE Base-Path (z.B. direkter Aufruf /login)
+      //    → auf Default-Base umleiten
       var examLabRoutes = [
-        '/login', '/home', '/sus', '/pruefung', '/uebung',
+        '/login', '/favoriten', '/home', '/sus', '/pruefung', '/uebung',
         '/fragensammlung', '/einstellungen'
       ];
       var pfad = l.pathname;
-      for (var i = 0; i < examLabRoutes.length; i++) {
-        if (pfad === examLabRoutes[i] || pfad.startsWith(examLabRoutes[i] + '/')) {
-          var route = pfad.slice(1); // ohne führendes /
-          l.replace(
-            l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
-            base + '?p=/' + encodeURIComponent(route) +
-            (l.search ? '&q=' + encodeURIComponent(l.search.slice(1)) : '') +
-            l.hash
-          );
+      for (var j = 0; j < examLabRoutes.length; j++) {
+        if (pfad === examLabRoutes[j] || pfad.startsWith(examLabRoutes[j] + '/')) {
+          redirectUnterBase(defaultBase, pfad.slice(1));
           return;
         }
       }
