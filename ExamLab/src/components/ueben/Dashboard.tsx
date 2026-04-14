@@ -162,7 +162,7 @@ export default function Dashboard({ deepLinkZiel }: DashboardProps = {}) {
       // Einrichtungsfragen komplett ausblenden — ausser im Demo-Modus, wo sie der einzige Inhalt sind
       const istDemo = useAuthStore.getState().istDemoModus
       if (!istDemo) {
-        if (tags.some(t => (typeof t === 'string' ? t : t.name) === 'einrichtung')) continue
+        if (tags.some(t => (typeof t === 'string' ? t : t.name) === 'einrichtung' || (typeof t === 'string' ? t : t.name) === 'einführung')) continue
         if (themaRaw === 'Einrichtung' || themaRaw === 'Einrichtungstest') continue
       }
 

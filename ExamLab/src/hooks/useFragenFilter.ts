@@ -153,7 +153,7 @@ export function useFragenFilter(
     return alleFragen.filter((f) => {
       // Einrichtungsfragen ausblenden — ausser im Demo-Modus, wo sie der einzige Inhalt sind
       const tags = f.tags || []
-      if (!istDemoModus && tags.some(t => (typeof t === 'string' ? t : t.name) === 'einrichtung')) return false
+      if (!istDemoModus && tags.some(t => (typeof t === 'string' ? t : t.name) === 'einrichtung' || (typeof t === 'string' ? t : t.name) === 'einführung')) return false
 
       // Schule/Privat-Filter
       if (filterKontext === 'schule' && !SCHUL_FACHBEREICHE.has(f.fachbereich)) return false

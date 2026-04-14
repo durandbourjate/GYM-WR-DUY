@@ -41,8 +41,8 @@ export default function AdminUebersicht({ onKindKlick, onFachKlick }: Props) {
       // Einrichtungsfragen ausblenden (Tutorial-Fragen) — ausser im Demo-Modus
       const tags = (f.tags || []) as (string | { name: string })[]
       if (!istDemo) {
-        if (tags.some(t => (typeof t === 'string' ? t : t.name) === 'einrichtung')) continue
-        if (f.thema === 'Einrichtung' || f.thema === 'Einrichtungstest') continue
+        if (tags.some(t => (typeof t === 'string' ? t : t.name) === 'einrichtung' || (typeof t === 'string' ? t : t.name) === 'einführung')) continue
+        if (f.thema === 'Einrichtung' || f.thema === 'Einrichtungstest' || f.thema === 'Einführung') continue
       }
 
       if (!stats[f.fach]) stats[f.fach] = { fach: f.fach, anzahl: 0, themen: new Set(), typen: new Set() }

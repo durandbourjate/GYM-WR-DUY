@@ -27,8 +27,8 @@ export default function AllgemeinTab() {
       for (const f of fragen) {
         const tags = (f.tags || []) as (string | { name: string })[]
         if (!istDemo) {
-          if (tags.some(t => (typeof t === 'string' ? t : t.name) === 'einrichtung')) continue
-          if (f.thema === 'Einrichtung' || f.thema === 'Einrichtungstest') continue
+          if (tags.some(t => (typeof t === 'string' ? t : t.name) === 'einrichtung' || (typeof t === 'string' ? t : t.name) === 'einführung')) continue
+          if (f.thema === 'Einrichtung' || f.thema === 'Einrichtungstest' || f.thema === 'Einführung') continue
         }
         const key = `${f.fach}|${f.thema}`
         if (!map.has(key)) map.set(key, f.fach)
