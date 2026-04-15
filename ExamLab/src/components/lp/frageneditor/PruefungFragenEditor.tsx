@@ -123,6 +123,24 @@ export default function PruefungFragenEditor({ frage, onSpeichern, onAbbrechen, 
             eigeneFachschaft={user?.fachschaft}
           />
         )}
+        berechtigungenHeaderSlot={({ berechtigungen, geteilt }) => {
+          const individuelle = berechtigungen.filter(
+            b => b.email !== '*' && !b.email.startsWith('fachschaft:')
+          )
+          const stufeLabel =
+            geteilt === 'schule' ? 'Schulweit'
+            : geteilt === 'fachschaft' ? 'Fachschaft'
+            : individuelle.length > 0 ? 'Privat + geteilt' : 'Privat'
+          const zusatz = individuelle.length > 0 ? ` · ${individuelle.length} LP` : ''
+          return (
+            <span
+              className="text-xs px-2 py-1 rounded-md border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-700/50 text-slate-600 dark:text-slate-300"
+              title="Geteilt mit (bearbeitbar in den Metadaten)"
+            >
+              Geteilt: {stufeLabel}{zusatz}
+            </span>
+          )
+        }}
         poolInfoSlot={({ frage: f, onSpeichern: speichern }) => {
           const pf = f as any as Frage | null
           if (!pf || pf.quelle !== 'pool' || !pf.poolId) return null

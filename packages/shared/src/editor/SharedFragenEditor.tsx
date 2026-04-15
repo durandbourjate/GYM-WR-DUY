@@ -91,6 +91,14 @@ export interface SharedFragenEditorProps {
     onRueckSync: () => void
   }) => React.ReactNode
 
+  /** Kompakte "Geteilt mit"-Statusanzeige in der Kopfzeile (Bundle 12 K-2, 15.04.2026).
+   *  Wird links vom "Zurück"-Button gerendert. Host gibt typischerweise den
+   *  BerechtigungenEditor im readOnly-Modus oder eine eigene Zusammenfassung. */
+  berechtigungenHeaderSlot?: (props: {
+    berechtigungen: Berechtigung[]
+    geteilt: 'privat' | 'fachschaft' | 'schule'
+  }) => React.ReactNode
+
   /** PDF-Editor Komponente (optional) */
   PDFEditorComponent?: React.ComponentType<any>
 
@@ -106,6 +114,7 @@ export interface SharedFragenEditorProps {
 export default function SharedFragenEditor({
   frage, onSpeichern, onAbbrechen, onLoeschen, performance,
   anhangEditorSlot, berechtigungenSlot, poolInfoSlot, poolSyncSlot,
+  berechtigungenHeaderSlot,
   PDFEditorComponent, rueckSyncSlot,
 }: SharedFragenEditorProps) {
   const config = useEditorConfig()
@@ -666,6 +675,8 @@ export default function SharedFragenEditor({
             {frage ? 'Frage bearbeiten' : 'Neue Frage erstellen'}
           </h2>
           <div className="flex items-center gap-2">
+            {/* Kompakte Geteilt-mit-Anzeige (Host-Slot, Bundle 12 K-2) */}
+            {berechtigungenHeaderSlot?.({ berechtigungen, geteilt })}
             {/* Pool-Sync Buttons (Host-Slot) */}
             {poolSyncSlot?.({ frage, typ, onRueckSync: () => setRueckSyncOffen(true) })}
             <button
