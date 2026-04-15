@@ -6,7 +6,7 @@
 
 ---
 
-## Session 113 — Bundle 12 + Deep-Link-Fix + Bundle 13 Plan (15.04.2026)
+## Session 113 — Bundle 12 + Deep-Link-Fix + Bundle 13 Cluster I (15.04.2026)
 
 ### Stand
 **Noch nicht auf main gemergt.** Alles auf `origin/preview` (Staging) gepusht, wartet auf User-Freigabe.
@@ -30,11 +30,22 @@ tsc ✅ | 246 Tests ✅ | Build ✅ | Browser-Tests in Chrome-in-Chrome durchgef
 **Weitere Fixes**
 - **Dark-Mode `.filter-btn`:** Basis-BG `bg-white dark:bg-slate-800` — inaktive Filter-Buttons im Dark Mode nicht mehr "unsichtbar" im Parent-Hintergrund.
 
-**Bundle 13 — Cluster I Planung**
+**Bundle 13 — Cluster I (implementiert)**
 - Design-Spec `ExamLab/docs/superpowers/specs/2026-04-15-bundle13-cluster-i-design.md`
 - Implementation-Plan `ExamLab/docs/superpowers/plans/2026-04-15-bundle13-cluster-i.md` (8 Tasks)
-- Branch: `feature/bundle13-cluster-i` (separat, nicht in preview gemerged)
-- **Bereit zur Implementation in neuer Session** (empfehlung: superpowers:executing-plans skill mit subagent-driven-development)
+- Alle 8 Tasks umgesetzt. tsc ✅ | 251 Tests ✅ | Build ✅.
+  - I-1 Route `/uebung/kurs/:kursId`
+  - I-2 `UebenTabLeiste.tsx` (5 vitest-Tests) — Kurs-Tabs inline bei aktivem "Übungen"-Tab
+  - I-3 LPStartseite: `useParams<{kursId}>` + `useNavigate`, localStorage `examlab-ueben-letzter-kurs`, Redirect bei ungültiger ID
+  - I-3 `useLPRouteSync.ts`: Case `/uebung/kurs/...` → setzt `uebungsTab='uebungen'`
+  - I-4 `UebungsToolView.tsx`: Gruppen-Info-Bar entfernt, neue Prop `aktiverKursId` synct Store
+  - I-5 `AdminDashboard.tsx`: interne Tabs "Übersicht"/"Themen" entfernt, rendert Themensteuerung direkt
+  - I-6 `AdminUebersicht.tsx` gelöscht (Inhalt war Mitglieder-Stats → Einstellungen→Mitglieder)
+  - I-7 `FaecherTab.tsx`: neue Sektion "Freigeschaltete Fächer pro Kurs" (lädt `ladeEinstellungen` parallel, direkter Save pro Toggle)
+
+### Offen (Bundle 13)
+- `AdminKindDetail`/`AdminThemaDetail`: aktuell keine Entry-Points mehr. Follow-up-Löschung möglich.
+- Toast-System für "Kurs nicht gefunden" (derzeit console.warn).
 
 ### Parkiert im Backlog (eigene Sessions)
 
@@ -54,6 +65,11 @@ tsc ✅ | 246 Tests ✅ | Build ✅ | Browser-Tests in Chrome-in-Chrome durchgef
 - `f65759e` K-2 Thema-Dropdown Lernziele
 - `cffe9d3` Merge Dark-Mode + K-2 Teilergebnisse
 - `5d52fa8` Tooltip-Rest Fachbereich→Fach
+- `5c8a3fb` Bundle 13 I-1: Route /uebung/kurs/:kursId
+- `4e8bc1e` Bundle 13 I-2: UebenTabLeiste mit Kurs-Tabs
+- `6317d89` Bundle 13 I-3+4: LPStartseite + UebungsToolView
+- `99b1f2f` Bundle 13 I-5+6: AdminDashboard ohne interne Tabs
+- `661817b` Bundle 13 I-7: Fachfreischaltung pro Kurs
 
 ### User-Aufgaben
 
