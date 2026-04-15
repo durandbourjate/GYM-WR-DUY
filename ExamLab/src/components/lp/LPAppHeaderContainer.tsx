@@ -7,10 +7,11 @@
 // bis dahin wird LPHeader.tsx weiterhin verwendet.
 
 import type React from 'react'
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../../store/authStore'
 import { useThemeStore } from '../../store/themeStore'
+import { useUebenGruppenStore } from '../../store/ueben/gruppenStore'
 import { useTabKaskadeConfigLP } from '../shared/header/useTabKaskadeConfig.lp'
 import { useGlobalSucheLP } from '../../hooks/useGlobalSucheLP'
 import { AppHeader } from '../shared/header/AppHeader'
@@ -45,11 +46,22 @@ export function LPAppHeaderContainer({ onHilfe, onFeedback, onEinstellungen, onZ
   const navigate = useNavigate()
   const [suchen, setSuchen] = useState('')
 
-  // Kaskaden-Konfiguration aus Route — leere Arrays sind okay für diese Phase.
-  // Echte Prüfungs-/Kurs-Daten werden in einem späteren Schritt angebunden.
+  // Kurse: alle Gruppen aus dem UebenGruppenStore, gefiltert auf Gruppen wo LP Admin ist.
+  const gruppen = useUebenGruppenStore((s) => s.gruppen)
+  const userEmail = useAuthStore((s) => s.user?.email ?? '')
+  const kurse = useMemo(
+    () =>
+      gruppen
+        .filter((g) => g.adminEmail.toLowerCase() === userEmail.toLowerCase())
+        .map((g) => ({ id: g.id, label: g.name })),
+    [gruppen, userEmail],
+  )
+
+  // Kaskaden-Konfiguration aus Route.
+  // Pruefungen/aktivePruefungen: kein globaler Store vorhanden — TODO: anbinden wenn Store existiert.
   const kaskadeConfig = useTabKaskadeConfigLP({
-    kurse: [],
-    pruefungen: [],
+    kurse,
+    pruefungen: [], // TODO: globalen PruefungsStore anbinden wenn verfügbar
     aktivePruefungen: [],
   })
 

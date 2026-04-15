@@ -469,7 +469,8 @@ export default function LPStartseite() {
       {/* Dashboard-Inhalte — nur wenn nicht im Composer */}
       {ansicht !== 'composer' && modus === 'uebung' && (
         <>
-          {/* Tab-Leiste */}
+          {/* Tab-Leiste — nur ohne neuen Header sichtbar (sonst doppelt) */}
+          {import.meta.env.VITE_ENABLE_NEW_HEADER !== '1' && (
           <div className="px-6 pt-4">
             <div className="flex items-center justify-between gap-4">
               <UebenTabLeiste
@@ -495,6 +496,7 @@ export default function LPStartseite() {
               />
             </div>
           </div>
+          )}
 
           {/* Tab-Content */}
           {uebungsTab === 'uebungen' && <UebungsToolView aktiverKursId={aktiverKursId} onFachKlick={() => setModus('fragensammlung')} />}
@@ -625,7 +627,8 @@ export default function LPStartseite() {
 
       {/* Prüfen-Ansicht */}
       {ansicht !== 'composer' && modus === 'pruefung' && <>
-      {/* Tab-Leiste */}
+      {/* Tab-Leiste — nur ohne neuen Header sichtbar (sonst doppelt) */}
+      {import.meta.env.VITE_ENABLE_NEW_HEADER !== '1' && (
       <div className="px-6 pt-4">
         <div className="flex items-center justify-between gap-4">
           <div className="flex gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-lg w-fit">
@@ -659,6 +662,7 @@ export default function LPStartseite() {
           />
         </div>
       </div>
+      )}
 
       {/* Content */}
       <main className="p-6">

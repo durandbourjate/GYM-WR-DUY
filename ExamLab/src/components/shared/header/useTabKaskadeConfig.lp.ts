@@ -24,7 +24,7 @@ export function baueLPConfigAusRoute(
   if (pathname.startsWith('/favoriten')) aktivL1 = 'favoriten'
   else if (pathname.startsWith('/pruefung')) {
     aktivL1 = 'pruefung'
-    aktivL2 = pathname.includes('/analyse') ? 'analyse' : 'durchfuehren'
+    aktivL2 = (pathname.includes('/analyse') || pathname.includes('/tracker')) ? 'analyse' : 'durchfuehren'
   } else if (pathname.startsWith('/uebung')) {
     aktivL1 = 'uebung'
     if (pathname.includes('/durchfuehren')) aktivL2 = 'durchfuehren'
@@ -56,7 +56,7 @@ export function baueLPConfigAusRoute(
   const durchfPruefenL2: L2Tab = {
     id: 'durchfuehren',
     label: 'Durchführen',
-    onClick: () => navigate('/pruefung/durchfuehren'),
+    onClick: () => navigate('/pruefung'),
     l3:
       aktivePruefungen.length > 0
         ? {
@@ -74,7 +74,7 @@ export function baueLPConfigAusRoute(
       id: 'pruefung',
       label: 'Prüfen',
       onClick: () => navigate('/pruefung'),
-      l2: [durchfPruefenL2, { id: 'analyse', label: 'Analyse', onClick: () => navigate('/pruefung/analyse') }],
+      l2: [durchfPruefenL2, { id: 'analyse', label: 'Analyse', onClick: () => navigate('/pruefung/tracker') }],
     },
     {
       id: 'uebung',
