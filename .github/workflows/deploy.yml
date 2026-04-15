@@ -100,6 +100,7 @@ jobs:
           VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
           VITE_APPS_SCRIPT_URL: ${{ secrets.VITE_APPS_SCRIPT_URL }}
           VITE_BASE_PATH: /GYM-WR-DUY/staging/
+          VITE_ENABLE_NEW_HEADER: "1"
         run: npx tsc -b && npx vite build
 
       - name: Add staging to site
