@@ -88,7 +88,7 @@ export function TabKaskade({ config }: Props) {
   return (
     <>
       <div
-        className="flex items-center gap-[1px] flex-1 flex-nowrap overflow-x-auto"
+        className="flex items-center gap-[1px] flex-1 flex-nowrap overflow-x-clip"
         role="tablist"
         aria-label="Hauptnavigation"
         onKeyDown={onL1KeyDown}

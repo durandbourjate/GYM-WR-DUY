@@ -46,15 +46,13 @@ export function LPAppHeaderContainer({ onHilfe, onFeedback, onEinstellungen, onZ
   const navigate = useNavigate()
   const [suchen, setSuchen] = useState('')
 
-  // Kurse: alle Gruppen aus dem UebenGruppenStore, gefiltert auf Gruppen wo LP Admin ist.
+  // Kurse: alle Gruppen aus dem UebenGruppenStore.
+  // ladeGruppen(email) gibt bereits nur Gruppen zurück, auf die der User Zugriff hat
+  // (Admin ODER Mitglied) — kein weiterer Filter nötig.
   const gruppen = useUebenGruppenStore((s) => s.gruppen)
-  const userEmail = useAuthStore((s) => s.user?.email ?? '')
   const kurse = useMemo(
-    () =>
-      gruppen
-        .filter((g) => g.adminEmail.toLowerCase() === userEmail.toLowerCase())
-        .map((g) => ({ id: g.id, label: g.name })),
-    [gruppen, userEmail],
+    () => gruppen.map((g) => ({ id: g.id, label: g.name })),
+    [gruppen],
   )
 
   // Kaskaden-Konfiguration aus Route.
