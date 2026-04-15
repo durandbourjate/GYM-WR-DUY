@@ -213,7 +213,7 @@ function AdminTab({ email, stammdaten }: { email: string; stammdaten: Stammdaten
   const { speichereStammdaten: speichereStammdatenAction } = useStammdatenStore()
   const [admins, setAdmins] = useState(stammdaten.admins.join('\n'))
   const [klassen, setKlassen] = useState(stammdaten.klassen.join(', '))
-  const [gefaesse, setGefaesse] = useState(stammdaten.gefaesse.join(', '))
+  const [gefaesse, setGefaesse] = useState<string[]>(stammdaten.gefaesse)
   const [kurse, setKurse] = useState<KursDefinition[]>(stammdaten.kurse)
   const [faecher, setFaecher] = useState<FachDefinition[]>(stammdaten.faecher)
   const [fachschaften, setFachschaften] = useState<FachschaftDefinition[]>(stammdaten.fachschaften)
@@ -224,11 +224,12 @@ function AdminTab({ email, stammdaten }: { email: string; stammdaten: Stammdaten
   const [neuerKursOffen, setNeuerKursOffen] = useState(false)
   const [neuesFachOffen, setNeuesFachOffen] = useState(false)
   const [neueFachschaftOffen, setNeueFachschaftOffen] = useState(false)
+  const [neuesGefaessOffen, setNeuesGefaessOffen] = useState(false)
 
   useEffect(() => {
     setAdmins(stammdaten.admins.join('\n'))
     setKlassen(stammdaten.klassen.join(', '))
-    setGefaesse(stammdaten.gefaesse.join(', '))
+    setGefaesse(stammdaten.gefaesse)
     setKurse(stammdaten.kurse)
     setFaecher(stammdaten.faecher)
     setFachschaften(stammdaten.fachschaften)
@@ -239,7 +240,7 @@ function AdminTab({ email, stammdaten }: { email: string; stammdaten: Stammdaten
     const daten: Partial<Stammdaten> = {
       admins: admins.split('\n').map(s => s.trim().toLowerCase()).filter(Boolean),
       klassen: klassen.split(',').map(s => s.trim()).filter(Boolean),
-      gefaesse: gefaesse.split(',').map(s => s.trim()).filter(Boolean),
+      gefaesse,
       kurse,
       faecher,
       fachschaften,
@@ -256,13 +257,14 @@ function AdminTab({ email, stammdaten }: { email: string; stammdaten: Stammdaten
     setBearbeitungsModus(false)
     setAdmins(stammdaten.admins.join('\n'))
     setKlassen(stammdaten.klassen.join(', '))
-    setGefaesse(stammdaten.gefaesse.join(', '))
+    setGefaesse(stammdaten.gefaesse)
     setKurse(stammdaten.kurse)
     setFaecher(stammdaten.faecher)
     setFachschaften(stammdaten.fachschaften)
     setNeuerKursOffen(false)
     setNeuesFachOffen(false)
     setNeueFachschaftOffen(false)
+    setNeuesGefaessOffen(false)
   }
 
   return (
@@ -278,7 +280,42 @@ function AdminTab({ email, stammdaten }: { email: string; stammdaten: Stammdaten
 
       <SettingsField label="Admins (E-Mails, eine pro Zeile)" value={admins} onChange={setAdmins} multiline readonly={!bearbeitungsModus} />
       <SettingsField label="Klassen (kommasepariert)" value={klassen} onChange={setKlassen} readonly={!bearbeitungsModus} hinweis="z.B. 27a, 28bc29fs, 29c, 30s" />
-      <SettingsField label="Gefässe (kommasepariert)" value={gefaesse} onChange={setGefaesse} readonly={!bearbeitungsModus} hinweis="z.B. SF, EF, EWR, GF" />
+      {/* === GEFÄSSE CRUD === */}
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Gefässe ({gefaesse.length})</label>
+          {bearbeitungsModus && !neuesGefaessOffen && (
+            <button onClick={() => setNeuesGefaessOffen(true)} className="text-xs text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 cursor-pointer">+ Gefäss</button>
+          )}
+        </div>
+        <div className="flex flex-wrap gap-1.5">
+          {gefaesse.map((g, idx) => (
+            <span key={g} className="text-xs px-2 py-1 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded inline-flex items-center gap-1">
+              {g}
+              {bearbeitungsModus && (
+                <button onClick={() => setGefaesse(prev => prev.filter((_, i) => i !== idx))} className="text-red-400 hover:text-red-600 cursor-pointer">✕</button>
+              )}
+            </span>
+          ))}
+        </div>
+        {neuesGefaessOffen && (
+          <InlineTextEditor
+            label="Gefäss"
+            felder={[
+              { name: 'kuerzel', placeholder: 'Kürzel (z.B. SF, EF, EWR, GF)', required: true },
+            ]}
+            onSpeichern={(werte) => {
+              const kuerzel = werte.kuerzel.trim()
+              if (kuerzel && !gefaesse.includes(kuerzel)) {
+                setGefaesse(prev => [...prev, kuerzel])
+              }
+              setNeuesGefaessOffen(false)
+            }}
+            onAbbrechen={() => setNeuesGefaessOffen(false)}
+          />
+        )}
+        <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-1">z.B. SF, EF, EWR, GF — werden bei Kursen und im Frageneditor als Auswahl angeboten.</p>
+      </div>
 
       {/* === KURSE CRUD === */}
       <div>
@@ -301,7 +338,7 @@ function AdminTab({ email, stammdaten }: { email: string; stammdaten: Stammdaten
         </div>
         {neuerKursOffen && (
           <InlineKursEditor
-            gefaesse={gefaesse.split(',').map(s => s.trim()).filter(Boolean)}
+            gefaesse={gefaesse}
             fachschaften={fachschaften}
             onSpeichern={(k) => { setKurse(prev => [...prev, k]); setNeuerKursOffen(false) }}
             onAbbrechen={() => setNeuerKursOffen(false)}
