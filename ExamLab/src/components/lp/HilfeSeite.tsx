@@ -213,7 +213,7 @@ function HilfeUeben() {
 
       <Untertitel>SuS-Übungsbereich (Selbststudium)</Untertitel>
       <Text>
-        Im Sub-Tab <strong>Übungen</strong> innerhalb von Üben verwalten Sie den Selbststudium-Bereich. Hier sind SuS in <strong>Gruppen</strong> organisiert (z.B. nach Kurs oder Familie). Jede Gruppe hat eine eigene Fragenbank und Fortschrittsdaten.
+        Im Sub-Tab <strong>Übungen</strong> innerhalb von Üben verwalten Sie den Selbststudium-Bereich. Hier sind SuS in <strong>Gruppen</strong> organisiert (z.B. nach Kurs oder Familie). Jede Gruppe hat eine eigene Fragensammlung und Fortschrittsdaten.
       </Text>
       <Text>
         Das Mastery-System basiert auf <strong>Sessions</strong> (nicht auf Tagen). Fragen durchlaufen 4 Stufen: <strong>neu → üben → gefestigt → gemeistert</strong>. Persistente Schwächen werden als &laquo;Dauerbaustellen&raquo; regelmässig erneut eingestreut, blockieren aber den Fortschritt nicht.
@@ -367,7 +367,7 @@ function HilfeFragen() {
         Jede Frage kann ein Bewertungsraster mit Kriterien und optionalen <strong>Niveaustufen</strong> haben. Niveaustufen beschreiben, was für die jeweilige Punktzahl erwartet wird (z.B. 2P: &laquo;Schlüssige Argumentation mit Belegen&raquo;, 1P: &laquo;Nachvollziehbar, aber lückenhaft&raquo;, 0P: &laquo;Keine Argumentation&raquo;).
       </Text>
       <Text>
-        <strong>12 Standard-Vorlagen</strong> stehen zur Verfügung, gefiltert nach Fachbereich: 5 fachübergreifende (Freitext Kurz/Lang, Analyse, Berechnung, Grafik), 4 WR-spezifische (Rechtsfallanalyse, VWL-Modellanalyse, BWL Entscheidung, FiBu) und 3 für andere Fachschaften (Textproduktion, Quellenanalyse, Experiment). Vorlagen werden automatisch auf die Fragepunkte skaliert. Eigene Vorlagen können gespeichert werden.
+        <strong>12 Standard-Vorlagen</strong> stehen zur Verfügung, gefiltert nach Fach: 5 fachübergreifende (Freitext Kurz/Lang, Analyse, Berechnung, Grafik), 4 WR-spezifische (Rechtsfallanalyse, VWL-Modellanalyse, BWL Entscheidung, FiBu) und 3 für andere Fachschaften (Textproduktion, Quellenanalyse, Experiment). Vorlagen werden automatisch auf die Fragepunkte skaliert. Eigene Vorlagen können gespeichert werden.
       </Text>
       <Text>
         Per <strong>KI generieren</strong> wird ein massgeschneidertes Raster inkl. Niveaustufen erstellt. Per <strong>KI verbessern</strong> wird ein bestehendes Raster auf Trennschärfe geprüft. Die KI-Korrektur bewertet bei vorhandenen Niveaustufen jedes Kriterium einzeln.
@@ -451,7 +451,7 @@ function HilfeKI() {
 
       <Untertitel>Generieren</Untertitel>
       <Text>
-        Erstellt neue Inhalte basierend auf den vorhandenen Metadaten (Thema, Fachbereich, Taxonomiestufe). Verfügbar für: Fragetext, Musterlösung, MC-Optionen, Zuordnungspaare, R/F-Aussagen, Lücken und Berechnungsergebnisse.
+        Erstellt neue Inhalte basierend auf den vorhandenen Metadaten (Thema, Fach, Taxonomiestufe). Verfügbar für: Fragetext, Musterlösung, MC-Optionen, Zuordnungspaare, R/F-Aussagen, Lücken und Berechnungsergebnisse.
       </Text>
 
       <Untertitel>Prüfen & Verbessern</Untertitel>
@@ -867,7 +867,7 @@ function HilfeFAQ() {
       </FAQItem>
 
       <FAQItem frage="Wie funktionieren die Bewertungsraster mit Niveaustufen?">
-        12 Standard-Vorlagen (nach Fachbereich gefiltert) stehen als Ausgangspunkt bereit — z.B. Rechtsfallanalyse, VWL-Modellanalyse oder Textproduktion. Jedes Kriterium kann optionale Niveaustufen haben, die beschreiben was für welche Punktzahl erwartet wird. Vorlagen werden automatisch auf die Fragepunkte skaliert. Per KI können Raster generiert oder auf Trennschärfe geprüft werden. Eigene Vorlagen lassen sich speichern.
+        12 Standard-Vorlagen (nach Fach gefiltert) stehen als Ausgangspunkt bereit — z.B. Rechtsfallanalyse, VWL-Modellanalyse oder Textproduktion. Jedes Kriterium kann optionale Niveaustufen haben, die beschreiben was für welche Punktzahl erwartet wird. Vorlagen werden automatisch auf die Fragepunkte skaliert. Per KI können Raster generiert oder auf Trennschärfe geprüft werden. Eigene Vorlagen lassen sich speichern.
       </FAQItem>
 
       <FAQItem frage="Wie kann ich ein Problem oder einen Wunsch melden?">

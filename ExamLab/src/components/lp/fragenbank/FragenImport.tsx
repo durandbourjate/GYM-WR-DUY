@@ -211,7 +211,7 @@ export default function FragenImport({ onImportiert, onSchliessen }: Props) {
               <div className="grid grid-cols-3 gap-3">
                 <div>
                   <label className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">
-                    Fachbereich
+                    Fach
                   </label>
                   <select
                     value={fachbereich}

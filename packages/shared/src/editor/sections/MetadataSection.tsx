@@ -98,11 +98,11 @@ export default function MetadataSection({
         <button
           onClick={() => ki.ausfuehren('klassifiziereFrage', { fragetext })}
           disabled={!fragetext.trim() || ki.ladeAktion !== null}
-          title="KI klassifiziert die Frage und schlägt Fachbereich, Thema, Bloom-Stufe und Tags vor"
+          title="KI klassifiziert die Frage und schlägt Fach, Thema, Bloom-Stufe und Tags vor"
           className={`px-2 py-0.5 text-[11px] rounded-md border transition-colors cursor-pointer inline-flex items-center gap-1
             ${!fragetext.trim() || ki.ladeAktion !== null
               ? 'border-slate-200 dark:border-slate-600 text-slate-400 dark:text-slate-500 cursor-not-allowed'
-              : 'border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
+              : 'border-blue-500 dark:border-blue-400 text-blue-700 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/30'
             }`}
         >
           {ki.ladeAktion === 'klassifiziereFrage' ? (
@@ -130,7 +130,7 @@ export default function MetadataSection({
               const tg = daten.tags as string[] | undefined
               return (
                 <div className="text-sm text-slate-700 dark:text-slate-200 space-y-1">
-                  {fb && <p><span className="text-xs text-slate-500 dark:text-slate-400">Fachbereich:</span> {fb}</p>}
+                  {fb && <p><span className="text-xs text-slate-500 dark:text-slate-400">Fach:</span> {fb}</p>}
                   {th && <p><span className="text-xs text-slate-500 dark:text-slate-400">Thema:</span> {th}</p>}
                   {uth && <p><span className="text-xs text-slate-500 dark:text-slate-400">Unterthema:</span> {uth}</p>}
                   {bl && <p><span className="text-xs text-slate-500 dark:text-slate-400">Bloom:</span> {bl}</p>}
@@ -160,16 +160,16 @@ export default function MetadataSection({
 
       <div className="grid grid-cols-2 gap-3">
         {istWRFachschaft(config.benutzer.fachschaft) ? (
-          <Feld label="Fachbereich">
-            <select value={fachbereich} onChange={(e) => setFachbereich(e.target.value as Fachbereich)} className="input-field">
+          <Feld label="Fach *">
+            <select value={fachbereich} onChange={(e) => setFachbereich(e.target.value as Fachbereich)} className="input-field input-pflicht">
               <option value="VWL">VWL</option>
               <option value="BWL">BWL</option>
               <option value="Recht">Recht</option>
             </select>
           </Feld>
         ) : (
-          <Feld label="Fachbereich">
-            <input type="text" value={fachbereich} readOnly className="input-field bg-slate-50 dark:bg-slate-700/50 text-slate-500 cursor-not-allowed" />
+          <Feld label="Fach *">
+            <input type="text" value={fachbereich} readOnly className="input-field input-pflicht text-slate-500 cursor-not-allowed" />
           </Feld>
         )}
         <Feld label="Bloom-Stufe">
@@ -181,7 +181,7 @@ export default function MetadataSection({
         </Feld>
         <Feld label="Thema *">
           <input type="text" value={thema} onChange={(e) => setThema(e.target.value)}
-            placeholder="z.B. Marktgleichgewicht" className="input-field" />
+            placeholder="z.B. Marktgleichgewicht" className="input-field input-pflicht" />
         </Feld>
         <Feld label="Zeitbedarf (Min.)">
           <input

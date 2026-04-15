@@ -10,7 +10,7 @@
 
 ### Stand
 Auf `main` gemergt. tsc ✅ | 246 Tests ✅ | Build ✅. Auf Staging von User grün verifiziert.
-**⚠️ Apps-Script-Deploy manuell nötig** (Backend-Fehlermeldung geändert).
+**⚠️ Apps-Script-Deploy manuell gemacht** (Backend-Fehlermeldung geändert).
 
 ### Erledigte Arbeiten
 
@@ -50,8 +50,13 @@ Auf `main` gemergt. tsc ✅ | 246 Tests ✅ | Build ✅. Auf Staging von User gr
 - **Deep-Link SuS-Flow** (aus S111): Gepasteter Deep-Link verliert Query-String beim Login, SuS sieht aktivierte LP-Themen nicht. Eigene Session.
 - **Dark-Mode `.filter-btn` Basis-BG:** Bei Bundle 13 global adressieren.
 - **Bundle 12 — Cluster K** (Frageneditor + Namens-Refactor + Einstellungen erweitern).
+- **K-2 Frageneditor Defaults leer (Type-Refactor, eigene Session):** Zeitbedarf/Bloom/Fach sollen beim Anlegen einer neuen Frage keinen Default haben. Braucht nullable Types (`fachbereich?: Fachbereich`, `bloom?: BloomStufe`, `zeitbedarf?: number`), Backend-Kompatibilität, Validation-Logic. Nicht in K-2 Session 15.04.2026 erledigt — zu grosser Scope.
+- **K-2 Header-Umbau "Geteilt mit" (eigene Session):** `BerechtigungenEditor` aus Metadaten-Section in FragenEditor-Header-Leiste links vom KI-Button verschieben. Layout-Arbeit, nicht in K-2 Session erledigt.
+- **K-2 Thema-Dropdown (eigene Session):** Im Lernziele-Bereich Thema als Dropdown statt Freitext. "Fachbereich" im Lernziele-Dropdown → "Fach". Braucht Datenquelle + UI.
+- **Daten-Migration Übungspool-Präfix (User-Aufgabe):** `node ExamLab/scripts/clean-themen-praefix.mjs` (Dry-Run), dann `--apply` zum Schreiben. Einmalig ausführen, um `thema`/`unterthema` aller Altdaten-Fragen zu bereinigen.
 - **Bundle 13 — Cluster I** (Üben-Übungen Tab-Architektur).
 - **Cluster L** — Üben-Analyse Heatmap (geparkt bis SuS-Daten).
+- **Code-intern Rename (eigene Session, später):** `Fachbereich`/`fachbereich` → `Fach`/`fach` und `Fragenbank`/`fragenbank` → `Fragensammlung`/`fragensammlung` in TypeScript-Typen, Stores (`fragenbankStore`, `fragenbankApi`, `fragenbankCache`), Datenfeldern, CSS-Klassen, Dateinamen, apps-script-code.js, Pool-Configs, Docs. In Bundle 12 K-1 wurden nur user-sichtbare Strings umbenannt (Entscheid User, 15.04.2026, Risikoeindämmung).
 
 ---
 

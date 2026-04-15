@@ -88,7 +88,7 @@ function HilfeStart() {
       <li>Logge dich über Google ein (oder per Code).</li>
       <li>Wähle auf der Startseite <strong>"Üben"</strong>.</li>
       <li>Wähle deine Gruppe (z.B. SF WR 29c).</li>
-      <li>Auf dem Dashboard siehst du Themen nach Fachbereich.</li>
+      <li>Auf dem Dashboard siehst du Themen nach Fach.</li>
       <li>Klicke auf ein Thema und starte eine Übung.</li>
     </ol>
     <Tipp>Die Lehrperson kann bestimmte Themen hervorheben — diese erscheinen unter "Für dich empfohlen".</Tipp>
