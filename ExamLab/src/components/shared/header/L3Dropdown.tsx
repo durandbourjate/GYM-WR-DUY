@@ -8,11 +8,12 @@ interface Props {
   onSelect: (ids: string[]) => void
   onAddNew?: () => void
   addNewLabel?: string
+  placeholder?: string
 }
 
 const MAX_LABEL_LEN = 37
 
-export function L3Dropdown({ mode, items, selectedIds, onSelect, onAddNew, addNewLabel }: Props) {
+export function L3Dropdown({ mode, items, selectedIds, onSelect, onAddNew, addNewLabel, placeholder }: Props) {
   const [offen, setOffen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
@@ -33,11 +34,13 @@ export function L3Dropdown({ mode, items, selectedIds, onSelect, onAddNew, addNe
   }, [offen])
 
   if (mode === 'none') return null
+  // selectedIds empty → placeholder mode (shown when items exist but none selected)
+  const keinItemGewaehlt = selectedIds.length === 0
 
-  const primary = items.find((i) => i.id === selectedIds[0])
+  const primary = keinItemGewaehlt ? undefined : items.find((i) => i.id === selectedIds[0])
   const rawLabel = primary?.label ?? '—'
   const truncated = rawLabel.length > MAX_LABEL_LEN ? rawLabel.slice(0, MAX_LABEL_LEN) + '…' : rawLabel
-  const extraCount = mode === 'multi' ? Math.max(0, selectedIds.length - 1) : 0
+  const extraCount = !keinItemGewaehlt && mode === 'multi' ? Math.max(0, selectedIds.length - 1) : 0
 
   function toggle(id: string) {
     if (mode === 'single') {
@@ -59,14 +62,19 @@ export function L3Dropdown({ mode, items, selectedIds, onSelect, onAddNew, addNe
         onClick={() => setOffen((o) => !o)}
         className="px-2.5 py-1 text-xs text-slate-900 dark:text-slate-100 cursor-pointer border border-violet-300 dark:border-violet-700 rounded bg-white dark:bg-slate-800 hover:border-violet-500 flex items-center gap-1.5"
       >
-        <span className="flex items-center gap-1.5">
-          {`${truncated} ▾`}
-          {extraCount > 0 && (
-            <span className="bg-violet-100 dark:bg-violet-900 text-violet-700 dark:text-violet-300 px-1.5 py-0.5 rounded-full text-[10px] font-semibold">
-              +{extraCount}
-            </span>
-          )}
-        </span>
+        {keinItemGewaehlt ? (
+          <span className="italic text-slate-500 dark:text-slate-400">{placeholder ?? 'Auswählen …'}</span>
+        ) : (
+          <>
+            <span>{truncated}</span>
+            {extraCount > 0 && (
+              <span className="bg-violet-100 dark:bg-violet-900 text-violet-700 dark:text-violet-300 px-1.5 py-0.5 rounded-full text-[10px] font-semibold">
+                +{extraCount}
+              </span>
+            )}
+          </>
+        )}
+        <span className="text-violet-500 text-[10px]">▾</span>
       </button>
       {offen && (
         <div role="listbox" className="absolute top-full left-0 mt-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md shadow-lg min-w-[220px] p-1 z-20">

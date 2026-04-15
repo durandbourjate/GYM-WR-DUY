@@ -66,7 +66,8 @@ describe('L3Dropdown', () => {
     const onSelect = vi.fn()
     render(<L3Dropdown mode="multi" items={itemsBase} selectedIds={['a', 'b']} onSelect={onSelect} />)
     fireEvent.click(screen.getByRole('combobox'))
-    fireEvent.click(screen.getByText('SF WR 29c'))
+    // Klick auf den listbox-Option-Button (nicht den Trigger-Span)
+    fireEvent.click(screen.getAllByRole('option')[0])
     expect(onSelect).toHaveBeenCalledWith(['b'])
   })
 
@@ -74,7 +75,18 @@ describe('L3Dropdown', () => {
     const onSelect = vi.fn()
     render(<L3Dropdown mode="multi" items={itemsBase} selectedIds={['a']} onSelect={onSelect} />)
     fireEvent.click(screen.getByRole('combobox'))
-    fireEvent.click(screen.getByText('SF WR 29c'))
+    // Klick auf den listbox-Option-Button (nicht den Trigger-Span)
+    fireEvent.click(screen.getAllByRole('option')[0])
     expect(onSelect).toHaveBeenCalledWith([])
+  })
+
+  it('zeigt placeholder wenn keine Auswahl und placeholder prop gesetzt', () => {
+    render(<L3Dropdown mode="single" items={itemsBase} selectedIds={[]} onSelect={() => {}} placeholder="Kurs wählen …" />)
+    expect(screen.getByRole('combobox')).toHaveTextContent('Kurs wählen …')
+  })
+
+  it('zeigt Fallback-Placeholder wenn keine Auswahl und kein placeholder prop', () => {
+    render(<L3Dropdown mode="single" items={itemsBase} selectedIds={[]} onSelect={() => {}} />)
+    expect(screen.getByRole('combobox')).toHaveTextContent('Auswählen …')
   })
 })

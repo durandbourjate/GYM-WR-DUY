@@ -56,7 +56,7 @@ export function TabKaskade({ config }: Props) {
               >
                 {t2.label}
               </button>
-              {aktiv && t2.l3 && t2.l3.selectedIds.length > 0 && (
+              {aktiv && t2.l3 && t2.l3.items.length > 0 && (
                 <L3Dropdown
                   mode={t2.l3.mode}
                   items={t2.l3.items}
@@ -64,6 +64,7 @@ export function TabKaskade({ config }: Props) {
                   onSelect={t2.l3.onSelect}
                   onAddNew={t2.l3.onAddNew}
                   addNewLabel={t2.l3.addNewLabel}
+                  placeholder={t2.l3.placeholder}
                 />
               )}
             </span>

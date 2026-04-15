@@ -15,6 +15,7 @@ export interface L3Config {
   onSelect: (ids: string[]) => void
   onAddNew?: () => void
   addNewLabel?: string
+  placeholder?: string
 }
 
 export interface L2Tab {

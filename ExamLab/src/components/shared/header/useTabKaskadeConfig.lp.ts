@@ -38,19 +38,21 @@ export function baueLPConfigAusRoute(
     id: 'uebungen',
     label: 'Übungen',
     onClick: () => navigate('/uebung'),
-    l3: aktivL3
-      ? {
-          mode: 'single',
-          items: kurse.map((k) => ({ id: k.id, label: k.label })),
-          selectedIds: [aktivL3],
-          onSelect: (ids) => {
-            if (ids[0]) {
-              onWaehleKurs?.(ids[0])
-              navigate(`/uebung/kurs/${ids[0]}`)
-            }
-          },
-        }
-      : undefined,
+    l3:
+      kurse.length > 0
+        ? {
+            mode: 'single',
+            items: kurse.map((k) => ({ id: k.id, label: k.label })),
+            selectedIds: aktivL3 ? [aktivL3] : [],
+            onSelect: (ids) => {
+              if (ids[0]) {
+                onWaehleKurs?.(ids[0])
+                navigate(`/uebung/kurs/${ids[0]}`)
+              }
+            },
+            placeholder: 'Kurs wählen …',
+          }
+        : undefined,
   }
 
   const durchfPruefenL2: L2Tab = {
