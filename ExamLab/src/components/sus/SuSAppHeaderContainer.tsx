@@ -7,10 +7,11 @@
 // bis dahin werden die jeweiligen Inline-Header weiterverwendet.
 
 import type React from 'react'
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../../store/authStore'
 import { useThemeStore } from '../../store/themeStore'
+import { useUebenGruppenStore } from '../../store/ueben/gruppenStore'
 import { useTabKaskadeConfigSuS } from '../shared/header/useTabKaskadeConfig.sus'
 import { useGlobalSucheSuS } from '../../hooks/useGlobalSucheSuS'
 import { AppHeader } from '../shared/header/AppHeader'
@@ -52,9 +53,14 @@ export function SuSAppHeaderContainer({
   const navigate = useNavigate()
   const [suchen, setSuchen] = useState('')
 
-  // Kaskaden-Konfiguration aus Route — leere Kurse sind okay für diese Phase.
-  // Echte Kurs-Daten werden in einem späteren Schritt angebunden.
-  const kaskadeConfig = useTabKaskadeConfigSuS({ kurse: [] })
+  // Kurse aus gruppenStore — Store liefert nur Gruppen, in denen SuS Mitglied ist.
+  const gruppen = useUebenGruppenStore((s) => s.gruppen)
+  const kurse = useMemo(
+    () => gruppen.map((g) => ({ id: g.id, label: g.name })),
+    [gruppen],
+  )
+
+  const kaskadeConfig = useTabKaskadeConfigSuS({ kurse })
 
   // Globale Suche — SuS-seitig (Scope-Guard: keine Lösungsfelder).
   const sucheErgebnis = useGlobalSucheSuS(

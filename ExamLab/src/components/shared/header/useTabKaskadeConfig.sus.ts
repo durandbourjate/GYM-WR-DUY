@@ -45,19 +45,21 @@ export function baueSuSConfigAusRoute(pathname: string, navigate: (to: string) =
           id: 'themen',
           label: 'Themen',
           onClick: () => navigate('/sus/ueben'),
-          l3: aktivL3
-            ? {
-                mode: 'single',
-                items: kurse.map((k) => ({ id: k.id, label: k.label })),
-                selectedIds: [aktivL3],
-                onSelect: (ids) => {
-                  if (ids[0]) {
-                    onWaehleKurs?.(ids[0])
-                    navigate(`/sus/ueben/kurs/${ids[0]}`)
-                  }
-                },
-              }
-            : undefined,
+          l3:
+            kurse.length > 0
+              ? {
+                  mode: 'single',
+                  items: kurse.map((k) => ({ id: k.id, label: k.label })),
+                  selectedIds: aktivL3 ? [aktivL3] : [],
+                  onSelect: (ids) => {
+                    if (ids[0]) {
+                      onWaehleKurs?.(ids[0])
+                      navigate(`/sus/ueben/kurs/${ids[0]}`)
+                    }
+                  },
+                  placeholder: 'Kurs wählen …',
+                }
+              : undefined,
         },
         { id: 'fortschritt', label: 'Fortschritt', onClick: () => navigate('/sus/ueben/fortschritt') },
         { id: 'ergebnisse', label: 'Ergebnisse', onClick: () => navigate('/sus/ueben/ergebnisse') },

@@ -81,6 +81,7 @@ VITE_ENABLE_NEW_HEADER=1 npm run dev
 - `542b0d2` SuS Dashboard-Tabs (Themen/Fortschritt/Ergebnisse) synct `dashboardTab` mit URL
 - `7b043cd` Router: `/sus/ueben/fortschritt`, `/sus/ueben/ergebnisse`, `/sus/ueben/kurs/:kursId`, `/sus/pruefen/ergebnisse` ergänzt
 - `06f451b` `ermittleScreen()` in AppShell.tsx + AppUeben.tsx: neue L2-Routen expliziten als `dashboard` erkennen, bevor das Übungs-Regex zuschlägt (behebt Flash+Rücksprung)
+- `<next>` SuS: `SuSAppHeaderContainer` liest echte Kurse aus `useUebenGruppenStore`; `useTabKaskadeConfigSuS` zeigt L3 immer wenn `kurse.length > 0` (analog LP), mit Placeholder "Kurs wählen …". Funktioniert auch bei SuS mit nur einem Kurs.
 
 ### Offen (nach User-Freigabe der Staging-Tests)
 
