@@ -7,6 +7,7 @@ import { useKorrekturDaten } from './useKorrekturDaten.ts'
 import { useKorrekturActions } from './useKorrekturActions.ts'
 import { formatDatum } from '../../../utils/zeit.ts'
 import LPHeader from '../LPHeader.tsx'
+import { LPAppHeaderContainer } from '../LPAppHeaderContainer'
 import FragenBrowser from '../fragenbank/FragenBrowser.tsx'
 import HilfeSeite from '../HilfeSeite.tsx'
 import KorrekturSchuelerZeile from './KorrekturSchuelerZeile.tsx'
@@ -112,23 +113,41 @@ export default function KorrekturDashboard({ pruefungId, eingebettet = false, co
   return (
     <div className={eingebettet ? '' : 'min-h-screen bg-slate-50 dark:bg-slate-900'}>
       {!eingebettet && (
-        <LPHeader
-          titel={`${istFormativ ? 'Auswertung' : 'Korrektur'}: ${korrektur?.pruefungTitel ?? pruefungId}`}
-          untertitel={korrektur ? `${korrektur.klasse} · ${korrektur.datum ? formatDatum(korrektur.datum) : ''} · ${korrektur.schueler.length} SuS` : undefined}
-          zurueck={() => { window.location.href = window.location.pathname }}
-          statusText={
-            (korrektur?.batchStatus === 'laeuft' || batchLaeuft)
-              ? `Korrektur läuft... ${korrektur?.batchFortschritt ? `${korrektur.batchFortschritt.erledigt}/${korrektur.batchFortschritt.gesamt}` : ''}`
-            : korrektur?.batchStatus === 'fehler'
-              ? `Fehler: ${korrektur.batchFehler}`
-            : undefined
-          }
-          aktionsButtons={aktionsLeiste}
-          onFragensammlung={() => { setZeigHilfe(false); setZeigFragenbank(!zeigFragenbank) }}
-          onHilfe={() => { setZeigFragenbank(false); setZeigHilfe(!zeigHilfe) }}
-          fragensammlungOffen={zeigFragenbank}
-          hilfeOffen={zeigHilfe}
-        />
+        import.meta.env.VITE_ENABLE_NEW_HEADER === '1' ? (
+          <LPAppHeaderContainer
+            onHilfe={() => { setZeigFragenbank(false); setZeigHilfe(!zeigHilfe) }}
+            onFeedback={() => {}}
+            onEinstellungen={() => {}}
+            onZurueck={() => { window.location.href = window.location.pathname }}
+            statusText={
+              (korrektur?.batchStatus === 'laeuft' || batchLaeuft)
+                ? `Korrektur läuft... ${korrektur?.batchFortschritt ? `${korrektur.batchFortschritt.erledigt}/${korrektur.batchFortschritt.gesamt}` : ''}`
+              : korrektur?.batchStatus === 'fehler'
+                ? `Fehler: ${korrektur.batchFehler}`
+              : undefined
+            }
+            aktionsButtons={aktionsLeiste}
+            untertitel={korrektur ? `${korrektur.klasse} · ${korrektur.datum ? formatDatum(korrektur.datum) : ''} · ${korrektur.schueler.length} SuS` : undefined}
+          />
+        ) : (
+          <LPHeader
+            titel={`${istFormativ ? 'Auswertung' : 'Korrektur'}: ${korrektur?.pruefungTitel ?? pruefungId}`}
+            untertitel={korrektur ? `${korrektur.klasse} · ${korrektur.datum ? formatDatum(korrektur.datum) : ''} · ${korrektur.schueler.length} SuS` : undefined}
+            zurueck={() => { window.location.href = window.location.pathname }}
+            statusText={
+              (korrektur?.batchStatus === 'laeuft' || batchLaeuft)
+                ? `Korrektur läuft... ${korrektur?.batchFortschritt ? `${korrektur.batchFortschritt.erledigt}/${korrektur.batchFortschritt.gesamt}` : ''}`
+              : korrektur?.batchStatus === 'fehler'
+                ? `Fehler: ${korrektur.batchFehler}`
+              : undefined
+            }
+            aktionsButtons={aktionsLeiste}
+            onFragensammlung={() => { setZeigHilfe(false); setZeigFragenbank(!zeigFragenbank) }}
+            onHilfe={() => { setZeigFragenbank(false); setZeigHilfe(!zeigHilfe) }}
+            fragensammlungOffen={zeigFragenbank}
+            hilfeOffen={zeigHilfe}
+          />
+        )
       )}
 
       {eingebettet && (

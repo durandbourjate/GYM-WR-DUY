@@ -16,6 +16,7 @@ import { formatDatum } from '../../utils/zeit.ts'
 import { getFachFarbe } from '../../utils/ueben/fachFarben.ts'
 import { bestimmePruefungsStatus, statusLabel, statusFarbe, korrekturLabel, erstelleDemoTrackerDaten } from '../../utils/trackerUtils.ts'
 import LPHeader from './LPHeader.tsx'
+import { LPAppHeaderContainer } from './LPAppHeaderContainer'
 import LPSkeleton from './LPSkeleton.tsx'
 import UebungsToolView from './UebungsToolView.tsx'
 import TrackerSection from './TrackerSection.tsx'
@@ -434,16 +435,24 @@ export default function LPStartseite() {
     <div className="h-screen bg-slate-50 dark:bg-slate-900 flex flex-col">
       {/* Header nur im Dashboard-Modus — Composer hat eigenen Header */}
       {ansicht !== 'composer' && (
-        <LPHeader
-          untertitel={user ? `${user.name} · Lehrperson` : undefined}
-          modus={modus}
-          onModusChange={setModus}
-          aktionsButtons={undefined}
-          onEinstellungen={() => toggleEinstellungen()}
-          onHilfe={toggleHilfe}
-          hilfeOffen={zeigHilfe}
-          einstellungenOffen={zeigEinstellungen}
-        />
+        import.meta.env.VITE_ENABLE_NEW_HEADER === '1' ? (
+          <LPAppHeaderContainer
+            onHilfe={toggleHilfe}
+            onFeedback={() => {}}
+            onEinstellungen={() => toggleEinstellungen()}
+          />
+        ) : (
+          <LPHeader
+            untertitel={user ? `${user.name} · Lehrperson` : undefined}
+            modus={modus}
+            onModusChange={setModus}
+            aktionsButtons={undefined}
+            onEinstellungen={() => toggleEinstellungen()}
+            onHilfe={toggleHilfe}
+            hilfeOffen={zeigHilfe}
+            einstellungenOffen={zeigEinstellungen}
+          />
+        )
       )}
 
       {/* Flex-Row: Hauptinhalt + optionale Sidebar */}

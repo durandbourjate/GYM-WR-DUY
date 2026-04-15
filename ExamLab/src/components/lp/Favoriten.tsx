@@ -7,6 +7,7 @@ import { useLPNavigation } from '../../hooks/useLPNavigation'
 import type { PruefungsConfig } from '../../types/pruefung'
 // Status direkt aus PruefungsConfig ableiten (ohne TrackerDaten)
 import LPHeader from './LPHeader'
+import { LPAppHeaderContainer } from './LPAppHeaderContainer'
 import LPSkeleton from './LPSkeleton'
 
 /** Favoriten-Startseite für Lehrpersonen: Favoriten, Korrekturen, anstehende/letzte Prüfungen */
@@ -71,15 +72,23 @@ export default function Favoriten() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
-      <LPHeader
-        untertitel={user ? `${user.name} · Lehrperson` : undefined}
-        modus="pruefung"
-        onModusChange={(m) => setModus(m as 'pruefung' | 'uebung' | 'fragensammlung')}
-        aktionsButtons={null}
-        onFragensammlung={() => setModus('fragensammlung')}
-        onEinstellungen={() => navigiereZuEinstellungen()}
-        onHilfe={() => {}}
-      />
+      {import.meta.env.VITE_ENABLE_NEW_HEADER === '1' ? (
+        <LPAppHeaderContainer
+          onHilfe={() => {}}
+          onFeedback={() => {}}
+          onEinstellungen={() => navigiereZuEinstellungen()}
+        />
+      ) : (
+        <LPHeader
+          untertitel={user ? `${user.name} · Lehrperson` : undefined}
+          modus="pruefung"
+          onModusChange={(m) => setModus(m as 'pruefung' | 'uebung' | 'fragensammlung')}
+          aktionsButtons={null}
+          onFragensammlung={() => setModus('fragensammlung')}
+          onEinstellungen={() => navigiereZuEinstellungen()}
+          onHilfe={() => {}}
+        />
+      )}
 
       <main className="max-w-6xl mx-auto p-6 space-y-8">
         <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">
