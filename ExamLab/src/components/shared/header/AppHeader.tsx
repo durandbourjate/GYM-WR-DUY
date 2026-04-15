@@ -1,3 +1,4 @@
+import type React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { TabKaskade } from './TabKaskade'
 import { GlobalSuche } from './GlobalSuche'
@@ -20,6 +21,12 @@ interface Props {
   suchen: string
   onSuchen: (s: string) => void
   sucheErgebnis: SucheErgebnis
+  // Detail-Modus
+  onZurueck?: () => void
+  breadcrumbs?: { label: string; aktion?: () => void }[]
+  aktionsButtons?: React.ReactNode
+  statusText?: string
+  untertitel?: string
 }
 
 export function AppHeader(props: Props) {
@@ -37,9 +44,36 @@ export function AppHeader(props: Props) {
             ExamLab
           </button>
           {tier === 'desktop' && <span className="text-[10px] text-slate-400">{APP_VERSION}</span>}
+          {props.onZurueck && (
+            <button
+              type="button"
+              onClick={props.onZurueck}
+              className="px-2 py-1 text-sm text-slate-600 dark:text-slate-300 rounded hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer"
+            >
+              ← Zurück
+            </button>
+          )}
+          {props.breadcrumbs && props.breadcrumbs.length > 0 && (
+            <nav className="flex items-center gap-1 text-sm text-slate-600 dark:text-slate-300">
+              {props.breadcrumbs.map((c, i) => (
+                <span key={i} className="flex items-center gap-1">
+                  <span className="text-slate-300">›</span>
+                  {c.aktion ? (
+                    <button type="button" onClick={c.aktion} className="hover:text-slate-900 cursor-pointer">{c.label}</button>
+                  ) : (
+                    <span className="font-medium text-slate-900 dark:text-slate-100">{c.label}</span>
+                  )}
+                </span>
+              ))}
+            </nav>
+          )}
+          {props.statusText && (
+            <span className="text-sm text-green-600 dark:text-green-400">{props.statusText}</span>
+          )}
         </div>
         <TabKaskade config={props.kaskadeConfig} />
         <div className="flex items-center gap-2 flex-shrink-0">
+          {props.aktionsButtons}
           <GlobalSuche suchen={props.suchen} onSuchen={props.onSuchen} ergebnis={props.sucheErgebnis} />
           <OptionenMenu
             rolle={props.rolle}

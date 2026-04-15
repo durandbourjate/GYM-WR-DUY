@@ -6,6 +6,7 @@
 // Wird in Task 2.2 hinter einem Feature-Flag in die LP-Seiten eingehängt;
 // bis dahin wird LPHeader.tsx weiterhin verwendet.
 
+import type React from 'react'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../../store/authStore'
@@ -18,9 +19,15 @@ interface Props {
   onHilfe: () => void
   onFeedback: () => void
   onEinstellungen: () => void
+  // Detail-Modus pass-through
+  onZurueck?: () => void
+  breadcrumbs?: { label: string; aktion?: () => void }[]
+  aktionsButtons?: React.ReactNode
+  statusText?: string
+  untertitel?: string
 }
 
-export function LPAppHeaderContainer({ onHilfe, onFeedback, onEinstellungen }: Props) {
+export function LPAppHeaderContainer({ onHilfe, onFeedback, onEinstellungen, onZurueck, breadcrumbs, aktionsButtons, statusText, untertitel }: Props) {
   const abmelden = useAuthStore((s) => s.abmelden)
   // AuthUser hat .name (Anzeigename), .vorname, .nachname, .email — .name ist immer befüllt.
   const benutzerName = useAuthStore((s) => s.user?.name ?? 'Lehrperson')
@@ -71,6 +78,11 @@ export function LPAppHeaderContainer({ onHilfe, onFeedback, onEinstellungen }: P
       suchen={suchen}
       onSuchen={setSuchen}
       sucheErgebnis={sucheErgebnis}
+      onZurueck={onZurueck}
+      breadcrumbs={breadcrumbs}
+      aktionsButtons={aktionsButtons}
+      statusText={statusText}
+      untertitel={untertitel}
     />
   )
 }
