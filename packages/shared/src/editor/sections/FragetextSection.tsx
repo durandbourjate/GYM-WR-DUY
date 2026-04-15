@@ -49,7 +49,7 @@ export default function FragetextSection({
         <div className="flex gap-1.5">
           <InlineAktionButton
             label="Generieren"
-            tooltip="KI erstellt einen neuen Fragetext basierend auf Thema, Fachbereich und Taxonomiestufe"
+            tooltip="KI erstellt einen neuen Fragetext basierend auf Thema, Fach und Taxonomiestufe"
             hinweis={!thema.trim() ? 'Thema nötig' : undefined}
             disabled={!thema.trim() || ki.ladeAktion !== null}
             ladend={ki.ladeAktion === 'generiereFragetext'}

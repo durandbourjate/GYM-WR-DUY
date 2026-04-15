@@ -15,6 +15,7 @@ import kontenrahmenDaten from '@shared/editor/kontenrahmenDaten'
 import SharedFragenEditor from '@shared/editor/SharedFragenEditor'
 import { istWRFachschaft } from '../../../utils/fachUtils.ts'
 import { useSchulConfig } from '../../../store/schulConfigStore.ts'
+import { generateZeitpunkte, zeitpunktModellAusConfig } from '../../../utils/zeitpunktUtils.ts'
 import type { Frage } from '../../../types/fragen.ts'
 import type { Frage as SharedFrage } from '@shared/types/fragen'
 import type { FragenPerformance } from '../../../types/tracker.ts'
@@ -48,10 +49,11 @@ export default function PruefungFragenEditor({ frage, onSpeichern, onAbbrechen, 
   useEffect(() => { setKontenrahmenData(kontenrahmenDaten) }, [])
 
   // EditorProvider Config + Services
+  // Zeitpunkte (Bundle 12 K-4): Modus+Anzahl aus SchulConfig, Fallback auf Legacy-semesterModell
   const semesterListe = useMemo(() => {
-    const n = schulConfig.semesterModell.regel.anzahl
-    return Array.from({ length: n }, (_, i) => `S${i + 1}`)
-  }, [schulConfig.semesterModell.regel.anzahl])
+    const modell = zeitpunktModellAusConfig(schulConfig, 'regel')
+    return generateZeitpunkte(modell)
+  }, [schulConfig])
 
   const editorConfig: EditorConfig = useMemo(() => ({
     benutzer: {
@@ -121,6 +123,24 @@ export default function PruefungFragenEditor({ frage, onSpeichern, onAbbrechen, 
             eigeneFachschaft={user?.fachschaft}
           />
         )}
+        berechtigungenHeaderSlot={({ berechtigungen, geteilt }) => {
+          const individuelle = berechtigungen.filter(
+            b => b.email !== '*' && !b.email.startsWith('fachschaft:')
+          )
+          const stufeLabel =
+            geteilt === 'schule' ? 'Schulweit'
+            : geteilt === 'fachschaft' ? 'Fachschaft'
+            : individuelle.length > 0 ? 'Privat + geteilt' : 'Privat'
+          const zusatz = individuelle.length > 0 ? ` · ${individuelle.length} LP` : ''
+          return (
+            <span
+              className="text-xs px-2 py-1 rounded-md border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-700/50 text-slate-600 dark:text-slate-300"
+              title="Geteilt mit (bearbeitbar in den Metadaten)"
+            >
+              Geteilt: {stufeLabel}{zusatz}
+            </span>
+          )
+        }}
         poolInfoSlot={({ frage: f, onSpeichern: speichern }) => {
           const pf = f as any as Frage | null
           if (!pf || pf.quelle !== 'pool' || !pf.poolId) return null

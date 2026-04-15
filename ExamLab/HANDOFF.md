@@ -6,11 +6,107 @@
 
 ---
 
+## Session 113 — Bundle 12 + Deep-Link-Fix + Bundle 13 Cluster I (15.04.2026)
+
+### Stand
+**Noch nicht auf main gemergt.** Alles auf `origin/preview` (Staging) gepusht, wartet auf User-Freigabe.
+tsc ✅ | 246 Tests ✅ | Build ✅ | Browser-Tests in Chrome-in-Chrome durchgeführt.
+
+### Erledigte Arbeiten (auf preview)
+
+**Bundle 12 — Cluster K (Namens-Refactor + Frageneditor-UX + Einstellungen)**
+- **K-1 Namens-Refactor (user-sichtbar):** "Fachbereich" → "Fach" in FragenImport, SuSHilfePanel, HilfeSeite, excelImport, FragetextSection-Tooltip. "Lernziele aus der Fragenbank" → "Fragensammlung" (LernzielWaehler). Code-intern Rename (Types/Stores/Files) bewusst **NICHT** durchgeführt (User-Entscheid: eigene Session, Risikoeindämmung).
+- **K-1 Cleanup-Script:** `ExamLab/scripts/clean-themen-praefix.mjs` — entfernt "Übungspool: "-Präfix aus thema/unterthema aller Fragen via Apps-Script-API. Dry-Run Default, `--apply` zum Schreiben. **User-Aufgabe:** Einmalig lokal ausführen.
+- **K-2 Frageneditor-UX (Teilmenge):** MetadataSection — Fach als Pflichtfeld (`input-pflicht`, Stern), Thema violett, Label "Fachbereich" → "Fach", KI-Klassifizieren-Button blau wenn aktiv. KI-Klassifizieren-Vorschau + Tooltip: "Fachbereich" → "Fach".
+- **K-2 Header "Geteilt mit":** Neuer `berechtigungenHeaderSlot` in SharedFragenEditor. Kompakte Status-Badge in Editor-Kopfzeile ("Geteilt: Privat" / "Fachschaft" / "Schulweit" / "Privat + geteilt · N LP"). Voller BerechtigungenEditor bleibt im Metadaten-Body.
+- **K-2 Thema-Dropdown (Lernziele):** LernzielWaehler "Neu erstellen"-Block — Thema als Dropdown mit bestehenden Themen pro Fach + "+ Neues Thema …"-Fallback. Label "Fachbereich" → "Fach". Fach-Wechsel leert Thema.
+- **K-3 Gefässe konfigurierbar:** Einstellungen → Admin → Gefässe jetzt als Chip-Editor (analog Fächer/Fachschaften). `+ Gefäss`-Inline-Editor mit Duplikat-Schutz.
+- **K-4 Zeitpunkt-Grundlagen:** `SchulConfig.zeitpunktModell` (Modus `schuljahr|semester|quartal` + Anzahl) optional mit Fallback auf legacy `semesterModell`. Utility `zeitpunktUtils.ts`. UI-Label "Semester" → "Zeitpunkt" (MetadataSection, ConfigTab, NotenStandPanel).
+
+**Deep-Link SuS-Flow Fix (aus S111 Backlog)**
+- `Router.tsx`: LPGuard ergänzt `returnTo=currentUrl`-Param beim Login-Redirect. Neuer **SuSGuard** für alle SuS-Routes (war vorher ohne Guard — App.tsx rendered LoginScreen inline ohne returnTo-Weitergabe).
+- Verifiziert: `/sus/ueben?fach=BWL&thema=Einführung` ohne Login → Redirect mit returnTo → nach Demo-SuS-Login zurück mit intaktem Query-String → `useDeepLinkAktivierung` aktiviert Thema.
+
+**Weitere Fixes**
+- **Dark-Mode `.filter-btn`:** Basis-BG `bg-white dark:bg-slate-800` — inaktive Filter-Buttons im Dark Mode nicht mehr "unsichtbar" im Parent-Hintergrund.
+
+**Bundle 13 — Cluster I (implementiert)**
+- Design-Spec `ExamLab/docs/superpowers/specs/2026-04-15-bundle13-cluster-i-design.md`
+- Implementation-Plan `ExamLab/docs/superpowers/plans/2026-04-15-bundle13-cluster-i.md` (8 Tasks)
+- Alle 8 Tasks umgesetzt. tsc ✅ | 251 Tests ✅ | Build ✅.
+  - I-1 Route `/uebung/kurs/:kursId`
+  - I-2 `UebenTabLeiste.tsx` (5 vitest-Tests) — Kurs-Tabs inline bei aktivem "Übungen"-Tab
+  - I-3 LPStartseite: `useParams<{kursId}>` + `useNavigate`, localStorage `examlab-ueben-letzter-kurs`, Redirect bei ungültiger ID
+  - I-3 `useLPRouteSync.ts`: Case `/uebung/kurs/...` → setzt `uebungsTab='uebungen'`
+  - I-4 `UebungsToolView.tsx`: Gruppen-Info-Bar entfernt, neue Prop `aktiverKursId` synct Store
+  - I-5 `AdminDashboard.tsx`: interne Tabs "Übersicht"/"Themen" entfernt, rendert Themensteuerung direkt
+  - I-6 `AdminUebersicht.tsx` gelöscht (Inhalt war Mitglieder-Stats → Einstellungen→Mitglieder)
+  - I-7 ~~Fachfreischaltung pro Kurs in FaecherTab~~ **nach User-Test zurückgerollt:** obere Checkbox-Liste deckt den Use-Case bereits ab (Kurs-Wechsel via Tab-Leiste → Fächer der aktiven Gruppe verwalten). Stattdessen Schrift in oberer Liste verkleinert (`text-sm`/`text-xs`).
+
+### Offen (Bundle 13)
+- `AdminKindDetail`/`AdminThemaDetail`: aktuell keine Entry-Points mehr. Follow-up-Löschung möglich.
+- Toast-System für "Kurs nicht gefunden" (derzeit console.warn).
+
+### Backlog aus S113 User-Test (für nächste Session)
+- **Einstellungen → Übungen → Farben:** Schrift sehr gross (analog FaecherTab verkleinern).
+- **Einstellungen → allgemein:** Mouse-over auf Flächen/Kacheln hat keine Hervorhebung.
+- **SuS-Version ≠ LP-Version Design:** Mouse-over, Buttons, Tabs, Farben sollten identisch sein. Als generische Regel (CSS-Layer/Tailwind-Preset) global definieren, nicht pro Komponente.
+- **Tabs global:** Bei Hover und Aktiv unten Strich, leicht abgerundete Ecken. Design-System-Regel.
+- **LP-Login Üben-Übungen:** "Keine Themen gefunden" → nach Wartezeit "Backend konnte nicht erreicht werden". Reproduzieren + Fix (war ev. Restwirkung vom fehlenden Bundle 12; nach Rebase erneut prüfen).
+- **Kopfzeilen-Refactor (gross):** Tab-Leiste + Suchfeld in Kopfzeile integrieren (Prüfen/Üben). Rechte Buttons (Einstellungen, Theme, Hilfe, Problem melden, Abmelden) in "⋮"-Menü zusammenfassen. Tab-Vorschläge:
+  - LP Prüfen: *Prüfung durchführen / Analyse*
+  - LP Üben: *Übung durchführen / Übungen (mit inline Kurs-Tabs) / Analyse* (bereits umgesetzt)
+  - SuS Üben: *Themen / Mein Fortschritt / Ergebnisse*
+  - SuS Prüfen: analog
+
+### Parkiert im Backlog (eigene Sessions)
+
+- **Code-intern Rename** (Types/Stores/Files): User-Entscheid Bundle 12.
+- **K-2 Defaults leer** (nullable Types `fachbereich?`, `bloom?`, `zeitbedarf?`): braucht Type-Refactor, viele Call-Sites.
+- **K-2 Header-Umbau "Geteilt mit" voll:** aktuell nur Status-Badge. Popover mit Inline-Edit wäre eigene Session.
+- **K-4 Admin-Editor Zeitpunkt-Modell:** braucht Backend-Persistenz (SchulConfig aktuell nur Defaults).
+
+### Commits (chronologisch auf preview)
+- `f45de0a` Bundle 12 K-1 + K-2 Teilmenge
+- `b474663` K-3 Gefässe Chip-Editor (gemerged)
+- `be3867a` K-4 Zeitpunkt-Grundlagen (gemerged)
+- `ce81df2` Deep-Link SuS-Flow Fix
+- `fb62007` Merge Deep-Link Fix
+- `aa5b6b6` Dark-Mode .filter-btn
+- `a632155` K-2 Header Geteilt-mit Badge
+- `f65759e` K-2 Thema-Dropdown Lernziele
+- `cffe9d3` Merge Dark-Mode + K-2 Teilergebnisse
+- `5d52fa8` Tooltip-Rest Fachbereich→Fach
+- `5c8a3fb` Bundle 13 I-1: Route /uebung/kurs/:kursId
+- `4e8bc1e` Bundle 13 I-2: UebenTabLeiste mit Kurs-Tabs
+- `6317d89` Bundle 13 I-3+4: LPStartseite + UebungsToolView
+- `99b1f2f` Bundle 13 I-5+6: AdminDashboard ohne interne Tabs
+- `661817b` Bundle 13 I-7: Fachfreischaltung pro Kurs
+
+### User-Aufgaben
+
+1. **Staging testen** (preview-Branch, GitHub Pages `/staging/` Ordner nach Build):
+   - Fragensammlung: "Fach" statt "Fachbereich" in Filtern + Editor
+   - Frage öffnen: violetter Rahmen bei Fach/Thema, KI-Button blau, "Geteilt: X" Badge
+   - Dark Mode: Filter-Buttons sichtbar
+   - Einstellungen → Admin → Gefässe-Chip-Editor (nur für Admin-User sichtbar)
+   - Einstellungen → Übungen → Fächer: Label "Zeitpunkt" statt "Semester"
+   - Deep-Link: als SuS `/sus/ueben?fach=BWL&thema=X` öffnen ohne Login → Login → Query-String bleibt
+2. **Altdaten bereinigen (optional):**
+   ```
+   cd ExamLab
+   node scripts/clean-themen-praefix.mjs          # Dry-Run
+   node scripts/clean-themen-praefix.mjs --apply  # Schreibt
+   ```
+3. **Bei Freigabe:** Merge `preview` → `main` + push
+
+---
+
 ## Session 112 — Ueben-Settings-Persistenz + Begriffs-Klärung + UX-Wünsche (15.04.2026)
 
 ### Stand
 Auf `main` gemergt. tsc ✅ | 246 Tests ✅ | Build ✅. Auf Staging von User grün verifiziert.
-**⚠️ Apps-Script-Deploy manuell nötig** (Backend-Fehlermeldung geändert).
+**⚠️ Apps-Script-Deploy manuell gemacht** (Backend-Fehlermeldung geändert).
 
 ### Erledigte Arbeiten
 
@@ -50,8 +146,14 @@ Auf `main` gemergt. tsc ✅ | 246 Tests ✅ | Build ✅. Auf Staging von User gr
 - **Deep-Link SuS-Flow** (aus S111): Gepasteter Deep-Link verliert Query-String beim Login, SuS sieht aktivierte LP-Themen nicht. Eigene Session.
 - **Dark-Mode `.filter-btn` Basis-BG:** Bei Bundle 13 global adressieren.
 - **Bundle 12 — Cluster K** (Frageneditor + Namens-Refactor + Einstellungen erweitern).
+- **K-2 Frageneditor Defaults leer (Type-Refactor, eigene Session):** Zeitbedarf/Bloom/Fach sollen beim Anlegen einer neuen Frage keinen Default haben. Braucht nullable Types (`fachbereich?: Fachbereich`, `bloom?: BloomStufe`, `zeitbedarf?: number`), Backend-Kompatibilität, Validation-Logic. Nicht in K-2 Session 15.04.2026 erledigt — zu grosser Scope.
+- **K-2 Header-Umbau "Geteilt mit" (eigene Session):** `BerechtigungenEditor` aus Metadaten-Section in FragenEditor-Header-Leiste links vom KI-Button verschieben. Layout-Arbeit, nicht in K-2 Session erledigt.
+- **K-2 Thema-Dropdown (eigene Session):** Im Lernziele-Bereich Thema als Dropdown statt Freitext. "Fachbereich" im Lernziele-Dropdown → "Fach". Braucht Datenquelle + UI.
+- **Daten-Migration Übungspool-Präfix (User-Aufgabe):** `node ExamLab/scripts/clean-themen-praefix.mjs` (Dry-Run), dann `--apply` zum Schreiben. Einmalig ausführen, um `thema`/`unterthema` aller Altdaten-Fragen zu bereinigen.
+- **K-4 Admin-Editor Zeitpunkt-Modell (eigene Session):** In Bundle 12 K-4 wurde `SchulConfig.zeitpunktModell` (Modus `schuljahr|semester|quartal` + Anzahl) + Utility `generateZeitpunkte()` + UI-Label "Semester" → "Zeitpunkt" eingeführt. **Fehlt:** Admin-Editor in Einstellungen, um Modus/Anzahl zu ändern. Braucht Backend-Persistenz (SchulConfig hat aktuell nur Defaults, kein Sheet-Tab). Alternative: Modell von `SchulConfig` nach `Stammdaten` migrieren (hat Backend). Bei Modus-Wechsel: Bestehende `semester: string[]`-Werte in Fragen (z.B. "S1".."S8") müssen ggf. migriert werden — User-Dokumentation oder Migrations-Skript nötig.
 - **Bundle 13 — Cluster I** (Üben-Übungen Tab-Architektur).
 - **Cluster L** — Üben-Analyse Heatmap (geparkt bis SuS-Daten).
+- **Code-intern Rename (eigene Session, später):** `Fachbereich`/`fachbereich` → `Fach`/`fach` und `Fragenbank`/`fragenbank` → `Fragensammlung`/`fragensammlung` in TypeScript-Typen, Stores (`fragenbankStore`, `fragenbankApi`, `fragenbankCache`), Datenfeldern, CSS-Klassen, Dateinamen, apps-script-code.js, Pool-Configs, Docs. In Bundle 12 K-1 wurden nur user-sichtbare Strings umbenannt (Entscheid User, 15.04.2026, Risikoeindämmung).
 
 ---
 

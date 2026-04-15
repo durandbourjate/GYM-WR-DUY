@@ -170,8 +170,8 @@ function parseZeile(
   if (!typ) { meldungen.push('Typ fehlt'); hatFehler = true }
   else if (!GUELTIGE_TYPEN.has(typ)) { meldungen.push(`Unbekannter Typ: ${typ}`); hatFehler = true }
 
-  if (!fachbereich) { meldungen.push('Fachbereich fehlt'); hatFehler = true }
-  else if (!GUELTIGE_FACHBEREICHE.has(fachbereich)) { meldungen.push(`Ungültiger Fachbereich: ${fachbereich}`); hatFehler = true }
+  if (!fachbereich) { meldungen.push('Fach fehlt'); hatFehler = true }
+  else if (!GUELTIGE_FACHBEREICHE.has(fachbereich)) { meldungen.push(`Ungültiges Fach: ${fachbereich}`); hatFehler = true }
 
   if (!thema) { meldungen.push('Thema fehlt'); hatFehler = true }
   if (!bloom) { meldungen.push('Bloom fehlt'); hatFehler = true }

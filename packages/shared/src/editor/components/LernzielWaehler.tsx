@@ -39,8 +39,20 @@ export default function LernzielWaehler({
     fach: aktuellerFachbereich || 'VWL',
     thema: '', bloom: 'K1', text: '',
   })
+  // Freitext-Fallback wenn im Themen-Dropdown "Neu…" gewählt wird (Bundle 12 K-2)
+  const [neuThemaEigen, setNeuThemaEigen] = useState(false)
   const [speichernd, setSpeichernd] = useState(false)
   const [aufgeklappt, setAufgeklappt] = useState<Set<string>>(new Set())
+
+  // Themen-Vorschläge aus bestehenden Lernzielen, gefiltert nach aktuell
+  // gewähltem Fach im Formular (Bundle 12 K-2). Eindeutig + alphabetisch.
+  const themenVorschlaege = useMemo(() => {
+    const set = new Set<string>()
+    for (const lz of lernziele) {
+      if (lz.fach === neuForm.fach && lz.thema) set.add(lz.thema)
+    }
+    return Array.from(set).sort((a, b) => a.localeCompare(b))
+  }, [lernziele, neuForm.fach])
 
   // Nur aktive Lernziele
   const aktiveLZ = useMemo(() => lernziele.filter(lz => lz.aktiv !== false), [lernziele])
@@ -254,10 +266,13 @@ export default function LernzielWaehler({
               <p className="text-[11px] font-medium text-purple-800 dark:text-purple-300 mb-2">Neues Lernziel</p>
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="text-[10px] text-slate-500 dark:text-slate-400">Fachbereich</label>
+                  <label className="text-[10px] text-slate-500 dark:text-slate-400">Fach</label>
                   <select
                     value={neuForm.fach}
-                    onChange={e => setNeuForm(prev => ({ ...prev, fach: e.target.value }))}
+                    onChange={e => {
+                      setNeuForm(prev => ({ ...prev, fach: e.target.value, thema: '' }))
+                      setNeuThemaEigen(false)
+                    }}
                     className="w-full px-2 py-1 text-xs border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-700 dark:text-white"
                   >
                     <option value="VWL">VWL</option>
@@ -282,13 +297,43 @@ export default function LernzielWaehler({
               </div>
               <div className="mt-2">
                 <label className="text-[10px] text-slate-500 dark:text-slate-400">Thema *</label>
-                <input
-                  type="text"
-                  value={neuForm.thema}
-                  onChange={e => setNeuForm(prev => ({ ...prev, thema: e.target.value }))}
-                  placeholder="z.B. Marktgleichgewicht"
-                  className="w-full px-2 py-1 text-xs border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-700 dark:text-white"
-                />
+                {themenVorschlaege.length > 0 && !neuThemaEigen ? (
+                  <select
+                    value={neuForm.thema}
+                    onChange={e => {
+                      if (e.target.value === '__neu__') {
+                        setNeuThemaEigen(true)
+                        setNeuForm(prev => ({ ...prev, thema: '' }))
+                      } else {
+                        setNeuForm(prev => ({ ...prev, thema: e.target.value }))
+                      }
+                    }}
+                    className="w-full px-2 py-1 text-xs border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-700 dark:text-white"
+                  >
+                    <option value="">— Thema wählen —</option>
+                    {themenVorschlaege.map(t => (
+                      <option key={t} value={t}>{t}</option>
+                    ))}
+                    <option value="__neu__">+ Neues Thema …</option>
+                  </select>
+                ) : (
+                  <input
+                    type="text"
+                    value={neuForm.thema}
+                    onChange={e => setNeuForm(prev => ({ ...prev, thema: e.target.value }))}
+                    placeholder="z.B. Marktgleichgewicht"
+                    className="w-full px-2 py-1 text-xs border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-700 dark:text-white"
+                    autoFocus={neuThemaEigen}
+                  />
+                )}
+                {themenVorschlaege.length > 0 && neuThemaEigen && (
+                  <button
+                    onClick={() => { setNeuThemaEigen(false); setNeuForm(prev => ({ ...prev, thema: '' })) }}
+                    className="mt-1 text-[10px] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer"
+                  >
+                    ← Aus Liste wählen
+                  </button>
+                )}
               </div>
               <div className="mt-2">
                 <label className="text-[10px] text-slate-500 dark:text-slate-400">Lernziel-Text *</label>
@@ -321,7 +366,7 @@ export default function LernzielWaehler({
       )}
 
       <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1">
-        Lernziele aus der Fragenbank
+        Lernziele aus der Fragensammlung
       </p>
     </div>
   )

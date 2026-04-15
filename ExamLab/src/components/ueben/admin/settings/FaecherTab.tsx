@@ -133,7 +133,7 @@ export default function FaecherTab() {
       {fachGruppen.map(({ fach, anzahl, themen }) => (
         <div key={fach} className="bg-white dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700 overflow-hidden">
           {/* Fach-Zeile */}
-          <div className="flex items-center gap-3 p-4">
+          <div className="flex items-center gap-3 px-3 py-2">
             <input
               type="checkbox"
               checked={fachSichtbar(fach)}
@@ -143,13 +143,13 @@ export default function FaecherTab() {
             />
             <label
               htmlFor={`fach-${fach}`}
-              className="flex-1 font-medium dark:text-white cursor-pointer"
+              className="flex-1 text-sm font-medium dark:text-white cursor-pointer"
             >
-              {fach} <span className="text-sm text-slate-500 dark:text-slate-400 font-normal">— {anzahl} Fragen</span>
+              {fach} <span className="text-xs text-slate-500 dark:text-slate-400 font-normal">— {anzahl} Fragen</span>
             </label>
             <button
               onClick={() => toggleAusgeklappt(fach)}
-              className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 min-w-[44px] min-h-[44px] flex items-center justify-center text-xs"
+              className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 min-w-[32px] min-h-[32px] flex items-center justify-center text-xs"
             >
               {ausgeklappt.has(fach) ? '▲' : '▼'}
             </button>
@@ -169,7 +169,7 @@ export default function FaecherTab() {
                   />
                   <label
                     htmlFor={`thema-${fach}-${thema}`}
-                    className="text-sm dark:text-slate-300 cursor-pointer"
+                    className="text-xs dark:text-slate-300 cursor-pointer"
                   >
                     {thema} <span className="text-slate-400 font-normal">({tAnzahl})</span>
                   </label>
