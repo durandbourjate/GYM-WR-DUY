@@ -75,7 +75,7 @@ export default function FarbenTab() {
           const aktuellefarbe = farbeFuerFach(fach)
           const istGeaendert = einstellungen.fachFarben[fach] !== undefined
           return (
-            <div key={fach} className="flex items-center gap-3 px-3 py-2">
+            <div key={fach} className="flex items-center gap-3 px-3 py-2 transition-colors hover:bg-slate-50 dark:hover:bg-slate-700/30">
               {/* Farbwähler */}
               <input
                 type="color"

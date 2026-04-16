@@ -133,7 +133,7 @@ export default function FaecherTab() {
       {fachGruppen.map(({ fach, anzahl, themen }) => (
         <div key={fach} className="bg-white dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700 overflow-hidden">
           {/* Fach-Zeile */}
-          <div className="flex items-center gap-3 px-3 py-2">
+          <div className="flex items-center gap-3 px-3 py-2 transition-colors hover:bg-slate-50 dark:hover:bg-slate-700/30">
             <input
               type="checkbox"
               checked={fachSichtbar(fach)}

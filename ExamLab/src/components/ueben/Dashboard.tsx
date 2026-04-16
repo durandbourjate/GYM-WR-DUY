@@ -850,7 +850,9 @@ function Chip({ label, count, aktiv, farbe, onClick }: {
       onClick={onClick}
       title={label}
       className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border-2 transition-colors cursor-pointer select-none ${
-        !aktiv ? 'text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-600' : ''
+        !aktiv
+          ? 'text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-600 hover:border-slate-400 dark:hover:border-slate-500 hover:bg-slate-50 dark:hover:bg-slate-700/50'
+          : ''
       }`}
       style={aktiv
         ? { backgroundColor: farbe, color: '#fff', borderColor: farbe }

@@ -89,7 +89,7 @@ export default function MitgliederTab() {
         {mitglieder.map((m) => {
           const istAdmin = m.rolle === 'admin'
           return (
-            <div key={m.email} className="flex items-center gap-3 p-4">
+            <div key={m.email} className="flex items-center gap-3 p-4 transition-colors hover:bg-slate-50 dark:hover:bg-slate-700/30">
               <div className="flex-1 min-w-0">
                 <p className="font-medium dark:text-white truncate">{m.name}</p>
                 <p className="text-xs text-slate-400 truncate">{m.email}</p>
