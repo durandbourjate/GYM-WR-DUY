@@ -2,6 +2,7 @@ import { useFrageAdapter } from '../../hooks/useFrageAdapter.ts'
 import type { BildbeschriftungFrage as BildbeschriftungFrageType } from '../../types/fragen.ts'
 import { renderMarkdown } from '../../utils/markdown.ts'
 import { fachbereichFarbe } from '../../utils/fachUtils.ts'
+import { toAssetUrl } from '../../utils/assetUrl.ts'
 
 interface Props {
   frage: BildbeschriftungFrageType
@@ -49,7 +50,7 @@ export default function BildbeschriftungFrage({ frage }: Props) {
       <div className={`relative inline-block ${!disabled && !alleAusgefuellt ? 'rounded-xl border-2 border-violet-400 dark:border-violet-500 p-1' : ''}`}>
         <div className="relative overflow-hidden w-fit max-w-full">
           <img
-            src={frage.bildUrl}
+            src={toAssetUrl(frage.bildUrl)}
             alt="Bildbeschriftung"
             className="block max-w-full rounded-lg select-none"
             style={{ objectFit: 'contain' }}

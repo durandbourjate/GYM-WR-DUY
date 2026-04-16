@@ -220,11 +220,19 @@ export default function App() {
           // (sonst umgeht der Schüler die Freischaltung)
         }
 
-        // Fallback: Einrichtungsübung lokal laden wenn Backend sie nicht kennt
-        if (pruefungIdAusUrl === 'einrichtung-uebung') {
-          console.log('[App] Einrichtungsübung: Backend hat keine Config — verwende eingebaute Version')
-          const resolvedConfig = { ...einrichtungsUebung, freigeschaltet: true }
-          const { navigationsFragen, alleFragen } = resolveFragenFuerPruefung(resolvedConfig, einrichtungsUebungFragen)
+        // Fallback: Einrichtungsübung + Einrichtungsprüfung lokal laden wenn Backend sie nicht kennt.
+        // Beide sind in der App eingebaut und können SuS als Demo/Einrichtung angezeigt werden, auch
+        // wenn das Backend (noch) keine spezifische Freischaltung hat. Der Fallback hilft besonders beim
+        // ersten Lobby-Beitritt wenn Backend den SuS noch nicht in der Teilnehmerliste führt.
+        const eingebauteFallbacks: Record<string, { config: PruefungsConfig; fragen: Frage[] }> = {
+          'einrichtung-uebung': { config: einrichtungsUebung, fragen: einrichtungsUebungFragen },
+          [einrichtungsPruefung.id]: { config: einrichtungsPruefung, fragen: demoFragen },
+        }
+        const fallback = eingebauteFallbacks[pruefungIdAusUrl]
+        if (fallback) {
+          console.log(`[App] ${pruefungIdAusUrl}: Backend hat keine Config — verwende eingebaute Version`)
+          const resolvedConfig = { ...fallback.config, freigeschaltet: true }
+          const { navigationsFragen, alleFragen } = resolveFragenFuerPruefung(resolvedConfig, fallback.fragen)
           setPruefungsConfig(resolvedConfig)
           setPruefungsFragen(navigationsFragen)
           setPruefungsAlleFragen(alleFragen)

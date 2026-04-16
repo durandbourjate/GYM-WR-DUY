@@ -5,6 +5,7 @@ import { apiService } from '../../services/apiService.ts'
 import type { PDFFrage as PDFFrageTyp } from '../../types/fragen.ts'
 import { renderMarkdown } from '../../utils/markdown.ts'
 import { fachbereichFarbe } from '../../utils/fachUtils.ts'
+import { toAssetUrl } from '../../utils/assetUrl.ts'
 import { usePDFRenderer } from './pdf/usePDFRenderer.ts'
 import { usePDFAnnotations } from './pdf/usePDFAnnotations.ts'
 import { PDFToolbar } from './pdf/PDFToolbar.tsx'
@@ -124,10 +125,11 @@ export default function PDFFrage({ frage }: Props) {
       }
 
       // 3. Direkte URL (funktioniert nur bei same-origin oder CORS-erlaubten URLs)
+      // Relative URLs (./materialien/..) absolutieren, damit sie nicht gegen die SPA-Route aufgelöst werden
       if (frage.pdfUrl) {
         try {
           if (abgebrochen) return
-          await renderer.ladePDF({ url: frage.pdfUrl })
+          await renderer.ladePDF({ url: toAssetUrl(frage.pdfUrl) })
           return
         } catch (err) {
           if (abgebrochen) return

@@ -3,6 +3,7 @@ import { useFrageAdapter } from '../../hooks/useFrageAdapter.ts'
 import type { HotspotFrage as HotspotFrageType } from '../../types/fragen.ts'
 import { renderMarkdown } from '../../utils/markdown.ts'
 import { fachbereichFarbe } from '../../utils/fachUtils.ts'
+import { toAssetUrl } from '../../utils/assetUrl.ts'
 
 interface Props {
   frage: HotspotFrageType
@@ -67,7 +68,7 @@ export default function HotspotFrage({ frage }: Props) {
           onClick={handleKlick}
         >
           <img
-            src={frage.bildUrl}
+            src={toAssetUrl(frage.bildUrl)}
             alt="Hotspot-Bild"
             className="block max-w-full rounded-lg select-none"
             style={{ objectFit: 'contain' }}

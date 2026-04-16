@@ -3,6 +3,7 @@ import DOMPurify from 'dompurify'
 import type { PruefungsMaterial } from '../types/pruefung.ts'
 import AudioPlayer from './AudioPlayer.tsx'
 import Tooltip from './ui/Tooltip.tsx'
+import { toAssetUrl } from '../utils/assetUrl.ts'
 
 export type MaterialModus = 'split' | 'overlay'
 
@@ -285,7 +286,8 @@ function MaterialInhalt({ material }: { material: PruefungsMaterial }) {
   // PDF / Datei-Upload (Bilder, PDFs)
   const materialUrl = material.url || (material.driveFileId ? `https://drive.google.com/file/d/${material.driveFileId}/view` : '')
   if ((material.typ === 'pdf' || material.typ === 'dateiUpload') && materialUrl) {
-    let embedUrl = convertToEmbedUrl(materialUrl)
+    // Relative URLs (./materialien/..) absolutieren, damit iframe nicht die SPA-Route auflöst
+    let embedUrl = convertToEmbedUrl(toAssetUrl(materialUrl))
     // Lokale PDFs: Toolbar ausblenden (kein Download/Print für SuS)
     // Google Drive Preview hat eigene Toolbar-Steuerung
     if (!embedUrl.includes('drive.google.com')) {

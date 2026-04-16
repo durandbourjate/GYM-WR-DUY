@@ -3,6 +3,7 @@ import { useFrageAdapter } from '../../hooks/useFrageAdapter.ts'
 import type { DragDropBildFrage as DragDropBildFrageType } from '../../types/fragen.ts'
 import { renderMarkdown } from '../../utils/markdown.ts'
 import { fachbereichFarbe } from '../../utils/fachUtils.ts'
+import { toAssetUrl } from '../../utils/assetUrl.ts'
 
 interface Props {
   frage: DragDropBildFrageType
@@ -106,7 +107,7 @@ export default function DragDropBildFrage({ frage }: Props) {
       <div className={`relative inline-block ${!disabled && !alleZugeordnet ? 'rounded-xl border-2 border-violet-400 dark:border-violet-500 p-1' : ''}`} style={{ touchAction: 'manipulation' }}>
         <div className="relative overflow-hidden w-fit max-w-full">
           <img
-            src={frage.bildUrl}
+            src={toAssetUrl(frage.bildUrl)}
             alt="Drag & Drop Bild"
             className="block max-w-full rounded-lg select-none"
             style={{ objectFit: 'contain' }}
