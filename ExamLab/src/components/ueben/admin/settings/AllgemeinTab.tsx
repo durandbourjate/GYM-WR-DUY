@@ -85,7 +85,7 @@ export default function AllgemeinTab() {
   return (
     <div className="space-y-6">
       {/* Gruppeninfo */}
-      <div className="bg-white dark:bg-slate-800 rounded-xl p-5 border border-slate-100 dark:border-slate-700 space-y-3">
+      <div className="settings-card space-y-3">
         <div>
           <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">Gruppenname</p>
           {nameBearbeiten ? (
@@ -135,7 +135,7 @@ export default function AllgemeinTab() {
       </div>
 
       {/* Anrede */}
-      <div className="bg-white dark:bg-slate-800 rounded-xl p-5 border border-slate-100 dark:border-slate-700">
+      <div className="settings-card">
         <p className="text-sm font-medium dark:text-white mb-3">Anrede</p>
         <div className="flex gap-2">
           {(['sie', 'du'] as const).map((wert) => (
@@ -151,7 +151,7 @@ export default function AllgemeinTab() {
       </div>
 
       {/* Feedback-Stil */}
-      <div className="bg-white dark:bg-slate-800 rounded-xl p-5 border border-slate-100 dark:border-slate-700">
+      <div className="settings-card">
         <p className="text-sm font-medium dark:text-white mb-3">Feedback-Stil</p>
         <div className="flex gap-2">
           {([{ id: 'sachlich', label: 'Sachlich' }, { id: 'ermutigend', label: 'Ermutigend' }] as const).map(({ id, label }) => (
@@ -167,7 +167,7 @@ export default function AllgemeinTab() {
       </div>
 
       {/* Fokusthema */}
-      <div className="bg-white dark:bg-slate-800 rounded-xl p-5 border border-slate-100 dark:border-slate-700">
+      <div className="settings-card">
         <p className="text-sm font-medium dark:text-white mb-1">Fokusthema</p>
         <p className="text-xs text-slate-400 mb-3">Wird den SuS prominent empfohlen. Optional.</p>
         <select
@@ -192,7 +192,7 @@ export default function AllgemeinTab() {
       </div>
 
       {/* Mastery-Schwellwerte */}
-      <div className="bg-white dark:bg-slate-800 rounded-xl p-5 border border-slate-100 dark:border-slate-700 space-y-4">
+      <div className="settings-card space-y-4">
         <div>
           <p className="text-sm font-medium dark:text-white mb-1">Mastery-Schwellwerte</p>
           <p className="text-xs text-slate-400">Bestimmt, ab wann Fragen als "gefestigt" oder "gemeistert" gelten.</p>
@@ -228,7 +228,7 @@ export default function AllgemeinTab() {
       </div>
 
       {/* Max aktuelle Themen */}
-      <div className="bg-white dark:bg-slate-800 rounded-xl p-5 border border-slate-100 dark:border-slate-700">
+      <div className="settings-card">
         <h4 className="font-medium mb-1">Maximale aktuelle Themen</h4>
         <p className="text-sm text-slate-500 dark:text-slate-400 mb-3">
           Wie viele Themen dürfen gleichzeitig als «aktuell» markiert sein?
