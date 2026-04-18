@@ -77,7 +77,7 @@ export default function BildbeschriftungFrage({ frage }: Props) {
                 onChange={(e) => handleEingabe(beschriftung.id, e.target.value)}
                 disabled={disabled}
                 placeholder={`Label ${i + 1}`}
-                className={`w-28 px-2 py-1 text-sm rounded border shadow-sm
+                className={`min-w-[120px] max-w-[220px] w-auto px-2 py-1 text-sm rounded border shadow-sm
                   bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100
                   border-slate-300 dark:border-slate-600
                   focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none

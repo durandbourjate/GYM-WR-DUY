@@ -2,9 +2,25 @@
  * Korrektur-Logik für ExamLab Üben.
  * Arbeitet mit dem shared Frage-Format (kanonisch, discriminated union).
  */
-import type { Frage } from '../../types/ueben/fragen'
+import type { Frage, FrageTyp } from '../../types/ueben/fragen'
 import type { Antwort } from '../../types/antworten'
 import { normalizeAntwort } from '../normalizeAntwort'
+
+/**
+ * Fragetypen, die nicht automatisch korrigiert werden können
+ * und stattdessen durch SuS selbstbewertet werden müssen.
+ */
+const SELBSTBEWERTUNGS_TYPEN: ReadonlyArray<FrageTyp> = [
+  'freitext',
+  'visualisierung',
+  'pdf',
+  'audio',
+  'code',
+]
+
+export function istSelbstbewertungstyp(typ: FrageTyp): boolean {
+  return SELBSTBEWERTUNGS_TYPEN.includes(typ)
+}
 
 export function pruefeAntwort(frage: Frage, antwort: Antwort | unknown): boolean {
   // Normalisierung: konvertiert Legacy-Üben-Felder (gewaehlt, wert, etc.)
