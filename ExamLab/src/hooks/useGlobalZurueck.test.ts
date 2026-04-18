@@ -1,13 +1,14 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { renderHook } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { createElement } from 'react'
 import { useGlobalZurueck, TOP_LEVEL_ROUTES } from './useGlobalZurueck'
 
-// Auth-Store mocken
+// Auth-Store mocken — mutableRolle erlaubt pro-Test-Überschreibung
+let mockRolle: 'lp' | 'sus' = 'lp'
 vi.mock('../store/authStore', () => ({
   useAuthStore: (sel: (s: { user: { rolle: 'lp' | 'sus' } | null }) => unknown) =>
-    sel({ user: { rolle: 'lp' } }),
+    sel({ user: { rolle: mockRolle } }),
 }))
 
 // navigate-Spy (muss vor dem ersten Import gesetzt sein, wird pro Test neu gesetzt)
@@ -34,7 +35,10 @@ function wrapper(initialPath: string, locationKey?: string) {
 }
 
 describe('useGlobalZurueck — canGoBack', () => {
-  beforeEach(() => navigateSpy.mockClear())
+  beforeEach(() => {
+    navigateSpy.mockClear()
+    mockRolle = 'lp'
+  })
 
   it('canGoBack=false auf /favoriten (Top-Level LP)', () => {
     const { result } = renderHook(() => useGlobalZurueck(), { wrapper: wrapper('/favoriten') })
@@ -86,7 +90,10 @@ describe('useGlobalZurueck — canGoBack', () => {
 })
 
 describe('useGlobalZurueck — goBack()', () => {
-  beforeEach(() => navigateSpy.mockClear())
+  beforeEach(() => {
+    navigateSpy.mockClear()
+    mockRolle = 'lp'
+  })
 
   it('ruft navigate(-1) wenn location.key !== "default"', () => {
     const { result } = renderHook(() => useGlobalZurueck(), {
@@ -109,23 +116,19 @@ describe('useGlobalZurueck — goBack()', () => {
 describe('useGlobalZurueck — SuS default-key', () => {
   beforeEach(() => {
     navigateSpy.mockClear()
-    // Überschreibe den Modul-Level-Mock für diesen Describe-Block
-    vi.doMock('../store/authStore', () => ({
-      useAuthStore: (sel: (s: { user: { rolle: 'sus' } }) => unknown) =>
-        sel({ user: { rolle: 'sus' } }),
-    }))
+    mockRolle = 'sus'
   })
 
-  it('ruft navigate("/sus/ueben", { replace: true }) wenn SuS + default-key', async () => {
-    // Für SuS-spezifischen Test: direktes Mocken des Hook-Returns testen wir
-    // über die Konstanten-Logik (defaultRoute ist intern — wir testen das Verhalten via LP/SuS)
-    // Da vi.doMock nicht hot-reload macht, testen wir die Konstante explizit:
-    // Der Hook berechnet die Fallback-Route aus user.rolle — dieser Test prüft
-    // dass die SuS-Fallback-URL korrekt ist (als indirekter Test).
-    // Vollständiger Nachweis: Die Konstante /sus/ueben ist in TOP_LEVEL_ROUTES enthalten,
-    // und defaultRoute('sus') = '/sus/ueben'.
-    expect(TOP_LEVEL_ROUTES.has('/sus/ueben')).toBe(true)
-    expect(TOP_LEVEL_ROUTES.has('/favoriten')).toBe(true)
+  afterEach(() => {
+    mockRolle = 'lp'
+  })
+
+  it('ruft navigate("/sus/ueben", { replace: true }) wenn SuS + default-key', () => {
+    const { result } = renderHook(() => useGlobalZurueck(), {
+      wrapper: wrapper('/sus/ueben/einrichtung-pruefung', 'default'),
+    })
+    result.current.goBack()
+    expect(navigateSpy).toHaveBeenCalledWith('/sus/ueben', { replace: true })
   })
 })
 
