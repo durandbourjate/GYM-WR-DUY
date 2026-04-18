@@ -6,6 +6,65 @@
 
 ---
 
+## Session 116 — Bundle A: Dynamic Import Fix + Übungsmodus-Korrektur-Flow (18.04.2026)
+
+### Stand
+**Auf `preview` gepusht (zwei Branches):**
+- `fix/dynamic-import-retry` (A1) — bereits am 17.04. zu preview gepusht
+- `feature/ueben-zwischenstand-flow` (A2) — pusht jetzt gebündelt mit A1 zu preview
+
+**Wartet auf Staging-Test mit echten Logins (LP + SuS).** Nach Freigabe: Merge zu `main`.
+
+### Umgesetzt
+
+**A1 — Dynamic Import Auto-Retry (Production-Blocker):**
+- Neu: `src/utils/lazyMitRetry.ts` (sessionStorage-Loop-Schutz)
+- 5 Stellen umgestellt: Router (App, LoginScreen, LPStartseite, Favoriten),
+  LPStartseite (5 Sub-Komponenten), FrageText (CodeBlock),
+  SuSStartseite (AppUeben)
+- Behebt "Failed to fetch dynamically imported module" auf Production nach
+  Deploy mit neuem Chunk-Hash (gemeldet von User für SuS-Login App-Chunk
+  und LP-Login Favoriten-Chunk)
+
+**A2 — Übungsmodus-Korrektur erst nach "Antwort prüfen" (6 Bugs):**
+- Root Cause: Üben-Adapter rief `beantworteById` sofort bei jeder Eingabe →
+  Frage wurde gesperrt + sofort als falsch markiert
+- Neuer Flow (Pool-Pattern): Eingabe → Zwischenstand → "Antwort prüfen"-Klick →
+  bei auto-typen Korrektur+Musterlösung, bei selbstbewerteten Typen
+  Musterlösung+3 Buttons (Richtig/Teilweise/Falsch)
+- Store: 2 neue Actions `pruefeAntwortJetzt`, `selbstbewertenById`
+- Adapter (`useFrageAdapter`): Üben-`onAntwort=speichereZwischenstandById`,
+  `disabled=istGeprueft`, neue Felder `onPruefen`, `onSelbstbewerten`,
+  `hatZwischenstand`, `istGeprueft`. Pruefungs-Modus unverändert.
+- Neue Komponente: `SelbstbewertungsDialog`
+- `QuizNavigation`: violetter "Antwort prüfen"-Button hinzugefügt
+- `UebungsScreen`: orchestriert Flow + Dialog-State
+- Helper `istSelbstbewertungstyp` aus `korrektur.ts` exportiert
+- Spot-Fixes: MC `OPT-0)` → `A)` aus Index, Bildbeschriftung `w-28` → `w-auto min-w-120 max-w-220`
+
+### Verifikation
+- TypeScript: ✅ tsc -b
+- Tests: ✅ 303/303 (Vitest)
+- Build: ✅
+- Browser-Smoke (Vite dev): ✅ alle neuen Module werden serviert
+- **Browser-E2E mit echten Logins: STEHT AUS (User-Test auf Staging)**
+
+### Lehre (für `bilder-in-pools.md` G-Sektion zu ergänzen)
+Übungsmodus muss konsequent vom Pruefungs-Modus getrennt werden — der Adapter
+muss **per `mode`-Check** unterschiedlich onAntwort-Verhalten zeigen. "Sofort
+korrigieren bei jeder Eingabe-Änderung" ist Prüfungs-Verhalten und macht
+Üben-Modus unbenutzbar. Der existierende `speichereZwischenstandById` war
+schon gestubbed aber nicht verlinkt — Stubs in Stores immer durch Code
+referenzieren oder löschen.
+
+### Plan-Dokumentation
+`ExamLab/docs/superpowers/plans/2026-04-18-uebungsmodus-korrektur-flow.md`
+(am 17.04. geschrieben; Implementation deckt Tasks 1-6 ab; Task 7 Audit
+zeigte: keine zusätzlichen Fragetyp-Anpassungen nötig, weil der Adapter-
+Refactor zentral wirkt).
+
+---
+
 ## Session 115 — Grosse Polish-Session (16.04.2026 → main)
 
 ### Stand
