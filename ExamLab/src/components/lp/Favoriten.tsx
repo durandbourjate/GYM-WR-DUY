@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, lazy, Suspense } from 'react'
+import { useState, useEffect, useMemo, Suspense } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuthStore } from '../../store/authStore'
 import { useFavoritenStore } from '../../store/favoritenStore'
@@ -8,10 +8,12 @@ import type { PruefungsConfig } from '../../types/pruefung'
 // Status direkt aus PruefungsConfig ableiten (ohne TrackerDaten)
 import { LPAppHeaderContainer } from './LPAppHeaderContainer'
 import LPSkeleton from './LPSkeleton'
+import LazyFallback from '../ui/LazyFallback'
+import { lazyMitRetry } from '../../utils/lazyMitRetry'
 
-// Lazy-loaded Overlays (analog LPStartseite.tsx)
-const EinstellungenPanel = lazy(() => import('../settings/EinstellungenPanel.tsx'))
-const HilfeSeite = lazy(() => import('./HilfeSeite.tsx'))
+// Lazy-loaded Overlays (analog LPStartseite.tsx, mit Retry bei Chunk-Load-Fehler nach Deploy)
+const EinstellungenPanel = lazyMitRetry(() => import('../settings/EinstellungenPanel.tsx'))
+const HilfeSeite = lazyMitRetry(() => import('./HilfeSeite.tsx'))
 
 /** Favoriten-Startseite für Lehrpersonen: Favoriten, Korrekturen, anstehende/letzte Prüfungen */
 export default function Favoriten() {
@@ -153,15 +155,6 @@ export default function Favoriten() {
           <HilfeSeite onSchliessen={toggleHilfe} />
         </Suspense>
       )}
-    </div>
-  )
-}
-
-/** Fallback-Spinner für lazy-geladene Overlays */
-function LazyFallback() {
-  return (
-    <div className="flex items-center justify-center py-12">
-      <div className="animate-spin h-6 w-6 border-2 border-slate-300 dark:border-slate-600 border-t-blue-500 rounded-full" />
     </div>
   )
 }
