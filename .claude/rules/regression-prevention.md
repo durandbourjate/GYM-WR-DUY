@@ -248,3 +248,20 @@ Wenn `apiClient.ts`, `pruefungApi.ts`, `korrekturUtils.ts` oder `apps-script-cod
 - Deployen waehrend aktiver Pruefungen
 - Session-Start mit Browser-Aktionen bevor Handoff gelesen und Plan erstellt ist
 - Planlos durch die Pruefung klicken statt gezielt Bug-spezifisch zu testen
+
+## "Button tut nichts"-Debugging (S118)
+
+**Bei Bugreports "Button/Klick reagiert nicht" IMMER zuerst `window.onerror` abonnieren, dann klicken.** React-EventHandler swallowen TypeErrors silent — der Klick wirkt wie "keine Reaktion", obwohl tatsaechlich eine Exception geworfen wird.
+
+**Debug-Patch (temporaer im Browser-Preview einfuegen):**
+```js
+// In DevTools Console oder via preview_eval
+window.addEventListener('error', (e) => console.error('[onerror]', e.message, e.error))
+window.addEventListener('unhandledrejection', (e) => console.error('[reject]', e.reason))
+```
+
+Dann erneut klicken — der echte Fehler wird sichtbar.
+
+**Regel:** Nicht erst raten welche Komponente schuld ist. Erst `window.onerror` abonnieren, dann den konkreten Stack lesen. Silent-swallowed Exceptions sind bei React-onClick/onChange besonders haeufig (Fehler in Handler → React macht state rollback → UI bleibt scheinbar unveraendert).
+
+Gefunden in S118: Luckentext-"Antwort pruefen"-Button tat nichts → `TypeError: Cannot read properties of undefined (reading 'some')` in `korrektur.ts`. Ohne window.onerror-Patch haette die Diagnose Stunden gekostet.

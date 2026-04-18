@@ -63,3 +63,27 @@ Auch Store-Getter-Methoden wie `getFoo(id)` sind nicht sicher im Selector, wenn 
 - Tailwind-Klassen bevorzugen (1220 className vs. 359 style= aktuell)
 - `style=` nur für dynamische Werte (berechnete Breiten, Farben aus Daten, Positionen)
 - Keine neuen hardcodierten Hex-Farben in style= — immer über `generateColorVariants()` oder CSS Custom Properties
+
+## Defensive Normalizer für Backend-Daten (S118)
+
+**Problem:** Wenn das Backend (Apps Script / Sheets) Felder inkonsistent liefert — optional, umbenannt, für SuS gefiltert — crashen Korrektur-/Render-Pfade mit unklaren `TypeError: Cannot read properties of undefined`-Fehlern. Im Event-Handler werden diese Exceptions oft silent geswallowed, die UI wirkt "tut nichts".
+
+**Regel:** Daten aus externen Quellen (Apps Script, Sheets, Pools) werden am Eintrittspunkt durch einen Normalizer geschickt, nicht im UI-Code verzweigt.
+
+**Muster (`ExamLab/src/utils/ueben/fragetypNormalizer.ts::normalisiereLueckentext`):**
+```ts
+// Akzeptiert unterschiedliche Feldnamen, stellt Array-Typ sicher
+function normalisiereLueckentext(frage: any): LueckentextFrage {
+  const luecken = (frage.luecken ?? []).map((l: any) => ({
+    ...l,
+    korrekteAntworten: Array.isArray(l.korrekteAntworten)
+      ? l.korrekteAntworten
+      : l.korrekt
+        ? [l.korrekt]
+        : Array.isArray(l.alternativen) ? l.alternativen : [],
+  }))
+  return { ...frage, luecken }
+}
+```
+
+**Komplementär:** In Pfaden die trotzdem gegen unvollständige Daten laufen können (z.B. `korrektur.ts`), defensive Array-Checks (`Array.isArray(x) && x.some(...)`) statt direkter Methodenaufrufe.
