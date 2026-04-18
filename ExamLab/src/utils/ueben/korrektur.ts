@@ -53,9 +53,11 @@ export function pruefeAntwort(frage: Frage, antwort: Antwort | unknown): boolean
 
     case 'lueckentext': {
       if (a.typ !== 'lueckentext') return false
-      return frage.luecken.every(l => {
+      const luecken = Array.isArray(frage.luecken) ? frage.luecken : []
+      return luecken.every(l => {
         const eingabe = (a.eintraege[l.id] || '').trim()
-        return l.korrekteAntworten.some(ka =>
+        const korrekt = Array.isArray(l.korrekteAntworten) ? l.korrekteAntworten : []
+        return korrekt.some(ka =>
           l.caseSensitive ? eingabe === ka.trim() : eingabe.toLowerCase() === ka.trim().toLowerCase()
         )
       })
