@@ -6,6 +6,56 @@
 
 ---
 
+## Session 119 — Merge A, Rebase B, Cleanup S118-Reste (18.04.2026)
+
+### Stand
+**Bundle A (S116) + A2-Bugfixes (S118) auf `main` gemergt + gepusht** (Merge-Commit `ec38944`). **Bundle B (S117) auf neue `main` rebased + Force-Push auf `feature/bundle-b-ux-systemregeln` und `preview`.** Wartet auf User-Browser-Test (Staging) → bei Freigabe Merge zu `main`.
+
+Branch `fix/s119-cleanup` enthält die Follow-ups aus S118 und die Lehren-Integration in `.claude/rules/`.
+
+### Umgesetzt
+
+1. **Merge Bundle A → main:**
+   - CI-Checks grün (tsc, 303/303 Tests, Build)
+   - `--no-ff` Merge mit Context-Commit
+   - `main` → origin
+
+2. **Rebase Bundle B auf neue main:**
+   - 3 Konflikte aufgelöst:
+     - HANDOFF.md (2×): main-Version behalten, B-Infos kommen in S119-Update
+     - LPStartseite.tsx: doppelter `lazyMitRetry`-Import dedupliziert
+     - utils/lazyMitRetry.ts: main-Version behalten (robuster — Generic + sessionStorage-Loop-Schutz statt B-Version ohne Loop-Schutz)
+   - Nach Rebase: 325/325 Tests grün (33 Files; +22 Tests durch Bundle B)
+   - Force-Push `feature/bundle-b-ux-systemregeln` + `preview`
+
+3. **Lückentext-Placeholder-Kosmetik (S118-Nachzügler):**
+   - `LueckentextFrage.tsx:132`: placeholder `Lücke ${lueckenId}` (zeigte `Lücke luecke-0`) → `Lücke ${parseInt(match[1], 10) + 1}` (zeigt `Lücke 1`)
+
+4. **Apps-Script `korrekteAntworten`-Audit:**
+   - Normalizer-Fallback bleibt relevant: schützt gegen unvollständig gespeicherte Sheets-Einträge
+   - **Security-Hinweis (nicht in S119 gefixt):** `lernplattformLadeFragen()` in `apps-script-code.js:7082` gibt `korrekteAntworten` 1:1 an SuS zurück (kein SuS-Filter wie in `ladePruefung()`). Im Übungsmodus sind Musterlösungen im Network-Tab sichtbar. Da Übungen nicht summativ sind, ist das bisher toleriert — für selbstgesteuerte Maturaprüfungs-Vorbereitung müsste ein eigener Korrektur-Endpoint her (separater Auftrag, Backend-Redesign)
+
+5. **Lehren aus S118 in rules/ integriert:**
+   - `code-quality.md`: Abschnitt "Defensive Normalizer für Backend-Daten" mit `normalisiereLueckentext`-Muster
+   - `deployment-workflow.md`: "Staging-Deploy-Queue hängt" — leerer Commit als Retrigger
+   - `regression-prevention.md`: "Button tut nichts"-Debugging via `window.onerror`
+
+### Offene Punkte nach S119
+- **Bundle B Browser-Test:** User muss auf Staging (`preview`) die 4 UX-Systemregeln verifizieren (Global-Zurück-Button, TabAutoScroll, Settings/Hilfe ohne Re-Mount, TabBar-Audit). Nach Freigabe Merge zu `main`.
+- **Staging-Verifikation S118-Restfixes:** DragDrop Mehrfach-Labels, R/F Fragetext-Dedup, Bildbeschriftung/Hotspot Bild-Kollaps — deployed, User-Verify ausstehend.
+- **Backend-Security `lernplattformLadeFragen()`:** eigener Auftrag für separate Session (siehe oben).
+
+### Verifikation
+- TypeScript: ✅ tsc -b (A-Merge + S119-Branch)
+- Tests: ✅ 303/303 (main/S119) · 325/325 (Bundle B nach Rebase)
+- Build: ✅
+- Browser: ⏸ Staging User-Test steht für Bundle B aus
+
+### Apps-Script
+**Nicht geändert — kein Deploy nötig.**
+
+---
+
 ## Session 118 — A2-Fragetypen-Bugfixes aus Staging-Test (18.04.2026)
 
 ### Stand

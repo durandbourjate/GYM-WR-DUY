@@ -106,3 +106,15 @@ git push
 4. Im Code: SW-unregister-Script bei Chunk-Load-Fehlern (Pattern in `LPStartseite.tsx::lazyMitRetry`)
 
 **Für User-Reports "sieht kaputt aus":** IMMER zuerst Hard-Reload empfehlen, BEVOR Bug-Untersuchung gestartet wird.
+
+## Staging-Deploy-Queue hängt (S118)
+
+**Problem:** Zwei Commits schnell hintereinander pushen führte dazu, dass der erste Deploy-Workflow lief, der zweite aber übersprungen/verschluckt wurde. Staging-Seite blieb auf altem Stand, `last-modified`-Header deutlich veraltet, obwohl GitHub-Actions-Workflow als "success" markiert war.
+
+**Retrigger:** Leerer Commit erzwingt neuen Workflow-Run:
+```bash
+git commit --allow-empty -m "Trigger staging re-deploy"
+git push
+```
+
+**Erkennung:** Wenn nach `git push` zur Preview-URL gefetcht wird und sich der Build-Timestamp nicht ändert (innerhalb von ~2 Minuten), wahrscheinlich ist der Workflow in der Queue hängengeblieben. Nicht lange raten — leerer Commit ist billig und löst zuverlässig aus.
