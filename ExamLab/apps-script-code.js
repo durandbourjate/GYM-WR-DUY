@@ -1479,6 +1479,19 @@ function ladePruefung(pruefungId, email) {
 
 // === SICHERHEIT: Lösungsdaten für SuS entfernen ===
 
+/** Fisher-Yates Shuffle (mutiert nicht, liefert neue Kopie). Für Übungs-Bereinigung. */
+function shuffle_(arr) {
+  if (!Array.isArray(arr)) return arr;
+  var result = arr.slice();
+  for (var i = result.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var temp = result[i];
+    result[i] = result[j];
+    result[j] = temp;
+  }
+  return result;
+}
+
 function bereinigeFrageFuerSuS_(frage) {
   var f = JSON.parse(JSON.stringify(frage)); // Deep Copy
 
