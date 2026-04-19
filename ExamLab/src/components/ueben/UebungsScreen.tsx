@@ -19,7 +19,7 @@ export default function UebungsScreen() {
     toggleUnsicher, istUnsicher, istSessionFertig, beendeSession,
     aktuelleFrage, kannZurueck,
     pruefeAntwortJetzt, selbstbewertenById,
-    speichertPruefung, pruefFehler,
+    speichertPruefung, pruefFehler, letzteMusterloesung,
   } = useUebenUebungsStore()
   const { zuErgebnis } = useSuSNavigation()
 
@@ -28,6 +28,14 @@ export default function UebungsScreen() {
 
   // Beim Frage-Wechsel Dialog schliessen
   useEffect(() => { setSelbstbewertungOffen(false) }, [frage?.id])
+
+  // Phase 2: Server liefert für Selbstbewertungstypen letzteMusterloesung —
+  // Dialog dann öffnen. Auto-korrigierbare Typen setzen stattdessen feedbackSichtbar.
+  useEffect(() => {
+    if (frage && istSelbstbewertungstyp(frage.typ) && letzteMusterloesung && !feedbackSichtbar) {
+      setSelbstbewertungOffen(true)
+    }
+  }, [frage, letzteMusterloesung, feedbackSichtbar])
 
   // Keyboard-Shortcuts
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
@@ -77,11 +85,10 @@ export default function UebungsScreen() {
   const fortschritt = Object.keys(session.antworten).length
 
   const handlePruefen = () => {
-    if (istSelbstbewertungstyp(frage.typ)) {
-      setSelbstbewertungOffen(true)
-    } else {
-      pruefeAntwortJetzt(frage.id)
-    }
+    // Phase 2: Server liefert Musterlösung + korrekt/selbstbewertung-Flag.
+    // Für Selbstbewertungstypen öffnet der useEffect unten den Dialog,
+    // sobald letzteMusterloesung vom Server eintrifft.
+    pruefeAntwortJetzt(frage.id)
   }
   const handleSelbstbewerten = (bewertung: Selbstbewertung) => {
     selbstbewertenById(frage.id, bewertung)
@@ -131,10 +138,12 @@ export default function UebungsScreen() {
           <FrageRenderer frage={normFrage as unknown as Frage} />
         </div>
 
-        {/* Selbstbewertung-Dialog (Freitext/Zeichnen/PDF/Audio/Code) */}
-        {selbstbewertungOffen && frage.musterlosung && (
+        {/* Selbstbewertung-Dialog (Freitext/Zeichnen/PDF/Audio/Code) —
+            Musterlösung kommt vom Server (Phase 2), Fallback auf frage.musterlosung
+            für Demo-Modus / angeleitete Übungen wo die Frage lokal ist. */}
+        {selbstbewertungOffen && (letzteMusterloesung || frage.musterlosung) && (
           <SelbstbewertungsDialog
-            musterloesung={frage.musterlosung}
+            musterloesung={letzteMusterloesung || frage.musterlosung || ''}
             onWahl={handleSelbstbewerten}
           />
         )}
