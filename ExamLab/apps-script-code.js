@@ -1689,6 +1689,242 @@ function bereinigeFrageFuerSuSUeben_(frage) {
   return f;
 }
 
+// === SERVER-SIDE KORREKTUR (Port aus korrektur.ts) ===
+
+var SELBSTBEWERTUNGS_TYPEN_ = ['freitext', 'visualisierung', 'pdf', 'audio', 'code'];
+
+function istSelbstbewertungstyp_(typ) {
+  return SELBSTBEWERTUNGS_TYPEN_.indexOf(typ) !== -1;
+}
+
+/** LaTeX-Normalisierung für Formel-Vergleich (1:1 Port) */
+function normalisiereLatex_(s) {
+  return String(s || '').replace(/\s+/g, '').replace(/\\cdot/g, '\\times').replace(/\*\*/g, '^').toLowerCase();
+}
+
+/**
+ * Server-side Antwort-Prüfung — spiegelt korrektur.ts::pruefeAntwort 1:1.
+ * Rückgabe: boolean (true/false) für auto-korrigierbare Typen,
+ * null für Selbstbewertungstypen (Caller entscheidet über Response).
+ */
+function pruefeAntwortServer_(frage, antwort) {
+  if (!frage || !antwort) return false;
+  var a = antwort;
+  switch (frage.typ) {
+    case 'mc': {
+      if (a.typ !== 'mc') return false;
+      var gewaehlt = Array.isArray(a.gewaehlteOptionen) ? a.gewaehlteOptionen : [];
+      var optionen = Array.isArray(frage.optionen) ? frage.optionen : [];
+      if (frage.mehrfachauswahl) {
+        var korrekte = optionen.filter(function(o) { return o.korrekt; }).map(function(o) { return o.id; });
+        var s1 = gewaehlt.slice().sort();
+        var s2 = korrekte.slice().sort();
+        return s1.length === s2.length && s1.every(function(v, i) { return v === s2[i]; });
+      }
+      var k = optionen.filter(function(o) { return o.korrekt; })[0];
+      if (!k) return false;
+      return gewaehlt[0] === k.id || gewaehlt[0] === k.text;
+    }
+
+    case 'richtigfalsch': {
+      if (a.typ !== 'richtigfalsch') return false;
+      var aussagen = Array.isArray(frage.aussagen) ? frage.aussagen : [];
+      var bew = a.bewertungen || {};
+      return aussagen.length > 0 && aussagen.every(function(x) { return bew[x.id] === x.korrekt; });
+    }
+
+    case 'lueckentext': {
+      if (a.typ !== 'lueckentext') return false;
+      var luecken = Array.isArray(frage.luecken) ? frage.luecken : [];
+      var eintraege = a.eintraege || {};
+      return luecken.length > 0 && luecken.every(function(l) {
+        var eingabe = String(eintraege[l.id] || '').trim();
+        var korrekt = Array.isArray(l.korrekteAntworten) ? l.korrekteAntworten : [];
+        if (korrekt.length === 0) return false;
+        return korrekt.some(function(ka) {
+          return l.caseSensitive
+            ? eingabe === String(ka).trim()
+            : eingabe.toLowerCase() === String(ka).trim().toLowerCase();
+        });
+      });
+    }
+
+    case 'berechnung': {
+      if (a.typ !== 'berechnung') return false;
+      var ergebnisse = Array.isArray(frage.ergebnisse) ? frage.ergebnisse : [];
+      var input = a.ergebnisse || {};
+      if (ergebnisse.length === 1) {
+        var istStr = input['default'] !== undefined ? input['default'] : (Object.values(input)[0] || '');
+        var ist = parseFloat(istStr);
+        if (isNaN(ist)) return false;
+        return Math.abs(ergebnisse[0].korrekt - ist) <= ergebnisse[0].toleranz;
+      }
+      return ergebnisse.length > 0 && ergebnisse.every(function(e) {
+        var v = parseFloat(input[e.id] || '0');
+        if (isNaN(v)) return false;
+        return Math.abs(e.korrekt - v) <= e.toleranz;
+      });
+    }
+
+    case 'sortierung': {
+      if (a.typ !== 'sortierung') return false;
+      var elemente = Array.isArray(frage.elemente) ? frage.elemente : [];
+      var reihenfolge = Array.isArray(a.reihenfolge) ? a.reihenfolge : [];
+      return elemente.length > 0 && elemente.length === reihenfolge.length &&
+        elemente.every(function(e, i) { return e === reihenfolge[i]; });
+    }
+
+    case 'zuordnung': {
+      if (a.typ !== 'zuordnung') return false;
+      var paare = Array.isArray(frage.paare) ? frage.paare : [];
+      var zu = a.zuordnungen || {};
+      return paare.length > 0 && paare.every(function(p) { return zu[p.links] === p.rechts; });
+    }
+
+    case 'hotspot': {
+      if (a.typ !== 'hotspot') return false;
+      var bereiche = Array.isArray(frage.bereiche) ? frage.bereiche : [];
+      var klicks = Array.isArray(a.klicks) ? a.klicks : [];
+      return bereiche.length > 0 && bereiche.length === klicks.length && bereiche.every(function(b) {
+        return klicks.some(function(kl) {
+          var r = (b.koordinaten && b.koordinaten.radius) || 10;
+          var dx = b.koordinaten.x - kl.x, dy = b.koordinaten.y - kl.y;
+          return Math.sqrt(dx * dx + dy * dy) < r;
+        });
+      });
+    }
+
+    case 'bildbeschriftung': {
+      if (a.typ !== 'bildbeschriftung') return false;
+      var beschr = Array.isArray(frage.beschriftungen) ? frage.beschriftungen : [];
+      var eintr = a.eintraege || {};
+      return beschr.length > 0 && beschr.every(function(b) {
+        var kks = Array.isArray(b.korrekt) ? b.korrekt : [];
+        return kks.some(function(ka) {
+          return String(eintr[b.id] || '').trim().toLowerCase() === String(ka).trim().toLowerCase();
+        });
+      });
+    }
+
+    case 'dragdrop_bild': {
+      if (a.typ !== 'dragdrop_bild') return false;
+      var zielzonen = Array.isArray(frage.zielzonen) ? frage.zielzonen : [];
+      var labels = Array.isArray(frage.labels) ? frage.labels : [];
+      var zud = a.zuordnungen || {};
+      return zielzonen.length > 0 && zielzonen.every(function(z) {
+        if (zud[z.korrektesLabel] === z.id) return true;
+        return labels.some(function(l) { return l === z.korrektesLabel && zud[l] === z.id; });
+      });
+    }
+
+    case 'aufgabengruppe': {
+      var ta = Array.isArray(frage.teilaufgaben) ? frage.teilaufgaben : [];
+      var ans = a.teilAntworten || a.teilantworten || {};
+      return ta.length > 0 && ta.every(function(sub) {
+        return pruefeAntwortServer_(sub, ans[sub.id]) === true;
+      });
+    }
+
+    case 'buchungssatz':
+    case 'tkonto':
+    case 'bilanzstruktur':
+    case 'kontenbestimmung':
+    case 'formel':
+      return pruefeFibuAntwortServer_(frage, a);
+
+    case 'freitext':
+    case 'visualisierung':
+    case 'pdf':
+    case 'audio':
+    case 'code':
+      return null; // Selbstbewertung — Caller entscheidet
+  }
+  return false;
+}
+
+/** FiBu + Formel — 1:1 Port aus korrektur.ts */
+function pruefeFibuAntwortServer_(frage, antwort) {
+  switch (frage.typ) {
+    case 'buchungssatz': {
+      if (antwort.typ !== 'buchungssatz') return false;
+      var korrektZeilen = Array.isArray(frage.buchungen) ? frage.buchungen : [];
+      var eingabeZeilen = Array.isArray(antwort.buchungen) ? antwort.buchungen : [];
+      if (korrektZeilen.length === 0 || korrektZeilen.length !== eingabeZeilen.length) return false;
+      var genutzt = {};
+      return korrektZeilen.every(function(kz) {
+        return eingabeZeilen.some(function(ez, i) {
+          if (genutzt[i]) return false;
+          if (ez.sollKonto === kz.sollKonto && ez.habenKonto === kz.habenKonto && Math.abs(ez.betrag - kz.betrag) < 0.01) {
+            genutzt[i] = true;
+            return true;
+          }
+          return false;
+        });
+      });
+    }
+
+    case 'tkonto': {
+      if (antwort.typ !== 'tkonto') return false;
+      var konten = Array.isArray(frage.konten) ? frage.konten : [];
+      if (konten.length === 0) return false;
+      return konten.every(function(konto) {
+        var eingabe = (Array.isArray(antwort.konten) ? antwort.konten : []).find(function(k) { return k.id === konto.id; });
+        if (!eingabe) return false;
+        var eintraege = Array.isArray(konto.eintraege) ? konto.eintraege : [];
+        var kLinks = eintraege.filter(function(e) { return e.seite === 'soll'; });
+        var kRechts = eintraege.filter(function(e) { return e.seite === 'haben'; });
+        var eL = Array.isArray(eingabe.eintraegeLinks) ? eingabe.eintraegeLinks : [];
+        var eR = Array.isArray(eingabe.eintraegeRechts) ? eingabe.eintraegeRechts : [];
+        var linksOk = kLinks.length === eL.length && kLinks.every(function(ks) {
+          return eL.some(function(es) { return es.gegenkonto === ks.gegenkonto && Math.abs(es.betrag - ks.betrag) < 0.01; });
+        });
+        var rechtsOk = kRechts.length === eR.length && kRechts.every(function(kh) {
+          return eR.some(function(eh) { return eh.gegenkonto === kh.gegenkonto && Math.abs(eh.betrag - kh.betrag) < 0.01; });
+        });
+        var saldo = eingabe.saldo;
+        var saldoOk = saldo ? Math.abs((saldo.betragLinks || 0) - (saldo.betragRechts || 0)) < 0.01 : true;
+        return linksOk && rechtsOk && saldoOk;
+      });
+    }
+
+    case 'bilanzstruktur': {
+      if (antwort.typ !== 'bilanzstruktur') return false;
+      var loesung = frage.loesung;
+      if (!loesung || !loesung.bilanz) return false;
+      var bilanz = antwort.bilanz || {};
+      var bilanzsumme = bilanz.bilanzsummeLinks !== undefined ? bilanz.bilanzsummeLinks : (bilanz.bilanzsummeRechts || 0);
+      return Math.abs(bilanzsumme - loesung.bilanz.bilanzsumme) < 0.01;
+    }
+
+    case 'kontenbestimmung': {
+      if (antwort.typ !== 'kontenbestimmung') return false;
+      var aufgaben = Array.isArray(frage.aufgaben) ? frage.aufgaben : [];
+      if (aufgaben.length === 0) return false;
+      var antwortAufgaben = antwort.aufgaben || {};
+      var antwortValues = Object.keys(antwortAufgaben).map(function(k) { return antwortAufgaben[k]; });
+      return aufgaben.every(function(aufgabe, i) {
+        var eingabe = (antwortValues[i] && antwortValues[i].antworten) || [];
+        var erwartet = Array.isArray(aufgabe.erwarteteAntworten) ? aufgabe.erwarteteAntworten : [];
+        if (erwartet.length !== eingabe.length) return false;
+        return erwartet.every(function(ea) {
+          return eingabe.some(function(ez) { return ez.kontonummer === (ea.kontonummer || '') && ez.seite === ea.seite; });
+        });
+      });
+    }
+
+    case 'formel': {
+      if (antwort.typ !== 'formel') return false;
+      var soll = normalisiereLatex_(frage.korrekteFormel);
+      var ist = normalisiereLatex_(antwort.latex);
+      if (!soll) return false;
+      return soll === ist;
+    }
+
+    default:
+      return false;
+  }
+}
+
 // === FRAGEN LADEN ===
 
 function ladeFragen(fragenIds) {
