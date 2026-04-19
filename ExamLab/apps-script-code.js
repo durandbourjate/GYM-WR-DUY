@@ -2014,11 +2014,21 @@ function pruefeAntwortServer_(frage, antwort) {
       if (a.typ !== 'hotspot') return false;
       var bereiche = Array.isArray(frage.bereiche) ? frage.bereiche : [];
       var klicks = Array.isArray(a.klicks) ? a.klicks : [];
-      return bereiche.length > 0 && bereiche.length === klicks.length && bereiche.every(function(b) {
+      if (bereiche.length === 0 || klicks.length === 0) return false;
+      // Korrekt = jeder Bereich von mind. einem Klick getroffen.
+      // Form-abhaengig: rechteck (x/y + breite/hoehe) vs. kreis (Radius-Distanz).
+      return bereiche.every(function(b) {
         return klicks.some(function(kl) {
-          var r = (b.koordinaten && b.koordinaten.radius) || 10;
-          var dx = b.koordinaten.x - kl.x, dy = b.koordinaten.y - kl.y;
-          return Math.sqrt(dx * dx + dy * dy) < r;
+          var ko = b.koordinaten || {};
+          if (b.form === 'rechteck') {
+            return kl.x >= ko.x && kl.x <= ko.x + (ko.breite || 0) &&
+                   kl.y >= ko.y && kl.y <= ko.y + (ko.hoehe || 0);
+          }
+          if (b.form === 'kreis') {
+            var dx = kl.x - ko.x, dy = kl.y - ko.y;
+            return Math.sqrt(dx * dx + dy * dy) <= (ko.radius || 10);
+          }
+          return false;
         });
       });
     }
