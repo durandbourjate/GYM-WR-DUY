@@ -981,6 +981,8 @@ function doPost(e) {
       return lernplattformSpeichereFrage(body);
     case 'lernplattformLoescheFrage':
       return lernplattformLoescheFrage(body);
+    case 'lernplattformPruefeAntwort':
+      return lernplattformPruefeAntwort(body);
 
     // Fortschritt
     case 'lernplattformSpeichereFortschritt':
@@ -7518,6 +7520,83 @@ function lernplattformLadeFragen(body) {
   } catch (e) {
     return jsonResponse({ success: false, error: e.message });
   }
+}
+
+/**
+ * SuS-Endpoint für server-seitige Antwort-Prüfung.
+ * Kehrt nur `{korrekt, musterlosung}` oder `{selbstbewertung:true, musterlosung}` zurück —
+ * niemals die Frage mit Lösungsfeldern.
+ */
+function lernplattformPruefeAntwort(body) {
+  var gruppeId = body.gruppeId;
+  var frageId = body.frageId;
+  var antwort = body.antwort;
+  var email = (body.email || '').toString().toLowerCase();
+
+  if (!gruppeId || !frageId || !antwort || !email) {
+    return jsonResponse({ success: false, error: 'Fehlende Parameter' });
+  }
+
+  // Rate-Limit: 30 Prüf-Requests pro Minute pro SuS (reicht für zügiges Üben,
+  // blockt Brute-Force-Scans via DevTools).
+  var rl = rateLimitCheck_('pruefe-antwort', email, 30, 60);
+  if (rl.blocked) return jsonResponse({ success: false, error: rl.error });
+
+  // Gruppe existiert?
+  var gruppen = alleGruppenLaden_();
+  var gruppe = gruppen.find(function(g) { return g.id === gruppeId; });
+  if (!gruppe) return jsonResponse({ success: false, error: 'Gruppe nicht gefunden' });
+
+  // Frage frisch (unbereinigt) laden — NIEMALS aus Request-Body nehmen
+  var frage = ladeFrageUnbereinigtById_(frageId);
+  if (!frage) return jsonResponse({ success: false, error: 'Frage nicht gefunden' });
+
+  var korrektResult = pruefeAntwortServer_(frage, antwort);
+
+  if (istSelbstbewertungstyp_(frage.typ)) {
+    return jsonResponse({
+      success: true,
+      selbstbewertung: true,
+      musterlosung: frage.musterlosung || '',
+      bewertungsraster: frage.bewertungsraster || null,
+    });
+  }
+
+  return jsonResponse({
+    success: true,
+    korrekt: korrektResult === true,
+    musterlosung: frage.musterlosung || '',
+  });
+}
+
+/** Frage unbereinigt aus Fragenbank laden — für Server-Korrektur */
+function ladeFrageUnbereinigtById_(frageId) {
+  try {
+    var fragenbank = SpreadsheetApp.openById(FRAGENBANK_ID);
+    var fragenbankTabs = getFragenbankTabs_();
+    for (var t = 0; t < fragenbankTabs.length; t++) {
+      var sheet = fragenbank.getSheetByName(fragenbankTabs[t]);
+      if (!sheet) continue;
+      var daten = sheet.getDataRange().getValues();
+      if (daten.length < 2) continue;
+      var headers = daten[0].map(function(h) { return String(h).trim(); });
+      for (var i = 1; i < daten.length; i++) {
+        var row = {};
+        for (var j = 0; j < headers.length; j++) {
+          var key = headers[j];
+          var val = daten[i][j];
+          if (!key || val === '' || val === null || val === undefined) continue;
+          row[key] = String(val);
+        }
+        if (row.id === frageId) {
+          return parseFrageKanonisch_(row, fragenbankTabs[t]);
+        }
+      }
+    }
+  } catch (e) {
+    console.log('[ladeFrageUnbereinigtById_] Fehler: ' + e.message);
+  }
+  return null;
 }
 
 /** Frage aus einer Sheet-Zeile im kanonischen Format parsen (shared mit ExamLab) */
