@@ -2012,15 +2012,34 @@ function pruefeAntwortServer_(frage, antwort) {
 
     case 'hotspot': {
       if (a.typ !== 'hotspot') return false;
-      var bereiche = Array.isArray(frage.bereiche) ? frage.bereiche : [];
+      var alle = Array.isArray(frage.bereiche) ? frage.bereiche : [];
       var klicks = Array.isArray(a.klicks) ? a.klicks : [];
-      return bereiche.length > 0 && bereiche.length === klicks.length && bereiche.every(function(b) {
-        return klicks.some(function(kl) {
-          var r = (b.koordinaten && b.koordinaten.radius) || 10;
-          var dx = b.koordinaten.x - kl.x, dy = b.koordinaten.y - kl.y;
-          return Math.sqrt(dx * dx + dy * dy) < r;
-        });
+      if (alle.length === 0 || klicks.length === 0) return false;
+      // Pool-Import-Konvention: alle Hotspots in bereiche[], nur korrekte mit punkte>0.
+      // LP-Editor: alle Bereiche haben punkte>0. Filter loest beides.
+      var punkteBereiche = alle.filter(function(b) { return (b.punkte || 0) > 0; });
+      var zuPruefen = punkteBereiche.length > 0 ? punkteBereiche : alle;
+      function trifft(b, kl) {
+        var ko = b.koordinaten || {};
+        if (b.form === 'rechteck') {
+          return kl.x >= ko.x && kl.x <= ko.x + (ko.breite || 0) &&
+                 kl.y >= ko.y && kl.y <= ko.y + (ko.hoehe || 0);
+        }
+        if (b.form === 'kreis') {
+          var dx = kl.x - ko.x, dy = kl.y - ko.y;
+          return Math.sqrt(dx * dx + dy * dy) <= (ko.radius || 10);
+        }
+        return false;
+      }
+      var alleKorrekteGetroffen = zuPruefen.every(function(b) {
+        return klicks.some(function(kl) { return trifft(b, kl); });
       });
+      if (!alleKorrekteGetroffen) return false;
+      var nichtKorrekte = alle.filter(function(b) { return zuPruefen.indexOf(b) < 0; });
+      var falscheGetroffen = nichtKorrekte.some(function(b) {
+        return klicks.some(function(kl) { return trifft(b, kl); });
+      });
+      return !falscheGetroffen;
     }
 
     case 'bildbeschriftung': {
@@ -3405,7 +3424,7 @@ function getTypDaten(frage) {
     case 'sortierung':
       return { elemente: frage.elemente, teilpunkte: frage.teilpunkte };
     case 'hotspot':
-      return { bildUrl: frage.bildUrl, bildDriveFileId: frage.bildDriveFileId, bild: frage.bild, hotspots: frage.hotspots, hotspotRadius: frage.hotspotRadius, maxKlicks: frage.maxKlicks };
+      return { bildUrl: frage.bildUrl, bildDriveFileId: frage.bildDriveFileId, bild: frage.bild, bereiche: frage.bereiche, mehrfachauswahl: frage.mehrfachauswahl };
     case 'bildbeschriftung':
       return { bildUrl: frage.bildUrl, bildDriveFileId: frage.bildDriveFileId, bild: frage.bild, beschriftungen: frage.beschriftungen };
     case 'dragdrop_bild':
