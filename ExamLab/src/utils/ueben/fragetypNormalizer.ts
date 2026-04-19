@@ -32,8 +32,53 @@ export function normalisiereFrageDaten(frage: Frage): Frage {
       return normalisiereDragDrop(frage as DragDropBildFrage) as Frage
     case 'lueckentext':
       return normalisiereLueckentext(frage as LueckentextFrage) as Frage
+    case 'mc':
+      return normalisiereMc(frage) as Frage
+    case 'richtigfalsch':
+      return normalisiereRichtigFalsch(frage as any) as Frage
+    case 'sortierung':
+      return normalisiereSortierung(frage as any) as Frage
+    case 'zuordnung':
+      return normalisiereZuordnung(frage as any) as Frage
     default:
       return frage
+  }
+}
+
+function normalisiereSortierung(f: any): any {
+  return { ...f, elemente: Array.isArray(f.elemente) ? f.elemente : [] }
+}
+
+function normalisiereZuordnung(f: any): any {
+  const paare = Array.isArray(f.paare) ? f.paare : []
+  const linksItems = Array.isArray(f.linksItems)
+    ? f.linksItems
+    : paare.map((p: any, i: number) => ({ id: p.id || `L${i}`, text: p.links }))
+  const rechtsItems = Array.isArray(f.rechtsItems)
+    ? f.rechtsItems
+    : paare.map((p: any, i: number) => ({ id: p.id || `R${i}`, text: p.rechts }))
+  return { ...f, paare, linksItems, rechtsItems }
+}
+
+function normalisiereMc(f: any): any {
+  const optionen = Array.isArray(f.optionen) ? f.optionen : []
+  return {
+    ...f,
+    optionen: optionen.map((o: any) => ({
+      ...o,
+      korrekt: typeof o.korrekt === 'boolean' ? o.korrekt : false,
+    })),
+  }
+}
+
+function normalisiereRichtigFalsch(f: any): any {
+  const aussagen = Array.isArray(f.aussagen) ? f.aussagen : []
+  return {
+    ...f,
+    aussagen: aussagen.map((a: any) => ({
+      ...a,
+      korrekt: typeof a.korrekt === 'boolean' ? a.korrekt : false,
+    })),
   }
 }
 
