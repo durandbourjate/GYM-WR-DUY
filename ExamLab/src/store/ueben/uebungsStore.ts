@@ -233,6 +233,8 @@ export const useUebenUebungsStore = create<UebungsState>((set, get) => ({
         antwort: normalized,
         email: session.email,
         token,
+        // fachbereich-Hint: spart Server ~75% Sheet-Reads (1 Tab statt 4)
+        fachbereich: frage.fachbereich,
       })
 
       // Auto-korrigierbare Fragen: `res.korrekt` ist boolean.
