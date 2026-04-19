@@ -22,3 +22,15 @@ describe('normalisiereMc', () => {
     expect(n.optionen.length).toBe(0)
   })
 })
+
+describe('normalisiereRichtigFalsch', () => {
+  it('setzt fehlendes aussagen[].korrekt auf false', () => {
+    const f: any = { id: 'f1', typ: 'richtigfalsch', aussagen: [{ id: 'a1', text: 'X' }] }
+    const n: any = normalisiereFrageDaten(f)
+    expect(typeof n.aussagen[0].korrekt).toBe('boolean')
+  })
+  it('fehlendes aussagen[] → []', () => {
+    const n: any = normalisiereFrageDaten({ id: 'f1', typ: 'richtigfalsch' } as any)
+    expect(Array.isArray(n.aussagen)).toBe(true)
+  })
+})

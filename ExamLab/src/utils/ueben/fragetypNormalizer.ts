@@ -34,6 +34,8 @@ export function normalisiereFrageDaten(frage: Frage): Frage {
       return normalisiereLueckentext(frage as LueckentextFrage) as Frage
     case 'mc':
       return normalisiereMc(frage) as Frage
+    case 'richtigfalsch':
+      return normalisiereRichtigFalsch(frage as any) as Frage
     default:
       return frage
   }
@@ -46,6 +48,17 @@ function normalisiereMc(f: any): any {
     optionen: optionen.map((o: any) => ({
       ...o,
       korrekt: typeof o.korrekt === 'boolean' ? o.korrekt : false,
+    })),
+  }
+}
+
+function normalisiereRichtigFalsch(f: any): any {
+  const aussagen = Array.isArray(f.aussagen) ? f.aussagen : []
+  return {
+    ...f,
+    aussagen: aussagen.map((a: any) => ({
+      ...a,
+      korrekt: typeof a.korrekt === 'boolean' ? a.korrekt : false,
     })),
   }
 }
