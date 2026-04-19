@@ -32,8 +32,21 @@ export function normalisiereFrageDaten(frage: Frage): Frage {
       return normalisiereDragDrop(frage as DragDropBildFrage) as Frage
     case 'lueckentext':
       return normalisiereLueckentext(frage as LueckentextFrage) as Frage
+    case 'mc':
+      return normalisiereMc(frage) as Frage
     default:
       return frage
+  }
+}
+
+function normalisiereMc(f: any): any {
+  const optionen = Array.isArray(f.optionen) ? f.optionen : []
+  return {
+    ...f,
+    optionen: optionen.map((o: any) => ({
+      ...o,
+      korrekt: typeof o.korrekt === 'boolean' ? o.korrekt : false,
+    })),
   }
 }
 
