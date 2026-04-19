@@ -156,7 +156,7 @@ describe('uebungsStore.pruefeAntwortJetzt (async, Server-seitig)', () => {
     while (!resolvePost) {
       await Promise.resolve()
     }
-    resolvePost!({ success: true, korrekt: false, musterlosung: 'B war richtig' })
+    ;(resolvePost as (v: unknown) => void)({ success: true, korrekt: false, musterlosung: 'B war richtig' })
     await promise
     expect(useUebenUebungsStore.getState().speichertPruefung).toBe(false)
   })
