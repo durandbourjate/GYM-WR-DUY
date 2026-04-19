@@ -3424,7 +3424,7 @@ function getTypDaten(frage) {
     case 'sortierung':
       return { elemente: frage.elemente, teilpunkte: frage.teilpunkte };
     case 'hotspot':
-      return { bildUrl: frage.bildUrl, bildDriveFileId: frage.bildDriveFileId, bild: frage.bild, hotspots: frage.hotspots, hotspotRadius: frage.hotspotRadius, maxKlicks: frage.maxKlicks };
+      return { bildUrl: frage.bildUrl, bildDriveFileId: frage.bildDriveFileId, bild: frage.bild, bereiche: frage.bereiche, mehrfachauswahl: frage.mehrfachauswahl };
     case 'bildbeschriftung':
       return { bildUrl: frage.bildUrl, bildDriveFileId: frage.bildDriveFileId, bild: frage.bild, beschriftungen: frage.beschriftungen };
     case 'dragdrop_bild':
