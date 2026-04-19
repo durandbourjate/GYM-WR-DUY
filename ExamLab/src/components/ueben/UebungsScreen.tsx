@@ -79,7 +79,13 @@ export default function UebungsScreen() {
   if (!session || !frage) return null
 
   // Daten normalisieren (fehlende Felder mit Defaults füllen)
-  const normFrage = normalisiereFrageDaten(frage)
+  // Phase 2: Backend liefert frage.musterlosung leer (bereinigt). Server schickt sie
+  // erst beim Prüf-Call zurück (in letzteMusterloesung). Hier patchen, damit
+  // Fragetyp-Komponenten + Feedback-Boxen weiterhin frage.musterlosung lesen können.
+  const baseFrage = letzteMusterloesung && !frage.musterlosung
+    ? { ...frage, musterlosung: letzteMusterloesung }
+    : frage
+  const normFrage = normalisiereFrageDaten(baseFrage)
   const istBeantwortet = frage.id in session.antworten
   const hatZwischenstand = frage.id in (session.zwischenstande ?? {})
   const fortschritt = Object.keys(session.antworten).length
@@ -138,12 +144,11 @@ export default function UebungsScreen() {
           <FrageRenderer frage={normFrage as unknown as Frage} />
         </div>
 
-        {/* Selbstbewertung-Dialog (Freitext/Zeichnen/PDF/Audio/Code) —
-            Musterlösung kommt vom Server (Phase 2), Fallback auf frage.musterlosung
-            für Demo-Modus / angeleitete Übungen wo die Frage lokal ist. */}
-        {selbstbewertungOffen && (letzteMusterloesung || frage.musterlosung) && (
+        {/* Selbstbewertung-Dialog (Freitext/Zeichnen/PDF/Audio/Code).
+            Musterlösung wird oben in normFrage gepatcht (frage.musterlosung || letzteMusterloesung). */}
+        {selbstbewertungOffen && normFrage.musterlosung && (
           <SelbstbewertungsDialog
-            musterloesung={letzteMusterloesung || frage.musterlosung || ''}
+            musterloesung={normFrage.musterlosung}
             onWahl={handleSelbstbewerten}
           />
         )}

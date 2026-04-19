@@ -325,6 +325,8 @@ export const useUebenUebungsStore = create<UebungsState>((set, get) => ({
       },
       feedbackSichtbar: false,
       letzteAntwortKorrekt: null,
+      letzteMusterloesung: null,
+      pruefFehler: null,
     })
   },
 
@@ -340,6 +342,8 @@ export const useUebenUebungsStore = create<UebungsState>((set, get) => ({
       session: { ...session, aktuelleFrageIndex: vorherigerIndex },
       feedbackSichtbar: hatAntwort,
       letzteAntwortKorrekt: hatAntwort ? (session.ergebnisse[vorherigeFrage.id] ?? null) : null,
+      letzteMusterloesung: null,
+      pruefFehler: null,
     })
   },
 
@@ -361,6 +365,8 @@ export const useUebenUebungsStore = create<UebungsState>((set, get) => ({
       },
       feedbackSichtbar: false,
       letzteAntwortKorrekt: null,
+      letzteMusterloesung: null,
+      pruefFehler: null,
     })
   },
 
