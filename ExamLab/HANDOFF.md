@@ -6,6 +6,67 @@
 
 ---
 
+## Session 122 — Phase 2 Backend-Security + Server-Korrektur-Endpoint (19.04.2026)
+
+### Stand
+**Phase 2 auf `feature/ueben-security-korrekturendpoint` — wartet auf Staging-Deploy + User-Test.**
+
+Löst den Haupt-Bug aus S119: `lernplattformLadeFragen()` lieferte Lösungsdaten 1:1 an SuS. Neuer Server-Korrektur-Endpoint erlaubt weiterhin sofortiges Feedback im selbstständigen Üben, ohne dass je eine Lösung im SuS-Network-Tab landet.
+
+### Umgesetzt — 11 Tasks auf Branch `feature/ueben-security-korrekturendpoint`
+
+**Backend (`apps-script-code.js`):**
+| Task | Inhalt |
+|------|--------|
+| 6 | `shuffle_` Fisher-Yates Helper |
+| 7 | `bereinigeFrageFuerSuSUeben_` — Löschung aller 20-Typen-Lösungsfelder + Mischung für 8 Typen |
+| 8 | `lernplattformLadeFragen` bereinigt SuS-Path + Adapter schickt `email` |
+| 9 | `pruefeAntwortServer_` + `pruefeFibuAntwortServer_` — 1:1 Port aus `korrektur.ts` |
+| 10 | `lernplattformPruefeAntwort` Endpoint + `ladeFrageUnbereinigtById_` + `doPost`-Routing |
+
+**Security-Fixes (nach Code-Review, C1..C6 + I1):**
+- **Auth-Bypass-Fix** (C-1/C-2): `lernplattformValidiereToken_` + `istGruppenMitglied_` — Email nur aus validem Token, nicht aus Request-Body. Ohne Token: SuS-Pfad, niemals LP.
+- **Legacy-Antwort-Normalizer** (C-3): `normalisiereAntwortServer_` 1:1 Port aus `normalizeAntwort.ts` (Aliases multi/tf/fill/calc/sort/open/zeichnen/bilanz/gruppe).
+- **T-Konto Saldo-Leak** (C-4): `saldo` + `anfangsbestand` (wenn nicht vorgegeben) entfernt.
+- **MC `erklaerung`-Leak** (C-5): `optionen[].erklaerung` in `bereinigeFrageFuerSuS_` gelöscht.
+- **IDOR + Familie-Gruppen** (C-6): `ladeFrageUnbereinigtById_(frageId, gruppe)` — Familie-Sheet-Support + Gruppen-Mitgliedschaft-Validierung.
+- **Rate-Limit** (I-1): 30 → 10/min auf `lernplattformRateLimitCheck_`.
+
+**Frontend (Tasks 12-16 via Subagent-Driven-Development):**
+| Task | Inhalt |
+|------|--------|
+| 12 | `PruefResultat`-Type + `uebenKorrekturApi.pruefeAntwortApi` Service |
+| 13 | `uebungsStore.pruefeAntwortJetzt` async, neue States `speichertPruefung`/`pruefFehler`/`letzteMusterloesung` |
+| 14 | `useFrageAdapter` propagiert neue States |
+| 15 | `QuizNavigation` Spinner + `aria-busy`; `UebungsScreen` `role="alert"`-Retry-Banner |
+| 16 | `uebenSecurityInvariant.test.ts` Snapshot-Test gegen 11-Felder-Sperrliste |
+
+**Selbstbewertung-Fix (Subagent-Risk-Report):**
+Bei Freitext/Visualisierung/PDF/Audio/Code war `frage.musterlosung` nach Bereinigung leer — `SelbstbewertungsDialog` nutzt jetzt `letzteMusterloesung` aus Store (kommt vom Server bei Prüf-Call). `handlePruefen` ruft für alle Typen `pruefeAntwortJetzt`; `useEffect` öffnet den Dialog wenn die Musterlösung eintrifft. Fallback auf `frage.musterlosung` für Demo-Modus.
+
+### Verifikation (lokal)
+- tsc -b: ✅
+- Tests: ✅ 353/353 (39 Files, 11 neue Tests)
+- Build: ✅
+- Subagent-Reviews: Code-Quality + Spec-Compliance durchgelaufen, Security-Findings adressiert.
+
+### ⚠️ Kritisch: Phase 2 MUSS atomisch deployen
+- Phase-1-Normalizer rekonstruiert `paare[]` NICHT aus `linksItems/rechtsItems` (Paarung = Lösung). Client auf Phase-1-Code mit Phase-2-Backend → Zuordnung-Korrektur immer `false`.
+- **Lösung:** Frontend (Tasks 12-16) + Backend (Tasks 6-10) müssen gleichzeitig live gehen. Kein partial-Merge.
+- Spec-Dokument ergänzt.
+
+### Apps-Script-Deploy (User)
+**Erforderlich vor Merge zu main.** User öffnet Apps-Script-Editor, kopiert `apps-script-code.js`, erstellt neue Bereitstellung.
+
+### Offene Schritte für S122
+- [ ] Staging-Push + Apps-Script-Deploy durch User
+- [ ] Browser-E2E-Test mit echten Logins (LP + SuS): Network-Check SuS-Response, 15 Fragetyp-Test (MC, R/F, Lückentext, Zuordnung, Sortierung, alle Bildtypen, FiBu), Selbstbewertungs-Flow, Offline-Retry, Rate-Limit
+- [ ] LP-Freigabe
+- [ ] Merge + Branch-Cleanup
+- [ ] Lehre in `rules/` dokumentieren
+
+---
+
 ## Session 121 — Phase 1 Frontend-Defensive (19.04.2026)
 
 ### Stand
