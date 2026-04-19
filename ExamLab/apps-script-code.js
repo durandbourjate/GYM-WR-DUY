@@ -7601,6 +7601,31 @@ function lernplattformLadeFragen(body) {
       }
     }
 
+    // Pre-Warm CacheService: alle unbereinigten Fragen einmalig speichern.
+    // Jeder spätere lernplattformPruefeAntwort-Call findet die Frage <100ms im Cache,
+    // statt erneut Sheet-Reads über alle Tabs zu machen.
+    try {
+      var cache = CacheService.getScriptCache();
+      var cacheEntries = {};
+      for (var pf = 0; pf < alleFragen.length; pf++) {
+        var fr = alleFragen[pf];
+        if (!fr || !fr.id) continue;
+        try {
+          var serialized = JSON.stringify(fr);
+          if (serialized.length < 95000) { // CacheService Limit ~100KB
+            cacheEntries['frage_v1_' + FRAGENBANK_ID + '_' + fr.id] = serialized;
+          }
+        } catch (eS) { /* skip frage on serialize error */ }
+      }
+      if (Object.keys(cacheEntries).length > 0) {
+        // putAll batch-schreibt in einem Call (max 1000 Keys, Total <9MB) — günstig.
+        cache.putAll(cacheEntries, 3600); // 1h TTL
+      }
+    } catch (eCache) {
+      // Cache-Failure ist nicht kritisch — Prüf-Calls fallen auf Sheet-Read zurück.
+      console.log('[lernplattformLadeFragen] Pre-Warm Cache fehlgeschlagen: ' + eCache.message);
+    }
+
     // Security: SuS erhalten bereinigte + gemischte Fragen (LP sieht Original)
     if (!istLP) {
       alleFragen = alleFragen.map(bereinigeFrageFuerSuSUeben_);
