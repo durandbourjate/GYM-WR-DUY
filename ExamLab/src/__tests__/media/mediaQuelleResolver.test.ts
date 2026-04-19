@@ -57,7 +57,6 @@ describe('ermittleAnhangQuelle', () => {
       driveFileId: 'ALT',
       dateiname: 'x.png',
       mimeType: 'image/png',
-      groesseBytes: 100,
     })
     if (q?.typ === 'drive') expect(q.driveFileId).toBe('NEU')
   })
@@ -68,7 +67,6 @@ describe('ermittleAnhangQuelle', () => {
       driveFileId: 'abc',
       dateiname: 'x.png',
       mimeType: 'image/png',
-      groesseBytes: 100,
     })
     expect(q?.typ).toBe('drive')
   })
