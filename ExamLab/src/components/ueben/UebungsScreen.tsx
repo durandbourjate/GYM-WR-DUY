@@ -19,6 +19,7 @@ export default function UebungsScreen() {
     toggleUnsicher, istUnsicher, istSessionFertig, beendeSession,
     aktuelleFrage, kannZurueck,
     pruefeAntwortJetzt, selbstbewertenById,
+    speichertPruefung, pruefFehler,
   } = useUebenUebungsStore()
   const { zuErgebnis } = useSuSNavigation()
 
@@ -109,6 +110,22 @@ export default function UebungsScreen() {
       />
 
       <main className="max-w-2xl mx-auto p-4">
+        {/* Retry-Banner bei fehlgeschlagener Server-Prüfung (Phase 2) */}
+        {pruefFehler && (
+          <div
+            role="alert"
+            className="mb-3 p-3 rounded-lg bg-red-50 text-red-800 dark:bg-red-900/30 dark:text-red-300 flex items-center justify-between gap-3"
+          >
+            <span>Prüfung fehlgeschlagen: {pruefFehler}</span>
+            <button
+              onClick={handlePruefen}
+              className="underline hover:no-underline font-medium whitespace-nowrap"
+            >
+              Erneut versuchen
+            </button>
+          </div>
+        )}
+
         {/* Frage-Karte — Fragetyp-Komponenten rendern fragetext selbst, analog Prüfungs-Modus (Layout.tsx) */}
         <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm p-6 mb-4">
           <FrageRenderer frage={normFrage as unknown as Frage} />
@@ -130,6 +147,7 @@ export default function UebungsScreen() {
           hatZwischenstand={hatZwischenstand && !selbstbewertungOffen}
           istLetzteFrage={session.aktuelleFrageIndex >= session.fragen.length - 1}
           istSessionFertig={istSessionFertig()}
+          speichertPruefung={speichertPruefung}
           onZurueck={vorherigeFrage}
           onUeberspringen={ueberspringen}
           onPruefen={handlePruefen}
