@@ -51,20 +51,50 @@ if (!istLP) {
 
 **B2 — `bereinigeFrageFuerSuSUeben_` (neu)**
 
-Baut auf `bereinigeFrageFuerSuS_` auf und ergänzt Mischung pro Typ. Mischung via Fisher-Yates (`shuffle_(arr)` Helper).
+Baut auf `bereinigeFrageFuerSuS_` auf. Zwei Aufgaben: (a) **alle 20 Typen:** Lösungsdaten entfernen, (b) **8 ausgewählte Typen:** zusätzlich Reihenfolgen mischen. Mischung via Fisher-Yates (`shuffle_(arr)` Helper).
 
-| Typ | Zusatz zu `bereinigeFrageFuerSuS_` |
-|-----|-----------------------------------|
+**Löschung (alle 20 Typen) — via `bereinigeFrageFuerSuS_` + Ergänzungen:**
+
+| Typ | Zu entfernen | Notiz |
+|-----|-------------|-------|
+| `mc` | `musterlosung`, `bewertungsraster`, `optionen[].korrekt` | bereits in `bereinigeFrageFuerSuS_` |
+| `richtigfalsch` | `musterlosung`, `aussagen[].korrekt`, `aussagen[].erklaerung` | bereits vorhanden |
+| `lueckentext` | `musterlosung`, `luecken[].korrekteAntworten`, `luecken[].korrekt` | bereits vorhanden |
+| `berechnung` | `musterlosung`, `ergebnisse[].korrekt`, `ergebnisse[].toleranz` | bereits vorhanden |
+| `zuordnung` | `musterlosung`, `paare[].rechts` (siehe Split unten) | **NEU** |
+| `sortierung` | `musterlosung` (elemente[] wird gemischt — siehe unten) | bereits vorhanden |
+| `bildbeschriftung` | `musterlosung`, `labels[].zoneId` oder `.korrekt` | **NEU** — Zone-Zuordnung ist die Lösung |
+| `dragdrop_bild` | `musterlosung`, `labels[].zoneId` | **NEU** |
+| `hotspot` | `musterlosung`, `hotspots[].korrekt` | **NEU** |
+| `buchungssatz` | `musterlosung`, `buchungen[].sollKonto`/`habenKonto`/`betrag` | **NEU** (korrekt-Buchung) |
+| `tkonto` | `musterlosung`, `korrekt`/`sollEintraege`/`habenEintraege` | **NEU** |
+| `bilanzstruktur` | `musterlosung`, `korrekt`-Felder pro Eintrag | **NEU** |
+| `kontenbestimmung` | `musterlosung`, `konten[].korrekt` | **NEU** |
+| `formel` | `musterlosung`, `korrekt` (LaTeX-Lösung) | **NEU** |
+| `aufgabengruppe` | Teilaufgaben rekursiv bereinigen | bereits vorhanden |
+| `freitext` | `musterlosung`, `bewertungsraster` | kommt erst bei Selbstbewertung über `lernplattformPruefeAntwort` |
+| `visualisierung` (Zeichnen) | `musterlosung`, `bewertungsraster`, Referenz-Zeichnung falls vorhanden | analog freitext |
+| `pdf` | `musterlosung`, `bewertungsraster` | analog freitext |
+| `audio` | `musterlosung`, `bewertungsraster` | analog freitext |
+| `code` | `musterlosung`, `bewertungsraster`, Referenz-Lösung | analog freitext |
+
+**Mischung (8 Typen) — zusätzlich nach Löschung:**
+
+| Typ | Mischung |
+|-----|----------|
 | `mc` | `optionen[]` mischen |
 | `richtigfalsch` | `aussagen[]` mischen |
-| `sortierung` | `elemente[]` mischen (Original = Lösung) |
+| `sortierung` | `elemente[]` mischen (Original = Lösung!) |
 | `zuordnung` | `paare[{links,rechts}]` → `linksItems[], rechtsItems[]` (rechts gemischt) |
 | `bildbeschriftung` | `labels[]` mischen |
 | `dragdrop_bild` | `labels[]` mischen |
-| `hotspot` | `hotspots[]` mischen, `korrekt`-Flag pro Hotspot entfernen |
+| `hotspot` | `hotspots[]` mischen |
 | `lueckentext` | Dropdown-Optionen pro Lücke mischen (falls vorhanden) |
 
 Pro Aufruf neue Mischung — das macht DevTools-Scraping über mehrere Requests nutzlos.
+
+**Unberührt (Reihenfolge nicht leak-relevant):**
+`berechnung`, `freitext`, `visualisierung`, `pdf`, `audio`, `code`, `formel`, FiBu-Typen, `aufgabengruppe`.
 
 **B3 — Neuer Endpoint `lernplattformPruefeAntwort`**
 
@@ -79,9 +109,34 @@ Flow:
 Response: { success: true, korrekt, musterlosung?, selbstbewertung?, korrektDetails? }
 ```
 
-**B4 — Korrektur-Portierung**
+**B4 — Korrektur-Portierung: Server-Mapping pro Typ**
 
-Neue Helper `pruefeAntwortServer_(frage, antwort)` im Apps-Script. Portiert `korrektur.ts::pruefeAntwort` für alle 20 Fragetypen. Logik spiegelt Client-Code, Tests prüfen Paritäts-Invariante.
+Neue Helper `pruefeAntwortServer_(frage, antwort)` im Apps-Script. Nicht alle 20 Typen werden automatisch korrigiert — die Selbstbewertungs-Typen bekommen nur die Musterlösung zurück, kein `korrekt`-Boolean.
+
+| Fragetyp | Server-Verhalten |
+|----------|-----------------|
+| `mc` | auto-korrigieren → `{korrekt, musterlosung}` |
+| `richtigfalsch` | auto-korrigieren |
+| `lueckentext` | auto-korrigieren (Case-Sensitive beachten) |
+| `berechnung` | auto-korrigieren (Toleranz beachten) |
+| `zuordnung` | auto-korrigieren |
+| `sortierung` | auto-korrigieren (Reihenfolge vergleichen) |
+| `bildbeschriftung` | auto-korrigieren (Label → Zone matchen) |
+| `dragdrop_bild` | auto-korrigieren |
+| `hotspot` | auto-korrigieren (Distanz-Check wie in Pool) |
+| `buchungssatz` | auto-korrigieren |
+| `tkonto` | auto-korrigieren |
+| `bilanzstruktur` | auto-korrigieren |
+| `kontenbestimmung` | auto-korrigieren |
+| `formel` | auto-korrigieren (LaTeX-Vergleich) |
+| `aufgabengruppe` | rekursiv: Teilaufgaben einzeln korrigieren, aggregiertes Resultat |
+| `freitext` | **Selbstbewertung** → `{selbstbewertung: true, musterlosung, bewertungsraster?}` |
+| `visualisierung` | Selbstbewertung analog freitext |
+| `pdf` | Selbstbewertung analog freitext |
+| `audio` | Selbstbewertung analog freitext |
+| `code` | Selbstbewertung analog freitext |
+
+**Portierung:** 1:1 aus `korrektur.ts::pruefeAntwort` (Switch-Case pro Typ). Test-Paritäts-Invariante: Für jede (frage, antwort)-Kombination in `src/utils/autoKorrektur.test.ts` Fixtures muss `pruefeAntwort(frage, antwort) === pruefeAntwortServer_(frage, antwort)` gelten. Mit einem kleinen JS-Test-Harness im Apps-Script-Editor oder via exportierten JSON-Fixtures zu verifizieren.
 
 ### Frontend (ExamLab/src)
 
@@ -108,7 +163,7 @@ Ruft `store.pruefeAntwortJetzt` async. Propagiert `speichertPruefung`, `pruefFeh
 
 **F4 — UI**
 
-- `QuizNavigation`: „Antwort prüfen"-Button mit Spinner während Request, disabled
+- `QuizNavigation`: „Antwort prüfen"-Button mit Spinner während Request, `disabled` + `aria-busy="true"` während `speichertPruefung`
 - `UebungsScreen` + `SelbstbewertungsDialog`: `pruefFehler`-Banner mit Retry-Button
 - Selbstbewertungstypen: Musterlösung kommt zusammen mit `selbstbewertung: true` Flag
 
@@ -119,6 +174,10 @@ Weiterhin genutzt für:
 - Angeleitete Übungen (Modus=`uebung` via `ladePruefung`) — dort korrigiert LP manuell
 
 Kein Delete, keine Breaking-Change.
+
+**F6 — Telemetrie (optional)**
+
+Apps-Script `pruefeAntwortServer_` loggt optional nach `LOG_SHEET_ID` (falls vorhanden) bei Korrektur-Ausnahmen — Portierungs-Drift zwischen `korrektur.ts` und `pruefeAntwortServer_` frühzeitig detektieren.
 
 ## Datenfluss (neu)
 
@@ -179,12 +238,35 @@ SuS Selbstbewertung (Freitext)
 - **Demo-Modus** — `einrichtungsFragen` lokal, kein Backend — bleibt lokale Korrektur.
 - **Pool-Daten-Korrekturen** — z.B. `korrekteAntworten` in Lückentext-Daten unvollständig (S118-Normalizer-Workaround). Separates Thema Daten-Audit.
 
-## Migration / Backwards Compat
+## Migration / Deployment-Reihenfolge
 
-- **Keine Client-Daten-Migration nötig** — API-Shape-Änderung ist additiv (`lernplattformPruefeAntwort` ist neu, `lernplattformLadeFragen` liefert weniger Felder für SuS).
-- **Apps-Script-Deploy erforderlich** (User muss nach Merge manuell neue Bereitstellung erstellen — Deployment-Workflow-Rule).
-- **Alte Clients vor diesem Fix:** bekommen bereinigte Fragen → deren Client-side `pruefeAntwort` liefert immer `korrekt: false` (weil Lösungsfelder fehlen). Akzeptabel — User updated Browser, neue Version aktiv.
-- **Frontend-Feature-Flag:** nicht nötig, da Frontend + Backend zusammen deployen.
+Race-Risiko: während eines Deploys kann ein alter Client (z.B. in einem offenen Tab ohne Hard-Reload) gegen das neue Backend sprechen. Bereinigte Fragen ohne erwartete Felder → `TypeError: Cannot read properties of undefined` (genau das Problem aus S118-Lehre).
+
+**Pflicht-Reihenfolge (Zweistufiger Deploy):**
+
+**Phase 1 — Frontend-Defensive (Staging → main, ohne Backend-Änderung):**
+1. In `src/utils/ueben/fragetypNormalizer.ts` für alle 8 Misch-Typen defensive Normalizer ergänzen (analog `normalisiereLueckentext` aus S118):
+   - `normalisiereMc`: wenn `optionen[].korrekt` fehlt → `false`-Default
+   - `normalisiereRichtigFalsch`: wenn `aussagen[].korrekt` fehlt → `false`
+   - `normalisiereSortierung`: wenn `elemente[]` fehlt → `[]`
+   - `normalisiereZuordnung`: Fallback `paare[] || (linksItems + rechtsItems split)`
+   - `normalisiereBildbeschriftung` / `normalisiereDragDropBild`: `labels[].zoneId` Fallback
+   - `normalisiereHotspot`: `hotspots[].korrekt` Fallback + defensive Array-Checks
+2. In `korrektur.ts::pruefeAntwort` defensive Guards (alle `frage.X.filter/some/every`-Aufrufe wrappen in `Array.isArray(frage.X)`).
+3. Deploy, auf Staging browser-verifiziert, Merge auf `main`.
+4. **Ab hier:** alte Clients die noch das alte Backend sehen funktionieren wie bisher; neue Clients können sowohl altes (volle Daten) als auch neues (bereinigt) Backend verarbeiten.
+
+**Phase 2 — Backend-Änderung (Frontend-Defensive aktiv):**
+1. Backend-Bereinigung + neuen Endpoint + Frontend-Async-Refactor implementieren.
+2. Deploy Frontend + Apps-Script manuell.
+3. Staging-Test mit echten Logins.
+4. LP-Freigabe → Merge `preview` → `main`.
+
+**Cache-Buster / SW-Unregister:**
+- Nach Phase-2-Deploy: Bei `pruefFehler` mit `status: 0` (Netzwerkfehler) oder Schema-Mismatch: automatisch Service-Worker unregistrieren + `caches.delete()` + Hard-Reload (pattern aus `LPStartseite::lazyMitRetry`).
+- Dokumentierter manueller Weg: `?cb=<timestamp>` anhängen (S115-Lehre in deployment-workflow.md).
+
+**Frontend-Feature-Flag:** nicht nötig — Phase 1 ist rückwärtskompatibel, Phase 2 koppelt Frontend- und Backend-Deploy.
 
 ## Sicherheits-Invariante
 
@@ -204,10 +286,14 @@ forall (frage in response.data):
 
 Ein Vitest-Snapshot-Test prüft diese Invariante gegen eine Mock-Response.
 
-## Deployment-Reihenfolge
+## Release-Checkliste (Phase 2)
 
-1. Backend + Frontend Merge auf `preview` (Staging)
-2. User deployed Apps-Script Bereitstellung
-3. E2E-Test auf Staging mit echten Logins
-4. LP-Freigabe
-5. Merge `preview` → `main` → Production
+Die Zweiphasigkeit ist im „Migration / Deployment-Reihenfolge"-Abschnitt oben dokumentiert. Dies ist die Phase-2-Runlist:
+
+1. Backend-Bereinigung + neuer Endpoint + Frontend-Async-Refactor auf `feature/ueben-security-korrekturendpoint`
+2. Lokale Checks: `tsc -b` · `vitest run` · `npm run build`
+3. Push zu `preview` (Staging) — Frontend deployed automatisch via GitHub Actions
+4. User deployed Apps-Script Bereitstellung manuell
+5. E2E-Test auf Staging mit echten Logins (LP + SuS), inkl. Sicherheits-Invariante im Network-Tab
+6. LP-Freigabe
+7. Merge `preview` → `main` → Production
