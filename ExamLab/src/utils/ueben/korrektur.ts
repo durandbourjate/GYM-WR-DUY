@@ -185,13 +185,24 @@ export function pruefeAntwort(frage: Frage, antwort: Antwort | unknown): boolean
       if (a.typ !== 'hotspot') return false
       const bereiche = Array.isArray(frage.bereiche) ? frage.bereiche : []
       const klicks = Array.isArray(a.klicks) ? a.klicks : []
-      return bereiche.length > 0 && bereiche.length === klicks.length &&
-        bereiche.every(b =>
-          klicks.some(k => {
-            const r = b.koordinaten.radius || 10
-            return Math.hypot(b.koordinaten.x - k.x, b.koordinaten.y - k.y) < r
-          })
-        )
+      if (bereiche.length === 0 || klicks.length === 0) return false
+      // Korrekt = jeder Bereich von mind. einem Klick getroffen (form-abhaengig:
+      // rechteck pruefung x/y + breite/hoehe, kreis per Radius-Distanz).
+      return bereiche.every(b =>
+        klicks.some(k => {
+          const ko = b.koordinaten
+          if (b.form === 'rechteck') {
+            return k.x >= ko.x && k.x <= ko.x + (ko.breite ?? 0) &&
+                   k.y >= ko.y && k.y <= ko.y + (ko.hoehe ?? 0)
+          }
+          if (b.form === 'kreis') {
+            const dx = k.x - ko.x
+            const dy = k.y - ko.y
+            return Math.sqrt(dx * dx + dy * dy) <= (ko.radius ?? 10)
+          }
+          return false
+        })
+      )
     }
 
     case 'bildbeschriftung': {
