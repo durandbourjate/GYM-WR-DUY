@@ -6,6 +6,45 @@
 
 ---
 
+## Session 121 — Phase 1 Frontend-Defensive (19.04.2026)
+
+### Stand
+**Phase 1 auf `preview` (Staging) — wartet auf LP-Freigabe, dann Merge zu `main`.**
+
+Vorbereitung für das grosse S122-Security-Hardening (eigener Endpoint für Übungs-Korrektur). Phase 1 härtet den Client defensiv, damit während Phase-2-Deploy (wenn das Backend plötzlich Lösungsfelder wegfiltert) keine White-Screen-Race entsteht.
+
+### Umgesetzt — 4 TDD-Tasks auf Branch `phase1/ueben-defensive-normalizer`
+
+| Task | Normalizer | Commit |
+|------|-----------|--------|
+| 1 | `normalisiereMc` — `optionen[].korrekt` default `false`, `optionen` fallback `[]` | `97f6766` |
+| 2 | `normalisiereRichtigFalsch` — `aussagen[].korrekt` default + `aussagen` fallback | `1c4ee54` |
+| 3 | `normalisiereSortierung` + `normalisiereZuordnung` — `elemente[]`/`paare[]` fallbacks + `linksItems`/`rechtsItems` Rekonstruktion | `4a0f7d4` |
+| 4 | `Array.isArray`-Guards in **allen 14 Array-Cases** von `korrektur.ts::pruefeAntwort` + Fail-closed `length > 0` gegen Vacuous-Truth | `b778685` |
+
+**Begründung Fail-closed `length > 0`:** `[].every(…)` liefert per JS-Spec `true`. Ohne den Guard würde ein SuS-Payload ohne Lösungs-Array als „korrekt" bewertet. Fail-closed `false` ist sicher.
+
+### Verifikation
+- tsc -b: ✅
+- Tests: ✅ 342/342 (36 Files, +17 neue Tests aus Tasks 1-4)
+- Build: ✅
+- Subagent-Reviews: Alle 4 Tasks via Spec-Compliance-Review + Code-Quality-Review approved (1× Critical nie, 1× Important nie, einige Minor advisory)
+- Browser-Verifikation auf Staging: **steht aus** (Phase 1 hat keine sichtbare UI-Änderung — es geht um Crash-Robustheit. Smoke-Test: SuS öffnet Übung, nichts crasht)
+
+### Apps-Script
+**Nicht geändert — kein Deploy nötig.**
+
+### Plan
+Phase 2 (Backend-Bereinigung + neuer Endpoint + Async-Refactor) kommt nach Phase-1-Merge zu main auf Branch `feature/ueben-security-korrekturendpoint`. Spec + Plan bereits geschrieben (`docs/superpowers/specs/` + `docs/superpowers/plans/`).
+
+### Offene Schritte für S121
+- [ ] Staging-Verifikation (Smoke-Test SuS-Übung)
+- [ ] LP-Freigabe
+- [ ] Merge `phase1/ueben-defensive-normalizer` → `main`
+- [ ] Branch-Cleanup (lokal + remote)
+
+---
+
 ## Session 120 — S118-Staging-Verifikation + R/F-Dedup-Followup (19.04.2026)
 
 ### Stand
