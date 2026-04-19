@@ -6,6 +6,35 @@
 
 ---
 
+## Session 125 — Phase 5 abgeschlossen (19.04.2026 spät)
+
+### Stand
+**Merge-Commit `64258b4` auf `main`. Apps-Script deployed + Migration ausgeführt. 73 Fragen bekamen MediaQuelle-Felder. Cooling-Off-Periode bis Phase 6 startet.**
+
+### Migration-Ergebnis (Apps-Script-Endpoint `admin:migrierMediaQuelle`, dryRun=false)
+| Sheet | Rows | Aktualisiert |
+|-------|------|--------------|
+| VWL | 1080 | 33 |
+| BWL | 536 | 18 |
+| Recht | 796 | 22 |
+| Informatik | — | Tab existiert nicht |
+| **Total** | **2412** | **73** |
+
+0 Fehler. Idempotent verifiziert (zweiter Durchlauf auf BWL → 0 neue Updates).
+
+### Staging-Frontend-Check nach Migration
+- BWL `bwl_marketing:hotspot01` im Editor geöffnet → Bild lädt (Pool-URL, 672×400).
+- Keine Regression.
+
+### Offen: Phase 6 — Cleanup (frühestens +2 Wochen)
+Nach erfolgreichem Cooling-Off ohne Bug-Reports:
+- Alt-Felder (`bildUrl`, `pdfUrl`, `pdfBase64`, `pdfDriveFileId`) aus `types/fragen.ts` entfernen.
+- `mediaUtils.ts` Hotfix (`mimeType: string | null | undefined`) zurückbauen auf strenge Signatur (`string`).
+- Editor-UI auf `MediaUpload`/`MediaAnzeige` umbauen (Task 9 aus Plan).
+- PDF-State-Init Hotfix überflüssig machen (nach Editor-Umbau).
+
+---
+
 ## Session 125 — Phase 5 vorbereitet (19.04.2026 spät)
 
 ### Stand
