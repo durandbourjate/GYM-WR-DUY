@@ -58,12 +58,42 @@ Bei Freitext/Visualisierung/PDF/Audio/Code war `frage.musterlosung` nach Bereini
 ### Apps-Script-Deploy (User)
 **Erforderlich vor Merge zu main.** User öffnet Apps-Script-Editor, kopiert `apps-script-code.js`, erstellt neue Bereitstellung.
 
-### Offene Schritte für S122
-- [ ] Staging-Push + Apps-Script-Deploy durch User
-- [ ] Browser-E2E-Test mit echten Logins (LP + SuS): Network-Check SuS-Response, 15 Fragetyp-Test (MC, R/F, Lückentext, Zuordnung, Sortierung, alle Bildtypen, FiBu), Selbstbewertungs-Flow, Offline-Retry, Rate-Limit
-- [ ] LP-Freigabe
-- [ ] Merge + Branch-Cleanup
-- [ ] Lehre in `rules/` dokumentieren
+### Hotfixes nach Staging-E2E-Test (chronologisch)
+
+| Commit | Inhalt |
+|--------|--------|
+| `7553777` | DragDrop Labels `[object Object]` — `Object.assign({}, "string")` erzeugte Char-Objekt; Fix: `typeof !== 'object'` durchreichen |
+| `f92a931` | `frage.musterlosung` leer für SuS → Komponenten zeigen nichts; Fix: `UebungsScreen` patcht `baseFrage.musterlosung = letzteMusterloesung` zentral; + `naechsteFrage`/`vorherigeFrage`/`ueberspringen` resetten `letzteMusterloesung`+`pruefFehler` (vermeidet Vor-Anzeige der vorigen Lösung) |
+| `8b5aebf` | Zuordnung zeigte nur Fragetext — Backend hatte `paare[]` durch `linksItems`/`rechtsItems` ersetzt, Frontend liest `paare[]`; Fix: Backend behält `paare[]` und mischt nur die `rechts`-Werte (Paarung verschleiert, UI unverändert kompatibel) |
+| `2e287df` | Speed v1: `fachbereich`-Hint vom Client mitgeschickt → Server priorisiert 1 Tab statt 4; CacheService 1h für gefundene Frage; Spalten-First-Lookup (id-Spalte separat, Object-Mapping nur bei Hit) |
+| `867b21c` | Speed v2: Pre-Warm Cache beim Initial-Load — `lernplattformLadeFragen` schreibt alle Fragen via `cache.putAll()` (1h TTL), spätere Prüf-Calls finden sie sofort |
+| (latest) | UX: Spinner-Text „Korrektur lädt …" statt nur „Prüfe…" — kommuniziert Server-Roundtrip |
+
+### Speed-Befund (aus Apps-Script-Logs, 19.04.2026)
+- Pro Prüf-Klick: **2 doPost-Calls** = ca. 4s + 2s ≈ **5.9s gesamt**
+- Auch reine `doGet`s dauern **1.1-2.8s** — Apps-Script-Latenz allein ist >1s, **plattform-inhärent**
+- Pre-Warm-Cache + fachbereich-Hint sparen Sheet-Reads (~75%) — aber nicht den HTTPS-Roundtrip
+- **Untere Grenze pro Apps-Script-Call: ~1.5-2s** (HTTPS-Handshake + V8-Container-Init + Spreadsheet-Auth)
+- **Akzeptiert als Tradeoff für Sicherheits-Architektur.** User plant langfristig Backend-Migration auf Cloud-Run/Vercel-Edge → echte Lösung dort.
+
+### Bekannte offene Punkte (eigene Sessions)
+- **Bildfragen-Pool-Audit**: Beveridge-Frage hat falsche Korrektur — siehe `memory/project_bildfragen_qualitaet.md`. Generelles Inhalts-Audit aller Pool-Fragen empfohlen.
+- **Backend-Migration**: Apps-Script-Latenz ist Plattform-Limit. Echte instant-UX nur durch Edge-Backend.
+
+### Verifikation nach Hotfixes (Staging mit echten Logins)
+- ✅ MC: Server-Korrektur → „Richtig!"
+- ✅ R/F: Server-Korrektur → „Richtig!"
+- ✅ DragDrop: Labels mit echten Texten + Server-Korrektur + Musterlösung
+- ✅ Zuordnung: 6 Paare mit Dropdowns, Server-Korrektur
+- ✅ Network-Schema: `{success, korrekt, musterlosung}` — keine Lösungs-Leaks
+- ✅ Vitest: 353/353 grün
+- ✅ tsc + build clean
+- ⚠️ Speed: 4-6s pro Prüf-Klick (siehe oben) — UX-Hinweis „Korrektur lädt …" mildert
+
+### Offene Schritte für S122-Abschluss
+- [ ] Merge `feature/ueben-security-korrekturendpoint` → `main`
+- [ ] Branch-Cleanup
+- [ ] Lehre in `rules/` (Apps-Script-Latenz dokumentieren, Pool-Audit-Trigger)
 
 ---
 

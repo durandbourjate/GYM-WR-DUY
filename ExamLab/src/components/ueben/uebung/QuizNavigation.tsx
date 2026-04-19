@@ -55,7 +55,7 @@ export default function QuizNavigation({
               className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"
             />
           )}
-          {speichertPruefung ? 'Prüfe…' : 'Antwort prüfen'}
+          {speichertPruefung ? 'Korrektur lädt …' : 'Antwort prüfen'}
         </button>
       )}
 
