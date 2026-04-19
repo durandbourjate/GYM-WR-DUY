@@ -6,10 +6,34 @@
 
 ---
 
-## Session 125 — MediaQuelle Phasen 0-4 (19.04.2026)
+## Session 125 — MediaQuelle Phasen 0-4 + Editor-Hotfixes (19.04.2026)
 
 ### Stand
-**Merge-Commit `52dd695` auf `main` + Push. Feature-Branch gelöscht. Phasen 0-4 abgeschlossen — Frontend komplett auf MediaQuelle Dual-Read + Dual-Write. Staging-E2E clean. Phasen 5 (Apps-Script-Migration) + 6 (Cleanup) offen.**
+**Merge-Commits `52dd695` (MediaQuelle Phasen 0-4) + `5f92449` (2 Editor-Hotfixes) auf `main` + Push. Feature-Branches gelöscht. Staging-E2E verifiziert.**
+
+### Editor-Hotfixes (nach Phase 4)
+Auf Branch `fix/editor-pool-bugs` — gemergt + gepusht, 2 offene Editor-Bugs aus Staging-Test behoben:
+
+**Hotfix 1 — pdfUrl im Editor erhalten (strukturell S124 Bug 2):**
+- `SharedFragenEditor.tsx` — `pdfUrl` State + State-Init aus `frage.pdfUrl`.
+- `TypEditorDispatcher.tsx` — `pdfUrl`/`setPdfUrl` als Props.
+- `PDFEditor.tsx` — Info-Box zeigt Pool/Drive-/URL-Referenz auch wenn nur `pdfUrl` oder `pdfDriveFileId` gesetzt (nicht nur bei `pdfBase64`). Entfernen-Button räumt alle drei.
+- `fragenFactory.ts` — `typDaten.pdfUrl` wird in `pdfQuelleAus`-Input gesteckt + im Output `pdfUrl` geschrieben.
+- Verhindert weiteren Data-Loss beim Speichern Pool-importierter PDF-Fragen.
+- **Einschränkung:** Bereits gespeicherte Pool-PDFs ohne `pdfUrl` im Backend brauchen Phase-5-Migrator (Re-Import aus Pool) zur Wiederherstellung.
+
+**Hotfix 2 — SVG-Container-Kollaps im Bild-Editor:**
+- `HotspotEditor.tsx`, `BildbeschriftungEditor.tsx`, `DragDropBildEditor.tsx` — Container `inline-block` → `block w-full max-w-2xl`, `<img>` → `block w-full h-auto`.
+- Pool-SVGs ohne `width`-Attribut waren unsichtbar (height: 0). Analog zu SuS-Seite (S115).
+- **Staging-verifiziert:** SVG jetzt 672×400 sichtbar im Editor.
+
+### Staging-E2E (echte Logins, Fragensammlung)
+- Hotspot-Filter → 11 Fragen, keine Errors
+- Hotspot-Editor öffnen (`bwl_marketing:hotspot01`) → SVG sichtbar (nach Hotfix 2)
+- PDF-Editor öffnen (`vwl_konjunktur:neu09`) → Editor clean (Hotfix 1 strukturell deployed, bestehende Frage hat pdfUrl im Backend bereits verloren)
+- Bildbeschriftung-Editor öffnen → Pool-SVG geladen
+- DragDropBild-Editor öffnen → Pool-SVG geladen
+- Vorherige ErrorBoundary-Crashes beim Typ-Filter (S124 mimeType-startsWith) sind Cache-Artefakte vom alten Chunk — mit dem neuen Chunk 0 Errors.
 
 ### Staging-E2E (echte Logins, Fragensammlung)
 - Hotspot-Filter → 11 Fragen, keine Errors
