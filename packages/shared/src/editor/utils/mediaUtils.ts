@@ -2,8 +2,8 @@
 export const MAX_GROESSE_STANDARD = 5 * 1024 * 1024  // 5 MB (Bild/PDF/Audio)
 export const MAX_GROESSE_VIDEO = 25 * 1024 * 1024     // 25 MB (Video)
 
-export function maxGroesseFuerMimeType(mimeType: string): number {
-  return mimeType.startsWith('video/') ? MAX_GROESSE_VIDEO : MAX_GROESSE_STANDARD
+export function maxGroesseFuerMimeType(mimeType: string | undefined | null): number {
+  return mimeType && mimeType.startsWith('video/') ? MAX_GROESSE_VIDEO : MAX_GROESSE_STANDARD
 }
 
 export function formatGroesse(bytes: number): string {
@@ -12,24 +12,27 @@ export function formatGroesse(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
 
-// MIME-Type Helpers
-export function istBild(mimeType: string): boolean {
-  return mimeType.startsWith('image/')
+// MIME-Type Helpers.
+// Akzeptieren undefined/null, weil ältere oder pool-importierte Anhänge mimeType
+// inkonsistent speichern. Ohne defensive Guards crashen die .startsWith-Aufrufe
+// und lassen Editor + Anhang-Anzeige abstürzen.
+export function istBild(mimeType: string | undefined | null): boolean {
+  return !!mimeType && mimeType.startsWith('image/')
 }
 
-export function istAudio(mimeType: string): boolean {
-  return mimeType.startsWith('audio/')
+export function istAudio(mimeType: string | undefined | null): boolean {
+  return !!mimeType && mimeType.startsWith('audio/')
 }
 
-export function istVideo(mimeType: string): boolean {
-  return mimeType.startsWith('video/') && mimeType !== 'video/embed'
+export function istVideo(mimeType: string | undefined | null): boolean {
+  return !!mimeType && mimeType.startsWith('video/') && mimeType !== 'video/embed'
 }
 
-export function istEmbed(mimeType: string): boolean {
+export function istEmbed(mimeType: string | undefined | null): boolean {
   return mimeType === 'video/embed'
 }
 
-export function istPDF(mimeType: string): boolean {
+export function istPDF(mimeType: string | undefined | null): boolean {
   return mimeType === 'application/pdf'
 }
 
