@@ -1557,6 +1557,138 @@ function bereinigeFrageFuerSuS_(frage) {
   return f;
 }
 
+/**
+ * Bereinigung für selbstständiges Üben: baut auf bereinigeFrageFuerSuS_ auf.
+ * Zusätzlich: entfernt weitere Lösungsfelder (FiBu + Formel + Bildbeschriftung/DragDrop/Hotspot)
+ * und mischt Reihenfolgen bei 8 Typen, damit konstantes Muster kein Hinweis auf Lösung gibt.
+ */
+function bereinigeFrageFuerSuSUeben_(frage) {
+  var f = bereinigeFrageFuerSuS_(frage);
+
+  // Zusätzliche Lösungsfeld-Bereinigungen (über Pruefungs-Variante hinaus)
+  if (f.buchungen) delete f.buchungen;
+  if (f.korrektBuchung) delete f.korrektBuchung;
+  if (f.sollEintraege) delete f.sollEintraege;
+  if (f.habenEintraege) delete f.habenEintraege;
+  if (f.korrekteFormel) delete f.korrekteFormel;
+  if (f.typ === 'formel' && f.korrekt) delete f.korrekt;
+
+  // FiBu: konten[].korrekt + bilanzEintraege[].korrekt + tkonto.loesung entfernen
+  if (Array.isArray(f.konten)) {
+    f.konten = f.konten.map(function(k) {
+      var c = Object.assign({}, k);
+      delete c.korrekt;
+      delete c.eintraege; // T-Konto-Lösungs-Einträge
+      return c;
+    });
+  }
+  if (Array.isArray(f.bilanzEintraege)) {
+    f.bilanzEintraege = f.bilanzEintraege.map(function(e) {
+      var c = Object.assign({}, e);
+      delete c.korrekt;
+      return c;
+    });
+  }
+  if (f.loesung) delete f.loesung; // bilanzstruktur.loesung
+  if (Array.isArray(f.aufgaben)) {
+    // kontenbestimmung.aufgaben[].erwarteteAntworten entfernen
+    f.aufgaben = f.aufgaben.map(function(a) {
+      var c = Object.assign({}, a);
+      delete c.erwarteteAntworten;
+      return c;
+    });
+  }
+
+  // Bildbeschriftung: labels[].zoneId IST die Lösung + beschriftungen[].korrekt
+  if ((f.typ === 'bildbeschriftung' || f.typ === 'dragdrop_bild') && Array.isArray(f.labels)) {
+    f.labels = f.labels.map(function(l) {
+      var c = Object.assign({}, l);
+      delete c.zoneId;
+      delete c.zone;
+      delete c.korrekt;
+      return c;
+    });
+  }
+  if (Array.isArray(f.beschriftungen)) {
+    f.beschriftungen = f.beschriftungen.map(function(b) {
+      var c = Object.assign({}, b);
+      delete c.korrekt;
+      return c;
+    });
+  }
+  if (Array.isArray(f.zielzonen)) {
+    f.zielzonen = f.zielzonen.map(function(z) {
+      var c = Object.assign({}, z);
+      delete c.korrektesLabel;
+      return c;
+    });
+  }
+
+  // Hotspot: bereiche[].korrekt + koordinaten unverändert (visuelles Target darstellen)
+  if (f.typ === 'hotspot' && Array.isArray(f.bereiche)) {
+    f.bereiche = f.bereiche.map(function(b) {
+      var c = Object.assign({}, b);
+      delete c.korrekt;
+      return c;
+    });
+  }
+  if (f.typ === 'hotspot' && Array.isArray(f.hotspots)) {
+    f.hotspots = f.hotspots.map(function(h) {
+      var c = Object.assign({}, h);
+      delete c.korrekt;
+      return c;
+    });
+  }
+
+  // Mischung (Fisher-Yates) pro Typ
+  switch (f.typ) {
+    case 'mc':
+      if (Array.isArray(f.optionen)) f.optionen = shuffle_(f.optionen);
+      break;
+    case 'richtigfalsch':
+      if (Array.isArray(f.aussagen)) f.aussagen = shuffle_(f.aussagen);
+      break;
+    case 'sortierung':
+      if (Array.isArray(f.elemente)) f.elemente = shuffle_(f.elemente);
+      break;
+    case 'zuordnung':
+      // Split in linksItems (Reihenfolge-konstant) + rechtsItems (gemischt)
+      if (Array.isArray(f.paare)) {
+        var links = f.paare.map(function(p, i) { return { id: p.id || 'L' + i, text: p.links }; });
+        var rechts = f.paare.map(function(p, i) { return { id: p.id || 'R' + i, text: p.rechts }; });
+        f.linksItems = links;
+        f.rechtsItems = shuffle_(rechts);
+        delete f.paare; // Paarung weg
+      }
+      break;
+    case 'bildbeschriftung':
+    case 'dragdrop_bild':
+      if (Array.isArray(f.labels)) f.labels = shuffle_(f.labels);
+      break;
+    case 'hotspot':
+      if (Array.isArray(f.hotspots)) f.hotspots = shuffle_(f.hotspots);
+      if (Array.isArray(f.bereiche)) f.bereiche = shuffle_(f.bereiche);
+      break;
+    case 'lueckentext':
+      if (Array.isArray(f.luecken)) {
+        f.luecken = f.luecken.map(function(l) {
+          if (Array.isArray(l.optionen)) {
+            return Object.assign({}, l, { optionen: shuffle_(l.optionen) });
+          }
+          return l;
+        });
+      }
+      break;
+  }
+
+  // Aufgabengruppe: rekursiv
+  if (Array.isArray(f.teilaufgaben)) {
+    f.teilaufgaben = f.teilaufgaben.map(bereinigeFrageFuerSuSUeben_);
+  }
+
+  return f;
+}
+
 // === FRAGEN LADEN ===
 
 function ladeFragen(fragenIds) {
