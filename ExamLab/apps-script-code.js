@@ -7227,6 +7227,8 @@ function lernplattformAendereRolle(body) {
 function lernplattformLadeFragen(body) {
   // gruppeId wird für Berechtigungsprüfung noch gebraucht, aber Fragen kommen aus der gemeinsamen Fragenbank
   var gruppeId = body.gruppeId;
+  var email = (body.email || '').toString().toLowerCase();
+  var istLP = istZugelasseneLP(email);
 
   // Prüfe ob Gruppe existiert (für Familie-Gruppen → eigenes Sheet)
   var gruppen = alleGruppenLaden_();
@@ -7269,6 +7271,11 @@ function lernplattformLadeFragen(body) {
         var frage = parseFrageKanonisch_(row, tabName);
         alleFragen.push(frage);
       }
+    }
+
+    // Security: SuS erhalten bereinigte + gemischte Fragen (LP sieht Original)
+    if (!istLP) {
+      alleFragen = alleFragen.map(bereinigeFrageFuerSuSUeben_);
     }
 
     return jsonResponse({ success: true, data: alleFragen });
