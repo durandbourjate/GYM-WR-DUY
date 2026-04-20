@@ -204,7 +204,11 @@ export default function DragDropBildEditor({ bildUrl, setBildUrl, zielzonen, set
     if (p) setMausPosition(p)
   }
 
-  const zonen = zielzonen.map(z => ({ id: z.id, punkte: z.punkte, akzent: 'violett' as const }))
+  // Defensiv: Zonen im Alt-Format (ohne Array-punkte) nicht rendern, sondern als Hinweis anzeigen
+  const istWohlgeformt = (z: DragDropBildZielzone) => Array.isArray((z as any).punkte) && (z as any).punkte.length >= 3
+  const sichereZonen = zielzonen.filter(istWohlgeformt)
+  const anzahlAlt = zielzonen.length - sichereZonen.length
+  const zonen = sichereZonen.map(z => ({ id: z.id, punkte: z.punkte, akzent: 'violett' as const }))
 
   return (
     <div className="space-y-4">
@@ -288,7 +292,7 @@ export default function DragDropBildEditor({ bildUrl, setBildUrl, zielzonen, set
               />
 
               {/* Zahlen-Badges */}
-              {zielzonen.map((zone, i) => {
+              {sichereZonen.map((zone, i) => {
                 const xs = zone.punkte.map(p => p.x), ys = zone.punkte.map(p => p.y)
                 const cx = xs.reduce((s, v) => s + v, 0) / xs.length
                 const cy = ys.reduce((s, v) => s + v, 0) / ys.length
@@ -304,6 +308,12 @@ export default function DragDropBildEditor({ bildUrl, setBildUrl, zielzonen, set
               })}
             </div>
           </div>
+          {anzahlAlt > 0 && (
+            <div className="text-xs text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-900/20 p-2 rounded border border-amber-300">
+              ⚠ {anzahlAlt} Zielzone{anzahlAlt > 1 ? 'n' : ''} ha{anzahlAlt > 1 ? 'ben' : 't'} noch das alte Zonen-Format und wird/werden nicht angezeigt.
+              Öffne Einstellungen → Admin → Zonen-Migration.
+            </div>
+          )}
         </>
       )}
 
@@ -334,7 +344,7 @@ export default function DragDropBildEditor({ bildUrl, setBildUrl, zielzonen, set
                   className="flex-1 px-2 py-1 text-sm border rounded bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-700 dark:text-white"
                 />
                 <span className="text-xs text-slate-400 px-1">
-                  {zone.form === 'rechteck' ? '□' : '⬡'} {zone.punkte.length}
+                  {zone.form === 'rechteck' ? '□' : '⬡'} {Array.isArray(zone.punkte) ? zone.punkte.length : '?'}
                 </span>
                 <button
                   type="button"

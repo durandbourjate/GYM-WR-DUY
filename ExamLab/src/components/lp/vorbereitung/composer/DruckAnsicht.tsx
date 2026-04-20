@@ -739,7 +739,7 @@ function DragDropBildDruck({ frage }: { frage: DragDropBildFrage }) {
         <div className="relative inline-block">
           <img src={mediaQuelleZuImgSrc(bildQuelle, toAssetUrl)} alt="Drag & Drop" className="max-w-full rounded border border-slate-300 print:border-slate-400" />
           {/* Nummerierte Zielzonen auf dem Bild (Bounding-Box aus punkte[]) */}
-          {zielzonen.map((z, i) => {
+          {zielzonen.filter(z => Array.isArray(z.punkte) && z.punkte.length >= 3).map((z, i) => {
             const xs = z.punkte.map(p => p.x), ys = z.punkte.map(p => p.y)
             const x = Math.min(...xs), y = Math.min(...ys)
             const b = Math.max(...xs) - x, h = Math.max(...ys) - y

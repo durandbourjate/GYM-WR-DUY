@@ -432,7 +432,7 @@ function HotspotAnzeige({ frage, antwort }: { frage: HotspotFrage; antwort: Extr
           <img src={bildSrc} alt="Hotspot" className="max-w-full rounded" />
           {/* Korrekte Bereiche als SVG-Polygone (grün gestrichelt) */}
           <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
-            {(frage.bereiche ?? []).map((b) => (
+            {(frage.bereiche ?? []).filter(b => Array.isArray(b.punkte) && b.punkte.length >= 3).map((b) => (
               <polygon
                 key={b.id}
                 points={b.punkte.map(p => `${p.x},${p.y}`).join(' ')}
@@ -445,7 +445,7 @@ function HotspotAnzeige({ frage, antwort }: { frage: HotspotFrage; antwort: Extr
             ))}
           </svg>
           {/* Bereich-Labels (als HTML, damit Text nicht skaliert wird) */}
-          {(frage.bereiche ?? []).map((b) => {
+          {(frage.bereiche ?? []).filter(b => Array.isArray(b.punkte) && b.punkte.length >= 3).map((b) => {
             const xs = b.punkte.map(p => p.x), ys = b.punkte.map(p => p.y)
             const cx = xs.reduce((s, v) => s + v, 0) / xs.length
             const cy = ys.reduce((s, v) => s + v, 0) / ys.length
@@ -529,7 +529,7 @@ function DragDropBildAnzeige({ frage, antwort }: { frage: DragDropBildFrage; ant
         <div className="relative inline-block">
           <img src={bildSrc} alt="Drag & Drop" className="max-w-full rounded" />
           {/* Zielzonen mit platzierten Labels */}
-          {frage.zielzonen.map((zone) => {
+          {frage.zielzonen.filter(z => Array.isArray(z.punkte) && z.punkte.length >= 3).map((zone) => {
             const labels = labelsInZone(antwort?.zuordnungen, zone.id)
             const hatAntwort = labels.length > 0
             const korrekt = zoneKorrektBelegt(antwort?.zuordnungen, zone.id, zone.korrektesLabel)

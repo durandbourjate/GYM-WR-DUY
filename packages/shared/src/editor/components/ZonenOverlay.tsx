@@ -61,7 +61,7 @@ export default function ZonenOverlay({
 
   return (
     <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-      {zonen.map(z => {
+      {zonen.filter(z => Array.isArray(z.punkte) && z.punkte.length >= 3).map(z => {
         const isSelected = z.id === selectedId
         const fill = fillFuer(z.akzent)
         const stroke = strokeFuer(z.akzent)

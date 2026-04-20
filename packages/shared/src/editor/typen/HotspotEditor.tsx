@@ -225,7 +225,11 @@ export default function HotspotEditor({ bildUrl, setBildUrl, bereiche, setBereic
     if (p) setMausPosition(p)
   }
 
-  const zonen = bereiche.map(b => ({ id: b.id, punkte: b.punkte, label: b.label, akzent: 'violett' as const }))
+  // Defensiv: Bereiche im Alt-Format (ohne Array-punkte) nicht rendern, sondern anzeigen als Hinweis
+  const istWohlgeformt = (b: HotspotBereich) => Array.isArray((b as any).punkte) && (b as any).punkte.length >= 3
+  const sichereBereiche = bereiche.filter(istWohlgeformt)
+  const anzahlAlt = bereiche.length - sichereBereiche.length
+  const zonen = sichereBereiche.map(b => ({ id: b.id, punkte: b.punkte, label: b.label, akzent: 'violett' as const }))
 
   return (
     <div className="space-y-4">
@@ -308,7 +312,7 @@ export default function HotspotEditor({ bildUrl, setBildUrl, bereiche, setBereic
               />
 
               {/* Zahlen-Badges über den Zonen (HTML, damit Text nicht skaliert wird) */}
-              {bereiche.map((bereich, i) => {
+              {sichereBereiche.map((bereich, i) => {
                 const xs = bereich.punkte.map(p => p.x), ys = bereich.punkte.map(p => p.y)
                 const minX = Math.min(...xs), minY = Math.min(...ys)
                 return (
@@ -323,6 +327,12 @@ export default function HotspotEditor({ bildUrl, setBildUrl, bereiche, setBereic
               })}
             </div>
           </div>
+          {anzahlAlt > 0 && (
+            <div className="text-xs text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-900/20 p-2 rounded border border-amber-300">
+              ⚠ {anzahlAlt} Bereich{anzahlAlt > 1 ? 'e' : ''} hat noch das alte Zonen-Format und wird nicht angezeigt.
+              Öffne Einstellungen → Admin → Zonen-Migration und führe die Migration für das betroffene Fach aus.
+            </div>
+          )}
         </>
       )}
 
@@ -366,7 +376,7 @@ export default function HotspotEditor({ bildUrl, setBildUrl, bereiche, setBereic
                   />
                   <span className="text-xs text-slate-400">Pkt</span>
                   <span className="text-xs text-slate-400 px-1">
-                    {bereich.form === 'rechteck' ? '□' : '⬡'} {bereich.punkte.length}
+                    {bereich.form === 'rechteck' ? '□' : '⬡'} {Array.isArray(bereich.punkte) ? bereich.punkte.length : '?'}
                   </span>
                   <button
                     type="button"
