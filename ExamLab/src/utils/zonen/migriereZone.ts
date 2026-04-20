@@ -34,7 +34,10 @@ export function migriereHotspotBereichAlt(alt: any): HotspotBereich {
     form,
     punkte,
     label: alt.label ?? '',
-    punktzahl: typeof alt.punktzahl === 'number' ? alt.punktzahl : (alt.punkte ?? 1),
+    punktzahl:
+      typeof alt.punktzahl === 'number' ? alt.punktzahl
+      : typeof alt.punkte === 'number' ? alt.punkte
+      : 1,
   } as HotspotBereich
 }
 

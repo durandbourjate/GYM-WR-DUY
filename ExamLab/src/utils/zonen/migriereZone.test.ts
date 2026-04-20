@@ -54,6 +54,32 @@ describe('migriereHotspotBereichAlt', () => {
     }
     expect(migriereHotspotBereichAlt(neu)).toEqual(neu)
   })
+  it('Degenerate: 2-Punkt-Array wird nicht als migriert erkannt (geht durch Alt-Pfad)', () => {
+    const alt = {
+      id: 'b4',
+      form: 'rechteck',
+      koordinaten: { x: 0, y: 0, breite: 10, hoehe: 10 },
+      punkte: [{x:0,y:0},{x:1,y:1}] as any, // weniger als 3 → idempotenz-guard false
+      label: 'X',
+      punktzahl: 3,
+    }
+    const neu = migriereHotspotBereichAlt(alt)
+    expect(neu.punkte).toHaveLength(4)    // wurde aus koordinaten neu gebaut
+    expect(typeof neu.punktzahl).toBe('number')
+    expect(neu.punktzahl).toBe(3)         // nicht das degenerate Array
+  })
+  it('Kreis ohne Koordinaten: Fallback-Zentrum + Fallback-Radius', () => {
+    const alt = { id: 'b5', form: 'kreis', koordinaten: {}, label: 'Fallback' }
+    const neu = migriereHotspotBereichAlt(alt)
+    expect(neu.form).toBe('polygon')
+    expect(neu.punkte).toHaveLength(12)
+    // Fallback: Zentrum (50,50), Radius 5
+    for (const pt of neu.punkte) {
+      const d = Math.hypot(pt.x - 50, pt.y - 50)
+      expect(d).toBeCloseTo(5, 5)
+    }
+    expect(neu.punktzahl).toBe(1) // Default
+  })
 })
 
 describe('migriereDragDropZielzoneAlt', () => {
