@@ -10298,6 +10298,8 @@ function schliesseFeedbackEintrag_(feedbackId, finaleVersionJson, options) {
       }
     }
     console.warn('[KIFeedback] feedbackId nicht gefunden:', feedbackId);
+  } catch(e) {
+    console.warn('[KIFeedback] schliesseFeedbackEintrag_ Lock-Fehler:', e);
   } finally {
     try { lock.releaseLock(); } catch(e){}
   }
@@ -10318,6 +10320,9 @@ function markiereFeedbackAlsIgnoriert_(feedbackId) {
         return;
       }
     }
+    console.log('[KIFeedback] ignoriert: Eintrag nicht offen oder nicht gefunden:', feedbackId);
+  } catch(e) {
+    console.warn('[KIFeedback] markiereFeedbackAlsIgnoriert_ Lock-Fehler:', e);
   } finally {
     try { lock.releaseLock(); } catch(e){}
   }
