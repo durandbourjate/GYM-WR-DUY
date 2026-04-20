@@ -1638,8 +1638,9 @@ function shuffle_(arr) {
 
 /**
  * Mischt Reihenfolgen der Antwort-Optionen pro Fragetyp (Fisher-Yates).
- * Mutiert das übergebene Objekt. Aufrufer muss bereits eine Deep-Copy haben,
- * wenn Original-Frage unverändert bleiben soll.
+ * Mutiert das übergebene Objekt. Aufrufer muss Besitzer des Objekts sein —
+ * bei Chain-Nutzung via mischeFrageOptionen_(bereinigeFrageFuerSuS_(f)) ist
+ * das sicher, weil bereinigeFrageFuerSuS_ intern eine Deep-Copy erstellt.
  * Rekursiv für Aufgabengruppen.
  */
 function mischeFrageOptionen_(frage) {
@@ -1693,6 +1694,11 @@ function mischeFrageOptionen_(frage) {
   return f;
 }
 
+/**
+ * Strenge Bereinigung für alle SuS-Ladepfade (Prüfung + angeleitete Übung + selbstständiges Üben).
+ * Liefert Deep-Copy ohne jegliche Lösungsfelder; keine Mischung (dafür siehe mischeFrageOptionen_).
+ * Rekursiv für Aufgabengruppen. Einziger kanonischer SuS-Bereinigungs-Pfad.
+ */
 function bereinigeFrageFuerSuS_(frage) {
   var f = JSON.parse(JSON.stringify(frage)); // Deep Copy
 
@@ -1726,6 +1732,7 @@ function bereinigeFrageFuerSuS_(frage) {
       var cleaned = Object.assign({}, l);
       delete cleaned.korrekteAntworten;
       delete cleaned.korrekt;
+      // Dropdown-Optionen behalten (SuS braucht sie zur Auswahl), aber nicht die korrekte markieren
       return cleaned;
     });
   }
@@ -1755,10 +1762,10 @@ function bereinigeFrageFuerSuS_(frage) {
     f.konten = f.konten.map(function(k) {
       var c = Object.assign({}, k);
       delete c.korrekt;
-      delete c.eintraege;
-      delete c.saldo;
+      delete c.eintraege; // T-Konto-Lösungs-Einträge
+      delete c.saldo;     // T-Konto-Saldo = Lösung
       if (!c.anfangsbestandVorgegeben) {
-        delete c.anfangsbestand;
+        delete c.anfangsbestand; // Bereinigen wenn nicht als Aufgabenstellung sichtbar
       }
       return c;
     });
