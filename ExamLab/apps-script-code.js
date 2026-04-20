@@ -10128,3 +10128,85 @@ function stelleKorrekturSheetHeaderBereit_(korrekturSheet) {
     korrekturSheet.getRange(1, neueSpalteIdx).setValue('kriterienBewertung');
   }
 }
+
+// ============================================================
+// KI-Kalibrierung — LP-Einstellungen Load/Save (2026-04-20)
+// ============================================================
+
+// Design-Entscheid (B5): Default global=false.
+// Begründung: Feature ist in v1 dark-launched. LP muss im Settings-Tab bewusst
+// aktivieren. Sobald AN: Feedback-Logging läuft sofort, Few-Shot-Injection
+// greift aber erst ab minBeispiele (Default 3) qualifizierten Paaren — das ist
+// die implizite Kalt-Start-Baseline (Spec Abschnitt 15). User-Onboarding via
+// Statistik-Tab-Empty-State: "Aktiviere KI-Kalibrierung, um von deinen
+// Korrekturen zu lernen".
+var KALIBRIERUNG_DEFAULTS = {
+  global: false,                    // Default AUS — LP schaltet explizit ein (B5)
+  aktionenAktiv: {
+    generiereMusterloesung: true,
+    klassifiziereFrage: true,
+    bewertungsrasterGenerieren: true,
+    korrigiereFreitext: true
+  },
+  minBeispiele: 3,
+  beispielAnzahl: 5
+};
+
+/**
+ * Lädt die Kalibrierungs-Einstellungen einer LP aus dem LPEinstellungen-Sheet.
+ * Fehlende Felder werden mit KALIBRIERUNG_DEFAULTS aufgefüllt (Object.assign).
+ * Falls Sheet fehlt oder LP-Zeile nicht gefunden → KALIBRIERUNG_DEFAULTS.
+ */
+function ladeLPKalibrierungsEinstellungen_(lpEmail) {
+  var ss = SpreadsheetApp.openById(CONFIGS_ID);
+  var sheet = ss.getSheetByName('LPEinstellungen');
+  if (!sheet) return KALIBRIERUNG_DEFAULTS;
+  var rows = sheet.getDataRange().getValues();
+  var headers = rows[0];
+  var emailIdx = headers.indexOf('email');
+  var konfigIdx = headers.indexOf('kalibrierung');
+  if (konfigIdx === -1) return KALIBRIERUNG_DEFAULTS;
+  for (var i = 1; i < rows.length; i++) {
+    if (String(rows[i][emailIdx]).toLowerCase() === lpEmail.toLowerCase()) {
+      try {
+        var parsed = JSON.parse(rows[i][konfigIdx] || '{}');
+        return Object.assign({}, KALIBRIERUNG_DEFAULTS, parsed);
+      } catch(e) { return KALIBRIERUNG_DEFAULTS; }
+    }
+  }
+  return KALIBRIERUNG_DEFAULTS;
+}
+
+/**
+ * Speichert die Kalibrierungs-Einstellungen einer LP als JSON-String im LPEinstellungen-Sheet.
+ * Legt Sheet + Headers an falls noch nicht vorhanden (idempotent).
+ * Aktualisiert bestehende LP-Zeile oder hängt neue Zeile an.
+ */
+function speichereLPKalibrierungsEinstellungen_(lpEmail, konfig) {
+  var ss = SpreadsheetApp.openById(CONFIGS_ID);
+  var sheet = ss.getSheetByName('LPEinstellungen');
+  if (!sheet) {
+    sheet = ss.insertSheet('LPEinstellungen');
+    sheet.appendRow(['email', 'kalibrierung', 'letzteAenderung']);
+  }
+  var lastCol = sheet.getLastColumn();
+  var headers = lastCol > 0 ? sheet.getRange(1, 1, 1, lastCol).getValues()[0] : [];
+  var konfigIdx = headers.indexOf('kalibrierung');
+  if (konfigIdx === -1) {
+    konfigIdx = lastCol; // 0-basierter Index für neue Spalte
+    sheet.getRange(1, lastCol + 1).setValue('kalibrierung');
+  }
+  var rows = sheet.getDataRange().getValues();
+  var emailIdx = headers.indexOf('email');
+  var konfigStr = JSON.stringify(konfig);
+  var jetzt = new Date().toISOString();
+  for (var i = 1; i < rows.length; i++) {
+    if (String(rows[i][emailIdx]).toLowerCase() === lpEmail.toLowerCase()) {
+      sheet.getRange(i + 1, konfigIdx + 1).setValue(konfigStr);
+      var zeitIdx = headers.indexOf('letzteAenderung');
+      if (zeitIdx >= 0) sheet.getRange(i + 1, zeitIdx + 1).setValue(jetzt);
+      return;
+    }
+  }
+  sheet.appendRow([lpEmail, konfigStr, jetzt]);
+}
