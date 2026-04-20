@@ -352,6 +352,33 @@ export const useUebenUebungsStore = create<UebungsState>((set, get) => ({
 
     const normalized = normalizeAntwort(antwort)
 
+    // Bundle Ü: Wenn Lösung vorgeladen ist, clientseitig korrigieren (instant).
+    // Selbstbewertungstypen (freitext/audio/visualisierung/pdf/code) haben zwar
+    // musterlosung im Slice, aber pruefeAntwort() liefert für sie kein sinnvolles
+    // Boolean — für die muss der Server-Pfad laufen (liefert selbstbewertung:true).
+    const istSelbstbewertbar = ['freitext', 'visualisierung', 'pdf', 'audio', 'code'].includes(frage.typ)
+    if (state.loesungenPreloaded[frageId] === true && !istSelbstbewertbar) {
+      const korrekt = pruefeAntwort(frage, normalized)
+      if (!session.freiwillig) {
+        useUebenFortschrittStore.getState().antwortVerarbeiten(frageId, session.email, korrekt, session.id)
+      }
+      set({
+        session: {
+          ...session,
+          antworten: { ...session.antworten, [frageId]: normalized },
+          ergebnisse: { ...session.ergebnisse, [frageId]: korrekt },
+          score: session.score + (korrekt ? 1 : 0),
+        },
+        speichertPruefung: false,
+        pruefFehler: null,
+        feedbackSichtbar: true,
+        letzteAntwortKorrekt: korrekt,
+        // musterlosung ist bereits in frage.musterlosung gemerged (mergeLoesungInFrage)
+        letzteMusterloesung: frage.musterlosung ?? null,
+      })
+      return
+    }
+
     // Sofort speichertPruefung markieren (synchron, vor jedem await), damit die UI
     // den Spinner rendert bevor der erste Micro-Task läuft.
     set({ speichertPruefung: true, pruefFehler: null })
