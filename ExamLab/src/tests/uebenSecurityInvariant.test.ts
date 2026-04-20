@@ -6,10 +6,19 @@ import { describe, it, expect } from 'vitest'
  * kein Feld aus der Sperrliste erscheint.
  */
 const SPERRLISTE = [
+  // Gemeinsam bei allen Fragetypen
   'musterlosung', 'bewertungsraster',
+  // Typ-spezifische Lösungsfelder
   'korrekt', 'korrekteAntworten', 'toleranz',
-  'erklaerung', 'sollKonto', 'habenKonto', 'korrektBuchung',
-  'sollEintraege', 'habenEintraege',
+  'erklaerung',
+  // FiBu-Typen
+  'sollKonto', 'habenKonto', 'korrektBuchung',
+  'sollEintraege', 'habenEintraege', 'buchungen',
+  'erwarteteAntworten', 'loesung',
+  // Bildbeschriftung / DragDrop
+  'zoneId', 'korrektesLabel',
+  // Formel
+  'korrekteFormel',
 ]
 
 function hatSperrfeld(obj: unknown, pfad: string[] = []): string | null {
@@ -52,5 +61,30 @@ describe('Security-Invariant: SuS-Response hat keine Lösungsfelder', () => {
   it('erkennt Leak von musterlosung', () => {
     const leak = { data: [{ musterlosung: 'X' }] }
     expect(hatSperrfeld(leak)).toBe('data.[0].musterlosung')
+  })
+
+  it('erkennt Leak von konten[].korrekt (FiBu)', () => {
+    const leak = { data: [{ typ: 'buchungssatz', konten: [{ id: 'k1', korrekt: true }] }] }
+    expect(hatSperrfeld(leak)).toBe('data.[0].konten.[0].korrekt')
+  })
+
+  it('erkennt Leak von labels[].zoneId (Bildbeschriftung)', () => {
+    const leak = { data: [{ typ: 'bildbeschriftung', labels: [{ id: 'l1', text: 'Zellkern', zoneId: 'z1' }] }] }
+    expect(hatSperrfeld(leak)).toBe('data.[0].labels.[0].zoneId')
+  })
+
+  it('erkennt Leak von bereiche[].korrekt (Hotspot)', () => {
+    const leak = { data: [{ typ: 'hotspot', bereiche: [{ id: 'b1', korrekt: true }] }] }
+    expect(hatSperrfeld(leak)).toBe('data.[0].bereiche.[0].korrekt')
+  })
+
+  it('erkennt Leak von korrekteFormel (Formel)', () => {
+    const leak = { data: [{ typ: 'formel', korrekteFormel: 'a^2+b^2=c^2' }] }
+    expect(hatSperrfeld(leak)).toBe('data.[0].korrekteFormel')
+  })
+
+  it('erkennt Leak von erwarteteAntworten (Kontenbestimmung)', () => {
+    const leak = { data: [{ typ: 'kontenbestimmung', aufgaben: [{ id: 'a1', erwarteteAntworten: ['1000'] }] }] }
+    expect(hatSperrfeld(leak)).toBe('data.[0].aufgaben.[0].erwarteteAntworten')
   })
 })
