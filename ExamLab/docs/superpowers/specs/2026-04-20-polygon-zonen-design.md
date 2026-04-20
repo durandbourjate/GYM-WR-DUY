@@ -39,7 +39,7 @@ export interface HotspotBereich {
   form: 'rechteck' | 'polygon'          // nur Editor-UX, Korrektur ignoriert
   punkte: { x: number; y: number }[]    // Prozent 0-100, ≥3 Punkte (Rechteck = 4)
   label: string
-  punkte_wert: number                   // früher „punkte"; umbenannt um Kollision zu vermeiden
+  punktzahl: number                     // früher „punkte"; umbenannt um Kollision zu vermeiden
 }
 
 export interface DragDropBildZielzone {
@@ -50,22 +50,24 @@ export interface DragDropBildZielzone {
 }
 ```
 
-**Wichtig:**
-- Alt-Felder (`koordinaten.{x,y,breite,hoehe,radius}`) werden komplett aus dem Typ entfernt
-- `form: 'kreis'` existiert nicht mehr
-- Feldname `punkte` (Array) in `HotspotBereich` würde mit dem Feld `punkte` (number) kollidieren — deshalb wird letzteres zu `punkte_wert` umbenannt (Konsequenz: Editor-UI-Label „Punkte", Backend-Key, Frontend-Render alle mit anpassen)
+**Wichtig — alte Feldnamen die entfernt werden:**
+- `HotspotBereich`: `koordinaten: {x, y, breite?, hoehe?, radius?}` → komplett raus
+- `DragDropBildZielzone`: `position: {x, y, breite, hoehe}` → komplett raus (Wrapper-Feld wird ersatzlos entfernt, Inhalt wandert in `punkte[]`)
+- `form: 'kreis'` existiert nicht mehr (Migration konvertiert zu `form: 'polygon'` mit 12 Punkten)
+- Feldname `punkte` (Array) in `HotspotBereich` würde mit dem Feld `punkte` (number, Punkte-Wert) kollidieren → letzteres wird zu `punktzahl` umbenannt (Konsequenz: Editor-UI-Label „Punkte" bleibt, Backend-Key ändert sich, `korrektur.ts` Zeilen ~190 müssen angepasst werden, Pool-JSON-Dateien kriegen Migrations-Rename, Fragensammlungs-Sheets-Spalten ebenso — alles im selben Migrator-Durchlauf)
 
 ### Migrations-Mapping
 
 Einmalige Konversion bestehender Daten — grob, da LP im Anschluss alle Zonen ohnehin manuell durchgeht:
 
-| Alt | Neu |
-|-----|-----|
-| `form: 'rechteck', koordinaten: {x, y, breite, hoehe}` | `form: 'rechteck', punkte: [(x,y), (x+b,y), (x+b,y+h), (x,y+h)]` |
-| `form: 'kreis', koordinaten: {x, y, radius}` | `form: 'polygon', punkte: 12 Punkte auf Kreis, 30° Winkelabstand, erster bei (x+r, y)` |
-| DragDrop-Zielzone `{x, y, breite, hoehe}` | `form: 'rechteck', punkte: 4 Ecken (wie oben)` |
+| Typ | Alt (Wrapper-Feld + Inhalt) | Neu |
+|-----|-----|-----|
+| Hotspot-Bereich, Rechteck | `koordinaten: {x, y, breite, hoehe}` | `form: 'rechteck', punkte: [(x,y), (x+b,y), (x+b,y+h), (x,y+h)]` |
+| Hotspot-Bereich, Kreis | `koordinaten: {x, y, radius}` | `form: 'polygon', punkte: 12 Punkte auf Kreis, 30° Winkelabstand, erster bei (x+r, y)` |
+| Hotspot-Bereich, Punkte-Wert | `punkte: number` | `punktzahl: number` |
+| DragDrop-Zielzone | `position: {x, y, breite, hoehe}` | `form: 'rechteck', punkte: 4 Ecken (wie oben)` |
 
-Alt-Feld `koordinaten` wird bei der Migration aus `typDaten` entfernt (Backend) bzw. aus Pool-Objekten gelöscht (Git-Repo).
+Alte Wrapper-Felder (`koordinaten` bei Hotspot, `position` bei DragDrop) werden bei der Migration aus `typDaten` entfernt (Backend) bzw. aus Pool-Objekten gelöscht (Git-Repo). Der Migrator muss wissen: Hotspot liest `koordinaten`, DragDrop liest `position` — unterschiedliche Quellfelder pro Fragetyp.
 
 ## Editor-UX
 
@@ -93,6 +95,7 @@ Alt-Feld `koordinaten` wird bei der Migration aus `typDaten` entfernt (Backend) 
 - Jeder Klick auf Bild = neuer Punkt
 - Während Zeichnen sichtbar: bisherige Punkte + dashed Vorschau-Linie zur Maus
 - **Abschluss**: Doppelklick auf Bild ODER Klick auf ersten Punkt (erster Punkt wird beim Cursor-Nahen vergrössert — klar klickbar)
+- **Abschluss-Race vermeiden**: Klick-auf-ersten-Punkt muss VOR dem generellen Klick-fügt-Punkt-hinzu-Handler geprüft werden. Bei schnellem Doppelklick auf den ersten Punkt (was als „add second point" interpretiert werden könnte) gewinnt „close polygon". Konkret: wenn Klick innerhalb Hit-Radius des ersten Punktes UND mindestens 3 Punkte gesetzt → schliessen; sonst neuer Punkt. Doppelklick-Event bekommt Priorität vor Single-Click durch `onDblClick`-Handler auf dem Container.
 - **Abbruch**: ESC oder Wechsel des Modus → nicht-fertige Punkte verworfen
 - Mindestens 3 Punkte, sonst wird Polygon verworfen
 - Bestehendes Polygon:
@@ -293,8 +296,14 @@ response: {
 ```
 
 - Iteriere alle Hotspot- und DragDrop-Bild-Fragen
-- Pro Frage: Alt-Felder lesen, `punkte[]` berechnen, `form` setzen, Alt-Feld `koordinaten` aus `typDaten` entfernen, speichern
-- **Idempotent**: wenn `punkte[]` bereits vorhanden und wohlgeformt (`Array.isArray(p) && p.length >= 3`), Frage überspringen → keine doppelte Migration bei wiederholten Runs
+- Pro Frage: Alt-Felder lesen (Hotspot: `koordinaten` + `punkte`-Zahl, DragDrop: `position`), `punkte[]`-Array berechnen, `form` setzen, Alt-Wrapper aus `typDaten` entfernen, bei Hotspot `punkte` (number) zu `punktzahl` umbenennen, speichern
+- **Idempotent**: wenn `punkte[]`-Array bereits vorhanden und wohlgeformt (`Array.isArray(p) && p.length >= 3`), Frage überspringen → keine doppelte Migration bei wiederholten Runs
+
+**Aufruf-Kanal für den Migrator** (wichtig, Lehre aus S125):
+- `curl` funktioniert NICHT — Apps-Script-Endpoints antworten mit 302-Redirect auf eine HTML-Error-Page
+- Entweder **Browser-`fetch`** von der ExamLab-Admin-UI aus (bester Weg: ein Admin-Knopf „Zonen migrieren" der den Dry-Run und die Live-Migration triggert, Response im UI anzeigt)
+- Oder **Node-Script mit `fetch({redirect: 'follow'})`** lokal ausführen (z.B. `tmp/migriere-zonen.mjs` analog zu `tmp/repair-hotspots.mjs` aus S125)
+- Empfehlung: Admin-UI-Knopf, weil er später bei anderen Migrationen wiederverwendbar ist und der Auth-Token automatisch aus der Session kommt
 
 ### Pool-Migrations-Script
 
@@ -319,6 +328,8 @@ if (ungueltig) {
 ```
 
 Nur an der Render-Stelle, kein Normalizer im Code-Körper. Dient ausschliesslich dem Migrations-Fenster.
+
+**Abgrenzung**: Leeres `bereiche[]` (Frage ohne definierte Zonen) ist KEIN Migrations-Fehler — das ist ein legitimer Zustand (LP hat Frage angelegt, noch keine Zonen gezeichnet). `.some()` auf leerem Array liefert `false`, Frage rendert normal mit leerer Zonen-Liste. Der Error-Boundary triggert nur wenn mindestens ein Bereich vorhanden ist, aber das `punkte[]`-Array fehlt/zu klein ist — also nur beim echten Datenkorruptions-Szenario.
 
 ### Rollback-Plan
 
@@ -416,9 +427,8 @@ Der Plan wird folgende Entscheidungen konkretisieren:
 
 1. **Reihenfolge der Tasks**: ob Types-Umstellung + Editor + Korrektur parallel auf Feature-Branch oder sequenziell
 2. **Backend-Korrektur-Endpoint-Name**: bleibt `lernplattformPruefeAntwort` oder neuer Endpoint?
-3. **Feldname `punkte_wert`**: final? Oder anderer Name um UI-Verwirrung („Punkte" vs. „Punkte-Koordinaten") zu vermeiden?
-4. **Pool-Migrations-Script**: Ausführungsort (lokal beim Entwickler, CI-Run, oder ad-hoc)?
-5. **Migrations-Fenster**: konkretes Datum/Uhrzeit abstimmen (abends, wenn keine aktiven LP-Sessions)
+3. **Pool-Migrations-Script**: Ausführungsort (lokal beim Entwickler, CI-Run, oder ad-hoc)?
+4. **Migrations-Fenster**: konkretes Datum/Uhrzeit abstimmen (abends, wenn keine aktiven LP-Sessions)
 
 ## Referenzen
 
