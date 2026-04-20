@@ -395,6 +395,7 @@ export default function FragenBrowser({ onHinzufuegen, onEntfernen, onSchliessen
         {/* Fragen-Editor Overlay */}
         {zeigEditor && (
           <FragenEditor
+            key={editFrage?.id ?? 'neu'}
             frage={editFrage}
             onSpeichern={handleFrageGespeichert}
             onAbbrechen={() => { setZeigEditor(false); setEditFrage(null) }}
@@ -630,10 +631,13 @@ export default function FragenBrowser({ onHinzufuegen, onEntfernen, onSchliessen
       {/* Fragen-Editor Overlay */}
       {zeigEditor && (
         <FragenEditor
+          key={editFrage?.id ?? 'neu'}
           frage={editFrage}
           onSpeichern={handleFrageGespeichert}
           onAbbrechen={() => { setZeigEditor(false); setEditFrage(null) }}
           performance={editFrage ? fragenStats.get(editFrage.id) : undefined}
+          onVorherigeFrage={nachbarCallbacks.onVor}
+          onNaechsteFrage={nachbarCallbacks.onNach}
         />
       )}
 
