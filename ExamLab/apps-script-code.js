@@ -9983,6 +9983,8 @@ function migrierZonenEndpoint_(body) {
         var typDatenCol = headers.indexOf('typDaten');
         var typCol = headers.indexOf('typ');
         var idCol = headers.indexOf('id');
+        var jsonCol = headers.indexOf('json');
+        var datenCol = headers.indexOf('daten');
         if (typDatenCol < 0 || typCol < 0) {
           errors.push({ tab: tabName, error: 'typDaten- oder typ-Spalte fehlt' });
           continue;
@@ -10002,31 +10004,52 @@ function migrierZonenEndpoint_(body) {
             continue;
           }
 
+          // parseFrage liest Hotspot/DragDrop primär aus json/daten-Spalte, dann typDaten-Fallback.
+          // Wir müssen beide synchron migrieren.
+          var vollJson = null, jsonAusSpalte = null;
+          if (jsonCol >= 0 && values[r][jsonCol]) {
+            try { vollJson = JSON.parse(values[r][jsonCol]); jsonAusSpalte = 'json'; } catch(e) {}
+          }
+          if (!vollJson && datenCol >= 0 && values[r][datenCol]) {
+            try { vollJson = JSON.parse(values[r][datenCol]); jsonAusSpalte = 'daten'; } catch(e) {}
+          }
+
           var geaendert = false;
 
-          if (typ === 'hotspot' && Array.isArray(typDaten.bereiche)) {
-            var neueBereiche = typDaten.bereiche.map(function(b) {
+          function migriereHotspotArr(arr) {
+            return arr.map(function(b) {
               if (zn_istWohlgeformt_(b)) return b;
               geaendert = true;
               return zn_migriereHotspotBereich_(b);
             });
-            if (geaendert) typDaten.bereiche = neueBereiche;
-          } else if (typ === 'dragdrop_bild' && Array.isArray(typDaten.zielzonen)) {
-            var neueZonen = typDaten.zielzonen.map(function(z) {
+          }
+          function migriereDragDropArr(arr) {
+            return arr.map(function(z) {
               if (zn_istWohlgeformt_(z)) return z;
               geaendert = true;
               return zn_migriereDragDropZielzone_(z);
             });
-            if (geaendert) typDaten.zielzonen = neueZonen;
+          }
+
+          if (typ === 'hotspot') {
+            if (Array.isArray(typDaten.bereiche)) typDaten.bereiche = migriereHotspotArr(typDaten.bereiche);
+            if (vollJson && Array.isArray(vollJson.bereiche)) vollJson.bereiche = migriereHotspotArr(vollJson.bereiche);
+          } else if (typ === 'dragdrop_bild') {
+            if (Array.isArray(typDaten.zielzonen)) typDaten.zielzonen = migriereDragDropArr(typDaten.zielzonen);
+            if (vollJson && Array.isArray(vollJson.zielzonen)) vollJson.zielzonen = migriereDragDropArr(vollJson.zielzonen);
           }
 
           if (geaendert) {
             aktualisiert++;
             if (summary.length < 50) {
-              summary.push({ tab: tabName, row: r + 1, frageId: values[r][idCol] || '(ohne-id)', typ: typ });
+              summary.push({ tab: tabName, row: r + 1, frageId: values[r][idCol] || '(ohne-id)', typ: typ, quellen: vollJson ? ('typDaten+' + jsonAusSpalte) : 'typDaten' });
             }
             if (!dryRun) {
               sheet.getRange(r + 1, typDatenCol + 1).setValue(JSON.stringify(typDaten));
+              if (vollJson) {
+                var col = jsonAusSpalte === 'json' ? jsonCol : datenCol;
+                sheet.getRange(r + 1, col + 1).setValue(JSON.stringify(vollJson));
+              }
             }
           } else {
             uebersprungen++;
