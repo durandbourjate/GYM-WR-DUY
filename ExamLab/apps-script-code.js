@@ -5011,6 +5011,49 @@ function wrapUserData(key, value) {
   return '<user_data key="' + key + '">' + safe + '</user_data>';
 }
 
+/**
+ * Injiziert Few-Shot-Prefix und erzeugt offenen Feedback-Eintrag.
+ * Nur für 4 instrumentierte Aktionen aufrufen.
+ * Rückgabe: { userPromptPrefix, feedbackId }.
+ */
+function injiziereKalibrierung_(email, aktion, daten) {
+  var out = { userPromptPrefix: '', feedbackId: null };
+  try {
+    var einst = ladeLPKalibrierungsEinstellungen_(email);
+    if (!einst.global) return out;
+    var beispiele = holeFewShotBeispiele_({
+      lpEmail: email, aktion: aktion,
+      fachbereich: daten.fachbereich, bloom: daten.bloom
+    });
+    out.userPromptPrefix = baueFewShotBlock_(aktion, beispiele);
+    out.feedbackId = starteFeedbackEintrag_({
+      lpEmail: email, aktion: aktion,
+      fachbereich: daten.fachbereich, bloom: daten.bloom,
+      inputJson: daten, kiOutputJson: {}
+    });
+  } catch (e) {
+    console.warn('[Kalibrierung] injiziereKalibrierung_ Fehler, fahre ohne Few-Shot fort:', e.message);
+  }
+  return out;
+}
+
+/** Trägt kiOutput nachträglich in offenen Feedback-Eintrag ein. Fail-open. */
+function setzeKIOutputInFeedback_(feedbackId, kiOutput) {
+  if (!feedbackId || !kiOutput) return;
+  try {
+    var sheet = stelleKIFeedbackSheetBereit_();
+    var rows = sheet.getDataRange().getValues();
+    var hdr = rows[0];
+    var ki = hdr.indexOf('kiOutputJson'), idIdx = hdr.indexOf('feedbackId');
+    for (var i = 1; i < rows.length; i++) {
+      if (rows[i][idIdx] === feedbackId) {
+        sheet.getRange(i + 1, ki + 1).setValue(JSON.stringify(kiOutput));
+        return;
+      }
+    }
+  } catch (e) { console.warn('[Kalibrierung] kiOutput-Nachtrag fehlgeschlagen:', e); }
+}
+
 function kiAssistentEndpoint(body) {
   try {
     var email = body.email;
@@ -5091,8 +5134,12 @@ function kiAssistentEndpoint(body) {
           'Fragetyp: ' + wrapUserData('typ', daten.typ || 'freitext') + '\n' +
           'Fragetext:\n' + wrapUserData('fragetext', daten.fragetext) + '\n\n' +
           'Antworte als JSON: { "musterlosung": "..." }';
+        // NEU: Kalibrierung v1 — Spec 2026-04-20
+        var _kal = injiziereKalibrierung_(email, 'generiereMusterloesung', daten);
+        userPrompt = _kal.userPromptPrefix + userPrompt;
         result = rufeClaudeAuf(systemPrompt, userPrompt, undefined, email);
-        return jsonResponse({ success: true, ergebnis: result });
+        setzeKIOutputInFeedback_(_kal.feedbackId, result);
+        return jsonResponse({ success: true, ergebnis: result, feedbackId: _kal.feedbackId });
 
       case 'generierePaare':
         if (!daten.fragetext) return jsonResponse({ error: 'Fragetext fehlt' });
@@ -5192,8 +5239,12 @@ function kiAssistentEndpoint(body) {
           'Erstelle für JEDES Kriterium Niveaustufen (Abstufungen von Max-Punkten bis 0), die beschreiben, ' +
           'was für die jeweilige Punktzahl erwartet wird. Niveaustufen in 0.5- oder 1-Schritten.\n\n' +
           'Antworte als JSON: { "kriterien": [{ "beschreibung": "...", "punkte": 2, "niveaustufen": [{ "punkte": 2, "beschreibung": "Volle Leistung..." }, { "punkte": 1, "beschreibung": "Teilleistung..." }, { "punkte": 0, "beschreibung": "Nicht erfüllt..." }] }, ...] }';
+        // NEU: Kalibrierung v1 — Spec 2026-04-20
+        var _kal = injiziereKalibrierung_(email, 'bewertungsrasterGenerieren', daten);
+        userPrompt = _kal.userPromptPrefix + userPrompt;
         result = rufeClaudeAuf(systemPrompt, userPrompt, undefined, email);
-        return jsonResponse({ success: true, ergebnis: result });
+        setzeKIOutputInFeedback_(_kal.feedbackId, result);
+        return jsonResponse({ success: true, ergebnis: result, feedbackId: _kal.feedbackId });
 
       case 'bewertungsrasterVerbessern':
         if (!daten.fragetext || !daten.bewertungsraster) return jsonResponse({ error: 'Fragetext und Bewertungsraster fehlen' });
@@ -5226,8 +5277,12 @@ function kiAssistentEndpoint(body) {
           '4. Bloom-Stufe: K1 (Wissen), K2 (Verstehen), K3 (Anwenden), K4 (Analysieren), K5 (Bewerten), K6 (Erschaffen)\n' +
           '5. Tags: 3–5 relevante Schlagwörter als Array\n\n' +
           'Antworte als JSON: { "fachbereich": "VWL"|"BWL"|"Recht", "thema": "...", "unterthema": "...", "bloom": "K1"-"K6", "tags": ["...", "..."] }';
+        // NEU: Kalibrierung v1 — Spec 2026-04-20
+        var _kal = injiziereKalibrierung_(email, 'klassifiziereFrage', daten);
+        userPrompt = _kal.userPromptPrefix + userPrompt;
         result = rufeClaudeAuf(systemPrompt, userPrompt, undefined, email);
-        return jsonResponse({ success: true, ergebnis: result });
+        setzeKIOutputInFeedback_(_kal.feedbackId, result);
+        return jsonResponse({ success: true, ergebnis: result, feedbackId: _kal.feedbackId });
 
       case 'importiereFragen':
         if (!daten.text) return jsonResponse({ error: 'Text zum Importieren fehlt' });
@@ -5421,7 +5476,11 @@ function kiAssistentEndpoint(body) {
           '\nSchülerantwort:\n' + wrapUserData('antwortText', ftAntwortText) + '\n\n' +
           'Antworte ausschliesslich als JSON: ' + ftJsonFormat;
 
+        // NEU: Kalibrierung v1 — Spec 2026-04-20
+        var _kal = injiziereKalibrierung_(email, 'korrigiereFreitext', daten);
+        ftUserPrompt = _kal.userPromptPrefix + ftUserPrompt;
         var ftResult = rufeClaudeAuf(ftSysPrompt, ftUserPrompt, 1536, email);
+        setzeKIOutputInFeedback_(_kal.feedbackId, ftResult);
 
         // Punkte auf [0, maxPunkte] begrenzen
         var ftPunkte = Number(ftResult.punkte) || 0;
@@ -5452,7 +5511,7 @@ function kiAssistentEndpoint(body) {
         var ftErgebnis = { punkte: ftPunkte, begruendung: ftBegruendung };
         if (ftKriterienBewertung) ftErgebnis.kriterienBewertung = ftKriterienBewertung;
 
-        return jsonResponse({ success: true, ergebnis: ftErgebnis });
+        return jsonResponse({ success: true, ergebnis: ftErgebnis, feedbackId: _kal.feedbackId });
       }
 
       case 'korrigiereZeichnung': {
