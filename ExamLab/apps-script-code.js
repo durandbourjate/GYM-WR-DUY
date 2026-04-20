@@ -1695,151 +1695,229 @@ function mischeFrageOptionen_(frage) {
 }
 
 /**
+ * LOESUNGS_FELDER_ — Single Source of Truth für Lösungs-Felder pro Fragetyp.
+ * Beide Funktionen bereinigeFrageFuerSuS_ (delete) und
+ * extrahiereLoesungsSlice_ (copy) iterieren deklarativ über diese Struktur.
+ *
+ * Ein neues Lösungs-Feld hinzufügen = genau eine Stelle editieren.
+ *
+ * Struktur:
+ * - einfach: Top-level-Felder ohne Typ-Bedingung (musterlosung, bewertungsraster)
+ * - typSpezifisch: Top-level-Felder, optional auf bestimmten Typ beschränkt
+ * - arrays: Array-Felder mit Sub-Lösungsfeldern (optionen[].korrekt etc.)
+ * - reihenfolge: Reihenfolgen-kritisch — werden NICHT gelöscht, sondern
+ *   nur in extrahiere als Original-Reihenfolge kopiert (sortierung.elemente,
+ *   zuordnung.paare). Der Bereinigungs-Pfad mischt sie via mischeFrageOptionen_.
+ * - konten: Spezialfall mit bedingtem anfangsbestand (nur bei !anfangsbestandVorgegeben)
+ * - labels: Spezialfall mit String-Guard (primitive labels unverändert durchreichen)
+ */
+var LOESUNGS_FELDER_ = {
+  einfach: ['musterlosung', 'bewertungsraster'],
+
+  typSpezifisch: [
+    { feld: 'korrekteFormel' },
+    { feld: 'korrekt', nurBeiTyp: 'formel' },
+    { feld: 'buchungen' },
+    { feld: 'korrektBuchung' },
+    { feld: 'sollEintraege' },
+    { feld: 'habenEintraege' },
+    { feld: 'loesung' },
+  ],
+
+  arrays: [
+    { feld: 'optionen', subFelder: ['korrekt', 'erklaerung'] },
+    { feld: 'aussagen', subFelder: ['korrekt', 'erklaerung'] },
+    { feld: 'luecken', subFelder: ['korrekteAntworten', 'korrekt'] },
+    { feld: 'ergebnisse', subFelder: ['korrekt', 'toleranz'] },
+    { feld: 'bilanzEintraege', subFelder: ['korrekt'] },
+    { feld: 'aufgaben', subFelder: ['erwarteteAntworten'] },
+    { feld: 'beschriftungen', subFelder: ['korrekt'] },
+    { feld: 'zielzonen', subFelder: ['korrektesLabel'] },
+    { feld: 'bereiche', subFelder: ['korrekt'], nurBeiTyp: 'hotspot' },
+    { feld: 'hotspots', subFelder: ['korrekt'], nurBeiTyp: 'hotspot' },
+  ],
+
+  reihenfolge: [
+    { feld: 'elemente', nurBeiTyp: 'sortierung' },
+    { feld: 'paare', nurBeiTyp: 'zuordnung' },
+  ],
+
+  konten: {
+    subFelder: ['korrekt', 'eintraege', 'saldo'],
+    bedingteSubFelder: [
+      { feld: 'anfangsbestand', bedingung: function(k) { return !k.anfangsbestandVorgegeben; } },
+    ],
+  },
+
+  labels: {
+    nurBeiTypen: ['bildbeschriftung', 'dragdrop_bild'],
+    subFelder: ['zoneId', 'zone', 'korrekt'],
+  },
+};
+
+/**
  * Strenge Bereinigung für alle SuS-Ladepfade (Prüfung + angeleitete Übung + selbstständiges Üben).
  * Liefert Deep-Copy ohne jegliche Lösungsfelder; keine Mischung (dafür siehe mischeFrageOptionen_).
  * Rekursiv für Aufgabengruppen. Einziger kanonischer SuS-Bereinigungs-Pfad.
+ *
+ * Iteriert deklarativ über LOESUNGS_FELDER_ — Single Source of Truth.
  */
 function bereinigeFrageFuerSuS_(frage) {
   var f = JSON.parse(JSON.stringify(frage)); // Deep Copy
 
-  // Gemeinsame Felder
-  delete f.musterlosung;
-  delete f.bewertungsraster;
-
-  // MC: korrekt + erklaerung aus Optionen entfernen
-  if (f.optionen && Array.isArray(f.optionen)) {
-    f.optionen = f.optionen.map(function(o) {
-      var cleaned = Object.assign({}, o);
-      delete cleaned.korrekt;
-      delete cleaned.erklaerung;
-      return cleaned;
-    });
+  // Einfache Felder (gemeinsam)
+  for (var i = 0; i < LOESUNGS_FELDER_.einfach.length; i++) {
+    delete f[LOESUNGS_FELDER_.einfach[i]];
   }
 
-  // R/F: korrekt-Feld aus Aussagen entfernen
-  if (f.aussagen && Array.isArray(f.aussagen)) {
-    f.aussagen = f.aussagen.map(function(a) {
-      var cleaned = Object.assign({}, a);
-      delete cleaned.korrekt;
-      delete cleaned.erklaerung;
-      return cleaned;
-    });
+  // Typ-spezifische Top-Level-Felder.
+  // Truthy-Guard bewusst (NICHT `!== undefined`) — matcht das Live-Verhalten
+  // von Bundle P (z.B. `if (f.buchungen) delete f.buchungen`). Änderung zu
+  // `!== undefined` wäre eine stille Verhaltens-Abweichung (würde auch
+  // `korrekt: 0` / `korrekt: false` bei Formel löschen, was Live nicht tut).
+  for (var j = 0; j < LOESUNGS_FELDER_.typSpezifisch.length; j++) {
+    var ts = LOESUNGS_FELDER_.typSpezifisch[j];
+    if (ts.nurBeiTyp && f.typ !== ts.nurBeiTyp) continue;
+    if (f[ts.feld]) delete f[ts.feld];
   }
 
-  // Lückentext: korrekteAntworten + korrekt aus Lücken entfernen
-  if (f.luecken && Array.isArray(f.luecken)) {
-    f.luecken = f.luecken.map(function(l) {
-      var cleaned = Object.assign({}, l);
-      delete cleaned.korrekteAntworten;
-      delete cleaned.korrekt;
-      // Dropdown-Optionen behalten (SuS braucht sie zur Auswahl), aber nicht die korrekte markieren
-      return cleaned;
-    });
+  // Array-Felder: Sub-Lösungsfelder entfernen
+  for (var k = 0; k < LOESUNGS_FELDER_.arrays.length; k++) {
+    var arr = LOESUNGS_FELDER_.arrays[k];
+    if (arr.nurBeiTyp && f.typ !== arr.nurBeiTyp) continue;
+    if (Array.isArray(f[arr.feld])) {
+      f[arr.feld] = f[arr.feld].map(function(item) {
+        var cleaned = Object.assign({}, item);
+        for (var s = 0; s < arr.subFelder.length; s++) {
+          delete cleaned[arr.subFelder[s]];
+        }
+        return cleaned;
+      });
+    }
   }
 
-  // Berechnung: korrekt-Wert + toleranz aus Ergebnissen entfernen
-  if (f.ergebnisse && Array.isArray(f.ergebnisse)) {
-    f.ergebnisse = f.ergebnisse.map(function(e) {
-      var cleaned = Object.assign({}, e);
-      delete cleaned.korrekt;
-      delete cleaned.toleranz;
-      return cleaned;
-    });
-  }
+  // Reihenfolgen-kritische Felder: NICHT löschen — Mischung via mischeFrageOptionen_
+  // (kein delete-Code hier, absichtlich leer)
 
-  // Formel: korrekteFormel + korrekt entfernen
-  if (f.korrekteFormel) delete f.korrekteFormel;
-  if (f.typ === 'formel' && f.korrekt) delete f.korrekt;
-
-  // Buchungssatz: buchungen, korrektBuchung, sollEintraege, habenEintraege
-  if (f.buchungen) delete f.buchungen;
-  if (f.korrektBuchung) delete f.korrektBuchung;
-  if (f.sollEintraege) delete f.sollEintraege;
-  if (f.habenEintraege) delete f.habenEintraege;
-
-  // FiBu Konten: korrekt, eintraege, saldo, anfangsbestand (bedingt)
+  // Konten: feste + bedingte Sub-Felder
   if (Array.isArray(f.konten)) {
     f.konten = f.konten.map(function(k) {
       var c = Object.assign({}, k);
-      delete c.korrekt;
-      delete c.eintraege; // T-Konto-Lösungs-Einträge
-      delete c.saldo;     // T-Konto-Saldo = Lösung
-      if (!c.anfangsbestandVorgegeben) {
-        delete c.anfangsbestand; // Bereinigen wenn nicht als Aufgabenstellung sichtbar
+      for (var s = 0; s < LOESUNGS_FELDER_.konten.subFelder.length; s++) {
+        delete c[LOESUNGS_FELDER_.konten.subFelder[s]];
+      }
+      for (var bs = 0; bs < LOESUNGS_FELDER_.konten.bedingteSubFelder.length; bs++) {
+        var b = LOESUNGS_FELDER_.konten.bedingteSubFelder[bs];
+        if (b.bedingung(c)) delete c[b.feld];
       }
       return c;
     });
   }
 
-  // Bilanzstruktur / Bilanz-ER
-  if (Array.isArray(f.bilanzEintraege)) {
-    f.bilanzEintraege = f.bilanzEintraege.map(function(e) {
-      var c = Object.assign({}, e);
-      delete c.korrekt;
-      return c;
-    });
-  }
-  if (f.loesung) delete f.loesung;
-
-  // Kontenbestimmung: aufgaben[].erwarteteAntworten
-  if (Array.isArray(f.aufgaben)) {
-    f.aufgaben = f.aufgaben.map(function(a) {
-      var c = Object.assign({}, a);
-      delete c.erwarteteAntworten;
-      return c;
-    });
-  }
-
-  // Bildbeschriftung / DragDrop: labels[].zoneId/zone/korrekt, beschriftungen[].korrekt, zielzonen[].korrektesLabel
-  // ACHTUNG: labels[] ist je nach Pool-Daten string[] (DragDrop-Bild) oder {id,text,zoneId}[]
-  // (Bildbeschriftung). Strings unverändert lassen, sonst werden sie zu Char-Objekten.
-  if ((f.typ === 'bildbeschriftung' || f.typ === 'dragdrop_bild') && Array.isArray(f.labels)) {
+  // Labels (bildbeschriftung/dragdrop_bild): primitive durchreichen, Objekt-Felder entfernen
+  if (LOESUNGS_FELDER_.labels.nurBeiTypen.indexOf(f.typ) !== -1 && Array.isArray(f.labels)) {
     f.labels = f.labels.map(function(l) {
       if (typeof l !== 'object' || l === null) return l;
       var c = Object.assign({}, l);
-      delete c.zoneId;
-      delete c.zone;
-      delete c.korrekt;
-      return c;
-    });
-  }
-  if (Array.isArray(f.beschriftungen)) {
-    f.beschriftungen = f.beschriftungen.map(function(b) {
-      var c = Object.assign({}, b);
-      delete c.korrekt;
-      return c;
-    });
-  }
-  if (Array.isArray(f.zielzonen)) {
-    f.zielzonen = f.zielzonen.map(function(z) {
-      var c = Object.assign({}, z);
-      delete c.korrektesLabel;
+      for (var s = 0; s < LOESUNGS_FELDER_.labels.subFelder.length; s++) {
+        delete c[LOESUNGS_FELDER_.labels.subFelder[s]];
+      }
       return c;
     });
   }
 
-  // Hotspot: bereiche[].korrekt + hotspots[].korrekt
-  if (f.typ === 'hotspot' && Array.isArray(f.bereiche)) {
-    f.bereiche = f.bereiche.map(function(b) {
-      var c = Object.assign({}, b);
-      delete c.korrekt;
-      return c;
-    });
-  }
-  if (f.typ === 'hotspot' && Array.isArray(f.hotspots)) {
-    f.hotspots = f.hotspots.map(function(h) {
-      var c = Object.assign({}, h);
-      delete c.korrekt;
-      return c;
-    });
-  }
-
-  // Aufgabengruppe: Teilaufgaben rekursiv bereinigen
-  if (f.teilaufgaben && Array.isArray(f.teilaufgaben)) {
+  // Aufgabengruppe: rekursiv bereinigen
+  if (Array.isArray(f.teilaufgaben)) {
     f.teilaufgaben = f.teilaufgaben.map(bereinigeFrageFuerSuS_);
   }
 
   return f;
+}
+
+/**
+ * Extrahiert Lösungs-Felder einer Original-Frage als LoesungsSlice.
+ * Umkehrfunktion von bereinigeFrageFuerSuS_ — nutzt dieselbe LOESUNGS_FELDER_-
+ * Konstante. Was dort gelöscht wird, wird hier kopiert.
+ *
+ * Reihenfolgen-kritische Felder (sortierung.elemente, zuordnung.paare) werden
+ * hier in Original-Form kopiert (Lösung), weil der Ladepfad sie mischt.
+ *
+ * Rückgabe enthält NUR Lösungs-Felder (keine Frage-Metadaten wie fragetext).
+ */
+function extrahiereLoesungsSlice_(frage) {
+  var slice = {};
+
+  // Einfache Felder (gemeinsam)
+  for (var i = 0; i < LOESUNGS_FELDER_.einfach.length; i++) {
+    var ef = LOESUNGS_FELDER_.einfach[i];
+    if (frage[ef] !== undefined && frage[ef] !== '') slice[ef] = frage[ef];
+  }
+
+  // Typ-spezifische Top-Level-Felder
+  for (var j = 0; j < LOESUNGS_FELDER_.typSpezifisch.length; j++) {
+    var ts = LOESUNGS_FELDER_.typSpezifisch[j];
+    if (ts.nurBeiTyp && frage.typ !== ts.nurBeiTyp) continue;
+    if (frage[ts.feld] !== undefined) slice[ts.feld] = frage[ts.feld];
+  }
+
+  // Array-Felder: id + Sub-Lösungsfelder in slice kopieren
+  for (var k = 0; k < LOESUNGS_FELDER_.arrays.length; k++) {
+    var arr = LOESUNGS_FELDER_.arrays[k];
+    if (arr.nurBeiTyp && frage.typ !== arr.nurBeiTyp) continue;
+    if (Array.isArray(frage[arr.feld])) {
+      slice[arr.feld] = frage[arr.feld].map(function(item) {
+        var out = { id: item.id };
+        for (var s = 0; s < arr.subFelder.length; s++) {
+          var sf = arr.subFelder[s];
+          if (item[sf] !== undefined) out[sf] = item[sf];
+        }
+        return out;
+      });
+    }
+  }
+
+  // Reihenfolgen-kritisch: Original-Reihenfolge in slice übernehmen
+  for (var r = 0; r < LOESUNGS_FELDER_.reihenfolge.length; r++) {
+    var rf = LOESUNGS_FELDER_.reihenfolge[r];
+    if (frage.typ === rf.nurBeiTyp && Array.isArray(frage[rf.feld])) {
+      if (rf.feld === 'paare') {
+        slice.paare = frage.paare.map(function(p) { return { links: p.links, rechts: p.rechts }; });
+      } else {
+        slice[rf.feld] = frage[rf.feld].slice();
+      }
+    }
+  }
+
+  // Konten: feste + bedingte Sub-Felder kopieren
+  if (Array.isArray(frage.konten)) {
+    slice.konten = frage.konten.map(function(k) {
+      var out = { id: k.id };
+      for (var s = 0; s < LOESUNGS_FELDER_.konten.subFelder.length; s++) {
+        var sf = LOESUNGS_FELDER_.konten.subFelder[s];
+        if (k[sf] !== undefined) out[sf] = k[sf];
+      }
+      for (var bs = 0; bs < LOESUNGS_FELDER_.konten.bedingteSubFelder.length; bs++) {
+        var b = LOESUNGS_FELDER_.konten.bedingteSubFelder[bs];
+        if (b.bedingung(k) && k[b.feld] !== undefined) out[b.feld] = k[b.feld];
+      }
+      return out;
+    });
+  }
+
+  // Labels: primitive durchreichen, Objekte auf id + Sub-Felder reduzieren
+  if (LOESUNGS_FELDER_.labels.nurBeiTypen.indexOf(frage.typ) !== -1 && Array.isArray(frage.labels)) {
+    slice.labels = frage.labels.map(function(l) {
+      if (typeof l !== 'object' || l === null) return l;
+      var out = { id: l.id };
+      for (var s = 0; s < LOESUNGS_FELDER_.labels.subFelder.length; s++) {
+        var sf = LOESUNGS_FELDER_.labels.subFelder[s];
+        if (l[sf] !== undefined) out[sf] = l[sf];
+      }
+      return out;
+    });
+  }
+
+  return slice;
 }
 
 /**
