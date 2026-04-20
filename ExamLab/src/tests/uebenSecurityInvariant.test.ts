@@ -64,7 +64,7 @@ describe('Security-Invariant: SuS-Response hat keine Lösungsfelder', () => {
   })
 
   it('erkennt Leak von konten[].korrekt (FiBu)', () => {
-    const leak = { data: [{ typ: 'buchungssatz', konten: [{ id: 'k1', korrekt: true }] }] }
+    const leak = { data: [{ typ: 'tkonto', konten: [{ id: 'k1', korrekt: true }] }] }
     expect(hatSperrfeld(leak)).toBe('data.[0].konten.[0].korrekt')
   })
 
@@ -86,5 +86,15 @@ describe('Security-Invariant: SuS-Response hat keine Lösungsfelder', () => {
   it('erkennt Leak von erwarteteAntworten (Kontenbestimmung)', () => {
     const leak = { data: [{ typ: 'kontenbestimmung', aufgaben: [{ id: 'a1', erwarteteAntworten: ['1000'] }] }] }
     expect(hatSperrfeld(leak)).toBe('data.[0].aufgaben.[0].erwarteteAntworten')
+  })
+
+  it('erkennt Leak von buchungen (Buchungssatz)', () => {
+    const leak = { data: [{ typ: 'buchungssatz', buchungen: [{ soll: '1000', haben: '1001' }] }] }
+    expect(hatSperrfeld(leak)).toBe('data.[0].buchungen')
+  })
+
+  it('erkennt Leak von loesung (Bilanzstruktur)', () => {
+    const leak = { data: [{ typ: 'bilanzstruktur', loesung: { aktiven: 100 } }] }
+    expect(hatSperrfeld(leak)).toBe('data.[0].loesung')
   })
 })
