@@ -10158,6 +10158,8 @@ var KALIBRIERUNG_DEFAULTS = {
  * Falls Sheet fehlt oder LP-Zeile nicht gefunden → KALIBRIERUNG_DEFAULTS.
  */
 function ladeLPKalibrierungsEinstellungen_(lpEmail) {
+  var emailLower = String(lpEmail || '').toLowerCase();
+  if (emailLower === '') return KALIBRIERUNG_DEFAULTS;
   var ss = SpreadsheetApp.openById(CONFIGS_ID);
   var sheet = ss.getSheetByName('LPEinstellungen');
   if (!sheet) return KALIBRIERUNG_DEFAULTS;
@@ -10167,7 +10169,7 @@ function ladeLPKalibrierungsEinstellungen_(lpEmail) {
   var konfigIdx = headers.indexOf('kalibrierung');
   if (konfigIdx === -1) return KALIBRIERUNG_DEFAULTS;
   for (var i = 1; i < rows.length; i++) {
-    if (String(rows[i][emailIdx]).toLowerCase() === lpEmail.toLowerCase()) {
+    if (String(rows[i][emailIdx]).toLowerCase() === emailLower) {
       try {
         var parsed = JSON.parse(rows[i][konfigIdx] || '{}');
         return Object.assign({}, KALIBRIERUNG_DEFAULTS, parsed);
@@ -10183,6 +10185,11 @@ function ladeLPKalibrierungsEinstellungen_(lpEmail) {
  * Aktualisiert bestehende LP-Zeile oder hängt neue Zeile an.
  */
 function speichereLPKalibrierungsEinstellungen_(lpEmail, konfig) {
+  var emailLower = String(lpEmail || '').toLowerCase();
+  if (emailLower === '') {
+    console.warn('[Kalibrierung] speichere ohne lpEmail, ignoriert');
+    return;
+  }
   var ss = SpreadsheetApp.openById(CONFIGS_ID);
   var sheet = ss.getSheetByName('LPEinstellungen');
   if (!sheet) {
@@ -10191,17 +10198,20 @@ function speichereLPKalibrierungsEinstellungen_(lpEmail, konfig) {
   }
   var lastCol = sheet.getLastColumn();
   var headers = lastCol > 0 ? sheet.getRange(1, 1, 1, lastCol).getValues()[0] : [];
+  var emailIdx = headers.indexOf('email');
+  if (emailIdx === -1) {
+    throw new Error('LPEinstellungen-Sheet hat keine email-Spalte — Setup fehlerhaft');
+  }
   var konfigIdx = headers.indexOf('kalibrierung');
   if (konfigIdx === -1) {
     konfigIdx = lastCol; // 0-basierter Index für neue Spalte
     sheet.getRange(1, lastCol + 1).setValue('kalibrierung');
   }
   var rows = sheet.getDataRange().getValues();
-  var emailIdx = headers.indexOf('email');
   var konfigStr = JSON.stringify(konfig);
   var jetzt = new Date().toISOString();
   for (var i = 1; i < rows.length; i++) {
-    if (String(rows[i][emailIdx]).toLowerCase() === lpEmail.toLowerCase()) {
+    if (String(rows[i][emailIdx]).toLowerCase() === emailLower) {
       sheet.getRange(i + 1, konfigIdx + 1).setValue(konfigStr);
       var zeitIdx = headers.indexOf('letzteAenderung');
       if (zeitIdx >= 0) sheet.getRange(i + 1, zeitIdx + 1).setValue(jetzt);
