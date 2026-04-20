@@ -10359,7 +10359,10 @@ function extrahiereText_(aktion, daten) {
   if (aktion === 'generiereMusterloesung') return daten.loesung || daten.musterlosung || '';
   if (aktion === 'bewertungsrasterGenerieren') {
     if (Array.isArray(daten.kriterien)) {
-      return daten.kriterien.map(function(k) {
+      var sortiert = daten.kriterien.slice().sort(function(a, b) {
+        return String(a.beschreibung || '').localeCompare(String(b.beschreibung || ''));
+      });
+      return sortiert.map(function(k) {
         return (k.beschreibung || '') + (k.punkte || '') + (Array.isArray(k.niveaustufen) ? k.niveaustufen.map(function(n){return n.beschreibung;}).join('|') : '');
       }).join('\n');
     }
