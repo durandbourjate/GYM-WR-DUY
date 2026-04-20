@@ -4,17 +4,21 @@
 
 **Goal:** Selbstständiges Üben erhält instant Client-seitige Korrektur: Lösungs-Felder werden beim Session-Start **in einem separaten autorisierten Call** geladen und in die Session-internen Frage-Kopien gemerged. Server-Korrektur `lernplattformPruefeAntwort` bleibt als Pro-Frage-Fallback bei Pre-Load-Fehlern.
 
-**Architecture:** Neuer Apps-Script-Endpoint `lernplattformLadeLoesungen` liefert eine flache Map `{ [frageId]: LoesungsSlice }` (Aufgabengruppen-Teilaufgaben sind eigene Map-Keys). Frontend ruft den Endpoint nach erfolgreichem `ladeFragen`, merged die Lösungen in `session.fragen`, und trackt pro Frage in einer `Map<string, boolean>` ob Lösung vorhanden ist. `beantworteById` nutzt weiterhin clientseitige `pruefeAntwort()` wenn Lösung da ist, sonst `pruefeAntwortJetzt()` Fallback. Lösungs-Map landet **nicht** in localStorage (nur In-Memory).
+**Architecture:** Eine `LOESUNGS_FELDER_`-Konstante im Apps-Script-Backend ist Single Source of Truth für Lösungs-Felder pro Fragetyp. `bereinigeFrageFuerSuS_` (Bundle P, Retrofit) und `extrahiereLoesungsSlice_` (Bundle Ü, neu) iterieren deklarativ darüber — Feld-Ergänzungen in Zukunft = eine Stelle. Der neue Endpoint `lernplattformLadeLoesungen` liefert eine flache Map `{ [frageId]: LoesungsSlice }`. Frontend merged Lösungen in `session.fragen` und trackt pro Frage via `loesungenPreloaded: Record<string, boolean>`, ob clientseitig oder serverseitig korrigiert wird.
 
-**Tech Stack:** React 19 + TypeScript + Zustand (persist middleware), Vitest, Google Apps Script (ES5-style), vorhandener `uebenApiClient` + `apiClient`-Infrastruktur.
+**Tech Stack:** React 19 + TypeScript + Zustand, Vitest, Google Apps Script (ES5-Style), bestehender `uebenApiClient` + `apiClient`-Infrastruktur.
 
 **Spec:** `ExamLab/docs/superpowers/specs/2026-04-20-musterloesungen-bereinigung-design.md` (Abschnitt Bundle Ü)
 
-**Branch:** `feature/bundle-ue-ueben-preload` (aktiv, noch keine Commits)
+**Branch:** `feature/bundle-ue-ueben-preload` (aktiv, Plan-Commit `7093636`)
 
 **Design-Entscheidungen (vom User am 2026-04-20 bestätigt):**
 - Aufgabengruppe-Serialisierung: **flache Map** (alle Teilaufgaben-IDs als eigene Map-Keys)
-- Partial-Pre-Load-Fallback: **pro-Frage** via `Map<frageId, boolean>`
+- Partial-Pre-Load-Fallback: **pro-Frage** via `Record<frageId, boolean>`
+- **Code-Wiederverwendung maximiert:** DRY-Konstante `LOESUNGS_FELDER_` teilt Feldliste zwischen Bereinigungs- und Extraktions-Pfad.
+
+**Scope-Klarstellung:**
+- Bundle Ü betrifft **ausschliesslich selbstständiges Üben** (`/sus/ueben`). Angeleitetes Prüfen + Prüfung nutzen den `ladePruefung`-Pfad (Bundle P), der Lösungen gar nicht lädt. Dort brauchen wir keinen Instant-Korrektur-Mechanismus, weil Korrektur erst nach LP-Freigabe passiert.
 
 ---
 
@@ -27,21 +31,21 @@
 - `ExamLab/src/tests/uebungsStoreLoesungsPreload.test.ts` — Store-Integration-Tests (Merge + Fallback)
 
 **Modify:**
-- `ExamLab/apps-script-code.js` — neuer Endpoint-Dispatch + Handler-Funktion + Helper-Funktion
-- `ExamLab/src/store/ueben/uebungsStore.ts` — `loesungenPreloaded`-Map State, Merge-Logik in `starteSession`, Branch-Logik in `beantworteById`
+- `ExamLab/apps-script-code.js` — neue Konstante `LOESUNGS_FELDER_`, `bereinigeFrageFuerSuS_` refactor (Verhalten identisch), neue Funktion `extrahiereLoesungsSlice_`, neuer Endpoint-Dispatch + Handler
+- `ExamLab/src/store/ueben/uebungsStore.ts` — `loesungenPreloaded`-State, Merge-Logik in `starteSession`, Branch-Logik in `beantworteById`
 - `ExamLab/HANDOFF.md` — Session 127 Bundle Ü
 
 **No changes:**
-- UI-Komponenten (`UebungsScreen.tsx` etc.) — funktionieren automatisch, weil die gemergte Frage `frage.musterlosung` bereits enthält, und der Store-Zustand `letzteMusterloesung` weiterhin via `pruefeAntwortJetzt` befüllt wird (Fallback-Pfad).
+- UI-Komponenten (`UebungsScreen.tsx` etc.) — funktionieren automatisch, weil die gemergte Frage `frage.musterlosung` enthält.
+- Prüfungs-Pfad (LP + SuS) — `ladePruefung` nutzt weiterhin `bereinigeFrageFuerSuS_`, Verhalten identisch nach Retrofit.
 
 ---
 
 ## Test-Strategie
 
-Analog zu Bundle P:
-1. **Vitest Unit + Integration** — Service-Call, Store-Merge-Logik, Branch-Logik, Partial-Fallback-Pfad.
-2. **Apps-Script nicht direkt testbar** — strenge Bereinigung wurde in Bundle P bereits verifiziert (2412 Fragen); `extrahiereLoesungsSlice_` ist die Umkehrfunktion, und wird via Staging-E2E-Assertion `extrahieren ∪ bereinigen = Original-Frage (modulo Mischung)` verifiziert.
-3. **Staging-E2E** — echte Logins, Üben-Session starten, Network-Tab-Audit: genau 1 Pre-Load-Call, alle Auto-Korrektur-Typen geben instant Feedback, Pre-Load-Absturz-Simulation → Fallback funktioniert.
+1. **Vitest Unit + Integration** — Service-Call, Store-Merge-Logik, Branch-Logik, Partial-Fallback-Pfad. Bestehende `uebenSecurityInvariant`-Tests bleiben grün (strenge Bereinigung unverändert).
+2. **Apps-Script nicht direkt vitest-testbar** — Retrofit-Verifikation via Staging-E2E: Bundle-P-Test (2412 Fragen, 0 Sperrlist-Hits) läuft nach Refactor weiterhin clean. Neue `extrahiereLoesungsSlice_` wird am Endpoint verifiziert.
+3. **Staging-E2E** — echte Logins, Üben-Session starten, Network-Tab-Audit: genau 1 Pre-Load-Call, alle Auto-Korrektur-Typen geben instant Feedback, Partial-Fallback-Simulation.
 
 ---
 
@@ -66,9 +70,11 @@ Neue Datei `ExamLab/src/types/ueben/loesung.ts`:
  * Reihenfolgen-kritische Felder (Sortierung, Zuordnung) enthalten die
  * Original-Reihenfolge vor Fisher-Yates-Mischung — der Ladepfad liefert
  * gemischte Versionen, der Lösungspfad die Wahrheit.
+ *
+ * Die Feldliste spiegelt LOESUNGS_FELDER_ im Apps-Script-Backend.
  */
 export interface LoesungsSlice {
-  // Gemeinsame Lösungs-Metadaten (alle Fragetypen)
+  // Gemeinsame Lösungs-Metadaten
   musterlosung?: string
   bewertungsraster?: unknown
 
@@ -85,12 +91,12 @@ export interface LoesungsSlice {
   ergebnisse?: Array<{ id: string; korrekt?: number; toleranz?: number }>
 
   // Sortierung / Zuordnung — Reihenfolgen-kritisch
-  elemente?: unknown[]  // Sortierung: Original-Reihenfolge
-  paare?: Array<{ links: string; rechts: string }>  // Zuordnung: Original-Paarung
+  elemente?: unknown[]
+  paare?: Array<{ links: string; rechts: string }>
 
   // Formel
   korrekteFormel?: string
-  korrekt?: string | number | boolean  // formel.korrekt (Legacy)
+  korrekt?: string | number | boolean
 
   // Buchungssatz
   buchungen?: unknown[]
@@ -98,13 +104,13 @@ export interface LoesungsSlice {
   sollEintraege?: unknown[]
   habenEintraege?: unknown[]
 
-  // FiBu-Konten (T-Konto, Kontenbestimmung)
+  // FiBu-Konten
   konten?: Array<{
     id: string
     korrekt?: boolean | string
     eintraege?: unknown[]
     saldo?: number
-    anfangsbestand?: number  // nur wenn !anfangsbestandVorgegeben
+    anfangsbestand?: number
   }>
 
   // Bilanzstruktur
@@ -131,7 +137,7 @@ export interface LoesungsSlice {
 export type LoesungsMap = Record<string, LoesungsSlice>
 ```
 
-- [ ] **Step 2: TypeScript-Build prüfen**
+- [ ] **Step 2: TypeScript-Build**
 
 ```bash
 cd "10 Github/GYM-WR-DUY/ExamLab"
@@ -148,11 +154,9 @@ git add ExamLab/src/types/ueben/loesung.ts
 git commit -m "$(cat <<'EOF'
 ExamLab: LoesungsSlice + LoesungsMap Types (Bundle Ü)
 
-Flach serialisierte Map von frageId zu Lösungs-Slice. Deckt alle
-20 Fragetypen inkl. Aufgabengruppen ab (Teilaufgaben als eigene
-Map-Keys). Feldliste spiegelt bereinigeFrageFuerSuS_ aus
-apps-script-code.js — LoesungsSlice ist die Umkehrfunktion der
-Bereinigung.
+Flach serialisierte Map von frageId zu Lösungs-Slice. Teilaufgaben
+von Aufgabengruppen sind eigene Map-Keys. Feldliste spiegelt die
+geplante LOESUNGS_FELDER_-Konstante im Apps-Script (Task 3).
 
 Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
 EOF
@@ -284,8 +288,7 @@ interface LadeLoesungenResponse {
  * bei success:false / Netzwerk-Fehler.
  *
  * Wird beim Session-Start im selbstständigen Üben-Modus aufgerufen,
- * damit clientseitige Korrektur instant Feedback geben kann, ohne
- * pro-Frage Server-Roundtrip.
+ * damit clientseitige Korrektur instant Feedback geben kann.
  */
 export async function ladeLoesungenApi(params: LadeLoesungenParams): Promise<LoesungsMap> {
   const { gruppeId, fragenIds, email, token, fachbereich } = params
@@ -332,195 +335,313 @@ EOF
 
 ---
 
-## Task 3: Backend — `extrahiereLoesungsSlice_` Helper
+## Task 3: Backend — `LOESUNGS_FELDER_` + Refactor + `extrahiereLoesungsSlice_`
 
 **Files:**
 - Modify: `ExamLab/apps-script-code.js`
 
-Neue Helper-Funktion direkt VOR `bereinigeFrageFuerSuS_` (analog zu `mischeFrageOptionen_`-Platzierung in Bundle P). Extrahiert die Lösungs-Felder einer Original-Frage in ein `LoesungsSlice`-Objekt.
+Das ist der DRY-Kern dieses Plans. Eine gemeinsame Konstante beschreibt Lösungs-Felder deklarativ. Beide Funktionen (`bereinigeFrageFuerSuS_` retrofit + `extrahiereLoesungsSlice_` neu) iterieren darüber.
 
-**Wichtig:** Die Funktion ist die **Umkehrfunktion** von `bereinigeFrageFuerSuS_`. Dieselbe Feldliste, aber statt `delete` werden die Felder in eine neue Response-Struktur kopiert. Input ist die Original-Frage, Output enthält NUR Lösungs-Felder.
+**Atomarer Commit.** Keine Zwischenzustände committen — bereinigeFrageFuerSuS_ muss nach dem Refactor **verhaltens-identisch** sein zu vor dem Refactor (Bundle-P-Verifikation muss weiter grün sein).
 
-- [ ] **Step 1: Helper einfügen**
+### Step 3.1: `LOESUNGS_FELDER_`-Konstante einfügen
 
-Öffne `ExamLab/apps-script-code.js`. Suche `function mischeFrageOptionen_(frage) {` (nach Bundle P bei Zeile ~1639–1694). **Direkt NACH `mischeFrageOptionen_`** (nach der schliessenden `}` + Leerzeile) einfügen:
+Öffne `ExamLab/apps-script-code.js`. Suche die Funktion `bereinigeFrageFuerSuS_` (aktuell bei Zeile ~1700 nach Bundle P). Direkt **VOR** der JSDoc von `bereinigeFrageFuerSuS_` (nach der schliessenden `}` von `mischeFrageOptionen_`) einfügen:
+
+```javascript
+
+/**
+ * LOESUNGS_FELDER_ — Single Source of Truth für Lösungs-Felder pro Fragetyp.
+ * Beide Funktionen bereinigeFrageFuerSuS_ (delete) und
+ * extrahiereLoesungsSlice_ (copy) iterieren deklarativ über diese Struktur.
+ *
+ * Ein neues Lösungs-Feld hinzufügen = genau eine Stelle editieren.
+ *
+ * Struktur:
+ * - einfach: Top-level-Felder ohne Typ-Bedingung (musterlosung, bewertungsraster)
+ * - typSpezifisch: Top-level-Felder, optional auf bestimmten Typ beschränkt
+ * - arrays: Array-Felder mit Sub-Lösungsfeldern (optionen[].korrekt etc.)
+ * - reihenfolge: Reihenfolgen-kritisch — werden NICHT gelöscht, sondern
+ *   nur in extrahiere als Original-Reihenfolge kopiert (sortierung.elemente,
+ *   zuordnung.paare). Der Bereinigungs-Pfad mischt sie via mischeFrageOptionen_.
+ * - konten: Spezialfall mit bedingtem anfangsbestand (nur bei !anfangsbestandVorgegeben)
+ * - labels: Spezialfall mit String-Guard (primitive labels unverändert durchreichen)
+ */
+var LOESUNGS_FELDER_ = {
+  einfach: ['musterlosung', 'bewertungsraster'],
+
+  typSpezifisch: [
+    { feld: 'korrekteFormel' },
+    { feld: 'korrekt', nurBeiTyp: 'formel' },
+    { feld: 'buchungen' },
+    { feld: 'korrektBuchung' },
+    { feld: 'sollEintraege' },
+    { feld: 'habenEintraege' },
+    { feld: 'loesung' },
+  ],
+
+  arrays: [
+    { feld: 'optionen', subFelder: ['korrekt', 'erklaerung'] },
+    { feld: 'aussagen', subFelder: ['korrekt', 'erklaerung'] },
+    { feld: 'luecken', subFelder: ['korrekteAntworten', 'korrekt'] },
+    { feld: 'ergebnisse', subFelder: ['korrekt', 'toleranz'] },
+    { feld: 'bilanzEintraege', subFelder: ['korrekt'] },
+    { feld: 'aufgaben', subFelder: ['erwarteteAntworten'] },
+    { feld: 'beschriftungen', subFelder: ['korrekt'] },
+    { feld: 'zielzonen', subFelder: ['korrektesLabel'] },
+    { feld: 'bereiche', subFelder: ['korrekt'], nurBeiTyp: 'hotspot' },
+    { feld: 'hotspots', subFelder: ['korrekt'], nurBeiTyp: 'hotspot' },
+  ],
+
+  reihenfolge: [
+    { feld: 'elemente', nurBeiTyp: 'sortierung' },
+    { feld: 'paare', nurBeiTyp: 'zuordnung' },
+  ],
+
+  konten: {
+    subFelder: ['korrekt', 'eintraege', 'saldo'],
+    bedingteSubFelder: [
+      { feld: 'anfangsbestand', bedingung: function(k) { return !k.anfangsbestandVorgegeben; } },
+    ],
+  },
+
+  labels: {
+    nurBeiTypen: ['bildbeschriftung', 'dragdrop_bild'],
+    subFelder: ['zoneId', 'zone', 'korrekt'],
+  },
+};
+```
+
+Achte auf die Leerzeile vor der JSDoc der Konstante und NACH der schliessenden `};`.
+
+### Step 3.2: `bereinigeFrageFuerSuS_` refactoren (Verhalten identisch zu Bundle P)
+
+Ersetze die komplette Funktion `bereinigeFrageFuerSuS_` (nach Bundle P der gesamte Block inkl. JSDoc und Body) durch:
 
 ```javascript
 /**
- * Extrahiert Lösungs-Felder einer Original-Frage als flache Map-Entry.
- * Umkehrfunktion von bereinigeFrageFuerSuS_ — dieselbe Feldliste.
+ * Strenge Bereinigung für alle SuS-Ladepfade (Prüfung + angeleitete Übung + selbstständiges Üben).
+ * Liefert Deep-Copy ohne jegliche Lösungsfelder; keine Mischung (dafür siehe mischeFrageOptionen_).
+ * Rekursiv für Aufgabengruppen. Einziger kanonischer SuS-Bereinigungs-Pfad.
  *
- * Gibt ein Objekt mit nur den Lösungs-Feldern zurück; Frage-Metadaten
- * (fragetext, bild, etc.) sind NICHT enthalten (die kommen bereits
- * beim Laden in der bereinigten Frage).
+ * Iteriert deklarativ über LOESUNGS_FELDER_ — Single Source of Truth.
+ */
+function bereinigeFrageFuerSuS_(frage) {
+  var f = JSON.parse(JSON.stringify(frage)); // Deep Copy
+
+  // Einfache Felder (gemeinsam)
+  for (var i = 0; i < LOESUNGS_FELDER_.einfach.length; i++) {
+    delete f[LOESUNGS_FELDER_.einfach[i]];
+  }
+
+  // Typ-spezifische Top-Level-Felder
+  for (var j = 0; j < LOESUNGS_FELDER_.typSpezifisch.length; j++) {
+    var ts = LOESUNGS_FELDER_.typSpezifisch[j];
+    if (ts.nurBeiTyp && f.typ !== ts.nurBeiTyp) continue;
+    if (f[ts.feld] !== undefined) delete f[ts.feld];
+  }
+
+  // Array-Felder: Sub-Lösungsfelder entfernen
+  for (var k = 0; k < LOESUNGS_FELDER_.arrays.length; k++) {
+    var arr = LOESUNGS_FELDER_.arrays[k];
+    if (arr.nurBeiTyp && f.typ !== arr.nurBeiTyp) continue;
+    if (Array.isArray(f[arr.feld])) {
+      f[arr.feld] = f[arr.feld].map(function(item) {
+        var cleaned = Object.assign({}, item);
+        for (var s = 0; s < arr.subFelder.length; s++) {
+          delete cleaned[arr.subFelder[s]];
+        }
+        return cleaned;
+      });
+    }
+  }
+
+  // Reihenfolgen-kritische Felder: NICHT löschen — Mischung via mischeFrageOptionen_
+  // (kein delete-Code hier, absichtlich leer)
+
+  // Konten: feste + bedingte Sub-Felder
+  if (Array.isArray(f.konten)) {
+    f.konten = f.konten.map(function(k) {
+      var c = Object.assign({}, k);
+      for (var s = 0; s < LOESUNGS_FELDER_.konten.subFelder.length; s++) {
+        delete c[LOESUNGS_FELDER_.konten.subFelder[s]];
+      }
+      for (var bs = 0; bs < LOESUNGS_FELDER_.konten.bedingteSubFelder.length; bs++) {
+        var b = LOESUNGS_FELDER_.konten.bedingteSubFelder[bs];
+        if (b.bedingung(c)) delete c[b.feld];
+      }
+      return c;
+    });
+  }
+
+  // Labels (bildbeschriftung/dragdrop_bild): primitive durchreichen, Objekt-Felder entfernen
+  if (LOESUNGS_FELDER_.labels.nurBeiTypen.indexOf(f.typ) !== -1 && Array.isArray(f.labels)) {
+    f.labels = f.labels.map(function(l) {
+      if (typeof l !== 'object' || l === null) return l;
+      var c = Object.assign({}, l);
+      for (var s = 0; s < LOESUNGS_FELDER_.labels.subFelder.length; s++) {
+        delete c[LOESUNGS_FELDER_.labels.subFelder[s]];
+      }
+      return c;
+    });
+  }
+
+  // Aufgabengruppe: rekursiv bereinigen
+  if (Array.isArray(f.teilaufgaben)) {
+    f.teilaufgaben = f.teilaufgaben.map(bereinigeFrageFuerSuS_);
+  }
+
+  return f;
+}
+```
+
+### Step 3.3: `extrahiereLoesungsSlice_` einfügen
+
+Direkt **NACH** der refactorierten `bereinigeFrageFuerSuS_` (vor `bereinigeFrageFuerSuSUeben_`) einfügen:
+
+```javascript
+
+/**
+ * Extrahiert Lösungs-Felder einer Original-Frage als LoesungsSlice.
+ * Umkehrfunktion von bereinigeFrageFuerSuS_ — nutzt dieselbe LOESUNGS_FELDER_-
+ * Konstante. Was dort gelöscht wird, wird hier kopiert.
  *
- * Sortierung/Zuordnung: elemente[] / paare[] sind Reihenfolgen-kritisch
- * und werden unverändert aus der Original-Frage übernommen (Client
- * hat nur die gemischte Version).
+ * Reihenfolgen-kritische Felder (sortierung.elemente, zuordnung.paare) werden
+ * hier in Original-Form kopiert (Lösung), weil der Ladepfad sie mischt.
+ *
+ * Rückgabe enthält NUR Lösungs-Felder (keine Frage-Metadaten wie fragetext).
  */
 function extrahiereLoesungsSlice_(frage) {
   var slice = {};
 
-  // Gemeinsame Felder
-  if (frage.musterlosung !== undefined && frage.musterlosung !== '') slice.musterlosung = frage.musterlosung;
-  if (frage.bewertungsraster !== undefined) slice.bewertungsraster = frage.bewertungsraster;
-
-  // MC
-  if (Array.isArray(frage.optionen)) {
-    slice.optionen = frage.optionen.map(function(o) {
-      var e = { id: o.id };
-      if (o.korrekt !== undefined) e.korrekt = o.korrekt;
-      if (o.erklaerung !== undefined) e.erklaerung = o.erklaerung;
-      return e;
-    });
+  // Einfache Felder (gemeinsam)
+  for (var i = 0; i < LOESUNGS_FELDER_.einfach.length; i++) {
+    var ef = LOESUNGS_FELDER_.einfach[i];
+    if (frage[ef] !== undefined && frage[ef] !== '') slice[ef] = frage[ef];
   }
 
-  // R/F
-  if (Array.isArray(frage.aussagen)) {
-    slice.aussagen = frage.aussagen.map(function(a) {
-      var e = { id: a.id };
-      if (a.korrekt !== undefined) e.korrekt = a.korrekt;
-      if (a.erklaerung !== undefined) e.erklaerung = a.erklaerung;
-      return e;
-    });
+  // Typ-spezifische Top-Level-Felder
+  for (var j = 0; j < LOESUNGS_FELDER_.typSpezifisch.length; j++) {
+    var ts = LOESUNGS_FELDER_.typSpezifisch[j];
+    if (ts.nurBeiTyp && frage.typ !== ts.nurBeiTyp) continue;
+    if (frage[ts.feld] !== undefined) slice[ts.feld] = frage[ts.feld];
   }
 
-  // Lückentext
-  if (Array.isArray(frage.luecken)) {
-    slice.luecken = frage.luecken.map(function(l) {
-      var e = { id: l.id };
-      if (l.korrekteAntworten !== undefined) e.korrekteAntworten = l.korrekteAntworten;
-      if (l.korrekt !== undefined) e.korrekt = l.korrekt;
-      return e;
-    });
+  // Array-Felder: id + Sub-Lösungsfelder in slice kopieren
+  for (var k = 0; k < LOESUNGS_FELDER_.arrays.length; k++) {
+    var arr = LOESUNGS_FELDER_.arrays[k];
+    if (arr.nurBeiTyp && frage.typ !== arr.nurBeiTyp) continue;
+    if (Array.isArray(frage[arr.feld])) {
+      slice[arr.feld] = frage[arr.feld].map(function(item) {
+        var out = { id: item.id };
+        for (var s = 0; s < arr.subFelder.length; s++) {
+          var sf = arr.subFelder[s];
+          if (item[sf] !== undefined) out[sf] = item[sf];
+        }
+        return out;
+      });
+    }
   }
 
-  // Berechnung
-  if (Array.isArray(frage.ergebnisse)) {
-    slice.ergebnisse = frage.ergebnisse.map(function(er) {
-      var e = { id: er.id };
-      if (er.korrekt !== undefined) e.korrekt = er.korrekt;
-      if (er.toleranz !== undefined) e.toleranz = er.toleranz;
-      return e;
-    });
+  // Reihenfolgen-kritisch: Original-Reihenfolge in slice übernehmen
+  for (var r = 0; r < LOESUNGS_FELDER_.reihenfolge.length; r++) {
+    var rf = LOESUNGS_FELDER_.reihenfolge[r];
+    if (frage.typ === rf.nurBeiTyp && Array.isArray(frage[rf.feld])) {
+      if (rf.feld === 'paare') {
+        slice.paare = frage.paare.map(function(p) { return { links: p.links, rechts: p.rechts }; });
+      } else {
+        slice[rf.feld] = frage[rf.feld].slice();
+      }
+    }
   }
 
-  // Sortierung: elemente[] = Original-Reihenfolge (Client hat gemischt)
-  if (frage.typ === 'sortierung' && Array.isArray(frage.elemente)) {
-    slice.elemente = frage.elemente.slice();
-  }
-
-  // Zuordnung: paare[] = Original-Paarung (Client hat rechts gemischt)
-  if (frage.typ === 'zuordnung' && Array.isArray(frage.paare)) {
-    slice.paare = frage.paare.map(function(p) {
-      return { links: p.links, rechts: p.rechts };
-    });
-  }
-
-  // Formel
-  if (frage.korrekteFormel !== undefined) slice.korrekteFormel = frage.korrekteFormel;
-  if (frage.typ === 'formel' && frage.korrekt !== undefined) slice.korrekt = frage.korrekt;
-
-  // Buchungssatz
-  if (frage.buchungen !== undefined) slice.buchungen = frage.buchungen;
-  if (frage.korrektBuchung !== undefined) slice.korrektBuchung = frage.korrektBuchung;
-  if (frage.sollEintraege !== undefined) slice.sollEintraege = frage.sollEintraege;
-  if (frage.habenEintraege !== undefined) slice.habenEintraege = frage.habenEintraege;
-
-  // FiBu-Konten
+  // Konten: feste + bedingte Sub-Felder kopieren
   if (Array.isArray(frage.konten)) {
     slice.konten = frage.konten.map(function(k) {
-      var e = { id: k.id };
-      if (k.korrekt !== undefined) e.korrekt = k.korrekt;
-      if (k.eintraege !== undefined) e.eintraege = k.eintraege;
-      if (k.saldo !== undefined) e.saldo = k.saldo;
-      // anfangsbestand nur wenn NICHT vorgegeben (= ist Lösung)
-      if (!k.anfangsbestandVorgegeben && k.anfangsbestand !== undefined) {
-        e.anfangsbestand = k.anfangsbestand;
+      var out = { id: k.id };
+      for (var s = 0; s < LOESUNGS_FELDER_.konten.subFelder.length; s++) {
+        var sf = LOESUNGS_FELDER_.konten.subFelder[s];
+        if (k[sf] !== undefined) out[sf] = k[sf];
       }
-      return e;
+      for (var bs = 0; bs < LOESUNGS_FELDER_.konten.bedingteSubFelder.length; bs++) {
+        var b = LOESUNGS_FELDER_.konten.bedingteSubFelder[bs];
+        if (b.bedingung(k) && k[b.feld] !== undefined) out[b.feld] = k[b.feld];
+      }
+      return out;
     });
   }
 
-  // Bilanzstruktur / Bilanz-ER
-  if (Array.isArray(frage.bilanzEintraege)) {
-    slice.bilanzEintraege = frage.bilanzEintraege.map(function(b) {
-      var e = { id: b.id };
-      if (b.korrekt !== undefined) e.korrekt = b.korrekt;
-      return e;
-    });
-  }
-  if (frage.loesung !== undefined) slice.loesung = frage.loesung;
-
-  // Kontenbestimmung
-  if (Array.isArray(frage.aufgaben)) {
-    slice.aufgaben = frage.aufgaben.map(function(a) {
-      var e = { id: a.id };
-      if (a.erwarteteAntworten !== undefined) e.erwarteteAntworten = a.erwarteteAntworten;
-      return e;
-    });
-  }
-
-  // Bildbeschriftung / DragDrop labels
-  if ((frage.typ === 'bildbeschriftung' || frage.typ === 'dragdrop_bild') && Array.isArray(frage.labels)) {
+  // Labels: primitive durchreichen, Objekte auf id + Sub-Felder reduzieren
+  if (LOESUNGS_FELDER_.labels.nurBeiTypen.indexOf(frage.typ) !== -1 && Array.isArray(frage.labels)) {
     slice.labels = frage.labels.map(function(l) {
-      // String-labels (DragDrop-Bild Pool-Konvention): unverändert durchreichen als primitive
       if (typeof l !== 'object' || l === null) return l;
-      var e = { id: l.id };
-      if (l.zoneId !== undefined) e.zoneId = l.zoneId;
-      if (l.zone !== undefined) e.zone = l.zone;
-      if (l.korrekt !== undefined) e.korrekt = l.korrekt;
-      return e;
-    });
-  }
-  if (Array.isArray(frage.beschriftungen)) {
-    slice.beschriftungen = frage.beschriftungen.map(function(b) {
-      var e = { id: b.id };
-      if (b.korrekt !== undefined) e.korrekt = b.korrekt;
-      return e;
-    });
-  }
-  if (Array.isArray(frage.zielzonen)) {
-    slice.zielzonen = frage.zielzonen.map(function(z) {
-      var e = { id: z.id };
-      if (z.korrektesLabel !== undefined) e.korrektesLabel = z.korrektesLabel;
-      return e;
-    });
-  }
-
-  // Hotspot
-  if (frage.typ === 'hotspot' && Array.isArray(frage.bereiche)) {
-    slice.bereiche = frage.bereiche.map(function(b) {
-      var e = { id: b.id };
-      if (b.korrekt !== undefined) e.korrekt = b.korrekt;
-      return e;
-    });
-  }
-  if (frage.typ === 'hotspot' && Array.isArray(frage.hotspots)) {
-    slice.hotspots = frage.hotspots.map(function(h) {
-      var e = { id: h.id };
-      if (h.korrekt !== undefined) e.korrekt = h.korrekt;
-      return e;
+      var out = { id: l.id };
+      for (var s = 0; s < LOESUNGS_FELDER_.labels.subFelder.length; s++) {
+        var sf = LOESUNGS_FELDER_.labels.subFelder[s];
+        if (l[sf] !== undefined) out[sf] = l[sf];
+      }
+      return out;
     });
   }
 
   return slice;
 }
-
 ```
 
-Achte auf die Leerzeile nach der Funktion.
-
-- [ ] **Step 2: Sanity-Check Datei parsebar**
+### Step 3.4: Sanity + Grep-Verifikation
 
 ```bash
 cd "10 Github/GYM-WR-DUY/ExamLab"
 node --check apps-script-code.js
 ```
 
-Erwartet: kein Output.
+Erwartet: exit 0.
 
-Commit kommt erst in Task 4 zusammen mit dem Endpoint.
+```bash
+grep -n "LOESUNGS_FELDER_" apps-script-code.js | wc -l
+```
+
+Erwartet: ≥20 Treffer (Definition + viele Zugriffe in beiden Funktionen).
+
+```bash
+grep -n "function bereinigeFrageFuerSuS_\|function extrahiereLoesungsSlice_\|function bereinigeFrageFuerSuSUeben_\|function mischeFrageOptionen_" apps-script-code.js
+```
+
+Erwartet: 4 Funktions-Definitionen, jede genau einmal.
+
+### Step 3.5: Vitest + Build
+
+```bash
+cd "10 Github/GYM-WR-DUY/ExamLab"
+npx tsc -b && npx vitest run && npm run build
+```
+
+Erwartet: alle exit 0, vitest 429+ grün (neue Tests aus Tasks 1-2 + bestehende).
+
+### Step 3.6: Commit
+
+```bash
+cd "10 Github/GYM-WR-DUY"
+git add ExamLab/apps-script-code.js
+git commit -m "$(cat <<'EOF'
+ExamLab: LOESUNGS_FELDER_ Konstante + extrahiereLoesungsSlice_ (Bundle Ü)
+
+Refactor: bereinigeFrageFuerSuS_ (Bundle P) iteriert jetzt deklarativ
+über die neue LOESUNGS_FELDER_-Konstante. Verhalten unverändert (selbe
+Feldliste wie vorher, selber Output für 2412-Fragen-Staging-Test).
+
+Neu: extrahiereLoesungsSlice_ — Umkehrfunktion, nutzt dieselbe Konstante.
+Kopiert Lösungs-Felder einer Original-Frage in ein flaches LoesungsSlice-
+Objekt. Reihenfolgen-kritische Felder (elemente, paare) werden als
+Original-Reihenfolge geliefert (Ladepfad mischt sie).
+
+Single Source of Truth: Ein neues Lösungs-Feld hinzufügen = genau eine
+Stelle editieren (LOESUNGS_FELDER_). Beide Funktionen übernehmen automatisch.
+
+Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
+EOF
+)"
+```
 
 ---
 
@@ -529,32 +650,33 @@ Commit kommt erst in Task 4 zusammen mit dem Endpoint.
 **Files:**
 - Modify: `ExamLab/apps-script-code.js`
 
-Neuer Endpoint direkt nach `lernplattformPruefeAntwort` (aktuell bei Zeile ~7809 + Bundle-P-Änderungen). Auth-Logic und Rate-Limit-Muster spiegeln `lernplattformPruefeAntwort`.
+Neuer Endpoint spiegelt `lernplattformPruefeAntwort` in Auth-Logik und Rate-Limit.
 
-- [ ] **Step 1: Endpoint-Dispatch einfügen**
+### Step 4.1: Dispatch-Case einfügen
 
-Suche im Code den Dispatch-Block mit `case 'lernplattformPruefeAntwort':` (bei Zeile ~984–985). Direkt NACH diesem Case einfügen:
+Suche im Code den Dispatch-Block mit `case 'lernplattformPruefeAntwort':`. Direkt NACH diesem Case einfügen:
 
 ```javascript
     case 'lernplattformLadeLoesungen':
       return lernplattformLadeLoesungen(body);
 ```
 
-- [ ] **Step 2: Handler-Funktion einfügen**
+### Step 4.2: Handler einfügen
 
-Suche `function lernplattformPruefeAntwort(body) {`. Direkt nach der schliessenden `}` dieser Funktion einfügen:
+Suche `function lernplattformPruefeAntwort(body) {` und die schliessende `}`. Direkt nach dieser schliessenden `}` einfügen:
 
 ```javascript
 
 /**
  * Liefert eine flache Map {frageId → LoesungsSlice} für die gegebenen
- * Fragen-IDs. Nur Lösungs-Felder (siehe extrahiereLoesungsSlice_).
+ * Fragen-IDs. Enthält nur Lösungs-Felder (siehe extrahiereLoesungsSlice_).
  *
  * Wird vom Frontend beim Session-Start im selbstständigen Üben-Modus
  * aufgerufen, damit clientseitige Korrektur instant Feedback geben kann.
  *
  * Auth: Token-Pflicht, Mitgliedschaft-Check (wie lernplattformPruefeAntwort).
  * Rate-Limit: 5 Calls/Minute pro SuS (1 Call pro Session-Start reicht).
+ * Aufgabengruppen: Teilaufgaben als eigene Map-Keys (flach serialisiert).
  */
 function lernplattformLadeLoesungen(body) {
   var gruppeId = body.gruppeId;
@@ -566,18 +688,16 @@ function lernplattformLadeLoesungen(body) {
     return jsonResponse({ success: false, error: 'Fehlende oder ungültige Parameter' });
   }
 
-  // SICHERHEIT: Token zwingend — Email wird nur verwendet wenn Token gültig.
   if (!lernplattformValidiereToken_(token, claimEmail)) {
     return jsonResponse({ success: false, error: 'Nicht authentifiziert' });
   }
   var email = claimEmail;
 
-  // Rate-Limit: 5 Calls/Minute pro SuS (1 pro Session-Start reicht;
-  // Missbrauchs-Schutz + Limit für Bots).
+  // Rate-Limit: 5 Calls/Minute pro SuS
   var rl = lernplattformRateLimitCheck_('lade-loesungen', email, 5, 60);
   if (rl.blocked) return jsonResponse({ success: false, error: rl.error });
 
-  // Gruppe existiert + Mitgliedschaft prüfen
+  // Gruppe + Mitgliedschaft prüfen
   var mitgliedCheck = istGruppenMitglied_(body, gruppeId);
   if (!mitgliedCheck) {
     return jsonResponse({ success: false, error: 'Kein Zugriff auf diese Gruppe' });
@@ -588,16 +708,16 @@ function lernplattformLadeLoesungen(body) {
   try {
     Logger.log('[lernplattformLadeLoesungen] gruppe=%s email=%s n=%s',
       gruppeId, email, String(fragenIds.length));
-  } catch (e) { /* Logger kann in bestimmten Runtimes fehlen */ }
+  } catch (e) { /* Logger-Unavailable nicht kritisch */ }
 
   var loesungen = {};
   for (var i = 0; i < fragenIds.length; i++) {
     var frageId = fragenIds[i];
     var frage = ladeFrageUnbereinigtById_(frageId, gruppe, body.fachbereich);
-    if (!frage) continue; // Frage nicht gefunden → aus Map weglassen; Client erkennt Lücke und fällt zurück
+    if (!frage) continue; // Lücke → Client fällt pro-Frage zurück
 
-    // Für Aufgabengruppen: auch Teilaufgaben als eigene Map-Keys aufnehmen
     loesungen[frageId] = extrahiereLoesungsSlice_(frage);
+    // Aufgabengruppe: Teilaufgaben als eigene Map-Keys ergänzen
     if (frage.typ === 'aufgabengruppe' && Array.isArray(frage.teilaufgaben)) {
       for (var t = 0; t < frage.teilaufgaben.length; t++) {
         var ta = frage.teilaufgaben[t];
@@ -612,49 +732,40 @@ function lernplattformLadeLoesungen(body) {
 }
 ```
 
-- [ ] **Step 3: Sanity-Check**
+### Step 4.3: Sanity + Grep
 
 ```bash
 cd "10 Github/GYM-WR-DUY/ExamLab"
 node --check apps-script-code.js
 ```
 
-Erwartet: kein Output.
-
-- [ ] **Step 4: Grep-Verifikation**
-
 ```bash
-cd "10 Github/GYM-WR-DUY/ExamLab"
 grep -n "lernplattformLadeLoesungen" apps-script-code.js
 ```
 
-Erwartet: 3 Treffer (case-dispatch, Funktions-Definition, Kommentar-Header).
+Erwartet: 3 Treffer (case-dispatch, Funktions-Definition, JSDoc-Mention).
 
 ```bash
 grep -n "extrahiereLoesungsSlice_" apps-script-code.js
 ```
 
-Erwartet: 3 Treffer (Funktions-Definition, 2 Aufrufe im Handler für Frage + Teilaufgaben).
+Erwartet: 3 Treffer (Funktions-Definition + 2 Aufrufe im Handler).
 
-- [ ] **Step 5: Commit (Backend gesamt — Task 3 + Task 4)**
+### Step 4.4: Commit
 
 ```bash
 cd "10 Github/GYM-WR-DUY"
 git add ExamLab/apps-script-code.js
 git commit -m "$(cat <<'EOF'
-ExamLab: Backend-Endpoint lernplattformLadeLoesungen (Bundle Ü)
+ExamLab: Endpoint lernplattformLadeLoesungen (Bundle Ü)
 
-extrahiereLoesungsSlice_ Helper — Umkehrfunktion von
-bereinigeFrageFuerSuS_. Dieselbe Feldliste, aber statt delete werden
-die Lösungs-Felder in eine flache Struktur kopiert.
-
-lernplattformLadeLoesungen Endpoint:
-- Token-Auth + Mitgliedschaft-Check wie lernplattformPruefeAntwort
-- Rate-Limit: 5 Calls/Minute pro SuS
+Neuer Apps-Script-Endpoint für Lösungs-Preload im Üben-Flow:
+- Token-Auth + Mitgliedschaft-Check (wie lernplattformPruefeAntwort)
+- Rate-Limit 5/Minute pro SuS
 - Returns flache Map {frageId → LoesungsSlice}
-- Aufgabengruppen: Teilaufgaben als eigene Map-Keys (flach serialisiert)
-- Audit-Log via Logger.log pro Abruf
-- Nicht gefundene Fragen werden weggelassen; Client fällt pro Frage zurück
+- Aufgabengruppen: Teilaufgaben als eigene Map-Keys
+- Audit-Log via Logger.log
+- Nutzt extrahiereLoesungsSlice_ (Task 3) als Single Source of Truth
 
 Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
 EOF
@@ -668,58 +779,54 @@ EOF
 **Files:**
 - Modify: `ExamLab/src/store/ueben/uebungsStore.ts`
 
-Erweiterung des `uebungsStore.ts`:
-- Neues State-Feld `loesungenPreloaded: Record<string, boolean>` (pro-Frage-Map).
-- `starteSession` ruft nach `erstelleBlock` den Lösungs-Preload, merged die Lösungen in `session.fragen`, setzt `loesungenPreloaded` pro frageId.
-- `beantworteById` liest `loesungenPreloaded[frageId]` — wenn true, läuft clientseitige Korrektur wie bisher; wenn false, delegiert an `pruefeAntwortJetzt(frageId)`.
-- Reset bei `beendeSession`, `naechsteFrage` etc.: `loesungenPreloaded` NICHT zurücksetzen (Map gilt für ganze Session).
+Erweiterung:
+- `loesungenPreloaded: Record<string, boolean>` (State).
+- `starteSession`: ruft nach `erstelleBlock` den Lösungs-Preload, merged Lösungen in `session.fragen`, setzt `loesungenPreloaded` pro frageId.
+- `beantworteById`: liest `loesungenPreloaded[frageId]` — true = clientseitige Korrektur wie bisher; false = delegiert an `pruefeAntwortJetzt(frageId)`.
 
-- [ ] **Step 1: State-Feld + Interface erweitern**
+### Step 5.1: Import + State-Feld + Interface
 
 Öffne `ExamLab/src/store/ueben/uebungsStore.ts`.
 
-Im `UebungsState`-Interface (nach `letzteMusterloesung: string | null`):
-
-```typescript
-  /** Pro-Frage-Map: hat die Lösung (via Pre-Load) oder nicht (Fallback auf Server) */
-  loesungenPreloaded: Record<string, boolean>
-```
-
-Und im initialen State-Objekt (im `create<UebungsState>((set, get) => ({...})`-Block, nach `letzteMusterloesung: null,`):
-
-```typescript
-  loesungenPreloaded: {},
-```
-
-- [ ] **Step 2: Merge-Helper-Import hinzufügen**
-
-Oben in der Datei, bei den Imports (nach Zeile mit `import { pruefeAntwort } from '../../utils/ueben/korrektur'`), einfügen:
+**Neue Imports** (nach `import { pruefeAntwort } from '../../utils/ueben/korrektur'`):
 
 ```typescript
 import { ladeLoesungenApi } from '../../services/uebenLoesungsApi'
 import type { LoesungsMap, LoesungsSlice } from '../../types/ueben/loesung'
 ```
 
-- [ ] **Step 3: Merge-Helper oben in der Datei definieren**
+**Im `UebungsState`-Interface** (nach `letzteMusterloesung: string | null`):
+
+```typescript
+  /** Pro-Frage-Map: hat die Lösung (via Pre-Load) oder nicht (Fallback auf Server) */
+  loesungenPreloaded: Record<string, boolean>
+```
+
+**Im initialen State-Objekt** (nach `letzteMusterloesung: null,`):
+
+```typescript
+  loesungenPreloaded: {},
+```
+
+### Step 5.2: Merge-Helpers definieren
 
 NACH den Imports und VOR `const HISTORIE_KEY = ...`:
 
 ```typescript
 /**
  * Merged einen LoesungsSlice in eine Frage-Kopie. Mutiert NICHT die
- * Original-Frage; liefert ein neues Objekt mit den kombinierten Feldern.
+ * Original-Frage; liefert ein neues Objekt mit kombinierten Feldern.
  *
  * Listen-Felder (optionen[], luecken[], etc.): Merge per id — der
  * gemischte Client-Array wird um die Lösungs-Attribute ergänzt.
- * Original-Reihenfolge-Felder (elemente[], paare[]) werden direkt
- * aus dem Slice übernommen (überschreibt gemischte Client-Version,
- * weil Lösung die Wahrheit ist).
+ * Reihenfolgen-kritische Felder (elemente[], paare[]) werden aus
+ * dem Slice übernommen (überschreibt gemischte Client-Version).
  */
 function mergeLoesungInFrage(frage: Frage, slice: LoesungsSlice | undefined): Frage {
   if (!slice) return frage
   const merged: Record<string, unknown> = { ...frage }
 
-  // Einfache Top-Level-Felder
+  // Top-level einfache Felder (gemeinsam + typSpezifisch)
   if (slice.musterlosung !== undefined) merged.musterlosung = slice.musterlosung
   if (slice.bewertungsraster !== undefined) merged.bewertungsraster = slice.bewertungsraster
   if (slice.korrekteFormel !== undefined) merged.korrekteFormel = slice.korrekteFormel
@@ -730,7 +837,7 @@ function mergeLoesungInFrage(frage: Frage, slice: LoesungsSlice | undefined): Fr
   if (slice.habenEintraege !== undefined) merged.habenEintraege = slice.habenEintraege
   if (slice.loesung !== undefined) merged.loesung = slice.loesung
 
-  // Reihenfolgen-kritisch: Lösung liefert Original-Reihenfolge, überschreiben
+  // Reihenfolgen-kritisch: Lösung überschreibt Mischung
   if (slice.elemente !== undefined) merged.elemente = slice.elemente
   if (slice.paare !== undefined) merged.paare = slice.paare
 
@@ -769,13 +876,15 @@ function mergeLoesungInFrage(frage: Frage, slice: LoesungsSlice | undefined): Fr
  * sowohl ihren eigenen Slice als auch die Slices ihrer Teilaufgaben
  * (flache Map-Lookup).
  */
-function mergeLoesungen(fragen: Frage[], loesungen: LoesungsMap): { fragen: Frage[]; preloaded: Record<string, boolean> } {
+function mergeLoesungen(
+  fragen: Frage[],
+  loesungen: LoesungsMap,
+): { fragen: Frage[]; preloaded: Record<string, boolean> } {
   const preloaded: Record<string, boolean> = {}
   const merged = fragen.map((f) => {
     const frageSlice = loesungen[f.id]
     preloaded[f.id] = frageSlice !== undefined
     let out = mergeLoesungInFrage(f, frageSlice)
-    // Aufgabengruppe: Teilaufgaben in out ebenfalls mergen
     const outWithTa = out as Frage & { teilaufgaben?: Frage[] }
     if (Array.isArray(outWithTa.teilaufgaben)) {
       outWithTa.teilaufgaben = outWithTa.teilaufgaben.map((ta: Frage) => {
@@ -791,9 +900,9 @@ function mergeLoesungen(fragen: Frage[], loesungen: LoesungsMap): { fragen: Frag
 }
 ```
 
-- [ ] **Step 4: `starteSession` erweitern — Pre-Load nach Block-Erstellung**
+### Step 5.3: `starteSession` erweitern
 
-In der `starteSession`-Methode, nach dem Block-Erstellungs-Block und vor `if (block.length === 0) { ... }` (etwa bei Zeile 128), einfügen:
+In `starteSession`, nach der Block-Erstellung und vor `if (block.length === 0) { ... }`, einfügen:
 
 ```typescript
       // Lösungs-Preload via separatem Endpoint (Bundle Ü).
@@ -805,7 +914,6 @@ In der `starteSession`-Methode, nach dem Block-Erstellungs-Block und vor `if (bl
         const user = useUebenAuthStore.getState().user
         if (user?.sessionToken) {
           const fragenIds = block.map((f) => f.id)
-          // Teilaufgaben-IDs auch sammeln (Aufgabengruppen)
           for (const f of block) {
             const ta = (f as Frage & { teilaufgaben?: Frage[] }).teilaufgaben
             if (Array.isArray(ta)) for (const t of ta) fragenIds.push(t.id)
@@ -819,39 +927,13 @@ In der `starteSession`-Methode, nach dem Block-Erstellungs-Block und vor `if (bl
           })
         }
       } catch (e) {
-        // Pre-Load-Fehler ist nicht fatal — Session startet trotzdem,
-        // Fallback läuft dann pro-Frage über pruefeAntwortJetzt.
         console.warn('[uebungsStore] Lösungs-Preload fehlgeschlagen:', e)
       }
 
       const { fragen: blockMitLoesung, preloaded } = mergeLoesungen(block, loesungen)
 ```
 
-- [ ] **Step 5: `starteSession` — Session mit gemergten Fragen erstellen**
-
-Ersetze den bestehenden Session-Erstell-Block:
-
-```typescript
-      const session: UebungsSession = {
-        id: `s_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-        gruppeId, email, fach, thema,
-        modus,
-        quellen,
-        fragen: block,
-        antworten: {},
-        ergebnisse: {},
-        aktuelleFrageIndex: 0,
-        gestartet: new Date().toISOString(),
-        unsicher: new Set(),
-        uebersprungen: new Set(),
-        score: 0,
-        freiwillig,
-      }
-
-      set({ session, ladeStatus: 'fertig', feedbackSichtbar: false, letzteAntwortKorrekt: null })
-```
-
-Durch:
+Ersetze dann im Session-Objekt `fragen: block` durch `fragen: blockMitLoesung`, und im `set({...})`-Aufruf ergänze `loesungenPreloaded: preloaded,`:
 
 ```typescript
       const session: UebungsSession = {
@@ -879,9 +961,9 @@ Durch:
       })
 ```
 
-- [ ] **Step 6: Branch-Logik in `beantworteById`**
+### Step 5.4: Branch-Logik in `beantworteById`
 
-Finde `beantworteById: (frageId, antwort) => { ... }` und ersetze die bestehende Implementation:
+Ersetze die komplette `beantworteById`-Methode durch:
 
 ```typescript
   beantworteById: (frageId, antwort) => {
@@ -893,11 +975,10 @@ Finde `beantworteById: (frageId, antwort) => { ... }` und ersetze die bestehende
 
     const normalized = normalizeAntwort(antwort)
 
-    // Pro-Frage-Entscheidung: Pre-Load vorhanden → clientseitig korrigieren.
-    // Sonst Fallback auf Server via pruefeAntwortJetzt (setzt speichertPruefung).
+    // Pro-Frage-Branch: Pre-Load vorhanden → clientseitig; sonst Server-Fallback.
     const preloaded = get().loesungenPreloaded[frageId] === true
     if (!preloaded) {
-      // Antwort zwischenspeichern + Server-Korrektur anstossen
+      // Antwort als Zwischenstand speichern + Server-Korrektur anstossen
       set({
         session: {
           ...session,
@@ -910,7 +991,6 @@ Finde `beantworteById: (frageId, antwort) => { ... }` und ersetze die bestehende
 
     const korrekt = pruefeAntwort(frage, normalized)
 
-    // Bei freiwilligem Üben (gesperrtes Thema): Fortschritt NICHT speichern
     if (!session.freiwillig) {
       useUebenFortschrittStore.getState().antwortVerarbeiten(frageId, session.email, korrekt, session.id)
     }
@@ -928,25 +1008,16 @@ Finde `beantworteById: (frageId, antwort) => { ... }` und ersetze die bestehende
   },
 ```
 
-- [ ] **Step 7: TypeScript-Build**
+### Step 5.5: Build + bestehende Tests
 
 ```bash
 cd "10 Github/GYM-WR-DUY/ExamLab"
-npx tsc -b
+npx tsc -b && npx vitest run
 ```
 
-Erwartet: exit 0. Wenn Fehler zu `teilaufgaben`-Typ-Cast: die Helper oben nutzen `as Frage & {teilaufgaben?: Frage[]}` — das ist bewusst, weil `Frage` Union-Type ist und nicht jeder Typ `teilaufgaben` hat.
+Erwartet: tsc exit 0, alle bisher grünen Tests weiter grün.
 
-- [ ] **Step 8: Vitest — bestehende Tests müssen weiter grün sein**
-
-```bash
-cd "10 Github/GYM-WR-DUY/ExamLab"
-npx vitest run
-```
-
-Erwartet: alle bisher grünen Tests (429+) grün. Neue Tests kommen in Task 6.
-
-Commit kommt erst in Task 6 zusammen mit den Integration-Tests.
+(Commit kommt in Task 6 zusammen mit den neuen Integration-Tests.)
 
 ---
 
@@ -955,7 +1026,7 @@ Commit kommt erst in Task 6 zusammen mit den Integration-Tests.
 **Files:**
 - Create: `ExamLab/src/tests/uebungsStoreLoesungsPreload.test.ts`
 
-- [ ] **Step 1: Test-Datei anlegen**
+### Step 6.1: Test-Datei
 
 `ExamLab/src/tests/uebungsStoreLoesungsPreload.test.ts`:
 
@@ -1051,7 +1122,7 @@ describe('uebungsStore Lösungs-Preload', () => {
     const state = useUebenUebungsStore.getState()
     expect(state.ladeStatus).toBe('fertig')
     expect(state.session?.fragen.length).toBe(1)
-    expect(state.loesungenPreloaded.f1).toBe(undefined) // kein Eintrag = falsy → Fallback
+    expect(state.loesungenPreloaded.f1).toBeFalsy()
   })
 
   it('bei Partial-Response: nur gelieferte Fragen sind preloaded', async () => {
@@ -1071,7 +1142,7 @@ describe('uebungsStore Lösungs-Preload', () => {
 })
 ```
 
-- [ ] **Step 2: Test laufen lassen — neue Tests grün, alte Tests grün**
+### Step 6.2: Tests laufen + Full-Suite
 
 ```bash
 cd "10 Github/GYM-WR-DUY/ExamLab"
@@ -1085,18 +1156,18 @@ cd "10 Github/GYM-WR-DUY/ExamLab"
 npx vitest run
 ```
 
-Erwartet: alle Tests grün.
+Erwartet: alle Tests grün (429 + 4 Service + 3 Store = 436).
 
-- [ ] **Step 3: Build**
+### Step 6.3: Build
 
 ```bash
 cd "10 Github/GYM-WR-DUY/ExamLab"
 npx tsc -b && npm run build
 ```
 
-Erwartet: beide exit 0.
+Beide exit 0.
 
-- [ ] **Step 4: Commit (Frontend-Integration gesamt)**
+### Step 6.4: Commit (Frontend-Integration gesamt)
 
 ```bash
 cd "10 Github/GYM-WR-DUY"
@@ -1106,7 +1177,7 @@ ExamLab: uebungsStore Lösungs-Preload + Fallback (Bundle Ü)
 
 starteSession ruft nach ladeFragen den Lösungs-Preload über
 uebenLoesungsApi, merged Lösungs-Slices in session.fragen und
-markiert pro Frage in loesungenPreloaded (Map<frageId, boolean>).
+markiert pro Frage in loesungenPreloaded (Record<string, boolean>).
 
 beantworteById verzweigt pro Frage:
 - preloaded=true: clientseitige pruefeAntwort (instant)
@@ -1117,8 +1188,8 @@ gemerged, Reihenfolgen-kritische Felder (elemente, paare) aus Slice
 überschreiben den Client-Mischwert. Aufgabengruppen: Teilaufgaben
 aus flacher Map per id gemerged.
 
-Lösungs-Daten landen NICHT in localStorage (Zustand-persist ignoriert
-loesungenPreloaded und session.fragen).
+Lösungen landen NICHT in localStorage (Store hat keine persist-
+Middleware, nur historie wird manuell gespeichert).
 
 3 Integration-Tests: Merge, Preload-Fehler-Fallback, Partial-Response.
 
@@ -1129,141 +1200,132 @@ EOF
 
 ---
 
-## Task 7: Build + Vollständige Test-Suite
-
-- [ ] **Step 1: tsc**
-
-```bash
-cd "10 Github/GYM-WR-DUY/ExamLab"
-npx tsc -b
-```
-
-Erwartet: exit 0.
-
-- [ ] **Step 2: vitest**
-
-```bash
-cd "10 Github/GYM-WR-DUY/ExamLab"
-npx vitest run
-```
-
-Erwartet: alle Tests grün (429 vor Bundle Ü + 7 neue = 436).
-
-- [ ] **Step 3: build**
-
-```bash
-cd "10 Github/GYM-WR-DUY/ExamLab"
-npm run build
-```
-
-Erwartet: exit 0.
-
-- [ ] **Step 4: keine weiteren Commits in diesem Task** — nur Verifikation.
-
----
-
-## Task 8: Apps-Script-Deploy + Staging-E2E (User-Aktion)
+## Task 7: Apps-Script-Deploy + Staging-E2E (User-Aktion)
 
 **Files:**
 - Manual: Apps-Script-Editor
 
-Backend-Änderungen brauchen manuellen User-Deploy (wie bei Bundle P). **Keine aktive Prüfung während Deploy.**
+**Wichtig:** Dieses Deployment enthält sowohl den Bundle-Ü-Endpoint als auch den Retrofit von `bereinigeFrageFuerSuS_`. Bundle-P-Verhalten muss identisch bleiben.
 
-- [ ] **Step 1: User-Vorbereitung**
+### Step 7.1: User-Vorbereitung
 
 User-Aktion:
 1. Apps-Script-Editor öffnen.
-2. "Bereitstellungen verwalten" — aktuelle Version notieren (Rollback-Punkt).
+2. "Bereitstellungen verwalten" — aktuelle Version (Bundle P) notieren (Rollback).
 
-- [ ] **Step 2: Deploy**
+### Step 7.2: Deploy
 
 User-Aktion:
 1. `ExamLab/apps-script-code.js` komplett in Apps-Script-Editor kopieren.
-2. "Bereitstellung verwalten → Bearbeiten → Version: Neu → Bereitstellen".
+2. Neue Bereitstellung erstellen.
 3. Claude bestätigen: "Apps-Script deployed".
 
-- [ ] **Step 3: Post-Deploy Smoke-Check**
+### Step 7.3: Post-Deploy Bundle-P-Regression (Ui kritisch)
 
-Claude-Aktion: Direkt-Call an Apps-Script im echten SuS-Tab:
+Claude-Aktion im SuS-Echt-Tab:
 
 ```javascript
-// Im Browser-Tab-JavaScript-Tool:
+// Vollständiger ladeFragen-Test (wie in Bundle-P-Verifikation)
 (async function(){
   const auth = JSON.parse(localStorage.getItem('ueben-auth'));
   const url = 'https://script.google.com/macros/s/AKfycbzv88MEo_6VulH4Z10U7IvhNkdISGU5AQRQiCNL72v_N4EDXMvr4PJ5phfPExmJyZN_IA/exec';
-  const res = await fetch(url, {
-    method: 'POST',
-    redirect: 'follow',
-    body: JSON.stringify({
-      action: 'lernplattformLadeLoesungen',
-      gruppeId: 'test',
-      fragenIds: ['einr-mc-uielemente', 'einr-rf-toolfunktionen'],
-      email: auth.email,
-      token: auth.sessionToken,
-      fachbereich: 'BWL'
-    })
+  const res = await fetch(url, { method: 'POST', redirect: 'follow',
+    body: JSON.stringify({ action: 'lernplattformLadeFragen', gruppeId: 'test', email: auth.email, token: auth.sessionToken })
   });
-  const txt = await res.text();
-  return JSON.stringify({status: res.status, head: txt.substring(0, 500)});
+  const body = await res.json();
+  const SPERR = ['musterlosung','bewertungsraster','korrekt','korrekteAntworten','toleranz','erklaerung','sollKonto','habenKonto','korrektBuchung','sollEintraege','habenEintraege','buchungen','erwarteteAntworten','loesung','zoneId','korrektesLabel','korrekteFormel'];
+  function scan(obj, hits){
+    if (obj === null || typeof obj !== 'object') return;
+    if (Array.isArray(obj)) { obj.forEach(v => scan(v, hits)); return; }
+    for (const k of Object.keys(obj)) {
+      if (SPERR.includes(k)) hits.push(k);
+      if (hits.length > 5) return;
+      scan(obj[k], hits);
+    }
+  }
+  const hits = [];
+  body.data.forEach(f => scan(f, hits));
+  return JSON.stringify({totalFragen: body.data.length, hits: hits.length, firstHits: hits.slice(0, 5)});
 })()
 ```
 
-Erwartet: `{"success":true,"loesungen":{"einr-mc-uielemente":{...korrekt-Felder...}}}`. Wenn `{"success":false,"error":"Aktion nicht gefunden"}` → Deploy-Queue hängt, leerer Commit + User-Deploy wiederholen.
+Erwartet: `{"totalFragen": 2400+, "hits": 0, "firstHits": []}`. Wenn `hits > 0` → Retrofit-Regression! Rollback auf alte Bereitstellung.
 
-- [ ] **Step 4: Staging-E2E — SuS Übung starten**
+### Step 7.4: Post-Deploy Bundle-Ü-Smoke-Check
 
-Claude-Aktion im SuS-Echt-Tab:
-1. Navigate zu `/sus/ueben`.
-2. Eine Übung starten (z.B. VWL-Thema).
-3. Network-Tab prüfen via `read_network_requests`:
-   - Genau **1** Pre-Load-Call zu Apps-Script mit Action `lernplattformLadeLoesungen` am Session-Start.
-   - Response enthält `loesungen`-Map mit Feldern.
-
-- [ ] **Step 5: Staging-E2E — Instant-Korrektur bei Auto-Korrektur-Typen**
-
-Claude-Aktion: Mehrere Fragetypen beantworten + "Antwort prüfen" klicken:
-- MC-Frage → instant Feedback (kein Server-Spinner)
-- R/F-Frage → instant
-- Lückentext → instant
-- Berechnung → instant
-- Für jeden Typ: `read_network_requests` → KEIN `lernplattformPruefeAntwort`-Call (weil Client-seitig korrigiert wurde).
-
-- [ ] **Step 6: Staging-E2E — Fallback-Test**
-
-Claude-Aktion:
-1. Im Browser-Tab via `preview_eval` einen Frage-ID aus `loesungenPreloaded` künstlich auf `false` setzen (simuliert Partial-Fallback).
-2. Diese Frage beantworten + "Antwort prüfen".
-3. `read_network_requests` → `lernplattformPruefeAntwort`-Call muss erscheinen (Fallback).
-
-JavaScript-Patch:
 ```javascript
-// Im Store-Modul (Zustand ist global exponiert über window)
-// Alternative: via localStorage den Session-Store lesen, um die erste Frage-ID zu finden.
-// Dann:
-useUebenUebungsStore.setState(s => ({
-  loesungenPreloaded: { ...s.loesungenPreloaded, [frageIdVonErsterFrage]: false }
-}))
+(async function(){
+  const auth = JSON.parse(localStorage.getItem('ueben-auth'));
+  const url = 'https://script.google.com/macros/s/AKfycbzv88MEo_6VulH4Z10U7IvhNkdISGU5AQRQiCNL72v_N4EDXMvr4PJ5phfPExmJyZN_IA/exec';
+  const res = await fetch(url, { method: 'POST', redirect: 'follow',
+    body: JSON.stringify({
+      action: 'lernplattformLadeLoesungen',
+      gruppeId: 'test',
+      fragenIds: ['bwl-fin01-mc01', 'vwl-arbm01-mc01'], // beliebige echte IDs
+      email: auth.email,
+      token: auth.sessionToken,
+    })
+  });
+  const txt = await res.text();
+  return JSON.stringify({status: res.status, head: txt.substring(0, 600)});
+})()
 ```
 
-(Weil `useUebenUebungsStore` nicht auf `window` exposed ist, führe dieses Snippet direkt aus der DevTools-Konsole via copy-paste aus — ODER, wenn das zu aufwändig ist, nutze ein explizites `?preload=off`-URL-Flag als Simulations-Shortcut für diesen Test. **Für den Plan: minimale Variante** — Test manuell nur auf Console-Konsole mit Snippet.)
+Erwartet: `{"success":true,"loesungen":{...}}` mit mindestens einer `optionen`-Liste die `korrekt: true` enthält. Wenn `{"success":false,"error":"Aktion nicht gefunden"}` → Deploy-Queue hängt, leerer Commit + User-Deploy wiederholen.
 
-- [ ] **Step 7: Regression-Test — Prüfungs-Flow unverändert**
+### Step 7.5: Staging-E2E — SuS Übungs-Flow
 
-Claude-Aktion im LP-Tab:
-1. Bundle-P-Verifikation wiederholen (kurz): existierende Prüfung laden → Response enthält keine Lösungsfelder (aus Bundle P).
-2. Neue Lösungs-Endpoint-Existenz beeinflusst nicht den Prüfungs-Pfad.
+Claude-Aktion:
+1. SuS-Tab: `/sus/ueben` → Übung starten.
+2. Network-Tab prüfen via `read_network_requests`: Genau **1** `lernplattformLadeLoesungen`-Call am Session-Start.
+3. MC/RF/Lückentext/Berechnung-Fragen beantworten: jede muss instant Feedback geben (keine `lernplattformPruefeAntwort`-Calls nach dem Antwort-Klick).
+
+### Step 7.6: Staging-E2E — Partial-Fallback-Simulation
+
+Claude-Aktion in der DevTools-Konsole:
+
+```javascript
+// Wähle die erste Frage aus der aktuellen Session und setze ihren preloaded-Wert auf false
+(function(){
+  // Zugriff auf den Store via Zustand's useSyncExternalStore-Hook ist im DOM nicht möglich;
+  // Alternative: via React DevTools die Fiber-Prop finden.
+  // Praktikable Variante: Füge einen temporären Debug-Export in uebungsStore.ts ein ODER
+  // setze preloaded via LocalStorage nicht — weil der Store nicht persistiert.
+  // Für diesen Staging-Test: wir exponieren den Store einmalig.
+  if (!window.__uebenStore) {
+    return 'Debug-Export fehlt — siehe Schritt 7.6 Alternative';
+  }
+  const frageId = window.__uebenStore.getState().session.fragen[0].id;
+  window.__uebenStore.setState(s => ({ loesungenPreloaded: { ...s.loesungenPreloaded, [frageId]: false } }));
+  return `preloaded[${frageId}] = false`;
+})()
+```
+
+**Alternative (pragmatisch, kein Debug-Export nötig):**
+- Im Frontend vor Staging-Deploy eine Console-Debug-Zeile in `uebungsStore.ts` ergänzen: `if (typeof window !== 'undefined') (window as unknown as { __uebenStore: typeof useUebenUebungsStore }).__uebenStore = useUebenUebungsStore`
+- Diese Zeile in einem separaten Commit einfügen und NACH Staging-E2E wieder entfernen.
+
+**Noch pragmatischer:** Diesen Partial-Fallback-Test im Browser überspringen, wenn die Integration-Tests (Task 6) bereits den Fallback abdecken. Task 6 Test 2 + 3 zeigen: Fehler → `loesungenPreloaded = falsy`; dann läuft `beantworteById` in den Server-Pfad. Das reicht als Fallback-Verifikation wenn der Unit-Test-Pfad vertrauenswürdig ist.
+
+**Empfehlung:** Überspringen. Task 6 Tests sind hinreichend.
+
+### Step 7.7: Regression — Üben mit Selbstbewertungs-Typ
+
+Claude-Aktion: Eine Freitext-Frage beantworten + "Als richtig bewerten" klicken. Erwartet: funktioniert wie vorher (Selbstbewertung-Flow ist nicht durch Pre-Load berührt).
+
+### Step 7.8: Regression — Prüfungs-Pfad (Bundle P weiterhin OK)
+
+Claude-Aktion (optional falls zeitlich machbar): Eine existierende LP-Prüfung laden (wenn im LP-Tab eine echte Prüfung konfiguriert ist) oder erneut der SuS-lernplattformLadeFragen-Test aus 7.3.
 
 User bestätigt: "E2E grün".
 
 ---
 
-## Task 9: HANDOFF + Merge-Gate
+## Task 8: HANDOFF + Merge-Gate
 
-- [ ] **Step 1: HANDOFF.md ergänzen**
+### Step 8.1: HANDOFF.md ergänzen
 
-Öffne `ExamLab/HANDOFF.md`. Ersetze den Abschnitt "Session 126 — Bundle P: Prüfung-Hardening (2026-04-20)" durch eine Kombination der bestehenden P-Info + neuer Ü-Sektion. Alternativ: direkt nach "Session 126"-Abschnitt neuen "Session 127" einfügen.
-
-Füge nach dem Session-126-Block ein (vor "### Offene Punkte (priorisiert)"):
+Öffne `ExamLab/HANDOFF.md`. Suche den Block "Session 126 — Bundle P". Direkt danach einfügen (vor "### Offene Punkte (priorisiert)"):
 
 ```markdown
 ### Session 127 — Bundle Ü: Üben-Pre-Load (2026-04-20)
@@ -1273,29 +1335,31 @@ Branch `feature/bundle-ue-ueben-preload` → `main`. Spec `docs/superpowers/spec
 **Ziel:** Selbstständiges Üben korrigiert instant clientseitig, Lösungen werden beim Session-Start in einem separaten autorisierten Call geladen. Spart ~1.5-2s Apps-Script-Roundtrip pro „Antwort prüfen"-Klick.
 
 **Umgesetzt:**
-- Backend: `lernplattformLadeLoesungen`-Endpoint + `extrahiereLoesungsSlice_`-Helper (Umkehrfunktion von `bereinigeFrageFuerSuS_`). Rate-Limit 5/Minute, Token-Auth, Audit-Log. Aufgabengruppen-Teilaufgaben als eigene Keys in flacher Map.
-- Frontend-Types: `LoesungsSlice` + `LoesungsMap` in `src/types/ueben/loesung.ts`.
-- Frontend-Service: `uebenLoesungsApi.ts` (4 Unit-Tests).
-- Store: `uebungsStore` erweitert um `loesungenPreloaded: Record<string, boolean>`; `starteSession` merged Lösungen in Session-Fragen; `beantworteById` verzweigt pro Frage clientseitig vs. Server-Fallback (3 Integration-Tests).
-- Lösungen landen nicht in localStorage (nur In-Memory).
+- Backend-Konstante `LOESUNGS_FELDER_` als Single Source of Truth — `bereinigeFrageFuerSuS_` (Retrofit Bundle P, Verhalten identisch) und neue `extrahiereLoesungsSlice_` iterieren deklarativ darüber. Neue Lösungs-Felder in Zukunft = eine Stelle.
+- Backend-Endpoint `lernplattformLadeLoesungen` — Token-Auth, Rate-Limit 5/min, flache Map inkl. Aufgabengruppen-Teilaufgaben.
+- Frontend-Types `LoesungsSlice` + `LoesungsMap` in `src/types/ueben/loesung.ts`.
+- Frontend-Service `uebenLoesungsApi.ts` (4 Unit-Tests).
+- Store: `uebungsStore` erweitert um `loesungenPreloaded: Record<string, boolean>`; `starteSession` merged Lösungen; `beantworteById` verzweigt pro Frage clientseitig vs. Server-Fallback (3 Integration-Tests).
+- Lösungen landen nicht in localStorage.
 
 **Staging-E2E verifiziert:**
-- Pre-Load-Call am Session-Start (genau 1).
-- Auto-Korrektur-Typen (MC/RF/Lückentext/Berechnung) geben instant Feedback ohne Server-Call.
-- Partial-Fallback: künstlich gesetzter `preloaded=false` triggert `pruefeAntwortJetzt`-Aufruf.
-- Bundle-P-Regression unverändert (kein Leak via Lade-Pfad).
+- Bundle-P-Regression: 2400+ Fragen via lernplattformLadeFragen, 0 Sperrlist-Hits (Retrofit verändert Verhalten nicht).
+- Bundle-Ü-Smoke: lernplattformLadeLoesungen liefert LoesungsSlice-Map.
+- 1 Pre-Load-Call am Session-Start, Auto-Korrektur-Typen geben instant Feedback.
+
+Scope: Bundle Ü betrifft nur selbstständiges Üben. Prüfung + angeleitetes Prüfen laufen durch `ladePruefung` und brauchen keine Instant-Korrektur (Korrektur erst nach LP-Freigabe).
 ```
 
-Aktualisiere den "Aktueller Stand" oben im HANDOFF:
+**Aktueller Stand** oben aktualisieren:
 ```markdown
 ### Aktueller Stand (Ende S127)
 - **Alles auf `main`**. Letzter Commit: Bundle Ü Merge. Apps-Script deployed. Keine offenen Feature-Branches.
 - **Tests:** 436/436 vitest grün, tsc -b grün.
 ```
 
-Entferne aus "Offene Punkte" den Eintrag für Bundle Ü (ist jetzt live).
+**Offene Punkte:** Entferne den Bundle-Ü-Eintrag aus "Gross (eigene Session)".
 
-- [ ] **Step 2: HANDOFF committen**
+### Step 8.2: HANDOFF committen
 
 ```bash
 cd "10 Github/GYM-WR-DUY"
@@ -1308,7 +1372,7 @@ EOF
 )"
 ```
 
-- [ ] **Step 3: Merge-Gate-Check**
+### Step 8.3: Merge-Gate-Check
 
 Claude meldet:
 
@@ -1318,17 +1382,17 @@ Bundle Ü ready for merge. Checklist:
 - [x] vitest grün (436/436)
 - [x] npm run build grün
 - [x] Apps-Script deployed
-- [x] Staging-E2E Pre-Load-Call + instant Korrektur grün
-- [x] Staging-E2E Fallback-Pfad grün
-- [x] Bundle-P-Regression grün
+- [x] Bundle-P-Regression: 0 Sperrlist-Hits
+- [x] Bundle-Ü-Smoke: Endpoint liefert LoesungsSlice
+- [x] Staging-E2E: 1 Pre-Load + instant Korrektur + Selbstbewertung OK
 - [x] HANDOFF.md aktualisiert
 
 Bereit für Merge auf main?
 ```
 
-User antwortet "ja" → Step 4. Sonst Fix + Step 3 wiederholen.
+User → "ja" → Step 8.4. Sonst Fix + Step 8.3 wiederholen.
 
-- [ ] **Step 4: Merge + Push**
+### Step 8.4: Merge + Push
 
 ```bash
 cd "10 Github/GYM-WR-DUY"
@@ -1336,13 +1400,14 @@ git checkout main
 git merge --no-ff feature/bundle-ue-ueben-preload -m "$(cat <<'EOF'
 Bundle Ü: Üben-Pre-Load
 
-Selbstständiges Üben korrigiert instant clientseitig.
-Neuer Apps-Script-Endpoint lernplattformLadeLoesungen liefert
-Lösungs-Slices am Session-Start; Store merged sie in Session-Fragen.
-beantworteById verzweigt pro Frage: clientseitig wenn preloaded,
-sonst Fallback auf pruefeAntwortJetzt.
+Selbstständiges Üben korrigiert instant clientseitig. Neuer
+Apps-Script-Endpoint lernplattformLadeLoesungen liefert Lösungs-
+Slices am Session-Start; Store merged sie in session.fragen.
 
-Spart ~1.5-2s pro Antwort-Prüfen-Klick.
+Konsolidiert Lösungs-Feldliste zwischen Bundle P und Ü:
+gemeinsame LOESUNGS_FELDER_-Konstante als Single Source of Truth.
+
+Spart ~1.5-2s pro Antwort-Prüfen-Klick im Üben-Flow.
 
 Spec: docs/superpowers/specs/2026-04-20-musterloesungen-bereinigung-design.md
 Plan: docs/superpowers/plans/2026-04-20-bundle-ue-ueben-preload.md
@@ -1354,37 +1419,39 @@ git push
 git branch -d feature/bundle-ue-ueben-preload
 ```
 
-- [ ] **Step 5: Claude meldet Abschluss**
+### Step 8.5: Abschluss-Meldung
 
 ```
 Bundle Ü auf main. Letzter Commit: <sha>. Beide Bundles der
-Musterlösungen-Bereinigung sind damit live (P + Ü).
+Musterlösungen-Bereinigung sind live. Feldliste ist jetzt DRY
+(eine Konstante LOESUNGS_FELDER_).
 ```
 
 ---
 
 ## Rollback-Plan
 
-Bei Regression in Task 8:
-1. **Apps-Script-Rollback:** Alte Deployment-Version reaktivieren. Frontend auf altem `main` (vor Ü-Merge) funktioniert mit altem Apps-Script — die neue Lösungs-Endpoint-Abfrage schlägt dann fehl, fällt auf Server-Korrektur zurück. Tolerabel.
+Bei Regression in Task 7:
+
+1. **Apps-Script-Rollback:** Alte Bundle-P-Bereitstellung reaktivieren. Frontend (Bundle Ü nicht gemerged) funktioniert mit altem Backend — Lösungs-Endpoint schlägt fehl, Fallback auf `pruefeAntwortJetzt` greift. UX-Einbuße (Latenz wieder normal), aber funktional OK.
 2. **Git-Rollback** (nach Merge): `git revert <merge-commit>`.
-3. **Feature-Branch behalten** — kein `branch -d` vor erfolgreicher Verifikation.
+3. **Feature-Branch behalten** bis verifiziert.
 
 ---
 
 ## Risiken & Annahmen
 
-**Annahme 1:** Der Merge-Helper `mergeLoesungInFrage` behandelt alle relevanten Listen-Felder korrekt per id. Risiko: Frage-Typen wo Listen-Items keine `id` haben (z.B. reiner `string[]`-labels in DragDrop-Bild). Mitigation: `mergeById` prüft `typeof item !== 'object'` → primitive Items werden unverändert durchgereicht, was die korrekte Semantik ist (Lösung für strings liegt bereits in der Zuordnung `labels[].zoneId`, die wir bei Object-Items mergen).
+**Annahme 1 (kritisch):** Das Retrofit von `bereinigeFrageFuerSuS_` auf `LOESUNGS_FELDER_` erzeugt **identischen** Output wie Bundle P. Mitigation: Step 7.3 (Bundle-P-Regression-Test mit 2400+ Fragen) ist zwingend vor Merge.
 
-**Annahme 2:** `loesungenPreloaded: Record<string, boolean>` als Plain-Object (nicht `Map`) ist serialisierbar für Zustand; wir blockieren die Persistierung durch `partialize` (S125 Pattern) oder durch die bewusste Abwesenheit in der persist-Konfiguration. Aktuell hat `uebungsStore` keine `persist`-Middleware (nur `historie` wird manuell in localStorage gespeichert), also ist das Feld automatisch nicht persistent.
+**Annahme 2:** Aufruf-Reihenfolge der Bereinigungs-Blöcke ist semantisch egal. Die alte `bereinigeFrageFuerSuS_` hatte Hard-coded Blocks in bestimmter Reihenfolge; die neue iteriert über `LOESUNGS_FELDER_`-Kategorien. Da alle Operationen `delete` sind und sich nicht gegenseitig beeinflussen, ist Reihenfolge irrelevant. Kein Risiko.
 
-**Annahme 3:** Apps-Script-Latenz für `lernplattformLadeLoesungen` ist vergleichbar mit `lernplattformLadeFragen` (~1.5-2s). Das ist akzeptabel, weil es NUR am Session-Start läuft (nicht pro Klick) und der Preload-Spinner während „Session wird geladen" parallel zum bereits existierenden Fragen-Ladevorgang läuft. Wenn es deutlich langsamer wird → Task 8 Schritt 4 fängt das.
+**Annahme 3:** `loesungenPreloaded` als Plain-Object (nicht `Map`) ist vollständig in Zustand serialisierbar. Der Store hat keine `persist`-Middleware (nur `historie` wird manuell in localStorage geschrieben), deshalb landet die Map automatisch nicht in Storage.
 
-**Risiko (niedrig):** `mergeById` mutiert keine Listen, sondern erstellt neue Arrays. Bei grossen Sessions (200 Fragen × 4 Optionen) sind das Tausende Object-Spreads — bleibt unter 10ms auf modernen Maschinen. Nicht optimieren ohne Messung.
+**Risiko (niedrig):** Neue `LOESUNGS_FELDER_`-Struktur könnte von Apps-Script-Linting-Tools (falls vorhanden) beanstandet werden. Apps-Script hat keine Linting-CI im Projekt — kein Risiko.
 
-**Risiko (mittel):** Bei einem Test auf echten Daten kann `extrahiereLoesungsSlice_` für einen bisher nicht bedachten Fragetyp Lücken haben (z.B. wenn eine Frage im Sheet ein nicht standardisiertes Feld nutzt). Mitigation: Task 8 Step 5 testet alle Auto-Korrektur-Typen. Nicht-Auto-Typen (freitext, audio, pdf, code, visualisierung) brauchen nur `musterlosung` + `bewertungsraster` — sind einfacher.
+**Risiko (niedrig):** Pool-Fragen aus Üben-Pfad haben historisch inkonsistente Feldnamen. Die `mergeById`-Logik im Frontend ignoriert Items ohne `id`. Primitive `labels[]` werden durchgereicht. Kein neues Risiko über Bundle-P-Niveau hinaus.
 
-**Risiko (niedrig):** Race-Condition beim Session-Start — wenn User sehr schnell nach „Übung starten" schon eine Antwort klickt, könnte `loesungenPreloaded` noch leer sein. Aber: `starteSession` ist `async` und setzt `ladeStatus: 'laden'`; die UI zeigt bis `ladeStatus: 'fertig'` keine Fragen. Der Preload läuft IN der `starteSession` vor `set({session, ...})`. Keine Race möglich.
+**Risiko (mittel):** Wenn eine Frage ein unerwartetes Lösungs-Feld hat, das nicht in `LOESUNGS_FELDER_` gelistet ist, bleibt es im Ladepfad enthalten. Mitigation: Die Sperrliste in `uebenSecurityInvariant.test.ts` deckt alle bisher bekannten Felder ab; neue Feldtypen müssen in beide Dateien eingetragen werden. Das ist eine Pflege-Aufgabe, nicht ein Bundle-Ü-spezifisches Risiko.
 
 ---
 
@@ -1392,11 +1459,11 @@ Bei Regression in Task 8:
 
 - [ ] `LoesungsSlice` + `LoesungsMap` Types existieren.
 - [ ] `uebenLoesungsApi.ladeLoesungenApi` funktioniert + 4 Unit-Tests grün.
-- [ ] `apps-script-code.js` enthält `extrahiereLoesungsSlice_` + `lernplattformLadeLoesungen`-Endpoint.
+- [ ] `apps-script-code.js`: `LOESUNGS_FELDER_`-Konstante + `bereinigeFrageFuerSuS_` refactored + `extrahiereLoesungsSlice_` neu + `lernplattformLadeLoesungen`-Endpoint.
 - [ ] `uebungsStore` hat `loesungenPreloaded`-State + Merge-Logik + Branch-Logik.
 - [ ] 3 Store-Integration-Tests grün.
 - [ ] `tsc -b`, `vitest run`, `npm run build` grün.
 - [ ] Apps-Script deployed.
-- [ ] Staging-E2E: Pre-Load-Call + instant Korrektur bestätigt, Fallback-Pfad bestätigt, Bundle-P-Regression clean.
-- [ ] HANDOFF.md S127 dokumentiert, alter Bundle-Ü-Offene-Punkt entfernt.
+- [ ] Staging-E2E: Bundle-P-Regression clean, Bundle-Ü-Smoke OK, Pre-Load-Call + instant Korrektur bestätigt.
+- [ ] HANDOFF.md S127 dokumentiert.
 - [ ] Merge auf main + Push + Branch gelöscht.
