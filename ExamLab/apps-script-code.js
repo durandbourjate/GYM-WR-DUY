@@ -1636,163 +1636,14 @@ function shuffle_(arr) {
   return result;
 }
 
-function bereinigeFrageFuerSuS_(frage) {
-  var f = JSON.parse(JSON.stringify(frage)); // Deep Copy
-
-  // Musterlösung + Bewertungsraster entfernen
-  delete f.musterlosung;
-  delete f.bewertungsraster;
-
-  // MC: korrekt + erklaerung aus Optionen entfernen
-  if (f.optionen && Array.isArray(f.optionen)) {
-    f.optionen = f.optionen.map(function(o) {
-      var cleaned = Object.assign({}, o);
-      delete cleaned.korrekt;
-      delete cleaned.erklaerung;
-      return cleaned;
-    });
-  }
-
-  // R/F: korrekt-Feld aus Aussagen entfernen
-  if (f.aussagen && Array.isArray(f.aussagen)) {
-    f.aussagen = f.aussagen.map(function(a) {
-      var cleaned = Object.assign({}, a);
-      delete cleaned.korrekt;
-      delete cleaned.erklaerung;
-      return cleaned;
-    });
-  }
-
-  // Lückentext: korrekteAntworten + korrekt aus Lücken entfernen
-  if (f.luecken && Array.isArray(f.luecken)) {
-    f.luecken = f.luecken.map(function(l) {
-      var cleaned = Object.assign({}, l);
-      delete cleaned.korrekteAntworten;
-      delete cleaned.korrekt;
-      // Dropdown-Optionen behalten (SuS braucht sie zur Auswahl), aber nicht die korrekte markieren
-      return cleaned;
-    });
-  }
-
-  // Berechnung: korrekt-Wert + toleranz aus Ergebnissen entfernen
-  if (f.ergebnisse && Array.isArray(f.ergebnisse)) {
-    f.ergebnisse = f.ergebnisse.map(function(e) {
-      var cleaned = Object.assign({}, e);
-      delete cleaned.korrekt;
-      delete cleaned.toleranz;
-      return cleaned;
-    });
-  }
-
-  // Zuordnung: korrekte Paarung verschleiern (rechts-Zuordnung nicht vorgeben)
-  // Paare bleiben — die Zuordnung ergibt sich aus der Reihenfolge, die gemischt wird
-
-  // Sortierung: korrekte Reihenfolge ist implizit in elemente[] — wird client-seitig gemischt
-
-  // Aufgabengruppe: Teilaufgaben rekursiv bereinigen
-  if (f.teilaufgaben && Array.isArray(f.teilaufgaben)) {
-    f.teilaufgaben = f.teilaufgaben.map(function(ta) {
-      return bereinigeFrageFuerSuS_(ta);
-    });
-  }
-
-  // FiBu-Typen: Kontenauswahl bereinigen (Konto-Kategorien können Hinweise geben)
-  // Kontenauswahl bleibt — SuS braucht sie zum Auswählen. Kategorien sind Lernstoff, kein Geheimnis.
-
-  return f;
-}
-
 /**
- * Bereinigung für selbstständiges Üben: baut auf bereinigeFrageFuerSuS_ auf.
- * Zusätzlich: entfernt weitere Lösungsfelder (FiBu + Formel + Bildbeschriftung/DragDrop/Hotspot)
- * und mischt Reihenfolgen bei 8 Typen, damit konstantes Muster kein Hinweis auf Lösung gibt.
+ * Mischt Reihenfolgen der Antwort-Optionen pro Fragetyp (Fisher-Yates).
+ * Mutiert das übergebene Objekt. Aufrufer muss bereits eine Deep-Copy haben,
+ * wenn Original-Frage unverändert bleiben soll.
+ * Rekursiv für Aufgabengruppen.
  */
-function bereinigeFrageFuerSuSUeben_(frage) {
-  var f = bereinigeFrageFuerSuS_(frage);
-
-  // Zusätzliche Lösungsfeld-Bereinigungen (über Pruefungs-Variante hinaus)
-  if (f.buchungen) delete f.buchungen;
-  if (f.korrektBuchung) delete f.korrektBuchung;
-  if (f.sollEintraege) delete f.sollEintraege;
-  if (f.habenEintraege) delete f.habenEintraege;
-  if (f.korrekteFormel) delete f.korrekteFormel;
-  if (f.typ === 'formel' && f.korrekt) delete f.korrekt;
-
-  // FiBu: konten[].korrekt + bilanzEintraege[].korrekt + tkonto.loesung entfernen
-  if (Array.isArray(f.konten)) {
-    f.konten = f.konten.map(function(k) {
-      var c = Object.assign({}, k);
-      delete c.korrekt;
-      delete c.eintraege; // T-Konto-Lösungs-Einträge
-      delete c.saldo;     // T-Konto-Saldo = Lösung
-      if (!c.anfangsbestandVorgegeben) {
-        delete c.anfangsbestand; // Bereinigen wenn nicht als Aufgabenstellung sichtbar
-      }
-      return c;
-    });
-  }
-  if (Array.isArray(f.bilanzEintraege)) {
-    f.bilanzEintraege = f.bilanzEintraege.map(function(e) {
-      var c = Object.assign({}, e);
-      delete c.korrekt;
-      return c;
-    });
-  }
-  if (f.loesung) delete f.loesung; // bilanzstruktur.loesung
-  if (Array.isArray(f.aufgaben)) {
-    // kontenbestimmung.aufgaben[].erwarteteAntworten entfernen
-    f.aufgaben = f.aufgaben.map(function(a) {
-      var c = Object.assign({}, a);
-      delete c.erwarteteAntworten;
-      return c;
-    });
-  }
-
-  // Bildbeschriftung: labels[].zoneId IST die Lösung + beschriftungen[].korrekt
-  // ACHTUNG: labels[] ist je nach Pool-Daten string[] (DragDrop-Bild) oder {id,text,zoneId}[]
-  // (Bildbeschriftung). Strings unverändert lassen, sonst werden sie zu Char-Objekten.
-  if ((f.typ === 'bildbeschriftung' || f.typ === 'dragdrop_bild') && Array.isArray(f.labels)) {
-    f.labels = f.labels.map(function(l) {
-      if (typeof l !== 'object' || l === null) return l;
-      var c = Object.assign({}, l);
-      delete c.zoneId;
-      delete c.zone;
-      delete c.korrekt;
-      return c;
-    });
-  }
-  if (Array.isArray(f.beschriftungen)) {
-    f.beschriftungen = f.beschriftungen.map(function(b) {
-      var c = Object.assign({}, b);
-      delete c.korrekt;
-      return c;
-    });
-  }
-  if (Array.isArray(f.zielzonen)) {
-    f.zielzonen = f.zielzonen.map(function(z) {
-      var c = Object.assign({}, z);
-      delete c.korrektesLabel;
-      return c;
-    });
-  }
-
-  // Hotspot: bereiche[].korrekt + koordinaten unverändert (visuelles Target darstellen)
-  if (f.typ === 'hotspot' && Array.isArray(f.bereiche)) {
-    f.bereiche = f.bereiche.map(function(b) {
-      var c = Object.assign({}, b);
-      delete c.korrekt;
-      return c;
-    });
-  }
-  if (f.typ === 'hotspot' && Array.isArray(f.hotspots)) {
-    f.hotspots = f.hotspots.map(function(h) {
-      var c = Object.assign({}, h);
-      delete c.korrekt;
-      return c;
-    });
-  }
-
-  // Mischung (Fisher-Yates) pro Typ
+function mischeFrageOptionen_(frage) {
+  var f = frage;
   switch (f.typ) {
     case 'mc':
       if (Array.isArray(f.optionen)) f.optionen = shuffle_(f.optionen);
@@ -1836,10 +1687,161 @@ function bereinigeFrageFuerSuSUeben_(frage) {
 
   // Aufgabengruppe: rekursiv
   if (Array.isArray(f.teilaufgaben)) {
-    f.teilaufgaben = f.teilaufgaben.map(bereinigeFrageFuerSuSUeben_);
+    f.teilaufgaben = f.teilaufgaben.map(mischeFrageOptionen_);
   }
 
   return f;
+}
+
+function bereinigeFrageFuerSuS_(frage) {
+  var f = JSON.parse(JSON.stringify(frage)); // Deep Copy
+
+  // Gemeinsame Felder
+  delete f.musterlosung;
+  delete f.bewertungsraster;
+
+  // MC: korrekt + erklaerung aus Optionen entfernen
+  if (f.optionen && Array.isArray(f.optionen)) {
+    f.optionen = f.optionen.map(function(o) {
+      var cleaned = Object.assign({}, o);
+      delete cleaned.korrekt;
+      delete cleaned.erklaerung;
+      return cleaned;
+    });
+  }
+
+  // R/F: korrekt-Feld aus Aussagen entfernen
+  if (f.aussagen && Array.isArray(f.aussagen)) {
+    f.aussagen = f.aussagen.map(function(a) {
+      var cleaned = Object.assign({}, a);
+      delete cleaned.korrekt;
+      delete cleaned.erklaerung;
+      return cleaned;
+    });
+  }
+
+  // Lückentext: korrekteAntworten + korrekt aus Lücken entfernen
+  if (f.luecken && Array.isArray(f.luecken)) {
+    f.luecken = f.luecken.map(function(l) {
+      var cleaned = Object.assign({}, l);
+      delete cleaned.korrekteAntworten;
+      delete cleaned.korrekt;
+      return cleaned;
+    });
+  }
+
+  // Berechnung: korrekt-Wert + toleranz aus Ergebnissen entfernen
+  if (f.ergebnisse && Array.isArray(f.ergebnisse)) {
+    f.ergebnisse = f.ergebnisse.map(function(e) {
+      var cleaned = Object.assign({}, e);
+      delete cleaned.korrekt;
+      delete cleaned.toleranz;
+      return cleaned;
+    });
+  }
+
+  // Formel: korrekteFormel + korrekt entfernen
+  if (f.korrekteFormel) delete f.korrekteFormel;
+  if (f.typ === 'formel' && f.korrekt) delete f.korrekt;
+
+  // Buchungssatz: buchungen, korrektBuchung, sollEintraege, habenEintraege
+  if (f.buchungen) delete f.buchungen;
+  if (f.korrektBuchung) delete f.korrektBuchung;
+  if (f.sollEintraege) delete f.sollEintraege;
+  if (f.habenEintraege) delete f.habenEintraege;
+
+  // FiBu Konten: korrekt, eintraege, saldo, anfangsbestand (bedingt)
+  if (Array.isArray(f.konten)) {
+    f.konten = f.konten.map(function(k) {
+      var c = Object.assign({}, k);
+      delete c.korrekt;
+      delete c.eintraege;
+      delete c.saldo;
+      if (!c.anfangsbestandVorgegeben) {
+        delete c.anfangsbestand;
+      }
+      return c;
+    });
+  }
+
+  // Bilanzstruktur / Bilanz-ER
+  if (Array.isArray(f.bilanzEintraege)) {
+    f.bilanzEintraege = f.bilanzEintraege.map(function(e) {
+      var c = Object.assign({}, e);
+      delete c.korrekt;
+      return c;
+    });
+  }
+  if (f.loesung) delete f.loesung;
+
+  // Kontenbestimmung: aufgaben[].erwarteteAntworten
+  if (Array.isArray(f.aufgaben)) {
+    f.aufgaben = f.aufgaben.map(function(a) {
+      var c = Object.assign({}, a);
+      delete c.erwarteteAntworten;
+      return c;
+    });
+  }
+
+  // Bildbeschriftung / DragDrop: labels[].zoneId/zone/korrekt, beschriftungen[].korrekt, zielzonen[].korrektesLabel
+  // ACHTUNG: labels[] ist je nach Pool-Daten string[] (DragDrop-Bild) oder {id,text,zoneId}[]
+  // (Bildbeschriftung). Strings unverändert lassen, sonst werden sie zu Char-Objekten.
+  if ((f.typ === 'bildbeschriftung' || f.typ === 'dragdrop_bild') && Array.isArray(f.labels)) {
+    f.labels = f.labels.map(function(l) {
+      if (typeof l !== 'object' || l === null) return l;
+      var c = Object.assign({}, l);
+      delete c.zoneId;
+      delete c.zone;
+      delete c.korrekt;
+      return c;
+    });
+  }
+  if (Array.isArray(f.beschriftungen)) {
+    f.beschriftungen = f.beschriftungen.map(function(b) {
+      var c = Object.assign({}, b);
+      delete c.korrekt;
+      return c;
+    });
+  }
+  if (Array.isArray(f.zielzonen)) {
+    f.zielzonen = f.zielzonen.map(function(z) {
+      var c = Object.assign({}, z);
+      delete c.korrektesLabel;
+      return c;
+    });
+  }
+
+  // Hotspot: bereiche[].korrekt + hotspots[].korrekt
+  if (f.typ === 'hotspot' && Array.isArray(f.bereiche)) {
+    f.bereiche = f.bereiche.map(function(b) {
+      var c = Object.assign({}, b);
+      delete c.korrekt;
+      return c;
+    });
+  }
+  if (f.typ === 'hotspot' && Array.isArray(f.hotspots)) {
+    f.hotspots = f.hotspots.map(function(h) {
+      var c = Object.assign({}, h);
+      delete c.korrekt;
+      return c;
+    });
+  }
+
+  // Aufgabengruppe: Teilaufgaben rekursiv bereinigen
+  if (f.teilaufgaben && Array.isArray(f.teilaufgaben)) {
+    f.teilaufgaben = f.teilaufgaben.map(bereinigeFrageFuerSuS_);
+  }
+
+  return f;
+}
+
+/**
+ * Bereinigung für selbstständiges Üben: strenge Bereinigung + Mischung.
+ * Strenge Bereinigung steckt vollständig in bereinigeFrageFuerSuS_;
+ * diese Funktion fügt nur noch Fisher-Yates-Mischung hinzu.
+ */
+function bereinigeFrageFuerSuSUeben_(frage) {
+  return mischeFrageOptionen_(bereinigeFrageFuerSuS_(frage));
 }
 
 // === SERVER-SIDE KORREKTUR (Port aus korrektur.ts) ===
