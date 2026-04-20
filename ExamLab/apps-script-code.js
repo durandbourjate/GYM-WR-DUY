@@ -10080,3 +10080,48 @@ function migrierZonenEndpoint_(body) {
     return jsonResponse({ error: 'Zonen-Migration fehlgeschlagen: ' + e.message });
   }
 }
+
+// ============================================================
+// KI-Kalibrierung — Sheet-Setup-Helper (2026-04-20)
+// ============================================================
+
+/**
+ * Idempotent: legt KIFeedback-Sheet mit Headers an, falls fehlt.
+ * Wird bei jedem schreibenden Feedback-Call als erstes aufgerufen.
+ */
+function stelleKIFeedbackSheetBereit_() {
+  var ss = SpreadsheetApp.openById(CONFIGS_ID);
+  var sheet = ss.getSheetByName('KIFeedback');
+  var headers = ['feedbackId','zeitstempel','lpEmail','fachschaft','aktion','fachbereich',
+                 'bloom','inputJson','kiOutputJson','finaleVersionJson','diffScore',
+                 'status','qualifiziert','wichtig','aktiv','teilen','embeddingHash'];
+  if (!sheet) {
+    sheet = ss.insertSheet('KIFeedback');
+    sheet.appendRow(headers);
+    sheet.setFrozenRows(1);
+    return sheet;
+  }
+  var vorhandene = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+  for (var i = 0; i < headers.length; i++) {
+    if (vorhandene[i] !== headers[i]) {
+      if (i >= sheet.getLastColumn()) {
+        // Spalte fehlt am Ende: ergänzen
+        sheet.getRange(1, i + 1).setValue(headers[i]);
+      }
+      // Header-Mismatch in mittlerer Spalte → Log, kein Throw (defensive)
+    }
+  }
+  return sheet;
+}
+
+/**
+ * Idempotent: ergänzt fehlenden `kriterienBewertung`-Header im Korrektur_-Sheet einer Prüfung.
+ * Aufgerufen von speichereKorrekturZeile vor dem Write.
+ */
+function stelleKorrekturSheetHeaderBereit_(korrekturSheet) {
+  var headers = korrekturSheet.getRange(1, 1, 1, korrekturSheet.getLastColumn()).getValues()[0];
+  if (headers.indexOf('kriterienBewertung') === -1) {
+    var neueSpalteIdx = korrekturSheet.getLastColumn() + 1;
+    korrekturSheet.getRange(1, neueSpalteIdx).setValue('kriterienBewertung');
+  }
+}
