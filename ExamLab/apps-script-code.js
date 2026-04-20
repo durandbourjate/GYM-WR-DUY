@@ -1636,10 +1636,73 @@ function shuffle_(arr) {
   return result;
 }
 
+/**
+ * Mischt Reihenfolgen der Antwort-Optionen pro Fragetyp (Fisher-Yates).
+ * Mutiert das übergebene Objekt. Aufrufer muss Besitzer des Objekts sein —
+ * bei Chain-Nutzung via mischeFrageOptionen_(bereinigeFrageFuerSuS_(f)) ist
+ * das sicher, weil bereinigeFrageFuerSuS_ intern eine Deep-Copy erstellt.
+ * Rekursiv für Aufgabengruppen.
+ */
+function mischeFrageOptionen_(frage) {
+  var f = frage;
+  switch (f.typ) {
+    case 'mc':
+      if (Array.isArray(f.optionen)) f.optionen = shuffle_(f.optionen);
+      break;
+    case 'richtigfalsch':
+      if (Array.isArray(f.aussagen)) f.aussagen = shuffle_(f.aussagen);
+      break;
+    case 'sortierung':
+      if (Array.isArray(f.elemente)) f.elemente = shuffle_(f.elemente);
+      break;
+    case 'zuordnung':
+      // Mische die rechts-Spalte unabhängig von links — Paarung verschleiert,
+      // UI-Komponente liest weiterhin paare[].links + paare[].rechts.
+      if (Array.isArray(f.paare)) {
+        var rechtsValues = f.paare.map(function(p) { return p.rechts; });
+        var rechtsShuffled = shuffle_(rechtsValues);
+        f.paare = f.paare.map(function(p, i) {
+          return Object.assign({}, p, { rechts: rechtsShuffled[i] });
+        });
+      }
+      break;
+    case 'bildbeschriftung':
+    case 'dragdrop_bild':
+      if (Array.isArray(f.labels)) f.labels = shuffle_(f.labels);
+      break;
+    case 'hotspot':
+      if (Array.isArray(f.hotspots)) f.hotspots = shuffle_(f.hotspots);
+      if (Array.isArray(f.bereiche)) f.bereiche = shuffle_(f.bereiche);
+      break;
+    case 'lueckentext':
+      if (Array.isArray(f.luecken)) {
+        f.luecken = f.luecken.map(function(l) {
+          if (Array.isArray(l.optionen)) {
+            return Object.assign({}, l, { optionen: shuffle_(l.optionen) });
+          }
+          return l;
+        });
+      }
+      break;
+  }
+
+  // Aufgabengruppe: rekursiv
+  if (Array.isArray(f.teilaufgaben)) {
+    f.teilaufgaben = f.teilaufgaben.map(mischeFrageOptionen_);
+  }
+
+  return f;
+}
+
+/**
+ * Strenge Bereinigung für alle SuS-Ladepfade (Prüfung + angeleitete Übung + selbstständiges Üben).
+ * Liefert Deep-Copy ohne jegliche Lösungsfelder; keine Mischung (dafür siehe mischeFrageOptionen_).
+ * Rekursiv für Aufgabengruppen. Einziger kanonischer SuS-Bereinigungs-Pfad.
+ */
 function bereinigeFrageFuerSuS_(frage) {
   var f = JSON.parse(JSON.stringify(frage)); // Deep Copy
 
-  // Musterlösung + Bewertungsraster entfernen
+  // Gemeinsame Felder
   delete f.musterlosung;
   delete f.bewertungsraster;
 
@@ -1684,41 +1747,17 @@ function bereinigeFrageFuerSuS_(frage) {
     });
   }
 
-  // Zuordnung: korrekte Paarung verschleiern (rechts-Zuordnung nicht vorgeben)
-  // Paare bleiben — die Zuordnung ergibt sich aus der Reihenfolge, die gemischt wird
+  // Formel: korrekteFormel + korrekt entfernen
+  if (f.korrekteFormel) delete f.korrekteFormel;
+  if (f.typ === 'formel' && f.korrekt) delete f.korrekt;
 
-  // Sortierung: korrekte Reihenfolge ist implizit in elemente[] — wird client-seitig gemischt
-
-  // Aufgabengruppe: Teilaufgaben rekursiv bereinigen
-  if (f.teilaufgaben && Array.isArray(f.teilaufgaben)) {
-    f.teilaufgaben = f.teilaufgaben.map(function(ta) {
-      return bereinigeFrageFuerSuS_(ta);
-    });
-  }
-
-  // FiBu-Typen: Kontenauswahl bereinigen (Konto-Kategorien können Hinweise geben)
-  // Kontenauswahl bleibt — SuS braucht sie zum Auswählen. Kategorien sind Lernstoff, kein Geheimnis.
-
-  return f;
-}
-
-/**
- * Bereinigung für selbstständiges Üben: baut auf bereinigeFrageFuerSuS_ auf.
- * Zusätzlich: entfernt weitere Lösungsfelder (FiBu + Formel + Bildbeschriftung/DragDrop/Hotspot)
- * und mischt Reihenfolgen bei 8 Typen, damit konstantes Muster kein Hinweis auf Lösung gibt.
- */
-function bereinigeFrageFuerSuSUeben_(frage) {
-  var f = bereinigeFrageFuerSuS_(frage);
-
-  // Zusätzliche Lösungsfeld-Bereinigungen (über Pruefungs-Variante hinaus)
+  // Buchungssatz: buchungen, korrektBuchung, sollEintraege, habenEintraege
   if (f.buchungen) delete f.buchungen;
   if (f.korrektBuchung) delete f.korrektBuchung;
   if (f.sollEintraege) delete f.sollEintraege;
   if (f.habenEintraege) delete f.habenEintraege;
-  if (f.korrekteFormel) delete f.korrekteFormel;
-  if (f.typ === 'formel' && f.korrekt) delete f.korrekt;
 
-  // FiBu: konten[].korrekt + bilanzEintraege[].korrekt + tkonto.loesung entfernen
+  // FiBu Konten: korrekt, eintraege, saldo, anfangsbestand (bedingt)
   if (Array.isArray(f.konten)) {
     f.konten = f.konten.map(function(k) {
       var c = Object.assign({}, k);
@@ -1731,6 +1770,8 @@ function bereinigeFrageFuerSuSUeben_(frage) {
       return c;
     });
   }
+
+  // Bilanzstruktur / Bilanz-ER
   if (Array.isArray(f.bilanzEintraege)) {
     f.bilanzEintraege = f.bilanzEintraege.map(function(e) {
       var c = Object.assign({}, e);
@@ -1738,9 +1779,10 @@ function bereinigeFrageFuerSuSUeben_(frage) {
       return c;
     });
   }
-  if (f.loesung) delete f.loesung; // bilanzstruktur.loesung
+  if (f.loesung) delete f.loesung;
+
+  // Kontenbestimmung: aufgaben[].erwarteteAntworten
   if (Array.isArray(f.aufgaben)) {
-    // kontenbestimmung.aufgaben[].erwarteteAntworten entfernen
     f.aufgaben = f.aufgaben.map(function(a) {
       var c = Object.assign({}, a);
       delete c.erwarteteAntworten;
@@ -1748,7 +1790,7 @@ function bereinigeFrageFuerSuSUeben_(frage) {
     });
   }
 
-  // Bildbeschriftung: labels[].zoneId IST die Lösung + beschriftungen[].korrekt
+  // Bildbeschriftung / DragDrop: labels[].zoneId/zone/korrekt, beschriftungen[].korrekt, zielzonen[].korrektesLabel
   // ACHTUNG: labels[] ist je nach Pool-Daten string[] (DragDrop-Bild) oder {id,text,zoneId}[]
   // (Bildbeschriftung). Strings unverändert lassen, sonst werden sie zu Char-Objekten.
   if ((f.typ === 'bildbeschriftung' || f.typ === 'dragdrop_bild') && Array.isArray(f.labels)) {
@@ -1776,7 +1818,7 @@ function bereinigeFrageFuerSuSUeben_(frage) {
     });
   }
 
-  // Hotspot: bereiche[].korrekt + koordinaten unverändert (visuelles Target darstellen)
+  // Hotspot: bereiche[].korrekt + hotspots[].korrekt
   if (f.typ === 'hotspot' && Array.isArray(f.bereiche)) {
     f.bereiche = f.bereiche.map(function(b) {
       var c = Object.assign({}, b);
@@ -1792,54 +1834,21 @@ function bereinigeFrageFuerSuSUeben_(frage) {
     });
   }
 
-  // Mischung (Fisher-Yates) pro Typ
-  switch (f.typ) {
-    case 'mc':
-      if (Array.isArray(f.optionen)) f.optionen = shuffle_(f.optionen);
-      break;
-    case 'richtigfalsch':
-      if (Array.isArray(f.aussagen)) f.aussagen = shuffle_(f.aussagen);
-      break;
-    case 'sortierung':
-      if (Array.isArray(f.elemente)) f.elemente = shuffle_(f.elemente);
-      break;
-    case 'zuordnung':
-      // Mische die rechts-Spalte unabhängig von links — Paarung verschleiert,
-      // UI-Komponente liest weiterhin paare[].links + paare[].rechts.
-      if (Array.isArray(f.paare)) {
-        var rechtsValues = f.paare.map(function(p) { return p.rechts; });
-        var rechtsShuffled = shuffle_(rechtsValues);
-        f.paare = f.paare.map(function(p, i) {
-          return Object.assign({}, p, { rechts: rechtsShuffled[i] });
-        });
-      }
-      break;
-    case 'bildbeschriftung':
-    case 'dragdrop_bild':
-      if (Array.isArray(f.labels)) f.labels = shuffle_(f.labels);
-      break;
-    case 'hotspot':
-      if (Array.isArray(f.hotspots)) f.hotspots = shuffle_(f.hotspots);
-      if (Array.isArray(f.bereiche)) f.bereiche = shuffle_(f.bereiche);
-      break;
-    case 'lueckentext':
-      if (Array.isArray(f.luecken)) {
-        f.luecken = f.luecken.map(function(l) {
-          if (Array.isArray(l.optionen)) {
-            return Object.assign({}, l, { optionen: shuffle_(l.optionen) });
-          }
-          return l;
-        });
-      }
-      break;
-  }
-
-  // Aufgabengruppe: rekursiv
-  if (Array.isArray(f.teilaufgaben)) {
-    f.teilaufgaben = f.teilaufgaben.map(bereinigeFrageFuerSuSUeben_);
+  // Aufgabengruppe: Teilaufgaben rekursiv bereinigen
+  if (f.teilaufgaben && Array.isArray(f.teilaufgaben)) {
+    f.teilaufgaben = f.teilaufgaben.map(bereinigeFrageFuerSuS_);
   }
 
   return f;
+}
+
+/**
+ * Bereinigung für selbstständiges Üben: strenge Bereinigung + Mischung.
+ * Strenge Bereinigung steckt vollständig in bereinigeFrageFuerSuS_;
+ * diese Funktion fügt nur noch Fisher-Yates-Mischung hinzu.
+ */
+function bereinigeFrageFuerSuSUeben_(frage) {
+  return mischeFrageOptionen_(bereinigeFrageFuerSuS_(frage));
 }
 
 // === SERVER-SIDE KORREKTUR (Port aus korrektur.ts) ===
