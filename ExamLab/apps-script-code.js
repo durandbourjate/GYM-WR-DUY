@@ -6,6 +6,102 @@
 // Danach: Bereitstellen → Bereitstellungen verwalten → Neue Version → Bereitstellen
 // ============================================================
 
+// === ZONEN-POLYGON HELPER (ab 2026-04-20, Polygon-Zonen-Refactor) ===
+
+/**
+ * Ray-Casting Point-in-Polygon. Funktioniert für konvexe und konkave Polygone.
+ * Polygon mit <3 Punkten ist degenerate → false.
+ * Gespiegelt aus ExamLab/src/utils/zonen/polygon.ts (istPunktInPolygon).
+ */
+function istPunktInPolygon_(p, polygon) {
+  if (!Array.isArray(polygon) || polygon.length < 3) return false;
+  var inside = false;
+  for (var i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+    var xi = polygon[i].x, yi = polygon[i].y;
+    var xj = polygon[j].x, yj = polygon[j].y;
+    var intersect = ((yi > p.y) !== (yj > p.y)) &&
+      (p.x < ((xj - xi) * (p.y - yi)) / (yj - yi) + xi);
+    if (intersect) inside = !inside;
+  }
+  return inside;
+}
+
+function zn_rechteckZuPolygon_(x, y, b, h) {
+  return [
+    { x: x, y: y }, { x: x + b, y: y },
+    { x: x + b, y: y + h }, { x: x, y: y + h }
+  ];
+}
+
+function zn_kreisZuPolygon_(cx, cy, r) {
+  var punkte = [], n = 12;
+  for (var i = 0; i < n; i++) {
+    var t = (2 * Math.PI * i) / n;
+    punkte.push({ x: cx + r * Math.cos(t), y: cy + r * Math.sin(t) });
+  }
+  return punkte;
+}
+
+function zn_istWohlgeformt_(zone) {
+  return zone && Array.isArray(zone.punkte) && zone.punkte.length >= 3;
+}
+
+/**
+ * Migriert eine Alt-Format-Hotspot-Zone ins neue Polygon-Format.
+ * Idempotent. Rechteck → 4-Punkt-Polygon, Kreis → 12-Punkt-Polygon.
+ * `punkte` (number) wird zu `punktzahl`.
+ */
+function zn_migriereHotspotBereich_(alt) {
+  if (zn_istWohlgeformt_(alt)) return alt;
+  var k = alt.koordinaten || {};
+  var form, punkte;
+  if (alt.form === 'kreis') {
+    form = 'polygon';
+    punkte = zn_kreisZuPolygon_(
+      typeof k.x === 'number' ? k.x : 50,
+      typeof k.y === 'number' ? k.y : 50,
+      typeof k.radius === 'number' ? k.radius : 5
+    );
+  } else {
+    form = 'rechteck';
+    punkte = zn_rechteckZuPolygon_(
+      typeof k.x === 'number' ? k.x : 0,
+      typeof k.y === 'number' ? k.y : 0,
+      typeof k.breite === 'number' ? k.breite : 0,
+      typeof k.hoehe === 'number' ? k.hoehe : 0
+    );
+  }
+  return {
+    id: alt.id,
+    form: form,
+    punkte: punkte,
+    label: alt.label || '',
+    punktzahl: typeof alt.punktzahl === 'number' ? alt.punktzahl
+      : typeof alt.punkte === 'number' ? alt.punkte
+      : 1
+  };
+}
+
+/**
+ * Migriert eine Alt-Format-DragDrop-Zielzone ins neue Polygon-Format.
+ * Idempotent. Liest `position: {x, y, breite, hoehe}`.
+ */
+function zn_migriereDragDropZielzone_(alt) {
+  if (zn_istWohlgeformt_(alt)) return alt;
+  var p = alt.position || {};
+  return {
+    id: alt.id,
+    form: 'rechteck',
+    punkte: zn_rechteckZuPolygon_(
+      typeof p.x === 'number' ? p.x : 0,
+      typeof p.y === 'number' ? p.y : 0,
+      typeof p.breite === 'number' ? p.breite : 0,
+      typeof p.hoehe === 'number' ? p.hoehe : 0
+    ),
+    korrektesLabel: alt.korrektesLabel || ''
+  };
+}
+
 // === KONFIGURATION ===
 const FRAGENBANK_ID = '1ASSRv7mSpmyD22PAMUJ8iekHwuamYkHpy9E6yxWNIVs';
 const CONFIGS_ID = '1QpcC44Ly7BUTLgUkVQtdqjTUDXmgdWdVD8ajjzsd7tE';
@@ -1037,6 +1133,10 @@ function doPost(e) {
     // === MEDIAQUELLE MIGRATION (Admin-only, S125 Phase 5) ===
     case 'admin:migrierMediaQuelle':
       return migrierFragenZuMediaQuelleEndpoint_(body);
+
+    // === POLYGON-ZONEN MIGRATION (Admin-only, Phase 6) ===
+    case 'admin:migriereZonen':
+      return migrierZonenEndpoint_(body);
 
     default:
       return jsonResponse({ error: 'Unbekannte Aktion' });
@@ -2116,21 +2216,12 @@ function pruefeAntwortServer_(frage, antwort) {
       var alle = Array.isArray(frage.bereiche) ? frage.bereiche : [];
       var klicks = Array.isArray(a.klicks) ? a.klicks : [];
       if (alle.length === 0 || klicks.length === 0) return false;
-      // Pool-Import-Konvention: alle Hotspots in bereiche[], nur korrekte mit punkte>0.
-      // LP-Editor: alle Bereiche haben punkte>0. Filter loest beides.
-      var punkteBereiche = alle.filter(function(b) { return (b.punkte || 0) > 0; });
+      // Pool-Import-Konvention: alle Hotspots in bereiche[], nur korrekte mit punktzahl>0.
+      // LP-Editor: alle Bereiche haben punktzahl>0. Filter loest beides.
+      var punkteBereiche = alle.filter(function(b) { return (b.punktzahl || 0) > 0; });
       var zuPruefen = punkteBereiche.length > 0 ? punkteBereiche : alle;
       function trifft(b, kl) {
-        var ko = b.koordinaten || {};
-        if (b.form === 'rechteck') {
-          return kl.x >= ko.x && kl.x <= ko.x + (ko.breite || 0) &&
-                 kl.y >= ko.y && kl.y <= ko.y + (ko.hoehe || 0);
-        }
-        if (b.form === 'kreis') {
-          var dx = kl.x - ko.x, dy = kl.y - ko.y;
-          return Math.sqrt(dx * dx + dy * dy) <= (ko.radius || 10);
-        }
-        return false;
+        return istPunktInPolygon_(kl, b.punkte || []);
       }
       var alleKorrekteGetroffen = zuPruefen.every(function(b) {
         return klicks.some(function(kl) { return trifft(b, kl); });
@@ -7312,10 +7403,10 @@ function migriereFachbereich_() {
 function repariereEinrichtungsFragen() {
   var reparaturen = {
     'einr-sort-planeten': { elemente: ['Merkur','Venus','Erde','Mars','Jupiter','Saturn','Uranus','Neptun'], teilpunkte: true },
-    'einr-hs-europa': { bildUrl: './demo-bilder/europa-karte.svg', bereiche: [{ id: 'schweiz', form: 'rechteck', koordinaten: { x: 45, y: 43, breite: 6, hoehe: 5 }, label: 'Schweiz', punkte: 2 }], mehrfachauswahl: false },
+    'einr-hs-europa': { bildUrl: './demo-bilder/europa-karte.svg', bereiche: [{ id: 'schweiz', form: 'rechteck', punkte: [{x:45,y:43},{x:51,y:43},{x:51,y:48},{x:45,y:48}], label: 'Schweiz', punktzahl: 2 }], mehrfachauswahl: false },
     'einr-bb-zelle': { bildUrl: './demo-bilder/tierzelle.svg', beschriftungen: [{ id: '1', position: { x: 50, y: 50 }, korrekt: ['Zellkern','Nukleus','Nucleus'] }, { id: '2', position: { x: 25, y: 30 }, korrekt: ['Zellmembran','Membran'] }, { id: '3', position: { x: 62, y: 55 }, korrekt: ['Mitochondrium','Mitochondrien'] }] },
     'einr-audio-vorstellen': { maxDauerSekunden: 60 },
-    'einr-dd-kontinente': { bildUrl: './demo-bilder/weltkarte.svg', zielzonen: [{ id: '1', position: { x: 12, y: 35, breite: 20, hoehe: 25 }, korrektesLabel: 'Nordamerika' }, { id: '2', position: { x: 45, y: 25, breite: 15, hoehe: 30 }, korrektesLabel: 'Europa' }, { id: '3', position: { x: 70, y: 35, breite: 20, hoehe: 30 }, korrektesLabel: 'Asien' }, { id: '4', position: { x: 20, y: 65, breite: 15, hoehe: 20 }, korrektesLabel: 'Südamerika' }], labels: ['Nordamerika','Europa','Asien','Südamerika','Afrika','Australien'] },
+    'einr-dd-kontinente': { bildUrl: './demo-bilder/weltkarte.svg', zielzonen: [{ id: '1', form: 'rechteck', punkte: [{x:12,y:35},{x:32,y:35},{x:32,y:60},{x:12,y:60}], korrektesLabel: 'Nordamerika' }, { id: '2', form: 'rechteck', punkte: [{x:45,y:25},{x:60,y:25},{x:60,y:55},{x:45,y:55}], korrektesLabel: 'Europa' }, { id: '3', form: 'rechteck', punkte: [{x:70,y:35},{x:90,y:35},{x:90,y:65},{x:70,y:65}], korrektesLabel: 'Asien' }, { id: '4', form: 'rechteck', punkte: [{x:20,y:65},{x:35,y:65},{x:35,y:85},{x:20,y:85}], korrektesLabel: 'Südamerika' }], labels: ['Nordamerika','Europa','Asien','Südamerika','Afrika','Australien'] },
     'einr-code-python': { sprache: 'python', starterCode: 'def ist_primzahl(n):\n    # Ihre Lösung hier\n    pass' },
     'einr-formel-pythagoras': { korrekteFormel: 'a^2 + b^2 = c^2', vergleichsModus: 'exakt' }
   };
@@ -9839,5 +9930,127 @@ function migrierFragenZuMediaQuelleEndpoint_(body) {
     });
   } catch (e) {
     return jsonResponse({ error: 'Migration fehlgeschlagen: ' + e.message });
+  }
+}
+
+// ============================================================
+// POLYGON-ZONEN MIGRATION (Admin-only, Phase 6)
+// ============================================================
+// Migriert bestehende Hotspot- und DragDrop-Bild-Fragen im Alt-Format
+// (form: 'rechteck'|'kreis', koordinaten/position-Wrapper, punkte: number)
+// ins neue Polygon-Format (form: 'rechteck'|'polygon', punkte: {x,y}[],
+// punktzahl: number). Idempotent. Default dry-run.
+//
+// Aufruf: POST { action: 'admin:migriereZonen', callerEmail, dryRun?, sheetName? }
+
+function migrierZonenEndpoint_(body) {
+  try {
+    var email = (body.callerEmail || body.email || '').toLowerCase();
+    if (!email || !istZugelasseneLP(email)) {
+      return jsonResponse({ error: 'Nur für Lehrpersonen' });
+    }
+    var admins = ladeStammdatenKey_('admins') || ['yannick.durand@gymhofwil.ch'];
+    if (admins.indexOf(email) < 0) {
+      return jsonResponse({ error: 'Nur Admins dürfen die Zonen-Migration ausführen' });
+    }
+
+    var dryRun = body.dryRun !== false; // Default TRUE zur Sicherheit
+    var sheetFilter = body.sheetName || null;
+    var tabs = ['VWL', 'BWL', 'Recht', 'Informatik'];
+    if (sheetFilter) tabs = tabs.filter(function(t) { return t === sheetFilter; });
+
+    var fragenbank = SpreadsheetApp.openById(FRAGENBANK_ID);
+    var summary = [];
+    var tabStats = [];
+    var errors = [];
+
+    for (var ti = 0; ti < tabs.length; ti++) {
+      var tabName = tabs[ti];
+      var sheet = fragenbank.getSheetByName(tabName);
+      if (!sheet) {
+        tabStats.push({ name: tabName, rows: 0, aktualisiert: 0, uebersprungen: 0, fehler: 'Tab nicht gefunden' });
+        continue;
+      }
+
+      try {
+        var range = sheet.getDataRange();
+        var values = range.getValues();
+        if (values.length < 2) {
+          tabStats.push({ name: tabName, rows: 0, aktualisiert: 0, uebersprungen: 0 });
+          continue;
+        }
+        var headers = values[0];
+        var typDatenCol = headers.indexOf('typDaten');
+        var typCol = headers.indexOf('typ');
+        var idCol = headers.indexOf('id');
+        if (typDatenCol < 0 || typCol < 0) {
+          errors.push({ tab: tabName, error: 'typDaten- oder typ-Spalte fehlt' });
+          continue;
+        }
+
+        var aktualisiert = 0, uebersprungen = 0;
+        for (var r = 1; r < values.length; r++) {
+          var typ = values[r][typCol];
+          if (typ !== 'hotspot' && typ !== 'dragdrop_bild') continue;
+
+          var typDatenStr = values[r][typDatenCol];
+          var typDaten = {};
+          try {
+            typDaten = typDatenStr ? JSON.parse(typDatenStr) : {};
+          } catch (parseErr) {
+            errors.push({ tab: tabName, row: r + 1, error: 'typDaten-Parse-Fehler: ' + parseErr.message });
+            continue;
+          }
+
+          var geaendert = false;
+
+          if (typ === 'hotspot' && Array.isArray(typDaten.bereiche)) {
+            var neueBereiche = typDaten.bereiche.map(function(b) {
+              if (zn_istWohlgeformt_(b)) return b;
+              geaendert = true;
+              return zn_migriereHotspotBereich_(b);
+            });
+            if (geaendert) typDaten.bereiche = neueBereiche;
+          } else if (typ === 'dragdrop_bild' && Array.isArray(typDaten.zielzonen)) {
+            var neueZonen = typDaten.zielzonen.map(function(z) {
+              if (zn_istWohlgeformt_(z)) return z;
+              geaendert = true;
+              return zn_migriereDragDropZielzone_(z);
+            });
+            if (geaendert) typDaten.zielzonen = neueZonen;
+          }
+
+          if (geaendert) {
+            aktualisiert++;
+            if (summary.length < 50) {
+              summary.push({ tab: tabName, row: r + 1, frageId: values[r][idCol] || '(ohne-id)', typ: typ });
+            }
+            if (!dryRun) {
+              sheet.getRange(r + 1, typDatenCol + 1).setValue(JSON.stringify(typDaten));
+            }
+          } else {
+            uebersprungen++;
+          }
+        }
+
+        tabStats.push({ name: tabName, rows: values.length - 1, aktualisiert: aktualisiert, uebersprungen: uebersprungen });
+      } catch (e) {
+        errors.push({ tab: tabName, error: e.toString() });
+      }
+    }
+
+    if (!dryRun) cacheInvalidieren_();
+
+    return jsonResponse({
+      success: true,
+      dryRun: dryRun,
+      sheetFilter: sheetFilter,
+      tabs: tabStats,
+      totalSummary: summary.length,
+      summary: summary,
+      errors: errors
+    });
+  } catch (e) {
+    return jsonResponse({ error: 'Zonen-Migration fehlgeschlagen: ' + e.message });
   }
 }
