@@ -6,23 +6,44 @@
 
 ---
 
-## Für die nächste Session (S126+)
+## Für die nächste Session (S127+)
 
-### Aktueller Stand (Ende S125)
-- **Alles auf `main`**. Letzter Commit: `2a14bfa` (HANDOFF S125-Hotspot-Bundle). Apps-Script ist deployed + Migration durchgeführt. Keine offenen Feature-Branches.
-- **Tests:** 419/419 vitest grün, tsc -b grün.
-- **2 untracked Files** (`AdminKindDetail.tsx`, `AdminThemaDetail.tsx`) sind aus S115-Regression — keine User-Sichtbarkeit, kein Bug. Separater Task zum Aufräumen.
+### Aktueller Stand (Ende S126)
+- **Alles auf `main`**. Letzter Commit: S126 Bundle P — Apps-Script-Bereinigungsfunktionen konsolidiert, Prüfung-Endpoint erhält automatisch strenge Bereinigung. Apps-Script deployed. Keine offenen Feature-Branches.
+- **Tests:** 429/429 vitest grün (inkl. 10 neue/erweiterte Security-Invariant-Tests), tsc -b grün.
+- Untracked Files `AdminKindDetail.tsx`/`AdminThemaDetail.tsx` aufgeräumt (S126 Cleanup).
+
+### Session 126 — Bundle P: Prüfung-Hardening (2026-04-20)
+
+Branch `feature/musterloesungen-bereinigung` → `main`. Spec `docs/superpowers/specs/2026-04-20-musterloesungen-bereinigung-design.md`, Plan `docs/superpowers/plans/2026-04-20-bundle-p-pruefung-hardening.md`.
+
+**Ziel:** SuS darf in Prüfung + angeleiteter Übung nie Lösungsfelder sehen, unabhängig vom Fragetyp. Vorher bereinigte `ladePruefung` nur mild (MC/RF/Lückentext/Berechnung) — FiBu/Hotspot/Bildbeschriftung/Formel-Lösungen waren in der Response sichtbar.
+
+**Umgesetzt:**
+- Konsolidierung in `apps-script-code.js`: `bereinigeFrageFuerSuS_` erhält volle strenge Bereinigung. `mischeFrageOptionen_` neu als separate Funktion (Fisher-Yates pro Fragetyp). `bereinigeFrageFuerSuSUeben_` → Ein-Zeiler-Wrapper.
+- Call-Sites unverändert: `ladePruefung` erhält automatisch strenge Bereinigung durch Funktions-Ersetzung.
+- Frontend unberührt (Prüfungs-Store nutzt Lösungsfelder nicht).
+- Vitest-Security-Invariant-Sperrliste erweitert um `buchungen`, `loesung`, `erwarteteAntworten`, `zoneId`, `korrektesLabel`, `korrekteFormel`, `sollEintraege`, `habenEintraege` (+ 7 neue Tests decken Leak-Erkennung pro Fragetyp).
+
+**Staging-E2E verifiziert:**
+- `lernplattformLadeFragen` als SuS direkt getestet: 2412 Fragen, alle 20 Typen → **0 Sperrlist-Felder** in Response.
+- Server-Korrektur (`lernplattformPruefeAntwort`) funktioniert weiterhin (MC + Musterlösung on-demand).
+
+**Bundle Ü (Üben-Pre-Load für instant Client-Korrektur)** folgt in eigener Session — Plan wird erst nach Freigabe von P geschrieben (Spec schon vorhanden).
 
 ### Offene Punkte (priorisiert)
 
 **Mittel:**
 1. **Editor-UX Resize-Handles** (Hotspot/DragDrop): Aktuell nur Drag-to-Move + numerische x/y/b/h-Inputs für Resize. Ecken-Handles (8-Richtungen) wären UX-Polish.
 2. **Bildbeschriftung SuS-Layout** (aus S118 erwähnt, nochmal prüfen): Labels positionieren, Input-Feld-Überlappung.
-3. **2 Demo-Einrichtungsfragen** (`einr-hs-europa`, `ueb-hs-europa`) haben kein Pool → manuell `bereiche` setzen oder Demo-Daten-Datei updaten (`einrichtungsFragen.ts`).
 
 **Gross (eigene Session):**
-4. **Detaillierte SuS-Lösungen pro Teilantwort** — User-Anliegen, siehe Memory `project_detaillierte_loesungen.md`. Braucht Brainstorming + Plan + eigene Implementierung pro Fragetyp (MC, R/F, Zuordnung, Hotspot, Bildbeschriftung, DragDrop, Lückentext).
-5. **Phase 6 Cleanup** MediaQuelle (frühestens +2 Wochen nach Phase 5 = ab 03.05.2026): Alt-Felder aus Types entfernen, Editor-UI auf MediaUpload/MediaAnzeige umbauen, mediaUtils-Hotfix zurückbauen.
+3. **Bundle Ü — Üben-Pre-Load** (Musterlösungen-Bereinigung Phase 2): Spec unter `docs/superpowers/specs/2026-04-20-musterloesungen-bereinigung-design.md` Abschnitt Bundle Ü. Neuer Endpoint `lernplattformLadeLoesungen` für instant-Client-Korrektur im Üben-Modus.
+4. **Detaillierte SuS-Lösungen pro Teilantwort** — User-Anliegen, Memory `project_detaillierte_loesungen.md`.
+5. **Phase 6 Cleanup** MediaQuelle (frühestens ab 03.05.2026): Alt-Felder aus Types entfernen, Editor-UI auf MediaUpload/MediaAnzeige umbauen, mediaUtils-Hotfix zurückbauen.
+
+**Niedrig (Follow-up-Hardening aus S126 Code-Review):**
+6. **Truthy-check delete pattern** (`apps-script-code.js` `bereinigeFrageFuerSuS_`): `if (f.buchungen) delete f.buchungen` etc. überspringt falsy-aber-present Werte. Unconditional `delete` ist in JS safe. Risk niedrig (Feldtypen fast immer wahrheitsfähig), aber defensiver.
 
 ### Lehren aus S125 (für Rule-Files)
 
