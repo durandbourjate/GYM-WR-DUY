@@ -43,7 +43,7 @@ Am Ende von `apps-script-code.js` (vor closing `}` des letzten Abschnitts):
  * Wird bei jedem schreibenden Feedback-Call als erstes aufgerufen.
  */
 function stelleKIFeedbackSheetBereit_() {
-  var ss = SpreadsheetApp.openById(GLOBAL_SPREADSHEET_ID);
+  var ss = SpreadsheetApp.openById(CONFIGS_ID);
   var sheet = ss.getSheetByName('KIFeedback');
   var headers = ['feedbackId','zeitstempel','lpEmail','fachschaft','aktion','fachbereich',
                  'bloom','inputJson','kiOutputJson','finaleVersionJson','diffScore',
@@ -110,7 +110,7 @@ Noch kein Endpoint-Wiring — reiner Sheet-Grundbau."
 Console-Skript im Apps-Script-Editor:
 ```js
 function pruefeLPEinstellungen() {
-  var ss = SpreadsheetApp.openById(GLOBAL_SPREADSHEET_ID);
+  var ss = SpreadsheetApp.openById(CONFIGS_ID);
   var sheet = ss.getSheetByName('LPEinstellungen');
   if (!sheet) { console.log('LPEinstellungen fehlt'); return; }
   console.log(sheet.getRange(1,1,1,sheet.getLastColumn()).getValues());
@@ -122,8 +122,15 @@ Erwartet: Bestehende Spalten dokumentieren. Wenn Sheet fehlt: neu anlegen in Tas
 - [ ] **Step 2.2: `ladeLPKalibrierungsEinstellungen_` + `speichereLPKalibrierungsEinstellungen_` hinzufügen**
 
 ```js
+// Design-Entscheid (B5): Default global=false.
+// Begründung: Feature ist in v1 dark-launched. LP muss im Settings-Tab bewusst
+// aktivieren. Sobald AN: Feedback-Logging läuft sofort, Few-Shot-Injection
+// greift aber erst ab minBeispiele (Default 3) qualifizierten Paaren — das ist
+// die implizite Kalt-Start-Baseline (Spec Abschnitt 15). User-Onboarding via
+// Statistik-Tab-Empty-State: "Aktiviere KI-Kalibrierung, um von deinen
+// Korrekturen zu lernen".
 var KALIBRIERUNG_DEFAULTS = {
-  global: false,                    // Default AUS — LP schaltet explizit ein
+  global: false,                    // Default AUS — LP schaltet explizit ein (B5)
   aktionenAktiv: {
     generiereMusterloesung: true,
     klassifiziereFrage: true,
@@ -135,7 +142,7 @@ var KALIBRIERUNG_DEFAULTS = {
 };
 
 function ladeLPKalibrierungsEinstellungen_(lpEmail) {
-  var ss = SpreadsheetApp.openById(GLOBAL_SPREADSHEET_ID);
+  var ss = SpreadsheetApp.openById(CONFIGS_ID);
   var sheet = ss.getSheetByName('LPEinstellungen');
   if (!sheet) return KALIBRIERUNG_DEFAULTS;
   var rows = sheet.getDataRange().getValues();
@@ -155,7 +162,7 @@ function ladeLPKalibrierungsEinstellungen_(lpEmail) {
 }
 
 function speichereLPKalibrierungsEinstellungen_(lpEmail, konfig) {
-  var ss = SpreadsheetApp.openById(GLOBAL_SPREADSHEET_ID);
+  var ss = SpreadsheetApp.openById(CONFIGS_ID);
   var sheet = ss.getSheetByName('LPEinstellungen');
   if (!sheet) {
     sheet = ss.insertSheet('LPEinstellungen');
@@ -592,89 +599,132 @@ Hart-Cap 1500 Tokens mit truncate/capByTokens Utils."
 
 ## Phase 2 — Endpoint-Integration (Apps Script)
 
-### Task 6 — kiAssistentEndpoint erweitern
+### Task 6 — kiAssistentEndpoint: Few-Shot-Prefix + Feedback-Start pro Case
+
+**Wichtig (aus Reviewer B2):** Es existiert kein zentraler `baueUserPrompt_`-Helper — `kiAssistentEndpoint` (Z. 5014–5512) ist ein ~500-Zeilen-`switch`-Statement mit inline gebauten Prompts. Wir ziehen keinen Refactor ein, sondern injizieren das Few-Shot-Prefix + `starteFeedbackEintrag_` **pro instrumentiertem Case**. 19 Nicht-instrumentierte Cases bleiben 100% unverändert.
+
+**Wichtig (aus Reviewer B3):** Bestehendes Response-Schema ist `jsonResponse({ success: true, ergebnis: result })`. Frontend (`uploadApi.ts:180`) liest `data.ergebnis`. Wir bleiben kompatibel und fügen nur `feedbackId` zusätzlich hinzu — KEIN Rename.
 
 **Files:**
-- Modify: `ExamLab/apps-script-code.js` (bestehenden `kiAssistentEndpoint` bei Zeile ~5014)
+- Modify: `ExamLab/apps-script-code.js` (`kiAssistentEndpoint` bei Z. 5014, nur 4 cases + return-Zeilen)
 
-- [ ] **Step 6.1: Instrumentation einbauen**
-
-Ersetze den Abschnitt zwischen `// Validierung` und `rufeClaudeAuf` durch:
+- [ ] **Step 6.1: Helper `injiziereKalibrierung_` vor `kiAssistentEndpoint` einfügen**
 
 ```js
-function kiAssistentEndpoint(body) {
-  var email = body.email;
-  var aktion = body.aktion;
-  var daten = body.daten || {};
-
-  if (!istZugelasseneLP(email)) {
-    return jsonResponse({ success: false, error: 'Nicht autorisiert' });
-  }
-
-  var instrumentiert = ['generiereMusterloesung','klassifiziereFrage',
-                        'bewertungsrasterGenerieren','korrigiereFreitext'].indexOf(aktion) !== -1;
-
-  var fewShotBlock = '';
-  var feedbackId = null;
-
-  if (instrumentiert) {
-    try {
-      var beispiele = holeFewShotBeispiele_({
-        lpEmail: email,
-        aktion: aktion,
-        fachbereich: daten.fachbereich,
-        bloom: daten.bloom
-      });
-      fewShotBlock = baueFewShotBlock_(aktion, beispiele);
-    } catch (e) {
-      console.warn('[Kalibrierung] Retrieval-Fehler, fahre ohne Few-Shot fort:', e.message);
-    }
-  }
-
-  var systemPrompt = /* ...bestehender System-Prompt */;  // BEHALTEN wie heute (Z. 5027)
-  var userPromptBase = baueUserPrompt_(aktion, daten);    // bestehender Helper
-  var userPrompt = fewShotBlock + userPromptBase;
-
-  var einst = instrumentiert ? ladeLPKalibrierungsEinstellungen_(email) : null;
-  if (instrumentiert && einst && einst.global) {
-    try {
-      feedbackId = starteFeedbackEintrag_({
-        lpEmail: email, aktion: aktion,
-        fachbereich: daten.fachbereich, bloom: daten.bloom,
-        inputJson: daten, kiOutputJson: {}  // kiOutput wird später nachgetragen
-      });
-    } catch (e) {
-      console.warn('[Kalibrierung] Start-Feedback-Fehler:', e.message);
-    }
-  }
-
-  var kiOutput;
+/**
+ * Injiziert Few-Shot-Prefix (leer-String wenn Kalibrierung aus) und erzeugt
+ * offenen Feedback-Eintrag. Rückgabe: { userPromptPrefix, feedbackId }.
+ * Nur für 4 instrumentierte Aktionen aufrufen.
+ */
+function injiziereKalibrierung_(email, aktion, daten) {
+  var out = { userPromptPrefix: '', feedbackId: null };
   try {
-    kiOutput = rufeClaudeAuf(systemPrompt, userPrompt, /* maxTokens wie heute */, email);
+    var einst = ladeLPKalibrierungsEinstellungen_(email);
+    if (!einst.global) return out;
+    var beispiele = holeFewShotBeispiele_({
+      lpEmail: email, aktion: aktion,
+      fachbereich: daten.fachbereich, bloom: daten.bloom
+    });
+    out.userPromptPrefix = baueFewShotBlock_(aktion, beispiele);
+    out.feedbackId = starteFeedbackEintrag_({
+      lpEmail: email, aktion: aktion,
+      fachbereich: daten.fachbereich, bloom: daten.bloom,
+      inputJson: daten, kiOutputJson: {}
+    });
   } catch (e) {
-    // Bei API-Quota-Fehler: Feedback ignorieren + Fehler melden (N1-Vorbereitung)
-    if (feedbackId) try { markiereFeedbackAlsIgnoriert_(feedbackId); } catch(_){}
-    throw e;
+    console.warn('[Kalibrierung] injiziereKalibrierung_ Fehler, fahre ohne Few-Shot fort:', e.message);
   }
-
-  // kiOutput in Feedback nachtragen
-  if (feedbackId && kiOutput) {
-    try {
-      var sheet = stelleKIFeedbackSheetBereit_();
-      var rows = sheet.getDataRange().getValues();
-      var hdr = rows[0];
-      var ki = hdr.indexOf('kiOutputJson'), idIdx = hdr.indexOf('feedbackId');
-      for (var i = 1; i < rows.length; i++) {
-        if (rows[i][idIdx] === feedbackId) {
-          sheet.getRange(i + 1, ki + 1).setValue(JSON.stringify(kiOutput));
-          break;
-        }
-      }
-    } catch (e) { console.warn('[Kalibrierung] kiOutput-Nachtrag fehlgeschlagen:', e); }
-  }
-
-  return jsonResponse({ success: true, daten: kiOutput, feedbackId: feedbackId });
+  return out;
 }
+
+/** Trägt kiOutput nachträglich in offenen Feedback-Eintrag ein. Fail-open. */
+function setzeKIOutputInFeedback_(feedbackId, kiOutput) {
+  if (!feedbackId || !kiOutput) return;
+  try {
+    var sheet = stelleKIFeedbackSheetBereit_();
+    var rows = sheet.getDataRange().getValues();
+    var hdr = rows[0];
+    var ki = hdr.indexOf('kiOutputJson'), idIdx = hdr.indexOf('feedbackId');
+    for (var i = 1; i < rows.length; i++) {
+      if (rows[i][idIdx] === feedbackId) {
+        sheet.getRange(i + 1, ki + 1).setValue(JSON.stringify(kiOutput));
+        return;
+      }
+    }
+  } catch (e) { console.warn('[Kalibrierung] kiOutput-Nachtrag fehlgeschlagen:', e); }
+}
+```
+
+- [ ] **Step 6.2: Pro instrumentiertem Case patch anwenden**
+
+Für jeden der 4 instrumentierten Cases (`generiereMusterloesung`, `klassifiziereFrage`, `bewertungsrasterGenerieren`, `korrigiereFreitext`) im `kiAssistentEndpoint`-Switch:
+
+**Vor dem `rufeClaudeAuf`-Call** (innerhalb des `case`-Blocks):
+```js
+// Kalibrierung v1 — Spec 2026-04-20
+var _kal = injiziereKalibrierung_(email, '<aktion>', daten);
+userPrompt = _kal.userPromptPrefix + userPrompt;  // userPrompt wurde bereits im case gebaut
+```
+
+**Nach `var result = rufeClaudeAuf(...)`** aber vor `return`:
+```js
+setzeKIOutputInFeedback_(_kal.feedbackId, result);
+return jsonResponse({ success: true, ergebnis: result, feedbackId: _kal.feedbackId });
+```
+
+Das vorherige `return jsonResponse({ success: true, ergebnis: result })` wird also um `feedbackId: _kal.feedbackId` erweitert — identisches Schema für bestehende Clients, die `feedbackId` nicht lesen, bleibt kompatibel.
+
+- [ ] **Step 6.3: Im Apps-Script-Editor smoke-testen**
+
+```js
+function smokeTest_kiEndpoint() {
+  var res = kiAssistentEndpoint({
+    email: 'yannick.durand@gymhofwil.ch',
+    aktion: 'generiereMusterloesung',
+    daten: { fragetext: 'Was ist BIP?', fachbereich: 'VWL', bloom: 'K2' }
+  });
+  console.log(JSON.parse(res.getContent()));
+}
+```
+
+Erwartet mit default-Einstellungen (global=false): `{success:true, ergebnis:{...}, feedbackId:null}`.
+
+- [ ] **Step 6.4: Master-Toggle AN → Smoke re-run**
+
+```js
+speichereLPKalibrierungsEinstellungen_('yannick.durand@gymhofwil.ch',
+  Object.assign({}, KALIBRIERUNG_DEFAULTS, { global: true }));
+smokeTest_kiEndpoint();  // erneut
+```
+
+Erwartet: `feedbackId: 'fb_...'`, neuer Eintrag mit Status `offen` im `KIFeedback`-Sheet.
+
+- [ ] **Step 6.5: Regressions-Smoke-Test für nicht-instrumentierte Aktion**
+
+```js
+function smokeTest_nichtInstrumentiert() {
+  var res = kiAssistentEndpoint({
+    email: 'yannick.durand@gymhofwil.ch',
+    aktion: 'generiereOptionen',  // nicht instrumentiert
+    daten: { fragetext: 'Was ist BIP?', fachbereich: 'VWL' }
+  });
+  var j = JSON.parse(res.getContent());
+  console.assert(j.success === true, 'success');
+  console.assert(j.ergebnis !== undefined, 'ergebnis-Feld unverändert');
+  console.assert(j.feedbackId === undefined, 'feedbackId nicht gesetzt bei nicht-instrumentierter Aktion');
+}
+```
+
+- [ ] **Step 6.6: Commit**
+
+```bash
+git add ExamLab/apps-script-code.js
+git commit -m "kiAssistentEndpoint: Few-Shot + Feedback-Start für 4 instrumentierte Cases
+
+Kein Refactor auf baueUserPrompt_ (existiert nicht) — Injection pro
+case inline via injiziereKalibrierung_ helper. 19 nicht-instrumentierte
+Cases bleiben 1:1 unverändert. Response-Schema bleibt { ergebnis },
+nur optional +feedbackId — rückwärtskompatibel."
 ```
 
 - [ ] **Step 6.2: Im Apps-Script-Editor smoke-testen**
@@ -781,35 +831,64 @@ aus bewertungsraster-Array)."
 
 ### Task 8 — speichereKorrekturZeile Persistenz-Fix + Feedback-Schliessung
 
+**Wichtig (Reviewer B4):** Heute schreibt `speichereKorrekturZeile` nur `lpPunkte`, `lpKommentar`, `geprueft`, `audioKommentarId` (Z. 6029–6050). Für `kiPunkte`, `kiBegruendung`, `quelle` existiert KEIN Write-Pfad — die Header-Spalten werden nur vom Auto-Korrektur-Initial-Setup beschrieben, bei manuellen LP-Updates nie. Das ist der blockierende Bug aus dem Audit. Diese Task legt den Write-Pfad **neu** an (nicht nur ergänzt) und migriert zusätzlich den `kriterienBewertung`-Header.
+
 **Files:**
-- Modify: `ExamLab/apps-script-code.js` (Endpoint `speichereKorrekturZeile` bei Zeile ~6015)
+- Modify: `ExamLab/apps-script-code.js` (Endpoint `speichereKorrekturZeile` bei Z. 6015)
 
-- [ ] **Step 8.1: Body-Felder erweitern + Header-Migration**
+- [ ] **Step 8.1a: Bestehenden Write-Block lokalisieren**
 
-In `speichereKorrekturZeile`, nach dem `openById`/`getSheetByName`-Block:
+```bash
+grep -n "function speichereKorrekturZeile" ExamLab/apps-script-code.js
+# Suche ab dort `lpPunkte`/`audioKommentarId`-Writes
+grep -n "audioKommentarId" ExamLab/apps-script-code.js | head -3
+```
+
+Identifiziere die Stelle, an der heute `lpPunkte` ins Sheet geschrieben wird (via `sheet.getRange(rowIdx, ...).setValue(...)` oder analoges Pattern).
+
+- [ ] **Step 8.1b: Body-Parsing + Header-Migration einziehen**
+
+Direkt nach dem `openById`/`getSheetByName('Korrektur_')`-Block, vor dem Write:
 
 ```js
+// Body-Felder lesen (Defaults null = nicht ändern)
 var kPunkte = body.kiPunkte !== undefined ? body.kiPunkte : null;
 var kBegr = body.kiBegruendung !== undefined ? body.kiBegruendung : null;
-var kritBew = body.kriterienBewertung || null;
+var kritBew = body.kriterienBewertung !== undefined ? body.kriterienBewertung : null;
 var quelle = body.quelle || null;
 
+// Header-Migration: stellt sicher, dass kriterienBewertung-Spalte existiert
 stelleKorrekturSheetHeaderBereit_(korrekturSheet);
-// …bisheriger Code, der headers liest, kommt danach und enthält dann auch kriterienBewertung
+
+// Headers nach Migration neu lesen
+var headers = korrekturSheet.getRange(1, 1, 1, korrekturSheet.getLastColumn()).getValues()[0];
 ```
 
-Im Write-Block (bestehend, wo `lpPunkte` etc. geschrieben werden) zusätzlich:
+- [ ] **Step 8.1c: Write-Pfad für 4 neue Felder neu anlegen**
+
+Analog zum bestehenden `lpPunkte`-Write-Pattern (dynamisches `headers.indexOf` + `setValue`). Einfügen direkt nach dem bestehenden Write-Block:
 
 ```js
-var hdrKI = headers.indexOf('kiPunkte');
-if (hdrKI >= 0 && kPunkte !== null) korrekturSheet.getRange(rowIdx, hdrKI + 1).setValue(kPunkte);
-var hdrKB = headers.indexOf('kiBegruendung');
-if (hdrKB >= 0 && kBegr !== null) korrekturSheet.getRange(rowIdx, hdrKB + 1).setValue(kBegr);
-var hdrKrit = headers.indexOf('kriterienBewertung');
-if (hdrKrit >= 0 && kritBew) korrekturSheet.getRange(rowIdx, hdrKrit + 1).setValue(JSON.stringify(kritBew));
-var hdrQuelle = headers.indexOf('quelle');
-if (hdrQuelle >= 0 && quelle) korrekturSheet.getRange(rowIdx, hdrQuelle + 1).setValue(quelle);
+// NEU: KI-Korrektur-Felder persistieren (Persistenz-Fix, Audit-Befund)
+function setIfPresent(colName, wert) {
+  if (wert === null || wert === undefined) return;
+  var idx = headers.indexOf(colName);
+  if (idx < 0) {
+    // Spalte fehlt — am Ende anhängen (analog Header-Migration-Pattern)
+    idx = korrekturSheet.getLastColumn();
+    korrekturSheet.getRange(1, idx + 1).setValue(colName);
+    headers = korrekturSheet.getRange(1, 1, 1, idx + 1).getValues()[0];
+  }
+  var schreibWert = (colName === 'kriterienBewertung') ? JSON.stringify(wert) : wert;
+  korrekturSheet.getRange(rowIdx, idx + 1).setValue(schreibWert);
+}
+setIfPresent('kiPunkte', kPunkte);
+setIfPresent('kiBegruendung', kBegr);
+setIfPresent('kriterienBewertung', kritBew);
+setIfPresent('quelle', quelle);
 ```
+
+`setIfPresent` ist lokal innerhalb `speichereKorrekturZeile`. Macht Header-Missing + Write atomar, falls Auto-Korrektur-Initial-Setup nie gelaufen ist für diese Prüfung.
 
 - [ ] **Step 8.2: Feedback-Schliessung ergänzen**
 
@@ -874,13 +953,19 @@ function listeKIFeedbacks(body) {
     if (f.nurWichtige && !r[c('wichtig')]) continue;
     if (f.von && String(r[c('zeitstempel')]) < f.von) continue;
     if (f.bis && String(r[c('zeitstempel')]) > f.bis) continue;
+    var inputParsed = safeParse_(r[c('inputJson')]);
+    // Privacy (W4): SuS-Antwort im Review-Tab truncaten — Screen-Sharing-Risiko
+    if (r[c('aktion')] === 'korrigiereFreitext' && inputParsed.antwortText) {
+      var voll = String(inputParsed.antwortText);
+      inputParsed.antwortText = voll.length > 200 ? voll.slice(0, 200) + '… [gekürzt]' : voll;
+    }
     result.push({
       feedbackId: r[c('feedbackId')],
       zeitstempel: r[c('zeitstempel')],
       aktion: r[c('aktion')],
       fachbereich: r[c('fachbereich')],
       bloom: r[c('bloom')],
-      inputJson: safeParse_(r[c('inputJson')]),
+      inputJson: inputParsed,
       kiOutputJson: safeParse_(r[c('kiOutputJson')]),
       finaleVersionJson: safeParse_(r[c('finaleVersionJson')]),
       diffScore: r[c('diffScore')],
@@ -1196,17 +1281,24 @@ export interface EditorServices {
 }
 ```
 
-- [ ] **Step 12.4: `uploadApi.kiAssistent` Rückgabe-Typ ändern**
+- [ ] **Step 12.4: `uploadApi.kiAssistent` Rückgabe-Typ ändern — Response-Key bleibt `ergebnis`**
+
+Heutige Zeile 180 in `uploadApi.ts`: `return data.ergebnis ?? null`. Backend liefert `data.ergebnis`, jetzt zusätzlich `data.feedbackId`. Beide Felder beibehalten:
 
 ```ts
 export async function kiAssistent(email: string, aktion: string, daten: Record<string, unknown>): Promise<KIAssistentRueckgabe | null> {
-  // ...existing fetch...
-  if (data.success) {
-    return { ergebnis: data.daten, feedbackId: data.feedbackId }
+  // ...existing fetch (unverändert)...
+  if (data.success && data.ergebnis !== undefined) {
+    return {
+      ergebnis: data.ergebnis as Record<string, unknown>,
+      feedbackId: data.feedbackId as string | undefined
+    }
   }
   return null
 }
 ```
+
+Backend-Feld heisst weiterhin `ergebnis` (nicht `daten`) — kompatibel mit bestehenden Aufrufen, die das Feld direkt lesen. Task 6 und diese Task-Stelle sind konsistent.
 
 - [ ] **Step 12.5: Neue `markiereFeedbackAlsIgnoriert`-Funktion in uploadApi**
 
@@ -1287,7 +1379,10 @@ async function ausfuehren(aktion: string, daten: Record<string, unknown>) {
   // Race-Handling (Spec 8.1 B2): alter offener Eintrag derselben Aktion → ignoriert
   const alt = offeneKIFeedbacks.find(f => f.aktion === aktion)
   if (alt && services.markiereFeedbackAlsIgnoriert) {
-    void services.markiereFeedbackAlsIgnoriert(alt.feedbackId)
+    // Fire-and-forget mit Error-Catch (sonst UnhandledPromiseRejection + stranded entries)
+    services.markiereFeedbackAlsIgnoriert(alt.feedbackId).catch(err =>
+      console.warn('[Kalibrierung] markiereFeedbackAlsIgnoriert fehlgeschlagen:', err)
+    )
   }
   setOffeneKIFeedbacks(prev => prev.filter(f => f.aktion !== aktion))
 
@@ -1456,6 +1551,7 @@ function verwerfen(aktion: string) {
   const fb = offeneKIFeedbacks.find(f => f.aktion === aktion)
   if (fb) {
     services.markiereFeedbackAlsIgnoriert?.(fb.feedbackId)
+      .catch(err => console.warn('[Kalibrierung] verwerfen: markiereFeedbackAlsIgnoriert fehlgeschlagen:', err))
     setOffeneKIFeedbacks(prev => prev.filter(f => f.aktion !== aktion))
   }
   setErgebnisse(prev => { const n = { ...prev }; delete n[aktion]; return n })
@@ -1827,8 +1923,27 @@ export default function StatistikKarten({ email }: { email: string }) {
   const [tage, setTage] = useState(30)
   const [stats, setStats] = useState<Awaited<ReturnType<typeof kalibrierungApi.statistik>>>(null)
 
-  useEffect(() => { kalibrierungApi.statistik(email, tage).then(setStats) }, [email, tage])
-  if (!stats) return <p className="text-slate-500">Lädt…</p>
+  const [einst, setEinst] = useState<KalibrierungsEinstellungen | null>(null)
+  useEffect(() => {
+    kalibrierungApi.statistik(email, tage).then(setStats)
+    kalibrierungApi.ladeEinstellungen(email).then(setEinst)
+  }, [email, tage])
+  if (!stats || !einst) return <p className="text-slate-500">Lädt…</p>
+
+  // B5-Onboarding: Wenn KI-Kalibrierung noch nie aktiviert wurde, klarer Call-to-Action
+  if (!einst.global && stats.aktionen.generiereMusterloesung.vorschlaege === 0) {
+    return (
+      <div className="p-6 rounded-xl border border-dashed border-slate-300 text-center space-y-3">
+        <p className="text-2xl">🎯</p>
+        <p className="font-semibold">KI-Kalibrierung ist noch nicht aktiv.</p>
+        <p className="text-sm text-slate-600 dark:text-slate-400">
+          Aktiviere sie im Einstellungen-Tab, damit die KI aus deinen Korrekturen
+          lernen kann. Die ersten {einst.minBeispiele} Beispiele bilden die Basis —
+          erst danach werden Vorschläge an deinen Stil angepasst.
+        </p>
+      </div>
+    )
+  }
 
   const gesamt = Object.values(stats.aktionen).reduce((s, a) => s + a.vorschlaege, 0)
   const unveraendertAbs = Object.values(stats.aktionen).reduce((s, a) => s + a.unveraendert, 0)
@@ -1883,29 +1998,229 @@ Ansatz-3-Placeholder für Few-Shot-Details unten."
 
 ---
 
-### Task 20 — Beispiele-Sub-Tab (Liste + Diff-Modal + Stern/Aktiv/Löschen)
+### Task 20a — Beispiele-Sub-Tab: Tabelle + Filter + Pagination
 
 **Files:**
 - Modify: `ExamLab/src/components/settings/kiKalibrierung/BeispieleListe.tsx`
+
+- [ ] **Step 20a.1: Grundgerüst — State + Load-Effect**
+
+```tsx
+export default function BeispieleListe({ email }: { email: string }) {
+  const [eintraege, setEintraege] = useState<BeispielEintrag[]>([])
+  const [gesamt, setGesamt] = useState(0)
+  const [seite, setSeite] = useState(0)
+  const [filter, setFilter] = useState<{ aktion?: string; fachbereich?: string; status?: string; nurWichtige?: boolean; von?: string; bis?: string }>({ status: 'qualifiziert' })
+
+  useEffect(() => {
+    kalibrierungApi.listeFeedbacks(email, filter, seite, 50).then(r => {
+      if (!r) return
+      setEintraege(r.eintraege)
+      setGesamt(r.gesamt)
+    })
+  }, [email, filter, seite])
+  // ...
+}
+type BeispielEintrag = {
+  feedbackId: string; zeitstempel: string; aktion: string; fachbereich: string; bloom?: string
+  inputJson: Record<string, unknown>; kiOutputJson: Record<string, unknown>; finaleVersionJson: Record<string, unknown>
+  diffScore: number; status: 'offen'|'geschlossen'|'ignoriert'; qualifiziert: boolean; wichtig: boolean; aktiv: boolean
+}
+```
+
+- [ ] **Step 20a.2: Filter-Leiste (5 Controls)**
+
+Spec 8.3: Aktion (Multi-Select), Fachbereich, Status, Datum-Range, „nur ⭐":
+
+```tsx
+<div className="flex flex-wrap gap-2 pb-3 border-b">
+  <select value={filter.aktion ?? ''} onChange={e => setFilter(f => ({...f, aktion: e.target.value || undefined}))}>
+    <option value="">Alle Aktionen</option>
+    <option value="generiereMusterloesung">Musterlösung</option>
+    <option value="klassifiziereFrage">Klassifikation</option>
+    <option value="bewertungsrasterGenerieren">Bewertungsraster</option>
+    <option value="korrigiereFreitext">Freitext-Korrektur</option>
+  </select>
+  <select value={filter.fachbereich ?? ''} onChange={e => setFilter(f => ({...f, fachbereich: e.target.value || undefined}))}>
+    <option value="">Alle Fächer</option><option>VWL</option><option>BWL</option><option>Recht</option><option>Informatik</option>
+  </select>
+  <select value={filter.status ?? 'qualifiziert'} onChange={e => setFilter(f => ({...f, status: e.target.value || undefined}))}>
+    <option value="">Alle</option>
+    <option value="qualifiziert">Qualifiziert</option>
+    <option value="geschlossen">Geschlossen</option>
+    <option value="ignoriert">Verworfen</option>
+    <option value="offen">Offen</option>
+  </select>
+  <label className="flex items-center gap-1 text-sm"><input type="checkbox" checked={filter.nurWichtige ?? false} onChange={e => setFilter(f => ({...f, nurWichtige: e.target.checked}))} />nur ⭐</label>
+  <input type="date" value={filter.von ?? ''} onChange={e => setFilter(f => ({...f, von: e.target.value || undefined}))} />
+  <input type="date" value={filter.bis ?? ''} onChange={e => setFilter(f => ({...f, bis: e.target.value || undefined}))} />
+</div>
+```
+
+Anmerkung: Backend-Filter-Feld `status` ist `'qualifiziert'` nicht 1:1 im Sheet-status-Feld — `listeKIFeedbacks` erweitern oder Frontend-seitig nachfiltern. Für v1 simpel Frontend-nachfiltern:
+
+```tsx
+const angezeigt = filter.status === 'qualifiziert'
+  ? eintraege.filter(e => e.qualifiziert && e.aktiv)
+  : eintraege
+```
+
+- [ ] **Step 20a.3: Tabelle + Pagination**
+
+```tsx
+<table className="w-full text-sm">
+  <thead>...</thead>
+  <tbody>
+    {angezeigt.map(e => <BeispielZeile key={e.feedbackId} eintrag={e} onRefresh={() => setSeite(s => s)} />)}
+  </tbody>
+</table>
+<div className="flex items-center justify-between pt-3">
+  <span className="text-xs text-slate-500">{gesamt} Einträge · Seite {seite + 1} / {Math.ceil(gesamt / 50)}</span>
+  <div className="flex gap-1">
+    <button disabled={seite === 0} onClick={() => setSeite(s => s - 1)}>‹</button>
+    <button disabled={(seite + 1) * 50 >= gesamt} onClick={() => setSeite(s => s + 1)}>›</button>
+  </div>
+</div>
+```
+
+- [ ] **Step 20a.4: Commit**
+
+```bash
+git add ExamLab/src/components/settings/kiKalibrierung/BeispieleListe.tsx
+git commit -m "Beispiele-Tab: Filter + Tabelle + Pagination (ohne Zeilen-Aktionen)"
+```
+
+---
+
+### Task 20b — Beispiele-Sub-Tab: Zeile mit Aktionen + Diff-Modal
+
+**Files:**
+- Modify: `ExamLab/src/components/settings/kiKalibrierung/BeispieleListe.tsx` (BeispielZeile-Sub-Komponente)
 - Create: `ExamLab/src/components/settings/kiKalibrierung/DiffModal.tsx`
 
-- [ ] **Step 20.1: Liste-Komponente mit Filter + Pagination**
+- [ ] **Step 20b.1: DiffModal — zwei Spalten ki vs. final**
 
-Gem. Spec Abschnitt 8.3 „Beispiele-Tab": Tabelle mit Spalten, Filter oben, klickbare „KI → LP"-Vorschau öffnet Diff-Modal, Stern/🗑/⊘ Aktionen pro Zeile. `aktualisiereFeedback`/`loescheFeedback`-Calls.
+```tsx
+// DiffModal.tsx
+export function DiffModal({ eintrag, onSchliessen }: { eintrag: BeispielEintrag; onSchliessen: () => void }) {
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40" onClick={onSchliessen}>
+      <div className="bg-white dark:bg-slate-800 rounded-xl max-w-4xl w-full max-h-[80vh] overflow-auto p-6" onClick={e => e.stopPropagation()}>
+        <div className="flex justify-between items-start mb-4">
+          <h3 className="font-bold">Vergleich KI ↔ LP (Aktion: {eintrag.aktion})</h3>
+          <button onClick={onSchliessen}>✕</button>
+        </div>
+        <div className="grid grid-cols-2 gap-4 text-sm">
+          <div>
+            <h4 className="font-semibold text-blue-700 mb-2">KI-Vorschlag</h4>
+            <pre className="whitespace-pre-wrap break-words bg-slate-50 dark:bg-slate-900 p-3 rounded">{JSON.stringify(eintrag.kiOutputJson, null, 2)}</pre>
+          </div>
+          <div>
+            <h4 className="font-semibold text-green-700 mb-2">Deine Endversion</h4>
+            <pre className="whitespace-pre-wrap break-words bg-slate-50 dark:bg-slate-900 p-3 rounded">{JSON.stringify(eintrag.finaleVersionJson, null, 2)}</pre>
+          </div>
+        </div>
+        <p className="text-xs text-slate-500 mt-4">Diff-Score: {eintrag.diffScore.toFixed(2)} · Status: {eintrag.status} · Qualifiziert: {eintrag.qualifiziert ? 'Ja' : 'Nein'}</p>
+      </div>
+    </div>
+  )
+}
+```
 
-- [ ] **Step 20.2: Diff-Modal**
+V1 ohne word-level Diff-Highlighting (simpler JSON-Vergleich). Kann später `diff`-npm-Paket ergänzen.
 
-Zwei-Spalten-Layout (links `kiOutputJson`, rechts `finaleVersionJson`), JSON-rendered als formatiert-vorhandener Key/Value. Einfache Text-Hervorhebung für geänderte Zeilen — kann mit `diff`-Paket oder manuellem Compare.
+- [ ] **Step 20b.2: BeispielZeile mit Aktionen**
 
-- [ ] **Step 20.3: Build + Tests grün + Commit**
+```tsx
+function BeispielZeile({ eintrag, onRefresh, email }: { eintrag: BeispielEintrag; onRefresh: () => void; email: string }) {
+  const [diffOffen, setDiffOffen] = useState(false)
+  const [wichtig, setWichtig] = useState(eintrag.wichtig)
+  const [aktiv, setAktiv] = useState(eintrag.aktiv)
+  const vorschau = getVorschau(eintrag)
+
+  async function toggleWichtig() {
+    const neu = !wichtig
+    setWichtig(neu)
+    await kalibrierungApi.aktualisiereFeedback(email, eintrag.feedbackId, { wichtig: neu })
+    onRefresh()
+  }
+  async function toggleAktiv() {
+    const neu = !aktiv
+    setAktiv(neu)
+    await kalibrierungApi.aktualisiereFeedback(email, eintrag.feedbackId, { aktiv: neu })
+    onRefresh()
+  }
+  async function loeschen() {
+    if (!confirm('Eintrag wirklich löschen?')) return
+    await kalibrierungApi.loescheFeedback(email, eintrag.feedbackId)
+    onRefresh()
+  }
+
+  return (
+    <tr className={aktiv ? '' : 'opacity-50'}>
+      <td>{new Date(eintrag.zeitstempel).toLocaleDateString('de-CH')}</td>
+      <td><Badge aktion={eintrag.aktion} /></td>
+      <td>{eintrag.fachbereich}{eintrag.bloom ? ' · ' + eintrag.bloom : ''}</td>
+      <td className="max-w-xs truncate">{vorschau}</td>
+      <td><button onClick={() => setDiffOffen(true)} className="text-blue-600 hover:underline text-xs">KI → LP</button></td>
+      <td>{eintrag.status}</td>
+      <td><button onClick={toggleWichtig} className={wichtig ? 'text-amber-500' : 'text-slate-400'}>{wichtig ? '★' : '☆'}</button></td>
+      <td>
+        <button onClick={toggleAktiv} title={aktiv ? 'Deaktivieren' : 'Aktivieren'}>{aktiv ? '⊙' : '⊘'}</button>
+        <button onClick={loeschen} className="text-red-500 ml-2">🗑</button>
+      </td>
+      {diffOffen && <td colSpan={8}><DiffModal eintrag={eintrag} onSchliessen={() => setDiffOffen(false)} /></td>}
+    </tr>
+  )
+}
+
+function getVorschau(e: BeispielEintrag): string {
+  // Extrahiere erstes relevantes Feld je nach Aktion
+  if (e.aktion === 'generiereMusterloesung') return String(e.inputJson.fragetext ?? '').slice(0, 60)
+  if (e.aktion === 'klassifiziereFrage') return String(e.inputJson.fragetext ?? '').slice(0, 60)
+  if (e.aktion === 'bewertungsrasterGenerieren') return String(e.inputJson.fragetext ?? '').slice(0, 60)
+  if (e.aktion === 'korrigiereFreitext') return String(e.inputJson.fragetext ?? '').slice(0, 60)  // SuS-Antwort ist im Backend bereits truncated
+  return '—'
+}
+```
+
+- [ ] **Step 20b.3: Commit**
+
+```bash
+git add ExamLab/src/components/settings/kiKalibrierung/
+git commit -m "Beispiele-Tab: Zeilen-Aktionen (Stern/Aktiv/Löschen) + Diff-Modal"
+```
+
+---
+
+### Task 20c — Tests für Beispiele-Tab
+
+**Files:**
+- Create: `ExamLab/src/components/settings/kiKalibrierung/BeispieleListe.test.tsx`
+
+- [ ] **Step 20c.1: Vitest-Test für Filter-Verhalten + Actions**
+
+```tsx
+// Mock kalibrierungApi mit vi.mock.
+// 1. Render BeispieleListe, assert dass kalibrierungApi.listeFeedbacks beim Mount aufgerufen wird.
+// 2. Filter "Aktion" ändern → erneuter listeFeedbacks-Call mit filter.aktion.
+// 3. Stern-Button klicken → aktualisiereFeedback aufgerufen mit wichtig:true.
+// 4. Löschen-Button → confirm-Dialog stub → loescheFeedback aufgerufen.
+```
+
+- [ ] **Step 20c.2: Build + Tests grün**
 
 ```bash
 cd ExamLab && npx tsc -b && npx vitest run
-git add ExamLab/src/components/settings/kiKalibrierung/
-git commit -m "Beispiele-Sub-Tab: Liste + Filter + Pagination + Diff-Modal
+```
 
-Aktionen pro Zeile: Stern toggeln, Aktiv toggeln, Löschen mit Confirm.
-Diff-Modal zeigt ki/lp nebeneinander."
+Erwartet: 455 + neue Tests grün.
+
+- [ ] **Step 20c.3: Commit**
+
+```bash
+git add ExamLab/src/components/settings/kiKalibrierung/BeispieleListe.test.tsx
+git commit -m "Beispiele-Tab Tests: Filter + Aktionen"
 ```
 
 ---
