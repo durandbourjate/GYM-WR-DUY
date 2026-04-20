@@ -1105,15 +1105,26 @@ git commit -m "Polygon: ZonenOverlay (gemeinsames SVG-Overlay für Editor + Korr
 
 - [ ] **Step 1: Test-Datei anlegen (failing)**
 
+**Wichtig (S125-Lehre, Memory):** HotspotEditor wird aus `@shared/editor/typen/...` re-exported und erwartet EditorContext-Props. Tests müssen die Komponente in `<EditorProvider config={...} services={...}>` wrappen — NICHT in `<EditorContext.Provider>` direkt. `EditorProvider` kommt aus `packages/shared/src/editor/EditorContext.tsx`.
+
 ```tsx
 import { render, fireEvent, screen } from '@testing-library/react'
+import { EditorProvider } from '../../EditorContext'
 import HotspotEditor from './HotspotEditor'
+
+function renderMitProvider(ui: React.ReactElement) {
+  return render(
+    <EditorProvider config={{ /* minimal config */ }} services={{ /* minimal services */ }}>
+      {ui}
+    </EditorProvider>
+  )
+}
 
 describe('HotspotEditor', () => {
   function setup(initialBereiche: any[] = []) {
     let bereiche = initialBereiche
     const setBereiche = (fn: any) => { bereiche = typeof fn === 'function' ? fn(bereiche) : fn }
-    // ... Render-Wrapper
+    // ... Render-Wrapper mit renderMitProvider
     return { getBereiche: () => bereiche, rerender }
   }
 
@@ -1583,8 +1594,12 @@ export default function ZonenMigratorButton() {
     if (!user?.email) return
     setBusy(true); setLog(null)
     try {
+      // Apps-Script-Web-Apps: Content-Type text/plain (nicht application/json!),
+      // sonst triggert der Browser einen CORS-Preflight den Apps-Script nicht beantwortet.
+      // Pattern identisch zu bestehenden admin:*-Calls (siehe `uebenGruppenAdapter.ts` o.ä.).
       const res = await fetch(APPS_SCRIPT_URL, {
         method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({
           action: 'admin:migriereZonen',
           callerEmail: user.email,
