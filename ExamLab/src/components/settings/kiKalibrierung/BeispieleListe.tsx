@@ -148,8 +148,8 @@ export default function BeispieleListe({ email }: { email: string }) {
     kalibrierungApi.listeFeedbacks(email, backendFilter, seite, 50)
       .then(r => {
         if (!r) { setFehler('Liste konnte nicht geladen werden'); return }
-        setEintraege(r.eintraege)
-        setGesamt(r.gesamt)
+        setEintraege(Array.isArray(r.eintraege) ? r.eintraege : [])
+        setGesamt(typeof r.gesamt === 'number' ? r.gesamt : 0)
       })
       .catch(() => setFehler('Netzwerkfehler beim Laden'))
       .finally(() => setLade(false))

@@ -19,8 +19,11 @@ export default function StatistikKarten({ email }: { email: string }) {
   if (ladeFehler) return <p className="text-sm text-red-500">{ladeFehler}</p>
   if (!stats || !einst) return <p className="text-sm text-slate-500 dark:text-slate-400">Lädt…</p>
 
+  // Defensive: Backend-Shape kann unerwartet sein (z.B. bei Version-Mismatch)
+  const aktionenSafe = (stats.aktionen && typeof stats.aktionen === 'object') ? stats.aktionen : {}
+
   // B5-Onboarding: Wenn KI-Kalibrierung noch nie aktiviert wurde, klarer Call-to-Action
-  const gesamtVorschlaege = Object.values(stats.aktionen).reduce((s, a) => s + a.vorschlaege, 0)
+  const gesamtVorschlaege = Object.values(aktionenSafe).reduce((s, a) => s + (a?.vorschlaege ?? 0), 0)
   if (!einst.global && gesamtVorschlaege === 0) {
     return (
       <div className="p-6 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 text-center space-y-3">
@@ -34,7 +37,7 @@ export default function StatistikKarten({ email }: { email: string }) {
     )
   }
 
-  const unveraendertAbs = Object.values(stats.aktionen).reduce((s, a) => s + a.unveraendert, 0)
+  const unveraendertAbs = Object.values(aktionenSafe).reduce((s, a) => s + (a?.unveraendert ?? 0), 0)
   const rate = gesamtVorschlaege > 0 ? Math.round(100 * unveraendertAbs / gesamtVorschlaege) : 0
 
   const aktionsLabels: Record<string, string> = {
@@ -71,7 +74,7 @@ export default function StatistikKarten({ email }: { email: string }) {
 
       {/* Karten pro Aktion */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {Object.entries(stats.aktionen).map(([a, s]) => (
+        {Object.entries(aktionenSafe).map(([a, s]) => (
           <div key={a} className="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 space-y-2">
             <h4 className="font-semibold dark:text-white">{aktionsLabels[a] ?? a}</h4>
             <p className="text-xs text-slate-500 dark:text-slate-400">Letzte {tage} Tage: {s.vorschlaege} Vorschläge</p>

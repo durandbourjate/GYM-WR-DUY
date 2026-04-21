@@ -43,25 +43,76 @@ export type KalibrierungsStatistik = {
   zeitraum_tage: number
 }
 
+/**
+ * Backend liefert immer `{ success, data }`. `postJson<T>` returnt das volle
+ * Response-Objekt. Dieser Helper unwrappt `.data` und gibt null zurück wenn
+ * `success` fehlt, data nicht vorhanden oder falscher Shape.
+ */
+async function unwrap<T>(
+  result: { success?: boolean; data?: unknown } | null
+): Promise<T | null> {
+  if (!result || typeof result !== 'object') return null
+  if (result.success === false) return null
+  if (result.data === undefined || result.data === null) return null
+  return result.data as T
+}
+
 export const kalibrierungApi = {
-  ladeEinstellungen: (email: string) =>
-    postJson<KalibrierungsEinstellungen>('kalibrierungsEinstellungen', { modus: 'laden', email }),
+  ladeEinstellungen: async (email: string) => {
+    const r = await postJson<{ success: boolean; data?: KalibrierungsEinstellungen }>(
+      'kalibrierungsEinstellungen', { modus: 'laden', email }
+    )
+    return unwrap<KalibrierungsEinstellungen>(r)
+  },
 
-  speichereEinstellungen: (email: string, konfig: KalibrierungsEinstellungen) =>
-    postJson<boolean>('kalibrierungsEinstellungen', { modus: 'speichern', email, konfig }),
+  speichereEinstellungen: async (email: string, konfig: KalibrierungsEinstellungen) => {
+    const r = await postJson<{ success: boolean }>(
+      'kalibrierungsEinstellungen', { modus: 'speichern', email, konfig }
+    )
+    return r?.success === true
+  },
 
-  listeFeedbacks: (email: string, filter: Record<string, unknown> = {}, seite = 0, proSeite = 50) =>
-    postJson<{ eintraege: KIFeedbackEintragLP[]; gesamt: number }>('listeKIFeedbacks', { email, filter, seite, proSeite }),
+  listeFeedbacks: async (
+    email: string,
+    filter: Record<string, unknown> = {},
+    seite = 0,
+    proSeite = 50,
+  ) => {
+    const r = await postJson<{ success: boolean; data?: { eintraege: KIFeedbackEintragLP[]; gesamt: number } }>(
+      'listeKIFeedbacks', { email, filter, seite, proSeite }
+    )
+    return unwrap<{ eintraege: KIFeedbackEintragLP[]; gesamt: number }>(r)
+  },
 
-  aktualisiereFeedback: (email: string, feedbackId: string, changes: { wichtig?: boolean; aktiv?: boolean }) =>
-    postJson<boolean>('aktualisiereKIFeedback', { email, feedbackId, ...changes }),
+  aktualisiereFeedback: async (
+    email: string,
+    feedbackId: string,
+    changes: { wichtig?: boolean; aktiv?: boolean },
+  ) => {
+    const r = await postJson<{ success: boolean }>(
+      'aktualisiereKIFeedback', { email, feedbackId, ...changes }
+    )
+    return r?.success === true
+  },
 
-  loescheFeedback: (email: string, feedbackId: string) =>
-    postJson<boolean>('loescheKIFeedback', { email, feedbackId }),
+  loescheFeedback: async (email: string, feedbackId: string) => {
+    const r = await postJson<{ success: boolean }>(
+      'loescheKIFeedback', { email, feedbackId }
+    )
+    return r?.success === true
+  },
 
-  bulkLoesche: (email: string, filter: Record<string, unknown>) =>
-    postJson<{ geloescht: number }>('bulkLoescheKIFeedbacks', { email, filter }),
+  bulkLoesche: async (email: string, filter: Record<string, unknown>) => {
+    const r = await postJson<{ success: boolean; data?: { geloescht: number } }>(
+      'bulkLoescheKIFeedbacks', { email, filter }
+    )
+    return unwrap<{ geloescht: number }>(r)
+  },
 
-  statistik: (email: string, zeitraum_tage = 30) =>
-    postJson<KalibrierungsStatistik>('kalibrierungsStatistik', { email, zeitraum_tage }),
+  statistik: async (email: string, zeitraum_tage = 30) => {
+    const r = await postJson<{ success: boolean; data?: KalibrierungsStatistik }>(
+      'kalibrierungsStatistik', { email, zeitraum_tage }
+    )
+    return unwrap<KalibrierungsStatistik>(r)
+  },
 }
