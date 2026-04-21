@@ -10757,6 +10757,14 @@ function testHeuristik_() {
 }
 
 /**
+ * Public-Wrapper für testC9GeneriereMusterloesung_ — erscheint im GAS-Editor-Dropdown,
+ * damit der Smoke-Test ohne Unterstrich-Konvention-Workaround ausführbar ist.
+ */
+function testC9GeneriereMusterloesung() {
+  return testC9GeneriereMusterloesung_();
+}
+
+/**
  * C9 Phase 3 — Smoke-Test für generiereMusterloesung mit Teilerklärungen.
  * Benötigt CLAUDE_API_KEY oder LP-spezifischen Key (EMAIL). Verbraucht ~4 API-Calls.
  * NUR im GAS-Script-Editor ausführen (nicht via Webapp-Trigger) — `Session.getActiveUser()`
