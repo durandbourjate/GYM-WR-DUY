@@ -6096,7 +6096,7 @@ function speichereKorrekturZeile(body) {
     var kPunkte = body.kiPunkte !== undefined ? body.kiPunkte : null;
     var kBegr = body.kiBegruendung !== undefined ? body.kiBegruendung : null;
     var kritBew = body.kriterienBewertung !== undefined ? body.kriterienBewertung : null;
-    var quelle = body.quelle || null;
+    var quelle = body.quelle !== undefined ? body.quelle : null;
 
     // Header-Migration: stellt sicher, dass kriterienBewertung-Spalte existiert
     stelleKorrekturSheetHeaderBereit_(sheet);
@@ -6149,7 +6149,9 @@ function speichereKorrekturZeile(body) {
     setIfPresent('quelle', quelle);
 
     // Kalibrierungs-Feedbacks schliessen (analog speichereFrage, Task 8)
-    if (body.offeneKIFeedbacks && Array.isArray(body.offeneKIFeedbacks)) {
+    // Nur schliessen wenn LP tatsächlich bewertet hat (verhindert verfälschte Trainings-Signale)
+    if (body.offeneKIFeedbacks && Array.isArray(body.offeneKIFeedbacks)
+        && body.lpPunkte !== undefined && body.lpPunkte !== null) {
       body.offeneKIFeedbacks.forEach(function(fb) {
         try {
           var final = {
