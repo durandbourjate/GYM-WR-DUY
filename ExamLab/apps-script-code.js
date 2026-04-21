@@ -5093,6 +5093,90 @@ function setzeKIOutputInFeedback_(feedbackId, kiOutput) {
   } catch (e) { console.warn('[Kalibrierung] kiOutput-Nachtrag fehlgeschlagen:', e); }
 }
 
+// C9 Phase 3 — baut pro Fragetyp den Sub-Element-Kontext + Regel-Text für generiereMusterloesung.
+// Gibt {kontext, regel, feld, gueltigeIds[]} zurück. Sub-Arrays werden vom Caller als
+// Top-Level-Properties in `daten` erwartet (daten.optionen, nicht daten.frage.optionen).
+// Wenn die Sub-Arrays fehlen (heutiger Caller sendet nur fragetext/typ/fachbereich/bloom
+// — bis Task 24 die Call-Site erweitert), bleibt gueltigeIds leer und Claude wird
+// angewiesen, teilerklaerungen=[] zu liefern.
+function baueTeilerklaerungsKontext_(daten) {
+  var typ = daten && daten.typ;
+  var leer = { kontext: '', regel: 'Dieser Fragetyp hat keine Sub-Elemente. teilerklaerungen MUSS ein leeres Array sein: "teilerklaerungen": [].', feld: '', gueltigeIds: [] };
+
+  function baue_(feld, array, regelText, idExtractor) {
+    if (!Array.isArray(array) || array.length === 0) return leer;
+    var extractor = idExtractor || function(e) { return e && e.id; };
+    var gueltigeIds = array.map(extractor).filter(function(id) { return typeof id === 'string' && id.length > 0; });
+    return {
+      kontext: 'Sub-Elemente (' + feld + '):\n' + wrapUserData(feld, JSON.stringify(array)) + '\n\n',
+      regel: regelText,
+      feld: feld,
+      gueltigeIds: gueltigeIds
+    };
+  }
+
+  switch (typ) {
+    case 'mc':
+      return baue_('optionen', daten.optionen,
+        'Pro optionen[i] eine Teilerklärung mit feld="optionen", id=optionen[i].id.\n' +
+        'Bei korrekt=true: begründe warum die Option richtig ist (1-2 Sätze).\n' +
+        'Bei korrekt=false: erkläre den Denkfehler oder warum der Distraktor plausibel aber falsch ist (1-2 Sätze).\n');
+    case 'richtigfalsch':
+      return baue_('aussagen', daten.aussagen,
+        'Pro aussagen[i] eine Teilerklärung mit feld="aussagen", id=aussagen[i].id.\n' +
+        '1-2 Sätze Begründung warum die Aussage richtig oder falsch ist.\n');
+    case 'zuordnung':
+      return baue_('paare', daten.paare,
+        'Pro paare[i] eine Teilerklärung mit feld="paare", id=paare[i].id.\n' +
+        'Erkläre kurz warum genau dieses linke Element zu diesem rechten Element gehört (1-2 Sätze).\n');
+    case 'lueckentext':
+      return baue_('luecken', daten.luecken,
+        'Pro luecken[i] eine Teilerklärung mit feld="luecken", id=luecken[i].id.\n' +
+        'Erkläre welcher Begriff hier erwartet wird und warum (1-2 Sätze).\n');
+    case 'hotspot':
+      return baue_('bereiche', daten.bereiche,
+        'Pro bereiche[i] eine Teilerklärung mit feld="bereiche", id=bereiche[i].id.\n' +
+        'Bei korrekt=true: erkläre warum dieser Bereich zu klicken ist.\n' +
+        'Bei korrekt=false: erkläre warum dieser Bereich ein Distraktor ist (1-2 Sätze).\n');
+    case 'dragdrop_bild':
+      return baue_('zielzonen', daten.zielzonen,
+        'Pro zielzonen[i] eine Teilerklärung mit feld="zielzonen", id=zielzonen[i].id.\n' +
+        'Erkläre welches Label hierhin gehört und warum (1-2 Sätze).\n');
+    case 'bildbeschriftung':
+      return baue_('beschriftungen', daten.beschriftungen,
+        'Pro beschriftungen[i] eine Teilerklärung mit feld="beschriftungen", id=beschriftungen[i].id.\n' +
+        'Erkläre was an dieser Stelle im Bild zu beschriften ist (1-2 Sätze).\n');
+    case 'kontenbestimmung':
+      return baue_('aufgaben', daten.aufgaben,
+        'Pro aufgaben[i] eine Teilerklärung mit feld="aufgaben", id=aufgaben[i].id.\n' +
+        'Erkläre welches Konto (und/oder welche Kategorie/Seite) korrekt ist und warum (1-2 Sätze).\n');
+    case 'buchungssatz':
+      return baue_('buchungen', daten.buchungen,
+        'Pro buchungen[i] eine Teilerklärung mit feld="buchungen", id=buchungen[i].id.\n' +
+        'Erkläre den Buchungssatz (Soll/Haben, Konten, Betrag) geschäftsvorfall-bezogen (1-2 Sätze).\n');
+    case 'bilanzstruktur':
+      return baue_('kontenMitSaldi', daten.kontenMitSaldi,
+        'Pro kontenMitSaldi[i] eine Teilerklärung mit feld="kontenMitSaldi", id=kontenMitSaldi[i].kontonummer. ' +
+        'Falls dieselbe Kontonummer mehrfach vorkommt (Duplikat): nur EINE Teilerklärung pro eindeutiger Kontonummer. ' +
+        'Erkläre wo dieses Konto in Bilanz/Erfolgsrechnung einzuordnen ist und warum (1-2 Sätze).',
+        function(e) { return e && e.kontonummer; });
+    // Bewusst ohne Teilerklärungen laut Spec-Abweichung S132 bzw. ohne Sub-Struktur:
+    case 'tkonto':
+    case 'sortierung':
+    case 'freitext':
+    case 'berechnung':
+    case 'zeichnen':
+    case 'audio':
+    case 'code':
+    case 'pdf':
+    case 'formel':
+    case 'visualisierung':
+    case 'aufgabengruppe':
+    default:
+      return leer;
+  }
+}
+
 function kiAssistentEndpoint(body) {
   try {
     var email = body.email;
@@ -5166,17 +5250,70 @@ function kiAssistentEndpoint(body) {
 
       case 'generiereMusterloesung':
         if (!daten.fragetext) return jsonResponse({ error: 'Fragetext fehlt' });
-        userPrompt = 'Erstelle eine vollständige Musterlösung für die folgende Prüfungsfrage. ' +
-          'Berücksichtige die Bloom-Stufe ' + wrapUserData('bloom', daten.bloom || 'K2') + ' und den Fachbereich ' + wrapUserData('fachbereich', daten.fachbereich || 'Wirtschaft & Recht') + '. ' +
-          'Bei Freitext-Fragen: formuliere eine Antwort die der erwarteten Länge und Tiefe entspricht. ' +
-          'Bei MC/R-F/Zuordnung/Lückentext: beschreibe die korrekten Antworten und erkläre kurz warum.\n\n' +
+        // C9 Phase 3 — Fragetyp-abhängigen Sub-Element-Kontext + Teilerklärungs-Regel zusammenbauen.
+        var _c9 = baueTeilerklaerungsKontext_(daten);
+        userPrompt = 'Erstelle eine Musterlösung und (falls zutreffend) Teilerklärungen pro Sub-Element für die folgende Prüfungsfrage. ' +
+          'Bloom-Stufe ' + wrapUserData('bloom', daten.bloom || 'K2') + ', Fachbereich ' + wrapUserData('fachbereich', daten.fachbereich || 'Wirtschaft & Recht') + '.\n\n' +
           'Fragetyp: ' + wrapUserData('typ', daten.typ || 'freitext') + '\n' +
           'Fragetext:\n' + wrapUserData('fragetext', daten.fragetext) + '\n\n' +
-          'Antworte als JSON: { "musterlosung": "..." }';
-        // NEU: Kalibrierung v1 — Spec 2026-04-20
+          _c9.kontext +
+          'Teilerklärungs-Regel für diesen Fragetyp:\n' + _c9.regel + '\n' +
+          'Anforderungen:\n' +
+          '- musterloesung: didaktische Gesamterklärung, 2-4 Sätze, fachlich präzise.\n' +
+          '- Bei Freitext-Fragen: formuliere eine Antwort die der erwarteten Länge und Tiefe entspricht.\n' +
+          '- teilerklaerungen[].text: 1-2 Sätze, fachlich präzise, keine Füllwörter.\n' +
+          '- teilerklaerungen[].id MUSS exakt aus dem Sub-Elemente-Kontext übernommen werden (keine neuen IDs erfinden).\n\n' +
+          'Antworte ausschliesslich als JSON:\n' +
+          '{\n' +
+          '  "musterloesung": "...",\n' +
+          '  "teilerklaerungen": [\n' +
+          '    { "feld": "<siehe Regel>", "id": "<siehe Kontext>", "text": "..." }\n' +
+          '  ]\n' +
+          '}';
+        // Kalibrierung v1 — Spec 2026-04-20
         var _kal = injiziereKalibrierung_(email, 'generiereMusterloesung', daten);
         userPrompt = _kal.userPromptPrefix + userPrompt;
-        result = rufeClaudeAuf(systemPrompt, userPrompt, undefined, email);
+        // max_tokens dynamisch: 1024 Puffer für Musterlösung + 150/Sub-Element für Teilerklärungen,
+        // gedeckelt bei 4096. Claude Sonnet 4 liefert das stabil, und es wird nur Nutzung abgerechnet.
+        var _maxTokens = Math.min(4096, 1024 + _c9.gueltigeIds.length * 150);
+        // Try/catch um Parse-Fehler bei truncated Responses (stop_reason='max_tokens' →
+        // rufeClaudeAuf parst unvollständiges JSON und wirft). Fallback: leere Response
+        // + Logging, damit die Editor-UI nicht crasht.
+        var _rawMuster = null;
+        try {
+          _rawMuster = rufeClaudeAuf(systemPrompt, userPrompt, _maxTokens, email);
+        } catch (_claudeErr) {
+          console.warn('[C9 generiereMusterloesung] Claude-Call fehlgeschlagen:', _claudeErr && _claudeErr.message);
+          _rawMuster = null;
+        }
+        // C9 Response-Normalizer: defensive gegen
+        //  (a) Legacy-Response nur mit "musterlosung" (alter Tippo-Key),
+        //  (b) fehlendes teilerklaerungen-Feld (Alt-Deployment),
+        //  (c) halluzinierte Einträge ohne feld/id/text,
+        //  (d) Array/String/null statt Objekt als Top-Level-Response,
+        //  (e) Claude erfindet IDs die nicht im Sub-Element-Kontext sind.
+        var _isObj = _rawMuster && typeof _rawMuster === 'object' && !Array.isArray(_rawMuster);
+        var _muster = _isObj ? (_rawMuster.musterloesung || _rawMuster.musterlosung || '') : '';
+        var _teil = [];
+        if (_isObj && Array.isArray(_rawMuster.teilerklaerungen) && _c9.gueltigeIds.length > 0) {
+          var _erlaubteIds = {};
+          _c9.gueltigeIds.forEach(function(id) { _erlaubteIds[id] = true; });
+          var _gesehen = {};
+          _teil = _rawMuster.teilerklaerungen.filter(function(t) {
+            if (!t || typeof t !== 'object') return false;
+            if (typeof t.feld !== 'string' || t.feld !== _c9.feld) return false;
+            if (typeof t.id !== 'string' || !_erlaubteIds[t.id]) return false;
+            if (typeof t.text !== 'string' || t.text.length === 0) return false;
+            if (_gesehen[t.id]) return false; // Dedup bei Claude-Mehrfach-Output derselben ID
+            _gesehen[t.id] = true;
+            return true;
+          });
+        }
+        // Rückwärtskompat: bestehende Editor-UI (MusterloesungSection, KIAssistentPanel)
+        // liest das Feld mit Tippo `musterlosung`. Dual-Write bis Task 24 den Caller
+        // auf `musterloesung` umbaut + KIMusterloesungPreview einführt.
+        // TODO (Task 24): Alias `musterlosung` entfernen sobald KIMusterloesungPreview lebt.
+        result = { musterloesung: _muster, musterlosung: _muster, teilerklaerungen: _teil };
         setzeKIOutputInFeedback_(_kal.feedbackId, result);
         return jsonResponse({ success: true, ergebnis: result, feedbackId: _kal.feedbackId });
 
@@ -10617,6 +10754,93 @@ function testHeuristik_() {
   console.assert(istQualifiziert_('korrigiereFreitext', diff5), 'Punktediff qualifiziert');
 
   console.log('Alle Heuristik-Tests bestanden.');
+}
+
+/**
+ * C9 Phase 3 — Smoke-Test für generiereMusterloesung mit Teilerklärungen.
+ * Benötigt CLAUDE_API_KEY oder LP-spezifischen Key (EMAIL). Verbraucht ~4 API-Calls.
+ * NUR im GAS-Script-Editor ausführen (nicht via Webapp-Trigger) — `Session.getActiveUser()`
+ * liefert sonst eine leere Adresse und `istZugelasseneLP` scheitert.
+ */
+function testC9GeneriereMusterloesung_() {
+  var EMAIL = Session.getActiveUser().getEmail();
+
+  // (1) MC mit 2 Optionen — erwartet 2 Teilerklärungen
+  var mc = {
+    aktion: 'generiereMusterloesung',
+    email: EMAIL,
+    daten: {
+      typ: 'mc',
+      fragetext: 'Welche Kennzahl gehört zur Liquiditätsanalyse?',
+      bloom: 'K2',
+      fachbereich: 'BWL',
+      optionen: [
+        { id: 'opt-a', text: 'Current Ratio', korrekt: true },
+        { id: 'opt-b', text: 'Umsatzrendite', korrekt: false }
+      ]
+    }
+  };
+  var r1 = kiAssistentEndpoint(mc);
+  var b1 = JSON.parse(r1.getContent());
+  Logger.log('MC: ' + JSON.stringify(b1, null, 2));
+  console.assert(b1.success === true, 'MC success');
+  console.assert(b1.ergebnis && typeof b1.ergebnis.musterloesung === 'string' && b1.ergebnis.musterloesung.length > 10, 'MC musterloesung gefuellt');
+  console.assert(Array.isArray(b1.ergebnis.teilerklaerungen) && b1.ergebnis.teilerklaerungen.length === 2, 'MC 2 Teilerklaerungen');
+  console.assert(b1.ergebnis.teilerklaerungen.every(function(t){ return t.feld === 'optionen'; }), 'MC feld=optionen');
+  console.assert(b1.ergebnis.teilerklaerungen.every(function(t){ return t.id === 'opt-a' || t.id === 'opt-b'; }), 'MC ids aus Kontext');
+
+  // (2) Freitext — erwartet teilerklaerungen: []
+  var ft = {
+    aktion: 'generiereMusterloesung',
+    email: EMAIL,
+    daten: { typ: 'freitext', fragetext: 'Erklaere den Unterschied zwischen Aufwand und Ausgabe.', bloom: 'K4', fachbereich: 'BWL' }
+  };
+  var r2 = kiAssistentEndpoint(ft);
+  var b2 = JSON.parse(r2.getContent());
+  Logger.log('Freitext: ' + JSON.stringify(b2, null, 2));
+  console.assert(b2.success === true, 'Freitext success');
+  console.assert(b2.ergebnis.musterloesung.length > 20, 'Freitext musterloesung substantiell');
+  console.assert(Array.isArray(b2.ergebnis.teilerklaerungen) && b2.ergebnis.teilerklaerungen.length === 0, 'Freitext teilerklaerungen leer');
+
+  // (3) MC ohne Sub-Elemente im Request (Simulation des heutigen Frontend-Callers vor Task 24)
+  //     — Backend darf NICHT crashen, teilerklaerungen muss leer sein.
+  var mcLegacy = {
+    aktion: 'generiereMusterloesung',
+    email: EMAIL,
+    daten: { typ: 'mc', fragetext: 'Welche Kennzahl gehoert zur Liquiditaetsanalyse?', bloom: 'K2', fachbereich: 'BWL' }
+  };
+  var r3 = kiAssistentEndpoint(mcLegacy);
+  var b3 = JSON.parse(r3.getContent());
+  Logger.log('MC-legacy (ohne optionen): ' + JSON.stringify(b3, null, 2));
+  console.assert(b3.success === true, 'MC-legacy success');
+  console.assert(Array.isArray(b3.ergebnis.teilerklaerungen) && b3.ergebnis.teilerklaerungen.length === 0, 'MC-legacy teilerklaerungen leer');
+
+  // (4) Bilanzstruktur mit Duplikat-Kontonummer — Dedup-Check im Normalizer
+  var bilanz = {
+    aktion: 'generiereMusterloesung',
+    email: EMAIL,
+    daten: {
+      typ: 'bilanzstruktur',
+      fragetext: 'Ordne die Konten der richtigen Bilanzseite und Gruppe zu.',
+      bloom: 'K3',
+      fachbereich: 'BWL',
+      kontenMitSaldi: [
+        { kontonummer: '1000', name: 'Kasse', saldo: 5000 },
+        { kontonummer: '1020', name: 'Bank', saldo: 20000 },
+        { kontonummer: '2000', name: 'Kreditoren', saldo: 8000 }
+      ]
+    }
+  };
+  var r4 = kiAssistentEndpoint(bilanz);
+  var b4 = JSON.parse(r4.getContent());
+  Logger.log('Bilanz: ' + JSON.stringify(b4, null, 2));
+  console.assert(b4.success === true, 'Bilanz success');
+  console.assert(Array.isArray(b4.ergebnis.teilerklaerungen), 'Bilanz teilerklaerungen Array');
+  console.assert(b4.ergebnis.teilerklaerungen.every(function(t){ return t.feld === 'kontenMitSaldi'; }), 'Bilanz feld=kontenMitSaldi');
+  var _erwarteteKnrs = { '1000': true, '1020': true, '2000': true };
+  console.assert(b4.ergebnis.teilerklaerungen.every(function(t){ return _erwarteteKnrs[t.id]; }), 'Bilanz ids aus Kontext');
+
+  console.log('✓ C9 generiereMusterloesung-Tests bestanden.');
 }
 
 function safeParse_(s) { try { return JSON.parse(s || '{}'); } catch(e) { return {}; } }
