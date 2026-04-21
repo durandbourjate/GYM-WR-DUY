@@ -184,7 +184,8 @@ export async function kiAssistent(email: string, aktion: string, daten: Record<s
           feedbackId: data.feedbackId as string | undefined,
         }
       }
-      // Legacy-Fallback: Backend liefert ergebnis direkt (ohne success-Wrapper)
+      // Defensiver Fallback: falls ein künftiger Endpoint den success-Wrapper vergisst,
+      // aber ergebnis direkt zurückliefert. Kein bekannter Legacy-Fall — nur Sicherheitsnetz.
       if (data.ergebnis !== undefined) {
         return { ergebnis: data.ergebnis as Record<string, unknown> }
       }
