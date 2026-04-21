@@ -5614,31 +5614,56 @@ function rufeClaudeAuf(systemPrompt, userPrompt, maxTokens, callerEmail) {
     throw new Error('Kein API Key verfügbar (weder pro LP noch global)');
   }
 
-  const response = UrlFetchApp.fetch('https://api.anthropic.com/v1/messages', {
-    method: 'post',
-    contentType: 'application/json',
-    headers: {
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01',
-    },
-    payload: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: maxTokens,
-      system: systemPrompt,
-      messages: [{ role: 'user', content: userPrompt }],
-    }),
-    muteHttpExceptions: true,
-  });
+  try {
+    const response = UrlFetchApp.fetch('https://api.anthropic.com/v1/messages', {
+      method: 'post',
+      contentType: 'application/json',
+      headers: {
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+      },
+      payload: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: maxTokens,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: userPrompt }],
+      }),
+      muteHttpExceptions: true,
+    });
 
-  const status = response.getResponseCode();
-  if (status !== 200) {
-    throw new Error('Claude API ' + status + ': ' + response.getContentText().substring(0, 200));
+    const status = response.getResponseCode();
+    if (status !== 200) {
+      const errMsg = 'Claude API ' + status + ': ' + response.getContentText().substring(0, 200);
+      // Quota-Watchdog: Bei Rate-Limit/Quota-Fehler Master-Toggle automatisch deaktivieren
+      if (callerEmail && /429|quota|rate.?limit|daily.?limit|overloaded/i.test(errMsg)) {
+        auditLog_('kiAssistent:quotaExceeded', callerEmail, { aktion: 'auto-disable-attempt', status: status });
+        try {
+          var einst = ladeLPKalibrierungsEinstellungen_(callerEmail);
+          einst.global = false;
+          einst.letzterQuotaFehler = new Date().toISOString();
+          speichereLPKalibrierungsEinstellungen_(callerEmail, einst);
+        } catch(_) {}
+      }
+      throw new Error(errMsg);
+    }
+
+    const result = JSON.parse(response.getContentText());
+    const text = result.content[0].text;
+    const cleaned = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    return JSON.parse(cleaned);
+  } catch(e) {
+    // Quota-Watchdog für Netzwerk-/Transport-Fehler (z.B. UrlFetchApp-Exception)
+    if (callerEmail && /quota|rate.?limit|429|daily.?limit/i.test(String(e.message || e))) {
+      auditLog_('kiAssistent:quotaExceeded', callerEmail, { aktion: 'auto-disable-attempt', fehler: String(e.message || e).substring(0, 200) });
+      try {
+        var einst2 = ladeLPKalibrierungsEinstellungen_(callerEmail);
+        einst2.global = false;
+        einst2.letzterQuotaFehler = new Date().toISOString();
+        speichereLPKalibrierungsEinstellungen_(callerEmail, einst2);
+      } catch(_) {}
+    }
+    throw e; // Bestehender Error-Pfad bleibt erhalten
   }
-
-  const result = JSON.parse(response.getContentText());
-  const text = result.content[0].text;
-  const cleaned = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-  return JSON.parse(cleaned);
 }
 
 /** Gemeinsamer System-Prompt für alle KI-Korrekturen */
@@ -10834,7 +10859,13 @@ function bulkLoescheKIFeedbacks(body) {
 function kalibrierungsEinstellungen(body) {
   if (!istZugelasseneLP(body.email)) return jsonResponse({success:false, error:'Nicht autorisiert'});
   if (body.modus === 'laden') {
-    return jsonResponse({success:true, data: ladeLPKalibrierungsEinstellungen_(body.email)});
+    var konfig = ladeLPKalibrierungsEinstellungen_(body.email);
+    // Quota-Warn-Flag: innerhalb von 24h nach letztem Quota-Fehler anzeigen
+    if (konfig.letzterQuotaFehler) {
+      var stundenSeitFehler = (Date.now() - new Date(konfig.letzterQuotaFehler).getTime()) / (60*60*1000);
+      konfig.zeigeQuotaWarnung = stundenSeitFehler < 24;
+    }
+    return jsonResponse({success:true, data: konfig});
   }
   if (body.modus === 'speichern') {
     if (!body.konfig) return jsonResponse({success:false, error:'konfig fehlt'});
