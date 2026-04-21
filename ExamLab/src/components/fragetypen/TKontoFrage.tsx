@@ -1,13 +1,17 @@
 import { useState, useEffect } from 'react'
 import { useFrageAdapter } from '../../hooks/useFrageAdapter.ts'
 import type { TKontoFrage as TKontoFrageType } from '../../types/fragen.ts'
+import type { Antwort } from '../../types/antworten.ts'
 import { renderMarkdown } from '../../utils/markdown.ts'
 import { fachbereichFarbe } from '../../utils/fachUtils.ts'
 import { kontoLabel } from '../../utils/kontenrahmen.ts'
 import KontenSelect from '../shared/KontenSelect.tsx'
+import { MusterloesungsBlock } from '@shared/ui/MusterloesungsBlock'
 
 interface Props {
   frage: TKontoFrageType
+  modus?: 'aufgabe' | 'loesung'
+  antwort?: Antwort | null
 }
 
 /** Border-Klasse: violett wenn leer + nicht readOnly, sonst neutral */
@@ -130,7 +134,14 @@ function vonAntwort(
   })
 }
 
-export default function TKontoFrage({ frage }: Props) {
+export default function TKontoFrage({ frage, modus = 'aufgabe', antwort: antwortProp }: Props) {
+  if (modus === 'loesung') {
+    return <TKontoLoesung frage={frage} antwort={antwortProp ?? null} />
+  }
+  return <TKontoAufgabe frage={frage} />
+}
+
+function TKontoAufgabe({ frage }: { frage: TKontoFrageType }) {
   const { antwort, onAntwort, speichereZwischenstand, disabled, feedbackSichtbar, korrekt } = useFrageAdapter(frage.id)
 
   const gespeicherteAntwort =
@@ -559,5 +570,207 @@ export default function TKontoFrage({ frage }: Props) {
         </div>
       )}
     </div>
+  )
+}
+
+// === LOESUNGSMODUS ===
+
+type SusEintrag = { gegenkonto: string; betrag: number }
+type EintragStatus =
+  | { art: 'korrekt'; gegenkonto: string; betrag: number }
+  | { art: 'falsch'; gegenkonto: string; betrag: number; hinweis: string }
+  | { art: 'fehlend'; gegenkonto: string; betrag: number }
+
+function matcheEintraege(korrekt: SusEintrag[], sus: SusEintrag[]): EintragStatus[] {
+  // Greedy match: fuer jeden korrekten Eintrag einen passenden SuS-Eintrag finden (beide Felder match)
+  const genutzt = new Set<number>()
+  const status: EintragStatus[] = []
+  for (const k of korrekt) {
+    const idx = sus.findIndex(
+      (s, i) => !genutzt.has(i) && s.gegenkonto === k.gegenkonto && Math.abs(s.betrag - k.betrag) < 0.01
+    )
+    if (idx >= 0) {
+      genutzt.add(idx)
+      status.push({ art: 'korrekt', gegenkonto: k.gegenkonto, betrag: k.betrag })
+    } else {
+      status.push({ art: 'fehlend', gegenkonto: k.gegenkonto, betrag: k.betrag })
+    }
+  }
+  // Nicht-genutzte SuS-Einträge sind überflüssig
+  sus.forEach((s, i) => {
+    if (!genutzt.has(i)) {
+      status.push({ art: 'falsch', gegenkonto: s.gegenkonto, betrag: s.betrag, hinweis: 'Nicht erwartet' })
+    }
+  })
+  return status
+}
+
+function TKontoLoesung({ frage, antwort }: { frage: TKontoFrageType; antwort: Antwort | null }) {
+  const susKonten = antwort?.typ === 'tkonto' ? antwort.konten : []
+  const konten = frage.konten ?? []
+  // Vorab-Gesamtstatus für Musterloesungsblock-Variante
+  const alleKontenKorrekt = konten.every((konto, kontoIdx) => {
+    const sus = susKonten.find((s) => s.id === konto.id) ?? susKonten[kontoIdx]
+    const korrektLinks = konto.eintraege.filter((e) => e.seite === 'soll')
+    const korrektRechts = konto.eintraege.filter((e) => e.seite === 'haben')
+    const susLinks: SusEintrag[] = Array.isArray(sus?.eintraegeLinks) ? sus!.eintraegeLinks : []
+    const susRechts: SusEintrag[] = Array.isArray(sus?.eintraegeRechts) ? sus!.eintraegeRechts : []
+    const linksStatus = matcheEintraege(korrektLinks, susLinks)
+    const rechtsStatus = matcheEintraege(korrektRechts, susRechts)
+    const alleLinksOk = linksStatus.every((s) => s.art === 'korrekt') && linksStatus.length === korrektLinks.length
+    const alleRechtsOk = rechtsStatus.every((s) => s.art === 'korrekt') && rechtsStatus.length === korrektRechts.length
+    const saldoBalanciert =
+      !sus?.saldo ||
+      Math.abs((sus.saldo.betragLinks ?? 0) - (sus.saldo.betragRechts ?? 0)) < 0.01
+    return alleLinksOk && alleRechtsOk && saldoBalanciert
+  })
+
+  return (
+    <div className="flex flex-col gap-5">
+      {/* Header: Badges */}
+      <div className="flex flex-wrap items-center gap-2">
+        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${fachbereichFarbe(frage.fachbereich)}`}>
+          {frage.fachbereich}
+        </span>
+        <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300">
+          {frage.bloom}
+        </span>
+        <span className="text-xs text-slate-500 dark:text-slate-400">
+          {frage.punkte} {frage.punkte === 1 ? 'Punkt' : 'Punkte'}
+        </span>
+        <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300">
+          T-Konto
+        </span>
+      </div>
+
+      {/* Aufgabentext */}
+      <div
+        className="text-base leading-relaxed text-slate-800 dark:text-slate-100 bg-slate-50 dark:bg-slate-800/80 p-4 rounded-lg border border-slate-200 dark:border-slate-700"
+        dangerouslySetInnerHTML={{ __html: renderMarkdown(frage.aufgabentext) }}
+      />
+
+      {/* Pro Konto eine T-Konto-Karte */}
+      <div className="flex flex-col gap-4">
+        {konten.map((konto, kontoIdx) => {
+          const sus = susKonten.find((s) => s.id === konto.id) ?? susKonten[kontoIdx]
+          const korrektLinks = konto.eintraege.filter((e) => e.seite === 'soll')
+          const korrektRechts = konto.eintraege.filter((e) => e.seite === 'haben')
+          const susLinks: SusEintrag[] = Array.isArray(sus?.eintraegeLinks) ? sus!.eintraegeLinks : []
+          const susRechts: SusEintrag[] = Array.isArray(sus?.eintraegeRechts) ? sus!.eintraegeRechts : []
+          const linksStatus = matcheEintraege(korrektLinks, susLinks)
+          const rechtsStatus = matcheEintraege(korrektRechts, susRechts)
+          const alleLinksOk = linksStatus.every((s) => s.art === 'korrekt') && linksStatus.length === korrektLinks.length
+          const alleRechtsOk = rechtsStatus.every((s) => s.art === 'korrekt') && rechtsStatus.length === korrektRechts.length
+
+          // Saldo-Check: falls Saldo-Werte übergeben, müssen sie balancieren
+          const saldoBalanciert =
+            !sus?.saldo ||
+            Math.abs((sus.saldo.betragLinks ?? 0) - (sus.saldo.betragRechts ?? 0)) < 0.01
+
+          const kontoKorrekt = alleLinksOk && alleRechtsOk && saldoBalanciert
+          const rahmen = kontoKorrekt
+            ? 'border-green-600 bg-green-50 dark:bg-green-950/20'
+            : 'border-red-600 bg-red-50 dark:bg-red-950/20'
+
+          return (
+            <div key={konto.id} className={`border-2 rounded-xl p-4 ${rahmen}`}>
+              <div className="flex items-center justify-between mb-3">
+                <span className="font-semibold text-slate-800 dark:text-slate-100">
+                  Konto {konto.kontonummer}
+                  {kontoLabel(konto.kontonummer) && (
+                    <span className="text-slate-500 dark:text-slate-400 font-normal ml-2">
+                      — {kontoLabel(konto.kontonummer)}
+                    </span>
+                  )}
+                </span>
+                <span className={`text-xs font-bold ${kontoKorrekt ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'}`}>
+                  {kontoKorrekt ? '\u2713 Korrekt' : '\u2717 Falsch'}
+                </span>
+              </div>
+
+              {/* T-Konto-Tabelle: Soll links, Haben rechts */}
+              <div className="grid grid-cols-2 gap-0 border border-slate-300 dark:border-slate-600 rounded overflow-hidden">
+                {/* Soll-Header */}
+                <div className="bg-slate-100 dark:bg-slate-700 px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200 border-r border-slate-300 dark:border-slate-600">
+                  Soll
+                </div>
+                <div className="bg-slate-100 dark:bg-slate-700 px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200">
+                  Haben
+                </div>
+                {/* Soll-Einträge + Haben-Einträge parallel */}
+                {Array.from({ length: Math.max(linksStatus.length, rechtsStatus.length, 1) }).map((_, i) => {
+                  const l = linksStatus[i]
+                  const r = rechtsStatus[i]
+                  return (
+                    <div key={i} className="contents">
+                      <div className="px-3 py-1 text-xs border-r border-t border-slate-200 dark:border-slate-700">
+                        {l ? <EintragBadge status={l} /> : <span className="text-slate-400">&nbsp;</span>}
+                      </div>
+                      <div className="px-3 py-1 text-xs border-t border-slate-200 dark:border-slate-700">
+                        {r ? <EintragBadge status={r} /> : <span className="text-slate-400">&nbsp;</span>}
+                      </div>
+                    </div>
+                  )
+                })}
+                {/* Saldo-Zeile (falls Saldo vorhanden) */}
+                {sus?.saldo && (
+                  <div className="contents">
+                    <div className={`px-3 py-1 text-xs border-r border-t-2 border-slate-400 dark:border-slate-500 ${saldoBalanciert ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'} font-semibold`}>
+                      Saldo: {(sus.saldo.betragLinks ?? 0).toFixed(2)}
+                    </div>
+                    <div className={`px-3 py-1 text-xs border-t-2 border-slate-400 dark:border-slate-500 ${saldoBalanciert ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'} font-semibold`}>
+                      Saldo: {(sus.saldo.betragRechts ?? 0).toFixed(2)}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Erwarteter Saldo */}
+              <div className="mt-2 text-xs text-slate-600 dark:text-slate-400">
+                Erwarteter Saldo: <span className="font-semibold text-green-700 dark:text-green-400">
+                  {konto.saldo.betrag.toFixed(2)} ({konto.saldo.seite === 'soll' ? 'links' : 'rechts'})
+                </span>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+
+      {/* Musterloesung */}
+      {frage.musterlosung && (
+        <MusterloesungsBlock variant={alleKontenKorrekt ? 'korrekt' : 'falsch'} label="Musterloesung">
+          <p>{frage.musterlosung}</p>
+        </MusterloesungsBlock>
+      )}
+    </div>
+  )
+}
+
+function EintragBadge({ status }: { status: EintragStatus }) {
+  if (status.art === 'korrekt') {
+    return (
+      <span className="inline-flex items-center gap-2 text-green-700 dark:text-green-400">
+        <span className="font-mono">{status.gegenkonto}</span>
+        <span className="font-mono">{status.betrag.toFixed(2)}</span>
+        <span aria-hidden>{'\u2713'}</span>
+      </span>
+    )
+  }
+  if (status.art === 'fehlend') {
+    return (
+      <span className="inline-flex items-center gap-2 text-red-700 dark:text-red-400">
+        <span className="font-mono font-semibold">{status.gegenkonto}</span>
+        <span className="font-mono font-semibold">{status.betrag.toFixed(2)}</span>
+        <em className="text-xs not-italic text-red-700 dark:text-red-400">(fehlt)</em>
+      </span>
+    )
+  }
+  // 'falsch' = ueberfluessig
+  return (
+    <span className="inline-flex items-center gap-2 text-red-700 dark:text-red-400 line-through">
+      <span className="font-mono">{status.gegenkonto}</span>
+      <span className="font-mono">{status.betrag.toFixed(2)}</span>
+      <em className="text-xs not-italic no-underline">({status.hinweis})</em>
+    </span>
   )
 }
