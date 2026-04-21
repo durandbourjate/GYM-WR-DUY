@@ -1145,10 +1145,25 @@ function doPost(e) {
     case 'bulkLoescheKIFeedbacks': return bulkLoescheKIFeedbacks(body);
     case 'kalibrierungsEinstellungen': return kalibrierungsEinstellungen(body);
     case 'kalibrierungsStatistik': return kalibrierungsStatistik(body);
-    case 'markiereKIFeedbackAlsIgnoriert':
+    case 'markiereKIFeedbackAlsIgnoriert': {
       if (!istZugelasseneLP(body.email)) return jsonResponse({success:false,error:'Nicht autorisiert'});
+      // IDOR-Schutz: prüfe dass feedbackId wirklich dem anfragenden LP gehört
+      var sheetCheck = stelleKIFeedbackSheetBereit_();
+      var rowsCheck = sheetCheck.getDataRange().getValues();
+      var hdrCheck = rowsCheck[0];
+      var idIdx = hdrCheck.indexOf('feedbackId');
+      var emailIdx = hdrCheck.indexOf('lpEmail');
+      var gehoert = false;
+      for (var i = 1; i < rowsCheck.length; i++) {
+        if (rowsCheck[i][idIdx] === body.feedbackId) {
+          gehoert = String(rowsCheck[i][emailIdx]).toLowerCase() === String(body.email).toLowerCase();
+          break;
+        }
+      }
+      if (!gehoert) return jsonResponse({success:false, error:'Nicht autorisiert (nicht eigener Eintrag)'});
       markiereFeedbackAlsIgnoriert_(body.feedbackId);
       return jsonResponse({success:true});
+    }
 
     default:
       return jsonResponse({ error: 'Unbekannte Aktion' });
@@ -10711,8 +10726,8 @@ function listeKIFeedbacks(body) {
     if (f.fachbereich && r[c('fachbereich')] !== f.fachbereich) continue;
     if (f.status && r[c('status')] !== f.status) continue;
     if (f.nurWichtige && !r[c('wichtig')]) continue;
-    if (f.von && String(r[c('zeitstempel')]) < f.von) continue;
-    if (f.bis && String(r[c('zeitstempel')]) > f.bis) continue;
+    if (f.von && toIsoStr_(r[c('zeitstempel')]) < f.von) continue;
+    if (f.bis && toIsoStr_(r[c('zeitstempel')]) > f.bis) continue;
 
     var inputParsed = safeParse_(r[c('inputJson')]);
     // Privacy (W4): SuS-Antwort im Review-Tab truncaten — Screen-Sharing-Risiko
@@ -10803,7 +10818,7 @@ function bulkLoescheKIFeedbacks(body) {
       if (String(rows[i][c('lpEmail')]).toLowerCase() !== body.email.toLowerCase()) continue;
       if (filter.status && rows[i][c('status')] !== filter.status) continue;
       if (filter.aelter_als) {
-        if (String(rows[i][c('zeitstempel')]) > filter.aelter_als) continue;
+        if (toIsoStr_(rows[i][c('zeitstempel')]) > filter.aelter_als) continue;
       }
       zuLoeschen.push(i + 1);
     }
@@ -10848,7 +10863,7 @@ function kalibrierungsStatistik(body) {
     if (String(r[c('lpEmail')]).toLowerCase() !== body.email.toLowerCase()) continue;
     var a = r[c('aktion')];
     if (!aktionenStats[a]) continue;
-    var zs = String(r[c('zeitstempel')]);
+    var zs = toIsoStr_(r[c('zeitstempel')]);
     if (zs < schwelleIso) continue;
     aktionenStats[a].vorschlaege++;
     var st = r[c('status')];
@@ -10863,4 +10878,13 @@ function kalibrierungsStatistik(body) {
     if (r[c('wichtig')] === true) aktionenStats[a].wichtige++;
   }
   return jsonResponse({success:true, data:{aktionen: aktionenStats, zeitraum_tage: tage}});
+}
+
+/** Zeitstempel aus Sheet robust zu ISO-String normieren.
+ *  Sheets kann ISO-Strings beim Lesen zu Date-Objekten parsen.
+ *  String(dateObj) liefert dann "Mon Apr 21 2026 ..." — nicht
+ *  lexikographisch mit ISO-Strings vergleichbar. */
+function toIsoStr_(wert) {
+  if (wert instanceof Date) return wert.toISOString();
+  return String(wert || '');
 }
