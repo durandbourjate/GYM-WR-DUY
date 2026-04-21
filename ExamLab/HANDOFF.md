@@ -6,7 +6,44 @@
 
 ---
 
-## Für die nächste Session (S131+)
+## Für die nächste Session (S132+)
+
+### Aktueller Stand (Ende S131, 21.04.2026) — C9 Phase 1 komplett, Branch offen
+
+**C9 = Detaillierte Lösungen pro Teilantwort** (ehemals `project_detaillierte_loesungen.md`). Branch `feature/c9-detaillierte-loesungen`, Tag `c9-phase1-foundation`. Phase 1 (Foundation) fertig, Phase 2 (Fragetyp-Komponenten) als nächstes.
+
+**Einstieg nächste Session:**
+1. `git checkout feature/c9-detaillierte-loesungen`
+2. Plan lesen: `ExamLab/docs/superpowers/plans/2026-04-21-c9-detaillierte-loesungen.md`
+3. Spec lesen: `ExamLab/docs/superpowers/specs/2026-04-21-c9-detaillierte-loesungen-design.md`
+4. Mockup (visuelle Referenz): `.superpowers/brainstorm/c9-loesungen/fragetypen-mockup-v6.html`
+5. Start Phase 2 Task 8 (MC `modus='loesung'`)
+
+**Phase 1 Ergebnis (7 Tasks, 7 Commits, Tag `c9-phase1-foundation`):**
+| Task | Commit | Was |
+|---|---|---|
+| 1 | `bdadbe0` | Branch + Spec/Plan committed |
+| 2 | `6be8333` | TS-Types: `erklaerung?` an 9 Sub-Interfaces (`ZuordnungPaar`, `Luecke`, `HotspotBereich`, `BildbeschriftungLabel`, `DragDropBildZielzone`, `BuchungssatzZeile`, `Kontenaufgabe`, `KontoMitSaldo` + MC/RF bereits da) |
+| 3 | `07982aa` | Apps-Script: `erklaerungSichtbar` top-level fehlte in `getTypDaten` — gefixt. `getTypDaten` macht KEIN Per-Feld-Whitelist-Stripping auf Sub-Arrays (passt ganze Arrays by-Reference) → `erklaerung`-Felder auf Sub-Elementen sind auto-safe |
+| 4 | `308a477` | `packages/shared/src/ui/AntwortZeile.tsx` + Tests (5) |
+| 5 | `3585f39` + `862ca18` | `packages/shared/src/ui/MusterloesungsBlock.tsx` + Tests (4) |
+| 6 | `6e936e7` | `packages/shared/src/ui/ZoneLabel.tsx` + Tests (4) |
+| 7 | Tag | Phase-1-Gate — 479/479 Tests, tsc+build grün |
+
+**Wichtige Abweichungen vom Plan (für Phase 2 zu wissen):**
+- **Shared-UI-Pfad:** `packages/shared/src/ui/` (nicht `ExamLab/src/shared/ui/` wie Plan sagte). Import via Alias `@shared/ui/X`. Tests in `ExamLab/src/tests/` nicht colokalisiert.
+- **`import type`-Pflicht:** tsconfig hat `verbatimModuleSyntax` — alle type-only Imports brauchen `import type` oder `import { type X }`.
+- **`SortierungItem` existiert nicht:** `SortierungFrage.elemente` ist `string[]`. Task 16 (Phase 2 Sortierung) muss entweder:
+  - (a) Typ-Umbau zu `SortierungItem[]` (Breaking Change — eigene Migration nötig)
+  - (b) Sortierung ohne Pro-Item-Erklärung (nur Farbmarkierung), erklaerung fällt weg
+  - Empfehlung: (b) — Sortierung ist selten, Pro-Item-Erklärung wenig wertvoll
+- **Apps-Script-Deploy nach Phase 1 NICHT nötig** — Phase-1-Änderungen sind Audit + fix eines einzelnen Top-Level-Feldes (`erklaerungSichtbar`), nicht C9-kritisch
+
+**Privacy-Follow-Up** (bleibt als Task 25 in Phase 3):
+Aktuell werden neue `erklaerung`-Felder auf `paare/luecken/bereiche/zielzonen/etc` für Prüfen-SuS NICHT bereinigt. `bereinigeFrageFuerSuS_` deletes bereits `optionen[].erklaerung` + `aussagen[].erklaerung` (vorbestehend), aber die neuen Felder fehlen in der Delete-Liste. Das ist OK solange keine Frage Erklärungen hat (d.h. vor der Migration, Phase 4). Vor Phase-4-Live-Run MUSS Task 25 umgesetzt sein. Spec/Plan dokumentieren das.
+
+**Phase 2 Überblick (14 Tasks):**
+Jeder Task = eine Fragetyp-Komponente auf `modus: 'aufgabe' | 'loesung'` umbauen. TDD je Typ mit 4–6 Tests. Reihenfolge nach Häufigkeit: MC → R/F → Zuordnung → Lückentext → Hotspot → Bildbeschriftung → DragDropBild → Freitext+Berechnung → Sortierung → Kontenbestimmung → Buchungssatz → TKonto → BilanzER. Nicht-auto-korrigierbar (kein modus-Umbau): Zeichnen, Audio, Code, PDF, FormelFrage.
 
 ### Aktueller Stand (Ende S130, 21.04.2026)
 - **KI-Kalibrierung komplett auf `main`** (Merge-Commit `1f3abcb`). 38 Commits in der Feature-Arbeit (20 Implementation-Tasks via Subagent-Driven Development + 10 Review-Fix-Runden + 2 Staging-Hotfixes + HANDOFF/Rules-Updates). Feature-Branch gelöscht.
