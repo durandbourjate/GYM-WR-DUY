@@ -5634,15 +5634,23 @@ function rufeClaudeAuf(systemPrompt, userPrompt, maxTokens, callerEmail) {
     const status = response.getResponseCode();
     if (status !== 200) {
       const errMsg = 'Claude API ' + status + ': ' + response.getContentText().substring(0, 200);
-      // Quota-Watchdog: Bei Rate-Limit/Quota-Fehler Master-Toggle automatisch deaktivieren
-      if (callerEmail && /429|quota|rate.?limit|daily.?limit|overloaded/i.test(errMsg)) {
+      // Quota-Watchdog: Bei echten Rate-Limit/Quota-Fehlern Master-Toggle automatisch deaktivieren.
+      // NICHT bei 529 "overloaded" (transient, Anthropic empfiehlt Retry — kein Auto-Disable).
+      // 'quota' nur mit '.?exceeded' erlaubt (verhindert False-Positives in Claude-Antworten über Wirtschafts-Quoten).
+      if (callerEmail && /429|rate.?limit|daily.?limit|quota.?exceeded/i.test(errMsg)) {
         auditLog_('kiAssistent:quotaExceeded', callerEmail, { aktion: 'auto-disable-attempt', status: status });
+        var watchdogLock = LockService.getScriptLock();
         try {
+          watchdogLock.waitLock(5000);
           var einst = ladeLPKalibrierungsEinstellungen_(callerEmail);
           einst.global = false;
           einst.letzterQuotaFehler = new Date().toISOString();
           speichereLPKalibrierungsEinstellungen_(callerEmail, einst);
-        } catch(_) {}
+        } catch(lockErr) {
+          console.warn('[Kalibrierung] Quota-Watchdog Lock-Fehler:', lockErr);
+        } finally {
+          try { watchdogLock.releaseLock(); } catch(_) {}
+        }
       }
       throw new Error(errMsg);
     }
@@ -5652,15 +5660,22 @@ function rufeClaudeAuf(systemPrompt, userPrompt, maxTokens, callerEmail) {
     const cleaned = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
     return JSON.parse(cleaned);
   } catch(e) {
-    // Quota-Watchdog für Netzwerk-/Transport-Fehler (z.B. UrlFetchApp-Exception)
-    if (callerEmail && /quota|rate.?limit|429|daily.?limit/i.test(String(e.message || e))) {
+    // Quota-Watchdog für Netzwerk-/Transport-Fehler (z.B. UrlFetchApp-Exception).
+    // Gleiche Regex wie oben: kein 'overloaded', 'quota' nur mit '.?exceeded'.
+    if (callerEmail && /429|rate.?limit|daily.?limit|quota.?exceeded/i.test(String(e.message || e))) {
       auditLog_('kiAssistent:quotaExceeded', callerEmail, { aktion: 'auto-disable-attempt', fehler: String(e.message || e).substring(0, 200) });
+      var watchdogLock2 = LockService.getScriptLock();
       try {
+        watchdogLock2.waitLock(5000);
         var einst2 = ladeLPKalibrierungsEinstellungen_(callerEmail);
         einst2.global = false;
         einst2.letzterQuotaFehler = new Date().toISOString();
         speichereLPKalibrierungsEinstellungen_(callerEmail, einst2);
-      } catch(_) {}
+      } catch(lockErr2) {
+        console.warn('[Kalibrierung] Quota-Watchdog Lock-Fehler (catch):', lockErr2);
+      } finally {
+        try { watchdogLock2.releaseLock(); } catch(_) {}
+      }
     }
     throw e; // Bestehender Error-Pfad bleibt erhalten
   }
