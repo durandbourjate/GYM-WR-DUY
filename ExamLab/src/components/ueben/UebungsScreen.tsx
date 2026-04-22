@@ -10,7 +10,10 @@ import QuizHeader from './uebung/QuizHeader'
 import QuizNavigation from './uebung/QuizNavigation'
 import QuizActions from './uebung/QuizActions'
 import SelbstbewertungsDialog from './uebung/SelbstbewertungsDialog'
-// FeedbackPanel wird von Fragetyp-Komponenten via FeedbackBox gerendert
+import { MusterloesungsBlock } from '@shared/ui/MusterloesungsBlock'
+// C9 Task 25+ (S135): nach „Antwort prüfen" rendert FrageRenderer mit modus='loesung' →
+// Phase-2-Lösungs-Komponente mit pro-Sub-Element-Rahmen + erklaerung-Anzeige.
+// MusterloesungsBlock darunter zeigt Gesamt-Musterlösung (ersetzt altes FeedbackPanel).
 
 export default function UebungsScreen() {
   const {
@@ -20,6 +23,7 @@ export default function UebungsScreen() {
     aktuelleFrage, kannZurueck,
     pruefeAntwortJetzt, selbstbewertenById,
     speichertPruefung, pruefFehler, letzteMusterloesung,
+    letzteAntwortKorrekt,
   } = useUebenUebungsStore()
   const { zuErgebnis } = useSuSNavigation()
 
@@ -139,9 +143,23 @@ export default function UebungsScreen() {
           </div>
         )}
 
-        {/* Frage-Karte — Fragetyp-Komponenten rendern fragetext selbst, analog Prüfungs-Modus (Layout.tsx) */}
+        {/* Frage-Karte — Fragetyp-Komponenten rendern fragetext selbst, analog Prüfungs-Modus (Layout.tsx).
+            Nach „Antwort prüfen" wechselt der Modus von 'aufgabe' → 'loesung', damit die
+            Phase-2-Lösungs-Komponente mit pro-Zeile-Rahmen + erklaerung-Anzeige gerendert wird. */}
         <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm p-6 mb-4">
-          <FrageRenderer frage={normFrage as unknown as Frage} />
+          <FrageRenderer
+            frage={normFrage as unknown as Frage}
+            modus={feedbackSichtbar ? 'loesung' : 'aufgabe'}
+            antwort={session.antworten[frage.id] ?? null}
+          />
+          {feedbackSichtbar && normFrage.musterlosung && (
+            <MusterloesungsBlock
+              variant={letzteAntwortKorrekt === false ? 'falsch' : 'korrekt'}
+              label={letzteAntwortKorrekt === false ? 'Nicht ganz — Musterlösung' : 'Musterlösung'}
+            >
+              <p className="whitespace-pre-wrap">{normFrage.musterlosung}</p>
+            </MusterloesungsBlock>
+          )}
         </div>
 
         {/* Selbstbewertung-Dialog (Freitext/Zeichnen/PDF/Audio/Code).
