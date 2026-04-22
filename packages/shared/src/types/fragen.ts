@@ -154,6 +154,8 @@ export interface LueckentextFrage extends FrageBase {
     korrekteAntworten: string[];
     caseSensitive: boolean;
     dropdownOptionen?: string[]  // wenn gesetzt und nicht leer → Dropdown statt Texteingabe
+    /** Teilerklärung (C9): warum dieser Begriff erwartet wird. */
+    erklaerung?: string;
   }[];
 }
 
@@ -244,6 +246,8 @@ export interface BuchungssatzZeile {
   sollKonto: string
   habenKonto: string
   betrag: number
+  /** Teilerklärung (C9): Geschäftsvorfall-bezogene Begründung pro Buchung. */
+  erklaerung?: string
 }
 
 /** @deprecated Altes Format — nur noch für Referenz */
@@ -308,6 +312,8 @@ export interface Kontenaufgabe {
   id: string
   text: string
   erwarteteAntworten: KontenAntwort[]
+  /** Teilerklärung (C9): warum diese Kategorie/Konto korrekt ist. */
+  erklaerung?: string
 }
 
 export interface KontenbestimmungFrage extends FrageBase {
@@ -324,6 +330,8 @@ export interface KontoMitSaldo {
   kontonummer: string
   name?: string
   saldo: number
+  /** Teilerklärung (C9): Einordnung in Bilanz/ER. ID = kontonummer. */
+  erklaerung?: string
 }
 
 export interface BilanzGruppe {
@@ -552,6 +560,8 @@ export interface HotspotBereich {
   punkte: { x: number; y: number }[]     // Prozent 0-100, ≥3 Punkte (Rechteck = 4)
   label: string
   punktzahl: number                      // Punkte-Wert für Korrektur
+  /** Teilerklärung (C9): Begründung warum Bereich korrekt / Distraktor ist. */
+  erklaerung?: string
 }
 
 export interface HotspotFrage extends FrageBase {
@@ -572,6 +582,8 @@ export interface BildbeschriftungLabel {
   id: string
   position: { x: number; y: number }  // Prozent 0-100
   korrekt: string[]                     // akzeptierte Antworten
+  /** Teilerklärung (C9): was an dieser Stelle zu beschriften ist und warum. */
+  erklaerung?: string
 }
 
 export interface BildbeschriftungFrage extends FrageBase {
@@ -600,6 +612,8 @@ export interface DragDropBildZielzone {
   form: 'rechteck' | 'polygon'
   punkte: { x: number; y: number }[]   // Prozent 0-100, ≥3 Punkte (Rechteck = 4)
   korrektesLabel: string
+  /** Teilerklärung (C9): welches Label hierhin gehört und warum. */
+  erklaerung?: string
 }
 
 export interface DragDropBildFrage extends FrageBase {
