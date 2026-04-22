@@ -1,15 +1,19 @@
 import { useState, useCallback } from 'react'
 import { useFrageAdapter } from '../../hooks/useFrageAdapter.ts'
 import type { DragDropBildFrage as DragDropBildFrageType } from '../../types/fragen.ts'
+import type { Antwort } from '../../types/antworten.ts'
 import { renderMarkdown } from '../../utils/markdown.ts'
 import { fachbereichFarbe } from '../../utils/fachUtils.ts'
 import { toAssetUrl } from '../../utils/assetUrl.ts'
 import { ermittleBildQuelle } from '@shared/utils/mediaQuelleResolver'
 import { mediaQuelleZuImgSrc } from '@shared/utils/mediaQuelleUrl'
 import { istZoneWohlgeformt } from '../../utils/zonen/migriereZone.ts'
+import { ZoneLabel } from '@shared/ui/ZoneLabel'
 
 interface Props {
   frage: DragDropBildFrageType
+  modus?: 'aufgabe' | 'loesung'
+  antwort?: Antwort | null
 }
 
 /** Bounding-Box aus Polygon-Punkten — SuS sieht Zone als Rechteck (Phase 2). */
@@ -20,7 +24,7 @@ function zoneBBox(punkte: { x: number; y: number }[]): { x: number; y: number; b
   return { x: minX, y: minY, breite: Math.max(...xs) - minX, hoehe: Math.max(...ys) - minY }
 }
 
-export default function DragDropBildFrage({ frage }: Props) {
+export default function DragDropBildFrage({ frage, modus = 'aufgabe', antwort: antwortProp }: Props) {
   // Error-Boundary: Zonen müssen im neuen Format (punkte[]) vorliegen
   const zonenUngueltig =
     Array.isArray(frage.zielzonen) && frage.zielzonen.length > 0 &&
@@ -32,6 +36,13 @@ export default function DragDropBildFrage({ frage }: Props) {
       </div>
     )
   }
+  if (modus === 'loesung') {
+    return <DragDropBildLoesung frage={frage} antwort={antwortProp ?? null} />
+  }
+  return <DragDropBildAufgabe frage={frage} />
+}
+
+function DragDropBildAufgabe({ frage }: { frage: DragDropBildFrageType }) {
   const { antwort, onAntwort, disabled, feedbackSichtbar, korrekt } = useFrageAdapter(frage.id)
   const bildQuelle = ermittleBildQuelle(frage)
 
@@ -251,6 +262,120 @@ export default function DragDropBildFrage({ frage }: Props) {
         <div className={`mt-4 p-3 rounded-lg ${korrekt ? 'bg-green-50 text-green-800 dark:bg-green-900/30 dark:text-green-300' : 'bg-red-50 text-red-800 dark:bg-red-900/30 dark:text-red-300'}`}>
           {korrekt ? '\u2713 Richtig!' : '\u2717 Leider falsch.'}
           {frage.musterlosung && <p className="mt-1 text-sm">{frage.musterlosung}</p>}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function DragDropBildLoesung({ frage, antwort }: { frage: DragDropBildFrageType; antwort: Antwort | null }) {
+  const bildQuelle = ermittleBildQuelle(frage)
+  const zuordnungen: Record<string, string> =
+    antwort?.typ === 'dragdrop_bild' ? antwort.zuordnungen : {}
+
+  const zielzonen = frage.zielzonen ?? []
+  const alleLabels = frage.labels ?? []
+
+  function labelsInZone(zoneId: string): string[] {
+    return alleLabels.filter(l => zuordnungen[l] === zoneId)
+  }
+
+  return (
+    <div className="flex flex-col gap-5">
+      {/* Header: Badges */}
+      <div className="flex flex-wrap items-center gap-2">
+        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${fachbereichFarbe(frage.fachbereich)}`}>
+          {frage.fachbereich}
+        </span>
+        <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300">
+          {frage.bloom}
+        </span>
+        <span className="text-xs text-slate-500 dark:text-slate-400">
+          {frage.punkte} {frage.punkte === 1 ? 'Punkt' : 'Punkte'}
+        </span>
+      </div>
+
+      {/* Fragetext */}
+      <div
+        className="text-base leading-relaxed text-slate-800 dark:text-slate-100 bg-slate-50 dark:bg-slate-800/80 p-4 rounded-lg border border-slate-200 dark:border-slate-700"
+        dangerouslySetInnerHTML={{ __html: renderMarkdown(frage.fragetext) }}
+      />
+
+      {/* Bild mit Zielzonen-BBox + ZoneLabel */}
+      <div className="relative block w-full max-w-2xl">
+        <div className="relative overflow-hidden w-full">
+          {bildQuelle && (
+            <img
+              src={mediaQuelleZuImgSrc(bildQuelle, toAssetUrl)}
+              alt="Drag & Drop Bild"
+              className="block w-full h-auto rounded-lg select-none"
+              style={{ objectFit: 'contain' }}
+              draggable={false}
+            />
+          )}
+
+          {/* SVG-Overlay: Polygon-Rahmen pro Zone */}
+          <svg
+            className="absolute inset-0 w-full h-full pointer-events-none"
+            viewBox="0 0 100 100"
+            preserveAspectRatio="none"
+          >
+            {zielzonen.map((z) => {
+              const istKorrekt = zuordnungen[z.korrektesLabel] === z.id
+              const points = (z.punkte ?? []).map(p => `${p.x},${p.y}`).join(' ')
+              return (
+                <polygon
+                  key={z.id}
+                  points={points}
+                  fill={istKorrekt ? 'rgba(34,197,94,0.1)' : 'rgba(220,38,38,0.08)'}
+                  stroke={istKorrekt ? '#16a34a' : '#dc2626'}
+                  strokeWidth={0.5}
+                  vectorEffect="non-scaling-stroke"
+                />
+              )
+            })}
+          </svg>
+
+          {/* ZoneLabel pro Zone, zentriert in der BBox */}
+          {zielzonen.map((z) => {
+            const istKorrekt = zuordnungen[z.korrektesLabel] === z.id
+            const susLabels = labelsInZone(z.id)
+            const susAntwort = susLabels.length > 0 ? susLabels.join(', ') : undefined
+            const bb = zoneBBox(z.punkte)
+            const centerX = bb.x + bb.breite / 2
+            const centerY = bb.y + bb.hoehe / 2
+            return (
+              <div
+                key={z.id}
+                className="absolute -translate-x-1/2 -translate-y-1/2 z-10"
+                style={{ left: `${centerX}%`, top: `${centerY}%` }}
+              >
+                <ZoneLabel
+                  variant={istKorrekt ? 'korrekt' : 'falsch'}
+                  susAntwort={istKorrekt ? z.korrektesLabel : susAntwort}
+                  korrekteAntwort={z.korrektesLabel}
+                  placeholder="leer gelassen"
+                />
+              </div>
+            )
+          })}
+        </div>
+      </div>
+
+      {/* Erklärungen pro Zone */}
+      {zielzonen.some((z) => !!z.erklaerung) && (
+        <div className="flex flex-col gap-2">
+          {zielzonen.map((z, i) => {
+            if (!z.erklaerung) return null
+            return (
+              <div
+                key={z.id}
+                className="pl-2.5 border-l-2 border-slate-300 dark:border-slate-600 text-xs italic text-slate-600 dark:text-slate-400"
+              >
+                {'\u{1F4A1}'} <strong>Zone {i + 1} ({z.korrektesLabel}):</strong> {z.erklaerung}
+              </div>
+            )
+          })}
         </div>
       )}
     </div>

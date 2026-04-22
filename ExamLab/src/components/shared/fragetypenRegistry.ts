@@ -1,5 +1,6 @@
 import type { ComponentType } from 'react'
 import type { Frage } from '../../types/fragen.ts'
+import type { Antwort } from '../../types/antworten.ts'
 
 // Alle Fragetyp-Komponenten (Prüfen + Üben via useFrageAdapter)
 import MCFrage from '../fragetypen/MCFrage.tsx'
@@ -28,7 +29,7 @@ import FormelFrageComponent from '../fragetypen/FormelFrageComponent.tsx'
  * Gilt für Prüfen- UND Üben-Modus (beide via useFrageAdapter).
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const FRAGETYP_KOMPONENTEN: Record<string, ComponentType<{ frage: Frage | any }>> = {
+export const FRAGETYP_KOMPONENTEN: Record<string, ComponentType<{ frage: Frage | any; modus?: 'aufgabe' | 'loesung'; antwort?: Antwort | null }>> = {
   mc: MCFrage,
   freitext: FreitextFrage,
   lueckentext: LueckentextFrage,

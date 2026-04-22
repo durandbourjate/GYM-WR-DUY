@@ -1857,16 +1857,28 @@ var LOESUNGS_FELDER_ = {
   ],
 
   arrays: [
+    // C9 Task 25: `erklaerung` pro Sub-Element entfernen (Prüfen-SuS).
+    // Flag opts.behalteErklaerung=true im Üben-Modus überschreibt diese Regel.
     { feld: 'optionen', subFelder: ['korrekt', 'erklaerung'] },
     { feld: 'aussagen', subFelder: ['korrekt', 'erklaerung'] },
-    { feld: 'luecken', subFelder: ['korrekteAntworten', 'korrekt'] },
+    { feld: 'luecken', subFelder: ['korrekteAntworten', 'korrekt', 'erklaerung'] },
     { feld: 'ergebnisse', subFelder: ['korrekt', 'toleranz'] },
     { feld: 'bilanzEintraege', subFelder: ['korrekt'] },
-    { feld: 'aufgaben', subFelder: ['erwarteteAntworten'] },
-    { feld: 'beschriftungen', subFelder: ['korrekt'] },
-    { feld: 'zielzonen', subFelder: ['korrektesLabel'] },
-    { feld: 'bereiche', subFelder: ['korrekt'], nurBeiTyp: 'hotspot' },
-    { feld: 'hotspots', subFelder: ['korrekt'], nurBeiTyp: 'hotspot' },
+    { feld: 'aufgaben', subFelder: ['erwarteteAntworten', 'erklaerung'] },
+    { feld: 'beschriftungen', subFelder: ['korrekt', 'erklaerung'] },
+    { feld: 'zielzonen', subFelder: ['korrektesLabel', 'erklaerung'] },
+    { feld: 'bereiche', subFelder: ['korrekt', 'erklaerung'], nurBeiTyp: 'hotspot' },
+    { feld: 'hotspots', subFelder: ['korrekt', 'erklaerung'], nurBeiTyp: 'hotspot' },
+    // BilanzER: kontenMitSaldi[].erklaerung (id = kontonummer). saldo selbst
+    // ist die Aufgabenstellung (LP gibt Saldo vor), nicht Lösung — wird nicht gestrippt.
+    { feld: 'kontenMitSaldi', subFelder: ['erklaerung'], nurBeiTyp: 'bilanzstruktur' },
+    // Buchungssatz: erklaerung pro Zeile. Das Array `buchungen` wird im
+    // Prüfen-Modus bereits via typSpezifisch komplett top-level gelöscht —
+    // dieser Eintrag greift daher praktisch nur im Üben-Modus (wo buchungen
+    // durch opts.behalteBuchungen via Caller erhalten bleiben müsste, aktuell
+    // out of scope) und als defensive Absicherung falls typSpezifisch-Delete
+    // umgangen wird.
+    { feld: 'buchungen', subFelder: ['erklaerung'], nurBeiTyp: 'buchungssatz' },
   ],
 
   reihenfolge: [
@@ -1875,7 +1887,9 @@ var LOESUNGS_FELDER_ = {
   ],
 
   konten: {
-    subFelder: ['korrekt', 'eintraege', 'saldo'],
+    // C9 Task 25: `erklaerung` pro TKonto-Eintrag entfernen (Prüfen-SuS).
+    // Flag opts.behalteErklaerung=true im Üben-Modus überschreibt diese Regel.
+    subFelder: ['korrekt', 'eintraege', 'saldo', 'erklaerung'],
     bedingteSubFelder: [
       { feld: 'anfangsbestand', bedingung: function(k) { return !k.anfangsbestandVorgegeben; } },
     ],
@@ -1893,8 +1907,15 @@ var LOESUNGS_FELDER_ = {
  * Rekursiv für Aufgabengruppen. Einziger kanonischer SuS-Bereinigungs-Pfad.
  *
  * Iteriert deklarativ über LOESUNGS_FELDER_ — Single Source of Truth.
+ *
+ * C9 Task 25 (S135 Privacy-Invariante): Optionales opts.behalteErklaerung=true
+ * lässt `erklaerung`-Felder in allen Sub-Arrays stehen. Nur vom Üben-Modus
+ * benutzt (`bereinigeFrageFuerSuSUeben_`) — im Prüfen-Modus bleibt Default=false
+ * (Erklärungen gehören zur Lösung, dürfen SuS nicht sehen).
  */
-function bereinigeFrageFuerSuS_(frage) {
+function bereinigeFrageFuerSuS_(frage, opts) {
+  opts = opts || {};
+  var behalteErklaerung = !!opts.behalteErklaerung;
   var f = JSON.parse(JSON.stringify(frage)); // Deep Copy
 
   // Einfache Felder (gemeinsam)
@@ -1913,7 +1934,10 @@ function bereinigeFrageFuerSuS_(frage) {
     if (f[ts.feld]) delete f[ts.feld];
   }
 
-  // Array-Felder: Sub-Lösungsfelder entfernen
+  // Array-Felder: Sub-Lösungsfelder entfernen. Bei behalteErklaerung=true
+  // bleibt `erklaerung` stehen (Pfad: Üben-Modus → SuS sieht Teilerklärungen
+  // nach "Antwort prüfen"). Sonstige Lösungsfelder (`korrekt`, `korrekteAntworten`,
+  // `korrektesLabel`, `erwarteteAntworten`) werden weiterhin entfernt.
   for (var k = 0; k < LOESUNGS_FELDER_.arrays.length; k++) {
     var arr = LOESUNGS_FELDER_.arrays[k];
     if (arr.nurBeiTyp && f.typ !== arr.nurBeiTyp) continue;
@@ -1921,7 +1945,9 @@ function bereinigeFrageFuerSuS_(frage) {
       f[arr.feld] = f[arr.feld].map(function(item) {
         var cleaned = Object.assign({}, item);
         for (var s = 0; s < arr.subFelder.length; s++) {
-          delete cleaned[arr.subFelder[s]];
+          var sf = arr.subFelder[s];
+          if (sf === 'erklaerung' && behalteErklaerung) continue;
+          delete cleaned[sf];
         }
         return cleaned;
       });
@@ -1936,7 +1962,9 @@ function bereinigeFrageFuerSuS_(frage) {
     f.konten = f.konten.map(function(konto) {
       var c = Object.assign({}, konto);
       for (var s = 0; s < LOESUNGS_FELDER_.konten.subFelder.length; s++) {
-        delete c[LOESUNGS_FELDER_.konten.subFelder[s]];
+        var sf = LOESUNGS_FELDER_.konten.subFelder[s];
+        if (sf === 'erklaerung' && behalteErklaerung) continue;
+        delete c[sf];
       }
       for (var bs = 0; bs < LOESUNGS_FELDER_.konten.bedingteSubFelder.length; bs++) {
         var b = LOESUNGS_FELDER_.konten.bedingteSubFelder[bs];
@@ -1958,9 +1986,10 @@ function bereinigeFrageFuerSuS_(frage) {
     });
   }
 
-  // Aufgabengruppe: rekursiv bereinigen
+  // Aufgabengruppe: rekursiv bereinigen — opts muss mitgegeben werden,
+  // sonst verlieren Teilaufgaben das behalteErklaerung-Flag.
   if (Array.isArray(f.teilaufgaben)) {
-    f.teilaufgaben = f.teilaufgaben.map(bereinigeFrageFuerSuS_);
+    f.teilaufgaben = f.teilaufgaben.map(function(t) { return bereinigeFrageFuerSuS_(t, opts); });
   }
 
   return f;
@@ -2065,9 +2094,15 @@ function extrahiereLoesungsSlice_(frage) {
  * Bereinigung für selbstständiges Üben: strenge Bereinigung + Mischung.
  * Strenge Bereinigung steckt vollständig in bereinigeFrageFuerSuS_;
  * diese Funktion fügt nur noch Fisher-Yates-Mischung hinzu.
+ *
+ * C9 Task 25 (S135): Übungsmodus behält `erklaerung`-Felder pro Sub-Element
+ * (via opts.behalteErklaerung=true) — SuS sieht die Teilerklärungen nach
+ * „Antwort prüfen" direkt aus dem Frage-Payload (siehe fragetypen/*.tsx
+ * modus='loesung'). Im Prüfen-Modus würde die erklaerung indirekt die
+ * Musterlösung verraten; deshalb dort Default=false.
  */
 function bereinigeFrageFuerSuSUeben_(frage) {
-  return mischeFrageOptionen_(bereinigeFrageFuerSuS_(frage));
+  return mischeFrageOptionen_(bereinigeFrageFuerSuS_(frage, { behalteErklaerung: true }));
 }
 
 // === SERVER-SIDE KORREKTUR (Port aus korrektur.ts) ===
@@ -3599,7 +3634,8 @@ function batchImportFragen(body) {
 function getTypDaten(frage) {
   switch (frage.typ) {
     case 'mc':
-      return { optionen: frage.optionen, mehrfachauswahl: frage.mehrfachauswahl, zufallsreihenfolge: frage.zufallsreihenfolge };
+      // optionen[].erklaerung: wird automatisch mitgespeichert, da frage.optionen als Ganzes übergeben wird (kein per-Feld-Whitelist auf Sub-Elementen)
+      return { optionen: frage.optionen, mehrfachauswahl: frage.mehrfachauswahl, zufallsreihenfolge: frage.zufallsreihenfolge, erklaerungSichtbar: frage.erklaerungSichtbar };
     case 'freitext':
       return { laenge: frage.laenge, hilfstextPlaceholder: frage.hilfstextPlaceholder };
     case 'lueckentext':
@@ -3607,7 +3643,8 @@ function getTypDaten(frage) {
     case 'zuordnung':
       return { paare: frage.paare, zufallsreihenfolge: frage.zufallsreihenfolge };
     case 'richtigfalsch':
-      return { aussagen: frage.aussagen };
+      // aussagen[].erklaerung: wird automatisch mitgespeichert, da frage.aussagen als Ganzes übergeben wird
+      return { aussagen: frage.aussagen, erklaerungSichtbar: frage.erklaerungSichtbar };
     case 'berechnung':
       return { ergebnisse: frage.ergebnisse, rechenwegErforderlich: frage.rechenwegErforderlich, hilfsmittel: frage.hilfsmittel };
     case 'buchungssatz':
@@ -5091,6 +5128,90 @@ function setzeKIOutputInFeedback_(feedbackId, kiOutput) {
   } catch (e) { console.warn('[Kalibrierung] kiOutput-Nachtrag fehlgeschlagen:', e); }
 }
 
+// C9 Phase 3 — baut pro Fragetyp den Sub-Element-Kontext + Regel-Text für generiereMusterloesung.
+// Gibt {kontext, regel, feld, gueltigeIds[]} zurück. Sub-Arrays werden vom Caller als
+// Top-Level-Properties in `daten` erwartet (daten.optionen, nicht daten.frage.optionen).
+// Wenn die Sub-Arrays fehlen (heutiger Caller sendet nur fragetext/typ/fachbereich/bloom
+// — bis Task 24 die Call-Site erweitert), bleibt gueltigeIds leer und Claude wird
+// angewiesen, teilerklaerungen=[] zu liefern.
+function baueTeilerklaerungsKontext_(daten) {
+  var typ = daten && daten.typ;
+  var leer = { kontext: '', regel: 'Dieser Fragetyp hat keine Sub-Elemente. teilerklaerungen MUSS ein leeres Array sein: "teilerklaerungen": [].', feld: '', gueltigeIds: [] };
+
+  function baue_(feld, array, regelText, idExtractor) {
+    if (!Array.isArray(array) || array.length === 0) return leer;
+    var extractor = idExtractor || function(e) { return e && e.id; };
+    var gueltigeIds = array.map(extractor).filter(function(id) { return typeof id === 'string' && id.length > 0; });
+    return {
+      kontext: 'Sub-Elemente (' + feld + '):\n' + wrapUserData(feld, JSON.stringify(array)) + '\n\n',
+      regel: regelText,
+      feld: feld,
+      gueltigeIds: gueltigeIds
+    };
+  }
+
+  switch (typ) {
+    case 'mc':
+      return baue_('optionen', daten.optionen,
+        'Pro optionen[i] eine Teilerklärung mit feld="optionen", id=optionen[i].id.\n' +
+        'Bei korrekt=true: begründe warum die Option richtig ist (1-2 Sätze).\n' +
+        'Bei korrekt=false: erkläre den Denkfehler oder warum der Distraktor plausibel aber falsch ist (1-2 Sätze).\n');
+    case 'richtigfalsch':
+      return baue_('aussagen', daten.aussagen,
+        'Pro aussagen[i] eine Teilerklärung mit feld="aussagen", id=aussagen[i].id.\n' +
+        '1-2 Sätze Begründung warum die Aussage richtig oder falsch ist.\n');
+    case 'zuordnung':
+      return baue_('paare', daten.paare,
+        'Pro paare[i] eine Teilerklärung mit feld="paare", id=paare[i].id.\n' +
+        'Erkläre kurz warum genau dieses linke Element zu diesem rechten Element gehört (1-2 Sätze).\n');
+    case 'lueckentext':
+      return baue_('luecken', daten.luecken,
+        'Pro luecken[i] eine Teilerklärung mit feld="luecken", id=luecken[i].id.\n' +
+        'Erkläre welcher Begriff hier erwartet wird und warum (1-2 Sätze).\n');
+    case 'hotspot':
+      return baue_('bereiche', daten.bereiche,
+        'Pro bereiche[i] eine Teilerklärung mit feld="bereiche", id=bereiche[i].id.\n' +
+        'Bei korrekt=true: erkläre warum dieser Bereich zu klicken ist.\n' +
+        'Bei korrekt=false: erkläre warum dieser Bereich ein Distraktor ist (1-2 Sätze).\n');
+    case 'dragdrop_bild':
+      return baue_('zielzonen', daten.zielzonen,
+        'Pro zielzonen[i] eine Teilerklärung mit feld="zielzonen", id=zielzonen[i].id.\n' +
+        'Erkläre welches Label hierhin gehört und warum (1-2 Sätze).\n');
+    case 'bildbeschriftung':
+      return baue_('beschriftungen', daten.beschriftungen,
+        'Pro beschriftungen[i] eine Teilerklärung mit feld="beschriftungen", id=beschriftungen[i].id.\n' +
+        'Erkläre was an dieser Stelle im Bild zu beschriften ist (1-2 Sätze).\n');
+    case 'kontenbestimmung':
+      return baue_('aufgaben', daten.aufgaben,
+        'Pro aufgaben[i] eine Teilerklärung mit feld="aufgaben", id=aufgaben[i].id.\n' +
+        'Erkläre welches Konto (und/oder welche Kategorie/Seite) korrekt ist und warum (1-2 Sätze).\n');
+    case 'buchungssatz':
+      return baue_('buchungen', daten.buchungen,
+        'Pro buchungen[i] eine Teilerklärung mit feld="buchungen", id=buchungen[i].id.\n' +
+        'Erkläre den Buchungssatz (Soll/Haben, Konten, Betrag) geschäftsvorfall-bezogen (1-2 Sätze).\n');
+    case 'bilanzstruktur':
+      return baue_('kontenMitSaldi', daten.kontenMitSaldi,
+        'Pro kontenMitSaldi[i] eine Teilerklärung mit feld="kontenMitSaldi", id=kontenMitSaldi[i].kontonummer. ' +
+        'Falls dieselbe Kontonummer mehrfach vorkommt (Duplikat): nur EINE Teilerklärung pro eindeutiger Kontonummer. ' +
+        'Erkläre wo dieses Konto in Bilanz/Erfolgsrechnung einzuordnen ist und warum (1-2 Sätze).',
+        function(e) { return e && e.kontonummer; });
+    // Bewusst ohne Teilerklärungen laut Spec-Abweichung S132 bzw. ohne Sub-Struktur:
+    case 'tkonto':
+    case 'sortierung':
+    case 'freitext':
+    case 'berechnung':
+    case 'zeichnen':
+    case 'audio':
+    case 'code':
+    case 'pdf':
+    case 'formel':
+    case 'visualisierung':
+    case 'aufgabengruppe':
+    default:
+      return leer;
+  }
+}
+
 function kiAssistentEndpoint(body) {
   try {
     var email = body.email;
@@ -5164,17 +5285,70 @@ function kiAssistentEndpoint(body) {
 
       case 'generiereMusterloesung':
         if (!daten.fragetext) return jsonResponse({ error: 'Fragetext fehlt' });
-        userPrompt = 'Erstelle eine vollständige Musterlösung für die folgende Prüfungsfrage. ' +
-          'Berücksichtige die Bloom-Stufe ' + wrapUserData('bloom', daten.bloom || 'K2') + ' und den Fachbereich ' + wrapUserData('fachbereich', daten.fachbereich || 'Wirtschaft & Recht') + '. ' +
-          'Bei Freitext-Fragen: formuliere eine Antwort die der erwarteten Länge und Tiefe entspricht. ' +
-          'Bei MC/R-F/Zuordnung/Lückentext: beschreibe die korrekten Antworten und erkläre kurz warum.\n\n' +
+        // C9 Phase 3 — Fragetyp-abhängigen Sub-Element-Kontext + Teilerklärungs-Regel zusammenbauen.
+        var _c9 = baueTeilerklaerungsKontext_(daten);
+        userPrompt = 'Erstelle eine Musterlösung und (falls zutreffend) Teilerklärungen pro Sub-Element für die folgende Prüfungsfrage. ' +
+          'Bloom-Stufe ' + wrapUserData('bloom', daten.bloom || 'K2') + ', Fachbereich ' + wrapUserData('fachbereich', daten.fachbereich || 'Wirtschaft & Recht') + '.\n\n' +
           'Fragetyp: ' + wrapUserData('typ', daten.typ || 'freitext') + '\n' +
           'Fragetext:\n' + wrapUserData('fragetext', daten.fragetext) + '\n\n' +
-          'Antworte als JSON: { "musterlosung": "..." }';
-        // NEU: Kalibrierung v1 — Spec 2026-04-20
+          _c9.kontext +
+          'Teilerklärungs-Regel für diesen Fragetyp:\n' + _c9.regel + '\n' +
+          'Anforderungen:\n' +
+          '- musterloesung: didaktische Gesamterklärung, 2-4 Sätze, fachlich präzise.\n' +
+          '- Bei Freitext-Fragen: formuliere eine Antwort die der erwarteten Länge und Tiefe entspricht.\n' +
+          '- teilerklaerungen[].text: 1-2 Sätze, fachlich präzise, keine Füllwörter.\n' +
+          '- teilerklaerungen[].id MUSS exakt aus dem Sub-Elemente-Kontext übernommen werden (keine neuen IDs erfinden).\n\n' +
+          'Antworte ausschliesslich als JSON:\n' +
+          '{\n' +
+          '  "musterloesung": "...",\n' +
+          '  "teilerklaerungen": [\n' +
+          '    { "feld": "<siehe Regel>", "id": "<siehe Kontext>", "text": "..." }\n' +
+          '  ]\n' +
+          '}';
+        // Kalibrierung v1 — Spec 2026-04-20
         var _kal = injiziereKalibrierung_(email, 'generiereMusterloesung', daten);
         userPrompt = _kal.userPromptPrefix + userPrompt;
-        result = rufeClaudeAuf(systemPrompt, userPrompt, undefined, email);
+        // max_tokens dynamisch: 1024 Puffer für Musterlösung + 150/Sub-Element für Teilerklärungen,
+        // gedeckelt bei 4096. Claude Sonnet 4 liefert das stabil, und es wird nur Nutzung abgerechnet.
+        var _maxTokens = Math.min(4096, 1024 + _c9.gueltigeIds.length * 150);
+        // Try/catch um Parse-Fehler bei truncated Responses (stop_reason='max_tokens' →
+        // rufeClaudeAuf parst unvollständiges JSON und wirft). Fallback: leere Response
+        // + Logging, damit die Editor-UI nicht crasht.
+        var _rawMuster = null;
+        try {
+          _rawMuster = rufeClaudeAuf(systemPrompt, userPrompt, _maxTokens, email);
+        } catch (_claudeErr) {
+          console.warn('[C9 generiereMusterloesung] Claude-Call fehlgeschlagen:', _claudeErr && _claudeErr.message);
+          _rawMuster = null;
+        }
+        // C9 Response-Normalizer: defensive gegen
+        //  (a) Legacy-Response nur mit "musterlosung" (alter Tippo-Key),
+        //  (b) fehlendes teilerklaerungen-Feld (Alt-Deployment),
+        //  (c) halluzinierte Einträge ohne feld/id/text,
+        //  (d) Array/String/null statt Objekt als Top-Level-Response,
+        //  (e) Claude erfindet IDs die nicht im Sub-Element-Kontext sind.
+        var _isObj = _rawMuster && typeof _rawMuster === 'object' && !Array.isArray(_rawMuster);
+        var _muster = _isObj ? (_rawMuster.musterloesung || _rawMuster.musterlosung || '') : '';
+        var _teil = [];
+        if (_isObj && Array.isArray(_rawMuster.teilerklaerungen) && _c9.gueltigeIds.length > 0) {
+          var _erlaubteIds = {};
+          _c9.gueltigeIds.forEach(function(id) { _erlaubteIds[id] = true; });
+          var _gesehen = {};
+          _teil = _rawMuster.teilerklaerungen.filter(function(t) {
+            if (!t || typeof t !== 'object') return false;
+            if (typeof t.feld !== 'string' || t.feld !== _c9.feld) return false;
+            if (typeof t.id !== 'string' || !_erlaubteIds[t.id]) return false;
+            if (typeof t.text !== 'string' || t.text.length === 0) return false;
+            if (_gesehen[t.id]) return false; // Dedup bei Claude-Mehrfach-Output derselben ID
+            _gesehen[t.id] = true;
+            return true;
+          });
+        }
+        // C9 Task 24: Dual-Write `musterlosung` entfernt — Frontend liest ab S134 via
+        // `normalisiereMusterloesungsAntwort` aus `musterloesung` (der Normalizer behält
+        // intern einen Legacy-Fallback auf alten Backend-Stände, aber neuer Code schreibt
+        // nur noch den korrekten Key).
+        result = { musterloesung: _muster, teilerklaerungen: _teil };
         setzeKIOutputInFeedback_(_kal.feedbackId, result);
         return jsonResponse({ success: true, ergebnis: result, feedbackId: _kal.feedbackId });
 
@@ -10615,6 +10789,207 @@ function testHeuristik_() {
   console.assert(istQualifiziert_('korrigiereFreitext', diff5), 'Punktediff qualifiziert');
 
   console.log('Alle Heuristik-Tests bestanden.');
+}
+
+/**
+ * Public-Wrapper für testC9GeneriereMusterloesung_ — erscheint im GAS-Editor-Dropdown,
+ * damit der Smoke-Test ohne Unterstrich-Konvention-Workaround ausführbar ist.
+ */
+function testC9GeneriereMusterloesung() {
+  return testC9GeneriereMusterloesung_();
+}
+
+/**
+ * C9 Phase 3 — Smoke-Test für generiereMusterloesung mit Teilerklärungen.
+ * Benötigt CLAUDE_API_KEY (Script-Property) oder LP-spezifischen Key. Verbraucht ~4 API-Calls.
+ *
+ * EMAIL-Konstante unten manuell auf eine zugelassene LP-E-Mail setzen (Domain @gymhofwil.ch,
+ * muss in der LP-Liste aktiv sein). Session.getActiveUser() fällt aus, weil das Apps-Script-
+ * Projekt den Scope `userinfo.email` nicht hat und wir den nicht nur für einen Smoke-Test
+ * hinzufügen wollen (würde bei allen Nutzern Re-Autorisierung auslösen).
+ */
+function testC9GeneriereMusterloesung_() {
+  var EMAIL = 'wr.test@gymhofwil.ch'; // ← ggf. auf eigene LP-E-Mail anpassen
+  // Apps-Script-V8 hat KEIN console.assert — eigener Helper der bei false wirft.
+  function assert_(cond, msg) { if (!cond) throw new Error('Assertion fehlgeschlagen: ' + msg); }
+
+  // (1) MC mit 2 Optionen — erwartet 2 Teilerklärungen
+  var mc = {
+    aktion: 'generiereMusterloesung',
+    email: EMAIL,
+    daten: {
+      typ: 'mc',
+      fragetext: 'Welche Kennzahl gehört zur Liquiditätsanalyse?',
+      bloom: 'K2',
+      fachbereich: 'BWL',
+      optionen: [
+        { id: 'opt-a', text: 'Current Ratio', korrekt: true },
+        { id: 'opt-b', text: 'Umsatzrendite', korrekt: false }
+      ]
+    }
+  };
+  var r1 = kiAssistentEndpoint(mc);
+  var b1 = JSON.parse(r1.getContent());
+  Logger.log('MC: ' + JSON.stringify(b1, null, 2));
+  assert_(b1.success === true, 'MC success');
+  assert_(b1.ergebnis && typeof b1.ergebnis.musterloesung === 'string' && b1.ergebnis.musterloesung.length > 10, 'MC musterloesung gefuellt');
+  assert_(Array.isArray(b1.ergebnis.teilerklaerungen) && b1.ergebnis.teilerklaerungen.length === 2, 'MC 2 Teilerklaerungen');
+  assert_(b1.ergebnis.teilerklaerungen.every(function(t){ return t.feld === 'optionen'; }), 'MC feld=optionen');
+  assert_(b1.ergebnis.teilerklaerungen.every(function(t){ return t.id === 'opt-a' || t.id === 'opt-b'; }), 'MC ids aus Kontext');
+
+  // (2) Freitext — erwartet teilerklaerungen: []
+  var ft = {
+    aktion: 'generiereMusterloesung',
+    email: EMAIL,
+    daten: { typ: 'freitext', fragetext: 'Erklaere den Unterschied zwischen Aufwand und Ausgabe.', bloom: 'K4', fachbereich: 'BWL' }
+  };
+  var r2 = kiAssistentEndpoint(ft);
+  var b2 = JSON.parse(r2.getContent());
+  Logger.log('Freitext: ' + JSON.stringify(b2, null, 2));
+  assert_(b2.success === true, 'Freitext success');
+  assert_(b2.ergebnis.musterloesung.length > 20, 'Freitext musterloesung substantiell');
+  assert_(Array.isArray(b2.ergebnis.teilerklaerungen) && b2.ergebnis.teilerklaerungen.length === 0, 'Freitext teilerklaerungen leer');
+
+  // (3) MC ohne Sub-Elemente im Request (Simulation des heutigen Frontend-Callers vor Task 24)
+  //     — Backend darf NICHT crashen, teilerklaerungen muss leer sein.
+  var mcLegacy = {
+    aktion: 'generiereMusterloesung',
+    email: EMAIL,
+    daten: { typ: 'mc', fragetext: 'Welche Kennzahl gehoert zur Liquiditaetsanalyse?', bloom: 'K2', fachbereich: 'BWL' }
+  };
+  var r3 = kiAssistentEndpoint(mcLegacy);
+  var b3 = JSON.parse(r3.getContent());
+  Logger.log('MC-legacy (ohne optionen): ' + JSON.stringify(b3, null, 2));
+  assert_(b3.success === true, 'MC-legacy success');
+  assert_(Array.isArray(b3.ergebnis.teilerklaerungen) && b3.ergebnis.teilerklaerungen.length === 0, 'MC-legacy teilerklaerungen leer');
+
+  // (4) Bilanzstruktur mit Duplikat-Kontonummer — Dedup-Check im Normalizer
+  var bilanz = {
+    aktion: 'generiereMusterloesung',
+    email: EMAIL,
+    daten: {
+      typ: 'bilanzstruktur',
+      fragetext: 'Ordne die Konten der richtigen Bilanzseite und Gruppe zu.',
+      bloom: 'K3',
+      fachbereich: 'BWL',
+      kontenMitSaldi: [
+        { kontonummer: '1000', name: 'Kasse', saldo: 5000 },
+        { kontonummer: '1020', name: 'Bank', saldo: 20000 },
+        { kontonummer: '2000', name: 'Kreditoren', saldo: 8000 }
+      ]
+    }
+  };
+  var r4 = kiAssistentEndpoint(bilanz);
+  var b4 = JSON.parse(r4.getContent());
+  Logger.log('Bilanz: ' + JSON.stringify(b4, null, 2));
+  assert_(b4.success === true, 'Bilanz success');
+  assert_(Array.isArray(b4.ergebnis.teilerklaerungen), 'Bilanz teilerklaerungen Array');
+  assert_(b4.ergebnis.teilerklaerungen.every(function(t){ return t.feld === 'kontenMitSaldi'; }), 'Bilanz feld=kontenMitSaldi');
+  var _erwarteteKnrs = { '1000': true, '1020': true, '2000': true };
+  assert_(b4.ergebnis.teilerklaerungen.every(function(t){ return _erwarteteKnrs[t.id]; }), 'Bilanz ids aus Kontext');
+
+  Logger.log('✓ C9 generiereMusterloesung-Tests bestanden.');
+}
+
+/**
+ * Public-Wrapper für testC9Privacy_ — erscheint im GAS-Editor-Dropdown.
+ */
+function testC9Privacy() {
+  return testC9Privacy_();
+}
+
+/**
+ * C9 Phase 3 Task 25 — Privacy-Invariante für erklaerung-Felder.
+ *
+ * Prüft für jeden relevanten Fragetyp:
+ *  - bereinigeFrageFuerSuS_(f) entfernt alle erklaerung-Felder (Prüfen-SuS darf sie nicht sehen).
+ *  - bereinigeFrageFuerSuSUeben_(f) behält alle erklaerung-Felder (Üben-SuS sieht sie nach „Antwort prüfen").
+ *
+ * KEINE API-Calls nötig — rein lokale Bereinigungslogik.
+ */
+function testC9Privacy_() {
+  function assert_(cond, msg) { if (!cond) throw new Error('Assertion fehlgeschlagen: ' + msg); }
+
+  // (1) MC — optionen[].erklaerung
+  var mc = { typ: 'mc', optionen: [
+    { id: 'a', text: 'X', korrekt: true, erklaerung: 'LEAK-A' },
+    { id: 'b', text: 'Y', korrekt: false, erklaerung: 'LEAK-B' },
+  ]};
+  var mcPruefen = bereinigeFrageFuerSuS_(mc);
+  var mcUeben = bereinigeFrageFuerSuSUeben_(mc);
+  assert_(!mcPruefen.optionen[0].erklaerung, 'MC Prüfen: erklaerung[0] entfernt');
+  assert_(!mcPruefen.optionen[1].erklaerung, 'MC Prüfen: erklaerung[1] entfernt');
+  assert_(mcUeben.optionen.length === 2, 'MC Üben: optionen erhalten');
+  var hasA = mcUeben.optionen.some(function(o){ return o.erklaerung === 'LEAK-A'; });
+  var hasB = mcUeben.optionen.some(function(o){ return o.erklaerung === 'LEAK-B'; });
+  assert_(hasA && hasB, 'MC Üben: erklaerung behalten');
+
+  // (2) Richtig/Falsch — aussagen[].erklaerung
+  var rf = { typ: 'richtigfalsch', aussagen: [
+    { id: '1', text: 'A', korrekt: true, erklaerung: 'RF-ERK' },
+  ]};
+  assert_(!bereinigeFrageFuerSuS_(rf).aussagen[0].erklaerung, 'RF Prüfen: erklaerung entfernt');
+  assert_(bereinigeFrageFuerSuSUeben_(rf).aussagen[0].erklaerung === 'RF-ERK', 'RF Üben: erklaerung behalten');
+
+  // (3) Lückentext — luecken[].erklaerung
+  var lt = { typ: 'lueckentext', textMitLuecken: 't', luecken: [
+    { id: 'l1', korrekteAntworten: ['x'], caseSensitive: false, erklaerung: 'LT-ERK' },
+  ]};
+  assert_(!bereinigeFrageFuerSuS_(lt).luecken[0].erklaerung, 'Luecken Prüfen: erklaerung entfernt');
+  assert_(bereinigeFrageFuerSuSUeben_(lt).luecken[0].erklaerung === 'LT-ERK', 'Luecken Üben: erklaerung behalten');
+
+  // (4) Hotspot — bereiche[].erklaerung
+  var hs = { typ: 'hotspot', bereiche: [
+    { id: 'h1', form: 'rechteck', punkte: [], label: 'X', punktzahl: 1, erklaerung: 'HS-ERK' },
+  ]};
+  assert_(!bereinigeFrageFuerSuS_(hs).bereiche[0].erklaerung, 'Hotspot Prüfen: erklaerung entfernt');
+  assert_(bereinigeFrageFuerSuSUeben_(hs).bereiche[0].erklaerung === 'HS-ERK', 'Hotspot Üben: erklaerung behalten');
+
+  // (5) Bildbeschriftung — beschriftungen[].erklaerung
+  var bb = { typ: 'bildbeschriftung', beschriftungen: [
+    { id: 'b1', position: {x: 0, y: 0}, korrekt: ['x'], erklaerung: 'BB-ERK' },
+  ]};
+  assert_(!bereinigeFrageFuerSuS_(bb).beschriftungen[0].erklaerung, 'Bildbeschr Prüfen: erklaerung entfernt');
+  assert_(bereinigeFrageFuerSuSUeben_(bb).beschriftungen[0].erklaerung === 'BB-ERK', 'Bildbeschr Üben: erklaerung behalten');
+
+  // (6) DragDrop Bild — zielzonen[].erklaerung
+  var dd = { typ: 'dragdrop_bild', zielzonen: [
+    { id: 'z1', form: 'rechteck', punkte: [], korrektesLabel: 'X', erklaerung: 'DD-ERK' },
+  ]};
+  assert_(!bereinigeFrageFuerSuS_(dd).zielzonen[0].erklaerung, 'DragDrop Prüfen: erklaerung entfernt');
+  assert_(bereinigeFrageFuerSuSUeben_(dd).zielzonen[0].erklaerung === 'DD-ERK', 'DragDrop Üben: erklaerung behalten');
+
+  // (7) Kontenbestimmung — aufgaben[].erklaerung
+  var kb = { typ: 'kontenbestimmung', aufgaben: [
+    { id: 'a1', text: 'X', erwarteteAntworten: [], erklaerung: 'KB-ERK' },
+  ]};
+  assert_(!bereinigeFrageFuerSuS_(kb).aufgaben[0].erklaerung, 'Kontenb Prüfen: erklaerung entfernt');
+  assert_(bereinigeFrageFuerSuSUeben_(kb).aufgaben[0].erklaerung === 'KB-ERK', 'Kontenb Üben: erklaerung behalten');
+
+  // (8) Bilanzstruktur — kontenMitSaldi[].erklaerung (ID = kontonummer)
+  var bi = { typ: 'bilanzstruktur', kontenMitSaldi: [
+    { kontonummer: '1000', saldo: 100, erklaerung: 'BI-ERK' },
+  ]};
+  assert_(!bereinigeFrageFuerSuS_(bi).kontenMitSaldi[0].erklaerung, 'BilanzER Prüfen: erklaerung entfernt');
+  assert_(bereinigeFrageFuerSuSUeben_(bi).kontenMitSaldi[0].erklaerung === 'BI-ERK', 'BilanzER Üben: erklaerung behalten');
+
+  // (9) TKonto — konten[].erklaerung (eintraege werden weggestrippt, aber erklaerung bleibt im Üben)
+  var tk = { typ: 'tkonto', konten: [
+    { id: 'k1', kontonummer: '1000', eintraege: [{seite:'soll', gegenkonto:'x', betrag:1}], saldo: {betrag:0, seite:'soll'}, erklaerung: 'TK-ERK' },
+  ]};
+  assert_(!bereinigeFrageFuerSuS_(tk).konten[0].erklaerung, 'TKonto Prüfen: erklaerung entfernt');
+  assert_(bereinigeFrageFuerSuSUeben_(tk).konten[0].erklaerung === 'TK-ERK', 'TKonto Üben: erklaerung behalten');
+
+  // (10) Buchungssatz — buchungen wird im Prüfen top-level gelöscht. Im Üben werden buchungen via
+  // separatem mischeFrageOptionen_-Pfad durchgereicht? Heute wird das gesamte buchungen-Array
+  // top-level gelöscht — Üben-Modus hat also keine buchungen. Dieser Test dokumentiert das
+  // Ist-Verhalten; Task 25 ändert das NICHT (separate Feature-Diskussion für Üben-FiBu).
+  var bs = { typ: 'buchungssatz', buchungen: [
+    { id: 'b1', sollKonto: '1000', habenKonto: '2000', betrag: 100, erklaerung: 'BS-ERK' },
+  ]};
+  assert_(!bereinigeFrageFuerSuS_(bs).buchungen, 'Buchungssatz Prüfen: buchungen komplett entfernt (top-level)');
+
+  Logger.log('✓ C9 Privacy-Tests bestanden (9 Typen + Buchungssatz-Dokumentation).');
 }
 
 function safeParse_(s) { try { return JSON.parse(s || '{}'); } catch(e) { return {}; } }

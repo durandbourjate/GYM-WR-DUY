@@ -3,12 +3,24 @@ import type { MCFrage as MCFrageType } from '../../types/fragen.ts'
 import type { Antwort } from '../../types/antworten.ts'
 import { renderMarkdown } from '../../utils/markdown.ts'
 import { fachbereichFarbe } from '../../utils/fachUtils.ts'
+import { AntwortZeile } from '@shared/ui/AntwortZeile'
 
 interface Props {
   frage: MCFrageType
+  /** 'aufgabe' (default) = interaktiv via Adapter, 'loesung' = readonly Korrektur-Ansicht aus Prop */
+  modus?: 'aufgabe' | 'loesung'
+  /** Nur relevant bei modus='loesung': die SuS-Antwort, die korrigiert angezeigt wird */
+  antwort?: Antwort | null
 }
 
-export default function MCFrage({ frage }: Props) {
+export default function MCFrage({ frage, modus = 'aufgabe', antwort: antwortProp }: Props) {
+  if (modus === 'loesung') {
+    return <MCFrageLoesung frage={frage} antwort={antwortProp ?? null} />
+  }
+  return <MCFrageAufgabe frage={frage} />
+}
+
+function MCFrageAufgabe({ frage }: { frage: MCFrageType }) {
   const { antwort, onAntwort, disabled, feedbackSichtbar, korrekt } = useFrageAdapter(frage.id)
 
   const gewaehlte: string[] =
@@ -105,6 +117,76 @@ export default function MCFrage({ frage }: Props) {
           {frage.musterlosung && <p className="mt-1 text-sm">{frage.musterlosung}</p>}
         </div>
       )}
+    </div>
+  )
+}
+
+function MCFrageLoesung({ frage, antwort }: { frage: MCFrageType; antwort: Antwort | null }) {
+  const gewaehlte: string[] =
+    (antwort as Extract<Antwort, { typ: 'mc' }> | null)?.gewaehlteOptionen ?? []
+
+  return (
+    <div className="flex flex-col gap-5">
+      {/* Header: Badges */}
+      <div className="flex flex-wrap items-center gap-2">
+        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${fachbereichFarbe(frage.fachbereich)}`}>
+          {frage.fachbereich}
+        </span>
+        <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300">
+          {frage.bloom}
+        </span>
+        <span className="text-xs text-slate-500 dark:text-slate-400">
+          {frage.punkte} {frage.punkte === 1 ? 'Punkt' : 'Punkte'}
+        </span>
+        {frage.mehrfachauswahl && (
+          <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300">
+            Mehrfachauswahl
+          </span>
+        )}
+      </div>
+
+      {/* Fragetext */}
+      <div
+        className="text-base leading-relaxed text-slate-800 dark:text-slate-100 bg-slate-50 dark:bg-slate-800/80 p-4 rounded-lg border border-slate-200 dark:border-slate-700"
+        dangerouslySetInnerHTML={{ __html: renderMarkdown(frage.fragetext) }}
+      />
+
+      {/* Optionen — Lösungs-Ansicht pro Zeile */}
+      <div className="flex flex-col">
+        {(frage.optionen ?? []).map((option, index) => {
+          const istGewaehlt = gewaehlte.includes(option.id)
+          const label = String.fromCharCode(65 + index)
+          let marker: 'ja' | 'nein' | 'leer'
+          let variant: 'korrekt' | 'falsch' | 'neutral'
+          if (istGewaehlt && option.korrekt) {
+            marker = 'ja'
+            variant = 'korrekt'
+          } else if (istGewaehlt && !option.korrekt) {
+            marker = 'ja'
+            variant = 'falsch'
+          } else if (!istGewaehlt && option.korrekt) {
+            marker = 'leer'
+            variant = 'falsch'
+          } else {
+            marker = 'leer'
+            variant = 'neutral'
+          }
+          return (
+            <AntwortZeile
+              key={option.id}
+              marker={marker}
+              variant={variant}
+              label={
+                <>
+                  <span className="font-semibold text-slate-500 dark:text-slate-400 mr-2">{label})</span>
+                  <span className="text-slate-800 dark:text-slate-100">{option.text}</span>
+                </>
+              }
+              erklaerung={option.erklaerung}
+            />
+          )
+        })}
+      </div>
     </div>
   )
 }

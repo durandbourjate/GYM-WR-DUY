@@ -1,13 +1,27 @@
 import { FRAGETYP_KOMPONENTEN } from './shared/fragetypenRegistry.ts'
 import MedienPlayer from './shared/MedienPlayer.tsx'
 import type { Frage, VisualisierungFrage } from '../types/fragen.ts'
+import type { Antwort } from '../types/antworten.ts'
 
 interface FrageRendererProps {
   frage: Frage
+  /**
+   * 'aufgabe' (default): interaktiv — Fragetyp-Komponente liest Antwort aus dem
+   * `useFrageAdapter`-Store-Hook. Wird überall dort verwendet, wo der Benutzer
+   * gerade antwortet (Prüfung, Übung vor „Antwort prüfen").
+   *
+   * 'loesung': readonly — Fragetyp-Komponente rendert Phase-2-Lösungs-Layout
+   * (pro Zeile Marker/Rahmen, `option.erklaerung`/`aussage.erklaerung`/... pro
+   * Sub-Element). Die angezeigte SuS-Antwort kommt aus dem `antwort`-Prop.
+   * Wird im Üben-Modus nach „Antwort prüfen" verwendet (via UebungsScreen).
+   */
+  modus?: 'aufgabe' | 'loesung'
+  /** Nur im modus='loesung': die korrigiert dargestellte SuS-Antwort. */
+  antwort?: Antwort | null
 }
 
 /** Rendert die passende Fragetyp-Komponente basierend auf frage.typ */
-export default function FrageRenderer({ frage }: FrageRendererProps) {
+export default function FrageRenderer({ frage, modus = 'aufgabe', antwort }: FrageRendererProps) {
   const medienEinbettung = frage.medienEinbettung
 
   const fragInhalt = (() => {
@@ -32,7 +46,7 @@ export default function FrageRenderer({ frage }: FrageRendererProps) {
       )
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return <Komponente frage={frage as any} />
+    return <Komponente frage={frage as any} modus={modus} antwort={antwort ?? null} />
   })()
 
   // Medien-Einbettung vor dem Frageinhalt rendern

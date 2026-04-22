@@ -1,14 +1,24 @@
 import { useMemo } from 'react'
 import { useFrageAdapter } from '../../hooks/useFrageAdapter.ts'
 import type { ZuordnungFrage as ZuordnungFrageType } from '../../types/fragen.ts'
+import type { Antwort } from '../../types/antworten.ts'
 import { renderMarkdown } from '../../utils/markdown.ts'
 import { fachbereichFarbe } from '../../utils/fachUtils.ts'
 
 interface Props {
   frage: ZuordnungFrageType
+  modus?: 'aufgabe' | 'loesung'
+  antwort?: Antwort | null
 }
 
-export default function ZuordnungFrage({ frage }: Props) {
+export default function ZuordnungFrage({ frage, modus = 'aufgabe', antwort: antwortProp }: Props) {
+  if (modus === 'loesung') {
+    return <ZuordnungLoesung frage={frage} antwort={antwortProp ?? null} />
+  }
+  return <ZuordnungAufgabe frage={frage} />
+}
+
+function ZuordnungAufgabe({ frage }: { frage: ZuordnungFrageType }) {
   const { antwort, onAntwort, disabled, feedbackSichtbar, korrekt } = useFrageAdapter(frage.id)
 
   const zuordnungen: Record<string, string> =
@@ -165,6 +175,93 @@ export default function ZuordnungFrage({ frage }: Props) {
           {frage.musterlosung && <p className="mt-1 text-sm">{frage.musterlosung}</p>}
         </div>
       )}
+    </div>
+  )
+}
+
+function ZuordnungLoesung({ frage, antwort }: { frage: ZuordnungFrageType; antwort: Antwort | null }) {
+  const zuordnungen: Record<string, string> =
+    antwort?.typ === 'zuordnung' ? antwort.zuordnungen : {}
+
+  return (
+    <div className="flex flex-col gap-5">
+      {/* Header: Badges */}
+      <div className="flex flex-wrap items-center gap-2">
+        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${fachbereichFarbe(frage.fachbereich)}`}>
+          {frage.fachbereich}
+        </span>
+        <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300">
+          {frage.bloom}
+        </span>
+        <span className="text-xs text-slate-500 dark:text-slate-400">
+          {frage.punkte} {frage.punkte === 1 ? 'Punkt' : 'Punkte'}
+        </span>
+        <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300">
+          {(frage.paare ?? []).length} Zuordnungen
+        </span>
+      </div>
+
+      <div
+        className="text-base leading-relaxed text-slate-800 dark:text-slate-100 bg-slate-50 dark:bg-slate-800/80 p-4 rounded-lg border border-slate-200 dark:border-slate-700"
+        dangerouslySetInnerHTML={{ __html: renderMarkdown(frage.fragetext) }}
+      />
+
+      {/* Zuordnungs-Lösungs-Ansicht */}
+      <div className="flex flex-col gap-3">
+        {(frage.paare ?? []).map((paar, index) => {
+          const susRechts = zuordnungen[paar.links]
+          const hatGeantwortet = typeof susRechts === 'string' && susRechts !== ''
+          const istKorrekt = hatGeantwortet && susRechts === paar.rechts
+
+          const rahmenClass = istKorrekt
+            ? 'border-green-600 bg-green-50 dark:bg-green-950/20'
+            : 'border-red-600 bg-red-50 dark:bg-red-950/20'
+
+          return (
+            <div
+              key={paar.links}
+              data-testid="zuordnung-zeile"
+              className={`flex flex-col gap-2 p-4 rounded-xl border-2 ${rahmenClass}`}
+            >
+              <div className="flex items-center gap-3">
+                <span className="flex-shrink-0 w-7 h-7 rounded-full bg-slate-200 dark:bg-slate-600 flex items-center justify-center text-sm font-semibold text-slate-600 dark:text-slate-300">
+                  {index + 1}
+                </span>
+                <span className="flex-1 text-slate-800 dark:text-slate-100 font-medium">
+                  {paar.links}
+                </span>
+                <span className="text-slate-400 dark:text-slate-500 text-lg flex-shrink-0">→</span>
+                <div className="flex-1 max-w-[50%] flex flex-col gap-0.5 leading-tight">
+                  {istKorrekt ? (
+                    <span className="inline-flex items-center gap-1 text-sm font-semibold text-green-700 dark:text-green-400">
+                      <span aria-hidden>{'\u2713'}</span>
+                      {paar.rechts}
+                    </span>
+                  ) : (
+                    <>
+                      <span className="text-xs font-bold text-green-700 dark:text-green-400">
+                        Korrekt: {paar.rechts}
+                      </span>
+                      <span className="text-sm text-red-700 dark:text-red-400">
+                        {hatGeantwortet ? (
+                          <>Deine Antwort: {susRechts}</>
+                        ) : (
+                          <em className="text-slate-500 italic">Nicht zugeordnet</em>
+                        )}
+                      </span>
+                    </>
+                  )}
+                </div>
+              </div>
+              {paar.erklaerung && (
+                <div className="pl-10 pr-2 border-l-2 border-slate-300 dark:border-slate-600 ml-4 text-xs italic text-slate-600 dark:text-slate-400">
+                  {'\u{1F4A1}'} {paar.erklaerung}
+                </div>
+              )}
+            </div>
+          )
+        })}
+      </div>
     </div>
   )
 }
