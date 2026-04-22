@@ -891,6 +891,8 @@ function doPost(e) {
       return speichereConfig(body);
     case 'speichereFrage':
       return speichereFrage(body);
+    case 'holeAlleFragenFuerMigration':
+      return holeAlleFragenFuerMigrationEndpoint(body);
     case 'loescheFrage':
       return loescheFrage(body);
     case 'loescheAllePoolFragen':
@@ -10889,6 +10891,54 @@ function testC9GeneriereMusterloesung_() {
   assert_(b4.ergebnis.teilerklaerungen.every(function(t){ return _erwarteteKnrs[t.id]; }), 'Bilanz ids aus Kontext');
 
   Logger.log('✓ C9 generiereMusterloesung-Tests bestanden.');
+}
+
+/**
+ * C9 Phase 4 Task 28 — Admin-Endpoint für Teilerklärungs-Migration.
+ *
+ * Liefert ALLE Fragen aus allen Fachbereichs-Tabs (VWL/BWL/Recht/Informatik) als
+ * Array. Nur für LP mit rolle='admin'. KEINE SuS-Bereinigung — das Skript braucht
+ * den vollen Frage-Zustand (musterlosung, korrekt, erklaerung) um den
+ * Idempotenz-Check machen zu können.
+ *
+ * body: { action: 'holeAlleFragenFuerMigration', email: '<admin-lp@...>' }
+ * response: { success: true, data: Frage[] }
+ */
+function holeAlleFragenFuerMigrationEndpoint(body) {
+  try {
+    var email = body.email;
+    if (!email || !istZugelasseneLP(email)) {
+      return jsonResponse({ error: 'Nur für Lehrpersonen' });
+    }
+    var lpInfo = getLPInfo(email);
+    var istAdmin = lpInfo && lpInfo.rolle === 'admin';
+    if (!istAdmin) {
+      return jsonResponse({ error: 'Nur für Admins' });
+    }
+
+    var fragenbank = SpreadsheetApp.openById(FRAGENBANK_ID);
+    var fachbereiche = ['VWL', 'BWL', 'Recht', 'Informatik'];
+    var alle = [];
+
+    for (var t = 0; t < fachbereiche.length; t++) {
+      var fachbereich = fachbereiche[t];
+      var sheet = fragenbank.getSheetByName(fachbereich);
+      if (!sheet) continue;
+      var rows = getSheetData(sheet);
+      for (var r = 0; r < rows.length; r++) {
+        try {
+          var frage = parseFrage(rows[r], fachbereich);
+          if (frage && frage.id) alle.push(frage);
+        } catch (err) {
+          console.warn('[Migration] parseFrage fehlgeschlagen für Row', r, 'in', fachbereich, ':', err && err.message);
+        }
+      }
+    }
+
+    return jsonResponse({ success: true, data: alle });
+  } catch (error) {
+    return jsonResponse({ error: error.message });
+  }
 }
 
 /**
