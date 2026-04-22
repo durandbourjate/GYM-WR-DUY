@@ -1,135 +1,113 @@
 # C9 Phase 4 — Teilerklärungs-Migration
 
-Lokales Node-Skript, das via Apps-Script-Admin-Endpoint + Anthropic-SDK für alle
-bestehenden ExamLab-Fragen (~2400) pro Sub-Element (Option, Aussage, Lücke, etc.)
-eine KI-Teilerklärung generiert und zurück in die Frage schreibt.
+Einmalige Migration: ~2400 bestehende ExamLab-Fragen bekommen einheitlich KI-generierte
+Musterlösungen + pro-Sub-Element-Teilerklärungen. Bearbeitet von **Claude Code** (keine
+externe SDK-Dependency, nutzt Subscription des Users).
 
-Analog zum Editor-Pfad (`ki.ausfuehren('generiereMusterloesung', ...)`), nur als
-Batch-Job ohne UI — und pro Frage statt pro LP-Klick.
+**Spec:** `../../docs/superpowers/specs/2026-04-22-c9-migration-design.md`
+**Plan:** `../../docs/superpowers/plans/2026-04-22-c9-migration.md`
+**Session-Protokoll:** [SESSION-PROTOCOL.md](SESSION-PROTOCOL.md)
 
-## Voraussetzung
+## Voraussetzungen
 
-- **Node ≥ 20.11** (für `fileURLToPath` und moderne `fetch`-API). Prüfe mit `node --version`.
-- **Anthropic API Key** aus dem Anthropic-Dashboard. Kosten: Sonnet 4.6 liegt bei
-  ca. $3 per 1M input tokens + $15 per 1M output tokens. Bei ~2400 Fragen à
-  ~1500 Token Input + ~500 Token Output erwartet Gesamtkosten **~$25–35**.
-- **Apps-Script-URL** der Produktions-Bereitstellung (Webapp-Exec-URL).
-- **LP-E-Mail** mit Admin-Rechten (muss in der LP-Tabelle auf Spalte `adminRolle=true`).
+- **Node >= 20.11**
+- **Apps-Script-URL** der Produktions-Bereitstellung (nach Deploy des Batch-Endpoints)
+- **LP-E-Mail mit `rolle=admin`**
+- **Google-Sheets-Backup der Fragenbank** (Pflicht vor Migration!)
 
-Zusätzlich ist der **Admin-Endpoint `holeAlleFragenFuerMigration` im Apps-Script
-nötig** — ist Teil desselben Phase-4-Commits. Nach dem Merge muss Apps-Script
-als neue Bereitstellung deployed werden.
+## Workflow (6 Phasen)
 
-## Setup
+### Phase A: Setup
+
+1. Google-Sheets-Backup: Drive → Fragenbank → Datei → **Kopie erstellen** → `ExamLab_Fragenbank_Backup_YYYY-MM-DD`
+2. Apps-Script neu deployen (mit `batchUpdateFragenMigration` + `holeAlleFragenFuerMigration` aktiviert)
+3. `testC9BatchUpdateFragenMigration` im GAS-Editor laufen lassen → erwartet `✓ C9 batchUpdateFragenMigration-Test bestanden.`
+4. Produktions-Pause: keine Frage-Bearbeitung während Migration läuft
+5. Env-Variablen setzen:
+   ```bash
+   export APPS_SCRIPT_URL=https://script.google.com/macros/s/.../exec
+   export MIGRATION_EMAIL=admin@gymhofwil.ch
+   ```
+
+### Phase B: Dump (einmalig)
 
 ```bash
 cd ExamLab/scripts/migrate-teilerklaerungen
-npm install
-
-export ANTHROPIC_API_KEY=sk-ant-...
-export APPS_SCRIPT_URL=https://script.google.com/macros/s/<DEPLOYMENT_ID>/exec
-export MIGRATION_EMAIL=admin@gymhofwil.ch   # Deine LP-E-Mail mit Admin-Rechten
+node dump.mjs
 ```
 
-## Workflow
-
-### 1. Dry-Run (20 Fragen, schreibt NICHT zurück)
+Output: `fragen-input.jsonl` (~2400 Zeilen). Plausibilitäts-Check:
 
 ```bash
-npm run dry-run
+wc -l fragen-input.jsonl    # ~2400
 ```
 
-→ Lädt 20 Fragen, fragt KI, schreibt Output in `log.jsonl` + `state.json`,
-aber **ruft `speichereFrage` NICHT auf**. Sheet bleibt unverändert.
+### Phase C: Stichprobe (Claude-Code Session 1)
 
-Öffne `log.jsonl` und prüfe stichprobenartig 3–5 Fragen verschiedener Typen auf
-fachliche Plausibilität. Bei Zweifeln: Modell wechseln
-(`MIGRATION_MODEL=claude-haiku-4-5-20251001` für günstiger/schneller, oder
-`claude-opus-4-7` für max. Qualität) und erneut `dry-run`.
-
-### 2. Stichprobe (50 Fragen live, kleine Batch)
+Claude Code bearbeitet 30 Stichproben-Fragen (seed=42, alle 9 Teilerklärungs-Typen abgedeckt).
+Nach Abschluss der Stichprobe:
 
 ```bash
-node migrate.mjs --limit=50
+node review-generator.mjs
 ```
 
-→ Schreibt 50 Fragen live ins Sheet. Prüfe im ExamLab-Üben-Modus die ersten
-5–10 Fragen: Teilerklärungen pro Option sichtbar nach „Antwort prüfen"?
+Output: `stichprobe-review.md` — User reviewt, gibt Freigabe oder Änderungs-Feedback.
 
-### 3. Full Run (alle ~2400 Fragen, läuft ~160 min)
+### Phase D: Full-Run (Claude-Code Sessions 2-24)
+
+Pro Session: 100 Fragen, Resume via `state.json`. Updates appended an `fragen-updates.jsonl`.
+
+Siehe [SESSION-PROTOCOL.md](SESSION-PROTOCOL.md) für den genauen Ablauf pro Session.
+
+### Phase E: Upload
+
+Nach allen ~2400 Fragen in `fragen-updates.jsonl`:
 
 ```bash
-nohup node migrate.mjs > migrate.log 2>&1 &
-tail -f migrate.log
+# Optional: Dry-Run zum Prüfen
+node upload.mjs --dry-run
+
+# Echter Upload
+node upload.mjs
 ```
 
-Bei Abbruch (Ctrl-C, Netz-Timeout, Anthropic-Rate-Limit): einfach erneut starten.
-`state.json` stellt sicher, dass keine Frage doppelt verarbeitet wird.
+Output: 3 Apps-Script-Calls (VWL, BWL, Recht — Informatik ausgelassen). Log in `upload.log`.
 
-## State-Datei (`state.json`)
+Verifikation:
+- `aktualisiert`-Count pro Fachbereich == erwartete Count aus `fragen-updates.jsonl`?
+- `nichtGefunden`-Liste leer (keine ID nicht gematcht)?
+- 5 Fragen pro Fachbereich manuell im SuS-Üben-Modus prüfen → Teilerklärungen sichtbar?
 
-```json
-{
-  "gestartet": "2026-04-22T10:00:00.000Z",
-  "fragen": {
-    "<frage-id>": {
-      "status": "done" | "failed" | "giving-up" | "skipped",
-      "teile": 4,
-      "musterloesung": "Kurzvorschau (120 Zeichen)",
-      "retries": 0,
-      "zeitpunkt": "..."
-    }
-  }
-}
-```
+### Phase F: Nachbereitung
 
-**Status-Semantik:**
-- `done` — Teilerklärungen erfolgreich geschrieben (oder Dry-Run loggiert).
-- `skipped` — Frage hatte bereits `erklaerung`-Felder (Idempotenz).
-- `failed` — Fehler beim Claude-Call oder Apps-Script-Save. Retry beim nächsten Lauf.
-- `giving-up` — 3× gescheitert, manuell prüfen (z.B. via `grep giving-up log.jsonl`).
+Nach Migration sind **alle Fragen `pruefungstauglich=false`**. Das ist beabsichtigt. User
+geht im Editor pro Frage durch + setzt `pruefungstauglich=true` nach Review. Nicht Teil
+dieses Skripts.
 
-## Log-Datei (`log.jsonl`)
+## Dateien
 
-JSONL mit einer Zeile pro verarbeiteter Frage. Enthält Frage-ID, Typ, Status,
-Anzahl Teilerklärungen, Musterlösungs-Preview und ggf. Fehlermeldung.
+| Datei | Rolle | Im Repo? |
+|---|---|---|
+| `dump.mjs` | Lädt alle Fragen via Apps-Script | ✓ |
+| `review-generator.mjs` | Baut `stichprobe-review.md` aus Input + Updates + IDs | ✓ |
+| `upload.mjs` | Schreibt Updates via Apps-Script pro Fachbereich | ✓ |
+| `SESSION-PROTOCOL.md` | Leitfaden für Claude-Code-Session | ✓ |
+| `package.json` | Node-Konfiguration (keine Dependencies) | ✓ |
+| `.gitignore` | Ignoriert lokale Migrations-Dateien | ✓ |
+| `state.json` | Resume-State | — (lokal, gitignored) |
+| `fragen-input.jsonl` | Dump-Output | — (lokal, gitignored) |
+| `fragen-updates.jsonl` | Claude-Code-Output | — (lokal, gitignored) |
+| `stichprobe-ids.json` | 30 Stichproben-IDs (seed=42) | — (lokal, gitignored) |
+| `upload.log` | Upload-History | — (lokal, gitignored) |
 
-## Kosten senken
+## Rollback
 
-- **Prompt-Caching**: Der System-Prompt ist via `cache_control: ephemeral`
-  gecacht — nach der ersten Frage werden Input-Tokens für das System nur noch
-  mit ~10% des Preises abgerechnet. Cache-TTL: 5 Min, läuft während des Batches
-  durchgehend warm.
-- **Rate-Limit-Buffer**: 800 ms pro Frage (überschreibbar via
-  `MIGRATION_RATE_LIMIT_MS`). Mit Tier-1 Anthropic-Rate-Limit (50 req/min)
-  sind das 75% Auslastung.
-- **Haiku-Option**: `MIGRATION_MODEL=claude-haiku-4-5-20251001` — ca. 10× günstiger
-  als Sonnet, aber fachliche Qualität bei Schweizer Recht/VWL bitte vorher im
-  Dry-Run prüfen.
+Bei Problemen:
+1. Drive öffnen → Backup-Kopie umbenennen → Live-Fragenbank ersetzen
+2. Apps-Script Cache via neuem Deploy invalidieren
 
-## Nach erfolgreicher Migration
+Kein Frontend-Deploy nötig.
 
-```bash
-# State-Datei archivieren für spätere Referenz
-cp state.json state-post-migration-$(date +%Y%m%d).json
-git add -f state-post-migration-*.json
-git commit -m "C9: Migration erfolgt — State archiviert"
-```
+## Kosten
 
-Dann in ExamLab (Üben-Modus) stichprobenartig prüfen:
-- MC-Frage → Antwort prüfen → Teilerklärungen pro Option sichtbar?
-- Richtig/Falsch → pro Aussage Teilerklärung?
-- Lückentext → pro Lücke?
-- Hotspot/Bildbeschriftung/DragDrop → pro Zone?
-
-Bei Auffälligkeiten: entsprechenden Frage-Typ in `state.json` resetten (`status` löschen),
-Skript erneut laufen lassen — betroffene Fragen werden neu bereichert.
-
-## Sicherheit
-
-- **Kein API-Key im Repo**: `.env` ist git-ignored, State und Log-Files
-  enthalten keine Keys.
-- **Admin-Check im Apps-Script**: `holeAlleFragenFuerMigration` + `speichereFrage`
-  prüfen `istAdmin_(email)` → nur LP mit `adminRolle=true` darf migrieren.
-- **Idempotenz**: Fragen mit bestehenden `erklaerung`-Feldern werden übersprungen,
-  sodass versehentliches Re-Running keine manuell gepflegten Texte überschreibt.
+Keine externen Kosten (Claude-Code-Subscription + Apps-Script-Quoten reichen aus).
