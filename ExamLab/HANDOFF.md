@@ -6,16 +6,28 @@
 
 ---
 
-## Für die nächste Session (S133+)
+## Für die nächste Session (S134+)
 
-### Aktueller Stand (S133, 22.04.2026) — C9 Phase 3 Task 22 fertig (Apps-Script), Branch offen
+### Aktueller Stand (Ende S133, 22.04.2026) — C9 Phase 3 Tasks 22 + 23 fertig, Branch offen
 
-**C9 = Detaillierte Lösungen pro Teilantwort**. Branch `feature/c9-detaillierte-loesungen`. Phase 1 + 2 + Task 22 von Phase 3 fertig. Letzter Commit `c41c77b`. Phase 3 Tasks 23–26 offen.
+**C9 = Detaillierte Lösungen pro Teilantwort**. Branch `feature/c9-detaillierte-loesungen` (preview + origin synchron). Phase 1 + 2 + Task 22 (Apps-Script) + Task 23 (Frontend-Normalizer) fertig. Letzter Commit `0792f16`. Phase 3 Tasks 24–26 offen.
 
 **Einstieg nächste Session:**
-1. `git checkout feature/c9-detaillierte-loesungen`
-2. Plan lesen: `ExamLab/docs/superpowers/plans/2026-04-21-c9-detaillierte-loesungen.md` — weiter ab **Task 23** (Service-Layer Response-Type + Normalizer)
-3. Spec lesen: `ExamLab/docs/superpowers/specs/2026-04-21-c9-detaillierte-loesungen-design.md`
+1. `git checkout feature/c9-detaillierte-loesungen && git pull`
+2. Plan lesen: `ExamLab/docs/superpowers/plans/2026-04-21-c9-detaillierte-loesungen.md` — weiter ab **Task 24** (Editor-UI `KIMusterloesungPreview` + Caller-Umbau)
+3. Spec lesen: `ExamLab/docs/superpowers/specs/2026-04-21-c9-detaillierte-loesungen-design.md` §6.2
+4. **Tests/Build-Status prüfen:** `cd ExamLab && npx tsc -b && npx vitest run` → erwartet 594/594 grün
+
+### Task 23 Ergebnis (1 Commit, S133 22.04.2026)
+
+**Frontend-Normalizer + Type + Unit-Tests.** Commit `0792f16`. **20 neue Tests, 594/594 vitest + tsc -b + build grün.**
+
+- Neu: `packages/shared/src/editor/musterloesungNormalizer.ts` mit Type `MusterloesungsAntwort` + `normalisiereMusterloesungsAntwort(raw)`
+- Export in `packages/shared/src/index.ts`
+- Whitelist der 10 bekannten Sub-Element-Felder (optionen/aussagen/paare/luecken/bereiche/zielzonen/beschriftungen/aufgaben/buchungen/kontenMitSaldi)
+- Defensive-Pfade: null/undefined/Array/String → leere Antwort; musterloesung > musterlosung Legacy; Halluzinations-IDs werden gefiltert
+- 20 Unit-Tests in `ExamLab/src/tests/musterloesungNormalizer.test.ts` inkl. 3 mit realen Smoke-Test-Responses aus Task 22
+- **Noch nicht integriert** in `MusterloesungSection.tsx` / `KIAssistentPanel.tsx` — passiert in Task 24 zusammen mit Caller-Umbau + Preview-Panel
 
 ### Task 22 Ergebnis (4 Commits, S133 22.04.2026)
 
@@ -44,12 +56,18 @@
 **Apps-Script-Deploy Status:**
 - ⚠️ **NOCH NICHT als neue Bereitstellung deployed**. Smoke-Test lief direkt im GAS-Editor (Script-Code, nicht Webapp). Deploy kann gebündelt werden mit Task 25 (`bereinigeFrageFuerSuS_` Privacy-Fix) — dann 1 Deploy für beide Backend-Changes.
 
-### Phase 3 Rest (Tasks 23–26)
+### Phase 3 Rest (Tasks 24–26)
 
-- **Task 23**: Service-Layer Response-Type-Erweiterung + defensiver Normalizer + Unit-Test (kein Deploy, reine TS)
-- **Task 24**: Neue `KIMusterloesungPreview`-Komponente (Editor) + Integration in `SharedFragenEditor`, + Caller-Umbau um Sub-Arrays zu schicken + Dual-Write-Alias `musterlosung` entfernen
-- **Task 25**: Privacy-Invariante — `bereinigeFrageFuerSuS_` muss `erklaerung` aus Sub-Feldern entfernen + Security-Test. ⚠️ Apps-Script-Deploy (gebündelt mit Task 22)
-- **Task 26**: Phase-3-Gate-Tag
+- **Task 24** (gross, 1-2h): Neue `KIMusterloesungPreview`-Komponente (Editor, editierbar, pro Teilerklärung Text-Input, Übernehmen-Logik) + Integration in `MusterloesungSection.tsx` + Caller-Umbau (Sub-Arrays `optionen[]`/`aussagen[]`/etc. aus der Frage mitschicken) + Normalizer aus Task 23 einbinden + Dual-Write-Alias `musterlosung` aus Backend entfernen (erst nachdem alle Caller auf `musterloesung` umgebaut sind). **Design-Entscheidung aus Spec §12:** KI überschreibt NICHT manuell gepflegte Erklärungen — nur leere Felder. Pro-Zeile-Override im UI.
+- **Task 25**: Privacy-Invariante — `bereinigeFrageFuerSuS_` muss `erklaerung` aus allen neuen Sub-Feldern entfernen (Prüfen-SuS). Security-Test in `securityInvarianten.test.ts`. ⚠️ Apps-Script-Deploy (gebündelt mit Task 22).
+- **Task 26**: Volltest + Phase-3-Gate-Tag `c9-phase3-backend`.
+
+**Wichtig für Task 24:**
+- Task 23 Normalizer liegt in `packages/shared/src/editor/musterloesungNormalizer.ts`. Import: `import { normalisiereMusterloesungsAntwort, type MusterloesungsAntwort } from '@shared/editor/musterloesungNormalizer'` (oder direkt aus `@shared` dank `index.ts`-Export).
+- `MusterloesungSection.tsx` liest heute `d.musterlosung` (Zeile 72) — muss auf Normalizer-Rückgabe umgestellt werden.
+- `KIAssistentPanel.tsx` Zeile 127-132 ebenfalls.
+- Caller in `MusterloesungSection.tsx:43` sendet heute nur `{fragetext, typ, fachbereich, bloom}` — muss um `optionen`/`aussagen`/`paare`/`luecken`/`bereiche`/`zielzonen`/`beschriftungen`/`aufgaben`/`buchungen`/`kontenMitSaldi` erweitert werden je nach Fragetyp.
+- NACH Task 24 Deploy: Backend-Alias `musterlosung` in `apps-script-code.js:5316` entfernen (TODO-Kommentar dort setzt Deadline). Bis dahin bleibt der Dual-Write bestehen.
 
 ### Separater Follow-Up (out of scope von Task 22, S133 entdeckt)
 
