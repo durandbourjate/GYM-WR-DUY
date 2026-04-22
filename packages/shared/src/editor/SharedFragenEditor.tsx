@@ -2,7 +2,7 @@
  * SharedFragenEditor — Generischer Editor-Hub für Prüfungsfragen.
  * Wird von Host-Apps (Pruefung, Lernplattform) mit EditorProvider + Slots genutzt.
  */
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useMemo } from 'react'
 import { useEditorConfig, useEditorServices } from './EditorContext'
 import { useFocusTrap } from './hooks/useFocusTrap'
 import { ResizableSidebar } from '../ui/ResizableSidebar'
@@ -36,6 +36,7 @@ import { TKontoBewertungsoptionen } from './typen/TKontoEditor'
 import { BilanzERBewertungsoptionen } from './typen/BilanzEREditor'
 import { useKIAssistent } from './useKIAssistent'
 import { InlineAktionButton, ErgebnisAnzeige } from './ki/KIBausteine'
+import { baueTeilerklaerungsKontext, type TeilerklaerungsKontext } from './musterloesungKontext'
 import { berechneZeitbedarf } from './zeitbedarf'
 import type { FragenPerformance } from '../types/fragen'
 
@@ -505,6 +506,75 @@ export default function SharedFragenEditor({
   // KI-Assistent
   const ki = useKIAssistent()
 
+  // C9 Task 24 — Teilerklärungs-Kontext für MusterloesungSection (Sub-Arrays im KI-Request + Writeback).
+  // Nur für Fragetypen mit Sub-Struktur + IDs (Zuordnung hat keine IDs, FiBu rendert kein MusterloesungSection).
+  const teilerklaerungsKontext = useMemo<TeilerklaerungsKontext | undefined>(() => {
+    switch (typ) {
+      case 'mc':
+        return baueTeilerklaerungsKontext<MCOption>({
+          feld: 'optionen',
+          items: optionen,
+          getId: (o) => o.id,
+          getLabel: (o) => `${o.id.toUpperCase()}: ${(o.text || '').slice(0, 60) || '(leer)'}`,
+          getErklaerung: (o) => o.erklaerung,
+          setzeErklaerung: (o, e) => ({ ...o, erklaerung: e }),
+          setItems: (u) => setOptionen((prev) => u(prev)),
+        })
+      case 'richtigfalsch':
+        return baueTeilerklaerungsKontext<RichtigFalschFrage['aussagen'][number]>({
+          feld: 'aussagen',
+          items: aussagen,
+          getId: (a) => a.id,
+          getLabel: (a, i) => `#${i + 1}: ${(a.text || '').slice(0, 60) || '(leer)'}`,
+          getErklaerung: (a) => a.erklaerung,
+          setzeErklaerung: (a, e) => ({ ...a, erklaerung: e }),
+          setItems: (u) => setAussagen((prev) => u(prev)),
+        })
+      case 'lueckentext':
+        return baueTeilerklaerungsKontext<LueckentextFrage['luecken'][number]>({
+          feld: 'luecken',
+          items: luecken,
+          getId: (l) => l.id,
+          getLabel: (l, i) => `Lücke ${i + 1}: ${(l.korrekteAntworten[0] || '').slice(0, 40) || '(leer)'}`,
+          getErklaerung: (l) => l.erklaerung,
+          setzeErklaerung: (l, e) => ({ ...l, erklaerung: e }),
+          setItems: (u) => setLuecken((prev) => u(prev)),
+        })
+      case 'hotspot':
+        return baueTeilerklaerungsKontext<HotspotBereich>({
+          feld: 'bereiche',
+          items: hsBereiche,
+          getId: (b) => b.id,
+          getLabel: (b, i) => `Bereich ${i + 1}: ${(b.label || '').slice(0, 40) || '(leer)'}`,
+          getErklaerung: (b) => b.erklaerung,
+          setzeErklaerung: (b, e) => ({ ...b, erklaerung: e }),
+          setItems: (u) => setHsBereiche((prev) => u(prev)),
+        })
+      case 'bildbeschriftung':
+        return baueTeilerklaerungsKontext<BildbeschriftungLabel>({
+          feld: 'beschriftungen',
+          items: bbBeschriftungen,
+          getId: (b) => b.id,
+          getLabel: (b, i) => `Stelle ${i + 1}: ${(b.korrekt[0] || '').slice(0, 40) || '(leer)'}`,
+          getErklaerung: (b) => b.erklaerung,
+          setzeErklaerung: (b, e) => ({ ...b, erklaerung: e }),
+          setItems: (u) => setBbBeschriftungen((prev) => u(prev)),
+        })
+      case 'dragdrop_bild':
+        return baueTeilerklaerungsKontext<DragDropBildZielzone>({
+          feld: 'zielzonen',
+          items: ddZielzonen,
+          getId: (z) => z.id,
+          getLabel: (z, i) => `Zone ${i + 1}: ${(z.korrektesLabel || '').slice(0, 40) || '(leer)'}`,
+          getErklaerung: (z) => z.erklaerung,
+          setzeErklaerung: (z, e) => ({ ...z, erklaerung: e }),
+          setItems: (u) => setDdZielzonen((prev) => u(prev)),
+        })
+      default:
+        return undefined
+    }
+  }, [typ, optionen, aussagen, luecken, hsBereiche, bbBeschriftungen, ddZielzonen])
+
   // Lernziel-Generierung + Zuordnung
   const [lernziele, setLernziele] = useState<Lernziel[]>([])
   const [lernzieleLadend, setLernzieleLadend] = useState(false)
@@ -901,6 +971,7 @@ export default function SharedFragenEditor({
               setMusterlosung={setMusterlosung}
               musterloeRef={musterloeRef}
               ki={ki}
+              teilerklaerungsKontext={teilerklaerungsKontext}
             />
           )}
 

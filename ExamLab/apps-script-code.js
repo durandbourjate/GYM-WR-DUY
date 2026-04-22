@@ -5309,11 +5309,11 @@ function kiAssistentEndpoint(body) {
             return true;
           });
         }
-        // Rückwärtskompat: bestehende Editor-UI (MusterloesungSection, KIAssistentPanel)
-        // liest das Feld mit Tippo `musterlosung`. Dual-Write bis Task 24 den Caller
-        // auf `musterloesung` umbaut + KIMusterloesungPreview einführt.
-        // TODO (Task 24): Alias `musterlosung` entfernen sobald KIMusterloesungPreview lebt.
-        result = { musterloesung: _muster, musterlosung: _muster, teilerklaerungen: _teil };
+        // C9 Task 24: Dual-Write `musterlosung` entfernt — Frontend liest ab S134 via
+        // `normalisiereMusterloesungsAntwort` aus `musterloesung` (der Normalizer behält
+        // intern einen Legacy-Fallback auf alten Backend-Stände, aber neuer Code schreibt
+        // nur noch den korrekten Key).
+        result = { musterloesung: _muster, teilerklaerungen: _teil };
         setzeKIOutputInFeedback_(_kal.feedbackId, result);
         return jsonResponse({ success: true, ergebnis: result, feedbackId: _kal.feedbackId });
 
