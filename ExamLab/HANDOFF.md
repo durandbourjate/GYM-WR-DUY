@@ -6,17 +6,43 @@
 
 ---
 
-## Für die nächste Session (S135+)
+## Für die nächste Session (S136+)
 
-### Aktueller Stand (Ende S134, 22.04.2026) — C9 Phase 3 Task 24 fertig, Tasks 25 + 26 offen
+### Aktueller Stand (Ende S135, 22.04.2026) — C9 Phase 3 komplett, Tag `c9-phase3-backend` gesetzt
 
-**C9 = Detaillierte Lösungen pro Teilantwort**. Branch `feature/c9-detaillierte-loesungen` (preview + origin synchron). Phase 1 + 2 + Task 22 (Apps-Script) + Task 23 (Frontend-Normalizer) + Task 24 (Editor-UI + Caller) fertig. Letzter Commit `6b454e8`. Phase 3 Tasks 25 + 26 offen.
+**C9 = Detaillierte Lösungen pro Teilantwort**. Branch `feature/c9-detaillierte-loesungen` (preview + origin synchron). **Phase 1 + 2 + 3 abgeschlossen (Tasks 22 + 23 + 24 + 25 + 26).** Letzter Commit `d6555bc`. Tag `c9-phase3-backend` auf origin.
 
-**Einstieg nächste Session:**
+**⚠️ Offen (User-Task):** Apps-Script als neue Bereitstellung deployen — gebündelt 3 Backend-Changes:
+- Task 22: `generiereMusterloesung` mit Teilerklärungen
+- Task 24: Dual-Write `musterlosung`-Alias entfernt
+- Task 25: `bereinigeFrageFuerSuS_` mit `opts.behalteErklaerung`
+
+Vor Deploy: `testC9Privacy` im GAS-Editor laufen lassen (Public-Wrapper ohne Unterstrich) → erwartet `✓ C9 Privacy-Tests bestanden (9 Typen + Buchungssatz-Dokumentation).`. Wenn grün → neue Bereitstellung erstellen und alte Bereitstellungs-URL reaktivieren falls Probleme auftreten.
+
+**Einstieg nächste Session (nach Deploy):**
 1. `git checkout feature/c9-detaillierte-loesungen && git pull`
-2. Plan lesen: `ExamLab/docs/superpowers/plans/2026-04-21-c9-detaillierte-loesungen.md` — weiter ab **Task 25** (Privacy `bereinigeFrageFuerSuS_`)
-3. Spec lesen: `ExamLab/docs/superpowers/specs/2026-04-21-c9-detaillierte-loesungen-design.md` §7
-4. **Tests/Build-Status prüfen:** `cd ExamLab && npx tsc -b && npx vitest run` → erwartet 612/612 grün
+2. Browser-E2E: Preview-Test im Üben-Modus — Teilerklärungen bei MC nach „Antwort prüfen" sichtbar.
+3. Wenn E2E grün: Merge nach `main`, Feature-Branch löschen.
+4. **Optional Phase 4:** Migrations-Skript (Plan Task 27+) für ~2400 bestehende Fragen (KI generiert Teilerklärungen via Node-Skript + Anthropic SDK). Wirklich erst starten, wenn Phase 3 auf `main` und stabil (~2 Wochen).
+
+### Task 25 Ergebnis (1 Commit, S135 22.04.2026)
+
+**Privacy-Invariante für erklaerung-Felder.** Commit `d6555bc`. **20 neue Frontend-Tests, 632/632 vitest + tsc -b + build grün.**
+
+- **LOESUNGS_FELDER_ erweitert**: `erklaerung` als Sub-Feld bei 7 Sub-Arrays ergänzt (`luecken`, `aufgaben`, `beschriftungen`, `zielzonen`, `bereiche`, `hotspots`, `konten`). Neue Einträge: `kontenMitSaldi` (BilanzER, id=kontonummer) + `buchungen` (defensiv).
+- **`bereinigeFrageFuerSuS_(frage, opts)`**: neuer optionaler `opts.behalteErklaerung`-Flag. Default=false → Prüfen-SuS sieht keine erklaerung (Lösungs-Leak verhindert). Rekursion durch Teilaufgaben gibt opts weiter.
+- **`bereinigeFrageFuerSuSUeben_`**: übergibt `behalteErklaerung=true` → Üben-SuS sieht Teilerklärungen nach „Antwort prüfen" direkt aus Frage-Payload (via `fragetypen/*.tsx modus='loesung'`).
+- **GAS-Test-Shim `testC9Privacy_`** + Public-Wrapper `testC9Privacy`: 9 Fragetypen + Buchungssatz-Dokumentation. Keine API-Calls, rein lokale Bereinigungslogik.
+- **Frontend-Test-Mirror**: parametrisierter `bereinige(frage, opts)`-Mock spiegelt Backend-Logik, 20 Tests (9 Typen × 2 Modi + Rekursion + Nicht-Lösungs-Felder).
+
+**Lehre S135 (→ code-quality.md):**
+- **Plan Step 25.2 „bereinigeFrageFuerSuSUeben_ NICHT anfassen" war irreführend**: die Funktion ruft `bereinigeFrageFuerSuS_` als Basis und erbt deshalb ALLE Bereinigungen. Ohne Parameter-Erweiterung (`opts.behalteErklaerung`) hätten MC+RF bereits heute die erklaerung im Üben verloren (was der Plan aber explizit verhindern will). **Regel**: Bei Plan-Schritten die sich auf „unverändert lassen" beziehen — immer prüfen ob die Funktion indirekte Abhängigkeiten hat, die das gewünschte Verhalten trotzdem brechen.
+
+### Task 24 Ergebnis (2 Commits, S134 22.04.2026)
+
+**KIMusterloesungPreview + Kontext-Helper + Caller-Umbau.** Commits `ee99497` (Types-Nachtrag) + `6b454e8` (Haupt). **18 neue Tests.**
+
+Siehe git log + MEMORY.md S134 für Details.
 
 ### Task 24 Ergebnis (2 Commits, S134 22.04.2026)
 
