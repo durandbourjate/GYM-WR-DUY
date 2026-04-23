@@ -891,6 +891,10 @@ function doPost(e) {
       return speichereConfig(body);
     case 'speichereFrage':
       return speichereFrage(body);
+    case 'holeAlleFragenFuerMigration':
+      return holeAlleFragenFuerMigrationEndpoint(body);
+    case 'batchUpdateFragenMigration':
+      return batchUpdateFragenMigrationEndpoint(body);
     case 'loescheFrage':
       return loescheFrage(body);
     case 'loescheAllePoolFragen':
@@ -10889,6 +10893,267 @@ function testC9GeneriereMusterloesung_() {
   assert_(b4.ergebnis.teilerklaerungen.every(function(t){ return _erwarteteKnrs[t.id]; }), 'Bilanz ids aus Kontext');
 
   Logger.log('✓ C9 generiereMusterloesung-Tests bestanden.');
+}
+
+/**
+ * C9 Phase 4 Task 28 — Admin-Endpoint für Teilerklärungs-Migration.
+ *
+ * Liefert ALLE Fragen aus allen Fachbereichs-Tabs (VWL/BWL/Recht/Informatik) als
+ * Array. Nur für LP mit rolle='admin'. KEINE SuS-Bereinigung — das Skript braucht
+ * den vollen Frage-Zustand (musterlosung, korrekt, erklaerung) um den
+ * Idempotenz-Check machen zu können.
+ *
+ * body: { action: 'holeAlleFragenFuerMigration', email: '<admin-lp@...>' }
+ * response: { success: true, data: Frage[] }
+ */
+function holeAlleFragenFuerMigrationEndpoint(body) {
+  try {
+    var email = body.email;
+    if (!email || !istZugelasseneLP(email)) {
+      return jsonResponse({ error: 'Nur für Lehrpersonen' });
+    }
+    var lpInfo = getLPInfo(email);
+    var istAdmin = lpInfo && lpInfo.rolle === 'admin';
+    if (!istAdmin) {
+      return jsonResponse({ error: 'Nur für Admins' });
+    }
+
+    var fragenbank = SpreadsheetApp.openById(FRAGENBANK_ID);
+    var fachbereiche = ['VWL', 'BWL', 'Recht', 'Informatik'];
+    var alle = [];
+
+    for (var t = 0; t < fachbereiche.length; t++) {
+      var fachbereich = fachbereiche[t];
+      var sheet = fragenbank.getSheetByName(fachbereich);
+      if (!sheet) continue;
+      var rows = getSheetData(sheet);
+      for (var r = 0; r < rows.length; r++) {
+        try {
+          var frage = parseFrage(rows[r], fachbereich);
+          if (frage && frage.id) alle.push(frage);
+        } catch (err) {
+          console.warn('[Migration] parseFrage fehlgeschlagen für Row', r, 'in', fachbereich, ':', err && err.message);
+        }
+      }
+    }
+
+    return jsonResponse({ success: true, data: alle });
+  } catch (error) {
+    return jsonResponse({ error: error.message });
+  }
+}
+
+/**
+ * C9 Phase 4 Task 2 — Batch-Update-Endpoint fuer Migration.
+ *
+ * Partial-Update-Semantik (Spec §8): NUR musterlosung, typDaten (nur die
+ * erklaerung-Subfelder), pruefungstauglich, geaendertAm, poolContentHash werden
+ * ueberschrieben. Alles andere (fragetext, Optionen-Text, korrekt-Flags, tags,
+ * punkte, thema, bloom, autor etc.) bleibt 1:1 wie es war.
+ *
+ * Request-Body: {
+ *   action: 'batchUpdateFragenMigration',
+ *   email: '<admin-lp>',
+ *   fachbereich: 'VWL'|'BWL'|'Recht'|'Informatik',
+ *   updates: [
+ *     { id: '<frage-id>', musterlosung: '<text>',
+ *       teilerklaerungen: [{ feld: 'optionen', id: 'opt-a', text: '...' }, ...] }
+ *   ]
+ * }
+ *
+ * Response: { success, aktualisiert, nichtGefunden: [ids] }
+ */
+function batchUpdateFragenMigrationEndpoint(body) {
+  try {
+    var email = body.email;
+    if (!email || !istZugelasseneLP(email)) {
+      return jsonResponse({ error: 'Nur für Lehrpersonen' });
+    }
+    var lpInfo = getLPInfo(email);
+    if (!lpInfo || lpInfo.rolle !== 'admin') {
+      return jsonResponse({ error: 'Nur für Admins' });
+    }
+    var fachbereich = body.fachbereich;
+    if (['VWL','BWL','Recht','Informatik'].indexOf(fachbereich) < 0) {
+      return jsonResponse({ error: 'Ungültiger fachbereich: ' + fachbereich });
+    }
+    var updates = body.updates;
+    if (!Array.isArray(updates) || updates.length === 0) {
+      return jsonResponse({ error: 'updates[] erwartet' });
+    }
+
+    var fragenbank = SpreadsheetApp.openById(FRAGENBANK_ID);
+    var sheet = fragenbank.getSheetByName(fachbereich);
+    if (!sheet) return jsonResponse({ error: 'Sheet ' + fachbereich + ' nicht gefunden' });
+
+    // Gesamte Sheet-Daten lesen
+    var lastRow = sheet.getLastRow();
+    var lastCol = sheet.getLastColumn();
+    if (lastRow < 2 || lastCol < 1) {
+      return jsonResponse({ error: 'Sheet ist leer' });
+    }
+    var allData = sheet.getRange(1, 1, lastRow, lastCol).getValues();
+    var headers = allData[0].map(String);
+    var idCol = headers.indexOf('id');
+    var typCol = headers.indexOf('typ');
+    var musterlosungCol = headers.indexOf('musterlosung');
+    var typDatenCol = headers.indexOf('typDaten');
+    var pruefungstauglichCol = headers.indexOf('pruefungstauglich');
+    var geaendertAmCol = headers.indexOf('geaendertAm');
+    var poolContentHashCol = headers.indexOf('poolContentHash');
+
+    if (idCol < 0 || typCol < 0 || musterlosungCol < 0 || typDatenCol < 0) {
+      return jsonResponse({ error: 'Pflicht-Spalten fehlen im Sheet (id/typ/musterlosung/typDaten)' });
+    }
+
+    // ID → Index in allData (0-basiert inkl. Header-Offset)
+    var idToRow = {};
+    for (var r = 1; r < allData.length; r++) {
+      var id = String(allData[r][idCol] || '');
+      if (id) idToRow[id] = r;
+    }
+
+    var nichtGefunden = [];
+    var aktualisiert = 0;
+    var nowIso = new Date().toISOString();
+
+    for (var u = 0; u < updates.length; u++) {
+      var upd = updates[u];
+      if (!upd || !upd.id) continue;
+      var rowIdx = idToRow[upd.id];
+      if (rowIdx === undefined) {
+        nichtGefunden.push(upd.id);
+        continue;
+      }
+      var row = allData[rowIdx];
+      var typDatenRaw = String(row[typDatenCol] || '{}');
+      var typDaten;
+      try { typDaten = JSON.parse(typDatenRaw); } catch (e) { typDaten = {}; }
+
+      // Teilerklaerungen in typDaten einarbeiten
+      if (Array.isArray(upd.teilerklaerungen)) {
+        for (var t = 0; t < upd.teilerklaerungen.length; t++) {
+          var te = upd.teilerklaerungen[t];
+          if (!te || !te.feld || !te.id || !te.text) continue;
+          var arr = typDaten[te.feld];
+          if (!Array.isArray(arr)) continue;
+          var idKey = te.feld === 'kontenMitSaldi' ? 'kontonummer' : 'id';
+          for (var i = 0; i < arr.length; i++) {
+            if (arr[i] && String(arr[i][idKey] || '') === String(te.id)) {
+              arr[i].erklaerung = te.text;
+              break;
+            }
+          }
+        }
+      }
+
+      // Row-Werte ueberschreiben (partial update — nur diese Felder, Rest bleibt)
+      row[musterlosungCol] = String(upd.musterlosung || '');
+      row[typDatenCol] = JSON.stringify(typDaten);
+      if (pruefungstauglichCol >= 0) row[pruefungstauglichCol] = ''; // false (leer = nicht-true)
+      if (geaendertAmCol >= 0) row[geaendertAmCol] = nowIso;
+      if (poolContentHashCol >= 0) row[poolContentHashCol] = ''; // neu berechnen beim naechsten Pool-Check
+
+      aktualisiert++;
+    }
+
+    // Alle Daten zurueckschreiben (ein setValues-Call — schnell auch bei 800+ rows)
+    sheet.getRange(1, 1, allData.length, headers.length).setValues(allData);
+
+    // Cache invalidieren
+    try { cacheInvalidieren_(); } catch (e) { /* ignore */ }
+
+    return jsonResponse({
+      success: true,
+      fachbereich: fachbereich,
+      aktualisiert: aktualisiert,
+      nichtGefunden: nichtGefunden,
+    });
+  } catch (error) {
+    return jsonResponse({ error: String(error && error.message || error) });
+  }
+}
+
+/**
+ * Public-Wrapper für testC9BatchUpdateFragenMigration_ — erscheint im GAS-Editor-Dropdown.
+ */
+function testC9BatchUpdateFragenMigration() {
+  return testC9BatchUpdateFragenMigration_();
+}
+
+/**
+ * C9 Phase 4 — Smoke-Test fuer batchUpdateFragenMigrationEndpoint.
+ *
+ * Testet Partial-Update-Semantik + ID-Match + nichtGefunden-Handling.
+ *
+ * ⚠️ Schreibt kurz IN DIE ECHTE FRAGENBANK (eine BWL-MC-Frage bekommt eine
+ * Marker-musterlosung, dann wird die Original-musterlosung sofort wieder zurueck-
+ * gesetzt). pruefungstauglich geht dabei auf leer — falls die Test-Frage vorher
+ * true war: User setzt sie manuell im Editor zurueck.
+ */
+function testC9BatchUpdateFragenMigration_() {
+  function assert_(cond, msg) { if (!cond) throw new Error('Assertion fehlgeschlagen: ' + msg); }
+  var EMAIL = 'wr.test@gymhofwil.ch'; // ← ggf. auf eigene Admin-LP-E-Mail anpassen
+
+  // 1. Eine beliebige MC-Frage aus BWL laden
+  var fragenbank = SpreadsheetApp.openById(FRAGENBANK_ID);
+  var sheet = fragenbank.getSheetByName('BWL');
+  var data = getSheetData(sheet);
+  var mcFrage = null;
+  for (var i = 0; i < data.length; i++) {
+    if (data[i].typ === 'mc') { mcFrage = data[i]; break; }
+  }
+  assert_(mcFrage, 'Keine MC-Frage in BWL gefunden');
+  var testId = mcFrage.id;
+  var originalMusterlosung = mcFrage.musterlosung;
+  var originalPruefungstauglich = mcFrage.pruefungstauglich;
+  Logger.log('Test-Frage: ' + testId);
+  Logger.log('  originale musterlosung (0-40): ' + String(originalMusterlosung).slice(0, 40));
+  Logger.log('  originale pruefungstauglich: ' + String(originalPruefungstauglich));
+
+  // 2. Marker-Update senden + absichtlich eine non-existente ID mitgeben
+  var markerText = '[TEST-MARKER ' + new Date().toISOString() + '] Migration-Test ok';
+  var body = {
+    action: 'batchUpdateFragenMigration',
+    email: EMAIL,
+    fachbereich: 'BWL',
+    updates: [
+      { id: testId, musterlosung: markerText, teilerklaerungen: [] },
+      { id: 'definitely-not-existing-id-xyz', musterlosung: 'should not apply', teilerklaerungen: [] }
+    ]
+  };
+  var r = batchUpdateFragenMigrationEndpoint(body);
+  var res = JSON.parse(r.getContent());
+  Logger.log('Response: ' + JSON.stringify(res, null, 2));
+
+  // 3. Assertions auf Response
+  assert_(res.success === true, 'success=true erwartet');
+  assert_(res.aktualisiert === 1, 'aktualisiert=1 erwartet (war: ' + res.aktualisiert + ')');
+  assert_(Array.isArray(res.nichtGefunden) && res.nichtGefunden.length === 1, 'nichtGefunden-Array mit 1 Eintrag erwartet');
+  assert_(res.nichtGefunden[0] === 'definitely-not-existing-id-xyz', 'nichtGefunden enthaelt die non-existente ID');
+
+  // 4. Verifikation im Sheet: musterlosung auf Marker, pruefungstauglich leer, geaendertAm neu
+  var dataNeu = getSheetData(sheet);
+  var frageNeu = null;
+  for (var j = 0; j < dataNeu.length; j++) {
+    if (dataNeu[j].id === testId) { frageNeu = dataNeu[j]; break; }
+  }
+  assert_(frageNeu, 'Test-Frage nach Update nicht gefunden');
+  assert_(frageNeu.musterlosung === markerText, 'musterlosung nicht auf Marker gesetzt (war: ' + String(frageNeu.musterlosung).slice(0, 80) + ')');
+  assert_(String(frageNeu.pruefungstauglich || '') === '', 'pruefungstauglich sollte leer sein (war: ' + String(frageNeu.pruefungstauglich) + ')');
+
+  // 5. RESTORE: Original-Musterlosung zuruecksetzen
+  body = {
+    action: 'batchUpdateFragenMigration',
+    email: EMAIL,
+    fachbereich: 'BWL',
+    updates: [{ id: testId, musterlosung: originalMusterlosung || '', teilerklaerungen: [] }],
+  };
+  batchUpdateFragenMigrationEndpoint(body);
+  Logger.log('✓ Restore: musterlosung fuer ' + testId + ' zurueck auf Original.');
+  Logger.log('⚠️ pruefungstauglich bleibt leer — falls vorher true (' + String(originalPruefungstauglich) + '), im Editor manuell wiedersetzen.');
+
+  Logger.log('✓ C9 batchUpdateFragenMigration-Test bestanden.');
 }
 
 /**
