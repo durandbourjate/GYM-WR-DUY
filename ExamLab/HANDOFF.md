@@ -12,10 +12,21 @@
 
 **Branch:** `fix/s137-ui-autokorrektur-bundle` (ausgehend von `main`), 7 Commits, **Staging-deployed** (`origin/preview`), **nicht auf main gemergt**.
 
-**⚠️ Apps-Script-Deploy erforderlich (Ticket 8 Bundle):** Der Branch ändert `apps-script-code.js` an 3 Stellen — neuer Helper `normalisiereTextAntwortServer_`, Lückentext + Bildbeschriftung in `pruefeAntwortServer_` nutzen Whitespace-Norm + explizites `=== true`, `generiereLuecken` + `pruefeLueckenAntworten` fordern 2-3 Synonyme. **Vor Staging-E2E: neue Apps-Script-Bereitstellung erstellen.** Test-Plan:
-1. Lückentext SuS-Antwort mit doppeltem Leerzeichen („München  buchsee") → soll korrekt matchen (vorher false negative)
-2. Bildbeschriftung mit Case-Mismatch („hof" statt „Hof") → default case-insensitive, korrekt
-3. LP KI-Assistent: „Lücken generieren" liefert mindestens 2-3 Alternativen pro Lücke
+**✅ Apps-Script deployed (S137 Ende, User-Task erledigt):** Frontend + Backend synchron. Staging-E2E offen.
+
+### Staging-E2E Test-Plan (S138)
+
+1. **Lückentext** — SuS-Antwort mit doppeltem Leerzeichen („München  buchsee") → soll korrekt matchen. Zusätzlich: klein-/gross-Schreibung („hofwil" statt „Hofwil") → insensitiv default, korrekt.
+2. **Bildbeschriftung** — Case-Mismatch-Test wie oben, default case-insensitive.
+3. **Dreistufige Labels** — Multi-Lücken-Frage teilweise beantworten → Label „Teilweise richtig (x/n) — Musterlösung". Voll falsch → „Leider falsch — Musterlösung". 100% → „Musterlösung".
+4. **LP KI-Assistent** — „Lücken generieren" liefert mindestens 2-3 Alternativen pro Lücke (ausser bei Zahlen/Gesetzesartikeln).
+5. **Menü „Problem melden"** — LP + SuS Rollen, Icon ⚠ sichtbar, Klick öffnet FeedbackModal „Rückmeldung geben".
+6. **SuS-Üben-Footer** — „⚠️ Problem melden" rechts neben „Als unsicher markieren", öffnet Modal mit Frage-Kontext.
+7. **SuS-Themenkacheln** — farbiger linker Rand, Punkt weg. Aktive Themen zusätzlich unterer Rand + „Aktuell"-Badge.
+8. **SuS-Hilfe-Sidebar** (Menü → Hilfe) — resizable per Drag, Titel „Hilfe" sichtbar (nicht unter Headbar), localStorage speichert Breite.
+9. **LP-Einstellungen Üben-Tab** — Kurs-Dropdown gefüllt OHNE vorher den Üben-Tab geklickt zu haben.
+
+Bei Freigabe: Merge nach `main`, Branch + preview aufräumen.
 
 **User hat 9 Tickets übergeben (S137):**
 1. ✅ **ERLEDIGT (Commit `e324474`)** Einstellungen Übungen: `AdminSettings` ruft `ladeGruppen(email)` beim Mount auf.
