@@ -8,9 +8,14 @@
 
 ## Für die nächste Session (S138+)
 
-### Aktueller Stand (Ende S137, 23.04.2026) — UI-Bundle auf `fix/s137-ui-autokorrektur-bundle` (6/9 Tickets fertig, auf `origin/preview` live)
+### Aktueller Stand (Ende S137, 23.04.2026) — UI-Bundle auf `fix/s137-ui-autokorrektur-bundle` (8/9 Tickets fertig, auf `origin/preview` live)
 
-**Branch:** `fix/s137-ui-autokorrektur-bundle` (ausgehend von `main`), 5 Commits, **Staging-deployed** (`origin/preview`), **nicht auf main gemergt**.
+**Branch:** `fix/s137-ui-autokorrektur-bundle` (ausgehend von `main`), 7 Commits, **Staging-deployed** (`origin/preview`), **nicht auf main gemergt**.
+
+**⚠️ Apps-Script-Deploy erforderlich (Ticket 8 Bundle):** Der Branch ändert `apps-script-code.js` an 3 Stellen — neuer Helper `normalisiereTextAntwortServer_`, Lückentext + Bildbeschriftung in `pruefeAntwortServer_` nutzen Whitespace-Norm + explizites `=== true`, `generiereLuecken` + `pruefeLueckenAntworten` fordern 2-3 Synonyme. **Vor Staging-E2E: neue Apps-Script-Bereitstellung erstellen.** Test-Plan:
+1. Lückentext SuS-Antwort mit doppeltem Leerzeichen („München  buchsee") → soll korrekt matchen (vorher false negative)
+2. Bildbeschriftung mit Case-Mismatch („hof" statt „Hof") → default case-insensitive, korrekt
+3. LP KI-Assistent: „Lücken generieren" liefert mindestens 2-3 Alternativen pro Lücke
 
 **User hat 9 Tickets übergeben (S137):**
 1. ✅ **ERLEDIGT (Commit `e324474`)** Einstellungen Übungen: `AdminSettings` ruft `ladeGruppen(email)` beim Mount auf.
@@ -20,7 +25,7 @@
 5. ✅ **ERLEDIGT (Commit `b8e1c8e`)** Problem-melden-Button im SuS-Üben-Footer, rechts neben „Als unsicher markieren"
 6. ✅ **ERLEDIGT (Commit `c31b30c`)** Menü-Eintrag „Problem melden" — Icon ✉ → ⚠, Label einheitlich „Problem melden" (beide Rollen), 8 Dead-Handler entfernt, FeedbackModal im AppHeader zentralisiert
 7. ✅ **ERLEDIGT (Commit `e324474`)** SuS-Hilfe-Sidebar auf `ResizableSidebar`-Overlay-Pattern migriert, `topOffset` aus Header-Höhe gemessen — resizable + Titel sichtbar
-8. ⏸️ Autokorrektur-Verhalten — **Doku fertig** (Commit `6a5799b`), **Anpassungen 1-4 offen**
+8. ✅ **ERLEDIGT (Commit `56a39a4`)** Autokorrektur-Anpassungen 1-4 + KI-Synonym-Prompt. Frontend + Apps-Script synchron. **Apps-Script-Deploy User-Task.**
 9. ✅ **ERLEDIGT** Memory `project_bildfragen_qualitaet.md` um „zu generische Zuordnungen (a/b/c)" ergänzt (Punkt 4 in der Audit-Liste)
 
 **Ticket 8 Anpassungen (User-freigegeben):**
