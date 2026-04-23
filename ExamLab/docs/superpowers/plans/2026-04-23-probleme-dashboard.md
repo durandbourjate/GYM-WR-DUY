@@ -145,6 +145,19 @@ git commit -m "ExamLab F1: Setup-Doku um UUID-Write-Handler erweitert"
 
 **Files:** `ExamLab/apps-script-code.js`
 
+- [ ] **Step 0 (Exploration):** Verifiziere bestehende Konstanten/Helper im Script:
+
+```bash
+grep -nE "^(var|function) (FRAGENBANK_ID|FRAGENBANK_SYSTEM_TABS|CONFIGS_ID|getLPInfo|findeLPInfo_|alleGruppenLaden_)" ExamLab/apps-script-code.js
+```
+
+Erwartete Treffer:
+- `FRAGENBANK_ID`, `FRAGENBANK_SYSTEM_TABS`, `CONFIGS_ID` als `var` ganz oben.
+- Helper `getLPInfo(email)` (Z. 402) — **nicht `findeLPInfo_`**.
+- `alleGruppenLaden_()` (Z. 378).
+
+Wenn ein Name nicht existiert: STOP, Plan anpassen vor Fortfahren.
+
 - [ ] **Step 1:** Finde eine gute Stelle nach `ermittleRechtMitLP` (ca. Zeile 690) für neue Helper.
 
 - [ ] **Step 2:** Füge Helper ein:
@@ -607,8 +620,10 @@ git commit -m "ExamLab F1: Types Recht + Problemmeldung"
 ### Task 13: API-Client
 
 **Files:**
-- Create: `ExamLab/src/api/problemmeldungenApi.ts`
-- Test: `ExamLab/src/api/problemmeldungenApi.test.ts`
+- Create: `ExamLab/src/services/problemmeldungenApi.ts`
+- Test: `ExamLab/src/services/problemmeldungenApi.test.ts`
+
+**Hinweis:** `postJson` aus `apiClient.ts` injiziert den `sessionToken` automatisch aus localStorage (siehe apiClient.ts:63). API-Client nimmt daher **nur `email`** als Parameter.
 
 - [ ] **Step 1: Failing test** — schreibe Test der den unwrap-Pattern verifiziert:
 
@@ -625,21 +640,33 @@ describe('problemmeldungenApi', () => {
       success: true,
       data: [{ id: 'm1', typ: 'problem', comment: 'x' } as any]
     })
-    const result = await listeProblemmeldungen({ email: 'a@b.ch', token: 't' })
+    const result = await listeProblemmeldungen('a@b.ch')
     expect(result).toHaveLength(1)
     expect(result[0].id).toBe('m1')
   })
 
   it('gibt leeres Array bei success=false', async () => {
     vi.spyOn(apiClient, 'postJson').mockResolvedValue({ success: false, error: 'x' })
-    const result = await listeProblemmeldungen({ email: 'a@b.ch', token: 't' })
+    const result = await listeProblemmeldungen('a@b.ch')
     expect(result).toEqual([])
   })
 
-  it('toggleProblemmeldung liefert boolean', async () => {
+  it('gibt leeres Array bei null/undefined Response', async () => {
+    vi.spyOn(apiClient, 'postJson').mockResolvedValue(null)
+    const result = await listeProblemmeldungen('a@b.ch')
+    expect(result).toEqual([])
+  })
+
+  it('toggleProblemmeldung liefert true bei success', async () => {
     vi.spyOn(apiClient, 'postJson').mockResolvedValue({ success: true })
-    const ok = await toggleProblemmeldung({ email: 'a@b.ch', token: 't', id: 'm1', erledigt: true })
+    const ok = await toggleProblemmeldung('a@b.ch', 'm1', true)
     expect(ok).toBe(true)
+  })
+
+  it('toggleProblemmeldung liefert false bei success=false', async () => {
+    vi.spyOn(apiClient, 'postJson').mockResolvedValue({ success: false, error: 'x' })
+    const ok = await toggleProblemmeldung('a@b.ch', 'm1', true)
+    expect(ok).toBe(false)
   })
 })
 ```
@@ -647,7 +674,7 @@ describe('problemmeldungenApi', () => {
 - [ ] **Step 2: Run test — erwarte FAIL** (Datei existiert nicht).
 
 ```bash
-cd ExamLab && npx vitest run src/api/problemmeldungenApi.test.ts
+cd ExamLab && npx vitest run src/services/problemmeldungenApi.test.ts
 ```
 
 - [ ] **Step 3: Implementation**
@@ -656,23 +683,29 @@ cd ExamLab && npx vitest run src/api/problemmeldungenApi.test.ts
 import type { Problemmeldung } from '../types/problemmeldung'
 import { postJson } from './apiClient'
 
-interface ListInput { email: string; token: string }
-interface ToggleInput { email: string; token: string; id: string; erledigt: boolean }
-
 interface ListResponse { success: boolean; data?: Problemmeldung[]; error?: string }
 interface ToggleResponse { success: boolean; error?: string }
 
-export async function listeProblemmeldungen(input: ListInput): Promise<Problemmeldung[]> {
-  const result = await postJson<ListResponse>('listeProblemmeldungen', input)
+export async function listeProblemmeldungen(email: string): Promise<Problemmeldung[]> {
+  const result = await postJson<ListResponse>('listeProblemmeldungen', { email })
   if (!result?.success || !Array.isArray(result.data)) return []
   return result.data
 }
 
-export async function toggleProblemmeldung(input: ToggleInput): Promise<boolean> {
-  const result = await postJson<ToggleResponse>('markiereProblemmeldungErledigt', input)
+export async function toggleProblemmeldung(
+  email: string,
+  id: string,
+  erledigt: boolean,
+): Promise<boolean> {
+  const result = await postJson<ToggleResponse>(
+    'markiereProblemmeldungErledigt',
+    { email, id, erledigt },
+  )
   return !!result?.success
 }
 ```
+
+`postJson` injiziert `sessionToken` automatisch aus localStorage — siehe `services/apiClient.ts:63`.
 
 - [ ] **Step 4: Run test — erwarte PASS**.
 
@@ -681,7 +714,7 @@ export async function toggleProblemmeldung(input: ToggleInput): Promise<boolean>
 - [ ] **Step 6:** Commit.
 
 ```bash
-git add ExamLab/src/api/problemmeldungenApi.ts ExamLab/src/api/problemmeldungenApi.test.ts
+git add ExamLab/src/services/problemmeldungenApi.ts ExamLab/src/services/problemmeldungenApi.test.ts
 git commit -m "ExamLab F1: API-Client problemmeldungenApi mit Response-Unwrap"
 ```
 
@@ -745,8 +778,14 @@ describe('priorisiereDeepLink', () => {
     expect(priorisiereDeepLink(m({ gruppeId: 'g1' }))).toEqual({ art: 'gruppe', id: 'g1' })
     expect(priorisiereDeepLink(m({ ort: 'dashboard' }))).toEqual({ art: 'ort', id: 'dashboard' })
   })
-  it('Pool-Frage liefert kein Ziel', () => {
+  it('Pool-Frage liefert kein Ziel (Deep-Link deaktiviert)', () => {
     expect(priorisiereDeepLink(m({ frageId: 'f1', istPoolFrage: true }))).toBeNull()
+  })
+  it('Pool-Frage mit zusätzlicher Prüfungs-ID fällt auf Prüfung zurück', () => {
+    expect(priorisiereDeepLink(m({ frageId: 'f1', istPoolFrage: true, pruefungId: 'p1' }))).toEqual({ art: 'pruefung', id: 'p1' })
+  })
+  it('Alle Felder leer liefert null', () => {
+    expect(priorisiereDeepLink(m({ ort: '' }))).toBeNull()
   })
 })
 ```
@@ -868,10 +907,11 @@ git add ExamLab/src/components/settings/problemmeldungen/ProblemmeldungenFilter.
 git commit -m "ExamLab F1: ProblemmeldungenFilter-Komponente"
 ```
 
-### Task 16: `ProblemmeldungZeile.tsx`
+### Task 16: `ProblemmeldungZeile.tsx` + Tests
 
 **Files:**
 - Create: `ExamLab/src/components/settings/problemmeldungen/ProblemmeldungZeile.tsx`
+- Test: `ExamLab/src/components/settings/problemmeldungen/ProblemmeldungZeile.test.tsx`
 
 - [ ] **Step 1:** Anlegen:
 
@@ -957,54 +997,107 @@ export default function ProblemmeldungZeile({ meldung, toggleErledigt, onOeffne,
 
 - [ ] **Step 2:** `npx tsc -b` grün.
 
-- [ ] **Step 3:** Commit.
+- [ ] **Step 3:** Tests für Legacy-Row + Toggle-Disable:
 
-```bash
-git add ExamLab/src/components/settings/problemmeldungen/ProblemmeldungZeile.tsx
-git commit -m "ExamLab F1: ProblemmeldungZeile-Komponente"
+```tsx
+// ProblemmeldungZeile.test.tsx
+import { render, screen, fireEvent } from '@testing-library/react'
+import { describe, it, expect, vi } from 'vitest'
+import ProblemmeldungZeile from './ProblemmeldungZeile'
+import type { Problemmeldung } from '../../../types/problemmeldung'
+
+const base: Problemmeldung = {
+  id: 'm1', zeitstempel: new Date().toISOString(), typ: 'problem', category: 'Test',
+  comment: 'Test-Kommentar', rolle: 'sus', frageId: 'f1', frageText: '', frageTyp: 'mc',
+  modus: 'pruefen', pruefungId: '', gruppeId: '', ort: '', appVersion: '',
+  inhaberEmail: 'lp@x.ch', inhaberAktiv: true, istPoolFrage: false,
+  recht: 'inhaber', erledigt: false,
+}
+
+describe('ProblemmeldungZeile', () => {
+  it('Legacy-Row (leere id): Toggle disabled mit Tooltip', () => {
+    const toggle = vi.fn()
+    render(<ProblemmeldungZeile meldung={{ ...base, id: '' }} toggleErledigt={toggle} onOeffne={() => {}} istAdmin={false} />)
+    const cb = screen.getByRole('checkbox')
+    expect(cb).toBeDisabled()
+    expect(cb.getAttribute('title')).toMatch(/Legacy-Eintrag/i)
+  })
+  it('nicht-Admin ohne Inhaber/Bearbeiter: Toggle disabled', () => {
+    const toggle = vi.fn()
+    render(<ProblemmeldungZeile meldung={{ ...base, recht: 'betrachter' }} toggleErledigt={toggle} onOeffne={() => {}} istAdmin={false} />)
+    expect(screen.getByRole('checkbox')).toBeDisabled()
+  })
+  it('Admin darf immer togglen', () => {
+    const toggle = vi.fn()
+    render(<ProblemmeldungZeile meldung={{ ...base, recht: 'betrachter' }} toggleErledigt={toggle} onOeffne={() => {}} istAdmin={true} />)
+    expect(screen.getByRole('checkbox')).not.toBeDisabled()
+  })
+  it('Toggle löst onChange mit invertiertem Wert aus', () => {
+    const toggle = vi.fn()
+    render(<ProblemmeldungZeile meldung={base} toggleErledigt={toggle} onOeffne={() => {}} istAdmin={false} />)
+    fireEvent.click(screen.getByRole('checkbox'))
+    expect(toggle).toHaveBeenCalledWith('m1', true)
+  })
+  it('ehemaliger Inhaber wird angezeigt', () => {
+    render(<ProblemmeldungZeile meldung={{ ...base, inhaberAktiv: false }} toggleErledigt={() => {}} onOeffne={() => {}} istAdmin={true} />)
+    expect(screen.getByText(/ehemaliger Inhaber/)).toBeInTheDocument()
+  })
+})
 ```
 
-### Task 17: Deep-Link-Navigation-Hook
+Run: `npx vitest run src/components/settings/problemmeldungen/ProblemmeldungZeile.test.tsx`.
+
+- [ ] **Step 4:** Commit.
+
+```bash
+git add ExamLab/src/components/settings/problemmeldungen/ProblemmeldungZeile.tsx ExamLab/src/components/settings/problemmeldungen/ProblemmeldungZeile.test.tsx
+git commit -m "ExamLab F1: ProblemmeldungZeile + Legacy-Row + Berechtigungs-Tests"
+```
+
+### Task 17: Deep-Link-Navigation-Hook (via React Router)
 
 **Files:**
 - Create: `ExamLab/src/components/settings/problemmeldungen/useDeepLink.ts`
 
-- [ ] **Step 1:** Anlegen (Ziele werden via window-Events an Router-Listener geschickt — existierendes Pattern im Projekt, alternativ `useNavigate` wenn vorhanden):
+Das Projekt nutzt React Router mit dem bestehenden Hook `useLPNavigation` (`src/hooks/useLPNavigation.ts`). Keine Custom-Events — direkt in die existierenden Navigations-Primitiven einhängen. Für Prüfung/Gruppe nutzen wir `navigiereZuComposer` (öffnet Composer mit `configId`), für Frage `navigiereZuFrageneditor`.
+
+- [ ] **Step 1:** Anlegen:
 
 ```ts
 import { useCallback } from 'react'
+import { useLPNavigation } from '../../../hooks/useLPNavigation'
 import type { DeepLinkZiel } from './filterLogik'
 
 export function useDeepLink(schliesseEinstellungen: () => void) {
+  const nav = useLPNavigation()
   return useCallback((ziel: DeepLinkZiel | null) => {
     if (!ziel) return
     schliesseEinstellungen()
     switch (ziel.art) {
       case 'frage':
-        window.dispatchEvent(new CustomEvent('examlab:oeffne-frage', { detail: { frageId: ziel.id } }))
+        nav.navigiereZuFrageneditor(ziel.id)
         break
       case 'pruefung':
-        window.dispatchEvent(new CustomEvent('examlab:oeffne-pruefung', { detail: { pruefungId: ziel.id } }))
-        break
       case 'gruppe':
-        window.dispatchEvent(new CustomEvent('examlab:oeffne-gruppe', { detail: { gruppeId: ziel.id } }))
+        // Composer öffnet sowohl Prüfung als auch Übung (prefix wird aus Pfad abgeleitet)
+        nav.navigiereZuComposer('', ziel.id)
         break
       case 'ort':
         // Nur Info, kein Navigate
         break
     }
-  }, [schliesseEinstellungen])
+  }, [nav, schliesseEinstellungen])
 }
 ```
 
-- [ ] **Step 2:** In den existierenden Page-Komponenten (`LPStartseite.tsx`, Fragensammlung, Prüfungs-Liste) Event-Listener ergänzen, die die jeweilige View öffnen und den Ziel-Datensatz vorwählen. Dies ist eine kleine Ergänzung im bestehenden Routing — Code-Änderung nur dort wo der jeweilige Tab geöffnet werden kann. **Implementation dispatcht zunächst nur das Event; passende Listener werden in Task 21 hinzugefügt**.
-
-- [ ] **Step 3:** Commit.
+- [ ] **Step 2:** Commit.
 
 ```bash
 git add ExamLab/src/components/settings/problemmeldungen/useDeepLink.ts
-git commit -m "ExamLab F1: useDeepLink-Hook dispatcht Custom-Events"
+git commit -m "ExamLab F1: useDeepLink-Hook via useLPNavigation / React Router"
 ```
+
+**Hinweis:** `navigiereZuComposer` leitet das Präfix (`/pruefung` vs. `/uebung`) aus `window.location.pathname` ab. Vom Einstellungen-Panel aus kann der Pfad `/einstellungen` sein — in diesem Fall wird das Default-Präfix `/pruefung` verwendet. Falls das E2E zeigt, dass das falsche Präfix gewählt wird, hier eine kleine Anpassung: vor dem Navigate per `navigate(gruppeTyp === 'uebung' ? '/uebung' : '/pruefung', { replace: true })` → dann `navigiereZuComposer`. Dazu müssten `baueGruppeMetaMap_` und der Payload `typ: 'pruefung'|'uebung'` durchreichen (ist bereits in Task 6 vorgesehen). Fallbehandlung im E2E verifizieren.
 
 ### Task 18: `ProblemmeldungenTab.tsx` (Container)
 
@@ -1018,19 +1111,18 @@ import { useState, useEffect, useCallback } from 'react'
 import type { Problemmeldung } from '../../../types/problemmeldung'
 import type { FilterConfig } from './filterLogik'
 import { filterMeldungen } from './filterLogik'
-import { listeProblemmeldungen, toggleProblemmeldung } from '../../../api/problemmeldungenApi'
+import { listeProblemmeldungen, toggleProblemmeldung } from '../../../services/problemmeldungenApi'
 import ProblemmeldungenFilter from './ProblemmeldungenFilter'
 import ProblemmeldungZeile from './ProblemmeldungZeile'
 import { useDeepLink } from './useDeepLink'
 
 interface Props {
   email: string
-  token: string
   istAdmin: boolean
   onSchliessen: () => void
 }
 
-export default function ProblemmeldungenTab({ email, token, istAdmin, onSchliessen }: Props) {
+export default function ProblemmeldungenTab({ email, istAdmin, onSchliessen }: Props) {
   const [meldungen, setMeldungen] = useState<Problemmeldung[] | null>(null)
   const [fehler, setFehler] = useState<string | null>(null)
   const [filter, setFilter] = useState<FilterConfig>({
@@ -1043,23 +1135,23 @@ export default function ProblemmeldungenTab({ email, token, istAdmin, onSchliess
 
   useEffect(() => {
     let abgebrochen = false
-    listeProblemmeldungen({ email, token })
+    listeProblemmeldungen(email)
       .then(data => { if (!abgebrochen) setMeldungen(data) })
       .catch(e => { if (!abgebrochen) setFehler(String(e?.message || e)) })
     return () => { abgebrochen = true }
-  }, [email, token])
+  }, [email])
 
   const toggleErledigt = useCallback(async (id: string, neuerWert: boolean) => {
     // Optimistisches Update
     setMeldungen(prev => prev ? prev.map(m => m.id === id ? { ...m, erledigt: neuerWert } : m) : prev)
-    const ok = await toggleProblemmeldung({ email, token, id, erledigt: neuerWert })
+    const ok = await toggleProblemmeldung(email, id, neuerWert)
     if (!ok) {
       // Revert bei Fehler
       setMeldungen(prev => prev ? prev.map(m => m.id === id ? { ...m, erledigt: !neuerWert } : m) : prev)
       setFehler('Toggle fehlgeschlagen. Bitte erneut versuchen.')
       setTimeout(() => setFehler(null), 3000)
     }
-  }, [email, token])
+  }, [email])
 
   if (fehler && meldungen === null) {
     return <div className="p-4 text-sm text-red-600 dark:text-red-400">Fehler beim Laden: {fehler}</div>
@@ -1119,11 +1211,11 @@ git commit -m "ExamLab F1: ProblemmeldungenTab Container mit Optimistic-Toggle"
 - [ ] **Step 1:** In `lpUIStore.ts` die `EinstellungenTab`-Union um `'problemmeldungen'` erweitern.
 
 - [ ] **Step 2:** In `EinstellungenPanel.tsx`:
-  - Import `ProblemmeldungenTab` und `listeProblemmeldungen`.
-  - Token aus `authStore` holen (per `useAuthStore(s => s.token)` — vorher prüfen, wie der Token-State heute heisst).
-  - Beim Mount `listeProblemmeldungen` laden, `offeneCount = meldungen.filter(m => !m.erledigt).length`.
-  - Im `tabs`-Array: nach Favoriten einfügen: `{ key: 'problemmeldungen', label: `Problemmeldungen${offeneCount > 0 ? ` (${offeneCount})` : ''}`, sichtbar: true }`.
-  - Im Render: `{tab === 'problemmeldungen' && user?.email && <ProblemmeldungenTab email={user.email} token={token} istAdmin={admin} onSchliessen={onSchliessen} />}`.
+  - Import `ProblemmeldungenTab`, `Problemmeldung`-Type und `listeProblemmeldungen`.
+  - **Token nicht manuell holen** — `postJson` injiziert ihn automatisch.
+  - Beim Mount `listeProblemmeldungen(user.email)` laden. `offeneCount = meldungen.filter(m => !m.erledigt).length`. State in `useState<Problemmeldung[] | null>(null)` halten.
+  - Im `tabs`-Array: nach Favoriten einfügen: `{ key: 'problemmeldungen', label: \`Problemmeldungen\${offeneCount > 0 ? \` (\${offeneCount})\` : ''}\`, sichtbar: true }`.
+  - Im Render: `{tab === 'problemmeldungen' && user?.email && <ProblemmeldungenTab email={user.email} istAdmin={admin} onSchliessen={onSchliessen} />}`.
   - **WICHTIG**: Hook-Order — `useState`/`useEffect` für Meldungen + Count **vor** allen Early-Returns deklarieren (Rule Hooks-vor-Early-Returns aus code-quality.md).
 
 - [ ] **Step 3:** `npx tsc -b` grün.
@@ -1137,26 +1229,13 @@ git add ExamLab/src/store/lpUIStore.ts ExamLab/src/components/settings/Einstellu
 git commit -m "ExamLab F1: Problemmeldungen-Tab in Einstellungen integriert"
 ```
 
-### Task 20: Deep-Link-Listener in Zielseiten
+### Task 20: _(entfernt)_ — Deep-Link via useLPNavigation reicht
 
-**Files:**
-- Modify: `ExamLab/src/components/lp/LPStartseite.tsx` (Event-Listener für `examlab:oeffne-frage`, der Fragensammlung öffnet + Frage vorselektiert — vermutlich via `useUiStore` + Query-Param)
-- Modify: entsprechende Prüfungs-/Gruppen-Start-Komponenten (je nach Pfadtiefe)
+Das bestehende `useLPNavigation`-Hook aus Task 17 nutzt React-Router-URLs direkt:
+- `/fragensammlung/:frageId` → öffnet `FragenEditor` (Route existiert in `Router.tsx`)
+- `/pruefung/:configId` bzw. `/uebung/:configId` → öffnet Composer
 
-Details je nach existierender Routing-Architektur. Minimal-Implementation:
-
-- [ ] **Step 1:** In `LPStartseite.tsx` ein `useEffect` ergänzen, der `window.addEventListener('examlab:oeffne-frage', handler)` registriert. Der Handler setzt den UI-State so, dass die Fragensammlung offen und die Frage vorselektiert ist.
-- [ ] **Step 2:** Analog für `examlab:oeffne-pruefung` → Prüfungs-Liste öffnen + auf Prüfung scrollen/selektieren.
-- [ ] **Step 3:** Analog für `examlab:oeffne-gruppe` → Gruppen-Settings öffnen.
-
-Da die Routing-Architektur des Projekts nicht trivial ist, ist dies der riskanteste Task. Vorgehen: **Exploration erst** (Grep nach bestehenden Custom-Events oder router-ähnlichen Hooks), dann Minimalversion.
-
-- [ ] **Step 4:** Commit.
-
-```bash
-git add ExamLab/src/components/lp/LPStartseite.tsx
-git commit -m "ExamLab F1: Deep-Link-Listener für examlab:oeffne-frage/pruefung/gruppe"
-```
+Keine zusätzlichen Listener in Zielseiten nötig. Fällt weg — Plan hat jetzt 24 Tasks statt 25.
 
 ---
 
@@ -1177,8 +1256,17 @@ git commit -m "ExamLab F1: Deep-Link-Listener für examlab:oeffne-frage/pruefung
 
 ### Task 23: Staging-Deploy
 
-- [ ] **Step 1:** `git push -u origin feature/problemmeldungen-dashboard:preview --force-with-lease`
-  - (Beachte Memory-Regel Preview-Force-Push: `git log preview ^feature/problemmeldungen-dashboard` prüfen — wenn preview Work-in-Progress hat, stoppen.)
+- [ ] **Step 0 (Pre-Check, Memory-Regel Preview-Force-Push):**
+
+```bash
+cd "10 Github/GYM-WR-DUY"
+git fetch origin preview
+git log origin/preview ^feature/problemmeldungen-dashboard --oneline | head -20
+```
+
+Wenn das Ergebnis **nicht leer** ist → STOP: `origin/preview` hat Work-in-Progress, die der Force-Push überschreiben würde. Erst klären mit User, was mit diesen Commits passiert (ggf. in Feature-Branch mergen oder als neuer Test-Branch pushen).
+
+- [ ] **Step 1:** Wenn Step 0 leer: `git push -u origin feature/problemmeldungen-dashboard:preview --force-with-lease`
 - [ ] **Step 2:** GitHub-Actions-Build abwarten, Staging-URL laden.
 - [ ] **Step 3:** User informiert + Chrome-in-Chrome-Tab-Gruppe vorbereiten.
 
@@ -1219,9 +1307,10 @@ git push
 
 | Test | Ebene | Datei |
 |------|-------|-------|
-| API-Client unwrap | Vitest-Unit | `src/api/problemmeldungenApi.test.ts` |
-| Filter-Logik | Vitest-Unit | `src/components/settings/problemmeldungen/filterLogik.test.ts` |
-| Deep-Link-Priorität | Vitest-Unit | `src/components/settings/problemmeldungen/filterLogik.test.ts` |
+| API-Client unwrap (success/failure/null) | Vitest-Unit | `src/services/problemmeldungenApi.test.ts` |
+| Filter-Logik (Status/Typ/nurMeine) | Vitest-Unit | `src/components/settings/problemmeldungen/filterLogik.test.ts` |
+| Deep-Link-Priorität + Pool-Frage + leer | Vitest-Unit | `src/components/settings/problemmeldungen/filterLogik.test.ts` |
+| ProblemmeldungZeile Legacy-Row + Rechte + Toggle | Vitest-RTL | `src/components/settings/problemmeldungen/ProblemmeldungZeile.test.tsx` |
 | Backend-Smoke | GAS-Editor | `testProblemmeldungen` (manuell) |
 | E2E | Chrome-in-Chrome | Staging-Tab-Gruppe |
 
@@ -1237,9 +1326,10 @@ git push
 
 ## Risiken / offene Unbekannte
 
-- **Task 20 (Deep-Link-Listener):** Routing-Architektur noch nicht verifiziert. Möglicherweise nutzt das Projekt bereits `useUiStore` für Tab-Navigation, was eine sauberere Lösung wäre als Custom-Events. Exploration nötig zu Implementation-Beginn.
-- **`authStore`-Token-Naming:** Muss vor Task 19 verifiziert werden (`s.token` vs. `s.sessionToken`).
+- **Deep-Link Präfix-Ableitung (Task 17):** `useLPNavigation.navigiereZuComposer` leitet `/pruefung` vs. `/uebung` aus `window.location.pathname` ab. Vom Einstellungen-Panel ist der Pfad `/einstellungen`, dann wird `/pruefung` (Fallback) gewählt. Bei Übungs-Meldungen kann das falsch sein. Falls E2E das zeigt, erweitert man `baueGruppeMetaMap_`-Payload um `typ` und routed clientseitig explizit vorab.
+- **Token wird automatisch injiziert:** `postJson` in `apiClient.ts` liest `sessionToken` aus localStorage (siehe apiClient.ts:63). Kein manuelles Parameter-Passing nötig. Das vereinfacht Task 13-18 gegenüber Reviewer-V1-Annahme.
 - **`FRAGENBANK_ID` vs. Pool-Fragen:** `baueFrageMetaMap_` iteriert über Fragenbank-Tabs; Pool-Fragen leben evtl. in separatem Sheet. Falls eine Meldung auf eine Pool-Frage-ID zeigt, die nicht in Fragenbank ist, → `frageMeta = null` → Meldung für LP nicht sichtbar, Admin sieht sie ohne Deep-Link. Prüfen beim E2E.
+- **`listeKIFeedbacks`-Pattern-Divergenz:** Existierende LP-Endpoints wie `listeKIFeedbacks` nutzen nur `istZugelasseneLP(email)` ohne `lernplattformValidiereToken_`. Unser neuer Endpoint verwendet beides — stärker, aber inkonsistent mit Legacy. Ist bewusste Verschärfung, keine Regression. Eventuell als separater Härtungs-Pass später die alten Endpoints angleichen.
 
 ## Referenzen
 
