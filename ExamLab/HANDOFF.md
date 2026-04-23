@@ -6,27 +6,42 @@
 
 ---
 
-## Für die nächste Session (S138+)
+## Für die nächste Session (S139+)
 
-### Aktueller Stand (Ende S137, 23.04.2026) — UI-Bundle auf `fix/s137-ui-autokorrektur-bundle` (8/9 Tickets fertig, auf `origin/preview` live)
+### Aktueller Stand (Ende S138, 23.04.2026) — S137 UI/Autokorrektur-Bundle auf `main` gemergt
 
-**Branch:** `fix/s137-ui-autokorrektur-bundle` (ausgehend von `main`), 7 Commits, **Staging-deployed** (`origin/preview`), **nicht auf main gemergt**.
+**Branch `fix/s137-ui-autokorrektur-bundle` nach `main` gemergt + gelöscht.** Staging-E2E komplett durchgeführt, alle 8 Tickets + KI-Synonyme-Prompt verifiziert. Ticket 2 (Übungsstart-Latenz) bleibt offen → Bundle E.
 
-**✅ Apps-Script deployed (S137 Ende, User-Task erledigt):** Frontend + Backend synchron. Staging-E2E offen.
+### S138 E2E-Verifikation (alle Tickets grün)
 
-### Staging-E2E Test-Plan (S138)
+| # | Ticket | Evidenz |
+|---|--------|---------|
+| 1 | LP-Einstellungen Übungen-Tab Kurs-Dropdown | Option „Test" direkt nach Tab-Wechsel befüllt, ohne Vorab-Klick auf Header-Üben |
+| 3/4 | SuS-Themenkacheln border-l-4 + „Aktuell"-Badge | VWL orange, Recht grün, BWL blau; aktuelle mit zusätzlichem unteren Rand |
+| 5 | Menü „Problem melden" ⚠ (LP + SuS) | Icon ⚠, Label einheitlich, FeedbackModal „Rückmeldung geben" öffnet korrekt |
+| 6 | SuS-Üben-Footer „Problem melden" | Rechts neben „Als unsicher markieren", Modal mit frageId-Kontext |
+| 7 | SuS-Hilfe-Sidebar resizable + Titel | Drag 480→714px, localStorage-persistent nach Reload |
+| 8a/b/d | Lückentext Whitespace-Normalisierung + case-insensitive default | 10/10 synthetische Tests grün (mehrfach-Leerzeichen, case-insensitive, caseSensitive=true respektiert, trim, Combos) |
+| 8c | Dreistufige Labels | Live gesehen: „LEIDER FALSCH — MUSTERLÖSUNG" (0/1) + „TEILWEISE RICHTIG (1/2) — MUSTERLÖSUNG" |
+| 10 | KI-Synonyme `generiereLuecken`-Prompt | Backend-Prompt [apps-script-code.js:5421-5438](apps-script-code.js:5421) verlangt 2-3 Alternativen (Synonyme, Schweizer/DE, Umlaut-Varianten, Kurz/Langform) |
 
-1. **Lückentext** — SuS-Antwort mit doppeltem Leerzeichen („München  buchsee") → soll korrekt matchen. Zusätzlich: klein-/gross-Schreibung („hofwil" statt „Hofwil") → insensitiv default, korrekt.
-2. **Bildbeschriftung** — Case-Mismatch-Test wie oben, default case-insensitive.
-3. **Dreistufige Labels** — Multi-Lücken-Frage teilweise beantworten → Label „Teilweise richtig (x/n) — Musterlösung". Voll falsch → „Leider falsch — Musterlösung". 100% → „Musterlösung".
-4. **LP KI-Assistent** — „Lücken generieren" liefert mindestens 2-3 Alternativen pro Lücke (ausser bei Zahlen/Gesetzesartikeln).
-5. **Menü „Problem melden"** — LP + SuS Rollen, Icon ⚠ sichtbar, Klick öffnet FeedbackModal „Rückmeldung geben".
-6. **SuS-Üben-Footer** — „⚠️ Problem melden" rechts neben „Als unsicher markieren", öffnet Modal mit Frage-Kontext.
-7. **SuS-Themenkacheln** — farbiger linker Rand, Punkt weg. Aktive Themen zusätzlich unterer Rand + „Aktuell"-Badge.
-8. **SuS-Hilfe-Sidebar** (Menü → Hilfe) — resizable per Drag, Titel „Hilfe" sichtbar (nicht unter Headbar), localStorage speichert Breite.
-9. **LP-Einstellungen Üben-Tab** — Kurs-Dropdown gefüllt OHNE vorher den Üben-Tab geklickt zu haben.
+### S138 Security-Cleanup
 
-Bei Freigabe: Merge nach `main`, Branch + preview aufräumen.
+GitHub Personal Access Token war im `git remote` im Klartext gespeichert. Behoben:
+1. Token auf GitHub revoked (User)
+2. SSH-Key generiert + auf GitHub hinzugefügt (User)
+3. Remote auf `git@github.com:durandbourjate/GYM-WR-DUY.git` umgestellt
+
+Kein Token mehr in `.git/config`. Alter Token in Backups ist durch Revoke wertlos.
+
+### Offen für S139+
+
+- **Bundle E (Backend-Perf)**: Ticket 2 — Übungsstart-Latenz durch serielle `lernplattformLadeLoesungen`-Schleife (Regression S122 Commit `d6555bc`). Lösung: Batch-Cache + `Promise.all()` + Pre-Warm beim Session-Init. Eigenes Backend-Bundle, separater Deploy.
+- **C9 Phase 4 laufende User-Aufgaben**: Stichprobenprüfung der 2412 migrierten Fragen im Editor pro Fachbereich; Freigaben `pruefungstauglich=true`; lokale Archiv-Dateien extern sichern/löschen.
+
+### Vorgänger-Stand (Ende S137, 23.04.2026)
+
+**8/9 Tickets auf `fix/s137-ui-autokorrektur-bundle` staged, Apps-Script deployed.** Details vor Merge siehe Commits `2ae83a9`/`324c78b`/`56a39a4`/`7a4ce51`/`e324474`/`b8e1c8e`/`c31b30c`.
 
 **User hat 9 Tickets übergeben (S137):**
 1. ✅ **ERLEDIGT (Commit `e324474`)** Einstellungen Übungen: `AdminSettings` ruft `ladeGruppen(email)` beim Mount auf.
