@@ -52,13 +52,21 @@ export default function DragDropBildEditor({ bildUrl, setBildUrl, zielzonen, set
     }
   }
 
+  // ESC bricht aktuelles Zeichnen ab. Delete/Backspace löscht selektierte Zone.
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (e.key === 'Escape') { setErsteEcke(null); setPolyPunkte([]) }
+      if ((e.key === 'Delete' || e.key === 'Backspace') && selectedId) {
+        const target = e.target as HTMLElement | null
+        if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) return
+        e.preventDefault()
+        setZielzonen(prev => prev.filter(z => z.id !== selectedId))
+        setSelectedId(null)
+      }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [])
+  }, [selectedId, setZielzonen])
 
   function polygonAbschliessen() {
     if (polyPunkte.length < 3) { setPolyPunkte([]); return }
@@ -251,9 +259,9 @@ export default function DragDropBildEditor({ bildUrl, setBildUrl, zielzonen, set
           <div>
             <p className="text-xs text-slate-500 dark:text-slate-400 mb-2">
               {modus === 'rechteck'
-                ? (ersteEcke ? 'Klicke auf die zweite Ecke des Rechtecks' : 'Klicke auf zwei Ecken — Zone ziehen zum Verschieben.')
+                ? (ersteEcke ? 'Klicke auf die zweite Ecke des Rechtecks' : 'Klicke auf zwei Ecken — Zone ziehen zum Verschieben. Delete/Backspace löscht markierte Zone.')
                 : (polyPunkte.length === 0
-                    ? 'Klicke mehrere Punkte — Doppelklick oder Klick auf ersten Punkt schliesst.'
+                    ? 'Klicke mehrere Punkte — Doppelklick oder Klick auf ersten Punkt schliesst. Delete/Backspace löscht markierte Zone.'
                     : `${polyPunkte.length} Punkt${polyPunkte.length !== 1 ? 'e' : ''} gesetzt.`)
               }
             </p>
