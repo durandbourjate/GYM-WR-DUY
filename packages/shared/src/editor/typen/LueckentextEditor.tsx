@@ -148,7 +148,7 @@ export default function LueckentextEditor({ textMitLuecken, setTextMitLuecken, l
             </span>
           </div>
           <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">
-            Korrekte Antworten pro Lücke
+            Antworten pro Lücke
           </label>
           {luecken.map((luecke, lueckenIndex) => {
             // Defensive: korrekteAntworten kann bei alten/unvollständigen Pool-Fragen undefined sein
@@ -160,15 +160,19 @@ export default function LueckentextEditor({ textMitLuecken, setTextMitLuecken, l
                 ? korrekteAntw.some((a) => luecke.dropdownOptionen!.includes(a))
                 : true
             return (
-              <div key={luecke.id} className="space-y-1.5">
-                <div
-                  data-modus-feld="freitext"
-                  className={lueckentextModus === 'dropdown' ? 'opacity-50' : ''}
-                >
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-slate-500 dark:text-slate-400 font-mono w-8 shrink-0" title={`ID: ${luecke.id}`}>
-                      {`{{${lueckenIndex + 1}}}`}
-                    </span>
+              <div key={luecke.id} className="flex items-start gap-2 pt-1 border-t border-slate-200 dark:border-slate-700 first:border-t-0 first:pt-0">
+                <span className="text-xs text-slate-500 dark:text-slate-400 font-mono w-10 shrink-0 pt-2" title={`ID: ${luecke.id}`}>
+                  {`{{${lueckenIndex + 1}}}`}
+                </span>
+                <div className="flex-1 space-y-1.5">
+                  <div
+                    data-modus-feld="freitext"
+                    className={lueckentextModus === 'dropdown' ? 'opacity-50' : ''}
+                  >
+                    <label className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300 mb-0.5">
+                      <span className="inline-block px-1.5 py-0.5 rounded bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 normal-case font-medium text-[10px]">Freitext</span>
+                      Korrekte Antworten (Hauptantwort + Synonyme)
+                    </label>
                     <input
                       type="text"
                       value={korrekteAntw.join(', ')}
@@ -181,25 +185,27 @@ export default function LueckentextEditor({ textMitLuecken, setTextMitLuecken, l
                         setLuecken(neu)
                       }}
                       placeholder="Korrekte Antworten (Komma-getrennt, z.B. Antwort1, Antwort2)"
-                      className={`input-field flex-1 ${hatKorrekteAntwort ? '' : 'border-red-400 dark:border-red-500 bg-red-50 dark:bg-red-900/10'}`}
+                      className={`input-field w-full ${hatKorrekteAntwort ? '' : 'border-red-400 dark:border-red-500 bg-red-50 dark:bg-red-900/10'}`}
                     />
+                    {lueckentextModus === 'dropdown' && (
+                      <p className="text-xs italic text-slate-500 dark:text-slate-400">
+                        — inaktiv im Dropdown-Modus
+                      </p>
+                    )}
+                    {!hatKorrekteAntwort && (
+                      <p className="text-xs text-red-600 dark:text-red-400">
+                        Keine korrekte Antwort hinterlegt — diese Lücke wird bei SuS-Antworten immer als falsch bewertet.
+                      </p>
+                    )}
                   </div>
-                  {lueckentextModus === 'dropdown' && (
-                    <p className="pl-10 text-xs italic text-slate-500 dark:text-slate-400">
-                      — inaktiv im Dropdown-Modus
-                    </p>
-                  )}
-                  {!hatKorrekteAntwort && (
-                    <p className="pl-10 text-xs text-red-600 dark:text-red-400">
-                      Keine korrekte Antwort hinterlegt — diese Lücke wird bei SuS-Antworten immer als falsch bewertet.
-                    </p>
-                  )}
-                </div>
-                <div
-                  data-modus-feld="dropdown"
-                  className={lueckentextModus === 'freitext' ? 'opacity-50' : ''}
-                >
-                  <div className="flex items-start gap-2 pl-10">
+                  <div
+                    data-modus-feld="dropdown"
+                    className={lueckentextModus === 'freitext' ? 'opacity-50' : ''}
+                  >
+                    <label className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300 mb-0.5">
+                      <span className="inline-block px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 normal-case font-medium text-[10px]">Dropdown</span>
+                      Auswahl-Optionen (1 Korrekte + 4 Distraktoren)
+                    </label>
                     <input
                       type="text"
                       value={dropdownText}
@@ -213,19 +219,19 @@ export default function LueckentextEditor({ textMitLuecken, setTextMitLuecken, l
                         setLuecken(neu)
                       }}
                       placeholder="Dropdown-Optionen (1 Korrekte + 4 Distraktoren, Komma-getrennt)"
-                      className="input-field flex-1 text-xs"
+                      className="input-field w-full text-xs"
                     />
+                    {lueckentextModus === 'freitext' && (
+                      <p className="text-xs italic text-slate-500 dark:text-slate-400">
+                        — inaktiv im Freitext-Modus
+                      </p>
+                    )}
+                    {luecke.dropdownOptionen && luecke.dropdownOptionen.length > 0 && !korrekteImDropdown && (
+                      <p className="text-xs text-amber-600 dark:text-amber-400">
+                        Korrekte Antwort nicht in Dropdown-Optionen enthalten
+                      </p>
+                    )}
                   </div>
-                  {lueckentextModus === 'freitext' && (
-                    <p className="pl-10 text-xs italic text-slate-500 dark:text-slate-400">
-                      — inaktiv im Freitext-Modus
-                    </p>
-                  )}
-                  {luecke.dropdownOptionen && luecke.dropdownOptionen.length > 0 && !korrekteImDropdown && (
-                    <p className="pl-10 text-xs text-amber-600 dark:text-amber-400">
-                      Korrekte Antwort nicht in Dropdown-Optionen enthalten
-                    </p>
-                  )}
                 </div>
               </div>
             )
