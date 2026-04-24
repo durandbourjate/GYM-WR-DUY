@@ -59,14 +59,22 @@ export default function HotspotEditor({ bildUrl, setBildUrl, bereiche, setBereic
     }
   }
 
-  // ESC bricht aktuelles Zeichnen ab
+  // ESC bricht aktuelles Zeichnen ab. Delete/Backspace löscht selektierten Bereich.
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (e.key === 'Escape') { setErsteEcke(null); setPolyPunkte([]) }
+      if ((e.key === 'Delete' || e.key === 'Backspace') && selectedId) {
+        // Nicht löschen, wenn der Fokus in einem Eingabefeld ist.
+        const target = e.target as HTMLElement | null
+        if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) return
+        e.preventDefault()
+        setBereiche(prev => prev.filter(b => b.id !== selectedId))
+        setSelectedId(null)
+      }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [])
+  }, [selectedId, setBereiche])
 
   function polygonAbschliessen() {
     if (polyPunkte.length < 3) { setPolyPunkte([]); return }
@@ -86,6 +94,10 @@ export default function HotspotEditor({ bildUrl, setBildUrl, bereiche, setBereic
   const handleBildKlick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     // Während aktivem Drag keine Klicks
     if (drag) return
+    // Klicks auf bestehende Zonen (SVG-Elemente im ZonenOverlay) nicht als
+    // Start-Klick für eine neue Zone interpretieren — handleZonePointerDown
+    // hat das bereits gehandhabt, der bubbling click würde sonst zur ersten Ecke.
+    if (e.target instanceof SVGElement) return
     const p = bildKoordinaten(e)
     if (!p) return
 
@@ -269,9 +281,9 @@ export default function HotspotEditor({ bildUrl, setBildUrl, bereiche, setBereic
           <div>
             <p className="text-sm text-slate-600 dark:text-slate-300 mb-2">
               {modus === 'rechteck'
-                ? (ersteEcke ? 'Klicke auf die zweite Ecke des Rechtecks' : 'Klicke auf zwei Ecken — Zone ziehen zum Verschieben, Ecke ziehen zum Resize')
+                ? (ersteEcke ? 'Klicke auf die zweite Ecke des Rechtecks' : 'Klicke auf zwei Ecken — Zone ziehen zum Verschieben, Ecke ziehen zum Resize. Delete/Backspace löscht markierte Zone.')
                 : (polyPunkte.length === 0
-                    ? 'Klicke mehrere Punkte — Doppelklick oder Klick auf den ersten Punkt schliesst das Polygon. ESC bricht ab.'
+                    ? 'Klicke mehrere Punkte — Doppelklick oder Klick auf den ersten Punkt schliesst das Polygon. ESC bricht ab. Delete/Backspace löscht markierte Zone.'
                     : `${polyPunkte.length} Punkt${polyPunkte.length !== 1 ? 'e' : ''} gesetzt. Doppelklick oder Klick auf ersten Punkt schliesst.`)
               }
             </p>
