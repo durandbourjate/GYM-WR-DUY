@@ -6,9 +6,57 @@
 
 ---
 
-## Für die nächste Session (S142+)
+## Für die nächste Session (S143+)
 
-### Aktueller Stand (Ende S141, 24.04.2026) — Altlasten-Bundle auf `main` gemergt
+### Aktueller Stand (Ende S142, 24.04.2026) — Phase 1-6 Lückentext-Modus + Apps-Script-Deploy + Migration
+
+**Branch `fix/lueckentext-editor`, 15 Commits seit `a3375f7` (Plan-Commit). Nicht auf main gemergt — wartet auf Phase 7 (KI-Batch) + Phase 8 (E2E + Merge).**
+
+**Plan-Dokument:** [`ExamLab/docs/superpowers/plans/2026-04-24-lueckentext-modus-migration.md`](docs/superpowers/plans/2026-04-24-lueckentext-modus-migration.md) — 22 Tasks in 8 Phasen. Phasen 1-6 komplett, Phase 7 ausstehend.
+
+**Was komplett ist:**
+1. **Phase 1** (Datenmodell): `LueckentextFrage.lueckentextModus?: 'freitext' | 'dropdown'` + Normalizer-Default (Heuristik: explizit > dropdownOptionen non-empty > freitext). Commit `5be371c`.
+2. **Phase 2** (Renderer): `LueckentextFrage.tsx` respektiert Modus statt alter `dropdownOptionen`-Heuristik. Korrektur ist modus-agnostisch (verifiziert mit Test). 3+1 Tests. Commits `0aba4ca` + `501eb5e`.
+3. **Phase 3** (Editor): Per-Frage-Toggle (Freitext/Dropdown) im LueckentextEditor, beide Felder sichtbar, inaktives gedimmt mit Label. `fragenFactory` defaulted `freitext`. Tote `ExamLab/src/utils/fragenFactory.ts` entfernt (S129 Lehre). 5 Tests. Commits `ff94a55` + `7ed7a9b` + `8315807`.
+4. **Phase 4** (Apps-Script Backend): `bereinigeFrageFuerSuS_` bewahrt Modus (Blacklist-Pattern bestätigt) + Test-Shim. Parser R/W an 3 Stellen (`parseFrage`, `parseFrageKanonisch_`, `getTypDaten`) + DRY-Helper `ermittleLueckentextModus_`. One-shot Migrator `migriereLueckentextModus` mit batch-setValues. Commits `2c92343` + `fa2652b` + `a638965` + `769093e` (Fixes DRY/Admin-Guard/Batch-Write) + `48f96b3` (Session-Scope-Fix).
+5. **Phase 5** (Endpoint): `batchUpdateLueckentextMigration` (Admin-only, partial update, setzt `pruefungstauglich=''`, LockService-geschützt). Test-Shim mit Restore-Logik für Test-Frage. Commits `07cc8f3` + `9928282` (Fixes: Kontrakt-Klärung + Test-Shim-Restore + Empty-Array-Semantik + Concurrency-JSDoc).
+6. **Phase 6** (Settings-Tab): Neuer Tab "Fragensammlung" in LP-Einstellungen, erste Funktion: Bulk-Toggle (Admin-only) zum Umschalten aller 253 Lückentext-Fragen zwischen Freitext/Dropdown. Frontend (Tab + Toggle + API-Wrapper mit `unwrap<T>`) + Backend (`bulkSetzeLueckentextModus_` mit batch-setValues + Cache-Invalidation + LockService). 3 Tests. Commits `5fa0a90` + `fbdd0a4` (LockService-Fix).
+
+**Test-Stand:** 680/680 vitest, tsc -b clean, build success.
+
+**Apps-Script Deploy & User-Tests (24.04.2026):**
+- ✅ `testBereinigeLueckentextModus` → lueckentextModus bleibt nach bereinige erhalten
+- ✅ `testC9BatchUpdateLueckentextMigration` → Endpoint + Restore-Logik funktionieren (Test-Frage `da05a438-…` sauber wiederhergestellt inkl. `pruefungstauglich`/`geaendertAm`/`poolContentHash`)
+- ✅ `testBulkSetzeLueckentextModus` → 253 Fragen auf `freitext` gesetzt, Idempotenz-Check `alleBereits=true`
+- ✅ `migriereLueckentextModus` → `Total: 253 · Neu gesetzt: 0 · Bereits gesetzt: 253` (alle via Bulk-Test schon migriert)
+
+**Status der 253 Lückentext-Fragen:** alle haben `lueckentextModus='freitext'`, alle (bis auf 2 Recht-Fragen) mit leeren `korrekteAntworten`. Bereit für KI-Batch-Migration.
+
+### Offen für S143+
+
+**Phase 7 (KI-Batch-Migration):** 5 Tasks noch nicht angefangen (Rate-Limit Ende S142).
+- Task 15: `dump.mjs` (nutzt bestehenden C9-Endpoint `holeAlleFragenFuerMigration`)
+- Task 16: `prompt-template.md` (System-Prompt für Claude: korrekteAntworten mit Synonymen + exakt 5 dropdownOptionen mit 1 Korrekte + 4 Distraktoren, KEINE Synonyme im Dropdown)
+- Task 17: `pick-stichprobe.mjs` + `review-generator.mjs` (Stichprobe 15 Fragen = 5/fachbereich, Markdown-Review)
+- Task 18: `upload.mjs` (analog C9 — per-fachbereich POST + adaptive-split on error) + `package.json` + `README.md` + `SESSION-PROTOCOL.md`
+- Target-Verzeichnis: `ExamLab/scripts/migrate-lueckentext-antworten/`
+- Template: `ExamLab/scripts/migrate-teilerklaerungen/` (C9 Phase 4)
+
+**Phase 7 Task 19 (User-Run):**
+1. Google-Sheets-Backup
+2. `node dump.mjs` → 253 Fragen
+3. `node pick-stichprobe.mjs` → 15 Fragen
+4. Neue Claude-Code-Session: `prompt-template.md` + `stichprobe.json` → Response speichern als `stichprobe-response.json`
+5. `node review-generator.mjs` → Markdown, User reviewt + gibt frei
+6. Nach Freigabe: Full-Run in Batches à ~30-50 analog
+7. Uploads pro Batch
+8. Final: `zaehleLeereLueckentextAntworten` erneut → erwartet 0/253
+
+**Phase 8 (E2E + Merge):** Test-Plan + Browser-Test mit echten Logins + HANDOFF + Merge zu main.
+
+---
+
+### Vorgänger-Stand (Ende S141, 24.04.2026) — Altlasten-Bundle auf `main` gemergt
 
 **Branch `fix/altlasten-bundle` nach `main` gemergt + gelöscht.** 5 Commits Cleanup-Arbeit, Staging-E2E mit echten Logins bestätigt.
 
