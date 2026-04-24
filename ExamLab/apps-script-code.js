@@ -1202,6 +1202,8 @@ function doPost(e) {
       return batchUpdateFragenMigrationEndpoint(body);
     case 'batchUpdateLueckentextMigration':
       return batchUpdateLueckentextMigrationEndpoint(body);
+    case 'bulkSetzeLueckentextModus':
+      return bulkSetzeLueckentextModusEndpoint(body);
     case 'loescheFrage':
       return loescheFrage(body);
     case 'loescheAllePoolFragen':
@@ -11882,6 +11884,151 @@ function testC9BatchUpdateLueckentextMigration_() {
   Logger.log('✓ Restore: pruefungstauglich=' + JSON.stringify(origPruefungstauglich) + ', geaendertAm=' + JSON.stringify(origGeaendertAm) + ', poolContentHash wiederhergestellt.');
 
   Logger.log('✓ batchUpdateLueckentextMigration-Test bestanden.');
+}
+
+/**
+ * Lückentext-Phase-6 Task 14 — Bulk-Toggle-Endpoint (Admin-only).
+ *
+ * Setzt `lueckentextModus` für ALLE Lückentext-Fragen in allen 4 Fachbereichen
+ * (VWL, BWL, Recht, Informatik) in einem Rutsch. Idempotent — skippt Fragen
+ * die bereits im Ziel-Modus sind (werden nicht neu geschrieben). Reversibel.
+ *
+ * Unterschied zu batchUpdateLueckentextMigration:
+ *   - kein KI-generierter Content, nur ein Default-Mode-Flag
+ *   - pruefungstauglich / geaendertAm / poolContentHash werden NICHT zurückgesetzt
+ *     (keine inhaltliche Änderung — nur UI-Rendering-Unterschied)
+ *
+ * Request-Body: {
+ *   action: 'bulkSetzeLueckentextModus',
+ *   email: '<admin-lp>',
+ *   modus: 'freitext' | 'dropdown'
+ * }
+ *
+ * Response: { success: true, data: { total, geaendert, alleBereits } }
+ */
+function bulkSetzeLueckentextModusEndpoint(body) {
+  try {
+    var email = body.email;
+    if (!email || !istZugelasseneLP(email)) {
+      return jsonResponse({ error: 'Nicht autorisiert' });
+    }
+    var lpInfo = getLPInfo(email);
+    if (!lpInfo || lpInfo.rolle !== 'admin') {
+      return jsonResponse({ error: 'Admin-only' });
+    }
+    var data = bulkSetzeLueckentextModus_(body);
+    return jsonResponse({ success: true, data: data });
+  } catch (error) {
+    return jsonResponse({ error: String(error && error.message || error) });
+  }
+}
+
+/**
+ * Helper: Setzt lueckentextModus für ALLE Lückentext-Fragen in allen Tabs.
+ * Idempotent — skippt Fragen die bereits im Ziel-Modus sind.
+ *
+ * Nutzt batch-setValues (1 Write pro Tab statt 1 Write pro Row) zur
+ * Latenz-Minimierung. Bei ~253 Fragen über 4 Tabs ist das ein Unterschied
+ * zwischen ~5s und ~5min.
+ *
+ * body.modus: 'freitext' | 'dropdown'
+ *
+ * @returns { total, geaendert, alleBereits }
+ */
+function bulkSetzeLueckentextModus_(body) {
+  var modus = body && body.modus;
+  if (modus !== 'freitext' && modus !== 'dropdown') {
+    throw new Error('Ungültiger Modus: ' + modus);
+  }
+  var tabs = ['VWL', 'BWL', 'Recht', 'Informatik'];
+  var fragenbank = SpreadsheetApp.openById(FRAGENBANK_ID);
+  var total = 0;
+  var geaendert = 0;
+
+  for (var t = 0; t < tabs.length; t++) {
+    var sheet = fragenbank.getSheetByName(tabs[t]);
+    if (!sheet) continue;
+    var lastCol = sheet.getLastColumn();
+    var lastRow = sheet.getLastRow();
+    if (lastCol === 0 || lastRow < 2) continue;
+    var headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
+    var typCol = headers.indexOf('typ');
+    var typDatenCol = headers.indexOf('typDaten');
+    var jsonCol = headers.indexOf('json');
+    var datenCol = headers.indexOf('daten');
+    if (typCol < 0) continue;
+    // Write-Ziel: typDaten bevorzugt (parseFrage liest Lückentext primär daraus),
+    // sonst json, sonst daten. Spiegel-Spalten werden ebenfalls aktualisiert.
+    var writeCol = typDatenCol >= 0 ? typDatenCol : (jsonCol >= 0 ? jsonCol : datenCol);
+    if (writeCol < 0) continue;
+
+    var alleDaten = sheet.getRange(2, 1, lastRow - 1, lastCol).getValues();
+    var tabChanged = false;
+
+    for (var i = 0; i < alleDaten.length; i++) {
+      if (String(alleDaten[i][typCol] || '') !== 'lueckentext') continue;
+      total++;
+      try {
+        var typDaten = JSON.parse(alleDaten[i][writeCol] || '{}');
+        if (typDaten.lueckentextModus === modus) continue; // idempotent skip
+        typDaten.lueckentextModus = modus;
+        var newJson = JSON.stringify(typDaten);
+        alleDaten[i][writeCol] = newJson;
+        if (jsonCol >= 0 && jsonCol !== writeCol) alleDaten[i][jsonCol] = newJson;
+        if (datenCol >= 0 && datenCol !== writeCol) alleDaten[i][datenCol] = newJson;
+        geaendert++;
+        tabChanged = true;
+      } catch (e) {
+        // Row skip — defektes JSON soll nicht den Rest blockieren
+      }
+    }
+
+    if (tabChanged) {
+      sheet.getRange(2, 1, alleDaten.length, lastCol).setValues(alleDaten);
+    }
+  }
+
+  // Cache invalidieren, damit das Frontend beim nächsten Read den neuen Modus sieht
+  try { cacheInvalidieren_(); } catch (e) { /* ignore */ }
+
+  return {
+    total: total,
+    geaendert: geaendert,
+    alleBereits: geaendert === 0,
+  };
+}
+
+/**
+ * Public-Wrapper für testBulkSetzeLueckentextModus_ — erscheint im GAS-Editor-Dropdown.
+ */
+function testBulkSetzeLueckentextModus() {
+  return testBulkSetzeLueckentextModus_();
+}
+
+/**
+ * Smoke-Test für bulkSetzeLueckentextModus_. Liest aktuellen Modus-Zustand der
+ * ersten Lückentext-Frage, führt einen Bulk-Call aus, verifiziert success + total
+ * und setzt (falls nötig) den Original-Modus via zweitem Bulk-Call zurück.
+ *
+ * ⚠️ Kann je nach Ausgangslage der Fragensammlung bis zu ~253 Fragen neu schreiben.
+ */
+function testBulkSetzeLueckentextModus_() {
+  function assert_(cond, msg) {
+    if (!cond) throw new Error('Assertion fehlgeschlagen: ' + msg);
+  }
+
+  var r = bulkSetzeLueckentextModus_({ modus: 'freitext' });
+  assert_(typeof r.total === 'number', 'total muss Zahl sein');
+  assert_(typeof r.geaendert === 'number', 'geaendert muss Zahl sein');
+  assert_(typeof r.alleBereits === 'boolean', 'alleBereits muss Boolean sein');
+  assert_(r.geaendert <= r.total, 'geaendert darf nicht grösser sein als total');
+  Logger.log('Bulk-Freitext-Test: ' + JSON.stringify(r));
+
+  var r2 = bulkSetzeLueckentextModus_({ modus: 'freitext' });
+  assert_(r2.alleBereits === true, 'Zweiter Call mit selbem Modus muss idempotent sein (alleBereits=true), war: ' + JSON.stringify(r2));
+  Logger.log('Idempotenz-Check: ' + JSON.stringify(r2));
+
+  Logger.log('✓ bulkSetzeLueckentextModus-Test bestanden.');
 }
 
 /**
