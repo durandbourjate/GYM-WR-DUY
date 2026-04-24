@@ -11564,7 +11564,17 @@ function testC9BatchUpdateFragenMigration_() {
  *   ]
  * }
  *
- * Response: { success, aktualisiert, nichtGefunden: [ids] }
+ * Response: { success, fachbereich, aktualisiert, nichtGefunden: [ids], keineLuecken: [ids], falscherTyp: [ids] }
+ *
+ * @note MIGRATIONS-FENSTER-PFLICHT: Dieser Endpoint liest via getValues() das
+ *       komplette Sheet in den Speicher, mutiert die Row-Kopien und schreibt
+ *       am Ende alles via setValues() zurueck. Laeuft parallel dazu ein
+ *       speichereFrage-Call eines LP, wird dessen Aenderung silent ueberschrieben
+ *       (Last-Writer-Wins auf unserer Seite). Darum DARF dieser Endpoint nur
+ *       waehrend einem angekuendigten Migrations-Fenster laufen — der Admin
+ *       muss vorher sicherstellen, dass keine LP/SuS gleichzeitig editieren
+ *       (Status bekannt geben, kurze Fragenbank-Freeze). Phase 6 kann das
+ *       mit Row-Level-Updates (statt Whole-Sheet-Snapshot) entschaerfen.
  */
 function batchUpdateLueckentextMigrationEndpoint(body) {
   try {
@@ -11624,6 +11634,7 @@ function batchUpdateLueckentextMigrationEndpoint(body) {
     }
 
     var nichtGefunden = [];
+    var keineLuecken = [];
     var falscherTyp = [];
     var aktualisiert = 0;
     var nowIso = new Date().toISOString();
@@ -11651,7 +11662,7 @@ function batchUpdateLueckentextMigrationEndpoint(body) {
       var typDaten;
       try { typDaten = JSON.parse(typDatenRaw); } catch (e) { typDaten = {}; }
       if (!Array.isArray(typDaten.luecken)) {
-        nichtGefunden.push(upd.id); // keine luecken im JSON → nicht migrierbar
+        keineLuecken.push(upd.id); // JSON hat kein luecken-Array → nicht migrierbar
         continue;
       }
 
@@ -11667,7 +11678,13 @@ function batchUpdateLueckentextMigrationEndpoint(body) {
         var luUpd = l && l.id ? updById[String(l.id)] : null;
         if (!luUpd) return l;
         var merged = Object.assign({}, l);
-        // Nur ueberschreiben wenn Update ein echtes Array mitgibt (defensiv).
+        // Semantik (Option a):
+        //   Array.isArray(x) === true  → ueberschreibt (auch leeres [] ist ein explizites Signal:
+        //                                 "LP wird's noch befuellen" / "Korrekte Antworten bewusst leer").
+        //   undefined / fehlendes Feld → bestehender Wert bleibt (Feld nicht migriert).
+        // Die KI-Batch-Pipeline liefert immer populierte Arrays, wenn sie eine Antwort
+        // generiert hat. Weiss sie nichts (halluzinations-safe), MUSS sie das Feld
+        // weglassen — nicht [] senden — damit der Alt-Wert erhalten bleibt.
         if (Array.isArray(luUpd.korrekteAntworten)) {
           merged.korrekteAntworten = luUpd.korrekteAntworten;
         }
@@ -11700,8 +11717,9 @@ function batchUpdateLueckentextMigrationEndpoint(body) {
       success: true,
       fachbereich: fachbereich,
       aktualisiert: aktualisiert,
-      nichtGefunden: nichtGefunden,
-      falscherTyp: falscherTyp,
+      nichtGefunden: nichtGefunden, // IDs die nicht im Sheet gefunden wurden
+      keineLuecken: keineLuecken,   // IDs deren JSON kein luecken-Array hat
+      falscherTyp: falscherTyp,     // IDs mit typ !== 'lueckentext'
     });
   } catch (error) {
     return jsonResponse({ error: String(error && error.message || error) });
@@ -11722,9 +11740,10 @@ function testC9BatchUpdateLueckentextMigration() {
  *
  * ⚠️ Schreibt kurz IN DIE ECHTE FRAGENBANK: die erste Lückentext-Frage aus BWL
  * bekommt TEST-MARKER-korrekteAntworten gesetzt. Nach dem Assert wird der
- * Originalzustand per zweitem Endpoint-Aufruf zurueckgeschrieben. pruefungstauglich
- * geht dabei auf leer — falls die Test-Frage vorher true war, User im Editor
- * manuell wiedersetzen.
+ * Originalzustand per zweitem Endpoint-Aufruf zurueckgeschrieben PLUS die
+ * Spalten pruefungstauglich/geaendertAm/poolContentHash werden direkt per
+ * Range.setValue() auf die vorher gemerkten Originalwerte zurueckgesetzt
+ * (der Endpoint selbst ueberschreibt sie bei jedem Call mit '' bzw. nowIso).
  */
 function testC9BatchUpdateLueckentextMigration_() {
   function assert_(cond, msg) { if (!cond) throw new Error('Assertion fehlgeschlagen: ' + msg); }
@@ -11752,19 +11771,25 @@ function testC9BatchUpdateLueckentextMigration_() {
   var jsonCol = headers.indexOf('json');
   var datenCol = headers.indexOf('daten');
   var pruefungstauglichCol = headers.indexOf('pruefungstauglich');
+  var geaendertAmCol = headers.indexOf('geaendertAm');
+  var poolContentHashCol = headers.indexOf('poolContentHash');
   var readCol = typDatenCol >= 0 ? typDatenCol : (jsonCol >= 0 ? jsonCol : datenCol);
   assert_(readCol >= 0, 'Weder typDaten noch json noch daten-Spalte im BWL-Sheet');
 
   var origRow = null;
+  var origRowIdx = -1; // 0-basiert in allData; spaeter +1 fuer Sheet-Range (1-basiert)
   for (var rr = 1; rr < allData.length; rr++) {
-    if (String(allData[rr][idCol]) === testId) { origRow = allData[rr]; break; }
+    if (String(allData[rr][idCol]) === testId) { origRow = allData[rr]; origRowIdx = rr; break; }
   }
   assert_(origRow, 'Test-Frage ' + testId + ' nicht in Row-Data gefunden');
   var origTypDatenRaw = String(origRow[readCol] || '{}');
   var origTypDaten = JSON.parse(origTypDatenRaw);
   assert_(Array.isArray(origTypDaten.luecken) && origTypDaten.luecken.length > 0, 'Test-Frage hat keine luecken');
-  var origPruefungstauglich = String(origRow[pruefungstauglichCol] || '');
-  Logger.log('  Original pruefungstauglich: ' + origPruefungstauglich);
+  var origPruefungstauglich = origRow[pruefungstauglichCol]; // roh (kann bool/string/'' sein)
+  var origGeaendertAm = geaendertAmCol >= 0 ? origRow[geaendertAmCol] : null;
+  var origPoolContentHash = poolContentHashCol >= 0 ? origRow[poolContentHashCol] : null;
+  Logger.log('  Original pruefungstauglich: ' + JSON.stringify(origPruefungstauglich));
+  Logger.log('  Original geaendertAm: ' + JSON.stringify(origGeaendertAm));
   Logger.log('  Original anzahl luecken: ' + origTypDaten.luecken.length);
 
   var ersteLuecke = origTypDaten.luecken[0];
@@ -11819,7 +11844,9 @@ function testC9BatchUpdateLueckentextMigration_() {
   assert_(neuZielLuecke, 'Ziel-Luecke ' + testLueckeId + ' nach Update nicht mehr vorhanden');
   assert_(Array.isArray(neuZielLuecke.korrekteAntworten) && neuZielLuecke.korrekteAntworten[0] === markerAntwort, 'korrekteAntworten nicht auf Marker gesetzt');
   assert_(Array.isArray(neuZielLuecke.dropdownOptionen) && neuZielLuecke.dropdownOptionen.indexOf(markerAntwort) >= 0, 'dropdownOptionen nicht auf Marker gesetzt');
-  assert_(String(rowNeu[pruefungstauglichCol] || '') === '', 'pruefungstauglich sollte leer sein (war: ' + String(rowNeu[pruefungstauglichCol]) + ')');
+  if (pruefungstauglichCol >= 0) {
+    assert_(String(rowNeu[pruefungstauglichCol] || '') === '', 'pruefungstauglich sollte leer sein (war: ' + String(rowNeu[pruefungstauglichCol]) + ')');
+  }
 
   // 5. RESTORE: Original-Werte zuruecksetzen
   var restoreBody = {
@@ -11837,7 +11864,22 @@ function testC9BatchUpdateLueckentextMigration_() {
   };
   batchUpdateLueckentextMigrationEndpoint(restoreBody);
   Logger.log('✓ Restore: Luecke ' + testLueckeId + ' zurueck auf Original (' + origKorrekteAntworten.length + ' korrekteAntworten, ' + origDropdownOptionen.length + ' dropdownOptionen).');
-  Logger.log('⚠️ pruefungstauglich bleibt leer — falls vorher true (' + origPruefungstauglich + '), im Editor manuell wiedersetzen.');
+
+  // Der Endpoint hat pruefungstauglich = '' + geaendertAm = nowIso + poolContentHash = ''
+  // gesetzt. Die drei Spalten direkt per setValue() auf die Original-Werte zuruecksetzen,
+  // damit die Test-Frage nicht in Produktion demoted bleibt.
+  // Sheet-Row = origRowIdx + 1 (allData ist 0-basiert inkl. Header, Sheet ist 1-basiert).
+  var sheetRow = origRowIdx + 1;
+  if (pruefungstauglichCol >= 0) {
+    sheet.getRange(sheetRow, pruefungstauglichCol + 1).setValue(origPruefungstauglich);
+  }
+  if (geaendertAmCol >= 0) {
+    sheet.getRange(sheetRow, geaendertAmCol + 1).setValue(origGeaendertAm);
+  }
+  if (poolContentHashCol >= 0) {
+    sheet.getRange(sheetRow, poolContentHashCol + 1).setValue(origPoolContentHash);
+  }
+  Logger.log('✓ Restore: pruefungstauglich=' + JSON.stringify(origPruefungstauglich) + ', geaendertAm=' + JSON.stringify(origGeaendertAm) + ', poolContentHash wiederhergestellt.');
 
   Logger.log('✓ batchUpdateLueckentextMigration-Test bestanden.');
 }

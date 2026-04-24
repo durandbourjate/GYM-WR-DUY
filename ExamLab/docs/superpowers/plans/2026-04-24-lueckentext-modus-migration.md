@@ -1323,59 +1323,130 @@ Upload-Skript siehe Task 18.
 **Files:**
 - Create: `ExamLab/scripts/migrate-lueckentext-antworten/upload.mjs`
 
-- [ ] **Step 18.1: Upload-Skript**
+**Kontrakt (muss mit `batchUpdateLueckentextMigrationEndpoint` matchen):**
+- POST-Body: `{ action: 'batchUpdateLueckentextMigration', email, fachbereich, updates }`
+  — **ein POST pro Fachbereich**, `fachbereich` top-level (nicht pro Update).
+- Response: `{ success, fachbereich, aktualisiert, nichtGefunden: string[], keineLuecken: string[], falscherTyp: string[] }`
+  oder bei Fehler `{ error }`.
+- Die Batch-Dateien werden pro Fachbereich geschrieben: `batch-BWL-s1.json`, `batch-VWL-s1.json`, `batch-Recht-s1.json`.
+  Entweder der Generator schreibt sie direkt so, oder das Upload-Skript gruppiert vor dem Call client-seitig.
+
+- [ ] **Step 18.1: Upload-Skript (analog zu C9 Phase 4 `migrate-teilerklaerungen/upload.mjs`)**
 
 ```js
 #!/usr/bin/env node
-// upload.mjs — pusht Batch-Updates an batchUpdateLueckentextMigration
-// Usage: node upload.mjs batch-s1.json
-
+/**
+ * Lückentext-Migration Upload — schreibt korrekteAntworten + dropdownOptionen
+ * via batchUpdateLueckentextMigrationEndpoint ins Sheet.
+ *
+ * Gruppiert Updates nach fachbereich, sendet einen POST pro Fachbereich.
+ * Bei HTTP-Fehler oder resp.error: split in Hälften + retry (analog C9).
+ *
+ * Usage:
+ *   export APPS_SCRIPT_URL=https://script.google.com/macros/s/.../exec
+ *   export MIGRATION_EMAIL=admin@gymhofwil.ch
+ *   node upload.mjs lueckentext-updates.jsonl
+ *   # oder
+ *   node upload.mjs batch-BWL-s1.json --dry-run
+ */
 import fs from 'node:fs/promises'
 
 const APPS_SCRIPT_URL = process.env.APPS_SCRIPT_URL
 const EMAIL = process.env.MIGRATION_EMAIL
 const file = process.argv[2]
+const DRY_RUN = process.argv.includes('--dry-run')
 if (!APPS_SCRIPT_URL || !EMAIL || !file) {
-  console.error('Usage: APPS_SCRIPT_URL=… MIGRATION_EMAIL=… node upload.mjs <batch.json>')
+  console.error('Usage: APPS_SCRIPT_URL=… MIGRATION_EMAIL=… node upload.mjs <batch.json|jsonl> [--dry-run]')
   process.exit(1)
 }
 
-const batch = JSON.parse(await fs.readFile(file, 'utf-8'))
-console.log(`Upload ${batch.length} Fragen aus ${file} …`)
-
-// Adaptive Batch-Size: falls Apps-Script >30s timeoutet, in Hälften splitten
-async function upload(items) {
+async function appsScriptCall(fachbereich, updates) {
   const r = await fetch(APPS_SCRIPT_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'text/plain' },
-    body: JSON.stringify({ action: 'batchUpdateLueckentextMigration', email: EMAIL, updates: items }),
+    body: JSON.stringify({
+      action: 'batchUpdateLueckentextMigration',
+      email: EMAIL,
+      fachbereich,
+      updates,
+    }),
     redirect: 'follow',
   })
   if (!r.ok) throw new Error(`HTTP ${r.status}`)
-  const resp = await r.json()
-  if (resp.error) throw new Error(resp.error)
-  return resp.results || []
+  return r.json()
 }
 
-try {
-  const results = await upload(batch)
-  const ok = results.filter(r => r.success).length
-  const err = results.filter(r => r.error)
-  console.log(`✓ ${ok}/${results.length} erfolgreich`)
-  if (err.length) console.log('Fehler:', JSON.stringify(err, null, 2))
-} catch (e) {
-  console.error('Upload fehlgeschlagen:', e.message)
-  if (batch.length > 10) {
-    console.log('→ retry mit kleineren Batches …')
-    const half = Math.floor(batch.length / 2)
-    await fs.writeFile(file.replace('.json', '-a.json'), JSON.stringify(batch.slice(0, half), null, 2))
-    await fs.writeFile(file.replace('.json', '-b.json'), JSON.stringify(batch.slice(half), null, 2))
-    console.log(`  → ${file.replace('.json','-a.json')} (${half})`)
-    console.log(`  → ${file.replace('.json','-b.json')} (${batch.length - half})`)
+async function uploadFachbereich(fachbereich, updates) {
+  console.log(`[upload] ${fachbereich}: ${updates.length} Fragen ...`)
+  if (DRY_RUN) {
+    console.log(`[upload] DRY-RUN: skip`)
+    return { success: true, aktualisiert: updates.length, nichtGefunden: [], keineLuecken: [], falscherTyp: [] }
   }
-  process.exit(1)
+  try {
+    const res = await appsScriptCall(fachbereich, updates)
+    if (res.error) throw new Error(`Apps-Script: ${res.error}`)
+    return res
+  } catch (e) {
+    // Bei Timeout / HTTP-Fehler / Apps-Script-Error: Haelfte versuchen (analog C9)
+    const splitable = updates.length > 10
+      && (e.message.includes('timeout') || e.message.includes('exceeded')
+          || e.message.includes('HTTP 5') || e.message.includes('HTTP 4')
+          || e.message.includes('Apps-Script'))
+    if (splitable) {
+      console.warn(`[upload] ${fachbereich} Fehler (${e.message}) — split in Hälften`)
+      const mid = Math.floor(updates.length / 2)
+      const r1 = await uploadFachbereich(fachbereich, updates.slice(0, mid))
+      const r2 = await uploadFachbereich(fachbereich, updates.slice(mid))
+      return {
+        success: r1.success && r2.success,
+        aktualisiert: (r1.aktualisiert || 0) + (r2.aktualisiert || 0),
+        nichtGefunden: [...(r1.nichtGefunden || []), ...(r2.nichtGefunden || [])],
+        keineLuecken: [...(r1.keineLuecken || []), ...(r2.keineLuecken || [])],
+        falscherTyp: [...(r1.falscherTyp || []), ...(r2.falscherTyp || [])],
+      }
+    }
+    throw e
+  }
+}
+
+// Input einlesen (JSON-Array oder JSONL — beide Formate unterstützt).
+// Jede Zeile / jedes Array-Element: { id, fachbereich, luecken: [...] }
+const text = await fs.readFile(file, 'utf-8')
+const items = file.endsWith('.jsonl')
+  ? text.split('\n').filter(l => l.trim()).map(l => JSON.parse(l))
+  : JSON.parse(text)
+
+// Nach fachbereich gruppieren (falls Datei mehrere enthält)
+const proFach = {}
+for (const u of items) {
+  const fb = u.fachbereich
+  if (!fb) { console.warn('[upload] Update ohne fachbereich, skip:', u.id); continue }
+  if (!proFach[fb]) proFach[fb] = []
+  proFach[fb].push({ id: u.id, luecken: u.luecken || [] })
+}
+
+const summary = {}
+for (const fb of Object.keys(proFach).sort()) {
+  summary[fb] = await uploadFachbereich(fb, proFach[fb])
+}
+
+console.log('\n[upload] === ZUSAMMENFASSUNG ===')
+for (const [fb, r] of Object.entries(summary)) {
+  console.log(`  ${fb}: aktualisiert=${r.aktualisiert}`
+    + `, nichtGefunden=${r.nichtGefunden?.length || 0}`
+    + `, keineLuecken=${r.keineLuecken?.length || 0}`
+    + `, falscherTyp=${r.falscherTyp?.length || 0}`)
+  const problematisch = [...(r.nichtGefunden || []), ...(r.keineLuecken || []), ...(r.falscherTyp || [])]
+  if (problematisch.length) {
+    console.log(`    IDs: ${problematisch.slice(0, 10).join(', ')}${problematisch.length > 10 ? ` (+${problematisch.length - 10} weitere)` : ''}`)
+  }
 }
 ```
+
+**Hinweise:**
+- Generator (Task 17) sollte pro Batch-Datei bereits nur einen Fachbereich enthalten (`batch-BWL-s1.json`, …) — Gruppierung hier ist Defence-in-Depth.
+- `lueckentext-updates.jsonl` ist das Full-Run-Format mit allen Fachbereichen in einer Datei (analog C9 `fragen-updates.jsonl`).
+- Logger/Log-File optional ergänzen — siehe C9 `upload.mjs` für Pattern.
 
 - [ ] **Step 18.2: Package.json**
 
