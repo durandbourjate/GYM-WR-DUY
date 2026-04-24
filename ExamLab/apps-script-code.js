@@ -1425,6 +1425,10 @@ function doPost(e) {
     case 'admin:migriereZonen':
       return migrierZonenEndpoint_(body);
 
+    // === PROBLEMMELDUNGEN: Read + Toggle (F1) ===
+    case 'listeProblemmeldungen': return listeProblemmeldungen(body);
+    case 'markiereProblemmeldungErledigt': return markiereProblemmeldungErledigt(body);
+
     // === KI-KALIBRIERUNG: Review + Statistik + Einstellungen (Task 9) ===
     case 'listeKIFeedbacks': return listeKIFeedbacks(body);
     case 'aktualisiereKIFeedback': return aktualisiereKIFeedback(body);
