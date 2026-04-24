@@ -10,10 +10,14 @@ interface Kategorie {
   typen: FrageTyp[]
 }
 
+// S140: 'audio' temporär aus der Typ-Auswahl entfernt (Base64-Payload sprengt
+// Sheets-Zell-Limit → Abgabe scheitert). Kommt nach der Backend-Migration zurück.
+// Bestehende Audio-Fragen bleiben in der Fragensammlung editierbar (typ ist nicht
+// aus dem FrageTyp-Union entfernt, nur aus der Auswahl-UI).
 const KATEGORIEN: Kategorie[] = [
   {
     label: 'Text & Sprache',
-    typen: ['freitext', 'lueckentext', 'audio'],
+    typen: ['freitext', 'lueckentext'],
   },
   {
     label: 'Auswahl & Zuordnung',

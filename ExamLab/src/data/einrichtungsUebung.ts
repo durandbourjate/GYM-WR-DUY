@@ -45,8 +45,8 @@ export const einrichtungsUebung: PruefungsConfig = {
     },
     {
       titel: 'Teil E: Spezielle Fragetypen',
-      beschreibung: 'Testen Sie PDF-Annotation, Hotspot, Bildbeschriftung, Audio, DragDrop, Code und Formel.',
-      fragenIds: ['ueb-pdf-witz', 'ueb-sort-planeten', 'ueb-hs-europa', 'ueb-bb-zelle', 'ueb-audio-vorstellen', 'ueb-dd-kontinente', 'ueb-code-python', 'ueb-formel-pythagoras'],
+      beschreibung: 'Testen Sie PDF-Annotation, Hotspot, Bildbeschriftung, DragDrop, Code und Formel.',
+      fragenIds: ['ueb-pdf-witz', 'ueb-sort-planeten', 'ueb-hs-europa', 'ueb-bb-zelle', 'ueb-dd-kontinente', 'ueb-code-python', 'ueb-formel-pythagoras'],
     },
   ],
 
