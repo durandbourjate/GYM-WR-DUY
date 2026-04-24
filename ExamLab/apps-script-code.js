@@ -2859,14 +2859,26 @@ function parseFrage(row, fachbereich) {
         maxZeichen: row.maxZeichen ? Number(row.maxZeichen) : undefined,
         hilfstextPlaceholder: typDaten.hilfstextPlaceholder || row.hilfstextPlaceholder || '',
       };
-    case 'lueckentext':
+    case 'lueckentext': {
+      // Phase 4 Task 8: lueckentextModus aus typDaten lesen, mit Heuristik-Fallback
+      // bei Alt-Daten (dropdownOptionen-Präsenz → 'dropdown', sonst 'freitext').
+      var ltLuecken = typDaten.luecken || safeJsonParse(row.luecken, []);
+      var ltModus = typDaten.lueckentextModus;
+      if (ltModus !== 'freitext' && ltModus !== 'dropdown') {
+        var hatDropdowns = Array.isArray(ltLuecken) && ltLuecken.some(function(l) {
+          return l && Array.isArray(l.dropdownOptionen) && l.dropdownOptionen.length > 0;
+        });
+        ltModus = hatDropdowns ? 'dropdown' : 'freitext';
+      }
       return {
         ...base,
         typ: 'lueckentext',
         fragetext: row.fragetext || '',
         textMitLuecken: typDaten.textMitLuecken || row.textMitLuecken || '',
-        luecken: typDaten.luecken || safeJsonParse(row.luecken, []),
+        luecken: ltLuecken,
+        lueckentextModus: ltModus,
       };
+    }
     case 'zuordnung':
       return {
         ...base,
@@ -3969,7 +3981,11 @@ function getTypDaten(frage) {
     case 'freitext':
       return { laenge: frage.laenge, hilfstextPlaceholder: frage.hilfstextPlaceholder };
     case 'lueckentext':
-      return { textMitLuecken: frage.textMitLuecken, luecken: frage.luecken };
+      // Phase 4 Task 8: lueckentextModus explizit in typDaten schreiben.
+      // `getTypDaten` nutzt ein Field-Whitelist-Pattern — neue Rendering-Metadata
+      // muss hier ergänzt werden, sonst geht das Feld bei jedem Save verloren
+      // (vgl. S125-Lehre zu Hotspot: Legacy-Feldnamen zerstörten Daten).
+      return { textMitLuecken: frage.textMitLuecken, luecken: frage.luecken, lueckentextModus: frage.lueckentextModus };
     case 'zuordnung':
       return { paare: frage.paare, zufallsreihenfolge: frage.zufallsreihenfolge };
     case 'richtigfalsch':
@@ -8956,13 +8972,25 @@ function parseFrageKanonisch_(row, fachbereich) {
         fragetext: row.fragetext || '',
         laenge: typDaten.laenge || row.laenge || 'mittel',
       });
-    case 'lueckentext':
+    case 'lueckentext': {
+      // Phase 4 Task 8: lueckentextModus aus typDaten lesen, mit Heuristik-Fallback
+      // bei Alt-Daten (dropdownOptionen-Präsenz → 'dropdown', sonst 'freitext').
+      var ltLuecken2 = typDaten.luecken || safeJsonParse_(row.luecken, []);
+      var ltModus2 = typDaten.lueckentextModus;
+      if (ltModus2 !== 'freitext' && ltModus2 !== 'dropdown') {
+        var hatDropdowns2 = Array.isArray(ltLuecken2) && ltLuecken2.some(function(l) {
+          return l && Array.isArray(l.dropdownOptionen) && l.dropdownOptionen.length > 0;
+        });
+        ltModus2 = hatDropdowns2 ? 'dropdown' : 'freitext';
+      }
       return Object.assign(base, {
         typ: 'lueckentext',
         fragetext: row.fragetext || '',
         textMitLuecken: typDaten.textMitLuecken || row.textMitLuecken || '',
-        luecken: typDaten.luecken || safeJsonParse_(row.luecken, []),
+        luecken: ltLuecken2,
+        lueckentextModus: ltModus2,
       });
+    }
     case 'richtigfalsch':
       return Object.assign(base, {
         typ: 'richtigfalsch',
