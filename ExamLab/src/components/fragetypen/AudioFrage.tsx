@@ -86,26 +86,26 @@ export default function AudioFrage({ frage }: Props) {
         const email = useAuthStore.getState().user?.email || ''
         const istDemo = useAuthStore.getState().istDemoModus
 
-        // Sofort Drive-Upload starten (parallel zur Anzeige) — Payload ~300KB → Drive statt inline
-        // Im Demo-Modus: Fallback auf inline Base64 (kein Backend verfügbar)
-        if (pruefungId && email && !istDemo) {
-          const driveUrl = await uploadAudioAntwort(pruefungId, email, frage.id, blob)
-          if (driveUrl) {
-            // Nur Drive-URL speichern (~50 Bytes statt ~300KB)
-            onAntwort({ typ: 'audio', aufnahmeUrl: driveUrl, dauer: dauerSek })
-            return
-          }
-          console.warn('[AudioFrage] Drive-Upload fehlgeschlagen, Fallback auf inline Base64')
-        }
-
-        // Fallback: Inline Base64 (Demo-Modus oder Upload-Fehler)
+        // S140 Ticket 5: Base64-First statt Drive-First.
+        // Vorher wurde onAntwort erst NACH Drive-Upload (bis 60s) aufgerufen. Wenn SuS
+        // vorher Abgabe drückte, fehlte das Audio komplett im Store. Jetzt: Base64
+        // sofort schreiben (garantiert im Store), Drive-Upload im Hintergrund und
+        // Antwort mit Drive-URL überschreiben (spart Payload beim nächsten Save).
         const reader = new FileReader()
         reader.onload = () => {
-          onAntwort({
-            typ: 'audio',
-            aufnahmeUrl: reader.result as string,
-            dauer: dauerSek,
-          })
+          const base64Url = reader.result as string
+          onAntwort({ typ: 'audio', aufnahmeUrl: base64Url, dauer: dauerSek })
+
+          // Drive-Upload im Hintergrund, ersetzt aufnahmeUrl wenn erfolgreich
+          if (pruefungId && email && !istDemo) {
+            uploadAudioAntwort(pruefungId, email, frage.id, blob).then(driveUrl => {
+              if (driveUrl) {
+                onAntwort({ typ: 'audio', aufnahmeUrl: driveUrl, dauer: dauerSek })
+              } else {
+                console.warn('[AudioFrage] Drive-Upload fehlgeschlagen, Base64 bleibt in Antwort')
+              }
+            })
+          }
         }
         reader.onerror = () => {
           setFehler('Audio konnte nicht gespeichert werden.')

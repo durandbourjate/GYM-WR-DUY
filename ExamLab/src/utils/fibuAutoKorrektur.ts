@@ -220,6 +220,13 @@ export function korrigiereKontenbestimmung(
   const details: KorrekturDetail[] = []
   const punkteProAufgabe = frage.punkte / Math.max(1, frage.aufgaben.length)
 
+  // Modus-aware: SuS gibt nur die Felder ein, die laut modus auch abgefragt werden.
+  // Erwartete Antworten können mehr Felder haben (z.B. kontonummer als Identifier).
+  // Ohne Modus-Filter würde z.B. bei kategorie_bestimmen die fehlende Kontonummer als "falsch" zählen.
+  const zeigeKonto = frage.modus === 'konto_bestimmen' || frage.modus === 'gemischt'
+  const zeigeKategorie = frage.modus === 'kategorie_bestimmen' || frage.modus === 'gemischt'
+  const zeigeSeite = frage.modus === 'kategorie_bestimmen' || frage.modus === 'gemischt'
+
   for (const aufgabe of frage.aufgaben) {
     const eingabe = antwortAufgaben[aufgabe.id]
     if (!eingabe || eingabe.antworten.length === 0) {
@@ -236,9 +243,9 @@ export function korrigiereKontenbestimmung(
       if (!antwort) continue
 
       let teilKorrekt = true
-      if (erwartet.kontonummer && antwort.kontonummer !== erwartet.kontonummer) teilKorrekt = false
-      if (erwartet.kategorie && antwort.kategorie !== erwartet.kategorie) teilKorrekt = false
-      if (erwartet.seite && antwort.seite !== erwartet.seite) teilKorrekt = false
+      if (zeigeKonto && erwartet.kontonummer && antwort.kontonummer !== erwartet.kontonummer) teilKorrekt = false
+      if (zeigeKategorie && erwartet.kategorie && antwort.kategorie !== erwartet.kategorie) teilKorrekt = false
+      if (zeigeSeite && erwartet.seite && antwort.seite !== erwartet.seite) teilKorrekt = false
 
       if (teilKorrekt) korrektCount++
     }
