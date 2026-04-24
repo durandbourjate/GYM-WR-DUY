@@ -12110,3 +12110,133 @@ function testBereinigeLueckentextModus_() {
 
 /** Public-Wrapper (ohne trailing _) damit GAS-Editor-Dropdown ihn findet. */
 function testBereinigeLueckentextModus() { testBereinigeLueckentextModus_(); }
+
+/**
+ * One-shot-Migrator: setzt `lueckentextModus` bei allen bestehenden
+ * Lückentext-Fragen in allen 4 Fachbereich-Tabs.
+ *
+ * Heuristik: `dropdownOptionen` non-empty → 'dropdown', sonst 'freitext'.
+ * Idempotent: bereits explizit gesetzte Werte werden NICHT überschrieben.
+ *
+ * Schreibt primär in `typDaten`-Spalte (das liest `parseFrage`/`parseFrageKanonisch_`
+ * für Lückentext). Zusätzlich wird `json`/`daten`-Spalte aktualisiert, falls
+ * vorhanden — analog zum Hotspot-Migrator (parseFrage fällt bei einigen Typen
+ * auf `json`/`daten` zurück; für Lückentext nicht, aber wir halten die Quellen
+ * konsistent).
+ *
+ * Manuell im GAS-Editor ausführen, NACH Google-Sheets-Backup der Fragenbank.
+ */
+function migriereLueckentextModus() {
+  var tabs = ['VWL', 'BWL', 'Recht', 'Informatik'];
+  var fragenbank = SpreadsheetApp.openById(FRAGENBANK_ID);
+  var total = 0;
+  var gesetzt = 0;
+  var schonGesetzt = 0;
+  var errors = [];
+  var tabStats = {};
+
+  for (var t = 0; t < tabs.length; t++) {
+    var tabName = tabs[t];
+    var sheet = fragenbank.getSheetByName(tabName);
+    if (!sheet) {
+      tabStats[tabName] = { gesetzt: 0, schonGesetzt: 0, gesamt: 0, fehler: 'Sheet fehlt' };
+      continue;
+    }
+    var lastCol = sheet.getLastColumn();
+    if (lastCol === 0) {
+      tabStats[tabName] = { gesetzt: 0, schonGesetzt: 0, gesamt: 0, fehler: 'Leeres Sheet' };
+      continue;
+    }
+    var headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
+    var typDatenCol = headers.indexOf('typDaten');
+    var typCol = headers.indexOf('typ');
+    var idCol = headers.indexOf('id');
+    var jsonCol = headers.indexOf('json');
+    var datenCol = headers.indexOf('daten');
+    if (typDatenCol < 0 || typCol < 0) {
+      tabStats[tabName] = { gesetzt: 0, schonGesetzt: 0, gesamt: 0, fehler: 'typDaten- oder typ-Spalte fehlt' };
+      continue;
+    }
+
+    var values = sheet.getDataRange().getValues();
+    var tabGesetzt = 0;
+    var tabSchonGesetzt = 0;
+    var tabGesamt = 0;
+
+    for (var r = 1; r < values.length; r++) {
+      if (values[r][typCol] !== 'lueckentext') continue;
+      total++;
+      tabGesamt++;
+      var frageId = idCol >= 0 ? values[r][idCol] : '(ohne-id)';
+      try {
+        var typDatenStr = values[r][typDatenCol];
+        var typDaten = typDatenStr ? JSON.parse(typDatenStr) : {};
+
+        if (typDaten.lueckentextModus === 'freitext' || typDaten.lueckentextModus === 'dropdown') {
+          schonGesetzt++;
+          tabSchonGesetzt++;
+          continue;
+        }
+
+        var hatDropdowns = Array.isArray(typDaten.luecken) && typDaten.luecken.some(function(l) {
+          return l && Array.isArray(l.dropdownOptionen) && l.dropdownOptionen.length > 0;
+        });
+        typDaten.lueckentextModus = hatDropdowns ? 'dropdown' : 'freitext';
+
+        var zeile = r + 1;
+        sheet.getRange(zeile, typDatenCol + 1).setValue(JSON.stringify(typDaten));
+
+        // Konsistenz: falls json-/daten-Spalte ebenfalls eine vollständige Frage
+        // enthält, dort denselben Modus setzen (gespiegelt vom Hotspot-Migrator-Pattern).
+        if (jsonCol >= 0) {
+          var jsonStr = values[r][jsonCol];
+          if (jsonStr) {
+            try {
+              var vollJson = JSON.parse(jsonStr);
+              if (vollJson && typeof vollJson === 'object') {
+                vollJson.lueckentextModus = typDaten.lueckentextModus;
+                sheet.getRange(zeile, jsonCol + 1).setValue(JSON.stringify(vollJson));
+              }
+            } catch (e) { /* ignore — json-Spalte defekt, typDaten reicht */ }
+          }
+        }
+        if (datenCol >= 0) {
+          var datenStr = values[r][datenCol];
+          if (datenStr) {
+            try {
+              var vollDaten = JSON.parse(datenStr);
+              if (vollDaten && typeof vollDaten === 'object') {
+                vollDaten.lueckentextModus = typDaten.lueckentextModus;
+                sheet.getRange(zeile, datenCol + 1).setValue(JSON.stringify(vollDaten));
+              }
+            } catch (e) { /* ignore */ }
+          }
+        }
+
+        gesetzt++;
+        tabGesetzt++;
+      } catch (e) {
+        errors.push({ tab: tabName, id: frageId, error: e.message });
+      }
+    }
+
+    tabStats[tabName] = { gesetzt: tabGesetzt, schonGesetzt: tabSchonGesetzt, gesamt: tabGesamt };
+  }
+
+  Logger.log('=== Lückentext-Modus-Migration ===');
+  for (var tn in tabStats) {
+    var s = tabStats[tn];
+    Logger.log(tn + ': ' + (s.gesetzt || 0) + ' neu gesetzt, ' + (s.schonGesetzt || 0) + ' schon gesetzt, ' + (s.gesamt || 0) + ' gesamt' + (s.fehler ? ' — ' + s.fehler : ''));
+  }
+  Logger.log('Total Lückentext-Fragen: ' + total);
+  Logger.log('Neu gesetzt: ' + gesetzt);
+  Logger.log('Bereits gesetzt (übersprungen): ' + schonGesetzt);
+  if (errors.length > 0) {
+    Logger.log('Fehler: ' + errors.length);
+    for (var i = 0; i < errors.length; i++) {
+      Logger.log('  [' + errors[i].tab + '] ' + errors[i].id + ': ' + errors[i].error);
+    }
+  }
+
+  return { total: total, gesetzt: gesetzt, schonGesetzt: schonGesetzt, errors: errors, tabs: tabStats };
+}
