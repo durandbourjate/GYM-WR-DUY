@@ -100,9 +100,12 @@ export default function FormelFrageComponent({ frage }: Props) {
       try {
         const katex = await ladeKatexAsync()
         const render = katex.default || katex
+        // S140 Ticket 2: throwOnError=false → auch bei leerem \sqrt{} oder unvollständigen
+        // Ausdrücken wird die Teil-Formel gerendert, statt die komplette Vorschau zu
+        // verstecken. Syntaxfehler werden von KaTeX visuell rot markiert.
         const html = render.renderToString(eingabe.trim(), {
           displayMode: true,
-          throwOnError: true,
+          throwOnError: false,
         })
         setVorschauHtml(html)
         setFehler('')
