@@ -8,9 +8,9 @@
 
 ## Für die nächste Session (S146+)
 
-### Aktueller Stand (S145, 24.04.2026) — Auth-Session-Restore-Fix auf `preview`, `main` unverändert
+### Aktueller Stand (S145, 24.04.2026) — Auth-Session-Restore-Fix auf `main` gemergt
 
-**Branch `fix/ueben-auth-session-restore-shape` (Commit `f2c88e1`) — auf `origin/preview` force-gepusht.** Nächster Schritt: User-E2E-Test auf Staging, dann Merge auf `main`.
+**Branch `fix/ueben-auth-session-restore-shape` auf `main` gemergt** (Merge-Commit `3e66452`, Feature-Branch gelöscht). GitHub Actions deployed automatisch.
 
 **Bug-Beschreibung:** `ExamLab/src/store/ueben/authStore.ts::sessionWiederherstellen` las das Response-Shape falsch. Frontend checkte `response.data.gueltig`, Backend (`apps-script-code.js:8218-8221 lernplattformValidiereToken`) liefert aber nur `{success: boolean}` ohne `data`-Wrapper. Resultat: `response.data.gueltig` war IMMER `undefined` → Session wurde bei jedem Restore-Call verworfen. Im Standalone-Üben-Modus (aufgerufen via `AppUeben.tsx:88` wenn `!IST_DEMO && !onZurueck`) flog der User bei jedem Refresh raus. Embedded-Flow via LP-Bridge (SuSStartseite) war nicht betroffen, weil dort die Bridge direkt `lernplattformLogin` ruft und den Token in den Store setzt.
 
@@ -20,12 +20,61 @@
 
 **Test-Stand:** 684/684 vitest (4 neu), `tsc -b` clean, `npm run build` success.
 
-**Impact-Analyse:** `lernplattformValidiereToken` wird ausschliesslich in `authStore.ts:104` konsumiert — keine weiteren Call-Sites. `sessionWiederherstellen` wird nur in `AppUeben.tsx:88` getriggert. Backend unverändert — kein Apps-Script-Deploy nötig.
+**Impact-Analyse:** `lernplattformValidiereToken` wird ausschliesslich in `authStore.ts:104` konsumiert — keine weiteren Call-Sites. `sessionWiederherstellen` wird nur in `AppUeben.tsx:88` getriggert. Backend unverändert — **kein Apps-Script-Deploy nötig**.
 
-**Offen (Phase 5 Merge-Gate):**
-- [ ] Browser-E2E mit echtem SuS-Login (`wr.test@stud.gymhofwil.ch`) auf Staging: Standalone-Üben öffnen → Login → Reload → bleibt eingeloggt. Vorher war Logout garantiert.
-- [ ] LP-Freigabe
-- [ ] Merge `preview` → `main`, Feature-Branch löschen
+**Commits auf `main` (neueste zuerst):**
+- `3e66452` — Merge fix/ueben-auth-session-restore-shape
+- `ff000ff` — ExamLab: HANDOFF S145 + Docs-Update zum Auth-Fix (LP-Hilfe Lückentext-Präzisierung + README-Pfad `Pruefung/` → `ExamLab/`)
+- `f2c88e1` — ExamLab: fix sessionWiederherstellen Response-Shape
+
+**Nebenarbeiten gebündelt:** LP-Hilfeseite ("Fragen & Fragensammlung" → Lückentext-Absatz) präzisiert um Modus-Toggle (Freitext/Dropdown pro Frage) + Bulk-Toggle (Einstellungen → Fragensammlung). README-Pfad-Korrekturen (Repo-Rename war schon in S107, aber Docs hatten `Pruefung/` stehen gelassen). SuS-HilfePanel unverändert — kein Änderungsbedarf.
+
+**Lehre S145 (für lernschleife.md bei Gelegenheit):** TS-Generic auf `postJson<T>` ist eine Lüge — `T` castet die ganze Backend-Response, nicht `.data`. Pattern-Varianten im Codebase:
+1. `postJson<{success, data?: X}>` → Consumer extrahiert `.data` (z.B. `anmeldenMitGoogle`)
+2. `postJson<{success, data: X}>` + Lese-Bug `response.data.X` **ohne** dass Response das `data`-Feld wirklich liefert — latenter Fehler wie hier.
+3. `unwrap<T>`-Helper (z.B. `kalibrierungApi`) — safest
+
+Neue API-Wrapper immer nach Backend-Shape verifizieren, nicht nach Frontend-Erwartung. Vgl. [code-quality.md](../.claude/rules/code-quality.md) §„postJson-Response-Unwrap".
+
+### Offen für S146+
+
+**1) Lückentext Phase 8 — Browser-E2E nachholen** (vom S144-Merge übersprungen):
+
+Test-Plan schreiben laut `regression-prevention.md` Phase 3.0 (Tabelle Änderung · Erwartetes Verhalten · Regressions-Risiko + Security-Check + kritische Pfade aus §1.3).
+
+Browser-Test mit echten Logins (LP: `yannick.durand@gymhofwil.ch` · SuS: `wr.test@stud.gymhofwil.ch`, nie Demo-Modus):
+
+**LP-Pfade:**
+- [ ] Fragensammlung → Lückentext-Frage öffnen → Feld-Labels "Freitext" / "Dropdown" sichtbar, Modus-Toggle funktioniert, inaktives Feld gedimmt
+- [ ] Einstellungen → Fragensammlung → Bulk-Toggle auf Dropdown → alle 253 wechseln
+- [ ] Prev/Next-Navigation im Editor — Felder korrekt gesynct (S129-Regel: `key={frage.id}`)
+- [ ] Manuelle Stichprobe 3 Fragen pro Fachbereich: sind Hauptantwort + Distraktoren plausibel?
+
+**SuS-Pfade (via LP-Bulk-Toggle beide Modi testen):**
+- [ ] **Freitext-Modus:** SuS tippt Hauptantwort → Auto-Korrektur = korrekt
+- [ ] **Freitext-Modus:** SuS tippt Synonym (z.B. "preiselastisch" statt "elastisch") → Auto-Korrektur = korrekt (case-insensitive!)
+- [ ] **Freitext-Modus:** SuS tippt Distraktor aus Dropdown ein → Auto-Korrektur = falsch
+- [ ] **Dropdown-Modus:** SuS wählt Korrekte → Auto-Korrektur = korrekt
+- [ ] **Dropdown-Modus:** SuS wählt Distraktor → Auto-Korrektur = falsch
+- [ ] **Einrichtungs-Frage** `einr-lt-hofwil`/`ueb-lt-hofwil`: Hofwil/Münchenbuchsee/Bern — beide Modi testen (spezielle `0`/`1`/`2`-Lücken-IDs, nicht `luecke-0`)
+
+**Security-Invarianten (Network-Tab):**
+- [ ] SuS-Request `holeFrage` zeigt im Response-Body KEINE `korrekteAntworten[]` und KEINE `dropdownOptionen[]` mehr als der Renderer braucht
+- [ ] LP-Request sieht alle Felder
+
+**2) LP-Review der migrierten Lückentext-Antworten** (paralleler Prozess, kein Merge-Blocker):
+
+Alle 253 Fragen haben `pruefungstauglich=false`. Der LP geht pro Frage im Frontend (Fragensammlung-Editor) durch, prüft Hauptantwort + Synonyme + Distraktoren, passt wo nötig an und setzt `pruefungstauglich=true`. Keine automatische Freischaltung — Fragensammlung bleibt dark-launched bis manuell freigegeben.
+
+**3) Bundle E (Übungsstart-Latenz)** bleibt offen — eigenes Backend-Bundle, nicht Teil des Lückentext-Projekts. `lernplattformLadeLoesungen` (apps-script-code.js:8807-8822) serielle Sheet-Reads optimieren (Bulk-Tab-Read + CacheService.putAll Pre-Warm). Brainstorming → Spec → Plan nötig.
+
+**4) Audio-Reaktivierung** nach Backend-Migration auf Edge-Runtime. Bis dahin deaktiviert. Re-Aktivierung via `git revert 8de1352`.
+
+**5) C9 Phase 4 laufende User-Aufgaben:** Stichprobenprüfung der 2412 migrierten Fragen, Freigaben `pruefungstauglich=true`, Archiv-Dateien extern sichern/löschen.
+
+**6) Aufräumarbeiten** (nicht blockierend):
+- Duplikat-Dateien aus C9-Migration (`*\ 2.md/mjs` im `ExamLab/scripts/migrate-teilerklaerungen/`) aufräumen — macOS-Kopien, stehen noch als untracked rum.
+- Stranded `ExamLab/src/components/ueben/admin/AdminFragenbank.tsx` — war in S141 gelöscht, ist wieder als untracked aufgetaucht (vermutlich durch Merge oder Worktree-Rest). Verifizieren und ggf. löschen.
 
 **Vorgänger-Stand (Ende S144, 24.04.2026) — Lückentext-Modus Phase 1-7 auf `main` gemergt**
 
@@ -60,40 +109,6 @@
 - `geaendertAm` auf 2026-04-24 aktualisiert; `poolContentHash` geleert (wird beim nächsten Pool-Check neu berechnet)
 
 **Backup-Status:** User hat Google-Sheets-Backup der Fragenbank vor Phase 7 erstellt (Pflicht laut README). Rollback-Pfad: Drive → Backup-Kopie umbenennen → Live-Fragenbank ersetzen + Apps-Script-Cache invalidieren.
-
-### Offen für S145+
-
-**1) Browser-E2E nachholen** (Phase 8 Tasks 20-21, beim Merge übersprungen):
-
-Test-Plan schreiben laut `regression-prevention.md` Phase 3.0 (Tabelle Änderung · Erwartetes Verhalten · Regressions-Risiko + Security-Check + kritische Pfade aus §1.3).
-
-Browser-Test mit echten Logins (LP: yannick.durand@gymhofwil.ch · SuS: wr.test@stud.gymhofwil.ch, nie Demo-Modus):
-
-**LP-Pfade:**
-- [ ] Fragensammlung → Lückentext-Frage öffnen → Feld-Labels "Freitext" / "Dropdown" sichtbar, Modus-Toggle funktioniert, inaktives Feld gedimmt
-- [ ] Einstellungen → Fragensammlung → Bulk-Toggle auf Dropdown → alle 253 wechseln
-- [ ] Prev/Next-Navigation im Editor — Felder korrekt gesynct (S129-Regel: `key={frage.id}`)
-- [ ] Manuelle Stichprobe 3 Fragen pro Fachbereich: sind Hauptantwort + Distraktoren plausibel?
-
-**SuS-Pfade (via LP-Bulk-Toggle beide Modi testen):**
-- [ ] **Freitext-Modus:** SuS tippt Hauptantwort → Auto-Korrektur = korrekt
-- [ ] **Freitext-Modus:** SuS tippt Synonym (z.B. "preiselastisch" statt "elastisch") → Auto-Korrektur = korrekt (case-insensitive!)
-- [ ] **Freitext-Modus:** SuS tippt Distraktor aus Dropdown ein → Auto-Korrektur = falsch
-- [ ] **Dropdown-Modus:** SuS wählt Korrekte → Auto-Korrektur = korrekt
-- [ ] **Dropdown-Modus:** SuS wählt Distraktor → Auto-Korrektur = falsch
-- [ ] **Einrichtungs-Frage** `einr-lt-hofwil`/`ueb-lt-hofwil`: Hofwil/Münchenbuchsee/Bern — beide Modi testen (spezielle `0`/`1`/`2`-Lücken-IDs, nicht `luecke-0`)
-
-**Security-Invarianten (Network-Tab):**
-- [ ] SuS-Request `holeFrage` zeigt im Response-Body KEINE `korrekteAntworten[]` und KEINE `dropdownOptionen[]` mehr als der Renderer braucht
-- [ ] LP-Request sieht alle Felder
-
-Bei Regressionen: direkt auf `main` Fix-Commit, oder Hotfix-Branch.
-
-**2) LP-Review der migrierten Antworten** (paralleler Prozess, kein Merge-Blocker):
-
-Alle 253 Fragen haben `pruefungstauglich=false`. Der LP geht pro Frage im Frontend (Fragensammlung-Editor) durch, prüft Hauptantwort + Synonyme + Distraktoren, passt wo nötig an und setzt `pruefungstauglich=true`. Keine automatische Freischaltung — Fragensammlung bleibt dark-launched bis manuell freigegeben.
-
-**3) Bundle E (Übungsstart-Latenz) bleibt offen** — eigenes Backend-Bundle, nicht Teil des Lückentext-Projekts. `lernplattformLadeLoesungen` serielle Sheet-Reads optimieren (Bulk-Tab-Read + CacheService.putAll Pre-Warm). Brainstorming → Spec → Plan nötig.
 
 ---
 
