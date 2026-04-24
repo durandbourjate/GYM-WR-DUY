@@ -720,6 +720,108 @@ function parseBerechtigungen(berechtigungen) {
   return [];
 }
 
+// === Problemmeldungen — Helper ===
+
+/**
+ * Liest Fragen-Sheet 1× und gibt Map {frageId: frageMeta} zurück.
+ * frageMeta enthält alle Felder, die istSichtbarMitLP / ermittleRechtMitLP brauchen:
+ * autor, erstelltVon, berechtigungen, geteilt, fachbereich, quelle.
+ * Zusätzlich: inhaberAktiv (Inhaber-Email noch im LP-Sheet).
+ */
+function baueFrageMetaMap_(frageIds) {
+  var map = {};
+  if (!frageIds || !frageIds.length) return map;
+
+  var fragenbank = SpreadsheetApp.openById(FRAGENBANK_ID);
+  var sheets = fragenbank.getSheets();
+  // LP-Emails einmalig holen für inhaberAktiv-Check
+  var aktiveEmails = holeAktiveLPEmails_();
+
+  for (var s = 0; s < sheets.length; s++) {
+    var sheet = sheets[s];
+    var name = sheet.getName();
+    if (FRAGENBANK_SYSTEM_TABS.indexOf(name) !== -1) continue;
+    var lastCol = sheet.getLastColumn();
+    if (lastCol === 0) continue;
+    var data = sheet.getDataRange().getValues();
+    if (data.length < 2) continue;
+    var headers = data[0].map(function(h) { return String(h).toLowerCase().trim(); });
+    var idIdx = headers.indexOf('id');
+    var autorIdx = headers.indexOf('autor');
+    var erstelltIdx = headers.indexOf('erstelltvon');
+    var berechtIdx = headers.indexOf('berechtigungen');
+    var geteiltIdx = headers.indexOf('geteilt');
+    var fachIdx = headers.indexOf('fachbereich');
+    var quelleIdx = headers.indexOf('quelle');
+    if (idIdx < 0) continue;
+
+    for (var i = 1; i < data.length; i++) {
+      var id = String(data[i][idIdx] || '');
+      if (!id || frageIds.indexOf(id) < 0) continue;
+      var inhaber = autorIdx >= 0 ? String(data[i][autorIdx] || '').toLowerCase() : '';
+      if (!inhaber && erstelltIdx >= 0) inhaber = String(data[i][erstelltIdx] || '').toLowerCase();
+      map[id] = {
+        id: id,
+        autor: autorIdx >= 0 ? String(data[i][autorIdx] || '') : '',
+        erstelltVon: erstelltIdx >= 0 ? String(data[i][erstelltIdx] || '') : '',
+        berechtigungen: berechtIdx >= 0 ? data[i][berechtIdx] : [],
+        geteilt: geteiltIdx >= 0 ? String(data[i][geteiltIdx] || '') : '',
+        fachbereich: fachIdx >= 0 ? String(data[i][fachIdx] || '') : '',
+        quelle: quelleIdx >= 0 ? String(data[i][quelleIdx] || '') : '',
+        inhaberEmail: inhaber,
+        inhaberAktiv: inhaber ? aktiveEmails.indexOf(inhaber) >= 0 : false,
+      };
+    }
+  }
+  return map;
+}
+
+/**
+ * Liest Gruppen-Registry 1× und gibt Map {gruppeId: meta} zurück.
+ * Pruefung + Uebung teilen dieselbe Registry (unterscheidbar via typ).
+ */
+function baueGruppeMetaMap_(gruppeIds) {
+  var map = {};
+  if (!gruppeIds || !gruppeIds.length) return map;
+  var gruppen = alleGruppenLaden_();
+  gruppen.forEach(function(g) {
+    if (gruppeIds.indexOf(g.id) < 0) return;
+    map[g.id] = {
+      id: g.id,
+      autor: g.adminEmail,
+      erstelltVon: g.adminEmail,
+      berechtigungen: [],  // Gruppen haben Mitglieder-Tab, keine berechtigungen-Array
+      geteilt: '',
+      fachbereich: '',
+      quelle: '',
+      typ: g.typ,
+      inhaberEmail: String(g.adminEmail || '').toLowerCase(),
+      inhaberAktiv: true,  // Admin-Email war in Registry, damit gültig
+    };
+  });
+  return map;
+}
+
+/**
+ * Hilfsfunktion: Liste aller aktiven LP-Emails (lowercase).
+ * Wird genau einmal pro listeProblemmeldungen-Call aufgerufen.
+ */
+function holeAktiveLPEmails_() {
+  var sheet = SpreadsheetApp.openById(CONFIGS_ID).getSheetByName('Lehrpersonen');
+  if (!sheet) return [];
+  var data = sheet.getDataRange().getValues();
+  if (data.length < 2) return [];
+  var headers = data[0].map(function(h) { return String(h).toLowerCase().trim(); });
+  var emailIdx = headers.indexOf('email');
+  if (emailIdx < 0) return [];
+  var out = [];
+  for (var i = 1; i < data.length; i++) {
+    var e = String(data[i][emailIdx] || '').toLowerCase().trim();
+    if (e) out.push(e);
+  }
+  return out;
+}
+
 // Zentrale Daten-Sheets (Synergien)
 const KURSE_SHEET_ID = '1inmEds_g48-lTFCqo9NUqAcxhDxF2mFSoBM5fO6uJng';       // User muss ID einsetzen
 const STUNDENPLAN_SHEET_ID = '1mesBOmPuLewvnY5iNb4iD2zNDUn8-ruK5HE0DsKwUSs';
