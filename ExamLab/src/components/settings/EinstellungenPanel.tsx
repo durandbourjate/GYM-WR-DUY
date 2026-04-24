@@ -9,6 +9,7 @@ import FavoritenTab from './FavoritenTab'
 import AdminSettings from '../ueben/admin/AdminSettings'
 import KIKalibrierungTab from './kiKalibrierung/KIKalibrierungTab'
 import ProblemmeldungenTab from './problemmeldungen/ProblemmeldungenTab'
+import FragensammlungTab from './fragensammlung/FragensammlungTab'
 import { listeProblemmeldungen } from '../../services/problemmeldungenApi'
 import type { Problemmeldung } from '../../types/problemmeldung'
 
@@ -58,6 +59,7 @@ export default function EinstellungenPanel({ onSchliessen, initialTab }: Props) 
     { key: 'favoriten', label: 'Favoriten', sichtbar: true },
     { key: 'problemmeldungen', label: `Problemmeldungen${offeneCount > 0 ? ` (${offeneCount})` : ''}`, sichtbar: true },
     { key: 'uebungen', label: 'Übungen', sichtbar: true },
+    { key: 'fragensammlung', label: 'Fragensammlung', sichtbar: true },
     { key: 'admin', label: 'Admin', sichtbar: admin },
     { key: 'kiKalibrierung', label: 'KI-Kalibrierung', sichtbar: true },
   ]
@@ -109,6 +111,9 @@ export default function EinstellungenPanel({ onSchliessen, initialTab }: Props) 
         )}
         {tab === 'problemmeldungen' && user?.email && (
           <ProblemmeldungenTab email={user.email} istAdmin={admin} onSchliessen={onSchliessen} />
+        )}
+        {tab === 'fragensammlung' && user?.email && (
+          <FragensammlungTab email={user.email} istAdmin={admin} />
         )}
       </div>
       </div>

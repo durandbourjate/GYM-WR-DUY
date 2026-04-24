@@ -1,0 +1,14 @@
+node_modules/
+fragen-dump.json
+prompt-input-*.json
+stichprobe.json
+stichprobe-ids.json
+stichprobe-response.json
+stichprobe-review.md
+state.json
+batch-*.json
+batch-*.jsonl
+lueckentext-updates.jsonl
+upload.log
+.env
+*.log

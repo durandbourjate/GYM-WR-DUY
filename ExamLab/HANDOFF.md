@@ -6,32 +6,81 @@
 
 ---
 
-## Für die nächste Session (S143+)
+## Für die nächste Session (S145+)
 
-### Aktueller Stand (Ende S142, 24.04.2026) — Bildeditor-Bundle auf `main`, Lückentext-Fix auf `preview`
+### Aktueller Stand (S144, 24.04.2026) — Lückentext-Modus Phase 1-7 auf `main` gemergt
 
-**Auf `main` gemergt (S142, Commit `d35a30b`):** Bildeditor Keyboard-Delete + Click-Bug-Fix — User kann Zone/Hotspot/Label markieren und per Delete/Backspace löschen. Bug behoben: Klick auf bestehende Zone-Fläche im Rechteck-Modus erzeugte eine neue "erste Ecke" (SVG-Target-Guard in handleBildKlick). Staging-E2E bestätigt.
+**Branch `fix/lueckentext-editor` auf `main` gemergt** (25 Commits: Phase 1-7 + Editor-Feld-Labels). Alle 253 Lückentext-Fragen haben jetzt `korrekteAntworten` (Hauptantwort + Synonyme) + `dropdownOptionen` (genau 5: 1 Korrekte + 4 Distraktoren). `pruefungstauglich=false` gesetzt — wartet auf LP-Review. **Browser-E2E mit echten Logins (Phase 8) wurde beim Merge NICHT durchgeführt** — User hat explizit Freigabe auf Basis von 680/680 vitest + tsc + build erteilt. Falls Regressionen auftauchen, in Follow-up-Session nacharbeiten.
 
-**Offen auf Feature-Branch `fix/lueckentext-editor` (preview deployed):**
+**Plan-Dokument:** [`ExamLab/docs/superpowers/plans/2026-04-24-lueckentext-modus-migration.md`](docs/superpowers/plans/2026-04-24-lueckentext-modus-migration.md) — 22 Tasks in 8 Phasen. Phasen 1-7 komplett. Phase 8 offen.
 
-1. **Phase 1 Editor-Fix** (Commit `4a3db93`):
-   - LueckentextEditor akzeptiert jetzt `{N}` UND `{{N}}` (SuS-Renderer konnte das schon).
-   - Mount-Migration: Pool-importierte Fragen mit `{N}` werden beim Öffnen im Editor auf `{{N}}` normalisiert.
-   - ID-Bridge: bestehende `luecke-N`-IDs (aus Pool-Imports) bleiben erhalten.
-   - Warn-Markierung: Lücken ohne korrekteAntworten bekommen roten Rahmen + Hinweistext.
-2. **Phase 2 GAS-Scan-Funktion** (gleicher Commit):
-   - `zaehleLeereLueckentextAntworten()` in apps-script-code.js — scannt alle 4 Fachbereich-Tabs, liefert Summary + Liste betroffener Frage-IDs. Manuell im GAS-Editor ausführen, kein Deploy nötig.
-3. **Phase 3 Spec** (Commit `2eee27f`): `docs/superpowers/specs/2026-04-24-lueckentext-antworten-migration-design.md` — Design für KI-Batch-Migration (Claude Code, analog C9 Phase 4).
+**Was komplett ist:**
+1. **Phase 1** (Datenmodell): `LueckentextFrage.lueckentextModus?: 'freitext' | 'dropdown'` + Normalizer-Default (Heuristik: explizit > dropdownOptionen non-empty > freitext). Commit `5be371c`.
+2. **Phase 2** (Renderer): `LueckentextFrage.tsx` respektiert Modus statt alter `dropdownOptionen`-Heuristik. Korrektur ist modus-agnostisch (verifiziert mit Test). 3+1 Tests. Commits `0aba4ca` + `501eb5e`.
+3. **Phase 3** (Editor): Per-Frage-Toggle (Freitext/Dropdown) im LueckentextEditor, beide Felder sichtbar, inaktives gedimmt mit Label. `fragenFactory` defaulted `freitext`. Tote `ExamLab/src/utils/fragenFactory.ts` entfernt (S129 Lehre). 5 Tests. Commits `ff94a55` + `7ed7a9b` + `8315807`.
+4. **Phase 4** (Apps-Script Backend): `bereinigeFrageFuerSuS_` bewahrt Modus (Blacklist-Pattern bestätigt) + Test-Shim. Parser R/W an 3 Stellen (`parseFrage`, `parseFrageKanonisch_`, `getTypDaten`) + DRY-Helper `ermittleLueckentextModus_`. One-shot Migrator `migriereLueckentextModus` mit batch-setValues. Commits `2c92343` + `fa2652b` + `a638965` + `769093e` (Fixes DRY/Admin-Guard/Batch-Write) + `48f96b3` (Session-Scope-Fix).
+5. **Phase 5** (Endpoint): `batchUpdateLueckentextMigration` (Admin-only, partial update, setzt `pruefungstauglich=''`, LockService-geschützt). Test-Shim mit Restore-Logik für Test-Frage. Commits `07cc8f3` + `9928282` (Fixes: Kontrakt-Klärung + Test-Shim-Restore + Empty-Array-Semantik + Concurrency-JSDoc).
+6. **Phase 6** (Settings-Tab): Neuer Tab "Fragensammlung" in LP-Einstellungen, erste Funktion: Bulk-Toggle (Admin-only) zum Umschalten aller 253 Lückentext-Fragen zwischen Freitext/Dropdown. Frontend (Tab + Toggle + API-Wrapper mit `unwrap<T>`) + Backend (`bulkSetzeLueckentextModus_` mit batch-setValues + Cache-Invalidation + LockService). 3 Tests. Commits `5fa0a90` + `fbdd0a4` (LockService-Fix).
+7. **Phase 7 Tasks 15-18** (KI-Batch-Skripte in `ExamLab/scripts/migrate-lueckentext-antworten/`): `dump.mjs` + `prompt-template.md` (schon in S142), neu `pick-stichprobe.mjs` (seed=42, 5/fachbereich), `review-generator.mjs` (Markdown mit alt-vs-neu + Sanity-Checks), `upload.mjs` (pro-fachbereich POST an `batchUpdateLueckentextMigration`, split-on-error bei >10 Einträgen), `package.json`, `.gitignore`, `README.md`, `SESSION-PROTOCOL.md`. Template = C9 Phase 4 (`migrate-teilerklaerungen/`). Commit `204043e`.
+8. **Phase 7 Task 19** (User-Run S144, 24.04.2026, Claude Code durchgeführt): Dump → Stichprobe (15 Fragen, 5/Fachbereich) → Claude-Code-Session direkt im Workflow → `stichprobe-response.json` → Review-MD mit LP-OK → Full-Run mit drei Batches (batch-BWL: 58, batch-Recht: 94, batch-VWL: 101) → 3× `upload.mjs` via `batchUpdateLueckentextMigration`. **Resultat: 253/253 aktualisiert, 0 nichtGefunden, 0 keineLuecken, 0 falscherTyp.** Re-Dump + Verifikations-Skript: **0 Fragen mit leeren korrekteAntworten, 0 Fragen mit Dropdown ≠ 5.** Alle Fragen `pruefungstauglich=false`.
 
-**To-do nächste Session:**
-1. Auf `fix/lueckentext-editor` checken, Tab 1 hard-reload, Frage `5b8e11b4-afd9-4e98-bf8c-e1c55d0a63c6` im LP-Editor öffnen → prüfen dass (a) Text auf `{{0}}`/`{{1}}` normalisiert wurde, (b) Lücken-Liste angezeigt, (c) leere Inputs rot markiert.
-2. GAS-Editor öffnen → `zaehleLeereLueckentextAntworten` ausführen → Logger-Output: Zahlen pro Fachbereich + Liste betroffener IDs.
-3. User-Entscheidung Variante A (nur leere befüllen) vs. B (alle Lückentexte mit Synonymen + Dropdown erweitern).
-4. Plan für Phase 3 schreiben (`docs/superpowers/plans/2026-04-24-lueckentext-antworten-migration.md`).
-5. Merge `fix/lueckentext-editor` → `main`.
-6. Phase 3 ausführen (Dump → Stichprobe → Review → Full-Run analog C9 Phase 4).
+**Test-Stand:** 680/680 vitest, tsc -b clean, build success. (Neue .mjs-Skripte: `node --check` OK.)
 
-**Bundle E (Übungsstart-Latenz) bleibt offen** — eigenes Backend-Bundle nach Lückentext-Migration.
+**Apps-Script Deploy & User-Tests (24.04.2026):**
+- ✅ `testBereinigeLueckentextModus` → lueckentextModus bleibt nach bereinige erhalten
+- ✅ `testC9BatchUpdateLueckentextMigration` → Endpoint + Restore-Logik funktionieren (Test-Frage `da05a438-…` sauber wiederhergestellt inkl. `pruefungstauglich`/`geaendertAm`/`poolContentHash`)
+- ✅ `testBulkSetzeLueckentextModus` → 253 Fragen auf `freitext` gesetzt, Idempotenz-Check `alleBereits=true`
+- ✅ `migriereLueckentextModus` → `Total: 253 · Neu gesetzt: 0 · Bereits gesetzt: 253` (alle via Bulk-Test schon migriert)
+- ✅ `batchUpdateLueckentextMigration` (drei echte Calls BWL/Recht/VWL, Task 19): `aktualisiert=58/94/101`, `nichtGefunden=0`, `keineLuecken=0`, `falscherTyp=0`
+
+**Status der 253 Lückentext-Fragen (nach Phase 7):**
+- Alle haben `lueckentextModus='freitext'` (Default — LP kann pro Frage oder via Bulk-Toggle auf `dropdown` wechseln)
+- Alle haben **≥1 `korrekteAntworten`** (Hauptantwort + 0-3 Synonyme) — verifiziert via Re-Dump
+- Alle haben **genau 5 `dropdownOptionen`** (1 Korrekte + 4 Distraktoren) — verifiziert via Re-Dump
+- Alle haben `pruefungstauglich=false` — **manuelle LP-Prüfung pro Frage vor Freigabe nötig**
+- `geaendertAm` auf 2026-04-24 aktualisiert; `poolContentHash` geleert (wird beim nächsten Pool-Check neu berechnet)
+
+**Backup-Status:** User hat Google-Sheets-Backup der Fragenbank vor Phase 7 erstellt (Pflicht laut README). Rollback-Pfad: Drive → Backup-Kopie umbenennen → Live-Fragenbank ersetzen + Apps-Script-Cache invalidieren.
+
+### Offen für S145+
+
+**1) Browser-E2E nachholen** (Phase 8 Tasks 20-21, beim Merge übersprungen):
+
+Test-Plan schreiben laut `regression-prevention.md` Phase 3.0 (Tabelle Änderung · Erwartetes Verhalten · Regressions-Risiko + Security-Check + kritische Pfade aus §1.3).
+
+Browser-Test mit echten Logins (LP: yannick.durand@gymhofwil.ch · SuS: wr.test@stud.gymhofwil.ch, nie Demo-Modus):
+
+**LP-Pfade:**
+- [ ] Fragensammlung → Lückentext-Frage öffnen → Feld-Labels "Freitext" / "Dropdown" sichtbar, Modus-Toggle funktioniert, inaktives Feld gedimmt
+- [ ] Einstellungen → Fragensammlung → Bulk-Toggle auf Dropdown → alle 253 wechseln
+- [ ] Prev/Next-Navigation im Editor — Felder korrekt gesynct (S129-Regel: `key={frage.id}`)
+- [ ] Manuelle Stichprobe 3 Fragen pro Fachbereich: sind Hauptantwort + Distraktoren plausibel?
+
+**SuS-Pfade (via LP-Bulk-Toggle beide Modi testen):**
+- [ ] **Freitext-Modus:** SuS tippt Hauptantwort → Auto-Korrektur = korrekt
+- [ ] **Freitext-Modus:** SuS tippt Synonym (z.B. "preiselastisch" statt "elastisch") → Auto-Korrektur = korrekt (case-insensitive!)
+- [ ] **Freitext-Modus:** SuS tippt Distraktor aus Dropdown ein → Auto-Korrektur = falsch
+- [ ] **Dropdown-Modus:** SuS wählt Korrekte → Auto-Korrektur = korrekt
+- [ ] **Dropdown-Modus:** SuS wählt Distraktor → Auto-Korrektur = falsch
+- [ ] **Einrichtungs-Frage** `einr-lt-hofwil`/`ueb-lt-hofwil`: Hofwil/Münchenbuchsee/Bern — beide Modi testen (spezielle `0`/`1`/`2`-Lücken-IDs, nicht `luecke-0`)
+
+**Security-Invarianten (Network-Tab):**
+- [ ] SuS-Request `holeFrage` zeigt im Response-Body KEINE `korrekteAntworten[]` und KEINE `dropdownOptionen[]` mehr als der Renderer braucht
+- [ ] LP-Request sieht alle Felder
+
+Bei Regressionen: direkt auf `main` Fix-Commit, oder Hotfix-Branch.
+
+**2) LP-Review der migrierten Antworten** (paralleler Prozess, kein Merge-Blocker):
+
+Alle 253 Fragen haben `pruefungstauglich=false`. Der LP geht pro Frage im Frontend (Fragensammlung-Editor) durch, prüft Hauptantwort + Synonyme + Distraktoren, passt wo nötig an und setzt `pruefungstauglich=true`. Keine automatische Freischaltung — Fragensammlung bleibt dark-launched bis manuell freigegeben.
+
+**3) Bundle E (Übungsstart-Latenz) bleibt offen** — eigenes Backend-Bundle, nicht Teil des Lückentext-Projekts. `lernplattformLadeLoesungen` serielle Sheet-Reads optimieren (Bulk-Tab-Read + CacheService.putAll Pre-Warm). Brainstorming → Spec → Plan nötig.
+
+---
+
+### Vorgänger-Stand (Ende S142, 24.04.2026) — Bildeditor-Bundle auf `main`
+
+Bildeditor Keyboard-Delete + Click-Bug-Fix auf `main` (Commit `d35a30b`). User kann Zone/Hotspot/Label markieren und per Delete/Backspace löschen. Bug behoben: Klick auf bestehende Zone-Fläche im Rechteck-Modus erzeugte eine neue "erste Ecke" (SVG-Target-Guard in `handleBildKlick`). Staging-E2E bestätigt.
 
 ### Vorgänger-Stand (Ende S141, 24.04.2026) — Altlasten-Bundle auf `main` gemergt
 

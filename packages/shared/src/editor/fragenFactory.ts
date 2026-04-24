@@ -58,7 +58,7 @@ export interface FrageBasis {
 export type TypSpezifischeDaten =
   | { typ: 'mc'; fragetext: string; optionen: MCOption[]; mehrfachauswahl: boolean; erklaerungSichtbar?: boolean }
   | { typ: 'freitext'; fragetext: string; laenge: 'kurz' | 'mittel' | 'lang'; placeholder: string; minWoerter?: number; maxWoerter?: number }
-  | { typ: 'lueckentext'; fragetext: string; textMitLuecken: string; luecken: LueckentextFrage['luecken'] }
+  | { typ: 'lueckentext'; fragetext: string; textMitLuecken: string; luecken: LueckentextFrage['luecken']; lueckentextModus?: 'freitext' | 'dropdown' }
   | { typ: 'zuordnung'; fragetext: string; paare: { links: string; rechts: string }[] }
   | { typ: 'richtigfalsch'; fragetext: string; aussagen: RichtigFalschFrage['aussagen']; erklaerungSichtbar?: boolean }
   | { typ: 'berechnung'; fragetext: string; ergebnisse: BerechnungFrage['ergebnisse']; rechenwegErforderlich: boolean; hilfsmittel: string }
@@ -109,6 +109,7 @@ export function erstelleFrageObjekt(basis: FrageBasis, typDaten: TypSpezifischeD
         fragetext: typDaten.fragetext.trim(),
         textMitLuecken: typDaten.textMitLuecken.trim(),
         luecken: typDaten.luecken.length > 0 ? typDaten.luecken : parseLuecken(typDaten.textMitLuecken),
+        lueckentextModus: typDaten.lueckentextModus ?? 'freitext',
       } as LueckentextFrage
 
     case 'zuordnung':

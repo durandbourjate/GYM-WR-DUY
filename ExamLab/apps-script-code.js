@@ -1200,6 +1200,10 @@ function doPost(e) {
       return holeAlleFragenFuerMigrationEndpoint(body);
     case 'batchUpdateFragenMigration':
       return batchUpdateFragenMigrationEndpoint(body);
+    case 'batchUpdateLueckentextMigration':
+      return batchUpdateLueckentextMigrationEndpoint(body);
+    case 'bulkSetzeLueckentextModus':
+      return bulkSetzeLueckentextModusEndpoint(body);
     case 'loescheFrage':
       return loescheFrage(body);
     case 'loescheAllePoolFragen':
@@ -1648,6 +1652,22 @@ function safeJsonParse(str, fallback) {
 
 /** Alias für Lernplattform-Funktionen (die safeJsonParse_ mit Unterstrich verwenden) */
 function safeJsonParse_(str, fallback) { return safeJsonParse(str, fallback); }
+
+/**
+ * Ermittelt Lückentext-Modus aus typDaten. Heuristik:
+ * explizit ('freitext'|'dropdown') > dropdownOptionen non-empty → 'dropdown' > 'freitext'.
+ * Identische Logik wie Frontend-Normalizer (fragetypNormalizer.ts).
+ * Shared-Helper für parseFrage, parseFrageKanonisch_ und migriereLueckentextModus.
+ */
+function ermittleLueckentextModus_(typDatenObj) {
+  var modus = typDatenObj && typDatenObj.lueckentextModus;
+  if (modus === 'freitext' || modus === 'dropdown') return modus;
+  var luecken = typDatenObj && typDatenObj.luecken;
+  var hatDropdowns = Array.isArray(luecken) && luecken.some(function(l) {
+    return l && Array.isArray(l.dropdownOptionen) && l.dropdownOptionen.length > 0;
+  });
+  return hatDropdowns ? 'dropdown' : 'freitext';
+}
 
 // ============================================================
 // === MediaQuelle Migrator (JS-Port, S125 Phase 5) ===
@@ -2859,14 +2879,23 @@ function parseFrage(row, fachbereich) {
         maxZeichen: row.maxZeichen ? Number(row.maxZeichen) : undefined,
         hilfstextPlaceholder: typDaten.hilfstextPlaceholder || row.hilfstextPlaceholder || '',
       };
-    case 'lueckentext':
+    case 'lueckentext': {
+      // Phase 4 Task 8: lueckentextModus aus typDaten lesen, mit Heuristik-Fallback
+      // bei Alt-Daten (dropdownOptionen-Präsenz → 'dropdown', sonst 'freitext').
+      var ltLuecken = typDaten.luecken || safeJsonParse(row.luecken, []);
+      var ltModus = ermittleLueckentextModus_({
+        lueckentextModus: typDaten.lueckentextModus,
+        luecken: ltLuecken,
+      });
       return {
         ...base,
         typ: 'lueckentext',
         fragetext: row.fragetext || '',
         textMitLuecken: typDaten.textMitLuecken || row.textMitLuecken || '',
-        luecken: typDaten.luecken || safeJsonParse(row.luecken, []),
+        luecken: ltLuecken,
+        lueckentextModus: ltModus,
       };
+    }
     case 'zuordnung':
       return {
         ...base,
@@ -3969,7 +3998,11 @@ function getTypDaten(frage) {
     case 'freitext':
       return { laenge: frage.laenge, hilfstextPlaceholder: frage.hilfstextPlaceholder };
     case 'lueckentext':
-      return { textMitLuecken: frage.textMitLuecken, luecken: frage.luecken };
+      // Phase 4 Task 8: lueckentextModus explizit in typDaten schreiben.
+      // `getTypDaten` nutzt ein Field-Whitelist-Pattern — neue Rendering-Metadata
+      // muss hier ergänzt werden, sonst geht das Feld bei jedem Save verloren
+      // (vgl. S125-Lehre zu Hotspot: Legacy-Feldnamen zerstörten Daten).
+      return { textMitLuecken: frage.textMitLuecken, luecken: frage.luecken, lueckentextModus: frage.lueckentextModus };
     case 'zuordnung':
       return { paare: frage.paare, zufallsreihenfolge: frage.zufallsreihenfolge };
     case 'richtigfalsch':
@@ -8956,13 +8989,22 @@ function parseFrageKanonisch_(row, fachbereich) {
         fragetext: row.fragetext || '',
         laenge: typDaten.laenge || row.laenge || 'mittel',
       });
-    case 'lueckentext':
+    case 'lueckentext': {
+      // Phase 4 Task 8: lueckentextModus aus typDaten lesen, mit Heuristik-Fallback
+      // bei Alt-Daten (dropdownOptionen-Präsenz → 'dropdown', sonst 'freitext').
+      var ltLuecken = typDaten.luecken || safeJsonParse_(row.luecken, []);
+      var ltModus = ermittleLueckentextModus_({
+        lueckentextModus: typDaten.lueckentextModus,
+        luecken: ltLuecken,
+      });
       return Object.assign(base, {
         typ: 'lueckentext',
         fragetext: row.fragetext || '',
         textMitLuecken: typDaten.textMitLuecken || row.textMitLuecken || '',
-        luecken: typDaten.luecken || safeJsonParse_(row.luecken, []),
+        luecken: ltLuecken,
+        lueckentextModus: ltModus,
       });
+    }
     case 'richtigfalsch':
       return Object.assign(base, {
         typ: 'richtigfalsch',
@@ -11500,6 +11542,506 @@ function testC9BatchUpdateFragenMigration_() {
 }
 
 /**
+ * Lückentext-Phase-5 Task 10 — Batch-Update-Endpoint fuer KI-Migration
+ * der luecken[].korrekteAntworten und luecken[].dropdownOptionen.
+ *
+ * Partial-Update-Semantik: NUR die gemeldeten luecken[].korrekteAntworten +
+ * luecken[].dropdownOptionen werden ueberschrieben, alles andere (fragetext,
+ * textMitLuecken, lueckentextModus, bloom, thema, punkte, tags, autor, ...)
+ * bleibt 1:1 erhalten. Luecken die NICHT in updates.luecken[] vorkommen,
+ * bleiben ebenfalls unveraendert. pruefungstauglich wird auf '' (false)
+ * gesetzt — keine KI-generierten Antworten ohne LP-Review in Prüfungen.
+ *
+ * Analog zu batchUpdateFragenMigrationEndpoint (C9 Phase 4).
+ *
+ * Request-Body: {
+ *   action: 'batchUpdateLueckentextMigration',
+ *   email: '<admin-lp>',
+ *   fachbereich: 'VWL'|'BWL'|'Recht'|'Informatik',
+ *   updates: [
+ *     { id: '<frage-id>', luecken: [
+ *       { id: 'luecke-0', korrekteAntworten: [...], dropdownOptionen: [...] },
+ *       ...
+ *     ]}
+ *   ]
+ * }
+ *
+ * Response: { success, fachbereich, aktualisiert, nichtGefunden: [ids], keineLuecken: [ids], falscherTyp: [ids] }
+ *
+ * @note MIGRATIONS-FENSTER-PFLICHT: Dieser Endpoint liest via getValues() das
+ *       komplette Sheet in den Speicher, mutiert die Row-Kopien und schreibt
+ *       am Ende alles via setValues() zurueck. Laeuft parallel dazu ein
+ *       speichereFrage-Call eines LP, wird dessen Aenderung silent ueberschrieben
+ *       (Last-Writer-Wins auf unserer Seite). Darum DARF dieser Endpoint nur
+ *       waehrend einem angekuendigten Migrations-Fenster laufen — der Admin
+ *       muss vorher sicherstellen, dass keine LP/SuS gleichzeitig editieren
+ *       (Status bekannt geben, kurze Fragenbank-Freeze). Phase 6 kann das
+ *       mit Row-Level-Updates (statt Whole-Sheet-Snapshot) entschaerfen.
+ */
+function batchUpdateLueckentextMigrationEndpoint(body) {
+  var lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(30000);
+    var email = body.email;
+    if (!email || !istZugelasseneLP(email)) {
+      return jsonResponse({ error: 'Nur für Lehrpersonen' });
+    }
+    var lpInfo = getLPInfo(email);
+    if (!lpInfo || lpInfo.rolle !== 'admin') {
+      return jsonResponse({ error: 'Nur für Admins' });
+    }
+    var fachbereich = body.fachbereich;
+    if (['VWL','BWL','Recht','Informatik'].indexOf(fachbereich) < 0) {
+      return jsonResponse({ error: 'Ungültiger fachbereich: ' + fachbereich });
+    }
+    var updates = body.updates;
+    if (!Array.isArray(updates) || updates.length === 0) {
+      return jsonResponse({ error: 'updates[] erwartet' });
+    }
+
+    var fragenbank = SpreadsheetApp.openById(FRAGENBANK_ID);
+    var sheet = fragenbank.getSheetByName(fachbereich);
+    if (!sheet) return jsonResponse({ error: 'Sheet ' + fachbereich + ' nicht gefunden' });
+
+    // Gesamte Sheet-Daten lesen
+    var lastRow = sheet.getLastRow();
+    var lastCol = sheet.getLastColumn();
+    if (lastRow < 2 || lastCol < 1) {
+      return jsonResponse({ error: 'Sheet ist leer' });
+    }
+    var allData = sheet.getRange(1, 1, lastRow, lastCol).getValues();
+    var headers = allData[0].map(String);
+    var idCol = headers.indexOf('id');
+    var typCol = headers.indexOf('typ');
+    var typDatenCol = headers.indexOf('typDaten');
+    var jsonCol = headers.indexOf('json');
+    var datenCol = headers.indexOf('daten');
+    var pruefungstauglichCol = headers.indexOf('pruefungstauglich');
+    var geaendertAmCol = headers.indexOf('geaendertAm');
+    var poolContentHashCol = headers.indexOf('poolContentHash');
+
+    if (idCol < 0) {
+      return jsonResponse({ error: 'Pflicht-Spalte id fehlt im Sheet' });
+    }
+    // Write-Ziel: typDaten bevorzugt (parseFrage liest Lückentext primär daraus),
+    // sonst json (Legacy), sonst daten. Wenn gar keine da ist: hart abbrechen.
+    var writeCol = typDatenCol >= 0 ? typDatenCol : (jsonCol >= 0 ? jsonCol : datenCol);
+    if (writeCol < 0) {
+      return jsonResponse({ error: 'Keine typDaten/json/daten-Spalte vorhanden' });
+    }
+
+    // ID → Index in allData
+    var idToRow = {};
+    for (var r = 1; r < allData.length; r++) {
+      var id = String(allData[r][idCol] || '');
+      if (id) idToRow[id] = r;
+    }
+
+    var nichtGefunden = [];
+    var keineLuecken = [];
+    var falscherTyp = [];
+    var aktualisiert = 0;
+    var nowIso = new Date().toISOString();
+
+    for (var u = 0; u < updates.length; u++) {
+      var upd = updates[u];
+      if (!upd || !upd.id) continue;
+      var rowIdx = idToRow[upd.id];
+      if (rowIdx === undefined) {
+        nichtGefunden.push(upd.id);
+        continue;
+      }
+      var row = allData[rowIdx];
+
+      // Sicherheit: nur Lückentext-Fragen updaten
+      if (typCol >= 0) {
+        var typWert = String(row[typCol] || '');
+        if (typWert !== 'lueckentext') {
+          falscherTyp.push(upd.id);
+          continue;
+        }
+      }
+
+      var typDatenRaw = String(row[writeCol] || '{}');
+      var typDaten;
+      try { typDaten = JSON.parse(typDatenRaw); } catch (e) { typDaten = {}; }
+      if (!Array.isArray(typDaten.luecken)) {
+        keineLuecken.push(upd.id); // JSON hat kein luecken-Array → nicht migrierbar
+        continue;
+      }
+
+      // Nur die gemeldeten luecken ueberschreiben — alle anderen bleiben
+      var updateLuecken = Array.isArray(upd.luecken) ? upd.luecken : [];
+      var updById = {};
+      for (var lu = 0; lu < updateLuecken.length; lu++) {
+        var luUpd = updateLuecken[lu];
+        if (luUpd && luUpd.id) updById[String(luUpd.id)] = luUpd;
+      }
+
+      typDaten.luecken = typDaten.luecken.map(function(l) {
+        var luUpd = l && l.id ? updById[String(l.id)] : null;
+        if (!luUpd) return l;
+        var merged = Object.assign({}, l);
+        // Semantik (Option a):
+        //   Array.isArray(x) === true  → ueberschreibt (auch leeres [] ist ein explizites Signal:
+        //                                 "LP wird's noch befuellen" / "Korrekte Antworten bewusst leer").
+        //   undefined / fehlendes Feld → bestehender Wert bleibt (Feld nicht migriert).
+        // Die KI-Batch-Pipeline liefert immer populierte Arrays, wenn sie eine Antwort
+        // generiert hat. Weiss sie nichts (halluzinations-safe), MUSS sie das Feld
+        // weglassen — nicht [] senden — damit der Alt-Wert erhalten bleibt.
+        if (Array.isArray(luUpd.korrekteAntworten)) {
+          merged.korrekteAntworten = luUpd.korrekteAntworten;
+        }
+        if (Array.isArray(luUpd.dropdownOptionen)) {
+          merged.dropdownOptionen = luUpd.dropdownOptionen;
+        }
+        return merged;
+      });
+
+      var newJson = JSON.stringify(typDaten);
+      row[writeCol] = newJson;
+      // Spiegel-Spalten aktualisieren wenn vorhanden (Legacy-Kompat für Reader
+      // die json/daten statt typDaten lesen).
+      if (jsonCol >= 0 && jsonCol !== writeCol) row[jsonCol] = newJson;
+      if (datenCol >= 0 && datenCol !== writeCol) row[datenCol] = newJson;
+      if (pruefungstauglichCol >= 0) row[pruefungstauglichCol] = ''; // false (leer = nicht-true)
+      if (geaendertAmCol >= 0) row[geaendertAmCol] = nowIso;
+      if (poolContentHashCol >= 0) row[poolContentHashCol] = ''; // neu berechnen beim naechsten Pool-Check
+
+      aktualisiert++;
+    }
+
+    // Alle Daten zurueckschreiben (ein setValues-Call — schnell auch bei 800+ rows)
+    sheet.getRange(1, 1, allData.length, headers.length).setValues(allData);
+
+    // Cache invalidieren
+    try { cacheInvalidieren_(); } catch (e) { /* ignore */ }
+
+    return jsonResponse({
+      success: true,
+      fachbereich: fachbereich,
+      aktualisiert: aktualisiert,
+      nichtGefunden: nichtGefunden, // IDs die nicht im Sheet gefunden wurden
+      keineLuecken: keineLuecken,   // IDs deren JSON kein luecken-Array hat
+      falscherTyp: falscherTyp,     // IDs mit typ !== 'lueckentext'
+    });
+  } catch (error) {
+    return jsonResponse({ error: String(error && error.message || error) });
+  } finally {
+    try { lock.releaseLock(); } catch (e) { /* no-op */ }
+  }
+}
+
+/**
+ * Public-Wrapper für testC9BatchUpdateLueckentextMigration_ — erscheint im GAS-Editor-Dropdown.
+ */
+function testC9BatchUpdateLueckentextMigration() {
+  return testC9BatchUpdateLueckentextMigration_();
+}
+
+/**
+ * Lückentext-Phase-5 — Smoke-Test fuer batchUpdateLueckentextMigrationEndpoint.
+ *
+ * Testet Partial-Update-Semantik + ID-Match + nichtGefunden-Handling + Typ-Guard.
+ *
+ * ⚠️ Schreibt kurz IN DIE ECHTE FRAGENBANK: die erste Lückentext-Frage aus BWL
+ * bekommt TEST-MARKER-korrekteAntworten gesetzt. Nach dem Assert wird der
+ * Originalzustand per zweitem Endpoint-Aufruf zurueckgeschrieben PLUS die
+ * Spalten pruefungstauglich/geaendertAm/poolContentHash werden direkt per
+ * Range.setValue() auf die vorher gemerkten Originalwerte zurueckgesetzt
+ * (der Endpoint selbst ueberschreibt sie bei jedem Call mit '' bzw. nowIso).
+ */
+function testC9BatchUpdateLueckentextMigration_() {
+  function assert_(cond, msg) { if (!cond) throw new Error('Assertion fehlgeschlagen: ' + msg); }
+  var EMAIL = 'wr.test@gymhofwil.ch'; // ← ggf. auf eigene Admin-LP-E-Mail anpassen
+
+  // 1. Eine Lückentext-Frage aus BWL laden
+  var fragenbank = SpreadsheetApp.openById(FRAGENBANK_ID);
+  var sheet = fragenbank.getSheetByName('BWL');
+  var data = getSheetData(sheet);
+  var ltFrage = null;
+  for (var i = 0; i < data.length; i++) {
+    if (data[i].typ === 'lueckentext') { ltFrage = data[i]; break; }
+  }
+  assert_(ltFrage, 'Keine Lückentext-Frage in BWL gefunden');
+  var testId = ltFrage.id;
+  Logger.log('Test-Frage: ' + testId);
+
+  // Original typDaten für Restore zwischenspeichern
+  var lastRow = sheet.getLastRow();
+  var lastCol = sheet.getLastColumn();
+  var allData = sheet.getRange(1, 1, lastRow, lastCol).getValues();
+  var headers = allData[0].map(String);
+  var idCol = headers.indexOf('id');
+  var typDatenCol = headers.indexOf('typDaten');
+  var jsonCol = headers.indexOf('json');
+  var datenCol = headers.indexOf('daten');
+  var pruefungstauglichCol = headers.indexOf('pruefungstauglich');
+  var geaendertAmCol = headers.indexOf('geaendertAm');
+  var poolContentHashCol = headers.indexOf('poolContentHash');
+  var readCol = typDatenCol >= 0 ? typDatenCol : (jsonCol >= 0 ? jsonCol : datenCol);
+  assert_(readCol >= 0, 'Weder typDaten noch json noch daten-Spalte im BWL-Sheet');
+
+  var origRow = null;
+  var origRowIdx = -1; // 0-basiert in allData; spaeter +1 fuer Sheet-Range (1-basiert)
+  for (var rr = 1; rr < allData.length; rr++) {
+    if (String(allData[rr][idCol]) === testId) { origRow = allData[rr]; origRowIdx = rr; break; }
+  }
+  assert_(origRow, 'Test-Frage ' + testId + ' nicht in Row-Data gefunden');
+  var origTypDatenRaw = String(origRow[readCol] || '{}');
+  var origTypDaten = JSON.parse(origTypDatenRaw);
+  assert_(Array.isArray(origTypDaten.luecken) && origTypDaten.luecken.length > 0, 'Test-Frage hat keine luecken');
+  var origPruefungstauglich = origRow[pruefungstauglichCol]; // roh (kann bool/string/'' sein)
+  var origGeaendertAm = geaendertAmCol >= 0 ? origRow[geaendertAmCol] : null;
+  var origPoolContentHash = poolContentHashCol >= 0 ? origRow[poolContentHashCol] : null;
+  Logger.log('  Original pruefungstauglich: ' + JSON.stringify(origPruefungstauglich));
+  Logger.log('  Original geaendertAm: ' + JSON.stringify(origGeaendertAm));
+  Logger.log('  Original anzahl luecken: ' + origTypDaten.luecken.length);
+
+  var ersteLuecke = origTypDaten.luecken[0];
+  var testLueckeId = ersteLuecke.id;
+  assert_(testLueckeId, 'Erste Luecke hat keine id');
+  var origKorrekteAntworten = Array.isArray(ersteLuecke.korrekteAntworten) ? ersteLuecke.korrekteAntworten.slice() : [];
+  var origDropdownOptionen = Array.isArray(ersteLuecke.dropdownOptionen) ? ersteLuecke.dropdownOptionen.slice() : [];
+
+  // 2. Marker-Update senden + absichtlich eine non-existente Frage-ID und eine
+  // non-existente Luecke-ID mitgeben (sollen ignoriert werden bzw. in nichtGefunden).
+  var markerAntwort = 'TEST-MARKER-' + Date.now();
+  var body = {
+    action: 'batchUpdateLueckentextMigration',
+    email: EMAIL,
+    fachbereich: 'BWL',
+    updates: [
+      {
+        id: testId,
+        luecken: [
+          { id: testLueckeId, korrekteAntworten: [markerAntwort], dropdownOptionen: [markerAntwort, 'Distraktor1', 'Distraktor2'] },
+          { id: 'luecke-id-gibts-nicht-xyz', korrekteAntworten: ['should not apply'], dropdownOptionen: [] },
+        ]
+      },
+      { id: 'definitely-not-existing-frage-id-xyz', luecken: [] }
+    ]
+  };
+  var r = batchUpdateLueckentextMigrationEndpoint(body);
+  var res = JSON.parse(r.getContent());
+  Logger.log('Response: ' + JSON.stringify(res, null, 2));
+
+  // 3. Assertions auf Response
+  assert_(res.success === true, 'success=true erwartet (war: ' + JSON.stringify(res) + ')');
+  assert_(res.aktualisiert === 1, 'aktualisiert=1 erwartet (war: ' + res.aktualisiert + ')');
+  assert_(Array.isArray(res.nichtGefunden) && res.nichtGefunden.length === 1, 'nichtGefunden-Array mit 1 Eintrag erwartet');
+  assert_(res.nichtGefunden[0] === 'definitely-not-existing-frage-id-xyz', 'nichtGefunden enthaelt die non-existente Frage-ID');
+
+  // 4. Verifikation im Sheet: Ziel-Luecke hat Marker-Antwort, andere Luecken bleiben,
+  // pruefungstauglich ist leer.
+  var allDataNeu = sheet.getRange(1, 1, sheet.getLastRow(), sheet.getLastColumn()).getValues();
+  var rowNeu = null;
+  for (var rn = 1; rn < allDataNeu.length; rn++) {
+    if (String(allDataNeu[rn][idCol]) === testId) { rowNeu = allDataNeu[rn]; break; }
+  }
+  assert_(rowNeu, 'Test-Frage nach Update nicht gefunden');
+  var typDatenNeu = JSON.parse(String(rowNeu[readCol] || '{}'));
+  assert_(Array.isArray(typDatenNeu.luecken), 'luecken-Array nach Update verloren');
+  assert_(typDatenNeu.luecken.length === origTypDaten.luecken.length, 'Anzahl luecken veraendert (war ' + origTypDaten.luecken.length + ', jetzt ' + typDatenNeu.luecken.length + ')');
+  var neuZielLuecke = null;
+  for (var lk = 0; lk < typDatenNeu.luecken.length; lk++) {
+    if (typDatenNeu.luecken[lk].id === testLueckeId) { neuZielLuecke = typDatenNeu.luecken[lk]; break; }
+  }
+  assert_(neuZielLuecke, 'Ziel-Luecke ' + testLueckeId + ' nach Update nicht mehr vorhanden');
+  assert_(Array.isArray(neuZielLuecke.korrekteAntworten) && neuZielLuecke.korrekteAntworten[0] === markerAntwort, 'korrekteAntworten nicht auf Marker gesetzt');
+  assert_(Array.isArray(neuZielLuecke.dropdownOptionen) && neuZielLuecke.dropdownOptionen.indexOf(markerAntwort) >= 0, 'dropdownOptionen nicht auf Marker gesetzt');
+  if (pruefungstauglichCol >= 0) {
+    assert_(String(rowNeu[pruefungstauglichCol] || '') === '', 'pruefungstauglich sollte leer sein (war: ' + String(rowNeu[pruefungstauglichCol]) + ')');
+  }
+
+  // 5. RESTORE: Original-Werte zuruecksetzen
+  var restoreBody = {
+    action: 'batchUpdateLueckentextMigration',
+    email: EMAIL,
+    fachbereich: 'BWL',
+    updates: [{
+      id: testId,
+      luecken: [{
+        id: testLueckeId,
+        korrekteAntworten: origKorrekteAntworten,
+        dropdownOptionen: origDropdownOptionen,
+      }]
+    }]
+  };
+  batchUpdateLueckentextMigrationEndpoint(restoreBody);
+  Logger.log('✓ Restore: Luecke ' + testLueckeId + ' zurueck auf Original (' + origKorrekteAntworten.length + ' korrekteAntworten, ' + origDropdownOptionen.length + ' dropdownOptionen).');
+
+  // Der Endpoint hat pruefungstauglich = '' + geaendertAm = nowIso + poolContentHash = ''
+  // gesetzt. Die drei Spalten direkt per setValue() auf die Original-Werte zuruecksetzen,
+  // damit die Test-Frage nicht in Produktion demoted bleibt.
+  // Sheet-Row = origRowIdx + 1 (allData ist 0-basiert inkl. Header, Sheet ist 1-basiert).
+  var sheetRow = origRowIdx + 1;
+  if (pruefungstauglichCol >= 0) {
+    sheet.getRange(sheetRow, pruefungstauglichCol + 1).setValue(origPruefungstauglich);
+  }
+  if (geaendertAmCol >= 0) {
+    sheet.getRange(sheetRow, geaendertAmCol + 1).setValue(origGeaendertAm);
+  }
+  if (poolContentHashCol >= 0) {
+    sheet.getRange(sheetRow, poolContentHashCol + 1).setValue(origPoolContentHash);
+  }
+  Logger.log('✓ Restore: pruefungstauglich=' + JSON.stringify(origPruefungstauglich) + ', geaendertAm=' + JSON.stringify(origGeaendertAm) + ', poolContentHash wiederhergestellt.');
+
+  Logger.log('✓ batchUpdateLueckentextMigration-Test bestanden.');
+}
+
+/**
+ * Lückentext-Phase-6 Task 14 — Bulk-Toggle-Endpoint (Admin-only).
+ *
+ * Setzt `lueckentextModus` für ALLE Lückentext-Fragen in allen 4 Fachbereichen
+ * (VWL, BWL, Recht, Informatik) in einem Rutsch. Idempotent — skippt Fragen
+ * die bereits im Ziel-Modus sind (werden nicht neu geschrieben). Reversibel.
+ *
+ * Unterschied zu batchUpdateLueckentextMigration:
+ *   - kein KI-generierter Content, nur ein Default-Mode-Flag
+ *   - pruefungstauglich / geaendertAm / poolContentHash werden NICHT zurückgesetzt
+ *     (keine inhaltliche Änderung — nur UI-Rendering-Unterschied)
+ *
+ * Request-Body: {
+ *   action: 'bulkSetzeLueckentextModus',
+ *   email: '<admin-lp>',
+ *   modus: 'freitext' | 'dropdown'
+ * }
+ *
+ * Response: { success: true, data: { total, geaendert, alleBereits } }
+ */
+function bulkSetzeLueckentextModusEndpoint(body) {
+  try {
+    var email = body.email;
+    if (!email || !istZugelasseneLP(email)) {
+      return jsonResponse({ error: 'Nicht autorisiert' });
+    }
+    var lpInfo = getLPInfo(email);
+    if (!lpInfo || lpInfo.rolle !== 'admin') {
+      return jsonResponse({ error: 'Admin-only' });
+    }
+    var data = bulkSetzeLueckentextModus_(body);
+    return jsonResponse({ success: true, data: data });
+  } catch (error) {
+    return jsonResponse({ error: String(error && error.message || error) });
+  }
+}
+
+/**
+ * Helper: Setzt lueckentextModus für ALLE Lückentext-Fragen in allen Tabs.
+ * Idempotent — skippt Fragen die bereits im Ziel-Modus sind.
+ *
+ * Nutzt batch-setValues (1 Write pro Tab statt 1 Write pro Row) zur
+ * Latenz-Minimierung. Bei ~253 Fragen über 4 Tabs ist das ein Unterschied
+ * zwischen ~5s und ~5min.
+ *
+ * body.modus: 'freitext' | 'dropdown'
+ *
+ * @returns { total, geaendert, alleBereits }
+ */
+function bulkSetzeLueckentextModus_(body) {
+  var modus = body && body.modus;
+  if (modus !== 'freitext' && modus !== 'dropdown') {
+    throw new Error('Ungültiger Modus: ' + modus);
+  }
+  var lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(30000);
+    var tabs = ['VWL', 'BWL', 'Recht', 'Informatik'];
+    var fragenbank = SpreadsheetApp.openById(FRAGENBANK_ID);
+    var total = 0;
+    var geaendert = 0;
+
+    for (var t = 0; t < tabs.length; t++) {
+      var sheet = fragenbank.getSheetByName(tabs[t]);
+      if (!sheet) continue;
+      var lastCol = sheet.getLastColumn();
+      var lastRow = sheet.getLastRow();
+      if (lastCol === 0 || lastRow < 2) continue;
+      var headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
+      var typCol = headers.indexOf('typ');
+      var typDatenCol = headers.indexOf('typDaten');
+      var jsonCol = headers.indexOf('json');
+      var datenCol = headers.indexOf('daten');
+      if (typCol < 0) continue;
+      // Write-Ziel: typDaten bevorzugt (parseFrage liest Lückentext primär daraus),
+      // sonst json, sonst daten. Spiegel-Spalten werden ebenfalls aktualisiert.
+      var writeCol = typDatenCol >= 0 ? typDatenCol : (jsonCol >= 0 ? jsonCol : datenCol);
+      if (writeCol < 0) continue;
+
+      var alleDaten = sheet.getRange(2, 1, lastRow - 1, lastCol).getValues();
+      var tabChanged = false;
+
+      for (var i = 0; i < alleDaten.length; i++) {
+        if (String(alleDaten[i][typCol] || '') !== 'lueckentext') continue;
+        total++;
+        try {
+          var typDaten = JSON.parse(alleDaten[i][writeCol] || '{}');
+          if (typDaten.lueckentextModus === modus) continue; // idempotent skip
+          typDaten.lueckentextModus = modus;
+          var newJson = JSON.stringify(typDaten);
+          alleDaten[i][writeCol] = newJson;
+          if (jsonCol >= 0 && jsonCol !== writeCol) alleDaten[i][jsonCol] = newJson;
+          if (datenCol >= 0 && datenCol !== writeCol) alleDaten[i][datenCol] = newJson;
+          geaendert++;
+          tabChanged = true;
+        } catch (e) {
+          // Row skip — defektes JSON soll nicht den Rest blockieren
+        }
+      }
+
+      if (tabChanged) {
+        sheet.getRange(2, 1, alleDaten.length, lastCol).setValues(alleDaten);
+      }
+    }
+
+    // Cache invalidieren, damit das Frontend beim nächsten Read den neuen Modus sieht
+    try { cacheInvalidieren_(); } catch (e) { /* ignore */ }
+
+    return {
+      total: total,
+      geaendert: geaendert,
+      alleBereits: geaendert === 0,
+    };
+  } finally {
+    try { lock.releaseLock(); } catch (e) { /* no-op */ }
+  }
+}
+
+/**
+ * Public-Wrapper für testBulkSetzeLueckentextModus_ — erscheint im GAS-Editor-Dropdown.
+ */
+function testBulkSetzeLueckentextModus() {
+  return testBulkSetzeLueckentextModus_();
+}
+
+/**
+ * Smoke-Test für bulkSetzeLueckentextModus_. Liest aktuellen Modus-Zustand der
+ * ersten Lückentext-Frage, führt einen Bulk-Call aus, verifiziert success + total
+ * und setzt (falls nötig) den Original-Modus via zweitem Bulk-Call zurück.
+ *
+ * ⚠️ Kann je nach Ausgangslage der Fragensammlung bis zu ~253 Fragen neu schreiben.
+ */
+function testBulkSetzeLueckentextModus_() {
+  function assert_(cond, msg) {
+    if (!cond) throw new Error('Assertion fehlgeschlagen: ' + msg);
+  }
+
+  var r = bulkSetzeLueckentextModus_({ modus: 'freitext' });
+  assert_(typeof r.total === 'number', 'total muss Zahl sein');
+  assert_(typeof r.geaendert === 'number', 'geaendert muss Zahl sein');
+  assert_(typeof r.alleBereits === 'boolean', 'alleBereits muss Boolean sein');
+  assert_(r.geaendert <= r.total, 'geaendert darf nicht grösser sein als total');
+  Logger.log('Bulk-Freitext-Test: ' + JSON.stringify(r));
+
+  var r2 = bulkSetzeLueckentextModus_({ modus: 'freitext' });
+  assert_(r2.alleBereits === true, 'Zweiter Call mit selbem Modus muss idempotent sein (alleBereits=true), war: ' + JSON.stringify(r2));
+  Logger.log('Idempotenz-Check: ' + JSON.stringify(r2));
+
+  Logger.log('✓ bulkSetzeLueckentextModus-Test bestanden.');
+}
+
+/**
  * Public-Wrapper für testC9Privacy_ — erscheint im GAS-Editor-Dropdown.
  */
 function testC9Privacy() {
@@ -11962,4 +12504,275 @@ function testProblemmeldungen() {
     Logger.log('(keine Meldungen im Sheet → Toggle-Test übersprungen)');
   }
   Logger.log('✓ Alle Smoke-Tests bestanden.');
+}
+
+/**
+ * Diagnose: scannt alle Fragenbank-Tabs nach Lückentextfragen mit mindestens
+ * einer leeren korrekteAntworten (Lücke ohne hinterlegte Antwort — SuS kann
+ * nie richtig antworten). Manuell im GAS-Editor ausführen, kein Deploy nötig.
+ *
+ * Output via Logger.log:
+ * - Gesamt-Summary pro Fachbereich
+ * - Pro betroffene Frage: id, fachbereich, Anzahl leerer Lücken, Text-Preview
+ */
+function zaehleLeereLueckentextAntworten() {
+  var tabs = ['VWL', 'BWL', 'Recht', 'Informatik'];
+  var fragenbank = SpreadsheetApp.openById(FRAGENBANK_ID);
+  var summary = {};
+  var betroffene = [];
+  var gesamtLueckentext = 0;
+  var gesamtBetroffen = 0;
+
+  for (var t = 0; t < tabs.length; t++) {
+    var tab = tabs[t];
+    var sheet = fragenbank.getSheetByName(tab);
+    if (!sheet) {
+      summary[tab] = { gesamt: 0, betroffen: 0, fehler: 'Sheet fehlt' };
+      continue;
+    }
+    var data = getSheetData(sheet);
+    var inTabGesamt = 0;
+    var inTabBetroffen = 0;
+
+    for (var r = 0; r < data.length; r++) {
+      var row = data[r];
+      if (row.typ !== 'lueckentext') continue;
+      inTabGesamt++;
+      var frage;
+      try {
+        frage = parseFrage(row, tab);
+      } catch (e) {
+        betroffene.push({
+          id: row.id, fachbereich: tab, anzahlLeer: -1,
+          vorschau: 'PARSE-FEHLER: ' + e.message
+        });
+        inTabBetroffen++;
+        continue;
+      }
+      var luecken = Array.isArray(frage.luecken) ? frage.luecken : [];
+      var anzahlLeer = 0;
+      for (var i = 0; i < luecken.length; i++) {
+        var l = luecken[i] || {};
+        var ka = Array.isArray(l.korrekteAntworten) ? l.korrekteAntworten : [];
+        var hatAntwort = false;
+        for (var k = 0; k < ka.length; k++) {
+          if (ka[k] && String(ka[k]).trim().length > 0) { hatAntwort = true; break; }
+        }
+        if (!hatAntwort) anzahlLeer++;
+      }
+      if (anzahlLeer > 0) {
+        inTabBetroffen++;
+        var vorschau = String(frage.textMitLuecken || '').slice(0, 80);
+        betroffene.push({
+          id: row.id, fachbereich: tab,
+          anzahlLeer: anzahlLeer,
+          anzahlLuecken: luecken.length,
+          vorschau: vorschau
+        });
+      }
+    }
+    summary[tab] = { gesamt: inTabGesamt, betroffen: inTabBetroffen };
+    gesamtLueckentext += inTabGesamt;
+    gesamtBetroffen += inTabBetroffen;
+  }
+
+  Logger.log('=== Lückentext-Antworten-Scan ===');
+  for (var tb in summary) {
+    var s = summary[tb];
+    Logger.log(tb + ': ' + (s.betroffen || 0) + ' / ' + (s.gesamt || 0) + ' Fragen mit leeren Lücken' + (s.fehler ? ' — ' + s.fehler : ''));
+  }
+  Logger.log('Total: ' + gesamtBetroffen + ' / ' + gesamtLueckentext + ' Lückentextfragen betroffen');
+
+  if (betroffene.length > 0) {
+    Logger.log('--- Betroffene Fragen ---');
+    for (var i = 0; i < betroffene.length; i++) {
+      var b = betroffene[i];
+      Logger.log('[' + b.fachbereich + '] ' + b.id + ' — ' + b.anzahlLeer + '/' + (b.anzahlLuecken || '?') + ' leer · "' + b.vorschau + '"');
+    }
+  }
+
+  return { summary: summary, betroffene: betroffene, gesamtLueckentext: gesamtLueckentext, gesamtBetroffen: gesamtBetroffen };
+}
+
+/**
+ * Smoke-Test (manuell im GAS-Editor ausführen): bestätigt dass
+ * bereinigeFrageFuerSuS_ das `lueckentextModus`-Feld (Rendering-Metadata)
+ * behält, während Lösungsfelder (`musterlosung`, `luecken[].korrekteAntworten`)
+ * entfernt werden.
+ *
+ * Hintergrund: `LOESUNGS_FELDER_` ist eine BLACKLIST (nur explizit gelistete
+ * Felder werden gelöscht). `lueckentextModus` ist nicht gelistet → bleibt
+ * automatisch erhalten. Dieser Test friert die Invariante ein, damit eine
+ * spätere Ergänzung der Blacklist den Modus nicht versehentlich mit-entfernt.
+ */
+function testBereinigeLueckentextModus_() {
+  // Apps-Script-V8 hat KEIN console.assert — eigener Helper der bei false wirft.
+  function assert_(cond, msg) { if (!cond) throw new Error('Assertion fehlgeschlagen: ' + msg); }
+
+  var frage = {
+    typ: 'lueckentext',
+    lueckentextModus: 'dropdown',
+    luecken: [{ id: 'l0', korrekteAntworten: ['x'], dropdownOptionen: ['x','y','z','a','b'], caseSensitive: false }],
+    musterlosung: 'geheim'
+  };
+  var bereinigt = bereinigeFrageFuerSuS_(frage);
+  assert_(bereinigt.lueckentextModus === 'dropdown', 'lueckentextModus muss erhalten bleiben');
+  assert_(!bereinigt.musterlosung, 'musterlosung muss entfernt sein');
+  assert_(!bereinigt.luecken[0].korrekteAntworten, 'korrekteAntworten muss entfernt sein');
+  Logger.log('✓ testBereinigeLueckentextModus_ OK');
+}
+
+/** Public-Wrapper (ohne trailing _) damit GAS-Editor-Dropdown ihn findet. */
+function testBereinigeLueckentextModus() { testBereinigeLueckentextModus_(); }
+
+/**
+ * One-shot-Migrator: setzt `lueckentextModus` bei allen bestehenden
+ * Lückentext-Fragen in allen 4 Fachbereich-Tabs.
+ *
+ * Heuristik: `dropdownOptionen` non-empty → 'dropdown', sonst 'freitext'.
+ * Idempotent: bereits explizit gesetzte Werte werden NICHT überschrieben.
+ *
+ * Schreibt primär in `typDaten`-Spalte (das liest `parseFrage`/`parseFrageKanonisch_`
+ * für Lückentext). Zusätzlich wird `json`/`daten`-Spalte aktualisiert, falls
+ * vorhanden — analog zum Hotspot-Migrator (parseFrage fällt bei einigen Typen
+ * auf `json`/`daten` zurück; für Lückentext nicht, aber wir halten die Quellen
+ * konsistent).
+ *
+ * Manuell im GAS-Editor ausführen, NACH Google-Sheets-Backup der Fragenbank.
+ */
+function migriereLueckentextModus() {
+  // SICHERHEIT: Diese Funktion ist NICHT im doPost-Dispatcher geroutet (grep-verifiziert).
+  // Manuelle Ausführung nur aus dem GAS-Editor möglich. Kein Session.getActiveUser()-Check
+  // weil das den Scope `userinfo.email` aktiv triggern würde (Re-Consent aller Benutzer nötig,
+  // siehe Kommentar bei testC9GeneriereMusterloesung_ um Zeile 11195). Falls diese Funktion
+  // jemals in den Dispatcher wandert: Scope in appsscript.json aktivieren + Email-Check
+  // einbauen (Pattern wie batchUpdateLueckentextMigrationEndpoint).
+
+  var tabs = ['VWL', 'BWL', 'Recht', 'Informatik'];
+  var fragenbank = SpreadsheetApp.openById(FRAGENBANK_ID);
+  var total = 0;
+  var gesetzt = 0;
+  var schonGesetzt = 0;
+  var errors = [];
+  var tabStats = {};
+
+  for (var t = 0; t < tabs.length; t++) {
+    var tabName = tabs[t];
+    var sheet = fragenbank.getSheetByName(tabName);
+    if (!sheet) {
+      tabStats[tabName] = { gesetzt: 0, schonGesetzt: 0, gesamt: 0, fehler: 'Sheet fehlt' };
+      continue;
+    }
+    var lastCol = sheet.getLastColumn();
+    if (lastCol === 0) {
+      tabStats[tabName] = { gesetzt: 0, schonGesetzt: 0, gesamt: 0, fehler: 'Leeres Sheet' };
+      continue;
+    }
+    var headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
+    var typDatenCol = headers.indexOf('typDaten');
+    var typCol = headers.indexOf('typ');
+    var idCol = headers.indexOf('id');
+    var jsonCol = headers.indexOf('json');
+    var datenCol = headers.indexOf('daten');
+    if (typDatenCol < 0 || typCol < 0) {
+      tabStats[tabName] = { gesetzt: 0, schonGesetzt: 0, gesamt: 0, fehler: 'typDaten- oder typ-Spalte fehlt' };
+      continue;
+    }
+
+    var lastRow = sheet.getLastRow();
+    if (lastRow < 2) {
+      tabStats[tabName] = { gesetzt: 0, schonGesetzt: 0, gesamt: 0 };
+      continue;
+    }
+
+    // Batch-Read: ALLE Daten in-memory laden, mutieren, am Ende 1x setValues.
+    // Vermeidet ~3 setValue-Calls pro Row (bei ~250 Fragen: bis zu 750 Service-Calls
+    // → Apps-Script-Timeout-Risiko). Analog: 1 setValues pro Tab.
+    var alleDaten = sheet.getRange(2, 1, lastRow - 1, lastCol).getValues();
+    var tabGesetzt = 0;
+    var tabSchonGesetzt = 0;
+    var tabGesamt = 0;
+    var tabHasChanges = false;
+
+    for (var r = 0; r < alleDaten.length; r++) {
+      var row = alleDaten[r];
+      if (row[typCol] !== 'lueckentext') continue;
+      total++;
+      tabGesamt++;
+      var frageId = idCol >= 0 ? row[idCol] : '(ohne-id)';
+      try {
+        var typDatenStr = row[typDatenCol];
+        var typDaten = typDatenStr ? JSON.parse(typDatenStr) : {};
+
+        if (typDaten.lueckentextModus === 'freitext' || typDaten.lueckentextModus === 'dropdown') {
+          schonGesetzt++;
+          tabSchonGesetzt++;
+          continue;
+        }
+
+        // Shared-Helper: identische Heuristik wie parseFrage / parseFrageKanonisch_ / Frontend.
+        typDaten.lueckentextModus = ermittleLueckentextModus_(typDaten);
+
+        alleDaten[r][typDatenCol] = JSON.stringify(typDaten);
+
+        // Konsistenz: falls json-/daten-Spalte ebenfalls eine vollständige Frage
+        // enthält, dort denselben Modus setzen (gespiegelt vom Hotspot-Migrator-Pattern).
+        // Mirror in-memory, KEIN separater setValue-Call.
+        if (jsonCol >= 0) {
+          var jsonStr = row[jsonCol];
+          if (jsonStr) {
+            try {
+              var vollJson = JSON.parse(jsonStr);
+              if (vollJson && typeof vollJson === 'object') {
+                vollJson.lueckentextModus = typDaten.lueckentextModus;
+                alleDaten[r][jsonCol] = JSON.stringify(vollJson);
+              }
+            } catch (e) { /* ignore — json-Spalte defekt, typDaten reicht */ }
+          }
+        }
+        if (datenCol >= 0) {
+          var datenStr = row[datenCol];
+          if (datenStr) {
+            try {
+              var vollDaten = JSON.parse(datenStr);
+              if (vollDaten && typeof vollDaten === 'object') {
+                vollDaten.lueckentextModus = typDaten.lueckentextModus;
+                alleDaten[r][datenCol] = JSON.stringify(vollDaten);
+              }
+            } catch (e) { /* ignore */ }
+          }
+        }
+
+        gesetzt++;
+        tabGesetzt++;
+        tabHasChanges = true;
+      } catch (e) {
+        errors.push({ tab: tabName, id: frageId, error: e.message });
+      }
+    }
+
+    // Nur 1 setValues-Call pro Tab, und auch nur wenn es echte Änderungen gab.
+    if (tabHasChanges) {
+      sheet.getRange(2, 1, alleDaten.length, lastCol).setValues(alleDaten);
+    }
+
+    tabStats[tabName] = { gesetzt: tabGesetzt, schonGesetzt: tabSchonGesetzt, gesamt: tabGesamt };
+  }
+
+  Logger.log('=== Lückentext-Modus-Migration ===');
+  for (var tn in tabStats) {
+    var s = tabStats[tn];
+    Logger.log(tn + ': ' + (s.gesetzt || 0) + ' neu gesetzt, ' + (s.schonGesetzt || 0) + ' schon gesetzt, ' + (s.gesamt || 0) + ' gesamt' + (s.fehler ? ' — ' + s.fehler : ''));
+  }
+  Logger.log('Total Lückentext-Fragen: ' + total);
+  Logger.log('Neu gesetzt: ' + gesetzt);
+  Logger.log('Bereits gesetzt (übersprungen): ' + schonGesetzt);
+  if (errors.length > 0) {
+    Logger.log('Fehler: ' + errors.length);
+    for (var i = 0; i < errors.length; i++) {
+      Logger.log('  [' + errors[i].tab + '] ' + errors[i].id + ': ' + errors[i].error);
+    }
+  }
+
+  return { total: total, gesetzt: gesetzt, schonGesetzt: schonGesetzt, errors: errors, tabs: tabStats };
 }
