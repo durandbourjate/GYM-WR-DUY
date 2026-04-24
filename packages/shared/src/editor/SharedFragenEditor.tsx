@@ -236,6 +236,11 @@ export default function SharedFragenEditor({
         }))
       : []
   )
+  const [lueckentextModus, setLueckentextModus] = useState<'freitext' | 'dropdown'>(
+    frage?.typ === 'lueckentext'
+      ? ((frage as LueckentextFrage).lueckentextModus ?? 'freitext')
+      : 'freitext'
+  )
 
   // Zuordnung-spezifisch
   const [paare, setPaare] = useState(
@@ -699,7 +704,7 @@ export default function SharedFragenEditor({
       case 'freitext':
         typDaten = { typ: 'freitext', fragetext, laenge, placeholder, minWoerter, maxWoerter }; break
       case 'lueckentext':
-        typDaten = { typ: 'lueckentext', fragetext, textMitLuecken, luecken }; break
+        typDaten = { typ: 'lueckentext', fragetext, textMitLuecken, luecken, lueckentextModus }; break
       case 'zuordnung':
         typDaten = { typ: 'zuordnung', fragetext, paare }; break
       case 'richtigfalsch':
@@ -910,6 +915,7 @@ export default function SharedFragenEditor({
             mehrfachauswahl={mehrfachauswahl} setMehrfachauswahl={setMehrfachauswahl}
             textMitLuecken={textMitLuecken} setTextMitLuecken={setTextMitLuecken}
             luecken={luecken} setLuecken={setLuecken}
+            lueckentextModus={lueckentextModus} setLueckentextModus={setLueckentextModus}
             paare={paare} setPaare={setPaare}
             aussagen={aussagen} setAussagen={setAussagen}
             erklaerungSichtbar={erklaerungSichtbar} setErklaerungSichtbar={setErklaerungSichtbar}

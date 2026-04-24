@@ -71,6 +71,8 @@ interface TypEditorDispatcherProps {
   setTextMitLuecken: (v: string) => void
   luecken: LueckentextFrage['luecken']
   setLuecken: React.Dispatch<React.SetStateAction<LueckentextFrage['luecken']>>
+  lueckentextModus: 'freitext' | 'dropdown'
+  setLueckentextModus: (v: 'freitext' | 'dropdown') => void
 
   // Zuordnung
   paare: { links: string; rechts: string }[]
@@ -289,6 +291,8 @@ export default function TypEditorDispatcher(props: TypEditorDispatcherProps) {
             setTextMitLuecken={props.setTextMitLuecken}
             luecken={props.luecken}
             setLuecken={props.setLuecken}
+            lueckentextModus={props.lueckentextModus}
+            setLueckentextModus={props.setLueckentextModus}
             titelRechts={ki.verfuegbar ? (
               <div className="flex gap-1.5">
                 <InlineAktionButton
