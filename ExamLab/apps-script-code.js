@@ -1649,6 +1649,22 @@ function safeJsonParse(str, fallback) {
 /** Alias für Lernplattform-Funktionen (die safeJsonParse_ mit Unterstrich verwenden) */
 function safeJsonParse_(str, fallback) { return safeJsonParse(str, fallback); }
 
+/**
+ * Ermittelt Lückentext-Modus aus typDaten. Heuristik:
+ * explizit ('freitext'|'dropdown') > dropdownOptionen non-empty → 'dropdown' > 'freitext'.
+ * Identische Logik wie Frontend-Normalizer (fragetypNormalizer.ts).
+ * Shared-Helper für parseFrage, parseFrageKanonisch_ und migriereLueckentextModus.
+ */
+function ermittleLueckentextModus_(typDatenObj) {
+  var modus = typDatenObj && typDatenObj.lueckentextModus;
+  if (modus === 'freitext' || modus === 'dropdown') return modus;
+  var luecken = typDatenObj && typDatenObj.luecken;
+  var hatDropdowns = Array.isArray(luecken) && luecken.some(function(l) {
+    return l && Array.isArray(l.dropdownOptionen) && l.dropdownOptionen.length > 0;
+  });
+  return hatDropdowns ? 'dropdown' : 'freitext';
+}
+
 // ============================================================
 // === MediaQuelle Migrator (JS-Port, S125 Phase 5) ===
 // ============================================================
@@ -2863,13 +2879,10 @@ function parseFrage(row, fachbereich) {
       // Phase 4 Task 8: lueckentextModus aus typDaten lesen, mit Heuristik-Fallback
       // bei Alt-Daten (dropdownOptionen-Präsenz → 'dropdown', sonst 'freitext').
       var ltLuecken = typDaten.luecken || safeJsonParse(row.luecken, []);
-      var ltModus = typDaten.lueckentextModus;
-      if (ltModus !== 'freitext' && ltModus !== 'dropdown') {
-        var hatDropdowns = Array.isArray(ltLuecken) && ltLuecken.some(function(l) {
-          return l && Array.isArray(l.dropdownOptionen) && l.dropdownOptionen.length > 0;
-        });
-        ltModus = hatDropdowns ? 'dropdown' : 'freitext';
-      }
+      var ltModus = ermittleLueckentextModus_({
+        lueckentextModus: typDaten.lueckentextModus,
+        luecken: ltLuecken,
+      });
       return {
         ...base,
         typ: 'lueckentext',
@@ -8975,20 +8988,17 @@ function parseFrageKanonisch_(row, fachbereich) {
     case 'lueckentext': {
       // Phase 4 Task 8: lueckentextModus aus typDaten lesen, mit Heuristik-Fallback
       // bei Alt-Daten (dropdownOptionen-Präsenz → 'dropdown', sonst 'freitext').
-      var ltLuecken2 = typDaten.luecken || safeJsonParse_(row.luecken, []);
-      var ltModus2 = typDaten.lueckentextModus;
-      if (ltModus2 !== 'freitext' && ltModus2 !== 'dropdown') {
-        var hatDropdowns2 = Array.isArray(ltLuecken2) && ltLuecken2.some(function(l) {
-          return l && Array.isArray(l.dropdownOptionen) && l.dropdownOptionen.length > 0;
-        });
-        ltModus2 = hatDropdowns2 ? 'dropdown' : 'freitext';
-      }
+      var ltLuecken = typDaten.luecken || safeJsonParse_(row.luecken, []);
+      var ltModus = ermittleLueckentextModus_({
+        lueckentextModus: typDaten.lueckentextModus,
+        luecken: ltLuecken,
+      });
       return Object.assign(base, {
         typ: 'lueckentext',
         fragetext: row.fragetext || '',
         textMitLuecken: typDaten.textMitLuecken || row.textMitLuecken || '',
-        luecken: ltLuecken2,
-        lueckentextModus: ltModus2,
+        luecken: ltLuecken,
+        lueckentextModus: ltModus,
       });
     }
     case 'richtigfalsch':
@@ -12127,6 +12137,13 @@ function testBereinigeLueckentextModus() { testBereinigeLueckentextModus_(); }
  * Manuell im GAS-Editor ausführen, NACH Google-Sheets-Backup der Fragenbank.
  */
 function migriereLueckentextModus() {
+  // Admin-Guard: Migrator schreibt Daten in ALLE Fragenbank-Tabs. Nie unbeaufsichtigt
+  // exponieren — identisches Pattern wie testC9BatchUpdateFragenMigration_ (S133).
+  var email = (Session.getActiveUser().getEmail() || '').toLowerCase();
+  if (email !== 'yannick.durand@gymhofwil.ch') {
+    throw new Error('Admin-only — tatsächlicher Caller: ' + email);
+  }
+
   var tabs = ['VWL', 'BWL', 'Recht', 'Informatik'];
   var fragenbank = SpreadsheetApp.openById(FRAGENBANK_ID);
   var total = 0;
@@ -12158,18 +12175,29 @@ function migriereLueckentextModus() {
       continue;
     }
 
-    var values = sheet.getDataRange().getValues();
+    var lastRow = sheet.getLastRow();
+    if (lastRow < 2) {
+      tabStats[tabName] = { gesetzt: 0, schonGesetzt: 0, gesamt: 0 };
+      continue;
+    }
+
+    // Batch-Read: ALLE Daten in-memory laden, mutieren, am Ende 1x setValues.
+    // Vermeidet ~3 setValue-Calls pro Row (bei ~250 Fragen: bis zu 750 Service-Calls
+    // → Apps-Script-Timeout-Risiko). Analog: 1 setValues pro Tab.
+    var alleDaten = sheet.getRange(2, 1, lastRow - 1, lastCol).getValues();
     var tabGesetzt = 0;
     var tabSchonGesetzt = 0;
     var tabGesamt = 0;
+    var tabHasChanges = false;
 
-    for (var r = 1; r < values.length; r++) {
-      if (values[r][typCol] !== 'lueckentext') continue;
+    for (var r = 0; r < alleDaten.length; r++) {
+      var row = alleDaten[r];
+      if (row[typCol] !== 'lueckentext') continue;
       total++;
       tabGesamt++;
-      var frageId = idCol >= 0 ? values[r][idCol] : '(ohne-id)';
+      var frageId = idCol >= 0 ? row[idCol] : '(ohne-id)';
       try {
-        var typDatenStr = values[r][typDatenCol];
+        var typDatenStr = row[typDatenCol];
         var typDaten = typDatenStr ? JSON.parse(typDatenStr) : {};
 
         if (typDaten.lueckentextModus === 'freitext' || typDaten.lueckentextModus === 'dropdown') {
@@ -12178,36 +12206,34 @@ function migriereLueckentextModus() {
           continue;
         }
 
-        var hatDropdowns = Array.isArray(typDaten.luecken) && typDaten.luecken.some(function(l) {
-          return l && Array.isArray(l.dropdownOptionen) && l.dropdownOptionen.length > 0;
-        });
-        typDaten.lueckentextModus = hatDropdowns ? 'dropdown' : 'freitext';
+        // Shared-Helper: identische Heuristik wie parseFrage / parseFrageKanonisch_ / Frontend.
+        typDaten.lueckentextModus = ermittleLueckentextModus_(typDaten);
 
-        var zeile = r + 1;
-        sheet.getRange(zeile, typDatenCol + 1).setValue(JSON.stringify(typDaten));
+        alleDaten[r][typDatenCol] = JSON.stringify(typDaten);
 
         // Konsistenz: falls json-/daten-Spalte ebenfalls eine vollständige Frage
         // enthält, dort denselben Modus setzen (gespiegelt vom Hotspot-Migrator-Pattern).
+        // Mirror in-memory, KEIN separater setValue-Call.
         if (jsonCol >= 0) {
-          var jsonStr = values[r][jsonCol];
+          var jsonStr = row[jsonCol];
           if (jsonStr) {
             try {
               var vollJson = JSON.parse(jsonStr);
               if (vollJson && typeof vollJson === 'object') {
                 vollJson.lueckentextModus = typDaten.lueckentextModus;
-                sheet.getRange(zeile, jsonCol + 1).setValue(JSON.stringify(vollJson));
+                alleDaten[r][jsonCol] = JSON.stringify(vollJson);
               }
             } catch (e) { /* ignore — json-Spalte defekt, typDaten reicht */ }
           }
         }
         if (datenCol >= 0) {
-          var datenStr = values[r][datenCol];
+          var datenStr = row[datenCol];
           if (datenStr) {
             try {
               var vollDaten = JSON.parse(datenStr);
               if (vollDaten && typeof vollDaten === 'object') {
                 vollDaten.lueckentextModus = typDaten.lueckentextModus;
-                sheet.getRange(zeile, datenCol + 1).setValue(JSON.stringify(vollDaten));
+                alleDaten[r][datenCol] = JSON.stringify(vollDaten);
               }
             } catch (e) { /* ignore */ }
           }
@@ -12215,9 +12241,15 @@ function migriereLueckentextModus() {
 
         gesetzt++;
         tabGesetzt++;
+        tabHasChanges = true;
       } catch (e) {
         errors.push({ tab: tabName, id: frageId, error: e.message });
       }
+    }
+
+    // Nur 1 setValues-Call pro Tab, und auch nur wenn es echte Änderungen gab.
+    if (tabHasChanges) {
+      sheet.getRange(2, 1, alleDaten.length, lastCol).setValues(alleDaten);
     }
 
     tabStats[tabName] = { gesetzt: tabGesetzt, schonGesetzt: tabSchonGesetzt, gesamt: tabGesamt };
