@@ -16,82 +16,104 @@
 
 Aktueller Branch `feature/problemmeldungen-dashboard` (bereits mit Spec-Commits angelegt).
 
-## Phase 1 — Feedback-Apps-Script (separat): Schema + Backfill + UUID-Write
+## Phase 1 — Feedback-Apps-Script (separat): Schema-Migration + UUID-Write (automatisiert)
 
-Das separate Feedback-Apps-Script schreibt heute anonyme Meldungen. Wir fügen UUID-Generierung hinzu, damit die Haupt-Apps-Script Zeilen eindeutig referenzieren kann.
+Das separate Feedback-Apps-Script schreibt heute anonyme Meldungen. Wir fügen UUID-Generierung hinzu, damit die Haupt-Apps-Script Zeilen eindeutig referenzieren kann. **Schema-Migration läuft automatisch** — User drückt einmal „Run" auf `migriereProblemmeldungenSchema()`.
 
-### Task 1: Sheet-Schema manuell erweitern (User)
+### Task 1: Setup-Doku + Apps-Script-Code vorbereiten
 
-**Files:** Google Sheet „ExamLab Problemmeldungen", Tab „ExamLab-Problemmeldungen"
+**Files:**
+- Create: `ExamLab/docs/superpowers/plans/2026-04-23-probleme-dashboard-setup.md`
 
-- [ ] **Step 1:** User öffnet das Sheet.
-- [ ] **Step 2:** User fügt nach Spalte `zeitstempel` eine neue Spalte `id` ein.
-- [ ] **Step 3:** User fügt nach Spalte `id` eine neue Spalte `erledigt` ein.
-- [ ] **Step 4:** User bestätigt: Header-Reihe ist jetzt `zeitstempel | id | erledigt | rolle | ort | typ | category | comment | pruefungId | frageId | frageText | zusatzinfo | frageTyp | modus | bildschirm | appVersion | gruppeId`.
+- [ ] **Step 1:** Setup-Doku anlegen mit Code-Blöcken für den separaten Feedback-Apps-Script (Copy-Paste-Vorlage für DUY):
 
-**Commit:** keiner (Sheet, nicht Git).
+````markdown
+# Setup — Probleme-Dashboard Feedback-Apps-Script
 
-### Task 2: Backfill-Function im separaten Feedback-Apps-Script
+Dieses Dokument enthält den Code, der in das **separate** Feedback-Apps-Script
+(`AKfycbwSxIOqGhAbnNM2-Y4ulgBY3usVEC6cKT4S5sEk4sf2CMognF5qxopj3FJtnTpm3nq7TQ`)
+eingefügt werden muss. Der Script liegt NICHT im Repo.
 
-Der separate Feedback-Apps-Script hat einen eigenen Code-Bereich. Ich kann dort nur den finalen Code als Diff im Plan festhalten — User muss ihn im GAS-Editor einfügen (kein lokales Repo für diesen Script).
+## 1. migriereProblemmeldungenSchema() — Auto-Migration
 
-**Files:** separater Feedback-Apps-Script (`Code.gs` im GAS-Editor), **nicht im Repo**.
-
-- [ ] **Step 1:** In der User-Doku den Code-Block für `backfillUuids` bereitstellen:
+Fügt fehlende Spalten `id` + `erledigt` ein und füllt leere UUIDs nach.
+Idempotent: kann gefahrlos mehrfach laufen.
 
 ```js
 /**
- * Einmalig auszuführen: füllt leere id-Zellen mit UUIDs.
- * User-Task: GAS-Editor → Function-Dropdown → backfillUuids → Run.
+ * Einmalig (oder wiederholt als Sanity-Check) laufen lassen.
+ * GAS-Editor → Function-Dropdown → migriereProblemmeldungenSchema → Run.
+ *
+ * 1. Fügt Spalte 'id' nach 'zeitstempel' ein (falls fehlt).
+ * 2. Fügt Spalte 'erledigt' nach 'id' ein (falls fehlt).
+ * 3. Füllt alle leeren id-Zellen mit frischer UUID.
  */
-function backfillUuids() {
+function migriereProblemmeldungenSchema() {
   var sheet = SpreadsheetApp.getActive().getSheetByName('ExamLab-Problemmeldungen');
   if (!sheet) throw new Error('Tab "ExamLab-Problemmeldungen" nicht gefunden');
   var lastCol = sheet.getLastColumn();
-  var headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
-  var idCol = headers.indexOf('id');
-  if (idCol < 0) throw new Error('Spalte "id" fehlt — Schema nicht migriert');
-  var lastRow = sheet.getLastRow();
-  if (lastRow < 2) return;
-  var range = sheet.getRange(2, idCol + 1, lastRow - 1, 1);
-  var values = range.getValues();
-  var count = 0;
-  for (var i = 0; i < values.length; i++) {
-    if (!values[i][0]) {
-      values[i][0] = Utilities.getUuid();
-      count++;
-    }
+  var headers = lastCol > 0 ? sheet.getRange(1, 1, 1, lastCol).getValues()[0] : [];
+
+  var zsCol = headers.indexOf('zeitstempel');
+  if (zsCol < 0) throw new Error('Spalte "zeitstempel" fehlt — Sheet hat unerwartetes Schema');
+
+  // 1) id-Spalte
+  if (headers.indexOf('id') < 0) {
+    sheet.insertColumnAfter(zsCol + 1);
+    sheet.getRange(1, zsCol + 2).setValue('id');
+    Logger.log('✓ Spalte "id" eingefügt');
   }
-  range.setValues(values);
-  Logger.log('Backfill: ' + count + ' UUIDs geschrieben.');
+
+  // Header neu lesen (Spalten-Verschiebung)
+  lastCol = sheet.getLastColumn();
+  headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
+
+  // 2) erledigt-Spalte nach id
+  var idCol = headers.indexOf('id');
+  if (headers.indexOf('erledigt') < 0) {
+    sheet.insertColumnAfter(idCol + 1);
+    sheet.getRange(1, idCol + 2).setValue('erledigt');
+    Logger.log('✓ Spalte "erledigt" eingefügt');
+  }
+
+  // 3) UUID-Backfill
+  lastCol = sheet.getLastColumn();
+  headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
+  idCol = headers.indexOf('id');
+  var lastRow = sheet.getLastRow();
+  if (lastRow >= 2) {
+    var range = sheet.getRange(2, idCol + 1, lastRow - 1, 1);
+    var values = range.getValues();
+    var count = 0;
+    for (var i = 0; i < values.length; i++) {
+      if (!values[i][0]) {
+        values[i][0] = Utilities.getUuid();
+        count++;
+      }
+    }
+    if (count > 0) range.setValues(values);
+    Logger.log('✓ Backfill: ' + count + ' UUIDs nachgetragen (' + (values.length - count) + ' bereits gesetzt)');
+  }
+
+  Logger.log('✓ Schema-Migration abgeschlossen');
 }
 ```
 
-- [ ] **Step 2:** Schreibe die Anleitung in `ExamLab/docs/superpowers/plans/2026-04-23-probleme-dashboard-setup.md` (kurzes Setup-Dokument für DUY).
+## 2. doGet(e) — gepatchter Write-Handler
 
-**Commit:**
-```bash
-git add ExamLab/docs/superpowers/plans/2026-04-23-probleme-dashboard-setup.md
-git commit -m "ExamLab F1: Setup-Doku für Feedback-Apps-Script-Migration"
-```
-
-### Task 3: Write-Handler des Feedback-Apps-Script patchen
-
-**Files:** separater Feedback-Apps-Script, **nicht im Repo**.
-
-- [ ] **Step 1:** Setup-Doku um Code-Snippet für den gepatchten `doGet`-Handler erweitern:
+Nach der Migration: bestehenden `doGet` ersetzen.
 
 ```js
 function doGet(e) {
-  // … bestehende Parameter-Extraktion …
   var sheet = SpreadsheetApp.getActive().getSheetByName('ExamLab-Problemmeldungen');
-  // Schema: zeitstempel | id | erledigt | rolle | ort | typ | category | comment
-  //       | pruefungId | frageId | frageText | zusatzinfo | frageTyp | modus
-  //       | bildschirm | appVersion | gruppeId
+  // Schema nach Migration:
+  // zeitstempel | id | erledigt | rolle | ort | typ | category | comment
+  //   | pruefungId | frageId | frageText | zusatzinfo | frageTyp | modus
+  //   | bildschirm | appVersion | gruppeId
   sheet.appendRow([
     new Date(),
-    Utilities.getUuid(),   // NEU
-    '',                    // NEU (erledigt leer)
+    Utilities.getUuid(),   // NEU: eindeutige ID
+    '',                    // NEU: erledigt leer
     e.parameter.rolle || '',
     e.parameter.ort || '',
     e.parameter.typ || '',
@@ -111,23 +133,32 @@ function doGet(e) {
 }
 ```
 
-- [ ] **Step 2:** Commit des Setup-Dokuments.
+## User-Tasks in Reihenfolge
 
-**Commit:**
+1. GAS-Editor des separaten Feedback-Apps-Scripts öffnen.
+2. Function `migriereProblemmeldungenSchema` einfügen → speichern → Run (einmalig).
+3. Log prüfen: `✓ Schema-Migration abgeschlossen`.
+4. Bestehenden `doGet` durch neue Version ersetzen → speichern.
+5. `Deploy → New deployment` → URL bleibt gleich (Web-App, Version erhöhen).
+6. Test: im ExamLab-Frontend eine Test-Meldung absenden, Sheet-Zeile inspizieren (UUID in `id`, leer in `erledigt`).
+````
+
+- [ ] **Step 2:** Commit.
+
 ```bash
 git add ExamLab/docs/superpowers/plans/2026-04-23-probleme-dashboard-setup.md
-git commit -m "ExamLab F1: Setup-Doku um UUID-Write-Handler erweitert"
+git commit -m "ExamLab F1: Setup-Doku mit Auto-Migration für Feedback-Apps-Script"
 ```
 
-### Task 4: User führt Backfill + Deploy aus
+### Task 2: User führt Schema-Migration + Deploy aus
 
-- [ ] **Step 1:** User öffnet GAS-Editor des Feedback-Apps-Script.
-- [ ] **Step 2:** User fügt `backfillUuids`-Function ein → speichert → führt einmal aus → prüft Log (Anzahl backfilled).
-- [ ] **Step 3:** User ersetzt `doGet` durch die neue Version → speichert → neue Bereitstellung erstellen (`Deploy → New deployment`).
-- [ ] **Step 4:** User meldet „Feedback-Apps-Script deployed".
-- [ ] **Step 5:** User testet einmalig: im ExamLab-Frontend eine Test-Meldung absenden → prüft, dass neue Sheet-Zeile eine UUID in `id` und leeres `erledigt` hat.
+- [ ] **Step 1:** User folgt Setup-Doku (siehe Task 1) — 6 Schritte, ~5 Minuten.
+- [ ] **Step 2:** User meldet „Feedback-Apps-Script migriert + deployed".
+- [ ] **Step 3:** User testet: eine Test-Meldung absenden → Sheet-Zeile zeigt UUID + leer.
 
 **Commit:** keiner.
+
+> _Hinweis: Die ursprünglichen Tasks 3 + 4 (separater Backfill-Script + separater Write-Handler-Patch) wurden in Task 1 als eine idempotente Migration zusammengefasst. Nummerierung 3/4 wird übersprungen, 5+ behält die ursprünglichen Nummern._
 
 ---
 

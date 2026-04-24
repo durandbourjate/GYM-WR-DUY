@@ -8,7 +8,31 @@
 
 ## Für die nächste Session (S139+)
 
-### Aktueller Stand (Ende S138, 23.04.2026) — S137 UI/Autokorrektur-Bundle auf `main` gemergt
+### Aktueller Stand (Ende S139, 23.04.2026) — Bundle F1 Spec+Plan auf `feature/problemmeldungen-dashboard`, `main` unverändert
+
+**S139 hat ausschliesslich Spec + Plan für Bundle F1 (Probleme-Dashboard) produziert.** Keine Code-Änderungen, `main` unverändert auf S138-Stand.
+
+**Offene Feature-Branches:**
+- `feature/problemmeldungen-dashboard` — Bundle F1 Spec + Plan committed (6 Commits). Bereit zur Implementierung in S140+. Plan: 24 Tasks in 5 Phasen. Setup-Doku [`2026-04-23-probleme-dashboard-setup.md`](docs/superpowers/plans/2026-04-23-probleme-dashboard-setup.md) enthält die automatisierte Schema-Migration für das separate Feedback-Apps-Script.
+
+**Bundle F2 (Bugfixes Testdurchlauf)** — vom User übergeben, noch nicht angegangen:
+1. Lobby-Anzeige SuS (ca. 30s Delay expected — UX-Hinweis nötig?).
+2. Formeleditor Wurzel-Preview Bug.
+3. Übung f20 Buchungsseite Soll/Haben unsinnig.
+4. Abgabe-Timeout nach 1min („lokal gespeichert, Übertragung gescheitert") — LP muss erzwingen.
+5. Audio-Aufnahme (4s) nicht übertragen.
+6. f14 Kontenkategorie-Autokorrektur zählt korrekt als falsch.
+7. f16 Hotspot-Zielfläche zählt richtigen Klick als falsch.
+
+Geplant als eigenes Bundle F2 nach F1-Merge oder parallel (je nach Prüfungsaktivität).
+
+### S139 Artefakte (commitet auf `feature/problemmeldungen-dashboard`)
+
+- Spec: [`2026-04-23-probleme-dashboard-design.md`](docs/superpowers/specs/2026-04-23-probleme-dashboard-design.md) — 2 Review-Runden, Approved.
+- Plan: [`2026-04-23-probleme-dashboard.md`](docs/superpowers/plans/2026-04-23-probleme-dashboard.md) — 2 Review-Runden, Approved.
+- Setup-Doku: [`2026-04-23-probleme-dashboard-setup.md`](docs/superpowers/plans/2026-04-23-probleme-dashboard-setup.md) — Code für separaten Feedback-Apps-Script (Auto-Migration + Write-Patch).
+
+### Vorgänger-Stand (Ende S138, 23.04.2026) — S137 UI/Autokorrektur-Bundle auf `main` gemergt
 
 **Branch `fix/s137-ui-autokorrektur-bundle` nach `main` gemergt + gelöscht.** Staging-E2E komplett durchgeführt, alle 8 Tickets + KI-Synonyme-Prompt verifiziert. Ticket 2 (Übungsstart-Latenz) bleibt offen → Bundle E.
 
