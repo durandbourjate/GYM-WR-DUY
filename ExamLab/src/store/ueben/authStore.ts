@@ -100,12 +100,15 @@ export const useUebenAuthStore = create<UebenAuthState>((set, get) => ({
         return
       }
 
-      const response = await uebenApiClient.post<{ success: boolean; data: { gueltig: boolean } }>(
+      // Backend liefert `{success: boolean}` ohne data-Wrapper (apps-script-code.js
+      // `lernplattformValidiereToken`). Früher las der Check `response.data.gueltig`
+      // — das war IMMER undefined → User wurde bei jedem Session-Restore ausgeloggt.
+      const response = await uebenApiClient.post<{ success: boolean }>(
         'lernplattformValidiereToken',
         { email: user.email, sessionToken: user.sessionToken }
       )
 
-      if (response?.data?.gueltig) {
+      if (response?.success) {
         set({ user, istAngemeldet: true, ladeStatus: 'fertig' })
       } else {
         localStorage.removeItem(STORAGE_KEY)
