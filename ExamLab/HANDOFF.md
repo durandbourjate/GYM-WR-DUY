@@ -31,24 +31,66 @@
 - ✅ `testC9BatchUpdateLueckentextMigration` → Endpoint + Restore-Logik funktionieren (Test-Frage `da05a438-…` sauber wiederhergestellt inkl. `pruefungstauglich`/`geaendertAm`/`poolContentHash`)
 - ✅ `testBulkSetzeLueckentextModus` → 253 Fragen auf `freitext` gesetzt, Idempotenz-Check `alleBereits=true`
 - ✅ `migriereLueckentextModus` → `Total: 253 · Neu gesetzt: 0 · Bereits gesetzt: 253` (alle via Bulk-Test schon migriert)
+- ✅ `batchUpdateLueckentextMigration` (drei echte Calls BWL/Recht/VWL, Task 19): `aktualisiert=58/94/101`, `nichtGefunden=0`, `keineLuecken=0`, `falscherTyp=0`
 
-**Status der 253 Lückentext-Fragen:** alle haben `lueckentextModus='freitext'`, alle (bis auf 2 Recht-Fragen) mit leeren `korrekteAntworten`. Bereit für KI-Batch-Migration.
+**Status der 253 Lückentext-Fragen (nach Phase 7):**
+- Alle haben `lueckentextModus='freitext'` (Default — LP kann pro Frage oder via Bulk-Toggle auf `dropdown` wechseln)
+- Alle haben **≥1 `korrekteAntworten`** (Hauptantwort + 0-3 Synonyme) — verifiziert via Re-Dump
+- Alle haben **genau 5 `dropdownOptionen`** (1 Korrekte + 4 Distraktoren) — verifiziert via Re-Dump
+- Alle haben `pruefungstauglich=false` — **manuelle LP-Prüfung pro Frage vor Freigabe nötig**
+- `geaendertAm` auf 2026-04-24 aktualisiert; `poolContentHash` geleert (wird beim nächsten Pool-Check neu berechnet)
+
+**Backup-Status:** User hat Google-Sheets-Backup der Fragenbank vor Phase 7 erstellt (Pflicht laut README). Rollback-Pfad: Drive → Backup-Kopie umbenennen → Live-Fragenbank ersetzen + Apps-Script-Cache invalidieren.
 
 ### Offen für S145+
 
 **Phase 8 (E2E + Merge):** Test-Plan + Browser-Test mit echten Logins + HANDOFF + Merge zu main.
 
-1. **Task 20: Test-Plan schreiben** (laut `regression-prevention.md` Phase 3.0) — Tabelle mit Änderungen, Regressions-Risiken, Security-Check, kritische Pfade.
-2. **Task 21: Browser-Test mit echten Logins** (LP: yannick.durand@gymhofwil.ch · SuS: wr.test@stud.gymhofwil.ch):
-   - Lückentext-Freitext-Frage: SuS tippt ein → Korrektur akzeptiert Hauptantwort + Synonyme
-   - Modus-Toggle im Editor (LP) → schaltet zwischen Freitext und Dropdown, Felder gedimmt
-   - Bulk-Toggle in Einstellungen → Fragensammlung → alle Fragen wechseln Modus
-   - Dropdown-Frage: SuS wählt → Korrektur funktioniert
-   - Stichprobe 3-5 Fragen pro Fachbereich manuell kontrollieren: Hauptantwort + 4 Distraktoren plausibel?
-   - Einrichtungs-Frage `einr-lt-hofwil`/`ueb-lt-hofwil` (Hofwil/Münchenbuchsee/Bern) → noch funktional?
-3. **Task 22: Freigabe + Merge:** LP-OK → HANDOFF finalisieren → `git checkout main && git merge fix/lueckentext-editor` → Push → Branch löschen.
+**Voraussetzungen vor Start:**
+- Branch `fix/lueckentext-editor` aktuell (Commits `340569b` + `8a12a91` pushed)
+- Kein aktiver Prüfungsbetrieb
+- Staging-Deploy optional (Feature-Branch-Preview), kann aber auch direkt aus Feature-Branch `npm run preview` getestet werden
 
-**LP-Review der migrierten Antworten (separat von Phase 8):** Alle 253 Fragen haben `pruefungstauglich=false`. Der LP geht pro Frage durch + setzt `pruefungstauglich=true` nach Prüfung. Keine automatische Freischaltung — Fragensammlung bleibt dark-launched bis manuell freigegeben.
+**Task 20 — Test-Plan schreiben** (laut `regression-prevention.md` Phase 3.0):
+
+Schriftliche Tabelle mit folgenden Spalten pro Testfall: Änderung · Erwartetes Verhalten · Regressions-Risiko.
+
+Pflichtinhalte:
+- Security-Check (leakt SuS-Response Lösungsdaten? → IMMER im Network-Tab prüfen: keine `korrekteAntworten[]` in der SuS-Frage-Response)
+- Betroffene kritische Pfade aus regression-prevention.md §1.3 (SuS lädt Prüfung, SuS-Heartbeat, SuS-Abgabe, LP-Monitoring, LP-Korrektur+Auto-Korrektur)
+
+**Task 21 — Browser-Test** (LP: yannick.durand@gymhofwil.ch · SuS: wr.test@stud.gymhofwil.ch, echte Logins, nie Demo-Modus):
+
+**LP-Pfade:**
+- [ ] Fragensammlung → Lückentext-Frage öffnen → Modus-Toggle Freitext ↔ Dropdown klicken, inaktives Feld gedimmt mit Label
+- [ ] Einstellungen → Fragensammlung → Bulk-Toggle auf Dropdown → alle 253 wechseln
+- [ ] Prev/Next-Navigation im Editor — Felder korrekt gesynct (S129-Regel: `key={frage.id}`)
+- [ ] Manuelle Stichprobe 3 Fragen pro Fachbereich: sind Hauptantwort + Distraktoren plausibel?
+
+**SuS-Pfade (via LP-Bulk-Toggle beide Modi testen):**
+- [ ] **Freitext-Modus:** SuS tippt Hauptantwort → Auto-Korrektur = korrekt
+- [ ] **Freitext-Modus:** SuS tippt Synonym (z.B. "preiselastisch" statt "elastisch") → Auto-Korrektur = korrekt (case-insensitive!)
+- [ ] **Freitext-Modus:** SuS tippt Distraktor aus Dropdown ein → Auto-Korrektur = falsch
+- [ ] **Dropdown-Modus:** SuS wählt Korrekte → Auto-Korrektur = korrekt
+- [ ] **Dropdown-Modus:** SuS wählt Distraktor → Auto-Korrektur = falsch
+- [ ] **Einrichtungs-Frage** `einr-lt-hofwil`/`ueb-lt-hofwil`: Hofwil/Münchenbuchsee/Bern → beide Modi testen, da das spezielle `0`/`1`/`2`-Lücken-IDs sind (nicht `luecke-0` wie Standard)
+
+**Security-Invarianten (Network-Tab):**
+- [ ] SuS-Request `holeFrage` zeigt im Response-Body KEINE `korrekteAntworten[]` und KEINE `dropdownOptionen[]`-Whitelist mehr als nötig
+- [ ] LP-Request sieht alle Felder (inkl. `korrekteAntworten`, `dropdownOptionen`)
+
+**Task 22 — Freigabe + Merge:**
+
+1. LP schreibt explizit "Merge OK" oder "Freigabe"
+2. `git checkout main && git merge fix/lueckentext-editor` (wenn main zwischenzeitlich weitergegangen ist: erst `git fetch origin && git rebase origin/main` auf Feature-Branch)
+3. HANDOFF.md finalisieren (S145-Block "Phase 8 DURCHGEFÜHRT")
+4. `git push`
+5. `git branch -d fix/lueckentext-editor`
+6. `git push origin --delete fix/lueckentext-editor`
+
+**Separat von Phase 8: LP-Review der migrierten Antworten.**
+
+Alle 253 Fragen haben `pruefungstauglich=false`. Der LP geht pro Frage im Frontend (Fragensammlung-Editor) durch, prüft Hauptantwort + Synonyme + Distraktoren, passt wo nötig an und setzt `pruefungstauglich=true`. Keine automatische Freischaltung — Fragensammlung bleibt dark-launched bis manuell freigegeben. Dieser Review-Prozess läuft parallel zur Produktion und ist kein Blocker für den Merge.
 
 ---
 
