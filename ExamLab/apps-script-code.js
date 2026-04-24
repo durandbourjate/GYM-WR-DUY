@@ -822,6 +822,111 @@ function holeAktiveLPEmails_() {
   return out;
 }
 
+/**
+ * Liefert Problemmeldungen aus separatem Sheet, gefiltert auf Sichtbarkeit.
+ * Auth: LP-Token. Rate-Limit: 30/5min.
+ * LP sieht nur Meldungen mit Fragen-/Prüfungs-/Gruppen-Kontext wo er Leserecht hat.
+ * Admin sieht alle.
+ */
+function listeProblemmeldungen(body) {
+  var email = String(body.email || '').toLowerCase().trim();
+  if (!istZugelasseneLP(email)) return jsonResponse({ success: false, error: 'Nicht autorisiert' });
+  if (!lernplattformValidiereToken_(body.token || body.sessionToken, email)) {
+    return jsonResponse({ success: false, error: 'Token ungültig' });
+  }
+  var rl = lernplattformRateLimitCheck_('listeProblemmeldungen', email, 30, 300);
+  if (rl.blocked) return jsonResponse({ success: false, error: rl.error });
+
+  var sheetId = PropertiesService.getScriptProperties().getProperty('PROBLEMMELDUNGEN_SHEET_ID');
+  if (!sheetId) return jsonResponse({ success: false, error: 'Problemmeldungen-Sheet nicht konfiguriert' });
+
+  var ss;
+  try { ss = SpreadsheetApp.openById(sheetId); }
+  catch (e) { return jsonResponse({ success: false, error: 'Sheet nicht erreichbar: ' + e.message }); }
+
+  var sheet = ss.getSheetByName('ExamLab-Problemmeldungen');
+  if (!sheet) return jsonResponse({ success: false, error: 'Tab "ExamLab-Problemmeldungen" nicht gefunden' });
+
+  var lastCol = sheet.getLastColumn();
+  if (lastCol === 0) return jsonResponse({ success: true, data: [] });
+  var headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0].map(function(h) { return String(h).trim(); });
+  var lastRow = sheet.getLastRow();
+  var rows = lastRow > 1 ? sheet.getRange(2, 1, lastRow - 1, lastCol).getValues() : [];
+  var col = function(name) { return headers.indexOf(name); };
+
+  var lpInfo = getLPInfo(email);
+  var istAdmin = !!(lpInfo && lpInfo.rolle === 'admin');
+
+  // Alle frageIds + gruppeIds (pruefungId und gruppeId teilen Namespace) deduplizieren
+  var frageIds = [];
+  var gruppeIds = [];
+  rows.forEach(function(r) {
+    var fid = String(r[col('frageId')] || '');
+    if (fid && frageIds.indexOf(fid) < 0) frageIds.push(fid);
+    var pid = String(r[col('pruefungId')] || '');
+    if (pid && gruppeIds.indexOf(pid) < 0) gruppeIds.push(pid);
+    var gid = String(r[col('gruppeId')] || '');
+    if (gid && gruppeIds.indexOf(gid) < 0) gruppeIds.push(gid);
+  });
+
+  var frageMap = baueFrageMetaMap_(frageIds);
+  var gruppeMap = baueGruppeMetaMap_(gruppeIds);
+
+  var meldungen = rows.map(function(r) {
+    var id = String(r[col('id')] || '');
+    var frageId = String(r[col('frageId')] || '');
+    var pruefungId = String(r[col('pruefungId')] || '');
+    var gruppeId = String(r[col('gruppeId')] || '');
+
+    var frageMeta = frageMap[frageId] || null;
+    var gruppeMeta = gruppeMap[pruefungId] || gruppeMap[gruppeId] || null;
+
+    var sichtbarFrage = frageMeta ? istSichtbarMitLP(email, frageMeta, lpInfo, istAdmin) : false;
+    var sichtbarGruppe = gruppeMeta ? istSichtbarMitLP(email, gruppeMeta, lpInfo, istAdmin) : false;
+    var hatKontext = !!(frageId || pruefungId || gruppeId);
+
+    // Sichtbarkeits-Regel:
+    // - Admin sieht alles.
+    // - LP sieht nur Meldungen mit Kontext wo mindestens eine Sichtbarkeit positiv ist.
+    var sichtbar = istAdmin || sichtbarFrage || sichtbarGruppe;
+    if (!sichtbar) return null;
+    if (!istAdmin && !hatKontext) return null;
+
+    var recht = 'betrachter';
+    if (frageMeta && sichtbarFrage) recht = ermittleRechtMitLP(email, frageMeta, lpInfo, istAdmin);
+    else if (gruppeMeta && sichtbarGruppe) recht = ermittleRechtMitLP(email, gruppeMeta, lpInfo, istAdmin);
+    else if (istAdmin) recht = 'inhaber';
+
+    // Privacy: frageText nur bei Leserecht auf Frage (oder Admin)
+    var frageTextRaw = String(r[col('frageText')] || '');
+    var frageText = (sichtbarFrage || istAdmin) ? frageTextRaw : '';
+
+    return {
+      id: id,
+      zeitstempel: toIsoStr_(r[col('zeitstempel')]),
+      typ: String(r[col('typ')] || ''),
+      category: String(r[col('category')] || ''),
+      comment: String(r[col('comment')] || ''),
+      rolle: String(r[col('rolle')] || ''),
+      frageId: frageId,
+      frageText: frageText,
+      frageTyp: String(r[col('frageTyp')] || ''),
+      modus: String(r[col('modus')] || ''),
+      pruefungId: pruefungId,
+      gruppeId: gruppeId,
+      ort: String(r[col('ort')] || ''),
+      appVersion: String(r[col('appVersion')] || ''),
+      inhaberEmail: frageMeta ? frageMeta.inhaberEmail : (gruppeMeta ? gruppeMeta.inhaberEmail : ''),
+      inhaberAktiv: frageMeta ? frageMeta.inhaberAktiv : (gruppeMeta ? gruppeMeta.inhaberAktiv : true),
+      istPoolFrage: !!(frageMeta && frageMeta.quelle === 'pool'),
+      recht: recht,
+      erledigt: String(r[col('erledigt')] || '').toLowerCase() === 'ja',
+    };
+  }).filter(function(m) { return m !== null; });
+
+  return jsonResponse({ success: true, data: meldungen });
+}
+
 // Zentrale Daten-Sheets (Synergien)
 const KURSE_SHEET_ID = '1inmEds_g48-lTFCqo9NUqAcxhDxF2mFSoBM5fO6uJng';       // User muss ID einsetzen
 const STUNDENPLAN_SHEET_ID = '1mesBOmPuLewvnY5iNb4iD2zNDUn8-ruK5HE0DsKwUSs';
