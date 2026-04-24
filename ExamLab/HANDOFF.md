@@ -6,9 +6,34 @@
 
 ---
 
-## Für die nächste Session (S142+)
+## Für die nächste Session (S143+)
 
-### Aktueller Stand (Ende S141, 24.04.2026) — Altlasten-Bundle auf `main` gemergt
+### Aktueller Stand (Ende S142, 24.04.2026) — Bildeditor-Bundle auf `main`, Lückentext-Fix auf `preview`
+
+**Auf `main` gemergt (S142, Commit `d35a30b`):** Bildeditor Keyboard-Delete + Click-Bug-Fix — User kann Zone/Hotspot/Label markieren und per Delete/Backspace löschen. Bug behoben: Klick auf bestehende Zone-Fläche im Rechteck-Modus erzeugte eine neue "erste Ecke" (SVG-Target-Guard in handleBildKlick). Staging-E2E bestätigt.
+
+**Offen auf Feature-Branch `fix/lueckentext-editor` (preview deployed):**
+
+1. **Phase 1 Editor-Fix** (Commit `4a3db93`):
+   - LueckentextEditor akzeptiert jetzt `{N}` UND `{{N}}` (SuS-Renderer konnte das schon).
+   - Mount-Migration: Pool-importierte Fragen mit `{N}` werden beim Öffnen im Editor auf `{{N}}` normalisiert.
+   - ID-Bridge: bestehende `luecke-N`-IDs (aus Pool-Imports) bleiben erhalten.
+   - Warn-Markierung: Lücken ohne korrekteAntworten bekommen roten Rahmen + Hinweistext.
+2. **Phase 2 GAS-Scan-Funktion** (gleicher Commit):
+   - `zaehleLeereLueckentextAntworten()` in apps-script-code.js — scannt alle 4 Fachbereich-Tabs, liefert Summary + Liste betroffener Frage-IDs. Manuell im GAS-Editor ausführen, kein Deploy nötig.
+3. **Phase 3 Spec** (Commit `2eee27f`): `docs/superpowers/specs/2026-04-24-lueckentext-antworten-migration-design.md` — Design für KI-Batch-Migration (Claude Code, analog C9 Phase 4).
+
+**To-do nächste Session:**
+1. Auf `fix/lueckentext-editor` checken, Tab 1 hard-reload, Frage `5b8e11b4-afd9-4e98-bf8c-e1c55d0a63c6` im LP-Editor öffnen → prüfen dass (a) Text auf `{{0}}`/`{{1}}` normalisiert wurde, (b) Lücken-Liste angezeigt, (c) leere Inputs rot markiert.
+2. GAS-Editor öffnen → `zaehleLeereLueckentextAntworten` ausführen → Logger-Output: Zahlen pro Fachbereich + Liste betroffener IDs.
+3. User-Entscheidung Variante A (nur leere befüllen) vs. B (alle Lückentexte mit Synonymen + Dropdown erweitern).
+4. Plan für Phase 3 schreiben (`docs/superpowers/plans/2026-04-24-lueckentext-antworten-migration.md`).
+5. Merge `fix/lueckentext-editor` → `main`.
+6. Phase 3 ausführen (Dump → Stichprobe → Review → Full-Run analog C9 Phase 4).
+
+**Bundle E (Übungsstart-Latenz) bleibt offen** — eigenes Backend-Bundle nach Lückentext-Migration.
+
+### Vorgänger-Stand (Ende S141, 24.04.2026) — Altlasten-Bundle auf `main` gemergt
 
 **Branch `fix/altlasten-bundle` nach `main` gemergt + gelöscht.** 5 Commits Cleanup-Arbeit, Staging-E2E mit echten Logins bestätigt.
 
