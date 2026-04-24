@@ -42,15 +42,18 @@ function LueckentextAufgabe({ frage }: { frage: LueckentextFrageType }) {
     antwort?.typ === 'lueckentext' ? antwort.eintraege : {}
 
   // Gemischte Dropdown-Optionen einmalig pro Frage berechnen (key = luecke.id)
+  // Nur befüllen wenn lueckentextModus === 'dropdown' (ab S142). Fallback: modus=dropdown
+  // + leere dropdownOptionen → Freitext-Input (Feld bleibt leer im Map).
   const gemischteOptionen = useMemo(() => {
     const result: Record<string, string[]> = {}
+    if (frage.lueckentextModus !== 'dropdown') return result
     for (const luecke of (frage.luecken ?? [])) {
       if (luecke.dropdownOptionen && luecke.dropdownOptionen?.length > 0) {
         result[luecke.id] = shuffleOptionen(luecke.dropdownOptionen, `${frage.id}-${luecke.id}`)
       }
     }
     return result
-  }, [frage.id, frage.luecken])
+  }, [frage.id, frage.luecken, frage.lueckentextModus])
 
   // Mapping Platzhalter-Nummer (aus {0}, {1}) → tatsächliche Lücken-ID
   // Pool-Converter vergibt Zufalls-IDs, der Text nutzt aber Index-basierte {0}/{1}.
