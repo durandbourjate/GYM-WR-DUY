@@ -11895,3 +11895,49 @@ function toIsoStr_(wert) {
   if (wert instanceof Date) return wert.toISOString();
   return String(wert || '');
 }
+
+/**
+ * F1 Smoke-Test: Problemmeldungen-Endpoints im GAS-Editor.
+ * Voraussetzung: Script-Property PROBLEMMELDUNGEN_SHEET_ID gesetzt.
+ * Verwendet Admin-Email für den Test.
+ * GAS-Editor → Function-Dropdown → testProblemmeldungen → Run.
+ */
+function testProblemmeldungen() {
+  var testEmail = 'yannick.durand@gymhofwil.ch';  // Admin
+  var ss = SpreadsheetApp.openById(PropertiesService.getScriptProperties().getProperty('PROBLEMMELDUNGEN_SHEET_ID'));
+  var sheet = ss.getSheetByName('ExamLab-Problemmeldungen');
+  if (!sheet) throw new Error('Tab nicht gefunden');
+
+  // Mock-Token erzeugen
+  var cache = CacheService.getScriptCache();
+  var mockToken = 'mock-test-' + Utilities.getUuid();
+  cache.put('lp_session_' + mockToken, JSON.stringify({ email: testEmail, ts: new Date().toISOString() }), 300);
+
+  // Liste abrufen
+  var listResp = listeProblemmeldungen({ email: testEmail, token: mockToken });
+  var listData = JSON.parse(listResp.getContent());
+  if (!listData.success) throw new Error('Liste: ' + listData.error);
+  Logger.log('✓ Liste OK: ' + listData.data.length + ' Meldungen');
+
+  // Toggle auf erste Meldung (wenn vorhanden)
+  if (listData.data.length > 0) {
+    var first = listData.data[0];
+    var origErledigt = first.erledigt;
+    var toggleResp = markiereProblemmeldungErledigt({
+      email: testEmail, token: mockToken,
+      id: first.id, erledigt: !origErledigt
+    });
+    var toggleData = JSON.parse(toggleResp.getContent());
+    if (!toggleData.success) throw new Error('Toggle: ' + toggleData.error);
+    Logger.log('✓ Toggle OK auf id=' + first.id);
+    // Zurücksetzen
+    markiereProblemmeldungErledigt({
+      email: testEmail, token: mockToken,
+      id: first.id, erledigt: origErledigt
+    });
+    Logger.log('✓ Zurückgesetzt');
+  } else {
+    Logger.log('(keine Meldungen im Sheet → Toggle-Test übersprungen)');
+  }
+  Logger.log('✓ Alle Smoke-Tests bestanden.');
+}
