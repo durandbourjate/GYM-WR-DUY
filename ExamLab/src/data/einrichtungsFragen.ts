@@ -476,26 +476,26 @@ export const einrichtungsFragen: Frage[] = [
     tags: ['einführung', 'test'],
     punkte: 2,
     zeitbedarf: 2,
-    musterlosung: 'Kasse (1000) = Aktivkonto. Mietaufwand (6000) = Aufwandkonto.',
+    musterlosung: 'Kasse (1000) = Aktivkonto, Zunahme im Soll. Mietaufwand (6000) = Aufwandkonto, Zunahme im Soll.',
     bewertungsraster: [
-      { beschreibung: 'Kasse korrekt als Aktiv bestimmt', punkte: 1 },
-      { beschreibung: 'Mietaufwand korrekt als Aufwand bestimmt', punkte: 1 },
+      { beschreibung: 'Kasse korrekt als Aktiv (Soll) bestimmt', punkte: 1 },
+      { beschreibung: 'Mietaufwand korrekt als Aufwand (Soll) bestimmt', punkte: 1 },
     ],
     verwendungen: [],
     quelle: 'manuell',
     autor,
-    aufgabentext: '**Übungsaufgabe zum Testen der Eingabefelder:**\n\nBestimmen Sie die Kontenkategorie. Die Lösung ist angegeben — tippen Sie sie einfach ein!\n\n📋 **Lösung:** Kasse = **Aktivkonto** | Mietaufwand = **Aufwandkonto**',
+    aufgabentext: '**Übungsaufgabe zum Testen der Eingabefelder:**\n\nBestimmen Sie die Kontenkategorie **und auf welcher Seite das Konto zunimmt** (Soll oder Haben). Die Lösung ist angegeben — tippen Sie sie einfach ein!\n\n📋 **Lösung:**\n- Kasse = **Aktivkonto**, Zunahme im **Soll**\n- Mietaufwand = **Aufwandkonto**, Zunahme im **Soll**\n\n💡 **Merkregel:** Aktiv- und Aufwandkonten nehmen im Soll zu, Passiv- und Ertragskonten im Haben.',
     modus: 'kategorie_bestimmen',
     aufgaben: [
       {
         id: 'kb-kasse',
-        text: 'Kasse (1000) — Welche Kategorie? (Tipp: Aktivkonto)',
-        erwarteteAntworten: [{ kontonummer: '1000', kategorie: 'aktiv' }],
+        text: 'Kasse (1000) — Kategorie und Zunahme-Seite? (Tipp: Aktivkonto, Zunahme im Soll)',
+        erwarteteAntworten: [{ kontonummer: '1000', kategorie: 'aktiv', seite: 'soll' }],
       },
       {
         id: 'kb-miete',
-        text: 'Mietaufwand (6000) — Welche Kategorie? (Tipp: Aufwandkonto)',
-        erwarteteAntworten: [{ kontonummer: '6000', kategorie: 'aufwand' }],
+        text: 'Mietaufwand (6000) — Kategorie und Zunahme-Seite? (Tipp: Aufwandkonto, Zunahme im Soll)',
+        erwarteteAntworten: [{ kontonummer: '6000', kategorie: 'aufwand', seite: 'soll' }],
       },
     ],
     kontenauswahl: {
@@ -723,15 +723,19 @@ export const einrichtungsFragen: Frage[] = [
     verwendungen: [],
     quelle: 'manuell',
     autor,
-    fragetext: 'Klicken Sie auf die **Schweiz** auf der Europakarte.\n\n💡 **Tipp:** Die Schweiz liegt im Herzen Europas, südlich von Deutschland und nördlich von Italien.',
+    fragetext: 'Klicken Sie auf die **Schweiz** (rot markiert) auf der Europakarte.\n\n💡 **Tipp:** Die Schweiz liegt im Herzen Europas, südlich von Deutschland und nördlich von Italien.',
     bildUrl: './demo-bilder/europa-karte.svg',
     bereiche: [
       {
         id: 'schweiz',
-        form: 'rechteck' as const,
+        form: 'polygon' as const,
+        // Polygon folgt dem roten SVG-Schweizumriss mit ~2-3% Toleranz-Puffer.
         punkte: [
-          { x: 45, y: 43 }, { x: 51, y: 43 },
-          { x: 51, y: 48 }, { x: 45, y: 48 },
+          { x: 43, y: 43 },
+          { x: 51, y: 42 },
+          { x: 52, y: 46 },
+          { x: 49, y: 49 },
+          { x: 44, y: 48 },
         ],
         label: 'Schweiz',
         punktzahl: 2,

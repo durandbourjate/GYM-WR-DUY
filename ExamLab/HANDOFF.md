@@ -6,9 +6,71 @@
 
 ---
 
-## Für die nächste Session (S139+)
+## Für die nächste Session (S141+)
 
-### Aktueller Stand (Ende S138, 23.04.2026) — S137 UI/Autokorrektur-Bundle auf `main` gemergt
+### Aktueller Stand (Ende S140, 24.04.2026) — Bundle F1 (Probleme-Dashboard) + F2 (Bugfix-Bundle) auf `main` gemergt
+
+**Branch `feature/problemmeldungen-dashboard` nach `main` gemergt + gelöscht.** Enthielt sowohl Bundle F1 (komplett neu: Probleme-Dashboard mit Backend-Endpoints + Frontend-UI) als auch Bundle F2 (7 Bugfix-Tickets aus dem Testdurchlauf).
+
+**Staging-E2E komplett mit echten Logins (yannick.durand + wr.test):**
+- F1: Dashboard lädt Meldungen, Filter reagieren, Toggle mit Label „erledigt", Deep-Link zur Frage öffnet Editor direkt, zur Prüfung/Übung mit korrektem Präfix.
+- F2 Ticket 1 (Lobby-Polling): SuS erscheint innerhalb 5s in LP-Lobby (vorher 30s).
+- F2 Ticket 2 (Formeleditor Wurzel): `\sqrt{2}` rendert sauber mit KaTeX-Fonts, Preview stabil.
+- F2 Ticket 3+6 (Kontenbestimmung f14): Text um Zunahme-Seite erweitert, erwarteteAntworten um `seite` ergänzt, Autokorrektur modus-aware (prüft nur Felder die im Modus abgefragt werden).
+- F2 Ticket 4 (Abgabe-Timeout): **Hauptursache war Audio-Base64 im Payload** (sprengte Google-Sheets-Zell-Limit ~50k Zeichen). Mit deaktiviertem Audio klappt Abgabe zuverlässig. Timeout-Erhöhung auf 180s + Retries bleibt als Schutz drin.
+- F2 Ticket 5 (Audio): **Für SuS temporär komplett deaktiviert** (Info-Box statt Recorder). Bestehende Aufnahmen bleiben abspielbar. Audio-Fragetyp auch aus Editor-Auswahl raus + aus Einrichtungsprüfung/-übung entfernt. Kommt nach Backend-Migration (Edge-Runtime, Memory S122) zurück.
+- F2 Ticket 7 (Hotspot Schweiz): Rechteck → Polygon mit 2-3% Puffer, Klick mitten in rote Fläche zählt korrekt.
+
+**F1 Bugs nach erstem E2E-Durchlauf gefixt (in derselben Session):**
+- Case-/Separator-insensitive Header-Lookup für Problemmeldungen-Sheet (Feedback-Apps-Script nutzt deutsche Capital-Labels `Zeitstempel`, `Prüfung-ID`).
+- Umlaut-Normalisierung `ü/ö/ä → ue/oe/ae` (vorher `u/o/a` → `Prüfung-ID` hat nicht mit `pruefungId` gematcht).
+- `lernplattformValidiereToken_` aus Endpoints entfernt (konsistent mit `listeKIFeedbacks` — Frontend schickt SuS-Prüfungs-Token, nicht LP-Token).
+- DeepLink: Pool-Fragen dennoch zur Fragensammlung, Präfix `/uebung` vs `/pruefung` aus Meldung-`modus` statt `window.location`.
+- Checkbox-Label „erledigt" unter der Box.
+- `/fragensammlung/:frageId` öffnet den Editor direkt (via `useParams` in LPStartseite + durchgereicht als `initialEditFrageId` an FragenBrowser).
+
+**F2 Bugs nach erstem E2E gefixt:**
+- Kontenbestimmung-Autokorrektur modus-aware (vorher ignorierte Kategorie, prüfte immer Kontonummer).
+- T-Konto-Autokorrektur ignoriert leere Platzhalter-Zeilen (vorher senkte leere Zeile den Score von 2/2 auf 1/2).
+- Audio-Antwort zuerst Base64-First (um Store zu persistieren), dann **Rollback zu komplett deaktiviert** weil Base64-Payload das Sheets-Limit sprengte.
+
+### S140 Apps-Script-Deploy Status
+
+- **Haupt-Apps-Script**: 3× deployed im Laufe der Session (Backend-Helper + Endpoints → Umlaut-Fix → Token-Check-Fix). Aktueller Deploy enthält `listeProblemmeldungen`, `markiereProblemmeldungErledigt`, Dispatcher-Cases + Smoke-Test.
+- **Separates Feedback-Apps-Script** (anonym, `AKfycbwSxI…`): einmalig Schema-Migration + `doGet`-Patch deployed. UUID-Backfill für 2 bestehende Meldungen durchgelaufen. Neue Meldungen bekommen `id` (UUID) + leeres `erledigt`-Feld.
+- **Script-Property**: `PROBLEMMELDUNGEN_SHEET_ID` im Haupt-Apps-Script gesetzt.
+
+### Offen für S141+
+
+- **Bundle E (Backend-Perf)**: Ticket 2 S137 — Übungsstart-Latenz durch serielle `lernplattformLadeLoesungen`-Schleife. Eigenes Backend-Bundle, separater Deploy.
+- **Audio-Reaktivierung**: Nach Backend-Migration auf Edge-Runtime (Cloud Run / Vercel / Cloudflare Workers). Bis dahin: `AudioFrage.tsx` zeigt Info-Box, Fragetyp ist aus Editor-Auswahl raus, aber Frage-Definitionen + Type-Union intakt → Re-Aktivierung über git revert des einen Commits (`8de1352`).
+- **C9 Phase 4 laufende User-Aufgaben**: Stichprobenprüfung der 2412 migrierten Fragen im Editor pro Fachbereich; Freigaben `pruefungstauglich=true`; lokale Archiv-Dateien extern sichern/löschen.
+
+### Vorgänger-Stand (Ende S139, 23.04.2026) — Bundle F1 Spec+Plan auf `feature/problemmeldungen-dashboard`, `main` unverändert
+
+**S139 hat ausschliesslich Spec + Plan für Bundle F1 (Probleme-Dashboard) produziert.** Keine Code-Änderungen, `main` unverändert auf S138-Stand.
+
+**Offene Feature-Branches:**
+- `feature/problemmeldungen-dashboard` — Bundle F1 Spec + Plan committed (6 Commits). Bereit zur Implementierung in S140+. Plan: 24 Tasks in 5 Phasen. Setup-Doku [`2026-04-23-probleme-dashboard-setup.md`](docs/superpowers/plans/2026-04-23-probleme-dashboard-setup.md) enthält die automatisierte Schema-Migration für das separate Feedback-Apps-Script.
+
+**Bundle F2 (Bugfixes Testdurchlauf)** — vom User übergeben, noch nicht angegangen:
+1. Lobby-Anzeige SuS (ca. 30s Delay expected — UX-Hinweis nötig?).
+2. Formeleditor Wurzel-Preview Bug.
+3. Übung f20 Buchungsseite Soll/Haben unsinnig.
+4. Abgabe-Timeout nach 1min („lokal gespeichert, Übertragung gescheitert") — LP muss erzwingen.
+5. Audio-Aufnahme (4s) nicht übertragen.
+6. f14 Kontenkategorie-Autokorrektur zählt korrekt als falsch.
+7. f16 Hotspot-Zielfläche zählt richtigen Klick als falsch.
+
+Geplant als eigenes Bundle F2 nach F1-Merge oder parallel (je nach Prüfungsaktivität).
+
+### S139 Artefakte (commitet auf `feature/problemmeldungen-dashboard`)
+
+- Spec: [`2026-04-23-probleme-dashboard-design.md`](docs/superpowers/specs/2026-04-23-probleme-dashboard-design.md) — 2 Review-Runden, Approved.
+- Plan: [`2026-04-23-probleme-dashboard.md`](docs/superpowers/plans/2026-04-23-probleme-dashboard.md) — 2 Review-Runden, Approved.
+- Setup-Doku: [`2026-04-23-probleme-dashboard-setup.md`](docs/superpowers/plans/2026-04-23-probleme-dashboard-setup.md) — Code für separaten Feedback-Apps-Script (Auto-Migration + Write-Patch).
+
+### Vorgänger-Stand (Ende S138, 23.04.2026) — S137 UI/Autokorrektur-Bundle auf `main` gemergt
 
 **Branch `fix/s137-ui-autokorrektur-bundle` nach `main` gemergt + gelöscht.** Staging-E2E komplett durchgeführt, alle 8 Tickets + KI-Synonyme-Prompt verifiziert. Ticket 2 (Übungsstart-Latenz) bleibt offen → Bundle E.
 

@@ -99,14 +99,21 @@ function bewerteTKontoEintraege(
     eintraegeRechts: { gegenkonto: string; betrag: number }[]
   }
 ): number {
+  // Leere Platzhalter-Zeilen (Frontend-UI-Default { gegenkonto: '', betrag: 0 })
+  // aus der Bewertung ausschliessen, sonst senkt jede nicht ausgefüllte Zeile die
+  // Score via `Math.max(..., eingabeListe.length)` künstlich.
+  const istLeer = (e: { gegenkonto: string; betrag: number }) =>
+    !e.gegenkonto && !e.betrag
+
   if (erwartet.length === 0) {
-    return (eingabe.eintraegeLinks.length === 0 && eingabe.eintraegeRechts.length === 0) ? 1 : 0
+    const echteEintraege = [...eingabe.eintraegeLinks, ...eingabe.eintraegeRechts].filter(e => !istLeer(e))
+    return echteEintraege.length === 0 ? 1 : 0
   }
 
-  // Flache Liste aller Eingabe-Einträge mit Seite
+  // Flache Liste aller Eingabe-Einträge mit Seite (leere ignorieren)
   const eingabeListe = [
-    ...eingabe.eintraegeLinks.map(e => ({ seite: 'links' as const, gegenkonto: e.gegenkonto, betrag: e.betrag })),
-    ...eingabe.eintraegeRechts.map(e => ({ seite: 'rechts' as const, gegenkonto: e.gegenkonto, betrag: e.betrag })),
+    ...eingabe.eintraegeLinks.filter(e => !istLeer(e)).map(e => ({ seite: 'links' as const, gegenkonto: e.gegenkonto, betrag: e.betrag })),
+    ...eingabe.eintraegeRechts.filter(e => !istLeer(e)).map(e => ({ seite: 'rechts' as const, gegenkonto: e.gegenkonto, betrag: e.betrag })),
   ]
 
   let treffer = 0
@@ -220,6 +227,13 @@ export function korrigiereKontenbestimmung(
   const details: KorrekturDetail[] = []
   const punkteProAufgabe = frage.punkte / Math.max(1, frage.aufgaben.length)
 
+  // Modus-aware: SuS gibt nur die Felder ein, die laut modus auch abgefragt werden.
+  // Erwartete Antworten können mehr Felder haben (z.B. kontonummer als Identifier).
+  // Ohne Modus-Filter würde z.B. bei kategorie_bestimmen die fehlende Kontonummer als "falsch" zählen.
+  const zeigeKonto = frage.modus === 'konto_bestimmen' || frage.modus === 'gemischt'
+  const zeigeKategorie = frage.modus === 'kategorie_bestimmen' || frage.modus === 'gemischt'
+  const zeigeSeite = frage.modus === 'kategorie_bestimmen' || frage.modus === 'gemischt'
+
   for (const aufgabe of frage.aufgaben) {
     const eingabe = antwortAufgaben[aufgabe.id]
     if (!eingabe || eingabe.antworten.length === 0) {
@@ -236,9 +250,9 @@ export function korrigiereKontenbestimmung(
       if (!antwort) continue
 
       let teilKorrekt = true
-      if (erwartet.kontonummer && antwort.kontonummer !== erwartet.kontonummer) teilKorrekt = false
-      if (erwartet.kategorie && antwort.kategorie !== erwartet.kategorie) teilKorrekt = false
-      if (erwartet.seite && antwort.seite !== erwartet.seite) teilKorrekt = false
+      if (zeigeKonto && erwartet.kontonummer && antwort.kontonummer !== erwartet.kontonummer) teilKorrekt = false
+      if (zeigeKategorie && erwartet.kategorie && antwort.kategorie !== erwartet.kategorie) teilKorrekt = false
+      if (zeigeSeite && erwartet.seite && antwort.seite !== erwartet.seite) teilKorrekt = false
 
       if (teilKorrekt) korrektCount++
     }

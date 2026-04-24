@@ -30,8 +30,8 @@ export const einrichtungsPruefung: PruefungsConfig = {
     },
     {
       titel: 'Teil B: Texteingabe & Sprache',
-      beschreibung: 'Testen Sie die verschiedenen Eingabemöglichkeiten: Freitext, Lückentext, Formel und Audio-Aufnahme.',
-      fragenIds: ['einr-ft-formatierung', 'einr-lt-hofwil', 'einr-ft-morgen', 'einr-formel-pythagoras', 'einr-audio-vorstellen'],
+      beschreibung: 'Testen Sie die verschiedenen Eingabemöglichkeiten: Freitext, Lückentext und Formel.',
+      fragenIds: ['einr-ft-formatierung', 'einr-lt-hofwil', 'einr-ft-morgen', 'einr-formel-pythagoras'],
     },
     {
       titel: 'Teil C: Zuordnung & Bilder',

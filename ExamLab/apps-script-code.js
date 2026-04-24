@@ -720,6 +720,311 @@ function parseBerechtigungen(berechtigungen) {
   return [];
 }
 
+// === Problemmeldungen — Helper ===
+
+/**
+ * Case-/Separator-insensitive Header-Lookup für Problemmeldungen-Sheet.
+ * Das Feedback-Apps-Script schreibt Header wie `Zeitstempel`, `Frage-ID`, `Prüfung-ID`.
+ * Backend fragt mit dem kanonischen Namen `zeitstempel`, `frageId`, `pruefungId`.
+ * Dieser Helper mappt beide Formen auf den Index.
+ */
+function problemmeldungenColIdx_(headers, name) {
+  // Exakter Match
+  var idx = headers.indexOf(name);
+  if (idx >= 0) return idx;
+  // Normalisierter Match (lowercase, Umlaute zu ue/oe/ae, ohne Separatoren)
+  // Reihenfolge wichtig: Umlaute vor Separator-Entfernung damit 'Prüfung-ID' → 'pruefungid' (nicht 'prufungid').
+  var norm = function(s) {
+    return String(s).toLowerCase()
+      .replace(/ü/g, 'ue')
+      .replace(/ö/g, 'oe')
+      .replace(/ä/g, 'ae')
+      .replace(/[-_\s]/g, '');
+  };
+  var target = norm(name);
+  for (var i = 0; i < headers.length; i++) {
+    if (norm(headers[i]) === target) return i;
+  }
+  return -1;
+}
+
+/**
+ * Liest Fragen-Sheet 1× und gibt Map {frageId: frageMeta} zurück.
+ * frageMeta enthält alle Felder, die istSichtbarMitLP / ermittleRechtMitLP brauchen:
+ * autor, erstelltVon, berechtigungen, geteilt, fachbereich, quelle.
+ * Zusätzlich: inhaberAktiv (Inhaber-Email noch im LP-Sheet).
+ */
+function baueFrageMetaMap_(frageIds) {
+  var map = {};
+  if (!frageIds || !frageIds.length) return map;
+
+  var fragenbank = SpreadsheetApp.openById(FRAGENBANK_ID);
+  var sheets = fragenbank.getSheets();
+  // LP-Emails einmalig holen für inhaberAktiv-Check
+  var aktiveEmails = holeAktiveLPEmails_();
+
+  for (var s = 0; s < sheets.length; s++) {
+    var sheet = sheets[s];
+    var name = sheet.getName();
+    if (FRAGENBANK_SYSTEM_TABS.indexOf(name) !== -1) continue;
+    var lastCol = sheet.getLastColumn();
+    if (lastCol === 0) continue;
+    var data = sheet.getDataRange().getValues();
+    if (data.length < 2) continue;
+    var headers = data[0].map(function(h) { return String(h).toLowerCase().trim(); });
+    var idIdx = headers.indexOf('id');
+    var autorIdx = headers.indexOf('autor');
+    var erstelltIdx = headers.indexOf('erstelltvon');
+    var berechtIdx = headers.indexOf('berechtigungen');
+    var geteiltIdx = headers.indexOf('geteilt');
+    var fachIdx = headers.indexOf('fachbereich');
+    var quelleIdx = headers.indexOf('quelle');
+    if (idIdx < 0) continue;
+
+    for (var i = 1; i < data.length; i++) {
+      var id = String(data[i][idIdx] || '');
+      if (!id || frageIds.indexOf(id) < 0) continue;
+      var inhaber = autorIdx >= 0 ? String(data[i][autorIdx] || '').toLowerCase() : '';
+      if (!inhaber && erstelltIdx >= 0) inhaber = String(data[i][erstelltIdx] || '').toLowerCase();
+      map[id] = {
+        id: id,
+        autor: autorIdx >= 0 ? String(data[i][autorIdx] || '') : '',
+        erstelltVon: erstelltIdx >= 0 ? String(data[i][erstelltIdx] || '') : '',
+        berechtigungen: berechtIdx >= 0 ? data[i][berechtIdx] : [],
+        geteilt: geteiltIdx >= 0 ? String(data[i][geteiltIdx] || '') : '',
+        fachbereich: fachIdx >= 0 ? String(data[i][fachIdx] || '') : '',
+        quelle: quelleIdx >= 0 ? String(data[i][quelleIdx] || '') : '',
+        inhaberEmail: inhaber,
+        inhaberAktiv: inhaber ? aktiveEmails.indexOf(inhaber) >= 0 : false,
+      };
+    }
+  }
+  return map;
+}
+
+/**
+ * Liest Gruppen-Registry 1× und gibt Map {gruppeId: meta} zurück.
+ * Pruefung + Uebung teilen dieselbe Registry (unterscheidbar via typ).
+ */
+function baueGruppeMetaMap_(gruppeIds) {
+  var map = {};
+  if (!gruppeIds || !gruppeIds.length) return map;
+  var gruppen = alleGruppenLaden_();
+  gruppen.forEach(function(g) {
+    if (gruppeIds.indexOf(g.id) < 0) return;
+    map[g.id] = {
+      id: g.id,
+      autor: g.adminEmail,
+      erstelltVon: g.adminEmail,
+      berechtigungen: [],  // Gruppen haben Mitglieder-Tab, keine berechtigungen-Array
+      geteilt: '',
+      fachbereich: '',
+      quelle: '',
+      typ: g.typ,
+      inhaberEmail: String(g.adminEmail || '').toLowerCase(),
+      inhaberAktiv: true,  // Admin-Email war in Registry, damit gültig
+    };
+  });
+  return map;
+}
+
+/**
+ * Hilfsfunktion: Liste aller aktiven LP-Emails (lowercase).
+ * Wird genau einmal pro listeProblemmeldungen-Call aufgerufen.
+ */
+function holeAktiveLPEmails_() {
+  var sheet = SpreadsheetApp.openById(CONFIGS_ID).getSheetByName('Lehrpersonen');
+  if (!sheet) return [];
+  var data = sheet.getDataRange().getValues();
+  if (data.length < 2) return [];
+  var headers = data[0].map(function(h) { return String(h).toLowerCase().trim(); });
+  var emailIdx = headers.indexOf('email');
+  if (emailIdx < 0) return [];
+  var out = [];
+  for (var i = 1; i < data.length; i++) {
+    var e = String(data[i][emailIdx] || '').toLowerCase().trim();
+    if (e) out.push(e);
+  }
+  return out;
+}
+
+/**
+ * Liefert Problemmeldungen aus separatem Sheet, gefiltert auf Sichtbarkeit.
+ * Auth: LP-Token. Rate-Limit: 30/5min.
+ * LP sieht nur Meldungen mit Fragen-/Prüfungs-/Gruppen-Kontext wo er Leserecht hat.
+ * Admin sieht alle.
+ */
+function listeProblemmeldungen(body) {
+  var email = String(body.email || '').toLowerCase().trim();
+  if (!istZugelasseneLP(email)) return jsonResponse({ success: false, error: 'Nicht autorisiert' });
+  // Konsistent mit listeKIFeedbacks & Co: kein LP-Session-Token im Frontend → nur istZugelasseneLP.
+  var rl = lernplattformRateLimitCheck_('listeProblemmeldungen', email, 30, 300);
+  if (rl.blocked) return jsonResponse({ success: false, error: rl.error });
+
+  var sheetId = PropertiesService.getScriptProperties().getProperty('PROBLEMMELDUNGEN_SHEET_ID');
+  if (!sheetId) return jsonResponse({ success: false, error: 'Problemmeldungen-Sheet nicht konfiguriert' });
+
+  var ss;
+  try { ss = SpreadsheetApp.openById(sheetId); }
+  catch (e) { return jsonResponse({ success: false, error: 'Sheet nicht erreichbar: ' + e.message }); }
+
+  var sheet = ss.getSheetByName('ExamLab-Problemmeldungen');
+  if (!sheet) return jsonResponse({ success: false, error: 'Tab "ExamLab-Problemmeldungen" nicht gefunden' });
+
+  var lastCol = sheet.getLastColumn();
+  if (lastCol === 0) return jsonResponse({ success: true, data: [] });
+  var headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0].map(function(h) { return String(h).trim(); });
+  var lastRow = sheet.getLastRow();
+  var rows = lastRow > 1 ? sheet.getRange(2, 1, lastRow - 1, lastCol).getValues() : [];
+  var col = function(name) { return problemmeldungenColIdx_(headers, name); };
+
+  var lpInfo = getLPInfo(email);
+  var istAdmin = !!(lpInfo && lpInfo.rolle === 'admin');
+
+  // Alle frageIds + gruppeIds (pruefungId und gruppeId teilen Namespace) deduplizieren
+  var frageIds = [];
+  var gruppeIds = [];
+  rows.forEach(function(r) {
+    var fid = String(r[col('frageId')] || '');
+    if (fid && frageIds.indexOf(fid) < 0) frageIds.push(fid);
+    var pid = String(r[col('pruefungId')] || '');
+    if (pid && gruppeIds.indexOf(pid) < 0) gruppeIds.push(pid);
+    var gid = String(r[col('gruppeId')] || '');
+    if (gid && gruppeIds.indexOf(gid) < 0) gruppeIds.push(gid);
+  });
+
+  var frageMap = baueFrageMetaMap_(frageIds);
+  var gruppeMap = baueGruppeMetaMap_(gruppeIds);
+
+  var meldungen = rows.map(function(r) {
+    var id = String(r[col('id')] || '');
+    var frageId = String(r[col('frageId')] || '');
+    var pruefungId = String(r[col('pruefungId')] || '');
+    var gruppeId = String(r[col('gruppeId')] || '');
+
+    var frageMeta = frageMap[frageId] || null;
+    var gruppeMeta = gruppeMap[pruefungId] || gruppeMap[gruppeId] || null;
+
+    var sichtbarFrage = frageMeta ? istSichtbarMitLP(email, frageMeta, lpInfo, istAdmin) : false;
+    var sichtbarGruppe = gruppeMeta ? istSichtbarMitLP(email, gruppeMeta, lpInfo, istAdmin) : false;
+    var hatKontext = !!(frageId || pruefungId || gruppeId);
+
+    // Sichtbarkeits-Regel:
+    // - Admin sieht alles.
+    // - LP sieht nur Meldungen mit Kontext wo mindestens eine Sichtbarkeit positiv ist.
+    var sichtbar = istAdmin || sichtbarFrage || sichtbarGruppe;
+    if (!sichtbar) return null;
+    if (!istAdmin && !hatKontext) return null;
+
+    var recht = 'betrachter';
+    if (frageMeta && sichtbarFrage) recht = ermittleRechtMitLP(email, frageMeta, lpInfo, istAdmin);
+    else if (gruppeMeta && sichtbarGruppe) recht = ermittleRechtMitLP(email, gruppeMeta, lpInfo, istAdmin);
+    else if (istAdmin) recht = 'inhaber';
+
+    // Privacy: frageText nur bei Leserecht auf Frage (oder Admin)
+    var frageTextRaw = String(r[col('frageText')] || '');
+    var frageText = (sichtbarFrage || istAdmin) ? frageTextRaw : '';
+
+    return {
+      id: id,
+      zeitstempel: toIsoStr_(r[col('zeitstempel')]),
+      typ: String(r[col('typ')] || ''),
+      category: String(r[col('category')] || ''),
+      comment: String(r[col('comment')] || ''),
+      rolle: String(r[col('rolle')] || ''),
+      frageId: frageId,
+      frageText: frageText,
+      frageTyp: String(r[col('frageTyp')] || ''),
+      modus: String(r[col('modus')] || ''),
+      pruefungId: pruefungId,
+      gruppeId: gruppeId,
+      ort: String(r[col('ort')] || ''),
+      appVersion: String(r[col('appVersion')] || ''),
+      inhaberEmail: frageMeta ? frageMeta.inhaberEmail : (gruppeMeta ? gruppeMeta.inhaberEmail : ''),
+      inhaberAktiv: frageMeta ? frageMeta.inhaberAktiv : (gruppeMeta ? gruppeMeta.inhaberAktiv : true),
+      istPoolFrage: !!(frageMeta && frageMeta.quelle === 'pool'),
+      recht: recht,
+      erledigt: String(r[col('erledigt')] || '').toLowerCase() === 'ja',
+    };
+  }).filter(function(m) { return m !== null; });
+
+  return jsonResponse({ success: true, data: meldungen });
+}
+
+/**
+ * Setzt erledigt-Flag auf einer Meldung.
+ * Auth: LP-Token. Rate-Limit: 60/5min.
+ * IDOR: nicht-Admin muss recht ∈ {inhaber, bearbeiter} auf Frage oder Gruppe haben.
+ */
+function markiereProblemmeldungErledigt(body) {
+  var email = String(body.email || '').toLowerCase().trim();
+  var id = String(body.id || '');
+  var erledigt = !!body.erledigt;
+  if (!istZugelasseneLP(email)) return jsonResponse({ success: false, error: 'Nicht autorisiert' });
+  // Konsistent mit aktualisiereKIFeedback & Co: kein LP-Session-Token → nur istZugelasseneLP.
+  var rl = lernplattformRateLimitCheck_('toggleProblemmeldung', email, 60, 300);
+  if (rl.blocked) return jsonResponse({ success: false, error: rl.error });
+  if (!id) return jsonResponse({ success: false, error: 'id fehlt' });
+
+  var sheetId = PropertiesService.getScriptProperties().getProperty('PROBLEMMELDUNGEN_SHEET_ID');
+  if (!sheetId) return jsonResponse({ success: false, error: 'Problemmeldungen-Sheet nicht konfiguriert' });
+
+  var ss;
+  try { ss = SpreadsheetApp.openById(sheetId); }
+  catch (e) { return jsonResponse({ success: false, error: 'Sheet nicht erreichbar: ' + e.message }); }
+
+  var sheet = ss.getSheetByName('ExamLab-Problemmeldungen');
+  if (!sheet) return jsonResponse({ success: false, error: 'Tab nicht gefunden' });
+
+  var lastCol = sheet.getLastColumn();
+  if (lastCol === 0) return jsonResponse({ success: false, error: 'Sheet leer' });
+  var headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0].map(function(h) { return String(h).trim(); });
+  var idCol = problemmeldungenColIdx_(headers, 'id');
+  var erledigtCol = problemmeldungenColIdx_(headers, 'erledigt');
+  var frageIdCol = problemmeldungenColIdx_(headers, 'frageId');
+  var pruefungIdCol = problemmeldungenColIdx_(headers, 'pruefungId');
+  var gruppeIdCol = problemmeldungenColIdx_(headers, 'gruppeId');
+  if (idCol < 0 || erledigtCol < 0) return jsonResponse({ success: false, error: 'Sheet-Schema kaputt' });
+
+  var lastRow = sheet.getLastRow();
+  var data = lastRow > 1 ? sheet.getRange(2, 1, lastRow - 1, lastCol).getValues() : [];
+
+  var lpInfo = getLPInfo(email);
+  var istAdmin = !!(lpInfo && lpInfo.rolle === 'admin');
+
+  for (var i = 0; i < data.length; i++) {
+    if (String(data[i][idCol]) !== id) continue;
+
+    if (!istAdmin) {
+      var frageId = String(data[i][frageIdCol] || '');
+      var pruefungId = String(data[i][pruefungIdCol] || '');
+      var gruppeId = String(data[i][gruppeIdCol] || '');
+      var recht = 'keine';
+      if (frageId) {
+        var fmeta = baueFrageMetaMap_([frageId])[frageId];
+        if (fmeta && istSichtbarMitLP(email, fmeta, lpInfo, false)) {
+          recht = ermittleRechtMitLP(email, fmeta, lpInfo, false);
+        }
+      }
+      if ((recht === 'keine' || recht === 'betrachter') && (pruefungId || gruppeId)) {
+        var gid = pruefungId || gruppeId;
+        var gmeta = baueGruppeMetaMap_([gid])[gid];
+        if (gmeta && istSichtbarMitLP(email, gmeta, lpInfo, false)) {
+          var gRecht = ermittleRechtMitLP(email, gmeta, lpInfo, false);
+          if (gRecht === 'inhaber' || gRecht === 'bearbeiter') recht = gRecht;
+        }
+      }
+      if (recht !== 'inhaber' && recht !== 'bearbeiter') {
+        return jsonResponse({ success: false, error: 'Keine Berechtigung für diese Meldung' });
+      }
+    }
+
+    sheet.getRange(i + 2, erledigtCol + 1).setValue(erledigt ? 'ja' : '');
+    return jsonResponse({ success: true });
+  }
+  return jsonResponse({ success: false, error: 'Meldung nicht gefunden' });
+}
+
 // Zentrale Daten-Sheets (Synergien)
 const KURSE_SHEET_ID = '1inmEds_g48-lTFCqo9NUqAcxhDxF2mFSoBM5fO6uJng';       // User muss ID einsetzen
 const STUNDENPLAN_SHEET_ID = '1mesBOmPuLewvnY5iNb4iD2zNDUn8-ruK5HE0DsKwUSs';
@@ -1141,6 +1446,10 @@ function doPost(e) {
     // === POLYGON-ZONEN MIGRATION (Admin-only, Phase 6) ===
     case 'admin:migriereZonen':
       return migrierZonenEndpoint_(body);
+
+    // === PROBLEMMELDUNGEN: Read + Toggle (F1) ===
+    case 'listeProblemmeldungen': return listeProblemmeldungen(body);
+    case 'markiereProblemmeldungErledigt': return markiereProblemmeldungErledigt(body);
 
     // === KI-KALIBRIERUNG: Review + Statistik + Einstellungen (Task 9) ===
     case 'listeKIFeedbacks': return listeKIFeedbacks(body);
@@ -11607,4 +11916,50 @@ function kalibrierungsStatistik(body) {
 function toIsoStr_(wert) {
   if (wert instanceof Date) return wert.toISOString();
   return String(wert || '');
+}
+
+/**
+ * F1 Smoke-Test: Problemmeldungen-Endpoints im GAS-Editor.
+ * Voraussetzung: Script-Property PROBLEMMELDUNGEN_SHEET_ID gesetzt.
+ * Verwendet Admin-Email für den Test.
+ * GAS-Editor → Function-Dropdown → testProblemmeldungen → Run.
+ */
+function testProblemmeldungen() {
+  var testEmail = 'yannick.durand@gymhofwil.ch';  // Admin
+  var ss = SpreadsheetApp.openById(PropertiesService.getScriptProperties().getProperty('PROBLEMMELDUNGEN_SHEET_ID'));
+  var sheet = ss.getSheetByName('ExamLab-Problemmeldungen');
+  if (!sheet) throw new Error('Tab nicht gefunden');
+
+  // Mock-Token erzeugen
+  var cache = CacheService.getScriptCache();
+  var mockToken = 'mock-test-' + Utilities.getUuid();
+  cache.put('lp_session_' + mockToken, JSON.stringify({ email: testEmail, ts: new Date().toISOString() }), 300);
+
+  // Liste abrufen
+  var listResp = listeProblemmeldungen({ email: testEmail, token: mockToken });
+  var listData = JSON.parse(listResp.getContent());
+  if (!listData.success) throw new Error('Liste: ' + listData.error);
+  Logger.log('✓ Liste OK: ' + listData.data.length + ' Meldungen');
+
+  // Toggle auf erste Meldung (wenn vorhanden)
+  if (listData.data.length > 0) {
+    var first = listData.data[0];
+    var origErledigt = first.erledigt;
+    var toggleResp = markiereProblemmeldungErledigt({
+      email: testEmail, token: mockToken,
+      id: first.id, erledigt: !origErledigt
+    });
+    var toggleData = JSON.parse(toggleResp.getContent());
+    if (!toggleData.success) throw new Error('Toggle: ' + toggleData.error);
+    Logger.log('✓ Toggle OK auf id=' + first.id);
+    // Zurücksetzen
+    markiereProblemmeldungErledigt({
+      email: testEmail, token: mockToken,
+      id: first.id, erledigt: origErledigt
+    });
+    Logger.log('✓ Zurückgesetzt');
+  } else {
+    Logger.log('(keine Meldungen im Sheet → Toggle-Test übersprungen)');
+  }
+  Logger.log('✓ Alle Smoke-Tests bestanden.');
 }

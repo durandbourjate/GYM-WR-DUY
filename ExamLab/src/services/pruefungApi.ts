@@ -65,16 +65,23 @@ export async function speichereAntworten(payload: {
     console.warn(`[API] Save-Payload gross: ${Math.round(payloadStr.length / 1024)} KB`)
   }
 
-  // Bei Abgabe: längerer Timeout (60s statt 30s) um Backend-Queue-Wartezeit abzufangen
-  const timeoutMs = payload.istAbgabe ? 60_000 : undefined
+  // Bei Abgabe: deutlich längerer Timeout (180s statt 30s) um Backend-Queue-Wartezeit
+  // und langsame Schreibvorgänge abzufangen. Auto-Save bleibt 30s.
+  const timeoutMs = payload.istAbgabe ? 180_000 : undefined
 
-  // Erster Versuch
-  const erfolg = await postBool('speichereAntworten', payload, { timeoutMs })
-  if (erfolg) return true
+  // S140 Ticket 4: Bei Abgabe bis zu 3 Versuche mit exponentialem Backoff (3s → 10s).
+  // Auto-Save bleibt bei 2 Versuchen (3s Backoff), damit keine Verzögerung entsteht.
+  const maxVersuche = payload.istAbgabe ? 3 : 2
+  const backoffsMs = [0, 3_000, 10_000]
 
-  // Retry nach 3s (einmal) — verhindert Datenverlust bei transienten Netzwerkfehlern
-  await new Promise(r => setTimeout(r, 3000))
-  return postBool('speichereAntworten', payload, { timeoutMs })
+  for (let versuch = 0; versuch < maxVersuche; versuch++) {
+    if (versuch > 0) {
+      await new Promise(r => setTimeout(r, backoffsMs[versuch]))
+    }
+    const erfolg = await postBool('speichereAntworten', payload, { timeoutMs })
+    if (erfolg) return true
+  }
+  return false
 }
 
 /** Lockdown-Metadaten für Heartbeat */

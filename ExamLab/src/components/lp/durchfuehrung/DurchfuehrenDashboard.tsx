@@ -280,6 +280,7 @@ export default function DurchfuehrenDashboard({ pruefungId }: { pruefungId: stri
 
   // Config periodisch aktualisieren (leichtgewichtig via ladeEinzelConfig)
   // Nur in Vorbereitung/Lobby — dort ändert sich Config (Freischaltung, Teilnehmer)
+  // Lobby: 5s damit neue SuS schnell in Teilnehmerliste erscheinen; Vorbereitung: 30s
   useEffect(() => {
     if (!user || !pruefungId || istDemoModus || pruefungId === 'demo') return
     if (phase !== 'vorbereitung' && phase !== 'lobby') return
@@ -290,7 +291,8 @@ export default function DurchfuehrenDashboard({ pruefungId }: { pruefungId: stri
       } catch { /* ignore */ }
     }
     // Nicht sofort laden — initialer Load kommt aus ladePruefung (oben)
-    const interval = setInterval(ladeConfig, 30000)
+    const intervallMs = phase === 'lobby' ? 5000 : 30000
+    const interval = setInterval(ladeConfig, intervallMs)
     return () => clearInterval(interval)
   }, [user, pruefungId, istDemoModus, phase])
 

@@ -172,13 +172,23 @@ export function pruefeAntwort(frage: Frage, antwort: Antwort | unknown): boolean
       const aufgaben = Array.isArray(frage.aufgaben) ? frage.aufgaben : []
       const eingabeAufgaben = a.aufgaben ?? {}
       if (aufgaben.length === 0) return false
+      // Modus-aware: nur Felder prüfen die im aktiven Modus relevant sind.
+      // S140 Ticket 6: vorher wurde `seite` immer gecheckt und `kategorie` nie → Kategorie-Modus zählte korrekt als falsch.
+      const zeigeKonto = frage.modus === 'konto_bestimmen' || frage.modus === 'gemischt'
+      const zeigeKategorie = frage.modus === 'kategorie_bestimmen' || frage.modus === 'gemischt'
+      const zeigeSeite = frage.modus === 'kategorie_bestimmen' || frage.modus === 'gemischt'
       return aufgaben.every((aufgabe, i) => {
         // Kanonisches Format: aufgaben ist Record<string, { antworten: [...] }>
         const eingabe = Object.values(eingabeAufgaben)[i]?.antworten ?? []
         const erwartet = Array.isArray(aufgabe.erwarteteAntworten) ? aufgabe.erwarteteAntworten : []
         if (erwartet.length !== eingabe.length) return false
         return erwartet.every(ea =>
-          eingabe.some((ez: { kontonummer?: string; seite?: string }) => ez.kontonummer === (ea.kontonummer || '') && ez.seite === ea.seite)
+          eingabe.some((ez: { kontonummer?: string; kategorie?: string; seite?: string }) => {
+            const kontoOk = !zeigeKonto || (ez.kontonummer ?? '') === (ea.kontonummer ?? '')
+            const kategorieOk = !zeigeKategorie || (ez.kategorie ?? '') === (ea.kategorie ?? '')
+            const seiteOk = !zeigeSeite || (ez.seite ?? '') === (ea.seite ?? '')
+            return kontoOk && kategorieOk && seiteOk
+          }),
         )
       })
     }

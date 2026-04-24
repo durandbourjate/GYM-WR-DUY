@@ -113,9 +113,14 @@ export async function uploadAudioKommentar(email: string, pruefungId: string, sc
 
 /** SuS-Audio-Antwort als Drive-File hochladen (statt inline Base64 im Antwort-JSON).
  *  Gibt die Drive-URL zurück die im Antwort-JSON gespeichert wird.
- *  Reduziert Payload von ~300KB auf wenige Bytes. */
+ *  Reduziert Payload von ~300KB auf wenige Bytes.
+ *  S140 Ticket 5: Timeout 60s — ohne Timeout hing onstop-Callback ewig wenn Apps-Script
+ *  nicht antwortete, `onAntwort` wurde nie aufgerufen → Audio fehlte beim Abgabe. */
 export async function uploadAudioAntwort(pruefungId: string, email: string, frageId: string, blob: Blob): Promise<string | null> {
   if (!APPS_SCRIPT_URL) return null
+
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), 60_000)
 
   try {
     const base64 = await fileToBase64(blob)
@@ -139,8 +144,12 @@ export async function uploadAudioAntwort(pruefungId: string, email: string, frag
         base64Data: base64,
         ...(token ? { sessionToken: token } : {}),
       }),
+      signal: controller.signal,
     })
-    if (!response.ok) return null
+    if (!response.ok) {
+      console.warn(`[API] uploadAudioAntwort: HTTP ${response.status}`)
+      return null
+    }
 
     const text = await response.text()
     try {
@@ -151,11 +160,18 @@ export async function uploadAudioAntwort(pruefungId: string, email: string, frag
       }
       return data.url ?? null
     } catch {
+      console.error('[API] uploadAudioAntwort: Antwort ist kein JSON')
       return null
     }
   } catch (error) {
-    console.error('[API] uploadAudioAntwort: Fehler:', error)
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      console.warn('[API] uploadAudioAntwort: Timeout nach 60s — Fallback auf inline Base64')
+    } else {
+      console.error('[API] uploadAudioAntwort: Fehler:', error)
+    }
     return null
+  } finally {
+    clearTimeout(timeoutId)
   }
 }
 
