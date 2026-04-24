@@ -99,14 +99,21 @@ function bewerteTKontoEintraege(
     eintraegeRechts: { gegenkonto: string; betrag: number }[]
   }
 ): number {
+  // Leere Platzhalter-Zeilen (Frontend-UI-Default { gegenkonto: '', betrag: 0 })
+  // aus der Bewertung ausschliessen, sonst senkt jede nicht ausgefüllte Zeile die
+  // Score via `Math.max(..., eingabeListe.length)` künstlich.
+  const istLeer = (e: { gegenkonto: string; betrag: number }) =>
+    !e.gegenkonto && !e.betrag
+
   if (erwartet.length === 0) {
-    return (eingabe.eintraegeLinks.length === 0 && eingabe.eintraegeRechts.length === 0) ? 1 : 0
+    const echteEintraege = [...eingabe.eintraegeLinks, ...eingabe.eintraegeRechts].filter(e => !istLeer(e))
+    return echteEintraege.length === 0 ? 1 : 0
   }
 
-  // Flache Liste aller Eingabe-Einträge mit Seite
+  // Flache Liste aller Eingabe-Einträge mit Seite (leere ignorieren)
   const eingabeListe = [
-    ...eingabe.eintraegeLinks.map(e => ({ seite: 'links' as const, gegenkonto: e.gegenkonto, betrag: e.betrag })),
-    ...eingabe.eintraegeRechts.map(e => ({ seite: 'rechts' as const, gegenkonto: e.gegenkonto, betrag: e.betrag })),
+    ...eingabe.eintraegeLinks.filter(e => !istLeer(e)).map(e => ({ seite: 'links' as const, gegenkonto: e.gegenkonto, betrag: e.betrag })),
+    ...eingabe.eintraegeRechts.filter(e => !istLeer(e)).map(e => ({ seite: 'rechts' as const, gegenkonto: e.gegenkonto, betrag: e.betrag })),
   ]
 
   let treffer = 0
