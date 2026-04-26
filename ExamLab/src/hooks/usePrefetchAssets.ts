@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { PRE_WARM_ENABLED } from '../services/preWarmApi'
 
 const REF_KEY = 'examlabPrefetchRefcount'
 
@@ -50,6 +51,7 @@ function releaseRef(url: string): void {
  */
 export function usePrefetchAssets(urls: readonly string[]): void {
   useEffect(() => {
+    if (!PRE_WARM_ENABLED) return
     const filtered = urls.filter((u): u is string => typeof u === 'string' && u.length > 0)
     for (const url of filtered) addRef(url)
     return () => {
