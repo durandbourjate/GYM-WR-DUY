@@ -191,6 +191,12 @@ function releaseRef(url: string): void {
  * Beim Unmount oder URL-Wechsel werden die Refs sauber freigegeben.
  *
  * Falsy URLs (leerer String) werden gefiltert.
+ *
+ * **WICHTIG für Aufrufer:** Das `urls`-Array MUSS `useMemo`-stabilisiert sein.
+ * Inline-Erzeugung (z.B. `pdfPrefetchUrls(frage.anhaenge)` direkt im JSX)
+ * erzeugt pro Render eine neue Array-Identity → useEffect feuert ständig →
+ * Add+Release-Loop. Siehe Task 5/6/7 im Plan: alle Aufrufer wickeln den
+ * URL-Build in `useMemo` ein.
  */
 export function usePrefetchAssets(urls: readonly string[]): void {
   useEffect(() => {
@@ -559,6 +565,9 @@ export function useEditorNeighborPrefetch({
     if (!email) return
 
     const timer = setTimeout(() => {
+      // previous/next werden aus Ref gelesen, NICHT aus den Effect-Deps:
+      // Debounce löst über Zeit aus, nicht über jeden Prop-Wechsel.
+      // Das ist Absicht — die useMemo-stabilisierten Werte sind beim Timer-Fire aktuell.
       const { previous: p, next: n, email: e } = aktuellRef.current
       const ladeDetail = useFragenbankStore.getState().ladeDetail
       if (p) void ladeDetail(e, p.id, p.fachbereich)
@@ -566,6 +575,7 @@ export function useEditorNeighborPrefetch({
     }, DEBOUNCE_MS)
 
     return () => clearTimeout(timer)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- previous/next absichtlich via Ref
   }, [currentFrageId, email])
 }
 ```
@@ -1007,7 +1017,7 @@ In MEMORY.md (`/Users/durandbourjate/.claude/projects/-Users-durandbourjate-Docu
 
 ## Erfolgskriterien
 
-- Vitest grün (Baseline + ~22 neue Tests aus Task 1+2+3)
+- Vitest grün (Baseline + ~20 neue Tests aus Task 1+2+3, plus 1 optional Integration aus Task 4)
 - `tsc -b` clean
 - `npm run build` erfolgreich
 - E2E auf staging: Trigger 1 messbar (Editor-Nav instant), Trigger 2 messbar (PDF aus Disk-Cache)
