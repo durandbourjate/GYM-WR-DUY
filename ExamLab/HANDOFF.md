@@ -8,7 +8,16 @@
 
 ## Für die nächste Session (S146+)
 
-### Aktueller Stand (S145, 24.04.2026) — Auth-Session-Restore-Fix auf `main` gemergt
+### Aktueller Stand (S146, 26.04.2026) — Repo-Cleanup auf `chore/cleanup-migration-scripts`
+
+**Untracked-Aufräumung aus HANDOFF S145 erledigt:**
+- 6 macOS-Duplikate (`* 2.md` / `* 2.mjs`) gelöscht: zwei `2026-04-22-c9-migration*`-Files in `docs/superpowers/{plans,specs}/` + vier `* 2.{md,mjs}` in `scripts/migrate-teilerklaerungen/`.
+- `ExamLab/src/components/ueben/admin/AdminFragenbank.tsx` gelöscht (S141 entfernt, war als Worktree-Rest wieder aufgetaucht; `AdminDashboard.tsx:5` hat Marker-Kommentar bestätigt).
+- 41 untracked C9-Migrations-Skripte (`generate-s2.mjs … generate-s36.mjs` + `generate-updates.mjs` + `pick-stichprobe.mjs` + `show-batch.mjs` + `show-fragen.mjs`) committed als Audit-Trail. Enthalten die handgetippten Musterlösungen + Teilerklärungen für die 2412-Fragen-C9-Migration (Source of Truth bei Rollback).
+
+**Test-Stand:** `tsc -b` clean, sonst keine Code-Änderung. Branch wartet auf Merge-Freigabe.
+
+### Vorgänger-Stand (S145, 24.04.2026) — Auth-Session-Restore-Fix auf `main` gemergt
 
 **Branch `fix/ueben-auth-session-restore-shape` auf `main` gemergt** (Merge-Commit `3e66452`, Feature-Branch gelöscht). GitHub Actions deployed automatisch.
 
@@ -72,9 +81,7 @@ Alle 253 Fragen haben `pruefungstauglich=false`. Der LP geht pro Frage im Fronte
 
 **5) C9 Phase 4 laufende User-Aufgaben:** Stichprobenprüfung der 2412 migrierten Fragen, Freigaben `pruefungstauglich=true`, Archiv-Dateien extern sichern/löschen.
 
-**6) Aufräumarbeiten** (nicht blockierend):
-- Duplikat-Dateien aus C9-Migration (`*\ 2.md/mjs` im `ExamLab/scripts/migrate-teilerklaerungen/`) aufräumen — macOS-Kopien, stehen noch als untracked rum.
-- Stranded `ExamLab/src/components/ueben/admin/AdminFragenbank.tsx` — war in S141 gelöscht, ist wieder als untracked aufgetaucht (vermutlich durch Merge oder Worktree-Rest). Verifizieren und ggf. löschen.
+**6) Aufräumarbeiten** — erledigt in S146 (siehe Aktueller Stand oben).
 
 **Vorgänger-Stand (Ende S144, 24.04.2026) — Lückentext-Modus Phase 1-7 auf `main` gemergt**
 
