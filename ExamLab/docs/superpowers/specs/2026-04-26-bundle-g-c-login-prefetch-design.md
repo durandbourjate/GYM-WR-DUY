@@ -60,37 +60,19 @@ void useFragenbankStore.getState().lade(email).catch((e) => {
 **Code-Skizze:**
 
 ```ts
-// Bundle G.c — Frontend-Cache & IDB-Cache leeren bevor User wechselt
+// Bundle G.c — Frontend-Cache und IDB-Cache leeren bevor User wechselt
 useFragenbankStore.getState().reset()
-await clearFragenbankCache()
 ```
 
 **Verhalten:**
 
-- `reset()` muss als neue Action im fragenbankStore existieren (es gibt heute kein dediziertes `reset`-Feld). Die Action setzt Status auf `'idle'`, leert `summaries`, `summaryMap`, `fragen`, `fragenMap`, `detailCache`, `_cacheInvalid`.
-- `clearFragenbankCache()` aus `src/services/fragenbankCache.ts` leert die 3 IDB-ObjectStores `summaries`, `details`, `meta`.
-- Reihenfolge: Memory zuerst (synchron), dann IDB (async, awaited). Logout-UI verzögert sich dadurch um ~50–100 ms — akzeptabel, da user-initiated und Logout-Aktionen kurzes Warten typisch sind.
-- Bestehende Logout-Side-Effects (`resetPruefungState()`, `clearSession()`, etc.) bleiben unverändert und laufen vor dem neuen Cleanup.
+- Eine `reset`-Action **existiert bereits** im fragenbankStore (siehe [`fragenbankStore.ts:403-414`](../../src/store/fragenbankStore.ts#L403)). Sie leert In-Memory-State (`summaries`, `summaryMap`, `detailCache`, `fragen`, `fragenMap`, status='idle', `_cacheInvalid: false`) UND ruft anschliessend `clearFragenbankCache()` fire-and-forget auf.
+- G.c.2 ist deshalb **ein einziger neuer Aufruf** in `abmelden()`. Keine zusätzliche `clearFragenbankCache()`-Invokation, keine `await`-Verzögerung der Logout-UI.
+- Bestehende Logout-Side-Effects (`resetPruefungState()`, `clearSession()`, etc.) bleiben unverändert und laufen vor dem neuen `reset()`-Aufruf.
 
-**Erwarteter Effekt:** Nach Logout sind In-Memory-State und IDB-Cache leer. Wenn der nächste User auf demselben Gerät sich einloggt, sieht er keine Frage-Stammdaten des Vorgängers.
+**Erwarteter Effekt:** Nach Logout sind In-Memory-State sofort leer und IDB-Cache wird im Hintergrund geleert (~50–100 ms async). Wenn der nächste User auf demselben Gerät sich einloggt, sieht er keine Frage-Stammdaten des Vorgängers im Memory; IDB ist innerhalb der typischen Re-Login-Zeit (Google-Auth-Roundtrip dauert deutlich länger als 100 ms) ebenfalls geleert.
 
-### Neue Action `reset` im fragenbankStore
-
-Der Store hat heute keine dedizierte Reset-Action. G.c ergänzt:
-
-```ts
-reset: () => set({
-  summaries: [],
-  summaryMap: new Map(),
-  fragen: [],
-  fragenMap: new Map(),
-  detailCache: {},
-  status: 'idle',
-  _cacheInvalid: false,
-})
-```
-
-Plus eine entsprechende Eintragung im Store-Interface. Keine Änderung an existierenden Methoden.
+**Edge-Case (akzeptiertes Restrisiko):** Wenn ein User den Browser-Tab nach Logout sehr schnell schliesst und vor IDB-Clear-Abschluss kein Cleanup-Window existiert, bleiben die IDB-Daten kurzzeitig persistent. Mitigation: TTL 10 min läuft nach kurzer Zeit ab. Falls dies in der Praxis ein Problem wird, kann ein späteres Sub-Bundle den Cleanup synchron mit `await` machen.
 
 ## Sicherheits-Audit
 
@@ -115,11 +97,10 @@ Plus eine entsprechende Eintragung im Store-Interface. Keine Änderung an existi
 
 | Datei | Art | Beschreibung |
 |---|---|---|
-| `src/store/authStore.ts` | EDIT (~6 Z) | Login-Pre-Fetch in `anmelden()`, Logout-Cleanup in `abmelden()` |
-| `src/store/fragenbankStore.ts` | EDIT (~10 Z) | Neue `reset`-Action in Interface + Implementierung |
-| `src/tests/authStoreLoginPrefetch.test.ts` | NEU | 4 Cases (Login triggert lade, Login wartet nicht auf Pre-Fetch, fail-silent, Logout triggert reset+clear in Reihenfolge) |
+| `src/store/authStore.ts` | EDIT (~5 Z) | Login-Pre-Fetch in `anmelden()`, Logout-Cleanup (`reset()`-Aufruf) in `abmelden()` |
+| `src/tests/authStoreLoginPrefetch.test.ts` | NEU | 4 Cases (Login triggert lade, Login wartet nicht auf Pre-Fetch, fail-silent, Logout triggert reset) |
 
-Keine neuen Hooks, keine Komponenten-Edits, kein Backend-Code.
+Keine neuen Hooks, keine Komponenten-Edits, kein Backend-Code, keine Änderung an `fragenbankStore.ts` (existing `reset()` wird unverändert wiederverwendet).
 
 ## Datenfluss
 
@@ -156,14 +137,15 @@ LP klickt "Abmelden"
   → authStore.abmelden()
     → resetPruefungState() (existing)
     → useFragenbankStore.getState().reset()  ← NEU
-    → await clearFragenbankCache()           ← NEU (~50–100 ms)
+        → setzt Memory-State auf initial (synchron)
+        → ruft clearFragenbankCache() fire-and-forget (existing reset-Verhalten)
     → clearSession() (existing)
     → set({ user: null, istAngemeldet: false }) (existing)
 
 Nächster User loggt sich ein
   → authStore.anmelden(...)
     → fragenbankStore Memory leer
-    → IDB leer
+    → IDB innerhalb der typischen Re-Login-Zeit (Auth-Roundtrip > 100 ms) auch leer
     → lade() startet Server-Roundtrip (kein stale-cache-leak)
 ```
 
@@ -173,8 +155,8 @@ Nächster User loggt sich ein
 |---|---|
 | Backend für Pre-Fetch nicht erreichbar | `lade()` setzt status='fehler' (existing). UI zeigt beim nächsten FragenBrowser-Mount nichts, fällt auf normalen Lade-Pfad zurück. Kein Login-Block. |
 | Pre-Fetch läuft noch wenn LP auf "Fragensammlung" klickt | `lade()` ist idempotent. Status-Guard verhindert doppelten Backend-Call. UI zeigt Spinner bis erster Datensatz da, dann instant. |
-| `clearFragenbankCache()` wirft (z.B. IDB-Quota) | `await`-Block fängt nicht; Logout schlägt mit Fehler fehl. Mitigations: try/catch im `abmelden()`, Fehler ignorieren und Logout fortsetzen. Spec wählt diesen Pfad — Logout DARF NICHT durch Cache-Cleanup blockiert werden. |
-| LP loggt aus während Pre-Fetch läuft | `reset()` setzt Store auf initial; der laufende `lade()`-Aufruf schreibt sein Ergebnis trotzdem, könnte Memory wieder befüllen. Mitigation: `lade()` prüft am Ende `if (!isAuthenticated) return` (kleine Erweiterung). Plan-Detail. |
+| `clearFragenbankCache()` wirft (z.B. IDB-Quota) | Existing `reset()` ruft fire-and-forget — der Fehler kann nicht zurück in den `abmelden()`-Pfad propagieren. Logout schlägt nicht fehl. |
+| LP loggt aus während Pre-Fetch läuft | `reset()` setzt Memory-State auf initial; der laufende `lade()`-Aufruf könnte sein Ergebnis nach `reset()` ins Memory schreiben. Akzeptiertes Restrisiko: passiert in der Praxis fast nie (User loggt selten innerhalb 1–2 s aus), und der nächste Login würde via `_cacheInvalid`-Flag oder erneutem `lade()`-Aufruf den State korrekt re-initialisieren. Wenn das Problem in Praxis auftritt: spätere Erweiterung mit AbortController. |
 
 ## Tests
 
@@ -185,7 +167,7 @@ Nächster User loggt sich ein
 1. `anmelden()` erfolgreich → `useFragenbankStore.lade` wurde mit `user.email` aufgerufen
 2. `anmelden()` returnt vor Pre-Fetch-Resolution (Verhaltens-Test mit hängender lade-Promise)
 3. Pre-Fetch wirft → `anmelden()` wirft NICHT (fail-silent verifiziert via spy auf `console.warn`)
-4. `abmelden()` → `reset()` wurde aufgerufen UND `clearFragenbankCache()` wurde aufgerufen, in dieser Reihenfolge
+4. `abmelden()` → `useFragenbankStore.getState().reset()` wurde aufgerufen (existing reset macht IDB-Cleanup intern; Test verifiziert nur den Aufruf-Pfad in `abmelden`)
 
 **E2E-Browser-Test auf staging:**
 
@@ -203,6 +185,5 @@ Nächster User loggt sich ein
 
 ## Risiken und Open Questions
 
-- **`lade()`-Implementierung kennt heute kein `force=true`-Bedürfnis nach Logout-Cleanup:** Wenn ein Pre-Fetch direkt nach reset() startet (Theorie: User loggt aus und Schalter-LP loggt sofort wieder ein), prüft `lade()` nur den `_cacheInvalid`-Flag. Plan-Phase: ggf. `_cacheInvalid: true` in `reset()` setzen, damit der nächste `lade()`-Aufruf den Server fragt.
-- **Edge-Case Race**: Logout während laufendem Pre-Fetch — siehe Fehlerbehandlung. Plan-Phase entscheidet ob es einen lokalen Cancel braucht oder ob `reset()` plus eigener Status-Check im finally-Block reicht.
+- **Edge-Case Race**: Logout während laufendem Pre-Fetch — siehe Fehlerbehandlung. Akzeptiertes Restrisiko, kein lokaler Cancel im G.c.
 - **Browser-Memory-Foot­print**: Bulk-Pre-Fetch lädt heute ~2400 Fragen (~5–10 MB serialisiert). LP hat das beim FragenBrowser-Mount schon — G.c verschiebt nur den Zeitpunkt. Kein neues Risiko.
