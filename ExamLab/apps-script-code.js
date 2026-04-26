@@ -8943,12 +8943,13 @@ function lernplattformPreWarmFragen(body) {
       return jsonResponse({ error: 'gruppeId oder fachbereich fehlt' });
     }
 
-    // 2. Auth: LP via Domain ODER SuS via Session-Token
-    //    validiereSessionToken_(token, email, pruefungId?) — pruefungId hier nicht relevant,
-    //    weil Pre-Warm an keine konkrete Prüfung gebunden ist.
+    // 2. Auth: LP via Domain ODER User via Lernplattform-Session-Token
+    //    lernplattformValidiereToken_ ist der korrekte Helper für LP/SuS-Lernplattform-Logins
+    //    (Cache lp_session_*). validiereSessionToken_ wäre für ExamLab-Prüfungs-Tokens
+    //    (Cache sus_session_*) — falscher Pfad für unsere Pre-Warm-Calls.
     var istLP = istZugelasseneLP(email);
     if (!istLP) {
-      if (!sessionToken || !validiereSessionToken_(sessionToken, email)) {
+      if (!sessionToken || !lernplattformValidiereToken_(sessionToken, email)) {
         return jsonResponse({ error: 'Nicht autorisiert' });
       }
     }
