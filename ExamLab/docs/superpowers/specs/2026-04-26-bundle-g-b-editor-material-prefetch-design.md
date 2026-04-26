@@ -66,7 +66,7 @@ usePrefetchAssets(urls: readonly string[])
 
 Verhalten:
 
-- Per `useEffect` auf `urls`-Änderung: für jede URL ein `<link rel="prefetch" as="document" href={url}>` in `document.head` einfügen. Cleanup-Funktion entfernt alle eingefügten Tags beim Unmount oder URL-Wechsel.
+- Per `useEffect` auf `urls`-Änderung: für jede URL ein `<link rel="prefetch" href={url}>` (ohne `as`-Attribut, siehe Begründung unten) in `document.head` einfügen. Cleanup-Funktion entfernt alle eingefügten Tags beim Unmount oder URL-Wechsel.
 - Deduplizierung: bevor ein Tag eingefügt wird, prüft der Hook ob bereits ein Prefetch-Tag mit derselben URL im DOM hängt (Zähler in `dataset.examlabPrefetch` für Refcount-basierte Cleanup-Sicherheit, falls zwei Komponenten denselben Asset prefetchen).
 - Akzeptiert leere Arrays / falsy URLs ohne Fehler.
 
@@ -76,7 +76,11 @@ Verhalten:
 - **SuS-Prüfen:** Analog im Prüfungs-Frage-Wrapper. Konkrete Datei wird im Plan identifiziert (Code-Lesung).
 - **LP-Korrektur:** `src/components/lp/korrektur/KorrekturFragenAnsicht.tsx` — wenn LP Frage X eines SuS anschaut, prefetch Material von Frage X+1.
 
-**URL-Quelle:** `frage.material[]` enthält Anhänge mit `url`-Feld. Die Roh-URL (vor `convertToEmbedUrl`) wird via `toAssetUrl()` durchgeschickt und als Prefetch-Ziel gesetzt. `convertToEmbedUrl()` ist nur für die iframe-`src` relevant — die rohe File-URL ist es, was der Browser tatsächlich lädt.
+**URL-Quelle:** `frage.material[]` enthält Anhänge mit `url`-Feld. Der Hook prefetcht **exakt die URL, die `MaterialPanel` später als iframe-`src` setzt** — das ist `convertToEmbedUrl(toAssetUrl(material.url))`. Begründung: Browser-Cache ist origin/path-spezifisch. Wenn wir `/view` prefetchen und das iframe später `/preview` lädt, sind das verschiedene URLs und der Cache greift nicht. Die Plan-Phase muss diesen Cache-Hit empirisch via DevTools verifizieren ("from disk cache" beim iframe-Open der prefetchten Frage).
+
+**Pro Frage nur erstes Material:** Wenn eine Frage mehrere Anhänge hat, prefetcht der Hook nur den ersten (`material[0].url`). Das limitiert Worst-Case-Bandbreite, deckt den Hauptfall (PDF als zentrales Material) ab, und ist der einzige Anhang den ein SuS typischerweise als nächstes öffnet.
+
+**`<link rel="prefetch">`-Attribut:** Ohne `as`-Attribut (Browser-Default), nicht `as="document"`. PDFs sind keine HTML-Dokumente; `as="document"` führt bei manchen Browsern zu Cache-Miss beim iframe-Reload. Plan-Phase verifiziert empirisch.
 
 **Frage-Editor (LP):** Bewusst keine Prefetch-Aufrufe im Edit-Modus. LP wechselt im Editor selten zwischen Fragen mit grossen Material-PDFs; YAGNI.
 
@@ -91,7 +95,7 @@ Beide Trigger berühren keine neuen Code-Pfade aus Sicherheits-Sicht:
 ### Performance-Bewusstsein
 
 - Trigger 1 erzeugt im Worst-Case 2 zusätzliche Backend-Roundtrips pro Editor-Open. Bei 24 Frage-Wechseln in einer Editor-Session: maximal +48 Calls. Server-Cache via G.a fängt das ab — `ladeFrageDetail` ist bereits gecacht (`alle_fragen`-Cache), zusätzliche Last vernachlässigbar.
-- Trigger 2 löst Browser-Prefetches aus, die bei `as="document"` mit niedriger Priorität laufen und vom Browser zurückgehalten werden, wenn der Hauptpfad gerade lädt. Keine Konkurrenz zum aktiv angezeigten Material.
+- Trigger 2 löst Browser-Prefetches mit niedriger Priorität aus, die vom Browser zurückgehalten werden, wenn der Hauptpfad gerade lädt. Keine Konkurrenz zum aktiv angezeigten Material.
 - Beide Hooks sind fail-silent: wenn Backend hängt oder Browser Prefetch verweigert, läuft die App normal weiter.
 
 ## Komponenten-Aufstellung
@@ -174,7 +178,7 @@ SuS klickt "Weiter" → Frage 6
 
 3. `fragenBrowserEditorPrefetch.test.tsx`:
    - Mount FragenBrowser mit gemockter Fragenliste, `handleEditFrage(X)` aufrufen
-   - Nach Debounce: `fragenbankStore.ladeDetail` wurde mit X, X-1, X+1 aufgerufen
+   - Nach Debounce: `fragenbankStore.ladeDetail` wurde mit X-1 und X+1 aufgerufen (Aufruf X kommt aus dem bestehenden `handleEditFrage`-Pfad und wird hier nicht erneut geprüft)
 
 **E2E-Browser-Test (auf staging):**
 
@@ -183,9 +187,9 @@ SuS klickt "Weiter" → Frage 6
 
 ## Risiken und Open Questions
 
-- **SuS-Prüfen Frage-Wrapper:** Die exakte Datei für den SuS-Prüfungs-Frage-Renderer steht in der Spec offen, weil der Brainstorming-Subagent diesen Pfad nicht referenziert hat. Im Plan wird das als erste Code-Lesung adressiert.
-- **Material-URL nach `toAssetUrl`:** Wenn `toAssetUrl` für relative Pfade einen anderen Origin als Drive zurückgibt (GitHub Pages BASE_URL), prefetcht der Browser gegen den GitHub-Pages-Origin — das ist genau richtig, weil das iframe später dorthin zeigt. Drive-URLs (`docs.google.com/...`) werden ebenfalls direkt prefetcht; CSP `connect-src`/`prefetch-src` muss das erlauben (laut bestehender CSP-Regelung mit `*.googleusercontent.com docs.google.com` ist das gegeben).
-- **Zwei Materialien pro Frage:** `material[]` kann mehrere Anhänge haben. Spec definiert "Material-URLs der nächsten 1–2 Fragen" — das ist die Summe aller `material[]`-Einträge dieser 1–2 Fragen. Bei sehr grossen Materialien (z.B. zwei je 5 MB PDFs in zwei Folge-Fragen) prefetchen wir 20 MB. Browser-Strategie limitiert das ohnehin (Connection-Limit, Bandbreite-Sharing); bei Bedarf reduzieren wir auf "nur erstes Material der nächsten Frage" — Plan-Detail.
+- **SuS-Prüfen Frage-Wrapper:** Die exakte Datei für den SuS-Prüfungs-Frage-Renderer steht in der Spec offen, weil der Brainstorming-Subagent diesen Pfad nicht referenziert hat. Im Plan wird das als erste Code-Lesung adressiert. Falls der Renderer mehrere Modi hat (Single-Frage vs. alle-auf-einer-Seite): Prefetch nur im Single-Frage-Modus (wo es sequentielle Übergänge gibt).
+- **Cache-Hit-Identität (kritisch):** Browser-Cache ist URL-exakt. Plan-Phase muss empirisch in DevTools Network-Tab prüfen, dass der Prefetch-Request und der nachfolgende iframe-`src`-Request identische URLs verwenden und die zweite Anforderung "from disk cache" liefert. Wenn nicht, ist der ganze Trigger 2 ein No-Op und muss nachgebessert werden (z.B. `as`-Attribut variieren oder Embed-Konvertierung anpassen).
+- **CSP:** `<link rel="prefetch">` initiiert GETs an dieselben URLs, die die iframes ohnehin laden würden. Bestehende CSP mit `*.googleusercontent.com docs.google.com` ist hinreichend; keine Änderung nötig.
 
 ## Erfolgskriterien
 
