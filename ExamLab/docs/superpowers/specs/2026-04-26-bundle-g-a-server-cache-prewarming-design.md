@@ -104,7 +104,9 @@ try {
 
 `preWarmKorrekturFuerLobby_` ist **kein neuer Endpoint**, sondern interne Helper-Funktion. Sie ruft `bulkLadeFragenAusSheet_` für die Korrektur-Daten dieser SuS-Abgabe.
 
-Latenz-Impact auf Abgabe-Response: 50-200 ms (Sheet-Read + Cache-Write). Akzeptabel, weil Abgabe nicht latency-kritisch ist.
+**Cache-Granularität:** Der Cache wird pro Lobby-Tab aggregiert befüllt (analog Bundle E — `bulkLadeFragenAusSheet_` cached den ganzen Tab). Jede SuS-Abgabe wärmt denselben Tab-Cache; weitere Abgaben aus derselben Lobby finden bei der ersten Abgabe schon einen warmen Cache und triggern via `tryLock`-äquivalentem Mechanismus keinen erneuten Sheet-Read (Detail im Plan).
+
+Latenz-Impact auf Abgabe-Response: 50-200 ms (Sheet-Read + Cache-Write) bei der ersten Abgabe; ~10 ms ab der zweiten (Cache schon warm).
 
 ### Frontend (ExamLab/src)
 
@@ -385,6 +387,8 @@ Echte Logins (LP `yannick.durand@gymhofwil.ch` + SuS `wr.test@stud.gymhofwil.ch`
 | `testPreWarmEffekt` warm-Pfad intern | ≤ 700 ms (nicht hard, ≤ 800 ms akzeptabel) |
 | Browser-Stoppuhr SuS-Übungsstart spürbar | ≤ 2.5 s |
 | Bundle-E-Latenzen unverändert (Regressions-Floor) | Cold ≤ 1'200 ms intern, Warm ≤ 250 ms intern |
+| Abgabe-Latenz mit Trigger D (erste Abgabe) | ≤ +250 ms gegenüber Bundle-E-Abgabe-Floor |
+| Abgabe-Latenz mit Trigger D (n-te Abgabe, Cache warm) | ≤ +30 ms gegenüber Bundle-E-Abgabe-Floor |
 | Alle GAS-Test-Shims grün | 9 Cases (3 pro Shim) |
 | Alle vitest-Tests grün | bestehende 684 + ~25 neue |
 | `tsc -b` clean | ja |
