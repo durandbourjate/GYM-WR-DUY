@@ -8849,16 +8849,18 @@ function lernplattformLadeLoesungen(body) {
         if (idSet.size === 0) continue; // Alles in vorigem Tab gefunden — kein Sheet-Read nötig
         var found = bulkLadeFragenAusSheet_(sheetId, tab, idSet);
         for (var k in found) {
+          if (!Object.prototype.hasOwnProperty.call(found, k)) continue;
           fragenMap[k] = found[k];
           // Aus den noch zu durchsuchenden Tabs entfernen (Worst-Case-Speed-up)
           for (var nextTab in byTab[sheetId]) {
+            if (!Object.prototype.hasOwnProperty.call(byTab[sheetId], nextTab)) continue;
             if (nextTab !== tab) byTab[sheetId][nextTab].delete(k);
           }
         }
       }
     }
   } catch (e) {
-    Logger.log('[lernplattformLadeLoesungen] Bulk-Read-Fallback aktiv: ' + e.message);
+    console.log('[lernplattformLadeLoesungen] Bulk-Read-Fallback aktiv: ' + e.message);
     fragenMap = {}; // Sicherheits-Reset, der Per-Frage-Loop unten füllt neu
   }
 
