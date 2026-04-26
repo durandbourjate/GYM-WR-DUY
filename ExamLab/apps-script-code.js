@@ -8937,8 +8937,10 @@ function lernplattformPreWarmFragen(body) {
       console.log('[PreWarmFragen] DoS-Schutz: ' + fragenIds.length + ' fragenIds von ' + email);
       return jsonResponse({ error: 'Zu viele Fragen (max 200)' });
     }
-    if (!gruppeId) {
-      return jsonResponse({ error: 'gruppeId fehlt' });
+    // gruppeId ODER fachbereich muss gesetzt sein — gruppiereFragenIdsNachTab_
+    // funktioniert mit fachbereich-Hint allein (Bundle-E-Pattern).
+    if (!gruppeId && !fachbereich) {
+      return jsonResponse({ error: 'gruppeId oder fachbereich fehlt' });
     }
 
     // 2. Auth: LP via Domain ODER SuS via Session-Token
