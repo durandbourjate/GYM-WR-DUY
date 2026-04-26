@@ -60,10 +60,10 @@ interface AuthStore {
   ladeStatus: 'idle' | 'laden' | 'fertig' | 'fehler'
   fehler: string | null
 
-  anmelden: (credential: GoogleCredential) => void
+  anmelden: (credential: GoogleCredential) => Promise<void>
   anmeldenMitCode: (schuelerId: string, name: string, email: string, sessionToken?: string) => void
   demoStarten: (rolle?: 'sus' | 'lp') => void
-  abmelden: () => void
+  abmelden: () => Promise<void>
   setFehler: (fehler: string | null) => void
 }
 
@@ -187,9 +187,11 @@ export const useAuthStore = create<AuthStore>((set) => ({
     set({ user, istDemoModus: true, ladeStatus: 'fertig', fehler: null })
   },
 
-  abmelden: () => {
-    // Bundle G.c — Frontend-Cache + IDB-Cache leeren bevor User wechselt
-    useFragenbankStore.getState().reset()
+  abmelden: async () => {
+    // Bundle G.c — Frontend-Cache + IDB-Cache leeren bevor User wechselt.
+    // await ist kritisch: window.location.href triggert Page-Unload und bricht
+    // in-flight IDB-Transaktionen ab. Privacy-Garantie würde sonst nicht halten.
+    await useFragenbankStore.getState().reset()
     clearSession()
     resetPruefungState()
     set({ user: null, istDemoModus: false, ladeStatus: 'idle', fehler: null })

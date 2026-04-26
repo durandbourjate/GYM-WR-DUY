@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 
 // Mocks für die Module die der authStore (in)direkt nutzt — vor dem Import der Stores
 const ladeMock = vi.fn(async () => {})
-const resetMock = vi.fn()
+const resetMock = vi.fn(async () => {})
 
 vi.mock('../store/fragenbankStore', () => ({
   useFragenbankStore: {
@@ -116,14 +116,36 @@ describe('Bundle G.c — authStore Login-Pre-Fetch + Logout-Cleanup', () => {
     consoleSpy.mockRestore()
   })
 
-  it('abmelden() ruft fragenbankStore.reset auf', () => {
+  it('abmelden() awaitet fragenbankStore.reset (Privacy-Garantie vor Hard-Nav)', async () => {
     useAuthStore.setState({
       user: { email: 'lp@gymhofwil.ch', name: 'Test', vorname: 'T', nachname: 'L', rolle: 'lp' },
       istDemoModus: false,
       ladeStatus: 'fertig',
       fehler: null,
     })
-    useAuthStore.getState().abmelden()
+    await useAuthStore.getState().abmelden()
+    expect(resetMock).toHaveBeenCalledTimes(1)
+  })
+
+  it('abmelden() wartet auf reset() bevor User-State gelöscht wird', async () => {
+    let releaseReset: (() => void) | undefined
+    resetMock.mockImplementationOnce(() => new Promise<void>((resolve) => { releaseReset = resolve }))
+    useAuthStore.setState({
+      user: { email: 'lp@gymhofwil.ch', name: 'Test', vorname: 'T', nachname: 'L', rolle: 'lp' },
+      istDemoModus: false,
+      ladeStatus: 'fertig',
+      fehler: null,
+    })
+
+    const abmeldenPromise = useAuthStore.getState().abmelden()
+    // Während reset() noch läuft, ist user noch gesetzt (kein voreiliger State-Reset)
+    await new Promise<void>((r) => setTimeout(r, 0))
+    expect(useAuthStore.getState().user?.email).toBe('lp@gymhofwil.ch')
+
+    releaseReset?.()
+    await abmeldenPromise
+    // Nach reset()-Commit: User leer
+    expect(useAuthStore.getState().user).toBeNull()
     expect(resetMock).toHaveBeenCalledTimes(1)
   })
 })
