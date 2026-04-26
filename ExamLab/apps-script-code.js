@@ -8952,6 +8952,26 @@ function ladeFrageUnbereinigtById_(frageId, gruppe, fachbereichHint) {
 }
 
 /**
+ * Stabiler Hash über ein fragenIds-Array für Soft-Lock-Cache-Keys.
+ * Sortiert + joined + MD5 → erste 8 Hex-Zeichen. Reicht für Dedup-Use-Case.
+ *
+ * @param {string[]} fragenIds
+ * @return {string} 8-Zeichen-Hex
+ */
+function hashIds_(fragenIds) {
+  if (!Array.isArray(fragenIds) || fragenIds.length === 0) return 'empty';
+  var sorted = fragenIds.slice().sort();
+  var raw = sorted.join('|');
+  var bytes = Utilities.computeDigest(Utilities.DigestAlgorithm.MD5, raw);
+  var hex = '';
+  for (var i = 0; i < 4; i++) {
+    var b = bytes[i] & 0xff;
+    hex += (b < 16 ? '0' : '') + b.toString(16);
+  }
+  return hex;
+}
+
+/**
  * Gruppiert fragenIds nach {sheetId → tab → Set<frageId>} für Bulk-Read.
  * - Familie-Gruppe (gruppe.typ === 'familie' && gruppe.fragebankSheetId): alles geht in eigenes Sheet, Tab 'Fragen'
  * - fachbereichHint gesetzt + Hint ist gültiger Tab: alle IDs in den Hint-Tab (Happy-Path bei Bank)
