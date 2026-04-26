@@ -5,6 +5,7 @@ import { clearIndexedDB } from '../services/autoSave.ts'
 import { clearQueue } from '../services/retryQueue.ts'
 import { ladeLehrpersonen, type LPInfo } from '../services/lpApi.ts'
 import { useFavoritenStore } from './favoritenStore.ts'
+import { useFragenbankStore } from './fragenbankStore.ts'
 
 // Cache für LP-Liste (pro Session geladen)
 let lpCache: LPInfo[] | null = null
@@ -130,6 +131,10 @@ export const useAuthStore = create<AuthStore>((set) => ({
       saveSession(user)
       saveDemoFlag(false)
       set({ user, istDemoModus: false, ladeStatus: 'fertig', fehler: null })
+      // Bundle G.c — Fragenbank im Hintergrund vorladen, damit FragenBrowser instant rendert
+      void useFragenbankStore.getState().lade(credential.email).catch((e) => {
+        console.warn('[G.c] Fragenbank-Pre-Fetch fehlgeschlagen (silent):', e)
+      })
     } finally {
       loginInProgress = false
     }
