@@ -8836,14 +8836,43 @@ function lernplattformLadeLoesungen(body) {
       gruppeId, email, String(fragenIds.length));
   } catch (e) { /* Logger-Unavailable nicht kritisch */ }
 
+  // === Bundle E (S146): Bulk-Read pro Sheet/Tab statt Per-Frage-Read ===
+  // Bei Fehler im Bulk-Pfad: Fallback auf bestehende Per-Frage-Schleife (kein Funktions-Verlust).
+  // Worst-Case-Optimierung (Plan-Review-Empfehlung): nach jedem Tab gefundene IDs aus den idSets
+  // der noch unbearbeiteten Tabs entfernen → spart Sheet-Reads wenn alle IDs in Tab 1 lagen.
+  var fragenMap = {};
+  try {
+    var byTab = gruppiereFragenIdsNachTab_(fragenIds, gruppe, body.fachbereich);
+    for (var sheetId in byTab) {
+      for (var tab in byTab[sheetId]) {
+        var idSet = byTab[sheetId][tab];
+        if (idSet.size === 0) continue; // Alles in vorigem Tab gefunden — kein Sheet-Read nötig
+        var found = bulkLadeFragenAusSheet_(sheetId, tab, idSet);
+        for (var k in found) {
+          if (!Object.prototype.hasOwnProperty.call(found, k)) continue;
+          fragenMap[k] = found[k];
+          // Aus den noch zu durchsuchenden Tabs entfernen (Worst-Case-Speed-up)
+          for (var nextTab in byTab[sheetId]) {
+            if (!Object.prototype.hasOwnProperty.call(byTab[sheetId], nextTab)) continue;
+            if (nextTab !== tab) byTab[sheetId][nextTab].delete(k);
+          }
+        }
+      }
+    }
+  } catch (e) {
+    console.log('[lernplattformLadeLoesungen] Bulk-Read-Fallback aktiv: ' + e.message);
+    fragenMap = {}; // Sicherheits-Reset, der Per-Frage-Loop unten füllt neu
+  }
+
   var loesungen = {};
   for (var i = 0; i < fragenIds.length; i++) {
     var frageId = fragenIds[i];
-    var frage = ladeFrageUnbereinigtById_(frageId, gruppe, body.fachbereich);
+    // Aus Bulk-Read-Map; falls Lücke, Per-Frage-Fallback (war heute schon der Pfad)
+    var frage = fragenMap[frageId] || ladeFrageUnbereinigtById_(frageId, gruppe, body.fachbereich);
     if (!frage) continue; // Lücke → Client fällt pro-Frage zurück
 
     loesungen[frageId] = extrahiereLoesungsSlice_(frage);
-    // Aufgabengruppe: Teilaufgaben als eigene Map-Keys ergänzen
+    // Aufgabengruppe: Teilaufgaben als eigene Map-Keys ergänzen (unverändert)
     if (frage.typ === 'aufgabengruppe' && Array.isArray(frage.teilaufgaben)) {
       for (var t = 0; t < frage.teilaufgaben.length; t++) {
         var ta = frage.teilaufgaben[t];
@@ -8920,6 +8949,120 @@ function ladeFrageUnbereinigtById_(frageId, gruppe, fachbereichHint) {
     console.log('[ladeFrageUnbereinigtById_] Fehler: ' + e.message);
   }
   return null;
+}
+
+/**
+ * Gruppiert fragenIds nach {sheetId → tab → Set<frageId>} für Bulk-Read.
+ * - Familie-Gruppe (gruppe.typ === 'familie' && gruppe.fragebankSheetId): alles geht in eigenes Sheet, Tab 'Fragen'
+ * - fachbereichHint gesetzt + Hint ist gültiger Tab: alle IDs in den Hint-Tab (Happy-Path bei Bank)
+ * - Sonst: Worst-Case → alle Bank-Tabs als Suchraum (max. 4 Bulk-Reads). Besser als N×Per-Frage.
+ *
+ * Returns: { [sheetId]: { [tab]: Set<frageId> } }
+ */
+function gruppiereFragenIdsNachTab_(fragenIds, gruppe, fachbereichHint) {
+  var result = {};
+  if (!fragenIds || fragenIds.length === 0) return result;
+
+  // Familie-Gruppe: eigenes Sheet, fester Tab 'Fragen'
+  var istFamilie = gruppe && gruppe.typ === 'familie' && gruppe.fragebankSheetId;
+  if (istFamilie) {
+    result[gruppe.fragebankSheetId] = { 'Fragen': new Set(fragenIds) };
+    return result;
+  }
+
+  // Bank-Gruppe: alle IDs gehen in FRAGENBANK_ID
+  var sheetId = FRAGENBANK_ID;
+  result[sheetId] = {};
+
+  var alleTabs = getFragenbankTabs_();
+  // Hint-Tab muss existieren in der Tab-Liste
+  if (fachbereichHint && alleTabs.indexOf(fachbereichHint) !== -1) {
+    result[sheetId][fachbereichHint] = new Set(fragenIds);
+    return result;
+  }
+
+  // Worst-Case: kein Hint → alle Tabs als Suchraum (Bulk-Read sucht alle IDs in jedem Tab)
+  for (var t = 0; t < alleTabs.length; t++) {
+    result[sheetId][alleTabs[t]] = new Set(fragenIds);
+  }
+  return result;
+}
+
+/**
+ * Liest in 1× Sheet-Read alle in idSet angefragten Fragen eines Tabs.
+ *
+ * Performance:
+ * - Cache-Lookup zuerst pro ID (frage_v1_<sheetId>_<frageId>) → Treffer aus idSet entfernen
+ * - Bei restlichem idSet > 0: 1× sheet.getDataRange().getValues() + Linear-Scan + Set.has()
+ * - Pro Treffer: cache.put mit < 100'000 Bytes-Guard (existing pattern)
+ *
+ * Returns: Map { [frageId]: Frage } — nur Treffer; Lücken fehlen schweigend.
+ */
+function bulkLadeFragenAusSheet_(sheetId, tab, idSet) {
+  var result = {};
+  if (!idSet || idSet.size === 0) return result;
+
+  var cache = CacheService.getScriptCache();
+  var remaining = new Set();
+
+  // Cache-Lookup zuerst
+  var ids = Array.from(idSet);
+  for (var i = 0; i < ids.length; i++) {
+    var cacheKey = 'frage_v1_' + sheetId + '_' + ids[i];
+    var cached = cache.get(cacheKey);
+    if (cached) {
+      try {
+        result[ids[i]] = JSON.parse(cached);
+        continue;
+      } catch (e) { /* fallthrough */ }
+    }
+    remaining.add(ids[i]);
+  }
+
+  if (remaining.size === 0) return result;
+
+  // Bulk-Read: 1× getDataRange().getValues()
+  try {
+    var ss = SpreadsheetApp.openById(sheetId);
+    var sheet = ss.getSheetByName(tab);
+    if (!sheet) return result;
+    var data = sheet.getDataRange().getValues();
+    if (data.length < 2) return result;
+
+    var headers = data[0].map(function(h) { return String(h).trim(); });
+    var idIdx = headers.indexOf('id');
+    if (idIdx === -1) return result;
+
+    // Linear-Scan, Match via Set.has() (O(1) statt O(N) bei jeder Frage)
+    for (var r = 1; r < data.length; r++) {
+      var rowId = String(data[r][idIdx]);
+      if (!remaining.has(rowId)) continue;
+
+      var row = {};
+      for (var c = 0; c < headers.length; c++) {
+        var key = headers[c];
+        var val = data[r][c];
+        if (!key || val === '' || val === null || val === undefined) continue;
+        row[key] = String(val);
+      }
+      var frage = parseFrageKanonisch_(row, tab);
+      result[rowId] = frage;
+
+      // Cache schreiben (< 100'000 Bytes-Guard)
+      try {
+        var serialized = JSON.stringify(frage);
+        if (serialized.length < 100000) {
+          cache.put('frage_v1_' + sheetId + '_' + rowId, serialized, 3600);
+        }
+      } catch (e) { /* skip cache on serialize error */ }
+      remaining.delete(rowId);
+      if (remaining.size === 0) break;
+    }
+  } catch (e) {
+    console.log('[bulkLadeFragenAusSheet_] Fehler in tab=' + tab + ': ' + e.message);
+  }
+
+  return result;
 }
 
 /** Frage aus einer Sheet-Zeile im kanonischen Format parsen (shared mit ExamLab) */
@@ -12775,4 +12918,208 @@ function migriereLueckentextModus() {
   }
 
   return { total: total, gesetzt: gesetzt, schonGesetzt: schonGesetzt, errors: errors, tabs: tabStats };
+}
+
+// =====================================================================
+// BUNDLE E — Test-Shims (S146)
+// =====================================================================
+
+/** Test-Shim für gruppiereFragenIdsNachTab_ — Public-Wrapper ohne Underscore (GAS-Dropdown-Sichtbarkeit, S133-Lehre) */
+function testGruppiereFragenIdsNachTab() {
+  return testGruppiereFragenIdsNachTab_();
+}
+
+function testGruppiereFragenIdsNachTab_() {
+  function assert_(cond, msg) { if (!cond) throw new Error('ASSERT FAIL: ' + msg); }
+  Logger.log('=== testGruppiereFragenIdsNachTab ===');
+
+  // Case 1: fachbereichHint gesetzt → alle IDs gehen in den Hint-Tab
+  var r1 = gruppiereFragenIdsNachTab_(['id1', 'id2'], null, 'BWL');
+  var sheet1 = Object.keys(r1)[0];
+  assert_(sheet1 === FRAGENBANK_ID, 'Case 1: sheetId muss FRAGENBANK_ID sein, war ' + sheet1);
+  assert_(Object.keys(r1[sheet1]).length === 1, 'Case 1: nur 1 Tab erwartet');
+  assert_(r1[sheet1]['BWL'] !== undefined, 'Case 1: Tab BWL fehlt');
+  assert_(r1[sheet1]['BWL'].size === 2, 'Case 1: 2 IDs erwartet, war ' + r1[sheet1]['BWL'].size);
+  Logger.log('Case 1 (Hint=BWL): OK');
+
+  // Case 2: kein Hint, kein Familie → alle Tabs als Suchraum
+  var r2 = gruppiereFragenIdsNachTab_(['id1'], null, '');
+  var tabs2 = Object.keys(r2[FRAGENBANK_ID]);
+  assert_(tabs2.length >= 2, 'Case 2: mindestens 2 Tabs erwartet (BWL+VWL+...), war ' + tabs2.length);
+  Logger.log('Case 2 (kein Hint): OK, ' + tabs2.length + ' Tabs');
+
+  // Case 3: Familie-Gruppe → eigenes Sheet, Tab "Fragen"
+  var familie = { typ: 'familie', fragebankSheetId: 'FAM_TEST_SHEET_ID' };
+  var r3 = gruppiereFragenIdsNachTab_(['fid1', 'fid2'], familie, 'BWL');
+  assert_(r3['FAM_TEST_SHEET_ID'] !== undefined, 'Case 3: Familie-Sheet fehlt');
+  assert_(r3['FAM_TEST_SHEET_ID']['Fragen'].size === 2, 'Case 3: 2 IDs in Fragen-Tab erwartet');
+  assert_(r3[FRAGENBANK_ID] === undefined, 'Case 3: Bank-Sheet darf nicht da sein');
+  Logger.log('Case 3 (Familie): OK');
+
+  Logger.log('=== testGruppiereFragenIdsNachTab: alle Cases OK ===');
+  return { success: true };
+}
+
+/** Public-Wrapper ohne Underscore */
+function testBulkLadeFragenAusSheet() { return testBulkLadeFragenAusSheet_(); }
+
+function testBulkLadeFragenAusSheet_() {
+  function assert_(cond, msg) { if (!cond) throw new Error('ASSERT FAIL: ' + msg); }
+  Logger.log('=== testBulkLadeFragenAusSheet ===');
+
+  // Erste 10 IDs aus BWL-Tab via direktem Sheet-Read holen (deterministisches Test-Set)
+  var ss = SpreadsheetApp.openById(FRAGENBANK_ID);
+  var sheet = ss.getSheetByName('BWL');
+  var data = sheet.getDataRange().getValues();
+  var headers = data[0].map(function(h) { return String(h).trim(); });
+  var idIdx = headers.indexOf('id');
+  var bwlIds = [];
+  for (var i = 1; i < data.length && bwlIds.length < 10; i++) {
+    if (data[i][idIdx]) bwlIds.push(String(data[i][idIdx]));
+  }
+  assert_(bwlIds.length === 10, 'Setup: brauche 10 BWL-IDs');
+
+  var cache = CacheService.getScriptCache();
+
+  // Case 1: Happy-Path — 10 IDs, alle gefunden, Cache-Slots gefüllt
+  for (var i = 0; i < bwlIds.length; i++) cache.remove('frage_v1_' + FRAGENBANK_ID + '_' + bwlIds[i]);
+  Utilities.sleep(50);
+  var idSet1 = new Set(bwlIds);
+  var r1 = bulkLadeFragenAusSheet_(FRAGENBANK_ID, 'BWL', idSet1);
+  assert_(Object.keys(r1).length === 10, 'Case 1: 10 Treffer erwartet, war ' + Object.keys(r1).length);
+  // Cache-Effekt: ein Eintrag muss jetzt im Cache sein
+  var cached = cache.get('frage_v1_' + FRAGENBANK_ID + '_' + bwlIds[5]);
+  assert_(cached !== null, 'Case 1: Cache-Eintrag für ID 5 fehlt');
+  Logger.log('Case 1 (Happy-Path): OK, 10/10 + Cache befüllt');
+
+  // Case 2: Lücken — 9 valide + 1 Garbage-ID
+  for (var i = 0; i < bwlIds.length; i++) cache.remove('frage_v1_' + FRAGENBANK_ID + '_' + bwlIds[i]);
+  Utilities.sleep(50);
+  var idSet2 = new Set(bwlIds.slice(0, 9).concat(['nicht-existent-12345']));
+  var r2 = bulkLadeFragenAusSheet_(FRAGENBANK_ID, 'BWL', idSet2);
+  assert_(Object.keys(r2).length === 9, 'Case 2: 9 Treffer erwartet, war ' + Object.keys(r2).length);
+  assert_(r2['nicht-existent-12345'] === undefined, 'Case 2: Garbage-ID darf nicht im Result sein');
+  Logger.log('Case 2 (Lücken): OK, 9/10 (Lücke schweigend)');
+
+  // Case 3: Cache-Hit — zweiter Call ohne Cache-Reset
+  // Hinweis: relies on Case 1 + Case 2 having written cache entries for bwlIds[0..4].
+  // Case 1 schreibt bwlIds[0..9], Case 2 ruft cache.remove dann erneut für bwlIds[0..8].
+  // → bwlIds[0..4] sind nach Case 2 wieder im Cache. Wenn Cases umsortiert werden,
+  // muss Case 3 entweder einen eigenen Warm-Up-Call machen oder die Annahme dokumentiert bleiben.
+  var idSet3 = new Set(bwlIds.slice(0, 5));
+  var t0 = Date.now();
+  var r3 = bulkLadeFragenAusSheet_(FRAGENBANK_ID, 'BWL', idSet3);
+  var dt = Date.now() - t0;
+  assert_(Object.keys(r3).length === 5, 'Case 3: 5 Treffer erwartet');
+  assert_(dt < 200, 'Case 3: Warm-Cache muss < 200 ms sein, war ' + dt);
+  Logger.log('Case 3 (Warm-Cache): OK, 5/5 in ' + dt + ' ms');
+
+  Logger.log('=== testBulkLadeFragenAusSheet: alle Cases OK ===');
+  return { success: true };
+}
+
+/** Public-Wrapper ohne Underscore */
+function testLadeLoesungenLatenzNachBundleE() { return testLadeLoesungenLatenzNachBundleE_(); }
+
+/**
+ * Misst die INTERNE Latenz von lernplattformLadeLoesungen nach Bundle E.
+ * Date.now()-Brackets DIREKT um den Bulk-Read + Per-Frage-Loop, nicht um den
+ * gesamten Web-App-Call (= ohne Plattform-Overhead von ~1.5-2 s).
+ * Akzeptanz-Kriterium: N=10 cold ≤ 800 ms intern.
+ */
+function testLadeLoesungenLatenzNachBundleE_() {
+  function assert_(cond, msg) { if (!cond) throw new Error('ASSERT FAIL: ' + msg); }
+  Logger.log('=== testLadeLoesungenLatenzNachBundleE ===');
+
+  // Erste 10 BWL-IDs holen
+  var ss = SpreadsheetApp.openById(FRAGENBANK_ID);
+  var sheet = ss.getSheetByName('BWL');
+  var data = sheet.getDataRange().getValues();
+  var headers = data[0].map(function(h) { return String(h).trim(); });
+  var idIdx = headers.indexOf('id');
+  var bwlIds = [];
+  for (var i = 1; i < data.length && bwlIds.length < 10; i++) {
+    if (data[i][idIdx]) bwlIds.push(String(data[i][idIdx]));
+  }
+  assert_(bwlIds.length === 10, 'Setup: brauche 10 BWL-IDs');
+
+  var cache = CacheService.getScriptCache();
+  var n_values = [1, 3, 5, 10];
+
+  Logger.log('--- COLD CACHE (intern, ohne Plattform-Overhead) ---');
+  for (var k = 0; k < n_values.length; k++) {
+    var n = n_values[k];
+    var ids = bwlIds.slice(0, n);
+
+    // Cache-Reset für alle 10 IDs
+    for (var j = 0; j < bwlIds.length; j++) {
+      cache.remove('frage_v1_' + FRAGENBANK_ID + '_' + bwlIds[j]);
+    }
+    Utilities.sleep(50);
+
+    // Internes Brackets — simuliert den Bulk-Read + Per-Frage-Loop von lernplattformLadeLoesungen
+    var t0 = Date.now();
+    var byTab = gruppiereFragenIdsNachTab_(ids, null, 'BWL');
+    var fragenMap = {};
+    for (var sheetId in byTab) {
+      for (var tab in byTab[sheetId]) {
+        var found = bulkLadeFragenAusSheet_(sheetId, tab, byTab[sheetId][tab]);
+        for (var x in found) fragenMap[x] = found[x];
+      }
+    }
+    var loesungen = {};
+    for (var p = 0; p < ids.length; p++) {
+      var frage = fragenMap[ids[p]] || ladeFrageUnbereinigtById_(ids[p], null, 'BWL');
+      if (frage) loesungen[ids[p]] = extrahiereLoesungsSlice_(frage);
+    }
+    var dt = Date.now() - t0;
+    Logger.log('N=%s cold intern: %s ms (gefunden %s/%s)', n, dt, Object.keys(loesungen).length, n);
+  }
+
+  // WARM misst nur den Bulk-Read-Pfad (kein Per-Frage-Loop, kein extrahiereLoesungsSlice_).
+  // Da extrahiereLoesungsSlice_ pure CPU ist (kein I/O), ist der Beitrag <5 ms — vernachlässigbar.
+  Logger.log('--- WARM CACHE (Re-Run) ---');
+  for (var k = 0; k < n_values.length; k++) {
+    var n = n_values[k];
+    var ids = bwlIds.slice(0, n);
+    var t0 = Date.now();
+    var byTab = gruppiereFragenIdsNachTab_(ids, null, 'BWL');
+    for (var sheetId in byTab) {
+      for (var tab in byTab[sheetId]) {
+        bulkLadeFragenAusSheet_(sheetId, tab, byTab[sheetId][tab]);
+      }
+    }
+    var dt = Date.now() - t0;
+    Logger.log('N=%s warm intern: %s ms', n, dt);
+  }
+
+  // Worst-Case-Variante (Plan-Review-Empfehlung): kein fachbereichHint → alle 4 Tabs durchsuchen
+  Logger.log('--- WORST-CASE COLD (kein fachbereichHint, alle Tabs) ---');
+  // Cache-Reset
+  for (var j = 0; j < bwlIds.length; j++) cache.remove('frage_v1_' + FRAGENBANK_ID + '_' + bwlIds[j]);
+  Utilities.sleep(50);
+  var t0 = Date.now();
+  var byTabWc = gruppiereFragenIdsNachTab_(bwlIds, null, ''); // leerer Hint
+  var foundCount = 0;
+  for (var sheetId in byTabWc) {
+    if (!Object.prototype.hasOwnProperty.call(byTabWc, sheetId)) continue;
+    for (var tab in byTabWc[sheetId]) {
+      if (!Object.prototype.hasOwnProperty.call(byTabWc[sheetId], tab)) continue;
+      if (byTabWc[sheetId][tab].size === 0) continue;
+      var f = bulkLadeFragenAusSheet_(sheetId, tab, byTabWc[sheetId][tab]);
+      for (var k in f) {
+        if (!Object.prototype.hasOwnProperty.call(f, k)) continue;
+        foundCount++;
+        for (var nextTab in byTabWc[sheetId]) {
+          if (!Object.prototype.hasOwnProperty.call(byTabWc[sheetId], nextTab)) continue;
+          if (nextTab !== tab) byTabWc[sheetId][nextTab].delete(k);
+        }
+      }
+    }
+  }
+  var dtWc = Date.now() - t0;
+  Logger.log('N=10 worst-case cold (alle Tabs, mit Cache-Filtering): %s ms (%s/10 gefunden)', dtWc, foundCount);
+
+  Logger.log('=== Akzeptanz-Kriterium: N=10 cold intern ≤ 800 ms (Happy-Path mit Hint) ===');
+  return { success: true };
 }
