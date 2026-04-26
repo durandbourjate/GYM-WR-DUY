@@ -9,7 +9,7 @@
 Sequenzielle Klick-Latenz an zwei konkreten Stellen eliminieren, ohne Backend-Änderung:
 
 1. LP klickt im FragenBrowser durch Fragen (prev/next im Editor) — heute 1.5–2 s pro Klick (Backend-Roundtrip an `ladeFrageDetail`)
-2. SuS/LP scrollt zur nächsten Frage mit Material-PDF — heute mehrere Sekunden iframe-Load beim ersten Öffnen
+2. SuS/LP scrollt zur nächsten Frage mit PDF-Anhang — heute mehrere Sekunden iframe-Load beim ersten Öffnen
 
 Nach G.b: Beide Übergänge fühlen sich instant an, weil Daten/Bytes vor dem Klick bereits im Frontend-Memory bzw. Browser-Cache liegen.
 
@@ -18,7 +18,7 @@ Nach G.b: Beide Übergänge fühlen sich instant an, weil Daten/Bytes vor dem Kl
 **Inkludiert (zwei Trigger):**
 
 - **Trigger 1 — Editor-Nachbar-Prefetch:** Beim Öffnen einer Frage im FragenBrowser-Editor parallel ±1 Nachbar-IDs via `ladeFrageDetail` ins `fragenbankStore.detailCache` laden. Frontend-Memory-Cache, kein neuer Backend-Endpoint.
-- **Trigger 2 — Material-PDF-Prefetch:** Beim Rendern einer Frage mit `material[]` browserseitig die Material-URLs der nächsten 1–2 Fragen via `<link rel="prefetch">` im `<head>` vorladen. Greift in Üben (SuS), Prüfen (SuS) und Korrektur-Fragen-Ansicht (LP).
+- **Trigger 2 — Anhang-PDF-Prefetch:** Beim Rendern einer Frage mit `anhaenge[]` browserseitig die PDF-URL des ersten PDF-Anhangs der **nächsten** Frage via `<link rel="prefetch">` im `<head>` vorladen. Greift in Üben (SuS), Prüfen (SuS) und Korrektur-Fragen-Ansicht (LP).
 
 **Explizit ausgeklammert:**
 
@@ -72,17 +72,21 @@ Verhalten:
 
 **Aufrufstellen:**
 
-- **SuS-Üben:** `src/components/ueben/UebungsScreen.tsx` (oder die Frage-Wrapper-Komponente, die in der Übungs-Schleife den aktiven Index hält). Berechnet die Material-URLs der nächsten 1–2 Fragen aus dem aktuellen Übungs-State.
-- **SuS-Prüfen:** Analog im Prüfungs-Frage-Wrapper. Konkrete Datei wird im Plan identifiziert (Code-Lesung).
-- **LP-Korrektur:** `src/components/lp/korrektur/KorrekturFragenAnsicht.tsx` — wenn LP Frage X eines SuS anschaut, prefetch Material von Frage X+1.
+- **SuS-Üben:** `src/components/ueben/UebungsScreen.tsx` (oder Wrapper-Komponente). Berechnet Anhang-URLs der nächsten Frage aus dem aktuellen Übungs-State (`session.fragen` + `session.aktuelleFrageIndex`).
+- **SuS-Prüfen:** `src/components/Layout.tsx` Z.~471 (Pro-Frage-Bereich, der `aktuelleFrage` rendert). Berechnet Anhang-URLs der nächsten Frage aus dem `pruefungsStore`.
+- **LP-Korrektur:** `src/components/lp/korrektur/KorrekturFragenAnsicht.tsx` — wenn LP Frage X eines SuS anschaut, prefetch Anhang von Frage X+1.
 
-**URL-Quelle:** `frage.material[]` enthält Anhänge mit `url`-Feld. Der Hook prefetcht **exakt die URL, die `MaterialPanel` später als iframe-`src` setzt** — das ist `convertToEmbedUrl(toAssetUrl(material.url))`. Begründung: Browser-Cache ist origin/path-spezifisch. Wenn wir `/view` prefetchen und das iframe später `/preview` lädt, sind das verschiedene URLs und der Cache greift nicht. Die Plan-Phase muss diesen Cache-Hit empirisch via DevTools verifizieren ("from disk cache" beim iframe-Open der prefetchten Frage).
+**URL-Quelle und Begriffsklärung:** Pro-Frage-Anhänge stehen unter `frage.anhaenge[]` als `FrageAnhang`-Objekte (Felder `driveFileId`, `mimeType`, `dateiname`). Globale Prüfungs-Materialien (`config.materialien` im `MaterialPanel`) sind nicht Ziel — sie laden einmal pro Prüfung und brauchen keinen Prefetch.
 
-**Pro Frage nur erstes Material:** Wenn eine Frage mehrere Anhänge hat, prefetcht der Hook nur den ersten (`material[0].url`). Das limitiert Worst-Case-Bandbreite, deckt den Hauptfall (PDF als zentrales Material) ab, und ist der einzige Anhang den ein SuS typischerweise als nächstes öffnet.
+Der Hook prefetcht **exakt die URL, die `MediaAnhang` später als iframe-`src` setzt**. Für PDF-Anhänge ist das `drivePreviewUrl(anhang.driveFileId)` (siehe `src/utils/mediaUtils.ts`). Browser-Cache ist URL-exakt — wenn der Prefetch eine andere URL (z.B. `driveStreamUrl`) verwendet als die später gerenderte iframe-`src`, greift der Cache nicht.
 
-**`<link rel="prefetch">`-Attribut:** Ohne `as`-Attribut (Browser-Default), nicht `as="document"`. PDFs sind keine HTML-Dokumente; `as="document"` führt bei manchen Browsern zu Cache-Miss beim iframe-Reload. Plan-Phase verifiziert empirisch.
+**Nur PDFs prefetchen:** Bilder rendern als Drive-Thumbnails mit `loading="lazy"` und sind klein/CDN-gecacht. Audio nutzt `preload="metadata"`. Video-Embeds (YouTube/Vimeo/Drive-Video) liefern eigene Lazy-Loading-Mechanik. PDFs sind die einzigen Anhänge, deren erstes Loading mehrere Sekunden dauern kann. → Hook erhält bereits gefilterte URL-Liste (Filter `istPDF(mimeType)` im Aufrufer).
 
-**Frage-Editor (LP):** Bewusst keine Prefetch-Aufrufe im Edit-Modus. LP wechselt im Editor selten zwischen Fragen mit grossen Material-PDFs; YAGNI.
+**Pro Frage nur erster PDF-Anhang:** Wenn eine Frage mehrere PDFs hat, prefetcht der Aufrufer nur den ersten. Das limitiert Worst-Case-Bandbreite und deckt den Hauptfall ab.
+
+**`<link rel="prefetch">`-Attribut:** Ohne `as`-Attribut (Browser-Default). PDFs sind keine HTML-Dokumente; `as="document"` führt bei manchen Browsern zu Cache-Miss beim iframe-Reload. Plan-Phase verifiziert empirisch.
+
+**Frage-Editor (LP):** Bewusst keine Prefetch-Aufrufe im Edit-Modus. LP wechselt im Editor selten zwischen Fragen mit grossen PDFs; YAGNI.
 
 ### Sicherheit und Privacy
 
@@ -135,14 +139,16 @@ LP klickt "Next" → Frage X+1
 ### Trigger 2
 
 ```
-SuS sieht Frage 5 mit Material-PDF
+SuS sieht Frage 5 (mit oder ohne PDF-Anhang)
   → UebungsScreen rendert
-  → usePrefetchAssets([material-url-frage-6, material-url-frage-7])
+  → Aufrufer berechnet: erstes PDF unter session.fragen[6].anhaenge
+    → Wenn vorhanden: drivePreviewUrl(driveFileId)
+  → usePrefetchAssets([drive-preview-url-frage-6])
     → <link rel="prefetch" href="..."> in document.head
     → Browser lädt PDF im Hintergrund (low priority)
 
 SuS klickt "Weiter" → Frage 6
-  → MaterialPanel rendert iframe mit src=...
+  → FrageAnhaenge → MediaAnhang rendert <iframe src={drivePreviewUrl(driveFileId)}>
   → Browser holt PDF aus eigenem Cache → instant
 ```
 
@@ -152,7 +158,7 @@ SuS klickt "Weiter" → Frage 6
 |---|---|
 | Backend liefert 401/403 für Nachbar-Frage | `fragenbankStore.ladeDetail` returnt `null`, Hook ignoriert. Keine UI-Folge. |
 | Browser unterstützt `<link rel="prefetch">` nicht | Tag wird gesetzt, Browser ignoriert. Keine UI-Folge. |
-| `material[]` ist leer / `url` ist leer | Hook bekommt leeres URL-Array, fügt nichts ein. |
+| `anhaenge[]` ist leer oder enthält keine PDFs | Aufrufer übergibt leeres URL-Array, Hook fügt nichts ein. |
 | LP klickt schnell durch 5 Fragen | Debounce hält Prefetch zurück, nur die letzte stabile Frage löst Prefetch. |
 | Komponente unmountet während Prefetch läuft | AbortController bricht ab, kein Memory-Leak. |
 | Zwei Komponenten fordern selbe URL | Refcount-Dedup, Tag bleibt bis beide unmounted. |
@@ -183,7 +189,7 @@ SuS klickt "Weiter" → Frage 6
 **E2E-Browser-Test (auf staging):**
 
 - LP-Login `wr.test@gymhofwil.ch`, FragenBrowser öffnen, beliebige Frage editieren, Network-Tab beobachten: drei `ladeFrageDetail`-Calls (für X, X-1, X+1) innerhalb der ersten Sekunde nach Editor-Open. Anschliessend "Next" klicken, Editor rendert sofort, kein neuer Backend-Call sichtbar.
-- SuS-Login `wr.test@stud.gymhofwil.ch`, Übung mit Material-Frage starten. DevTools → Network → Filter "PDF": die nächste Frage-Material-URL erscheint als Prefetch-Request (Initiator: link). Bei Klick auf "Weiter" lädt das PDF aus dem Disk-Cache (Status 200, "from disk cache" oder Time < 50 ms).
+- SuS-Login `wr.test@stud.gymhofwil.ch`, Übung mit PDF-Anhang in einer Folgefrage starten. DevTools → Network → Filter "PDF": die nächste-Frage-PDF-URL (`drivePreviewUrl`) erscheint als Prefetch-Request (Initiator: `link`). Bei Klick auf "Weiter" lädt das PDF aus dem Disk-Cache (Status 200, "from disk cache" oder Time < 50 ms).
 
 ## Risiken und Open Questions
 
@@ -196,5 +202,5 @@ SuS klickt "Weiter" → Frage 6
 - Vitest grün (Frontend, alle bestehenden + neue Tests)
 - `tsc -b` clean
 - `npm run build` erfolgreich
-- E2E auf staging: Editor-Nav (FragenBrowser) instant, Material-Open instant für die nächste Frage einer Übung
+- E2E auf staging: Editor-Nav (FragenBrowser) instant, PDF-Anhang-Open instant für die nächste Frage einer Übung
 - Keine Regression: SuS-Üben startet weiterhin in <4 s, FragenBrowser öffnet erste Frage normal, Korrektur-Workflow unverändert
