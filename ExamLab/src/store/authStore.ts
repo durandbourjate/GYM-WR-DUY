@@ -188,6 +188,8 @@ export const useAuthStore = create<AuthStore>((set) => ({
   },
 
   abmelden: () => {
+    // Bundle G.c — Frontend-Cache + IDB-Cache leeren bevor User wechselt
+    useFragenbankStore.getState().reset()
     clearSession()
     resetPruefungState()
     set({ user: null, istDemoModus: false, ladeStatus: 'idle', fehler: null })
