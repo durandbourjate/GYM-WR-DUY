@@ -8972,6 +8972,73 @@ function lernplattformPreWarmFragen(body) {
 }
 
 /**
+ * Bundle G.a Trigger D — Inline-Pre-Warm der Korrektur-Daten nach SuS-Abgabe.
+ *
+ * Wird aus speichereAntworten im istAbgabe===true-Pfad aufgerufen (try/catch).
+ * Liest fragenIds aus Configs-Sheet anhand pruefungId und befüllt CacheService
+ * via bulkLadeFragenAusSheet_.
+ *
+ * Cache-Granularität pro Lobby-Tab: erste Abgabe wärmt den Tab, weitere
+ * Abgaben derselben Lobby finden den Tab schon warm (~10 ms statt ~200 ms).
+ *
+ * @param {string} pruefungId
+ * @param {string} susEmail (für Logging)
+ */
+function preWarmKorrekturNachAbgabe_(pruefungId, susEmail) {
+  var startMs = Date.now();
+  try {
+    // fragenIds aus Configs-Sheet extrahieren (analog speichereAntworten Z.~3052)
+    var configSheet = SpreadsheetApp.openById(CONFIGS_ID).getSheetByName('Configs');
+    var configRow = getSheetData(configSheet).find(function(r) { return r.id === pruefungId; });
+    if (!configRow) {
+      console.log('[PreWarmKorrektur] Config nicht gefunden: ' + pruefungId);
+      return;
+    }
+
+    // abschnitte ist JSON-String in der Sheet-Spalte
+    var abschnitte;
+    try {
+      abschnitte = JSON.parse(configRow.abschnitte || '[]');
+    } catch (e) {
+      console.log('[PreWarmKorrektur] abschnitte-Parse-Fehler: ' + e.message);
+      return;
+    }
+
+    var fragenIds = [];
+    for (var i = 0; i < abschnitte.length; i++) {
+      var ids = abschnitte[i].fragenIds || abschnitte[i].fragen || [];
+      for (var j = 0; j < ids.length; j++) {
+        // ids[j] kann String oder {id, ...}-Objekt sein
+        var fid = typeof ids[j] === 'string' ? ids[j] : (ids[j] && ids[j].id);
+        if (fid) fragenIds.push(fid);
+      }
+    }
+
+    if (fragenIds.length === 0) {
+      console.log('[PreWarmKorrektur] keine fragenIds in pruefung=' + pruefungId);
+      return;
+    }
+
+    // Bulk-Read pro Tab (Bundle-E-Helper)
+    var gruppeId = configRow.klasse || ''; // gruppeId-Heuristik analog ladeFrageUnbereinigtById_
+    var fachbereich = (configRow.fachbereiche || '').split(',')[0] || '';
+    var byTab = gruppiereFragenIdsNachTab_(fragenIds, gruppeId, fachbereich);
+    for (var sheetId in byTab) {
+      for (var tab in byTab[sheetId]) {
+        bulkLadeFragenAusSheet_(sheetId, tab, byTab[sheetId][tab]);
+      }
+    }
+
+    var latenzMs = Date.now() - startMs;
+    Logger.log('[PreWarmKorrektur] pruefungId=%s sus=%s n=%s ms=%s',
+               pruefungId, susEmail, fragenIds.length, latenzMs);
+
+  } catch (e) {
+    console.log('[PreWarmKorrektur-Fehler] ' + e.message);
+  }
+}
+
+/**
  * Frage unbereinigt laden — für Server-Korrektur.
  * Familie-Gruppen mit eigenem Sheet: aus gruppe.fragebankSheetId lesen.
  * Alle anderen: aus globaler FRAGENBANK_ID.
