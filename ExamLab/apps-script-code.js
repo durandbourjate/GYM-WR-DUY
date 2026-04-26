@@ -13469,3 +13469,50 @@ function testPreWarmEffekt_() {
 }
 
 function testPreWarmEffekt() { return testPreWarmEffekt_(); }
+
+/**
+ * Test-Shim für preWarmKorrekturNachAbgabe_ (Trigger D).
+ *
+ * Cases:
+ *   (a) Erste Abgabe einer Lobby → Cache-Befüllung messbar (~50-200 ms)
+ *   (b) Zweite Abgabe derselben Lobby → Cache schon warm, Overhead ~10 ms
+ */
+function testPreWarmKorrekturNachAbgabe_() {
+  var assert_ = function(cond, msg) {
+    if (!cond) throw new Error('ASSERT FAILED: ' + msg);
+  };
+
+  // Setup: existierende Test-Prüfung mit pruefungId aus Configs-Sheet wählen
+  var configSheet = SpreadsheetApp.openById(CONFIGS_ID).getSheetByName('Configs');
+  var configs = getSheetData(configSheet);
+  // Erste Test-Prüfung mit nicht-leerer abschnitte-Spalte
+  var testConfig = configs.find(function(c) {
+    return c.id && c.abschnitte && c.abschnitte.length > 2; // nicht leer "[]"
+  });
+  assert_(testConfig, 'Brauche eine Test-Prüfung mit abschnitten in Configs-Sheet');
+
+  // Cache-Reset
+  var cache = CacheService.getScriptCache();
+  // Tab-Cache-Keys nicht direkt rauspflücken — Bundle E nutzt frage_v1_<sheetId>_<frageId>.
+  // Wir messen Differenz zwischen 1. und 2. Aufruf, auch wenn vorher etwas im Cache war.
+
+  // (a) Erste Abgabe
+  var t1 = Date.now();
+  preWarmKorrekturNachAbgabe_(testConfig.id, 'wr.test@stud.gymhofwil.ch');
+  var ms1 = Date.now() - t1;
+  Logger.log('Case (a) Erste Abgabe: %s ms', ms1);
+
+  // (b) Zweite Abgabe
+  var t2 = Date.now();
+  preWarmKorrekturNachAbgabe_(testConfig.id, 'wr.test2@stud.gymhofwil.ch');
+  var ms2 = Date.now() - t2;
+  Logger.log('Case (b) Zweite Abgabe: %s ms (sollte schneller als (a) sein)', ms2);
+
+  // Soft-Assertion: zweite Abgabe sollte deutlich schneller sein (Cache warm)
+  Logger.log('Cache-Effekt-Verhältnis: ms2/ms1 = %s%% (Ziel <50%%)',
+             Math.round(100 * ms2 / Math.max(ms1, 1)));
+
+  Logger.log('=== testPreWarmKorrekturNachAbgabe — beide Cases gelaufen ===');
+}
+
+function testPreWarmKorrekturNachAbgabe() { return testPreWarmKorrekturNachAbgabe_(); }
