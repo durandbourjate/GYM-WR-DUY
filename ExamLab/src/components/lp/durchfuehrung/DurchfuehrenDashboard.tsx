@@ -5,6 +5,7 @@ import DurchfuehrenSusReihenSkeleton from '../skeletons/DurchfuehrenSusReihenSke
 import { useAuthStore } from '../../../store/authStore.ts'
 import { apiService } from '../../../services/apiService.ts'
 import { preWarmKorrektur } from '../../../services/preWarmApi'
+import { schreibeGespeicherteAnzahl } from '../../../utils/skeletonAnzahl'
 import { erstelleDemoMonitoring } from '../../../data/demoMonitoring.ts'
 import { demoFragen } from '../../../data/demoFragen.ts'
 import { einrichtungsPruefung } from '../../../data/einrichtungsPruefung.ts'
@@ -140,6 +141,9 @@ export default function DurchfuehrenDashboard({ pruefungId }: { pruefungId: stri
   // AbortController für Monitoring-Polling (Overlap-Schutz)
   const monitoringAbortRef = useRef<AbortController | null>(null)
 
+  // G.f.2 — letzter geschriebener Wert für localStorage-Persist (verhindert redundante Writes)
+  const letzteGeschriebeneAnzahlRef = useRef<number | null>(null)
+
   // Verbindungsfehler-Tracking (Ref statt State → kein useCallback-Rebuild)
   const fehlerCountRef = useRef(0)
   const [zeigeVerbindungsBanner, setZeigeVerbindungsBanner] = useState(false)
@@ -235,6 +239,16 @@ export default function DurchfuehrenDashboard({ pruefungId }: { pruefungId: stri
     const interval = setInterval(ladeDaten, intervallMs)
     return () => clearInterval(interval)
   }, [autoRefresh, ladeStatus, ladeDaten, phase])
+
+  // G.f.2 — SuS-Anzahl pro pruefungId persistieren für layout-akkurates Skeleton
+  useEffect(() => {
+    if (ladeStatus !== 'fertig' || !pruefungId) return
+    const anzahl = daten?.schueler?.length ?? 0
+    if (anzahl <= 0) return
+    if (letzteGeschriebeneAnzahlRef.current === anzahl) return
+    schreibeGespeicherteAnzahl(`examlab-lp-letzte-sus-anzahl-${pruefungId}`, anzahl)
+    letzteGeschriebeneAnzahlRef.current = anzahl
+  }, [ladeStatus, daten?.schueler?.length, pruefungId])
 
   // Abgaben + Fragen + Config einmalig laden (ladePruefung gibt beides zurück)
   useEffect(() => {
