@@ -81,8 +81,8 @@ Beim erfolgreichen Configs-Laden persistieren wir die zwei Counts:
 ```ts
 // Nach erfolgreichem ladeAlleConfigs:
 try {
-  localStorage.setItem('examlab.lp.lastSummativeCount', String(summativeConfigs.length))
-  localStorage.setItem('examlab.lp.lastFormativeCount', String(formativeConfigs.length))
+  localStorage.setItem('examlab-lp-letzte-summative-anzahl', String(summativeConfigs.length))
+  localStorage.setItem('examlab-lp-letzte-formative-anzahl', String(formativeConfigs.length))
 } catch { /* sessionStorage nicht verfügbar */ }
 ```
 
@@ -175,7 +175,7 @@ configsLadeStatus = 'laden' → LPCardsSkeleton sichtbar
   ↓
 configsLadeStatus = 'fertig', echte Cards rendern
   ↓
-localStorage.setItem('examlab.lp.lastSummativeCount', ...)
+localStorage.setItem('examlab-lp-letzte-summative-anzahl', ...)
 ```
 
 ### Use-Case B — Tab-Wechsel zu Tracker während Lade
@@ -197,7 +197,7 @@ trackerLadeStatus = 'fertig', echter TrackerSection rendert
 ```
 LP-Login zum 2.+ Mal in der Browser-Geschichte
   ↓
-LPCardsSkeleton liest localStorage 'examlab.lp.lastSummativeCount' = 12
+LPCardsSkeleton liest localStorage 'examlab-lp-letzte-summative-anzahl' = 12
   ↓
 12 Karten-Placeholder erscheinen — match dem User-typischen Anzahl
   ↓
@@ -300,9 +300,10 @@ trackerLadeStatus = 'fertig' && !trackerDaten
 1. **Drei Skeleton-Komponenten** (`LPCardsSkeleton`, `LPTrackerSkeleton`, `LPUebungenSkeleton`) als isolierte Files mit Unit-Tests
 2. **localStorage-Helper** `leseGespeicherteAnzahl` als Util in `src/utils/`
 3. **`LPStartseite.tsx`** Refactor:
-   - `ladeStatus` umbenannt zu `configsLadeStatus`
-   - `trackerLadeStatus`-State hinzugefügt + bei Tracker-Lade-Resolve gesetzt
-   - localStorage-Persist nach erfolgreichem Configs-Lade
+   - `ladeStatus` umbenannt zu `configsLadeStatus` (~9 Aufruf-Stellen, alle mit `setLadeStatus` mitumbenennen)
+   - `trackerLadeStatus`-State hinzugefügt + bei Tracker-Lade-Resolve gesetzt (sowohl im success- als auch im catch-Pfad)
+   - **`handleZurueck` (Z. 421-434)**: bei Re-Load auch `setTrackerLadeStatus('laden')` setzen, sonst zeigt Tracker-Tab keinen Skeleton während Re-Load
+   - localStorage-Persist nach erfolgreichem Configs-Lade (Bindestrich-Convention `examlab-lp-letzte-summative-anzahl` analog `examlab-ueben-letzter-kurs`)
    - Globaler `<LPSkeleton />` Early-Return entfernt (Z. 446)
    - Pro-Section Skeleton-Render-Pattern eingeführt
    - "Übungen werden geladen…"-Text-Label entfernt (Z. 489)
