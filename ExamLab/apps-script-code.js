@@ -1396,6 +1396,8 @@ function doPost(e) {
       return lernplattformLadeLoesungen(body);
     case 'lernplattformPreWarmFragen':
       return lernplattformPreWarmFragen(body);
+    case 'lernplattformPreWarmKorrektur':
+      return lernplattformPreWarmKorrektur(body);
 
     // Fortschritt
     case 'lernplattformSpeichereFortschritt':
@@ -9048,6 +9050,67 @@ function lernplattformPreWarmFragen(body) {
 }
 
 /**
+ * Bundle G.d.1 Hebel C — Pre-Warm der Korrektur-Daten.
+ *
+ * LP-only. Cached die ladeKorrekturBerechne_-Response für 60s unter
+ * Key 'korrektur_data_' + pruefungId. ladeKorrektur prüft denselben Key.
+ *
+ * CacheService-Soft-Lock (30s TTL) auf 'prewarm_korrektur_' + pruefungId
+ * dedupliziert Re-Klicks (LP klickt Tab Auswertung 2× kurz hintereinander).
+ *
+ * Body: { email, sessionToken?, pruefungId }
+ * Response: { success: true, latenzMs: X }
+ *         | { success: true, deduped: true }
+ *         | { error: 'Nicht autorisiert' | 'Pruefung nicht gefunden' | <fehler> }
+ */
+function lernplattformPreWarmKorrektur(body) {
+  var startMs = Date.now();
+  try {
+    var email = (body.email || '').toLowerCase().trim();
+    var pruefungId = body.pruefungId;
+
+    if (!pruefungId) return jsonResponse({ error: 'Pruefung nicht gefunden' });
+    if (!email || !istZugelasseneLP(email)) {
+      return jsonResponse({ error: 'Nicht autorisiert' });
+    }
+
+    // Soft-Lock (30s) gegen Re-Klick-Doppel-Read
+    var cache = CacheService.getScriptCache();
+    var lockKey = 'prewarm_korrektur_' + pruefungId;
+    if (cache.get(lockKey)) {
+      return jsonResponse({ success: true, deduped: true });
+    }
+    cache.put(lockKey, '1', 30);
+
+    var data = ladeKorrekturBerechne_(pruefungId);
+    if (!data) {
+      return jsonResponse({ error: 'Pruefung nicht gefunden' });
+    }
+    data.letzteAktualisierung = new Date().toISOString();
+
+    // Cache-Eintrag setzen — ladeKorrektur findet ihn
+    try {
+      var serialized = JSON.stringify(data);
+      var bytes = Utilities.newBlob(serialized).getBytes().length;
+      if (bytes <= 80000) {
+        cache.put('korrektur_data_' + pruefungId, serialized, 60);
+      } else {
+        Logger.log('[PreWarmKorrektur] body=%s Bytes > 80000, kein Cache-Put', bytes);
+      }
+    } catch (e) {
+      console.log('[PreWarmKorrektur] Cache-Put-Fehler: ' + e.message);
+    }
+
+    var latenzMs = Date.now() - startMs;
+    Logger.log('[PreWarmKorrektur] pruefungId=%s ms=%s', pruefungId, latenzMs);
+    return jsonResponse({ success: true, latenzMs: latenzMs });
+  } catch (e) {
+    console.log('[PreWarmKorrektur-Fehler] ' + e.message);
+    return jsonResponse({ error: e.message });
+  }
+}
+
+/**
  * Bundle G.a Trigger D — Inline-Pre-Warm der Korrektur-Daten nach SuS-Abgabe.
  *
  * Wird aus speichereAntworten im istAbgabe===true-Pfad aufgerufen (try/catch).
@@ -13701,6 +13764,57 @@ function testPreWarmFragenBeimFreischalten_() {
   Logger.log('=== testPreWarmFragenBeimFreischalten_ alle Cases gruen ===');
 }
 function testPreWarmFragenBeimFreischalten() { testPreWarmFragenBeimFreischalten_(); }
+
+/**
+ * Test-Shim für lernplattformPreWarmKorrektur (Bundle G.d.1 Hebel C).
+ */
+function testPreWarmKorrektur_() {
+  var configSheet = SpreadsheetApp.openById(CONFIGS_ID).getSheetByName('Configs');
+  var rows = getSheetData(configSheet);
+  if (rows.length === 0) throw new Error('Keine Pruefung in Configs');
+  var testConfig = rows[0];
+  var testLP = 'wr.test@gymhofwil.ch'; // muss in istZugelasseneLP sein
+  Logger.log('Test-Pruefung: id=%s', testConfig.id);
+
+  var cache = CacheService.getScriptCache();
+  cache.remove('prewarm_korrektur_' + testConfig.id);
+  cache.remove('korrektur_data_' + testConfig.id);
+
+  // Case (a) Cold-Call
+  var t1 = Date.now();
+  var r1 = JSON.parse(lernplattformPreWarmKorrektur({
+    email: testLP, pruefungId: testConfig.id
+  }).getContent());
+  Logger.log('Case (a) Cold: success=%s ms=%s', r1.success, Date.now() - t1);
+  assert_(r1.success === true, 'Cold-Call kein success');
+  assert_(typeof r1.latenzMs === 'number', 'Cold-Call latenzMs fehlt');
+  assert_(cache.get('korrektur_data_' + testConfig.id), 'Cache nach Cold-Call leer');
+
+  // Case (b) Deduped
+  var r2 = JSON.parse(lernplattformPreWarmKorrektur({
+    email: testLP, pruefungId: testConfig.id
+  }).getContent());
+  Logger.log('Case (b) Deduped: success=%s deduped=%s', r2.success, r2.deduped);
+  assert_(r2.deduped === true, 'Zweiter Call nicht deduped');
+
+  // Case (c) Auth-Fail
+  var r3 = JSON.parse(lernplattformPreWarmKorrektur({
+    email: 'fremder@example.com', pruefungId: testConfig.id
+  }).getContent());
+  Logger.log('Case (c) Auth-Fail: error=%s', r3.error);
+  assert_(r3.error === 'Nicht autorisiert', 'Fremder LP nicht abgelehnt');
+
+  // Case (d) Pruefung nicht gefunden
+  var r4 = JSON.parse(lernplattformPreWarmKorrektur({
+    email: testLP, pruefungId: 'inexistente-id-xyz'
+  }).getContent());
+  // ladeKorrekturBerechne_ liefert immer Body (auch wenn Sheet nicht gefunden) — kein Crash erwartet
+  Logger.log('Case (d) Unbekannte ID: success=%s deduped=%s error=%s',
+             r4.success, r4.deduped, r4.error);
+
+  Logger.log('=== testPreWarmKorrektur_ alle Cases gruen ===');
+}
+function testPreWarmKorrektur() { testPreWarmKorrektur_(); }
 
 // Top-Level assert_ — alle bestehenden assert_-Definitionen sind function-scoped
 // (innerhalb anderer Test-Shims) und damit von hier aus nicht erreichbar.
