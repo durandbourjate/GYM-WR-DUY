@@ -228,7 +228,7 @@ export default function DurchfuehrenDashboard({ pruefungId }: { pruefungId: stri
   // Auto-Refresh: 5s in Live-Phase (kritisch), 15s sonst (spart Connections für Button-Clicks)
   useEffect(() => {
     if (!autoRefresh || ladeStatus === 'fehler') return
-    const intervallMs = phase === 'aktiv' ? 5000 : 15000
+    const intervallMs = (phase === 'aktiv' || phase === 'lobby') ? 5000 : 15000
     const interval = setInterval(ladeDaten, intervallMs)
     return () => clearInterval(interval)
   }, [autoRefresh, ladeStatus, ladeDaten, phase])
