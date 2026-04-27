@@ -8,6 +8,21 @@
 
 ## Für die nächste Session (S154)
 
+### In Arbeit (S154, 27.04.2026) — Bundle G.e (Fragensammlung-Virtualisierung)
+
+Branch: `feature/bundle-g-e-virtualisierung` (Worktree)
+
+**Baseline (vor G.e, Phase 0 vom User in Browser nachzuholen):**
+- DOM-Knoten: <BASELINE_DOM_NODES> (User-Mess Phase 0)
+- Initial-Render: <BASELINE_INITIAL_MS> ms (User-Mess Phase 0)
+- Heap-Snapshot: <BASELINE_HEAP_MB> MB (User-Mess Phase 0)
+- Bundle-Size (vor `@tanstack/react-virtual`): nicht erfasst, Worktree-Build vor S154-Start ist die Referenz
+
+**Bundle-Diff nach Task 1 (`@tanstack/react-virtual` installiert):**
+- Bundle-Size unverändert relevant (Lib lazy-loaded ins LPStartseite-Chunk, ~6 KB gzipped erwartet)
+
+---
+
 ### Aktueller Stand (S153, 27.04.2026) — Bundle G.d.2 auf `main` (Stammdaten-IDB-Cache)
 
 **Was die Session machte:** Plan-Phase via `writing-plans`-Skill (1 Reviewer-Loop, approved) → Implementation via `subagent-driven-development`-Skill (5 Implementer-Subagents + 5 Spec-Reviews + 5 Code-Quality-Reviews + 2 Inline-Tasks) → Voll-Verify (tsc + 772 vitest + build) → Browser-E2E mit echten Logins → 1 Bug entdeckt + Fix-Loop → Re-E2E → Merge auf `main`.
