@@ -1396,6 +1396,8 @@ function doPost(e) {
       return lernplattformLadeLoesungen(body);
     case 'lernplattformPreWarmFragen':
       return lernplattformPreWarmFragen(body);
+    case 'lernplattformPreWarmKorrektur':
+      return lernplattformPreWarmKorrektur(body);
 
     // Fortschritt
     case 'lernplattformSpeichereFortschritt':
@@ -6552,6 +6554,92 @@ function getOrCreateKorrekturSheet(pruefungId) {
 
 function setKorrekturStatus(sheet, status, erledigt, gesamt) {
   sheet.getRange('Z1').setValue(JSON.stringify({ status, erledigt, gesamt, timestamp: new Date().toISOString() }));
+  // Bundle G.d.1 — Cache-Invalidierung. pruefungId aus Sheet-Name 'Korrektur_<id>' extrahieren.
+  try {
+    var name = sheet.getName();
+    if (name && name.indexOf('Korrektur_') === 0) {
+      CacheService.getScriptCache().remove('korrektur_data_' + name.substring(10));
+    }
+  } catch (e) { /* fail-silent */ }
+}
+
+/**
+ * Bundle G.d.1 — Berechnet die Korrektur-Body-Struktur (ohne jsonResponse-Wrapping
+ * und ohne letzteAktualisierung). Auth-Check ist Caller-Responsibility.
+ *
+ * Wird von ladeKorrektur und lernplattformPreWarmKorrektur genutzt.
+ *
+ * @returns {Object} Body. Bei fehlendem Sheet leerer Schueler-Array + idle-Status.
+ */
+function ladeKorrekturBerechne_(pruefungId) {
+  var sheet = ANTWORTEN_MASTER_ID
+    ? SpreadsheetApp.openById(ANTWORTEN_MASTER_ID).getSheetByName('Korrektur_' + pruefungId)
+    : null;
+
+  var configSheet = SpreadsheetApp.openById(CONFIGS_ID).getSheetByName('Configs');
+  var configRow = getSheetData(configSheet).find(function(r) { return r.id === pruefungId; });
+
+  if (!sheet) {
+    return {
+      pruefungId: pruefungId,
+      pruefungTitel: configRow ? configRow.titel : pruefungId,
+      datum: configRow ? configRow.datum : '',
+      klasse: configRow ? configRow.klasse : '',
+      schueler: [],
+      batchStatus: 'idle',
+    };
+  }
+
+  var data = getSheetData(sheet);
+  var statusJson = safeJsonParse(sheet.getRange('Z1').getValue(), { status: 'idle' });
+  var schuelerMap = {};
+  for (var i = 0; i < data.length; i++) {
+    var row = data[i];
+    if (!row.email) continue;
+    if (!schuelerMap[row.email]) {
+      schuelerMap[row.email] = {
+        email: row.email, name: row.name || row.email,
+        bewertungen: {}, gesamtPunkte: 0, maxPunkte: 0, korrekturStatus: 'offen',
+      };
+    }
+    var b = {
+      frageId: row.frageId, fragenTyp: row.fragenTyp || '',
+      maxPunkte: Number(row.maxPunkte) || 0,
+      kiPunkte: row.kiPunkte !== '' ? Number(row.kiPunkte) : null,
+      lpPunkte: row.lpPunkte !== '' ? Number(row.lpPunkte) : null,
+      kiBegruendung: row.kiBegruendung || null,
+      kiFeedback: row.kiFeedback || null,
+      lpKommentar: row.lpKommentar || null,
+      quelle: row.quelle || 'auto',
+      geprueft: row.geprueft === 'true',
+    };
+    schuelerMap[row.email].bewertungen[row.frageId] = b;
+    var eff = b.lpPunkte !== null ? b.lpPunkte : (b.kiPunkte !== null ? b.kiPunkte : 0);
+    schuelerMap[row.email].gesamtPunkte += eff;
+    schuelerMap[row.email].maxPunkte += b.maxPunkte;
+  }
+
+  var schuelerKeys = Object.keys(schuelerMap);
+  for (var k = 0; k < schuelerKeys.length; k++) {
+    var s = schuelerMap[schuelerKeys[k]];
+    var bewertungen = Object.values(s.bewertungen);
+    if (bewertungen.every(function(b) { return b.geprueft; })) {
+      s.korrekturStatus = 'review-fertig';
+    } else if (bewertungen.some(function(b) { return b.quelle === 'ki' || b.quelle === 'auto'; })) {
+      s.korrekturStatus = 'ki-bewertet';
+    }
+  }
+
+  return {
+    pruefungId: pruefungId,
+    pruefungTitel: configRow ? configRow.titel : pruefungId,
+    datum: configRow ? configRow.datum : '',
+    klasse: configRow ? configRow.klasse : '',
+    schueler: Object.values(schuelerMap),
+    batchStatus: statusJson.status || 'idle',
+    batchFortschritt: statusJson.erledigt !== undefined
+      ? { erledigt: statusJson.erledigt, gesamt: statusJson.gesamt } : undefined,
+  };
 }
 
 function ladeKorrektur(pruefungId, email) {
@@ -6560,73 +6648,39 @@ function ladeKorrektur(pruefungId, email) {
       return jsonResponse({ error: 'Nur für Lehrpersonen' });
     }
 
-    const sheet = ANTWORTEN_MASTER_ID
-      ? SpreadsheetApp.openById(ANTWORTEN_MASTER_ID).getSheetByName('Korrektur_' + pruefungId)
-      : null;
-
-    if (!sheet) {
-      const configSheet = SpreadsheetApp.openById(CONFIGS_ID).getSheetByName('Configs');
-      const configRow = getSheetData(configSheet).find(r => r.id === pruefungId);
-      return jsonResponse({
-        pruefungId,
-        pruefungTitel: configRow ? configRow.titel : pruefungId,
-        datum: configRow ? configRow.datum : '',
-        klasse: configRow ? configRow.klasse : '',
-        schueler: [],
-        batchStatus: 'idle',
-        letzteAktualisierung: new Date().toISOString(),
-      });
-    }
-    const data = getSheetData(sheet);
-    const statusJson = safeJsonParse(sheet.getRange('Z1').getValue(), { status: 'idle' });
-    const configSheet = SpreadsheetApp.openById(CONFIGS_ID).getSheetByName('Configs');
-    const configRow = getSheetData(configSheet).find(r => r.id === pruefungId);
-
-    const schuelerMap = {};
-    for (const row of data) {
-      if (!row.email) continue;
-      if (!schuelerMap[row.email]) {
-        schuelerMap[row.email] = {
-          email: row.email, name: row.name || row.email,
-          bewertungen: {}, gesamtPunkte: 0, maxPunkte: 0, korrekturStatus: 'offen',
-        };
-      }
-      const b = {
-        frageId: row.frageId, fragenTyp: row.fragenTyp || '',
-        maxPunkte: Number(row.maxPunkte) || 0,
-        kiPunkte: row.kiPunkte !== '' ? Number(row.kiPunkte) : null,
-        lpPunkte: row.lpPunkte !== '' ? Number(row.lpPunkte) : null,
-        kiBegruendung: row.kiBegruendung || null,
-        kiFeedback: row.kiFeedback || null,
-        lpKommentar: row.lpKommentar || null,
-        quelle: row.quelle || 'auto',
-        geprueft: row.geprueft === 'true',
-      };
-      schuelerMap[row.email].bewertungen[row.frageId] = b;
-      const eff = b.lpPunkte !== null ? b.lpPunkte : (b.kiPunkte !== null ? b.kiPunkte : 0);
-      schuelerMap[row.email].gesamtPunkte += eff;
-      schuelerMap[row.email].maxPunkte += b.maxPunkte;
-    }
-
-    for (const s of Object.values(schuelerMap)) {
-      const bewertungen = Object.values(s.bewertungen);
-      if (bewertungen.every(b => b.geprueft)) {
-        s.korrekturStatus = 'review-fertig';
-      } else if (bewertungen.some(b => b.quelle === 'ki' || b.quelle === 'auto')) {
-        s.korrekturStatus = 'ki-bewertet';
+    // Bundle G.d.1 — Cache-Hit-Pfad
+    var cache = CacheService.getScriptCache();
+    var cacheKey = 'korrektur_data_' + pruefungId;
+    var cached = cache.get(cacheKey);
+    if (cached) {
+      try {
+        var cachedBody = JSON.parse(cached);
+        cachedBody.letzteAktualisierung = new Date().toISOString();
+        return jsonResponse(cachedBody);
+      } catch (e) {
+        console.log('[ladeKorrektur] Cache-Parse-Fehler: ' + e.message);
+        // Fall-through zu Sheet-Read
       }
     }
 
-    return jsonResponse({
-      pruefungId,
-      pruefungTitel: configRow ? configRow.titel : pruefungId,
-      datum: configRow ? configRow.datum : '',
-      klasse: configRow ? configRow.klasse : '',
-      schueler: Object.values(schuelerMap),
-      batchStatus: statusJson.status || 'idle',
-      batchFortschritt: statusJson.erledigt !== undefined ? { erledigt: statusJson.erledigt, gesamt: statusJson.gesamt } : undefined,
-      letzteAktualisierung: new Date().toISOString(),
-    });
+    var body = ladeKorrekturBerechne_(pruefungId);
+    body.letzteAktualisierung = new Date().toISOString();
+
+    // Cache befüllen (best-effort, nicht blockierend)
+    try {
+      var serialized = JSON.stringify(body);
+      // Echter Byte-Count gegen CacheService-100KB-Limit, 80KB als Sicherheits-Threshold
+      var bytes = Utilities.newBlob(serialized).getBytes().length;
+      if (bytes <= 80000) {
+        cache.put(cacheKey, serialized, 60);
+      } else {
+        Logger.log('[ladeKorrektur] body=%s Bytes > 80000, kein Cache-Put', bytes);
+      }
+    } catch (e) {
+      console.log('[ladeKorrektur] Cache-Put-Fehler: ' + e.message);
+    }
+
+    return jsonResponse(body);
   } catch (error) {
     return jsonResponse({ error: error.message });
   }
@@ -6797,6 +6851,11 @@ function speichereKorrekturZeile(body) {
       });
     }
 
+    // Bundle G.d.1 — Cache-Invalidierung
+    try {
+      CacheService.getScriptCache().remove('korrektur_data_' + pruefungId);
+    } catch (e) { /* fail-silent */ }
+
     return jsonResponse({ success: true });
   } catch (error) {
     return jsonResponse({ error: error.message });
@@ -6925,6 +6984,13 @@ function schalteFreiEndpoint(body) {
     const col = headers.indexOf('freigeschaltet');
     if (col >= 0) {
       configSheet.getRange(rowIndex + 2, col + 1).setValue('true');
+    }
+
+    // Bundle G.d.1 Hebel B — Inline-Pre-Warm der Frage-Daten
+    try {
+      preWarmFragenBeimFreischalten_(pruefungId);
+    } catch (e) {
+      console.log('[SchalteFrei-PreWarm-Fehler] ' + e.message);
     }
 
     return jsonResponse({ success: true });
@@ -8984,6 +9050,70 @@ function lernplattformPreWarmFragen(body) {
 }
 
 /**
+ * Bundle G.d.1 Hebel C — Pre-Warm der Korrektur-Daten.
+ *
+ * LP-only. Cached die ladeKorrekturBerechne_-Response für 60s unter
+ * Key 'korrektur_data_' + pruefungId. ladeKorrektur prüft denselben Key.
+ *
+ * CacheService-Soft-Lock (30s TTL) auf 'prewarm_korrektur_' + pruefungId
+ * dedupliziert Re-Klicks (LP klickt Tab Auswertung 2× kurz hintereinander).
+ *
+ * Body: { email, sessionToken?, pruefungId }
+ * Response: { success: true, latenzMs: X }
+ *         | { success: true, deduped: true }
+ *         | { error: 'Nicht autorisiert' | 'Pruefung nicht gefunden' | <fehler> }
+ */
+function lernplattformPreWarmKorrektur(body) {
+  var startMs = Date.now();
+  try {
+    var email = (body.email || '').toLowerCase().trim();
+    var pruefungId = body.pruefungId;
+
+    if (!pruefungId) return jsonResponse({ error: 'Pruefung nicht gefunden' });
+    if (!email || !istZugelasseneLP(email)) {
+      return jsonResponse({ error: 'Nicht autorisiert' });
+    }
+
+    // Soft-Lock (30s) gegen Re-Klick-Doppel-Read
+    var cache = CacheService.getScriptCache();
+    var lockKey = 'prewarm_korrektur_' + pruefungId;
+    if (cache.get(lockKey)) {
+      return jsonResponse({ success: true, deduped: true });
+    }
+    cache.put(lockKey, '1', 30);
+
+    var data = ladeKorrekturBerechne_(pruefungId);
+    // Defensiv: ladeKorrekturBerechne_ liefert aktuell IMMER ein Body-Objekt
+    // (auch bei unbekannter pruefungId — dann mit schueler:[]). Branch hier nur
+    // als Schutz, falls Helper-Vertrag in Zukunft auf null/undefined umgestellt wird.
+    if (!data) {
+      return jsonResponse({ error: 'Pruefung nicht gefunden' });
+    }
+    data.letzteAktualisierung = new Date().toISOString();
+
+    // Cache-Eintrag setzen — ladeKorrektur findet ihn
+    try {
+      var serialized = JSON.stringify(data);
+      var bytes = Utilities.newBlob(serialized).getBytes().length;
+      if (bytes <= 80000) {
+        cache.put('korrektur_data_' + pruefungId, serialized, 60);
+      } else {
+        Logger.log('[PreWarmKorrektur] body=%s Bytes > 80000, kein Cache-Put', bytes);
+      }
+    } catch (e) {
+      console.log('[PreWarmKorrektur] Cache-Put-Fehler: ' + e.message);
+    }
+
+    var latenzMs = Date.now() - startMs;
+    Logger.log('[PreWarmKorrektur] pruefungId=%s ms=%s', pruefungId, latenzMs);
+    return jsonResponse({ success: true, latenzMs: latenzMs });
+  } catch (e) {
+    console.log('[PreWarmKorrektur-Fehler] ' + e.message);
+    return jsonResponse({ error: e.message });
+  }
+}
+
+/**
  * Bundle G.a Trigger D — Inline-Pre-Warm der Korrektur-Daten nach SuS-Abgabe.
  *
  * Wird aus speichereAntworten im istAbgabe===true-Pfad aufgerufen (try/catch).
@@ -9047,6 +9177,82 @@ function preWarmKorrekturNachAbgabe_(pruefungId, susEmail) {
 
   } catch (e) {
     console.log('[PreWarmKorrektur-Fehler] ' + e.message);
+  }
+}
+
+/**
+ * Bundle G.d.1 Hebel B — Inline-Pre-Warm der Frage-Daten beim LP-Klick "Freischalten".
+ *
+ * Wird aus schalteFreiEndpoint nach setValue('freigeschaltet') aufgerufen (try/catch).
+ * Liest fragenIds aus Configs-Sheet anhand pruefungId und befüllt CacheService
+ * via bulkLadeFragenAusSheet_. CacheService-Soft-Lock (30s) dedupliziert mit
+ * G.a-Trigger A (lernplattformPreWarmFragen) — Lock-Key konkurriert NICHT
+ * (anderer Prefix), also doppelter Pre-Warm möglich aber unschädlich.
+ *
+ * Latenz-Impact auf schalteFrei-Response: ~50-200ms cold, ~10ms warm.
+ *
+ * @param {string} pruefungId
+ */
+function preWarmFragenBeimFreischalten_(pruefungId) {
+  var startMs = Date.now();
+  try {
+    // CacheService-Soft-Lock (30s) gegen Doppel-Read bei Schnell-Klicks
+    var cache = CacheService.getScriptCache();
+    var lockKey = 'prewarm_freischalten_' + pruefungId;
+    if (cache.get(lockKey)) {
+      Logger.log('[PreWarmFreischalten] dedup pruefungId=%s', pruefungId);
+      return;
+    }
+    cache.put(lockKey, '1', 30);
+
+    // fragenIds aus Configs-Sheet (analog preWarmKorrekturNachAbgabe_ Z.~9000)
+    var configSheet = SpreadsheetApp.openById(CONFIGS_ID).getSheetByName('Configs');
+    var configRow = getSheetData(configSheet).find(function(r) { return r.id === pruefungId; });
+    if (!configRow) {
+      console.log('[PreWarmFreischalten] Config nicht gefunden: ' + pruefungId);
+      return;
+    }
+
+    var abschnitte;
+    try { abschnitte = JSON.parse(configRow.abschnitte || '[]'); }
+    catch (e) {
+      console.log('[PreWarmFreischalten] abschnitte-Parse-Fehler: ' + e.message);
+      return;
+    }
+
+    var fragenIds = [];
+    for (var i = 0; i < abschnitte.length; i++) {
+      var ids = abschnitte[i].fragenIds || abschnitte[i].fragen || [];
+      for (var j = 0; j < ids.length; j++) {
+        var fid = typeof ids[j] === 'string' ? ids[j] : (ids[j] && ids[j].id);
+        if (fid) fragenIds.push(fid);
+      }
+    }
+    if (fragenIds.length === 0) {
+      console.log('[PreWarmFreischalten] keine fragenIds in pruefung=' + pruefungId);
+      return;
+    }
+
+    var gruppeId = configRow.klasse || '';
+    var fachbereich = (configRow.fachbereiche || '').split(',')[0] || '';
+    // Guard analog lernplattformPreWarmFragen Z. 8942: ohne beide Hinweise würde
+    // gruppiereFragenIdsNachTab_ undefiniert reagieren (G.a-Pattern).
+    if (!gruppeId && !fachbereich) {
+      console.log('[PreWarmFreischalten] keine gruppeId/fachbereich, skip pruefungId=' + pruefungId);
+      return;
+    }
+    var byTab = gruppiereFragenIdsNachTab_(fragenIds, gruppeId, fachbereich);
+    for (var sheetId in byTab) {
+      for (var tab in byTab[sheetId]) {
+        bulkLadeFragenAusSheet_(sheetId, tab, byTab[sheetId][tab]);
+      }
+    }
+
+    var latenzMs = Date.now() - startMs;
+    Logger.log('[PreWarmFreischalten] pruefungId=%s n=%s ms=%s',
+               pruefungId, fragenIds.length, latenzMs);
+  } catch (e) {
+    console.log('[PreWarmFreischalten-Fehler] ' + e.message);
   }
 }
 
@@ -13519,3 +13725,104 @@ function testPreWarmKorrekturNachAbgabe_() {
 }
 
 function testPreWarmKorrekturNachAbgabe() { return testPreWarmKorrekturNachAbgabe_(); }
+
+/**
+ * Test-Shim für preWarmFragenBeimFreischalten_ (Bundle G.d.1 Hebel B).
+ * Public-Wrapper testPreWarmFragenBeimFreischalten ohne trailing-Underscore
+ * (S133-Lehre: GAS-Editor-Dropdown blendet '_'-Funktionen aus).
+ */
+function testPreWarmFragenBeimFreischalten_() {
+  var configSheet = SpreadsheetApp.openById(CONFIGS_ID).getSheetByName('Configs');
+  var rows = getSheetData(configSheet).filter(function(r) { return r.abschnitte; });
+  if (rows.length === 0) {
+    throw new Error('Keine Test-Pruefung mit abschnitte gefunden');
+  }
+  var testConfig = rows[0];
+  Logger.log('Test-Config: id=%s titel=%s', testConfig.id, testConfig.titel);
+
+  // Cache cleanup vor Test
+  var cache = CacheService.getScriptCache();
+  cache.remove('prewarm_freischalten_' + testConfig.id);
+
+  // Case (a) Cold-Call
+  var t1 = Date.now();
+  preWarmFragenBeimFreischalten_(testConfig.id);
+  var ms1 = Date.now() - t1;
+  Logger.log('Case (a) Cold: ms=%s', ms1);
+  assert_(ms1 < 5000, 'Cold-Call > 5s — verdaechtig');
+  assert_(cache.get('prewarm_freischalten_' + testConfig.id) === '1',
+          'Lock-Key nach Cold-Call nicht gesetzt');
+
+  // Case (b) Deduped
+  var t2 = Date.now();
+  preWarmFragenBeimFreischalten_(testConfig.id);
+  var ms2 = Date.now() - t2;
+  Logger.log('Case (b) Deduped: ms=%s', ms2);
+  assert_(ms2 < 500, 'Deduped-Call zu langsam — Lock greift nicht');
+
+  // Case (c) Unbekannte pruefungId — kein Crash
+  preWarmFragenBeimFreischalten_('inexistente-id-xyz');
+  Logger.log('Case (c) Unbekannte ID: kein Crash');
+
+  Logger.log('=== testPreWarmFragenBeimFreischalten_ alle Cases gruen ===');
+}
+function testPreWarmFragenBeimFreischalten() { testPreWarmFragenBeimFreischalten_(); }
+
+/**
+ * Test-Shim für lernplattformPreWarmKorrektur (Bundle G.d.1 Hebel C).
+ */
+function testPreWarmKorrektur_() {
+  var configSheet = SpreadsheetApp.openById(CONFIGS_ID).getSheetByName('Configs');
+  var rows = getSheetData(configSheet);
+  if (rows.length === 0) throw new Error('Keine Pruefung in Configs');
+  var testConfig = rows[0];
+  var testLP = 'wr.test@gymhofwil.ch'; // muss in istZugelasseneLP sein
+  Logger.log('Test-Pruefung: id=%s', testConfig.id);
+
+  var cache = CacheService.getScriptCache();
+  cache.remove('prewarm_korrektur_' + testConfig.id);
+  cache.remove('korrektur_data_' + testConfig.id);
+
+  // Case (a) Cold-Call
+  var t1 = Date.now();
+  var r1 = JSON.parse(lernplattformPreWarmKorrektur({
+    email: testLP, pruefungId: testConfig.id
+  }).getContent());
+  Logger.log('Case (a) Cold: success=%s ms=%s', r1.success, Date.now() - t1);
+  assert_(r1.success === true, 'Cold-Call kein success');
+  assert_(typeof r1.latenzMs === 'number', 'Cold-Call latenzMs fehlt');
+  assert_(cache.get('korrektur_data_' + testConfig.id), 'Cache nach Cold-Call leer');
+
+  // Case (b) Deduped
+  var r2 = JSON.parse(lernplattformPreWarmKorrektur({
+    email: testLP, pruefungId: testConfig.id
+  }).getContent());
+  Logger.log('Case (b) Deduped: success=%s deduped=%s', r2.success, r2.deduped);
+  assert_(r2.deduped === true, 'Zweiter Call nicht deduped');
+
+  // Case (c) Auth-Fail
+  var r3 = JSON.parse(lernplattformPreWarmKorrektur({
+    email: 'fremder@example.com', pruefungId: testConfig.id
+  }).getContent());
+  Logger.log('Case (c) Auth-Fail: error=%s', r3.error);
+  assert_(r3.error === 'Nicht autorisiert', 'Fremder LP nicht abgelehnt');
+
+  // Case (d) Pruefung nicht gefunden
+  var r4 = JSON.parse(lernplattformPreWarmKorrektur({
+    email: testLP, pruefungId: 'inexistente-id-xyz'
+  }).getContent());
+  // ladeKorrekturBerechne_ liefert immer Body (auch wenn Sheet nicht gefunden) — kein Crash erwartet
+  Logger.log('Case (d) Unbekannte ID: success=%s deduped=%s error=%s',
+             r4.success, r4.deduped, r4.error);
+  assert_(r4.success === true || r4.error === 'Pruefung nicht gefunden',
+          'Unknown-ID weder success noch erwarteter Error');
+
+  Logger.log('=== testPreWarmKorrektur_ alle Cases gruen ===');
+}
+function testPreWarmKorrektur() { testPreWarmKorrektur_(); }
+
+// Top-Level assert_ — alle bestehenden assert_-Definitionen sind function-scoped
+// (innerhalb anderer Test-Shims) und damit von hier aus nicht erreichbar.
+// Nur einmal definieren, falls bei Codebase-Update ein Top-Level-assert_ ergänzt wird,
+// kann diese Definition entfallen.
+function assert_(cond, msg) { if (!cond) throw new Error(msg); }

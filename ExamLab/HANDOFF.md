@@ -6,9 +6,82 @@
 
 ---
 
-## Für die nächste Session (S152)
+## Für die nächste Session (S153)
 
-### Aktueller Stand (S151, 27.04.2026) — Bundle G.d/e/f Specs auf `main`, Plan-Phase offen
+### Aktueller Stand (S152, 27.04.2026) — Bundle G.d.1 auf `main` (Hebel A/B/C/D)
+
+**Was die Session machte:** Plan-Phase via `writing-plans`-Skill (2 Reviewer-Loops) → Implementation via `subagent-driven-development`-Skill (8 Implementer-Subagents + Spec/Quality-Reviews je Task) → Backend GAS-Tests grün → Frontend-Build grün → Browser-E2E mit echten Logins → Merge auf `main`.
+
+**Was Bundle G.d.1 macht:** Reduziert vier Sync-Punkt-Latenzen zwischen LP↔SuS in Phasen-Übergängen:
+
+| Hebel | Bereich | Änderung | Erwartung |
+|---|---|---|---|
+| **A** | Frontend `DurchfuehrenDashboard.tsx:231` | LP-Monitoring-Polling Lobby 15s→5s (`(phase === 'aktiv' \|\| phase === 'lobby') ? 5000 : 15000`) | Sync 1 (LP sieht SuS-grün): 20s→≤7s |
+| **B** | Backend `apps-script-code.js` | `schalteFreiEndpoint` ruft inline `preWarmFragenBeimFreischalten_` (CacheService-Soft-Lock 30s, Configs-Sheet-Read, `bulkLadeFragenAusSheet_`) | Sync 2 (SuS-erste-Frage): 5s→≤2s |
+| **C** | Backend + Frontend | Neuer Endpoint `lernplattformPreWarmKorrektur` (LP-only) + Cache-Layer in `ladeKorrektur` (60s TTL, 80KB Byte-Threshold via `Utilities.newBlob`) + Invalidierung in `speichereKorrekturZeile` und `setKorrekturStatus` (deckt `batchKorrektur` indirekt ab via Sheet-Name-Extraktion) + Wrapper `preWarmKorrektur` in `preWarmApi.ts` + 3 Trigger-Stellen in `DurchfuehrenDashboard.tsx` mit Marker-Kommentaren (`G.d.1 Trigger Tab-Wechsel/Phase-beendet/Direct-Mount`) | Sync 4 (Auswertung-Tab): 2-4s→≤1.5s |
+| **D** | Frontend `Startbildschirm.tsx:86` | SuS-Warteraum-Heartbeat 5s→3s | Sync 2 marginal -2s |
+
+**Architektur-Highlights:**
+- **Backend bündelt 1 Apps-Script-Deploy** (Hard-Constraint aus Spec): Helper + Endpoint + Cache-Layer + Invalidierung + 2 GAS-Test-Shims (`testPreWarmFragenBeimFreischalten`, `testPreWarmKorrektur`) — alles in 5 Backend-Commits, dann **EIN** User-Deploy. Vermeidet S133/S135-Multi-Deploy-Thrash.
+- **Cache-Architektur Hebel C:** kurzlebiger Cache (60s TTL) unter Key `'korrektur_data_' + pruefungId`. Pre-Warm + reguläre Reads nutzen denselben Key. `setKorrekturStatus`-Invalidierung deckt elegant alle `batchKorrektur`-Aufrufe ab (Sheet-Name → `name.substring(10)` → pruefungId).
+- **Marker-Kommentar-basierte Tests:** Statt fragiler Regex über JSX nutzen 4 Trigger-Tests `?raw`-Source-Import + `code.indexOf(marker) + substring(0, 500)`. Inverse-Check verifiziert: ohne Marker → Test FAIL.
+
+**Implementations-Commits auf `main`** (10 Commits + Merge-Commit):
+```
+d1c05f7 G.d.1 Backend: Helper preWarmFragenBeimFreischalten_ + Test-Shim
+01a2a7a G.d.1 Backend: schalteFreiEndpoint ruft preWarmFragenBeimFreischalten_
+923686d G.d.1 Backend: ladeKorrektur Cache-Layer + Invalidierung in speichereKorrekturZeile/setKorrekturStatus
+64c88a6 G.d.1 Backend: Endpoint lernplattformPreWarmKorrektur + Test-Shim
+683ffda G.d.1 Backend: Review-Fixes Task 4 (defensive comment + soft assertion)
+310203e G.d.1 Frontend Hebel A: LP-Polling Lobby 15s -> 5s
+a4b1965 G.d.1 Frontend Hebel A: Test auf synchronen Source-Read fixen (Spec-Compliance)
+c46693e G.d.1 Frontend Hebel D: SuS-Warteraum-Polling 5s -> 3s
+cdce8df G.d.1 Frontend Hebel C: preWarmKorrektur-Wrapper + Tests
+b1d4a07 G.d.1 Frontend Hebel C: preWarmKorrektur-Trigger in 3 Stellen (wechsleTab, Phase-Wechsel, Direct-Mount)
+```
+
+**Test-Stand:**
+- 743/743 vitest grün (vorher 731 Baseline + 12 neue: 6 `preWarmKorrektur` + 1 Hebel A + 1 Hebel D + 4 Trigger-Marker)
+- 2 GAS-Test-Shims grün auf staging-Deploy: `testPreWarmFragenBeimFreischalten` (cold=3'182ms n=22, deduped=39ms), `testPreWarmKorrektur` (cold=1'668ms, deduped/auth-fail/unknown-id alle korrekt)
+- `tsc -b` clean, `npm run build` clean
+
+**Browser-E2E auf preview, 27.04.2026, echte Logins:**
+
+| # | Test | Ergebnis |
+|---|---|---|
+| 5a | Tab-Wechsel-Trigger (Hebel C Trigger 1) | ✓ POST `lernplattformPreWarmKorrektur` sichtbar nach Tab-Klick |
+| 5b | Phase-Wechsel-Trigger zu beendet (Hebel C Trigger 2) | ✓ POST nach „Prüfung beenden" — `beendePruefung` + Pre-Warm-POST sichtbar |
+| 5c | Direct-Mount-Trigger (Hebel C Trigger 3) | ✓ POST nach Direct-URL-Navigate ohne `?tab=`-Param |
+| 5d | Korrektur-Cache-Hit | ✓ Auswertung-Tab lädt direkt komplett (Trigger 2 hat vorgewärmt) |
+| 6 | Re-Klick-Dedup | ✓ 2 POSTs, beide 200 — Backend-Soft-Lock dedupliziert silent |
+| 7 | G.a Trigger A unverändert | ⊝ Code nicht angefasst, S147-E2E bestand |
+| 8 | G.c IDB-Logout-Cleanup | ⊝ Code nicht angefasst, S149-E2E bestand |
+
+Alle G.d.1-spezifischen Trigger funktionieren end-to-end. Hebel A/D sind 1-Line-Konstanten mit Source-Read-Tests verifiziert (Inverse-Check FAIL beim Code-Revert). Hebel B end-to-end via GAS-Test bestätigt.
+
+**Subagent-Driven-Development-Stats:**
+- 8 Implementer-Subagent-Calls (Tasks 1-9 ohne 5+10+11)
+- 1 Review-Loop-Iteration (Task 6 Test mit Graceful-Fallback → Spec-konform via `?raw`-Import gefixt)
+- 8 Spec-Compliance-Reviews + 8 Code-Quality-Reviews + 1 Final-Bundle-Review
+- Branch + Tasks zwischen Hauptkonversation und Subagents sauber synchronisiert
+
+**Lehren S152:**
+1. **Spec sagte `fs.readFileSync` für Source-Read-Tests, Implementer wählte Vite `?raw`-Import.** Reviewer akzeptierte das als äquivalent (synchroner Source-Read, type-safe via `vite/client`, vitest+jsdom-kompatibel) → Spec-Wunsch ist Form, Inverse-Check (Test FAIL beim Code-Revert) ist die echte Anforderung. Pattern für Source-Read-Tests in TSX-Komponenten: `import componentSource from '../X.tsx?raw'` + Regex.
+2. **Marker-Kommentare als Test-Anker.** Strukturelle Test-Anforderungen über fragile Regex auf JSX-Code zu legen lädt Bruch ein. Mit eindeutigen Marker-Kommentaren (`G.d.1 Trigger <Variant>`) und `code.indexOf(marker) + substring(idx, idx + 500)` werden Tests robust gegen Refactors. Inverse-Check (Marker entfernen → Test FAIL) beweist die Anchor-Stärke.
+3. **Apps-Script `for...of` und `const` werden in V8 unterstützt.** Der Helper-Refactor (Task 3 `ladeKorrekturBerechne_`) hat aus Stil-Konsistenz `for...of`/`const` zu `for(var i)` rückkonvertiert — funktional äquivalent. Bei zukünftigen Edits in `apps-script-code.js` darf der Stil bleiben — kein Bedarf zu Modernisieren.
+
+**Offene Follow-Ups (nicht-blockierend, aus Final-Review):**
+- `preWarmKorrektur` extrahiert `sessionToken` aus `useUebenAuthStore`, wird aber von LP-Context aufgerufen — funktioniert weil `istZugelasseneLP(email)` Backend-Auth-Gate. Code-Kommentar oder explizites `sessionToken`-Argument wäre klarer.
+- Network-Error-Test für `preWarmKorrektur` analog G.a-Pattern fehlt (6 Cases statt der G.a-7).
+- `setKorrekturStatus` triggert 3-4× Cache-Invalidierung während laufender `batchKorrektur` — korrekt aber dokumentationswürdig.
+
+**Offen für S153+:**
+- **G.d.2 Plan-Phase** via `writing-plans`-Skill (IDB-Cache Klassenlisten + Gruppen, 24h TTL, Login-Pre-Fetch). Spec auf `main` (`d2133fb`), reviewer-approved.
+- Danach G.e (Fragensammlung-Virtualisierung) + G.f (LP-Startseite Skeleton).
+
+---
+
+### Vorgänger-Stand (S151, 27.04.2026) — Bundle G.d/e/f Specs auf `main`, Plan-Phase offen
 
 **Was die Session machte:** Reine Brainstorming + Spec-Phase für die offenen Bundle-G-Sub-Bundles. Vier Specs erstellt, jede via Spec-Reviewer-Subagent geprüft und nach Findings verfeinert. Keine Code-Änderungen am Frontend/Backend.
 

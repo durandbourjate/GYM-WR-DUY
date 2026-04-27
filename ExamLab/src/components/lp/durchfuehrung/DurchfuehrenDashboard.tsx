@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback, useRef, useMemo } from 'react'
 import { TabBar } from '../../ui/TabBar'
 import { useAuthStore } from '../../../store/authStore.ts'
 import { apiService } from '../../../services/apiService.ts'
+import { preWarmKorrektur } from '../../../services/preWarmApi'
 import { erstelleDemoMonitoring } from '../../../data/demoMonitoring.ts'
 import { demoFragen } from '../../../data/demoFragen.ts'
 import { einrichtungsPruefung } from '../../../data/einrichtungsPruefung.ts'
@@ -228,7 +229,7 @@ export default function DurchfuehrenDashboard({ pruefungId }: { pruefungId: stri
   // Auto-Refresh: 5s in Live-Phase (kritisch), 15s sonst (spart Connections für Button-Clicks)
   useEffect(() => {
     if (!autoRefresh || ladeStatus === 'fehler') return
-    const intervallMs = phase === 'aktiv' ? 5000 : 15000
+    const intervallMs = (phase === 'aktiv' || phase === 'lobby') ? 5000 : 15000
     const interval = setInterval(ladeDaten, intervallMs)
     return () => clearInterval(interval)
   }, [autoRefresh, ladeStatus, ladeDaten, phase])
@@ -263,6 +264,10 @@ export default function DurchfuehrenDashboard({ pruefungId }: { pruefungId: stri
         // Nur wenn beendetUm gesetzt UND freigeschaltet (= nicht zurueckgesetzt fuer neue Durchfuehrung)
         if (pruefungResult.config.beendetUm && pruefungResult.config.freigeschaltet && !urlTab) {
           setActiveTab('auswertung')
+          // G.d.1 Trigger Direct-Mount — Pre-Warm Korrektur bei beendet-URL
+          if (user?.email && pruefungId) {
+            void preWarmKorrektur(pruefungId, user.email)
+          }
         }
       }
       abgabenGeladen.current = true
@@ -301,9 +306,13 @@ export default function DurchfuehrenDashboard({ pruefungId }: { pruefungId: stri
     const neuerTab = phaseZuTab(phase)
     if (tabIndex(neuerTab) > tabIndex(phaseZuTab(letztePhaseRef.current))) {
       setActiveTab(neuerTab)
+      // G.d.1 Trigger Phase-beendet — Pre-Warm Korrektur bei Auto-Wechsel
+      if (phase === 'beendet' && user?.email && pruefungId) {
+        void preWarmKorrektur(pruefungId, user.email)
+      }
     }
     letztePhaseRef.current = phase
-  }, [phase])
+  }, [phase, user, pruefungId])
 
   // Timer für aktive Phase
   useEffect(() => {
@@ -318,6 +327,10 @@ export default function DurchfuehrenDashboard({ pruefungId }: { pruefungId: stri
   function wechsleTab(tab: DurchfuehrenTab) {
     if (!istTabVerfuegbar(tab, phase)) return
     setActiveTab(tab)
+    // G.d.1 Trigger Tab-Wechsel — Pre-Warm Korrektur wenn auswertung
+    if (tab === 'auswertung' && user?.email && pruefungId) {
+      void preWarmKorrektur(pruefungId, user.email)
+    }
     const url = new URL(window.location.href)
     url.searchParams.set('tab', tab)
     window.history.replaceState({}, '', url.toString())
