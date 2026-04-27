@@ -9083,6 +9083,9 @@ function lernplattformPreWarmKorrektur(body) {
     cache.put(lockKey, '1', 30);
 
     var data = ladeKorrekturBerechne_(pruefungId);
+    // Defensiv: ladeKorrekturBerechne_ liefert aktuell IMMER ein Body-Objekt
+    // (auch bei unbekannter pruefungId — dann mit schueler:[]). Branch hier nur
+    // als Schutz, falls Helper-Vertrag in Zukunft auf null/undefined umgestellt wird.
     if (!data) {
       return jsonResponse({ error: 'Pruefung nicht gefunden' });
     }
@@ -13811,6 +13814,8 @@ function testPreWarmKorrektur_() {
   // ladeKorrekturBerechne_ liefert immer Body (auch wenn Sheet nicht gefunden) — kein Crash erwartet
   Logger.log('Case (d) Unbekannte ID: success=%s deduped=%s error=%s',
              r4.success, r4.deduped, r4.error);
+  assert_(r4.success === true || r4.error === 'Pruefung nicht gefunden',
+          'Unknown-ID weder success noch erwarteter Error');
 
   Logger.log('=== testPreWarmKorrektur_ alle Cases gruen ===');
 }
