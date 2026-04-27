@@ -86,6 +86,8 @@ export interface Props {
   handleFrageLoeschen: (frage: FilterbareFrage) => void
   /** Trigger für Scroll-Reset (z.B. Suchtext, Gruppierung, Filter-Count). */
   scrollResetTrigger: unknown
+  /** Optional: externer Ref auf den Scroll-Container (für Wheel-Forwarding aus dem Header). */
+  scrollContainerRef?: React.RefObject<HTMLDivElement | null>
 }
 
 export default function VirtualisierteFragenListe(p: Props) {
@@ -93,10 +95,19 @@ export default function VirtualisierteFragenListe(p: Props) {
     () => baueFlatItems(p.gruppierteAnzeige, p.gruppierung, p.aufgeklappteGruppen),
     [p.gruppierteAnzeige, p.gruppierung, p.aufgeklappteGruppen],
   )
-  const scrollRef = useRef<HTMLDivElement>(null)
+  const internalScrollRef = useRef<HTMLDivElement>(null)
+  // Callback-Ref, der die DOM-Node intern UND in einen optional übergebenen Container-Ref schreibt.
+  // So bleibt `getScrollElement` zuverlässig (liest `internalScrollRef.current`) und der Aufrufer
+  // (z.B. FragenBrowser) kann denselben Ref für externe Wheel-Forwarding-Logik nutzen.
+  const setRef = (node: HTMLDivElement | null) => {
+    internalScrollRef.current = node
+    if (p.scrollContainerRef) {
+      ;(p.scrollContainerRef as React.MutableRefObject<HTMLDivElement | null>).current = node
+    }
+  }
   const virtualizer = useVirtualizer({
     count: flatItems.length,
-    getScrollElement: () => scrollRef.current,
+    getScrollElement: () => internalScrollRef.current,
     estimateSize: (i: number) => {
       const item = flatItems[i]
       if (!item) return 80
@@ -114,7 +125,7 @@ export default function VirtualisierteFragenListe(p: Props) {
   if (flatItems.length === 0) return null
 
   return (
-    <div ref={scrollRef} className="h-full overflow-y-auto" data-testid="virt-scroll">
+    <div ref={setRef} className="h-full overflow-y-auto" data-testid="virt-scroll">
       <div
         style={{
           height: virtualizer.getTotalSize(),
