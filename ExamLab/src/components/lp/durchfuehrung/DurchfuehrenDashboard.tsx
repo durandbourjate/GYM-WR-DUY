@@ -361,6 +361,11 @@ export default function DurchfuehrenDashboard({ pruefungId }: { pruefungId: stri
   // Skeleton- vs. Voll-Layout entscheiden — bei 'laden' zeigt Tab-Content den Skeleton
   const istLadenOderConfigFehlt = ladeStatus === 'laden' || !config
 
+  // Tab-spezifischer Skeleton — als Variable, damit der JSX-Switch unten 1-stufig bleibt (code-quality.md)
+  const tabSkeleton = activeTab === 'vorbereitung'
+    ? <DurchfuehrenVorbereitungSkeleton />
+    : <DurchfuehrenSusReihenSkeleton pruefungId={pruefungId} />
+
   // Fehler-Screen nur bei explizitem Fehler-Status (oder daten=null nach erfolgreichem Lade-Abschluss)
   if (ladeStatus === 'fehler' || (ladeStatus === 'fertig' && !daten)) {
     return (
@@ -463,12 +468,7 @@ export default function DurchfuehrenDashboard({ pruefungId }: { pruefungId: stri
 
       {/* === Tab-Content === */}
       <div className="max-w-7xl mx-auto w-full px-4 py-4 space-y-4 flex-1">
-        {ladeStatus === 'laden' ? (
-          /* Echter Skeleton während Lade — pro activeTab */
-          activeTab === 'vorbereitung'
-            ? <DurchfuehrenVorbereitungSkeleton />
-            : <DurchfuehrenSusReihenSkeleton pruefungId={pruefungId} />
-        ) : !config ? (
+        {ladeStatus === 'laden' ? tabSkeleton : !config ? (
           /* Lade fertig, aber Config fehlt — Inline-Hinweis (verhindert Endlos-Skeleton) */
           <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-6 text-center">
             <p className="text-sm text-amber-800 dark:text-amber-200 mb-3">
