@@ -10,6 +10,23 @@ vi.mock('../store/fragenbankStore', () => ({
   },
 }))
 
+const klassenlistenLadeMock = vi.fn(async () => {})
+const klassenlistenResetMock = vi.fn(async () => {})
+const gruppenLadeMock = vi.fn(async () => {})
+const gruppenResetMock = vi.fn(async () => {})
+
+vi.mock('../store/klassenlistenStore', () => ({
+  useKlassenlistenStore: {
+    getState: () => ({ lade: klassenlistenLadeMock, reset: klassenlistenResetMock }),
+  },
+}))
+
+vi.mock('../store/ueben/gruppenStore', () => ({
+  useUebenGruppenStore: {
+    getState: () => ({ ladeGruppen: gruppenLadeMock, reset: gruppenResetMock }),
+  },
+}))
+
 // LP-API mocken — ladeUndCacheLPs() ruft ladeLehrpersonen() auf.
 // Mock-Liste enthält test-LP damit rolleAusDomain 'lp' zurückgibt.
 vi.mock('../services/lpApi', () => ({
@@ -80,6 +97,10 @@ describe('Bundle G.c — authStore Login-Pre-Fetch + Logout-Cleanup', () => {
     pruefungStateMock.abgegeben = false
     pruefungStateMock.beendetUm = null
     sessionStorage.clear()
+    klassenlistenLadeMock.mockClear()
+    klassenlistenResetMock.mockClear()
+    gruppenLadeMock.mockClear()
+    gruppenResetMock.mockClear()
     // Auth-Store vor jedem Test in den initialen Zustand zurücksetzen
     useAuthStore.setState({ user: null, istDemoModus: false, ladeStatus: 'idle', fehler: null })
   })
@@ -180,5 +201,65 @@ describe('Bundle G.c — authStore Login-Pre-Fetch + Logout-Cleanup', () => {
     releaseClearIDB?.()
     await abmeldenPromise
     expect(useAuthStore.getState().user).toBeNull()
+  })
+
+  it('anmelden() (LP) feuert Pre-Fetch für Fragenbank + Klassenlisten + Gruppen', async () => {
+    await useAuthStore.getState().anmelden(credential)
+    expect(ladeMock).toHaveBeenCalledWith('lp@gymhofwil.ch')
+    expect(klassenlistenLadeMock).toHaveBeenCalledWith('lp@gymhofwil.ch')
+    expect(gruppenLadeMock).toHaveBeenCalledWith('lp@gymhofwil.ch')
+  })
+
+  it('anmelden() Pre-Fetch-Fehler werden silent geschluckt (kein Throw)', async () => {
+    klassenlistenLadeMock.mockRejectedValueOnce(new Error('Backend down'))
+    gruppenLadeMock.mockRejectedValueOnce(new Error('Backend down'))
+    await expect(useAuthStore.getState().anmelden(credential)).resolves.toBeUndefined()
+    await new Promise<void>((r) => setTimeout(r, 0)) // einmal ticken für Reject-Handler
+  })
+
+  it('abmelden() awaitet Promise.all der 3 reset()-Aufrufe vor window.location.href', async () => {
+    let resolveK: (() => void) | undefined
+    let resolveG: (() => void) | undefined
+    klassenlistenResetMock.mockImplementationOnce(() => new Promise<void>((r) => { resolveK = r }))
+    gruppenResetMock.mockImplementationOnce(() => new Promise<void>((r) => { resolveG = r }))
+
+    let abgeschlossen = false
+    const p = useAuthStore.getState().abmelden().then(() => { abgeschlossen = true })
+
+    // Tick — abmelden darf NOCH NICHT durch sein, weil Promise.all hängt
+    await new Promise<void>((r) => setTimeout(r, 0))
+    expect(abgeschlossen).toBe(false)
+
+    resolveK?.()
+    resolveG?.()
+    await p
+    expect(abgeschlossen).toBe(true)
+    expect(klassenlistenResetMock).toHaveBeenCalledTimes(1)
+    expect(gruppenResetMock).toHaveBeenCalledTimes(1)
+    expect(resetMock).toHaveBeenCalledTimes(1) // Fragenbank-reset auch
+  })
+
+  it('anmeldenMitCode() (SuS) feuert nur Gruppen-Pre-Fetch (NICHT Klassenlisten, NICHT Fragenbank)', async () => {
+    await useAuthStore.getState().anmeldenMitCode('S123', 'Test SuS', 'sus@stud.gymhofwil.ch', 'tok')
+    expect(gruppenLadeMock).toHaveBeenCalledWith('sus@stud.gymhofwil.ch')
+    expect(klassenlistenLadeMock).not.toHaveBeenCalled()
+    expect(ladeMock).not.toHaveBeenCalled()
+  })
+
+  it('anmelden() (SuS via Google-Login) feuert nur Gruppen, NICHT Fragenbank/Klassenlisten (LP-only)', async () => {
+    // SuS-Email-Domain → rolleAusDomain returnt 'sus' bevor LP-Liste geprüft wird.
+    // Ohne Rollen-Guard würde Backend 403 für ladeKlassenlisten/ladeFragenbank schicken
+    // (silent-fail catch + Console-Warning bei jedem SuS-Google-Login).
+    const susCredential = {
+      email: 'student@stud.gymhofwil.ch',
+      name: 'Test SuS',
+      given_name: 'Test',
+      family_name: 'SuS',
+      picture: '',
+    }
+    await useAuthStore.getState().anmelden(susCredential)
+    expect(gruppenLadeMock).toHaveBeenCalledWith('student@stud.gymhofwil.ch')
+    expect(klassenlistenLadeMock).not.toHaveBeenCalled()
+    expect(ladeMock).not.toHaveBeenCalled() // Fragenbank
   })
 })

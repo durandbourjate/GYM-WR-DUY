@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useAuthStore, ladeUndCacheLPs } from '../../../store/authStore'
 import { apiService } from '../../../services/apiService'
+import { useKlassenlistenStore } from '../../../store/klassenlistenStore'
 import type { PruefungsConfig, Teilnehmer } from '../../../types/pruefung'
 import type { Berechtigung } from '../../../types/auth'
 import type { LPInfo } from '../../../services/lpApi'
@@ -21,9 +22,27 @@ interface Props {
 
 export default function VorbereitungPhase({ config, onTeilnehmerGesetzt, onWeiterZurLobby, onConfigUpdate }: Props) {
   const user = useAuthStore((s) => s.user)
-  const [rohDaten, setRohDaten] = useState<KlassenlistenSuS[]>([])
-  const [ladeStatus, setLadeStatus] = useState<'idle' | 'laden' | 'fertig' | 'fehler'>('idle')
+
+  // G.d.2 — Klassenlisten via Cache-First Store statt lokalem useState.
+  // Der Store cached die roh-API-Antwort; das UI-Mapping (KlassenlistenEintrag → KlassenlistenSuS)
+  // bleibt hier, weil es UI-Concern ist (kurs-Default '—').
+  const klassenlistenDaten = useKlassenlistenStore((s) => s.daten)
+  const klassenlistenLadeStatus = useKlassenlistenStore((s) => s.ladeStatus)
+  const klassenlistenLade = useKlassenlistenStore((s) => s.lade)
   const [fehler, setFehler] = useState('')
+
+  const rohDaten: KlassenlistenSuS[] = useMemo(
+    () => (klassenlistenDaten ?? []).map((e) => ({
+      email: e.email,
+      name: e.name,
+      vorname: e.vorname,
+      klasse: e.klasse,
+      kurs: e.kurs || '—',
+    })),
+    [klassenlistenDaten]
+  )
+  const ladeStatus = klassenlistenLadeStatus
+
   // Neues State-Modell: Set aller ausgewählten SuS-Emails (ersetzt ausgewaehlteKurse + abgewaehlte)
   const [ausgewaehlteSuS, setAusgewaehlteSuS] = useState<Set<string>>(new Set())
   // Manuell hinzugefügte Teilnehmer (nicht aus Klassenlisten)
@@ -44,27 +63,22 @@ export default function VorbereitungPhase({ config, onTeilnehmerGesetzt, onWeite
     (config.berechtigungen as Berechtigung[] | undefined) ?? []
   )
 
-  // Klassenlisten laden
-  const ladeKlassenlisten = useCallback(async () => {
-    if (!user || !apiService.istKonfiguriert()) return
-    setLadeStatus('laden')
-    setFehler('')
-    try {
-      const daten = await apiService.ladeKlassenlisten(user.email)
-      const sus: KlassenlistenSuS[] = daten.map((e) => ({
-        email: e.email,
-        name: e.name,
-        vorname: e.vorname,
-        klasse: e.klasse,
-        kurs: e.kurs || '—',
-      }))
-      setRohDaten(sus)
-      setLadeStatus('fertig')
-    } catch (err) {
-      setFehler(String(err))
-      setLadeStatus('fehler')
-    }
-  }, [user])
+  // Klassenlisten laden (wrapper über Store-Action; force=true für Cache-Bypass beim Refresh)
+  const ladeKlassenlisten = useCallback(
+    async (force = false) => {
+      if (!user || !apiService.istKonfiguriert()) return
+      setFehler('')
+      try {
+        await klassenlistenLade(user.email, force ? { force: true } : undefined)
+        if (useKlassenlistenStore.getState().ladeStatus === 'fehler') {
+          setFehler('Klassenlisten konnten nicht geladen werden.')
+        }
+      } catch (err) {
+        setFehler(String(err))
+      }
+    },
+    [user, klassenlistenLade]
+  )
 
   useEffect(() => { ladeKlassenlisten() }, [ladeKlassenlisten])
   useEffect(() => { ladeUndCacheLPs().then(setLpListe) }, [])
@@ -293,8 +307,8 @@ export default function VorbereitungPhase({ config, onTeilnehmerGesetzt, onWeite
             <span
               role="button"
               tabIndex={0}
-              onClick={(e) => { e.stopPropagation(); ladeKlassenlisten() }}
-              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); ladeKlassenlisten() } }}
+              onClick={(e) => { e.stopPropagation(); ladeKlassenlisten(true) }}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); ladeKlassenlisten(true) } }}
               className="text-xs text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
             >
               Neu laden

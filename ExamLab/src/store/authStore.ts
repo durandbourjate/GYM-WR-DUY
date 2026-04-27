@@ -6,6 +6,8 @@ import { clearQueue } from '../services/retryQueue.ts'
 import { ladeLehrpersonen, type LPInfo } from '../services/lpApi.ts'
 import { useFavoritenStore } from './favoritenStore.ts'
 import { useFragenbankStore } from './fragenbankStore.ts'
+import { useKlassenlistenStore } from './klassenlistenStore.ts'
+import { useUebenGruppenStore } from './ueben/gruppenStore.ts'
 
 // Cache für LP-Liste (pro Session geladen)
 let lpCache: LPInfo[] | null = null
@@ -138,10 +140,21 @@ export const useAuthStore = create<AuthStore>((set) => ({
       saveSession(user)
       saveDemoFlag(false)
       set({ user, istDemoModus: false, ladeStatus: 'fertig', fehler: null })
-      // Bundle G.c — Fragenbank im Hintergrund vorladen, damit FragenBrowser instant rendert
-      void useFragenbankStore.getState().lade(credential.email).catch((e) => {
-        console.warn('[G.c] Fragenbank-Pre-Fetch fehlgeschlagen (silent):', e)
+      // Bundle G.d.2 — Gruppen für ALLE Logins (LP + SuS-via-Google)
+      void useUebenGruppenStore.getState().ladeGruppen(credential.email).catch((e) => {
+        console.warn('[G.d.2] Gruppen-Pre-Fetch fehlgeschlagen (silent):', e)
       })
+      // G.c + G.d.2 — Fragenbank + Klassenlisten sind LP-only.
+      // SuS-Google-Login (rolle='sus') würde sonst 403 vom Backend bekommen
+      // (silent fail, aber unnötiger API-Roundtrip + Console-Warning).
+      if (rolle === 'lp') {
+        void useFragenbankStore.getState().lade(credential.email).catch((e) => {
+          console.warn('[G.c] Fragenbank-Pre-Fetch fehlgeschlagen (silent):', e)
+        })
+        void useKlassenlistenStore.getState().lade(credential.email).catch((e) => {
+          console.warn('[G.d.2] Klassenlisten-Pre-Fetch fehlgeschlagen (silent):', e)
+        })
+      }
     } finally {
       loginInProgress = false
     }
@@ -164,6 +177,11 @@ export const useAuthStore = create<AuthStore>((set) => ({
     saveSession(user)
     saveDemoFlag(false)
     set({ user, istDemoModus: false, ladeStatus: 'fertig', fehler: null })
+    // Bundle G.d.2 — SuS profitiert vom Gruppen-Pre-Fetch falls Wechsel in den Üben-Tab nach Prüfung.
+    // KEIN Klassenlisten-Pre-Fetch (LP-only). KEIN Fragenbank-Pre-Fetch (LP-only).
+    void useUebenGruppenStore.getState().ladeGruppen(email).catch((e) => {
+      console.warn('[G.d.2] Gruppen-Pre-Fetch fehlgeschlagen (SuS, silent):', e)
+    })
   },
 
   demoStarten: (rolle: 'sus' | 'lp' = 'sus') => {
@@ -197,12 +215,17 @@ export const useAuthStore = create<AuthStore>((set) => ({
   },
 
   abmelden: async () => {
-    // Bundle G.c + S150-Hotfix — Frontend-Cache + IDB-Cache leeren bevor User wechselt.
+    // Bundle G.c + G.d.2 + S150-Hotfix — Frontend-Cache + alle 3 IDB-Datenbanken leeren bevor User wechselt.
     // await ist kritisch: window.location.href triggert Page-Unload und bricht
-    // in-flight IDB-Transaktionen ab. Privacy-Garantie würde sonst nicht halten.
-    // Beide IDB-Pfade (Fragenbank + Pruefungs-autoSave) muessen vor der Hard-Nav
-    // committed sein.
-    await useFragenbankStore.getState().reset()
+    // in-flight IDB-Transaktionen ab (S149-Lehre, safety-pwa.md). Privacy-Garantie
+    // hängt davon ab dass alle 3 reset()-Aufrufe vor der Hard-Nav committed sind.
+    // Promise.all parallel — die 3 Datenbanken sind unabhängig, längste bestimmt
+    // die Logout-Latenz (typisch ~50 ms).
+    await Promise.all([
+      useFragenbankStore.getState().reset(),
+      useKlassenlistenStore.getState().reset(),
+      useUebenGruppenStore.getState().reset(),
+    ])
     clearSession()
     await resetPruefungState()
     set({ user: null, istDemoModus: false, ladeStatus: 'idle', fehler: null })
