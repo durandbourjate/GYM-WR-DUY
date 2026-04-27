@@ -125,7 +125,7 @@ export default function VirtualisierteFragenListe(p: Props) {
   if (flatItems.length === 0) return null
 
   return (
-    <div ref={setRef} className="h-full overflow-y-auto" data-testid="virt-scroll">
+    <div ref={setRef} className="h-full min-h-0 overflow-y-auto" data-testid="virt-scroll">
       <div
         style={{
           height: virtualizer.getTotalSize(),

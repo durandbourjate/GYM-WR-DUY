@@ -281,7 +281,9 @@ export default function FragenBrowser({ onHinzufuegen, onEntfernen, onSchliessen
   // Inline-Modus: als reguläre Seitenkomponente rendern (kein Overlay)
   if (inline) {
     return (
-      <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 flex flex-col overflow-hidden">
+      // flex-1 + min-h-0: Container wächst auf verfügbare Höhe im flex-column-Parent
+      // → die virtualisierte Liste bekommt eine endliche Höhe und scrollt selbst.
+      <div className="flex-1 min-h-0 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 flex flex-col overflow-hidden">
         {/* Header mit Suche + Filter */}
         <FragenBrowserHeader
           ladeStatus={ladeStatus}
@@ -326,8 +328,8 @@ export default function FragenBrowser({ onHinzufuegen, onEntfernen, onSchliessen
           listeRef={listeRef}
         />
 
-        {/* Fragen-Liste — Wrapper ohne eigenen Scroll; virtualisierte Liste scrollt selbst und teilt ihren Container per `scrollContainerRef={listeRef}` für Wheel-Forwarding aus dem Header. */}
-        <div className="flex-1 relative overflow-hidden">
+        {/* Fragen-Liste — Wrapper ohne eigenen Scroll; virtualisierte Liste scrollt selbst und teilt ihren Container per `scrollContainerRef={listeRef}` für Wheel-Forwarding aus dem Header. min-h-0 erlaubt flex-1 zu schrumpfen, damit die innere h-full-Liste eine endliche Höhe bekommt. */}
+        <div className="flex-1 min-h-0 relative overflow-hidden">
           {ladeStatus === 'laden' && (
             <p className="text-sm text-slate-500 dark:text-slate-400 text-center py-8">
               Fragensammlung wird geladen...
@@ -501,8 +503,8 @@ export default function FragenBrowser({ onHinzufuegen, onEntfernen, onSchliessen
           listeRef={listeRef}
         />
 
-        {/* Fragen-Liste — Wrapper ohne eigenen Scroll; virtualisierte Liste scrollt selbst und teilt ihren Container per `scrollContainerRef={listeRef}` für Wheel-Forwarding aus dem Header. */}
-        <div className="flex-1 relative overflow-hidden">
+        {/* Fragen-Liste — Wrapper ohne eigenen Scroll; virtualisierte Liste scrollt selbst und teilt ihren Container per `scrollContainerRef={listeRef}` für Wheel-Forwarding aus dem Header. min-h-0 erlaubt flex-1 zu schrumpfen, damit die innere h-full-Liste eine endliche Höhe bekommt. */}
+        <div className="flex-1 min-h-0 relative overflow-hidden">
           {ladeStatus === 'laden' && (
             <p className="text-sm text-slate-500 dark:text-slate-400 text-center py-8">
               Fragensammlung wird geladen...
