@@ -13,6 +13,7 @@ import type {
   LueckentextFrage,
   HotspotBereich, BildbeschriftungLabel,
   DragDropBildZielzone,
+  DragDropBildLabel,
   InlineTeilaufgabe,
 } from '../../types/fragen'
 import type { FrageTyp } from '../editorUtils'
@@ -189,8 +190,8 @@ interface TypEditorDispatcherProps {
   // DragDrop Bild
   ddZielzonen: DragDropBildZielzone[]
   setDdZielzonen: React.Dispatch<React.SetStateAction<DragDropBildZielzone[]>>
-  ddLabels: string[]
-  setDdLabels: React.Dispatch<React.SetStateAction<string[]>>
+  ddLabels: DragDropBildLabel[]
+  setDdLabels: React.Dispatch<React.SetStateAction<DragDropBildLabel[]>>
 
   // Code
   codeSprache: string

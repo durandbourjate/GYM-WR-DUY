@@ -40,7 +40,7 @@ const frage = {
       erklaerung: 'Rechte Bilanzseite = Mittelherkunft.',
     },
   ],
-} as DDType
+} as unknown as DDType
 
 describe('DragDropBildFrage modus=loesung', () => {
   it('alle Labels korrekt platziert → alle Zonen grün', () => {

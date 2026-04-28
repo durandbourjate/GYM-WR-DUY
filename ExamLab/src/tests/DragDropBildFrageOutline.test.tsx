@@ -55,7 +55,7 @@ const frage = {
     { id: 'z1', form: 'rechteck', punkte: [{ x: 0, y: 0 }, { x: 50, y: 0 }, { x: 50, y: 50 }, { x: 0, y: 50 }], korrektesLabel: 'A' },
   ],
   labels: ['A', 'B'],
-} as DDType
+} as unknown as DDType
 
 describe('DragDropBildFrage Violett-Outline', () => {
   beforeEach(() => mockAdapter.mockReset())

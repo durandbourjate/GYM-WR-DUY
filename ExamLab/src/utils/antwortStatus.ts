@@ -1,5 +1,6 @@
 import type { Frage, AufgabengruppeFrage } from '../types/fragen.ts'
 import type { Antwort } from '../types/antworten.ts'
+import { normalisiereDragDropBild, normalisiereDragDropAntwort } from './ueben/fragetypNormalizer'
 
 /**
  * Prüft ob eine Frage vollständig beantwortet ist.
@@ -141,10 +142,11 @@ export function istVollstaendigBeantwortet(
 
     case 'dragdrop_bild': {
       if (frage.typ !== 'dragdrop_bild') return true
-      // Alle Zielzonen muessen zugeordnet sein
       const ddFrage = frage as import('../types/fragen.ts').DragDropBildFrage
-      const anzahlZonen = ddFrage.zielzonen.length
-      const zugeordnet = Object.keys(antwort.zuordnungen).length
+      const f = normalisiereDragDropBild(ddFrage)
+      const norm = normalisiereDragDropAntwort(antwort, f)
+      const anzahlZonen = f.zielzonen.length
+      const zugeordnet = Object.keys(norm.zuordnungen).length
       return zugeordnet >= anzahlZonen
     }
 

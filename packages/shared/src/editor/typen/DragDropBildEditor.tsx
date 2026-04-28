@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect, useMemo } from 'react'
-import type { DragDropBildZielzone } from '../../types/fragen'
+import type { DragDropBildZielzone, DragDropBildLabel } from '../../types/fragen'
 import BildMitGenerator from '../components/BildMitGenerator'
 import { resolvePoolBildUrl } from '../utils/poolBildUrl'
 import ZonenOverlay from '../components/ZonenOverlay'
@@ -10,8 +10,8 @@ interface Props {
   setBildUrl: (v: string) => void
   zielzonen: DragDropBildZielzone[]
   setZielzonen: React.Dispatch<React.SetStateAction<DragDropBildZielzone[]>>
-  labels: string[]
-  setLabels: React.Dispatch<React.SetStateAction<string[]>>
+  labels: DragDropBildLabel[]
+  setLabels: React.Dispatch<React.SetStateAction<DragDropBildLabel[]>>
   /** Pflichtfeld-Status der Zielzonen-Section (Bundle H Phase 6) */
   feldStatusZielzonen?: FeldStatus
 }
@@ -41,22 +41,80 @@ function rechteckEckeDrag(punkte: { x: number; y: number }[], punktIndex: number
   return neuePunkte
 }
 
+function genId(): string {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID().slice(0, 8)
+  return Math.random().toString(36).slice(2, 10)
+}
+
+/** Mini Chip-Input: Enter fügt Chip hinzu, x entfernt. */
+function ChipInput({
+  chips,
+  onAdd,
+  onRemove,
+  placeholder,
+  testId,
+  chipTestIdPrefix,
+}: {
+  chips: string[]
+  onAdd: (text: string) => void
+  onRemove: (index: number) => void
+  placeholder?: string
+  testId: string
+  chipTestIdPrefix?: string
+}) {
+  const [text, setText] = useState('')
+  function commit() {
+    const t = text.trim()
+    if (!t) return
+    onAdd(t)
+    setText('')
+  }
+  return (
+    <div className="flex flex-wrap gap-1 px-2 py-1 border rounded bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 min-h-[36px]">
+      {chips.map((c, i) => (
+        <span
+          key={`${c}-${i}`}
+          data-testid={chipTestIdPrefix ? `${chipTestIdPrefix}${c}` : undefined}
+          className="inline-flex items-center gap-1 px-2 py-0.5 text-xs rounded bg-violet-100 dark:bg-violet-900/30 text-violet-800 dark:text-violet-200"
+        >
+          {c}
+          <button
+            type="button"
+            onClick={() => onRemove(i)}
+            className="text-violet-500 hover:text-violet-700 dark:hover:text-violet-300"
+            title="Entfernen"
+          >
+            ×
+          </button>
+        </span>
+      ))}
+      <input
+        data-testid={testId}
+        type="text"
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ',') {
+            e.preventDefault()
+            commit()
+          }
+        }}
+        onBlur={commit}
+        placeholder={placeholder}
+        className="flex-1 min-w-[120px] px-1 text-sm bg-transparent text-slate-700 dark:text-white outline-none"
+      />
+    </div>
+  )
+}
+
 export default function DragDropBildEditor({ bildUrl, setBildUrl, zielzonen, setZielzonen, labels, setLabels, feldStatusZielzonen }: Props) {
   const [modus, setModus] = useState<Modus>('rechteck')
   const [ersteEcke, setErsteEcke] = useState<{ x: number; y: number } | null>(null)
   const [polyPunkte, setPolyPunkte] = useState<{ x: number; y: number }[]>([])
   const [selectedId, setSelectedId] = useState<string | null>(null)
-  const [labelsText, setLabelsText] = useState((labels ?? []).join(', '))
   const [drag, setDrag] = useState<Drag>(null)
   const [mausPosition, setMausPosition] = useState<{ x: number; y: number } | null>(null)
-  const [poolWarn, setPoolWarn] = useState<string | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (!poolWarn) return
-    const t = setTimeout(() => setPoolWarn(null), 3000)
-    return () => clearTimeout(t)
-  }, [poolWarn])
 
   function bildKoordinaten(e: { clientX: number; clientY: number }): { x: number; y: number } | null {
     const container = containerRef.current
@@ -68,7 +126,6 @@ export default function DragDropBildEditor({ bildUrl, setBildUrl, zielzonen, set
     }
   }
 
-  // ESC bricht aktuelles Zeichnen ab. Delete/Backspace löscht selektierte Zone.
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (e.key === 'Escape') { setErsteEcke(null); setPolyPunkte([]) }
@@ -90,7 +147,7 @@ export default function DragDropBildEditor({ bildUrl, setBildUrl, zielzonen, set
       id: `z${Date.now()}`,
       form: 'polygon',
       punkte: polyPunkte,
-      korrektesLabel: `Label ${zielzonen.length + 1}`,
+      korrekteLabels: [`Label ${zielzonen.length + 1}`],
     }
     setZielzonen(prev => [...prev, neu])
     setPolyPunkte([])
@@ -99,8 +156,6 @@ export default function DragDropBildEditor({ bildUrl, setBildUrl, zielzonen, set
 
   const handleBildKlick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     if (drag) return
-    // Klicks auf bestehende Zonen (SVG-Elemente im ZonenOverlay) nicht als
-    // Start-Klick für eine neue Zone interpretieren.
     if (e.target instanceof SVGElement) return
     const p = bildKoordinaten(e)
     if (!p) return
@@ -123,7 +178,7 @@ export default function DragDropBildEditor({ bildUrl, setBildUrl, zielzonen, set
             { x: minX + breite, y: minY + hoehe },
             { x: minX, y: minY + hoehe },
           ],
-          korrektesLabel: `Label ${zielzonen.length + 1}`,
+          korrekteLabels: [`Label ${zielzonen.length + 1}`],
         }
         setZielzonen(prev => [...prev, neu])
         setErsteEcke(null)
@@ -212,8 +267,9 @@ export default function DragDropBildEditor({ bildUrl, setBildUrl, zielzonen, set
     }
   }, [drag, setZielzonen])
 
-  const handleLabelAendern = useCallback((id: string, label: string) => {
-    setZielzonen(prev => prev.map(z => z.id === id ? { ...z, korrektesLabel: label } : z))
+  // Bundle J: Multi-Label per Zone (Synonyme)
+  const updateZoneLabels = useCallback((zoneId: string, korrekteLabels: string[]) => {
+    setZielzonen(prev => prev.map(z => z.id === zoneId ? { ...z, korrekteLabels } : z))
   }, [setZielzonen])
 
   const handleZoneLoeschen = useCallback((id: string) => {
@@ -221,39 +277,56 @@ export default function DragDropBildEditor({ bildUrl, setBildUrl, zielzonen, set
     if (selectedId === id) setSelectedId(null)
   }, [setZielzonen, selectedId])
 
-  const handleLabelsAktualisieren = useCallback((text: string) => {
-    setLabelsText(text)
-    const eingabe = text.split(',').map(l => l.trim()).filter(Boolean)
-    const seen = new Set<string>()
-    const dedup: string[] = []
-    for (const l of eingabe) {
-      if (seen.has(l)) continue
-      seen.add(l)
-      dedup.push(l)
-    }
-    setLabels(dedup)
-    if (dedup.length < eingabe.length) {
-      setPoolWarn('Doppelte Einträge im Pool wurden entfernt.')
-    }
+  // Pool-Operations: Duplikate erlaubt
+  const addPoolLabel = useCallback((text: string) => {
+    setLabels(prev => [...prev, { id: genId(), text }])
   }, [setLabels])
 
-  const doppelteZonenLabels = useMemo(() => {
-    const map = new Map<string, number[]>()
-    ;(zielzonen ?? []).forEach((z, i) => {
-      const l = (z.korrektesLabel ?? '').trim()
-      if (!l) return
-      if (!map.has(l)) map.set(l, [])
-      map.get(l)!.push(i + 1)
-    })
-    return [...map.entries()].filter(([, idx]) => idx.length > 1)
-  }, [zielzonen])
+  const removePoolLabel = useCallback((index: number) => {
+    setLabels(prev => prev.filter((_, i) => i !== index))
+  }, [setLabels])
+
+  // Konsistenz-Hinweise
+  const konsistenzHinweise = useMemo(() => {
+    const zonenTexte = new Map<string, number>()
+    for (const z of zielzonen) {
+      for (const l of (z.korrekteLabels ?? [])) {
+        const k = l.trim().toLowerCase()
+        if (!k) continue
+        zonenTexte.set(k, (zonenTexte.get(k) ?? 0) + 1)
+      }
+    }
+    const poolTexte = new Map<string, number>()
+    for (const l of labels) {
+      const k = (l.text ?? '').trim().toLowerCase()
+      if (!k) continue
+      poolTexte.set(k, (poolTexte.get(k) ?? 0) + 1)
+    }
+    const hinweise: Array<{ text: string; level: 'warn' | 'info' }> = []
+    let zoneIndex = 0
+    for (const z of zielzonen) {
+      zoneIndex++
+      for (const text of (z.korrekteLabels ?? [])) {
+        const k = text.trim().toLowerCase()
+        if (!k) continue
+        const poolCnt = poolTexte.get(k) ?? 0
+        const zonenCnt = zonenTexte.get(k) ?? 0
+        if (poolCnt < zonenCnt) {
+          hinweise.push({ text: `Zone ${zoneIndex} akzeptiert '${text}', Pool hat ${poolCnt} (gebraucht: ${zonenCnt})`, level: 'warn' })
+        }
+      }
+    }
+    for (const [text, cnt] of poolTexte) {
+      if (!zonenTexte.has(text)) hinweise.push({ text: `Pool-Token '${text}' (${cnt}×) passt zu keiner Zone (Distraktor)`, level: 'info' })
+    }
+    return hinweise
+  }, [zielzonen, labels])
 
   function handleMouseMove(e: React.MouseEvent) {
     const p = bildKoordinaten(e)
     if (p) setMausPosition(p)
   }
 
-  // Defensiv: Zonen im Alt-Format (ohne Array-punkte) nicht rendern, sondern als Hinweis anzeigen
   const istWohlgeformt = (z: DragDropBildZielzone) => Array.isArray((z as any).punkte) && (z as any).punkte.length >= 3
   const sichereZonen = (zielzonen ?? []).filter(istWohlgeformt)
   const anzahlAlt = (zielzonen ?? []).length - sichereZonen.length
@@ -340,7 +413,6 @@ export default function DragDropBildEditor({ bildUrl, setBildUrl, zielzonen, set
                 onKantenKlick={handleKantenKlick}
               />
 
-              {/* Zahlen-Badges */}
               {sichereZonen.map((zone, i) => {
                 const xs = zone.punkte.map(p => p.x), ys = zone.punkte.map(p => p.y)
                 const cx = xs.reduce((s, v) => s + v, 0) / xs.length
@@ -369,17 +441,8 @@ export default function DragDropBildEditor({ bildUrl, setBildUrl, zielzonen, set
       {(zielzonen ?? []).length > 0 && (
         <div data-testid="dnd-zielzonen-section" className={`space-y-2 ${pflichtCls(feldStatusZielzonen)}`}>
           <h5 className="text-xs font-medium text-slate-600 dark:text-slate-300">
-            Zielzonen ({(zielzonen ?? []).length})
+            Zielzonen ({(zielzonen ?? []).length}) — pro Zone akzeptierte Label-Synonyme
           </h5>
-          {doppelteZonenLabels.length > 0 && (
-            <div role="alert" className="mb-3 p-3 rounded-lg border border-orange-400 bg-orange-50 dark:bg-orange-900/20 dark:border-orange-600 text-sm space-y-1 text-orange-800 dark:text-orange-200">
-              {doppelteZonenLabels.map(([label, zonen]) => (
-                <div key={label}>
-                  ⚠ {zonen.length} Zonen mit identischem Label „{label}" (Zonen {zonen.join(', ')}). Im Übungs-Modus wird eine zwingend falsch ausgewertet.
-                </div>
-              ))}
-            </div>
-          )}
           {(zielzonen ?? []).map((zone, i) => (
             <div
               key={zone.id}
@@ -390,17 +453,20 @@ export default function DragDropBildEditor({ bildUrl, setBildUrl, zielzonen, set
               }`}
               onClick={() => setSelectedId(zone.id)}
             >
-              <div className="flex items-center gap-2">
-                <span className="w-6 h-6 flex items-center justify-center bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs font-bold rounded-full shrink-0">
+              <div className="flex items-start gap-2">
+                <span className="w-6 h-6 flex items-center justify-center bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs font-bold rounded-full shrink-0 mt-1">
                   {i + 1}
                 </span>
-                <input
-                  type="text"
-                  value={zone.korrektesLabel}
-                  onChange={(e) => handleLabelAendern(zone.id, e.target.value)}
-                  placeholder="Korrektes Label"
-                  className="flex-1 px-2 py-1 text-sm border rounded bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-700 dark:text-white"
-                />
+                <div className="flex-1">
+                  <ChipInput
+                    chips={zone.korrekteLabels ?? []}
+                    onAdd={(t) => updateZoneLabels(zone.id, [...(zone.korrekteLabels ?? []), t])}
+                    onRemove={(idx) => updateZoneLabels(zone.id, (zone.korrekteLabels ?? []).filter((_, i) => i !== idx))}
+                    placeholder="Korrekte Labels (Enter zum Hinzufügen)"
+                    testId={`zone-${zone.id}-chip-input`}
+                    chipTestIdPrefix={`zone-${zone.id}-chip-`}
+                  />
+                </div>
                 <button
                   type="button"
                   onClick={(e) => { e.stopPropagation(); handleZoneLoeschen(zone.id) }}
@@ -417,35 +483,38 @@ export default function DragDropBildEditor({ bildUrl, setBildUrl, zielzonen, set
 
       <div>
         <label className="text-xs text-slate-500 dark:text-slate-400">
-          Label-Pool (kommasepariert, inkl. Distraktoren)
+          Label-Pool (Duplikate erlaubt für Multi-Zone-Tokens)
         </label>
-        <input
-          type="text"
-          value={labelsText}
-          onChange={(e) => handleLabelsAktualisieren(e.target.value)}
-          placeholder="Label 1, Label 2, Distraktor 1, ..."
-          className="w-full mt-1 px-3 py-2 text-sm border rounded-lg bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-700 dark:text-white"
-        />
-        {poolWarn && (
-          <div role="status" className="mt-2 p-2 rounded bg-amber-50 text-amber-900 dark:bg-amber-900/30 dark:text-amber-200 text-xs">
-            {poolWarn}
-          </div>
-        )}
+        <div className="mt-1">
+          <ChipInput
+            chips={labels.map(l => l.text)}
+            onAdd={addPoolLabel}
+            onRemove={removePoolLabel}
+            placeholder="Pool-Token (Enter)"
+            testId="pool-chip-input"
+            chipTestIdPrefix="pool-chip-"
+          />
+        </div>
         <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
-          Muss alle korrekten Labels der Zielzonen enthalten. Zusaetzliche Labels dienen als Distraktoren.
+          Pro Zone müssen genug passende Tokens im Pool sein. Zusätzliche Tokens dienen als Distraktoren.
         </p>
       </div>
 
-      {zielzonen.length > 0 && (labels ?? []).length > 0 && (
-        (() => {
-          const fehlend = zielzonen.filter(z => !(labels ?? []).includes(z.korrektesLabel))
-          if (fehlend.length === 0) return null
-          return (
-            <div className="text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 p-2 rounded">
-              Warnung: Folgende korrekte Labels fehlen im Pool: {fehlend.map(z => z.korrektesLabel).join(', ')}
+      {konsistenzHinweise.length > 0 && (
+        <div data-testid="dnd-konsistenz" className="space-y-1">
+          {konsistenzHinweise.map((h, i) => (
+            <div
+              key={i}
+              className={`text-xs p-2 rounded border ${
+                h.level === 'warn'
+                  ? 'text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-900/20 border-amber-300'
+                  : 'text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-700'
+              }`}
+            >
+              {h.text}
             </div>
-          )
-        })()
+          ))}
+        </div>
       )}
     </div>
   )

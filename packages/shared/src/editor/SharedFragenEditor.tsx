@@ -28,7 +28,7 @@ import type {
   VisualisierungFrage, CanvasConfig,
   PDFFrage, PDFKategorie, PDFAnnotationsWerkzeug, PDFAnnotation,
   SortierungFrage, HotspotFrage, HotspotBereich, BildbeschriftungFrage, BildbeschriftungLabel,
-  AudioFrage, DragDropBildFrage, DragDropBildZielzone,
+  AudioFrage, DragDropBildFrage, DragDropBildLabel, DragDropBildZielzone,
   CodeFrage, FormelFrage, Lernziel,
 } from '../types/fragen'
 import type { Berechtigung } from '../types/auth'
@@ -462,12 +462,32 @@ export default function SharedFragenEditor({
   )
 
   // DragDrop-Bild-spezifisch
-  const [ddZielzonen, setDdZielzonen] = useState<DragDropBildZielzone[]>(
-    frage?.typ === 'dragdrop_bild' ? (frage as DragDropBildFrage).zielzonen ?? [] : []
-  )
-  const [ddLabels, setDdLabels] = useState<string[]>(
-    frage?.typ === 'dragdrop_bild' ? (frage as DragDropBildFrage).labels ?? [] : []
-  )
+  const [ddZielzonen, setDdZielzonen] = useState<DragDropBildZielzone[]>(() => {
+    if (frage?.typ !== 'dragdrop_bild') return []
+    const raw = (frage as DragDropBildFrage).zielzonen ?? []
+    // Migrations-Adapter: korrektesLabel → korrekteLabels
+    return raw.map(z => {
+      if (Array.isArray((z as any).korrekteLabels) && (z as any).korrekteLabels.length > 0) {
+        return z
+      }
+      const legacy = (z as any).korrektesLabel
+      return { ...z, korrekteLabels: legacy ? [String(legacy)] : [] }
+    })
+  })
+  const [ddLabels, setDdLabels] = useState<DragDropBildLabel[]>(() => {
+    if (frage?.typ !== 'dragdrop_bild') return []
+    const raw = (frage as DragDropBildFrage).labels ?? []
+    // Migrations-Adapter: string[] → DragDropBildLabel[]
+    return raw.map((l: any, i: number) => {
+      if (typeof l === 'string') {
+        return { id: `lbl-${i}-${Math.random().toString(36).slice(2, 8)}`, text: l }
+      }
+      if (l && typeof l === 'object' && typeof l.text === 'string') {
+        return { id: l.id ?? `lbl-${i}-${Math.random().toString(36).slice(2, 8)}`, text: l.text }
+      }
+      return { id: `lbl-${i}-${Math.random().toString(36).slice(2, 8)}`, text: '' }
+    })
+  })
 
   // Code-spezifisch
   const [codeSprache, setCodeSprache] = useState(

@@ -15,7 +15,7 @@ import type {
   PDFFrage, PDFKategorie, PDFAnnotationsWerkzeug, PDFAnnotation,
   SortierungFrage, HotspotFrage, HotspotBereich,
   BildbeschriftungFrage, BildbeschriftungLabel,
-  AudioFrage, DragDropBildFrage, DragDropBildZielzone,
+  AudioFrage, DragDropBildFrage, DragDropBildLabel, DragDropBildZielzone,
   CodeFrage, FormelFrage,
 } from '../types/fragen'
 import { parseLuecken } from './editorUtils'
@@ -74,7 +74,7 @@ export type TypSpezifischeDaten =
   | { typ: 'hotspot'; fragetext: string; bildUrl: string; bereiche: HotspotBereich[]; mehrfachauswahl: boolean }
   | { typ: 'bildbeschriftung'; fragetext: string; bildUrl: string; beschriftungen: BildbeschriftungLabel[] }
   | { typ: 'audio'; fragetext: string; maxDauerSekunden?: number }
-  | { typ: 'dragdrop_bild'; fragetext: string; bildUrl: string; zielzonen: DragDropBildZielzone[]; labels: string[] }
+  | { typ: 'dragdrop_bild'; fragetext: string; bildUrl: string; zielzonen: DragDropBildZielzone[]; labels: DragDropBildLabel[] }
   | { typ: 'code'; fragetext: string; sprache: string; starterCode: string; musterLoesungCode: string }
   | { typ: 'formel'; fragetext: string; korrekteFormel: string; vergleichsModus: 'exakt' }
 
@@ -286,7 +286,7 @@ export function erstelleFrageObjekt(basis: FrageBasis, typDaten: TypSpezifischeD
         bildUrl,
         bild: bildQuelleAus({ bildUrl }) ?? undefined,
         zielzonen: typDaten.zielzonen,
-        labels: typDaten.labels.filter(l => l.trim()),
+        labels: typDaten.labels.filter(l => l && l.text.trim().length > 0),
       } as DragDropBildFrage
     }
 

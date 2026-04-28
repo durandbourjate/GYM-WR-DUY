@@ -6,6 +6,103 @@
 
 ---
 
+## Bundle J — KOMPLETT auf main (28.04.2026, S160)
+
+**Migration-Status (28.04.2026 22:50 CEST):**
+- 28/28 dragdrop_bild-Fragen erfolgreich migriert (5 BWL + 10 Recht + 12 VWL + 1 Demo `einr-dd-kontinente`).
+- Re-Dump-Verifikation: 0 Fragen mit altem Format, 0 nicht gefunden.
+- Browser-E2E auf Staging mit echten Logins: LP-Editor (Multi-Label Chip-Input + Pool-Token-Liste + Konsistenz-Hinweise) und SuS-Üben (3-Zonen-Layout + Pool-Tokens als Chips, alle Frage `c3ff19bd-...` Arbeitslosigkeitstypen).
+- Pre-Merge-Checks: tsc 0 Errors, **1098 vitest** (+16 vs main 1082), npm run build ✓.
+
+**Was Bundle J gebracht hat:**
+- DragDrop-Bild-Datenmodell auf Multi-Zone (eine `korrekteLabels: string[]` pro Zone statt Single-Label) und Multi-Label-Akzeptanz (Synonym-Listen).
+- Pool-Tokens jetzt mit ID + Text (`DragDropBildLabel{id, text}`), Stack-Counter für Duplikate, deterministische `stabilId(frageId, text, index)` Cross-Env-Hashes (TS+ESM-Mirror).
+- Generic `felder`-Patch am `batchUpdateFragenMigration`-Endpoint — nutzbar für künftige Migrationen (S160-Erweiterung des C9-Endpoints).
+
+**Apps-Script-Bereitstellungen die in S160 deployed wurden:**
+1. **Erste Bereitstellung (Vor-Session):** Phase 4 — `LOESUNGS_FELDER_` mit `korrekteLabels` + `testDragDropMultiZonePrivacy_`.
+2. **Zweite Bereitstellung (S160 22:30 ca.):** Phase 9.0 — generic `felder`-Patch am `batchUpdateFragenMigrationEndpoint` + `testBundleJMigrationFelder`.
+
+**Cleanup-Reminder (~14 Tage):** Audit-Skript erneut ausführen, prüfen ob noch alte Fragen rumstehen, dann Cleanup-Bundle starten — `korrektesLabel`/`legacyLabels` aus Types entfernen, Dual-Read-Pfade weg.
+
+---
+
+## Bundle J Browser-E2E Test-Plan (S160)
+
+### Setup
+- Tab-Gruppe mit LP (`wr.test@gymhofwil.ch`) + SuS (`wr.test@stud.gymhofwil.ch`).
+- Test-Prüfung: Einrichtungsprüfung mit DnD-Bild-Frage `einr-dd-kontinente`.
+- Stichprobe-Migration via `node upload.mjs --ids=<5-10 IDs>` vor dem E2E.
+
+### Zu testende Änderungen
+
+| # | Änderung | Erwartetes Verhalten | Regressions-Risiko |
+|---|----------|---------------------|-------------------|
+| 1 | LP-Editor Multi-Zone-Frage | Bilanz-Schema mit 2× `Aktiva`-Zonen + 2 `Aktiva`-Pool-Tokens speicherbar | Editor crasht bei alten Fragen |
+| 2 | LP-Editor Multi-Label | Zone akzeptiert `['Marketing-Mix', '4P']` | Chip-Input verliert Daten |
+| 3 | SuS-Stack-Counter | Pool zeigt `Aktiva ×2`, Counter dekrementiert beim Drop | Stack verschwindet falsch |
+| 4 | SuS-Korrektur Multi-Zone | 2 `Aktiva`-Tokens in 2 `Aktiva`-Zonen → beide korrekt | Eine Zone fälschlich falsch |
+| 5 | Bestand-Frage (vor Mig) | Frage öffnen + lösen wie vorher (Demo-Frage `einr-dd-kontinente`) | Antwort orphaned |
+| 6 | Bestand-Frage (nach Mig) | Frage öffnen + lösen wie vorher (1:1-Mapping) | Antwort orphaned |
+
+### Security-Check
+
+- [ ] SuS-API-Response: keine `korrekteLabels`, kein `korrektesLabel` (DevTools → Network → letzte Antwort-Response).
+- [ ] SuS-API-Response: `labels` hat `id+text` (kein Lösungs-Hint im id-Pattern, IDs sind base32-Hashes).
+- [ ] LP-API-Response: `korrekteLabels` vollständig (bei LP-Editor / Korrektur).
+
+### Kritische Pfade (regression-prevention.md §1.3)
+
+- [ ] SuS lädt Üben-Modus mit DnD-Frage.
+- [ ] LP Korrektur-Vollansicht für DnD-Frage.
+- [ ] LP Druck-Ansicht (`/lp/druck`).
+- [ ] SuS-Heartbeat speichert `zuordnungen`.
+- [ ] SuS-Abgabe persistiert.
+
+### Regressions-Tests (verwandte Fragetypen)
+
+- [ ] Hotspot, Bildbeschriftung (gleiche Bild-Pattern).
+- [ ] Sortierung, Zuordnung (Drag-verwandt).
+- [ ] FiBu-Tabellen-Eingabe (Buchungssatz, T-Konto, Bilanz/ER).
+
+### Mobile / iPad-Test (PFLICHT für Stack-Touch-Mechanik)
+
+- [ ] iPad oder Chrome-DevTools Mobile-Simulation: Tap-to-Select auf Stack `Soll ×3`.
+- [ ] Tap auf Zone → Counter dekrementiert auf ×2.
+- [ ] Bei Counter = 0: Stack verschwindet aus Pool.
+- [ ] Tap auf platzierten Token in Zone → entfernt, Counter +1.
+- [ ] Touch-Targets ≥ 44×44px.
+- [ ] `touchAction: 'none'` auf interaktiven Elementen während Tap.
+
+---
+
+## Bundle J Phase 1-8 — KOMPLETT (Branch `feature/bundle-j-dragdrop-multi-zone`)
+
+**Stand 28.04.2026 Ende der Session:**
+- 20 Commits seit main.
+- Phase 1.3 Type-Erweiterung: 65 tsc-Errors → 0 nach Phase 8.
+- **1098 vitest passes** (vorher 1082, +16 für neue Normalizer/Stack/Pool/Editor-Tests).
+- `npm run build` grün, `npx tsc -b` clean.
+
+**Was steht für nächste Session an:**
+
+1. **Phase 9 — Migrations-Skript** (Tasks 27-31, Plan-Lines 2196-2519)
+   - `ExamLab/scripts/migrate-dragdrop-multi-zone/` mit `package.json`, `dump.mjs`, `migrate.mjs`, `upload.mjs`, `SESSION-PROTOCOL.md`
+   - Smoke-Run mit Mock-Input vor User-Migration
+   - Reine Skript-Arbeit, kein UI-Test
+2. **Phase 10 — E2E + Full-Run** (Tasks 32-35)
+   - Browser-E2E mit echten Logins (Tab-Gruppe LP+SuS)
+   - Test-Plan in HANDOFF
+   - Stichprobe-Migration (5-10 Fragen) → Verifikation → Full-Run
+3. **Phase 11 — Merge auf main** (Tasks 36-38)
+   - Pre-Merge-Checks
+   - Merge + Push
+   - Cleanup-Reminder via mcp__scheduled-tasks (~2 Wochen)
+
+**Vorbedingung für Phase 9-10:** User-Task Phase 4 (Apps-Script-Deploy + `testDragDropMultiZonePrivacy = OK`) muss erfolgt sein.
+
+---
+
 ## S158 (28.04.2026) — Bundle J: Spec + Plan freigegeben, Implementation offen
 
 **Was die Session machte:** Reine Brainstorming + Plan-Session. Kein Code-Change. Spec rev3 (2 Reviewer-Iterationen) + Plan rev3 (2 Reviewer-Iterationen) auf `main` committed und gepusht. Implementation für nächste Session reserviert.

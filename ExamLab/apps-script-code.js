@@ -2203,7 +2203,7 @@ var LOESUNGS_FELDER_ = {
     { feld: 'bilanzEintraege', subFelder: ['korrekt'] },
     { feld: 'aufgaben', subFelder: ['erwarteteAntworten', 'erklaerung'] },
     { feld: 'beschriftungen', subFelder: ['korrekt', 'erklaerung'] },
-    { feld: 'zielzonen', subFelder: ['korrektesLabel', 'erklaerung'] },
+    { feld: 'zielzonen', subFelder: ['korrektesLabel', 'korrekteLabels', 'erklaerung'] },
     { feld: 'bereiche', subFelder: ['korrekt', 'erklaerung'], nurBeiTyp: 'hotspot' },
     { feld: 'hotspots', subFelder: ['korrekt', 'erklaerung'], nurBeiTyp: 'hotspot' },
     // BilanzER: kontenMitSaldi[].erklaerung (id = kontonummer). saldo selbst
@@ -8215,6 +8215,12 @@ function migriereFachbereich_() {
 // === EINMALIG: Reparatur Einrichtungsprüfung (fehlende typDaten) ===
 // Nach Ausführung kann diese Funktion gelöscht werden.
 function repariereEinrichtungsFragen() {
+  // Bundle J: DragDrop-Korrektur läuft nur im Frontend (autoKorrektur.ts).
+  // Backend speichert nur die ID-keyed Antworten (zuordnungen). Migration des
+  // Antwort-Schemas durch normalisiereDragDropAntwort am Read-Eintrittspunkt.
+  // Demo-Frage `einr-dd-kontinente` bleibt im Legacy-Format (korrektesLabel +
+  // string[]-labels) — Frontend-Normalizer hebt sie zur Laufzeit. Cleanup-Bundle
+  // konvertiert sie aufs neue Format.
   var reparaturen = {
     'einr-sort-planeten': { elemente: ['Merkur','Venus','Erde','Mars','Jupiter','Saturn','Uranus','Neptun'], teilpunkte: true },
     'einr-hs-europa': { bildUrl: './demo-bilder/europa-karte.svg', bereiche: [{ id: 'schweiz', form: 'rechteck', punkte: [{x:45,y:43},{x:51,y:43},{x:51,y:48},{x:45,y:48}], label: 'Schweiz', punktzahl: 2 }], mehrfachauswahl: false },
@@ -11863,19 +11869,32 @@ function holeAlleFragenFuerMigrationEndpoint(body) {
 
 /**
  * C9 Phase 4 Task 2 — Batch-Update-Endpoint fuer Migration.
+ * Bundle J Phase 9 — erweitert um optionalen `felder`-Patch (typDaten + Spalten).
  *
- * Partial-Update-Semantik (Spec §8): NUR musterlosung, typDaten (nur die
- * erklaerung-Subfelder), pruefungstauglich, geaendertAm, poolContentHash werden
+ * Partial-Update-Semantik (Spec §8): NUR die mitgegebenen Felder werden
  * ueberschrieben. Alles andere (fragetext, Optionen-Text, korrekt-Flags, tags,
  * punkte, thema, bloom, autor etc.) bleibt 1:1 wie es war.
+ *
+ * Drei Update-Pfade pro Frage (alle optional, kombinierbar):
+ * - `musterlosung: '<text>'` — ueberschreibt musterlosung-Spalte (nur wenn Key vorhanden)
+ * - `teilerklaerungen: [{feld, id, text}]` — patcht typDaten[feld][i].erklaerung (C9-Pfad)
+ * - `felder: {<key>: <wert>}` — generischer Patch:
+ *     - Wenn <key> eine Sheet-Spalte ist (z.B. pruefungstauglich): direkt setzen
+ *     - Sonst: typDaten[<key>] = <wert> (ueberschreibt den Subbaum vollstaendig)
+ *
+ * Default-Verhalten: pruefungstauglich → '' (false) nach jedem Update,
+ * AUSSER felder.pruefungstauglich wurde explizit gesetzt.
  *
  * Request-Body: {
  *   action: 'batchUpdateFragenMigration',
  *   email: '<admin-lp>',
  *   fachbereich: 'VWL'|'BWL'|'Recht'|'Informatik',
  *   updates: [
- *     { id: '<frage-id>', musterlosung: '<text>',
- *       teilerklaerungen: [{ feld: 'optionen', id: 'opt-a', text: '...' }, ...] }
+ *     { id: '<frage-id>',
+ *       musterlosung?: '<text>',
+ *       teilerklaerungen?: [{feld, id, text}],
+ *       felder?: {zielzonen: [...], labels: [...], pruefungstauglich: bool, ...}
+ *     }
  *   ]
  * }
  *
@@ -11948,7 +11967,7 @@ function batchUpdateFragenMigrationEndpoint(body) {
       var typDaten;
       try { typDaten = JSON.parse(typDatenRaw); } catch (e) { typDaten = {}; }
 
-      // Teilerklaerungen in typDaten einarbeiten
+      // Teilerklaerungen in typDaten einarbeiten (C9-Pfad)
       if (Array.isArray(upd.teilerklaerungen)) {
         for (var t = 0; t < upd.teilerklaerungen.length; t++) {
           var te = upd.teilerklaerungen[t];
@@ -11965,10 +11984,37 @@ function batchUpdateFragenMigrationEndpoint(body) {
         }
       }
 
+      // Bundle J: generic felder-Patch (Top-Level-Spalten ODER typDaten-Sub-Keys)
+      var pruefungstauglichExpliclySet = false;
+      if (upd.felder && typeof upd.felder === 'object') {
+        for (var fkey in upd.felder) {
+          if (!Object.prototype.hasOwnProperty.call(upd.felder, fkey)) continue;
+          var fval = upd.felder[fkey];
+          var colIdx = headers.indexOf(fkey);
+          if (colIdx >= 0) {
+            // Top-Level-Sheet-Spalte
+            if (fkey === 'pruefungstauglich') {
+              row[colIdx] = fval === true ? 'true' : '';
+              pruefungstauglichExpliclySet = true;
+            } else if (fkey === 'musterlosung' || fkey === 'typDaten' || fkey === 'geaendertAm' || fkey === 'poolContentHash') {
+              // diese Spalten werden weiter unten gemanaged — ueberschreiben via felder verboten
+              continue;
+            } else {
+              row[colIdx] = (typeof fval === 'object' && fval !== null) ? JSON.stringify(fval) : String(fval);
+            }
+          } else {
+            // typDaten-Sub-Feld (z.B. zielzonen, labels)
+            typDaten[fkey] = fval;
+          }
+        }
+      }
+
       // Row-Werte ueberschreiben (partial update — nur diese Felder, Rest bleibt)
-      row[musterlosungCol] = String(upd.musterlosung || '');
+      if ('musterlosung' in upd) row[musterlosungCol] = String(upd.musterlosung || '');
       row[typDatenCol] = JSON.stringify(typDaten);
-      if (pruefungstauglichCol >= 0) row[pruefungstauglichCol] = ''; // false (leer = nicht-true)
+      if (!pruefungstauglichExpliclySet && pruefungstauglichCol >= 0) {
+        row[pruefungstauglichCol] = ''; // false (leer = nicht-true) — Default fuer alle Migrationen
+      }
       if (geaendertAmCol >= 0) row[geaendertAmCol] = nowIso;
       if (poolContentHashCol >= 0) row[poolContentHashCol] = ''; // neu berechnen beim naechsten Pool-Check
 
@@ -12673,6 +12719,221 @@ function testC9Privacy_() {
   assert_(!bereinigeFrageFuerSuS_(bs).buchungen, 'Buchungssatz Prüfen: buchungen komplett entfernt (top-level)');
 
   Logger.log('✓ C9 Privacy-Tests bestanden (9 Typen + Buchungssatz-Dokumentation).');
+}
+
+/**
+ * Bundle J Phase 4 — DragDrop-Bild Multi-Zone Privacy-Test.
+ * Prüft dass bereinigeFrageFuerSuS_ sowohl korrekteLabels (neu) als auch
+ * korrektesLabel (legacy) entfernt, plus erklaerung im Prüfen-Modus.
+ * Plus: S122-Type-Guard — primitive (string) labels werden durchgereicht.
+ */
+function testDragDropMultiZonePrivacy_() {
+  function assert_(cond, msg) { if (!cond) throw new Error('FAIL: ' + msg); }
+  var fragePost = {
+    typ: 'dragdrop_bild',
+    zielzonen: [
+      { id: 'z1', korrekteLabels: ['Aktiva'], erklaerung: 'foo' },
+      { id: 'z2', korrekteLabels: ['Passiva'] },
+    ],
+    labels: [{ id: 'lid-1', text: 'Aktiva' }, { id: 'lid-2', text: 'Passiva' }],
+  };
+  var bereinigtPost = bereinigeFrageFuerSuS_(fragePost);
+  assert_(!bereinigtPost.zielzonen[0].korrekteLabels, 'korrekteLabels entfernt (post-migration)');
+  assert_(!bereinigtPost.zielzonen[0].erklaerung, 'erklaerung entfernt im Prüfen-Modus');
+  assert_(bereinigtPost.labels.length === 2, 'labels bleiben (Text wird angezeigt)');
+  assert_(bereinigtPost.labels[0].text === 'Aktiva', 'Text bleibt');
+  assert_(bereinigtPost.labels[0].id === 'lid-1', 'ID bleibt');
+
+  var fragePre = {
+    typ: 'dragdrop_bild',
+    zielzonen: [
+      { id: 'z1', korrektesLabel: 'Aktiva', erklaerung: 'foo' },
+    ],
+    labels: ['Aktiva', 'Passiva'],  // string[]
+  };
+  var bereinigtPre = bereinigeFrageFuerSuS_(fragePre);
+  assert_(!bereinigtPre.zielzonen[0].korrektesLabel, 'Legacy korrektesLabel entfernt');
+  assert_(typeof bereinigtPre.labels[0] === 'string', 'Legacy string-labels durchgereicht (S122-Guard)');
+
+  var frageMix = {
+    typ: 'dragdrop_bild',
+    zielzonen: [
+      { id: 'z1', korrekteLabels: ['Aktiva'], korrektesLabel: 'Aktiva', erklaerung: 'foo' },
+    ],
+    labels: [{ id: 'a', text: 'Aktiva' }, 'Passiva'],  // gemischt
+  };
+  var bereinigtMix = bereinigeFrageFuerSuS_(frageMix);
+  assert_(!bereinigtMix.zielzonen[0].korrekteLabels, 'beide Felder entfernt (mix)');
+  assert_(!bereinigtMix.zielzonen[0].korrektesLabel, 'beide Felder entfernt (mix)');
+  assert_(bereinigtMix.labels.length === 2, 'labels bleiben in mix');
+  Logger.log('✓ Bundle J DragDrop Multi-Zone Privacy-Tests bestanden.');
+  return 'OK';
+}
+
+function testDragDropMultiZonePrivacy() {  // public wrapper für GAS-Editor
+  return testDragDropMultiZonePrivacy_();
+}
+
+/**
+ * Bundle J Phase 9 — Smoke-Test fuer batchUpdateFragenMigrationEndpoint mit
+ * generic `felder`-Patch (zielzonen, labels, pruefungstauglich).
+ *
+ * ⚠️ Schreibt kurz IN DIE ECHTE FRAGENBANK. Nach erfolgreichem Test wird der
+ * urspruengliche Zustand wiederhergestellt — BIS AUF pruefungstauglich, das
+ * der Test deutlich auf '' setzt (User darf nach Test manuell zuruecksetzen).
+ *
+ * Wichtig: getSheetData() liefert ALLE Spalten als String (auch typDaten).
+ * Deshalb durch parseFrage(row, fachbereich) schicken um zielzonen/labels
+ * geparst zu erhalten. Andernfalls ist frage.zielzonen undefined.
+ */
+function testBundleJMigrationFelder_() {
+  function assert_(cond, msg) { if (!cond) throw new Error('Assertion fehlgeschlagen: ' + msg); }
+  var EMAIL = 'wr.test@gymhofwil.ch'; // ggf. auf eigene Admin-LP-E-Mail anpassen
+
+  // 1. Eine dragdrop_bild-Frage in BWL/Recht/VWL finden + parseFrage anwenden
+  var fragenbank = SpreadsheetApp.openById(FRAGENBANK_ID);
+  var fachbereiche = ['BWL', 'Recht', 'VWL'];
+  var dndFrage = null;
+  var fachbereichVerwendet = null;
+  for (var fb = 0; fb < fachbereiche.length && !dndFrage; fb++) {
+    var sheet = fragenbank.getSheetByName(fachbereiche[fb]);
+    if (!sheet) continue;
+    var data = getSheetData(sheet);
+    for (var i = 0; i < data.length; i++) {
+      if (data[i].typ === 'dragdrop_bild') {
+        dndFrage = parseFrage(data[i], fachbereiche[fb]);
+        fachbereichVerwendet = fachbereiche[fb];
+        break;
+      }
+    }
+  }
+  assert_(dndFrage, 'Keine dragdrop_bild-Frage in BWL/Recht/VWL gefunden');
+  var testId = dndFrage.id;
+  Logger.log('Test-Frage: ' + testId + ' aus ' + fachbereichVerwendet);
+
+  // 2. Originalwerte sichern — DEEP COPY weil Patch das Objekt veraendert
+  var originalZielzonen = JSON.parse(JSON.stringify(dndFrage.zielzonen || []));
+  var originalLabels = JSON.parse(JSON.stringify(dndFrage.labels || []));
+  var originalMusterlosung = dndFrage.musterlosung;
+  Logger.log('Original zielzonen-Anzahl: ' + originalZielzonen.length + ', labels-Anzahl: ' + originalLabels.length);
+  assert_(originalZielzonen.length > 0, 'Frage muss zielzonen haben (parseFrage hat geparst)');
+
+  // 3. Marker-Patch via felder
+  var markerZonen = [{ id: 'test-z-marker', korrekteLabels: ['BUNDLE-J-TEST'] }];
+  var markerLabels = [{ id: 'test-l-marker', text: 'BUNDLE-J-TEST' }];
+  var body = {
+    action: 'batchUpdateFragenMigration',
+    email: EMAIL,
+    fachbereich: fachbereichVerwendet,
+    updates: [{
+      id: testId,
+      felder: { zielzonen: markerZonen, labels: markerLabels, pruefungstauglich: false },
+    }, {
+      id: 'definitely-not-existing-bundle-j-id-xyz',
+      felder: { zielzonen: [], labels: [] },
+    }],
+  };
+  var r = batchUpdateFragenMigrationEndpoint(body);
+  var res = JSON.parse(r.getContent());
+  Logger.log('Response: ' + JSON.stringify(res, null, 2));
+  assert_(res.success === true, 'success=true erwartet');
+  assert_(res.aktualisiert === 1, 'aktualisiert=1 erwartet (war: ' + res.aktualisiert + ')');
+  assert_(Array.isArray(res.nichtGefunden) && res.nichtGefunden.length === 1, 'nichtGefunden mit 1 Eintrag');
+  assert_(res.nichtGefunden[0] === 'definitely-not-existing-bundle-j-id-xyz', 'nichtGefunden enthaelt Marker-ID');
+
+  // 4. Verifikation im Sheet — durch parseFrage schicken weil getSheetData stringifiziert
+  var sheetVerify = fragenbank.getSheetByName(fachbereichVerwendet);
+  var dataNeu = getSheetData(sheetVerify);
+  var frageNeu = null;
+  for (var j = 0; j < dataNeu.length; j++) {
+    if (dataNeu[j].id === testId) {
+      frageNeu = parseFrage(dataNeu[j], fachbereichVerwendet);
+      break;
+    }
+  }
+  assert_(frageNeu, 'Frage nach Update gefunden');
+  assert_(JSON.stringify(frageNeu.zielzonen) === JSON.stringify(markerZonen), 'zielzonen wurde via felder gesetzt');
+  assert_(JSON.stringify(frageNeu.labels) === JSON.stringify(markerLabels), 'labels wurde via felder gesetzt');
+  assert_(String(frageNeu.musterlosung || '') === String(originalMusterlosung || ''), 'musterlosung unveraendert (Bundle-J-Pfad clobbert nicht)');
+  assert_(frageNeu.pruefungstauglich === false, 'pruefungstauglich auf false');
+
+  // 5. Rollback: Originalwerte zurueckschreiben
+  var rollbackBody = {
+    action: 'batchUpdateFragenMigration',
+    email: EMAIL,
+    fachbereich: fachbereichVerwendet,
+    updates: [{
+      id: testId,
+      felder: {
+        zielzonen: originalZielzonen,
+        labels: originalLabels,
+      },
+    }],
+  };
+  batchUpdateFragenMigrationEndpoint(rollbackBody);
+  Logger.log('Rollback abgeschlossen — Frage ' + testId + ' wieder im Original-Zustand (pruefungstauglich bleibt false, ggf. manuell setzen)');
+
+  Logger.log('✓ Bundle J Migration-Felder-Test bestanden.');
+  return 'OK';
+}
+
+function testBundleJMigrationFelder() {  // public wrapper für GAS-Editor
+  return testBundleJMigrationFelder_();
+}
+
+/**
+ * Bundle J Phase 9 — Recovery-Shim fuer einr-dd-kontinente.
+ *
+ * Setzt die Demo-Frage `einr-dd-kontinente` in BWL auf den kanonischen
+ * Original-Stand zurueck (aus `ExamLab/src/data/einrichtungsFragen.ts`).
+ *
+ * Verwendung wenn ein vorheriger fehlerhafter Test-Lauf die Frage mit
+ * Marker-Daten ueberschrieben hat. Nutzt den felder-Patch — schreibt
+ * korrekteLabels (neues Format) + labels-Objekt-Array. pruefungstauglich
+ * bleibt false (Default des Endpoints), User soll im Editor manuell pruefen
+ * und freigeben.
+ */
+function recoverEinrDdKontinente_() {
+  var EMAIL = 'wr.test@gymhofwil.ch';
+  var TARGET_ID = 'einr-dd-kontinente';
+  var FACHBEREICH = 'BWL';
+
+  // Kanonische Werte aus einrichtungsFragen.ts (Stand 28.04.2026)
+  var zielzonen = [
+    { id: '1', form: 'rechteck', punkte: [{x:12,y:35},{x:32,y:35},{x:32,y:60},{x:12,y:60}], korrekteLabels: ['Nordamerika'] },
+    { id: '2', form: 'rechteck', punkte: [{x:45,y:25},{x:60,y:25},{x:60,y:55},{x:45,y:55}], korrekteLabels: ['Europa'] },
+    { id: '3', form: 'rechteck', punkte: [{x:70,y:35},{x:90,y:35},{x:90,y:65},{x:70,y:65}], korrekteLabels: ['Asien'] },
+    { id: '4', form: 'rechteck', punkte: [{x:20,y:65},{x:35,y:65},{x:35,y:85},{x:20,y:85}], korrekteLabels: ['Südamerika'] },
+  ];
+  var labels = [
+    { id: 'kont-na', text: 'Nordamerika' },
+    { id: 'kont-eu', text: 'Europa' },
+    { id: 'kont-as', text: 'Asien' },
+    { id: 'kont-sa', text: 'Südamerika' },
+    { id: 'kont-af', text: 'Afrika' },
+    { id: 'kont-au', text: 'Australien' },
+  ];
+
+  var body = {
+    action: 'batchUpdateFragenMigration',
+    email: EMAIL,
+    fachbereich: FACHBEREICH,
+    updates: [{
+      id: TARGET_ID,
+      felder: { zielzonen: zielzonen, labels: labels },
+    }],
+  };
+  var r = batchUpdateFragenMigrationEndpoint(body);
+  var res = JSON.parse(r.getContent());
+  Logger.log('Recovery-Response: ' + JSON.stringify(res, null, 2));
+  if (res.success !== true) throw new Error('Recovery fehlgeschlagen: ' + (res.error || JSON.stringify(res)));
+  if (res.aktualisiert !== 1) throw new Error('aktualisiert=1 erwartet (war: ' + res.aktualisiert + '). nichtGefunden: ' + JSON.stringify(res.nichtGefunden));
+  Logger.log('✓ einr-dd-kontinente wiederhergestellt. Bitte im LP-Editor öffnen und pruefungstauglich=true setzen wenn alles ok.');
+  return 'OK';
+}
+
+function recoverEinrDdKontinente() {  // public wrapper für GAS-Editor
+  return recoverEinrDdKontinente_();
 }
 
 function safeParse_(s) { try { return JSON.parse(s || '{}'); } catch(e) { return {}; } }
