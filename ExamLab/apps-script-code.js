@@ -11869,19 +11869,32 @@ function holeAlleFragenFuerMigrationEndpoint(body) {
 
 /**
  * C9 Phase 4 Task 2 — Batch-Update-Endpoint fuer Migration.
+ * Bundle J Phase 9 — erweitert um optionalen `felder`-Patch (typDaten + Spalten).
  *
- * Partial-Update-Semantik (Spec §8): NUR musterlosung, typDaten (nur die
- * erklaerung-Subfelder), pruefungstauglich, geaendertAm, poolContentHash werden
+ * Partial-Update-Semantik (Spec §8): NUR die mitgegebenen Felder werden
  * ueberschrieben. Alles andere (fragetext, Optionen-Text, korrekt-Flags, tags,
  * punkte, thema, bloom, autor etc.) bleibt 1:1 wie es war.
+ *
+ * Drei Update-Pfade pro Frage (alle optional, kombinierbar):
+ * - `musterlosung: '<text>'` — ueberschreibt musterlosung-Spalte (nur wenn Key vorhanden)
+ * - `teilerklaerungen: [{feld, id, text}]` — patcht typDaten[feld][i].erklaerung (C9-Pfad)
+ * - `felder: {<key>: <wert>}` — generischer Patch:
+ *     - Wenn <key> eine Sheet-Spalte ist (z.B. pruefungstauglich): direkt setzen
+ *     - Sonst: typDaten[<key>] = <wert> (ueberschreibt den Subbaum vollstaendig)
+ *
+ * Default-Verhalten: pruefungstauglich → '' (false) nach jedem Update,
+ * AUSSER felder.pruefungstauglich wurde explizit gesetzt.
  *
  * Request-Body: {
  *   action: 'batchUpdateFragenMigration',
  *   email: '<admin-lp>',
  *   fachbereich: 'VWL'|'BWL'|'Recht'|'Informatik',
  *   updates: [
- *     { id: '<frage-id>', musterlosung: '<text>',
- *       teilerklaerungen: [{ feld: 'optionen', id: 'opt-a', text: '...' }, ...] }
+ *     { id: '<frage-id>',
+ *       musterlosung?: '<text>',
+ *       teilerklaerungen?: [{feld, id, text}],
+ *       felder?: {zielzonen: [...], labels: [...], pruefungstauglich: bool, ...}
+ *     }
  *   ]
  * }
  *
@@ -11954,7 +11967,7 @@ function batchUpdateFragenMigrationEndpoint(body) {
       var typDaten;
       try { typDaten = JSON.parse(typDatenRaw); } catch (e) { typDaten = {}; }
 
-      // Teilerklaerungen in typDaten einarbeiten
+      // Teilerklaerungen in typDaten einarbeiten (C9-Pfad)
       if (Array.isArray(upd.teilerklaerungen)) {
         for (var t = 0; t < upd.teilerklaerungen.length; t++) {
           var te = upd.teilerklaerungen[t];
@@ -11971,10 +11984,37 @@ function batchUpdateFragenMigrationEndpoint(body) {
         }
       }
 
+      // Bundle J: generic felder-Patch (Top-Level-Spalten ODER typDaten-Sub-Keys)
+      var pruefungstauglichExpliclySet = false;
+      if (upd.felder && typeof upd.felder === 'object') {
+        for (var fkey in upd.felder) {
+          if (!Object.prototype.hasOwnProperty.call(upd.felder, fkey)) continue;
+          var fval = upd.felder[fkey];
+          var colIdx = headers.indexOf(fkey);
+          if (colIdx >= 0) {
+            // Top-Level-Sheet-Spalte
+            if (fkey === 'pruefungstauglich') {
+              row[colIdx] = fval === true ? 'true' : '';
+              pruefungstauglichExpliclySet = true;
+            } else if (fkey === 'musterlosung' || fkey === 'typDaten' || fkey === 'geaendertAm' || fkey === 'poolContentHash') {
+              // diese Spalten werden weiter unten gemanaged — ueberschreiben via felder verboten
+              continue;
+            } else {
+              row[colIdx] = (typeof fval === 'object' && fval !== null) ? JSON.stringify(fval) : String(fval);
+            }
+          } else {
+            // typDaten-Sub-Feld (z.B. zielzonen, labels)
+            typDaten[fkey] = fval;
+          }
+        }
+      }
+
       // Row-Werte ueberschreiben (partial update — nur diese Felder, Rest bleibt)
-      row[musterlosungCol] = String(upd.musterlosung || '');
+      if ('musterlosung' in upd) row[musterlosungCol] = String(upd.musterlosung || '');
       row[typDatenCol] = JSON.stringify(typDaten);
-      if (pruefungstauglichCol >= 0) row[pruefungstauglichCol] = ''; // false (leer = nicht-true)
+      if (!pruefungstauglichExpliclySet && pruefungstauglichCol >= 0) {
+        row[pruefungstauglichCol] = ''; // false (leer = nicht-true) — Default fuer alle Migrationen
+      }
       if (geaendertAmCol >= 0) row[geaendertAmCol] = nowIso;
       if (poolContentHashCol >= 0) row[poolContentHashCol] = ''; // neu berechnen beim naechsten Pool-Check
 
@@ -12732,6 +12772,106 @@ function testDragDropMultiZonePrivacy_() {
 
 function testDragDropMultiZonePrivacy() {  // public wrapper für GAS-Editor
   return testDragDropMultiZonePrivacy_();
+}
+
+/**
+ * Bundle J Phase 9 — Smoke-Test fuer batchUpdateFragenMigrationEndpoint mit
+ * generic `felder`-Patch (zielzonen, labels, pruefungstauglich).
+ *
+ * ⚠️ Schreibt kurz IN DIE ECHTE FRAGENBANK. Nach erfolgreichem Test wird der
+ * urspruengliche Zustand wiederhergestellt — BIS AUF pruefungstauglich, das
+ * der Test deutlich auf '' setzt (User darf nach Test manuell zuruecksetzen).
+ */
+function testBundleJMigrationFelder_() {
+  function assert_(cond, msg) { if (!cond) throw new Error('Assertion fehlgeschlagen: ' + msg); }
+  var EMAIL = 'wr.test@gymhofwil.ch'; // ggf. auf eigene Admin-LP-E-Mail anpassen
+
+  // 1. Eine dragdrop_bild-Frage in BWL/Recht/VWL finden
+  var fragenbank = SpreadsheetApp.openById(FRAGENBANK_ID);
+  var fachbereiche = ['BWL', 'Recht', 'VWL'];
+  var dndFrage = null;
+  var fachbereichVerwendet = null;
+  for (var fb = 0; fb < fachbereiche.length && !dndFrage; fb++) {
+    var sheet = fragenbank.getSheetByName(fachbereiche[fb]);
+    if (!sheet) continue;
+    var data = getSheetData(sheet);
+    for (var i = 0; i < data.length; i++) {
+      if (data[i].typ === 'dragdrop_bild') {
+        dndFrage = data[i];
+        fachbereichVerwendet = fachbereiche[fb];
+        break;
+      }
+    }
+  }
+  assert_(dndFrage, 'Keine dragdrop_bild-Frage in BWL/Recht/VWL gefunden');
+  var testId = dndFrage.id;
+  Logger.log('Test-Frage: ' + testId + ' aus ' + fachbereichVerwendet);
+
+  // 2. Originalwerte sichern (typDaten via getSheetData kommt schon geparst)
+  var originalTypDaten = JSON.parse(JSON.stringify({
+    zielzonen: dndFrage.zielzonen || [],
+    labels: dndFrage.labels || [],
+  }));
+  var originalMusterlosung = dndFrage.musterlosung;
+
+  // 3. Marker-Patch via felder
+  var markerZonen = [{ id: 'test-z-marker', korrekteLabels: ['BUNDLE-J-TEST'] }];
+  var markerLabels = [{ id: 'test-l-marker', text: 'BUNDLE-J-TEST' }];
+  var body = {
+    action: 'batchUpdateFragenMigration',
+    email: EMAIL,
+    fachbereich: fachbereichVerwendet,
+    updates: [{
+      id: testId,
+      felder: { zielzonen: markerZonen, labels: markerLabels, pruefungstauglich: false },
+    }, {
+      id: 'definitely-not-existing-bundle-j-id-xyz',
+      felder: { zielzonen: [], labels: [] },
+    }],
+  };
+  var r = batchUpdateFragenMigrationEndpoint(body);
+  var res = JSON.parse(r.getContent());
+  Logger.log('Response: ' + JSON.stringify(res, null, 2));
+  assert_(res.success === true, 'success=true erwartet');
+  assert_(res.aktualisiert === 1, 'aktualisiert=1 erwartet (war: ' + res.aktualisiert + ')');
+  assert_(Array.isArray(res.nichtGefunden) && res.nichtGefunden.length === 1, 'nichtGefunden mit 1 Eintrag');
+  assert_(res.nichtGefunden[0] === 'definitely-not-existing-bundle-j-id-xyz', 'nichtGefunden enthaelt Marker-ID');
+
+  // 4. Verifikation im Sheet (re-read über getSheetData → typDaten ist geparst)
+  var sheetVerify = fragenbank.getSheetByName(fachbereichVerwendet);
+  var dataNeu = getSheetData(sheetVerify);
+  var frageNeu = null;
+  for (var j = 0; j < dataNeu.length; j++) {
+    if (dataNeu[j].id === testId) { frageNeu = dataNeu[j]; break; }
+  }
+  assert_(frageNeu, 'Frage nach Update gefunden');
+  assert_(JSON.stringify(frageNeu.zielzonen) === JSON.stringify(markerZonen), 'zielzonen wurde via felder gesetzt');
+  assert_(JSON.stringify(frageNeu.labels) === JSON.stringify(markerLabels), 'labels wurde via felder gesetzt');
+  assert_(String(frageNeu.musterlosung || '') === String(originalMusterlosung || ''), 'musterlosung unveraendert (Bundle-J-Pfad clobbert nicht)');
+  assert_(String(frageNeu.pruefungstauglich || '') === '' || frageNeu.pruefungstauglich === false, 'pruefungstauglich auf false');
+
+  // 5. Rollback: Originalwerte zurueckschreiben
+  var rollbackBody = {
+    action: 'batchUpdateFragenMigration',
+    email: EMAIL,
+    fachbereich: fachbereichVerwendet,
+    updates: [{
+      id: testId,
+      felder: {
+        zielzonen: originalTypDaten.zielzonen,
+        labels: originalTypDaten.labels,
+      },
+    }],
+  };
+  batchUpdateFragenMigrationEndpoint(rollbackBody);
+  Logger.log('Rollback abgeschlossen — Frage ' + testId + ' wieder im Original-Zustand (pruefungstauglich bleibt false, ggf. manuell setzen)');
+
+  Logger.log('✓ Bundle J Migration-Felder-Test bestanden.');
+  return 'OK';
+}
+
+function testBundleJMigrationFelder() {  // public wrapper für GAS-Editor
+  return testBundleJMigrationFelder_();
 }
 
 function safeParse_(s) { try { return JSON.parse(s || '{}'); } catch(e) { return {}; } }
