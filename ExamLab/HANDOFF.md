@@ -9,6 +9,8 @@
 ## Bundle J User-Tasks
 
 - [x] **Audit-Skript ausgeführt (28.04.2026):** 28 DnD-Bild-Fragen total, **0 Multi-Zone-Bugs**, 28 mit Distraktoren (Standard). Keine LP-Re-Edits nach Migration nötig — sauberer 1:1-Migrationspfad.
+- [ ] **User-Task Phase 4:** Apps-Script-Editor öffnen → `testDragDropMultiZonePrivacy` ausführen → erwartet `OK`
+- [ ] **User-Task Phase 4:** Neue Apps-Script-Bereitstellung erstellen (mit erweiterten LOESUNGS_FELDER_) + URL notieren
 
 ---
 

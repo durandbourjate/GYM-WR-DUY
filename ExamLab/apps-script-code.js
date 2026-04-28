@@ -12675,6 +12675,59 @@ function testC9Privacy_() {
   Logger.log('✓ C9 Privacy-Tests bestanden (9 Typen + Buchungssatz-Dokumentation).');
 }
 
+/**
+ * Bundle J Phase 4 — DragDrop-Bild Multi-Zone Privacy-Test.
+ * Prüft dass bereinigeFrageFuerSuS_ sowohl korrekteLabels (neu) als auch
+ * korrektesLabel (legacy) entfernt, plus erklaerung im Prüfen-Modus.
+ * Plus: S122-Type-Guard — primitive (string) labels werden durchgereicht.
+ */
+function testDragDropMultiZonePrivacy_() {
+  function assert_(cond, msg) { if (!cond) throw new Error('FAIL: ' + msg); }
+  var fragePost = {
+    typ: 'dragdrop_bild',
+    zielzonen: [
+      { id: 'z1', korrekteLabels: ['Aktiva'], erklaerung: 'foo' },
+      { id: 'z2', korrekteLabels: ['Passiva'] },
+    ],
+    labels: [{ id: 'lid-1', text: 'Aktiva' }, { id: 'lid-2', text: 'Passiva' }],
+  };
+  var bereinigtPost = bereinigeFrageFuerSuS_(fragePost);
+  assert_(!bereinigtPost.zielzonen[0].korrekteLabels, 'korrekteLabels entfernt (post-migration)');
+  assert_(!bereinigtPost.zielzonen[0].erklaerung, 'erklaerung entfernt im Prüfen-Modus');
+  assert_(bereinigtPost.labels.length === 2, 'labels bleiben (Text wird angezeigt)');
+  assert_(bereinigtPost.labels[0].text === 'Aktiva', 'Text bleibt');
+  assert_(bereinigtPost.labels[0].id === 'lid-1', 'ID bleibt');
+
+  var fragePre = {
+    typ: 'dragdrop_bild',
+    zielzonen: [
+      { id: 'z1', korrektesLabel: 'Aktiva', erklaerung: 'foo' },
+    ],
+    labels: ['Aktiva', 'Passiva'],  // string[]
+  };
+  var bereinigtPre = bereinigeFrageFuerSuS_(fragePre);
+  assert_(!bereinigtPre.zielzonen[0].korrektesLabel, 'Legacy korrektesLabel entfernt');
+  assert_(typeof bereinigtPre.labels[0] === 'string', 'Legacy string-labels durchgereicht (S122-Guard)');
+
+  var frageMix = {
+    typ: 'dragdrop_bild',
+    zielzonen: [
+      { id: 'z1', korrekteLabels: ['Aktiva'], korrektesLabel: 'Aktiva', erklaerung: 'foo' },
+    ],
+    labels: [{ id: 'a', text: 'Aktiva' }, 'Passiva'],  // gemischt
+  };
+  var bereinigtMix = bereinigeFrageFuerSuS_(frageMix);
+  assert_(!bereinigtMix.zielzonen[0].korrekteLabels, 'beide Felder entfernt (mix)');
+  assert_(!bereinigtMix.zielzonen[0].korrektesLabel, 'beide Felder entfernt (mix)');
+  assert_(bereinigtMix.labels.length === 2, 'labels bleiben in mix');
+  Logger.log('✓ Bundle J DragDrop Multi-Zone Privacy-Tests bestanden.');
+  return 'OK';
+}
+
+function testDragDropMultiZonePrivacy() {  // public wrapper für GAS-Editor
+  return testDragDropMultiZonePrivacy_();
+}
+
 function safeParse_(s) { try { return JSON.parse(s || '{}'); } catch(e) { return {}; } }
 
 // ─── Task 5: Few-Shot-Retrieval + Block-Builder ───────────────────────────────
