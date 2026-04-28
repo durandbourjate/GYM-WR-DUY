@@ -2203,7 +2203,7 @@ var LOESUNGS_FELDER_ = {
     { feld: 'bilanzEintraege', subFelder: ['korrekt'] },
     { feld: 'aufgaben', subFelder: ['erwarteteAntworten', 'erklaerung'] },
     { feld: 'beschriftungen', subFelder: ['korrekt', 'erklaerung'] },
-    { feld: 'zielzonen', subFelder: ['korrektesLabel', 'erklaerung'] },
+    { feld: 'zielzonen', subFelder: ['korrektesLabel', 'korrekteLabels', 'erklaerung'] },
     { feld: 'bereiche', subFelder: ['korrekt', 'erklaerung'], nurBeiTyp: 'hotspot' },
     { feld: 'hotspots', subFelder: ['korrekt', 'erklaerung'], nurBeiTyp: 'hotspot' },
     // BilanzER: kontenMitSaldi[].erklaerung (id = kontonummer). saldo selbst
