@@ -24,3 +24,45 @@ export function zoneKorrektBelegt(
   const soll = korrektesLabel.trim().toLowerCase()
   return labelsInZone(zuordnungen, zoneId).some(l => l.trim().toLowerCase() === soll)
 }
+
+import type { DragDropBildLabel } from '../types/ueben/fragen'
+
+export interface DragDropBildStack {
+  text: string
+  anzahl: number
+  freieIds: string[]
+}
+
+/**
+ * Gruppiert Pool-Tokens nach Text und filtert platzierte heraus.
+ * Output ist die SuS-Pool-Anzeige (Stack mit Counter).
+ */
+export function gruppiereStacks(
+  labels: DragDropBildLabel[],
+  zuordnungen: Record<string, string>,
+): DragDropBildStack[] {
+  const map = new Map<string, string[]>()
+  for (const l of labels) {
+    if (zuordnungen[l.id]) continue
+    if (!map.has(l.text)) map.set(l.text, [])
+    map.get(l.text)!.push(l.id)
+  }
+  return [...map.entries()]
+    .map(([text, freieIds]) => ({ text, anzahl: freieIds.length, freieIds }))
+    .filter(s => s.anzahl > 0)
+}
+
+/**
+ * Deterministische ID-Auswahl: kleinster Index in `labels` mit gegebenem Text,
+ * dessen ID nicht in `zuordnungen` vorkommt.
+ */
+export function naechsteFreieLabelId(
+  labels: DragDropBildLabel[],
+  text: string,
+  zuordnungen: Record<string, string>,
+): string | null {
+  for (const l of labels) {
+    if (l.text === text && !zuordnungen[l.id]) return l.id
+  }
+  return null
+}
