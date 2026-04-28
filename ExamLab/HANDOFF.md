@@ -14,12 +14,30 @@
 
 ---
 
-## Bundle J Phase 1-8 — KOMPLETT
+## Bundle J Phase 1-8 — KOMPLETT (Branch `feature/bundle-j-dragdrop-multi-zone`)
 
+**Stand 28.04.2026 Ende der Session:**
+- 20 Commits seit main.
 - Phase 1.3 Type-Erweiterung: 65 tsc-Errors → 0 nach Phase 8.
-- 1098 vitest passes (vorher 1082, +16 für neue normalizer/Stack/Pool/Editor-Tests).
-- `npm run build` grün.
-- Phase 9 (Migrations-Skript) + Phase 10 (E2E + Full-Run) offen.
+- **1098 vitest passes** (vorher 1082, +16 für neue Normalizer/Stack/Pool/Editor-Tests).
+- `npm run build` grün, `npx tsc -b` clean.
+
+**Was steht für nächste Session an:**
+
+1. **Phase 9 — Migrations-Skript** (Tasks 27-31, Plan-Lines 2196-2519)
+   - `ExamLab/scripts/migrate-dragdrop-multi-zone/` mit `package.json`, `dump.mjs`, `migrate.mjs`, `upload.mjs`, `SESSION-PROTOCOL.md`
+   - Smoke-Run mit Mock-Input vor User-Migration
+   - Reine Skript-Arbeit, kein UI-Test
+2. **Phase 10 — E2E + Full-Run** (Tasks 32-35)
+   - Browser-E2E mit echten Logins (Tab-Gruppe LP+SuS)
+   - Test-Plan in HANDOFF
+   - Stichprobe-Migration (5-10 Fragen) → Verifikation → Full-Run
+3. **Phase 11 — Merge auf main** (Tasks 36-38)
+   - Pre-Merge-Checks
+   - Merge + Push
+   - Cleanup-Reminder via mcp__scheduled-tasks (~2 Wochen)
+
+**Vorbedingung für Phase 9-10:** User-Task Phase 4 (Apps-Script-Deploy + `testDragDropMultiZonePrivacy = OK`) muss erfolgt sein.
 
 ---
 
