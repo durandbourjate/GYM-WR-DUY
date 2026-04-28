@@ -986,6 +986,7 @@ export default function SharedFragenEditor({
             fachbereich={fachbereich}
             thema={thema}
             ki={ki}
+            validation={validation}
             PDFEditorComponent={PDFEditorComponent}
             laenge={laenge} setLaenge={setLaenge}
             placeholder={placeholder} setPlaceholder={setPlaceholder}
