@@ -9,6 +9,7 @@ import { ermittleBildQuelle } from '@shared/utils/mediaQuelleResolver'
 import { mediaQuelleZuImgSrc } from '@shared/utils/mediaQuelleUrl'
 import { istZoneWohlgeformt } from '../../utils/zonen/migriereZone.ts'
 import { ZoneLabel } from '@shared/ui/ZoneLabel'
+import { istEingabeLeer } from '../../utils/ueben/leereEingabenDetektor.ts'
 
 interface Props {
   frage: DragDropBildFrageType
@@ -131,6 +132,10 @@ function DragDropBildAufgabe({ frage }: { frage: DragDropBildFrageType }) {
 
   const alleZugeordnet = verfuegbareLabels.length === 0
 
+  const violettOutline = !feedbackSichtbar && istEingabeLeer(frage, antwort, 'gesamt')
+    ? 'border-violet-400 dark:border-violet-500 ring-1 ring-violet-300 dark:ring-violet-600/40'
+    : 'border-transparent'
+
   return (
     <div className="flex flex-col gap-5">
       {/* Header: Badges */}
@@ -157,7 +162,7 @@ function DragDropBildAufgabe({ frage }: { frage: DragDropBildFrageType }) {
 
       {/* Bild mit Zielzonen — feste Container-Breite, damit SVGs ohne explizite width-Attribute
           (nur viewBox) sichtbar sind statt auf 0 zu kollabieren */}
-      <div className={`relative block w-full max-w-2xl ${!disabled && !alleZugeordnet ? 'rounded-xl border-2 border-violet-400 dark:border-violet-500 p-1' : ''}`} style={{ touchAction: 'manipulation' }}>
+      <div data-testid="dragdrop_bild-input-area" className={`relative block w-full max-w-2xl rounded-xl border ${violettOutline} p-1`} style={{ touchAction: 'manipulation' }}>
         <div className="relative overflow-hidden w-full">
           {bildQuelle && (
             <img
