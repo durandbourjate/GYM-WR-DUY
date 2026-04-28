@@ -97,6 +97,36 @@ export interface DragDropBildFrage extends FrageBase {
 
 **Begründung:** Der Wechsel von Text-Key zu ID-Key ist zwingend, weil bei Multi-Zone zwei Tokens mit identischem Text in unterschiedlichen Zonen liegen müssen.
 
+### 5.2.1 Zentraler Normalizer (`ExamLab/src/utils/ueben/fragetypNormalizer.ts::normalisiereDragDropBild`)
+
+Analog zum `normalisiereLueckentext`-Pattern (S118-Lehre, `.claude/rules/code-quality.md`): Daten aus Apps-Script werden am Eintrittspunkt normalisiert, nicht im UI-Code verzweigt. Damit ist Dual-Read **eine Stelle**, nicht in Editor + Renderer + Korrektur + SuS-Stack-Logik separat.
+
+```ts
+function normalisiereDragDropBild(frage: any): DragDropBildFrage {
+  const labels = (frage.labels ?? []).map((l: any) =>
+    typeof l === 'string' ? { id: stabilId(frage.id, l), text: l } : { id: l.id ?? stabilId(frage.id, l.text), text: l.text ?? '' }
+  )
+  const zielzonen = (frage.zielzonen ?? []).map((z: any) => ({
+    ...z,
+    korrekteLabels: Array.isArray(z.korrekteLabels) && z.korrekteLabels.length > 0
+      ? z.korrekteLabels
+      : z.korrektesLabel
+        ? [z.korrektesLabel]
+        : [],
+  }))
+  return { ...frage, labels, zielzonen }
+}
+```
+
+**Wo der Normalizer aufgerufen wird (eine Stelle pro Pfad):**
+
+- LP-Editor — beim Mount (`useState`-Init mit Frage als Argument; `key={frage.id}` am Editor sichert Re-Init bei Frage-Wechsel — siehe `code-quality.md` S129).
+- SuS-Renderer (`DragDropBildFrage.tsx`) — am Top des Components, mit `useMemo([frage.id])`.
+- Auto-Korrektur (`korrigiereDragDropBild`) — als erstes vor der Schleife.
+- Apps-Script-Bereinigung — schreibt nur `korrekteLabels`-Feld, aber bereinigt `korrektesLabel` weiterhin (Defense-in-Depth).
+
+**`stabilId(frageId, text)`-Helper:** deterministischer Hash (z.B. SHA-1 erstes 8-char base32 von `frageId + '|' + index`), damit dieselbe Pre-Migration-Frage nach mehrfachem Mount immer dieselben IDs bekommt — kein Antwort-Verlust durch wechselnde IDs während der Migration. Nach Migration sind IDs in der Datenbank persistent (kein Hash mehr nötig).
+
 ### 5.3 Korrektur-Logik (`ExamLab/src/utils/autoKorrektur.ts::korrigiereDragDropBild`)
 
 ```ts
@@ -199,6 +229,7 @@ Beim Speichern wird **immer** das neue Modell geschrieben. Das alte Feld (`korre
   - Platzieren: `{ ...zuordnungen, [labelId]: zoneId }`.
   - Entfernen: `delete zuordnungen[labelId]`.
 - Token aus Zone zurück in Pool ziehen: Counter +1, Stack erscheint wieder wenn vorher verschwunden.
+- **Stack-Pick-Determinismus:** Beim Tap auf einen Stack wird die Label-Instanz mit dem **kleinsten Index in `frage.labels`**, deren `id` noch nicht in `Object.keys(zuordnungen)` vorkommt, ausgewählt. Damit ist die Auswahl nach Re-Render konsistent und nicht zufällig.
 
 ### 7.3 Zone-Anzeige (innen)
 
@@ -331,12 +362,14 @@ Re-use `batchUpdateFragenMigration` Endpoint (Admin-only, IDOR-safe, aus C9 Phas
 ### 10.3 Migrations-Reihenfolge (zwingend)
 
 1. **Apps-Script-Deploy mit Dual-Read** (`LOESUNGS_FELDER_` erweitert um `korrekteLabels`).
-2. **Frontend-Deploy mit Adapter** (Editor + Renderer + Korrektur lesen beide Felder, schreiben nur neues; SuS-Stack-UI; Konverter).
+2. **Frontend-Deploy mit Normalizer** (Editor + Renderer + Korrektur rufen alle `normalisiereDragDropBild` auf — eine Stelle, vier Pfade. Schreibt nur neues Format. SuS-Stack-UI; Konverter.).
 3. **Stichprobe-Migration** (5-10 Fragen) → Re-Dump-Verifikation.
 4. **Full-Run-Migration** über alle Bestand-Fragen.
-5. **Cleanup-Bundle** (separat, ca. 2 Wochen Stabilität später) — Dual-Read entfernen, alte Felder aus Code.
+5. **Cleanup-Bundle** (separat, ca. 2 Wochen Stabilität später) — Normalizer-Dual-Read-Pfad entfernen, alte Felder aus Code, `legacyLabels`/`korrektesLabel` aus Type-Definitionen.
 
 Sequenz analog C9: Backend kennt beide Felder, bevor Frontend irgendwas neu schreibt.
+
+**Robustheit zwischen Schritten 2 und 4:** Im Fenster zwischen Frontend-Deploy und Migrations-Skript-Run können alte Bestand-Fragen weiterhin SuS gespielt werden — der Normalizer liefert für jede Frage immer das neue Modell, egal ob das Sheet `korrektesLabel` oder `korrekteLabels` enthält. Stable-IDs (Sektion 5.2.1) sichern, dass SuS-Antworten beim Reload denselben Label-Instanzen zugeordnet bleiben.
 
 ### 10.4 User-Tasks (im Plan zu detaillieren)
 
@@ -356,7 +389,8 @@ Sequenz analog C9: Backend kennt beide Felder, bevor Frontend irgendwas neu schr
 | `DragDropBildFrageStacks.test.tsx` | Counter-Anzeige ab Stack ≥ 2, kein Counter bei Stack = 1, Tap-Mechanik wählt nächste ID, Pool-leer-bei-letzter-Platzierung, Drag-Back-zum-Pool inkrementiert Counter |
 | `securityInvarianten.test.ts` | `korrekteLabels` entfernt für SuS, `korrektesLabel` (Legacy) entfernt, Erklärung-Privacy unverändert (C9), Label-ID-Determinismus (kein zone-Pattern) |
 | `poolConverter.test.ts` | Multi-Label aus Pool-Zone-Attribut, Distraktoren ohne zone-Match werden Pool-Items ohne Zone-Bindung, IDs werden generiert wenn Pool-Format keine `id` hat |
-| `dragdropBildUtils.test.ts` (falls neu) | `labelMap`-Helper, `gruppiereStacks`-Helper |
+| `dragdropBildUtils.test.ts` (falls neu) | `labelMap`-Helper, `gruppiereStacks`-Helper, deterministische Stack-Pick-Logik (kleinster Index nicht-platziert) |
+| `fragetypNormalizer.test.ts` | `normalisiereDragDropBild` — Dual-Read alte/neue/gemischte Form, `stabilId`-Determinismus über mehrere Mounts mit gleicher `frageId`, Token mit leerem Text wird ignoriert |
 | Apps-Script Test-Shim `testDragDropMultiZonePrivacy_` | Bereinigung beider Felder + Erklärungs-Modi |
 
 Test-Bestand vor Bundle J: 1082 vitest passes (S157). Ziel nach Bundle J: ≥1100.
@@ -372,7 +406,8 @@ Test-Bestand vor Bundle J: 1082 vitest passes (S157). Ziel nach Bundle J: ≥110
 | 5 | SuS-Stack-Zähler verrät Lösungsstruktur ohne Distraktoren | LP-Verantwortung: Distraktoren hinzufügen wenn Anti-Hint relevant. UI zeigt Hinweis im Editor wenn Pool exakt zu Zonen-Bedarf passt. |
 | 6 | Browser-Test-Aufwand groß (alle Fragetypen-Risiko-Gruppen) | Test-Plan in Plan-Phase mit konkreten Pfaden. Verwandtschaftsgruppen aus `regression-prevention.md` einhalten. |
 | 7 | Migrations-Skript bricht mid-run ab | `batchUpdateFragenMigration` ist idempotent (überschreibt selbe Felder). Resume möglich via Dump-Re-Lauf. |
-| 8 | Nicht-deterministische ID-Generierung im Editor verursacht Re-Render-Loops | IDs nur **einmal** beim Mount des Editors generieren (`useState`-Init oder `useMemo`-mit-stabilem-Key). Niemals pro Render. |
+| 8 | Nicht-deterministische ID-Generierung im Editor verursacht Re-Render-Loops | IDs nur **einmal** beim Mount des Editors generieren (`useState`-Init oder `useMemo`-mit-stabilem-Key `frage.id`). Niemals pro Render. |
+| 9 | Adapter nur im Editor → Korrektur/Renderer crashen bei Bestand-Fragen ohne `korrekteLabels` | Zentraler `normalisiereDragDropBild` (Sektion 5.2.1) wird an **allen vier Pfaden** aufgerufen: Editor-Mount, SuS-Renderer, Auto-Korrektur, Konverter. `stabilId` (deterministischer Hash aus `frageId+text+index`) sichert, dass mehrfaches Normalisieren derselben Pre-Migration-Frage immer dieselben IDs liefert — keine Antwort-Verluste durch wechselnde IDs. |
 
 ## 13. Migrations-Phasen-Übersicht
 
