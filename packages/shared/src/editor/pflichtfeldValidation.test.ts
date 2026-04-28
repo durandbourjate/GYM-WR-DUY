@@ -68,3 +68,180 @@ describe('validierePflichtfelder — mc', () => {
     expect(r.empfohlenErfuellt).toBe(false)
   })
 })
+
+describe('validierePflichtfelder — richtigfalsch', () => {
+  const gueltig = {
+    id: 'r1',
+    typ: 'richtigfalsch',
+    fragetext: 'q',
+    aussagen: [
+      { id: 'a1', text: 'A1', korrekt: true, erklaerung: 'e1' },
+      { id: 'a2', text: 'A2', korrekt: false, erklaerung: 'e2' },
+    ],
+  }
+  it('alle erfüllt', () => {
+    const r = validierePflichtfelder(gueltig as any)
+    expect(r.pflichtErfuellt).toBe(true)
+    expect(r.empfohlenErfuellt).toBe(true)
+  })
+  it('pflicht-leer mit nur 1 Aussage', () => {
+    const r = validierePflichtfelder({ ...gueltig, aussagen: [gueltig.aussagen[0]] } as any)
+    expect(r.pflichtErfuellt).toBe(false)
+  })
+  it('pflicht-leer wenn Aussage ohne korrekt-flag (null)', () => {
+    const r = validierePflichtfelder({
+      ...gueltig,
+      aussagen: [
+        { id: 'a1', text: 'A1', korrekt: null, erklaerung: 'e1' },
+        { id: 'a2', text: 'A2', korrekt: false, erklaerung: 'e2' },
+      ],
+    } as any)
+    expect(r.pflichtErfuellt).toBe(false)
+  })
+  it('empfohlen-leer ohne Erklärungen', () => {
+    const r = validierePflichtfelder({
+      ...gueltig,
+      aussagen: gueltig.aussagen.map((a) => ({ ...a, erklaerung: '' })),
+    } as any)
+    expect(r.pflichtErfuellt).toBe(true)
+    expect(r.empfohlenErfuellt).toBe(false)
+  })
+})
+
+describe('validierePflichtfelder — lueckentext', () => {
+  it('Freitext-Modus: alle erfüllt', () => {
+    const r = validierePflichtfelder({
+      id: 'l1',
+      typ: 'lueckentext',
+      fragetext: 'q',
+      textMitLuecken: 'Das ist ein {{1}} Test',
+      lueckentextModus: 'freitext',
+      luecken: [{ id: '1', korrekteAntworten: ['Antwort'], caseSensitive: false }],
+    } as any)
+    expect(r.pflichtErfuellt).toBe(true)
+  })
+  it('Freitext-Modus: pflicht-leer ohne korrekteAntworten', () => {
+    const r = validierePflichtfelder({
+      id: 'l1',
+      typ: 'lueckentext',
+      fragetext: 'q',
+      textMitLuecken: '{{1}}',
+      lueckentextModus: 'freitext',
+      luecken: [{ id: '1', korrekteAntworten: [], caseSensitive: false }],
+    } as any)
+    expect(r.pflichtErfuellt).toBe(false)
+  })
+  it('pflicht-leer ohne Lücken-Platzhalter', () => {
+    const r = validierePflichtfelder({
+      id: 'l1',
+      typ: 'lueckentext',
+      fragetext: 'q',
+      textMitLuecken: 'Kein Platzhalter hier',
+      lueckentextModus: 'freitext',
+      luecken: [],
+    } as any)
+    expect(r.pflichtErfuellt).toBe(false)
+  })
+  it('Dropdown-Modus: alle erfüllt mit korrektem Eintrag', () => {
+    const r = validierePflichtfelder({
+      id: 'l1',
+      typ: 'lueckentext',
+      fragetext: 'q',
+      textMitLuecken: '{{1}}',
+      lueckentextModus: 'dropdown',
+      luecken: [
+        {
+          id: '1',
+          korrekteAntworten: ['A'],
+          caseSensitive: false,
+          dropdownOptionen: ['A', 'B'],
+        },
+      ],
+    } as any)
+    expect(r.pflichtErfuellt).toBe(true)
+  })
+  it('Dropdown-Modus: pflicht-leer mit nur 1 Option', () => {
+    const r = validierePflichtfelder({
+      id: 'l1',
+      typ: 'lueckentext',
+      fragetext: 'q',
+      textMitLuecken: '{{1}}',
+      lueckentextModus: 'dropdown',
+      luecken: [
+        {
+          id: '1',
+          korrekteAntworten: ['A'],
+          caseSensitive: false,
+          dropdownOptionen: ['A'],
+        },
+      ],
+    } as any)
+    expect(r.pflichtErfuellt).toBe(false)
+  })
+})
+
+describe('validierePflichtfelder — sortierung', () => {
+  it('alle erfüllt', () => {
+    const r = validierePflichtfelder({
+      id: 's1',
+      typ: 'sortierung',
+      fragetext: 'q',
+      elemente: ['A', 'B', 'C'],
+    } as any)
+    expect(r.pflichtErfuellt).toBe(true)
+  })
+  it('pflicht-leer mit nur 1 Element', () => {
+    const r = validierePflichtfelder({
+      id: 's1',
+      typ: 'sortierung',
+      fragetext: 'q',
+      elemente: ['A'],
+    } as any)
+    expect(r.pflichtErfuellt).toBe(false)
+  })
+  it('pflicht-leer ohne Frage-Text', () => {
+    const r = validierePflichtfelder({
+      id: 's1',
+      typ: 'sortierung',
+      fragetext: '',
+      elemente: ['A', 'B'],
+    } as any)
+    expect(r.pflichtErfuellt).toBe(false)
+  })
+})
+
+describe('validierePflichtfelder — zuordnung', () => {
+  it('alle erfüllt', () => {
+    const r = validierePflichtfelder({
+      id: 'z1',
+      typ: 'zuordnung',
+      fragetext: 'q',
+      paare: [
+        { links: 'L1', rechts: 'R1' },
+        { links: 'L2', rechts: 'R2' },
+      ],
+    } as any)
+    expect(r.pflichtErfuellt).toBe(true)
+  })
+  it('pflicht-leer mit nur 1 Paar', () => {
+    const r = validierePflichtfelder({
+      id: 'z1',
+      typ: 'zuordnung',
+      fragetext: 'q',
+      paare: [{ links: 'L1', rechts: 'R1' }],
+    } as any)
+    expect(r.pflichtErfuellt).toBe(false)
+  })
+  it('pflicht-leer mit halbem Paar (rechts leer)', () => {
+    const r = validierePflichtfelder({
+      id: 'z1',
+      typ: 'zuordnung',
+      fragetext: 'q',
+      paare: [
+        { links: 'L1', rechts: 'R1' },
+        { links: 'L2', rechts: '' },
+      ],
+    } as any)
+    expect(r.pflichtErfuellt).toBe(false)
+  })
+})
