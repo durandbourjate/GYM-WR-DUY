@@ -172,7 +172,7 @@ function normalisiereDragDropAntwort(
 
 **Aufruf-Stellen:** überall wo eine Antwort gelesen wird — Pfade 3, 4, 5, 6 aus Tabelle 5.2.1, plus IndexedDB-Restore in `autoSave.ts::restoreFromIndexedDB`. Schreib-Pfade (autoSave-Persist) nutzen das neue ID-Format direkt.
 
-Antwort-Normalizer wird **vor** dem Frage-Normalizer aufgerufen — er braucht die normalisierte Frage als Kontext.
+Antwort-Normalizer wird **nach** dem Frage-Normalizer aufgerufen — er liest `frage.labels` und braucht die bereits normalisierte Frage als Kontext.
 
 ### 5.3 Korrektur-Logik (`ExamLab/src/utils/autoKorrektur.ts::korrigiereDragDropBild`)
 
