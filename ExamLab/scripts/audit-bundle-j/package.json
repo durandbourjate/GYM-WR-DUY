@@ -1,0 +1,16 @@
+{
+  "name": "audit-bundle-j",
+  "version": "1.0.0",
+  "description": "Bundle J Phase 0 — Audit DragDrop-Bild-Fragen-Bestand vor Migration",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "audit": "node zaehleDragDropFragen.mjs"
+  },
+  "dependencies": {
+    "undici": "^6.21.0"
+  },
+  "engines": {
+    "node": ">=20.11"
+  }
+}

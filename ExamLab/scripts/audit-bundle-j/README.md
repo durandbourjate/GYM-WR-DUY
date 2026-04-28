@@ -6,6 +6,13 @@
 - Apps-Script-URL der aktuellen Bereitstellung
 - Admin-Token (siehe Apps Script Properties → AUDIT_TOKEN)
 
+## Setup (einmalig)
+
+```bash
+cd ExamLab/scripts/audit-bundle-j
+npm install
+```
+
 ## Ausführung
 
 ```bash
