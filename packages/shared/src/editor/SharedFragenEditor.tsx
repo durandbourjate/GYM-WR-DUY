@@ -9,6 +9,7 @@ import { ResizableSidebar } from '../ui/ResizableSidebar'
 import { defaultFachbereich } from './fachUtils'
 import { validiereFrage } from './fragenValidierung'
 import { validierePflichtfelder } from './pflichtfeldValidation'
+import { buildFragePreview } from './buildFragePreview'
 import PflichtfeldDialog from './components/PflichtfeldDialog'
 import DoppelteLabelDialog from './components/DoppelteLabelDialog'
 import PruefungstauglichBadge from './components/PruefungstauglichBadge'
@@ -630,53 +631,27 @@ export default function SharedFragenEditor({
   const [pflichtDialogOpen, setPflichtDialogOpen] = useState(false)
   const [doppelDialogOpen, setDoppelDialogOpen] = useState(false)
 
-  // Minimal-Preview der aktuellen Frage für Validator (nur typ-spezifische Felder relevant)
-  const aktuelleFrage = useMemo(() => {
-    const id = frage?.id ?? 'preview'
-    const basis = { id, typ, fragetext }
-    switch (typ) {
-      case 'mc':
-        return { ...basis, optionen, mehrfachauswahl }
-      case 'freitext':
-        return { ...basis, musterlosung, bewertungsraster }
-      case 'lueckentext':
-        return { ...basis, textMitLuecken, luecken, lueckentextModus }
-      case 'zuordnung':
-        return { ...basis, paare }
-      case 'richtigfalsch':
-        return { ...basis, aussagen }
-      case 'berechnung':
-        return { ...basis, ergebnisse }
-      case 'buchungssatz':
-        return { ...basis, fragetext: geschaeftsfall, geschaeftsfall, buchungen }
-      case 'tkonto':
-        return { ...basis, aufgabentext: tkAufgabentext, konten: tkKonten }
-      case 'kontenbestimmung':
-        return { ...basis, aufgabentext: kbAufgabentext, aufgaben: kbAufgaben }
-      case 'bilanzstruktur':
-        return { ...basis, aufgabentext: biAufgabentext, kontenMitSaldi: biKontenMitSaldi }
-      case 'aufgabengruppe':
-        return { ...basis, kontext: agKontext, teilaufgaben: agTeilaufgaben }
-      case 'visualisierung':
-        return { ...basis, untertyp: 'frei', canvasConfig }
-      case 'pdf':
-        return { ...basis, pdfDriveFileId, pdfUrl, pdfBase64, pdfErlaubteWerkzeuge }
-      case 'sortierung':
-        return { ...basis, elemente: sortElemente }
-      case 'hotspot':
-        return { ...basis, bildUrl, bereiche: hsBereiche }
-      case 'bildbeschriftung':
-        return { ...basis, bildUrl, beschriftungen: bbBeschriftungen }
-      case 'dragdrop_bild':
-        return { ...basis, bildUrl, zielzonen: ddZielzonen, labels: ddLabels }
-      case 'code':
-        return { ...basis, sprache: codeSprache, musterloesung: codeMusterLoesungCode }
-      case 'formel':
-        return { ...basis, korrekteFormel: formelKorrekteFormel }
-      default:
-        return basis
-    }
-  }, [
+  // Minimal-Preview der aktuellen Frage für Validator (nur typ-spezifische Felder relevant).
+  // Switch ausgelagert nach buildFragePreview.ts (DRY + LOC-Reduktion).
+  const aktuelleFrage = useMemo(() => buildFragePreview({
+    id: frage?.id,
+    typ, fragetext,
+    optionen, mehrfachauswahl,
+    musterlosung, bewertungsraster,
+    textMitLuecken, luecken, lueckentextModus,
+    paare, aussagen, ergebnisse,
+    geschaeftsfall, buchungen,
+    tkAufgabentext, tkKonten,
+    kbAufgabentext, kbAufgaben,
+    biAufgabentext, biKontenMitSaldi,
+    agKontext, agTeilaufgaben,
+    canvasConfig,
+    pdfDriveFileId, pdfUrl, pdfBase64, pdfErlaubteWerkzeuge,
+    sortElemente,
+    bildUrl, hsBereiche, bbBeschriftungen, ddZielzonen, ddLabels,
+    codeSprache, codeMusterLoesungCode,
+    formelKorrekteFormel,
+  }), [
     typ, fragetext, optionen, mehrfachauswahl, musterlosung, bewertungsraster,
     textMitLuecken, luecken, lueckentextModus, paare, aussagen, ergebnisse,
     geschaeftsfall, buchungen, tkAufgabentext, tkKonten, kbAufgabentext, kbAufgaben,
@@ -687,7 +662,7 @@ export default function SharedFragenEditor({
   ])
 
   const validation = useMemo(
-    () => validierePflichtfelder(aktuelleFrage as unknown as Frage),
+    () => validierePflichtfelder(aktuelleFrage),
     [aktuelleFrage],
   )
 
