@@ -8,7 +8,8 @@
 
 ## Bundle J User-Tasks
 
-- [ ] Audit-Skript ausführen (env: `APPS_SCRIPT_URL`, `AUDIT_TOKEN`)
+- [ ] Audit-Skript ausführen (env: `APPS_SCRIPT_URL`, `MIGRATION_EMAIL`)
+  - Endpoint `holeAlleFragenFuerMigration` (Admin-LP-Auth, kein Token)
   - Output zur Phase-Plan-Schätzung verwenden
   - Multi-Zone-Bug-IDs an LP für Re-Edit-Liste kommunizieren
 

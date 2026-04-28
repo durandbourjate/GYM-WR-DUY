@@ -3,20 +3,24 @@
 import { request } from 'undici'
 
 const APPS_SCRIPT_URL = process.env.APPS_SCRIPT_URL
-const AUDIT_TOKEN = process.env.AUDIT_TOKEN
-if (!APPS_SCRIPT_URL || !AUDIT_TOKEN) {
-  console.error('Setze APPS_SCRIPT_URL und AUDIT_TOKEN in der Umgebung.')
+const MIGRATION_EMAIL = process.env.MIGRATION_EMAIL
+if (!APPS_SCRIPT_URL || !MIGRATION_EMAIL) {
+  console.error('Setze APPS_SCRIPT_URL und MIGRATION_EMAIL (Admin-LP) in der Umgebung.')
   process.exit(1)
 }
 
 const { body } = await request(APPS_SCRIPT_URL, {
   method: 'POST',
   headers: { 'Content-Type': 'text/plain' },
-  body: JSON.stringify({ action: 'dumpFragen', token: AUDIT_TOKEN }),
+  body: JSON.stringify({ action: 'holeAlleFragenFuerMigration', email: MIGRATION_EMAIL }),
 })
 const data = await body.json()
-if (!data.success) {
+if (data.error) {
   console.error('API-Fehler:', data.error)
+  process.exit(1)
+}
+if (!Array.isArray(data.data)) {
+  console.error('Unerwartetes Response-Shape (data.data ist kein Array):', data)
   process.exit(1)
 }
 

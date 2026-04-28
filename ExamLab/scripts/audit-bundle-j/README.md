@@ -3,8 +3,8 @@
 ## Voraussetzungen
 
 - Node 20+
-- Apps-Script-URL der aktuellen Bereitstellung
-- Admin-Token (siehe Apps Script Properties → AUDIT_TOKEN)
+- Apps-Script-URL der aktuellen Bereitstellung (`VITE_APPS_SCRIPT_URL` aus `ExamLab/.env.local` ist die heutige Prod-/Staging-URL)
+- Admin-LP-E-Mail (Endpoint `holeAlleFragenFuerMigration` validiert via `istZugelasseneLP` + `rolle='admin'`)
 
 ## Setup (einmalig)
 
@@ -17,7 +17,7 @@ npm install
 
 ```bash
 export APPS_SCRIPT_URL='https://script.google.com/macros/s/.../exec'
-export AUDIT_TOKEN='...'
+export MIGRATION_EMAIL='admin-lp@gymhofwil.ch'
 cd ExamLab/scripts/audit-bundle-j
 node zaehleDragDropFragen.mjs
 ```
