@@ -6,6 +6,14 @@
 
 ---
 
+## Bundle J User-Tasks
+
+- [ ] Audit-Skript ausführen (env: `APPS_SCRIPT_URL`, `AUDIT_TOKEN`)
+  - Output zur Phase-Plan-Schätzung verwenden
+  - Multi-Zone-Bug-IDs an LP für Re-Edit-Liste kommunizieren
+
+---
+
 ## S158 (28.04.2026) — Bundle J: Spec + Plan freigegeben, Implementation offen
 
 **Was die Session machte:** Reine Brainstorming + Plan-Session. Kein Code-Change. Spec rev3 (2 Reviewer-Iterationen) + Plan rev3 (2 Reviewer-Iterationen) auf `main` committed und gepusht. Implementation für nächste Session reserviert.
