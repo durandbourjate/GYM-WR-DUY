@@ -48,4 +48,15 @@ describe('normalisiereDragDropAntwort', () => {
     const out = normalisiereDragDropAntwort(antwort, frage)
     expect(out.zuordnungen).toEqual({})
   })
+
+  it('IDB-Restore mappt Pre-Migration-text-keyed zuordnungen auf id-keyed', () => {
+    const idbAntwort = { typ: 'dragdrop_bild' as const, zuordnungen: { 'Aktiva': 'z1' } }
+    const aktuelleFrage: any = {
+      id: 'f1', typ: 'dragdrop_bild',
+      zielzonen: [{ id: 'z1', form: 'rechteck', punkte: [], korrekteLabels: ['Aktiva'] }],
+      labels: [{ id: 'sid-aktiva', text: 'Aktiva' }],
+    }
+    const out = normalisiereDragDropAntwort(idbAntwort, aktuelleFrage)
+    expect(out.zuordnungen).toEqual({ 'sid-aktiva': 'z1' })
+  })
 })
