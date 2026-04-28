@@ -210,6 +210,144 @@ describe('validierePflichtfelder — sortierung', () => {
   })
 })
 
+describe('validierePflichtfelder — bildbeschriftung', () => {
+  const gueltig = {
+    id: 'b1',
+    typ: 'bildbeschriftung',
+    fragetext: 'q',
+    bildUrl: 'http://x/y.png',
+    beschriftungen: [
+      { id: 'l1', position: { x: 10, y: 20 }, korrekt: ['Antwort'] },
+    ],
+  }
+  it('alle erfüllt', () => {
+    const r = validierePflichtfelder(gueltig as any)
+    expect(r.pflichtErfuellt).toBe(true)
+  })
+  it('pflicht-leer ohne bildUrl', () => {
+    const r = validierePflichtfelder({ ...gueltig, bildUrl: '' } as any)
+    expect(r.pflichtErfuellt).toBe(false)
+  })
+  it('pflicht-leer mit Beschriftung ohne korrekt-Antwort', () => {
+    const r = validierePflichtfelder({
+      ...gueltig,
+      beschriftungen: [{ id: 'l1', position: { x: 10, y: 20 }, korrekt: [''] }],
+    } as any)
+    expect(r.pflichtErfuellt).toBe(false)
+  })
+  it('pflicht-leer ohne Beschriftungen', () => {
+    const r = validierePflichtfelder({ ...gueltig, beschriftungen: [] } as any)
+    expect(r.pflichtErfuellt).toBe(false)
+  })
+})
+
+describe('validierePflichtfelder — dragdrop_bild', () => {
+  const gueltig = {
+    id: 'd1',
+    typ: 'dragdrop_bild',
+    fragetext: 'q',
+    bildUrl: 'http://x/y.png',
+    zielzonen: [{ id: 'z1', form: 'rechteck', punkte: [], korrektesLabel: 'A' }],
+    labels: ['A', 'B'],
+  }
+  it('alle erfüllt', () => {
+    const r = validierePflichtfelder(gueltig as any)
+    expect(r.pflichtErfuellt).toBe(true)
+  })
+  it('pflicht-leer wenn korrektesLabel nicht im labels-Pool', () => {
+    const r = validierePflichtfelder({ ...gueltig, labels: ['B', 'C'] } as any)
+    expect(r.pflichtErfuellt).toBe(false)
+  })
+  it('pflicht-leer ohne Zielzonen', () => {
+    const r = validierePflichtfelder({ ...gueltig, zielzonen: [] } as any)
+    expect(r.pflichtErfuellt).toBe(false)
+  })
+})
+
+describe('validierePflichtfelder — hotspot', () => {
+  const gueltig = {
+    id: 'h1',
+    typ: 'hotspot',
+    fragetext: 'q',
+    bildUrl: 'http://x/y.png',
+    bereiche: [{ id: 'br1', form: 'rechteck', punkte: [], label: 'A', punktzahl: 1 }],
+  }
+  it('alle erfüllt', () => {
+    const r = validierePflichtfelder(gueltig as any)
+    expect(r.pflichtErfuellt).toBe(true)
+  })
+  it('pflicht-leer ohne bildUrl', () => {
+    const r = validierePflichtfelder({ ...gueltig, bildUrl: '' } as any)
+    expect(r.pflichtErfuellt).toBe(false)
+  })
+  it('pflicht-leer ohne Bereiche', () => {
+    const r = validierePflichtfelder({ ...gueltig, bereiche: [] } as any)
+    expect(r.pflichtErfuellt).toBe(false)
+  })
+  it('akzeptiert legacy hotspots[]-Feld', () => {
+    const r = validierePflichtfelder({
+      id: 'h1',
+      typ: 'hotspot',
+      fragetext: 'q',
+      bildUrl: 'http://x/y.png',
+      hotspots: [{ id: 'br1' }],
+    } as any)
+    expect(r.pflichtErfuellt).toBe(true)
+  })
+})
+
+describe('validierePflichtfelder — freitext', () => {
+  it('alle erfüllt mit musterloesung + bewertungsraster', () => {
+    const r = validierePflichtfelder({
+      id: 'f1',
+      typ: 'freitext',
+      fragetext: 'q',
+      musterlosung: 'antwort',
+      bewertungsraster: [{ beschreibung: 'b', punkte: 1 }],
+    } as any)
+    expect(r.pflichtErfuellt).toBe(true)
+    expect(r.empfohlenErfuellt).toBe(true)
+  })
+  it('pflicht-leer ohne fragetext', () => {
+    const r = validierePflichtfelder({ id: 'f1', typ: 'freitext', fragetext: '' } as any)
+    expect(r.pflichtErfuellt).toBe(false)
+  })
+  it('empfohlen-leer ohne musterloesung & ohne bewertungsraster', () => {
+    const r = validierePflichtfelder({ id: 'f1', typ: 'freitext', fragetext: 'q' } as any)
+    expect(r.pflichtErfuellt).toBe(true)
+    expect(r.empfohlenErfuellt).toBe(false)
+  })
+})
+
+describe('validierePflichtfelder — berechnung', () => {
+  const gueltig = {
+    id: 'br1',
+    typ: 'berechnung',
+    fragetext: 'q',
+    erklaerung: 'Lösungsweg',
+    ergebnisse: [
+      { id: 'e1', label: 'Result', korrekt: 42, toleranz: 0.1, einheit: 'CHF' },
+    ],
+  }
+  it('alle erfüllt', () => {
+    const r = validierePflichtfelder(gueltig as any)
+    expect(r.pflichtErfuellt).toBe(true)
+    expect(r.empfohlenErfuellt).toBe(true)
+  })
+  it('pflicht-leer ohne ergebnisse', () => {
+    const r = validierePflichtfelder({ ...gueltig, ergebnisse: [] } as any)
+    expect(r.pflichtErfuellt).toBe(false)
+  })
+  it('empfohlen-leer ohne toleranz/einheit', () => {
+    const r = validierePflichtfelder({
+      ...gueltig,
+      ergebnisse: [{ id: 'e1', label: 'Result', korrekt: 42 }],
+    } as any)
+    expect(r.pflichtErfuellt).toBe(true)
+    expect(r.empfohlenErfuellt).toBe(false)
+  })
+})
+
 describe('validierePflichtfelder — zuordnung', () => {
   it('alle erfüllt', () => {
     const r = validierePflichtfelder({

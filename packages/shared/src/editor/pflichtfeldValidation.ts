@@ -42,6 +42,16 @@ export function validierePflichtfelder(frage: Frage | null | undefined): Validat
         return validiereSortierung(frage as any)
       case 'zuordnung':
         return validiereZuordnung(frage as any)
+      case 'bildbeschriftung':
+        return validiereBildbeschriftung(frage as any)
+      case 'dragdrop_bild':
+        return validiereDragDropBild(frage as any)
+      case 'hotspot':
+        return validiereHotspot(frage as any)
+      case 'freitext':
+        return validiereFreitext(frage as any)
+      case 'berechnung':
+        return validiereBerechnung(frage as any)
       case 'audio':
         return DEFAULT_OK
       default:
@@ -167,6 +177,161 @@ function validiereZuordnung(frage: any): ValidationResult {
     },
     pflichtLeerFelder: pflichtLeer,
     empfohlenLeerFelder: [],
+  }
+}
+
+function validiereBildbeschriftung(frage: any): ValidationResult {
+  const fragetextOk = strNonEmpty(frage.fragetext)
+  const bildOk = strNonEmpty(frage.bildUrl)
+  const beschriftungen = Array.isArray(frage.beschriftungen) ? frage.beschriftungen : []
+  const allBeschOk =
+    beschriftungen.length > 0 &&
+    beschriftungen.every((b: any) => {
+      const pos = b?.position
+      const posOk = pos && typeof pos.x === 'number' && typeof pos.y === 'number'
+      const korrekt = Array.isArray(b?.korrekt) ? b.korrekt : []
+      const hatAntwort = korrekt.some((k: any) => strNonEmpty(k))
+      return posOk && hatAntwort
+    })
+
+  const pflichtLeer: string[] = []
+  if (!fragetextOk) pflichtLeer.push('Frage-Text')
+  if (!bildOk) pflichtLeer.push('Bild-URL')
+  if (!allBeschOk) pflichtLeer.push('Mind. 1 Beschriftung mit Position + korrekt-Antwort')
+
+  return {
+    pflichtErfuellt: pflichtLeer.length === 0,
+    empfohlenErfuellt: true,
+    felderStatus: {
+      fragetext: fragetextOk ? 'ok' : 'pflicht-leer',
+      bildUrl: bildOk ? 'ok' : 'pflicht-leer',
+      beschriftungen: allBeschOk ? 'ok' : 'pflicht-leer',
+    },
+    pflichtLeerFelder: pflichtLeer,
+    empfohlenLeerFelder: [],
+  }
+}
+
+function validiereDragDropBild(frage: any): ValidationResult {
+  const fragetextOk = strNonEmpty(frage.fragetext)
+  const bildOk = strNonEmpty(frage.bildUrl)
+  const zielzonen = Array.isArray(frage.zielzonen) ? frage.zielzonen : []
+  const labelsRaw = Array.isArray(frage.labels) ? frage.labels : []
+  const labels: string[] = labelsRaw
+    .map((l: any) => (typeof l === 'string' ? l.trim() : typeof l?.text === 'string' ? l.text.trim() : ''))
+    .filter((l: string) => l.length > 0)
+  const mind1Zone =
+    zielzonen.length > 0 && zielzonen.every((z: any) => strNonEmpty(z?.korrektesLabel))
+  const alleLabelsImPool =
+    mind1Zone &&
+    zielzonen.every((z: any) => labels.includes(typeof z?.korrektesLabel === 'string' ? z.korrektesLabel.trim() : ''))
+
+  const pflichtLeer: string[] = []
+  if (!fragetextOk) pflichtLeer.push('Frage-Text')
+  if (!bildOk) pflichtLeer.push('Bild-URL')
+  if (!mind1Zone) pflichtLeer.push('Mind. 1 Zielzone mit korrektesLabel')
+  if (mind1Zone && !alleLabelsImPool) pflichtLeer.push('Alle korrektesLabel müssen im Labels-Pool sein')
+
+  return {
+    pflichtErfuellt: pflichtLeer.length === 0,
+    empfohlenErfuellt: true,
+    felderStatus: {
+      fragetext: fragetextOk ? 'ok' : 'pflicht-leer',
+      bildUrl: bildOk ? 'ok' : 'pflicht-leer',
+      zielzonen: mind1Zone && alleLabelsImPool ? 'ok' : 'pflicht-leer',
+    },
+    pflichtLeerFelder: pflichtLeer,
+    empfohlenLeerFelder: [],
+  }
+}
+
+function validiereHotspot(frage: any): ValidationResult {
+  const fragetextOk = strNonEmpty(frage.fragetext)
+  const bildOk = strNonEmpty(frage.bildUrl)
+  const bereiche = Array.isArray(frage.bereiche)
+    ? frage.bereiche
+    : Array.isArray((frage as any).hotspots)
+      ? (frage as any).hotspots
+      : []
+  const mind1 = bereiche.length >= 1
+
+  const pflichtLeer: string[] = []
+  if (!fragetextOk) pflichtLeer.push('Frage-Text')
+  if (!bildOk) pflichtLeer.push('Bild-URL')
+  if (!mind1) pflichtLeer.push('Mind. 1 Bereich')
+
+  return {
+    pflichtErfuellt: pflichtLeer.length === 0,
+    empfohlenErfuellt: true,
+    felderStatus: {
+      fragetext: fragetextOk ? 'ok' : 'pflicht-leer',
+      bildUrl: bildOk ? 'ok' : 'pflicht-leer',
+      bereiche: mind1 ? 'ok' : 'pflicht-leer',
+    },
+    pflichtLeerFelder: pflichtLeer,
+    empfohlenLeerFelder: [],
+  }
+}
+
+function validiereFreitext(frage: any): ValidationResult {
+  const fragetextOk = strNonEmpty(frage.fragetext)
+  const musterOk = strNonEmpty(frage.musterlosung) || strNonEmpty(frage.musterloesung)
+  const rasterOk =
+    (Array.isArray(frage.bewertungsraster) && frage.bewertungsraster.length > 0) ||
+    (Array.isArray((frage as any).bewertungskriterien) && (frage as any).bewertungskriterien.length > 0)
+  const empfohlenOk = musterOk || rasterOk
+
+  const pflichtLeer: string[] = []
+  if (!fragetextOk) pflichtLeer.push('Frage-Text')
+
+  const empfohlenLeer: string[] = []
+  if (!empfohlenOk) empfohlenLeer.push('Musterlösung oder Bewertungsraster')
+
+  return {
+    pflichtErfuellt: pflichtLeer.length === 0,
+    empfohlenErfuellt: empfohlenLeer.length === 0,
+    felderStatus: {
+      fragetext: fragetextOk ? 'ok' : 'pflicht-leer',
+      musterloesung: empfohlenOk ? 'ok' : 'empfohlen-leer',
+    },
+    pflichtLeerFelder: pflichtLeer,
+    empfohlenLeerFelder: empfohlenLeer,
+  }
+}
+
+function validiereBerechnung(frage: any): ValidationResult {
+  const fragetextOk = strNonEmpty(frage.fragetext)
+  const ergebnisse = Array.isArray(frage.ergebnisse) ? frage.ergebnisse : []
+  const mind1Ergebnis =
+    ergebnisse.length > 0 &&
+    ergebnisse.every((e: any) => {
+      const wert = e?.korrekt ?? e?.korrekteAntwort ?? e?.ergebnis
+      return wert !== undefined && wert !== null && wert !== ''
+    })
+  const allFelderEmpfohlen =
+    ergebnisse.length > 0 &&
+    ergebnisse.every((e: any) => typeof e?.toleranz === 'number' && strNonEmpty(e?.einheit))
+  const erklaerungEmpfohlen = strNonEmpty(frage.erklaerung)
+
+  const pflichtLeer: string[] = []
+  if (!fragetextOk) pflichtLeer.push('Frage-Text')
+  if (!mind1Ergebnis) pflichtLeer.push('Mind. 1 Ergebnis mit korrekter Antwort')
+
+  const empfohlenLeer: string[] = []
+  if (!allFelderEmpfohlen) empfohlenLeer.push('Toleranz + Einheit pro Ergebnis')
+  if (!erklaerungEmpfohlen) empfohlenLeer.push('Erklärung')
+
+  return {
+    pflichtErfuellt: pflichtLeer.length === 0,
+    empfohlenErfuellt: empfohlenLeer.length === 0,
+    felderStatus: {
+      fragetext: fragetextOk ? 'ok' : 'pflicht-leer',
+      ergebnisse: mind1Ergebnis ? 'ok' : 'pflicht-leer',
+      toleranz: allFelderEmpfohlen ? 'ok' : 'empfohlen-leer',
+      erklaerung: erklaerungEmpfohlen ? 'ok' : 'empfohlen-leer',
+    },
+    pflichtLeerFelder: pflichtLeer,
+    empfohlenLeerFelder: empfohlenLeer,
   }
 }
 
