@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest'
+import { execSync } from 'node:child_process'
+import { writeFileSync, unlinkSync } from 'node:fs'
 import { stabilId } from './stabilId'
 
 describe('stabilId', () => {
@@ -30,5 +32,27 @@ describe('stabilId', () => {
   it('Output ist nur a-z2-7 (base32, lowercase)', () => {
     const id = stabilId('frage-1', 'Test 123', 0)
     expect(id).toMatch(/^[a-z2-7]{8}$/)
+  })
+
+  it('TS- und MJS-Variante liefern byte-identische IDs', () => {
+    const cases = [
+      ['frage-1', 'Aktiva', 0],
+      ['frage-2', 'Soll', 5],
+      ['fr-with-äöü', 'Spezial', 99],
+    ] as const
+    const tsResults = cases.map(([f, t, i]) => stabilId(f, t, i))
+
+    const tmpScript = '/tmp/stabilId-mjs-check.mjs'
+    writeFileSync(tmpScript, `
+      import { stabilId } from '${process.cwd()}/../packages/shared/src/utils/stabilId.mjs'
+      const cases = ${JSON.stringify(cases)}
+      for (const [f, t, i] of cases) console.log(stabilId(f, t, i))
+    `)
+    try {
+      const out = execSync(`node ${tmpScript}`, { encoding: 'utf8' }).trim().split('\n')
+      expect(out).toEqual(tsResults)
+    } finally {
+      unlinkSync(tmpScript)
+    }
   })
 })
