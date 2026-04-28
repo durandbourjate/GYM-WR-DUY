@@ -6,9 +6,73 @@
 
 ---
 
-## Für die nächste Session (S156)
+## Für die nächste Session (S157) — Bundle H Implementation starten
 
-### Aktueller Stand (S155, 27.04.2026) — Bundle G.f.2 auf `main`
+### Aktueller Stand (S156, 28.04.2026) — Bundle H Spec + Plan freigegeben, Implementation offen
+
+**Was die Session machte:** Reine Brainstorming + Plan-Session. Kein Code-Change. Spec rev3 (3 Reviewer-Iterationen) + Plan rev2 (2 Reviewer-Iterationen) auf `main` committed und gepusht. Implementation für nächste Session reserviert.
+
+**Bundle H Scope (Spec rev3):**
+- Violett-Pflichtfeld-System (3 Stufen: Pflicht/Empfohlen/Optional, gekoppelt an `pruefungstauglich`)
+- Bestätigungsdialoge für Pflicht-leer + Drag&Drop-Bild Doppel-Labels (statt Save-Block, Default-Button = Abbrechen)
+- 4 typ-spezifische Vereinfachungen: Sortierung MC-Pattern + Bulk-Paste, Bildbeschriftung x/y-Inputs raus, Hotspot+DnD Form-Indicator+Punkte-Count weg, Drag&Drop Pool-Dedupe
+- SuS-Tastatur Enter/Cmd+Enter mit `data-no-enter-submit`-Whitelist
+- SuS Zone-Outline auf leeren Eingaben
+- Schülercode-Login UI ausgeblendet (beide LoginScreens, Code für Re-Aktivierung erhalten)
+- Audio-Filter-Verifikation (bereits aus FrageTypAuswahl raus, S140-Kommentar)
+
+**Out of Scope:**
+- Bundle I — Performance-Audit (LP-Üben 20s, SuS-Login 25s) — eigener Spec
+- Bundle J — DnD-Bild Multi-Zone-Datenmodell-Migration — eigener Spec, weil Korrektur-Algorithmus per Label-String indiziert (nicht Zone-ID)
+- Schülercode-Code-Removal — Reminder-Task für 2026-06-09 (in Phase 12.1 anzulegen)
+
+**Wichtige Spec→Plan-Korrekturen via Code-Audit:**
+- `packages/shared/src/editor/...` liegt auf **Repo-Root**, nicht in ExamLab. Vite-Alias `@shared` maps von ExamLab via `../packages/shared/src`.
+- `ExamLab/src/components/lp/frageneditor/MCEditor.tsx` etc. sind **Re-Export-Stubs** (`export { default } from '@shared/editor/typen/MCEditor'`). Echte Editoren in `packages/shared/src/editor/typen/`.
+- `validiereFrage` existiert bereits (`packages/shared/src/editor/fragenValidierung.ts:34`) — neuer `validierePflichtfelder` daneben (single-responsibility).
+- `handleSpeichern` ist in `packages/shared/src/editor/SharedFragenEditor.tsx:625` — Save-Hook für Validation+Dialog-Integration.
+- Audio bereits aus `FrageTypAuswahl` raus (S140-Kommentar Z. 13). Phase 4 reduziert auf Regression-Test + KI-Backend-Sweep.
+- `BaseDialog` lebt in `ExamLab/src/components/ui/` — Cross-Package-Import vermeiden, Dialoge inline mit Tailwind-Modal in `packages/shared`.
+- Audit-Skript-Endpoint: `holeAlleFragenFuerMigration` (existing, Pattern aus `ExamLab/scripts/migrate-teilerklaerungen/dump.mjs`).
+
+**Plan-Aufbau (13 Phasen, ~36 Tasks):**
+- Phase 0: Vorbedingungen (Branch, Vitest-Glob, Tastatur-Spike, Audio-Sweep, 4 Audit-Skripte)
+- Phase 1: `validierePflichtfelder` Helper (TDD, alle 19 Typen + Default-Branch + Defensiv)
+- Phase 2: `PflichtfeldDialog` + `DoppelteLabelDialog` + `PruefungstauglichBadge` + Save-Hook
+- Phase 3: 4 Editoren konsumieren Helper (MC, RF, Lückentext, Zuordnung — parallel)
+- Phase 4: Audio-Status Verifikation
+- Phase 5: UebungsScreen Tastatur-Erweiterung
+- Phase 6: Hotspot + DragDropBild: Form-Indicator+Punkte-Count weg
+- Phase 7: Bildbeschriftung x/y-Inputs raus
+- Phase 8: Sortierung MC-Pattern + Bulk-Paste
+- Phase 9: DragDropBild Pool-Dedupe + Doppellabel-Detection (sequenziell nach Phase 6)
+- Phase 10: SuS-Renderer Zone-Outline (8 Renderer parallel)
+- Phase 11: Schülercode UI raus (2 LoginScreens parallel)
+- Phase 12: Reminder-Task für 2026-06-09 anlegen (Hard-Gate vor Push)
+- Phase 13: E2E + Merge
+
+**Dependency-Graph (Plan Z. 36–56):** Sequential 0→1→2→3, Parallel innerhalb Phase 3+6+7+8+10+11, Direct-Mode-Pflicht für Spike (0.2), Audit-Ausführung (0.6), E2E (13.2), User-Freigabe (13.4 Step 4).
+
+**Schätzung:** 8–10h Implementation + 2h E2E. Wahrscheinlich 1–2 Sessions.
+
+**Reviewer-Loop-Zusammenfassung:**
+- Spec: 3 Iterationen — Iteration 1 (13 Findings, 1 Critical „Multi-Zone-Akzeptanz Datenmodell-Konflikt"), Iteration 2 (8 Findings), Iteration 3 (Approved + 1 kleine Konsistenz-Note nachgezogen)
+- Plan: 2 Iterationen — Iteration 1 (16 Findings, 2 Critical „Pfade falsch + Endpoint-Annahme falsch") via Bash-Audit + Plan-Rewrite, Iteration 2 (Approved, alle 16 stichprobenartig verifiziert)
+
+**Methodik-Lehren S156:**
+1. **Audit-Subagents können in unbekannter Codebase halluzinieren** — beide Audit-Subagents in dieser Session haben fälschlich `packages/shared/src/editor/`-Dateien an Pfaden beschrieben, die nicht existieren. Direkt-Bash-Audit mit `ls`/`find`/`grep` ist zuverlässiger als Subagent-Audit für Pfad-Realität. Bei Path-Annahmen vor Plan-Phase: Master-Direct-Audit, nicht Subagent.
+2. **Plan-Reviewer-Pfad-Verifikation ist Goldwert** — Reviewer hat den Path-Mismatch sofort erkannt, was im Plan-Body übersehen wurde. Eskalation an Master-Direct-Audit mit Bash war der Fix.
+3. **Spec-Path-Annahmen als „Plan-Phase prüfen"-Marker** — Spec rev3 hatte explizit „Annahme zu prüfen in Plan-Phase" für `bereinigeFrageBeimSpeichern` markiert. Das ist genau der richtige Spec-Stil: Annahmen als solche kennzeichnen, nicht als Fakten.
+
+### User-Tasks vor S157
+
+1. **Plan ggf. lesen** ([2026-04-28-bundle-h-editor-ux-feinschliff.md](../docs/superpowers/plans/2026-04-28-bundle-h-editor-ux-feinschliff.md)) — letzte Chance für Strukturänderungen vor Implementation
+2. **`APPS_SCRIPT_URL` + `MIGRATION_EMAIL`-env-Variablen vorbereiten** — werden in Phase 0.6 gebraucht (Audit-Skripte)
+3. **S157 starten** mit „starte Bundle H Phase 0" oder ähnlich
+
+---
+
+### Vorheriger Stand (S155, 27.04.2026) — Bundle G.f.2 auf `main`
 
 **Was die Session machte:** Brainstorming via `superpowers:brainstorming` (4 User-Entscheidungen, Spec-Reviewer-approved + User-approved) → Plan via `superpowers:writing-plans` (Plan-Reviewer-approved) → Implementation via `superpowers:subagent-driven-development` (10 Tasks, je Implementer + Spec-Compliance + Code-Quality-Review) → Voll-Verify (tsc + 827 vitest + build) → Browser-E2E mit echten Logins (7 Pfade) → Merge.
 
