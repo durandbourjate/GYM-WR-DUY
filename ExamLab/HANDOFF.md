@@ -14,38 +14,12 @@
 
 ---
 
-## Bundle J Phase 1.3 — Compile-Fehler nach Type-Erweiterung
+## Bundle J Phase 1-8 — KOMPLETT
 
-(Stand: nach Task 4 + Phase-1.3-Followup, werden in Phase 2-8 Pfad-für-Pfad gefixt)
-
-**Update Phase 1.3-Followup:** ExamLab-lokale `src/types/fragen.ts` ebenfalls migriert (Plan-Lücke entdeckt — viele ExamLab-Pfade importieren lokal statt aus `@shared`). Total tsc-Errors jetzt: **65** (vorher 13).
-
-**Top-Files mit Fehler-Count (18 Dateien):**
-
-| # | Datei | Fehler |
-|---|-------|-------:|
-| 1 | `ExamLab/src/utils/autoKorrektur.test.ts` | 18 |
-| 2 | `ExamLab/src/data/einrichtungsUebungFragen.ts` | 10 |
-| 3 | `ExamLab/src/data/einrichtungsFragen.ts` | 10 |
-| 4 | `ExamLab/src/tests/DragDropBildFragePool.test.tsx` | 4 |
-| 5 | `packages/shared/src/editor/typen/DragDropBildEditor.tsx` | 3 |
-| 6 | `ExamLab/src/utils/ueben/korrektur.ts` | 2 |
-| 7 | `ExamLab/src/utils/ueben/fragetypNormalizer.ts` | 2 |
-| 8 | `ExamLab/src/utils/poolConverter.ts` | 2 |
-| 9 | `ExamLab/src/tests/DragDropBildEditorPool.test.tsx` | 2 |
-| 10 | `ExamLab/src/tests/DragDropBildEditorPflicht.test.tsx` | 2 |
-| 11 | `ExamLab/src/components/lp/korrektur/KorrekturFrageVollansicht.tsx` | 2 |
-| 12 | `ExamLab/src/components/fragetypen/DragDropBildFrage.tsx` | 2 |
-| 13 | `ExamLab/src/utils/autoKorrektur.ts` | 1 |
-| 14 | `ExamLab/src/tests/DragDropBildFrageOutline.test.tsx` | 1 |
-| 15 | `ExamLab/src/tests/DragDropBildFrageLoesung.test.tsx` | 1 |
-| 16 | `ExamLab/src/components/lp/vorbereitung/composer/DruckAnsicht.tsx` | 1 |
-| 17 | `packages/shared/src/editor/fragenFactory.ts` | 1 |
-| 18 | `packages/shared/src/editor/SharedFragenEditor.tsx` | 1 |
-
-**Spec-5.2.1-Pfade verifiziert sichtbar:** `autoKorrektur.ts` (1 Error), `poolConverter.ts` (2 Errors), `DragDropBildFrage.tsx` (2 Errors), `KorrekturFrageVollansicht.tsx` (2 Errors), `DruckAnsicht.tsx` (1 Error). Alle aus dem Plan-Step-5.2.1-Inventar erscheinen jetzt im tsc-Output.
-
-**Out of Scope für Phase 1.3:** Imports von `ExamLab/src/types/fragen.ts` auf `@shared/types/fragen` umstellen (separater Aufräum-Task — Plan beendet weiter mit zwei parallelen Type-Definitionen).
+- Phase 1.3 Type-Erweiterung: 65 tsc-Errors → 0 nach Phase 8.
+- 1098 vitest passes (vorher 1082, +16 für neue normalizer/Stack/Pool/Editor-Tests).
+- `npm run build` grün.
+- Phase 9 (Migrations-Skript) + Phase 10 (E2E + Full-Run) offen.
 
 ---
 
