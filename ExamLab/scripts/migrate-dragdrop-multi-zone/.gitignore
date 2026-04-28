@@ -1,0 +1,8 @@
+node_modules/
+fragen.json
+fragen-vor.json
+migriert.json
+migriert-vor.json
+upload.log
+.env
+*.log
