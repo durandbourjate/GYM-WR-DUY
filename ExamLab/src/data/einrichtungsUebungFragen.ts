@@ -792,12 +792,19 @@ export const einrichtungsUebungFragen: Frage[] = [
     fragetext: 'Ordnen Sie die **Kontinente** den richtigen Positionen auf der Weltkarte zu.\n\n💡 Tippen Sie auf ein Label, dann auf die Zielzone (oder ziehen Sie es dorthin).',
     bildUrl: './demo-bilder/weltkarte.svg',
     zielzonen: [
-      { id: '1', form: 'rechteck' as const, punkte: [{x:12,y:35},{x:32,y:35},{x:32,y:60},{x:12,y:60}], korrektesLabel: 'Nordamerika' },
-      { id: '2', form: 'rechteck' as const, punkte: [{x:45,y:25},{x:60,y:25},{x:60,y:55},{x:45,y:55}], korrektesLabel: 'Europa' },
-      { id: '3', form: 'rechteck' as const, punkte: [{x:70,y:35},{x:90,y:35},{x:90,y:65},{x:70,y:65}], korrektesLabel: 'Asien' },
-      { id: '4', form: 'rechteck' as const, punkte: [{x:20,y:65},{x:35,y:65},{x:35,y:85},{x:20,y:85}], korrektesLabel: 'Südamerika' },
+      { id: '1', form: 'rechteck' as const, punkte: [{x:12,y:35},{x:32,y:35},{x:32,y:60},{x:12,y:60}], korrekteLabels: ['Nordamerika'] },
+      { id: '2', form: 'rechteck' as const, punkte: [{x:45,y:25},{x:60,y:25},{x:60,y:55},{x:45,y:55}], korrekteLabels: ['Europa'] },
+      { id: '3', form: 'rechteck' as const, punkte: [{x:70,y:35},{x:90,y:35},{x:90,y:65},{x:70,y:65}], korrekteLabels: ['Asien'] },
+      { id: '4', form: 'rechteck' as const, punkte: [{x:20,y:65},{x:35,y:65},{x:35,y:85},{x:20,y:85}], korrekteLabels: ['Südamerika'] },
     ],
-    labels: ['Nordamerika', 'Europa', 'Asien', 'Südamerika', 'Afrika', 'Australien'],
+    labels: [
+      { id: 'kont-na', text: 'Nordamerika' },
+      { id: 'kont-eu', text: 'Europa' },
+      { id: 'kont-as', text: 'Asien' },
+      { id: 'kont-sa', text: 'Südamerika' },
+      { id: 'kont-af', text: 'Afrika' },
+      { id: 'kont-au', text: 'Australien' },
+    ],
   },
 
   // E7 — Code: Python-Funktion schreiben

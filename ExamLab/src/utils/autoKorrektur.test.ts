@@ -348,7 +348,7 @@ describe('autoKorrigiere', () => {
   // === DRAG & DROP BILD ===
 
   it('korrigiert DragDropBild alle korrekt', () => {
-    const frage: DragDropBildFrage = {
+    const frage: any = {
       id: 'dd-1', typ: 'dragdrop_bild', version: 1, erstelltAm: '2026-01-01', geaendertAm: '2026-01-01',
       fachbereich: 'VWL', fach: 'Wirtschaft & Recht', thema: 'Test',
       semester: ['S3'], gefaesse: ['SF'], bloom: 'K2', tags: [],
@@ -373,7 +373,7 @@ describe('autoKorrigiere', () => {
   })
 
   it('korrigiert DragDropBild teilweise korrekt', () => {
-    const frage: DragDropBildFrage = {
+    const frage: any = {
       id: 'dd-2', typ: 'dragdrop_bild', version: 1, erstelltAm: '2026-01-01', geaendertAm: '2026-01-01',
       fachbereich: 'VWL', fach: 'Wirtschaft & Recht', thema: 'Test',
       semester: ['S3'], gefaesse: ['SF'], bloom: 'K2', tags: [],
@@ -396,7 +396,7 @@ describe('autoKorrigiere', () => {
   })
 
   it('korrigiert DragDropBild case-insensitive', () => {
-    const frage: DragDropBildFrage = {
+    const frage: any = {
       id: 'dd-3', typ: 'dragdrop_bild', version: 1, erstelltAm: '2026-01-01', geaendertAm: '2026-01-01',
       fachbereich: 'VWL', fach: 'Wirtschaft & Recht', thema: 'Test',
       semester: ['S3'], gefaesse: ['SF'], bloom: 'K2', tags: [],
@@ -418,7 +418,7 @@ describe('autoKorrigiere', () => {
   })
 
   it('korrigiert DragDropBild leere Zuordnung', () => {
-    const frage: DragDropBildFrage = {
+    const frage: any = {
       id: 'dd-4', typ: 'dragdrop_bild', version: 1, erstelltAm: '2026-01-01', geaendertAm: '2026-01-01',
       fachbereich: 'VWL', fach: 'Wirtschaft & Recht', thema: 'Test',
       semester: ['S3'], gefaesse: ['SF'], bloom: 'K2', tags: [],

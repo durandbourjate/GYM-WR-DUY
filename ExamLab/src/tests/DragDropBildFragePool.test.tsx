@@ -37,7 +37,7 @@ const baseFrage = {
       korrektesLabel: 'Passiva',
     },
   ],
-} as Omit<DDType, 'labels'>
+} as unknown as Omit<DDType, 'labels'>
 
 describe('DragDropBildFrage SuS-Pool-Stacks (Bundle J)', () => {
   it('Doppelte Labels (case-sensitive, getrimmt) erscheinen als ein Stack mit Counter', () => {

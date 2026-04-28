@@ -6,7 +6,6 @@ import type { Frage, MCFrage, RichtigFalschFrage, LueckentextFrage, ZuordnungFra
 import type { Antwort } from '../types/antworten'
 import { korrigiereBuchungssatz, korrigiereTKonto, korrigiereKontenbestimmung, korrigiereBilanzER } from './fibuAutoKorrektur'
 import { normalisiereLatex } from './latexRenderer'
-import { labelsInZone, zoneKorrektBelegt } from './dragdropBildUtils'
 import { normalisiereDragDropBild, normalisiereDragDropAntwort } from './ueben/fragetypNormalizer'
 import { istPunktInPolygon } from './zonen/polygon'
 export type { KorrekturErgebnis, KorrekturDetail } from './fibuAutoKorrektur'
