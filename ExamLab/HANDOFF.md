@@ -10,7 +10,7 @@
 
 ### Bundle K — Type-Konsolidierung Frage Core + Storage ✅ MERGED
 
-**Merge:** Bundle K auf `main` (Merge-Commit folgt). 16 Commits Feature-Arbeit auf `refactor/type-konsolidierung-frage-core-storage`.
+**Merge:** `de01e01` auf `main` (29.04.2026). 16 Commits Feature-Arbeit auf `refactor/type-konsolidierung-frage-core-storage` (Branch gelöscht). Audit-Files (Phase 0) post-Merge entfernt.
 
 **Geliefert:**
 - `packages/shared/src/types/fragen-core.ts` (kanonische Editor-Types in shared, 699 Z.)
@@ -39,6 +39,29 @@
 - `Extract<Frage, {typ:'X'}>`-Aliases als zentrale Storage-Sub-Type-Exports in fragen-storage exportieren
 - `leereEingabenDetektor.ts` könnte direkt auf `@shared/types/fragen-core` (SuS-Pfad)
 - Inline `import('./auth').Berechtigung[]` in FrageSummary auf top-of-file-Import-Style
+
+---
+
+## Eintrittspunkte für nächste Session
+
+Bundle K ist abgeschlossen. Drei Optionen für die nächste Session — Kosten/Nutzen-Vergleich:
+
+### Option A: Bundle K-Nachzügler (klein, ~30 min, easy win)
+Die 4 Tech-Debt-Items aus dem Bundle-K-Code-Review als kleines Hygiene-Bundle umsetzen:
+1. Storage-Sub-Type-Exports in `fragen-storage.ts` zentralisieren (eliminiert 23 `Extract<Frage, …>`-Aliase in 3 Files)
+2. `alsCoreFrage<T>`-Helper für DruckAnsicht (11 Casts → 1 Helper)
+3. `leereEingabenDetektor.ts` Import direkt auf `@shared/types/fragen-core` (SuS-Pfad-Hygiene)
+4. FrageSummary-Inline-Import-Style begradigen
+
+Vorgehen: direkter Implementierungs-Sweep ohne Brainstorming, keine Backend-Änderung, kein Apps-Script-Deploy. Branch `refactor/bundle-k-followup`. Test: tsc + vitest, kein Browser-E2E nötig (rein interner Refactor).
+
+### Option B: `as any`-Cleanup-Bundle (mittel, ~1 Session)
+72 `as any`-Stellen in der Codebase (von 58 gewachsen, siehe `code-quality.md`). Eigenes Hygiene-Bundle. Brainstorming → Plan → Implementation. Reduziert TypeScript-Untyped-Surface, fängt potenzielle Bugs.
+
+### Option C: Media-Phase-3-5 Dual-Write (groß, ~3-4 Sessions)
+`MediaQuelle`-Type ist in shared definiert, aber Apps-Script kennt ihn nicht. Echte Migration: Backend liest+schreibt beide Formate (`bildUrl`/`pdfBase64` UND `MediaQuelle`), Frontend-Migrator existiert (`mediaQuelleMigrator.ts`). Apps-Script-Deploy nötig. Phase 6 (alte Felder weg, Daten-Migration) als separates Bundle danach.
+
+**Empfehlung:** Option A als Auftakt-Aufgabe — schließt Bundle K sauber ab und ist in <1h erledigt. Danach Option B oder C je nach User-Priorität.
 
 ---
 
