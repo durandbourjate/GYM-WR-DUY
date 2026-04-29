@@ -2,7 +2,7 @@ import type { GooglePayload, CodeLoginResponse } from '../../types/ueben/auth'
 import type { Gruppe, Mitglied } from '../../types/ueben/gruppen'
 import type { Frage, FragenFilter } from '../../types/ueben/fragen'
 import type { FragenFortschritt, SessionEintrag } from '../../types/ueben/fortschritt'
-import type { Lernziel } from '@shared/types/fragen'
+import type { Lernziel } from '@shared/types/fragen-core'
 
 export interface LernenAuthServiceInterface {
   initializeGoogleAuth(onSuccess: (payload: GooglePayload) => void, onError: (error: string) => void): void

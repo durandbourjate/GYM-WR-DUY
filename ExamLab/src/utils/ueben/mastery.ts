@@ -1,5 +1,5 @@
 import type { MasteryStufe, FragenFortschritt, LernzielStatus } from '../../types/ueben/fortschritt'
-import type { Lernziel } from '@shared/types/fragen'
+import type { Lernziel } from '@shared/types/fragen-core'
 import { DEFAULT_MASTERY_SCHWELLWERTE, type MasterySchwellwerte } from '../../types/ueben/settings'
 
 export function berechneMastery(
