@@ -166,8 +166,9 @@ cd "$ROOT"
 # Alle as-any-Stellen, ohne node_modules
 TOTAL=$(grep -rn "as any" ExamLab/src/ packages/shared/src/ 2>/dev/null | wc -l)
 
-# Defensive-Tests (vorangestellter Kommentar oder gleiche Zeile)
-DEFENSIVE=$(grep -rn "as unknown as.*// Defensive\|// Defensive" ExamLab/src/ packages/shared/src/ 2>/dev/null | wc -l)
+# Defensive-Tests: Inline-Kommentar `/* Defensive: … */` oder `// Defensive: …` auf derselben Zeile wie der `as`-Cast.
+# Konvention: 1-Zeilen-Scan reicht — `Defensive`-Token MUSS in derselben Zeile wie der Cast stehen.
+DEFENSIVE=$(grep -rEn "as (unknown as |any).*Defensive" ExamLab/src/ packages/shared/src/ 2>/dev/null | wc -l)
 
 UNDOKUMENTIERT=$((TOTAL - DEFENSIVE))
 
@@ -364,12 +365,11 @@ expect(() => validierePflichtfelder({} as any)).not.toThrow()
 
 **Nachher:**
 ```ts
-// Defensive: bewusst kaputter Input, prüft Robustheit gegen undefined/leere Objekte
-expect(() => validierePflichtfelder(null as unknown as Frage)).not.toThrow()
-expect(() => validierePflichtfelder({} as unknown as Frage)).not.toThrow()
+expect(() => validierePflichtfelder(null as unknown as Frage /* Defensive: bewusst kaputter Input, prüft Robustheit */)).not.toThrow()
+expect(() => validierePflichtfelder({} as unknown as Frage /* Defensive: leeres Objekt */)).not.toThrow()
 ```
 
-Form `as unknown as Frage` (statt `as any`) macht den bewussten Type-Bruch explizit. Vorangestellter Kommentar `// Defensive: …` macht es für das Audit-Skript erkennbar.
+Form `as unknown as <Type>` (statt `as any`) macht den bewussten Type-Bruch explizit. **Inline-Kommentar `/* Defensive: … */`** auf derselben Zeile wie der Cast macht es für das Audit-Skript erkennbar (1-Zeilen-Scan, kein 2-Zeilen-Lookup nötig). Mehrzeilige Kommentare über dem Cast sind erlaubt für Erklärung, aber das `Defensive`-Token MUSS in derselben Zeile wie der Cast stehen.
 
 ---
 
