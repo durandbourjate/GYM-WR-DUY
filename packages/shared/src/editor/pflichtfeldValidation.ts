@@ -1,4 +1,11 @@
-import type { Frage } from '../types/fragen-core'
+import type {
+  Frage,
+  MCFrage, RichtigFalschFrage, LueckentextFrage, SortierungFrage,
+  ZuordnungFrage, BildbeschriftungFrage, DragDropBildFrage, HotspotFrage,
+  FreitextFrage, BerechnungFrage, BuchungssatzFrage, TKontoFrage,
+  KontenbestimmungFrage, BilanzERFrage, VisualisierungFrage, PDFFrage,
+  CodeFrage, FormelFrage, AufgabengruppeFrage,
+} from '../types/fragen-core'
 
 export type FeldStatus = 'pflicht-leer' | 'empfohlen-leer' | 'ok'
 
@@ -29,53 +36,36 @@ function strNonEmpty(s: unknown): boolean {
 
 export function validierePflichtfelder(frage: Frage | null | undefined): ValidationResult {
   if (!frage || typeof frage !== 'object') return DEFAULT_OK
-
   try {
-    switch ((frage as any).typ) {
-      case 'mc':
-        return validiereMC(frage as any)
-      case 'richtigfalsch':
-        return validiereRichtigFalsch(frage as any)
-      case 'lueckentext':
-        return validiereLueckentext(frage as any)
-      case 'sortierung':
-        return validiereSortierung(frage as any)
-      case 'zuordnung':
-        return validiereZuordnung(frage as any)
-      case 'bildbeschriftung':
-        return validiereBildbeschriftung(frage as any)
-      case 'dragdrop_bild':
-        return validiereDragDropBild(frage as any)
-      case 'hotspot':
-        return validiereHotspot(frage as any)
-      case 'freitext':
-        return validiereFreitext(frage as any)
-      case 'berechnung':
-        return validiereBerechnung(frage as any)
-      case 'buchungssatz':
-        return validiereBuchungssatz(frage as any)
-      case 'tkonto':
-        return validiereTKonto(frage as any)
-      case 'kontenbestimmung':
-        return validiereKontenbestimmung(frage as any)
-      case 'bilanzstruktur':
-        return validiereBilanzstruktur(frage as any)
+    switch (frage.typ) {
+      case 'mc': return validiereMC(frage)
+      case 'richtigfalsch': return validiereRichtigFalsch(frage)
+      case 'lueckentext': return validiereLueckentext(frage)
+      case 'sortierung': return validiereSortierung(frage)
+      case 'zuordnung': return validiereZuordnung(frage)
+      case 'bildbeschriftung': return validiereBildbeschriftung(frage)
+      case 'dragdrop_bild': return validiereDragDropBild(frage)
+      case 'hotspot': return validiereHotspot(frage)
+      case 'freitext': return validiereFreitext(frage)
+      case 'berechnung': return validiereBerechnung(frage)
+      case 'buchungssatz': return validiereBuchungssatz(frage)
+      case 'tkonto': return validiereTKonto(frage)
+      case 'kontenbestimmung': return validiereKontenbestimmung(frage)
+      case 'bilanzstruktur': return validiereBilanzstruktur(frage)
       case 'visualisierung':
-      case 'zeichnen':
-        return validiereVisualisierung(frage as any)
-      case 'pdf':
-        return validierePDF(frage as any)
-      case 'code':
-        return validiereCode(frage as any)
-      case 'formel':
-        return validiereFormel(frage as any)
-      case 'aufgabengruppe':
-        return validiereAufgabengruppe(frage as any)
-      case 'audio':
-        return DEFAULT_OK
-      default:
-        console.warn(`[pflichtfeldValidation] Unbekannter typ: ${(frage as any).typ}`)
+        return validiereVisualisierung(frage)
+      case 'pdf': return validierePDF(frage)
+      case 'code': return validiereCode(frage)
+      case 'formel': return validiereFormel(frage)
+      case 'aufgabengruppe': return validiereAufgabengruppe(frage)
+      case 'audio': return DEFAULT_OK
+      default: {
+        // 'zeichnen' war Legacy-Variante von 'visualisierung' — TypeScript fängt
+        // den Case nicht in der Frage-Union ab; default deckt unbekannte Strings.
+        const unbekannterTyp = (frage as { typ?: unknown }).typ
+        console.warn(`[pflichtfeldValidation] Unbekannter typ: ${String(unbekannterTyp)}`)
         return DEFAULT_KONSERVATIV
+      }
     }
   } catch (err) {
     console.error('[pflichtfeldValidation] crash:', err)
@@ -83,14 +73,14 @@ export function validierePflichtfelder(frage: Frage | null | undefined): Validat
   }
 }
 
-function validiereRichtigFalsch(frage: any): ValidationResult {
+function validiereRichtigFalsch(frage: RichtigFalschFrage): ValidationResult {
   const fragetextOk = strNonEmpty(frage.fragetext)
   const aussagen = Array.isArray(frage.aussagen) ? frage.aussagen : []
-  const mitText = aussagen.filter((a: any) => strNonEmpty(a?.text))
+  const mitText = aussagen.filter(a => strNonEmpty(a?.text))
   const mind2 = mitText.length >= 2
   const alleKorrektGeflaggt =
-    aussagen.length > 0 && aussagen.every((a: any) => a?.korrekt === true || a?.korrekt === false)
-  const erklaerungenAlle = aussagen.length > 0 && aussagen.every((a: any) => strNonEmpty(a?.erklaerung))
+    aussagen.length > 0 && aussagen.every(a => a?.korrekt === true || a?.korrekt === false)
+  const erklaerungenAlle = aussagen.length > 0 && aussagen.every(a => strNonEmpty(a?.erklaerung))
 
   const pflichtLeer: string[] = []
   if (!fragetextOk) pflichtLeer.push('Frage-Text')
@@ -113,7 +103,7 @@ function validiereRichtigFalsch(frage: any): ValidationResult {
   }
 }
 
-function validiereLueckentext(frage: any): ValidationResult {
+function validiereLueckentext(frage: LueckentextFrage): ValidationResult {
   const fragetextOk = strNonEmpty(frage.fragetext)
   const text = typeof frage.textMitLuecken === 'string' ? frage.textMitLuecken : ''
   const platzhalterOk = /\{\d+\}|\{\{\d+\}\}/.test(text)
@@ -122,14 +112,14 @@ function validiereLueckentext(frage: any): ValidationResult {
 
   const allLueckenOk =
     luecken.length > 0 &&
-    luecken.every((l: any) => {
+    luecken.every(l => {
       if (modus === 'freitext') {
         const antworten = Array.isArray(l?.korrekteAntworten) ? l.korrekteAntworten : []
-        return antworten.some((a: any) => strNonEmpty(a))
+        return antworten.some(a => strNonEmpty(a))
       }
       const dropdown = Array.isArray(l?.dropdownOptionen) ? l.dropdownOptionen : []
       const korrekt = Array.isArray(l?.korrekteAntworten) ? l.korrekteAntworten : []
-      return dropdown.length >= 2 && korrekt.some((a: any) => strNonEmpty(a))
+      return dropdown.length >= 2 && korrekt.some(a => strNonEmpty(a))
     })
 
   const pflichtLeer: string[] = []
@@ -156,10 +146,10 @@ function validiereLueckentext(frage: any): ValidationResult {
   }
 }
 
-function validiereSortierung(frage: any): ValidationResult {
+function validiereSortierung(frage: SortierungFrage): ValidationResult {
   const fragetextOk = strNonEmpty(frage.fragetext)
   const elemente = Array.isArray(frage.elemente) ? frage.elemente : []
-  const mind2 = elemente.filter((e: any) => strNonEmpty(e)).length >= 2
+  const mind2 = elemente.filter(e => strNonEmpty(e)).length >= 2
 
   const pflichtLeer: string[] = []
   if (!fragetextOk) pflichtLeer.push('Frage-Text')
@@ -177,10 +167,10 @@ function validiereSortierung(frage: any): ValidationResult {
   }
 }
 
-function validiereZuordnung(frage: any): ValidationResult {
+function validiereZuordnung(frage: ZuordnungFrage): ValidationResult {
   const fragetextOk = strNonEmpty(frage.fragetext)
   const paare = Array.isArray(frage.paare) ? frage.paare : []
-  const vollstaendig = paare.filter((p: any) => strNonEmpty(p?.links) && strNonEmpty(p?.rechts))
+  const vollstaendig = paare.filter(p => strNonEmpty(p?.links) && strNonEmpty(p?.rechts))
   const mind2 = vollstaendig.length >= 2
 
   const pflichtLeer: string[] = []
@@ -199,17 +189,17 @@ function validiereZuordnung(frage: any): ValidationResult {
   }
 }
 
-function validiereBildbeschriftung(frage: any): ValidationResult {
+function validiereBildbeschriftung(frage: BildbeschriftungFrage): ValidationResult {
   const fragetextOk = strNonEmpty(frage.fragetext)
   const bildOk = strNonEmpty(frage.bildUrl)
   const beschriftungen = Array.isArray(frage.beschriftungen) ? frage.beschriftungen : []
   const allBeschOk =
     beschriftungen.length > 0 &&
-    beschriftungen.every((b: any) => {
+    beschriftungen.every(b => {
       const pos = b?.position
       const posOk = pos && typeof pos.x === 'number' && typeof pos.y === 'number'
       const korrekt = Array.isArray(b?.korrekt) ? b.korrekt : []
-      const hatAntwort = korrekt.some((k: any) => strNonEmpty(k))
+      const hatAntwort = korrekt.some(k => strNonEmpty(k))
       return posOk && hatAntwort
     })
 
@@ -231,25 +221,25 @@ function validiereBildbeschriftung(frage: any): ValidationResult {
   }
 }
 
-function validiereDragDropBild(frage: any): ValidationResult {
+function validiereDragDropBild(frage: DragDropBildFrage): ValidationResult {
   const fragetextOk = strNonEmpty(frage.fragetext)
   const bildOk = strNonEmpty(frage.bildUrl)
   const zielzonen = Array.isArray(frage.zielzonen) ? frage.zielzonen : []
-  const labelsRaw = Array.isArray(frage.labels) ? frage.labels : []
+  const labelsRaw: unknown[] = Array.isArray(frage.labels) ? frage.labels : [] // Defensive: Legacy-Daten können string[] statt DragDropBildLabel[] enthalten
   const labels: string[] = labelsRaw
-    .map((l: any) => (typeof l === 'string' ? l.trim() : typeof l?.text === 'string' ? l.text.trim() : ''))
-    .filter((l: string) => l.length > 0)
+    .map(l => (typeof l === 'string' ? l.trim() : typeof (l as { text?: unknown })?.text === 'string' ? (l as { text: string }).text.trim() : ''))
+    .filter(l => l.length > 0)
   const mind1Zone =
     zielzonen.length > 0 &&
-    zielzonen.every((z: any) =>
+    zielzonen.every(z =>
       Array.isArray(z?.korrekteLabels) &&
       z.korrekteLabels.length > 0 &&
-      z.korrekteLabels.every((l: unknown) => strNonEmpty(l)),
+      z.korrekteLabels.every(l => strNonEmpty(l)),
     )
   const alleLabelsImPool =
     mind1Zone &&
-    zielzonen.every((z: any) =>
-      (z.korrekteLabels as string[]).every((l) => labels.includes(l.trim())),
+    zielzonen.every(z =>
+      z.korrekteLabels.every(l => labels.includes(l.trim())),
     )
 
   const pflichtLeer: string[] = []
@@ -271,13 +261,14 @@ function validiereDragDropBild(frage: any): ValidationResult {
   }
 }
 
-function validiereHotspot(frage: any): ValidationResult {
+function validiereHotspot(frage: HotspotFrage): ValidationResult {
   const fragetextOk = strNonEmpty(frage.fragetext)
   const bildOk = strNonEmpty(frage.bildUrl)
+  const frageCompat = frage as unknown as { hotspots?: unknown[] } // Defensive: legacy 'hotspots' alias vor Kanonisierung zu 'bereiche'
   const bereiche = Array.isArray(frage.bereiche)
     ? frage.bereiche
-    : Array.isArray((frage as any).hotspots)
-      ? (frage as any).hotspots
+    : Array.isArray(frageCompat.hotspots)
+      ? frageCompat.hotspots
       : []
   const mind1 = bereiche.length >= 1
 
@@ -299,12 +290,13 @@ function validiereHotspot(frage: any): ValidationResult {
   }
 }
 
-function validiereFreitext(frage: any): ValidationResult {
+function validiereFreitext(frage: FreitextFrage): ValidationResult {
   const fragetextOk = strNonEmpty(frage.fragetext)
-  const musterOk = strNonEmpty(frage.musterlosung) || strNonEmpty(frage.musterloesung)
+  const frageCompat = frage as unknown as { musterloesung?: string; bewertungskriterien?: unknown[] } // Defensive: Legacy-Tippfehler-Aliases aus alten Datensätzen
+  const musterOk = strNonEmpty(frage.musterlosung) || strNonEmpty(frageCompat.musterloesung)
   const rasterOk =
     (Array.isArray(frage.bewertungsraster) && frage.bewertungsraster.length > 0) ||
-    (Array.isArray((frage as any).bewertungskriterien) && (frage as any).bewertungskriterien.length > 0)
+    (Array.isArray(frageCompat.bewertungskriterien) && frageCompat.bewertungskriterien.length > 0)
   const empfohlenOk = musterOk || rasterOk
 
   const pflichtLeer: string[] = []
@@ -325,19 +317,21 @@ function validiereFreitext(frage: any): ValidationResult {
   }
 }
 
-function validiereBerechnung(frage: any): ValidationResult {
+function validiereBerechnung(frage: BerechnungFrage): ValidationResult {
   const fragetextOk = strNonEmpty(frage.fragetext)
   const ergebnisse = Array.isArray(frage.ergebnisse) ? frage.ergebnisse : []
   const mind1Ergebnis =
     ergebnisse.length > 0 &&
-    ergebnisse.every((e: any) => {
-      const wert = e?.korrekt ?? e?.korrekteAntwort ?? e?.ergebnis
+    ergebnisse.every(e => {
+      const eCompat = e as unknown as { korrekteAntwort?: unknown; ergebnis?: unknown } // Defensive: Legacy-Feldnamen aus älteren Frage-Versionen
+      const wert: unknown = e?.korrekt ?? eCompat?.korrekteAntwort ?? eCompat?.ergebnis
       return wert !== undefined && wert !== null && wert !== ''
     })
   const allFelderEmpfohlen =
     ergebnisse.length > 0 &&
-    ergebnisse.every((e: any) => typeof e?.toleranz === 'number' && strNonEmpty(e?.einheit))
-  const erklaerungEmpfohlen = strNonEmpty(frage.erklaerung)
+    ergebnisse.every(e => typeof e?.toleranz === 'number' && strNonEmpty(e?.einheit))
+  const frageCompat = frage as unknown as { erklaerung?: string } // Defensive: erklaerung existiert nicht auf BerechnungFrage-Typ, aber in älteren Datensätzen
+  const erklaerungEmpfohlen = strNonEmpty(frageCompat.erklaerung)
 
   const pflichtLeer: string[] = []
   if (!fragetextOk) pflichtLeer.push('Frage-Text')
@@ -361,10 +355,11 @@ function validiereBerechnung(frage: any): ValidationResult {
   }
 }
 
-function validiereBuchungssatz(frage: any): ValidationResult {
-  const fragetextOk = strNonEmpty(frage.fragetext) || strNonEmpty(frage.geschaeftsfall)
+function validiereBuchungssatz(frage: BuchungssatzFrage): ValidationResult {
+  const frageCompat = frage as unknown as { fragetext?: string } // Defensive: Legacy 'fragetext'-Alias aus älteren Datensätzen
+  const fragetextOk = strNonEmpty(frageCompat.fragetext) || strNonEmpty(frage.geschaeftsfall)
   const buchungen = Array.isArray(frage.buchungen) ? frage.buchungen : []
-  const mind1 = buchungen.filter((b: any) => strNonEmpty(b?.sollKonto) || strNonEmpty(b?.habenKonto)).length >= 1
+  const mind1 = buchungen.filter(b => strNonEmpty(b?.sollKonto) || strNonEmpty(b?.habenKonto)).length >= 1
 
   const pflichtLeer: string[] = []
   if (!fragetextOk) pflichtLeer.push('Geschäftsfall / Frage-Text')
@@ -382,10 +377,11 @@ function validiereBuchungssatz(frage: any): ValidationResult {
   }
 }
 
-function validiereTKonto(frage: any): ValidationResult {
-  const aufgabentextOk = strNonEmpty(frage.aufgabentext) || strNonEmpty(frage.tkAufgabentext)
+function validiereTKonto(frage: TKontoFrage): ValidationResult {
+  const frageCompat = frage as unknown as { tkAufgabentext?: string } // Defensive: Legacy 'tkAufgabentext'-Alias aus älteren Datensätzen
+  const aufgabentextOk = strNonEmpty(frage.aufgabentext) || strNonEmpty(frageCompat.tkAufgabentext)
   const konten = Array.isArray(frage.konten) ? frage.konten : []
-  const mind1 = konten.filter((k: any) => strNonEmpty(k?.kontonummer)).length >= 1
+  const mind1 = konten.filter(k => strNonEmpty(k?.kontonummer)).length >= 1
 
   const pflichtLeer: string[] = []
   if (!aufgabentextOk) pflichtLeer.push('Aufgabentext')
@@ -403,10 +399,10 @@ function validiereTKonto(frage: any): ValidationResult {
   }
 }
 
-function validiereKontenbestimmung(frage: any): ValidationResult {
+function validiereKontenbestimmung(frage: KontenbestimmungFrage): ValidationResult {
   const aufgabentextOk = strNonEmpty(frage.aufgabentext)
   const aufgaben = Array.isArray(frage.aufgaben) ? frage.aufgaben : []
-  const mind1 = aufgaben.filter((a: any) => strNonEmpty(a?.text)).length >= 1
+  const mind1 = aufgaben.filter(a => strNonEmpty(a?.text)).length >= 1
 
   const pflichtLeer: string[] = []
   if (!aufgabentextOk) pflichtLeer.push('Aufgabentext')
@@ -424,12 +420,13 @@ function validiereKontenbestimmung(frage: any): ValidationResult {
   }
 }
 
-function validiereBilanzstruktur(frage: any): ValidationResult {
+function validiereBilanzstruktur(frage: BilanzERFrage): ValidationResult {
   const aufgabentextOk = strNonEmpty(frage.aufgabentext)
   const konten = Array.isArray(frage.kontenMitSaldi) ? frage.kontenMitSaldi : []
   const mind1 =
-    konten.filter((k: any) => {
-      const wert = k?.saldo ?? k?.betrag
+    konten.filter(k => {
+      const kCompat = k as unknown as { betrag?: unknown } // Defensive: Legacy 'betrag'-Alias aus älteren Frage-Versionen
+      const wert: unknown = k?.saldo ?? kCompat?.betrag
       return strNonEmpty(k?.kontonummer) && wert !== undefined && wert !== null && wert !== ''
     }).length >= 1
 
@@ -449,7 +446,7 @@ function validiereBilanzstruktur(frage: any): ValidationResult {
   }
 }
 
-function validiereVisualisierung(frage: any): ValidationResult {
+function validiereVisualisierung(frage: VisualisierungFrage): ValidationResult {
   const fragetextOk = strNonEmpty(frage.fragetext)
   const untertypOk = strNonEmpty(frage.untertyp)
   const konfigOk =
@@ -474,11 +471,12 @@ function validiereVisualisierung(frage: any): ValidationResult {
   }
 }
 
-function validierePDF(frage: any): ValidationResult {
+function validierePDF(frage: PDFFrage): ValidationResult {
   const fragetextOk = strNonEmpty(frage.fragetext)
   const pdfOk = strNonEmpty(frage.pdfDriveFileId) || strNonEmpty(frage.pdfUrl) || strNonEmpty(frage.pdfBase64)
-  const werkzeugeRaw = Array.isArray(frage.pdfErlaubteWerkzeuge)
-    ? frage.pdfErlaubteWerkzeuge
+  const frageCompat = frage as unknown as { pdfErlaubteWerkzeuge?: unknown[] } // Defensive: Legacy 'pdfErlaubteWerkzeuge'-Alias aus älteren Frage-Versionen
+  const werkzeugeRaw = Array.isArray(frageCompat.pdfErlaubteWerkzeuge)
+    ? frageCompat.pdfErlaubteWerkzeuge
     : Array.isArray(frage.erlaubteWerkzeuge)
       ? frage.erlaubteWerkzeuge
       : []
@@ -502,11 +500,12 @@ function validierePDF(frage: any): ValidationResult {
   }
 }
 
-function validiereCode(frage: any): ValidationResult {
+function validiereCode(frage: CodeFrage): ValidationResult {
   const fragetextOk = strNonEmpty(frage.fragetext)
   const sprachenOk = strNonEmpty(frage.sprache)
-  const musterOk = strNonEmpty(frage.musterLoesung) || strNonEmpty(frage.musterloesung)
-  const testCases = Array.isArray(frage.testCases) ? frage.testCases : []
+  const frageCompat = frage as unknown as { musterloesung?: string; testCases?: unknown[] } // Defensive: Legacy-Feldnamen aus älteren Frage-Versionen
+  const musterOk = strNonEmpty(frage.musterLoesung) || strNonEmpty(frageCompat.musterloesung)
+  const testCases = Array.isArray(frageCompat.testCases) ? frageCompat.testCases : []
   const empfohlenOk = musterOk || testCases.length > 0
 
   const pflichtLeer: string[] = []
@@ -529,11 +528,12 @@ function validiereCode(frage: any): ValidationResult {
   }
 }
 
-function validiereFormel(frage: any): ValidationResult {
+function validiereFormel(frage: FormelFrage): ValidationResult {
   const fragetextOk = strNonEmpty(frage.fragetext)
   const formelOk = strNonEmpty(frage.korrekteFormel)
   const toleranzOk = typeof frage.toleranz === 'number'
-  const erklaerungOk = strNonEmpty(frage.erklaerung)
+  const frageCompat = frage as unknown as { erklaerung?: string } // Defensive: erklaerung nicht auf FormelFrage-Typ, aber in Daten vorhanden
+  const erklaerungOk = strNonEmpty(frageCompat.erklaerung)
 
   const pflichtLeer: string[] = []
   if (!fragetextOk) pflichtLeer.push('Frage-Text')
@@ -557,12 +557,13 @@ function validiereFormel(frage: any): ValidationResult {
   }
 }
 
-function validiereAufgabengruppe(frage: any, ebene = 0): ValidationResult {
+function validiereAufgabengruppe(frage: AufgabengruppeFrage, ebene = 0): ValidationResult {
   if (ebene >= 3) {
     console.warn('[pflichtfeldValidation] Aufgabengruppen-Tiefe > 3, pass-through')
     return DEFAULT_OK
   }
-  const fragetextOk = strNonEmpty(frage.fragetext) || strNonEmpty(frage.kontext)
+  const frageCompat = frage as unknown as { fragetext?: string } // Defensive: Legacy 'fragetext'-Alias, AufgabengruppeFrage verwendet 'kontext'
+  const fragetextOk = strNonEmpty(frageCompat.fragetext) || strNonEmpty(frage.kontext)
   const teilaufgaben = Array.isArray(frage.teilaufgaben) ? frage.teilaufgaben : []
   if (teilaufgaben.length === 0) {
     return {
@@ -573,27 +574,29 @@ function validiereAufgabengruppe(frage: any, ebene = 0): ValidationResult {
       empfohlenLeerFelder: [],
     }
   }
-  const sub = teilaufgaben.map((t: any) =>
-    t?.typ === 'aufgabengruppe' ? validiereAufgabengruppe(t, ebene + 1) : validierePflichtfelder(t),
+  const sub = teilaufgaben.map(t =>
+    t?.typ === 'aufgabengruppe'
+      ? validiereAufgabengruppe(t as unknown as AufgabengruppeFrage, ebene + 1) // Defensive: InlineTeilaufgabe.typ ist string, kein Discriminated-Union-Mitglied
+      : validierePflichtfelder(t as unknown as Frage), // Defensive: InlineTeilaufgabe ist kein Frage-Union-Mitglied, aber strukturell kompatibel für Validierung
   )
   return {
-    pflichtErfuellt: fragetextOk && sub.every((s: ValidationResult) => s.pflichtErfuellt),
-    empfohlenErfuellt: sub.every((s: ValidationResult) => s.empfohlenErfuellt),
+    pflichtErfuellt: fragetextOk && sub.every(s => s.pflichtErfuellt),
+    empfohlenErfuellt: sub.every(s => s.empfohlenErfuellt),
     felderStatus: { fragetext: fragetextOk ? 'ok' : 'pflicht-leer' },
     pflichtLeerFelder: [
       ...(fragetextOk ? [] : ['Frage-Text']),
-      ...sub.flatMap((s: ValidationResult) => s.pflichtLeerFelder),
+      ...sub.flatMap(s => s.pflichtLeerFelder),
     ],
-    empfohlenLeerFelder: sub.flatMap((s: ValidationResult) => s.empfohlenLeerFelder),
+    empfohlenLeerFelder: sub.flatMap(s => s.empfohlenLeerFelder),
   }
 }
 
-function validiereMC(frage: any): ValidationResult {
+function validiereMC(frage: MCFrage): ValidationResult {
   const fragetextOk = strNonEmpty(frage.fragetext)
   const optionen = Array.isArray(frage.optionen) ? frage.optionen : []
-  const mind2 = optionen.filter((o: any) => strNonEmpty(o?.text)).length >= 2
-  const eineKorrekt = optionen.some((o: any) => o?.korrekt === true)
-  const erklaerungenAlle = optionen.length > 0 && optionen.every((o: any) => strNonEmpty(o?.erklaerung))
+  const mind2 = optionen.filter(o => strNonEmpty(o?.text)).length >= 2
+  const eineKorrekt = optionen.some(o => o?.korrekt === true)
+  const erklaerungenAlle = optionen.length > 0 && optionen.every(o => strNonEmpty(o?.erklaerung))
 
   const pflichtLeer: string[] = []
   if (!fragetextOk) pflichtLeer.push('Frage-Text')
