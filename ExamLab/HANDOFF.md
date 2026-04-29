@@ -8,6 +8,32 @@
 
 ## Letzter Stand auf main
 
+### Bundle L.a — Mock-Helper + pflichtfeldValidation-Pilot ✅ MERGED
+
+**Branch:** `refactor/bundle-l-a-mock-helper-pflichtfeld` (29.04.2026). 1113/1113 vitest (+15 vs main 1098), tsc + build clean.
+
+**Geliefert:**
+- `packages/shared/src/test-helpers/frageCoreMocks.ts` (neu, generischer `mockCoreFrage<T>`-Helper für 20 Sub-Types)
+- `packages/shared/src/test-helpers/frageCoreMocks.test.ts` (11 Tests inkl. deterministische Defaults + Array-Instanz-pro-Aufruf)
+- `ExamLab/src/__tests__/helpers/frageStorageMocks.ts` (neu, Storage-Wrapper delegiert an Core)
+- `ExamLab/src/__tests__/helpers/frageStorageMocks.test.ts` (4 Tests)
+- `scripts/audit-as-any.sh` (neu, 1-Zeilen-Defensive-Scan, `--strict`-Mode für CI-Gate)
+- `pflichtfeldValidation.ts`: 24 → 0 `as any` (19 Sub-Funktion-Signaturen typisiert von `any` → konkrete Sub-Types, Switch-Casts entfernt durch TS-Discriminator-Narrowing, 14 Defensive-Casts für Legacy-Field-Aliases aus `buildFragePreview`)
+- `pflichtfeldValidation.test.ts`: 79 → 0 `as any` (Migration auf `mockCoreFrage`, 12 Defensive-Marker)
+
+**Audit-Stand:** 199 → 96 (-103). 26 Defensive-Marker dokumentiert. 70 undokumentierte verbleiben (alle in L.b/L.c-Scope).
+
+**Lehren:**
+1. **Plan-Defaults sind grobe Skizze, nicht Source-of-Truth.** Plan hatte ~14 von 20 Sub-Type-Defaults mit falschen Feldnamen oder fehlenden Pflichtfeldern (z.B. `hotspots` statt `bereiche`, `zonen` statt `zielzonen`, `maxDauerSek` statt `maxDauerSekunden`). Implementer-Subagent korrigierte alle gegen `fragen-core.ts`. **Regel für künftige Pläne:** Bei Type-erzeugenden Helpern den Plan explizit als „Skizze" markieren und darauf hinweisen, gegen die echten Type-Defs zu verifizieren.
+2. **TS2352 in `tsc -b` mit EXIT=0 möglich.** Incrementelles Build kaschiert Errors aus Cross-Project-Files (nur tsc-Output prüfen, NICHT auf Exit-Code verlassen). Subagent + Quality-Reviewer hatten den TS2352 in Helper-Cast übersehen — beim nachgelagerten direkten tsc-Check erst sichtbar. Fix: `as Extract<...>` → `as unknown as Extract<...>`.
+3. **Legacy-Field-Aliases in `pflichtfeldValidation` sind genuine Defensive-Pattern.** Validator wird mit Editor-State aus `buildFragePreview.ts` aufgerufen, der heterogene Form-State-Shapes synthetisiert (z.B. `tkAufgabentext`, `pdfErlaubteWerkzeuge`). 14 Defensive-Casts dokumentieren das. Removal erfordert separaten Refactor von `buildFragePreview` (Out-of-Scope für Bundle L; Follow-up als „Bundle M / future" notiert).
+
+**Out of Scope (für L.b/L.c oder eigenes Bundle):**
+- `buildFragePreview` Output-Canonicalization (würde Defensive-Casts in pflichtfeldValidation überflüssig machen)
+- 70 weitere `as any` in poolConverter, fragetypNormalizer, PruefungFragenEditor, etc.
+
+---
+
 ### Bundle K-Followup — Storage-Sub-Type-Hygiene ✅ MERGED
 
 **Branch:** `refactor/bundle-k-followup` (29.04.2026). 1098/1098 vitest, tsc + build clean.
@@ -56,10 +82,13 @@
 
 ## Eintrittspunkte für nächste Session
 
-Bundle K + Followup sind abgeschlossen. Zwei verbleibende Optionen:
+Bundle L.a abgeschlossen. Drei Eintrittspunkte:
 
-### Option B: `as any`-Cleanup-Bundle (mittel, ~1 Session) ← USER-WAHL ALS NÄCHSTES
-72 `as any`-Stellen in der Codebase (von 58 gewachsen, siehe `code-quality.md`). Eigenes Hygiene-Bundle. Brainstorming → Plan → Implementation. Reduziert TypeScript-Untyped-Surface, fängt potenzielle Bugs.
+### Bundle L.b — poolConverter (~1 Session) ← NÄCHSTES
+26 `as any`-Stellen in `ExamLab/src/utils/poolConverter.{ts,test.ts}`. Eigene Komplexität: Pool-Frage-Type ist nicht Storage/Core, sondern Pool-Format. Plan-Sub-Brainstorm in L.b.0 entscheidet zwischen (a) `PoolFrage`-Discriminated-Union, (b) Per-Sub-Type Type-Guards, (c) zod-Schema-Validator. Plan: [docs/superpowers/plans/2026-04-29-bundle-l-as-any-cleanup.md](../docs/superpowers/plans/2026-04-29-bundle-l-as-any-cleanup.md) Phase L.b.
+
+### Bundle L.c — Restliche Production + Tests + CI-Gate (~1 Session)
+~70 verbliebene `as any`-Stellen in fragetypNormalizer (6), PruefungFragenEditor (6), fragenbankStore (3), VorschauTab (2) + 9 Einzel-Files + 15 Test-Dateien. Plus CI-Gate-Aktivierung (`npm run lint:as-any`). Mechanischer Sweep mit etablierten Helpern. Plan-Phase L.c.
 
 ### Option C: Media-Phase-3-5 Dual-Write (groß, ~3-4 Sessions)
 `MediaQuelle`-Type ist in shared definiert, aber Apps-Script kennt ihn nicht. Echte Migration: Backend liest+schreibt beide Formate (`bildUrl`/`pdfBase64` UND `MediaQuelle`), Frontend-Migrator existiert (`mediaQuelleMigrator.ts`). Apps-Script-Deploy nötig. Phase 6 (alte Felder weg, Daten-Migration) als separates Bundle danach.
