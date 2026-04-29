@@ -3,7 +3,7 @@
  * Shared Version — Host-Apps übergeben pruefungsspezifische Komponenten als Props.
  */
 import { useState } from 'react'
-import type { Fachbereich, BloomStufe, FragenPerformance, Lernziel } from '../../types/fragen'
+import type { Fachbereich, BloomStufe, FragenPerformance, Lernziel } from '../../types/fragen-core'
 import type { Berechtigung } from '../../types/auth'
 import type { useKIAssistent } from '../useKIAssistent'
 import { useEditorConfig } from '../EditorContext'

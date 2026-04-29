@@ -1,4 +1,4 @@
-import type { Frage, AufgabengruppeFrage } from '../types/fragen.ts'
+import type { Frage, AufgabengruppeFrage } from '../types/fragen-storage'
 import type { Antwort } from '../types/antworten.ts'
 import { normalisiereDragDropBild, normalisiereDragDropAntwort } from './ueben/fragetypNormalizer'
 
@@ -130,7 +130,7 @@ export function istVollstaendigBeantwortet(
     case 'bildbeschriftung': {
       if (frage.typ !== 'bildbeschriftung') return true
       // Alle Labels muessen ausgefuellt sein
-      const bbFrage = frage as import('../types/fragen.ts').BildbeschriftungFrage
+      const bbFrage = frage as import('../types/fragen-storage').BildbeschriftungFrage
       const anzahlLabels = bbFrage.beschriftungen.length
       const ausgefuellt = Object.values(antwort.eintraege).filter(v => v.trim() !== '').length
       return ausgefuellt >= anzahlLabels
@@ -142,7 +142,7 @@ export function istVollstaendigBeantwortet(
 
     case 'dragdrop_bild': {
       if (frage.typ !== 'dragdrop_bild') return true
-      const ddFrage = frage as import('../types/fragen.ts').DragDropBildFrage
+      const ddFrage = frage as import('../types/fragen-storage').DragDropBildFrage
       const f = normalisiereDragDropBild(ddFrage)
       const norm = normalisiereDragDropAntwort(antwort, f)
       const anzahlZonen = f.zielzonen.length

@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import KontenbestimmungFrage from '../components/fragetypen/KontenbestimmungFrage.tsx'
-import type { KontenbestimmungFrage as KBType } from '../types/fragen.ts'
+import type { KontenbestimmungFrage as KBType } from '../types/fragen-storage'
 import type { Antwort } from '../types/antworten.ts'
 
 const frage = {

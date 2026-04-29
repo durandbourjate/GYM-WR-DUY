@@ -1,4 +1,4 @@
-import type { HotspotBereich, DragDropBildZielzone } from '../../types/fragen'
+import type { HotspotBereich, DragDropBildZielzone } from '../../types/fragen-storage'
 import type { Punkt } from './polygon'
 
 const KREIS_POLYGON_PUNKTE = 12

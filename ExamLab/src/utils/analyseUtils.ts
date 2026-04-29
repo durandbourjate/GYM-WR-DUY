@@ -1,4 +1,4 @@
-import type { Frage, BloomStufe } from '../types/fragen.ts'
+import type { Frage, BloomStufe } from '../types/fragen-storage'
 import type { PruefungsConfig } from '../types/pruefung.ts'
 import { berechneZeitbedarf } from './zeitbedarf.ts'
 import { typLabel } from './fachUtils.ts'

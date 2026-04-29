@@ -1,5 +1,5 @@
 import { useFrageAdapter } from '../../hooks/useFrageAdapter.ts'
-import type { BildbeschriftungFrage as BildbeschriftungFrageType, BildbeschriftungLabel } from '../../types/fragen.ts'
+import type { BildbeschriftungFrage as BildbeschriftungFrageType, BildbeschriftungLabel } from '../../types/fragen-storage'
 import type { Antwort } from '../../types/antworten.ts'
 import { renderMarkdown } from '../../utils/markdown.ts'
 import { fachbereichFarbe } from '../../utils/fachUtils.ts'

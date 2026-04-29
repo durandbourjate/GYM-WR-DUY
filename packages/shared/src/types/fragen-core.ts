@@ -1,4 +1,5 @@
 import type { MediaQuelle } from './mediaQuelle'
+import type { Berechtigung } from './auth'
 
 // === ANHANG ===
 export interface FrageAnhang {
@@ -67,10 +68,9 @@ export interface FrageBase {
 
   // Sharing / Zusammenarbeit (Google-Docs-Modell)
   autor?: string;  // E-Mail der erstellenden LP (= Inhaber)
-  berechtigungen?: unknown[];  // Rechte-Array (Pruefung-intern: Berechtigung[])
+  berechtigungen?: Berechtigung[];  // Rechte-Array
   geteilt?: 'privat' | 'fachschaft' | 'schule';  // Legacy/abgeleitet
   geteiltVon?: string;  // Anzeigename bei geteilten Fragen
-  _recht?: unknown;  // Vom Backend berechnet (nicht gespeichert)
 
   // Pool-Sync (importierte Fragen aus Übungspools)
   poolId?: string                     // Compound-Key '{pool}:{frage}', z.B. 'vwl_bip:d01'
@@ -78,7 +78,6 @@ export interface FrageBase {
   pruefungstauglich?: boolean         // Separat abgesegnet in ExamLab
   poolContentHash?: string            // SHA-256 für Änderungserkennung
   poolUpdateVerfuegbar?: boolean      // true wenn Pool-Version neuer
-  poolVersion?: unknown               // PoolFrageSnapshot (Pruefung-intern)
   lernzielIds?: string[]              // Referenzen auf Lernziel-Einträge
 }
 
@@ -138,10 +137,26 @@ export interface FreitextFrage extends FrageBase {
   hilfstextPlaceholder?: string;
 }
 
+export interface ZuordnungPaar {
+  links: string;
+  rechts: string;
+  /** Teilerklärung (C9): optional, backward-compatible. */
+  erklaerung?: string;
+}
+
+export interface Luecke {
+  id: string;
+  korrekteAntworten: string[];
+  caseSensitive: boolean;
+  dropdownOptionen?: string[];  // wenn gesetzt und nicht leer → Dropdown statt Texteingabe
+  /** Teilerklärung (C9): warum dieser Begriff erwartet wird. */
+  erklaerung?: string;
+}
+
 export interface ZuordnungFrage extends FrageBase {
   typ: 'zuordnung';
   fragetext: string;
-  paare: { links: string; rechts: string }[];
+  paare: ZuordnungPaar[];
   zufallsreihenfolge: boolean;
 }
 
@@ -149,14 +164,7 @@ export interface LueckentextFrage extends FrageBase {
   typ: 'lueckentext';
   fragetext: string;
   textMitLuecken: string;
-  luecken: {
-    id: string;
-    korrekteAntworten: string[];
-    caseSensitive: boolean;
-    dropdownOptionen?: string[]  // wenn gesetzt und nicht leer → Dropdown statt Texteingabe
-    /** Teilerklärung (C9): warum dieser Begriff erwartet wird. */
-    erklaerung?: string;
-  }[];
+  luecken: Luecke[];
   lueckentextModus?: 'freitext' | 'dropdown';  // NEU — default 'freitext' via Normalizer
 }
 

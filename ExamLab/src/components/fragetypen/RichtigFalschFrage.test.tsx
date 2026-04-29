@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import RichtigFalschFrage from './RichtigFalschFrage.tsx'
-import type { RichtigFalschFrage as RFFrageType } from '../../types/fragen.ts'
+import type { RichtigFalschFrage as RFFrageType } from '../../types/fragen-storage'
 
 vi.mock('../../hooks/useFrageAdapter.ts', () => ({
   useFrageAdapter: () => ({

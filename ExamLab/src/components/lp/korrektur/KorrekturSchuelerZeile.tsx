@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { SchuelerKorrektur, SchuelerAbgabe } from '../../../types/korrektur.ts'
-import type { Frage, PDFAnnotation, PDFFrage } from '../../../types/fragen.ts'
+import type { Frage, PDFAnnotation, PDFFrage } from '../../../types/fragen-storage'
 import type { KorrekturErgebnis } from '../../../utils/autoKorrektur.ts'
 import { effektivePunkte, berechneNote, statusLabel, korrekturStatusFarbe } from '../../../utils/korrekturUtils.ts'
 import type { NotenConfig } from '../../../types/pruefung.ts'

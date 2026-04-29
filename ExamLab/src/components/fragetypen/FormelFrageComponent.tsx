@@ -5,7 +5,7 @@
  */
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useFrageAdapter } from '../../hooks/useFrageAdapter.ts'
-import type { FormelFrage } from '../../types/fragen.ts'
+import type { FormelFrage } from '../../types/fragen-storage'
 import { fachbereichFarbe } from '../../utils/fachUtils.ts'
 import { ladeKatexAsync, istKatexGeladen } from '../../utils/latexRenderer.ts'
 import FrageText from '../shared/FrageText.tsx'

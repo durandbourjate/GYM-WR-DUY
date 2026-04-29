@@ -1,4 +1,4 @@
-import type { LueckentextFrage } from '../../../types/fragen.ts'
+import type { LueckentextFrage } from '../../../types/fragen-storage'
 
 export type FrageTyp = 'mc' | 'freitext' | 'lueckentext' | 'zuordnung' | 'richtigfalsch' | 'berechnung' | 'buchungssatz' | 'tkonto' | 'kontenbestimmung' | 'bilanzstruktur' | 'aufgabengruppe' | 'visualisierung' | 'pdf' | 'sortierung' | 'hotspot' | 'bildbeschriftung' | 'audio' | 'dragdrop_bild' | 'code' | 'formel'
 

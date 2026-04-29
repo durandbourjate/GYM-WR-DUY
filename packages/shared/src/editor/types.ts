@@ -3,7 +3,7 @@
  * Host-Apps (ExamLab) implementieren diese Interfaces
  * und übergeben sie via EditorContext.
  */
-import type { FrageAnhang, Lernziel } from '../types/fragen'
+import type { FrageAnhang, Lernziel } from '../types/fragen-core'
 
 /** Feature-Flags: was der Editor anzeigen soll */
 export interface EditorFeatures {

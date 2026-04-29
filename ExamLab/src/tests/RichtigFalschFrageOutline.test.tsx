@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import RichtigFalschFrage from '../components/fragetypen/RichtigFalschFrage.tsx'
-import type { RichtigFalschFrage as RFType } from '../types/fragen.ts'
+import type { RichtigFalschFrage as RFType } from '../types/fragen-storage'
 import type { Antwort } from '../types/antworten.ts'
 import type { FrageAdapterResult } from '../hooks/useFrageAdapter.ts'
 

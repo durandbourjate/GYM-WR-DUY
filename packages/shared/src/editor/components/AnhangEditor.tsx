@@ -1,5 +1,5 @@
 import { useRef, useState, useCallback } from 'react'
-import type { FrageAnhang } from '../../types/fragen'
+import type { FrageAnhang } from '../../types/fragen-core'
 import { Abschnitt } from './EditorBausteine'
 import { maxGroesseFuerMimeType, formatGroesse, AKZEPTIERTE_MIME_TYPES, parseVideoUrl, istBild, istAudio, istVideo, istEmbed } from '../utils/mediaUtils'
 

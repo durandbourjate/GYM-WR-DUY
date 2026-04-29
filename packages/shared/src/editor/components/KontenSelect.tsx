@@ -6,7 +6,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { sucheKonten, kontoLabel, findKonto, type KontoEintrag } from '../kontenrahmen'
-import type { KontenauswahlConfig } from '../../types/fragen'
+import type { KontenauswahlConfig } from '../../types/fragen-core'
 
 interface KontenSelectProps {
   value: string

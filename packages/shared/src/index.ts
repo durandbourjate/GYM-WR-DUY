@@ -1,4 +1,4 @@
-export * from './types/fragen'
+export * from './types/fragen-core'
 export * from './types/auth'
 
 // Editor Infrastructure

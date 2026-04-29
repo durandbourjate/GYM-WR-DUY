@@ -6,28 +6,43 @@
 
 ---
 
+## Letzter Stand auf main
+
+### Bundle K — Type-Konsolidierung Frage Core + Storage ✅ MERGED
+
+**Merge:** Bundle K auf `main` (Merge-Commit folgt). 16 Commits Feature-Arbeit auf `refactor/type-konsolidierung-frage-core-storage`.
+
+**Geliefert:**
+- `packages/shared/src/types/fragen-core.ts` (kanonische Editor-Types in shared, 699 Z.)
+- `ExamLab/src/types/fragen-storage.ts` (Storage-Erweiterung mit `WithStorageBase<T>`-Helper, 108 Z.)
+- `ExamLab/src/types/auth.ts` re-exportet `Berechtigung`/`RechteStufe` aus `@shared/types/auth`
+- Alte `packages/shared/src/types/fragen.ts` + `ExamLab/src/types/fragen.ts` gelöscht
+- index.ts re-exportet nur fragen-core (single-export wegen TS2308-Ambiguität bei Dual-Export)
+
+**Cut-Entscheidung umgesetzt:** `berechtigungen`/`geteilt`/`autor` in core (Editor-Felder), nur `_recht`/`poolVersion` storage-only. `tags: string[]` in core, `tags: (string|Tag)[]` in storage. Strukturelles Subtyping erlaubt Storage-Frage als Editor-Input ohne Mapping; an einer Stelle (`PruefungFragenEditor.poolSyncSlot`) Cast am Callback-Boundary nötig.
+
+**E2E-Verifikation auf staging mit echten Logins:**
+- LP-Fragensammlung lädt 2363 Fragen, Tags rendern, Filter funktionieren
+- MC-Editor öffnet sauber: Pflichtfeld-Outlines violett, Pool-Info-Slot, Sharing-Badge
+- prev/next-Navigation synchronisiert (S129-Regel intakt)
+- SuS-Üben-Modus: MC-Frage Auto-Korrektur funktioniert, Musterlösung mit C9-Phase-2-Layout
+- Privacy: SuS-UI rendert keine Storage-Felder (Pool-Info, Sharing fehlen wie erwartet)
+
+**Lehren aus der Implementation (für künftige Type-Migrationen):**
+1. **Audit-Pattern muss Extension- und inline-import-Varianten erfassen** — Phase-0-Audit `from '...types/fragen'` (single-quote-Ende) hat ~95 Files mit `.ts`-Extension verpasst (`from '../types/fragen.ts'`) und alle inline `import('...types/fragen').X`-Type-Expressions. Phase 5 musste die nachziehen. Künftig: Pattern-Set mit `'`, `.ts'`, `.tsx'`, `.js'` UND `import\\(['"`]` einbeziehen.
+2. **Doppel-`export *` aus zwei strukturell-identischen Files erzeugt 78× TS2308** — TS resolviert duplicate symbols nicht silent zu „identisch", sondern droppt sie. Plan-Achtung-Fallback (single-export) war richtig.
+3. **`fragen-storage` re-exportet via `export type *` Core-Sub-Type-Namen mit Core-Tags** — `MCFrage` etc. aus fragen-storage sind die Core-Variante (string-tags), nicht Storage. Storage-Caller die narrow Sub-Types brauchen, müssen `Extract<Frage, {typ:'mc'}>`-Aliase oder explizite `WithStorageBase<Core.MCFrage>`-Exports nutzen. Dokumentiert in 3 Files (autoKorrektur.ts, fibuAutoKorrektur.ts, KorrekturFrageVollansicht.tsx).
+4. **Storage-Felder sind nicht in shared erlaubt** — `poolVersion?: unknown` darf NICHT in fragen-core wieder eingebaut werden, auch wenn ein TS-Fehler an einem Callback-Boundary „nur ein Feld" verlangt. Lösung ist Cast am Callback-Boundary (Spec Risiko-Mitigation #3), nicht Storage-Feld-Leak in Core.
+
+**Tech-Debt aus Code-Review (post-Merge-Bundles):**
+- DruckAnsicht.tsx 11 Casts könnten via `alsCoreFrage<T>`-Helper konsolidiert werden
+- `Extract<Frage, {typ:'X'}>`-Aliases als zentrale Storage-Sub-Type-Exports in fragen-storage exportieren
+- `leereEingabenDetektor.ts` könnte direkt auf `@shared/types/fragen-core` (SuS-Pfad)
+- Inline `import('./auth').Berechtigung[]` in FrageSummary auf top-of-file-Import-Style
+
+---
+
 ## Aktiv offen
-
-### Bundle K — Type-Konsolidierung Frage Core + Storage (Spec + Plan ready, Implementation offen)
-
-**Status:** Spec + Plan auf `main` (Commits `7c9e2b2` Spec rev3, `4888793` Plan rev2). Beide Reviewer-Approved. Implementation für nächste Session reserviert.
-
-**Spec:** [docs/superpowers/specs/2026-04-29-type-konsolidierung-frage-core-storage-design.md](../docs/superpowers/specs/2026-04-29-type-konsolidierung-frage-core-storage-design.md)
-**Plan:** [docs/superpowers/plans/2026-04-29-type-konsolidierung-frage-core-storage.md](../docs/superpowers/plans/2026-04-29-type-konsolidierung-frage-core-storage.md)
-
-**Was Bundle K liefert:**
-- `packages/shared/src/types/fragen-core.ts` (UI/Editor-Layer ohne Backend-Konzepte)
-- `ExamLab/src/types/fragen-storage.ts` (Backend-Layer mit `_recht`/`poolVersion`/Tag-Override via `WithStorageBase<T>`-Helper)
-- Sub-Cleanup: `ExamLab/src/types/auth.ts` re-exportet `Berechtigung`/`RechteStufe` aus `@shared/types/auth`
-- 7 Phasen, ~16 Tasks, ~3 Sessions, kein Apps-Script-Deploy
-- Adressiert FrageBase-Divergenz (war S159 Spawn-Task M2)
-
-**Cut-Decision:** `berechtigungen`/`geteilt`/`autor` bleiben in core (Editor liest+schreibt), nur `_recht`/`poolVersion` sind storage-only.
-
-**Eintrittspunkt nächste Session:**
-1. Plan öffnen: `docs/superpowers/plans/2026-04-29-type-konsolidierung-frage-core-storage.md`
-2. `superpowers:subagent-driven-development` invoken
-3. Beginnt mit Phase 0 Task 1: Branch `refactor/type-konsolidierung-frage-core-storage` + 6 Audit-Skripte
 
 ### Kleine Follow-Ups (nicht blockierend)
 

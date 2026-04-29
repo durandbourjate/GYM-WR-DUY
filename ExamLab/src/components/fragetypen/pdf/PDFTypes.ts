@@ -3,7 +3,7 @@ export type {
   PDFFrage, PDFAnnotation, PDFHighlightAnnotation, PDFKommentarAnnotation,
   PDFFreihandAnnotation, PDFLabelAnnotation, PDFTextAnnotation, PDFKategorie,
   PDFAnnotationsWerkzeug, PDFToolbarWerkzeug, PDFTextRange,
-} from '../../../types/fragen.ts'
+} from '../../../types/fragen-storage'
 
 // Component-local types
 export interface PDFRenderState {

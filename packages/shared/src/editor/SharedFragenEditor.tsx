@@ -30,7 +30,7 @@ import type {
   SortierungFrage, HotspotFrage, HotspotBereich, BildbeschriftungFrage, BildbeschriftungLabel,
   AudioFrage, DragDropBildFrage, DragDropBildLabel, DragDropBildZielzone,
   CodeFrage, FormelFrage, Lernziel,
-} from '../types/fragen'
+} from '../types/fragen-core'
 import type { Berechtigung } from '../types/auth'
 import type { FrageTyp } from './editorUtils'
 import { generiereFrageId } from './editorUtils'
@@ -43,7 +43,7 @@ import { useKIAssistent } from './useKIAssistent'
 import { InlineAktionButton, ErgebnisAnzeige } from './ki/KIBausteine'
 import { baueTeilerklaerungsKontext, type TeilerklaerungsKontext } from './musterloesungKontext'
 import { berechneZeitbedarf } from './zeitbedarf'
-import type { FragenPerformance } from '../types/fragen'
+import type { FragenPerformance } from '../types/fragen-core'
 
 // Sections (shared)
 import MetadataSection from './sections/MetadataSection'
@@ -514,7 +514,7 @@ export default function SharedFragenEditor({
 
   // Sharing (Google-Docs-Modell)
   const [geteilt, setGeteilt] = useState<'privat' | 'fachschaft' | 'schule'>(frage?.geteilt ?? 'privat')
-  const [berechtigungen, setBerechtigungen] = useState<Berechtigung[]>((frage?.berechtigungen as Berechtigung[] | undefined) ?? [])
+  const [berechtigungen, setBerechtigungen] = useState<Berechtigung[]>(frage?.berechtigungen ?? [])
 
   // Anhänge
   const [anhaenge, setAnhaenge] = useState<FrageAnhang[]>(frage?.anhaenge ?? [])

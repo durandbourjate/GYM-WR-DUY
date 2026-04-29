@@ -5,7 +5,7 @@
  */
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { useFrageAdapter } from '../../hooks/useFrageAdapter.ts'
-import type { CodeFrage } from '../../types/fragen.ts'
+import type { CodeFrage } from '../../types/fragen-storage'
 import { fachbereichFarbe } from '../../utils/fachUtils.ts'
 import FrageText from '../shared/FrageText.tsx'
 

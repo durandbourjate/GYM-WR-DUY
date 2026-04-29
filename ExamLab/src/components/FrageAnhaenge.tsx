@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { FrageAnhang } from '../types/fragen.ts'
+import type { FrageAnhang } from '../types/fragen-storage'
 import MediaAnhang from './MediaAnhang.tsx'
 import Tooltip from './ui/Tooltip.tsx'
 

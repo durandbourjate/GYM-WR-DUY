@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { FragenBewertung, KriteriumBewertung, KIFeedbackEintrag } from '../../../types/korrektur.ts'
-import type { Frage, FreitextFrage } from '../../../types/fragen.ts'
+import type { Frage, FreitextFrage } from '../../../types/fragen-storage'
 import type { Antwort } from '../../../types/antworten.ts'
 import type { KorrekturErgebnis } from '../../../utils/autoKorrektur.ts'
 import { effektivePunkte, quelleLabel } from '../../../utils/korrekturUtils.ts'

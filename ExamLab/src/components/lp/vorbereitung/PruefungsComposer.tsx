@@ -9,7 +9,7 @@ import { apiService } from '../../../services/apiService.ts'
 import { preWarmFragen } from '../../../services/preWarmApi'
 import { demoFragen } from '../../../data/demoFragen.ts'
 import { erstelleDemoTrackerDaten, aggregiereFragenPerformance } from '../../../utils/trackerUtils.ts'
-import type { Frage } from '../../../types/fragen.ts'
+import type { Frage } from '../../../types/fragen-storage'
 import type { PruefungsConfig, PruefungsAbschnitt } from '../../../types/pruefung.ts'
 import type { FragenPerformance } from '../../../types/tracker.ts'
 

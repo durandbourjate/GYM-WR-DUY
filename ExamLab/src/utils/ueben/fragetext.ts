@@ -6,7 +6,7 @@
  * - geschaeftsfall (Buchungssatz)
  * - kontext (Aufgabengruppe)
  */
-import type { Frage } from '@shared/types/fragen'
+import type { Frage } from '@shared/types/fragen-core'
 
 export function getFragetext(frage: Frage): string {
   switch (frage.typ) {

@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
-import type { BildbeschriftungLabel } from '../../types/fragen'
+import type { BildbeschriftungLabel } from '../../types/fragen-core'
 import BildMitGenerator from '../components/BildMitGenerator'
 import { resolvePoolBildUrl } from '../utils/poolBildUrl'
 import type { FeldStatus } from '../pflichtfeldValidation'

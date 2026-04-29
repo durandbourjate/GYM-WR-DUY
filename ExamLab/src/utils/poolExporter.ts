@@ -8,7 +8,7 @@ import type {
   ZuordnungFrage,
   RichtigFalschFrage,
   BerechnungFrage,
-} from '../types/fragen'
+} from '../types/fragen-storage'
 
 export interface PoolFrageExport {
   id: string

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import BildbeschriftungFrage from '../components/fragetypen/BildbeschriftungFrage.tsx'
-import type { BildbeschriftungFrage as BBType } from '../types/fragen.ts'
+import type { BildbeschriftungFrage as BBType } from '../types/fragen-storage'
 import type { Antwort } from '../types/antworten.ts'
 import type { FrageAdapterResult } from '../hooks/useFrageAdapter.ts'
 

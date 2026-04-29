@@ -1,5 +1,5 @@
 import { useFrageAdapter } from '../../hooks/useFrageAdapter.ts'
-import type { BerechnungFrage as BerechnungFrageType } from '../../types/fragen.ts'
+import type { BerechnungFrage as BerechnungFrageType } from '../../types/fragen-storage'
 import type { Antwort } from '../../types/antworten.ts'
 import { renderMarkdown } from '../../utils/markdown.ts'
 import { fachbereichFarbe } from '../../utils/fachUtils.ts'

@@ -51,10 +51,10 @@ export type {
   DragDropBildLabel,
   CanvasConfig,
   DiagrammConfig,
-} from '@shared/types/fragen'
+} from '@shared/types/fragen-core'
 
 /** Typ-Alias: alle möglichen Fragetyp-Strings */
-import type { Frage } from '@shared/types/fragen'
+import type { Frage } from '@shared/types/fragen-core'
 export type FrageTyp = Frage['typ']
 
 // Filter für Fragen-Abfragen

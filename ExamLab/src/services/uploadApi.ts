@@ -1,4 +1,4 @@
-import type { FrageAnhang } from '../types/fragen.ts'
+import type { FrageAnhang } from '../types/fragen-storage'
 import type { KIAssistentRueckgabe } from '@shared/editor/types'
 import { APPS_SCRIPT_URL, fileToBase64 } from './apiClient'
 

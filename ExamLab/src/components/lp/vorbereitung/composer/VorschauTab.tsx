@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { PruefungsConfig } from '../../../../types/pruefung.ts'
-import type { Frage, FrageAnhang, MCFrage, FreitextFrage, LueckentextFrage, ZuordnungFrage, RichtigFalschFrage, BerechnungFrage, BuchungssatzFrage, TKontoFrage, KontenbestimmungFrage, BilanzERFrage, AufgabengruppeFrage } from '../../../../types/fragen.ts'
+import type { Frage, FrageAnhang, MCFrage, FreitextFrage, LueckentextFrage, ZuordnungFrage, RichtigFalschFrage, BerechnungFrage, BuchungssatzFrage, TKontoFrage, KontenbestimmungFrage, BilanzERFrage, AufgabengruppeFrage } from '../../../../types/fragen-storage'
 import { kontoLabel } from '../../../../utils/kontenrahmen.ts'
 import { formatDatum } from '../../../../utils/zeit.ts'
 import { typLabel, fachbereichFarbe } from '../../../../utils/fachUtils.ts'

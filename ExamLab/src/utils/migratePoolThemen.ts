@@ -10,7 +10,7 @@
 import { poolTitel } from './poolTitelMapping'
 import { useFragenbankStore } from '../store/fragenbankStore'
 import { speichereFrage } from '../services/fragenbankApi'
-import type { Frage } from '../types/fragen'
+import type { Frage } from '../types/fragen-storage'
 
 export interface MigrationErgebnis {
   total: number

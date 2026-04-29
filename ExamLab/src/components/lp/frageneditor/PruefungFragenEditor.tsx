@@ -17,8 +17,8 @@ import type { SpeichernMeta } from '@shared/editor/SharedFragenEditor'
 import { istWRFachschaft } from '../../../utils/fachUtils.ts'
 import { useSchulConfig } from '../../../store/schulConfigStore.ts'
 import { generateZeitpunkte, zeitpunktModellAusConfig } from '../../../utils/zeitpunktUtils.ts'
-import type { Frage } from '../../../types/fragen.ts'
-import type { Frage as SharedFrage } from '@shared/types/fragen'
+import type { Frage } from '../../../types/fragen-storage'
+import type { Frage as SharedFrage } from '@shared/types/fragen-core'
 import type { FragenPerformance } from '../../../types/tracker.ts'
 
 // Pruefung-spezifische Komponenten
@@ -186,7 +186,10 @@ export default function PruefungFragenEditor({ frage, onSpeichern, onAbbrechen, 
             </div>
           )
         }}
-        poolSyncSlot={({ frage: f, typ, onRueckSync }) => (
+        poolSyncSlot={({ frage: fc, typ, onRueckSync }) => {
+          // Editor-Slot gibt Core.Frage — Cast auf Storage.Frage für `poolVersion`-Zugriff (Storage-Feld).
+          const f = fc as Frage | null
+          return (
           <>
             {f && f.poolId && f.poolVersion && (
               <button
@@ -205,7 +208,8 @@ export default function PruefungFragenEditor({ frage, onSpeichern, onAbbrechen, 
               </button>
             )}
           </>
-        )}
+          )
+        }}
         rueckSyncSlot={({ offen, onSchliessen, onErfolg }) => (
           frage ? (
             <RueckSyncDialog

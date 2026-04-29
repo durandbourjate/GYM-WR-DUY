@@ -2,7 +2,7 @@
  * Excel-Import Utility — parst XLSX-Dateien und konvertiert Zeilen in Frage-Objekte.
  * Lazy-loaded `xlsx` Library (gleich wie backupExport.ts).
  */
-import type { Frage, Fachbereich, BloomStufe } from '../types/fragen'
+import type { Frage, Fachbereich, BloomStufe } from '../types/fragen-storage'
 import { generiereFrageId } from '../components/lp/frageneditor/editorUtils'
 
 // --- Spalten-Definition ---

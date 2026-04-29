@@ -3,7 +3,7 @@
  * Ersetzt die einfache Checkbox-Liste in MetadataSection.
  */
 import { useState, useMemo } from 'react'
-import type { Lernziel, BloomStufe } from '../../types/fragen'
+import type { Lernziel, BloomStufe } from '../../types/fragen-core'
 
 interface LernzielWaehlerProps {
   lernziele: Lernziel[]

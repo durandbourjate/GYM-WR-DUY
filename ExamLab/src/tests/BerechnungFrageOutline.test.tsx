@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import BerechnungFrage from '../components/fragetypen/BerechnungFrage.tsx'
-import type { BerechnungFrage as BType } from '../types/fragen.ts'
+import type { BerechnungFrage as BType } from '../types/fragen-storage'
 import type { Antwort } from '../types/antworten.ts'
 import type { FrageAdapterResult } from '../hooks/useFrageAdapter.ts'
 

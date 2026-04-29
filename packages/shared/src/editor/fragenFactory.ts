@@ -17,7 +17,7 @@ import type {
   BildbeschriftungFrage, BildbeschriftungLabel,
   AudioFrage, DragDropBildFrage, DragDropBildLabel, DragDropBildZielzone,
   CodeFrage, FormelFrage,
-} from '../types/fragen'
+} from '../types/fragen-core'
 import { parseLuecken } from './editorUtils'
 import {
   generiereMuserloesungBuchungssatz,

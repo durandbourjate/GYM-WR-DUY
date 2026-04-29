@@ -1,5 +1,5 @@
 import type { ComponentType } from 'react'
-import type { Frage } from '../../types/fragen.ts'
+import type { Frage } from '../../types/fragen-storage'
 import type { Antwort } from '../../types/antworten.ts'
 
 // Alle Fragetyp-Komponenten (Prüfen + Üben via useFrageAdapter)

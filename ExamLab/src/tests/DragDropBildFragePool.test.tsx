@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import DragDropBildFrage from '../components/fragetypen/DragDropBildFrage.tsx'
 import { FrageModeProvider } from '../context/FrageModeContext.tsx'
-import type { DragDropBildFrage as DDType } from '../types/fragen.ts'
+import type { DragDropBildFrage as DDType } from '../types/fragen-storage'
 
 const baseFrage = {
   id: 'dd-pool',

@@ -15,7 +15,7 @@ import type {
   DragDropBildZielzone,
   DragDropBildLabel,
   InlineTeilaufgabe,
-} from '../../types/fragen'
+} from '../../types/fragen-core'
 import type { FrageTyp } from '../editorUtils'
 import type { useKIAssistent } from '../useKIAssistent'
 import type { ValidationResult, FeldStatus } from '../pflichtfeldValidation'

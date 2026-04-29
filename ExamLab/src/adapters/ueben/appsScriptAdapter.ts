@@ -229,7 +229,7 @@ export const uebenFragenAdapter = new AppsScriptFragenAdapter()
 
 // --- Fortschritt-Adapter: Gruppen-Fortschritt + Lernziele ---
 
-import type { Lernziel } from '@shared/types/fragen'
+import type { Lernziel } from '@shared/types/fragen-core'
 import type { FragenFortschritt, SessionEintrag } from '../../types/ueben/fortschritt'
 import type { FortschrittService } from '../../services/ueben/interfaces'
 

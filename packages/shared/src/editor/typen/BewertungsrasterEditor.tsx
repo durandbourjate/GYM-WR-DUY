@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { Bewertungskriterium, Fachbereich, Niveaustufe } from '../../types/fragen'
+import type { Bewertungskriterium, Fachbereich, Niveaustufe } from '../../types/fragen-core'
 import { Abschnitt } from '../components/EditorBausteine'
 import {
   STANDARD_VORLAGEN,

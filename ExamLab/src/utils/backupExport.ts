@@ -1,5 +1,5 @@
 import type { PruefungsConfig } from '../types/pruefung'
-import type { Frage } from '../types/fragen'
+import type { Frage } from '../types/fragen-storage'
 import type { SchuelerAbgabe, PruefungsKorrektur, FragenBewertung } from '../types/korrektur'
 import { antwortAlsText } from './exportUtils'
 

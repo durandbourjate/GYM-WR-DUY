@@ -3,7 +3,7 @@ import { usePruefungStore } from '../../../store/pruefungStore.ts'
 import { useFragenbankStore } from '../../../store/fragenbankStore.ts'
 import { demoFragen } from '../../../data/demoFragen.ts'
 import type { PruefungsConfig } from '../../../types/pruefung.ts'
-import type { Frage } from '../../../types/fragen.ts'
+import type { Frage } from '../../../types/fragen-storage'
 import Layout from '../../Layout.tsx'
 
 interface Props {

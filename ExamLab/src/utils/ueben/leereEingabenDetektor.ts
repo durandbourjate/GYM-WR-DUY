@@ -1,4 +1,4 @@
-import type { Frage } from '../../types/fragen.ts'
+import type { Frage } from '../../types/fragen-storage'
 import type { Antwort } from '../../types/antworten.ts'
 
 /**

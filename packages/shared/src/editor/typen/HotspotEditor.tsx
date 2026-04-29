@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
-import type { HotspotBereich } from '../../types/fragen'
+import type { HotspotBereich } from '../../types/fragen-core'
 import BildMitGenerator from '../components/BildMitGenerator'
 import { resolvePoolBildUrl } from '../utils/poolBildUrl'
 import ZonenOverlay from '../components/ZonenOverlay'

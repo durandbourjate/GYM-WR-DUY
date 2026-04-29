@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { useFrageAdapter } from '../../hooks/useFrageAdapter.ts'
 import { usePruefungStore } from '../../store/pruefungStore.ts'
-import type { LueckentextFrage as LueckentextFrageType, Luecke } from '../../types/fragen.ts'
+import type { LueckentextFrage as LueckentextFrageType, Luecke } from '../../types/fragen-storage'
 import type { Antwort } from '../../types/antworten.ts'
 import { renderMarkdown } from '../../utils/markdown.ts'
 import { fachbereichFarbe } from '../../utils/fachUtils.ts'

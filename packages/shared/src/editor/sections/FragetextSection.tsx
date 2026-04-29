@@ -2,7 +2,7 @@
  * Fragetext-Abschnitt: FormattierungsToolbar, Textarea, KI-Buttons (generieren, verbessern, Lernziel).
  * Extrahiert aus FragenEditor.tsx → shared.
  */
-import type { Fachbereich, BloomStufe, Lernziel } from '../../types/fragen'
+import type { Fachbereich, BloomStufe, Lernziel } from '../../types/fragen-core'
 import type { FrageTyp } from '../editorUtils'
 import type { useKIAssistent } from '../useKIAssistent'
 import { useEditorServices, useEditorConfig } from '../EditorContext'

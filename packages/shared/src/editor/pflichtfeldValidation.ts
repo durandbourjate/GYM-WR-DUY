@@ -1,4 +1,4 @@
-import type { Frage } from '../types/fragen'
+import type { Frage } from '../types/fragen-core'
 
 export type FeldStatus = 'pflicht-leer' | 'empfohlen-leer' | 'ok'
 

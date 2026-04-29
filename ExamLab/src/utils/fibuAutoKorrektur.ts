@@ -1,4 +1,11 @@
-import type { BuchungssatzFrage, BuchungssatzZeile, TKontoFrage, TKontoEintrag, KontenbestimmungFrage, BilanzERFrage } from '../types/fragen'
+import type { Frage, BuchungssatzZeile, TKontoEintrag } from '../types/fragen-storage'
+
+// Storage-Varianten der FiBu-Fragetypen via Extract<Frage, ...> — siehe Kommentar
+// in autoKorrektur.ts. Direkter Import der Named-Types liefert Core-Varianten.
+type BuchungssatzFrage = Extract<Frage, { typ: 'buchungssatz' }>
+type TKontoFrage = Extract<Frage, { typ: 'tkonto' }>
+type KontenbestimmungFrage = Extract<Frage, { typ: 'kontenbestimmung' }>
+type BilanzERFrage = Extract<Frage, { typ: 'bilanzstruktur' }>
 import type { Antwort } from '../types/antworten'
 import { findKonto } from './kontenrahmen'
 

@@ -1,5 +1,5 @@
 import { useFrageAdapter } from '../../hooks/useFrageAdapter.ts'
-import type { AudioFrage as AudioFrageType } from '../../types/fragen.ts'
+import type { AudioFrage as AudioFrageType } from '../../types/fragen-storage'
 import { renderMarkdown } from '../../utils/markdown.ts'
 import { fachbereichFarbe } from '../../utils/fachUtils.ts'
 

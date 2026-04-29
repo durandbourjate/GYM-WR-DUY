@@ -4,7 +4,7 @@
  * Koordinatensystem und optionale Musterlösung.
  */
 import { useRef, useState } from 'react'
-import type { CanvasConfig } from '../../types/fragen'
+import type { CanvasConfig } from '../../types/fragen-core'
 import { useEditorConfig, useEditorServices } from '../EditorContext'
 import { Abschnitt, Feld } from '../components/EditorBausteine'
 

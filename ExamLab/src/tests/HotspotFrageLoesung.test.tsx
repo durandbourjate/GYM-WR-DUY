@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import HotspotFrage from '../components/fragetypen/HotspotFrage.tsx'
-import type { HotspotFrage as HSType } from '../types/fragen.ts'
+import type { HotspotFrage as HSType } from '../types/fragen-storage'
 import type { Antwort } from '../types/antworten.ts'
 
 // Polygon 1: Quadrat 10-30 / 10-30

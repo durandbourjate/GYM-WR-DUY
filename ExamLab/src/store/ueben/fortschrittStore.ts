@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import type { FragenFortschritt, MasteryStufe, ThemenFortschritt, SessionEintrag } from '../../types/ueben/fortschritt'
 import type { Frage } from '../../types/ueben/fragen'
-import type { Lernziel } from '@shared/types/fragen'
+import type { Lernziel } from '@shared/types/fragen-core'
 import { aktualisiereFortschritt } from '../../utils/ueben/mastery'
 import { db } from '../../utils/ueben/indexedDB'
 import { uebenFortschrittAdapter } from '../../adapters/ueben/appsScriptAdapter'
