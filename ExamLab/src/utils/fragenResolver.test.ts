@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { resolveFragenFuerPruefung } from './fragenResolver'
 import type { PruefungsConfig } from '../types/pruefung'
-import type { Frage } from '../types/fragen'
+import type { Frage } from '../types/fragen-storage'
 
 // Minimal-Config-Factory
 function makeConfig(abschnitte: { fragenIds: string[] }[]): PruefungsConfig {

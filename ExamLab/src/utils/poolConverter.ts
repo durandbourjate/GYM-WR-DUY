@@ -26,7 +26,7 @@ import type {
   BuchungssatzFrage,
   TKontoFrage,
   KontenbestimmungFrage,
-} from '../types/fragen'
+} from '../types/fragen-storage'
 
 const POOL_IMG_BASE_URL = 'https://durandbourjate.github.io/GYM-WR-DUY/Uebungen/Uebungspools/'
 

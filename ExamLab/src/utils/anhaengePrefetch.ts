@@ -1,4 +1,4 @@
-import type { FrageAnhang } from '../types/fragen'
+import type { FrageAnhang } from '../types/fragen-storage'
 import { drivePreviewUrl, istPDF } from './mediaUtils'
 
 /**

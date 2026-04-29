@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { istAutoKorrigierbar, autoKorrigiere } from './autoKorrektur'
-import type { Frage, MCFrage, RichtigFalschFrage, SortierungFrage, HotspotFrage, BildbeschriftungFrage, DragDropBildFrage, FormelFrage } from '../types/fragen'
+import type { Frage, MCFrage, RichtigFalschFrage, SortierungFrage, HotspotFrage, BildbeschriftungFrage, DragDropBildFrage, FormelFrage } from '../types/fragen-storage'
 import type { Antwort } from '../types/antworten'
 
 describe('istAutoKorrigierbar', () => {

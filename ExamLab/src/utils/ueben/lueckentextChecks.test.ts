@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { anzahlOffeneLuecken, alleLueckenGefuellt } from './lueckentextChecks'
-import type { Frage } from '../../types/fragen'
+import type { Frage } from '../../types/fragen-storage'
 import type { Antwort } from '../../types/antworten'
 
 const baseMeta = {
