@@ -54,65 +54,104 @@ packages/shared/src/types/fragen.ts             (durch fragen-core.ts ersetzt)
 ExamLab/src/types/fragen.ts                     (durch fragen-storage.ts ersetzt)
 ```
 
+### Cut-Decision: Sharing in core, EffektivesRecht in storage
+
+**Faktencheck (S162-Audit):**
+- `SharedFragenEditor.tsx:517` liest `frage?.berechtigungen`, `:785` schreibt `berechtigungen` zurück → Berechtigungen sind UI-Sharing-Konzept
+- `Berechtigung` + `RechteStufe` sind in `packages/shared/src/types/auth.ts` und `ExamLab/src/types/auth.ts` **strukturell identisch** (3 Felder: email/recht/name) — die Duplikation in ExamLab ist Code-Smell
+- `EffektivesRecht` (inhaber/bearbeiter/betrachter) existiert NUR in ExamLab/auth.ts — ist Backend-berechnet (`_recht`) und nur in der Storage-Schicht relevant
+- `geteilt`/`geteiltVon`/`autor` werden in Editor + Korrektur-UI gerendert → Sharing-UI
+
+**Cut:**
+
+| Feld | Layer | Begründung |
+|---|---|---|
+| `berechtigungen?: Berechtigung[]` | **core** | Editor liest+schreibt sie aktiv. `Berechtigung` aus `@shared/types/auth` |
+| `geteilt?` | **core** | Editor zeigt Sharing-Status |
+| `geteiltVon?` | **core** | UI-Anzeige |
+| `autor`, `erstelltVon` | **core** | UI-Anzeige |
+| `pruefungstauglich?: boolean` | **core** | Editor-Toggle |
+| `tags: string[]` | **core** | nur Namen |
+| `_recht?: EffektivesRecht` | **storage** | Backend-berechnet, ExamLab-spezifisch |
+| `poolVersion?: PoolFrageSnapshot` | **storage** | ExamLab-Pool-Sync-Konzept |
+| `tags: (string \| Tag)[]` | **storage** (Override) | Tag-Objekte mit `farbe`/`ebene` sind ExamLab-UX |
+| `FrageSummary` mit Berechtigungs-Feldern | **storage** | enthält `_recht` |
+
 ### Inhalt von `fragen-core.ts` (shared)
 
-UI/Editor-Layer ohne Auth-/Sharing-/Pool-Konzepte:
+UI/Editor-Layer mit Sharing-UI-Konzepten:
 
-- `FrageBase` — gemeinsame Felder ohne `berechtigungen`/`_recht`/`geteilt`/`poolVersion`
-  - `tags: string[]` (nur Namen)
+- `FrageBase` mit allen UI-relevanten Feldern inkl. `berechtigungen?: Berechtigung[]`, `geteilt?`, `geteiltVon?`, `autor`, `erstelltVon`, `pruefungstauglich?`, `tags: string[]`
+- **Nicht enthalten:** `_recht`, `poolVersion`
 - Discriminated Union `Frage`
 - Enums: `Fachbereich`, `BloomStufe`
 - Alle 18 Fragetyp-Interfaces als named exports: `MCFrage`, `RichtigFalschFrage`, `LueckentextFrage`, `FreitextFrage`, `BerechnungFrage`, `ZuordnungFrage`, `SortierungFrage`, `HotspotFrage`, `BildbeschriftungFrage`, `DragDropBildFrage`, `CodeFrage`, `AudioFrage`, `BuchungssatzFrage`, `TKontoFrage`, `BilanzERFrage`, `KontenbestimmungFrage`, `PDFFrage`, `ZeichnenFrage`
 - Alle Sub-Types als named exports: `Luecke`, `ZuordnungPaar`, `BildbeschriftungLabel`, `HotspotBereich`, `DragDropBildLabel`, `DragDropBildZielzone`, `MCOption`, `BerechnungBeispiel`, `Buchung`, `BilanzPosten`, `KontenbestimmungEintrag`
 - `Lernziel`, `FragenPerformance`, `FrageAnhang` (UI-relevant), `FrageTyp`-String-Union
-- `pruefungstauglich?: boolean` bleibt in core (Editor zeigt's an)
+- Import: `import type { Berechtigung } from './auth'` (bleibender shared/auth.ts)
 
 ### Inhalt von `fragen-storage.ts` (ExamLab)
 
-Backend-Storage-Layer mit Pruefungstool-spezifischen Konzepten:
+Backend-Storage-Layer mit ExamLab-spezifischen Konzepten:
 
 ```ts
 import type * as Core from '@shared/types/fragen-core'
-import type { Berechtigung, EffektivesRecht } from './auth'
+import type { EffektivesRecht } from './auth'
 import type { Tag } from './tags'
 import type { PoolFrageSnapshot } from './pool'
 
-// FrageBase erweitert um Backend-Felder
+// FrageBase erweitert um Backend-Felder + tags-Override
 export interface FrageBase extends Omit<Core.FrageBase, 'tags'> {
   tags: (string | Tag)[]                  // Override: erlaubt Tag-Objekte
-  berechtigungen?: Berechtigung[]
-  _recht?: EffektivesRecht
-  geteilt?: 'privat' | 'fachschaft' | 'schule'   // Legacy
-  poolVersion?: PoolFrageSnapshot
+  _recht?: EffektivesRecht                // Backend-berechnet
+  poolVersion?: PoolFrageSnapshot         // ExamLab-Pool-Sync
 }
 
-// Eigene Storage-Frage-Union: jeder Typ extends Core.X mit erweiterter Base
+// Eigene Storage-Frage-Union — Sammlung der Core-Typen mit erweiterter Base
+// Implementations-Pattern: Type-Helper `WithStorageBase<T>` der die Override macht,
+// dann Union per `WithStorageBase<Core.MCFrage> | WithStorageBase<Core.RichtigFalschFrage> | …`.
+type WithStorageBase<T extends Core.Frage> =
+  Omit<T, keyof Core.FrageBase> & FrageBase
+
 export type Frage =
-  | (Core.MCFrage & { tags: (string | Tag)[]; berechtigungen?: Berechtigung[]; _recht?: EffektivesRecht; geteilt?: ...; poolVersion?: PoolFrageSnapshot })
-  | (Core.RichtigFalschFrage & { ... })
-  | ...
+  | WithStorageBase<Core.MCFrage>
+  | WithStorageBase<Core.RichtigFalschFrage>
+  // … alle 18 Fragetypen analog
 
-// Re-Exports der Sub-Types damit ein Storage-Caller nur eine Datei importieren muss
-export type { MCOption, Luecke, ZuordnungPaar, ... } from '@shared/types/fragen-core'
+// Re-Exports der Core-Sub-Types damit Storage-Caller nur ein File importieren
+export type {
+  Fachbereich, BloomStufe, FrageTyp,
+  MCOption, Luecke, ZuordnungPaar, BildbeschriftungLabel,
+  HotspotBereich, DragDropBildLabel, DragDropBildZielzone,
+  Buchung, BilanzPosten, KontenbestimmungEintrag,
+  Lernziel, FragenPerformance, FrageAnhang,
+} from '@shared/types/fragen-core'
 
-// FrageSummary mit Berechtigung — bleibt storage-only
+// FrageSummary mit Storage-Feldern — bleibt storage-only
 export interface FrageSummary {
   id: string
   typ: string
-  // ... alle Summary-Felder
-  berechtigungen?: Berechtigung[]
+  // … alle Summary-Felder
   _recht?: EffektivesRecht
 }
 ```
 
-**Anmerkung zur Storage-Frage-Union:** Die Union-Konstruktion via Intersection ist verbose. Alternative ist generic FrageBase: `FrageBase<TExt = {}>`. Wir wählen den verbosen Intersection-Ansatz für Plain-TypeScript-Lesbarkeit; die ~18 Zeilen Union-Definition sind übersichtlich genug.
+**Anmerkung zur Storage-Frage-Union:** Type-Helper `WithStorageBase<T>` zentralisiert die Override-Logik (statt 18× Intersection). 1 Helper + 18 Zeilen Union-Definition.
 
 ### Type-Strategie für Editor-Komponenten in shared
 
 - Editor-Props nehmen `Core.MCFrage`, `Core.LueckentextFrage`, etc.
-- Storage-Frage-Objekte aus ExamLab sind **structurally compatible** (zusätzliche Felder werden ignoriert) → kein Mapping nötig
+- Storage-Frage-Objekte aus ExamLab sind **structurally compatible** für die Core-Felder (zusätzliche `_recht`/`poolVersion` werden ignoriert) → kein Mapping nötig
 - TypeScript-strukturelles Subtyping erledigt das automatisch
-- Editor-Code muss niemals `frage.berechtigungen` lesen (Audit in Phase 1 verifiziert das)
+- Editor liest `berechtigungen`/`geteilt`/`autor` direkt aus `Core.FrageBase` (jetzt korrekt typisiert, kein `as Berechtigung[] | undefined`-Cast mehr nötig)
+- Editor liest niemals `frage._recht` oder `frage.poolVersion` — Audit in Phase 0 verifiziert das
+
+### Sub-Cleanup: Doppelte `Berechtigung` in ExamLab/auth.ts entfernen
+
+`ExamLab/src/types/auth.ts` definiert `Berechtigung` und `RechteStufe` strukturell identisch zu `packages/shared/src/types/auth.ts`. Die ExamLab-Variante wird entfernt:
+- `ExamLab/src/types/auth.ts` re-exportet `Berechtigung` und `RechteStufe` aus `@shared/types/auth`
+- `EffektivesRecht`, `Rolle`, `AuthUser` bleiben in ExamLab (kontextspezifisch)
+- Single Source of Truth für `Berechtigung`-Type
 
 ### Update `packages/shared/src/index.ts`
 
@@ -139,14 +178,29 @@ Konflikte bei doppeltem Export: shared hat keine `Berechtigung[]`/`_recht`-Felde
 ### Phase 0: Branch + Audit
 
 - Branch `refactor/type-konsolidierung-frage-core-storage`
-- Audit-Skript:
+- Audit-Skripte (Reihenfolge):
   ```bash
+  # Alle Frage-Type-Imports inventarisieren
   grep -rn "from '@shared/types/fragen'" ExamLab/src/ packages/shared/src/ > audit-shared-imports.txt
-  grep -rn "from '\\.\\./types/fragen'\\|from '\\./types/fragen'\\|from '\\.\\./\\.\\./types/fragen'" ExamLab/src/ > audit-local-imports.txt
-  grep -rn "frage\\.berechtigungen\\|frage\\._recht\\|frage\\.poolVersion\\|frage\\.geteilt" packages/shared/src/ > audit-storage-leak.txt
-  grep -rn "tag\\.farbe\\|tag\\.ebene" packages/shared/src/ > audit-tag-leak.txt
+  grep -rn "from '\\(\\.\\.\\?/\\)\\+types/fragen'" ExamLab/src/ > audit-local-imports.txt
+  # Erwartung: ~14 + ~16 = ~30 Stellen total
+
+  # Storage-Felder die NICHT in core gehören dürfen (in shared/ rendern)
+  grep -rn "frage\\._recht\\|frage\\.poolVersion" packages/shared/src/ > audit-storage-leak.txt
+  # Erwartung: 0 Treffer
+
+  # Tag-Objekt-Eigenschaften (Tag.farbe/Tag.ebene sind ExamLab-UX)
+  grep -rn "tag\\.farbe\\|tag\\.ebene\\|\\.tags\\[.*\\]\\.farbe" packages/shared/src/ > audit-tag-leak.txt
+  # Erwartung: 0 Treffer (Tag-Rendering ist ExamLab-Komponente)
+
+  # Sharing-Felder die in core BLEIBEN (UI-Konzepte)
+  grep -rn "frage\\.berechtigungen\\|frage\\.geteilt\\|frage\\.autor" packages/shared/src/ > audit-sharing-in-core.txt
+  # Erwartung: ≥1 Treffer (SharedFragenEditor.tsx:517+785) — bestätigt dass Sharing-Felder zu core gehören
   ```
-- **Erwartung:** `audit-storage-leak.txt` und `audit-tag-leak.txt` müssen leer sein. Falls Treffer: Storage-Felder sickern in Editor-Code → Editor anpassen, NICHT core erweitern.
+- **Auswertung:**
+  - `storage-leak.txt` und `tag-leak.txt` müssen leer sein. Falls Treffer: Storage-Felder sickern in Editor-Code → Editor anpassen, NICHT core erweitern.
+  - `sharing-in-core.txt` validiert die Cut-Decision (Berechtigungen + geteilt in core).
+  - Alle Imports aus den ersten beiden Files werden in Phase 3-4 systematisch umgestellt.
 
 ### Phase 1: `fragen-core.ts` in shared anlegen
 
@@ -165,18 +219,20 @@ Konflikte bei doppeltem Export: shared hat keine `Berechtigung[]`/`_recht`-Felde
 
 ### Phase 3: Editor-Imports umstellen
 
-- Tests in `ExamLab/src/tests/`: `*PflichtTests.tsx`, `MultiZone.test.tsx`, etc. — Imports `@shared/types/fragen` → `@shared/types/fragen-core`
-- shared/editor-Code: bereits meist via `./types/fragen` lokal — Pfad anpassen
-- ~10 Dateien
+- Tests in `ExamLab/src/tests/` (`*PflichtTests.tsx`, `MultiZone.test.tsx`, etc.) — Imports `@shared/types/fragen` → `@shared/types/fragen-core`
+- shared/editor-Code (`packages/shared/src/editor/`): Type-Imports auf `fragen-core` (relativer Pfad `../types/fragen-core`)
+- `SharedFragenEditor.tsx:517` — der `as Berechtigung[] | undefined`-Cast kann entfallen, weil `frage.berechtigungen?` jetzt korrekt typisiert ist
+- ~14 Dateien (basierend auf `audit-shared-imports.txt`)
 - **Validierung:** `tsc -b` clean, `vitest` grün
 
 ### Phase 4: ExamLab-Storage-Imports umstellen
 
 - ExamLab-Stores (`fragenbankStore.ts`, `pruefungStore.ts`, …): `from '../types/fragen'` → `from '../types/fragen-storage'`
-- Apps-Script-Adapter (`adapters/ueben/appsScriptAdapter.ts`): storage-Layer
-- Service-Layer (`services/ueben/interfaces.ts`): storage-Layer
-- Komponenten die Frage-Daten lesen (FragenBrowser, KorrekturFrageVollansicht, …): storage-Layer
-- ~10 Dateien
+- Apps-Script-Adapter `ExamLab/src/adapters/ueben/appsScriptAdapter.ts`: storage-Layer
+- Service-Layer `ExamLab/src/services/ueben/interfaces.ts`: storage-Layer
+- Komponenten die Frage-Daten lesen: storage-Layer
+- Sub-Cleanup: `ExamLab/src/types/auth.ts` re-exportet `Berechtigung` + `RechteStufe` aus `@shared/types/auth` (Doppeldefinition entfernt)
+- ~16 Dateien (basierend auf `audit-local-imports.txt`)
 - **Validierung:** `tsc -b` clean, `vitest` grün
 
 ### Phase 5: Cleanup
@@ -184,10 +240,11 @@ Konflikte bei doppeltem Export: shared hat keine `Berechtigung[]`/`_recht`-Felde
 - `ExamLab/src/types/fragen.ts` löschen
 - `packages/shared/src/types/fragen.ts` löschen (durch core ersetzt)
 - `packages/shared/src/index.ts`: nur noch `export * from './types/fragen-core'`
-- Verifikation:
+- Verifikation (alle Pfad-Varianten — relativ, parent, grand-parent):
   ```bash
-  grep -rn "from '@shared/types/fragen'" ExamLab/src/ packages/shared/src/  # muss leer sein
-  grep -rn "from '\\.\\./types/fragen'" ExamLab/src/                          # muss leer sein
+  grep -rn "from '@shared/types/fragen'" ExamLab/src/ packages/shared/src/         # muss leer sein
+  grep -rn "from '\\(\\.\\.\\?/\\)\\+types/fragen'" ExamLab/src/                    # muss leer sein
+  grep -rn "from '\\(\\.\\.\\?/\\)\\+types/fragen'" packages/shared/src/            # muss leer sein
   ```
 - **Validierung:** `tsc -b` clean, `vitest` grün, `npm run build` erfolgreich
 
@@ -216,7 +273,7 @@ Konflikte bei doppeltem Export: shared hat keine `Berechtigung[]`/`_recht`-Felde
 | # | Risiko | Mitigation |
 |---|---|---|
 | 1 | Übersehener Import-Pfad — eine Stelle bleibt auf altem `fragen.ts` und compiliert weil `index.ts` während Übergang beide exportiert | Phase 5 grep-Verifikation: alte Pfade müssen leer sein, sonst Rollback. CI würde danach scheitern. |
-| 2 | Strukturelles Subtyping reicht nicht — eine Editor-Funktion erwartet doch ein storage-Feld (Berechtigung) | Phase 0 Audit: `frage.berechtigungen`/`frage._recht`/`poolVersion` in `packages/shared/` muss 0 sein. Falls nicht: betroffenen Code in ExamLab umsiedeln, NICHT core erweitern. |
+| 2 | Strukturelles Subtyping reicht nicht — eine Editor-Funktion erwartet doch ein Backend-Feld (`_recht`/`poolVersion`) | Phase 0 Audit: `frage._recht`/`frage.poolVersion` in `packages/shared/` muss 0 sein. Falls nicht: betroffenen Code in ExamLab umsiedeln, NICHT core erweitern. (Sharing-Felder `berechtigungen`/`geteilt`/`autor` sind explizit in core erlaubt.) |
 | 3 | `tags`-Type-Drift — core hat `string[]`, storage hat `(string \| Tag)[]`, ein Editor will `tag.farbe` lesen | Phase 0 Audit: `tag\\.farbe`/`tag\\.ebene` in `packages/shared/` muss 0 sein. Wahrscheinlich kein Issue (Tag-Rendering ist ExamLab-UX-Komponente). |
 | 4 | Apps-Script-Adapter liest Backend-Daten (mit Berechtigung) — muss `fragen-storage` importieren | Phase 4 explizit: `appsScriptAdapter.ts` auf storage. Verifikation per Type-Test in Adapter-Tests. |
 | 5 | Test-Suite-Updates aufwendiger als geschätzt — Tests mocken `FrageBase` mit Pflichtfeldern die wir verschieben | Tests laufen meist auf core (Editor-Tests). Storage-relevante Tests (Stores) auf storage. Falls ein Test beides braucht → storage. |
@@ -249,14 +306,16 @@ Konflikte bei doppeltem Export: shared hat keine `Berechtigung[]`/`_recht`-Felde
 
 ## Erfolgs-Kriterien
 
-- [x] 0 Treffer für `from '@shared/types/fragen'` und `from '*types/fragen'` (alte Pfade weg) → in Phase 5
-- [x] 1098 vitest grün
-- [x] `npx tsc -b` clean
-- [x] `npm run build` clean
-- [x] Browser-E2E ohne Errors auf staging mit echten Logins (Phase 6)
-- [x] HANDOFF.md aktualisiert mit Bundle-K-Status
-- [x] Spec + Plan committet
-- [x] FrageBase-Divergenz aus „Aktiv offen" in HANDOFF.md entfernt
+- [ ] 0 Treffer für `from '@shared/types/fragen'` (Phase 5 grep)
+- [ ] 0 Treffer für relative `from '...types/fragen'` (alle Tiefen) — Phase 5 grep
+- [ ] 1098 vitest grün
+- [ ] `npx tsc -b` clean
+- [ ] `npm run build` clean
+- [ ] Browser-E2E ohne Errors auf staging mit echten Logins (Phase 6)
+- [ ] HANDOFF.md aktualisiert mit Bundle-K-Status
+- [ ] Spec + Plan committet
+- [ ] FrageBase-Divergenz aus „Aktiv offen" in HANDOFF.md entfernt
+- [ ] Sub-Cleanup `ExamLab/types/auth.ts` re-exportet `Berechtigung`/`RechteStufe` aus `@shared/types/auth`
 
 ---
 
