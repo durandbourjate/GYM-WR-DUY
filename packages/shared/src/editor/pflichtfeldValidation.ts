@@ -36,53 +36,36 @@ function strNonEmpty(s: unknown): boolean {
 
 export function validierePflichtfelder(frage: Frage | null | undefined): ValidationResult {
   if (!frage || typeof frage !== 'object') return DEFAULT_OK
-
   try {
-    switch ((frage as any).typ) {
-      case 'mc':
-        return validiereMC(frage as any)
-      case 'richtigfalsch':
-        return validiereRichtigFalsch(frage as any)
-      case 'lueckentext':
-        return validiereLueckentext(frage as any)
-      case 'sortierung':
-        return validiereSortierung(frage as any)
-      case 'zuordnung':
-        return validiereZuordnung(frage as any)
-      case 'bildbeschriftung':
-        return validiereBildbeschriftung(frage as any)
-      case 'dragdrop_bild':
-        return validiereDragDropBild(frage as any)
-      case 'hotspot':
-        return validiereHotspot(frage as any)
-      case 'freitext':
-        return validiereFreitext(frage as any)
-      case 'berechnung':
-        return validiereBerechnung(frage as any)
-      case 'buchungssatz':
-        return validiereBuchungssatz(frage as any)
-      case 'tkonto':
-        return validiereTKonto(frage as any)
-      case 'kontenbestimmung':
-        return validiereKontenbestimmung(frage as any)
-      case 'bilanzstruktur':
-        return validiereBilanzstruktur(frage as any)
+    switch (frage.typ) {
+      case 'mc': return validiereMC(frage)
+      case 'richtigfalsch': return validiereRichtigFalsch(frage)
+      case 'lueckentext': return validiereLueckentext(frage)
+      case 'sortierung': return validiereSortierung(frage)
+      case 'zuordnung': return validiereZuordnung(frage)
+      case 'bildbeschriftung': return validiereBildbeschriftung(frage)
+      case 'dragdrop_bild': return validiereDragDropBild(frage)
+      case 'hotspot': return validiereHotspot(frage)
+      case 'freitext': return validiereFreitext(frage)
+      case 'berechnung': return validiereBerechnung(frage)
+      case 'buchungssatz': return validiereBuchungssatz(frage)
+      case 'tkonto': return validiereTKonto(frage)
+      case 'kontenbestimmung': return validiereKontenbestimmung(frage)
+      case 'bilanzstruktur': return validiereBilanzstruktur(frage)
       case 'visualisierung':
-      case 'zeichnen':
-        return validiereVisualisierung(frage as any)
-      case 'pdf':
-        return validierePDF(frage as any)
-      case 'code':
-        return validiereCode(frage as any)
-      case 'formel':
-        return validiereFormel(frage as any)
-      case 'aufgabengruppe':
-        return validiereAufgabengruppe(frage as any)
-      case 'audio':
-        return DEFAULT_OK
-      default:
-        console.warn(`[pflichtfeldValidation] Unbekannter typ: ${(frage as any).typ}`)
+        return validiereVisualisierung(frage)
+      case 'pdf': return validierePDF(frage)
+      case 'code': return validiereCode(frage)
+      case 'formel': return validiereFormel(frage)
+      case 'aufgabengruppe': return validiereAufgabengruppe(frage)
+      case 'audio': return DEFAULT_OK
+      default: {
+        // 'zeichnen' war Legacy-Variante von 'visualisierung' — TypeScript fängt
+        // den Case nicht in der Frage-Union ab; default deckt unbekannte Strings.
+        const unbekannterTyp = (frage as { typ?: unknown }).typ
+        console.warn(`[pflichtfeldValidation] Unbekannter typ: ${String(unbekannterTyp)}`)
         return DEFAULT_KONSERVATIV
+      }
     }
   } catch (err) {
     console.error('[pflichtfeldValidation] crash:', err)
