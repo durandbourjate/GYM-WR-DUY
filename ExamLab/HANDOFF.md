@@ -21,6 +21,12 @@
 
 **FrageBase-Divergenz** (S159 Spawn-Task M2): `packages/shared/src/index.ts` vs `ExamLab/src/types/fragen.ts` — Re-Export aus `@shared` blockiert.
 
+### Future Bundles (geplant)
+
+- **Media-Phase-3-5 Dual-Write Migration** — `MediaQuelle`-Type ist in shared definiert (`packages/shared/src/types/mediaQuelle.ts`), aber Apps-Script kennt ihn nicht. Echte Migration ist eigenes Bundle in Bundle-J-Grösse: Backend liest+schreibt beide Formate (`bildUrl`/`pdfBase64` UND `MediaQuelle`), Frontend-Migrator ist bereits da (`mediaQuelleMigrator.ts`). ~3-4 Sessions, Apps-Script-Deploy nötig. Phase 6 (alte Felder weg, Daten-Migration) als separates Bundle danach.
+- **`as any`-Cleanup** — 72 Stellen aktuell (von 58 gewachsen), eigenes Hygiene-Bundle, ~1 Session.
+- **Backend-Migration weg von Apps-Script** (langfristig, strategisch) — Edge-Runtime / Cloud Run / Cloudflare Workers. Vorbereitend: API-Contract (Zod/JSON-Schema), Endpoint-Inventar, Schema-Doku. Kein konkreter Trigger jetzt, aber Vorarbeit lohnt während anderer Bundles.
+
 ### Future / YAGNI (nur falls UX-Feedback negativ)
 
 - Bundle G.f.3 — KorrekturDashboard-Skeleton (eingebettet + standalone) falls G.d.1 Pre-Warm-Cache-Miss-Flash spürbar
