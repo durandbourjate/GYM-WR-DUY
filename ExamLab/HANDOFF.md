@@ -8,6 +8,27 @@
 
 ## Aktiv offen
 
+### Bundle K — Type-Konsolidierung Frage Core + Storage (Spec + Plan ready, Implementation offen)
+
+**Status:** Spec + Plan auf `main` (Commits `7c9e2b2` Spec rev3, `4888793` Plan rev2). Beide Reviewer-Approved. Implementation für nächste Session reserviert.
+
+**Spec:** [docs/superpowers/specs/2026-04-29-type-konsolidierung-frage-core-storage-design.md](../docs/superpowers/specs/2026-04-29-type-konsolidierung-frage-core-storage-design.md)
+**Plan:** [docs/superpowers/plans/2026-04-29-type-konsolidierung-frage-core-storage.md](../docs/superpowers/plans/2026-04-29-type-konsolidierung-frage-core-storage.md)
+
+**Was Bundle K liefert:**
+- `packages/shared/src/types/fragen-core.ts` (UI/Editor-Layer ohne Backend-Konzepte)
+- `ExamLab/src/types/fragen-storage.ts` (Backend-Layer mit `_recht`/`poolVersion`/Tag-Override via `WithStorageBase<T>`-Helper)
+- Sub-Cleanup: `ExamLab/src/types/auth.ts` re-exportet `Berechtigung`/`RechteStufe` aus `@shared/types/auth`
+- 7 Phasen, ~16 Tasks, ~3 Sessions, kein Apps-Script-Deploy
+- Adressiert FrageBase-Divergenz (war S159 Spawn-Task M2)
+
+**Cut-Decision:** `berechtigungen`/`geteilt`/`autor` bleiben in core (Editor liest+schreibt), nur `_recht`/`poolVersion` sind storage-only.
+
+**Eintrittspunkt nächste Session:**
+1. Plan öffnen: `docs/superpowers/plans/2026-04-29-type-konsolidierung-frage-core-storage.md`
+2. `superpowers:subagent-driven-development` invoken
+3. Beginnt mit Phase 0 Task 1: Branch `refactor/type-konsolidierung-frage-core-storage` + 6 Audit-Skripte
+
 ### Kleine Follow-Ups (nicht blockierend)
 
 **G.d.1 Final-Review Follow-Ups** (aus S152):
@@ -19,7 +40,7 @@
 - `cleanupNachAbgabe.ts:13` — `clearIndexedDB(...).catch(...)` ohne await
 - `App.tsx:180` — `clearIndexedDB`/`clearQueue` bei `durchfuehrungId`-Wechsel
 
-**FrageBase-Divergenz** (S159 Spawn-Task M2): `packages/shared/src/index.ts` vs `ExamLab/src/types/fragen.ts` — Re-Export aus `@shared` blockiert.
+~~**FrageBase-Divergenz** (S159 Spawn-Task M2)~~ → wird durch Bundle K aufgelöst (siehe oben).
 
 ### Future Bundles (geplant)
 
