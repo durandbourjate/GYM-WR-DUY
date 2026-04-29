@@ -85,7 +85,7 @@ UI/Editor-Layer mit Sharing-UI-Konzepten:
 - **Nicht enthalten:** `_recht`, `poolVersion`
 - Discriminated Union `Frage`
 - Enums: `Fachbereich`, `BloomStufe`
-- Alle 18 Fragetyp-Interfaces als named exports: `MCFrage`, `RichtigFalschFrage`, `LueckentextFrage`, `FreitextFrage`, `BerechnungFrage`, `ZuordnungFrage`, `SortierungFrage`, `HotspotFrage`, `BildbeschriftungFrage`, `DragDropBildFrage`, `CodeFrage`, `AudioFrage`, `BuchungssatzFrage`, `TKontoFrage`, `BilanzERFrage`, `KontenbestimmungFrage`, `PDFFrage`, `ZeichnenFrage`
+- Alle 20 Fragetyp-Interfaces als named exports (verifiziert gegen aktuelle `Frage`-Union): `MCFrage`, `FreitextFrage`, `ZuordnungFrage`, `LueckentextFrage`, `VisualisierungFrage`, `RichtigFalschFrage`, `BerechnungFrage`, `BuchungssatzFrage`, `TKontoFrage`, `KontenbestimmungFrage`, `BilanzERFrage`, `AufgabengruppeFrage`, `PDFFrage`, `SortierungFrage`, `HotspotFrage`, `BildbeschriftungFrage`, `AudioFrage`, `DragDropBildFrage`, `CodeFrage`, `FormelFrage`
 - Alle Sub-Types als named exports: `Luecke`, `ZuordnungPaar`, `BildbeschriftungLabel`, `HotspotBereich`, `DragDropBildLabel`, `DragDropBildZielzone`, `MCOption`, `BerechnungBeispiel`, `Buchung`, `BilanzPosten`, `KontenbestimmungEintrag`
 - `Lernziel`, `FragenPerformance`, `FrageAnhang` (UI-relevant), `FrageTyp`-String-Union
 - Import: `import type { Berechtigung } from './auth'` (bleibender shared/auth.ts)
@@ -116,7 +116,7 @@ type WithStorageBase<T extends Core.Frage> =
 export type Frage =
   | WithStorageBase<Core.MCFrage>
   | WithStorageBase<Core.RichtigFalschFrage>
-  // … alle 18 Fragetypen analog
+  // … alle 20 Fragetypen analog
 
 // Re-Exports der Core-Sub-Types damit Storage-Caller nur ein File importieren
 export type {
@@ -136,7 +136,7 @@ export interface FrageSummary {
 }
 ```
 
-**Anmerkung zur Storage-Frage-Union:** Type-Helper `WithStorageBase<T>` zentralisiert die Override-Logik (statt 18× Intersection). 1 Helper + 18 Zeilen Union-Definition.
+**Anmerkung zur Storage-Frage-Union:** Type-Helper `WithStorageBase<T>` zentralisiert die Override-Logik (statt 20× Intersection). 1 Helper + 20 Zeilen Union-Definition. `WithStorageBase<T>` funktioniert mit Discriminated Unions weil `typ` (der Discriminator) auf jedem Sub-Type liegt (nicht in `FrageBase`), `Omit<T, keyof Core.FrageBase>` lässt ihn unverändert → Narrowing via `frage.typ === 'mc'` funktioniert nach wie vor.
 
 ### Type-Strategie für Editor-Komponenten in shared
 
@@ -183,7 +183,7 @@ Konflikte bei doppeltem Export: shared hat keine `Berechtigung[]`/`_recht`-Felde
   # Alle Frage-Type-Imports inventarisieren
   grep -rn "from '@shared/types/fragen'" ExamLab/src/ packages/shared/src/ > audit-shared-imports.txt
   grep -rn "from '\\(\\.\\.\\?/\\)\\+types/fragen'" ExamLab/src/ > audit-local-imports.txt
-  # Erwartung: ~14 + ~16 = ~30 Stellen total
+  # Erwartung: ~15 + ~24 = ~39 Stellen total (verifiziert mit Reviewer-Audit)
 
   # Storage-Felder die NICHT in core gehören dürfen (in shared/ rendern)
   grep -rn "frage\\._recht\\|frage\\.poolVersion" packages/shared/src/ > audit-storage-leak.txt
@@ -222,7 +222,7 @@ Konflikte bei doppeltem Export: shared hat keine `Berechtigung[]`/`_recht`-Felde
 - Tests in `ExamLab/src/tests/` (`*PflichtTests.tsx`, `MultiZone.test.tsx`, etc.) — Imports `@shared/types/fragen` → `@shared/types/fragen-core`
 - shared/editor-Code (`packages/shared/src/editor/`): Type-Imports auf `fragen-core` (relativer Pfad `../types/fragen-core`)
 - `SharedFragenEditor.tsx:517` — der `as Berechtigung[] | undefined`-Cast kann entfallen, weil `frage.berechtigungen?` jetzt korrekt typisiert ist
-- ~14 Dateien (basierend auf `audit-shared-imports.txt`)
+- ~15 Dateien (basierend auf `audit-shared-imports.txt`)
 - **Validierung:** `tsc -b` clean, `vitest` grün
 
 ### Phase 4: ExamLab-Storage-Imports umstellen
@@ -232,7 +232,7 @@ Konflikte bei doppeltem Export: shared hat keine `Berechtigung[]`/`_recht`-Felde
 - Service-Layer `ExamLab/src/services/ueben/interfaces.ts`: storage-Layer
 - Komponenten die Frage-Daten lesen: storage-Layer
 - Sub-Cleanup: `ExamLab/src/types/auth.ts` re-exportet `Berechtigung` + `RechteStufe` aus `@shared/types/auth` (Doppeldefinition entfernt)
-- ~16 Dateien (basierend auf `audit-local-imports.txt`)
+- ~24 Dateien (basierend auf `audit-local-imports.txt`) — Subagent-Driven-Development empfehlenswert für parallele Updates
 - **Validierung:** `tsc -b` clean, `vitest` grün
 
 ### Phase 5: Cleanup
@@ -279,7 +279,7 @@ Konflikte bei doppeltem Export: shared hat keine `Berechtigung[]`/`_recht`-Felde
 | 5 | Test-Suite-Updates aufwendiger als geschätzt — Tests mocken `FrageBase` mit Pflichtfeldern die wir verschieben | Tests laufen meist auf core (Editor-Tests). Storage-relevante Tests (Stores) auf storage. Falls ein Test beides braucht → storage. |
 | 6 | Re-Export-Reihenfolge in `index.ts` — falsche Reihenfolge → Type-Konflikt bei doppeltem `export *` | Pattern: in Übergangsphase `export type { ... }` explizit listen statt `export *`, falls Konflikte auftreten. |
 | 7 | `Frage`-Union wird via Intersection groß — Editor-Code mit `Frage`-Union kommt mit Storage-Frage in Kontakt und Discriminator wird ambig | TypeScript löst Discriminated Unions strukturell — `typ`-Discriminator funktioniert in beiden Welten gleich. Verify mit einem Test der `frage.typ === 'mc'` narrowing macht. |
-| 8 | `FrageSummary` wird ausserhalb ExamLab gebraucht | Audit: `grep -rn "FrageSummary" packages/shared/` — falls Treffer, in core nachziehen (ohne Berechtigung) und storage erweitert. |
+| 8 | `FrageSummary` wird ausserhalb ExamLab gebraucht | ✅ Reviewer-verifiziert: 0 Treffer in `packages/shared/` — kein Issue, Storage-Layer-Platzierung bestätigt. |
 
 ---
 
