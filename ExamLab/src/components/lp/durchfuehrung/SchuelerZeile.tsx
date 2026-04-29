@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react'
 import type { SchuelerStatus, PruefungsNachricht } from '../../../types/monitoring.ts'
 import type { Antwort } from '../../../types/antworten.ts'
-import type { Frage } from '../../../types/fragen.ts'
+import type { Frage } from '../../../types/fragen-storage'
 import { apiService } from '../../../services/apiService.ts'
 import BeendenDialog from './BeendenDialog.tsx'
 

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import MCFrage from '../components/fragetypen/MCFrage.tsx'
-import type { MCFrage as MCFrageType } from '../types/fragen.ts'
+import type { MCFrage as MCFrageType } from '../types/fragen-storage'
 import type { Antwort } from '../types/antworten.ts'
 import type { FrageAdapterResult } from '../hooks/useFrageAdapter.ts'
 

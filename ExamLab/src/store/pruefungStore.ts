@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { Frage } from '../types/fragen.ts'
+import type { Frage } from '../types/fragen-storage'
 import type { PruefungsConfig } from '../types/pruefung.ts'
 import type { Antwort, Unterbrechung } from '../types/antworten.ts'
 

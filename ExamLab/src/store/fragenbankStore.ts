@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { Frage, FrageSummary } from '../types/fragen.ts'
+import type { Frage, FrageSummary } from '../types/fragen-storage'
 import { ladeFragenbank, ladeFragenbankSummary, ladeFrageDetail } from '../services/fragenbankApi.ts'
 import {
   getCachedSummaries, setCachedSummaries,

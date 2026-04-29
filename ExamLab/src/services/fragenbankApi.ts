@@ -1,4 +1,4 @@
-import type { Frage, FrageSummary } from '../types/fragen.ts'
+import type { Frage, FrageSummary } from '../types/fragen-storage'
 import type { PruefungsConfig } from '../types/pruefung.ts'
 import { APPS_SCRIPT_URL, getJson, postBool } from './apiClient'
 

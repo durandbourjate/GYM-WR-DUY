@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import BuchungssatzFrage from '../components/fragetypen/BuchungssatzFrage.tsx'
-import type { BuchungssatzFrage as BSType } from '../types/fragen.ts'
+import type { BuchungssatzFrage as BSType } from '../types/fragen-storage'
 import type { Antwort } from '../types/antworten.ts'
 
 const frage = {

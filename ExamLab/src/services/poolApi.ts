@@ -1,4 +1,4 @@
-import type { Frage } from '../types/fragen.ts'
+import type { Frage } from '../types/fragen-storage'
 import type { Lernziel } from '../types/pool'
 import { APPS_SCRIPT_URL, postJson } from './apiClient'
 

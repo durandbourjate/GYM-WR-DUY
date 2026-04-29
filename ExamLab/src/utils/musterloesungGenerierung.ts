@@ -5,7 +5,7 @@
 import type {
   BuchungssatzZeile, TKontoDefinition, Kontenaufgabe,
   BilanzERLoesung, KontoMitSaldo,
-} from '../types/fragen.ts'
+} from '../types/fragen-storage'
 import { kontoLabel } from './kontenrahmen.ts'
 
 /** Schweizer Zahlenformat mit Apostroph (5'000) */

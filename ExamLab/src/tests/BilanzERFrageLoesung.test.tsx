@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import BilanzERFrage from '../components/fragetypen/BilanzERFrage.tsx'
-import type { BilanzERFrage as BEType } from '../types/fragen.ts'
+import type { BilanzERFrage as BEType } from '../types/fragen-storage'
 import type { Antwort } from '../types/antworten.ts'
 
 const frageBilanz = {

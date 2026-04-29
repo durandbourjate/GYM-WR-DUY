@@ -76,7 +76,7 @@ export default function UebenEditorProvider({ children }: Props) {
     uploadAnhang: async (frageId: string, datei: File) => {
       try {
         const base64 = await dateiZuBase64(datei)
-        const response = await uebenApiClient.post<{ success: boolean; data: import('@shared/types/fragen').FrageAnhang }>(
+        const response = await uebenApiClient.post<{ success: boolean; data: import('../../../types/fragen-storage').FrageAnhang }>(
           'lernplattformUploadAnhang',
           { frageId, dateiname: datei.name, mimeType: datei.type, base64, email: user?.email },
           getToken()
@@ -91,7 +91,7 @@ export default function UebenEditorProvider({ children }: Props) {
     // Lernziele laden (aus Fragenbank-Metadaten)
     ladeLernziele: async (_gefaess: string, fachbereich: string) => {
       try {
-        const response = await uebenApiClient.post<{ success: boolean; data: import('@shared/types/fragen').Lernziel[] }>(
+        const response = await uebenApiClient.post<{ success: boolean; data: import('../../../types/fragen-storage').Lernziel[] }>(
           'lernplattformLadeLernziele',
           { fachbereich, email: user?.email },
           getToken()

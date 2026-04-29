@@ -6,7 +6,7 @@ import type {
   BilanzERFrage, AufgabengruppeFrage, SortierungFrage,
   InlineTeilaufgabe,
   HotspotFrage, BildbeschriftungFrage, DragDropBildFrage
-} from '../../../../types/fragen.ts'
+} from '../../../../types/fragen-storage'
 import { kontoLabel } from '../../../../utils/kontenrahmen.ts'
 import { formatDatum } from '../../../../utils/zeit.ts'
 import { typLabel } from '../../../../utils/fachUtils.ts'
@@ -227,17 +227,17 @@ function DruckAnhaenge({ anhaenge }: { anhaenge: FrageAnhang[] }) {
 
 function FrageInhalt({ frage }: { frage: Frage }) {
   switch (frage.typ) {
-    case 'mc': return <MCDruck frage={frage} />
-    case 'richtigfalsch': return <RichtigFalschDruck frage={frage} />
-    case 'freitext': return <FreitextDruck frage={frage} />
-    case 'lueckentext': return <LueckentextDruck frage={frage} />
-    case 'zuordnung': return <ZuordnungDruck frage={frage} />
-    case 'berechnung': return <BerechnungDruck frage={frage} />
-    case 'buchungssatz': return <BuchungssatzDruck frage={frage} />
-    case 'tkonto': return <TKontoDruck frage={frage} />
-    case 'kontenbestimmung': return <KontenbestimmungDruck frage={frage} />
-    case 'bilanzstruktur': return <BilanzDruck frage={frage} />
-    case 'aufgabengruppe': return <AufgabengruppeDruck frage={frage} />
+    case 'mc': return <MCDruck frage={frage as MCFrage} />
+    case 'richtigfalsch': return <RichtigFalschDruck frage={frage as RichtigFalschFrage} />
+    case 'freitext': return <FreitextDruck frage={frage as FreitextFrage} />
+    case 'lueckentext': return <LueckentextDruck frage={frage as LueckentextFrage} />
+    case 'zuordnung': return <ZuordnungDruck frage={frage as ZuordnungFrage} />
+    case 'berechnung': return <BerechnungDruck frage={frage as BerechnungFrage} />
+    case 'buchungssatz': return <BuchungssatzDruck frage={frage as BuchungssatzFrage} />
+    case 'tkonto': return <TKontoDruck frage={frage as TKontoFrage} />
+    case 'kontenbestimmung': return <KontenbestimmungDruck frage={frage as KontenbestimmungFrage} />
+    case 'bilanzstruktur': return <BilanzDruck frage={frage as BilanzERFrage} />
+    case 'aufgabengruppe': return <AufgabengruppeDruck frage={frage as AufgabengruppeFrage} />
     case 'sortierung': return <SortierungDruck frage={frage as SortierungFrage} />
     case 'visualisierung': return <ZeichenDruck />
     case 'pdf': return <PDFHinweis />

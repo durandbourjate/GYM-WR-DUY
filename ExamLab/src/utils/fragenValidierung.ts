@@ -2,7 +2,7 @@
  * Validierung von Prüfungsfragen.
  * Extrahiert aus FragenEditor.tsx — pure Funktion ohne Komponentenabhängigkeiten.
  */
-import type { MCOption, BuchungssatzZeile, Kontenaufgabe, KontoMitSaldo } from '../types/fragen.ts'
+import type { MCOption, BuchungssatzZeile, Kontenaufgabe, KontoMitSaldo } from '../types/fragen-storage'
 
 export interface FrageValidierungsParams {
   typ: string

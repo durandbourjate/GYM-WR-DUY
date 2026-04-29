@@ -1,4 +1,4 @@
-import type { Frage, FrageSummary } from '../../../../types/fragen.ts'
+import type { Frage, FrageSummary } from '../../../../types/fragen-storage'
 
 /** Pool-Badges: Zeigt Quelle und Status von Pool-Fragen */
 export default function PoolBadges({ frage }: { frage: Frage | FrageSummary }) {

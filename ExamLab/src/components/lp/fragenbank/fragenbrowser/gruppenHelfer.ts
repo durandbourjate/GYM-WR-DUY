@@ -1,5 +1,5 @@
 import { typLabel } from '../../../../utils/fachUtils.ts'
-import type { Frage, FrageSummary } from '../../../../types/fragen.ts'
+import type { Frage, FrageSummary } from '../../../../types/fragen-storage'
 
 export type Gruppierung = 'keine' | 'fachbereich' | 'thema' | 'typ' | 'bloom'
 

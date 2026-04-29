@@ -1,5 +1,5 @@
 // src/services/fragenbankCache.ts
-import type { Frage, FrageSummary } from '../types/fragen.ts'
+import type { Frage, FrageSummary } from '../types/fragen-storage'
 
 const IDB_NAME = 'examlab-fragenbank-cache'
 const IDB_VERSION = 1

@@ -3,7 +3,7 @@ import { usePruefungStore } from '../store/pruefungStore.ts'
 import { useAuthStore } from '../store/authStore.ts'
 import { fachbereichFarbe } from '../utils/fachUtils.ts'
 import { berechneAbschnittFortschritt } from '../utils/abschnitte.ts'
-import type { Frage, MCFrage, LueckentextFrage, ZuordnungFrage } from '../types/fragen.ts'
+import type { Frage, MCFrage, LueckentextFrage, ZuordnungFrage } from '../types/fragen-storage'
 import type { Antwort } from '../types/antworten.ts'
 
 interface AbgabeZusammenfassungProps {

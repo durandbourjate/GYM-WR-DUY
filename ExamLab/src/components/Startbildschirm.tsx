@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import type { PruefungsConfig } from '../types/pruefung.ts'
-import type { Frage } from '../types/fragen.ts'
+import type { Frage } from '../types/fragen-storage'
 import { usePruefungStore } from '../store/pruefungStore.ts'
 import { useAuthStore } from '../store/authStore.ts'
 import { apiService } from '../services/apiService.ts'

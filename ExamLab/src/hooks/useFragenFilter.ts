@@ -5,7 +5,7 @@
 import { useState, useMemo, useEffect } from 'react'
 import { gruppenKey } from '../components/lp/fragenbank/fragenbrowser/gruppenHelfer.ts'
 import type { Gruppierung } from '../components/lp/fragenbank/fragenbrowser/gruppenHelfer.ts'
-import type { Frage, FrageSummary, Fachbereich, BloomStufe } from '../types/fragen.ts'
+import type { Frage, FrageSummary, Fachbereich, BloomStufe } from '../types/fragen-storage'
 
 /** Typ der sowohl für Frage als auch FrageSummary funktioniert (Filter braucht nur diese Felder) */
 export type FilterbareFrage = Frage | FrageSummary

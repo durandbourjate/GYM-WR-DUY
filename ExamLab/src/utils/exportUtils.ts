@@ -1,5 +1,5 @@
 import type { PruefungsKorrektur, SchuelerAbgabe } from '../types/korrektur.ts'
-import type { Frage, MCFrage, ZuordnungFrage, LueckentextFrage, RichtigFalschFrage, BerechnungFrage, PDFAnnotation } from '../types/fragen.ts'
+import type { Frage, MCFrage, ZuordnungFrage, LueckentextFrage, RichtigFalschFrage, BerechnungFrage, PDFAnnotation } from '../types/fragen-storage'
 import type { Antwort } from '../types/antworten.ts'
 import type { SchuelerStatus } from '../types/monitoring.ts'
 import type { PruefungsConfig } from '../types/pruefung.ts'

@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import TKontoFrage from '../components/fragetypen/TKontoFrage.tsx'
-import type { TKontoFrage as TKType } from '../types/fragen.ts'
+import type { TKontoFrage as TKType } from '../types/fragen-storage'
 import type { Antwort } from '../types/antworten.ts'
 
 const frage = {

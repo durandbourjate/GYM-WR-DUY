@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render } from '@testing-library/react'
 import LueckentextFrage from '../components/fragetypen/LueckentextFrage.tsx'
-import type { LueckentextFrage as LTType } from '../types/fragen.ts'
+import type { LueckentextFrage as LTType } from '../types/fragen-storage'
 
 // Hooks am Modul-Level mocken — der Aufgabe-Renderer braucht useFrageAdapter und
 // usePruefungStore, hier reicht ein minimaler Stub damit die Inputs/Selects gerendert

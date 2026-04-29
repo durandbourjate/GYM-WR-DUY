@@ -1,5 +1,5 @@
 import type { PruefungsConfig, PruefungsAbschnitt } from '../types/pruefung.ts'
-import type { Frage } from '../types/fragen.ts'
+import type { Frage } from '../types/fragen-storage'
 import type { Antwort } from '../types/antworten.ts'
 import { istVollstaendigBeantwortet } from './antwortStatus.ts'
 

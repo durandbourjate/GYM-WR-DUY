@@ -16,7 +16,7 @@ import type {
   TKontoFrage as TKontoFrageType,
   KontenbestimmungFrage as KontenbestimmungFrageType,
   BilanzERFrage as BilanzERFrageType,
-} from '../../types/fragen.ts'
+} from '../../types/fragen-storage'
 import MCFrage from './MCFrage.tsx'
 import FreitextFrage from './FreitextFrage.tsx'
 import LueckentextFrage from './LueckentextFrage.tsx'

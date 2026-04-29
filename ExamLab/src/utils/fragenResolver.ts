@@ -1,4 +1,4 @@
-import type { Frage, AufgabengruppeFrage, InlineTeilaufgabe } from '../types/fragen.ts'
+import type { Frage, AufgabengruppeFrage, InlineTeilaufgabe } from '../types/fragen-storage'
 import type { PruefungsConfig } from '../types/pruefung.ts'
 
 /**

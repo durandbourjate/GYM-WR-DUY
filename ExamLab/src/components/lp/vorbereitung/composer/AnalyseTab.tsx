@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import type { Frage } from '../../../../types/fragen.ts'
+import type { Frage } from '../../../../types/fragen-storage'
 import type { PruefungsConfig } from '../../../../types/pruefung.ts'
 import { berechnePruefungsAnalyse } from '../../../../utils/analyseUtils.ts'
 import { useKIAssistent } from '../../frageneditor/useKIAssistent.ts'

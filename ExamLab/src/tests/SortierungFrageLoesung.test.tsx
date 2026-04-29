@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import SortierungFrage from '../components/fragetypen/SortierungFrage.tsx'
-import type { SortierungFrage as SType } from '../types/fragen.ts'
+import type { SortierungFrage as SType } from '../types/fragen-storage'
 import type { Antwort } from '../types/antworten.ts'
 
 const frage = {

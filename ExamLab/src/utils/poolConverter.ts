@@ -266,10 +266,10 @@ export function konvertierePoolFrage(
 
     punkte: berechnePunkte(poolFrage),
     musterlosung: poolFrage.explain ?? poolFrage.sample ?? '',
-    bewertungsraster: [] as import('../types/fragen').Bewertungskriterium[],
+    bewertungsraster: [] as import('../types/fragen-storage').Bewertungskriterium[],
 
     schwierigkeit: poolFrage.diff,
-    verwendungen: [] as import('../types/fragen').Verwendung[],
+    verwendungen: [] as import('../types/fragen-storage').Verwendung[],
 
     zeitbedarf: schaetzeZeitbedarf(poolFrage),
 

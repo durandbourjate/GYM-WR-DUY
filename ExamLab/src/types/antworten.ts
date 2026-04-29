@@ -63,7 +63,7 @@ export type Antwort =
       stufen: { label: string; konten: { nr: string; betrag: number }[]; zwischentotal?: number }[];
       gewinnVerlust?: number;
     } }
-  | { typ: 'pdf'; annotationen?: import('./fragen').PDFAnnotation[]; text?: string; selbstbewertung?: Selbstbewertung }
+  | { typ: 'pdf'; annotationen?: import('./fragen-storage').PDFAnnotation[]; text?: string; selbstbewertung?: Selbstbewertung }
   | { typ: 'sortierung'; reihenfolge: string[] }
   | { typ: 'hotspot'; klicks: { x: number; y: number }[] }
   | { typ: 'bildbeschriftung'; eintraege: Record<string, string> }

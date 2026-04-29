@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { apiService } from '../../../services/apiService.ts'
 import type { PruefungsKorrektur, SchuelerAbgabe, FragenBewertung } from '../../../types/korrektur.ts'
-import type { Frage } from '../../../types/fragen.ts'
+import type { Frage } from '../../../types/fragen-storage'
 import { exportiereAlsCSV, exportiereErgebnisseAlsCSV, downloadCSV } from '../../../utils/exportUtils.ts'
 import { exportiereBackupXlsx } from '../../../utils/backupExport.ts'
 

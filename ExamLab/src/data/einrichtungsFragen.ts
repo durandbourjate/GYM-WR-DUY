@@ -1,4 +1,4 @@
-import type { Frage } from '../types/fragen.ts'
+import type { Frage } from '../types/fragen-storage'
 import { DEMO_AUTOR_EMAIL } from './demoConfig.ts'
 
 const jetzt = '2026-03-24T00:00:00.000Z'

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import type { Frage, FrageSummary, Fachbereich, BloomStufe } from '../../../../types/fragen.ts'
+import type { Frage, FrageSummary, Fachbereich, BloomStufe } from '../../../../types/fragen-storage'
 import type { Sortierung, FilterPoolStatus, FilterKontext } from '../../../../hooks/useFragenFilter.ts'
 import type { Gruppierung } from './gruppenHelfer.ts'
 import { typLabel } from '../../../../utils/fachUtils.ts'

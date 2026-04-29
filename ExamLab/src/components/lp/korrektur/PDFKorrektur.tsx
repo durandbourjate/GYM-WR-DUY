@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
-import type { PDFFrage, PDFAnnotation } from '../../../types/fragen.ts'
+import type { PDFFrage, PDFAnnotation } from '../../../types/fragen-storage'
 import type { FragenBewertung } from '../../../types/korrektur.ts'
 import { effektivePunkte } from '../../../utils/korrekturUtils.ts'
 import { apiService } from '../../../services/apiService.ts'

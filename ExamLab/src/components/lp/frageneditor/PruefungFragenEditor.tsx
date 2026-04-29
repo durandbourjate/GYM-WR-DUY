@@ -17,7 +17,7 @@ import type { SpeichernMeta } from '@shared/editor/SharedFragenEditor'
 import { istWRFachschaft } from '../../../utils/fachUtils.ts'
 import { useSchulConfig } from '../../../store/schulConfigStore.ts'
 import { generateZeitpunkte, zeitpunktModellAusConfig } from '../../../utils/zeitpunktUtils.ts'
-import type { Frage } from '../../../types/fragen.ts'
+import type { Frage } from '../../../types/fragen-storage'
 import type { Frage as SharedFrage } from '@shared/types/fragen-core'
 import type { FragenPerformance } from '../../../types/tracker.ts'
 

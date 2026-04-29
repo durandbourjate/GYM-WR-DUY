@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import LueckentextFrage from '../components/fragetypen/LueckentextFrage.tsx'
-import type { LueckentextFrage as LTType } from '../types/fragen.ts'
+import type { LueckentextFrage as LTType } from '../types/fragen-storage'
 import type { Antwort } from '../types/antworten.ts'
 
 const frage = {

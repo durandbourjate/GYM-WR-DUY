@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import FreitextFrage from '../components/fragetypen/FreitextFrage.tsx'
-import type { FreitextFrage as FTType } from '../types/fragen.ts'
+import type { FreitextFrage as FTType } from '../types/fragen-storage'
 import type { Antwort } from '../types/antworten.ts'
 
 const frage = {

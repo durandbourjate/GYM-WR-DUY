@@ -1,6 +1,6 @@
 import { FRAGETYP_KOMPONENTEN } from './shared/fragetypenRegistry.ts'
 import MedienPlayer from './shared/MedienPlayer.tsx'
-import type { Frage, VisualisierungFrage } from '../types/fragen.ts'
+import type { Frage, VisualisierungFrage } from '../types/fragen-storage'
 import type { Antwort } from '../types/antworten.ts'
 
 interface FrageRendererProps {

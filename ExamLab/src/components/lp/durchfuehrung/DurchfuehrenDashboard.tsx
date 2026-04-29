@@ -19,7 +19,7 @@ const eingebauteVersionen: Record<string, { config: PruefungsConfig; fragen: Fra
 }
 import type { MonitoringDaten, PruefungsNachricht } from '../../../types/monitoring.ts'
 import type { SchuelerAbgabe } from '../../../types/korrektur.ts'
-import type { Frage } from '../../../types/fragen.ts'
+import type { Frage } from '../../../types/fragen-storage'
 import { LPAppHeaderContainer } from '../LPAppHeaderContainer'
 import EinstellungenPanel from '../../settings/EinstellungenPanel.tsx'
 import FragenBrowser from '../fragenbank/FragenBrowser.tsx'
