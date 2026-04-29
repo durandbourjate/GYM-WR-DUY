@@ -7,7 +7,7 @@
  * pro Sub-Element generieren kann). Das Ergebnis wird in `KIMusterloesungPreview`
  * angezeigt — die LP entscheidet pro Zeile ob eine Teilerklärung übernommen wird.
  */
-import type { Fachbereich, BloomStufe } from '../../types/fragen'
+import type { Fachbereich, BloomStufe } from '../../types/fragen-core'
 import type { FrageTyp } from '../editorUtils'
 import type { useKIAssistent } from '../useKIAssistent'
 import type { TeilerklaerungsKontext } from '../musterloesungKontext'

@@ -1,4 +1,4 @@
-import type { TKontoDefinition, TKontoBewertung, KontenauswahlConfig } from '../../types/fragen'
+import type { TKontoDefinition, TKontoBewertung, KontenauswahlConfig } from '../../types/fragen-core'
 import { Abschnitt } from '../components/EditorBausteine'
 import KontenSelect from '../components/KontenSelect'
 import { sucheKonten } from '../kontenrahmen'

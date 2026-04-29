@@ -1,4 +1,4 @@
-import type { KontenbestimmungFrage, Kontenaufgabe, KontenauswahlConfig, KontenAntwort } from '../../types/fragen'
+import type { KontenbestimmungFrage, Kontenaufgabe, KontenauswahlConfig, KontenAntwort } from '../../types/fragen-core'
 import { Abschnitt } from '../components/EditorBausteine'
 import KontenSelect from '../components/KontenSelect'
 import { sucheKonten } from '../kontenrahmen'

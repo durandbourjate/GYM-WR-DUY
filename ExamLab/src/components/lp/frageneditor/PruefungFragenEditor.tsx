@@ -186,7 +186,10 @@ export default function PruefungFragenEditor({ frage, onSpeichern, onAbbrechen, 
             </div>
           )
         }}
-        poolSyncSlot={({ frage: f, typ, onRueckSync }) => (
+        poolSyncSlot={({ frage: fc, typ, onRueckSync }) => {
+          // Editor-Slot gibt Core.Frage — Cast auf Storage.Frage für `poolVersion`-Zugriff (Storage-Feld).
+          const f = fc as Frage | null
+          return (
           <>
             {f && f.poolId && f.poolVersion && (
               <button
@@ -205,7 +208,8 @@ export default function PruefungFragenEditor({ frage, onSpeichern, onAbbrechen, 
               </button>
             )}
           </>
-        )}
+          )
+        }}
         rueckSyncSlot={({ offen, onSchliessen, onErfolg }) => (
           frage ? (
             <RueckSyncDialog

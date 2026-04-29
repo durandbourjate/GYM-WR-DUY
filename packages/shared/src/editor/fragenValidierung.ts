@@ -2,7 +2,7 @@
  * Validierung von Fragen.
  * Pure Funktion ohne Komponentenabhängigkeiten.
  */
-import type { MCOption, BuchungssatzZeile, Kontenaufgabe, KontoMitSaldo } from '../types/fragen'
+import type { MCOption, BuchungssatzZeile, Kontenaufgabe, KontoMitSaldo } from '../types/fragen-core'
 
 export interface FrageValidierungsParams {
   typ: string

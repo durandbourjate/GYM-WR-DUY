@@ -1,4 +1,4 @@
-import type { BerechnungFrage } from '../../types/fragen'
+import type { BerechnungFrage } from '../../types/fragen-core'
 import { Abschnitt } from '../components/EditorBausteine'
 
 interface BerechnungEditorProps {

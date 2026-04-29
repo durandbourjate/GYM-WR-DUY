@@ -1,4 +1,4 @@
-import type { MCOption } from '../../types/fragen'
+import type { MCOption } from '../../types/fragen-core'
 import { Abschnitt } from '../components/EditorBausteine'
 import type { FeldStatus } from '../pflichtfeldValidation'
 

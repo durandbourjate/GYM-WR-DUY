@@ -1,4 +1,4 @@
-import type { BilanzERFrage, KontoMitSaldo, BilanzERLoesung, BilanzERBewertung, BilanzStruktur, BilanzGruppe, ERStruktur, ERStufe } from '../../types/fragen'
+import type { BilanzERFrage, KontoMitSaldo, BilanzERLoesung, BilanzERBewertung, BilanzStruktur, BilanzGruppe, ERStruktur, ERStufe } from '../../types/fragen-core'
 import { Abschnitt } from '../components/EditorBausteine'
 import KontenSelect from '../components/KontenSelect'
 

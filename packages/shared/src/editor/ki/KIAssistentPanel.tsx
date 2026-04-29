@@ -6,9 +6,9 @@ export { useKIAssistent } from '../useKIAssistent'
 export type { AktionKey, AktionErgebnis } from '../useKIAssistent'
 
 import type { useKIAssistent } from '../useKIAssistent'
-import type { MCOption } from '../../types/fragen'
+import type { MCOption } from '../../types/fragen-core'
 import type { FrageTyp } from '../editorUtils'
-import type { Fachbereich, BloomStufe } from '../../types/fragen'
+import type { Fachbereich, BloomStufe } from '../../types/fragen-core'
 import { InlineAktionButton, ErgebnisAnzeige } from './KIBausteine'
 
 // === Fragetext-Buttons ===

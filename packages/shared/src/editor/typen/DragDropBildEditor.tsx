@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect, useMemo } from 'react'
-import type { DragDropBildZielzone, DragDropBildLabel } from '../../types/fragen'
+import type { DragDropBildZielzone, DragDropBildLabel } from '../../types/fragen-core'
 import BildMitGenerator from '../components/BildMitGenerator'
 import { resolvePoolBildUrl } from '../utils/poolBildUrl'
 import ZonenOverlay from '../components/ZonenOverlay'

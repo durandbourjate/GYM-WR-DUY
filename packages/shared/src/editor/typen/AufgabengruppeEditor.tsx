@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { InlineTeilaufgabe, MCOption } from '../../types/fragen'
+import type { InlineTeilaufgabe, MCOption } from '../../types/fragen-core'
 import { typLabel } from '../fachUtils'
 import { Abschnitt } from '../components/EditorBausteine'
 import MCEditor from './MCEditor'

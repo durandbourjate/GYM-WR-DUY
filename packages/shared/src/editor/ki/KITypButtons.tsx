@@ -2,7 +2,7 @@
  * Typ-spezifische KI-Buttons fuer Zuordnung, R/F, Lueckentext, Berechnung.
  */
 import type { useKIAssistent } from '../useKIAssistent'
-import type { RichtigFalschFrage, BerechnungFrage } from '../../types/fragen'
+import type { RichtigFalschFrage, BerechnungFrage } from '../../types/fragen-core'
 import { InlineAktionButton, ErgebnisAnzeige } from './KIBausteine'
 
 // === Zuordnung ===

@@ -9,7 +9,7 @@
  * `FrageBasis` mit id/version/erstelltAm/... — andere Struktur, anderer Output-Typ.
  * Hier reicht das Minimum, das `validierePflichtfelder` braucht.
  */
-import type { Frage } from '../types/fragen'
+import type { Frage } from '../types/fragen-core'
 
 export interface FragePreviewState {
   id?: string

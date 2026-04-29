@@ -4,7 +4,7 @@
  * usePDFRenderer ist optional — ohne wird die Seitenzahl nicht automatisch ermittelt.
  */
 import { useRef, useState, useEffect } from 'react'
-import type { PDFKategorie, PDFAnnotationsWerkzeug, PDFAnnotation } from '../../types/fragen'
+import type { PDFKategorie, PDFAnnotationsWerkzeug, PDFAnnotation } from '../../types/fragen-core'
 import { Abschnitt, Feld } from './EditorBausteine'
 
 export interface PDFEditorProps {

@@ -1,4 +1,4 @@
-import type { BloomStufe } from '../types/fragen'
+import type { BloomStufe } from '../types/fragen-core'
 
 type FrageTypKey = 'mc' | 'freitext' | 'lueckentext' | 'zuordnung' | 'richtigfalsch' | 'berechnung' | 'visualisierung'
 
