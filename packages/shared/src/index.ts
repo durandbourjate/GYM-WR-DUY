@@ -1,4 +1,8 @@
-export * from './types/fragen'
+export * from './types/fragen-core'
+// fragen.ts wird in Phase 5 komplett entfernt — bis dahin bleiben die 16 direkten
+// Imports (`from '@shared/types/fragen'`) unverändert funktional, weil sie das File
+// direkt resolven (nicht über diesen Index). Doppel-Export beider Files ist nicht
+// möglich (TS2308 — beide exportieren identische Symbole).
 export * from './types/auth'
 
 // Editor Infrastructure
