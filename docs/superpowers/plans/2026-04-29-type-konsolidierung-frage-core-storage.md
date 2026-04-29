@@ -71,7 +71,7 @@ grep -rn "frage\\.berechtigungen\\|frage\\.geteilt\\|frage\\.autor" packages/sha
 Erwartete Treffer:
 - `audit-shared-imports.txt` — ~15 Stellen (Tests, Stores, Adapter, ueben/fragen.ts)
 - `audit-local-imports.txt` — ~24 Stellen (Utils, Components, Services)
-- `audit-shared-internal-imports.txt` — ~35 Stellen (alle shared/editor)
+- `audit-shared-internal-imports.txt` — ~35 Stellen (alle shared/editor) — Implementer-Input für Task 7
 - `audit-storage-leak.txt` — **0 Treffer** (sonst Stop, Architektur überdenken)
 - `audit-tag-leak.txt` — **0 Treffer** (sonst Stop)
 - `audit-sharing-in-core.txt` — ≥1 Treffer (`SharedFragenEditor.tsx:517+785`) — bestätigt Cut
@@ -335,7 +335,18 @@ export type {
 
 ⚠️ **Wichtig:** Die `export type {}`-Liste muss vollständig sein — alle Sub-Types die heute in `ExamLab/src/types/fragen.ts` exportiert werden, müssen hier re-exportiert werden, sonst brechen Phase-4-Imports.
 
-**Verifikation:** Vor Step 4.2 die alte `ExamLab/src/types/fragen.ts` durchgehen und sicherstellen, dass jeder `export interface X` / `export type X` entweder in `fragen-core` oder im Re-Export oben enthalten ist.
+**Verifikation:** Vor Step 4.2 alle Exports der alten `fragen.ts` mit dem Re-Export von `fragen-storage.ts` vergleichen:
+
+```bash
+# Alle Top-Level-Exports der alten ExamLab/types/fragen.ts auflisten
+grep -oE "^export (interface|type) \\w+" ExamLab/src/types/fragen.ts | sort -u > /tmp/old-exports.txt
+# Alle Re-Exports aus fragen-storage.ts auflisten (named-Block + lokale interfaces)
+grep -oE "^export (interface|type) \\w+|^\\s+\\w+," ExamLab/src/types/fragen-storage.ts | tr -d ' ,' | sort -u > /tmp/new-exports.txt
+# Vergleich — Top-Level-Exports der alten Datei müssen alle abgedeckt sein
+diff /tmp/old-exports.txt /tmp/new-exports.txt
+```
+
+Falls Diff Einträge zeigt (nur `<`-Zeilen im Diff): fehlende Symbole im Re-Export ergänzen, Step 4.1 wiederholen.
 
 - [ ] **Step 4.2: `tsc -b` + `vitest run`**
 
@@ -422,9 +433,9 @@ git add ExamLab/src/{types,utils,adapters,components,services,store}/
 git commit -m "Bundle K Phase 3.2: 8 ExamLab-src-Files auf fragen-core"
 ```
 
-### Task 7: shared/editor-Files (35+ Files mit `../types/fragen` oder `../../types/fragen`)
+### Task 7: shared/editor-Files (~35 Files mit `../types/fragen` oder `../../types/fragen`)
 
-**Files:** Aus `audit-shared-internal-imports.txt` — alle Files in `packages/shared/src/editor/` mit relativem `types/fragen`-Import.
+**Files:** Aus `audit-shared-internal-imports.txt` (von Phase 0 Task 1.2 generiert) — alle Files in `packages/shared/src/editor/` mit relativem `types/fragen`-Import. Implementer/Subagent muss diese Datei einlesen für die vollständige File-Liste.
 
 - [ ] **Step 7.1: Globale Substitution in `packages/shared/src/editor/`**
 
@@ -434,9 +445,14 @@ Pattern:
 
 Pro File reviewen (sed-Auto kann subtile Pfad-Issues erzeugen).
 
-- [ ] **Step 7.2: `tsc -b` + `vitest run`**
+- [ ] **Step 7.2: `tsc -b` + `vitest run` + `npm run build`**
 
-Expected: clean + 1098 grün
+```bash
+cd ExamLab
+npx tsc -b                    # Expected: clean
+npx vitest run                # Expected: 1098 grün
+npm run build                 # Expected: erfolgreich (Editor-Imports betreffen am meisten Code, dort am wahrscheinlichsten Build-Probleme)
+```
 
 - [ ] **Step 7.3: Commit**
 
@@ -448,10 +464,17 @@ git commit -m "Bundle K Phase 3.3: shared/editor-Files auf fragen-core"
 ### Task 8: `SharedFragenEditor.tsx` `as Berechtigung[]`-Cast entfernen
 
 **Files:**
-- Modify: `packages/shared/src/editor/SharedFragenEditor.tsx:517`
+- Modify: `packages/shared/src/editor/SharedFragenEditor.tsx:517` (und ggf. weitere Stellen)
 
-- [ ] **Step 8.1: Cast entfernen**
+- [ ] **Step 8.0: Alle `as Berechtigung`-Stellen finden**
 
+```bash
+grep -n "as Berechtigung" packages/shared/src/editor/SharedFragenEditor.tsx
+```
+
+- [ ] **Step 8.1: Cast(s) entfernen**
+
+Beispiel Z. 517 (read):
 ```ts
 // VORHER
 const [berechtigungen, setBerechtigungen] = useState<Berechtigung[]>(
@@ -463,6 +486,8 @@ const [berechtigungen, setBerechtigungen] = useState<Berechtigung[]>(
   frage?.berechtigungen ?? []
 )
 ```
+
+Falls Step 8.0 weitere Treffer zeigt: alle entfernen.
 
 - [ ] **Step 8.2: `tsc -b` + `vitest run`**
 
@@ -485,7 +510,7 @@ git commit -m "Bundle K Phase 3.4: SharedFragenEditor — Berechtigung-Cast weg 
 
 **Subagent-Driven-Development empfohlen** — parallele Updates pro Cluster.
 
-### Task 9: ExamLab-utils (10 Files)
+### Task 9: ExamLab-utils (12 Files)
 
 **Files:**
 - Modify: `ExamLab/src/utils/excelImport.ts:5`
