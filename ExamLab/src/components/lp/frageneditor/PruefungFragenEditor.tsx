@@ -153,7 +153,7 @@ export default function PruefungFragenEditor({ frage, onSpeichern, onAbbrechen, 
           )
         }}
         poolInfoSlot={({ frage: f, onSpeichern: speichern }) => {
-          const pf = f as unknown as Frage | null /* Defensive: Slot liefert Core-Frage, ExamLab arbeitet mit Storage-Frage (poolId/poolVersion/poolUpdateVerfuegbar/quelle/quellReferenz/pruefungstauglich Storage-only) */
+          const pf = f as unknown as Frage | null /* Defensive: Slot ist Core-typisiert; Body liest poolVersion (Storage-only via WithStorageBase) */
           if (!pf || pf.quelle !== 'pool' || !pf.poolId) return null
           return (
             <div className="p-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg border border-slate-200 dark:border-slate-600">
@@ -216,7 +216,7 @@ export default function PruefungFragenEditor({ frage, onSpeichern, onAbbrechen, 
               frage={frage}
               offen={offen}
               onSchliessen={onSchliessen}
-              onErfolg={onErfolg as unknown as (updates: Partial<Frage>) => void /* Defensive: Slot ist Core-typisiert, RueckSyncDialog erwartet Storage-Frage */}
+              onErfolg={onErfolg as unknown as (updates: Partial<Frage>) => void /* Defensive: Slot ist Core-typisiert; RueckSyncDialog erwartet Partial<Storage.Frage> mit poolVersion (Storage-only via WithStorageBase) */}
             />
           ) : null
         )}
