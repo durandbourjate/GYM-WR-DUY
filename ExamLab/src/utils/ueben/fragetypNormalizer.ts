@@ -64,10 +64,18 @@ function normalisiereZuordnung(f: ZuordnungFrage): ZuordnungFrageMitUi {
   const fMitUi = f as ZuordnungFrageMitUi
   const linksItems: ZuordnungUiItem[] = Array.isArray(fMitUi.linksItems)
     ? fMitUi.linksItems
-    : paare.map((p, i) => ({ id: `L${i}`, text: p.links }))
+    : paare.map((p, i) => ({
+        // Defensive: Legacy-paare können id tragen (vor Core-Type-Konsolidierung)
+        id: (p as { id?: string }).id ?? `L${i}`,
+        text: p.links,
+      }))
   const rechtsItems: ZuordnungUiItem[] = Array.isArray(fMitUi.rechtsItems)
     ? fMitUi.rechtsItems
-    : paare.map((p, i) => ({ id: `R${i}`, text: p.rechts }))
+    : paare.map((p, i) => ({
+        // Defensive: Legacy-paare können id tragen (vor Core-Type-Konsolidierung)
+        id: (p as { id?: string }).id ?? `R${i}`,
+        text: p.rechts,
+      }))
   return { ...f, paare, linksItems, rechtsItems }
 }
 
