@@ -8,6 +8,31 @@
 
 ## Letzter Stand auf main
 
+### Post-Bundle-L Spawn-Task-Cleanups ✅ MERGED (01.05.2026)
+
+Beide Spawn-Tasks aus Bundle L.c (Lehre 2 — `as any` versteckt Mapping-Drift) abgearbeitet:
+
+1. **`refactor/zuordnung-normalizer-cleanup`** — Merge-Commit auf `main`. `linksItems`/`rechtsItems` Dead-UI-State aus `normalisiereZuordnung` entfernt (eingeführt 19.04.2026 als spekulative Defensive für nie-realisiertes Backend-Format `{linksItems, rechtsItems}` statt `paare[]`). Alle 6 Renderer (`ZuordnungFrage.tsx`, `AbgabeZusammenfassung`, `KorrekturFrageVollansicht`, `VorschauTab`, `DruckAnsicht`, `FragenImport`) lesen ausschliesslich `frage.paare`. Nebenbei: irreführender Test "rekonstruiert paare[] aus linksItems + rechtsItems" entfernt — der Code rekonstruierte gar nichts, paare wurde lediglich auf `[]` defaulted, Test war seit jeher trivial-bestanden trotz täuschendem Namen.
+
+2. **`refactor/build-frage-preview-field-drift`** — Merge-Commit auf `main`. `buildFragePreview` schrieb für PDF und Code Frage-Felder mit Legacy-Namen, die nur über die Defensive-Compat-Casts in `pflichtfeldValidation` durchkamen:
+   - `pdf`: `pdfErlaubteWerkzeuge` → `erlaubteWerkzeuge` (canonical, fragen-core.ts:551)
+   - `code`: `musterloesung` → `musterLoesung` (canonical, fragen-core.ts:662)
+   - Validator (Z. 477-481, :507) liest jetzt über den primären Canonical-Pfad. Compat-Casts für Storage-Legacy bleiben.
+   - **NICHT in diesem Bundle:** Visualisierungs-Drift (`untertyp: 'frei'`) — kein Pure-Rename, sondern Architektur-Drift (Editor hat keine UI für untertyp, `speichereJetzt` schreibt das Feld nicht). Separater Spawn-Task offen.
+
+**Verifikation beider Branches:** tsc -b clean, 1126/1130 vitest passes (4 .todo unverändert, der entfernte Misnamed-Test war kein .todo), build clean, lint:as-any 0 undokumentiert. Browser-E2E auf staging mit echten Logins (LP `wr.test@gymhofwil.ch` + SuS `wr.test@stud.gymhofwil.ch`):
+- LP-Editor PDF-Frage: Werkzeug-Pflichtfeld-Pfad lebendig (Save-Dialog listet "Mindestens ein Werkzeug auswählen").
+- LP-Editor Code-Frage: "Musterlösung oder Testfälle"-Empfohlen-Hint verschwindet beim Tippen → `musterLoesung`-Refactor wirkt End-to-End.
+- SuS-Üben Zuordnungs-Frage (VWL · Arbeitslosigkeit & Armut · Filter "Paare"): Rendert links-Texte + rechts-Auswählen-Dropdowns korrekt, paare-Array intakt → `linksItems`/`rechtsItems`-Cleanup ohne Regression.
+
+**Lehren (für `code-quality.md` bei Gelegenheit):**
+
+1. **Tests können trotz misnamen Beschreibungen passieren.** Der Test `'rekonstruiert paare[] aus linksItems + rechtsItems'` testete tatsächlich nur dass `Array.isArray(n.paare)` true ist (immer wahr nach Default `[]`). Bei TODO-Tests "wenn ich's später aktiviere" oder bei spekulativen Defensive-Pfaden: **Test-Name muss die Behauptung machen, die der Code tatsächlich beweist.** Beim Refactor von Dead-Code immer Tests querlesen, nicht nur grün/rot prüfen.
+
+2. **Validator-Dual-Reads schützen — bestätigt Dead-Field-Cleanup ist sicher.** Beide PDF + Code Renames in `buildFragePreview` waren rückwärts-kompatibel, weil `pflichtfeldValidation` schon einen Defensive-Compat-Cast für die Legacy-Namen hatte. Das ist genau das Pattern, das man für sichere Field-Renames will: erst Reader auf Dual-Read umstellen, dann Writer migrieren, dann (optional) Compat entfernen wenn alle Storage-Daten migriert sind.
+
+---
+
 ### Bundle L.c — Restliche Production + Tests + CI-Gate (Bundle L KOMPLETT) ⏳ READY FOR REVIEW
 
 **Branch:** `refactor/bundle-l-c-rest`. 16 Commits seit `18d5311` (L.b Doku-Followup). 1127/1127 vitest, tsc + build clean. Audit Total/Defensive/Undokumentiert: **0/0/0**, `--strict` EXIT 0.
