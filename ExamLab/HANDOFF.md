@@ -8,6 +8,53 @@
 
 ## Letzter Stand auf main
 
+### Bundle L.c — Restliche Production + Tests + CI-Gate (Bundle L KOMPLETT) ⏳ READY FOR REVIEW
+
+**Branch:** `refactor/bundle-l-c-rest`. 16 Commits seit `18d5311` (L.b Doku-Followup). 1127/1127 vitest, tsc + build clean. Audit Total/Defensive/Undokumentiert: **0/0/0**, `--strict` EXIT 0.
+
+**Geliefert (in 12 Tasks):**
+
+- **L.c.0 (`bbb94fa`):** Stale-Cleanup. `packages/shared/src/types/fragen.ts` (Bundle-K-Restanz) entfernt, `*.tsbuildinfo` in `.gitignore`.
+- **L.c.1 (`2b75040`+`a57017b`):** `fragetypNormalizer.ts` 6→0. Sub-Funktion-Signaturen typisiert (Klasse 1 Discriminator-Switch), `isPunktArray`-Type-Guard für Hotspot-Polygon, lokaler `ZuordnungFrageMitUi`-Helper-Type für UI-Renderer-Felder. Folge-Defensive für Legacy-`p.id` in `normalisiereZuordnung`.
+- **L.c.2 (`30bf467`+`c3c9026`):** `PruefungFragenEditor.tsx` 6→0. `performance`-Cast war strukturell unnötig (FragenPerformance in `tracker.ts` und `fragen-core.ts` identisch). 5 Core/Storage-Mismatch-Stellen (poolInfoSlot + rueckSyncSlot.onErfolg) auf `as unknown as <Type> /* Defensive: */`. Reviewer-I-1: Marker-Begründung präzisiert auf reales Storage-only-Feld `poolVersion` (nicht alle aufgelisteten Felder waren Storage-only).
+- **L.c.3 (`b6a1206`):** `fragenbankStore.ts` 3→0. `(f as any).fragetext` → `(f as { fragetext?: string }).fragetext` an 3 Summary-Build-Stellen.
+- **L.c.4 (`5bb9e2a`):** `VorschauTab.tsx` 2→0. Discriminator-Narrowing greift im `frage.typ === 'pdf'`-Block, Cast war reine Type-Lücke.
+- **L.c.5 (`d59dbd8`):** Production-1er-Sammel (HotspotEditor, DragDropBildEditor, UebungsScreen, ZeichnenCanvas, FrageRenderer) 5→0. 4× Cast-Removal, 1× Defensive-Marker (ZeichnenCanvas Union-Distribution-Limit analog Z. 352).
+- **L.c.6 (`e87f709`):** `buildFragePreview.test.ts` 22→0. 19 Sub-Type-spezifische Output-Casts (`as MCFrage` etc.) + 3 degenerierte Test-Casts. Entlarvte 3 Mapping-Drifts in `buildFragePreview.ts` (Spawn-Task `fix/buildFragePreview-field-name-drift` registriert).
+- **L.c.7 (`af1687a`):** `korrektur.test.ts` 15→0 + ~10 `: any`-Variable-Annotationen. Defensive-Marker für Crash-Robustheits-Tests.
+- **L.c.8 (`53e614c`+`b476e3d`):** `fragetypNormalizer.test.ts` 3→0 + Production-Nachbesserung `normalisiereDragDropBild` (L.c.1-Audit-Lücke: `frage: any`-Parameter + 5 Lambda-Annotationen). Refactor auf `unknown`-Param mit Type-Guards.
+- **L.c.9 (`9a7617d`):** Test-Sammel (7 Files) 9→0. Mix aus Cast-Removal, Defensive-Marker, und gezielten Helper-Type-Konkretisierungen.
+- **L.c.10 (`21d7947`+`aaf95ed`+`72706ab`+`75c4caf`):** Audit-Skript erweitert (`as any` + `: any` + `= any`, mit Kommentar-Filter und String-Literal-Filter; saubere Math `Total - Defensive >= 0`). 14 weitere `any`-Verwendungen aufgedeckt + adressiert (Production: `migriereZone.ts`-Trio, `BilanzERFrage.tsx`, `SharedFragenEditor.tsx`-Lambda; Tests: 4 in `autoKorrektur.test.ts`, 3 in `SuSAppHeaderContainer.test.tsx`, 2 Setter-Types). `BilanzERFrage.tsx::Antwort = any` durch `BilanzAntwort = Extract<...>` ersetzt. **CI-Gate aktiv:** `npm run lint:as-any` script in `ExamLab/package.json`, Build-Step `Audit any Use (Bundle L Gate)` vor `Build ExamLab` in `.github/workflows/deploy.yml`.
+- **L.c.11 (`3ca12e7`):** `code-quality.md` Eintrag aktualisiert auf finalen Stand (alle 3 `any`-Token, CI-Gate, Defensive-Pattern).
+
+**Audit-Stand finale Bundle L Gesamt-Bilanz:**
+| Phase | Total `any` | Defensive | Δ |
+|---|---|---|---|
+| Pre-Bundle-L (Baseline) | 214 | 0 | — |
+| L.a Merge | 96 | 14 | -103 |
+| L.b Merge | 71 | 26 | -25 |
+| **L.c Final** | **0** | **0** | **-71** |
+
+(Defensive-Counter sind nicht kumulativ — L.c hat einige der L.a/L.b-Defensive-Marker durch saubere Refactors ersetzt; final stehen alle Casts entweder als sauber-typisiert oder als Inline-Defensive-Marker auf `as unknown as <Type>`-Form, die im neuen Audit-Skript nicht als `any` zählen.)
+
+**Lehren (für `code-quality.md`/Memory):**
+
+1. **Audit-Skript-Pattern muss `as any`, `: any` UND `= any` erfassen.** Das alte Skript zählte nur `as any` — Variable-Annotationen und Type-Aliase blieben unsichtbar. Bundle L.c hat das beim Cleanup von `buildFragePreview.test.ts`-Casts entdeckt: Tests waren auf `as any` aufgeräumt, aber `: any`-Annotationen blieben. Erweiterung ergab 14 weitere Stellen (Production + Test).
+
+2. **`as any` versteckt Mapping-Drift sogar BEYOND L.b-M1.** L.c.6 entlarvte: `buildFragePreview.ts` schreibt Felder mit Namen, die nicht zu den entsprechenden Frage-Sub-Types passen (`pdfErlaubteWerkzeuge` vs `erlaubteWerkzeuge`, `musterloesung` vs `musterLoesung`, `untertyp: 'frei'` außerhalb der Type-Union). Production-Code könnte Editor-Preview-Werte falsch lesen — separater Spawn-Task. Bundle-L.b-Lehre („Quell-/Ziel-Form prüfen") gilt allgemein für jeden `as any`-Cleanup.
+
+3. **`as unknown as <ConcreteType> /* Defensive: */` zählt nicht als `any`.** Das Audit-Skript erfasst `any` als Token, nicht `unknown`. Defensive-Casts auf konkrete Sub-Types sind explizit erlaubt (sind dokumentierte Type-Bypässe für Legacy-Daten / API-Boundary-Mismatch). Audit zählt nur **undokumentierte** `any`-Nutzungen.
+
+4. **Pragmatic Hot-Fix vs Subagent-Round-Trip:** Bei Tasks mit ≤ 3 trivialen 1-Line-Substitutionen lohnt der Subagent-Spec/Quality-Review-Cycle nicht. Master-Direct-Edit + Self-Review ist für L.c.3, L.c.4, L.c.11 ~3-5× schneller. Subagent bleibt richtig für File-übergreifende Refactors (L.c.5+L.c.10) und grosse Test-Files (L.c.6+L.c.7).
+
+**User-Tasks vor Merge:**
+- [ ] `git push origin refactor/bundle-l-c-rest:preview --force` (nach Lehre `feedback_preview_forcepush.md` zuerst `git log preview ^refactor/bundle-l-c-rest --oneline` prüfen ob preview Work-in-Progress hat)
+- [ ] Browser-E2E auf staging mit echten LP+SuS-Logins. Test-Plan: 3-5 Sub-Type-Editor-Pfade (MC, RichtigFalsch, Hotspot, DragDrop-Bild, BilanzER) — speichern, prev/next, Pflichtfeld-Outline-Verhalten. Korrektur-Pfade: BilanzER-Frage (wegen `Antwort`-Type-Refactor), DragDrop-Bild (wegen `normalisiereDragDropBild`-Refactor in L.c.8). Kein Crash, keine sichtbaren Regressionen.
+- [ ] LP-Freigabe ("Merge OK") im Chat.
+- [ ] Spawn-Tasks im Hinterkopf: `linksItems/rechtsItems` dead-UI-Cleanup + `buildFragePreview` Field-Name-Drift (beide separate Branches/PRs nach Bundle L.c-Merge).
+
+---
+
 ### Bundle L.b — poolConverter (Discriminated Union + FiBu-Konverter-Bugfix) ✅ MERGED
 
 **Merge:** `9ed67db` auf `main` (29.04.2026). Branch `refactor/bundle-l-b-pool-converter` (gelöscht). 1127/1127 vitest (+14 vs L.a 1113), tsc + build clean.
