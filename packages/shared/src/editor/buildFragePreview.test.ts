@@ -213,7 +213,7 @@ describe('buildFragePreview', () => {
     expect(f.canvasConfig).toBe(cfg)
   })
 
-  it('pdf: legt pdfDriveFileId + pdfUrl + pdfBase64 + pdfErlaubteWerkzeuge ab', () => {
+  it('pdf: legt pdfDriveFileId + pdfUrl + pdfBase64 + erlaubteWerkzeuge ab', () => {
     const f = buildFragePreview({
       typ: 'pdf',
       fragetext: 'PDF',
@@ -221,23 +221,23 @@ describe('buildFragePreview', () => {
       pdfUrl: 'https://x.pdf',
       pdfBase64: '',
       pdfErlaubteWerkzeuge: ['highlighter'],
-    }) as unknown as PDFFrage & { pdfErlaubteWerkzeuge: string[] }
+    }) as unknown as PDFFrage
     expect(f.typ).toBe('pdf')
     expect(f.pdfDriveFileId).toBe('abc')
     expect(f.pdfUrl).toBe('https://x.pdf')
-    expect(f.pdfErlaubteWerkzeuge).toEqual(['highlighter'])
+    expect(f.erlaubteWerkzeuge).toEqual(['highlighter'])
   })
 
-  it('code: mappt codeSprache → sprache und codeMusterLoesungCode → musterloesung', () => {
+  it('code: mappt codeSprache → sprache und codeMusterLoesungCode → musterLoesung', () => {
     const f = buildFragePreview({
       typ: 'code',
       fragetext: 'Schreibe',
       codeSprache: 'python',
       codeMusterLoesungCode: 'print("hi")',
-    }) as unknown as CodeFrage & { musterloesung: string }
+    }) as unknown as CodeFrage
     expect(f.typ).toBe('code')
     expect(f.sprache).toBe('python')
-    expect(f.musterloesung).toBe('print("hi")')
+    expect(f.musterLoesung).toBe('print("hi")')
   })
 
   it('formel: mappt formelKorrekteFormel → korrekteFormel', () => {
