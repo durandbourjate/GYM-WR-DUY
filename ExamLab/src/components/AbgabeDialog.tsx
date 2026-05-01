@@ -101,7 +101,7 @@ export default function AbgabeDialog({ onSchliessen }: Props) {
         // ERST NACH Backend-Erfolg als abgegeben markieren — verhindert false-positive
         pruefungAbgeben()
         setStatus('erfolg')
-        cleanupNachAbgabe(storeKey)
+        await cleanupNachAbgabe(storeKey)
       } else {
         // Backend-Save fehlgeschlagen — phase bleibt 'pruefung', SuS kann retry
         setStatus('fehler')
@@ -110,7 +110,7 @@ export default function AbgabeDialog({ onSchliessen }: Props) {
       // Demo-Modus oder kein Backend → direkt Erfolg
       pruefungAbgeben()
       setStatus('erfolg')
-      cleanupNachAbgabe(storeKey)
+      await cleanupNachAbgabe(storeKey)
     }
   }
 
@@ -130,7 +130,7 @@ export default function AbgabeDialog({ onSchliessen }: Props) {
     if (erfolg) {
       pruefungAbgeben()
       setStatus('erfolg')
-      cleanupNachAbgabe(storeKey)
+      await cleanupNachAbgabe(storeKey)
     } else {
       setStatus('fehler')
     }

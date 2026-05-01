@@ -47,9 +47,9 @@ Beide Spawn-Tasks aus Bundle L.c (Lehre 2 — `as any` versteckt Mapping-Drift) 
 
 ---
 
-### Bundle L.c — Restliche Production + Tests + CI-Gate (Bundle L KOMPLETT) ⏳ READY FOR REVIEW
+### Bundle L.c — Restliche Production + Tests + CI-Gate (Bundle L KOMPLETT) ✅ MERGED
 
-**Branch:** `refactor/bundle-l-c-rest`. 16 Commits seit `18d5311` (L.b Doku-Followup). 1127/1127 vitest, tsc + build clean. Audit Total/Defensive/Undokumentiert: **0/0/0**, `--strict` EXIT 0.
+**Merge:** `911cbea` auf `main` (01.05.2026). Branch `refactor/bundle-l-c-rest` (gelöscht). 1127/1127 vitest, tsc + build clean. Audit Total/Defensive/Undokumentiert: **0/0/0**, `--strict` EXIT 0.
 
 **Geliefert (in 12 Tasks):**
 
@@ -86,11 +86,7 @@ Beide Spawn-Tasks aus Bundle L.c (Lehre 2 — `as any` versteckt Mapping-Drift) 
 
 4. **Pragmatic Hot-Fix vs Subagent-Round-Trip:** Bei Tasks mit ≤ 3 trivialen 1-Line-Substitutionen lohnt der Subagent-Spec/Quality-Review-Cycle nicht. Master-Direct-Edit + Self-Review ist für L.c.3, L.c.4, L.c.11 ~3-5× schneller. Subagent bleibt richtig für File-übergreifende Refactors (L.c.5+L.c.10) und grosse Test-Files (L.c.6+L.c.7).
 
-**User-Tasks vor Merge:**
-- [ ] `git push origin refactor/bundle-l-c-rest:preview --force` (nach Lehre `feedback_preview_forcepush.md` zuerst `git log preview ^refactor/bundle-l-c-rest --oneline` prüfen ob preview Work-in-Progress hat)
-- [ ] Browser-E2E auf staging mit echten LP+SuS-Logins. Test-Plan: 3-5 Sub-Type-Editor-Pfade (MC, RichtigFalsch, Hotspot, DragDrop-Bild, BilanzER) — speichern, prev/next, Pflichtfeld-Outline-Verhalten. Korrektur-Pfade: BilanzER-Frage (wegen `Antwort`-Type-Refactor), DragDrop-Bild (wegen `normalisiereDragDropBild`-Refactor in L.c.8). Kein Crash, keine sichtbaren Regressionen.
-- [ ] LP-Freigabe ("Merge OK") im Chat.
-- [ ] Spawn-Tasks im Hinterkopf: `linksItems/rechtsItems` dead-UI-Cleanup + `buildFragePreview` Field-Name-Drift (beide separate Branches/PRs nach Bundle L.c-Merge).
+**Folge-Cleanups (alle gemergt 01.05.2026):** `linksItems/rechtsItems` Dead-UI-Cleanup, `buildFragePreview` Field-Name-Drift, `VisualisierungFrage.untertyp` Vaporware-Removal — siehe oben „Post-Bundle-L Spawn-Task-Cleanups".
 
 ---
 
@@ -214,15 +210,12 @@ Auswirkung: `fibuAutoKorrektur.ts:70-94` und `BuchungssatzFrage.tsx` lesen `frag
 
 ## Eintrittspunkte für nächste Session
 
-Bundle L.a abgeschlossen. Drei Eintrittspunkte:
+Bundle L (a/b/c) abgeschlossen, Folge-Cleanups gemergt. Mögliche nächste Themen:
 
-### Bundle L.b — poolConverter (~1 Session) ← NÄCHSTES
-26 `as any`-Stellen in `ExamLab/src/utils/poolConverter.{ts,test.ts}`. Eigene Komplexität: Pool-Frage-Type ist nicht Storage/Core, sondern Pool-Format. Plan-Sub-Brainstorm in L.b.0 entscheidet zwischen (a) `PoolFrage`-Discriminated-Union, (b) Per-Sub-Type Type-Guards, (c) zod-Schema-Validator. Plan: [docs/superpowers/plans/2026-04-29-bundle-l-as-any-cleanup.md](../docs/superpowers/plans/2026-04-29-bundle-l-as-any-cleanup.md) Phase L.b.
+### Code-Vereinfachung (Spec + Plan committed, Implementation offen)
+Spec/Plan in `868e01c`/`04a8648`/`758b192`. Implementation als nächstes Bundle.
 
-### Bundle L.c — Restliche Production + Tests + CI-Gate (~1 Session)
-~70 verbliebene `as any`-Stellen in fragetypNormalizer (6), PruefungFragenEditor (6), fragenbankStore (3), VorschauTab (2) + 9 Einzel-Files + 15 Test-Dateien. Plus CI-Gate-Aktivierung (`npm run lint:as-any`). Mechanischer Sweep mit etablierten Helpern. Plan-Phase L.c.
-
-### Option C: Media-Phase-3-5 Dual-Write (groß, ~3-4 Sessions)
+### Media-Phase-3-5 Dual-Write (groß, ~3-4 Sessions)
 `MediaQuelle`-Type ist in shared definiert, aber Apps-Script kennt ihn nicht. Echte Migration: Backend liest+schreibt beide Formate (`bildUrl`/`pdfBase64` UND `MediaQuelle`), Frontend-Migrator existiert (`mediaQuelleMigrator.ts`). Apps-Script-Deploy nötig. Phase 6 (alte Felder weg, Daten-Migration) als separates Bundle danach.
 
 ---
@@ -231,21 +224,15 @@ Bundle L.a abgeschlossen. Drei Eintrittspunkte:
 
 ### Kleine Follow-Ups (nicht blockierend)
 
-**G.d.1 Final-Review Follow-Ups** (aus S152):
-- `preWarmKorrektur` extrahiert `sessionToken` aus `useUebenAuthStore`, wird aber von LP-Context aufgerufen → expliziter `sessionToken`-Argument wäre klarer
-- Network-Error-Test für `preWarmKorrektur` fehlt (6 Cases statt G.a-7)
-- `setKorrekturStatus` triggert 3-4× Cache-Invalidierung während laufender `batchKorrektur` — korrekt aber dokumentationswürdig
+~~**G.d.1 Final-Review Follow-Ups** (aus S152)~~ — alle 3 Items im Restposten-Bundle 01.05.2026 erledigt (`preWarmKorrektur(pruefungId, email, signal?, sessionToken?)`-Signatur, Network-Error-Test, `setKorrekturStatus`-Cache-Doku-Kommentar in `apps-script-code.js`).
 
-**autoSave-IDB-Race Restbestände** (S150-Sweep, niedrige Priorität — kein Hard-Nav direkt danach):
-- `cleanupNachAbgabe.ts:13` — `clearIndexedDB(...).catch(...)` ohne await
-- `App.tsx:180` — `clearIndexedDB`/`clearQueue` bei `durchfuehrungId`-Wechsel
+~~**autoSave-IDB-Race Restbestände** (S150-Sweep)~~ — beide Stellen im Restposten-Bundle 01.05.2026 erledigt (`cleanupNachAbgabe` als `async`, `App.tsx::durchfuehrungId`-Wechsel mit `await clearIndexedDB`/`await clearQueue`).
 
-~~**FrageBase-Divergenz** (S159 Spawn-Task M2)~~ → wird durch Bundle K aufgelöst (siehe oben).
+~~**FrageBase-Divergenz** (S159 Spawn-Task M2)~~ → durch Bundle K aufgelöst.
 
 ### Future Bundles (geplant)
 
 - **Media-Phase-3-5 Dual-Write Migration** — `MediaQuelle`-Type ist in shared definiert (`packages/shared/src/types/mediaQuelle.ts`), aber Apps-Script kennt ihn nicht. Echte Migration ist eigenes Bundle in Bundle-J-Grösse: Backend liest+schreibt beide Formate (`bildUrl`/`pdfBase64` UND `MediaQuelle`), Frontend-Migrator ist bereits da (`mediaQuelleMigrator.ts`). ~3-4 Sessions, Apps-Script-Deploy nötig. Phase 6 (alte Felder weg, Daten-Migration) als separates Bundle danach.
-- **`as any`-Cleanup** — 72 Stellen aktuell (von 58 gewachsen), eigenes Hygiene-Bundle, ~1 Session.
 - **Backend-Migration weg von Apps-Script** (langfristig, strategisch) — Edge-Runtime / Cloud Run / Cloudflare Workers. Vorbereitend: API-Contract (Zod/JSON-Schema), Endpoint-Inventar, Schema-Doku. Kein konkreter Trigger jetzt, aber Vorarbeit lohnt während anderer Bundles.
 
 ### Future / YAGNI (nur falls UX-Feedback negativ)

@@ -88,18 +88,22 @@ export default function Timer({ onZeitAbgelaufen }: Props) {
       // ignorieren
     }
 
+    const storeKey = new URLSearchParams(window.location.search).get('id') || 'default'
     if (apiService.istKonfiguriert() && !istDemoModus && user?.email) {
-      apiService.speichereAntworten({
+      // Promise-Chain awaitet cleanupNachAbgabe → IDB-Tx kann completen bevor User
+      // navigiert. Caller (autoAbgabe) ist sync — fire-and-forget, aber die innere
+      // Chain läuft korrekt durch.
+      void apiService.speichereAntworten({
         pruefungId: config!.id,
         email: user.email,
         antworten: antwortenRef.current,
         version: -1,
         istAbgabe: true,
         gesamtFragen: fragen.length,
-      }).then(() => cleanupNachAbgabe(new URLSearchParams(window.location.search).get('id') || 'default'))
+      }).then(() => cleanupNachAbgabe(storeKey))
     } else {
       // Demo oder kein Backend — sofort aufräumen
-      cleanupNachAbgabe(new URLSearchParams(window.location.search).get('id') || 'default')
+      void cleanupNachAbgabe(storeKey)
     }
   }
 
