@@ -46,7 +46,7 @@ describe('Security-Invariant: SuS-Response hat keine Lösungsfelder', () => {
         { id: 'f1', typ: 'mc', fragetext: '?', optionen: [{ id: 'o1', text: 'A' }, { id: 'o2', text: 'B' }] },
         { id: 'f2', typ: 'richtigfalsch', fragetext: '?', aussagen: [{ id: 'a1', text: 'X' }] },
         { id: 'f3', typ: 'sortierung', fragetext: '?', elemente: ['x', 'y', 'z'] },
-        { id: 'f4', typ: 'zuordnung', fragetext: '?', linksItems: [], rechtsItems: [] },
+        { id: 'f4', typ: 'zuordnung', fragetext: '?', paare: [] },
         { id: 'f5', typ: 'lueckentext', fragetext: '?', textMitLuecken: '...', luecken: [{ id: 'l1' }] },
       ],
     }

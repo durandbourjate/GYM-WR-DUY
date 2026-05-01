@@ -52,31 +52,9 @@ function normalisiereSortierung(f: SortierungFrage): SortierungFrage {
 }
 
 // Zuordnung: paare ist im Type-Vertrag required, Backend liefert es aber gelegentlich
-// nicht. linksItems/rechtsItems sind UI-Zusatzfelder die der Renderer erwartet.
-type ZuordnungUiItem = { id: string; text: string }
-type ZuordnungFrageMitUi = ZuordnungFrage & {
-  linksItems?: ZuordnungUiItem[]
-  rechtsItems?: ZuordnungUiItem[]
-}
-
-function normalisiereZuordnung(f: ZuordnungFrage): ZuordnungFrageMitUi {
-  const paare = Array.isArray(f.paare) ? f.paare : []
-  const fMitUi = f as ZuordnungFrageMitUi
-  const linksItems: ZuordnungUiItem[] = Array.isArray(fMitUi.linksItems)
-    ? fMitUi.linksItems
-    : paare.map((p, i) => ({
-        // Defensive: Legacy-paare können id tragen (vor Core-Type-Konsolidierung)
-        id: (p as { id?: string }).id ?? `L${i}`,
-        text: p.links,
-      }))
-  const rechtsItems: ZuordnungUiItem[] = Array.isArray(fMitUi.rechtsItems)
-    ? fMitUi.rechtsItems
-    : paare.map((p, i) => ({
-        // Defensive: Legacy-paare können id tragen (vor Core-Type-Konsolidierung)
-        id: (p as { id?: string }).id ?? `R${i}`,
-        text: p.rechts,
-      }))
-  return { ...f, paare, linksItems, rechtsItems }
+// nicht — defensiv auf [] normalisieren.
+function normalisiereZuordnung(f: ZuordnungFrage): ZuordnungFrage {
+  return { ...f, paare: Array.isArray(f.paare) ? f.paare : [] }
 }
 
 function normalisiereMc(f: MCFrage): MCFrage {
