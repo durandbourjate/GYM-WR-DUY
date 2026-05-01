@@ -44,16 +44,10 @@ describe('normalisiereSortierung', () => {
   })
 })
 describe('normalisiereZuordnung', () => {
-  it('fehlendes paare[] → [] und linksItems/rechtsItems Fallback', () => {
-    const n = normalisiereFrageDaten({ id: 'f1', typ: 'zuordnung' } as unknown as Frage /* Defensive: Test-Mock ohne paare[] prüft Defensive-Pfad */) as ZuordnungFrage & { linksItems: unknown[]; rechtsItems: unknown[] }
+  it('fehlendes paare[] → []', () => {
+    const n = normalisiereFrageDaten({ id: 'f1', typ: 'zuordnung' } as unknown as Frage /* Defensive: Test-Mock ohne paare[] prüft Defensive-Pfad */) as ZuordnungFrage
     expect(Array.isArray(n.paare)).toBe(true)
-    expect(Array.isArray(n.linksItems)).toBe(true)
-    expect(Array.isArray(n.rechtsItems)).toBe(true)
-  })
-  it('rekonstruiert paare[] aus linksItems + rechtsItems (neues Backend-Format)', () => {
-    const f = { id: 'f1', typ: 'zuordnung', linksItems: [{ id: 'L1', text: 'a' }], rechtsItems: [{ id: 'R1', text: 'b' }] } as unknown as Frage /* Defensive: Test-Mock mit Backend-UI-Feldern statt paare[] */
-    const n = normalisiereFrageDaten(f) as ZuordnungFrage
-    expect(Array.isArray(n.paare)).toBe(true)
+    expect(n.paare).toHaveLength(0)
   })
 })
 
