@@ -45,8 +45,7 @@ export default function FrageRenderer({ frage, modus = 'aufgabe', antwort }: Fra
         </div>
       )
     }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return <Komponente frage={frage as any} modus={modus} antwort={antwort ?? null} />
+    return <Komponente frage={frage} modus={modus} antwort={antwort ?? null} />
   })()
 
   // Medien-Einbettung vor dem Frageinhalt rendern

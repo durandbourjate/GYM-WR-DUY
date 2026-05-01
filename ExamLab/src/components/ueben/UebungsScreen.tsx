@@ -237,8 +237,7 @@ export default function UebungsScreen() {
             // bewerteAntwortDetails liefert Teilpunkte für Multi-Element-Typen (R/F, Lückentext,
             // Bildbeschriftung, Zuordnung mit >1 Element). null → Single-Element → binär.
             const details = letzteAntwortKorrekt === false
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              ? bewerteAntwortDetails(normFrage as any, session.antworten[frage.id] ?? null)
+              ? bewerteAntwortDetails(normFrage, session.antworten[frage.id] ?? null)
               : null
             let label = 'Musterlösung'
             let variant: 'korrekt' | 'falsch' = 'korrekt'
