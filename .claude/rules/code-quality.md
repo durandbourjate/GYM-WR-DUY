@@ -14,7 +14,7 @@ Bei neuen Features: Prüfe ob eine bestehende Datei über 800 Zeilen wächst. Fa
 ## TypeScript-Strenge
 
 - **Build-Check VOR jedem Commit: `npx tsc -b` (NICHT `tsc --noEmit`!)** — `tsc -b` entspricht dem CI. `tsc --noEmit` ist weniger streng und findet nicht alle Fehler. Gilt für Pruefung UND Unterrichtsplaner.
-- Kein neues `as any` einführen (aktuell 71 Stellen, davon 26 dokumentierte Defensive-Marker — nicht erhöhen). Bundle L.c soll auf 0 undokumentierte Stellen + CI-Gate.
+- Kein neues `any` einführen (`as any`, `: any`, `= any`). Bundle L (a/b/c) hat 214 → 0 reduziert, CI-Gate `npm run lint:as-any` (in `ExamLab/package.json`, ruft `scripts/audit-as-any.sh --strict` auf) lehnt undokumentierte Stellen seit 01.05.2026 ab. Defensive-Pattern ist `as unknown as <ConcreteType> /* Defensive: <Begründung> */` — schmaler Cast mit Inline-Marker auf der Cast-Zeile (1-Zeilen-Scan).
 - Neue Funktionen: explizite Parameter- und Return-Types
 - `JSON.parse()` immer in try/catch wrappen und Rückgabetyp validieren
 

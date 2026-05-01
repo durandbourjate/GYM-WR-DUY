@@ -1,5 +1,26 @@
 import { describe, it, expect } from 'vitest'
 import { buildFragePreview } from './buildFragePreview'
+import type {
+  MCFrage,
+  FreitextFrage,
+  LueckentextFrage,
+  ZuordnungFrage,
+  RichtigFalschFrage,
+  BerechnungFrage,
+  BuchungssatzFrage,
+  TKontoFrage,
+  KontenbestimmungFrage,
+  BilanzERFrage,
+  HotspotFrage,
+  BildbeschriftungFrage,
+  DragDropBildFrage,
+  SortierungFrage,
+  AufgabengruppeFrage,
+  VisualisierungFrage,
+  PDFFrage,
+  CodeFrage,
+  FormelFrage,
+} from '../types/fragen-core'
 
 describe('buildFragePreview', () => {
   it('mc: legt optionen + mehrfachauswahl an basis ab', () => {
@@ -8,7 +29,7 @@ describe('buildFragePreview', () => {
       fragetext: 'Q',
       optionen: [{ id: 'a', text: 'A', korrekt: true }],
       mehrfachauswahl: false,
-    }) as any
+    }) as unknown as MCFrage
     expect(f.typ).toBe('mc')
     expect(f.fragetext).toBe('Q')
     expect(f.optionen).toHaveLength(1)
@@ -21,7 +42,7 @@ describe('buildFragePreview', () => {
       fragetext: 'Erklären Sie',
       musterlosung: 'Antwort',
       bewertungsraster: [{ beschreibung: 'X', punkte: 1 }],
-    }) as any
+    }) as unknown as FreitextFrage
     expect(f.typ).toBe('freitext')
     expect(f.musterlosung).toBe('Antwort')
     expect(f.bewertungsraster).toHaveLength(1)
@@ -34,7 +55,7 @@ describe('buildFragePreview', () => {
       textMitLuecken: 'Hallo {{1}}',
       luecken: [{ id: '1', korrekteAntworten: ['Welt'] }],
       lueckentextModus: 'freitext',
-    }) as any
+    }) as unknown as LueckentextFrage
     expect(f.typ).toBe('lueckentext')
     expect(f.textMitLuecken).toBe('Hallo {{1}}')
     expect(f.luecken).toHaveLength(1)
@@ -46,7 +67,7 @@ describe('buildFragePreview', () => {
       typ: 'zuordnung',
       fragetext: 'Ordne zu',
       paare: [{ links: 'L', rechts: 'R' }],
-    }) as any
+    }) as unknown as ZuordnungFrage
     expect(f.typ).toBe('zuordnung')
     expect(f.paare).toHaveLength(1)
   })
@@ -56,7 +77,7 @@ describe('buildFragePreview', () => {
       typ: 'richtigfalsch',
       fragetext: 'R/F',
       aussagen: [{ id: '1', text: 'X', korrekt: true }],
-    }) as any
+    }) as unknown as RichtigFalschFrage
     expect(f.typ).toBe('richtigfalsch')
     expect(f.aussagen).toHaveLength(1)
   })
@@ -66,7 +87,7 @@ describe('buildFragePreview', () => {
       typ: 'berechnung',
       fragetext: 'Rechnung',
       ergebnisse: [{ id: '1', label: 'E', korrekt: 42, toleranz: 0 }],
-    }) as any
+    }) as unknown as BerechnungFrage
     expect(f.typ).toBe('berechnung')
     expect(f.ergebnisse).toHaveLength(1)
   })
@@ -77,7 +98,7 @@ describe('buildFragePreview', () => {
       fragetext: 'irrelevant',
       geschaeftsfall: 'GF-Text',
       buchungen: [{ id: '1', sollKonto: '1000', habenKonto: '2000', betrag: 100 }],
-    }) as any
+    }) as unknown as BuchungssatzFrage & { fragetext: string }
     expect(f.typ).toBe('buchungssatz')
     expect(f.fragetext).toBe('GF-Text')
     expect(f.geschaeftsfall).toBe('GF-Text')
@@ -90,7 +111,7 @@ describe('buildFragePreview', () => {
       fragetext: '',
       tkAufgabentext: 'TK-Aufgabe',
       tkKonten: [{ id: '1', kontonummer: '1000' }],
-    }) as any
+    }) as unknown as TKontoFrage
     expect(f.typ).toBe('tkonto')
     expect(f.aufgabentext).toBe('TK-Aufgabe')
     expect(f.konten).toHaveLength(1)
@@ -102,7 +123,7 @@ describe('buildFragePreview', () => {
       fragetext: '',
       kbAufgabentext: 'KB-Aufgabe',
       kbAufgaben: [{ id: '1', text: 'X', erwarteteAntworten: [] }],
-    }) as any
+    }) as unknown as KontenbestimmungFrage
     expect(f.typ).toBe('kontenbestimmung')
     expect(f.aufgabentext).toBe('KB-Aufgabe')
     expect(f.aufgaben).toHaveLength(1)
@@ -114,7 +135,7 @@ describe('buildFragePreview', () => {
       fragetext: '',
       biAufgabentext: 'BI-Aufgabe',
       biKontenMitSaldi: [{ kontonummer: '1000', saldo: 100 }],
-    }) as any
+    }) as unknown as BilanzERFrage
     expect(f.typ).toBe('bilanzstruktur')
     expect(f.aufgabentext).toBe('BI-Aufgabe')
     expect(f.kontenMitSaldi).toHaveLength(1)
@@ -126,7 +147,7 @@ describe('buildFragePreview', () => {
       fragetext: 'Klicke',
       bildUrl: '/img/x.png',
       hsBereiche: [{ id: '1', x: 10, y: 10, radius: 5 }],
-    }) as any
+    }) as unknown as HotspotFrage
     expect(f.typ).toBe('hotspot')
     expect(f.bildUrl).toBe('/img/x.png')
     expect(f.bereiche).toHaveLength(1)
@@ -138,7 +159,7 @@ describe('buildFragePreview', () => {
       fragetext: 'Beschrifte',
       bildUrl: '/img/x.png',
       bbBeschriftungen: [{ id: '1', text: 'A', x: 0, y: 0 }],
-    }) as any
+    }) as unknown as BildbeschriftungFrage
     expect(f.typ).toBe('bildbeschriftung')
     expect(f.bildUrl).toBe('/img/x.png')
     expect(f.beschriftungen).toHaveLength(1)
@@ -151,7 +172,7 @@ describe('buildFragePreview', () => {
       bildUrl: '/img/x.png',
       ddZielzonen: [{ id: 'z1', korrektesLabel: 'A' }],
       ddLabels: [{ id: 'l1', text: 'A' }],
-    }) as any
+    }) as unknown as DragDropBildFrage
     expect(f.typ).toBe('dragdrop_bild')
     expect(f.bildUrl).toBe('/img/x.png')
     expect(f.zielzonen).toHaveLength(1)
@@ -163,7 +184,7 @@ describe('buildFragePreview', () => {
       typ: 'sortierung',
       fragetext: 'Sortiere',
       sortElemente: ['A', 'B', 'C'],
-    }) as any
+    }) as unknown as SortierungFrage
     expect(f.typ).toBe('sortierung')
     expect(f.elemente).toEqual(['A', 'B', 'C'])
   })
@@ -174,7 +195,7 @@ describe('buildFragePreview', () => {
       fragetext: '',
       agKontext: 'Kontext',
       agTeilaufgaben: [{ id: '1', frage: 'X' }],
-    }) as any
+    }) as unknown as AufgabengruppeFrage
     expect(f.typ).toBe('aufgabengruppe')
     expect(f.kontext).toBe('Kontext')
     expect(f.teilaufgaben).toHaveLength(1)
@@ -186,7 +207,7 @@ describe('buildFragePreview', () => {
       typ: 'visualisierung',
       fragetext: 'Zeichne',
       canvasConfig: cfg,
-    }) as any
+    }) as unknown as VisualisierungFrage & { untertyp: string }
     expect(f.typ).toBe('visualisierung')
     expect(f.untertyp).toBe('frei')
     expect(f.canvasConfig).toBe(cfg)
@@ -200,7 +221,7 @@ describe('buildFragePreview', () => {
       pdfUrl: 'https://x.pdf',
       pdfBase64: '',
       pdfErlaubteWerkzeuge: ['highlighter'],
-    }) as any
+    }) as unknown as PDFFrage & { pdfErlaubteWerkzeuge: string[] }
     expect(f.typ).toBe('pdf')
     expect(f.pdfDriveFileId).toBe('abc')
     expect(f.pdfUrl).toBe('https://x.pdf')
@@ -213,7 +234,7 @@ describe('buildFragePreview', () => {
       fragetext: 'Schreibe',
       codeSprache: 'python',
       codeMusterLoesungCode: 'print("hi")',
-    }) as any
+    }) as unknown as CodeFrage & { musterloesung: string }
     expect(f.typ).toBe('code')
     expect(f.sprache).toBe('python')
     expect(f.musterloesung).toBe('print("hi")')
@@ -224,23 +245,30 @@ describe('buildFragePreview', () => {
       typ: 'formel',
       fragetext: 'Formel',
       formelKorrekteFormel: 'a^2+b^2',
-    }) as any
+    }) as unknown as FormelFrage
     expect(f.typ).toBe('formel')
     expect(f.korrekteFormel).toBe('a^2+b^2')
   })
 
   it('id default: "preview" wenn nicht übergeben', () => {
-    const f = buildFragePreview({ typ: 'mc', fragetext: 'Q' }) as any
+    const f = buildFragePreview({ typ: 'mc', fragetext: 'Q' }) as unknown as MCFrage
     expect(f.id).toBe('preview')
   })
 
   it('id explizit: durchgereicht', () => {
-    const f = buildFragePreview({ id: 'q-42', typ: 'mc', fragetext: 'Q' }) as any
+    const f = buildFragePreview({ id: 'q-42', typ: 'mc', fragetext: 'Q' }) as unknown as MCFrage
     expect(f.id).toBe('q-42')
   })
 
   it('unbekannter typ: nur basis (id, typ, fragetext)', () => {
-    const f = buildFragePreview({ typ: 'unbekannt', fragetext: 'X' }) as any
+    // Defensive: Test prüft Verhalten bei nicht-konformem `typ` (default-Branch in buildFragePreview).
+    const f = buildFragePreview({ typ: 'unbekannt', fragetext: 'X' }) as unknown as {
+      typ: string
+      fragetext: string
+      id: string
+      optionen?: unknown
+      luecken?: unknown
+    }
     expect(f.typ).toBe('unbekannt')
     expect(f.fragetext).toBe('X')
     // Keine typ-spezifischen Felder

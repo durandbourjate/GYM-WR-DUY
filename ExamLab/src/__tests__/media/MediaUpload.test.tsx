@@ -5,19 +5,19 @@ import MediaUpload from '@shared/components/MediaUpload'
 import { EditorProvider } from '@shared/editor/EditorContext'
 import type { EditorConfig, EditorServices } from '@shared/editor/types'
 
-const config: EditorConfig = {
+const config = {
   benutzer: { name: 'Test', email: 'test@x' },
   verfuegbareGefaesse: [],
   verfuegbareSemester: [],
   zeigeFiBuTypen: false,
   features: {},
-} as any
+} as unknown as EditorConfig /* Defensive: Test-Mock — leeres features-Objekt reicht für MediaUpload-Test */
 
-const services: EditorServices = {
+const services = {
   istUploadVerfuegbar: () => false,
   istKIVerfuegbar: () => false,
   uploadAnhang: vi.fn(),
-} as any
+} as unknown as EditorServices /* Defensive: Test-Mock — uploadAnhang-Signatur reicht für MediaUpload-Test */
 
 function wrap(el: ReactNode) {
   return (

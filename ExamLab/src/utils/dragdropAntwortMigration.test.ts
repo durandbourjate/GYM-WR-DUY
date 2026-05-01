@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { normalisiereDragDropAntwort } from './ueben/fragetypNormalizer'
 import type { DragDropBildFrage } from '../types/ueben/fragen'
 
-const frage: DragDropBildFrage = {
+const frage = {
   id: 'f1',
   typ: 'dragdrop_bild',
   fragetext: 'Test',
@@ -16,7 +16,7 @@ const frage: DragDropBildFrage = {
     { id: 'lid-aktiva', text: 'Aktiva' },
     { id: 'lid-passiva', text: 'Passiva' },
   ],
-} as any
+} as unknown as DragDropBildFrage /* Defensive: Test-Mock ohne fragenummer/punktzahl-Felder */
 
 describe('normalisiereDragDropAntwort', () => {
   it('Pre-Migration-Antwort: text-keyed → id-keyed', () => {
@@ -51,11 +51,11 @@ describe('normalisiereDragDropAntwort', () => {
 
   it('IDB-Restore mappt Pre-Migration-text-keyed zuordnungen auf id-keyed', () => {
     const idbAntwort = { typ: 'dragdrop_bild' as const, zuordnungen: { 'Aktiva': 'z1' } }
-    const aktuelleFrage: any = {
+    const aktuelleFrage = {
       id: 'f1', typ: 'dragdrop_bild',
       zielzonen: [{ id: 'z1', form: 'rechteck', punkte: [], korrekteLabels: ['Aktiva'] }],
       labels: [{ id: 'sid-aktiva', text: 'Aktiva' }],
-    }
+    } as unknown as DragDropBildFrage /* Defensive: Test-Mock minimal — IDB-Restore-Pfad braucht nur labels+zielzonen */
     const out = normalisiereDragDropAntwort(idbAntwort, aktuelleFrage)
     expect(out.zuordnungen).toEqual({ 'sid-aktiva': 'z1' })
   })

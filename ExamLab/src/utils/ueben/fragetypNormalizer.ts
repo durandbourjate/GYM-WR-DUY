@@ -3,7 +3,7 @@
  * Stellt sicher, dass alle erwarteten Felder vorhanden sind,
  * auch wenn das Backend unvollständige Daten liefert.
  */
-import type { Frage, TKontoFrage, KontenbestimmungFrage, BilanzERFrage, HotspotFrage, BildbeschriftungFrage, DragDropBildFrage, DragDropBildLabel, DragDropBildZielzone, LueckentextFrage } from '../../types/ueben/fragen'
+import type { Frage, TKontoFrage, KontenbestimmungFrage, BilanzERFrage, HotspotFrage, BildbeschriftungFrage, DragDropBildFrage, DragDropBildLabel, DragDropBildZielzone, LueckentextFrage, MCFrage, RichtigFalschFrage, SortierungFrage, ZuordnungFrage } from '../../types/ueben/fragen'
 import { stabilId } from '../../../../packages/shared/src/utils/stabilId'
 
 // BuchungssatzFrage-Typ aus shared fragen importieren
@@ -36,47 +36,65 @@ export function normalisiereFrageDaten(frage: Frage): Frage {
     case 'mc':
       return normalisiereMc(frage) as Frage
     case 'richtigfalsch':
-      return normalisiereRichtigFalsch(frage as any) as Frage
+      return normalisiereRichtigFalsch(frage) as Frage
     case 'sortierung':
-      return normalisiereSortierung(frage as any) as Frage
+      return normalisiereSortierung(frage) as Frage
     case 'zuordnung':
-      return normalisiereZuordnung(frage as any) as Frage
+      return normalisiereZuordnung(frage) as Frage
     default:
       return frage
   }
 }
 
-function normalisiereSortierung(f: any): any {
+// Sortierung: Backend kann elemente fehlen lassen → defensiv auf [] normalisieren.
+function normalisiereSortierung(f: SortierungFrage): SortierungFrage {
   return { ...f, elemente: Array.isArray(f.elemente) ? f.elemente : [] }
 }
 
-function normalisiereZuordnung(f: any): any {
+// Zuordnung: paare ist im Type-Vertrag required, Backend liefert es aber gelegentlich
+// nicht. linksItems/rechtsItems sind UI-Zusatzfelder die der Renderer erwartet.
+type ZuordnungUiItem = { id: string; text: string }
+type ZuordnungFrageMitUi = ZuordnungFrage & {
+  linksItems?: ZuordnungUiItem[]
+  rechtsItems?: ZuordnungUiItem[]
+}
+
+function normalisiereZuordnung(f: ZuordnungFrage): ZuordnungFrageMitUi {
   const paare = Array.isArray(f.paare) ? f.paare : []
-  const linksItems = Array.isArray(f.linksItems)
-    ? f.linksItems
-    : paare.map((p: any, i: number) => ({ id: p.id || `L${i}`, text: p.links }))
-  const rechtsItems = Array.isArray(f.rechtsItems)
-    ? f.rechtsItems
-    : paare.map((p: any, i: number) => ({ id: p.id || `R${i}`, text: p.rechts }))
+  const fMitUi = f as ZuordnungFrageMitUi
+  const linksItems: ZuordnungUiItem[] = Array.isArray(fMitUi.linksItems)
+    ? fMitUi.linksItems
+    : paare.map((p, i) => ({
+        // Defensive: Legacy-paare können id tragen (vor Core-Type-Konsolidierung)
+        id: (p as { id?: string }).id ?? `L${i}`,
+        text: p.links,
+      }))
+  const rechtsItems: ZuordnungUiItem[] = Array.isArray(fMitUi.rechtsItems)
+    ? fMitUi.rechtsItems
+    : paare.map((p, i) => ({
+        // Defensive: Legacy-paare können id tragen (vor Core-Type-Konsolidierung)
+        id: (p as { id?: string }).id ?? `R${i}`,
+        text: p.rechts,
+      }))
   return { ...f, paare, linksItems, rechtsItems }
 }
 
-function normalisiereMc(f: any): any {
+function normalisiereMc(f: MCFrage): MCFrage {
   const optionen = Array.isArray(f.optionen) ? f.optionen : []
   return {
     ...f,
-    optionen: optionen.map((o: any) => ({
+    optionen: optionen.map(o => ({
       ...o,
       korrekt: typeof o.korrekt === 'boolean' ? o.korrekt : false,
     })),
   }
 }
 
-function normalisiereRichtigFalsch(f: any): any {
+function normalisiereRichtigFalsch(f: RichtigFalschFrage): RichtigFalschFrage {
   const aussagen = Array.isArray(f.aussagen) ? f.aussagen : []
   return {
     ...f,
-    aussagen: aussagen.map((a: any) => ({
+    aussagen: aussagen.map(a => ({
       ...a,
       korrekt: typeof a.korrekt === 'boolean' ? a.korrekt : false,
     })),
@@ -227,18 +245,40 @@ function normalisiereKoordinate(wert: number | undefined): number {
   return wert
 }
 
+/**
+ * Type-Guard für Polygon-Punkt-Arrays. HotspotBereich.punkte ist im Type-Vertrag
+ * required `{x:number;y:number}[]`, aber Legacy-Backend-Daten können das Feld leer
+ * lassen oder Punkte mit fehlenden Koordinaten liefern.
+ */
+function isPunktArray(x: unknown): x is { x: number; y: number }[] {
+  return (
+    Array.isArray(x) &&
+    x.every(
+      p =>
+        p !== null &&
+        typeof p === 'object' &&
+        typeof (p as { x?: unknown }).x === 'number' &&
+        typeof (p as { y?: unknown }).y === 'number',
+    )
+  )
+}
+
 function normalisiereHotspot(f: HotspotFrage): HotspotFrage {
   return {
     ...f,
-    bereiche: Array.isArray(f.bereiche) ? f.bereiche.map(b => ({
-      id: b.id,
-      form: b.form === 'polygon' ? 'polygon' : 'rechteck',
-      punkte: Array.isArray((b as any).punkte) && (b as any).punkte.every((p: any) => typeof p?.x === 'number' && typeof p?.y === 'number')
-        ? (b as any).punkte.map((p: any) => ({ x: normalisiereKoordinate(p.x), y: normalisiereKoordinate(p.y) }))
-        : [],
-      label: b.label ?? '',
-      punktzahl: typeof (b as any).punktzahl === 'number' ? (b as any).punktzahl : 1,
-    })) : [],
+    bereiche: Array.isArray(f.bereiche) ? f.bereiche.map(b => {
+      const rohPunkte: unknown = b.punkte
+      const rohPunktzahl: unknown = b.punktzahl
+      return {
+        id: b.id,
+        form: b.form === 'polygon' ? 'polygon' : 'rechteck',
+        punkte: isPunktArray(rohPunkte)
+          ? rohPunkte.map(p => ({ x: normalisiereKoordinate(p.x), y: normalisiereKoordinate(p.y) }))
+          : [],
+        label: b.label ?? '',
+        punktzahl: typeof rohPunktzahl === 'number' ? rohPunktzahl : 1,
+      }
+    }) : [],
   }
 }
 
@@ -256,28 +296,51 @@ function normalisiereBildbeschriftung(f: BildbeschriftungFrage): Bildbeschriftun
   }
 }
 
-export function normalisiereDragDropBild(frage: any): DragDropBildFrage {
-  const labels: DragDropBildLabel[] = (frage.labels ?? []).map((l: any, i: number) => {
+/**
+ * Akzeptiert Pool-Format (string-Labels, lockeres `zielzonen`-Schema) und das konkrete
+ * `DragDropBildFrage`-Storage-Format. Strukturelle Compat über die zwei
+ * gemeinsamen Felder; alles andere wird mit Type-Guards eingelesen.
+ */
+type DragDropBildEingabe = DragDropBildFrage | {
+  id?: string
+  labels?: unknown[]
+  zielzonen?: unknown[]
+}
+
+export function normalisiereDragDropBild(frage: DragDropBildEingabe): DragDropBildFrage {
+  const labelsRoh: unknown[] = Array.isArray(frage.labels) ? frage.labels : []
+  const labels: DragDropBildLabel[] = labelsRoh.map((l, i) => {
     if (typeof l === 'string') {
-      return { id: stabilId(frage.id, l, i), text: l }
+      return { id: stabilId(frage.id ?? '', l, i), text: l }
     }
-    if (l && typeof l === 'object' && typeof l.text === 'string') {
-      return { id: l.id ?? stabilId(frage.id, l.text, i), text: l.text }
+    if (l && typeof l === 'object') {
+      const obj = l as { id?: string; text?: unknown }
+      if (typeof obj.text === 'string') {
+        return { id: obj.id ?? stabilId(frage.id ?? '', obj.text, i), text: obj.text }
+      }
     }
-    return { id: stabilId(frage.id, '', i), text: '' }
+    return { id: stabilId(frage.id ?? '', '', i), text: '' }
   })
-  const zielzonen: DragDropBildZielzone[] = (frage.zielzonen ?? []).map((z: any) => ({
-    ...z,
-    id: z.id || `zone-${Math.random().toString(36).slice(2, 8)}`,
-    form: z.form === 'polygon' ? 'polygon' : 'rechteck',
-    punkte: Array.isArray(z.punkte) && z.punkte.every((p: any) => typeof p?.x === 'number' && typeof p?.y === 'number')
-      ? z.punkte.map((p: any) => ({ x: normalisiereKoordinate(p.x), y: normalisiereKoordinate(p.y) }))
-      : [],
-    korrekteLabels: Array.isArray(z.korrekteLabels)
-      ? z.korrekteLabels.map((s: string) => String(s))
-      : [],
-  }))
-  return { ...frage, labels, zielzonen }
+  const zielzonenRoh: unknown[] = Array.isArray(frage.zielzonen) ? frage.zielzonen : []
+  const zielzonen: DragDropBildZielzone[] = zielzonenRoh.map(z => {
+    const obj = (z && typeof z === 'object' ? z : {}) as Record<string, unknown>
+    const rohPunkte = obj.punkte
+    const punkte: { x: number; y: number }[] = Array.isArray(rohPunkte)
+      && rohPunkte.every(p => p !== null && typeof p === 'object' && typeof (p as { x?: unknown }).x === 'number' && typeof (p as { y?: unknown }).y === 'number')
+      ? (rohPunkte as { x: number; y: number }[]).map(p => ({ x: normalisiereKoordinate(p.x), y: normalisiereKoordinate(p.y) }))
+      : []
+    const korrekteLabels: string[] = Array.isArray(obj.korrekteLabels)
+      ? obj.korrekteLabels.map(s => String(s))
+      : []
+    return {
+      ...obj,
+      id: typeof obj.id === 'string' && obj.id ? obj.id : `zone-${Math.random().toString(36).slice(2, 8)}`,
+      form: obj.form === 'polygon' ? 'polygon' : 'rechteck',
+      punkte,
+      korrekteLabels,
+    } as DragDropBildZielzone
+  })
+  return { ...frage, labels, zielzonen } as DragDropBildFrage
 }
 
 type DragDropBildAntwort = { typ: 'dragdrop_bild'; zuordnungen: Record<string, string> }

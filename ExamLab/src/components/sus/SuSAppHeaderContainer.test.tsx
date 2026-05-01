@@ -4,13 +4,15 @@ import { MemoryRouter } from 'react-router-dom'
 
 // --- Store-Mocks (MÜSSEN vor dem Import der Komponente stehen) ---
 vi.mock('../../store/authStore', () => ({
-  useAuthStore: (selector: any) => selector({ abmelden: vi.fn(), user: { name: 'Test SuS' } }),
+  useAuthStore: (selector: (s: { abmelden: () => void; user: { name: string } | null }) => unknown) =>
+    selector({ abmelden: vi.fn(), user: { name: 'Test SuS' } }),
 }))
 vi.mock('../../store/themeStore', () => ({
-  useThemeStore: (selector: any) => selector({ mode: 'light', toggleMode: vi.fn() }),
+  useThemeStore: (selector: (s: { mode: 'light' | 'dark'; toggleMode: () => void }) => unknown) =>
+    selector({ mode: 'light', toggleMode: vi.fn() }),
 }))
 vi.mock('../../store/fragenbankStore', () => ({
-  useFragenbankStore: (selector: any) => selector({ summaries: [] }),
+  useFragenbankStore: (selector: (s: { summaries: [] }) => unknown) => selector({ summaries: [] }),
 }))
 
 import { SuSAppHeaderContainer } from './SuSAppHeaderContainer'

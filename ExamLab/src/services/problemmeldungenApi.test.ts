@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { listeProblemmeldungen, toggleProblemmeldung } from './problemmeldungenApi'
 import * as apiClient from './apiClient'
+import type { Problemmeldung } from '../types/problemmeldung'
 
 describe('problemmeldungenApi', () => {
   beforeEach(() => vi.restoreAllMocks())
@@ -8,8 +9,7 @@ describe('problemmeldungenApi', () => {
   it('unwrappt listeProblemmeldungen-Response', async () => {
     vi.spyOn(apiClient, 'postJson').mockResolvedValue({
       success: true,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      data: [{ id: 'm1', typ: 'problem', comment: 'x' } as any],
+      data: [{ id: 'm1', typ: 'problem', comment: 'x' } as unknown as Problemmeldung /* Defensive: Test-Mock — Backend liefert ggf. Subset */],
     })
     const result = await listeProblemmeldungen('a@b.ch')
     expect(result).toHaveLength(1)

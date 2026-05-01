@@ -327,7 +327,7 @@ export default function DragDropBildEditor({ bildUrl, setBildUrl, zielzonen, set
     if (p) setMausPosition(p)
   }
 
-  const istWohlgeformt = (z: DragDropBildZielzone) => Array.isArray((z as any).punkte) && (z as any).punkte.length >= 3
+  const istWohlgeformt = (z: DragDropBildZielzone) => Array.isArray(z.punkte) && z.punkte.length >= 3
   const sichereZonen = (zielzonen ?? []).filter(istWohlgeformt)
   const anzahlAlt = (zielzonen ?? []).length - sichereZonen.length
   const zonen = sichereZonen.map(z => ({ id: z.id, punkte: z.punkte, akzent: 'violett' as const }))

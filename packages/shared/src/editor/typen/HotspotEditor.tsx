@@ -247,7 +247,7 @@ export default function HotspotEditor({ bildUrl, setBildUrl, bereiche, setBereic
   }
 
   // Defensiv: Bereiche im Alt-Format (ohne Array-punkte) nicht rendern, sondern anzeigen als Hinweis
-  const istWohlgeformt = (b: HotspotBereich) => Array.isArray((b as any).punkte) && (b as any).punkte.length >= 3
+  const istWohlgeformt = (b: HotspotBereich) => Array.isArray(b.punkte) && b.punkte.length >= 3
   const sichereBereiche = (bereiche ?? []).filter(istWohlgeformt)
   const anzahlAlt = (bereiche ?? []).length - sichereBereiche.length
   const zonen = sichereBereiche.map(b => ({ id: b.id, punkte: b.punkte, label: b.label, akzent: 'violett' as const }))

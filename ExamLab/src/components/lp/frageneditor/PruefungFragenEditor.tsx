@@ -112,7 +112,7 @@ export default function PruefungFragenEditor({ frage, onSpeichern, onAbbrechen, 
         frage={frage as unknown as SharedFrage | null}
         onSpeichern={(f, meta) => onSpeichern(f as unknown as Frage, meta)}
         onAbbrechen={onAbbrechen}
-        performance={performance as any}
+        performance={performance}
         onVorherigeFrage={onVorherigeFrage}
         onNaechsteFrage={onNaechsteFrage}
         PDFEditorComponent={PDFEditor}
@@ -153,7 +153,7 @@ export default function PruefungFragenEditor({ frage, onSpeichern, onAbbrechen, 
           )
         }}
         poolInfoSlot={({ frage: f, onSpeichern: speichern }) => {
-          const pf = f as any as Frage | null
+          const pf = f as unknown as Frage | null /* Defensive: Slot ist Core-typisiert; Body liest poolVersion (Storage-only via WithStorageBase) */
           if (!pf || pf.quelle !== 'pool' || !pf.poolId) return null
           return (
             <div className="p-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg border border-slate-200 dark:border-slate-600">
@@ -165,7 +165,7 @@ export default function PruefungFragenEditor({ frage, onSpeichern, onAbbrechen, 
                   <button
                     onClick={() => {
                       const aktualisiert = { ...pf, pruefungstauglich: !pf.pruefungstauglich, geaendertAm: new Date().toISOString() }
-                      speichern(aktualisiert as any)
+                      speichern(aktualisiert as unknown as SharedFrage /* Defensive: Storage-Frage zurueck durch Core-typisierten Slot */)
                     }}
                     className={pf.pruefungstauglich
                       ? 'px-3 py-1 text-sm bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300 rounded hover:bg-green-200 dark:hover:bg-green-900/70 cursor-pointer'
@@ -179,8 +179,8 @@ export default function PruefungFragenEditor({ frage, onSpeichern, onAbbrechen, 
               {pf.poolUpdateVerfuegbar && pf.poolVersion && (
                 <PoolUpdateVergleich
                   frage={pf}
-                  onUebernehmen={() => speichern({ ...pf, poolUpdateVerfuegbar: false, geaendertAm: new Date().toISOString() } as any)}
-                  onIgnorieren={() => speichern({ ...pf, poolUpdateVerfuegbar: false, geaendertAm: new Date().toISOString() } as any)}
+                  onUebernehmen={() => speichern({ ...pf, poolUpdateVerfuegbar: false, geaendertAm: new Date().toISOString() } as unknown as SharedFrage /* Defensive: Storage-Frage zurueck durch Core-typisierten Slot */)}
+                  onIgnorieren={() => speichern({ ...pf, poolUpdateVerfuegbar: false, geaendertAm: new Date().toISOString() } as unknown as SharedFrage /* Defensive: Storage-Frage zurueck durch Core-typisierten Slot */)}
                 />
               )}
             </div>
@@ -216,7 +216,7 @@ export default function PruefungFragenEditor({ frage, onSpeichern, onAbbrechen, 
               frage={frage}
               offen={offen}
               onSchliessen={onSchliessen}
-              onErfolg={onErfolg as any}
+              onErfolg={onErfolg as unknown as (updates: Partial<Frage>) => void /* Defensive: Slot ist Core-typisiert; RueckSyncDialog erwartet Partial<Storage.Frage> mit poolVersion (Storage-only via WithStorageBase) */}
             />
           ) : null
         )}

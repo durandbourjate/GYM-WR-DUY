@@ -1,3 +1,4 @@
+import type React from 'react'
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { DragDropBildEditor } from '@shared/index'
@@ -28,9 +29,9 @@ const baseServices: EditorServices = {
 
 function renderEditor(opts: {
   zielzonen?: DragDropBildZielzone[]
-  setZielzonen?: any
+  setZielzonen?: React.Dispatch<React.SetStateAction<DragDropBildZielzone[]>>
   labels?: DragDropBildLabel[]
-  setLabels?: any
+  setLabels?: React.Dispatch<React.SetStateAction<DragDropBildLabel[]>>
 }) {
   return render(
     <EditorProvider config={baseConfig} services={baseServices}>

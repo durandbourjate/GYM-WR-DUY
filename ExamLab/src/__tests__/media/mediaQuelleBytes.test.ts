@@ -40,7 +40,7 @@ describe('mediaQuelleZuArrayBuffer', () => {
   })
 
   it('throws bei HTTP-Fehler', async () => {
-    ;(globalThis.fetch as any).mockResolvedValueOnce({ ok: false, status: 404, statusText: 'NF' })
+    vi.mocked(globalThis.fetch).mockResolvedValueOnce({ ok: false, status: 404, statusText: 'NF' } as Response)
     await expect(
       mediaQuelleZuArrayBuffer(
         { typ: 'extern', url: 'https://x/y.pdf', mimeType: 'application/pdf' },

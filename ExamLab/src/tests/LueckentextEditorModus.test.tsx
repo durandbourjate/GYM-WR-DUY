@@ -1,15 +1,18 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import LueckentextEditor from '@shared/editor/typen/LueckentextEditor'
+import type { LueckentextFrage } from '@shared/types/fragen-core'
+
+type LueckenList = LueckentextFrage['luecken']
 
 // LueckentextEditor nutzt nur Props (kein EditorContext, kein Store) — minimaler Setup reicht.
 
 function renderEditor(overrides: {
   textMitLuecken?: string
-  luecken?: Array<{ id: string; korrekteAntworten: string[]; caseSensitive: boolean; dropdownOptionen?: string[] }>
+  luecken?: LueckenList
   lueckentextModus?: 'freitext' | 'dropdown'
   setTextMitLuecken?: (v: string) => void
-  setLuecken?: (v: any) => void
+  setLuecken?: (v: LueckenList) => void
   setLueckentextModus?: (v: 'freitext' | 'dropdown') => void
 } = {}) {
   const setTextMitLuecken = overrides.setTextMitLuecken ?? (() => {})
@@ -20,7 +23,7 @@ function renderEditor(overrides: {
       textMitLuecken={overrides.textMitLuecken ?? 'Die Hauptstadt ist {{1}}.'}
       setTextMitLuecken={setTextMitLuecken}
       luecken={overrides.luecken ?? [{ id: '1', korrekteAntworten: ['Bern'], caseSensitive: false }]}
-      setLuecken={setLuecken as any}
+      setLuecken={setLuecken}
       lueckentextModus={overrides.lueckentextModus ?? 'freitext'}
       setLueckentextModus={setLueckentextModus}
     />

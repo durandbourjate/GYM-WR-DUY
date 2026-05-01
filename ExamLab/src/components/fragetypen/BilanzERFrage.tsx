@@ -45,9 +45,9 @@ const btnRemove = 'min-h-[36px] min-w-[28px] flex items-center justify-center te
 const btnAdd = 'mt-1 min-h-[36px] flex items-center gap-1 text-xs font-medium text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 opacity-60 hover:opacity-100 transition-opacity'
 
 /* ─── Konvertierung Store ↔ Eingabe ─── */
-function zuAntwort(bilanz: BilanzEingabe | null, er: ERFeldEingabe | null) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const res: any = { typ: 'bilanzstruktur' }
+type BilanzAntwort = Extract<StoreAntwort, { typ: 'bilanzstruktur' }>
+function zuAntwort(bilanz: BilanzEingabe | null, er: ERFeldEingabe | null): BilanzAntwort {
+  const res: BilanzAntwort = { typ: 'bilanzstruktur' }
   if (bilanz) {
     const mapS = (s: SeiteEingabe) => ({ label: s.label, gruppen: s.gruppen.map(g => ({ label: g.label, konten: g.konten.map(k => ({ nr: k.nr, betrag: parseFloat(k.betrag) || 0 })) })) })
     res.bilanz = { linkeSeite: mapS(bilanz.linkeSeite), rechteSeite: mapS(bilanz.rechteSeite), bilanzsummeLinks: bilanz.bilanzsummeLinks ? parseFloat(bilanz.bilanzsummeLinks) || undefined : undefined, bilanzsummeRechts: bilanz.bilanzsummeRechts ? parseFloat(bilanz.bilanzsummeRechts) || undefined : undefined }
@@ -58,8 +58,7 @@ function zuAntwort(bilanz: BilanzEingabe | null, er: ERFeldEingabe | null) {
   return res
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type Antwort = any
+type Antwort = BilanzAntwort
 
 function vonAntwortBilanz(a?: Antwort): BilanzEingabe {
   if (!a?.bilanz) return leereBilanz()

@@ -617,8 +617,8 @@ export function ZeichnenCanvas({
         case 'ellipse': {
           const aktiver = engine.state.aktiverCommand;
           if (!aktiver || (aktiver.typ !== 'rechteck' && aktiver.typ !== 'ellipse')) break;
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          engine.addCommand({ ...aktiver, bis: punkt } as any);
+          // Defensive: Omit<DrawCommand,'id'> verteilt sich nicht über Union (rechteck | ellipse)
+          engine.addCommand({ ...aktiver, bis: punkt } as unknown as Omit<DrawCommand, 'id'>);
           break;
         }
 
