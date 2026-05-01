@@ -1,6 +1,6 @@
 import { FRAGETYP_KOMPONENTEN } from './shared/fragetypenRegistry.ts'
 import MedienPlayer from './shared/MedienPlayer.tsx'
-import type { Frage, VisualisierungFrage } from '../types/fragen-storage'
+import type { Frage } from '../types/fragen-storage'
 import type { Antwort } from '../types/antworten.ts'
 
 interface FrageRendererProps {
@@ -25,18 +25,6 @@ export default function FrageRenderer({ frage, modus = 'aufgabe', antwort }: Fra
   const medienEinbettung = frage.medienEinbettung
 
   const fragInhalt = (() => {
-    // Sonderfall: visualisierung/zeichnen — nur Untertyp 'zeichnen' ist implementiert
-    if (frage.typ === 'visualisierung') {
-      const vizFrage = frage as VisualisierungFrage
-      if (vizFrage.untertyp !== 'zeichnen') {
-        return (
-          <div className="p-6 bg-slate-100 dark:bg-slate-800 rounded-xl text-slate-500 dark:text-slate-400 text-center">
-            Visualisierungs-Untertyp «{vizFrage.untertyp}» wird in einer späteren Phase implementiert.
-          </div>
-        )
-      }
-    }
-
     const Komponente = FRAGETYP_KOMPONENTEN[frage.typ]
     if (!Komponente) {
       return (

@@ -43,7 +43,7 @@ const SUB_DEFAULTS: { [K in FrageTyp]: Omit<Extract<Frage, { typ: K }>, keyof Fr
   freitext: { fragetext: 'Test-Frage', laenge: 'kurz' } as Omit<FreitextFrage, keyof FrageBase | 'typ'>,
   zuordnung: { fragetext: 'Test-Frage', paare: [], zufallsreihenfolge: false } as Omit<ZuordnungFrage, keyof FrageBase | 'typ'>,
   lueckentext: { fragetext: 'Test-Frage', textMitLuecken: '', luecken: [], lueckentextModus: 'freitext' } as Omit<LueckentextFrage, keyof FrageBase | 'typ'>,
-  visualisierung: { fragetext: 'Test-Frage', untertyp: 'zeichnen' } as Omit<VisualisierungFrage, keyof FrageBase | 'typ'>,
+  visualisierung: { fragetext: 'Test-Frage' } as Omit<VisualisierungFrage, keyof FrageBase | 'typ'>,
   richtigfalsch: { fragetext: 'Test-Frage', aussagen: [] } as Omit<RichtigFalschFrage, keyof FrageBase | 'typ'>,
   berechnung: { fragetext: 'Test-Frage', ergebnisse: [], rechenwegErforderlich: false } as Omit<BerechnungFrage, keyof FrageBase | 'typ'>,
   buchungssatz: { geschaeftsfall: 'Test', buchungen: [], kontenauswahl: { modus: 'voll' } } as Omit<BuchungssatzFrage, keyof FrageBase | 'typ'>,

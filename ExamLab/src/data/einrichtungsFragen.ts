@@ -325,7 +325,6 @@ export const einrichtungsFragen: Frage[] = [
     quelle: 'manuell',
     autor,
     fragetext: 'Zeichnen Sie einen **Smiley** 😊 auf die Zeichenfläche unten.\n\n💡 **Aufgabe:** Testen Sie dabei mindestens **2 verschiedene Werkzeuge** aus der Werkzeugleiste (z.B. Stift, Linie, Kreis, Text, Pfeil). Probieren Sie auch verschiedene Farben aus!',
-    untertyp: 'zeichnen',
     canvasConfig: { breite: 600, hoehe: 400, koordinatensystem: false, werkzeuge: ['stift', 'linie', 'pfeil', 'text', 'rechteck', 'ellipse'] },
   },
 

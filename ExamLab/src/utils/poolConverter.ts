@@ -582,7 +582,6 @@ export function konvertierePoolFrage(
       const frage: VisualisierungFrage = {
         ...basis,
         typ: 'visualisierung',
-        untertyp: 'zeichnen',
         fragetext: poolFrage.q,
       }
       return frage

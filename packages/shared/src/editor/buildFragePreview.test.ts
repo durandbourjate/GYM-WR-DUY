@@ -201,15 +201,14 @@ describe('buildFragePreview', () => {
     expect(f.teilaufgaben).toHaveLength(1)
   })
 
-  it('visualisierung: legt untertyp=frei + canvasConfig ab', () => {
+  it('visualisierung: legt canvasConfig ab', () => {
     const cfg = { breite: 800, hoehe: 600, werkzeuge: ['stift'] }
     const f = buildFragePreview({
       typ: 'visualisierung',
       fragetext: 'Zeichne',
       canvasConfig: cfg,
-    }) as unknown as VisualisierungFrage & { untertyp: string }
+    }) as unknown as VisualisierungFrage
     expect(f.typ).toBe('visualisierung')
-    expect(f.untertyp).toBe('frei')
     expect(f.canvasConfig).toBe(cfg)
   })
 

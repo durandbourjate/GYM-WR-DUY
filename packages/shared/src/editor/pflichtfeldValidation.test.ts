@@ -315,7 +315,6 @@ describe('validierePflichtfelder — visualisierung', () => {
   it('alle erfüllt mit canvasConfig', () => {
     const r = validierePflichtfelder(mockCoreFrage('visualisierung', {
       fragetext: 'q',
-      untertyp: 'zeichnen',
       canvasConfig: { breite: 800, hoehe: 600, koordinatensystem: false, werkzeuge: ['stift'] },
     }))
     expect(r.pflichtErfuellt).toBe(true)
@@ -323,17 +322,9 @@ describe('validierePflichtfelder — visualisierung', () => {
   it('alle erfüllt mit ausgangsdiagramm', () => {
     const r = validierePflichtfelder(mockCoreFrage('visualisierung', {
       fragetext: 'q',
-      untertyp: 'diagramm-manipulieren',
       ausgangsdiagramm: { typ: 'angebot-nachfrage' },
     }))
     expect(r.pflichtErfuellt).toBe(true)
-  })
-  it('pflicht-leer ohne untertyp', () => {
-    const r = validierePflichtfelder(mockCoreFrage('visualisierung', {
-      fragetext: 'q',
-      untertyp: undefined as unknown as string /* Defensive: bewusst undefined */,
-    }))
-    expect(r.pflichtErfuellt).toBe(false)
   })
 })
 

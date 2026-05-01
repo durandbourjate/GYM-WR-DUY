@@ -448,14 +448,12 @@ function validiereBilanzstruktur(frage: BilanzERFrage): ValidationResult {
 
 function validiereVisualisierung(frage: VisualisierungFrage): ValidationResult {
   const fragetextOk = strNonEmpty(frage.fragetext)
-  const untertypOk = strNonEmpty(frage.untertyp)
   const konfigOk =
     (frage.canvasConfig && typeof frage.canvasConfig === 'object') ||
     (frage.ausgangsdiagramm && typeof frage.ausgangsdiagramm === 'object')
 
   const pflichtLeer: string[] = []
   if (!fragetextOk) pflichtLeer.push('Frage-Text')
-  if (!untertypOk) pflichtLeer.push('Untertyp')
   if (!konfigOk) pflichtLeer.push('Canvas- oder Diagramm-Konfiguration')
 
   return {
@@ -463,7 +461,6 @@ function validiereVisualisierung(frage: VisualisierungFrage): ValidationResult {
     empfohlenErfuellt: true,
     felderStatus: {
       fragetext: fragetextOk ? 'ok' : 'pflicht-leer',
-      untertyp: untertypOk ? 'ok' : 'pflicht-leer',
       konfig: konfigOk ? 'ok' : 'pflicht-leer',
     },
     pflichtLeerFelder: pflichtLeer,
