@@ -48,7 +48,7 @@ describe('bildQuelleAus', () => {
 
   it('null bei fehlender Quelle', () => {
     expect(bildQuelleAus({ bildUrl: '', bildDriveFileId: '' })).toBeNull()
-    expect(bildQuelleAus({} as any)).toBeNull()
+    expect(bildQuelleAus({})).toBeNull()
   })
 })
 

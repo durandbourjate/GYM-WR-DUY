@@ -59,7 +59,7 @@ describe('migriereHotspotBereichAlt', () => {
       id: 'b4',
       form: 'rechteck',
       koordinaten: { x: 0, y: 0, breite: 10, hoehe: 10 },
-      punkte: [{x:0,y:0},{x:1,y:1}] as any, // weniger als 3 → idempotenz-guard false
+      punkte: [{x:0,y:0},{x:1,y:1}] as unknown as { x: number; y: number }[], /* Defensive: weniger als 3 Punkte — testet idempotenz-guard false */
       label: 'X',
       punktzahl: 3,
     }
