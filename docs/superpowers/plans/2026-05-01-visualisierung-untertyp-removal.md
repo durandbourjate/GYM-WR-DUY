@@ -5,9 +5,9 @@
 **Goal:** Vaporware-Field `untertyp` aus `VisualisierungFrage` und `InlineTeilaufgabe` vollständig entfernen, inklusive zugehöriger Renderer-Gate, Validator-Pflichtcheck, Demo-Daten, Factory- und Konverter-Writes, sowie Tests die das alte Verhalten asserten.
 
 **Architecture:** Reine Refactor-Reduktion. Keine neuen Komponenten, keine Datenmigration. Reihenfolge der Tasks ist bewusst so gewählt, dass jeder Commit individuell tsc-clean ist:
-1. Erst alle Konsumenten (Validator, Renderer, Preview) entkoppeln
-2. Dann alle Writer (Factory, Demo-Daten, Pool-Konverter, Mock)
-3. Zum Schluss das Type-Field selbst — Cascade-tsc dann no-op
+1. Erst alle Konsumenten (Validator, Renderer, Preview) entkoppeln (Phase 1, 3 unabhängige Commits)
+2. Dann Writer + Type-Field als atomares Bundle (Phase 2, 1 Commit) — diese müssen zwingend zusammen, weil weder Writer-First noch Type-First ohne tsc-Errors möglich ist
+3. Voll-Verifikation, Staging-Deploy, Browser-E2E, Merge (Phasen 3-5)
 
 **Tech Stack:** TypeScript 5.x, React 19, Vite 5.x, Vitest 4.x, Tailwind CSS v4 (UI), Zustand (State), CodeMirror/Tiptap (Editor) — keine neuen Dependencies.
 
@@ -73,6 +73,8 @@
 ## Phase 1 — Frontend-Konsumenten entkoppeln
 
 Drei unabhängige Teil-Refactors. Reihenfolge zwischen ihnen ist beliebig, wichtig ist nur dass alle 3 vor Phase 2 durch sind.
+
+**Hinweis Vitest-Isolation:** Pro Task läuft `vitest run` nur auf dem Test-File des jeweiligen Tasks. Es gibt keine versteckten Cross-Task-Test-Abhängigkeiten — kein Test-File ruft fremde Editor-Pfade indirekt auf, die in den anderen Tasks geändert werden.
 
 ### Task 1.1: Validator-Pflichtcheck entfernen
 
@@ -205,15 +207,21 @@ Drei unabhängige Teil-Refactors. Reihenfolge zwischen ihnen ist beliebig, wicht
 
 ---
 
-## Phase 2 — Writer säubern
+## Phase 2 — Writers + Type-Field als atomares Bundle
 
-Mit den Konsumenten aus Phase 1 weg, schreiben jetzt nur noch ein paar Stellen in das Feld. Alle in dieser Phase.
+**Warum ein Commit:** VisualisierungFrage hat `untertyp` derzeit als Pflicht-Field. Sobald wir es in Mock/Demo-Daten/Pool-Konverter weglassen, wirft tsc „untertyp fehlt"-Errors. Sobald wir umgekehrt nur das Type-Field entfernen aber die Writer noch setzen, wirft tsc „excess property"-Errors. Beide Reihenfolgen sind nicht commit-isoliert tsc-clean. Daher: alle 5 Edits in einem einzigen Commit.
 
-### Task 2.1: Factory + Mock
+(Factory-Body, Mock, Demo-Daten 1+2, Pool-Konverter, Type-Field — die Factory-Input-Type-Änderung ist als Optional-Property-Removal isoliert tsc-clean, wird trotzdem im Bundle mitgezogen.)
+
+### Task 2.1: Writer + Type Bundle
 
 **Files:**
 - Modify: `packages/shared/src/editor/fragenFactory.ts:71, 205-213`
 - Modify: `packages/shared/src/test-helpers/frageCoreMocks.ts:46`
+- Modify: `ExamLab/src/data/einrichtungsFragen.ts:328`
+- Modify: `ExamLab/src/data/einrichtungsUebungFragen.ts:607`
+- Modify: `ExamLab/src/utils/poolConverter.ts:585`
+- Modify: `packages/shared/src/types/fragen-core.ts:173, 455-456`
 
 - [ ] **Step 1: fragenFactory.ts Input-Type anpassen**
 
@@ -248,72 +256,25 @@ Mit den Konsumenten aus Phase 1 weg, schreiben jetzt nur noch ein paar Stellen i
 
    (Property `untertyp: 'zeichnen'` weg.)
 
-- [ ] **Step 4: tsc verifizieren**
+- [ ] **Step 4: Demo-Daten bereinigen**
 
-   ```bash
-   cd ExamLab && npx tsc -b
-   ```
+   In beiden Files die jeweilige Zeile `untertyp: 'zeichnen',` komplett (inkl. Komma) entfernen:
+   - `ExamLab/src/data/einrichtungsFragen.ts:328`
+   - `ExamLab/src/data/einrichtungsUebungFragen.ts:607`
 
-   Erwartet: tsc clean. Achtung: VisualisierungFrage hat in dieser Phase noch das `untertyp`-Field. tsc sollte trotzdem grün sein, weil der Mock den `Omit`-Cast verwendet und das Field optional ist im `Omit`-Result (oder TypeScript es nicht als zwingend-fehlend flaggt — Frage-Type-Vertrag ist Pflicht-Field, aber das `as`-Cast bypasst). Falls tsc hier doch flaggt, im Mock vorübergehend `untertyp: 'zeichnen' as never` oder `untertyp: undefined as unknown as 'zeichnen'` einsetzen — wird in Task 3.1 sowieso obsolet.
+- [ ] **Step 5: Pool-Konverter bereinigen**
 
-- [ ] **Step 5: Commit**
+   In `ExamLab/src/utils/poolConverter.ts:585` die Zeile `untertyp: 'zeichnen',` komplett (inkl. Komma) entfernen.
 
-   ```bash
-   git add packages/shared/src/editor/fragenFactory.ts packages/shared/src/test-helpers/frageCoreMocks.ts
-   git commit -m "Visualisierung untertyp: Factory-Input + Mock bereinigen"
-   ```
+- [ ] **Step 6: VisualisierungFrage-Interface bereinigen**
 
-### Task 2.2: Demo-Daten + Pool-Konverter
-
-**Files:**
-- Modify: `ExamLab/src/data/einrichtungsFragen.ts:328`
-- Modify: `ExamLab/src/data/einrichtungsUebungFragen.ts:607`
-- Modify: `ExamLab/src/utils/poolConverter.ts:585`
-
-- [ ] **Step 1: Demo-Daten und Pool-Konverter bereinigen**
-
-   In allen 3 Files die jeweilige Zeile `untertyp: 'zeichnen',` entfernen:
-
-   - `ExamLab/src/data/einrichtungsFragen.ts:328` — komplette Zeile inkl. Komma weg
-   - `ExamLab/src/data/einrichtungsUebungFragen.ts:607` — komplette Zeile inkl. Komma weg
-   - `ExamLab/src/utils/poolConverter.ts:585` — komplette Zeile inkl. Komma weg
-
-- [ ] **Step 2: tsc verifizieren**
-
-   ```bash
-   cd ExamLab && npx tsc -b
-   ```
-
-   Erwartet: tsc clean. Wenn nicht: VisualisierungFrage hat in dieser Phase noch `untertyp` als Pflicht-Field, und `einrichtungsFragen.ts`/`einrichtungsUebungFragen.ts` sind explizit als `VisualisierungFrage` typisiert. tsc würde dann „untertyp fehlt"-Errors werfen. In dem Fall: diese Tasks 2.1+2.2 bündeln mit Task 3.1 in einem einzigen Commit, denn Type-Refactor und Writer-Cleanup hängen voneinander ab.
-
-   **Implementer-Hinweis:** Wenn Step 2 hier rote Errors wirft, einfach weitermachen zu Task 3.1 — der Type-Cleanup räumt sie auf. Dann am Ende von Task 3.1 EINEN gemeinsamen Commit für Tasks 2.1+2.2+3.1 machen statt drei einzelne. Anpassung der Commit-Sequenz, sonst sauberer Plan.
-
-- [ ] **Step 3: Commit (falls Step 2 grün)**
-
-   ```bash
-   git add ExamLab/src/data/einrichtungsFragen.ts ExamLab/src/data/einrichtungsUebungFragen.ts ExamLab/src/utils/poolConverter.ts
-   git commit -m "Visualisierung untertyp: Demo-Daten + Pool-Konverter bereinigen"
-   ```
-
----
-
-## Phase 3 — Type-Field entfernen
-
-### Task 3.1: VisualisierungFrage + InlineTeilaufgabe Interface bereinigen
-
-**Files:**
-- Modify: `packages/shared/src/types/fragen-core.ts:171-178`
-- Modify: `packages/shared/src/types/fragen-core.ts:454-462`
-
-- [ ] **Step 1: VisualisierungFrage-Interface bereinigen**
-
-   In `packages/shared/src/types/fragen-core.ts:171-178`, die Zeile 173 entfernen:
+   In `packages/shared/src/types/fragen-core.ts:173` die Zeile entfernen:
 
    ```ts
    untertyp: 'zeichnen' | 'diagramm-manipulieren' | 'schema-erstellen';
    ```
 
-   Resultierendes Interface:
+   Resultierendes Interface (Z. 171-177 nach Edit):
 
    ```ts
    export interface VisualisierungFrage extends FrageBase {
@@ -325,38 +286,32 @@ Mit den Konsumenten aus Phase 1 weg, schreiben jetzt nur noch ein paar Stellen i
    }
    ```
 
-- [ ] **Step 2: InlineTeilaufgabe.untertyp entfernen**
+- [ ] **Step 7: InlineTeilaufgabe.untertyp entfernen**
 
-   In `packages/shared/src/types/fragen-core.ts:454-462`, die Zeile 456 entfernen:
+   In `packages/shared/src/types/fragen-core.ts:454-462` die Zeile 456 (`untertyp?: string`) entfernen. Auch die `// Visualisierung/Zeichnen`-Comment-Zeile direkt darüber (Z. 455) mit weg — referenziert nach Cleanup nur noch zwei selbsterklärende Felder.
 
-   ```ts
-     untertyp?: string
-   ```
-
-   Auch die `// Visualisierung/Zeichnen`-Comment-Zeile direkt darüber (Z. 455) entfernen, weil sie nach diesem Cleanup nur noch auf die zwei verbliebenen Felder `canvasConfig` und `musterloesungBild` zeigt — Comment sollte beide referenzieren oder weg. Empfehlung: weg, redundant da Field-Namen selbsterklärend sind.
-
-- [ ] **Step 3: tsc -b verifizieren**
+- [ ] **Step 8: tsc -b verifizieren**
 
    ```bash
    cd ExamLab && npx tsc -b
    ```
 
-   Erwartet: tsc clean (kein Konsument liest mehr `frage.untertyp` für Visualisierung dank Phase 1+2).
+   Erwartet: tsc clean (alle Konsumenten in Phase 1 entkoppelt, alle Writer in diesem Bundle bereinigt, Type-Field passt zum neuen Stand).
 
-   **Falls tsc Errors wirft, die NICHT zu den in der Spec gelisteten 11 Files gehören:** Stopp — neue Konsumenten gefunden, die im Audit (Spec rev2) nicht erfasst waren. Dem User melden, Spec aktualisieren, ob im Plan zu adressieren oder als separate Story.
+   **Falls tsc Errors wirft, die NICHT zu den in der Spec gelisteten 11 Files gehören:** STOPP — neue Konsumenten gefunden, die im Audit (Spec rev2) nicht erfasst waren. Dem User melden, Spec aktualisieren, entscheiden ob im Plan zu adressieren oder als separate Story.
 
-- [ ] **Step 4: Commit**
+- [ ] **Step 9: Commit (gebündelt)**
 
    ```bash
-   git add packages/shared/src/types/fragen-core.ts
-   git commit -m "Visualisierung untertyp: Type-Field aus VisualisierungFrage + InlineTeilaufgabe entfernen"
+   git add packages/shared/src/editor/fragenFactory.ts packages/shared/src/test-helpers/frageCoreMocks.ts ExamLab/src/data/einrichtungsFragen.ts ExamLab/src/data/einrichtungsUebungFragen.ts ExamLab/src/utils/poolConverter.ts packages/shared/src/types/fragen-core.ts
+   git commit -m "Visualisierung untertyp: Writer-Cleanup + Type-Field entfernt (Bundle)"
    ```
 
 ---
 
-## Phase 4 — Voll-Verifikation
+## Phase 3 — Voll-Verifikation
 
-### Task 4.1: Alle Gates lokal grün
+### Task 3.1: Alle Gates lokal grün
 
 **Files:** Keine. Reine Verifikation.
 
@@ -374,7 +329,7 @@ Mit den Konsumenten aus Phase 1 weg, schreiben jetzt nur noch ein paar Stellen i
    cd ExamLab && npx vitest run
    ```
 
-   Erwartet: Alle Tests grün, ein Test weniger als vorher (`'pflicht-leer ohne untertyp'` ist jetzt entfernt). Erwartet: 1126 passes (oder 1125 falls .todo unverändert).
+   Erwartet: **1125 passes** (1126 vor Refactor minus dem entfernten `'pflicht-leer ohne untertyp'`-Test). 4 .todo unverändert.
 
 - [ ] **Step 3: Vite-Build**
 
@@ -394,13 +349,13 @@ Mit den Konsumenten aus Phase 1 weg, schreiben jetzt nur noch ein paar Stellen i
 
 - [ ] **Step 5: User-Status-Update**
 
-   Dem User melden: Phase 4 grün, bereit für Staging-Deploy.
+   Dem User melden: Phase 3 grün, bereit für Staging-Deploy.
 
 ---
 
-## Phase 5 — Staging-Deploy + Browser-E2E
+## Phase 4 — Staging-Deploy + Browser-E2E
 
-### Task 5.1: Force-Push auf preview
+### Task 4.1: Force-Push auf preview
 
 **Files:** Keine, Git-Operation.
 
@@ -438,7 +393,7 @@ Mit den Konsumenten aus Phase 1 weg, schreiben jetzt nur noch ein paar Stellen i
 
    Background-Job mit `run_in_background: true` und Timeout 300000ms (5 min, üblicher GitHub-Actions-Run).
 
-### Task 5.2: Browser-E2E mit echten Logins
+### Task 4.2: Browser-E2E mit echten Logins
 
 **Files:** Keine. Browser-Test mit Chrome-MCP.
 
@@ -472,12 +427,12 @@ User loggt manuell ein, danach „kannst loslegen" o.ä.
 
 - [ ] **Test E2E-3: SuS-Üben Visualisierungs-Frage rendern**
 
-   1. Tab 2 (SuS) → Üben-Tab → Thema mit Visualisierungs-Frage öffnen (oder Mix-Übung)
-   2. Bis zur Visualisierungs-Frage navigieren (oder Filter „Typ" falls vorhanden)
+   1. Tab 2 (SuS) → Üben-Tab → „Einrichtungs-Übung" (oder „Einführungs-Übung") starten — diese enthält die `einrichtungsUebungFragen.ts:606-608` Smiley-Zeichnen-Frage als bekannte Visualisierungs-Frage
+   2. Bis zur Smiley-Frage navigieren (Frage-Text beginnt mit „**Zeichenübung:** Zeichnen Sie einen **Smiley** 😊")
    
-   **Erwartet:** Canvas erscheint, Werkzeuge funktionieren. **KEIN „wird in einer späteren Phase implementiert"-Platzhalter.**
+   **Erwartet:** Canvas erscheint, Stift-/Farbe-Werkzeuge funktionieren. **KEIN „wird in einer späteren Phase implementiert"-Platzhalter.**
    
-   **Failure-Mode:** Platzhalter erscheint → Renderer-Gate nicht sauber entfernt.
+   **Failure-Mode:** Platzhalter erscheint → Renderer-Gate nicht sauber entfernt. Falls die Einrichtungs-Übung im aktuellen SuS-Setup nicht verfügbar ist: alternativ via LP-Tab eine bestehende Visualisierungs-Frage in die Fragensammlung schalten und im SuS-Tab über Filter aufrufen.
 
 - [ ] **Test E2E-4: Konsole + Network sauber**
 
@@ -494,9 +449,9 @@ User loggt manuell ein, danach „kannst loslegen" o.ä.
 
 ---
 
-## Phase 6 — Merge auf main
+## Phase 5 — Merge auf main
 
-### Task 6.1: Merge + Push + Cleanup
+### Task 5.1: Merge + Push + Cleanup
 
 **Files:** Keine, Git-Operation.
 
@@ -533,7 +488,7 @@ User loggt manuell ein, danach „kannst loslegen" o.ä.
    git push origin --delete refactor/visualisierung-untertyp-drift
    ```
 
-### Task 6.2: HANDOFF.md aktualisieren
+### Task 5.2: HANDOFF.md aktualisieren
 
 **Files:**
 - Modify: `ExamLab/HANDOFF.md` (Top-Section)
@@ -558,7 +513,7 @@ User loggt manuell ein, danach „kannst loslegen" o.ä.
    git push origin main
    ```
 
-### Task 6.3: Memory-File anlegen
+### Task 5.3: Memory-File anlegen
 
 **Files:**
 - Create: `/Users/durandbourjate/.claude/projects/-Users-durandbourjate-Documents--Gym-Hofwil-00-Automatisierung-Unterricht/memory/project_visualisierung_untertyp_removal.md`
@@ -580,9 +535,9 @@ User loggt manuell ein, danach „kannst loslegen" o.ä.
 
 ---
 
-## Phase 7 — Code-Quality.md Lehre eintragen (optional, kann auch separat)
+## Phase 6 — Code-Quality.md Lehre eintragen (optional, kann auch separat)
 
-### Task 7.1: code-quality.md ergänzen
+### Task 6.1: code-quality.md ergänzen
 
 **Files:**
 - Modify: `.claude/rules/code-quality.md` (Repo, nicht Memory)
@@ -628,4 +583,4 @@ Diese Punkte aus der Spec werden in diesem Plan **nicht** adressiert:
 - **`ausgangsdiagramm`-Field + `DiagrammConfig`-Type** — Folge-Cleanup
 - **PDF/Code Validator-Compat-Casts** — separater PR
 
-Falls der Implementer Spawn-Task-Chips dafür anlegen will: am Ende von Phase 6 ist der natürliche Zeitpunkt.
+Falls der Implementer Spawn-Task-Chips dafür anlegen will: am Ende von Phase 5 ist der natürliche Zeitpunkt.
