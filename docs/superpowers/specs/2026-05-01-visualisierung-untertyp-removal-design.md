@@ -48,10 +48,12 @@ User-Bestätigung (Brainstorming, 2026-05-01): Freihand-Zeichnen ist die einzige
 
 ## Scope
 
-8 Dateien, geschätzt 10-20 Zeilen entfernt insgesamt.
+11 Dateien (Frontend/Shared), geschätzt 20-30 Zeilen entfernt insgesamt. Apps-Script-Backend bleibt unangetastet (siehe „Out of Scope").
 
 ### 1. Type-Definition
-**`packages/shared/src/types/fragen-core.ts:171-174`** — `untertyp`-Property aus `VisualisierungFrage`-Interface entfernen.
+**`packages/shared/src/types/fragen-core.ts`**:
+- Z. 173 — `untertyp`-Property aus `VisualisierungFrage`-Interface entfernen
+- Z. 456 — `untertyp?: string` aus `InlineTeilaufgabe`-Interface entfernen (war Visualisierung-Sub-Aufgaben in Aufgabengruppen, wird von `inlineTeilaufgabeAlsFrage` in `ExamLab/src/utils/fragenResolver.ts:59` ohnehin nicht propagiert — toter Field-Slot, der konsistent mitfällt)
 
 ### 2. Validator
 **`packages/shared/src/editor/pflichtfeldValidation.ts:449-472`** — `validiereVisualisierung`:
@@ -61,7 +63,12 @@ User-Bestätigung (Brainstorming, 2026-05-01): Freihand-Zeichnen ist die einzige
 Verbleibende Pflichtfelder: `fragetext`, `konfig` (canvasConfig OR ausgangsdiagramm).
 
 ### 3. Validator-Test
-**`packages/shared/src/editor/pflichtfeldValidation.test.ts:326`** — Test-Mock-Frage mit `untertyp: 'diagramm-manipulieren'` umstellen oder entfernen, je nachdem was die Test-Aussage prüft (vor Edit lesen). Wenn der Test gegen die alte untertyp-Pflicht prüft, kompletten Test entfernen.
+**`packages/shared/src/editor/pflichtfeldValidation.test.ts`** — `describe('— visualisierung')`-Block hat **drei** untertyp-Stellen, je unterschiedliche Behandlung:
+- Z. 318 (`'OK mit fragetext + untertyp + canvasConfig'`): `untertyp: 'zeichnen'`-Property aus Mock entfernen, Test bleibt (prüft nur dass Pflicht-Check passiert wenn fragetext+canvasConfig gesetzt sind)
+- Z. 326 (`'pflicht-leer ohne fragetext'` o.ä.): `untertyp: 'diagramm-manipulieren'`-Property aus Mock entfernen, Test bleibt (prüft fragetext-Pflicht)
+- Z. 331-336 (`it('pflicht-leer ohne untertyp', ...)`): **kompletten Test entfernen**, ist nach Refactor obsolet (untertyp ist kein Pflichtfeld mehr).
+
+Kein Ersatz-Test für „pflicht-leer ohne fragetext/konfig" nötig — beide existierten schon vor diesem Refactor.
 
 ### 4. Factory
 **`packages/shared/src/editor/fragenFactory.ts:71, 209`**:
@@ -112,13 +119,23 @@ const fragInhalt = (() => {
   return <Komponente frage={frage} modus={modus} antwort={antwort ?? null} />
 })()
 ```
-`VisualisierungFrage`-Import wird obsolet; entfernen.
+`VisualisierungFrage`-Import wird obsolet; entfernen. Der `(frage as { typ: string }).typ`-Cast ist bewusster TypeScript-Bridging-Pattern für den `FRAGETYP_KOMPONENTEN`-Index-Lookup-Fallback und existiert in identischer Form bereits — beim Edit 1:1 übernehmen.
+
+### 9. Demo-Daten
+Zwei Production-Daten-Files erzeugen `VisualisierungFrage`-Objekte als Object-Literal mit explizitem `untertyp: 'zeichnen'` (nicht über die Factory). tsc würde nach Type-Refactor crashen — Field-Zeile entfernen:
+- **`ExamLab/src/data/einrichtungsFragen.ts:328`** — `untertyp: 'zeichnen',` Zeile entfernen
+- **`ExamLab/src/data/einrichtungsUebungFragen.ts:607`** — `untertyp: 'zeichnen',` Zeile entfernen
+
+### 10. Pool-Konverter
+**`ExamLab/src/utils/poolConverter.ts:585`** — Konverter schreibt `untertyp: 'zeichnen'` in eine `VisualisierungFrage`-Form. Field-Zeile entfernen.
+
+### 11. (`InlineTeilaufgabe.untertyp` siehe Abschnitt 1, derselbe File)
 
 ## Datenmigration
 
 **Keine.** Storage-Daten bleiben intakt:
 - Old fragen mit `untertyp: 'zeichnen'` behalten das Feld in Storage. TypeScript ignoriert es nach dem Refactor (kein Read-Pfad mehr). Render-Verhalten unverändert (würde sowieso Komponente rendern).
-- Old fragen mit `untertyp: 'diagramm-manipulieren'` oder `'schema-erstellen'`: extrem unwahrscheinlich (speichereJetzt schrieb nie, nur Factory mit explizitem Input). Falls vorhanden, würde der Renderer sie jetzt als Freihand-Zeichnen-Komponente rendern statt Platzhalter — was inhaltlich vermutlich passt, weil `canvasConfig` bei beiden gleich strukturiert wäre. Falls Daten-Inkonsistenz auftauchen würde: separate Story.
+- Old fragen mit `untertyp: 'diagramm-manipulieren'` oder `'schema-erstellen'`: erwartet 0. Vor Merge muss der Implementer eine **Apps-Script-Daten-Audit-Query** im Backend laufen lassen (z.B. `runQuery_('SELECT * WHERE typDaten LIKE \"%diagramm-manipulieren%\" OR typDaten LIKE \"%schema-erstellen%\"')` oder Sheet-Spalten-Filter). Falls Treffer existieren: separate Folge-Migration ODER inhaltliche Klärung mit User vor Refactor-Merge. Falls 0 Treffer: Refactor sicher.
 
 ## Test-Plan
 
@@ -147,8 +164,10 @@ Refactor ändert KEINE Datenflüsse zum Backend, KEINE Privacy-Invarianten. `ber
 
 ## Out of Scope
 
-- macOS-Duplikate (`fragen-core 2.ts`, `pflichtfeldValidation 2.ts` etc.) — separater Cleanup, separate PR.
-- Cleanup der Validator-Compat-Casts für Storage-Legacy in `pflichtfeldValidation.ts` (PDF + Code) — separat, sobald Storage-Daten-Audit abgeschlossen.
+- **Apps-Script Backend-Writer (4 Stellen).** `apps-script-code.js:2996, 4071, 9624` und `apps-script-lernen/lernplattform-backend.js:915` schreiben weiterhin `untertyp: typDaten.untertyp || row.untertyp || 'zeichnen'` ins Sheet. Nach Frontend-Refactor sind das harmlose Legacy-Writer (Frontend liefert kein `untertyp` mehr → Default `'zeichnen'` wandert in Storage als Phantom-Field). Storage-Schema bleibt rückwärts-kompatibel, Frontend ignoriert das Feld. Optional in einer späteren Apps-Script-Cleanup-Welle entfernen.
+- **macOS-Duplikate** (`fragen-core 2.ts`, `pflichtfeldValidation 2.ts`, `buildFragePreview.test 2.ts` etc.) — werden in diesem Branch **explizit nicht angefasst**, auch wenn sie ebenfalls `untertyp` enthalten. Separater Cleanup-PR (siehe Workflow-Memory: „Duplikat-Dateien regelmässig aufräumen").
+- **Cleanup der Validator-Compat-Casts für Storage-Legacy** in `pflichtfeldValidation.ts` (PDF + Code) — separat, sobald Storage-Daten-Audit abgeschlossen.
+- **`ausgangsdiagramm`-Field auf `VisualisierungFrage`** (`fragen-core.ts:175`) und der `DiagrammConfig`-Type sind ohne `untertyp` semantisch tot — kein Renderer existiert. Auch der `frage.ausgangsdiagramm`-Fallback in `validiereVisualisierung` (Z. 454) wird obsolet, sobald `ausgangsdiagramm` weg ist. Nicht in diesem Bundle, aber als künftiger Cleanup notiert. Ist heute harmless dead-code.
 - `as any`-Audit oder andere Refactor-Bundles.
 
 ## Verifikations-Workflow
