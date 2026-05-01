@@ -293,3 +293,39 @@ return <FormularMit {...konfig} onChange={update} />
 ```
 
 **Test-Abdeckung:** vitest mit instant-resolving Mocks beim ersten Render deckt diesen Bug nicht ab — der zweite Render passiert nie ohne Re-Trigger. Staging-Test mit echtem async-Fetch ist der einzige reliable Detektor. Für neue Settings-Komponenten mit async-Load: explizit einen Test mit `act(() => advance)` der State-Transition sauber provoziert.
+
+## Vaporware-Type-Union-Werte vermeiden (Visualisierung untertyp, 01.05.2026)
+
+**Problem:** Type-Union-Werte für noch-nicht-implementierte Modi vorab in der Type-Definition platzieren führt zu Architektur-Drift über Monate:
+
+- Validator wird auf Pflicht-Check getrimmt → Schreiber muss Sentinel liefern → Compat-Cast nötig
+- Renderer wächst Gate-Code für unimplementierte Pfade
+- Storage-Vertrag wird nicht eingehalten (`speichereJetzt` ignoriert die Pflicht)
+- Cleanup zieht 11 Stellen über mehrere Files
+
+**Konkret aufgetreten:** `VisualisierungFrage.untertyp = 'zeichnen' | 'diagramm-manipulieren' | 'schema-erstellen'` — nur `'zeichnen'` real implementiert, andere 2 nie gebaut. `buildFragePreview` schummelte einen `'frei'`-Sentinel rein um den Validator-non-empty-Check zu erfüllen — dieser Wert war nicht mal in der Type-Union. Renderer hatte ein „wird in einer späteren Phase implementiert"-Gate. `speichereJetzt` schrieb das Field nie. Cleanup brauchte 5 Commits über 11 Files.
+
+**Regel:** Type-Union-Werte für noch-nicht-implementierte Modi NICHT in der Type-Definition vorab platzieren. Stattdessen:
+
+- Solange nur 1 Modus existiert: gar kein Discriminator-Feld
+- Wenn ≥2 Modi geplant aber noch nicht alle gebaut: Type-Union mit nur den **realisierten** Werten; ergänze später im selben PR wie die Implementation
+
+Antimuster: Type-Union-Werte als TODO-Liste im Schema statt als Backlog-Ticket. **Schemas sind keine Roadmap.**
+
+## TS-Field-Removal in Discriminated-Union braucht atomic-bundle Commit (Visualisierung untertyp, 01.05.2026)
+
+**Problem:** Bei einem Field das in mehreren Writer-Stellen gesetzt wird UND aus dem Type entfernt werden soll, ist weder Writer-First noch Type-First commit-isoliert tsc-clean:
+
+- **Writer-First:** Writer schreiben ein Field das im Type fehlt → "missing required" / excess-property
+- **Type-First:** Type fehlt das Field, Writer schreiben es noch → excess-property errors
+
+**Konkret aufgetreten (Visualisierung-untertyp-Removal):** 5 Writer (Factory, Mock, 2 Demo-Daten-Files, Pool-Konverter) + Type-Definition. Erste Plan-Version trennte sie in Phase 2 + Phase 3 — Reviewer fing das ab und schlug Bundling vor.
+
+**Lösung:**
+
+1. Konsumenten erst entkoppeln (Reader, Validator, Gates) in eigenen tsc-clean Commits — Phase 1
+2. Writer + Type-Field als atomares Bundle in EINEM Commit — Phase 2
+
+**Regel:** Bei Field-Removal in Discriminated-Union immer Plan strukturieren als „Konsumenten-Entkopplung (n Commits) + Writer+Type-Bundle (1 Commit)". Plan-Reviewer fängt es auch mit, wenn die Bundling-Entscheidung explizit dokumentiert ist (Plan rev2 nach Reviewer-Round).
+
+**Verwandtes Pattern:** Validator-Dual-Reads (Defensive-Compat-Cast für Legacy-Aliases) erlauben graduelle Migration — siehe Bundle L.b/L.c Lehre. Aber bei vollem Field-Removal aus dem Type ist Bundling unausweichlich.
