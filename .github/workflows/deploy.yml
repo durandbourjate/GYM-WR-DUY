@@ -97,6 +97,11 @@ jobs:
         working-directory: preview-src/ExamLab
         run: npm ci
 
+      - name: Audit `any` Use (Bundle L Gate, staging)
+        if: steps.checkout-preview.outcome == 'success'
+        working-directory: preview-src/ExamLab
+        run: npm run lint:as-any
+
       - name: Build Staging (ExamLab from preview)
         if: steps.checkout-preview.outcome == 'success'
         working-directory: preview-src/ExamLab

@@ -27,8 +27,7 @@ SOURCES=(ExamLab/src packages/shared/src)
 # Alle Treffer (`as any` oder `: any` als Token), ohne Kommentar-Zeilen
 # und ohne String-Literal-Wrapping.
 RAW_HITS=$(grep -rEn '\bas any\b|: any\b|= any\b' "${SOURCES[@]}" 2>/dev/null | \
-  grep -vE '^[^:]+:[0-9]+:\s*//' | \
-  grep -vE '^[^:]+:[0-9]+:\s*\*' | \
+  grep -vE '^[^:]+:[0-9]+:\s*(//|/\*|\*)' | \
   grep -vE "['\"]as any['\"]" || true)
 
 TOTAL=$(echo "$RAW_HITS" | grep -c . || true)
