@@ -6567,6 +6567,10 @@ function getOrCreateKorrekturSheet(pruefungId) {
 function setKorrekturStatus(sheet, status, erledigt, gesamt) {
   sheet.getRange('Z1').setValue(JSON.stringify({ status, erledigt, gesamt, timestamp: new Date().toISOString() }));
   // Bundle G.d.1 — Cache-Invalidierung. pruefungId aus Sheet-Name 'Korrektur_<id>' extrahieren.
+  // Aufruf-Kadenz pro batchKorrektur-Run: 1× 'laeuft' (start), N× 'laeuft' alle 10 erledigte
+  // Antworten, 1× 'fertig'/'fehler' am Ende — typisch 3-5 Invalidierungen pro Batch.
+  // Akzeptabel: jeder Cache-Miss kostet ~1 Sheet-Read; LP-Frontend pollt Status alle 3s,
+  // Cache-Hit-Rate bleibt während Aktiv-Phase ohnehin niedrig.
   try {
     var name = sheet.getName();
     if (name && name.indexOf('Korrektur_') === 0) {

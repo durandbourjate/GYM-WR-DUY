@@ -177,8 +177,10 @@ export default function App() {
               console.log('[App] Prüfung wurde zurückgesetzt (durchfuehrungId geändert). State wird gelöscht.')
               usePruefungStore.getState().zuruecksetzen()
               try { localStorage.removeItem(`pruefung-state-${pruefungIdAusUrl}`) } catch { /* ignore */ }
-              clearIndexedDB(pruefungIdAusUrl).catch(() => {})
-              clearQueue().catch(() => {})
+              // tx.oncomplete-await: Race zwischen IDB-Clear und nachfolgendem
+              // Auto-Save (Heartbeat in Layout/Timer) verhindern (S150-Lehre).
+              await clearIndexedDB(pruefungIdAusUrl)
+              await clearQueue()
               setWurdeZurueckgesetzt(true)
             }
 

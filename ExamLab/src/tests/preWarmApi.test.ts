@@ -92,6 +92,23 @@ describe('preWarmKorrektur', () => {
     await expect(preWarmKorrektur('p123', 'lp@gymhofwil.ch')).resolves.toBeUndefined()
   })
 
+  it('schluckt Network-Error silent', async () => {
+    postJsonMock.mockRejectedValueOnce(new Error('network'))
+    const { preWarmKorrektur } = await import('../services/preWarmApi')
+    await expect(preWarmKorrektur('p123', 'lp@gymhofwil.ch')).resolves.toBeUndefined()
+  })
+
+  it('reicht expliziten sessionToken durch (LP-Context: leer = okay)', async () => {
+    postJsonMock.mockResolvedValueOnce({ success: true })
+    const { preWarmKorrektur } = await import('../services/preWarmApi')
+    await preWarmKorrektur('p123', 'lp@gymhofwil.ch', undefined, 'tok-lp-99')
+    expect(postJsonMock).toHaveBeenCalledWith(
+      'lernplattformPreWarmKorrektur',
+      expect.anything(),
+      'tok-lp-99',
+    )
+  })
+
   it('skippt API-Call bei signal.aborted', async () => {
     const { preWarmKorrektur } = await import('../services/preWarmApi')
     const abortController = new AbortController()

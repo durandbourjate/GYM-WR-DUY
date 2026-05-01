@@ -67,12 +67,18 @@ export async function preWarmFragen(
  * Wenn `email` leer: kein API-Call.
  * Wenn `PRE_WARM_ENABLED` false: kein API-Call.
  *
+ * `sessionToken` ist optional. Wird ausschliesslich aus dem LP-Context aufgerufen
+ * (DurchfuehrenDashboard), wo der LP-Auth-Pfad keinen passenden Üben-SessionToken
+ * hat — Backend-Endpoint authentifiziert via `email` + `istZugelasseneLP`. Wenn
+ * irgendwann ein expliziter Token vorliegt, kann er hier durchgereicht werden.
+ *
  * Backend-Endpoint: `lernplattformPreWarmKorrektur`.
  */
 export async function preWarmKorrektur(
   pruefungId: string,
   email: string,
   signal?: AbortSignal,
+  sessionToken: string = '',
 ): Promise<void> {
   if (!PRE_WARM_ENABLED) return
   if (signal?.aborted) return
@@ -80,8 +86,6 @@ export async function preWarmKorrektur(
   if (!email) return
 
   try {
-    const user = useUebenAuthStore.getState().user
-    const sessionToken = user?.sessionToken ?? ''
     const response = await uebenApiClient.post<PreWarmResponse>(
       'lernplattformPreWarmKorrektur',
       { email, pruefungId },
