@@ -296,28 +296,51 @@ function normalisiereBildbeschriftung(f: BildbeschriftungFrage): Bildbeschriftun
   }
 }
 
-export function normalisiereDragDropBild(frage: any): DragDropBildFrage {
-  const labels: DragDropBildLabel[] = (frage.labels ?? []).map((l: any, i: number) => {
+/**
+ * Akzeptiert Pool-Format (string-Labels, lockeres `zielzonen`-Schema) und das konkrete
+ * `DragDropBildFrage`-Storage-Format. Strukturelle Compat über die zwei
+ * gemeinsamen Felder; alles andere wird mit Type-Guards eingelesen.
+ */
+type DragDropBildEingabe = DragDropBildFrage | {
+  id?: string
+  labels?: unknown[]
+  zielzonen?: unknown[]
+}
+
+export function normalisiereDragDropBild(frage: DragDropBildEingabe): DragDropBildFrage {
+  const labelsRoh: unknown[] = Array.isArray(frage.labels) ? frage.labels : []
+  const labels: DragDropBildLabel[] = labelsRoh.map((l, i) => {
     if (typeof l === 'string') {
-      return { id: stabilId(frage.id, l, i), text: l }
+      return { id: stabilId(frage.id ?? '', l, i), text: l }
     }
-    if (l && typeof l === 'object' && typeof l.text === 'string') {
-      return { id: l.id ?? stabilId(frage.id, l.text, i), text: l.text }
+    if (l && typeof l === 'object') {
+      const obj = l as { id?: string; text?: unknown }
+      if (typeof obj.text === 'string') {
+        return { id: obj.id ?? stabilId(frage.id ?? '', obj.text, i), text: obj.text }
+      }
     }
-    return { id: stabilId(frage.id, '', i), text: '' }
+    return { id: stabilId(frage.id ?? '', '', i), text: '' }
   })
-  const zielzonen: DragDropBildZielzone[] = (frage.zielzonen ?? []).map((z: any) => ({
-    ...z,
-    id: z.id || `zone-${Math.random().toString(36).slice(2, 8)}`,
-    form: z.form === 'polygon' ? 'polygon' : 'rechteck',
-    punkte: Array.isArray(z.punkte) && z.punkte.every((p: any) => typeof p?.x === 'number' && typeof p?.y === 'number')
-      ? z.punkte.map((p: any) => ({ x: normalisiereKoordinate(p.x), y: normalisiereKoordinate(p.y) }))
-      : [],
-    korrekteLabels: Array.isArray(z.korrekteLabels)
-      ? z.korrekteLabels.map((s: string) => String(s))
-      : [],
-  }))
-  return { ...frage, labels, zielzonen }
+  const zielzonenRoh: unknown[] = Array.isArray(frage.zielzonen) ? frage.zielzonen : []
+  const zielzonen: DragDropBildZielzone[] = zielzonenRoh.map(z => {
+    const obj = (z && typeof z === 'object' ? z : {}) as Record<string, unknown>
+    const rohPunkte = obj.punkte
+    const punkte: { x: number; y: number }[] = Array.isArray(rohPunkte)
+      && rohPunkte.every(p => p !== null && typeof p === 'object' && typeof (p as { x?: unknown }).x === 'number' && typeof (p as { y?: unknown }).y === 'number')
+      ? (rohPunkte as { x: number; y: number }[]).map(p => ({ x: normalisiereKoordinate(p.x), y: normalisiereKoordinate(p.y) }))
+      : []
+    const korrekteLabels: string[] = Array.isArray(obj.korrekteLabels)
+      ? obj.korrekteLabels.map(s => String(s))
+      : []
+    return {
+      ...obj,
+      id: typeof obj.id === 'string' && obj.id ? obj.id : `zone-${Math.random().toString(36).slice(2, 8)}`,
+      form: obj.form === 'polygon' ? 'polygon' : 'rechteck',
+      punkte,
+      korrekteLabels,
+    } as DragDropBildZielzone
+  })
+  return { ...frage, labels, zielzonen } as DragDropBildFrage
 }
 
 type DragDropBildAntwort = { typ: 'dragdrop_bild'; zuordnungen: Record<string, string> }
