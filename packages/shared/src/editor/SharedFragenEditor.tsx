@@ -471,9 +471,14 @@ export default function SharedFragenEditor({
   })
   const [ddLabels, setDdLabels] = useState<DragDropBildLabel[]>(() => {
     if (frage?.typ !== 'dragdrop_bild') return []
-    return ((frage as DragDropBildFrage).labels ?? []).map((l: any, i: number) => {
-      if (l && typeof l === 'object' && typeof l.text === 'string') {
-        return { id: l.id ?? `lbl-${i}-${Math.random().toString(36).slice(2, 8)}`, text: l.text }
+    const rohLabels = ((frage as DragDropBildFrage).labels ?? []) as unknown as unknown[]
+    return rohLabels.map((l, i) => {
+      if (l && typeof l === 'object' && 'text' in l && typeof (l as { text: unknown }).text === 'string') {
+        const obj = l as { id?: unknown; text: string }
+        return {
+          id: typeof obj.id === 'string' ? obj.id : `lbl-${i}-${Math.random().toString(36).slice(2, 8)}`,
+          text: obj.text,
+        }
       }
       // Defensiv: Pre-Migration-Imports (string[]) abfangen
       if (typeof l === 'string') {

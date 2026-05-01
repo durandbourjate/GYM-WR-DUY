@@ -348,7 +348,7 @@ describe('autoKorrigiere', () => {
   // === DRAG & DROP BILD ===
 
   it('korrigiert DragDropBild alle korrekt', () => {
-    const frage: any = {
+    const frage = {
       id: 'dd-1', typ: 'dragdrop_bild', version: 1, erstelltAm: '2026-01-01', geaendertAm: '2026-01-01',
       fachbereich: 'VWL', fach: 'Wirtschaft & Recht', thema: 'Test',
       semester: ['S3'], gefaesse: ['SF'], bloom: 'K2', tags: [],
@@ -366,7 +366,7 @@ describe('autoKorrigiere', () => {
         { id: 'l3', text: 'Preis' },
         { id: 'l4', text: 'Menge' },
       ],
-    }
+    } as unknown as DragDropBildFrage /* Defensive: Test-Mock, FrageBase-Felder vereinfacht */
     const antwort: Antwort = {
       typ: 'dragdrop_bild',
       zuordnungen: { l1: 'z1', l2: 'z2', l3: 'z3' },
@@ -377,7 +377,7 @@ describe('autoKorrigiere', () => {
   })
 
   it('korrigiert DragDropBild teilweise korrekt', () => {
-    const frage: any = {
+    const frage = {
       id: 'dd-2', typ: 'dragdrop_bild', version: 1, erstelltAm: '2026-01-01', geaendertAm: '2026-01-01',
       fachbereich: 'VWL', fach: 'Wirtschaft & Recht', thema: 'Test',
       semester: ['S3'], gefaesse: ['SF'], bloom: 'K2', tags: [],
@@ -393,7 +393,7 @@ describe('autoKorrigiere', () => {
         { id: 'l2', text: 'Inflation' },
         { id: 'l3', text: 'Deflation' },
       ],
-    }
+    } as unknown as DragDropBildFrage /* Defensive: Test-Mock, FrageBase-Felder vereinfacht */
     const antwort: Antwort = {
       typ: 'dragdrop_bild',
       zuordnungen: { l1: 'z1', l3: 'z2' },
@@ -404,7 +404,7 @@ describe('autoKorrigiere', () => {
   })
 
   it('korrigiert DragDropBild case-insensitive', () => {
-    const frage: any = {
+    const frage = {
       id: 'dd-3', typ: 'dragdrop_bild', version: 1, erstelltAm: '2026-01-01', geaendertAm: '2026-01-01',
       fachbereich: 'VWL', fach: 'Wirtschaft & Recht', thema: 'Test',
       semester: ['S3'], gefaesse: ['SF'], bloom: 'K2', tags: [],
@@ -415,7 +415,7 @@ describe('autoKorrigiere', () => {
         { id: 'z1', form: 'rechteck', punkte: [{x:10,y:10},{x:30,y:10},{x:30,y:30},{x:10,y:30}], korrekteLabels: ['BIP'] },
       ],
       labels: [{ id: 'l1', text: 'bip' }],  // Lowercase im Pool
-    }
+    } as unknown as DragDropBildFrage /* Defensive: Test-Mock, FrageBase-Felder vereinfacht */
     const antwort: Antwort = {
       typ: 'dragdrop_bild',
       zuordnungen: { l1: 'z1' },
@@ -426,7 +426,7 @@ describe('autoKorrigiere', () => {
   })
 
   it('korrigiert DragDropBild leere Zuordnung', () => {
-    const frage: any = {
+    const frage = {
       id: 'dd-4', typ: 'dragdrop_bild', version: 1, erstelltAm: '2026-01-01', geaendertAm: '2026-01-01',
       fachbereich: 'VWL', fach: 'Wirtschaft & Recht', thema: 'Test',
       semester: ['S3'], gefaesse: ['SF'], bloom: 'K2', tags: [],
@@ -441,7 +441,7 @@ describe('autoKorrigiere', () => {
         { id: 'l1', text: 'BIP' },
         { id: 'l2', text: 'Inflation' },
       ],
-    }
+    } as unknown as DragDropBildFrage /* Defensive: Test-Mock, FrageBase-Felder vereinfacht */
     const antwort: Antwort = {
       typ: 'dragdrop_bild',
       zuordnungen: {},

@@ -12,31 +12,36 @@ const KREIS_POLYGON_PUNKTE = 12
  *  - Kreis:    { form: 'kreis',    koordinaten: { x, y, radius },        ... }
  * Feld `punkte` (number) wird zu `punktzahl` umbenannt.
  */
-export function migriereHotspotBereichAlt(alt: any): HotspotBereich {
-  if (Array.isArray(alt.punkte) && alt.punkte.length >= 3) {
-    return alt as HotspotBereich
+export function migriereHotspotBereichAlt(alt: unknown): HotspotBereich {
+  const obj = (alt && typeof alt === 'object' ? alt : {}) as Record<string, unknown>
+  if (Array.isArray(obj.punkte) && obj.punkte.length >= 3) {
+    return obj as unknown as HotspotBereich
   }
 
-  const k = alt.koordinaten ?? {}
+  const k = (obj.koordinaten && typeof obj.koordinaten === 'object'
+    ? obj.koordinaten
+    : {}) as Record<string, unknown>
   let form: 'rechteck' | 'polygon'
   let punkte: Punkt[]
 
-  if (alt.form === 'kreis') {
+  const numOr = (v: unknown, d: number): number => (typeof v === 'number' ? v : d)
+
+  if (obj.form === 'kreis') {
     form = 'polygon'
-    punkte = kreisZuPolygon(k.x ?? 50, k.y ?? 50, k.radius ?? 5, KREIS_POLYGON_PUNKTE)
+    punkte = kreisZuPolygon(numOr(k.x, 50), numOr(k.y, 50), numOr(k.radius, 5), KREIS_POLYGON_PUNKTE)
   } else {
     form = 'rechteck'
-    punkte = rechteckZuPolygon(k.x ?? 0, k.y ?? 0, k.breite ?? 0, k.hoehe ?? 0)
+    punkte = rechteckZuPolygon(numOr(k.x, 0), numOr(k.y, 0), numOr(k.breite, 0), numOr(k.hoehe, 0))
   }
 
   return {
-    id: alt.id,
+    id: typeof obj.id === 'string' ? obj.id : '',
     form,
     punkte,
-    label: alt.label ?? '',
+    label: typeof obj.label === 'string' ? obj.label : '',
     punktzahl:
-      typeof alt.punktzahl === 'number' ? alt.punktzahl
-      : typeof alt.punkte === 'number' ? alt.punkte
+      typeof obj.punktzahl === 'number' ? obj.punktzahl
+      : typeof obj.punkte === 'number' ? obj.punkte
       : 1,
   } as HotspotBereich
 }
@@ -47,23 +52,27 @@ export function migriereHotspotBereichAlt(alt: any): HotspotBereich {
  * `korrekteLabels: string[]` Format.
  * Alt-Format: { position: { x, y, breite, hoehe }, korrektesLabel?, id }
  */
-export function migriereDragDropZielzoneAlt(alt: any): DragDropBildZielzone {
-  if (Array.isArray(alt.punkte) && alt.punkte.length >= 3 && Array.isArray(alt.korrekteLabels)) {
-    return alt as DragDropBildZielzone
+export function migriereDragDropZielzoneAlt(alt: unknown): DragDropBildZielzone {
+  const obj = (alt && typeof alt === 'object' ? alt : {}) as Record<string, unknown>
+  if (Array.isArray(obj.punkte) && obj.punkte.length >= 3 && Array.isArray(obj.korrekteLabels)) {
+    return obj as unknown as DragDropBildZielzone
   }
 
-  const p = alt.position ?? {}
-  const korrekteLabels: string[] = Array.isArray(alt.korrekteLabels)
-    ? alt.korrekteLabels.map((s: unknown) => String(s ?? ''))
-    : alt.korrektesLabel
-      ? [String(alt.korrektesLabel)]
+  const p = (obj.position && typeof obj.position === 'object'
+    ? obj.position
+    : {}) as Record<string, unknown>
+  const korrekteLabels: string[] = Array.isArray(obj.korrekteLabels)
+    ? obj.korrekteLabels.map((s: unknown) => String(s ?? ''))
+    : obj.korrektesLabel
+      ? [String(obj.korrektesLabel)]
       : []
+  const numOr = (v: unknown, d: number): number => (typeof v === 'number' ? v : d)
   return {
-    id: alt.id,
+    id: typeof obj.id === 'string' ? obj.id : '',
     form: 'rechteck',
-    punkte: Array.isArray(alt.punkte) && alt.punkte.length >= 3
-      ? alt.punkte
-      : rechteckZuPolygon(p.x ?? 0, p.y ?? 0, p.breite ?? 0, p.hoehe ?? 0),
+    punkte: Array.isArray(obj.punkte) && obj.punkte.length >= 3
+      ? (obj.punkte as Punkt[])
+      : rechteckZuPolygon(numOr(p.x, 0), numOr(p.y, 0), numOr(p.breite, 0), numOr(p.hoehe, 0)),
     korrekteLabels,
   }
 }
@@ -72,8 +81,10 @@ export function migriereDragDropZielzoneAlt(alt: any): DragDropBildZielzone {
  * True wenn die Zone das neue Format hat (punkte[] mit ≥3 Punkten).
  * Genutzt im Frontend-Error-Boundary für die Migrations-Fenster-Übergangs-Phase.
  */
-export function istZoneWohlgeformt(zone: any): boolean {
-  return Array.isArray(zone?.punkte) && zone.punkte.length >= 3
+export function istZoneWohlgeformt(zone: unknown): boolean {
+  if (!zone || typeof zone !== 'object') return false
+  const punkte = (zone as { punkte?: unknown }).punkte
+  return Array.isArray(punkte) && punkte.length >= 3
 }
 
 // --- interne Helfer ---
