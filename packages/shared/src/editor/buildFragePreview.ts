@@ -133,7 +133,6 @@ export function buildFragePreview(s: FragePreviewState): Frage {
     case 'visualisierung':
       return {
         ...basis,
-        untertyp: 'frei',
         canvasConfig: s.canvasConfig,
       } as unknown as Frage
     case 'pdf':
