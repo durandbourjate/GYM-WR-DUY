@@ -142,7 +142,7 @@ export function buildFragePreview(s: FragePreviewState): Frage {
         pdfDriveFileId: s.pdfDriveFileId,
         pdfUrl: s.pdfUrl,
         pdfBase64: s.pdfBase64,
-        pdfErlaubteWerkzeuge: s.pdfErlaubteWerkzeuge,
+        erlaubteWerkzeuge: s.pdfErlaubteWerkzeuge,
       } as unknown as Frage
     case 'sortierung':
       return { ...basis, elemente: s.sortElemente } as unknown as Frage
@@ -165,7 +165,7 @@ export function buildFragePreview(s: FragePreviewState): Frage {
       return {
         ...basis,
         sprache: s.codeSprache,
-        musterloesung: s.codeMusterLoesungCode,
+        musterLoesung: s.codeMusterLoesungCode,
       } as unknown as Frage
     case 'formel':
       return { ...basis, korrekteFormel: s.formelKorrekteFormel } as unknown as Frage
