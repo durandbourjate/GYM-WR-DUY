@@ -170,7 +170,6 @@ export interface LueckentextFrage extends FrageBase {
 
 export interface VisualisierungFrage extends FrageBase {
   typ: 'visualisierung';
-  untertyp: 'zeichnen' | 'diagramm-manipulieren' | 'schema-erstellen';
   fragetext: string;
   ausgangsdiagramm?: DiagrammConfig;
   canvasConfig?: CanvasConfig;
@@ -452,8 +451,6 @@ export interface InlineTeilaufgabe {
   seitenAnzahl?: number
   kategorien?: PDFKategorie[]
   erlaubteWerkzeuge?: PDFAnnotationsWerkzeug[]
-  // Visualisierung/Zeichnen
-  untertyp?: string
   canvasConfig?: CanvasConfig
   musterloesungBild?: string
   // FiBu (Buchungssatz, TKonto, etc.) — typ-spezifische Felder als generisches Objekt

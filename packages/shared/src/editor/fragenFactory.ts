@@ -68,7 +68,7 @@ export type TypSpezifischeDaten =
   | { typ: 'kontenbestimmung'; aufgabentext: string; modus: KontenbestimmungFrage['modus']; aufgaben: Kontenaufgabe[]; kontenauswahl: KontenauswahlConfig }
   | { typ: 'bilanzstruktur'; aufgabentext: string; modus: BilanzERFrage['modus']; kontenMitSaldi: KontoMitSaldo[]; loesung: BilanzERLoesung; bewertungsoptionen: BilanzERBewertung }
   | { typ: 'aufgabengruppe'; kontext: string; teilaufgabenIds: string[]; teilaufgaben?: InlineTeilaufgabe[] }
-  | { typ: 'visualisierung'; untertyp?: VisualisierungFrage['untertyp']; fragetext?: string; canvasConfig?: CanvasConfig; musterloesungBild?: string }
+  | { typ: 'visualisierung'; fragetext?: string; canvasConfig?: CanvasConfig; musterloesungBild?: string }
   | { typ: 'pdf'; fragetext: string; pdfDriveFileId?: string; pdfBase64?: string; pdfUrl?: string; pdfDateiname: string; seitenAnzahl: number; kategorien?: PDFKategorie[]; erlaubteWerkzeuge: PDFAnnotationsWerkzeug[]; musterloesungAnnotationen?: PDFAnnotation[] }
   | { typ: 'sortierung'; fragetext: string; elemente: string[]; teilpunkte: boolean }
   | { typ: 'hotspot'; fragetext: string; bildUrl: string; bereiche: HotspotBereich[]; mehrfachauswahl: boolean }
@@ -206,7 +206,6 @@ export function erstelleFrageObjekt(basis: FrageBasis, typDaten: TypSpezifischeD
       return {
         ...basis,
         typ: 'visualisierung',
-        untertyp: typDaten.untertyp || 'zeichnen',
         fragetext: typDaten.fragetext?.trim() || '',
         canvasConfig: typDaten.canvasConfig,
         musterloesungBild: typDaten.musterloesungBild,
