@@ -58,8 +58,7 @@ function zuAntwort(bilanz: BilanzEingabe | null, er: ERFeldEingabe | null): Bila
   return res
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type Antwort = any
+type Antwort = BilanzAntwort
 
 function vonAntwortBilanz(a?: Antwort): BilanzEingabe {
   if (!a?.bilanz) return leereBilanz()

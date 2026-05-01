@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 # Audit-Skript für undokumentierte `any`-Verwendungen in TypeScript-Code.
 #
-# Erfasst zwei Token:
+# Erfasst drei Token:
 #   - `as any` (Type-Cast)
 #   - `: any` (Parameter-/Variable-/Property-Type-Annotation)
+#   - `= any` (Type-Alias-Definition, z.B. `type X = any`)
 #
 # Defensive-Konvention: das Token steht auf der gleichen Zeile wie ein
 # Inline-Kommentar mit dem Wort `Defensive` (1-Zeilen-Scan, robust gegen
@@ -25,7 +26,7 @@ SOURCES=(ExamLab/src packages/shared/src)
 
 # Alle Treffer (`as any` oder `: any` als Token), ohne Kommentar-Zeilen
 # und ohne String-Literal-Wrapping.
-RAW_HITS=$(grep -rEn '\bas any\b|: any\b' "${SOURCES[@]}" 2>/dev/null | \
+RAW_HITS=$(grep -rEn '\bas any\b|: any\b|= any\b' "${SOURCES[@]}" 2>/dev/null | \
   grep -vE '^[^:]+:[0-9]+:\s*//' | \
   grep -vE '^[^:]+:[0-9]+:\s*\*' | \
   grep -vE "['\"]as any['\"]" || true)
