@@ -18,18 +18,32 @@ Beide Spawn-Tasks aus Bundle L.c (Lehre 2 — `as any` versteckt Mapping-Drift) 
    - `pdf`: `pdfErlaubteWerkzeuge` → `erlaubteWerkzeuge` (canonical, fragen-core.ts:551)
    - `code`: `musterloesung` → `musterLoesung` (canonical, fragen-core.ts:662)
    - Validator (Z. 477-481, :507) liest jetzt über den primären Canonical-Pfad. Compat-Casts für Storage-Legacy bleiben.
-   - **NICHT in diesem Bundle:** Visualisierungs-Drift (`untertyp: 'frei'`) — kein Pure-Rename, sondern Architektur-Drift (Editor hat keine UI für untertyp, `speichereJetzt` schreibt das Feld nicht). Separater Spawn-Task offen.
+   - **Visualisierungs-Drift** (`untertyp: 'frei'`) wurde nachgereicht in Bullet 3.
 
-**Verifikation beider Branches:** tsc -b clean, 1126/1130 vitest passes (4 .todo unverändert, der entfernte Misnamed-Test war kein .todo), build clean, lint:as-any 0 undokumentiert. Browser-E2E auf staging mit echten Logins (LP `wr.test@gymhofwil.ch` + SuS `wr.test@stud.gymhofwil.ch`):
+3. **`refactor/visualisierung-untertyp-drift`** — Merge-Commit `83b1634` auf `main`. **Vaporware-Type-Field-Cleanup**: `VisualisierungFrage.untertyp` (`'zeichnen' | 'diagramm-manipulieren' | 'schema-erstellen'`) komplett entfernt. Faktisch war nur `'zeichnen'` jemals implementiert; die anderen 2 Untertypen sind nie gebaut worden (durch DragDrop-Bild, Bildbeschriftung, Hotspot ohnehin abgedeckt).
+   - **Pre-Refactor User-Audit** im Apps-Script: 0 Treffer für `'diagramm-manipulieren'`/`'schema-erstellen'` in 2411 Fragen (VWL+BWL+Recht).
+   - **Scope (11 Files, 5 Commits):** Validator-Pflichtcheck (`pflichtfeldValidation.ts`) + obsoleten Test entfernt; Renderer-Gate (`FrageRenderer.tsx` "wird in einer späteren Phase implementiert"-Platzhalter) entfernt; `buildFragePreview` Sentinel `'frei'` entfernt + Test angepasst; Factory-Input + Body, Mock, 2 Demo-Daten-Files, Pool-Konverter — alle Writer säuberten + Type-Field aus `VisualisierungFrage` + `InlineTeilaufgabe` als atomares Bundle (TS-Field-Removal kann nicht ohne Writer-Removal isoliert tsc-clean sein).
+   - **Subagent-Driven-Development** für 4 Implementer-Tasks, je 2-stufig reviewed (Spec-Compliance + Code-Quality), alle 8 Reviews ✅ Approved.
+   - **Apps-Script-Backend-Writer** (4 Stellen) bewusst NICHT angefasst — harmlose Phantom-Field-Writer, Storage-rückwärts-kompatibel.
+   - **macOS-Duplikate** (`* 2.ts`-Files mit alten `untertyp`-Referenzen) bleiben out-of-scope — separater Cleanup-PR. tsc ignoriert sie wegen Leerzeichen im Glob (verifiziert mit `tsc -b --force` exit 0).
+
+**Verifikation aller drei Branches:** tsc -b clean, 1125 vitest passes (1126 vor Refactor minus den 1 entfernten obsoleten `'pflicht-leer ohne untertyp'`-Test), build clean, lint:as-any 0/0/0. Browser-E2E auf staging mit echten Logins (LP `wr.test@gymhofwil.ch` + SuS `wr.test@stud.gymhofwil.ch`):
 - LP-Editor PDF-Frage: Werkzeug-Pflichtfeld-Pfad lebendig (Save-Dialog listet "Mindestens ein Werkzeug auswählen").
 - LP-Editor Code-Frage: "Musterlösung oder Testfälle"-Empfohlen-Hint verschwindet beim Tippen → `musterLoesung`-Refactor wirkt End-to-End.
 - SuS-Üben Zuordnungs-Frage (VWL · Arbeitslosigkeit & Armut · Filter "Paare"): Rendert links-Texte + rechts-Auswählen-Dropdowns korrekt, paare-Array intakt → `linksItems`/`rechtsItems`-Cleanup ohne Regression.
+- LP-Editor Visualisierungs-Frage neu anlegen: Save-Dialog ohne 'Untertyp'-Pflichtfeld → Validator-Cleanup wirkt.
+- LP-Editor bestehende Visualisierungs-Frage (Marketing-Mix-Modell): Pool-Import-Badge, Prüfungstauglich, Canvas-Konfiguration geladen ohne Crash.
+- SuS-Üben Visualisierungs-Frage (BWL · Markt- und Leistungsanalyse · Filter "Zeichnen"): Canvas + Werkzeugleiste rendern, **KEIN** "wird in einer späteren Phase implementiert"-Platzhalter → Renderer-Gate-Removal wirkt.
 
 **Lehren (für `code-quality.md` bei Gelegenheit):**
 
 1. **Tests können trotz misnamen Beschreibungen passieren.** Der Test `'rekonstruiert paare[] aus linksItems + rechtsItems'` testete tatsächlich nur dass `Array.isArray(n.paare)` true ist (immer wahr nach Default `[]`). Bei TODO-Tests "wenn ich's später aktiviere" oder bei spekulativen Defensive-Pfaden: **Test-Name muss die Behauptung machen, die der Code tatsächlich beweist.** Beim Refactor von Dead-Code immer Tests querlesen, nicht nur grün/rot prüfen.
 
 2. **Validator-Dual-Reads schützen — bestätigt Dead-Field-Cleanup ist sicher.** Beide PDF + Code Renames in `buildFragePreview` waren rückwärts-kompatibel, weil `pflichtfeldValidation` schon einen Defensive-Compat-Cast für die Legacy-Namen hatte. Das ist genau das Pattern, das man für sichere Field-Renames will: erst Reader auf Dual-Read umstellen, dann Writer migrieren, dann (optional) Compat entfernen wenn alle Storage-Daten migriert sind.
+
+3. **Vaporware-Type-Union-Werte vermeiden.** `'diagramm-manipulieren' | 'schema-erstellen'` waren als Future-Plan in der Type-Union platziert, ohne dazugehörige Implementierung. Folgen über Monate: Validator wird auf Pflicht-Check getrimmt → Schreiber muss Sentinel liefern → Compat-Cast nötig → Renderer wächst Gate-Code für unimplementierte Pfade → Storage-Vertrag wird nicht eingehalten → Cleanup zieht 11 Stellen über mehrere Files. **Regel:** Type-Union-Werte für noch-nicht-implementierte Modi NICHT vorab platzieren. Solange nur 1 Modus existiert: gar kein Discriminator-Feld. Wenn ≥2 Modi geplant aber noch nicht alle gebaut: Type-Union mit nur den realisierten Werten; ergänze später im selben PR wie die Implementation. Antimuster: Type-Union-Werte als TODO-Liste im Schema statt als Backlog-Ticket. Schemas sind keine Roadmap.
+
+4. **TS-Field-Removal in Discriminated-Union braucht atomic-bundle Commit.** Bei einem Field das in mehreren Writer-Stellen gesetzt wird UND aus dem Type entfernt werden soll: weder Writer-First (Writer schreiben dann ein Field das im Type fehlt → "missing required" excess-property) noch Type-First (Type fehlt das Field, Writer schreiben es noch → excess-property errors) kann commit-isoliert tsc-clean sein. Lösung: Konsumenten erst entkoppeln (Reader, Validator, Gates), dann Writer + Type als atomares Bundle. Plan-Reviewer fängt das auch mit, wenn man Bundling-Entscheidung explizit dokumentiert.
 
 ---
 
