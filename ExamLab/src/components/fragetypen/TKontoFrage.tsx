@@ -726,11 +726,13 @@ function TKontoLoesung({ frage, antwort }: { frage: TKontoFrageType; antwort: An
               </div>
 
               {/* Erwarteter Saldo */}
-              <div className="mt-2 text-xs text-slate-600 dark:text-slate-400">
-                Erwarteter Saldo: <span className="font-semibold text-green-700 dark:text-green-400">
-                  {konto.saldo.betrag.toFixed(2)} ({konto.saldo.seite === 'soll' ? 'links' : 'rechts'})
-                </span>
-              </div>
+              {konto.saldo && (
+                <div className="mt-2 text-xs text-slate-600 dark:text-slate-400">
+                  Erwarteter Saldo: <span className="font-semibold text-green-700 dark:text-green-400">
+                    {Number(konto.saldo.betrag ?? 0).toFixed(2)} ({konto.saldo.seite === 'soll' ? 'links' : 'rechts'})
+                  </span>
+                </div>
+              )}
             </div>
           )
         })}
@@ -751,7 +753,7 @@ function EintragBadge({ status }: { status: EintragStatus }) {
     return (
       <span className="inline-flex items-center gap-2 text-green-700 dark:text-green-400">
         <span className="font-mono">{status.gegenkonto}</span>
-        <span className="font-mono">{status.betrag.toFixed(2)}</span>
+        <span className="font-mono">{Number(status.betrag ?? 0).toFixed(2)}</span>
         <span aria-hidden>{'\u2713'}</span>
       </span>
     )
@@ -760,7 +762,7 @@ function EintragBadge({ status }: { status: EintragStatus }) {
     return (
       <span className="inline-flex items-center gap-2 text-red-700 dark:text-red-400">
         <span className="font-mono font-semibold">{status.gegenkonto}</span>
-        <span className="font-mono font-semibold">{status.betrag.toFixed(2)}</span>
+        <span className="font-mono font-semibold">{Number(status.betrag ?? 0).toFixed(2)}</span>
         <em className="text-xs not-italic text-red-700 dark:text-red-400">(fehlt)</em>
       </span>
     )
@@ -769,7 +771,7 @@ function EintragBadge({ status }: { status: EintragStatus }) {
   return (
     <span className="inline-flex items-center gap-2 text-red-700 dark:text-red-400 line-through">
       <span className="font-mono">{status.gegenkonto}</span>
-      <span className="font-mono">{status.betrag.toFixed(2)}</span>
+      <span className="font-mono">{Number(status.betrag ?? 0).toFixed(2)}</span>
       <em className="text-xs not-italic no-underline">({status.hinweis})</em>
     </span>
   )

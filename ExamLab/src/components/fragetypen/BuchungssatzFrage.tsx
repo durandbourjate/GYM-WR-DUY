@@ -351,7 +351,7 @@ function BuchungssatzLoesung({ frage, antwort }: { frage: BuchungssatzFrageType;
                         <td className="pr-3 text-slate-500 dark:text-slate-400 align-top py-0.5">Korrekt:</td>
                         <td className="pr-3 py-0.5 font-mono font-semibold text-green-700 dark:text-green-400">{z.korrekt.sollKonto}</td>
                         <td className="pr-3 py-0.5 font-mono font-semibold text-green-700 dark:text-green-400">{z.korrekt.habenKonto}</td>
-                        <td className="pr-3 py-0.5 font-mono font-semibold text-green-700 dark:text-green-400 text-right">{z.korrekt.betrag.toFixed(2)}</td>
+                        <td className="pr-3 py-0.5 font-mono font-semibold text-green-700 dark:text-green-400 text-right">{Number(z.korrekt.betrag ?? 0).toFixed(2)}</td>
                       </tr>
                     )}
                   </tbody>
