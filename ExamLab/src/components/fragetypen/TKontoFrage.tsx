@@ -250,7 +250,7 @@ function TKontoAufgabe({ frage }: { frage: TKontoFrageType }) {
         {konten.map((konto, kIdx) => {
           const def = frage.konten[kIdx]
           return (
-            <div key={konto.id} className="rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 overflow-hidden">
+            <div key={konto.id} className="rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
               {/* Konto-Header — Kontoname + Kontenkategorie */}
               <div className="px-4 py-3 bg-slate-50 dark:bg-slate-700/50 border-b border-slate-200 dark:border-slate-700">
                 <div className="flex items-center justify-center gap-3">
