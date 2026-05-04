@@ -92,11 +92,6 @@ function BuchungssatzAufgabe({ frage }: { frage: BuchungssatzFrageType }) {
     }
   }
 
-  /** Explizite Abgabe im Üben-Modus (mit Korrektur) */
-  function antwortPruefen() {
-    onAntwort(zuAntwort(buchungen))
-  }
-
   function feldAendern(buchungIdx: number, feld: keyof BuchungEingabe, wert: string) {
     const kopie = buchungen.map((b) => ({ ...b }))
     kopie[buchungIdx] = { ...kopie[buchungIdx], [feld]: wert }
@@ -235,17 +230,6 @@ function BuchungssatzAufgabe({ frage }: { frage: BuchungssatzFrageType }) {
         </button>
       )}
 
-      {/* Prüfen-Button (nur Üben-Modus, wenn noch nicht beantwortet) */}
-      {speichereZwischenstand && !disabled && (
-        <button
-          type="button"
-          onClick={antwortPruefen}
-          className="min-h-[48px] self-end px-6 py-2.5 rounded-xl bg-slate-800 text-white dark:bg-slate-200 dark:text-slate-800 font-medium text-sm hover:bg-slate-900 dark:hover:bg-slate-100 transition-colors"
-        >
-          Antwort prüfen
-        </button>
-      )}
-
       {/* Feedback (Üben-Modus) */}
       {feedbackSichtbar && korrekt !== null && (
         <div className={`mt-4 p-3 rounded-lg ${korrekt ? 'bg-green-50 text-green-800 dark:bg-green-900/30 dark:text-green-300' : 'bg-red-50 text-red-800 dark:bg-red-900/30 dark:text-red-300'}`}>
@@ -351,7 +335,7 @@ function BuchungssatzLoesung({ frage, antwort }: { frage: BuchungssatzFrageType;
                         <td className="pr-3 text-slate-500 dark:text-slate-400 align-top py-0.5">Korrekt:</td>
                         <td className="pr-3 py-0.5 font-mono font-semibold text-green-700 dark:text-green-400">{z.korrekt.sollKonto}</td>
                         <td className="pr-3 py-0.5 font-mono font-semibold text-green-700 dark:text-green-400">{z.korrekt.habenKonto}</td>
-                        <td className="pr-3 py-0.5 font-mono font-semibold text-green-700 dark:text-green-400 text-right">{z.korrekt.betrag.toFixed(2)}</td>
+                        <td className="pr-3 py-0.5 font-mono font-semibold text-green-700 dark:text-green-400 text-right">{Number(z.korrekt.betrag ?? 0).toFixed(2)}</td>
                       </tr>
                     )}
                   </tbody>

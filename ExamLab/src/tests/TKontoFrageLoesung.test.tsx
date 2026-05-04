@@ -132,4 +132,32 @@ describe('TKontoFrage modus=loesung', () => {
     expect(document.querySelector('select')).toBeNull()
     expect(document.querySelector('button')).toBeNull()
   })
+
+  it('crasht nicht wenn konto.saldo undefined ist (Datendrift-Robustheit)', () => {
+    const frageOhneSaldo = {
+      ...frage,
+      konten: [{ ...frage.konten[0], saldo: undefined }],
+    } as unknown as TKType
+    expect(() => {
+      render(<TKontoFrage frage={frageOhneSaldo} modus="loesung" />)
+    }).not.toThrow()
+    // Erwarteter-Saldo-Block fehlt komplett wenn saldo undefined
+    expect(screen.queryByText(/Erwarteter Saldo/)).toBeNull()
+  })
+
+  it('crasht nicht wenn eintraege[i].betrag undefined ist (Datendrift-Robustheit)', () => {
+    const frageOhneBetrag = {
+      ...frage,
+      konten: [{
+        ...frage.konten[0],
+        eintraege: [
+          { seite: 'soll', gegenkonto: '3000' },
+          { seite: 'haben', gegenkonto: '2000' },
+        ],
+      }],
+    } as unknown as TKType
+    expect(() => {
+      render(<TKontoFrage frage={frageOhneBetrag} modus="loesung" />)
+    }).not.toThrow()
+  })
 })

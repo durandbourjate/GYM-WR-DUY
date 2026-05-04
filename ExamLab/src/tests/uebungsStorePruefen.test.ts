@@ -139,6 +139,62 @@ describe('uebungsStore.pruefeAntwortJetzt (async, Server-seitig)', () => {
     expect(state.session?.antworten['f2']).toEqual({ typ: 'freitext', text: 'Meine Antwort' })
   })
 
+  it('Bug 8b: bei "Nicht authentifiziert" einmaliger Auto-Retry mit Session-Restore', async () => {
+    useUebenUebungsStore.setState({ session: baseSession() })
+
+    // localStorage für sessionWiederherstellen — neuer Token wird eingelesen
+    localStorage.setItem('ueben-auth', JSON.stringify({
+      email: 'sus@stud.gymhofwil.ch',
+      name: 'Test',
+      rolle: 'lernend',
+      sessionToken: 'token-refreshed',
+      loginMethode: 'code',
+    }))
+
+    let pruefCalls = 0
+    vi.spyOn(uebenApiClient, 'post').mockImplementation(async (action: string) => {
+      if (action === 'lernplattformValidiereToken') {
+        return { success: true } as unknown as null
+      }
+      if (action === 'lernplattformPruefeAntwort') {
+        pruefCalls++
+        if (pruefCalls === 1) {
+          return { success: false, error: 'Nicht authentifiziert' } as unknown as null
+        }
+        return { success: true, korrekt: true, musterlosung: 'OK' } as unknown as null
+      }
+      return null as unknown as null
+    })
+
+    await useUebenUebungsStore.getState().pruefeAntwortJetzt('f1')
+
+    const state = useUebenUebungsStore.getState()
+    expect(pruefCalls).toBe(2)
+    expect(state.pruefFehler).toBeNull()
+    expect(state.letzteAntwortKorrekt).toBe(true)
+    expect(state.session?.ergebnisse['f1']).toBe(true)
+
+    localStorage.clear()
+  })
+
+  it('Bug 8b: bei "Nicht authentifiziert" ohne refreshten Token: Sitzung-abgelaufen-Hinweis', async () => {
+    useUebenUebungsStore.setState({ session: baseSession() })
+    // Kein localStorage-Eintrag → sessionWiederherstellen findet nichts → user bleibt null
+    localStorage.removeItem('ueben-auth')
+    useUebenAuthStore.setState({ user: null, istAngemeldet: false })
+
+    vi.spyOn(uebenApiClient, 'post').mockResolvedValue({
+      success: false,
+      error: 'Nicht authentifiziert',
+    } as unknown as null)
+
+    await useUebenUebungsStore.getState().pruefeAntwortJetzt('f1')
+
+    const state = useUebenUebungsStore.getState()
+    expect(state.speichertPruefung).toBe(false)
+    expect(state.pruefFehler).toBe('Sitzung abgelaufen — bitte neu anmelden')
+  })
+
   it('speichertPruefung ist true während des Calls', async () => {
     useUebenUebungsStore.setState({ session: baseSession() })
     let resolvePost: ((v: unknown) => void) | null = null

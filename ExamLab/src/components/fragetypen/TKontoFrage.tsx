@@ -168,10 +168,6 @@ function TKontoAufgabe({ frage }: { frage: TKontoFrageType }) {
     }
   }
 
-  function antwortPruefen() {
-    onAntwort(zuAntwort(konten))
-  }
-
   function deepCopy(): KontoEingabe[] {
     return konten.map((k) => ({
       ...k,
@@ -254,7 +250,7 @@ function TKontoAufgabe({ frage }: { frage: TKontoFrageType }) {
         {konten.map((konto, kIdx) => {
           const def = frage.konten[kIdx]
           return (
-            <div key={konto.id} className="rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 overflow-hidden">
+            <div key={konto.id} className="rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
               {/* Konto-Header — Kontoname + Kontenkategorie */}
               <div className="px-4 py-3 bg-slate-50 dark:bg-slate-700/50 border-b border-slate-200 dark:border-slate-700">
                 <div className="flex items-center justify-center gap-3">
@@ -551,17 +547,6 @@ function TKontoAufgabe({ frage }: { frage: TKontoFrageType }) {
         })}
       </div>
 
-      {/* Prüfen-Button (nur Üben-Modus, wenn noch nicht beantwortet) */}
-      {speichereZwischenstand && !disabled && (
-        <button
-          type="button"
-          onClick={antwortPruefen}
-          className="min-h-[48px] self-end px-6 py-2.5 rounded-xl bg-slate-800 text-white dark:bg-slate-200 dark:text-slate-800 font-medium text-sm hover:bg-slate-900 dark:hover:bg-slate-100 transition-colors mt-4"
-        >
-          Antwort prüfen
-        </button>
-      )}
-
       {/* Feedback (Üben-Modus) */}
       {feedbackSichtbar && korrekt !== null && (
         <div className={`mt-4 p-3 rounded-lg ${korrekt ? 'bg-green-50 text-green-800 dark:bg-green-900/30 dark:text-green-300' : 'bg-red-50 text-red-800 dark:bg-red-900/30 dark:text-red-300'}`}>
@@ -726,11 +711,13 @@ function TKontoLoesung({ frage, antwort }: { frage: TKontoFrageType; antwort: An
               </div>
 
               {/* Erwarteter Saldo */}
-              <div className="mt-2 text-xs text-slate-600 dark:text-slate-400">
-                Erwarteter Saldo: <span className="font-semibold text-green-700 dark:text-green-400">
-                  {konto.saldo.betrag.toFixed(2)} ({konto.saldo.seite === 'soll' ? 'links' : 'rechts'})
-                </span>
-              </div>
+              {konto.saldo && (
+                <div className="mt-2 text-xs text-slate-600 dark:text-slate-400">
+                  Erwarteter Saldo: <span className="font-semibold text-green-700 dark:text-green-400">
+                    {Number(konto.saldo.betrag ?? 0).toFixed(2)} ({konto.saldo.seite === 'soll' ? 'links' : 'rechts'})
+                  </span>
+                </div>
+              )}
             </div>
           )
         })}
@@ -751,7 +738,7 @@ function EintragBadge({ status }: { status: EintragStatus }) {
     return (
       <span className="inline-flex items-center gap-2 text-green-700 dark:text-green-400">
         <span className="font-mono">{status.gegenkonto}</span>
-        <span className="font-mono">{status.betrag.toFixed(2)}</span>
+        <span className="font-mono">{Number(status.betrag ?? 0).toFixed(2)}</span>
         <span aria-hidden>{'\u2713'}</span>
       </span>
     )
@@ -760,7 +747,7 @@ function EintragBadge({ status }: { status: EintragStatus }) {
     return (
       <span className="inline-flex items-center gap-2 text-red-700 dark:text-red-400">
         <span className="font-mono font-semibold">{status.gegenkonto}</span>
-        <span className="font-mono font-semibold">{status.betrag.toFixed(2)}</span>
+        <span className="font-mono font-semibold">{Number(status.betrag ?? 0).toFixed(2)}</span>
         <em className="text-xs not-italic text-red-700 dark:text-red-400">(fehlt)</em>
       </span>
     )
@@ -769,7 +756,7 @@ function EintragBadge({ status }: { status: EintragStatus }) {
   return (
     <span className="inline-flex items-center gap-2 text-red-700 dark:text-red-400 line-through">
       <span className="font-mono">{status.gegenkonto}</span>
-      <span className="font-mono">{status.betrag.toFixed(2)}</span>
+      <span className="font-mono">{Number(status.betrag ?? 0).toFixed(2)}</span>
       <em className="text-xs not-italic no-underline">({status.hinweis})</em>
     </span>
   )

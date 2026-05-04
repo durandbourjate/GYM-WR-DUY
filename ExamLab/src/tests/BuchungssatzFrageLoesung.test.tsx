@@ -105,4 +105,17 @@ describe('BuchungssatzFrage modus=loesung', () => {
     expect(document.querySelector('select')).toBeNull()
     expect(document.querySelector('button')).toBeNull()
   })
+
+  it('crasht nicht wenn frage.buchungen[i].betrag undefined ist (Datendrift-Robustheit)', () => {
+    const frageOhneBetrag = {
+      ...frage,
+      buchungen: [
+        { id: 'b1', sollKonto: '1000', habenKonto: '3000' },
+      ],
+    } as unknown as BSType
+    expect(() => {
+      render(<BuchungssatzFrage frage={frageOhneBetrag} modus="loesung" />)
+    }).not.toThrow()
+    expect(screen.getByText('0.00')).toBeInTheDocument()
+  })
 })

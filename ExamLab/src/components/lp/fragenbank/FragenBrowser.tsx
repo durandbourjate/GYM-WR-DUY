@@ -136,16 +136,18 @@ export default function FragenBrowser({ onHinzufuegen, onEntfernen, onSchliessen
     ladeStats()
   }, [user, istDemoModus])
 
-  // Wenn initialEditFrageId gesetzt, Editor sofort öffnen sobald Fragen geladen
+  // Wenn initialEditFrageId gesetzt, Editor öffnen sobald Fragen geladen.
+  // Reagiert auch auf nachträglichen Wechsel (z.B. URL-Sync via Globale Suche).
+  // Idempotenz-Guard verhindert Reopen wenn Editor schon dieselbe Frage zeigt.
   useEffect(() => {
-    if (ladeStatus === 'fertig' && initialEditFrageId) {
-      const frage = alleFragen.find((f) => f.id === initialEditFrageId)
-      if (frage) {
-        handleEditFrage(frage)
-      }
+    if (ladeStatus !== 'fertig' || !initialEditFrageId) return
+    if (editFrage?.id === initialEditFrageId) return
+    const frage = alleFragen.find((f) => f.id === initialEditFrageId)
+    if (frage) {
+      handleEditFrage(frage)
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps — Nur beim ersten Laden ausführen
-  }, [ladeStatus])
+  // eslint-disable-next-line react-hooks/exhaustive-deps — handleEditFrage / alleFragen / editFrage sind Snapshot-Reads, deps bleiben minimal
+  }, [ladeStatus, initialEditFrageId])
 
   /** Ein Klick: Frage hinzufügen oder entfernen */
   const toggleFrageInPruefung = useCallback((frageId: string): void => {

@@ -55,10 +55,6 @@ function KontenbestimmungAufgabe({ frage }: { frage: KontenbestimmungFrageType }
     }
   }
 
-  function antwortPruefen() {
-    onAntwort({ typ: 'kontenbestimmung' as const, aufgaben: aufgabenAntworten })
-  }
-
   function aendereAntwort(
     aufgabeId: string,
     antwortIdx: number,
@@ -106,7 +102,7 @@ function KontenbestimmungAufgabe({ frage }: { frage: KontenbestimmungFrageType }
       />
 
       {/* Tabelle */}
-      <div className="rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 overflow-hidden">
+      <div className="rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-slate-50 dark:bg-slate-700/50 text-xs text-slate-500 dark:text-slate-400">
@@ -205,17 +201,6 @@ function KontenbestimmungAufgabe({ frage }: { frage: KontenbestimmungFrageType }
           </tbody>
         </table>
       </div>
-
-      {/* Prüfen-Button (nur Üben-Modus, wenn noch nicht beantwortet) */}
-      {speichereZwischenstand && !disabled && (
-        <button
-          type="button"
-          onClick={antwortPruefen}
-          className="min-h-[48px] self-end px-6 py-2.5 rounded-xl bg-slate-800 text-white dark:bg-slate-200 dark:text-slate-800 font-medium text-sm hover:bg-slate-900 dark:hover:bg-slate-100 transition-colors"
-        >
-          Antwort prüfen
-        </button>
-      )}
 
       {/* Feedback (Üben-Modus) */}
       {feedbackSichtbar && korrekt !== null && (

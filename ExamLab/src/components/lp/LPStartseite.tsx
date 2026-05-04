@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, Suspense } from 'react'
-import { useParams, useNavigate, useLocation } from 'react-router-dom'
+import { useParams, useNavigate, useLocation, useSearchParams } from 'react-router-dom'
 import { useAuthStore } from '../../store/authStore.ts'
 import { useUebenGruppenStore } from '../../store/ueben/gruppenStore.ts'
 import { useFragenbankStore } from '../../store/fragenbankStore.ts'
@@ -91,6 +91,10 @@ function LPStartseiteInner() {
   // Bundle 13 I: URL-basierte Kurs-Auswahl für Üben-Übungen
   const navigate = useNavigate()
   const { kursId: urlKursId, frageId: urlFrageId } = useParams<{ kursId?: string; frageId?: string }>()
+  // Bug 4: Globale Suche navigiert auf `/fragensammlung?frage=<id>` (Query-Param,
+  // nicht Path-Param). useParams sieht das nicht — daher zusätzlich aus Query lesen.
+  const [queryParams] = useSearchParams()
+  const queryFrageId = queryParams.get('frage') || undefined
   const gruppen = useUebenGruppenStore(s => s.gruppen)
   const aktiverKursId = urlKursId
   const aktiverKurs = useMemo(
@@ -866,7 +870,7 @@ function LPStartseiteInner() {
               onHinzufuegen={() => {}}
               onSchliessen={() => useLPNavigationStore.getState().zurueck()}
               bereitsVerwendet={[]}
-              initialEditFrageId={urlFrageId ?? deepLinkFrageId ?? undefined}
+              initialEditFrageId={urlFrageId ?? queryFrageId ?? deepLinkFrageId ?? undefined}
               onFrageAktualisiert={() => { clearDeepLinkFrageId() }}
             />
           </Suspense>
