@@ -287,7 +287,7 @@ function VollAutocomplete({
         <ul
           ref={listRef}
           role="listbox"
-          className="absolute z-50 mt-1 max-h-64 w-full overflow-auto rounded-md border
+          className="absolute z-50 mt-1 max-h-64 w-full min-w-[320px] overflow-auto rounded-md border
             border-slate-200 bg-white shadow-lg dark:border-slate-600 dark:bg-slate-800"
         >
           {results.length === 0 ? (
