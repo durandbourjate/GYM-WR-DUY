@@ -26,8 +26,10 @@
 | `ExamLab/src/hooks/useThemenVorschlaege.ts` | Memo-Selector über fragenbankStore.summaries (dedupe + fach-filter) | Create |
 | `ExamLab/src/hooks/useThemenVorschlaege.test.ts` | Unit-Test für Selector | Create |
 | `packages/shared/src/editor/typen/HotspotEditor.tsx` | Keine Änderung (label schon vorhanden) | — |
-| `ExamLab/src/components/lp/frageneditor/DragDropBildEditor.tsx` | Zonennamen-Input pro Zielzone | Modify |
-| `ExamLab/src/components/lp/frageneditor/BildbeschriftungEditor.tsx` | Zonennamen-Input pro Beschriftung | Modify |
+| `packages/shared/src/editor/typen/DragDropBildEditor.tsx` | Zonennamen-Input pro Zielzone (echter Editor — `ExamLab/.../DragDropBildEditor.tsx` ist nur Re-Export-Stub) | Modify |
+| `packages/shared/src/editor/typen/BildbeschriftungEditor.tsx` | Zonennamen-Input pro Beschriftung (echter Editor, ExamLab-Variante ist Stub) | Modify |
+| `packages/shared/src/editor/types.ts` | `EditorServices`-Erweiterung: `ladeThemen?: (fachbereich: string) => string[]` | Modify |
+| `ExamLab/src/components/lp/frageneditor/PruefungFragenEditor.tsx` | `ladeThemen`-Service-Implementation via `useThemenVorschlaege`-Hook | Modify |
 | `ExamLab/src/components/lp/korrektur/KorrekturFrageVollansicht.tsx` | Zone-Header mit `label`-Fallback (DnD/Bildbeschriftung) | Modify |
 
 ---
@@ -91,16 +93,18 @@ git commit -m "Bundle 2 P1.1: Type-Erweiterung label?: string für DnD + Bildbes
 Suche `LOESUNGS_FELDER_` und finde den Block mit `feld: 'zielzonen'` und `feld: 'beschriftungen'`. Ersetze:
 
 ```javascript
-// vorher (irgendwo im Block):
+// vorher (Z. 2205-2206 aktuell, verifiziert per sed):
+{ feld: 'beschriftungen', subFelder: ['korrekt', 'erklaerung'] },
 { feld: 'zielzonen', subFelder: ['korrekteLabels', 'erklaerung'] },
-{ feld: 'beschriftungen', subFelder: ['korrekt', 'caseSensitive', 'erklaerung'] },
 
 // nachher:
+{ feld: 'beschriftungen', subFelder: ['korrekt', 'erklaerung', 'label'] },
 { feld: 'zielzonen', subFelder: ['korrekteLabels', 'erklaerung', 'label'] },
-{ feld: 'beschriftungen', subFelder: ['korrekt', 'caseSensitive', 'erklaerung', 'label'] },
 ```
 
-Hotspot-Stelle (`feld: 'bereiche'`) bleibt UNVERÄNDERT — Hotspot-`label` ist Aufgabenstellung, nicht Lösungs-Hint.
+Hotspot-Stelle (`feld: 'bereiche'`, Z. 2207) bleibt UNVERÄNDERT — Hotspot-`label` ist Aufgabenstellung, nicht Lösungs-Hint.
+
+**Hinweis:** Spec listete `'caseSensitive'` als zusätzliches Sub-Feld für `beschriftungen`. Audit-Verifikation zeigt: aktueller Code strippt `caseSensitive` nicht (war auch vor Bundle 2 schon nicht in der Liste) und es ist eine Bewertungsregel (case-sensitive matching), KEINE Lösungs-Information. Plan-Korrektur: `caseSensitive` NICHT in Strip-Liste ergänzen — nur `label`.
 
 - [ ] **Step 2: Test-Shim `testBundle2Privacy_` schreiben**
 
@@ -196,11 +200,11 @@ User bestätigt Deploy mit „Apps-Script deployed". Dann weiter zu Phase 2.
 ### Task 2.1: DragDropBildEditor — Zonennamen-Input
 
 **Files:**
-- Modify: `ExamLab/src/components/lp/frageneditor/DragDropBildEditor.tsx`
+- Modify: `packages/shared/src/editor/typen/DragDropBildEditor.tsx` (echte Editor-Datei; `ExamLab/.../DragDropBildEditor.tsx` ist 2-Zeilen-Re-Export-Stub und wird NICHT angefasst)
 
 - [ ] **Step 1: Datei lesen, Zone-Render-Stelle finden**
 
-Suche nach `zielzonen.map` oder `zielzone.id` oder Header-Render pro Zone. Identifiziere den Render-Block für eine einzelne Zone (üblicherweise eine Card/Panel mit Polygon-Editor + korrekteLabels-Chips).
+Suche nach `zielzonen.map` oder `zielzone.id` oder Header-Render pro Zone in `packages/shared/src/editor/typen/DragDropBildEditor.tsx`. Identifiziere den Render-Block für eine einzelne Zone (üblicherweise eine Card/Panel mit Polygon-Editor + korrekteLabels-Chips). Der Setter heißt typischerweise `setZielzonen(prev => prev.map(z => z.id === id ? {...z, label: ...} : z))`.
 
 - [ ] **Step 2: Zonennamen-Input ergänzen**
 
@@ -234,11 +238,11 @@ git commit -m "Bundle 2 P2.1: Zonennamen-Input in DragDropBildEditor"
 ### Task 2.2: BildbeschriftungEditor — Zonennamen-Input
 
 **Files:**
-- Modify: `ExamLab/src/components/lp/frageneditor/BildbeschriftungEditor.tsx`
+- Modify: `packages/shared/src/editor/typen/BildbeschriftungEditor.tsx` (echte Editor-Datei; ExamLab-Variante ist Stub)
 
 - [ ] **Step 1: Datei lesen, Zone-Render-Stelle finden**
 
-Suche nach `beschriftungen.map` oder `beschriftung.id` für den Per-Zone-Render-Block.
+Suche nach `beschriftungen.map` oder `beschriftung.id` in `packages/shared/src/editor/typen/BildbeschriftungEditor.tsx` für den Per-Zone-Render-Block. Existing Header zeigt vermutlich „Label N: …" — dieses ändern auf `label || \`Marker N\`` oder ergänzen mit Zonennamen-Input über dem korrekt-Chips-Block.
 
 - [ ] **Step 2: Zonennamen-Input ergänzen**
 
@@ -400,29 +404,35 @@ git add ExamLab/src/hooks/useThemenVorschlaege.ts ExamLab/src/hooks/useThemenVor
 git commit -m "Bundle 2 P3.1: useThemenVorschlaege Hook (TDD: 3 Tests)"
 ```
 
-### Task 3.2: MetadataSection — datalist-Anbindung
+### Task 3.2: EditorServices-Erweiterung + MetadataSection-datalist
+
+**Architektur-Entscheidung (rev2):** `fachbereich` ist interner State von SharedFragenEditor (Z. 172). Der Caller (PruefungFragenEditor) hat keinen Zugriff auf den aktuellen Fachbereich der editierten Frage — bei Fachwechsel im Editor würden vorgereichte fixe Vorschläge stale bleiben. Lösung: existing `EditorServices`-Pattern nutzen (siehe `services.ladeLernziele` als Vorlage). Service-Funktion `ladeThemen(fachbereich) => string[]` wird vom Caller injiziert, intern in SharedFragenEditor mit aktuellem `fachbereich`-State aufgerufen.
 
 **Files:**
-- Modify: `packages/shared/src/editor/sections/MetadataSection.tsx`
+- Modify: `packages/shared/src/editor/types.ts` (EditorServices-Interface erweitern)
+- Modify: `packages/shared/src/editor/sections/MetadataSection.tsx` (datalist)
+- Modify: `packages/shared/src/editor/SharedFragenEditor.tsx` (Service-Aufruf + Prop an MetadataSection)
+- Modify: `ExamLab/src/components/lp/frageneditor/PruefungFragenEditor.tsx` (Service-Implementation via Hook)
 
-- [ ] **Step 1: Datei lesen, Thema-Input-Stelle finden**
+- [ ] **Step 1: EditorServices erweitern**
 
-Suche nach `thema` und `<input` — im aktuellen MetadataSection wird das Thema vermutlich als plain `<input>` gerendert.
+In `packages/shared/src/editor/types.ts`, im `EditorServices`-Interface (Z. ~52-70):
 
-- [ ] **Step 2: datalist-Anbindung ergänzen**
+```ts
+export interface EditorServices {
+  // ... existing
+  ladeLernziele?: (gefaess: string, fachbereich: string) => Promise<Lernziel[]>
+  // NEU:
+  /** Liefert Themen-Vorschläge für Autocomplete im Frageneditor, fach-gefiltert. */
+  ladeThemen?: (fachbereich: string) => string[]
+}
+```
 
-WICHTIG: `MetadataSection.tsx` ist im `packages/shared/`-Verzeichnis, also browser-agnostic. `useThemenVorschlaege`-Hook liegt in `ExamLab/src/hooks/`. Es gibt zwei Möglichkeiten:
+- [ ] **Step 2: MetadataSection datalist-Anbindung**
 
-**Variante A** (Recommended): Themen-Vorschläge als Prop von außen reinreichen.
-- MetadataSection bekommt neue Prop `themenVorschlaege?: string[]`
-- Caller (SharedFragenEditor.tsx) ruft `useThemenVorschlaege(fachbereich)` auf und passt die Liste durch.
-
-**Variante B**: Hook-Pfad universell machen (komplexer, nicht in Scope).
-
-Implementierung Variante A in MetadataSection.tsx:
+`packages/shared/src/editor/sections/MetadataSection.tsx`: Props-Interface ergänzen + Thema-Input erweitern.
 
 ```tsx
-// Props-Interface ergänzen:
 interface Props {
   // ... existing props
   themenVorschlaege?: string[]
@@ -445,35 +455,86 @@ interface Props {
 )}
 ```
 
-`fachbereich` ist schon Prop in MetadataSection (Z. 22 + 69 aus Audit).
+`fachbereich` ist bereits Prop in MetadataSection.
 
-- [ ] **Step 3: SharedFragenEditor.tsx — Hook + Prop weitergeben**
+- [ ] **Step 3: SharedFragenEditor — Service-Aufruf mit aktuellem State**
 
-Suche `<MetadataSection ...` und ergänze Prop:
+In `packages/shared/src/editor/SharedFragenEditor.tsx`, irgendwo nach dem `fachbereich`-useState (Z. 172):
 
 ```tsx
-import { useThemenVorschlaege } from '../../../ExamLab/src/hooks/useThemenVorschlaege' // Pfad anpassen!
-// Oder wenn shared package keinen direct ExamLab-Import erlaubt: über Prop von außen
+// Themen-Vorschläge per Service holen — sieht aktuellen fachbereich-State
+const themenVorschlaege = services.ladeThemen?.(fachbereich) ?? []
 ```
 
-Cross-package-Import von `packages/shared/` → `ExamLab/src/` ist normalerweise NICHT erlaubt (shared darf nicht von ExamLab abhängen). Daher: Hook-Aufruf in `PruefungFragenEditor.tsx` (im ExamLab-Paket, Caller von SharedFragenEditor), und Prop bis zur MetadataSection durchreichen.
+(Kein `useMemo` nötig — der ExamLab-Hook intern memoized bereits).
 
-Konkret:
-1. `PruefungFragenEditor.tsx`: `const themenVorschlaege = useThemenVorschlaege(fachbereich)`
-2. `<SharedFragenEditor themenVorschlaege={themenVorschlaege} ... />`
-3. `SharedFragenEditor.tsx`: nimmt `themenVorschlaege` Prop, gibt es an MetadataSection weiter
-4. `MetadataSection.tsx`: rendert datalist (siehe oben)
+Bei `<MetadataSection ...>`-Aufruf Prop weitergeben:
 
-- [ ] **Step 4: tsc + alle Tests grün**
+```tsx
+<MetadataSection
+  // ... existing
+  themenVorschlaege={themenVorschlaege}
+/>
+```
+
+- [ ] **Step 4: PruefungFragenEditor — Service-Implementation**
+
+In `ExamLab/src/components/lp/frageneditor/PruefungFragenEditor.tsx`, im `services`-Objekt (analog zu `ladeLernziele`-Implementation Z. ~99-105):
+
+```tsx
+import { useThemenVorschlaege } from '../../../hooks/useThemenVorschlaege'
+
+// Im Component-Body:
+// Hook ruft sich für jeden fachbereich neu auf — wir wrappen in eine stable callable
+// (oder rufen direkt in services.ladeThemen mit dem fachbereich-Arg).
+// Pattern A (Recommended): direkter Aufruf via Closure
+const ladeThemen = useCallback((fachbereich: string) => {
+  // useThemenVorschlaege ist ein Hook und kann nicht in Callbacks aufgerufen werden.
+  // Lösung: Hook außerhalb aufrufen mit dynamischem fachbereich.
+  // Da wir dynamischen fachbereich brauchen, geht das nicht direkt.
+  // ...
+}, [])
+```
+
+WICHTIG: React-Hooks dürfen nur top-level aufgerufen werden, nicht in Callbacks. Daher folgender Pattern:
+
+```tsx
+// In PruefungFragenEditor:
+import { useFragenbankStore } from '../../../store/fragenbankStore'
+import { useMemo, useCallback } from 'react'
+
+// Im Component:
+const summaries = useFragenbankStore((s) => s.summaries)
+
+const ladeThemen = useCallback((fachbereich: string): string[] => {
+  if (!fachbereich) return []
+  const themen = new Set<string>()
+  for (const s of summaries) {
+    if (s.fachbereich === fachbereich && s.thema && s.thema.trim()) {
+      themen.add(s.thema.trim())
+    }
+  }
+  return Array.from(themen).sort((a, b) => a.localeCompare(b, 'de'))
+}, [summaries])
+
+const services = useMemo(() => ({
+  // ... existing services like ladeLernziele
+  ladeThemen,
+}), [/* existing deps */, ladeThemen])
+```
+
+**Hinweis Hook vs. Closure:** Der `useThemenVorschlaege`-Hook aus Task 3.1 ist gut für Test-Isolation, aber im PruefungFragenEditor brauchen wir die Funktion mit dynamischem `fachbereich`-Argument. Inline-Closure mit `useFragenbankStore` ist hier idiomatisch. Hook bleibt im Plan für eventuelle direkte UI-Verwendung an anderer Stelle (z.B. wenn LP-Filter-UI später Themen-Autocomplete braucht).
+
+- [ ] **Step 5: tsc + alle Tests grün**
 
 Run: `cd ExamLab && npx tsc -b && npx tsc -b ../packages/shared --force && npx vitest run`
 Expected: clean, alle Tests grün.
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 6: Commit**
 
 ```bash
-git add packages/shared/src/editor/sections/MetadataSection.tsx packages/shared/src/editor/SharedFragenEditor.tsx ExamLab/src/components/lp/frageneditor/PruefungFragenEditor.tsx
-git commit -m "Bundle 2 P3.2: Themen-Autocomplete via datalist + Prop-Drilling von PruefungFragenEditor"
+git add packages/shared/src/editor/types.ts packages/shared/src/editor/sections/MetadataSection.tsx packages/shared/src/editor/SharedFragenEditor.tsx ExamLab/src/components/lp/frageneditor/PruefungFragenEditor.tsx
+git commit -m "Bundle 2 P3.2: Themen-Autocomplete via EditorServices-ladeThemen + datalist"
 ```
 
 ---
@@ -487,11 +548,15 @@ git commit -m "Bundle 2 P3.2: Themen-Autocomplete via datalist + Prop-Drilling v
 
 - [ ] **Step 1: Banner-Prop + Auto-Hide-Effect ergänzen**
 
+**Import-Note:** LernzielWaehler hat aktuell nur `useState, useMemo`-Import. `useEffect` muss zum Import hinzugefügt werden (`import { useState, useMemo, useEffect } from 'react'`).
+
+**Prop-Pattern:** Banner wird vom Caller (SharedFragenEditor) als Counter `number | undefined` übergeben — jeder Counter-Increment triggert den Effect (neue Number-Referenz). Daher `zeigeResetHinweis?: number` (nicht boolean).
+
 ```tsx
 interface Props {
   // ... existing props
-  /** Wenn gesetzt: zeigt Reset-Hinweis-Banner, der nach 5s automatisch ausgeblendet wird. */
-  zeigeResetHinweis?: boolean
+  /** Counter-Increment triggert den Reset-Hinweis-Banner für 5s. undefined = kein Hinweis. */
+  zeigeResetHinweis?: number
 }
 
 export function LernzielWaehler({ zeigeResetHinweis, ...props }: Props) {
@@ -531,54 +596,79 @@ git add packages/shared/src/editor/components/LernzielWaehler.tsx
 git commit -m "Bundle 2 P4.1: LernzielWaehler Reset-Banner-Prop mit 5s Auto-Hide"
 ```
 
-### Task 4.2: SharedFragenEditor — setFachbereich-Wrapper + Lernziel-Reload
+### Task 4.2: SharedFragenEditor — setFachbereich-Wrapper + Lernziel-Reload-Fix
 
 **Files:**
-- Modify: `packages/shared/src/editor/SharedFragenEditor.tsx` (zwei Edit-Stellen)
+- Modify: `packages/shared/src/editor/SharedFragenEditor.tsx` (drei Edit-Stellen)
 
-- [ ] **Step 1: setFachbereich-Wrapper ergänzen**
+**Wichtig (rev2):** Der existing useEffect für Lernziele-Load (Z. 615-625) hat einen Early-Return-Guard `if (!services.ladeLernziele || lernziele.length > 0) return`. Wenn nur `[fachbereich]` als deps ergänzt wird, läuft der Effect zwar erneut bei Fachwechsel — aber `lernziele.length > 0` ist immer noch true (alte Liste vom alten Fach) → Early-Return → keine Neuladung. Daher muss der setFachbereich-Wrapper ZUSÄTZLICH `setLernziele([])` triggern, damit der nachfolgende Effect die Liste neu lädt.
+
+- [ ] **Step 1: setFachbereich-Wrapper ergänzen (drei Setter-Calls)**
 
 Aktuell: `const [fachbereich, setFachbereich] = useState<Fachbereich>(...)` (Z. ~172).
 
-Ändere zu (oder ergänze einen Wrapper):
+Ändere zu:
 
 ```tsx
-const [fachbereich, setFachbereichRaw] = useState<Fachbereich>(...)
+const [fachbereich, setFachbereichRaw] = useState<Fachbereich>(
+  frage?.fachbereich ?? defaultFachbereich(config.benutzer.fachschaft) as Fachbereich
+)
 const [resetBanner, setResetBanner] = useState<number>(0) // counter, jeder Increment triggert Banner-Reset
 
 const setFachbereich = useCallback((neu: Fachbereich) => {
   setFachbereichRaw((prev) => {
     if (prev !== neu) {
-      // Fachwechsel: Lernziele resetten + Banner triggern
-      setLernzielIds([])
-      setResetBanner((c) => c + 1)
+      // Fachwechsel: drei Resets nötig
+      setLernzielIds([])           // (a) Aktuelle Lernziel-Auswahl der Frage leeren
+      setLernziele([])             // (b) Lernziel-LISTE leeren — sonst greift Early-Return im useEffect
+      setResetBanner((c) => c + 1) // (c) Banner-Counter triggern
     }
     return neu
   })
-}, []) // setLernzielIds + setResetBanner sind setState-stable
+}, [])
 ```
 
-`setLernzielIds` muss existieren — falls aktuell anders heißt, anpassen. Aus Spec: `frage.lernzielIds`. Der State-Setter ist vermutlich `setLernzielIds` oder ähnliches; kurz im File suchen.
+Setter-Stabilität: `setLernzielIds`, `setLernziele`, `setResetBanner` sind alle React-`useState`-Setter — referenz-stabil, müssen nicht in deps.
+
+`setLernzielIds` und `setLernziele` müssen existieren — kurz im File suchen + verifizieren der Namen.
 
 - [ ] **Step 2: Lernziel-Load-Effect Fachbereich-Dep ergänzen**
 
-Suche den `useEffect` mit `apiLadeLernziele`-Aufruf (Z. ~619 laut Reviewer-Audit). Aktuell vermutlich:
+Suche den `useEffect` mit `services.ladeLernziele`-Aufruf (Z. ~615-625 verifiziert per sed).
 
+Aktuell:
 ```tsx
 useEffect(() => {
-  // ladeLernziele(fachbereich) ...
-}, []) // empty deps — läuft nur einmal
+  if (!services.ladeLernziele || lernziele.length > 0) return
+  let abgebrochen = false
+  setLernzieleLadend(true)
+  services.ladeLernziele(config.benutzer?.email ?? '', fachbereich)
+    .then(lz => { if (!abgebrochen && lz) setLernziele(lz) })
+    .catch(e => console.warn('[SharedFragenEditor] Lernziele laden fehlgeschlagen:', e))
+    .finally(() => { if (!abgebrochen) setLernzieleLadend(false) })
+  return () => { abgebrochen = true }
+// eslint-disable-next-line react-hooks/exhaustive-deps
+}, []) // Nur einmal beim Mount laden
 ```
 
-Ändere zu:
+Ändere `deps`-Array von `[]` auf `[fachbereich]`:
 
 ```tsx
-useEffect(() => {
-  // ladeLernziele(fachbereich) ...
-}, [fachbereich]) // re-läuft bei Fachwechsel → frische Lernziel-Liste
+// eslint-disable-next-line react-hooks/exhaustive-deps
+}, [fachbereich]) // Bei Mount UND bei Fachwechsel laden (lernziele wird vorher in setFachbereich-Wrapper geleert)
 ```
 
-Falls der Effect `fachbereich` aus closure liest aber das nicht in deps hat — eslint/tsc warnt vermutlich. Den Fix konservativ: nur `fachbereich` ergänzen, andere Closures bleiben.
+eslint-disable-Comment beibehalten (mehrere Closures ungetracked, das ist OK weil setter-stable).
+
+**Funktions-Verifikation der Reset-Kette bei Fachwechsel:**
+1. User wechselt Fach → `setFachbereich(neu)` aufgerufen
+2. Wrapper: `setLernziele([])` → State-Update queued
+3. Wrapper: `setLernzielIds([])` → State-Update queued
+4. Wrapper: `setFachbereichRaw(neu)` → State-Update queued
+5. React re-rendert mit neuem fachbereich-State + lernziele=[]
+6. useEffect sieht neuen `fachbereich` in deps → läuft erneut
+7. Guard: `lernziele.length > 0` = false → Early-Return übersprungen
+8. `services.ladeLernziele(email, neu)` läuft → setzt `setLernziele(lz)` für neuen Fachbereich
 
 - [ ] **Step 3: LernzielWaehler-Aufruf — Banner-Prop weitergeben**
 
@@ -591,20 +681,18 @@ Suche `<LernzielWaehler` im File und ergänze:
 />
 ```
 
-Der Counter-Pattern via `resetBanner > 0 ? resetBanner : undefined` triggert den `useEffect` im LernzielWaehler bei jedem Increment, weil sich der Wert ändert.
-
-Alternative: `key={resetBanner}` Trick — würde LernzielWaehler remounten. Aber das verliert internal state (Lade-State, etc.) → besser über Prop.
+Der Counter-Pattern via `resetBanner > 0 ? resetBanner : undefined` triggert den `useEffect` im LernzielWaehler bei jedem Increment (neue Number-Referenz).
 
 - [ ] **Step 4: tsc + Tests grün**
 
 Run: `cd ExamLab && npx tsc -b && npx tsc -b ../packages/shared --force && npx vitest run`
-Expected: clean. Bestehende Tests sollten grün bleiben (Wrapper ist transparent).
+Expected: clean. Bestehende Tests sollten grün bleiben (Wrapper ist transparent für Initial-Render-Pfad).
 
 - [ ] **Step 5: Commit**
 
 ```bash
 git add packages/shared/src/editor/SharedFragenEditor.tsx
-git commit -m "Bundle 2 P4.2: setFachbereich-Wrapper für Lernziel-Reset + useEffect-dep"
+git commit -m "Bundle 2 P4.2: setFachbereich-Wrapper für Lernziel-Reset + useEffect-dep + lernziele-Liste-Clear"
 ```
 
 ---
