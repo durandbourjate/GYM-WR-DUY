@@ -11,6 +11,7 @@ import { pruefeAntwort } from '../../utils/ueben/korrektur'
 import { normalisiereDragDropBild } from '../../utils/ueben/fragetypNormalizer'
 import { ladeLoesungenApi } from '../../services/uebenLoesungsApi'
 import type { LoesungsMap, LoesungsSlice } from '../../types/ueben/loesung'
+import type { PruefResultat } from '../../types/ueben/pruefResultat'
 import { normalizeAntwort } from '../../utils/normalizeAntwort'
 import { useUebenFortschrittStore } from './fortschrittStore'
 
@@ -411,15 +412,32 @@ export const useUebenUebungsStore = create<UebungsState>((set, get) => ({
       const token = user?.sessionToken || ''
 
       const { pruefeAntwortApi } = await import('../../services/uebenKorrekturApi')
-      const res = await pruefeAntwortApi({
+      const callApi = (tok: string): Promise<PruefResultat> => pruefeAntwortApi({
         gruppeId: session.gruppeId,
         frageId,
         antwort: normalized,
         email: session.email,
-        token,
+        token: tok,
         // fachbereich-Hint: spart Server ~75% Sheet-Reads (1 Tab statt 4)
         fachbereich: frage.fachbereich,
       })
+
+      // Bug 8b: bei Auth-Fehler einmaliger Auto-Retry mit
+      // sessionWiederherstellen. Token im Memory kann nach langer
+      // Tab-Inaktivität stale sein (Backend-Cache-TTL oder Session-Lock).
+      // sessionWiederherstellen lädt aus localStorage + revalidiert gegen
+      // Backend, dann wird der frische Token für den Retry verwendet.
+      let res: PruefResultat
+      try {
+        res = await callApi(token)
+      } catch (authErr) {
+        const authMsg = authErr instanceof Error ? authErr.message : ''
+        if (authMsg !== 'Nicht authentifiziert') throw authErr
+        await useUebenAuthStore.getState().sessionWiederherstellen()
+        const refreshed = useUebenAuthStore.getState().user?.sessionToken
+        if (!refreshed) throw new Error('Sitzung abgelaufen — bitte neu anmelden')
+        res = await callApi(refreshed)
+      }
 
       // Auto-korrigierbare Fragen: `res.korrekt` ist boolean.
       // Selbstbewertungs-Typen: `res.selbstbewertung` ist true, korrekt bleibt undefined
