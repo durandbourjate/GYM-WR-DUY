@@ -64,6 +64,8 @@ interface MetadataSectionProps {
   lernzieleLadend?: boolean
   /** Themen-Vorschläge für Autocomplete (datalist) — fach-gefiltert vom Caller */
   themenVorschlaege?: string[]
+  /** Counter-Increment triggert den Reset-Hinweis-Banner im LernzielWaehler für 5s. undefined = kein Hinweis. */
+  zeigeLernzielResetHinweis?: number
 }
 
 export default function MetadataSection({
@@ -90,6 +92,7 @@ export default function MetadataSection({
   lernzielIds = [], setLernzielIds,
   onNeuLernzielErstellen, lernzieleLadend,
   themenVorschlaege,
+  zeigeLernzielResetHinweis,
 }: MetadataSectionProps) {
   const [statsOffen, setStatsOffen] = useState(false)
   const config = useEditorConfig()
@@ -294,6 +297,7 @@ export default function MetadataSection({
           onNeuErstellen={onNeuLernzielErstellen}
           aktuellerFachbereich={fachbereich}
           ladend={lernzieleLadend}
+          zeigeResetHinweis={zeigeLernzielResetHinweis && zeigeLernzielResetHinweis > 0 ? zeigeLernzielResetHinweis : undefined}
         />
       )}
 
