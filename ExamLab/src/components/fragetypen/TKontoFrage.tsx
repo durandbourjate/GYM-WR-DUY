@@ -168,10 +168,6 @@ function TKontoAufgabe({ frage }: { frage: TKontoFrageType }) {
     }
   }
 
-  function antwortPruefen() {
-    onAntwort(zuAntwort(konten))
-  }
-
   function deepCopy(): KontoEingabe[] {
     return konten.map((k) => ({
       ...k,
@@ -550,17 +546,6 @@ function TKontoAufgabe({ frage }: { frage: TKontoFrageType }) {
           )
         })}
       </div>
-
-      {/* Prüfen-Button (nur Üben-Modus, wenn noch nicht beantwortet) */}
-      {speichereZwischenstand && !disabled && (
-        <button
-          type="button"
-          onClick={antwortPruefen}
-          className="min-h-[48px] self-end px-6 py-2.5 rounded-xl bg-slate-800 text-white dark:bg-slate-200 dark:text-slate-800 font-medium text-sm hover:bg-slate-900 dark:hover:bg-slate-100 transition-colors mt-4"
-        >
-          Antwort prüfen
-        </button>
-      )}
 
       {/* Feedback (Üben-Modus) */}
       {feedbackSichtbar && korrekt !== null && (
