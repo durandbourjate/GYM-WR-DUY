@@ -23,7 +23,11 @@ Drei unabhängige UI-Features, gemeinsam als Bundle 2 implementiert (additiv, ke
 **Trigger:** Wenn `fachbereich` im Frageneditor wechselt, dann:
 - `frage.lernzielIds = []` (Reset, weil alte Auswahl invalid für neues Fach)
 - Lernziel-Dropdown lädt frisch via `apiLadeLernziele(email, neuerFachbereich)`
-- Reset-Banner („Lernziele wurden bei Fachwechsel zurückgesetzt") in LernzielWaehler für 5s sichtbar
+- Reset-Banner („Lernziele wurden bei Fachwechsel zurückgesetzt") in LernzielWaehler für 5s sichtbar (Auto-Hide-Timer, nicht dismissible — Hint, nicht Action)
+
+**Implementation-Stellen (zwei Edits in SharedFragenEditor):**
+- Z. 172 `setFachbereich`-State-Setter wrappen: bei Fachwechsel `setLernzielIds([])` triggern + Banner-Flag setzen
+- Z. ~619 (`useEffect` für Lernziele-Load mit `[]`-deps): Fachbereich als Dep ergänzen oder separaten Effect, sodass Lernziele bei Wechsel neu geladen werden
 
 **Begründung Reset (vs. Behalten):** Lernziele sind in `apiLadeLernziele` über `fachbereich`-Parameter geladen, also fach-spezifisch. Eine Lernziel-ID aus VWL macht in BWL keinen Sinn (würde nicht im Dropdown auftauchen, aber im Storage referenzieren). Reset ist der einzig konsistente State.
 
@@ -87,6 +91,8 @@ Drei unabhängige UI-Features, gemeinsam als Bundle 2 implementiert (additiv, ke
 ```
 
 Hotspot-Stelle (`{ feld: 'bereiche', subFelder: ['korrekt', 'erklaerung'] }`) bleibt unverändert.
+
+**Call-Graph-Hinweis:** Die Erweiterung von `LOESUNGS_FELDER_` wirkt automatisch in `bereinigeFrageFuerSuSUeben_`, weil dieses `bereinigeFrageFuerSuS_` aufruft (S135-Memory-Lehre: indirekte Abhängigkeiten via Call-Graph). SuS-Üben-Modus wird also auch für DnD/Bildbeschriftung das `label` korrekt strippen.
 
 **Apps-Script-Deploy:** nötig (1 neue Bereitstellung).
 
