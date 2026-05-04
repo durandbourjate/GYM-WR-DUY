@@ -611,6 +611,9 @@ export default function SharedFragenEditor({
   const [gewaehlterLernzielId, setGewaehlterLernzielId] = useState('')
   const [lernzielIds, setLernzielIds] = useState<string[]>(frage?.lernzielIds ?? [])
 
+  // Themen-Vorschläge per Service holen — sieht aktuellen fachbereich-State
+  const themenVorschlaege = services.ladeThemen?.(fachbereich) ?? []
+
   // Auto-Load: Lernziele beim Editor-Öffnen laden
   useEffect(() => {
     if (!services.ladeLernziele || lernziele.length > 0) return
@@ -962,6 +965,7 @@ export default function SharedFragenEditor({
             lernzielIds={lernzielIds} setLernzielIds={setLernzielIds}
             onNeuLernzielErstellen={services.speichereLernziel ? handleNeuLernzielErstellen : undefined}
             lernzieleLadend={lernzieleLadend}
+            themenVorschlaege={themenVorschlaege}
           />
 
           {/* Fragetyp wählen — kategorisiert */}
