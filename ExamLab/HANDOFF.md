@@ -8,6 +8,25 @@
 
 ## Letzter Stand auf main
 
+### Fragetyp- und Suche-Bugs ✅ MERGED (04.05.2026)
+
+5 Bugfixes aus User-Bug-Report-Bundle. Atomare Commits pro Bug auf `fix/fragetyp-und-suche-bugs`, dann gemerged auf `main`. Apps-Script-Backend unverändert.
+
+1. **Bug 9 — Buchungssatz `toFixed`-Crash** (`01f620e`): `z.korrekt.betrag.toFixed(2)` in `BuchungssatzFrage:354` ungeschützt; ebenso `konto.saldo.betrag.toFixed(2)` (TKontoFrage:731) und `status.betrag.toFixed(2)` (TKontoFrage `EintragBadge`, 3 Stellen). Defensive Guards `Number(... ?? 0).toFixed(2)`. Erwarteter-Saldo-Block in T-Konto rendert nun conditional (`{konto.saldo && (...)}`).
+2. **Bug 4 — Globale Suche öffnet Frage nicht** (`27d1c93` + `2054ee5`): Zwei zusammenwirkende Probleme. (a) `FragenBrowser` useEffect deps `[ladeStatus]` mit eslint-disable „Nur beim ersten Laden" — bei URL-Wechsel nach Mount kein Re-Trigger. Fix: deps auf `[ladeStatus, initialEditFrageId]` + Idempotenz-Guard. (b) Globale Suche navigiert auf `?frage=<id>` (Query-Param), `LPStartseite` las nur Path-Param via `useParams` → `urlFrageId` immer undefined. Fix: `useSearchParams` ergänzt, `queryFrageId` in Fallback-Kette.
+3. **Bug 7 — Doppelter „Antwort prüfen"-Button** (`e4c3c40`): TKonto, Buchungssatz, Kontenbestimmung hatten lokale Buttons, die `onAntwort()` aufriefen. Im Üben-Modus mappt `useFrageAdapter.onAntwort` aber auf `uebenSpeichereZwischenstandById` — der lokale Button war funktionaler NoOp (Zwischenstand wird ohnehin bei jeder Eingabe-Änderung über `aktualisiere()` geschrieben). Lokale Buttons + tote `antwortPruefen()`-Funktionen entfernt.
+4. **Bug 8a — Konto-Dropdown verdeckt + zu schmal** (`6baf9fc` + `2054ee5`): `overflow-hidden` auf Tabellen-Containern (KontenbestimmungFrage:105, TKontoFrage:253) clippte das `KontenSelect`-Voll-Autocomplete-Dropdown. Buchungssatz war nicht betroffen (keine custom-Dropdowns). overflow-hidden entfernt; Dropdown `<ul>` zusätzlich `min-w-[320px]` damit Konto-Code + Name + Kategorie-Badge in schmalen Tabellen-Spalten lesbar.
+5. **Bug 8b — „Nicht authentifiziert" nach langem Tab** (`c0cce0a`): Backend-Apps-Script lehnt FiBu-Antwort-Prüf-Request ab (`Z. 8849: lernplattformValidiereToken_`). Reload heilt es → state-Bug (Token im uebenAuthStore-Memory wird nach langer Inaktivität stale). Root-Cause-Hypothese: Backend-Cache-TTL oder Session-Lock durch parallelen Login. Pragmatischer Fix in `pruefeAntwortJetzt`: bei Auth-Fehler einmaliger Auto-Retry mit `sessionWiederherstellen` (lädt Token aus localStorage + revalidiert). Falls Refresh kein Token liefert → klarer Hinweis „Sitzung abgelaufen — bitte neu anmelden". Defensive Fix; Root-Cause nicht final geklärt.
+
+**Verifikation:** tsc -b clean, 1132/1132 vitest (5 neue Tests: 1× BuchungssatzFrage, 2× TKontoFrage, 2× uebungsStorePruefen), build clean, `lint:as-any` 0/0/0. Browser-E2E auf staging mit echten Logins — Bugs 4/7/8a/9 user-bestätigt nach 1× Hotfix-Round (Bug 4 + 8a-Verfeinerung). Bug 8b nicht direkt reproduzierbar, defensiver Auto-Retry-Pfad ohne Side-Effects.
+
+**Lehren (für `code-quality.md`):**
+- `useEffect` mit `eslint-disable-next-line react-hooks/exhaustive-deps`-Comment „Nur beim ersten Laden" ist ein **Code-Smell**: bei jedem Prop-Wechsel-Trigger-Bug. Wenn das Verhalten wirklich „nur Mount" ist, gehört es in einen Mount-Only-Pattern (`useRef`-Guard) statt deps-truncate. S129-Pattern ähnlich.
+- URL-Routing-Lücken: `useParams` liest Path-Params, `useSearchParams` Query-Params. Bei Suche/Deep-Link-Mechanismen prüfen, OB die navigierende Seite ALLE benötigten URL-Bestandteile liest. Hier: globale Suche navigierte auf `?frage=<id>`, Empfänger las nur `:frageId/`-Path.
+- Lokale „Aktion"-Buttons in Frage-Komponenten, die `onAntwort()` aufrufen, sind im Üben-Modus NoOps (siehe `useFrageAdapter.onAntwort`-Mapping auf `uebenSpeichereZwischenstandById`). Im Doubt: QuizNavigation-Footer ist der einzige Antwort-prüfen-Pfad in Üben.
+
+---
+
 ### Post-Bundle-L Spawn-Task-Cleanups ✅ MERGED (01.05.2026)
 
 Beide Spawn-Tasks aus Bundle L.c (Lehre 2 — `as any` versteckt Mapping-Drift) abgearbeitet:
