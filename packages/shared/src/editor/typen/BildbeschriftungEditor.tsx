@@ -187,7 +187,7 @@ export default function BildbeschriftungEditor({ bildUrl, setBildUrl, beschriftu
                     <span className="flex-shrink-0 w-7 h-7 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs font-bold text-slate-600 dark:text-slate-300">
                       {i + 1}
                     </span>
-                    <div className="flex-1 space-y-2" data-testid={`marker-${b.id}-antworten`}>
+                    <div className="flex-1 space-y-2">
                       <input
                         type="text"
                         value={b.label ?? ''}
@@ -196,18 +196,20 @@ export default function BildbeschriftungEditor({ bildUrl, setBildUrl, beschriftu
                         data-testid={`marker-${b.id}-label-input`}
                         className="w-full text-sm px-2 py-1 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:border-indigo-500 focus:outline-none"
                       />
-                      <label className="text-xs text-slate-500 dark:text-slate-400 block mb-0.5">
-                        Akzeptierte Antworten (kommagetrennt)
-                      </label>
-                      <input
-                        type="text"
-                        value={b.korrekt.join(', ')}
-                        onChange={(e) => handleKorrektAendern(b.id, e.target.value)}
-                        autoFocus={editId === b.id}
-                        onFocus={() => setEditId(null)}
-                        className={inputCls}
-                        placeholder="Antwort 1, Antwort 2, ..."
-                      />
+                      <div data-testid={`marker-${b.id}-antworten`}>
+                        <label className="text-xs text-slate-500 dark:text-slate-400 block mb-0.5">
+                          Akzeptierte Antworten (kommagetrennt)
+                        </label>
+                        <input
+                          type="text"
+                          value={b.korrekt.join(', ')}
+                          onChange={(e) => handleKorrektAendern(b.id, e.target.value)}
+                          autoFocus={editId === b.id}
+                          onFocus={() => setEditId(null)}
+                          className={inputCls}
+                          placeholder="Antwort 1, Antwort 2, ..."
+                        />
+                      </div>
                     </div>
                     <button
                       onClick={(e) => { e.stopPropagation(); handleEntfernen(b.id) }}
